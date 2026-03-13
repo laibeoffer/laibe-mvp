@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-Hant"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>萊比 LaiBE - 註冊與治理引導</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#64748b",
+                        "primary-dark": "#475569",
+                        "completed": "#a8a29e",
+                        "future": "#e2e8f0",
+                        "pcm-green": "#8fa394",
+                        "morandi-blue": "#778899",
+                        "morandi-green": "#81C0C0",
+                        "morandi-lavender": "#A6A6D2",
+                        "morandi-purple": "#8080C0",
+                        "morandi-red": "#AD5A5A",
+                        "morandi-yellow": "#A5A552",
+                        "morandi-cyan": "#5CADAD",
+                        "morandi-magenta": "#AE57A4",
+                        "slate-blue-dark": "#475569",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        "display": ["Noto Sans TC", "sans-serif"],
+                        "body": ["Noto Sans TC", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .hero-icon-shadow {
+            box-shadow: 0 20px 40px -10px rgba(119, 136, 153, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-sm px-6 py-4">
+<div class="mx-auto flex max-w-[1280px] items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-morandi-purple text-white">
+<span class="material-symbols-outlined text-[20px]">architecture</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">萊比 LaiBE <span class="text-sm font-normal text-slate-500 ml-2">發案流程起點</span></h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-morandi-blue dark:hover:text-morandi-blue transition-colors">
+                幫助中心
+            </button>
+</div>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center pb-20">
+<div class="w-full bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800 pt-8 pb-12 relative overflow-visible">
+<div class="mx-auto max-w-[1024px] px-6 relative">
+<div class="relative flex w-full items-start justify-between z-10">
+<div class="absolute left-0 top-[15px] h-[2px] w-full bg-slate-200 dark:bg-slate-700 z-0"></div>
+<div class="relative z-10 flex flex-col items-center gap-2 group cursor-default">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-completed text-white ring-4 ring-white dark:ring-surface-dark transition-all">
+<span class="material-symbols-outlined text-[18px] font-bold">check</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-sm font-bold text-completed">需求及預算確認</span>
+<span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">已完成</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 group cursor-default">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-morandi-purple text-white ring-4 ring-morandi-purple/20 transition-all shadow-md shadow-morandi-purple/30 relative">
+<span class="text-sm font-bold">2</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-sm font-bold text-morandi-purple">註冊 / 登入</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">當前階段</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 group cursor-default">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 ring-4 ring-white dark:ring-surface-dark border border-slate-300 dark:border-slate-600">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+</div>
+<div class="flex flex-col items-center opacity-60">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">上架費繳納</span>
+<span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">合約啟動</span>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2 group cursor-default">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400 ring-4 ring-white dark:ring-surface-dark border border-slate-300 dark:border-slate-600">
+<span class="material-symbols-outlined text-[16px]">lock</span>
+</div>
+<div class="flex flex-col items-center opacity-60">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">發布案件</span>
+<span class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">案件上線</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full flex flex-col items-center justify-center pt-16 pb-12 px-6">
+<div class="relative mb-8 group">
+<div class="w-[130px] h-[130px] rounded-full bg-morandi-blue flex items-center justify-center hero-icon-shadow relative z-10 transition-transform duration-300 group-hover:scale-105">
+<span class="material-symbols-outlined text-white text-[64px]">person_add</span>
+</div>
+<div class="absolute inset-0 rounded-full bg-morandi-blue/20 blur-xl transform scale-110 z-0"></div>
+</div>
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">註冊 / 登入</h2>
+<p class="text-slate-500 dark:text-slate-400 mb-10 text-lg font-light tracking-wide">開始發案前，請完成帳戶驗證</p>
+<button class="px-12 py-4 rounded-full bg-slate-blue-dark hover:bg-slate-700 text-white text-lg font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 w-full max-w-xs">
+            立即註冊 / 登入
+        </button>
+<div class="mt-6">
+<a class="text-sm text-slate-500 hover:text-morandi-blue dark:text-slate-400 dark:hover:text-morandi-blue transition-colors underline-offset-4 hover:underline" href="#">
+                已有帳號？直接登入
+            </a>
+</div>
+</div>
+<div class="w-full max-w-[800px] px-6 py-8">
+<div class="border-t border-slate-200 dark:border-slate-800 pt-10">
+<div class="rounded-xl bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-800 p-6 opacity-90 hover:opacity-100 transition-opacity">
+<div class="flex items-center gap-3 mb-6">
+<div class="p-2 bg-morandi-green/10 rounded-lg">
+<span class="material-symbols-outlined text-morandi-green text-[20px]">shield_person</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-700 dark:text-slate-200">PCM 專業工程管理審查</h3>
+<p class="text-xs text-slate-400 dark:text-slate-500">第三方治理機制，確保專案執行品質</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="space-y-2">
+<h4 class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-morandi-green"></span>
+                            文件審查
+                        </h4>
+<div class="flex flex-wrap gap-1.5 pl-2.5 border-l border-slate-100 dark:border-slate-700">
+<span class="text-[10px] text-slate-500 dark:text-slate-400">發包合理性</span>
+<span class="text-[10px] text-slate-300 dark:text-slate-600">/</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">預算檢核</span>
+<span class="text-[10px] text-slate-300 dark:text-slate-600">/</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">條款風險</span>
+</div>
+</div>
+<div class="space-y-2">
+<h4 class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-morandi-green"></span>
+                            撥款審查
+                        </h4>
+<div class="flex flex-wrap gap-1.5 pl-2.5 border-l border-slate-100 dark:border-slate-700">
+<span class="text-[10px] text-slate-500 dark:text-slate-400">進度確認</span>
+<span class="text-[10px] text-slate-300 dark:text-slate-600">/</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">驗收審核</span>
+<span class="text-[10px] text-slate-300 dark:text-slate-600">/</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">簽核</span>
+</div>
+</div>
+<div class="space-y-2">
+<h4 class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                            風險控制
+                        </h4>
+<div class="flex flex-wrap gap-1.5 pl-2.5 border-l border-slate-100 dark:border-slate-700">
+<span class="text-[10px] text-slate-500 dark:text-slate-400">預警</span>
+<span class="text-[10px] text-slate-300 dark:text-slate-600">/</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">超預算警示</span>
+<span class="text-[10px] text-slate-300 dark:text-slate-600">/</span>
+<span class="text-[10px] text-slate-500 dark:text-slate-400">二次確認</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 flex justify-center">
+<div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-full border border-slate-100 dark:border-slate-700">
+<span class="material-symbols-outlined text-morandi-blue text-[18px]">info</span>
+<span class="text-xs text-slate-500 dark:text-slate-400">需要協助？您可以先瀏覽 <a class="text-morandi-blue hover:underline" href="#">成功案例庫</a> 或聯繫客服</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-surface-dark py-6 mt-auto">
+<div class="mx-auto max-w-[1280px] px-6 text-center text-sm text-slate-500 dark:text-slate-400">
+        © 2024 萊比 LaiBE. All rights reserved. 隱私權政策 | 服務條款
+    </div>
+</footer>
+
+</body></html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-Hant"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>標案發布成功 - LaiBE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec5b",
+                        "primary-dark": "#0fb847", // Darker shade for hover
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102216",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2c20",
+                        "text-main-light": "#111813",
+                        "text-main-dark": "#e0e6e2",
+                        "text-secondary-light": "#61896f",
+                        "text-secondary-dark": "#8fa898",
+                        "border-light": "#dbe6df",
+                        "border-dark": "#2a4032",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans TC", "sans-serif"],
+                        "body": ["Inter", "Noto Sans TC", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 1,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-text-main-light dark:text-text-main-dark transition-colors duration-200">
+<!-- Top Navigation -->
+<header class="sticky top-0 z-50 w-full bg-surface-light dark:bg-surface-dark border-b border-border-light dark:border-border-dark px-6 py-4 transition-colors duration-200">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="text-primary size-8 flex items-center justify-center">
+<span class="material-symbols-outlined !text-[32px]">dataset</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">LaiBE</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">首頁</a>
+<a class="text-sm font-medium text-primary hover:text-primary-dark transition-colors relative after:content-[''] after:absolute after:-bottom-5 after:left-0 after:w-full after:h-0.5 after:bg-primary" href="#">專案管理</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">供應商資料庫</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">訊息中心</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-surface-light dark:border-surface-dark"></span>
+</button>
+<div class="size-9 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden cursor-pointer border border-border-light dark:border-border-dark" data-alt="User profile avatar showing a smiling professional man" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC20p2yi38EoVRXnR2ZYLHFMcOLc4Dt9UPwaatpngxv7_48hFZVQa84tgmHm3OhsbKkao1t-p8dJpibEI0CKrk6WSz5atEpyzm07FBvq3-mrAc4Y7_jIIeIyf8Na2XhVCKykw-6y0VNZsamRn6VFH-3w6fa7ObEEXmbv4-PFmlnU-X7S2FzkNdzd2EktlCwAjAXjE605EjihKjDPRjDe_1aA6umV8-KnJpufsHvTbhNozgdZX7YFmrEQtFcYFKFxyzYPtnNv4UYOms'); background-size: cover; background-position: center;">
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center p-6 md:py-12">
+<div class="w-full max-w-2xl animate-fade-in-up">
+<!-- Success Status Header -->
+<div class="flex flex-col items-center text-center mb-10">
+<div class="size-20 bg-primary/20 dark:bg-primary/10 rounded-full flex items-center justify-center mb-6 ring-8 ring-primary/5 dark:ring-primary/5">
+<span class="material-symbols-outlined text-primary !text-[48px]">check_circle</span>
+</div>
+<h2 class="text-2xl md:text-3xl font-bold mb-3">標案已成功上架</h2>
+<p class="text-text-secondary-light dark:text-text-secondary-dark max-w-md leading-relaxed">
+                    您的案件已發布至平台，系統已自動通知符合資格的供應商，請耐心等候回應。
+                </p>
+</div>
+<!-- Summary Card -->
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden mb-8 transition-colors duration-200">
+<div class="px-6 py-4 border-b border-border-light dark:border-border-dark bg-gray-50/50 dark:bg-gray-800/30 flex justify-between items-center">
+<span class="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">案件摘要</span>
+<span class="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">發布中</span>
+</div>
+<div class="p-6 grid gap-6">
+<!-- Row 1 -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined !text-[16px]">tag</span> 標案編號
+                            </span>
+<span class="text-base font-medium">LB-2023-0082</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined !text-[16px]">category</span> 案件類型
+                            </span>
+<span class="text-base font-medium">軟體開發 / 系統整合</span>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px bg-border-light dark:bg-border-dark w-full"></div>
+<!-- Row 2 -->
+<div class="grid grid-cols-1 gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined !text-[16px]">verified_user</span> 乙方資格要求
+                            </span>
+<span class="text-base font-medium">資本額 500 萬以上 / 具備 ISO 27001 認證 / 需有政府標案經驗</span>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px bg-border-light dark:bg-border-dark w-full"></div>
+<!-- Row 3 -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined !text-[16px]">schedule</span> 截止日期
+                            </span>
+<span class="text-base font-medium text-red-600 dark:text-red-400">2023/12/31 18:00</span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined !text-[16px]">attach_money</span> 預算範圍
+                            </span>
+<span class="text-base font-medium">NT$ 2,000,000 - 3,500,000</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col items-center gap-4">
+<div class="flex flex-col sm:flex-row w-full justify-center gap-4">
+<button class="group flex-1 max-w-[240px] h-12 flex items-center justify-center gap-2 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm">
+<span class="material-symbols-outlined text-text-main-light dark:text-text-main-dark !text-[20px] group-hover:scale-110 transition-transform">visibility</span>
+<span class="font-bold text-sm">查看競標回應</span>
+</button>
+<button class="group flex-1 max-w-[240px] h-12 flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-black rounded-lg transition-all shadow-md shadow-primary/20 hover:shadow-primary/40">
+<span class="material-symbols-outlined !text-[20px] group-hover:scale-110 transition-transform">settings</span>
+<span class="font-bold text-sm">管理案件</span>
+</button>
+</div>
+<a class="mt-4 flex items-center gap-1 text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined !text-[18px]">info</span>
+<span>了解 PCM 治理流程</span>
+<span class="material-symbols-outlined !text-[16px] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">arrow_forward</span>
+</a>
+</div>
+</div>
+</main>
+<!-- Optional Footer for context -->
+<footer class="mt-auto py-6 text-center border-t border-border-light dark:border-border-dark">
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+            © 2023 LaiBE Inc. All rights reserved. 
+        </p>
+</footer>
+</body></html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LaiBE - 官方首頁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "terracotta-red": "#984B4B",
+                        "warm-beige": "#F9F8F6",
+                        "charcoal": "#333333",
+                        "background": "#F9F8F6",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans", sans-serif;
+            background-color: #F9F8F6;
+            color: #333333;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-charcoal transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 w-full bg-terracotta-red text-white py-4">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center gap-2 font-black text-2xl tracking-tighter">
+                    <span class="material-symbols-outlined text-3xl">architecture</span>
+                    <span>LaiBE</span>
+                </div>
+                <!-- Nav -->
+                <div class="flex items-center gap-6">
+                    <a href="#"
+                        class="hidden sm:block text-white/90 hover:text-white font-bold text-sm tracking-wide">我是屋主</a>
+                    <a href="#"
+                        class="hidden sm:block text-white/90 hover:text-white font-bold text-sm tracking-wide">我是乙方</a>
+                    <button class="text-white hover:text-white/80 transition-colors">
+                        <span class="material-symbols-outlined text-3xl">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="bg-terracotta-red relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-8">
+                    <!-- Left Text -->
+                    <div class="w-full lg:w-1/2 text-white z-10 lg:pr-8">
+                        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
+                            試試我們的免費繪圖吧！
+                        </h1>
+                        <h2 class="text-xl sm:text-2xl font-bold mb-10 opacity-90 leading-snug">
+                            想自己畫圖？還是手邊已有報價單？
+                        </h2>
+
+                        <div class="flex flex-col sm:flex-row gap-6 mt-8">
+                            <button
+                                class="bg-white text-terracotta-red px-8 py-4 rounded font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
+                                開始畫圖做預算
+                            </button>
+
+                            <div class="relative w-full sm:w-auto">
+                                <!-- Badge -->
+                                <div
+                                    class="absolute -top-3 -right-3 z-20 bg-yellow-400 text-charcoal text-xs font-black px-2 py-1 rounded shadow-md transform rotate-6 border border-yellow-500 uppercase tracking-widest">
+                                    HOT / 推薦
+                                </div>
+                                <!-- Outline Button -->
+                                <button
+                                    class="w-full sm:w-auto border-2 border-white/60 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded font-bold text-lg hover:bg-white/20 transition-all">
+                                    免費報價健檢
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Visual -->
+                    <div class="w-full lg:w-1/2 relative flex justify-center lg:justify-end mt-12 lg:mt-0">
+                        <img src="./hero_isometric_room.png" alt="3D Isometric Room Design"
+                            class="w-full max-w-lg object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-[1.02] transition-transform duration-700" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Value Props -->
+        <section class="bg-warm-beige py-24">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20 -mt-36">
+                    <!-- Card 1 -->
+                    <div
+                        class="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-2 transition-all flex flex-col items-start min-h-[280px]">
+                        <div
+                            class="mb-6 flex items-center justify-center text-terracotta-red bg-warm-beige/50 p-4 rounded-xl">
+                            <span class="material-symbols-outlined text-[40px] leading-none">robot_2</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-charcoal mb-4">AI 專案助理</h3>
+                        <p class="text-charcoal/70 text-lg font-medium leading-relaxed">讓你不再看不懂現場，監工有靠山。</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div
+                        class="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-2 transition-all flex flex-col items-start min-h-[280px]">
+                        <div
+                            class="mb-6 flex items-center justify-center text-terracotta-red bg-warm-beige/50 p-4 rounded-xl">
+                            <span class="material-symbols-outlined text-[40px] leading-none">search</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-charcoal mb-4">報價健檢</h3>
+                        <p class="text-charcoal/70 text-lg font-medium leading-relaxed">一鍵明白報價區間，拒絕當盤子。</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div
+                        class="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-2 transition-all flex flex-col items-start min-h-[280px]">
+                        <div
+                            class="mb-6 flex items-center justify-center text-terracotta-red bg-warm-beige/50 p-4 rounded-xl">
+                            <span class="material-symbols-outlined text-[40px] leading-none">extension</span>
+                        </div>
+                        <h3 class="text-2xl font-black text-charcoal mb-4">最簡易的平面圖製作</h3>
+                        <p class="text-charcoal/70 text-lg font-medium leading-relaxed">插座、燈具、天花板規劃不求人。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section class="bg-white py-32 border-y border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2
+                    class="text-3xl sm:text-4xl lg:text-5xl font-black text-charcoal mb-24 tracking-tight leading-tight">
+                    萊比不是裝潢媒合平台，<br class="hidden sm:block" />
+                    <span class="text-terracotta-red">是您的裝潢 AI 顧問。</span>
+                </h2>
+
+                <div
+                    class="relative max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 md:gap-0">
+                    <!-- Dashed Line Connector (Desktop only) -->
+                    <div
+                        class="hidden md:block absolute top-[44px] left-[15%] right-[15%] h-[2px] border-t-2 border-dashed border-charcoal/30 z-0">
+                    </div>
+
+                    <!-- Step 1 -->
+                    <div class="relative z-10 flex flex-col items-center gap-6 bg-white px-2 sm:px-6 w-full md:w-56">
+                        <div
+                            class="w-24 h-24 rounded-full border border-charcoal/20 bg-white flex items-center justify-center text-charcoal shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-[48px] font-extralight text-terracotta-red">checklist</span>
+                        </div>
+                        <span class="text-xl font-bold text-charcoal">輸入統一規格</span>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="relative z-10 flex flex-col items-center gap-6 bg-white px-2 sm:px-6 w-full md:w-56">
+                        <div
+                            class="w-24 h-24 rounded-full border border-charcoal/20 bg-white flex items-center justify-center text-charcoal shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-[48px] font-extralight text-terracotta-red">pan_tool</span>
+                        </div>
+                        <span class="text-xl font-bold text-charcoal">多人同時估價</span>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="relative z-10 flex flex-col items-center gap-6 bg-white px-2 sm:px-6 w-full md:w-56">
+                        <div
+                            class="w-24 h-24 rounded-full border border-charcoal/20 bg-white flex items-center justify-center text-charcoal shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-[48px] font-extralight text-terracotta-red">shield</span>
+                        </div>
+                        <span class="text-xl font-bold text-charcoal">產出安心比價單</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pain Points - Zig Zag Layout -->
+        <section class="bg-warm-beige py-32">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-32">
+
+                <!-- Block 1: Text Left, Img Right -->
+                <div class="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-24">
+                    <div class="w-full md:w-1/2 flex flex-col items-start z-10">
+                        <div class="text-terracotta-red font-bold text-sm mb-4 tracking-[0.2em] uppercase">Pain Point 01
+                        </div>
+                        <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">話術再見</h2>
+                        <p class="text-xl text-charcoal/80 leading-relaxed font-medium">
+                            強調數據取代話術。不再被似是而非的專業名詞與模糊承諾綁架，透過 LaiBE，所有的報價與規格都必須攤在陽光下。
+                        </p>
+                    </div>
+                    <div
+                        class="w-full md:w-1/2 relative bg-gray-200 aspect-[4/3] flex items-center justify-center text-gray-400 overflow-hidden shadow-2xl rounded-sm">
+                        <img src="./image_12.png" alt="無奈的設計師向趾高氣昂的女子解釋"
+                            class="w-full h-full object-cover select-none" />
+                    </div>
+                </div>
+
+                <!-- Block 2: Img Left, Text Right -->
+                <div class="flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+                    <div
+                        class="w-full md:w-1/2 relative bg-gray-200 aspect-[4/3] flex items-center justify-center text-gray-400 overflow-hidden shadow-2xl rounded-sm">
+                        <img src="./image_25.png" alt="夫妻看著滿桌報價單感到頭痛" class="w-full h-full object-cover select-none" />
+                    </div>
+                    <div class="w-full md:w-1/2 flex flex-col items-start md:pl-8 lg:pl-16 z-10">
+                        <div class="text-terracotta-red font-bold text-sm mb-4 tracking-[0.2em] uppercase">Pain Point 02
+                        </div>
+                        <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">請款囉嗦再見</h2>
+                        <p class="text-xl text-charcoal/80 leading-relaxed font-medium">
+                            強調階段性撥款。拒絕超前請款、進度脫鉤。透過嚴謹的節點驗收機制，做多少事給多少錢，保障資金安全。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Block 3: Text Left, Img Right -->
+                <div class="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-24">
+                    <div class="w-full md:w-1/2 flex flex-col items-start z-10">
+                        <div class="text-terracotta-red font-bold text-sm mb-4 tracking-[0.2em] uppercase">Pain Point 03
+                        </div>
+                        <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">裝潢詐騙不再見</h2>
+                        <p class="text-xl text-charcoal/80 leading-relaxed font-medium">
+                            強調價金代管安全。採用第三方金流代管服務，切斷惡意捲款的可能性。讓信任回歸制度，打造再無裝潢難民的安全環境。
+                        </p>
+                    </div>
+                    <div
+                        class="w-full md:w-1/2 relative bg-gray-200 aspect-[4/3] flex items-center justify-center text-gray-400 overflow-hidden shadow-2xl rounded-sm">
+                        <img src="./image_19.png" alt="群眾舉牌抗議詐騙" class="w-full h-full object-cover select-none" />
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Footer CTA -->
+        <section class="bg-terracotta-red py-32">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-12 leading-tight tracking-tight">
+                    準備好拿回<br class="hidden sm:block" />裝潢的主導權了嗎？
+                </h2>
+                <button
+                    class="bg-white text-terracotta-red px-12 py-5 rounded font-black text-xl lg:text-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                    立即免費開始
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-charcoal py-12 border-t border-black/10">
+        <div
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 font-black text-white opacity-80 text-xl tracking-tighter">
+                <span class="material-symbols-outlined text-2xl">architecture</span>
+                <span>LaiBE</span>
+            </div>
+            <div class="text-sm text-white/50 font-medium">
+                © 2026 LaiBE Inc. All rights reserved.
+            </div>
+            <div class="flex gap-6 text-sm text-white/50">
+                <a href="#" class="hover:text-white transition-colors">服務條款</a>
+                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

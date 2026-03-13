@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaiBE - 統包標決策儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F9D9D', // 莫蘭迪湖水綠
+                        danger: '#AD5A5A',   // 莫蘭迪磚紅
+                        background: '#F2F2F0', // 淺灰
+                        surface: '#FFFFFF'   // 白卡片
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* 確保字體圖標正常渲染 */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* 模態視窗動畫 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .modal-box-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="bg-background min-h-screen p-6 text-slate-800">
+
+    <!-- 頂部標題列 -->
+    <header class="max-w-[1400px] mx-auto mb-6 flex justify-between items-end">
+        <div>
+            <h1 class="text-3xl font-black text-slate-800 tracking-tight">統包標決策儀表板 <span
+                    class="text-primary text-xl ml-2 tracking-normal font-bold">BID-2023-A01</span></h1>
+            <p class="text-slate-500 mt-2 font-medium">系統依據《萊比憲法》執行 50/50 (AI/User) 加權決策邏輯</p>
+        </div>
+        <div class="text-xs font-mono bg-slate-200 text-slate-600 px-3 py-1 rounded">
+            STATUS: <span class="text-primary font-bold">AWAITING_DECISION</span>
+        </div>
+    </header>
+
+    <!-- 三欄式佈局 (25% - 50% - 25%) -->
+    <main class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6 h-[800px]">
+
+        <!-- ================= 左欄 (25%): 入圍廠商列表 ================= -->
+        <section
+            class="col-span-1 bg-surface rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+            <div class="bg-slate-100 p-4 border-b border-slate-200">
+                <h2 class="font-bold text-slate-700 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-500 text-base">list_alt</span>
+                    入圍廠商 (3)
+                </h2>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-3" id="vendor-list">
+                <!-- 廠商清單 (系統推薦/最高分) -->
+                <button
+                    class="vendor-btn w-full text-left p-4 rounded-lg border-2 border-primary bg-primary/5 transition-all relative overflow-hidden group"
+                    data-id="v1" data-is-top="true">
+                    <div
+                        class="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-bl">
+                        系統最優</div>
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold">
+                            AB</div>
+                        <div>
+                            <div class="font-bold text-slate-800">Audio Build 團隊</div>
+                            <div class="text-xs text-slate-500">綜效評分: 88 (AI: 92)</div>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- 廠商清單 (第二名) -->
+                <button
+                    class="vendor-btn w-full text-left p-4 rounded-lg border-2 border-transparent bg-slate-50 hover:border-slate-300 transition-all group"
+                    data-id="v2" data-is-top="false">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-slate-300 text-slate-600 rounded-full flex items-center justify-center font-bold">
+                            CD</div>
+                        <div>
+                            <div class="font-bold text-slate-800">Craft Design 所</div>
+                            <div class="text-xs text-slate-500">綜效評分: 82 (AI: 80)</div>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- 廠商清單 (第三名) -->
+                <button
+                    class="vendor-btn w-full text-left p-4 rounded-lg border-2 border-transparent bg-slate-50 hover:border-slate-300 transition-all group"
+                    data-id="v3" data-is-top="false">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 bg-slate-300 text-slate-600 rounded-full flex items-center justify-center font-bold">
+                            NX</div>
+                        <div>
+                            <div class="font-bold text-slate-800">Nexus 聯合工務</div>
+                            <div class="text-xs text-slate-500">綜效評分: 76 (AI: 72)</div>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ================= 中欄 (50%): 評分儀表板與決策區 ================= -->
+        <section
+            class="col-span-2 bg-surface rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden relative">
+            <div class="bg-slate-800 text-white p-6 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black tracking-tight" id="selected-vendor-name">Audio Build 團隊</h2>
+                    <p class="text-slate-400 text-sm mt-1">統一編號: 82736190 | 負責人: 張大緯</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-[10px] text-slate-400 mb-1 uppercase tracking-widest">目前加權總分 (50/50)</div>
+                    <div class="text-5xl font-black text-white" id="current-total-score">88</div>
+                </div>
+            </div>
+
+            <div class="flex-1 p-8 grid grid-cols-2 gap-8 bg-slate-50">
+                <!-- AI 客觀評分 -->
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <span class="material-symbols-outlined text-primary">robot_2</span>
+                        <h3 class="font-bold text-slate-700">AI 書記官量化 (50%)</h3>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                            <span>SpecDB 匹配率</span><span>92/100</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1.5">
+                            <div class="bg-primary h-1.5 rounded-full" style="width: 92%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                            <span>預算合理性</span><span>95/100</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1.5">
+                            <div class="bg-primary h-1.5 rounded-full" style="width: 95%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                            <span>文件完整率 (RFI)</span><span>89/100</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-1.5">
+                            <div class="bg-primary h-1.5 rounded-full" style="width: 89%"></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-white p-3 border border-slate-100 rounded text-xs text-slate-500 font-mono shadow-sm">
+                        [客觀數據描述]：此設計包含指定規格材料，報價位於 SpecDB 合規基準+5% 內。歷史 RFI 回覆皆於 24 小時內補件完成。
+                    </div>
+                </div>
+
+                <!-- 業主主觀評分 -->
+                <div class="space-y-6">
+                    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+                        <span class="material-symbols-outlined text-indigo-500">person</span>
+                        <h3 class="font-bold text-slate-700">業主質化裁量 (50%)</h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-3">
+                            設計滿意度主觀評分 (1-10)
+                        </label>
+                        <input type="range" id="user-score-slider" min="1" max="10" value="8"
+                            class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        <div class="flex justify-between text-xs font-bold text-slate-400 mt-2">
+                            <span>1 (不佳)</span>
+                            <span class="text-lg text-indigo-600" id="user-score-display">8</span>
+                            <span>10 (極優)</span>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-indigo-50/50 p-4 border border-indigo-100 rounded text-xs text-slate-600 font-bold mb-4">
+                        💡 拖動滑桿將即時改變上方「加權總分」。
+                        <br>(計算方式：AI得分*0.5 + 業主打分*10*0.5)
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部決策按鈕區 -->
+            <div class="p-6 bg-white border-t border-slate-200 space-y-4">
+                <div class="flex gap-4">
+                    <button id="btn-reject"
+                        class="flex-1 py-3 border-2 border-danger text-danger font-bold rounded-lg hover:bg-red-50 transition-colors">
+                        案件流標 (Reject)
+                    </button>
+                    <button id="btn-confirm"
+                        class="w-[65%] py-3 bg-primary text-white font-bold rounded-lg hover:brightness-110 transition-all shadow-md">
+                        確認決標此廠商 (Approve)
+                    </button>
+                </div>
+
+                <!-- 流標理由表單 (預設隱藏) -->
+                <div id="reject-form" class="hidden bg-red-50 border border-red-100 rounded-lg p-5 mt-4 transition-all">
+                    <div class="mb-4 p-3 bg-white border border-danger rounded shadow-sm">
+                        <p class="text-danger font-bold">⚠️ 若確定流標後欲重新上架案件，須支付一定上架費。</p>
+                    </div>
+                    <h4 class="text-sm font-bold text-danger mb-3">請選擇法定流標理由（必須擇一）：</h4>
+                    <div class="space-y-2 mb-4" id="reject-radio-group">
+                        <label
+                            class="flex items-center gap-2 cursor-pointer text-sm text-slate-700 hover:bg-red-100/50 p-1 rounded transition-colors">
+                            <input type="radio" name="reject_reason" class="text-danger focus:ring-danger accent-danger"
+                                value="budget">
+                            全數廠商報價偏離市場行情過高
+                        </label>
+                        <label
+                            class="flex items-center gap-2 cursor-pointer text-sm text-slate-700 hover:bg-red-100/50 p-1 rounded transition-colors">
+                            <input type="radio" name="reject_reason" class="text-danger focus:ring-danger accent-danger"
+                                value="time">
+                            工期評估無法滿足合約底線
+                        </label>
+                        <label
+                            class="flex items-center gap-2 cursor-pointer text-sm text-slate-700 hover:bg-red-100/50 p-1 rounded transition-colors">
+                            <input type="radio" name="reject_reason" class="text-danger focus:ring-danger accent-danger"
+                                value="other">
+                            設計能力與專案目標不符
+                        </label>
+                    </div>
+                    <textarea
+                        class="w-full text-sm p-3 border border-slate-300 rounded focus:border-danger focus:ring-1 focus:ring-danger outline-none transition-all"
+                        rows="2" placeholder="其他客觀說明事項..."></textarea>
+                    <div class="mt-3 flex justify-end gap-2">
+                        <button id="btn-cancel-reject"
+                            class="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 font-bold">取消</button>
+                        <button id="btn-submit-reject" disabled
+                            class="px-4 py-2 text-sm bg-danger text-white rounded font-bold shadow-sm opacity-50 cursor-not-allowed transition-all">提交並作廢本案</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 遮罩 (避免未操作前亂點) -->
+            <!-- <div class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 hidden"></div> -->
+        </section>
+
+
+        <!-- ================= 右欄 (25%): 軌跡與對話 ================= -->
+        <section class="col-span-1 flex flex-col gap-6">
+
+            <!-- 上半部: Immutable Timeline 黑盒子時序表 -->
+            <div class="flex-1 bg-[#1A1F24] rounded-xl shadow-sm border border-slate-700 overflow-hidden flex flex-col">
+                <div class="bg-[#111418] p-3 border-b border-slate-700 flex items-center justify-between">
+                    <h2 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-400 text-sm">terminal</span>
+                        Immutable Timeline
+                    </h2>
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                </div>
+                <!-- Log 輸出區 -->
+                <div id="timeline-log"
+                    class="flex-1 p-4 overflow-y-auto font-mono text-[10px] leading-relaxed space-y-2 scrollbar-hide text-slate-400">
+                    <div class="text-slate-500">> 啟動決策紀錄核心...</div>
+                    <div class="text-white">> 載入 SpecDB 預算模組 [OK]</div>
+                    <div class="text-white">> 載入 PCM 最終審查文件 [OK]</div>
+                    <!-- JS 動態插入 -->
+                </div>
+            </div>
+
+            <!-- 下半部: AI 助理 -->
+            <div class="h-[280px] bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden">
+                <div class="bg-primary p-3 flex items-center gap-2 text-white">
+                    <span class="material-symbols-outlined">support_agent</span>
+                    <span class="font-bold text-sm">萊比書記助理</span>
+                </div>
+                <div class="flex-1 p-4 overflow-y-auto text-xs space-y-4 bg-slate-50">
+                    <div class="flex gap-2">
+                        <div
+                            class="w-6 h-6 rounded-full bg-primary flex-shrink-0 flex items-center justify-center text-white">
+                            <span class="material-symbols-outlined text-[12px]">robot_2</span>
+                        </div>
+                        <div
+                            class="bg-white p-2 rounded-lg rounded-tl-none border border-slate-100 text-slate-600 shadow-sm leading-relaxed">
+                            您好，我是負責本案合規檢查的 AI 書記官。當前系統最優選為 **Audio Build**，其預算報價合規率達基準 92%。請問是否需要調閱其 RFI 紀錄？
+                        </div>
+                    </div>
+                </div>
+                <div class="p-2 border-t border-slate-100 bg-white flex">
+                    <input type="text" placeholder="輸入指令..."
+                        class="flex-1 text-xs px-2 py-1 outline-none text-slate-700">
+                    <button class="text-primary p-1 rounded hover:bg-slate-50"><span
+                            class="material-symbols-outlined text-[18px]">send</span></button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ================= 全螢幕翻盤攔截紅框 Modal ================= -->
+    <div id="override-modal"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/80 backdrop-blur-sm hidden modal-enter">
+        <div
+            class="bg-surface rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border-4 border-danger modal-box-enter">
+            <!-- 頂部危險標示 -->
+            <div class="bg-danger p-4 flex items-center gap-3 text-white">
+                <span class="material-symbols-outlined text-4xl">warning</span>
+                <div>
+                    <h2 class="text-xl font-black tracking-widest leading-none">⚠️ 風險與免責告知</h2>
+                    <p class="text-xs text-white/80 mt-1">Override Warning: Action inherently disrupts SSOT baseline.
+                    </p>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <p class="text-slate-800 font-bold text-lg">您正在選擇非系統建議之「最優標」。</p>
+
+                <div class="bg-red-50 p-4 border border-red-200 rounded text-sm text-red-800 leading-relaxed font-bold">
+                    根據《萊比憲法》免責條款：<br>
+                    此選擇可能導致 PCM 審查成本增加，且平台不對後續衍生之預算追加、工期延宕承擔制度背書責任。
+                </div>
+
+                <div class="bg-slate-50 p-4 border border-slate-200 rounded text-sm space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">系統最優廠商：</span>
+                        <span class="font-bold text-slate-700">Audio Build 團隊 (88分)</span>
+                    </div>
+                    <div class="flex justify-between border-t border-slate-200 pt-2 border-dashed">
+                        <span class="text-slate-500">您欲強行決標：</span>
+                        <span class="font-black text-danger" id="modal-target-vendor">Craft Design 所 (82分)</span>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-xs text-slate-500 font-bold mb-2">請輸入 <span
+                            class="text-danger select-all bg-red-50 px-1 py-0.5 rounded border border-red-100">我同意承擔風險</span>
+                        以解除系統安全鎖：</p>
+                    <input type="text" id="override-input" autocomplete="off" placeholder="請精確輸入同意文字..."
+                        class="w-full px-4 py-3 border-2 border-slate-300 rounded focus:border-danger focus:outline-none focus:ring-2 focus:ring-danger/20 font-bold text-slate-800 transition-all font-mono">
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-100 border-t border-slate-200 flex justify-end gap-3">
+                <button id="btn-modal-cancel"
+                    class="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-bold rounded hover:bg-slate-50 transition-colors">
+                    取消，返回儀表板
+                </button>
+                <button id="btn-modal-confirm" disabled
+                    class="px-6 py-2.5 bg-danger text-white font-bold rounded opacity-50 cursor-not-allowed transition-all">
+                    強制覆寫決標
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 腳本邏輯 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // UI 元素
+            const vendorsList = document.querySelectorAll('.vendor-btn');
+            const vendorNameTitle = document.getElementById('selected-vendor-name');
+            const slider = document.getElementById('user-score-slider');
+            const scoreDisplay = document.getElementById('user-score-display');
+            const totalScoreDisplay = document.getElementById('current-total-score');
+
+            const btnConfirm = document.getElementById('btn-confirm');
+            const btnReject = document.getElementById('btn-reject');
+            const rejectForm = document.getElementById('reject-form');
+            const btnCancelReject = document.getElementById('btn-cancel-reject');
+            const btnSubmitReject = document.getElementById('btn-submit-reject');
+            const rejectRadioGroup = document.querySelectorAll('input[name="reject_reason"]');
+
+            const timelineLog = document.getElementById('timeline-log');
+
+            const modal = document.getElementById('override-modal');
+            const overrideInput = document.getElementById('override-input');
+            const btnModalCancel = document.getElementById('btn-modal-cancel');
+            const btnModalConfirm = document.getElementById('btn-modal-confirm');
+            const modalTargetVendor = document.getElementById('modal-target-vendor');
+
+            // 狀態變數
+            let currentVendor = {
+                name: "Audio Build 團隊",
+                isTop: true,
+                aiScore: 92,
+                baseTotal: 88 // 初始計算值
+            };
+
+            // 寫入 Timeline 日誌函數
+            function appendLog(message, isGreen = false) {
+                const now = new Date();
+                const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+                const div = document.createElement('div');
+                div.className = isGreen ? "text-green-400 font-bold" : "text-slate-300";
+                div.innerText = `[${timeStr}] ${message}`;
+                timelineLog.appendChild(div);
+                timelineLog.scrollTop = timelineLog.scrollHeight;
+            }
+
+            // 模擬定期日誌
+            setInterval(() => {
+                const logs = [
+                    "> 讀取 SSOT session_state...",
+                    "> 檢驗預算庫存偏離值... [通過]",
+                    "> 監控 RFI 時效... [+0h]",
+                    "> 萊比守衛過濾網路封包...",
+                    "> 驗證 PCM 電子簽章完整性 [OK]"
+                ];
+                const r = Math.floor(Math.random() * logs.length);
+                appendLog(logs[r]);
+            }, 3500);
+
+            // 更新總分計算
+            function updateTotalScore() {
+                const userVal = parseInt(slider.value, 10);
+                scoreDisplay.textContent = userVal;
+                // AI 佔 50%，User 佔 50% (User分數 1-10 轉為 10-100)
+                const finalScore = Math.round((currentVendor.aiScore * 0.5) + ((userVal * 10) * 0.5));
+                totalScoreDisplay.textContent = finalScore;
+
+                // 動態改變總分顏色
+                if (finalScore >= 85) totalScoreDisplay.className = "text-5xl font-black text-primary";
+                else if (finalScore >= 70) totalScoreDisplay.className = "text-5xl font-black text-amber-400";
+                else totalScoreDisplay.className = "text-5xl font-black text-danger";
+            }
+
+            // 滑桿監聽
+            slider.addEventListener('input', updateTotalScore);
+
+            // 廠商切換邏輯
+            vendorsList.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    // 更換樣式
+                    vendorsList.forEach(b => {
+                        b.classList.remove('border-primary', 'bg-primary/5');
+                        b.classList.add('border-transparent', 'bg-slate-50');
+                    });
+                    const target = e.currentTarget;
+                    target.classList.remove('border-transparent', 'bg-slate-50');
+                    target.classList.add('border-primary', 'bg-primary/5');
+
+                    // 記錄狀態
+                    currentVendor.isTop = target.dataset.isTop === 'true';
+                    currentVendor.name = target.querySelector('.text-slate-800').innerText;
+
+                    // 隨機重設一個 AI 分數與 Slider 來模擬切換
+                    currentVendor.aiScore = currentVendor.isTop ? 92 : (Math.floor(Math.random() * 10) + 70);
+                    slider.value = currentVendor.isTop ? 8 : 6;
+
+                    vendorNameTitle.textContent = currentVendor.name;
+                    updateTotalScore();
+
+                    appendLog(`> 使用者切換注目廠商: ${currentVendor.name}`);
+                });
+            });
+
+            // 決標處理
+            btnConfirm.addEventListener('click', () => {
+                const currentScore = totalScoreDisplay.textContent;
+
+                if (!currentVendor.isTop) {
+                    appendLog(`> 偵測到強制翻盤企圖，啟動免責模態視窗`, true);
+                    // 顯示模態窗
+                    modalTargetVendor.textContent = `${currentVendor.name} (${currentScore}分)`;
+                    overrideInput.value = '';
+                    btnModalConfirm.disabled = true;
+                    btnModalConfirm.classList.add('opacity-50', 'cursor-not-allowed');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                } else {
+                    appendLog(`> 決標驗證通過: 選擇為最優標，鎖定 SSOT 狀態.`, true);
+                    alert("🎉 決標成功！此決定落實萊比最低摩擦路徑，系統已記錄。");
+                }
+            });
+
+            // 免責文字輸入驗證
+            overrideInput.addEventListener('input', (e) => {
+                if (e.target.value === '我同意承擔風險') {
+                    btnModalConfirm.disabled = false;
+                    btnModalConfirm.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btnModalConfirm.classList.add('hover:bg-red-700', 'shadow-[0_0_15px_rgba(173,90,90,0.5)]');
+                } else {
+                    btnModalConfirm.disabled = true;
+                    btnModalConfirm.classList.add('opacity-50', 'cursor-not-allowed');
+                    btnModalConfirm.classList.remove('hover:bg-red-700', 'shadow-[0_0_15px_rgba(173,90,90,0.5)]');
+                }
+            });
+
+            // 取消/確認 模態窗
+            btnModalCancel.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                appendLog(`> 業主取消翻盤操作.`);
+            });
+
+            btnModalConfirm.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                appendLog(`> 【SYSTEM OVERRIDE】業主已強制決標非最優選項！風險完全轉移。`, true);
+                alert("【免責決標完成】已記錄您的強制翻盤決策，系統免責聲明已自動生效。");
+            });
+
+            // 流標表單處理
+            btnReject.addEventListener('click', () => {
+                rejectForm.classList.toggle('hidden');
+                if (!rejectForm.classList.contains('hidden')) {
+                    appendLog(`> 業主開啟案件流標流程(Reject Process)，等待合規理由選擇`);
+                    // 確保開啟時狀態重置
+                    btnSubmitReject.disabled = true;
+                    btnSubmitReject.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            });
+
+            // 監聽 Radio Buttons 狀態
+            rejectRadioGroup.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    const selected = document.querySelector('input[name="reject_reason"]:checked');
+                    if (selected) {
+                        btnSubmitReject.disabled = false;
+                        btnSubmitReject.classList.remove('opacity-50', 'cursor-not-allowed');
+                        appendLog(`> 使用者選擇流標理由: [${selected.value}]`);
+                    }
+                });
+            });
+
+            btnCancelReject.addEventListener('click', () => {
+                rejectForm.classList.add('hidden');
+                appendLog(`> 業主取消流標流程`);
+            });
+
+            btnSubmitReject.addEventListener('click', () => {
+                alert("🚨 流標確認：即將收取重新上架費，案件進入結案程序。");
+                appendLog(`> 【決策結果】案件確定流標，進入重新上架收費與合規保留流程。`, true);
+                rejectForm.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+
+</html>

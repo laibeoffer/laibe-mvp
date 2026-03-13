@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>預算總表預覽 (Step 3 Summary View) | LaiBE Construction</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .font-display {
+                font-family: 'Noto Sans TC', sans-serif;
+            }
+            .a4-container {
+                width: 210mm;
+                min-height: 297mm;
+                padding: 20mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            }
+            .document-grid-line {
+                border-color: #e5e7eb;
+            }
+            .locked-value {
+                background-color: #f9fafb !important;
+                cursor: not-allowed !important;
+                user-select: none;
+            }
+        }
+        :root {
+            --primary-navy: #2C3E50;
+            --step-active: #6B8E8E;
+            --ai-accent: #4A90E2;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-display min-h-screen flex flex-col relative">
+    <header class="bg-[#D8E2DC] border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto px-8 py-5">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="h-9 w-9 bg-gray-800 rounded flex items-center justify-center text-white font-bold text-xl">
+                        L</div>
+                    <span class="font-bold text-gray-700 tracking-widest text-lg uppercase">LaiBE Construction</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-gray-600 font-medium">
+                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">person</span>
+                        專案負責人：Alex Chen</span>
+                    <span class="flex items-center gap-2"><span
+                            class="material-symbols-outlined text-lg">calendar_today</span> 2023/10/24</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-12">
+                <h1 class="text-2xl font-bold text-gray-800 whitespace-nowrap">
+                    Step 3 – 預算總表預覽
+                </h1>
+                <div class="flex-1 flex items-center gap-0">
+                    <div class="flex flex-col items-center flex-1 relative">
+                        <div class="w-full h-1 bg-[var(--step-active)] absolute top-2/4 -translate-y-1/2 left-0"></div>
+                        <div
+                            class="w-4 h-4 rounded-full bg-[var(--step-active)] z-10 relative border-4 border-[#D8E2DC]">
+                        </div>
+                        <span class="text-[10px] mt-1 text-[var(--step-active)] font-bold">Step 1</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-1 relative">
+                        <div class="w-full h-1 bg-[var(--step-active)] absolute top-2/4 -translate-y-1/2 left-0"></div>
+                        <div
+                            class="w-4 h-4 rounded-full bg-[var(--step-active)] z-10 relative border-4 border-[#D8E2DC]">
+                        </div>
+                        <span class="text-[10px] mt-1 text-[var(--step-active)] font-bold">Step 2</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-1 relative">
+                        <div class="w-full h-1 bg-gray-300 absolute top-2/4 -translate-y-1/2 left-0">
+                            <div class="w-1/2 h-full bg-[var(--step-active)]"></div>
+                        </div>
+                        <div class="w-6 h-6 rounded-full bg-gray-800 z-10 relative border-4 border-[#D8E2DC]"></div>
+                        <span class="text-[10px] mt-1 text-gray-800 font-bold uppercase tracking-wider">Step 3
+                            Active</span>
+                    </div>
+                    <div class="flex flex-col items-center flex-1 relative">
+                        <div class="w-full h-1 bg-gray-300 absolute top-2/4 -translate-y-1/2 left-0"></div>
+                        <div class="w-4 h-4 rounded-full bg-gray-300 z-10 relative border-4 border-[#D8E2DC]"></div>
+                        <span class="text-[10px] mt-1 text-gray-400 font-bold">Step 4</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="flex-1 max-w-screen-2xl mx-auto w-full p-8 grid grid-cols-10 gap-8">
+        <div class="col-span-7 space-y-6">
+            <div class="flex items-center bg-gray-200 p-1 rounded-lg w-fit">
+                <button
+                    class="px-6 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100 transition-all">明細表</button>
+                <button class="px-6 py-2 text-sm font-medium bg-gray-800 text-white rounded-md shadow-sm">總表</button>
+            </div>
+            <div class="a4-container">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3 tracking-[0.3em]">工程預算總表</h2>
+                    <div class="h-1 w-24 bg-gray-800 mx-auto mb-8"></div>
+                    <div class="grid grid-cols-2 text-left text-sm text-gray-600 border-b border-gray-100 pb-4">
+                        <div class="space-y-1">
+                            <p><span class="text-gray-400">專案名稱：</span>信義區 Alex Chen 宅邸裝修工程</p>
+                            <p><span class="text-gray-400">業主姓名：</span>Alex Chen 先生</p>
+                        </div>
+                        <div class="space-y-1 text-right">
+                            <p><span class="text-gray-400">報價日期：</span>2023/10/24</p>
+                            <p><span class="text-gray-400">報價編號：</span>LB-20231024-003</p>
+                        </div>
+                    </div>
+                </div>
+                <table class="w-full text-left border-collapse mb-10 border-t-2 border-gray-800">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-700 text-sm">
+                            <th class="py-4 px-4 font-bold border-b border-r border-gray-200 w-16 text-center">項次</th>
+                            <th class="py-4 px-4 font-bold border-b border-r border-gray-200">工程項目</th>
+                            <th class="py-4 px-4 font-bold border-b border-r border-gray-200 w-24 text-center">單位</th>
+                            <th class="py-4 px-4 font-bold border-b border-r border-gray-200 w-44 text-right">金額</th>
+                            <th class="py-4 px-4 font-bold border-b border-gray-200">備註</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-800">
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">1</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">A. 拆除及保護工程</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">56,500</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">含公共梯間保護</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">2</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">B. 泥作及防水工程</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">185,000</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">浴室全室防水</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">3</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">C. 水電工程</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">245,800</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">全室線路更新</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">4</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">D. 木作及裝飾工程</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">680,200</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">含天花板、櫃體</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">5</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">E. 油漆工程</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">125,000</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">得利乳膠漆</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">6</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">F. 燈具及設備安裝</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">45,600</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">業主自備燈具</td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">7</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">G. 玻璃及鋁窗工程</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">85,000</td>
+                            <td class="py-4 px-4 text-xs text-gray-400"></td>
+                        </tr>
+                        <tr class="border-b border-gray-200">
+                            <td class="py-4 px-4 text-center border-r border-gray-100">8</td>
+                            <td class="py-4 px-4 font-medium border-r border-gray-100">H. 清潔及其他</td>
+                            <td class="py-4 px-4 text-center border-r border-gray-100">式</td>
+                            <td class="py-4 px-4 text-right border-r border-gray-100 tabular-nums locked-value"
+                                data-locked="true">25,000</td>
+                            <td class="py-4 px-4 text-xs text-gray-400">細清</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-gray-50/50">
+                            <td class="py-4 px-4 text-right font-bold text-gray-600 border-r border-gray-200"
+                                colspan="3">小計</td>
+                            <td class="py-4 px-4 text-right font-bold text-gray-900 border-r border-gray-200 tabular-nums locked-value"
+                                data-locked="true">1,448,100</td>
+                            <td class="py-4 px-4"></td>
+                        </tr>
+                        <tr class="bg-gray-50/50">
+                            <td class="py-4 px-4 text-right text-gray-600 border-r border-gray-200" colspan="3">工程管理費
+                                (8.5%)</td>
+                            <td class="py-4 px-4 text-right text-gray-800 border-r border-gray-200 tabular-nums locked-value"
+                                data-locked="true">123,088</td>
+                            <td class="py-4 px-4"></td>
+                        </tr>
+                        <tr class="border-t-2 border-gray-800 bg-gray-100">
+                            <td class="py-5 px-4 text-right font-bold text-xl text-gray-900 border-r border-gray-200"
+                                colspan="3">合計</td>
+                            <td class="py-5 px-4 text-right font-bold text-2xl text-gray-900 border-r border-gray-200 tabular-nums locked-value flex items-center justify-end gap-2"
+                                data-locked="true">
+                                180: <span class="material-symbols-outlined text-gray-400 text-sm">lock</span>
+                                181: 1,571,188
+                                182: </td>
+                            <td class="py-5 px-4 text-sm font-medium text-gray-500">NTD (未稅)</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="mb-16">
+                    <div class="flex items-start gap-2 text-red-600 font-bold mb-1">
+                        <span class="material-symbols-outlined text-base">info</span>
+                        <span>說明：未列項目：空調、淨水器、熱水器、窗簾</span>
+                    </div>
+                    <p class="text-gray-400 text-xs pl-6 leading-relaxed">
+                        ※ 本預算表僅供初步參考，實際施作細節以簽約圖說為準。<br />
+                        ※ 報價有效期限為 15 天，逾期請重新詢價。
+                    </p>
+                </div>
+            </div>
+        </div>
+        <aside class="col-span-3 space-y-6 sticky top-48 self-start">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-6">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">預覽與輸出</h3>
+                    <div class="flex flex-col gap-4">
+                        <button
+                            class="w-full py-4 px-6 bg-[var(--primary-navy)] hover:bg-[#1a252f] text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]">
+                            <span class="material-symbols-outlined">picture_as_pdf</span> 匯出 PDF
+                        </button>
+                        <button
+                            class="w-full py-4 px-6 bg-[var(--primary-navy)] hover:bg-[#1a252f] text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]">
+                            <span class="material-symbols-outlined">description</span> 匯出空白標單
+                        </button>
+                        <button
+                            class="w-full py-4 px-6 bg-white border-2 border-gray-200 hover:border-gray-800 hover:text-gray-800 text-gray-600 rounded-lg font-bold flex items-center justify-center gap-3 transition-all">
+                            <span class="material-symbols-outlined">print</span> 列印報表
+                        </button>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 border-t border-gray-100">
+                    <button
+                        class="w-full py-3 px-6 text-gray-500 hover:text-gray-800 font-medium flex items-center justify-center gap-2 transition-colors">
+                        <span class="material-symbols-outlined text-xl">close</span> 關閉預覽
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 bg-[#D8E2DC]/30 border border-[#D8E2DC] rounded-xl">
+                <div class="flex items-center gap-3 mb-3 text-[var(--step-active)]">
+                    <span class="material-symbols-outlined font-bold">description</span>
+                    <span class="font-bold text-sm tracking-wide">文件資訊</span>
+                </div>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    這是您的最終預預算總表。在匯出之前，請確認所有大項金額與管理費計算正確。若需更改，請點擊左上角「明細表」返回編輯。
+                </p>
+            </div>
+        </aside>
+    </main>
+    <footer class="mt-auto py-8 text-center text-gray-400 text-xs border-t border-gray-100">
+        <p>© 2023 LaiBE Construction Tender Platform. Professional B2B Solution.</p>
+    </footer>
+    <div class="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-3 pointer-events-none">
+        <div
+            class="bg-white w-80 shadow-2xl rounded-2xl border border-gray-200 overflow-hidden pointer-events-auto flex flex-col">
+            <div class="bg-[var(--primary-navy)] text-white p-4 flex items-center justify-between cursor-move">
+                <div class="flex items-center gap-2">
+                    <div class="bg-[var(--ai-accent)] p-1.5 rounded-lg flex items-center justify-center">
+                        <span class="material-symbols-outlined text-white text-sm">smart_toy</span>
+                    </div>
+                    <span class="font-bold text-sm">AI 預算助理</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button
+                        class="material-symbols-outlined text-gray-400 hover:text-white transition-colors text-lg">minimize</button>
+                    <button
+                        class="material-symbols-outlined text-gray-400 hover:text-white transition-colors text-lg">close</button>
+                </div>
+            </div>
+            <div id="ai-chat-body" class="h-64 p-4 overflow-y-auto bg-gray-50 space-y-4">
+                <div class="flex gap-2">
+                    <div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-gray-500 text-xs">smart_toy</span>
+                    </div>
+                    <div
+                        class="bg-white border border-gray-200 p-3 rounded-2xl rounded-tl-none text-xs text-gray-700 leading-relaxed shadow-sm">
+                        您好！我是您的 AI 預算助理。我發現「木作工程」佔總預算的 43%，建議確認明細是否包含甲醛處理。
+                    </div>
+                </div>
+                <div class="flex gap-2 justify-end">
+                    <div
+                        class="bg-[var(--ai-accent)] text-white p-3 rounded-2xl rounded-tr-none text-xs leading-relaxed shadow-sm">
+                        好的，我再確認一下。管理費 8.5% 是符合行情嗎？
+                    </div>
+                </div>
+            </div>
+            <div class="p-3 bg-white border-t border-gray-100 flex gap-2">
+                <input
+                    class="flex-1 bg-gray-100 border-none rounded-full px-4 py-2 text-xs focus:ring-1 focus:ring-[var(--ai-accent)] outline-none"
+                    placeholder="詢問關於預算的問題..." type="text" />
+                <button
+                    class="bg-[var(--ai-accent)] text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                    <span class="material-symbols-outlined text-sm">send</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lockedElements = document.querySelectorAll('[data-locked="true"]');
+            const aiChatBody = document.getElementById('ai-chat-body');
+
+            lockedElements.forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const alertMsg = "目前的數值是由空間建模數據鎖定。若需變更，請退回編輯階段。禁止在預覽階段直接修改。";
+
+                    // 1. Browser Alert
+                    alert(alertMsg);
+
+                    // 2. AI Assistant Message
+                    if (aiChatBody) {
+                        const msgHtml = `
+                            <div class="flex gap-2">
+                                <div class="w-7 h-7 bg-red-100 border border-red-200 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <span class="material-symbols-outlined text-red-500 text-xs">warning</span>
+                                </div>
+                                <div class="bg-red-50 border border-red-100 p-3 rounded-2xl rounded-tl-none text-xs text-red-700 leading-relaxed shadow-sm">
+                                    ${alertMsg}
+                                </div>
+                            </div>
+                        `;
+                        aiChatBody.insertAdjacentHTML('beforeend', msgHtml);
+                        aiChatBody.scrollTop = aiChatBody.scrollHeight;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

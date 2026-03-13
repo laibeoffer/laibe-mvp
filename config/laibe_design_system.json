@@ -1,0 +1,55 @@
+{
+    "system_name": "LaiBE_Design_System",
+    "version": "1.2",
+    "color_tokens": {
+        "primary": {
+            "hex": "#4F9D9D",
+            "name": "莫蘭迪湖水綠",
+            "usage": "確認 / 安全 / AI高分 / 合規"
+        },
+        "danger": {
+            "hex": "#AD5A5A",
+            "name": "莫蘭迪磚紅",
+            "usage": "流標 / 警告 / 翻盤 / 違憲"
+        },
+        "background": {
+            "hex": "#F2F2F0",
+            "name": "淺灰",
+            "usage": "系統底色 / 畫布"
+        },
+        "surface": {
+            "hex": "#FFFFFF",
+            "name": "白卡片",
+            "usage": "內容區塊 / 模態窗"
+        }
+    },
+    "layout_standards": {
+        "bidding_decision_page": {
+            "type": "Three-Column Layout",
+            "split_ratio": "25% - 50% - 25%",
+            "columns": {
+                "left": {
+                    "width": "25%",
+                    "components": [
+                        "入圍廠商列表 (Vertical Card List)"
+                    ]
+                },
+                "center": {
+                    "width": "50%",
+                    "components": [
+                        "50/50 評分儀表板 (AI vs User)",
+                        "流標按鈕群組 (確認決標 Green, 案件流標 Red Outline)",
+                        "流標理由表單 (單選題:工期長/報價高/不滿意 + 其他說明欄位)"
+                    ]
+                },
+                "right": {
+                    "width": "25%",
+                    "components": [
+                        "黑盒子時序表 (Immutable Timeline) - 上半部",
+                        "AI 決策助理對話框 (Chat Interface) - 下半部"
+                    ]
+                }
+            }
+        }
+    }
+}

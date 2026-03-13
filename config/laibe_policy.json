@@ -1,0 +1,80 @@
+{
+  "system_name": "LaiBE_System",
+  "core_philosophy": "制度不是信任，是限制。合規是最低摩擦路徑；違規必須承擔全部後果。",
+  "system_architecture": {
+    "navigation_and_state": {
+      "interactive_stepper": "頂部的進度條為可點擊 Icon 節點，支援雙重反悔路徑，隨時可跳回之前的步驟。",
+      "cloud_memory": "支援即時雲端儲存 (State Persistence)，頁面跳轉必須保留 Draft State，防止資料遺失。"
+    },
+    "ubiquitous_ai": {
+      "mandatory_presence": "所有決策頁面 (Decision Page) 必須強制配置 AI 引導官對話框。",
+      "contextual_support": "AI 必須根據當前頁面上下文 (Context) 提供建議，如預算頁行情分析或發案頁費率建議。"
+    },
+    "fee_terminology": {
+      "standardization": "系統中不存在『平台費』。所有固定收取的費用統稱為『上架費 (Listing Fee)』。",
+      "listing_fee_amount": 3000,
+      "behavioral_constraint": "在計算總預算時，必須強制且明確地外加『上架費 (Listing Fee): NT$ 3,000』。"
+    },
+    "workflow_logic": {
+      "path_alignment": "『統包標』流程邏輯與『設計標』完全一致。",
+      "optional_steps": "統包標與設計標的 Step 2 (平面拼圖) 及 Step 3 (預算生成) 皆為可選 (Optional)。使用者可自訂或上傳跳過，系統保留彈性，不可鎖死。"
+    },
+    "drawing_derivative_engine": {
+      "rcp_generation": "天花板平面圖 (RCP) 依據 Ceiling_Config 自動生成。Cove 生成雙線內縮燈槽，Flat 生成全區填充線。依據面積與 Lux 自動佈置嵌燈。",
+      "layer_tags": "平面配置圖物件須帶有圖層標籤 (Layer_Power, Layer_Water, Layer_Flooring) 以連動生成子圖面。",
+      "data_ssot": "衍生圖面必須共享 Master Plan 座標系，禁止單獨修改尺寸，採即時重新渲染模式。",
+      "export_requirements": "圖面導出須帶有 LaiBE 數位浮水印與版本編號 (v1.0.x)，作為簽約合法附件。"
+    }
+  },
+  "ai_agent_rules": {
+    "role": "書記官",
+    "allowed_actions": [
+      "引用制度條文",
+      "判斷語言",
+      "記錄歷史案例結構"
+    ],
+    "forbidden_actions": [
+      "裁決",
+      "背責",
+      "改寫制度",
+      "提出最佳解方案"
+    ],
+    "output_levels": [
+      "合規",
+      "疑似違規_需人工",
+      "違憲_拒絕"
+    ]
+  },
+  "ui_execution_rules": {
+    "budget_locking": {
+      "description": "預算數值鎖定原則",
+      "visual_constraint": "不能改的東西，看起來就要不能改 (必須加上 🔒 圖示與灰色背景)",
+      "behavioral_constraint": "禁止在預覽階段直接修改，若需變更必須退回編輯階段。"
+    },
+    "geometry_validation": {
+      "description": "空間幾何閉合原則",
+      "behavioral_constraint": "偵測到外框未閉合時，強制禁用下一步或匯出按鈕，並發出泥作/油漆預算失真警告。"
+    },
+    "bidding_decision_layout": {
+      "description": "決標頁面三欄式佈局強制規定",
+      "visual_constraint": "左欄25%(廠商列表)、中欄50%(評分儀表板+流標按鈕+理由表單)、右欄25%(黑盒子時序+AI對話)。",
+      "behavioral_constraint": "中欄必須包含明確之『案件流標』與表單，右欄必須顯示 Immutable Timeline，強化決策不可逆性。"
+    },
+    "bidding_abort_penalty": {
+      "description": "流標代價機制與理由強制性",
+      "visual_constraint": "在所有『案件流標』按鈕下方的理由選擇區，必須強制顯示警告文字：『若確定流標後欲重新上架案件，須支付一定上架費。』，使用 #AD5A5A (莫蘭迪磚紅) 粗體字。",
+      "behavioral_constraint": "所有流標動作必須關聯至少一個『流標原因 (Radio Button)』，否則禁止送出。"
+    }
+  },
+  "turnkey_bidding_logic": {
+    "TURNKEY_BIDDING_SCORE": {
+      "AI_QUANTITATIVE": "50%",
+      "USER_QUALITATIVE": "50%"
+    },
+    "AI_SCORE_CRITERIA": [
+      "文件完整度",
+      "預算合理性",
+      "SpecDB 匹配率"
+    ]
+  }
+}

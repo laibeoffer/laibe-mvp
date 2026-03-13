@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="bg-black">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LaiBE - 大師榮譽戰績榜 (Pro Portfolio)</title>
+    <!-- Fonts: Inter for Sans, Playfair Display for elegant numerals/headings -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "obsidian-black": "#070707",
+                        "ink-gray": "#121212",
+                        "gold-light": "#FFFACD",
+                        "gold-base": "#D4AF37",
+                        "gold-dark": "#997A15",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "Noto Sans TC", "sans-serif"],
+                        serif: ["Playfair Display", "serif"],
+                    },
+                    backgroundImage: {
+                        'gold-gradient': 'linear-gradient(135deg, #FFFACD 0%, #D4AF37 50%, #997A15 100%)',
+                        'gold-gradient-text': 'linear-gradient(to bottom right, #FFFACD, #D4AF37, #AA8529)',
+                        'metal-texture': 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22 opacity=%220.03%22/%3E%3C/svg%3E")',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #070707;
+            color: #E5E7EB;
+            overflow-x: hidden;
+        }
+
+        /* 1. Gold Text Clipping Utility */
+        .text-gold-clip {
+            background: linear-gradient(to bottom, #FFFEE0 0%, #D4AF37 40%, #AA8529 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0px 4px 15px rgba(212, 175, 55, 0.2);
+        }
+
+        /* 2. Fine Gold Border Utility */
+        .border-gold-fine {
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: inset 0 0 20px rgba(212, 175, 55, 0.05), Math.random() 0 0 10px rgba(212, 175, 55, 0.1);
+        }
+
+        /* 3. Outer Glows */
+        .glow-avatar {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.2);
+            border: 2px solid #D4AF37;
+        }
+
+        /* 4. Light-Racing Animation (The Masterpiece Gallery Cards) */
+        .light-racing-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            /* subtle rounding */
+            background-color: #121212;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .light-racing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent 0%, transparent 60%, #FFFACD 80%, #D4AF37 100%);
+            animation: rotate-light 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+
+        .light-racing-card::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            /* controls thickness of the racing border */
+            background-color: #121212;
+            border-radius: 2px;
+            z-index: 1;
+        }
+
+        .light-racing-card>* {
+            position: relative;
+            z-index: 2;
+            /* content stays above the animated border */
+        }
+
+        .light-racing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+        }
+
+        .light-racing-card:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes rotate-light {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 5. Gold Flakes Particles (Background Animation) */
+        .particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, #FFFACD 0%, #D4AF37 50%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-up infinite linear forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                transform: translateY(110vh) scale(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.8;
+                transform: translateY(90vh) scale(1);
+            }
+
+            90% {
+                opacity: 0.8;
+                transform: translateY(10vh) scale(1.2);
+            }
+
+            100% {
+                transform: translateY(-10vh) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Generate multiple particles with varying delays in JS */
+
+        /* 6. Gold Badge & Wax Seal CSS Approximations */
+        .badge-metal {
+            background: linear-gradient(180deg, #D4AF37 0%, #AA8529 100%);
+            color: #070707;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            border: 1px solid #FFFACD;
+        }
+
+        .wax-seal {
+            background: radial-gradient(circle at 30% 30%, #D4AF37, #8B6914);
+            box-shadow:
+                2px 4px 10px rgba(0, 0, 0, 0.8),
+                inset 1px 2px 4px rgba(255, 250, 205, 0.5),
+                inset -2px -4px 8px rgba(0, 0, 0, 0.6);
+            border-radius: 50%;
+            position: relative;
+            /* Rough edges simulation */
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+
+        .wax-seal::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .wax-seal::after {
+            content: '備';
+            font-family: 'Playfair Display', serif;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 250, 205, 0.8);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body class="bg-obsidian-black relative min-h-screen">
+
+    <!-- Ambient Texture & Particles Background -->
+    <div class="fixed inset-0 bg-metal-texture pointer-events-none z-0"></div>
+    <div class="particles-container" id="particles"></div>
+
+    <!-- Main Content Container (z-index above background) -->
+    <div class="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-40">
+
+        <!-- Page Title -->
+        <div class="text-center mb-16">
+            <h1 class="text-3xl md:text-4xl font-serif text-gold-clip tracking-[0.15em] mb-4">大師榮譽戰績榜</h1>
+            <div class="w-24 h-px bg-gradient-to-r from-transparent via-gold-base to-transparent mx-auto"></div>
+        </div>
+
+        <!-- Section 1: The Glory Bio Card -->
+        <section
+            class="border-gold-fine bg-ink-gray/60 backdrop-blur-md rounded-lg p-8 md:p-12 mb-20 relative overflow-hidden">
+            <!-- Subtle accent light in top left -->
+            <div
+                class="absolute top-0 left-0 w-64 h-64 bg-gold-base rounded-full mix-blend-screen filter blur-[100px] opacity-10">
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-between gap-12 relative z-10">
+                <!-- Left: Avatar & Title -->
+                <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=256&h=256"
+                            alt="大明設計師" class="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover glow-avatar">
+                        <!-- Verified Badge -->
+                        <div
+                            class="absolute -bottom-3 left-1/2 -translate-x-1/2 badge-metal px-4 py-1 rounded-full text-xs font-bold tracking-widest whitespace-nowrap z-10">
+                            萊比金牌核實
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline justify-center md:justify-start gap-4 mb-2">
+                            <h2 class="text-4xl font-serif text-white tracking-wide">王大明</h2>
+                            <span class="text-gold-base font-medium tracking-widest text-sm">尊榮設計師</span>
+                        </div>
+                        <p class="text-gray-400 text-sm leading-relaxed max-w-md font-light">
+                            王大設計館群工程、建議、開發設計師、室內陳設。把導向家的實習護送給每一次。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right: Meta Stats -->
+                <div class="flex items-center gap-10 md:gap-16 pr-0 md:pr-8">
+                    <!-- Stat 1 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-gray-400 text-xs tracking-[0.2em] mb-3">累計完工案量</span>
+                        <span class="text-5xl lg:text-6xl font-serif text-gold-clip">42</span>
+                    </div>
+                    <!-- Stat 2 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-gray-400 text-xs tracking-[0.2em] mb-3">專業好評數</span>
+                        <span class="text-5xl lg:text-6xl font-serif text-gold-clip">128</span>
+                    </div>
+                    <!-- Stat 3 -->
+                    <div class="flex flex-col items-center">
+                        <span class="text-gray-400 text-xs tracking-[0.2em] mb-3">萊比誠信指數</span>
+                        <span class="text-5xl lg:text-6xl font-serif text-gold-clip">99<span
+                                class="text-3xl">%</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The Masterpiece Gallery -->
+        <section class="mb-24">
+            <div class="flex items-end justify-between mb-8">
+                <h3 class="text-xl md:text-2xl font-serif text-gold-clip tracking-widest flex items-center gap-4">
+                    戰績作品牆
+                    <span class="text-sm font-sans text-gray-500 tracking-[0.2em] uppercase">Masterpiece Gallery</span>
+                </h3>
+                <button
+                    class="hidden md:flex items-center gap-2 border border-gold-base/40 px-4 py-1.5 rounded text-gold-base text-sm hover:bg-gold-base/10 transition-colors">
+                    新增榮耀案例 <span class="material-symbols-outlined text-lg">add</span>
+                </button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="light-racing-card aspect-[4/3] group cursor-pointer block">
+                    <div class="absolute inset-0 p-1.5 flex flex-col h-full bg-ink-gray">
+                        <div class="relative flex-1 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&q=80&w=800"
+                                alt="豪華麗人寓方案"
+                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 blur-[1px] group-hover:blur-none">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                            </div>
+
+                            <!-- Card Content Overlay -->
+                            <div class="absolute bottom-0 left-0 p-6 w-full">
+                                <h4 class="text-white font-serif text-xl mb-2 tracking-wide">豪華麗人寓方案</h4>
+                                <div
+                                    class="flex items-center gap-3 text-xs text-gold-base/80 tracking-widest font-light">
+                                    <span>豪宅設計</span>
+                                    <span class="w-1 h-1 rounded-full bg-gold-base/50"></span>
+                                    <span>軟裝陳設</span>
+                                    <span class="w-1 h-1 rounded-full bg-gold-base/50"></span>
+                                    <span>客製傢俱</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="light-racing-card aspect-[4/3] group cursor-pointer block">
+                    <div class="absolute inset-0 p-1.5 flex flex-col h-full bg-ink-gray">
+                        <div class="relative flex-1 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
+                                alt="商業空間"
+                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 blur-[1px] group-hover:blur-none">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                            </div>
+
+                            <div class="absolute bottom-0 left-0 p-6 w-full">
+                                <h4 class="text-white font-serif text-xl mb-2 tracking-wide">商業辦公空間</h4>
+                                <div
+                                    class="flex items-center gap-3 text-xs text-gold-base/80 tracking-widest font-light">
+                                    <span>商空規劃</span>
+                                    <span class="w-1 h-1 rounded-full bg-gold-base/50"></span>
+                                    <span>系統傢俱</span>
+                                    <span class="w-1 h-1 rounded-full bg-gold-base/50"></span>
+                                    <span>動線設計</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="light-racing-card aspect-[4/3] group cursor-pointer block">
+                    <div class="absolute inset-0 p-1.5 flex flex-col h-full bg-ink-gray">
+                        <div class="relative flex-1 overflow-hidden">
+                            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800"
+                                alt="老屋翻修改修"
+                                class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 blur-[1px] group-hover:blur-none">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
+                            </div>
+
+                            <div class="absolute bottom-0 left-0 p-6 w-full">
+                                <h4 class="text-white font-serif text-xl mb-2 tracking-wide">老屋翻修改造</h4>
+                                <div
+                                    class="flex items-center gap-3 text-xs text-gold-base/80 tracking-widest font-light">
+                                    <span>老屋拉皮</span>
+                                    <span class="w-1 h-1 rounded-full bg-gold-base/50"></span>
+                                    <span>管線重建</span>
+                                    <span class="w-1 h-1 rounded-full bg-gold-base/50"></span>
+                                    <span>泥作砌磚</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Add Button -->
+            <button
+                class="mt-6 md:hidden w-full flex items-center justify-center gap-2 border border-gold-base/40 px-4 py-4 rounded text-gold-base hover:bg-gold-base/10 transition-colors">
+                新增榮耀案例 <span class="material-symbols-outlined text-xl">add</span>
+            </button>
+        </section>
+
+        <!-- Section 3: The Credential Wall -->
+        <section>
+            <h3 class="text-xl md:text-2xl font-serif text-gold-clip tracking-widest flex items-center gap-4 mb-8">
+                專業證照牆
+                <span class="text-sm font-sans text-gray-500 tracking-[0.2em] uppercase">Credential Wall</span>
+            </h3>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
+                <!-- Cert 1 -->
+                <div class="relative group">
+                    <div
+                        class="aspect-[4/3] border border-gold-base/30 bg-ink-gray/80 p-1 flex items-center justify-center overflow-hidden hover:border-gold-base/70 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1589330694653-afa5de1020b0?auto=format&fit=crop&q=80&w=400"
+                            alt="室內設計乙級"
+                            class="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-500">
+                    </div>
+                    <!-- Wax Seal -->
+                    <div
+                        class="absolute -bottom-3 -right-3 w-12 h-12 wax-seal z-10 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                    </div>
+                    <div
+                        class="absolute bottom-1 left-1/2 -translate-x-1/2 w-[80%] text-center bg-black/80 backdrop-blur-sm px-2 py-0.5 border border-gold-base/20">
+                        <p class="text-[0.6rem] text-gold-light font-medium tracking-widest">萊比官方核實</p>
+                    </div>
+                </div>
+
+                <!-- Cert 2 -->
+                <div class="relative group">
+                    <div
+                        class="aspect-[4/3] border border-gold-base/30 bg-ink-gray/80 p-1 flex items-center justify-center overflow-hidden hover:border-gold-base/70 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=400"
+                            alt="建築製圖應用乙級"
+                            class="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-500">
+                    </div>
+                    <!-- Wax Seal -->
+                    <div
+                        class="absolute -bottom-3 -right-3 w-12 h-12 wax-seal z-10 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                    </div>
+                    <div
+                        class="absolute bottom-1 left-1/2 -translate-x-1/2 w-[80%] text-center bg-black/80 backdrop-blur-sm px-2 py-0.5 border border-gold-base/20">
+                        <p class="text-[0.6rem] text-gold-light font-medium tracking-widest">萊比官方核實</p>
+                    </div>
+                </div>
+
+                <!-- Cert 3 -->
+                <div class="relative group">
+                    <div
+                        class="aspect-[4/3] border border-gold-base/30 bg-ink-gray/80 p-1 flex items-center justify-center overflow-hidden hover:border-gold-base/70 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?auto=format&fit=crop&q=80&w=400"
+                            alt="室內裝修工程管理"
+                            class="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-500">
+                    </div>
+                    <!-- Wax Seal -->
+                    <div
+                        class="absolute -bottom-3 -right-3 w-12 h-12 wax-seal z-10 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                    </div>
+                    <div
+                        class="absolute bottom-1 left-1/2 -translate-x-1/2 w-[80%] text-center bg-black/80 backdrop-blur-sm px-2 py-0.5 border border-gold-base/20">
+                        <p class="text-[0.6rem] text-gold-light font-medium tracking-widest">萊比官方核實</p>
+                    </div>
+                </div>
+
+                <!-- Cert 4 -->
+                <div class="relative group">
+                    <div
+                        class="aspect-[4/3] border border-gold-base/30 bg-ink-gray/80 p-1 flex items-center justify-center overflow-hidden hover:border-gold-base/70 transition-colors">
+                        <img src="https://images.unsplash.com/photo-1558485208-a82fca94ffcb?auto=format&fit=crop&q=80&w=400"
+                            alt="裝潢木工"
+                            class="w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 group-hover:opacity-80 transition-all duration-500">
+                    </div>
+                    <!-- Wax Seal -->
+                    <div
+                        class="absolute -bottom-3 -right-3 w-12 h-12 wax-seal z-10 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                    </div>
+                    <div
+                        class="absolute bottom-1 left-1/2 -translate-x-1/2 w-[80%] text-center bg-black/80 backdrop-blur-sm px-2 py-0.5 border border-gold-base/20">
+                        <p class="text-[0.6rem] text-gold-light font-medium tracking-widest">萊比官方核實</p>
+                    </div>
+                </div>
+
+                <!-- Add Cert Button -->
+                <button
+                    class="aspect-[4/3] border border-dashed border-gray-600 bg-ink-gray/40 hover:bg-gold-base/5 hover:border-gold-base/50 flex flex-col items-center justify-center gap-2 transition-all group">
+                    <span
+                        class="material-symbols-outlined text-3xl text-gray-500 group-hover:text-gold-base transition-colors">add</span>
+                    <span
+                        class="text-xs font-light tracking-widest text-gray-400 group-hover:text-gold-light transition-colors">新增專業證照</span>
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <div
+        class="fixed bottom-0 left-0 w-full z-50 bg-gradient-to-t from-obsidian-black via-obsidian-black/90 to-transparent pt-12 pb-6 px-4">
+        <div class="max-w-[1280px] mx-auto flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
+            <button
+                class="w-full sm:w-auto px-8 py-3 rounded border border-gold-base/30 text-gold-light font-sans font-medium text-sm hover:bg-gold-base/10 transition-colors flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg">lock</span>
+                保存這份榮耀
+            </button>
+
+            <button
+                class="w-full sm:w-auto px-8 py-3 rounded badge-metal font-sans font-bold text-sm tracking-wider hover:-translate-y-1 transition-transform flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+                <span class="material-symbols-outlined text-lg">visibility</span>
+                進入對外展示模式
+            </button>
+        </div>
+    </div>
+
+
+    <!-- Script for Particle Generation -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const container = document.getElementById('particles');
+            const particleCount = 25; // Keep it low for performance
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                // Randomize size, position, and animation properties
+                const size = Math.random() * 4 + 1; // 1px to 5px
+                const left = Math.random() * 100; // 0% to 100%
+                const duration = Math.random() * 20 + 15; // 15s to 35s
+                const delay = Math.random() * -30; // Negative delay to start mid-animation
+
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${left}%`;
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${delay}s`;
+
+                container.appendChild(particle);
+            }
+        });
+    </script>
+</body>
+
+</html>

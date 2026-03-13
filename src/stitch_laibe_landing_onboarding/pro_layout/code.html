@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LaiBE - 乙方專業人士入口</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "deep-cyan": "#34575B",
+                        "signal-orange": "#FF6B00",
+                        "pure-white": "#FFFFFF",
+                        "charcoal": "#333333",
+                        "light-gray": "#F3F4F6",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "Noto Sans TC", "sans-serif"],
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans TC", sans-serif;
+            background-color: #FFFFFF;
+            color: #333333;
+        }
+
+        /* Object Crop Utility Classes for image_92dc71.jpg */
+        /* The original image is a 2x2 grid. We use scale(2) to zoom into one quadrant, 
+           and transform-origin to parse which quadrant. */
+        .crop-container {
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            /* Placeholder color before load */
+        }
+
+        .crop-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(2);
+        }
+
+        /* The 4 quadrants of image_92dc71.jpg */
+        .crop-top-left {
+            transform-origin: top left;
+        }
+
+        .crop-top-right {
+            transform-origin: top right;
+        }
+
+        .crop-bottom-left {
+            transform-origin: bottom left;
+        }
+
+        .crop-bottom-right {
+            transform-origin: bottom right;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="absolute top-0 w-full z-50 py-6">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-white font-black text-2xl tracking-tighter">
+                <span class="material-symbols-outlined text-3xl">architecture</span>
+                <span>LaiBE Pro</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-white/90 font-bold text-sm tracking-wide">
+                <a href="#" class="hover:text-white transition-colors">平台機制</a>
+                <a href="#" class="hover:text-white transition-colors">驗證案源</a>
+                <a href="#" class="hover:text-white transition-colors">信任評價</a>
+            </div>
+            <button class="text-white hover:text-white/80 transition-colors md:hidden">
+                <span class="material-symbols-outlined text-3xl">menu</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Deep Cyan) -->
+    <section class="bg-deep-cyan pt-32 pb-24 lg:pt-40 lg:pb-32 relative overflow-hidden">
+        <div
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-8">
+
+            <!-- Left Text -->
+            <div class="w-full lg:w-1/2 text-white pr-0 lg:pr-8">
+                <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-[1.15] tracking-tight">
+                    AI 賦能的<br />主動選案新時代
+                </h1>
+                <h2 class="text-xl sm:text-2xl font-bold mb-10 opacity-90 leading-relaxed max-w-xl">
+                    精準對接 100% 真實需求，不再把大把鈔票給廣告。
+                </h2>
+                <button
+                    class="bg-signal-orange text-white px-10 py-5 rounded font-black text-xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto text-center">
+                    立即查看案源
+                </button>
+            </div>
+
+            <!-- Right Visual (Bottom-right Crop: Hammer Breaking Wall) -->
+            <div class="w-full lg:w-1/2 flex justify-center lg:justify-end">
+                <!-- 16:9 Aspect Ratio Container for the crop -->
+                <div
+                    class="crop-container w-full max-w-lg aspect-video rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <img src="./image_92dc71.jpg" alt="打破舊有廣告模式" class="crop-image crop-bottom-right" />
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Recent Validated Cases (List View) -->
+    <section class="bg-light-gray py-24 border-y border-charcoal/10">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
+                <div>
+                    <h3 class="text-3xl font-black text-charcoal mb-2">最新驗證案源</h3>
+                    <p class="text-charcoal/60 font-medium tracking-wide">由 AI 完成需求驗證，無虛假、無需比稿費用的真實案件。</p>
+                </div>
+                <button class="text-signal-orange font-bold hover:underline underline-offset-4 flex items-center gap-1">
+                    查看全部 <span class="material-symbols-outlined text-sm">arrow_forward_ios</span>
+                </button>
+            </div>
+
+            <!-- List Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-charcoal/10 overflow-hidden">
+                <!-- Header Row (Hidden on mobile for cleaner look) -->
+                <div
+                    class="hidden md:grid grid-cols-12 gap-4 p-6 bg-charcoal/5 border-b border-charcoal/10 text-sm font-bold text-charcoal/60">
+                    <div class="col-span-2">發布日期</div>
+                    <div class="col-span-5">案件標題 & 地區</div>
+                    <div class="col-span-2">狀態</div>
+                    <div class="col-span-3 text-right">預算區間</div>
+                </div>
+
+                <!-- List Items -->
+                <div class="divide-y divide-charcoal/5 cursor-pointer">
+                    <!-- Item 1 -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-light-gray/50 transition-colors items-center group">
+                        <div class="col-span-2 text-charcoal/50 text-sm font-medium">今天 10:30</div>
+                        <div
+                            class="col-span-5 font-bold text-lg text-charcoal group-hover:text-deep-cyan transition-colors">
+                            新北林口 35坪 毛胚屋全室裝潢規劃</div>
+                        <div class="col-span-2">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ring-1 ring-inset ring-green-600/20 bg-green-50 text-green-700">需求確認完畢</span>
+                        </div>
+                        <div class="col-span-3 text-left md:text-right font-black text-xl text-signal-orange">NT$ 250 -
+                            300 萬</div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-light-gray/50 transition-colors items-center group">
+                        <div class="col-span-2 text-charcoal/50 text-sm font-medium">今天 09:15</div>
+                        <div
+                            class="col-span-5 font-bold text-lg text-charcoal group-hover:text-deep-cyan transition-colors">
+                            台北大安 15坪 老屋翻新 (含水電重置)</div>
+                        <div class="col-span-2">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ring-1 ring-inset ring-green-600/20 bg-green-50 text-green-700">需求確認完畢</span>
+                        </div>
+                        <div class="col-span-3 text-left md:text-right font-black text-xl text-signal-orange">NT$ 120 -
+                            150 萬</div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-light-gray/50 transition-colors items-center group">
+                        <div class="col-span-2 text-charcoal/50 text-sm font-medium">昨日 16:40</div>
+                        <div
+                            class="col-span-5 font-bold text-lg text-charcoal group-hover:text-deep-cyan transition-colors">
+                            台中西屯 50坪 預售屋客變與室內設計</div>
+                        <div class="col-span-2">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ring-1 ring-inset ring-green-600/20 bg-blue-50 text-blue-700">出圖現勘中</span>
+                        </div>
+                        <div class="col-span-3 text-left md:text-right font-black text-xl text-signal-orange">NT$ 400 -
+                            550 萬</div>
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-light-gray/50 transition-colors items-center group">
+                        <div class="col-span-2 text-charcoal/50 text-sm font-medium">昨日 14:20</div>
+                        <div
+                            class="col-span-5 font-bold text-lg text-charcoal group-hover:text-deep-cyan transition-colors">
+                            高雄左營 28坪 新成屋工業風裝潢</div>
+                        <div class="col-span-2">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ring-1 ring-inset ring-green-600/20 bg-green-50 text-green-700">需求確認完畢</span>
+                        </div>
+                        <div class="col-span-3 text-left md:text-right font-black text-xl text-signal-orange">NT$ 180 -
+                            220 萬</div>
+                    </div>
+
+                    <!-- Item 5 -->
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-12 gap-4 p-6 hover:bg-light-gray/50 transition-colors items-center group">
+                        <div class="col-span-2 text-charcoal/50 text-sm font-medium">昨日 11:05</div>
+                        <div
+                            class="col-span-5 font-bold text-lg text-charcoal group-hover:text-deep-cyan transition-colors">
+                            桃園青埔 80坪 透天厝一條龍統包</div>
+                        <div class="col-span-2">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ring-1 ring-inset ring-gray-600/20 bg-gray-50 text-gray-700">等待業主回覆</span>
+                        </div>
+                        <div class="col-span-3 text-left md:text-right font-black text-xl text-signal-orange">NT$ 800 -
+                            1000 萬</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storytelling Section (Zig-Zag Layout) -->
+    <section class="bg-pure-white py-32 overflow-hidden">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-32">
+
+            <!-- Block 1: Financial and Dignity (Text Left / Image Right) -->
+            <!-- Image: Top-Left Crop (4 Confident Designers) -->
+            <div class="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-24">
+                <div class="w-full md:w-1/2 flex flex-col items-start z-10">
+                    <div
+                        class="text-deep-cyan font-black text-sm mb-4 tracking-[0.2em] uppercase bg-deep-cyan/10 px-3 py-1 rounded">
+                        Feature 01</div>
+                    <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">讓專業回歸專業，把尊嚴還給設計師。</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-signal-orange mt-1">check_circle</span>
+                            <p class="text-xl text-charcoal/80 leading-relaxed font-bold">請款不再難以啟齒</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-signal-orange mt-1">check_circle</span>
+                            <p class="text-xl text-charcoal/80 leading-relaxed font-bold">按表操課準時收款</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-lg text-charcoal/60 leading-relaxed">
+                        我們知道您只想專注於設計與工程。透過 LaiBE 的階段性自動撥款機制，只要通過驗收節點，款項直接入帳，保障現金流，拒絕無限期拖欠。
+                    </p>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <div
+                        class="crop-container w-full aspect-[4/3] rounded-sm shadow-xl relative after:absolute after:inset-0 after:border after:border-black/5">
+                        <img src="./image_92dc71.jpg" alt="自信的專業設計師團隊" class="crop-image crop-top-left" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block 2: Efficiency and AI (Image Left / Text Right) -->
+            <!-- Image: Top-Right Crop (Robot organizing documents) -->
+            <div class="flex flex-col md:flex-row items-center gap-12 lg:gap-24">
+                <div class="w-full md:w-1/2">
+                    <div
+                        class="crop-container w-full aspect-[4/3] rounded-sm shadow-xl relative after:absolute after:inset-0 after:border after:border-black/5">
+                        <img src="./image_92dc71.jpg" alt="機器人整理文件" class="crop-image crop-top-right" />
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 flex flex-col items-start z-10">
+                    <div
+                        class="text-deep-cyan font-black text-sm mb-4 tracking-[0.2em] uppercase bg-deep-cyan/10 px-3 py-1 rounded">
+                        Feature 02</div>
+                    <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">AI 專案管家，你的最強後盾。</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-signal-orange mt-1">check_circle</span>
+                            <p class="text-xl text-charcoal/80 leading-relaxed font-bold">專屬 AI PCM 助理</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-signal-orange mt-1">check_circle</span>
+                            <p class="text-xl text-charcoal/80 leading-relaxed font-bold">公正第三方證據紀錄</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-lg text-charcoal/60 leading-relaxed">
+                        不再被工地現場繁雜的瑣事淹沒。AI 助理協助整理日誌、匯整對話紀錄。所有變更皆留存系統 Log，成為公正的第三方證據，有效拒絕奧客無理挑剔。
+                    </p>
+                    <div class="mt-8 p-5 bg-light-gray rounded border-l-4 border-signal-orange w-full">
+                        <p class="text-sm text-charcoal/80 font-bold flex items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-signal-orange text-lg">gavel</span>
+                            合約內建保護條款
+                        </p>
+                        <p class="text-xs text-charcoal/60 leading-relaxed">
+                            若業主未選用 PCM，乙方仍有權「自費啟動」AI 監管，確保驗收標準客觀公正。此權利已內建於 LaiBE 標準合約中，絕無球員兼裁判之疑慮。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block 3: Visions and Solutions (Text Left / Image Right) -->
+            <!-- Image: Bottom-Left Crop (Arguments and conflicts) -->
+            <div class="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-24">
+                <div class="w-full md:w-1/2 flex flex-col items-start z-10">
+                    <div
+                        class="text-deep-cyan font-black text-sm mb-4 tracking-[0.2em] uppercase bg-deep-cyan/10 px-3 py-1 rounded">
+                        Feature 03</div>
+                    <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">終結裝潢亂象，建立優良信譽。</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-signal-orange mt-1">check_circle</span>
+                            <p class="text-xl text-charcoal/80 leading-relaxed font-bold">累積永續企業信評</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-signal-orange mt-1">check_circle</span>
+                            <p class="text-xl text-charcoal/80 leading-relaxed font-bold">不再為廣告版面燒錢</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-lg text-charcoal/60 leading-relaxed">
+                        遠離無謂的爭端場面！LaiBE 終結「羊毛出在狗身上豬付錢」的惡性競爭時代。用實績與完工品質說話，優良評等自然為您帶來下一個頂級好案。
+                    </p>
+                </div>
+                <div class="w-full md:w-1/2">
+                    <div
+                        class="crop-container w-full aspect-[4/3] rounded-sm shadow-xl relative after:absolute after:inset-0 after:border after:border-black/5">
+                        <!-- Note this is the conflict image acting as pain point -->
+                        <img src="./image_92dc71.jpg" alt="業主與設計師爭執"
+                            class="crop-image crop-bottom-left grayscale sepia-[.3] contrast-125 mix-blend-multiply opacity-90" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <section class="bg-deep-cyan py-32 text-center text-white">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+            <h2 class="text-4xl sm:text-5xl lg:text-6xl font-black mb-10 leading-tight tracking-tight">
+                準備好加入<br class="hidden sm:block" />新一代的裝潢生態系了嗎？
+            </h2>
+            <button
+                class="bg-signal-orange text-white px-12 py-5 rounded font-black text-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
+                立即申請成為合作夥伴
+            </button>
+        </div>
+    </section>
+
+</body>
+
+</html>

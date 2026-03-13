@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaiBE - PCM 審查官操作面板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .verdict-approved {
+            background-color: #ecfdf5;
+            border-color: #22c55e;
+        }
+
+        /* 綠色 */
+        .verdict-rejected {
+            background-color: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        /* 紅色 */
+        .verdict-pending {
+            background-color: #fefce8;
+            border-color: #eab308;
+        }
+
+        /* 黃色 */
+    </style>
+</head>
+
+<body class="p-8">
+
+    <div class="max-w-7xl mx-auto space-y-8">
+        <header class="flex justify-between items-end border-b pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-800">PCM 審查官操作面板 (SpecDB)</h1>
+                <p class="text-slate-500 mt-2">憲法層級：CLAIM + EVIDENCE + VERDICT 唯一真相來源審查</p>
+                <div
+                    class="mt-2 text-sm font-semibold text-amber-700 bg-amber-50 border border-amber-200 p-2 rounded w-fit">
+                    📌 書面審查宣告：PCM 僅對文件之真實性與完整性負責，不代行現場監工作業流程之責。
+                </div>
+            </div>
+            <div>
+                <!-- 受監控的決策按鈕，用於展示橋接器聯動 -->
+                <button id="next-btn"
+                    class="px-6 py-2 bg-[#2C3E50] text-white rounded shadow-md font-bold transition-all">
+                    下一步：預算生成
+                </button>
+            </div>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                        <th class="py-4 px-6 font-bold text-slate-700 w-1/4">項目名稱 (Claim)</th>
+                        <th class="py-4 px-6 font-bold text-slate-700 w-1/4">單價與前提</th>
+                        <th class="py-4 px-6 font-bold text-slate-700 w-1/4">證據連結 (Evidence)</th>
+                        <th class="py-4 px-6 font-bold text-slate-700 w-1/4">裁決核心區 (Verdict Zone)</th>
+                    </tr>
+                </thead>
+                <tbody id="spec-table-body" class="divide-y divide-slate-100">
+                    <!-- Data will be populated here by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 引入 plancraft_bridge.js 以便觸發聯動鎖死功能 -->
+    <script src="src/plancraft_bridge.js"></script>
+    <script>
+        // 初始化模擬資料庫 (對應 specdb_schema.json)
+        const specDB = {
+            "spec_items": [
+                {
+                    "item_id": "FLD-001",
+                    "CLAIM": {
+                        "name": "超耐磨木地板",
+                        "category": "地坪工程",
+                        "unit": "坪",
+                        "system_unit_price": 3500,
+                        "prerequisites": ["需平整素地", "地坪高低差需小於 3mm/m", "報價含防潮墊與靜音墊"],
+                        "description": "連工帶料，基本直鋪工法"
+                    },
+                    "EVIDENCE": {
+                        "source_type": "historical_project",
+                        "source_reference": "Project-2023-A012_LivingRoom",
+                        "vendor_quote_uri": "https://laibe.system/docs/quotes/Q-2023-A012.pdf",
+                        "document_checklist": ["出廠證明", "施工前素地照片"],
+                        "has_rfi_records": false,
+                        "abnormal_price_increase_records": false
+                    },
+                    "VERDICT": {
+                        "pcm_status": "pending", // 預設為尚未裁決
+                        "pcm_signature": null,
+                        "verdict_timestamp": null
+                    }
+                },
+                {
+                    "item_id": "WLL-002",
+                    "CLAIM": {
+                        "name": "得利乳膠漆",
+                        "category": "油漆工程",
+                        "unit": "坪",
+                        "system_unit_price": 1200,
+                        "prerequisites": ["含批土打磨", "兩底三度"],
+                        "description": "連工帶料"
+                    },
+                    "EVIDENCE": {
+                        "source_type": "vendor_contract",
+                        "source_reference": "Vendor-PNT-005",
+                        "vendor_quote_uri": "https://laibe.system/docs/quotes/PNT-005.pdf",
+                        "document_checklist": ["進場材料清單", "施工紀錄表"],
+                        "has_rfi_records": true,
+                        "abnormal_price_increase_records": false
+                    },
+                    "VERDICT": {
+                        "pcm_status": "pending",
+                        "pcm_signature": null,
+                        "verdict_timestamp": null
+                    }
+                }
+            ]
+        };
+
+        const tableBody = document.getElementById('spec-table-body');
+
+        function renderTable() {
+            tableBody.innerHTML = '';
+            specDB.spec_items.forEach(item => {
+                const tr = document.createElement('tr');
+
+                // 決定視覺反饋顏色
+                let rowBgClass = '';
+                if (item.VERDICT.pcm_status === 'approved') rowBgClass = 'verdict-approved border-l-4';
+                if (item.VERDICT.pcm_status === 'rejected') rowBgClass = 'verdict-rejected border-l-4';
+                if (item.VERDICT.pcm_status === 'cannot_judge') rowBgClass = 'verdict-pending border-l-4';
+
+                tr.className = `transition-colors ${rowBgClass}`;
+
+                tr.innerHTML = `
+                    <td class="py-4 px-6">
+                        <div class="font-bold text-slate-800 text-lg">${item.CLAIM.name}</div>
+                        <div class="text-xs text-slate-400 mt-1 font-mono">${item.item_id} | ${item.CLAIM.category}</div>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="font-mono text-slate-700 bg-slate-100 px-2 py-1 rounded inline-block mb-2">
+                            NT$ ${item.CLAIM.system_unit_price} / ${item.CLAIM.unit}
+                        </div>
+                        <div class="text-xs text-slate-500 max-w-[200px]">
+                            <span class="font-bold text-slate-600">前提條件:</span><br>
+                            ${item.CLAIM.prerequisites.join(';<br>')}
+                        </div>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="text-sm">
+                            <span class="inline-block px-2 py-1 bg-slate-200 rounded text-xs text-slate-600 mb-2 font-mono">來源: ${item.EVIDENCE.source_type}</span>
+                            <br>
+                            <a href="#" class="text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 text-sm font-medium">
+                                <span class="material-symbols-outlined text-[16px]">insert_drive_file</span>
+                                開啟憑證檔案
+                            </a>
+                            <div class="mt-3">
+                                <span class="text-xs font-bold text-slate-700">📜 書面檢核清單:</span>
+                                <ul class="list-disc pl-4 mt-1 text-xs text-slate-500">
+                                    ${item.EVIDENCE.document_checklist ? item.EVIDENCE.document_checklist.map(doc => `<li>${doc}</li>`).join('') : '<li class="text-slate-400">無要求</li>'}
+                                </ul>
+                            </div>
+                            <div class="mt-3 bg-slate-50 p-2 rounded border border-slate-100">
+                                <span class="text-xs font-bold text-slate-700 block mb-1">🛡️ Anti-Bullying_Status (反霸凌檢查):</span>
+                                <div class="flex items-center gap-2 text-xs">
+                                    ${(item.EVIDENCE.has_rfi_records || item.EVIDENCE.abnormal_price_increase_records)
+                        ? '<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded font-semibold border border-red-200">🚩 高風險 (有 RFI 或異常追價紀錄)</span>'
+                        : '<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded font-semibold border border-green-200">✅ 正常 (無異常追價紀錄)</span>'
+                    }
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6">
+                        <div class="flex gap-2 mb-3">
+                            <button onclick="auditItem('${item.item_id}', 'approved')" class="flex-1 py-1.5 bg-white text-green-700 border border-green-300 rounded hover:bg-green-50 transition-colors text-sm font-bold shadow-sm">
+                                ✅ 通過
+                            </button>
+                            <button onclick="auditItem('${item.item_id}', 'rejected')" class="flex-1 py-1.5 bg-white text-red-700 border border-red-300 rounded hover:bg-red-50 transition-colors text-sm font-bold shadow-sm">
+                                ❌ 不通過
+                            </button>
+                            <button onclick="auditItem('${item.item_id}', 'cannot_judge')" class="flex-1 py-1.5 bg-white text-yellow-700 border border-yellow-300 rounded hover:bg-yellow-50 transition-colors text-sm font-bold shadow-sm">
+                                ❓ 無法判斷
+                            </button>
+                        </div>
+                        <div class="text-xs text-slate-500">
+                            狀態: <span class="font-black uppercase">${item.VERDICT.pcm_status}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 mt-1">
+                            最後更新: <span class="font-mono">${item.VERDICT.verdict_timestamp || '--'}</span>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // 裁決更新邏輯
+        function auditItem(id, status) {
+            const item = specDB.spec_items.find(i => i.item_id === id);
+            if (item) {
+                item.VERDICT.pcm_status = status;
+                item.VERDICT.pcm_signature = "PCM_AlexChen"; // 模擬 PCM 簽章
+
+                const now = new Date();
+                item.VERDICT.verdict_timestamp = now.getFullYear() + "-" +
+                    String(now.getMonth() + 1).padStart(2, '0') + "-" +
+                    String(now.getDate()).padStart(2, '0') + " " +
+                    String(now.getHours()).padStart(2, '0') + ":" +
+                    String(now.getMinutes()).padStart(2, '0');
+
+                console.log(`[PCM 審查] 項目 ${id} 狀態更新為: ${status}`);
+
+                // 重新渲染表格
+                renderTable();
+
+                // 檢查是否觸發預算崩潰 (與橋接器聯動)
+                checkSystemIntegrity();
+            }
+        }
+
+        // 系統完整性檢查：有任何關鍵單價被否決，則預算基礎崩潰，聯動前端橋接器鎖死
+        function checkSystemIntegrity() {
+            const hasRejected = specDB.spec_items.some(i => i.VERDICT.pcm_status === 'rejected');
+
+            if (hasRejected) {
+                console.warn("[系統警告] 偵測到 PCM 否決關鍵單價。預算基礎崩潰！");
+
+                // 這裡呼叫我們寫好的橋接器函數
+                if (typeof validatePlanCraftSchema === 'function') {
+                    // 故意傳入 false 觸發攔截與鎖死機制
+                    validatePlanCraftSchema({ boundaries: [], isClosed: false });
+
+                    // 動態修改警示文字以符合審查情境
+                    setTimeout(() => {
+                        const alertBox = document.getElementById('laibe-geometry-alert');
+                        if (alertBox) {
+                            alertBox.innerHTML = alertBox.innerHTML
+                                .replace('空間幾何閉合異常', 'PCM 審查否決異常')
+                                .replace('偵測到外框線段未完全閉合。根據 <span class="font-bold">LaiBE 制度 4.2 條</span>，形狀缺漏將導致「泥作工程」與「油漆面積」計算失真。',
+                                    'PCM 官已正式否決關鍵單價 (SpecDB)，原預算基準庫失效。')
+                                .replace('返回值 PlanCraft 修正邊界', '聯繫 PCM 官員重啟單價談判');
+                        }
+                    }, 50);
+                }
+            } else {
+                // 如果沒有 Rejected，檢查是否全數核准，給予解鎖
+                const allApproved = specDB.spec_items.every(i => i.VERDICT.pcm_status === 'approved');
+                if (allApproved && typeof validatePlanCraftSchema === 'function') {
+                    validatePlanCraftSchema({ boundaries: [], isClosed: true });
+                }
+            }
+        }
+
+        // 初始化
+        renderTable();
+
+    </script>
+</body>
+
+</html>

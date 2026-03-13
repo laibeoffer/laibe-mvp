@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LaiBE DIY Renovation - 案件上架預覽</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#6B7C85", // Morandi Grey-Blue/Green as primary
+                        "primary-dark": "#55646c",
+                        "secondary": "#E8EAE9", // Light Morandi Background
+                        "accent": "#2D3E50", // Dark Navy for Headers/Buttons
+                        "accent-hover": "#1a2530",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#1a202c",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#2d3748",
+                        "text-main-light": "#334155",
+                        "text-main-dark": "#e2e8f0",
+                        "text-sub-light": "#64748b",
+                        "text-sub-dark": "#94a3b8",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#4a5568",
+                        "morandi-pink": "#D9C9C7", 
+                        "morandi-blue": "#C4D4D8",
+                        "status-success": "#5F8D78",
+                        "status-warning": "#D4A373",
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        display: ['"Noto Sans TC"', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                        'xl': '0.75rem', // 12px
+                        '2xl': '1.5rem',
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.03)',
+                        'sticky-footer': '0 -4px 20px -5px rgba(0, 0, 0, 0.05)',
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark min-h-screen flex font-sans">
+<aside class="w-64 fixed inset-y-0 left-0 z-20 flex flex-col bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark hidden lg:flex">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    L
+                </div>
+<div>
+<h1 class="text-xl font-bold text-accent dark:text-white leading-tight">LaiBE</h1>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark">DIY Renovation</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-6 py-4">
+<ul class="relative">
+<div class="absolute left-4 top-4 bottom-10 w-0.5 bg-gray-200 dark:bg-gray-700 -z-10"></div>
+<li class="mb-8 relative group">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-sm z-10">
+<span class="material-icons-round text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-text-sub-light dark:text-text-sub-dark">發案準備</span>
+</div>
+</li>
+<li class="mb-8 relative group">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-sm z-10">
+<span class="material-icons-round text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-text-sub-light dark:text-text-sub-dark">上架費繳納</span>
+</div>
+</li>
+<li class="mb-8 relative group">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shadow-sm z-10">
+<span class="material-icons-round text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-text-sub-light dark:text-text-sub-dark">發案條件設定</span>
+</div>
+</li>
+<li class="relative">
+<div class="flex items-center p-2 -ml-2 rounded-lg bg-secondary/50 dark:bg-gray-700/50 backdrop-blur-sm border border-morandi-blue/30 dark:border-gray-600">
+<div class="w-8 h-8 rounded-full bg-accent dark:bg-blue-600 flex items-center justify-center text-white shadow-md z-10">
+<span class="material-icons-round text-lg">publish</span>
+</div>
+<span class="ml-4 text-sm font-bold text-accent dark:text-white">標案發布</span>
+</div>
+</li>
+</ul>
+</nav>
+</aside>
+<main class="lg:ml-64 flex-1 flex flex-col min-h-screen">
+<div class="p-4 lg:p-8 flex-1 overflow-y-auto pb-32">
+<div class="max-w-7xl mx-auto space-y-8">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold text-accent dark:text-white mb-2 tracking-wide">案件上架預覽</h2>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm">請再次確認以下內容，發布後將正式進入媒合流程</p>
+</div>
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<div class="xl:col-span-2 space-y-8">
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 lg:p-8 shadow-soft border border-border-light/50 dark:border-border-dark relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-secondary/30 rounded-bl-full -mr-8 -mt-8"></div>
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-lg font-bold text-accent dark:text-white flex items-center gap-2">
+<span class="material-icons-round text-primary">rule</span>
+                                發案規則摘要
+                            </h3>
+<button class="text-xs text-primary hover:text-primary-dark font-medium flex items-center gap-1 transition-colors">
+<span class="material-icons-round text-sm">edit</span> 編輯
+                            </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+<div class="p-4 rounded-lg bg-background-light dark:bg-background-dark/50">
+<span class="text-xs text-text-sub-light dark:text-text-sub-dark block mb-1">標案類型</span>
+<span class="text-sm font-bold text-accent dark:text-white">統包標 (設計+工程)</span>
+</div>
+<div class="p-4 rounded-lg bg-background-light dark:bg-background-dark/50">
+<span class="text-xs text-text-sub-light dark:text-text-sub-dark block mb-1">廠商資格</span>
+<span class="text-sm font-bold text-accent dark:text-white">限定法人</span>
+</div>
+<div class="p-4 rounded-lg bg-background-light dark:bg-background-dark/50">
+<span class="text-xs text-text-sub-light dark:text-text-sub-dark block mb-1">PCM 專業營建管理</span>
+<span class="text-sm font-bold text-status-success flex items-center gap-1">
+<span class="material-icons-round text-sm">check_circle</span> 已啟用
+                                </span>
+</div>
+</div>
+<div class="bg-orange-50 dark:bg-orange-900/10 border border-orange-100 dark:border-orange-900/30 rounded-lg p-4 flex items-start gap-3">
+<span class="material-icons-round text-orange-400 mt-0.5">info</span>
+<div>
+<p class="text-sm font-medium text-orange-800 dark:text-orange-200">本案總預算超過 75 萬，已強制限定法人競標。</p>
+<p class="text-xs text-orange-600 dark:text-orange-300 mt-1">這將確保投標廠商具備合法的公司登記與營運資格，提升履約保障。</p>
+</div>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 lg:p-8 shadow-soft border border-border-light/50 dark:border-border-dark">
+<h3 class="text-lg font-bold text-accent dark:text-white mb-6 flex items-center gap-2">
+<span class="material-icons-round text-primary">folder_open</span>
+                                專案資料圖資
+                            </h3>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="group relative bg-background-light dark:bg-background-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
+<img alt="Floor Plan" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3f6or6afFj9yy9ep22QqdmJn_Ai2ZzRBtrrp5gVomcCObka4TmCIeaGo-IpY3PFbD9iuym2WWzlT2WqQz2mYrf7zPSinkmrWLE9KQk0h0k5WT42UCR1haH_Ag0ie0HXwgZnF1qRR_qpe_qphmBzmIEkJpLhZF2-q4rMYOxnQ7qgdEm69-wJlxlSOnEjP22Z8NUNDSY4LZDp8S6v4e_HzAdxGdGr2Ks1uCMybxmUfhKFvMUmjRP7jNfV9AimSFQkJoz2kVxTtP3Oo"/>
+<div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-bold text-accent dark:text-white">平面圖</span>
+<button class="text-primary hover:text-accent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-icons-round text-sm">edit</span>
+</button>
+</div>
+<div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark">
+<span>2 份檔案</span>
+<span>10 分鐘前</span>
+</div>
+</div>
+</div>
+<div class="group relative bg-background-light dark:bg-background-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
+<img alt="Reference Image" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaxlSEd42f1gW12A26XWTl63_7Leyzszop-0rKGZqVvLRqa6EZmVyMPCdtJdK7iEULbCjibP2G-6E6CGGGwHljTt6RwPNaae-325-WHUZ7Kf-TO9kUg9Ba2K7qTd4OqVDodAIPCQsaB2wrWM5LAgMgcq4d9SZFrRoiFPRhJc7svUWgWhXFfd6C74LHWikZKkuZic7Z0r6Up9bmA1PQwgpzhzTfILZVdLCTmheQ5VMwAtxG9SzsfiOIDHqCgJJqKgAGf2DPd32dBEQ"/>
+</div>
+<div class="p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-bold text-accent dark:text-white">參考圖片</span>
+<button class="text-primary hover:text-accent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-icons-round text-sm">edit</span>
+</button>
+</div>
+<div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark">
+<span>5 份檔案</span>
+<span>1 小時前</span>
+</div>
+</div>
+</div>
+<div class="group relative bg-background-light dark:bg-background-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative overflow-hidden">
+<img alt="Construction Drawing" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjA77VaZ42jb5b0R5ecE85MhEbTu24thUk7gnoxwxvBYv0gmf88IIID79fY_x0o2dZrRXgoZXqxphf2lpT-mYtg0BKtp8yy4BdKJoKG0H4qI4opvAvl7m0eQtWLwUWVOtFO1DBD0prUOXC9dD1IAFu1B8zU5z8Vp2IiAJXXCLymp8KSV5UUW5yGa9Y9cl53MPYK9b-IihpVBZuqHEqv9qxK9sj4qSBcgePJ9SmZAKQWOJWq579nmAo4AFrju-ecarpaYV035b49B0"/>
+</div>
+<div class="p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-bold text-accent dark:text-white">現有施工圖</span>
+<button class="text-primary hover:text-accent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-icons-round text-sm">edit</span>
+</button>
+</div>
+<div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark">
+<span>1 份檔案</span>
+<span>昨天</span>
+</div>
+</div>
+</div>
+<div class="group relative bg-background-light dark:bg-background-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative flex items-center justify-center">
+<span class="material-icons-round text-4xl text-gray-400">image</span>
+</div>
+<div class="p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-bold text-accent dark:text-white">示意圖</span>
+<button class="text-primary hover:text-accent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-icons-round text-sm">edit</span>
+</button>
+</div>
+<div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark">
+<span>0 份檔案</span>
+<span>-</span>
+</div>
+</div>
+</div>
+<div class="group relative bg-background-light dark:bg-background-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative flex items-center justify-center">
+<span class="material-icons-round text-4xl text-gray-400">camera_alt</span>
+</div>
+<div class="p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-bold text-accent dark:text-white">現況照片</span>
+<button class="text-primary hover:text-accent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-icons-round text-sm">edit</span>
+</button>
+</div>
+<div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark">
+<span>8 份檔案</span>
+<span>2 天前</span>
+</div>
+</div>
+</div>
+<div class="group relative bg-background-light dark:bg-background-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors">
+<div class="h-32 bg-gray-200 dark:bg-gray-700 relative flex items-center justify-center bg-stripes">
+<span class="material-icons-round text-4xl text-gray-400">description</span>
+</div>
+<div class="p-3">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-bold text-accent dark:text-white">空白標單</span>
+<button class="text-primary hover:text-accent p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+<span class="material-icons-round text-sm">edit</span>
+</button>
+</div>
+<div class="flex justify-between items-center text-xs text-text-sub-light dark:text-text-sub-dark">
+<span>1 份檔案</span>
+<span>剛剛</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 lg:p-8 shadow-soft border border-border-light/50 dark:border-border-dark">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-bold text-accent dark:text-white flex items-center gap-2">
+<span class="material-icons-round text-primary">psychology</span>
+                                設計工程規劃概念
+                            </h3>
+<button class="text-text-sub-light hover:text-accent transition-colors">
+<span class="material-icons-round">expand_less</span>
+</button>
+</div>
+<div class="bg-background-light dark:bg-background-dark rounded-xl p-6 border border-border-light dark:border-border-dark">
+<p class="text-sm text-text-main-light dark:text-text-main-dark leading-relaxed whitespace-pre-line">
+                                針對本次辦公室裝修案，主要訴求為現代極簡風格（Minimalist Modern），希望以白色與淺灰色為主調，搭配溫潤的木質元素，營造明亮且專業的工作氛圍。
+                                重點需求：
+                                1. 開放式辦公區：需容納 20 人，注重動線流暢與自然採光。
+                                2. 會議室：一間 8 人會議室（需隔音良好）、一間 4 人討論室。
+                                3. 茶水間：結合休憩功能，需有簡單吧台設計。
+                                4. 地板：全室鋪設超耐磨木地板，會議室採用方塊地毯。
+                                期望完工後能提升員工協作效率，並展現公司創新與活力的品牌形象。
+                            </p>
+</div>
+</section>
+<section class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 lg:p-8 shadow-soft border border-border-light/50 dark:border-border-dark">
+<h3 class="text-lg font-bold text-accent dark:text-white mb-6 flex items-center gap-2">
+<span class="material-icons-round text-primary">account_balance_wallet</span>
+                                預算快照
+                            </h3>
+<div class="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-xl bg-gradient-to-r from-accent to-[#3d5266] text-white shadow-lg">
+<div>
+<span class="text-xs text-gray-300 block mb-1">總預算金額 (含稅)</span>
+<span class="text-3xl font-bold font-display">NT$ 2,500,000</span>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-center">
+<span class="text-xs text-gray-300 block mb-1">付款節點</span>
+<span class="text-xl font-bold">4 期</span>
+</div>
+<div class="w-px h-10 bg-gray-500/50"></div>
+<div class="text-center">
+<span class="text-xs text-gray-300 block mb-1">工期預估</span>
+<span class="text-xl font-bold">90 天</span>
+</div>
+</div>
+<button class="px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-lg text-sm font-medium transition-colors border border-white/20">
+                                查看完整預算明細
+                            </button>
+</div>
+</section>
+</div>
+<div class="xl:col-span-1 space-y-6">
+<div class="sticky top-8 space-y-6">
+<div class="bg-white dark:bg-surface-dark rounded-xl shadow-soft border border-border-light dark:border-border-dark overflow-hidden">
+<div class="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center gap-2">
+<span class="material-icons-round text-primary">smart_toy</span>
+<h4 class="font-bold text-accent dark:text-white">AI 發案風險檢視</h4>
+</div>
+<div class="p-6 space-y-5">
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-status-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-icons-round text-status-success text-sm">check</span>
+</div>
+<div>
+<h5 class="text-sm font-bold text-text-main-light dark:text-text-main-dark">預算完整度</h5>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">各項單價符合市場行情區間，預備金設定合理 (10%)。</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-status-warning/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-icons-round text-status-warning text-sm">warning</span>
+</div>
+<div>
+<h5 class="text-sm font-bold text-text-main-light dark:text-text-main-dark">文件齊備度</h5>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">缺少「既有管線圖」，可能影響拆除工程報價精準度。</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-status-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-icons-round text-status-success text-sm">check</span>
+</div>
+<div>
+<h5 class="text-sm font-bold text-text-main-light dark:text-text-main-dark">廠商資格匹配</h5>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">已限定法人，符合預算規模法規要求。</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-status-success/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-icons-round text-status-success text-sm">check</span>
+</div>
+<div>
+<h5 class="text-sm font-bold text-text-main-light dark:text-text-main-dark">PCM 建議</h5>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-1">已開啟 PCM 服務，專案經理將協助審核報價單。</p>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<div class="bg-secondary/50 rounded-lg p-3 text-xs text-text-sub-light dark:text-text-sub-dark leading-relaxed">
+                                AI 檢視結果僅供參考，系統建議您補充缺漏文件以降低追加預算風險。
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 right-0 lg:left-64 bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark p-4 shadow-sticky-footer z-30">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+<button class="w-full md:w-auto px-6 py-3 rounded-xl border border-border-dark/20 text-text-sub-light hover:text-accent hover:bg-gray-50 transition-colors font-medium">
+                返回修改
+            </button>
+<div class="flex flex-col items-end w-full md:w-auto">
+<button class="w-full md:w-auto px-8 py-3 rounded-xl bg-accent hover:bg-accent-hover text-white font-bold text-lg shadow-lg shadow-accent/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                    確認發案上架
+                    <span class="material-icons-round">rocket_launch</span>
+</button>
+<p class="hidden md:block text-[10px] text-text-sub-light mt-2 text-right">
+                    點擊確認即代表同意 LaiBE 服務條款，案件將於審核後 (約 2-4 小時) 正式公開。
+                </p>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LaiBE - Phase 1-2 設計標交付物檢核清單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F9D9D', // 莫蘭迪湖水綠
+                        danger: '#AD5A5A',   // 莫蘭迪磚紅
+                        background: '#F2F2F0', // 淺灰
+                        surface: '#FFFFFF'   // 白卡片
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* 模態視窗動畫 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-enter {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .modal-box-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+
+        /* 自訂 checkbox 樣式 */
+        .laibe-checkbox {
+            appearance: none;
+            background-color: #fff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.5em;
+            height: 1.5em;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.25em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .laibe-checkbox::before {
+            content: "";
+            width: 0.8em;
+            height: 0.8em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .laibe-checkbox:checked {
+            background-color: #4F9D9D;
+            border-color: #4F9D9D;
+        }
+
+        .laibe-checkbox:checked::before {
+            transform: scale(1);
+        }
+    </style>
+</head>
+
+<body class="bg-background min-h-screen p-6 text-slate-800 flex flex-col items-center">
+
+    <!-- 標題區 -->
+    <header class="w-full max-w-[800px] mb-8 mt-4">
+        <h1 class="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-2">
+            <span class="material-symbols-outlined text-4xl text-primary">architecture</span>
+            📐 設計標驗收：交付文件檢核
+        </h1>
+        <p class="text-slate-500 mt-2 font-medium">請確認以下交付文件皆已詳閱並核實。全數勾選後方可執行撥款作業。</p>
+
+        <!-- 進度條 -->
+        <div class="mt-6 flex items-center justify-between text-sm font-bold text-slate-600 mb-2">
+            <span>檢核進度</span>
+            <span id="progress-text">0/5</span>
+        </div>
+        <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+            <div id="progress-bar" class="bg-primary h-3 rounded-full transition-all duration-300" style="width: 0%">
+            </div>
+        </div>
+    </header>
+
+    <!-- 檢核清單主卡片 -->
+    <main
+        class="w-full max-w-[800px] bg-surface rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        <div class="p-6 divide-y divide-slate-100 flex-1" id="checklist-container">
+
+            <!-- Item 1 -->
+            <div class="py-5 flex items-center justify-between group hover:bg-slate-50 transition-colors -mx-6 px-6">
+                <label class="flex items-center gap-4 cursor-pointer select-none w-full">
+                    <input type="checkbox" class="laibe-checkbox checklist-item" data-id="1">
+                    <span class="font-bold text-slate-700 text-lg">平面配置定案圖</span>
+                </label>
+                <button
+                    class="view-btn px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-600 hover:border-primary hover:text-primary transition-colors flex items-center gap-2"
+                    data-id="1">
+                    <span class="material-symbols-outlined text-[18px]">imagesmode</span> 查看圖檔
+                </button>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="py-5 flex items-center justify-between group hover:bg-slate-50 transition-colors -mx-6 px-6">
+                <label class="flex items-center gap-4 cursor-pointer select-none w-full">
+                    <input type="checkbox" class="laibe-checkbox checklist-item" data-id="2">
+                    <span class="font-bold text-slate-700 text-lg">水電迴路配置圖</span>
+                </label>
+                <button
+                    class="view-btn px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-600 hover:border-primary hover:text-primary transition-colors flex items-center gap-2"
+                    data-id="2">
+                    <span class="material-symbols-outlined text-[18px]">imagesmode</span> 查看圖檔
+                </button>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="py-5 flex items-center justify-between group hover:bg-slate-50 transition-colors -mx-6 px-6">
+                <label class="flex items-center gap-4 cursor-pointer select-none w-full">
+                    <input type="checkbox" class="laibe-checkbox checklist-item" data-id="3">
+                    <span class="font-bold text-slate-700 text-lg">立面施工指引圖</span>
+                </label>
+                <button
+                    class="view-btn px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-600 hover:border-primary hover:text-primary transition-colors flex items-center gap-2"
+                    data-id="3">
+                    <span class="material-symbols-outlined text-[18px]">imagesmode</span> 查看圖檔
+                </button>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="py-5 flex items-center justify-between group hover:bg-slate-50 transition-colors -mx-6 px-6">
+                <label class="flex items-center gap-4 cursor-pointer select-none w-full">
+                    <input type="checkbox" class="laibe-checkbox checklist-item" data-id="4">
+                    <span class="font-bold text-slate-700 text-lg">3D 渲染示意圖</span>
+                </label>
+                <button
+                    class="view-btn px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-600 hover:border-primary hover:text-primary transition-colors flex items-center gap-2"
+                    data-id="4">
+                    <span class="material-symbols-outlined text-[18px]">imagesmode</span> 查看圖檔
+                </button>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="py-5 flex items-center justify-between group hover:bg-slate-50 transition-colors -mx-6 px-6">
+                <label class="flex items-center gap-4 cursor-pointer select-none w-full">
+                    <input type="checkbox" class="laibe-checkbox checklist-item" data-id="5">
+                    <span class="font-bold text-slate-700 text-lg">裝修材質表</span>
+                </label>
+                <button
+                    class="view-btn px-4 py-2 border border-slate-300 rounded text-sm font-bold text-slate-600 hover:border-primary hover:text-primary transition-colors flex items-center gap-2"
+                    data-id="5">
+                    <span class="material-symbols-outlined text-[18px]">imagesmode</span> 查看圖檔
+                </button>
+            </div>
+        </div>
+
+        <!-- 底部行動區 -->
+        <div class="bg-slate-50 p-6 border-t border-slate-200">
+            <button id="btn-submit" disabled
+                class="w-full py-4 text-white font-black tracking-widest rounded-lg flex items-center justify-center gap-2 transition-all duration-300 bg-slate-300 cursor-not-allowed">
+                <span class="material-symbols-outlined" id="submit-icon">lock</span>
+                <span id="submit-text">確認驗收並撥款 (0/5)</span>
+            </button>
+        </div>
+    </main>
+
+    <!-- ================= 警告 Modal (未看圖 / 點太快) ================= -->
+    <div id="warning-modal"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/60 backdrop-blur-sm hidden modal-enter">
+        <div
+            class="bg-surface rounded-xl shadow-2xl w-full max-w-md overflow-hidden border-4 border-danger modal-box-enter">
+            <div class="bg-danger p-4 flex items-center gap-3 text-white">
+                <span class="material-symbols-outlined text-3xl">warning</span>
+                <h2 class="text-lg font-black tracking-widest">系統防呆攔截</h2>
+            </div>
+            <div class="p-6">
+                <p id="warning-message" class="text-slate-800 font-bold text-base leading-relaxed">
+                    <!-- JS 動態寫入警告文字 -->
+                </p>
+            </div>
+            <div class="p-4 bg-slate-100 border-t border-slate-200 flex justify-end">
+                <button id="btn-close-warning"
+                    class="px-6 py-2 bg-danger text-white font-bold rounded hover:bg-red-700 transition-colors">
+                    這就去看
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 最終確認 Modal ================= -->
+    <div id="final-confirm-modal"
+        class="fixed inset-0 z-50 items-center justify-center bg-black/70 backdrop-blur-sm hidden modal-enter">
+        <div
+            class="bg-surface rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border-4 border-primary modal-box-enter">
+            <div class="bg-primary p-4 flex items-center gap-3 text-white">
+                <span class="material-symbols-outlined text-3xl">task_alt</span>
+                <h2 class="text-xl font-black tracking-widest">最終授權確認</h2>
+            </div>
+            <div class="p-6 space-y-4">
+                <div
+                    class="bg-primary/10 p-4 border border-primary/30 rounded text-slate-800 font-bold text-lg leading-relaxed text-center">
+                    您即將授權撥付設計費，<br>此動作<span class="text-danger">不可撤回</span>！<br>請再次確認交付物皆符合合約標準。
+                </div>
+            </div>
+            <div class="p-4 bg-slate-100 border-t border-slate-200 flex justify-end gap-3">
+                <button id="btn-cancel-final"
+                    class="px-6 py-2.5 bg-white border border-slate-300 text-slate-700 font-bold rounded hover:bg-slate-50 transition-colors">
+                    取消再想想
+                </button>
+                <button id="btn-execute-final"
+                    class="px-6 py-2.5 bg-primary text-white font-bold rounded hover:brightness-110 transition-colors shadow-md">
+                    確認！立刻執行撥款
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkboxes = document.querySelectorAll('.checklist-item');
+            const viewButtons = document.querySelectorAll('.view-btn');
+            const progressText = document.getElementById('progress-text');
+            const progressBar = document.getElementById('progress-bar');
+            const btnSubmit = document.getElementById('btn-submit');
+            const submitIcon = document.getElementById('submit-icon');
+            const submitText = document.getElementById('submit-text');
+
+            const warningModal = document.getElementById('warning-modal');
+            const warningMessage = document.getElementById('warning-message');
+            const btnCloseWarning = document.getElementById('btn-close-warning');
+
+            const finalConfirmModal = document.getElementById('final-confirm-modal');
+            const btnCancelFinal = document.getElementById('btn-cancel-final');
+            const btnExecuteFinal = document.getElementById('btn-execute-final');
+
+            const totalItems = checkboxes.length;
+
+            // 紀錄每個項目的查看狀態 {id: boolean}
+            const viewedItems = {};
+
+            // 紀錄勾選的時間戳，用來判斷是否「快速亂勾」
+            let clickTimestamps = [];
+
+            // 顯示警告 Modal
+            function showWarning(msg) {
+                warningMessage.innerHTML = msg;
+                warningModal.classList.remove('hidden');
+                warningModal.classList.add('flex');
+            }
+
+            btnCloseWarning.addEventListener('click', () => {
+                warningModal.classList.add('hidden');
+                warningModal.classList.remove('flex');
+            });
+
+            // 檢視按鈕事件綁定
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    viewedItems[id] = true; // 標記為已看過
+
+                    // 視覺反饋
+                    e.currentTarget.classList.add('bg-primary', 'text-white', 'border-primary');
+                    e.currentTarget.classList.remove('text-slate-600', 'bg-transparent', 'border-slate-300');
+                    e.currentTarget.innerHTML = `<span class="material-symbols-outlined text-[18px]">visibility</span> 已查看`;
+
+                    // 模擬彈出圖檔，這裡僅用 console 代表
+                    console.log(`[SYS] 打開檢視圖檔 ID: ${id}`);
+                });
+            });
+
+            // 勾選邏輯與防呆
+            checkboxes.forEach(cb => {
+                cb.addEventListener('click', (e) => {
+                    const id = e.target.dataset.id;
+                    const isChecked = e.target.checked;
+
+                    // 若取消勾選，直接放行
+                    if (!isChecked) {
+                        updateProgress();
+                        return;
+                    }
+
+                    // 防呆 1: 沒看過圖檔不准勾
+                    if (!viewedItems[id]) {
+                        e.preventDefault(); // 阻止勾選
+                        showWarning('⚠️ 偵測到您尚未開啟圖檔確認內容，請先點擊右側「查看圖檔」進行核對。');
+                        return;
+                    }
+
+                    // 防呆 2: 三秒內連續亂勾 > 3項
+                    const now = Date.now();
+                    // 加入陣列並保留最近的點擊記錄
+                    clickTimestamps.push(now);
+                    // 只保留3秒內的記錄
+                    clickTimestamps = clickTimestamps.filter(t => now - t <= 3000);
+
+                    if (clickTimestamps.length > 3) {
+                        e.preventDefault(); // 阻止本次勾選
+                        // 雖然阻止了，但要把最後一次拿掉以免卡死
+                        clickTimestamps.pop();
+                        showWarning('⚠️ 偵測到快速勾選！為確保您的權益，請確實點擊右側「查看圖檔」按鈕，核對設計細節後再行勾選。');
+                        return;
+                    }
+
+                    // 通過檢驗，更新進度
+                    updateProgress();
+                });
+            });
+
+            function updateProgress() {
+                const checkedCount = document.querySelectorAll('.checklist-item:checked').length;
+                const percentage = (checkedCount / totalItems) * 100;
+
+                // 更新文字與進度條寬度
+                progressText.textContent = `${checkedCount}/${totalItems}`;
+                progressBar.style.width = `${percentage}%`;
+
+                // 更新按鈕狀態
+                if (checkedCount === totalItems) {
+                    // 解鎖
+                    btnSubmit.disabled = false;
+                    btnSubmit.classList.remove('bg-slate-300', 'cursor-not-allowed', 'text-slate-400');
+                    btnSubmit.classList.add('bg-primary', 'hover:brightness-110', 'shadow-[0_4px_14px_0_rgba(79,157,157,0.39)]');
+                    submitIcon.textContent = 'payments';
+                    submitText.textContent = '確認驗收並撥款';
+                } else {
+                    // 上鎖
+                    btnSubmit.disabled = true;
+                    btnSubmit.classList.add('bg-slate-300', 'cursor-not-allowed');
+                    btnSubmit.classList.remove('bg-primary', 'hover:brightness-110', 'shadow-[0_4px_14px_0_rgba(79,157,157,0.39)]');
+                    submitIcon.textContent = 'lock';
+                    submitText.textContent = `確認驗收並撥款 (${checkedCount}/${totalItems})`;
+                }
+            }
+
+            // 提交按鈕點擊，喚起最終確認
+            btnSubmit.addEventListener('click', () => {
+                finalConfirmModal.classList.remove('hidden');
+                finalConfirmModal.classList.add('flex');
+            });
+
+            // 最終確認 Modal 邏輯
+            btnCancelFinal.addEventListener('click', () => {
+                finalConfirmModal.classList.add('hidden');
+                finalConfirmModal.classList.remove('flex');
+            });
+
+            btnExecuteFinal.addEventListener('click', () => {
+                finalConfirmModal.classList.add('hidden');
+                finalConfirmModal.classList.remove('flex');
+                alert("✅ 撥款指令已經送出，合規記錄已存入 SSOT。");
+            });
+
+        });
+    </script>
+</body>
+
+</html>

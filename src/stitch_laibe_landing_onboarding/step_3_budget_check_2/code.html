@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>預算明細表預覽 - 最終修正版 | LaiBE Construction</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .font-display {
+                font-family: 'Noto Sans TC', sans-serif;
+            }
+            .a4-container {
+                width: 210mm;
+                min-height: 297mm;
+                padding: 20mm;
+                margin: 0 auto;
+                background: white;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            }
+        }
+        :root {
+            --primary-navy: #2C3E50;
+            --step-active: #6B8E8E;
+            --ai-accent: #4A90E2;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-display min-h-screen flex flex-col">
+<header class="bg-[#D8E2DC] border-b border-gray-200 sticky top-0 z-50">
+<div class="max-w-screen-2xl mx-auto px-8 py-5">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 bg-gray-800 rounded flex items-center justify-center text-white font-bold text-xl">L</div>
+<span class="font-bold text-gray-700 tracking-widest text-lg uppercase">LaiBE Construction</span>
+</div>
+<div class="flex items-center gap-6 text-sm text-gray-600 font-medium">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">person</span> 專案負責人：Alex Chen</span>
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-lg">calendar_today</span> 2023/10/24</span>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<h1 class="text-2xl font-bold text-gray-800 whitespace-nowrap">Step 3 – 預算明細表預覽</h1>
+<div class="flex-1 flex items-center gap-0">
+<div class="flex flex-col items-center flex-1 relative">
+<div class="w-full h-1 bg-[var(--step-active)] absolute top-2/4 -translate-y-1/2 left-0"></div>
+<div class="w-4 h-4 rounded-full bg-[var(--step-active)] z-10 relative border-4 border-[#D8E2DC]"></div>
+<span class="text-[10px] mt-1 text-[var(--step-active)] font-bold">Step 1</span>
+</div>
+<div class="flex flex-col items-center flex-1 relative">
+<div class="w-full h-1 bg-[var(--step-active)] absolute top-2/4 -translate-y-1/2 left-0"></div>
+<div class="w-4 h-4 rounded-full bg-[var(--step-active)] z-10 relative border-4 border-[#D8E2DC]"></div>
+<span class="text-[10px] mt-1 text-[var(--step-active)] font-bold">Step 2</span>
+</div>
+<div class="flex flex-col items-center flex-1 relative">
+<div class="w-full h-1 bg-gray-300 absolute top-2/4 -translate-y-1/2 left-0">
+<div class="w-1/2 h-full bg-[var(--step-active)]"></div>
+</div>
+<div class="w-6 h-6 rounded-full bg-gray-800 z-10 relative border-4 border-[#D8E2DC]"></div>
+<span class="text-[10px] mt-1 text-gray-800 font-bold uppercase tracking-wider">Step 3 Active</span>
+</div>
+<div class="flex flex-col items-center flex-1 relative">
+<div class="w-full h-1 bg-gray-300 absolute top-2/4 -translate-y-1/2 left-0"></div>
+<div class="w-4 h-4 rounded-full bg-gray-300 z-10 relative border-4 border-[#D8E2DC]"></div>
+<span class="text-[10px] mt-1 text-gray-400 font-bold">Step 4</span>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-screen-2xl mx-auto w-full p-8 grid grid-cols-10 gap-8 relative">
+<div class="col-span-7 space-y-6">
+<div class="flex items-center bg-gray-200 p-1 rounded-lg w-fit">
+<button class="px-6 py-2 text-sm font-medium bg-gray-800 text-white rounded-md shadow-sm transition-all">明細表</button>
+<button class="px-6 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100 transition-all">總表</button>
+</div>
+<div class="a4-container">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold text-gray-900 mb-3 tracking-[0.3em]">工程預算明細表</h2>
+<div class="h-1 w-24 bg-gray-800 mx-auto mb-8"></div>
+<div class="grid grid-cols-2 text-left text-xs text-gray-600 border-b border-gray-100 pb-4">
+<div class="space-y-1">
+<p><span class="text-gray-400">專案名稱：</span>信義區 Alex Chen 宅邸裝修工程</p>
+<p><span class="text-gray-400">業主姓名：</span>Alex Chen 先生</p>
+</div>
+<div class="space-y-1 text-right">
+<p><span class="text-gray-400">報價日期：</span>2023/10/24</p>
+<p><span class="text-gray-400">報價編號：</span>LB-20231024-003</p>
+</div>
+</div>
+</div>
+<table class="w-full text-left border-collapse mb-10 border-t-2 border-gray-800 text-xs">
+<thead>
+<tr class="bg-gray-50 text-gray-700">
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-10 text-center">項次</th>
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-32">品項</th>
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-10 text-center">單位</th>
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-12 text-center">數量</th>
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-20 text-right">單價</th>
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-20 text-right">複價</th>
+<th class="py-2 px-2 font-bold border-b border-r border-gray-200 w-32">規格說明</th>
+<th class="py-2 px-2 font-bold border-b border-gray-200 w-20">備註</th>
+</tr>
+</thead>
+<tbody class="text-gray-800">
+<tr class="bg-gray-100/80">
+<td class="py-2 px-2 text-center font-bold text-gray-700 border-b border-gray-200" colspan="8">A. 拆除及保護工程</td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">1.1</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100">客廳天花拆除</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">坪</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">12</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums">2,500</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">30,000</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight">含原有角料及燈具清運</td>
+<td class="py-2 px-2 text-[10px] text-gray-400"></td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">1.2</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100">臥室地坪保護</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">式</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">1</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums">8,500</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">8,500</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight">兩層保護板+夾板</td>
+<td class="py-2 px-2 text-[10px] text-gray-400">含公設走道</td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">1.3</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100">廢棄物清運</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">車</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">2</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums">9,000</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">18,000</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight">合法處理場證明</td>
+<td class="py-2 px-2 text-[10px] text-gray-400"></td>
+</tr>
+<tr class="bg-gray-100/80">
+<td class="py-2 px-2 text-center font-bold text-gray-700 border-b border-gray-200" colspan="8">B. 水電工程</td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">2.1</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100">全室迴路更新</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">式</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">1</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums">120,000</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">120,000</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight">太平洋電纜 2.0mm/5.5mm</td>
+<td class="py-2 px-2 text-[10px] text-gray-400">不含開關面板</td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">2.2</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100">新增插座出線口</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">處</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">15</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums">2,200</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">33,000</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight">打鑿埋管工資另計</td>
+<td class="py-2 px-2 text-[10px] text-gray-400"></td>
+</tr>
+<tr class="bg-gray-100/80">
+<td class="py-2 px-2 text-center font-bold text-gray-700 border-b border-gray-200" colspan="8">C. 木作工程</td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">3.1</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100">平釘天花板</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">坪</td>
+<td class="py-2 px-2 text-center border-r border-gray-100">22</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums">4,200</td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">92,400</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight">日本矽酸鈣板 + 台灣角料</td>
+<td class="py-2 px-2 text-[10px] text-gray-400">F1級低甲醛</td>
+</tr>
+<tr class="border-b border-gray-200">
+<td class="py-2 px-2 text-center border-r border-gray-100">...</td>
+<td class="py-2 px-2 font-medium border-r border-gray-100 text-gray-400 italic">（以下略）</td>
+<td class="py-2 px-2 text-center border-r border-gray-100"></td>
+<td class="py-2 px-2 text-center border-r border-gray-100"></td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums"></td>
+<td class="py-2 px-2 text-right border-r border-gray-100 tabular-nums font-medium">...</td>
+<td class="py-2 px-2 text-[10px] text-gray-500 border-r border-gray-100 leading-tight"></td>
+<td class="py-2 px-2 text-[10px] text-gray-400"></td>
+</tr>
+</tbody>
+<tfoot>
+<tr class="bg-gray-50">
+<td class="py-3 px-2 text-right font-bold text-gray-600 border-r border-gray-200" colspan="5">小計</td>
+<td class="py-3 px-2 text-right font-bold text-gray-900 border-r border-gray-200 tabular-nums">1,448,100</td>
+<td class="py-3 px-2" colspan="2"></td>
+</tr>
+<tr class="bg-gray-50">
+<td class="py-3 px-2 text-right text-gray-600 border-r border-gray-200" colspan="5">工程管理費 (8.5%)</td>
+<td class="py-3 px-2 text-right text-gray-800 border-r border-gray-200 tabular-nums">123,088</td>
+<td class="py-3 px-2" colspan="2"></td>
+</tr>
+<tr class="border-t-2 border-gray-800 bg-gray-100">
+<td class="py-4 px-2 text-right font-bold text-xl text-gray-900 border-r border-gray-200" colspan="5">合計</td>
+<td class="py-4 px-2 text-right font-bold text-2xl text-gray-900 border-r border-gray-200 tabular-nums">1,571,188</td>
+<td class="py-4 px-2 text-xs font-medium text-gray-500" colspan="2">NTD (未稅)</td>
+</tr>
+</tfoot>
+</table>
+<div class="mb-10">
+<div class="flex items-start gap-2 text-red-600 font-bold mb-1">
+<span class="material-symbols-outlined text-base">info</span>
+<span class="text-xs">說明：未列項目：空調、淨水器、熱水器、窗簾</span>
+</div>
+<p class="text-gray-400 text-[10px] pl-6 leading-relaxed">
+                    ※ 本預算表僅供初步參考，實際施作細節以簽約圖說為準。<br/>
+                    ※ 報價有效期限為 15 天，逾期請重新詢價。
+                </p>
+</div>
+</div>
+</div>
+<aside class="col-span-3 space-y-6 sticky top-48 self-start">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="p-6">
+<h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">預覽與輸出</h3>
+<div class="flex flex-col gap-4">
+<button class="w-full py-4 px-6 bg-[var(--primary-navy)] hover:bg-[#1a252f] text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]">
+<span class="material-symbols-outlined">picture_as_pdf</span> 匯出 PDF
+                    </button>
+<button class="w-full py-4 px-6 bg-[var(--primary-navy)] hover:bg-[#1a252f] text-white rounded-lg font-bold shadow-md flex items-center justify-center gap-3 transition-all transform active:scale-[0.98]">
+<span class="material-symbols-outlined">border_color</span> 匯出空白標單
+                    </button>
+<button class="w-full py-4 px-6 bg-white border-2 border-gray-200 hover:border-gray-800 hover:text-gray-800 text-gray-600 rounded-lg font-bold flex items-center justify-center gap-3 transition-all">
+<span class="material-symbols-outlined">print</span> 列印報表
+                    </button>
+</div>
+</div>
+<div class="bg-gray-50 px-6 py-4 border-t border-gray-100">
+<button class="w-full py-3 px-6 text-gray-500 hover:text-gray-800 font-medium flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-xl">close</span> 關閉預覽
+                </button>
+</div>
+</div>
+<div class="p-6 bg-[#D8E2DC]/30 border border-[#D8E2DC] rounded-xl">
+<div class="flex items-center gap-3 mb-3 text-[var(--step-active)]">
+<span class="material-symbols-outlined font-bold">description</span>
+<span class="font-bold text-sm tracking-wide">文件資訊</span>
+</div>
+<p class="text-xs text-gray-500 leading-relaxed">
+                這是您的最終預算明細表。包含所有工項的單價分析與規格說明。在匯出之前，請確認所有細項、數量與備註說明無誤。
+            </p>
+</div>
+</aside>
+<div class="fixed bottom-8 right-8 z-[100] w-80 shadow-2xl rounded-2xl overflow-hidden border border-gray-200 bg-white flex flex-col group transition-all duration-300">
+<div class="bg-gray-800 p-4 flex items-center justify-between cursor-move">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[var(--ai-accent)] flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">smart_toy</span>
+</div>
+<div>
+<h4 class="text-white text-sm font-bold">AI 預算助理</h4>
+<span class="flex items-center gap-1 text-[10px] text-green-400"><span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> 在線中</span>
+</div>
+</div>
+<button class="text-gray-400 hover:text-white"><span class="material-symbols-outlined text-lg">close</span></button>
+</div>
+<div class="h-64 p-4 overflow-y-auto bg-gray-50 space-y-4">
+<div class="flex gap-2">
+<div class="w-6 h-6 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center"><span class="material-symbols-outlined text-xs">smart_toy</span></div>
+<div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-xs text-gray-700 leading-relaxed border border-gray-100">
+                    您好！我是您的 AI 預算助理。我發現「客廳天花拆除」的單價略低於市場行情，需要我為您分析嗎？
+                </div>
+</div>
+<div class="flex gap-2 flex-row-reverse">
+<div class="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0 flex items-center justify-center"><span class="material-symbols-outlined text-xs">person</span></div>
+<div class="bg-gray-800 p-3 rounded-2xl rounded-tr-none shadow-sm text-xs text-white leading-relaxed">
+                    請幫我檢查是否有遺漏的工項。
+                </div>
+</div>
+</div>
+<div class="p-3 border-t border-gray-100 bg-white">
+<div class="relative">
+<input class="w-full pl-4 pr-10 py-2 bg-gray-100 border-none rounded-full text-xs focus:ring-1 focus:ring-[var(--ai-accent)]" placeholder="輸入您的問題..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--ai-accent)]"><span class="material-symbols-outlined">send</span></button>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-8 text-center text-gray-400 text-xs border-t border-gray-100">
+<p>© 2023 LaiBE Construction Tender Platform. Professional B2B Solution.</p>
+</footer>
+
+</body></html>

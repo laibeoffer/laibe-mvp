@@ -1,0 +1,22 @@
+{
+    "geometry_status": {
+        "is_closed": false,
+        "last_updated": null
+    },
+    "pcm_audit_status": {
+        "has_rejected": false,
+        "all_approved": false
+    },
+    "bidding_scores": {
+        "quantitative_score": 0,
+        "qualitative_score": 0,
+        "user_override": []
+    },
+    "budget_draft_state": {
+        "manual_price_adjustments": {},
+        "manual_quantity_adjustments": {},
+        "last_saved": null
+    },
+    "current_phase": "editing",
+    "last_system_update": null
+}

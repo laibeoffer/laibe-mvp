@@ -1,0 +1,38 @@
+{
+    "spec_items": [
+        {
+            "item_id": "FLD-001",
+            "CLAIM": {
+                "name": "超耐磨木地板",
+                "category": "地坪工程",
+                "unit": "坪",
+                "system_unit_price": 3500,
+                "market_calibration": {
+                    "baseline_price": 3400,
+                    "warning_threshold_percentage": 15,
+                    "exceeds_warning_message": "此單價略高於市場行情，建議確認是否含清運或其他隱藏費用"
+                },
+                "prerequisites": [
+                    "需平整素地",
+                    "地坪高低差需小於 3mm/m",
+                    "報價含防潮墊與靜音墊"
+                ],
+                "description": "連工帶料，基本直鋪工法"
+            },
+            "EVIDENCE": {
+                "source_type": "historical_project",
+                "source_reference": "Project-2023-A012_LivingRoom",
+                "vendor_quote_uri": "https://laibe.system/docs/quotes/Q-2023-A012.pdf",
+                "evidence_confidence_score": 0.95,
+                "last_updated": "2023-11-15T10:00:00Z"
+            },
+            "VERDICT": {
+                "_SYSTEM_ENFORCEMENT_WARNING": "!!! 絕對禁止 AI 自動化寫入或覆寫。此節點永遠保留給 PCM (專業營建管理) 人工審核簽核使用 !!!",
+                "pcm_status": "approved",
+                "pcm_signature": "PCM_AlexChen",
+                "verdict_timestamp": "2023-11-16T14:30:00Z",
+                "audit_notes": "單價符合當前 Q4 市場均價，且施工範圍明確，核准納入系統基準。"
+            }
+        }
+    ]
+}

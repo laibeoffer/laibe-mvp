@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>工程預算明細校對 - 恢復進度條版</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .font-display {
+                font-family: 'Noto Sans TC', sans-serif;
+            }
+            .a4-shadow {
+                box-shadow: 0 0 15px rgba(0,0,0,0.08);
+            }
+            .select-material {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+                background-position: right 0.2rem center;
+                background-size: 1.25em 1.25em;
+                padding-right: 1.5rem;
+                padding-top: 0.1rem;
+                padding-bottom: 0.1rem;
+            }
+            .row-active {
+                background-color: rgba(129, 192, 192, 0.08);
+                border-left: 4px solid #81C0C0;
+            }
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 4px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: #E5E7EB;
+                border-radius: 10px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #D1D5DB;
+            }
+        }
+        :root {
+            --morandi-teal: #6B8E8E;
+            --morandi-bg: #D8E2DC;
+            --morandi-dark: #2C3E50;
+            --highlight-green: #81C0C0;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F9FA] text-gray-800 font-display min-h-screen flex flex-col">
+<header class="bg-[#D8E2DC] border-b border-gray-200 sticky top-0 z-40">
+<div class="max-w-screen-2xl mx-auto px-6 py-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 bg-gray-800 rounded flex items-center justify-center text-white font-bold text-sm">L</div>
+<span class="font-bold text-gray-700 tracking-wider">LaiBE Construction</span>
+</div>
+<div class="flex items-center gap-6 text-sm text-gray-600">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">person</span> 專案負責人：Alex Chen</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-base">history</span> AI 生成時間：2023/10/24 14:20</span>
+</div>
+</div>
+</div>
+</header>
+<section class="bg-white border-b border-gray-200 py-8 px-6">
+<div class="max-w-screen-2xl mx-auto">
+<div class="flex flex-col gap-8">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-4">
+<h1 class="text-3xl font-bold text-gray-800">工程預算明細校對</h1>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-[#6B8E8E]/10 text-[#6B8E8E] text-xs rounded-full border border-[#6B8E8E]/30 font-bold tracking-wide">Step 3 當前進度</span>
+<button class="px-3 py-1 bg-gray-50 border border-gray-200 rounded-full text-gray-600 text-xs hover:bg-gray-100 flex items-center gap-1 transition-colors font-medium">
+<span class="material-symbols-outlined text-sm">visibility</span> 預覽報告
+                        </button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2 bg-white border border-gray-300 rounded-md text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors">上一步</button>
+<button class="px-6 py-2 bg-[#2C3E50] text-white rounded-md text-sm font-medium hover:bg-[#1a252f] transition-colors">下一步：標單確認</button>
+</div>
+</div>
+<div class="relative flex items-center justify-between w-full max-w-5xl mx-auto px-10">
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
+<div class="absolute top-1/2 left-0 w-1/2 h-0.5 bg-[#6B8E8E] -translate-y-1/2 z-0 transition-all duration-500"></div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-[#6B8E8E] flex items-center justify-center text-white shadow-sm ring-4 ring-white">
+<span class="material-symbols-outlined text-xl">check</span>
+</div>
+<div class="absolute top-12 text-center whitespace-nowrap">
+<span class="text-xs font-medium text-[#6B8E8E]">Step 1</span>
+<p class="text-sm font-bold text-gray-600">需求確認</p>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-[#6B8E8E] flex items-center justify-center text-white shadow-sm ring-4 ring-white">
+<span class="material-symbols-outlined text-xl">check</span>
+</div>
+<div class="absolute top-12 text-center whitespace-nowrap">
+<span class="text-xs font-medium text-[#6B8E8E]">Step 2</span>
+<p class="text-sm font-bold text-gray-600">空間基準</p>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-[#6B8E8E] flex items-center justify-center text-white shadow-lg ring-4 ring-[#D8E2DC] scale-110">
+<span class="font-bold text-lg">3</span>
+</div>
+<div class="absolute top-14 text-center whitespace-nowrap">
+<span class="text-xs font-bold text-[#6B8E8E]">Step 3</span>
+<p class="text-base font-bold text-[#2C3E50]">預算生成</p>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-400 shadow-sm ring-4 ring-white">
+<span class="font-bold text-sm">4</span>
+</div>
+<div class="absolute top-12 text-center whitespace-nowrap">
+<span class="text-xs font-medium text-gray-400">Step 4</span>
+<p class="text-sm font-medium text-gray-400">標單確認</p>
+</div>
+</div>
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center text-gray-400 shadow-sm ring-4 ring-white">
+<span class="font-bold text-sm">5</span>
+</div>
+<div class="absolute top-12 text-center whitespace-nowrap">
+<span class="text-xs font-medium text-gray-400">Step 5</span>
+<p class="text-sm font-medium text-gray-400">合約草案</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<main class="flex-1 max-w-screen-2xl mx-auto w-full p-6 grid grid-cols-12 gap-6 items-start">
+<div class="col-span-9 flex flex-col gap-4">
+<div class="bg-white rounded-lg a4-shadow border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-white">
+<div class="flex items-center gap-4">
+<h2 class="font-bold text-gray-700">工程明細項目</h2>
+<div class="flex gap-2">
+<span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded font-medium">總計 32 項</span>
+<span class="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded border border-orange-100 flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-xs">error</span> 2 項單價異常
+                        </span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-sm px-3 py-1.5 border border-gray-200 rounded text-gray-600 hover:bg-gray-50 flex items-center gap-1 font-medium transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span> 篩選
+                    </button>
+<button class="text-sm px-3 py-1.5 border border-gray-200 rounded text-gray-600 hover:bg-gray-50 flex items-center gap-1 font-medium transition-colors">
+<span class="material-symbols-outlined text-sm">sort</span> 排序
+                    </button>
+</div>
+</div>
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 text-gray-500 text-[13px] border-b border-gray-200">
+<th class="py-3 px-4 w-12 font-bold">項次</th>
+<th class="py-3 px-4 w-[28%] font-bold">品項</th>
+<th class="py-3 px-4 w-12 text-center font-bold">單位</th>
+<th class="py-3 px-4 w-12 text-right font-bold">數量</th>
+<th class="py-3 px-4 w-20 text-right font-bold">單價</th>
+<th class="py-3 px-4 w-24 text-right font-bold">複價</th>
+<th class="py-3 px-4 w-[20%] font-bold">規格說明</th>
+<th class="py-3 px-4 font-bold">備註</th>
+</tr>
+</thead>
+<tbody class="text-gray-700 text-sm divide-y divide-gray-100">
+<tr class="bg-[#D8E2DC]/20">
+<td class="py-2.5 px-4 font-bold text-[#6B8E8E] text-xs tracking-wider" colspan="8">A. 拆除及保護工程</td>
+</tr>
+<tr class="hover:bg-gray-50/80 transition-colors group">
+<td class="py-3 px-4 text-center text-gray-400">01</td>
+<td class="py-3 px-4">
+<div class="font-medium mb-1">公共空間地面及牆面保護工程</div>
+<select class="select-material text-xs border border-gray-300 rounded bg-white text-gray-600 focus:ring-1 focus:ring-[#6B8E8E] focus:border-[#6B8E8E] py-0 pl-2 pr-6 h-6 leading-none">
+<option selected="">雙層保護</option>
+<option>單層瓦楞板</option>
+<option>夾板保護</option>
+</select>
+</td>
+<td class="py-3 px-4 text-center">式</td>
+<td class="py-3 px-4 text-right">1</td>
+<td class="py-3 px-4 text-right font-mono">15,000</td>
+<td class="py-3 px-4 text-right font-mono">15,000</td>
+<td class="py-3 px-4">
+<div class="flex items-center justify-between gap-2">
+<span class="truncate text-xs text-gray-500">厚 2.0mm 瓦愣板雙層鋪設</span>
+<button class="shrink-0 text-[10px] text-[#6B8E8E] hover:underline whitespace-nowrap">查看工法</button>
+</div>
+</td>
+<td class="py-3 px-4 text-gray-400 text-xs">-</td>
+</tr>
+<tr class="hover:bg-gray-50/80 transition-colors group">
+<td class="py-3 px-4 text-center text-gray-400">02</td>
+<td class="py-3 px-4">
+<div class="font-medium mb-1">室內地坪、廚具及傢俱保護</div>
+<select class="select-material text-xs border border-gray-300 rounded bg-white text-gray-600 focus:ring-1 focus:ring-[#6B8E8E] focus:border-[#6B8E8E] py-0 pl-2 pr-6 h-6 leading-none">
+<option selected="">標準保護</option>
+<option>加強保護</option>
+</select>
+</td>
+<td class="py-3 px-4 text-center">式</td>
+<td class="py-3 px-4 text-right">1</td>
+<td class="py-3 px-4 text-right font-mono">8,500</td>
+<td class="py-3 px-4 text-right font-mono">8,500</td>
+<td class="py-3 px-4">
+<div class="flex items-center justify-between gap-2">
+<span class="truncate text-xs text-gray-500">防潮布+瓦楞板</span>
+<button class="shrink-0 text-[10px] text-[#6B8E8E] hover:underline whitespace-nowrap">查看工法</button>
+</div>
+</td>
+<td class="py-3 px-4 text-gray-400 text-xs">含梯廳</td>
+</tr>
+<tr class="bg-orange-50/30 hover:bg-orange-50/50 transition-colors group">
+<td class="py-3 px-4 text-center text-gray-400">03</td>
+<td class="py-3 px-4">
+<div class="font-medium mb-1">既存木作櫃體拆除及清運</div>
+<select class="select-material text-xs border border-gray-300 rounded bg-white text-gray-600 focus:ring-1 focus:ring-[#6B8E8E] focus:border-[#6B8E8E] py-0 pl-2 pr-6 h-6 leading-none">
+<option selected="">含清運</option>
+<option>僅拆除</option>
+</select>
+</td>
+<td class="py-3 px-4 text-center">式</td>
+<td class="py-3 px-4 text-right">1</td>
+<td class="py-3 px-4 text-right font-mono text-orange-600 font-bold bg-orange-100/50 rounded">33,000</td>
+<td class="py-3 px-4 text-right font-mono text-orange-600 font-bold">33,000</td>
+<td class="py-3 px-4">
+<div class="flex items-center justify-between gap-2">
+<span class="truncate text-xs text-gray-500">含廢棄物清運費、搬運費</span>
+<button class="shrink-0 text-[10px] text-[#6B8E8E] hover:underline whitespace-nowrap">查看工法</button>
+</div>
+</td>
+<td class="py-3 px-4 text-gray-400 text-xs">需申請電梯</td>
+</tr>
+<tr class="bg-[#D8E2DC]/20">
+<td class="py-2.5 px-4 font-bold text-[#6B8E8E] text-xs tracking-wider" colspan="8">B. 泥作及防水工程</td>
+</tr>
+<tr class="row-active transition-colors group">
+<td class="py-3 px-4 text-center text-gray-400">06</td>
+<td class="py-3 px-4">
+<div class="font-medium mb-1">隔間牆砌磚工程</div>
+<select class="select-material text-xs border border-gray-300 rounded bg-white text-gray-600 focus:ring-1 focus:ring-[#6B8E8E] focus:border-[#6B8E8E] py-0 pl-2 pr-6 h-6 leading-none">
+<option selected="">紅磚 1/2B</option>
+<option>白磚</option>
+<option>輕隔間 (石膏板)</option>
+<option>輕隔間 (矽酸鈣)</option>
+</select>
+</td>
+<td class="py-3 px-4 text-center">坪</td>
+<td class="py-3 px-4 text-right">12</td>
+<td class="py-3 px-4 text-right font-mono">5,800</td>
+<td class="py-3 px-4 text-right font-mono">69,600</td>
+<td class="py-3 px-4">
+<div class="flex items-center justify-between gap-2">
+<span class="truncate text-xs text-gray-500">1/2B 磚牆、含雙面粗胚粉光</span>
+<button class="shrink-0 text-[10px] text-[#6B8E8E] font-bold underline whitespace-nowrap">查看工法</button>
+</div>
+</td>
+<td class="py-3 px-4 text-gray-400 text-xs">高度 &lt; 3M</td>
+</tr>
+</tbody>
+</table>
+<div class="p-6 bg-gray-50 flex justify-between items-start">
+<div class="text-sm text-gray-500 max-w-md">
+<p class="font-bold mb-1 flex items-center gap-1 text-gray-700">
+<span class="material-symbols-outlined text-sm">info</span> 校對說明
+                    </p>
+<p>上述單價基於市場平均值計算。點擊「查看工法」可於右側面板瀏覽詳細施工標準與市場行情參考。若有特殊需求，請直接於表格中調整數量或規格。</p>
+</div>
+<div class="text-right flex flex-col gap-1">
+<div class="flex justify-between w-64 text-sm text-gray-600">
+<span>項目小計</span>
+<span class="font-mono">245,250</span>
+</div>
+<div class="flex justify-between w-64 text-sm text-gray-600">
+<span>預估管理費 (8.5%)</span>
+<span class="font-mono">20,846</span>
+</div>
+<div class="h-px bg-gray-200 my-2"></div>
+<div class="flex justify-between w-64 text-lg font-bold text-[#2C3E50]">
+<span>預算總計</span>
+<span class="font-mono">NT$ 266,096</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col gap-4 sticky top-28">
+<div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
+<h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">檔案與匯出</h3>
+<div class="flex flex-col gap-2">
+<button class="w-full py-2.5 px-4 bg-[#2C3E50] hover:bg-[#1a252f] text-white rounded-md font-medium shadow-sm flex items-center justify-center gap-2 transition-colors text-sm">
+<span class="material-symbols-outlined text-xl">description</span> 匯出明細報價
+                </button>
+<button class="w-full py-2.5 px-4 bg-white border border-[#2C3E50]/30 hover:bg-gray-50 text-[#2C3E50] rounded-md font-medium flex items-center justify-center gap-2 transition-colors text-sm">
+<span class="material-symbols-outlined text-xl">tab_unselected</span> 匯出空白標單
+                </button>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-[#6B8E8E] overflow-hidden">
+<div class="p-3 bg-[#6B8E8E]/10 border-b border-[#6B8E8E]/20 flex justify-between items-center">
+<span class="font-bold text-[#2C3E50] text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[#6B8E8E] text-lg">menu_book</span> 工法與規格詳情
+                </span>
+<span class="text-[10px] text-[#6B8E8E] bg-white px-1.5 py-0.5 rounded border border-[#6B8E8E]/30">項次 06 連動中</span>
+</div>
+<div class="p-4 space-y-4">
+<div>
+<h4 class="text-xs font-bold text-gray-700 mb-1">隔間牆砌磚工程 - 紅磚 1/2B</h4>
+<p class="text-[11px] text-gray-500">標準紅磚砌築，適用於一般室內隔間。</p>
+</div>
+<div class="h-px bg-gray-100"></div>
+<div>
+<div class="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wider font-bold">材料規格</div>
+<ul class="text-xs text-gray-600 space-y-1.5">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[14px] text-gray-400 mt-0.5">check_circle</span>
+<span>主材：標準紅磚 (20x10x5cm)</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[14px] text-gray-400 mt-0.5">check_circle</span>
+<span>水泥砂漿：1:3 水泥砂漿</span>
+</li>
+</ul>
+</div>
+<div>
+<div class="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wider font-bold">標準工法</div>
+<div class="text-xs text-gray-600 leading-relaxed bg-gray-50 p-2 rounded border border-gray-100">
+                        每日砌築高度不超過 1.2m，避免倒塌。交丁處需滿漿，轉角處需加強交錯咬合。門窗開口處需設置眉樑。
+                    </div>
+</div>
+<div>
+<div class="text-[10px] text-gray-400 mb-1.5 uppercase tracking-wider font-bold">市場單價參考</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-gray-500">行情：</span>
+<span class="font-mono font-bold text-gray-700">NT$ 5,500 - 6,800 / 坪</span>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-orange-200 overflow-hidden">
+<div class="p-3 bg-orange-50 border-b border-orange-100 flex justify-between items-center">
+<span class="font-bold text-orange-700 text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-orange-600 text-lg">smart_toy</span> 單價異常警示
+                </span>
+<span class="bg-orange-200 text-orange-800 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Alert</span>
+</div>
+<div class="p-4 space-y-4">
+<div class="border-l-2 border-orange-400 pl-3">
+<p class="text-xs text-gray-500 mb-1">偵測到項次 03</p>
+<p class="text-sm font-bold text-gray-800">既存木作櫃體拆除及清運</p>
+</div>
+<button class="w-full py-2 bg-[#81C0C0] hover:bg-[#6ea8a8] text-white rounded text-sm font-bold transition-colors shadow-sm flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span> 查看建議與修正
+                </button>
+</div>
+</div>
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col max-h-[480px]">
+<div class="p-3 border-b border-gray-100 bg-white flex items-center justify-between">
+<span class="font-bold text-gray-700 text-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[#6B8E8E] text-lg">chat_bubble</span> AI 助理
+                </span>
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-[10px] text-gray-400 font-medium uppercase">Online</span>
+</span>
+</div>
+<div class="p-4 flex-1 overflow-y-auto custom-scrollbar space-y-4 min-h-[220px] bg-white">
+<div class="flex flex-col gap-1 items-start">
+<div class="bg-gray-100 text-gray-700 text-xs py-2.5 px-3 rounded-2xl rounded-tl-none max-w-[90%] leading-relaxed">
+                        您好，我是您的預算助理。我已經完成市場價格比對，發現「拆除工程」中有 1 項單價略高，需要為您分析嗎？
+                    </div>
+<span class="text-[10px] text-gray-400 ml-1">14:20</span>
+</div>
+<div class="flex flex-col gap-1 items-end">
+<div class="bg-[#6B8E8E] text-white text-xs py-2.5 px-3 rounded-2xl rounded-tr-none max-w-[90%] leading-relaxed">
+                        請幫我檢查這份標單的完整性。
+                    </div>
+<span class="text-[10px] text-gray-400 mr-1">14:21</span>
+</div>
+<div class="flex flex-col gap-1 items-start">
+<div class="bg-gray-100 text-gray-700 text-xs py-2.5 px-3 rounded-2xl rounded-tl-none max-w-[90%] leading-relaxed">
+                        正在檢查... 整體結構良好。建議在「水電工程」中細化插座規格，以避免日後施工爭議。
+                    </div>
+<span class="text-[10px] text-gray-400 ml-1">14:21</span>
+</div>
+</div>
+<div class="px-3 pb-3 flex flex-wrap gap-1.5 bg-white">
+<button class="text-[10px] py-1 px-2.5 bg-gray-50 border border-gray-200 text-gray-500 rounded-full hover:border-[#6B8E8E] hover:text-[#6B8E8E] hover:bg-white transition-all">檢查標單完整性</button>
+<button class="text-[10px] py-1 px-2.5 bg-gray-50 border border-gray-200 text-gray-500 rounded-full hover:border-[#6B8E8E] hover:text-[#6B8E8E] hover:bg-white transition-all">比對市場單價</button>
+<button class="text-[10px] py-1 px-2.5 bg-gray-50 border border-gray-200 text-gray-500 rounded-full hover:border-[#6B8E8E] hover:text-[#6B8E8E] hover:bg-white transition-all">生成預算摘要</button>
+</div>
+<div class="p-3 border-t border-gray-100 bg-gray-50">
+<div class="relative">
+<input class="w-full text-xs border-gray-200 rounded-md pr-10 focus:ring-[#6B8E8E] focus:border-[#6B8E8E] placeholder:text-gray-400 py-2" placeholder="詢問 AI 關於預算、工法或市場行情..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-[#6B8E8E] hover:text-[#5a7979] transition-colors">
+<span class="material-symbols-outlined text-lg">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

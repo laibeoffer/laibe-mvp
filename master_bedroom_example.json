@@ -1,0 +1,157 @@
+{
+    "room_id": "RM-MBR-001",
+    "room_type": "Master Bedroom",
+    "dimensions": {
+        "length_cm": 450,
+        "width_cm": 380,
+        "slab_height_cm": 320
+    },
+    "space_attributes": {
+        "Ceiling_Config": {
+            "Enable": true,
+            "Height": 280,
+            "Type": "Cove",
+            "layer_tags": [
+                "Layer_Ceiling",
+                "Layer_Power"
+            ],
+            "notes": "間接照明，預留 40cm 高度供管線與燈槽使用"
+        },
+        "Wall_Finish": {
+            "default_material_id": "WLL-002",
+            "notes": "預設採用得利乳膠漆"
+        },
+        "Floor_Finish": {
+            "default_material_id": "FLD-001",
+            "notes": "預設採用超耐磨木地板"
+        }
+    },
+    "objects": [
+        {
+            "object_id": "OBJ-STR-001",
+            "category": "Structure",
+            "type": "High_Wall",
+            "properties": {
+                "Length": 450,
+                "Thickness": 15,
+                "is_load_bearing": false
+            },
+            "graphics": {
+                "plan_svg_ref": "svg_wall_standard_h",
+                "elevation_img_ref": "img_wall_standard"
+            },
+            "position": {
+                "x": 0,
+                "y": 0,
+                "rotation": 0
+            }
+        },
+        {
+            "object_id": "OBJ-STO-001",
+            "category": "Storage",
+            "type": "Wardrobe",
+            "properties": {
+                "Construction_Method": "System",
+                "Width": 240,
+                "Height": 280,
+                "Depth": 60,
+                "Snap_Constraint": {
+                    "active": true,
+                    "locked_depth": 60,
+                    "override_flag": false
+                },
+                "Height_Constraint": {
+                    "max_allowed": 280,
+                    "source": "Ceiling_Config.Height"
+                }
+            },
+            "graphics": {
+                "plan_svg_ref": "svg_wardrobe_sys_240",
+                "elevation_img_ref": "img_wardrobe_sys_240"
+            },
+            "position": {
+                "x": 0,
+                "y": 50,
+                "rotation": 90
+            }
+        },
+        {
+            "object_id": "OBJ-ELE-001",
+            "category": "Electrical",
+            "type": "Switch",
+            "layer_tags": [
+                "Layer_Power"
+            ],
+            "properties": {
+                "gang_count": 2,
+                "is_three_way": true,
+                "linked_lights": [
+                    "OBJ-LGT-001",
+                    "OBJ-LGT-002"
+                ],
+                "validation_status": "Valid",
+                "validation_note": "未超過單一面板 6 切上限"
+            },
+            "graphics": {
+                "plan_svg_ref": "svg_switch_3way_2g"
+            },
+            "position": {
+                "x": 10,
+                "y": 100,
+                "rotation": 0,
+                "height_from_floor": 120
+            }
+        },
+        {
+            "object_id": "OBJ-APP-001",
+            "category": "Appliances",
+            "type": "Air_Conditioner",
+            "layer_tags": [
+                "Layer_Power",
+                "Layer_Water"
+            ],
+            "properties": {
+                "Power_Load": "220V",
+                "capacity_tons": 1.5,
+                "auto_spawned_socket": "OBJ-ELE-002"
+            },
+            "graphics": {
+                "plan_svg_ref": "svg_ac_wall",
+                "elevation_img_ref": "img_ac_wall"
+            },
+            "position": {
+                "x": 200,
+                "y": 0,
+                "rotation": 0,
+                "height_from_floor": 240
+            }
+        },
+        {
+            "object_id": "OBJ-ELE-002",
+            "category": "Electrical",
+            "type": "Socket",
+            "layer_tags": [
+                "Layer_Power"
+            ],
+            "properties": {
+                "voltage": "220V",
+                "purpose": "Dedicated AC Power",
+                "auto_spawned_by": "OBJ-APP-001"
+            },
+            "graphics": {
+                "plan_svg_ref": "svg_socket_220v"
+            },
+            "position": {
+                "x": 220,
+                "y": 0,
+                "rotation": 0,
+                "height_from_floor": 220
+            }
+        }
+    ],
+    "validation_state": {
+        "door_conflict_check": "Passed",
+        "switch_gang_check": "Passed",
+        "snap_constraints_check": "Passed"
+    }
+}

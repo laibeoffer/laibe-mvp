@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>競標決策儀表板 - 全寬數據對照版</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4A6FA5", 
+                        "primary-dark": "#36527A",
+                        "accent": "#C08B76",
+                        "background-light": "#F9FAFB",
+                        "background-dark": "#1A202C",
+                        "morandi-purple": "#AE57A4",
+                        "morandi-red": "#AD5A5A",
+                        "morandi-yellow": "#A5A552",
+                        "morandi-green": "#5CADAD",
+                        "morandi-blue": "#8080C0",
+                        "surface": "#FFFFFF"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans TC", "sans-serif"],
+                        "sans": ["Inter", "Noto Sans TC", "sans-serif"],
+                    },
+                    boxShadow: {
+                        "card": "0 2px 12px rgba(0, 0, 0, 0.04)",
+                        "soft": "0 1px 3px rgba(0, 0, 0, 0.05)"
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #F9FAFB;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+        }
+        .quote-table th {
+            white-space: nowrap;
+        }
+        .quote-table td {
+            vertical-align: middle;
+        }
+        .chat-bubble {
+            position: relative;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            max-width: 80%;
+        }
+        .chat-bubble.ai {
+            border-bottom-left-radius: 0;
+        }
+        .chat-bubble.user {
+            border-bottom-right-radius: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-gray-100 min-h-screen flex flex-col font-display transition-colors duration-200">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-200 dark:border-slate-700 px-6 py-4 bg-white dark:bg-[#1A202C] sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2.5">
+<div class="size-9 flex items-center justify-center bg-primary text-white rounded-lg shadow-sm">
+<span class="material-symbols-outlined text-[20px]">roofing</span>
+</div>
+<div class="flex flex-col">
+<h2 class="text-slate-800 dark:text-white text-lg font-bold leading-none tracking-tight">LaiBE</h2>
+<span class="text-[10px] text-slate-500 font-medium tracking-wide uppercase mt-0.5">Bid Analysis</span>
+</div>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<h1 class="text-base font-semibold text-slate-700 dark:text-slate-200">大安區居家翻新 (30坪) - 報價明細審核</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-8 ring-2 ring-slate-100 dark:ring-slate-700 ml-2" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBa4vktKguhGufb4seiIQ4tltH3Sd81LFiATBnB4QYKr9dcpwUnM86vUsuBX1c3luVwogSXKqNfYMXOVlKcQ_kyHZYuACP78zSR2x_bCXEX465N0I90YYdUJPFxnTMBqhY1kJOc5cRMwh-wAvFvi8Yw8LRdxOM3VUOL0S64DCp8eB3BpILmj-InL5DHEQNKqKnT8sWYYLq8EOoU9Zt4oQLHnamIpzJcP4bwPI2MQhr-j03TbY8ptM44N6zMsWawsmSAOWkhClWuVDI");'></div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-[1400px] mx-auto py-8 px-4 sm:px-6 lg:px-8">
+<div class="mb-8">
+<h2 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight flex items-center gap-3">
+                競標方案高階分析
+                <span class="inline-flex items-center rounded-full bg-morandi-blue/10 px-2.5 py-0.5 text-xs font-medium text-morandi-blue ring-1 ring-inset ring-morandi-blue/30">AI Quote Breakdown</span>
+</h2>
+<p class="mt-2 text-slate-500 dark:text-slate-400">針對各廠商報價明細、工項內容與風險評估的綜合對比。</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+<div class="flex flex-col rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-card overflow-hidden group">
+<div class="p-5 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-morandi-blue/10 flex items-center justify-center text-lg font-bold text-morandi-blue">A</div>
+<div>
+<h3 class="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
+                                    優選木工坊
+                                    <span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+</h3>
+<span class="inline-flex items-center rounded-sm bg-morandi-blue/10 px-1.5 py-0.5 text-[10px] font-medium text-morandi-blue mt-1">品質首選</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-slate-800 dark:text-white tabular-nums">$1,250k</p>
+<p class="text-xs text-slate-500">工期 60 天</p>
+</div>
+</div>
+<div class="mt-2">
+<span class="inline-flex items-center gap-1 rounded-full bg-morandi-purple/10 px-2.5 py-1 text-xs font-semibold text-morandi-purple w-full justify-center">
+<span class="material-symbols-outlined text-[14px]">diamond</span>
+                            頂級材料導向策略
+                        </span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col gap-5">
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">空間優化建議</p>
+<div class="relative h-24 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600 flex items-center justify-center group-hover:bg-slate-200 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-slate-300 text-4xl">floor</span>
+<div class="absolute inset-0 bg-black/5 flex items-center justify-center">
+<span class="bg-white/90 dark:bg-black/80 text-slate-700 dark:text-white text-xs font-bold px-2 py-1 rounded shadow-sm">收納最大化配置</span>
+</div>
+</div>
+</div>
+<div class="bg-amber-50 dark:bg-amber-900/10 p-3 rounded-lg border border-amber-100 dark:border-amber-800/30">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-amber-500 text-[16px] mt-0.5">warning</span>
+<div class="text-xs text-amber-800 dark:text-amber-200">
+<span class="font-bold">除外項目：</span>窗簾與活動家具<br/>
+<span class="font-bold">潛在風險：</span>特殊漆料可能需補價差
+                            </div>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 p-2">
+<div class="grid grid-cols-3 gap-2">
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-morandi-green hover:bg-morandi-green/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">floor</span>
+                            平面圖
+                        </button>
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium bg-morandi-green/10 text-morandi-green ring-1 ring-morandi-green/30">
+<span class="material-symbols-outlined text-[18px]">engineering</span>
+                            工法書
+                        </button>
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-morandi-green hover:bg-morandi-green/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">calculate</span>
+                            預算書
+                        </button>
+</div>
+</div>
+</div>
+<div class="flex flex-col rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-card overflow-hidden group">
+<div class="p-5 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-morandi-green/10 flex items-center justify-center text-lg font-bold text-morandi-green">B</div>
+<div>
+<h3 class="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
+                                    極速裝修團隊
+                                    <span class="material-symbols-outlined text-primary text-[16px]">verified</span>
+</h3>
+<span class="inline-flex items-center rounded-sm bg-morandi-green/10 px-1.5 py-0.5 text-[10px] font-medium text-morandi-green mt-1">效率首選</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-slate-800 dark:text-white tabular-nums">$1,100k</p>
+<p class="text-xs text-slate-500">工期 45 天</p>
+</div>
+</div>
+<div class="mt-2">
+<span class="inline-flex items-center gap-1 rounded-full bg-morandi-green/10 px-2.5 py-1 text-xs font-semibold text-morandi-green w-full justify-center">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+                            快速完工模組化策略
+                        </span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col gap-5">
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">空間優化建議</p>
+<div class="relative h-24 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600 flex items-center justify-center group-hover:bg-slate-200 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-slate-300 text-4xl">schema</span>
+<div class="absolute inset-0 bg-black/5 flex items-center justify-center">
+<span class="bg-white/90 dark:bg-black/80 text-slate-700 dark:text-white text-xs font-bold px-2 py-1 rounded shadow-sm">動線優化與開放格局</span>
+</div>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[16px] mt-0.5">info</span>
+<div class="text-xs text-slate-600 dark:text-slate-300">
+<span class="font-bold">除外項目：</span>全室冷氣空調<br/>
+<span class="font-bold">備註：</span>夜間趕工可能產生噪音投訴
+                            </div>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 p-2">
+<div class="grid grid-cols-3 gap-2">
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium bg-morandi-green/10 text-morandi-green ring-1 ring-morandi-green/30">
+<span class="material-symbols-outlined text-[18px]">floor</span>
+                            平面圖
+                        </button>
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-morandi-green hover:bg-morandi-green/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">engineering</span>
+                            工法書
+                        </button>
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-morandi-green hover:bg-morandi-green/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">calculate</span>
+                            預算書
+                        </button>
+</div>
+</div>
+</div>
+<div class="flex flex-col rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-card overflow-hidden group">
+<div class="p-5 border-b border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-lg bg-morandi-red/10 flex items-center justify-center text-lg font-bold text-morandi-red">C</div>
+<div>
+<h3 class="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1">
+                                    實惠工程行
+                                    <span class="material-symbols-outlined text-slate-300 text-[16px]">verified_user</span>
+</h3>
+<span class="inline-flex items-center rounded-sm bg-morandi-red/10 px-1.5 py-0.5 text-[10px] font-medium text-morandi-red mt-1">預算首選</span>
+</div>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-slate-800 dark:text-white tabular-nums">$880k</p>
+<p class="text-xs text-slate-500">工期 50 天</p>
+</div>
+</div>
+<div class="mt-2">
+<span class="inline-flex items-center gap-1 rounded-full bg-morandi-red/10 px-2.5 py-1 text-xs font-semibold text-morandi-red w-full justify-center">
+<span class="material-symbols-outlined text-[14px]">savings</span>
+                            經濟實惠介入策略
+                        </span>
+</div>
+</div>
+<div class="p-5 flex-1 flex flex-col gap-5">
+<div>
+<p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">空間優化建議</p>
+<div class="relative h-24 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600 flex items-center justify-center group-hover:bg-slate-200 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-slate-300 text-4xl">grid_view</span>
+<div class="absolute inset-0 bg-black/5 flex items-center justify-center">
+<span class="bg-white/90 dark:bg-black/80 text-slate-700 dark:text-white text-xs font-bold px-2 py-1 rounded shadow-sm">基礎機能修復</span>
+</div>
+</div>
+</div>
+<div class="bg-red-50 dark:bg-red-900/10 p-3 rounded-lg border border-red-100 dark:border-red-800/30">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-red-500 text-[16px] mt-0.5">report_problem</span>
+<div class="text-xs text-red-800 dark:text-red-200">
+<span class="font-bold">除外項目：</span>水電管線更換、燈具<br/>
+<span class="font-bold">潛在風險：</span>完工後追加款可能性高
+                            </div>
+</div>
+</div>
+</div>
+<div class="border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/30 p-2">
+<div class="grid grid-cols-3 gap-2">
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium bg-morandi-green/10 text-morandi-green ring-1 ring-morandi-green/30">
+<span class="material-symbols-outlined text-[18px]">floor</span>
+                            平面圖
+                        </button>
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-morandi-green hover:bg-morandi-green/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">engineering</span>
+                            工法書
+                        </button>
+<button class="flex flex-col items-center justify-center gap-1 py-2 rounded-lg text-xs font-medium text-slate-500 hover:text-morandi-green hover:bg-morandi-green/10 transition-all">
+<span class="material-symbols-outlined text-[18px]">calculate</span>
+                            預算書
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-12">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400">table_chart</span>
+                    競標對照矩陣
+                </h3>
+<button class="flex items-center justify-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-md text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-soft">
+<span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+<span>匯出 PDF 比較表</span>
+</button>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-slate-500 uppercase bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700">
+<tr>
+<th class="px-6 py-4 font-medium w-1/4" scope="col">評比維度</th>
+<th class="px-6 py-4 font-bold text-morandi-blue" scope="col">優選木工坊 (A)</th>
+<th class="px-6 py-4 font-bold text-morandi-green" scope="col">極速裝修團隊 (B)</th>
+<th class="px-6 py-4 font-bold text-morandi-red" scope="col">實惠工程行 (C)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">總報價</td>
+<td class="px-6 py-4 text-slate-900 dark:text-white font-bold">$1,250,000</td>
+<td class="px-6 py-4 text-slate-900 dark:text-white font-bold">$1,100,000</td>
+<td class="px-6 py-4 text-slate-900 dark:text-white font-bold">$880,000</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">預計工期</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">60 天</td>
+<td class="px-6 py-4 text-morandi-green font-semibold">45 天 (最快)</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">50 天</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">保固承諾</td>
+<td class="px-6 py-4 text-morandi-blue font-semibold">3 年 (最優)</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">1 年</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">1 年</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">設計變動量</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">高度客製化</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">部分模組化</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">既有格局微調</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+<td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">風險等級</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">
+<span class="inline-flex items-center gap-1 text-green-600 font-medium"><span class="material-symbols-outlined text-[16px]">check_circle</span> 低</span>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">
+<span class="inline-flex items-center gap-1 text-amber-600 font-medium"><span class="material-symbols-outlined text-[16px]">warning</span> 中</span>
+</td>
+<td class="px-6 py-4 text-slate-600 dark:text-slate-300">
+<span class="inline-flex items-center gap-1 text-red-600 font-medium"><span class="material-symbols-outlined text-[16px]">error</span> 高</span>
+</td>
+</tr>
+<tr class="bg-slate-50/50 dark:bg-slate-800">
+<td class="px-6 py-4 font-bold text-slate-800 dark:text-white border-t border-slate-200 dark:border-slate-600">AI 推薦分數</td>
+<td class="px-6 py-4 border-t border-slate-200 dark:border-slate-600">
+<div class="flex items-center gap-2">
+<span class="text-lg font-bold text-morandi-blue">92</span>
+<div class="h-2 w-16 bg-slate-200 rounded-full overflow-hidden">
+<div class="h-full bg-morandi-blue w-[92%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 border-t border-slate-200 dark:border-slate-600">
+<div class="flex items-center gap-2">
+<span class="text-lg font-bold text-morandi-green">85</span>
+<div class="h-2 w-16 bg-slate-200 rounded-full overflow-hidden">
+<div class="h-full bg-morandi-green w-[85%]"></div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 border-t border-slate-200 dark:border-slate-600">
+<div class="flex items-center gap-2">
+<span class="text-lg font-bold text-morandi-red">78</span>
+<div class="h-2 w-16 bg-slate-200 rounded-full overflow-hidden">
+<div class="h-full bg-morandi-red w-[78%]"></div>
+</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section class="mb-12">
+<div class="flex items-end justify-between mb-6">
+<h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400">format_list_numbered</span>
+                    全案報價明細交叉對比表
+                </h3>
+<div class="flex gap-4 text-xs font-medium text-slate-500">
+<div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-morandi-green/20 border border-morandi-green/40"></span> 最低報價</div>
+<div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-morandi-red/10 border border-morandi-red/40"></span> 偏離市場均價</div>
+</div>
+</div>
+<div class="w-full bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden mb-8">
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left quote-table">
+<thead class="bg-slate-50 dark:bg-slate-700/50 border-b border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-500 uppercase">
+<tr>
+<th class="px-4 py-3 w-[60px] text-center">項次</th>
+<th class="px-4 py-3 min-w-[200px]">品項 (工項名稱)</th>
+<th class="px-4 py-3 text-right min-w-[120px] text-slate-500 bg-slate-100/50 dark:bg-slate-800/80">預算價</th>
+<th class="px-4 py-3 text-right min-w-[140px] text-morandi-blue">優選木工坊</th>
+<th class="px-4 py-3 text-right min-w-[140px] text-morandi-green">極速裝修團隊</th>
+<th class="px-4 py-3 text-right min-w-[140px] text-morandi-red">實惠工程行</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<tr class="bg-slate-50/80 dark:bg-slate-700/30">
+<td class="px-4 py-2 font-bold text-slate-700 dark:text-slate-300" colspan="6">
+<span class="inline-block w-2 h-2 rounded-full bg-slate-400 mr-2"></span>拆除工程
+                            </td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">01</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">全室舊裝修拆除及清運</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$60,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$65,000</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$58,000</td>
+<td class="px-4 py-3 text-right tabular-nums bg-morandi-red/5 text-morandi-red font-medium">$42,000 <span class="text-[10px] ml-1">!</span></td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">02</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">浴室磁磚剔除 (2間)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$26,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$28,000</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$25,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$26,500</td>
+</tr>
+<tr class="bg-slate-50/80 dark:bg-slate-700/30">
+<td class="px-4 py-2 font-bold text-slate-700 dark:text-slate-300" colspan="6">
+<span class="inline-block w-2 h-2 rounded-full bg-slate-400 mr-2"></span>水電工程
+                            </td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">03</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">全室電線更新 (太平洋2.0)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$80,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$85,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$82,000</td>
+<td class="px-4 py-3 text-right tabular-nums bg-morandi-red/5 text-morandi-red font-medium">$45,000 <span class="text-[10px] ml-1">!</span></td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">04</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">新增插座迴路 (每式)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$3,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$3,200</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$2,800</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$3,000</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">05</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">冷熱水管更新 (不鏽鋼壓接)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$50,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$55,000</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$48,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-400 italic">未報價</td>
+</tr>
+<tr class="bg-slate-50/80 dark:bg-slate-700/30">
+<td class="px-4 py-2 font-bold text-slate-700 dark:text-slate-300" colspan="6">
+<span class="inline-block w-2 h-2 rounded-full bg-slate-400 mr-2"></span>天花與地坪
+                            </td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">06</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">全室平釘天花板 (日本麗仕)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$110,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$120,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$115,000</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$95,000</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">07</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">超耐磨木地板 (每坪連工帶料)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$6,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$6,500</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$5,200</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$5,500</td>
+</tr>
+<tr class="bg-slate-50/80 dark:bg-slate-700/30">
+<td class="px-4 py-2 font-bold text-slate-700 dark:text-slate-300" colspan="6">
+<span class="inline-block w-2 h-2 rounded-full bg-slate-400 mr-2"></span>油漆工程
+                            </td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">08</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">全室乳膠漆 (得利/虹牌)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$75,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$85,000</td>
+<td class="px-4 py-3 text-right tabular-nums font-semibold bg-morandi-green/10 text-morandi-green/90">$68,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$70,000</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/20">
+<td class="px-4 py-3 text-center text-slate-400">09</td>
+<td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-200">特殊漆施作 (客廳主牆)</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-500 bg-slate-100/30 dark:bg-slate-800/50">$20,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-600 dark:text-slate-300">$25,000</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-400 italic">另計</td>
+<td class="px-4 py-3 text-right tabular-nums text-slate-400 italic">未報價</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+<div class="space-y-4 h-full">
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 relative overflow-hidden h-full flex flex-col">
+<div class="absolute top-0 right-0 w-24 h-24 bg-morandi-purple/10 rounded-bl-full -mr-4 -mt-4"></div>
+<h4 class="text-sm font-bold text-slate-800 dark:text-white mb-3 flex items-center gap-2 relative z-10">
+<span class="material-symbols-outlined text-morandi-purple">auto_awesome</span>
+                        AI 規格差異解析
+                    </h4>
+<div class="space-y-4 relative z-10 flex-1">
+<div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3 border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">拆除工程</span>
+<span class="text-[10px] text-red-500 font-bold bg-red-50 px-1.5 rounded">價差 35%</span>
+</div>
+<p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+<strong class="text-slate-900 dark:text-white">實惠工程行報價過低</strong>。優選木工坊與極速裝修團隊包含「合法清運證明」與「電梯保護」，實惠工程行僅含拆除工資，清運費可能另計。
+                            </p>
+</div>
+<div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3 border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">水電工程</span>
+<span class="text-[10px] text-amber-500 font-bold bg-amber-50 px-1.5 rounded">缺漏項</span>
+</div>
+<p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+<strong class="text-slate-900 dark:text-white">實惠工程行電線更新報價異常</strong>。其報價 $45,000 遠低於市場行情 ($80k+)，可能未包含全室抽換，僅更換面板或局部線路。
+                            </p>
+</div>
+<div class="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3 border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-1">
+<span class="text-[10px] font-bold uppercase text-slate-500 tracking-wider">油漆工程</span>
+<span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-1.5 rounded">規格不同</span>
+</div>
+<p class="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+<strong class="text-slate-900 dark:text-white">工法差異</strong>。優選木工坊標註「一底兩度」加全室批土；極速裝修團隊僅「兩道面漆」；實惠工程行未標註工法，需確認是否含批土研磨。
+                            </p>
+</div>
+</div>
+</div>
+</div>
+<div class="h-full">
+<div class="bg-gradient-to-br from-primary/5 to-morandi-blue/5 rounded-xl border border-primary/10 p-6 h-full flex flex-col justify-center">
+<div class="flex items-center gap-3 mb-4">
+<div class="p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 text-primary">
+<span class="material-symbols-outlined text-[24px]">gavel</span>
+</div>
+<h4 class="text-sm font-bold text-primary dark:text-primary-light uppercase tracking-wider">總體審核結論</h4>
+</div>
+<p class="text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                            雖然 <span class="text-morandi-red font-bold">實惠工程行</span> 總價最低，但水電與拆除項目存在重大缺漏風險，且與預算價偏差較大。建議優先考慮 <span class="text-morandi-green font-bold">極速裝修團隊</span> 並追加「冷熱水管」報價，或與 <span class="text-morandi-blue font-bold">優選木工坊</span> 議價油漆與特殊工項。
+                        </p>
+<div class="grid grid-cols-2 gap-3 mt-auto">
+<div class="bg-white/60 dark:bg-slate-800/60 p-3 rounded-lg border border-white/50 dark:border-slate-700/50">
+<span class="text-xs text-slate-500 block mb-1">建議採取行動</span>
+<span class="text-sm font-bold text-slate-800 dark:text-white">要求 B 廠商補充管線規格</span>
+</div>
+<div class="bg-white/60 dark:bg-slate-800/60 p-3 rounded-lg border border-white/50 dark:border-slate-700/50">
+<span class="text-xs text-slate-500 block mb-1">風險規避建議</span>
+<span class="text-sm font-bold text-slate-800 dark:text-white">請 C 廠商詳列施工清單</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="w-full bg-morandi-purple/5 dark:bg-[#1f2029] rounded-2xl border border-morandi-purple/10 dark:border-slate-700 p-6 shadow-card relative overflow-hidden flex flex-col h-[500px]">
+<div class="absolute -top-[50px] -right-[50px] w-[300px] h-[300px] bg-morandi-purple/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex items-center gap-3 mb-6 relative z-10 border-b border-morandi-purple/10 dark:border-slate-700 pb-4">
+<div class="size-10 rounded-lg bg-gradient-to-br from-morandi-purple to-purple-700 flex items-center justify-center text-white shadow-lg shadow-morandi-purple/20">
+<span class="material-symbols-outlined text-[24px]">smart_toy</span>
+</div>
+<div>
+<h2 class="text-lg font-bold text-slate-800 dark:text-white tracking-tight">AI 智能決策助理</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">您可以隨時詢問關於報價差異的細節</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto pr-2 space-y-4 mb-4 scrollbar-hide">
+<div class="flex items-start gap-3">
+<div class="size-8 rounded-full bg-morandi-purple/10 flex items-center justify-center text-morandi-purple flex-shrink-0 mt-1">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+<div class="chat-bubble ai bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600">
+<p class="text-sm text-slate-700 dark:text-slate-200">
+                            您好！我是您的競標決策助理。根據目前的報價分析，<span class="font-bold text-morandi-green">極速裝修團隊</span>雖然在工期上最有優勢，但其<span class="font-bold">「冷熱水管」</span>報價低於優選木工坊，可能使用了不同等級的材料。您想了解更多關於這部分的差異嗎？
+                        </p>
+</div>
+</div>
+<div class="flex items-start gap-3 justify-end">
+<div class="chat-bubble user bg-primary text-white shadow-md">
+<p class="text-sm">
+                            請幫我比較一下優選木工坊和極速裝修團隊在「水電工程」方面的總價差異，以及主要的風險點。
+                        </p>
+</div>
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-slate-500 dark:text-slate-300 flex-shrink-0 mt-1">
+<span class="material-symbols-outlined text-[16px]">person</span>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="size-8 rounded-full bg-morandi-purple/10 flex items-center justify-center text-morandi-purple flex-shrink-0 mt-1">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+<div class="chat-bubble ai bg-white dark:bg-slate-700 shadow-sm border border-slate-100 dark:border-slate-600 space-y-2">
+<p class="text-sm text-slate-700 dark:text-slate-200">
+                            沒問題，分析如下：
+                        </p>
+<ul class="list-disc pl-4 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+<li><strong>總價差異：</strong>優選木工坊水電總計約 $143,200，極速裝修團隊約 $132,800。價差約 $10,400。</li>
+<li><strong>主要風險 (A)：</strong>無明顯風險，規格標示明確 (太平洋電線 2.0、不鏽鋼壓接)。</li>
+<li><strong>主要風險 (B)：</strong>插座迴路數量可能依現場實作追加；冷熱水管單價略低，建議確認是否含保溫披覆。</li>
+</ul>
+<p class="text-sm text-slate-700 dark:text-slate-200 mt-2">
+                            另外需注意 <span class="text-morandi-red font-bold">實惠工程行</span> 在此項目有嚴重低估 ($45k 電線更新)，極高機率會產生追加款。
+                        </p>
+</div>
+</div>
+</div>
+<div class="relative mt-auto">
+<input class="w-full pl-4 pr-12 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl shadow-sm focus:ring-2 focus:ring-morandi-purple focus:border-transparent outline-none text-sm text-slate-700 dark:text-white transition-all placeholder:text-slate-400" placeholder="輸入您的問題，例如：實惠工程行的拆除費用合理嗎？" type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-morandi-purple hover:bg-morandi-purple/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">send</span>
+</button>
+</div>
+</section>
+</main>
+
+</body></html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LaiBE 萊比 - 裝潢文件選擇</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "olive-gold": "#B5B512",
+                        "off-white": "#F9F8F6",
+                        "charcoal": "#333333",
+                        "muted-blue": "#4A90E2",
+                        "forest-green": "#2E7D32",
+                        "burnt-orange": "#D84315",
+                        "deep-purple": "#4527A0"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "Noto Sans TC", "sans-serif"],
+                    },
+                    boxShadow: {
+                        // Neumorphism: Left-Top light, Right-Bottom dark
+                        'neumorph': '8px 8px 16px #9a9a0f, -8px -8px 16px #d0d015',
+                        'neumorph-inset': 'inset 8px 8px 16px #9a9a0f, inset -8px -8px 16px #d0d015',
+                    }
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans TC", sans-serif;
+            background-color: #B5B512;
+            /* Deep Olive Gold */
+            color: #333333;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+
+        /* Neumorphism Active State */
+        .neumorph-button {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .neumorph-button:active,
+        .neumorph-button.active {
+            box-shadow: inset 8px 8px 16px #9a9a0f, inset -8px -8px 16px #d0d015 !important;
+            transform: scale(0.98);
+        }
+
+        /* Disable text selection on interactive elements */
+        .no-select {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-olive-gold min-h-screen flex flex-col items-center justify-between pb-24 pt-12 relative overflow-x-hidden">
+
+    <!-- Subtle Header -->
+    <header class="w-full max-w-[1280px] mx-auto px-6 flex justify-center lg:justify-start mb-16 lg:mb-24">
+        <div class="flex items-center gap-2 text-off-white opacity-90">
+            <span class="material-symbols-outlined text-2xl">architecture</span>
+            <span class="text-xl font-bold tracking-tight">LaiBE</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-[1280px] mx-auto px-6 flex-grow flex flex-col items-center">
+
+        <!-- Title Area -->
+        <div class="text-center mb-16 lg:mb-24 w-full">
+            <h1 class="text-4xl sm:text-5xl lg:text-5xl font-black text-off-white mb-4 tracking-tight">
+                讓我們開始吧！您手邊有哪些資料？
+            </h1>
+            <p class="text-off-white/80 text-lg lg:text-xl font-medium">
+                選擇您擁有的圖面或文件，我們將協助您快速建立專案。
+            </p>
+        </div>
+
+        <!-- The "Document" Grid -->
+        <!-- Max-w restricted to keep buttons 80% visually compared to a full spread, increased gaps -->
+        <div class="w-full max-w-5xl grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12 mb-20 relative z-10">
+
+            <!-- Button: Floor Plan -->
+            <button
+                class="neumorph-button w-full aspect-square bg-olive-gold rounded-3xl shadow-neumorph flex flex-col items-center justify-center gap-6 cursor-pointer group no-select">
+                <span
+                    class="material-symbols-outlined text-5xl sm:text-6xl text-muted-blue drop-shadow-sm transition-transform group-hover:scale-110 duration-300">layers</span>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xl sm:text-2xl font-bold text-charcoal">平面圖</span>
+                    <span class="text-xs sm:text-sm text-charcoal/60 font-medium">PDF 或圖檔格式</span>
+                </div>
+            </button>
+
+            <!-- Button: Quotation -->
+            <button
+                class="neumorph-button w-full aspect-square bg-olive-gold rounded-3xl shadow-neumorph flex flex-col items-center justify-center gap-6 cursor-pointer group no-select">
+                <span
+                    class="material-symbols-outlined text-5xl sm:text-6xl text-forest-green drop-shadow-sm transition-transform group-hover:scale-110 duration-300">receipt_long</span>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xl sm:text-2xl font-bold text-charcoal">報價單</span>
+                    <span class="text-xs sm:text-sm text-charcoal/60 font-medium">Excel 或 PDF</span>
+                </div>
+            </button>
+
+            <!-- Button: Detail Drawings -->
+            <button
+                class="neumorph-button w-full aspect-square bg-olive-gold rounded-3xl shadow-neumorph flex flex-col items-center justify-center gap-6 cursor-pointer group no-select">
+                <span
+                    class="material-symbols-outlined text-5xl sm:text-6xl text-burnt-orange drop-shadow-sm transition-transform group-hover:scale-110 duration-300">straighten</span>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xl sm:text-2xl font-bold text-charcoal">詳細施工圖</span>
+                    <span class="text-xs sm:text-sm text-charcoal/60 font-medium">CAD 或 PDF</span>
+                </div>
+            </button>
+
+            <!-- Button: 3D Render -->
+            <button
+                class="neumorph-button w-full aspect-square bg-olive-gold rounded-3xl shadow-neumorph flex flex-col items-center justify-center gap-6 cursor-pointer group no-select">
+                <span
+                    class="material-symbols-outlined text-5xl sm:text-6xl text-deep-purple drop-shadow-sm transition-transform group-hover:scale-110 duration-300">view_in_ar</span>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="text-xl sm:text-2xl font-bold text-charcoal">3D 效果圖</span>
+                    <span class="text-xs sm:text-sm text-charcoal/60 font-medium">多角度渲染圖</span>
+                </div>
+            </button>
+
+        </div>
+
+        <!-- The "Start Fresh" Option -->
+        <div class="w-full max-w-4xl relative z-20">
+            <button
+                class="w-full bg-off-white rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:justify-start gap-6 cursor-pointer shadow-[0_20px_40px_rgba(0,0,0,0.15)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-300 group no-select">
+                <div
+                    class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white shadow-inner flex items-center justify-center flex-shrink-0">
+                    <!-- Colorful gradient icon -->
+                    <svg class="w-12 h-12 sm:w-14 sm:h-14 transition-transform group-hover:scale-110 duration-300"
+                        viewBox="0 0 24 24" fill="url(#puzzle-gradient)">
+                        <defs>
+                            <linearGradient id="puzzle-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#FF0080" />
+                                <stop offset="50%" stop-color="#7928CA" />
+                                <stop offset="100%" stop-color="#0070F3" />
+                            </linearGradient>
+                        </defs>
+                        <path
+                            d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z" />
+                    </svg>
+                </div>
+                <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
+                    <h2 class="text-2xl sm:text-3xl font-black text-charcoal mb-2">我要從零開始繪圖</h2>
+                    <p class="text-charcoal/70 text-base sm:text-lg font-medium">沒有任何資料也沒關係，我們帶您一步步完成專案設定與繪圖。</p>
+                </div>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Bottom CTA -->
+    <div
+        class="w-full fixed bottom-0 left-0 p-6 sm:p-8 flex justify-center bg-gradient-to-t from-olive-gold via-olive-gold/90 to-transparent z-50 pointer-events-none">
+        <button
+            class="pointer-events-auto bg-white hover:bg-off-white text-charcoal px-16 py-5 rounded-full font-black text-xl shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3">
+            <span>下一步</span>
+            <span class="material-symbols-outlined text-2xl font-bold">arrow_forward</span>
+        </button>
+    </div>
+
+    <script>
+        // Simple toggle logic for neumorphic buttons
+        const neumorphButtons = document.querySelectorAll('.neumorph-button');
+        neumorphButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+            });
+        });
+    </script>
+
+</body>
+
+</html>

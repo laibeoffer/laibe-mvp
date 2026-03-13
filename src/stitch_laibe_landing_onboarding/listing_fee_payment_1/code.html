@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-Hant"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>帳戶建立 - 萊比 LaiBE</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "morandi-olive": "#8da399",
+                        "morandi-blue": "#5b7c99", 
+                        "morandi-lavender": "#e6e6fa",
+                        "morandi-slate": "#4a5d6e",
+                        "morandi-bg": "#f4f5f5",
+                        "morandi-warm-grey": "#efefeb","morandi-light-gray": "#e3e5e8",
+                        "primary": "#5b7c99", 
+                        "primary-hover": "#4a6b88",
+                        "card-bg": "#f8f9fa",
+                        "card-border": "#ebebeb"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "Noto Sans TC", "sans-serif"],
+                        "sans": ["Inter", "Noto Sans TC", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+        }
+        .step-connector {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e5e7eb;
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="bg-morandi-bg text-slate-700 min-h-screen flex flex-col">
+<header class="flex items-center justify-between border-b border-solid border-slate-200 bg-white px-6 py-4 sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="size-8 text-morandi-blue">
+<svg class="w-full h-full" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-800 text-xl font-bold tracking-tight">萊比 LaiBE</h2>
+</div>
+<div class="hidden md:flex items-center gap-8 text-sm">
+<div class="flex items-center gap-2 text-slate-400">
+<span class="font-medium text-slate-600">需求與預算確認</span>
+<span class="material-symbols-outlined text-[16px] text-morandi-olive font-bold">check</span>
+</div>
+<div class="w-8 h-[1px] bg-slate-200"></div>
+<div class="flex items-center gap-2 text-slate-800 font-bold">
+<span>註冊 / 登入</span>
+<div class="size-2 rounded-full bg-morandi-blue"></div>
+</div>
+<div class="w-8 h-[1px] bg-slate-200"></div>
+<div class="flex items-center gap-2 text-slate-400">
+<span>上架費繳納</span>
+</div>
+<div class="w-8 h-[1px] bg-slate-200"></div>
+<div class="flex items-center gap-2 text-slate-400">
+<span>發布案件</span>
+</div>
+</div>
+<div></div> 
+</header>
+<main class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 lg:px-8 lg:py-12 flex flex-col justify-center min-h-[calc(100vh-80px)]">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-2xl shadow-sm overflow-hidden min-h-[600px] border border-slate-100">
+<div class="bg-morandi-warm-grey p-10 lg:p-16 flex flex-col justify-center relative">
+<div class="max-w-md mx-auto w-full">
+<div class="mb-10">
+<h1 class="text-3xl lg:text-4xl font-bold text-slate-800 mb-4 tracking-tight leading-tight">開始建立您的<br/>發案治理流程</h1>
+<p class="text-slate-500 text-lg leading-relaxed">完成註冊後，即可進入案件發佈與工程審查流程。</p>
+</div>
+<div class="flex flex-col gap-6">
+<div class="flex items-start gap-4">
+<div class="size-12 rounded-xl bg-white/60 flex items-center justify-center text-morandi-slate shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[24px]">verified_user</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800 text-lg">實名驗證機制</h3>
+<p class="text-slate-500 text-sm mt-1">確保雙方身份真實性，建立信任基礎。</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="size-12 rounded-xl bg-white/60 flex items-center justify-center text-morandi-slate shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[24px]">account_balance</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800 text-lg">資金託管安全</h3>
+<p class="text-slate-500 text-sm mt-1">階段性驗收放款，保障裝修資金安全。</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="size-12 rounded-xl bg-white/60 flex items-center justify-center text-morandi-slate shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-[24px]">engineering</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800 text-lg">PCM 專業工程審查（可選）</h3>
+<p class="text-slate-500 text-sm mt-1">引入第三方專業監造，確保施工品質。</p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-8 left-8 right-8 lg:left-12 lg:right-auto">
+<div class="flex items-end gap-3 animate-fade-in-up">
+<div class="bg-white px-4 py-3 rounded-2xl rounded-bl-none shadow-md border border-slate-100 max-w-xs">
+<p class="text-sm text-slate-600">您好！我是您的 AI 程序助理。為了保障您的權益，所有發案者都需要完成實名治理帳戶的建立。</p>
+</div>
+<div class="size-10 rounded-full bg-morandi-slate flex items-center justify-center text-white shrink-0 shadow-md">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="bg-white p-10 lg:p-16 flex flex-col justify-center">
+<div class="max-w-md mx-auto w-full">
+<div class="flex justify-between items-center mb-8">
+<h2 class="text-2xl font-bold text-slate-800">建立帳戶</h2>
+<a class="text-sm text-morandi-slate font-medium hover:text-slate-800 transition-colors" href="#">已有帳戶？登入</a>
+</div>
+<form class="flex flex-col gap-5">
+<div class="flex flex-col gap-5">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1.5">真實姓名</label>
+<input class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:ring-1 focus:ring-morandi-slate focus:border-morandi-slate transition-all placeholder-slate-400 text-sm" placeholder="請輸入您的真實姓名" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1.5">電子郵件</label>
+<input class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:ring-1 focus:ring-morandi-slate focus:border-morandi-slate transition-all placeholder-slate-400 text-sm" placeholder="name@example.com" type="email"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1.5">手機號碼</label>
+<input class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:ring-1 focus:ring-morandi-slate focus:border-morandi-slate transition-all placeholder-slate-400 text-sm" placeholder="09XX-XXX-XXX" type="tel"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1.5">設定密碼</label>
+<input class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:ring-1 focus:ring-morandi-slate focus:border-morandi-slate transition-all placeholder-slate-400 text-sm" placeholder="••••••••" type="password"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1.5">確認密碼</label>
+<input class="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 text-slate-800 focus:bg-white focus:ring-1 focus:ring-morandi-slate focus:border-morandi-slate transition-all placeholder-slate-400 text-sm" placeholder="••••••••" type="password"/>
+</div>
+</div>
+</div>
+<div class="mt-1">
+<p class="text-xs text-slate-400 leading-relaxed">
+                            密碼需包含至少 8 個字元，並包含大小寫英文字母與數字。
+                        </p>
+</div>
+<button class="mt-4 w-full bg-morandi-slate hover:bg-slate-700 text-white font-semibold py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all text-base flex items-center justify-center gap-2" type="button">
+                        建立帳戶
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+<div class="mt-4 text-center">
+<p class="text-xs text-slate-400">
+                            點擊建立帳戶即代表您同意 <a class="underline decoration-slate-300 hover:text-slate-600" href="#">服務條款</a> 與 <a class="underline decoration-slate-300 hover:text-slate-600" href="#">隱私權政策</a>。
+                        </p>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

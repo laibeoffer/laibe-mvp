@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LaiBE Construction - 訂金繳納成功</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #6B7C85;
+            --primary-dark: #55646c;
+            --secondary: #E8EAE9;
+            --accent: #2D3E50;
+            --accent-hover: #1a2530;
+            --background-light: #F9FAFB;
+            --surface-light: #FFFFFF;
+            --text-main: #334155;
+            --text-sub: #64748b;
+            --border-light: #e2e8f0;
+            --status-success: #5F8D78;
+            --status-success-light: #F0F4F2;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-main);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .success-badge-pulse {
+            box-shadow: 0 0 0 0 rgba(95, 141, 120, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(95, 141, 120, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(95, 141, 120, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(95, 141, 120, 0); }
+        }
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 24px;
+            bottom: 0;
+            width: 2px;
+            background-color: #E2E8F0;
+        }
+        .timeline-item:last-child .timeline-line::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+<aside class="w-72 fixed inset-y-0 left-0 z-20 flex flex-col bg-white border-r border-[var(--border-light)] hidden lg:flex">
+<div class="px-8 py-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-[var(--primary)] rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                L
+            </div>
+<div>
+<h1 class="text-xl font-bold text-[var(--accent)] leading-tight tracking-tight">LaiBE</h1>
+<p class="text-[10px] text-[var(--text-sub)] uppercase tracking-widest">Construction</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-8 py-4">
+<ul class="relative space-y-8">
+<div class="absolute left-4 top-4 bottom-10 w-0.5 bg-gray-100 -z-10"></div>
+<li class="relative flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-[var(--status-success)] flex items-center justify-center text-white z-10 shadow-sm">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="text-sm font-medium text-[var(--text-sub)]">發案準備</span>
+</li>
+<li class="relative flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-[var(--status-success)] flex items-center justify-center text-white z-10 shadow-sm">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="text-sm font-medium text-[var(--text-sub)]">發案條件設定</span>
+</li>
+<li class="relative flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-[var(--status-success)] flex items-center justify-center text-white z-10 shadow-sm">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="text-sm font-medium text-[var(--text-sub)]">標案發布預覽</span>
+</li>
+<li class="relative flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center text-white z-10 shadow-lg shadow-gray-200">
+<span class="material-symbols-outlined text-lg">payments</span>
+</div>
+<span class="text-sm font-bold text-[var(--accent)]">訂金繳納完成</span>
+</li>
+</ul>
+</nav>
+<div class="p-8 border-t border-[var(--border-light)]">
+<div class="bg-gray-50 rounded-xl p-4">
+<p class="text-xs text-[var(--text-sub)] leading-relaxed">
+                如有任何操作問題，請聯繫專屬案管人員或撥打免付費專線。
+            </p>
+</div>
+</div>
+</aside>
+<main class="lg:ml-72 flex-1 flex flex-col items-center justify-start py-12 px-6 overflow-y-auto">
+<div class="max-w-3xl w-full">
+<div class="text-center mb-12">
+<div class="inline-flex items-center justify-center w-20 h-20 bg-[var(--status-success-light)] rounded-full mb-6 success-badge-pulse">
+<span class="material-symbols-outlined text-[var(--status-success)] text-4xl">verified_user</span>
+</div>
+<h2 class="text-3xl font-bold text-[var(--accent)] mb-3">訂金繳納成功</h2>
+<div class="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--status-success-light)] border border-[var(--status-success)]/20 rounded-full">
+<span class="w-2 h-2 bg-[var(--status-success)] rounded-full animate-pulse"></span>
+<span class="text-sm font-medium text-[var(--status-success)]">治理規則已激活</span>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-8">
+<section class="bg-white rounded-2xl p-8 border border-[var(--border-light)] shadow-sm">
+<div class="flex items-center justify-between mb-8 pb-6 border-b border-gray-50">
+<h3 class="text-sm font-bold text-[var(--accent)] uppercase tracking-wider">交易細節摘要</h3>
+<div class="flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-bold uppercase">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+                        競標正式啟動
+                    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+<div>
+<p class="text-xs text-[var(--text-sub)] mb-1">繳納金額</p>
+<p class="text-xl font-bold text-[var(--accent)] font-mono">TWD 15,000</p>
+</div>
+<div>
+<p class="text-xs text-[var(--text-sub)] mb-1">交易序號</p>
+<p class="text-sm font-medium text-[var(--accent)] flex items-center gap-1">
+                            TXN-20231027-8892 <span class="material-symbols-outlined text-sm cursor-pointer hover:text-[var(--primary)]">content_copy</span>
+</p>
+</div>
+<div>
+<p class="text-xs text-[var(--text-sub)] mb-1">支付時間</p>
+<p class="text-sm font-medium text-[var(--accent)]">2023-10-27 14:32:15</p>
+</div>
+<div>
+<p class="text-xs text-[var(--text-sub)] mb-1">支付方式</p>
+<p class="text-sm font-medium text-[var(--accent)]">信用卡 (末四碼 4242)</p>
+</div>
+</div>
+</section>
+<section class="bg-white rounded-2xl p-8 border border-[var(--border-light)] shadow-sm">
+<h3 class="text-sm font-bold text-[var(--accent)] uppercase tracking-wider mb-8">後續管理進度預估</h3>
+<div class="space-y-0">
+<div class="timeline-item relative pb-10 timeline-line">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-white border-2 border-[var(--status-success)] flex items-center justify-center z-10">
+<span class="w-2.5 h-2.5 rounded-full bg-[var(--status-success)]"></span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="text-sm font-bold text-[var(--accent)]">標案正式對外公告</h4>
+<span class="text-xs font-medium text-[var(--status-success)]">進行中</span>
+</div>
+<p class="text-xs text-[var(--text-sub)]">系統正同步推播至符合資格的優質廠商 (約需 2-4 小時)。</p>
+</div>
+</div>
+</div>
+<div class="timeline-item relative pb-10 timeline-line">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-gray-50 border-2 border-gray-200 flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-gray-400 text-sm">schedule</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="text-sm font-bold text-gray-500">PCM 文件預審階段</h4>
+<span class="text-xs text-gray-400">預計 10/30 開始</span>
+</div>
+<p class="text-xs text-gray-400">專案經理將於投標期間同步進行技術文件齊備度初核。</p>
+</div>
+</div>
+</div>
+<div class="timeline-item relative">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-gray-50 border-2 border-gray-200 flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-gray-400 text-sm">event_available</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="text-sm font-bold text-gray-500">競標截止與決標</h4>
+<span class="text-xs text-gray-400">11/15 17:00</span>
+</div>
+<p class="text-xs text-gray-400">系統將鎖定投標通道並產出投標廠商綜合比分報告。</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<div class="flex flex-col gap-4 mt-4 mb-12">
+<button class="w-full py-4 px-6 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold rounded-xl transition-all shadow-lg shadow-[var(--accent)]/10 flex items-center justify-center gap-2 group">
+<span>進入競標管理儀表板</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<button class="w-full py-4 px-6 bg-white border border-[var(--border-light)] hover:bg-gray-50 text-[var(--accent)] font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg">description</span>
+                    查看押標金機制與合約條款說明
+                </button>
+</div>
+</div>
+<footer class="text-center">
+<p class="text-xs text-[var(--text-sub)]">
+                LaiBE Smart Contract Security. 您的權益已受數位治理規則與第三方金流信託保障。
+            </p>
+</footer>
+</div>
+</main>
+
+</body></html>

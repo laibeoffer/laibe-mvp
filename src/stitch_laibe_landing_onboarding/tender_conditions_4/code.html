@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LaiBE Construction - 訂金繳納確認</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #5CADAD;
+            --primary-dark: #4A8E8E;
+            --accent: #2D3E50;
+            --accent-hover: #1E2B38;
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --border: #E2E8F0;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-completed .icon-bg {
+            background-color: var(--primary);
+        }
+        .step-active .icon-bg {
+            background-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(45, 62, 80, 0.1);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-item:focus-within .accordion-content {
+            max-height: 500px;
+        }
+        .accordion-item:focus-within .arrow-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-[var(--background)] text-slate-700 min-h-screen flex">
+<aside class="w-72 fixed inset-y-0 left-0 z-20 flex flex-col bg-white border-r border-[var(--border)] hidden lg:flex">
+<div class="px-8 py-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-[var(--primary)] rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                L
+            </div>
+<div>
+<h1 class="text-xl font-bold text-[var(--accent)] leading-tight tracking-tight">LaiBE</h1>
+<p class="text-[10px] text-slate-400 uppercase tracking-widest">Construction Platform</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-8 py-4">
+<ul class="relative">
+<div class="absolute left-4 top-4 bottom-10 w-0.5 bg-slate-100 -z-10"></div>
+<li class="mb-8 relative step-completed">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full icon-bg flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-slate-400">發案準備</span>
+</div>
+</li>
+<li class="mb-8 relative step-completed">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full icon-bg flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-slate-400">上架費繳納</span>
+</div>
+</li>
+<li class="mb-8 relative step-completed">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full icon-bg flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-slate-400">條件設定</span>
+</div>
+</li>
+<li class="mb-8 relative step-completed">
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full icon-bg flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-lg">check</span>
+</div>
+<span class="ml-4 text-sm font-medium text-slate-400">標案發布預覽</span>
+</div>
+</li>
+<li class="relative step-active">
+<div class="flex items-center p-3 -ml-3 rounded-xl bg-slate-50 border border-slate-100">
+<div class="w-8 h-8 rounded-full icon-bg flex items-center justify-center text-white z-10">
+<span class="material-symbols-outlined text-lg">payments</span>
+</div>
+<span class="ml-4 text-sm font-bold text-[var(--accent)]">訂金繳納</span>
+</div>
+</li>
+</ul>
+</nav>
+</aside>
+<main class="lg:ml-72 flex-1 flex flex-col min-h-screen">
+<div class="p-6 lg:p-12 flex-1 overflow-y-auto pb-32">
+<div class="max-w-4xl mx-auto space-y-10">
+<div class="text-center space-y-3">
+<div class="inline-flex items-center px-3 py-1 rounded-full bg-[var(--primary)]/10 text-[var(--primary)] text-xs font-bold tracking-wider mb-2">
+                    STEP 05 FINAL CONFIRMATION
+                </div>
+<h2 class="text-3xl font-bold text-[var(--accent)] tracking-tight">訂金繳納確認</h2>
+<p class="text-slate-500 max-w-lg mx-auto leading-relaxed">
+                    本環節為確保競標誠意與啟動治理監控，請確認以下訂金明細。
+                </p>
+</div>
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+<div class="p-8 lg:p-10 border-b border-slate-100 bg-gradient-to-br from-white to-slate-50">
+<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="space-y-1 text-center md:text-left">
+<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">總預算金額 (含稅)</span>
+<div class="text-2xl font-bold text-slate-700">NT$ 2,500,000</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)]">
+<span class="material-symbols-outlined font-bold">percent</span>
+</div>
+<div>
+<span class="text-xs font-bold text-slate-400 uppercase tracking-widest">訂金比例</span>
+<div class="text-xl font-bold text-slate-700">1.0%</div>
+</div>
+</div>
+<div class="h-16 w-px bg-slate-200 hidden md:block"></div>
+<div class="text-center md:text-right">
+<span class="text-xs font-bold text-[var(--primary)] uppercase tracking-widest">應繳納訂金總額</span>
+<div class="text-4xl font-black text-[var(--accent)] mt-1">NT$ 25,000</div>
+</div>
+</div>
+</div>
+<div class="p-8 lg:p-10 bg-white grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div class="flex items-center gap-2 text-[var(--accent)] font-bold">
+<span class="material-symbols-outlined text-[var(--primary)]">verified_user</span>
+                            甲方訂金說明
+                        </div>
+<div class="bg-slate-50 p-5 rounded-xl border border-slate-100 leading-relaxed text-sm text-slate-600">
+                            此為<span class="font-bold text-[var(--accent)]">誠意金</span>性質。於合約簽署後，此筆金額將<span class="font-bold text-[var(--primary)]">自動折抵首期工程款</span>。繳納後將立即啟動平台「治理監控系統」，保障案件執行的公平性與安全性。
+                        </div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-2 text-[var(--accent)] font-bold">
+<span class="material-symbols-outlined text-[var(--primary)]">gavel</span>
+                            乙方押標金規則
+                        </div>
+<div class="bg-slate-50 p-5 rounded-xl border border-slate-100 leading-relaxed text-sm text-slate-600">
+                            為維護投標品質，未來所有投標廠商需同步繳納 <span class="font-bold text-[var(--accent)]">0.3% 押標金</span>。<span class="font-bold text-slate-500">未中標者：</span>評選結束後立即退還；<span class="font-bold text-slate-500">中標者：</span>於開工申報完成後退還。
+                        </div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">法律與退款規則說明</h4>
+<div class="bg-white border border-slate-200 rounded-xl overflow-hidden accordion-item" tabindex="0">
+<div class="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">info</span>
+<span class="font-medium text-[var(--accent)]">訂金退款條件與比例說明</span>
+</div>
+<span class="material-symbols-outlined arrow-icon transition-transform text-slate-400">expand_more</span>
+</div>
+<div class="accordion-content">
+<div class="p-6 border-t border-slate-100 text-sm text-slate-500 space-y-4 leading-relaxed">
+<p>1. <span class="font-bold text-slate-700">流標或撤案：</span>若案件於公開競標期間因無廠商投標而流標，或由甲方於評選前主動撤案，訂金將扣除 5% 手續費後全額退還。</p>
+<p>2. <span class="font-bold text-slate-700">中標後拒簽：</span>若廠商中標後，甲方無正當理由拒絕簽約，視同違約，訂金將作為平台治理與行政成本不予退還。</p>
+<p>3. <span class="font-bold text-slate-700">爭議處理：</span>若發生不可抗力因素導致案件中止，將由平台仲裁委員會根據實際進度判定退款比例。</p>
+</div>
+</div>
+</div>
+<div class="bg-white border border-slate-200 rounded-xl overflow-hidden accordion-item" tabindex="1">
+<div class="p-4 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">shield</span>
+<span class="font-medium text-[var(--accent)]">平台治理監控服務聲明</span>
+</div>
+<span class="material-symbols-outlined arrow-icon transition-transform text-slate-400">expand_more</span>
+</div>
+<div class="accordion-content">
+<div class="p-6 border-t border-slate-100 text-sm text-slate-500 leading-relaxed">
+                            繳納訂金後，系統將自動為本案開啟「履約動態追蹤」與「款項信託管理」服務。平台將依據標單內容與時間軸進行第三方監控，確保工程各階段之交付與支付皆符合誠信原則。
+                        </div>
+</div>
+</div>
+</div>
+<div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-4">
+<span class="material-symbols-outlined text-blue-500">lightbulb</span>
+<p class="text-sm text-blue-700 leading-relaxed">
+                    溫馨提示：本平台採用第三方支付系統，確保您的金流安全。點擊下一步後，您將跳轉至加密支付頁面完成繳費。
+                </p>
+</div>
+</div>
+</div>
+<div class="fixed bottom-0 left-0 right-0 lg:left-72 bg-white/90 backdrop-blur-md border-t border-slate-200 p-5 shadow-[0_-4px_20px_0_rgba(0,0,0,0.03)] z-30">
+<div class="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<button class="w-full md:w-auto px-8 py-3 rounded-xl border border-slate-200 text-slate-500 hover:text-[var(--accent)] hover:bg-slate-50 transition-all font-medium flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                返回上架預覽
+            </button>
+<div class="flex flex-col items-center md:items-end w-full md:w-auto gap-2">
+<button class="w-full md:w-auto px-10 py-4 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold text-lg shadow-xl shadow-[var(--accent)]/20 transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3">
+                    立即繳納訂金並啟動競標
+                    <span class="material-symbols-outlined">rocket_launch</span>
+</button>
+<p class="text-[10px] text-slate-400 text-center md:text-right">
+                    完成支付即代表您同意上述訂金機制與平台治理條款
+                </p>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-Hant"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>合約治理與風險洞察編輯介面 (Balanced Mode)</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Serif+TC:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#475569", // Neutral Slate
+                        "accent": "#10B981", // Success Green
+                        "background-light": "#F8FAFC",
+                        "paper-light": "#ffffff",
+                        "morandi-blue": "#94A3B8",
+                        "morandi-green": "#8F9E98",
+                        "morandi-beige": "#F1F5F9",
+                        "risk-low": "#10B981",
+                        "risk-neutral": "#64748B",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "serif": ["Noto Serif TC", "serif"],
+                    },
+                    boxShadow: {
+                        'paper': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+                        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07)',
+                    }
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0; 
+            border-radius: 10px;
+        }
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 1px rgba(0,0,0,0.1), 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25mm 20mm;
+            position: relative;
+        }
+        @media screen and (max-width: 1024px) {
+            .a4-page {
+                width: 100%;
+                padding: 20px;
+            }
+        }
+        .timeline-line {
+            position: absolute;
+            left: 24px;
+            top: 24px;
+            bottom: 24px;
+            width: 1.5px;
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] font-display text-slate-600 flex flex-col h-screen overflow-hidden">
+<header class="h-14 flex items-center justify-between px-6 border-b border-slate-200 bg-white z-20 shrink-0">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2.5">
+<div class="flex items-center justify-center size-8 bg-slate-800 rounded text-white">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-sm font-bold tracking-tight text-slate-800 leading-none">萊比 LaiBE</h1>
+<span class="text-[9px] text-slate-400 tracking-widest font-bold uppercase mt-0.5">Governance Engine</span>
+</div>
+</div>
+<div class="h-4 w-px bg-slate-200"></div>
+<div class="flex items-center gap-2">
+<span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Balanced Mode</span>
+<span class="text-sm font-medium text-slate-800">合約治理與風險洞察編輯介面</span>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<nav class="flex items-center gap-1 mr-4">
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors">付款結構</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-800 border-b-2 border-slate-800">治理設定</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors">PCM 模式</button>
+<button class="px-3 py-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors">程序升級規則</button>
+</nav>
+<div class="size-8 rounded-full bg-slate-100 border border-slate-200 overflow-hidden" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAHfjCvVhB75itnwGZVHw8KmIBYu-kWyvO72davbKywbfRHbL8-291x5n13mGd7qRsiEQQHx-3_fZ54FXIDjTnluRRLjRqfmQKn0cLrCfgznqorXd5TO1Xso810J73OACxre1gRnw74JqMzubC8pA-4YP_f4IMxjY3q2p_A3BJeQ0TjA365O6Ss_N5L8LEpGUVC2YT2ES0cYLuLYiUHGhpAV9AHZmJfSoaFUO7oV8olqmT_0s2W_WS0axVvkh6N5XCEBU3V-KBP88Y'); background-size: cover;"></div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden relative">
+<main class="flex-1 overflow-y-auto relative p-8 flex flex-col items-center">
+<div class="w-full max-w-[210mm] mb-8 p-8 bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-accent/10 rounded-lg">
+<span class="material-symbols-outlined text-accent text-[20px]">analytics</span>
+</div>
+<div>
+<h3 class="text-base font-bold text-slate-900">風險洞察 — 結構平衡</h3>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-[11px] font-bold text-accent flex items-center gap-1">
+<span class="size-1.5 rounded-full bg-accent animate-pulse"></span> 🟢 低風險
+                            </span>
+<span class="text-[11px] font-bold text-accent">🟢 財務暴露在安全閾值內</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-1">分析日期</span>
+<span class="text-xs font-medium text-slate-600">2024.05.24 14:30</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<div class="space-y-5">
+<h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">結構化分析結果</h4>
+<div class="grid grid-cols-1 gap-3">
+<div class="flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-100">
+<span class="text-xs text-slate-600">驗收前累計撥付</span>
+<span class="text-xs font-bold text-slate-900">≤ 40% <span class="text-accent ml-1">符合</span></span>
+</div>
+<div class="flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-100">
+<span class="text-xs text-slate-600">尾款比例</span>
+<span class="text-xs font-bold text-slate-900">≥ 10% <span class="text-accent ml-1">符合</span></span>
+</div>
+<div class="flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-100">
+<span class="text-xs text-slate-600">款項集中度</span>
+<span class="text-xs font-bold text-slate-900">無異常集中 <span class="text-accent ml-1">優</span></span>
+</div>
+<div class="flex items-center justify-between p-3 bg-slate-50 rounded border border-slate-100">
+<span class="text-xs text-slate-600">程序升級規則</span>
+<span class="text-xs font-bold text-slate-900">已啟用 <span class="text-accent ml-1">有效</span></span>
+</div>
+</div>
+</div>
+<div class="flex flex-col">
+<h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2 mb-4">客觀 PCM 評估</h4>
+<div class="p-4 bg-slate-50 rounded-lg border border-slate-200 mb-4 flex-1">
+<p class="text-xs font-bold text-slate-800 mb-3 leading-relaxed">
+                            基於當前財務結構與風險分佈，不需要啟用 PCM (專業工程管理)。
+                        </p>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 text-[11px] text-slate-500">
+<span class="material-symbols-outlined text-[14px] text-accent">check_circle</span>
+                                付款碎裂化程度合理，無明顯資金斷層
+                            </li>
+<li class="flex items-start gap-2 text-[11px] text-slate-500">
+<span class="material-symbols-outlined text-[14px] text-accent">check_circle</span>
+                                無異常預付比例，符合行業風險管理基準
+                            </li>
+<li class="flex items-start gap-2 text-[11px] text-slate-500">
+<span class="material-symbols-outlined text-[14px] text-accent">check_circle</span>
+                                已有明確驗收與升級機制，保障程序完整性
+                            </li>
+<li class="flex items-start gap-2 text-[11px] text-slate-500">
+<span class="material-symbols-outlined text-[14px] text-accent">check_circle</span>
+                                財務暴露受控，單期風險在安全閾值內
+                            </li>
+</ul>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3 opacity-60 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">add_moderator</span>
+<div class="flex flex-col">
+<span class="text-xs font-bold text-slate-700">可選：啟用 PCM 額外程序監督</span>
+<p class="text-[10px] text-slate-400">提供第三方驗證、正式驗收文件審核、現場進度核實等。對於本案結構，PCM 為建議選配而非必要。</p>
+</div>
+</div>
+<button class="text-[10px] font-bold text-slate-400 border border-slate-200 px-3 py-1 rounded hover:bg-slate-50 transition-colors uppercase tracking-tight">
+                        查看詳情
+                    </button>
+</div>
+</div>
+</div>
+<div class="a4-page text-slate-800 mb-20">
+<div class="text-center mb-16 font-serif">
+<h2 class="text-2xl font-bold mb-3 tracking-widest text-slate-900">專案委託承攬契約書</h2>
+<div class="h-[1px] w-20 bg-slate-300 mx-auto my-5"></div>
+<h3 class="text-lg font-bold text-slate-600">第三章 專案財務治理設計</h3>
+</div>
+<div class="mb-12">
+<h4 class="text-sm font-bold mb-6 flex items-center gap-2 border-l-2 border-slate-800 pl-3 font-serif">
+                    3.1 付款期別與里程碑
+                </h4>
+<div class="relative pl-4">
+<div class="timeline-line"></div>
+<div class="relative pl-12 mb-8">
+<div class="absolute left-[19px] top-1.5 size-2.5 rounded-full bg-slate-800 z-10"></div>
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<span class="text-sm font-bold text-slate-900">第一期：合約簽署預付款</span>
+<p class="text-xs text-slate-500 max-w-md leading-relaxed">本期款項於合約正式生效後支付，用於啟動行政程序與材料採購準備。</p>
+</div>
+<span class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded">10%</span>
+</div>
+</div>
+<div class="relative pl-12 mb-8">
+<div class="absolute left-[19px] top-1.5 size-2.5 rounded-full bg-white border-2 border-slate-300 z-10"></div>
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<span class="text-sm font-bold text-slate-900">第二期：基礎工程進度節點</span>
+<p class="text-xs text-slate-500 max-w-md leading-relaxed">完成拆除、水電配管等基礎隱蔽工程，並通過現場階段性查驗。</p>
+</div>
+<span class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded">30%</span>
+</div>
+</div>
+<div class="relative pl-12 mb-8">
+<div class="absolute left-[19px] top-1.5 size-2.5 rounded-full bg-white border-2 border-slate-300 z-10"></div>
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<span class="text-sm font-bold text-slate-900">第三期：主體工程完成</span>
+<p class="text-xs text-slate-500 max-w-md leading-relaxed">木作、油漆及各項設備安裝完畢，經雙方初步清點合格。</p>
+</div>
+<span class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded">50%</span>
+</div>
+</div>
+<div class="relative pl-12">
+<div class="absolute left-[19px] top-1.5 size-2.5 rounded-full bg-white border-2 border-slate-800 z-10"></div>
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<span class="text-sm font-bold text-slate-900">第四期：總驗收與保固啟動</span>
+<p class="text-xs text-slate-500 max-w-md leading-relaxed">完成缺失改善，交付相關保固文件後支付尾款。此期款項為履約保障之關鍵節點。</p>
+</div>
+<span class="text-xs font-bold text-slate-800 bg-slate-100 px-2 py-1 rounded font-mono">10%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-10">
+<h4 class="text-sm font-bold mb-4 flex items-center gap-2 border-l-2 border-slate-800 pl-3 font-serif">
+                    3.2 程序升級與治理機制
+                </h4>
+<div class="p-6 bg-slate-50 rounded-lg border border-slate-100">
+<p class="text-xs text-slate-600 leading-relaxed mb-4">
+                        本合約已內建「對稱性程序升級機制」，旨在確保雙方履行義務之對等性。當發生進度延誤或付款遲延時，系統將依據預設之升級規則自動啟動提醒、正式書面催告及調解程序。
+                    </p>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white p-3 rounded border border-slate-200">
+<div class="text-[10px] font-bold text-slate-400 uppercase mb-2">乙方逾期升級路徑</div>
+<div class="flex items-center gap-1 text-[10px] text-slate-800">
+<span>通知</span> <span class="material-symbols-outlined text-[12px] opacity-30">arrow_forward</span>
+<span>催告</span> <span class="material-symbols-outlined text-[12px] opacity-30">arrow_forward</span>
+<span>停工</span> <span class="material-symbols-outlined text-[12px] opacity-30">arrow_forward</span>
+<span class="text-slate-900 font-bold">解約</span>
+</div>
+</div>
+<div class="bg-white p-3 rounded border border-slate-200">
+<div class="text-[10px] font-bold text-slate-400 uppercase mb-2">甲方遲延升級路徑</div>
+<div class="flex items-center gap-1 text-[10px] text-slate-800">
+<span>通知</span> <span class="material-symbols-outlined text-[12px] opacity-30">arrow_forward</span>
+<span>推定</span> <span class="material-symbols-outlined text-[12px] opacity-30">arrow_forward</span>
+<span>調解</span> <span class="material-symbols-outlined text-[12px] opacity-30">arrow_forward</span>
+<span class="text-slate-900 font-bold">求償</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<aside class="w-[280px] bg-white border-l border-slate-200 flex flex-col z-10 shrink-0">
+<div class="p-6 border-b border-slate-100 bg-slate-50/30">
+<h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">shield_with_heart</span>
+                治理摘要
+            </h2>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<span class="text-[11px] font-medium text-slate-500">治理狀態</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-accent/10 text-accent border border-accent/10">結構穩定</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] font-bold text-slate-400 uppercase">風險結構</span>
+<span class="text-[10px] font-bold text-accent uppercase">優質</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-accent w-[20%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-[10px] font-bold text-slate-400 uppercase">資金暴露比例</span>
+<span class="text-[10px] font-bold text-slate-800 uppercase">40.0%</span>
+</div>
+<div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-slate-800 w-[40%]"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8">
+<div class="space-y-4">
+<h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">系統參數</h3>
+<div class="p-3 bg-white border border-slate-200 rounded hover:border-slate-400 transition-colors cursor-pointer group">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-medium text-slate-600">逾期違約金</span>
+<span class="text-[10px] font-bold text-slate-900">0.1% / 日</span>
+</div>
+<p class="text-[9px] text-slate-400 leading-tight">標準市場行情參數</p>
+</div>
+<div class="p-3 bg-white border border-slate-200 rounded hover:border-slate-400 transition-colors cursor-pointer group">
+<div class="flex justify-between items-center mb-1">
+<span class="text-[11px] font-medium text-slate-600">驗收緩衝期</span>
+<span class="text-[10px] font-bold text-slate-900">7 天</span>
+</div>
+<p class="text-[9px] text-slate-400 leading-tight">預設改善寬限時間</p>
+</div>
+</div>
+<div class="pt-6 border-t border-slate-100">
+<button class="w-full py-2 bg-slate-800 text-white text-[11px] font-bold rounded hover:bg-slate-700 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">save</span>
+                    更新合約參數
+                </button>
+</div>
+</div>
+<div class="p-4 bg-slate-50 border-t border-slate-100">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-slate-400">info</span>
+<span class="text-[9px] text-slate-400 leading-tight font-medium">萊比系統係依據既定治理機制運作，為雙方提供中立客觀的結構性分析。</span>
+</div>
+</div>
+</aside>
+</div>
+
+</body></html>
