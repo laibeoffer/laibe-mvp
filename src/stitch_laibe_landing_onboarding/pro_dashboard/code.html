@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>LaiBE - 乙方入口首頁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "terracotta-red": "#984B4B",
+                        "warm-beige": "#F9F8F6",
+                        "charcoal": "#333333",
+                        "background": "#F9F8F6",
+                        "soft-line": "#E9E4DD",
+                        "olive-gray": "#EEF1EC",
+                        "soft-blue": "#EDF3F8",
+                        "soft-lilac": "#F2EDF8",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "Noto Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        soft: "0 8px 30px rgba(0,0,0,0.06)",
+                        softlg: "0 18px 50px rgba(0,0,0,0.10)"
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans", sans-serif;
+            background: #F9F8F6;
+            color: #333333;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-charcoal min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/5">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-20 flex items-center justify-between">
+                <div class="flex items-center gap-2 font-black text-2xl tracking-tighter text-charcoal">
+                    <span class="material-symbols-outlined text-[30px] text-terracotta-red">architecture</span>
+                    <span>LaiBE</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="#"
+                        class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">查看招標案件</a>
+                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">我的投標</a>
+                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">文件中心</a>
+                    <div
+                        class="w-10 h-10 rounded-full bg-terracotta-red/10 flex items-center justify-center text-terracotta-red">
+                        <span class="material-symbols-outlined">badge</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- HERO -->
+        <section class="py-16 lg:py-20 bg-white border-b border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-terracotta-red/10 text-terracotta-red text-sm font-bold mb-6">
+                            <span class="material-symbols-outlined text-[18px]">construction</span>
+                            乙方入口首頁
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight mb-6">
+                            瀏覽裝修招標案件
+                        </h1>
+                        <p class="text-lg sm:text-xl leading-relaxed text-charcoal/75 max-w-2xl mb-10 font-medium">
+                            提交投標文件，參與競標。
+                        </p>
+                        <button
+                            class="bg-terracotta-red text-white px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:opacity-90 transition">
+                            查看招標案件
+                        </button>
+                    </div>
+
+                    <div class="bg-warm-beige rounded-3xl shadow-soft p-8">
+                        <div class="text-sm text-charcoal/50 font-bold mb-2">投標概覽</div>
+                        <div class="text-2xl font-black mb-6">乙方工作狀態</div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-white rounded-2xl p-5 text-center">
+                                <div
+                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                                    <span class="material-symbols-outlined">format_list_bulleted</span>
+                                </div>
+                                <div class="font-black">招標案件</div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 text-center">
+                                <div
+                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                                    <span class="material-symbols-outlined">description</span>
+                                </div>
+                                <div class="font-black">我的投標</div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 text-center">
+                                <div
+                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                                    <span class="material-symbols-outlined">folder_open</span>
+                                </div>
+                                <div class="font-black">文件中心</div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 text-center">
+                                <div
+                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                                    <span class="material-symbols-outlined">workspace_premium</span>
+                                </div>
+                                <div class="font-black">履約紀錄</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 招標案件 -->
+        <section class="py-20 bg-warm-beige">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">招標案件</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">優先查看目前可投標的裝修案件。</p>
+                </div>
+
+                <div class="overflow-hidden rounded-3xl border border-black/5 shadow-soft bg-white">
+                    <div class="grid grid-cols-5 bg-warm-beige px-6 py-4 font-black text-charcoal">
+                        <div>案件名稱</div>
+                        <div>地區</div>
+                        <div>預算</div>
+                        <div>空間類型</div>
+                        <div>投標截止日</div>
+                    </div>
+
+                    <div class="grid grid-cols-5 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
+                        <div>中古屋全室翻新</div>
+                        <div>台北市</div>
+                        <div>NT$ 1,200,000</div>
+                        <div>住宅</div>
+                        <div>2026/03/28</div>
+                    </div>
+
+                    <div class="grid grid-cols-5 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
+                        <div>廚房浴室更新案</div>
+                        <div>新北市</div>
+                        <div>NT$ 480,000</div>
+                        <div>住宅</div>
+                        <div>2026/03/26</div>
+                    </div>
+
+                    <div class="grid grid-cols-5 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
+                        <div>辦公室空間調整</div>
+                        <div>新竹市</div>
+                        <div>NT$ 860,000</div>
+                        <div>商空</div>
+                        <div>2026/03/30</div>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <button
+                        class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
+                        查看案件
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 我的投標 -->
+        <section class="py-20 bg-white border-y border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">我的投標</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">查看已投標案件、場勘邀請與決標結果。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-warm-beige rounded-3xl p-8 shadow-soft">
+                        <div
+                            class="w-14 h-14 rounded-full bg-white text-terracotta-red flex items-center justify-center mb-5">
+                            <span class="material-symbols-outlined">description</span>
+                        </div>
+                        <h3 class="text-2xl font-black mb-3">已投標案件</h3>
+                        <p class="text-charcoal/75 text-lg font-medium leading-relaxed">
+                            查看目前已提交報價與文件的案件。
+                        </p>
+                    </div>
+
+                    <div class="bg-warm-beige rounded-3xl p-8 shadow-soft">
+                        <div
+                            class="w-14 h-14 rounded-full bg-white text-terracotta-red flex items-center justify-center mb-5">
+                            <span class="material-symbols-outlined">event_available</span>
+                        </div>
+                        <h3 class="text-2xl font-black mb-3">場勘邀請</h3>
+                        <p class="text-charcoal/75 text-lg font-medium leading-relaxed">
+                            查看甲方邀請場勘與現勘安排。
+                        </p>
+                    </div>
+
+                    <div class="bg-warm-beige rounded-3xl p-8 shadow-soft">
+                        <div
+                            class="w-14 h-14 rounded-full bg-white text-terracotta-red flex items-center justify-center mb-5">
+                            <span class="material-symbols-outlined">emoji_events</span>
+                        </div>
+                        <h3 class="text-2xl font-black mb-3">決標結果</h3>
+                        <p class="text-charcoal/75 text-lg font-medium leading-relaxed">
+                            瀏覽投標後的決標與後續進度。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 文件中心 -->
+        <section class="py-20 bg-warm-beige">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">文件中心</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">乙方可提交報價與執行相關文件。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                        </div>
+                        <div class="font-black text-lg">報價單</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">assignment</span>
+                        </div>
+                        <div class="font-black text-lg">施工計畫</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">inventory_2</span>
+                        </div>
+                        <div class="font-black text-lg">材料說明</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">design_services</span>
+                        </div>
+                        <div class="font-black text-lg">設計加工</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PCM 審查區 -->
+        <section class="py-20 bg-white border-t border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-terracotta-red rounded-3xl px-8 py-10 lg:px-12 lg:py-12 text-white">
+                    <div class="text-sm font-bold tracking-[0.2em] uppercase text-white/75 mb-3">PCM Review</div>
+                    <h2 class="text-3xl sm:text-4xl font-black leading-tight mb-4">
+                        PCM 審查區
+                    </h2>
+                    <p class="text-lg text-white/85 max-w-3xl font-medium mb-8">
+                        顯示目前案件的 PCM 審查結果，協助乙方了解需補件或重送的內容。
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div class="bg-white rounded-2xl p-6 text-charcoal flex items-center justify-between">
+                            <span class="font-black text-xl">PASS</span>
+                            <span class="material-symbols-outlined text-green-600">task_alt</span>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 text-charcoal flex items-center justify-between">
+                            <span class="font-black text-xl">NO</span>
+                            <span class="material-symbols-outlined text-red-600">cancel</span>
+                        </div>
+                        <div class="bg-white rounded-2xl p-6 text-charcoal flex items-center justify-between">
+                            <span class="font-black text-xl">RESUBMIT</span>
+                            <span class="material-symbols-outlined text-amber-600">refresh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 評分紀錄 -->
+        <section class="py-20 bg-warm-beige">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">評分紀錄</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">顯示案件評價與履約紀錄。</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-3xl shadow-soft p-8">
+                        <div class="text-sm text-charcoal/50 font-bold mb-2">案件評價</div>
+                        <div class="text-4xl font-black text-terracotta-red mb-3">4.8 / 5</div>
+                        <div class="text-charcoal/70 font-medium">來自近 12 筆合作案件的平均評分</div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-soft p-8">
+                        <div class="text-sm text-charcoal/50 font-bold mb-2">履約紀錄</div>
+                        <div class="text-4xl font-black text-terracotta-red mb-3">92%</div>
+                        <div class="text-charcoal/70 font-medium">依時完成、補件效率與文件完整度綜合評估</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-charcoal py-12">
+        <div
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
+                <span class="material-symbols-outlined text-[26px]">architecture</span>
+                <span>LaiBE</span>
+            </div>
+            <div class="text-sm text-white/50 font-medium">
+                © 2026 LaiBE Inc. All rights reserved.
+            </div>
+            <div class="flex gap-6 text-sm text-white/50">
+                <a href="#" class="hover:text-white transition-colors">服務條款</a>
+                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>LaiBE - 預算編輯頁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "owner-primary": "#AD5A5A",
+                        "owner-deep": "#8C4747",
+                        "owner-soft": "#F7EEEE",
+                        "charcoal": "#1F1F1F",
+                        "surface": "#111214",
+                        "surface-2": "#17191D",
+                        "surface-3": "#1F2228",
+                        "warm-bg": "#F9F8F6",
+                        "soft-line": "#E8E2DB"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "Noto Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        soft: "0 4px 20px rgba(0,0,0,0.04)",
+                        softlg: "0 12px 40px rgba(0,0,0,0.08)"
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans", sans-serif;
+            background: #F9F8F6;
+            color: #1F1F1F;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #E8E2DB;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4cdc4;
+        }
+        
+        .table-container {
+            height: calc(100vh - 450px);
+            min-height: 300px;
+        }
+        
+        /* 鎖定輸入框樣式，符合 user rule */
+        .input-locked {
+            background-color: transparent;
+            border: none;
+            color: #1F1F1F;
+            font-weight: 600;
+            width: 100%;
+            padding: 0;
+            cursor: not-allowed;
+        }
+        .input-locked:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .table-row-hover:hover {
+            background-color: #F7EEEE;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-warm-bg flex flex-col">
+
+    <!-- Header 包含上方流程列 -->
+    <header class="sticky top-0 z-50 bg-white border-b border-soft-line shadow-sm shrink-0">
+        <div class="max-w-[1600px] mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition">
+                    <img src="../../assets/laibe_logo.png" alt="LaiBE Logo" class="h-10 w-auto object-contain" />
+                </a>
+
+                <!-- 流程列 -->
+                <div class="hidden md:flex items-center gap-2 text-xs font-bold text-charcoal/40">
+                    <a href="../onboard_ai_agent/code.html" class="hover:text-charcoal transition">需求討論</a>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <a href="../preview_floor_plan/code.html" class="hover:text-charcoal transition">平面拼圖</a>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <a href="../preview_budget/code.html" class="flex items-center gap-1.5 text-owner-primary bg-owner-soft px-3 py-1 rounded-full hover:bg-owner-primary/20 transition">
+                        <span class="w-4 h-4 rounded-full bg-owner-primary text-white flex items-center justify-center text-[10px]">3</span>
+                        <span>預算生成</span>
+                    </a>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <a href="#" class="hover:text-charcoal transition">合約生成</a>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <a href="#" class="hover:text-charcoal transition">PCM治理</a>
+                    <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                    <a href="#" class="hover:text-charcoal transition">發布招標</a>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 text-sm font-bold">
+                <div class="text-charcoal/50">案件編號：#LB-20260317</div>
+                <div class="w-8 h-8 rounded-full bg-owner-soft flex items-center justify-center text-owner-primary">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-[1600px] w-full mx-auto px-6 py-6 flex flex-col lg:flex-row gap-6 h-[calc(100vh-64px)]">
+        
+        <!-- 左側主區 -->
+        <div class="flex-1 flex flex-col gap-6 w-full lg:w-0 overflow-hidden">
+            
+            <!-- 上半部：專案摘要區與平面系統圖對照區 -->
+            <div class="flex flex-col xl:flex-row gap-6 shrink-0">
+                <!-- 專案摘要區 -->
+                <div class="bg-white rounded-2xl border border-soft-line shadow-sm p-5 xl:w-[320px] shrink-0">
+                    <h2 class="text-sm font-bold text-charcoal/50 uppercase tracking-wider mb-4">Project Summary</h2>
+                    <h3 class="text-xl font-black text-charcoal mb-4">台北信義 A 戶室內裝修案</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b border-soft-line pb-2">
+                            <span class="text-charcoal/50 font-medium">總坪數</span>
+                            <span class="font-bold text-charcoal">25 坪</span>
+                        </div>
+                        <div class="flex justify-between border-b border-soft-line pb-2">
+                            <span class="text-charcoal/50 font-medium">屋況</span>
+                            <span class="font-bold text-charcoal">中古屋翻新</span>
+                        </div>
+                        <div class="flex justify-between border-b border-soft-line pb-2">
+                            <span class="text-charcoal/50 font-medium">主要需求</span>
+                            <span class="font-bold text-charcoal">兩房一廳 / 全室水電重拉</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 平面系統圖對照區 -->
+                <div class="bg-white rounded-2xl border border-soft-line shadow-sm p-5 flex-1 flex flex-col">
+                    <div class="flex gap-6 border-b border-soft-line mb-4 shrink-0">
+                        <button class="pb-3 border-b-2 border-owner-primary font-bold text-owner-primary text-sm flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">floor</span>
+                            平面配置圖
+                        </button>
+                        <button class="pb-3 font-bold text-charcoal/40 text-sm hover:text-charcoal/70 transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">electrical_services</span>
+                            插座配置圖
+                        </button>
+                        <button class="pb-3 font-bold text-charcoal/40 text-sm hover:text-charcoal/70 transition flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px]">lightbulb</span>
+                            燈具配置圖
+                        </button>
+                    </div>
+                    <div class="flex-1 bg-[#FDFDFD] rounded-xl border border-soft-line flex items-center justify-center relative overflow-hidden grid-bg" style="background-image: radial-gradient(circle, #E8E2DB 1px, transparent 1px); background-size: 20px 20px;">
+                        <span class="material-symbols-outlined text-charcoal/10 text-[64px]">architecture</span>
+                        <div class="absolute bottom-3 right-3 bg-white/90 px-3 py-1.5 rounded-lg text-xs font-bold text-charcoal shadow-sm border border-soft-line backdrop-blur flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-[14px] text-owner-primary">info</span>
+                            此為唯讀對照圖面，修改尺寸將重置關聯預算
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下半部：詳細預算清單表格 -->
+            <div class="bg-white rounded-2xl border border-soft-line shadow-sm flex flex-col flex-1 min-h-[400px]">
+                
+                <!-- Table Toolbar -->
+                <div class="px-5 py-4 border-b border-soft-line flex items-center justify-between bg-[#FCFBFA] rounded-t-2xl shrink-0">
+                    <div class="flex items-center gap-4">
+                        <h2 class="text-base font-black text-charcoal">詳細預算清單</h2>
+                        <span class="px-2.5 py-1 rounded bg-owner-soft text-owner-primary text-xs font-bold">共 42 項</span>
+                    </div>
+                    <div class="flex items-center gap-3 relative group">
+                        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-charcoal text-white text-xs font-bold hover:bg-black/80 transition shadow-sm">
+                            <span class="material-symbols-outlined text-[16px]">add</span>
+                            新增工項
+                            <span class="material-symbols-outlined text-[14px] ml-1 opacity-50">arrow_drop_down</span>
+                        </button>
+                        <!-- 下拉選單 (Hover 顯示，僅示意結構) -->
+                        <div class="absolute top-full right-0 mt-1 w-32 bg-white rounded-lg shadow-softlg border border-soft-line py-1 hidden group-hover:block z-20">
+                            <button class="w-full text-left px-4 py-2 text-xs font-bold text-charcoal hover:bg-black/5 transition">新增工項</button>
+                            <button class="w-full text-left px-4 py-2 text-xs font-bold text-charcoal hover:bg-black/5 transition">新增項目</button>
+                            <button class="w-full text-left px-4 py-2 text-xs font-bold text-charcoal hover:bg-black/5 transition">小計</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Header & Scrollable Body -->
+                <div class="flex-1 overflow-auto">
+                    <table class="w-full text-left text-sm whitespace-nowrap">
+                        <thead class="bg-white sticky top-0 z-10 box-shadow-bottom">
+                            <tr class="text-xs font-bold text-charcoal/50 uppercase tracking-wider border-b border-soft-line">
+                                <th class="pl-5 pr-2 py-3 w-10"></th>
+                                <th class="px-2 py-3 w-12 text-center">項次</th>
+                                <th class="px-3 py-3 min-w-[180px]">類別 / 項目</th>
+                                <th class="px-3 py-3 w-12 text-center">單位</th>
+                                <th class="px-3 py-3 w-16 text-right">數量</th>
+                                <th class="px-3 py-3 w-24 text-right">單價</th>
+                                <th class="px-3 py-3 w-28 text-right">總計</th>
+                                <th class="px-3 py-3 w-56">規格與說明</th>
+                                <th class="px-3 py-3 w-10 text-center">AI</th>
+                                <th class="pr-5 pl-3 py-3 w-12 text-center">操作</th>
+                            </tr>
+                            <!-- Drop Shadow trick for sticky header -->
+                            <tr class="h-0"><td colspan="10" class="p-0 border-0"><div class="absolute bottom-0 w-full h-[1px] shadow-[0_2px_4px_rgba(0,0,0,0.02)]"></div></td></tr>
+                        </thead>
+                        <tbody class="divide-y divide-soft-line text-charcoal">
+                            <!-- Row 1 -->
+                            <tr class="table-row-hover transition border-t border-soft-line">
+                                <td class="pl-5 pr-2 py-3 relative group">
+                                    <button class="w-6 h-6 rounded flex items-center justify-center text-charcoal/40 hover:bg-black/5 hover:text-charcoal transition">
+                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                    </button>
+                                    <div class="absolute top-10 left-5 w-28 bg-white rounded-lg shadow-softlg border border-soft-line py-1 hidden group-hover:block z-20">
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">加入工項</button>
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">加入項目</button>
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">小計</button>
+                                    </div>
+                                </td>
+                                <td class="px-2 py-3 text-center text-xs text-charcoal/50 font-bold">1.1</td>
+                                <td class="px-3 py-3 font-bold">
+                                    拆除工程 - 隔間拆除
+                                </td>
+                                <td class="px-3 py-3 text-center">坪</td>
+                                <td class="px-3 py-3 text-right">
+                                    <input type="text" value="3.5" class="input-locked text-right" readonly />
+                                </td>
+                                <td class="px-3 py-3 text-right">
+                                    <input type="text" value="2,500" class="w-16 text-right text-sm border-b border-soft-line focus:border-owner-primary focus:outline-none bg-transparent" />
+                                </td>
+                                <td class="px-3 py-3 text-right font-bold text-owner-primary tabular-nums">8,750</td>
+                                <td class="px-3 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" value="含廢棄物清運，依規範施工" class="w-full text-xs border-b border-transparent hover:border-soft-line focus:border-owner-primary focus:outline-none bg-transparent text-charcoal/70" />
+                                        <a href="#" class="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-black/5 text-charcoal/60 hover:bg-owner-primary hover:text-white transition whitespace-nowrap" title="連結工法規格書">[工法書]</a>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    <span class="material-symbols-outlined text-[16px] text-owner-primary cursor-help" title="AI 自動匡列項目">auto_awesome</span>
+                                </td>
+                                <td class="pr-5 pl-3 py-3 text-center">
+                                    <button class="text-charcoal/30 hover:text-red-500 transition"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                                </td>
+                            </tr>
+
+                            <!-- Row 2 -->
+                            <tr class="table-row-hover transition border-t border-soft-line">
+                                <td class="pl-5 pr-2 py-3 relative group">
+                                    <button class="w-6 h-6 rounded flex items-center justify-center text-charcoal/40 hover:bg-black/5 hover:text-charcoal transition">
+                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                    </button>
+                                    <div class="absolute top-10 left-5 w-28 bg-white rounded-lg shadow-softlg border border-soft-line py-1 hidden group-hover:block z-20">
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">加入工項</button>
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">加入項目</button>
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">小計</button>
+                                    </div>
+                                </td>
+                                <td class="px-2 py-3 text-center text-xs text-charcoal/50 font-bold">1.2</td>
+                                <td class="px-3 py-3 font-bold">
+                                    水電工程 - 全室冷熱水管更新
+                                </td>
+                                <td class="px-3 py-3 text-center">式</td>
+                                <td class="px-3 py-3 text-right">
+                                    <input type="text" value="1" class="input-locked text-right" readonly />
+                                </td>
+                                <td class="px-3 py-3 text-right">
+                                    <input type="text" value="120,000" class="w-16 text-right text-sm border-b border-soft-line focus:border-owner-primary focus:outline-none bg-transparent" />
+                                </td>
+                                <td class="px-3 py-3 text-right font-bold text-owner-primary tabular-nums">120,000</td>
+                                <td class="px-3 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" value="不銹鋼壓接管，含試水壓力測試" class="w-full text-xs border-b border-transparent hover:border-soft-line focus:border-owner-primary focus:outline-none bg-transparent text-charcoal/70" />
+                                        <a href="#" class="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-black/5 text-charcoal/60 hover:bg-owner-primary hover:text-white transition whitespace-nowrap" title="連結工法規格書">[工法書]</a>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-3 text-center">
+                                    <span class="material-symbols-outlined text-[16px] text-blue-500 cursor-help" title="系統鎖定基礎工程">lock</span>
+                                </td>
+                                <td class="pr-5 pl-3 py-3 text-center">
+                                    <button class="text-charcoal/30 hover:text-red-500 transition" disabled title="系統鎖定項目不可刪除"><span class="material-symbols-outlined text-[18px] opacity-50">delete</span></button>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3 -->
+                            <tr class="table-row-hover transition border-t border-soft-line">
+                                <td class="pl-5 pr-2 py-3 relative group">
+                                    <button class="w-6 h-6 rounded flex items-center justify-center text-charcoal/40 hover:bg-black/5 hover:text-charcoal transition">
+                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                    </button>
+                                    <div class="absolute top-10 left-5 w-28 bg-white rounded-lg shadow-softlg border border-soft-line py-1 hidden group-hover:block z-20">
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">加入工項</button>
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">加入項目</button>
+                                        <button class="w-full text-left px-3 py-1.5 text-xs font-bold text-charcoal hover:bg-black/5 transition">小計</button>
+                                    </div>
+                                </td>
+                                <td class="px-2 py-3 text-center text-xs text-charcoal/50 font-bold">2.1</td>
+                                <td class="px-3 py-3 font-bold">
+                                    泥作工程 - 浴室防水重作
+                                </td>
+                                <td class="px-3 py-3 text-center">間</td>
+                                <td class="px-3 py-3 text-right">
+                                    <input type="text" value="2" class="w-12 text-right text-sm border-b border-soft-line focus:border-owner-primary focus:outline-none bg-transparent" />
+                                </td>
+                                <td class="px-3 py-3 text-right">
+                                    <input type="text" value="35,000" class="w-16 text-right text-sm border-b border-soft-line focus:border-owner-primary focus:outline-none bg-transparent" />
+                                </td>
+                                <td class="px-3 py-3 text-right font-bold text-owner-primary tabular-nums">70,000</td>
+                                <td class="px-3 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <input type="text" value="彈性水泥塗佈三道，含角落抗裂網" class="w-full text-xs border-b border-transparent hover:border-soft-line focus:border-owner-primary focus:outline-none bg-transparent text-charcoal/70" />
+                                        <a href="#" class="shrink-0 text-[10px] px-1.5 py-0.5 rounded bg-black/5 text-charcoal/60 hover:bg-owner-primary hover:text-white transition whitespace-nowrap" title="連結工法規格書">[工法書]</a>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-3 text-center"></td>
+                                <td class="pr-5 pl-3 py-3 text-center">
+                                    <button class="text-charcoal/30 hover:text-red-500 transition"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="px-5 py-3 border-t border-soft-line flex items-center justify-between text-xs bg-white shrink-0 rounded-b-2xl">
+                    <span class="text-charcoal/50 font-medium">顯示 1-10 項，共 42 項</span>
+                    <div class="flex items-center gap-2">
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-soft-line text-charcoal/40 hover:text-charcoal hover:bg-black/5 disabled:opacity-50"><span class="material-symbols-outlined text-[16px]">chevron_left</span></button>
+                        <span class="w-7 h-7 flex items-center justify-center rounded bg-owner-soft text-owner-primary font-bold">1</span>
+                        <button class="w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 font-bold text-charcoal/60">2</button>
+                        <button class="w-7 h-7 flex items-center justify-center rounded hover:bg-black/5 font-bold text-charcoal/60">3</button>
+                        <span class="text-charcoal/40">...</span>
+                        <button class="w-7 h-7 flex items-center justify-center rounded border border-soft-line text-charcoal/60 hover:text-charcoal hover:bg-black/5"><span class="material-symbols-outlined text-[16px]">chevron_right</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底層匯入補充文件區 -->
+            <div class="bg-white rounded-2xl border border-soft-line shadow-sm p-5 shrink-0">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-bold text-charcoal flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">post_add</span>
+                        匯入文件區
+                    </h3>
+                    <span class="text-xs text-owner-primary bg-owner-soft px-2 py-0.5 rounded font-bold">已存在詳細清單內容，本區已關閉</span>
+                </div>
+                
+                <div class="flex gap-4">
+                    <!-- Disabled Upload Zone -->
+                    <div class="w-64 h-24 rounded-xl border-2 border-dashed border-charcoal/10 bg-black/5 flex flex-col items-center justify-center text-charcoal/30 cursor-not-allowed opacity-70">
+                        <span class="material-symbols-outlined text-[20px] mb-1">block</span>
+                        <span class="text-xs font-bold text-center px-4 mt-1">為確保資料不干擾<br>清單已有內容時禁止重新匯入</span>
+                    </div>
+
+                    <!-- 最近匯入列表 -->
+                    <div class="flex-1 grid grid-cols-2 gap-3">
+                        <div class="bg-white border text-charcoal/70 border-owner-primary/20 rounded-lg p-3 flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-owner-primary">description</span>
+                                <div>
+                                    <div class="text-sm font-bold text-charcoal">統包初版報價單.pdf</div>
+                                    <div class="text-[10px]">2026/03/17 匯入，已作為 AI 解析來源</div>
+                                </div>
+                            </div>
+                            <button class="text-charcoal/30 hover:text-owner-primary"><span class="material-symbols-outlined text-[16px]">visibility</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 右側側欄 -->
+        <div class="w-full lg:w-[320px] xl:w-[360px] shrink-0 flex flex-col gap-6 overflow-y-auto hidden-scrollbar">
+            
+            <!-- 預算摘要卡與操作按鈕 -->
+            <div class="bg-white rounded-2xl border border-soft-line shadow-sm p-6 shrink-0">
+                <div class="space-y-4 mb-6">
+                    <div class="flex justify-between items-end">
+                        <span class="text-sm font-bold text-charcoal/50">工程小計</span>
+                        <span class="text-base font-bold text-charcoal tabular-nums">NT$ 1,680,000</span>
+                    </div>
+                    <div class="flex justify-between items-end border-b border-soft-line pb-4">
+                        <div class="flex items-center gap-1 text-sm font-bold text-charcoal/50">
+                            管理費與稅金 (10%)
+                            <span class="material-symbols-outlined text-[14px] cursor-help" title="依平台公版標準">info</span>
+                        </div>
+                        <span class="text-base font-bold text-charcoal tabular-nums">NT$ 168,000</span>
+                    </div>
+                    <div class="flex justify-between items-end pt-2">
+                        <span class="text-sm font-bold text-charcoal uppercase">預估總金額</span>
+                        <span class="text-2xl font-black text-owner-primary tabular-nums tracking-tight">NT$ 1,848,000</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button class="w-full py-3 rounded-xl border border-soft-line bg-white text-sm font-bold text-charcoal hover:bg-black/5 transition flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">chrome_reader_mode</span>
+                        查看規範文件 (工法/材料)
+                    </button>
+                    <button class="w-full py-3 rounded-xl border border-soft-line bg-white text-sm font-bold text-charcoal hover:bg-black/5 transition flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">floor</span>
+                        返回平面配置
+                    </button>
+                    <button class="w-full py-3 rounded-xl bg-charcoal text-white text-sm font-bold hover:bg-black/80 transition flex items-center justify-center gap-2 shadow-sm">
+                        <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                        生成空白標單 (發包用)
+                    </button>
+                    <button class="w-full py-3.5 rounded-xl bg-owner-primary text-white text-sm font-bold hover:bg-owner-deep transition flex items-center justify-center gap-2 shadow-soft mt-2">
+                        前往預算總覽
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI 導引助理對話框 -->
+            <div class="bg-[#111214] rounded-2xl shadow-softlg overflow-hidden flex flex-col flex-1 min-h-[300px]">
+                <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-2 text-white">
+                        <span class="material-symbols-outlined text-owner-primary">psychiatry</span>
+                        <span class="font-bold text-sm">AI 導引助理</span>
+                    </div>
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-owner-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-owner-primary"></span>
+                    </span>
+                </div>
+                
+                <div class="p-5 flex-1 overflow-y-auto space-y-4 pt-4">
+                    <div class="text-xs text-white/40 text-center font-bold mb-2">以下為 AI 檢查結果</div>
+                    
+                    <div class="bg-white/10 rounded-xl rounded-tl-none p-3 border border-white/5 w-11/12">
+                        <div class="text-sm text-white/90 leading-relaxed font-medium">
+                            您剛剛修改了「兩間浴室防水」的單價。根據市場行情區間，此價格低於均價 20%，請特別留意合約中防水保固的年限是否相應縮短。
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white/10 rounded-xl rounded-tl-none p-3 border border-owner-primary/30 w-11/12 relative">
+                        <div class="absolute -left-1.5 -top-1.5 w-3 h-3 bg-owner-primary rounded-full border-2 border-[#111214]"></div>
+                        <div class="text-sm text-white/90 leading-relaxed font-medium">
+                            另外，我發現清單中漏列了「廢棄物清運後續車趟費」。這通常會是完工後容易追加的項目，需要我幫您把這項加進【假設工程】分類中嗎？
+                        </div>
+                        <div class="mt-3 flex gap-2">
+                            <button class="px-3 py-1.5 rounded-lg bg-owner-primary text-white text-xs font-bold hover:bg-owner-deep">加入清單</button>
+                            <button class="px-3 py-1.5 rounded-lg border border-white/20 text-white/70 text-xs font-bold hover:bg-white/10">略過</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-white/5 border-t border-white/10 shrink-0">
+                    <div class="relative">
+                        <input type="text" placeholder="向 AI 詢問預算合理性、工法或補遺..." class="w-full bg-[#1A1C21] border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:outline-none focus:border-owner-primary placeholder-white/30" />
+                        <button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg flex items-center justify-center text-owner-primary hover:bg-white/5 transition">
+                            <span class="material-symbols-outlined text-[18px]">send</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+</body>
+</html>

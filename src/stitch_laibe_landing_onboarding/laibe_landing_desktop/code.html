@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LaiBE - 官方首頁</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>LaiBE - 裝修規劃首頁</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
         rel="stylesheet" />
@@ -18,9 +18,17 @@
                         "warm-beige": "#F9F8F6",
                         "charcoal": "#333333",
                         "background": "#F9F8F6",
+                        "soft-line": "#E9E4DD",
+                        "olive-gray": "#EEF1EC",
+                        "soft-blue": "#EDF3F8",
+                        "soft-lilac": "#F2EDF8",
                     },
                     fontFamily: {
-                        "display": ["Inter", "Noto Sans", "sans-serif"]
+                        display: ["Inter", "Noto Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        soft: "0 8px 30px rgba(0,0,0,0.06)",
+                        softlg: "0 18px 50px rgba(0,0,0,0.10)"
                     }
                 },
             },
@@ -29,31 +37,27 @@
     <style>
         body {
             font-family: 'Inter', "Noto Sans", sans-serif;
-            background-color: #F9F8F6;
+            background: #F9F8F6;
             color: #333333;
         }
     </style>
 </head>
 
-<body class="bg-background text-charcoal transition-colors duration-300 min-h-screen flex flex-col">
+<body class="bg-background text-charcoal min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="sticky top-0 z-50 w-full bg-terracotta-red text-white py-4">
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/5">
         <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex h-16 items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center gap-2 font-black text-2xl tracking-tighter">
-                    <span class="material-symbols-outlined text-3xl">architecture</span>
-                    <span>LaiBE</span>
-                </div>
-                <!-- Nav -->
+            <div class="h-20 flex items-center justify-between">
+                <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition">
+                    <img src="../../assets/laibe_logo.png" alt="LaiBE Logo" class="h-10 w-auto object-contain" />
+                </a>
                 <div class="flex items-center gap-6">
-                    <a href="#"
-                        class="hidden sm:block text-white/90 hover:text-white font-bold text-sm tracking-wide">我是屋主</a>
-                    <a href="#"
-                        class="hidden sm:block text-white/90 hover:text-white font-bold text-sm tracking-wide">我是乙方</a>
-                    <button class="text-white hover:text-white/80 transition-colors">
-                        <span class="material-symbols-outlined text-3xl">menu</span>
+                    <a href="../onboard_ai_agent/code.html" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">開始需求評估</a>
+                    <a href="../onboard_ai_agent/code.html" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">生成裝修預算</a>
+                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">瀏覽招標</a>
+                    <button class="text-charcoal">
+                        <span class="material-symbols-outlined text-[30px]">menu</span>
                     </button>
                 </div>
             </div>
@@ -61,215 +65,337 @@
     </header>
 
     <main class="flex-grow">
-        <!-- Hero Section -->
-        <section class="bg-terracotta-red relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-8">
-                    <!-- Left Text -->
-                    <div class="w-full lg:w-1/2 text-white z-10 lg:pr-8">
-                        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-[1.1] tracking-tight">
-                            試試我們的免費繪圖吧！
+
+        <!-- HERO -->
+        <section class="bg-terracotta-red py-16 lg:py-24 overflow-hidden">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="text-white">
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-sm font-bold mb-6">
+                            <span class="material-symbols-outlined text-[18px]">home_repair_service</span>
+                            裝修規劃先從工具開始
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black leading-[1.08] tracking-tight mb-6">
+                            不用再一家一家問報價<br />
+                            先做平面拼圖，<br class="hidden sm:block" />
+                            立即生成裝修預算
                         </h1>
-                        <h2 class="text-xl sm:text-2xl font-bold mb-10 opacity-90 leading-snug">
-                            想自己畫圖？還是手邊已有報價單？
-                        </h2>
+                        <p class="text-lg sm:text-xl leading-relaxed text-white/90 max-w-2xl mb-10 font-medium">
+                            萊比提供免費工具，讓你在找設計師或統包之前，先拿到圖面、預算與施工規格。
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="../onboard_ai_agent/code.html"
+                                class="inline-block text-center bg-white text-terracotta-red px-8 py-4 rounded-xl font-black text-lg shadow-xl hover:scale-[1.02] transition-all">
+                                開始做平面拼圖
+                            </a>
+                            <a href="../onboard_ai_agent/code.html"
+                                class="inline-block text-center border-2 border-white/60 text-white bg-white/10 px-8 py-4 rounded-xl font-black text-lg hover:bg-white/20 transition-all">
+                                生成裝修預算
+                            </a>
+                        </div>
+                        <div class="mt-6 text-sm text-white/80 font-medium">
+                            免費使用 · 不需要註冊
+                        </div>
+                    </div>
 
-                        <div class="flex flex-col sm:flex-row gap-6 mt-8">
-                            <button
-                                class="bg-white text-terracotta-red px-8 py-4 rounded font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-                                開始畫圖做預算
-                            </button>
-
-                            <div class="relative w-full sm:w-auto">
-                                <!-- Badge -->
-                                <div
-                                    class="absolute -top-3 -right-3 z-20 bg-yellow-400 text-charcoal text-xs font-black px-2 py-1 rounded shadow-md transform rotate-6 border border-yellow-500 uppercase tracking-widest">
-                                    HOT / 推薦
+                    <div class="relative">
+                        <div class="grid grid-cols-1 gap-5">
+                            <div class="bg-[#C88D62] rounded-3xl p-4 shadow-softlg">
+                                <img src="./hero_isometric_room.png" alt="平面拼圖示意圖"
+                                    class="w-full h-auto object-contain rounded-2xl bg-[#D9B18F]" />
+                            </div>
+                            <div class="bg-white rounded-3xl shadow-soft p-6">
+                                <div class="flex items-center justify-between mb-5">
+                                    <div>
+                                        <div class="text-sm text-charcoal/50 font-bold">預算預覽</div>
+                                        <div class="text-2xl font-black text-charcoal">工程預算書</div>
+                                    </div>
+                                    <span
+                                        class="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold bg-terracotta-red/10 text-terracotta-red">
+                                        市場平均 ±10%
+                                    </span>
                                 </div>
-                                <!-- Outline Button -->
-                                <button
-                                    class="w-full sm:w-auto border-2 border-white/60 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded font-bold text-lg hover:bg-white/20 transition-all">
-                                    免費報價健檢
-                                </button>
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex justify-between border-b border-black/5 pb-2">
+                                        <span>拆除清運</span><span class="font-bold">NT$ 68,000</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-black/5 pb-2">
+                                        <span>泥作 / 防水</span><span class="font-bold">NT$ 125,000</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-black/5 pb-2">
+                                        <span>水電工程</span><span class="font-bold">NT$ 143,000</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-black/5 pb-2">
+                                        <span>木作 / 天花</span><span class="font-bold">NT$ 186,000</span>
+                                    </div>
+                                    <div class="flex justify-between pt-2 text-lg font-black">
+                                        <span>預算估算</span><span class="text-terracotta-red">NT$ 522,000</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Visual -->
-                    <div class="w-full lg:w-1/2 relative flex justify-center lg:justify-end mt-12 lg:mt-0">
-                        <img src="./hero_isometric_room.png" alt="3D Isometric Room Design"
-                            class="w-full max-w-lg object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] hover:scale-[1.02] transition-transform duration-700" />
-                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Value Props -->
-        <section class="bg-warm-beige py-24">
+        <!-- 工具入口 -->
+        <section class="py-24 bg-warm-beige">
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-20 -mt-36">
-                    <!-- Card 1 -->
-                    <div
-                        class="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-2 transition-all flex flex-col items-start min-h-[280px]">
+                <div class="text-center mb-14">
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        先做兩件事
+                    </h2>
+                    <p class="text-lg sm:text-xl text-charcoal/75 font-medium">
+                        只要 10 分鐘，你就能知道裝修大概多少錢
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-3xl shadow-soft p-10 border border-black/5">
                         <div
-                            class="mb-6 flex items-center justify-center text-terracotta-red bg-warm-beige/50 p-4 rounded-xl">
-                            <span class="material-symbols-outlined text-[40px] leading-none">robot_2</span>
+                            class="w-16 h-16 rounded-2xl bg-terracotta-red/10 text-terracotta-red flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">grid_view</span>
                         </div>
-                        <h3 class="text-2xl font-black text-charcoal mb-4">AI 專案助理</h3>
-                        <p class="text-charcoal/70 text-lg font-medium leading-relaxed">讓你不再看不懂現場，監工有靠山。</p>
+                        <h3 class="text-2xl font-black mb-4">平面拼圖</h3>
+                        <p class="text-charcoal/75 text-lg leading-relaxed mb-8 font-medium">
+                            把家具拖進平面圖，系統會自動判斷空間需求。
+                        </p>
+                        <a href="../onboard_ai_agent/code.html"
+                            class="inline-block bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
+                            開始拼圖
+                        </a>
                     </div>
 
-                    <!-- Card 2 -->
-                    <div
-                        class="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-2 transition-all flex flex-col items-start min-h-[280px]">
+                    <div class="bg-white rounded-3xl shadow-soft p-10 border border-black/5">
                         <div
-                            class="mb-6 flex items-center justify-center text-terracotta-red bg-warm-beige/50 p-4 rounded-xl">
-                            <span class="material-symbols-outlined text-[40px] leading-none">search</span>
+                            class="w-16 h-16 rounded-2xl bg-terracotta-red/10 text-terracotta-red flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">receipt_long</span>
                         </div>
-                        <h3 class="text-2xl font-black text-charcoal mb-4">報價健檢</h3>
-                        <p class="text-charcoal/70 text-lg font-medium leading-relaxed">一鍵明白報價區間，拒絕當盤子。</p>
-                    </div>
-
-                    <!-- Card 3 -->
-                    <div
-                        class="bg-white p-10 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:-translate-y-2 transition-all flex flex-col items-start min-h-[280px]">
-                        <div
-                            class="mb-6 flex items-center justify-center text-terracotta-red bg-warm-beige/50 p-4 rounded-xl">
-                            <span class="material-symbols-outlined text-[40px] leading-none">extension</span>
-                        </div>
-                        <h3 class="text-2xl font-black text-charcoal mb-4">最簡易的平面圖製作</h3>
-                        <p class="text-charcoal/70 text-lg font-medium leading-relaxed">插座、燈具、天花板規劃不求人。</p>
+                        <h3 class="text-2xl font-black mb-4">預算生成</h3>
+                        <p class="text-charcoal/75 text-lg leading-relaxed mb-8 font-medium">
+                            系統會依據空間需求，生成完整工程預算。
+                        </p>
+                        <a href="../onboard_ai_agent/code.html"
+                            class="inline-block bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
+                            生成預算
+                        </a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Process Section -->
-        <section class="bg-white py-32 border-y border-black/5">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2
-                    class="text-3xl sm:text-4xl lg:text-5xl font-black text-charcoal mb-24 tracking-tight leading-tight">
-                    萊比不是裝潢媒合平台，<br class="hidden sm:block" />
-                    <span class="text-terracotta-red">是您的裝潢 AI 顧問。</span>
+        <!-- 預算生成說明 -->
+        <section class="py-24 bg-white border-y border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <div class="text-terracotta-red font-bold tracking-[0.2em] text-sm uppercase mb-4">Budget Engine
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-6">
+                            裝修預算不是猜出來的
+                        </h2>
+                        <p class="text-lg sm:text-xl text-charcoal/80 leading-relaxed font-medium mb-6">
+                            萊比的預算生成系統，依據工料分析與施工工法計算。
+                        </p>
+                        <p class="text-lg sm:text-xl text-charcoal/80 leading-relaxed font-medium">
+                            系統會自動生成：工程項目、施工規格、預算估算。
+                        </p>
+                    </div>
+
+                    <div class="bg-warm-beige rounded-3xl p-8 shadow-soft">
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-4 bg-white rounded-2xl p-5">
+                                <span
+                                    class="material-symbols-outlined text-terracotta-red text-[28px]">format_list_bulleted</span>
+                                <div>
+                                    <div class="font-black text-lg">工程項目</div>
+                                    <div class="text-charcoal/70">依空間需求自動生成主要工項</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 bg-white rounded-2xl p-5">
+                                <span
+                                    class="material-symbols-outlined text-terracotta-red text-[28px]">construction</span>
+                                <div>
+                                    <div class="font-black text-lg">施工規格</div>
+                                    <div class="text-charcoal/70">對應工法與基礎施工標準</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 bg-white rounded-2xl p-5">
+                                <span
+                                    class="material-symbols-outlined text-terracotta-red text-[28px]">monitoring</span>
+                                <div>
+                                    <div class="font-black text-lg">預算估算</div>
+                                    <div class="text-charcoal/70">市場平均價格，合理浮動區間約 ±10%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 招標流程 -->
+        <section class="py-24 bg-warm-beige">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4">
+                        不用再一家一家問報價
+                    </h2>
+                    <p class="text-lg sm:text-xl text-charcoal/75 font-medium max-w-3xl mx-auto">
+                        萊比讓多家廠商同時投標，避免傳統裝修詢價資訊不對稱。
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                        </div>
+                        <div class="font-black text-lg">生成預算</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">publish</span>
+                        </div>
+                        <div class="font-black text-lg">案件上架</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">groups</span>
+                        </div>
+                        <div class="font-black text-lg">廠商投標</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">search_insights</span>
+                        </div>
+                        <div class="font-black text-lg">場勘</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
+                        <div
+                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
+                            <span class="material-symbols-outlined">task_alt</span>
+                        </div>
+                        <div class="font-black text-lg">決標</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PCM 制度 -->
+        <section class="py-24 bg-white border-y border-black/5">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                    <div>
+                        <div class="text-terracotta-red font-bold tracking-[0.2em] text-sm uppercase mb-4">PCM Review
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-6">
+                            裝修最難的不是找人<br />
+                            是判斷誰說的是真的
+                        </h2>
+                        <p class="text-lg sm:text-xl text-charcoal/80 leading-relaxed font-medium mb-6">
+                            場勘後的追加報價與施工文件，將由 PCM 進行審查。
+                        </p>
+                        <p class="text-lg sm:text-xl text-charcoal/80 leading-relaxed font-medium mb-6">
+                            PCM 不參與設計，只審查：施工流程、材料規格、施工工法、文件合理性。
+                        </p>
+                        <p class="text-base text-charcoal/60 font-bold">
+                            甲方仍保有最終決定權
+                        </p>
+                    </div>
+
+                    <div class="bg-warm-beige rounded-3xl p-8 shadow-soft">
+                        <div class="grid grid-cols-1 gap-4 mb-6">
+                            <div class="bg-white rounded-2xl p-5 flex items-center justify-between">
+                                <span class="font-black text-lg">PASS</span>
+                                <span class="material-symbols-outlined text-green-600">task_alt</span>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 flex items-center justify-between">
+                                <span class="font-black text-lg">NO</span>
+                                <span class="material-symbols-outlined text-red-600">cancel</span>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 flex items-center justify-between">
+                                <span class="font-black text-lg">RESUBMIT</span>
+                                <span class="material-symbols-outlined text-amber-600">refresh</span>
+                            </div>
+                        </div>
+
+                        <div class="text-charcoal/70 text-base leading-relaxed font-medium">
+                            場勘與施工後，真正難的是判斷追加內容是否合理。萊比把專業審查放在後面，讓工具先吸引用戶，制度再接手。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="py-24 bg-terracotta-red">
+            <div class="max-w-[960px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+                    先做平面拼圖<br class="hidden sm:block" />
+                    看看裝修大概多少錢
                 </h2>
-
-                <div
-                    class="relative max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12 md:gap-0">
-                    <!-- Dashed Line Connector (Desktop only) -->
-                    <div
-                        class="hidden md:block absolute top-[44px] left-[15%] right-[15%] h-[2px] border-t-2 border-dashed border-charcoal/30 z-0">
-                    </div>
-
-                    <!-- Step 1 -->
-                    <div class="relative z-10 flex flex-col items-center gap-6 bg-white px-2 sm:px-6 w-full md:w-56">
-                        <div
-                            class="w-24 h-24 rounded-full border border-charcoal/20 bg-white flex items-center justify-center text-charcoal shadow-sm">
-                            <span
-                                class="material-symbols-outlined text-[48px] font-extralight text-terracotta-red">checklist</span>
-                        </div>
-                        <span class="text-xl font-bold text-charcoal">輸入統一規格</span>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="relative z-10 flex flex-col items-center gap-6 bg-white px-2 sm:px-6 w-full md:w-56">
-                        <div
-                            class="w-24 h-24 rounded-full border border-charcoal/20 bg-white flex items-center justify-center text-charcoal shadow-sm">
-                            <span
-                                class="material-symbols-outlined text-[48px] font-extralight text-terracotta-red">pan_tool</span>
-                        </div>
-                        <span class="text-xl font-bold text-charcoal">多人同時估價</span>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="relative z-10 flex flex-col items-center gap-6 bg-white px-2 sm:px-6 w-full md:w-56">
-                        <div
-                            class="w-24 h-24 rounded-full border border-charcoal/20 bg-white flex items-center justify-center text-charcoal shadow-sm">
-                            <span
-                                class="material-symbols-outlined text-[48px] font-extralight text-terracotta-red">shield</span>
-                        </div>
-                        <span class="text-xl font-bold text-charcoal">產出安心比價單</span>
-                    </div>
+                <div class="flex justify-center">
+                    <a href="../onboard_ai_agent/code.html"
+                        class="inline-block bg-white text-terracotta-red px-10 py-5 rounded-xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">
+                        開始拼圖
+                    </a>
+                </div>
+                <div class="mt-5 text-white/85 text-base font-medium">
+                    免費使用 · 不需要註冊
                 </div>
             </div>
         </section>
 
-        <!-- Pain Points - Zig Zag Layout -->
-        <section class="bg-warm-beige py-32">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col gap-32">
-
-                <!-- Block 1: Text Left, Img Right -->
-                <div class="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-24">
-                    <div class="w-full md:w-1/2 flex flex-col items-start z-10">
-                        <div class="text-terracotta-red font-bold text-sm mb-4 tracking-[0.2em] uppercase">Pain Point 01
-                        </div>
-                        <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">話術再見</h2>
-                        <p class="text-xl text-charcoal/80 leading-relaxed font-medium">
-                            強調數據取代話術。不再被似是而非的專業名詞與模糊承諾綁架，透過 LaiBE，所有的報價與規格都必須攤在陽光下。
-                        </p>
-                    </div>
-                    <div
-                        class="w-full md:w-1/2 relative bg-gray-200 aspect-[4/3] flex items-center justify-center text-gray-400 overflow-hidden shadow-2xl rounded-sm">
-                        <img src="./image_12.png" alt="無奈的設計師向趾高氣昂的女子解釋"
-                            class="w-full h-full object-cover select-none" />
-                    </div>
+        <!-- FAQ -->
+        <section class="py-24 bg-warm-beige">
+            <div class="max-w-[960px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight">
+                        常見問題
+                    </h2>
                 </div>
 
-                <!-- Block 2: Img Left, Text Right -->
-                <div class="flex flex-col md:flex-row items-center gap-12 lg:gap-24">
-                    <div
-                        class="w-full md:w-1/2 relative bg-gray-200 aspect-[4/3] flex items-center justify-center text-gray-400 overflow-hidden shadow-2xl rounded-sm">
-                        <img src="./image_25.png" alt="夫妻看著滿桌報價單感到頭痛" class="w-full h-full object-cover select-none" />
-                    </div>
-                    <div class="w-full md:w-1/2 flex flex-col items-start md:pl-8 lg:pl-16 z-10">
-                        <div class="text-terracotta-red font-bold text-sm mb-4 tracking-[0.2em] uppercase">Pain Point 02
+                <div class="space-y-5">
+                    <div class="bg-white rounded-2xl p-7 shadow-soft">
+                        <div class="font-black text-xl mb-3">Q1 預算準確嗎？</div>
+                        <div class="text-charcoal/75 text-lg leading-relaxed">
+                            預算為市場平均估算，合理浮動約 ±10%。
                         </div>
-                        <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">請款囉嗦再見</h2>
-                        <p class="text-xl text-charcoal/80 leading-relaxed font-medium">
-                            強調階段性撥款。拒絕超前請款、進度脫鉤。透過嚴謹的節點驗收機制，做多少事給多少錢，保障資金安全。
-                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-7 shadow-soft">
+                        <div class="font-black text-xl mb-3">Q2 一定要找萊比的廠商嗎？</div>
+                        <div class="text-charcoal/75 text-lg leading-relaxed">
+                            不需要，預算與規格書可自由使用。
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-7 shadow-soft">
+                        <div class="font-black text-xl mb-3">Q3 PCM 是什麼？</div>
+                        <div class="text-charcoal/75 text-lg leading-relaxed">
+                            PCM 是專案管理制度，負責審查施工文件與追加內容。
+                        </div>
                     </div>
                 </div>
-
-                <!-- Block 3: Text Left, Img Right -->
-                <div class="flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-24">
-                    <div class="w-full md:w-1/2 flex flex-col items-start z-10">
-                        <div class="text-terracotta-red font-bold text-sm mb-4 tracking-[0.2em] uppercase">Pain Point 03
-                        </div>
-                        <h2 class="text-4xl lg:text-5xl font-black text-charcoal mb-6 leading-tight">裝潢詐騙不再見</h2>
-                        <p class="text-xl text-charcoal/80 leading-relaxed font-medium">
-                            強調價金代管安全。採用第三方金流代管服務，切斷惡意捲款的可能性。讓信任回歸制度，打造再無裝潢難民的安全環境。
-                        </p>
-                    </div>
-                    <div
-                        class="w-full md:w-1/2 relative bg-gray-200 aspect-[4/3] flex items-center justify-center text-gray-400 overflow-hidden shadow-2xl rounded-sm">
-                        <img src="./image_19.png" alt="群眾舉牌抗議詐騙" class="w-full h-full object-cover select-none" />
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Footer CTA -->
-        <section class="bg-terracotta-red py-32">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-black text-white mb-12 leading-tight tracking-tight">
-                    準備好拿回<br class="hidden sm:block" />裝潢的主導權了嗎？
-                </h2>
-                <button
-                    class="bg-white text-terracotta-red px-12 py-5 rounded font-black text-xl lg:text-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300">
-                    立即免費開始
-                </button>
             </div>
         </section>
     </main>
 
-    <footer class="bg-charcoal py-12 border-t border-black/10">
+    <!-- Footer -->
+    <footer class="bg-charcoal py-12">
         <div
-            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-2 font-black text-white opacity-80 text-xl tracking-tighter">
-                <span class="material-symbols-outlined text-2xl">architecture</span>
-                <span>LaiBE</span>
-            </div>
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition">
+                <img src="../../assets/laibe_logo.png" alt="LaiBE Logo" class="h-8 w-auto object-contain" />
+            </a>
             <div class="text-sm text-white/50 font-medium">
                 © 2026 LaiBE Inc. All rights reserved.
             </div>

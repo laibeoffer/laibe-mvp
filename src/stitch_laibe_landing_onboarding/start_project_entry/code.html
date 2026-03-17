@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>LaiBE - 開始建立案件</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "owner-primary": "#AD5A5A",
+                        "owner-deep": "#8E4747",
+                        "owner-soft": "#F6ECEC",
+                        "warm-beige": "#F9F8F6",
+                        "charcoal": "#333333",
+                        "background": "#F9F8F6",
+                        "soft-line": "#E9E4DD"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "Noto Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        soft: "0 8px 30px rgba(0,0,0,0.06)",
+                        softlg: "0 18px 50px rgba(0,0,0,0.10)"
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans", sans-serif;
+            background: #F9F8F6;
+            color: #333333;
+        }
+    </style>
+</head>
+
+<body class="bg-background text-charcoal min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/5">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-20 flex items-center justify-between">
+                <div class="flex items-center gap-2 font-black text-2xl tracking-tighter text-charcoal">
+                    <span class="material-symbols-outlined text-[30px] text-owner-primary">architecture</span>
+                    <span>LaiBE</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">返回首頁</a>
+                    <div
+                        class="w-10 h-10 rounded-full bg-owner-soft flex items-center justify-center text-owner-primary">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+
+        <!-- Hero -->
+        <section class="py-16 lg:py-20 bg-white border-b border-black/5">
+            <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-owner-soft text-owner-primary text-sm font-bold mb-6">
+                        <span class="material-symbols-outlined text-[18px]">home</span>
+                        建立案件起始頁
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-6">
+                        開始建立你的裝修案件
+                    </h1>
+                    <p class="text-lg sm:text-xl text-charcoal/75 leading-relaxed font-medium">
+                        選擇你現在手邊有的資料，或直接從零開始。萊比會先幫你整理需求，再進入平面拼圖與預算生成。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Entry Cards -->
+        <section class="py-20 bg-warm-beige">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
+
+                    <div class="bg-white rounded-3xl shadow-soft p-8 border border-black/5 flex flex-col">
+                        <div
+                            class="w-16 h-16 rounded-2xl bg-owner-soft text-owner-primary flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">floor_plan</span>
+                        </div>
+                        <h2 class="text-2xl font-black mb-4">平面圖</h2>
+                        <p class="text-charcoal/75 text-base leading-relaxed font-medium mb-8 flex-grow">
+                            已有平面圖時，可快速開始配置家具與空間需求。
+                        </p>
+                        <button
+                            class="bg-owner-primary text-white px-5 py-4 rounded-xl font-bold hover:bg-owner-deep transition">
+                            匯入平面圖
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-soft p-8 border border-black/5 flex flex-col">
+                        <div
+                            class="w-16 h-16 rounded-2xl bg-owner-soft text-owner-primary flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">receipt_long</span>
+                        </div>
+                        <h2 class="text-2xl font-black mb-4">報價單</h2>
+                        <p class="text-charcoal/75 text-base leading-relaxed font-medium mb-8 flex-grow">
+                            已有廠商報價時，可先做報價健檢與預算比對。
+                        </p>
+                        <button
+                            class="bg-owner-primary text-white px-5 py-4 rounded-xl font-bold hover:bg-owner-deep transition">
+                            匯入報價單
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-soft p-8 border border-black/5 flex flex-col">
+                        <div
+                            class="w-16 h-16 rounded-2xl bg-owner-soft text-owner-primary flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">description</span>
+                        </div>
+                        <h2 class="text-2xl font-black mb-4">施工圖</h2>
+                        <p class="text-charcoal/75 text-base leading-relaxed font-medium mb-8 flex-grow">
+                            已有較完整圖資時，可直接整理工程項目與施工規格。
+                        </p>
+                        <button
+                            class="bg-owner-primary text-white px-5 py-4 rounded-xl font-bold hover:bg-owner-deep transition">
+                            匯入施工圖
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-soft p-8 border border-black/5 flex flex-col">
+                        <div
+                            class="w-16 h-16 rounded-2xl bg-owner-soft text-owner-primary flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">imagesmode</span>
+                        </div>
+                        <h2 class="text-2xl font-black mb-4">3D 圖</h2>
+                        <p class="text-charcoal/75 text-base leading-relaxed font-medium mb-8 flex-grow">
+                            有效果圖或參考圖時，可協助 AI 更快理解風格方向。
+                        </p>
+                        <button
+                            class="bg-owner-primary text-white px-5 py-4 rounded-xl font-bold hover:bg-owner-deep transition">
+                            匯入 3D 圖
+                        </button>
+                    </div>
+
+                    <div class="bg-owner-primary text-white rounded-3xl shadow-softlg p-8 flex flex-col">
+                        <div class="w-16 h-16 rounded-2xl bg-white/15 text-white flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-[34px]">auto_awesome</span>
+                        </div>
+                        <h2 class="text-2xl font-black mb-4">從零開始</h2>
+                        <p class="text-white/85 text-base leading-relaxed font-medium mb-8 flex-grow">
+                            先由引導官對話協助你整理需求，再進入平面拼圖與預算生成。
+                        </p>
+                        <button
+                            class="bg-white text-owner-primary px-5 py-4 rounded-xl font-black hover:scale-[1.02] transition-all">
+                            開始建立
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Hint -->
+        <section class="py-16 bg-white border-y border-black/5">
+            <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div
+                    class="bg-owner-soft rounded-3xl p-8 lg:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                    <div>
+                        <div class="text-sm font-bold tracking-[0.2em] uppercase text-owner-primary mb-3">Owner Flow
+                        </div>
+                        <h2 class="text-3xl sm:text-4xl font-black leading-tight mb-4">
+                            先整理需求，再做預算
+                        </h2>
+                        <p class="text-lg text-charcoal/75 font-medium max-w-2xl">
+                            這一頁只負責讓你開始案件，不急著上架、不急著登入，先把資料整理出來比較重要。
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 min-w-fit">
+                        <div class="bg-white rounded-2xl px-4 py-3 text-center font-black text-sm">引導官對話</div>
+                        <div class="bg-white rounded-2xl px-4 py-3 text-center font-black text-sm">平面拼圖</div>
+                        <div class="bg-white rounded-2xl px-4 py-3 text-center font-black text-sm">預算生成</div>
+                        <div class="bg-white rounded-2xl px-4 py-3 text-center font-black text-sm">正式發案</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-charcoal py-12">
+        <div
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
+                <span class="material-symbols-outlined text-[26px]">architecture</span>
+                <span>LaiBE</span>
+            </div>
+            <div class="text-sm text-white/50 font-medium">
+                © 2026 LaiBE Inc. All rights reserved.
+            </div>
+            <div class="flex gap-6 text-sm text-white/50">
+                <a href="#" class="hover:text-white transition-colors">服務條款</a>
+                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>

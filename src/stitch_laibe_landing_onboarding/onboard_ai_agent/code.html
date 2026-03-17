@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>LaiBE - Step 1：需求表單 / 引導官頁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "owner-primary": "#AD5A5A",
+                        "owner-deep": "#8C4747",
+                        "owner-soft": "#F7EEEE",
+                        "charcoal": "#1F1F1F",
+                        "surface": "#111214",
+                        "surface-2": "#17191D",
+                        "surface-3": "#1F2228",
+                        "warm-bg": "#F9F8F6",
+                        "soft-line": "#E8E2DB"
+                    },
+                    fontFamily: {
+                        display: ["Inter", "Noto Sans", "sans-serif"]
+                    },
+                    boxShadow: {
+                        soft: "0 8px 30px rgba(0,0,0,0.06)",
+                        softlg: "0 18px 50px rgba(0,0,0,0.10)"
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', "Noto Sans", sans-serif;
+            background: #F9F8F6;
+            color: #1F1F1F;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-warm-bg text-charcoal">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/5">
+        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-20 flex items-center justify-between">
+                <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition">
+                    <img src="../../assets/laibe_logo.png" alt="LaiBE Logo" class="h-10 w-auto object-contain" />
+                </a>
+                <div class="hidden md:flex items-center gap-3 text-sm font-bold">
+                    <div class="flex items-center gap-2 text-owner-primary bg-owner-soft px-3 py-1.5 rounded-full">
+                        <span class="w-6 h-6 rounded-full bg-owner-primary text-white flex items-center justify-center text-xs">1</span>
+                        <span>需求表單 / 引導官頁</span>
+                    </div>
+                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
+                    <div class="flex items-center gap-2 text-charcoal/40">
+                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">2</span>
+                        <span>平面拼圖</span>
+                    </div>
+                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
+                    <div class="flex items-center gap-2 text-charcoal/40">
+                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">3</span>
+                        <span>預算生成</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="../laibe_landing_desktop/code.html"
+                        class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">返回首頁</a>
+                    <div
+                        class="w-10 h-10 rounded-full bg-owner-soft flex items-center justify-center text-owner-primary">
+                        <span class="material-symbols-outlined">auto_awesome</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- 上半部：對話體驗 -->
+        <section class="bg-black text-white pt-20 pb-16">
+            <div class="max-w-[920px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-10">
+                    <div class="inline-flex items-center gap-2 text-owner-primary text-lg font-bold mb-4">
+                        <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
+                        <span>藍，你好</span>
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-6">
+                        你想從哪裡著手？
+                    </h1>
+                    <p class="text-lg sm:text-xl text-white/70 leading-relaxed font-medium max-w-3xl">
+                        直接告訴我你目前的裝修想法、手邊資料或預算顧慮。你一邊說，我一邊幫你整理成案件筆記。
+                    </p>
+                </div>
+
+                <div class="bg-surface-2 rounded-[28px] border border-white/10 shadow-softlg p-5 sm:p-6">
+                    <div class="text-white/50 text-lg font-medium mb-4">問問引導官</div>
+
+                    <div
+                        class="min-h-[120px] rounded-2xl bg-surface-3 border border-white/10 px-5 py-5 flex items-start">
+                        <span class="text-white/35 text-lg leading-relaxed">
+                            例如：我想先做 20 坪中古屋翻新，兩房一廳，自住，想知道預算大概多少……
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-5 flex-wrap gap-4">
+                        <div class="flex items-center gap-4 text-white/70">
+                            <button class="flex items-center gap-2 hover:text-white transition">
+                                <span class="material-symbols-outlined">add</span>
+                                <span class="font-medium">上傳圖檔</span>
+                            </button>
+                            <button class="flex items-center gap-2 hover:text-white transition">
+                                <span class="material-symbols-outlined">construction</span>
+                                <span class="font-medium">工具</span>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <div class="text-white/60 font-bold">甲方引導</div>
+                            <button
+                                class="w-11 h-11 rounded-full bg-owner-primary hover:bg-owner-deep transition flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white">north_east</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mt-6">
+                    <button
+                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
+                        我有平面圖，想先估預算
+                    </button>
+                    <button
+                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
+                        我還不知道預算夠不夠
+                    </button>
+                    <button
+                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
+                        我想先整理施工範圍
+                    </button>
+                    <button
+                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
+                        我有報價單想先檢查
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 下半部：即時筆記 -->
+        <section class="py-16 bg-warm-bg">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <!-- 左：即時整理摘要 -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-3xl shadow-soft border border-black/5 overflow-hidden">
+                            <div class="px-8 py-6 border-b border-black/5 bg-owner-soft">
+                                <div class="text-owner-primary text-sm font-bold tracking-[0.2em] uppercase mb-2">Live
+                                    Notes</div>
+                                <h2 class="text-3xl font-black tracking-tight">即時整理筆記</h2>
+                                <p class="text-charcoal/70 text-lg font-medium mt-3">
+                                    你一邊說，引導官一邊把需求整理成案件摘要。
+                                </p>
+                            </div>
+
+                            <div class="p-8 space-y-8">
+                                <div>
+                                    <div class="text-sm text-charcoal/45 font-bold tracking-[0.16em] uppercase mb-3">
+                                        目前需求摘要</div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
+                                            <div class="text-sm text-charcoal/50 font-bold mb-2">房屋類型</div>
+                                            <div class="text-lg font-black">中古屋</div>
+                                        </div>
+                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
+                                            <div class="text-sm text-charcoal/50 font-bold mb-2">空間條件</div>
+                                            <div class="text-lg font-black">20 坪 / 2 房 1 廳</div>
+                                        </div>
+                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
+                                            <div class="text-sm text-charcoal/50 font-bold mb-2">使用目的</div>
+                                            <div class="text-lg font-black">自住</div>
+                                        </div>
+                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
+                                            <div class="text-sm text-charcoal/50 font-bold mb-2">目前狀態</div>
+                                            <div class="text-lg font-black">尚未提供平面圖</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="text-sm text-charcoal/45 font-bold tracking-[0.16em] uppercase mb-3">
+                                        預算方向</div>
+                                    <div class="bg-[#FAF7F7] rounded-2xl p-6">
+                                        <div class="text-charcoal/80 text-lg leading-relaxed font-medium">
+                                            目前需求傾向為「翻新、自住、希望先掌握預算」，但尚未確認衛浴、廚房與收納是否全面重做，因此預算區間仍待補資料後估算。
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="text-sm text-charcoal/45 font-bold tracking-[0.16em] uppercase mb-3">
+                                        引導官已整理出的重點</div>
+                                    <div class="space-y-3">
+                                        <div class="flex items-start gap-3 bg-[#FAF7F7] rounded-2xl p-5">
+                                            <span
+                                                class="material-symbols-outlined text-owner-primary mt-0.5">task_alt</span>
+                                            <div class="text-charcoal/80 text-base leading-relaxed font-medium">
+                                                使用者希望先了解裝修預算，不想先進入繁瑣發案流程。
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-3 bg-[#FAF7F7] rounded-2xl p-5">
+                                            <span
+                                                class="material-symbols-outlined text-owner-primary mt-0.5">task_alt</span>
+                                            <div class="text-charcoal/80 text-base leading-relaxed font-medium">
+                                                現階段應優先補齊空間配置與施工範圍，再進一步生成預算。
+                                            </div>
+                                        </div>
+                                        <div class="flex items-start gap-3 bg-[#FAF7F7] rounded-2xl p-5">
+                                            <span
+                                                class="material-symbols-outlined text-owner-primary mt-0.5">task_alt</span>
+                                            <div class="text-charcoal/80 text-base leading-relaxed font-medium">
+                                                若使用者已有平面圖，可直接進入拼圖或匯圖流程加快整理。
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右：缺漏資訊與下一步 -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-3xl shadow-soft border border-black/5 p-7">
+                            <div class="text-owner-primary text-sm font-bold tracking-[0.2em] uppercase mb-3">Missing
+                                Info</div>
+                            <h3 class="text-2xl font-black mb-5">還缺哪些資訊？</h3>
+                            <div class="space-y-3">
+                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">是否要重做衛浴</div>
+                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">是否需要更新廚房設備</div>
+                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">有無現況照片或平面圖</div>
+                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">是否有喜歡的風格參考圖
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-3xl shadow-soft border border-black/5 p-7">
+                            <div class="text-owner-primary text-sm font-bold tracking-[0.2em] uppercase mb-3">Next Step
+                            </div>
+                            <h3 class="text-2xl font-black mb-5">下一步建議</h3>
+                            <div class="space-y-4">
+                                <a href="../preview_floor_plan/code.html"
+                                    class="block w-full text-left bg-owner-primary text-white px-5 py-4 rounded-2xl font-bold hover:bg-owner-deep transition">
+                                    進入平面拼圖 (下一步)
+                                </a>
+                                <button
+                                    class="w-full text-left bg-owner-soft text-owner-primary px-5 py-4 rounded-2xl font-bold hover:opacity-90 transition">
+                                    上傳平面圖
+                                </button>
+                                <a href="../preview_budget/code.html"
+                                    class="block w-full text-left bg-owner-soft text-owner-primary px-5 py-4 rounded-2xl font-bold hover:opacity-90 transition">
+                                    直接生成預算草稿
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#111214] text-white rounded-3xl shadow-softlg p-7">
+                            <div class="text-white/55 text-sm font-bold tracking-[0.2em] uppercase mb-3">Agent Prompt
+                            </div>
+                            <h3 class="text-2xl font-black mb-4">你說的，系統有在聽</h3>
+                            <p class="text-white/75 leading-relaxed font-medium mb-3">
+                                這一頁的核心不是聊天，而是讓使用者感受到需求正被收斂為預算參數。
+                            </p>
+                            <div class="bg-owner-primary/20 border border-owner-primary/30 rounded-xl p-4 text-sm font-bold text-white/90">
+                                💡 重要提醒：若只有平面拼圖、沒有需求參數，預算生成可能失準，因此此需求表單是預算生成前的必要節點。
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-charcoal py-12">
+        <div
+            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
+                <span class="material-symbols-outlined text-[26px]">architecture</span>
+                <span>LaiBE</span>
+            </div>
+            <div class="text-sm text-white/50 font-medium">
+                © 2026 LaiBE Inc. All rights reserved.
+            </div>
+            <div class="flex gap-6 text-sm text-white/50">
+                <a href="#" class="hover:text-white transition-colors">服務條款</a>
+                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
