@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+import os
+
+html_content = """<!DOCTYPE html>
 <html class="light" lang="zh-TW"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -285,4 +287,18 @@
     });
 </script>
 
-</body></html>
+</body></html>"""
+
+path1 = r"c:\laibe_project\src\stitch_laibe_landing_onboarding\client_document_selection\code.html"
+path2 = r"c:\Users\J\Desktop\for_ai_studio\public_owner_preflow\client_document_selection_code.html"
+
+os.makedirs(os.path.dirname(path1), exist_ok=True)
+os.makedirs(os.path.dirname(path2), exist_ok=True)
+
+with open(path1, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+with open(path2, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("Files written successfully.")

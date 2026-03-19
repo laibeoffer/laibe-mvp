@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-TW"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LaiBE 平台工程投標須知</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: '#AD5A5A'
+                }
+            }
+        }
+    }
+</script>
+<style data-purpose="typography">
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #f4f4f5; /* Light gray background */
+      color: #1a202c;
+    }
+  </style>
+<style data-purpose="document-styling">
+    /* Custom styles for the formal document feel */
+    .document-card {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Watermark styling */
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 8rem;
+      color: rgba(173, 90, 90, 0.05); /* Faint #AD5A5A */
+      pointer-events: none;
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-weight: 900;
+      z-index: 0;
+    }
+
+    .governance-stamp {
+      border: 3px double #AD5A5A;
+      color: #AD5A5A;
+      padding: 4px 12px;
+      font-weight: 700;
+      display: inline-block;
+      transform: rotate(-5deg);
+      opacity: 0.8;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    /* Custom color for primary action */
+    .bg-laibe-red {
+      background-color: #AD5A5A;
+    }
+    
+    .bg-laibe-red:hover {
+      background-color: #8A4848;
+    }
+
+    .bg-laibe-red:disabled {
+      background-color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    /* List styling for formal sections */
+    .legal-list {
+      counter-reset: section;
+    }
+    .legal-list-item {
+      position: relative;
+      padding-left: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .legal-list-item::before {
+      counter-increment: section;
+      content: counter(section) ".";
+      position: absolute;
+      left: 0;
+      font-weight: 700;
+      color: #AD5A5A;
+      font-size: 1.25rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#f4f4f5] flex flex-col items-center">
+
+<!-- Header -->
+<header class="w-full bg-white/95 backdrop-blur border-b border-black/5 z-50">
+    <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="h-[72px] md:h-20 flex items-center justify-between">
+            <a href="file:///C:/Users/J/Desktop/for_ai_studio/public_owner_preflow/laibe_landing_desktop_code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
+                <img src="file:///C:/Users/J/Desktop/for_ai_studio/logo/0317_png/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
+            </a>
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border border-slate-200">
+                    <img alt="使用者頭像" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQIqZ9XF0wjvA6HQCbLIaJGmye72Le2Q76gWFckyHMHL2OtaPzL264WQpkQ3u2JwggWSlQ8pMo_ficKbRlkq9aqthjf7OLDaq4JmYaHbVEkuJtS1JN3m_wNQn3zmgv0x2y7brnq71842eKYyc4VoPeN41x-J5D6zZnR5nf2GbNe8-9Qex_2D8fmJiwOXtbz9ebDzvPTj5kuIFUmTaS-zNMXrpIYqWf1ErCS8IbEQeukGU7DZZVFwZZF4En5s2XcPQIsNcoHMsQjZw"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- BEGIN: GovernanceDocumentContainer -->
+<main class="max-w-4xl w-full py-12 px-4" data-purpose="main-content-area">
+<!-- BEGIN: DocumentHeader -->
+<div class="mb-8 text-center" data-purpose="header-section">
+<div class="governance-stamp">Official Governance</div>
+<h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-800">
+        LaiBE 平台工程投標須知
+      </h1>
+<p class="text-slate-500 mt-2 font-medium">(系統性通用條款)</p>
+</div>
+<!-- END: DocumentHeader -->
+<!-- BEGIN: DocumentBody -->
+<article class="document-card bg-white p-8 md:p-16 rounded-sm border border-slate-200" data-purpose="formal-document">
+<!-- Watermark Background -->
+<div class="watermark">OFFICIAL GOVERNANCE</div>
+<div class="relative z-10">
+<!-- Introduction -->
+<p class="mb-10 text-slate-600 leading-relaxed border-b pb-8">
+          本須知旨在建立 LaiBE 平台公開、透明且具備專業第三方監理之工程投標環境。凡於本平台進行之所有工程採購及投標行為，均受下列條款約束，並具備法律效力。
+        </p>
+<!-- Rules Content -->
+<div class="legal-list">
+<!-- Section 1 -->
+<section class="legal-list-item">
+<h2 class="text-xl font-bold mb-4 text-slate-800">PCM 治理權限說明</h2>
+<div class="space-y-3 text-slate-700 leading-relaxed">
+<div class="flex gap-3">
+<span class="text-slate-400">●</span>
+<p>甲方（業主）確認已採用或保有於任何工程階段「申請 PCM 介入」之權利。</p>
+</div>
+<div class="flex gap-3">
+<span class="text-slate-400">●</span>
+<p>乙方（承包商）確認知悉並同意接受 PCM 之監管、數量核實及撥款審查。</p>
+</div>
+<div class="flex gap-3">
+<span class="text-slate-400">●</span>
+<p>乙方亦保有於任何爭議階段「主動申請 PCM 介入」以保障自身權益之權利。</p>
+</div>
+</div>
+</section>
+<!-- Section 2 -->
+<section class="legal-list-item">
+<h2 class="text-xl font-bold mb-4 text-slate-800">追加減治理規則</h2>
+<div class="space-y-3 text-slate-700 leading-relaxed">
+<div class="flex gap-3">
+<span class="text-slate-400">●</span>
+<p>確認遵循「±3% 變更自動裁決」與「5%/10% 進場保護」之平台原則。</p>
+</div>
+</div>
+</section>
+<!-- Section 3 -->
+<section class="legal-list-item">
+<h2 class="text-xl font-bold mb-4 text-slate-800">數位存證效力</h2>
+<div class="space-y-3 text-slate-700 leading-relaxed">
+<div class="flex gap-3">
+<span class="text-slate-400">●</span>
+<p>雙方同意於平台內產生之所有紀錄、照片及對話均具備履約證據力。</p>
+</div>
+</div>
+</section>
+</div>
+<!-- End Rules Content -->
+</div>
+</article>
+<!-- END: DocumentBody -->
+<!-- BEGIN: AcceptanceForm -->
+<div class="mt-10 max-w-2xl mx-auto" data-purpose="acceptance-form">
+<div class="bg-white/50 p-6 rounded-lg border border-slate-200 shadow-sm">
+<label class="flex items-start gap-4 cursor-pointer group">
+<input class="mt-1 h-5 w-5 rounded border-gray-300 text-primary focus:ring-primary" id="agreement-checkbox" onchange="toggleSubmitButton()" type="checkbox"/>
+<span class="text-slate-700 text-base md:text-lg font-bold select-none group-hover:text-slate-900 transition-colors">
+            我已詳閱並確認知悉上述投標須知，同意遵循平台治理規則。
+          </span>
+</label>
+<div class="mt-8 flex justify-center">
+<button class="bg-laibe-red text-white px-12 py-4 rounded font-bold text-lg shadow-lg transition-all transform active:scale-95 disabled:opacity-50 disabled:transform-none" disabled="" id="submit-button" onclick="handleSubmission()">
+            確認並進入投標
+          </button>
+</div>
+</div>
+<p class="text-center text-slate-400 text-xs mt-6 tracking-widest uppercase">
+        LaiBE Platform Engineering Governance Protocol v2.4
+      </p>
+</div>
+<!-- END: AcceptanceForm -->
+</main>
+<!-- END: GovernanceDocumentContainer -->
+<script data-purpose="event-handlers">
+    /**
+     * Toggles the disabled state of the submission button based on checkbox status
+     */
+    function toggleSubmitButton() {
+      const checkbox = document.getElementById('agreement-checkbox');
+      const button = document.getElementById('submit-button');
+      button.disabled = !checkbox.checked;
+    }
+
+    /**
+     * Simulates the transition to the next stage of the tender process
+     */
+    function handleSubmission() {
+      const checkbox = document.getElementById('agreement-checkbox');
+      if (checkbox.checked) {
+        // Mocking interaction
+        alert('請在實際環境中接續後續流程。');
+      }
+    }
+  </script>
+</body></html>

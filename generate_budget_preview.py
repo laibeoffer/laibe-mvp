@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+import os
+
+html_content = """<!DOCTYPE html>
 <html lang="zh-TW">
 <head>
 <meta charset="utf-8"/>
@@ -191,7 +193,9 @@
 </div>
 </article>
 <!-- END: Main Document Card -->
-<!-- BEGIN: Attachment Status Area -->
+"""
+
+html_content_2 = """<!-- BEGIN: Attachment Status Area -->
 <section class="mb-12 bg-white/50 backdrop-blur-sm border border-laibe-border rounded-xl p-6" data-purpose="attachment-status">
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 <!-- Status 1 -->
@@ -270,3 +274,20 @@
 <p>© 2024 Laibe 智慧家裝室內設計。保留所有權利。僅供專業估算參考使用。</p>
 </footer>
 </body></html>
+"""
+
+full_html = html_content + html_content_2
+
+path1 = r"c:\laibe_project\src\stitch_laibe_landing_onboarding\budget_document_preview\code.html"
+path2 = r"c:\Users\J\Desktop\for_ai_studio\public_owner_preflow\budget_document_preview_code.html"
+
+os.makedirs(os.path.dirname(path1), exist_ok=True)
+os.makedirs(os.path.dirname(path2), exist_ok=True)
+
+with open(path1, "w", encoding="utf-8") as f:
+    f.write(full_html)
+
+with open(path2, "w", encoding="utf-8") as f:
+    f.write(full_html)
+
+print("Files written successfully.")
