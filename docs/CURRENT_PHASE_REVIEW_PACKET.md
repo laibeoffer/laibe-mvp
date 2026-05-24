@@ -1455,6 +1455,16 @@ Yes, with notes.
 
 配件倉庫：工法與規格目前可進入 phase review。Ready 範圍限 MethodSpecCatalog contract、seed catalog、validator P0 guard、MethodSpec -> BudgetEstimateLine / BudgetOutputSnapshot 邊界文件與 user-triggered review result 結論；不代表正式報價、正式 DB、正式人工審核流程、正式 Excel / PDF 或 renderer 工作已完成。
 
+### Freeze note 補充
+
+- 已新增 `docs/budget/32-method-spec-validator-freeze-note.md`，作為 MS-12 `PASS_WITH_NOTES` 後的 MethodSpec validator checkpoint。
+- freeze note 記錄目前 frozen baseline：PR #4 merged、P0 / P1-A / P1-B validator complete、MS-12 `PASS_WITH_NOTES`、budget regression total `231103`、line count `12`、review-required line count `5`。
+- freeze note 確認 `PricingRule` 仍是目前唯一 deterministic formal price source；AI / RAG / raw candidate data 不得直接變正式價格。
+- freeze note 確認 `LaborRule` 維持 reference-only；`MaterialSpec`、`ItemMaterialBinding`、`NoteTemplate`、`InclusionExclusionRule` 不得改 `quantity`、`unit_price` 或 `amount`。
+- freeze note 確認 UnitConversion coverage 仍是 warning-only，不得重算或改寫已產生 quantity。
+- freeze note 確認 Inclusion / Exclusion scope coverage 仍是 warning / allowed-condition only，不得直接 propagation 到 renderer / output，也不得新增、刪除或改寫正式工項。
+- 本補充沒有修改 runtime code、specs validator implementation、renderer / output、raw warehouse、frontend、plan-puzzle、payment / escrow / listing fee。
+
 ---
 
 ## 原物料採購與倉儲 成果
