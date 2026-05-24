@@ -1086,6 +1086,37 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - consolidated chatroom task and defect prompt
+
+Published by:
+Deputy Codex
+
+Status:
+Commander requested one consolidated prompt covering every chatroom's current task and defect. The prompt is issued from the Commander thread; this blackboard records the operational summary.
+
+Changed:
+- Consolidated shared rules for all chatrooms: read mandatory files, expand folder scopes into files, publish `UPCOMING_PHASE_DECLARED`, claim/request a GitHub Issue before file-changing work, and report back in blackboard short format.
+- Summarized per-workstream tasks and defects for Plan Puzzle, MethodSpec Warehouse, Raw Candidate Warehouse, Output Documents, Visual Simulation, Quote Factory, Site Flow Builder, Governance Rules, Repo Status Patrol, Reviewer, and Brand Visual.
+- Reaffirmed current defect pattern: chat-only reports are not formal delivery; silent standby is not allowed when a safe preview task exists; implementation cannot bypass Issue / Commander formal dispatch.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- PR #14 update pending publication.
+
+Blocked:
+- PR #14 still awaits clean Codex re-review before merge.
+
+Next:
+- Commander can paste the consolidated prompt into each chatroom. Each chatroom must reply with `UPCOMING_PHASE_DECLARED`, Issue claim/draft, blocker, or `TASK_PREVIEW_MISSING`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-24 - PR #14 Codex review fix: READY status and Quote Factory reporting
 
 Published by:
