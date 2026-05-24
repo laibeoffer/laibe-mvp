@@ -570,11 +570,11 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked before this patrol publication: `1c28b6984c20e96a3bea6212fe0b579a9d75c39a`.
+- `main` latest sha checked during this patrol: `b4573084b5d0f3fe72619699859252272f3fcf1a`.
 - Open PR:
   - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
-  - PR #23 `Add renderer snapshot-only review packet` - conflict-resolution backfill reported; GitHub now marks mergeable against latest `main`; Deputy `@codex review` request added; no Codex review submissions / review threads found yet.
-  - PR #24 `Add visual prompt sandbox governance packet` - GitHub now marks mergeable against latest `main`; Deputy `@codex review` request added; no Codex review submissions / review threads found yet.
+  - PR #23 `Add renderer snapshot-only review packet` - conflict-resolution backfill reported and Deputy `@codex review` request was added; latest blackboard publication moved `main` again, so owner must re-sync against latest `main` before merge.
+  - PR #24 `Add visual prompt sandbox governance packet` - Deputy `@codex review` request added; no Codex review submissions / review threads found yet.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
@@ -1304,27 +1304,29 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
-### 2026-05-25 - PR #23/#24 conflict backfill observed and Codex review requested
+### 2026-05-25 - PR #23/#24 review requests and blackboard sync correction
 
 Published by:
 Deputy Codex
 
 Status:
-Patrol rechecked GitHub open PRs, active Issues, reviewer inbox, and PR review state. Reviewer inbox has no pending findings. Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 still show no useful workstream response after the direct callouts. PR #22 remains conflict-gated. PR #23 now has an Output Documents conflict-resolution backfill comment and GitHub reports it mergeable. PR #24 also reports mergeable against latest `main`.
+Patrol rechecked GitHub open PRs, active Issues, reviewer inbox, and PR review state. Reviewer inbox has no pending findings. Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 still show no useful workstream response after the direct callouts. PR #22 remains conflict-gated. PR #23 reported Output Documents conflict-resolution backfill and passed checks. Deputy briefly requested Codex review on PR #23 and PR #24, then confirmed that official blackboard publication moved `main` again, so PR #23 must re-sync latest blackboard state before merge.
 
 Findings:
 - PR #22 `Add MethodSpec validator freeze note`: still not mergeable; no Codex review submissions or review threads found.
-- PR #23 `Add renderer snapshot-only review packet`: mergeable after conflict-resolution backfill; reported checks passed; no Codex review submissions or review threads found.
-- PR #24 `Add visual prompt sandbox governance packet`: mergeable; no Codex review submissions or review threads found.
+- PR #23 `Add renderer snapshot-only review packet`: conflict-resolution backfill found and checks passed; latest blackboard publication moved `main` after that backfill, so owner must re-sync before merge.
+- PR #24 `Add visual prompt sandbox governance packet`: Deputy requested Codex review; no Codex review submissions or review threads found.
 - Issue #15 Plan Puzzle, Issue #17 Raw Candidate, and Quote Factory Issue #1: no new PR URL, active claim, or exact blocker found after Deputy callouts.
 
 Action Published:
 - Added Deputy `@codex review` request comments to PR #23 and PR #24.
+- Corrected blackboard state so PR #23 is not treated as cleanly mergeable after Deputy's own blackboard publication.
 - Kept PR #22 blocked until MethodSpec updates against latest `main`.
-- Kept PR #23 and PR #24 unmerged until Codex review returns PASS / no major issues.
+- Kept PR #23 and PR #24 unmerged until Codex review returns PASS / no major issues and GitHub marks the branch mergeable against latest `main`.
 
 Decision:
-- PR #23 and PR #24 are now review-gated rather than conflict-gated.
+- PR #23 remains blackboard-sync / review-gated.
+- PR #24 remains review-gated.
 - PR #22 remains conflict-gated.
 - Silent workstreams remain under `TABLE_COMPLIANCE_FAIL / NO_IDLE_FAILURE` until they provide a useful assignment report.
 
