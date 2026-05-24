@@ -823,6 +823,137 @@ Current member-goal interpretation:
   - Repo: laibeoffer/laibe-quote-factory
   - Need Commander: no unless external repo integration into laibe-mvp is requested
 
+### ACTIVE TASK DISPATCHES
+
+These dispatches convert the Commander task preview backlog into active work. Every named chatroom must either start its scoped task, or publish `UPCOMING_PHASE_DECLARED` with a concrete blocker. No chatroom may claim silent standby only because there is no open PR or Issue.
+
+- [ ] To: 平面拼圖 / Plan Puzzle
+  - Workstream: plancraft/page-ui / plancraft/adapter-clean
+  - Branch / Repo: plancraft/zone-area-boundary-refinement / laibeoffer/laibe-mvp
+  - Mission: Execute Phase 1 `Plancraft+ Zone Area / Boundary Refinement`.
+  - Why this agent: Owns LaiBE importer UI and zone boundary geometry. Does not own Plancraft core or budget runtime.
+  - Action: Implement zone polygon validation, shoelace area estimate, `areaM2`, `areaPing`, `areaSource`, `areaStatus`, `areaConfidence`, `reviewerRequired`, `reviewerReasons`, structured `boundaryIssues`, Zone Inspector area display/actions, canvas area labels/styles, Plancraft+ draft JSON area metadata export, and docs sync. Run `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - Allowed files: `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`.
+  - Stop if: budget adapter/types/runtime, Plancraft core, formal estimate, Excel/PDF, DB/API, AI API, payment/escrow/listing fee, package/framework/install, `formalEstimateGuard` weakening, or `generateBudgetEstimate` acceptance of Plancraft+ spike is required.
+  - Need Commander: No.
+  - Need Reviewer: No.
+
+- [ ] To: 配件倉庫：工法與規格 / Method Spec Warehouse
+  - Workstream: warehouse/method-spec
+  - Branch / Repo: warehouse/method-spec-validator-freeze-note / laibeoffer/laibe-mvp
+  - Mission: Publish `MethodSpec validator freeze note`.
+  - Why this agent: Owns MethodSpec / MaterialSpec / LaborRule boundaries and validator policy history.
+  - Action: Create/update `docs/budget/32-method-spec-validator-freeze-note.md` summarizing P0/P1-A/P1-B complete, MS-12 `PASS_WITH_NOTES`, current guard evidence, P2 backlog, and no formal price authority. Update handoff/review packet only if needed.
+  - Allowed files: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+  - Stop if: runtime code, data model expansion, formal price, renderer/output, raw warehouse, Plancraft, frontend, payment, or AI API work is required.
+  - Need Commander: No.
+  - Need Reviewer: No.
+
+- [ ] To: 原物料採購與倉儲 / Raw Candidate Warehouse
+  - Workstream: warehouse/raw-candidate
+  - Branch / Repo: warehouse/raw-source-quality-scoring / laibeoffer/laibe-mvp
+  - Mission: Start R1.5 source quality scoring / reviewer checklist.
+  - Why this agent: Owns raw candidate intake, source traceability, and candidate-only material evidence before formal pricing.
+  - Action: Define candidate-only source quality scoring and reviewer checklist for raw warehouse sources. Keep all outputs as candidate evidence and maintain `formal_price_generated: false`.
+  - Allowed files: `src/lib/budget/raw-warehouse/`, `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+  - Stop if: `PricingRule`, `MaterialSpec`, `LaborRule`, `BudgetEstimateLine.unit_price`, renderer/output, frontend, payment, DB/API, AI API, or formal price authority is required.
+  - Need Commander: No.
+  - Need Reviewer: No.
+
+- [ ] To: 成品物流：預算表單輸出 / Output Documents
+  - Workstream: output/budget-documents
+  - Branch / Repo: output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+  - Mission: Start renderer snapshot-only review packet / static guard next step.
+  - Why this agent: Owns BudgetOutputSnapshot-to-renderer boundaries and placeholder writer safety, not pricing or MethodSpec decisions.
+  - Action: Prepare a snapshot-only review packet and/or harden renderer static import denylist / placeholder writer guard. Preserve the rule that output reads `BudgetOutputSnapshot` or snapshot-gated `RenderedBudgetDocument` only.
+  - Allowed files: `src/lib/budget/renderers/`, `docs/budget/27-renderer-snapshot-only-review-packet.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+  - Stop if: real `.xlsx` / `.pdf`, budget engine rerun, pricing rules, material resolver, MethodSpecCatalog changes, formal output decisions, payment, DB/API, or AI API work is required.
+  - Need Commander: No unless formal output format or user-facing document behavior is requested.
+  - Need Reviewer: No.
+
+- [ ] To: 模擬圖生成 / Visual Simulation
+  - Workstream: visual/simulation-governance
+  - Branch / Repo: visual/brief-prompt-sandbox-governance / laibeoffer/laibe-mvp
+  - Mission: Start visual brief / prompt / negative prompt / sandbox governance packet.
+  - Why this agent: Owns visual simulation governance, visual brief structure, prompt hygiene, and image sandbox policy only.
+  - Action: Produce reusable visual brief fields, Chinese prompt, English prompt, negative prompt, ratio, filename, alt text, integration notes, reviewer notes, sandbox disclaimer, storage policy notes, and API-disabled preview governance.
+  - Allowed files: `docs/ai_style_visual_chat/`, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+  - Stop if: real image API, API key, backend/proxy, upload/storage production integration, production asset, construction drawing, formal design drawing, quote basis, site runtime code, payment, or non-visual workstream content is required.
+  - Need Commander: No unless visual direction, real API, or storage policy decision is required.
+  - Need Reviewer: No.
+
+- [ ] To: 預算原料清洗工廠 / Quote Factory
+  - Workstream: quote-factory/price-range-governance
+  - Branch / Repo: qf/qf5-3-audit-override-publish / laibeoffer/laibe-quote-factory
+  - Mission: Verify/publish QF5.3, then prepare QF5.4 only after QF5.3 is visible in the external repo.
+  - Why this agent: Owns PriceRange candidate governance in the external Quote Factory repo. This is not Visual Simulation and not `laibe-mvp` implementation work.
+  - Action: In `laibeoffer/laibe-quote-factory` only, verify QF5.3 audit/override files, validation results, illegal override blocking, and no formal price fields. If QF5.3 is missing, create the Quote Factory roadmap/DoD/phase index before QF5.4. Publish completion status back to this blackboard.
+  - Allowed repo/files: `laibeoffer/laibe-quote-factory`; QF5.3 docs/config/scripts/review_queue/exports files; Quote Factory roadmap docs.
+  - Stop if: modifying `laibe-mvp`, Supabase/API/migration, formal price, `PricingRule`, `BudgetEstimateLine.unit_price`, renderer/output, payment, or AI API work is required.
+  - Need Commander: No.
+  - Need Reviewer: No.
+
+- [ ] To: 網站主流程 Builder0522 / Site Flow Builder
+  - Workstream: site/page-formalization
+  - Branch / Repo: site/task-preview-intake / laibeoffer/laibe-mvp
+  - Mission: Publish `TASK_PREVIEW_MISSING` / task-preview intake for site flow.
+  - Why this agent: Owns landing/onboarding/header/CTA/routing/dashboard flow, but no current Commander-selected page/CTA/routing task is active.
+  - Action: Read required site flow docs and this blackboard, then publish `UPCOMING_PHASE_DECLARED` stating no Commander-selected page/CTA/routing task exists. Do not edit UI. If useful, provide a short intake list of what the Commander must choose next: page, CTA, route, visual direction, or dashboard flow.
+  - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md` status/report only, optionally `docs/CURRENT_PHASE_REVIEW_PACKET.md` if summarizing site blocker.
+  - Stop if: any UI/page/product direction/routing/CTA change would be required.
+  - Need Commander: Yes for actual page/CTA/routing/visual task.
+  - Need Reviewer: No.
+
+- [ ] To: Codex 指令優化 / Governance Rules
+  - Workstream: governance/codex-rules
+  - Branch / Repo: codex/blackboard-no-idle-patrol-rules / laibeoffer/laibe-mvp
+  - Mission: Finish PR #14 publication of no-idle blackboard rules and active dispatches.
+  - Why this agent: Owns blackboard, heartbeat, Issue workflow, and workstream registry governance.
+  - Action: Track Codex review on PR #14. If Codex review PASS / no major issues and changed files remain inside `docs/WORKSTREAM_BLACKBOARD.md`, merge without asking. If NEEDS_FIX or scope expands, publish the minimal fix task.
+  - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md`; governance docs only if review requires.
+  - Need Commander: No.
+  - Need Reviewer: No unless Codex review reports P1/P2/NEEDS_FIX or scope expands.
+
+- [ ] To: 盤點 Git/GitHub 狀態 / Repo Status Patrol
+  - Workstream: governance/repo-status
+  - Branch / Repo: none / laibeoffer/laibe-mvp and laibeoffer/laibe-quote-factory
+  - Mission: Keep GitHub state tied to the blackboard.
+  - Why this agent: Owns read-only Git/GitHub status visibility, not implementation.
+  - Action: On each patrol, report main SHA, open PRs, open Issues, PR review state, changed files for open PRs, and whether each PR maps to a blackboard workstream decision. For PR #14, confirm it remains blackboard-only and publish merge readiness after Codex review.
+  - Allowed files: none for normal read-only patrol; `docs/WORKSTREAM_BLACKBOARD.md` only if publishing a status change.
+  - Stop if: destructive git, force-push, reset/clean/stash/rebase, secret access, or implementation changes would be required.
+  - Need Commander: No unless a merge/reject decision falls outside automatic clean-scope rules.
+  - Need Reviewer: No unless Codex review reports P1/P2/NEEDS_FIX or scope expands.
+
+- [ ] To: 最高指揮官 / Commander Patrol
+  - Workstream: command/deputy
+  - Branch / Repo: none / laibeoffer/laibe-mvp
+  - Mission: Continue 15-minute deputy patrol and force workstream momentum through the blackboard.
+  - Why this agent: This commander thread is now the sole active Deputy Codex; previous/secondary deputy is offline.
+  - Action: Interpret member reports, GitHub PR/Issue state, and blackboard together; publish workstream decisions to `docs/WORKSTREAM_BLACKBOARD.md`; ensure each chatroom either works from its preview task, declares `UPCOMING_PHASE_DECLARED`, or reports a concrete blocker. Do not ask Commander about IT workflow details.
+  - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md` for operational decisions; governance docs only when explicitly scoped.
+  - Stop if: product direction, visual direction, business logic, formal payment/escrow/listing fee, real AI API/API key/upload, formal price, formal Excel/PDF, destructive git, large deletion, or out-of-policy merge/reject is required.
+  - Need Commander: No for routine patrol.
+  - Need Reviewer: No.
+
+- [ ] To: 審查官聊天室 / LAIBE_REVIEWER
+  - Workstream: none-review-only
+  - Branch / Repo: none / laibeoffer/laibe-mvp
+  - Mission: No proactive build task; monitor review triggers only.
+  - Why this agent: Reviewer is read-only and must not replace Builder or Deputy.
+  - Action: If PR #14 Codex review or any workstream marks `Need Reviewer: Yes`, perform read-only review. Otherwise report `NO_REVIEW_TRIGGER`.
+  - Need Commander: No.
+  - Need Reviewer: N/A.
+
+- [ ] To: LOGO / Brand Visual
+  - Workstream: brand-visual
+  - Branch / Repo: brand/task-preview-intake / laibeoffer/laibe-mvp
+  - Mission: Report `TASK_PREVIEW_MISSING` unless Commander gives a brand / logo task.
+  - Why this agent: Brand direction requires Commander visual judgment; no current task preview assigns brand changes.
+  - Action: Do not redesign the brand or logo. Read any existing brand notes and publish what Commander input is missing before work can start.
+  - Need Commander: Yes.
+  - Need Reviewer: No.
+
 ### NEEDS REVIEW
 
 - [ ] None unless a workstream explicitly asks LAIBE_REVIEWER or hits risk trigger.
@@ -956,6 +1087,53 @@ Current member-goal interpretation:
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-24 - active task dispatches from preview backlog
+
+Published by:
+Deputy Codex
+
+Status:
+Commander task preview backlog has been converted into concrete active tasks for every pinned workstream/chatroom.
+
+Changed:
+- Added `ACTIVE TASK DISPATCHES` under `Dispatch Queue`.
+- Assigned one primary active task to each chatroom/workstream instead of allowing silent standby.
+- Required each workstream to either start the scoped task or publish `UPCOMING_PHASE_DECLARED` with a concrete blocker.
+- Named allowed files/repos, stop conditions, Need Commander, and Need Reviewer for each dispatch.
+- Preserved boundaries: no Plancraft core edits, no formal estimate, no formal price, no formal Excel/PDF, no real AI API/API key, no payment/escrow/listing fee, no secrets, no destructive git.
+
+Dispatched:
+- 平面拼圖 / Plan Puzzle: `Plancraft+ Zone Area / Boundary Refinement`.
+- 配件倉庫：工法與規格 / Method Spec Warehouse: `MethodSpec validator freeze note`.
+- 原物料採購與倉儲 / Raw Candidate Warehouse: R1.5 source quality scoring / reviewer checklist.
+- 成品物流：預算表單輸出 / Output Documents: renderer snapshot-only review packet / static guard next step.
+- 模擬圖生成 / Visual Simulation: visual brief / prompt / negative prompt / sandbox governance packet.
+- 預算原料清洗工廠 / Quote Factory: verify/publish QF5.3 in `laibeoffer/laibe-quote-factory`, then prepare QF5.4.
+- 網站主流程 Builder0522 / Site Flow Builder: `TASK_PREVIEW_MISSING` / intake declaration until Commander chooses a page/CTA/routing task.
+- Codex 指令優化 / Governance Rules: finish PR #14 publication and merge after clean Codex review.
+- 盤點 Git/GitHub 狀態 / Repo Status Patrol: read-only PR/Issue/main SHA patrol tied to blackboard decisions.
+- 最高指揮官 / Commander Patrol: continue 15-minute deputy patrol and publish decisions to the blackboard.
+- 審查官聊天室 / LAIBE_REVIEWER: no proactive build task; monitor review triggers only.
+- LOGO / Brand Visual: `TASK_PREVIEW_MISSING` until Commander gives brand direction.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- PR #14 update pending publication.
+
+Blocked:
+- None.
+
+Next:
+- Workstreams must post completion/progress back to this blackboard. Chat-only completion reports are not formal delivery.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-24 - heartbeat prompt no-idle sync
 
