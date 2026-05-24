@@ -1,5 +1,23 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Governance Task: Codex Rules Support Patrol Assigned
+
+- 本輪任務名稱：Codex Rules Support Patrol Assigned。
+- 任務類型：Governance / Patrol Support / Prompt Drift Audit；本輪只更新黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- Commander offered Codex 指令優化 / `governance/codex-rules` as a helper that can check the blackboard every 20 minutes.
+- Deputy Codex accepted this helper only as governance / prompt-drift support, not Builder work, not Reviewer work, and not Deputy replacement.
+- New helper responsibilities:
+  - read blackboard and governance docs,
+  - detect prompt drift, heartbeat wording drift, dispatch-format gaps, stale workstream routing, and missing blackboard rule coverage,
+  - report `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, or `NO_GOVERNANCE_ACTION_NEEDED`,
+  - propose concise corrections for Deputy Codex to decide / publish.
+- Forbidden for this helper: source-code edits, Builder task implementation, PR merge/reject, Issue open/close without Deputy request, product/visual/business decisions, secrets, payment, formal price, formal Excel/PDF, real AI API, upload, destructive git.
+- Deputy Codex remains final routing and blackboard publication authority.
+
 ## Latest Patrol Task: Direct Workstream Callouts / PR Conflict Comments
 
 - 本輪任務名稱：Deputy Patrol Direct Workstream Callouts / PR Conflict Comments。

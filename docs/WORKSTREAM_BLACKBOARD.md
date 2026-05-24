@@ -479,6 +479,37 @@ Reviewer patrol support must not:
 
 If reviewer patrol support finds a problem, it reports concise evidence and a recommended Deputy action. Deputy Codex decides routing and blackboard publication.
 
+### Codex Rules Support Patrol Rule
+
+Codex 指令優化 / `governance/codex-rules` may support Deputy Codex as a 20-minute governance / prompt-drift patrol assistant.
+
+This helper does not become a Builder, Deputy, reviewer, merger, product owner, or implementation agent.
+
+Codex rules support patrol may inspect:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+- `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md`
+- active heartbeat prompts / automation wording when visible in chat
+- active Issues / PRs only to check whether blackboard rules, dispatch format, and workstream routing are being followed
+
+Codex rules support patrol may report:
+- `PROMPT_DRIFT_FOUND`
+- `BLACKBOARD_RULE_GAP_FOUND`
+- `DISPATCH_FORMAT_GAP_FOUND`
+- `HEARTBEAT_WORDING_GAP_FOUND`
+- `NO_GOVERNANCE_ACTION_NEEDED`
+
+Codex rules support patrol must not:
+- implement Builder tasks
+- edit source code
+- modify payment / escrow / listing fee, formal price, formal Excel/PDF, real AI API, upload, secrets, or runtime code
+- merge / reject PRs
+- open / close Issues unless Deputy explicitly asks
+- replace Deputy Codex decisions
+
+If it finds a governance issue, it should report a concise proposed blackboard / prompt correction and mark whether Deputy Codex must decide before publication.
+
 ## Deputy Technical Judgment Rules
 
 使用者只負責需求、產品方向、視覺審美、商業邏輯與最終裁決。
@@ -539,7 +570,7 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked before this patrol publication: `33bf191deb7b392ed0fa56e0497a4629abd09fb5`.
+- `main` latest sha checked before this governance support publication: `224fd7387281b67f78ca76dc25f2566b3c19cb16`.
 - Open PR:
   - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
   - PR #23 `Add renderer snapshot-only review packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
@@ -625,7 +656,7 @@ Scope:
 - `templates/`
 
 Current:
-PR #2 merged. PR #7 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and initial handoff source for new chats.
+PR #2 merged. PR #7 merged. PR #14 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and initial handoff source for new chats. Commander authorized this chatroom to support Deputy Codex as a 20-minute governance / prompt-drift patrol assistant.
 
 Forbidden:
 website pages, budget implementation, payment / escrow / listing fee, real AI API.
@@ -637,7 +668,7 @@ Blocked:
 None.
 
 Next:
-Only update when workflow rules or blackboard reporting discipline changes.
+Every 20 minutes when configured active, read the blackboard and governance docs, then report whether there is prompt drift, dispatch-format drift, heartbeat wording drift, stale workstream routing, or missing blackboard rule coverage. Propose concise governance corrections for Deputy Codex. Do not implement Builder tasks.
 
 Need Commander:
 Only for system-rule changes.
@@ -1094,11 +1125,11 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 - [ ] To: Codex 指令優化 / Governance Rules
   - Workstream: governance/codex-rules
-  - Branch / Repo: codex/blackboard-no-idle-patrol-rules / laibeoffer/laibe-mvp
-  - Mission: PR #14 publication of no-idle blackboard rules and active dispatches is complete.
-  - Why this agent: Owns blackboard, heartbeat, Issue workflow, and workstream registry governance.
-  - Action: PR #14 received clean Codex review and was merged to `main`. Continue future governance work only through a new scoped Issue / dispatch.
-  - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md`; governance docs only if review requires.
+  - Branch / Repo: none for normal patrol / laibeoffer/laibe-mvp
+  - Mission: Support Deputy Codex with 20-minute governance / prompt-drift patrol.
+  - Why this agent: Owns blackboard rules, heartbeat wording, Issue workflow, workstream registry, and dispatch-format hygiene without taking over Deputy decisions.
+  - Action: On each 20-minute patrol, read the blackboard and governance docs. Report `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, or `NO_GOVERNANCE_ACTION_NEEDED`. Propose concise corrections for Deputy Codex to approve / publish. Do not implement Builder tasks or merge / reject PRs.
+  - Allowed files: none for normal patrol; `docs/WORKSTREAM_BLACKBOARD.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CHATROOM_GITHUB_WORKSTREAMS.md`, and `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md` only if Deputy explicitly asks for a governance patch.
   - Need Commander: No.
   - Need Reviewer: No.
 
@@ -1272,6 +1303,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - Codex rules support patrol assigned
+
+Published by:
+Deputy Codex
+
+Status:
+Commander offered Codex 指令優化 / `governance/codex-rules` as a helper that can check the blackboard every 20 minutes. Deputy Codex accepts this as governance / prompt-drift support, not Builder work and not Deputy replacement.
+
+Changed:
+- Added `Codex Rules Support Patrol Rule`.
+- Updated `governance/codex-rules` status and dispatch to allow 20-minute governance / prompt-drift patrol.
+- Defined allowed report codes: `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, and `NO_GOVERNANCE_ACTION_NEEDED`.
+- Clarified that this helper may propose concise blackboard / prompt corrections but must not implement Builder tasks, merge / reject PRs, open / close Issues without Deputy request, or replace Deputy decisions.
+
+Decision:
+- Codex 指令優化 may help Deputy Codex audit rule drift, stale heartbeat wording, missing dispatch fields, and blackboard governance gaps every 20 minutes.
+- Deputy Codex remains final routing and blackboard publication authority.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - deputy patrol direct callouts and PR conflict comments
 
