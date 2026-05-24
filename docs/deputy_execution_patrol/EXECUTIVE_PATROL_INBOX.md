@@ -37,10 +37,14 @@ PENDING
 
 ## Pending Executive Findings
 
+No pending Executive findings after this Deputy patrol.
+
+## Processed Executive Findings
+
 ### 2026-05-24T20:37:22Z - [READY_FOR_DEPUTY_MERGE_CHECK] - Quote Factory
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -52,13 +56,13 @@ Issue / PR:
 laibeoffer/laibe-quote-factory Issue #1 / PR #2
 
 Finding:
-MISSED_PROGRESS_FOUND: Deputy workflow repair opened PR #2 with validation and boundary checks. PR #2 is open and mergeable=true. Executive Officer cannot merge, reject, or close Issue #1.
+MISSED_PROGRESS_FOUND: Deputy workflow repair opened PR #2 with validation and boundary checks. PR #2 was open and mergeable, and Executive Officer correctly routed merge / close authority back to Deputy Codex.
 
 Evidence:
-PR #2 https://github.com/laibeoffer/laibe-quote-factory/pull/2; head eaa39959063f985f241e436434450f2f6b02105b; base c332d43c174e5f8b5816cceb5fbdc3ca5f708fd8. PR body reports validation passes for apply_price_range_review_overrides.py, validate_price_ranges.py, and validate_sample_cloud_payload.py, plus no formal price / PricingRule / BudgetEstimateLine.unit_price and no Supabase / API / migration.
+PR #2 https://github.com/laibeoffer/laibe-quote-factory/pull/2; head eaa39959063f985f241e436434450f2f6b02105b; base c332d43c174e5f8b5816cceb5fbdc3ca5f708fd8. PR body reported validation passes for `apply_price_range_review_overrides.py`, `validate_price_ranges.py`, and `validate_sample_cloud_payload.py`, plus no formal price / PricingRule / BudgetEstimateLine.unit_price and no Supabase / API / migration.
 
 Action already taken:
-Published Executive Officer test patrol blackboard entry. No merge, no Issue close, no source-code change.
+Executive Officer published the merge-check callout. Deputy Codex checked changed files, PR comments, Codex review result, and review threads.
 
 Recommended Deputy action:
 Review PR #2 and decide the merge / reject / re-review gate.
@@ -67,15 +71,15 @@ Need Commander:
 No
 
 Need Reviewer:
-No unless Deputy finds formal pricing / API / migration boundary risk.
+No
 
 Deputy Decision:
-PENDING
+Merged PR #2 after Codex review reported no major issues, changed files stayed in Quote Factory candidate-governance scope, and no review threads or high-risk boundary issues were found. Merge commit: `d075c505d0e950ca288e8d374bdf2efc6b447105`. Quote Factory Issue #1 is closed by the merge.
 
 ### 2026-05-24T20:10:19Z - [EXECUTIVE_CALL_OUT] - Plan Puzzle
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -90,7 +94,7 @@ Finding:
 Next Executive Officer patrol still found no PR URL, issue claim, validation result, exact blocker, or expected branch after Deputy processed the prior Executive callout.
 
 Evidence:
-Latest main ceda437d5cd8e3a7eaba6269c93ec34eea1f77b7; branch plancraft/zone-area-boundary-refinement returned NOT_FOUND; Issue #15 comments now include Executive Officer follow-up https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529846485.
+Latest checked branch search still found no `plancraft/zone-area-boundary-refinement` branch. Issue #15 comments include Executive Officer follow-up https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529846485.
 
 Action already taken:
 Posted EXECUTIVE_CALL_OUT comment to Issue #15 and published blackboard short-format entry.
@@ -105,12 +109,12 @@ Need Reviewer:
 No
 
 Deputy Decision:
-PENDING
+Accepted. This remains a repeated workstream execution miss, not a Commander blocker. Executive Officer and Triage Officer should keep #15 under active chase for PR URL, issue claim, validation result, or exact blocker. Do not create a substitute implementation from Deputy unless the Commander explicitly reassigns the Builder task.
 
 ### 2026-05-24T20:10:19Z - [EXECUTIVE_CALL_OUT] - Raw Candidate
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -125,7 +129,7 @@ Finding:
 Next Executive Officer patrol still found no PR URL, issue claim, candidate-only validation result, exact blocker, or expected branch after Deputy processed the prior Executive callout.
 
 Evidence:
-Latest main ceda437d5cd8e3a7eaba6269c93ec34eea1f77b7; branch warehouse/raw-source-quality-scoring returned NOT_FOUND; Issue #17 comments now include Executive Officer follow-up https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529846548.
+Latest checked branch search still found no `warehouse/raw-source-quality-scoring` branch. Issue #17 comments include Executive Officer follow-up https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529846548.
 
 Action already taken:
 Posted EXECUTIVE_CALL_OUT comment to Issue #17 and published blackboard short-format entry.
@@ -140,12 +144,12 @@ Need Reviewer:
 No unless formal pricing boundary appears.
 
 Deputy Decision:
-PENDING
+Accepted. This remains a repeated workstream execution miss, not a Commander blocker. Executive Officer and Triage Officer should keep #17 under active chase for PR URL, issue claim, candidate-only validation result, forbidden-pricing-field check, or exact blocker. Do not let the workstream answer `standby`, `no task`, or `blocked by missing formal Issue` while Issue #17 exists.
 
 ### 2026-05-24T20:10:19Z - [EXECUTIVE_CALL_OUT] - Quote Factory
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -154,30 +158,28 @@ Workstream:
 Quote Factory / quote-factory/price-range-governance
 
 Issue / PR:
-laibeoffer/laibe-quote-factory Issue #1
+laibeoffer/laibe-quote-factory Issue #1 / PR #2
 
 Finding:
-Next Executive Officer patrol still found unreported Quote Factory progress but no PR URL, validation result, formal pricing check, Supabase/API/migration check, or LaiBE MVP blackboard handoff report after Deputy processed the prior Executive callout.
+Next Executive Officer patrol originally found unreported Quote Factory progress but no PR URL, validation result, formal pricing check, Supabase/API/migration check, or LaiBE MVP blackboard handoff report.
 
 Evidence:
-Latest laibe-mvp main ceda437d5cd8e3a7eaba6269c93ec34eea1f77b7; Quote Factory main c332d43c174e5f8b5816cceb5fbdc3ca5f708fd8; branch qf/qf5-3-audit-override-publish is ahead of main by 1 commit and changes QF5.3 / QF roadmap files; Issue #1 comments now include Executive Officer follow-up https://github.com/laibeoffer/laibe-quote-factory/issues/1#issuecomment-4529846601.
+The missing PR was later repaired as PR #2 and reviewed by Codex with no major issues.
 
 Action already taken:
-Posted EXECUTIVE_CALL_OUT comment to Quote Factory Issue #1 and published blackboard short-format entry.
+Deputy workflow repair opened PR #2, requested Codex review, and later merged it after a clean merge gate.
 
 Recommended Deputy action:
-If the next check still finds no PR URL or blocker, verify branch scope and repair PR workflow if needed.
+Verify branch scope and repair PR workflow if needed.
 
 Need Commander:
 No
 
 Need Reviewer:
-No unless formal pricing / API / migration boundary appears.
+No
 
 Deputy Decision:
-PENDING
-
-## Processed Executive Findings
+Resolved by PR #2 merge. Quote Factory Issue #1 is closed. Next Quote Factory work should move to QF5.4 only through a new scoped issue / dispatch, still candidate-only and no formal pricing / API / migration.
 
 ### 2026-05-24T19:56:49Z - [EXECUTIVE_CALL_OUT] - Plan Puzzle
 
