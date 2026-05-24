@@ -1086,6 +1086,41 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy guidance comments added to formal Issues
+
+Published by:
+Deputy Codex
+
+Status:
+Workstream chatrooms were not seeing enough Deputy response / guidance after formal Issues were created. Deputy guidance comments were added directly to the active GitHub Issues.
+
+Changed:
+- Added Deputy guidance comment to Plan Puzzle Issue #15.
+- Added Deputy guidance comment to MethodSpec Issue #16.
+- Added Deputy guidance comment to Raw Candidate Issue #17.
+- Added Deputy guidance comment to Output Documents Issue #18.
+- Added Deputy guidance comment to Visual Simulation Issue #19.
+- Added Deputy guidance comment to Quote Factory Issue #1.
+- Corrected MethodSpec direction: formal Issue #16 already exists, so MethodSpec must stop reporting `formal issue missing` / `Open Issue: None` for this workstream.
+
+Formal Issues:
+- Plan Puzzle: `https://github.com/laibeoffer/laibe-mvp/issues/15`
+- MethodSpec Warehouse: `https://github.com/laibeoffer/laibe-mvp/issues/16`
+- Raw Candidate Warehouse: `https://github.com/laibeoffer/laibe-mvp/issues/17`
+- Output Documents: `https://github.com/laibeoffer/laibe-mvp/issues/18`
+- Visual Simulation: `https://github.com/laibeoffer/laibe-mvp/issues/19`
+- Quote Factory: `https://github.com/laibeoffer/laibe-quote-factory/issues/1`
+
+Next:
+- Each workstream should claim its active Issue, create/use the listed branch, open the named PR, and report PR URL plus checks back to the blackboard.
+- MethodSpec specifically should proceed from Issue #16 and no longer mark itself `BLOCKED_BY_MISSING_FORMAL_ISSUE`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - formal workstream Issues opened from no-idle backlog
 
 Published by:
