@@ -1,5 +1,26 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: PR #23 Codex Review P2 Recorded
+
+- 本輪任務名稱：PR #23 Codex Review P2 Recorded。
+- 任務類型：Governance / Patrol / PR Review Gate；本輪只處理 GitHub PR review 狀態、PR 留言、黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `1d0d6ecc266a6302e2cf32c2b20e8fd04065bc15`。
+- PR #23 `Add renderer snapshot-only review packet`:
+  - Codex review result: P2 on `src/lib/budget/renderers/formal-file-writer-policy.ts`.
+  - Review issue: `inferFormalArtifactFormat()` can accept mismatched `renderer` / `format` and infer the wrong artifact format instead of failing closed.
+  - Current PR state: open, not mergeable, head `5ffd0f3e737960b386695d25ad5d0fc4d71a62c2`.
+  - Changed files remain in Output Documents renderer / docs scope, but P2 blocks merge.
+- Deputy action:
+  - Added a PR #23 comment and Issue #18 status update instructing Output Documents to fix renderer / format mismatch handling, preserve snapshot-only boundaries, re-sync latest `main`, rerun checks, and request Codex re-review.
+  - Updated `docs/WORKSTREAM_BLACKBOARD.md` so PR #23 is marked `NEEDS_FIX / P2`.
+  - Updated `laibe-commander-patrol` heartbeat prompt to remove stale hardcoded Issue #19 active-state guidance and require current GitHub / blackboard verification every patrol.
+- Need Commander: No.
+- Need Reviewer: Yes until the P2 is fixed and re-reviewed.
+
 ## Latest Patrol Task: PR #24 Merged After Clean Codex Review
 
 - 本輪任務名稱：PR #24 Merged After Clean Codex Review。

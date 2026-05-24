@@ -570,10 +570,10 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked during this patrol: `cf170e248a48be2df43f6cd6e6db0ef956cd5658`.
+- `main` latest sha checked before this patrol publication: `1d0d6ecc266a6302e2cf32c2b20e8fd04065bc15`.
 - Open PR:
   - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
-  - PR #23 `Add renderer snapshot-only review packet` - conflict-resolution backfill reported and Deputy `@codex review` request was added; latest blackboard publication moved `main` again, so owner must re-sync against latest `main` before merge.
+  - PR #23 `Add renderer snapshot-only review packet` - Codex review found P2 in `src/lib/budget/renderers/formal-file-writer-policy.ts`; merge blocked until renderer / format mismatch handling fails closed, latest `main` is re-synced, checks rerun, and Codex re-review passes. Need Reviewer: Yes.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
@@ -1302,6 +1302,35 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - PR #23 Codex review P2 recorded
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found a new Codex review on PR #23. Codex raised P2 on `src/lib/budget/renderers/formal-file-writer-policy.ts`: `inferFormalArtifactFormat()` can accept mismatched `renderer` / `format` and infer the wrong artifact format instead of failing closed.
+
+Changed:
+- Added Deputy follow-up comment to PR #23.
+- Added Deputy status update to Issue #18.
+- Marked PR #23 as `NEEDS_FIX / P2`.
+- Updated current global state so PR #23 is no longer treated as only merge-sync / review-gated.
+- Updated `laibe-commander-patrol` heartbeat prompt to stop relying on a hardcoded active Issue list; each patrol must read current GitHub / blackboard state.
+
+Decision:
+- PR #23 remains blocked from merge.
+- Output Documents must fix renderer / format mismatch handling inside renderer / writer scope.
+- Required behavior: `renderer` and `format` must agree, or preflight / inference must fail closed.
+- Preserve snapshot-only boundaries: no real `.xlsx` / `.pdf`, no budget engine rerun, no pricing rules, no formal output.
+- After fix: re-sync latest `main`, rerun existing renderer static guard / syntax / smoke checks, and request Codex re-review.
+- No next Output Documents dispatch until PR #23 is merged, closed, or re-scoped.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes, until the P2 is fixed and re-reviewed.
 
 ### 2026-05-25 - PR #24 merged after clean Codex review
 
