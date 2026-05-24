@@ -1256,6 +1256,52 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - patrol found open PRs #22-#24 conflict-gated
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found three new open PRs from active workstreams. Each PR maps to an active Issue and appears inside the expected workstream scope, but none has Codex review comments yet and all three are currently not mergeable against latest `main` because `docs/NEXT_CODEX_HANDOFF.md` and/or `docs/WORKSTREAM_BLACKBOARD.md` changed on `main`.
+
+Main SHA:
+`ec13d76c269950a9d0a1a5f942a04dad609d7f1d`
+
+Open PRs:
+- PR #22 `Add MethodSpec validator freeze note`
+  - Issue: #16
+  - Workstream: `warehouse/method-spec`
+  - Files: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - Table compliance: `TABLE_COMPLIANCE_PARTIAL`
+  - Scope: expected documentation scope
+  - Blocker: merge conflict with latest `docs/NEXT_CODEX_HANDOFF.md`; no Codex review comments found
+- PR #23 `Add renderer snapshot-only review packet`
+  - Issue: #18
+  - Workstream: `output/budget-documents`
+  - Files: `src/lib/budget/renderers/*`, `docs/budget/27-renderer-snapshot-only-review-packet.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/WORKSTREAM_BLACKBOARD.md`
+  - Table compliance: `TABLE_COMPLIANCE_PARTIAL`
+  - Scope: expected renderer / snapshot-only scope, with blackboard publication
+  - Blocker: merge conflict with latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; no Codex review comments found
+- PR #24 `Add visual prompt sandbox governance packet`
+  - Issue: #19
+  - Workstream: `visual/simulation-governance`
+  - Files: `docs/ai_style_visual_chat/*`, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - Table compliance: `TABLE_COMPLIANCE_PARTIAL`
+  - Scope: expected visual governance / prompt sandbox scope
+  - Blocker: merge conflict with latest `docs/NEXT_CODEX_HANDOFF.md`; no Codex review comments found
+
+Decision:
+- Do not merge PR #22, #23, or #24 yet.
+- These are technical workflow blockers, not Commander blockers.
+- Each owner workstream must update its branch against latest `main`, preserve Deputy patrol / reviewer patrol blackboard entries, resolve only its own documentation merge conflict, then request / wait for Codex review.
+- Need Reviewer remains No unless conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - reviewer patrol support enabled
 
 Published by:
