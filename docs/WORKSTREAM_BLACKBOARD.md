@@ -803,24 +803,24 @@ Current member-goal interpretation:
 ### READY
 
 - [ ] plancraft/page-ui / plancraft/adapter-clean — Plancraft+ Zone Area / Boundary Refinement
-  - Status: READY executable Builder task published. This workstream should continue from the preview backlog and must not idle only because no PR / Issue is open.
+  - Status: ISSUE_READY. This workstream must publish `UPCOMING_PHASE_DECLARED` and claim/request the formal GitHub Issue before any file-changing implementation.
   - Workstream: plancraft/page-ui / plancraft/adapter-clean
   - Need Commander: no unless product flow, visual interaction, budget adapter/type changes, or formal estimate strategy changes
 - [ ] warehouse/raw-candidate — R1.5 source quality scoring / reviewer checklist
-  - Status: preview backlog task, should continue unless blocked
+  - Status: ISSUE_READY preview backlog task; claim/request formal Issue before file-changing implementation
   - Workstream: warehouse/raw-candidate
   - Need Commander: no unless formal pricing boundary changes
 - [ ] warehouse/method-spec — MethodSpec validator freeze note
-  - Status: preview backlog task after MS-12 PASS_WITH_NOTES
+  - Status: ISSUE_READY preview backlog task after MS-12 PASS_WITH_NOTES; claim/request formal Issue before file-changing implementation
   - Workstream: warehouse/method-spec
   - File target: `docs/budget/32-method-spec-validator-freeze-note.md`
   - Need Commander: no unless formal price / PricingRule / budget line authority changes
 - [ ] output/budget-documents — renderer snapshot-only review packet / static guard next step
-  - Status: preview backlog task, should continue without producing real `.xlsx` / `.pdf`
+  - Status: ISSUE_READY preview backlog task; claim/request formal Issue before file-changing implementation and do not produce real `.xlsx` / `.pdf`
   - Workstream: output/budget-documents
   - Need Commander: no unless formal Excel / PDF or product-facing output decisions are requested
 - [ ] quote-factory/price-range-governance — QF5.3 verify / publish, then QF5.4 next
-  - Status: QF5.3 report received but must be owned by Quote Factory and verified on GitHub
+  - Status: ISSUE_READY in external repo. QF5.3 report received but must be owned by Quote Factory and verified on GitHub; report status to Deputy for blackboard sync.
   - Repo: laibeoffer/laibe-quote-factory
   - Need Commander: no unless external repo integration into laibe-mvp is requested
 
@@ -888,9 +888,9 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Branch / Repo: qf/qf5-3-audit-override-publish / laibeoffer/laibe-quote-factory
   - Mission: Prepare the formal work order to verify/publish QF5.3, then prepare QF5.4 only after QF5.3 is visible in the external repo.
   - Why this agent: Owns PriceRange candidate governance in the external Quote Factory repo. This is not Visual Simulation and not `laibe-mvp` implementation work.
-  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue in `laibeoffer/laibe-quote-factory`. Verify QF5.3 before QF5.4; keep formal price blocked.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue in `laibeoffer/laibe-quote-factory`. Verify QF5.3 before QF5.4; keep formal price blocked. Report the short status back to Deputy Codex for blackboard sync.
   - Allowed repo/files: `laibeoffer/laibe-quote-factory`; QF5.3 docs/config/scripts/review_queue/exports files; Quote Factory roadmap docs.
-  - Stop if: modifying `laibe-mvp`, Supabase/API/migration, formal price, `PricingRule`, `BudgetEstimateLine.unit_price`, renderer/output, payment, or AI API work is required.
+  - Stop if: modifying `laibe-mvp` implementation files, Supabase/API/migration, formal price, `PricingRule`, `BudgetEstimateLine.unit_price`, renderer/output, payment, or AI API work is required. Blackboard status publication is handled by Deputy Codex unless a separate `laibe-mvp` governance Issue authorizes it.
   - Need Commander: No.
   - Need Reviewer: No.
 
@@ -1085,6 +1085,37 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-24 - PR #14 Codex review fix: READY status and Quote Factory reporting
+
+Published by:
+Deputy Codex
+
+Status:
+PR #14 received another Codex review on commit `811190d`: P1 noted the `READY` section still implied non-issue-gated Plan Puzzle execution; earlier P2 noted Quote Factory blackboard publication conflicted with its external-repo boundary. Both were corrected.
+
+Changed:
+- Changed `READY` entries to `ISSUE_READY`, making Issue / formal dispatch required before file-changing implementation.
+- Clarified that Quote Factory reports short status to Deputy Codex; Deputy handles blackboard sync unless a separate `laibe-mvp` governance Issue authorizes a blackboard edit.
+- Preserved no-idle behavior as phase declaration / Issue claim, not direct implementation permission.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- PR #14 update pending publication.
+
+Blocked:
+- PR #14 should not merge until Codex re-review confirms no remaining P1/P2.
+
+Next:
+- Push the blackboard fix to PR #14 and request Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-24 - PR #14 Codex review fix: issue-gated no-idle rules
 
@@ -1302,13 +1333,13 @@ Published by:
 Deputy Codex
 
 Status:
-Plancraft / Plan Puzzle now has an executable Builder instruction, not only a READY marker.
+Superseded by later Issue-gated patrol rules. Plancraft / Plan Puzzle is now `ISSUE_READY`; file-changing work requires a GitHub Issue or Commander formal dispatch.
 
 Changed:
-- Published a direct `To: 平面拼圖 / Plan Puzzle` dispatch for `Plancraft+ Zone Area / Boundary Refinement`.
-- Listed implementation steps, allowed files, stop conditions, validation checks, area formulas, review flags, UI / export requirements, and blackboard completion reporting requirements.
-- Clarified that this workstream should continue from the Commander preview backlog instead of idling when no PR / Issue is open.
-- Preserved Commander override: Reviewer is skipped for this scoped Builder round, but output must remain candidate / reviewable and formal estimate must stay blocked.
+- Earlier direct execution wording is no longer active.
+- Current rule requires `UPCOMING_PHASE_DECLARED` plus GitHub Issue / Commander formal dispatch before file-changing implementation.
+- Detailed implementation steps belong in the formal Issue / task preview, not in the blackboard.
+- Formal estimate remains blocked.
 
 Files:
 - `docs/WORKSTREAM_BLACKBOARD.md`
