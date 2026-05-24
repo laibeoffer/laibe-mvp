@@ -13,6 +13,7 @@
 本輪不修改程式碼。
 本輪不輸出 Codex 施工指令。
 本輪只產出視覺模擬方案、prompt、素材規格、檔名與整合備註。
+本輪若涉及 sandbox preview，只能視為 API-disabled / mock governance，不得宣稱已接真 image API。
 
 ---
 
@@ -26,6 +27,11 @@
 - AI_RULES/TASK_DISPATCH_RULES.md
 - AI_RULES/LAIBE_VISUAL_SIM_RULES.md
 - docs/LAIBE_VISUAL_SIM_CHATROOM.md
+- docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md
+- docs/ai_style_visual_chat/PROMPT_SANITIZATION_RULES.md
+- docs/ai_style_visual_chat/IMAGE_API_REQUEST_SCHEMA.md
+- docs/ai_style_visual_chat/REFERENCE_IMAGE_POLICY.md
+- docs/ai_style_visual_chat/GENERATED_IMAGE_STORAGE_POLICY.md
 - AI_RULES/HANDOFF_RULES.md
 - docs/NEXT_CODEX_HANDOFF.md，若存在
 
@@ -84,6 +90,14 @@
 17. 給 Reviewer 的審查備註
 18. 風險提醒
 
+若本輪需要 sandbox governance，請另外確認：
+
+- Prompt preview 只使用「風格示意」、「案件上架參考」、「空間氛圍」語氣。
+- Negative prompt 明確排除施工圖、正式設計圖、真實案例、正式報價依據與完工保證。
+- Reference image upload 維持 disabled。
+- 不接真 image API、不放 API key、不建立 upload pipeline、不建立 production storage。
+- 不把 visual simulation 寫入 Plancraft geometry、budget data、formal case data 或 production assets。
+
 ---
 
 ## 絕對禁止
@@ -93,7 +107,12 @@
 - 不要宣稱圖片已整合進網站
 - 不要宣稱圖片是真實案例
 - 不要宣稱圖片是施工圖
+- 不要宣稱圖片是正式設計圖
 - 不要宣稱圖片可作為正式報價依據
+- 不要宣稱圖片是完工保證
+- 不要接真 image API
+- 不要放 API key
+- 不要建立 reference image upload 或 production asset pipeline
 - 不要替 Builder 決定 routing
 - 不要取代 Reviewer 審查
 
