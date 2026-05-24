@@ -194,7 +194,7 @@ Default language rule:
 
 ### Task Preview Backlog Enforcement
 
-各聊天室不得因為沒有 open PR / open Issue 就發呆。Commander 已提供「任務預告」作為候選任務清單；沒有新的 GitHub 派工時，各聊天室必須回到自己的任務預告，找出下一個安全、低風險、符合本 workstream 的任務繼續推進。只有以下情況可以停下：
+各聊天室不得因為沒有 open PR / open Issue 就發呆。Commander 已提供「任務預告」作為候選任務清單；沒有新的 GitHub 派工時，各聊天室必須回到自己的任務預告，找出下一個安全、低風險、符合本 workstream 的候選任務，並先發布 `UPCOMING_PHASE_DECLARED` 與 GitHub Issue draft / claim。實作型修改仍必須等 GitHub Issue 或 Commander 明確正式派工；任務預告本身不是繞過 Issue 的施工授權。只有以下情況可以停下：
 - 任務碰到正式 payment / escrow / listing fee。
 - 任務碰到真 AI API / API key / 真上傳。
 - 任務碰到正式價格 / PricingRule / `BudgetEstimateLine.unit_price`。
@@ -203,7 +203,7 @@ Default language rule:
 - 任務缺少產品方向、視覺方向、商業邏輯裁決。
 - 任務預告中沒有本聊天室的下一步，必須回報 `TASK_PREVIEW_MISSING`，不得安靜 standby。
 
-「Standby」只能用於沒有任務預告、任務被 blocker 擋住、或任務需要 Commander/Reviewer 的情況；回報時必須寫清楚為什麼不能繼續。若任務只是文件、候選資料、validator、sandbox governance、read-only review packet、或不碰正式高風險邊界，應依任務預告繼續工作。
+「Standby」只能用於沒有任務預告、任務被 blocker 擋住、或任務需要 Commander/Reviewer 的情況；回報時必須寫清楚為什麼不能繼續。若任務只是文件、候選資料、validator、sandbox governance、read-only review packet、或不碰正式高風險邊界，應依任務預告準備 formal Issue / blackboard dispatch；只有在 GitHub Issue 或 Commander 明確正式派工存在時，才開始會改檔的施工。
 
 ### Upcoming Phase Declaration Rule
 
@@ -213,8 +213,9 @@ Required behavior:
 - Do not reply only with "no new PR / no new Issue / standby."
 - Read this blackboard and the task preview backlog.
 - Identify the next safe phase that belongs to the current workstream.
-- Publish an `UPCOMING_PHASE_DECLARED` entry to this blackboard before starting or before reporting blocked.
-- If the next phase is safe and inside the workstream boundary, proceed without waiting for a new Issue / PR.
+- Publish an `UPCOMING_PHASE_DECLARED` entry to this blackboard before requesting / claiming the formal Issue, starting read-only preparation, or reporting blocked.
+- If the next phase is safe and inside the workstream boundary but no GitHub Issue or Commander formal dispatch exists, publish a concise Issue draft / claim instead of starting implementation.
+- File-changing implementation starts only after a GitHub Issue exists or the Commander explicitly provides a formal dispatch for that workstream.
 - If the next phase cannot proceed, report the exact blocker using `BLOCKED_BY_COMMANDER_DECISION`, `BLOCKED_BY_REVIEWER_TRIGGER`, `BLOCKED_BY_HIGH_RISK_SCOPE`, `BLOCKED_BY_MISSING_TASK_PREVIEW`, or `BLOCKED_BY_SCOPE_MISMATCH`.
 
 Required upcoming-phase short format:
@@ -232,7 +233,7 @@ Required upcoming-phase short format:
 - Need Reviewer:
 
 Current required upcoming-phase declarations:
-- `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then continue if still inside the allowed floor-plan files and docs.
+- `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then claim or request the matching formal Issue before implementation.
 - `warehouse/method-spec`: declare `MethodSpec validator freeze note`, target `docs/budget/32-method-spec-validator-freeze-note.md`.
 - `warehouse/raw-candidate`: declare `R1.5 source quality scoring / reviewer checklist` or the next raw warehouse candidate-intake doc task.
 - `output/budget-documents`: declare `renderer snapshot-only review packet / static guard next step`; no real `.xlsx` / `.pdf`.
@@ -242,12 +243,12 @@ Current required upcoming-phase declarations:
 - `governance/codex-rules`: declare the next blackboard / Issue workflow / heartbeat prompt / workstream registry governance task.
 
 目前任務預告對應的下一步：
-- 平面拼圖 / `plancraft/page-ui` / `plancraft/adapter-clean`: 繼續 `Plancraft+ Zone Area / Boundary Refinement`；完成後再依序處理 `Production Quantity Fact Contract`，但 formal estimate 仍 blocked。
-- 配件倉庫：工法與規格 / `warehouse/method-spec`: MS-12 已是 `PASS_WITH_NOTES`；下一步改為 `docs/budget/32-method-spec-validator-freeze-note.md`，整理 P0 / P1-A / P1-B 已完成與 P2 backlog。若需要新增 catalog / formal price，才停下。
-- 原物料採購與倉儲 / `warehouse/raw-candidate`: 繼續 R1.5 source quality scoring / reviewer checklist，或 Raw Warehouse architecture / intake pipeline 的候選文件；不得產生正式價格。
-- 成品物流：預算表單輸出 / `output/budget-documents`: 繼續 renderer snapshot-only review packet、renderer static guard / import denylist、或 placeholder writer hardening；不得產生正式 `.xlsx` / `.pdf` 對外輸出。
-- 模擬圖生成 / `visual/simulation-governance`: 繼續 visual brief / prompt / negative prompt / sandbox governance / storage policy / reviewer packet；不得接真 image API、API key、backend production runtime。
-- 預算原料清洗工廠 / `quote-factory/price-range-governance`: 先 verify / publish QF5.3；若缺 roadmap，建立 Quote Factory roadmap / definition of done / phase index；不得修改 `laibeoffer/laibe-mvp`，不得產生正式價格。
+- 平面拼圖 / `plancraft/page-ui` / `plancraft/adapter-clean`: 宣告 `Plancraft+ Zone Area / Boundary Refinement` 並 claim / request formal Issue；完成後再依序處理 `Production Quantity Fact Contract`，但 formal estimate 仍 blocked。
+- 配件倉庫：工法與規格 / `warehouse/method-spec`: MS-12 已是 `PASS_WITH_NOTES`；下一步宣告 `docs/budget/32-method-spec-validator-freeze-note.md` 並 claim / request formal Issue。若需要新增 catalog / formal price，才停下。
+- 原物料採購與倉儲 / `warehouse/raw-candidate`: 宣告 R1.5 source quality scoring / reviewer checklist，或 Raw Warehouse architecture / intake pipeline 候選文件，並 claim / request formal Issue；不得產生正式價格。
+- 成品物流：預算表單輸出 / `output/budget-documents`: 宣告 renderer snapshot-only review packet、renderer static guard / import denylist、或 placeholder writer hardening，並 claim / request formal Issue；不得產生正式 `.xlsx` / `.pdf` 對外輸出。
+- 模擬圖生成 / `visual/simulation-governance`: 宣告 visual brief / prompt / negative prompt / sandbox governance / storage policy / reviewer packet，並 claim / request formal Issue；不得接真 image API、API key、backend production runtime。
+- 預算原料清洗工廠 / `quote-factory/price-range-governance`: 先宣告 verify / publish QF5.3 並在 Quote Factory repo claim / request formal Issue；若缺 roadmap，建立 Quote Factory roadmap / definition of done / phase index；不得修改 `laibeoffer/laibe-mvp`，不得產生正式價格。
 - 網站主流程 Builder0522 / `site/page-formalization`: 若任務預告沒有指定頁面，回報 `TASK_PREVIEW_MISSING` 並等待 Commander 指定 page / CTA / routing / visual flow；不得自行改產品方向。
 - Codex 指令優化 / `governance/codex-rules`: 繼續補齊黑板、Issue workflow、heartbeat prompt、workstream registry 與任務治理文件。
 
@@ -825,14 +826,14 @@ Current member-goal interpretation:
 
 ### ACTIVE TASK DISPATCHES
 
-These dispatches convert the Commander task preview backlog into active work. Every named chatroom must either start its scoped task, or publish `UPCOMING_PHASE_DECLARED` with a concrete blocker. No chatroom may claim silent standby only because there is no open PR or Issue.
+These dispatches convert the Commander task preview backlog into issue-ready work orders. Every named chatroom must publish `UPCOMING_PHASE_DECLARED`, claim or request a formal GitHub Issue, or report a concrete blocker. No chatroom may claim silent standby only because there is no open PR or Issue. Blackboard dispatches are coordination records, not full implementation specs.
 
 - [ ] To: 平面拼圖 / Plan Puzzle
   - Workstream: plancraft/page-ui / plancraft/adapter-clean
   - Branch / Repo: plancraft/zone-area-boundary-refinement / laibeoffer/laibe-mvp
-  - Mission: Execute Phase 1 `Plancraft+ Zone Area / Boundary Refinement`.
+  - Mission: Prepare the formal work order for Phase 1 `Plancraft+ Zone Area / Boundary Refinement`.
   - Why this agent: Owns LaiBE importer UI and zone boundary geometry. Does not own Plancraft core or budget runtime.
-  - Action: Implement zone polygon validation, shoelace area estimate, `areaM2`, `areaPing`, `areaSource`, `areaStatus`, `areaConfidence`, `reviewerRequired`, `reviewerReasons`, structured `boundaryIssues`, Zone Inspector area display/actions, canvas area labels/styles, Plancraft+ draft JSON area metadata export, and docs sync. Run `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue using the Commander task preview as the implementation source. Do not start file-changing implementation until the Issue or Commander formal dispatch exists.
   - Allowed files: `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`.
   - Stop if: budget adapter/types/runtime, Plancraft core, formal estimate, Excel/PDF, DB/API, AI API, payment/escrow/listing fee, package/framework/install, `formalEstimateGuard` weakening, or `generateBudgetEstimate` acceptance of Plancraft+ spike is required.
   - Need Commander: No.
@@ -841,9 +842,9 @@ These dispatches convert the Commander task preview backlog into active work. Ev
 - [ ] To: 配件倉庫：工法與規格 / Method Spec Warehouse
   - Workstream: warehouse/method-spec
   - Branch / Repo: warehouse/method-spec-validator-freeze-note / laibeoffer/laibe-mvp
-  - Mission: Publish `MethodSpec validator freeze note`.
+  - Mission: Prepare the formal work order for `MethodSpec validator freeze note`.
   - Why this agent: Owns MethodSpec / MaterialSpec / LaborRule boundaries and validator policy history.
-  - Action: Create/update `docs/budget/32-method-spec-validator-freeze-note.md` summarizing P0/P1-A/P1-B complete, MS-12 `PASS_WITH_NOTES`, current guard evidence, P2 backlog, and no formal price authority. Update handoff/review packet only if needed.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue for the freeze-note doc. Keep the implementation source in the Issue, not expanded inside this blackboard.
   - Allowed files: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
   - Stop if: runtime code, data model expansion, formal price, renderer/output, raw warehouse, Plancraft, frontend, payment, or AI API work is required.
   - Need Commander: No.
@@ -852,9 +853,9 @@ These dispatches convert the Commander task preview backlog into active work. Ev
 - [ ] To: 原物料採購與倉儲 / Raw Candidate Warehouse
   - Workstream: warehouse/raw-candidate
   - Branch / Repo: warehouse/raw-source-quality-scoring / laibeoffer/laibe-mvp
-  - Mission: Start R1.5 source quality scoring / reviewer checklist.
+  - Mission: Prepare the formal work order for R1.5 source quality scoring / reviewer checklist.
   - Why this agent: Owns raw candidate intake, source traceability, and candidate-only material evidence before formal pricing.
-  - Action: Define candidate-only source quality scoring and reviewer checklist for raw warehouse sources. Keep all outputs as candidate evidence and maintain `formal_price_generated: false`.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue for candidate-only source quality scoring. Keep all outputs candidate-only and keep formal pricing blocked.
   - Allowed files: `src/lib/budget/raw-warehouse/`, `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
   - Stop if: `PricingRule`, `MaterialSpec`, `LaborRule`, `BudgetEstimateLine.unit_price`, renderer/output, frontend, payment, DB/API, AI API, or formal price authority is required.
   - Need Commander: No.
@@ -863,9 +864,9 @@ These dispatches convert the Commander task preview backlog into active work. Ev
 - [ ] To: 成品物流：預算表單輸出 / Output Documents
   - Workstream: output/budget-documents
   - Branch / Repo: output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
-  - Mission: Start renderer snapshot-only review packet / static guard next step.
+  - Mission: Prepare the formal work order for renderer snapshot-only review packet / static guard next step.
   - Why this agent: Owns BudgetOutputSnapshot-to-renderer boundaries and placeholder writer safety, not pricing or MethodSpec decisions.
-  - Action: Prepare a snapshot-only review packet and/or harden renderer static import denylist / placeholder writer guard. Preserve the rule that output reads `BudgetOutputSnapshot` or snapshot-gated `RenderedBudgetDocument` only.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue for the snapshot-only / static-guard task. Preserve the rule that output reads `BudgetOutputSnapshot` or snapshot-gated `RenderedBudgetDocument` only.
   - Allowed files: `src/lib/budget/renderers/`, `docs/budget/27-renderer-snapshot-only-review-packet.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
   - Stop if: real `.xlsx` / `.pdf`, budget engine rerun, pricing rules, material resolver, MethodSpecCatalog changes, formal output decisions, payment, DB/API, or AI API work is required.
   - Need Commander: No unless formal output format or user-facing document behavior is requested.
@@ -874,9 +875,9 @@ These dispatches convert the Commander task preview backlog into active work. Ev
 - [ ] To: 模擬圖生成 / Visual Simulation
   - Workstream: visual/simulation-governance
   - Branch / Repo: visual/brief-prompt-sandbox-governance / laibeoffer/laibe-mvp
-  - Mission: Start visual brief / prompt / negative prompt / sandbox governance packet.
+  - Mission: Prepare the formal work order for visual brief / prompt / negative prompt / sandbox governance packet.
   - Why this agent: Owns visual simulation governance, visual brief structure, prompt hygiene, and image sandbox policy only.
-  - Action: Produce reusable visual brief fields, Chinese prompt, English prompt, negative prompt, ratio, filename, alt text, integration notes, reviewer notes, sandbox disclaimer, storage policy notes, and API-disabled preview governance.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue for the visual governance packet. Keep real image API/API key/backend/storage production work blocked.
   - Allowed files: `docs/ai_style_visual_chat/`, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
   - Stop if: real image API, API key, backend/proxy, upload/storage production integration, production asset, construction drawing, formal design drawing, quote basis, site runtime code, payment, or non-visual workstream content is required.
   - Need Commander: No unless visual direction, real API, or storage policy decision is required.
@@ -885,9 +886,9 @@ These dispatches convert the Commander task preview backlog into active work. Ev
 - [ ] To: 預算原料清洗工廠 / Quote Factory
   - Workstream: quote-factory/price-range-governance
   - Branch / Repo: qf/qf5-3-audit-override-publish / laibeoffer/laibe-quote-factory
-  - Mission: Verify/publish QF5.3, then prepare QF5.4 only after QF5.3 is visible in the external repo.
+  - Mission: Prepare the formal work order to verify/publish QF5.3, then prepare QF5.4 only after QF5.3 is visible in the external repo.
   - Why this agent: Owns PriceRange candidate governance in the external Quote Factory repo. This is not Visual Simulation and not `laibe-mvp` implementation work.
-  - Action: In `laibeoffer/laibe-quote-factory` only, verify QF5.3 audit/override files, validation results, illegal override blocking, and no formal price fields. If QF5.3 is missing, create the Quote Factory roadmap/DoD/phase index before QF5.4. Publish completion status back to this blackboard.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue in `laibeoffer/laibe-quote-factory`. Verify QF5.3 before QF5.4; keep formal price blocked.
   - Allowed repo/files: `laibeoffer/laibe-quote-factory`; QF5.3 docs/config/scripts/review_queue/exports files; Quote Factory roadmap docs.
   - Stop if: modifying `laibe-mvp`, Supabase/API/migration, formal price, `PricingRule`, `BudgetEstimateLine.unit_price`, renderer/output, payment, or AI API work is required.
   - Need Commander: No.
@@ -898,7 +899,7 @@ These dispatches convert the Commander task preview backlog into active work. Ev
   - Branch / Repo: site/task-preview-intake / laibeoffer/laibe-mvp
   - Mission: Publish `TASK_PREVIEW_MISSING` / task-preview intake for site flow.
   - Why this agent: Owns landing/onboarding/header/CTA/routing/dashboard flow, but no current Commander-selected page/CTA/routing task is active.
-  - Action: Read required site flow docs and this blackboard, then publish `UPCOMING_PHASE_DECLARED` stating no Commander-selected page/CTA/routing task exists. Do not edit UI. If useful, provide a short intake list of what the Commander must choose next: page, CTA, route, visual direction, or dashboard flow.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` with `TASK_PREVIEW_MISSING`. Do not edit UI or invent product direction.
   - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md` status/report only, optionally `docs/CURRENT_PHASE_REVIEW_PACKET.md` if summarizing site blocker.
   - Stop if: any UI/page/product direction/routing/CTA change would be required.
   - Need Commander: Yes for actual page/CTA/routing/visual task.
@@ -967,16 +968,13 @@ These dispatches convert the Commander task preview backlog into active work. Ev
 - [x] To: 平面拼圖 / Plan Puzzle
   - Workstream: plancraft/page-ui / plancraft/adapter-clean
   - Branch / Repo: plancraft/zone-area-boundary-refinement / laibeoffer/laibe-mvp
-  - Mission: Make `Plancraft+ Zone Area / Boundary Refinement` directly executable, not just standby / patrol.
-  - Why this agent: This is the only workstream that owns the LaiBE floor-plan importer, zone boundary UI, and Plancraft+ candidate geometry path. It must push the area / boundary candidate data forward while keeping all budget adapter and formal estimate guards intact.
-  - Supersedes: Any older Plancraft standby note in this blackboard. Current decision is READY and executable.
-  - Action: Continue work now from the Commander task preview. Start by reading the mandatory Plancraft files and confirming the current `project.version`; if safe, move to `0.11.0-zone-area-boundary-refinement`, but do not downgrade if the actual version is already higher. Then implement / verify: zone polygon validation, shoelace area estimate in mm2, `areaM2`, `areaPing`, `areaSource`, `areaStatus`, `areaConfidence`, `reviewerRequired`, `reviewerReasons`, structured `boundaryIssues`, Zone Inspector area display, recalculate / clear area controls, canvas area labels, invalid / needs-review styling, and Plancraft+ draft JSON export with area metadata.
-  - Required validation checks: polygon has at least 3 points, polygon closed, no repeated consecutive points, area > 0, `boundaryEdgeIds` exist, edge ids map to `nodeGraph.edges`, boundary open / missing edge / possible ordering issues are reported, and MVP segment-intersection self-intersection detection exists or is clearly documented as limited.
-  - Area policy: `area` stays mm2; `areaM2 = area / 1000000`; `areaPing = areaM2 / 3.305785`; invalid polygons use `areaStatus: not_calculated`; boundary warnings use `areaStatus: needs_review`; this round must never emit `production_final`.
-  - Reviewer rule: `reviewerRequired` defaults true for candidate area data unless there is a later explicit accept flow. `Need Reviewer` remains No for this Builder round because Commander explicitly skipped Reviewer, but the output must be marked reviewable.
+  - Mission: Make `Plancraft+ Zone Area / Boundary Refinement` the next formal work order, not silent standby.
+  - Why this agent: This workstream owns the LaiBE floor-plan importer and zone boundary candidate path while budget adapter and formal estimate guards remain intact.
+  - Supersedes: Any older Plancraft standby note in this blackboard. Current decision is ISSUE_READY, not direct implementation permission.
+  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request the matching GitHub Issue. Keep the full implementation checklist in the Issue / task preview, not in this blackboard.
   - Allowed files: `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`.
   - Stop and report if: budget adapter/runtime/types must change; `laibeoffer/plancraft` or Plancraft core must change; a new package/framework/install is needed; formal estimate / Excel / PDF / DB / API / AI API / payment / escrow / listing fee is requested; `formalEstimateGuard` or `generateBudgetEstimate` guard would be weakened.
-  - Completion report must be pasted to this blackboard: changed files, new files, whether Plancraft changed, whether budget runtime changed, guard status, `project.version`, area model, validation list, area formulas, status/confidence rules, UI/export behavior, `node --check plan-puzzle.js` result, docs updates, known risks, and next recommendation.
+  - Completion report must be pasted to this blackboard using the short format.
   - Need Commander: No.
   - Need Reviewer: No.
 
@@ -994,7 +992,7 @@ These dispatches convert the Commander task preview backlog into active work. Ev
   - Branch / Repo: plancraft/zone-area-boundary-refinement / laibeoffer/laibe-mvp
   - Mission: Plancraft+ Zone Area / Boundary Refinement.
   - Why this agent: This work belongs to the LaiBE floor-plan importer / Plancraft+ zone geometry layer, not Visual Simulation, Quote Factory, MethodSpec, or Output.
-  - Action: READY. Proceed with zone polygon validation, shoelace area estimate, `areaM2`, `areaPing`, `areaSource`, `areaStatus`, `areaConfidence`, `reviewerRequired`, `reviewerReasons`, boundary quality issues, export JSON area metadata, and docs sync.
+  - Action: ISSUE_READY. Publish `UPCOMING_PHASE_DECLARED` and use the GitHub Issue workflow before implementation. Keep implementation details in the Issue / task preview, not in this blackboard.
   - Allowed files: `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`.
   - Guard: Do not modify `laibeoffer/plancraft`; do not modify budget adapter runtime or budget types; do not create a production adapter; do not unblock formal estimate; do not produce Excel / PDF, DB / API, AI API, payment, escrow, or listing fee work. If budget adapter or budget type changes seem required, stop and report.
   - Need Commander: No.
@@ -1087,6 +1085,38 @@ These dispatches convert the Commander task preview backlog into active work. Ev
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-24 - PR #14 Codex review fix: issue-gated no-idle rules
+
+Published by:
+Deputy Codex
+
+Status:
+PR #14 received Codex review comments on the earlier commit: P1 issue-gated execution ambiguity and P2 implementation detail inside blackboard dispatches. Blackboard rules were corrected.
+
+Changed:
+- Reinstated GitHub Issue / Commander formal dispatch as the gate for file-changing implementation.
+- Kept no-idle behavior, but changed it to `UPCOMING_PHASE_DECLARED` + Issue draft / claim rather than direct implementation from task preview alone.
+- Shortened active dispatches so the blackboard remains an operational routing board, not an implementation spec.
+- Converted Plan Puzzle's detailed implementation checklist into an `ISSUE_READY` dispatch that points to the task preview / Issue for details.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- PR #14 update pending publication.
+
+Blocked:
+- PR #14 should not merge until Codex re-review confirms the P1/P2 comments are addressed.
+
+Next:
+- Push the blackboard fix to PR #14 and request Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-24 - active task dispatches from preview backlog
 
