@@ -539,11 +539,11 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha: `6eb6e95cbd1c7dee0f87617381dbfa637a28123b`.
+- `main` latest sha checked before this patrol publication: `33bf191deb7b392ed0fa56e0497a4629abd09fb5`.
 - Open PR:
-  - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; no Codex review comments found.
-  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; no Codex review comments found.
-  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; no Codex review comments found.
+  - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
+  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
+  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
@@ -1272,6 +1272,36 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - deputy patrol direct callouts and PR conflict comments
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol checked latest GitHub state, reviewer inbox, active Issues, open PRs, and PR review threads. Reviewer inbox has no pending findings. PR #22, #23, and #24 remain open and conflict-gated against latest `main`; no Codex review comments or review threads were found before Deputy patrol comments were added.
+
+Findings:
+- Plan Puzzle Issue #15: still no PR URL, workstream claim, or real blocker after prior Deputy guidance.
+- Raw Candidate Issue #17: still no PR URL, workstream claim, or real blocker after prior Deputy guidance.
+- Quote Factory Issue #1: still no PR URL, workstream claim, or real blocker after prior Deputy guidance.
+- Output Documents PR #23 branch contains a blackboard-only `TASK_REQUESTED` asking for next formal dispatch, but PR #23 itself remains conflict-gated and unreviewed.
+
+Action Published:
+- Added direct `TABLE_COMPLIANCE_FAIL / NO_IDLE_FAILURE` callout comments to Issue #15, Issue #17, and Quote Factory Issue #1.
+- Added conflict-resolution patrol comments to PR #22, PR #23, and PR #24.
+- Denied next Output Documents formal dispatch until PR #23 is merged, explicitly closed, or re-scoped. Output Documents must first resolve PR #23 conflicts while preserving Deputy / reviewer patrol entries.
+
+Decision:
+- PR #22, #23, and #24 are not mergeable yet.
+- Plan Puzzle, Raw Candidate, and Quote Factory must provide PR URL, active Issue claim, or exact blocker with attempted resolution on next patrol.
+- These are technical workflow / workstream execution blockers, not Commander blockers.
+
+Need Commander:
+No
+
+Need Reviewer:
+No, unless future conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
 
 ### 2026-05-25 - reviewer inbox findings processed by Deputy
 

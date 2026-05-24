@@ -1,5 +1,28 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: Direct Workstream Callouts / PR Conflict Comments
+
+- 本輪任務名稱：Deputy Patrol Direct Workstream Callouts / PR Conflict Comments。
+- 任務類型：Governance / Patrol / Workstream Supervision；本輪只更新黑板、handoff，並在 GitHub Issue / PR 留下副指揮官巡檢留言，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `33bf191deb7b392ed0fa56e0497a4629abd09fb5`。
+- Reviewer inbox had no pending findings.
+- Open PRs remain:
+  - PR #22 `Add MethodSpec validator freeze note` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict comment added.
+  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict comment added.
+  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict comment added.
+- No Codex review comments or review threads were found before Deputy patrol comments were added.
+- Direct no-idle / table-compliance callouts were added to:
+  - Issue #15 Plan Puzzle
+  - Issue #17 Raw Candidate
+  - Quote Factory Issue #1
+- Output Documents PR #23 branch contained a local blackboard `TASK_REQUESTED` asking for the next formal dispatch. Deputy decision: no next Output Documents formal dispatch until PR #23 is merged, explicitly closed, or re-scoped.
+- Need Commander: No.
+- Need Reviewer: No unless future conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
 ## Latest Patrol Task: Reviewer Inbox Findings Processed
 
 - 本輪任務名稱：Reviewer Inbox Findings Processed by Deputy。
