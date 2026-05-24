@@ -343,6 +343,32 @@ If the workstream still cannot find the missing progress, it must not simply ans
 
 Deputy Codex must treat failure to backfill missed progress as `TABLE_COMPLIANCE_FAIL` and, after two patrols, as non-response.
 
+### No Idle / Task Request Rule
+
+No chatroom may end a heartbeat or patrol with only `not implementing`, `no task`, `nothing to do`, `cannot find work`, `no formal Issue`, `standby`, or `blocked by missing formal Issue`.
+
+Required behavior:
+- If an active Issue / dispatch exists, claim it, follow the Issue table, and report branch / PR / blocker progress.
+- If the workstream missed the Issue / dispatch, apply `Missed Progress Backfill Rule` first.
+- If no formal Issue truly exists but the task preview backlog contains an in-scope next task, the workstream must publish `TASK_REQUESTED` with a formal Issue draft instead of stopping.
+- If no preview task exists, publish `TASK_PREVIEW_MISSING` with the exact Commander input needed.
+- If the task is blocked only by missing GitHub Issue / branch / PR mechanics, escalate to Deputy Codex, not Commander.
+
+Required no-idle report fields:
+- `TASK_REQUESTED` or `TASK_PREVIEW_MISSING`
+- one concrete proposed task title
+- target workstream
+- allowed files / repo
+- forbidden scope
+- smallest first action
+- why Deputy or Commander is needed
+
+Need Commander:
+- `No` for missing GitHub Issue, branch, PR, commit, staging, local stale state, or other technical workflow gaps.
+- `Yes` only for product direction, visual direction, business logic, formal payment / escrow / listing fee, real AI API / upload / API key, formal price, formal Excel/PDF, destructive git, or high-risk final decisions.
+
+Deputy Codex must treat an idle answer without `TASK_REQUESTED`, `TASK_PREVIEW_MISSING`, active Issue claim, PR URL, or real blocker as `TABLE_COMPLIANCE_FAIL`.
+
 Current required upcoming-phase declarations:
 - `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then claim or request the matching formal Issue before implementation.
 - `warehouse/method-spec`: declare `MethodSpec validator freeze note`, target `docs/budget/32-method-spec-validator-freeze-note.md`.
@@ -1196,6 +1222,36 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - no idle task request rule added
+
+Published by:
+Deputy Codex
+
+Status:
+Commander clarified that chatrooms must not answer that they are not implementing, cannot find work, or are blocked by missing formal Issue and then stop. If a chatroom truly cannot proceed, it must report that and proactively request a concrete task / formal Issue / Deputy action.
+
+Changed:
+- Added `No Idle / Task Request Rule`.
+- Banned ending a patrol with only `not implementing`, `no task`, `nothing to do`, `cannot find work`, `no formal Issue`, `standby`, or `blocked by missing formal Issue`.
+- Required `TASK_REQUESTED` with a formal Issue draft when a preview-backlog task exists but no formal Issue truly exists.
+- Required `TASK_PREVIEW_MISSING` only when the Commander input is genuinely missing.
+- Clarified that missing GitHub Issue / branch / PR mechanics are Deputy-level technical workflow gaps, not Need Commander.
+- Reaffirmed that idle answers without task request, active Issue claim, PR URL, or real blocker are `TABLE_COMPLIANCE_FAIL`.
+- Updated active heartbeat automations for Deputy Patrol, Plan Puzzle, MethodSpec Warehouse, Raw Candidate Warehouse, Output Documents, Visual Simulation, Quote Factory, and LAIBE_REVIEWER to enforce no-idle / task-request behavior.
+- Added no-idle correction comments to active Issues #15-#19 and Quote Factory Issue #1.
+
+Quote Factory Correction:
+- Quote Factory Issue #1 already exists and is open. Reporting `Open Issue: 0` / `BLOCKED_BY_MISSING_FORMAL_ISSUE` for QF5.3 is stale state and must be corrected by backfill.
+
+Next:
+- Every workstream must either progress, request a concrete task, or provide a real blocker. Deputy Codex must reject idle / no-task / no-formal-Issue answers that do not include `TASK_REQUESTED`, `TASK_PREVIEW_MISSING`, active Issue claim, PR URL, or real blocker.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - missed progress backfill rule added
 
