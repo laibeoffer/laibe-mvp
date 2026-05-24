@@ -440,6 +440,76 @@ Current required upcoming-phase declarations:
 - 副指揮官懷疑 Builder 越界
 - 使用者要求審查
 
+### Reviewer Patrol Support Rule
+
+LAIBE_REVIEWER may wake hourly during the current correction / stabilization period as a read-only secretary / patrol support role for Deputy Codex.
+
+This does not convert the reviewer into a Builder, Deputy, dispatcher, merger, product owner, or implementation agent.
+
+Reviewer patrol support may inspect:
+- active Issues / PRs / Codex review results
+- member chatroom reports and blackboard entries
+- active dispatch table fields
+- allowed files / forbidden scope / validation checks
+- missed progress / stale local state / duplicate Issue routing
+- no-idle violations and table-compliance failures
+- high-risk triggers: formal price, formal output, payment, real AI API / upload / API key, destructive git, cross-workstream changes
+
+Reviewer patrol support may report:
+- `NO_REVIEW_TRIGGER`
+- `REVIEW_TRIGGER_FOUND`
+- `PATROL_RISK_FOUND`
+- `TABLE_COMPLIANCE_FAIL`
+- `MISSED_PROGRESS_BACKFILL_REQUIRED`
+
+Reviewer patrol support file:
+- Dedicated inbox: `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+- If reviewer finds a decision-worthy risk, scope issue, missed progress, or table-compliance failure, it may append a short entry to this inbox with `Status: PENDING_DEPUTY_DECISION`.
+- The reviewer must not update `docs/WORKSTREAM_BLACKBOARD.md` directly. Deputy Codex reads the inbox, makes the routing decision, and publishes official blackboard decisions.
+- If reviewer finds no issue, it may report `NO_REVIEW_TRIGGER` without editing the inbox.
+
+Reviewer patrol support must not:
+- modify files outside `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+- open / close Issues or PRs
+- dispatch Builder tasks
+- merge / reject PRs
+- implement fixes
+- make product, visual, or business decisions
+- read or expose secrets
+
+If reviewer patrol support finds a problem, it reports concise evidence and a recommended Deputy action. Deputy Codex decides routing and blackboard publication.
+
+### Codex Rules Support Patrol Rule
+
+Codex 指令優化 / `governance/codex-rules` may support Deputy Codex as a 20-minute governance / prompt-drift patrol assistant.
+
+This helper does not become a Builder, Deputy, reviewer, merger, product owner, or implementation agent.
+
+Codex rules support patrol may inspect:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+- `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md`
+- active heartbeat prompts / automation wording when visible in chat
+- active Issues / PRs only to check whether blackboard rules, dispatch format, and workstream routing are being followed
+
+Codex rules support patrol may report:
+- `PROMPT_DRIFT_FOUND`
+- `BLACKBOARD_RULE_GAP_FOUND`
+- `DISPATCH_FORMAT_GAP_FOUND`
+- `HEARTBEAT_WORDING_GAP_FOUND`
+- `NO_GOVERNANCE_ACTION_NEEDED`
+
+Codex rules support patrol must not:
+- implement Builder tasks
+- edit source code
+- modify payment / escrow / listing fee, formal price, formal Excel/PDF, real AI API, upload, secrets, or runtime code
+- merge / reject PRs
+- open / close Issues unless Deputy explicitly asks
+- replace Deputy Codex decisions
+
+If it finds a governance issue, it should report a concise proposed blackboard / prompt correction and mark whether Deputy Codex must decide before publication.
+
 ## Deputy Technical Judgment Rules
 
 使用者只負責需求、產品方向、視覺審美、商業邏輯與最終裁決。
@@ -500,9 +570,18 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha: `ce584e822f1d6a9fc65c21b0753f6c85896e202f`.
-- Open PR: None.
-- Open Issue: None.
+- `main` latest sha checked before this governance support publication: `224fd7387281b67f78ca76dc25f2566b3c19cb16`.
+- Open PR:
+  - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
+  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
+  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
+- Open Issue:
+  - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
+  - #16 `[MethodSpec] Add validator freeze note`
+  - #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`
+  - #18 `[Output Documents] Add renderer snapshot-only review packet / static guard next step`
+  - #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet`
+  - External: `laibeoffer/laibe-quote-factory` #1 `[Quote Factory] Verify/publish QF5.3 audit override and prepare QF5.4 dry-run contract`
 - 以下 PR 已 merged：
   - PR #1 site/page-formalization
   - PR #2 governance/codex-rules
@@ -516,6 +595,7 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
   - PR #10 Sync workstream registry with blackboard, merge commit `57c81695977c4c18f87b02590469af4b89880ea8`
   - PR #12 Add workstream issue template, merge commit `157c75520b31b37c81b67b7f7082c7e03e968fec`
   - PR #13 Define issue blackboard patrol workflow, merge commit `ce584e822f1d6a9fc65c21b0753f6c85896e202f`
+  - PR #14 Publish blackboard patrol and no-idle rules
 
 ## Workstream Status
 
@@ -576,7 +656,7 @@ Scope:
 - `templates/`
 
 Current:
-PR #2 merged. PR #7 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and initial handoff source for new chats.
+PR #2 merged. PR #7 merged. PR #14 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and initial handoff source for new chats. Commander authorized this chatroom to support Deputy Codex as a 20-minute governance / prompt-drift patrol assistant.
 
 Forbidden:
 website pages, budget implementation, payment / escrow / listing fee, real AI API.
@@ -588,7 +668,7 @@ Blocked:
 None.
 
 Next:
-Only update when workflow rules or blackboard reporting discipline changes.
+Every 20 minutes when configured active, read the blackboard and governance docs, then report whether there is prompt drift, dispatch-format drift, heartbeat wording drift, stale workstream routing, or missing blackboard rule coverage. Propose concise governance corrections for Deputy Codex. Do not implement Builder tasks.
 
 Need Commander:
 Only for system-rule changes.
@@ -806,21 +886,22 @@ Branch:
 `none-review-only`
 
 Role:
-Read-only reviewer / audit role.
+Read-only reviewer / audit role. Also serves as 3-hour read-only patrol support for Deputy Codex.
 
 Scope:
 - PR diff
 - Codex reports
 - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
 - `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` append-only patrol findings
 - `AGENTS.md`
 - `AI_RULES/*`
 
 Current:
-No GitHub branch required. Rules are in `main`. Reviewer remains sampling-based / risk-triggered, not scheduled for every task.
+No GitHub branch required. Rules are in `main`. Reviewer remains `none-review-only`, but may wake hourly during the current correction / stabilization period to audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
 
 Forbidden:
-implementation, file edits, refactors, feature work, product design, dispatch decisions.
+implementation, source-code edits, refactors, feature work, product design, dispatch decisions, PR merge / reject, Issue open / close, Builder task ownership, or direct blackboard decisions. The only allowed file write is append-only reviewer patrol findings in `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
 
 Last PR / Commit:
 N/A.
@@ -829,7 +910,7 @@ Blocked:
 None.
 
 Next:
-Only respond when @reviewer is requested.
+Every hour while the heartbeat is configured active, report either `NO_REVIEW_TRIGGER` or append concise evidence for `REVIEW_TRIGGER_FOUND` / `PATROL_RISK_FOUND` / `TABLE_COMPLIANCE_FAIL` / `MISSED_PROGRESS_BACKFILL_REQUIRED` to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`. Do not act directly.
 
 Need Commander:
 Only if review escalates to product decision.
@@ -1044,11 +1125,11 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 - [ ] To: Codex 指令優化 / Governance Rules
   - Workstream: governance/codex-rules
-  - Branch / Repo: codex/blackboard-no-idle-patrol-rules / laibeoffer/laibe-mvp
-  - Mission: PR #14 publication of no-idle blackboard rules and active dispatches is complete.
-  - Why this agent: Owns blackboard, heartbeat, Issue workflow, and workstream registry governance.
-  - Action: PR #14 received clean Codex review and was merged to `main`. Continue future governance work only through a new scoped Issue / dispatch.
-  - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md`; governance docs only if review requires.
+  - Branch / Repo: none for normal patrol / laibeoffer/laibe-mvp
+  - Mission: Support Deputy Codex with 20-minute governance / prompt-drift patrol.
+  - Why this agent: Owns blackboard rules, heartbeat wording, Issue workflow, workstream registry, and dispatch-format hygiene without taking over Deputy decisions.
+  - Action: On each 20-minute patrol, read the blackboard and governance docs. Report `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, or `NO_GOVERNANCE_ACTION_NEEDED`. Propose concise corrections for Deputy Codex to approve / publish. Do not implement Builder tasks or merge / reject PRs.
+  - Allowed files: none for normal patrol; `docs/WORKSTREAM_BLACKBOARD.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CHATROOM_GITHUB_WORKSTREAMS.md`, and `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md` only if Deputy explicitly asks for a governance patch.
   - Need Commander: No.
   - Need Reviewer: No.
 
@@ -1077,9 +1158,9 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 - [ ] To: 審查官聊天室 / LAIBE_REVIEWER
   - Workstream: none-review-only
   - Branch / Repo: none / laibeoffer/laibe-mvp
-  - Mission: No proactive build task; monitor review triggers only.
-  - Why this agent: Reviewer is read-only and must not replace Builder or Deputy.
-  - Action: If any workstream marks `Need Reviewer: Yes`, perform read-only review. Otherwise report `NO_REVIEW_TRIGGER`.
+  - Mission: Every hour while configured active, help Deputy Codex with read-only secretary / patrol support: audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+  - Why this agent: Reviewer can catch risk and compliance gaps without taking over Builder or Deputy authority.
+  - Action: Report `NO_REVIEW_TRIGGER` when no issue exists. If a decision-worthy finding exists, append it to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`, concise evidence, and recommended Deputy action. Do not dispatch, merge, edit code, or implement.
   - Need Commander: No.
   - Need Reviewer: N/A.
 
@@ -1222,6 +1303,206 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - Codex rules support patrol assigned
+
+Published by:
+Deputy Codex
+
+Status:
+Commander offered Codex 指令優化 / `governance/codex-rules` as a helper that can check the blackboard every 20 minutes. Deputy Codex accepts this as governance / prompt-drift support, not Builder work and not Deputy replacement.
+
+Changed:
+- Added `Codex Rules Support Patrol Rule`.
+- Updated `governance/codex-rules` status and dispatch to allow 20-minute governance / prompt-drift patrol.
+- Defined allowed report codes: `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, and `NO_GOVERNANCE_ACTION_NEEDED`.
+- Clarified that this helper may propose concise blackboard / prompt corrections but must not implement Builder tasks, merge / reject PRs, open / close Issues without Deputy request, or replace Deputy decisions.
+
+Decision:
+- Codex 指令優化 may help Deputy Codex audit rule drift, stale heartbeat wording, missing dispatch fields, and blackboard governance gaps every 20 minutes.
+- Deputy Codex remains final routing and blackboard publication authority.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - deputy patrol direct callouts and PR conflict comments
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol checked latest GitHub state, reviewer inbox, active Issues, open PRs, and PR review threads. Reviewer inbox has no pending findings. PR #22, #23, and #24 remain open and conflict-gated against latest `main`; no Codex review comments or review threads were found before Deputy patrol comments were added.
+
+Findings:
+- Plan Puzzle Issue #15: still no PR URL, workstream claim, or real blocker after prior Deputy guidance.
+- Raw Candidate Issue #17: still no PR URL, workstream claim, or real blocker after prior Deputy guidance.
+- Quote Factory Issue #1: still no PR URL, workstream claim, or real blocker after prior Deputy guidance.
+- Output Documents PR #23 branch contains a blackboard-only `TASK_REQUESTED` asking for next formal dispatch, but PR #23 itself remains conflict-gated and unreviewed.
+
+Action Published:
+- Added direct `TABLE_COMPLIANCE_FAIL / NO_IDLE_FAILURE` callout comments to Issue #15, Issue #17, and Quote Factory Issue #1.
+- Added conflict-resolution patrol comments to PR #22, PR #23, and PR #24.
+- Denied next Output Documents formal dispatch until PR #23 is merged, explicitly closed, or re-scoped. Output Documents must first resolve PR #23 conflicts while preserving Deputy / reviewer patrol entries.
+
+Decision:
+- PR #22, #23, and #24 are not mergeable yet.
+- Plan Puzzle, Raw Candidate, and Quote Factory must provide PR URL, active Issue claim, or exact blocker with attempted resolution on next patrol.
+- These are technical workflow / workstream execution blockers, not Commander blockers.
+
+Need Commander:
+No
+
+Need Reviewer:
+No, unless future conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25 - reviewer inbox findings processed by Deputy
+
+Published by:
+Deputy Codex
+
+Status:
+LAIBE_REVIEWER was given the secretary / inbox role and produced three local inbox findings. Deputy Codex processed them and recorded decisions in `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
+
+Findings processed:
+- Cross-workstream stale blackboard state: resolved by existing Deputy commit `3f07253`; latest `main` now lists PR #22, #23, #24, Issues #15-#19, and Quote Factory Issue #1.
+- PR review / mergeability gate for PR #22, #23, #24: confirmed; decision remains do not merge until owner workstreams update against latest `main`, preserve Deputy / reviewer patrol entries, and report conflict-resolution / review status.
+- Plan Puzzle duplicate Issue #20 reference: latest `origin/main` does not assign Plan Puzzle to #20; #20 is only recorded as duplicate closed in favor of canonical Issue #15. Treat the reviewer observation as stale local state.
+
+Decision:
+- No Commander action required.
+- No LAIBE_REVIEWER escalation required.
+- Reviewer may continue hourly secretary patrol if configured, but any local stale-state finding must cite latest `origin/main` before Deputy action.
+- Canonical active Plan Puzzle task remains Issue #15.
+- Active reviewer cadence is now hourly, matching the Commander-provided reviewer heartbeat screenshot.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - deputy patrol rechecked PRs and synced reviewer cadence wording
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol rechecked GitHub state after reviewer patrol inbox creation. The reviewer inbox has no pending findings. PR #22, #23, and #24 remain open, in expected workstream scope, and blocked by merge conflicts against latest `main`; no PR comments or review threads were found.
+
+Changed:
+- Synced active `Current Global State` to latest `main` sha `6eb6e95cbd1c7dee0f87617381dbfa637a28123b`.
+- Recorded open PRs #22, #23, #24 and active Issues #15-#19 plus Quote Factory Issue #1 in the current global state.
+- Corrected the active `Reviewer Patrol Support Rule` wording from the old 3-hour cadence to the current 2-hour correction / stabilization cadence.
+
+Decision:
+- Do not merge PR #22, #23, or #24 yet.
+- The blocker remains technical branch / conflict resolution, not Commander input.
+- Owner workstreams must update against latest `main`, preserve Deputy / reviewer patrol blackboard entries, and report PR review / conflict-resolution status back to the blackboard.
+- LAIBE_REVIEWER should keep using `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` only for decision-worthy findings with `Status: PENDING_DEPUTY_DECISION`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No, unless conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25 - reviewer patrol inbox created
+
+Published by:
+Deputy Codex
+
+Status:
+Commander clarified that reviewer patrol support should have a dedicated file-based handoff lane and wait for Deputy Codex裁決 before blackboard publication.
+
+Changed:
+- Added `docs/deputy_reviewer_patrol/README.md`.
+- Added `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
+- Updated reviewer patrol support rules: reviewer may append decision-worthy findings only to the inbox with `Status: PENDING_DEPUTY_DECISION`.
+- Reviewer must not update the blackboard directly. Deputy Codex reads the inbox, decides, and publishes official blackboard decisions.
+- Updated reviewer patrol cadence from 3 hours to 2 hours during the current correction / stabilization period.
+
+Decision:
+- Reviewer patrol findings now have a fixed file destination.
+- Deputy Codex remains the sole routing and blackboard publication authority.
+
+Need Commander:
+No
+
+Need Reviewer:
+N/A
+
+### 2026-05-25 - patrol found open PRs #22-#24 conflict-gated
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found three new open PRs from active workstreams. Each PR maps to an active Issue and appears inside the expected workstream scope, but none has Codex review comments yet and all three are currently not mergeable against latest `main` because `docs/NEXT_CODEX_HANDOFF.md` and/or `docs/WORKSTREAM_BLACKBOARD.md` changed on `main`.
+
+Main SHA:
+`ec13d76c269950a9d0a1a5f942a04dad609d7f1d`
+
+Open PRs:
+- PR #22 `Add MethodSpec validator freeze note`
+  - Issue: #16
+  - Workstream: `warehouse/method-spec`
+  - Files: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - Table compliance: `TABLE_COMPLIANCE_PARTIAL`
+  - Scope: expected documentation scope
+  - Blocker: merge conflict with latest `docs/NEXT_CODEX_HANDOFF.md`; no Codex review comments found
+- PR #23 `Add renderer snapshot-only review packet`
+  - Issue: #18
+  - Workstream: `output/budget-documents`
+  - Files: `src/lib/budget/renderers/*`, `docs/budget/27-renderer-snapshot-only-review-packet.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/WORKSTREAM_BLACKBOARD.md`
+  - Table compliance: `TABLE_COMPLIANCE_PARTIAL`
+  - Scope: expected renderer / snapshot-only scope, with blackboard publication
+  - Blocker: merge conflict with latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; no Codex review comments found
+- PR #24 `Add visual prompt sandbox governance packet`
+  - Issue: #19
+  - Workstream: `visual/simulation-governance`
+  - Files: `docs/ai_style_visual_chat/*`, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - Table compliance: `TABLE_COMPLIANCE_PARTIAL`
+  - Scope: expected visual governance / prompt sandbox scope
+  - Blocker: merge conflict with latest `docs/NEXT_CODEX_HANDOFF.md`; no Codex review comments found
+
+Decision:
+- Do not merge PR #22, #23, or #24 yet.
+- These are technical workflow blockers, not Commander blockers.
+- Each owner workstream must update its branch against latest `main`, preserve Deputy patrol / reviewer patrol blackboard entries, resolve only its own documentation merge conflict, then request / wait for Codex review.
+- Need Reviewer remains No unless conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - reviewer patrol support enabled
+
+Published by:
+Deputy Codex
+
+Status:
+Commander authorized LAIBE_REVIEWER to wake every 3 hours and help Deputy Codex with read-only patrol support.
+
+Changed:
+- Added `Reviewer Patrol Support Rule`.
+- Clarified that LAIBE_REVIEWER remains `none-review-only` and cannot build, dispatch, merge, close Issues, or make product decisions.
+- Assigned reviewer patrol support to audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+- Updated LAIBE_REVIEWER dispatch language from passive trigger monitoring to 3-hour read-only patrol support.
+
+Decision:
+- Deputy Codex remains the sole active Deputy and final routing authority.
+- Reviewer patrol support can reduce missed patrol gaps by reporting concise evidence and recommended Deputy action.
+
+Need Commander:
+No
+
+Need Reviewer:
+N/A
 
 ### 2026-05-25 - duplicate workstream Issues closed
 

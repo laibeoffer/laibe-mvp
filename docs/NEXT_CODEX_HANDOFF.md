@@ -26,6 +26,114 @@
 - 固定 disclaimer 必須保留：`本圖僅為風格示意，用於案件上架與溝通參考，不代表最終設計、施工圖、實際尺寸、工法、材料品牌或正式報價內容。`
 - 下一步若繼續 visual simulation，仍只能處理 visual brief / prompt / negative prompt / governance。任何真 API、reference image upload、production storage、正式圖片用途或 server runtime 都需要新的 formal Issue 並視情況標示 Need Commander: Yes。
 
+## Latest Governance Task: Codex Rules Support Patrol Assigned
+
+- 本輪任務名稱：Codex Rules Support Patrol Assigned。
+- 任務類型：Governance / Patrol Support / Prompt Drift Audit；本輪只更新黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- Commander offered Codex 指令優化 / `governance/codex-rules` as a helper that can check the blackboard every 20 minutes.
+- Deputy Codex accepted this helper only as governance / prompt-drift support, not Builder work, not Reviewer work, and not Deputy replacement.
+- New helper responsibilities:
+  - read blackboard and governance docs,
+  - detect prompt drift, heartbeat wording drift, dispatch-format gaps, stale workstream routing, and missing blackboard rule coverage,
+  - report `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, or `NO_GOVERNANCE_ACTION_NEEDED`,
+  - propose concise corrections for Deputy Codex to decide / publish.
+- Forbidden for this helper: source-code edits, Builder task implementation, PR merge/reject, Issue open/close without Deputy request, product/visual/business decisions, secrets, payment, formal price, formal Excel/PDF, real AI API, upload, destructive git.
+- Deputy Codex remains final routing and blackboard publication authority.
+
+## Latest Patrol Task: Direct Workstream Callouts / PR Conflict Comments
+
+- 本輪任務名稱：Deputy Patrol Direct Workstream Callouts / PR Conflict Comments。
+- 任務類型：Governance / Patrol / Workstream Supervision；本輪只更新黑板、handoff，並在 GitHub Issue / PR 留下副指揮官巡檢留言，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `33bf191deb7b392ed0fa56e0497a4629abd09fb5`。
+- Reviewer inbox had no pending findings.
+- Open PRs remain:
+  - PR #22 `Add MethodSpec validator freeze note` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict comment added.
+  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict comment added.
+  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict comment added.
+- No Codex review comments or review threads were found before Deputy patrol comments were added.
+- Direct no-idle / table-compliance callouts were added to:
+  - Issue #15 Plan Puzzle
+  - Issue #17 Raw Candidate
+  - Quote Factory Issue #1
+- Output Documents PR #23 branch contained a local blackboard `TASK_REQUESTED` asking for the next formal dispatch. Deputy decision: no next Output Documents formal dispatch until PR #23 is merged, explicitly closed, or re-scoped.
+- Need Commander: No.
+- Need Reviewer: No unless future conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
+## Latest Patrol Task: Reviewer Inbox Findings Processed
+
+- 本輪任務名稱：Reviewer Inbox Findings Processed by Deputy。
+- 任務類型：Governance / Patrol / Reviewer Secretary Intake；本輪只處理審查官 inbox 發現，不修改功能程式碼。
+- 修改檔案：
+  - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 審查官本輪回報三筆 findings：
+  1. Current Global State 顯示 Open PR / Open Issue 為 None 的 stale blackboard 問題。
+  2. PR #22/#23/#24 無 PR comments / review threads 且不 mergeable 的 PR review gate 問題。
+  3. Plan Puzzle 疑似引用 duplicate Issue #20 的 table compliance 問題。
+- 副指揮官裁決：
+  - Finding 1 已由 commit `3f07253` 修正；最新 `main` 已列出 PR #22/#23/#24、Issues #15-#19、Quote Factory Issue #1。
+  - Finding 2 確認仍成立；PR #22/#23/#24 不 merge，等各 owner workstream 更新 latest `main`、保留 Deputy / reviewer patrol entries、解 conflict、回報 review / conflict-resolution status。
+  - Finding 3 在最新 `origin/main` 未重現；Issue #20 只作為 duplicate closed 記錄，Plan Puzzle canonical task 仍是 Issue #15。此 finding 視為 stale local state。
+- Reviewer inbox 現在保留 processed decision 記錄；目前沒有需要 Commander 裁決的 pending reviewer finding。
+- Commander has configured the reviewer secretary heartbeat to run hourly; blackboard current sections now reflect hourly reviewer secretary / patrol support.
+- Next Deputy action: 續巡 PR #22-#24；若審查官下次再上報，先核對它是否讀到最新 `origin/main`，再決定是否發布黑板。
+
+## Latest Patrol Task: PR Conflict Recheck / Reviewer Cadence Wording Sync
+
+- 本輪任務名稱：Deputy Patrol PR Conflict Recheck / Reviewer Cadence Wording Sync。
+- 任務類型：Governance / Patrol / Documentation；本輪只更新黑板狀態與審查官巡檢規則文字，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state rechecked: `main` latest sha is `6eb6e95cbd1c7dee0f87617381dbfa637a28123b`.
+- Open PRs remain #22, #23, #24. Each stays inside its expected workstream scope, has no PR comments / review threads, and is still conflict-gated against latest `main`.
+- Active Issues remain #15-#19 in `laibeoffer/laibe-mvp` and #1 in `laibeoffer/laibe-quote-factory`.
+- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` has no pending reviewer findings at this handoff point.
+- Corrected `Reviewer Patrol Support Rule` wording in the blackboard; it now reflects the latest hourly reviewer secretary / patrol cadence configured by Commander.
+- Next Deputy action: keep watching PR #22-#24 for conflict-resolution updates, Codex review comments, or scope changes; publish any new decision to the blackboard before reporting to Commander.
+
+## Latest Governance Task: Reviewer Patrol Support
+
+- 本輪任務名稱：Reviewer Patrol Support for Deputy Codex。
+- 任務類型：Governance / Automation / Documentation；本輪只更新黑板與審查官 heartbeat，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無；此段已由下方 `Reviewer Patrol Inbox` 段落補充固定交付檔案。
+- Commander initially authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex; current correction / stabilization cadence is now hourly.
+- LAIBE_REVIEWER remains `none-review-only`; it may audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+- LAIBE_REVIEWER must not implement, edit files, open / close Issues, merge / reject PRs, dispatch Builder tasks, make product decisions, or read / expose secrets.
+- Expected reviewer patrol results: `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, `PATROL_RISK_FOUND`, `TABLE_COMPLIANCE_FAIL`, or `MISSED_PROGRESS_BACKFILL_REQUIRED`.
+- Deputy Codex remains the sole active Deputy and final routing / blackboard publication authority.
+- Automation updated: `laibe-reviewer-heartbeat` was first set to 3-hour read-only patrol support; current 2-hour inbox-based prompt is recorded below.
+
+## Latest Governance Task: Reviewer Patrol Inbox
+
+- 本輪任務名稱：Reviewer Patrol Inbox for Deputy Decision。
+- 任務類型：Governance / Automation / Documentation；本輪只新增審查官巡檢交付資料夾與黑板規則，不修改功能程式碼。
+- 新增檔案：
+  - `docs/deputy_reviewer_patrol/README.md`
+  - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Reviewer patrol findings now have a dedicated file handoff lane.
+- LAIBE_REVIEWER may append decision-worthy findings only to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`.
+- LAIBE_REVIEWER must not update `docs/WORKSTREAM_BLACKBOARD.md` directly, must not edit source code, and must not open / close Issues, merge PRs, dispatch Builder tasks, or make product decisions.
+- Deputy Codex reads the inbox, decides whether action is needed, and publishes official decisions to `docs/WORKSTREAM_BLACKBOARD.md`.
+- Reviewer heartbeat cadence is now hourly during the correction / stabilization period.
+
 ## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
 
 - 本輪任務名稱：Issue / Blackboard / Heartbeat Patrol Workflow。
