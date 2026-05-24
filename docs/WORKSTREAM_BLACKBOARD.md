@@ -1086,6 +1086,32 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Raw Candidate stale issue-state correction
+
+Published by:
+Deputy Codex
+
+Status:
+Raw Candidate Warehouse reported `formal GitHub Issue missing` / issue draft only, but formal Issue #17 already exists. This means the workstream read stale local blackboard / stale GitHub state.
+
+Changed:
+- Added Deputy correction comment to Raw Candidate Issue #17.
+- Clarified that Issue #17 is the active dispatch for `warehouse/raw-candidate` R1.5.
+- Raw Candidate must stop reporting `Open Issue: None`, `沒有正式 GitHub Issue`, or `formal issue draft only` for this workstream.
+- If a chatroom local `docs/WORKSTREAM_BLACKBOARD.md` disagrees with GitHub `origin/main`, it must treat local state as stale and read GitHub `origin/main` plus the active Issue.
+
+Formal Issue:
+- Raw Candidate Warehouse: `https://github.com/laibeoffer/laibe-mvp/issues/17`
+
+Next:
+- Raw Candidate Warehouse should claim Issue #17, create/use branch `warehouse/raw-source-quality-scoring`, implement only candidate-only R1.5 scope, open PR `Add raw source quality scoring reviewer checklist`, and report PR URL plus candidate-only / forbidden-pricing-field checks back to the blackboard.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Deputy guidance comments added to formal Issues
 
 Published by:
