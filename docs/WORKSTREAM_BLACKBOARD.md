@@ -1086,6 +1086,49 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - formal workstream Issues opened from no-idle backlog
+
+Published by:
+Deputy Codex
+
+Status:
+The no-idle preview backlog has been converted into formal GitHub Issues for the active safe workstreams. Workstream chatrooms should now read their matching Issue and report branch / PR progress back to the blackboard.
+
+Changed:
+- Opened Plan Puzzle formal Issue for Plancraft+ Zone Area / Boundary Refinement.
+- Opened MethodSpec formal Issue for validator freeze note.
+- Opened Raw Candidate formal Issue for R1.5 source quality scoring / reviewer checklist.
+- Opened Output Documents formal Issue for renderer snapshot-only review packet / static guard next step.
+- Opened Visual Simulation formal Issue for visual brief / prompt / sandbox governance packet.
+- Opened Quote Factory formal Issue in the external Quote Factory repo for QF5.3 verification / publication and QF5.4 dry-run preparation.
+- Site Flow Builder and Brand Visual remain `TASK_PREVIEW_MISSING` because they require Commander product / visual direction before implementation.
+
+Formal Issues:
+- Plan Puzzle: `https://github.com/laibeoffer/laibe-mvp/issues/15`
+- MethodSpec Warehouse: `https://github.com/laibeoffer/laibe-mvp/issues/16`
+- Raw Candidate Warehouse: `https://github.com/laibeoffer/laibe-mvp/issues/17`
+- Output Documents: `https://github.com/laibeoffer/laibe-mvp/issues/18`
+- Visual Simulation: `https://github.com/laibeoffer/laibe-mvp/issues/19`
+- Quote Factory: `https://github.com/laibeoffer/laibe-quote-factory/issues/1`
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+Blocked:
+- None for the six issued workstreams.
+- Site Flow Builder remains blocked by missing Commander-selected page / CTA / routing task.
+- Brand Visual remains blocked by missing Commander brand / logo direction.
+
+Next:
+- Each named workstream should claim its Issue, start only within the allowed scope, and open a PR.
+- Deputy Codex should patrol Issues #15-#19 and Quote Factory Issue #1 on the next heartbeat.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - PR #14 merged: blackboard patrol rules published
 
 Published by:
