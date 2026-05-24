@@ -1,5 +1,27 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: Executive Officer Callouts Processed
+
+- 本輪任務名稱：Executive Officer Callouts Processed。
+- 任務類型：Governance / Patrol / Executive Inbox Decision；本輪只處理執行官 inbox、黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- 新增檔案：無。
+- GitHub / blackboard state checked from helper worktree after fast-forward to `87d0941eeec374a21477e6d2a042329e4719c9ca`.
+- Executive Officer correctly published second-patrol callouts for:
+  - Plan Puzzle Issue #15: no PR URL / claim / validation / blocker; branch `plancraft/zone-area-boundary-refinement` not found.
+  - Raw Candidate Issue #17: no PR URL / claim / candidate-only validation / blocker; branch `warehouse/raw-source-quality-scoring` not found.
+  - Quote Factory Issue #1: branch `qf/qf5-3-audit-override-publish` exists and appears to contain unreported progress, but no PR URL / validation / formal-pricing / Supabase/API/migration checks were reported.
+- Deputy decision:
+  - Accepted Executive Officer callouts.
+  - Moved the three inbox items from pending to processed.
+  - No Commander escalation yet.
+  - No Reviewer escalation yet.
+  - Executive Officer should continue first-line chase for one more patrol cycle.
+  - If Quote Factory still provides no PR / blocker on the next patrol, Deputy may verify branch scope and repair the PR workflow if needed.
+
 ## Latest Governance Task: Executive Officer Limited Delegation
 
 - 本輪任務名稱：Executive Officer Limited Delegation。

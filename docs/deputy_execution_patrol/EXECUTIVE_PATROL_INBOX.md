@@ -37,10 +37,14 @@ PENDING
 
 ## Pending Executive Findings
 
+No pending executive findings yet.
+
+## Processed Executive Findings
+
 ### 2026-05-24T19:56:49Z - [EXECUTIVE_CALL_OUT] - Plan Puzzle
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -70,12 +74,12 @@ Need Reviewer:
 No
 
 Deputy Decision:
-PENDING
+Accepted. Executive Officer correctly escalated the second-patrol no-response for Issue #15. No Commander or Reviewer escalation is needed yet. Executive Officer should continue first-line chase and require a PR URL, issue claim, validation result, or exact blocker. If the next Executive Officer patrol still finds no useful response, publish another `EXECUTIVE_CALL_OUT` and keep the item visible for Deputy follow-up.
 
 ### 2026-05-24T19:56:49Z - [EXECUTIVE_CALL_OUT] - Raw Candidate
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -105,12 +109,12 @@ Need Reviewer:
 No unless formal pricing boundary appears.
 
 Deputy Decision:
-PENDING
+Accepted. Executive Officer correctly escalated the second-patrol no-response for Issue #17. No Commander or Reviewer escalation is needed yet. Executive Officer should continue first-line chase and require a PR URL, issue claim, candidate-only validation result, forbidden-pricing-field check, or exact blocker. If the next Executive Officer patrol still finds no useful response, publish another `EXECUTIVE_CALL_OUT` and keep the item visible for Deputy follow-up.
 
 ### 2026-05-24T19:56:49Z - [EXECUTIVE_CALL_OUT] - Quote Factory
 
 Status:
-PENDING_DEPUTY_DECISION
+RESOLVED_BY_DEPUTY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -140,9 +144,5 @@ Need Reviewer:
 No unless formal pricing / API / migration boundary appears.
 
 Deputy Decision:
-PENDING
-
-## Processed Executive Findings
-
-No processed executive findings yet.
+Accepted. Executive Officer correctly identified unreported Quote Factory progress: branch `qf/qf5-3-audit-override-publish` exists but no PR URL / validation report was found. No Commander or Reviewer escalation is needed yet. Executive Officer should require a PR URL, validation result, formal pricing negative check, Supabase / API / migration negative check, or exact blocker. If the next Executive Officer patrol still finds no PR or blocker, keep the item visible for Deputy follow-up; Deputy may then verify branch scope and repair the PR workflow if needed.
 
