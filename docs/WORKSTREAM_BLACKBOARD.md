@@ -125,7 +125,7 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha: `9095a98`.
+- `main` latest sha: `b1e1aa4`.
 - Open PR: None.
 - 以下 PR 已 merged：
   - PR #1 site/page-formalization
@@ -134,6 +134,7 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
   - PR #4 warehouse/method-spec
   - PR #5 output/budget-documents, merge commit `9095a98`
   - PR #6 visual/simulation-governance
+  - PR #7 Update workstream blackboard status, merge commit `b1e1aa4`
 
 ## Workstream Status
 
@@ -194,13 +195,13 @@ Scope:
 - `templates/`
 
 Current:
-PR #2 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and is being initialized as a handoff source for new chats.
+PR #2 merged. PR #7 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and initial handoff source for new chats.
 
 Forbidden:
 website pages, budget implementation, payment / escrow / listing fee, real AI API.
 
 Last PR / Commit:
-PR #2 merged. Blackboard branch `governance/workstream-blackboard` pushed; formal PR / merge still pending.
+PR #7 merged, merge commit `b1e1aa4`.
 
 Blocked:
 None.
@@ -399,7 +400,7 @@ Scope:
 - `docs/budget/plancraft-plus-production-adapter-design.md`
 
 Current:
-Branch exists / ready. Known sha: `4ff59ad`. Suggested next task is closed zone area candidate contract, but it has not been approved or started.
+Branch exists / ready. Known sha: `4ff59ad`. Suggested next task remains `plancraft/adapter-clean` for closed zone area candidate contract, but it has not been approved or started.
 
 Forbidden:
 Plancraft core, formal estimate, formal `generateBudgetEstimate()` flow, renderer / Excel / PDF, DB / API / AI / payment.
@@ -411,7 +412,7 @@ Blocked:
 Awaiting Commander approval.
 
 Next:
-Keep as READY / not approved. Prepare minimal Issue only after Commander approves.
+Keep `plancraft/adapter-clean` as proposed / not started. Prepare minimal Issue only after Commander approves.
 
 Need Commander:
 Yes.
@@ -460,8 +461,9 @@ N/A.
 
 ### READY
 
-- [ ] plancraft/adapter — closed zone area candidate contract
+- [ ] plancraft/adapter-clean — closed zone area candidate contract
   - Status: proposed by Deputy Codex, not approved yet
+  - Workstream: plancraft/adapter
   - Need Commander: yes
 
 ### NEEDS REVIEW
@@ -477,6 +479,8 @@ N/A.
 ### 2026-05-24 — deputy-codex
 
 Changed:
+- Synced blackboard after PR #7 merge: `main` latest sha `b1e1aa4`, open PR None, PR #7 merged with merge commit `b1e1aa4`.
+- Kept `plancraft/adapter-clean` as proposed / not started.
 - Filled initial handoff status for all known workstreams from chatroom self-introductions.
 - Added Role, Scope, Current, Last PR / Commit, Blocked, Next, Need Commander, and Need Reviewer fields for each workstream.
 - Added concise Forbidden boundaries so new chats can identify their own scope without relying on old chat memory.
@@ -485,10 +489,10 @@ Files:
 - `docs/WORKSTREAM_BLACKBOARD.md`
 
 PR / Commit:
-- Not staged / not committed in this round.
+- PR #7 merged; latest main `b1e1aa4`.
 
 Next:
-- Keep `plancraft/adapter` closed zone area candidate contract as READY / not approved.
+- Keep `plancraft/adapter-clean` closed zone area candidate contract as READY / not approved.
 
 ### 2026-05-24 — system
 
