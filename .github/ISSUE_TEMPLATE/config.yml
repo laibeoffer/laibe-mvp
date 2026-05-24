@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: LaiBE workstream dispatch policy
+    url: https://github.com/laibeoffer/laibe-mvp/blob/main/docs/CHATROOM_GITHUB_WORKSTREAMS.md
+    about: Use scoped workstream issues instead of unstructured tasks.
