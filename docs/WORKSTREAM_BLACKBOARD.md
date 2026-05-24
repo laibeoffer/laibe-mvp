@@ -908,19 +908,19 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 - [ ] To: Codex 指令優化 / Governance Rules
   - Workstream: governance/codex-rules
   - Branch / Repo: codex/blackboard-no-idle-patrol-rules / laibeoffer/laibe-mvp
-  - Mission: Finish PR #14 publication of no-idle blackboard rules and active dispatches.
+  - Mission: PR #14 publication of no-idle blackboard rules and active dispatches is complete.
   - Why this agent: Owns blackboard, heartbeat, Issue workflow, and workstream registry governance.
-  - Action: Track Codex review on PR #14. If Codex review PASS / no major issues and changed files remain inside `docs/WORKSTREAM_BLACKBOARD.md`, merge without asking. If NEEDS_FIX or scope expands, publish the minimal fix task.
+  - Action: PR #14 received clean Codex review and was merged to `main`. Continue future governance work only through a new scoped Issue / dispatch.
   - Allowed files: `docs/WORKSTREAM_BLACKBOARD.md`; governance docs only if review requires.
   - Need Commander: No.
-  - Need Reviewer: No unless Codex review reports P1/P2/NEEDS_FIX or scope expands.
+  - Need Reviewer: No.
 
 - [ ] To: 盤點 Git/GitHub 狀態 / Repo Status Patrol
   - Workstream: governance/repo-status
   - Branch / Repo: none / laibeoffer/laibe-mvp and laibeoffer/laibe-quote-factory
   - Mission: Keep GitHub state tied to the blackboard.
   - Why this agent: Owns read-only Git/GitHub status visibility, not implementation.
-  - Action: On each patrol, report main SHA, open PRs, open Issues, PR review state, changed files for open PRs, and whether each PR maps to a blackboard workstream decision. For PR #14, confirm it remains blackboard-only and publish merge readiness after Codex review.
+  - Action: On each patrol, report main SHA, open PRs, open Issues, PR review state, changed files for open PRs, and whether each PR maps to a blackboard workstream decision. PR #14 is merged; future PRs need their own blackboard decision.
   - Allowed files: none for normal read-only patrol; `docs/WORKSTREAM_BLACKBOARD.md` only if publishing a status change.
   - Stop if: destructive git, force-push, reset/clean/stash/rebase, secret access, or implementation changes would be required.
   - Need Commander: No unless a merge/reject decision falls outside automatic clean-scope rules.
@@ -942,7 +942,7 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Branch / Repo: none / laibeoffer/laibe-mvp
   - Mission: No proactive build task; monitor review triggers only.
   - Why this agent: Reviewer is read-only and must not replace Builder or Deputy.
-  - Action: If PR #14 Codex review or any workstream marks `Need Reviewer: Yes`, perform read-only review. Otherwise report `NO_REVIEW_TRIGGER`.
+  - Action: If any workstream marks `Need Reviewer: Yes`, perform read-only review. Otherwise report `NO_REVIEW_TRIGGER`.
   - Need Commander: No.
   - Need Reviewer: N/A.
 
@@ -1085,6 +1085,39 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - PR #14 merged: blackboard patrol rules published
+
+Published by:
+Deputy Codex
+
+Status:
+PR #14 was cleanly reviewed by Codex and merged. Blackboard no-idle / mandatory-read / issue-ready patrol rules are now on `main`.
+
+Changed:
+- Merged PR #14 after the latest Codex review reported no major issues.
+- Published Active Deputy Authority, Mandatory Read Rules By Chatroom, issue-ready no-idle patrol rules, consolidated chatroom task/defect prompt summary, and active dispatch governance to `main`.
+- Confirmed changed file scope was `docs/WORKSTREAM_BLACKBOARD.md` only.
+- Closed stale PR #14 patrol wording in active dispatches.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- PR #14 merged.
+- Merge commit: `6a709f2e9e3ec78d9c3c69318a203004f4b0e8dd`
+
+Blocked:
+- None.
+
+Next:
+- Workstream chatrooms should read `main` blackboard, publish `UPCOMING_PHASE_DECLARED`, and claim/request formal Issues before file-changing work.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - consolidated chatroom task and defect prompt
 
