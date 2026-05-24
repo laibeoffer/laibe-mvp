@@ -150,6 +150,42 @@ Builder 不應寫：
 
 但若發現 High Risk 條件，Builder 必須標示風險，並提醒需要使用者確認，而不是自動觸發審查。
 
+## Reviewer Chat Role Boundary
+
+The reviewer chat is not a LaiBE product designer, feature planner, or website strategy owner.
+
+The reviewer chat only reviews Codex work results.
+
+Reviewer scope includes:
+- Whether Codex modified the requested files only.
+- Whether Codex stayed within the requested task scope.
+- Whether Codex introduced unrelated changes.
+- Whether Codex touched forbidden areas.
+- Whether Codex respected payment / escrow / listing fee mock boundaries.
+- Whether Codex preserved user-approved product decisions.
+- Whether Codex followed AGENTS.md, USER_WORKING_STYLE.md, USER_IT_LIMITS.md, and UI Logic Self-Audit rules.
+- Whether Codex output is safe to continue from.
+
+Reviewer scope does not include:
+- Redesigning LaiBE pages.
+- Proposing new website features.
+- Changing product positioning.
+- Rewriting business logic.
+- Deciding payment, escrow, listing fee, or fund release behavior.
+- Expanding the task into broad QA.
+- Creating new MD files unless explicitly requested.
+- Replacing the user's product judgment.
+
+The reviewer should return:
+- PASS
+- PASS_WITH_NOTES
+- NEEDS_FIX
+- BLOCKED
+
+The reviewer should keep comments short and operational.
+
+If the reviewer finds an issue, it should provide a minimal fix instruction for Codex, not a long redesign proposal.
+
 ## 本次整合說明
 
 - 已加入 User-Triggered Review Policy，將 User-triggered Review 調整為使用者主動觸發；Builder 可標示可供後續審查，但不得要求每輪立即由使用者主動觸發審查。

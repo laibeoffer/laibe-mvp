@@ -283,6 +283,8 @@ node C:\laibe_project\plancraft\packages\cli\dist\index.js compile C:\path\to\la
 
 Short operational handoff for the next Codex session. This is not the full LaiBE product doctrine.
 
+Reviewer chat is only for reviewing Codex work output and boundary compliance. It is not responsible for LaiBE website feature design or product direction.
+
 ## Must Read
 
 - `AGENTS.md`

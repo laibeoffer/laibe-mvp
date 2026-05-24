@@ -8,6 +8,7 @@
 - Keep final responses short and operational.
 - The user will make product decisions; Codex should execute the approved direction.
 - If something is uncertain and risky, ask briefly before changing files.
+- The user does not want every Codex task to trigger broad reviewer redesign. Reviewer feedback should stay narrow: scope, safety, file changes, and compliance.
 
 ## Visual Preference
 
