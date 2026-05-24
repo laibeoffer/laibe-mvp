@@ -1342,6 +1342,47 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - EXECUTIVE_CALL_OUT / next patrol still no response
+
+Published by:
+Executive Officer
+
+- Workstream: Plan Puzzle / plancraft/page-ui / plancraft/adapter-clean
+- Issue / PR: laibeoffer/laibe-mvp Issue #15
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No expected branch, PR URL, Issue claim, validation result, or exact blocker found after the prior Executive callout was processed by Deputy.
+- Action Taken: Executive follow-up comment posted to Issue #15: https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529846485
+- Next Required: PR URL, active Issue claim, or exact blocker + attempted resolution; include node --check, guard check, changed files, allowed/forbidden scope, and blackboard short report.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, if the next check still has no PR URL, claim, or real blocker.
+- Need Commander: No
+- Need Reviewer: No
+
+- Workstream: Raw Candidate / warehouse/raw-candidate
+- Issue / PR: laibeoffer/laibe-mvp Issue #17
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No expected branch, PR URL, Issue claim, candidate-only validation result, or exact blocker found after the prior Executive callout was processed by Deputy.
+- Action Taken: Executive follow-up comment posted to Issue #17: https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529846548
+- Next Required: PR URL or candidate-only blocker report; confirm no formal price, no PricingRule, no BudgetEstimateLine.unit_price.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, if the next check still has no PR URL, claim, or real blocker.
+- Need Commander: No
+- Need Reviewer: No unless formal pricing boundary appears.
+
+- Workstream: Quote Factory / quote-factory/price-range-governance
+- Issue / PR: laibeoffer/laibe-quote-factory Issue #1
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED / MISSED_PROGRESS_FOUND
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: Branch qf/qf5-3-audit-override-publish exists and is ahead of main by 1 commit, but no PR URL, validation result, formal pricing check, Supabase/API/migration check, or LaiBE MVP blackboard handoff report was found.
+- Action Taken: Executive follow-up comment posted to Quote Factory Issue #1: https://github.com/laibeoffer/laibe-quote-factory/issues/1#issuecomment-4529846601
+- Next Required: Quote Factory PR URL or exact QF5.3/QF5.4 validation blocker; report validation result and formal pricing / Supabase / API / migration negative checks.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes. If the next check still has no PR URL or blocker, Deputy may need to verify branch scope and repair PR workflow.
+- Need Commander: No
+- Need Reviewer: No unless formal pricing / API / migration boundary appears.
+
 ### 2026-05-25 - Deputy processed Executive Officer callouts
 
 Published by:
