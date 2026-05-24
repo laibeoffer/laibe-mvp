@@ -1,5 +1,27 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: PR #24 Merged After Clean Codex Review
+
+- 本輪任務名稱：PR #24 Merged After Clean Codex Review。
+- 任務類型：Governance / Patrol / PR Merge Gate；本輪只依授權處理 clean-scope PR merge，並更新黑板 / handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `cf170e248a48be2df43f6cd6e6db0ef956cd5658`。
+- PR #24 `Add visual prompt sandbox governance packet`:
+  - Codex review result: no major issues.
+  - Mergeability before merge: mergeable.
+  - Changed files: Visual Simulation governance / prompt sandbox docs, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, and `docs/NEXT_CODEX_HANDOFF.md`.
+  - Forbidden scope check: no website runtime code, no `plan-puzzle.js`, no Plancraft, no budget / raw warehouse / MethodSpec / renderer, no payment / escrow / listing fee, no real image API, no API key / `.env`, no backend / proxy / upload pipeline, no production storage.
+  - Merge result: merged with merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`; Issue #19 closed by the merge.
+- Current open PRs after merge:
+  - PR #22 remains conflict-gated.
+  - PR #23 remains latest-blackboard-sync / review-gated and must re-sync against latest `main` before merge.
+- Current silent workstreams still under follow-up: Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 need PR URL, active claim, or exact blocker.
+- Need Commander: No.
+- Need Reviewer: No.
+
 ## Latest Visual Simulation Governance Task: Visual Brief Prompt Sandbox Governance Packet
 
 - 本輪任務名稱：Visual Brief Prompt Sandbox Governance Packet。

@@ -570,17 +570,15 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked during this patrol: `b4573084b5d0f3fe72619699859252272f3fcf1a`.
+- `main` latest sha checked during this patrol: `cf170e248a48be2df43f6cd6e6db0ef956cd5658`.
 - Open PR:
   - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
   - PR #23 `Add renderer snapshot-only review packet` - conflict-resolution backfill reported and Deputy `@codex review` request was added; latest blackboard publication moved `main` again, so owner must re-sync against latest `main` before merge.
-  - PR #24 `Add visual prompt sandbox governance packet` - Deputy `@codex review` request added; no Codex review submissions / review threads found yet.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
   - #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`
   - #18 `[Output Documents] Add renderer snapshot-only review packet / static guard next step`
-  - #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet`
   - External: `laibeoffer/laibe-quote-factory` #1 `[Quote Factory] Verify/publish QF5.3 audit override and prepare QF5.4 dry-run contract`
 - 以下 PR 已 merged：
   - PR #1 site/page-formalization
@@ -596,6 +594,7 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
   - PR #12 Add workstream issue template, merge commit `157c75520b31b37c81b67b7f7082c7e03e968fec`
   - PR #13 Define issue blackboard patrol workflow, merge commit `ce584e822f1d6a9fc65c21b0753f6c85896e202f`
   - PR #14 Publish blackboard patrol and no-idle rules
+  - PR #24 Add visual prompt sandbox governance packet, merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`
 
 ## Workstream Status
 
@@ -792,19 +791,19 @@ Scope:
 - `skills/laibe-visual-sim/SKILL.md`
 
 Current:
-PR #6 merged. Governance docs, templates, and skill documentation only. Does not include `plan-puzzle.js`, Quote Factory, PriceRange, raw warehouse, MethodSpec, or output renderer work. Minimal Real Server Runtime Spike result is recorded as sandbox-only governance status: route B, no backend runtime, no proxy stub, no real image API, no API key / `.env`, disabled adapter / fallback only, and no production asset pipeline.
+PR #6 merged. PR #24 merged. Governance docs, templates, skill documentation, visual brief, prompt / negative prompt, sandbox preview workflow, prompt sanitization, request schema, generated-image storage policy, and reviewer packet only. Does not include `plan-puzzle.js`, Quote Factory, PriceRange, raw warehouse, MethodSpec, output renderer, site runtime, real image API, API key / `.env`, backend / proxy / upload pipeline, production storage, or production asset pipeline.
 
 Forbidden:
 real image API, API key, real AI API, Plancraft geometry, `plan-puzzle.js`, budget, raw warehouse, MethodSpec, renderer, payment / escrow / listing fee, or presenting simulations as construction drawings, formal design drawings, real cases, quote basis, or completion guarantees.
 
 Last PR / Commit:
-PR #6 merged.
+PR #24 merged, merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`.
 
 Blocked:
 None.
 
 Next:
-Pause unless visual simulation policy changes. If continuing toward real server runtime, first decide a scoped local same-origin proxy spike and keep it disabled-by-default / no-secret / no-production. If Quote Factory, PriceRange, warehouse, renderer, or Plancraft implementation reports appear in this chatroom, mark them as wrong-workstream input and route them back to the correct workstream.
+Pause unless visual simulation policy changes or a new visual brief / prompt / sandbox governance task is issued. If continuing toward real server runtime, first decide a scoped local same-origin proxy spike and keep it disabled-by-default / no-secret / no-production. If Quote Factory, PriceRange, warehouse, renderer, or Plancraft implementation reports appear in this chatroom, mark them as wrong-workstream input and route them back to the correct workstream.
 
 Need Commander:
 Only if real image/API direction or visual/product direction is considered.
@@ -1303,6 +1302,32 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - PR #24 merged after clean Codex review
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found Codex review on PR #24: no major issues. GitHub reported PR #24 mergeable, changed files stayed inside Visual Simulation governance / prompt sandbox scope, and no review threads were open. Deputy merged PR #24 under the automatic clean-scope rule.
+
+Changed:
+- Merged PR #24 `Add visual prompt sandbox governance packet`.
+- GitHub closed Issue #19 through the PR merge.
+- Updated current global state: PR #24 and Issue #19 are no longer open.
+- Visual Simulation status now records PR #24 as merged and remains sandbox / governance only.
+
+Decision:
+- `visual/simulation-governance` is complete for Issue #19 and returns to pause / next-visual-governance-task mode.
+- Real image API, API key, backend / proxy, upload pipeline, production storage, construction drawing claims, formal design drawing claims, quote basis, and completion guarantee remain blocked.
+- PR #22 remains conflict-gated.
+- PR #23 remains latest-blackboard-sync / review-gated and must re-sync against latest `main` before merge.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - PR #23/#24 review requests and blackboard sync correction
 
