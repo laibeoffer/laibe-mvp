@@ -1,5 +1,24 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
+
+- 本輪任務名稱：Issue / Blackboard / Heartbeat Patrol Workflow。
+- 任務類型：Governance / Documentation；本輪只更新 GitHub 工作流治理文件，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：
+  - `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md`
+- 目的：把 GitHub Issue、戰情黑板與各聊天室 heartbeat 巡邏制度正式寫入 repo 文件。
+- 核心規則：GitHub Issue = 正式派工單；PR = 完工驗收單；`docs/WORKSTREAM_BLACKBOARD.md` = 戰情黑板；thread heartbeat 只能喚醒目前聊天室，不能喚醒其他聊天室。
+- Deputy Codex 派工必須包含：`To`、`Workstream`、`Branch / Repo`、`Mission`、`Why this agent`、`Action`、`Need Commander`、`Need Reviewer`。
+- 派工不可只寫 branch、不可只寫 workstream、不可丟給「大家」；跨線任務要指定主責 agent，其他工作線只列 reference。
+- `Need Commander` 預設 No，只在產品方向、視覺方向、商業邏輯、正式金流 / escrow / listing fee、真 AI API、正式價格、正式 Excel/PDF 或其他高風險決策時設 Yes。
+- `Need Reviewer` 預設 No，只在 Codex review NEEDS_FIX / P1 / P2、高風險範圍、明確審查需求、routing / CTA / header 或資料模型邊界時設 Yes。
+- 本輪沒有修改 `src/`、網站頁面、`app/`、`components/`、`assets/`、budget engine、Plancraft core、payment、escrow、listing fee、real AI API、upload backend 或 secrets。
+- PR #12 Issue template 已 merged；本輪後續由 PR #13 追蹤 patrol workflow 文件化。
+
 ## Latest Documentation Task: Plancraft+ Production Adapter Design Doc
 
 - 本輪任務名稱：Plancraft+ Production Adapter Design Doc。
