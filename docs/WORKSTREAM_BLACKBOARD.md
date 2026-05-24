@@ -1223,6 +1223,31 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - duplicate workstream Issues closed
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found two newly opened duplicate Issues that would create routing drift if left open. No open PRs were found. Canonical active Issues remain #15-#19 in `laibeoffer/laibe-mvp` and #1 in `laibeoffer/laibe-quote-factory`.
+
+Changed:
+- Closed duplicate Plan Puzzle Issue #20 as duplicate of canonical Issue #15.
+- Closed duplicate Raw Candidate Issue #21 as duplicate of canonical Issue #17.
+- Added duplicate-triage comments on #20 and #21 before closing.
+- Added routing notes to canonical Issues #15 and #17.
+
+Decision:
+- Plan Puzzle must claim and progress Issue #15 only.
+- Raw Candidate Warehouse must claim and progress Issue #17 only.
+- Duplicate Issue creation counts as a routing drift risk; workstreams must use `Missed Progress Backfill Rule` before creating a new formal Issue for an already-active task.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - no idle task request rule added
 
 Published by:
