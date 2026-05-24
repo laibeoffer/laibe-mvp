@@ -1,9 +1,4 @@
-import { generateBudgetEstimate } from "../budget-generator.ts";
-import { mockProject } from "../mock/mock-layout.ts";
-import { buildBudgetCatalogFromMethodSpec } from "../specs/build-budget-catalog-from-method-spec.ts";
-import { seedMethodSpecCatalog } from "../specs/seed-method-spec-catalog.ts";
-import { validateMethodSpecCatalog } from "../specs/validate-method-spec-catalog.ts";
-import { formatBudgetSheetOutput } from "./budget-sheet-formatter.ts";
+import { fixtureBudgetOutputSnapshot } from "../renderers/fixture-budget-output-snapshot.ts";
 import {
   exportBudgetSheetToJson,
   exportCustomerBudgetRows,
@@ -11,17 +6,19 @@ import {
 } from "./budget-output-exporter.ts";
 import { validateBudgetSheetOutput } from "./budget-output-validator.ts";
 
-const methodSpecValidation = validateMethodSpecCatalog(seedMethodSpecCatalog);
-const budgetCatalog = buildBudgetCatalogFromMethodSpec(seedMethodSpecCatalog);
-const budgetEstimate = generateBudgetEstimate(mockProject, budgetCatalog);
-const budgetSheetOutput = formatBudgetSheetOutput(
-  budgetEstimate,
-  seedMethodSpecCatalog,
-);
-const outputValidation = validateBudgetSheetOutput(
-  budgetSheetOutput,
-  seedMethodSpecCatalog,
-);
+// Output demos are snapshot-only: they consume a persisted fixture snapshot
+// and never rerun estimate generation or pricing logic.
+const budgetSheetOutput = {
+  estimate_id: fixtureBudgetOutputSnapshot.estimate_id,
+  project_id: fixtureBudgetOutputSnapshot.project_id,
+  stage: fixtureBudgetOutputSnapshot.estimate_stage,
+  generated_at: fixtureBudgetOutputSnapshot.generated_at,
+  customer_view: fixtureBudgetOutputSnapshot.customer_view,
+  internal_view: fixtureBudgetOutputSnapshot.internal_view,
+  totals: fixtureBudgetOutputSnapshot.totals,
+  warnings: fixtureBudgetOutputSnapshot.warnings,
+};
+const outputValidation = validateBudgetSheetOutput(budgetSheetOutput);
 const customerRows = exportCustomerBudgetRows(budgetSheetOutput);
 const internalTraceRows = exportInternalTraceRows(budgetSheetOutput);
 
@@ -32,8 +29,8 @@ const materialBindingReviewWarningCount = outputValidation.warnings.filter(
 ).length;
 
 const summary = {
-  output_valid: methodSpecValidation.valid && outputValidation.valid,
-  method_spec_valid: methodSpecValidation.valid,
+  output_valid: outputValidation.valid,
+  snapshot_only: true,
   output_validation: outputValidation,
   estimate_id: budgetSheetOutput.estimate_id,
   total_amount: budgetSheetOutput.totals.total_amount,

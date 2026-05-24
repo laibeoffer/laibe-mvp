@@ -1,37 +1,12 @@
-import { generateBudgetEstimate } from "../budget-generator.ts";
-import { mockProject } from "../mock/mock-layout.ts";
-import { buildBudgetCatalogFromMethodSpec } from "../specs/build-budget-catalog-from-method-spec.ts";
-import { seedMethodSpecCatalog } from "../specs/seed-method-spec-catalog.ts";
-import { validateMethodSpecCatalog } from "../specs/validate-method-spec-catalog.ts";
-import { formatBudgetSheetOutput } from "./budget-sheet-formatter.ts";
-import { createBudgetOutputSnapshot } from "./budget-output-snapshot.ts";
-import {
-  validateBudgetOutputSnapshot,
-  validateBudgetSheetOutput,
-} from "./budget-output-validator.ts";
+import { fixtureBudgetOutputSnapshot } from "../renderers/fixture-budget-output-snapshot.ts";
+import { validateBudgetOutputSnapshot } from "./budget-output-validator.ts";
 import { InMemoryBudgetOutputRepository } from "./in-memory-budget-output-repository.ts";
 import type { BudgetOutputSnapshot } from "./types.ts";
 
-const methodSpecValidation = validateMethodSpecCatalog(seedMethodSpecCatalog);
-const budgetCatalog = buildBudgetCatalogFromMethodSpec(seedMethodSpecCatalog);
-const budgetEstimate = generateBudgetEstimate(mockProject, budgetCatalog);
-const budgetSheetOutput = formatBudgetSheetOutput(
-  budgetEstimate,
-  seedMethodSpecCatalog,
-);
-const outputValidation = validateBudgetSheetOutput(
-  budgetSheetOutput,
-  seedMethodSpecCatalog,
-);
-const snapshot = createBudgetOutputSnapshot(budgetSheetOutput, {
-  catalog_version: seedMethodSpecCatalog.version,
-  output_version: "budget-output-v1",
-  validation_report: outputValidation,
-});
-const snapshotValidation = validateBudgetOutputSnapshot(
-  snapshot,
-  seedMethodSpecCatalog,
-);
+// Output snapshot demos are snapshot-only: they consume a persisted fixture
+// snapshot and never rerun estimate generation or pricing logic.
+const snapshot = fixtureBudgetOutputSnapshot;
+const snapshotValidation = validateBudgetOutputSnapshot(snapshot);
 const invalidSnapshot = { ...snapshot } as Partial<BudgetOutputSnapshot>;
 
 delete invalidSnapshot.snapshot_id;
@@ -39,7 +14,6 @@ delete invalidSnapshot.source_summary;
 
 const invalidSnapshotValidation = validateBudgetOutputSnapshot(
   invalidSnapshot,
-  seedMethodSpecCatalog,
 );
 const repository = new InMemoryBudgetOutputRepository();
 
@@ -51,8 +25,8 @@ const materialBindingReviewWarningCount = snapshotValidation.warnings.filter(
 ).length;
 
 const summary = {
-  method_spec_valid: methodSpecValidation.valid,
-  output_valid: outputValidation.valid && snapshotValidation.valid,
+  snapshot_only: true,
+  output_valid: snapshotValidation.valid,
   snapshot_id: snapshot.snapshot_id,
   estimate_stage: snapshot.estimate_stage,
   total_amount: snapshot.totals.total_amount,
