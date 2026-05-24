@@ -288,6 +288,34 @@ Forbidden passive replies:
 - `Dirty worktree, so no action.`
 - Any equivalent response without Issue claim, PR URL, blocker, or task-preview decision.
 
+### Issue Table Compliance Audit Rule
+
+Deputy Codex must continuously check whether each workstream is following the exact assignment table / Issue body instead of loosely summarizing or downgrading the task.
+
+Every patrol must compare each active workstream report against:
+- `To:`
+- `Workstream:`
+- `Branch / Repo:`
+- `Mission:`
+- `Why this agent:`
+- `Action:`
+- `Need Commander:`
+- `Need Reviewer:`
+- allowed files / repo
+- forbidden scope
+- validation checks
+- required completion report fields
+
+Table compliance status:
+- `TABLE_COMPLIANCE_PASS`: the report follows the active Issue / dispatch and reports claim, branch / PR, blocker, or completed checks.
+- `TABLE_COMPLIANCE_PARTIAL`: the report references the right Issue / workstream but misses required fields, validation, or blackboard publication.
+- `TABLE_COMPLIANCE_FAIL`: the report says no Issue / no task / standby while an active Issue exists, treats a formal Issue as only a draft, uses stale PR / Issue state, changes allowed scope, ignores forbidden scope, or fails to read mandatory files.
+
+Required Deputy action:
+- Publish table-compliance failures to this blackboard.
+- When a formal Issue exists, comment on that Issue with the correction.
+- If the same workstream fails table compliance for two patrols, apply the `Deputy Two-Patrol Non-Response Rule` and demand an assignment report before the next patrol.
+
 Current required upcoming-phase declarations:
 - `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then claim or request the matching formal Issue before implementation.
 - `warehouse/method-spec`: declare `MethodSpec validator freeze note`, target `docs/budget/32-method-spec-validator-freeze-note.md`.
@@ -1141,6 +1169,36 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - Raw Candidate heartbeat root cause and table compliance rule
+
+Published by:
+Deputy Codex
+
+Status:
+Commander reported that the Raw Candidate Warehouse chatroom still did not receive / act on Deputy guidance. Root cause found: the active `原物料採購與倉儲 GitHub 黑板 heartbeat` automation prompt was stale. It still described the workstream as read-only, told it not to open PRs, and said R1.5 should be treated as not explicitly dispatched when no formal issue was detected. It also did not name Issue #17 as the active formal dispatch and did not require issue-table compliance checks.
+
+Changed:
+- Updated the Raw Candidate heartbeat automation to name Issue #17 as the active formal task.
+- Removed the stale behavior that allowed `沒有正式 Issue`, `尚未明確 dispatch`, `本輪無新指派`, or `standby` while Issue #17 is open.
+- Required Raw Candidate to read mandatory files, verify GitHub Issue #17, treat local stale state as stale, and compare its report against Issue #17 fields.
+- Updated the Commander patrol automation to audit `TABLE_COMPLIANCE_PASS`, `TABLE_COMPLIANCE_PARTIAL`, or `TABLE_COMPLIANCE_FAIL` for every active workstream.
+- Added `Issue Table Compliance Audit Rule` to this blackboard.
+
+Root Cause:
+- Automation prompt drift, not Commander instruction failure.
+- The workstream was following an old heartbeat instruction that conflicted with the newer blackboard / Issue state.
+- The workstream was not forced to reconcile local state with GitHub `origin/main` and active Issue #17.
+
+Next:
+- Raw Candidate Warehouse must claim Issue #17, declare `UPCOMING_PHASE_DECLARED`, report table compliance, and either open the R1.5 PR or provide a real blocker with attempted resolution.
+- Deputy Codex must check every workstream report against its Issue / dispatch table on each patrol.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - first missed patrol after problem-solving duty
 
