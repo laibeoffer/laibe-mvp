@@ -440,6 +440,39 @@ Current required upcoming-phase declarations:
 - 副指揮官懷疑 Builder 越界
 - 使用者要求審查
 
+### Reviewer Patrol Support Rule
+
+LAIBE_REVIEWER may wake every 3 hours as a read-only patrol support role for Deputy Codex.
+
+This does not convert the reviewer into a Builder, Deputy, dispatcher, merger, product owner, or implementation agent.
+
+Reviewer patrol support may inspect:
+- active Issues / PRs / Codex review results
+- member chatroom reports and blackboard entries
+- active dispatch table fields
+- allowed files / forbidden scope / validation checks
+- missed progress / stale local state / duplicate Issue routing
+- no-idle violations and table-compliance failures
+- high-risk triggers: formal price, formal output, payment, real AI API / upload / API key, destructive git, cross-workstream changes
+
+Reviewer patrol support may report:
+- `NO_REVIEW_TRIGGER`
+- `REVIEW_TRIGGER_FOUND`
+- `PATROL_RISK_FOUND`
+- `TABLE_COMPLIANCE_FAIL`
+- `MISSED_PROGRESS_BACKFILL_REQUIRED`
+
+Reviewer patrol support must not:
+- modify files
+- open / close Issues or PRs
+- dispatch Builder tasks
+- merge / reject PRs
+- implement fixes
+- make product, visual, or business decisions
+- read or expose secrets
+
+If reviewer patrol support finds a problem, it reports concise evidence and a recommended Deputy action. Deputy Codex decides routing and blackboard publication.
+
 ## Deputy Technical Judgment Rules
 
 使用者只負責需求、產品方向、視覺審美、商業邏輯與最終裁決。
@@ -806,7 +839,7 @@ Branch:
 `none-review-only`
 
 Role:
-Read-only reviewer / audit role.
+Read-only reviewer / audit role. Also serves as 3-hour read-only patrol support for Deputy Codex.
 
 Scope:
 - PR diff
@@ -817,10 +850,10 @@ Scope:
 - `AI_RULES/*`
 
 Current:
-No GitHub branch required. Rules are in `main`. Reviewer remains sampling-based / risk-triggered, not scheduled for every task.
+No GitHub branch required. Rules are in `main`. Reviewer remains `none-review-only`, but may wake every 3 hours to audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
 
 Forbidden:
-implementation, file edits, refactors, feature work, product design, dispatch decisions.
+implementation, file edits, refactors, feature work, product design, dispatch decisions, PR merge / reject, Issue open / close, or Builder task ownership.
 
 Last PR / Commit:
 N/A.
@@ -829,7 +862,7 @@ Blocked:
 None.
 
 Next:
-Only respond when @reviewer is requested.
+Every 3 hours, report either `NO_REVIEW_TRIGGER` or concise evidence for `REVIEW_TRIGGER_FOUND` / `PATROL_RISK_FOUND` to Deputy Codex. Do not act directly.
 
 Need Commander:
 Only if review escalates to product decision.
@@ -1077,9 +1110,9 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 - [ ] To: 審查官聊天室 / LAIBE_REVIEWER
   - Workstream: none-review-only
   - Branch / Repo: none / laibeoffer/laibe-mvp
-  - Mission: No proactive build task; monitor review triggers only.
-  - Why this agent: Reviewer is read-only and must not replace Builder or Deputy.
-  - Action: If any workstream marks `Need Reviewer: Yes`, perform read-only review. Otherwise report `NO_REVIEW_TRIGGER`.
+  - Mission: Every 3 hours, help Deputy Codex with read-only patrol support: audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+  - Why this agent: Reviewer can catch risk and compliance gaps without taking over Builder or Deputy authority.
+  - Action: Report `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, or `PATROL_RISK_FOUND` with concise evidence and recommended Deputy action. Do not dispatch, merge, edit, or implement.
   - Need Commander: No.
   - Need Reviewer: N/A.
 
@@ -1222,6 +1255,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - reviewer patrol support enabled
+
+Published by:
+Deputy Codex
+
+Status:
+Commander authorized LAIBE_REVIEWER to wake every 3 hours and help Deputy Codex with read-only patrol support.
+
+Changed:
+- Added `Reviewer Patrol Support Rule`.
+- Clarified that LAIBE_REVIEWER remains `none-review-only` and cannot build, dispatch, merge, close Issues, or make product decisions.
+- Assigned reviewer patrol support to audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+- Updated LAIBE_REVIEWER dispatch language from passive trigger monitoring to 3-hour read-only patrol support.
+
+Decision:
+- Deputy Codex remains the sole active Deputy and final routing authority.
+- Reviewer patrol support can reduce missed patrol gaps by reporting concise evidence and recommended Deputy action.
+
+Need Commander:
+No
+
+Need Reviewer:
+N/A
 
 ### 2026-05-25 - duplicate workstream Issues closed
 

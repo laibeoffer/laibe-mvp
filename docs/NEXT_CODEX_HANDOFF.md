@@ -1,5 +1,20 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Governance Task: Reviewer Patrol Support
+
+- 本輪任務名稱：Reviewer Patrol Support for Deputy Codex。
+- 任務類型：Governance / Automation / Documentation；本輪只更新黑板與審查官 heartbeat，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- Commander authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex.
+- LAIBE_REVIEWER remains `none-review-only`; it may audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+- LAIBE_REVIEWER must not implement, edit files, open / close Issues, merge / reject PRs, dispatch Builder tasks, make product decisions, or read / expose secrets.
+- Expected reviewer patrol results: `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, `PATROL_RISK_FOUND`, `TABLE_COMPLIANCE_FAIL`, or `MISSED_PROGRESS_BACKFILL_REQUIRED`.
+- Deputy Codex remains the sole active Deputy and final routing / blackboard publication authority.
+- Automation updated: `laibe-reviewer-heartbeat` remains active on a 3-hour cadence with the revised patrol-support prompt.
+
 ## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
 
 - 本輪任務名稱：Issue / Blackboard / Heartbeat Patrol Workflow。
