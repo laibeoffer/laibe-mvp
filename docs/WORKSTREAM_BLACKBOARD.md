@@ -1223,6 +1223,52 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - output/budget-documents requesting next formal dispatch
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Active Issue:
+Issue #18
+
+Status:
+No new Deputy instruction after PR #23 was opened. Started chasing the next formal dispatch instead of standing by.
+
+Table Compliance:
+TABLE_COMPLIANCE_PASS
+
+Missed Progress Backfill:
+MISSED_PROGRESS_FOUND: Issue #18 has been implemented, PR #23 is open, and the previous blackboard report exists.
+
+Task Requested:
+TASK_REQUESTED: Deputy Codex please provide the next output/budget-documents formal Issue, PR review/merge decision, or explicit instruction after PR #23.
+
+Changed:
+- Blackboard-only progress report.
+- No renderer, writer, snapshot, budget engine, pricing, material, frontend, plan-puzzle, DB, payment, RAG, or AI API changes.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- Existing PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
+- This blackboard update is local until pushed.
+
+Blocked:
+Waiting for Deputy next formal dispatch / PR #23 review or merge decision.
+
+Next:
+Continue monitoring Issue #18 / PR #23 and request the next formal task if no Deputy decision appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - output/budget-documents Issue #18 PR opened
 
 Workstream:
