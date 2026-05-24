@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LaiBE | 甲方 AI 書記官</title>
+  <title>LaiBE | AI 引導官</title>
   <link rel="icon" href="../../../assets/logo/laibe_offer.svg" />
   <link rel="apple-touch-icon" href="../../../assets/logo/laibe_offer.svg" />
   <style>
@@ -14,10 +14,10 @@
       --surface: rgba(255, 255, 255, 0.075);
       --surface-strong: rgba(255, 255, 255, 0.12);
       --text-main: #f4f7f8;
-      --text-secondary: #b8c0c7;
-      --text-muted: #7c858d;
-      --line-soft: rgba(255, 255, 255, 0.12);
-      --line-medium: rgba(255, 255, 255, 0.22);
+      --text-secondary: #c9d1d7;
+      --text-muted: #8d979f;
+      --line-soft: rgba(255, 255, 255, 0.14);
+      --line-medium: rgba(255, 255, 255, 0.24);
       --metal-silver: #dce6ec;
       --metal-steel: #9aa7b3;
       --metal-champagne: #cbb88a;
@@ -41,9 +41,12 @@
       font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
       color: var(--text-main);
       background:
-        radial-gradient(circle at 18% 16%, rgba(121, 216, 255, 0.12), transparent 28%),
-        radial-gradient(circle at 84% 28%, rgba(98, 230, 200, 0.08), transparent 32%),
-        linear-gradient(145deg, #050607 0%, #0b0d10 42%, #12161a 100%);
+        radial-gradient(circle at 16% 8%, rgba(121, 216, 255, 0.16), transparent 22rem),
+        radial-gradient(circle at 82% 14%, rgba(98, 230, 200, 0.10), transparent 20rem),
+        radial-gradient(circle at 52% 84%, rgba(203, 184, 138, 0.08), transparent 24rem),
+        repeating-linear-gradient(118deg, rgba(255, 255, 255, 0.032) 0 1px, transparent 1px 13px),
+        repeating-linear-gradient(5deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 9px),
+        linear-gradient(180deg, var(--bg-black), var(--bg-charcoal) 42%, var(--bg-cement));
       overflow-x: hidden;
     }
 
@@ -52,20 +55,28 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
+      z-index: -1;
       background:
-        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 10px),
-        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 34px);
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 4px),
+        repeating-linear-gradient(145deg, rgba(220, 230, 236, 0.035) 0 1px, transparent 1px 18px);
       mix-blend-mode: screen;
-      opacity: 0.48;
-      z-index: 0;
+      opacity: 0.62;
     }
 
-    a { color: inherit; text-decoration: none; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
 
     .site-header {
       position: sticky;
       top: 0;
-      z-index: 40;
+      z-index: 50;
       height: 76px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.095);
       background:
@@ -75,19 +86,17 @@
       box-shadow: 0 10px 34px rgba(0, 0, 0, 0.18);
     }
 
-    .header-inner {
-      width: 100%;
-      height: 76px;
+    .nav {
+      height: 100%;
       margin: 0;
       padding: 0 24px;
       display: flex;
       align-items: center;
-      justify-content: flex-start;
       gap: 42px;
     }
 
     .brand {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       min-height: 42px;
       opacity: 0.94;
@@ -101,33 +110,41 @@
     }
 
     .brand-logo {
+      display: block;
       width: 105px;
       height: auto;
-      display: block;
+      max-height: 60px;
+      object-fit: contain;
     }
 
-    .nav {
+    .nav-links {
       display: flex;
       align-items: center;
       gap: 22px;
       color: var(--text-secondary);
       font-size: 14px;
       font-weight: 800;
-      letter-spacing: 0.02em;
     }
 
-    .nav a {
+    .nav-link,
+    .tools-button {
       position: relative;
       padding: 8px 0;
-      transition: color 160ms ease, text-shadow 160ms ease;
+      color: var(--text-secondary);
+      background: none;
+      border: 0;
+      cursor: pointer;
+      font-weight: 800;
     }
 
-    .nav a:hover {
+    .nav-link:hover,
+    .tools-button:hover {
       color: var(--accent-cyan);
       text-shadow: 0 0 18px rgba(121, 216, 255, 0.28);
     }
 
-    .nav a::after {
+    .nav-link::after,
+    .tools-button::after {
       content: "";
       position: absolute;
       left: 0;
@@ -140,21 +157,63 @@
       transition: transform 200ms ease;
     }
 
-    .nav a:hover::after {
+    .nav-link:hover::after,
+    .tools-button:hover::after {
       transform: scaleX(1);
     }
 
-    .login-link {
+    .tools-wrap {
+      position: relative;
+    }
+
+    .tools-menu {
+      position: absolute;
+      top: calc(100% + 16px);
+      left: 0;
+      width: 230px;
+      padding: 10px;
       border: 1px solid var(--line-medium);
-      border-radius: 999px;
+      border-radius: 18px;
+      background: rgba(8, 10, 12, 0.96);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.48);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .tools-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .tools-menu a,
+    .tools-menu span {
+      display: block;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .tools-menu a:hover {
+      background: rgba(121, 216, 255, 0.12);
+    }
+
+    .tools-menu span {
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .login-link {
       padding: 8px 13px !important;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
       color: var(--text-main);
       background: rgba(255, 255, 255, 0.045);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    }
-
-    .login-link::after {
-      display: none;
     }
 
     main {
@@ -162,45 +221,45 @@
       z-index: 1;
     }
 
-    .owner-start {
-      min-height: calc(100vh - 76px);
+    .hero {
       width: min(100% - 48px, var(--section-max));
+      min-height: calc(100vh - 76px);
       margin: 0 auto;
-      padding: 92px 0 120px;
+      padding: 88px 0 76px;
       display: grid;
-      grid-template-columns: minmax(360px, 0.72fr) minmax(560px, 1.28fr);
+      grid-template-columns: minmax(360px, 0.9fr) minmax(480px, 1.1fr);
       gap: 64px;
       align-items: center;
     }
 
     .kicker {
+      margin: 0 0 20px;
       color: var(--accent-cyan);
       font-size: 12px;
       font-weight: 900;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      margin: 0 0 22px;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(42px, 5vw, 72px);
-      line-height: 1.02;
-      letter-spacing: -0.04em;
       max-width: 720px;
+      font-size: clamp(42px, 5vw, 74px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
     }
 
     .lead {
       margin: 30px 0 0;
-      max-width: 680px;
+      max-width: 690px;
       color: var(--text-secondary);
       font-size: clamp(17px, 1.5vw, 21px);
-      line-height: 1.8;
+      line-height: 1.82;
       font-weight: 650;
     }
 
-    .cta-row {
-      margin-top: 40px;
+    .hero-cta {
+      margin-top: 36px;
       display: flex;
       flex-wrap: wrap;
       gap: 14px;
@@ -212,9 +271,11 @@
       justify-content: center;
       min-height: 52px;
       padding: 0 22px;
+      border: 1px solid transparent;
       border-radius: 999px;
-      font-weight: 900;
       font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
       transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
     }
 
@@ -226,7 +287,7 @@
 
     .btn-secondary {
       color: var(--text-main);
-      border: 1px solid var(--line-medium);
+      border-color: var(--line-medium);
       background: rgba(255, 255, 255, 0.06);
     }
 
@@ -235,12 +296,21 @@
       box-shadow: 0 24px 52px rgba(255, 255, 255, 0.12);
     }
 
+    .btn:focus-visible,
+    .circle-btn:focus-visible,
+    .start-card:focus-visible,
+    .tools-button:focus-visible,
+    .nav-link:focus-visible {
+      outline: 2px solid rgba(121, 216, 255, 0.78);
+      outline-offset: 4px;
+    }
+
     .guide-panel {
       position: relative;
+      min-height: 560px;
       border: 1px solid var(--line-medium);
       border-radius: 34px;
       padding: 30px;
-      min-height: 520px;
       background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045)),
         repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 12px);
@@ -253,8 +323,20 @@
       position: absolute;
       inset: -40% -30%;
       background: radial-gradient(circle, rgba(121, 216, 255, 0.18), transparent 34%);
-      opacity: 0.55;
+      opacity: 0.58;
       transform: translate(24%, -18%);
+      pointer-events: none;
+    }
+
+    .guide-panel::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 34px;
+      right: 34px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(220, 230, 236, 0.72), rgba(121, 216, 255, 0.72), transparent);
+      opacity: 0.72;
       pointer-events: none;
     }
 
@@ -263,8 +345,8 @@
       z-index: 1;
     }
 
-    .prompt-label {
-      margin-bottom: 10px;
+    .panel-label {
+      margin-bottom: 14px;
       color: var(--accent-cyan);
       font-size: 12px;
       font-weight: 900;
@@ -283,8 +365,8 @@
       gap: 12px;
       align-items: center;
       padding: 10px 12px;
-      border-radius: 999px;
       border: 1px solid rgba(220, 230, 236, 0.24);
+      border-radius: 999px;
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035)),
         #090b0e;
@@ -300,7 +382,7 @@
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
       cursor: pointer;
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 800;
       transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
     }
 
@@ -310,6 +392,12 @@
       box-shadow: 0 0 22px rgba(121, 216, 255, 0.18);
     }
 
+    .send-btn {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent-orange-2), var(--accent-orange));
+      box-shadow: 0 12px 28px rgba(255, 104, 26, 0.22);
+    }
+
     .ai-input input {
       width: 100%;
       min-width: 0;
@@ -317,23 +405,12 @@
       outline: 0;
       color: var(--text-main);
       background: transparent;
-      font: inherit;
       font-size: 15px;
       font-weight: 800;
     }
 
     .ai-input input::placeholder {
       color: rgba(244, 247, 248, 0.72);
-    }
-
-    .typing-caret {
-      display: inline-block;
-      width: 1px;
-      height: 1.25em;
-      margin-left: 2px;
-      background: var(--accent-cyan);
-      vertical-align: -0.18em;
-      animation: caretBlink 900ms steps(2, start) infinite;
     }
 
     .upload-menu {
@@ -388,39 +465,14 @@
       line-height: 1.7;
     }
 
-    .guide-response.visible {
-      animation: fadeUp 220ms ease both;
-    }
-
-    .guide-response strong {
-      color: var(--text-main);
-    }
-
-    .guide-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .guide-options button {
-      border: 1px solid var(--line-medium);
-      border-radius: 999px;
-      padding: 9px 12px;
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.055);
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .terminal-head {
+    .response-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
       padding: 14px 18px;
       border-bottom: 1px solid rgba(121, 216, 255, 0.14);
-      color: rgba(244, 247, 248, 0.62);
+      color: rgba(244, 247, 248, 0.66);
       font-family: "SFMono-Regular", Consolas, monospace;
       font-size: 12px;
       font-weight: 800;
@@ -429,94 +481,83 @@
       background: rgba(0, 0, 0, 0.22);
     }
 
-    .terminal-lines {
-      padding: 12px 18px 16px;
-      font-family: "SFMono-Regular", Consolas, monospace;
+    .response-body {
+      padding: 18px;
+      color: var(--text-secondary);
+      font-size: 15px;
+      font-weight: 700;
     }
 
-    .terminal-line {
-      display: grid;
-      grid-template-columns: 132px 1fr;
-      gap: 18px;
-      padding: 13px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.075);
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .terminal-line:last-child {
-      border-bottom: 0;
-    }
-
-    .terminal-key {
-      color: var(--accent-mint);
-      letter-spacing: 0.06em;
-    }
-
-    .terminal-value {
+    .response-body strong {
       color: var(--text-main);
     }
 
-    .next-entry {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 16px;
+    .mock-note {
+      margin: 14px 0 0;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
-    .next-card {
-      min-height: 112px;
+    .start-options {
+      margin-top: 22px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .start-card {
+      min-height: 126px;
       border: 1px solid var(--line-soft);
-      border-radius: 20px;
-      padding: 16px;
+      border-radius: 18px;
+      padding: 15px;
       color: var(--text-main);
       background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035)),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035)),
         rgba(255, 255, 255, 0.035);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      text-align: left;
       transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
     }
 
-    .next-card:hover {
+    .start-card:hover {
       transform: translateY(-2px);
       border-color: rgba(121, 216, 255, 0.42);
       box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28), 0 0 24px rgba(121, 216, 255, 0.08);
     }
 
-    .next-card.primary {
-      border-color: rgba(255, 154, 47, 0.48);
-      background:
-        linear-gradient(135deg, rgba(255, 154, 47, 0.28), rgba(255, 104, 26, 0.18)),
-        rgba(255, 104, 26, 0.08);
-      box-shadow: 0 18px 42px rgba(255, 104, 26, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-    }
-
-    .next-card strong {
+    .start-card strong {
       display: block;
-      color: var(--text-main);
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 950;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
-    .next-card span {
+    .start-card span {
       display: block;
       margin-top: 8px;
       color: var(--text-secondary);
       font-size: 13px;
-      line-height: 1.55;
-      font-weight: 720;
+      line-height: 1.5;
+      font-weight: 700;
     }
 
-    @keyframes caretBlink {
-      0%, 44% { opacity: 1; }
-      45%, 100% { opacity: 0; }
+    .route-note {
+      display: block;
+      margin-top: 12px;
+      color: var(--accent-cyan);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .start-options {
+    .flow-preview {
       width: min(100% - 48px, var(--section-max));
       margin: 0 auto;
-      padding: 36px 0 118px;
+      padding: 12px 0 120px;
     }
 
     .section-head {
@@ -529,129 +570,17 @@
 
     .section-head h2 {
       margin: 0;
-      font-size: clamp(32px, 4vw, 54px);
-      line-height: 1.05;
-      letter-spacing: -0.035em;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
     }
 
     .section-head p {
-      max-width: 420px;
+      max-width: 430px;
       margin: 0;
       color: var(--text-secondary);
       line-height: 1.7;
       font-weight: 650;
-    }
-
-    .option-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .option-card {
-      min-height: 330px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      border: 1px solid var(--line-soft);
-      border-radius: 30px;
-      padding: 26px;
-      background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.035)),
-        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 10px);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-      transition: transform 170ms ease, border-color 170ms ease, box-shadow 170ms ease;
-    }
-
-    .option-card:hover {
-      transform: translateY(-6px);
-      border-color: rgba(121, 216, 255, 0.45);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34), 0 0 28px rgba(121, 216, 255, 0.08);
-    }
-
-    .option-card h3 {
-      margin: 22px 0 10px;
-      font-size: 28px;
-      letter-spacing: -0.025em;
-    }
-
-    .option-card p {
-      margin: 0;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      font-weight: 650;
-    }
-
-    .mini-plan,
-    .mini-quote,
-    .mini-chat {
-      min-height: 132px;
-      border: 1px solid var(--line-soft);
-      border-radius: 22px;
-      padding: 16px;
-      background: rgba(0, 0, 0, 0.22);
-    }
-
-    .mini-plan {
-      display: grid;
-      grid-template-columns: 1.35fr 0.75fr;
-      grid-template-rows: 1fr 0.82fr;
-      gap: 8px;
-    }
-
-    .room {
-      border: 1px solid rgba(121, 216, 255, 0.48);
-      border-radius: 12px;
-      padding: 10px;
-      color: rgba(244, 247, 248, 0.82);
-      font-size: 12px;
-      font-weight: 900;
-      background: rgba(121, 216, 255, 0.06);
-    }
-
-    .room:nth-child(3) {
-      grid-column: span 2;
-      border-color: rgba(98, 230, 200, 0.5);
-      background: rgba(98, 230, 200, 0.06);
-    }
-
-    .quote-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      color: var(--text-secondary);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .quote-row span:last-child {
-      color: var(--metal-champagne);
-    }
-
-    .bubble {
-      max-width: 88%;
-      margin: 8px 0;
-      padding: 10px 12px;
-      border-radius: 16px;
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.105);
-      font-size: 13px;
-      font-weight: 800;
-      line-height: 1.45;
-    }
-
-    .bubble.ai {
-      margin-left: auto;
-      background: rgba(98, 230, 200, 0.16);
-    }
-
-    .flow-preview {
-      width: min(100% - 48px, var(--section-max));
-      margin: 0 auto;
-      padding: 0 0 128px;
     }
 
     .flow-line {
@@ -668,9 +597,9 @@
       min-height: 118px;
       border-radius: 20px;
       padding: 16px;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
       color: var(--text-secondary);
+      font-size: 15px;
       font-weight: 850;
     }
 
@@ -682,153 +611,217 @@
       letter-spacing: 0.12em;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     @media (max-width: 980px) {
-      .nav { display: none; }
-      .owner-start {
+      .nav-links {
+        gap: 16px;
+        font-size: 13px;
+      }
+
+      .hero {
         grid-template-columns: 1fr;
         padding-top: 56px;
+        min-height: auto;
         gap: 42px;
       }
-      .option-grid,
+
       .flow-line,
-      .next-entry {
+      .start-options {
         grid-template-columns: 1fr;
       }
+
       .section-head {
         display: block;
       }
+
       .section-head p {
         margin-top: 16px;
       }
     }
 
-    @media (max-width: 620px) {
-      .header-inner,
-      .owner-start,
-      .start-options,
+    @media (max-width: 720px) {
+      .site-header,
+      .nav {
+        height: auto;
+        min-height: 76px;
+      }
+
+      .nav {
+        width: min(100% - 28px, var(--section-max));
+        margin: 0 auto;
+        padding: 12px 0;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px 14px;
+      }
+
+      .hero,
       .flow-preview {
         width: min(100% - 28px, var(--section-max));
       }
-      .brand-logo { width: 88px; }
-      .guide-panel { padding: 18px; border-radius: 26px; }
-      .ai-input {
-        min-height: 62px;
-        grid-template-columns: 42px 1fr 42px;
+
+      .brand-logo {
+        width: 88px;
       }
+
+      .guide-panel {
+        padding: 18px;
+        border-radius: 26px;
+      }
+
+      .ai-input {
+        min-height: auto;
+        grid-template-columns: 42px 1fr 42px;
+        gap: 8px;
+        border-radius: 26px;
+      }
+
       .circle-btn {
         width: 42px;
         height: 42px;
+      }
+
+      .ai-input input {
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .flow-step {
+        min-height: 92px;
       }
     }
   </style>
 </head>
 <body>
   <header class="site-header">
-    <div class="header-inner">
+    <nav class="nav" aria-label="全站導覽">
       <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="返回 LaiBE 首頁">
-        <img class="brand-logo" src="../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+        <img class="brand-logo" src="../../../assets/logo/laibe_offer.svg" alt="LaiBE Offer" />
       </a>
-      <nav class="nav" aria-label="主要導覽">
-        <a href="../laibe_landing_desktop/code.html#tools">工具</a>
-        <a href="#guideInput">流程</a>
-        <a href="../laibe_landing_desktop/code.html#about">關於萊比</a>
-        <a href="../laibe_landing_desktop/code.html#flow">PCM 後台</a>
-        <a class="login-link" href="#top">我有帳號</a>
-      </nav>
-    </div>
+      <div class="nav-links">
+        <div class="tools-wrap">
+          <button class="tools-button" id="toolsToggle" type="button" aria-expanded="false" aria-controls="toolsMenu">工具</button>
+          <div class="tools-menu" id="toolsMenu">
+            <a href="../preview_floor_plan/code.html">平面拼圖</a>
+            <a href="../preview_budget/code.html">預算生成</a>
+            <span>LiDAR 下載</span>
+            <span>iScanner 下載</span>
+          </div>
+        </div>
+        <a class="nav-link" href="../laibe_landing_desktop/code.html#flow">流程</a>
+        <a class="nav-link" href="../laibe_landing_desktop/code.html#about">About LaiBE</a>
+        <a class="nav-link" href="../laibe_landing_desktop/code.html#pcm">PCM backend</a>
+        <a class="login-link" href="#guideInput">甲方入口</a>
+      </div>
+    </nav>
   </header>
 
   <main>
-    <section class="owner-start" id="top">
+    <section class="hero" id="top">
       <div>
-        <p class="kicker">Requirement Prompt</p>
-        <h1>需求越清楚，<br />平面圖與預算越精準。</h1>
+        <p class="kicker">AI Guidance Officer</p>
+        <h1>先把需求說清楚，<br />再開始找設計師或統包。</h1>
         <p class="lead">
-          就像 prompt 一樣，輸入越完整，後面的平面拼圖、預算生成與詢價條件就越不容易失準。你只要把現況、想法、限制與檔案交給 AI 書記官，它會先幫你記成可討論的需求筆記。
+          不用先懂工法、材料或估價方式。你可以先上傳平面圖、報價單，或直接描述你的需求，AI 引導官會一步一步幫你整理成可討論、可詢價的條件。
         </p>
+        <div class="hero-cta" aria-label="頁面主要操作">
+          <button class="btn btn-primary" id="startGuideCta" type="button">開始 AI 引導</button>
+          <a class="btn btn-secondary" href="../preview_budget/code.html">先看報價健檢</a>
+        </div>
       </div>
 
-      <section class="guide-panel" aria-label="AI 書記官輸入框">
-        <div class="prompt-label">AI 書記官</div>
+      <section class="guide-panel" aria-label="AI 引導官輸入區">
+        <div class="panel-label">不知道怎麼開始？先讓 AI 引導官幫你整理需求。</div>
         <div class="input-wrap" id="guideInput">
           <div class="ai-input">
             <button class="circle-btn" id="uploadToggle" type="button" aria-label="開啟上傳選單">+</button>
-            <input id="guideText" type="text" autocomplete="off" placeholder="" />
-            <button class="circle-btn" id="submitGuide" type="button" aria-label="送出需求">→</button>
+            <input id="guideText" type="text" autocomplete="off" placeholder="上傳平面圖或報價單，或直接輸入你的需求" />
+            <button class="circle-btn send-btn" id="submitGuide" type="button" aria-label="送出需求">›</button>
           </div>
-          <div class="upload-menu" id="uploadMenu">
+          <div class="upload-menu" id="uploadMenu" aria-label="上傳 mock 選單">
             <button type="button" data-upload="plan">上傳平面圖</button>
             <button type="button" data-upload="quote">上傳報價單</button>
           </div>
-          <input id="planInput" hidden type="file" accept="image/*,.pdf,.dwg,.dxf" />
-          <input id="quoteInput" hidden type="file" accept="image/*,.pdf,.xlsx,.csv" />
         </div>
-        <div class="guide-response visible" id="guideResponse">
-          <div class="terminal-head">
-            <span>LAIBE_SCRIBE.EXE</span>
-            <span>SESSION_01</span>
+
+        <div class="guide-response" id="guideResponse" aria-live="polite">
+          <div class="response-head">
+            <span>LAIBE_GUIDE</span>
+            <span>MOCK_ONLY</span>
           </div>
-          <div class="terminal-lines">
-            <div class="terminal-line">
-              <span class="terminal-key">&gt; AREA</span>
-              <span class="terminal-value">房屋現況約 25 坪。</span>
-            </div>
-            <div class="terminal-line">
-              <span class="terminal-key">&gt; LAYOUT</span>
-              <span class="terminal-value">房屋現況格局：3 房 2 廳。</span>
-            </div>
-            <div class="terminal-line">
-              <span class="terminal-key">&gt; SCOPE</span>
-              <span class="terminal-value">主要裝修範圍：廚房與客廳。</span>
-            </div>
-            <div class="terminal-line">
-              <span class="terminal-key">&gt; OVERVIEW</span>
-              <span class="terminal-value">開放式廚房；須拆除現有封閉廚房牆面，重新配置客餐廳與廚房動線。</span>
-            </div>
-            <div class="terminal-line">
-              <span class="terminal-key">&gt; NEXT</span>
-              <span class="terminal-value">此需求成果可接續平面拼圖與預算生成，作為後續詢價條件基礎。</span>
-            </div>
+          <div class="response-body" id="responseBody">
+            <strong>我會先把資訊整理成需求邊界。</strong><br />
+            可以從平面圖、報價單，或幾個基本問題開始。這裡只做前端 mock，不會上傳檔案，也不會呼叫真 AI。
+            <p class="mock-note">No backend / no real upload / no real AI API</p>
           </div>
         </div>
-        <div class="next-entry" aria-label="問答完成後的下一步">
-          <a class="next-card primary" href="../preview_floor_plan/code.html">
-            <strong>問答完成，進入平面拼圖</strong>
-            <span>先把空間邊界拼出來，讓後續預算有依據。</span>
+
+        <div class="start-options" aria-label="三個開始方式">
+          <a class="start-card" href="../preview_floor_plan/code.html" data-start="plan">
+            <strong>我有平面圖</strong>
+            <span>上傳後先建立空間邊界。</span>
+            <em class="route-note">前往平面拼圖</em>
           </a>
-          <a class="next-card" href="../preview_budget/code.html">
-            <strong>已有平面圖，直接進入預算生成</strong>
-            <span>已有基本圖面或格局條件時，可先產生預算草稿。</span>
+          <a class="start-card" href="../preview_budget/code.html" data-start="quote">
+            <strong>我有報價單</strong>
+            <span>先做一次報價健康檢查。</span>
+            <em class="route-note">前往報價健檢 placeholder</em>
           </a>
+          <button class="start-card" type="button" data-start="blank">
+            <strong>我什麼都沒有</strong>
+            <span>讓 AI 引導官先問你必要問題。</span>
+            <em class="route-note">留在本頁 mock 引導</em>
+          </button>
         </div>
       </section>
     </section>
 
+    <section class="flow-preview" aria-label="引導流程預覽">
+      <div class="section-head">
+        <h2>引導流程預覽</h2>
+        <p>流程只整理需求，不替你做產品決策；輸出會成為後續平面拼圖、預算草稿與詢價討論的基礎。</p>
+      </div>
+      <div class="flow-line">
+        <div class="flow-step"><strong>01</strong>屋況</div>
+        <div class="flow-step"><strong>02</strong>空間</div>
+        <div class="flow-step"><strong>03</strong>預算</div>
+        <div class="flow-step"><strong>04</strong>時程</div>
+        <div class="flow-step"><strong>05</strong>需求</div>
+        <div class="flow-step"><strong>06</strong>產出需求列表</div>
+      </div>
+    </section>
   </main>
 
   <script>
+    const toolsToggle = document.getElementById("toolsToggle");
+    const toolsMenu = document.getElementById("toolsMenu");
     const uploadToggle = document.getElementById("uploadToggle");
     const uploadMenu = document.getElementById("uploadMenu");
     const guideText = document.getElementById("guideText");
     const submitGuide = document.getElementById("submitGuide");
-    const guideResponse = document.getElementById("guideResponse");
-    const planInput = document.getElementById("planInput");
-    const quoteInput = document.getElementById("quoteInput");
-    const promptSamples = [
-      "只要說一句「OK」，我就開始問、你回答，我負責做筆記。",
-      "我有平面圖，想先整理空間需求與預算邊界。",
-      "我有報價單，但看不懂哪些工項合理。",
-      "我第一次裝修，不知道該先準備什麼。"
-    ];
-    let promptIndex = 0;
-    let promptChar = 0;
-    let deletingPrompt = false;
-    let typingTimer;
+    const startGuideCta = document.getElementById("startGuideCta");
+    const responseBody = document.getElementById("responseBody");
+    const startCards = document.querySelectorAll(".start-card");
+
+    function closeMenus(event) {
+      if (!event.target.closest(".tools-wrap")) {
+        toolsMenu.classList.remove("open");
+        toolsToggle.setAttribute("aria-expanded", "false");
+      }
+      if (!event.target.closest(".input-wrap")) {
+        uploadMenu.classList.remove("open");
+      }
+    }
+
+    toolsToggle.addEventListener("click", () => {
+      const isOpen = toolsMenu.classList.toggle("open");
+      toolsToggle.setAttribute("aria-expanded", String(isOpen));
+    });
 
     uploadToggle.addEventListener("click", () => {
       uploadMenu.classList.toggle("open");
@@ -838,67 +831,49 @@
       const button = event.target.closest("button[data-upload]");
       if (!button) return;
       uploadMenu.classList.remove("open");
-      if (button.dataset.upload === "plan") planInput.click();
-      if (button.dataset.upload === "quote") quoteInput.click();
+      const label = button.dataset.upload === "plan" ? "平面圖" : "報價單";
+      responseBody.innerHTML = `<strong>${label}上傳已模擬接收。</strong><br />目前不會開啟真上傳，也不會傳送任何檔案。我會先用 mock 流程提示下一步：${label === "平面圖" ? "建立空間邊界。" : "做報價健康檢查。"}<p class="mock-note">Front-end mock action only</p>`;
     });
-
-    function handleFile(input) {
-      const file = input.files && input.files[0];
-      if (!file) return;
-      guideText.value = `已選擇：${file.name}`;
-      guideResponse.classList.add("visible");
-    }
-
-    planInput.addEventListener("change", () => handleFile(planInput));
-    quoteInput.addEventListener("change", () => handleFile(quoteInput));
 
     function submitMockGuide() {
       const value = guideText.value.trim();
-      guideResponse.classList.add("visible");
-      if (!value) {
-        guideText.placeholder = "可以直接輸入：我第一次裝修，不知道怎麼開始";
+      const trigger = value.includes("我想找設計師") || value.includes("我不知道怎麼開始");
+      if (trigger) {
+        responseBody.innerHTML = "<strong>可以，我先幫你整理需求邊界。</strong><br />你可以先選：平面圖、報價單，或從零開始回答幾個問題。<p class=\"mock-note\">Mock response / no real AI API</p>";
+        return;
       }
+      responseBody.innerHTML = "<strong>收到，我會先把描述拆成可討論的需求條件。</strong><br />下一步會確認屋況、空間、預算、時程與你最在意的需求。這裡只顯示前端 mock 回應。<p class=\"mock-note\">Mock response / no real AI API</p>";
     }
 
     submitGuide.addEventListener("click", submitMockGuide);
+    startGuideCta.addEventListener("click", () => {
+      document.getElementById("guideInput").scrollIntoView({ behavior: "smooth", block: "center" });
+      guideText.focus();
+      responseBody.innerHTML = "<strong>可以，先從一句話開始。</strong><br />你可以輸入「我不知道怎麼開始」，或先用左側 + 選擇平面圖 / 報價單 mock 入口。<p class=\"mock-note\">Page-level mock guide / no real upload / no real AI API</p>";
+    });
     guideText.addEventListener("keydown", (event) => {
       if (event.key === "Enter") submitMockGuide();
     });
 
-    document.addEventListener("click", (event) => {
-      if (!event.target.closest(".input-wrap")) uploadMenu.classList.remove("open");
+    startCards.forEach((card) => {
+      card.addEventListener("click", (event) => {
+        const mode = card.dataset.start;
+        if (mode === "plan") {
+          responseBody.innerHTML = "<strong>平面圖路線。</strong><br />這個入口會前往平面拼圖頁，先建立空間邊界；目前仍不會執行真上傳。<p class=\"mock-note\">Linked to preview_floor_plan / no real upload</p>";
+          return;
+        }
+        if (mode === "quote") {
+          responseBody.innerHTML = "<strong>報價單路線。</strong><br />這個入口會前往目前的預算 / 報價健檢 placeholder；不會接後端或正式報價。<p class=\"mock-note\">Linked to preview_budget placeholder</p>";
+          return;
+        }
+        if (mode === "blank") {
+          event.preventDefault();
+          responseBody.innerHTML = "<strong>從零開始。</strong><br />我會先問屋況、空間、預算、時程與必要需求，整理成可詢價列表。<p class=\"mock-note\">Guided questions mock</p>";
+        }
+      });
     });
 
-    function runPromptTyping() {
-      if (document.activeElement === guideText || guideText.value.trim()) {
-        typingTimer = window.setTimeout(runPromptTyping, 700);
-        return;
-      }
-
-      const current = promptSamples[promptIndex];
-      if (!deletingPrompt) {
-        promptChar += 1;
-        guideText.placeholder = current.slice(0, promptChar);
-        if (promptChar >= current.length) {
-          deletingPrompt = true;
-          typingTimer = window.setTimeout(runPromptTyping, 1600);
-          return;
-        }
-      } else {
-        promptChar -= 1;
-        guideText.placeholder = current.slice(0, Math.max(0, promptChar));
-        if (promptChar <= 0) {
-          deletingPrompt = false;
-          promptIndex = (promptIndex + 1) % promptSamples.length;
-          typingTimer = window.setTimeout(runPromptTyping, 420);
-          return;
-        }
-      }
-
-      typingTimer = window.setTimeout(runPromptTyping, deletingPrompt ? 28 : 54);
-    }
-
-    runPromptTyping();
+    document.addEventListener("click", closeMenus);
   </script>
 </body>
 </html>
