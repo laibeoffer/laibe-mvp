@@ -259,6 +259,35 @@ Required callout format:
 - Need Commander:
 - Need Reviewer:
 
+### Workstream Problem-Solving Duty / No Passive Reply Rule
+
+Every workstream chatroom is responsible for actively trying to complete its assigned task. A workstream must not answer with passive non-work such as `no task`, `nothing to do`, `standby`, `no issue`, or local dirty-worktree notes when an active Issue, active dispatch, or task-preview backlog exists.
+
+Required behavior when an active Issue / dispatch exists:
+- Read the active Issue and mandatory files.
+- Identify the first safe action inside the allowed scope.
+- Attempt to solve ordinary technical workflow problems without asking the Commander.
+- If blocked, shrink the problem and propose the smallest next fix or route.
+- Report one of: branch started, PR URL, exact blocker, minimal fix plan, or scope mismatch.
+
+Only escalate to Deputy Codex after the workstream has tried to solve the problem and can report:
+- What it attempted.
+- Which files / Issues / PRs it checked.
+- Why the blocker cannot be solved inside its allowed scope.
+- What Deputy Codex should do next.
+
+Allowed non-implementation reply when no task truly exists:
+- Use `TASK_PREVIEW_MISSING` only with the missing Commander input, the workstream boundary, and the exact next decision needed.
+- Do not use `TASK_PREVIEW_MISSING` as a generic idle reply when an active Issue exists.
+
+Forbidden passive replies:
+- `No task.`
+- `No open Issue.`
+- `Standby.`
+- `Waiting.`
+- `Dirty worktree, so no action.`
+- Any equivalent response without Issue claim, PR URL, blocker, or task-preview decision.
+
 Current required upcoming-phase declarations:
 - `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then claim or request the matching formal Issue before implementation.
 - `warehouse/method-spec`: declare `MethodSpec validator freeze note`, target `docs/budget/32-method-spec-validator-freeze-note.md`.
@@ -1112,6 +1141,31 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - workstream problem-solving duty added
+
+Published by:
+Deputy Codex
+
+Status:
+Commander instructed that workstream chatrooms must actively try to solve problems and complete their assigned tasks before escalating to Deputy Codex. Passive replies such as `no task`, `standby`, or `no issue` are not acceptable when an active Issue, active dispatch, or task-preview backlog exists.
+
+Changed:
+- Added `Workstream Problem-Solving Duty / No Passive Reply Rule`.
+- Required each workstream with an active Issue / dispatch to read the Issue, identify the first safe action, and attempt normal technical problem-solving inside its allowed scope.
+- Required blocked workstreams to report what they attempted, which files / Issues / PRs they checked, why the blocker cannot be solved inside allowed scope, and what Deputy Codex should do next.
+- Limited `TASK_PREVIEW_MISSING` to true missing Commander-input cases; it cannot be used as a generic idle reply when an active Issue exists.
+- Explicitly banned passive replies such as `No task`, `No open Issue`, `Standby`, `Waiting`, or `Dirty worktree, so no action` without Issue claim, PR URL, blocker, or task-preview decision.
+
+Next:
+- Deputy Codex should treat passive replies from active workstreams as non-response and apply the two-patrol callout rule.
+- Workstreams with Issues #15-#19 and Quote Factory Issue #1 must now either claim the Issue, open a PR, or provide a real blocker with attempted resolution.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - Deputy two-patrol non-response rule added
 
