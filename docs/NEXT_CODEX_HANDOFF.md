@@ -1,5 +1,26 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: Reviewer Inbox Findings Processed
+
+- 本輪任務名稱：Reviewer Inbox Findings Processed by Deputy。
+- 任務類型：Governance / Patrol / Reviewer Secretary Intake；本輪只處理審查官 inbox 發現，不修改功能程式碼。
+- 修改檔案：
+  - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 審查官本輪回報三筆 findings：
+  1. Current Global State 顯示 Open PR / Open Issue 為 None 的 stale blackboard 問題。
+  2. PR #22/#23/#24 無 PR comments / review threads 且不 mergeable 的 PR review gate 問題。
+  3. Plan Puzzle 疑似引用 duplicate Issue #20 的 table compliance 問題。
+- 副指揮官裁決：
+  - Finding 1 已由 commit `3f07253` 修正；最新 `main` 已列出 PR #22/#23/#24、Issues #15-#19、Quote Factory Issue #1。
+  - Finding 2 確認仍成立；PR #22/#23/#24 不 merge，等各 owner workstream 更新 latest `main`、保留 Deputy / reviewer patrol entries、解 conflict、回報 review / conflict-resolution status。
+  - Finding 3 在最新 `origin/main` 未重現；Issue #20 只作為 duplicate closed 記錄，Plan Puzzle canonical task 仍是 Issue #15。此 finding 視為 stale local state。
+- Reviewer inbox 現在保留 processed decision 記錄；目前沒有需要 Commander 裁決的 pending reviewer finding。
+- Commander has configured the reviewer secretary heartbeat to run hourly; blackboard current sections now reflect hourly reviewer secretary / patrol support.
+- Next Deputy action: 續巡 PR #22-#24；若審查官下次再上報，先核對它是否讀到最新 `origin/main`，再決定是否發布黑板。
+
 ## Latest Patrol Task: PR Conflict Recheck / Reviewer Cadence Wording Sync
 
 - 本輪任務名稱：Deputy Patrol PR Conflict Recheck / Reviewer Cadence Wording Sync。
@@ -12,7 +33,7 @@
 - Open PRs remain #22, #23, #24. Each stays inside its expected workstream scope, has no PR comments / review threads, and is still conflict-gated against latest `main`.
 - Active Issues remain #15-#19 in `laibeoffer/laibe-mvp` and #1 in `laibeoffer/laibe-quote-factory`.
 - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` has no pending reviewer findings at this handoff point.
-- Corrected `Reviewer Patrol Support Rule` wording in the blackboard so the active rule says 2 hours during correction / stabilization, matching the active `laibe-reviewer-heartbeat` cadence.
+- Corrected `Reviewer Patrol Support Rule` wording in the blackboard; it now reflects the latest hourly reviewer secretary / patrol cadence configured by Commander.
 - Next Deputy action: keep watching PR #22-#24 for conflict-resolution updates, Codex review comments, or scope changes; publish any new decision to the blackboard before reporting to Commander.
 
 ## Latest Governance Task: Reviewer Patrol Support
@@ -23,7 +44,7 @@
   - `docs/WORKSTREAM_BLACKBOARD.md`
   - `docs/NEXT_CODEX_HANDOFF.md`
 - 新增檔案：無；此段已由下方 `Reviewer Patrol Inbox` 段落補充固定交付檔案。
-- Commander initially authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex; current stabilization cadence is now 2 hours, recorded below.
+- Commander initially authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex; current correction / stabilization cadence is now hourly.
 - LAIBE_REVIEWER remains `none-review-only`; it may audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
 - LAIBE_REVIEWER must not implement, edit files, open / close Issues, merge / reject PRs, dispatch Builder tasks, make product decisions, or read / expose secrets.
 - Expected reviewer patrol results: `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, `PATROL_RISK_FOUND`, `TABLE_COMPLIANCE_FAIL`, or `MISSED_PROGRESS_BACKFILL_REQUIRED`.
@@ -44,7 +65,7 @@
 - LAIBE_REVIEWER may append decision-worthy findings only to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`.
 - LAIBE_REVIEWER must not update `docs/WORKSTREAM_BLACKBOARD.md` directly, must not edit source code, and must not open / close Issues, merge PRs, dispatch Builder tasks, or make product decisions.
 - Deputy Codex reads the inbox, decides whether action is needed, and publishes official decisions to `docs/WORKSTREAM_BLACKBOARD.md`.
-- Reviewer heartbeat cadence is now 2 hours during the correction / stabilization period.
+- Reviewer heartbeat cadence is now hourly during the correction / stabilization period.
 
 ## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
 

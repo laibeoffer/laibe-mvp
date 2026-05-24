@@ -442,7 +442,7 @@ Current required upcoming-phase declarations:
 
 ### Reviewer Patrol Support Rule
 
-LAIBE_REVIEWER may wake every 2 hours during the current correction / stabilization period as a read-only patrol support role for Deputy Codex.
+LAIBE_REVIEWER may wake hourly during the current correction / stabilization period as a read-only secretary / patrol support role for Deputy Codex.
 
 This does not convert the reviewer into a Builder, Deputy, dispatcher, merger, product owner, or implementation agent.
 
@@ -867,7 +867,7 @@ Scope:
 - `AI_RULES/*`
 
 Current:
-No GitHub branch required. Rules are in `main`. Reviewer remains `none-review-only`, but may wake every 2 hours during the current correction / stabilization period to audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+No GitHub branch required. Rules are in `main`. Reviewer remains `none-review-only`, but may wake hourly during the current correction / stabilization period to audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
 
 Forbidden:
 implementation, source-code edits, refactors, feature work, product design, dispatch decisions, PR merge / reject, Issue open / close, Builder task ownership, or direct blackboard decisions. The only allowed file write is append-only reviewer patrol findings in `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
@@ -879,7 +879,7 @@ Blocked:
 None.
 
 Next:
-Every 2 hours, report either `NO_REVIEW_TRIGGER` or append concise evidence for `REVIEW_TRIGGER_FOUND` / `PATROL_RISK_FOUND` / `TABLE_COMPLIANCE_FAIL` / `MISSED_PROGRESS_BACKFILL_REQUIRED` to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`. Do not act directly.
+Every hour while the heartbeat is configured active, report either `NO_REVIEW_TRIGGER` or append concise evidence for `REVIEW_TRIGGER_FOUND` / `PATROL_RISK_FOUND` / `TABLE_COMPLIANCE_FAIL` / `MISSED_PROGRESS_BACKFILL_REQUIRED` to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`. Do not act directly.
 
 Need Commander:
 Only if review escalates to product decision.
@@ -1127,7 +1127,7 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 - [ ] To: 審查官聊天室 / LAIBE_REVIEWER
   - Workstream: none-review-only
   - Branch / Repo: none / laibeoffer/laibe-mvp
-  - Mission: Every 2 hours, help Deputy Codex with read-only patrol support: audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+  - Mission: Every hour while configured active, help Deputy Codex with read-only secretary / patrol support: audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
   - Why this agent: Reviewer can catch risk and compliance gaps without taking over Builder or Deputy authority.
   - Action: Report `NO_REVIEW_TRIGGER` when no issue exists. If a decision-worthy finding exists, append it to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`, concise evidence, and recommended Deputy action. Do not dispatch, merge, edit code, or implement.
   - Need Commander: No.
@@ -1272,6 +1272,32 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - reviewer inbox findings processed by Deputy
+
+Published by:
+Deputy Codex
+
+Status:
+LAIBE_REVIEWER was given the secretary / inbox role and produced three local inbox findings. Deputy Codex processed them and recorded decisions in `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
+
+Findings processed:
+- Cross-workstream stale blackboard state: resolved by existing Deputy commit `3f07253`; latest `main` now lists PR #22, #23, #24, Issues #15-#19, and Quote Factory Issue #1.
+- PR review / mergeability gate for PR #22, #23, #24: confirmed; decision remains do not merge until owner workstreams update against latest `main`, preserve Deputy / reviewer patrol entries, and report conflict-resolution / review status.
+- Plan Puzzle duplicate Issue #20 reference: latest `origin/main` does not assign Plan Puzzle to #20; #20 is only recorded as duplicate closed in favor of canonical Issue #15. Treat the reviewer observation as stale local state.
+
+Decision:
+- No Commander action required.
+- No LAIBE_REVIEWER escalation required.
+- Reviewer may continue hourly secretary patrol if configured, but any local stale-state finding must cite latest `origin/main` before Deputy action.
+- Canonical active Plan Puzzle task remains Issue #15.
+- Active reviewer cadence is now hourly, matching the Commander-provided reviewer heartbeat screenshot.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - deputy patrol rechecked PRs and synced reviewer cadence wording
 
