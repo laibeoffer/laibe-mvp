@@ -50,8 +50,8 @@ html_content = """<!DOCTYPE html>
 <header class="bg-white border-b border-laibe-border sticky top-0 z-50">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 <div class="flex items-center gap-8">
-<a href="file:///C:/Users/J/Desktop/for_ai_studio/public_owner_preflow/laibe_landing_desktop_code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-    <img src="file:///C:/Users/J/Desktop/for_ai_studio/logo/0317_png/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
+<a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
+    <img src="../../../assets/logo/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
 </a>
 <nav class="hidden md:flex space-x-6 text-sm font-medium text-slate-500">
 <a class="hover:text-laibe-red transition-colors" href="#">導引討論</a>
@@ -278,16 +278,19 @@ html_content_2 = """<!-- BEGIN: Attachment Status Area -->
 
 full_html = html_content + html_content_2
 
+WRITE_DESKTOP_COPY = False
+
 path1 = r"c:\laibe_project\src\stitch_laibe_landing_onboarding\budget_document_preview\code.html"
 path2 = r"c:\Users\J\Desktop\for_ai_studio\public_owner_preflow\budget_document_preview_code.html"
 
 os.makedirs(os.path.dirname(path1), exist_ok=True)
-os.makedirs(os.path.dirname(path2), exist_ok=True)
 
 with open(path1, "w", encoding="utf-8") as f:
     f.write(full_html)
 
-with open(path2, "w", encoding="utf-8") as f:
-    f.write(full_html)
+if WRITE_DESKTOP_COPY:
+    os.makedirs(os.path.dirname(path2), exist_ok=True)
+    with open(path2, "w", encoding="utf-8") as f:
+        f.write(full_html)
 
 print("Files written successfully.")

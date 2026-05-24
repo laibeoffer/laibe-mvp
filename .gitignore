@@ -34,3 +34,73 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# LaiBE local safety ignores
+
+# Secrets / credentials
+.env
+.env.*
+*.env
+auth.json
+*token*
+*secret*
+*api_key*
+*credentials*
+*service-account*
+*.pem
+*.key
+*.p12
+
+# Archives / exports
+*.zip
+*.rar
+*.7z
+*_export.*
+stitch_export.*
+
+# Office / planning attachments
+*.xlsx
+*.xls
+*.docx
+*.doc
+*.pptx
+*.ppt
+
+# Screenshots / videos / large local media
+*.mp4
+*.mov
+*.avi
+*.webm
+*.mkv
+*.jpg
+*.jpeg
+*.png
+*.webp
+
+# Local backups / duplicates
+*.bak
+*.backup
+*.tmp
+*.log
+*backup*
+*duplicate*
+*_old*
+*_copy*
+
+# Local cleanup / archive folders
+_archive/
+docs/archive_md/
+archive/
+backup/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Keep canonical project docs/assets
+!assets/logo/*.svg
+!docs/*.md
+!AGENTS.md

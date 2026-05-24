@@ -4,11 +4,11 @@ import Link from 'next/link';
 export default function OwnerSidebar() {
     // System Designer Rule: No shortcuts or hidden entries. Explicitly listed routes.
     const routes = [
-        { name: 'Dashboard', path: '/owner/dashboard' },
-        { name: 'Projects', path: '/owner/project/new' }, // 'New' vs 'List' can be explicitly separated
-        { name: 'Bids', path: '/owner/bids' },
-        { name: 'Contracts', path: '/owner/contracts' },
-        { name: 'Messages', path: '/owner/messages' },
+        { name: '儀表板', path: '/owner/dashboard' },
+        { name: '專案', path: '/owner/project/new' }, // 'New' vs 'List' can be explicitly separated
+        { name: '投標', path: '/owner/bids' },
+        { name: '合約', path: '/owner/contracts' },
+        { name: '訊息', path: '/owner/messages' },
     ];
 
     return (

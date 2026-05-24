@@ -12,14 +12,14 @@ export default function OwnerDashboard() {
         <div className="space-y-6">
             <div className="flex justify-between items-end border-b border-slate-200 pb-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-slate-900">Dashboard</h2>
-                    <p className="text-sm text-slate-500 mt-1">Overview of your active and past projects.</p>
+                    <h2 className="text-2xl font-bold text-slate-900">儀表板</h2>
+                    <p className="text-sm text-slate-500 mt-1">您活躍與過往專案的概覽。</p>
                 </div>
                 <a
                     href="/owner/project/new"
                     className="bg-slate-900 text-white px-4 py-2 rounded-md font-bold text-sm hover:bg-slate-800 transition-colors"
                 >
-                    Initiate New Project
+                    建立新專案
                 </a>
             </div>
 

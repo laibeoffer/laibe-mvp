@@ -1,312 +1,904 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>LaiBE - Step 1：需求表單 / 引導官頁</title>
-    <link rel="icon" href="file:///C:/Users/J/Desktop/for_ai_studio/logo/0317_png/laibe_512_v2.png" />
-    <link rel="apple-touch-icon" href="file:///C:/Users/J/Desktop/for_ai_studio/logo/0317_png/laibe_512_v2.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "owner-primary": "#AD5A5A",
-                        "owner-deep": "#8C4747",
-                        "owner-soft": "#F7EEEE",
-                        "charcoal": "#1F1F1F",
-                        "surface": "#111214",
-                        "surface-2": "#17191D",
-                        "surface-3": "#1F2228",
-                        "warm-bg": "#F9F8F6",
-                        "soft-line": "#E8E2DB"
-                    },
-                    fontFamily: {
-                        display: ["Inter", "Noto Sans", "sans-serif"]
-                    },
-                    boxShadow: {
-                        soft: "0 8px 30px rgba(0,0,0,0.06)",
-                        softlg: "0 18px 50px rgba(0,0,0,0.10)"
-                    }
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', "Noto Sans", sans-serif;
-            background: #F9F8F6;
-            color: #1F1F1F;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE | 甲方 AI 書記官</title>
+  <link rel="icon" href="../../../assets/logo/laibe_offer.svg" />
+  <link rel="apple-touch-icon" href="../../../assets/logo/laibe_offer.svg" />
+  <style>
+    :root {
+      --bg-black: #050607;
+      --bg-charcoal: #0b0d10;
+      --bg-cement: #12161a;
+      --surface: rgba(255, 255, 255, 0.075);
+      --surface-strong: rgba(255, 255, 255, 0.12);
+      --text-main: #f4f7f8;
+      --text-secondary: #b8c0c7;
+      --text-muted: #7c858d;
+      --line-soft: rgba(255, 255, 255, 0.12);
+      --line-medium: rgba(255, 255, 255, 0.22);
+      --metal-silver: #dce6ec;
+      --metal-steel: #9aa7b3;
+      --metal-champagne: #cbb88a;
+      --accent-cyan: #79d8ff;
+      --accent-mint: #62e6c8;
+      --accent-orange: #ff681a;
+      --accent-orange-2: #ff9a2f;
+      --section-max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-black);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 18% 16%, rgba(121, 216, 255, 0.12), transparent 28%),
+        radial-gradient(circle at 84% 28%, rgba(98, 230, 200, 0.08), transparent 32%),
+        linear-gradient(145deg, #050607 0%, #0b0d10 42%, #12161a 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 10px),
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 34px);
+      mix-blend-mode: screen;
+      opacity: 0.48;
+      z-index: 0;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: 76px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.095);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.055), transparent),
+        rgba(5, 6, 7, 0.72);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.18);
+    }
+
+    .header-inner {
+      width: 100%;
+      height: 76px;
+      margin: 0;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 42px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      opacity: 0.94;
+      transition: opacity 180ms ease, filter 180ms ease, transform 180ms ease;
+    }
+
+    .brand:hover {
+      opacity: 1;
+      filter: brightness(1.04);
+      transform: translateY(-1px);
+    }
+
+    .brand-logo {
+      width: 105px;
+      height: auto;
+      display: block;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .nav a {
+      position: relative;
+      padding: 8px 0;
+      transition: color 160ms ease, text-shadow 160ms ease;
+    }
+
+    .nav a:hover {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 18px rgba(121, 216, 255, 0.28);
+    }
+
+    .nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      transform: scaleX(0);
+      transform-origin: center;
+      background: linear-gradient(90deg, transparent, var(--metal-silver), var(--accent-cyan), transparent);
+      transition: transform 200ms ease;
+    }
+
+    .nav a:hover::after {
+      transform: scaleX(1);
+    }
+
+    .login-link {
+      border: 1px solid var(--line-medium);
+      border-radius: 999px;
+      padding: 8px 13px !important;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.045);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .login-link::after {
+      display: none;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .owner-start {
+      min-height: calc(100vh - 76px);
+      width: min(100% - 48px, var(--section-max));
+      margin: 0 auto;
+      padding: 92px 0 120px;
+      display: grid;
+      grid-template-columns: minmax(360px, 0.72fr) minmax(560px, 1.28fr);
+      gap: 64px;
+      align-items: center;
+    }
+
+    .kicker {
+      color: var(--accent-cyan);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      margin: 0 0 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 5vw, 72px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      max-width: 720px;
+    }
+
+    .lead {
+      margin: 30px 0 0;
+      max-width: 680px;
+      color: var(--text-secondary);
+      font-size: clamp(17px, 1.5vw, 21px);
+      line-height: 1.8;
+      font-weight: 650;
+    }
+
+    .cta-row {
+      margin-top: 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 0 22px;
+      border-radius: 999px;
+      font-weight: 900;
+      font-size: 15px;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent-orange-2), var(--accent-orange));
+      box-shadow: 0 20px 45px rgba(255, 104, 26, 0.24);
+    }
+
+    .btn-secondary {
+      color: var(--text-main);
+      border: 1px solid var(--line-medium);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 52px rgba(255, 255, 255, 0.12);
+    }
+
+    .guide-panel {
+      position: relative;
+      border: 1px solid var(--line-medium);
+      border-radius: 34px;
+      padding: 30px;
+      min-height: 520px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.045)),
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 12px);
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      overflow: hidden;
+    }
+
+    .guide-panel::before {
+      content: "";
+      position: absolute;
+      inset: -40% -30%;
+      background: radial-gradient(circle, rgba(121, 216, 255, 0.18), transparent 34%);
+      opacity: 0.55;
+      transform: translate(24%, -18%);
+      pointer-events: none;
+    }
+
+    .guide-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .prompt-label {
+      margin-bottom: 10px;
+      color: var(--accent-cyan);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .ai-input {
+      min-height: 74px;
+      display: grid;
+      grid-template-columns: 48px 1fr 48px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(220, 230, 236, 0.24);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035)),
+        #090b0e;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 16px 40px rgba(0, 0, 0, 0.32);
+    }
+
+    .circle-btn {
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(220, 230, 236, 0.28);
+      border-radius: 50%;
+      color: var(--text-main);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: 700;
+      transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .circle-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(121, 216, 255, 0.7);
+      box-shadow: 0 0 22px rgba(121, 216, 255, 0.18);
+    }
+
+    .ai-input input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--text-main);
+      background: transparent;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .ai-input input::placeholder {
+      color: rgba(244, 247, 248, 0.72);
+    }
+
+    .typing-caret {
+      display: inline-block;
+      width: 1px;
+      height: 1.25em;
+      margin-left: 2px;
+      background: var(--accent-cyan);
+      vertical-align: -0.18em;
+      animation: caretBlink 900ms steps(2, start) infinite;
+    }
+
+    .upload-menu {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      width: 210px;
+      padding: 8px;
+      border: 1px solid var(--line-medium);
+      border-radius: 18px;
+      background: rgba(8, 10, 12, 0.96);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.42);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px);
+      transition: opacity 150ms ease, transform 150ms ease;
+      z-index: 5;
+    }
+
+    .upload-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .upload-menu button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--text-main);
+      background: transparent;
+      text-align: left;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .upload-menu button:hover {
+      background: rgba(121, 216, 255, 0.12);
+    }
+
+    .guide-response {
+      margin-top: 24px;
+      border: 1px solid rgba(121, 216, 255, 0.22);
+      border-radius: 26px;
+      color: var(--text-secondary);
+      background:
+        linear-gradient(180deg, rgba(121, 216, 255, 0.08), transparent 34%),
+        rgba(0, 0, 0, 0.42);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+      overflow: hidden;
+      line-height: 1.7;
+    }
+
+    .guide-response.visible {
+      animation: fadeUp 220ms ease both;
+    }
+
+    .guide-response strong {
+      color: var(--text-main);
+    }
+
+    .guide-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .guide-options button {
+      border: 1px solid var(--line-medium);
+      border-radius: 999px;
+      padding: 9px 12px;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.055);
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(121, 216, 255, 0.14);
+      color: rgba(244, 247, 248, 0.62);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .terminal-lines {
+      padding: 12px 18px 16px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+    }
+
+    .terminal-line {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      gap: 18px;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .terminal-line:last-child {
+      border-bottom: 0;
+    }
+
+    .terminal-key {
+      color: var(--accent-mint);
+      letter-spacing: 0.06em;
+    }
+
+    .terminal-value {
+      color: var(--text-main);
+    }
+
+    .next-entry {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .next-card {
+      min-height: 112px;
+      border: 1px solid var(--line-soft);
+      border-radius: 20px;
+      padding: 16px;
+      color: var(--text-main);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035)),
+        rgba(255, 255, 255, 0.035);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .next-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(121, 216, 255, 0.42);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28), 0 0 24px rgba(121, 216, 255, 0.08);
+    }
+
+    .next-card.primary {
+      border-color: rgba(255, 154, 47, 0.48);
+      background:
+        linear-gradient(135deg, rgba(255, 154, 47, 0.28), rgba(255, 104, 26, 0.18)),
+        rgba(255, 104, 26, 0.08);
+      box-shadow: 0 18px 42px rgba(255, 104, 26, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .next-card strong {
+      display: block;
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 950;
+      line-height: 1.3;
+    }
+
+    .next-card span {
+      display: block;
+      margin-top: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 720;
+    }
+
+    @keyframes caretBlink {
+      0%, 44% { opacity: 1; }
+      45%, 100% { opacity: 0; }
+    }
+
+    .start-options {
+      width: min(100% - 48px, var(--section-max));
+      margin: 0 auto;
+      padding: 36px 0 118px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 30px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(32px, 4vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -0.035em;
+    }
+
+    .section-head p {
+      max-width: 420px;
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-weight: 650;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .option-card {
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid var(--line-soft);
+      border-radius: 30px;
+      padding: 26px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.035)),
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.026) 0 1px, transparent 1px 10px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      transition: transform 170ms ease, border-color 170ms ease, box-shadow 170ms ease;
+    }
+
+    .option-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(121, 216, 255, 0.45);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34), 0 0 28px rgba(121, 216, 255, 0.08);
+    }
+
+    .option-card h3 {
+      margin: 22px 0 10px;
+      font-size: 28px;
+      letter-spacing: -0.025em;
+    }
+
+    .option-card p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-weight: 650;
+    }
+
+    .mini-plan,
+    .mini-quote,
+    .mini-chat {
+      min-height: 132px;
+      border: 1px solid var(--line-soft);
+      border-radius: 22px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    .mini-plan {
+      display: grid;
+      grid-template-columns: 1.35fr 0.75fr;
+      grid-template-rows: 1fr 0.82fr;
+      gap: 8px;
+    }
+
+    .room {
+      border: 1px solid rgba(121, 216, 255, 0.48);
+      border-radius: 12px;
+      padding: 10px;
+      color: rgba(244, 247, 248, 0.82);
+      font-size: 12px;
+      font-weight: 900;
+      background: rgba(121, 216, 255, 0.06);
+    }
+
+    .room:nth-child(3) {
+      grid-column: span 2;
+      border-color: rgba(98, 230, 200, 0.5);
+      background: rgba(98, 230, 200, 0.06);
+    }
+
+    .quote-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .quote-row span:last-child {
+      color: var(--metal-champagne);
+    }
+
+    .bubble {
+      max-width: 88%;
+      margin: 8px 0;
+      padding: 10px 12px;
+      border-radius: 16px;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.105);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .bubble.ai {
+      margin-left: auto;
+      background: rgba(98, 230, 200, 0.16);
+    }
+
+    .flow-preview {
+      width: min(100% - 48px, var(--section-max));
+      margin: 0 auto;
+      padding: 0 0 128px;
+    }
+
+    .flow-line {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      border: 1px solid var(--line-soft);
+      border-radius: 30px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .flow-step {
+      min-height: 118px;
+      border-radius: 20px;
+      padding: 16px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.035));
+      color: var(--text-secondary);
+      font-weight: 850;
+    }
+
+    .flow-step strong {
+      display: block;
+      margin-bottom: 18px;
+      color: var(--accent-cyan);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 980px) {
+      .nav { display: none; }
+      .owner-start {
+        grid-template-columns: 1fr;
+        padding-top: 56px;
+        gap: 42px;
+      }
+      .option-grid,
+      .flow-line,
+      .next-entry {
+        grid-template-columns: 1fr;
+      }
+      .section-head {
+        display: block;
+      }
+      .section-head p {
+        margin-top: 16px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .header-inner,
+      .owner-start,
+      .start-options,
+      .flow-preview {
+        width: min(100% - 28px, var(--section-max));
+      }
+      .brand-logo { width: 88px; }
+      .guide-panel { padding: 18px; border-radius: 26px; }
+      .ai-input {
+        min-height: 62px;
+        grid-template-columns: 42px 1fr 42px;
+      }
+      .circle-btn {
+        width: 42px;
+        height: 42px;
+      }
+    }
+  </style>
 </head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="返回 LaiBE 首頁">
+        <img class="brand-logo" src="../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+      </a>
+      <nav class="nav" aria-label="主要導覽">
+        <a href="../laibe_landing_desktop/code.html#tools">工具</a>
+        <a href="#guideInput">流程</a>
+        <a href="../laibe_landing_desktop/code.html#about">關於萊比</a>
+        <a href="../laibe_landing_desktop/code.html#flow">PCM 後台</a>
+        <a class="login-link" href="#top">我有帳號</a>
+      </nav>
+    </div>
+  </header>
 
-<body class="min-h-screen bg-warm-bg text-charcoal">
+  <main>
+    <section class="owner-start" id="top">
+      <div>
+        <p class="kicker">Requirement Prompt</p>
+        <h1>需求越清楚，<br />平面圖與預算越精準。</h1>
+        <p class="lead">
+          就像 prompt 一樣，輸入越完整，後面的平面拼圖、預算生成與詢價條件就越不容易失準。你只要把現況、想法、限制與檔案交給 AI 書記官，它會先幫你記成可討論的需求筆記。
+        </p>
+      </div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/5">
-        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="h-[72px] md:h-20 flex items-center justify-between">
-                <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-                    <img src="file:///C:/Users/J/Desktop/for_ai_studio/logo/0317_png/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
-                </a>
-                <div class="hidden md:flex items-center gap-3 text-sm font-bold">
-                    <div class="flex items-center gap-2 text-owner-primary bg-owner-soft px-3 py-1.5 rounded-full">
-                        <span class="w-6 h-6 rounded-full bg-owner-primary text-white flex items-center justify-center text-xs">1</span>
-                        <span>需求表單 / 引導官頁</span>
-                    </div>
-                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
-                    <div class="flex items-center gap-2 text-charcoal/40">
-                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">2</span>
-                        <span>平面拼圖</span>
-                    </div>
-                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
-                    <div class="flex items-center gap-2 text-charcoal/40">
-                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">3</span>
-                        <span>預算生成</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <a href="../laibe_landing_desktop/code.html"
-                        class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">返回首頁</a>
-                    <div
-                        class="w-10 h-10 rounded-full bg-owner-soft flex items-center justify-center text-owner-primary">
-                        <span class="material-symbols-outlined">auto_awesome</span>
-                    </div>
-                </div>
-            </div>
+      <section class="guide-panel" aria-label="AI 書記官輸入框">
+        <div class="prompt-label">AI 書記官</div>
+        <div class="input-wrap" id="guideInput">
+          <div class="ai-input">
+            <button class="circle-btn" id="uploadToggle" type="button" aria-label="開啟上傳選單">+</button>
+            <input id="guideText" type="text" autocomplete="off" placeholder="" />
+            <button class="circle-btn" id="submitGuide" type="button" aria-label="送出需求">→</button>
+          </div>
+          <div class="upload-menu" id="uploadMenu">
+            <button type="button" data-upload="plan">上傳平面圖</button>
+            <button type="button" data-upload="quote">上傳報價單</button>
+          </div>
+          <input id="planInput" hidden type="file" accept="image/*,.pdf,.dwg,.dxf" />
+          <input id="quoteInput" hidden type="file" accept="image/*,.pdf,.xlsx,.csv" />
         </div>
-    </header>
-
-    <main>
-
-        <!-- 上半部：對話體驗 -->
-        <section class="bg-black text-white pt-20 pb-16">
-            <div class="max-w-[920px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="mb-10">
-                    <div class="inline-flex items-center gap-2 text-owner-primary text-lg font-bold mb-4">
-                        <span class="material-symbols-outlined text-[22px]">auto_awesome</span>
-                        <span>藍，你好</span>
-                    </div>
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-6">
-                        你想從哪裡著手？
-                    </h1>
-                    <p class="text-lg sm:text-xl text-white/70 leading-relaxed font-medium max-w-3xl">
-                        直接告訴我你目前的裝修想法、手邊資料或預算顧慮。你一邊說，我一邊幫你整理成案件筆記。
-                    </p>
-                </div>
-
-                <div class="bg-surface-2 rounded-[28px] border border-white/10 shadow-softlg p-5 sm:p-6">
-                    <div class="text-white/50 text-lg font-medium mb-4">問問引導官</div>
-
-                    <div
-                        class="min-h-[120px] rounded-2xl bg-surface-3 border border-white/10 px-5 py-5 flex items-start">
-                        <span class="text-white/35 text-lg leading-relaxed">
-                            例如：我想先做 20 坪中古屋翻新，兩房一廳，自住，想知道預算大概多少……
-                        </span>
-                    </div>
-
-                    <div class="flex items-center justify-between mt-5 flex-wrap gap-4">
-                        <div class="flex items-center gap-4 text-white/70">
-                            <button class="flex items-center gap-2 hover:text-white transition">
-                                <span class="material-symbols-outlined">add</span>
-                                <span class="font-medium">上傳圖檔</span>
-                            </button>
-                            <button class="flex items-center gap-2 hover:text-white transition">
-                                <span class="material-symbols-outlined">construction</span>
-                                <span class="font-medium">工具</span>
-                            </button>
-                        </div>
-
-                        <div class="flex items-center gap-4">
-                            <div class="text-white/60 font-bold">甲方引導</div>
-                            <button
-                                class="w-11 h-11 rounded-full bg-owner-primary hover:bg-owner-deep transition flex items-center justify-center">
-                                <span class="material-symbols-outlined text-white">north_east</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap gap-3 mt-6">
-                    <button
-                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
-                        我有平面圖，想先估預算
-                    </button>
-                    <button
-                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
-                        我還不知道預算夠不夠
-                    </button>
-                    <button
-                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
-                        我想先整理施工範圍
-                    </button>
-                    <button
-                        class="px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 text-white/90 text-sm font-medium">
-                        我有報價單想先檢查
-                    </button>
-                </div>
+        <div class="guide-response visible" id="guideResponse">
+          <div class="terminal-head">
+            <span>LAIBE_SCRIBE.EXE</span>
+            <span>SESSION_01</span>
+          </div>
+          <div class="terminal-lines">
+            <div class="terminal-line">
+              <span class="terminal-key">&gt; AREA</span>
+              <span class="terminal-value">房屋現況約 25 坪。</span>
             </div>
-        </section>
-
-        <!-- 下半部：即時筆記 -->
-        <section class="py-16 bg-warm-bg">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    <!-- 左：即時整理摘要 -->
-                    <div class="lg:col-span-2">
-                        <div class="bg-white rounded-3xl shadow-soft border border-black/5 overflow-hidden">
-                            <div class="px-8 py-6 border-b border-black/5 bg-owner-soft">
-                                <div class="text-owner-primary text-sm font-bold tracking-[0.2em] uppercase mb-2">Live
-                                    Notes</div>
-                                <h2 class="text-3xl font-black tracking-tight">即時整理筆記</h2>
-                                <p class="text-charcoal/70 text-lg font-medium mt-3">
-                                    你一邊說，引導官一邊把需求整理成案件摘要。
-                                </p>
-                            </div>
-
-                            <div class="p-8 space-y-8">
-                                <div>
-                                    <div class="text-sm text-charcoal/45 font-bold tracking-[0.16em] uppercase mb-3">
-                                        目前需求摘要</div>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
-                                            <div class="text-sm text-charcoal/50 font-bold mb-2">房屋類型</div>
-                                            <div class="text-lg font-black">中古屋</div>
-                                        </div>
-                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
-                                            <div class="text-sm text-charcoal/50 font-bold mb-2">空間條件</div>
-                                            <div class="text-lg font-black">20 坪 / 2 房 1 廳</div>
-                                        </div>
-                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
-                                            <div class="text-sm text-charcoal/50 font-bold mb-2">使用目的</div>
-                                            <div class="text-lg font-black">自住</div>
-                                        </div>
-                                        <div class="bg-[#FAF7F7] rounded-2xl p-5">
-                                            <div class="text-sm text-charcoal/50 font-bold mb-2">目前狀態</div>
-                                            <div class="text-lg font-black">尚未提供平面圖</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="text-sm text-charcoal/45 font-bold tracking-[0.16em] uppercase mb-3">
-                                        預算方向</div>
-                                    <div class="bg-[#FAF7F7] rounded-2xl p-6">
-                                        <div class="text-charcoal/80 text-lg leading-relaxed font-medium">
-                                            目前需求傾向為「翻新、自住、希望先掌握預算」，但尚未確認衛浴、廚房與收納是否全面重做，因此預算區間仍待補資料後估算。
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <div class="text-sm text-charcoal/45 font-bold tracking-[0.16em] uppercase mb-3">
-                                        引導官已整理出的重點</div>
-                                    <div class="space-y-3">
-                                        <div class="flex items-start gap-3 bg-[#FAF7F7] rounded-2xl p-5">
-                                            <span
-                                                class="material-symbols-outlined text-owner-primary mt-0.5">task_alt</span>
-                                            <div class="text-charcoal/80 text-base leading-relaxed font-medium">
-                                                使用者希望先了解裝修預算，不想先進入繁瑣發案流程。
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start gap-3 bg-[#FAF7F7] rounded-2xl p-5">
-                                            <span
-                                                class="material-symbols-outlined text-owner-primary mt-0.5">task_alt</span>
-                                            <div class="text-charcoal/80 text-base leading-relaxed font-medium">
-                                                現階段應優先補齊空間配置與施工範圍，再進一步生成預算。
-                                            </div>
-                                        </div>
-                                        <div class="flex items-start gap-3 bg-[#FAF7F7] rounded-2xl p-5">
-                                            <span
-                                                class="material-symbols-outlined text-owner-primary mt-0.5">task_alt</span>
-                                            <div class="text-charcoal/80 text-base leading-relaxed font-medium">
-                                                若使用者已有平面圖，可直接進入拼圖或匯圖流程加快整理。
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 右：缺漏資訊與下一步 -->
-                    <div class="space-y-6">
-                        <div class="bg-white rounded-3xl shadow-soft border border-black/5 p-7">
-                            <div class="text-owner-primary text-sm font-bold tracking-[0.2em] uppercase mb-3">Missing
-                                Info</div>
-                            <h3 class="text-2xl font-black mb-5">還缺哪些資訊？</h3>
-                            <div class="space-y-3">
-                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">是否要重做衛浴</div>
-                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">是否需要更新廚房設備</div>
-                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">有無現況照片或平面圖</div>
-                                <div class="bg-owner-soft rounded-2xl p-4 font-medium text-charcoal/85">是否有喜歡的風格參考圖
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-3xl shadow-soft border border-black/5 p-7">
-                            <div class="text-owner-primary text-sm font-bold tracking-[0.2em] uppercase mb-3">Next Step
-                            </div>
-                            <h3 class="text-2xl font-black mb-5">下一步建議</h3>
-                            <div class="space-y-4">
-                                <a href="../preview_floor_plan/code.html"
-                                    class="block w-full text-left bg-owner-primary text-white px-5 py-4 rounded-2xl font-bold hover:bg-owner-deep transition">
-                                    進入平面拼圖 (下一步)
-                                </a>
-                                <button
-                                    class="w-full text-left bg-owner-soft text-owner-primary px-5 py-4 rounded-2xl font-bold hover:opacity-90 transition">
-                                    上傳平面圖
-                                </button>
-                                <a href="../preview_budget/code.html"
-                                    class="block w-full text-left bg-owner-soft text-owner-primary px-5 py-4 rounded-2xl font-bold hover:opacity-90 transition">
-                                    直接生成預算草稿
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="bg-[#111214] text-white rounded-3xl shadow-softlg p-7">
-                            <div class="text-white/55 text-sm font-bold tracking-[0.2em] uppercase mb-3">Agent Prompt
-                            </div>
-                            <h3 class="text-2xl font-black mb-4">你說的，系統有在聽</h3>
-                            <p class="text-white/75 leading-relaxed font-medium mb-3">
-                                這一頁的核心不是聊天，而是讓使用者感受到需求正被收斂為預算參數。
-                            </p>
-                            <div class="bg-owner-primary/20 border border-owner-primary/30 rounded-xl p-4 text-sm font-bold text-white/90">
-                                💡 重要提醒：若只有平面拼圖、沒有需求參數，預算生成可能失準，因此此需求表單是預算生成前的必要節點。
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+            <div class="terminal-line">
+              <span class="terminal-key">&gt; LAYOUT</span>
+              <span class="terminal-value">房屋現況格局：3 房 2 廳。</span>
             </div>
-        </section>
-
-    </main>
-
-    <footer class="bg-charcoal py-12">
-        <div
-            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
-                <span class="material-symbols-outlined text-[26px]">architecture</span>
-                <span>LaiBE</span>
+            <div class="terminal-line">
+              <span class="terminal-key">&gt; SCOPE</span>
+              <span class="terminal-value">主要裝修範圍：廚房與客廳。</span>
             </div>
-            <div class="text-sm text-white/50 font-medium">
-                © 2026 LaiBE Inc. All rights reserved.
+            <div class="terminal-line">
+              <span class="terminal-key">&gt; OVERVIEW</span>
+              <span class="terminal-value">開放式廚房；須拆除現有封閉廚房牆面，重新配置客餐廳與廚房動線。</span>
             </div>
-            <div class="flex gap-6 text-sm text-white/50">
-                <a href="#" class="hover:text-white transition-colors">服務條款</a>
-                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+            <div class="terminal-line">
+              <span class="terminal-key">&gt; NEXT</span>
+              <span class="terminal-value">此需求成果可接續平面拼圖與預算生成，作為後續詢價條件基礎。</span>
             </div>
+          </div>
         </div>
-    </footer>
+        <div class="next-entry" aria-label="問答完成後的下一步">
+          <a class="next-card primary" href="../preview_floor_plan/code.html">
+            <strong>問答完成，進入平面拼圖</strong>
+            <span>先把空間邊界拼出來，讓後續預算有依據。</span>
+          </a>
+          <a class="next-card" href="../preview_budget/code.html">
+            <strong>已有平面圖，直接進入預算生成</strong>
+            <span>已有基本圖面或格局條件時，可先產生預算草稿。</span>
+          </a>
+        </div>
+      </section>
+    </section>
 
+  </main>
+
+  <script>
+    const uploadToggle = document.getElementById("uploadToggle");
+    const uploadMenu = document.getElementById("uploadMenu");
+    const guideText = document.getElementById("guideText");
+    const submitGuide = document.getElementById("submitGuide");
+    const guideResponse = document.getElementById("guideResponse");
+    const planInput = document.getElementById("planInput");
+    const quoteInput = document.getElementById("quoteInput");
+    const promptSamples = [
+      "只要說一句「OK」，我就開始問、你回答，我負責做筆記。",
+      "我有平面圖，想先整理空間需求與預算邊界。",
+      "我有報價單，但看不懂哪些工項合理。",
+      "我第一次裝修，不知道該先準備什麼。"
+    ];
+    let promptIndex = 0;
+    let promptChar = 0;
+    let deletingPrompt = false;
+    let typingTimer;
+
+    uploadToggle.addEventListener("click", () => {
+      uploadMenu.classList.toggle("open");
+    });
+
+    uploadMenu.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-upload]");
+      if (!button) return;
+      uploadMenu.classList.remove("open");
+      if (button.dataset.upload === "plan") planInput.click();
+      if (button.dataset.upload === "quote") quoteInput.click();
+    });
+
+    function handleFile(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      guideText.value = `已選擇：${file.name}`;
+      guideResponse.classList.add("visible");
+    }
+
+    planInput.addEventListener("change", () => handleFile(planInput));
+    quoteInput.addEventListener("change", () => handleFile(quoteInput));
+
+    function submitMockGuide() {
+      const value = guideText.value.trim();
+      guideResponse.classList.add("visible");
+      if (!value) {
+        guideText.placeholder = "可以直接輸入：我第一次裝修，不知道怎麼開始";
+      }
+    }
+
+    submitGuide.addEventListener("click", submitMockGuide);
+    guideText.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") submitMockGuide();
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!event.target.closest(".input-wrap")) uploadMenu.classList.remove("open");
+    });
+
+    function runPromptTyping() {
+      if (document.activeElement === guideText || guideText.value.trim()) {
+        typingTimer = window.setTimeout(runPromptTyping, 700);
+        return;
+      }
+
+      const current = promptSamples[promptIndex];
+      if (!deletingPrompt) {
+        promptChar += 1;
+        guideText.placeholder = current.slice(0, promptChar);
+        if (promptChar >= current.length) {
+          deletingPrompt = true;
+          typingTimer = window.setTimeout(runPromptTyping, 1600);
+          return;
+        }
+      } else {
+        promptChar -= 1;
+        guideText.placeholder = current.slice(0, Math.max(0, promptChar));
+        if (promptChar <= 0) {
+          deletingPrompt = false;
+          promptIndex = (promptIndex + 1) % promptSamples.length;
+          typingTimer = window.setTimeout(runPromptTyping, 420);
+          return;
+        }
+      }
+
+      typingTimer = window.setTimeout(runPromptTyping, deletingPrompt ? 28 : 54);
+    }
+
+    runPromptTyping();
+  </script>
 </body>
-
 </html>

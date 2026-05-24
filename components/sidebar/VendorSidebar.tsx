@@ -4,11 +4,11 @@ import Link from 'next/link';
 export default function VendorSidebar() {
     // System Designer Rule: No shortcuts or hidden entries. Explicitly listed routes.
     const routes = [
-        { name: 'Dashboard', path: '/vendor/dashboard' },
-        { name: 'Qualification', path: '/vendor/qualification' },
-        { name: 'Tenders (Bids)', path: '/vendor/tenders' },
-        { name: 'Active Projects', path: '/vendor/project/dummy-id' }, // Placeholder for project selection
-        { name: 'Messages', path: '/vendor/messages' },
+        { name: '儀表板', path: '/vendor/dashboard' },
+        { name: '資格審核', path: '/vendor/qualification' },
+        { name: '招標 (投標)', path: '/vendor/tenders' },
+        { name: '活躍專案', path: '/vendor/project/dummy-id' }, // Placeholder for project selection
+        { name: '訊息', path: '/vendor/messages' },
     ];
 
     return (

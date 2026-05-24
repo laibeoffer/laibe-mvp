@@ -10,12 +10,12 @@ export default function VendorDashboardPage() {
     return (
         <div className="space-y-6">
             <div className="border-b border-slate-200 pb-4">
-                <h2 className="text-2xl font-bold text-slate-900">Vendor Dashboard</h2>
-                <p className="text-sm text-slate-500 mt-1">Overview of your committed projects and pending actions.</p>
+                <h2 className="text-2xl font-bold text-slate-900">廠商儀表板</h2>
+                <p className="text-sm text-slate-500 mt-1">您已承諾的專案與待處理事項概覽。</p>
             </div>
 
             <div>
-                <h3 className="text-lg font-bold text-slate-800 mb-4">Active Bound Contracts</h3>
+                <h3 className="text-lg font-bold text-slate-800 mb-4">已綁定合約</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {assignedProjects.map(p => (
                         <ProjectCard key={p.id} id={p.id} title={p.title} status={p.status} totalBudget={p.budget} />

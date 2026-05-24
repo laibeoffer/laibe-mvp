@@ -100,8 +100,8 @@ html_content = """<!DOCTYPE html>
 <header class="w-full bg-white/95 backdrop-blur border-b border-black/5 z-50">
     <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <div class="h-[72px] md:h-20 flex items-center justify-between">
-            <a href="file:///C:/Users/J/Desktop/for_ai_studio/public_owner_preflow/laibe_landing_desktop_code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-                <img src="file:///C:/Users/J/Desktop/for_ai_studio/logo/0317_png/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
+            <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
+                <img src="../../../assets/logo/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
             </a>
             <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border border-slate-200">
@@ -223,16 +223,19 @@ html_content = """<!DOCTYPE html>
 </body></html>
 """
 
+WRITE_DESKTOP_COPY = False
+
 path1 = r"c:\laibe_project\src\stitch_laibe_landing_onboarding\tender_notice\code.html"
 path2 = r"c:\Users\J\Desktop\for_ai_studio\public_owner_preflow\tender_notice_code.html"
 
 os.makedirs(os.path.dirname(path1), exist_ok=True)
-os.makedirs(os.path.dirname(path2), exist_ok=True)
 
 with open(path1, "w", encoding="utf-8") as f:
     f.write(html_content)
 
-with open(path2, "w", encoding="utf-8") as f:
-    f.write(html_content)
+if WRITE_DESKTOP_COPY:
+    os.makedirs(os.path.dirname(path2), exist_ok=True)
+    with open(path2, "w", encoding="utf-8") as f:
+        f.write(html_content)
 
 print("Files written successfully.")
