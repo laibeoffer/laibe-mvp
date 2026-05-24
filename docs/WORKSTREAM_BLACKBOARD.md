@@ -142,48 +142,98 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 Branch:
 `site/page-formalization`
 
-Status:
-Merged baseline page formalization. Currently handled manually by Commander + ChatGPT + Codex due visual judgment requirements.
+Role:
+LaiBE MVP Web Flow Builder collaborator. Owns landing, onboarding, header, CTA, routing, progress bar, back button, dashboard flow, and page connections.
+
+Scope:
+- `src/stitch_laibe_landing_onboarding/`
+- `laibe_landing_desktop/code.html`
+- `onboard_ai_agent/code.html`
+- `preview_floor_plan/code.html`
+- `preview_floor_plan/plan-puzzle.js`
+- `preview_budget/code.html`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+
+Current:
+PR #1 merged. Website main flow remains handled manually by Commander + ChatGPT + Codex because visual judgment is required. `site/web-flow-routing` was checked before; whitelisted files had no diff from `main`, so no commit / PR was created.
+
+Forbidden:
+budget engine, raw warehouse, MethodSpec, output renderer, payment / escrow / listing fee, real AI API, real upload.
+
+Last PR / Commit:
+PR #1 merged.
 
 Blocked:
 None.
 
 Next:
-Wait for Commander-selected page task.
+Wait for Commander-selected page or CTA / routing task.
 
 Need Commander:
-Yes, for visual direction.
+Yes, for page selection, visual direction, or product-flow decisions.
 
 Need Reviewer:
-No by default.
+No.
 
 ### governance/codex-rules
 
 Branch:
 `governance/codex-rules`
 
-Status:
-Merged governance templates and workstream mapping.
+Role:
+Codex rules, task templates, and workstream coordination.
+
+Scope:
+- `AGENTS.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/USER_WORKING_STYLE.md`
+- `docs/USER_IT_LIMITS.md`
+- `docs/GITHUB_BRANCH_STRATEGY.md`
+- `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `templates/`
+
+Current:
+PR #2 merged. `docs/WORKSTREAM_BLACKBOARD.md` is established as the shared status board and is being initialized as a handoff source for new chats.
+
+Forbidden:
+website pages, budget implementation, payment / escrow / listing fee, real AI API.
+
+Last PR / Commit:
+PR #2 merged. Blackboard branch `governance/workstream-blackboard` pushed; formal PR / merge still pending.
 
 Blocked:
 None.
 
 Next:
-Only update when workflow rules change.
+Only update when workflow rules or blackboard reporting discipline changes.
 
 Need Commander:
 Only for system-rule changes.
 
 Need Reviewer:
-No by default.
+No.
 
 ### warehouse/raw-candidate
 
 Branch:
 `warehouse/raw-candidate`
 
-Status:
-Merged raw candidate warehouse workspace.
+Role:
+Raw Candidate Warehouse / raw material intake and review station.
+
+Scope:
+- `src/lib/budget/raw-warehouse/`
+- `docs/budget/20-25 raw candidate` series
+
+Current:
+PR #3 merged. Owns RawCatalogSource, RawCatalogItem, Candidate, ReviewQueueItem, HandoffProposal, risk_flags, review queue, observed price safety, and import boundary guard. Candidate data only; no formal price output.
+
+Forbidden:
+formal price, PricingRule, MaterialSpec / LaborRule, `BudgetEstimateLine.unit_price`, renderer / Excel / PDF, BudgetOutputSnapshot, plan-puzzle, payment / escrow / listing fee.
+
+Last PR / Commit:
+PR #3 merged.
 
 Blocked:
 None.
@@ -195,15 +245,30 @@ Need Commander:
 No.
 
 Need Reviewer:
-Only if formal price boundary is touched.
+No. Trigger only if formal price boundary is touched.
 
 ### warehouse/method-spec
 
 Branch:
 `warehouse/method-spec`
 
-Status:
-Merged MethodSpec catalog validators.
+Role:
+MethodSpec / MaterialSpec / LaborRule data-layer gatekeeper.
+
+Scope:
+- `src/lib/budget/specs/`
+- MethodSpec / MaterialSpec / LaborRule / UnitConversion / InclusionExclusionRule
+- validator policy
+- docs/budget MethodSpec series
+
+Current:
+PR #4 merged. P0 validator hardening complete. P1-A / P1-B validator complete. MS-12 Reviewer result: PASS_WITH_NOTES.
+
+Forbidden:
+raw warehouse, renderer / output, frontend, formal budget engine pricing, payment / escrow / listing fee.
+
+Last PR / Commit:
+PR #4 merged.
 
 Blocked:
 None.
@@ -215,15 +280,29 @@ Need Commander:
 No.
 
 Need Reviewer:
-Only if formal price or BudgetEstimateLine boundary is touched.
+No. Trigger only if formal price or BudgetEstimateLine boundary is touched.
 
 ### output/budget-documents
 
 Branch:
 `output/budget-documents`
 
-Status:
-Merged after P2 fix. Output demos are now snapshot-only. PR #5 merge commit: `9095a98`.
+Role:
+BudgetOutputSnapshot to renderer / writer skeleton / dry-run output.
+
+Scope:
+- `src/lib/budget/output/`
+- specified `src/lib/budget/renderers/` renderer / writer skeleton files
+- `docs/budget/15-26 output` series
+
+Current:
+PR #5 merged. Codex review previously raised P2: output demo must not call `generateBudgetEstimate()`. Fixed as snapshot-only. No real xlsx/pdf output.
+
+Forbidden:
+rerun budget engine, decide prices, read pricing rules, modify MethodSpecCatalog, raw warehouse, frontend, plan-puzzle, real xlsx/pdf, payment / escrow / listing fee.
+
+Last PR / Commit:
+PR #5 merged, merge commit `9095a98`.
 
 Blocked:
 None.
@@ -235,15 +314,29 @@ Need Commander:
 No.
 
 Need Reviewer:
-Only if real Excel/PDF output boundary is touched.
+No. Trigger only if real Excel/PDF output boundary is touched.
 
 ### visual/simulation-governance
 
 Branch:
 `visual/simulation-governance`
 
-Status:
-Merged visual simulation governance docs.
+Role:
+AI style visual / image API spike / sandbox governance.
+
+Scope:
+- `docs/ai_style_visual_chat/`
+- `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`
+- `skills/laibe-visual-sim/SKILL.md`
+
+Current:
+PR #6 merged. Governance docs, templates, and skill documentation only. Does not include `plan-puzzle.js`, Quote Factory, or PriceRange.
+
+Forbidden:
+real image API, API key, real AI API, Plancraft geometry, `plan-puzzle.js`, budget, raw warehouse, MethodSpec, renderer, payment / escrow / listing fee, or presenting simulations as construction drawings, formal design drawings, real cases, quote basis, or completion guarantees.
+
+Last PR / Commit:
+PR #6 merged.
 
 Blocked:
 None.
@@ -252,21 +345,34 @@ Next:
 Pause unless visual simulation policy changes.
 
 Need Commander:
-Only if real image/API direction is considered.
+Only if real image/API direction or visual/product direction is considered.
 
 Need Reviewer:
-Only if API/runtime boundary is touched.
+No. Trigger only if API/runtime boundary is touched.
 
 ### plancraft/page-ui
 
 Branch:
 `plancraft/page-ui`
 
-Status:
-No remote branch yet. Current known page UI files had no dirty changes during last check.
+Role:
+Plancraft+ page UI builder.
+
+Scope:
+- `preview_floor_plan/code.html`
+- `preview_floor_plan/plan-puzzle.js`
+
+Current:
+Page UI was previously inventoried with no dirty changes. No PR is needed at the current baseline.
+
+Forbidden:
+Plancraft core, formal estimate, renderer / Excel / PDF, DB / API / AI / payment.
+
+Last PR / Commit:
+No PR.
 
 Blocked:
-Awaiting Commander decision.
+Awaiting Commander-selected page-ui task.
 
 Next:
 Do not start unless Commander selects page-ui task.
@@ -275,35 +381,68 @@ Need Commander:
 Yes.
 
 Need Reviewer:
-No by default.
+No.
 
 ### plancraft/adapter
 
 Branch:
 `plancraft/adapter`
 
-Status:
-Branch exists / ready. Suggested next task: closed zone area candidate contract, but not started.
+Role:
+Plancraft+ adapter contract spike.
+
+Scope:
+- `src/lib/budget/adapters/preview-floor-plan-adapter.ts`
+- `src/lib/budget/types.ts`
+- `src/lib/budget/budget-generator.ts`
+- `src/lib/budget/demo-generate-budget-from-preview-floor-plan.ts`
+- `docs/budget/plancraft-plus-production-adapter-design.md`
+
+Current:
+Branch exists / ready. Known sha: `4ff59ad`. Suggested next task is closed zone area candidate contract, but it has not been approved or started.
+
+Forbidden:
+Plancraft core, formal estimate, formal `generateBudgetEstimate()` flow, renderer / Excel / PDF, DB / API / AI / payment.
+
+Last PR / Commit:
+Branch `plancraft/adapter`, sha `4ff59ad`.
 
 Blocked:
 Awaiting Commander approval.
 
 Next:
-Prepare minimal Issue only after Commander approves.
+Keep as READY / not approved. Prepare minimal Issue only after Commander approves.
 
 Need Commander:
 Yes.
 
 Need Reviewer:
-Only if adapter starts touching formal estimate boundary.
+No. Trigger only if adapter touches formal estimate boundary or crosses workstreams.
 
 ### none-review-only / LAIBE_REVIEWER
 
 Branch:
-None.
+`none-review-only`
 
-Status:
-Reviewer remains read-only. No default branch needed.
+Role:
+Read-only reviewer / audit role.
+
+Scope:
+- PR diff
+- Codex reports
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `AGENTS.md`
+- `AI_RULES/*`
+
+Current:
+No GitHub branch required. Rules are in `main`. Reviewer remains sampling-based / risk-triggered, not scheduled for every task.
+
+Forbidden:
+implementation, file edits, refactors, feature work, product design, dispatch decisions.
+
+Last PR / Commit:
+N/A.
 
 Blocked:
 None.
@@ -334,6 +473,22 @@ N/A.
 - [ ] None
 
 ## Update Log
+
+### 2026-05-24 — deputy-codex
+
+Changed:
+- Filled initial handoff status for all known workstreams from chatroom self-introductions.
+- Added Role, Scope, Current, Last PR / Commit, Blocked, Next, Need Commander, and Need Reviewer fields for each workstream.
+- Added concise Forbidden boundaries so new chats can identify their own scope without relying on old chat memory.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- Not staged / not committed in this round.
+
+Next:
+- Keep `plancraft/adapter` closed zone area candidate contract as READY / not approved.
 
 ### 2026-05-24 — system
 
