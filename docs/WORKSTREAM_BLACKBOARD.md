@@ -1223,6 +1223,50 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - output/budget-documents Issue #18 PR opened
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Status:
+Issue #18 implemented and PR opened. Renderer output remains snapshot-only; no real `.xlsx` / `.pdf` output.
+
+Changed:
+- Added renderer snapshot-only review packet for static guard / import denylist / placeholder writer hardening.
+- Added formal file writer artifact policy contract.
+- Added renderer static guard command wrapper.
+- Restored missing renderer helper modules needed by the snapshot-only path.
+- Verified static guard `valid: true` and fixture smoke `manifest_ready` with `artifact_written: false`.
+
+Files:
+- `docs/budget/27-renderer-snapshot-only-review-packet.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `src/lib/budget/renderers/formal-file-writer-policy.ts`
+- `src/lib/budget/renderers/run-renderer-static-guard.ts`
+- `src/lib/budget/renderers/customer-warning-sanitizer.ts`
+- `src/lib/budget/renderers/validate-render-options.ts`
+- `src/lib/budget/renderers/formal-renderer-token.ts`
+
+PR / Commit:
+- PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
+- Commit: `0460d58`
+
+Blocked:
+None.
+
+Next:
+Wait for PR review / merge. Do not start real Excel / PDF writer without explicit Commander dispatch.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - no idle task request rule added
 
 Published by:
