@@ -316,6 +316,33 @@ Required Deputy action:
 - When a formal Issue exists, comment on that Issue with the correction.
 - If the same workstream fails table compliance for two patrols, apply the `Deputy Two-Patrol Non-Response Rule` and demand an assignment report before the next patrol.
 
+### Missed Progress Backfill Rule
+
+If a workstream misses an existing progress update, active Issue, PR, blackboard entry, merge, blocker, Deputy correction, or Commander instruction, it must go back and find the missing progress before it can claim standby or continue from a stale state.
+
+Required backfill search order:
+- GitHub active Issue body and comments.
+- GitHub open / recently merged PRs for the workstream.
+- GitHub `origin/main` version of `docs/WORKSTREAM_BLACKBOARD.md`.
+- `docs/WORKSTREAM_BLACKBOARD.md` `Update Log`.
+- `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md` when relevant.
+- Workstream mandatory read files listed in `Mandatory Read Rules By Chatroom`.
+- Current chatroom report / handoff export if available.
+
+Required report when progress was missed:
+- `MISSED_PROGRESS_FOUND`: include the exact Issue / PR / commit / blackboard heading / file path found.
+- `LOCAL_STATE_STALE`: explain which local or chatroom state was stale and what source supersedes it.
+- `BACKFILL_ACTION`: state the corrected next action, such as claim Issue, open PR, update blackboard, or report a real blocker.
+
+If the workstream still cannot find the missing progress, it must not simply answer `not found`. It must report:
+- every source checked,
+- the search terms used,
+- the latest GitHub main SHA checked,
+- why the progress cannot be confirmed,
+- what Deputy Codex must verify next.
+
+Deputy Codex must treat failure to backfill missed progress as `TABLE_COMPLIANCE_FAIL` and, after two patrols, as non-response.
+
 Current required upcoming-phase declarations:
 - `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then claim or request the matching formal Issue before implementation.
 - `warehouse/method-spec`: declare `MethodSpec validator freeze note`, target `docs/budget/32-method-spec-validator-freeze-note.md`.
@@ -1169,6 +1196,31 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - missed progress backfill rule added
+
+Published by:
+Deputy Codex
+
+Status:
+Commander instructed that when any workstream misses existing progress, it must go back and find the missed progress and report it before continuing. Missing progress cannot be treated as `no task`, `no issue`, `standby`, or `not found` without a search log.
+
+Changed:
+- Added `Missed Progress Backfill Rule`.
+- Required workstreams to search GitHub Issues, PRs, `origin/main` blackboard, blackboard `Update Log`, handoff files, mandatory workstream files, and chatroom handoff reports when progress appears missing.
+- Required reports to include `MISSED_PROGRESS_FOUND`, `LOCAL_STATE_STALE`, and `BACKFILL_ACTION` when stale or missed progress is found.
+- Required a concrete search log if progress cannot be found.
+- Deputy Codex must treat failure to backfill missed progress as `TABLE_COMPLIANCE_FAIL`, then as non-response after two patrols.
+- Updated active heartbeat automations for Deputy Patrol, Plan Puzzle, MethodSpec Warehouse, Raw Candidate Warehouse, Output Documents, Visual Simulation, Quote Factory, and LAIBE_REVIEWER so missed-progress backfill is enforced at wakeup time.
+
+Next:
+- On each patrol, Deputy Codex must require stale workstreams to backfill missed progress before accepting standby or a blocker report.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - Raw Candidate heartbeat root cause and table compliance rule
 
