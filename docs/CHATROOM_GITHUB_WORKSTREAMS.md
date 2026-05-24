@@ -13,13 +13,48 @@ All construction work should happen on a scoped branch and finish with a PR.
 - 對應 branch：`site/page-formalization`
 - 完成後要開 PR。
 
-## 平面拼圖
+## Plancraft fork / external read-only reference
 
-- 負責什麼：preview_floor_plan page UI、canvas tool hierarchy、Plancraft+ adapter candidate flow。
-- 不能碰什麼：正式估價輸出、Excel / PDF、payment、未授權 production adapter。
-- 對應 branch：`plancraft/page-ui`
-- 對應 branch：`plancraft/adapter`
-- 完成後要開 PR。
+- Repo：`laibeoffer/plancraft`
+- Original：`pedroodb/plancraft`
+- License：MIT License
+- 角色：Plancraft SVG / DSL 平面圖工具 fork。
+- 狀態：`plancraft/` 是 nested git repo，在 `laibe-mvp` 內只作為 read-only reference。
+- 規則：不要把整個 `plancraft/` 直接提交進 `laibe-mvp`。
+- 規則：若未來正式引用，需保留 third-party attribution / license note。
+- 規則：不要把 Plancraft fork、LaiBE Importer UI、Plancraft Adapter Clean 混在同一個 PR。
+
+## LaiBE Importer UI / 平面圖匯入工具
+
+- Repo：`laibeoffer/laibe-mvp`
+- Workstream：`plancraft/page-ui` 或 `plancraft/importer-ui`
+- 主要檔案：
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- 角色：萊比自製平面圖匯入與校正工具，用來補足原 Plancraft 不支援 PNG / JPG / PDF 匯入的問題。
+- 負責什麼：PNG / JPG / JPEG 匯入、PDF 匯入接口與不支援預覽提示、FileReader underlay、底圖校正、canvas / toolbar、wall-first 工具、wallGraph / nodeGraph、openings / zones / zone boundary、`.pc` converter spike、renderer preview report。
+- 不能碰什麼：budget adapter、formal estimate、Plancraft core、renderer / Excel / PDF、payment、AI API / upload backend。
+- 規則：如果沒有新 diff，不要建立空 PR。
+- Need Commander：只有涉及視覺、canvas tool hierarchy、CTA / routing 時才 Yes。
+- Need Reviewer：No by default。
+
+## Plancraft Adapter Clean / Budget Candidate Contract
+
+- Repo：`laibeoffer/laibe-mvp`
+- Workstream：`plancraft/adapter-clean`
+- PR：#9 Add Plancraft adapter candidate contract
+- Status：merged
+- 主要檔案：
+  - `src/lib/budget/adapters/preview-floor-plan-adapter.ts`
+  - `src/lib/budget/types.ts`
+  - `src/lib/budget/demo-generate-budget-from-preview-floor-plan.ts`
+  - `docs/budget/plancraft-plus-production-adapter-design.md`
+- 角色：Plancraft+ draft JSON 轉成 budget-system candidate data 的 adapter contract / spike。
+- 負責什麼：candidate-only budget facts、zones -> Space candidate、openings -> QuantityFact candidate、nodeGraph.edges -> wall facts candidate、`productionReady: false`、`formalEstimateAllowed: false`、formal estimate guard blocked。
+- 不能碰什麼：正式估價、`generateBudgetEstimate()` 正式流程、`BudgetEstimateLine.unit_price`、Plancraft core、preview floor plan UI、renderer / Excel / PDF、raw warehouse、MethodSpec、payment / escrow / listing fee、AI API / upload backend。
+- 規則：demo 不呼叫 `generateBudgetEstimate()`；不產生正式估價。
+- Need Commander：No，除非要改正式估價策略、產品流程或視覺互動。
+- Need Reviewer：No by default；只有 Codex review 出現 NEEDS_FIX / P1 / P2，或越界到 formal estimate / `BudgetEstimateLine.unit_price` 才 Yes。
 
 ## 原物料採購與倉儲
 
@@ -49,12 +84,18 @@ All construction work should happen on a scoped branch and finish with a PR.
 - 對應 branch：`visual/simulation-governance`
 - 完成後要開 PR。
 
-## laibe_quote_factory
+## Quote Factory / 預算原料清洗工廠
 
-- 負責什麼：PriceRange review decision、manual override audit trail、candidate price stats、audit log、illegal override blocking。
-- 不能碰什麼：formal price、PricingRule、BudgetEstimateLine、Supabase、migration、formal quotation。
-- 對應 branch：`quote-factory/price-range-governance`
-- 完成後要開 PR。
+- Repo：`laibeoffer/laibe-quote-factory`
+- Branch：`main`
+- Status：initial repo pushed
+- Workstream：`quote-factory/price-range-governance`
+- 類型：external repo / external workstream，不是 `laibe-mvp` branch。
+- 角色：把歷史報價單資料整理成可追溯候選資料。
+- Flow：RawQuoteRow -> RawCatalogItem / RawCatalogSource -> PriceObservation -> PriceRange -> PriceRange Review Decision。
+- 不能碰什麼：正式價格、正式 PricingRule、`BudgetEstimateLine.unit_price`、`C:\laibe_project`、Supabase、API / migration、Renderer / BudgetOutputSnapshot、payment / escrow / listing fee。
+- Need Commander：No。
+- Need Reviewer：No。
 
 ## Codex 指令優化
 
