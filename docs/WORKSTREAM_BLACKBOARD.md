@@ -21,6 +21,45 @@
 - Operational rule: do not wait for another Deputy before publishing patrol decisions, workstream dispatches, blackboard status updates, or GitHub/Issue/PR routing decisions.
 - If another Deputy returns later, it must read this blackboard first and avoid overwriting active patrol decisions unless the Commander explicitly reassigns authority.
 
+### Executive Officer Delegation Rule
+
+The Executive Officer is a patrol executor for Deputy Codex, not a second Deputy and not a replacement Commander.
+
+Assigned patrol ownership:
+- Plan Puzzle / `plancraft/page-ui`: Issue #15.
+- Raw Candidate / `warehouse/raw-candidate`: Issue #17.
+- Quote Factory / `quote-factory/price-range-governance`: `laibeoffer/laibe-quote-factory` Issue #1.
+- MethodSpec / `warehouse/method-spec`: Issue #16 and PR #22 conflict / review follow-up.
+- Output Documents / `output/budget-documents`: Issue #18 and PR #23 P2 fix follow-up.
+
+Executive Officer may directly do:
+- Chase the assigned chatrooms for `UPCOMING_PHASE_DECLARED`, Issue claim, PR URL, blocker, validation result, and blackboard short-format report.
+- Add concise follow-up comments to the assigned GitHub Issues / PRs when a workstream misses instructions, misses progress, or replies passively.
+- Add `EXECUTIVE_FOLLOW_UP`, `EXECUTIVE_CALL_OUT`, or `EXECUTIVE_STATUS_CHECK` entries to this blackboard.
+- Require workstreams to read the exact mandatory files listed in this blackboard before reporting.
+- Draft a proposed Issue / next action and mark it `RECOMMENDATION_PENDING_DEPUTY`.
+
+Executive Officer must route back to Deputy Codex for:
+- PR merge / reject / close decisions.
+- Issue close / reopen decisions.
+- Final `Need Commander` / `Need Reviewer` determination.
+- Any new formal dispatch outside the active Issue scope.
+- Cross-workstream reassignment.
+- Scope expansion, changed files outside the Issue table, or repeated table-compliance failure.
+- Payment / escrow / listing fee, real AI API / upload / API key, formal price, formal Excel/PDF, destructive git, large deletion, force-push / reset / clean, product direction, visual direction, or business logic.
+
+Executive Officer communication locations:
+- Workstream chatroom: direct work instruction / chase message.
+- Active GitHub Issue / PR: formal follow-up comment tied to the assignment.
+- `docs/WORKSTREAM_BLACKBOARD.md`: shared operational status and callouts.
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`: decision requests or blockers that require Deputy Codex.
+- Commander thread: Deputy Codex reports final decisions; Executive Officer should not bypass Deputy Codex unless the Commander explicitly asks.
+
+Two-cycle enforcement:
+- If an assigned workstream provides no useful response after one Executive Officer patrol, Executive Officer should post a direct follow-up in the workstream chatroom and the relevant Issue / PR.
+- If there is still no useful response after two Executive Officer patrols, Executive Officer must post an `EXECUTIVE_CALL_OUT` to this blackboard and add a short decision request to `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Passive endings such as `no task`, `standby`, `cannot find work`, `no formal Issue`, or `blocked by missing formal Issue` are not accepted while an active Issue or PR exists.
+
 ## Mandatory Read Rules By Chatroom
 
 所有聊天室的 heartbeat / read-only 巡查都必須先讀文件，再判斷狀態。資料夾名稱只代表範圍，不代表已讀取內容；若指令列出資料夾，聊天室必須展開並讀取該資料夾內的相關檔案。若檔案在本地不存在，先查 GitHub `origin/main`；仍不存在才回報 `MISSING`，不得自行腦補。
@@ -1302,6 +1341,32 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - Executive Officer limited delegation published
+
+Published by:
+Deputy Codex
+
+Status:
+Commander asked whether Executive Officer should receive clearer authority, reporting locations, communication rules, and assigned chatrooms. Deputy Codex published a limited delegation model.
+
+Changed:
+- Added `Executive Officer Delegation Rule`.
+- Created `docs/deputy_execution_patrol/README.md`.
+- Created `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Assigned Executive Officer first-line patrol ownership for Issue #15, Issue #17, Quote Factory Issue #1, PR #22 / Issue #16, and PR #23 / Issue #18.
+
+Decision:
+- Executive Officer may directly chase assigned workstreams, comment on assigned Issues / PRs, and publish concise executive follow-ups to this blackboard.
+- Executive Officer must route merge / reject, Issue close / reopen, final `Need Commander` / `Need Reviewer`, new formal dispatch outside active Issue scope, cross-workstream reassignment, and all high-risk scope back to Deputy Codex.
+- Communication locations are now explicit: workstream chatroom, active GitHub Issue / PR, this blackboard, and `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- If a workstream is still passive after two Executive Officer patrols, Executive Officer must publish `EXECUTIVE_CALL_OUT` and append a Deputy decision request to the inbox.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - PR #23 Codex review P2 recorded
 

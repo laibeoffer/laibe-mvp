@@ -1,5 +1,30 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Governance Task: Executive Officer Limited Delegation
+
+- 本輪任務名稱：Executive Officer Limited Delegation。
+- 任務類型：Governance / Patrol Support / Delegation；本輪只更新黑板、handoff，並建立執行官與副指揮官的專用溝通資料夾，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：
+  - `docs/deputy_execution_patrol/README.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Commander asked whether Executive Officer needs clearer rules for reporting, named communication, what must route through Deputy Codex, and whether Executive Officer should receive partial authority / assigned chatrooms.
+- Deputy decision:
+  - Executive Officer is a patrol executor for Deputy Codex, not a second Deputy and not a replacement Commander.
+  - Executive Officer may directly chase assigned workstreams, comment on assigned Issues / PRs, and publish concise `EXECUTIVE_FOLLOW_UP`, `EXECUTIVE_CALL_OUT`, or `EXECUTIVE_STATUS_CHECK` entries to `docs/WORKSTREAM_BLACKBOARD.md`.
+  - Executive Officer must route PR merge / reject, Issue close / reopen, final `Need Commander` / `Need Reviewer`, new formal dispatch outside active Issue scope, cross-workstream reassignment, and high-risk scope back to Deputy Codex.
+  - Dedicated inbox for Deputy decisions: `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Assigned Executive Officer patrol ownership:
+  - Plan Puzzle Issue #15.
+  - Raw Candidate Issue #17.
+  - Quote Factory Issue #1.
+  - MethodSpec Issue #16 / PR #22 conflict and review follow-up.
+  - Output Documents Issue #18 / PR #23 P2 fix follow-up.
+- Need Commander: No.
+- Need Reviewer: No.
+
 ## Latest Patrol Task: PR #23 Codex Review P2 Recorded
 
 - 本輪任務名稱：PR #23 Codex Review P2 Recorded。
