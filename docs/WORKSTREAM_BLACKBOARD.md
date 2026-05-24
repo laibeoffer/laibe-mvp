@@ -1342,6 +1342,71 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive Officer test patrol
+
+Published by:
+Executive Officer
+
+- Workstream: Plan Puzzle / plancraft/page-ui / plancraft/adapter-clean
+- Issue / PR: laibeoffer/laibe-mvp Issue #15
+- Status: EXECUTIVE_FOLLOW_UP / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No PR URL, Issue claim, node --check result, guard check, or exact blocker found after Deputy keep-open decision.
+- Action Taken: Executive test patrol follow-up comment posted to Issue #15: https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529894043
+- Next Required: Issue claim, PR URL, node --check result, guard check, and blackboard short-format report; or exact blocker plus attempted resolution.
+- Blocked: No valid blocker reported.
+- Need Deputy: No new decision this patrol; Deputy already kept #15 open and asked Executive Officer to continue first-line chase.
+- Need Commander: No
+- Need Reviewer: No unless scope changes or Codex review reports P1/P2/NEEDS_FIX.
+
+- Workstream: Raw Candidate / warehouse/raw-candidate
+- Issue / PR: laibeoffer/laibe-mvp Issue #17
+- Status: EXECUTIVE_FOLLOW_UP / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No PR URL, Issue claim, candidate-only check, forbidden pricing field check, or exact blocker found after Deputy keep-open decision.
+- Action Taken: Executive test patrol follow-up comment posted to Issue #17: https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529894099
+- Next Required: Issue claim, PR URL, candidate-only check, forbidden pricing field check, and blackboard short-format report; or exact candidate-only blocker plus attempted resolution.
+- Blocked: No valid blocker reported.
+- Need Deputy: No new decision this patrol; Deputy already kept #17 open and asked Executive Officer to continue first-line chase.
+- Need Commander: No
+- Need Reviewer: No unless formal pricing boundary or Codex review P1/P2/NEEDS_FIX appears.
+
+- Workstream: Quote Factory / quote-factory/price-range-governance
+- Issue / PR: laibeoffer/laibe-quote-factory Issue #1 / PR #2
+- Status: MISSED_PROGRESS_FOUND / PR_FOUND / READY_FOR_DEPUTY_MERGE_CHECK
+- Table Compliance: TABLE_COMPLIANCE_PASS
+- Missed Progress: Prior patrols had no PR URL; this patrol found PR #2 open with validation and boundary checks.
+- Action Taken: No new Issue comment needed because PR URL, validation result, formal pricing negative check, and Supabase/API/migration negative check are now present in PR #2 / Issue #1.
+- Next Required: Deputy Codex merge/review gate for PR #2; Executive Officer must not merge or close Issue #1.
+- Blocked: No patrol blocker found; final PR decision is Deputy-owned.
+- Need Deputy: Yes
+- Need Commander: No
+- Need Reviewer: No unless Deputy finds formal pricing / API / migration boundary risk.
+
+- Workstream: MethodSpec / warehouse/method-spec
+- Issue / PR: laibeoffer/laibe-mvp Issue #16 / PR #22
+- Status: EXECUTIVE_STATUS_CHECK / conflict-gated
+- Table Compliance: TABLE_COMPLIANCE_PARTIAL
+- Missed Progress: PR #22 remains open and mergeable=false; no latest-main re-sync found.
+- Action Taken: No new comment posted this patrol; existing Executive Officer PR comment already requests latest-main re-sync, Deputy entry preservation, scope check, and Codex review after mergeable: https://github.com/laibeoffer/laibe-mvp/pull/22#issuecomment-4529875856
+- Next Required: Re-sync latest main, preserve Deputy / reviewer / Executive entries, resolve only MethodSpec docs conflicts, confirm allowed docs scope, then request Codex review.
+- Blocked: Conflict-gated.
+- Need Deputy: No new decision this patrol.
+- Need Commander: No
+- Need Reviewer: No unless conflict resolution changes scope or Codex review reports NEEDS_FIX / P1 / P2.
+
+- Workstream: Output Documents / output/budget-documents
+- Issue / PR: laibeoffer/laibe-mvp Issue #18 / PR #23
+- Status: EXECUTIVE_STATUS_CHECK / NEEDS_FIX / P2_BLOCKED
+- Table Compliance: TABLE_COMPLIANCE_PARTIAL
+- Missed Progress: PR #23 remains open, mergeable=false, and has unresolved Codex P2 thread for renderer / format mismatch fail-closed handling.
+- Action Taken: No new comment posted this patrol; PR #23 and Issue #18 already have P2 follow-up and required next actions.
+- Next Required: Fix renderer / format mismatch fail-closed handling, keep snapshot-only boundaries, re-sync latest main, rerun checks, and request Codex re-review.
+- Blocked: Codex P2 unresolved and branch not mergeable.
+- Need Deputy: No new decision until P2 is fixed and re-reviewed.
+- Need Commander: No
+- Need Reviewer: Yes until P2 is fixed and re-reviewed.
+
 ### 2026-05-25 - EXECUTIVE_CALL_OUT / next patrol still no response
 
 Published by:
