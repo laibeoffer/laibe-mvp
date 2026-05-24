@@ -1,5 +1,25 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: PR #23/#24 Conflict Backfill Observed / Codex Review Requested
+
+- 本輪任務名稱：PR #23/#24 Conflict Backfill Observed / Codex Review Requested。
+- 任務類型：Governance / Patrol / PR Review Gate；本輪只更新黑板、handoff，並在 GitHub PR 留下副指揮官巡檢留言，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `1c28b6984c20e96a3bea6212fe0b579a9d75c39a`。
+- Reviewer inbox had no pending findings.
+- PR state:
+  - PR #22 `Add MethodSpec validator freeze note` remains conflict-gated and has no Codex review submissions / review threads.
+  - PR #23 `Add renderer snapshot-only review packet` now has an Output Documents conflict-resolution backfill comment, reports passed checks, and GitHub marks it mergeable against latest `main`.
+  - PR #24 `Add visual prompt sandbox governance packet` is now marked mergeable against latest `main`.
+- Deputy added `@codex review` request comments to PR #23 and PR #24.
+- Do not merge PR #23 or PR #24 until Codex review returns PASS / no major issues and scope remains clean.
+- Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 still have no useful workstream response after direct callouts; keep treating them as `TABLE_COMPLIANCE_FAIL / NO_IDLE_FAILURE` until PR URL, issue claim, or exact blocker appears.
+- Need Commander: No.
+- Need Reviewer: No unless Codex review reports NEEDS_FIX / P1 / P2, conflict resolution changes scope, or forbidden/high-risk scope appears.
+
 ## Latest Governance Task: Codex Rules Support Patrol Assigned
 
 - 本輪任務名稱：Codex Rules Support Patrol Assigned。
