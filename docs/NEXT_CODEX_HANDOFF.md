@@ -1,5 +1,31 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Visual Simulation Governance Task: Visual Brief Prompt Sandbox Governance Packet
+
+- 本輪任務名稱：Visual Brief Prompt Sandbox Governance Packet。
+- 任務來源：GitHub Issue #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet`。
+- 任務類型：Documentation / Governance / Prompt Brief；本輪只更新 LAIBE_VISUAL_SIM 的 visual brief、prompt、negative prompt、sandbox policy、storage policy 與 reviewer packet 文件。
+- 新增檔案：
+  - `docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`
+- 修改檔案：
+  - `docs/ai_style_visual_chat/PROMPT_SANITIZATION_RULES.md`
+  - `docs/ai_style_visual_chat/IMAGE_API_REQUEST_SCHEMA.md`
+  - `docs/ai_style_visual_chat/GENERATED_IMAGE_STORAGE_POLICY.md`
+  - `docs/ai_style_visual_chat/IMAGE_API_SPIKE_REVIEW_CHECKLIST.md`
+  - `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`
+  - `skills/laibe-visual-sim/SKILL.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 本輪沒有修改網站 runtime code、`plan-puzzle.js`、Plancraft core、budget、raw warehouse、MethodSpec、renderer、routing、CTA、Header、payment、escrow 或 listing fee。
+- 本輪沒有接真 image API，沒有建立 backend / proxy / upload pipeline，沒有新增 API key、`.env`、package、node_modules 或 production storage。
+- `VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md` 定義 visual brief 必備欄位、prompt preview 降溫語氣、negative prompt 必備排除項、sandbox preview workflow、placeholder visual card 規格、Builder 整合邊界與 Reviewer 檢查重點。
+- `styleVisualApiRequest` contract 維持白名單欄位：`roomType`、`primaryStyle`、`secondaryStyle`、`colorTone`、`materialTone`、`budgetLevel`、`purpose: "bid-listing-style-reference"`、`disclaimerRequired: true`、`referenceImage: { allowed: false, reason: "reference image upload requires separate privacy review" }`。
+- `styleVisualApiRequest` 不得包含 `rawPrompt`、`systemPrompt`、`developerPrompt`、`projectId`、`avoid`、`walls`、`openings`、`zones`、`scale`、`plancraftBridge`、正式預算資料、reference image file 或使用者私宅圖片。
+- Prompt 必須由系統 template 組裝，不得直接使用 raw user prompt；negative prompt 必須阻擋施工圖、正式設計圖、真實案例、正式報價依據、完工保證、精準尺寸、材料品牌保證與法規符合宣稱。
+- Generated preview 只能是 sandbox / mock / temporary preview；不得寫入正式案件資料、production assets、budget data、export JSON、Plancraft geometry 或 case dashboard。
+- 固定 disclaimer 必須保留：`本圖僅為風格示意，用於案件上架與溝通參考，不代表最終設計、施工圖、實際尺寸、工法、材料品牌或正式報價內容。`
+- 下一步若繼續 visual simulation，仍只能處理 visual brief / prompt / negative prompt / governance。任何真 API、reference image upload、production storage、正式圖片用途或 server runtime 都需要新的 formal Issue 並視情況標示 Need Commander: Yes。
+
 ## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
 
 - 本輪任務名稱：Issue / Blackboard / Heartbeat Patrol Workflow。
