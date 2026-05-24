@@ -1,5 +1,20 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Patrol Task: PR Conflict Recheck / Reviewer Cadence Wording Sync
+
+- 本輪任務名稱：Deputy Patrol PR Conflict Recheck / Reviewer Cadence Wording Sync。
+- 任務類型：Governance / Patrol / Documentation；本輪只更新黑板狀態與審查官巡檢規則文字，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state rechecked: `main` latest sha is `6eb6e95cbd1c7dee0f87617381dbfa637a28123b`.
+- Open PRs remain #22, #23, #24. Each stays inside its expected workstream scope, has no PR comments / review threads, and is still conflict-gated against latest `main`.
+- Active Issues remain #15-#19 in `laibeoffer/laibe-mvp` and #1 in `laibeoffer/laibe-quote-factory`.
+- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` has no pending reviewer findings at this handoff point.
+- Corrected `Reviewer Patrol Support Rule` wording in the blackboard so the active rule says 2 hours during correction / stabilization, matching the active `laibe-reviewer-heartbeat` cadence.
+- Next Deputy action: keep watching PR #22-#24 for conflict-resolution updates, Codex review comments, or scope changes; publish any new decision to the blackboard before reporting to Commander.
+
 ## Latest Governance Task: Reviewer Patrol Support
 
 - 本輪任務名稱：Reviewer Patrol Support for Deputy Codex。
