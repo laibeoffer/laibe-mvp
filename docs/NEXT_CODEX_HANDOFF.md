@@ -7,13 +7,29 @@
 - 修改檔案：
   - `docs/WORKSTREAM_BLACKBOARD.md`
   - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- Commander authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex.
+- 新增檔案：無；此段已由下方 `Reviewer Patrol Inbox` 段落補充固定交付檔案。
+- Commander initially authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex; current stabilization cadence is now 2 hours, recorded below.
 - LAIBE_REVIEWER remains `none-review-only`; it may audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
 - LAIBE_REVIEWER must not implement, edit files, open / close Issues, merge / reject PRs, dispatch Builder tasks, make product decisions, or read / expose secrets.
 - Expected reviewer patrol results: `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, `PATROL_RISK_FOUND`, `TABLE_COMPLIANCE_FAIL`, or `MISSED_PROGRESS_BACKFILL_REQUIRED`.
 - Deputy Codex remains the sole active Deputy and final routing / blackboard publication authority.
-- Automation updated: `laibe-reviewer-heartbeat` remains active on a 3-hour cadence with the revised patrol-support prompt.
+- Automation updated: `laibe-reviewer-heartbeat` was first set to 3-hour read-only patrol support; current 2-hour inbox-based prompt is recorded below.
+
+## Latest Governance Task: Reviewer Patrol Inbox
+
+- 本輪任務名稱：Reviewer Patrol Inbox for Deputy Decision。
+- 任務類型：Governance / Automation / Documentation；本輪只新增審查官巡檢交付資料夾與黑板規則，不修改功能程式碼。
+- 新增檔案：
+  - `docs/deputy_reviewer_patrol/README.md`
+  - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Reviewer patrol findings now have a dedicated file handoff lane.
+- LAIBE_REVIEWER may append decision-worthy findings only to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`.
+- LAIBE_REVIEWER must not update `docs/WORKSTREAM_BLACKBOARD.md` directly, must not edit source code, and must not open / close Issues, merge PRs, dispatch Builder tasks, or make product decisions.
+- Deputy Codex reads the inbox, decides whether action is needed, and publishes official decisions to `docs/WORKSTREAM_BLACKBOARD.md`.
+- Reviewer heartbeat cadence is now 2 hours during the correction / stabilization period.
 
 ## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
 

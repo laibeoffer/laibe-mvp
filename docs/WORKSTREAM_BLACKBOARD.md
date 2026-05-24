@@ -462,8 +462,14 @@ Reviewer patrol support may report:
 - `TABLE_COMPLIANCE_FAIL`
 - `MISSED_PROGRESS_BACKFILL_REQUIRED`
 
+Reviewer patrol support file:
+- Dedicated inbox: `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+- If reviewer finds a decision-worthy risk, scope issue, missed progress, or table-compliance failure, it may append a short entry to this inbox with `Status: PENDING_DEPUTY_DECISION`.
+- The reviewer must not update `docs/WORKSTREAM_BLACKBOARD.md` directly. Deputy Codex reads the inbox, makes the routing decision, and publishes official blackboard decisions.
+- If reviewer finds no issue, it may report `NO_REVIEW_TRIGGER` without editing the inbox.
+
 Reviewer patrol support must not:
-- modify files
+- modify files outside `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
 - open / close Issues or PRs
 - dispatch Builder tasks
 - merge / reject PRs
@@ -846,14 +852,15 @@ Scope:
 - Codex reports
 - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
 - `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` append-only patrol findings
 - `AGENTS.md`
 - `AI_RULES/*`
 
 Current:
-No GitHub branch required. Rules are in `main`. Reviewer remains `none-review-only`, but may wake every 3 hours to audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+No GitHub branch required. Rules are in `main`. Reviewer remains `none-review-only`, but may wake every 2 hours during the current correction / stabilization period to audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
 
 Forbidden:
-implementation, file edits, refactors, feature work, product design, dispatch decisions, PR merge / reject, Issue open / close, or Builder task ownership.
+implementation, source-code edits, refactors, feature work, product design, dispatch decisions, PR merge / reject, Issue open / close, Builder task ownership, or direct blackboard decisions. The only allowed file write is append-only reviewer patrol findings in `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
 
 Last PR / Commit:
 N/A.
@@ -862,7 +869,7 @@ Blocked:
 None.
 
 Next:
-Every 3 hours, report either `NO_REVIEW_TRIGGER` or concise evidence for `REVIEW_TRIGGER_FOUND` / `PATROL_RISK_FOUND` to Deputy Codex. Do not act directly.
+Every 2 hours, report either `NO_REVIEW_TRIGGER` or append concise evidence for `REVIEW_TRIGGER_FOUND` / `PATROL_RISK_FOUND` / `TABLE_COMPLIANCE_FAIL` / `MISSED_PROGRESS_BACKFILL_REQUIRED` to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`. Do not act directly.
 
 Need Commander:
 Only if review escalates to product decision.
@@ -1110,9 +1117,9 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 - [ ] To: 審查官聊天室 / LAIBE_REVIEWER
   - Workstream: none-review-only
   - Branch / Repo: none / laibeoffer/laibe-mvp
-  - Mission: Every 3 hours, help Deputy Codex with read-only patrol support: audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+  - Mission: Every 2 hours, help Deputy Codex with read-only patrol support: audit active Issues / PRs / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
   - Why this agent: Reviewer can catch risk and compliance gaps without taking over Builder or Deputy authority.
-  - Action: Report `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, or `PATROL_RISK_FOUND` with concise evidence and recommended Deputy action. Do not dispatch, merge, edit, or implement.
+  - Action: Report `NO_REVIEW_TRIGGER` when no issue exists. If a decision-worthy finding exists, append it to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`, concise evidence, and recommended Deputy action. Do not dispatch, merge, edit code, or implement.
   - Need Commander: No.
   - Need Reviewer: N/A.
 
@@ -1255,6 +1262,31 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - reviewer patrol inbox created
+
+Published by:
+Deputy Codex
+
+Status:
+Commander clarified that reviewer patrol support should have a dedicated file-based handoff lane and wait for Deputy Codex裁決 before blackboard publication.
+
+Changed:
+- Added `docs/deputy_reviewer_patrol/README.md`.
+- Added `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`.
+- Updated reviewer patrol support rules: reviewer may append decision-worthy findings only to the inbox with `Status: PENDING_DEPUTY_DECISION`.
+- Reviewer must not update the blackboard directly. Deputy Codex reads the inbox, decides, and publishes official blackboard decisions.
+- Updated reviewer patrol cadence from 3 hours to 2 hours during the current correction / stabilization period.
+
+Decision:
+- Reviewer patrol findings now have a fixed file destination.
+- Deputy Codex remains the sole routing and blackboard publication authority.
+
+Need Commander:
+No
+
+Need Reviewer:
+N/A
 
 ### 2026-05-25 - patrol found open PRs #22-#24 conflict-gated
 
