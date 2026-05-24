@@ -232,6 +232,33 @@ Required upcoming-phase short format:
 - Need Commander:
 - Need Reviewer:
 
+### Deputy Two-Patrol Non-Response Rule
+
+Deputy Codex must actively supervise workstream momentum. If any named chatroom / workstream has an active Issue, active dispatch, or required `UPCOMING_PHASE_DECLARED` item and fails to provide a useful response for two consecutive Deputy patrols, Deputy must stop silent waiting and publish a direct callout.
+
+Non-response includes:
+- No reply in the workstream chatroom after two patrol cycles.
+- Repeating stale state such as `Open Issue: None` when a formal Issue already exists.
+- Reporting standby without `UPCOMING_PHASE_DECLARED`, blocker, PR URL, or task-preview status.
+- Reporting only local dirty worktree status without claiming the active Issue or explaining a true blocker.
+
+Required Deputy action after two non-response patrols:
+- Name exactly one workstream / chatroom.
+- Point to the active Issue / PR / blackboard entry.
+- Tell that chatroom to submit an assignment report before the next patrol.
+- State the required deliverable: `UPCOMING_PHASE_DECLARED`, Issue claim, branch/PR URL, blocker, or `TASK_PREVIEW_MISSING`.
+- Publish the callout to this blackboard and, when a formal Issue exists, add a short Deputy guidance comment on that Issue.
+
+Required callout format:
+- To:
+- Workstream:
+- Active Issue / PR:
+- Missed Patrol Count:
+- Required Assignment:
+- Deadline:
+- Need Commander:
+- Need Reviewer:
+
 Current required upcoming-phase declarations:
 - `plancraft/page-ui` / `plancraft/adapter-clean`: declare `Plancraft+ Zone Area / Boundary Refinement`, then claim or request the matching formal Issue before implementation.
 - `warehouse/method-spec`: declare `MethodSpec validator freeze note`, target `docs/budget/32-method-spec-validator-freeze-note.md`.
@@ -1085,6 +1112,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25 - Deputy two-patrol non-response rule added
+
+Published by:
+Deputy Codex
+
+Status:
+Commander instructed that if any chatroom fails to respond for two or more patrol cycles, Deputy Codex must directly call out that chatroom and require assignment delivery. This is now a blackboard rule.
+
+Changed:
+- Added `Deputy Two-Patrol Non-Response Rule`.
+- Defined non-response as no reply, stale state, standby without `UPCOMING_PHASE_DECLARED`, or local-status-only reports that do not claim the active Issue.
+- Required Deputy Codex to name the workstream, point to the active Issue / PR / blackboard entry, and demand one concrete assignment report before the next patrol.
+- Required Deputy Codex to publish the callout to the blackboard and add a short Issue guidance comment when a formal Issue exists.
+
+Next:
+- Track missed patrol counts for active workstreams with Issues #15-#19 and Quote Factory Issue #1.
+- If any workstream reaches two missed patrols, publish a direct callout and require `UPCOMING_PHASE_DECLARED`, Issue claim, branch/PR URL, blocker, or `TASK_PREVIEW_MISSING`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-25 - Raw Candidate stale issue-state correction
 
