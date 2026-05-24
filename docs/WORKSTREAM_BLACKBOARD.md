@@ -1142,6 +1142,28 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - first missed patrol after problem-solving duty
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol verified that `laibeoffer/laibe-mvp` has no open PRs, Issues #15-#19 remain open, and `laibeoffer/laibe-quote-factory` Issue #1 remains open. The latest comments on all six active Issues are still Deputy duty updates; no workstream has yet replied with an Issue claim, PR URL, real blocker, or assignment report after the `Workstream Problem-Solving Duty / No Passive Reply Rule`.
+
+Changed:
+- Recorded missed patrol count `1` for active workstreams after the no-passive-reply duty update.
+- Active workstreams being watched: Plan Puzzle Issue #15, MethodSpec Issue #16, Raw Candidate Issue #17, Output Documents Issue #18, Visual Simulation Issue #19, and Quote Factory Issue #1.
+- No formal callout comment was posted yet because the `Deputy Two-Patrol Non-Response Rule` triggers after two consecutive missed patrols.
+
+Next:
+- If the next patrol still sees no useful workstream response, Deputy Codex must publish direct callouts and require each silent workstream to submit `UPCOMING_PHASE_DECLARED`, Issue claim, branch / PR URL, real blocker, or `TASK_PREVIEW_MISSING`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - workstream problem-solving duty added
 
 Published by:
