@@ -4525,6 +4525,38 @@ No
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Executive final-gate ACK follow-up on `14e6bd7`
+
+Workstream:
+command/executive / final-gate visibility lane
+
+Status:
+FINAL_GATE_VISIBILITY_STILL_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / NO_COMMANDER_DECISION
+
+Table Compliance:
+PASS - PR #23 and PR #25 still have pushed branch heads, PR URLs, current-main merge-tree simulation pass, visible validation evidence, and clean Codex comments. No branch-head regression or new NEEDS_FIX / P1 / P2 was found.
+
+Missed Progress:
+No Builder missed progress; ordinary Builder chase remains stopped. Deputy final-gate visibility is still pending.
+
+Action Taken:
+Executive Officer rechecked latest main `14e6bd7d5e01149d95683baa5def443c5cf59d69`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, PR comments, reviews, changed files, PR refs, fetched PR heads / merge refs, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #23 remains open and REST `mergeable=True` at head `d126327ddac96d29ba553a5c7ca9aab9e6461217`; `refs/pull/23/merge` remains `c39436e1d2a73963626e4d3c9466350832139a74`; local merge-tree against current main exits `0` with tree `8eaea53467755ac7b499a29f0658ed68e6ea2f53`; latest useful comments remain Output Documents repair `4534112469`, Codex clean `4534133600`, and post-review patrol update `4534162541`. PR #25 remains open and REST `mergeable=True` at head `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; `refs/pull/25/merge` remains `8d796e62b303066b9097b48a59b37fd7ea7fa933`; local merge-tree exits `0` with tree `bcb5315fb1869cb09ccc4eedd95ace01001d1726`; latest useful comments remain `PLAN_PUZZLE_ACTION_TAKEN` `4534058804` and Codex clean `4534078809`.
+
+Next Required:
+Deputy Codex should publish final-gate visibility for PR #23 and PR #25, or state an exact blocker with attempted fix. Executive should keep monitor-only unless branch heads change, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
+Blocked:
+No Executive-level blocker. Merge / reject remains Deputy authority.
+
+Need Deputy:
+Yes for PR #23 / PR #25 final-gate visibility; no merge / reject executed by Executive.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drift.
+
 ### 2026-05-25 - Executive PR23 clean / PR25 still final-gate on `a4fa97f`
 
 Workstream:

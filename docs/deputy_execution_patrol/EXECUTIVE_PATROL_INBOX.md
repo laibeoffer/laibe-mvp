@@ -37,6 +37,49 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T12:29:52Z - [EXECUTIVE_ACTION_REQUEST] - Final Gate Visibility
+
+Status:
+PENDING_DEPUTY_DECISION / FINAL_GATE_VISIBILITY_STILL_PENDING
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+command/deputy / final-gate visibility
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / Issue #18 and PR #25 / Issue #15
+
+Finding:
+No new Deputy final-gate ACK was visible after the 12:17 Executive final-gate routing update. PR #23 and PR #25 remain open, mergeable, and current-main merge-tree clean; ordinary Builder chase remains stopped.
+
+Evidence:
+- Latest main: `14e6bd7d5e01149d95683baa5def443c5cf59d69`.
+- PR #23 state: open, merged `False`, head `d126327ddac96d29ba553a5c7ca9aab9e6461217`, `refs/pull/23/merge` `c39436e1d2a73963626e4d3c9466350832139a74`, REST `mergeable=True`, local merge-tree exit `0`, tree `8eaea53467755ac7b499a29f0658ed68e6ea2f53`.
+- PR #23 latest useful comments remain Output Documents repair `4534112469`, Codex clean `4534133600`, and post-review patrol update `4534162541`; no newer final-gate ACK was found.
+- PR #25 state: open, merged `False`, head `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`, `refs/pull/25/merge` `8d796e62b303066b9097b48a59b37fd7ea7fa933`, REST `mergeable=True`, local merge-tree exit `0`, tree `bcb5315fb1869cb09ccc4eedd95ace01001d1726`.
+- PR #25 latest useful comments remain `PLAN_PUZZLE_ACTION_TAKEN` `4534058804` and Codex clean `4534078809`; no newer final-gate ACK was found.
+- PR #22 and PR #26 also still merge-tree clean and remain monitor-only final-gate candidates.
+
+Action already taken:
+Executive Officer rechecked required sources, GitHub Issues / PRs / comments / reviews / files, PR refs, and local merge-tree signals; updated blackboard and delivery-ledger watch. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Publish final-gate visibility for PR #23 and PR #25, or state the exact blocker with attempted fix. Executive should continue monitor-only unless branch heads change, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes or new Codex review reports NEEDS_FIX / P1 / P2.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T12:17:48Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents
 
 Status:
