@@ -4556,3 +4556,36 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Deputy2 visible ACK follow-up on `b2a7f45`
+
+Workstream:
+command/executive / Deputy Codex-2 repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2 / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Fast-forwarded patrol worktree to latest `origin/main` `b2a7f45599416822280807b19fda4f670a56ca9d`.
+- Re-checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open Issues / open PR metadata, PR #23 / PR #25 comments and review state, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 and PR #26 remain Deputy Codex final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Executive reassignment recommendation `4531941113`; PR reviews remain `4353275479` / `4354108564`; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`; no GitHub merge ref or PR review exists; local merge-tree exits `128` / unrelated histories in this worktree while the Commander ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+- No Deputy Codex-2 visible repair ACK was found after the 07:57 Executive follow-up and 08:05 Commander reconfirmation.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #23 / PR #25 assigned to Deputy Codex-2 workflow repair.
+- Executive Officer issued one single-primary `To: Deputy Codex-2` visible ACK follow-up in `EXECUTIVE_PATROL_INBOX.md`.
+- Required next visible ACK from Deputy Codex-2: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, and next executable owner.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
