@@ -37,6 +37,51 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T14:50:49Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Post-Publication Sync Repair
+
+Status:
+POST_PUBLICATION_SYNC_BLOCKED_AGAIN / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 briefly reached current-main final-gate evidence on head `976b4cba3ab33743d02a97451f04ddc65a316dc1`, but Executive's patrol-doc publication advanced `main` to `a5c0d357641fea516ad2a2f91eb4cb180a819f26` and made PR #23 sync-blocked again by `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Previous latest-main repair evidence: Builder comment `4535080840` against `20808ae85e0847ce606a0208a6fa932f1ba92221`.
+- Previous clean Codex result: comment `4535125308` at `2026-05-25T14:46:15Z`.
+- New main after Executive publication: `a5c0d357641fea516ad2a2f91eb4cb180a819f26`.
+- PR #23 head remains `976b4cba3ab33743d02a97451f04ddc65a316dc1`.
+- Post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+- PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox with a superseding sync-repair request. No source files were modified by Executive and no merge / reject / close action was executed.
+
+Recommended next action:
+Output Documents Builder should fetch latest `origin/main`, re-sync PR #23 against `a5c0d357641fea516ad2a2f91eb4cb180a819f26` or newer, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus patrol entries, rerun required checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
 ### 2026-05-25T14:44:23Z - [DEPUTY_DECISION_REQUEST] - PR23 Final Gate After Latest Sync
 
 Status:
