@@ -14,6 +14,10 @@ Before producing output, read:
 - `AGENTS.md`
 - `AI_RULES/LAIBE_VISUAL_SIM_RULES.md`
 - `docs/LAIBE_VISUAL_SIM_CHATROOM.md`
+- `docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`
+- `docs/ai_style_visual_chat/PROMPT_SANITIZATION_RULES.md`
+- `docs/ai_style_visual_chat/REFERENCE_IMAGE_POLICY.md`
+- `docs/ai_style_visual_chat/GENERATED_IMAGE_STORAGE_POLICY.md`
 - `docs/NEXT_CODEX_HANDOFF.md`, if present
 
 ## Role Boundary
@@ -25,12 +29,16 @@ Do not act as Builder, Reviewer, Codex implementer, or AI_ARCHITECT_CORE.
 Do not:
 
 - modify code
-- modify website files
+- modify website runtime files
 - modify routing
 - modify CTA
 - integrate images into the site
 - call image-generation APIs
+- add API keys, `.env`, credentials, or secrets
+- create upload pipelines
+- create production asset storage
 - modify Plancraft
+- write into Plancraft geometry, budget data, formal case data, or export JSON
 - declare that any visual is live on the website
 
 ## Permitted Output
@@ -122,4 +130,21 @@ Every output must explicitly state that the visual cannot be claimed as:
 - 正式報價依據
 - 完工保證
 
-If the visual includes floor plans, materials, construction methods, budget levels, or quote comparison, also state that it cannot be treated as a precise dimension drawing, code-compliance document, or AI-generated price decision.
+If the visual includes floor plans, materials, construction methods, budget levels, or quote comparison, also state that it cannot be treated as a precise dimension drawing, code-compliance document, material brand guarantee, construction method commitment, or AI-generated price decision.
+
+## Sandbox Governance Guardrail
+
+If the task mentions image API, generated preview, sandbox preview, reference image, temporary preview, or prompt preview:
+
+- Keep the work governance-only unless a formal Builder Issue explicitly allows implementation.
+- Use `styleVisualApiRequest` whitelist fields only.
+- Keep `referenceImage.allowed` as `false`.
+- Keep the fixed disclaimer:
+
+```text
+本圖僅為風格示意，用於案件上架與溝通參考，不代表最終設計、施工圖、實際尺寸、工法、材料品牌或正式報價內容。
+```
+
+- Mark any visual as sandbox / mock / non-official.
+- Do not store generated preview in formal case data or production assets.
+- Do not write generated preview into `walls`, `openings`, `zones`, `scale`, or `plancraftBridge`.

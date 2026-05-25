@@ -6,9 +6,11 @@ Map LaiBE chatrooms to scoped GitHub workstreams.
 
 All construction work should happen on a scoped branch and finish with a PR.
 
+Primary strategic source: `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`.
+
 ## Global Dispatch / Heartbeat Rules
 
-GitHub Issue is the formal dispatch unit. `docs/WORKSTREAM_BLACKBOARD.md` is the shared status board. Pull Request is the completion / review artifact.
+GitHub Issue is the formal dispatch ticket. `docs/WORKSTREAM_BLACKBOARD.md` is the battle board. Pull Request is the completion / review artifact. Heartbeat / automation is a patrol timer only, not a dispatch channel.
 
 Deputy Codex dispatch must include:
 

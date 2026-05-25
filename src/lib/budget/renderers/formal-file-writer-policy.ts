@@ -166,24 +166,51 @@ export const buildFormalArtifactFilename = (
   return `${parts.join("-")}.${getFormalArtifactExtension(format)}`;
 };
 
-export const inferFormalArtifactFormat = (
-  output: Pick<FormalRenderedSkeletonOutput, "renderer" | "format">,
-): FormalArtifactFormat => {
-  if (
-    output.renderer === "formal_excel_skeleton" ||
-    output.format === "excel_skeleton"
-  ) {
+const formatFromRenderer = (
+  renderer: FormalRenderedSkeletonOutput["renderer"],
+): FormalArtifactFormat | null => {
+  if (renderer === "formal_excel_skeleton") {
     return "excel";
   }
 
-  if (
-    output.renderer === "formal_pdf_skeleton" ||
-    output.format === "pdf_skeleton"
-  ) {
+  if (renderer === "formal_pdf_skeleton") {
     return "pdf";
   }
 
-  throw new Error("Unknown formal renderer output format.");
+  return null;
+};
+
+const formatFromSkeletonFormat = (
+  format: FormalRenderedSkeletonOutput["format"],
+): FormalArtifactFormat | null => {
+  if (format === "excel_skeleton") {
+    return "excel";
+  }
+
+  if (format === "pdf_skeleton") {
+    return "pdf";
+  }
+
+  return null;
+};
+
+export const inferFormalArtifactFormat = (
+  output: Pick<FormalRenderedSkeletonOutput, "renderer" | "format">,
+): FormalArtifactFormat => {
+  const rendererFormat = formatFromRenderer(output.renderer);
+  const skeletonFormat = formatFromSkeletonFormat(output.format);
+
+  if (!rendererFormat || !skeletonFormat) {
+    throw new Error("Unknown formal renderer output format.");
+  }
+
+  if (rendererFormat !== skeletonFormat) {
+    throw new Error(
+      `Formal renderer / format mismatch: ${output.renderer} cannot produce ${output.format}.`,
+    );
+  }
+
+  return rendererFormat;
 };
 
 export const storageTargetIsAllowed = (
