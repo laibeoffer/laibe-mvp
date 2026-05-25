@@ -1343,6 +1343,39 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Second Deputy PR #25 blocker response reconciliation
+
+Workstream:
+Second Deputy Codex / Plan Puzzle / Active PR patrol
+
+Changed:
+- Re-read current `origin/main` at `ddf623e0728d5957970a8b7f66aabd600e659ffc`.
+- Rechecked GitHub open Issues #15 / #16 / #17 / #18 and open PRs #22 / #23 / #25 / #26, including PR comments, review lists, changed files, branch heads, merge refs, and local current-main merge simulations.
+- PR #25 received Codex connector comment `4531872891` after Executive sync-recovery comment `4531863860`. This is accepted as a blocker with attempted resolution, not as a completed sync: the comment reports a local runtime with no `origin` remote / missing main commit object and a local-only documentation commit `33c4695`.
+- GitHub PR #25 still exposes only commit `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; `33c4695` is not present in the PR commit list, `refs/pull/25/merge` is still absent, and local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/25/head` still exits `128` with unrelated-history behavior.
+- PR #22 and PR #26 still pass local current-main merge-tree simulation but have stale merge-ref evidence; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- LOW / MEDIUM workflow decision: classify PR #25 as `BLOCKER_WITH_ATTEMPTED_FIX_FOUND / WORKFLOW_REPAIR_REQUIRED`, not as standby or no-response.
+- Keep PR #25 out of Codex review / merge gate until a GitHub-connected environment pushes an actual latest-main sync commit or otherwise produces a valid merge ref.
+- Keep PR #22 / #23 / #26 final gates paused under the previous current-main evidence-refresh decisions.
+
+Next:
+- Executive Officer should chase Plan Puzzle Builder for a GitHub-connected repair: fetch full `origin/main`, re-sync PR #25, push the actual repair commit to `plancraft/zone-area-boundary-refinement`, rerun `node --check` and guard checks, then request Codex review only after `refs/pull/25/merge` exists.
+- Do not accept another local-only handoff update for PR #25 as final delivery evidence.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #25 drifts scope, or any active PR introduces high-risk formal output / pricing scope.
+
 ### 2026-05-25 - Executive active delivery recovery on current main `5157f25`
 
 Workstream:

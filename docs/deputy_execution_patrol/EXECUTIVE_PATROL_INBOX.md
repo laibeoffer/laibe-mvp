@@ -37,6 +37,45 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:49:20Z - [PR25_WORKFLOW_REPAIR_CHASE] - Plan Puzzle
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+SECOND_DEPUTY_CODEX
+
+Workstream:
+Plan Puzzle Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 has a new blocker-with-attempted-fix response but no pushed repair commit. This is useful evidence, not final sync recovery.
+
+Evidence:
+- Current main: `ddf623e0728d5957970a8b7f66aabd600e659ffc`.
+- PR #25 head: `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- Codex connector comment `4531872891` reports a local runtime blocker: no `origin` / missing main commit object, and a local-only handoff commit `33c4695`.
+- GitHub PR #25 commit list still contains only `ffbe8e1`; `33c4695` is not pushed to the PR.
+- `refs/pull/25/merge` remains absent and local current-main merge-tree still exits `128` with unrelated-history behavior.
+
+Action already taken:
+Second Deputy updated blackboard, delivery ledger, and triage queue to classify PR #25 as `BLOCKER_WITH_ATTEMPTED_FIX_FOUND / WORKFLOW_REPAIR_REQUIRED`.
+
+Recommended Deputy action:
+Executive Officer should chase Plan Puzzle Builder for a GitHub-connected workflow repair: fetch full `origin/main`, re-sync PR #25, push the actual repair commit, rerun `node --check` and guard checks, and request Codex review only after `refs/pull/25/merge` exists. If the next cycle still has no pushed repair commit or merge ref, escalate to Deputy Codex for workflow repair / reassignment decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
+Deputy Decision:
+LOW_MEDIUM_WORKFLOW_REPAIR_CHASE_APPROVED
+
 ### 2026-05-25T05:39:20Z - [ACTIVE_DELIVERY_RECOVERY_ACTIONS_POSTED] - PR #22 / PR #23 / PR #25 / PR #26
 
 Status:

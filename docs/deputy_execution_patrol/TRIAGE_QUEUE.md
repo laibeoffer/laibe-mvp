@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T05:49:20Z - [PR25_BLOCKER_WITH_ATTEMPTED_FIX_FOUND] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Current main is `ddf623e0728d5957970a8b7f66aabd600e659ffc`. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; GitHub commits for PR #25 still contain only that commit and no `refs/pull/25/merge`. Codex connector comment `4531872891` reports a blocker with attempted fix from a runtime without `origin` / the target main object and a local-only commit `33c4695`, which is not present on the PR. Local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/25/head` still exits `128` with unrelated-history behavior.
+
+Recommended Executive Action:
+Chase Plan Puzzle Builder for GitHub-connected workflow repair: fetch full `origin/main`, re-sync PR #25, push the actual repair commit to `plancraft/zone-area-boundary-refinement`, rerun `node --check` and guard checks, and request Codex review only after a merge ref exists. Do not accept another local-only handoff update as final delivery evidence.
+
+Recommended Deputy Action:
+Keep PR #25 in sync recovery / workflow repair. No cross-workstream reassignment yet; escalate to Deputy Codex only if the next cycle still produces no pushed repair commit or valid merge ref.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25T05:39:20Z - [ACTIVE_PR_CURRENT_MAIN_REFRESH] - PR #22 / PR #23 / PR #25 / PR #26
 
 Status:
