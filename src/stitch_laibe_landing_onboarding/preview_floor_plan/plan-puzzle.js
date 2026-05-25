@@ -4308,7 +4308,7 @@
           continue;
         }
         const intersection = getSegmentIntersection(segments[firstIndex], segments[secondIndex]);
-        if (intersection && !isPointAtWallEndpoint(segments[firstIndex], intersection) && !isPointAtWallEndpoint(segments[secondIndex], intersection)) {
+        if (intersection) {
           return true;
         }
       }

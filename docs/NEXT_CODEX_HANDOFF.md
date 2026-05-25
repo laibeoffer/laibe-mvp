@@ -2,6 +2,9 @@
 
 ## Latest Plan-Puzzle Task: Plancraft+ Zone Area / Boundary Refinement
 
+- 2026-05-25 heartbeat follow-up：已針對 PR #25 Codex P2 `discussion_r3299302339` 修正 polygon self-intersection 判斷。
+- `hasPolygonSelfIntersection()` 現在會把非相鄰邊段的任何交點都視為 self-intersection，包含 T-junction / endpoint-on-edge 這類 malformed boundary；避免 malformed closed zone 被計算候選面積。
+- 本次 P2 fix 仍維持 candidate-only zone area；沒有修改 Plancraft core、budget adapter/runtime/type、formal quantity、formal estimate、renderer、payment、AI/API 或 secrets。
 - 2026-05-25 heartbeat follow-up：已針對 PR #25 最新 Codex P2 修正 `areaUpdatedAt` 與 invalid closed polygon 行為。
 - `areaUpdatedAt` 現在只在 boundary geometry 或 area metadata signature 實際改變時更新；單純 `render()` / `syncZoneBoundaryMetadata()` 不再刷新時間戳，避免 draft export nondeterministic churn。
 - closed 但 invalid 的 polygon 現在仍保留 `polygon` geometry，讓 canvas 可用 invalid styling 顯示並方便使用者修正，不會因 `boundaryStatus: "invalid"` 被清成空陣列。
