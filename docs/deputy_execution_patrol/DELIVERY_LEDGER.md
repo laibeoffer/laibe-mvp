@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-25T22:18:02Z - Active PR metadata contradiction against `afac58d`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION / DEPUTY2_VALIDATION_REFRESH_REQUIRED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #25 / PR #26 GitHub metadata / merge-ref reconciliation, plus PR #23 final-gate evidence awareness. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `afac58d7951c70888bb71973b8482d3d04fda7da`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `afac58d7951c70888bb71973b8482d3d04fda7da`: PR #22 tree `2b56e353c05a4e06690ad0ce0c15185a4712da88`; PR #23 tree `ab336642d1dee6cb57b192fc6754e381c96b5759`; PR #25 tree `4fc7548de0cd507fe9288c67d68686a2ecf4067d`; PR #26 tree `09ada2794733c7142aabf22144a13ed3ae47ca88`; all diff-check exits `0`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #23 reports `mergeable=true`; PR #22 / PR #25 / PR #26 report `mergeable=false` while local current-main merge-tree passes. This contradiction requires Deputy Codex-2 validation refresh or blocker publication before Deputy final-gate action.
+- Issue-state evidence remains the 22:09Z connector check: #15 / #16 / #17 / #18 open and #19 closed/completed; no contradictory PR / branch evidence was found this cycle.
+- PR #22 and PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with Builder fix replies and latest clean Codex evidence after `f882b90`. PR #25 has unresolved repaired-thread metadata plus outdated historical thread metadata; latest clean Codex evidence exists after `1835e29`, but one historical P2 fix was reported in review/comment flow rather than inline thread reply.
+- Why no ordinary Executive chase exists: active work is now a metadata reconciliation / final-gate visibility problem, not missing Builder output. Executive should not post duplicate GitHub comments unless Deputy Codex-2 reports no visible ACK next patrol.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:09:17Z - Active PR final-gate reconfirmed against `e17da06`
 
 Status:

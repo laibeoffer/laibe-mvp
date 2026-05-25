@@ -1345,6 +1345,23 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T22:18:02Z - Latest-main metadata reconciliation after `afac58d`
+
+- Workstream: deputy-codex / active-final-gates
+- Branch: `origin/main` `afac58d7951c70888bb71973b8482d3d04fda7da`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION / DEPUTY2_VALIDATION_REFRESH_REQUIRED`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR metadata, PR comments, Codex review results, review threads, changed-file lists, fetched refs, current-main merge-tree, and diff-check.
+- GitHub connector status: all four PRs remain open and non-draft. PR #23 reports `mergeable=true`; PR #22 / PR #25 / PR #26 report `mergeable=false` even though local current-main merge-tree passes and PR merge refs exist. Treat this as GitHub metadata / merge-ref stale or contradictory until Deputy Codex-2 refreshes evidence.
+- Current-main simulation against `afac58d` passes for all four active PRs: PR #22 tree `2b56e353c05a4e06690ad0ce0c15185a4712da88`; PR #23 tree `ab336642d1dee6cb57b192fc6754e381c96b5759`; PR #25 tree `4fc7548de0cd507fe9288c67d68686a2ecf4067d`; PR #26 tree `09ada2794733c7142aabf22144a13ed3ae47ca88`; all diff-check exits `0`.
+- Latest clean Codex evidence: PR #22 comment `4531356014`; PR #23 comment `4537316105` after head `f882b90`; PR #25 comment `4536168380` after head `1835e29`; PR #26 comment `4531555287`.
+- Review-thread state: PR #22 / PR #26 have no review threads. PR #23 still has unresolved repaired-thread metadata for `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, each with fix replies and later clean Codex evidence. PR #25 still has unresolved repaired-thread metadata for `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj`, plus outdated `PRRT_kwDORlw1t86EmLZ2`; the endpoint-on-edge P2 has fix evidence in review/comment flow and later clean Codex evidence, but not an inline thread reply.
+- Issue-state evidence remains the 22:09Z connector check: #15 / #16 / #17 / #18 open and #19 closed/completed; this patrol found no contradictory PR or branch evidence.
+- Primary To: Deputy Codex-2.
+- Action: publish `VALIDATION_REFRESH_FOUND`, `NO_NEW_EVIDENCE_AFTER_CHECK`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` for the GitHub metadata contradiction on PR #22 / PR #25 / PR #26 and include latest main SHA, branch SHA, merge-ref state, and current-main simulation evidence. Do not merge / reject / close. Deputy Codex remains final-gate owner after metadata reconciliation.
+- Need Commander: No
+- Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:09:17Z - Latest-main final-gate reconfirmation after `e17da06`
 
 - Workstream: executive-officer / active-final-gates

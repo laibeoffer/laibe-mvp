@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T22:18:02Z - [GITHUB_METADATA_CONTRADICTION_AFAC58D] - Deputy Codex-2
+
+Status:
+NEEDS_DEPUTY2_VALIDATION_REFRESH / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY_DECISION_AFTER_REFRESH
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `afac58d7951c70888bb71973b8482d3d04fda7da`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Current-main merge-tree and diff-check pass for all four active PRs against `afac58d`: PR #22 tree `2b56e353c05a4e06690ad0ce0c15185a4712da88`; PR #23 tree `ab336642d1dee6cb57b192fc6754e381c96b5759`; PR #25 tree `4fc7548de0cd507fe9288c67d68686a2ecf4067d`; PR #26 tree `09ada2794733c7142aabf22144a13ed3ae47ca88`; all diff-check exits `0`. GitHub connector reports all four open / non-draft, but PR #22 / PR #25 / PR #26 are `mergeable=false` while PR #23 is `mergeable=true`. PR #23 and PR #25 still carry unresolved repaired-thread metadata despite later clean Codex evidence.
+
+Recommended Executive Action:
+Do not duplicate ordinary Builder chase. If Deputy Codex-2 has no visible ACK next patrol, issue one visible ACK request to Deputy Codex-2 for metadata refresh / exact blocker.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish a validation refresh or exact blocker for PR #22 / PR #25 / PR #26 GitHub metadata contradiction. Deputy Codex should then publish final-gate decision visibility and decide whether PR #23 / PR #25 unresolved repaired-thread metadata requires manual resolution before merge eligibility.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:09:17Z - [ACTIVE_PRS_FINAL_GATE_RECONFIRMED_E17DA06] - Deputy Codex
 
 Status:
