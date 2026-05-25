@@ -1343,6 +1343,53 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Output Documents Builder PR23 metadata-only staging-write P2 fix on `f852c11`
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Active Issue / PR:
+Issue #18 / PR #23
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CODEX_P2_FIX_APPLIED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS
+
+Action Taken:
+Output Documents Builder confirmed the post-`01b489c21a71db7a3301918e44bcfea75e60206a` Codex P2 review on PR #23: `review_packet_attachment` was metadata-only but could still write a local placeholder when paired with `write_to_staging: true`. Builder added a staging write-permission gate so metadata-only storage targets remain valid for manifest metadata but are blocked from local staging writes. Builder also merged latest `origin/main` `f852c11a266cb1c1fd60c8f21bdbec30ebf3941b` and resolved only the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving both latest main patrol entries and prior Output Documents repair history.
+
+Changed:
+- `src/lib/budget/renderers/formal-local-staging-policy.ts` now rejects `write_to_staging: true` when the selected storage target does not allow file writes.
+- `src/lib/budget/renderers/formal-file-writer-entry.ts` passes `write_to_staging` into the staging policy gate before manifest / placeholder handling.
+- `src/lib/budget/renderers/formal-placeholder-artifact-writer.ts` passes `write_to_staging` into its second staging policy check.
+- `docs/WORKSTREAM_BLACKBOARD.md` conflict resolved only.
+- Latest main patrol docs were accepted from `origin/main`.
+
+Validation:
+- Renderer static guard: `valid: true`, `issue_count: 0`.
+- Renderer TypeScript syntax loop: pass.
+- Invalid fixture / mismatch smoke: `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, `format_matches_output: false`.
+- Metadata-only storage target write smoke: `status: blocked`, `artifact_written: false`, error includes `Storage target does not allow local staging writes`.
+- `git diff --check`: pass.
+- Real `.xlsx` / `.pdf` diff check: no added or changed files.
+
+Snapshot-only Boundary:
+- No real `.xlsx` / `.pdf` generated.
+- No budget engine rerun.
+- No pricing rules or material resolver used.
+- No MethodSpecCatalog, raw warehouse, Plan Puzzle, frontend, payment, DB/API/migration, AI API, or secrets touched.
+
+Blocked:
+Branch publication / Codex re-review visibility pending.
+
+Need Commander:
+No.
+
+Need Reviewer:
+Yes until Codex P2 is re-reviewed clean.
+
 ### 2026-05-25 - Output Documents Builder PR23 current-main repair on `387cada`
 
 Workstream:
@@ -1586,6 +1633,77 @@ No.
 
 Need Reviewer:
 No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
+### 2026-05-25T15:28:39Z - Executive PR23 P2 sync-block reconfirmed
+
+- Workstream: command/executive / output/budget-documents
+- Branch: `origin/main` `c8e307639122d73705a667cc4d66adcfd26cee80`
+- Status: `PR23_CODEX_P2_BLOCKER_RECONFIRMED / CURRENT_MAIN_SYNC_BLOCKED / EXISTING_BUILDER_REQUEST_CURRENT / NO_DUPLICATE_CHASE`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub REST returned `403`, so patrol used public PR / Issue pages, `git ls-remote`, fetched PR refs, and local merge-tree fallback.
+  - Public page `data-status` confirms PR #22 / #23 / #25 / #26 are `pullOpened`, PR #24 is `pullMerged`, Issues #15 / #16 / #17 / #18 are `issueOpened`, Issue #19 is `issueClosed`, and Quote Factory Issue #1 / PR #2 are completed.
+  - PR #23 head remains `01b489c21a71db7a3301918e44bcfea75e60206a`; public PR page still shows the post-`01b489c` Codex P2 `Block staging writes for metadata-only storage target`.
+  - Current-main simulation now checked against `c8e307639122d73705a667cc4d66adcfd26cee80`: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+  - `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+  - PR #22, PR #25, and PR #26 merge-tree checks against `c8e307639122d73705a667cc4d66adcfd26cee80` exit `0`; all four PR diff-checks exit `0`.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Existing PR #23 P2 fix plus latest-main sync request remains current.
+  - Why this agent: Builder owns PR #23 and the P2 is inside renderer file-writer policy scope.
+  - Action: No duplicate GitHub chase issued this round. Builder still must fix the metadata-only storage target staging-write blocker, re-sync only `docs/WORKSTREAM_BLACKBOARD.md` against latest `origin/main`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review.
+  - Need Commander: No
+  - Need Reviewer: Yes, due Codex P2.
+
+### 2026-05-25T15:20:08Z - PR23 Codex P2 and latest-main sync blocked
+
+- Workstream: command/deputy / output/budget-documents
+- Branch: `origin/main` `b14845cb03314f5eecdcdef59b2337eb56dd15ba`
+- Status: `PR23_CODEX_P2_BLOCKER_FOUND / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_FIX_REQUIRED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. Open Issues remain #15, #16, #17, #18.
+  - PR #23 head remains `01b489c21a71db7a3301918e44bcfea75e60206a`; the previous Builder repair comment is `4535229076`.
+  - GitHub REST comments/reviews returned `403`, so patrol used the public PR page fallback. The public page shows a Codex review on reviewed commit `01b489c21a` with P2: `Block staging writes for metadata-only storage target`, in `src/lib/budget/renderers/formal-file-writer-policy.ts` around lines `+216` to `+220`.
+  - P2 finding summary: `review_packet_attachment` has `allows_file_write: false`, but `storageTargetIsAllowed()` only checks target presence, so `writeFormalBudgetArtifact()` with `storage_target: "review_packet_attachment"` and `write_to_staging: true` can still produce a local placeholder file.
+  - `refs/pull/23/merge` still targets prior base `387cada726b3d91fc48ce5044dca80e36bdfa9d8` plus PR head `01b489c21a71db7a3301918e44bcfea75e60206a`; it is stale current-main evidence.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against latest `origin/main`.
+  - `git diff --check origin/main..refs/patrol/hb1520/pr23` exits `0`. PR #22 / PR #25 / PR #26 remain merge-tree clean against latest `origin/main`.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Fix PR #23 Codex P2 and re-sync against latest `origin/main`.
+  - Why this agent: Builder owns PR #23 and the P2 is inside the renderer file-writer policy scope.
+  - Action: Fix the metadata-only storage target staging-write blocker, re-sync only `docs/WORKSTREAM_BLACKBOARD.md` against latest `origin/main`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review.
+  - Need Commander: No
+  - Need Reviewer: Yes, due Codex P2.
+
+### 2026-05-25T15:04:07Z - PR23 sync repair ACK found / Codex review pending
+
+- Workstream: command/executive / output/budget-documents
+- Branch: `origin/main` `387cada726b3d91fc48ce5044dca80e36bdfa9d8`
+- Status: `PR23_WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_PRE_PUBLICATION / CODEX_REVIEW_REQUESTED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. PR #23 head advanced to `01b489c21a71db7a3301918e44bcfea75e60206a`.
+  - Output Documents Builder posted current-main workflow repair evidence in comment `4535229076`, using current main `387cada726b3d91fc48ce5044dca80e36bdfa9d8`.
+  - Builder reported renderer static guard pass, renderer TypeScript syntax loop pass, invalid fixture / mismatch smoke pass with `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, and `format_matches_output: false`, real `.xlsx` / `.pdf` diff check clean, and no renderer code changed in this repair pass.
+  - Builder requested `@codex review`; no post-`01b489c` clean Codex result was visible at patrol time.
+  - GitHub metadata before API rate-limit reported PR #23 `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` is `156fcd681c37d922ab9c5f53a79d3d29bbf2f350`.
+  - `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `b751c23ee0f3b50da1121b16280d66f4c670cce2`; `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+  - PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: PR #23 post-`01b489c` Codex result and post-publication sync watch.
+  - Why this agent: Builder owns the PR #23 repair branch; Executive found a valid repair ACK and review request, but this docs-only publication may advance main again.
+  - Action: After this patrol-doc publication, check latest `origin/main`. If `docs/WORKSTREAM_BLACKBOARD.md` conflicts again, re-sync only that file, preserve the fail-closed renderer fix and patrol entries, rerun checks, and request / wait for post-head Codex review. If Codex returns clean and latest-main sync remains clean, route to Deputy final gate.
+  - Need Commander: No
+  - Need Reviewer: Yes until post-`01b489c` Codex review is clean and latest-main sync is rechecked.
 
 ### 2026-05-25T14:50:49Z - PR23 post-publication sync blocked again
 

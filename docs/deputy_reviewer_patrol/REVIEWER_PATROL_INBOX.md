@@ -35,7 +35,40 @@ PENDING
 
 ## Pending Reviewer Findings
 
-No pending reviewer findings yet.
+### 2026-05-25T15:20:08Z - [CODEX_P2_REVIEW_GATE] - Output Documents
+
+Status:
+PENDING_REVIEWER_WATCH
+
+Reviewer:
+LAIBE_REVIEWER
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+`laibeoffer/laibe-mvp` Issue #18 / PR #23
+
+Finding:
+Commander patrol found a post-`01b489c` Codex P2 on the public PR page: `Block staging writes for metadata-only storage target`.
+
+Evidence:
+- PR #23 head: `01b489c21a71db7a3301918e44bcfea75e60206a`.
+- File: `src/lib/budget/renderers/formal-file-writer-policy.ts`, around lines `+216` to `+220`.
+- P2 summary: `review_packet_attachment` declares `allows_file_write: false`, but `storageTargetIsAllowed()` only checks target presence, so `writeFormalBudgetArtifact()` with `storage_target: "review_packet_attachment"` and `write_to_staging: true` can still produce a local placeholder file.
+- Latest-main sync is also blocked: `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against `b14845cb03314f5eecdcdef59b2337eb56dd15ba`.
+
+Recommended Deputy action:
+Keep PR #23 out of final gate. Route the P2 fix and latest-main sync repair to Output Documents Builder, then require Codex re-review before final-gate reconsideration.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes
+
+Deputy Decision:
+BUILDER_FIX_PENDING
 
 ## Processed Reviewer Findings
 
