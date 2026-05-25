@@ -36,6 +36,188 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T20:12:33Z - [DEPUTY_LOOP_BREAK_DECISION_AFTER_404EE84] - Output Documents
+
+Status:
+DEPUTY_DECISION_PUBLISHED / FINAL_SYNC_REQUESTED / PATROL_DOC_FREEZE_WINDOW
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23
+
+Evidence:
+Latest pre-publication `origin/main` is `404ee842789c2cfca74e925cdd8747c30b93f8e2`. PR #23 head remains `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. No PR #22 / #23 / #25 / #26 issue comments or review comments were found after `2026-05-25T20:06:56Z`. Against `404ee84`, PR #23 merge-tree exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check exits `0`. PR #22 / #25 / #26 pass current-main merge-tree and diff-check against `404ee84`.
+
+Recommended Executive Action:
+Do not publish more no-new-evidence docs-only patrol commits for PR #23 during this final sync window. Watch for the Output Documents Builder final-sync result only.
+
+Recommended Deputy Action:
+Deputy decision is already published: primary To is Output Documents Builder for one final PR #23 sync after this decision commit lands on `main`. PR #22 / PR #25 / PR #26 are held in `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or new evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+### 2026-05-25T20:06:56Z - [NO_NEW_DEPUTY_ACK_AFTER_A705674] - Deputy Codex
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / NEEDS_DEPUTY_DECISION / CURRENT_MAIN_SYNC_LOOP
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 final-gate visibility
+
+Evidence:
+Latest `origin/main` is `a7056744ec4668f31d7435a7e26a3d0901de0fc8`. Sources checked: mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, PR comments / review comments after `2026-05-25T19:50:59Z`, PR #23 / #25 review threads, fetched PR heads, merge-tree, and diff-check. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. No new PR #22 / #23 / #25 / #26 issue comments or review comments were found after `19:50:59`, and no Deputy Codex merge / reject / exact-blocker ACK is visible. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. Against `a705674`, PR #23 merge-tree exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check exits `0`. PR #22 / #25 / #26 remain current-main clean with trees `b3d557435e0188e8886125c9048bf08a2d11a9d9`, `02636a0e1ce35ac8c139773c81324ed3b3dbf48a`, and `4737258e067890bed5163d4bddf83604331987a4`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Do not chase Output Documents Builder again while PR #23's required `BLOCKER_WITH_ATTEMPTED_FIX` remains current. Keep one single-primary `To: Deputy Codex` request for loop-break / final-gate visibility and publish docs-only patrol state to main.
+
+Recommended Deputy Action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Also publish final-gate visibility or exact blockers for PR #22 / PR #25 / PR #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+### 2026-05-25T19:50:59Z - [NO_NEW_DEPUTY_ACK_AFTER_5766720] - Deputy Codex
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / NEEDS_DEPUTY_DECISION / CURRENT_MAIN_SYNC_LOOP / TABLE_COMPLIANCE_BACKFILL
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 final-gate visibility
+
+Evidence:
+Latest `origin/main` is `5766720797b4cc45de85e37334ce11baf4e34163`. The previous blackboard-only patrol commit advanced main from `de82362` but did not update the delivery ledger, triage queue, or Executive inbox, so this patrol is the ledger / inbox compliance backfill. Sources checked: mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR comments and review threads through the connector, fetched PR heads, merge-tree, and diff-check. GitHub REST Issue detail hit API-limit fallback after Issue #15; connector comments / review threads, PR refs, and local simulation are controlling. No new Deputy Codex merge / reject / exact-blocker ACK is visible after the `19:50` reconfirmation. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. Against `5766720`, PR #23 merge-tree exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check exits `0`. PR #22 / #25 / #26 remain current-main clean with trees `492a96c37c2c8c3abcc826f4b2ca8cfe04c371c0`, `87f0b8d3dce91155f70d75c8983af75ff160cdd0`, and `005a05cfdbc2109876a9ba36fda8b9f3ff0116d4`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Do not chase Output Documents Builder again while PR #23's required `BLOCKER_WITH_ATTEMPTED_FIX` remains current. Keep one single-primary `To: Deputy Codex` request for loop-break / final-gate visibility and publish docs-only patrol state to main.
+
+Recommended Deputy Action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Also publish final-gate visibility or exact blockers for PR #22 / PR #25 / PR #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+### 2026-05-25T19:33:39Z - [NO_NEW_DEPUTY_ACK_PR23_LOOP_BREAK] - Deputy Codex
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / NEEDS_DEPUTY_DECISION / CURRENT_MAIN_SYNC_LOOP
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 final-gate visibility
+
+Evidence:
+Latest `origin/main` is `8a61d6f09c4572bbd097b9926480cbab1d9fd9a2`. Sources checked: mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR / Issue metadata, comments and reviews after `2026-05-25T19:18:16Z`, fetched PR heads, merge-tree, and diff-check. No PR #22 / #23 / #25 / #26 comments or reviews were found after the `19:18` Executive request. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. Against `8a61d6f`, PR #23 merge-tree exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check exits `0`. PR #22 / #25 / #26 remain current-main clean with trees `5393eb2fdb77ece548cbaecf9221ebf97181cbfb`, `4a531ccee23d7e661aebb1a8af9486888f870752`, and `ab53dee2e34bffeedf97ae02911b4a36e0dc83a1`; all diff-checks exit `0`. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+
+Recommended Executive Action:
+Do not chase Output Documents Builder again while PR #23's required `BLOCKER_WITH_ATTEMPTED_FIX` remains current. Keep one single-primary `To: Deputy Codex` request for loop-break / final-gate visibility.
+
+Recommended Deputy Action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Also publish final-gate visibility or exact blockers for PR #22 / PR #25 / PR #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+### 2026-05-25T19:18:16Z - [PR23_BLOCKER_ACK_DEPUTY_LOOP_BREAK_REQUIRED] - Output Documents / Deputy Codex
+
+Status:
+BLOCKER_WITH_ATTEMPTED_FIX / NEEDS_DEPUTY_DECISION / CURRENT_MAIN_SYNC_LOOP
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 final-gate visibility
+
+Evidence:
+Latest `origin/main` is `b738e110c0ab4323c30aa1bde3d6a9dadce8f63e`. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`. Output Documents Builder posted `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` at `2026-05-25T19:17:41Z`, confirming latest-main check, merge-tree exit `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, diff-check pass, renderer static guard pass, TypeScript syntax loop pass, real `.xlsx` / `.pdf` unchanged, and no forbidden scope. Builder did not push another blind docs-only re-sync because the current blackboard routes the repeated sync-loop policy to Deputy Codex. PR #22 / #25 / #26 remain current-main clean against `b738e11`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder chase for PR #23 until Deputy Codex decides the sync-loop policy. Keep one single-primary Deputy Codex visibility request.
+
+Recommended Deputy Action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Also publish final-gate visibility for PR #22 / #25 / #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+### 2026-05-25T18:55:29Z - [PR23_POST_PUSH_SYNC_BLOCKED_AFTER_312ABFA] - Output Documents / Deputy Codex
+
+Status:
+NEEDS_OWNER_SYNC_REPAIR / CODEX_CLEAN_STALE_FOR_CURRENT_MAIN / PR22_PR25_PR26_DEPUTY_ACK_PENDING
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 gate watch
+
+Evidence:
+Executive docs-only publication advanced `origin/main` to `312abfa96f36fcc7f59770ad81771b237c2a5457`. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9` with Builder repair comment `4536480487` and clean Codex comment `4536508595`, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1855-post/pr23` exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb1855-post/pr23` exits `0`. PR #22 / #25 / #26 remain current-main clean after `312abfa` with merge-tree trees `c0b575973c90cfe738a83efe16a1b497fc40b4cb`, `c49c17150132a4bb5d9517e0e6b7666554687eff`, and `797cd4fc44cfa1aeb7f526b27e120cdf98edeffe`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Route PR #23 back to Output Documents Builder for scoped latest-main sync repair. Keep PR #22 / #25 / #26 with Deputy Codex final-gate visibility; no ordinary Builder chase for those three while heads and validation remain stable.
+
+Recommended Owner Action:
+Output Documents Builder should re-sync PR #23 against latest main `312abfa96f36fcc7f59770ad81771b237c2a5457`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve renderer repair evidence and latest patrol entries, rerun validation, push scoped sync head, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
+### 2026-05-25T18:55:29Z - [PR23_REPAIR_CLEAN_ALL_FINAL_GATE_PENDING] - Deputy Codex
+
+Status:
+NEEDS_DEPUTY_DECISION_VISIBILITY / CURRENT_MAIN_PASS / NO_NEW_BLOCKER
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `65980441e7dd1d51b5976129a1a7f5f2f9097dfe`. PR #23 advanced to `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Output Documents Builder posted workflow repair comment `4536480487` at `2026-05-25T18:51:22Z`, reporting latest-main sync, validation reruns, no renderer source behavior change, merge simulation PASS, and boundary check PASS. Codex returned clean comment `4536508595` at `2026-05-25T18:55:18Z`. Current-main merge-tree / diff-check now pass for PR #22 / #23 / #25 / #26 with trees `a99860757a85f1b36e7eef7cf35b9815f1c0fead`, `7f5043ebc67d135cbe4f81d1631722860cd1b62f`, `5f077431c6e00c992ab360818bf616033f255f55`, and `f3d9fadc438e0fd40b251fe29e2ebb12dbad82a3`; all diff-checks exit `0`. No Deputy Codex merge / reject / blocker ACK is visible after the `18:29` Executive request.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder chase for PR #23 and stop ordinary Builder chase for PR #22 / #25 / #26 while heads and validation remain stable. Keep a single combined Deputy Codex final-gate visibility request.
+
+Recommended Deputy Action:
+Deputy Codex should publish final-gate decision visibility or an exact blocker for PR #22 / #23 / #25 / #26 after reconfirming no branch-head change, scope drift, new Codex blocker, formal-price risk, or post-publication merge-tree conflict.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T18:29:23Z - [PR23_ACTIVE_HANDLER_SILENT_AFTER_CC7174A] - Output Documents
 
 Status:
