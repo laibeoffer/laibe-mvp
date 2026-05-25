@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T17:26:34Z - [PR25_CODEX_P2_ON_A83A121] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / CODEX_P2_BLOCKER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `b8e6489c5dde14a82591a5d5c649d170757b8b78`. PR #25 head remains `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`; `refs/pull/25/merge` refreshed to `5259954b59a7a0e7306e48331c226e6de847dba7` with parents `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986` and `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`. Current-main simulation still passes: `git merge-tree --write-tree origin/main refs/patrol/hb1726/pr25` exits `0` with tree `6ab1617439dd14b0cb942e3b063b81b30a81540d`, and `git diff --check origin/main..refs/patrol/hb1726/pr25` exits `0`. Public PR page shows Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` at review `4358021349`, then Codex review `4358033006` at `2026-05-25T17:21:20Z` on reviewed commit `a83a121d07` with P2 `discussion_r3299302339` near `plan-puzzle.js` line `4311`.
+
+Recommended Executive Action:
+Issue a single-primary `To: Plan Puzzle Builder` visible fix request. Required labels: `ACTION_TAKEN` with branch SHA, validation results, allowed / forbidden scope checks, and `@codex review`, or `BLOCKER_WITH_ATTEMPTED_FIX` with exact attempted fix. Do not merge / reject / close.
+
+Recommended Deputy Action:
+Hold PR #25 out of final gate until the P2 is fixed and a post-fix clean Codex result is visible. PR #22 / PR #23 / PR #26 remain separate current-main simulation-pass final-gate candidates.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and post-fix Codex result is clean.
+
 ### 2026-05-25T17:13:03Z - [PR25_HEAD_ADVANCED_REVIEW_PENDING] - Plan Puzzle
 
 Status:

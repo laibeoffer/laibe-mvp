@@ -609,12 +609,12 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked before this patrol publication: `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`.
+- `main` latest sha checked before this patrol publication: `b8e6489c5dde14a82591a5d5c649d170757b8b78`.
 - Open PR:
-  - PR #22 `Add MethodSpec validator freeze note` - current-main merge-tree and diff-check pass against `28fb1cd`; remains Deputy final-gate monitor-only. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
-  - PR #23 `Add renderer snapshot-only review packet` - P2 fix remains on head `1be77d0`; Codex clean comment `4535507114`; current-main merge-tree and diff-check pass against `28fb1cd`; remains routed to Deputy final gate. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
-  - PR #25 `Add Plancraft+ zone area boundary refinement` - head advanced to `a83a121d`; this is a merge of `origin/main` `28fb1cd` into prior clean head `e2decbec`. Local current-main merge-tree/diff-check pass against `28fb1cd`, and PR diff against current main remains limited to Issue #15 allowed files, but public PR page shows no post-`a83a121` Codex clean result. Route back to Plan Puzzle Builder for visible review-result ACK. Need Reviewer: Yes until post-`a83a121` Codex clean result or explicit Deputy override.
-  - PR #26 `Add raw source quality scoring reviewer checklist` - current-main merge-tree and diff-check pass against `28fb1cd`; remains Deputy final-gate monitor-only. Need Reviewer: No unless branch changes, formal-price risk, or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #22 `Add MethodSpec validator freeze note` - current-main merge-tree and diff-check pass against `b8e6489`; remains Deputy final-gate monitor-only. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #23 `Add renderer snapshot-only review packet` - P2 fix remains on head `1be77d0`; Codex clean comment `4535507114`; current-main merge-tree and diff-check pass against `b8e6489`; remains routed to Deputy final gate. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #25 `Add Plancraft+ zone area boundary refinement` - head remains `a83a121d`; current-main merge-tree and diff-check pass against `b8e6489`, but public PR page now shows Codex review `4358033006` on reviewed commit `a83a121d07` with P2 `discussion_r3299302339` in `plan-puzzle.js` line `4311` vicinity. Route to Plan Puzzle Builder for scoped P2 fix and re-review. Need Reviewer: Yes until the P2 is fixed and post-fix Codex result is clean.
+  - PR #26 `Add raw source quality scoring reviewer checklist` - current-main merge-tree and diff-check pass against `b8e6489`; remains Deputy final-gate monitor-only. Need Reviewer: No unless branch changes, formal-price risk, or Codex reports NEEDS_FIX / P1 / P2.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
@@ -1344,6 +1344,28 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25T17:26:34Z - PR25 Codex P2 found on a83a121
+
+- Workstream: executive-officer / plancraft-page-ui
+- Branch: `origin/main` `b8e6489c5dde14a82591a5d5c649d170757b8b78`
+- Status: `PR25_CODEX_P2_ON_A83A121 / CURRENT_MAIN_SIMULATION_PASS / BUILDER_FIX_REQUIRED / NO_MERGE_EXECUTED`
+- Evidence:
+  - GitHub public pages show PR #22 / #23 / #25 / #26 open; Issues #15 / #16 / #17 / #18 open; Issue #19 closed.
+  - PR #25 head remains `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`; `refs/pull/25/merge` refreshed to `5259954b59a7a0e7306e48331c226e6de847dba7` with parents `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986` and `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1726/pr25` exits `0` with tree `6ab1617439dd14b0cb942e3b063b81b30a81540d`; `git diff --check origin/main..refs/patrol/hb1726/pr25` exits `0`.
+  - Public PR page now shows Plan Puzzle Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` at review `4358021349` for head `a83a121d`, followed by Codex review `4358033006` at `2026-05-25T17:21:20Z` on reviewed commit `a83a121d07`.
+  - Codex review added P2 `discussion_r3299302339`: endpoint-on-edge intersections are still missed by the self-intersection check near `plan-puzzle.js` line `4311`.
+  - PR #22 / PR #23 / PR #26 also pass current-main merge-tree and diff-check against `b8e6489`.
+- Decision:
+  - To: Plan Puzzle Builder
+  - Workstream: plancraft/page-ui / plancraft-adapter-clean
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: Fix only the new Codex P2 on PR #25 head `a83a121d`, rerun validation, push a scoped head, and request Codex re-review.
+  - Why this agent: Plan Puzzle Builder owns Issue #15 / PR #25 and the P2 is in the Plan Puzzle self-intersection logic.
+  - Action: Report `ACTION_TAKEN` with branch SHA, validation results, allowed / forbidden scope checks, and `@codex review`, or `BLOCKER_WITH_ATTEMPTED_FIX` with exact attempted fix. No Executive merge / reject / close action.
+  - Need Commander: No
+  - Need Reviewer: Yes until the P2 is fixed and post-fix Codex result is clean.
 
 ### 2026-05-25T15:28:39Z - Executive PR23 P2 sync-block reconfirmed
 

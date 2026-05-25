@@ -37,6 +37,53 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T17:26:34Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Codex P2 On A83A121
+
+Status:
+ACTION_TAKEN / CODEX_P2_FOUND / BUILDER_FIX_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 now has a visible post-`a83a121` Codex result, but it is a P2 blocker rather than a clean result. Current-main merge-tree and diff-check still pass, so the next executable action is a scoped Builder fix and re-review request, not Deputy final gate.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips.
+- Latest `origin/main`: `b8e6489c5dde14a82591a5d5c649d170757b8b78`.
+- PR #25 status: open.
+- Current PR #25 head: `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+- `refs/pull/25/merge`: `5259954b59a7a0e7306e48331c226e6de847dba7`, with parents `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986` and `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1726/pr25` exits `0` with tree `6ab1617439dd14b0cb942e3b063b81b30a81540d`.
+- `git diff --check origin/main..refs/patrol/hb1726/pr25` exits `0`.
+- Public PR page shows Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` at review `4358021349` for head `a83a121d`.
+- Public PR page shows Codex review `4358033006` at `2026-05-25T17:21:20Z`, reviewed commit `a83a121d07`, with P2 `discussion_r3299302339` near `plan-puzzle.js` line `4311`.
+- PR #22 / PR #23 / PR #26 remain current-main merge-tree and diff-check clean.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should fix only Codex P2 `discussion_r3299302339`, rerun `node --check`, `git diff --check`, merge-tree against latest main, allowed / forbidden scope checks, push a scoped repair head, and request Codex re-review. Required visible ACK: `ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and post-fix Codex result is clean.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_FIX_REQUIRED
+
 ### 2026-05-25T17:13:03Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Head Advanced / Review Result Pending
 
 Status:
