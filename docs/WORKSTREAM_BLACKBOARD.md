@@ -1343,6 +1343,50 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy patrol found workflow repair PRs #25 / #26
+
+Workstream:
+Plan Puzzle / Raw Candidate / Deputy Codex patrol
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+DELIVERY_RECOVERY_PROGRESS_FOUND / PR_REVIEW_AND_SYNC_CHECK_REQUIRED
+
+Changed:
+- Patrol rechecked Git refs after the automation recovery doctrine update. Workflow repair progress now exists for both previously branchless stalled items.
+- Plan Puzzle branch `plancraft/zone-area-boundary-refinement` now exists at `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; GitHub PR ref maps it to PR #25.
+- PR #25 changed files observed by git diff: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- PR #25 branch is not based on latest `origin/main` `70751e68bd4d9f6b75add7b65ddd04b289657faa`; `refs/pull/25/merge` was not found during this patrol, so mergeability requires Executive / Deputy-2 verification.
+- Raw Candidate branch `warehouse/raw-source-quality-scoring` now exists at `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; GitHub PR ref maps it to PR #26.
+- PR #26 changed files observed by git diff: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/WORKSTREAM_BLACKBOARD.md`, `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`, `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`, `src/lib/budget/raw-warehouse/source-quality-scoring.ts`, and `src/lib/budget/raw-warehouse/types.ts`.
+- `refs/pull/26/merge` exists, but PR #26 still needs allowed-scope / forbidden-pricing-field / validation / review-state verification before any merge decision.
+- PR #22 and PR #23 also expose merge refs this patrol, but PR #23 remains Need Reviewer: Yes until the prior Codex P2 is confirmed fixed and clean by re-review.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+
+PR / Commit:
+- Deputy Codex docs-only patrol update.
+
+Blocked:
+- PR #25: mergeability / latest-main sync requires verification.
+- PR #23: review gate remains until Codex P2 is re-reviewed clean.
+
+Next:
+- Executive Officer should verify PR #25 mergeability, checks, allowed files, `node --check`, guard checks, and whether a latest-main re-sync is needed.
+- Executive Officer should verify PR #26 checks, candidate-only boundary, forbidden formal-pricing fields, and validation output.
+- Triage Officer should stop classifying #15 / #17 as no-branch stalls and move them to PR verification / review-readiness tracking.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until Codex re-review is clean. No for PR #25 / PR #26 unless scope drift, forbidden file changes, or Codex review reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25 - Deputy automation recovery doctrine updated
 
 Workstream:
