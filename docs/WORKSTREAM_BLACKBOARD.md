@@ -4525,6 +4525,38 @@ No
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Executive PR25 clean / PR23 review pending on `45c560f`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+PR25_CODEX_CLEAN_FINAL_GATE / PR23_CODEX_REVIEW_REQUESTED / PR23_RESULT_PENDING
+
+Table Compliance:
+PARTIAL - PR #25 has current-main merge simulation and clean Codex re-review; PR #23 has current-main repair evidence and review request but still needs the post-`d126327` Codex result.
+
+Missed Progress:
+PR #25 remains `0`; PR #23 reset from `21` to `0` because an effective Output Documents repair artifact is now visible.
+
+Action Taken:
+Executive Officer rechecked latest main `45c560fb46b95ea055363670126c5d9edb889f07`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, public PR pages, PR refs, fetched PR heads / merge refs, base-to-head changed files, commit lists, and local merge-tree signals. `gh` is unavailable and GitHub REST metadata returned unauthenticated `403`; public page / refs fallback was used. PR #25 head is now `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; public PR page shows Codex P2 fixes plus clean result; `refs/pull/25/merge` exists at `8d796e62b303066b9097b48a59b37fd7ea7fa933`; local merge-tree exits `0`. PR #23 head is now `d126327ddac96d29ba553a5c7ca9aab9e6461217`; public PR page shows current-main workflow repair, rerun checks, and `@codex review`; `refs/pull/23/merge` exists at `c39436e1d2a73963626e4d3c9466350832139a74`; local merge-tree exits `0`; no post-`d126327` clean Codex result was visible this cycle.
+
+Next Required:
+Deputy Codex should publish final-gate visibility for PR #25. Output Documents Builder must report the post-`d126327` Codex re-review result or exact blocker for PR #23.
+
+Blocked:
+PR #23 is no longer merge-tree blocked, but Codex review result is still pending for the latest head.
+
+Need Deputy:
+Yes for PR #25 final-gate visibility only; no merge / reject executed by Executive.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drift.
+
 ### 2026-05-25 - Executive PR25 repair accepted / PR23 still blocked on `df7f3b3`
 
 Workstream:

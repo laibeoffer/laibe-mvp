@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T12:05:40Z - [PR25_FINAL_GATE_READY_PR23_REVIEW_PENDING] - Plan Puzzle / Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION / NEEDS_EXECUTIVE_WATCH
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15 and PR #23 / Issue #18
+
+Evidence:
+Latest main is `45c560fb46b95ea055363670126c5d9edb889f07`. PR #25 head advanced to `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; `refs/pull/25/merge` exists at `8d796e62b303066b9097b48a59b37fd7ea7fa933`; current-main merge-tree exits `0`; public PR page shows `PLAN_PUZZLE_ACTION_TAKEN` for the Codex P2 fixes and a clean Codex result. PR #23 head advanced to `d126327ddac96d29ba553a5c7ca9aab9e6461217`; `refs/pull/23/merge` exists at `c39436e1d2a73963626e4d3c9466350832139a74`; current-main merge-tree exits `0`; public PR page shows Output Documents workflow repair, rerun checks, and `@codex review`, but no clean Codex result on the latest `d126327` head was visible in this patrol.
+
+Recommended Executive Action:
+Stop ordinary Builder chase for PR #25 and chase Deputy final-gate visibility only. For PR #23, chase Output Documents Builder for the post-`d126327` Codex review result or exact blocker; do not mark PR #23 final-gate ready until the latest-head review result is clean.
+
+Recommended Deputy Action:
+Deputy Codex owns PR #25 merge / reject gate. PR #23 should remain review-result pending until Codex returns clean on latest head or reports NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
 ### 2026-05-25T06:52:30Z - [PR26_VALIDATION_REFRESH_FOUND] - Raw Candidate
 
 Status:
