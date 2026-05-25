@@ -4525,6 +4525,39 @@ No
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Executive Builder repair ACK follow-up on `39d6c2c`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `39d6c2c211473219a288e7444295b1c6a389eee8`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:51 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `12`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
 ### 2026-05-25 - Executive Builder repair ACK follow-up on `1b1dec0`
 
 Workstream:
