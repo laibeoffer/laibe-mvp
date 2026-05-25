@@ -991,6 +991,27 @@
       stroke-dasharray: 8 7;
     }
 
+    .zone-boundary-polygon.is-invalid {
+      fill: rgba(255,126,112,.11);
+      stroke: rgba(255,126,112,.78);
+      stroke-dasharray: 5 6;
+    }
+
+    .zone-area-label {
+      fill: #f7fbff;
+      stroke: rgba(5,7,10,.82);
+      stroke-width: 4px;
+      paint-order: stroke fill;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      pointer-events: none;
+    }
+
+    .zone-area-label.is-invalid {
+      fill: var(--danger);
+    }
+
     .zone-boundary-edge {
       fill: none;
       stroke: rgba(98,230,200,.74);
