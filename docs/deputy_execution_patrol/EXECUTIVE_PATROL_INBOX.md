@@ -55,10 +55,10 @@ Finding:
 PR #23 was previously routed to Deputy final gate after clean Codex review, but latest main advanced after that review. GitHub API now reports the PR as dirty against current main, so final gate must pause.
 
 Evidence:
-- Current `origin/main`: `c4efa03d880c0784d76435dcf2f208b133a7c91b`.
+- Current `origin/main`: `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
 - PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`.
-- GitHub API: `mergeable=false`, `mergeable_state=dirty`, base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
-- Local `origin/pr-merge/23` exists but targets old base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
+- GitHub PR metadata: `mergeable=false`, base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- Available PR #23 merge ref targets old base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
 
 Action already taken:
 Deputy Codex updated `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, and `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`.

@@ -1343,6 +1343,39 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Second Deputy current-main reconciliation after PR #23 withdrawal
+
+Workstream:
+Second Deputy Codex / Output Documents / MethodSpec / Raw Candidate / Plan Puzzle
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+PR_23_SYNC_BLOCKED_RECONFIRMED / CURRENT_MAIN_RECONCILED
+
+Changed:
+- Second Deputy patrol rechecked current `origin/main`, GitHub open PRs / Issues, PR comments, and PR refs after the upstream `PR_23_FINAL_GATE_WITHDRAWN` patrol entry.
+- Current `origin/main` is `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
+- PR #23 remains open on head `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub PR metadata reports `mergeable=false` and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. Local current-main merge simulation still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`, so the final gate remains withdrawn.
+- PR #22 remains open on head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge simulation found no content conflict, but final merge / reject still belongs to Deputy Codex.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; current-main merge simulation found no content conflict, but final merge / reject still belongs to Deputy Codex.
+- PR #25 remains open on head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local merge attempt still refuses unrelated histories.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Next:
+- Executive Officer should chase PR #23 re-sync against current main and PR #25 true sync recovery.
+- Deputy Codex keeps final gate ownership for PR #22 and PR #26, and must not treat PR #23 as final-gate ready until it re-syncs.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
 ### 2026-05-25 - PR #23 final gate withdrawn after main advanced
 
 Workstream:
@@ -1356,7 +1389,7 @@ PR_23_FINAL_GATE_WITHDRAWN / SYNC_BLOCKED_AFTER_MAIN_ADVANCE
 
 Changed:
 - Patrol rechecked GitHub API after the previous `FINAL_GATE_READY` entry.
-- Current `origin/main` is `c4efa03d880c0784d76435dcf2f208b133a7c91b`.
+- Current `origin/main` has since advanced through `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
 - PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but GitHub API now reports `mergeable=false`, `mergeable_state=dirty`, and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
 - Local ref `refs/remotes/origin/pr-merge/23` still exists at `8ef304b72e6afd92e61e14274cd4611f65281398`, but that merge ref targets the older base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
 - The prior clean Codex result `4531569296` is therefore treated as stale for merge-gate purposes until PR #23 re-syncs latest main and gets a fresh mergeability / review signal.
