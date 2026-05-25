@@ -57,3 +57,7 @@ Effective artifact examples:
 - `DEPUTY_SIGNAL_DECISION_REQUIRED` means Executive has enough current-main patrol evidence to stop ordinary chase, but Deputy must decide whether that evidence is sufficient for gate routing or whether a repair owner must refresh the branch / validation report.
 - `COMPLETED_WAITING_NEXT_SCOPED_TASK` is valid only after Issue / PR / merge / blackboard state reconciliation is complete.
 - `TASK_PREVIEW_MISSING` is valid only when no active Issue, PR, task preview, stale branch, or Commander instruction exists.
+
+## Executive Visible ACK Watch
+
+- `2026-05-25T07:29:00Z`: `ACTIVE_HANDLER_SILENT` remains after latest main `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`. Executive Officer checked required governance docs, blackboard, this ledger, triage queue, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, branch heads, and local merge-tree signals. PR #22 / PR #26 still merge-tree cleanly against latest main and remain Deputy Codex final-gate visibility rows. PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 still has no merge ref and local merge-tree exits `128` / unrelated histories, so both remain Deputy Codex-2 repair-status rows. No table row state changed; `EXECUTIVE_PATROL_INBOX.md` was updated with the 07:29 visible ACK follow-up.

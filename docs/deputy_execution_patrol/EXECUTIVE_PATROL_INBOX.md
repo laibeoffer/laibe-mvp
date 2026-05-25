@@ -69,6 +69,9 @@ Executive Officer checked latest `origin/main`, open PR metadata, PR comments, r
 Follow-up 2026-05-25T07:18:56Z:
 Executive Officer re-checked latest main `dfad5c559032311ca6202f615062cf206900dd37`, open PR / Issue metadata, PR comments / reviews via GitHub REST, PR refs, and local merge-tree signals. No visible handler ACK was found after the 07:08 action request. PR #22 still merge-trees cleanly against latest main; PR #26 still merge-trees cleanly against latest main and retains the 06:52 validation refresh. Deputy Codex still needs to publish a visible final-gate ACK before the next patrol.
 
+Follow-up 2026-05-25T07:29:00Z:
+Executive Officer re-checked latest main `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`, latest blackboard, delivery ledger, triage queue, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, and local merge-tree signals. No visible handler ACK was found after the 07:18 follow-up. PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df` and merge-tree exits `0`; PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` and merge-tree exits `0`. `ACTIVE_HANDLER_SILENT` remains for Deputy Codex final-gate visibility.
+
 Recommended Deputy action:
 Post visible ACK with one of: `FINAL_GATE_DECISION_PENDING`, `FINAL_GATE_READY_FOR_MERGE_CHECK`, `FINAL_GATE_BLOCKED_BY_MERGEABILITY`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Do not ask Commander unless merge/reject final judgment requires Commander under rules.
 
@@ -112,6 +115,9 @@ Executive Officer checked latest `origin/main`, open PR metadata, PR comments, r
 
 Follow-up 2026-05-25T07:18:56Z:
 Executive Officer re-checked latest main `dfad5c559032311ca6202f615062cf206900dd37`, open PR / Issue metadata, PR comments / reviews via GitHub REST, PR refs, and local merge-tree signals. No visible handler ACK was found after the 07:08 action request. PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 still has no merge ref and local merge-tree exits `128` / unrelated histories. Deputy Codex-2 still needs to publish repair-status ACK or blocker-with-attempted-fix before the next patrol.
+
+Follow-up 2026-05-25T07:29:00Z:
+Executive Officer re-checked latest main `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`, latest blackboard, delivery ledger, triage queue, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, and local merge-tree signals. No visible handler ACK was found after the 07:18 follow-up. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c` and still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`, still has no merge ref, and local merge-tree exits `128` / unrelated histories. `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair-status visibility.
 
 Recommended Deputy action:
 Post visible ACK with one of: `WORKFLOW_REPAIR_ATTEMPTED`, `ACTION_TAKEN`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Keep scope limited to branch/worktree reconciliation and documented validation; stop on source drift, formal output/pricing, payment, AI API, or cross-workstream scope.

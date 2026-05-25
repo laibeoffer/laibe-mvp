@@ -4361,3 +4361,36 @@ No
 
 Need Reviewer:
 No
+
+### 2026-05-25 - Executive visible ACK recovery patrol on current main `8007ae0`
+
+Workstream:
+command/executive / active handler visible ACK recovery
+
+Status:
+ACTIVE_HANDLER_SILENT / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-read latest `origin/main` at `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, branch heads, and local merge-tree signals.
+- No visible handler ACK was found after the 07:08 and 07:18 Executive action requests.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local merge-tree against current main exits `0`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local merge-tree against current main exits `0`, and PR comment `4532187707` remains the latest validation refresh.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local merge-tree exits `128` / unrelated histories.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #22 / PR #26 in Deputy Codex final-gate visibility ACK lane. Do not duplicate ordinary Builder chase unless branch head or validation evidence changes.
+- Keep PR #23 / PR #25 in Deputy Codex-2 repair-status ACK lane. Do not loop back to original Builders while the ledger names Deputy Codex-2 as Current Handler.
+- Executive Officer updated the ledger watch note and the two pending inbox action requests with 07:29 visible ACK follow-up.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
