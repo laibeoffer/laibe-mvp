@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T22:32:46Z - [VALIDATION_REFRESH_FOUND_71C02F0] - Deputy Codex
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `71c02f0143be0876291d84cd22232d3782b4d7e1`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector now reports all four PRs open / non-draft / `mergeable=true`; the 22:18Z metadata contradiction is resolved. Current-main merge-tree and diff-check pass for all four active PRs against `71c02f0`: PR #22 tree `63894f62c463dda6d9b527abd86878b951ec369b`; PR #23 tree `ef3f7c37723e41417556b8a718cbb8025da5446c`; PR #25 tree `5b617b3fc555fc0b54598a9be2c6d78420ee8498`; PR #26 tree `76d2db942a573572d1d624294bfa5540c518e74e`; all diff-check exits `0`. PR #23 and PR #25 still carry unresolved repaired-thread metadata despite later clean Codex evidence.
+
+Recommended Executive Action:
+No duplicate Builder or GitHub chase while branch heads, validation, and Codex results remain stable. Keep the single visible inbox request to Deputy Codex.
+
+Recommended Deputy Action:
+Deputy Codex should publish final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved repaired-thread metadata requires manual resolution, validation refresh, or blocker publication, or whether later clean evidence is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:18:02Z - [GITHUB_METADATA_CONTRADICTION_AFAC58D] - Deputy Codex-2
 
 Status:

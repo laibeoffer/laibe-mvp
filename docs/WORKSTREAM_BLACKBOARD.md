@@ -1345,6 +1345,20 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T22:32:46Z - Metadata contradiction cleared after `71c02f0`
+
+- Workstream: executive-officer / active-final-gates
+- Branch: `origin/main` `71c02f0143be0876291d84cd22232d3782b4d7e1`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_CONTRADICTION_RESOLVED / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issue / PR metadata, PR comments, Codex review results, review threads, fetched refs, current-main merge-tree, and diff-check.
+- GitHub connector status: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed. PR #22 / PR #23 / PR #25 / PR #26 are all open, non-draft, and connector `mergeable=true`; the 22:18Z PR #22 / PR #25 / PR #26 metadata contradiction is no longer present.
+- Current-main simulation against `71c02f0143be0876291d84cd22232d3782b4d7e1` passes for all four active PRs: PR #22 tree `63894f62c463dda6d9b527abd86878b951ec369b`; PR #23 tree `ef3f7c37723e41417556b8a718cbb8025da5446c`; PR #25 tree `5b617b3fc555fc0b54598a9be2c6d78420ee8498`; PR #26 tree `76d2db942a573572d1d624294bfa5540c518e74e`; all diff-check exits `0`.
+- Review-thread state: PR #22 / PR #26 have no review threads. PR #23 and PR #25 still have unresolved repaired-thread metadata despite latest clean Codex evidence after their current heads; this is a Deputy final-gate manual-thread / blocker decision, not an ordinary Builder chase.
+- Visible follow-up issued: single-primary `To: Deputy Codex` in Executive inbox to publish `ACTION_TAKEN` final-gate visibility or an exact blocker for PR #22 / #23 / #25 / #26. Deputy Codex-2 validation refresh is considered found unless GitHub metadata flips again.
+- Need Commander: No.
+- Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:18:02Z - Latest-main metadata reconciliation after `afac58d`
 
 - Workstream: deputy-codex / active-final-gates
