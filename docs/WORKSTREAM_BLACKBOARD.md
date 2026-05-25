@@ -1345,6 +1345,27 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T19:50:38Z - Latest-main reconfirmation after `de82362`
+
+- Workstream: command/deputy / output-budget-documents / active PR final gates
+- Branch: `origin/main` `de82362e77bbb3ff152f348960f06e46a2291671`
+- Status: `STATE_RECONCILIATION / DEPUTY_LOOP_BREAK_ACK_STILL_PENDING / PR23_DOC_SYNC_LOOP_UNCHANGED / PR22_PR25_PR26_CURRENT_MAIN_PASS`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Rechecked mandatory governance docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, handoff docs, PR refs, fetched PR heads / merge refs, local merge-tree, and diff-check.
+  - `de82362` is another Executive / patrol refresh, not a Deputy merge / reject / exact-blocker ACK; `EXECUTIVE_PATROL_INBOX.md` still shows `Deputy Decision: PENDING` for `DEPUTY_LOOP_BREAK_ACK_STILL_PENDING`.
+  - PR #23 remains at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. Latest-main merge-tree against `de82362` still exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+  - PR #22 / #25 / #26 still pass latest-main merge-tree and diff-check against `de82362`: trees `a69e3da3fe7dab7c3450373f48fd5d396be92002`, `e57d3f4ff956c8bbb2f924a9b7cb4f6fe762be06`, and `be2795547e69818f70d4b1004561d80c3835b687`.
+- Decision:
+  - To: Deputy Codex
+  - Workstream: output/budget-documents + active final gates
+  - Branch / Repo: PR #23 `output/renderer-static-guard-review-packet`; PR #22/#25/#26 / `laibeoffer/laibe-mvp`
+  - Mission: Stop the patrol-doc sync loop from returning to Builder by publishing the Deputy loop-break / final-gate policy.
+  - Why this agent: Deputy Codex owns final-gate and merge-window decisions; Executive has already refreshed the ACK watch and PR #23 already has Builder blocker-with-attempted-fix evidence.
+  - Action: Choose one: pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or record an exact final-gate blocker. Also publish final-gate visibility or exact blockers for PR #22/#25/#26.
+  - Need Commander: No
+  - Need Reviewer: No unless a branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T19:33:39Z - No Deputy ACK after latest-main reconfirmation
 
 - Workstream: executive-officer / output-budget-documents / active PR final gates
