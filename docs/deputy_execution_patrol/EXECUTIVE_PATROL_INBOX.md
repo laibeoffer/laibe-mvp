@@ -37,7 +37,47 @@ PENDING
 
 ## Pending Executive Findings
 
-No pending Executive findings after this Deputy patrol.
+### 2026-05-25T02:28:57Z - [DEPUTY2_EXECUTIVE_FOLLOW_UP_REQUIRED] - Active Stalls
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Plan Puzzle / Raw Candidate / MethodSpec / Output Documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15, Issue #17, PR #22, PR #23
+
+Finding:
+Deputy Codex-2 patrol confirmed the four active priority stalls remain unresolved after the latest main SHA `cfdf7f42dd35485fccb703a812b7c4030df777fb`.
+
+Evidence:
+- Issue #15: no remote branch `plancraft/zone-area-boundary-refinement`, PR URL, Issue claim, `node --check`, guard check, or exact blocker with attempted resolution.
+- Issue #17: no remote branch `warehouse/raw-source-quality-scoring`, PR URL, Issue claim, candidate-only validation, forbidden-pricing-field check, or exact blocker with attempted resolution.
+- PR #22: open and `mergeable=false`; branch exists and changed files remain in Issue #16 allowed docs, but latest-main re-sync / conflict follow-up is still missing.
+- PR #23: open and `mergeable=false`; unresolved Codex P2 review thread remains on `src/lib/budget/renderers/formal-file-writer-policy.ts` requiring renderer / format mismatch fail-closed handling.
+
+Action already taken:
+Deputy Codex-2 posted follow-up comments requiring next reports before the next Deputy-2 patrol:
+- Issue #15 comment `4531077495`
+- Issue #17 comment `4531077587`
+- PR #22 comment `4531077662`
+- PR #23 comment `4531077747`
+
+Recommended Deputy action:
+Keep these as execution / review-gate stalls. Do not escalate to Commander. If the next patrol still finds no useful response, name the responsible Builder workstream directly as overdue for assignment report: Plan Puzzle Builder for #15, Raw Candidate Builder for #17, MethodSpec Builder for #22, and Output Documents Builder for #23.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
+Deputy Decision:
+PENDING_EXECUTIVE_CHASE
 
 ## Processed Executive Findings
 

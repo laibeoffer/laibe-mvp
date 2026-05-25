@@ -1343,6 +1343,53 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy Codex-2 active-stall patrol
+
+Workstream:
+cross-workstream patrol / Deputy Codex-2
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+ACTIVE_STALLS_CONFIRMED / EXECUTIVE_FOLLOW_UP_REQUIRED
+
+Changed:
+- Deputy Codex-2 rechecked latest `main` SHA `cfdf7f42dd35485fccb703a812b7c4030df777fb`, open Issues, open PRs, PR review threads, branch refs, triage queue, and Executive inbox.
+- Plan Puzzle Issue #15 still has no remote branch `plancraft/zone-area-boundary-refinement`, PR URL, Issue claim, `node --check`, guard check, or exact blocker with attempted resolution.
+- Raw Candidate Issue #17 still has no remote branch `warehouse/raw-source-quality-scoring`, PR URL, Issue claim, candidate-only validation, forbidden-pricing-field check, or exact blocker with attempted resolution.
+- MethodSpec PR #22 remains open and `mergeable=false`; branch `warehouse/method-spec-validator-freeze-note` exists, changed files are still the Issue #16 allowed docs, but latest-main re-sync / conflict follow-up remains missing.
+- Output Documents PR #23 remains open and `mergeable=false`; unresolved Codex P2 review thread remains on `src/lib/budget/renderers/formal-file-writer-policy.ts` for renderer / format mismatch fail-closed handling.
+- Deputy Codex-2 posted GitHub follow-up comments on Issue #15, Issue #17, PR #22, and PR #23 requiring concrete next reports before the next Deputy-2 patrol.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only patrol update.
+- GitHub follow-up comments:
+  - Issue #15 comment `4531077495`
+  - Issue #17 comment `4531077587`
+  - PR #22 comment `4531077662`
+  - PR #23 comment `4531077747`
+
+Blocked:
+- #15 and #17 are execution stalls, not Commander blockers.
+- #22 is blocked on technical re-sync / conflict follow-up.
+- #23 is blocked on Codex P2 fix and re-review.
+
+Next:
+- Executive Officer should chase #15 / #17 / #22 / #23 for the exact deliverables named in the Deputy Codex-2 comments.
+- If the next Deputy-2 patrol still finds no useful response, name the responsible Builder workstream directly as overdue for assignment report: Plan Puzzle Builder for #15, Raw Candidate Builder for #17, MethodSpec Builder for #22, and Output Documents Builder for #23.
+- Do not chase completed Quote Factory QF5.3 or Visual Simulation #19.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy five-hour stall root cause and recovery plan
 
 Workstream:
