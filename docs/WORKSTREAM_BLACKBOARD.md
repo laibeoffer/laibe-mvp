@@ -1345,6 +1345,27 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T19:05:34Z - PR23 post-f899 sync loop / Deputy final-gate policy required
+
+- Workstream: command/deputy / output-budget-documents / active PR final gates
+- Branch: `origin/main` `f899b1098291ecaf9a27217b8418f730c6f1e420`
+- Status: `STATE_RECONCILIATION / PR23_CLEAN_CODEX_BUT_CURRENT_MAIN_SYNC_BLOCKED_AFTER_F899B109 / FINAL_GATE_VISIBILITY_PENDING / PREVIOUS_DUAL_TO_DISPATCH_SUPERSEDED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Rechecked latest `origin/main`, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub connector PR metadata/comments for PR #22/#23/#25, PR refs, fetched branch heads, local merge-tree, diff-check, and changed-file scope.
+  - PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Output Documents Builder repair comment `4536480487` and clean Codex comment `4536508595` remain valid branch evidence, but current-main `git merge-tree --write-tree origin/main refs/patrol/hb1905/pr23` exits `1` with conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+  - PR #22, PR #25, and PR #26 local merge-tree and diff-check against `f899b1098291ecaf9a27217b8418f730c6f1e420` exit `0`.
+  - The prior `2026-05-25T18:55:29Z post-push` entry contained two primary `To:` lines. This patrol supersedes that routing with one primary `To:` target.
+- Decision:
+  - To: Deputy Codex
+  - Workstream: output/budget-documents + active final gates
+  - Branch / Repo: PR #23 `output/renderer-static-guard-review-packet`; PR #22/#25/#26 / `laibeoffer/laibe-mvp`
+  - Mission: Break the docs-only patrol sync loop and publish final-gate decision visibility.
+  - Why this agent: Deputy Codex owns final gate / merge-window policy; PR #23 has repeated Builder repairs and clean Codex results but is re-blocked by patrol-doc main advances, while PR #22/#25/#26 remain current-main clean.
+  - Action: Decide whether to pause docs-only patrol pushes for a short merge window, request one final Output Documents re-sync against `f899b1098291ecaf9a27217b8418f730c6f1e420`, or mark an exact final-gate blocker. Also publish final-gate visibility for PR #22/#25/#26.
+  - Need Commander: No
+  - Need Reviewer: No unless a branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T18:55:29Z post-push - PR23 sync-blocked again after patrol publication
 
 - Workstream: executive-officer / output-budget-documents / method-spec / raw-candidate / plancraft-page-ui
