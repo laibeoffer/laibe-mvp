@@ -40,6 +40,29 @@ Effective artifact examples:
 Execution-time main rule:
 - If a row or inbox entry embeds an older main SHA, the owner must still fetch and use the latest `origin/main` at repair / validation time. The embedded SHA is evidence, not a permission to repair against stale main.
 
+## Active Deputy Decision Override
+
+### 2026-05-25T20:12:33Z - PR23 patrol-doc sync loop break
+
+Status:
+`DEPUTY_LOOP_BREAK_DECISION / FINAL_SYNC_REQUESTED / PATROL_DOC_FREEZE_WINDOW`
+
+Decision:
+- Primary To: Output Documents Builder.
+- Applies to: PR #23 `output/renderer-static-guard-review-packet`.
+- Supersedes older PR #23 row states that say only `DEPUTY_LOOP_BREAK_ACK_PENDING_AFTER_A705674`.
+- After this decision publication lands on `main`, Output Documents Builder should fetch latest `origin/main`, sync PR #23 against that latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve PR #23 source / validation scope, rerun renderer static guard and diff-check evidence, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+- Until that final sync result is visible, patrols should not publish more no-new-evidence docs-only commits for PR #23. Publish again only if a PR branch head changes, a new GitHub comment / review appears, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or Commander / Reviewer escalation criteria appear.
+
+Final-gate visibility:
+- PR #22 / PR #25 / PR #26 are current-main merge-tree and diff-check clean against pre-publication `404ee842789c2cfca74e925cdd8747c30b93f8e2`; they are held in `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or new branch / review evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ## Delivery Table
 
 | Workstream | Issue / PR | Primary Owner | Branch | Branch SHA | PR URL | Current State | Last Effective Artifact | Validation / Checks | Missed Cycles | Current Handler | Next Required Action | Escalation Level | Need Commander | Need Reviewer |

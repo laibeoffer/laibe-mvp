@@ -37,6 +37,47 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T20:12:33Z - [DEPUTY_LOOP_BREAK_DECISION_AFTER_404EE84] - PR23 Sync Loop / Final Gate
+
+Status:
+DEPUTY_DECISION_PUBLISHED / FINAL_SYNC_REQUESTED / PATROL_DOC_FREEZE_WINDOW
+
+Executive Officer:
+N/A - Deputy Codex decision entry
+
+To:
+Output Documents Builder
+
+Workstream:
+Output Documents / PR #23
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23
+
+Finding:
+The repeated PR #23 blocker is now confirmed as patrol-doc sync churn, not a missing Builder ACK. PR #23 already has Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504`; no PR #22 / #23 / #25 / #26 comments or review comments were found after `2026-05-25T20:06:56Z`.
+
+Evidence:
+- Latest pre-publication `origin/main`: `404ee842789c2cfca74e925cdd8747c30b93f8e2`.
+- PR #23 head remains `eb7caa738431c0624c30c3242e8d28b0b4b618e9`.
+- PR #23 merge-tree against `404ee84` exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`.
+- PR #22 / PR #25 / PR #26 pass merge-tree and diff-check against `404ee84`.
+
+Action already taken:
+Deputy Codex published the loop-break policy: one final PR #23 sync is authorized after this decision commit lands on `main`; no more no-new-evidence docs-only patrol commits should be published for PR #23 during this final sync window.
+
+Recommended Deputy action:
+Watch for the Output Documents Builder final-sync result. Do not issue another ordinary Builder chase unless the branch head changes, a new GitHub comment / review appears, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or scope drifts.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+Deputy Decision:
+PUBLISHED_FINAL_SYNC_WINDOW
+
 ### 2026-05-25T20:06:56Z - [DEPUTY_LOOP_BREAK_ACK_STILL_PENDING_AFTER_A705674] - PR23 Sync Loop / Final Gate
 
 Status:

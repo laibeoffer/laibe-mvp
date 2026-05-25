@@ -609,12 +609,12 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked before this patrol publication: `a7056744ec4668f31d7435a7e26a3d0901de0fc8`.
+- `main` latest sha checked before this patrol publication: `404ee842789c2cfca74e925cdd8747c30b93f8e2`.
 - Open PR:
-  - PR #22 `Add MethodSpec validator freeze note` - current-main merge-tree and diff-check pass against `a705674` with tree `b3d557435e0188e8886125c9048bf08a2d11a9d9`; still needs Deputy Codex final-gate decision visibility because no merge/reject/blocker ACK is visible after the current Executive request. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
-  - PR #23 `Add renderer snapshot-only review packet` - head `eb7caa7` has Builder `WORKFLOW_REPAIR_ATTEMPTED` comment `4536480487`, clean Codex comment `4536508595`, and Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504`; against latest main `a705674`, merge-tree still conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check passes. Current Handler is Deputy Codex for loop-break / final-gate policy, not another blind Builder re-sync. Need Reviewer: No unless branch changes and Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
-  - PR #25 `Add Plancraft+ zone area boundary refinement` - head remains `1835e29`; Builder `PLAN_PUZZLE_ACTION_TAKEN` review `4358124195`, clean Codex comment `4536168380`, and current-main merge-tree / diff-check pass against `a705674` with tree `02636a0e1ce35ac8c139773c81324ed3b3dbf48a`. No Deputy final-gate ACK is visible after the current request, so Executive refreshed Deputy Codex final-gate visibility. Need Reviewer: No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
-  - PR #26 `Add raw source quality scoring reviewer checklist` - current-main merge-tree and diff-check pass against `a705674` with tree `4737258e067890bed5163d4bddf83604331987a4`; still needs Deputy Codex final-gate decision visibility because no merge/reject/blocker ACK is visible after the current Executive request. Need Reviewer: No unless branch changes, formal-price risk, or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #22 `Add MethodSpec validator freeze note` - current-main merge-tree and diff-check pass against `404ee84` with tree `1c5c6c18a6e1fda23802c53b71a8c5df34cf68ac`; Deputy final-gate visibility published as `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or a new branch / review signal appears. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #23 `Add renderer snapshot-only review packet` - head `eb7caa7` has Builder `WORKFLOW_REPAIR_ATTEMPTED` comment `4536480487`, clean Codex comment `4536508595`, and Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504`; against latest main `404ee84`, merge-tree still conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check passes. Deputy loop-break decision: one final sync request goes to Output Documents Builder after this decision publication; routine no-new-evidence docs-only patrol pushes are frozen for this PR #23 sync window. Need Reviewer: No unless branch changes and Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+  - PR #25 `Add Plancraft+ zone area boundary refinement` - head remains `1835e29`; Builder `PLAN_PUZZLE_ACTION_TAKEN` review `4358124195`, clean Codex comment `4536168380`, and current-main merge-tree / diff-check pass against `404ee84` with tree `4e23abbebd161279c98d0fd4ca0c6c39b90e5996`. Deputy final-gate visibility published as `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or a new branch / review signal appears. Need Reviewer: No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+  - PR #26 `Add raw source quality scoring reviewer checklist` - current-main merge-tree and diff-check pass against `404ee84` with tree `3eb3295a3e83ae66e67952d5ae2ed7f6b6d75a40`; Deputy final-gate visibility published as `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or a new branch / review signal appears. Need Reviewer: No unless branch changes, formal-price risk, or Codex reports NEEDS_FIX / P1 / P2.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
@@ -1344,6 +1344,29 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25T20:12:33Z - Deputy loop-break decision after `404ee84`
+
+- Workstream: command/deputy / output-budget-documents / active PR final gates
+- Branch: pre-publication `origin/main` `404ee842789c2cfca74e925cdd8747c30b93f8e2`
+- Status: `DEPUTY_LOOP_BREAK_DECISION / FINAL_SYNC_REQUESTED / PATROL_DOC_FREEZE_WINDOW / PR22_PR25_PR26_HOLD_STABLE_MAIN_WINDOW`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Rechecked mandatory governance docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, handoff docs, GitHub REST PR / Issue metadata, issue comments after `2026-05-25T20:06:56Z`, review comments after `2026-05-25T20:06:56Z`, fetched PR heads / merge refs, local merge-tree, and diff-check.
+  - GitHub PR / Issue metadata still shows PR #22 / #23 / #25 / #26 open, Issues #15 / #16 / #17 / #18 open, and Issue #19 closed. PR heads are unchanged: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `eb7caa738431c0624c30c3242e8d28b0b4b618e9`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+  - No PR #22 / #23 / #25 / #26 issue comments or review comments were found after `2026-05-25T20:06:56Z`.
+  - PR #23 remains blocked only by patrol docs churn: merge-tree against `404ee84` exits `1` with conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb2012/pr23` exits `0`.
+  - PR #22 / #25 / #26 pass current-main merge-tree and diff-check against `404ee84`: trees `1c5c6c18a6e1fda23802c53b71a8c5df34cf68ac`, `4e23abbebd161279c98d0fd4ca0c6c39b90e5996`, and `3eb3295a3e83ae66e67952d5ae2ed7f6b6d75a40`.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: PR #23 `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Perform one final PR #23 sync after this Deputy decision publication lands on `main`.
+  - Why this agent: PR #23 already has the required Builder `BLOCKER_WITH_ATTEMPTED_FIX`; Deputy Codex is now breaking the patrol-doc sync loop by authorizing one final sync window instead of repeated blind Builder chases.
+  - Action: After this decision commit is visible on `origin/main`, fetch latest `origin/main`, sync PR #23 against that latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve all PR #23 source / validation scope, rerun renderer static guard and diff-check evidence, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`. Do not use embedded old SHA as the sync base.
+  - Patrol guardrail: Until Output Documents Builder reports that final sync result, do not publish more no-new-evidence docs-only patrol commits for PR #23. Publish again only if a PR branch head changes, a new GitHub comment / review appears, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or Commander/Reviewer escalation criteria appear.
+  - Need Commander: No
+  - Need Reviewer: No unless a branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or scope drifts.
 
 ### 2026-05-25T20:06:56Z - No Deputy ACK after `a705674` post-push
 

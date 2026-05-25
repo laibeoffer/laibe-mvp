@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T20:12:33Z - [DEPUTY_LOOP_BREAK_DECISION_AFTER_404EE84] - Output Documents
+
+Status:
+DEPUTY_DECISION_PUBLISHED / FINAL_SYNC_REQUESTED / PATROL_DOC_FREEZE_WINDOW
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23
+
+Evidence:
+Latest pre-publication `origin/main` is `404ee842789c2cfca74e925cdd8747c30b93f8e2`. PR #23 head remains `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. No PR #22 / #23 / #25 / #26 issue comments or review comments were found after `2026-05-25T20:06:56Z`. Against `404ee84`, PR #23 merge-tree exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check exits `0`. PR #22 / #25 / #26 pass current-main merge-tree and diff-check against `404ee84`.
+
+Recommended Executive Action:
+Do not publish more no-new-evidence docs-only patrol commits for PR #23 during this final sync window. Watch for the Output Documents Builder final-sync result only.
+
+Recommended Deputy Action:
+Deputy decision is already published: primary To is Output Documents Builder for one final PR #23 sync after this decision commit lands on `main`. PR #22 / PR #25 / PR #26 are held in `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or new evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
 ### 2026-05-25T20:06:56Z - [NO_NEW_DEPUTY_ACK_AFTER_A705674] - Deputy Codex
 
 Status:
