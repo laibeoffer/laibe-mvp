@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T14:12:34Z - [PR23_REPAIR_ACK_CLEAN_BUT_SYNC_BLOCKED_AGAIN] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / LATEST_MAIN_SYNC_BLOCKED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest main is `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`. PR #23 head advanced to `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; Output Documents Builder posted repair / validation evidence in comment `4534883253` against previous main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`, and Codex returned clean in comment `4534905765` at `2026-05-25T14:10:43Z`. After Executive published patrol docs to main `e8722bd`, `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. PR #25 remains current-main clean: `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0`.
+
+Recommended Executive Action:
+Chase Output Documents Builder for one more latest-main sync against `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the fail-closed renderer fix and patrol entries, rerunning checks, and requesting Codex re-review if the head changes.
+
+Recommended Deputy Action:
+No new Deputy decision this round. PR #23 should stay out of final gate until latest-main sync is repaired against `e8722bd`. PR #25 remains Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T14:04:16Z - [PR25_CODEX_CLEAN_PR23_SYNC_BLOCKED] - Plan Puzzle / Output Documents
 
 Status:

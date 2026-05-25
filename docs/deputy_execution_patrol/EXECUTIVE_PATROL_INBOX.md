@@ -37,6 +37,51 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T14:12:34Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents Post-Push Sync
+
+Status:
+REPAIR_ACK_FOUND_CODEX_CLEAN_BUT_CURRENT_MAIN_SYNC_BLOCKED_AGAIN / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 has a fresh Builder repair report and fresh clean Codex result, but Executive patrol docs advanced main afterward. Against latest main, PR #23 is current-main sync blocked again by `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest main checked after Executive push: `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`.
+- PR #23 head: `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`.
+- Builder repair report: comment `4534883253`, using previous main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`.
+- Codex clean result: comment `4534905765` at `2026-05-25T14:10:43Z`.
+- GitHub PR #23 merge ref `43f9343a809fd95636d86a3c25aa6a56fb88e5e0` still targets pre-publish base `96dd05e` plus PR head `77eb69c`.
+- Post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main; PR #25 remains Deputy final-gate candidate.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended next action:
+Output Documents Builder should re-sync PR #23 against `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus patrol entries, rerun required checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
 ### 2026-05-25T14:04:16Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle Final Gate
 
 Status:
