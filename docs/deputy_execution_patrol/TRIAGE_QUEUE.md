@@ -36,6 +36,188 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T15:28:39Z - [PR23_P2_SYNC_BLOCKED_RECONFIRMED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / EXISTING_BUILDER_REQUEST_CURRENT
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` is `c8e307639122d73705a667cc4d66adcfd26cee80`. PR #23 remains head `01b489c21a71db7a3301918e44bcfea75e60206a`. Public PR page fallback still shows the post-`01b489c` Codex P2: `Block staging writes for metadata-only storage target`. GitHub REST returned `403`; patrol used public pages, `git ls-remote`, fetched refs, and local simulation fallback. `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict, while `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / #25 / #26 remain merge-tree clean against `c8e3076`; all four PR diff-checks pass.
+
+Recommended Executive Action:
+Do not issue a duplicate GitHub chase this round. Keep the existing single-primary `To: Output Documents Builder` request active for the P2 fix, latest-main sync repair, rerun checks, and Codex re-review.
+
+Recommended Deputy Action:
+No merge / reject / close on PR #23 this round. Keep PR #23 out of final gate until the P2 is fixed, latest-main sync is clean, and Codex re-review is clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes due Codex P2.
+
+### 2026-05-25T15:20:08Z - [PR23_CODEX_P2_SYNC_BLOCKED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / LATEST_MAIN_SYNC_BLOCKED
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` is `b14845cb03314f5eecdcdef59b2337eb56dd15ba`. PR #23 remains head `01b489c21a71db7a3301918e44bcfea75e60206a`. Public PR page fallback found a post-`01b489c` Codex P2: `Block staging writes for metadata-only storage target`, in `src/lib/budget/renderers/formal-file-writer-policy.ts` around lines `+216` to `+220`. REST comments/reviews returned `403`. `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict; `git diff --check origin/main..refs/patrol/hb1520/pr23` exits `0`. PR #22 / #25 / #26 remain merge-tree clean.
+
+Recommended Executive Action:
+Chase Output Documents Builder for one scoped P2 fix plus latest-main sync repair. Do not route PR #23 to Deputy final gate until the P2 is fixed, latest-main sync is clean, and Codex re-review is clean.
+
+Recommended Deputy Action:
+No merge / reject / close on PR #23 this round. PR #25 remains a separate Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes due Codex P2.
+
+### 2026-05-25T15:04:07Z - [PR23_SYNC_REPAIRED_CODEX_PENDING] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+PR #23 advanced to head `01b489c21a71db7a3301918e44bcfea75e60206a`. Output Documents Builder posted `WORKFLOW_REPAIR_ATTEMPTED` in comment `4535229076`, reporting latest-main sync against `387cada726b3d91fc48ce5044dca80e36bdfa9d8`, renderer static guard pass, syntax pass, invalid fixture / mismatch smoke pass, no real `.xlsx` / `.pdf` changes, and `@codex review`. GitHub metadata before rate-limit reported PR #23 `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` is `156fcd681c37d922ab9c5f53a79d3d29bbf2f350`; local `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `b751c23ee0f3b50da1121b16280d66f4c670cce2`; `git diff --check origin/main..refs/patrol/pr23` exits `0`. No post-`01b489c` clean Codex result was visible at patrol time.
+
+Recommended Executive Action:
+Watch for post-`01b489c` Codex result and post-publication sync state. If this patrol-doc publication advances main and reopens `docs/WORKSTREAM_BLACKBOARD.md` conflict, chase Output Documents Builder for one scoped sync repair. If Codex returns clean and latest-main sync remains clean, route PR #23 to Deputy final gate.
+
+Recommended Deputy Action:
+No merge / reject / close on PR #23 this round. PR #25 remains a separate Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`01b489c` Codex review is clean and latest-main sync is rechecked.
+
+### 2026-05-25T14:50:49Z - [PR23_POST_PUBLICATION_SYNC_BLOCKED_AGAIN] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / LATEST_MAIN_SYNC_BLOCKED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Executive published patrol docs to main `a5c0d357641fea516ad2a2f91eb4cb180a819f26` after finding PR #23 current-main clean on prior main `20808ae85e0847ce606a0208a6fa932f1ba92221`. PR #23 head remains `976b4cba3ab33743d02a97451f04ddc65a316dc1`; post-`976b4cb` clean Codex comment is `4535125308`; post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` now exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / #25 / #26 remain merge-tree clean.
+
+Recommended Executive Action:
+Chase Output Documents Builder for latest-main sync repair. This supersedes the pre-publication PR #23 final-gate request until the branch is re-synced against current `origin/main`.
+
+Recommended Deputy Action:
+Do not final-gate PR #23 until latest-main sync is repaired again. PR #25 remains a separate Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T14:44:23Z - [PR23_CODEX_CLEAN_CURRENT_MAIN_REPAIRED] - Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest main is `20808ae85e0847ce606a0208a6fa932f1ba92221`. PR #23 advanced to head `976b4cba3ab33743d02a97451f04ddc65a316dc1`; Output Documents Builder posted current-main repair evidence in comment `4535080840`; Codex returned clean after that head in comment `4535125308`; GitHub reports `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` exists at `9f595895c900ea4048ec988ed3f3e514cec1eb5d`; local `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `bc30ceb4fc3223be80648cb2dcbe5c34eaa8ad90`; `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / #25 / #26 also remain merge-tree clean against latest main.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder sync chase unless PR #23 branch head changes, validation is contradicted, or Codex reports a new blocker. Keep visible final-gate routing to Deputy Codex.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #23. Do not delegate merge / reject to Executive.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
+### 2026-05-25T14:22:59Z - [POST_PUBLICATION_VERIFY_PR25_PR23] - Plan Puzzle / Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION / NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15, and PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` at Commander verification is `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`. PR #25 remains head `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba` with post-head clean Codex comment `4534994840`; `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr25` exits `0` with tree `fea59880d0ac05e9e0a8502593b51f62f4a398b2`, and `git diff --check origin/main..refs/patrol/hb1422/pr25` exits `0`. PR #23 remains head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2` with clean Codex comment `4534905765`, but `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. Local primary worktree is `LOCAL_STATE_STALE`; `origin/main` evidence was used.
+
+Recommended Executive Action:
+Keep PR #25 routed to Deputy Codex final-gate visibility. Keep PR #23 routed to Output Documents Builder for latest-`origin/main` re-sync; the Builder must fetch current `origin/main` at repair time instead of relying on the embedded SHA in any prior patrol entry.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Do not merge / reject / close PR #23; keep it out of final gate until latest-main sync is repaired.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
+### 2026-05-25T14:22:53Z - [PR25_CODEX_CLEAN_PR23_SYNC_BLOCKED_CURRENT_MAIN] - Plan Puzzle / Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION / NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15, and PR #23 / Issue #18
+
+Evidence:
+Latest main is `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`. PR #25 head advanced to `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`; Builder posted `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` in review `4357243064`, Codex returned clean in comment `4534994840` at `2026-05-25T14:25:16Z`, `refs/pull/25/merge` is `d7993baa4714ddb2819f7e1c58cee1c6b7eb9d77`, `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `b094fb84ee8ed1f6778b964f00da91d8d93f94af`, and `git diff --check origin/main..refs/patrol/pr25` passes. PR #23 head remains `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; Codex returned clean in comment `4534905765`, but `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against latest main. PR #22 / PR #26 remain merge-tree clean.
+
+Recommended Executive Action:
+Route PR #25 to Deputy Codex final-gate visibility. Chase Output Documents Builder for latest-main re-sync on PR #23, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the fail-closed renderer fix and patrol entries, rerunning checks, and requesting Codex re-review if branch head changes.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Do not merge / reject / close PR #23; keep it out of final gate until latest-main sync is repaired against `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
 ### 2026-05-25T14:12:34Z - [PR23_REPAIR_ACK_CLEAN_BUT_SYNC_BLOCKED_AGAIN] - Output Documents
 
 Status:
