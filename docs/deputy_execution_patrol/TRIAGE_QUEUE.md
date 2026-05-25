@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:04:41Z - [PR23_POST_PUBLISH_SYNC_BLOCKED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Executive found PR #23 repaired on head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f` against main `a2c3a273fb3f8f1d232a135c1eed162d79af1047`, then published patrol docs to main `999a32376dbe8490dbc4f756455015b247f4c5c6`. Post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`; PR #22 / PR #25 / PR #26 still exit `0`.
+
+Recommended Executive Action:
+Chase Output Documents Builder for a latest-main re-sync against `999a323`, preserving the fail-closed renderer fix and the new Executive patrol entries. Require rerun checks and Codex re-review if branch head changes.
+
+Recommended Deputy Action:
+No new Deputy decision is needed unless the Builder cannot repair the docs conflict or the repair changes scope.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T13:04:41Z - [PR23_REPAIR_FOUND_REVIEW_REFRESH_NEEDED] - Output Documents
 
 Status:

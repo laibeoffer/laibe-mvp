@@ -37,6 +37,48 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T13:04:41Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents Post-Publish Sync
+
+Status:
+CURRENT_MAIN_SYNC_BLOCKED_AGAIN / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 produced a valid repair artifact on head `b503cd3`, but after Executive patrol publication advanced main to `999a323`, PR #23 is current-main sync blocked again on `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest main after patrol publication: `999a32376dbe8490dbc4f756455015b247f4c5c6`.
+- PR #23 head: `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`.
+- Post-push check: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 still merge-tree clean after `999a323`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox after the post-push recheck. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Deputy repair-owner decision is needed this round. Output Documents Builder must re-sync PR #23 against latest main `999a323`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus new Executive patrol entries, rerun required checks, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
 ### 2026-05-25T13:04:41Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents
 
 Status:
