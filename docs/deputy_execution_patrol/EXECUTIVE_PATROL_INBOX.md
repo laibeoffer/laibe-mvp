@@ -1219,6 +1219,9 @@ Re-check latest `origin/main`, PR #25 head `ffbe8e1`, and merge-tree / merge ref
 Follow-up 2026-05-25T08:36:37Z:
 To: Plan Puzzle Builder. Executive Officer re-checked latest main `b563821e94bc3785692bd8a766968aa3b326457e`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR metadata before API rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` was found after the 08:30 direct repair request. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves the `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
 
+Follow-up 2026-05-25T08:49:39Z:
+To: Plan Puzzle Builder. Executive Officer re-checked latest main `983facfc0e6d564cf2442c0d9e31a357d1395b52`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open-PR API until `403` rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or branch-head update was found after the 08:36 follow-up. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves the `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
+
 Need Commander:
 No
 
@@ -1250,6 +1253,9 @@ Re-check latest `origin/main`, PR #23 head `a75e380`, and merge-tree / merge ref
 
 Follow-up 2026-05-25T08:36:37Z:
 To: Output Documents Builder. Executive Officer re-checked latest main `b563821e94bc3785692bd8a766968aa3b326457e`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR metadata before API rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` was found after the 08:30 direct repair request. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` still exists but is not current-main readiness evidence; local current-main merge-tree exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
+
+Follow-up 2026-05-25T08:49:39Z:
+To: Output Documents Builder. Executive Officer re-checked latest main `983facfc0e6d564cf2442c0d9e31a357d1395b52`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open-PR API until `403` rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or branch-head update was found after the 08:36 follow-up. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence; local current-main merge-tree exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
 
 Need Commander:
 No

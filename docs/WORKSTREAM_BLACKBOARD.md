@@ -4655,6 +4655,39 @@ No
 Need Reviewer:
 No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Executive Builder repair ACK follow-up on `983facf`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / API_LIMIT_FALLBACK
+
+Changed:
+- Re-checked latest `origin/main` at `983facfc0e6d564cf2442c0d9e31a357d1395b52`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST open-PR API until `403` rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is stale / not current-main readiness evidence; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or branch-head update was found after the 08:36 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `6`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
 ### 2026-05-25 - Executive Builder repair ACK follow-up on `b563821`
 
 Workstream:
