@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T19:50:59Z - [NO_NEW_DEPUTY_ACK_AFTER_5766720] - Deputy Codex
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / NEEDS_DEPUTY_DECISION / CURRENT_MAIN_SYNC_LOOP / TABLE_COMPLIANCE_BACKFILL
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 final-gate visibility
+
+Evidence:
+Latest `origin/main` is `5766720797b4cc45de85e37334ce11baf4e34163`. The previous blackboard-only patrol commit advanced main from `de82362` but did not update the delivery ledger, triage queue, or Executive inbox, so this patrol is the ledger / inbox compliance backfill. Sources checked: mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR comments and review threads through the connector, fetched PR heads, merge-tree, and diff-check. GitHub REST Issue detail hit API-limit fallback after Issue #15; connector comments / review threads, PR refs, and local simulation are controlling. No new Deputy Codex merge / reject / exact-blocker ACK is visible after the `19:50` reconfirmation. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling ACK. Against `5766720`, PR #23 merge-tree exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, while diff-check exits `0`. PR #22 / #25 / #26 remain current-main clean with trees `492a96c37c2c8c3abcc826f4b2ca8cfe04c371c0`, `87f0b8d3dce91155f70d75c8983af75ff160cdd0`, and `005a05cfdbc2109876a9ba36fda8b9f3ff0116d4`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Do not chase Output Documents Builder again while PR #23's required `BLOCKER_WITH_ATTEMPTED_FIX` remains current. Keep one single-primary `To: Deputy Codex` request for loop-break / final-gate visibility and publish docs-only patrol state to main.
+
+Recommended Deputy Action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Also publish final-gate visibility or exact blockers for PR #22 / PR #25 / PR #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
 ### 2026-05-25T19:33:39Z - [NO_NEW_DEPUTY_ACK_PR23_LOOP_BREAK] - Deputy Codex
 
 Status:
