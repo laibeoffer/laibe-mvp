@@ -37,51 +37,42 @@ PENDING
 
 ## Pending Executive Findings
 
-### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
+### 2026-05-25T06:13:21Z - [DEPUTY_DECISION_PUBLISHED] - PR #23 / PR #25
 
 Status:
-PENDING_DEPUTY_DECISION
+DEPUTY_DECISION_MADE
 
 Executive Officer:
-EXECUTIVE_OFFICER
+DEPUTY_CODEX
 
 Workstream:
-MethodSpec Builder / Raw Candidate Builder
+Output Documents Builder / Plan Puzzle Builder
 
 Issue / PR:
-laibeoffer/laibe-mvp Issue #16 / PR #22; Issue #17 / PR #26
+laibeoffer/laibe-mvp PR #23 / Issue #18 and PR #25 / Issue #15
 
 Finding:
-After the 05:59 Executive call-outs, PR #22 and PR #26 still have no owner-posted current-main evidence. Executive current-main merge-tree checks now pass for both PRs against `origin/main` `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`, but GitHub merge refs remain stale. This is no longer a plain owner chase; Deputy must decide whether Executive evidence is sufficient for gate routing or whether a repair / refresh owner is required.
+PR #23 and PR #25 have crossed from ordinary owner chase into workflow repair. Deputy Codex assigns Deputy Codex-2 as the LOW / MEDIUM workflow repair owner for both packages.
 
 Evidence:
 - Current main: `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`.
-- PR #22 head: `e338431e04811b5b7b0bdcff789f8d3d162ee8df`.
-- PR #22 local current-main merge-tree: exit `0`.
-- PR #22 GitHub changed files remain Issue #16 allowed docs only: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
-- PR #22 review threads: none.
-- PR #22 available merge ref still targets old base `a1da6a766c0b9a99b4d3cab48d7d0304e1330660`.
-- PR #26 head: `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
-- PR #26 local current-main merge-tree: exit `0`.
-- PR #26 available merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
-- No owner response was found after Executive call-outs `4531941286` and `4531941371`.
+- PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head: `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; repeated local-only commits `33c4695` / `d8e2c4e` are not pushed, no merge ref exists, and current-main merge-tree conflicts in `docs/NEXT_CODEX_HANDOFF.md`.
 
 Action already taken:
-Executive Officer did not post duplicate GitHub comments this round. Delivery ledger and triage queue were updated to classify PR #22 / PR #26 as `DEPUTY_SIGNAL_DECISION_REQUIRED / CURRENT_MAIN_SIMULATION_PASS_MERGE_REF_STALE`.
+Deputy Codex updated blackboard, delivery ledger, triage queue, and this inbox with two exact Deputy Codex-2 repair dispatches.
 
 Recommended Deputy action:
-Decide per PR:
-- PR #22: either accept Executive current-main merge-tree plus allowed-docs evidence and route the final gate, or assign MethodSpec owner / repair lane to publish fresh current-main mergeability confirmation.
-- PR #26: either accept Executive current-main merge-tree evidence while noting stale owner validation, or assign Raw Candidate owner / repair lane to rerun R1.5 validation and forbidden formal-pricing checks against current main.
+Monitor Deputy Codex-2 repair package status. Executive Officer should avoid duplicate ordinary chase comments unless PR #23 or PR #25 branch heads change.
 
 Need Commander:
 No
 
 Need Reviewer:
-No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
 
 Deputy Decision:
-PENDING
+APPROVED_DEPUTY2_LOW_MEDIUM_WORKFLOW_REPAIR
 
 ### 2026-05-25T06:07:51Z - [PR25_DEPUTY_WORKFLOW_REPAIR_DECISION_REQUIRED] - Plan Puzzle
 

@@ -36,31 +36,31 @@ Need Reviewer:
 
 ## Open Triage Items
 
-### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
+### 2026-05-25T06:13:21Z - [DEPUTY2_REPAIR_ASSIGNED] - PR #23 / PR #25
 
 Status:
-NEEDS_DEPUTY_DECISION
+NEEDS_DEPUTY_DECISION_RESOLVED
 
 Complexity:
 MEDIUM
 
 Target:
-`laibeoffer/laibe-mvp` PR #22 / PR #26
+`laibeoffer/laibe-mvp` PR #23 and PR #25
 
 Evidence:
-Current main is `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local `git merge-tree --write-tree origin/main refs/eopatrol/pr22-head` exits `0`, GitHub changed files remain the Issue #16 docs-only set, and no review threads exist, but the available merge ref still targets old base `a1da6a766c0b9a99b4d3cab48d7d0304e1330660`. PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local `git merge-tree --write-tree origin/main refs/eopatrol/pr26-head` exits `0`, but the available merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. No owner response was found after Executive call-outs `4531941286` and `4531941371`.
+Current main is `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c` and current-main merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; repeated local-only commits `33c4695` / `d8e2c4e` are not pushed, no merge ref exists, and current-main merge-tree conflicts in `docs/NEXT_CODEX_HANDOFF.md`. PR #22 / PR #26 still pass current-main merge-tree but lack owner evidence refresh.
 
 Recommended Executive Action:
-Do not post duplicate ordinary chase comments unless either branch head changes. Executive has current-main merge-tree evidence; the remaining gap is Deputy gate / repair-lane decision.
+Avoid duplicate ordinary chase comments for PR #23 / PR #25 unless branch heads change. Watch for Deputy Codex-2 repair package status.
 
 Recommended Deputy Action:
-Decide per PR whether Executive current-main merge-tree evidence is sufficient for gate routing or whether to assign a refresh owner. For PR #22, the practical missing item is a fresh owner current-main / allowed-docs confirmation. For PR #26, the practical missing item is rerun R1.5 validation and forbidden formal-pricing checks against current main.
+Decision made: Deputy Codex-2 is assigned LOW / MEDIUM workflow repair packages for PR #23 and PR #25. Scope is limited to current-main branch/worktree reconciliation and documented validation; stop on source drift, high-risk formal output, formal pricing, payment, AI API, or cross-workstream scope.
 
 Need Commander:
 No
 
 Need Reviewer:
-No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
 
 ### 2026-05-25T06:07:51Z - [PR25_DEPUTY_WORKFLOW_REPAIR_DECISION_REQUIRED] - Plan Puzzle
 
