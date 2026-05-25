@@ -13,6 +13,32 @@
 
 ---
 
+## Strategic Plan Source
+
+`docs/LAIBE_CODEX_STRATEGIC_PLAN.md` 是 Codex 工作線、邊界與派工制度的戰略來源。任何副指揮官、執行官、分流員、Builder、Reviewer 或治理聊天室在判斷工作線前，必須先用該文件確認 Role / Scope / Forbidden / Completion Criteria。
+
+派工制度固定如下：
+
+- GitHub Issue 是正式派工單。
+- `docs/WORKSTREAM_BLACKBOARD.md` 是戰情板。
+- Heartbeat / automation 是巡邏員，只能定時喚醒本聊天室，不能取代 Issue 或黑板。
+- 副指揮官派工必須寫明 `To: Agent`，不得只寫 workstream、branch 或 repo。
+- Issue 必須列出 `To`、`Workstream`、`Branch / Repo`、`Target files`、`Task`、`Allowed changes`、`Forbidden scope`、`Self-check`、`Git / PR instructions`、`Blackboard update`、`Completion report format`、`Need Commander`、`Need Reviewer`。
+
+預算生成系統不得再被當作單一聊天室任務，必須拆成三倉：
+
+- 原物料採購與倉儲：`warehouse/raw-candidate`，只處理 raw source / candidate / review queue / handoff proposal。
+- 配件倉庫：`warehouse/method-spec`，處理 MethodSpec / MethodRecipe / MaterialSpec / LaborRule / UnitConversion / validator policy。
+- 成品物流：`output/budget-documents`，只處理 BudgetOutputSnapshot 後的 renderer / writer / artifact policy。
+
+外部工作線必須獨立標示：
+
+- 平面拼圖應區分 Plancraft fork、LaiBE Importer UI、Plancraft Adapter Clean，不得混線。
+- 模擬圖生成只屬於 `visual/simulation-governance`，不得混入 Quote Factory 或 budget output。
+- 預算原料清洗屬於外部 repo `laibeoffer/laibe-quote-factory`，不得當作 `laibe-mvp` branch。
+
+---
+
 ## Review Dispatch Rule
 
 審查任務由使用者主動指派。

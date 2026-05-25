@@ -158,6 +158,14 @@ export const invalidFormalDocumentFixtures: InvalidFormalDocumentFixture[] = [
     options: customerExcelOptions,
   },
   {
+    case_code: "renderer_format_mismatch",
+    output: {
+      ...fixtureCustomerPdfDocument,
+      format: "excel_skeleton",
+    },
+    options: makeWriterPreflightOptions(fixtureCustomerPdfDocument, "excel"),
+  },
+  {
     case_code: "wrong_token",
     output: {
       ...fixtureCustomerExcelDocument,

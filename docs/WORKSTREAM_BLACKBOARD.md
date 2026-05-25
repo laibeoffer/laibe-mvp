@@ -21,6 +21,45 @@
 - Operational rule: do not wait for another Deputy before publishing patrol decisions, workstream dispatches, blackboard status updates, or GitHub/Issue/PR routing decisions.
 - If another Deputy returns later, it must read this blackboard first and avoid overwriting active patrol decisions unless the Commander explicitly reassigns authority.
 
+### Executive Officer Delegation Rule
+
+The Executive Officer is a patrol executor for Deputy Codex, not a second Deputy and not a replacement Commander.
+
+Assigned patrol ownership:
+- Plan Puzzle / `plancraft/page-ui`: Issue #15.
+- Raw Candidate / `warehouse/raw-candidate`: Issue #17.
+- Quote Factory / `quote-factory/price-range-governance`: `laibeoffer/laibe-quote-factory` Issue #1.
+- MethodSpec / `warehouse/method-spec`: Issue #16 and PR #22 conflict / review follow-up.
+- Output Documents / `output/budget-documents`: Issue #18 and PR #23 P2 fix follow-up.
+
+Executive Officer may directly do:
+- Chase the assigned chatrooms for `UPCOMING_PHASE_DECLARED`, Issue claim, PR URL, blocker, validation result, and blackboard short-format report.
+- Add concise follow-up comments to the assigned GitHub Issues / PRs when a workstream misses instructions, misses progress, or replies passively.
+- Add `EXECUTIVE_FOLLOW_UP`, `EXECUTIVE_CALL_OUT`, or `EXECUTIVE_STATUS_CHECK` entries to this blackboard.
+- Require workstreams to read the exact mandatory files listed in this blackboard before reporting.
+- Draft a proposed Issue / next action and mark it `RECOMMENDATION_PENDING_DEPUTY`.
+
+Executive Officer must route back to Deputy Codex for:
+- PR merge / reject / close decisions.
+- Issue close / reopen decisions.
+- Final `Need Commander` / `Need Reviewer` determination.
+- Any new formal dispatch outside the active Issue scope.
+- Cross-workstream reassignment.
+- Scope expansion, changed files outside the Issue table, or repeated table-compliance failure.
+- Payment / escrow / listing fee, real AI API / upload / API key, formal price, formal Excel/PDF, destructive git, large deletion, force-push / reset / clean, product direction, visual direction, or business logic.
+
+Executive Officer communication locations:
+- Workstream chatroom: direct work instruction / chase message.
+- Active GitHub Issue / PR: formal follow-up comment tied to the assignment.
+- `docs/WORKSTREAM_BLACKBOARD.md`: shared operational status and callouts.
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`: decision requests or blockers that require Deputy Codex.
+- Commander thread: Deputy Codex reports final decisions; Executive Officer should not bypass Deputy Codex unless the Commander explicitly asks.
+
+Two-cycle enforcement:
+- If an assigned workstream provides no useful response after one Executive Officer patrol, Executive Officer should post a direct follow-up in the workstream chatroom and the relevant Issue / PR.
+- If there is still no useful response after two Executive Officer patrols, Executive Officer must post an `EXECUTIVE_CALL_OUT` to this blackboard and add a short decision request to `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Passive endings such as `no task`, `standby`, `cannot find work`, `no formal Issue`, or `blocked by missing formal Issue` are not accepted while an active Issue or PR exists.
+
 ## Mandatory Read Rules By Chatroom
 
 所有聊天室的 heartbeat / read-only 巡查都必須先讀文件，再判斷狀態。資料夾名稱只代表範圍，不代表已讀取內容；若指令列出資料夾，聊天室必須展開並讀取該資料夾內的相關檔案。若檔案在本地不存在，先查 GitHub `origin/main`；仍不存在才回報 `MISSING`，不得自行腦補。
@@ -570,18 +609,16 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked before this governance support publication: `224fd7387281b67f78ca76dc25f2566b3c19cb16`.
+- `main` latest sha checked before this patrol publication: `3fce287be402fe9981b6a7fe33d2be8b7839e350`.
 - Open PR:
   - PR #22 `Add MethodSpec validator freeze note` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
-  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
-  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated against latest `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict-resolution comment added; no Codex review comments / review threads found.
+  - PR #23 `Add renderer snapshot-only review packet` - Codex review found P2 in `src/lib/budget/renderers/formal-file-writer-policy.ts`; merge blocked until renderer / format mismatch handling fails closed, latest `main` is re-synced, checks rerun, and Codex re-review passes. Need Reviewer: Yes.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
   - #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`
   - #18 `[Output Documents] Add renderer snapshot-only review packet / static guard next step`
-  - #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet`
-  - External: `laibeoffer/laibe-quote-factory` #1 `[Quote Factory] Verify/publish QF5.3 audit override and prepare QF5.4 dry-run contract`
+  - External: none for `laibeoffer/laibe-quote-factory`; Issue #1 was closed by merged PR #2.
 - 以下 PR 已 merged：
   - PR #1 site/page-formalization
   - PR #2 governance/codex-rules
@@ -596,6 +633,8 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
   - PR #12 Add workstream issue template, merge commit `157c75520b31b37c81b67b7f7082c7e03e968fec`
   - PR #13 Define issue blackboard patrol workflow, merge commit `ce584e822f1d6a9fc65c21b0753f6c85896e202f`
   - PR #14 Publish blackboard patrol and no-idle rules
+  - PR #24 Add visual prompt sandbox governance packet, merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`
+  - External Quote Factory PR #2 Add PriceRange audit override contract, merge commit `d075c505d0e950ca288e8d374bdf2efc6b447105`
 
 ## Workstream Status
 
@@ -792,19 +831,19 @@ Scope:
 - `skills/laibe-visual-sim/SKILL.md`
 
 Current:
-PR #6 merged. Governance docs, templates, and skill documentation only. Does not include `plan-puzzle.js`, Quote Factory, PriceRange, raw warehouse, MethodSpec, or output renderer work. Minimal Real Server Runtime Spike result is recorded as sandbox-only governance status: route B, no backend runtime, no proxy stub, no real image API, no API key / `.env`, disabled adapter / fallback only, and no production asset pipeline.
+PR #6 merged. PR #24 merged. Governance docs, templates, skill documentation, visual brief, prompt / negative prompt, sandbox preview workflow, prompt sanitization, request schema, generated-image storage policy, and reviewer packet only. Does not include `plan-puzzle.js`, Quote Factory, PriceRange, raw warehouse, MethodSpec, output renderer, site runtime, real image API, API key / `.env`, backend / proxy / upload pipeline, production storage, or production asset pipeline.
 
 Forbidden:
 real image API, API key, real AI API, Plancraft geometry, `plan-puzzle.js`, budget, raw warehouse, MethodSpec, renderer, payment / escrow / listing fee, or presenting simulations as construction drawings, formal design drawings, real cases, quote basis, or completion guarantees.
 
 Last PR / Commit:
-PR #6 merged.
+PR #24 merged, merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`.
 
 Blocked:
 None.
 
 Next:
-Pause unless visual simulation policy changes. If continuing toward real server runtime, first decide a scoped local same-origin proxy spike and keep it disabled-by-default / no-secret / no-production. If Quote Factory, PriceRange, warehouse, renderer, or Plancraft implementation reports appear in this chatroom, mark them as wrong-workstream input and route them back to the correct workstream.
+Pause unless visual simulation policy changes or a new visual brief / prompt / sandbox governance task is issued. If continuing toward real server runtime, first decide a scoped local same-origin proxy spike and keep it disabled-by-default / no-secret / no-production. If Quote Factory, PriceRange, warehouse, renderer, or Plancraft implementation reports appear in this chatroom, mark them as wrong-workstream input and route them back to the correct workstream.
 
 Need Commander:
 Only if real image/API direction or visual/product direction is considered.
@@ -939,10 +978,10 @@ Scope:
 - PriceRange Review Decision
 
 Current:
-QF5.2 PriceRange Review Decision Contract completed and published. PriceRange review decisions remain candidate-governance metadata only; `approved_for_cloud` means cloud-ready candidate statistics, not formal price approval.
+QF5.2 PriceRange Review Decision Contract completed and published. QF5.3 PriceRange Review Decision Audit / Override Contract was verified through PR #2 and merged in the external Quote Factory repo. PriceRange review decisions remain candidate-governance metadata only; `approved_for_cloud` means cloud-ready candidate statistics, not formal price approval.
 
 Last PR / Commit:
-Commit `c332d43c174e5f8b5816cceb5fbdc3ca5f708fd8`, `feat(quote-factory): add raw quote cleaning workspace`.
+PR #2 merged, merge commit `d075c505d0e950ca288e8d374bdf2efc6b447105`. Previous baseline commit `c332d43c174e5f8b5816cceb5fbdc3ca5f708fd8`, `feat(quote-factory): add raw quote cleaning workspace`.
 
 Forbidden:
 formal price, formal PricingRule, `BudgetEstimateLine.unit_price`, modifying GitHub repo `laibeoffer/laibe-mvp`, Supabase, API / migration, Renderer / BudgetOutputSnapshot, payment / escrow / listing fee.
@@ -951,7 +990,7 @@ Blocked:
 None.
 
 Next:
-Keep as external repo. Next suggested step is QF5.3 review decision audit / override governance, still without merging into `laibe-mvp` unless an explicit integration task is approved.
+Keep as external repo. Next suggested step is QF5.4 PriceRange Review Audit QA / Cloud Staging Dry-run Contract, still candidate-only and without merging into `laibe-mvp` unless an explicit integration task is approved.
 
 Need Commander:
 No.
@@ -1038,7 +1077,7 @@ Current member-goal interpretation:
   - Workstream: output/budget-documents
   - Need Commander: no unless formal Excel / PDF or product-facing output decisions are requested
 - [ ] quote-factory/price-range-governance — QF5.3 verify / publish, then QF5.4 next
-  - Status: ISSUE_READY in external repo. QF5.3 report received but must be owned by Quote Factory and verified on GitHub; report status to Deputy for blackboard sync.
+  - Status: QF5.3 COMPLETE in external repo. PR #2 merged and Issue #1 closed; QF5.4 may start only through a new scoped issue / dispatch.
   - Repo: laibeoffer/laibe-quote-factory
   - Need Commander: no unless external repo integration into laibe-mvp is requested
 
@@ -1106,7 +1145,7 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Branch / Repo: qf/qf5-3-audit-override-publish / laibeoffer/laibe-quote-factory
   - Mission: Prepare the formal work order to verify/publish QF5.3, then prepare QF5.4 only after QF5.3 is visible in the external repo.
   - Why this agent: Owns PriceRange candidate governance in the external Quote Factory repo. This is not Visual Simulation and not `laibe-mvp` implementation work.
-  - Action: Publish `UPCOMING_PHASE_DECLARED` and claim/request a GitHub Issue in `laibeoffer/laibe-quote-factory`. Verify QF5.3 before QF5.4; keep formal price blocked. Report the short status back to Deputy Codex for blackboard sync.
+  - Action: COMPLETED for QF5.3 via PR #2. Do not keep chasing Issue #1. Future QF5.4 work requires a new scoped issue / dispatch; keep formal price blocked.
   - Allowed repo/files: `laibeoffer/laibe-quote-factory`; QF5.3 docs/config/scripts/review_queue/exports files; Quote Factory roadmap docs.
   - Stop if: modifying `laibe-mvp` implementation files, Supabase/API/migration, formal price, `PricingRule`, `BudgetEstimateLine.unit_price`, renderer/output, payment, or AI API work is required. Blackboard status publication is handled by Deputy Codex unless a separate `laibe-mvp` governance Issue authorizes it.
   - Need Commander: No.
@@ -1304,7 +1343,7 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
-### 2026-05-25 - output/budget-documents PR #23 conflict resolution pushed
+### 2026-05-25 - output/budget-documents PR #23 P2 fail-closed fix
 
 Workstream:
 output/budget-documents
@@ -1316,137 +1355,616 @@ Active Issue:
 Issue #18
 
 Status:
-Deputy PR #23 conflict instruction completed and pushed. Branch is updated against latest `origin/main`.
+PR #23 Codex P2 fix implemented. `inferFormalArtifactFormat()` now requires formal renderer output `renderer` and `format` to agree; mismatched gated documents fail closed and preflight returns invalid instead of inferring the wrong artifact format.
 
 Table Compliance:
 TABLE_COMPLIANCE_PASS
 
 Missed Progress Backfill:
-MISSED_PROGRESS_FOUND: PR #23 Deputy patrol comment was found and acted on.
+MISSED_PROGRESS_FOUND: PR #23 P2 review thread and Deputy / Executive follow-up comments were found and addressed.
 
 Task Requested:
-None. Current task was PR #23 conflict resolution.
+None. Active formal task is PR #23 P2 repair.
 
 Changed:
-- Resolved `docs/WORKSTREAM_BLACKBOARD.md` merge conflict while preserving Deputy / reviewer patrol entries and Output Documents PR #23 reports.
-- Kept latest `main` reviewer patrol inbox files.
-- Verified renderer static guard and fixture smoke after conflict resolution.
+- Re-synced latest `origin/main` into PR #23 branch.
+- Resolved `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving latest main patrol entries.
+- Fixed renderer / format mismatch handling in `src/lib/budget/renderers/formal-file-writer-policy.ts`.
+- Updated writer preflight so mismatch inference does not fall back to renderer-only format.
+- Added invalid fixture coverage for `renderer_format_mismatch`.
+- Reran renderer static guard, renderer syntax checks, fixture smoke, and mismatch smoke.
 
 Files:
+- `src/lib/budget/renderers/formal-file-writer-policy.ts`
+- `src/lib/budget/renderers/formal-file-writer-preflight.ts`
+- `src/lib/budget/renderers/fixture-invalid-formal-documents.ts`
 - `docs/WORKSTREAM_BLACKBOARD.md`
-- `docs/NEXT_CODEX_HANDOFF.md`
-- `docs/deputy_reviewer_patrol/README.md`
-- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
 
 PR / Commit:
 - PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
-- Conflict-resolution commit: `13fefdc`
+- Commit: current PR #23 branch update
 
 Blocked:
-Waiting for PR #23 review / merge decision after conflict resolution.
+None after local checks. Awaiting Codex re-review after push.
 
 Next:
-Monitor PR #23 for review comments or mergeability decision. Do not start next Output Documents formal task until PR #23 is merged, explicitly closed, or re-scoped.
+Push PR #23 update and request `@codex review`.
 
 Need Commander:
 No
 
 Need Reviewer:
-No
+Yes until Codex P2 is fixed and re-reviewed cleanly.
 
-### 2026-05-25 - output/budget-documents PR #23 conflict gate backfill
+### 2026-05-25 - Deputy Codex-2 overdue decision gate
 
 Workstream:
-output/budget-documents
+cross-workstream decision gate / Deputy Codex-2
 
 Branch / Repo:
-output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
-
-Active Issue:
-Issue #18
+`main` / `laibeoffer/laibe-mvp`
 
 Status:
-Deputy instruction found on PR #23. PR #23 is conflict-gated against latest `main`; branch update / conflict resolution is in progress.
+DECISIONS_PUBLISHED / FINAL_CALL_AND_WORKFLOW_REPAIR
 
-Table Compliance:
-TABLE_COMPLIANCE_PASS
+Decision Source:
+- `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- GitHub open Issues / PRs / comments / review threads at latest checked `main` SHA `ce7a821bc29a522008398adb89ac1a2f4e2eee76`
 
-Missed Progress Backfill:
-MISSED_PROGRESS_FOUND: Deputy patrol comment on PR #23 says no next Output Documents formal dispatch until PR #23 is merged, explicitly closed, or re-scoped.
+Decisions:
+- PR #23 / Output Documents: `REVIEW_GATE_HOLD`. PR #23 must not merge. The unresolved Codex P2 review thread on `src/lib/budget/renderers/formal-file-writer-policy.ts` remains the gate until renderer / format mismatch handling fails closed, latest `main` is re-synced, renderer static guard / syntax / smoke checks are rerun, and Codex re-review is requested and clean.
+- PR #22 / MethodSpec: `FINAL_CALL_TO_ORIGINAL_OWNER`. MethodSpec Builder gets one final owner call for latest-main re-sync, patrol entries preserved, only MethodSpec docs conflict resolution, changed files confirmed within Issue #16 allowed docs, then Codex review request after mergeable. If still no effective artifact next decision cycle, route to `DEPUTY_WORKFLOW_REPAIR`.
+- Issue #17 / Raw Candidate: `DEPUTY_WORKFLOW_REPAIR`. Repeated Executive and Deputy cycles found no branch `warehouse/raw-source-quality-scoring`, no PR URL, no Issue claim, no candidate-only validation, no forbidden-pricing-field check, and no attempted blocker. Original owner no longer blocks progress; Deputy repair lane should create or assign a clean repair path for the active Issue while preserving candidate-only scope.
+- Issue #15 / Plan Puzzle: `DEPUTY_WORKFLOW_REPAIR`. Repeated Executive and Deputy cycles found no branch `plancraft/zone-area-boundary-refinement`, no PR URL, no Issue claim, no `node --check`, no guard check, and no attempted blocker. Original owner no longer blocks progress; Deputy repair lane should create or assign a clean repair path for the active Issue while preserving Plan Puzzle allowed scope and no formal estimate boundary.
 
-Task Requested:
-None. Active task is conflict resolution for existing PR #23.
-
-Changed:
-- Merged latest `origin/main` into `output/renderer-static-guard-review-packet`.
-- Preserved Deputy / reviewer patrol entries from latest `main`.
-- Resolved Output Documents blackboard conflict by keeping both PR #23 reports and Deputy patrol decisions.
+Evidence:
+- GitHub Issue #15 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:07Z`, still without effective artifact.
+- GitHub Issue #17 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:09Z`, still without effective artifact.
+- GitHub PR #22 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:10Z`; head remains `19bea40ef740b72cbc11a6b3e65c55fcc8358f20`.
+- GitHub PR #23 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:11Z`; head remains `5ffd0f3e737960b386695d25ad5d0fc4d71a62c2`; Codex P2 thread remains unresolved and not outdated.
+- Triage queue has lagging / P2-blocked items but no separate `OVERDUE_REASSIGNMENT_RECOMMENDED` card was found this round.
 
 Files:
 - `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only decision update.
+
+Blocked:
+- #23 is blocked by review gate.
+- #22 is blocked by original-owner final call.
+- #15 and #17 are blocked by workflow repair routing, not by Commander decision.
+
+Next:
+- Executive Officer should stop treating #15 and #17 as ordinary chase-only stalls and route them through Deputy workflow repair / reassignment lane.
+- Executive Officer should issue the final MethodSpec owner call for PR #22 exactly once, then route to Deputy workflow repair if still empty.
+- Output Documents remains held at review gate; do not merge PR #23 until the Codex P2 is fixed and re-reviewed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
+### 2026-05-25 - Strategic plan imported / dispatch source clarified
+
+Workstream:
+governance/codex-rules
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+STRATEGIC_PLAN_PUBLISHED / DISPATCH_RULES_CLARIFIED
+
+Changed:
+- Imported Commander-revised strategic plan into `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`.
+- Added the strategic plan to mandatory reading via `AGENTS.md` and `AI_RULES/CODEX_MANDATORY_ENTRY.md`.
+- Updated dispatch rules so GitHub Issue = formal dispatch ticket, `docs/WORKSTREAM_BLACKBOARD.md` = battle board, heartbeat / automation = patrol timer.
+- Reaffirmed Deputy dispatch must name `To: Agent`.
+- Reaffirmed budget generation is split into three warehouses: `warehouse/raw-candidate`, `warehouse/method-spec`, and `output/budget-documents`.
+- Reaffirmed separate workstreams for Plan Puzzle, Visual Simulation, and external Quote Factory / price-range governance.
+
+Files:
+- `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
+- `AGENTS.md`
+- `AI_RULES/CODEX_MANDATORY_ENTRY.md`
+- `AI_RULES/TASK_DISPATCH_RULES.md`
+- `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
 - `docs/NEXT_CODEX_HANDOFF.md`
-- `docs/deputy_reviewer_patrol/README.md`
-- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
-
-PR / Commit:
-- Existing PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
-
-Blocked:
-Waiting for local validation and conflict-resolution push.
-
-Next:
-Run renderer static guard / syntax checks, commit conflict resolution, push PR #23, then wait for review / merge decision.
-
-Need Commander:
-No
-
-Need Reviewer:
-No
-
-### 2026-05-25 - output/budget-documents requesting next formal dispatch
-
-Workstream:
-output/budget-documents
-
-Branch / Repo:
-output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
-
-Active Issue:
-Issue #18
-
-Status:
-No new Deputy instruction after PR #23 was opened. Started chasing the next formal dispatch instead of standing by.
-
-Table Compliance:
-TABLE_COMPLIANCE_PASS
-
-Missed Progress Backfill:
-MISSED_PROGRESS_FOUND: Issue #18 has been implemented, PR #23 is open, and the previous blackboard report exists.
-
-Task Requested:
-TASK_REQUESTED: Deputy Codex please provide the next output/budget-documents formal Issue, PR review/merge decision, or explicit instruction after PR #23.
-
-Changed:
-- Blackboard-only progress report.
-- No renderer, writer, snapshot, budget engine, pricing, material, frontend, plan-puzzle, DB, payment, RAG, or AI API changes.
-
-Files:
 - `docs/WORKSTREAM_BLACKBOARD.md`
 
 PR / Commit:
-- Existing PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
-- This blackboard update is local until pushed.
+- Docs-only governance integration.
 
 Blocked:
-Waiting for Deputy next formal dispatch / PR #23 review or merge decision.
+- None.
 
 Next:
-Continue monitoring Issue #18 / PR #23 and request the next formal task if no Deputy decision appears.
+- Deputy / Executive / Triage / workstream heartbeats should read `docs/LAIBE_CODEX_STRATEGIC_PLAN.md` before classifying workstreams or dispatching new tasks.
+
 Need Commander:
 No
 
 Need Reviewer:
 No
+
+### 2026-05-25 - Deputy Codex-2 overdue assignment patrol
+
+Workstream:
+cross-workstream patrol / Deputy Codex-2
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+STALL_CONTINUES / OVERDUE_ASSIGNMENT_REPORTS_REQUIRED
+
+Changed:
+- Deputy Codex-2 rechecked latest `main` SHA `b01a49aad0aadf85e8d44798e532bef59851d956`, open Issues, open PRs, PR review threads, branch refs, triage queue, and Executive inbox.
+- No useful Builder response was found after the prior Deputy Codex-2 follow-up comments on Issue #15, Issue #17, PR #22, and PR #23.
+- Plan Puzzle Builder is now directly overdue for Issue #15 assignment report: Issue claim, PR URL, `node --check`, guard check, or exact blocker with attempted resolution.
+- Raw Candidate Builder is now directly overdue for Issue #17 assignment report: Issue claim, PR URL, candidate-only validation, forbidden-pricing-field check, or exact blocker with attempted resolution.
+- MethodSpec Builder is now directly overdue for PR #22 assignment report: latest-main re-sync, patrol entries preserved, only MethodSpec docs conflict resolution, Issue #16 allowed-scope confirmation, then Codex review.
+- Output Documents Builder is now directly overdue for PR #23 assignment report: renderer / format mismatch fail-closed fix, latest-main re-sync, renderer static guard / syntax / smoke checks, and Codex re-review.
+- No new GitHub comments were posted this round to avoid duplicate chase noise; the Executive inbox was updated with a direct owner callout.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only patrol update.
+
+Blocked:
+- #15 and #17 remain execution stalls, not Commander blockers.
+- #22 remains blocked on technical re-sync / conflict follow-up.
+- #23 remains blocked on Codex P2 fix and re-review.
+
+Next:
+- Executive Officer should point the next chase directly at Plan Puzzle Builder, Raw Candidate Builder, MethodSpec Builder, and Output Documents Builder with the deliverables above.
+- If the same four items are still empty next patrol, keep them active as `EXECUTOR_FOLLOWUP_REQUIRED / STALL_CONTINUES` and request Deputy decision only for reassignment or workflow repair.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
+### 2026-05-25 - Deputy Codex-2 active-stall patrol
+
+Workstream:
+cross-workstream patrol / Deputy Codex-2
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+ACTIVE_STALLS_CONFIRMED / EXECUTIVE_FOLLOW_UP_REQUIRED
+
+Changed:
+- Deputy Codex-2 rechecked latest `main` SHA `cfdf7f42dd35485fccb703a812b7c4030df777fb`, open Issues, open PRs, PR review threads, branch refs, triage queue, and Executive inbox.
+- Plan Puzzle Issue #15 still has no remote branch `plancraft/zone-area-boundary-refinement`, PR URL, Issue claim, `node --check`, guard check, or exact blocker with attempted resolution.
+- Raw Candidate Issue #17 still has no remote branch `warehouse/raw-source-quality-scoring`, PR URL, Issue claim, candidate-only validation, forbidden-pricing-field check, or exact blocker with attempted resolution.
+- MethodSpec PR #22 remains open and `mergeable=false`; branch `warehouse/method-spec-validator-freeze-note` exists, changed files are still the Issue #16 allowed docs, but latest-main re-sync / conflict follow-up remains missing.
+- Output Documents PR #23 remains open and `mergeable=false`; unresolved Codex P2 review thread remains on `src/lib/budget/renderers/formal-file-writer-policy.ts` for renderer / format mismatch fail-closed handling.
+- Deputy Codex-2 posted GitHub follow-up comments on Issue #15, Issue #17, PR #22, and PR #23 requiring concrete next reports before the next Deputy-2 patrol.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only patrol update.
+- GitHub follow-up comments:
+  - Issue #15 comment `4531077495`
+  - Issue #17 comment `4531077587`
+  - PR #22 comment `4531077662`
+  - PR #23 comment `4531077747`
+
+Blocked:
+- #15 and #17 are execution stalls, not Commander blockers.
+- #22 is blocked on technical re-sync / conflict follow-up.
+- #23 is blocked on Codex P2 fix and re-review.
+
+Next:
+- Executive Officer should chase #15 / #17 / #22 / #23 for the exact deliverables named in the Deputy Codex-2 comments.
+- If the next Deputy-2 patrol still finds no useful response, name the responsible Builder workstream directly as overdue for assignment report: Plan Puzzle Builder for #15, Raw Candidate Builder for #17, MethodSpec Builder for #22, and Output Documents Builder for #23.
+- Do not chase completed Quote Factory QF5.3 or Visual Simulation #19.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
+### 2026-05-25 - Deputy five-hour stall root cause and recovery plan
+
+Workstream:
+cross-workstream patrol / execution supervision
+
+Status:
+ROOT_CAUSE_FOUND / RECOVERY_REQUIRED
+
+Evidence:
+- Active execution stalls persist after repeated Deputy and Executive comments: Plan Puzzle Issue #15 still has no `plancraft/zone-area-boundary-refinement` branch, PR URL, Issue claim, `node --check`, guard check, or exact blocker.
+- Raw Candidate Issue #17 still has no `warehouse/raw-source-quality-scoring` branch, PR URL, Issue claim, candidate-only check, forbidden-pricing-field check, or exact blocker.
+- MethodSpec PR #22 remains open and `mergeable=false`; owner has not reported latest-main re-sync / allowed-scope confirmation after follow-up.
+- Output Documents PR #23 remains open and `mergeable=false`; unresolved Codex P2 remains on renderer / format mismatch fail-closed handling.
+- Triage queue has not produced new executable `EXECUTIVE_ACTION_REQUEST` entries since `2026-05-24T20:43:51Z`; this made triage advisory instead of operational.
+- Executive inbox has no new pending action request after the latest stall escalation; first-line chasing did not convert repeated stalls into new executable owner demands.
+- Quote Factory QF5.3 and Visual Simulation are not active stalls: Quote Factory PR #2 / Issue #1 and Visual PR #24 / Issue #19 are closed by merge.
+- Site Flow Builder and Brand Visual are true `TASK_PREVIEW_MISSING` / Commander-input-needed workstreams, not execution stalls.
+
+Root Cause:
+- Active workrooms read stale local state or stale heartbeat wording instead of latest GitHub Issues / PRs / `origin/main` blackboard.
+- Patrol support roles were too passive: Triage summarized but did not produce sendable chase cards; Executive followed up but did not keep a persistent inbox item open after each failed cycle.
+- Deputy patrol incorrectly allowed unchanged stalls to become quiet after publication instead of notifying Commander when active stalls persisted.
+- Some workstreams treated missing branch / PR mechanics as a blocker or no-task condition instead of solving inside scope or escalating a concrete attempted blocker.
+
+Recovery:
+- Plan Puzzle: Executive / second Deputy must require Issue #15 claim plus PR URL or exact attempted blocker next cycle. If still empty, reassign or have Deputy repair workflow.
+- Raw Candidate: Executive / second Deputy must require Issue #17 claim plus PR URL or exact candidate-only blocker next cycle. If still empty, reassign or have Deputy repair workflow.
+- MethodSpec: require PR #22 latest-main re-sync, preserve patrol entries, resolve only MethodSpec docs conflicts, confirm changed files remain within Issue #16 allowed docs, then request Codex review.
+- Output Documents: require PR #23 P2 fix, fail-closed renderer / format mismatch handling, latest-main re-sync, renderer guard / syntax / smoke checks, and Codex re-review.
+- Triage Officer must write executable `EXECUTIVE_ACTION_REQUEST` / `DEPUTY_DECISION_REQUEST` cards, not only status summaries.
+- Executive Officer must keep first-line chase active until each stalled workstream reports PR URL, Issue claim, validation result, or exact blocker with attempted resolution.
+
+Need Commander:
+No for #15, #17, #22, #23 technical recovery. Yes only if Site Builder / Brand Visual product or visual direction is desired.
+
+Need Reviewer:
+Yes for PR #23 until P2 is fixed and re-reviewed. No for #15, #17, #22 unless scope changes or Codex review reports P1/P2/NEEDS_FIX.
+
+### 2026-05-25 - Deputy stall escalation after Commander challenge
+
+Published by:
+Deputy Codex
+
+Status:
+Commander challenged why patrol did not keep pushing progress while chatrooms are stalled. Deputy rechecked the blackboard, Executive / Triage inboxes, GitHub PRs / Issues, remote branches, and latest `main`.
+
+Finding:
+- The prior `DONT_NOTIFY` heartbeat judgment was too quiet: unchanged stalled status is still an operational problem.
+- Plan Puzzle Issue #15 remains open with no expected branch, PR URL, Issue claim, `node --check` result, guard check, blackboard report, or exact blocker.
+- Raw Candidate Issue #17 remains open with no expected branch, PR URL, Issue claim, candidate-only check, forbidden-pricing-field check, blackboard report, or exact blocker.
+- MethodSpec PR #22 remains open and `mergeable=false`; no latest-main re-sync or post-sync scope confirmation found.
+- Output Documents PR #23 remains open and `mergeable=false`; Codex P2 remains unresolved for renderer / format mismatch fail-closed handling.
+- Quote Factory QF5.3 is not stalled anymore: external PR #2 is merged and Issue #1 is closed. Future QF5.4 needs a new scoped issue / dispatch.
+- Visual Simulation PR #24 is merged and Issue #19 is closed; this workstream is not an active stall unless a new sandbox-governance task is issued.
+- Site Flow Builder and Brand Visual remain true `TASK_PREVIEW_MISSING` / Commander-input-needed workstreams, not execution stalls.
+
+Action Taken:
+- Posted Deputy `STALL_ESCALATION` follow-up comments to Issue #15, Issue #17, PR #22, and PR #23.
+- Required active execution workstreams to produce an Issue claim, PR URL, validation / guard checks, blackboard short-format report, or exact blocker with attempted resolution before the next patrol.
+- Reclassified silent unchanged status as a notify-worthy patrol concern, not a quiet no-op, when repeated active workstream stalls remain.
+
+Decision:
+- Do not wait silently on #15, #17, #22, or #23.
+- Executive Officer must keep first-line chase active and treat another empty patrol as `EXECUTOR_FOLLOWUP_REQUIRED / STALL_CONTINUES`.
+- Deputy Codex must notify Commander when active execution stalls persist, even if the GitHub state is technically unchanged.
+- No Commander escalation is needed for #15, #17, or #22 because their next actions are technical execution / sync tasks already defined.
+- PR #23 keeps Need Reviewer: Yes until the Codex P2 is fixed and re-reviewed.
+
+Need Commander:
+No for active technical stalls. Yes only for Site Flow / Brand Visual product or visual direction.
+
+Need Reviewer:
+Yes for PR #23 only. No for #15, #17, and #22 unless scope changes or Codex review reports P1/P2/NEEDS_FIX.
+
+### 2026-05-25 - Deputy merge gate / Quote Factory PR #2 merged
+
+Published by:
+Deputy Codex
+
+Status:
+Deputy patrol checked latest GitHub state from `origin/main`, Executive Officer inbox, open PRs, open Issues, PR comments, and review threads. Quote Factory PR #2 had the missing PR URL, validation result, formal-pricing negative check, Supabase/API/migration negative check, clean Quote Factory-only changed files, Codex review with no major issues, and no review threads.
+
+Decisions:
+- Merged external Quote Factory PR #2 `Add PriceRange audit override contract`.
+- Merge commit: `d075c505d0e950ca288e8d374bdf2efc6b447105`.
+- Quote Factory Issue #1 is closed by PR #2.
+- QF5.3 is now published in `laibeoffer/laibe-quote-factory`; QF5.4 may become the next Quote Factory dry-run/governance task, but remains candidate-only.
+- No `laibe-mvp` implementation files were touched by the Quote Factory PR.
+- No formal price, `PricingRule`, `MaterialSpec`, `LaborRule`, `BudgetEstimateLine.unit_price`, Supabase, API, migration, renderer, payment, escrow, listing fee, or AI API boundary was opened.
+- Plan Puzzle Issue #15 and Raw Candidate Issue #17 still have no expected branch / PR URL / issue claim / validation report / exact blocker. Executive Officer and Triage Officer should keep first-line chase active; this remains a technical execution follow-up, not Commander work.
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md` is initialized so the Triage Officer has a file-based queue instead of chat-only routing.
+
+Need Commander:
+No
+
+Need Reviewer:
+No for Quote Factory PR #2 after clean Codex review. PR #23 still has Need Reviewer: Yes until the P2 is fixed and re-reviewed.
+
+### 2026-05-25 - Executive Officer test patrol
+
+Published by:
+Executive Officer
+
+- Workstream: Plan Puzzle / plancraft/page-ui / plancraft/adapter-clean
+- Issue / PR: laibeoffer/laibe-mvp Issue #15
+- Status: EXECUTIVE_FOLLOW_UP / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No PR URL, Issue claim, node --check result, guard check, or exact blocker found after Deputy keep-open decision.
+- Action Taken: Executive test patrol follow-up comment posted to Issue #15: https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529894043
+- Next Required: Issue claim, PR URL, node --check result, guard check, and blackboard short-format report; or exact blocker plus attempted resolution.
+- Blocked: No valid blocker reported.
+- Need Deputy: No new decision this patrol; Deputy already kept #15 open and asked Executive Officer to continue first-line chase.
+- Need Commander: No
+- Need Reviewer: No unless scope changes or Codex review reports P1/P2/NEEDS_FIX.
+
+- Workstream: Raw Candidate / warehouse/raw-candidate
+- Issue / PR: laibeoffer/laibe-mvp Issue #17
+- Status: EXECUTIVE_FOLLOW_UP / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No PR URL, Issue claim, candidate-only check, forbidden pricing field check, or exact blocker found after Deputy keep-open decision.
+- Action Taken: Executive test patrol follow-up comment posted to Issue #17: https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529894099
+- Next Required: Issue claim, PR URL, candidate-only check, forbidden pricing field check, and blackboard short-format report; or exact candidate-only blocker plus attempted resolution.
+- Blocked: No valid blocker reported.
+- Need Deputy: No new decision this patrol; Deputy already kept #17 open and asked Executive Officer to continue first-line chase.
+- Need Commander: No
+- Need Reviewer: No unless formal pricing boundary or Codex review P1/P2/NEEDS_FIX appears.
+
+- Workstream: Quote Factory / quote-factory/price-range-governance
+- Issue / PR: laibeoffer/laibe-quote-factory Issue #1 / PR #2
+- Status: MISSED_PROGRESS_FOUND / PR_FOUND / READY_FOR_DEPUTY_MERGE_CHECK
+- Table Compliance: TABLE_COMPLIANCE_PASS
+- Missed Progress: Prior patrols had no PR URL; this patrol found PR #2 open with validation and boundary checks.
+- Action Taken: No new Issue comment needed because PR URL, validation result, formal pricing negative check, and Supabase/API/migration negative check are now present in PR #2 / Issue #1.
+- Next Required: Deputy Codex merge/review gate for PR #2; Executive Officer must not merge or close Issue #1.
+- Blocked: No patrol blocker found; final PR decision is Deputy-owned.
+- Need Deputy: Yes
+- Need Commander: No
+- Need Reviewer: No unless Deputy finds formal pricing / API / migration boundary risk.
+
+- Workstream: MethodSpec / warehouse/method-spec
+- Issue / PR: laibeoffer/laibe-mvp Issue #16 / PR #22
+- Status: EXECUTIVE_STATUS_CHECK / conflict-gated
+- Table Compliance: TABLE_COMPLIANCE_PARTIAL
+- Missed Progress: PR #22 remains open and mergeable=false; no latest-main re-sync found.
+- Action Taken: No new comment posted this patrol; existing Executive Officer PR comment already requests latest-main re-sync, Deputy entry preservation, scope check, and Codex review after mergeable: https://github.com/laibeoffer/laibe-mvp/pull/22#issuecomment-4529875856
+- Next Required: Re-sync latest main, preserve Deputy / reviewer / Executive entries, resolve only MethodSpec docs conflicts, confirm allowed docs scope, then request Codex review.
+- Blocked: Conflict-gated.
+- Need Deputy: No new decision this patrol.
+- Need Commander: No
+- Need Reviewer: No unless conflict resolution changes scope or Codex review reports NEEDS_FIX / P1 / P2.
+
+- Workstream: Output Documents / output/budget-documents
+- Issue / PR: laibeoffer/laibe-mvp Issue #18 / PR #23
+- Status: EXECUTIVE_STATUS_CHECK / NEEDS_FIX / P2_BLOCKED
+- Table Compliance: TABLE_COMPLIANCE_PARTIAL
+- Missed Progress: PR #23 remains open, mergeable=false, and has unresolved Codex P2 thread for renderer / format mismatch fail-closed handling.
+- Action Taken: No new comment posted this patrol; PR #23 and Issue #18 already have P2 follow-up and required next actions.
+- Next Required: Fix renderer / format mismatch fail-closed handling, keep snapshot-only boundaries, re-sync latest main, rerun checks, and request Codex re-review.
+- Blocked: Codex P2 unresolved and branch not mergeable.
+- Need Deputy: No new decision until P2 is fixed and re-reviewed.
+- Need Commander: No
+- Need Reviewer: Yes until P2 is fixed and re-reviewed.
+
+### 2026-05-25 - EXECUTIVE_CALL_OUT / next patrol still no response
+
+Published by:
+Executive Officer
+
+- Workstream: Plan Puzzle / plancraft/page-ui / plancraft/adapter-clean
+- Issue / PR: laibeoffer/laibe-mvp Issue #15
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No expected branch, PR URL, Issue claim, validation result, or exact blocker found after the prior Executive callout was processed by Deputy.
+- Action Taken: Executive follow-up comment posted to Issue #15: https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529846485
+- Next Required: PR URL, active Issue claim, or exact blocker + attempted resolution; include node --check, guard check, changed files, allowed/forbidden scope, and blackboard short report.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, if the next check still has no PR URL, claim, or real blocker.
+- Need Commander: No
+- Need Reviewer: No
+
+- Workstream: Raw Candidate / warehouse/raw-candidate
+- Issue / PR: laibeoffer/laibe-mvp Issue #17
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No expected branch, PR URL, Issue claim, candidate-only validation result, or exact blocker found after the prior Executive callout was processed by Deputy.
+- Action Taken: Executive follow-up comment posted to Issue #17: https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529846548
+- Next Required: PR URL or candidate-only blocker report; confirm no formal price, no PricingRule, no BudgetEstimateLine.unit_price.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, if the next check still has no PR URL, claim, or real blocker.
+- Need Commander: No
+- Need Reviewer: No unless formal pricing boundary appears.
+
+- Workstream: Quote Factory / quote-factory/price-range-governance
+- Issue / PR: laibeoffer/laibe-quote-factory Issue #1
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED / MISSED_PROGRESS_FOUND
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: Branch qf/qf5-3-audit-override-publish exists and is ahead of main by 1 commit, but no PR URL, validation result, formal pricing check, Supabase/API/migration check, or LaiBE MVP blackboard handoff report was found.
+- Action Taken: Executive follow-up comment posted to Quote Factory Issue #1: https://github.com/laibeoffer/laibe-quote-factory/issues/1#issuecomment-4529846601
+- Next Required: Quote Factory PR URL or exact QF5.3/QF5.4 validation blocker; report validation result and formal pricing / Supabase / API / migration negative checks.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes. If the next check still has no PR URL or blocker, Deputy may need to verify branch scope and repair PR workflow.
+- Need Commander: No
+- Need Reviewer: No unless formal pricing / API / migration boundary appears.
+
+### 2026-05-25 - Deputy processed Executive Officer callouts
+
+Published by:
+Deputy Codex
+
+Status:
+Deputy read `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md` after Executive Officer's test patrol. Executive Officer correctly published second-patrol callouts for Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1.
+
+Findings:
+- Plan Puzzle / Issue #15: no PR URL, issue claim, validation result, or exact blocker found. Branch `plancraft/zone-area-boundary-refinement` was not found.
+- Raw Candidate / Issue #17: no PR URL, issue claim, candidate-only validation result, or exact blocker found. Branch `warehouse/raw-source-quality-scoring` was not found.
+- Quote Factory / Issue #1: branch `qf/qf5-3-audit-override-publish` exists and appears to contain unreported progress, but no PR URL, validation result, formal pricing check, Supabase / API / migration check, or blackboard handoff report was found.
+
+Decision:
+- Executive Officer callouts are accepted and moved to processed status in `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- No Commander escalation yet.
+- No Reviewer escalation yet.
+- Executive Officer should continue first-line chase for one more patrol cycle.
+- If the next Executive Officer patrol still finds no useful response, keep the callout visible for Deputy follow-up. For Quote Factory, Deputy may then verify branch scope and repair the PR workflow if needed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - EXECUTIVE_CALL_OUT / second patrol no-response
+
+Published by:
+Executive Officer
+
+- Workstream: Plan Puzzle / plancraft/page-ui / plancraft/adapter-clean
+- Issue / PR: laibeoffer/laibe-mvp Issue #15
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No linked branch / PR / claim / validation report found after two Executive Officer patrols.
+- Action Taken: Executive follow-up comment posted to Issue #15: https://github.com/laibeoffer/laibe-mvp/issues/15#issuecomment-4529813544
+- Next Required: PR URL, active Issue claim, or exact blocker + attempted resolution; include node --check, guard check, changed files, allowed/forbidden scope, and blackboard short report.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, monitor repeated non-response and decide whether additional routing is needed if the next patrol is still empty.
+- Need Commander: No
+- Need Reviewer: No
+
+- Workstream: Raw Candidate / warehouse/raw-candidate
+- Issue / PR: laibeoffer/laibe-mvp Issue #17
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED
+- Table Compliance: TABLE_COMPLIANCE_FAIL
+- Missed Progress: No linked branch / PR / claim / candidate-only validation report found after two Executive Officer patrols.
+- Action Taken: Executive follow-up comment posted to Issue #17: https://github.com/laibeoffer/laibe-mvp/issues/17#issuecomment-4529813803
+- Next Required: PR URL or candidate-only blocker report; confirm no formal price, no PricingRule, no BudgetEstimateLine.unit_price.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, monitor repeated non-response and decide whether additional routing is needed if the next patrol is still empty.
+- Need Commander: No
+- Need Reviewer: No
+
+- Workstream: Quote Factory / quote-factory/price-range-governance
+- Issue / PR: laibeoffer/laibe-quote-factory Issue #1
+- Status: EXECUTIVE_CALL_OUT / EXECUTOR_FOLLOWUP_REQUIRED / MISSED_PROGRESS_FOUND
+- Table Compliance: TABLE_COMPLIANCE_PARTIAL
+- Missed Progress: Branch qf/qf5-3-audit-override-publish exists and is ahead of main, but no PR URL, validation result, formal pricing check, Supabase/API/migration check, or handoff report was found.
+- Action Taken: Executive follow-up comment posted to Quote Factory Issue #1: https://github.com/laibeoffer/laibe-quote-factory/issues/1#issuecomment-4529814079
+- Next Required: Quote Factory PR URL or exact QF5.3/QF5.4 validation blocker; report formal pricing / Supabase / API / migration negative checks.
+- Blocked: No valid blocker reported.
+- Need Deputy: Yes, monitor repeated non-response and decide whether additional routing is needed if the next patrol is still empty.
+- Need Commander: No
+- Need Reviewer: No
+
+### 2026-05-25 - Executive Officer limited delegation published
+
+Published by:
+Deputy Codex
+
+Status:
+Commander asked whether Executive Officer should receive clearer authority, reporting locations, communication rules, and assigned chatrooms. Deputy Codex published a limited delegation model.
+
+Changed:
+- Added `Executive Officer Delegation Rule`.
+- Created `docs/deputy_execution_patrol/README.md`.
+- Created `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Assigned Executive Officer first-line patrol ownership for Issue #15, Issue #17, Quote Factory Issue #1, PR #22 / Issue #16, and PR #23 / Issue #18.
+
+Decision:
+- Executive Officer may directly chase assigned workstreams, comment on assigned Issues / PRs, and publish concise executive follow-ups to this blackboard.
+- Executive Officer must route merge / reject, Issue close / reopen, final `Need Commander` / `Need Reviewer`, new formal dispatch outside active Issue scope, cross-workstream reassignment, and all high-risk scope back to Deputy Codex.
+- Communication locations are now explicit: workstream chatroom, active GitHub Issue / PR, this blackboard, and `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- If a workstream is still passive after two Executive Officer patrols, Executive Officer must publish `EXECUTIVE_CALL_OUT` and append a Deputy decision request to the inbox.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - PR #23 Codex review P2 recorded
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found a new Codex review on PR #23. Codex raised P2 on `src/lib/budget/renderers/formal-file-writer-policy.ts`: `inferFormalArtifactFormat()` can accept mismatched `renderer` / `format` and infer the wrong artifact format instead of failing closed.
+
+Changed:
+- Added Deputy follow-up comment to PR #23.
+- Added Deputy status update to Issue #18.
+- Marked PR #23 as `NEEDS_FIX / P2`.
+- Updated current global state so PR #23 is no longer treated as only merge-sync / review-gated.
+- Updated `laibe-commander-patrol` heartbeat prompt to stop relying on a hardcoded active Issue list; each patrol must read current GitHub / blackboard state.
+
+Decision:
+- PR #23 remains blocked from merge.
+- Output Documents must fix renderer / format mismatch handling inside renderer / writer scope.
+- Required behavior: `renderer` and `format` must agree, or preflight / inference must fail closed.
+- Preserve snapshot-only boundaries: no real `.xlsx` / `.pdf`, no budget engine rerun, no pricing rules, no formal output.
+- After fix: re-sync latest `main`, rerun existing renderer static guard / syntax / smoke checks, and request Codex re-review.
+- No next Output Documents dispatch until PR #23 is merged, closed, or re-scoped.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes, until the P2 is fixed and re-reviewed.
+
+### 2026-05-25 - PR #24 merged after clean Codex review
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol found Codex review on PR #24: no major issues. GitHub reported PR #24 mergeable, changed files stayed inside Visual Simulation governance / prompt sandbox scope, and no review threads were open. Deputy merged PR #24 under the automatic clean-scope rule.
+
+Changed:
+- Merged PR #24 `Add visual prompt sandbox governance packet`.
+- GitHub closed Issue #19 through the PR merge.
+- Updated current global state: PR #24 and Issue #19 are no longer open.
+- Visual Simulation status now records PR #24 as merged and remains sandbox / governance only.
+
+Decision:
+- `visual/simulation-governance` is complete for Issue #19 and returns to pause / next-visual-governance-task mode.
+- Real image API, API key, backend / proxy, upload pipeline, production storage, construction drawing claims, formal design drawing claims, quote basis, and completion guarantee remain blocked.
+- PR #22 remains conflict-gated.
+- PR #23 remains latest-blackboard-sync / review-gated and must re-sync against latest `main` before merge.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - PR #23/#24 review requests and blackboard sync correction
+
+Published by:
+Deputy Codex
+
+Status:
+Patrol rechecked GitHub open PRs, active Issues, reviewer inbox, and PR review state. Reviewer inbox has no pending findings. Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 still show no useful workstream response after the direct callouts. PR #22 remains conflict-gated. PR #23 reported Output Documents conflict-resolution backfill and passed checks. Deputy briefly requested Codex review on PR #23 and PR #24, then confirmed that official blackboard publication moved `main` again, so PR #23 must re-sync latest blackboard state before merge.
+
+Findings:
+- PR #22 `Add MethodSpec validator freeze note`: still not mergeable; no Codex review submissions or review threads found.
+- PR #23 `Add renderer snapshot-only review packet`: conflict-resolution backfill found and checks passed; latest blackboard publication moved `main` after that backfill, so owner must re-sync before merge.
+- PR #24 `Add visual prompt sandbox governance packet`: Deputy requested Codex review; no Codex review submissions or review threads found.
+- Issue #15 Plan Puzzle, Issue #17 Raw Candidate, and Quote Factory Issue #1: no new PR URL, active claim, or exact blocker found after Deputy callouts.
+
+Action Published:
+- Added Deputy `@codex review` request comments to PR #23 and PR #24.
+- Corrected blackboard state so PR #23 is not treated as cleanly mergeable after Deputy's own blackboard publication.
+- Kept PR #22 blocked until MethodSpec updates against latest `main`.
+- Kept PR #23 and PR #24 unmerged until Codex review returns PASS / no major issues and GitHub marks the branch mergeable against latest `main`.
+
+Decision:
+- PR #23 remains blackboard-sync / review-gated.
+- PR #24 remains review-gated.
+- PR #22 remains conflict-gated.
+- Silent workstreams remain under `TABLE_COMPLIANCE_FAIL / NO_IDLE_FAILURE` until they provide a useful assignment report.
+
+Need Commander:
+No
+
+Need Reviewer:
+No, unless Codex review reports NEEDS_FIX / P1 / P2, a conflict-resolution patch changes scope, or a forbidden/high-risk scope appears.
 
 ### 2026-05-25 - Codex rules support patrol assigned
 
@@ -1466,49 +1984,6 @@ Decision:
 - Codex 指令優化 may help Deputy Codex audit rule drift, stale heartbeat wording, missing dispatch fields, and blackboard governance gaps every 20 minutes.
 - Deputy Codex remains final routing and blackboard publication authority.
 
-Need Commander:
-No
-
-Need Reviewer:
-No
-
-### 2026-05-25 - output/budget-documents Issue #18 PR opened
-
-Workstream:
-output/budget-documents
-
-Branch / Repo:
-output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
-
-Status:
-Issue #18 implemented and PR opened. Renderer output remains snapshot-only; no real `.xlsx` / `.pdf` output.
-
-Changed:
-- Added renderer snapshot-only review packet for static guard / import denylist / placeholder writer hardening.
-- Added formal file writer artifact policy contract.
-- Added renderer static guard command wrapper.
-- Restored missing renderer helper modules needed by the snapshot-only path.
-- Verified static guard `valid: true` and fixture smoke `manifest_ready` with `artifact_written: false`.
-
-Files:
-- `docs/budget/27-renderer-snapshot-only-review-packet.md`
-- `docs/NEXT_CODEX_HANDOFF.md`
-- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
-- `src/lib/budget/renderers/formal-file-writer-policy.ts`
-- `src/lib/budget/renderers/run-renderer-static-guard.ts`
-- `src/lib/budget/renderers/customer-warning-sanitizer.ts`
-- `src/lib/budget/renderers/validate-render-options.ts`
-- `src/lib/budget/renderers/formal-renderer-token.ts`
-
-PR / Commit:
-- PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
-- Commit: `0460d58`
-
-Blocked:
-None.
-
-Next:
-Wait for PR review / merge. Do not start real Excel / PDF writer without explicit Commander dispatch.
 Need Commander:
 No
 

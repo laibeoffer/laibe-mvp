@@ -169,21 +169,35 @@ export const buildFormalArtifactFilename = (
 export const inferFormalArtifactFormat = (
   output: Pick<FormalRenderedSkeletonOutput, "renderer" | "format">,
 ): FormalArtifactFormat => {
-  if (
-    output.renderer === "formal_excel_skeleton" ||
+  const rendererFormat =
+    output.renderer === "formal_excel_skeleton"
+      ? "excel"
+      : output.renderer === "formal_pdf_skeleton"
+        ? "pdf"
+        : null;
+
+  const declaredFormat =
     output.format === "excel_skeleton"
-  ) {
+      ? "excel"
+      : output.format === "pdf_skeleton"
+        ? "pdf"
+        : null;
+
+  if (!rendererFormat || !declaredFormat) {
+    throw new Error("Unknown formal renderer output format.");
+  }
+
+  if (rendererFormat !== declaredFormat) {
+    throw new Error(
+      `Formal renderer output mismatch: renderer ${output.renderer} does not match format ${output.format}.`,
+    );
+  }
+
+  if (rendererFormat === "excel") {
     return "excel";
   }
 
-  if (
-    output.renderer === "formal_pdf_skeleton" ||
-    output.format === "pdf_skeleton"
-  ) {
-    return "pdf";
-  }
-
-  throw new Error("Unknown formal renderer output format.");
+  return "pdf";
 };
 
 export const storageTargetIsAllowed = (

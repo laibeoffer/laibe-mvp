@@ -189,24 +189,6 @@ const safeStorageTargetIsAllowed = (
     }
   })();
 
-const inferOutputFormat = (
-  output: Record<string, unknown> | null,
-): FormalArtifactFormat | null => {
-  if (!output) {
-    return null;
-  }
-
-  if (output.renderer === "formal_excel_skeleton") {
-    return "excel";
-  }
-
-  if (output.renderer === "formal_pdf_skeleton") {
-    return "pdf";
-  }
-
-  return null;
-};
-
 const canBuildExpectedFilename = (
   output: Record<string, unknown> | null,
   format: unknown,
@@ -251,7 +233,7 @@ const inferFormatNoThrow = (
   try {
     return inferFormalArtifactFormat(output as FormalRenderedSkeletonOutput);
   } catch {
-    return inferOutputFormat(output);
+    return null;
   }
 };
 

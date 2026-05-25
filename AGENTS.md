@@ -39,6 +39,7 @@
 每次 Codex 任務開始前，必須依序閱讀：
 
 1. AGENTS.md
+1a. docs/LAIBE_CODEX_STRATEGIC_PLAN.md
 2. AI_RULES/SYSTEM_ARCHITECTURE.md
 3. AI_RULES/ROUTING_RULES.md
 3a. AI_RULES/UX_FLOW_REVIEW_RULES.md，若任務涉及網站設計邏輯、頁面鏈接、CTA、header、progress bar 或 UX Flow Review

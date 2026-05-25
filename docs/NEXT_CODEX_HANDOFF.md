@@ -1,5 +1,176 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
+
+- 本輪任務名稱：Strategic Plan Imported / Dispatch Source Clarified。
+- 任務類型：Governance / Documentation / Dispatch Rules；本輪只整合指揮官校正版戰略計畫，不修改功能程式碼。
+- 新增檔案：
+  - `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
+- 修改檔案：
+  - `AGENTS.md`
+  - `AI_RULES/CODEX_MANDATORY_ENTRY.md`
+  - `AI_RULES/TASK_DISPATCH_RULES.md`
+  - `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+- 整合重點：
+  - 將「預算生成系統」明確拆回三倉：`warehouse/raw-candidate`、`warehouse/method-spec`、`output/budget-documents`。
+  - 獨立標示平面拼圖三層、模擬圖生成、外部 Quote Factory / 預算原料清洗工作線，避免混線。
+  - 明確化 GitHub Issue = 派工單、Blackboard = 戰情板、Heartbeat = 巡邏員。
+  - 副指揮官派工必須有 `To: Agent`，不得只寫 workstream / branch / repo。
+- 未修改檔案：
+  - 未修改 `src/`、budget implementation、plan-puzzle、renderer、payment、AI API、`.env` 或任何 secrets。
+- 已知風險：
+  - 既有主工作樹仍有其他聊天室造成的大量 dirty / untracked 狀態；本輪在乾淨黑板發布 worktree 中進行 docs-only 整合，避免覆蓋他人改動。
+- Need Commander: No，這是使用者提供的戰略計畫落檔與治理索引。
+- Need Reviewer: No，除非後續要求審查治理文件一致性。
+
+## Latest Patrol Task: Quote Factory PR #2 Merged / Triage Queue Initialized
+
+- 本輪任務名稱：Quote Factory PR #2 Merged / Triage Queue Initialized。
+- 任務類型：Governance / Patrol / External Repo Merge Gate / Triage Support；本輪只處理 GitHub PR gate、黑板、handoff、執行官 inbox 與分流隊列，不修改 `laibe-mvp` 功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- 新增檔案：
+  - `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- GitHub / blackboard state checked from helper worktree after fast-forward to `3fce287be402fe9981b6a7fe33d2be8b7839e350`.
+- Quote Factory PR #2 `Add PriceRange audit override contract`:
+  - Repo: `laibeoffer/laibe-quote-factory`.
+  - Changed files stayed inside Quote Factory candidate-governance scope.
+  - Codex review result: no major issues.
+  - Review threads: none.
+  - Validation / boundary checks reported: `apply_price_range_review_overrides.py`, `validate_price_ranges.py`, `validate_sample_cloud_payload.py`, no formal price / `PricingRule` / `BudgetEstimateLine.unit_price`, no Supabase / API / migration.
+  - Merge result: merged with merge commit `d075c505d0e950ca288e8d374bdf2efc6b447105`.
+  - Quote Factory Issue #1 is closed by the merge.
+- Deputy decision:
+  - QF5.3 is complete and published in the external Quote Factory repo.
+  - Next Quote Factory task may be QF5.4 dry-run / governance only through a new scoped Issue / dispatch.
+  - No Commander escalation.
+  - No Reviewer escalation.
+- Still active follow-up:
+  - Plan Puzzle Issue #15: no expected branch / PR / claim / validation / blocker found.
+  - Raw Candidate Issue #17: no expected branch / PR / claim / candidate-only validation / blocker found.
+  - Output Documents PR #23: Codex P2 remains unresolved; Need Reviewer remains Yes until fixed and re-reviewed.
+- Triage queue initialized so the Triage Officer can route lagging workstreams through a file-based queue instead of chat-only state.
+
+## Latest Patrol Task: Executive Officer Callouts Processed
+
+- 本輪任務名稱：Executive Officer Callouts Processed。
+- 任務類型：Governance / Patrol / Executive Inbox Decision；本輪只處理執行官 inbox、黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- 新增檔案：無。
+- GitHub / blackboard state checked from helper worktree after fast-forward to `87d0941eeec374a21477e6d2a042329e4719c9ca`.
+- Executive Officer correctly published second-patrol callouts for:
+  - Plan Puzzle Issue #15: no PR URL / claim / validation / blocker; branch `plancraft/zone-area-boundary-refinement` not found.
+  - Raw Candidate Issue #17: no PR URL / claim / candidate-only validation / blocker; branch `warehouse/raw-source-quality-scoring` not found.
+  - Quote Factory Issue #1: branch `qf/qf5-3-audit-override-publish` exists and appears to contain unreported progress, but no PR URL / validation / formal-pricing / Supabase/API/migration checks were reported.
+- Deputy decision:
+  - Accepted Executive Officer callouts.
+  - Moved the three inbox items from pending to processed.
+  - No Commander escalation yet.
+  - No Reviewer escalation yet.
+  - Executive Officer should continue first-line chase for one more patrol cycle.
+  - If Quote Factory still provides no PR / blocker on the next patrol, Deputy may verify branch scope and repair the PR workflow if needed.
+
+## Latest Governance Task: Executive Officer Limited Delegation
+
+- 本輪任務名稱：Executive Officer Limited Delegation。
+- 任務類型：Governance / Patrol Support / Delegation；本輪只更新黑板、handoff，並建立執行官與副指揮官的專用溝通資料夾，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：
+  - `docs/deputy_execution_patrol/README.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Commander asked whether Executive Officer needs clearer rules for reporting, named communication, what must route through Deputy Codex, and whether Executive Officer should receive partial authority / assigned chatrooms.
+- Deputy decision:
+  - Executive Officer is a patrol executor for Deputy Codex, not a second Deputy and not a replacement Commander.
+  - Executive Officer may directly chase assigned workstreams, comment on assigned Issues / PRs, and publish concise `EXECUTIVE_FOLLOW_UP`, `EXECUTIVE_CALL_OUT`, or `EXECUTIVE_STATUS_CHECK` entries to `docs/WORKSTREAM_BLACKBOARD.md`.
+  - Executive Officer must route PR merge / reject, Issue close / reopen, final `Need Commander` / `Need Reviewer`, new formal dispatch outside active Issue scope, cross-workstream reassignment, and high-risk scope back to Deputy Codex.
+  - Dedicated inbox for Deputy decisions: `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Assigned Executive Officer patrol ownership:
+  - Plan Puzzle Issue #15.
+  - Raw Candidate Issue #17.
+  - Quote Factory Issue #1.
+  - MethodSpec Issue #16 / PR #22 conflict and review follow-up.
+  - Output Documents Issue #18 / PR #23 P2 fix follow-up.
+- Need Commander: No.
+- Need Reviewer: No.
+
+## Latest Patrol Task: PR #23 Codex Review P2 Recorded
+
+- 本輪任務名稱：PR #23 Codex Review P2 Recorded。
+- 任務類型：Governance / Patrol / PR Review Gate；本輪只處理 GitHub PR review 狀態、PR 留言、黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `1d0d6ecc266a6302e2cf32c2b20e8fd04065bc15`。
+- PR #23 `Add renderer snapshot-only review packet`:
+  - Codex review result: P2 on `src/lib/budget/renderers/formal-file-writer-policy.ts`.
+  - Review issue: `inferFormalArtifactFormat()` can accept mismatched `renderer` / `format` and infer the wrong artifact format instead of failing closed.
+  - Current PR state: open, not mergeable, head `5ffd0f3e737960b386695d25ad5d0fc4d71a62c2`.
+  - Changed files remain in Output Documents renderer / docs scope, but P2 blocks merge.
+- Deputy action:
+  - Added a PR #23 comment and Issue #18 status update instructing Output Documents to fix renderer / format mismatch handling, preserve snapshot-only boundaries, re-sync latest `main`, rerun checks, and request Codex re-review.
+  - Updated `docs/WORKSTREAM_BLACKBOARD.md` so PR #23 is marked `NEEDS_FIX / P2`.
+  - Updated `laibe-commander-patrol` heartbeat prompt to remove stale hardcoded Issue #19 active-state guidance and require current GitHub / blackboard verification every patrol.
+- Need Commander: No.
+- Need Reviewer: Yes until the P2 is fixed and re-reviewed.
+
+## Latest Patrol Task: PR #24 Merged After Clean Codex Review
+
+- 本輪任務名稱：PR #24 Merged After Clean Codex Review。
+- 任務類型：Governance / Patrol / PR Merge Gate；本輪只依授權處理 clean-scope PR merge，並更新黑板 / handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `cf170e248a48be2df43f6cd6e6db0ef956cd5658`。
+- PR #24 `Add visual prompt sandbox governance packet`:
+  - Codex review result: no major issues.
+  - Mergeability before merge: mergeable.
+  - Changed files: Visual Simulation governance / prompt sandbox docs, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, and `docs/NEXT_CODEX_HANDOFF.md`.
+  - Forbidden scope check: no website runtime code, no `plan-puzzle.js`, no Plancraft, no budget / raw warehouse / MethodSpec / renderer, no payment / escrow / listing fee, no real image API, no API key / `.env`, no backend / proxy / upload pipeline, no production storage.
+  - Merge result: merged with merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`; Issue #19 closed by the merge.
+- Current open PRs after merge:
+  - PR #22 remains conflict-gated.
+  - PR #23 remains latest-blackboard-sync / review-gated and must re-sync against latest `main` before merge.
+- Current silent workstreams still under follow-up: Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 need PR URL, active claim, or exact blocker.
+- Need Commander: No.
+- Need Reviewer: No.
+
+## Latest Visual Simulation Governance Task: Visual Brief Prompt Sandbox Governance Packet
+
+- 本輪任務名稱：Visual Brief Prompt Sandbox Governance Packet。
+- 任務來源：GitHub Issue #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet`。
+- 任務類型：Documentation / Governance / Prompt Brief；本輪只更新 LAIBE_VISUAL_SIM 的 visual brief、prompt、negative prompt、sandbox policy、storage policy 與 reviewer packet 文件。
+- 新增檔案：
+  - `docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`
+- 修改檔案：
+  - `docs/ai_style_visual_chat/PROMPT_SANITIZATION_RULES.md`
+  - `docs/ai_style_visual_chat/IMAGE_API_REQUEST_SCHEMA.md`
+  - `docs/ai_style_visual_chat/GENERATED_IMAGE_STORAGE_POLICY.md`
+  - `docs/ai_style_visual_chat/IMAGE_API_SPIKE_REVIEW_CHECKLIST.md`
+  - `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`
+  - `skills/laibe-visual-sim/SKILL.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 本輪沒有修改網站 runtime code、`plan-puzzle.js`、Plancraft core、budget、raw warehouse、MethodSpec、renderer、routing、CTA、Header、payment、escrow 或 listing fee。
+- 本輪沒有接真 image API，沒有建立 backend / proxy / upload pipeline，沒有新增 API key、`.env`、package、node_modules 或 production storage。
+- `VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md` 定義 visual brief 必備欄位、prompt preview 降溫語氣、negative prompt 必備排除項、sandbox preview workflow、placeholder visual card 規格、Builder 整合邊界與 Reviewer 檢查重點。
+- `styleVisualApiRequest` contract 維持白名單欄位：`roomType`、`primaryStyle`、`secondaryStyle`、`colorTone`、`materialTone`、`budgetLevel`、`purpose: "bid-listing-style-reference"`、`disclaimerRequired: true`、`referenceImage: { allowed: false, reason: "reference image upload requires separate privacy review" }`。
+- `styleVisualApiRequest` 不得包含 `rawPrompt`、`systemPrompt`、`developerPrompt`、`projectId`、`avoid`、`walls`、`openings`、`zones`、`scale`、`plancraftBridge`、正式預算資料、reference image file 或使用者私宅圖片。
+- Prompt 必須由系統 template 組裝，不得直接使用 raw user prompt；negative prompt 必須阻擋施工圖、正式設計圖、真實案例、正式報價依據、完工保證、精準尺寸、材料品牌保證與法規符合宣稱。
+- Generated preview 只能是 sandbox / mock / temporary preview；不得寫入正式案件資料、production assets、budget data、export JSON、Plancraft geometry 或 case dashboard。
+- 固定 disclaimer 必須保留：`本圖僅為風格示意，用於案件上架與溝通參考，不代表最終設計、施工圖、實際尺寸、工法、材料品牌或正式報價內容。`
+- 下一步若繼續 visual simulation，仍只能處理 visual brief / prompt / negative prompt / governance。任何真 API、reference image upload、production storage、正式圖片用途或 server runtime 都需要新的 formal Issue 並視情況標示 Need Commander: Yes。
+
 ## Latest Governance Task: Codex Rules Support Patrol Assigned
 
 - 本輪任務名稱：Codex Rules Support Patrol Assigned。

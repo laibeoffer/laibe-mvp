@@ -4,6 +4,8 @@
 
 本文件不是 API 實作文件，不提供 API key，不要求串接任何模型，不代表功能已上線。
 
+若任務只需要 visual brief、prompt、negative prompt、placeholder visual card 或 sandbox preview 文案，請優先使用 `VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`。本文件只補充未來 Image API spike 的治理邊界。
+
 ## Spike 目的
 
 - 驗證 Visual Simulation Panel 未來是否可以安全銜接 image generation request。
