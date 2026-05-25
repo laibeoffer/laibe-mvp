@@ -1343,6 +1343,40 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive active delivery decision refresh on current main `d34fe38`
+
+Workstream:
+Executive Officer / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Changed:
+- Re-read current `origin/main` at `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`.
+- Rechecked GitHub open Issues / PRs, PR comments, changed files, review threads, branch heads, PR merge refs, and local current-main merge simulations for PR #22 / #23 / #25 / #26.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, GitHub changed files remain Issue #16 docs-only, and no review threads exist, but the available merge ref still targets old base `a1da6a`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, but the available merge ref still targets old base `0e8ab82` and no owner-posted current-main validation was found after Executive call-out `4531941371`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. The old P2 thread is outdated with a fix reply, but the branch remains sync-blocked.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local-only commits `33c4695` / `d8e2c4e` still are not pushed to PR #25.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- PR #22 / PR #26 are now classified as `DEPUTY_SIGNAL_DECISION_REQUIRED / CURRENT_MAIN_SIMULATION_PASS_MERGE_REF_STALE`; ordinary duplicate chase is no longer useful unless a branch changes.
+- PR #23 and PR #25 remain already pending Deputy workflow repair / reassignment decisions; no duplicate GitHub comments were posted this patrol.
+- No Commander escalation: these are GitHub workflow / branch evidence decisions, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+
+Next:
+- Deputy Codex should decide whether Executive current-main merge-tree evidence is enough to route PR #22 / PR #26 to gate, or assign refresh owners for current-main confirmation / validation reruns.
+- Deputy Codex should still decide PR #23 Output Documents workflow repair and PR #25 Plan Puzzle repair lane.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a branch changes, a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
 ### 2026-05-25 - Second Deputy PR #25 repeated local-only repair escalated
 
 Workstream:
