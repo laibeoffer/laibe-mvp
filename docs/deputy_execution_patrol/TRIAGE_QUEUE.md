@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T16:59:14Z - [PR25_CODEX_CLEAN_FINAL_GATE] - Plan Puzzle
+
+Status:
+NEEDS_DEPUTY_DECISION / FINAL_GATE_CANDIDATE / NEEDS_REVIEWER_NO
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `1773387fd393c6af1710f8b999bb34ee1be64031`. PR #25 head advanced to `e2decbec50d1cb65241123b76372555658e88cde`; `refs/pull/25/merge` refreshed to `19310577152e6ce52bf2556d6d0e469f05621718`; `git merge-tree --write-tree origin/main refs/patrol/hb1659/pr25` exits `0` with tree `38bf6304134dbede31361a12ed7e5e513ea24441`; `git diff --check origin/main..refs/patrol/hb1659/pr25` exits `0`. Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, `@codex review`, and post-`e2decbec` clean Codex result. PR #25 diff remains limited to Issue #15 allowed files. PR #22 / #23 / #26 also remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Stop ordinary Plan Puzzle Builder chase. Keep a visibility watch only for branch-head changes, contradicted validation, Codex NEEDS_FIX / P1 / P2, or scope drift.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or mergeability change before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+
 ### 2026-05-25T16:41:35Z - [PR25_CODEX_CLEAN_FINAL_GATE] - Plan Puzzle
 
 Status:
