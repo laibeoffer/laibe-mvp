@@ -1343,6 +1343,42 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy stall escalation after Commander challenge
+
+Published by:
+Deputy Codex
+
+Status:
+Commander challenged why patrol did not keep pushing progress while chatrooms are stalled. Deputy rechecked the blackboard, Executive / Triage inboxes, GitHub PRs / Issues, remote branches, and latest `main`.
+
+Finding:
+- The prior `DONT_NOTIFY` heartbeat judgment was too quiet: unchanged stalled status is still an operational problem.
+- Plan Puzzle Issue #15 remains open with no expected branch, PR URL, Issue claim, `node --check` result, guard check, blackboard report, or exact blocker.
+- Raw Candidate Issue #17 remains open with no expected branch, PR URL, Issue claim, candidate-only check, forbidden-pricing-field check, blackboard report, or exact blocker.
+- MethodSpec PR #22 remains open and `mergeable=false`; no latest-main re-sync or post-sync scope confirmation found.
+- Output Documents PR #23 remains open and `mergeable=false`; Codex P2 remains unresolved for renderer / format mismatch fail-closed handling.
+- Quote Factory QF5.3 is not stalled anymore: external PR #2 is merged and Issue #1 is closed. Future QF5.4 needs a new scoped issue / dispatch.
+- Visual Simulation PR #24 is merged and Issue #19 is closed; this workstream is not an active stall unless a new sandbox-governance task is issued.
+- Site Flow Builder and Brand Visual remain true `TASK_PREVIEW_MISSING` / Commander-input-needed workstreams, not execution stalls.
+
+Action Taken:
+- Posted Deputy `STALL_ESCALATION` follow-up comments to Issue #15, Issue #17, PR #22, and PR #23.
+- Required active execution workstreams to produce an Issue claim, PR URL, validation / guard checks, blackboard short-format report, or exact blocker with attempted resolution before the next patrol.
+- Reclassified silent unchanged status as a notify-worthy patrol concern, not a quiet no-op, when repeated active workstream stalls remain.
+
+Decision:
+- Do not wait silently on #15, #17, #22, or #23.
+- Executive Officer must keep first-line chase active and treat another empty patrol as `EXECUTOR_FOLLOWUP_REQUIRED / STALL_CONTINUES`.
+- Deputy Codex must notify Commander when active execution stalls persist, even if the GitHub state is technically unchanged.
+- No Commander escalation is needed for #15, #17, or #22 because their next actions are technical execution / sync tasks already defined.
+- PR #23 keeps Need Reviewer: Yes until the Codex P2 is fixed and re-reviewed.
+
+Need Commander:
+No for active technical stalls. Yes only for Site Flow / Brand Visual product or visual direction.
+
+Need Reviewer:
+Yes for PR #23 only. No for #15, #17, and #22 unless scope changes or Codex review reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy merge gate / Quote Factory PR #2 merged
 
 Published by:
