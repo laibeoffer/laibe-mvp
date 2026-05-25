@@ -37,6 +37,52 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T17:26:34Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Sync Blocked After C570
+
+Status:
+ACTION_TAKEN / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_SYNC_REPAIR_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 had been a Deputy final-gate candidate, but Executive's patrol-doc publication advanced main to `c57003b` and reopened a current-main merge-tree conflict in `docs/WORKSTREAM_BLACKBOARD.md`. The next executable action is a scoped latest-main sync repair by Output Documents Builder.
+
+Evidence:
+- Sources checked: post-push `origin/main`, fetched PR heads / merge refs, local merge-tree, and diff-check after publishing the PR #25 P2 routing update.
+- Latest `origin/main`: `c57003bfd044990b327b8b3210a026423ce61d44`.
+- PR #23 status: open.
+- PR #23 head: `1be77d0481cd03893a8253e812094f745341078a`.
+- Prior Builder P2 fix comment: `4535482545`.
+- Prior clean Codex comment: `4535507114`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1726-post/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` content conflict.
+- `git diff --check origin/main..refs/patrol/hb1726-post/pr23` exits `0`.
+- PR #22 / PR #25 / PR #26 remain current-main merge-tree and diff-check clean after `c57003b`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Output Documents Builder should re-sync PR #23 against latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the metadata-only staging-write P2 fix and patrol entries, rerun renderer static guard / syntax / smoke / diff checks, push a scoped sync head, and request Codex re-review if branch head changes. Required visible ACK: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_REQUIRED
+
 ### 2026-05-25T17:26:34Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Codex P2 On A83A121
 
 Status:

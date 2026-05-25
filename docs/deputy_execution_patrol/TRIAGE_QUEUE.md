@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T17:26:34Z - [PR23_SYNC_BLOCKED_AFTER_C570] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_SYNC_REPAIR_REQUIRED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Executive published docs-only patrol update to main `c57003bfd044990b327b8b3210a026423ce61d44`. PR #23 head remains `1be77d0481cd03893a8253e812094f745341078a`; prior Builder P2 fix comment `4535482545` and clean Codex comment `4535507114` still exist, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1726-post/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` content conflict. `git diff --check origin/main..refs/patrol/hb1726-post/pr23` exits `0`. PR #22 / PR #25 / PR #26 still pass current-main merge-tree and diff-check after `c57003b`.
+
+Recommended Executive Action:
+Issue a single-primary `To: Output Documents Builder` sync-repair request. Required labels: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, validation result, allowed / forbidden scope checks, and re-review request if branch head changes.
+
+Recommended Deputy Action:
+Hold PR #23 out of final gate until the branch is re-synced against latest main and Codex re-review is clean if the head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T17:26:34Z - [PR25_CODEX_P2_ON_A83A121] - Plan Puzzle
 
 Status:
