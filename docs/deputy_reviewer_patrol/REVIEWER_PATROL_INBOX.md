@@ -38,7 +38,7 @@ PENDING
 ### 2026-05-25T15:20:08Z - [CODEX_P2_REVIEW_GATE] - Output Documents
 
 Status:
-PENDING_REVIEWER_WATCH
+RESOLVED_BY_CLEAN_CODEX_REVIEW
 
 Reviewer:
 LAIBE_REVIEWER
@@ -65,10 +65,12 @@ Need Commander:
 No
 
 Need Reviewer:
-Yes
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
 
 Deputy Decision:
-BUILDER_FIX_PENDING
+PR23_P2_FIXED_AND_CLEAN_ON_HEAD_1BE77D0
+Resolution update 2026-05-25T15:51:46Z:
+PR #23 advanced to head `1be77d0481cd03893a8253e812094f745341078a`. Builder posted the P2 fix / validation report in comment `4535482545`, including metadata-only storage target write smoke `status: blocked` / `artifact_written: false`. Codex returned clean in comment `4535507114`, and `git merge-tree --write-tree origin/main refs/patrol/hb1551/pr23` exits `0`. Reviewer watch is closed unless branch changes or Codex reports a new blocker.
 
 ## Processed Reviewer Findings
 
