@@ -12,6 +12,14 @@ Default reporting rule:
 - Every active workstream must report an effective artifact: Issue claim, branch, PR URL, validation result, or exact blocker with attempted fix.
 - `standby`, `no task`, `nothing to do`, `cannot find work`, or `blocked by missing formal Issue` is not enough when an Issue, PR, branch, stale blackboard entry, or task preview exists.
 
+Visible heartbeat rule:
+- If `DELIVERY_LEDGER.md` names the chatroom / role as `Current Handler`, the next heartbeat must produce a visible status report in that chatroom and update the relevant patrol file if evidence changed.
+- Do not stay silent on an active row just because the work is already listed on the blackboard.
+- Valid visible status reports must include one of: `ACTION_TAKEN`, `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- `NO_NEW_EVIDENCE_AFTER_CHECK` is allowed only after listing the exact sources checked and the latest main / branch SHA.
+- Completed rows such as `COMPLETED_WAITING_NEXT_SCOPED_TASK` may stay quiet only when no stale state, no active Issue / PR, and no Deputy / Executive dispatch exists.
+- Reviewer may stay quiet unless `Need Reviewer: Yes`, Codex review NEEDS_FIX / P1 / P2, scope drift, or explicit review request exists.
+
 ## Deputy Codex
 
 ROLE:

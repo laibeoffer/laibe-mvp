@@ -1343,6 +1343,40 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Active row visible heartbeat rule added
+
+Workstream:
+command/deputy / automation governance
+
+Status:
+STALL_CAUSE_IDENTIFIED / VISIBILITY_RULE_PUBLISHED
+
+Changed:
+- Checked local automation configs: relevant LaiBE workstream heartbeats are `ACTIVE`, including Executive Officer, Deputy Codex-2, Triage Officer, Plan Puzzle, Raw Candidate, MethodSpec, Output Documents, Quote Factory, Visual Simulation, and Reviewer.
+- The current stall symptom is not that the automation records are disabled. The issue is that several rows had been routed into blackboard / `DELIVERY_LEDGER.md` decisions without requiring the target chatroom to visibly ACK the active assignment each cycle.
+- Latest `origin/main` already includes PR #26 validation refresh (`c93b4d6`), but UI chat timestamps can still look stalled when the work is recorded only in docs / GitHub and the thread does not post a visible status.
+- Added a `Visible heartbeat rule` to `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+
+Decision:
+- If `DELIVERY_LEDGER.md` names a role / chatroom as `Current Handler`, that chatroom must visibly report next heartbeat with `ACTION_TAKEN`, `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- `NO_NEW_EVIDENCE_AFTER_CHECK` must list sources checked plus latest main / branch SHA.
+- Completed rows may stay quiet only when no stale state, active Issue / PR, or Deputy / Executive dispatch exists.
+- Reviewer may stay quiet unless Need Reviewer / Codex review / scope-risk conditions exist.
+
+Next:
+- Deputy / Executive / Triage should treat silent active-handler rows as a patrol failure and write a direct recovery prompt to the exact target chatroom.
+- Current active handlers to watch: Deputy Codex for PR #22 / PR #26 final-gate decisions; Deputy Codex-2 for PR #23 / PR #25 workflow repair; completed rows such as Quote Factory and Visual Simulation do not need repeated visible chatter unless stale state appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Deputy signal decision for PR #22 / PR #26 on current main `a215335`
 
 Workstream:
