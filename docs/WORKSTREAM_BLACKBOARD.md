@@ -6078,3 +6078,34 @@ No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
   - Action: Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision.
   - Need Commander: No
   - Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or scope drift is found.
+
+### 2026-05-25T18:38:56Z - Commander latest-main reconfirmation on `874b446`
+
+- Workstream: command/deputy / output-budget-documents / plancraft-page-ui / method-spec / raw-candidate
+- Branch: `origin/main` `874b4466f16c541c42b42f680dc1328ce39da263`
+- Status: `PR23_STILL_SYNC_BLOCKED / PR25_STILL_CODEX_CLEAN_FINAL_GATE / PR22_PR26_STILL_FINAL_GATE_CANDIDATES / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Rechecked required governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR comments / review threads, fetched PR heads / merge refs, current-main merge-tree, diff-check, and branch changed-file scope.
+  - PR #23 head remains `671964aea546871499b5933e213fb0838b111bea`; Builder sync repair comment `4536113272` and clean Codex comment `4536130930` are still visible, but latest `origin/main` after `874b446` still leaves `git merge-tree --write-tree origin/main refs/patrol/hb1838/pr23` exiting `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb1838/pr23` exits `0`.
+  - PR #25 head remains `1835e292caea35b4758276c7002c09d2e9c1dada`; Builder review `4358124195` fixed Codex P2 `discussion_r3299302339`, clean Codex comment `4536168380` is visible, review thread is now outdated, and `git merge-tree --write-tree origin/main refs/patrol/hb1838/pr25` exits `0` with tree `4f530521bdacbe9f47547f9158c5bd90b25cfdb3`; `git diff --check origin/main..refs/patrol/hb1838/pr25` exits `0`.
+  - PR #22 and PR #26 also remain current-main merge-tree / diff-check clean against `874b446` with trees `39d64c09886fecc1b6982d0078c98c13b8e4c7fa` and `ecdc4a88edc018efbd994602e10a9db9a1bd7128`.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: PR #23 latest-main sync repair remains required against `874b4466f16c541c42b42f680dc1328ce39da263`.
+  - Why this agent: Output Documents Builder owns Issue #18 / PR #23 and the only current blocker is scoped patrol-doc sync conflict.
+  - Action: Re-sync PR #23 against latest `origin/main`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve the metadata-only staging-write P2 fix and latest patrol entries, rerun renderer static guard / TypeScript syntax / real `.xlsx` and `.pdf` diff check / `git diff --check` / merge-tree, push scoped sync head, and request Codex re-review if branch head changes.
+  - Need Commander: No
+  - Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+- Decision:
+  - To: Deputy Codex
+  - Workstream: method-spec / plancraft-page-ui / raw-candidate
+  - Branch / Repo: PR #22 / PR #25 / PR #26 on `laibeoffer/laibe-mvp`
+  - Mission: Publish final-gate decision visibility or exact blocker for PR #22 / PR #25 / PR #26.
+  - Why this agent: Deputy Codex owns final merge / reject / blocker decisions; Commander patrol reconfirmed current-main merge-tree and diff-check pass, and no new Codex blocker or scope drift was found.
+  - Action: Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision. No Builder chase is needed for PR #25 unless evidence changes.
+  - Need Commander: No
+  - Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or scope drifts.
