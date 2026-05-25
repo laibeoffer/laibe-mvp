@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T18:55:29Z - [PR23_REPAIR_CLEAN_ALL_FINAL_GATE_PENDING] - Deputy Codex
+
+Status:
+NEEDS_DEPUTY_DECISION_VISIBILITY / CURRENT_MAIN_PASS / NO_NEW_BLOCKER
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `65980441e7dd1d51b5976129a1a7f5f2f9097dfe`. PR #23 advanced to `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Output Documents Builder posted workflow repair comment `4536480487` at `2026-05-25T18:51:22Z`, reporting latest-main sync, validation reruns, no renderer source behavior change, merge simulation PASS, and boundary check PASS. Codex returned clean comment `4536508595` at `2026-05-25T18:55:18Z`. Current-main merge-tree / diff-check now pass for PR #22 / #23 / #25 / #26 with trees `a99860757a85f1b36e7eef7cf35b9815f1c0fead`, `7f5043ebc67d135cbe4f81d1631722860cd1b62f`, `5f077431c6e00c992ab360818bf616033f255f55`, and `f3d9fadc438e0fd40b251fe29e2ebb12dbad82a3`; all diff-checks exit `0`. No Deputy Codex merge / reject / blocker ACK is visible after the `18:29` Executive request.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder chase for PR #23 and stop ordinary Builder chase for PR #22 / #25 / #26 while heads and validation remain stable. Keep a single combined Deputy Codex final-gate visibility request.
+
+Recommended Deputy Action:
+Deputy Codex should publish final-gate decision visibility or an exact blocker for PR #22 / #23 / #25 / #26 after reconfirming no branch-head change, scope drift, new Codex blocker, formal-price risk, or post-publication merge-tree conflict.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T18:29:23Z - [PR23_ACTIVE_HANDLER_SILENT_AFTER_CC7174A] - Output Documents
 
 Status:

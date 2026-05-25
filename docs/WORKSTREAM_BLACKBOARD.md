@@ -609,12 +609,12 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
 - GitHub repo `laibeoffer/laibe-mvp` 已建立。
 - Codex environment 已建立。
 - `main` 已作為整合主線。
-- `main` latest sha checked before this patrol publication: `cc7174aa67dd581eeeca0508210d4ae03415b02b`.
+- `main` latest sha checked before this patrol publication: `65980441e7dd1d51b5976129a1a7f5f2f9097dfe`.
 - Open PR:
-  - PR #22 `Add MethodSpec validator freeze note` - current-main merge-tree and diff-check pass against `cc7174a`; still needs Deputy Codex final-gate decision visibility because no merge/reject/blocker ACK is visible after the current Executive request. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
-  - PR #23 `Add renderer snapshot-only review packet` - head remains `671964a` with Builder sync repair comment `4536113272` and clean Codex comment `4536130930`, but latest `main` `cc7174a` still leaves post-publication merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check still passes. No new Output Documents Builder ACK was found after the 17:56 request, so Executive refreshed the single-primary Builder follow-up. Need Reviewer: No unless branch changes and Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
-  - PR #25 `Add Plancraft+ zone area boundary refinement` - head remains `1835e29`; Builder `PLAN_PUZZLE_ACTION_TAKEN` review `4358124195`, clean Codex comment `4536168380`, and current-main merge-tree / diff-check pass against `cc7174a`. No Deputy final-gate ACK is visible after the 17:56 request, so Executive refreshed Deputy Codex final-gate visibility. Need Reviewer: No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
-  - PR #26 `Add raw source quality scoring reviewer checklist` - current-main merge-tree and diff-check pass against `cc7174a`; still needs Deputy Codex final-gate decision visibility because no merge/reject/blocker ACK is visible after the current Executive request. Need Reviewer: No unless branch changes, formal-price risk, or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #22 `Add MethodSpec validator freeze note` - current-main merge-tree and diff-check pass against `6598044`; still needs Deputy Codex final-gate decision visibility because no merge/reject/blocker ACK is visible after the current Executive request. Need Reviewer: No unless branch changes or Codex reports NEEDS_FIX / P1 / P2.
+  - PR #23 `Add renderer snapshot-only review packet` - head advanced to `eb7caa7`; Output Documents Builder posted `WORKFLOW_REPAIR_ATTEMPTED` evidence in comment `4536480487`, Codex returned clean in comment `4536508595`, and current-main merge-tree / diff-check pass against `6598044`. Ordinary Builder sync chase stops; Deputy Codex final-gate decision visibility is now required. Need Reviewer: No unless branch changes and Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+  - PR #25 `Add Plancraft+ zone area boundary refinement` - head remains `1835e29`; Builder `PLAN_PUZZLE_ACTION_TAKEN` review `4358124195`, clean Codex comment `4536168380`, and current-main merge-tree / diff-check pass against `6598044`. No Deputy final-gate ACK is visible after the current request, so Executive refreshed Deputy Codex final-gate visibility. Need Reviewer: No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+  - PR #26 `Add raw source quality scoring reviewer checklist` - current-main merge-tree and diff-check pass against `6598044`; still needs Deputy Codex final-gate decision visibility because no merge/reject/blocker ACK is visible after the current Executive request. Need Reviewer: No unless branch changes, formal-price risk, or Codex reports NEEDS_FIX / P1 / P2.
 - Open Issue:
   - #15 `[Plan Puzzle] Plancraft+ Zone Area / Boundary Refinement`
   - #16 `[MethodSpec] Add validator freeze note`
@@ -1344,6 +1344,22 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-25T18:55:29Z - PR23 repair clean / all active PRs Deputy final-gate ACK pending
+
+- Workstream: executive-officer / output-budget-documents / method-spec / raw-candidate / plancraft-page-ui
+- Branch: `origin/main` `65980441e7dd1d51b5976129a1a7f5f2f9097dfe`
+- Status: `PR23_WORKFLOW_REPAIR_ATTEMPTED / CODEX_REVIEW_CLEAN / PR22_PR23_PR25_PR26_DEPUTY_ACK_PENDING / NO_MERGE_EXECUTED`
+- Evidence:
+  - Checked required governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PRs / Issues, PR comments, PR reviews, fetched PR heads / merge refs, local merge-tree, diff-check, and changed-file scope.
+  - Open PR heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `eb7caa738431c0624c30c3242e8d28b0b4b618e9`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+  - PR #23 Builder posted workflow repair comment `4536480487` at `2026-05-25T18:51:22Z`, reporting latest-main sync against `6598044`, no renderer source behavior change, renderer static guard PASS, syntax PASS, diff-check PASS, real `.xlsx` / `.pdf` no-added-or-changed check, merge simulation PASS tree `7f5043ebc67d135cbe4f81d1631722860cd1b62f`, and scope boundary PASS. Codex returned clean comment `4536508595` at `2026-05-25T18:55:18Z`.
+  - Current-main simulations against `6598044` pass for PR #22 / #23 / #25 / #26: trees `a99860757a85f1b36e7eef7cf35b9815f1c0fead`, `7f5043ebc67d135cbe4f81d1631722860cd1b62f`, `5f077431c6e00c992ab360818bf616033f255f55`, and `f3d9fadc438e0fd40b251fe29e2ebb12dbad82a3`; all diff-checks exit `0`.
+- Decision:
+  - To: Deputy Codex
+  - Mission: Publish final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. These rows now have current-main merge-tree / diff-check pass and no new Codex blocker.
+  - Need Commander: No
+  - Need Reviewer: No unless a branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
 
 ### 2026-05-25T18:29:23Z - PR23 still sync-blocked / Deputy final-gate ACK refresh
 
