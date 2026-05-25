@@ -1216,6 +1216,9 @@ Commander bypassed the silent Deputy Codex-2 repair bottleneck. The PR branch ow
 Action:
 Re-check latest `origin/main`, PR #25 head `ffbe8e1`, and merge-tree / merge ref. Resolve only the current-main `docs/NEXT_CODEX_HANDOFF.md` conflict inside Issue #15 scope, push an actual branch update, rerun `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` and guard checks, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
 
+Follow-up 2026-05-25T08:36:37Z:
+To: Plan Puzzle Builder. Executive Officer re-checked latest main `b563821e94bc3785692bd8a766968aa3b326457e`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR metadata before API rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` was found after the 08:30 direct repair request. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves the `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
+
 Need Commander:
 No
 
@@ -1244,6 +1247,9 @@ Commander bypassed the silent Deputy Codex-2 repair bottleneck. The PR branch ow
 
 Action:
 Re-check latest `origin/main`, PR #23 head `a75e380`, and merge-tree / merge ref. Resolve only the current-main `docs/WORKSTREAM_BLACKBOARD.md` conflict inside Output Documents scope, preserve fail-closed P2 fix and patrol records, push an actual branch update, rerun renderer static guard / syntax / mismatch fixture / invalid fixture / `.xlsx/.pdf` no-output check / `git diff --check` where available, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Follow-up 2026-05-25T08:36:37Z:
+To: Output Documents Builder. Executive Officer re-checked latest main `b563821e94bc3785692bd8a766968aa3b326457e`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR metadata before API rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` was found after the 08:30 direct repair request. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` still exists but is not current-main readiness evidence; local current-main merge-tree exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
 
 Need Commander:
 No
