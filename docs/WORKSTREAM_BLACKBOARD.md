@@ -4394,3 +4394,36 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+### 2026-05-25 - Commander patrol current-main reconciliation on `1c40007`
+
+Workstream:
+command/deputy / active PR final-gate and repair lanes
+
+Status:
+STATE_RECONCILIATION_UPDATED / ACTIVE_HANDLER_SILENT_REMAINS
+
+Changed:
+- Fast-forwarded patrol worktree to latest `origin/main` `1c4000748a18`.
+- Rechecked GitHub REST issue state: Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed / completed.
+- Rechecked PR refs via `git ls-remote` and fetched PR heads into patrol refs.
+- PR #22 head `e338431` still merge-tree cleanly against current main; changed files remain limited to Issue #16 docs.
+- PR #26 head `7853fe7` still merge-tree cleanly against current main; validation refresh comment `4532187707` remains the current evidence package.
+- PR #23 head `a75e380` still merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head `ffbe8e1` still has no GitHub merge ref; current local merge-tree now reports a concrete `docs/NEXT_CODEX_HANDOFF.md` content conflict instead of only the older unrelated-history signal.
+
+Decision:
+- Deputy Codex visible ACK is published for PR #22 and PR #26: both remain final-gate candidates on current main `1c40007`. No merge/reject was executed in this patrol.
+- No ordinary Builder chase is needed for PR #22 / PR #26 unless branch head changes, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+- Keep PR #23 and PR #25 assigned to Deputy Codex-2 workflow repair. Deputy Codex-2 must publish `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or equivalent visible ACK.
+- `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair rows #23 / #25 only.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
