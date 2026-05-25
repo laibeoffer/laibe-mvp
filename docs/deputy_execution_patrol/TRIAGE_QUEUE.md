@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T17:56:00Z - [PR23_POST_PUSH_SYNC_BLOCKED_AFTER_874DFF8] - Output Documents
+
+Status:
+NEEDS_OWNER_SYNC_REPAIR / CODEX_CLEAN_STALE_FOR_CURRENT_MAIN / BUILDER_CHASE_REOPENED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+PR #23 head remains `671964aea546871499b5933e213fb0838b111bea`. Builder sync repair comment `4536113272` and clean Codex comment `4536130930` still stand for the pre-publication base, but Executive's docs-only publication advanced `origin/main` to `874dff894d2da33ce2af34914e9fd5d24cc56960`. Post-push `git merge-tree --write-tree origin/main refs/patrol/hb1750-post/pr23` exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb1750-post/pr23` exits `0`.
+
+Recommended Executive Action:
+Keep a single-primary follow-up to Output Documents Builder. Do not route PR #23 to Deputy final gate again until latest-main merge-tree is clean after publication.
+
+Recommended Owner Action:
+Output Documents Builder should re-sync PR #23 against latest main `874dff894d2da33ce2af34914e9fd5d24cc56960`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve the metadata-only staging-write P2 fix and latest patrol entries, rerun renderer static guard / TypeScript syntax / real `.xlsx` and `.pdf` diff check / `git diff --check` / merge-tree, push the scoped sync head, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T17:56:00Z - [PR25_POST_FIX_CODEX_CLEAN_FINAL_GATE] - Plan Puzzle
+
+Status:
+NEEDS_DEPUTY_DECISION / FINAL_GATE_CANDIDATE / BUILDER_CHASE_STOPPED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+PR #25 head remains `1835e292caea35b4758276c7002c09d2e9c1dada`. Plan Puzzle Builder posted `PLAN_PUZZLE_ACTION_TAKEN` in review `4358124195` for Codex P2 `discussion_r3299302339`, and Codex returned post-fix clean comment `4536168380` at `2026-05-25T17:54:38Z`. Post-push `git merge-tree --write-tree origin/main refs/patrol/hb1750-post/pr25` exits `0` with tree `8264b620338e29e30a81be07ddcc4b952c9745ee`; `git diff --check origin/main..refs/patrol/hb1750-post/pr25` exits `0`.
+
+Recommended Executive Action:
+Stop ordinary Plan Puzzle Builder chase unless PR #25 branch head changes, validation is contradicted, Codex reports NEEDS_FIX / P1 / P2, or scope drift appears. Keep only Deputy final-gate visibility.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drifts.
+
 ### 2026-05-25T17:50:34Z - [PR23_SYNC_REPAIRED_CLEAN_FINAL_GATE] - Output Documents
 
 Status:
