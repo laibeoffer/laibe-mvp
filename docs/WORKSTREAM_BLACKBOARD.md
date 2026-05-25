@@ -1399,6 +1399,746 @@ No
 Need Reviewer:
 No new reviewer action after clean Codex re-review, unless latest-main re-sync changes scope or Codex reports P1/P2/NEEDS_FIX again.
 
+### 2026-05-25 - Chatroom heartbeat prompt sync published
+
+Workstream:
+command/deputy / automation governance
+
+Status:
+PROMPT_SYNC_PUBLISHED / VISIBLE_REPORTING_ENFORCED
+
+Changed:
+- Updated commander heartbeat `laibe-commander-patrol` to include cadence accountability, active-handler visible ACK rules, and `CADRE_RULE_FAIL` / `ACTIVE_HANDLER_SILENT` escalation.
+- Previously updated cadre heartbeats remain active: `laibe-mvp-executor-patrol`, `laibe-deputy-15min-patrol`, `laibe-triage-officer-heartbeat`, and governance patrol `20`.
+- Updated workstream heartbeats to include visible status codes, latest-source checking, and no-standby rules: `laibe-plan-puzzle-patrol`, `heartbeat-2` Output Documents, `laibe-method-spec-patrol`, `heartbeat` Raw Candidate, `heartbeat-4` Quote Factory, `heartbeat-3` Visual Simulation, and `laibe-reviewer-heartbeat`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+Decision:
+- All active workstream automations now know that if `DELIVERY_LEDGER.md` points to them, they must visibly report with one of `ACTION_TAKEN`, `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- Completed / waiting rows may stay quiet only when no active Issue / PR, stale state, or Deputy / Executive dispatch exists.
+- Reviewer stays quiet unless Need Reviewer / Codex review / scope-risk / explicit review request exists.
+
+Next:
+- Watch the next patrol cycle for compliance. Any active handler that replies only `standby`, `no task`, or a bare `NO_NEW_*` without checked sources should be marked `CADRE_RULE_FAIL` or `WORKSTREAM_VISIBLE_REPORT_FAIL`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Cadre accountability prompts corrected
+
+Workstream:
+command/deputy / automation governance
+
+Status:
+CADRE_LAYER_CAUSE_CONFIRMED / PROMPTS_UPDATED
+
+Changed:
+- Diagnosis from Commander screenshots: Executive Officer, Second Deputy, Triage Officer, and Governance Patrol were active, but their prompts let them stop at classification / no-duplicate-chase / route-back behavior.
+- Executive Officer reported `NO_NEW_EXECUTIVE_ACTION` while active rows still needed visible ACK / final-gate / repair status.
+- Second Deputy made useful LOW / MEDIUM decisions, but still routed PR #22 / #26 / #23 / #25 back to Deputy Codex instead of forcing active-handler visible closure.
+- Triage Officer used fallback / stale state and produced routing that conflicted with the latest `DELIVERY_LEDGER.md`.
+- Governance Patrol detected stale local state but did not turn the finding into an active-handler silence alert.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+- Automation prompts updated in Codex app: `laibe-mvp-executor-patrol`, `laibe-deputy-15min-patrol`, `laibe-triage-officer-heartbeat`, `20`.
+
+Decision:
+- Confirm the current failure is in the cadre layer, not only in individual Builder workstreams.
+- Executive Officer must convert ledger decisions into visible follow-up / ACK requests; skipping duplicate GitHub comments does not allow a silent patrol.
+- Deputy Codex-2 must act on rows where it is Current Handler by publishing repair / validation attempts or a blocker with attempted fix.
+- Triage Officer must route from the latest `DELIVERY_LEDGER.md`; stale API / local fallback must be marked and must not override ledger state.
+- Governance Patrol must report `ACTIVE_HANDLER_SILENT` when a ledger Current Handler has no visible ACK.
+
+Next:
+- Watch next Executive / Deputy2 / Triage / Governance patrols for visible ACK compliance.
+- If a cadre still reports only `NO_NEW_*` while an active row lacks visible ACK, treat it as `CADRE_RULE_FAIL` and route a direct correction to that role.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Active row visible heartbeat rule added
+
+Workstream:
+command/deputy / automation governance
+
+Status:
+STALL_CAUSE_IDENTIFIED / VISIBILITY_RULE_PUBLISHED
+
+Changed:
+- Checked local automation configs: relevant LaiBE workstream heartbeats are `ACTIVE`, including Executive Officer, Deputy Codex-2, Triage Officer, Plan Puzzle, Raw Candidate, MethodSpec, Output Documents, Quote Factory, Visual Simulation, and Reviewer.
+- The current stall symptom is not that the automation records are disabled. The issue is that several rows had been routed into blackboard / `DELIVERY_LEDGER.md` decisions without requiring the target chatroom to visibly ACK the active assignment each cycle.
+- Latest `origin/main` already includes PR #26 validation refresh (`c93b4d6`), but UI chat timestamps can still look stalled when the work is recorded only in docs / GitHub and the thread does not post a visible status.
+- Added a `Visible heartbeat rule` to `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+
+Decision:
+- If `DELIVERY_LEDGER.md` names a role / chatroom as `Current Handler`, that chatroom must visibly report next heartbeat with `ACTION_TAKEN`, `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- `NO_NEW_EVIDENCE_AFTER_CHECK` must list sources checked plus latest main / branch SHA.
+- Completed rows may stay quiet only when no stale state, active Issue / PR, or Deputy / Executive dispatch exists.
+- Reviewer may stay quiet unless Need Reviewer / Codex review / scope-risk conditions exist.
+
+Next:
+- Deputy / Executive / Triage should treat silent active-handler rows as a patrol failure and write a direct recovery prompt to the exact target chatroom.
+- Current active handlers to watch: Deputy Codex for PR #22 / PR #26 final-gate decisions; Deputy Codex-2 for PR #23 / PR #25 workflow repair; completed rows such as Quote Factory and Visual Simulation do not need repeated visible chatter unless stale state appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Deputy signal decision for PR #22 / PR #26 on current main `a215335`
+
+Workstream:
+command/deputy / active PR recovery
+
+Status:
+DEPUTY_SIGNAL_DECISION_PUBLISHED / NEED_COMMANDER_NO
+
+Changed:
+- Fast-forwarded patrol state to latest `origin/main` `a2153359db2422ecd6c048032da563be9372a44f`.
+- Rechecked tracked PR heads and current-main merge simulations for PR #22 / PR #23 / PR #25 / PR #26.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/22` exits `0`, and base-to-head changed files remain limited to Issue #16 allowed docs: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/26` exits `0`, but fresh R1.5 validation / forbidden formal-pricing evidence is still absent after Executive call-out `4531941371`.
+- PR #23 remains current-main sync-blocked: merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 remains current-main repair-blocked: no `refs/pull/25/merge`, and merge-tree exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- PR #22: accept Executive / Deputy current-main merge-tree plus allowed-docs evidence. Stop ordinary owner chase and move to Deputy final-gate consideration. No Commander escalation and no Reviewer needed unless head changes or Codex reports NEEDS_FIX / P1 / P2.
+- PR #26: do not accept merge-tree-only evidence for final gate because the PR touches raw-warehouse source files. Assign Deputy Codex-2 a LOW / MEDIUM validation-refresh package to rerun or obtain R1.5 validation and forbidden formal-pricing checks without source edits.
+- PR #23 / PR #25: keep existing Deputy Codex-2 workflow repair assignments active; do not duplicate ordinary chase unless branch heads change.
+
+Dispatch:
+To:
+Deputy Codex-2
+Workstream:
+warehouse/raw-candidate
+Branch / Repo:
+`warehouse/raw-source-quality-scoring` / `laibeoffer/laibe-mvp`
+Mission:
+PR #26 validation-refresh package.
+Why this agent:
+Deputy Codex-2 owns GitHub / branch / worktree reconciliation and LOW / MEDIUM validation recovery; Raw Candidate owner has not posted fresh current-main validation after Executive call-out.
+Action:
+Rerun or obtain current-main R1.5 validation and forbidden formal-pricing checks for PR #26 without source edits. Confirm no formal price, PricingRule, BudgetEstimateLine, renderer, payment, AI API, or cross-workstream scope. Stop and route back if validation requires code changes or high-risk scope. Request Codex re-review only if the PR head changes.
+Need Commander:
+No
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2, formal-price risk appears, or scope drifts.
+
+Next:
+- Deputy Codex owns final clean-scope gate consideration for PR #22.
+- Deputy Codex-2 should report PR #26 validation-refresh status, plus continuing PR #23 / PR #25 repair status, back to `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, and `EXECUTIVE_PATROL_INBOX.md`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Executive signal refresh after Deputy repair assignment `2c26cd5`
+
+Workstream:
+Executive Officer / MethodSpec / Raw Candidate / Output Documents / Plan Puzzle
+
+Changed:
+- Re-read latest `origin/main` at `2c26cd5184d3e4c26b9028221eef692d0208ce7d`, including the Deputy-published PR #23 / PR #25 workflow repair assignments.
+- Rechecked tracked PR heads and current-main merge simulations for PR #22 / #23 / #25 / #26.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, changed files remain Issue #16 docs-only, and no owner response was found after Executive call-out `4531941286`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, but no fresh owner-posted R1.5 validation / forbidden formal-pricing rerun was found after Executive call-out `4531941371`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. Deputy Codex-2 repair assignment remains active.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and current-main merge-tree still refuses unrelated histories. Deputy Codex-2 repair assignment remains active.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- PR #22 / PR #26 are now classified as `DEPUTY_SIGNAL_DECISION_REQUIRED / CURRENT_MAIN_SIMULATION_PASS_MERGE_REF_STALE`; ordinary duplicate chase is no longer useful unless a branch changes.
+- PR #23 / PR #25 remain assigned to Deputy Codex-2 workflow repair. Executive should watch for repair package output rather than duplicate owner chase.
+- No Commander escalation: these are GitHub workflow / branch evidence decisions, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+
+Next:
+- Deputy Codex should decide whether Executive current-main merge-tree evidence is enough to route PR #22 / PR #26 to gate, or assign refresh owners for current-main confirmation / validation reruns.
+- Deputy Codex-2 should report PR #23 / PR #25 repair package status back to `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, and `EXECUTIVE_PATROL_INBOX.md`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a branch changes, a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
+### 2026-05-25 - Deputy workflow repair assignment for PR #23 / PR #25
+
+Workstream:
+command/deputy / active PR recovery
+
+Status:
+DEPUTY_REPAIR_ASSIGNMENT_PUBLISHED / NEED_COMMANDER_NO
+
+Changed:
+- Re-read current `origin/main` at `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`.
+- Rechecked open PRs #22 / #23 / #25 / #26 and latest issue / PR comments.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge-tree still exits `1` with content conflict in `docs/WORKSTREAM_BLACKBOARD.md`. Executive already posted reassignment recommendation `4531941113`; no owner branch update found.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; repeated local-only handoff comments `4531872891` / `4531949297` did not push `33c4695` or `d8e2c4e` to the PR. Current-main merge-tree now exits `1` with content conflict in `docs/NEXT_CODEX_HANDOFF.md`, so the useful blocker is a concrete handoff conflict, not a Commander decision.
+- PR #22 and PR #26 still pass current-main merge-tree simulation but their owner current-main evidence remains missing after Executive call-outs.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Approve LOW / MEDIUM workflow repair assignment to Deputy Codex-2 for PR #23 and PR #25.
+- This is branch / worktree reconciliation, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+- Do not escalate to Commander.
+
+Dispatch:
+To:
+Deputy Codex-2
+Workstream:
+output/budget-documents
+Branch / Repo:
+`output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+Mission:
+PR #23 current-main workflow repair package.
+Why this agent:
+Deputy Codex-2 owns GitHub / branch / worktree reconciliation and LOW / MEDIUM workflow repair decisions via `DELIVERY_LEDGER.md`; Output Documents owner has not produced a branch update after repeated Executive call-outs.
+Action:
+Attempt or prepare a repair package for PR #23 against current `origin/main` `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. Scope is limited to resolving the `docs/WORKSTREAM_BLACKBOARD.md` current-main conflict, preserving the fail-closed P2 fix and patrol docs, rerunning renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, and requesting Codex re-review only if the PR head changes. Stop and report if any non-PR #23 source conflict, formal `.xlsx` / `.pdf`, formal price, payment, AI API, or cross-workstream scope appears.
+Need Commander:
+No
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Dispatch:
+To:
+Deputy Codex-2
+Workstream:
+plancraft/page-ui / Plan Puzzle
+Branch / Repo:
+`plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+Mission:
+PR #25 current-main workflow repair package.
+Why this agent:
+Deputy Codex-2 owns GitHub / branch / worktree reconciliation and LOW / MEDIUM workflow repair decisions via `DELIVERY_LEDGER.md`; Plan Puzzle produced repeated local-only handoffs without a pushed branch update.
+Action:
+Attempt or prepare a repair package for PR #25 against current `origin/main` `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. Scope is limited to resolving the `docs/NEXT_CODEX_HANDOFF.md` current-main conflict, preserving Issue #15 zone area / boundary refinement scope, pushing an actual branch update if authorized by the repair lane, rerunning `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` plus guard checks, and requesting Codex review only after a PR merge ref exists. Stop and report if any Plancraft core, budget adapter/runtime/type, formal quantity/estimate/unit_price, renderer/Excel/PDF/payment/AI/API, or cross-workstream scope appears.
+Need Commander:
+No
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Next:
+- Executive Officer should avoid duplicate ordinary chase comments for PR #23 / PR #25 unless branch heads change.
+- Deputy Codex-2 should report repair package status back to `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, and `EXECUTIVE_PATROL_INBOX.md`.
+- Keep PR #22 / PR #26 final gates paused until owner current-main evidence is fresh.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Second Deputy PR #25 repeated local-only repair escalated
+
+Workstream:
+Second Deputy Codex / Plan Puzzle / Active PR patrol
+
+Changed:
+- Re-read current `origin/main` at `ca16cba437125a2ff38b4f4332245821d5ce085e` after fast-forwarding from `7a8fb02`.
+- Rechecked GitHub open Issues #15 / #16 / #17 / #18 and open PRs #22 / #23 / #25 / #26, including PR comments, review lists, changed files, branch heads, merge refs, and local current-main merge simulations.
+- PR #25 received a second Codex connector local-only handoff comment `4531949297` after Executive follow-up `4531941207`. The comment reports local commit `d8e2c4e` and `make_pr` metadata, but live GitHub still shows only open PRs #22 / #23 / #25 / #26 and PR #25 still contains only commit `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- PR #25 still has no `refs/pull/25/merge`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/25/head` exits `128` with unrelated-history behavior against current `origin/main`.
+- PR #22 and PR #26 still pass local current-main merge-tree simulation but have stale merge-ref / owner-evidence signals; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- LOW / MEDIUM workflow decision: mark PR #25 as `REPEAT_LOCAL_ONLY_HANDOFF / PENDING_DEPUTY_DECISION`.
+- The useful blocker evidence is now exhausted for ordinary Executive chase; the missing artifact is a pushed repair commit / branch head update that creates a valid PR merge ref.
+- No Commander escalation: this is GitHub workflow repair, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+
+Next:
+- Deputy Codex should decide a workflow repair owner or repair lane for PR #25 inside Plan Puzzle / Issue #15 scope.
+- Repair scope remains narrow: resolve the current-main handoff conflict, preserve Issue #15 boundaries, push the actual branch update, rerun `node --check` and guard checks, and request Codex review only after `refs/pull/25/merge` exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #25 drifts scope, or any active PR introduces high-risk formal output / pricing scope.
+
+### 2026-05-25 - Executive active delivery recovery on current main `6dd50fe`
+
+Workstream:
+Executive Officer / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Changed:
+- Re-read current `origin/main` at `6dd50fe3a44815142e47a283e6065cfd679e1fbf`.
+- Rechecked GitHub open Issues / PRs, PR comments, review threads, changed files, branch heads, PR merge refs, and local current-main merge simulations for PR #22 / #23 / #25 / #26.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge simulation still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. No owner response was found after Executive call-out `4531863742`, so Executive posted `OVERDUE_REASSIGNMENT_RECOMMENDED` comment `4531941113`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and the local-only connector commit `33c4695` is not pushed. Executive posted workflow repair follow-up `4531941207`.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, but owner current-main evidence is still missing. Executive posted call-out `4531941286`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, but owner current-main validation / forbidden-pricing evidence is still missing. Executive posted call-out `4531941371`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Route PR #23 to Deputy decision for workflow repair / reassignment inside Output Documents scope.
+- Keep PR #25 in workflow repair; if next cycle still has no pushed repair commit or merge ref, escalate to Deputy workflow repair / reassignment.
+- Keep PR #22 and PR #26 final gates paused until current-main owner evidence is fresh.
+
+Next:
+- Deputy Codex: decide PR #23 workflow repair / reassignment owner.
+- Plan Puzzle Builder: push an actual current-main repair for PR #25 and produce a merge ref before review.
+- MethodSpec Builder: provide latest main SHA, current-main mergeability / merge-tree status, and allowed docs-only confirmation.
+- Raw Candidate Builder: provide latest main SHA, current-main mergeability / merge-tree status, R1.5 validation, and forbidden formal-pricing checks.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
+### 2026-05-25 - Deputy PR #25 blocker refined to current-main handoff conflict
+
+Workstream:
+plancraft/page-ui / Plan Puzzle
+
+Branch:
+plancraft/zone-area-boundary-refinement
+
+Status:
+PR_25_SYNC_CONFLICT_IDENTIFIED / WORKFLOW_REPAIR_REQUIRED
+
+Changed:
+- Re-read current `origin/main` at `7a8fb02d24003919fe59fd4f9fae63d8df9c4625`.
+- Rechecked open PRs #22 / #23 / #25 / #26 and local current-main merge simulations.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and GitHub API still returns `mergeable_state=unknown`.
+- Unlike the prior patrol that saw `git merge-tree` exit `128`, current-main simulation now exits `1` with a concrete content conflict in `docs/NEXT_CODEX_HANDOFF.md`.
+- The local-only PR #25 handoff commit `33c4695` still is not present on the GitHub PR; PR #25 still has only the pushed head `ffbe8e1`.
+- PR #22 and PR #26 still pass current-main merge-tree simulation but have stale merge-ref evidence; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Refine PR #25 from no-merge-base / unrelated-history wording to a concrete `docs/NEXT_CODEX_HANDOFF.md` current-main conflict.
+- Keep PR #25 in workflow repair; do not treat the prior local-only handoff update as delivered.
+
+Next:
+- Executive Officer should chase exactly one primary owner, Plan Puzzle Builder, to resolve the current-main `docs/NEXT_CODEX_HANDOFF.md` conflict in a GitHub-connected environment, preserve Issue #15 scope, push the actual branch update, rerun `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` and guard checks, then request Codex review only after a PR merge ref exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25 - Second Deputy PR #25 blocker response reconciliation
+
+Workstream:
+Second Deputy Codex / Plan Puzzle / Active PR patrol
+
+Changed:
+- Re-read current `origin/main` at `ddf623e0728d5957970a8b7f66aabd600e659ffc`.
+- Rechecked GitHub open Issues #15 / #16 / #17 / #18 and open PRs #22 / #23 / #25 / #26, including PR comments, review lists, changed files, branch heads, merge refs, and local current-main merge simulations.
+- PR #25 received Codex connector comment `4531872891` after Executive sync-recovery comment `4531863860`. This is accepted as a blocker with attempted resolution, not as a completed sync: the comment reports a local runtime with no `origin` remote / missing main commit object and a local-only documentation commit `33c4695`.
+- GitHub PR #25 still exposes only commit `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; `33c4695` is not present in the PR commit list, `refs/pull/25/merge` is still absent, and local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/25/head` still exits `128` with unrelated-history behavior.
+- PR #22 and PR #26 still pass local current-main merge-tree simulation but have stale merge-ref evidence; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- LOW / MEDIUM workflow decision: classify PR #25 as `BLOCKER_WITH_ATTEMPTED_FIX_FOUND / WORKFLOW_REPAIR_REQUIRED`, not as standby or no-response.
+- Keep PR #25 out of Codex review / merge gate until a GitHub-connected environment pushes an actual latest-main sync commit or otherwise produces a valid merge ref.
+- Keep PR #22 / #23 / #26 final gates paused under the previous current-main evidence-refresh decisions.
+
+Next:
+- Executive Officer should chase Plan Puzzle Builder for a GitHub-connected repair: fetch full `origin/main`, re-sync PR #25, push the actual repair commit to `plancraft/zone-area-boundary-refinement`, rerun `node --check` and guard checks, then request Codex review only after `refs/pull/25/merge` exists.
+- Do not accept another local-only handoff update for PR #25 as final delivery evidence.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #25 drifts scope, or any active PR introduces high-risk formal output / pricing scope.
+
+### 2026-05-25 - Executive active delivery recovery on current main `5157f25`
+
+Workstream:
+Executive Officer / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Changed:
+- Re-read current `origin/main` at `5157f258f3d6ac360233b11350329611a5d0c48b`.
+- Rechecked PR #22 / #23 / #25 / #26 refs, comments, review threads, changed files, and current-main merge simulations.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, but available merge ref is anchored to old base `a1da6a`. Executive posted current-main evidence refresh comment `4531863942`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. Executive posted `EXECUTIVE_CALL_OUT` comment `4531863742`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local merge-tree exits `128` with no usable merge base / unrelated-history behavior. Executive posted sync recovery comment `4531863860`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, so the prior conflict wording was corrected. Executive updated comment `4531733938` to require evidence refresh, not conflict repair.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Blocked:
+- PR #23 remains current-main sync-blocked.
+- PR #25 remains no-merge-ref / no-usable-merge-base sync-blocked.
+- PR #22 and PR #26 are not content-conflict signals locally, but final-gate evidence is stale until current-main mergeability / validation / Codex signal is refreshed.
+
+Next:
+- MethodSpec Builder: provide latest-main SHA, current-main mergeability / merge-tree status, and allowed docs-only confirmation; request Codex re-review only if head changes.
+- Output Documents Builder: re-sync PR #23 against current main, preserve fail-closed P2 fix, rerun renderer checks, and request Codex re-review if head changes.
+- Plan Puzzle Builder: re-sync PR #25 in a GitHub-connected environment, rerun `node --check` and guard checks, and request Codex review only after a merge ref exists.
+- Raw Candidate Builder: provide latest-main SHA, mergeability / merge-tree status, R1.5 validation set, and forbidden formal-pricing checks; request Codex re-review only if head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any PR drifts scope.
+
+### 2026-05-25 - Deputy PR #26 current-main simulation correction
+
+Workstream:
+warehouse/raw-candidate
+
+Branch:
+warehouse/raw-source-quality-scoring
+
+Status:
+CURRENT_MAIN_SIMULATION_PASS / OWNER_COMMENT_CORRECTION_REQUIRED / FINAL_GATE_PAUSED
+
+Changed:
+- Re-read current `origin/main` at `e655829eedeeb11b293aba3240a04b558a2bfd3f`.
+- Rechecked open PRs #22 / #23 / #25 / #26 and current-main merge simulations.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; GitHub API reports `mergeable=true` / `mergeable_state=clean`.
+- Local `git merge-tree --write-tree origin/main origin/pr/26` exits `0` against `e655829`, so there is no current-main content-conflict signal for PR #26 in this patrol.
+- Available `refs/pull/26/merge` still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`, so the final-gate evidence remains stale even though current-main simulation passes.
+- Executive owner comment `4531733938` described PR #26 as conflicting; that wording is now corrected by Deputy patrol. The required owner action is evidence refresh, not conflict repair.
+- PR #23 still has a current-main conflict in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 still has a current-main conflict in `docs/NEXT_CODEX_HANDOFF.md`; PR #22 current-main simulation passes.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy patrol docs update.
+
+Blocked:
+- PR #26 final gate remains paused until current-main evidence is fresh: latest main SHA, mergeability / merge-tree signal, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if the PR head changes.
+
+Next:
+- Executive Officer should correct the PR #26 chase wording: ask Raw Candidate Builder for current-main evidence refresh, not a conflict fix.
+- Keep PR #22 in Deputy final gate; keep PR #23 and PR #25 in sync recovery.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Second Deputy PR #26 current-main signal refinement
+
+Workstream:
+Second Deputy Codex / Raw Candidate
+
+Status:
+PR_26_FINAL_GATE_STILL_PAUSED / CONFLICT_LABEL_REFINED
+
+Changed:
+- Second Deputy patrol rechecked `origin/main`, PR refs, GitHub metadata, and comments after Executive posted PR #26 follow-up comment `4531733938`.
+- Current `origin/main` at patrol time was `61b8902098bfb1727e33bdaf1f2268b40edabce3`.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Local current-main merge simulation found no content-conflict signal for PR #26 this round, but the available PR #26 merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`, so the prior final-gate evidence remains stale.
+- Delivery Ledger state was refined from `SYNC_BLOCKED_AFTER_MAIN_ADVANCE` to `SYNC_REFRESH_REQUIRED_AFTER_MAIN_ADVANCE` while keeping final gate paused.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+
+Next:
+- Raw Candidate Builder should still re-sync or otherwise produce a fresh current-main mergeability signal, rerun R1.5 validation / forbidden formal-pricing checks, and request Codex re-review if the head changes.
+- Deputy Codex keeps final merge / reject authority; PR #26 should not be treated as final-gate ready until the stale merge-ref / validation signal is refreshed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless fresh Codex review reports NEEDS_FIX / P1 / P2, formal-price risk appears, or scope drifts.
+
+### 2026-05-25 - Executive current-main sync follow-up for PR #23 / PR #26
+
+Workstream:
+Executive Officer / Output Documents / Raw Candidate
+
+Status:
+EXECUTIVE_FOLLOW_UP_POSTED / CURRENT_MAIN_SYNC_REQUIRED
+
+Changed:
+- Executive patrol read current `origin/main` at `8a46630010a6b4ce125f5259d11f58c9f6fab481`.
+- PR #23 remains open on head `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub metadata reports `mergeable=false` / no current `merge_commit_sha`, and local current-main merge simulation still conflicts. Executive posted PR #23 follow-up comment `4531733668`.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; it previously had validation / Codex clean / Deputy gate routing, but its mergeability / validation signal became stale after main advanced. Executive posted PR #26 follow-up comment `4531733938`; Second Deputy later refined the ledger row to `SYNC_REFRESH_REQUIRED_AFTER_MAIN_ADVANCE` after local current-main merge simulation found no content-conflict signal.
+- PR #22 remains open on head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge simulation found no content conflict, so Executive did not reopen ordinary chase.
+- PR #25 remains open on head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no merge base / merge ref exists, and the prior sync-recovery blocker remains active.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+
+Blocked:
+- PR #23 needs current-main re-sync, renderer checks, and Codex re-review if the head changes.
+- PR #26 needs current-main re-sync, R1.5 validation rerun, forbidden formal-pricing checks, and Codex re-review if the head changes.
+- PR #25 still needs true latest-main sync in a GitHub-connected environment before Codex review.
+
+Next:
+- Output Documents Builder should re-sync PR #23 against current main and report checks.
+- Raw Candidate Builder should re-sync PR #26 against current main and report validation / forbidden-pricing checks.
+- Deputy Codex keeps final merge / reject authority; final gate is withdrawn for PR #23 and PR #26 until current-main signals are clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or either PR drifts scope.
+
+### 2026-05-25 - Second Deputy current-main reconciliation after PR #23 withdrawal
+
+Workstream:
+Second Deputy Codex / Output Documents / MethodSpec / Raw Candidate / Plan Puzzle
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+PR_23_SYNC_BLOCKED_RECONFIRMED / CURRENT_MAIN_RECONCILED
+
+Changed:
+- Second Deputy patrol rechecked current `origin/main`, GitHub open PRs / Issues, PR comments, and PR refs after the upstream `PR_23_FINAL_GATE_WITHDRAWN` patrol entry.
+- Patrol-start `origin/main` before this docs publication was `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
+- PR #23 remains open on head `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub PR metadata reports `mergeable=false` and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. Local current-main merge simulation still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`, so the final gate remains withdrawn.
+- PR #22 remains open on head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge simulation found no content conflict, but final merge / reject still belongs to Deputy Codex.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; current-main merge simulation found no content conflict, but final merge / reject still belongs to Deputy Codex.
+- PR #25 remains open on head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local merge attempt still refuses unrelated histories.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Next:
+- Executive Officer should chase PR #23 re-sync against current main and PR #25 true sync recovery.
+- Deputy Codex keeps final gate ownership for PR #22 and PR #26, and must not treat PR #23 as final-gate ready until it re-syncs.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+### 2026-05-25 - PR #23 final gate withdrawn after main advanced
+
+Workstream:
+Output Documents / Deputy Codex patrol
+
+Branch / Repo:
+`output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+
+Status:
+PR_23_FINAL_GATE_WITHDRAWN / SYNC_BLOCKED_AFTER_MAIN_ADVANCE
+
+Changed:
+- Patrol rechecked GitHub API after the previous `FINAL_GATE_READY` entry.
+- Patrol-start `origin/main` before the Second Deputy reconciliation was `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but GitHub API now reports `mergeable=false`, `mergeable_state=dirty`, and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- Local ref `refs/remotes/origin/pr-merge/23` still exists at `8ef304b72e6afd92e61e14274cd4611f65281398`, but that merge ref targets the older base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
+- The prior clean Codex result `4531569296` is therefore treated as stale for merge-gate purposes until PR #23 re-syncs latest main and gets a fresh mergeability / review signal.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+- To: Output Documents Builder
+- Workstream: output/budget-documents
+- Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+- Mission: Re-sync PR #23 against current `origin/main` `c4efa03`, resolve only own-scope conflicts, rerun renderer checks, and request Codex re-review if head changes.
+- Why this agent: Output Documents owns PR #23 and renderer snapshot-only recovery.
+- Action: Executive Officer should chase PR #23 re-sync; Deputy final gate is paused until GitHub reports current-main mergeability.
+- Need Commander: No
+- Need Reviewer: No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Second Deputy heartbeat post-resync review correction
+
+Workstream:
+Second Deputy Codex / Output Documents / MethodSpec / Raw Candidate / Plan Puzzle
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+PR_23_FINAL_GATE_READY / DELIVERY_LEDGER_RECONCILED / NO_COMMANDER_ESCALATION
+
+Changed:
+- Heartbeat patrol rechecked Git refs and PR comments after the immediate repair-check update.
+- Current `origin/main` is `25475f0363e7fc483f2e6215eadd82b7bfc8d131`.
+- PR #23 has post-resync Codex clean result `4531569296` on head `a75e3802a30f13201cf2df5705112142d9251e8c`; Executive routed it to Deputy final gate in comment `4531573705`. This supersedes the prior `REVIEW_GATE_HOLD` note that was waiting for post-resync Codex result.
+- PR #22 remains final-gate ready from the prior check: head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, merge ref exists, Codex clean `4531356014`.
+- PR #26 remains final-gate ready: head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`, merge ref exists, Executive validation plus Codex clean `4531555287`.
+- PR #25 remains sync-blocked: head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`, no `refs/pull/25/merge`.
+- Concurrent main update added `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` and `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`; Second Deputy reconciled this patrol against those files instead of keeping a duplicate local ledger.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Second Deputy docs-only heartbeat update.
+
+Blocked:
+- PR #25: no merge ref; requires latest-main sync that produces a merge ref before Codex review.
+
+Next:
+- Deputy Codex final gate queue: PR #22, PR #23, PR #26.
+- Executive Officer should chase only PR #25 sync recovery among these four unless another branch state changes.
+- Triage should stop treating PR #23 or PR #26 as needing Executive verification.
+
+Need Commander:
+No
+
+Need Reviewer:
+No for PR #22 / #23 / #26 after clean Codex results. No for PR #25 unless scope drifts or Codex later reports P1/P2/NEEDS_FIX.
+
+### 2026-05-25 - Role parameters and delivery ledger published
+
+Workstream:
+governance / patrol coordination
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+ROLE_PARAMETERS_AND_DELIVERY_LEDGER_PUBLISHED
+
+Changed:
+- Added shared chatroom role parameters for Deputy Codex, Deputy Codex-2, Executive Officer, Triage Officer, Reviewer, and active workstream chatrooms.
+- Added `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` so Deputy Codex-2 and Executive Officer use one table for Issue / branch / PR / stalled-cycle tracking.
+- Deputy Codex-2 may decide LOW / MEDIUM technical workflow recovery from the ledger; HIGH / CRITICAL risks still route to Deputy Codex / Commander / Reviewer as defined.
+- Environment guidance now forbids default setup / cleanup commands such as `pip install -r requirements.txt`, `npm install`, setup scripts, `rm -rf`, `git clean`, `git reset`, `git stash`, and `git rebase`.
+- Updated active heartbeat prompts for Deputy Codex, Deputy Codex-2, Executive Officer, Triage Officer, Reviewer, Codex Rules, Plan Puzzle, Raw Candidate, MethodSpec, Output Documents, Visual Simulation, and Quote Factory to read the role parameters / delivery ledger.
+
+Files:
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+Next:
+- Executive Officer, Deputy Codex-2, and Triage Officer must read and update `DELIVERY_LEDGER.md` during patrols.
+- Workstream chatrooms must use the matching role parameter block when reporting or recovering delivery state.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Deputy Codex-2 immediate repair check
+
+Workstream:
+Deputy Codex-2 / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+IMMEDIATE_REPAIR_CHECK_COMPLETE / FINAL_GATES_AND_SYNC_BLOCKERS_UPDATED
+
+Changed:
+- Deputy Codex-2 ran an immediate repair check after the missed-alarm complaint instead of waiting for the next heartbeat.
+- Latest `origin/main` is `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- PR #22 head is `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; `refs/pull/22/merge` exists at `72f0f3eff085cc434921b7490c513d644208c46d`. GitHub comments report latest-main re-sync, allowed Issue #16 docs-only scope, `@codex review`, and clean Codex result `4531356014`. Route PR #22 to Deputy final merge / reject gate. Need Reviewer: No unless branch changes or Codex reports P1/P2/NEEDS_FIX.
+- PR #23 head is `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists at `8ef304b72e6afd92e61e14274cd4611f65281398`, and the branch contains latest `origin/main`. GitHub comments report the renderer / format mismatch fail-closed fix and a post-resync `@codex review` request at comment `4531552098`; no post-resync clean Codex result was found in fetched comments during this check. Keep PR #23 in REVIEW_GATE_HOLD until the post-resync Codex check is clean.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; `refs/pull/25/merge` is absent, and local git found no merge base with current `origin/main`. GitHub comments report a sync-recovery attempt / environment blocker, but the remote PR head did not advance in refs during this check. Keep PR #25 as latest-main sync blocker; no Codex review request or merge gate yet.
+- PR #26 head is `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; `refs/pull/26/merge` exists at `f3db625a4716b8997f06e98673ccf8d2ba0e037d`. GitHub comments report Executive validation, candidate-only safety, forbidden formal-pricing negative checks, and clean Codex review `4531555287`. Route PR #26 to Deputy final merge / reject gate. Need Reviewer: No unless branch changes or Codex reports P1/P2/NEEDS_FIX.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only repair-check update.
+
+Blocked:
+- PR #25: no merge ref / no merge base with current `origin/main`; needs true latest-main sync in a GitHub-connected environment.
+- PR #23: post-resync Codex review result not yet found; hold final gate until clean.
+
+Next:
+- Deputy final gate candidates now include PR #22 and PR #26.
+- Executive Officer should stop chasing PR #22 / PR #26 as ordinary stalls unless their branch state changes.
+- Executive Officer should keep PR #25 on exact sync-recovery chase and require a branch head that produces a merge ref.
+- Output Documents owner must wait for or obtain post-resync clean Codex review on PR #23 before Deputy final gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the post-resync Codex check is clean. No for PR #22 / PR #25 / PR #26 unless scope drifts or Codex reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy patrol found workflow repair PRs #25 / #26
 
 Workstream:
@@ -3582,3 +4322,991 @@ PR / Commit:
 
 Next:
 - Establish blackboard reporting discipline before starting next build task.
+
+### 2026-05-25 - Second Deputy PR #26 validation refresh found on current main `f960cfd`
+
+Workstream:
+Second Deputy Codex / Raw Candidate / Active PR patrol
+
+Status:
+PR_26_VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_CANDIDATE
+
+Changed:
+- Re-read latest `origin/main` at `f960cfda01beca5d3d61d8065094bba8a95b48df` and GitHub PR / Issue comments for PR #22 / #23 / #25 / #26 plus Issue #15 / #17.
+- PR #26 received current-main validation evidence in comment `4532187707` after Executive call-out `4531941371`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/26/head` exits `0` and produced tree `7650c6a3cd615004fa0244c0780312cb6104b935`.
+- The PR #26 evidence refresh reports R1.5 validation reruns, raw warehouse static guard pass, candidate-only safety preserved, and forbidden formal-pricing checks negative: no formal price, no `PricingRule`, no formal `MaterialSpec` / `LaborRule`, no `BudgetEstimateLine.unit_price`, no renderer / Excel / PDF / `BudgetOutputSnapshot`, no floor-plan / frontend / Supabase/API/migration / RAG / AI API / payment / escrow / listing fee.
+- PR #22 still passes current-main merge-tree locally and remains a Deputy final-gate candidate.
+- PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 still has no merge ref and local merge-tree refuses unrelated histories.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- LOW / MEDIUM workflow decision: accept PR #26 comment `4532187707` as the missing validation-refresh artifact for the current patrol.
+- Stop ordinary Executive chase for PR #26 unless the branch head changes, validation evidence is contradicted, or a new Codex review reports NEEDS_FIX / P1 / P2.
+- Route PR #26 back to Deputy Codex final merge / reject gate consideration; Deputy Codex still owns final merge / reject.
+- Keep PR #23 and PR #25 in Deputy Codex-2 workflow repair lanes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a new Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
+### 2026-05-25 - Second Deputy automation prompt hardened
+
+Workstream:
+governance / Deputy Codex-2 automation
+
+Status:
+DEPUTY2_AUTOMATION_PROMPT_CORRECTED / EXECUTION_PATROL_ENFORCED
+
+Changed:
+- Commander observed that the Deputy Codex commander patrol prompt was operating correctly because it used a clear battlefield, mission, operating model, visible-handler rule, delegation model, failure conditions, and publication duty.
+- Second Deputy prompt was still too close to a role description: it used permissive language such as LOW / MEDIUM support and allowed the patrol to behave as an analyst or route-back desk instead of a workflow repair owner.
+- Updated heartbeat automation `laibe-deputy-15min-patrol` / `laibe-deputy2-10min-patrol` to a commander-style execution patrol prompt.
+- Added a `COMMANDER_STYLE_PROMPT_REQUIREMENT` and `VISIBLE_HANDLER_OBLIGATION` under Deputy Codex-2 role parameters.
+
+Decision:
+- Deputy Codex-2 is now explicitly a LOW / MEDIUM workflow recovery owner for rows where `Current Handler` is Deputy Codex-2.
+- Deputy Codex-2 may not return bare `NO_NEW_DEPUTY2_DECISION`, `standby`, `waiting for Deputy`, or route-back language while it owns an active ledger row.
+- If Deputy Codex-2 cannot repair PR #23 / PR #25 / PR #26-style workflow rows, it must publish blocker evidence with attempted fix, latest main SHA, branch SHA, and next executable owner.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Executive / Triage / Governance patrol prompts hardened
+
+Workstream:
+governance / cadre automation prompts
+
+Status:
+CADRE_AUTOMATION_PROMPTS_CORRECTED / GOVERNANCE_PATROL_RESTORED
+
+Changed:
+- Commander compared the commander patrol prompt against Executive Officer and Triage Officer prompts and found the same structural gap: the prompts described role boundaries but did not fully enforce battlefield, operating sequence, visible ACK recovery, route ownership, and publication duties.
+- Local automation inspection found Governance Patrol automation ID `20` exists, but its prompt was unreadable / not practically usable as a commander-style patrol setting.
+- Updated Executive Officer heartbeat `laibe-mvp-executor-patrol` to a visible follow-up execution patrol: battlefield is `DELIVERY_LEDGER.md` plus `EXECUTIVE_PATROL_INBOX.md`; it must run STATE_RECONCILIATION then VISIBLE_ACK_RECOVERY and cannot report `NO_NEW_EXECUTIVE_ACTION` while active handlers lack visible ACK.
+- Updated Triage Officer heartbeat `laibe-triage-officer-heartbeat` to routing recovery patrol: battlefield is `TRIAGE_QUEUE.md` plus `DELIVERY_LEDGER.md`; it must run STATE_RECONCILIATION, LAG_CLASSIFICATION, then ROUTING_RECOVERY and may not route against the ledger.
+- Rewrote Governance Patrol heartbeat ID `20` as `laibe-governance-patrol-20min`: battlefield is `WORKSTREAM_BLACKBOARD.md` plus `CHATROOM_ROLE_PARAMETERS.md`; it must audit cadre accountability and prompt-rule gaps, including `ACTIVE_HANDLER_SILENT`, `CADRE_RULE_FAIL`, and `PROMPT_RULE_GAP`.
+- Added Executive Officer, Triage Officer, and Governance Patrol commander-style prompt requirements to `CHATROOM_ROLE_PARAMETERS.md`.
+
+Decision:
+- Executive Officer owns visible ACK recovery, not passive status summaries.
+- Triage Officer owns executable routing from the latest ledger, not stale fallback routing.
+- Governance Patrol exists and must inspect patrol health / prompt-rule gaps, but remains read-only by default unless Deputy / Commander explicitly authorizes docs-only publication.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-25 - Executive visible ACK recovery patrol on current main `8007ae0`
+
+Workstream:
+command/executive / active handler visible ACK recovery
+
+Status:
+ACTIVE_HANDLER_SILENT / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-read latest `origin/main` at `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, branch heads, and local merge-tree signals.
+- No visible handler ACK was found after the 07:08 and 07:18 Executive action requests.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local merge-tree against current main exits `0`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local merge-tree against current main exits `0`, and PR comment `4532187707` remains the latest validation refresh.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local merge-tree exits `128` / unrelated histories.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #22 / PR #26 in Deputy Codex final-gate visibility ACK lane. Do not duplicate ordinary Builder chase unless branch head or validation evidence changes.
+- Keep PR #23 / PR #25 in Deputy Codex-2 repair-status ACK lane. Do not loop back to original Builders while the ledger names Deputy Codex-2 as Current Handler.
+- Executive Officer updated the ledger watch note and the two pending inbox action requests with 07:29 visible ACK follow-up.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+### 2026-05-25 - Commander patrol current-main reconciliation on `1c40007`
+
+Workstream:
+command/deputy / active PR final-gate and repair lanes
+
+Status:
+STATE_RECONCILIATION_UPDATED / ACTIVE_HANDLER_SILENT_REMAINS
+
+Changed:
+- Fast-forwarded patrol worktree to latest `origin/main` `1c4000748a18`.
+- Rechecked GitHub REST issue state: Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed / completed.
+- Rechecked PR refs via `git ls-remote` and fetched PR heads into patrol refs.
+- PR #22 head `e338431` still merge-tree cleanly against current main; changed files remain limited to Issue #16 docs.
+- PR #26 head `7853fe7` still merge-tree cleanly against current main; validation refresh comment `4532187707` remains the current evidence package.
+- PR #23 head `a75e380` still merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head `ffbe8e1` still has no GitHub merge ref; current local merge-tree now reports a concrete `docs/NEXT_CODEX_HANDOFF.md` content conflict instead of only the older unrelated-history signal.
+
+Decision:
+- Deputy Codex visible ACK is published for PR #22 and PR #26: both remain final-gate candidates on current main `1c40007`. No merge/reject was executed in this patrol.
+- No ordinary Builder chase is needed for PR #22 / PR #26 unless branch head changes, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+- Keep PR #23 and PR #25 assigned to Deputy Codex-2 workflow repair. Deputy Codex-2 must publish `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or equivalent visible ACK.
+- `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair rows #23 / #25 only.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+### 2026-05-25 - Executive ACK reconciliation on current main `944b71a`
+
+Workstream:
+command/executive / active handler visible ACK recovery
+
+Status:
+DEPUTY_ACK_FOUND / ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2
+
+Changed:
+- Re-read latest `origin/main` at `944b71a95562d06fdf08dfeb2dd828243b59ec65`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open PR / Issue metadata until unauthenticated REST rate limit, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- Deputy visible ACK for PR #22 / PR #26 is now found in the `2026-05-25T07:34:01Z` Commander patrol entry; Executive visible-ACK chase for those two rows is satisfied.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local merge-tree against current main exits `0`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local merge-tree against current main exits `0`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no GitHub merge ref exists, and local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves the Commander-patrol `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Stop Executive visible-ACK chase for Deputy Codex final-gate visibility on PR #22 / PR #26 unless branch head, validation evidence, or Codex review state changes.
+- Keep PR #23 / PR #25 in Deputy Codex-2 repair-status ACK lane. Deputy Codex-2 still needs `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair rows only.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+### 2026-05-25 - Commander patrol API fallback and Deputy2 silence check on `829ef3e`
+
+Workstream:
+command/deputy / Deputy Codex-2 repair lanes
+
+Status:
+API_LIMIT_FALLBACK / ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2
+
+Changed:
+- Fast-forwarded patrol worktree to latest `origin/main` `829ef3ecf876`.
+- GitHub REST returned 403 during PR comment / metadata checks, so this patrol used `git ls-remote`, fetched PR heads, `origin/main`, blackboard, delivery ledger, triage queue, and Executive inbox as fallback sources.
+- PR #23 head remains `a75e3802a30f`; local merge-tree against current main exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a`; local merge-tree against current main exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- No new Deputy Codex-2 visible repair ACK was found in blackboard / ledger / Executive inbox after the prior Executive follow-up.
+
+Decision:
+- No new Commander decision is needed this cycle.
+- Keep PR #23 and PR #25 assigned to Deputy Codex-2 workflow repair.
+- Deputy Codex-2 still owes `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked and latest main / branch SHA.
+- Executive Officer should avoid duplicate Builder chase and keep the visible ACK chase pointed at Deputy Codex-2 while the ledger names Deputy Codex-2 as Current Handler.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Deputy2 visible ACK follow-up on `dc26429`
+
+Workstream:
+command/executive / Deputy Codex-2 repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2 / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-read latest `origin/main` at `dc26429562ba686973495496acac58ceb87b6924`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open Issues / open PR metadata, PR #23 / PR #25 comments and review state, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 and PR #26 remain Deputy Codex final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Executive reassignment recommendation `4531941113`, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`, no GitHub merge ref exists, and local merge-tree exits `128` / unrelated histories in this worktree.
+- No Deputy Codex-2 visible repair ACK was found after the 07:41 Executive follow-up.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #23 / PR #25 assigned to Deputy Codex-2 workflow repair.
+- Executive Officer issued one single-primary `To: Deputy Codex-2` visible ACK follow-up in `EXECUTIVE_PATROL_INBOX.md`.
+- Required next visible ACK from Deputy Codex-2: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, and next executable owner.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive PR25 repair accepted / PR23 still blocked on `df7f3b3`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+PR25_BUILDER_REPAIR_ACCEPTED / PR25_CODEX_REVIEW_REQUEST_PENDING / PR23_BUILDER_REPAIR_ACK_PENDING
+
+Table Compliance:
+PARTIAL - PR #25 now has a pushed Builder repair artifact and current-main merge simulation pass; PR #23 still lacks required Builder repair ACK.
+
+Missed Progress:
+PR #25 missed cycles reset to `0` after public `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`; PR #23 missed cycles increased to `21`.
+
+Action Taken:
+Executive Officer rechecked latest main `df7f3b33888c64c5f5bdac4b63eb472d158b2146`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, public PR pages, PR refs, fetched PR heads, and local merge-tree signals. PR #25 head advanced to `f545c131141b2694765e827d1831822869b4c35a`; `refs/pull/25/merge` exists at `41850dd7af1305b32c8baab85fb978e7f76a3181`; local merge-tree exits `0` with tree `86583d0681cb1122ccb508760e5e2b048f92c34b`. PR #23 remains head `a75e3802a30f13201cf2df5705112142d9251e8c`; no required ACK label was found on the public PR page; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. GitHub REST metadata hit unauthenticated `403` fallback.
+
+Next Required:
+Plan Puzzle Builder must request `@codex review` on PR #25 and report `CODEX_REVIEW_REQUESTED` / result or exact blocker. Output Documents Builder must provide `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and blocker.
+
+Blocked:
+PR #23 remains current-main sync blocked.
+
+Need Deputy:
+No new request this patrol; Deputy owns PR #25 merge / reject if Codex review is clean.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drift.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `c576c81`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `c576c81c672b068d4cf6d1f90a8fc30f07ee35f3`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, merge-ref improvement, or new repair comment was found after the 11:12 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `20`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `b1a890e`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `b1a890e15bddeef5efd9030c7b868f1305e3728f`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, merge-ref improvement, or new repair comment was found after the 11:02 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `19`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `a28ceb5`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `a28ceb562f238196638f759ff2ca8b94da0ac172`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 10:52 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `18`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `65ae937`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `65ae9372ff7099aae57c597e44c9f1bef2461402`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 10:42 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `17`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `9d54d93`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `9d54d93223b29c5ebf3b95acb40870b49083d783`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 10:32 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `16`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `5d44c8f`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `5d44c8f2c081d23ad7d2c2c717ebae056d009107`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 10:22 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `15`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `ec8e636`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `ec8e636a5c6c6078757d7b5ec95ebe6be487b131`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 10:13 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `14`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `4448a6a`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `4448a6a739cefcbc2ecec246699acf7a43960071`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 10:02 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `13`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `39d6c2c`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `39d6c2c211473219a288e7444295b1c6a389eee8`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:51 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `12`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `1b1dec0`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `1b1dec0cdd81be9544b23a9de97e0e261bb84923`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST open PR / issue metadata, PR #23 / PR #25 comments and reviews, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 and PR #24 remain closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains connector local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Deputy reassignment recommendation `4531941113`; PR reviews remain historical; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:05 Commander direct Builder callout.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `8`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `aacf9be`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / REST_403_FALLBACK
+
+Changed:
+- Re-checked latest `origin/main` at `aacf9befb33f6b331610fd04ed8630b088e325e6`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST PR metadata with `403` fallback, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub refs confirm PR #22 / #23 / #25 / #26 remain open; PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:41 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `11`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `723fe8a`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / REST_403_FALLBACK
+
+Changed:
+- Re-checked latest `origin/main` at `723fe8a8f3f34bdec8aca42d7a83a7acaaf76fd9`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST metadata/comments/reviews with full `403` fallback, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub refs confirm PR #22 / #23 / #25 / #26 remain open; PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; public PR page keyword scan found no required ACK labels; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence; public PR page keyword scan found no required ACK labels; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:28 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `10`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `bd24fff`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT / BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / REST_COMMENT_REVIEW_FALLBACK
+
+Changed:
+- Re-checked latest `origin/main` at `bd24fff3f8e588da95a9ac9cae1d0d917ed11e42`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub PR metadata, public PR pages for PR #23 / PR #25 after REST comment-review `403` fallback, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub refs confirm PR #22 / #23 / #25 / #26 remain open; PR #22 / PR #26 remain Deputy final-gate monitor-only rows with local merge-tree exit `0`.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:17 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `9`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No for product / business / merge direction; automation rebind may be needed if the Builder chatrooms still do not receive heartbeat messages.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander patrol Deputy2 repair ACK check on `1845ccd`
+
+Workstream:
+command/deputy / Deputy Codex-2 repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT_RECONFIRMED_FOR_DEPUTY2 / NO_COMMANDER_DECISION
+
+Changed:
+- Fast-forward check confirmed patrol worktree is on latest `origin/main` `1845ccd885f4`.
+- GitHub REST open PR / Issue metadata was available this cycle: PR #22, #23, #25, and #26 remain open; Issues #15, #16, #17, and #18 remain open.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local merge-tree against current main exits `0`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local merge-tree against current main exits `0`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Executive reassignment recommendation `4531941113`; local merge-tree still exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local merge-tree exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- No Deputy Codex-2 visible repair ACK was found after the latest Executive single-primary follow-up.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Decision:
+- Keep PR #22 / PR #26 in Deputy Codex final-gate monitor-only lane. No merge / reject action was executed.
+- Keep PR #23 / PR #25 assigned to Deputy Codex-2 workflow repair. The required next visible ACK remains `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, and next executable owner.
+- This remains a cadre execution visibility gap, not a Commander product / business / visual decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Deputy2 visible ACK follow-up on `b2a7f45`
+
+Workstream:
+command/executive / Deputy Codex-2 repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2 / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Fast-forwarded patrol worktree to latest `origin/main` `b2a7f45599416822280807b19fda4f670a56ca9d`.
+- Re-checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open Issues / open PR metadata, PR #23 / PR #25 comments and review state, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 and PR #26 remain Deputy Codex final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Executive reassignment recommendation `4531941113`; PR reviews remain `4353275479` / `4354108564`; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`; no GitHub merge ref or PR review exists; local merge-tree exits `128` / unrelated histories in this worktree while the Commander ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+- No Deputy Codex-2 visible repair ACK was found after the 07:57 Executive follow-up and 08:05 Commander reconfirmation.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #23 / PR #25 assigned to Deputy Codex-2 workflow repair.
+- Executive Officer issued one single-primary `To: Deputy Codex-2` visible ACK follow-up in `EXECUTIVE_PATROL_INBOX.md`.
+- Required next visible ACK from Deputy Codex-2: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, and next executable owner.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander bypasses silent Deputy2 repair bottleneck
+
+Workstream:
+command/deputy / active repair routing
+
+Status:
+CADRE_BYPASS_REASSIGNMENT / BUILDER_REPAIR_RESTORED
+
+Changed:
+- Commander inspection found the system still stalled because PR #23 / PR #25 were assigned to Deputy Codex-2 repair lanes, but repeated patrols only produced more `ACTIVE_HANDLER_SILENT` evidence instead of repair attempts.
+- Confirmed several workstream automations had mojibake / unreadable prompts, so the worker chats were not reliably receiving executable role parameters.
+- Updated workstream heartbeat prompts to English for Plan Puzzle, Output Documents, Raw Candidate, MethodSpec, Visual Simulation, Quote Factory, and Reviewer.
+- Reassigned PR #25 Current Handler from Deputy Codex-2 to Plan Puzzle Builder for direct current-main handoff-conflict repair.
+- Reassigned PR #23 Current Handler from Deputy Codex-2 to Output Documents Builder for direct current-main blackboard-conflict repair.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Deputy Codex-2 remains a LOW / MEDIUM workflow deputy, but it is no longer the active repair bottleneck for PR #23 / PR #25 this cycle.
+- Executive Officer must chase the branch owners directly:
+  - PR #25: Plan Puzzle Builder must report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+  - PR #23: Output Documents Builder must report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+- No merge / reject / close action was executed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander direct Builder repair ACK second callout
+
+Workstream:
+command/deputy / active repair routing / chatroom heartbeat visibility
+
+Status:
+ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / BUILDER_VISIBLE_ACK_REQUIRED
+
+Changed:
+- Re-checked latest `origin/main` through merge catch-up to `8d903c41d1aeec58fcb3782c7a8529418ca165c9` after Executive follow-ups on `b563821`, `322594b`, and `8d903c4`.
+- GitHub connector confirms PR #22 / #23 / #25 / #26 are still open; PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- PR #23 latest useful repair evidence remains the earlier Output Documents re-sync / clean Codex review sequence, but current-main merge-tree still exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict after main advanced.
+- PR #25 latest useful evidence remains local-only handoff comments `4531872891` / `4531949297`; no `refs/pull/25/merge` exists and current-main merge-tree still exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, branch-head update, or new PR comment was found after the 08:30 / 08:36 direct Builder repair requests.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder.
+- Keep PR #23 Current Handler as Output Documents Builder.
+- Executive must now chase visible chat ACK, not another passive GitHub duplicate: each Builder must report `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+- If the target chatroom still does not receive heartbeat messages, rebind that workstream automation to the current chatroom before the next patrol.
+
+Need Commander:
+No for product / business / merge direction; manual UI automation rebind may be needed if the chatroom heartbeat target is stale.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander patrol automation cleanup and repair-lane watch
+
+Workstream:
+command/deputy / automation governance / active repair routing
+
+Status:
+AUTOMATION_DUPLICATE_REMOVED / BUILDER_REPAIR_ACK_PENDING
+
+Changed:
+- Rechecked latest `origin/main` `bf39dc4251f3` after the direct Builder repair reassignment.
+- Deleted obsolete duplicate heartbeat automation `automation`; canonical Governance Patrol remains `20` / `laibe-governance-patrol-20min`.
+- Verified workstream prompts no longer contain mojibake for Raw Candidate, Output Documents, Visual Simulation, Quote Factory, MethodSpec, Plan Puzzle, Reviewer, Commander, Deputy2, Executive, Triage, and Governance.
+- PR #23 head still remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains `4531941113`; local merge-tree against current main still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head still remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains `4531949297`; no current merge ref is available and local merge-tree still conflicts in `docs/NEXT_CODEX_HANDOFF.md`.
+- Existing GitHub merge refs for PR #22 / #23 / #26 are stale against older base SHAs and must not be treated as current-main merge readiness.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder.
+- Keep PR #23 Current Handler as Output Documents Builder.
+- Executive should wait for the next Builder heartbeat window, then chase the Builder directly if no `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` appears.
+- No merge / reject / close action was executed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `322594b`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-checked latest `origin/main` at `322594b1fed29351a938be0f0c0de92b27dc14dc`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST open PR / issue metadata, PR #23 / PR #25 comments and reviews, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 and PR #24 remain closed.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains connector local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Deputy reassignment recommendation `4531941113`; PR reviews remain historical; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or branch-head update was found after the 08:49 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `7`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `983facf`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / API_LIMIT_FALLBACK
+
+Changed:
+- Re-checked latest `origin/main` at `983facfc0e6d564cf2442c0d9e31a357d1395b52`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub REST open-PR API until `403` rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- PR #22 / PR #26 remain Deputy final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is stale / not current-main readiness evidence; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or branch-head update was found after the 08:36 Executive follow-ups.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Missed cycles for PR #25 / PR #23 increased to `6`.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Builder repair ACK follow-up on `b563821`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+BUILDER_REPAIR_ACK_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / API_LIMIT_FALLBACK
+
+Changed:
+- Re-checked latest `origin/main` at `b563821e94bc3785692bd8a766968aa3b326457e`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open PR metadata before API rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- PR #25 remains assigned to Plan Puzzle Builder; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+- PR #23 remains assigned to Output Documents Builder; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists but is stale / not current-main readiness evidence; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or branch-head update was found after the 08:30 direct Builder repair requests.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder.
+- Executive Officer added single-primary follow-ups in `EXECUTIVE_PATROL_INBOX.md` to both builders.
+- Required next visible ACK from each builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
