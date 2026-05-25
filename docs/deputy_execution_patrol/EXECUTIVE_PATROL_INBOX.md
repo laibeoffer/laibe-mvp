@@ -37,10 +37,53 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T21:21:59Z - [PR23_ACTION_TAKEN_REVIEW_PENDING_AFTER_F882B90] - Output Documents
+
+Status:
+VALIDATION_REFRESH_FOUND / ACTION_TAKEN / CODEX_REVIEW_REQUESTED / REVIEW_RESULT_PENDING
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder / Codex re-review watch
+
+Workstream:
+Output Documents / PR #23
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+Output Documents Builder answered the `4537214455` follow-up with `ACTION_TAKEN`, pushed PR #23 to `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, and requested `@codex review`; no post-`f882b90` clean Codex result is visible yet.
+
+Evidence:
+- Latest `origin/main`: `907802a2ca6f13882a7a88c54e14bda9c0d145e6`.
+- PR #23 head: `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`.
+- Builder PR comment `4537294884` at `2026-05-25T21:19:33Z` reports `ACTION_TAKEN`, non-array warning guard, validation pass, no real `.xlsx` / `.pdf` changes, and snapshot-only boundary preservation.
+- Builder review-thread reply `3299985379` replies to Codex P2 `3299934115` and reports the same fix / validation.
+- Post-publication current-main merge-tree against `907802a2ca6f13882a7a88c54e14bda9c0d145e6` exits `0` with tree `d1639e4a9a29c2eb5118e809291f2f2ca1d4e6d3`; `git diff --check origin/main..refs/patrol/hb2115-post/pr23` exits `0`.
+- No post-`f882b90` Codex clean / NEEDS_FIX / P1 / P2 result is visible yet.
+
+Action already taken:
+Recorded the Builder ACK and post-push branch-head change in the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Hold PR #23 out of final-gate routing until Codex re-review after `f882b90` is clean. Stop ordinary Output Documents Builder chase unless the branch changes again, validation is contradicted, repair scope drifts, or Codex reports `NEEDS_FIX`, `P1`, or `P2`.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the post-`f882b90` Codex result is clean.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T21:15:40Z - [PR23_ACTIVE_HANDLER_SILENT_AFTER_4537214455] - Output Documents
 
 Status:
-EXECUTIVE_ACTION_REQUEST / ACTIVE_HANDLER_SILENT / REVIEW_GATE_BLOCKED
+SUPERSEDED_BY_2026-05-25T21:21:59Z_ACTION_TAKEN / EXECUTIVE_ACTION_REQUEST / ACTIVE_HANDLER_SILENT / REVIEW_GATE_BLOCKED
 
 Executive Officer:
 EXECUTIVE_OFFICER

@@ -36,10 +36,36 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T21:21:59Z - [PR23_ACTION_TAKEN_REVIEW_PENDING_AFTER_F882B90] - Output Documents
+
+Status:
+VALIDATION_REFRESH_FOUND / ACTION_TAKEN / CODEX_REVIEW_REQUESTED / NEEDS_REVIEWER / REVIEW_RESULT_PENDING
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23
+
+Evidence:
+PR #23 advanced to head `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b` with commit `fix(renderer): guard non-array customer warnings`, changing only `src/lib/budget/renderers/customer-warning-sanitizer.ts` relative to the prior P2-fix head `f2668e2`. Output Documents Builder posted `ACTION_TAKEN` comment `4537294884` and review-thread reply `3299985379`, reporting non-array warning smoke, renderer static guard, renderer TypeScript syntax loop, diff-check, no real `.xlsx` / `.pdf` changes, snapshot-only boundary preservation, and `@codex review`. Latest `origin/main` is `907802a2ca6f13882a7a88c54e14bda9c0d145e6`; current-main merge-tree exits `0` with tree `d1639e4a9a29c2eb5118e809291f2f2ca1d4e6d3` and diff-check exits `0`. No post-`f882b90` clean Codex result is visible yet.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder chase while the `ACTION_TAKEN` / validation evidence remains current. Watch for post-`f882b90` Codex result: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked.
+
+Recommended Deputy Action:
+Hold PR #23 out of final-gate routing until Codex re-review after `f882b90` is clean. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless new branch, validation, review, or scope evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the post-`f882b90` Codex result is clean.
+
 ### 2026-05-25T21:15:40Z - [PR23_ACTIVE_HANDLER_SILENT_AFTER_4537214455] - Output Documents
 
 Status:
-NEEDS_EXECUTIVE_CHASE / ACTIVE_HANDLER_SILENT / NEEDS_REVIEWER / REVIEW_GATE_BLOCKED
+SUPERSEDED_BY_2026-05-25T21:21:59Z_ACTION_TAKEN / NEEDS_EXECUTIVE_CHASE / ACTIVE_HANDLER_SILENT / NEEDS_REVIEWER / REVIEW_GATE_BLOCKED
 
 Complexity:
 HIGH
