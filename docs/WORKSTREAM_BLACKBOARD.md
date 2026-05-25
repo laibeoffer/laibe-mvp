@@ -1343,6 +1343,46 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy automation recovery doctrine updated
+
+Workstream:
+governance / patrol automation
+
+Branch / Repo:
+Codex app heartbeat automations / `laibeoffer/laibe-mvp`
+
+Status:
+STATE_RECONCILIATION_AND_DELIVERY_RECOVERY_ENABLED
+
+Changed:
+- Updated commander patrol, Executive Officer, Triage Officer, Deputy Codex-2, Codex Rules patrol, and active workstream heartbeats to stop passive `standby` / `WAITING_NEXT_ISSUE` handling.
+- Patrol doctrine now requires `STATE_RECONCILIATION` first when GitHub, blackboard, branch, PR, Issue, or chatroom state is inconsistent.
+- Active Issues / PRs now require `DELIVERY_RECOVERY`: claim, branch, PR URL, latest branch SHA, latest-main sync, allowed-files check, forbidden-scope check, validation, or an exact blocker with attempted fix.
+- Triage Officer must create executable action cards instead of only explaining role limits.
+- Executive Officer must keep first-line chase active and write action requests / decision requests when workstreams remain stalled.
+- Workstream heartbeats for Plan Puzzle, Raw Candidate, MethodSpec, Output Documents, Visual Simulation, and Quote Factory now require state reconciliation / recovery before any waiting status.
+- Quote Factory patrol now follows QF5.3 state reconciliation before QF5.4 wait; Visual Simulation patrol now reconciles #19 / PR #24 completion before next safe task drafting.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- Codex app automation settings: `laibe-commander-patrol`, `laibe-mvp-executor-patrol`, `laibe-triage-officer-heartbeat`, `laibe-deputy-15min-patrol`, `laibe-plan-puzzle-patrol`, `heartbeat`, `laibe-method-spec-patrol`, `heartbeat-2`, `heartbeat-3`, `heartbeat-4`, `20`
+
+PR / Commit:
+- Deputy Codex blackboard-only patrol update.
+
+Blocked:
+- None for automation wording. Actual workstream recovery still depends on the next heartbeat runs producing claims, PR URLs, validation, or exact blockers.
+
+Next:
+- Executive Officer and Triage Officer should convert the next stale workstream cycle into action cards / decision requests, not status-only summaries.
+- Workstreams must perform state reconciliation before reporting waiting / standby.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Deputy patrol branch updates after decision gate
 
 Workstream:
