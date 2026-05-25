@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:59:16Z - [PR25_P2_FIX_FOUND_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Latest main is `7151adcf83fa696f12b8be3dfa2e0703023a101c`. PR #25 head advanced to `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; `refs/pull/25/merge` exists at `6dd6e86e7acfaa6009d4ebaadaaff47a2e4d59fe`; current-main merge-tree exits `0`. Builder posted `PLAN_PUZZLE_ACTION_TAKEN`, responded to all three Codex P2 review comments, reran validation, and requested `@codex review`. No post-`e61b67a` clean Codex result is visible yet.
+
+Recommended Executive Action:
+Watch for the post-`e61b67a` Codex result. If clean, route PR #25 back to Deputy final gate. If Codex reports `NEEDS_FIX` / `P1` / `P2`, keep Plan Puzzle Builder fix lane active.
+
+Recommended Deputy Action:
+Do not merge / reject / close until post-`e61b67a` Codex re-review is clean. No Commander escalation needed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e61b67a` Codex result is clean.
+
 ### 2026-05-25T13:39:14Z - [PR23_POST_PUBLISH_SYNC_BLOCKED_PR25_P2_PENDING] - Output Documents / Plan Puzzle
 
 Status:

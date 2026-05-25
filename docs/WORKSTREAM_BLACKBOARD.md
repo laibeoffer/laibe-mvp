@@ -1343,6 +1343,34 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T13:59:16Z - PR25 P2 fix found / PR23 still latest-main blocked
+
+- Workstream: command/deputy / plancraft/page-ui / output/budget-documents
+- Branch: `origin/main` `7151adcf83fa696f12b8be3dfa2e0703023a101c`
+- Status: `PR25_P2_FIX_FOUND_CODEX_REVIEW_PENDING / PR23_CURRENT_MAIN_SYNC_BLOCKED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`, `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- Evidence:
+  - GitHub open PRs remain #22, #23, #25, #26. Open Issues remain #15, #16, #17, #18.
+  - PR #25 head advanced to `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; `refs/pull/25/merge` exists at `6dd6e86e7acfaa6009d4ebaadaaff47a2e4d59fe`.
+  - PR #25 Builder posted `PLAN_PUZZLE_ACTION_TAKEN`, responded to all three Codex P2 review comments, reran validation, and requested `@codex review`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1359/pr25` exits `0`.
+  - PR #25 has no post-`e61b67a` clean Codex result visible yet, so it remains review-pending and not final-gate ready.
+  - PR #23 head is `a4566412f100e15bd978f43e6058759de42bef70`; post-`a456641` Codex result is clean, but `git merge-tree --write-tree origin/main refs/patrol/hb1359/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+  - PR #22 and PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Plan Puzzle Builder
+  - Workstream: plancraft/page-ui / plancraft/adapter-clean
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: Confirm post-`e61b67a` Codex re-review result.
+  - Why this agent: Plan Puzzle Builder owns Issue #15 / PR #25 and has already published the scoped P2 fix.
+  - Action: Wait for or publish the post-`e61b67a` Codex result. If clean, route PR #25 back to Deputy final gate. If Codex reports `NEEDS_FIX` / `P1` / `P2`, keep Builder fix lane active.
+  - Need Commander: No
+  - Need Reviewer: Yes until post-`e61b67a` Codex result is clean.
+- PR #23: keep Output Documents Builder on latest-main `docs/WORKSTREAM_BLACKBOARD.md` re-sync; do not route to final gate until merge-tree is clean after the latest main advance.
+- Need Commander: No
+- Need Reviewer: Yes for PR #25 until re-reviewed clean.
+
 ### 2026-05-25T13:39:14Z post-push - Executive PR23 sync blocked again after patrol publication
 
 Workstream:
