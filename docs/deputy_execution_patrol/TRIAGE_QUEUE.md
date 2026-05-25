@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T19:18:16Z - [PR23_BLOCKER_ACK_DEPUTY_LOOP_BREAK_REQUIRED] - Output Documents / Deputy Codex
+
+Status:
+BLOCKER_WITH_ATTEMPTED_FIX / NEEDS_DEPUTY_DECISION / CURRENT_MAIN_SYNC_LOOP
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 final-gate visibility
+
+Evidence:
+Latest `origin/main` is `b738e110c0ab4323c30aa1bde3d6a9dadce8f63e`. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`. Output Documents Builder posted `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` at `2026-05-25T19:17:41Z`, confirming latest-main check, merge-tree exit `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, diff-check pass, renderer static guard pass, TypeScript syntax loop pass, real `.xlsx` / `.pdf` unchanged, and no forbidden scope. Builder did not push another blind docs-only re-sync because the current blackboard routes the repeated sync-loop policy to Deputy Codex. PR #22 / #25 / #26 remain current-main clean against `b738e11`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder chase for PR #23 until Deputy Codex decides the sync-loop policy. Keep one single-primary Deputy Codex visibility request.
+
+Recommended Deputy Action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Also publish final-gate visibility for PR #22 / #25 / #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
 ### 2026-05-25T18:55:29Z - [PR23_POST_PUSH_SYNC_BLOCKED_AFTER_312ABFA] - Output Documents / Deputy Codex
 
 Status:

@@ -37,6 +37,51 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T19:18:16Z - [DEPUTY_LOOP_BREAK_POLICY_REQUEST] - PR23 Sync Loop / Final Gate
+
+Status:
+PENDING_DEPUTY_DECISION / BLOCKER_WITH_ATTEMPTED_FIX_FOUND / CURRENT_MAIN_SYNC_LOOP
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+Output Documents / active final gates
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 plus PR #22 / PR #25 / PR #26
+
+Finding:
+PR #23 has a fresh Output Documents Builder `BLOCKER_WITH_ATTEMPTED_FIX` ACK, not silence. The blocker is now a repeated docs-only patrol sync loop that the Builder says is outside the Builder role and already routed to Deputy Codex for policy / final-gate decision. PR #22 / #25 / #26 remain current-main clean and still need Deputy final-gate visibility.
+
+Evidence:
+- Sources checked: mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, comments, reviews, fetched PR heads / merge refs, merge-tree, and diff-check.
+- Latest `origin/main`: `b738e110c0ab4323c30aa1bde3d6a9dadce8f63e`.
+- PR #23 status: open; head `eb7caa738431c0624c30c3242e8d28b0b4b618e9`.
+- PR #23 prior repair chain: Builder `WORKFLOW_REPAIR_ATTEMPTED` comment `4536480487`; Codex clean comment `4536508595`.
+- PR #23 new ACK: Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` at `2026-05-25T19:17:41Z`.
+- PR #23 current-main simulation: `git merge-tree --write-tree origin/main refs/patrol/hb1918/pr23` exits `1` with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb1918/pr23` exits `0`.
+- Builder validation on current PR head remains clean: renderer static guard PASS, TypeScript syntax loop PASS, real `.xlsx` / `.pdf` unchanged, and no forbidden pricing / raw / frontend / payment / DB/API / RAG/AI API / secrets scope.
+- PR #22 / #25 / #26 current-main simulations pass against `b738e11`: trees `772cb7be00ac00874c3b2a31ef6a09b3d22466d5`, `b992ea6f0fab1fd179d43705157855c6affdc638`, and `9cfd0126e03cf4606a8d33e1ea65720fbecc2237`; all diff-checks exit `0`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. Ordinary Output Documents Builder chase is paused because the required visible ACK exists and the remaining issue is loop-break / final-gate policy. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex should decide whether to pause docs-only patrol pushes for a short merge window, request one final PR #23 re-sync against latest main, or mark an exact final-gate blocker. Deputy Codex should also publish final-gate visibility for PR #22 / #25 / #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Deputy requests another branch update, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or repair scope changes.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T18:55:29Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Sync Blocked After 312ABFA
 
 Status:
