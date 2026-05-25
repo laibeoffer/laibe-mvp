@@ -1512,7 +1512,7 @@ Files:
 - `docs/WORKSTREAM_BLACKBOARD.md`
 
 PR / Commit:
-- Commit: `039fa747f976881ccdd72d0bbf2d89cdc39a1c2a` on `warehouse/raw-source-quality-scoring`.
+- Commit: latest branch head `b1fadb7e821f912a83bbb675751e9a9c915ba169`; initial delivery commit `039fa747f976881ccdd72d0bbf2d89cdc39a1c2a`.
 - PR: #26 `Add raw source quality scoring reviewer checklist` - https://github.com/laibeoffer/laibe-mvp/pull/26
 
 Blocked:
