@@ -1343,6 +1343,41 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Output Documents Builder PR23 current-main repair on `fca20e8`
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS
+
+Action Taken:
+Latest `origin/main` advanced again to `fca20e853bb1a846ed63379a4cd290439aa56a60` after the PR #23 head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f` was repaired and re-reviewed clean. Output Documents Builder merged the newer main into the PR #23 worktree and resolved the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving the Deputy PR23 sync-repair assignment, the Executive patrol findings, the latest main patrol entries, and the prior Output Documents repair entries.
+
+Changed:
+- `docs/WORKSTREAM_BLACKBOARD.md` conflict resolved only.
+- Latest main patrol docs were accepted from `origin/main`.
+- Renderer code and snapshot review packet files were not edited during this repair.
+
+Validation:
+- Renderer static guard: `valid: true`, `issue_count: 0`.
+- Renderer TypeScript syntax loop: pass.
+- Invalid fixture / mismatch smoke: `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, `format_matches_output: false`.
+- `git diff --check`: pass.
+- Real `.xlsx` / `.pdf` diff check: no added or changed files.
+
+Blocked:
+Branch publication / Codex re-review visibility pending.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
 ### 2026-05-25 - Output Documents Builder PR23 current-main repair on `a2c3a27`
 
 Workstream:
@@ -1376,6 +1411,66 @@ No.
 
 Need Reviewer:
 No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
+### 2026-05-25T13:04:41Z - Executive post-push PR23 sync blocker on `999a323`
+
+Workstream:
+command/executive / output/budget-documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / POST_PUBLISH_MAIN_ADVANCED / CURRENT_MAIN_SYNC_BLOCKED_AGAIN
+
+Changed:
+- Executive first found PR #23 repaired on head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f` against `origin/main` `a2c3a273fb3f8f1d232a135c1eed162d79af1047`.
+- Executive then published patrol docs to `main` as `999a32376dbe8490dbc4f756455015b247f4c5c6`.
+- Post-push recheck shows PR #23 is stale again against latest `origin/main` `999a32376dbe8490dbc4f756455015b247f4c5c6`: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 still merge-tree clean after `999a323`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+Output Documents Builder must re-sync PR #23 against latest main `999a323`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the existing fail-closed renderer fix plus the new Executive patrol entries, rerun required renderer / fixture / diff checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T13:04:41Z - Executive PR23 repair found on `b503cd3`
+
+Workstream:
+command/executive / output/budget-documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REFRESH_REQUIRED
+
+Changed:
+- Rechecked latest `origin/main` `a2c3a273fb3f8f1d232a135c1eed162d79af1047`.
+- GitHub public PR state shows PR #23 open at head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `refs/pull/23/merge` exists at `18f079ec64367f6fa37d4005280aaa4b3ed5657c`.
+- Fetched PR #23 and verified `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `5326a9b9b243aed08945bd628b6c6c5c65f58fcc`.
+- PR #23 branch blackboard contains Output Documents Builder `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` for the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- Latest repair commit `b503cd3` resolves `docs/WORKSTREAM_BLACKBOARD.md`; renderer code and snapshot review packet files were not edited in that repair commit.
+- GitHub REST returned `403`, so patrol used public PR pages, refs, fetched PR heads, and local simulation fallback.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+Output Documents Builder must publish / confirm `CODEX_REVIEW_REQUESTED` or the post-`b503cd3` Codex result. Do not route PR #23 back to Deputy final gate until the latest-head re-review is visible or Deputy explicitly accepts the docs-only sync as sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
 
 ### 2026-05-25T12:56:32Z - PR23 sync repair owner assigned
 
