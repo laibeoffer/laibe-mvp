@@ -52,6 +52,7 @@ Effective artifact examples:
 
 ## Current Patrol Notes
 
+- `2026-05-25T12:56:32Z`: Deputy decision made for PR #23. The delivery-table row still records the stale final-gate blocker, but the active handler for the next executable action is now `Output Documents Builder`, not Deputy Codex. Required next action: re-sync PR #23 against latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer / format mismatch P2 fix, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, and request Codex re-review if branch head changes. Deputy final gate is paused until latest-main merge-tree is clean again.
 - `FINAL_GATE_READY` means Deputy Codex owns merge / reject; Executive Officer should not keep ordinary chase active unless branch state changes.
 - `SYNC_BLOCKED` is not standby. Executive Officer must obtain a true latest-main sync and merge ref before Codex review.
 - `DEPUTY_SIGNAL_DECISION_REQUIRED` means Executive has enough current-main patrol evidence to stop ordinary chase, but Deputy must decide whether that evidence is sufficient for gate routing or whether a repair owner must refresh the branch / validation report.
