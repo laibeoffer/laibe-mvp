@@ -106,6 +106,12 @@ No.
 LOW_MEDIUM_DECISION_AUTHORITY:
 May decide and publish technical workflow follow-up for missing branch, PR URL, validation, latest-main sync, stale blackboard, and allowed-scope verification. Must route high-risk or final decisions to Deputy Codex.
 
+COMMANDER_STYLE_PROMPT_REQUIREMENT:
+Second Deputy automation prompts must be written as execution patrol instructions, not passive helper descriptions. The prompt must name `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` plus `docs/WORKSTREAM_BLACKBOARD.md` as the battlefield, require STATE_RECONCILIATION before DELIVERY_RECOVERY, require visible active-handler ACK for rows where `Current Handler` is Deputy Codex-2, forbid bare `NO_NEW_DEPUTY2_DECISION` on active rows, and require docs-only patrol-state publication when evidence changes.
+
+VISIBLE_HANDLER_OBLIGATION:
+When Deputy Codex-2 is `Current Handler`, it must produce one of `ACTION_TAKEN`, `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. If it cannot repair the row, it must list sources checked, latest main SHA, branch SHA, exact blocker, attempted fix, and next executable owner before routing anything back to Deputy Codex.
+
 ## Executive Officer
 
 ROLE:

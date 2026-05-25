@@ -4301,3 +4301,32 @@ No
 
 Need Reviewer:
 No unless a new Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
+### 2026-05-25 - Second Deputy automation prompt hardened
+
+Workstream:
+governance / Deputy Codex-2 automation
+
+Status:
+DEPUTY2_AUTOMATION_PROMPT_CORRECTED / EXECUTION_PATROL_ENFORCED
+
+Changed:
+- Commander observed that the Deputy Codex commander patrol prompt was operating correctly because it used a clear battlefield, mission, operating model, visible-handler rule, delegation model, failure conditions, and publication duty.
+- Second Deputy prompt was still too close to a role description: it used permissive language such as LOW / MEDIUM support and allowed the patrol to behave as an analyst or route-back desk instead of a workflow repair owner.
+- Updated heartbeat automation `laibe-deputy-15min-patrol` / `laibe-deputy2-10min-patrol` to a commander-style execution patrol prompt.
+- Added a `COMMANDER_STYLE_PROMPT_REQUIREMENT` and `VISIBLE_HANDLER_OBLIGATION` under Deputy Codex-2 role parameters.
+
+Decision:
+- Deputy Codex-2 is now explicitly a LOW / MEDIUM workflow recovery owner for rows where `Current Handler` is Deputy Codex-2.
+- Deputy Codex-2 may not return bare `NO_NEW_DEPUTY2_DECISION`, `standby`, `waiting for Deputy`, or route-back language while it owns an active ledger row.
+- If Deputy Codex-2 cannot repair PR #23 / PR #25 / PR #26-style workflow rows, it must publish blocker evidence with attempted fix, latest main SHA, branch SHA, and next executable owner.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No
