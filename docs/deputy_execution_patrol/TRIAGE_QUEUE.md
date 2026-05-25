@@ -36,10 +36,36 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T20:41:28Z - [PR23_CODEX_P2_AFTER_FINAL_SYNC] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / REVIEW_GATE_BLOCKED
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23
+
+Evidence:
+Latest `origin/main` is `326db8a39c7e4b2b95ee119c85b07fca376a0301`. PR #23 head is `47dd4acee2302ddd3b6a7b008cb70cb667abba6d` and remains current-main merge-tree clean against `326db8a` with tree `6dca710c0206fcee0b661ab5cea39147e653cb28`; diff-check exits `0`. GitHub MCP found post-head Codex review `4358680834` at `2026-05-25T20:36:35Z` with unresolved P2 thread `PRRT_kwDORlw1t86En1Yw` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` line 14: `Handle non-string warnings before sanitizing`. Executive posted PR follow-up comment `4537133554`.
+
+Recommended Executive Action:
+Treat PR #23 as Output Documents Builder repair-gated, not Deputy final-gate clean. Wait for exactly one visible ACK label: `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`; chase again only if the handler remains silent in the next patrol or new evidence changes.
+
+Recommended Deputy Action:
+Hold PR #23 out of final-gate visibility until the P2 is fixed and Codex re-review is clean. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless new evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
 ### 2026-05-25T20:33:55Z - [PR23_FINAL_SYNC_FOUND] - Deputy Codex
 
 Status:
-FINAL_SYNC_FOUND / NEEDS_DEPUTY_DECISION / API_LIMIT_FALLBACK
+SUPERSEDED_FOR_PR23_BY_2026-05-25T20:41:28Z_CODEX_P2 / FINAL_SYNC_FOUND / NEEDS_DEPUTY_DECISION / API_LIMIT_FALLBACK
 
 Complexity:
 HIGH
