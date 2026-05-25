@@ -6,6 +6,44 @@ Map LaiBE chatrooms to scoped GitHub workstreams.
 
 All construction work should happen on a scoped branch and finish with a PR.
 
+Primary strategic source: `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`.
+
+## Global Dispatch / Heartbeat Rules
+
+GitHub Issue is the formal dispatch ticket. `docs/WORKSTREAM_BLACKBOARD.md` is the battle board. Pull Request is the completion / review artifact. Heartbeat / automation is a patrol timer only, not a dispatch channel.
+
+Deputy Codex dispatch must include:
+
+- To:
+- Workstream:
+- Branch / Repo:
+- Mission:
+- Why this agent:
+- Action:
+- Need Commander:
+- Need Reviewer:
+
+Rules:
+
+- `To:` must name exactly one primary agent / chatroom.
+- Do not dispatch to "everyone".
+- Do not provide only a branch name.
+- Do not provide only a workstream name.
+- Cross-workstream tasks must name a primary owner and list other workstreams as references only.
+- `Need Commander: No` by default; set `Yes` only for product, visual, commercial, or high-risk formal decisions.
+- `Need Reviewer: No` by default; set `Yes` only for Codex review NEEDS_FIX / P1 / P2, high-risk scope, explicit review request, or boundary-sensitive changes.
+
+Heartbeat rules:
+
+- Thread heartbeat only wakes the current chatroom.
+- Deputy heartbeat patrols all Issues, PRs, blackboard status, and Codex review blockers.
+- Workstream heartbeat patrols only that workstream's own `To:` / `Workstream:` Issues, related PRs, and blackboard section.
+- A chatroom with GitHub connected is not automatically scheduled; it still needs its own heartbeat automation.
+
+Full workflow:
+
+- `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md`
+
 ## 網站主流程 / 網頁修改
 
 - 負責什麼：landing、onboarding、header、CTA、routing、page formalization、頁面主流程。
