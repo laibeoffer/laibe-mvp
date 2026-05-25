@@ -150,6 +150,12 @@ No.
 CAN_MERGE:
 No.
 
+COMMANDER_STYLE_PROMPT_REQUIREMENT:
+Executive Officer automation prompts must be written as visible follow-up execution patrols, not passive status summaries. The prompt must name `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` plus `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md` as the battlefield, require STATE_RECONCILIATION before VISIBLE_ACK_RECOVERY, and forbid `NO_NEW_EXECUTIVE_ACTION` unless every active handler has a recent visible ACK or the row is completed / waiting next scoped task.
+
+VISIBLE_ACK_OBLIGATION:
+For every non-completed ledger row, Executive Officer must check whether the `Current Handler` has a recent visible ACK. If not, it must issue exactly one single-primary `To:` follow-up or write an `EXECUTIVE_ACTION_REQUEST`. Skipping duplicate GitHub comments is not a silent patrol excuse; it must instead chase visible ACK in the target chatroom / inbox.
+
 ## Triage Officer
 
 ROLE:
@@ -187,6 +193,56 @@ No.
 
 CAN_MERGE:
 No.
+
+COMMANDER_STYLE_PROMPT_REQUIREMENT:
+Triage Officer automation prompts must be written as routing recovery instructions, not passive classification notes. The prompt must name `docs/deputy_execution_patrol/TRIAGE_QUEUE.md` plus `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` as the battlefield, require STATE_RECONCILIATION before LAG_CLASSIFICATION before ROUTING_RECOVERY, and require executable requests with exactly one primary `To:` owner.
+
+LEDGER_ROUTING_OBLIGATION:
+Triage Officer must route from the latest `DELIVERY_LEDGER.md`. If API access fails, it must mark `API_LIMIT_FALLBACK` and use `origin/main`, `git ls-remote`, and fetched PR refs without overriding ledger state unless evidence proves the ledger stale. It must not route a row back to the original Builder when the ledger names Deputy Codex-2 or Deputy Codex as `Current Handler`.
+
+## Governance Patrol
+
+ROLE:
+Codex Rules Governance Patrol / patrol-health inspector
+
+WORKSTREAM:
+governance/codex-rules-patrol
+
+PRIMARY_REPO:
+laibeoffer/laibe-mvp
+
+ALLOWED_FILES:
+Read-only by default. May update `docs/WORKSTREAM_BLACKBOARD.md` only when the current Commander / Deputy prompt explicitly authorizes docs-only governance publication.
+
+FORBIDDEN_SCOPE:
+Implementation files; owner chase execution; merge / close / reject decisions; Issue / PR comments; high-risk product / business / visual / payment / formal output / AI API scope.
+
+ACTIVE_ISSUE_OR_PR:
+All active ledger rows and active cadre automations, inspected only for governance / patrol-health failures.
+
+MUST_REPORT:
+finding type, lag status, complexity, evidence, suggested routing, suggested Executive action, suggested Deputy2 action, suggested Deputy action, Need Deputy / Commander / Reviewer.
+
+ESCALATE_TO:
+Executive Officer for LOW/MEDIUM visible ACK or owner chase gaps; Deputy Codex-2 for LOW/MEDIUM workflow repair gaps; Deputy Codex for HIGH/CRITICAL or final-gate governance decisions.
+
+CAN_COMMIT:
+No by default.
+
+CAN_PUSH:
+No by default.
+
+CAN_OPEN_PR:
+No.
+
+CAN_MERGE:
+No.
+
+COMMANDER_STYLE_PROMPT_REQUIREMENT:
+Governance Patrol automation prompts must be written as patrol-health inspection instructions. The prompt must name `docs/WORKSTREAM_BLACKBOARD.md` plus `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md` as the battlefield, require STATE_RECONCILIATION before CADRE_ACCOUNTABILITY_AUDIT before PROMPT_RULE_AUDIT, and report `ACTIVE_HANDLER_SILENT`, `CADRE_RULE_FAIL`, `PROMPT_RULE_GAP`, or `NO_NEW_GOVERNANCE_FINDING` with checked sources.
+
+PROMPT_RULE_OBLIGATION:
+Governance Patrol must verify that active cadre automations have battlefield, operating model, visible-ACK rule, forbidden passive `NO_NEW_*` behavior on active rows, and publication-duty language. Missing or unreadable automation settings are `PROMPT_RULE_GAP` and must be routed to Deputy Codex / Executive with exact evidence.
 
 ## Reviewer
 

@@ -4330,3 +4330,34 @@ No
 
 Need Reviewer:
 No
+
+### 2026-05-25 - Executive / Triage / Governance patrol prompts hardened
+
+Workstream:
+governance / cadre automation prompts
+
+Status:
+CADRE_AUTOMATION_PROMPTS_CORRECTED / GOVERNANCE_PATROL_RESTORED
+
+Changed:
+- Commander compared the commander patrol prompt against Executive Officer and Triage Officer prompts and found the same structural gap: the prompts described role boundaries but did not fully enforce battlefield, operating sequence, visible ACK recovery, route ownership, and publication duties.
+- Local automation inspection found Governance Patrol automation ID `20` exists, but its prompt was unreadable / not practically usable as a commander-style patrol setting.
+- Updated Executive Officer heartbeat `laibe-mvp-executor-patrol` to a visible follow-up execution patrol: battlefield is `DELIVERY_LEDGER.md` plus `EXECUTIVE_PATROL_INBOX.md`; it must run STATE_RECONCILIATION then VISIBLE_ACK_RECOVERY and cannot report `NO_NEW_EXECUTIVE_ACTION` while active handlers lack visible ACK.
+- Updated Triage Officer heartbeat `laibe-triage-officer-heartbeat` to routing recovery patrol: battlefield is `TRIAGE_QUEUE.md` plus `DELIVERY_LEDGER.md`; it must run STATE_RECONCILIATION, LAG_CLASSIFICATION, then ROUTING_RECOVERY and may not route against the ledger.
+- Rewrote Governance Patrol heartbeat ID `20` as `laibe-governance-patrol-20min`: battlefield is `WORKSTREAM_BLACKBOARD.md` plus `CHATROOM_ROLE_PARAMETERS.md`; it must audit cadre accountability and prompt-rule gaps, including `ACTIVE_HANDLER_SILENT`, `CADRE_RULE_FAIL`, and `PROMPT_RULE_GAP`.
+- Added Executive Officer, Triage Officer, and Governance Patrol commander-style prompt requirements to `CHATROOM_ROLE_PARAMETERS.md`.
+
+Decision:
+- Executive Officer owns visible ACK recovery, not passive status summaries.
+- Triage Officer owns executable routing from the latest ledger, not stale fallback routing.
+- Governance Patrol exists and must inspect patrol health / prompt-rule gaps, but remains read-only by default unless Deputy / Commander explicitly authorizes docs-only publication.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No
