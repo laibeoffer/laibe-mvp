@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T16:25:23Z - [PR25_REVIEW_RESULT_STILL_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / CODEX_REVIEW_REQUESTED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `a9524b3e2aa495523bae7553f343ae079c272e37`. PR #25 head remains `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`; `refs/pull/25/merge` remains `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`; `git merge-tree --write-tree origin/main refs/patrol/hb1625/pr25` exits `0`; `git diff --check origin/main..refs/patrol/hb1625/pr25` exits `0`. Public PR page still shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` and `@codex review`, but no post-`e4e9e90` `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, or `P2` result is visible. PR #22 / #23 / #26 also remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Issue a single-primary `To: Plan Puzzle Builder` visible ACK request. Required labels: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists. Do not post duplicate GitHub comments unless a new blocker or branch-head change appears.
+
+Recommended Deputy Action:
+Hold PR #25 final-gate decision until post-`e4e9e90` Codex result is visible, or explicitly accept the sync-only branch-head change without re-review. PR #23 remains a separate final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
 ### 2026-05-25T16:02:17Z - [PR25_REVIEW_PENDING_AFTER_SYNC] - Plan Puzzle
 
 Status:
