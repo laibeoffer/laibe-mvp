@@ -1,21 +1,21 @@
 # Image API Request Schema
 
-本文件定義未來 Image Generation API Integration Spike 可使用的 request schema。
+本文件定義未來 Image Generation API spike 的 request / response contract。此 contract 只用於 spike / proof of concept，不代表 production API 已建立。
 
-本 schema 只供 spike / proof of concept 使用，不代表 production API contract 已凍結。
+本文件不提供 API key，不要求建立 backend，不允許前端直連 image generation provider。
 
 ## styleVisualApiRequest
 
+未來若進入 server-side proxy spike，前端只能傳入下列白名單欄位：
+
 ```js
 styleVisualApiRequest = {
-  projectId,
   roomType,
   primaryStyle,
   secondaryStyle,
   colorTone,
   materialTone,
   budgetLevel,
-  avoid,
   purpose: "bid-listing-style-reference",
   disclaimerRequired: true,
   referenceImage: {
@@ -27,55 +27,76 @@ styleVisualApiRequest = {
 
 ## 欄位說明
 
-- `projectId`：spike 用 project identifier，不得包含地址、姓名、電話或其他個資。
-- `roomType`：空間類型，例如客廳、臥室、廚房。
-- `primaryStyle`：主要風格，例如奶油風。
-- `secondaryStyle`：次要風格，例如古典風。
-- `colorTone`：色調，例如米白暖色。
-- `materialTone`：材質語彙，例如大理石 + 溫潤木質。
-- `budgetLevel`：預算感，例如中高階。不得被解讀為正式報價或預算承諾。
-- `avoid`：需要避免的元素，例如過度豪宅化、暗色壓迫感、真實品牌 logo。
-- `purpose`：固定為 `bid-listing-style-reference`。
-- `disclaimerRequired`：必須為 `true`，不得由使用者覆寫。
-- `referenceImage.allowed`：本階段固定為 `false`。
+- `roomType`: 空間類型，例如「客廳」、「臥室」、「廚房」。
+- `primaryStyle`: 主要風格，例如「奶油風」。
+- `secondaryStyle`: 次要風格，例如「古典風」。
+- `colorTone`: 色調，例如「米白暖色」。
+- `materialTone`: 材質氛圍，例如「大理石 + 溫潤木質」。
+- `budgetLevel`: 預算感，只能用於視覺質感參考，不得轉成正式價格或報價承諾。
+- `purpose`: 必須固定為 `bid-listing-style-reference`。
+- `disclaimerRequired`: 必須固定為 `true`。
+- `referenceImage.allowed`: 必須固定為 `false`，直到通過獨立 privacy review。
 
-## 白名單欄位規則
+## 禁止欄位
 
-- Request schema 只能由白名單欄位組成。
-- 不允許任意新增自由文字欄位。
-- 不允許使用者傳入 `systemPrompt`、`developerPrompt`、`rawPrompt`、`negativeSystemPrompt` 或類似欄位。
-- 不允許使用者覆寫 `purpose` 或 `disclaimerRequired`。
-- 不允許使用者覆寫 disclaimer 文字。
+`styleVisualApiRequest` 不得包含：
 
-## 禁止傳入 Image API 的資料
-
-以下資料不得傳入 image generation API：
-
+- `rawPrompt`
+- `systemPrompt`
+- `developerPrompt`
+- `negativeSystemPrompt`
+- `projectId`，除非未來另有正式 privacy / storage review
+- `avoid`，若需要排除項，應由系統 negative prompt template 產生，不進 API request contract
 - `walls`
 - `openings`
 - `zones`
 - `scale`
 - `plancraftBridge`
 - Plancraft `.pc` 或 bridge converter payload
-- 正式預算資料
-- 正式報價資料
-- 使用者個資
-- 地址、電話、門牌、社區名稱等可識別位置資訊
+- BudgetEstimate、PricingRule、MaterialSpec、LaborRule 或正式預算資料
+- reference image file
+- 使用者上傳的私人住宅照片、圖面或現場圖
 
 ## Prompt 組裝規則
 
-- Prompt 必須由系統 template 組裝。
-- 使用者欄位值只能填入 template 的指定位置。
-- 系統必須保留「風格示意、案件上架與溝通參考」語氣。
-- 系統必須避免將 `budgetLevel` 轉成正式價格、材料等級承諾或施工範圍承諾。
+- API request 不得攜帶 raw prompt。
+- Prompt 必須由 server-side 或受控系統 template 組裝。
+- 使用者不得覆寫 disclaimer、purpose 或 safety metadata。
+- `budgetLevel` 只能描述「視覺質感」，不得被解讀成價格等級、工程預算或報價承諾。
+- reference image upload 仍維持 disabled。
+
+## styleVisualApiResponse
+
+Spike response 只能使用下列 shape：
+
+```js
+styleVisualApiResponse = {
+  status: "disabled" | "mock_ready" | "error",
+  imageUrl: null,
+  previewDataUrl: null,
+  message,
+  metadata: {
+    generatedBy: "LAIBE_VISUAL_SIM",
+    usage: "bid-listing-style-reference",
+    sandbox: true,
+    isOfficialDesign: false,
+    isConstructionDrawing: false,
+    isQuotationBasis: false,
+    isRealCase: false,
+    savedToOfficialCase: false
+  }
+}
+```
+
+若沒有安全 server-side proxy，`status` 必須是 `disabled` 或 local `mock_ready`，不得假裝已接 production API。
 
 ## Schema Gate
 
-進入 API spike 前，Builder 必須先確認：
+任何 Builder 或 Reviewer 進入 image API spike 前，必須確認：
 
-- 所有欄位都有長度限制。
-- 所有欄位都經過 prompt sanitization。
-- `referenceImage.allowed` 仍為 `false`。
-- `disclaimerRequired` 仍為 `true`。
-- request 不包含 Plancraft geometry。
-
+- Request 只含白名單欄位。
+- `referenceImage.allowed === false`。
+- `disclaimerRequired === true`。
+- 沒有 Plancraft geometry。
+- 沒有正式案件資料、正式預算資料或 production asset 指標。
+- 沒有 API key、secret、token 或 credential 進入 frontend、Markdown、handoff 或 console。

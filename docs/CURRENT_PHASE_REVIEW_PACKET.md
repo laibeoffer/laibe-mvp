@@ -16,6 +16,7 @@ Draft / Ready for user-triggered review / Reviewed / Needs update before review
 本文件已包含 AI_ARCHITECT_CORE 治理規則層成果。  
 本次追加整理 LAIBE_WEB_FLOW_BUILDER 聊天室負責範圍：landing、onboarding、header、CTA、routing、progress bar、dashboard flow、頁面連接。
 本次追加整理 LAIBE_VISUAL_SIM 聊天室負責範圍：模擬圖、示意圖、圖片 prompt、visual brief、asset spec、對應網站位置、不可宣稱事項。
+本次追加整理 LAIBE_VISUAL_SIM Issue #19 成果：visual brief / prompt / negative prompt / sandbox governance packet、storage policy、reference image policy 與 reviewer packet 邊界。
 
 補充說明：本檔已在後續區段加入本聊天室負責的 budget-system / specDB / method-spec / budget output / estimate / quote / material / labor data，以及 plan-puzzle input adapter 銜接成果。
 
@@ -50,6 +51,54 @@ AI / Codex 中央治理規則層、Web Flow 靜態連接、Budget / specDB / Met
 ## Phase Goal
 
 建立萊比專案的 AI / Codex 中央治理規則層，整理 Web Flow 靜態頁面連接成果，並補齊 budget-system 從 deterministic mock engine、preview floor plan adapter、local warehouse、method-spec warehouse、budget output logistics、snapshot contract 到 renderer gate 的階段性資料契約，讓 LAIBE_REVIEWER 可對治理規則、頁面流程邊界與預算資料層一致性進行階段總審查。
+
+---
+
+## LAIBE_VISUAL_SIM Issue #19 成果
+
+### 完成事項
+
+- 建立 `docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`，集中定義 visual brief、prompt preview、negative prompt、sandbox preview workflow、placeholder visual card、Builder 整合邊界與 Reviewer 審查重點。
+- 修正並收斂 `PROMPT_SANITIZATION_RULES.md`，明確規定 prompt 必須由系統 template 組裝，不得直接使用 raw user prompt。
+- 修正並收斂 `IMAGE_API_REQUEST_SCHEMA.md`，統一 `styleVisualApiRequest` 白名單欄位，並禁止 `rawPrompt`、`systemPrompt`、`developerPrompt`、Plancraft geometry、正式預算資料與 reference image file。
+- 修正並收斂 `GENERATED_IMAGE_STORAGE_POLICY.md`，明確 generated preview 只能是 sandbox / mock / temporary preview，不得寫入正式案件資料或 production assets。
+- 修正並收斂 `IMAGE_API_SPIKE_REVIEW_CHECKLIST.md`，補齊 API key / secret、request schema、prompt sanitization、reference image、generated preview、Plancraft geometry contamination 與 handoff 檢查項目。
+- 更新 `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`，加入 sandbox governance 必讀文件與禁止事項。
+- 更新 `skills/laibe-visual-sim/SKILL.md`，修復固定輸出格式亂碼並補上 sandbox governance guardrail。
+
+### 產出素材 / Prompt
+
+- 產出的是治理文件、prompt 規則、negative prompt 規則、visual brief 欄位規格與 reviewer checklist。
+- 未產出真圖片。
+- 未呼叫 image generation API。
+- 未建立 API key、`.env`、backend、proxy、upload pipeline 或 production storage。
+
+### 對應網站位置
+
+- 對應未來 Visual Simulation Panel、Prompt Preview、Placeholder Visual Card 與 sandbox preview UI 的文案 / 資料規格。
+- 本輪未修改任何網站 runtime 檔案，未修改 `plan-puzzle.js`、routing、CTA 或 Header。
+
+### 不可宣稱事項
+
+Visual simulation 只能作為案件上架與風格溝通輔助，不得宣稱為：
+
+- 施工圖。
+- 正式設計圖。
+- 真實案例。
+- 竣工圖。
+- 精準尺寸圖。
+- 正式報價依據。
+- 完工保證。
+
+### 已知風險
+
+- 真 image API、reference image upload、production asset storage、正式圖片用途或 server runtime 都尚未開放。
+- 若未來進入真 API / server runtime，需另開 formal Issue，且 API key 不得進 frontend、repo、Markdown、handoff 或 console。
+- Reference image upload 仍需獨立 privacy review。
+
+### 是否 ready for phase review
+
+Ready for user-triggered review。此狀態不代表自動啟動 LAIBE_REVIEWER。
 
 ---
 
