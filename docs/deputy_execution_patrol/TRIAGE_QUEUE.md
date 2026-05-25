@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:31:12Z - [PR25_CODEX_P2_BLOCKED] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Latest main is `fca20e853bb1a846ed63379a4cd290439aa56a60`. PR #25 head advanced to `48910be809922fac58b1c89d78cf81b5d7c61210`; current-main merge-tree exits `0`, but Codex review comments at `2026-05-25T13:22:45Z` and `2026-05-25T13:23:13Z` report P2 findings on `areaUpdatedAt` stability and invalid closed polygon preservation.
+
+Recommended Executive Action:
+Chase Plan Puzzle Builder for a single visible `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`. Require scoped P2 fixes, validation rerun, and Codex re-review before PR #25 returns to Deputy final gate.
+
+Recommended Deputy Action:
+Do not merge / reject / close. Keep PR #25 out of final gate until P2 is fixed and re-reviewed clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until Codex P2 is fixed and re-reviewed clean.
+
 ### 2026-05-25T13:04:41Z - [PR23_POST_PUBLISH_SYNC_BLOCKED] - Output Documents
 
 Status:

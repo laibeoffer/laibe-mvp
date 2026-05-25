@@ -1343,6 +1343,36 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T13:31:12Z - PR25 Codex P2 blocker and automation lifecycle guard audit
+
+- Workstream: command/deputy / plancraft/page-ui / automation-governance
+- Branch: `origin/main` `fca20e853bb1a846ed63379a4cd290439aa56a60`
+- Status: `PR25_CODEX_P2_BLOCKED / AUTOMATION_SELF_DELETE_GUARD_REQUIRED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Evidence:
+  - GitHub open PRs: #22, #23, #25, #26. Open Issues: #15, #16, #17, #18.
+  - Latest main: `fca20e853bb1a846ed63379a4cd290439aa56a60`.
+  - PR #25 head advanced to `48910be809922fac58b1c89d78cf81b5d7c61210`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1331/pr25` exits `0`, but Codex review comments at `2026-05-25T13:22:45Z` / `2026-05-25T13:23:13Z` added P2 findings on `areaUpdatedAt` stability and invalid closed polygon preservation.
+  - PR #23 head remains `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `git merge-tree --write-tree origin/main refs/patrol/hb1331/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+  - PR #22 and PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Plan Puzzle Builder
+  - Workstream: plancraft/page-ui / plancraft/adapter-clean
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: Fix only the new Codex P2 findings on PR #25 and request re-review.
+  - Why this agent: Plan Puzzle Builder owns Issue #15 / PR #25 and the P2 findings are in `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - Action: Preserve Issue #15 scope, keep `areaUpdatedAt` stable when boundary / area metadata is unchanged, preserve invalid closed polygon geometry, rerun `node --check`, `git diff --check`, merge-tree against latest main, and guard checks; publish `PLAN_PUZZLE_ACTION_TAKEN`; request Codex re-review.
+  - Need Commander: No
+  - Need Reviewer: Yes until P2 is fixed and re-reviewed clean.
+- Automation lifecycle:
+  - Treat any workstream heartbeat self-deletion as `AUTOMATION_SELF_DELETE_VIOLATION`.
+  - No workstream should delete, pause, disable, rename, replace, or modify its own automation when it is waiting for next scoped task.
+  - If a heartbeat appears obsolete, the workstream must report `AUTOMATION_LIFECYCLE_REVIEW_NEEDED` and continue reporting `NO_NEW_EVIDENCE_AFTER_CHECK`; lifecycle decisions stay with Commander / Deputy Codex commander thread.
+- Need Commander: No
+- Need Reviewer: Yes for PR #25 Codex P2.
+
 ### 2026-05-25T13:04:41Z - Executive post-push PR23 sync blocker on `999a323`
 
 Workstream:
