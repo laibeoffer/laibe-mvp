@@ -166,38 +166,51 @@ export const buildFormalArtifactFilename = (
   return `${parts.join("-")}.${getFormalArtifactExtension(format)}`;
 };
 
-export const inferFormalArtifactFormat = (
-  output: Pick<FormalRenderedSkeletonOutput, "renderer" | "format">,
-): FormalArtifactFormat => {
-  const rendererFormat =
-    output.renderer === "formal_excel_skeleton"
-      ? "excel"
-      : output.renderer === "formal_pdf_skeleton"
-        ? "pdf"
-        : null;
-
-  const declaredFormat =
-    output.format === "excel_skeleton"
-      ? "excel"
-      : output.format === "pdf_skeleton"
-        ? "pdf"
-        : null;
-
-  if (!rendererFormat || !declaredFormat) {
-    throw new Error("Unknown formal renderer output format.");
-  }
-
-  if (rendererFormat !== declaredFormat) {
-    throw new Error(
-      `Formal renderer output mismatch: renderer ${output.renderer} does not match format ${output.format}.`,
-    );
-  }
-
-  if (rendererFormat === "excel") {
+const formatFromRenderer = (
+  renderer: FormalRenderedSkeletonOutput["renderer"],
+): FormalArtifactFormat | null => {
+  if (renderer === "formal_excel_skeleton") {
     return "excel";
   }
 
-  return "pdf";
+  if (renderer === "formal_pdf_skeleton") {
+    return "pdf";
+  }
+
+  return null;
+};
+
+const formatFromSkeletonFormat = (
+  format: FormalRenderedSkeletonOutput["format"],
+): FormalArtifactFormat | null => {
+  if (format === "excel_skeleton") {
+    return "excel";
+  }
+
+  if (format === "pdf_skeleton") {
+    return "pdf";
+  }
+
+  return null;
+};
+
+export const inferFormalArtifactFormat = (
+  output: Pick<FormalRenderedSkeletonOutput, "renderer" | "format">,
+): FormalArtifactFormat => {
+  const rendererFormat = formatFromRenderer(output.renderer);
+  const skeletonFormat = formatFromSkeletonFormat(output.format);
+
+  if (!rendererFormat || !skeletonFormat) {
+    throw new Error("Unknown formal renderer output format.");
+  }
+
+  if (rendererFormat !== skeletonFormat) {
+    throw new Error(
+      `Formal renderer / format mismatch: ${output.renderer} cannot produce ${output.format}.`,
+    );
+  }
+
+  return rendererFormat;
 };
 
 export const storageTargetIsAllowed = (

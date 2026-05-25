@@ -1343,7 +1343,7 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
-### 2026-05-25 - output/budget-documents PR #23 P2 fail-closed fix
+### 2026-05-25 - output/budget-documents PR #23 P2 fix
 
 Workstream:
 output/budget-documents
@@ -1355,7 +1355,7 @@ Active Issue:
 Issue #18
 
 Status:
-PR #23 Codex P2 fix implemented. `inferFormalArtifactFormat()` now requires formal renderer output `renderer` and `format` to agree; mismatched gated documents fail closed and preflight returns invalid instead of inferring the wrong artifact format.
+PR #23 Codex P2 fix completed. Renderer / format mismatches now fail closed before artifact policy inference can proceed.
 
 Table Compliance:
 TABLE_COMPLIANCE_PASS
@@ -1369,9 +1369,10 @@ None. Active formal task is PR #23 P2 repair.
 Changed:
 - Re-synced latest `origin/main` into PR #23 branch.
 - Resolved `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving latest main patrol entries.
-- Fixed renderer / format mismatch handling in `src/lib/budget/renderers/formal-file-writer-policy.ts`.
-- Updated writer preflight so mismatch inference does not fall back to renderer-only format.
-- Added invalid fixture coverage for `renderer_format_mismatch`.
+- Updated `inferFormalArtifactFormat()` so `renderer` and `format` must agree.
+- Updated file writer preflight no-throw wrapper so mismatched gated documents return `format_matches_output: false` instead of falling back to renderer-only inference.
+- Added focused invalid fixture case `renderer_format_mismatch`.
+- Preserved snapshot-only boundaries: no real `.xlsx` / `.pdf`, no budget engine rerun, no pricing rules, no material resolver, no raw warehouse, no MethodSpec, no plan-puzzle, no payment, no RAG, and no AI API.
 - Reran renderer static guard, renderer syntax checks, fixture smoke, and mismatch smoke.
 
 Files:
@@ -1385,16 +1386,16 @@ PR / Commit:
 - Commit: current PR #23 branch update
 
 Blocked:
-None after local checks. Awaiting Codex re-review after push.
+None after local validation and push.
 
 Next:
-Push PR #23 update and request `@codex review`.
+Request Codex re-review on PR #23 and wait for the P2 thread to be rechecked.
 
 Need Commander:
 No
 
 Need Reviewer:
-Yes until Codex P2 is fixed and re-reviewed cleanly.
+Yes until Codex P2 is re-reviewed clean.
 
 ### 2026-05-25 - Deputy Codex-2 overdue decision gate
 
