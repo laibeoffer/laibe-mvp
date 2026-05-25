@@ -4460,3 +4460,34 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+### 2026-05-25 - Commander patrol API fallback and Deputy2 silence check on `829ef3e`
+
+Workstream:
+command/deputy / Deputy Codex-2 repair lanes
+
+Status:
+API_LIMIT_FALLBACK / ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2
+
+Changed:
+- Fast-forwarded patrol worktree to latest `origin/main` `829ef3ecf876`.
+- GitHub REST returned 403 during PR comment / metadata checks, so this patrol used `git ls-remote`, fetched PR heads, `origin/main`, blackboard, delivery ledger, triage queue, and Executive inbox as fallback sources.
+- PR #23 head remains `a75e3802a30f`; local merge-tree against current main exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a`; local merge-tree against current main exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- No new Deputy Codex-2 visible repair ACK was found in blackboard / ledger / Executive inbox after the prior Executive follow-up.
+
+Decision:
+- No new Commander decision is needed this cycle.
+- Keep PR #23 and PR #25 assigned to Deputy Codex-2 workflow repair.
+- Deputy Codex-2 still owes `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked and latest main / branch SHA.
+- Executive Officer should avoid duplicate Builder chase and keep the visible ACK chase pointed at Deputy Codex-2 while the ledger names Deputy Codex-2 as Current Handler.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
