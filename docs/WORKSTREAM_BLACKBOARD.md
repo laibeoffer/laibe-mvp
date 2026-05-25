@@ -4165,3 +4165,38 @@ PR / Commit:
 
 Next:
 - Establish blackboard reporting discipline before starting next build task.
+
+### 2026-05-25 - Second Deputy PR #26 validation refresh found on current main `f960cfd`
+
+Workstream:
+Second Deputy Codex / Raw Candidate / Active PR patrol
+
+Status:
+PR_26_VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_CANDIDATE
+
+Changed:
+- Re-read latest `origin/main` at `f960cfda01beca5d3d61d8065094bba8a95b48df` and GitHub PR / Issue comments for PR #22 / #23 / #25 / #26 plus Issue #15 / #17.
+- PR #26 received current-main validation evidence in comment `4532187707` after Executive call-out `4531941371`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/26/head` exits `0` and produced tree `7650c6a3cd615004fa0244c0780312cb6104b935`.
+- The PR #26 evidence refresh reports R1.5 validation reruns, raw warehouse static guard pass, candidate-only safety preserved, and forbidden formal-pricing checks negative: no formal price, no `PricingRule`, no formal `MaterialSpec` / `LaborRule`, no `BudgetEstimateLine.unit_price`, no renderer / Excel / PDF / `BudgetOutputSnapshot`, no floor-plan / frontend / Supabase/API/migration / RAG / AI API / payment / escrow / listing fee.
+- PR #22 still passes current-main merge-tree locally and remains a Deputy final-gate candidate.
+- PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 still has no merge ref and local merge-tree refuses unrelated histories.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- LOW / MEDIUM workflow decision: accept PR #26 comment `4532187707` as the missing validation-refresh artifact for the current patrol.
+- Stop ordinary Executive chase for PR #26 unless the branch head changes, validation evidence is contradicted, or a new Codex review reports NEEDS_FIX / P1 / P2.
+- Route PR #26 back to Deputy Codex final merge / reject gate consideration; Deputy Codex still owns final merge / reject.
+- Keep PR #23 and PR #25 in Deputy Codex-2 workflow repair lanes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a new Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.

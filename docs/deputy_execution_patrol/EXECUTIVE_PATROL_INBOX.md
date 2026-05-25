@@ -37,6 +37,45 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T06:52:30Z - [PR26_VALIDATION_REFRESH_FOUND] - Raw Candidate
+
+Status:
+DEPUTY_DECISION_MADE
+
+Executive Officer:
+SECOND_DEPUTY_CODEX
+
+Workstream:
+Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #17 / PR #26
+
+Finding:
+The previously missing PR #26 current-main validation refresh has now been posted. This resolves the ordinary evidence-refresh chase for PR #26 and routes the PR back to Deputy Codex final-gate consideration.
+
+Evidence:
+- Current main: `f960cfda01beca5d3d61d8065094bba8a95b48df`.
+- PR #26 head: `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- PR #26 comment `4532187707` reports `git merge-tree --write-tree origin/main HEAD` exit `0` with tree `7650c6a3cd615004fa0244c0780312cb6104b935`.
+- PR #26 comment `4532187707` reports R1.5 validation reruns and forbidden formal-pricing checks passed.
+- Second Deputy local patrol confirms `git merge-tree --write-tree origin/main refs/remotes/origin/pr/26/head` exits `0`.
+
+Action already taken:
+Second Deputy updated the blackboard, delivery ledger, triage queue, and this inbox to stop duplicate ordinary PR #26 chase and route the refreshed evidence to Deputy Codex.
+
+Recommended Deputy action:
+Consider PR #26 at final merge / reject gate. Do not treat Raw Candidate as stalled unless the branch head changes, validation evidence is contradicted, or a new Codex review reports NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2, formal-price risk appears, or scope drifts.
+
+Deputy Decision:
+PR26_VALIDATION_REFRESH_ACCEPTED_FOR_DEPUTY_GATE
+
 ### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
 
 Status:

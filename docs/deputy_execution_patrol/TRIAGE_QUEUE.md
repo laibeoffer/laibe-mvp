@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T06:52:30Z - [PR26_VALIDATION_REFRESH_FOUND] - Raw Candidate
+
+Status:
+NEEDS_DEPUTY_DECISION_RESOLVED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #26 / Issue #17
+
+Evidence:
+Latest main is `f960cfda01beca5d3d61d8065094bba8a95b48df`. PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. PR comment `4532187707` supplies the missing current-main evidence refresh: local merge-tree against current main exits `0` with tree `7650c6a3cd615004fa0244c0780312cb6104b935`, R1.5 validation reruns passed, raw warehouse static guard passed, and forbidden formal-pricing checks remain negative. Second Deputy local patrol also confirms current-main merge-tree exits `0`.
+
+Recommended Executive Action:
+Do not post duplicate ordinary chase comments for PR #26 unless the branch head changes, validation evidence is contradicted, or a new Codex review reports NEEDS_FIX / P1 / P2.
+
+Recommended Deputy Action:
+Decision made by Deputy Codex-2: accept PR #26 validation-refresh evidence as found and route PR #26 back to Deputy Codex final merge / reject gate consideration. Deputy Codex retains final gate authority.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T06:44:24Z - [DEPUTY_SIGNAL_DECISION_PUBLISHED] - MethodSpec / Raw Candidate
 
 Status:
