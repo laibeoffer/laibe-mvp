@@ -1345,11 +1345,33 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T21:00:00Z - PR23 follow-up Codex P2 after `f2668e2`
+
+- Workstream: executive-officer / output-budget-documents
+- Branch: `origin/main` `23cb3572227076e0216b8e757a70c247fd266c89`; PR #23 `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`
+- Status: `CODEX_P2_FOUND_AFTER_ACTION_TAKEN / REVIEW_GATE_BLOCKED / VISIBLE_ACK_RECOVERY / BUILDER_ACK_REQUIRED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Rechecked mandatory governance docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub MCP PR comments and PR #23 review threads, GitHub REST PR metadata, fetched PR refs, local merge-tree, and diff-check.
+  - Output Documents Builder posted `ACTION_TAKEN` comment `4537194620` for the prior PR #23 P2 and advanced PR #23 to `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`.
+  - PR #23 remains current-main merge-tree clean against `23cb357`: `git merge-tree --write-tree origin/main refs/patrol/hb2100/pr23` exits `0` with tree `666a5611331bfef325a8fcb0970e1013b6a22deb`; `git diff --check` exits `0`.
+  - GitHub MCP found post-`f2668e2` Codex review `4358750718` at `2026-05-25T21:02:05Z` with unresolved, not-outdated P2 thread `PRRT_kwDORlw1t86EoBgM` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` lines 20-21: `Guard non-array warnings before mapping`.
+  - PR #22 / #25 / #26 also pass current-main merge-tree and diff-check against `23cb357`: trees `d3641953e5435aa817ec4371ae49681fa296b9c4`, `62f345cb24282ce6138f7f43720259a1eee19a01`, and `0f39b9eee9df4c529b432636e634cfe776caa8eb`.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: PR #23 `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Fix the new Codex P2 and request Codex re-review; PR #23 is not final-gate clean while this P2 is open.
+  - Why this agent: Output Documents Builder owns Issue #18 / PR #23 renderer snapshot-only repair scope; this is new review evidence after the prior `ACTION_TAKEN`.
+  - Action: Executive posted PR comment `4537214455` requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Repair must add a non-array guard before `sanitizeCustomerWarnings()` calls `.map()`, or fail closed upstream before direct sanitizer invocation can throw, while preserving snapshot-only/no real Excel/PDF/no pricing/no raw/frontend/payment/API/secrets boundaries. Rerun renderer static guard, renderer syntax checks, focused non-array warning smoke or fixture, real `.xlsx/.pdf` diff check, and `git diff --check`, then request Codex re-review.
+  - Need Commander: No
+  - Need Reviewer: Yes until the P2 is fixed and Codex re-review is clean.
+
 ### 2026-05-25T20:41:28Z - PR23 Codex P2 found after final sync
 
 - Workstream: executive-officer / output-budget-documents
 - Branch: `origin/main` `326db8a39c7e4b2b95ee119c85b07fca376a0301`; PR #23 `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`
-- Status: `CODEX_P2_FOUND / REVIEW_GATE_BLOCKED / VISIBLE_ACK_RECOVERY / BUILDER_ACK_REQUIRED`
+- Status: `SUPERSEDED_BY_2026-05-25T21:00:00Z_FOLLOWUP_P2 / CODEX_P2_FOUND / REVIEW_GATE_BLOCKED / BUILDER_ACTION_FOUND`
 - Changed: patrol docs only; no source files changed.
 - Evidence:
   - Rechecked mandatory governance docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub MCP PR comments and review threads, fetched PR refs, local merge-tree, and diff-check.
@@ -1362,7 +1384,7 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Branch / Repo: PR #23 `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
   - Mission: Fix the new Codex P2 and request Codex re-review; PR #23 is not final-gate clean while this P2 is open.
   - Why this agent: Output Documents Builder owns Issue #18 / PR #23 renderer snapshot-only repair scope; this is new review evidence after the final-sync window.
-  - Action: Executive posted PR comment `4537133554` requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Repair must handle non-string `warnings` before `sanitizeCustomerWarnings()` calls string methods, or fail closed upstream, while preserving snapshot-only/no real Excel/PDF/no pricing/no raw/frontend/payment/API/secrets boundaries. Rerun renderer static guard, renderer syntax checks, focused malformed-warning smoke or fixture, real `.xlsx/.pdf` diff check, and `git diff --check`, then request Codex re-review.
+  - Action: Executive posted PR comment `4537133554` requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Builder later posted `ACTION_TAKEN` comment `4537194620`, then Codex opened new review `4358750718`; see the `2026-05-25T21:00:00Z` update log entry for the active P2.
   - Need Commander: No
   - Need Reviewer: Yes until the P2 is fixed and Codex re-review is clean.
 

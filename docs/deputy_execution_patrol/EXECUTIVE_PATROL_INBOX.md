@@ -37,10 +37,53 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T21:00:00Z - [PR23_FOLLOWUP_CODEX_P2_AFTER_F2668E2] - Output Documents
+
+Status:
+EXECUTIVE_ACTION_REQUEST / CODEX_P2_FOUND_AFTER_ACTION_TAKEN / REVIEW_GATE_BLOCKED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+Output Documents / PR #23
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+Output Documents Builder posted `ACTION_TAKEN` for the previous PR #23 P2 and advanced the branch to `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`, but GitHub MCP found a new post-fix Codex P2 at `2026-05-25T21:02:05Z`.
+
+Evidence:
+- Latest `origin/main`: `23cb3572227076e0216b8e757a70c247fd266c89`.
+- PR #23 head: `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`.
+- Builder prior-P2 `ACTION_TAKEN`: PR comment `4537194620`, with renderer static guard / syntax / malformed-warning smoke / diff-check / real `.xlsx` and `.pdf` diff checks reported pass.
+- PR #23 current-main merge-tree exits `0` with tree `666a5611331bfef325a8fcb0970e1013b6a22deb`; diff-check exits `0`.
+- Codex review `4358750718` / thread `PRRT_kwDORlw1t86EoBgM` is unresolved and not outdated on `src/lib/budget/renderers/customer-warning-sanitizer.ts` lines 20-21: `Guard non-array warnings before mapping`.
+- PR #22 / PR #25 / PR #26 remain current-main merge-tree and diff-check clean against `23cb357`.
+
+Action already taken:
+Posted a single-primary PR #23 follow-up comment `4537214455` to Output Documents Builder requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Updated blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Hold PR #23 out of final-gate routing until this new P2 is fixed and Codex re-review is clean. PR #22 / PR #25 / PR #26 can remain Deputy final-gate visibility candidates unless new branch, validation, review, or scope evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T20:41:28Z - [PR23_CODEX_P2_AFTER_FINAL_SYNC] - Output Documents
 
 Status:
-EXECUTIVE_ACTION_REQUEST / CODEX_P2_FOUND / REVIEW_GATE_BLOCKED
+SUPERSEDED_BY_2026-05-25T21:00:00Z_FOLLOWUP_P2 / EXECUTIVE_ACTION_REQUEST / CODEX_P2_FOUND / REVIEW_GATE_BLOCKED
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -65,7 +108,7 @@ Evidence:
 - PR #22 / PR #25 / PR #26 remain current-main merge-tree and diff-check clean against `326db8a`.
 
 Action already taken:
-Posted a single-primary PR #23 follow-up comment `4537133554` to Output Documents Builder requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Updated blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+Posted a single-primary PR #23 follow-up comment `4537133554` to Output Documents Builder requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Builder later posted `ACTION_TAKEN` comment `4537194620`, which was followed by new Codex P2 review `4358750718`; see the `2026-05-25T21:00:00Z` inbox entry. No merge / reject / close action was executed.
 
 Recommended Deputy action:
 Hold PR #23 out of final-gate routing until the P2 is fixed and Codex re-review is clean. PR #22 / PR #25 / PR #26 can remain Deputy final-gate visibility candidates unless new branch, validation, review, or scope evidence appears.

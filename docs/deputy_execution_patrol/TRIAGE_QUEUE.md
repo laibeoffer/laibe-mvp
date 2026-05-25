@@ -36,7 +36,7 @@ Need Reviewer:
 
 ## Open Triage Items
 
-### 2026-05-25T20:41:28Z - [PR23_CODEX_P2_AFTER_FINAL_SYNC] - Output Documents
+### 2026-05-25T21:00:00Z - [PR23_FOLLOWUP_CODEX_P2_AFTER_F2668E2] - Output Documents
 
 Status:
 NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / REVIEW_GATE_BLOCKED
@@ -48,7 +48,33 @@ Target:
 `laibeoffer/laibe-mvp` PR #23
 
 Evidence:
-Latest `origin/main` is `326db8a39c7e4b2b95ee119c85b07fca376a0301`. PR #23 head is `47dd4acee2302ddd3b6a7b008cb70cb667abba6d` and remains current-main merge-tree clean against `326db8a` with tree `6dca710c0206fcee0b661ab5cea39147e653cb28`; diff-check exits `0`. GitHub MCP found post-head Codex review `4358680834` at `2026-05-25T20:36:35Z` with unresolved P2 thread `PRRT_kwDORlw1t86En1Yw` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` line 14: `Handle non-string warnings before sanitizing`. Executive posted PR follow-up comment `4537133554`.
+Latest `origin/main` is `23cb3572227076e0216b8e757a70c247fd266c89`. PR #23 head is `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`; current-main merge-tree is clean with tree `666a5611331bfef325a8fcb0970e1013b6a22deb` and diff-check exits `0`. Builder posted prior-P2 `ACTION_TAKEN` comment `4537194620`, but GitHub MCP found new post-fix Codex review `4358750718` at `2026-05-25T21:02:05Z` with unresolved P2 thread `PRRT_kwDORlw1t86EoBgM` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` lines 20-21: `Guard non-array warnings before mapping`. Executive posted PR follow-up comment `4537214455`.
+
+Recommended Executive Action:
+Treat PR #23 as Output Documents Builder repair-gated, not Deputy final-gate clean. Wait for exactly one visible ACK label: `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`; chase again only if the handler remains silent in the next patrol or new evidence changes.
+
+Recommended Deputy Action:
+Hold PR #23 out of final-gate visibility until the new non-array warning P2 is fixed and Codex re-review is clean. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless new evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
+### 2026-05-25T20:41:28Z - [PR23_CODEX_P2_AFTER_FINAL_SYNC] - Output Documents
+
+Status:
+SUPERSEDED_BY_2026-05-25T21:00:00Z_FOLLOWUP_P2 / NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / REVIEW_GATE_BLOCKED
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23
+
+Evidence:
+Latest `origin/main` is `326db8a39c7e4b2b95ee119c85b07fca376a0301`. PR #23 head is `47dd4acee2302ddd3b6a7b008cb70cb667abba6d` and remains current-main merge-tree clean against `326db8a` with tree `6dca710c0206fcee0b661ab5cea39147e653cb28`; diff-check exits `0`. GitHub MCP found post-head Codex review `4358680834` at `2026-05-25T20:36:35Z` with unresolved P2 thread `PRRT_kwDORlw1t86En1Yw` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` line 14: `Handle non-string warnings before sanitizing`. Executive posted PR follow-up comment `4537133554`; Builder later posted `ACTION_TAKEN` comment `4537194620`, after which Codex opened the new P2 captured in the `2026-05-25T21:00:00Z` triage item.
 
 Recommended Executive Action:
 Treat PR #23 as Output Documents Builder repair-gated, not Deputy final-gate clean. Wait for exactly one visible ACK label: `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`; chase again only if the handler remains silent in the next patrol or new evidence changes.
