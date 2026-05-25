@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T05:06:20Z - [SYNC_BLOCKED_AFTER_MAIN_ADVANCE] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18 / `output/budget-documents`
+
+Evidence:
+PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but current `origin/main` advanced to `c4efa03d880c0784d76435dcf2f208b133a7c91b`. GitHub API reports `mergeable=false`, `mergeable_state=dirty`, and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. The existing merge ref targets the older base and is stale for current final-gate purposes.
+
+Recommended Executive Action:
+Chase Output Documents owner to re-sync PR #23 against current `origin/main`, resolve only own-scope conflicts, rerun renderer static guard / syntax / mismatch / fixture checks, and request Codex re-review if the head changes.
+
+Recommended Deputy Action:
+Withdraw PR #23 final gate until GitHub reports mergeable against current main and the post-sync review signal is clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
 ### 2026-05-25T04:44:49Z - [FINAL_GATE_READY] - Output Documents
 
 Status:

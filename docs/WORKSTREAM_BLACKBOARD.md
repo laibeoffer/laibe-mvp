@@ -1343,6 +1343,46 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - PR #23 final gate withdrawn after main advanced
+
+Workstream:
+Output Documents / Deputy Codex patrol
+
+Branch / Repo:
+`output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+
+Status:
+PR_23_FINAL_GATE_WITHDRAWN / SYNC_BLOCKED_AFTER_MAIN_ADVANCE
+
+Changed:
+- Patrol rechecked GitHub API after the previous `FINAL_GATE_READY` entry.
+- Current `origin/main` is `c4efa03d880c0784d76435dcf2f208b133a7c91b`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but GitHub API now reports `mergeable=false`, `mergeable_state=dirty`, and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- Local ref `refs/remotes/origin/pr-merge/23` still exists at `8ef304b72e6afd92e61e14274cd4611f65281398`, but that merge ref targets the older base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
+- The prior clean Codex result `4531569296` is therefore treated as stale for merge-gate purposes until PR #23 re-syncs latest main and gets a fresh mergeability / review signal.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+- To: Output Documents Builder
+- Workstream: output/budget-documents
+- Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+- Mission: Re-sync PR #23 against current `origin/main` `c4efa03`, resolve only own-scope conflicts, rerun renderer checks, and request Codex re-review if head changes.
+- Why this agent: Output Documents owns PR #23 and renderer snapshot-only recovery.
+- Action: Executive Officer should chase PR #23 re-sync; Deputy final gate is paused until GitHub reports current-main mergeability.
+- Need Commander: No
+- Need Reviewer: No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Second Deputy heartbeat post-resync review correction
 
 Workstream:

@@ -37,6 +37,44 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:06:20Z - [PR_23_FINAL_GATE_WITHDRAWN] - Output Documents
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+DEPUTY_CODEX
+
+Workstream:
+Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / Issue #18
+
+Finding:
+PR #23 was previously routed to Deputy final gate after clean Codex review, but latest main advanced after that review. GitHub API now reports the PR as dirty against current main, so final gate must pause.
+
+Evidence:
+- Current `origin/main`: `c4efa03d880c0784d76435dcf2f208b133a7c91b`.
+- PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`.
+- GitHub API: `mergeable=false`, `mergeable_state=dirty`, base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- Local `origin/pr-merge/23` exists but targets old base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
+
+Action already taken:
+Deputy Codex updated `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, and `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`.
+
+Recommended Deputy action:
+Withdraw PR #23 final gate until Output Documents re-syncs current main, reruns renderer checks, and obtains a fresh mergeability / Codex review signal if the head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Deputy Decision:
+PR_23_FINAL_GATE_WITHDRAWN / EXECUTIVE_SYNC_CHASE_REQUIRED
+
 ### 2026-05-25T04:44:49Z - [POST_RESYNC_CODEX_CLEAN_FOUND] - PR #23
 
 Status:
