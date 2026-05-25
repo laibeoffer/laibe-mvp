@@ -2,6 +2,10 @@
 
 ## Latest Plan-Puzzle Task: Plancraft+ Zone Area / Boundary Refinement
 
+- 2026-05-25 heartbeat follow-up：已針對 PR #25 最新 Codex P2 修正 `areaUpdatedAt` 與 invalid closed polygon 行為。
+- `areaUpdatedAt` 現在只在 boundary geometry 或 area metadata signature 實際改變時更新；單純 `render()` / `syncZoneBoundaryMetadata()` 不再刷新時間戳，避免 draft export nondeterministic churn。
+- closed 但 invalid 的 polygon 現在仍保留 `polygon` geometry，讓 canvas 可用 invalid styling 顯示並方便使用者修正，不會因 `boundaryStatus: "invalid"` 被清成空陣列。
+- 本次 follow-up 仍只碰 Issue #15 allowed files；不修改 Plancraft core、budget adapter/runtime/type、formal estimate、renderer、payment、AI/API 或 secrets。
 - 本輪任務名稱：Plancraft+ Zone Area / Boundary Refinement。
 - 任務來源：黑板 dispatch 與 GitHub Issue #15 `Plancraft+ Zone Area / Boundary Refinement`。
 - 修改檔案：

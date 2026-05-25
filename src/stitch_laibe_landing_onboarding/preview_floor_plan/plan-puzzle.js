@@ -4033,20 +4033,44 @@
   }
 
   function applyBoundaryDraftToZone(zone, draft, updateTimestamp) {
+    const previousAreaUpdateSignature = getZoneAreaUpdateSignature(zone);
     zone.boundaryEdgeIds = [...draft.edgeIds];
     zone.boundaryWallIds = [...draft.boundaryWallIds];
     zone.polygon = draft.polygon.map((point) => ({ ...point }));
     zone.boundaryStatus = draft.status;
     zone.boundaryIssues = draft.issues.map((issue) => ({ ...issue }));
-    applyZoneAreaMetadata(zone, draft);
+    applyZoneAreaMetadata(zone, draft, previousAreaUpdateSignature);
     if (updateTimestamp) {
       zone.updatedAt = new Date().toISOString();
     }
   }
 
-  function applyZoneAreaMetadata(zone, draft) {
+  function applyZoneAreaMetadata(zone, draft, previousAreaUpdateSignature) {
     const metadata = buildZoneAreaMetadata(draft);
+    const nextAreaUpdateSignature = getZoneAreaUpdateSignature({ ...zone, ...metadata });
+    metadata.areaUpdatedAt = previousAreaUpdateSignature === nextAreaUpdateSignature
+      ? zone.areaUpdatedAt || null
+      : new Date().toISOString();
     Object.assign(zone, metadata);
+  }
+
+  function getZoneAreaUpdateSignature(zone) {
+    return JSON.stringify({
+      boundaryEdgeIds: Array.isArray(zone.boundaryEdgeIds) ? zone.boundaryEdgeIds : [],
+      boundaryWallIds: Array.isArray(zone.boundaryWallIds) ? zone.boundaryWallIds : [],
+      polygon: Array.isArray(zone.polygon) ? zone.polygon : [],
+      area: zone.area ?? null,
+      areaSqMm: zone.areaSqMm ?? null,
+      areaM2: zone.areaM2 ?? null,
+      areaPing: zone.areaPing ?? null,
+      areaSource: zone.areaSource ?? null,
+      areaStatus: zone.areaStatus || "not_calculated",
+      areaConfidence: Number.isFinite(Number(zone.areaConfidence)) ? Number(zone.areaConfidence) : ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: zone.areaAuthority || ZONE_AREA_AUTHORITY,
+      reviewerRequired: zone.reviewerRequired !== false,
+      reviewerReasons: Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : []
+    });
   }
 
   function buildZoneAreaMetadata(draft) {
@@ -4065,7 +4089,7 @@
       areaAuthority: ZONE_AREA_AUTHORITY,
       reviewerRequired: true,
       reviewerReasons,
-      areaUpdatedAt: new Date().toISOString()
+      areaUpdatedAt: null
     };
 
     if (draft?.status !== "closed") {
@@ -4117,7 +4141,7 @@
       areaAuthority: ZONE_AREA_AUTHORITY,
       reviewerRequired: true,
       reviewerReasons: uniqueIds([...reviewerReasons, ...getZoneAreaReviewerReasonsFromIssues(issues)]),
-      areaUpdatedAt: new Date().toISOString()
+      areaUpdatedAt: null
     };
   }
 
@@ -4203,7 +4227,7 @@
       edgeIds: normalizedEdgeIds,
       edges: validEdges,
       boundaryWallIds,
-      polygon: status === "closed" ? polygonResult.polygon : [],
+      polygon: polygonResult.closed ? polygonResult.polygon : [],
       issues,
       status
     };
