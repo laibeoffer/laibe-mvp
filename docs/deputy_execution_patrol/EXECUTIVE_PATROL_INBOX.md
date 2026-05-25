@@ -37,6 +37,52 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T15:20:08Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Codex P2 Fix And Latest-Main Sync
+
+Status:
+CODEX_P2_BLOCKER_FOUND / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+COMMANDER_PATROL
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 is not ready for Deputy final gate. It has a post-`01b489c` Codex P2 and is also latest-main sync-blocked by `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest `origin/main`: `b14845cb03314f5eecdcdef59b2337eb56dd15ba`.
+- PR #23 head: `01b489c21a71db7a3301918e44bcfea75e60206a`.
+- Builder repair report: comment `4535229076`.
+- Public PR page fallback found Codex review on reviewed commit `01b489c21a`.
+- P2: `Block staging writes for metadata-only storage target`.
+- File: `src/lib/budget/renderers/formal-file-writer-policy.ts`, around lines `+216` to `+220`.
+- P2 summary: `review_packet_attachment` declares `allows_file_write: false`, but `storageTargetIsAllowed()` only checks target presence, so staging can still write a local placeholder file for a metadata-only target.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- `git diff --check origin/main..refs/patrol/hb1520/pr23` exits `0`.
+
+Action already taken:
+Commander patrol updated the blackboard, delivery ledger, triage queue, reviewer inbox, and this inbox. No source files were modified and no merge / reject / close action was executed.
+
+Recommended next action:
+Output Documents Builder should fix the metadata-only storage target staging-write blocker, re-sync only `docs/WORKSTREAM_BLACKBOARD.md` against latest `origin/main`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes due Codex P2.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_P2_FIX_PENDING
+
 ### 2026-05-25T15:04:07Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Review Result / Post-Publication Sync Watch
 
 Status:

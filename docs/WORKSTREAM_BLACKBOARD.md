@@ -1343,6 +1343,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T15:20:08Z - PR23 Codex P2 and latest-main sync blocked
+
+- Workstream: command/deputy / output/budget-documents
+- Branch: `origin/main` `b14845cb03314f5eecdcdef59b2337eb56dd15ba`
+- Status: `PR23_CODEX_P2_BLOCKER_FOUND / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_FIX_REQUIRED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. Open Issues remain #15, #16, #17, #18.
+  - PR #23 head remains `01b489c21a71db7a3301918e44bcfea75e60206a`; the previous Builder repair comment is `4535229076`.
+  - GitHub REST comments/reviews returned `403`, so patrol used the public PR page fallback. The public page shows a Codex review on reviewed commit `01b489c21a` with P2: `Block staging writes for metadata-only storage target`, in `src/lib/budget/renderers/formal-file-writer-policy.ts` around lines `+216` to `+220`.
+  - P2 finding summary: `review_packet_attachment` has `allows_file_write: false`, but `storageTargetIsAllowed()` only checks target presence, so `writeFormalBudgetArtifact()` with `storage_target: "review_packet_attachment"` and `write_to_staging: true` can still produce a local placeholder file.
+  - `refs/pull/23/merge` still targets prior base `387cada726b3d91fc48ce5044dca80e36bdfa9d8` plus PR head `01b489c21a71db7a3301918e44bcfea75e60206a`; it is stale current-main evidence.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against latest `origin/main`.
+  - `git diff --check origin/main..refs/patrol/hb1520/pr23` exits `0`. PR #22 / PR #25 / PR #26 remain merge-tree clean against latest `origin/main`.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Fix PR #23 Codex P2 and re-sync against latest `origin/main`.
+  - Why this agent: Builder owns PR #23 and the P2 is inside the renderer file-writer policy scope.
+  - Action: Fix the metadata-only storage target staging-write blocker, re-sync only `docs/WORKSTREAM_BLACKBOARD.md` against latest `origin/main`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review.
+  - Need Commander: No
+  - Need Reviewer: Yes, due Codex P2.
+
 ### 2026-05-25T15:04:07Z - PR23 sync repair ACK found / Codex review pending
 
 - Workstream: command/executive / output/budget-documents

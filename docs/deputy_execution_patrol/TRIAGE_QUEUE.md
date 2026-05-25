@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T15:20:08Z - [PR23_CODEX_P2_SYNC_BLOCKED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / LATEST_MAIN_SYNC_BLOCKED
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` is `b14845cb03314f5eecdcdef59b2337eb56dd15ba`. PR #23 remains head `01b489c21a71db7a3301918e44bcfea75e60206a`. Public PR page fallback found a post-`01b489c` Codex P2: `Block staging writes for metadata-only storage target`, in `src/lib/budget/renderers/formal-file-writer-policy.ts` around lines `+216` to `+220`. REST comments/reviews returned `403`. `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict; `git diff --check origin/main..refs/patrol/hb1520/pr23` exits `0`. PR #22 / #25 / #26 remain merge-tree clean.
+
+Recommended Executive Action:
+Chase Output Documents Builder for one scoped P2 fix plus latest-main sync repair. Do not route PR #23 to Deputy final gate until the P2 is fixed, latest-main sync is clean, and Codex re-review is clean.
+
+Recommended Deputy Action:
+No merge / reject / close on PR #23 this round. PR #25 remains a separate Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes due Codex P2.
+
 ### 2026-05-25T15:04:07Z - [PR23_SYNC_REPAIRED_CODEX_PENDING] - Output Documents
 
 Status:
