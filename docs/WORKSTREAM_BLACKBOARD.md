@@ -1343,6 +1343,48 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy Codex-2 overdue assignment patrol
+
+Workstream:
+cross-workstream patrol / Deputy Codex-2
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+STALL_CONTINUES / OVERDUE_ASSIGNMENT_REPORTS_REQUIRED
+
+Changed:
+- Deputy Codex-2 rechecked latest `main` SHA `b01a49aad0aadf85e8d44798e532bef59851d956`, open Issues, open PRs, PR review threads, branch refs, triage queue, and Executive inbox.
+- No useful Builder response was found after the prior Deputy Codex-2 follow-up comments on Issue #15, Issue #17, PR #22, and PR #23.
+- Plan Puzzle Builder is now directly overdue for Issue #15 assignment report: Issue claim, PR URL, `node --check`, guard check, or exact blocker with attempted resolution.
+- Raw Candidate Builder is now directly overdue for Issue #17 assignment report: Issue claim, PR URL, candidate-only validation, forbidden-pricing-field check, or exact blocker with attempted resolution.
+- MethodSpec Builder is now directly overdue for PR #22 assignment report: latest-main re-sync, patrol entries preserved, only MethodSpec docs conflict resolution, Issue #16 allowed-scope confirmation, then Codex review.
+- Output Documents Builder is now directly overdue for PR #23 assignment report: renderer / format mismatch fail-closed fix, latest-main re-sync, renderer static guard / syntax / smoke checks, and Codex re-review.
+- No new GitHub comments were posted this round to avoid duplicate chase noise; the Executive inbox was updated with a direct owner callout.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only patrol update.
+
+Blocked:
+- #15 and #17 remain execution stalls, not Commander blockers.
+- #22 remains blocked on technical re-sync / conflict follow-up.
+- #23 remains blocked on Codex P2 fix and re-review.
+
+Next:
+- Executive Officer should point the next chase directly at Plan Puzzle Builder, Raw Candidate Builder, MethodSpec Builder, and Output Documents Builder with the deliverables above.
+- If the same four items are still empty next patrol, keep them active as `EXECUTOR_FOLLOWUP_REQUIRED / STALL_CONTINUES` and request Deputy decision only for reassignment or workflow repair.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy Codex-2 active-stall patrol
 
 Workstream:

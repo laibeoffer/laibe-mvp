@@ -37,6 +37,48 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T02:55:06Z - [DEPUTY2_OVERDUE_ASSIGNMENT_REPORT] - Active Stalls
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Plan Puzzle Builder / Raw Candidate Builder / MethodSpec Builder / Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15, Issue #17, PR #22, PR #23
+
+Finding:
+Deputy Codex-2 next patrol found no useful Builder response after the prior Deputy-2 comments required reports before this patrol. The same four priority items remain stalled on latest main SHA `b01a49aad0aadf85e8d44798e532bef59851d956`.
+
+Evidence:
+- Issue #15: last relevant comment remains Deputy Codex-2 comment `4531077495`; no remote branch `plancraft/zone-area-boundary-refinement`, PR URL, Issue claim, `node --check`, guard check, or exact blocker with attempted resolution.
+- Issue #17: last relevant comment remains Deputy Codex-2 comment `4531077587`; no remote branch `warehouse/raw-source-quality-scoring`, PR URL, Issue claim, candidate-only validation, forbidden-pricing-field check, or exact blocker with attempted resolution.
+- PR #22: last relevant comment remains Deputy Codex-2 comment `4531077662`; PR is still open on head `19bea40ef740b72cbc11a6b3e65c55fcc8358f20`, with no latest-main re-sync or Issue #16 allowed-scope confirmation.
+- PR #23: last relevant comment remains Deputy Codex-2 comment `4531077747`; PR is still open on head `5ffd0f3e737960b386695d25ad5d0fc4d71a62c2`, and the Codex P2 review thread remains unresolved on `src/lib/budget/renderers/formal-file-writer-policy.ts`.
+
+Action already taken:
+Deputy Codex-2 updated the blackboard and this Executive inbox with direct responsible-workstream callouts. No new GitHub comments were posted this round to avoid duplicate chase noise.
+
+Recommended Deputy action:
+Keep as execution / review-gate stalls. Executive Officer should directly chase:
+- Plan Puzzle Builder for #15 assignment report.
+- Raw Candidate Builder for #17 assignment report.
+- MethodSpec Builder for #22 latest-main re-sync and allowed-scope confirmation.
+- Output Documents Builder for #23 P2 fail-closed fix, checks, and Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
+Deputy Decision:
+PENDING_EXECUTIVE_CHASE
+
 ### 2026-05-25T02:28:57Z - [DEPUTY2_EXECUTIVE_FOLLOW_UP_REQUIRED] - Active Stalls
 
 Status:
