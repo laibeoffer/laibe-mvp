@@ -76,7 +76,7 @@ No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
 Deputy Decision:
 PENDING
 
-### 2026-05-25T05:16:50Z - [FINAL_GATE_WITHDRAWN_CURRENT_MAIN_CONFLICT] - Raw Candidate
+### 2026-05-25T05:16:50Z - [FINAL_GATE_PAUSED_SYNC_REFRESH_REQUIRED] - Raw Candidate
 
 Status:
 PENDING_RAW_CANDIDATE_ACTION
@@ -91,7 +91,7 @@ Issue / PR:
 laibeoffer/laibe-mvp PR #26 / Issue #17
 
 Finding:
-PR #26 was previously routed to Deputy final gate after candidate-only validation and clean Codex review, but current-main merge simulation now reports a conflict. PR #26 must re-sync before final gate can resume.
+PR #26 was previously routed to Deputy final gate after candidate-only validation and clean Codex review, but main advanced and the available mergeability / validation signal is stale. PR #26 must produce a current-main mergeability signal before final gate can resume.
 
 Evidence:
 - Patrol-start `origin/main`: `8a46630010a6b4ce125f5259d11f58c9f6fab481`.
@@ -99,13 +99,13 @@ Evidence:
 - Previous Executive validation: comment `4531540239`.
 - Previous Codex clean result: comment `4531555287`.
 - Previous Deputy gate routing: comment `4531573641`.
-- Local merge simulation against current main reports conflict.
+- Second Deputy rechecked at `61b8902`; local current-main merge simulation found no content-conflict signal, but available PR #26 merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
 
 Action already taken:
 Executive Officer posted PR #26 follow-up comment `4531733938` requiring current-main re-sync, R1.5 validation rerun, forbidden formal-pricing checks, and Codex re-review if the head changes.
 
 Recommended Deputy action:
-Withdraw PR #26 final gate until Raw Candidate re-syncs current main and produces a fresh clean mergeability / validation / Codex signal.
+Keep PR #26 final gate paused until Raw Candidate re-syncs current main or otherwise produces a fresh clean mergeability / validation / Codex signal.
 
 Need Commander:
 No

@@ -1343,6 +1343,37 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Second Deputy PR #26 current-main signal refinement
+
+Workstream:
+Second Deputy Codex / Raw Candidate
+
+Status:
+PR_26_FINAL_GATE_STILL_PAUSED / CONFLICT_LABEL_REFINED
+
+Changed:
+- Second Deputy patrol rechecked `origin/main`, PR refs, GitHub metadata, and comments after Executive posted PR #26 follow-up comment `4531733938`.
+- Current `origin/main` at patrol time was `61b8902098bfb1727e33bdaf1f2268b40edabce3`.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Local current-main merge simulation found no content-conflict signal for PR #26 this round, but the available PR #26 merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`, so the prior final-gate evidence remains stale.
+- Delivery Ledger state was refined from `SYNC_BLOCKED_AFTER_MAIN_ADVANCE` to `SYNC_REFRESH_REQUIRED_AFTER_MAIN_ADVANCE` while keeping final gate paused.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+
+Next:
+- Raw Candidate Builder should still re-sync or otherwise produce a fresh current-main mergeability signal, rerun R1.5 validation / forbidden formal-pricing checks, and request Codex re-review if the head changes.
+- Deputy Codex keeps final merge / reject authority; PR #26 should not be treated as final-gate ready until the stale merge-ref / validation signal is refreshed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless fresh Codex review reports NEEDS_FIX / P1 / P2, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25 - Executive current-main sync follow-up for PR #23 / PR #26
 
 Workstream:
@@ -1354,7 +1385,7 @@ EXECUTIVE_FOLLOW_UP_POSTED / CURRENT_MAIN_SYNC_REQUIRED
 Changed:
 - Executive patrol read current `origin/main` at `8a46630010a6b4ce125f5259d11f58c9f6fab481`.
 - PR #23 remains open on head `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub metadata reports `mergeable=false` / no current `merge_commit_sha`, and local current-main merge simulation still conflicts. Executive posted PR #23 follow-up comment `4531733668`.
-- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; it previously had validation / Codex clean / Deputy gate routing, but local current-main merge simulation now conflicts. Executive posted PR #26 follow-up comment `4531733938` and moved the delivery ledger row from `FINAL_GATE_READY` to `SYNC_BLOCKED_AFTER_MAIN_ADVANCE`.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; it previously had validation / Codex clean / Deputy gate routing, but its mergeability / validation signal became stale after main advanced. Executive posted PR #26 follow-up comment `4531733938`; Second Deputy later refined the ledger row to `SYNC_REFRESH_REQUIRED_AFTER_MAIN_ADVANCE` after local current-main merge simulation found no content-conflict signal.
 - PR #22 remains open on head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge simulation found no content conflict, so Executive did not reopen ordinary chase.
 - PR #25 remains open on head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no merge base / merge ref exists, and the prior sync-recovery blocker remains active.
 

@@ -36,7 +36,7 @@ Need Reviewer:
 
 ## Open Triage Items
 
-### 2026-05-25T05:16:50Z - [CURRENT_MAIN_CONFLICT] - Raw Candidate
+### 2026-05-25T05:16:50Z - [SYNC_REFRESH_REQUIRED] - Raw Candidate
 
 Status:
 NEEDS_EXECUTIVE_CHASE
@@ -48,13 +48,13 @@ Target:
 `laibeoffer/laibe-mvp` PR #26 / Issue #17 / `warehouse/raw-candidate`
 
 Evidence:
-PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. It previously had Executive validation `4531540239`, Codex clean result `4531555287`, and Deputy gate routing `4531573641`, but patrol-start `origin/main` is now `8a46630010a6b4ce125f5259d11f58c9f6fab481` and local merge simulation against current main reports conflict.
+PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. It previously had Executive validation `4531540239`, Codex clean result `4531555287`, and Deputy gate routing `4531573641`, but patrol-start `origin/main` advanced and the available PR merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. Second Deputy rechecked at `61b8902` and found no local content-conflict signal, but final-gate evidence remains stale until current-main mergeability / validation / Codex signal is refreshed.
 
 Recommended Executive Action:
 Chase Raw Candidate owner to re-sync PR #26 against current main, preserve R1.5 scope and patrol / blackboard entries, rerun the R1.5 validation set plus forbidden formal-pricing checks, and request Codex re-review if the head changes. Executive follow-up comment `4531733938` was posted.
 
 Recommended Deputy Action:
-Withdraw PR #26 final gate until the branch is current-main clean and validation / Codex signal is fresh again.
+Keep PR #26 final gate paused until the branch has a current-main mergeability signal and validation / Codex signal is fresh again.
 
 Need Commander:
 No
