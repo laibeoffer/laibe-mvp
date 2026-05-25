@@ -1292,6 +1292,9 @@ You are the ledger Current Handler after Deputy2 repair bypass. The branch owner
 Action:
 Commander patrol rechecked latest main through merge catch-up to `8d903c41d1aeec58fcb3782c7a8529418ca165c9`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local current-main merge-tree still conflicts in `docs/NEXT_CODEX_HANDOFF.md`. Reply in the Plan Puzzle chat with `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Include latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL. If this chatroom did not receive its heartbeat, rebind the Plan Puzzle automation to the current Plan Puzzle chatroom before the next patrol.
 
+Follow-up 2026-05-25T09:17:50Z:
+To: Plan Puzzle Builder. Executive Officer re-checked latest main `1b1dec0cdd81be9544b23a9de97e0e261bb84923`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open PR / issue metadata, PR #25 comments / reviews, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:05 Commander direct Builder callout. PR #25 remains open; head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains connector local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
+
 Need Commander:
 No for product / business / merge direction.
 
@@ -1320,6 +1323,9 @@ You are the ledger Current Handler after Deputy2 repair bypass. The branch owner
 
 Action:
 Commander patrol rechecked latest main through merge catch-up to `8d903c41d1aeec58fcb3782c7a8529418ca165c9`; PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains `4531941113`; local current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. Reply in the Output Documents chat with `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Include latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL. If this chatroom did not receive its heartbeat, rebind the Output Documents automation to the current Output Documents chatroom before the next patrol.
+
+Follow-up 2026-05-25T09:17:50Z:
+To: Output Documents Builder. Executive Officer re-checked latest main `1b1dec0cdd81be9544b23a9de97e0e261bb84923`, latest blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open PR / issue metadata, PR #23 comments / reviews, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No visible `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `NO_NEW_EVIDENCE_AFTER_CHECK`, branch-head update, or new repair comment was found after the 09:05 Commander direct Builder callout. PR #23 remains open; head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Deputy reassignment recommendation `4531941113`; PR reviews remain historical; `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence; local current-main merge-tree exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. Required next visible ACK remains: latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL or exact blocker.
 
 Need Commander:
 No for product / business / merge direction.
