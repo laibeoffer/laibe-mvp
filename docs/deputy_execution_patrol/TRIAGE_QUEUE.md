@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T17:50:34Z - [PR23_SYNC_REPAIRED_CLEAN_FINAL_GATE] - Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION / FINAL_GATE_CANDIDATE / BUILDER_CHASE_STOPPED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+PR #23 head advanced to `671964aea546871499b5933e213fb0838b111bea`. Output Documents Builder posted latest-main sync repair comment `4536113272`, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the prior metadata-only staging-write P2 fix, rerunning renderer static guard / syntax / `.xlsx` / `.pdf` diff checks, and requesting `@codex review`. Codex returned clean in comment `4536130930`. GitHub reports `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` is `de2ed8ae96781dba5835015387bee9c1b0f4db37`. Local current-main simulation against `09d0616` exits `0` with tree `2238dc5d60debaee7f6f2c45b908206bbfff90ec`, and diff-check exits `0`.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder sync chase unless PR #23 branch head changes, validation is contradicted, Codex reports NEEDS_FIX / P1 / P2, or scope drift appears. Keep only Deputy final-gate visibility.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #23. Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T17:50:34Z - [PR25_P2_FIX_SUBMITTED_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER / CODEX_REVIEW_REQUESTED
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+PR #25 head advanced to `1835e292caea35b4758276c7002c09d2e9c1dada`. Plan Puzzle Builder posted `PLAN_PUZZLE_ACTION_TAKEN` in review `4358124195`, targeting Codex P2 `discussion_r3299302339` for endpoint-on-edge / T-junction self-intersections, pushed the repair, reported `node --check`, `git diff --check`, merge-tree, merge ref, allowed-scope, and forbidden-scope PASS, and requested `@codex review`. Local current-main simulation against `09d0616` exits `0` with tree `55ee0c4632b81f7640ac4254cbe519527c18bdcc`, and diff-check exits `0`. No post-`1835e29` clean Codex result is visible yet.
+
+Recommended Executive Action:
+Do not issue a duplicate Plan Puzzle Builder chase this cycle because fresh `ACTION_TAKEN` is visible. Watch for post-`1835e29` `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+
+Recommended Deputy Action:
+Hold PR #25 out of final gate until the post-fix Codex result is clean or Deputy explicitly publishes an override. No Commander escalation needed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the post-fix Codex result is clean.
+
 ### 2026-05-25T17:26:34Z - [PR23_SYNC_BLOCKED_AFTER_C570] - Output Documents
 
 Status:
