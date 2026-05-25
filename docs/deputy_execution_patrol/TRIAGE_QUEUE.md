@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T12:46:29Z - [PR23_FINAL_GATE_ACK_STALE] - Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest main is `7338cc2b568e32d0988a1a9ec717970b1fb5b664`. Deputy final-gate ACK is visible in `docs/WORKSTREAM_BLACKBOARD.md` at `2026-05-25T12:40:29Z`, but after that main advance PR #23 is no longer latest-main merge-tree clean. PR #23 head remains `d126327ddac96d29ba553a5c7ca9aab9e6461217`; `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`. The old `refs/pull/23/merge` `c39436e1d2a73963626e4d3c9466350832139a74` is stale relative to latest main. PR #22 / PR #25 / PR #26 still merge-tree clean against latest main.
+
+Recommended Executive Action:
+Do not treat PR #23 as final-gate ready until latest-main sync is repaired. Do not post duplicate Builder chase unless Deputy assigns the repair owner; keep the visible request pointed to Deputy Codex.
+
+Recommended Deputy Action:
+Decide the PR #23 workflow repair owner. Minimal repair: re-sync PR #23 against latest main, resolve only the `docs/WORKSTREAM_BLACKBOARD.md` conflict, preserve the fail-closed renderer / format mismatch fix, rerun Output Documents checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless repair changes scope or new Codex review reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25T12:17:48Z - [PR23_PR25_FINAL_GATE_READY] - Output Documents / Plan Puzzle
 
 Status:

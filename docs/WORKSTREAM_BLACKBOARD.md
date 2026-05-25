@@ -1343,6 +1343,38 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive PR23 final-gate ACK stale on `7338cc2`
+
+Workstream:
+command/executive / final-gate visibility lane / output repair routing
+
+Status:
+PR23_FINAL_GATE_ACK_STALE / CURRENT_MAIN_SYNC_BLOCKED / DEPUTY_DECISION_REQUIRED
+
+Table Compliance:
+PARTIAL - PR #23 still has a clean Codex comment on head `d126327`, but it no longer has a clean current-main merge-tree after main advanced to `7338cc2`. PR #22 / PR #25 / PR #26 remain current-main merge-tree clean.
+
+Missed Progress:
+No Builder non-response counted this cycle; this is a fresh stale-state finding after Deputy ACK advanced main.
+
+Action Taken:
+Executive Officer rechecked latest main `7338cc2b568e32d0988a1a9ec717970b1fb5b664`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, `git ls-remote` PR refs, fetched PR heads / merge refs, local merge-tree signals, and changed-file lists. GitHub REST returned `403`, so refs / local simulation fallback was used. Deputy final-gate ACK is visible in the `2026-05-25T12:40:29Z` blackboard entry, but `git merge-tree --write-tree origin/main refs/patrol/pr23` now exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`. PR #23 head remains `d126327ddac96d29ba553a5c7ca9aab9e6461217`; the old merge ref `c39436e1d2a73963626e4d3c9466350832139a74` must not be treated as latest-main readiness. PR #22 / PR #25 / PR #26 still merge-tree clean against latest main.
+
+Next Required:
+Deputy Codex must decide the PR #23 workflow repair owner. Minimal next task: re-sync PR #23 against latest main, resolve only the `docs/WORKSTREAM_BLACKBOARD.md` conflict while preserving the fail-closed P2 fix, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, then request Codex re-review if the branch head changes.
+
+Blocked:
+PR #23 latest-main sync is blocked by `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+
+Need Deputy:
+Yes.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless repair changes scope or new Codex review reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25T12:40:29Z - Deputy final-gate visibility ACK
 
 - Workstream: command/deputy / final-gate visibility

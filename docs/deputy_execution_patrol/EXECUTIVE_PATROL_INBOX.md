@@ -37,6 +37,51 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T12:46:29Z - [DEPUTY_DECISION_REQUEST] - Output Documents
+
+Status:
+PENDING_DEPUTY_DECISION / PR23_FINAL_GATE_ACK_STALE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+The Deputy final-gate ACK published on main `7338cc2b568e32d0988a1a9ec717970b1fb5b664` is now stale for PR #23 because the same main advance reintroduced a current-main merge conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest main: `7338cc2b568e32d0988a1a9ec717970b1fb5b664`.
+- PR #23 head: `d126327ddac96d29ba553a5c7ca9aab9e6461217`.
+- Codex clean comment on the PR head remains `4534133600`.
+- Old `refs/pull/23/merge`: `c39436e1d2a73963626e4d3c9466350832139a74`; treat as stale relative to latest main.
+- Attempted check: fetched PR refs and ran `git merge-tree --write-tree origin/main refs/patrol/pr23`.
+- Exact blocker: merge-tree exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 still merge-tree clean against latest main.
+- GitHub REST returned `403`, so refs / local simulation fallback was used.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+Decide the PR #23 workflow repair owner. Minimal next task: re-sync PR #23 against latest main, resolve only the `docs/WORKSTREAM_BLACKBOARD.md` conflict while preserving the fail-closed P2 fix, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, then request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless repair changes scope or new Codex review reports NEEDS_FIX / P1 / P2.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T12:29:52Z - [EXECUTIVE_ACTION_REQUEST] - Final Gate Visibility
 
 Status:
