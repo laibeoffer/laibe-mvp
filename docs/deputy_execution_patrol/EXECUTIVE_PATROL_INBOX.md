@@ -37,6 +37,91 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T20:41:28Z - [PR23_CODEX_P2_AFTER_FINAL_SYNC] - Output Documents
+
+Status:
+EXECUTIVE_ACTION_REQUEST / CODEX_P2_FOUND / REVIEW_GATE_BLOCKED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+Output Documents / PR #23
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 final sync is visible at head `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`, but it is no longer a clean Deputy final-gate candidate because GitHub MCP found a post-head Codex P2 at `2026-05-25T20:36:35Z`.
+
+Evidence:
+- Latest `origin/main`: `326db8a39c7e4b2b95ee119c85b07fca376a0301`.
+- PR #23 head: `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`.
+- PR #23 current-main merge-tree exits `0` with tree `6dca710c0206fcee0b661ab5cea39147e653cb28`; diff-check exits `0`.
+- Codex review `4358680834` / thread `PRRT_kwDORlw1t86En1Yw` is unresolved and not outdated on `src/lib/budget/renderers/customer-warning-sanitizer.ts` line 14: `Handle non-string warnings before sanitizing`.
+- PR #22 / PR #25 / PR #26 remain current-main merge-tree and diff-check clean against `326db8a`.
+
+Action already taken:
+Posted a single-primary PR #23 follow-up comment `4537133554` to Output Documents Builder requesting `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`. Updated blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Hold PR #23 out of final-gate routing until the P2 is fixed and Codex re-review is clean. PR #22 / PR #25 / PR #26 can remain Deputy final-gate visibility candidates unless new branch, validation, review, or scope evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T20:33:55Z - [PR23_FINAL_SYNC_FOUND_AFTER_LOOP_BREAK] - Active Final Gates
+
+Status:
+SUPERSEDED_FOR_PR23_BY_2026-05-25T20:41:28Z_CODEX_P2 / PENDING_DEPUTY_DECISION / FINAL_SYNC_FOUND / API_LIMIT_FALLBACK
+
+Executive Officer:
+N/A - Commander patrol finding
+
+To:
+Deputy Codex
+
+Workstream:
+Active PR final gates
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26
+
+Finding:
+PR #23 final sync after the Deputy loop-break decision is now visible by branch-head evidence. Output Documents Builder should not be chased again for ordinary sync unless branch, validation, review, or scope evidence changes.
+
+Evidence:
+- Latest `origin/main`: `6a154321a35861c006653f9b7312e0c1f63ff5a6`.
+- PR #23 advanced from `eb7caa738431c0624c30c3242e8d28b0b4b618e9` to `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`.
+- Delta from old PR #23 head to `47dd4ac` changes only `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`, and `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`; no PR #23 source implementation files changed after the prior clean `eb7caa7` head.
+- PR #23 merge-tree against `6a15432` exits `0` with tree `1e90b58f84ae516e7c3e6b0dba587ece7499db83`; diff-check exits `0`; `refs/pull/23/merge` exists at `cf1a40400d296c43a8a66574ff6ebd32af0f4dfd`.
+- PR #22 / PR #25 / PR #26 also pass current-main merge-tree and diff-check against `6a15432`.
+- GitHub REST comments / review comments are rate-limited this cycle; refs and local simulations are controlling evidence.
+
+Action already taken:
+Updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. Decide whether refs/local evidence is sufficient, or require a post-`47dd4ac` visible validation / Codex review comment once GitHub API access is available.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-output risk appears, or scope drifts.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T20:12:33Z - [DEPUTY_LOOP_BREAK_DECISION_AFTER_404EE84] - PR23 Sync Loop / Final Gate
 
 Status:
