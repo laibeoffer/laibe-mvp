@@ -37,6 +37,97 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T14:22:53Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle Final Gate After Sync
+
+Status:
+CODEX_REVIEW_CLEAN_AFTER_BDFBE1A / DEPUTY_FINAL_GATE_VISIBILITY_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 now has a clean Codex result on the current sync head `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`. Executive patrol found current-main merge-tree pass against latest main and routes PR #25 back to Deputy final gate. Executive did not merge, reject, or close.
+
+Evidence:
+- Latest main checked: `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`.
+- PR #25 head: `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`.
+- PR #25 merge ref: `d7993baa4714ddb2819f7e1c58cee1c6b7eb9d77`.
+- Builder sync repair report: review `4357243064` at `2026-05-25T14:21:48Z`.
+- Codex clean result: comment `4534994840` at `2026-05-25T14:25:16Z`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `b094fb84ee8ed1f6778b964f00da91d8d93f94af`.
+- `git diff --check origin/main..refs/patrol/pr25` exits `0`.
+- PR diff remains limited to Issue #15 allowed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no scope drift before merge / reject; ordinary Builder chase can stop unless branch changes or Codex reports new NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports new NEEDS_FIX / P1 / P2, or scope drift is found.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T14:22:53Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents Current-Main Sync
+
+Status:
+CODEX_CLEAN_BUT_CURRENT_MAIN_SYNC_BLOCKED / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 has a clean Codex result on head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`, but latest main is now `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`, and PR #23 is current-main sync blocked again by `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest main checked: `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`.
+- PR #23 head: `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`.
+- Builder repair report: comment `4534883253`, using previous main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`.
+- Codex clean result: comment `4534905765` at `2026-05-25T14:10:43Z`.
+- GitHub PR #23 merge ref `43f9343a809fd95636d86a3c25aa6a56fb88e5e0` still targets base `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0` plus PR head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+- PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended next action:
+Output Documents Builder should re-sync PR #23 against `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus patrol entries, rerun required checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
 ### 2026-05-25T14:12:34Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents Post-Push Sync
 
 Status:
