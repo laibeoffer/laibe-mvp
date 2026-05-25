@@ -1343,6 +1343,41 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Output Documents Builder PR23 current-main repair on `2b6e613`
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS
+
+Action Taken:
+Latest `origin/main` advanced again to `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79` after PR #23 head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2` received a clean Codex result. Output Documents Builder merged the newer main into the PR #23 worktree and resolved the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving Output Documents repair entries and latest main patrol entries.
+
+Changed:
+- `docs/WORKSTREAM_BLACKBOARD.md` conflict resolved only.
+- Latest main patrol docs were accepted from `origin/main`.
+- Renderer code and snapshot review packet files were not edited during this repair.
+
+Validation:
+- Renderer static guard: `valid: true`, `issue_count: 0`.
+- Renderer TypeScript syntax loop: pass.
+- Invalid fixture / mismatch smoke: `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, `format_matches_output: false`.
+- `git diff --check`: pass.
+- Real `.xlsx` / `.pdf` diff check: no added or changed files.
+
+Blocked:
+Branch publication / Codex re-review visibility pending.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
 ### 2026-05-25 - Output Documents Builder PR23 current-main repair on `96dd05e`
 
 Workstream:
@@ -1481,6 +1516,86 @@ No.
 
 Need Reviewer:
 No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
+### 2026-05-25T14:22:53Z - PR25 post-sync Codex clean / PR23 still current-main blocked
+
+- Workstream: command/executive / plancraft/page-ui / output/budget-documents
+- Branch: `origin/main` `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`
+- Status: `PR25_CODEX_CLEAN_AFTER_BDFBE1A / PR23_CURRENT_MAIN_SYNC_BLOCKED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. Open Issues remain #15, #16, #17, #18; Issue #19 remains closed by prior PR #24 reconciliation.
+  - PR #25 head is `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`; `refs/pull/25/merge` exists at `d7993baa4714ddb2819f7e1c58cee1c6b7eb9d77` with parents `ec89b26a415b229e7b3cec66e93a65d79a9dbaab` and `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`.
+  - PR #25 Builder posted `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` in review `4357243064`; Codex returned clean after that head in comment `4534994840` at `2026-05-25T14:25:16Z`.
+  - `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `b094fb84ee8ed1f6778b964f00da91d8d93f94af`, and `git diff --check origin/main..refs/patrol/pr25` passes.
+  - PR #23 head remains `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; Codex returned clean in comment `4534905765`, but `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against latest main `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`.
+  - PR #22 and PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Deputy Codex
+  - Workstream: plancraft/page-ui / plancraft/adapter-clean
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: PR #25 final-gate visibility after clean Codex result on `bdfbe1a`.
+  - Why this agent: Deputy Codex owns merge / reject final decisions; Executive found the requested clean post-sync Codex result and current-main merge-tree pass.
+  - Action: Deputy final-gate decision for PR #25. No merge / reject was executed by Executive.
+  - Need Commander: No
+  - Need Reviewer: No unless branch changes, Codex reports new `NEEDS_FIX` / `P1` / `P2`, or scope drift is found.
+- PR #23:
+  - To: Output Documents Builder
+  - Action: Re-sync PR #23 against latest main `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review if branch head changes.
+  - Need Commander: No
+  - Need Reviewer: No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T14:12:34Z - PR23 repair ACK found but post-push main blocked again / PR25 still clean
+
+- Workstream: command/executive / output/budget-documents / plancraft/page-ui
+- Branch: `origin/main` `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`
+- Status: `PR23_REPAIR_ACK_FOUND_CODEX_CLEAN_BUT_SYNC_BLOCKED_AGAIN / PR25_STILL_CURRENT_MAIN_SIMULATION_PASS / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Executive published the 14:04 patrol docs to main commit `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`, then re-fetched main and PR refs.
+  - PR #23 advanced after the prior patrol to head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; Output Documents Builder posted current-main repair evidence in comment `4534883253` against previous main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`, and Codex returned clean in comment `4534905765` at `2026-05-25T14:10:43Z`.
+  - GitHub merge ref for PR #23 still targets the pre-publish base: `43f9343a809fd95636d86a3c25aa6a56fb88e5e0` has parents `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0` and `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`.
+  - Post-push local simulation against latest main `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0` still exits `1` for PR #23 with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict.
+  - PR #25 head remains `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; post-push `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `72ffebd712387d55c3d01fb9709b82e4057046af`, and `git diff --check origin/main..refs/patrol/pr25` passes.
+  - PR #22 and PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: PR #23 latest-main sync recovery after patrol main advanced to `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`.
+  - Why this agent: Builder has the active repair branch and already posted the scoped repair / validation / Codex clean chain; latest main advanced after that repair.
+  - Action: Re-sync PR #23 against `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix and patrol entries, rerun checks, and request Codex re-review if branch head changes.
+  - Need Commander: No
+  - Need Reviewer: No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T14:04:16Z - PR25 Codex clean / PR23 still latest-main blocked
+
+- Workstream: command/executive / plancraft/page-ui / output/budget-documents
+- Branch: `origin/main` `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`
+- Status: `PR25_CODEX_CLEAN_FINAL_GATE_CANDIDATE / PR23_CURRENT_MAIN_SYNC_BLOCKED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. Issues #15 / #16 / #17 / #18 remain active by ledger / PR linkage; Issue #19 remains closed by PR #24.
+  - PR #25 head is `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; `refs/pull/25/merge` exists at `6dd6e86e7acfaa6009d4ebaadaaff47a2e4d59fe`.
+  - PR #25 Builder posted `PLAN_PUZZLE_ACTION_TAKEN` in comment `4534833932`; Codex returned clean after the P2 fix in comment `4534856589` at `2026-05-25T14:03:15Z`.
+  - `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` against latest main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`, and `git diff --check origin/main..refs/patrol/pr25` passes.
+  - PR #23 head remains `a4566412f100e15bd978f43e6058759de42bef70`; Codex returned clean in comment `4534721681`, but `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against latest main.
+  - PR #22 and PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Deputy Codex
+  - Workstream: plancraft/page-ui / plancraft/adapter-clean
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: PR #25 final-gate visibility after clean Codex re-review.
+  - Why this agent: Deputy Codex owns merge / reject final decisions; Executive found the requested clean post-P2 Codex result and current-main merge-tree pass.
+  - Action: Deputy final-gate decision for PR #25. No merge / reject was executed by Executive.
+  - Need Commander: No
+  - Need Reviewer: No unless branch changes, Codex reports new `NEEDS_FIX` / `P1` / `P2`, or scope drift is found.
+- PR #23:
+  - To: Output Documents Builder
+  - Action: Re-sync PR #23 against latest main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review if branch head changes.
+  - Need Commander: No
+  - Need Reviewer: No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
 
 ### 2026-05-25T13:59:16Z - PR25 P2 fix found / PR23 still latest-main blocked
 
