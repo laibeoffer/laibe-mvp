@@ -1343,6 +1343,31 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T12:56:32Z - PR23 sync repair owner assigned
+
+- Workstream: command/deputy / output/budget-documents
+- Branch: `origin/main` `651fdbb2febdc39ca6375f101d571f4942c26f2c`
+- Status: `DEPUTY_DECISION_MADE / PR23_SYNC_REPAIR_ASSIGNED / NO_MERGE_EXECUTED`
+- Changed: Deputy decision only; no source files changed.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Evidence:
+  - PR #23 head remains `d126327ddac96d29ba553a5c7ca9aab9e6461217`; Codex clean comment `4534133600` remains the latest clean review for that head.
+  - Latest main is `651fdbb2febdc39ca6375f101d571f4942c26f2c`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1256/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+  - PR #22 / PR #25 / PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Re-sync PR #23 against latest main after final-gate ACK made the blackboard stale.
+  - Why this agent: Output Documents Builder owns Issue #18 / PR #23 and the branch contains renderer snapshot-only recovery work.
+  - Action: Resolve only the `docs/WORKSTREAM_BLACKBOARD.md` conflict while preserving the fail-closed renderer / format mismatch P2 fix and patrol documentation; rerun renderer static guard, renderer syntax, mismatch smoke, fixture smoke, invalid fixture, `.xlsx/.pdf` diff check, and `git diff --check`; request Codex re-review if branch head changes.
+  - Need Commander: No
+  - Need Reviewer: No unless repair changes scope or Codex reports `NEEDS_FIX` / `P1` / `P2`.
+- Next: Executive Officer should chase a visible ACK from Output Documents Builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`. Do not route PR #23 to final gate again until latest-main merge-tree is clean.
+- Need Commander: No
+- Need Reviewer: No
+
 ### 2026-05-25 - Executive PR23 final-gate ACK stale on `7338cc2`
 
 Workstream:

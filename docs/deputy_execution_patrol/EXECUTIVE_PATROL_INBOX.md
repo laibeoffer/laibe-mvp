@@ -40,7 +40,7 @@ PENDING
 ### 2026-05-25T12:46:29Z - [DEPUTY_DECISION_REQUEST] - Output Documents
 
 Status:
-PENDING_DEPUTY_DECISION / PR23_FINAL_GATE_ACK_STALE
+DEPUTY_DECISION_MADE / PR23_SYNC_REPAIR_ASSIGNED
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -80,7 +80,7 @@ Need Reviewer:
 No unless repair changes scope or new Codex review reports NEEDS_FIX / P1 / P2.
 
 Deputy Decision:
-PENDING
+2026-05-25T12:56:32Z - ASSIGNED_TO_OUTPUT_DOCUMENTS_BUILDER. Executive Officer should chase one visible ACK from Output Documents Builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`. Do not route PR #23 back to final gate until latest-main merge-tree is clean again. Need Commander: No. Need Reviewer: No unless repair changes scope or Codex reports `NEEDS_FIX` / `P1` / `P2`.
 
 ### 2026-05-25T12:29:52Z - [EXECUTIVE_ACTION_REQUEST] - Final Gate Visibility
 
