@@ -1343,6 +1343,66 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T13:39:14Z - Executive PR23 repair found / PR25 P2 still pending on `b16399b`
+
+Workstream:
+command/executive / output/budget-documents / plancraft/page-ui
+
+Status:
+PR23_WORKFLOW_REPAIR_FOUND / PRE_PUBLISH_MAIN_SIMULATION_PASS / PR25_P2_FIX_ACK_PENDING
+
+Changed:
+- Rechecked latest `origin/main` `b16399b4bc7b2816f000ea50d09eadcd16ce01e9`, required patrol docs, open Issue / PR state, PR refs, branch heads, merge refs, changed-file signals, and local merge-tree simulations.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open; PR #24 remains merged.
+- PR #23 head advanced to `a4566412f100e15bd978f43e6058759de42bef70`; `refs/pull/23/merge` exists at `b09a3346cddc63e0f334bcbe2b80c34dea97ee9a`; `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `dbab984cc4658a03e4e37527b01b429bc789a48e` before this patrol publication.
+- PR #23 branch blackboard contains Output Documents Builder `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` against `b16399b`; latest repair commit reports only `docs/WORKSTREAM_BLACKBOARD.md` conflict resolution, preserving the fail-closed renderer fix and accepting latest patrol docs from main.
+- PR #25 remains at head `48910be809922fac58b1c89d78cf81b5d7c61210`; `refs/pull/25/merge` exists at `ad41c4656aa74bca107f980d61b0b48dfed6fc31`; merge-tree exits `0`, but no newer P2 fix head was found after the Codex P2 comments at `2026-05-25T13:22:45Z` / `2026-05-25T13:23:13Z`.
+- PR #22 and PR #26 remain merge-tree clean against `b16399b`.
+
+Action Taken:
+- Updated the delivery ledger, triage queue, and Executive inbox with one single-primary follow-up for Output Documents Builder and one single-primary follow-up for Plan Puzzle Builder.
+- No merge / reject / close action was executed. No source files were modified.
+
+Next:
+- To: Output Documents Builder. Publish / confirm `CODEX_REVIEW_REQUESTED` or a post-`a456641` Codex result if the branch remains clean after this patrol publication; if main advances and blackboard conflicts again, perform the same scoped latest-main re-sync and rerun required checks.
+- To: Plan Puzzle Builder. Fix only the new Codex P2 findings on PR #25, rerun validation, publish `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`, and request Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #25 until the P2 findings are fixed and re-reviewed clean. No for PR #23 unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T13:31:12Z - PR25 Codex P2 blocker and automation lifecycle guard audit
+
+- Workstream: command/deputy / plancraft/page-ui / automation-governance
+- Branch: `origin/main` `fca20e853bb1a846ed63379a4cd290439aa56a60`
+- Status: `PR25_CODEX_P2_BLOCKED / AUTOMATION_SELF_DELETE_GUARD_REQUIRED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Evidence:
+  - GitHub open PRs: #22, #23, #25, #26. Open Issues: #15, #16, #17, #18.
+  - Latest main: `fca20e853bb1a846ed63379a4cd290439aa56a60`.
+  - PR #25 head advanced to `48910be809922fac58b1c89d78cf81b5d7c61210`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1331/pr25` exits `0`, but Codex review comments at `2026-05-25T13:22:45Z` / `2026-05-25T13:23:13Z` added P2 findings on `areaUpdatedAt` stability and invalid closed polygon preservation.
+  - PR #23 head remains `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `git merge-tree --write-tree origin/main refs/patrol/hb1331/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+  - PR #22 and PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Plan Puzzle Builder
+  - Workstream: plancraft/page-ui / plancraft/adapter-clean
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: Fix only the new Codex P2 findings on PR #25 and request re-review.
+  - Why this agent: Plan Puzzle Builder owns Issue #15 / PR #25 and the P2 findings are in `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - Action: Preserve Issue #15 scope, keep `areaUpdatedAt` stable when boundary / area metadata is unchanged, preserve invalid closed polygon geometry, rerun `node --check`, `git diff --check`, merge-tree against latest main, and guard checks; publish `PLAN_PUZZLE_ACTION_TAKEN`; request Codex re-review.
+  - Need Commander: No
+  - Need Reviewer: Yes until P2 is fixed and re-reviewed clean.
+- Automation lifecycle:
+  - Treat any workstream heartbeat self-deletion as `AUTOMATION_SELF_DELETE_VIOLATION`.
+  - No workstream should delete, pause, disable, rename, replace, or modify its own automation when it is waiting for next scoped task.
+  - If a heartbeat appears obsolete, the workstream must report `AUTOMATION_LIFECYCLE_REVIEW_NEEDED` and continue reporting `NO_NEW_EVIDENCE_AFTER_CHECK`; lifecycle decisions stay with Commander / Deputy Codex commander thread.
+- Need Commander: No
+- Need Reviewer: Yes for PR #25 Codex P2.
+
 ### 2026-05-25T13:04:41Z - Executive post-push PR23 sync blocker on `999a323`
 
 Workstream:

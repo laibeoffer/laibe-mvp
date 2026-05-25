@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:39:14Z - [PR23_REPAIR_FOUND_PR25_P2_ACK_PENDING] - Output Documents / Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18, and PR #25 / Issue #15
+
+Evidence:
+Latest main is `b16399b4bc7b2816f000ea50d09eadcd16ce01e9`. PR #23 advanced to head `a4566412f100e15bd978f43e6058759de42bef70`; `refs/pull/23/merge` exists at `b09a3346cddc63e0f334bcbe2b80c34dea97ee9a`; pre-publication merge-tree exits `0` with tree `dbab984cc4658a03e4e37527b01b429bc789a48e`; branch blackboard reports `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` against `b16399b`. PR #25 remains at head `48910be809922fac58b1c89d78cf81b5d7c61210`; merge ref exists at `ad41c4656aa74bca107f980d61b0b48dfed6fc31`; merge-tree exits `0`, but no newer fix head / visible ACK was found after Codex P2 comments on `areaUpdatedAt` stability and invalid closed polygon preservation.
+
+Recommended Executive Action:
+Chase Output Documents Builder for `CODEX_REVIEW_REQUESTED` or a post-`a456641` Codex result, with a post-publication re-sync if latest main advances again. Chase Plan Puzzle Builder for `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX` on the scoped P2 fixes.
+
+Recommended Deputy Action:
+Do not merge / reject / close. Keep PR #25 out of final gate until P2 is fixed and re-reviewed clean. PR #23 may return to final-gate consideration only after post-publication current-main state and Codex review visibility are confirmed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #25 until Codex P2 is fixed and re-reviewed clean. No for PR #23 unless new Codex review reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T13:31:12Z - [PR25_CODEX_P2_BLOCKED] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Latest main is `fca20e853bb1a846ed63379a4cd290439aa56a60`. PR #25 head advanced to `48910be809922fac58b1c89d78cf81b5d7c61210`; current-main merge-tree exits `0`, but Codex review comments at `2026-05-25T13:22:45Z` and `2026-05-25T13:23:13Z` report P2 findings on `areaUpdatedAt` stability and invalid closed polygon preservation.
+
+Recommended Executive Action:
+Chase Plan Puzzle Builder for a single visible `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`. Require scoped P2 fixes, validation rerun, and Codex re-review before PR #25 returns to Deputy final gate.
+
+Recommended Deputy Action:
+Do not merge / reject / close. Keep PR #25 out of final gate until P2 is fixed and re-reviewed clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until Codex P2 is fixed and re-reviewed clean.
+
 ### 2026-05-25T13:04:41Z - [PR23_POST_PUBLISH_SYNC_BLOCKED] - Output Documents
 
 Status:
