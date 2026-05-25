@@ -48,7 +48,7 @@ Target:
 `laibeoffer/laibe-mvp` PR #23 / Issue #18 / `output/budget-documents`
 
 Evidence:
-PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but current `origin/main` has advanced through `24e0c72076620aa2e7699ddc2fa3beb8db033fca`. GitHub PR metadata reports `mergeable=false` and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. The available merge ref targets an older base and is stale for current final-gate purposes.
+PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but patrol-start `origin/main` before the Second Deputy reconciliation had advanced through `24e0c72076620aa2e7699ddc2fa3beb8db033fca`. GitHub PR metadata reports `mergeable=false` and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. The available merge ref targets an older base and is stale for current final-gate purposes.
 
 Recommended Executive Action:
 Chase Output Documents owner to re-sync PR #23 against current `origin/main`, resolve only own-scope conflicts, rerun renderer static guard / syntax / mismatch / fixture checks, and request Codex re-review if the head changes.

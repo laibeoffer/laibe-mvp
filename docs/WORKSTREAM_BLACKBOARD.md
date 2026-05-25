@@ -1356,7 +1356,7 @@ PR_23_SYNC_BLOCKED_RECONFIRMED / CURRENT_MAIN_RECONCILED
 
 Changed:
 - Second Deputy patrol rechecked current `origin/main`, GitHub open PRs / Issues, PR comments, and PR refs after the upstream `PR_23_FINAL_GATE_WITHDRAWN` patrol entry.
-- Current `origin/main` is `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
+- Patrol-start `origin/main` before this docs publication was `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
 - PR #23 remains open on head `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub PR metadata reports `mergeable=false` and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. Local current-main merge simulation still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`, so the final gate remains withdrawn.
 - PR #22 remains open on head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge simulation found no content conflict, but final merge / reject still belongs to Deputy Codex.
 - PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; current-main merge simulation found no content conflict, but final merge / reject still belongs to Deputy Codex.
@@ -1389,7 +1389,7 @@ PR_23_FINAL_GATE_WITHDRAWN / SYNC_BLOCKED_AFTER_MAIN_ADVANCE
 
 Changed:
 - Patrol rechecked GitHub API after the previous `FINAL_GATE_READY` entry.
-- Current `origin/main` has since advanced through `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
+- Patrol-start `origin/main` before the Second Deputy reconciliation was `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
 - PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`, but GitHub API now reports `mergeable=false`, `mergeable_state=dirty`, and base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
 - Local ref `refs/remotes/origin/pr-merge/23` still exists at `8ef304b72e6afd92e61e14274cd4611f65281398`, but that merge ref targets the older base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
 - The prior clean Codex result `4531569296` is therefore treated as stale for merge-gate purposes until PR #23 re-syncs latest main and gets a fresh mergeability / review signal.

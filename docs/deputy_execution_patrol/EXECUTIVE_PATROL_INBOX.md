@@ -55,7 +55,7 @@ Finding:
 PR #23 was previously routed to Deputy final gate after clean Codex review, but latest main advanced after that review. GitHub API now reports the PR as dirty against current main, so final gate must pause.
 
 Evidence:
-- Current `origin/main`: `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
+- Patrol-start `origin/main` before the Second Deputy reconciliation: `24e0c72076620aa2e7699ddc2fa3beb8db033fca`.
 - PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`.
 - GitHub PR metadata: `mergeable=false`, base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
 - Available PR #23 merge ref targets old base `0e8ab82`; current `origin/main` is not an ancestor of PR #23 head.
