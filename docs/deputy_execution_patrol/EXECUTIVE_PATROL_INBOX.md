@@ -37,6 +37,52 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T14:44:23Z - [DEPUTY_DECISION_REQUEST] - PR23 Final Gate After Latest Sync
+
+Status:
+CODEX_REVIEW_CLEAN / CURRENT_MAIN_SYNC_REPAIRED / DEPUTY_FINAL_GATE_VISIBILITY_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 is no longer current-main sync-blocked this round. Output Documents Builder advanced the branch to latest-main sync head `976b4cba3ab33743d02a97451f04ddc65a316dc1`, and Codex returned clean after that head. Executive did not merge, reject, or close.
+
+Evidence:
+- Latest main checked: `20808ae85e0847ce606a0208a6fa932f1ba92221`.
+- PR #23 head: `976b4cba3ab33743d02a97451f04ddc65a316dc1`.
+- Builder repair report: comment `4535080840` at `2026-05-25T14:39:12Z`.
+- Codex clean result: comment `4535125308` at `2026-05-25T14:46:15Z`.
+- GitHub PR metadata: `mergeable: true`, `mergeable_state: clean`.
+- `refs/pull/23/merge`: `9f595895c900ea4048ec988ed3f3e514cec1eb5d`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `bc30ceb4fc3223be80648cb2dcbe5c34eaa8ad90`.
+- `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+- Original Codex P2 thread in `formal-file-writer-policy.ts` has a fix reply, and no new NEEDS_FIX / P1 / P2 was found after the latest head.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified by Executive and no merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex final-gate decision for PR #23. Reconfirm no branch-head change, scope drift, or new Codex review blocker before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T14:22:59Z - [DEPUTY_DECISION_REQUEST] - PR25 Final Gate Still Valid After Publication
 
 Status:

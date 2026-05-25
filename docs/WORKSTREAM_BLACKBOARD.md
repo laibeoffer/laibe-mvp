@@ -1343,6 +1343,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T14:44:23Z - PR23 latest-main repair clean / route to Deputy final gate
+
+- Workstream: command/executive / output/budget-documents
+- Branch: `origin/main` `20808ae85e0847ce606a0208a6fa932f1ba92221`
+- Status: `PR23_CODEX_REVIEW_CLEAN / CURRENT_MAIN_SYNC_REPAIRED / DEPUTY_FINAL_GATE_CANDIDATE / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. Open Issues remain #15, #16, #17, #18; Issue #19 remains closed by prior PR #24 reconciliation.
+  - PR #23 head advanced to `976b4cba3ab33743d02a97451f04ddc65a316dc1`; Output Documents Builder posted current-main workflow repair evidence in comment `4535080840` at `2026-05-25T14:39:12Z`.
+  - Codex returned clean after the `976b4cb` head in comment `4535125308` at `2026-05-25T14:46:15Z`.
+  - GitHub reports PR #23 `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` is `9f595895c900ea4048ec988ed3f3e514cec1eb5d`.
+  - `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `bc30ceb4fc3223be80648cb2dcbe5c34eaa8ad90`; `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+  - Original Codex P2 in `formal-file-writer-policy.ts` has a fix reply, and no new NEEDS_FIX / P1 / P2 was found after the latest head.
+  - PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main.
+- Decision:
+  - To: Deputy Codex
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: PR #23 final-gate visibility after clean Codex result on `976b4cb`.
+  - Why this agent: Deputy Codex owns merge / reject final decisions; Executive found the required repair ACK, current-main merge-tree pass, and post-head clean Codex result.
+  - Action: Deputy final-gate decision for PR #23. No merge / reject was executed by Executive.
+  - Need Commander: No
+  - Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or scope drift is found.
+
 ### 2026-05-25T14:22:59Z - Commander post-publication verification / PR25 stays final-gate / PR23 stays sync-blocked
 
 - Workstream: command/deputy / plancraft/page-ui / output/budget-documents
