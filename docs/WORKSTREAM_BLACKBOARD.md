@@ -4525,6 +4525,38 @@ No
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Executive PR25 repair accepted / PR23 still blocked on `df7f3b3`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+PR25_BUILDER_REPAIR_ACCEPTED / PR25_CODEX_REVIEW_REQUEST_PENDING / PR23_BUILDER_REPAIR_ACK_PENDING
+
+Table Compliance:
+PARTIAL - PR #25 now has a pushed Builder repair artifact and current-main merge simulation pass; PR #23 still lacks required Builder repair ACK.
+
+Missed Progress:
+PR #25 missed cycles reset to `0` after public `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`; PR #23 missed cycles increased to `21`.
+
+Action Taken:
+Executive Officer rechecked latest main `df7f3b33888c64c5f5bdac4b63eb472d158b2146`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, public PR pages, PR refs, fetched PR heads, and local merge-tree signals. PR #25 head advanced to `f545c131141b2694765e827d1831822869b4c35a`; `refs/pull/25/merge` exists at `41850dd7af1305b32c8baab85fb978e7f76a3181`; local merge-tree exits `0` with tree `86583d0681cb1122ccb508760e5e2b048f92c34b`. PR #23 remains head `a75e3802a30f13201cf2df5705112142d9251e8c`; no required ACK label was found on the public PR page; local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. GitHub REST metadata hit unauthenticated `403` fallback.
+
+Next Required:
+Plan Puzzle Builder must request `@codex review` on PR #25 and report `CODEX_REVIEW_REQUESTED` / result or exact blocker. Output Documents Builder must provide `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and blocker.
+
+Blocked:
+PR #23 remains current-main sync blocked.
+
+Need Deputy:
+No new request this patrol; Deputy owns PR #25 merge / reject if Codex review is clean.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drift.
+
 ### 2026-05-25 - Executive Builder repair ACK follow-up on `c576c81`
 
 Workstream:
