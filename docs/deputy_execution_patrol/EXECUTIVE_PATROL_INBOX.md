@@ -1193,3 +1193,61 @@ No unless formal pricing / API / migration boundary appears.
 Deputy Decision:
 Accepted. Executive Officer correctly identified unreported Quote Factory progress: branch `qf/qf5-3-audit-override-publish` exists but no PR URL / validation report was found. No Commander or Reviewer escalation is needed yet. Executive Officer should require a PR URL, validation result, formal pricing negative check, Supabase / API / migration negative check, or exact blocker. If the next Executive Officer patrol still finds no PR or blocker, keep the item visible for Deputy follow-up; Deputy may then verify branch scope and repair the PR workflow if needed.
 
+### 2026-05-25T08:30:00Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Mission:
+PR #25 direct current-main repair after Deputy2 silence
+
+Why this agent:
+Commander bypassed the silent Deputy Codex-2 repair bottleneck. The PR branch owner must now attempt the scoped repair directly.
+
+Action:
+Re-check latest `origin/main`, PR #25 head `ffbe8e1`, and merge-tree / merge ref. Resolve only the current-main `docs/NEXT_CODEX_HANDOFF.md` conflict inside Issue #15 scope, push an actual branch update, rerun `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` and guard checks, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drift or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T08:30:00Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Mission:
+PR #23 direct current-main repair after Deputy2 silence
+
+Why this agent:
+Commander bypassed the silent Deputy Codex-2 repair bottleneck. The PR branch owner must now attempt the scoped repair directly.
+
+Action:
+Re-check latest `origin/main`, PR #23 head `a75e380`, and merge-tree / merge ref. Resolve only the current-main `docs/WORKSTREAM_BLACKBOARD.md` conflict inside Output Documents scope, preserve fail-closed P2 fix and patrol records, push an actual branch update, rerun renderer static guard / syntax / mismatch fixture / invalid fixture / `.xlsx/.pdf` no-output check / `git diff --check` where available, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+

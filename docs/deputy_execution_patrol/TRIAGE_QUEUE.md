@@ -660,6 +660,50 @@ No
 Need Reviewer:
 Yes
 
-## Processed Triage Items
+## Current Bypass Triage Items
 
-No processed triage items yet.
+### 2026-05-25T08:30:00Z - [CADRE_BYPASS_REASSIGNMENT] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Deputy Codex-2 remained silent after repeated Executive and Commander follow-ups. Ledger now reassigns Current Handler to Plan Puzzle Builder. PR #25 still needs current-main handoff-conflict repair and a pushed branch update.
+
+Recommended Executive Action:
+Chase Plan Puzzle Builder for `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`; do not chase Deputy2 for this row unless the ledger changes again.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drift or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T08:30:00Z - [CADRE_BYPASS_REASSIGNMENT] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` Issue #18 / PR #23 / `output/renderer-static-guard-review-packet`
+
+Evidence:
+Deputy Codex-2 remained silent after repeated Executive and Commander follow-ups. Ledger now reassigns Current Handler to Output Documents Builder. PR #23 still needs current-main blackboard-conflict repair and a pushed branch update.
+
+Recommended Executive Action:
+Chase Output Documents Builder for `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`; do not chase Deputy2 for this row unless the ledger changes again.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.

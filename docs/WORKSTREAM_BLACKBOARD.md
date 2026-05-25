@@ -4589,3 +4589,36 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander bypasses silent Deputy2 repair bottleneck
+
+Workstream:
+command/deputy / active repair routing
+
+Status:
+CADRE_BYPASS_REASSIGNMENT / BUILDER_REPAIR_RESTORED
+
+Changed:
+- Commander inspection found the system still stalled because PR #23 / PR #25 were assigned to Deputy Codex-2 repair lanes, but repeated patrols only produced more `ACTIVE_HANDLER_SILENT` evidence instead of repair attempts.
+- Confirmed several workstream automations had mojibake / unreadable prompts, so the worker chats were not reliably receiving executable role parameters.
+- Updated workstream heartbeat prompts to English for Plan Puzzle, Output Documents, Raw Candidate, MethodSpec, Visual Simulation, Quote Factory, and Reviewer.
+- Reassigned PR #25 Current Handler from Deputy Codex-2 to Plan Puzzle Builder for direct current-main handoff-conflict repair.
+- Reassigned PR #23 Current Handler from Deputy Codex-2 to Output Documents Builder for direct current-main blackboard-conflict repair.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Deputy Codex-2 remains a LOW / MEDIUM workflow deputy, but it is no longer the active repair bottleneck for PR #23 / PR #25 this cycle.
+- Executive Officer must chase the branch owners directly:
+  - PR #25: Plan Puzzle Builder must report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+  - PR #23: Output Documents Builder must report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+- No merge / reject / close action was executed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
