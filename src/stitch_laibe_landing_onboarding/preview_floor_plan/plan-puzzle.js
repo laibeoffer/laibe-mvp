@@ -3950,9 +3950,34 @@
   function syncZoneBoundaryMetadata() {
     project.zones.forEach((zone) => {
       ensureZoneBoundaryFields(zone);
+      const clearedAreaMetadata = getClearedZoneAreaMetadata(zone);
       const draft = createZoneBoundaryDraft(zone.boundaryEdgeIds || []);
       applyBoundaryDraftToZone(zone, draft, false);
+      if (clearedAreaMetadata) {
+        Object.assign(zone, clearedAreaMetadata);
+      }
     });
+  }
+
+  function getClearedZoneAreaMetadata(zone) {
+    const reviewerReasons = Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : [];
+    if (zone.areaStatus !== "not_calculated" || !reviewerReasons.includes("zone-area-cleared")) {
+      return null;
+    }
+    return {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: uniqueIds([...reviewerReasons, "zone-area-candidate-only"]),
+      areaUpdatedAt: zone.areaUpdatedAt || null
+    };
   }
 
   function ensureZoneBoundaryFields(zone) {
@@ -4045,9 +4070,14 @@
 
     if (draft?.status !== "closed") {
       const statusReason = draft?.status === "invalid" ? "zone-boundary-invalid" : "zone-boundary-not-closed";
+      const areaStatus = draft?.status === "none"
+        ? "not_calculated"
+        : draft?.status === "invalid"
+          ? "invalid"
+          : "open_boundary";
       return {
         ...base,
-        areaStatus: draft?.status === "none" ? "not_calculated" : "open_boundary",
+        areaStatus,
         areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
         reviewerReasons: uniqueIds([...reviewerReasons, statusReason, ...issues.map((issue) => issue.type)])
       };
