@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #26
+
+Evidence:
+Current main is `2c26cd5184d3e4c26b9028221eef692d0208ce7d`. PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local `git merge-tree --write-tree origin/main refs/eopatrol/pr22-head` exits `0`, GitHub changed files remain the Issue #16 docs-only set, and no review threads exist, but the available merge ref still targets old base `a1da6a766c0b9a99b4d3cab48d7d0304e1330660`. PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local `git merge-tree --write-tree origin/main refs/eopatrol/pr26-head` exits `0`, but the available merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. No owner response was found after Executive call-outs `4531941286` and `4531941371`.
+
+Recommended Executive Action:
+Do not post duplicate ordinary chase comments unless either branch head changes. Executive has current-main merge-tree evidence; the remaining gap is Deputy gate / repair-lane decision.
+
+Recommended Deputy Action:
+Decide per PR whether Executive current-main merge-tree evidence is sufficient for gate routing or whether to assign a refresh owner. For PR #22, the practical missing item is a fresh owner current-main / allowed-docs confirmation. For PR #26, the practical missing item is rerun R1.5 validation and forbidden formal-pricing checks against current main.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
+
 ### 2026-05-25T06:13:21Z - [DEPUTY2_REPAIR_ASSIGNED] - PR #23 / PR #25
 
 Status:

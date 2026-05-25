@@ -1343,6 +1343,40 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive signal refresh after Deputy repair assignment `2c26cd5`
+
+Workstream:
+Executive Officer / MethodSpec / Raw Candidate / Output Documents / Plan Puzzle
+
+Changed:
+- Re-read latest `origin/main` at `2c26cd5184d3e4c26b9028221eef692d0208ce7d`, including the Deputy-published PR #23 / PR #25 workflow repair assignments.
+- Rechecked tracked PR heads and current-main merge simulations for PR #22 / #23 / #25 / #26.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, changed files remain Issue #16 docs-only, and no owner response was found after Executive call-out `4531941286`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, but no fresh owner-posted R1.5 validation / forbidden formal-pricing rerun was found after Executive call-out `4531941371`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. Deputy Codex-2 repair assignment remains active.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and current-main merge-tree still refuses unrelated histories. Deputy Codex-2 repair assignment remains active.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- PR #22 / PR #26 are now classified as `DEPUTY_SIGNAL_DECISION_REQUIRED / CURRENT_MAIN_SIMULATION_PASS_MERGE_REF_STALE`; ordinary duplicate chase is no longer useful unless a branch changes.
+- PR #23 / PR #25 remain assigned to Deputy Codex-2 workflow repair. Executive should watch for repair package output rather than duplicate owner chase.
+- No Commander escalation: these are GitHub workflow / branch evidence decisions, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+
+Next:
+- Deputy Codex should decide whether Executive current-main merge-tree evidence is enough to route PR #22 / PR #26 to gate, or assign refresh owners for current-main confirmation / validation reruns.
+- Deputy Codex-2 should report PR #23 / PR #25 repair package status back to `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, and `EXECUTIVE_PATROL_INBOX.md`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a branch changes, a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
 ### 2026-05-25 - Deputy workflow repair assignment for PR #23 / PR #25
 
 Workstream:

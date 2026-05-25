@@ -37,6 +37,52 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
+
+Status:
+PENDING_DEPUTY_DECISION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+MethodSpec Builder / Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #16 / PR #22; Issue #17 / PR #26
+
+Finding:
+After the 05:59 Executive call-outs, PR #22 and PR #26 still have no owner-posted current-main evidence. Executive current-main merge-tree checks now pass for both PRs against `origin/main` `2c26cd5184d3e4c26b9028221eef692d0208ce7d`, but GitHub merge refs remain stale. This is no longer a plain owner chase; Deputy must decide whether Executive evidence is sufficient for gate routing or whether a repair / refresh owner is required.
+
+Evidence:
+- Current main: `2c26cd5184d3e4c26b9028221eef692d0208ce7d`.
+- PR #22 head: `e338431e04811b5b7b0bdcff789f8d3d162ee8df`.
+- PR #22 local current-main merge-tree: exit `0`.
+- PR #22 GitHub changed files remain Issue #16 allowed docs only: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+- PR #22 review threads: none.
+- PR #22 available merge ref still targets old base `a1da6a766c0b9a99b4d3cab48d7d0304e1330660`.
+- PR #26 head: `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- PR #26 local current-main merge-tree: exit `0`.
+- PR #26 available merge ref still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- No owner response was found after Executive call-outs `4531941286` and `4531941371`.
+
+Action already taken:
+Executive Officer did not post duplicate GitHub comments this round. Delivery ledger and triage queue were updated to classify PR #22 / PR #26 as `DEPUTY_SIGNAL_DECISION_REQUIRED / CURRENT_MAIN_SIMULATION_PASS_MERGE_REF_STALE`.
+
+Recommended Deputy action:
+Decide per PR:
+- PR #22: either accept Executive current-main merge-tree plus allowed-docs evidence and route the final gate, or assign MethodSpec owner / repair lane to publish fresh current-main mergeability confirmation.
+- PR #26: either accept Executive current-main merge-tree evidence while noting stale owner validation, or assign Raw Candidate owner / repair lane to rerun R1.5 validation and forbidden formal-pricing checks against current main.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T06:13:21Z - [DEPUTY_DECISION_PUBLISHED] - PR #23 / PR #25
 
 Status:
