@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T04:23:16Z - [PR_VERIFICATION_REQUIRED] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/page-ui`
+
+Evidence:
+Branch `plancraft/zone-area-boundary-refinement` now exists at `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7` and maps to PR #25. Changed files are Plan Puzzle UI plus handoff/review packet docs. Branch is not based on latest main, and `refs/pull/25/merge` was not found during Deputy patrol.
+
+Recommended Executive Action:
+Stop classifying this as no-branch stall. Verify PR #25 mergeability, latest-main sync need, allowed files, `node --check`, guard checks, and Codex review readiness.
+
+Recommended Deputy Action:
+Keep as technical PR verification / sync follow-up. No Commander escalation unless the PR changes product direction, formal estimate boundary, payment, AI API, or forbidden files.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drift or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T04:23:16Z - [PR_VERIFICATION_REQUIRED] - Raw Candidate
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` Issue #17 / PR #26 / `warehouse/raw-candidate`
+
+Evidence:
+Branch `warehouse/raw-source-quality-scoring` now exists at `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` and maps to PR #26. Changed files are raw-warehouse scoring/checklist scope plus handoff/blackboard docs. `refs/pull/26/merge` exists, but candidate-only validation and forbidden formal-pricing checks still need verification.
+
+Recommended Executive Action:
+Stop classifying this as no-branch stall. Verify PR #26 validation command output, candidate-only boundary, forbidden formal-price / PricingRule / BudgetEstimateLine fields, changed files, and Codex review readiness.
+
+Recommended Deputy Action:
+Keep as technical PR verification follow-up. No Commander escalation unless formal price / formal catalog / renderer / payment / API boundary appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drift, formal pricing risk, or Codex review reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-24T20:43:51Z - [LAGGING_TWO_CYCLES] - Plan Puzzle
 
 Status:

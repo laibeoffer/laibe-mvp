@@ -37,6 +37,88 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T04:23:16Z - [WORKFLOW_REPAIR_PRS_FOUND] - PR #25 / PR #26
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Plan Puzzle Builder / Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25, Issue #17 / PR #26
+
+Finding:
+Deputy patrol found new PR refs for the two previously branchless workflow-repair stalls. These are no longer ordinary no-response items; they now need PR verification, allowed-scope checks, validation checks, and review-readiness routing.
+
+Evidence:
+- PR #25 head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7` maps to branch `plancraft/zone-area-boundary-refinement`.
+- PR #25 changed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- PR #25 branch is not based on latest `origin/main` `70751e68bd4d9f6b75add7b65ddd04b289657faa`, and `refs/pull/25/merge` was not found.
+- PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` maps to branch `warehouse/raw-source-quality-scoring`.
+- PR #26 changed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/WORKSTREAM_BLACKBOARD.md`, `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`, `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`, `src/lib/budget/raw-warehouse/source-quality-scoring.ts`, `src/lib/budget/raw-warehouse/types.ts`.
+- `refs/pull/26/merge` exists, but validation and forbidden-pricing-field checks still need verification.
+
+Action already taken:
+Deputy Codex published a blackboard update recording the new workflow-repair PRs and changing #15 / #17 from no-branch stall to PR verification tracking.
+
+Recommended Deputy action:
+Executive Officer should verify:
+- PR #25: mergeability, latest-main sync, changed files, `node --check`, plan-puzzle guard checks, and whether Codex review should be requested after sync.
+- PR #26: candidate-only boundary, forbidden formal-pricing fields, validation command output, changed files, and whether Codex review should be requested.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drift, forbidden file changes, or Codex review reports NEEDS_FIX / P1 / P2.
+
+Deputy Decision:
+PENDING_EXECUTIVE_VERIFICATION
+
+### 2026-05-25T04:05:13Z - [PR_BRANCH_UPDATES_FOUND] - PR #22 / PR #23
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+MethodSpec Builder / Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22, PR #23
+
+Finding:
+Deputy patrol found new remote branch heads after the Deputy Codex-2 decision gate. #22 and #23 are no longer empty stalls; they need mergeability / checks / review-state verification.
+
+Evidence:
+- PR #22 branch `warehouse/method-spec-validator-freeze-note` moved to `e338431e04811b5b7b0bdcff789f8d3d162ee8df` and includes `e338431 Merge origin/main into MethodSpec freeze note`.
+- PR #22 changed files observed from git diff: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/budget/32-method-spec-validator-freeze-note.md`.
+- PR #23 branch `output/renderer-static-guard-review-packet` moved to `cb276cb2ab5cbfd5538d758ccde6172d529cd90b`.
+- PR #23 now includes `76d4fc7 fix(output): reject renderer format mismatches`, `c05cadd fix(output): fail closed on renderer format mismatch`, and `cb276cb merge(output): reconcile pr23 p2 fix branch`.
+
+Action already taken:
+Deputy Codex published a short blackboard update recording the branch-head changes and keeping #23 review gate active.
+
+Recommended Deputy action:
+Executive Officer should verify:
+- PR #22: current mergeability, checks, and whether Codex re-review is needed / requested.
+- PR #23: checks, Codex re-review status, and whether the prior P2 thread is fixed / outdated / clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until Codex re-review is clean. No for #22 unless Codex review reports NEEDS_FIX / P1 / P2 or scope changes.
+
+Deputy Decision:
+PENDING_EXECUTIVE_VERIFICATION
+
 ### 2026-05-25T03:34:00Z - [DEPUTY2_DECISIONS_PUBLISHED] - Active Stalls
 
 Status:
