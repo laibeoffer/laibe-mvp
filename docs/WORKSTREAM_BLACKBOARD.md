@@ -1343,6 +1343,36 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Chatroom heartbeat prompt sync published
+
+Workstream:
+command/deputy / automation governance
+
+Status:
+PROMPT_SYNC_PUBLISHED / VISIBLE_REPORTING_ENFORCED
+
+Changed:
+- Updated commander heartbeat `laibe-commander-patrol` to include cadence accountability, active-handler visible ACK rules, and `CADRE_RULE_FAIL` / `ACTIVE_HANDLER_SILENT` escalation.
+- Previously updated cadre heartbeats remain active: `laibe-mvp-executor-patrol`, `laibe-deputy-15min-patrol`, `laibe-triage-officer-heartbeat`, and governance patrol `20`.
+- Updated workstream heartbeats to include visible status codes, latest-source checking, and no-standby rules: `laibe-plan-puzzle-patrol`, `heartbeat-2` Output Documents, `laibe-method-spec-patrol`, `heartbeat` Raw Candidate, `heartbeat-4` Quote Factory, `heartbeat-3` Visual Simulation, and `laibe-reviewer-heartbeat`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+Decision:
+- All active workstream automations now know that if `DELIVERY_LEDGER.md` points to them, they must visibly report with one of `ACTION_TAKEN`, `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- Completed / waiting rows may stay quiet only when no active Issue / PR, stale state, or Deputy / Executive dispatch exists.
+- Reviewer stays quiet unless Need Reviewer / Codex review / scope-risk / explicit review request exists.
+
+Next:
+- Watch the next patrol cycle for compliance. Any active handler that replies only `standby`, `no task`, or a bare `NO_NEW_*` without checked sources should be marked `CADRE_RULE_FAIL` or `WORKSTREAM_VISIBLE_REPORT_FAIL`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Cadre accountability prompts corrected
 
 Workstream:
