@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T05:55:21Z - [PR25_CONFLICT_REFINED] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Current main is `7a8fb02d24003919fe59fd4f9fae63d8df9c4625`. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; the local-only commit `33c4695` from connector comment `4531872891` is still not pushed to the PR and no `refs/pull/25/merge` exists. Current-main simulation now exits `1` with a concrete conflict in `docs/NEXT_CODEX_HANDOFF.md`, replacing the prior `exit 128` / unrelated-history blocker wording.
+
+Recommended Executive Action:
+Chase Plan Puzzle Builder with the refined blocker: resolve the `docs/NEXT_CODEX_HANDOFF.md` current-main conflict in a GitHub-connected environment, preserve Issue #15 scope, push the actual branch update, rerun `node --check` and guard checks, then request Codex review only after a PR merge ref exists.
+
+Recommended Deputy Action:
+Keep PR #25 in workflow repair. Do not escalate to Commander. Escalate to Deputy workflow repair / reassignment only if the next cycle still produces no pushed repair commit or valid merge ref.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25T05:49:20Z - [PR25_BLOCKER_WITH_ATTEMPTED_FIX_FOUND] - Plan Puzzle
 
 Status:

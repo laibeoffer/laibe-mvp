@@ -1343,6 +1343,44 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy PR #25 blocker refined to current-main handoff conflict
+
+Workstream:
+plancraft/page-ui / Plan Puzzle
+
+Branch:
+plancraft/zone-area-boundary-refinement
+
+Status:
+PR_25_SYNC_CONFLICT_IDENTIFIED / WORKFLOW_REPAIR_REQUIRED
+
+Changed:
+- Re-read current `origin/main` at `7a8fb02d24003919fe59fd4f9fae63d8df9c4625`.
+- Rechecked open PRs #22 / #23 / #25 / #26 and local current-main merge simulations.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and GitHub API still returns `mergeable_state=unknown`.
+- Unlike the prior patrol that saw `git merge-tree` exit `128`, current-main simulation now exits `1` with a concrete content conflict in `docs/NEXT_CODEX_HANDOFF.md`.
+- The local-only PR #25 handoff commit `33c4695` still is not present on the GitHub PR; PR #25 still has only the pushed head `ffbe8e1`.
+- PR #22 and PR #26 still pass current-main merge-tree simulation but have stale merge-ref evidence; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Refine PR #25 from no-merge-base / unrelated-history wording to a concrete `docs/NEXT_CODEX_HANDOFF.md` current-main conflict.
+- Keep PR #25 in workflow repair; do not treat the prior local-only handoff update as delivered.
+
+Next:
+- Executive Officer should chase exactly one primary owner, Plan Puzzle Builder, to resolve the current-main `docs/NEXT_CODEX_HANDOFF.md` conflict in a GitHub-connected environment, preserve Issue #15 scope, push the actual branch update, rerun `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` and guard checks, then request Codex review only after a PR merge ref exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25 - Second Deputy PR #25 blocker response reconciliation
 
 Workstream:

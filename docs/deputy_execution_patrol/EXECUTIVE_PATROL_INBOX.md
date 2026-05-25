@@ -37,6 +37,44 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:55:21Z - [PR25_CONFLICT_REFINED] - Plan Puzzle
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+DEPUTY_CODEX
+
+Workstream:
+Plan Puzzle Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 blocker is now more specific. The previous no-merge-base / `exit 128` wording is stale; current-main simulation against `origin/main` `7a8fb02d24003919fe59fd4f9fae63d8df9c4625` reaches a concrete conflict in `docs/NEXT_CODEX_HANDOFF.md`.
+
+Evidence:
+- PR #25 head: `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- Local-only connector commit `33c4695` from comment `4531872891` is still not pushed to the PR.
+- No `refs/pull/25/merge` exists.
+- `git merge-tree --write-tree origin/main origin/pr/25` exits `1` and reports `CONFLICT (content): Merge conflict in docs/NEXT_CODEX_HANDOFF.md`.
+
+Action already taken:
+Deputy Codex updated the blackboard, delivery ledger, triage queue, and this inbox with the refined blocker.
+
+Recommended Deputy action:
+Executive Officer should chase Plan Puzzle Builder to resolve the `docs/NEXT_CODEX_HANDOFF.md` current-main conflict in a GitHub-connected environment, preserve Issue #15 scope, push the actual repair commit, rerun `node --check` and guard checks, and request Codex review only after a merge ref exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
+Deputy Decision:
+LOW_MEDIUM_WORKFLOW_REPAIR_CHASE_APPROVED
+
 ### 2026-05-25T05:49:20Z - [PR25_WORKFLOW_REPAIR_CHASE] - Plan Puzzle
 
 Status:
