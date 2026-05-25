@@ -1376,6 +1376,48 @@ No
 Need Reviewer:
 No
 
+### 2026-05-25 - Deputy Codex-2 immediate repair check
+
+Workstream:
+Deputy Codex-2 / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+IMMEDIATE_REPAIR_CHECK_COMPLETE / FINAL_GATES_AND_SYNC_BLOCKERS_UPDATED
+
+Changed:
+- Deputy Codex-2 ran an immediate repair check after the missed-alarm complaint instead of waiting for the next heartbeat.
+- Latest `origin/main` is `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- PR #22 head is `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; `refs/pull/22/merge` exists at `72f0f3eff085cc434921b7490c513d644208c46d`. GitHub comments report latest-main re-sync, allowed Issue #16 docs-only scope, `@codex review`, and clean Codex result `4531356014`. Route PR #22 to Deputy final merge / reject gate. Need Reviewer: No unless branch changes or Codex reports P1/P2/NEEDS_FIX.
+- PR #23 head is `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists at `8ef304b72e6afd92e61e14274cd4611f65281398`, and the branch contains latest `origin/main`. GitHub comments report the renderer / format mismatch fail-closed fix and a post-resync `@codex review` request at comment `4531552098`; no post-resync clean Codex result was found in fetched comments during this check. Keep PR #23 in REVIEW_GATE_HOLD until the post-resync Codex check is clean.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; `refs/pull/25/merge` is absent, and local git found no merge base with current `origin/main`. GitHub comments report a sync-recovery attempt / environment blocker, but the remote PR head did not advance in refs during this check. Keep PR #25 as latest-main sync blocker; no Codex review request or merge gate yet.
+- PR #26 head is `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; `refs/pull/26/merge` exists at `f3db625a4716b8997f06e98673ccf8d2ba0e037d`. GitHub comments report Executive validation, candidate-only safety, forbidden formal-pricing negative checks, and clean Codex review `4531555287`. Route PR #26 to Deputy final merge / reject gate. Need Reviewer: No unless branch changes or Codex reports P1/P2/NEEDS_FIX.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only repair-check update.
+
+Blocked:
+- PR #25: no merge ref / no merge base with current `origin/main`; needs true latest-main sync in a GitHub-connected environment.
+- PR #23: post-resync Codex review result not yet found; hold final gate until clean.
+
+Next:
+- Deputy final gate candidates now include PR #22 and PR #26.
+- Executive Officer should stop chasing PR #22 / PR #26 as ordinary stalls unless their branch state changes.
+- Executive Officer should keep PR #25 on exact sync-recovery chase and require a branch head that produces a merge ref.
+- Output Documents owner must wait for or obtain post-resync clean Codex review on PR #23 before Deputy final gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the post-resync Codex check is clean. No for PR #22 / PR #25 / PR #26 unless scope drifts or Codex reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy patrol found workflow repair PRs #25 / #26
 
 Workstream:
