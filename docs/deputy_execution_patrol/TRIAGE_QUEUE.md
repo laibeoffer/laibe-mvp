@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T17:13:03Z - [PR25_HEAD_ADVANCED_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / CODEX_REVIEW_RESULT_PENDING
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`. PR #25 head advanced from `e2decbec50d1cb65241123b76372555658e88cde` to `a83a121d072f653783b8b8b26d8ef3a2fae5aec2` by merging current main into the branch. `refs/pull/25/merge` remains stale at `19310577152e6ce52bf2556d6d0e469f05621718` with parents `1773387` and `e2decbec`; local current-main simulation still passes: `git merge-tree --write-tree origin/main refs/patrol/hb1713/pr25` exits `0` with tree `f931dec3eefee6705273c2988114add7f1448148`, and `git diff --check origin/main..refs/patrol/hb1713/pr25` exits `0`. PR #25 diff against current main remains limited to Issue #15 allowed files. Public PR page exposes `a83a121` as the head but no post-`a83a121` clean Codex result.
+
+Recommended Executive Action:
+Issue a single-primary `To: Plan Puzzle Builder` visible ACK request. Required labels: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists. Do not post duplicate GitHub comments unless a new blocker or branch-head change appears.
+
+Recommended Deputy Action:
+Pause PR #25 final-gate decision until post-`a83a121` Codex result is visible, or Deputy explicitly accepts the sync-only branch-head change without re-review. PR #22 / #23 / #26 remain separate current-main simulation-pass final-gate candidates.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`a83a121` Codex result is clean or Deputy override is published.
+
 ### 2026-05-25T16:59:14Z - [PR25_CODEX_CLEAN_FINAL_GATE] - Plan Puzzle
 
 Status:

@@ -37,6 +37,55 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T17:13:03Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Head Advanced / Review Result Pending
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / BUILDER_VISIBLE_ACK_REQUIRED / NO_DUPLICATE_GITHUB_CHASE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 branch head changed after the prior Deputy final-gate request. The new head appears to be a sync-only merge of current main into the PR branch, and current-main local simulation passes, but no post-`a83a121` Codex clean result is visible on the public PR page.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, PR #25 public Codex review clips, and PR #25 commit/diff history.
+- Latest `origin/main`: `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`.
+- PR #25 status: open.
+- Previous clean PR #25 head: `e2decbec50d1cb65241123b76372555658e88cde`.
+- Current PR #25 head: `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+- Current PR #25 head parents: `e2decbec50d1cb65241123b76372555658e88cde` and `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`.
+- `refs/pull/25/merge`: stale at `19310577152e6ce52bf2556d6d0e469f05621718`, with parents `1773387fd393c6af1710f8b999bb34ee1be64031` and `e2decbec50d1cb65241123b76372555658e88cde`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1713/pr25` exits `0` with tree `f931dec3eefee6705273c2988114add7f1448148`.
+- `git diff --check origin/main..refs/patrol/hb1713/pr25` exits `0`.
+- PR #25 diff against current main remains limited to Issue #15 allowed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- Public PR page exposes `a83a121` as the head but no post-`a83a121` clean Codex result; no `NO_NEW_EVIDENCE_AFTER_CHECK` was found.
+- Why no executable change exists for Executive: this is a review-result visibility / owner ACK gap after a branch-head change; Executive may chase visibility but may not edit source, merge, reject, or close.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should report one of `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists. If the head changes again, include validation refresh and allowed / forbidden scope checks.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`a83a121` Codex result is clean or Deputy override is published.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / CODEX_REVIEW_RESULT_PENDING
+
 ### 2026-05-25T16:59:14Z - [DEPUTY_FINAL_GATE_REQUEST] - PR25 Clean After E2DECBE
 
 Status:
