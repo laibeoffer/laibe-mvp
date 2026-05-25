@@ -1,5 +1,30 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
+
+- 本輪任務名稱：Strategic Plan Imported / Dispatch Source Clarified。
+- 任務類型：Governance / Documentation / Dispatch Rules；本輪只整合指揮官校正版戰略計畫，不修改功能程式碼。
+- 新增檔案：
+  - `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
+- 修改檔案：
+  - `AGENTS.md`
+  - `AI_RULES/CODEX_MANDATORY_ENTRY.md`
+  - `AI_RULES/TASK_DISPATCH_RULES.md`
+  - `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+- 整合重點：
+  - 將「預算生成系統」明確拆回三倉：`warehouse/raw-candidate`、`warehouse/method-spec`、`output/budget-documents`。
+  - 獨立標示平面拼圖三層、模擬圖生成、外部 Quote Factory / 預算原料清洗工作線，避免混線。
+  - 明確化 GitHub Issue = 派工單、Blackboard = 戰情板、Heartbeat = 巡邏員。
+  - 副指揮官派工必須有 `To: Agent`，不得只寫 workstream / branch / repo。
+- 未修改檔案：
+  - 未修改 `src/`、budget implementation、plan-puzzle、renderer、payment、AI API、`.env` 或任何 secrets。
+- 已知風險：
+  - 既有主工作樹仍有其他聊天室造成的大量 dirty / untracked 狀態；本輪在乾淨黑板發布 worktree 中進行 docs-only 整合，避免覆蓋他人改動。
+- Need Commander: No，這是使用者提供的戰略計畫落檔與治理索引。
+- Need Reviewer: No，除非後續要求審查治理文件一致性。
+
 ## Latest Patrol Task: Quote Factory PR #2 Merged / Triage Queue Initialized
 
 - 本輪任務名稱：Quote Factory PR #2 Merged / Triage Queue Initialized。

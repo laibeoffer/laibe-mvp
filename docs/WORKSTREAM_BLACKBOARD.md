@@ -1343,6 +1343,49 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Strategic plan imported / dispatch source clarified
+
+Workstream:
+governance/codex-rules
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+STRATEGIC_PLAN_PUBLISHED / DISPATCH_RULES_CLARIFIED
+
+Changed:
+- Imported Commander-revised strategic plan into `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`.
+- Added the strategic plan to mandatory reading via `AGENTS.md` and `AI_RULES/CODEX_MANDATORY_ENTRY.md`.
+- Updated dispatch rules so GitHub Issue = formal dispatch ticket, `docs/WORKSTREAM_BLACKBOARD.md` = battle board, heartbeat / automation = patrol timer.
+- Reaffirmed Deputy dispatch must name `To: Agent`.
+- Reaffirmed budget generation is split into three warehouses: `warehouse/raw-candidate`, `warehouse/method-spec`, and `output/budget-documents`.
+- Reaffirmed separate workstreams for Plan Puzzle, Visual Simulation, and external Quote Factory / price-range governance.
+
+Files:
+- `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
+- `AGENTS.md`
+- `AI_RULES/CODEX_MANDATORY_ENTRY.md`
+- `AI_RULES/TASK_DISPATCH_RULES.md`
+- `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- Docs-only governance integration.
+
+Blocked:
+- None.
+
+Next:
+- Deputy / Executive / Triage / workstream heartbeats should read `docs/LAIBE_CODEX_STRATEGIC_PLAN.md` before classifying workstreams or dispatching new tasks.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Deputy Codex-2 overdue assignment patrol
 
 Workstream:
