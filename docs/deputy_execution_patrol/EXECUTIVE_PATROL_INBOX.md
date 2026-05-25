@@ -37,6 +37,47 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T03:34:00Z - [DEPUTY2_DECISIONS_PUBLISHED] - Active Stalls
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Plan Puzzle Builder / Raw Candidate Builder / MethodSpec Builder / Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15, Issue #17, PR #22, PR #23
+
+Finding:
+Deputy Codex-2 processed the overdue action items as decisions, not another routine chase. Latest checked main SHA: `ce7a821bc29a522008398adb89ac1a2f4e2eee76`.
+
+Evidence:
+- Issue #15 and #17 still have no claim, branch, PR URL, validation result, or blocker with attempted fix after Executive `STALL_CONTINUES` comments at `2026-05-25T03:28Z`.
+- PR #22 still has no latest-main re-sync, allowed-scope confirmation, or Codex review request after Executive `STALL_CONTINUES`.
+- PR #23 still has unresolved, non-outdated Codex P2 on `src/lib/budget/renderers/formal-file-writer-policy.ts`.
+
+Action already taken:
+Deputy Codex-2 published the decision gate to `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Recommended Deputy action:
+No Commander escalation. Use the following routing:
+- PR #23: `REVIEW_GATE_HOLD`.
+- PR #22: `FINAL_CALL_TO_ORIGINAL_OWNER`.
+- Issue #17: `DEPUTY_WORKFLOW_REPAIR`.
+- Issue #15: `DEPUTY_WORKFLOW_REPAIR`.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
+Deputy Decision:
+PUBLISHED_TO_BLACKBOARD
+
 ### 2026-05-25T02:55:06Z - [DEPUTY2_OVERDUE_ASSIGNMENT_REPORT] - Active Stalls
 
 Status:

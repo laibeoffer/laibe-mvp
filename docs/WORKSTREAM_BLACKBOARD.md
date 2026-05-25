@@ -1343,6 +1343,60 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy Codex-2 overdue decision gate
+
+Workstream:
+cross-workstream decision gate / Deputy Codex-2
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+DECISIONS_PUBLISHED / FINAL_CALL_AND_WORKFLOW_REPAIR
+
+Decision Source:
+- `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- GitHub open Issues / PRs / comments / review threads at latest checked `main` SHA `ce7a821bc29a522008398adb89ac1a2f4e2eee76`
+
+Decisions:
+- PR #23 / Output Documents: `REVIEW_GATE_HOLD`. PR #23 must not merge. The unresolved Codex P2 review thread on `src/lib/budget/renderers/formal-file-writer-policy.ts` remains the gate until renderer / format mismatch handling fails closed, latest `main` is re-synced, renderer static guard / syntax / smoke checks are rerun, and Codex re-review is requested and clean.
+- PR #22 / MethodSpec: `FINAL_CALL_TO_ORIGINAL_OWNER`. MethodSpec Builder gets one final owner call for latest-main re-sync, patrol entries preserved, only MethodSpec docs conflict resolution, changed files confirmed within Issue #16 allowed docs, then Codex review request after mergeable. If still no effective artifact next decision cycle, route to `DEPUTY_WORKFLOW_REPAIR`.
+- Issue #17 / Raw Candidate: `DEPUTY_WORKFLOW_REPAIR`. Repeated Executive and Deputy cycles found no branch `warehouse/raw-source-quality-scoring`, no PR URL, no Issue claim, no candidate-only validation, no forbidden-pricing-field check, and no attempted blocker. Original owner no longer blocks progress; Deputy repair lane should create or assign a clean repair path for the active Issue while preserving candidate-only scope.
+- Issue #15 / Plan Puzzle: `DEPUTY_WORKFLOW_REPAIR`. Repeated Executive and Deputy cycles found no branch `plancraft/zone-area-boundary-refinement`, no PR URL, no Issue claim, no `node --check`, no guard check, and no attempted blocker. Original owner no longer blocks progress; Deputy repair lane should create or assign a clean repair path for the active Issue while preserving Plan Puzzle allowed scope and no formal estimate boundary.
+
+Evidence:
+- GitHub Issue #15 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:07Z`, still without effective artifact.
+- GitHub Issue #17 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:09Z`, still without effective artifact.
+- GitHub PR #22 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:10Z`; head remains `19bea40ef740b72cbc11a6b3e65c55fcc8358f20`.
+- GitHub PR #23 latest comments include Executive `STALL_CONTINUES` at `2026-05-25T03:28:11Z`; head remains `5ffd0f3e737960b386695d25ad5d0fc4d71a62c2`; Codex P2 thread remains unresolved and not outdated.
+- Triage queue has lagging / P2-blocked items but no separate `OVERDUE_REASSIGNMENT_RECOMMENDED` card was found this round.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex-2 docs-only decision update.
+
+Blocked:
+- #23 is blocked by review gate.
+- #22 is blocked by original-owner final call.
+- #15 and #17 are blocked by workflow repair routing, not by Commander decision.
+
+Next:
+- Executive Officer should stop treating #15 and #17 as ordinary chase-only stalls and route them through Deputy workflow repair / reassignment lane.
+- Executive Officer should issue the final MethodSpec owner call for PR #22 exactly once, then route to Deputy workflow repair if still empty.
+- Output Documents remains held at review gate; do not merge PR #23 until the Codex P2 is fixed and re-reviewed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until the P2 is fixed and re-reviewed. No for #15, #17, or #22 unless scope changes or Codex reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Strategic plan imported / dispatch source clarified
 
 Workstream:
