@@ -4525,6 +4525,38 @@ No
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Executive PR23 clean / PR25 still final-gate on `a4fa97f`
+
+Workstream:
+command/executive / final-gate visibility lane
+
+Status:
+PR23_CODEX_CLEAN_FINAL_GATE / PR25_FINAL_GATE_STILL_READY / NO_COMMANDER_DECISION
+
+Table Compliance:
+PASS - PR #23 and PR #25 both have pushed branch heads, PR URLs, current-main merge-tree simulation pass, visible validation evidence, and clean Codex comments. PR #22 / PR #26 remain monitor-only final-gate candidates.
+
+Missed Progress:
+PR #23 remains `0`; PR #25 remains `0`.
+
+Action Taken:
+Executive Officer rechecked latest main `a4fa97fb846290ac459c5176313ce9a30d55ae89`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages, PR refs, fetched PR heads / merge refs, changed files, reviews, comments, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #23 head is `d126327ddac96d29ba553a5c7ca9aab9e6461217`; Codex post-`d126327` clean comment `4534133600` is now visible; follow-up PR comment `4534162541` records no new NEEDS_FIX / P1 / P2; `refs/pull/23/merge` exists at `c39436e1d2a73963626e4d3c9466350832139a74`; local `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `c23d7d6be4d07f093397b72798ba8671bcc663cb`. PR #25 head remains `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; Codex clean comment remains visible; `refs/pull/25/merge` exists at `8d796e62b303066b9097b48a59b37fd7ea7fa933`; current-main merge-tree exits `0` with tree `6e061c61c7874ebe6e6fedd37b4f7a038c2e21d1`.
+
+Next Required:
+Deputy Codex should publish final-gate visibility for PR #23 and PR #25. Executive should monitor only unless a branch head changes, validation evidence is contradicted, or a new Codex NEEDS_FIX / P1 / P2 appears.
+
+Blocked:
+No Executive-level blocker. Merge / reject remains Deputy authority.
+
+Need Deputy:
+Yes for PR #23 / PR #25 final-gate visibility; no merge / reject executed by Executive.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drift.
+
 ### 2026-05-25 - Executive PR25 clean / PR23 review pending on `45c560f`
 
 Workstream:
