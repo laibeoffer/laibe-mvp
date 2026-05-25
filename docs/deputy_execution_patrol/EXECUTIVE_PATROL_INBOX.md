@@ -37,6 +37,52 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T16:02:17Z - [EXECUTIVE_STATUS_CHECK] - PR25 Branch Advanced / Review Pending
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CODEX_REVIEW_REQUESTED / NO_DUPLICATE_CHASE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 branch head changed after the previous final-gate candidate state. Builder produced a current-main sync ACK and requested `@codex review`, but no post-`e4e9e90` clean Codex result is visible yet. PR #25 should not be treated as Deputy final-gate ready until that review result appears, unless Deputy explicitly accepts the sync-only branch-head change.
+
+Evidence:
+- Latest `origin/main`: `1643ea172b248b37b193e4bf60ea49223283ed4d`.
+- Previous PR #25 final-gate head: `01dcb7ee4f1c7ac81395a8474f1538c2fd85cc12`.
+- Current PR #25 head: `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`.
+- Public PR page visible ACK: `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`.
+- Builder report says latest main was merged with a normal merge commit, `node --check` passed, `git diff --check` passed, merge-tree passed, allowed-scope check passed, forbidden-scope check passed, and `@codex review` was requested.
+- `refs/pull/25/merge`: `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1602/pr25` exits `0` with tree `f36a0a55dee196d155961e1cecc872cb48f96e4d`.
+- `git diff --check origin/main..refs/patrol/hb1602/pr25` exits `0`.
+- No post-`e4e9e90` clean Codex result was visible on the public PR page at patrol time.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no GitHub duplicate chase was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should report the post-`e4e9e90` Codex result: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / CODEX_REVIEW_RESULT_PENDING
+
 ### 2026-05-25T15:51:46Z - [DEPUTY_FINAL_GATE_REQUEST] - PR23 P2 Fixed / Clean
 
 Status:

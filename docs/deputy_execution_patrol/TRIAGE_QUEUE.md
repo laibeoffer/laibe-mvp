@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T16:02:17Z - [PR25_REVIEW_PENDING_AFTER_SYNC] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER / CODEX_REVIEW_REQUESTED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `1643ea172b248b37b193e4bf60ea49223283ed4d`. PR #25 head advanced from `01dcb7ee4f1c7ac81395a8474f1538c2fd85cc12` to `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`. Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`; Builder merged latest main, reran `node --check`, `git diff --check`, merge-tree, allowed-scope and forbidden-scope checks, and requested `@codex review`. `refs/pull/25/merge` is `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`; `git merge-tree --write-tree origin/main refs/patrol/hb1602/pr25` exits `0`; `git diff --check origin/main..refs/patrol/hb1602/pr25` exits `0`. No post-`e4e9e90` clean Codex result was visible at patrol time. PR #23 remains current-main clean and Codex-clean on head `1be77d0`; PR #22 / #26 remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Do not issue a duplicate GitHub chase this round. Watch for post-`e4e9e90` Codex result; if no result is visible next patrol, chase a single-primary `To: Plan Puzzle Builder` ACK with `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+
+Recommended Deputy Action:
+Hold PR #25 final-gate decision until post-`e4e9e90` Codex result is visible, or explicitly accept the sync-only branch-head change without re-review. PR #23 remains a separate final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
 ### 2026-05-25T15:51:46Z - [PR23_P2_RESOLVED_FINAL_GATE] - Output Documents
 
 Status:
