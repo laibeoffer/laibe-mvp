@@ -1343,6 +1343,39 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Role parameters and delivery ledger published
+
+Workstream:
+governance / patrol coordination
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+ROLE_PARAMETERS_AND_DELIVERY_LEDGER_PUBLISHED
+
+Changed:
+- Added shared chatroom role parameters for Deputy Codex, Deputy Codex-2, Executive Officer, Triage Officer, Reviewer, and active workstream chatrooms.
+- Added `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` so Deputy Codex-2 and Executive Officer use one table for Issue / branch / PR / stalled-cycle tracking.
+- Deputy Codex-2 may decide LOW / MEDIUM technical workflow recovery from the ledger; HIGH / CRITICAL risks still route to Deputy Codex / Commander / Reviewer as defined.
+- Environment guidance now forbids default setup / cleanup commands such as `pip install -r requirements.txt`, `npm install`, setup scripts, `rm -rf`, `git clean`, `git reset`, `git stash`, and `git rebase`.
+- Updated active heartbeat prompts for Deputy Codex, Deputy Codex-2, Executive Officer, Triage Officer, Reviewer, Codex Rules, Plan Puzzle, Raw Candidate, MethodSpec, Output Documents, Visual Simulation, and Quote Factory to read the role parameters / delivery ledger.
+
+Files:
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+Next:
+- Executive Officer, Deputy Codex-2, and Triage Officer must read and update `DELIVERY_LEDGER.md` during patrols.
+- Workstream chatrooms must use the matching role parameter block when reporting or recovering delivery state.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Deputy patrol found workflow repair PRs #25 / #26
 
 Workstream:
