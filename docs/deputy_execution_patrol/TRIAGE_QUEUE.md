@@ -36,6 +36,84 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:59:16Z - [PR25_P2_FIX_FOUND_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Latest main is `7151adcf83fa696f12b8be3dfa2e0703023a101c`. PR #25 head advanced to `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; `refs/pull/25/merge` exists at `6dd6e86e7acfaa6009d4ebaadaaff47a2e4d59fe`; current-main merge-tree exits `0`. Builder posted `PLAN_PUZZLE_ACTION_TAKEN`, responded to all three Codex P2 review comments, reran validation, and requested `@codex review`. No post-`e61b67a` clean Codex result is visible yet.
+
+Recommended Executive Action:
+Watch for the post-`e61b67a` Codex result. If clean, route PR #25 back to Deputy final gate. If Codex reports `NEEDS_FIX` / `P1` / `P2`, keep Plan Puzzle Builder fix lane active.
+
+Recommended Deputy Action:
+Do not merge / reject / close until post-`e61b67a` Codex re-review is clean. No Commander escalation needed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e61b67a` Codex result is clean.
+
+### 2026-05-25T13:39:14Z - [PR23_POST_PUBLISH_SYNC_BLOCKED_PR25_P2_PENDING] - Output Documents / Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18, and PR #25 / Issue #15
+
+Evidence:
+Executive published patrol docs to main `feabaac285f5a0d22fdacf877ea88a8aa8bb7bf1`. Post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`; PR #23 head is `a4566412f100e15bd978f43e6058759de42bef70`. PR #22 / PR #25 / PR #26 remain merge-tree clean. PR #25 remains at head `48910be809922fac58b1c89d78cf81b5d7c61210` with Codex P2 still requiring scoped Builder fix and re-review.
+
+Recommended Executive Action:
+Chase Output Documents Builder for latest-main re-sync on PR #23, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the fail-closed renderer fix and patrol entries, rerunning checks, and requesting Codex re-review if branch head changes. Continue chasing Plan Puzzle Builder for `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Recommended Deputy Action:
+Do not merge / reject / close. Keep PR #23 out of final gate until latest-main sync is repaired and Codex review visibility is current. Keep PR #25 out of final gate until P2 is fixed and re-reviewed clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #25 until Codex P2 is fixed and re-reviewed clean. No for PR #23 unless new Codex review reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T13:39:14Z - [PR23_REPAIR_FOUND_PR25_P2_ACK_PENDING] - Output Documents / Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18, and PR #25 / Issue #15
+
+Evidence:
+Latest main is `b16399b4bc7b2816f000ea50d09eadcd16ce01e9`. PR #23 advanced to head `a4566412f100e15bd978f43e6058759de42bef70`; `refs/pull/23/merge` exists at `b09a3346cddc63e0f334bcbe2b80c34dea97ee9a`; pre-publication merge-tree exits `0` with tree `dbab984cc4658a03e4e37527b01b429bc789a48e`; branch blackboard reports `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` against `b16399b`. PR #25 remains at head `48910be809922fac58b1c89d78cf81b5d7c61210`; merge ref exists at `ad41c4656aa74bca107f980d61b0b48dfed6fc31`; merge-tree exits `0`, but no newer fix head / visible ACK was found after Codex P2 comments on `areaUpdatedAt` stability and invalid closed polygon preservation.
+
+Recommended Executive Action:
+Chase Output Documents Builder for `CODEX_REVIEW_REQUESTED` or a post-`a456641` Codex result, with a post-publication re-sync if latest main advances again. Chase Plan Puzzle Builder for `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX` on the scoped P2 fixes.
+
+Recommended Deputy Action:
+Do not merge / reject / close. Keep PR #25 out of final gate until P2 is fixed and re-reviewed clean. PR #23 may return to final-gate consideration only after post-publication current-main state and Codex review visibility are confirmed.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #25 until Codex P2 is fixed and re-reviewed clean. No for PR #23 unless new Codex review reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T13:31:12Z - [PR25_CODEX_P2_BLOCKED] - Plan Puzzle
 
 Status:

@@ -37,6 +37,176 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T13:59:16Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle Review Result
+
+Status:
+P2_FIX_FOUND / CODEX_REVIEW_RESULT_PENDING
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+Plan Puzzle Builder pushed PR #25 head `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`, posted `PLAN_PUZZLE_ACTION_TAKEN`, replied to all three new Codex P2 review comments, reran validation, and requested `@codex review`. PR #25 remains review-pending until a post-`e61b67a` clean Codex result appears.
+
+Evidence:
+- Latest main: `7151adcf83fa696f12b8be3dfa2e0703023a101c`.
+- PR #25 head: `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`.
+- PR #25 merge ref: `6dd6e86e7acfaa6009d4ebaadaaff47a2e4d59fe`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1359/pr25` exits `0`.
+- Builder validation report includes `node --check`, `git diff --check`, merge-tree pass, allowed scope check, forbidden scope check, and `@codex review`.
+- Review comments at `2026-05-25T13:59:37Z`, `13:59:39Z`, and `13:59:41Z` reply to the P2 findings.
+
+Action already taken:
+Commander patrol updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Commander decision is needed. Executive Officer should watch for the post-`e61b67a` Codex result. If clean, route PR #25 back to Deputy final gate; if Codex reports `NEEDS_FIX` / `P1` / `P2`, keep Builder fix lane active.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e61b67a` Codex result is clean.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / CODEX_REVIEW_RESULT_PENDING
+
+### 2026-05-25T13:39:14Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents Post-Publish Sync
+
+Status:
+CURRENT_MAIN_SYNC_BLOCKED_AGAIN / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 produced a valid repair artifact on head `a456641`, but after Executive patrol publication advanced main to `feabaac`, PR #23 is current-main sync blocked again on `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest main after patrol publication: `feabaac285f5a0d22fdacf877ea88a8aa8bb7bf1`.
+- PR #23 head: `a4566412f100e15bd978f43e6058759de42bef70`.
+- Post-push check: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 still merge-tree clean after `feabaac`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox after the post-push recheck. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Deputy repair-owner decision is needed this round. Output Documents Builder must re-sync PR #23 against latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus new Executive patrol entries, rerun required checks, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
+### 2026-05-25T13:39:14Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / CODEX_REVIEW_VISIBILITY_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 produced a new latest-main repair artifact on head `a4566412f100e15bd978f43e6058759de42bef70`. The remaining visible gap is a post-`a456641` Codex review request / result confirmation, plus post-publication current-main recheck if this patrol docs commit advances main again.
+
+Evidence:
+- Latest main checked: `b16399b4bc7b2816f000ea50d09eadcd16ce01e9`.
+- PR #23 head: `a4566412f100e15bd978f43e6058759de42bef70`.
+- `refs/pull/23/merge`: `b09a3346cddc63e0f334bcbe2b80c34dea97ee9a`.
+- Pre-publication check: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `dbab984cc4658a03e4e37527b01b429bc789a48e`.
+- Branch blackboard contains `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` against `b16399b`.
+- `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Deputy decision is needed this round. Output Documents Builder must publish / confirm `CODEX_REVIEW_REQUESTED` or a post-`a456641` Codex result if still clean after this patrol publication; if main advances and a patrol-doc conflict reopens, re-sync only patrol docs, rerun checks, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_REVIEW_VISIBILITY_PENDING
+
+### 2026-05-25T13:39:14Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle
+
+Status:
+CODEX_REVIEW_P2_BLOCKED / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 remains at head `48910be809922fac58b1c89d78cf81b5d7c61210`. It is merge-tree clean against latest main, but no new P2 fix head or visible Builder ACK was found after the Codex P2 review comments.
+
+Evidence:
+- Latest main checked: `b16399b4bc7b2816f000ea50d09eadcd16ce01e9`.
+- PR #25 head: `48910be809922fac58b1c89d78cf81b5d7c61210`.
+- `refs/pull/25/merge`: `ad41c4656aa74bca107f980d61b0b48dfed6fc31`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `140bc252e07fdf0b40f764188cf766b84ad5014b`.
+- Codex review comments at `2026-05-25T13:22:45Z` and `2026-05-25T13:23:13Z` report P2 findings on `areaUpdatedAt` stability and invalid closed polygon preservation.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Deputy decision is needed this round. Executive should keep chasing Plan Puzzle Builder for `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`; Builder must fix only the new P2 findings, rerun validation, and request Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until Codex P2 is fixed and re-reviewed clean.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_P2_FIX_PENDING
+
 ### 2026-05-25T13:31:12Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle
 
 Status:
