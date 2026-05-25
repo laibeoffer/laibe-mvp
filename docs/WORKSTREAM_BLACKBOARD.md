@@ -1512,14 +1512,14 @@ Files:
 - `docs/WORKSTREAM_BLACKBOARD.md`
 
 PR / Commit:
-- Commit: pending local commit before push.
-- PR: pending creation after branch push.
+- Commit: `039fa747f976881ccdd72d0bbf2d89cdc39a1c2a` on `warehouse/raw-source-quality-scoring`.
+- PR: #26 `Add raw source quality scoring reviewer checklist` - https://github.com/laibeoffer/laibe-mvp/pull/26
 
 Blocked:
 None.
 
 Next:
-Open PR for Issue #17 and request Codex review.
+Wait for PR #26 checks / Codex review. Keep follow-up candidate-only and do not convert observed price into formal pricing.
 
 Need Commander:
 No

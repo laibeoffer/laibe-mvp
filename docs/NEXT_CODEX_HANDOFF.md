@@ -5,6 +5,7 @@
 - 本輪任務名稱：Raw Candidate Issue #17 Delivery Reconciliation / R1.5 source quality scoring reviewer checklist。
 - 任務來源：GitHub Issue #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`。
 - Branch：`warehouse/raw-source-quality-scoring`。
+- PR：#26 `Add raw source quality scoring reviewer checklist` - https://github.com/laibeoffer/laibe-mvp/pull/26。
 - 修改檔案：
   - `src/lib/budget/raw-warehouse/types.ts`
   - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
@@ -21,7 +22,7 @@
 - `formal_price_generated` 維持 `false`；`price_authority` 維持 `"none"`；`observed_price_is_evidence_only` 為 `true`。
 - Demo command：`node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`。
 - 本輪未修改 renderer / Excel / PDF、`BudgetOutputSnapshot`、MethodSpec 主規則、平面拼圖、frontend、DB/API、RAG/AI API、payment、escrow 或 listing fee。
-- 下一步建議：PR #17 對應分支可進行 Codex review；若審查通過，再由 Deputy / Commander 決定 merge。
+- 下一步建議：PR #26 可進行 checks / Codex review；若審查通過，再由 Deputy / Commander 決定 merge。
 
 ## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
 
