@@ -4524,3 +4524,35 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander patrol Deputy2 repair ACK check on `1845ccd`
+
+Workstream:
+command/deputy / Deputy Codex-2 repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT_RECONFIRMED_FOR_DEPUTY2 / NO_COMMANDER_DECISION
+
+Changed:
+- Fast-forward check confirmed patrol worktree is on latest `origin/main` `1845ccd885f4`.
+- GitHub REST open PR / Issue metadata was available this cycle: PR #22, #23, #25, and #26 remain open; Issues #15, #16, #17, and #18 remain open.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local merge-tree against current main exits `0`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local merge-tree against current main exits `0`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Executive reassignment recommendation `4531941113`; local merge-tree still exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local merge-tree exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- No Deputy Codex-2 visible repair ACK was found after the latest Executive single-primary follow-up.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Decision:
+- Keep PR #22 / PR #26 in Deputy Codex final-gate monitor-only lane. No merge / reject action was executed.
+- Keep PR #23 / PR #25 assigned to Deputy Codex-2 workflow repair. The required next visible ACK remains `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, and next executable owner.
+- This remains a cadre execution visibility gap, not a Commander product / business / visual decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
