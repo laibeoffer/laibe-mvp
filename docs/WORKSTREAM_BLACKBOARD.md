@@ -4491,3 +4491,36 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive Deputy2 visible ACK follow-up on `dc26429`
+
+Workstream:
+command/executive / Deputy Codex-2 repair ACK lane
+
+Status:
+ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2 / EXECUTIVE_FOLLOW_UP_PUBLISHED
+
+Changed:
+- Re-read latest `origin/main` at `dc26429562ba686973495496acac58ceb87b6924`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open Issues / open PR metadata, PR #23 / PR #25 comments and review state, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- GitHub Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed.
+- PR #22 and PR #26 remain Deputy Codex final-gate monitor-only rows; local merge-tree against current main exits `0` for both.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains Executive reassignment recommendation `4531941113`, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`, no GitHub merge ref exists, and local merge-tree exits `128` / unrelated histories in this worktree.
+- No Deputy Codex-2 visible repair ACK was found after the 07:41 Executive follow-up.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #23 / PR #25 assigned to Deputy Codex-2 workflow repair.
+- Executive Officer issued one single-primary `To: Deputy Codex-2` visible ACK follow-up in `EXECUTIVE_PATROL_INBOX.md`.
+- Required next visible ACK from Deputy Codex-2: `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, and next executable owner.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
