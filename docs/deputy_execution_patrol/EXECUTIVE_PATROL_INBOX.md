@@ -37,6 +37,48 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T04:42:41Z - [IMMEDIATE_REPAIR_CHECK] - PR #22 / PR #23 / PR #25 / PR #26
+
+Status:
+PENDING_DEPUTY_FINAL_GATE_AND_EXECUTIVE_FOLLOWUP
+
+Executive Officer:
+DEPUTY_CODEX_2
+
+Workstream:
+MethodSpec Builder / Output Documents Builder / Plan Puzzle Builder / Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22, PR #23, PR #25, PR #26
+
+Finding:
+Immediate repair check found that some older pending-verification inbox items are now resolved into final-gate or focused sync/review blockers.
+
+Evidence:
+- Main SHA checked: `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- PR #22: head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; `refs/pull/22/merge` exists at `72f0f3eff085cc434921b7490c513d644208c46d`; comments report latest-main re-sync, Issue #16 allowed docs-only scope, `@codex review`, and clean Codex result `4531356014`.
+- PR #23: head `a75e3802a30f13201cf2df5705112142d9251e8c`; `refs/pull/23/merge` exists at `8ef304b72e6afd92e61e14274cd4611f65281398`; comments report post-resync checks and `@codex review` request `4531552098`, but no post-resync clean Codex result was found during this check.
+- PR #25: head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge`; local git found no merge base with current `origin/main`; comments report sync-recovery blocker, but remote head did not advance in refs during this check.
+- PR #26: head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; `refs/pull/26/merge` exists at `f3db625a4716b8997f06e98673ccf8d2ba0e037d`; comments report validation / candidate-only boundary / forbidden formal-pricing negative checks and clean Codex result `4531555287`.
+
+Action already taken:
+Deputy Codex-2 published the immediate repair-check decision to `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Recommended Deputy action:
+- PR #22: Deputy final merge / reject gate; no further Executive chase unless branch state changes.
+- PR #26: Deputy final merge / reject gate; no further Executive chase unless branch state changes.
+- PR #23: keep review gate hold until a clean Codex result is present after head `a75e380`.
+- PR #25: keep Executive sync-recovery chase; require true latest-main sync that produces a merge ref before Codex review.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until post-resync Codex check is clean. No for PR #22 / PR #25 / PR #26 unless scope drifts or Codex reports P1/P2/NEEDS_FIX.
+
+Deputy Decision:
+PR_22_FINAL_GATE_READY / PR_26_FINAL_GATE_READY / PR_23_REVIEW_GATE_HOLD / PR_25_SYNC_BLOCKED
+
 ### 2026-05-25T04:23:16Z - [WORKFLOW_REPAIR_PRS_FOUND] - PR #25 / PR #26
 
 Status:
