@@ -4622,3 +4622,35 @@ No
 
 Need Reviewer:
 No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Commander patrol automation cleanup and repair-lane watch
+
+Workstream:
+command/deputy / automation governance / active repair routing
+
+Status:
+AUTOMATION_DUPLICATE_REMOVED / BUILDER_REPAIR_ACK_PENDING
+
+Changed:
+- Rechecked latest `origin/main` `bf39dc4251f3` after the direct Builder repair reassignment.
+- Deleted obsolete duplicate heartbeat automation `automation`; canonical Governance Patrol remains `20` / `laibe-governance-patrol-20min`.
+- Verified workstream prompts no longer contain mojibake for Raw Candidate, Output Documents, Visual Simulation, Quote Factory, MethodSpec, Plan Puzzle, Reviewer, Commander, Deputy2, Executive, Triage, and Governance.
+- PR #23 head still remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains `4531941113`; local merge-tree against current main still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head still remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains `4531949297`; no current merge ref is available and local merge-tree still conflicts in `docs/NEXT_CODEX_HANDOFF.md`.
+- Existing GitHub merge refs for PR #22 / #23 / #26 are stale against older base SHAs and must not be treated as current-main merge readiness.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder.
+- Keep PR #23 Current Handler as Output Documents Builder.
+- Executive should wait for the next Builder heartbeat window, then chase the Builder directly if no `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` appears.
+- No merge / reject / close action was executed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
