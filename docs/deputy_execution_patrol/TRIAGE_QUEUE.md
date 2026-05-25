@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T18:29:23Z - [PR23_ACTIVE_HANDLER_SILENT_AFTER_CC7174A] - Output Documents
+
+Status:
+NEEDS_OWNER_SYNC_REPAIR / ACTIVE_HANDLER_SILENT / BUILDER_SYNC_REPAIR_REQUIRED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` is `cc7174aa67dd581eeeca0508210d4ae03415b02b`; PR #23 is open at head `671964aea546871499b5933e213fb0838b111bea`. Builder sync repair comment `4536113272` and clean Codex comment `4536130930` remain visible, but no new Output Documents Builder ACK is visible after the `17:56` Executive sync-block request. `git merge-tree --write-tree origin/main refs/patrol/hb1829/pr23` exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb1829/pr23` exits `0`.
+
+Recommended Executive Action:
+Keep a single-primary follow-up to Output Documents Builder. Do not route PR #23 to Deputy final gate again until latest-main merge-tree is clean after publication.
+
+Recommended Owner Action:
+Output Documents Builder should re-sync PR #23 against latest main `cc7174aa67dd581eeeca0508210d4ae03415b02b`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve the metadata-only staging-write P2 fix and latest patrol entries, rerun renderer static guard / TypeScript syntax / real `.xlsx` and `.pdf` diff check / `git diff --check` / merge-tree, push the scoped sync head, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T18:29:23Z - [PR22_PR25_PR26_DEPUTY_ACK_PENDING] - Deputy Codex
+
+Status:
+NEEDS_DEPUTY_DECISION_VISIBILITY / CURRENT_MAIN_PASS / NO_NEW_BLOCKER
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `cc7174aa67dd581eeeca0508210d4ae03415b02b`. PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df` passes merge-tree with tree `e64a7c98b957ae7592f4be9e40c842d28be41f7c`; PR #25 head `1835e292caea35b4758276c7002c09d2e9c1dada` has clean Codex comment `4536168380` and passes merge-tree with tree `46ec710631b44886c1273c8e4ad2d5046beecfc5`; PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` passes merge-tree with tree `ee4b10f0bb556825c65406d92d222f53e251df35`. All three diff-checks exit `0`; no Deputy Codex merge / reject / blocker ACK is visible after the `17:56` Executive final-gate request.
+
+Recommended Executive Action:
+No owner chase for the original Builders while branch heads and validation remain stable. Keep a single Deputy Codex final-gate visibility request.
+
+Recommended Deputy Action:
+Deputy Codex should publish final-gate decision visibility or an exact blocker for PR #22 / #25 / #26 after reconfirming no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T17:56:00Z - [PR23_POST_PUSH_SYNC_BLOCKED_AFTER_874DFF8] - Output Documents
 
 Status:

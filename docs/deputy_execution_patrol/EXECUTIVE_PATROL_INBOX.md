@@ -37,6 +37,93 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T18:29:23Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Sync Repair ACK Still Missing
+
+Status:
+ACTION_REQUIRED / ACTIVE_HANDLER_SILENT / CURRENT_MAIN_SYNC_BLOCKED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 still has no new Output Documents Builder ACK after the `17:56` Executive sync-block request, and latest-main simulation remains blocked against current `origin/main`.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, issue comments, PR reviews, fetched PR heads / merge refs, merge-tree, diff-check, and changed-file scope.
+- Latest `origin/main`: `cc7174aa67dd581eeeca0508210d4ae03415b02b`.
+- PR #23 status: open.
+- PR #23 head: `671964aea546871499b5933e213fb0838b111bea`.
+- Builder sync repair comment: `4536113272` at `2026-05-25T17:43:01Z`.
+- Clean Codex comment: `4536130930` at `2026-05-25T17:46:31Z`.
+- No new Output Documents Builder ACK is visible after the `17:56` Executive request.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1829/pr23` exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+- `git diff --check origin/main..refs/patrol/hb1829/pr23` exits `0`.
+- PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean after `cc7174a`.
+
+Action requested:
+Re-sync PR #23 against latest main `cc7174aa67dd581eeeca0508210d4ae03415b02b`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve the metadata-only staging-write P2 fix and latest patrol entries, rerun renderer static guard / TypeScript syntax / real `.xlsx` and `.pdf` diff check / `git diff --check` / merge-tree, push a scoped sync head, and request Codex re-review if the branch head changes.
+
+Required visible ACK:
+`WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T18:29:23Z - [DEPUTY_FINAL_GATE_VISIBILITY_REQUEST] - PR22 PR25 PR26
+
+Status:
+PENDING_DEPUTY_DECISION / CURRENT_MAIN_PASS / NO_NEW_BLOCKER
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+MethodSpec / Plan Puzzle / Raw Candidate
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #25 / PR #26
+
+Finding:
+PR #22 / #25 / #26 remain current-main clean final-gate candidates, but no Deputy Codex merge / reject / exact-blocker ACK is visible after the `17:56` Executive final-gate request.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, issue comments, PR reviews, fetched PR heads / merge refs, merge-tree, diff-check, and changed-file scope.
+- Latest `origin/main`: `cc7174aa67dd581eeeca0508210d4ae03415b02b`.
+- PR #22 status: open; head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; clean Codex comment `4531356014`; merge-tree exits `0` with tree `e64a7c98b957ae7592f4be9e40c842d28be41f7c`; diff-check exits `0`.
+- PR #25 status: open; head `1835e292caea35b4758276c7002c09d2e9c1dada`; Builder review `4358124195`; clean Codex comment `4536168380`; merge-tree exits `0` with tree `46ec710631b44886c1273c8e4ad2d5046beecfc5`; diff-check exits `0`.
+- PR #26 status: open; head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; validation refresh comment `4532187707`; merge-tree exits `0` with tree `ee4b10f0bb556825c65406d92d222f53e251df35`; diff-check exits `0`.
+- No new NEEDS_FIX / P1 / P2, scope-drift, formal-price, or validation contradiction evidence was found in this patrol.
+
+Action already taken:
+Executive Officer refreshed the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex should publish final-gate decision visibility or the exact blocker for PR #22 / #25 / #26. Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T17:56:00Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Sync Blocked After 874DFF8
 
 Status:
