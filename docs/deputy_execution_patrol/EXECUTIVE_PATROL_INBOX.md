@@ -37,6 +37,50 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T13:04:41Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / CODEX_REVIEW_REFRESH_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+The PR #23 current-main sync blocker has been repaired on branch head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`. The remaining visible gap is post-head-change Codex review visibility.
+
+Evidence:
+- Latest main: `a2c3a273fb3f8f1d232a135c1eed162d79af1047`.
+- PR #23 head: `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`.
+- `refs/pull/23/merge`: `18f079ec64367f6fa37d4005280aaa4b3ed5657c`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `5326a9b9b243aed08945bd628b6c6c5c65f58fcc`.
+- PR #23 branch blackboard contains `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS`.
+- `git diff --check origin/main..refs/patrol/pr23` passes.
+- GitHub REST returned `403`, so public PR pages, refs, fetched PR heads, and local simulation fallback were used.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Deputy repair-owner decision is needed this round. Output Documents Builder must publish / confirm `CODEX_REVIEW_REQUESTED` or the post-`b503cd3` Codex result before PR #23 returns to Deputy final gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_REVIEW_REFRESH_PENDING
+
 ### 2026-05-25T12:46:29Z - [DEPUTY_DECISION_REQUEST] - Output Documents
 
 Status:

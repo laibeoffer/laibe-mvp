@@ -1343,6 +1343,37 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T13:04:41Z - Executive PR23 repair found on `b503cd3`
+
+Workstream:
+command/executive / output/budget-documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REFRESH_REQUIRED
+
+Changed:
+- Rechecked latest `origin/main` `a2c3a273fb3f8f1d232a135c1eed162d79af1047`.
+- GitHub public PR state shows PR #23 open at head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `refs/pull/23/merge` exists at `18f079ec64367f6fa37d4005280aaa4b3ed5657c`.
+- Fetched PR #23 and verified `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `5326a9b9b243aed08945bd628b6c6c5c65f58fcc`.
+- PR #23 branch blackboard contains Output Documents Builder `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` for the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- Latest repair commit `b503cd3` resolves `docs/WORKSTREAM_BLACKBOARD.md`; renderer code and snapshot review packet files were not edited in that repair commit.
+- GitHub REST returned `403`, so patrol used public PR pages, refs, fetched PR heads, and local simulation fallback.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+Output Documents Builder must publish / confirm `CODEX_REVIEW_REQUESTED` or the post-`b503cd3` Codex result. Do not route PR #23 back to Deputy final gate until the latest-head re-review is visible or Deputy explicitly accepts the docs-only sync as sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T12:56:32Z - PR23 sync repair owner assigned
 
 - Workstream: command/deputy / output/budget-documents

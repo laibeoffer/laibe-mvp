@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:04:41Z - [PR23_REPAIR_FOUND_REVIEW_REFRESH_NEEDED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_WATCH
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest main is `a2c3a273fb3f8f1d232a135c1eed162d79af1047`. PR #23 is open and head advanced to `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `refs/pull/23/merge` exists at `18f079ec64367f6fa37d4005280aaa4b3ed5657c`; `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `5326a9b9b243aed08945bd628b6c6c5c65f58fcc`. PR #23 branch blackboard contains Output Documents Builder `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS`. GitHub REST returned `403`, so public PR pages, refs, fetched PR heads, and local simulation fallback were used.
+
+Recommended Executive Action:
+Stop chasing the old `docs/WORKSTREAM_BLACKBOARD.md` conflict. Chase Output Documents Builder for `CODEX_REVIEW_REQUESTED` or the post-`b503cd3` Codex result, or exact blocker with attempted fix.
+
+Recommended Deputy Action:
+No new Deputy repair-owner decision is needed this round. Keep PR #23 out of final gate until latest-head Codex re-review is visible or Deputy explicitly accepts the docs-only sync as sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T12:46:29Z - [PR23_FINAL_GATE_ACK_STALE] - Output Documents
 
 Status:
