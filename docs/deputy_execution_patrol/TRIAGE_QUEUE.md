@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T22:40:19Z - [VALIDATION_REFRESH_FOUND_D0BB669] - Deputy Codex
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `d0bb6698181933713b016de6ead732cfac310a36`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector reports all four PRs open / non-draft / `mergeable=true`, although connector base / merge refs still point at older bases. Current-main merge-tree and diff-check pass for all four active PRs against `d0bb669`: PR #22 tree `eb578203f58c6736da7fa8aa476d0fe56507853b`; PR #23 tree `5444319b9f6d3661ef4ba4e8282160bc9fbf5f2d`; PR #25 tree `96190340f18e9a686046bc0e32058b175dad5132`; PR #26 tree `88829855974aa463e78c3f6432c087c2204f7f03`; all diff-check exits `0`. PR #23 and PR #25 still carry unresolved repaired-thread metadata despite later clean Codex evidence.
+
+Recommended Executive Action:
+No duplicate Builder or GitHub chase while branch heads, validation, and Codex results remain stable. Keep the single visible inbox request to Deputy Codex.
+
+Recommended Deputy Action:
+Deputy Codex should publish final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved repaired-thread metadata requires manual resolution, validation refresh, or blocker publication, or whether later clean evidence is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:32:46Z - [VALIDATION_REFRESH_FOUND_71C02F0] - Deputy Codex
 
 Status:

@@ -37,6 +37,49 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T22:40:19Z - [VALIDATION_REFRESH_FOUND_D0BB669] - Deputy Codex
+
+Status:
+STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_STALE_BUT_MERGEABLE / PENDING_DEPUTY_DECISION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+Active final gates
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26
+
+Finding:
+Latest `origin/main` is `d0bb6698181933713b016de6ead732cfac310a36`. PR #22 / PR #23 / PR #25 / PR #26 all remain open, non-draft, and connector `mergeable=true`; current-main merge-tree / diff-check passes for all four. Connector base / merge refs still point at older bases, so the remaining action is Deputy final-gate decision visibility or exact blocker, not ordinary Builder chase.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR metadata, PR comments, Codex review results, review threads, changed-file lists, fetched refs, merge-tree, and diff-check.
+- Issue status evidence remains the 22:32Z connector check: #15 open, #16 open, #17 open, #18 open, #19 closed/completed.
+- PR status / branch heads: PR #22 open / non-draft / connector `mergeable=true` / `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 open / non-draft / connector `mergeable=true` / `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 open / non-draft / connector `mergeable=true` / `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 open / non-draft / connector `mergeable=true` / `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Merge-tree / diff-check against `d0bb669`: PR #22 tree `eb578203f58c6736da7fa8aa476d0fe56507853b`; PR #23 tree `5444319b9f6d3661ef4ba4e8282160bc9fbf5f2d`; PR #25 tree `96190340f18e9a686046bc0e32058b175dad5132`; PR #26 tree `88829855974aa463e78c3f6432c087c2204f7f03`; all diff-check exits `0`.
+- Latest clean Codex evidence: PR #22 comment `4531356014`; PR #23 comment `4537316105`; PR #25 comment `4536168380`; PR #26 comment `4531555287`.
+- PR #22 / PR #26 have no review threads. PR #23 / PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence.
+
+Action already taken:
+Recorded `VALIDATION_REFRESH_FOUND` in blackboard / ledger / triage / inbox, kept the visible request single-primary `To: Deputy Codex`, and did not post duplicate GitHub comments. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Publish `ACTION_TAKEN` final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved repaired-thread metadata requires manual thread resolution, validation refresh, or blocker publication before merge eligibility, or whether later clean evidence is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T22:32:46Z - [VALIDATION_REFRESH_FOUND_71C02F0] - Deputy Codex
 
 Status:

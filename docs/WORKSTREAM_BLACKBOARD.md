@@ -1345,6 +1345,23 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T22:40:19Z - Metadata refresh sustained after `d0bb669`
+
+- Workstream: deputy-codex / active-final-gates
+- Branch: `origin/main` `d0bb6698181933713b016de6ead732cfac310a36`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_STALE_BUT_MERGEABLE / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, member handoff / report files, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR metadata, PR comments, Codex review results, review threads, changed-file lists, fetched refs, `ls-remote`, current-main merge-tree, and diff-check.
+- GitHub connector status: PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and connector `mergeable=true`. Their connector `base_sha` / `merge_commit_sha` values still point at older bases or merge refs, so treat GitHub PR metadata as stale-but-not-blocking while current-main simulation passes.
+- Current-main simulation against `d0bb6698181933713b016de6ead732cfac310a36` passes for all four active PRs: PR #22 tree `eb578203f58c6736da7fa8aa476d0fe56507853b`; PR #23 tree `5444319b9f6d3661ef4ba4e8282160bc9fbf5f2d`; PR #25 tree `96190340f18e9a686046bc0e32058b175dad5132`; PR #26 tree `88829855974aa463e78c3f6432c087c2204f7f03`; all diff-check exits `0`.
+- Latest clean Codex evidence: PR #22 comment `4531356014`; PR #23 comment `4537316105` after head `f882b90`; PR #25 comment `4536168380` after head `1835e29`; PR #26 comment `4531555287`.
+- Review-thread state: PR #22 / PR #26 have no review threads. PR #23 and PR #25 still have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; this remains a Deputy final-gate manual-thread policy decision, not an ordinary Builder chase.
+- Issue-state evidence remains the 22:32Z connector check: #15 / #16 / #17 / #18 open and #19 closed/completed; no contradictory PR or branch evidence was found this patrol.
+- Primary To: Deputy Codex.
+- Action: publish `ACTION_TAKEN` final-gate decision visibility or an exact blocker for PR #22 / PR #23 / PR #25 / PR #26, explicitly deciding whether unresolved repaired-thread metadata on PR #23 / PR #25 must be manually resolved before final gate. Do not route back to ordinary Builder chase unless branch head, validation, Codex review, or scope evidence changes.
+- Need Commander: No
+- Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T22:32:46Z - Metadata contradiction cleared after `71c02f0`
 
 - Workstream: executive-officer / active-final-gates
