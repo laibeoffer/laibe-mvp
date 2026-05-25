@@ -4427,3 +4427,36 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+### 2026-05-25 - Executive ACK reconciliation on current main `944b71a`
+
+Workstream:
+command/executive / active handler visible ACK recovery
+
+Status:
+DEPUTY_ACK_FOUND / ACTIVE_HANDLER_SILENT_REMAINS_FOR_DEPUTY2
+
+Changed:
+- Re-read latest `origin/main` at `944b71a95562d06fdf08dfeb2dd828243b59ec65`.
+- Checked required governance docs, blackboard, `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, `EXECUTIVE_PATROL_INBOX.md`, reviewer inbox, GitHub open PR / Issue metadata until unauthenticated REST rate limit, `git ls-remote` PR refs, fetched PR heads, branch heads, and local merge-tree signals.
+- Deputy visible ACK for PR #22 / PR #26 is now found in the `2026-05-25T07:34:01Z` Commander patrol entry; Executive visible-ACK chase for those two rows is satisfied.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local merge-tree against current main exits `0`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local merge-tree against current main exits `0`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no GitHub merge ref exists, and local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves the Commander-patrol `docs/NEXT_CODEX_HANDOFF.md` conflict evidence.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Stop Executive visible-ACK chase for Deputy Codex final-gate visibility on PR #22 / PR #26 unless branch head, validation evidence, or Codex review state changes.
+- Keep PR #23 / PR #25 in Deputy Codex-2 repair-status ACK lane. Deputy Codex-2 still needs `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+- `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair rows only.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.

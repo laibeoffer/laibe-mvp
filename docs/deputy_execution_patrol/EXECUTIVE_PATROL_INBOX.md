@@ -40,7 +40,7 @@ PENDING
 ### 2026-05-25T07:08:55Z - [EXECUTIVE_ACTION_REQUEST] - Deputy Codex Final Gate Visibility
 
 Status:
-PENDING_HANDLER_ACK
+ACK_FOUND_MONITOR_ONLY
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -72,8 +72,11 @@ Executive Officer re-checked latest main `dfad5c559032311ca6202f615062cf206900dd
 Follow-up 2026-05-25T07:29:00Z:
 Executive Officer re-checked latest main `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`, latest blackboard, delivery ledger, triage queue, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, and local merge-tree signals. No visible handler ACK was found after the 07:18 follow-up. PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df` and merge-tree exits `0`; PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` and merge-tree exits `0`. `ACTIVE_HANDLER_SILENT` remains for Deputy Codex final-gate visibility.
 
+Follow-up 2026-05-25T07:41:31Z:
+Executive Officer found the missing Deputy visible ACK in the `2026-05-25T07:34:01Z` Commander patrol entry now present on latest main `944b71a95562d06fdf08dfeb2dd828243b59ec65`. PR #22 and PR #26 remain final-gate candidates; no merge / reject was executed in patrol. This satisfies the visible-ACK request for Deputy Codex unless a branch head changes, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
 Recommended Deputy action:
-Post visible ACK with one of: `FINAL_GATE_DECISION_PENDING`, `FINAL_GATE_READY_FOR_MERGE_CHECK`, `FINAL_GATE_BLOCKED_BY_MERGEABILITY`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Do not ask Commander unless merge/reject final judgment requires Commander under rules.
+No additional visible-ACK chase required for PR #22 / PR #26 this round. Keep final gate ownership with Deputy Codex; Executive Officer should monitor only for branch-head changes, contradicted validation evidence, or a new Codex NEEDS_FIX / P1 / P2 signal.
 
 Need Commander:
 No
@@ -82,7 +85,7 @@ Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
 
 Deputy Decision:
-PENDING_HANDLER_ACK
+DEPUTY_VISIBLE_ACK_FOUND_2026-05-25T07:34:01Z
 
 ### 2026-05-25T07:08:55Z - [EXECUTIVE_ACTION_REQUEST] - Deputy Codex-2 Repair Status Visibility
 
@@ -118,6 +121,9 @@ Executive Officer re-checked latest main `dfad5c559032311ca6202f615062cf206900dd
 
 Follow-up 2026-05-25T07:29:00Z:
 Executive Officer re-checked latest main `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`, latest blackboard, delivery ledger, triage queue, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, and local merge-tree signals. No visible handler ACK was found after the 07:18 follow-up. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c` and still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`, still has no merge ref, and local merge-tree exits `128` / unrelated histories. `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair-status visibility.
+
+Follow-up 2026-05-25T07:41:31Z:
+Executive Officer re-checked latest main `944b71a95562d06fdf08dfeb2dd828243b59ec65`, latest blackboard, delivery ledger, triage queue, reviewer inbox, GitHub open PR / Issue metadata until unauthenticated REST rate limit was hit, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. No Deputy Codex-2 repair-status ACK was found after the 07:29 follow-up. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c` and still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`, still has no GitHub merge ref, and local merge-tree exits `128` / unrelated histories in this worktree while the latest ledger records the concrete `docs/NEXT_CODEX_HANDOFF.md` conflict from Commander patrol. `ACTIVE_HANDLER_SILENT` remains for Deputy Codex-2 repair-status visibility only. Deputy Codex-2 must publish `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK` before the next patrol.
 
 Recommended Deputy action:
 Post visible ACK with one of: `WORKFLOW_REPAIR_ATTEMPTED`, `ACTION_TAKEN`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Keep scope limited to branch/worktree reconciliation and documented validation; stop on source drift, formal output/pricing, payment, AI API, or cross-workstream scope.
