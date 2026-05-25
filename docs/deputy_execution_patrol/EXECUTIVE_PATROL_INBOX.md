@@ -37,6 +37,51 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T15:04:07Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Review Result / Post-Publication Sync Watch
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CODEX_REVIEW_REQUESTED / BUILDER_VISIBLE_ACK_FOUND
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+Output Documents Builder repaired the previous post-publication sync block and pushed PR #23 head `01b489c21a71db7a3301918e44bcfea75e60206a`. The branch is clean against patrol-start main `387cada726b3d91fc48ce5044dca80e36bdfa9d8`, and Builder requested `@codex review`. No post-`01b489c` clean Codex result was visible at patrol time. Because Executive is publishing this patrol-doc update, PR #23 may require one more latest-main sync against the new main after publication.
+
+Evidence:
+- PR #23 head: `01b489c21a71db7a3301918e44bcfea75e60206a`.
+- Builder repair / validation report: comment `4535229076`.
+- Patrol-start main: `387cada726b3d91fc48ce5044dca80e36bdfa9d8`.
+- `refs/pull/23/merge`: `156fcd681c37d922ab9c5f53a79d3d29bbf2f350`.
+- GitHub metadata before API rate-limit: `mergeable: true`, `mergeable_state: clean`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `b751c23ee0f3b50da1121b16280d66f4c670cce2`.
+- `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+- Builder validation report includes renderer static guard pass, renderer TypeScript syntax pass, invalid fixture / mismatch smoke pass, real `.xlsx` / `.pdf` diff check clean, and no renderer code changed in this repair pass.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified by Executive and no merge / reject / close action was executed.
+
+Recommended next action:
+Output Documents Builder should check latest `origin/main` after this patrol-doc publication. If PR #23 conflicts again, re-sync only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus patrol entries, rerun required checks, and request / wait for post-head Codex review. If Codex returns clean and latest-main sync remains clean, route back to Deputy final gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`01b489c` Codex review is clean and latest-main sync is rechecked.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_REVIEW_RESULT_WATCH_PENDING
+
 ### 2026-05-25T14:50:49Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Post-Publication Sync Repair
 
 Status:

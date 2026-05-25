@@ -1343,6 +1343,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T15:04:07Z - PR23 sync repair ACK found / Codex review pending
+
+- Workstream: command/executive / output/budget-documents
+- Branch: `origin/main` `387cada726b3d91fc48ce5044dca80e36bdfa9d8`
+- Status: `PR23_WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_PRE_PUBLICATION / CODEX_REVIEW_REQUESTED / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - GitHub open PR refs remain #22, #23, #25, #26. PR #23 head advanced to `01b489c21a71db7a3301918e44bcfea75e60206a`.
+  - Output Documents Builder posted current-main workflow repair evidence in comment `4535229076`, using current main `387cada726b3d91fc48ce5044dca80e36bdfa9d8`.
+  - Builder reported renderer static guard pass, renderer TypeScript syntax loop pass, invalid fixture / mismatch smoke pass with `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, and `format_matches_output: false`, real `.xlsx` / `.pdf` diff check clean, and no renderer code changed in this repair pass.
+  - Builder requested `@codex review`; no post-`01b489c` clean Codex result was visible at patrol time.
+  - GitHub metadata before API rate-limit reported PR #23 `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` is `156fcd681c37d922ab9c5f53a79d3d29bbf2f350`.
+  - `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `b751c23ee0f3b50da1121b16280d66f4c670cce2`; `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+  - PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: PR #23 post-`01b489c` Codex result and post-publication sync watch.
+  - Why this agent: Builder owns the PR #23 repair branch; Executive found a valid repair ACK and review request, but this docs-only publication may advance main again.
+  - Action: After this patrol-doc publication, check latest `origin/main`. If `docs/WORKSTREAM_BLACKBOARD.md` conflicts again, re-sync only that file, preserve the fail-closed renderer fix and patrol entries, rerun checks, and request / wait for post-head Codex review. If Codex returns clean and latest-main sync remains clean, route to Deputy final gate.
+  - Need Commander: No
+  - Need Reviewer: Yes until post-`01b489c` Codex review is clean and latest-main sync is rechecked.
+
 ### 2026-05-25T14:50:49Z - PR23 post-publication sync blocked again
 
 - Workstream: command/executive / output/budget-documents

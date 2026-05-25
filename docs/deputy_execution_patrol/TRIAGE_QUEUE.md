@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T15:04:07Z - [PR23_SYNC_REPAIRED_CODEX_PENDING] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+PR #23 advanced to head `01b489c21a71db7a3301918e44bcfea75e60206a`. Output Documents Builder posted `WORKFLOW_REPAIR_ATTEMPTED` in comment `4535229076`, reporting latest-main sync against `387cada726b3d91fc48ce5044dca80e36bdfa9d8`, renderer static guard pass, syntax pass, invalid fixture / mismatch smoke pass, no real `.xlsx` / `.pdf` changes, and `@codex review`. GitHub metadata before rate-limit reported PR #23 `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` is `156fcd681c37d922ab9c5f53a79d3d29bbf2f350`; local `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `b751c23ee0f3b50da1121b16280d66f4c670cce2`; `git diff --check origin/main..refs/patrol/pr23` exits `0`. No post-`01b489c` clean Codex result was visible at patrol time.
+
+Recommended Executive Action:
+Watch for post-`01b489c` Codex result and post-publication sync state. If this patrol-doc publication advances main and reopens `docs/WORKSTREAM_BLACKBOARD.md` conflict, chase Output Documents Builder for one scoped sync repair. If Codex returns clean and latest-main sync remains clean, route PR #23 to Deputy final gate.
+
+Recommended Deputy Action:
+No merge / reject / close on PR #23 this round. PR #25 remains a separate Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`01b489c` Codex review is clean and latest-main sync is rechecked.
+
 ### 2026-05-25T14:50:49Z - [PR23_POST_PUBLICATION_SYNC_BLOCKED_AGAIN] - Output Documents
 
 Status:
