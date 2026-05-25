@@ -2118,3 +2118,67 @@ Conditional ready。
 - Landing 與 onboarding 的視覺方向、header 母版、前段 CTA 與頁面連接已可進入 phase review。
 - Routing / CTA 尚未全部正式化，因此 phase review 應標示為「可審查目前階段成果，但不代表完整網站流程全通」。
 - Dashboard flow、progress bar 全站一致性、手機版完整 QA 與 placeholder route 收斂仍需下一階段處理。
+
+---
+
+## 原物料採購與倉儲 補充成果：R1.5 Source Quality Scoring / Reviewer Checklist
+
+### 完成事項
+
+- 已依 GitHub Issue #17 建立 R1.5 candidate-only source quality scoring / reviewer checklist。
+- 新增 `SourceQualityAssessment`、`ReviewerChecklistItem`、`SourceQualityGrade` 與 `ReviewerChecklistStatus` 型別。
+- 新增 `scoreSourceQualityForCandidates()`，只讀 raw source / raw item / candidate / validation result，輸出 source quality score、grade、reviewer checklist 與 recommended review status。
+- reviewer checklist 檢查 source identity、source date、source reliability、raw item trace、suggested code、unit、currency、observed price evidence-only 與 validation status。
+- demo 合併 R1.3 multi-source fixtures 與 R1.4 negative/source-quality fixtures，確認每筆 candidate 都有 assessment。
+- proposal contract、warehouse export safety、observed price safety 與 static guard 仍通過。
+- `formal_price_generated` 維持 `false`，`price_authority` 維持 `"none"`。
+
+### 修改檔案
+
+- `src/lib/budget/raw-warehouse/types.ts`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+### 新增檔案
+
+- `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
+- `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
+- `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
+
+### 未完成事項
+
+- 尚未建立人工審核 UI。
+- 尚未接真實 raw source 匯入或 Excel parser。
+- 尚未接 DB / API / migration。
+- 尚未將 source quality score 接入正式 catalog publishing，且本階段明確禁止。
+
+### 原物料 / 採購 / 倉儲資料影響
+
+- R1.5 只新增候選證據品質評分與 reviewer checklist，協助後續人工審核判斷資料是否完整。
+- `observed_price` 仍只代表觀測證據，不是正式價格。
+- quality score 與 recommended review status 不代表正式上架或正式定價。
+
+### 對 MethodSpecCatalog 的影響
+
+- 不修改 MethodSpec 主規則。
+- 不產生正式 `MaterialSpec`、`LaborRule` 或 `PricingRule`。
+- 未來若要交給 MethodSpec / material / pricing review，只能透過 proposal / review packet 進行人工審核。
+
+### 對 budget-system 的影響
+
+- 不呼叫 `generateBudgetEstimate()`。
+- 不產生 `BudgetEstimateLine` 或 `BudgetEstimateLine.unit_price`。
+- 不影響 deterministic budget engine、renderer、BudgetOutputSnapshot 或平面拼圖 adapter。
+
+### 風險
+
+- quality score 若被下游誤解為價格核准，屬 blocker 級越權風險；文件與 demo 已明確標示不是 formal approval。
+- static guard / safety checks 目前仍是 local demo，尚未接 CI。
+- source quality scoring 規則仍是 MVP rule-based prototype，尚未代表真實採購信用模型。
+
+### 是否 ready for phase review
+
+Yes，ready for user-triggered phase review。
+
+Ready 範圍限 R1.5 candidate-only source quality scoring / reviewer checklist，不代表正式價格、正式 catalog publishing、正式採購系統或正式報價完成。

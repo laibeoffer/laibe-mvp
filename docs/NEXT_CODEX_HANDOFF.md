@@ -1,5 +1,28 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Raw Candidate Warehouse Task: R1.5 Source Quality Scoring / Reviewer Checklist
+
+- 本輪任務名稱：Raw Candidate Issue #17 Delivery Reconciliation / R1.5 source quality scoring reviewer checklist。
+- 任務來源：GitHub Issue #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`。
+- Branch：`warehouse/raw-source-quality-scoring`。
+- 修改檔案：
+  - `src/lib/budget/raw-warehouse/types.ts`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+- 新增檔案：
+  - `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
+  - `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
+  - `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
+- R1.5 新增 `SourceQualityAssessment`、`ReviewerChecklistItem`、`SourceQualityGrade` 與 `ReviewerChecklistStatus`，只作候選證據的品質評分與 reviewer checklist。
+- `scoreSourceQualityForCandidates()` 只讀 `RawCatalogSource`、`RawCatalogItem`、`RawCatalogCandidate` 與 `CandidateValidationResult`，輸出 source quality score、grade、reviewer checklist、recommended review status 與 recommendation reason。
+- R1.5 reviewer checklist 檢查 source identity、source date、source reliability、raw item trace、suggested code、unit、currency、observed price evidence-only 與 validation status。
+- `observed_price` 仍只作 evidence；R1.5 不產生正式 `PricingRule`、`MaterialSpec`、`LaborRule`、`BudgetEstimateLine.unit_price`、正式報價或 customer-facing output。
+- `formal_price_generated` 維持 `false`；`price_authority` 維持 `"none"`；`observed_price_is_evidence_only` 為 `true`。
+- Demo command：`node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`。
+- 本輪未修改 renderer / Excel / PDF、`BudgetOutputSnapshot`、MethodSpec 主規則、平面拼圖、frontend、DB/API、RAG/AI API、payment、escrow 或 listing fee。
+- 下一步建議：PR #17 對應分支可進行 Codex review；若審查通過，再由 Deputy / Commander 決定 merge。
+
 ## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
 
 - 本輪任務名稱：Strategic Plan Imported / Dispatch Source Clarified。

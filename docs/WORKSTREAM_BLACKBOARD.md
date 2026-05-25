@@ -1440,6 +1440,50 @@ No
 Need Reviewer:
 No
 
+### 2026-05-25 - warehouse/raw-candidate Issue #17 R1.5 delivery
+
+Workstream:
+warehouse/raw-candidate
+
+Branch / Repo:
+warehouse/raw-source-quality-scoring / laibeoffer/laibe-mvp
+
+Status:
+PR_READY. Issue #17 claimed and R1.5 source quality scoring / reviewer checklist delivered as candidate-only raw warehouse work.
+
+Changed:
+- Added candidate-only source quality scoring and reviewer checklist.
+- Added `SourceQualityAssessment`, `ReviewerChecklistItem`, `SourceQualityGrade`, and `ReviewerChecklistStatus`.
+- Added demo coverage that combines R1.3 multi-source fixtures and R1.4 negative/source-quality fixtures.
+- Confirmed proposal contract, warehouse export safety, observed price safety, and raw warehouse static guard pass.
+- Confirmed `formal_price_generated: false`, `price_authority: "none"`, `formal_pricing_rule_generated: false`, and `formal_budget_line_generated: false`.
+- No formal `PricingRule`, no `MaterialSpec` / `LaborRule`, no `BudgetEstimateLine.unit_price`, no renderer / Excel / PDF, no `BudgetOutputSnapshot`, no floor-plan, no payment / escrow / listing fee.
+
+Files:
+- `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
+- `src/lib/budget/raw-warehouse/types.ts`
+- `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
+- `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+PR / Commit:
+- Commit: pending local commit before push.
+- PR: pending creation after branch push.
+
+Blocked:
+None.
+
+Next:
+Open PR for Issue #17 and request Codex review.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Deputy Codex-2 overdue assignment patrol
 
 Workstream:
