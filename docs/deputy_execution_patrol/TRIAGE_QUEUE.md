@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T06:07:51Z - [PR25_DEPUTY_WORKFLOW_REPAIR_DECISION_REQUIRED] - Plan Puzzle
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Current main is `ca16cba437125a2ff38b4f4332245821d5ce085e`. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; GitHub PR #25 commit list still contains only that commit, no new open PR exists beyond #22 / #23 / #25 / #26, and no `refs/pull/25/merge` exists. Connector comment `4531949297` reports another local-only repair commit `d8e2c4e` plus `make_pr` metadata, but neither `33c4695` nor `d8e2c4e` is pushed to PR #25. Local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/25/head` still exits `128` with unrelated-history behavior.
+
+Recommended Executive Action:
+Avoid duplicate ordinary chase comments unless the branch changes. The next useful artifact is a pushed repair commit / branch head update that creates a merge ref.
+
+Recommended Deputy Action:
+Decide workflow repair / reassignment inside Plan Puzzle / Issue #15 scope. Minimal repair task: resolve the current-main handoff conflict in a GitHub-connected environment, preserve Issue #15 scope, push the actual branch update, rerun `node --check` and guard checks, and request Codex review only after a PR merge ref exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25T05:59:21Z - [PR23_REASSIGNMENT_RECOMMENDED] - Output Documents
 
 Status:

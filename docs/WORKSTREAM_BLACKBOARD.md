@@ -1343,6 +1343,39 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Second Deputy PR #25 repeated local-only repair escalated
+
+Workstream:
+Second Deputy Codex / Plan Puzzle / Active PR patrol
+
+Changed:
+- Re-read current `origin/main` at `ca16cba437125a2ff38b4f4332245821d5ce085e` after fast-forwarding from `7a8fb02`.
+- Rechecked GitHub open Issues #15 / #16 / #17 / #18 and open PRs #22 / #23 / #25 / #26, including PR comments, review lists, changed files, branch heads, merge refs, and local current-main merge simulations.
+- PR #25 received a second Codex connector local-only handoff comment `4531949297` after Executive follow-up `4531941207`. The comment reports local commit `d8e2c4e` and `make_pr` metadata, but live GitHub still shows only open PRs #22 / #23 / #25 / #26 and PR #25 still contains only commit `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- PR #25 still has no `refs/pull/25/merge`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/25/head` exits `128` with unrelated-history behavior against current `origin/main`.
+- PR #22 and PR #26 still pass local current-main merge-tree simulation but have stale merge-ref / owner-evidence signals; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- LOW / MEDIUM workflow decision: mark PR #25 as `REPEAT_LOCAL_ONLY_HANDOFF / PENDING_DEPUTY_DECISION`.
+- The useful blocker evidence is now exhausted for ordinary Executive chase; the missing artifact is a pushed repair commit / branch head update that creates a valid PR merge ref.
+- No Commander escalation: this is GitHub workflow repair, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+
+Next:
+- Deputy Codex should decide a workflow repair owner or repair lane for PR #25 inside Plan Puzzle / Issue #15 scope.
+- Repair scope remains narrow: resolve the current-main handoff conflict, preserve Issue #15 boundaries, push the actual branch update, rerun `node --check` and guard checks, and request Codex review only after `refs/pull/25/merge` exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #25 drifts scope, or any active PR introduces high-risk formal output / pricing scope.
+
 ### 2026-05-25 - Executive active delivery recovery on current main `6dd50fe`
 
 Workstream:

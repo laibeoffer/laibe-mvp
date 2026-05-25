@@ -37,6 +37,46 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T06:07:51Z - [PR25_DEPUTY_WORKFLOW_REPAIR_DECISION_REQUIRED] - Plan Puzzle
+
+Status:
+PENDING_DEPUTY_DECISION
+
+Executive Officer:
+SECOND_DEPUTY_CODEX
+
+Workstream:
+Plan Puzzle Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 has now produced a second local-only repair handoff without a pushed branch update. Ordinary Executive chase has enough blocker evidence; Deputy workflow repair / reassignment decision is now needed inside the existing Plan Puzzle scope.
+
+Evidence:
+- Current main: `ca16cba437125a2ff38b4f4332245821d5ce085e`.
+- PR #25 head: `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- Codex connector comments `4531872891` and `4531949297` report local-only repair commits `33c4695` and `d8e2c4e`.
+- GitHub PR #25 commit list still contains only `ffbe8e1`; neither local repair commit is pushed to PR #25.
+- No new open PR exists beyond #22 / #23 / #25 / #26 despite the `make_pr` metadata reported in comment `4531949297`.
+- `refs/pull/25/merge` remains absent and local current-main merge-tree still exits `128` with unrelated-history behavior.
+
+Action already taken:
+Second Deputy updated blackboard, delivery ledger, and triage queue to classify PR #25 as `REPEAT_LOCAL_ONLY_HANDOFF / PENDING_DEPUTY_DECISION`.
+
+Recommended Deputy action:
+Decide a workflow repair owner / repair lane for PR #25 inside Plan Puzzle / Issue #15 scope. Required repair evidence: pushed branch update on `plancraft/zone-area-boundary-refinement`, current-main sync, `node --check`, guard checks, and Codex review request only after `refs/pull/25/merge` exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T05:59:21Z - [PR23_WORKFLOW_REPAIR_REASSIGNMENT_RECOMMENDED] - Output Documents
 
 Status:
