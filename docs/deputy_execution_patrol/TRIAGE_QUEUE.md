@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T15:28:39Z - [PR23_P2_SYNC_BLOCKED_RECONFIRMED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / EXISTING_BUILDER_REQUEST_CURRENT
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` is `c8e307639122d73705a667cc4d66adcfd26cee80`. PR #23 remains head `01b489c21a71db7a3301918e44bcfea75e60206a`. Public PR page fallback still shows the post-`01b489c` Codex P2: `Block staging writes for metadata-only storage target`. GitHub REST returned `403`; patrol used public pages, `git ls-remote`, fetched refs, and local simulation fallback. `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict, while `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / #25 / #26 remain merge-tree clean against `c8e3076`; all four PR diff-checks pass.
+
+Recommended Executive Action:
+Do not issue a duplicate GitHub chase this round. Keep the existing single-primary `To: Output Documents Builder` request active for the P2 fix, latest-main sync repair, rerun checks, and Codex re-review.
+
+Recommended Deputy Action:
+No merge / reject / close on PR #23 this round. Keep PR #23 out of final gate until the P2 is fixed, latest-main sync is clean, and Codex re-review is clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes due Codex P2.
+
 ### 2026-05-25T15:20:08Z - [PR23_CODEX_P2_SYNC_BLOCKED] - Output Documents
 
 Status:

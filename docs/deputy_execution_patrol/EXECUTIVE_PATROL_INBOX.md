@@ -37,6 +37,50 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T15:28:39Z - [EXECUTIVE_STATUS_CHECK] - PR23 P2 Request Still Current
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / EXISTING_BUILDER_REQUEST_CURRENT / NO_DUPLICATE_CHASE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 remains blocked by the same post-`01b489c` Codex P2 and by latest-main sync conflict. The `15:20:08Z` single-primary Builder action request remains current, so Executive did not add a duplicate GitHub chase.
+
+Evidence:
+- Latest `origin/main`: `c8e307639122d73705a667cc4d66adcfd26cee80`.
+- PR #23 head: `01b489c21a71db7a3301918e44bcfea75e60206a`.
+- Public PR page fallback still shows Codex P2: `Block staging writes for metadata-only storage target`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- `git diff --check origin/main..refs/patrol/pr23` exits `0`.
+- PR #22 / #25 / #26 merge-tree checks exit `0`; all four PR diff-checks pass.
+- GitHub REST returned `403`, so public PR / Issue pages and git refs were used.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified and no merge / reject / close action was executed.
+
+Recommended next action:
+Output Documents Builder should continue the existing request: fix the metadata-only storage target staging-write blocker, re-sync only `docs/WORKSTREAM_BLACKBOARD.md` against latest `origin/main`, preserve the fail-closed renderer fix and patrol entries, rerun required checks, and request Codex re-review.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes due Codex P2.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_P2_FIX_PENDING
+
 ### 2026-05-25T15:20:08Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Codex P2 Fix And Latest-Main Sync
 
 Status:
