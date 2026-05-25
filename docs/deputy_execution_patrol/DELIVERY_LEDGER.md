@@ -42,6 +42,27 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-25T20:33:55Z - PR23 final sync found
+
+Status:
+`FINAL_SYNC_FOUND / CURRENT_MAIN_MERGE_TREE_PASS / API_LIMIT_FALLBACK / DEPUTY_FINAL_GATE_VISIBILITY_REQUIRED`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final gate.
+- Supersedes the `2026-05-25T20:12:33Z` PR #23 final-sync request. Output Documents Builder final sync is now found by branch-head / ref evidence: PR #23 advanced from `eb7caa738431c0624c30c3242e8d28b0b4b618e9` to `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`.
+- PR #23 final-sync delta changes only patrol docs from the old PR #23 head; no source implementation files changed after the prior clean `eb7caa7` head.
+- PR #23 current-main merge-tree against `6a154321a35861c006653f9b7312e0c1f63ff5a6` exits `0` with tree `1e90b58f84ae516e7c3e6b0dba587ece7499db83`; diff-check exits `0`; `refs/pull/23/merge` exists at `cf1a40400d296c43a8a66574ff6ebd32af0f4dfd`.
+- PR #22 / PR #25 / PR #26 also pass current-main merge-tree and diff-check against `6a15432`: trees `1f54374a6f254985cfdc450e8c43134d8608881b`, `a53c08a2b5b23fd54ab739f18cdb3c10cbafefe3`, and `bcd325953692d599a978125c3a2c04fddad468b9`.
+- GitHub REST comments / review comments are rate-limited this cycle, so refs and local simulations are controlling evidence.
+- Do not issue another ordinary Output Documents Builder sync chase unless PR #23 branch head, validation evidence, review evidence, or scope evidence changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-output risk appears, or scope drifts.
+
 ### 2026-05-25T20:12:33Z - PR23 patrol-doc sync loop break
 
 Status:
