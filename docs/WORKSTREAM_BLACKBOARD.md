@@ -1343,6 +1343,41 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Output Documents Builder PR23 current-main repair on `20808ae`
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS
+
+Action Taken:
+Latest `origin/main` advanced again to `20808ae85e0847ce606a0208a6fa932f1ba92221` after the prior PR #23 local repair against `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`. Output Documents Builder merged the newer main into the PR #23 worktree and resolved the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving Output Documents repair entries and latest main patrol entries.
+
+Changed:
+- `docs/WORKSTREAM_BLACKBOARD.md` conflict resolved only.
+- Latest main patrol docs were accepted from `origin/main`.
+- Renderer code and snapshot review packet files were not edited during this repair.
+
+Validation:
+- Renderer static guard: `valid: true`, `issue_count: 0`.
+- Renderer TypeScript syntax loop: pass.
+- Invalid fixture / mismatch smoke: `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, `format_matches_output: false`.
+- `git diff --check`: pass.
+- Real `.xlsx` / `.pdf` diff check: no added or changed files.
+
+Blocked:
+Branch publication / Codex re-review visibility pending.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
 ### 2026-05-25 - Output Documents Builder PR23 current-main repair on `2b6e613`
 
 Workstream:
@@ -1516,6 +1551,22 @@ No.
 
 Need Reviewer:
 No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
+### 2026-05-25T14:22:59Z - Commander post-publication verification / PR25 stays final-gate / PR23 stays sync-blocked
+
+- Workstream: command/deputy / plancraft/page-ui / output/budget-documents
+- Branch: `origin/main` `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`
+- Status: `LOCAL_STATE_STALE_FALLBACK_USED / PR25_FINAL_GATE_STILL_VALID / PR23_SYNC_BLOCKED_STILL_VALID / NO_MERGE_EXECUTED`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - Local primary worktree is missing `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, so Commander patrol used `origin/main` doctrine-source fallback. This is `LOCAL_STATE_STALE` for the local workspace, not a product blocker.
+  - PR #25 head remains `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`; post-head clean Codex result remains comment `4534994840` at `2026-05-25T14:25:16Z`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr25` exits `0` with tree `fea59880d0ac05e9e0a8502593b51f62f4a398b2`; `git diff --check origin/main..refs/patrol/hb1422/pr25` exits `0`. PR #25 remains a Deputy final-gate candidate.
+  - PR #23 head remains `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; clean Codex result remains comment `4534905765`, but `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against latest `origin/main`.
+  - PR #22 and PR #26 still merge-tree clean against latest `origin/main`.
+- Next: Deputy Codex should make the final-gate decision for PR #25. Output Documents Builder must re-sync PR #23 against whatever `origin/main` is at repair time, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the renderer fix and patrol entries, rerunning checks, and requesting Codex re-review if the branch head changes.
+- Need Commander: No
+- Need Reviewer: No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
 
 ### 2026-05-25T14:22:53Z - PR25 post-sync Codex clean / PR23 still current-main blocked
 
