@@ -1343,6 +1343,79 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy workflow repair assignment for PR #23 / PR #25
+
+Workstream:
+command/deputy / active PR recovery
+
+Status:
+DEPUTY_REPAIR_ASSIGNMENT_PUBLISHED / NEED_COMMANDER_NO
+
+Changed:
+- Re-read current `origin/main` at `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`.
+- Rechecked open PRs #22 / #23 / #25 / #26 and latest issue / PR comments.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge-tree still exits `1` with content conflict in `docs/WORKSTREAM_BLACKBOARD.md`. Executive already posted reassignment recommendation `4531941113`; no owner branch update found.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; repeated local-only handoff comments `4531872891` / `4531949297` did not push `33c4695` or `d8e2c4e` to the PR. Current-main merge-tree now exits `1` with content conflict in `docs/NEXT_CODEX_HANDOFF.md`, so the useful blocker is a concrete handoff conflict, not a Commander decision.
+- PR #22 and PR #26 still pass current-main merge-tree simulation but their owner current-main evidence remains missing after Executive call-outs.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Approve LOW / MEDIUM workflow repair assignment to Deputy Codex-2 for PR #23 and PR #25.
+- This is branch / worktree reconciliation, not product, visual, business, formal price, formal Excel/PDF, payment, real AI API, or merge / reject authority.
+- Do not escalate to Commander.
+
+Dispatch:
+To:
+Deputy Codex-2
+Workstream:
+output/budget-documents
+Branch / Repo:
+`output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+Mission:
+PR #23 current-main workflow repair package.
+Why this agent:
+Deputy Codex-2 owns GitHub / branch / worktree reconciliation and LOW / MEDIUM workflow repair decisions via `DELIVERY_LEDGER.md`; Output Documents owner has not produced a branch update after repeated Executive call-outs.
+Action:
+Attempt or prepare a repair package for PR #23 against current `origin/main` `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. Scope is limited to resolving the `docs/WORKSTREAM_BLACKBOARD.md` current-main conflict, preserving the fail-closed P2 fix and patrol docs, rerunning renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, and requesting Codex re-review only if the PR head changes. Stop and report if any non-PR #23 source conflict, formal `.xlsx` / `.pdf`, formal price, payment, AI API, or cross-workstream scope appears.
+Need Commander:
+No
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Dispatch:
+To:
+Deputy Codex-2
+Workstream:
+plancraft/page-ui / Plan Puzzle
+Branch / Repo:
+`plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+Mission:
+PR #25 current-main workflow repair package.
+Why this agent:
+Deputy Codex-2 owns GitHub / branch / worktree reconciliation and LOW / MEDIUM workflow repair decisions via `DELIVERY_LEDGER.md`; Plan Puzzle produced repeated local-only handoffs without a pushed branch update.
+Action:
+Attempt or prepare a repair package for PR #25 against current `origin/main` `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. Scope is limited to resolving the `docs/NEXT_CODEX_HANDOFF.md` current-main conflict, preserving Issue #15 zone area / boundary refinement scope, pushing an actual branch update if authorized by the repair lane, rerunning `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` plus guard checks, and requesting Codex review only after a PR merge ref exists. Stop and report if any Plancraft core, budget adapter/runtime/type, formal quantity/estimate/unit_price, renderer/Excel/PDF/payment/AI/API, or cross-workstream scope appears.
+Need Commander:
+No
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Next:
+- Executive Officer should avoid duplicate ordinary chase comments for PR #23 / PR #25 unless branch heads change.
+- Deputy Codex-2 should report repair package status back to `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, and `EXECUTIVE_PATROL_INBOX.md`.
+- Keep PR #22 / PR #26 final gates paused until owner current-main evidence is fresh.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Second Deputy PR #25 repeated local-only repair escalated
 
 Workstream:

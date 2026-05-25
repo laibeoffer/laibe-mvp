@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T06:13:21Z - [DEPUTY2_REPAIR_ASSIGNED] - PR #23 / PR #25
+
+Status:
+NEEDS_DEPUTY_DECISION_RESOLVED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 and PR #25
+
+Evidence:
+Current main is `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c` and current-main merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; repeated local-only commits `33c4695` / `d8e2c4e` are not pushed, no merge ref exists, and current-main merge-tree conflicts in `docs/NEXT_CODEX_HANDOFF.md`. PR #22 / PR #26 still pass current-main merge-tree but lack owner evidence refresh.
+
+Recommended Executive Action:
+Avoid duplicate ordinary chase comments for PR #23 / PR #25 unless branch heads change. Watch for Deputy Codex-2 repair package status.
+
+Recommended Deputy Action:
+Decision made: Deputy Codex-2 is assigned LOW / MEDIUM workflow repair packages for PR #23 and PR #25. Scope is limited to current-main branch/worktree reconciliation and documented validation; stop on source drift, high-risk formal output, formal pricing, payment, AI API, or cross-workstream scope.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
 ### 2026-05-25T06:07:51Z - [PR25_DEPUTY_WORKFLOW_REPAIR_DECISION_REQUIRED] - Plan Puzzle
 
 Status:

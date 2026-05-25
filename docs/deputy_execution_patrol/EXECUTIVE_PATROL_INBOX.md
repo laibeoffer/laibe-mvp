@@ -37,6 +37,43 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T06:13:21Z - [DEPUTY_DECISION_PUBLISHED] - PR #23 / PR #25
+
+Status:
+DEPUTY_DECISION_MADE
+
+Executive Officer:
+DEPUTY_CODEX
+
+Workstream:
+Output Documents Builder / Plan Puzzle Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / Issue #18 and PR #25 / Issue #15
+
+Finding:
+PR #23 and PR #25 have crossed from ordinary owner chase into workflow repair. Deputy Codex assigns Deputy Codex-2 as the LOW / MEDIUM workflow repair owner for both packages.
+
+Evidence:
+- Current main: `d34fe38d2f673fe50e8c977adc90ac3ede0d37c5`.
+- PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge-tree conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head: `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; repeated local-only commits `33c4695` / `d8e2c4e` are not pushed, no merge ref exists, and current-main merge-tree conflicts in `docs/NEXT_CODEX_HANDOFF.md`.
+
+Action already taken:
+Deputy Codex updated blackboard, delivery ledger, triage queue, and this inbox with two exact Deputy Codex-2 repair dispatches.
+
+Recommended Deputy action:
+Monitor Deputy Codex-2 repair package status. Executive Officer should avoid duplicate ordinary chase comments unless PR #23 or PR #25 branch heads change.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Deputy Decision:
+APPROVED_DEPUTY2_LOW_MEDIUM_WORKFLOW_REPAIR
+
 ### 2026-05-25T06:07:51Z - [PR25_DEPUTY_WORKFLOW_REPAIR_DECISION_REQUIRED] - Plan Puzzle
 
 Status:
