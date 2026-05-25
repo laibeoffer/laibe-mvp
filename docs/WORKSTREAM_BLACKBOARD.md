@@ -4623,6 +4623,38 @@ No
 Need Reviewer:
 No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
 
+### 2026-05-25 - Commander direct Builder repair ACK second callout
+
+Workstream:
+command/deputy / active repair routing / chatroom heartbeat visibility
+
+Status:
+ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / BUILDER_VISIBLE_ACK_REQUIRED
+
+Changed:
+- Re-checked latest `origin/main` `983facfc0e6d564cf2442c0d9e31a357d1395b52` after Executive follow-up on `b563821`.
+- GitHub connector confirms PR #22 / #23 / #25 / #26 are still open; PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`.
+- PR #23 latest useful repair evidence remains the earlier Output Documents re-sync / clean Codex review sequence, but current-main merge-tree still exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict after main advanced.
+- PR #25 latest useful evidence remains local-only handoff comments `4531872891` / `4531949297`; no `refs/pull/25/merge` exists and current-main merge-tree still exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+- No `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, branch-head update, or new PR comment was found after the 08:30 / 08:36 direct Builder repair requests.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Keep PR #25 Current Handler as Plan Puzzle Builder.
+- Keep PR #23 Current Handler as Output Documents Builder.
+- Executive must now chase visible chat ACK, not another passive GitHub duplicate: each Builder must report `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL.
+- If the target chatroom still does not receive heartbeat messages, rebind that workstream automation to the current chatroom before the next patrol.
+
+Need Commander:
+No for product / business / merge direction; manual UI automation rebind may be needed if the chatroom heartbeat target is stale.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
 ### 2026-05-25 - Commander patrol automation cleanup and repair-lane watch
 
 Workstream:

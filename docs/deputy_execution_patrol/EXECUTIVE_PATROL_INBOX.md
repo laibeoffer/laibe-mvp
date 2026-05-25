@@ -1257,3 +1257,61 @@ No
 Need Reviewer:
 No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
 
+### 2026-05-25T09:05:46Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle
+
+Status:
+ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Mission:
+PR #25 visible ACK and current-main repair attempt
+
+Why this agent:
+You are the ledger Current Handler after Deputy2 repair bypass. The branch owner must provide a visible chat ACK and attempt the scoped workflow repair or report an exact blocker.
+
+Action:
+Commander patrol rechecked latest main `983facfc0e6d564cf2442c0d9e31a357d1395b52`; PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; latest PR comment remains local-only handoff `4531949297`; no `refs/pull/25/merge` exists; local current-main merge-tree still conflicts in `docs/NEXT_CODEX_HANDOFF.md`. Reply in the Plan Puzzle chat with `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Include latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL. If this chatroom did not receive its heartbeat, rebind the Plan Puzzle automation to the current Plan Puzzle chatroom before the next patrol.
+
+Need Commander:
+No for product / business / merge direction.
+
+Need Reviewer:
+No unless scope drift or Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T09:05:46Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents
+
+Status:
+ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Mission:
+PR #23 visible ACK and current-main repair attempt
+
+Why this agent:
+You are the ledger Current Handler after Deputy2 repair bypass. The branch owner must provide a visible chat ACK and attempt the scoped workflow repair or report an exact blocker.
+
+Action:
+Commander patrol rechecked latest main `983facfc0e6d564cf2442c0d9e31a357d1395b52`; PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; latest PR comment remains `4531941113`; local current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. Reply in the Output Documents chat with `WORKFLOW_REPAIR_ATTEMPTED`, `BLOCKER_WITH_ATTEMPTED_FIX`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Include latest main SHA, branch SHA, sources checked, attempted fix, validation result, and PR URL. If this chatroom did not receive its heartbeat, rebind the Output Documents automation to the current Output Documents chatroom before the next patrol.
+
+Need Commander:
+No for product / business / merge direction.
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
