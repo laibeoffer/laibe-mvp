@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T18:55:29Z - [PR23_POST_PUSH_SYNC_BLOCKED_AFTER_312ABFA] - Output Documents / Deputy Codex
+
+Status:
+NEEDS_OWNER_SYNC_REPAIR / CODEX_CLEAN_STALE_FOR_CURRENT_MAIN / PR22_PR25_PR26_DEPUTY_ACK_PENDING
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 plus PR #22 / PR #25 / PR #26 gate watch
+
+Evidence:
+Executive docs-only publication advanced `origin/main` to `312abfa96f36fcc7f59770ad81771b237c2a5457`. PR #23 remains open at head `eb7caa738431c0624c30c3242e8d28b0b4b618e9` with Builder repair comment `4536480487` and clean Codex comment `4536508595`, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1855-post/pr23` exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `git diff --check origin/main..refs/patrol/hb1855-post/pr23` exits `0`. PR #22 / #25 / #26 remain current-main clean after `312abfa` with merge-tree trees `c0b575973c90cfe738a83efe16a1b497fc40b4cb`, `c49c17150132a4bb5d9517e0e6b7666554687eff`, and `797cd4fc44cfa1aeb7f526b27e120cdf98edeffe`; all diff-checks exit `0`.
+
+Recommended Executive Action:
+Route PR #23 back to Output Documents Builder for scoped latest-main sync repair. Keep PR #22 / #25 / #26 with Deputy Codex final-gate visibility; no ordinary Builder chase for those three while heads and validation remain stable.
+
+Recommended Owner Action:
+Output Documents Builder should re-sync PR #23 against latest main `312abfa96f36fcc7f59770ad81771b237c2a5457`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve renderer repair evidence and latest patrol entries, rerun validation, push scoped sync head, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
 ### 2026-05-25T18:55:29Z - [PR23_REPAIR_CLEAN_ALL_FINAL_GATE_PENDING] - Deputy Codex
 
 Status:

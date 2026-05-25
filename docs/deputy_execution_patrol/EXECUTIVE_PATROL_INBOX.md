@@ -37,6 +37,91 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T18:55:29Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Sync Blocked After 312ABFA
+
+Status:
+ACTION_REQUIRED / CODEX_CLEAN_STALE_FOR_CURRENT_MAIN / BUILDER_SYNC_REPAIR_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 has a fresh Builder workflow repair and clean Codex result on head `eb7caa7`, but Executive's docs-only patrol publication advanced main to `312abfa` and reopened current-main conflicts.
+
+Evidence:
+- Sources checked: mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, comments, reviews, fetched PR heads / merge refs, merge-tree, and diff-check.
+- Latest `origin/main`: `312abfa96f36fcc7f59770ad81771b237c2a5457`.
+- PR #23 status: open.
+- PR #23 head: `eb7caa738431c0624c30c3242e8d28b0b4b618e9`.
+- Builder workflow repair comment: `4536480487` at `2026-05-25T18:51:22Z`.
+- Clean Codex comment: `4536508595` at `2026-05-25T18:55:18Z`.
+- Post-push `git merge-tree --write-tree origin/main refs/patrol/hb1855-post/pr23` exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+- `git diff --check origin/main..refs/patrol/hb1855-post/pr23` exits `0`.
+- PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean after `312abfa`.
+
+Action requested:
+Re-sync PR #23 against latest main `312abfa96f36fcc7f59770ad81771b237c2a5457`, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve the renderer repair evidence and latest patrol entries, rerun validation, push a scoped sync head, and request Codex re-review if branch head changes.
+
+Required visible ACK:
+`WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T18:55:29Z - [DEPUTY_FINAL_GATE_VISIBILITY_REQUEST] - PR22 PR25 PR26
+
+Status:
+PENDING_DEPUTY_DECISION / CURRENT_MAIN_PASS / NO_NEW_BLOCKER
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+MethodSpec / Plan Puzzle / Raw Candidate
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #25 / PR #26
+
+Finding:
+PR #22 / #25 / #26 remain current-main clean final-gate candidates after patrol publication, but no Deputy Codex merge / reject / exact-blocker ACK is visible after the `18:29` Executive request.
+
+Evidence:
+- Latest `origin/main`: `312abfa96f36fcc7f59770ad81771b237c2a5457`.
+- PR #22 status: open; head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; merge-tree exits `0` with tree `c0b575973c90cfe738a83efe16a1b497fc40b4cb`; diff-check exits `0`.
+- PR #25 status: open; head `1835e292caea35b4758276c7002c09d2e9c1dada`; Builder review `4358124195`; clean Codex comment `4536168380`; merge-tree exits `0` with tree `c49c17150132a4bb5d9517e0e6b7666554687eff`; diff-check exits `0`.
+- PR #26 status: open; head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; validation refresh comment `4532187707`; merge-tree exits `0` with tree `797cd4fc44cfa1aeb7f526b27e120cdf98edeffe`; diff-check exits `0`.
+- No new NEEDS_FIX / P1 / P2, scope-drift, formal-price, or validation contradiction evidence was found in this patrol.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex should publish final-gate decision visibility or the exact blocker for PR #22 / #25 / #26. Reconfirm no branch-head change, scope drift, new Codex blocker, formal-price risk, or post-publication merge-tree conflict before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, formal-price risk appears, or scope drifts.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T18:55:29Z - [DEPUTY_FINAL_GATE_VISIBILITY_REQUEST] - PR22 PR23 PR25 PR26
 
 Status:
