@@ -1343,6 +1343,42 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive active delivery recovery on current main `6dd50fe`
+
+Workstream:
+Executive Officer / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Changed:
+- Re-read current `origin/main` at `6dd50fe3a44815142e47a283e6065cfd679e1fbf`.
+- Rechecked GitHub open Issues / PRs, PR comments, review threads, changed files, branch heads, PR merge refs, and local current-main merge simulations for PR #22 / #23 / #25 / #26.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; current-main merge simulation still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. No owner response was found after Executive call-out `4531863742`, so Executive posted `OVERDUE_REASSIGNMENT_RECOMMENDED` comment `4531941113`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and the local-only connector commit `33c4695` is not pushed. Executive posted workflow repair follow-up `4531941207`.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, but owner current-main evidence is still missing. Executive posted call-out `4531941286`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, but owner current-main validation / forbidden-pricing evidence is still missing. Executive posted call-out `4531941371`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- Route PR #23 to Deputy decision for workflow repair / reassignment inside Output Documents scope.
+- Keep PR #25 in workflow repair; if next cycle still has no pushed repair commit or merge ref, escalate to Deputy workflow repair / reassignment.
+- Keep PR #22 and PR #26 final gates paused until current-main owner evidence is fresh.
+
+Next:
+- Deputy Codex: decide PR #23 workflow repair / reassignment owner.
+- Plan Puzzle Builder: push an actual current-main repair for PR #25 and produce a merge ref before review.
+- MethodSpec Builder: provide latest main SHA, current-main mergeability / merge-tree status, and allowed docs-only confirmation.
+- Raw Candidate Builder: provide latest main SHA, current-main mergeability / merge-tree status, R1.5 validation, and forbidden formal-pricing checks.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any active PR drifts scope.
+
 ### 2026-05-25 - Deputy PR #25 blocker refined to current-main handoff conflict
 
 Workstream:

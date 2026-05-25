@@ -37,6 +37,83 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:59:21Z - [PR23_WORKFLOW_REPAIR_REASSIGNMENT_RECOMMENDED] - Output Documents
+
+Status:
+PENDING_DEPUTY_DECISION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 remains current-main sync-blocked after the Executive call-out. This is no longer a plain owner chase; it now needs Deputy workflow repair / reassignment decision inside the existing Output Documents scope.
+
+Evidence:
+- Current main: `6dd50fe3a44815142e47a283e6065cfd679e1fbf`.
+- PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`.
+- GitHub reports no current merge commit.
+- Local `git merge-tree --write-tree origin/main refs/eopatrol/pr23-head` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- No owner response or branch update was found after Executive call-out comment `4531863742`.
+
+Action already taken:
+Executive Officer posted PR #23 `OVERDUE_REASSIGNMENT_RECOMMENDED` comment `4531941113` and updated delivery ledger / triage / blackboard state.
+
+Recommended Deputy action:
+Assign a workflow repair owner inside Output Documents scope to re-sync PR #23 against current main, preserve the fail-closed P2 fix and patrol docs, resolve only PR #23 / Output Documents conflicts, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, and request Codex re-review if the head changes. No Commander escalation is needed.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T05:59:21Z - [ACTIVE_DELIVERY_RECOVERY_CALLOUTS_POSTED] - PR #22 / PR #25 / PR #26
+
+Status:
+PENDING_OWNER_REFRESH
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+MethodSpec Builder / Plan Puzzle Builder / Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22, PR #25, PR #26
+
+Finding:
+Current-main evidence is still missing from PR #22 and PR #26, while PR #25 still has a useful blocker but no pushed repair commit or merge ref.
+
+Evidence:
+- Current main: `6dd50fe3a44815142e47a283e6065cfd679e1fbf`.
+- PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`: local merge-tree exits `0`, but owner has not posted current-main evidence after comment `4531863942`.
+- PR #25 head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`: no merge ref; local-only commit `33c4695` from connector comment `4531872891` is still not pushed.
+- PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`: local merge-tree exits `0`, but owner has not posted refreshed R1.5 validation / forbidden formal-pricing evidence after comment `4531733938`.
+
+Action already taken:
+Executive Officer posted PR #25 follow-up comment `4531941207`, PR #22 call-out comment `4531941286`, and PR #26 call-out comment `4531941371`.
+
+Recommended Deputy action:
+Keep PR #22 / #26 final gates paused until current-main evidence is fresh. Keep PR #25 in workflow repair. If the next patrol still has no owner evidence for #22 / #26 or no pushed repair / merge ref for #25, decide a specific workflow repair package for the stalled PR.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
+
+Deputy Decision:
+PENDING_OWNER_REFRESH
+
 ### 2026-05-25T05:55:21Z - [PR25_CONFLICT_REFINED] - Plan Puzzle
 
 Status:

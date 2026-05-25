@@ -36,6 +36,84 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T05:59:21Z - [PR23_REASSIGNMENT_RECOMMENDED] - Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Current main is `6dd50fe3a44815142e47a283e6065cfd679e1fbf`. PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub reports no current merge commit, and local `git merge-tree --write-tree origin/main refs/eopatrol/pr23-head` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`. No owner response or branch update was found after Executive call-out comment `4531863742`.
+
+Recommended Executive Action:
+Done this patrol: posted PR #23 `OVERDUE_REASSIGNMENT_RECOMMENDED` comment `4531941113` and updated the delivery ledger / inbox. Avoid duplicate chase comments unless the branch changes.
+
+Recommended Deputy Action:
+Decide workflow repair / reassignment inside Output Documents scope. Minimal repair task: re-sync PR #23 against current main, preserve the fail-closed P2 fix and patrol docs, resolve only PR #23 / Output Documents conflicts, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, then request Codex re-review if the head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+### 2026-05-25T05:59:21Z - [PR25_WORKFLOW_REPAIR_CHASE_POSTED] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Current main is `6dd50fe3a44815142e47a283e6065cfd679e1fbf`. PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists. Connector blocker response `4531872891` is useful evidence but its local-only commit `33c4695` is not pushed to PR #25. Current local merge-tree still cannot produce a merge tree (`exit=128`, refusing unrelated histories).
+
+Recommended Executive Action:
+Done this patrol: posted PR #25 Executive follow-up comment `4531941207` requiring GitHub-connected repair, pushed branch update, `node --check`, guard checks, and review request only after a merge ref exists.
+
+Recommended Deputy Action:
+Keep PR #25 in workflow repair. If the next cycle still has no pushed repair commit or merge ref, decide Deputy workflow repair / reassignment.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex review later reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T05:59:21Z - [PR22_PR26_EVIDENCE_CALLOUTS] - MethodSpec / Raw Candidate
+
+Status:
+LAGGING_TWO_CYCLES
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #26
+
+Evidence:
+Current main is `6dd50fe3a44815142e47a283e6065cfd679e1fbf`. PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df` and PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` both pass local current-main merge-tree simulation (`exit=0`), but available merge refs remain anchored to older bases and no owner response was found after prior Executive evidence-refresh comments.
+
+Recommended Executive Action:
+Done this patrol: posted PR #22 call-out comment `4531941286` and PR #26 call-out comment `4531941371`. Require latest main SHA, mergeability / merge-tree evidence, allowed-files confirmation for PR #22, and R1.5 validation / forbidden formal-pricing checks for PR #26.
+
+Recommended Deputy Action:
+Keep final gate paused until current-main evidence is fresh. If either remains empty next cycle, decide workflow repair package for the specific PR.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
+
 ### 2026-05-25T05:55:21Z - [PR25_CONFLICT_REFINED] - Plan Puzzle
 
 Status:
