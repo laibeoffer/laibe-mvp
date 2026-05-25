@@ -42,6 +42,29 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-25T22:09:17Z - Active PR final-gate reconfirmed against `e17da06`
+
+Status:
+`STATE_RECONCILIATION / NO_NEW_EVIDENCE_AFTER_CHECK / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes, or Deputy explicitly reroutes repair.
+- Latest `origin/main` is `e17da0682f8c2ab84646a39b4880eb218f25f2b1`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `e17da0682f8c2ab84646a39b4880eb218f25f2b1`: PR #22 tree `e8ca6838c31c623596495e9de83949242a092085`; PR #23 tree `2060c5c97a43b3e6873e06800ebd4fc0ce98556d`; PR #25 tree `6fcda8ca4afd77856327a08800a25354a721edff`; PR #26 tree `d00650e23e468cf83e4a16ef1e5a5420bce6a83c`; all diff-check exits `0`.
+- GitHub connector confirms Issues #15 / #16 / #17 / #18 open and Issue #19 closed/completed. PR #22 / #23 / #25 / #26 remain open, mergeable, and non-draft.
+- PR #22 and PR #26 have no review threads.
+- PR #23 has unresolved repaired-thread metadata for `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, each with Builder fix replies and latest clean Codex evidence after `f882b90`. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- PR #25 has unresolved repaired-thread metadata for non-outdated `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj`, plus outdated historical `PRRT_kwDORlw1t86EmLZ2` without a visible fix reply. Deputy Codex should decide whether this requires manual thread resolution, validation refresh, or exact blocker publication before final gate.
+- Why no further Executive executable change exists: active handlers are already routed to Deputy final gate; Executive cannot merge / reject / close, and no branch-head, validation, or new Codex blocker evidence appeared after the latest clean results.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:51:15Z - Active PR final-gate reconfirmed against `3cb1d07`
 
 Status:
@@ -260,6 +283,10 @@ No unless a branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation 
 | LOGO / Brand Visual | None | Brand Visual | None | N/A | N/A | `TASK_PREVIEW_MISSING` | No current Commander visual direction dispatch. | N/A | 0 | Deputy / Commander | Requires exact visual direction before work. | LOW | Yes if Commander wants brand task | No |
 
 ## Current Patrol Notes
+
+- `2026-05-25T22:09:17Z`: Executive Officer rechecked latest `origin/main` `e17da0682f8c2ab84646a39b4880eb218f25f2b1`, mandatory docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issue / PR metadata via connector, review threads, fetched PR heads / merge refs, merge-tree, and diff-check. Active PR heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. All four current-main merge-tree / diff-check checks pass against `e17da06`: PR #22 tree `e8ca6838c31c623596495e9de83949242a092085`; PR #23 tree `2060c5c97a43b3e6873e06800ebd4fc0ce98556d`; PR #25 tree `6fcda8ca4afd77856327a08800a25354a721edff`; PR #26 tree `d00650e23e468cf83e4a16ef1e5a5420bce6a83c`.
+
+- `2026-05-25T22:09:17Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` for active final gates. Issues #15-#18 remain open and Issue #19 remains closed/completed. PR #22 / PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with fix replies. PR #25 has unresolved repaired-thread metadata plus outdated historical `PRRT_kwDORlw1t86EmLZ2` without a visible fix reply. Required visible ACK remains single-primary `To: Deputy Codex`: publish `ACTION_TAKEN` final-gate decision visibility or exact blocker for PR #22 / #23 / #25 / #26, including whether PR #23 / #25 manual thread resolution or validation refresh is required.
 
 - `2026-05-25T21:33:47Z`: Executive Officer rechecked latest `origin/main` `46e76543f975b5a01ff03a973cb71dd64d21b835`, mandatory docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR metadata/comments/review threads via connector, Issues #15-#19, fetched PR heads, merge-tree, and diff-check. Active PR heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. All four current-main merge-tree / diff-check checks pass against `46e7654`: PR #22 tree `5a4631e517f69d8b874af0e85a727ae5c43084f9`; PR #23 `8ac12821761b518138b60c15cbdfcce7a4de64e3`; PR #25 `88212a9e7b499c9bb80e3eee0022aa197fab47c8`; PR #26 `1d15419916131be330476afc7627cdaf1164617d`.
 

@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T22:09:17Z - [ACTIVE_PRS_FINAL_GATE_RECONFIRMED_E17DA06] - Deputy Codex
+
+Status:
+ON_TRACK / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `e17da0682f8c2ab84646a39b4880eb218f25f2b1`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Current-main merge-tree and diff-check pass for all four active PRs against `e17da06`: PR #22 tree `e8ca6838c31c623596495e9de83949242a092085`; PR #23 tree `2060c5c97a43b3e6873e06800ebd4fc0ce98556d`; PR #25 tree `6fcda8ca4afd77856327a08800a25354a721edff`; PR #26 tree `d00650e23e468cf83e4a16ef1e5a5420bce6a83c`; all diff-check exits `0`. PR #22 and PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with Builder fix replies. PR #25 has unresolved repaired-thread metadata plus outdated historical `PRRT_kwDORlw1t86EmLZ2` without a visible fix reply. This remains a Deputy final-gate manual-thread / blocker decision item.
+
+Recommended Executive Action:
+Stop ordinary Builder chase while branch heads, validation, and Codex results remain stable. Do not issue duplicate GitHub comments. Keep a single visible inbox request to Deputy Codex.
+
+Recommended Deputy Action:
+Publish final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved review-thread metadata requires manual resolution, validation refresh, or blocker publication, or whether later clean evidence is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:51:15Z - [ACTIVE_PRS_FINAL_GATE_RECONFIRMED_3CB1D07] - Deputy Codex
 
 Status:
