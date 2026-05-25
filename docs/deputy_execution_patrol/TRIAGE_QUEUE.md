@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T23:39:20Z - [GITHUB_METADATA_CONTRADICTION_3081BB4] - Deputy Codex-2
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION / NEEDS_DEPUTY2_VALIDATION_REFRESH
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `3081bb4f6a187d36a463077ff0dd2865b1262283`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector reports all four PRs open / non-draft but `mergeable=false`, while local current-main merge-tree and diff-check pass for all four against `3081bb4`: PR #22 tree `1b2b63030765102710c8bb8bcac2d4392f2a30db`; PR #23 tree `75c93211343f7205e9ddc9bb36b7d208a6e8b7db`; PR #25 tree `a728a3b3e15ce2c31d92a9ee834d9b9ef6c1e432`; PR #26 tree `d03968c5466be51d1ca324e6c8d32d11caf87080`; all diff-check exits `0`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+
+Recommended Executive Action:
+No duplicate GitHub or Builder chase while branch heads and local validation remain stable. Keep the visible request single-primary `To: Deputy Codex-2`.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, or exact blocker for the connector `mergeable=false` / local merge-tree pass contradiction, including latest main SHA, branch SHA, connector mergeability, merge-ref state, and current-main simulation evidence. Deputy Codex final-gate remains paused until metadata is reconciled or Deputy explicitly accepts local simulation as sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T23:29:19Z - [NO_NEW_EVIDENCE_AFTER_CHECK_8586F70] - Deputy Codex
 
 Status:

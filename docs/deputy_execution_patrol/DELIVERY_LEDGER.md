@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-25T23:39:20Z - Active PR metadata contradiction reopened against `3081bb4`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION / DEPUTY2_VALIDATION_REFRESH_REQUIRED / DEPUTY_FINAL_GATE_PAUSED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 GitHub metadata / merge-ref reconciliation before Deputy Codex final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `3081bb4f6a187d36a463077ff0dd2865b1262283`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft, but reports `mergeable=false` for all four while connector base SHAs still point at older main commits. Issue #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+- Current-main merge-tree and diff-check pass for all four active PRs against `3081bb4f6a187d36a463077ff0dd2865b1262283`: PR #22 tree `1b2b63030765102710c8bb8bcac2d4392f2a30db`; PR #23 tree `75c93211343f7205e9ddc9bb36b7d208a6e8b7db`; PR #25 tree `a728a3b3e15ce2c31d92a9ee834d9b9ef6c1e432`; PR #26 tree `d03968c5466be51d1ca324e6c8d32d11caf87080`; all diff-check exits `0`.
+- Latest visible clean / validation evidence remains: PR #22 clean Codex `4531356014` and latest discussion `4531941286`; PR #23 clean Codex `4537316105`; PR #25 clean Codex `4536168380`; PR #26 current-main evidence `4532187707`.
+- PR #22 and PR #26 have no review threads. PR #23 and PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; keep this as a final-gate policy item after metadata reconciliation.
+- Why no merge / reject / close exists: connector metadata now contradicts local current-main simulation. Deputy Codex-2 owns the LOW / MEDIUM GitHub / branch / worktree reconciliation before Deputy Codex can publish final-gate visibility.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T23:29:19Z - Active PR final-gate watch refreshed against `8586f70`
 
 Status:
