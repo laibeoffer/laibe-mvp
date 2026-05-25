@@ -20,6 +20,13 @@ Visible heartbeat rule:
 - Completed rows such as `COMPLETED_WAITING_NEXT_SCOPED_TASK` may stay quiet only when no stale state, no active Issue / PR, and no Deputy / Executive dispatch exists.
 - Reviewer may stay quiet unless `Need Reviewer: Yes`, Codex review NEEDS_FIX / P1 / P2, scope drift, or explicit review request exists.
 
+Cadre accountability rule:
+- Executive Officer must convert ledger decisions into visible follow-up / ACK requests; skipping duplicate GitHub comments does not allow a silent patrol.
+- Deputy Codex-2 must act on rows where it is Current Handler by publishing repair / validation attempts or a blocker with attempted fix.
+- Triage Officer must route from the latest `DELIVERY_LEDGER.md`; stale GitHub API / local fallback must be marked and must not override ledger state.
+- Governance patrol must report `ACTIVE_HANDLER_SILENT` when a ledger Current Handler has no visible ACK.
+- Deputy Codex remains final owner for high-risk, merge / reject / close, and Commander-facing decisions, but LOW / MEDIUM technical flow must not boomerang back without attempted action.
+
 ## Deputy Codex
 
 ROLE:

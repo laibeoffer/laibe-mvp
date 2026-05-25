@@ -1343,6 +1343,43 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Cadre accountability prompts corrected
+
+Workstream:
+command/deputy / automation governance
+
+Status:
+CADRE_LAYER_CAUSE_CONFIRMED / PROMPTS_UPDATED
+
+Changed:
+- Diagnosis from Commander screenshots: Executive Officer, Second Deputy, Triage Officer, and Governance Patrol were active, but their prompts let them stop at classification / no-duplicate-chase / route-back behavior.
+- Executive Officer reported `NO_NEW_EXECUTIVE_ACTION` while active rows still needed visible ACK / final-gate / repair status.
+- Second Deputy made useful LOW / MEDIUM decisions, but still routed PR #22 / #26 / #23 / #25 back to Deputy Codex instead of forcing active-handler visible closure.
+- Triage Officer used fallback / stale state and produced routing that conflicted with the latest `DELIVERY_LEDGER.md`.
+- Governance Patrol detected stale local state but did not turn the finding into an active-handler silence alert.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`
+- Automation prompts updated in Codex app: `laibe-mvp-executor-patrol`, `laibe-deputy-15min-patrol`, `laibe-triage-officer-heartbeat`, `20`.
+
+Decision:
+- Confirm the current failure is in the cadre layer, not only in individual Builder workstreams.
+- Executive Officer must convert ledger decisions into visible follow-up / ACK requests; skipping duplicate GitHub comments does not allow a silent patrol.
+- Deputy Codex-2 must act on rows where it is Current Handler by publishing repair / validation attempts or a blocker with attempted fix.
+- Triage Officer must route from the latest `DELIVERY_LEDGER.md`; stale API / local fallback must be marked and must not override ledger state.
+- Governance Patrol must report `ACTIVE_HANDLER_SILENT` when a ledger Current Handler has no visible ACK.
+
+Next:
+- Watch next Executive / Deputy2 / Triage / Governance patrols for visible ACK compliance.
+- If a cadre still reports only `NO_NEW_*` while an active row lacks visible ACK, treat it as `CADRE_RULE_FAIL` and route a direct correction to that role.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Active row visible heartbeat rule added
 
 Workstream:
