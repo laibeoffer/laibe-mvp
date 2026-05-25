@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T14:50:49Z - [PR23_POST_PUBLICATION_SYNC_BLOCKED_AGAIN] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / LATEST_MAIN_SYNC_BLOCKED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Executive published patrol docs to main `a5c0d357641fea516ad2a2f91eb4cb180a819f26` after finding PR #23 current-main clean on prior main `20808ae85e0847ce606a0208a6fa932f1ba92221`. PR #23 head remains `976b4cba3ab33743d02a97451f04ddc65a316dc1`; post-`976b4cb` clean Codex comment is `4535125308`; post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` now exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / #25 / #26 remain merge-tree clean.
+
+Recommended Executive Action:
+Chase Output Documents Builder for latest-main sync repair. This supersedes the pre-publication PR #23 final-gate request until the branch is re-synced against current `origin/main`.
+
+Recommended Deputy Action:
+Do not final-gate PR #23 until latest-main sync is repaired again. PR #25 remains a separate Deputy final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T14:44:23Z - [PR23_CODEX_CLEAN_CURRENT_MAIN_REPAIRED] - Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest main is `20808ae85e0847ce606a0208a6fa932f1ba92221`. PR #23 advanced to head `976b4cba3ab33743d02a97451f04ddc65a316dc1`; Output Documents Builder posted current-main repair evidence in comment `4535080840`; Codex returned clean after that head in comment `4535125308`; GitHub reports `mergeable: true` / `mergeable_state: clean`; `refs/pull/23/merge` exists at `9f595895c900ea4048ec988ed3f3e514cec1eb5d`; local `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `bc30ceb4fc3223be80648cb2dcbe5c34eaa8ad90`; `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / #25 / #26 also remain merge-tree clean against latest main.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder sync chase unless PR #23 branch head changes, validation is contradicted, or Codex reports a new blocker. Keep visible final-gate routing to Deputy Codex.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #23. Do not delegate merge / reject to Executive.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
 ### 2026-05-25T14:22:59Z - [POST_PUBLICATION_VERIFY_PR25_PR23] - Plan Puzzle / Output Documents
 
 Status:
