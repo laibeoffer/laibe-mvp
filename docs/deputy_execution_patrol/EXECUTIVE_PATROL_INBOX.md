@@ -37,6 +37,85 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:16:50Z - [EXECUTIVE_FOLLOW_UP_POSTED] - Output Documents
+
+Status:
+PENDING_OUTPUT_DOCS_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / Issue #18
+
+Finding:
+PR #23 remains dirty / sync-blocked against current main after the prior clean Codex review and final-gate routing. Deputy final gate remains withdrawn until the branch is re-synced and checks / review signal are fresh again.
+
+Evidence:
+- Patrol-start `origin/main`: `8a46630010a6b4ce125f5259d11f58c9f6fab481`.
+- PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`.
+- GitHub metadata reports `mergeable=false` and no current `merge_commit_sha`.
+- Local merge simulation against current main still reports conflict.
+- Prior clean Codex result `4531569296` predates the current-main drift.
+
+Action already taken:
+Executive Officer posted PR #23 follow-up comment `4531733668` requiring current-main re-sync, renderer checks, and Codex re-review if the head changes.
+
+Recommended Deputy action:
+Keep PR #23 final gate withdrawn until Output Documents reports a current-main re-sync, reruns renderer static guard / syntax / mismatch / fixture checks, and obtains a fresh mergeability / Codex review signal if the head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T05:16:50Z - [FINAL_GATE_WITHDRAWN_CURRENT_MAIN_CONFLICT] - Raw Candidate
+
+Status:
+PENDING_RAW_CANDIDATE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #26 / Issue #17
+
+Finding:
+PR #26 was previously routed to Deputy final gate after candidate-only validation and clean Codex review, but current-main merge simulation now reports a conflict. PR #26 must re-sync before final gate can resume.
+
+Evidence:
+- Patrol-start `origin/main`: `8a46630010a6b4ce125f5259d11f58c9f6fab481`.
+- PR #26 head: `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Previous Executive validation: comment `4531540239`.
+- Previous Codex clean result: comment `4531555287`.
+- Previous Deputy gate routing: comment `4531573641`.
+- Local merge simulation against current main reports conflict.
+
+Action already taken:
+Executive Officer posted PR #26 follow-up comment `4531733938` requiring current-main re-sync, R1.5 validation rerun, forbidden formal-pricing checks, and Codex re-review if the head changes.
+
+Recommended Deputy action:
+Withdraw PR #26 final gate until Raw Candidate re-syncs current main and produces a fresh clean mergeability / validation / Codex signal.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2, formal-price risk, or scope drift.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T05:06:20Z - [PR_23_FINAL_GATE_WITHDRAWN] - Output Documents
 
 Status:

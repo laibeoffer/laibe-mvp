@@ -36,6 +36,58 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T05:16:50Z - [CURRENT_MAIN_CONFLICT] - Raw Candidate
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #26 / Issue #17 / `warehouse/raw-candidate`
+
+Evidence:
+PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. It previously had Executive validation `4531540239`, Codex clean result `4531555287`, and Deputy gate routing `4531573641`, but patrol-start `origin/main` is now `8a46630010a6b4ce125f5259d11f58c9f6fab481` and local merge simulation against current main reports conflict.
+
+Recommended Executive Action:
+Chase Raw Candidate owner to re-sync PR #26 against current main, preserve R1.5 scope and patrol / blackboard entries, rerun the R1.5 validation set plus forbidden formal-pricing checks, and request Codex re-review if the head changes. Executive follow-up comment `4531733938` was posted.
+
+Recommended Deputy Action:
+Withdraw PR #26 final gate until the branch is current-main clean and validation / Codex signal is fresh again.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2, formal-price risk, or scope drift.
+
+### 2026-05-25T05:16:50Z - [EXECUTIVE_FOLLOW_UP_POSTED] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18 / `output/budget-documents`
+
+Evidence:
+PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; patrol-start `origin/main` is `8a46630010a6b4ce125f5259d11f58c9f6fab481`. GitHub metadata reports `mergeable=false` and no current `merge_commit_sha`, and local merge simulation still reports conflict.
+
+Recommended Executive Action:
+Chase Output Documents owner to re-sync PR #23 against current main, preserve the fail-closed P2 fix and patrol docs, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, and request Codex re-review if the head changes. Executive follow-up comment `4531733668` was posted.
+
+Recommended Deputy Action:
+Keep PR #23 final gate withdrawn until current-main mergeability and fresh checks / review signal are restored.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2 or scope drifts.
+
 ### 2026-05-25T05:06:20Z - [SYNC_BLOCKED_AFTER_MAIN_ADVANCE] - Output Documents
 
 Status:

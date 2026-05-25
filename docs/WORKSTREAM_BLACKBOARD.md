@@ -1343,6 +1343,43 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive current-main sync follow-up for PR #23 / PR #26
+
+Workstream:
+Executive Officer / Output Documents / Raw Candidate
+
+Status:
+EXECUTIVE_FOLLOW_UP_POSTED / CURRENT_MAIN_SYNC_REQUIRED
+
+Changed:
+- Executive patrol read current `origin/main` at `8a46630010a6b4ce125f5259d11f58c9f6fab481`.
+- PR #23 remains open on head `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub metadata reports `mergeable=false` / no current `merge_commit_sha`, and local current-main merge simulation still conflicts. Executive posted PR #23 follow-up comment `4531733668`.
+- PR #26 remains open on head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; it previously had validation / Codex clean / Deputy gate routing, but local current-main merge simulation now conflicts. Executive posted PR #26 follow-up comment `4531733938` and moved the delivery ledger row from `FINAL_GATE_READY` to `SYNC_BLOCKED_AFTER_MAIN_ADVANCE`.
+- PR #22 remains open on head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge simulation found no content conflict, so Executive did not reopen ordinary chase.
+- PR #25 remains open on head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no merge base / merge ref exists, and the prior sync-recovery blocker remains active.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+
+Blocked:
+- PR #23 needs current-main re-sync, renderer checks, and Codex re-review if the head changes.
+- PR #26 needs current-main re-sync, R1.5 validation rerun, forbidden formal-pricing checks, and Codex re-review if the head changes.
+- PR #25 still needs true latest-main sync in a GitHub-connected environment before Codex review.
+
+Next:
+- Output Documents Builder should re-sync PR #23 against current main and report checks.
+- Raw Candidate Builder should re-sync PR #26 against current main and report validation / forbidden-pricing checks.
+- Deputy Codex keeps final merge / reject authority; final gate is withdrawn for PR #23 and PR #26 until current-main signals are clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or either PR drifts scope.
+
 ### 2026-05-25 - Second Deputy current-main reconciliation after PR #23 withdrawal
 
 Workstream:
