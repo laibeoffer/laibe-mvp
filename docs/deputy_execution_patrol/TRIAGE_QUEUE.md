@@ -36,6 +36,84 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T04:44:49Z - [FINAL_GATE_READY] - Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18 / `output/budget-documents`
+
+Evidence:
+PR #23 head `a75e3802a30f13201cf2df5705112142d9251e8c` has `refs/pull/23/merge` at `8ef304b72e6afd92e61e14274cd4611f65281398`. Output Documents reported latest-main resync and reran renderer static guard / syntax / mismatch / fixture / invalid fixture checks in comment `4531552098`. Codex post-resync review returned clean in comment `4531569296`, and Executive routed the PR to Deputy final gate in comment `4531573705`.
+
+Recommended Executive Action:
+Stop ordinary chase. Watch only for branch-state changes before Deputy final gate.
+
+Recommended Deputy Action:
+Deputy Codex owns final merge / reject gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, or Codex later reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T04:44:49Z - [FINAL_GATE_READY] - MethodSpec / Raw Candidate
+
+Status:
+NEEDS_DEPUTY_DECISION
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 and PR #26
+
+Evidence:
+PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df` has `refs/pull/22/merge` at `72f0f3eff085cc434921b7490c513d644208c46d` and clean Codex result `4531356014`. PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3` has `refs/pull/26/merge` at `f3db625a4716b8997f06e98673ccf8d2ba0e037d`; Executive validation and candidate-only / forbidden-pricing checks are recorded in comment `4531540239`, and Codex clean result is `4531555287`.
+
+Recommended Executive Action:
+No further chase unless branch state changes.
+
+Recommended Deputy Action:
+Deputy Codex owns final merge / reject gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, or Codex later reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T04:44:49Z - [SYNC_BLOCKED] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` Issue #15 / PR #25 / `plancraft/page-ui`
+
+Evidence:
+PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; `refs/pull/25/merge` is absent. No Codex review or Deputy final gate should start until latest-main sync creates a merge ref.
+
+Recommended Executive Action:
+Ask Plan Puzzle owner for a true latest-main sync in a GitHub-connected environment, then rerun `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`, guard checks, and request Codex review only after merge ref exists.
+
+Recommended Deputy Action:
+Keep as technical sync recovery. No Commander escalation unless product direction, formal estimate, payment, API, or forbidden files appear.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless scope drifts or Codex later reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25T04:23:16Z - [PR_VERIFICATION_REQUIRED] - Plan Puzzle
 
 Status:

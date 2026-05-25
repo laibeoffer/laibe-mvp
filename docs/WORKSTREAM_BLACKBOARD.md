@@ -1343,6 +1343,50 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Second Deputy heartbeat post-resync review correction
+
+Workstream:
+Second Deputy Codex / Output Documents / MethodSpec / Raw Candidate / Plan Puzzle
+
+Branch / Repo:
+`laibeoffer/laibe-mvp`
+
+Status:
+PR_23_FINAL_GATE_READY / DELIVERY_LEDGER_INITIALIZED / NO_COMMANDER_ESCALATION
+
+Changed:
+- Heartbeat patrol rechecked Git refs and PR comments after the immediate repair-check update.
+- Current `origin/main` is `25475f0363e7fc483f2e6215eadd82b7bfc8d131`.
+- PR #23 has post-resync Codex clean result `4531569296` on head `a75e3802a30f13201cf2df5705112142d9251e8c`; Executive routed it to Deputy final gate in comment `4531573705`. This supersedes the prior `REVIEW_GATE_HOLD` note that was waiting for post-resync Codex result.
+- PR #22 remains final-gate ready from the prior check: head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, merge ref exists, Codex clean `4531356014`.
+- PR #26 remains final-gate ready: head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`, merge ref exists, Executive validation plus Codex clean `4531555287`.
+- PR #25 remains sync-blocked: head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`, no `refs/pull/25/merge`.
+- Concurrent main update added `docs/deputy_execution_patrol/DELIVERY_LEDGER.md` and `docs/deputy_execution_patrol/CHATROOM_ROLE_PARAMETERS.md`; Second Deputy reconciled this patrol against those files instead of keeping a duplicate local ledger.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Second Deputy docs-only heartbeat update.
+
+Blocked:
+- PR #25: no merge ref; requires latest-main sync that produces a merge ref before Codex review.
+- None after the concurrent patrol-file update; PR #25 remains the only active workflow blocker in this set.
+
+Next:
+- Deputy Codex final gate queue: PR #22, PR #23, PR #26.
+- Executive Officer should chase only PR #25 sync recovery among these four unless another branch state changes.
+- Triage should stop treating PR #23 or PR #26 as needing Executive verification.
+
+Need Commander:
+No
+
+Need Reviewer:
+No for PR #22 / #23 / #26 after clean Codex results. No for PR #25 unless scope drifts or Codex later reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy Codex-2 immediate repair check
 
 Workstream:

@@ -37,6 +37,46 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T04:44:49Z - [POST_RESYNC_CODEX_CLEAN_FOUND] - PR #23
+
+Status:
+PENDING_DEPUTY_FINAL_GATE
+
+Executive Officer:
+SECOND_DEPUTY_CODEX
+
+Workstream:
+Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / Issue #18
+
+Finding:
+Post-resync Codex result arrived after the immediate repair check. PR #23 is no longer waiting on reviewer-gate evidence; it is now a Deputy final merge / reject gate item.
+
+Evidence:
+- Current main checked: `25475f0363e7fc483f2e6215eadd82b7bfc8d131`.
+- PR #23 head: `a75e3802a30f13201cf2df5705112142d9251e8c`.
+- `refs/pull/23/merge`: `8ef304b72e6afd92e61e14274cd4611f65281398`.
+- Output Documents latest-main resync and checks: comment `4531552098`.
+- Codex post-resync clean result: comment `4531569296`.
+- Executive final-gate routing: comment `4531573705`.
+
+Action already taken:
+Second Deputy published the correction to `docs/WORKSTREAM_BLACKBOARD.md`, initialized `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, and added fresh triage entries.
+
+Recommended Deputy action:
+Deputy Codex final merge / reject gate for PR #23. No further Executive chase unless branch state changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, scope drifts, or Codex later reports P1/P2/NEEDS_FIX.
+
+Deputy Decision:
+PR_23_FINAL_GATE_READY
+
 ### 2026-05-25T04:42:41Z - [IMMEDIATE_REPAIR_CHECK] - PR #22 / PR #23 / PR #25 / PR #26
 
 Status:
