@@ -1343,6 +1343,44 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy five-hour stall root cause and recovery plan
+
+Workstream:
+cross-workstream patrol / execution supervision
+
+Status:
+ROOT_CAUSE_FOUND / RECOVERY_REQUIRED
+
+Evidence:
+- Active execution stalls persist after repeated Deputy and Executive comments: Plan Puzzle Issue #15 still has no `plancraft/zone-area-boundary-refinement` branch, PR URL, Issue claim, `node --check`, guard check, or exact blocker.
+- Raw Candidate Issue #17 still has no `warehouse/raw-source-quality-scoring` branch, PR URL, Issue claim, candidate-only check, forbidden-pricing-field check, or exact blocker.
+- MethodSpec PR #22 remains open and `mergeable=false`; owner has not reported latest-main re-sync / allowed-scope confirmation after follow-up.
+- Output Documents PR #23 remains open and `mergeable=false`; unresolved Codex P2 remains on renderer / format mismatch fail-closed handling.
+- Triage queue has not produced new executable `EXECUTIVE_ACTION_REQUEST` entries since `2026-05-24T20:43:51Z`; this made triage advisory instead of operational.
+- Executive inbox has no new pending action request after the latest stall escalation; first-line chasing did not convert repeated stalls into new executable owner demands.
+- Quote Factory QF5.3 and Visual Simulation are not active stalls: Quote Factory PR #2 / Issue #1 and Visual PR #24 / Issue #19 are closed by merge.
+- Site Flow Builder and Brand Visual are true `TASK_PREVIEW_MISSING` / Commander-input-needed workstreams, not execution stalls.
+
+Root Cause:
+- Active workrooms read stale local state or stale heartbeat wording instead of latest GitHub Issues / PRs / `origin/main` blackboard.
+- Patrol support roles were too passive: Triage summarized but did not produce sendable chase cards; Executive followed up but did not keep a persistent inbox item open after each failed cycle.
+- Deputy patrol incorrectly allowed unchanged stalls to become quiet after publication instead of notifying Commander when active stalls persisted.
+- Some workstreams treated missing branch / PR mechanics as a blocker or no-task condition instead of solving inside scope or escalating a concrete attempted blocker.
+
+Recovery:
+- Plan Puzzle: Executive / second Deputy must require Issue #15 claim plus PR URL or exact attempted blocker next cycle. If still empty, reassign or have Deputy repair workflow.
+- Raw Candidate: Executive / second Deputy must require Issue #17 claim plus PR URL or exact candidate-only blocker next cycle. If still empty, reassign or have Deputy repair workflow.
+- MethodSpec: require PR #22 latest-main re-sync, preserve patrol entries, resolve only MethodSpec docs conflicts, confirm changed files remain within Issue #16 allowed docs, then request Codex review.
+- Output Documents: require PR #23 P2 fix, fail-closed renderer / format mismatch handling, latest-main re-sync, renderer guard / syntax / smoke checks, and Codex re-review.
+- Triage Officer must write executable `EXECUTIVE_ACTION_REQUEST` / `DEPUTY_DECISION_REQUEST` cards, not only status summaries.
+- Executive Officer must keep first-line chase active until each stalled workstream reports PR URL, Issue claim, validation result, or exact blocker with attempted resolution.
+
+Need Commander:
+No for #15, #17, #22, #23 technical recovery. Yes only if Site Builder / Brand Visual product or visual direction is desired.
+
+Need Reviewer:
+Yes for PR #23 until P2 is fixed and re-reviewed. No for #15, #17, #22 unless scope changes or Codex review reports P1/P2/NEEDS_FIX.
+
 ### 2026-05-25 - Deputy stall escalation after Commander challenge
 
 Published by:
