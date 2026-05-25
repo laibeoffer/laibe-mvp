@@ -1343,6 +1343,49 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy patrol branch updates after decision gate
+
+Workstream:
+cross-workstream patrol / Deputy Codex
+
+Branch / Repo:
+`main` / `laibeoffer/laibe-mvp`
+
+Status:
+PR_BRANCH_UPDATES_FOUND / REVIEW_RECHECK_REQUIRED
+
+Changed:
+- After Deputy Codex-2 published the decision gate, patrol found new remote PR branch heads for #22 and #23.
+- MethodSpec PR #22 branch `warehouse/method-spec-validator-freeze-note` moved to `e338431e04811b5b7b0bdcff789f8d3d162ee8df` with commit `e338431 Merge origin/main into MethodSpec freeze note`.
+- PR #22 changed files remain docs-only / MethodSpec freeze-note scope: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, and `docs/budget/32-method-spec-validator-freeze-note.md`.
+- Output Documents PR #23 branch `output/renderer-static-guard-review-packet` moved to `cb276cb2ab5cbfd5538d758ccde6172d529cd90b`.
+- PR #23 now includes output fix commits `76d4fc7 fix(output): reject renderer format mismatches`, `c05cadd fix(output): fail closed on renderer format mismatch`, and `cb276cb merge(output): reconcile pr23 p2 fix branch`.
+- PR #23 still needs Codex re-review / review-thread verification before merge; keep Need Reviewer: Yes until the P2 is confirmed fixed and clean.
+- Plan Puzzle Issue #15 still has no remote branch `plancraft/zone-area-boundary-refinement`; Raw Candidate Issue #17 still has no remote branch `warehouse/raw-source-quality-scoring`. The `DEPUTY_WORKFLOW_REPAIR` decision for #15 / #17 remains active.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy Codex docs-only patrol update.
+
+Blocked:
+- #15 / #17: workflow repair lane, no target branch found.
+- #23: review gate remains until Codex re-review is clean.
+- #22: branch updated; needs mergeability / re-review status confirmation.
+
+Next:
+- Executive Officer should verify PR #22 mergeability and whether Codex re-review was requested.
+- Executive Officer should verify PR #23 checks and Codex re-review / P2 thread status before any merge decision.
+- Keep #15 / #17 out of ordinary chase-only mode; route through Deputy workflow repair or reassignment.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until Codex re-review is clean. No for #15, #17, or #22 unless scope changes or Codex reports NEEDS_FIX / P1 / P2.
+
 ### 2026-05-25 - Deputy Codex-2 overdue decision gate
 
 Workstream:

@@ -37,6 +37,46 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T04:05:13Z - [PR_BRANCH_UPDATES_FOUND] - PR #22 / PR #23
+
+Status:
+PENDING_EXECUTIVE_ACTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+MethodSpec Builder / Output Documents Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22, PR #23
+
+Finding:
+Deputy patrol found new remote branch heads after the Deputy Codex-2 decision gate. #22 and #23 are no longer empty stalls; they need mergeability / checks / review-state verification.
+
+Evidence:
+- PR #22 branch `warehouse/method-spec-validator-freeze-note` moved to `e338431e04811b5b7b0bdcff789f8d3d162ee8df` and includes `e338431 Merge origin/main into MethodSpec freeze note`.
+- PR #22 changed files observed from git diff: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/budget/32-method-spec-validator-freeze-note.md`.
+- PR #23 branch `output/renderer-static-guard-review-packet` moved to `cb276cb2ab5cbfd5538d758ccde6172d529cd90b`.
+- PR #23 now includes `76d4fc7 fix(output): reject renderer format mismatches`, `c05cadd fix(output): fail closed on renderer format mismatch`, and `cb276cb merge(output): reconcile pr23 p2 fix branch`.
+
+Action already taken:
+Deputy Codex published a short blackboard update recording the branch-head changes and keeping #23 review gate active.
+
+Recommended Deputy action:
+Executive Officer should verify:
+- PR #22: current mergeability, checks, and whether Codex re-review is needed / requested.
+- PR #23: checks, Codex re-review status, and whether the prior P2 thread is fixed / outdated / clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #23 until Codex re-review is clean. No for #22 unless Codex review reports NEEDS_FIX / P1 / P2 or scope changes.
+
+Deputy Decision:
+PENDING_EXECUTIVE_VERIFICATION
+
 ### 2026-05-25T03:34:00Z - [DEPUTY2_DECISIONS_PUBLISHED] - Active Stalls
 
 Status:
