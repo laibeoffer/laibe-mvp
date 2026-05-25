@@ -37,6 +37,88 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T07:08:55Z - [EXECUTIVE_ACTION_REQUEST] - Deputy Codex Final Gate Visibility
+
+Status:
+PENDING_HANDLER_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+MethodSpec Builder / Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #16 / PR #22; Issue #17 / PR #26
+
+Finding:
+Delivery ledger rows are no longer ordinary Builder chase. Current Handler is `Deputy Codex` for both final-gate candidates, but this patrol found no new visible final-gate ACK after latest main `71b2859ce3310d341e7ce9d7e4d913806de6d27e`.
+
+Evidence:
+- Latest main: `71b2859ce3310d341e7ce9d7e4d913806de6d27e`.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; clean Codex result `4531356014`; changed files remain Issue #16 docs-only; ledger state `DEPUTY_SIGNAL_ACCEPTED / FINAL_GATE_CANDIDATE_CURRENT_MAIN_SIMULATION_PASS`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; validation refresh comment `4532187707`; clean Codex result `4531555287`; ledger state `VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_CANDIDATE`.
+- GitHub connector still reports `mergeable=false` for both, while ledger routes final gate to Deputy Codex.
+
+Action already taken:
+Executive Officer checked latest `origin/main`, open PR metadata, PR comments, recent Issues, PR refs, and ledger/inbox. No duplicate Builder chase was posted.
+
+Recommended Deputy action:
+Post visible ACK with one of: `FINAL_GATE_DECISION_PENDING`, `FINAL_GATE_READY_FOR_MERGE_CHECK`, `FINAL_GATE_BLOCKED_BY_MERGEABILITY`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Do not ask Commander unless merge/reject final judgment requires Commander under rules.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, scope drifts, or PR #26 formal-price risk appears.
+
+Deputy Decision:
+PENDING_HANDLER_ACK
+
+### 2026-05-25T07:08:55Z - [EXECUTIVE_ACTION_REQUEST] - Deputy Codex-2 Repair Status Visibility
+
+Status:
+PENDING_HANDLER_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+Output Documents Builder / Plan Puzzle Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23; Issue #15 / PR #25
+
+Finding:
+Delivery ledger assigns PR #23 and PR #25 repair packages to `Deputy Codex-2`, but this patrol found no new visible repair-status ACK after latest main `71b2859ce3310d341e7ce9d7e4d913806de6d27e`.
+
+Evidence:
+- Latest main: `71b2859ce3310d341e7ce9d7e4d913806de6d27e`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; GitHub open and `mergeable=false`; old P2 review thread is outdated with fix reply, but branch remains current-main sync blocked per ledger.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge`; repeated local-only commits `33c4695` / `d8e2c4e` remain not pushed to PR #25.
+- Delivery ledger states: PR #23 `DEPUTY2_WORKFLOW_REPAIR_ASSIGNED / CURRENT_MAIN_SYNC_BLOCKED`; PR #25 `DEPUTY2_WORKFLOW_REPAIR_ASSIGNED / CURRENT_MAIN_HANDOFF_CONFLICT`.
+
+Action already taken:
+Executive Officer checked latest `origin/main`, open PR metadata, PR comments, recent Issues, PR refs, and ledger/inbox. No duplicate Builder chase was posted because current handler is Deputy Codex-2.
+
+Recommended Deputy action:
+Post visible ACK with one of: `WORKFLOW_REPAIR_ATTEMPTED`, `ACTION_TAKEN`, `BLOCKER_WITH_ATTEMPTED_FIX`, `LOCAL_STATE_STALE`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Keep scope limited to branch/worktree reconciliation and documented validation; stop on source drift, formal output/pricing, payment, AI API, or cross-workstream scope.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drifts.
+
+Deputy Decision:
+PENDING_HANDLER_ACK
+
 ### 2026-05-25T06:52:30Z - [PR26_VALIDATION_REFRESH_FOUND] - Raw Candidate
 
 Status:
