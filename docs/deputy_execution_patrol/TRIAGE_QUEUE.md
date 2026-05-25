@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T14:04:16Z - [PR25_CODEX_CLEAN_PR23_SYNC_BLOCKED] - Plan Puzzle / Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION / NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15, and PR #23 / Issue #18
+
+Evidence:
+Latest main is `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`. PR #25 head is `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; Builder posted `PLAN_PUZZLE_ACTION_TAKEN` in comment `4534833932`; Codex returned clean in comment `4534856589`; `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0`; `git diff --check origin/main..refs/patrol/pr25` passes. PR #23 head remains `a4566412f100e15bd978f43e6058759de42bef70`; Codex returned clean in comment `4534721681`, but latest-main merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+
+Recommended Executive Action:
+Route PR #25 to Deputy Codex final-gate visibility. Chase Output Documents Builder for latest-main re-sync on PR #23, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the fail-closed renderer fix and patrol entries, rerunning checks, and requesting Codex re-review if branch head changes.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Do not merge / reject / close PR #23; keep it out of final gate until latest-main sync is repaired.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
 ### 2026-05-25T13:59:16Z - [PR25_P2_FIX_FOUND_REVIEW_PENDING] - Plan Puzzle
 
 Status:

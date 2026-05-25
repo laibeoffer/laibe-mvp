@@ -37,6 +37,93 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T14:04:16Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle Final Gate
+
+Status:
+CODEX_REVIEW_CLEAN / DEPUTY_FINAL_GATE_VISIBILITY_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 now has the missing post-P2 clean Codex result. Executive patrol found current-main merge-tree pass against latest main and routes PR #25 back to Deputy final gate. Executive did not merge, reject, or close.
+
+Evidence:
+- Latest main checked: `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`.
+- PR #25 head: `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`.
+- PR #25 merge ref: `6dd6e86e7acfaa6009d4ebaadaaff47a2e4d59fe`.
+- Builder action report: `PLAN_PUZZLE_ACTION_TAKEN` in PR comment `4534833932`.
+- Codex clean result: comment `4534856589` at `2026-05-25T14:03:15Z`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `0a492b7a70db3ba592b345c2b03911ce3551ae95`.
+- `git diff --check origin/main..refs/patrol/pr25` exits `0`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no scope drift before merge / reject; ordinary Builder chase can stop unless branch changes or Codex reports new NEEDS_FIX / P1 / P2.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports new NEEDS_FIX / P1 / P2, or scope drift is found.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T14:04:16Z - [EXECUTIVE_ACTION_REQUEST] - Output Documents Latest-Main Sync
+
+Status:
+CODEX_CLEAN_BUT_CURRENT_MAIN_SYNC_BLOCKED / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 has a clean Codex result on head `a456641`, but latest main advanced to `96dd05e`, and PR #23 is current-main sync blocked again by `docs/WORKSTREAM_BLACKBOARD.md`.
+
+Evidence:
+- Latest main checked: `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`.
+- PR #23 head: `a4566412f100e15bd978f43e6058759de42bef70`.
+- Codex clean result: comment `4534721681` at `2026-05-25T13:41:47Z`.
+- `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No merge / reject / close action was executed and no source files were modified.
+
+Recommended Deputy action:
+No new Deputy repair-owner decision is needed this round. Output Documents Builder must re-sync PR #23 against latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus patrol entries, rerun checks, and request Codex re-review if branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
 ### 2026-05-25T13:59:16Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle Review Result
 
 Status:
