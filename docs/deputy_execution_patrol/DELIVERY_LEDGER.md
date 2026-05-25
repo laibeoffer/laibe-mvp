@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-25T21:51:15Z - Active PR final-gate reconfirmed against `3cb1d07`
+
+Status:
+`LOCAL_STATE_STALE_CORRECTED / NO_NEW_EVIDENCE_AFTER_CHECK / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `3cb1d079804f5dbfd121726b4119b185aae096f6`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `3cb1d079804f5dbfd121726b4119b185aae096f6`: PR #22 tree `dbc3f04460145a8f210c27aba13466fca49a02d1`; PR #23 tree `747c18571705238ddb9ba9d1c4921bc1c6ffad7f`; PR #25 tree `af769b29956be7d3a02a98e31a1f26e2fce5f886`; PR #26 tree `66e1f0738a764a4f541db5cfa57bb9763a1bd8ce`; all diff-check exits `0`.
+- GitHub PR metadata confirms PR #22 / #23 / #25 / #26 remain open, mergeable, and non-draft. `gh` CLI is unavailable and unauthenticated REST issue checks returned 403, so issue-state evidence remains the prior 21:33Z connector check (#15 / #16 / #17 / #18 open, #19 closed) with no contradictory PR / branch evidence found this cycle.
+- PR #23 has clean Codex comment `4537316105` after `f882b90`; unresolved non-outdated review-thread metadata still exists for repaired P2s `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, with Builder fix replies. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- PR #25 has clean Codex comment `4536168380` after `1835e29`; unresolved non-outdated review-thread metadata still exists for repaired P2s `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj`, with Builder fix replies, plus outdated historical P2 metadata. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- Why no further Executive executable change exists: active handlers are already routed to Deputy final gate; Executive cannot merge / reject / close, and no branch-head, validation, or new Codex blocker evidence appeared after the latest clean results.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:33:47Z - Active PR final-gate reconfirmed against `46e7654`
 
 Status:

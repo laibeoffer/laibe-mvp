@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T21:51:15Z - [ACTIVE_PRS_FINAL_GATE_RECONFIRMED_3CB1D07] - Deputy Codex
+
+Status:
+ON_TRACK / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `3cb1d079804f5dbfd121726b4119b185aae096f6`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Current-main merge-tree and diff-check pass for all four active PRs against `3cb1d07`: PR #22 tree `dbc3f04460145a8f210c27aba13466fca49a02d1`; PR #23 tree `747c18571705238ddb9ba9d1c4921bc1c6ffad7f`; PR #25 tree `af769b29956be7d3a02a98e31a1f26e2fce5f886`; PR #26 tree `66e1f0738a764a4f541db5cfa57bb9763a1bd8ce`; all diff-check exits `0`. GitHub PR metadata confirms all four PRs are open, mergeable, and non-draft. `gh` CLI is unavailable and unauthenticated REST issue checks returned 403, so issue-state evidence remains the prior 21:33Z connector check (#15 / #16 / #17 / #18 open, #19 closed). PR #23 and PR #25 still have unresolved historical review-thread metadata with Builder fix replies plus later clean Codex comments; this is a Deputy final-gate manual-thread decision item.
+
+Recommended Executive Action:
+Stop ordinary Builder chase while branch heads, validation, and Codex results remain stable. Do not issue duplicate GitHub comments. Keep a single visible inbox request to Deputy Codex.
+
+Recommended Deputy Action:
+Publish final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved historical review-thread metadata requires manual resolution or whether the later clean Codex comments are sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:33:47Z - [ACTIVE_PRS_FINAL_GATE_RECONFIRMED_46E7654] - Deputy Codex
 
 Status:
