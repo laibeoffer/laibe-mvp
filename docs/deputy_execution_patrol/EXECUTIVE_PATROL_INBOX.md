@@ -37,6 +37,378 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T17:26:34Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Sync Blocked After C570
+
+Status:
+ACTION_TAKEN / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_SYNC_REPAIR_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 had been a Deputy final-gate candidate, but Executive's patrol-doc publication advanced main to `c57003b` and reopened a current-main merge-tree conflict in `docs/WORKSTREAM_BLACKBOARD.md`. The next executable action is a scoped latest-main sync repair by Output Documents Builder.
+
+Evidence:
+- Sources checked: post-push `origin/main`, fetched PR heads / merge refs, local merge-tree, and diff-check after publishing the PR #25 P2 routing update.
+- Latest `origin/main`: `c57003bfd044990b327b8b3210a026423ce61d44`.
+- PR #23 status: open.
+- PR #23 head: `1be77d0481cd03893a8253e812094f745341078a`.
+- Prior Builder P2 fix comment: `4535482545`.
+- Prior clean Codex comment: `4535507114`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1726-post/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` content conflict.
+- `git diff --check origin/main..refs/patrol/hb1726-post/pr23` exits `0`.
+- PR #22 / PR #25 / PR #26 remain current-main merge-tree and diff-check clean after `c57003b`.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Output Documents Builder should re-sync PR #23 against latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the metadata-only staging-write P2 fix and patrol entries, rerun renderer static guard / syntax / smoke / diff checks, push a scoped sync head, and request Codex re-review if branch head changes. Required visible ACK: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_REQUIRED
+
+### 2026-05-25T17:26:34Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Codex P2 On A83A121
+
+Status:
+ACTION_TAKEN / CODEX_P2_FOUND / BUILDER_FIX_REQUIRED
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 now has a visible post-`a83a121` Codex result, but it is a P2 blocker rather than a clean result. Current-main merge-tree and diff-check still pass, so the next executable action is a scoped Builder fix and re-review request, not Deputy final gate.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips.
+- Latest `origin/main`: `b8e6489c5dde14a82591a5d5c649d170757b8b78`.
+- PR #25 status: open.
+- Current PR #25 head: `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+- `refs/pull/25/merge`: `5259954b59a7a0e7306e48331c226e6de847dba7`, with parents `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986` and `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1726/pr25` exits `0` with tree `6ab1617439dd14b0cb942e3b063b81b30a81540d`.
+- `git diff --check origin/main..refs/patrol/hb1726/pr25` exits `0`.
+- Public PR page shows Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` at review `4358021349` for head `a83a121d`.
+- Public PR page shows Codex review `4358033006` at `2026-05-25T17:21:20Z`, reviewed commit `a83a121d07`, with P2 `discussion_r3299302339` near `plan-puzzle.js` line `4311`.
+- PR #22 / PR #23 / PR #26 remain current-main merge-tree and diff-check clean.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should fix only Codex P2 `discussion_r3299302339`, rerun `node --check`, `git diff --check`, merge-tree against latest main, allowed / forbidden scope checks, push a scoped repair head, and request Codex re-review. Required visible ACK: `ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and post-fix Codex result is clean.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_FIX_REQUIRED
+
+### 2026-05-25T17:13:03Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Head Advanced / Review Result Pending
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / BUILDER_VISIBLE_ACK_REQUIRED / NO_DUPLICATE_GITHUB_CHASE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 branch head changed after the prior Deputy final-gate request. The new head appears to be a sync-only merge of current main into the PR branch, and current-main local simulation passes, but no post-`a83a121` Codex clean result is visible on the public PR page.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, PR #25 public Codex review clips, and PR #25 commit/diff history.
+- Latest `origin/main`: `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`.
+- PR #25 status: open.
+- Previous clean PR #25 head: `e2decbec50d1cb65241123b76372555658e88cde`.
+- Current PR #25 head: `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`.
+- Current PR #25 head parents: `e2decbec50d1cb65241123b76372555658e88cde` and `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`.
+- `refs/pull/25/merge`: stale at `19310577152e6ce52bf2556d6d0e469f05621718`, with parents `1773387fd393c6af1710f8b999bb34ee1be64031` and `e2decbec50d1cb65241123b76372555658e88cde`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1713/pr25` exits `0` with tree `f931dec3eefee6705273c2988114add7f1448148`.
+- `git diff --check origin/main..refs/patrol/hb1713/pr25` exits `0`.
+- PR #25 diff against current main remains limited to Issue #15 allowed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- Public PR page exposes `a83a121` as the head but no post-`a83a121` clean Codex result; no `NO_NEW_EVIDENCE_AFTER_CHECK` was found.
+- Why no executable change exists for Executive: this is a review-result visibility / owner ACK gap after a branch-head change; Executive may chase visibility but may not edit source, merge, reject, or close.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should report one of `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists. If the head changes again, include validation refresh and allowed / forbidden scope checks.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`a83a121` Codex result is clean or Deputy override is published.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / CODEX_REVIEW_RESULT_PENDING
+
+### 2026-05-25T16:59:14Z - [DEPUTY_FINAL_GATE_REQUEST] - PR25 Clean After E2DECBE
+
+Status:
+PENDING_DEPUTY_DECISION / CODEX_REVIEW_CLEAN_AFTER_E2DECBE / CURRENT_MAIN_SIMULATION_PASS
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 has a refreshed sync head `e2decbec` and a post-head clean Codex review. Executive found refreshed merge evidence, current-main merge-tree pass, diff-check pass, and allowed-scope evidence. This is a Deputy final-gate decision request, not an Executive merge / reject / close action.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips.
+- Latest `origin/main`: `1773387fd393c6af1710f8b999bb34ee1be64031`.
+- PR #25 head: `e2decbec50d1cb65241123b76372555658e88cde`.
+- PR #25 status: open.
+- `refs/pull/25/merge`: `19310577152e6ce52bf2556d6d0e469f05621718`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1659/pr25` exits `0` with tree `38bf6304134dbede31361a12ed7e5e513ea24441`.
+- `git diff --check origin/main..refs/patrol/hb1659/pr25` exits `0`.
+- Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, `@codex review`, and post-`e2decbec` clean Codex result: `Codex Review: Didn't find any major issues`.
+- PR #25 diff against current main remains limited to Issue #15 allowed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- PR #22 / PR #23 / PR #26 also pass current-main merge-tree and diff-check.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub chase was posted, and no merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or mergeability change before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T16:41:35Z - [DEPUTY_FINAL_GATE_REQUEST] - PR25 Clean After F33D3ED
+
+Status:
+PENDING_DEPUTY_DECISION / CODEX_REVIEW_CLEAN_AFTER_F33D3ED / CURRENT_MAIN_SIMULATION_PASS
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 now has the missing post-head clean Codex review after the latest sync head `f33d3ed`. Executive found refreshed merge evidence, current-main merge-tree pass, diff-check pass, and allowed-scope evidence. This is a Deputy final-gate decision request, not an Executive merge / reject / close action.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips.
+- Latest `origin/main`: `427039f7ee47b5564aad980ca08d5a3e586b8e74`.
+- PR #25 head: `f33d3edaeb267faf568e91dfd28571ca3ad2301b`.
+- PR #25 status: open.
+- `refs/pull/25/merge`: `8081e5557c6b317a7023a6145a76b73841f50997`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1641/pr25` exits `0` with tree `46ad77c4a1cd239424bf07aefba65bb5ec7faad6`.
+- `git diff --check origin/main..refs/patrol/hb1641/pr25` exits `0`.
+- Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, `@codex review`, and post-`f33d3ed` clean Codex result: `Codex Review: Didn't find any major issues`.
+- PR #25 diff against current main remains limited to Issue #15 allowed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- PR #22 / PR #23 / PR #26 also pass current-main merge-tree and diff-check.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub chase was posted, and no merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or mergeability change before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T16:25:23Z - [EXECUTIVE_ACTION_REQUEST] - PR25 Review Result Still Pending
+
+Status:
+NO_NEW_EVIDENCE_AFTER_CHECK / BUILDER_VISIBLE_ACK_REQUIRED / NO_DUPLICATE_GITHUB_CHASE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 still has no visible post-`e4e9e90` Codex result. The branch remains current-main clean, but final gate cannot resume until a post-head review result is visible or Deputy explicitly accepts the sync-only head change.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, and diff-check.
+- Latest `origin/main`: `a9524b3e2aa495523bae7553f343ae079c272e37`.
+- PR #25 head: `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`.
+- PR #25 status: open.
+- `refs/pull/25/merge`: `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1625/pr25` exits `0` with tree `5a87e8f7eb11404663e85a87c4fbfcb20f151731`.
+- `git diff --check origin/main..refs/patrol/hb1625/pr25` exits `0`.
+- Public PR page still shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` and `@codex review` on `e4e9e90`, but no later `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, or `P2` result is visible.
+- Why no executable change exists for Executive: this is a review-result visibility wait / owner ACK issue; Executive may chase visibility but may not edit source, merge, reject, or close.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no duplicate GitHub comment was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should report one of `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / CODEX_REVIEW_RESULT_PENDING
+
+### 2026-05-25T16:02:17Z - [EXECUTIVE_STATUS_CHECK] - PR25 Branch Advanced / Review Pending
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CODEX_REVIEW_REQUESTED / NO_DUPLICATE_CHASE
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft/page-ui / plancraft-adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 branch head changed after the previous final-gate candidate state. Builder produced a current-main sync ACK and requested `@codex review`, but no post-`e4e9e90` clean Codex result is visible yet. PR #25 should not be treated as Deputy final-gate ready until that review result appears, unless Deputy explicitly accepts the sync-only branch-head change.
+
+Evidence:
+- Latest `origin/main`: `1643ea172b248b37b193e4bf60ea49223283ed4d`.
+- Previous PR #25 final-gate head: `01dcb7ee4f1c7ac81395a8474f1538c2fd85cc12`.
+- Current PR #25 head: `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`.
+- Public PR page visible ACK: `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`.
+- Builder report says latest main was merged with a normal merge commit, `node --check` passed, `git diff --check` passed, merge-tree passed, allowed-scope check passed, forbidden-scope check passed, and `@codex review` was requested.
+- `refs/pull/25/merge`: `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1602/pr25` exits `0` with tree `f36a0a55dee196d155961e1cecc872cb48f96e4d`.
+- `git diff --check origin/main..refs/patrol/hb1602/pr25` exits `0`.
+- No post-`e4e9e90` clean Codex result was visible on the public PR page at patrol time.
+
+Action already taken:
+Executive Officer updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified, no GitHub duplicate chase was posted, and no merge / reject / close action was executed.
+
+Recommended next action:
+Plan Puzzle Builder should report the post-`e4e9e90` Codex result: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / CODEX_REVIEW_RESULT_PENDING
+
+### 2026-05-25T15:51:46Z - [DEPUTY_FINAL_GATE_REQUEST] - PR23 P2 Fixed / Clean
+
+Status:
+PENDING_DEPUTY_DECISION / CODEX_CLEAN_FINAL_GATE_CANDIDATE
+
+Executive Officer:
+COMMANDER_PATROL
+
+To:
+Deputy Codex
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 is no longer blocked by the prior metadata-only staging-write P2 or by latest-main sync at patrol time. It has a new fix head, clean Codex result, refreshed merge ref, and local current-main merge-tree pass.
+
+Evidence:
+- Latest `origin/main`: `f852c11a266cb1c1fd60c8f21bdbec30ebf3941b`.
+- PR #23 head: `1be77d0481cd03893a8253e812094f745341078a`.
+- Builder P2 fix / validation report: comment `4535482545`.
+- Clean Codex result after the fix head: comment `4535507114` at `2026-05-25T15:48:34Z`.
+- `refs/pull/23/merge`: `6242d8e023b6f632dbb01895fdeb89ead1744bc8`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1551/pr23` exits `0` with tree `ec071a90ca8d1d36a756f72b65bb7365559fe14f`.
+- `git diff --check origin/main..refs/patrol/hb1551/pr23` exits `0`.
+- P2 fix evidence includes metadata-only storage target write smoke `status: blocked`, `artifact_written: false`, and error text `Storage target does not allow local staging writes`.
+
+Action already taken:
+Commander patrol updated the blackboard, delivery ledger, triage queue, Executive inbox, and reviewer inbox. No source files were modified by patrol and no merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex final-gate decision for PR #23. Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
+Deputy Decision:
+PENDING
 ### 2026-05-25T15:28:39Z - [EXECUTIVE_STATUS_CHECK] - PR23 P2 Request Still Current
 
 Status:

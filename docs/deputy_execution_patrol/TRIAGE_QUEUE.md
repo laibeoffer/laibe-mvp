@@ -36,6 +36,213 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T17:26:34Z - [PR23_SYNC_BLOCKED_AFTER_C570] - Output Documents
+
+Status:
+NEEDS_EXECUTIVE_CHASE / CURRENT_MAIN_SYNC_BLOCKED / BUILDER_SYNC_REPAIR_REQUIRED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Executive published docs-only patrol update to main `c57003bfd044990b327b8b3210a026423ce61d44`. PR #23 head remains `1be77d0481cd03893a8253e812094f745341078a`; prior Builder P2 fix comment `4535482545` and clean Codex comment `4535507114` still exist, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1726-post/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` content conflict. `git diff --check origin/main..refs/patrol/hb1726-post/pr23` exits `0`. PR #22 / PR #25 / PR #26 still pass current-main merge-tree and diff-check after `c57003b`.
+
+Recommended Executive Action:
+Issue a single-primary `To: Output Documents Builder` sync-repair request. Required labels: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, validation result, allowed / forbidden scope checks, and re-review request if branch head changes.
+
+Recommended Deputy Action:
+Hold PR #23 out of final gate until the branch is re-synced against latest main and Codex re-review is clean if the head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T17:26:34Z - [PR25_CODEX_P2_ON_A83A121] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / CODEX_P2_BLOCKER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `b8e6489c5dde14a82591a5d5c649d170757b8b78`. PR #25 head remains `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`; `refs/pull/25/merge` refreshed to `5259954b59a7a0e7306e48331c226e6de847dba7` with parents `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986` and `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`. Current-main simulation still passes: `git merge-tree --write-tree origin/main refs/patrol/hb1726/pr25` exits `0` with tree `6ab1617439dd14b0cb942e3b063b81b30a81540d`, and `git diff --check origin/main..refs/patrol/hb1726/pr25` exits `0`. Public PR page shows Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` at review `4358021349`, then Codex review `4358033006` at `2026-05-25T17:21:20Z` on reviewed commit `a83a121d07` with P2 `discussion_r3299302339` near `plan-puzzle.js` line `4311`.
+
+Recommended Executive Action:
+Issue a single-primary `To: Plan Puzzle Builder` visible fix request. Required labels: `ACTION_TAKEN` with branch SHA, validation results, allowed / forbidden scope checks, and `@codex review`, or `BLOCKER_WITH_ATTEMPTED_FIX` with exact attempted fix. Do not merge / reject / close.
+
+Recommended Deputy Action:
+Hold PR #25 out of final gate until the P2 is fixed and a post-fix clean Codex result is visible. PR #22 / PR #23 / PR #26 remain separate current-main simulation-pass final-gate candidates.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and post-fix Codex result is clean.
+
+### 2026-05-25T17:13:03Z - [PR25_HEAD_ADVANCED_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / CODEX_REVIEW_RESULT_PENDING
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`. PR #25 head advanced from `e2decbec50d1cb65241123b76372555658e88cde` to `a83a121d072f653783b8b8b26d8ef3a2fae5aec2` by merging current main into the branch. `refs/pull/25/merge` remains stale at `19310577152e6ce52bf2556d6d0e469f05621718` with parents `1773387` and `e2decbec`; local current-main simulation still passes: `git merge-tree --write-tree origin/main refs/patrol/hb1713/pr25` exits `0` with tree `f931dec3eefee6705273c2988114add7f1448148`, and `git diff --check origin/main..refs/patrol/hb1713/pr25` exits `0`. PR #25 diff against current main remains limited to Issue #15 allowed files. Public PR page exposes `a83a121` as the head but no post-`a83a121` clean Codex result.
+
+Recommended Executive Action:
+Issue a single-primary `To: Plan Puzzle Builder` visible ACK request. Required labels: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists. Do not post duplicate GitHub comments unless a new blocker or branch-head change appears.
+
+Recommended Deputy Action:
+Pause PR #25 final-gate decision until post-`a83a121` Codex result is visible, or Deputy explicitly accepts the sync-only branch-head change without re-review. PR #22 / #23 / #26 remain separate current-main simulation-pass final-gate candidates.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`a83a121` Codex result is clean or Deputy override is published.
+
+### 2026-05-25T16:59:14Z - [PR25_CODEX_CLEAN_FINAL_GATE] - Plan Puzzle
+
+Status:
+NEEDS_DEPUTY_DECISION / FINAL_GATE_CANDIDATE / NEEDS_REVIEWER_NO
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `1773387fd393c6af1710f8b999bb34ee1be64031`. PR #25 head advanced to `e2decbec50d1cb65241123b76372555658e88cde`; `refs/pull/25/merge` refreshed to `19310577152e6ce52bf2556d6d0e469f05621718`; `git merge-tree --write-tree origin/main refs/patrol/hb1659/pr25` exits `0` with tree `38bf6304134dbede31361a12ed7e5e513ea24441`; `git diff --check origin/main..refs/patrol/hb1659/pr25` exits `0`. Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, `@codex review`, and post-`e2decbec` clean Codex result. PR #25 diff remains limited to Issue #15 allowed files. PR #22 / #23 / #26 also remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Stop ordinary Plan Puzzle Builder chase. Keep a visibility watch only for branch-head changes, contradicted validation, Codex NEEDS_FIX / P1 / P2, or scope drift.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or mergeability change before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+
+### 2026-05-25T16:41:35Z - [PR25_CODEX_CLEAN_FINAL_GATE] - Plan Puzzle
+
+Status:
+NEEDS_DEPUTY_DECISION / FINAL_GATE_CANDIDATE / NEEDS_REVIEWER_NO
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `427039f7ee47b5564aad980ca08d5a3e586b8e74`. PR #25 head advanced to `f33d3edaeb267faf568e91dfd28571ca3ad2301b`; `refs/pull/25/merge` refreshed to `8081e5557c6b317a7023a6145a76b73841f50997`; `git merge-tree --write-tree origin/main refs/patrol/hb1641/pr25` exits `0` with tree `46ad77c4a1cd239424bf07aefba65bb5ec7faad6`; `git diff --check origin/main..refs/patrol/hb1641/pr25` exits `0`. Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, `@codex review`, and post-`f33d3ed` clean Codex result. PR #25 diff remains limited to Issue #15 allowed files. PR #22 / #23 / #26 also remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Stop ordinary Plan Puzzle Builder chase. Keep a visibility watch only for branch-head changes, contradicted validation, Codex NEEDS_FIX / P1 / P2, or scope drift.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or mergeability change before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+
+### 2026-05-25T16:25:23Z - [PR25_REVIEW_RESULT_STILL_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER / CODEX_REVIEW_REQUESTED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `a9524b3e2aa495523bae7553f343ae079c272e37`. PR #25 head remains `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`; `refs/pull/25/merge` remains `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`; `git merge-tree --write-tree origin/main refs/patrol/hb1625/pr25` exits `0`; `git diff --check origin/main..refs/patrol/hb1625/pr25` exits `0`. Public PR page still shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` and `@codex review`, but no post-`e4e9e90` `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, or `P2` result is visible. PR #22 / #23 / #26 also remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Issue a single-primary `To: Plan Puzzle Builder` visible ACK request. Required labels: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main SHA, branch SHA, PR status, sources checked, and why no executable change exists. Do not post duplicate GitHub comments unless a new blocker or branch-head change appears.
+
+Recommended Deputy Action:
+Hold PR #25 final-gate decision until post-`e4e9e90` Codex result is visible, or explicitly accept the sync-only branch-head change without re-review. PR #23 remains a separate final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
+### 2026-05-25T16:02:17Z - [PR25_REVIEW_PENDING_AFTER_SYNC] - Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_WATCH / NEEDS_REVIEWER / CODEX_REVIEW_REQUESTED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15
+
+Evidence:
+Latest `origin/main` is `1643ea172b248b37b193e4bf60ea49223283ed4d`. PR #25 head advanced from `01dcb7ee4f1c7ac81395a8474f1538c2fd85cc12` to `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`. Public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`; Builder merged latest main, reran `node --check`, `git diff --check`, merge-tree, allowed-scope and forbidden-scope checks, and requested `@codex review`. `refs/pull/25/merge` is `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`; `git merge-tree --write-tree origin/main refs/patrol/hb1602/pr25` exits `0`; `git diff --check origin/main..refs/patrol/hb1602/pr25` exits `0`. No post-`e4e9e90` clean Codex result was visible at patrol time. PR #23 remains current-main clean and Codex-clean on head `1be77d0`; PR #22 / #26 remain merge-tree and diff-check clean.
+
+Recommended Executive Action:
+Do not issue a duplicate GitHub chase this round. Watch for post-`e4e9e90` Codex result; if no result is visible next patrol, chase a single-primary `To: Plan Puzzle Builder` ACK with `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+
+Recommended Deputy Action:
+Hold PR #25 final-gate decision until post-`e4e9e90` Codex result is visible, or explicitly accept the sync-only branch-head change without re-review. PR #23 remains a separate final-gate candidate.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until post-`e4e9e90` Codex result is clean or Deputy override is published.
+
+### 2026-05-25T15:51:46Z - [PR23_P2_RESOLVED_FINAL_GATE] - Output Documents
+
+Status:
+ON_TRACK / NEEDS_DEPUTY_DECISION / FINAL_GATE_CANDIDATE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` is `f852c11a266cb1c1fd60c8f21bdbec30ebf3941b`. PR #23 advanced to head `1be77d0481cd03893a8253e812094f745341078a`; Builder posted the metadata-only staging-write P2 fix in comment `4535482545`; Codex returned clean in comment `4535507114`; `refs/pull/23/merge` exists at `6242d8e023b6f632dbb01895fdeb89ead1744bc8`; `git merge-tree --write-tree origin/main refs/patrol/hb1551/pr23` exits `0`; `git diff --check origin/main..refs/patrol/hb1551/pr23` exits `0`.
+
+Recommended Executive Action:
+Stop ordinary Output Documents Builder chase unless PR #23 branch head changes, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #23. Do not merge / reject / close without rechecking branch head, mergeability, scope, and review state at decision time.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
 ### 2026-05-25T15:28:39Z - [PR23_P2_SYNC_BLOCKED_RECONFIRMED] - Output Documents
 
 Status:
