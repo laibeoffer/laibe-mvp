@@ -37,6 +37,92 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T14:22:59Z - [DEPUTY_DECISION_REQUEST] - PR25 Final Gate Still Valid After Publication
+
+Status:
+CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_REQUIRED
+
+Executive Officer:
+COMMANDER_PATROL
+
+To:
+Deputy Codex
+
+Workstream:
+plancraft/page-ui / plancraft/adapter-clean
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 remains a final-gate candidate after main advanced to `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`. No merge / reject / close action was executed.
+
+Evidence:
+- PR #25 head: `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`.
+- Clean Codex result after that head: comment `4534994840` at `2026-05-25T14:25:16Z`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr25` exits `0` with tree `fea59880d0ac05e9e0a8502593b51f62f4a398b2`.
+- `git diff --check origin/main..refs/patrol/hb1422/pr25` exits `0`.
+- GitHub merge ref still names prior base `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`, so local current-main simulation is the controlling readiness evidence until GitHub refreshes the merge ref.
+
+Action already taken:
+Commander patrol updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified.
+
+Recommended Deputy action:
+Make the final-gate decision for PR #25. Reconfirm no branch-head change or scope drift before any merge / reject decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, or scope drift is found.
+
+Deputy Decision:
+PENDING
+
+### 2026-05-25T14:22:59Z - [EXECUTIVE_ACTION_REQUEST] - PR23 Latest-Origin-Main Sync
+
+Status:
+CODEX_CLEAN_BUT_CURRENT_MAIN_SYNC_BLOCKED / BUILDER_VISIBLE_ACK_REQUIRED
+
+Executive Officer:
+COMMANDER_PATROL
+
+To:
+Output Documents Builder
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #18 / PR #23
+
+Finding:
+PR #23 still has a clean Codex result on head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`, but it remains sync-blocked by `docs/WORKSTREAM_BLACKBOARD.md` against latest `origin/main`. The repair prompt must tell the Builder to fetch and use whatever `origin/main` is at repair time, not an old embedded SHA.
+
+Evidence:
+- Latest `origin/main` at Commander verification: `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`.
+- PR #23 head: `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`.
+- Builder repair report: comment `4534883253`, using previous main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`.
+- Codex clean result: comment `4534905765` at `2026-05-25T14:10:43Z`.
+- `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr23` exits `1`.
+- Exact blocker: content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- `git diff --check origin/main..refs/patrol/hb1422/pr23` exits `0`.
+
+Action already taken:
+Commander patrol updated the blackboard, delivery ledger, triage queue, and this inbox. No source files were modified.
+
+Recommended next action:
+Output Documents Builder should fetch latest `origin/main`, re-sync PR #23 against that current main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer fix plus patrol entries, rerun required checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
+Deputy Decision:
+NOT_REQUIRED_THIS_ROUND / BUILDER_SYNC_REPAIR_PENDING
+
 ### 2026-05-25T14:22:53Z - [EXECUTIVE_ACTION_REQUEST] - Plan Puzzle Final Gate After Sync
 
 Status:

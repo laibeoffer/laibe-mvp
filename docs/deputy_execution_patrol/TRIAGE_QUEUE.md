@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T14:22:59Z - [POST_PUBLICATION_VERIFY_PR25_PR23] - Plan Puzzle / Output Documents
+
+Status:
+NEEDS_DEPUTY_DECISION / NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15, and PR #23 / Issue #18
+
+Evidence:
+Latest `origin/main` at Commander verification is `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`. PR #25 remains head `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba` with post-head clean Codex comment `4534994840`; `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr25` exits `0` with tree `fea59880d0ac05e9e0a8502593b51f62f4a398b2`, and `git diff --check origin/main..refs/patrol/hb1422/pr25` exits `0`. PR #23 remains head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2` with clean Codex comment `4534905765`, but `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. Local primary worktree is `LOCAL_STATE_STALE`; `origin/main` evidence was used.
+
+Recommended Executive Action:
+Keep PR #25 routed to Deputy Codex final-gate visibility. Keep PR #23 routed to Output Documents Builder for latest-`origin/main` re-sync; the Builder must fetch current `origin/main` at repair time instead of relying on the embedded SHA in any prior patrol entry.
+
+Recommended Deputy Action:
+Deputy Codex final-gate decision for PR #25. Do not merge / reject / close PR #23; keep it out of final gate until latest-main sync is repaired.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
 ### 2026-05-25T14:22:53Z - [PR25_CODEX_CLEAN_PR23_SYNC_BLOCKED_CURRENT_MAIN] - Plan Puzzle / Output Documents
 
 Status:
