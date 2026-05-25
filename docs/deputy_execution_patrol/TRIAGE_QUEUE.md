@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T13:39:14Z - [PR23_POST_PUBLISH_SYNC_BLOCKED_PR25_P2_PENDING] - Output Documents / Plan Puzzle
+
+Status:
+NEEDS_EXECUTIVE_CHASE / NEEDS_REVIEWER
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / Issue #18, and PR #25 / Issue #15
+
+Evidence:
+Executive published patrol docs to main `feabaac285f5a0d22fdacf877ea88a8aa8bb7bf1`. Post-push `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`; PR #23 head is `a4566412f100e15bd978f43e6058759de42bef70`. PR #22 / PR #25 / PR #26 remain merge-tree clean. PR #25 remains at head `48910be809922fac58b1c89d78cf81b5d7c61210` with Codex P2 still requiring scoped Builder fix and re-review.
+
+Recommended Executive Action:
+Chase Output Documents Builder for latest-main re-sync on PR #23, resolving only `docs/WORKSTREAM_BLACKBOARD.md`, preserving the fail-closed renderer fix and patrol entries, rerunning checks, and requesting Codex re-review if branch head changes. Continue chasing Plan Puzzle Builder for `PLAN_PUZZLE_ACTION_TAKEN` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+Recommended Deputy Action:
+Do not merge / reject / close. Keep PR #23 out of final gate until latest-main sync is repaired and Codex review visibility is current. Keep PR #25 out of final gate until P2 is fixed and re-reviewed clean.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes for PR #25 until Codex P2 is fixed and re-reviewed clean. No for PR #23 unless new Codex review reports NEEDS_FIX / P1 / P2, validation is contradicted, or repair scope drifts.
+
 ### 2026-05-25T13:39:14Z - [PR23_REPAIR_FOUND_PR25_P2_ACK_PENDING] - Output Documents / Plan Puzzle
 
 Status:
