@@ -1343,6 +1343,48 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy PR #26 current-main simulation correction
+
+Workstream:
+warehouse/raw-candidate
+
+Branch:
+warehouse/raw-source-quality-scoring
+
+Status:
+CURRENT_MAIN_SIMULATION_PASS / OWNER_COMMENT_CORRECTION_REQUIRED / FINAL_GATE_PAUSED
+
+Changed:
+- Re-read current `origin/main` at `e655829eedeeb11b293aba3240a04b558a2bfd3f`.
+- Rechecked open PRs #22 / #23 / #25 / #26 and current-main merge simulations.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; GitHub API reports `mergeable=true` / `mergeable_state=clean`.
+- Local `git merge-tree --write-tree origin/main origin/pr/26` exits `0` against `e655829`, so there is no current-main content-conflict signal for PR #26 in this patrol.
+- Available `refs/pull/26/merge` still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`, so the final-gate evidence remains stale even though current-main simulation passes.
+- Executive owner comment `4531733938` described PR #26 as conflicting; that wording is now corrected by Deputy patrol. The required owner action is evidence refresh, not conflict repair.
+- PR #23 still has a current-main conflict in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 still has a current-main conflict in `docs/NEXT_CODEX_HANDOFF.md`; PR #22 current-main simulation passes.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+PR / Commit:
+- Deputy patrol docs update.
+
+Blocked:
+- PR #26 final gate remains paused until current-main evidence is fresh: latest main SHA, mergeability / merge-tree signal, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if the PR head changes.
+
+Next:
+- Executive Officer should correct the PR #26 chase wording: ask Raw Candidate Builder for current-main evidence refresh, not a conflict fix.
+- Keep PR #22 in Deputy final gate; keep PR #23 and PR #25 in sync recovery.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Second Deputy PR #26 current-main signal refinement
 
 Workstream:

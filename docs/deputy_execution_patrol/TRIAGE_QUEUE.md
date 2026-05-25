@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T05:29:50Z - [OWNER_COMMENT_CORRECTION_REQUIRED] - Raw Candidate
+
+Status:
+NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #26 / Issue #17 / `warehouse/raw-candidate`
+
+Evidence:
+Deputy patrol rechecked current `origin/main` at `e655829eedeeb11b293aba3240a04b558a2bfd3f`. PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; GitHub API reports `mergeable=true` / `mergeable_state=clean`, and `git merge-tree --write-tree origin/main origin/pr/26` exits `0`. However, `refs/pull/26/merge` still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. Prior Executive comment `4531733938` says local simulation reports conflict; that wording is stale / incorrect for this patrol.
+
+Recommended Executive Action:
+Post or send a corrected Raw Candidate follow-up: PR #26 needs current-main evidence refresh, not conflict repair. Required evidence remains latest main SHA, mergeability / merge-tree signal, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if the head changes.
+
+Recommended Deputy Action:
+Keep PR #26 final gate paused until the current-main evidence is fresh. Do not escalate to Commander and do not route to Reviewer unless Codex reports NEEDS_FIX / P1 / P2, formal-price risk, or scope drift.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25T05:16:50Z - [SYNC_REFRESH_REQUIRED] - Raw Candidate
 
 Status:

@@ -37,6 +37,45 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:29:50Z - [PR_26_SIGNAL_CORRECTION_REQUIRED] - Raw Candidate
+
+Status:
+PENDING_EXECUTIVE_CORRECTION
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #26 / Issue #17
+
+Finding:
+The latest Raw Candidate owner follow-up comment `4531733938` incorrectly frames PR #26 as a current-main conflict fix. Deputy patrol rechecked current `origin/main` `e655829eedeeb11b293aba3240a04b558a2bfd3f`; PR #26 has no local current-main content-conflict signal in this patrol, but final-gate evidence is still stale because the available PR merge ref targets old base `0e8ab82`.
+
+Evidence:
+- PR #26 head: `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub API: `mergeable=true`, `mergeable_state=clean`.
+- Local `git merge-tree --write-tree origin/main origin/pr/26` exits `0`.
+- `refs/pull/26/merge` parent still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`.
+- Therefore the owner should refresh current-main evidence, not repair a conflict.
+
+Action already taken:
+Deputy Codex updated the blackboard, delivery ledger, triage queue, and this inbox to correct the routing signal.
+
+Recommended Deputy action:
+No Commander escalation. Keep PR #26 final gate paused until Raw Candidate / Executive provides fresh current-main evidence: latest main SHA, mergeability / merge-tree result, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless new Codex review reports NEEDS_FIX / P1 / P2, formal-price risk, or scope drift.
+
+Deputy Decision:
+APPROVED_FOR_EXECUTIVE_CORRECTION
+
 ### 2026-05-25T05:16:50Z - [EXECUTIVE_FOLLOW_UP_POSTED] - Output Documents
 
 Status:
