@@ -42,6 +42,25 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-25T21:26:11Z - Active PR final-gate reconfirmed against `9b820a2`
+
+Status:
+`LOCAL_STATE_STALE_CORRECTED / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `9b820a25e8c1186331782c8079c0ff703278cfbb`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `9b820a25e8c1186331782c8079c0ff703278cfbb`: PR #22 tree `452091d97c7859dbb49bf5f0549dcfe68a7e7226`; PR #23 tree `efbf407a4a52ef0a327b2998ff76d0934fe386cc`; PR #25 tree `175155b391b36d0eb5348207076c89b1cabc9655`; PR #26 tree `c64863e82216204d2abe784dc712bafe8c8bebf0`; all diff-check exits `0`.
+- PR #23 clean Codex comment `4537316105` after `f882b90` remains controlling; GitHub review-thread metadata still lists older P2 threads as unresolved, with Builder fix replies present. Deputy Codex should treat that as a final-gate check item, not an ordinary Output Documents Builder chase, unless a new Codex blocker appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:22:48Z - PR23 Codex clean after `f882b90`
 
 Status:

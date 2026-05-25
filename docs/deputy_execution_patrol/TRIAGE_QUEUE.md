@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T21:26:11Z - [ACTIVE_PRS_FINAL_GATE_RECONFIRMED_9B820A2] - Deputy Codex
+
+Status:
+ON_TRACK / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY_DECISION
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `9b820a25e8c1186331782c8079c0ff703278cfbb`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Current-main merge-tree and diff-check pass for all four active PRs against `9b820a2`: PR #22 tree `452091d97c7859dbb49bf5f0549dcfe68a7e7226`; PR #23 tree `efbf407a4a52ef0a327b2998ff76d0934fe386cc`; PR #25 tree `175155b391b36d0eb5348207076c89b1cabc9655`; PR #26 tree `c64863e82216204d2abe784dc712bafe8c8bebf0`; all diff-check exits `0`. PR #23 still has clean Codex comment `4537316105` after `f882b90`; older P2 review threads remain unresolved in GitHub metadata but have Builder fix replies.
+
+Recommended Executive Action:
+Stop ordinary Builder chase while branch heads, validation, and Codex result remain stable. Do not issue duplicate GitHub comments.
+
+Recommended Deputy Action:
+Publish final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23, explicitly decide whether unresolved historical review-thread metadata requires manual resolution or whether the later clean Codex comment is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:22:48Z - [PR23_CODEX_CLEAN_FINAL_GATE_AFTER_F882B90] - Output Documents
 
 Status:
