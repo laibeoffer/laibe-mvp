@@ -1343,6 +1343,23 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T12:40:29Z - Deputy final-gate visibility ACK
+
+- Workstream: command/deputy / final-gate visibility
+- Branch: `origin/main` `ee1401ab3c80fcff388d530de635111b8e7dd22c`
+- Status: `FINAL_GATE_ACK / CLEAN_SCOPE_CANDIDATES / NO_MERGE_EXECUTED`
+- Changed: blackboard final-gate visibility only.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`
+- PR / Commit:
+  - PR #22 head `e338431`; Codex clean comment `4531356014`; current-main `git merge-tree --write-tree origin/main refs/patrol/hb1240/pr22` exit `0`, tree `f624a5e73565a3b50611dcb2d798cc8471bea6ca`; changed files remain Issue #16 docs-only.
+  - PR #23 head `d126327`; Codex clean comment `4534133600`; current-main merge-tree exit `0`, tree `97346db398ae8a2d9695cbde2cbb58aca2ee3a8d`; snapshot-only boundary remains intact.
+  - PR #25 head `58b42b5`; Codex clean comment `4534078809`; current-main merge-tree exit `0`, tree `b93cc1d7afe7a6404cc4e59506efae72f93e767a`; Issue #15 allowed-files scope remains intact.
+  - PR #26 head `7853fe7`; Codex clean comment `4531555287`; current-main merge-tree exit `0`, tree `9ea4ee17c4858c69ae8822ba30a6665225ee19e3`; candidate-only raw warehouse boundary remains intact.
+- Blocked: GitHub REST API returned `403`, so patrol used GitHub connector PR comments, `git ls-remote` PR refs, fetched PR refs, and local merge-tree simulation.
+- Next: Deputy final-gate candidates are acknowledged for PR #22 / #23 / #25 / #26. Executive should stop ordinary owner chase and monitor only unless a branch head changes, validation evidence is contradicted, or Codex reports `NEEDS_FIX` / `P1` / `P2`. No merge / reject / close action was executed in this patrol.
+- Need Commander: No
+- Need Reviewer: No
+
 ### 2026-05-25 - Chatroom heartbeat prompt sync published
 
 Workstream:
