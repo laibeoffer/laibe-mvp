@@ -1345,6 +1345,26 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T21:33:47Z - Latest-main final-gate reconfirmation after `46e7654`
+
+- Workstream: executive-officer / active-final-gates
+- Branch: `origin/main` `46e76543f975b5a01ff03a973cb71dd64d21b835`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `NO_NEW_EVIDENCE_AFTER_CHECK / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+- Changed: patrol docs only; no source files changed.
+- Evidence:
+  - 已依序重讀 mandatory docs、strategic plan、blackboard、role parameters、delivery ledger、triage queue、Executive inbox、Reviewer inbox，並重新抓取 `origin/main` 與 PR #22 / #23 / #25 / #26 heads。
+  - GitHub connector 補足 REST rate-limit 後的查核：Issues #15 / #16 / #17 / #18 仍 open；Issue #19 closed。PR #22 / #23 / #25 / #26 仍 open。
+  - `origin/main` 已由上一輪紀錄的 `9b820a2` 推進到 docs-only commit `46e7654`；四個 active PR head 未再變動。
+  - Against `origin/main` `46e76543f975b5a01ff03a973cb71dd64d21b835`, current-main merge-tree and diff-check pass for all active PRs: PR #22 tree `5a4631e517f69d8b874af0e85a727ae5c43084f9`; PR #23 tree `8ac12821761b518138b60c15cbdfcce7a4de64e3`; PR #25 tree `88212a9e7b499c9bb80e3eee0022aa197fab47c8`; PR #26 tree `1d15419916131be330476afc7627cdaf1164617d`; all diff-check exits `0`.
+  - PR #23 latest clean Codex comment remains `4537316105` after head `f882b90`; review-thread metadata still lists unresolved threads `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, each with Builder fix replies. Treat as Deputy final-gate manual-thread question, not ordinary Builder chase, unless new blocker appears.
+  - PR #25 latest clean Codex comment remains `4536168380` after head `1835e29`; review-thread metadata still lists unresolved non-outdated threads `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj` with Builder fix replies. Treat as Deputy final-gate manual-thread question, not ordinary Builder chase, unless new blocker appears.
+- Decision:
+  - To: Deputy Codex
+  - Mission: 請發布 PR #22 / #23 / #25 / #26 的 final-gate decision visibility 或 exact blocker。
+  - Action: Reconfirm no branch-head change, scope drift, new Codex blocker, validation contradiction, post-publication merge-tree conflict, or required manual review-thread resolution before any merge / reject decision. Executive Officer cannot merge / reject / close.
+  - Need Commander: No
+  - Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-25T21:26:11Z - Latest-main final-gate reconfirmation after `9b820a2`
 
 - Workstream: deputy-codex / active-final-gates
