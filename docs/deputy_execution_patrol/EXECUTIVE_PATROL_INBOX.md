@@ -40,7 +40,7 @@ PENDING
 ### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
 
 Status:
-PENDING_DEPUTY_DECISION
+DEPUTY_DECISION_MADE
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -70,9 +70,9 @@ Action already taken:
 Executive Officer did not post duplicate GitHub comments this round. Delivery ledger and triage queue were updated to classify PR #22 / PR #26 as `DEPUTY_SIGNAL_DECISION_REQUIRED / CURRENT_MAIN_SIMULATION_PASS_MERGE_REF_STALE`.
 
 Recommended Deputy action:
-Decide per PR:
-- PR #22: either accept Executive current-main merge-tree plus allowed-docs evidence and route the final gate, or assign MethodSpec owner / repair lane to publish fresh current-main mergeability confirmation.
-- PR #26: either accept Executive current-main merge-tree evidence while noting stale owner validation, or assign Raw Candidate owner / repair lane to rerun R1.5 validation and forbidden formal-pricing checks against current main.
+Decision published on current main `a2153359db2422ecd6c048032da563be9372a44f`:
+- PR #22: accept current-main merge-tree plus allowed-docs evidence and route to Deputy final-gate consideration. Stop ordinary owner chase unless the branch head changes.
+- PR #26: assign Deputy Codex-2 a validation-refresh package before final gate because PR #26 touches raw-warehouse source files. Required evidence: current-main R1.5 validation and forbidden formal-pricing checks, with no source edits unless explicitly re-dispatched.
 
 Need Commander:
 No
@@ -81,7 +81,7 @@ Need Reviewer:
 No unless branch changes, scope drifts, Codex reports NEEDS_FIX / P1 / P2, or PR #26 introduces formal-price risk.
 
 Deputy Decision:
-PENDING
+PR22_SIGNAL_ACCEPTED__PR26_DEPUTY2_VALIDATION_REFRESH_ASSIGNED
 
 ### 2026-05-25T06:13:21Z - [DEPUTY_DECISION_PUBLISHED] - PR #23 / PR #25
 

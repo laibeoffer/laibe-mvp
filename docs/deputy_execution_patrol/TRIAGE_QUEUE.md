@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-25T06:44:24Z - [DEPUTY_SIGNAL_DECISION_PUBLISHED] - MethodSpec / Raw Candidate
+
+Status:
+NEEDS_DEPUTY_DECISION_RESOLVED
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #26, with continuing watch on PR #23 / PR #25
+
+Evidence:
+Current main is `a2153359db2422ecd6c048032da563be9372a44f`. PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; current-main merge-tree exits `0`, and base-to-head changed files remain limited to Issue #16 allowed docs. PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; current-main merge-tree exits `0`, but fresh R1.5 validation / forbidden formal-pricing evidence is still absent. PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 still has no merge ref and conflicts in `docs/NEXT_CODEX_HANDOFF.md`.
+
+Recommended Executive Action:
+Do not post duplicate ordinary chase comments for PR #22 / PR #23 / PR #25 / PR #26 unless branch heads change. Watch for Deputy Codex-2 repair / validation-refresh package output.
+
+Recommended Deputy Action:
+Decision made: PR #22 may move to Deputy final-gate consideration based on current-main merge-tree plus allowed-docs evidence. PR #26 needs Deputy Codex-2 validation refresh before final gate because it touches raw-warehouse source files. PR #23 / PR #25 remain Deputy Codex-2 workflow repair packages.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2, PR #26 shows formal-price risk, or any scope drifts.
+
 ### 2026-05-25T06:13:21Z - [PR22_PR26_DEPUTY_SIGNAL_DECISION_REQUIRED] - MethodSpec / Raw Candidate
 
 Status:

@@ -1343,6 +1343,61 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Deputy signal decision for PR #22 / PR #26 on current main `a215335`
+
+Workstream:
+command/deputy / active PR recovery
+
+Status:
+DEPUTY_SIGNAL_DECISION_PUBLISHED / NEED_COMMANDER_NO
+
+Changed:
+- Fast-forwarded patrol state to latest `origin/main` `a2153359db2422ecd6c048032da563be9372a44f`.
+- Rechecked tracked PR heads and current-main merge simulations for PR #22 / PR #23 / PR #25 / PR #26.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/22` exits `0`, and base-to-head changed files remain limited to Issue #16 allowed docs: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local `git merge-tree --write-tree origin/main refs/remotes/origin/pr/26` exits `0`, but fresh R1.5 validation / forbidden formal-pricing evidence is still absent after Executive call-out `4531941371`.
+- PR #23 remains current-main sync-blocked: merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- PR #25 remains current-main repair-blocked: no `refs/pull/25/merge`, and merge-tree exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Decision:
+- PR #22: accept Executive / Deputy current-main merge-tree plus allowed-docs evidence. Stop ordinary owner chase and move to Deputy final-gate consideration. No Commander escalation and no Reviewer needed unless head changes or Codex reports NEEDS_FIX / P1 / P2.
+- PR #26: do not accept merge-tree-only evidence for final gate because the PR touches raw-warehouse source files. Assign Deputy Codex-2 a LOW / MEDIUM validation-refresh package to rerun or obtain R1.5 validation and forbidden formal-pricing checks without source edits.
+- PR #23 / PR #25: keep existing Deputy Codex-2 workflow repair assignments active; do not duplicate ordinary chase unless branch heads change.
+
+Dispatch:
+To:
+Deputy Codex-2
+Workstream:
+warehouse/raw-candidate
+Branch / Repo:
+`warehouse/raw-source-quality-scoring` / `laibeoffer/laibe-mvp`
+Mission:
+PR #26 validation-refresh package.
+Why this agent:
+Deputy Codex-2 owns GitHub / branch / worktree reconciliation and LOW / MEDIUM validation recovery; Raw Candidate owner has not posted fresh current-main validation after Executive call-out.
+Action:
+Rerun or obtain current-main R1.5 validation and forbidden formal-pricing checks for PR #26 without source edits. Confirm no formal price, PricingRule, BudgetEstimateLine, renderer, payment, AI API, or cross-workstream scope. Stop and route back if validation requires code changes or high-risk scope. Request Codex re-review only if the PR head changes.
+Need Commander:
+No
+Need Reviewer:
+No unless Codex review reports NEEDS_FIX / P1 / P2, formal-price risk appears, or scope drifts.
+
+Next:
+- Deputy Codex owns final clean-scope gate consideration for PR #22.
+- Deputy Codex-2 should report PR #26 validation-refresh status, plus continuing PR #23 / PR #25 repair status, back to `DELIVERY_LEDGER.md`, `TRIAGE_QUEUE.md`, and `EXECUTIVE_PATROL_INBOX.md`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-25 - Executive signal refresh after Deputy repair assignment `2c26cd5`
 
 Workstream:
