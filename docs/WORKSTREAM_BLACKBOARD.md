@@ -1343,6 +1343,140 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25T13:04:41Z - Executive post-push PR23 sync blocker on `999a323`
+
+Workstream:
+command/executive / output/budget-documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / POST_PUBLISH_MAIN_ADVANCED / CURRENT_MAIN_SYNC_BLOCKED_AGAIN
+
+Changed:
+- Executive first found PR #23 repaired on head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f` against `origin/main` `a2c3a273fb3f8f1d232a135c1eed162d79af1047`.
+- Executive then published patrol docs to `main` as `999a32376dbe8490dbc4f756455015b247f4c5c6`.
+- Post-push recheck shows PR #23 is stale again against latest `origin/main` `999a32376dbe8490dbc4f756455015b247f4c5c6`: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #22 / PR #25 / PR #26 still merge-tree clean after `999a323`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+Output Documents Builder must re-sync PR #23 against latest main `999a323`, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the existing fail-closed renderer fix plus the new Executive patrol entries, rerun required renderer / fixture / diff checks, and request Codex re-review if the branch head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T13:04:41Z - Executive PR23 repair found on `b503cd3`
+
+Workstream:
+command/executive / output/budget-documents
+
+Status:
+WORKFLOW_REPAIR_FOUND / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REFRESH_REQUIRED
+
+Changed:
+- Rechecked latest `origin/main` `a2c3a273fb3f8f1d232a135c1eed162d79af1047`.
+- GitHub public PR state shows PR #23 open at head `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `refs/pull/23/merge` exists at `18f079ec64367f6fa37d4005280aaa4b3ed5657c`.
+- Fetched PR #23 and verified `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `5326a9b9b243aed08945bd628b6c6c5c65f58fcc`.
+- PR #23 branch blackboard contains Output Documents Builder `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` for the repeated `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- Latest repair commit `b503cd3` resolves `docs/WORKSTREAM_BLACKBOARD.md`; renderer code and snapshot review packet files were not edited in that repair commit.
+- GitHub REST returned `403`, so patrol used public PR pages, refs, fetched PR heads, and local simulation fallback.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Next:
+Output Documents Builder must publish / confirm `CODEX_REVIEW_REQUESTED` or the post-`b503cd3` Codex result. Do not route PR #23 back to Deputy final gate until the latest-head re-review is visible or Deputy explicitly accepts the docs-only sync as sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T12:56:32Z - PR23 sync repair owner assigned
+
+- Workstream: command/deputy / output/budget-documents
+- Branch: `origin/main` `651fdbb2febdc39ca6375f101d571f4942c26f2c`
+- Status: `DEPUTY_DECISION_MADE / PR23_SYNC_REPAIR_ASSIGNED / NO_MERGE_EXECUTED`
+- Changed: Deputy decision only; no source files changed.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Evidence:
+  - PR #23 head remains `d126327ddac96d29ba553a5c7ca9aab9e6461217`; Codex clean comment `4534133600` remains the latest clean review for that head.
+  - Latest main is `651fdbb2febdc39ca6375f101d571f4942c26f2c`.
+  - `git merge-tree --write-tree origin/main refs/patrol/hb1256/pr23` exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`.
+  - PR #22 / PR #25 / PR #26 still merge-tree clean against latest main.
+- Decision:
+  - To: Output Documents Builder
+  - Workstream: output/budget-documents
+  - Branch / Repo: `output/renderer-static-guard-review-packet` / `laibeoffer/laibe-mvp`
+  - Mission: Re-sync PR #23 against latest main after final-gate ACK made the blackboard stale.
+  - Why this agent: Output Documents Builder owns Issue #18 / PR #23 and the branch contains renderer snapshot-only recovery work.
+  - Action: Resolve only the `docs/WORKSTREAM_BLACKBOARD.md` conflict while preserving the fail-closed renderer / format mismatch P2 fix and patrol documentation; rerun renderer static guard, renderer syntax, mismatch smoke, fixture smoke, invalid fixture, `.xlsx/.pdf` diff check, and `git diff --check`; request Codex re-review if branch head changes.
+  - Need Commander: No
+  - Need Reviewer: No unless repair changes scope or Codex reports `NEEDS_FIX` / `P1` / `P2`.
+- Next: Executive Officer should chase a visible ACK from Output Documents Builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`. Do not route PR #23 to final gate again until latest-main merge-tree is clean.
+- Need Commander: No
+- Need Reviewer: No
+
+### 2026-05-25 - Executive PR23 final-gate ACK stale on `7338cc2`
+
+Workstream:
+command/executive / final-gate visibility lane / output repair routing
+
+Status:
+PR23_FINAL_GATE_ACK_STALE / CURRENT_MAIN_SYNC_BLOCKED / DEPUTY_DECISION_REQUIRED
+
+Table Compliance:
+PARTIAL - PR #23 still has a clean Codex comment on head `d126327`, but it no longer has a clean current-main merge-tree after main advanced to `7338cc2`. PR #22 / PR #25 / PR #26 remain current-main merge-tree clean.
+
+Missed Progress:
+No Builder non-response counted this cycle; this is a fresh stale-state finding after Deputy ACK advanced main.
+
+Action Taken:
+Executive Officer rechecked latest main `7338cc2b568e32d0988a1a9ec717970b1fb5b664`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, `git ls-remote` PR refs, fetched PR heads / merge refs, local merge-tree signals, and changed-file lists. GitHub REST returned `403`, so refs / local simulation fallback was used. Deputy final-gate ACK is visible in the `2026-05-25T12:40:29Z` blackboard entry, but `git merge-tree --write-tree origin/main refs/patrol/pr23` now exits `1` with a content conflict in `docs/WORKSTREAM_BLACKBOARD.md`. PR #23 head remains `d126327ddac96d29ba553a5c7ca9aab9e6461217`; the old merge ref `c39436e1d2a73963626e4d3c9466350832139a74` must not be treated as latest-main readiness. PR #22 / PR #25 / PR #26 still merge-tree clean against latest main.
+
+Next Required:
+Deputy Codex must decide the PR #23 workflow repair owner. Minimal next task: re-sync PR #23 against latest main, resolve only the `docs/WORKSTREAM_BLACKBOARD.md` conflict while preserving the fail-closed P2 fix, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, then request Codex re-review if the branch head changes.
+
+Blocked:
+PR #23 latest-main sync is blocked by `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+
+Need Deputy:
+Yes.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless repair changes scope or new Codex review reports NEEDS_FIX / P1 / P2.
+
+### 2026-05-25T12:40:29Z - Deputy final-gate visibility ACK
+
+- Workstream: command/deputy / final-gate visibility
+- Branch: `origin/main` `ee1401ab3c80fcff388d530de635111b8e7dd22c`
+- Status: `FINAL_GATE_ACK / CLEAN_SCOPE_CANDIDATES / NO_MERGE_EXECUTED`
+- Changed: blackboard final-gate visibility only.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`
+- PR / Commit:
+  - PR #22 head `e338431`; Codex clean comment `4531356014`; current-main `git merge-tree --write-tree origin/main refs/patrol/hb1240/pr22` exit `0`, tree `f624a5e73565a3b50611dcb2d798cc8471bea6ca`; changed files remain Issue #16 docs-only.
+  - PR #23 head `d126327`; Codex clean comment `4534133600`; current-main merge-tree exit `0`, tree `97346db398ae8a2d9695cbde2cbb58aca2ee3a8d`; snapshot-only boundary remains intact.
+  - PR #25 head `58b42b5`; Codex clean comment `4534078809`; current-main merge-tree exit `0`, tree `b93cc1d7afe7a6404cc4e59506efae72f93e767a`; Issue #15 allowed-files scope remains intact.
+  - PR #26 head `7853fe7`; Codex clean comment `4531555287`; current-main merge-tree exit `0`, tree `9ea4ee17c4858c69ae8822ba30a6665225ee19e3`; candidate-only raw warehouse boundary remains intact.
+- Blocked: GitHub REST API returned `403`, so patrol used GitHub connector PR comments, `git ls-remote` PR refs, fetched PR refs, and local merge-tree simulation.
+- Next: Deputy final-gate candidates are acknowledged for PR #22 / #23 / #25 / #26. Executive should stop ordinary owner chase and monitor only unless a branch head changes, validation evidence is contradicted, or Codex reports `NEEDS_FIX` / `P1` / `P2`. No merge / reject / close action was executed in this patrol.
+- Need Commander: No
+- Need Reviewer: No
+
 ### 2026-05-25 - Chatroom heartbeat prompt sync published
 
 Workstream:
@@ -4524,6 +4658,102 @@ No
 
 Need Reviewer:
 No unless Codex reports NEEDS_FIX / P1 / P2 or repair scope drifts.
+
+### 2026-05-25 - Executive final-gate ACK follow-up on `14e6bd7`
+
+Workstream:
+command/executive / final-gate visibility lane
+
+Status:
+FINAL_GATE_VISIBILITY_STILL_PENDING / EXECUTIVE_FOLLOW_UP_PUBLISHED / NO_COMMANDER_DECISION
+
+Table Compliance:
+PASS - PR #23 and PR #25 still have pushed branch heads, PR URLs, current-main merge-tree simulation pass, visible validation evidence, and clean Codex comments. No branch-head regression or new NEEDS_FIX / P1 / P2 was found.
+
+Missed Progress:
+No Builder missed progress; ordinary Builder chase remains stopped. Deputy final-gate visibility is still pending.
+
+Action Taken:
+Executive Officer rechecked latest main `14e6bd7d5e01149d95683baa5def443c5cf59d69`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, PR comments, reviews, changed files, PR refs, fetched PR heads / merge refs, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #23 remains open and REST `mergeable=True` at head `d126327ddac96d29ba553a5c7ca9aab9e6461217`; `refs/pull/23/merge` remains `c39436e1d2a73963626e4d3c9466350832139a74`; local merge-tree against current main exits `0` with tree `8eaea53467755ac7b499a29f0658ed68e6ea2f53`; latest useful comments remain Output Documents repair `4534112469`, Codex clean `4534133600`, and post-review patrol update `4534162541`. PR #25 remains open and REST `mergeable=True` at head `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; `refs/pull/25/merge` remains `8d796e62b303066b9097b48a59b37fd7ea7fa933`; local merge-tree exits `0` with tree `bcb5315fb1869cb09ccc4eedd95ace01001d1726`; latest useful comments remain `PLAN_PUZZLE_ACTION_TAKEN` `4534058804` and Codex clean `4534078809`.
+
+Next Required:
+Deputy Codex should publish final-gate visibility for PR #23 and PR #25, or state an exact blocker with attempted fix. Executive should keep monitor-only unless branch heads change, validation evidence is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
+Blocked:
+No Executive-level blocker. Merge / reject remains Deputy authority.
+
+Need Deputy:
+Yes for PR #23 / PR #25 final-gate visibility; no merge / reject executed by Executive.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drift.
+
+### 2026-05-25 - Executive PR23 clean / PR25 still final-gate on `a4fa97f`
+
+Workstream:
+command/executive / final-gate visibility lane
+
+Status:
+PR23_CODEX_CLEAN_FINAL_GATE / PR25_FINAL_GATE_STILL_READY / NO_COMMANDER_DECISION
+
+Table Compliance:
+PASS - PR #23 and PR #25 both have pushed branch heads, PR URLs, current-main merge-tree simulation pass, visible validation evidence, and clean Codex comments. PR #22 / PR #26 remain monitor-only final-gate candidates.
+
+Missed Progress:
+PR #23 remains `0`; PR #25 remains `0`.
+
+Action Taken:
+Executive Officer rechecked latest main `a4fa97fb846290ac459c5176313ce9a30d55ae89`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages, PR refs, fetched PR heads / merge refs, changed files, reviews, comments, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #23 head is `d126327ddac96d29ba553a5c7ca9aab9e6461217`; Codex post-`d126327` clean comment `4534133600` is now visible; follow-up PR comment `4534162541` records no new NEEDS_FIX / P1 / P2; `refs/pull/23/merge` exists at `c39436e1d2a73963626e4d3c9466350832139a74`; local `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `c23d7d6be4d07f093397b72798ba8671bcc663cb`. PR #25 head remains `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; Codex clean comment remains visible; `refs/pull/25/merge` exists at `8d796e62b303066b9097b48a59b37fd7ea7fa933`; current-main merge-tree exits `0` with tree `6e061c61c7874ebe6e6fedd37b4f7a038c2e21d1`.
+
+Next Required:
+Deputy Codex should publish final-gate visibility for PR #23 and PR #25. Executive should monitor only unless a branch head changes, validation evidence is contradicted, or a new Codex NEEDS_FIX / P1 / P2 appears.
+
+Blocked:
+No Executive-level blocker. Merge / reject remains Deputy authority.
+
+Need Deputy:
+Yes for PR #23 / PR #25 final-gate visibility; no merge / reject executed by Executive.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drift.
+
+### 2026-05-25 - Executive PR25 clean / PR23 review pending on `45c560f`
+
+Workstream:
+command/executive / direct Builder repair ACK lane
+
+Status:
+PR25_CODEX_CLEAN_FINAL_GATE / PR23_CODEX_REVIEW_REQUESTED / PR23_RESULT_PENDING
+
+Table Compliance:
+PARTIAL - PR #25 has current-main merge simulation and clean Codex re-review; PR #23 has current-main repair evidence and review request but still needs the post-`d126327` Codex result.
+
+Missed Progress:
+PR #25 remains `0`; PR #23 reset from `21` to `0` because an effective Output Documents repair artifact is now visible.
+
+Action Taken:
+Executive Officer rechecked latest main `45c560fb46b95ea055363670126c5d9edb889f07`, required governance docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, public PR pages, PR refs, fetched PR heads / merge refs, base-to-head changed files, commit lists, and local merge-tree signals. `gh` is unavailable and GitHub REST metadata returned unauthenticated `403`; public page / refs fallback was used. PR #25 head is now `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; public PR page shows Codex P2 fixes plus clean result; `refs/pull/25/merge` exists at `8d796e62b303066b9097b48a59b37fd7ea7fa933`; local merge-tree exits `0`. PR #23 head is now `d126327ddac96d29ba553a5c7ca9aab9e6461217`; public PR page shows current-main workflow repair, rerun checks, and `@codex review`; `refs/pull/23/merge` exists at `c39436e1d2a73963626e4d3c9466350832139a74`; local merge-tree exits `0`; no post-`d126327` clean Codex result was visible this cycle.
+
+Next Required:
+Deputy Codex should publish final-gate visibility for PR #25. Output Documents Builder must report the post-`d126327` Codex re-review result or exact blocker for PR #23.
+
+Blocked:
+PR #23 is no longer merge-tree blocked, but Codex review result is still pending for the latest head.
+
+Need Deputy:
+Yes for PR #25 final-gate visibility only; no merge / reject executed by Executive.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless Codex reports NEEDS_FIX / P1 / P2 or scope drift.
 
 ### 2026-05-25 - Executive PR25 repair accepted / PR23 still blocked on `df7f3b3`
 
