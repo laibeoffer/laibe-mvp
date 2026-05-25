@@ -1343,6 +1343,42 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-25 - Executive active delivery recovery on current main `5157f25`
+
+Workstream:
+Executive Officer / MethodSpec / Output Documents / Plan Puzzle / Raw Candidate
+
+Changed:
+- Re-read current `origin/main` at `5157f258f3d6ac360233b11350329611a5d0c48b`.
+- Rechecked PR #22 / #23 / #25 / #26 refs, comments, review threads, changed files, and current-main merge simulations.
+- PR #22 head remains `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; local current-main merge-tree exits `0`, but available merge ref is anchored to old base `a1da6a`. Executive posted current-main evidence refresh comment `4531863942`.
+- PR #23 head remains `a75e3802a30f13201cf2df5705112142d9251e8c`; local current-main merge-tree still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. Executive posted `EXECUTIVE_CALL_OUT` comment `4531863742`.
+- PR #25 head remains `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`; no `refs/pull/25/merge` exists and local merge-tree exits `128` with no usable merge base / unrelated-history behavior. Executive posted sync recovery comment `4531863860`.
+- PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; local current-main merge-tree exits `0`, so the prior conflict wording was corrected. Executive updated comment `4531733938` to require evidence refresh, not conflict repair.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+
+Blocked:
+- PR #23 remains current-main sync-blocked.
+- PR #25 remains no-merge-ref / no-usable-merge-base sync-blocked.
+- PR #22 and PR #26 are not content-conflict signals locally, but final-gate evidence is stale until current-main mergeability / validation / Codex signal is refreshed.
+
+Next:
+- MethodSpec Builder: provide latest-main SHA, current-main mergeability / merge-tree status, and allowed docs-only confirmation; request Codex re-review only if head changes.
+- Output Documents Builder: re-sync PR #23 against current main, preserve fail-closed P2 fix, rerun renderer checks, and request Codex re-review if head changes.
+- Plan Puzzle Builder: re-sync PR #25 in a GitHub-connected environment, rerun `node --check` and guard checks, and request Codex review only after a merge ref exists.
+- Raw Candidate Builder: provide latest-main SHA, mergeability / merge-tree status, R1.5 validation set, and forbidden formal-pricing checks; request Codex re-review only if head changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any PR drifts scope.
+
 ### 2026-05-25 - Deputy PR #26 current-main simulation correction
 
 Workstream:

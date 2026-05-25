@@ -36,10 +36,36 @@ Need Reviewer:
 
 ## Open Triage Items
 
-### 2026-05-25T05:29:50Z - [OWNER_COMMENT_CORRECTION_REQUIRED] - Raw Candidate
+### 2026-05-25T05:39:20Z - [ACTIVE_PR_CURRENT_MAIN_REFRESH] - PR #22 / PR #23 / PR #25 / PR #26
 
 Status:
 NEEDS_EXECUTIVE_CHASE
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Current main is `5157f258f3d6ac360233b11350329611a5d0c48b`. PR #22 and PR #26 both pass local current-main merge-tree simulation but still have stale merge refs. PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. PR #25 still has no merge ref and local merge-tree exits `128` with no usable merge base / unrelated-history behavior.
+
+Recommended Executive Action:
+Done this patrol: updated PR #26 comment `4531733938`, posted PR #23 call-out `4531863742`, posted PR #25 sync recovery comment `4531863860`, and posted PR #22 current-main evidence refresh comment `4531863942`.
+
+Recommended Deputy Action:
+Keep PR #22 / #23 / #26 final gates paused until current-main evidence is fresh. Keep PR #25 in sync recovery. If PR #23 remains empty after this call-out, prepare Deputy workflow repair / reassignment inside Output Documents scope.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any PR drifts scope.
+
+### 2026-05-25T05:29:50Z - [OWNER_COMMENT_CORRECTION_REQUIRED] - Raw Candidate
+
+Status:
+CORRECTED_BY_EXECUTIVE
 
 Complexity:
 MEDIUM
@@ -51,7 +77,7 @@ Evidence:
 Deputy patrol rechecked current `origin/main` at `e655829eedeeb11b293aba3240a04b558a2bfd3f`. PR #26 head remains `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`; GitHub API reports `mergeable=true` / `mergeable_state=clean`, and `git merge-tree --write-tree origin/main origin/pr/26` exits `0`. However, `refs/pull/26/merge` still targets old base `0e8ab82a23700b4c2fbffb7f9dd1d6d9f0c2e405`. Prior Executive comment `4531733938` says local simulation reports conflict; that wording is stale / incorrect for this patrol.
 
 Recommended Executive Action:
-Post or send a corrected Raw Candidate follow-up: PR #26 needs current-main evidence refresh, not conflict repair. Required evidence remains latest main SHA, mergeability / merge-tree signal, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if the head changes.
+Done during 2026-05-25T05:39Z patrol: PR #26 comment `4531733938` was updated to require current-main evidence refresh, not conflict repair. Required evidence remains latest main SHA, mergeability / merge-tree signal, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if the head changes.
 
 Recommended Deputy Action:
 Keep PR #26 final gate paused until the current-main evidence is fresh. Do not escalate to Commander and do not route to Reviewer unless Codex reports NEEDS_FIX / P1 / P2, formal-price risk, or scope drift.

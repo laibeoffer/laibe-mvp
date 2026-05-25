@@ -37,10 +37,52 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-25T05:39:20Z - [ACTIVE_DELIVERY_RECOVERY_ACTIONS_POSTED] - PR #22 / PR #23 / PR #25 / PR #26
+
+Status:
+PENDING_OWNER_REFRESH
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+Workstream:
+MethodSpec Builder / Output Documents Builder / Plan Puzzle Builder / Raw Candidate Builder
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22, PR #23, PR #25, PR #26
+
+Finding:
+Current main advanced to `5157f258f3d6ac360233b11350329611a5d0c48b`. Existing final-gate / sync evidence for the four active PR rows is stale or blocked against current main.
+
+Evidence:
+- PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`: local `git merge-tree --write-tree origin/main refs/eopatrol/pr22-head` exits `0`, but the available merge ref is anchored to old base `a1da6a`.
+- PR #23 head `a75e3802a30f13201cf2df5705112142d9251e8c`: local merge simulation still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`.
+- PR #25 head `ffbe8e1e72a1af1df0c7fce1397bd3ff91f615b7`: no `refs/pull/25/merge`; local merge-tree exits `128` with no usable merge base / unrelated-history behavior.
+- PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`: local merge-tree exits `0`, so prior conflict wording was corrected; merge ref still targets old base `0e8ab82`.
+
+Action already taken:
+- Updated PR #26 follow-up comment `4531733938` to require current-main evidence refresh, not conflict repair.
+- Posted PR #23 `EXECUTIVE_CALL_OUT` comment `4531863742`.
+- Posted PR #25 current-main sync recovery comment `4531863860`.
+- Posted PR #22 current-main evidence refresh comment `4531863942`.
+- Updated delivery ledger, triage queue, and blackboard with this patrol state.
+
+Recommended Deputy action:
+Keep final gate paused for PR #22 / #23 / #26 until current-main evidence is fresh. Keep PR #25 in sync recovery. If PR #23 remains empty after this call-out, prepare Deputy workflow repair / reassignment inside Output Documents scope.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a fresh Codex review reports NEEDS_FIX / P1 / P2, PR #26 introduces formal-price risk, or any PR drifts scope.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-25T05:29:50Z - [PR_26_SIGNAL_CORRECTION_REQUIRED] - Raw Candidate
 
 Status:
-PENDING_EXECUTIVE_CORRECTION
+CORRECTED_BY_EXECUTIVE
 
 Executive Officer:
 EXECUTIVE_OFFICER
@@ -62,7 +104,7 @@ Evidence:
 - Therefore the owner should refresh current-main evidence, not repair a conflict.
 
 Action already taken:
-Deputy Codex updated the blackboard, delivery ledger, triage queue, and this inbox to correct the routing signal.
+Deputy Codex updated the blackboard, delivery ledger, triage queue, and this inbox to correct the routing signal. Executive Officer then updated PR #26 comment `4531733938` during the 2026-05-25T05:39Z patrol with current-main evidence refresh wording.
 
 Recommended Deputy action:
 No Commander escalation. Keep PR #26 final gate paused until Raw Candidate / Executive provides fresh current-main evidence: latest main SHA, mergeability / merge-tree result, R1.5 validation set, forbidden formal-pricing checks, and Codex re-review only if head changes.
