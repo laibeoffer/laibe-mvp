@@ -18,6 +18,12 @@ const containsInternalTraceTerm = (value) =>
   );
 
 export const sanitizeCustomerWarnings = (warnings) => {
+  if (!Array.isArray(warnings)) {
+    return warnings === null || warnings === undefined
+      ? []
+      : [unsafeWarningFallback];
+  }
+
   const sanitized = warnings.map((warning) => {
     if (typeof warning !== "string") {
       return unsafeWarningFallback;
