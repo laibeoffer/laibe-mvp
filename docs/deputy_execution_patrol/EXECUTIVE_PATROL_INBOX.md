@@ -37,6 +37,138 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T12:30:13Z - [REPEATED_DEPUTY2_ACK_SILENCE_5014D03] - Deputy Codex-2
+
+Status:
+VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+active final gates / repeated Deputy2 ACK recovery
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26
+
+Finding:
+No visible Deputy Codex-2 ACK was found after the 11:05 `PENDING_DEPUTY2_ACK` row. `origin/main` is stable at `5014d03c1f86aac91ac99cd8e46f4326eacd006e`; active PR heads are unchanged; local current-main merge-tree and diff-check pass for all four active PRs. This remains Deputy2 ACK visibility, not ordinary Builder missing work.
+
+Evidence:
+- Sources checked: required docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR issue comments since `2026-05-26T11:05:25Z`, and current-main merge-tree / diff-check outputs.
+- Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed.
+- PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged.
+- PR heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- REST mergeability: PR #22 / PR #23 / PR #26 `mergeable=true` / `mergeable_state=clean`; PR #25 `mergeable=null` / `mergeable_state=unknown`, with merge ref present.
+- Merge-tree / diff-check against `5014d03`: PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`; PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`; PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`; PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all diff-check exits `0`.
+- PR #22 / PR #23 / PR #25 / PR #26 have no new issue comments since `2026-05-26T11:05:25Z`.
+
+Action already taken:
+Executive Officer published this docs-only repeated-silence follow-up and avoided duplicate GitHub / Builder chase. No source files changed. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for active PR current-main simulation against `5014d03`, including PR #25 clean Codex evidence, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains. After Deputy2 ACK, Deputy Codex should publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
+### 2026-05-26T11:05:25Z - [PR25_CODEX_CLEAN_FOUND_6BA84DB] - Deputy Codex-2
+
+Status:
+VALIDATION_REFRESH_FOUND / CODEX_REVIEW_CLEAN_FOUND / PR25_HEAD_STABLE / CURRENT_MAIN_SIMULATION_PASS / REVIEW_GATE_CLEARED / PENDING_DEPUTY2_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+plancraft-page-ui / PR #25 post-fix clean review reconciliation
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25, with PR #22 / PR #23 / PR #26 active final-gate context checked
+
+Finding:
+The 10:47 row said no post-`607b262` clean Codex result was visible. This patrol found the clean result: PR #25 comment `4543568360` at `2026-05-26T10:44:11Z` reports Codex found no major issues after the `607b262` fix. PR #25 is now back to Deputy2 validation ACK / Deputy final-gate visibility, not ordinary Plan Puzzle Builder chase.
+
+Evidence:
+- Latest checked `origin/main`: `6ba84db4c024349528509a8d7843a8f2fd88c781`.
+- PR #25 head: `607b2621c97820dc8774831617aba6b59dc984dc`.
+- PR #25 REST metadata: open, non-draft, `mergeable=true`, `mergeable_state=clean`, updated `2026-05-26T10:44:11Z`.
+- Plan Puzzle Builder comment `4543536945` at `2026-05-26T10:41:00Z`: `PLAN_PUZZLE_ACTION_TAKEN`.
+- Codex clean comment `4543568360` at `2026-05-26T10:44:11Z`: no major issues.
+- Merge-tree / diff-check against `6ba84db`: PR #22 tree `1b226438e4c409ae825352b4d9e6fb41724cbe5a`; PR #23 tree `b5fa1f78bbc6544d04d53f1d65711e3bcecbc1cc`; PR #25 tree `3f975585ee4ab0d4f003eeefd31af988de933012`; PR #26 tree `51ec97217d9822a1a6e37925a39dfe430b879305`; all diff-check exits `0`.
+- Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged.
+
+Action already taken:
+Executive Officer published this docs-only status correction, stopped ordinary PR #25 Builder chase while clean Codex evidence remains current, and did not post duplicate GitHub comments. No source files changed. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` acknowledging PR #25 post-fix Codex clean result and current-main simulation against `6ba84db`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains. After Deputy2 ACK, Deputy Codex should publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
+### 2026-05-26T10:47:18Z - [PR25_CODEX_P2_REPAIRED_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+CODEX_P2_FOUND / WORKFLOW_REPAIR_ATTEMPTED / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REQUESTED / POST_FIX_REVIEW_PENDING
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft-page-ui / PR #25 Codex P2 repair result watch
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 received a new Codex P2 on reviewed commit `7480b24c7b`; Plan Puzzle Builder pushed a scoped fix in `607b262` and requested `@codex review`. The next executable artifact is the post-fix Codex result, so PR #25 is not Deputy final-gate ready yet.
+
+Evidence:
+- Latest checked `origin/main`: `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`.
+- PR #25 head: `607b2621c97820dc8774831617aba6b59dc984dc`.
+- Codex P2 found by public PR page fallback: collinear non-adjacent self-overlap / retraced edge was not detected before area estimation on reviewed commit `7480b24c7b`.
+- Builder repair evidence: added `doCollinearSegmentsOverlap()`, called it from `hasPolygonSelfIntersection()`, updated `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md`, pushed `607b262`, requested `@codex review`.
+- Merge ref: `0aaac05d089731d41c57a34b8da9d239f611ce65`.
+- Local merge-tree tree: `988d305289a2901b7639064b5779e8d97f564e30`; `git diff --check` exits `0`.
+- Changed files remain scoped to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+
+Action already taken:
+Commander patrol published this docs-only status update and superseded the PR #25 final-gate ACK request from `2026-05-26T10:22:27Z`. No source files changed. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Do not merge PR #25 until post-`607b262` Codex review result is visible and clean, or until an exact blocker is acknowledged.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+Yes for Codex P2 re-review result; no separate LAIBE_REVIEWER action unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
+Deputy Decision:
+PENDING_CODEX_REVIEW_RESULT
+
 ### 2026-05-26T10:22:27Z - [PR25_REPAIR_FOUND_B489E7A] - Deputy Codex-2
 
 Status:

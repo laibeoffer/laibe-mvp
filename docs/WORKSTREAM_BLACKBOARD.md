@@ -1345,6 +1345,86 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
+
+- Workstream: executive-visible-ack-recovery / active-final-gates / metadata-reconciliation
+- Branch: `origin/main` `5014d03c1f86aac91ac99cd8e46f4326eacd006e`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+- Changed: Executive Officer re-read required docs from latest `origin/main`, reconciled GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR issue comments since `2026-05-26T11:05:25Z`, and reran current-main merge-tree plus diff-check against `5014d03`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open and non-draft; PR #27 remains closed / merged. PR #22 / #23 / #26 REST metadata is clean; PR #25 REST mergeability is still `unknown`, but its merge ref exists and local validation passes.
+- Current-main simulation against `5014d03` passes for all four active PRs: PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`; PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`; PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`; PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all `git diff --check` results exit `0`.
+- Recovery assessment: no newer Deputy Codex-2 visible ACK was found after the 11:05 `PENDING_DEPUTY2_ACK` row, and PR #22 / PR #23 / PR #25 / PR #26 have no new issue comments since `2026-05-26T11:05:25Z`. Active Builder work is not missing; this remains Deputy Codex-2 visible ACK recovery followed by Deputy Codex final-gate visibility.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: active-final-gate metadata reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for active PR current-main simulation against latest main `5014d03c1f86aac91ac99cd8e46f4326eacd006e`, including PR #25 clean Codex evidence. If contradictory evidence remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: no duplicate Builder or GitHub chase. Keep the single-primary Deputy Codex-2 ACK request until a visible ACK appears; after Deputy Codex-2 ACK appears, chase Deputy Codex final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or user explicitly requests review.
+
+### 2026-05-26T11:05:25Z - PR #25 post-fix Codex clean found after `6ba84db`
+
+- Workstream: plan-puzzle / active-final-gates / metadata-reconciliation
+- Branch: `origin/main` `6ba84db4c024349528509a8d7843a8f2fd88c781`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CODEX_REVIEW_CLEAN_FOUND / PR25_HEAD_STABLE / CURRENT_MAIN_SIMULATION_PASS / REVIEW_GATE_CLEARED / PENDING_DEPUTY2_ACK / DEPUTY_FINAL_GATE_NEXT`
+- Changed: Executive Officer found the missing post-`607b262` Codex clean result for PR #25: comment `4543568360` at `2026-05-26T10:44:11Z`. This supersedes the 10:47 post-fix-review-pending row while the clean evidence remains current.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open and non-draft; PR #27 remains closed / merged. PR #25 REST reports `mergeable=true` and `mergeable_state=clean`.
+- Current-main simulation against `6ba84db` passes for all four active PRs: PR #22 tree `1b226438e4c409ae825352b4d9e6fb41724cbe5a`; PR #23 tree `b5fa1f78bbc6544d04d53f1d65711e3bcecbc1cc`; PR #25 tree `3f975585ee4ab0d4f003eeefd31af988de933012`; PR #26 tree `51ec97217d9822a1a6e37925a39dfe430b879305`; all `git diff --check` results exit `0`.
+- Recovery assessment: ordinary Plan Puzzle Builder chase is no longer needed while the `607b262` fix and clean Codex review remain current. Next visible step is Deputy Codex-2 validation ACK for PR #25 clean review / current-main simulation, then Deputy Codex final-gate visibility or exact blocker.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: PR #25 post-fix clean review reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` acknowledging PR #25 clean Codex result and active PR current-main simulation against latest main `6ba84db4c024349528509a8d7843a8f2fd88c781`. If contradictory evidence remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: do not chase ordinary Plan Puzzle Builder for PR #25 while clean Codex evidence remains current; chase Deputy Codex-2 ACK next, then Deputy Codex final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or user explicitly requests review.
+
+### 2026-05-26T10:47:18Z - PR #25 Codex P2 repaired; post-fix review pending
+
+- Workstream: plancraft-page-ui / Codex P2 repair recovery
+- Branch: `origin/main` `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`; PR #25 `plancraft/zone-area-boundary-refinement` head `607b2621c97820dc8774831617aba6b59dc984dc`
+- Status: `VALIDATION_REFRESH_FOUND / CODEX_P2_FOUND / WORKFLOW_REPAIR_ATTEMPTED / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REQUESTED / POST_FIX_REVIEW_PENDING / GITHUB_CONNECTOR_TIMEOUT_FALLBACK`
+- Changed: patrol docs only; no source files changed by this Commander patrol.
+- Evidence:
+  - GitHub connector timed out, so patrol used `git ls-remote`, fetched PR refs, local merge-tree / diff-check, and public PR page fallback.
+  - PR #25 head advanced from `7480b24c7b4e23aab5c2783ee6caf21a729b1002` to `607b2621c97820dc8774831617aba6b59dc984dc`.
+  - Public PR page shows a new Codex P2 on reviewed commit `7480b24c7b`: collinear non-adjacent self-overlap / retraced edge was not detected before area estimation.
+  - Plan Puzzle Builder reported a scoped repair: added `doCollinearSegmentsOverlap()` and called it from `hasPolygonSelfIntersection()`, updated `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md`, pushed `607b262`, and requested `@codex review`.
+  - `refs/pull/25/merge` refreshed to `0aaac05d089731d41c57a34b8da9d239f611ce65`; local current-main merge-tree against `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e` exits clean with tree `988d305289a2901b7639064b5779e8d97f564e30`; `git diff --check` exits `0`.
+  - PR #25 diff remains limited to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - No post-`607b262` clean Codex result was visible at patrol time.
+- Decision:
+  - To: Plan Puzzle Builder
+  - Workstream: plancraft-page-ui
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: report the post-`607b262` Codex review result for PR #25, or exact blocker if review does not return.
+  - Why this agent: Plan Puzzle Builder owns Issue #15 / PR #25 and already performed the scoped P2 fix; the next executable artifact is the post-fix Codex result, not Deputy final-gate merge.
+  - Action: publish `CODEX_REVIEW_CLEAN`, `NEEDS_FIX` / `P1` / `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked, latest main SHA `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`, branch SHA `607b2621c97820dc8774831617aba6b59dc984dc`, merge ref `0aaac05d089731d41c57a34b8da9d239f611ce65`, validation result, and PR URL.
+  - Need Commander: No unless requesting merge / reject for PR #25.
+  - Need Reviewer: Yes for Codex P2 re-review result; no separate LAIBE_REVIEWER action unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
 ### 2026-05-26T10:22:27Z - PR #25 repair evidence found on `b489e7a`
 
 - Workstream: plancraft-page-ui / final-gate validation refresh
