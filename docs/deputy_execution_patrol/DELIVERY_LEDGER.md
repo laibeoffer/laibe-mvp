@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T10:22:27Z - PR #25 repair evidence found after `b489e7a`
+
+Status:
+`VALIDATION_REFRESH_FOUND / WORKFLOW_REPAIR_ATTEMPTED_FOUND / PR25_HEAD_ADVANCED / GITHUB_MERGEABLE_CLEAN / CURRENT_MAIN_SIMULATION_PASS / API_LIMIT_FALLBACK_AFTER_PARTIAL_REST / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #25 `plancraft/zone-area-boundary-refinement` latest-main validation refresh after Plan Puzzle Builder repair evidence.
+- Latest checked `origin/main` is `b489e7a320829772e6b89dd2ad8ad548ec339262`.
+- PR #25 branch head advanced from prior ledger head `2fb56655b9d0a4d8d03613f9deee301e047c7966` to `7480b24c7b4e23aab5c2783ee6caf21a729b1002`.
+- GitHub state before API rate-limit fallback: PR #25 is open, non-draft by prior state, `mergeable=true`, `mergeable_state=clean`, and has visible issue comment `4543310426` at `2026-05-26T10:19:29Z` beginning `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`.
+- Current-main merge-tree and diff-check for PR #25 pass against `b489e7a320829772e6b89dd2ad8ad548ec339262`: tree `da8ef4e2c9b3bde98a007df6bc6d2aae17e26fdd`; diff-check exits `0`.
+- PR #25 changed files remain scoped to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- PR #22 / #23 / #26 had no new issue comments after `2026-05-26T10:01:09Z` before API rate-limit fallback; local merge-tree / diff-check still pass against `b489e7a`.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #25 current-main simulation against `b489e7a`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if any blocker remains.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, or scope drifts.
+
 ### 2026-05-26T10:01:09Z - Repeated Deputy2 ACK silence after `dadf4e3`
 
 Status:

@@ -37,6 +37,49 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T10:22:27Z - [PR25_REPAIR_FOUND_B489E7A] - Deputy Codex-2
+
+Status:
+VALIDATION_REFRESH_FOUND / WORKFLOW_REPAIR_ATTEMPTED_FOUND / PR25_HEAD_ADVANCED / GITHUB_MERGEABLE_CLEAN / CURRENT_MAIN_SIMULATION_PASS / PENDING_DEPUTY2_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+plancraft-page-ui / PR #25 latest-main validation refresh
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+Plan Puzzle Builder produced a new visible repair artifact for PR #25. The branch head advanced and GitHub now reports PR #25 as clean before API rate-limit fallback. Local current-main simulation against latest `origin/main` also passes.
+
+Evidence:
+- Latest checked `origin/main`: `b489e7a320829772e6b89dd2ad8ad548ec339262`.
+- PR #25 head: `7480b24c7b4e23aab5c2783ee6caf21a729b1002`.
+- New visible comment: `4543310426` by `laibeoffer`, created `2026-05-26T10:19:29Z`, beginning `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`.
+- GitHub REST before rate-limit fallback: `mergeable=true`, `mergeable_state=clean`, `updated_at=2026-05-26T10:24:10Z`.
+- Local merge-tree tree: `da8ef4e2c9b3bde98a007df6bc6d2aae17e26fdd`; `git diff --check` exits `0`.
+- Changed files: `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+
+Action already taken:
+Commander patrol published this docs-only status update and stopped ordinary Plan Puzzle Builder chase for this evidence. No source files changed. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #25 against `b489e7a`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if any blocker remains.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / P1 / P2 or scope drift appears.
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
 ### 2026-05-26T10:01:09Z - [REPEATED_DEPUTY2_ACK_SILENCE_DADF4E3] - Deputy Codex-2
 
 Status:
