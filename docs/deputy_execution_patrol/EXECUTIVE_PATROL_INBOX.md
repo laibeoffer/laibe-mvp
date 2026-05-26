@@ -37,6 +37,49 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T08:36:24Z - [PR25_REFRESH_GPU_BRANCH_GATE_2781E2F] - Deputy Codex-2
+
+Status:
+PR25_HEAD_ADVANCED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / LOCAL_GPU_BRANCH_PUSHED_NOT_MAIN_READY / PENDING_DEPUTY2_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+active final gates / metadata ACK recovery / local GPU worker governance visibility
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / PR #26, with PR #22 / PR #25 checked for stable final-gate context; `origin/local-ai-workflow` checked for Local GPU Worker status
+
+Finding:
+Latest checked `origin/main` is `2781e2f03ad67f534a113151e32854ded36c8caa`. PR #25 advanced to `2fb56655b9d0a4d8d03613f9deee301e047c7966`, REST reports clean mergeability, and latest Codex review reports no major issues. Current-main merge-tree and diff-check pass for all four active PRs. `origin/local-ai-workflow` contains the Local GPU Worker entrypoint commit `91da4f3`, but the branch is not clean-main-ready because its diff from main is broad.
+
+Evidence:
+- Issues #15 / #16 / #17 / #18 remain open.
+- PR heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- PR #25 Codex clean comment: `4542137002` at `2026-05-26T08:29:55Z`.
+- Merge-tree / diff-check against `2781e2f`: PR #22 tree `7ee472b11006a57440611b493064c075e4ac2028`; PR #23 tree `94f1bbb431bcbf59884e78998b36b11e0350a15d`; PR #25 tree `14b96db89128c0cbfe60232f15b376179e3a9fb8`; PR #26 tree `85b27cc17659245b0528fd2a60d97757ef85de7a`; all diff-check exits `0`.
+- `origin/main:AGENTS.md` does not contain the Local GPU Worker section; `origin/local-ai-workflow:AGENTS.md` does contain it.
+- `origin/local-ai-workflow` includes `scripts/gpu-readonly.ps1` and `scripts/gpu-readonly.bat`, but diff from `origin/main` includes more than the three intended worker files.
+
+Action already taken:
+Commander patrol published this docs-only reconciliation. No source files, secrets, payment/auth/webhook files, package files, merge, close, or destructive git actions were touched.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `2781e2f`, include PR #25 head `2fb5665` refresh, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains. Deputy Codex should keep Local GPU Worker as `PUSHED_NOT_MAIN_READY` and require a clean main-based path before adoption.
+
+Need Commander:
+No for ACK routing. Yes before Local GPU Worker final adoption / merge into `main`.
+
+Need Reviewer:
+No
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
 ### 2026-05-26T07:47:53Z - [DEPUTY2_ACK_RECOVERY_DCA29B3] - Deputy Codex-2
 
 Status:

@@ -42,6 +42,29 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T08:36:24Z - PR #25 refresh and Local GPU Worker branch gate against `2781e2f`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / LOCAL_GPU_BRANCH_PUSHED_NOT_MAIN_READY / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility, now with refreshed PR #25 final-gate context. This remains a patrol / metadata ACK problem, not ordinary Builder missing work.
+- Latest checked `origin/main` is `2781e2f03ad67f534a113151e32854ded36c8caa`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #25 REST reports `mergeable=true` / `mergeable_state=clean`; latest Codex review comment `4542137002` at `2026-05-26T08:29:55Z` reports no major issues.
+- Current-main merge-tree and diff-check pass for all four active PRs against `2781e2f03ad67f534a113151e32854ded36c8caa`: PR #22 tree `7ee472b11006a57440611b493064c075e4ac2028`; PR #23 tree `94f1bbb431bcbf59884e78998b36b11e0350a15d`; PR #25 tree `14b96db89128c0cbfe60232f15b376179e3a9fb8`; PR #26 tree `85b27cc17659245b0528fd2a60d97757ef85de7a`; all diff-check exits `0`.
+- Local GPU Worker state: `origin/local-ai-workflow` is pushed at `91da4f3e54b423ac84cc9a3d3136707dd8425412` and contains `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`, but `origin/main` does not yet contain the Local GPU Worker section. Diff from `origin/main` to `origin/local-ai-workflow` is broad, so the branch is not clean-main-ready and must not be merged as-is for worker adoption.
+- Required visible follow-up remains: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `2781e2f`, include PR #25 head `2fb5665` refresh, or publish exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains.
+- After Deputy Codex-2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26 and for the Local GPU Worker clean-main adoption route.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing. Yes before final Local GPU Worker adoption or merge into `main`.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
 ### 2026-05-26T07:47:53Z - Executive visible ACK recovery after automation prompt repair against `dca29b3`
 
 Status:

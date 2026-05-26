@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T08:36:24Z - [PR25_REFRESH_GPU_BRANCH_GATE_2781E2F] - Active final gates / Local GPU Worker
+
+Status:
+ON_TRACK / PR25_HEAD_ADVANCED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / LOCAL_GPU_BRANCH_PUSHED_NOT_MAIN_READY / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / PR #26 metadata reconciliation ACK visibility, refreshed PR #25 context, and `origin/local-ai-workflow` Local GPU Worker branch gate
+
+Evidence:
+Latest checked `origin/main` is `2781e2f03ad67f534a113151e32854ded36c8caa`. Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #25 advanced to `2fb56655b9d0a4d8d03613f9deee301e047c7966`, reports clean mergeability, and has latest Codex clean comment `4542137002` at `2026-05-26T08:29:55Z`. Current-main merge-tree and diff-check pass for all four against `2781e2f`: PR #22 tree `7ee472b11006a57440611b493064c075e4ac2028`; PR #23 tree `94f1bbb431bcbf59884e78998b36b11e0350a15d`; PR #25 tree `14b96db89128c0cbfe60232f15b376179e3a9fb8`; PR #26 tree `85b27cc17659245b0528fd2a60d97757ef85de7a`; all diff-check exits `0`. `origin/local-ai-workflow` is pushed at `91da4f3e54b423ac84cc9a3d3136707dd8425412` and contains Local GPU Worker rules/scripts, but it is not clean-main-ready because its diff from `origin/main` includes more than `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`.
+
+Recommended Executive Action:
+Keep one single-primary `To: Deputy Codex-2` visible ACK request. Do not chase ordinary Builders or post duplicate GitHub comments while validation and scope evidence remain clean.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `2781e2f`, include PR #25 head `2fb5665` refresh, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains. Classify `local-ai-workflow` as `NEEDS_DEPUTY_DECISION / CLEAN_BRANCH_REQUIRED`; do not merge it as-is.
+
+Need Commander:
+No for ACK routing. Yes before Local GPU Worker final adoption / merge into `main`.
+
+Need Reviewer:
+No
+
 ### 2026-05-26T07:47:53Z - [DEPUTY2_ACK_RECOVERY_DCA29B3] - Deputy Codex-2
 
 Status:
