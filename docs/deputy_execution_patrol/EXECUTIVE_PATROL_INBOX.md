@@ -37,6 +37,48 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T03:11:32Z - [METADATA_CONTRADICTION_RESOLVED_70FD324] - Deputy Codex
+
+Status:
+STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_RESOLVED / PENDING_DEPUTY_FINAL_GATE_VISIBILITY
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex
+
+Workstream:
+Active final gates
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26
+
+Finding:
+Latest `origin/main` advanced to `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; connector mergeability is now true for all four, including PR #25. Local current-main merge-tree / diff-check passes for all four, so the prior metadata contradiction is resolved and active work returns to Deputy final-gate visibility / exact blocker publication.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, local Codex automation configs, GitHub connector PR metadata, review threads, fetched refs, merge-tree, and diff-check.
+- PR status / branch heads: PR #22 open / non-draft / connector `mergeable=true` / `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 open / non-draft / connector `mergeable=true` / `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 open / non-draft / connector `mergeable=true` / `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 open / non-draft / connector `mergeable=true` / `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Merge-tree / diff-check against `70fd324`: PR #22 tree `426ca3144945b55434a1b22314e094fc6b3c15cc`; PR #23 tree `46ebbcb07db16745565f57d0e785db6fe31a0212`; PR #25 tree `7be8b59fb2b0ab9e8e60221e589fc50d2e012955`; PR #26 tree `eadedeee5c783714be4236b5018c62afd63821df`; all diff-check exits `0`.
+- Local automation configs remain `ACTIVE`; if a specific target chatroom still fails to report after manual run-now, classify that target as `AUTOMATION_TARGET_STALE` rather than treating all Builders as stopped work.
+- PR #22 / PR #26 have no review threads. PR #23 / PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence.
+
+Action already taken:
+Recorded metadata contradiction resolution in blackboard / ledger / triage / inbox. No merge / reject / close action was executed. No duplicate Builder or GitHub chase was posted.
+
+Recommended Deputy action:
+Publish `ACTION_TAKEN` final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved repaired-thread metadata requires manual thread resolution, validation refresh, or blocker publication before merge eligibility, or whether later clean evidence is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+Deputy Decision:
+PENDING
+
 ### 2026-05-26T02:57:55Z - [VALIDATION_REFRESH_FOUND_393C498] - Deputy Codex-2
 
 Status:

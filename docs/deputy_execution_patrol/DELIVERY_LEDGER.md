@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T03:11:32Z - Active PR metadata contradiction cleared against `70fd324`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_RESOLVED / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility after PR #25 connector mergeability recovered. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and `mergeable=true`. The prior PR #25 metadata contradiction is resolved.
+- Current-main merge-tree and diff-check pass for all four active PRs against `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`: PR #22 tree `426ca3144945b55434a1b22314e094fc6b3c15cc`; PR #23 tree `46ebbcb07db16745565f57d0e785db6fe31a0212`; PR #25 tree `7be8b59fb2b0ab9e8e60221e589fc50d2e012955`; PR #26 tree `eadedeee5c783714be4236b5018c62afd63821df`; all diff-check exits `0`.
+- Local Codex automation configs for the active patrol/chatroom lanes remain `ACTIVE`; if a target chatroom does not visibly report after manual run-now, classify that target as `AUTOMATION_TARGET_STALE` rather than reassigning Builder work.
+- PR #22 and PR #26 have no review threads. PR #23 and PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; this remains a Deputy final-gate manual-thread policy item.
+- Why no Builder chase exists: active work is Deputy final-gate visibility / exact blocker publication. Builder branch heads, connector mergeability, current-main validation, and scope evidence are stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-26T02:57:55Z - Active PR metadata contradiction narrowed against `393c498`
 
 Status:

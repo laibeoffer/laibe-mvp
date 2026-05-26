@@ -1345,6 +1345,22 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T03:11:32Z - Metadata contradiction cleared after `70fd324`
+
+- Workstream: deputy-codex / active-final-gates / automation-delivery-check
+- Branch: `origin/main` `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_RESOLVED / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, local Codex automation configs, GitHub connector PR metadata, review threads, fetched PR refs, current-main merge-tree, and diff-check.
+- Automation finding: local Codex automation configs for Commander, Executive Officer, Deputy Codex-2, Triage Officer, Governance Patrol, MethodSpec, Plan Puzzle, Raw Material, Output Documents, Quote Factory, Visual Simulation, and Reviewer remain `ACTIVE`. If a target chatroom still does not display `Source: ... Round Result:` after manual "run now", treat that specific target as `AUTOMATION_TARGET_STALE`; do not assume all Builders need new work.
+- GitHub status: PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and connector `mergeable=true`. The prior PR #25 metadata contradiction is cleared. Issue-state evidence remains previous patrol evidence unless contradicted by a newer Issue check: #15 / #16 / #17 / #18 open and #19 closed/completed.
+- Current-main simulation against `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0` passes for all four active PRs: PR #22 tree `426ca3144945b55434a1b22314e094fc6b3c15cc`; PR #23 tree `46ebbcb07db16745565f57d0e785db6fe31a0212`; PR #25 tree `7be8b59fb2b0ab9e8e60221e589fc50d2e012955`; PR #26 tree `eadedeee5c783714be4236b5018c62afd63821df`; all diff-check exits `0`.
+- Review-thread state: PR #22 / PR #26 have no review threads. PR #23 and PR #25 still have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; this is now a Deputy final-gate manual-thread policy item, not a metadata blocker and not an ordinary Builder chase.
+- Primary To: Deputy Codex.
+- Action: publish `ACTION_TAKEN` final-gate decision visibility or an exact blocker for PR #22 / PR #23 / PR #25 / PR #26. Do not loop back to ordinary Builder chase while branch heads, mergeability, validation, Codex evidence, and scope evidence remain stable. If automation silence persists, prioritize Deputy Codex-2 / Executive Officer / Triage Officer / Governance Patrol target-staleness checks before reworking Builder prompts.
+- Need Commander: No
+- Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-26T02:57:55Z - Metadata contradiction narrowed after `393c498`
 
 - Workstream: deputy-codex-2 / active-final-gates

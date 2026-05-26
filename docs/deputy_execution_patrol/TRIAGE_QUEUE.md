@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T03:11:32Z - [METADATA_CONTRADICTION_RESOLVED_70FD324] - Deputy Codex
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_RESOLVED / NEEDS_DEPUTY_FINAL_GATE_VISIBILITY
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26
+
+Evidence:
+Latest `origin/main` is `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector reports all four PRs open / non-draft / `mergeable=true`. Current-main merge-tree and diff-check pass for all four against `70fd324`: PR #22 tree `426ca3144945b55434a1b22314e094fc6b3c15cc`; PR #23 tree `46ebbcb07db16745565f57d0e785db6fe31a0212`; PR #25 tree `7be8b59fb2b0ab9e8e60221e589fc50d2e012955`; PR #26 tree `eadedeee5c783714be4236b5018c62afd63821df`; all diff-check exits `0`. Local automation configs remain `ACTIVE`, but target chatrooms that fail to visibly report after manual run-now should be classified individually as `AUTOMATION_TARGET_STALE`.
+
+Recommended Executive Action:
+No duplicate GitHub or Builder chase while branch heads, mergeability, validation, and Codex evidence remain stable. If visible silence persists, chase only the patrol chain for `AUTOMATION_TARGET_STALE` evidence.
+
+Recommended Deputy Action:
+Deputy Codex should publish `ACTION_TAKEN` final-gate decision visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. For PR #23 and PR #25, explicitly decide whether unresolved repaired-thread metadata requires manual resolution before final gate or whether later clean evidence is sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-26T02:57:55Z - [VALIDATION_REFRESH_FOUND_393C498] - Deputy Codex-2
 
 Status:
