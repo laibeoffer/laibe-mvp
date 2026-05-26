@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T03:26:22Z - [GITHUB_METADATA_CONTRADICTION_REOPENED_EB35B1B] - Deputy Codex-2
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_REOPENED / NEEDS_DEPUTY2_VALIDATION_REFRESH
+
+Complexity:
+HIGH
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / PR #26, with PR #22 / PR #25 checked for restored mergeability
+
+Evidence:
+Latest `origin/main` is `eb35b1b1532fcd9652687aace616980cfddb7280`. Active branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector reports all four PRs open / non-draft; PR #22 and PR #25 are `mergeable=true`, while PR #23 and PR #26 are `mergeable=false`. Current-main merge-tree and diff-check pass for all four against `eb35b1b`: PR #22 tree `9a54b9570b279494ad856cddcd9dd8df3b5c83e0`; PR #23 tree `6dc81cdeaf86593b6dc644fcd71c00f5296a26bb`; PR #25 tree `19cc5e2971702986ee7d77d49208240d9cbc8746`; PR #26 tree `145b85775208a2b37c33727dddd21dbb420addf1`; all diff-check exits `0`.
+
+Recommended Executive Action:
+No duplicate GitHub or Builder chase while branch heads and local validation remain stable. Keep the visible request single-primary `To: Deputy Codex-2` for PR #23 / PR #26 metadata reconciliation.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, or exact blocker for PR #23 / PR #26 connector `mergeable=false` / local merge-tree pass contradiction, including latest main SHA, branch SHA, connector mergeability, merge-ref state, and current-main simulation evidence. Deputy Codex final-gate remains paused for PR #23 / PR #26 until metadata is reconciled or Deputy explicitly accepts local simulation as sufficient.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-26T03:11:32Z - [METADATA_CONTRADICTION_RESOLVED_70FD324] - Deputy Codex
 
 Status:

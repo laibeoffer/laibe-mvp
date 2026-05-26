@@ -1345,6 +1345,21 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T03:26:22Z - Metadata contradiction reappeared after `eb35b1b`
+
+- Workstream: deputy-codex-2 / active-final-gates / automation-delivery-check
+- Branch: `origin/main` `eb35b1b1532fcd9652687aace616980cfddb7280`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_REOPENED / DEPUTY2_VALIDATION_REFRESH_REQUIRED / DEPUTY_FINAL_GATE_PAUSED`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, delivery ledger, triage queue, Executive inbox, GitHub connector PR metadata, fetched PR refs, current-main merge-tree, and diff-check.
+- GitHub status: PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. Connector reports PR #22 `mergeable=true`, PR #23 `mergeable=false`, PR #25 `mergeable=true`, and PR #26 `mergeable=false`, while local current-main simulation passes for all four. Treat PR #23 / PR #26 as GitHub metadata / merge-ref contradiction until Deputy Codex-2 refreshes or publishes exact blocker evidence.
+- Current-main simulation against `eb35b1b1532fcd9652687aace616980cfddb7280` passes for all four active PRs: PR #22 tree `9a54b9570b279494ad856cddcd9dd8df3b5c83e0`; PR #23 tree `6dc81cdeaf86593b6dc644fcd71c00f5296a26bb`; PR #25 tree `19cc5e2971702986ee7d77d49208240d9cbc8746`; PR #26 tree `145b85775208a2b37c33727dddd21dbb420addf1`; all diff-check exits `0`.
+- Automation finding: local automation configs remained `ACTIVE` in the prior patrol; this cycle found no new automation-config deletion evidence. If a target chatroom still does not display `Source: ... Round Result:` after manual run-now, classify that target individually as `AUTOMATION_TARGET_STALE`.
+- Primary To: Deputy Codex-2.
+- Action: publish visible `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` for the PR #23 / PR #26 connector `mergeable=false` versus local current-main PASS contradiction. Do not loop PR #23 / PR #26 back to ordinary Builders while branch heads, local validation, and scope evidence remain stable.
+- Need Commander: No
+- Need Reviewer: No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-26T03:11:32Z - Metadata contradiction cleared after `70fd324`
 
 - Workstream: deputy-codex / active-final-gates / automation-delivery-check

@@ -42,6 +42,26 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T03:26:22Z - Active PR metadata contradiction reopened against `eb35b1b`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_REOPENED / DEPUTY2_VALIDATION_REFRESH_REQUIRED / DEPUTY_FINAL_GATE_PAUSED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 GitHub metadata / merge-ref reconciliation before Deputy Codex final-gate visibility. PR #22 / PR #25 connector mergeability remains restored. Do not loop PR #23 / PR #26 back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `eb35b1b1532fcd9652687aace616980cfddb7280`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. Connector mergeability: PR #22 `true`; PR #23 `false`; PR #25 `true`; PR #26 `false`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `eb35b1b1532fcd9652687aace616980cfddb7280`: PR #22 tree `9a54b9570b279494ad856cddcd9dd8df3b5c83e0`; PR #23 tree `6dc81cdeaf86593b6dc644fcd71c00f5296a26bb`; PR #25 tree `19cc5e2971702986ee7d77d49208240d9cbc8746`; PR #26 tree `145b85775208a2b37c33727dddd21dbb420addf1`; all diff-check exits `0`.
+- Why no merge / reject / close exists: PR #23 / PR #26 connector metadata contradicts local current-main simulation. Deputy Codex-2 owns LOW / MEDIUM GitHub / branch / worktree reconciliation before Deputy Codex can publish final-gate visibility for those PRs.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
 ### 2026-05-26T03:11:32Z - Active PR metadata contradiction cleared against `70fd324`
 
 Status:

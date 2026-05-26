@@ -37,6 +37,46 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T03:26:22Z - [GITHUB_METADATA_CONTRADICTION_REOPENED_EB35B1B] - Deputy Codex-2
+
+Status:
+STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_REOPENED / PENDING_DEPUTY2_VALIDATION_REFRESH
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+Active final gates
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #23 / PR #26
+
+Finding:
+Latest `origin/main` advanced to `eb35b1b1532fcd9652687aace616980cfddb7280`. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; connector mergeability is now true for PR #22 / PR #25 but false for PR #23 / PR #26. Local current-main merge-tree / diff-check passes for all four, so the metadata contradiction has reopened for PR #23 / PR #26 and needs Deputy Codex-2 visible validation refresh or exact blocker.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, delivery ledger, triage queue, Executive inbox, GitHub connector PR metadata, fetched refs, merge-tree, and diff-check.
+- PR status / branch heads: PR #22 open / non-draft / connector `mergeable=true` / `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 open / non-draft / connector `mergeable=false` / `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 open / non-draft / connector `mergeable=true` / `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 open / non-draft / connector `mergeable=false` / `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Merge-tree / diff-check against `eb35b1b`: PR #22 tree `9a54b9570b279494ad856cddcd9dd8df3b5c83e0`; PR #23 tree `6dc81cdeaf86593b6dc644fcd71c00f5296a26bb`; PR #25 tree `19cc5e2971702986ee7d77d49208240d9cbc8746`; PR #26 tree `145b85775208a2b37c33727dddd21dbb420addf1`; all diff-check exits `0`.
+
+Action already taken:
+Recorded `GITHUB_METADATA_CONTRADICTION_REOPENED` in blackboard / ledger / triage / inbox, refreshed validation against `eb35b1b`, kept the visible request single-primary `To: Deputy Codex-2`, and did not post duplicate GitHub comments. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, or exact blocker for PR #23 / PR #26 connector `mergeable=false` / local merge-tree pass contradiction, including latest main SHA, branch SHA, connector mergeability, merge-ref state, and current-main simulation evidence. After reconciliation, Deputy Codex can resume final-gate visibility and manual-thread policy decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
 ### 2026-05-26T03:11:32Z - [METADATA_CONTRADICTION_RESOLVED_70FD324] - Deputy Codex
 
 Status:
