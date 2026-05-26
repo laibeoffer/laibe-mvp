@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T07:24:01Z - Commander direct order after chatroom recovery against `913ccc5`
+
+Status:
+`CHATROOM_RECOVERY_CONFIRMED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DIRECT_ORDERS_PUBLISHED / DEPUTY2_ACK_REQUIRED / DEPUTY_FINAL_GATE_NEXT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. This remains a patrol/metadata ACK problem, not ordinary Builder missing work.
+- Latest checked `origin/main` is `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. REST mergeability returned transient `null`, but merge refs exist for all four active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`: PR #22 tree `f127e4854fd3f8112add696dbbfb714a4522ba3e`; PR #23 tree `7584f780a951d057e60ff8c6f40b22a5a88df13b`; PR #25 tree `c572ccf97df46a186512c5aafc13fa623b20d756`; PR #26 tree `b5a5d410e2de79304562b8430c61fbe92083492c`; all diff-check exits `0`.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `913ccc5`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains.
+- After Deputy Codex-2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, or scope drifts.
+
 ### 2026-05-26T06:59:41Z - Deputy2 ACK recovery after automation run-now check against `3528ae0`
 
 Status:

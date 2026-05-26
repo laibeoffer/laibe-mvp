@@ -1345,6 +1345,79 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T07:24:01Z - Commander direct orders after chatroom recovery
+
+- Workstream: commander / active-final-gates / visible-chatroom-recovery
+- Branch: `origin/main` `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `CHATROOM_RECOVERY_CONFIRMED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DIRECT_ORDERS_PUBLISHED / DEPUTY2_ACK_REQUIRED / DEPUTY_FINAL_GATE_NEXT`
+- Changed: Commander reports chatrooms have recovered. Patrol re-fetched `origin/main`, verified latest main advanced to `913ccc5`, checked GitHub open PRs / open Issues / PR refs, fetched PR heads, and reran current-main merge-tree plus diff-check.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / #23 / #25 / #26 remain open and non-draft. GitHub REST mergeability returned transient `null`, but current merge refs exist for all four active PRs.
+- Current-main simulation against `913ccc5` passes for all four active PRs: PR #22 tree `f127e4854fd3f8112add696dbbfb714a4522ba3e`; PR #23 tree `7584f780a951d057e60ff8c6f40b22a5a88df13b`; PR #25 tree `c572ccf97df46a186512c5aafc13fa623b20d756`; PR #26 tree `b5a5d410e2de79304562b8430c61fbe92083492c`; all `git diff --check` results exit `0`.
+- Recovery assessment: active Builder work is not missing. The current blocker is visible Deputy Codex-2 metadata ACK, followed by Deputy Codex final-gate visibility / exact blocker publication. No new feature dispatch is authorized.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: active-final-gate metadata reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for PR #23 / PR #26 against latest main `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`, citing branch heads, merge refs, merge-tree PASS, and diff-check PASS. If contradictory GitHub metadata remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`. Do not route PR #23 / PR #26 back to ordinary Builders while branch heads and validation remain stable.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Deputy Codex.
+  Workstream: final-gate visibility.
+  Action: after Deputy Codex-2 ACK, publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26. Reconfirm no branch-head change, scope drift, new Codex `NEEDS_FIX` / P1 / P2, or validation contradiction. Do not execute merge / reject / close inside patrol.
+  Need Commander: No for visibility; Yes before any merge / reject / close outside automatic clean-scope rules.
+  Need Reviewer: No unless evidence changes.
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: chase only Deputy Codex-2 ACK next. After Deputy Codex-2 ACK appears, chase Deputy Codex final-gate visibility. Do not chase ordinary Builders or post duplicate GitHub comments while current evidence remains stable.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Triage Officer.
+  Workstream: queue classification.
+  Action: classify PR #23 / PR #26 as `NEEDS_DEPUTY2_ACK`, PR #22 / PR #25 as `NEEDS_DEPUTY_FINAL_GATE_VISIBILITY`, and Builders as no-new-work unless branch / review / validation evidence changes. Do not let `API_LIMIT_FALLBACK` override ledger and current merge-tree evidence.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Governance Patrol.
+  Workstream: automation / visible heartbeat governance.
+  Action: since Commander reports chatrooms recovered, stop global-stale escalation. If any individual room fails its next visible heartbeat after run-now, mark only that room `AUTOMATION_TARGET_STALE`; otherwise enforce required ACK labels and no-idle rules.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Plan Puzzle Builder.
+  Workstream: PR #25 / Issue #15.
+  Action: no new implementation. If heartbeat asks for status, report `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main `913ccc5`, branch `1835e292caea35b4758276c7002c09d2e9c1dada`, merge-tree PASS, diff-check PASS, and wait for Deputy final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Output Documents Builder.
+  Workstream: PR #23 / Issue #18.
+  Action: no new implementation. If heartbeat asks for status, report `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main `913ccc5`, branch `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, merge-tree PASS, diff-check PASS, and wait for Deputy2 ACK / Deputy final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: MethodSpec Builder.
+  Workstream: PR #22 / Issue #16.
+  Action: no new implementation. If heartbeat asks for status, report `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main `913ccc5`, branch `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, merge-tree PASS, diff-check PASS, and wait for Deputy final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Raw Candidate Builder.
+  Workstream: PR #26 / Issue #17.
+  Action: no new implementation. If heartbeat asks for status, report `NO_NEW_EVIDENCE_AFTER_CHECK` with latest main `913ccc5`, branch `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`, merge-tree PASS, diff-check PASS, and wait for Deputy2 ACK / Deputy final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Visual Simulation.
+  Workstream: Issue #19 / PR #24.
+  Action: remain completed / waiting next scoped task. Do not restart #19 / #24, do not delete heartbeat automation, and do not begin image API / upload / production asset work.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Quote Factory Builder.
+  Workstream: QF5.3 / QF5.4.
+  Action: keep QF5.3 closed / completed and do not start QF5.4 without a new scoped dispatch. If asked for status, report completed waiting next scoped task.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No for recovery and visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, repair scope drifts, or a final-gate policy decision explicitly requests review.
+
 ### 2026-05-26T06:59:41Z - Deputy2 ACK recovery after automation run-now check
 
 - Workstream: executive-visible-ack-recovery / deputy-codex-2 / active-final-gates

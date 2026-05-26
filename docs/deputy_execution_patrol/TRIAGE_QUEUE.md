@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T07:24:01Z - [COMMANDER_DIRECT_ORDER_913CCC5] - Deputy Codex-2
+
+Status:
+ON_TRACK / CHATROOM_RECOVERY_CONFIRMED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / PR #26 metadata reconciliation ACK visibility, with PR #22 / PR #25 final-gate context checked
+
+Evidence:
+Latest checked `origin/main` is `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; Issues #15 / #16 / #17 / #18 remain open. Branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Current-main merge-tree and diff-check pass for all four against `913ccc5`: PR #22 tree `f127e4854fd3f8112add696dbbfb714a4522ba3e`; PR #23 tree `7584f780a951d057e60ff8c6f40b22a5a88df13b`; PR #25 tree `c572ccf97df46a186512c5aafc13fa623b20d756`; PR #26 tree `b5a5d410e2de79304562b8430c61fbe92083492c`; all diff-check exits `0`.
+
+Recommended Executive Action:
+Chase only Deputy Codex-2 ACK next. Do not chase ordinary Builders or duplicate GitHub comments while branch heads, validation, and scope evidence remain stable.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `913ccc5`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains. After that ACK, Deputy Codex should publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T06:59:41Z - [DEPUTY2_ACK_RECOVERY_3528AE0] - Deputy Codex-2
 
 Status:
