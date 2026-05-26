@@ -1345,6 +1345,22 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T06:59:41Z - Deputy2 ACK recovery after automation run-now check
+
+- Workstream: executive-visible-ack-recovery / deputy-codex-2 / active-final-gates
+- Branch: `origin/main` `3528ae0bf6e60d400365a5c0d13deeaba891878b`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / AUTOMATION_CHECKED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_STABLE_AFTER_RETRY / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, local automation config, GitHub connector PR metadata, REST PR / Issue metadata, PR comments, review threads, fetched PR refs, current-main merge-tree, and diff-check.
+- Automation status: `laibe-mvp-executor-patrol` remains `ACTIVE` as heartbeat `laibe-executive-officer-10min-patrol` with `RRULE:FREQ=MINUTELY;INTERVAL=9`; no automation deletion or mutation was needed.
+- GitHub status: PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and final reconciled metadata is `mergeable=true`. Connector initially returned stale `mergeable=false` for PR #22 / PR #25, but REST metadata and connector retry both confirmed `mergeable=true`. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed/completed.
+- Current-main simulation against `3528ae0bf6e60d400365a5c0d13deeaba891878b` passes for all four active PRs: PR #22 tree `22e10701e2731dc807e05692cc0335ac30bf3ea6`; PR #23 tree `a427e3e67dabbbfacdfe16fa959accf5855b375c`; PR #25 tree `8b7bcb3477a4cc2621e05abec07611982274939d`; PR #26 tree `14a7b02844364bb4a4f0437ee478874688f66c69`; all diff-check exits `0`.
+- Visible ACK recovery: latest visible Deputy2-target row remains the 2026-05-26T04:43:22Z `PENDING_DEPUTY2_ACK`; no newer visible Deputy Codex-2 `VALIDATION_REFRESH_FOUND`, `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX` ACK was found in blackboard, delivery ledger, triage queue, or Executive inbox.
+- Primary To: Deputy Codex-2.
+- Action: publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `3528ae0`, or publish exact `BLOCKER_WITH_ATTEMPTED_FIX` if Deputy Codex-2 still sees contradictory merge-ref evidence. Do not chase ordinary Builders and do not post duplicate GitHub comments while branch heads, scope, metadata, and local validation remain stable.
+- Need Commander: No
+- Need Reviewer: No
+
 ### 2026-05-26T04:43:22Z - Deputy2 ACK recovery after `d6baa1e`
 
 - Workstream: executive-visible-ack-recovery / deputy-codex-2 / active-final-gates

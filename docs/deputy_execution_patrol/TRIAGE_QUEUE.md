@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T06:59:41Z - [DEPUTY2_ACK_RECOVERY_3528AE0] - Deputy Codex-2
+
+Status:
+ON_TRACK / AUTOMATION_CHECKED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_STABLE_AFTER_RETRY / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / PR #26 metadata reconciliation ACK visibility
+
+Evidence:
+Latest checked `origin/main` is `3528ae0bf6e60d400365a5c0d13deeaba891878b`. Automation `laibe-mvp-executor-patrol` remains `ACTIVE` as heartbeat `laibe-executive-officer-10min-patrol` with `RRULE:FREQ=MINUTELY;INTERVAL=9`. PR #22 / PR #23 / PR #25 / PR #26 remain open / non-draft / final reconciled `mergeable=true`; REST and connector retry cleared the transient PR #22 / PR #25 stale `mergeable=false` response. Current-main merge-tree and diff-check pass for all four against `3528ae0`: PR #22 tree `22e10701e2731dc807e05692cc0335ac30bf3ea6`; PR #23 tree `a427e3e67dabbbfacdfe16fa959accf5855b375c`; PR #25 tree `8b7bcb3477a4cc2621e05abec07611982274939d`; PR #26 tree `14a7b02844364bb4a4f0437ee478874688f66c69`; all diff-check exits `0`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed. No newer visible Deputy Codex-2 ACK was found in blackboard, delivery ledger, triage queue, or Executive inbox.
+
+Recommended Executive Action:
+No duplicate Builder or GitHub chase. Keep the visible request single-primary `To: Deputy Codex-2` for PR #23 / PR #26 ACK visibility.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 connector metadata recovery against `3528ae0`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence still exists. After visible ACK, Deputy Codex can resume final-gate visibility handling.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T04:43:22Z - [DEPUTY2_ACK_RECOVERY_D6BAA1E] - Deputy Codex-2
 
 Status:

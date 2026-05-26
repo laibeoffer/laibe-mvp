@@ -42,6 +42,29 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T06:59:41Z - Deputy2 ACK recovery after automation run-now check against `3528ae0`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_CHECKED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_STABLE_AFTER_RETRY / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. This is not ordinary Builder missing work; branch heads, PR scope, GitHub metadata after retry, and local current-main simulation remain stable.
+- Latest checked `origin/main` is `3528ae0bf6e60d400365a5c0d13deeaba891878b`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Automation check: `laibe-mvp-executor-patrol` remains `ACTIVE` as heartbeat `laibe-executive-officer-10min-patrol` with `RRULE:FREQ=MINUTELY;INTERVAL=9`.
+- GitHub metadata: PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and final reconciled state is `mergeable=true`; REST and connector retry cleared the transient PR #22 / PR #25 stale `mergeable=false` response.
+- Current-main merge-tree and diff-check pass for all four active PRs against `3528ae0bf6e60d400365a5c0d13deeaba891878b`: PR #22 tree `22e10701e2731dc807e05692cc0335ac30bf3ea6`; PR #23 tree `a427e3e67dabbbfacdfe16fa959accf5855b375c`; PR #25 tree `8b7bcb3477a4cc2621e05abec07611982274939d`; PR #26 tree `14a7b02844364bb4a4f0437ee478874688f66c69`; all diff-check exits `0`.
+- Latest visible Deputy2-target row remains `PENDING_DEPUTY2_ACK`; no newer Deputy Codex-2 visible ACK was found in blackboard / ledger / triage / Executive inbox.
+- Required visible follow-up: Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `3528ae0`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains.
+- Why no Builder chase exists: PR #23 / PR #26 are metadata reconciliation / ACK visibility, not missing Builder output. Do not post duplicate GitHub comments while branch heads, scope evidence, metadata, and local validation remain stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T04:43:22Z - Deputy2 ACK recovery after metadata resolution against `d6baa1e`
 
 Status:
