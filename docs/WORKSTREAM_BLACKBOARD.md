@@ -1345,6 +1345,30 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T10:47:18Z - PR #25 Codex P2 repaired; post-fix review pending
+
+- Workstream: plancraft-page-ui / Codex P2 repair recovery
+- Branch: `origin/main` `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`; PR #25 `plancraft/zone-area-boundary-refinement` head `607b2621c97820dc8774831617aba6b59dc984dc`
+- Status: `VALIDATION_REFRESH_FOUND / CODEX_P2_FOUND / WORKFLOW_REPAIR_ATTEMPTED / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REQUESTED / POST_FIX_REVIEW_PENDING / GITHUB_CONNECTOR_TIMEOUT_FALLBACK`
+- Changed: patrol docs only; no source files changed by this Commander patrol.
+- Evidence:
+  - GitHub connector timed out, so patrol used `git ls-remote`, fetched PR refs, local merge-tree / diff-check, and public PR page fallback.
+  - PR #25 head advanced from `7480b24c7b4e23aab5c2783ee6caf21a729b1002` to `607b2621c97820dc8774831617aba6b59dc984dc`.
+  - Public PR page shows a new Codex P2 on reviewed commit `7480b24c7b`: collinear non-adjacent self-overlap / retraced edge was not detected before area estimation.
+  - Plan Puzzle Builder reported a scoped repair: added `doCollinearSegmentsOverlap()` and called it from `hasPolygonSelfIntersection()`, updated `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md`, pushed `607b262`, and requested `@codex review`.
+  - `refs/pull/25/merge` refreshed to `0aaac05d089731d41c57a34b8da9d239f611ce65`; local current-main merge-tree against `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e` exits clean with tree `988d305289a2901b7639064b5779e8d97f564e30`; `git diff --check` exits `0`.
+  - PR #25 diff remains limited to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - No post-`607b262` clean Codex result was visible at patrol time.
+- Decision:
+  - To: Plan Puzzle Builder
+  - Workstream: plancraft-page-ui
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: report the post-`607b262` Codex review result for PR #25, or exact blocker if review does not return.
+  - Why this agent: Plan Puzzle Builder owns Issue #15 / PR #25 and already performed the scoped P2 fix; the next executable artifact is the post-fix Codex result, not Deputy final-gate merge.
+  - Action: publish `CODEX_REVIEW_CLEAN`, `NEEDS_FIX` / `P1` / `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked, latest main SHA `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`, branch SHA `607b2621c97820dc8774831617aba6b59dc984dc`, merge ref `0aaac05d089731d41c57a34b8da9d239f611ce65`, validation result, and PR URL.
+  - Need Commander: No unless requesting merge / reject for PR #25.
+  - Need Reviewer: Yes for Codex P2 re-review result; no separate LAIBE_REVIEWER action unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
 ### 2026-05-26T10:22:27Z - PR #25 repair evidence found on `b489e7a`
 
 - Workstream: plancraft-page-ui / final-gate validation refresh

@@ -37,6 +37,50 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T10:47:18Z - [PR25_CODEX_P2_REPAIRED_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+CODEX_P2_FOUND / WORKFLOW_REPAIR_ATTEMPTED / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REQUESTED / POST_FIX_REVIEW_PENDING
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Plan Puzzle Builder
+
+Workstream:
+plancraft-page-ui / PR #25 Codex P2 repair result watch
+
+Issue / PR:
+laibeoffer/laibe-mvp Issue #15 / PR #25
+
+Finding:
+PR #25 received a new Codex P2 on reviewed commit `7480b24c7b`; Plan Puzzle Builder pushed a scoped fix in `607b262` and requested `@codex review`. The next executable artifact is the post-fix Codex result, so PR #25 is not Deputy final-gate ready yet.
+
+Evidence:
+- Latest checked `origin/main`: `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`.
+- PR #25 head: `607b2621c97820dc8774831617aba6b59dc984dc`.
+- Codex P2 found by public PR page fallback: collinear non-adjacent self-overlap / retraced edge was not detected before area estimation on reviewed commit `7480b24c7b`.
+- Builder repair evidence: added `doCollinearSegmentsOverlap()`, called it from `hasPolygonSelfIntersection()`, updated `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md`, pushed `607b262`, requested `@codex review`.
+- Merge ref: `0aaac05d089731d41c57a34b8da9d239f611ce65`.
+- Local merge-tree tree: `988d305289a2901b7639064b5779e8d97f564e30`; `git diff --check` exits `0`.
+- Changed files remain scoped to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+
+Action already taken:
+Commander patrol published this docs-only status update and superseded the PR #25 final-gate ACK request from `2026-05-26T10:22:27Z`. No source files changed. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Do not merge PR #25 until post-`607b262` Codex review result is visible and clean, or until an exact blocker is acknowledged.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+Yes for Codex P2 re-review result; no separate LAIBE_REVIEWER action unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
+Deputy Decision:
+PENDING_CODEX_REVIEW_RESULT
+
 ### 2026-05-26T10:22:27Z - [PR25_REPAIR_FOUND_B489E7A] - Deputy Codex-2
 
 Status:

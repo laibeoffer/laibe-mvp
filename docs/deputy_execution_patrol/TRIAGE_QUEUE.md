@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T10:47:18Z - [PR25_CODEX_P2_REPAIRED_REVIEW_PENDING] - Plan Puzzle
+
+Status:
+NEEDS_REVIEWER / CODEX_P2_FOUND / WORKFLOW_REPAIR_ATTEMPTED / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REQUESTED / POST_FIX_REVIEW_PENDING
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Latest checked `origin/main` is `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`. PR #25 head advanced to `607b2621c97820dc8774831617aba6b59dc984dc`. Public PR page fallback shows a new Codex P2 on reviewed commit `7480b24c7b` for collinear non-adjacent self-overlap before area estimation. Plan Puzzle Builder reported a scoped fix, pushed `607b262`, and requested `@codex review`. `refs/pull/25/merge` refreshed to `0aaac05d089731d41c57a34b8da9d239f611ce65`; local merge-tree tree is `988d305289a2901b7639064b5779e8d97f564e30`; diff-check exits `0`. No post-`607b262` clean Codex result was visible at patrol time.
+
+Recommended Executive Action:
+Stop Deputy2 final-gate ACK chase for PR #25 until post-fix Codex result is visible. Keep one single-primary visible ACK request to Plan Puzzle Builder for the post-`607b262` Codex result or exact blocker.
+
+Recommended Deputy Action:
+Do not merge PR #25 from the 10:22 final-gate evidence alone. Wait for post-`607b262` `CODEX_REVIEW_CLEAN` or decide exact blocker if review stays unavailable.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+Yes for Codex P2 re-review result.
+
 ### 2026-05-26T10:22:27Z - [PR25_REPAIR_FOUND_B489E7A] - Plan Puzzle
 
 Status:
