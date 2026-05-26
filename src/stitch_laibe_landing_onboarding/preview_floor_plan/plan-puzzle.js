@@ -4307,6 +4307,9 @@
         if (adjacent) {
           continue;
         }
+        if (doCollinearSegmentsOverlap(segments[firstIndex], segments[secondIndex])) {
+          return true;
+        }
         const intersection = getSegmentIntersection(segments[firstIndex], segments[secondIndex]);
         if (intersection) {
           return true;
@@ -4314,6 +4317,36 @@
       }
     }
     return false;
+  }
+
+  function doCollinearSegmentsOverlap(firstSegment, secondSegment) {
+    if (getDistance(firstSegment.from, firstSegment.to) <= GEOMETRY_EPSILON || getDistance(secondSegment.from, secondSegment.to) <= GEOMETRY_EPSILON) {
+      return false;
+    }
+    const firstVector = {
+      x: firstSegment.to.x - firstSegment.from.x,
+      y: firstSegment.to.y - firstSegment.from.y
+    };
+    const secondVector = {
+      x: secondSegment.to.x - secondSegment.from.x,
+      y: secondSegment.to.y - secondSegment.from.y
+    };
+    if (Math.abs(cross(firstVector, secondVector)) > GEOMETRY_EPSILON) {
+      return false;
+    }
+    const offset = {
+      x: secondSegment.from.x - firstSegment.from.x,
+      y: secondSegment.from.y - firstSegment.from.y
+    };
+    if (Math.abs(cross(offset, firstVector)) > GEOMETRY_EPSILON) {
+      return false;
+    }
+    const axis = Math.abs(firstVector.x) >= Math.abs(firstVector.y) ? "x" : "y";
+    const firstRange = sortedPair(firstSegment.from[axis], firstSegment.to[axis]);
+    const secondRange = sortedPair(secondSegment.from[axis], secondSegment.to[axis]);
+    const overlapStart = Math.max(firstRange[0], secondRange[0]);
+    const overlapEnd = Math.min(firstRange[1], secondRange[1]);
+    return overlapEnd - overlapStart > GEOMETRY_EPSILON;
   }
 
   function createZoneBoundaryIssue(type, edgeIds, message, severity = "warning") {

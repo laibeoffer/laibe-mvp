@@ -2,6 +2,9 @@
 
 ## Latest Plan-Puzzle Task: Plancraft+ Zone Area / Boundary Refinement
 
+- 2026-05-26 heartbeat follow-up：已針對 PR #25 Codex P2 `discussion_r3303088652` 修正 collinear self-overlap 判斷。
+- `hasPolygonSelfIntersection()` 現在會先檢查非相鄰邊段是否在同一直線上形成重疊，包含 retraced edge / non-adjacent collinear overlap；這類 malformed closed boundary 會被視為 self-intersection，不會輸出候選面積。
+- 本次 P2 fix 仍維持 candidate-only zone area；沒有修改 Plancraft core、budget adapter/runtime/type、formal quantity、formal estimate、renderer、payment、AI/API 或 secrets。
 - 2026-05-25 heartbeat follow-up：已針對 PR #25 Codex P2 `discussion_r3299302339` 修正 polygon self-intersection 判斷。
 - `hasPolygonSelfIntersection()` 現在會把非相鄰邊段的任何交點都視為 self-intersection，包含 T-junction / endpoint-on-edge 這類 malformed boundary；避免 malformed closed zone 被計算候選面積。
 - 本次 P2 fix 仍維持 candidate-only zone area；沒有修改 Plancraft core、budget adapter/runtime/type、formal quantity、formal estimate、renderer、payment、AI/API 或 secrets。

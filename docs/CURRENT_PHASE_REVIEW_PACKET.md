@@ -20,7 +20,7 @@ Draft / Ready for user-triggered review / Reviewed / Needs update before review
 
 補充說明：本檔已在後續區段加入本聊天室負責的 budget-system / specDB / method-spec / budget output / estimate / quote / material / labor data，以及 plan-puzzle input adapter 銜接成果。
 
-Plan Puzzle PR #25 follow-up：已補上 latest Codex P2 fixes，讓 `areaUpdatedAt` 只在 boundary / area metadata 實際改變時更新，保留 closed invalid polygon geometry 供 canvas invalid styling 與人工修正，並讓非相鄰邊段的 endpoint-on-edge / T-junction 交點也被判定為 polygon self-intersection。本 follow-up 仍維持 candidate-only zone area，未解除 formal estimate guard。
+Plan Puzzle PR #25 follow-up：已補上 latest Codex P2 fixes，讓 `areaUpdatedAt` 只在 boundary / area metadata 實際改變時更新，保留 closed invalid polygon geometry 供 canvas invalid styling 與人工修正，並讓非相鄰邊段的 endpoint-on-edge / T-junction 交點與 collinear self-overlap / retraced edge 也被判定為 polygon self-intersection。本 follow-up 仍維持 candidate-only zone area，未解除 formal estimate guard。
 
 ---
 
