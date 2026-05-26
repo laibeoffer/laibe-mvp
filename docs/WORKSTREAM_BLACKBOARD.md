@@ -1345,6 +1345,34 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T09:45:22Z - Executive visible ACK recovery after patrol docs advanced main
+
+- Workstream: executive-visible-ack-recovery / active-final-gates / metadata-reconciliation
+- Branch: `origin/main` `432b231fb298f2887e300c17e3a9daf70a6f8f4f`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+- Changed: Executive Officer re-read required governance / strategy / blackboard / role / ledger / triage / inbox / reviewer files from latest `origin/main`, reconciled GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR #23 / PR #26 issue comments since `2026-05-26T09:07:05Z`, and reran current-main merge-tree plus diff-check against `432b231`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open and non-draft. PR #27 remains closed / merged; Local GPU Worker remains adopted on `main`. REST mergeability returned `unknown`, but merge refs exist for all four active PRs.
+- Current-main simulation against `432b231` passes for all four active PRs: PR #22 tree `9176e6eebd9e062a94177d0c7a768d242324922c`; PR #23 tree `eae47f32288d07e813359d856eb3ab65a941ac2e`; PR #25 tree `37a259e1ca012a9f08bee16130170b1a0a5718f4`; PR #26 tree `cb08d0dfca779d99c25ea9ab7d21f7a5e2a632dc`; all `git diff --check` results exit `0`.
+- Recovery assessment: no newer Deputy Codex-2 visible ACK was found after the 09:07 `PENDING_DEPUTY2_ACK` row, and PR #23 / PR #26 have no new issue comments since `2026-05-26T09:07:05Z`. Active Builder work is not missing; this remains Deputy Codex-2 visible ACK recovery followed by Deputy Codex final-gate visibility.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: active-final-gate metadata reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for active PR current-main simulation against latest main `432b231fb298f2887e300c17e3a9daf70a6f8f4f`, citing branch heads, merge refs, merge-tree PASS, and diff-check PASS. If GitHub mergeability remains contradictory after retry, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`. Do not route PR #23 / PR #26 back to ordinary Builders while branch heads and validation remain stable.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: no duplicate Builder or GitHub chase. Keep the single-primary Deputy Codex-2 ACK request until a visible ACK appears; after Deputy Codex-2 ACK appears, chase Deputy Codex final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, repair scope drifts, or a final-gate policy decision explicitly requests review.
+
 ### 2026-05-26T09:07:05Z - PR #27 merged and Local GPU Worker adopted on main
 
 - Workstream: local-gpu-worker-governance / active-final-gates

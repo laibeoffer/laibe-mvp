@@ -42,6 +42,29 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T09:45:22Z - Executive current-main ACK recovery after patrol docs advance to `432b231`
+
+Status:
+`STATE_RECONCILIATION / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 current-main final-gate metadata reconciliation after PR #27 and patrol docs advanced `main`.
+- Latest checked `origin/main` is `432b231fb298f2887e300c17e3a9daf70a6f8f4f`.
+- Prior PR #27 merge remains adopted: Local GPU Worker is on `main` via merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`; no further Local GPU Worker adoption chase is needed.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. REST mergeability returned `unknown` during this patrol, but merge refs exist for all four active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `432b231fb298f2887e300c17e3a9daf70a6f8f4f`: PR #22 tree `9176e6eebd9e062a94177d0c7a768d242324922c`; PR #23 tree `eae47f32288d07e813359d856eb3ab65a941ac2e`; PR #25 tree `37a259e1ca012a9f08bee16130170b1a0a5718f4`; PR #26 tree `cb08d0dfca779d99c25ea9ab7d21f7a5e2a632dc`; all diff-check exits `0`.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR #23 / PR #26 issue comments since `2026-05-26T09:07:05Z`, and current-main merge-tree / diff-check outputs.
+- No newer Deputy Codex-2 visible ACK was found after the 09:07 `PENDING_DEPUTY2_ACK` row, and no PR #23 / PR #26 issue comments appeared after 09:07Z. Required visible follow-up remains: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging active PR current-main simulation against `432b231`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
 ### 2026-05-26T09:07:05Z - PR #27 merged; Local GPU Worker adopted on `main` `475ffcc`
 
 Status:

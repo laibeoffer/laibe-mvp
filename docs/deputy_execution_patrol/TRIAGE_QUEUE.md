@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T09:45:22Z - [EXEC_ACK_RECOVERY_432B231] - Active final gates
+
+Status:
+ON_TRACK / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after patrol docs advanced `main` to `432b231`
+
+Evidence:
+Latest checked `origin/main` is `432b231fb298f2887e300c17e3a9daf70a6f8f4f`. PR #27 remains closed / merged and Local GPU Worker remains adopted on `main` via merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; branch heads are PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. REST mergeability returned `unknown`, but merge refs exist and local current-main merge-tree / diff-check pass for all four against `432b231`: PR #22 tree `9176e6eebd9e062a94177d0c7a768d242324922c`; PR #23 tree `eae47f32288d07e813359d856eb3ab65a941ac2e`; PR #25 tree `37a259e1ca012a9f08bee16130170b1a0a5718f4`; PR #26 tree `cb08d0dfca779d99c25ea9ab7d21f7a5e2a632dc`; all diff-check exits `0`. No newer Deputy Codex-2 visible ACK or PR #23 / PR #26 issue comment was found after the 09:07 `PENDING_DEPUTY2_ACK` row.
+
+Recommended Executive Action:
+Keep one single-primary `To: Deputy Codex-2` visible ACK request. Do not chase ordinary Builders or post duplicate GitHub comments while local validation remains clean and no new PR comments exist.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `432b231`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T09:07:05Z - [PR27_MERGED_GPU_MAIN_RESOURCE_475FFCC] - Active final gates / Local GPU Worker
 
 Status:
