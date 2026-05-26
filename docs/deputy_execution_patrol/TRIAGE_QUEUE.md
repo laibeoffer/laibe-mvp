@@ -36,6 +36,110 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T10:01:09Z - [REPEATED_DEPUTY2_ACK_SILENCE_DADF4E3] - Active final gates
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / GITHUB_CONNECTOR_TIMEOUT_FALLBACK / REPEATED_ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after `main` advanced to `dadf4e3`
+
+Evidence:
+Latest checked `origin/main` is `dadf4e359e75df46f99dd44b66161a24c1f4ead4`. PR #27 remains closed / merged and Local GPU Worker remains adopted on `main`. Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; branch heads are PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector timed out; REST fallback returned `mergeable=null` / `mergeable_state=unknown`. Local current-main merge-tree / diff-check pass for all four against `dadf4e3`: PR #22 tree `8011fde33c01dedb87b994cdb147290650ac1329`; PR #23 tree `cba192ca4a9ae04b5ecb9b3d10ccfba6984d25c8`; PR #25 tree `219811567a27739a21c0016986d886c042a2fba7`; PR #26 tree `857ca6b032d771f8c803828bd847c1c2a8aefa7e`; all diff-check exits `0`. No newer Deputy Codex-2 visible ACK, PR #23 / PR #26 issue comment, or PR #23 / PR #26 review was found after `2026-05-26T09:45:22Z`.
+
+Recommended Executive Action:
+Issue one direct follow-up only to Deputy Codex-2. Do not chase ordinary Builders or post duplicate GitHub comments while local validation remains clean.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `dadf4e3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-26T09:45:22Z - [EXEC_ACK_RECOVERY_432B231] - Active final gates
+
+Status:
+ON_TRACK / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after patrol docs advanced `main` to `432b231`
+
+Evidence:
+Latest checked `origin/main` is `432b231fb298f2887e300c17e3a9daf70a6f8f4f`. PR #27 remains closed / merged and Local GPU Worker remains adopted on `main` via merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; branch heads are PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. REST mergeability returned `unknown`, but merge refs exist and local current-main merge-tree / diff-check pass for all four against `432b231`: PR #22 tree `9176e6eebd9e062a94177d0c7a768d242324922c`; PR #23 tree `eae47f32288d07e813359d856eb3ab65a941ac2e`; PR #25 tree `37a259e1ca012a9f08bee16130170b1a0a5718f4`; PR #26 tree `cb08d0dfca779d99c25ea9ab7d21f7a5e2a632dc`; all diff-check exits `0`. No newer Deputy Codex-2 visible ACK or PR #23 / PR #26 issue comment was found after the 09:07 `PENDING_DEPUTY2_ACK` row.
+
+Recommended Executive Action:
+Keep one single-primary `To: Deputy Codex-2` visible ACK request. Do not chase ordinary Builders or post duplicate GitHub comments while local validation remains clean and no new PR comments exist.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `432b231`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-26T09:07:05Z - [PR27_MERGED_GPU_MAIN_RESOURCE_475FFCC] - Active final gates / Local GPU Worker
+
+Status:
+ON_TRACK / PR27_MERGED / LOCAL_GPU_WORKER_ADOPTED_ON_MAIN / VALIDATION_REFRESH_FOUND / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after PR #27 merge; Local GPU Worker marked `DONE / MAIN_RESOURCE`
+
+Evidence:
+Latest checked `origin/main` is `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`. PR #27 is closed / merged with merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36` and introduced only `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`. `origin/main` now contains the Local GPU Worker rules and both scripts. Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. GitHub connector reports `mergeable=false` for the open PRs after `main` advanced, but local current-main merge-tree and diff-check pass for all four against `475ffcc`: PR #22 tree `70445c6d917b4fa9770bf03c5d793851b95d2082`; PR #23 tree `21268d41f992bbb7d0c3aa475fa1112260fc3d5c`; PR #25 tree `386f6646f97cfef64740ad1fec290e1ec8763de7`; PR #26 tree `1f9272e73f51467c34d3e989c9aef6130966c55a`; all diff-check exits `0`.
+
+Recommended Executive Action:
+Stop Local GPU Worker adoption chase. Keep one single-primary `To: Deputy Codex-2` visible ACK request for active PR current-main reconciliation. Do not chase ordinary Builders while local validation remains clean.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `475ffcc`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry. Keep Local GPU Worker classified as `DONE / MAIN_RESOURCE`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-26T08:36:24Z - [PR25_REFRESH_GPU_BRANCH_GATE_2781E2F] - Active final gates / Local GPU Worker
+
+Status:
+ON_TRACK / PR25_HEAD_ADVANCED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / LOCAL_GPU_BRANCH_PUSHED_NOT_MAIN_READY / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / PR #26 metadata reconciliation ACK visibility, refreshed PR #25 context, and `origin/local-ai-workflow` Local GPU Worker branch gate
+
+Evidence:
+Latest checked `origin/main` is `2781e2f03ad67f534a113151e32854ded36c8caa`. Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #25 advanced to `2fb56655b9d0a4d8d03613f9deee301e047c7966`, reports clean mergeability, and has latest Codex clean comment `4542137002` at `2026-05-26T08:29:55Z`. Current-main merge-tree and diff-check pass for all four against `2781e2f`: PR #22 tree `7ee472b11006a57440611b493064c075e4ac2028`; PR #23 tree `94f1bbb431bcbf59884e78998b36b11e0350a15d`; PR #25 tree `14b96db89128c0cbfe60232f15b376179e3a9fb8`; PR #26 tree `85b27cc17659245b0528fd2a60d97757ef85de7a`; all diff-check exits `0`. `origin/local-ai-workflow` is pushed at `91da4f3e54b423ac84cc9a3d3136707dd8425412` and contains Local GPU Worker rules/scripts, but it is not clean-main-ready because its diff from `origin/main` includes more than `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`.
+
+Recommended Executive Action:
+Keep one single-primary `To: Deputy Codex-2` visible ACK request. Do not chase ordinary Builders or post duplicate GitHub comments while validation and scope evidence remain clean.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `2781e2f`, include PR #25 head `2fb5665` refresh, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains. Classify `local-ai-workflow` as `NEEDS_DEPUTY_DECISION / CLEAN_BRANCH_REQUIRED`; do not merge it as-is.
+
+Need Commander:
+No for ACK routing. Yes before Local GPU Worker final adoption / merge into `main`.
+
+Need Reviewer:
+No
+
 ### 2026-05-26T07:47:53Z - [DEPUTY2_ACK_RECOVERY_DCA29B3] - Deputy Codex-2
 
 Status:

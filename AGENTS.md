@@ -34,6 +34,76 @@
 - 不得使用 `for_ai_studio` 作為主專案。
 - 不得把根目錄 `config.toml` 當成安全 Codex runtime config。
 
+## Laibe Local GPU Worker
+
+Laibe 專案已配置本地 GPU worker。任何最高指揮官 Agent、統籌 Agent、分工 Agent，在處理任務前都必須知道此資源存在。
+
+本地硬體：
+- GPU: NVIDIA RTX 4070 12GB
+- RAM: 64GB
+- CPU: Intel i9-11900K
+
+本地 AI 環境：
+- Ollama 0.24.0
+- Codex CLI 0.131.0
+- Model: qwen2.5-coder:7b
+
+重要規則：
+- 一般 Codex App / Codex 聊天室不會自動使用 GPU
+- 只有透過 Ollama / Codex OSS local provider 才會使用 GPU
+- Preferred path: `scripts/gpu-readonly.ps1` / `scripts/gpu-readonly.bat` direct Ollama mode
+- Codex OSS path 已驗證會調動 GPU，但 qwen2.5-coder:7b 可能輸出 tool-call JSON，因此不作為主要分析入口
+- 本地 GPU worker 是直接 Ollama read-only file analyzer，不是 Codex patch agent
+- 本地 GPU worker 只能做 read-only analysis / patch draft
+- 本地 GPU worker 不得直接修改 production code
+- 本地 GPU worker 不得碰 payment/auth/webhook/.env/secrets
+- 本地 GPU worker 不得做 workspace-write patch
+- 正式改檔仍必須交給雲端 Codex 或人工 review 後執行
+
+已驗證：
+- Ollama 推理時 RTX 4070 會參與運算
+- Codex OSS read-only workflow 可用
+- Codex OSS workspace-write patch worker 不可靠
+- qwen2.5-coder:7b 不得作為正式改檔 agent
+
+本地 GPU worker 可以處理：
+- 指定檔案分析
+- bug tracing
+- 程式碼解釋
+- 指定檔案解釋
+- unified diff 草稿
+- test case 草稿
+- 小範圍技術問答
+
+本地 GPU worker 不可處理：
+- 直接修改 production code
+- 架構決策
+- 多檔案重構
+- routing core
+- package.json / package-lock.json
+- database schema / migration
+- deployment config
+- payment/auth/webhook/.env/secrets
+
+任務分派規則：
+- 如果只是分析、讀檔、找 bug 線索、產生 patch 草稿，優先考慮使用本地 GPU worker。
+- 如果需要正式改檔，交給雲端 Codex。
+- 不得讓本地 GPU worker 掃描整個 repo。
+- 每次 GPU worker 任務必須指定單一檔案或小範圍目錄。
+- 本地 GPU worker 是 read-only / draft assistant，不是正式施工 agent。
+
+本地 GPU worker 簡易入口：
+
+```powershell
+.\scripts\gpu-readonly.ps1 -FilePath "local_ai_sandbox\add-safe.js" -Instruction "Explain this file. Do not edit files. Suggest a unified diff draft only if needed."
+```
+
+也可使用 Windows 批次入口：
+
+```bat
+scripts\gpu-readonly.bat local_ai_sandbox\add-safe.js "Explain this file. Do not edit files. Suggest a unified diff draft only if needed."
+```
+
 ## 1. Mandatory Reading Order
 
 每次 Codex 任務開始前，必須依序閱讀：
