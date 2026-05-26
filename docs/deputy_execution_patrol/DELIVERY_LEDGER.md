@@ -42,6 +42,30 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T07:47:53Z - Executive visible ACK recovery after automation prompt repair against `dca29b3`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_REPAIRED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. This remains a patrol/metadata ACK problem, not ordinary Builder missing work.
+- Automation repair: `laibe-mvp-executor-patrol` remains `ACTIVE` as the Executive Officer heartbeat; prompt was refreshed to the current short-report patrol instructions, including PR #23 / PR #25 Deputy2 routing, PR #22 / PR #26 final-gate routing, and the no-duplicate Builder / GitHub-comment rule. Schedule and target thread were preserved.
+- Latest checked `origin/main` is `dca29b344ddab3738142addc39c57e7622052794`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; REST reports `mergeable=true` and `mergeable_state=clean` for all four. Merge refs exist for all four active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `dca29b344ddab3738142addc39c57e7622052794`: PR #22 tree `57b5aa112a198b3fdaea97dd74e7b0852cd36e2b`; PR #23 tree `7b6372d263e87d109415f548eaced6cbbeda3154`; PR #25 tree `dc914fe0fa673f1ef317ace62d98e13daf628d08`; PR #26 tree `66484eacbcea9b6998d1ac982f9484a45006fb11`; all diff-check exits `0`.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issue / PR metadata, PR refs, PR #23 / PR #26 comments, and current-main merge-tree / diff-check outputs.
+- No newer Deputy Codex-2 visible ACK was found after the prior `PENDING_DEPUTY2_ACK` row. Required visible follow-up remains: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `dca29b3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains.
+- After Deputy Codex-2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, or scope drifts.
+
 ### 2026-05-26T07:24:01Z - Commander direct order after chatroom recovery against `913ccc5`
 
 Status:

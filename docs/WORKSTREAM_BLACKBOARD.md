@@ -1345,6 +1345,34 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T07:47:53Z - Executive visible ACK recovery after automation prompt repair
+
+- Workstream: executive-visible-ack-recovery / active-final-gates / automation-health
+- Branch: `origin/main` `dca29b344ddab3738142addc39c57e7622052794`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / AUTOMATION_REPAIRED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+- Changed: Executive Officer inspected and repaired `laibe-mvp-executor-patrol` by refreshing the heartbeat prompt to the current Executive Officer short-report patrol instructions; schedule and target thread were preserved. Patrol then re-fetched `origin/main`, checked required governance / strategy / blackboard / ledger / triage / inbox / reviewer files, reconciled GitHub Issues / PRs / PR refs / PR #23 and PR #26 comments, and reran current-main merge-tree plus diff-check.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open, non-draft, REST `mergeable=true`, and REST `mergeable_state=clean`; merge refs exist for all four active PRs.
+- Current-main simulation against `dca29b3` passes for all four active PRs: PR #22 tree `57b5aa112a198b3fdaea97dd74e7b0852cd36e2b`; PR #23 tree `7b6372d263e87d109415f548eaced6cbbeda3154`; PR #25 tree `dc914fe0fa673f1ef317ace62d98e13daf628d08`; PR #26 tree `66484eacbcea9b6998d1ac982f9484a45006fb11`; all `git diff --check` results exit `0`.
+- Recovery assessment: no newer Deputy Codex-2 visible ACK was found after the prior `PENDING_DEPUTY2_ACK` row. Active Builder work is not missing. The current blocker is visible Deputy Codex-2 metadata ACK for PR #23 / PR #26, followed by Deputy Codex final-gate visibility / exact blocker publication. No duplicate GitHub comments were posted.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: active-final-gate metadata reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for PR #23 / PR #26 against latest main `dca29b344ddab3738142addc39c57e7622052794`, citing branch heads, merge refs, merge-tree PASS, and diff-check PASS. If contradictory GitHub metadata remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`. Do not route PR #23 / PR #26 back to ordinary Builders while branch heads and validation remain stable.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: no duplicate Builder or GitHub chase. Keep the single-primary Deputy Codex-2 ACK request until a visible ACK appears; after Deputy Codex-2 ACK appears, chase Deputy Codex final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, repair scope drifts, or a final-gate policy decision explicitly requests review.
+
 ### 2026-05-26T07:24:01Z - Commander direct orders after chatroom recovery
 
 - Workstream: commander / active-final-gates / visible-chatroom-recovery

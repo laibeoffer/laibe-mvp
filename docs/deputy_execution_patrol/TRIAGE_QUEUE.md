@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T07:47:53Z - [DEPUTY2_ACK_RECOVERY_DCA29B3] - Deputy Codex-2
+
+Status:
+ON_TRACK / AUTOMATION_REPAIRED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #23 / PR #26 metadata reconciliation ACK visibility, with PR #22 / PR #25 final-gate context checked
+
+Evidence:
+Latest checked `origin/main` is `dca29b344ddab3738142addc39c57e7622052794`. Automation `laibe-mvp-executor-patrol` remains `ACTIVE`; prompt was refreshed to the current Executive Officer short-report patrol rules and schedule / target thread were preserved. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open / non-draft / REST `mergeable=true` / `mergeable_state=clean`. Branch heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. Current-main merge-tree and diff-check pass for all four against `dca29b3`: PR #22 tree `57b5aa112a198b3fdaea97dd74e7b0852cd36e2b`; PR #23 tree `7b6372d263e87d109415f548eaced6cbbeda3154`; PR #25 tree `dc914fe0fa673f1ef317ace62d98e13daf628d08`; PR #26 tree `66484eacbcea9b6998d1ac982f9484a45006fb11`; all diff-check exits `0`. No newer Deputy Codex-2 visible ACK was found in blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, or PR #23 / PR #26 comments after the prior `PENDING_DEPUTY2_ACK` row.
+
+Recommended Executive Action:
+Keep one single-primary `To: Deputy Codex-2` visible ACK request. Do not chase ordinary Builders or post duplicate GitHub comments while branch heads, validation, and scope evidence remain stable.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `dca29b3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains. After that ACK, Deputy Codex should publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T07:24:01Z - [COMMANDER_DIRECT_ORDER_913CCC5] - Deputy Codex-2
 
 Status:
