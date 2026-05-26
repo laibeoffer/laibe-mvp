@@ -1345,6 +1345,21 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T04:43:22Z - Deputy2 ACK recovery after `d6baa1e`
+
+- Workstream: executive-visible-ack-recovery / deputy-codex-2 / active-final-gates
+- Branch: `origin/main` `d6baa1e5bd7b5eacdd55d63617cf46dc80bf21fc`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_CONTRADICTION_RESOLVED / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT`
+- Changed: patrol docs only; no source files changed.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, delivery ledger, triage queue, Executive inbox, GitHub connector PR metadata, open / closed Issue search, fetched PR refs, current-main merge-tree, and diff-check.
+- GitHub status: PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and connector `mergeable=true`; PR #23 / PR #26 metadata contradiction from the previous ledger row is resolved by current connector evidence. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed/completed.
+- Current-main simulation against `d6baa1e5bd7b5eacdd55d63617cf46dc80bf21fc` passes for all four active PRs: PR #22 tree `bdf4f4b81980fb85cda0812426e17d4e3fbf2336`; PR #23 tree `3f729d2b514c564a1f549f055514675a753c36f6`; PR #25 tree `b2bc08f18bfc3dbe0e44aa0b396583d7f9636a6f`; PR #26 tree `45584f743e6b6aadbd71297bd1d63fb3436bc647`; all diff-check exits `0`.
+- Visible ACK recovery: latest Executive inbox row was `To: Deputy Codex-2` with `PENDING_DEPUTY2_ACK`; no newer visible Deputy Codex-2 ACK was found in blackboard, delivery ledger, triage queue, or Executive inbox.
+- Primary To: Deputy Codex-2.
+- Action: publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 connector metadata recovery against `d6baa1e`, or publish exact `BLOCKER_WITH_ATTEMPTED_FIX` if Deputy Codex-2 still sees contradictory merge-ref evidence. Do not chase ordinary Builders and do not post duplicate GitHub comments while branch heads, scope, and local validation remain stable.
+- Need Commander: No
+- Need Reviewer: No
+
 ### 2026-05-26T03:26:22Z - Metadata contradiction reappeared after `eb35b1b`
 
 - Workstream: deputy-codex-2 / active-final-gates / automation-delivery-check

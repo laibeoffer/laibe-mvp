@@ -42,6 +42,26 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T04:43:22Z - Deputy2 ACK recovery after metadata resolution against `d6baa1e`
+
+Status:
+`STATE_RECONCILIATION / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_CONTRADICTION_RESOLVED / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. The previous PR #23 / PR #26 connector `mergeable=false` contradiction is resolved by current connector evidence, but Deputy Codex-2 has not yet published a visible ACK in blackboard / ledger / triage / Executive inbox.
+- Latest `origin/main` is `d6baa1e5bd7b5eacdd55d63617cf46dc80bf21fc`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and `mergeable=true`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+- Current-main merge-tree and diff-check pass for all four active PRs against `d6baa1e5bd7b5eacdd55d63617cf46dc80bf21fc`: PR #22 tree `bdf4f4b81980fb85cda0812426e17d4e3fbf2336`; PR #23 tree `3f729d2b514c564a1f549f055514675a753c36f6`; PR #25 tree `b2bc08f18bfc3dbe0e44aa0b396583d7f9636a6f`; PR #26 tree `45584f743e6b6aadbd71297bd1d63fb3436bc647`; all diff-check exits `0`.
+- Why no Builder chase exists: PR #23 / PR #26 are metadata reconciliation / ACK visibility, not missing Builder output. Branch heads, scope evidence, and local validation are stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T03:26:22Z - Active PR metadata contradiction reopened against `eb35b1b`
 
 Status:
