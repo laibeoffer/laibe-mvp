@@ -1345,6 +1345,34 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T11:05:25Z - PR #25 post-fix Codex clean found after `6ba84db`
+
+- Workstream: plan-puzzle / active-final-gates / metadata-reconciliation
+- Branch: `origin/main` `6ba84db4c024349528509a8d7843a8f2fd88c781`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CODEX_REVIEW_CLEAN_FOUND / PR25_HEAD_STABLE / CURRENT_MAIN_SIMULATION_PASS / REVIEW_GATE_CLEARED / PENDING_DEPUTY2_ACK / DEPUTY_FINAL_GATE_NEXT`
+- Changed: Executive Officer found the missing post-`607b262` Codex clean result for PR #25: comment `4543568360` at `2026-05-26T10:44:11Z`. This supersedes the 10:47 post-fix-review-pending row while the clean evidence remains current.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open and non-draft; PR #27 remains closed / merged. PR #25 REST reports `mergeable=true` and `mergeable_state=clean`.
+- Current-main simulation against `6ba84db` passes for all four active PRs: PR #22 tree `1b226438e4c409ae825352b4d9e6fb41724cbe5a`; PR #23 tree `b5fa1f78bbc6544d04d53f1d65711e3bcecbc1cc`; PR #25 tree `3f975585ee4ab0d4f003eeefd31af988de933012`; PR #26 tree `51ec97217d9822a1a6e37925a39dfe430b879305`; all `git diff --check` results exit `0`.
+- Recovery assessment: ordinary Plan Puzzle Builder chase is no longer needed while the `607b262` fix and clean Codex review remain current. Next visible step is Deputy Codex-2 validation ACK for PR #25 clean review / current-main simulation, then Deputy Codex final-gate visibility or exact blocker.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: PR #25 post-fix clean review reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` acknowledging PR #25 clean Codex result and active PR current-main simulation against latest main `6ba84db4c024349528509a8d7843a8f2fd88c781`. If contradictory evidence remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: do not chase ordinary Plan Puzzle Builder for PR #25 while clean Codex evidence remains current; chase Deputy Codex-2 ACK next, then Deputy Codex final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or user explicitly requests review.
+
 ### 2026-05-26T10:47:18Z - PR #25 Codex P2 repaired; post-fix review pending
 
 - Workstream: plancraft-page-ui / Codex P2 repair recovery
