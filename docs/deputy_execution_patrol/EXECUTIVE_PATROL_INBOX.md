@@ -37,6 +37,49 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T02:57:55Z - [VALIDATION_REFRESH_FOUND_393C498] - Deputy Codex-2
+
+Status:
+STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_NARROWED / PENDING_DEPUTY2_VALIDATION_REFRESH
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+Active final gates
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26
+
+Finding:
+Latest `origin/main` advanced to `393c4981381e9f8a7655e1e07fa6b4b0601293a7`. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; connector mergeability is now true for PR #22 / PR #23 / PR #26 but still false for PR #25. Local current-main merge-tree / diff-check passes for all four, so the metadata contradiction is narrowed to PR #25 and still needs Deputy Codex-2 visible validation refresh or exact blocker.
+
+Evidence:
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub connector PR metadata, open / closed Issue search, PR comments, reviews, Codex review comments, review threads, fetched refs, merge-tree, and diff-check.
+- Issue status: #15 open, #16 open, #17 open, #18 open, #19 closed/completed.
+- PR status / branch heads: PR #22 open / non-draft / connector `mergeable=true` / `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 open / non-draft / connector `mergeable=true` / `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 open / non-draft / connector `mergeable=false` / `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 open / non-draft / connector `mergeable=true` / `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Merge-tree / diff-check against `393c498`: PR #22 tree `944dcfc6fc6a2d353a71915f7d22187ca52eb36a`; PR #23 tree `cf3742b446be6dfc42a8f7514b342f1418ec9c6f`; PR #25 tree `f5d31a7fa43c92c3af3bce039c108c10644209b7`; PR #26 tree `86784dafc49dd5569af8e6e628a90d23a2834c9c`; all diff-check exits `0`.
+- Latest visible PR discussion evidence: PR #22 latest discussion `4531941286`; PR #23 clean Codex `4537316105`; PR #25 clean Codex `4536168380`; PR #26 current-main evidence `4532187707`.
+- PR #22 / PR #26 have no review threads. PR #23 / PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence.
+
+Action already taken:
+Recorded `VALIDATION_REFRESH_FOUND` / metadata contradiction narrowing in blackboard / ledger / triage / inbox, refreshed validation against `393c498`, kept the visible request single-primary `To: Deputy Codex-2`, and did not post duplicate GitHub comments. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND`, `WORKFLOW_REPAIR_ATTEMPTED`, or exact blocker for PR #25's connector `mergeable=false` / local merge-tree pass contradiction, including latest main SHA, branch SHA, connector mergeability, merge-ref state, and current-main simulation evidence. After PR #25 metadata reconciliation, Deputy Codex can resume final-gate visibility and manual-thread policy decision.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
 ### 2026-05-25T23:39:20Z - [GITHUB_METADATA_CONTRADICTION_3081BB4] - Deputy Codex-2
 
 Status:
