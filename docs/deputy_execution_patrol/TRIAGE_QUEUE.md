@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T09:07:05Z - [PR27_MERGED_GPU_MAIN_RESOURCE_475FFCC] - Active final gates / Local GPU Worker
+
+Status:
+ON_TRACK / PR27_MERGED / LOCAL_GPU_WORKER_ADOPTED_ON_MAIN / VALIDATION_REFRESH_FOUND / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after PR #27 merge; Local GPU Worker marked `DONE / MAIN_RESOURCE`
+
+Evidence:
+Latest checked `origin/main` is `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`. PR #27 is closed / merged with merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36` and introduced only `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`. `origin/main` now contains the Local GPU Worker rules and both scripts. Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. GitHub connector reports `mergeable=false` for the open PRs after `main` advanced, but local current-main merge-tree and diff-check pass for all four against `475ffcc`: PR #22 tree `70445c6d917b4fa9770bf03c5d793851b95d2082`; PR #23 tree `21268d41f992bbb7d0c3aa475fa1112260fc3d5c`; PR #25 tree `386f6646f97cfef64740ad1fec290e1ec8763de7`; PR #26 tree `1f9272e73f51467c34d3e989c9aef6130966c55a`; all diff-check exits `0`.
+
+Recommended Executive Action:
+Stop Local GPU Worker adoption chase. Keep one single-primary `To: Deputy Codex-2` visible ACK request for active PR current-main reconciliation. Do not chase ordinary Builders while local validation remains clean.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `475ffcc`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry. Keep Local GPU Worker classified as `DONE / MAIN_RESOURCE`.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T08:36:24Z - [PR25_REFRESH_GPU_BRANCH_GATE_2781E2F] - Active final gates / Local GPU Worker
 
 Status:

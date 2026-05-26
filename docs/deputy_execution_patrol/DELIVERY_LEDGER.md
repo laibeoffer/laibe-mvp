@@ -42,6 +42,29 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T09:07:05Z - PR #27 merged; Local GPU Worker adopted on `main` `475ffcc`
+
+Status:
+`STATE_RECONCILIATION / PR27_MERGED / LOCAL_GPU_WORKER_ADOPTED_ON_MAIN / VALIDATION_REFRESH_FOUND / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 current-main final-gate metadata reconciliation after PR #27 advanced `main`.
+- PR #27 state: closed / merged at `2026-05-26T09:00:21Z`, merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`. It only introduced `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`; Local GPU Worker is now a `main` resource.
+- Latest checked `origin/main` is `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. GitHub connector currently reports `mergeable=false` for the open PRs after `main` advanced, so current validation uses local Git merge-tree and diff-check.
+- Current-main merge-tree and diff-check pass for all four active PRs against `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`: PR #22 tree `70445c6d917b4fa9770bf03c5d793851b95d2082`; PR #23 tree `21268d41f992bbb7d0c3aa475fa1112260fc3d5c`; PR #25 tree `386f6646f97cfef64740ad1fec290e1ec8763de7`; PR #26 tree `1f9272e73f51467c34d3e989c9aef6130966c55a`; all diff-check exits `0`.
+- Local GPU Worker branch gate is closed: do not merge `origin/local-ai-workflow` for this purpose and do not continue the clean-branch adoption route unless a future scoped task asks for cleanup.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging active PR current-main simulation against `475ffcc`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+- Why no Builder chase exists: PR #27 was a commander-authorized governance merge and the remaining active PRs pass local current-main simulation. Builders should not be asked for new implementation unless a specific PR later shows a real blocker.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
 ### 2026-05-26T08:36:24Z - PR #25 refresh and Local GPU Worker branch gate against `2781e2f`
 
 Status:

@@ -37,6 +37,49 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T09:07:05Z - [PR27_MERGED_GPU_MAIN_RESOURCE_475FFCC] - Deputy Codex-2
+
+Status:
+PR27_MERGED / LOCAL_GPU_WORKER_ADOPTED_ON_MAIN / VALIDATION_REFRESH_FOUND / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / PENDING_DEPUTY2_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+active final gates / metadata ACK recovery after Local GPU Worker merge
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26; PR #27 closed / merged
+
+Finding:
+PR #27 was merged into `main` with merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`, and Local GPU Worker is now a main-branch resource. The previous `local-ai-workflow` clean-branch gate is resolved. After `main` advanced, GitHub connector reports `mergeable=false` for the remaining open PRs, but local Git merge-tree and diff-check pass for PR #22 / #23 / #25 / #26 against `475ffcc`.
+
+Evidence:
+- `origin/main` is `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`.
+- PR #27 merged at `2026-05-26T09:00:21Z`; changed files were `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`.
+- `origin/main:AGENTS.md` contains `## Laibe Local GPU Worker`; `origin/main` contains both GPU worker scripts.
+- Issues #15 / #16 / #17 / #18 remain open; PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft.
+- PR heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Merge-tree / diff-check against `475ffcc`: PR #22 tree `70445c6d917b4fa9770bf03c5d793851b95d2082`; PR #23 tree `21268d41f992bbb7d0c3aa475fa1112260fc3d5c`; PR #25 tree `386f6646f97cfef64740ad1fec290e1ec8763de7`; PR #26 tree `1f9272e73f51467c34d3e989c9aef6130966c55a`; all diff-check exits `0`.
+
+Action already taken:
+Commander patrol published this docs-only reconciliation. No source files, secrets, payment/auth/webhook files, package files, destructive git, or extra branch merges were touched.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for active PR current-main simulation against `475ffcc`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry. Executive Officer should stop Local GPU Worker adoption chase.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
 ### 2026-05-26T08:36:24Z - [PR25_REFRESH_GPU_BRANCH_GATE_2781E2F] - Deputy Codex-2
 
 Status:

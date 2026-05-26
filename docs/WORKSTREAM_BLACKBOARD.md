@@ -1345,6 +1345,19 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T09:07:05Z - PR #27 merged and Local GPU Worker adopted on main
+
+- Workstream: local-gpu-worker-governance / active-final-gates
+- Branch: `origin/main` `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`; PR #27 merged with merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / PR27_MERGED / LOCAL_GPU_WORKER_ADOPTED_ON_MAIN / VALIDATION_REFRESH_FOUND / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / DEPUTY2_ACK_STILL_REQUIRED`
+- Changed: Commander-authorized PR #27 was merged into `main`. `origin/main` now contains the `AGENTS.md` Laibe Local GPU Worker section and `scripts/gpu-readonly.ps1` / `scripts/gpu-readonly.bat`. The old `origin/local-ai-workflow` clean-branch gate is closed; do not use or merge `local-ai-workflow` for this worker adoption.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / #23 / #25 / #26 remain open and non-draft. PR #27 is closed / merged. GitHub connector currently reports `mergeable=false` for the remaining open PRs after `main` advanced, so this patrol used local Git merge-tree against latest `origin/main` as the current validation source.
+- Current-main simulation against `475ffcc` passes for all four active PRs: PR #22 tree `70445c6d917b4fa9770bf03c5d793851b95d2082`; PR #23 tree `21268d41f992bbb7d0c3aa475fa1112260fc3d5c`; PR #25 tree `386f6646f97cfef64740ad1fec290e1ec8763de7`; PR #26 tree `1f9272e73f51467c34d3e989c9aef6130966c55a`; all `git diff --check 475ffcc <merge-tree>` results exit `0`.
+- Dispatch: To: Deputy Codex-2. Workstream: active final-gate metadata ACK recovery. Branch / Repo: `laibeoffer/laibe-mvp`, PR #22 / #23 / #25 / #26. Mission: publish visible `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` against latest `origin/main` `475ffcc`, noting PR #27 has merged and the Local GPU Worker is now a main-branch resource. Why this agent: Deputy Codex-2 owns GitHub / branch / worktree reconciliation. Action: cite the four merge-tree / diff-check pass results above or publish exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry. Need Commander: No. Need Reviewer: No.
+- Dispatch: To: Executive Officer. Workstream: visible ACK recovery. Branch / Repo: `laibeoffer/laibe-mvp`, PR #22 / #23 / #25 / #26. Mission: stop Local GPU Worker adoption chase; chase only Deputy Codex-2 visible ACK for active PR current-main reconciliation. Why this agent: Executive Officer owns owner chase and missing ACK visibility. Action: do not ask Builders for new implementation while local simulation is clean. Need Commander: No. Need Reviewer: No.
+- Dispatch: To: Triage Officer. Workstream: queue classification. Branch / Repo: `laibeoffer/laibe-mvp`. Mission: mark PR #27 / Local GPU Worker as `DONE / MAIN_RESOURCE`, and route active PRs as current-main validation refresh pending Deputy2 ACK. Why this agent: Triage owns queue sorting and lag classification. Action: remove `LOCAL_GPU_BRANCH_PUSHED_NOT_MAIN_READY` from active route; keep active PR final-gate routing separate. Need Commander: No. Need Reviewer: No.
+- Safety: No source / production files, payment, auth, webhook, `.env`, secrets, package files, destructive git, or extra branch merge were touched by this patrol.
+
 ### 2026-05-26T08:36:24Z - Commander patrol after PR #25 refresh and local GPU branch gate
 
 - Workstream: active-final-gates / local-gpu-worker-governance
