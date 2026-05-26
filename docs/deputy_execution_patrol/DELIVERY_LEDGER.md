@@ -42,6 +42,28 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 active final-gate metadata reconciliation after PR #25 clean Codex evidence was published.
+- Latest checked `origin/main` is `5014d03c1f86aac91ac99cd8e46f4326eacd006e`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged. REST reports PR #22 / PR #23 / PR #26 `mergeable=true` / `mergeable_state=clean`; PR #25 returned `mergeable=null` / `mergeable_state=unknown`, but its merge ref exists.
+- Current-main merge-tree and diff-check pass for all four active PRs against `5014d03c1f86aac91ac99cd8e46f4326eacd006e`: PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`; PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`; PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`; PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all diff-check exits `0`.
+- Sources checked: required docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR issue comments since `2026-05-26T11:05:25Z`, and current-main merge-tree / diff-check outputs.
+- No issue comments appeared on PR #22 / PR #23 / PR #25 / PR #26 after `2026-05-26T11:05:25Z`, and no newer Deputy Codex-2 visible ACK was found after the 11:05 `PENDING_DEPUTY2_ACK` row. This is repeated active-handler silence, not Builder missing work.
+- Required visible follow-up: Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #25 clean Codex result plus active PR current-main simulation against `5014d03`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if any contradictory evidence remains. After Deputy2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
 ### 2026-05-26T11:05:25Z - PR #25 post-fix Codex clean found after `6ba84db`
 
 Status:

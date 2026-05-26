@@ -37,6 +37,50 @@ PENDING
 
 ## Pending Executive Findings
 
+### 2026-05-26T12:30:13Z - [REPEATED_DEPUTY2_ACK_SILENCE_5014D03] - Deputy Codex-2
+
+Status:
+VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK
+
+Executive Officer:
+EXECUTIVE_OFFICER
+
+To:
+Deputy Codex-2
+
+Workstream:
+active final gates / repeated Deputy2 ACK recovery
+
+Issue / PR:
+laibeoffer/laibe-mvp PR #22 / PR #23 / PR #25 / PR #26
+
+Finding:
+No visible Deputy Codex-2 ACK was found after the 11:05 `PENDING_DEPUTY2_ACK` row. `origin/main` is stable at `5014d03c1f86aac91ac99cd8e46f4326eacd006e`; active PR heads are unchanged; local current-main merge-tree and diff-check pass for all four active PRs. This remains Deputy2 ACK visibility, not ordinary Builder missing work.
+
+Evidence:
+- Sources checked: required docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR issue comments since `2026-05-26T11:05:25Z`, and current-main merge-tree / diff-check outputs.
+- Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed.
+- PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged.
+- PR heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- REST mergeability: PR #22 / PR #23 / PR #26 `mergeable=true` / `mergeable_state=clean`; PR #25 `mergeable=null` / `mergeable_state=unknown`, with merge ref present.
+- Merge-tree / diff-check against `5014d03`: PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`; PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`; PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`; PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all diff-check exits `0`.
+- PR #22 / PR #23 / PR #25 / PR #26 have no new issue comments since `2026-05-26T11:05:25Z`.
+
+Action already taken:
+Executive Officer published this docs-only repeated-silence follow-up and avoided duplicate GitHub / Builder chase. No source files changed. No merge / reject / close action was executed.
+
+Recommended Deputy action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for active PR current-main simulation against `5014d03`, including PR #25 clean Codex evidence, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains. After Deputy2 ACK, Deputy Codex should publish final-gate visibility or exact blocker for PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
+Deputy Decision:
+PENDING_DEPUTY2_ACK
+
 ### 2026-05-26T11:05:25Z - [PR25_CODEX_CLEAN_FOUND_6BA84DB] - Deputy Codex-2
 
 Status:

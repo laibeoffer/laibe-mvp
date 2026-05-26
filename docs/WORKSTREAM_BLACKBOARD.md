@@ -1345,6 +1345,34 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
+
+- Workstream: executive-visible-ack-recovery / active-final-gates / metadata-reconciliation
+- Branch: `origin/main` `5014d03c1f86aac91ac99cd8e46f4326eacd006e`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+- Changed: Executive Officer re-read required docs from latest `origin/main`, reconciled GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR issue comments since `2026-05-26T11:05:25Z`, and reran current-main merge-tree plus diff-check against `5014d03`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open and non-draft; PR #27 remains closed / merged. PR #22 / #23 / #26 REST metadata is clean; PR #25 REST mergeability is still `unknown`, but its merge ref exists and local validation passes.
+- Current-main simulation against `5014d03` passes for all four active PRs: PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`; PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`; PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`; PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all `git diff --check` results exit `0`.
+- Recovery assessment: no newer Deputy Codex-2 visible ACK was found after the 11:05 `PENDING_DEPUTY2_ACK` row, and PR #22 / PR #23 / PR #25 / PR #26 have no new issue comments since `2026-05-26T11:05:25Z`. Active Builder work is not missing; this remains Deputy Codex-2 visible ACK recovery followed by Deputy Codex final-gate visibility.
+
+Direct orders:
+- Primary To: Deputy Codex-2.
+  Workstream: active-final-gate metadata reconciliation.
+  Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` for active PR current-main simulation against latest main `5014d03c1f86aac91ac99cd8e46f4326eacd006e`, including PR #25 clean Codex evidence. If contradictory evidence remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`.
+  Need Commander: No
+  Need Reviewer: No
+- Primary To: Executive Officer.
+  Workstream: visible ACK recovery.
+  Action: no duplicate Builder or GitHub chase. Keep the single-primary Deputy Codex-2 ACK request until a visible ACK appears; after Deputy Codex-2 ACK appears, chase Deputy Codex final-gate visibility.
+  Need Commander: No
+  Need Reviewer: No
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or user explicitly requests review.
+
 ### 2026-05-26T11:05:25Z - PR #25 post-fix Codex clean found after `6ba84db`
 
 - Workstream: plan-puzzle / active-final-gates / metadata-reconciliation

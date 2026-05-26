@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T12:30:13Z - [REPEATED_DEPUTY2_ACK_SILENCE_5014D03] - Active final gates
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after `main` advanced to `5014d03`
+
+Evidence:
+Latest checked `origin/main` is `5014d03c1f86aac91ac99cd8e46f4326eacd006e`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged. PR #22 / PR #23 / PR #26 REST metadata is clean; PR #25 REST mergeability is still `unknown`, but its merge ref exists and local current-main merge-tree / diff-check pass. Current-main merge-tree and diff-check pass for PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`, PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`, PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`, and PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all diff-check exits `0`. No PR #22 / #23 / #25 / #26 issue comments appeared after `2026-05-26T11:05:25Z`, and no newer Deputy Codex-2 ACK was found after the 11:05 row.
+
+Recommended Executive Action:
+Keep one single-primary `To: Deputy Codex-2` visible ACK request. Do not chase ordinary Builders or post duplicate GitHub comments while local validation remains clean and no new PR comments exist.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `5014d03`, or exact blocker if contradictory evidence remains. After Deputy2 ACK, Deputy Codex owns final-gate visibility or exact blocker.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No
+
 ### 2026-05-26T11:05:25Z - [PR25_CODEX_CLEAN_FOUND_6BA84DB] - Plan Puzzle / active final gates
 
 Status:
