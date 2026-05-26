@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T10:22:27Z - [PR25_REPAIR_FOUND_B489E7A] - Plan Puzzle
+
+Status:
+ON_TRACK / WORKFLOW_REPAIR_ATTEMPTED_FOUND / PR25_HEAD_ADVANCED / GITHUB_MERGEABLE_CLEAN / CURRENT_MAIN_SIMULATION_PASS / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #25 / Issue #15 / `plancraft/zone-area-boundary-refinement`
+
+Evidence:
+Latest checked `origin/main` is `b489e7a320829772e6b89dd2ad8ad548ec339262`. PR #25 head advanced to `7480b24c7b4e23aab5c2783ee6caf21a729b1002`. GitHub REST, before API rate-limit fallback, returned `mergeable=true` / `mergeable_state=clean`; issue comment `4543310426` at `2026-05-26T10:19:29Z` begins `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`. Local current-main merge-tree tree is `da8ef4e2c9b3bde98a007df6bc6d2aae17e26fdd`; diff-check exits `0`. Changed files remain scoped to the Plan Puzzle page and handoff / phase packet docs.
+
+Recommended Executive Action:
+Stop ordinary Plan Puzzle Builder chase for PR #25 while this evidence stays current. Keep one single-primary visible ACK request to Deputy Codex-2.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #25 against `b489e7a`, or exact blocker if GitHub / local validation becomes contradictory.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+No
+
 ### 2026-05-26T10:01:09Z - [REPEATED_DEPUTY2_ACK_SILENCE_DADF4E3] - Active final gates
 
 Status:

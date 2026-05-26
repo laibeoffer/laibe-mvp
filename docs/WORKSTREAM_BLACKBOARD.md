@@ -1345,6 +1345,29 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T10:22:27Z - PR #25 repair evidence found on `b489e7a`
+
+- Workstream: plancraft-page-ui / final-gate validation refresh
+- Branch: `origin/main` `b489e7a320829772e6b89dd2ad8ad548ec339262`; PR #25 `plancraft/zone-area-boundary-refinement` head `7480b24c7b4e23aab5c2783ee6caf21a729b1002`
+- Status: `VALIDATION_REFRESH_FOUND / WORKFLOW_REPAIR_ATTEMPTED_FOUND / PR25_HEAD_ADVANCED / GITHUB_MERGEABLE_CLEAN / CURRENT_MAIN_SIMULATION_PASS / API_LIMIT_FALLBACK_AFTER_PARTIAL_REST`
+- Changed: patrol docs only; no source files changed by this Commander patrol.
+- Evidence:
+  - GitHub REST, before rate-limit fallback, returned PR #25 `mergeable=true` / `mergeable_state=clean` and `updated_at=2026-05-26T10:24:10Z`.
+  - PR #25 has a new visible issue comment `4543310426` by `laibeoffer` at `2026-05-26T10:19:29Z`, beginning `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`.
+  - `refs/pull/25/head` advanced from the prior ledger head `2fb56655b9d0a4d8d03613f9deee301e047c7966` to `7480b24c7b4e23aab5c2783ee6caf21a729b1002`.
+  - Current-main simulation against `b489e7a320829772e6b89dd2ad8ad548ec339262` exits clean: `git merge-tree --write-tree` tree `da8ef4e2c9b3bde98a007df6bc6d2aae17e26fdd`; `git diff --check` exits `0`.
+  - PR #25 changed files remain scoped to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+  - PR #22 / #23 / #26 had no new issue comments after `2026-05-26T10:01:09Z` before API rate-limit fallback; local current-main simulations still exit clean against `b489e7a`.
+- Decision:
+  - To: Deputy Codex-2
+  - Workstream: plancraft-page-ui
+  - Branch / Repo: `plancraft/zone-area-boundary-refinement` / `laibeoffer/laibe-mvp`
+  - Mission: acknowledge the PR #25 Builder repair and finish latest-main final-gate validation against `b489e7a`.
+  - Why this agent: Deputy Codex-2 owns GitHub / branch / worktree reconciliation and the visible ACK for validation refresh; Plan Puzzle Builder has now produced an effective repair artifact.
+  - Action: publish `VALIDATION_REFRESH_FOUND` or `ACTION_TAKEN` with latest main SHA `b489e7a320829772e6b89dd2ad8ad548ec339262`, branch SHA `7480b24c7b4e23aab5c2783ee6caf21a729b1002`, GitHub `mergeable=clean`, merge-tree tree `da8ef4e2c9b3bde98a007df6bc6d2aae17e26fdd`, diff-check `0`, and exact blocker if any remains.
+  - Need Commander: No unless requesting merge / reject for PR #25.
+  - Need Reviewer: No unless Codex reports `NEEDS_FIX` / P1 / P2 or scope drift appears.
+
 ### 2026-05-26T10:01:09Z - Repeated Deputy2 ACK silence after `dadf4e3`
 
 - Workstream: active-final-gates / deputy2-visible-ack-recovery
