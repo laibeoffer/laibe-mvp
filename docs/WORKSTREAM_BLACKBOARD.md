@@ -1345,6 +1345,20 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-05-26T10:01:09Z - Repeated Deputy2 ACK silence after `dadf4e3`
+
+- Workstream: active-final-gates / deputy2-visible-ack-recovery
+- Branch: `origin/main` `dadf4e359e75df46f99dd44b66161a24c1f4ead4`; PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`
+- Status: `STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / GITHUB_CONNECTOR_TIMEOUT_FALLBACK / REPEATED_ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / PENDING_DEPUTY2_ACK`
+- Changed: Commander patrol re-read required governance / strategy / blackboard / role / ledger / triage / inbox / reviewer files from latest `origin/main`, reconciled GitHub Issues #15-#18, PR #22 / #23 / #25 / #26 / #27 metadata through REST fallback, checked PR #23 / PR #26 issue comments and reviews since `2026-05-26T09:45:22Z`, and reran current-main merge-tree plus diff-check against `dadf4e3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / #23 / #25 / #26 remain open and non-draft. PR #27 remains closed / merged. GitHub REST currently returns `mergeable=null` / `mergeable_state=unknown` for active PRs, and the GitHub connector timed out during this patrol, so current validation uses local Git refs plus REST fallback.
+- Current-main simulation against `dadf4e3` passes for all four active PRs: PR #22 tree `8011fde33c01dedb87b994cdb147290650ac1329`; PR #23 tree `cba192ca4a9ae04b5ecb9b3d10ccfba6984d25c8`; PR #25 tree `219811567a27739a21c0016986d886c042a2fba7`; PR #26 tree `857ca6b032d771f8c803828bd847c1c2a8aefa7e`; all `git diff --check dadf4e3 <merge-tree>` results exit `0`.
+- Recovery assessment: no Deputy Codex-2 visible ACK, no PR #23 / PR #26 issue comment, and no PR #23 / PR #26 review appeared after the `2026-05-26T09:45:22Z` `PENDING_DEPUTY2_ACK` row. This is now a repeated active-handler silence, not missing Builder work.
+- Dispatch: To: Deputy Codex-2. Workstream: active final-gate metadata ACK recovery. Branch / Repo: `laibeoffer/laibe-mvp`, PR #22 / #23 / #25 / #26. Mission: immediately publish visible `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` against latest `origin/main` `dadf4e359e75df46f99dd44b66161a24c1f4ead4`. Why this agent: Deputy Codex-2 is the ledger Current Handler for GitHub / branch / worktree reconciliation. Action: cite branch heads, REST fallback state, merge-tree PASS, and diff-check PASS above; if contradictory evidence remains, publish exact `BLOCKER_WITH_ATTEMPTED_FIX`. Need Commander: No. Need Reviewer: No.
+- Dispatch: To: Executive Officer. Workstream: visible ACK recovery. Branch / Repo: `laibeoffer/laibe-mvp`. Mission: issue one direct follow-up only to Deputy Codex-2; do not chase ordinary Builders or post duplicate GitHub comments while local validation is clean. Why this agent: Executive Officer owns owner chase and repeated non-response callouts. Action: point Deputy Codex-2 to this row and request one short visible ACK. Need Commander: No. Need Reviewer: No.
+- Dispatch: To: Triage Officer. Workstream: queue classification. Branch / Repo: `laibeoffer/laibe-mvp`. Mission: keep active PRs `ON_TRACK / VALIDATION_REFRESH_FOUND`, classify the blocker as `REPEATED_ACTIVE_HANDLER_SILENT / NEEDS_DEPUTY2_ACK`, and keep Local GPU Worker as `DONE / MAIN_RESOURCE`. Why this agent: Triage owns queue sorting and lag classification. Action: do not reroute to Builders. Need Commander: No. Need Reviewer: No.
+- Safety: No source / production files, payment, auth, webhook, `.env`, secrets, package files, destructive git, merge, close, or force action were touched.
+
 ### 2026-05-26T09:45:22Z - Executive visible ACK recovery after patrol docs advanced main
 
 - Workstream: executive-visible-ack-recovery / active-final-gates / metadata-reconciliation

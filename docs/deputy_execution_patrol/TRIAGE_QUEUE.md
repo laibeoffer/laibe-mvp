@@ -36,6 +36,32 @@ Need Reviewer:
 
 ## Open Triage Items
 
+### 2026-05-26T10:01:09Z - [REPEATED_DEPUTY2_ACK_SILENCE_DADF4E3] - Active final gates
+
+Status:
+ON_TRACK / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / GITHUB_CONNECTOR_TIMEOUT_FALLBACK / REPEATED_ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / NEEDS_DEPUTY2_ACK
+
+Complexity:
+MEDIUM
+
+Target:
+`laibeoffer/laibe-mvp` PR #22 / PR #23 / PR #25 / PR #26 current-main validation refresh after `main` advanced to `dadf4e3`
+
+Evidence:
+Latest checked `origin/main` is `dadf4e359e75df46f99dd44b66161a24c1f4ead4`. PR #27 remains closed / merged and Local GPU Worker remains adopted on `main`. Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; branch heads are PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector timed out; REST fallback returned `mergeable=null` / `mergeable_state=unknown`. Local current-main merge-tree / diff-check pass for all four against `dadf4e3`: PR #22 tree `8011fde33c01dedb87b994cdb147290650ac1329`; PR #23 tree `cba192ca4a9ae04b5ecb9b3d10ccfba6984d25c8`; PR #25 tree `219811567a27739a21c0016986d886c042a2fba7`; PR #26 tree `857ca6b032d771f8c803828bd847c1c2a8aefa7e`; all diff-check exits `0`. No newer Deputy Codex-2 visible ACK, PR #23 / PR #26 issue comment, or PR #23 / PR #26 review was found after `2026-05-26T09:45:22Z`.
+
+Recommended Executive Action:
+Issue one direct follow-up only to Deputy Codex-2. Do not chase ordinary Builders or post duplicate GitHub comments while local validation remains clean.
+
+Recommended Deputy Action:
+Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for active PR current-main simulation against `dadf4e3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ### 2026-05-26T09:45:22Z - [EXEC_ACK_RECOVERY_432B231] - Active final gates
 
 Status:

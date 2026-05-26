@@ -42,6 +42,29 @@ Execution-time main rule:
 
 ## Active Deputy Decision Override
 
+### 2026-05-26T10:01:09Z - Repeated Deputy2 ACK silence after `dadf4e3`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / GITHUB_CONNECTOR_TIMEOUT_FALLBACK / REPEATED_ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 current-main final-gate metadata reconciliation after `main` advanced to `dadf4e3`.
+- Latest checked `origin/main` is `dadf4e359e75df46f99dd44b66161a24c1f4ead4`.
+- Prior PR #27 merge remains adopted: Local GPU Worker is on `main` via merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`; no further Local GPU Worker adoption chase is needed.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #27 remains closed / merged. GitHub connector timed out during this patrol; REST fallback returned `mergeable=null` / `mergeable_state=unknown` for active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `dadf4e359e75df46f99dd44b66161a24c1f4ead4`: PR #22 tree `8011fde33c01dedb87b994cdb147290650ac1329`; PR #23 tree `cba192ca4a9ae04b5ecb9b3d10ccfba6984d25c8`; PR #25 tree `219811567a27739a21c0016986d886c042a2fba7`; PR #26 tree `857ca6b032d771f8c803828bd847c1c2a8aefa7e`; all diff-check exits `0`.
+- No newer Deputy Codex-2 visible ACK was found after the `2026-05-26T09:45:22Z` `PENDING_DEPUTY2_ACK` row, and no PR #23 / PR #26 issue comment or review appeared after that row. This is a repeated active-handler silence / two-patrol non-response.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging active PR current-main simulation against `dadf4e3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
 ### 2026-05-26T09:45:22Z - Executive current-main ACK recovery after patrol docs advance to `432b231`
 
 Status:
