@@ -51,6 +51,9 @@ Laibe 專案已配置本地 GPU worker。任何最高指揮官 Agent、統籌 Ag
 重要規則：
 - 一般 Codex App / Codex 聊天室不會自動使用 GPU
 - 只有透過 Ollama / Codex OSS local provider 才會使用 GPU
+- Preferred path: `scripts/gpu-readonly.ps1` / `scripts/gpu-readonly.bat` direct Ollama mode
+- Codex OSS path 已驗證會調動 GPU，但 qwen2.5-coder:7b 可能輸出 tool-call JSON，因此不作為主要分析入口
+- 本地 GPU worker 是直接 Ollama read-only file analyzer，不是 Codex patch agent
 - 本地 GPU worker 只能做 read-only analysis / patch draft
 - 本地 GPU worker 不得直接修改 production code
 - 本地 GPU worker 不得碰 payment/auth/webhook/.env/secrets
@@ -92,19 +95,13 @@ Laibe 專案已配置本地 GPU worker。任何最高指揮官 Agent、統籌 Ag
 本地 GPU worker 簡易入口：
 
 ```powershell
-.\scripts\gpu-readonly.ps1 "Read only the specified file. Do not edit files. Explain the issue and generate a unified diff draft only."
+.\scripts\gpu-readonly.ps1 -FilePath "local_ai_sandbox\add-safe.js" -Instruction "Explain this file. Do not edit files. Suggest a unified diff draft only if needed."
 ```
 
 也可使用 Windows 批次入口：
 
 ```bat
-scripts\gpu-readonly.bat "Read only the specified file. Do not edit files. Explain the issue and generate a unified diff draft only."
-```
-
-底層典型命令：
-
-```powershell
-codex.cmd exec --oss --local-provider ollama -m qwen2.5-coder:7b -s read-only -C C:\laibe_project "Read only the specified file. Do not edit files. Explain the issue and generate a unified diff draft only."
+scripts\gpu-readonly.bat local_ai_sandbox\add-safe.js "Explain this file. Do not edit files. Suggest a unified diff draft only if needed."
 ```
 
 ## 1. Mandatory Reading Order
