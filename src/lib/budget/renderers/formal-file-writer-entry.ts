@@ -68,6 +68,7 @@ export const writeFormalBudgetArtifact = (
   const stagingPolicy = validateFormalLocalStagingPolicy({
     storage_target: optionsRecord.storage_target,
     staging_relative_path: optionsRecord.staging_relative_path,
+    write_to_staging: optionsRecord.write_to_staging,
     actual_artifact_kind: actualArtifactKind,
     signed_document_exists: optionsRecord.signed_document_exists,
   });

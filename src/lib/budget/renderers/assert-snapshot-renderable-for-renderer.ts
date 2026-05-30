@@ -23,6 +23,34 @@ const getStringField = (
   return typeof value === "string" ? value : null;
 };
 
+const getStringArrayElementErrors = (
+  snapshot: Partial<BudgetOutputSnapshot> | null | undefined,
+  field: keyof BudgetOutputSnapshot,
+): string[] => {
+  if (!isRecord(snapshot)) {
+    return [];
+  }
+
+  const value = snapshot[field];
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const invalidIndexes = value
+    .map((entry, index) => (typeof entry === "string" ? null : index))
+    .filter((index): index is number => index !== null);
+
+  return invalidIndexes.length > 0
+    ? [
+        `BudgetOutputSnapshot.${String(
+          field,
+        )} must contain only strings. Invalid indexes: ${invalidIndexes.join(
+          ", ",
+        )}.`,
+      ]
+    : [];
+};
+
 const makeRejectedGateResult = (
   snapshot: Partial<BudgetOutputSnapshot> | null | undefined,
   errors: string[],
@@ -55,8 +83,19 @@ export const assertSnapshotRenderableForRenderer = (
     );
   }
 
-  return assertSnapshotRenderable(snapshot, {
+  const gate = assertSnapshotRenderable(snapshot, {
     requireCustomerView: options.requireCustomerView ?? true,
     requireInternalView: options.requireInternalView ?? false,
   });
+
+  const rendererOnlyErrors = getStringArrayElementErrors(snapshot, "warnings");
+  if (rendererOnlyErrors.length > 0) {
+    return {
+      ...gate,
+      allowed: false,
+      errors: [...gate.errors, ...rendererOnlyErrors],
+    };
+  }
+
+  return gate;
 };

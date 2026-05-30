@@ -1,4 +1,4 @@
-const tokenRegistry = new WeakSet<object>();
+const tokenRegistry = new WeakSet();
 
 const tokenBrand = Symbol("laibe.formal_renderer_entry_token");
 
