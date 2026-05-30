@@ -1,5 +1,24 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest MethodSpec Documentation Task: Validator Freeze Note
+
+- 本輪任務名稱：MethodSpec validator freeze note。
+- GitHub Issue：#16 `[MethodSpec] Add validator freeze note`。
+- 任務類型：Documentation / Governance checkpoint；本輪只整理 MethodSpec validator 狀態與邊界，不修改 runtime code。
+- 新增檔案：
+  - `docs/budget/32-method-spec-validator-freeze-note.md`
+- 修改檔案：
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- 未修改：`src/lib/budget/specs/`、`src/lib/budget/output/`、`src/lib/budget/renderers/`、`src/lib/budget/raw-warehouse/`、`src/lib/budget/intake/`、frontend、preview floor plan、plan-puzzle、payment / escrow / listing fee。
+- 目前凍結狀態：PR #4 merged；P0 / P1-A / P1-B MethodSpec validator work complete；MS-12 reviewer verdict is `PASS_WITH_NOTES`。
+- `PASS_WITH_NOTES` 只因歷史 dirty / untracked repo baseline，非 validator boundary failure。
+- Frozen invariants：AI / RAG / raw candidate data 不得直接成為正式價格；`LaborRule` remains reference-only；`MaterialSpec` / `ItemMaterialBinding` / `NoteTemplate` / `InclusionExclusionRule` 不得改 `unit_price`、`amount` 或 `quantity`。
+- UnitConversion coverage remains warning-only and must not rewrite generated quantities.
+- Inclusion / Exclusion scope coverage remains warning / allowed-condition only and must not propagate directly to renderer or output.
+- Regression baseline remains: total amount `231103`, budget line count `12`, review-required line count `5`.
+- 下一步建議：若繼續 MethodSpec，應另開 formal Issue 做 P2 validator planning 或 clean worktree / file ownership proof；不得從本文件直接進 formal price、renderer、raw warehouse publishing 或 schema expansion。
+
 ## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
 
 - 本輪任務名稱：Strategic Plan Imported / Dispatch Source Clarified。
