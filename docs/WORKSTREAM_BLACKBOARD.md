@@ -94,7 +94,7 @@ Forbidden:
 
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
-| Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT_PR_OPEN | 40 | Yes | PR #32 initializes the vault and is open / mergeable; PR #31 remains related boundary context and is now routed to Integration Officer disposition issue #41. Summaries, gaps, proposals, decisions, and feedback loops live under `docs/budget_knowledge_vault/`. |
+| Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT_PR_OPEN | 40 | Yes | PR #32 initializes the vault and is open / mergeable; PR #31 remains related boundary context in Integration Officer disposition issue #41. Functional Acceptance rule is tracked as support evidence only. Summaries, gaps, proposals, decisions, and feedback loops live under `docs/budget_knowledge_vault/`. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` now exposes front-end QA log, summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. Not part of budget integration gate. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
 
@@ -152,6 +152,18 @@ Use this format only when changing current status:
 ```
 
 Do not paste full logs or repeated heartbeat text into this file.
+
+### 2026-06-01 - Budget Knowledge Vault Functional Acceptance Signal
+
+- Agent: Budget Knowledge Vault Agent
+- Workstream: `knowledge/budget-vault`
+- Status: `ISSUE41_FUNCTIONAL_ACCEPTANCE_SIGNAL_TRACKED / PR32_OPEN_MERGEABLE`
+- Progress %: 40
+- Evidence: Issue #41 records that `MERGED_TO_MAIN` is not equal to `FUNCTIONAL_ACCEPTED`; docs/governance/blackboard/handoff-only PRs are `Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY`; four budget gate lines remain below 100 and the `BUDGET_ENGINE_ENTRY_BLOCKER` investigation belongs to `LAIBE_REVIEWER_INTEGRATION_OFFICER`.
+- Blocker: PR #31 / PR #32 remain unmerged; Budget Knowledge Vault cannot run Budget Engine investigation, start integration harness, or decide gate readiness.
+- Need Commander: No
+- Need Reviewer: No, unless Integration Officer records forbidden budget flow, renderer boundary drift, payment/auth/webhook/secrets, formal price/output conversion, or disputed scope.
+- Next single action: Keep PR #32 current and keep Issue #41 Functional Acceptance / blocker evidence mirrored in `docs/budget_knowledge_vault/`.
 
 ### 2026-06-01 - Budget Knowledge Vault Blackboard Patrol
 

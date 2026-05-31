@@ -8,6 +8,8 @@
 | PR #26 final review / merge gate pending | Raw Candidate | Open | Raw candidate handoff evidence is not yet confirmed as merged shared truth. |
 | `BUDGET_ENGINE_ENTRY_BLOCKER` | MethodSpec / Budget Engine | Open | Executable budget integration dry-run cannot be claimed until the engine entry path is clarified. |
 | PR #29 not merged in task brief | Output Documents | Open | Snapshot-only integration usage note is not confirmed as merged shared truth. |
+| Functional Acceptance evidence required | All four budget core lines | Open | Issue #41 says `MERGED_TO_MAIN` is not `FUNCTIONAL_ACCEPTED`; no line can become 100 without accepted runtime / validator / static guard / smoke evidence. |
+| Budget Engine entry investigation pending | MethodSpec / Budget Engine | Open | Issue #41 assigns read-only Budget Engine entry investigation to `LAIBE_REVIEWER_INTEGRATION_OFFICER` and forbids patching or creating `budget-generator.ts` in this round. |
 
 ## Support Agent Initialization Gaps
 
