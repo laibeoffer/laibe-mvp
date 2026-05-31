@@ -22,6 +22,46 @@ Draft / Ready for user-triggered review / Reviewed / Needs update before review
 
 ---
 
+## Plancraft+ 平面拼圖引導官 MVP
+
+### 本輪新增
+
+- 在 `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html` / `plan-puzzle.js` 的右側狀態區新增「平面拼圖引導官」。
+- UI 包含對話區、輸入框、送出按鈕、快速問題、引導流程按鈕、對話狀態、圖層切換、系統提醒 / 缺失清單與提醒動作。
+- 新增本地 `GUIDE_KNOWLEDGE` 與 keyword matching，不呼叫真實 LLM。
+- 新增開始、屋況、主要需求、預算偏好、圖面提醒、需求摘要的本地引導流程。
+- 新增 guide 資料模型並寫入 Plancraft+ draft JSON：
+  - `project.guide`
+  - `project.guideLog`
+  - `project.requirementNotes`
+  - `project.guideSummary`
+- `currentLayer` 會給平面配置、拆除、地坪、燈具、空調的本地建議。
+- `selectedObject` 會針對 wall / opening / zone / issue 給需求整理與專業確認提醒。
+- `systemReminders` 會讀既有 `project.systemReminders` 並補本地缺失提醒。
+
+### 邊界
+
+- 本輪不是 AI API integration。
+- 本輪未接 OpenAI API。
+- 本輪未接 image API。
+- 本輪不是正式估價。
+- 本輪未做 AI 自動估價。
+- 本輪未做 production storage。
+- 本輪未修改 Plancraft core。
+- 本輪未修改 budget runtime。
+- 本輪未解除 `formalEstimateGuard`。
+- 本輪未讓 `generateBudgetEstimate` 接受 Plancraft+ spike output 或 guide data。
+- `guideLog` / `requirementNotes` / `guideSummary` 是需求整理與招標溝通資料，不是正式 quantity、正式施工圖或正式報價依據。
+
+### Review / Commander
+
+- Need Commander：Yes。原因：平面拼圖引導官會影響使用者行動線、問答內容、需求記錄與產品體驗，需要 Commander 確認產品方向。
+- Need Reviewer：No。原因：本輪只做 UI / local guide / Plancraft+ draft JSON，不改 budget runtime、guard 或 Plancraft core。
+- 資料模型變更：有，限於 Plancraft+ draft JSON 的 guide 欄位；未接正式預算資料流。
+- 下一步唯一建議：Commander 先確認引導官問答語氣、流程順序與產品定位，再決定是否進入 UX / copy / review 調整。
+
+---
+
 ## Phase Name
 
 AI / Codex 中央治理規則層、Web Flow 靜態連接、Budget / specDB / Method-spec 資料契約建立階段

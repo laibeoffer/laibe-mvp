@@ -73,6 +73,152 @@
     /真實案例|實績照片|完工照|施工成果|施工圖|竣工圖|正式設計圖|正式報價|報價依據|完工保證|法規符合|消防符合|結構安全/gi,
     /real\s*case|completed\s*project|construction\s*drawing|blueprint|official\s*quotation|final\s*design/gi
   ];
+  const GUIDE_MODE = "local_rule_based";
+  const GUIDE_DISCLAIMER = "平面拼圖引導官提供需求整理與操作引導，不代表正式設計、施工圖、結構判斷或正式報價。";
+  const GUIDE_WELCOME_MESSAGE = "我是平面拼圖引導官，可以協助你整理需求、理解圖層與提醒缺漏。本輪只使用本地規則，不會連接任何 AI API。";
+  const GUIDE_FALLBACK_MESSAGE = "我目前可以協助你理解平面拼圖操作、圖層、預算提醒與需求記錄。這個問題我先幫你記錄成備註，後續可請廠商或萊比協助確認。";
+  const GUIDE_LAYER_OPTIONS = [
+    { value: "floor_plan", label: "平面配置" },
+    { value: "demolition_plan", label: "拆除圖" },
+    { value: "flooring_plan", label: "地坪圖" },
+    { value: "lighting_plan", label: "燈具圖" },
+    { value: "ac_plan", label: "空調圖" }
+  ];
+  const GUIDE_QUICK_QUESTIONS = [
+    "我要怎麼開始？",
+    "這張圖不是施工圖是什麼意思？",
+    "我該先畫牆還是先放櫃子？",
+    "哪些項目會影響預算？",
+    "我不確定要不要拆牆怎麼辦？",
+    "如何匯入丈量圖？",
+    "如何設定比例？",
+    "怎麼讓廠商看懂我的需求？",
+    "哪些東西只是示意，不會直接進預算？"
+  ];
+  const GUIDE_FLOW_STEP_OPTIONS = {
+    start: ["我要匯入丈量圖", "我要重做格局", "我要拆除舊裝潢", "我要新增櫃體", "我要整理浴室", "我不知道，請引導我"],
+    house_condition: ["新成屋", "舊屋", "不確定"],
+    old_house_details: ["有現況照片", "有漏水 / 壁癌 / 裂縫 / 海砂屋疑慮", "有舊櫃體或舊裝潢需要拆除", "目前不確定"],
+    main_needs: ["格局調整", "拆除", "地坪", "天花", "木作櫃", "系統櫃", "廚具", "浴室", "燈具", "插座 / 弱電", "給排水", "空調", "其他"],
+    budget_preference: ["省預算", "標準", "質感優先", "請廠商建議"]
+  };
+  const GUIDE_KNOWLEDGE = [
+    {
+      id: "start",
+      keywords: ["怎麼開始", "如何開始", "我要怎麼開始", "開始", "第一步"],
+      text: "建議先匯入丈量圖或手上的平面底圖，接著校正比例，再建立牆體、門窗、空間名稱與主要需求。你也可以先用備註告訴我想改哪些地方。"
+    },
+    {
+      id: "import-underlay",
+      keywords: ["匯入", "丈量圖", "底圖", "上傳", "jpg", "png", "pdf"],
+      text: "你可以用左側或上方的匯入按鈕放入 JPG / PNG 底圖。PDF 目前只保留匯入接口，建議先轉成圖片再校正比例。"
+    },
+    {
+      id: "scale",
+      keywords: ["比例", "校正", "設定比例", "尺寸比例", "pxpermm"],
+      text: "設定比例時，請在底圖上點兩個已知距離的點，再輸入實際長度 mm。比例校正後，牆長、開口位置與後續需求整理才比較有參考性。"
+    },
+    {
+      id: "draw-wall",
+      keywords: ["畫牆", "牆", "牆體", "wall"],
+      text: "畫牆時先選牆體狀態：既有牆、新設牆或拆除牆，再在畫布上點起點與終點。新設牆的厚度會影響後續需求整理；拆除或開口不確定時要標為需專業確認。"
+    },
+    {
+      id: "wall-status",
+      keywords: ["既有牆", "新設牆", "拆除牆", "拆牆", "承重牆", "結構牆"],
+      text: "既有牆代表現況保留，新設牆代表想新增，拆除牆代表希望移除。拆除牆體需要確認是否為承重牆或結構牆，不確定時請標記為需專業確認，不要直接當成可拆。"
+    },
+    {
+      id: "dimension",
+      keywords: ["標尺寸", "尺寸", "長度", "mm", "量測"],
+      text: "目前牆長與開口位置會依比例校正後的 mm 顯示。若你知道實際尺寸，請優先校正比例，再畫牆與開口；正式尺寸仍需現場丈量確認。"
+    },
+    {
+      id: "openings",
+      keywords: ["門窗", "門", "窗", "開口", "opening"],
+      text: "門、窗與開口需要先選到一段牆或 edge，再新增開口。寬度、offset、門片方向與窗台高度都只是需求整理資料，正式做法仍需廠商現場確認。"
+    },
+    {
+      id: "cabinet",
+      keywords: ["櫃", "木作", "系統櫃", "廚具", "櫃體"],
+      text: "櫃體需求建議先用備註記錄位置、用途、材質偏好、五金等級與是否納入預算。木作櫃、系統櫃與廚具的計價方式不同，後續需廠商依尺寸與材料確認。"
+    },
+    {
+      id: "layers",
+      keywords: ["圖層", "切換圖層", "顯示圖層", "隱藏圖層", "疊加"],
+      text: "圖層是把不同需求分開看：平面配置放牆、門窗與空間；拆除圖標要拆的項目；地坪圖標材料範圍；燈具與空調圖則整理偏好與位置。"
+    },
+    {
+      id: "not-construction-drawing",
+      keywords: ["施工圖", "不是施工圖", "正式施工圖", "這張圖不是施工圖"],
+      text: "平面拼圖是招標需求整理工具，不是正式施工圖。它可以幫你把需求說清楚，正式施工圖需要設計師或專業人員確認。"
+    },
+    {
+      id: "budget-impact",
+      keywords: ["影響預算", "預算", "預算準", "估價準", "報價"],
+      text: "會影響預算的項目包括拆除、清運、牆體、地坪、天花、櫃體、廚具、浴室防水、燈具、插座弱電、給排水與空調。目前平面拼圖整理的是預算候選資料，不是正式報價。"
+    },
+    {
+      id: "overview",
+      keywords: ["總預覽", "預覽", "總覽"],
+      text: "總預覽是把目前底圖、牆、門窗、空間標籤、提醒與需求備註一起看，方便你確認廠商是否能讀懂你的意圖。"
+    },
+    {
+      id: "photos",
+      keywords: ["照片", "現況照", "補照片"],
+      text: "現況照片能幫廠商判斷拆除、漏水、壁癌、管線、設備位置與施工限制。照片不是正式鑑定，但能降低廠商理解落差。"
+    },
+    {
+      id: "hauling",
+      keywords: ["清運", "垃圾", "拆除清運", "雜工"],
+      text: "只要有拆除項目，通常就會牽涉清運、保護、搬運與雜工。平面拼圖可以先提醒這些預算候選項目，正式金額仍需廠商依現場確認。"
+    },
+    {
+      id: "waterproofing",
+      keywords: ["防水", "浴室", "試水"],
+      text: "如果你有浴室地坪或給排水變更，系統會提醒防水與試水。是否納入預算仍由你確認，實際做法需要廠商或專業人員現場判斷。"
+    },
+    {
+      id: "kitchen",
+      keywords: ["廚具", "廚房", "插座", "給排水", "排水"],
+      text: "廚具需求會牽涉插座、弱電、給排水、瓦斯或排風位置。建議先標位置與偏好，並把不確定的管線條件列為請廠商建議。"
+    },
+    {
+      id: "ac",
+      keywords: ["空調", "冷氣", "排水條件", "冷房"],
+      text: "空調位置可先記錄偏好，例如不要吹床、每房一台、室外機位置或排水限制。冷房能力、管線與排水仍需現場確認。"
+    },
+    {
+      id: "uncertain",
+      keywords: ["不確定", "不知道", "需要建議", "請廠商建議"],
+      text: "不確定的項目不用硬決定。你可以先記錄為備註，優先標成「請廠商建議」或「需專業確認」，後續招標時讓廠商回覆。"
+    },
+    {
+      id: "professional",
+      keywords: ["專業", "法規", "結構", "海砂屋", "漏水", "壁癌", "裂縫"],
+      text: "涉及結構、法規、海砂屋、漏水、壁癌或裂縫時，需要專業確認或場勘確認。平面拼圖只負責記錄疑慮，不提供結構或法規判斷。"
+    },
+    {
+      id: "ai-image",
+      keywords: ["AI 圖", "AI圖", "風格示意", "模擬圖", "完工效果"],
+      text: "AI 風格示意圖只用來幫助表達風格方向，不是正式設計圖、施工圖或完工保證，也不代表實際材料與完工效果。"
+    },
+    {
+      id: "formal-quote",
+      keywords: ["正式報價", "正式估價", "報價單", "預算單"],
+      text: "預算單或需求摘要不是正式報價。正式報價需要廠商依現場、材料、尺寸、工法與施工條件確認後提出。"
+    },
+    {
+      id: "contractor-readable",
+      keywords: ["廠商看懂", "看懂需求", "招標", "溝通"],
+      text: "要讓廠商看懂，請補齊空間名稱、保留 / 新增 / 拆除項目、主要材料偏好、不確定事項、需廠商建議的問題，以及哪些項目只是示意。"
+    },
+    {
+      id: "sketch-only",
+      keywords: ["示意", "不會直接進預算", "哪些東西只是示意"],
+      text: "底圖、AI 風格示意、renderer preview、.pc spike、未校正比例的線段、未封閉的空間、多數備註都只是需求或示意資料，不會直接成為正式預算數量。"
+    }
+  ];
   const SVG_NS = "http://www.w3.org/2000/svg";
 
   const canvas = document.getElementById("planCanvas");
@@ -165,7 +311,51 @@
       openings: [],
       zones: [],
       furniture: [],
+      guide: createInitialGuideState(),
+      guideLog: [createGuideWelcomeLog()],
+      requirementNotes: [],
+      guideSummary: createInitialGuideSummary(),
       plancraftBridge: getPlancraftBridgeStatus()
+    };
+  }
+
+  function createInitialGuideState() {
+    return {
+      enabled: true,
+      mode: GUIDE_MODE,
+      apiBacked: false,
+      disclaimerAccepted: false,
+      currentStep: "start",
+      completedSteps: [],
+      pendingSuggestions: [],
+      resolvedSuggestionIds: [],
+      lastUpdatedAt: null
+    };
+  }
+
+  function createGuideWelcomeLog() {
+    const createdAt = new Date().toISOString();
+    return {
+      id: createId("guide-log"),
+      role: "guide",
+      type: "message",
+      text: GUIDE_WELCOME_MESSAGE,
+      layer: "floor_plan",
+      selectedObjectId: null,
+      selectedObjectType: null,
+      relatedReminderIds: [],
+      createdAt,
+      savedToRequirements: false
+    };
+  }
+
+  function createInitialGuideSummary() {
+    return {
+      userIntent: [],
+      uncertainties: [],
+      budgetRelevantNotes: [],
+      contractorQuestions: [],
+      generatedAt: null
     };
   }
 
@@ -210,6 +400,9 @@
       currentOpeningSwing: "left",
       currentZoneType: DEFAULT_ZONE_TYPE,
       currentZoneName: ZONE_TYPE_LABELS[DEFAULT_ZONE_TYPE],
+      currentLayer: "floor_plan",
+      guideInput: "",
+      guideClearPending: false,
       zoneBoundaryState: createInitialZoneBoundaryState(),
       pcConverterReport: createInitialPcConverterReport(),
       message: "",
@@ -435,6 +628,42 @@
     if (action === "generate-style-visual") {
       startStyleVisualDraft();
     }
+    if (action === "guide-send") {
+      sendGuideInput();
+    }
+    if (action === "guide-quick-question") {
+      handleGuideQuickQuestion(actionButton.dataset.guideQuestion);
+    }
+    if (action === "guide-start-flow") {
+      startGuideFlow();
+    }
+    if (action === "guide-continue-flow") {
+      continueGuideFlow();
+    }
+    if (action === "guide-flow-option") {
+      handleGuideFlowOption(actionButton.dataset.guideOption);
+    }
+    if (action === "guide-capture-question") {
+      captureGuideQuestion();
+    }
+    if (action === "guide-generate-summary") {
+      generateGuideSummary(true);
+    }
+    if (action === "guide-clear-chat") {
+      clearGuideChat();
+    }
+    if (action === "guide-save-log") {
+      saveGuideLogToRequirement(actionButton.dataset.guideLogId);
+    }
+    if (action === "guide-reminder-action") {
+      handleGuideReminderAction(actionButton.dataset.reminderId, actionButton.dataset.reminderAction);
+    }
+    if (action === "guide-set-layer") {
+      setGuideLayer(actionButton.dataset.guideLayer);
+    }
+    if (action === "guide-accept-disclaimer") {
+      acceptGuideDisclaimer();
+    }
   }
 
   function handleDocumentInput(event) {
@@ -464,6 +693,9 @@
     }
     if (field.startsWith("style-visual-")) {
       updateStyleVisualRequestFromField(input);
+    }
+    if (field === "guide-input") {
+      uiState.guideInput = input.value;
     }
   }
 
@@ -545,6 +777,11 @@
 
   function handleDocumentKeydown(event) {
     const target = event.target;
+    if (target instanceof HTMLElement && target.matches("[data-field='guide-input']") && event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendGuideInput();
+      return;
+    }
     const isEditingText = target instanceof HTMLElement && (
       target.tagName === "INPUT" ||
       target.tagName === "SELECT" ||
@@ -1404,10 +1641,12 @@
   }
 
   function exportDraft() {
+    ensureGuideState();
     rebuildWallGraph();
     rebuildNodeGraph();
     syncZoneBoundaryMetadata();
     syncBridge();
+    syncGuideSuggestions();
     const payload = JSON.parse(JSON.stringify(project));
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: "application/json;charset=utf-8"
@@ -1841,10 +2080,12 @@
   }
 
   function render() {
+    ensureGuideState();
     rebuildWallGraph();
     rebuildNodeGraph();
     syncZoneBoundaryMetadata();
     syncBridge();
+    syncGuideSuggestions();
     renderUnderlay();
     renderZonePolygons();
     renderWalls();
@@ -2372,10 +2613,12 @@
     const selectedOpening = getSelectedOpening();
     const selectedWall = getSelectedWall();
     const styleVisualPanel = renderStyleVisualPanel();
+    const guidePanel = renderGuidePanel();
     const bridgePanel = `${renderBridgeCard()}${renderPcConverterReportCard()}${renderRendererPreviewReportCard()}`;
     if (selectedZone) {
       inspectorBody.innerHTML = `
         ${renderSelectedZoneCard(selectedZone)}
+        ${guidePanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
@@ -2388,6 +2631,7 @@
     if (selectedOpening) {
       inspectorBody.innerHTML = `
         ${renderSelectedOpeningCard(selectedOpening)}
+        ${guidePanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
@@ -2400,6 +2644,7 @@
     if (selectedWall) {
       inspectorBody.innerHTML = `
         ${renderSelectedWallCard(selectedWall)}
+        ${guidePanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
@@ -2415,6 +2660,7 @@
           <h2>Plancraft+ 匯入狀態：尚未匯入</h2>
           <p>比例狀態：尚未校正。下一步請先匯入 JPG 或 PNG 丈量圖。</p>
         </section>
+        ${guidePanel}
         ${renderWallWorkflowCard()}
         ${renderZoneWorkflowCard()}
         ${renderWallGraphCard()}
@@ -2429,6 +2675,7 @@
     if (!project.importSource.previewSupported) {
       inspectorBody.innerHTML = `
         ${renderImportSourceCard()}
+        ${guidePanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks(PDF_NOT_SUPPORTED_MESSAGE)}
@@ -2442,6 +2689,7 @@
       ${renderImportSourceCard()}
       ${renderUnderlayControls()}
       ${renderScaleCard()}
+      ${guidePanel}
       ${renderWallWorkflowCard()}
       ${renderZoneWorkflowCard()}
       ${renderWallGraphCard()}
@@ -2819,6 +3067,988 @@
         ` : `<div class="inline-message" style="margin-top: 12px;">選取 wall-intersection issue 後，可以手動切分相關牆段。</div>`}
       </div>
     `;
+  }
+
+  function ensureGuideState() {
+    if (!project.guide || typeof project.guide !== "object") {
+      project.guide = createInitialGuideState();
+    }
+    project.guide.enabled = true;
+    project.guide.mode = GUIDE_MODE;
+    project.guide.apiBacked = false;
+    project.guide.disclaimerAccepted = Boolean(project.guide.disclaimerAccepted);
+    project.guide.currentStep = project.guide.currentStep || "start";
+    project.guide.completedSteps = Array.isArray(project.guide.completedSteps) ? project.guide.completedSteps : [];
+    project.guide.pendingSuggestions = Array.isArray(project.guide.pendingSuggestions) ? project.guide.pendingSuggestions : [];
+    project.guide.resolvedSuggestionIds = Array.isArray(project.guide.resolvedSuggestionIds) ? project.guide.resolvedSuggestionIds : [];
+    project.guide.lastUpdatedAt = project.guide.lastUpdatedAt || null;
+
+    if (!Array.isArray(project.guideLog)) {
+      project.guideLog = [];
+    }
+    if (!project.guideLog.length) {
+      project.guideLog.push(createGuideWelcomeLog());
+    }
+    if (!Array.isArray(project.requirementNotes)) {
+      project.requirementNotes = [];
+    }
+    if (!project.guideSummary || typeof project.guideSummary !== "object") {
+      project.guideSummary = createInitialGuideSummary();
+    }
+    project.guideSummary.userIntent = Array.isArray(project.guideSummary.userIntent) ? project.guideSummary.userIntent : [];
+    project.guideSummary.uncertainties = Array.isArray(project.guideSummary.uncertainties) ? project.guideSummary.uncertainties : [];
+    project.guideSummary.budgetRelevantNotes = Array.isArray(project.guideSummary.budgetRelevantNotes) ? project.guideSummary.budgetRelevantNotes : [];
+    project.guideSummary.contractorQuestions = Array.isArray(project.guideSummary.contractorQuestions) ? project.guideSummary.contractorQuestions : [];
+    project.guideSummary.generatedAt = project.guideSummary.generatedAt || null;
+  }
+
+  function renderGuidePanel() {
+    ensureGuideState();
+    const pendingSuggestions = project.guide.pendingSuggestions || [];
+    const selectedContext = getSelectedObjectGuideContext();
+    const currentLayer = getCurrentLayer();
+    const requirementCount = project.requirementNotes.filter((note) => note.source === "guide").length;
+    const selectedLabel = selectedContext ? `${selectedContext.label} ${selectedContext.id}` : "未選取";
+
+    return `
+      <section class="status-card guide-panel" aria-label="平面拼圖引導官">
+        <div class="guide-heading">
+          <div>
+            <b>平面拼圖引導官</b>
+            <p>${escapeHTML(GUIDE_DISCLAIMER)}</p>
+          </div>
+          <span class="guide-mode">Local</span>
+        </div>
+
+        <div class="guide-disclaimer ${project.guide.disclaimerAccepted ? "is-accepted" : ""}">
+          <span>${project.guide.disclaimerAccepted ? "已確認限制" : "請先確認：本工具只整理需求與操作引導，不提供正式設計或報價。"}</span>
+          ${project.guide.disclaimerAccepted ? "" : `<button class="secondary-btn compact" type="button" data-action="guide-accept-disclaimer">我了解</button>`}
+        </div>
+
+        <div class="guide-status-grid" aria-label="對話狀態">
+          <div><span>已記錄需求</span><strong>${requirementCount}</strong></div>
+          <div><span>待確認建議</span><strong>${pendingSuggestions.length}</strong></div>
+          <div><span>目前圖層</span><strong>${escapeHTML(getGuideLayerLabel(currentLayer))}</strong></div>
+          <div><span>選取物件</span><strong>${escapeHTML(selectedLabel)}</strong></div>
+        </div>
+
+        <div class="guide-layer-row" aria-label="圖層建議切換">
+          ${GUIDE_LAYER_OPTIONS.map((layer) => `
+            <button class="guide-chip ${layer.value === currentLayer ? "is-active" : ""}" type="button" data-action="guide-set-layer" data-guide-layer="${escapeAttribute(layer.value)}">${escapeHTML(layer.label)}</button>
+          `).join("")}
+        </div>
+
+        <div class="guide-thread" aria-live="polite">
+          ${project.guideLog.map(renderGuideMessage).join("")}
+        </div>
+
+        <div class="guide-input-row">
+          <textarea class="guide-input" data-field="guide-input" rows="3" placeholder="可以問我怎麼畫牆、怎麼標尺寸、哪些項目會影響預算……">${escapeHTML(uiState.guideInput)}</textarea>
+          <button class="toolbar-btn primary" type="button" data-action="guide-send">送出</button>
+        </div>
+
+        <div class="guide-section-label">快速問題</div>
+        <div class="guide-quick-grid">
+          ${GUIDE_QUICK_QUESTIONS.map((question) => `
+            <button class="guide-chip" type="button" data-action="guide-quick-question" data-guide-question="${escapeAttribute(question)}">${escapeHTML(question)}</button>
+          `).join("")}
+        </div>
+
+        <div class="guide-section-label">引導流程</div>
+        <div class="guide-action-grid">
+          <button class="secondary-btn" type="button" data-action="guide-start-flow">開始引導</button>
+          <button class="secondary-btn" type="button" data-action="guide-continue-flow">繼續下一步</button>
+          <button class="secondary-btn" type="button" data-action="guide-capture-question">記錄目前疑問</button>
+          <button class="secondary-btn" type="button" data-action="guide-generate-summary">產生需求摘要</button>
+          <button class="danger-btn" type="button" data-action="guide-clear-chat">${uiState.guideClearPending ? "再按一次清除" : "清除本輪對話"}</button>
+        </div>
+
+        ${renderGuideFlowOptions()}
+        ${renderGuideSuggestions()}
+      </section>
+    `;
+  }
+
+  function renderGuideMessage(entry) {
+    const roleLabel = entry.role === "user" ? "你" : entry.role === "system" ? "系統" : "引導官";
+    const typeLabel = getGuideLogTypeLabel(entry.type);
+    const savedLabel = entry.savedToRequirements ? `<span class="guide-saved-label">已記錄</span>` : "";
+    const canSave = entry.type !== "warning" && entry.type !== "summary";
+    const saveButton = canSave && !entry.savedToRequirements
+      ? `<button class="guide-save-button" type="button" data-action="guide-save-log" data-guide-log-id="${escapeAttribute(entry.id)}">記錄為需求</button>`
+      : "";
+    return `
+      <article class="guide-message is-${escapeAttribute(entry.role)}">
+        <div class="guide-message-meta">
+          <span>${escapeHTML(roleLabel)} · ${escapeHTML(typeLabel)}</span>
+          <time>${escapeHTML(formatGuideTime(entry.createdAt))}</time>
+        </div>
+        <div class="guide-message-text">${formatGuideText(entry.text)}</div>
+        <div class="guide-message-foot">
+          <span>${escapeHTML(getGuideLayerLabel(entry.layer || "floor_plan"))}${entry.selectedObjectType ? ` · ${escapeHTML(entry.selectedObjectType)}` : ""}</span>
+          <span>${savedLabel}${saveButton}</span>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderGuideFlowOptions() {
+    const currentStep = project.guide?.currentStep || "start";
+    const options = GUIDE_FLOW_STEP_OPTIONS[currentStep] || [];
+    if (!options.length) {
+      return "";
+    }
+    return `
+      <div class="guide-flow-options" aria-label="引導流程選項">
+        ${options.map((option) => `
+          <button class="guide-chip" type="button" data-action="guide-flow-option" data-guide-option="${escapeAttribute(option)}">${escapeHTML(option)}</button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderGuideSuggestions() {
+    const pendingSuggestions = project.guide?.pendingSuggestions || [];
+    if (!pendingSuggestions.length) {
+      return `<div class="guide-reminder-empty">目前沒有待確認提醒。平面拼圖仍是需求整理，不會因提醒完成而變成正式施工圖或正式報價。</div>`;
+    }
+    return `
+      <div class="guide-section-label">系統提醒 / 缺失清單</div>
+      <div class="guide-reminder-list">
+        ${pendingSuggestions.map((reminder) => `
+          <div class="guide-reminder-card">
+            <strong>${escapeHTML(reminder.text)}</strong>
+            <span>${escapeHTML(getRequirementCategoryLabel(reminder.category))} · ${escapeHTML(getRequirementPriorityLabel(reminder.priority))}</span>
+            <div class="guide-reminder-actions">
+              <button type="button" data-action="guide-reminder-action" data-reminder-id="${escapeAttribute(reminder.id)}" data-reminder-action="budget">加入預算</button>
+              <button type="button" data-action="guide-reminder-action" data-reminder-id="${escapeAttribute(reminder.id)}" data-reminder-action="ignore">忽略</button>
+              <button type="button" data-action="guide-reminder-action" data-reminder-id="${escapeAttribute(reminder.id)}" data-reminder-action="ask_contractor">請廠商建議</button>
+              <button type="button" data-action="guide-reminder-action" data-reminder-id="${escapeAttribute(reminder.id)}" data-reminder-action="note">記錄為備註</button>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function sendGuideInput() {
+    ensureGuideState();
+    const text = String(uiState.guideInput || "").trim();
+    if (!text) {
+      uiState.error = "";
+      uiState.message = "請先輸入問題或需求。";
+      render();
+      return;
+    }
+    appendGuideLogEntry("user", inferUserGuideType(text), text);
+    const response = resolveGuideResponse(text);
+    appendGuideLogEntry("guide", response.type, response.text, {
+      relatedReminderIds: response.relatedReminderIds
+    });
+    if (response.saveFallbackNote) {
+      addRequirementNote(text, response.category || "uncertainty", "ask_contractor", {
+        textPrefix: "待確認問題："
+      });
+    }
+    uiState.guideInput = "";
+    uiState.guideClearPending = false;
+    render();
+  }
+
+  function handleGuideQuickQuestion(question) {
+    const text = String(question || "").trim();
+    if (!text) {
+      return;
+    }
+    appendGuideLogEntry("user", "question", text);
+    const response = resolveGuideResponse(text);
+    appendGuideLogEntry("guide", response.type, response.text, {
+      relatedReminderIds: response.relatedReminderIds
+    });
+    uiState.guideClearPending = false;
+    render();
+  }
+
+  function startGuideFlow() {
+    ensureGuideState();
+    project.guide.currentStep = "start";
+    project.guide.lastUpdatedAt = new Date().toISOString();
+    appendGuideLogEntry("guide", "question", getGuideStepPrompt("start"));
+    render();
+  }
+
+  function continueGuideFlow() {
+    ensureGuideState();
+    const currentStep = project.guide.currentStep || "start";
+    if (currentStep === "plan_reminders") {
+      appendGuideLogEntry("guide", "suggestion", buildReminderResponseText());
+      markGuideStepCompleted("plan_reminders");
+      project.guide.currentStep = "summary";
+      appendGuideLogEntry("guide", "question", "提醒已列出。下一步可以產生需求摘要，整理給後續廠商閱讀。");
+      render();
+      return;
+    }
+    if (currentStep === "summary" || currentStep === "done") {
+      generateGuideSummary(true);
+      project.guide.currentStep = "done";
+      render();
+      return;
+    }
+    const nextStep = getNextGuideStep(currentStep);
+    markGuideStepCompleted(currentStep);
+    project.guide.currentStep = nextStep;
+    project.guide.lastUpdatedAt = new Date().toISOString();
+    appendGuideLogEntry("guide", nextStep === "plan_reminders" ? "suggestion" : "question", nextStep === "plan_reminders" ? buildReminderResponseText() : getGuideStepPrompt(nextStep));
+    render();
+  }
+
+  function handleGuideFlowOption(option) {
+    ensureGuideState();
+    const text = String(option || "").trim();
+    if (!text) {
+      return;
+    }
+    const currentStep = project.guide.currentStep || "start";
+    appendGuideLogEntry("user", "answer", text);
+    addRequirementNote(text, getGuideStepCategory(currentStep, text), getGuideStepPriority(currentStep, text));
+    markGuideStepCompleted(currentStep);
+
+    let nextStep = getNextGuideStep(currentStep, text);
+    let reply = `已記錄：「${text}」。`;
+    if (nextStep === "plan_reminders") {
+      reply = `${reply}\n\n${buildReminderResponseText()}`;
+    } else if (nextStep === "summary" || nextStep === "done") {
+      reply = `${reply}\n\n我可以幫你產生需求摘要，整理屋況、主要需求、不確定事項、需廠商建議與可能影響預算的項目。`;
+    } else {
+      reply = `${reply}\n\n${getGuideStepPrompt(nextStep)}`;
+    }
+
+    project.guide.currentStep = nextStep;
+    project.guide.lastUpdatedAt = new Date().toISOString();
+    appendGuideLogEntry("guide", nextStep === "plan_reminders" ? "suggestion" : "question", reply);
+    render();
+  }
+
+  function captureGuideQuestion() {
+    ensureGuideState();
+    const typedText = String(uiState.guideInput || "").trim();
+    const lastUserLog = [...project.guideLog].reverse().find((entry) => entry.role === "user");
+    const text = typedText || lastUserLog?.text || "使用者目前有疑問，需請廠商或萊比協助確認。";
+    if (typedText) {
+      appendGuideLogEntry("user", "question", typedText);
+    }
+    addRequirementNote(text, "uncertainty", "ask_contractor", {
+      textPrefix: "目前疑問："
+    });
+    appendGuideLogEntry("system", "message", "已將目前疑問記錄到 requirementNotes，後續可請廠商或萊比協助確認。");
+    uiState.guideInput = "";
+    render();
+  }
+
+  function generateGuideSummary(shouldLog) {
+    ensureGuideState();
+    const notes = project.requirementNotes.filter((note) => note.source === "guide" && note.includeInSummary !== false);
+    const userLogs = project.guideLog.filter((entry) => entry.role === "user");
+    const sourceItems = notes.length ? notes : userLogs.map((entry) => ({
+      text: entry.text,
+      category: inferRequirementCategory(entry.text, entry.layer),
+      priority: inferRequirementPriority(entry.text)
+    }));
+
+    const userIntent = uniqueText(sourceItems
+      .filter((item) => !["uncertainty", "professional_review", "budget"].includes(item.category))
+      .map((item) => item.text))
+      .slice(0, 8);
+    const uncertainties = uniqueText(sourceItems
+      .filter((item) => item.category === "uncertainty" || item.category === "professional_review" || item.priority === "ask_contractor" || containsAny(item.text, ["不確定", "疑問", "拆牆", "漏水", "壁癌", "裂縫", "海砂屋", "專業"]))
+      .map((item) => item.text))
+      .slice(0, 8);
+    const budgetRelevantNotes = uniqueText(sourceItems
+      .filter((item) => isBudgetRelevantCategory(item.category) || containsAny(item.text, ["預算", "拆除", "清運", "防水", "給排水", "插座", "櫃", "廚具", "空調", "材料", "五金"]))
+      .map((item) => item.text))
+      .slice(0, 10);
+    const contractorQuestions = uniqueText(sourceItems
+      .filter((item) => item.priority === "ask_contractor" || item.category === "professional_review" || containsAny(item.text, ["請廠商", "需專業", "場勘", "確認"]))
+      .map((item) => item.text))
+      .slice(0, 8);
+
+    project.guideSummary = {
+      userIntent,
+      uncertainties,
+      budgetRelevantNotes,
+      contractorQuestions,
+      generatedAt: new Date().toISOString()
+    };
+
+    const summaryText = [
+      "目前已記錄：",
+      `1. 屋況：${summarizeByKeywords(sourceItems, ["新成屋", "舊屋", "屋況", "漏水", "壁癌", "裂縫", "海砂屋"])}`,
+      `2. 主要需求：${userIntent.length ? userIntent.join("；") : "尚未明確記錄"}`,
+      `3. 不確定事項：${uncertainties.length ? uncertainties.join("；") : "尚未記錄"}`,
+      `4. 需廠商建議：${contractorQuestions.length ? contractorQuestions.join("；") : "尚未記錄"}`,
+      `5. 可能影響預算的項目：${budgetRelevantNotes.length ? budgetRelevantNotes.join("；") : "尚未記錄"}`
+    ].join("\n");
+
+    if (shouldLog) {
+      appendGuideLogEntry("guide", "summary", summaryText);
+    }
+    return project.guideSummary;
+  }
+
+  function clearGuideChat() {
+    ensureGuideState();
+    if (!uiState.guideClearPending) {
+      uiState.guideClearPending = true;
+      appendGuideLogEntry("system", "warning", "清除本輪對話需要二次確認。再按一次「再按一次清除」才會清除 guideLog；已記錄的 requirementNotes 與 guideSummary 不會被刪除。");
+      render();
+      return;
+    }
+    project.guideLog = [createGuideWelcomeLog()];
+    uiState.guideClearPending = false;
+    project.guide.lastUpdatedAt = new Date().toISOString();
+    appendGuideLogEntry("system", "message", "已清除本輪對話。需求備註與摘要仍保留在 draft JSON。");
+    render();
+  }
+
+  function saveGuideLogToRequirement(logId) {
+    ensureGuideState();
+    const entry = project.guideLog.find((item) => item.id === logId);
+    if (!entry) {
+      return;
+    }
+    const note = addRequirementNote(entry.text, inferRequirementCategory(entry.text, entry.layer), inferRequirementPriority(entry.text), {
+      relatedObjectId: entry.selectedObjectId
+    });
+    entry.savedToRequirements = true;
+    appendGuideLogEntry("system", "message", `已將訊息記錄為需求備註：${note.id}`);
+    render();
+  }
+
+  function handleGuideReminderAction(reminderId, reminderAction) {
+    ensureGuideState();
+    const reminder = getGuideSystemReminders({ includeResolved: true }).find((item) => item.id === reminderId)
+      || (project.guide.pendingSuggestions || []).find((item) => item.id === reminderId);
+    if (!reminder) {
+      return;
+    }
+    const action = String(reminderAction || "");
+    if (action === "ignore") {
+      markGuideSuggestionResolved(reminder.id);
+      appendGuideLogEntry("system", "message", `已忽略提醒：「${reminder.text}」。`);
+    } else if (action === "ask_contractor") {
+      addRequirementNote(reminder.text, reminder.category || "other", "ask_contractor", {
+        textPrefix: "請廠商建議：",
+        relatedReminderIds: [reminder.id]
+      });
+      markGuideSuggestionResolved(reminder.id);
+      appendGuideLogEntry("system", "suggestion", `已記錄為需廠商建議：「${reminder.text}」。`);
+    } else if (action === "budget") {
+      addRequirementNote(reminder.text, reminder.category || "budget", "must", {
+        textPrefix: "預算候選提醒：",
+        relatedReminderIds: [reminder.id]
+      });
+      markGuideSuggestionResolved(reminder.id);
+      appendGuideLogEntry("system", "warning", "已記錄為預算候選提醒，但不會直接送進 budget runtime，也不是正式報價依據。");
+    } else {
+      addRequirementNote(reminder.text, reminder.category || "other", reminder.priority || "optional", {
+        textPrefix: "備註：",
+        relatedReminderIds: [reminder.id]
+      });
+      markGuideSuggestionResolved(reminder.id);
+      appendGuideLogEntry("system", "message", `已記錄為備註：「${reminder.text}」。`);
+    }
+    syncGuideSuggestions();
+    render();
+  }
+
+  function setGuideLayer(layer) {
+    const nextLayer = GUIDE_LAYER_OPTIONS.some((item) => item.value === layer) ? layer : "floor_plan";
+    uiState.currentLayer = nextLayer;
+    appendGuideLogEntry("guide", "suggestion", getGuideLayerAdvice(nextLayer));
+    render();
+  }
+
+  function acceptGuideDisclaimer() {
+    ensureGuideState();
+    project.guide.disclaimerAccepted = true;
+    project.guide.lastUpdatedAt = new Date().toISOString();
+    appendGuideLogEntry("system", "message", "已確認：平面拼圖引導官只提供需求整理與操作引導，不代表正式設計、施工圖、結構判斷或正式報價。");
+    render();
+  }
+
+  function resolveGuideResponse(text) {
+    const normalized = normalizeGuideText(text);
+    const selectedContext = getSelectedObjectGuideContext();
+    if (containsAnyNormalized(normalized, ["還缺什麼", "缺什麼", "漏掉", "提醒", "待確認", "缺失"])) {
+      const reminders = getGuideSystemReminders();
+      return {
+        type: "suggestion",
+        text: buildReminderResponseText(reminders),
+        relatedReminderIds: reminders.map((item) => item.id)
+      };
+    }
+    if (selectedContext && containsAnyNormalized(normalized, ["這個物件", "選取物件", "會不會進預算", "還缺", "需要專業", "可以怎麼修改", "這是什麼"])) {
+      return {
+        type: "answer",
+        text: `${getSelectedObjectGuideAdvice(selectedContext)}\n\n${getGuideLayerAdvice(getCurrentLayer())}`,
+        relatedReminderIds: []
+      };
+    }
+    if (containsAnyNormalized(normalized, ["目前圖層", "這個圖層", "圖層建議"])) {
+      return {
+        type: "answer",
+        text: getGuideLayerAdvice(getCurrentLayer()),
+        relatedReminderIds: []
+      };
+    }
+
+    const knowledge = matchGuideKnowledge(text);
+    if (knowledge) {
+      const reminders = project.guide?.pendingSuggestions || [];
+      const contextLine = selectedContext && containsAnyNormalized(normalized, ["預算", "缺", "專業", "修改", "選取", "物件"])
+        ? `\n\n選取物件建議：${getSelectedObjectGuideAdvice(selectedContext)}`
+        : "";
+      const reminderLine = reminders.length ? `\n\n目前有 ${reminders.length} 項提醒待確認，可以在下方選擇加入預算、忽略、請廠商建議或記錄為備註。` : "";
+      return {
+        type: "answer",
+        text: `${knowledge.text}\n\n目前圖層建議：${getGuideLayerAdvice(getCurrentLayer())}${contextLine}${reminderLine}`,
+        relatedReminderIds: reminders.map((item) => item.id)
+      };
+    }
+
+    return {
+      type: "warning",
+      text: GUIDE_FALLBACK_MESSAGE,
+      relatedReminderIds: [],
+      saveFallbackNote: true,
+      category: "uncertainty"
+    };
+  }
+
+  function matchGuideKnowledge(text) {
+    const normalized = normalizeGuideText(text);
+    let bestMatch = null;
+    let bestScore = 0;
+    GUIDE_KNOWLEDGE.forEach((entry) => {
+      const score = (entry.keywords || []).reduce((sum, keyword) => {
+        const normalizedKeyword = normalizeGuideText(keyword);
+        return normalizedKeyword && normalized.includes(normalizedKeyword) ? sum + 1 : sum;
+      }, 0);
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = entry;
+      }
+    });
+    return bestMatch;
+  }
+
+  function appendGuideLogEntry(role, type, text, options = {}) {
+    ensureGuideState();
+    const entry = createGuideLogEntry(role, type, text, options);
+    project.guideLog.push(entry);
+    project.guide.lastUpdatedAt = entry.createdAt;
+    return entry;
+  }
+
+  function createGuideLogEntry(role, type, text, options = {}) {
+    const selectedContext = getSelectedObjectGuideContext();
+    return {
+      id: createId("guide-log"),
+      role,
+      type,
+      text: String(text || ""),
+      layer: options.layer || getCurrentLayer(),
+      selectedObjectId: options.selectedObjectId ?? selectedContext?.id ?? null,
+      selectedObjectType: options.selectedObjectType ?? selectedContext?.type ?? null,
+      relatedReminderIds: Array.isArray(options.relatedReminderIds) ? options.relatedReminderIds : [],
+      createdAt: options.createdAt || new Date().toISOString(),
+      savedToRequirements: Boolean(options.savedToRequirements)
+    };
+  }
+
+  function addRequirementNote(text, category, priority, options = {}) {
+    ensureGuideState();
+    const selectedContext = getSelectedObjectGuideContext();
+    const note = {
+      id: createId("guide-note"),
+      source: "guide",
+      text: `${options.textPrefix || ""}${String(text || "").trim()}`,
+      category: normalizeRequirementCategory(category || inferRequirementCategory(text, getCurrentLayer())),
+      layer: options.layer || getCurrentLayer(),
+      relatedObjectId: options.relatedObjectId ?? selectedContext?.id ?? null,
+      priority: normalizeRequirementPriority(priority || inferRequirementPriority(text)),
+      includeInSummary: true,
+      createdAt: new Date().toISOString()
+    };
+    if (Array.isArray(options.relatedReminderIds) && options.relatedReminderIds.length) {
+      note.relatedReminderIds = options.relatedReminderIds;
+    }
+    project.requirementNotes.push(note);
+    project.guide.lastUpdatedAt = note.createdAt;
+    return note;
+  }
+
+  function syncGuideSuggestions() {
+    if (!project.guide) {
+      return;
+    }
+    const nextSuggestions = getGuideSystemReminders();
+    const currentSerialized = JSON.stringify(project.guide.pendingSuggestions || []);
+    const nextSerialized = JSON.stringify(nextSuggestions);
+    if (currentSerialized !== nextSerialized) {
+      project.guide.pendingSuggestions = nextSuggestions;
+      project.guide.lastUpdatedAt = new Date().toISOString();
+    }
+  }
+
+  function getGuideSystemReminders(options = {}) {
+    const includeResolved = Boolean(options.includeResolved);
+    const resolvedIds = new Set(project.guide?.resolvedSuggestionIds || []);
+    const reminders = [];
+    const addReminder = (id, text, category = "other", priority = "ask_contractor", extra = {}) => {
+      if (!id || reminders.some((item) => item.id === id)) {
+        return;
+      }
+      reminders.push({
+        id,
+        text,
+        category,
+        priority,
+        layer: extra.layer || getCurrentLayer(),
+        relatedObjectId: extra.relatedObjectId || null,
+        relatedReminderIds: extra.relatedReminderIds || []
+      });
+    };
+
+    (project.systemReminders || []).forEach((reminder, index) => {
+      const id = reminder.id || `system-reminder-${index + 1}`;
+      addReminder(
+        id,
+        reminder.text || reminder.message || "有一項系統提醒待確認。",
+        reminder.category || "other",
+        reminder.priority || "ask_contractor",
+        { relatedObjectId: reminder.relatedObjectId || null }
+      );
+    });
+
+    if (!project.underlay || !project.importSource) {
+      addReminder("missing-underlay", "你還沒有匯入底圖。建議先匯入丈量圖或平面草圖，再校正比例。", "layout", "must", { layer: "floor_plan" });
+    }
+    if (!project.scale?.calibrated) {
+      addReminder("missing-scale", "你還沒有校正比例。比例會影響尺寸判讀與後續需求整理。", "layout", "must", { layer: "floor_plan" });
+    }
+    if (!project.zones?.length) {
+      addReminder("missing-zone-labels", "你還沒有標空間名稱。建議先標客廳、房間、廚房、浴室等空間，讓廠商更容易理解需求。", "layout", "must", { layer: "floor_plan" });
+    }
+    if (!hasMaterialRequirementNote()) {
+      addReminder("missing-material-level", "你還沒有選材料或設備等級。可先記錄省預算、標準、質感優先或請廠商建議。", "material", "ask_contractor");
+    }
+    if (hasDemolitionSignal()) {
+      addReminder("demolition-hauling", "你有拆除項目，預算候選提醒會涉及清運與雜工；仍需廠商依現場確認。", "demolition", "must", { layer: "demolition_plan" });
+    }
+    if (hasBathroomSignal()) {
+      addReminder("bathroom-waterproofing", "你有浴室或浴室地坪相關需求，建議確認防水與試水項目。", "bathroom", "must", { layer: "flooring_plan" });
+    }
+    if (hasKitchenSignal()) {
+      addReminder("kitchen-outlet-plumbing", "你有廚具或廚房需求，建議確認插座、弱電、給排水與設備位置。", "kitchen", "ask_contractor", { layer: "floor_plan" });
+    }
+    if (hasAcSignal()) {
+      addReminder("ac-condition", "你有空調需求，建議確認新舊屋條件、排水路徑與不要直吹床等偏好。", "ac", "ask_contractor", { layer: "ac_plan" });
+    }
+    if ((project.wallGraph?.issues || []).length) {
+      addReminder("wall-graph-issues", `目前有 ${(project.wallGraph?.issues || []).length} 項牆線提醒待確認，建議先處理端點、重疊或交會問題。`, "layout", "ask_contractor", { layer: "floor_plan" });
+    }
+    if (hasProfessionalReviewSignal()) {
+      addReminder("professional-review", "有拆牆、結構、漏水、壁癌、裂縫或海砂屋疑慮時，請標記為需專業或場勘確認，不要直接當成可施工。", "professional_review", "ask_contractor");
+    }
+
+    if (includeResolved) {
+      return reminders;
+    }
+    return reminders.filter((reminder) => !resolvedIds.has(reminder.id));
+  }
+
+  function buildReminderResponseText(reminders = getGuideSystemReminders()) {
+    if (!reminders.length) {
+      return "目前沒有待確認提醒。仍建議確認比例、空間名稱、材料偏好與需廠商判斷的項目。";
+    }
+    return [
+      `目前有 ${reminders.length} 項提醒待確認：`,
+      ...reminders.map((reminder, index) => `${index + 1}. ${reminder.text}`),
+      "每一項都可以在下方選擇：加入預算、忽略、請廠商建議，或記錄為備註。加入預算只會寫成需求紀錄，不會進正式估價。"
+    ].join("\n");
+  }
+
+  function getCurrentLayer() {
+    const currentLayer = uiState.currentLayer || "floor_plan";
+    return GUIDE_LAYER_OPTIONS.some((layer) => layer.value === currentLayer) ? currentLayer : "floor_plan";
+  }
+
+  function getGuideLayerLabel(layer) {
+    return GUIDE_LAYER_OPTIONS.find((item) => item.value === layer)?.label || "平面配置圖";
+  }
+
+  function getGuideLayerAdvice(layer = getCurrentLayer()) {
+    if (layer === "demolition_plan") {
+      return "拆除圖只需標示要拆除的項目。清運與垃圾車數量會在預算候選提醒中處理，不需要你自己畫成正式估價。";
+    }
+    if (layer === "flooring_plan") {
+      return "地坪圖用來標示地坪材料與範圍。若是浴室地坪，系統會提醒防水與試水需要確認。";
+    }
+    if (layer === "lighting_plan") {
+      return "燈具配置以需求整理為主，你可以補充想要明亮、溫暖或情境燈；實際迴路仍需專業確認。";
+    }
+    if (layer === "ac_plan") {
+      return "空調位置由系統依空間與冷房需求做本地提醒，你只需要補充例如不要吹床、每房一台、排水路徑等偏好。";
+    }
+    return "平面配置圖主要用來放牆、門窗、櫃體、廚具與空間標籤。它是需求整理，不是正式施工圖。";
+  }
+
+  function getSelectedObjectGuideContext() {
+    const wall = getSelectedWall();
+    if (wall) {
+      return { id: wall.id, type: "wall", label: "牆體", object: wall };
+    }
+    const opening = getSelectedOpening();
+    if (opening) {
+      return { id: opening.id, type: "opening", label: getOpeningKindLabel(opening.kind), object: opening };
+    }
+    const zone = getSelectedZone();
+    if (zone) {
+      return { id: zone.id, type: "zone", label: "空間標籤", object: zone };
+    }
+    const issue = getSelectedIssue();
+    if (issue) {
+      return { id: issue.id, type: "issue", label: "系統提醒", object: issue };
+    }
+    return null;
+  }
+
+  function getSelectedObjectGuideAdvice(context = getSelectedObjectGuideContext()) {
+    if (!context) {
+      return "目前沒有選取物件。你可以先點選牆、門窗或空間標籤，我會依選取物件提醒還缺哪些資料。";
+    }
+    if (context.type === "wall") {
+      const wall = context.object;
+      const statusText = getWallStatusLabel(wall.status);
+      return `這是一段牆體，目前標示為「${statusText}」。若它是新設牆，厚度會影響需求整理；若是既有牆、承重牆或要拆除，開口與拆除都需要專業確認。`;
+    }
+    if (context.type === "opening") {
+      const opening = context.object;
+      return `這是${getOpeningKindLabel(opening.kind)}。寬度、位置、開啟方向與窗台高度會影響廠商理解需求，但仍不是正式施工尺寸。`;
+    }
+    if (context.type === "zone") {
+      const zone = context.object;
+      return `這是空間標籤「${zone.name || getZoneTypeLabel(zone.type)}」。若已有 boundary 與 area metadata，可以作為需求整理參考，但仍不是正式面積報價。`;
+    }
+    if (context.type === "issue") {
+      return `這是系統提醒：「${context.object.message || context.object.type}」。建議先確認牆端點、重疊或交會狀態，必要時請廠商協助判讀。`;
+    }
+    return "這個物件可作需求整理參考，但仍不是正式施工圖或正式報價依據。";
+  }
+
+  function getOpeningKindLabel(kind) {
+    if (kind === "door") {
+      return "門";
+    }
+    if (kind === "window") {
+      return "窗";
+    }
+    return "開口";
+  }
+
+  function getGuideStepPrompt(step) {
+    if (step === "house_condition") {
+      return "這是新成屋還是舊屋？";
+    }
+    if (step === "old_house_details") {
+      return "舊屋我會先幫你記錄需求，不做專業判斷。是否有現況照片、漏水 / 壁癌 / 裂縫 / 海砂屋疑慮，或舊櫃體與舊裝潢需要拆除？";
+    }
+    if (step === "main_needs") {
+      return "這次主要想處理哪些項目？";
+    }
+    if (step === "budget_preference") {
+      return "你的預算方向比較偏哪一種？";
+    }
+    if (step === "plan_reminders") {
+      return buildReminderResponseText();
+    }
+    if (step === "summary") {
+      return "我可以產生需求摘要，整理屋況、主要需求、不確定事項、需廠商建議與可能影響預算的項目。";
+    }
+    return "你想先從哪裡開始？可以先匯入丈量圖，或先告訴我你想改哪些地方。";
+  }
+
+  function getNextGuideStep(step, answerText = "") {
+    if (step === "start") {
+      return "house_condition";
+    }
+    if (step === "house_condition") {
+      return String(answerText).includes("舊屋") ? "old_house_details" : "main_needs";
+    }
+    if (step === "old_house_details") {
+      return "main_needs";
+    }
+    if (step === "main_needs") {
+      return "budget_preference";
+    }
+    if (step === "budget_preference") {
+      return "plan_reminders";
+    }
+    if (step === "plan_reminders") {
+      return "summary";
+    }
+    if (step === "summary") {
+      return "done";
+    }
+    return "start";
+  }
+
+  function markGuideStepCompleted(step) {
+    ensureGuideState();
+    if (!step || project.guide.completedSteps.includes(step)) {
+      return;
+    }
+    project.guide.completedSteps.push(step);
+  }
+
+  function markGuideSuggestionResolved(reminderId) {
+    ensureGuideState();
+    if (!project.guide.resolvedSuggestionIds.includes(reminderId)) {
+      project.guide.resolvedSuggestionIds.push(reminderId);
+    }
+    project.guide.pendingSuggestions = (project.guide.pendingSuggestions || []).filter((item) => item.id !== reminderId);
+    project.guide.lastUpdatedAt = new Date().toISOString();
+  }
+
+  function getGuideStepCategory(step, text) {
+    if (step === "budget_preference") {
+      return "budget";
+    }
+    if (step === "old_house_details") {
+      return containsAny(text, ["漏水", "壁癌", "裂縫", "海砂屋"]) ? "professional_review" : "demolition";
+    }
+    if (step === "house_condition") {
+      return "other";
+    }
+    return inferRequirementCategory(text, getCurrentLayer());
+  }
+
+  function getGuideStepPriority(step, text) {
+    if (step === "budget_preference") {
+      return text.includes("請廠商") ? "ask_contractor" : "nice_to_have";
+    }
+    if (containsAny(text, ["不確定", "請廠商", "漏水", "壁癌", "裂縫", "海砂屋"])) {
+      return "ask_contractor";
+    }
+    return "must";
+  }
+
+  function inferUserGuideType(text) {
+    return /[?？]|怎麼|如何|什麼|為什麼/.test(String(text)) ? "question" : "answer";
+  }
+
+  function inferRequirementCategory(text, layer = getCurrentLayer()) {
+    const value = String(text || "");
+    if (containsAny(value, ["格局", "牆", "門", "窗", "空間", "比例", "尺寸", "施工圖", "平面"])) {
+      return "layout";
+    }
+    if (containsAny(value, ["拆除", "拆牆", "清運", "垃圾"])) {
+      return "demolition";
+    }
+    if (containsAny(value, ["木作", "櫃體", "系統櫃", "五金"])) {
+      return "cabinet";
+    }
+    if (containsAny(value, ["廚具", "廚房"])) {
+      return "kitchen";
+    }
+    if (containsAny(value, ["浴室", "防水", "試水"])) {
+      return "bathroom";
+    }
+    if (containsAny(value, ["地坪", "地板", "磁磚"])) {
+      return "flooring";
+    }
+    if (containsAny(value, ["天花"])) {
+      return "ceiling";
+    }
+    if (containsAny(value, ["燈具", "照明", "情境燈"])) {
+      return "lighting";
+    }
+    if (containsAny(value, ["插座", "弱電", "網路"])) {
+      return "outlet_low_voltage";
+    }
+    if (containsAny(value, ["給排水", "排水", "水管"])) {
+      return "plumbing";
+    }
+    if (containsAny(value, ["空調", "冷氣"])) {
+      return "ac";
+    }
+    if (containsAny(value, ["材料", "材質", "設備", "五金"])) {
+      return "material";
+    }
+    if (containsAny(value, ["預算", "報價", "估價", "價格"])) {
+      return "budget";
+    }
+    if (containsAny(value, ["不確定", "疑問", "不知道"])) {
+      return "uncertainty";
+    }
+    if (containsAny(value, ["專業", "結構", "法規", "海砂屋", "漏水", "壁癌", "裂縫", "承重"])) {
+      return "professional_review";
+    }
+    if (layer === "demolition_plan") {
+      return "demolition";
+    }
+    if (layer === "flooring_plan") {
+      return "flooring";
+    }
+    if (layer === "lighting_plan") {
+      return "lighting";
+    }
+    if (layer === "ac_plan") {
+      return "ac";
+    }
+    return "other";
+  }
+
+  function inferRequirementPriority(text) {
+    const value = String(text || "");
+    if (containsAny(value, ["必須", "一定", "要做", "加入預算", "防水", "拆除"])) {
+      return "must";
+    }
+    if (containsAny(value, ["希望", "偏好", "質感", "標準"])) {
+      return "nice_to_have";
+    }
+    if (containsAny(value, ["不確定", "請廠商", "專業", "場勘", "漏水", "壁癌", "裂縫", "海砂屋", "承重"])) {
+      return "ask_contractor";
+    }
+    return "optional";
+  }
+
+  function normalizeRequirementCategory(category) {
+    const allowed = new Set(["layout", "demolition", "cabinet", "kitchen", "bathroom", "flooring", "ceiling", "lighting", "outlet_low_voltage", "plumbing", "ac", "material", "budget", "uncertainty", "professional_review", "other"]);
+    return allowed.has(category) ? category : "other";
+  }
+
+  function normalizeRequirementPriority(priority) {
+    const allowed = new Set(["must", "nice_to_have", "optional", "ask_contractor"]);
+    return allowed.has(priority) ? priority : "optional";
+  }
+
+  function getRequirementCategoryLabel(category) {
+    const labels = {
+      layout: "格局",
+      demolition: "拆除",
+      cabinet: "櫃體",
+      kitchen: "廚房",
+      bathroom: "浴室",
+      flooring: "地坪",
+      ceiling: "天花",
+      lighting: "燈具",
+      outlet_low_voltage: "插座 / 弱電",
+      plumbing: "給排水",
+      ac: "空調",
+      material: "材料",
+      budget: "預算候選",
+      uncertainty: "不確定",
+      professional_review: "專業確認",
+      other: "其他"
+    };
+    return labels[category] || labels.other;
+  }
+
+  function getRequirementPriorityLabel(priority) {
+    const labels = {
+      must: "必須確認",
+      nice_to_have: "偏好",
+      optional: "備註",
+      ask_contractor: "請廠商建議"
+    };
+    return labels[priority] || labels.optional;
+  }
+
+  function isBudgetRelevantCategory(category) {
+    return ["budget", "demolition", "cabinet", "kitchen", "bathroom", "flooring", "ceiling", "lighting", "outlet_low_voltage", "plumbing", "ac", "material"].includes(category);
+  }
+
+  function hasMaterialRequirementNote() {
+    return (project.requirementNotes || []).some((note) => note.category === "material" || note.category === "budget" || containsAny(note.text, ["材料", "材質", "設備", "省預算", "標準", "質感"]));
+  }
+
+  function hasDemolitionSignal() {
+    return (project.walls || []).some((wall) => wall.status === "demolished")
+      || (project.requirementNotes || []).some((note) => note.category === "demolition" || containsAny(note.text, ["拆除", "拆牆", "清運"]));
+  }
+
+  function hasBathroomSignal() {
+    return (project.zones || []).some((zone) => zone.type === "bathroom" || containsAny(zone.name, ["浴室", "廁所"]))
+      || (project.requirementNotes || []).some((note) => note.category === "bathroom" || containsAny(note.text, ["浴室", "防水", "試水"]));
+  }
+
+  function hasKitchenSignal() {
+    return (project.zones || []).some((zone) => zone.type === "kitchen" || containsAny(zone.name, ["廚房", "廚具"]))
+      || (project.requirementNotes || []).some((note) => note.category === "kitchen" || containsAny(note.text, ["廚房", "廚具", "給排水", "插座"]));
+  }
+
+  function hasAcSignal() {
+    return getCurrentLayer() === "ac_plan"
+      || (project.requirementNotes || []).some((note) => note.category === "ac" || containsAny(note.text, ["空調", "冷氣", "排水"]));
+  }
+
+  function hasProfessionalReviewSignal() {
+    return (project.walls || []).some((wall) => wall.structural || wall.status === "demolished")
+      || (project.requirementNotes || []).some((note) => note.category === "professional_review" || containsAny(note.text, ["拆牆", "承重", "結構", "法規", "漏水", "壁癌", "裂縫", "海砂屋"]));
+  }
+
+  function formatGuideText(text) {
+    return escapeHTML(text).replace(/\n/g, "<br>");
+  }
+
+  function formatGuideTime(value) {
+    if (!value) {
+      return "-";
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "-";
+    }
+    return date.toLocaleTimeString("zh-Hant", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function getGuideLogTypeLabel(type) {
+    const labels = {
+      message: "訊息",
+      question: "問題",
+      answer: "回答",
+      suggestion: "建議",
+      warning: "提醒",
+      summary: "摘要"
+    };
+    return labels[type] || "訊息";
+  }
+
+  function summarizeByKeywords(items, keywords) {
+    const matches = uniqueText(items.filter((item) => containsAny(item.text, keywords)).map((item) => item.text));
+    return matches.length ? matches.slice(0, 4).join("；") : "尚未明確記錄";
+  }
+
+  function uniqueText(items) {
+    return [...new Set(items.map((item) => String(item || "").trim()).filter(Boolean))];
+  }
+
+  function containsAny(value, keywords) {
+    const normalized = normalizeGuideText(value);
+    return keywords.some((keyword) => normalized.includes(normalizeGuideText(keyword)));
+  }
+
+  function containsAnyNormalized(normalizedValue, keywords) {
+    return keywords.some((keyword) => normalizedValue.includes(normalizeGuideText(keyword)));
+  }
+
+  function normalizeGuideText(value) {
+    return String(value || "").toLowerCase().replace(/\s+/g, "");
   }
 
   function renderStyleVisualPanel() {

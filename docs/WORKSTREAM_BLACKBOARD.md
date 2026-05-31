@@ -1358,6 +1358,53 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 - Need Commander: Yes, for formal implementation dispatch and role confirmation after the Executive Officer / guide assistant correction.
 - Need Reviewer: No, because this is a blackboard-only role announcement and no product or runtime files changed.
 
+### 2026-06-01T00:12:28+08:00 - Plancraft+ 平面拼圖引導官 MVP
+
+- 任務名稱：Plancraft+ 平面拼圖引導官 MVP
+- 任務類型：Builder / UI Interaction / Guide Assistant / plan-puzzle
+- Workstream：plancraft/page-ui / plan-puzzle-guide-assistant
+- Branch / Repo：`plancraft-plan-puzzle-guide-assistant-mvp` / `laibeoffer/laibe-mvp`
+- Status：COMPLETED
+- 修改檔案：
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- 未修改：
+  - `C:\laibe_project\plancraft`
+  - Plancraft core
+  - budget runtime
+  - `package.json`
+  - `node_modules`
+  - payment / escrow / listing fee
+- 完成事項：
+  - 建立右側狀態區「平面拼圖引導官」UI。
+  - 建立本地 FAQ / guide knowledge；本輪不接真實 LLM。
+  - 建立本地問答流程、快速問題、引導流程與二次確認清除。
+  - 建立 `project.guide`、`project.guideLog`、`project.requirementNotes`、`project.guideSummary`。
+  - 每則使用者輸入與引導官回覆寫入 `guideLog`。
+  - 可將訊息、疑問、提醒寫入 `requirementNotes`。
+  - 可產生需求摘要並寫入 `guideSummary`。
+  - 與 `currentLayer`、`selectedObject`、現有 / 本地 `systemReminders` 連動。
+  - 匯出 Plancraft+ draft JSON 時包含 guide / guideLog / requirementNotes / guideSummary。
+- 未完成事項：
+  - 未接真實 LLM API。
+  - 未接 OpenAI API。
+  - 未接 image API。
+  - 未做 production storage。
+  - 未做正式估價。
+  - 未做 AI 自動估價。
+- 測試 / 驗證：
+  - `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`：通過。
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`：檔案存在，可作為 file:// 靜態頁開啟。
+  - Browser console：未能確認；in-app Browser / node_repl 連線在本沙盒回報 `windows sandbox failed: spawn setup refresh`，沒有進到頁面本身。
+- Need Commander：Yes
+- 原因：本輪建立平面拼圖引導官，會影響使用者行動線、問答內容、需求記錄與產品體驗，需要最高指揮官確認方向。
+- Need Reviewer：No
+- Reviewer 判定理由：本輪只做 UI / local rule-based guide / Plancraft+ draft JSON 欄位，不改 budget runtime、guard 或 Plancraft core；guideLog / requirementNotes / guideSummary 只作需求紀錄，不作正式 budget input。
+- 下一步唯一建議：請 Commander 確認平面拼圖引導官的問答語氣、流程順序與是否進入下一輪 UX / product copy 調整。
+
 ### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
 
 - Workstream: executive-visible-ack-recovery / active-final-gates / metadata-reconciliation

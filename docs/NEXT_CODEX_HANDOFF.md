@@ -1,5 +1,43 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Plan Puzzle Task: Plancraft+ 平面拼圖引導官 MVP
+
+- 本輪任務名稱：Plancraft+ 平面拼圖引導官 MVP。
+- 任務類型：Builder / UI Interaction / Guide Assistant / plan-puzzle。
+- 修改檔案：
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- 新增檔案：無。
+- 未修改：`C:\laibe_project\plancraft`、Plancraft core、budget runtime、`package.json`、`node_modules`、payment / escrow / listing fee。
+- Guide data model：
+  - `project.guide`: `enabled`, `mode: "local_rule_based"`, `apiBacked: false`, `disclaimerAccepted`, `currentStep`, `completedSteps`, `pendingSuggestions`, `resolvedSuggestionIds`, `lastUpdatedAt`。
+  - `project.guideLog[]`: `id`, `role`, `type`, `text`, `layer`, `selectedObjectId`, `selectedObjectType`, `relatedReminderIds`, `createdAt`, `savedToRequirements`。
+  - `project.requirementNotes[]`: `source: "guide"`, `text`, `category`, `layer`, `relatedObjectId`, `priority`, `includeInSummary`, `createdAt`。
+  - `project.guideSummary`: `userIntent`, `uncertainties`, `budgetRelevantNotes`, `contractorQuestions`, `generatedAt`。
+- Local rule-based guide 行為：
+  - 右側狀態區新增「平面拼圖引導官」對話面板、輸入框、送出按鈕、9 個快速問題、引導流程按鈕、狀態摘要、圖層切換、提醒清單與提醒動作。
+  - 本地 `GUIDE_KNOWLEDGE` 支援開始、匯入底圖、校正比例、畫牆、牆狀態 / 拆牆、標尺寸、門窗、櫃體 / 廚具、圖層、施工圖邊界、預算候選、總預覽、照片、清運、防水、廚房插座 / 給排水、空調、不確定事項、廠商建議、專業確認、AI 風格示意、正式報價邊界與廠商可讀性。
+  - 引導流程包含開始、屋況、舊屋追問、主要需求、預算偏好、圖面提醒、需求摘要。
+  - fallback 會以不確定事項寫入 `requirementNotes`，提醒後續請廠商或萊比確認。
+- 連動狀態：
+  - `currentLayer` 會回覆 floor / demolition / flooring / lighting / ac 的本地建議。
+  - `selectedObject` 會針對 wall / opening / zone / issue 回覆物件用途、預算候選、缺漏資料與專業確認提醒。
+  - `systemReminders` 會讀現有 `project.systemReminders`，並用本地 generator 補出底圖、比例、空間名稱、材料等級、拆除清運、浴室防水、廚房插座 / 給排水、空調條件、牆線 issue、專業確認等提醒。
+- 匯出狀態：
+  - Plancraft+ draft JSON 匯出包含 `guide`、`guideLog`、`requirementNotes`、`guideSummary`。
+  - `guideLog` / `requirementNotes` / `guideSummary` 只作需求整理與招標溝通摘要，不是正式 quantity，不進 `generateBudgetEstimate`，不解除 `formalEstimateGuard`，不使 `productionReady` 變 true。
+- 未接真實 LLM API；未接 OpenAI API；未接 image API；未新增 API key、backend、production storage 或 package / framework。
+- 驗證：
+  - `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js` 通過。
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html` 檔案存在，可由 file:// 靜態開啟。
+  - Browser console 互動驗證未完成；in-app Browser / node_repl 連線在本沙盒回報 `windows sandbox failed: spawn setup refresh`，沒有進到頁面本身。
+- Need Commander：Yes，因本輪影響使用者行動線、問答內容、需求記錄與產品體驗。
+- Need Reviewer：No，因本輪未修改 budget runtime、guard 或 Plancraft core；guide 欄位僅屬 Plancraft+ draft JSON 需求紀錄。
+- 下一步唯一建議：Commander 確認引導官問答語氣、流程順序與產品定位後，再開下一輪 UX / copy / review 調整。
+
 ## Latest MethodSpec Documentation Task: Validator Freeze Note
 
 - 本輪任務名稱：MethodSpec validator freeze note。
