@@ -1,6 +1,6 @@
 ﻿# Commander Decisions
 
-Status: decision log placeholder.
+Status: decision log with explicit non-decision signals.
 
 ## Rules
 
@@ -10,4 +10,11 @@ Status: decision log placeholder.
 
 ## Current Decisions
 
-No new commander decision is recorded by this vault in this round.
+No commander decision is recorded by this vault in this round.
+
+## Commander Decision Inputs
+
+| Source | Signal | Vault Interpretation | Action |
+|---|---|---|---|
+| PR #31 self-check comment | `Need Commander: Yes only if deciding to merge despite Codex review usage limit.` | This is a conditional merge-authority signal, not a commander decision. Budget Knowledge Vault must not resolve it. | Track as pending context for Integration Officer / Commander; do not merge, close, or dispatch from this vault. |
+| PR #32 | No commander instruction found during latest scoped patrol. | Initialization remains active, but there is no commander decision to record. | Continue scoped patrol and keep PR #32 mergeable. |
