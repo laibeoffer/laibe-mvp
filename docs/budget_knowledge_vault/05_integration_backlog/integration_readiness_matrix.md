@@ -23,18 +23,18 @@ Issue #41 records that `MERGED_TO_MAIN` is not equal to `FUNCTIONAL_ACCEPTED`.
 
 ## Latest Vault Patrol
 
-- checked_at: 2026-06-01T04:52:39+08:00
+- checked_at: 2026-06-01T05:04:40+08:00
 - source_checked: GitHub PR #32 / PR #31 / Issue #41 / compact blackboard
 - assigned_pr: PR #32 `Add Budget Knowledge Vault support agent`
 - assigned_pr_status: open, mergeable clean, not merged, no PR comments found in latest scoped patrol
-- assigned_pr_head_sha_at_patrol_start: `66e584902151b7ff8d881e4eefe39dd5825eb949`
+- assigned_pr_head_sha_at_patrol_start: `c4d8efa06b088f7bcc8b4c4006cc0dfcd2c3ee1b`
 - assigned_pr_base_sha: `7b72fd9cfeada095ed5729bac3d728f4da0da806`
 - assigned_pr_comments: none found in scoped patrol
 - related_boundary_pr: PR #31 `Register Budget Knowledge Vault support boundary`, open, mergeability dirty, review signal unavailable because Codex review usage limits were reached, now routed to Integration Officer disposition issue #41
 - related_boundary_pr_head_sha: `024289e74b8d7e4200dd40aa210aca5f2ffcb82a`
 - related_boundary_pr_status: open, not merged, mergeability dirty
 - issue_41_comments_checked: Commander Blackboard Patrol Decision remains the latest scoped Integration Officer / Commander signal mirrored in this vault
-- scoped_change_since_last_patrol: no new PR #32 comments, no new PR #31 comments, no PR review threads, and no new Issue #41 instruction were found; the PR #32 patrol snapshot was refreshed after docs-only commit `66e5849` while keeping support-only boundaries unchanged
+- scoped_change_since_last_patrol: no new PR #32 comments, no new PR #31 comments, no PR review threads, and no new Issue #41 instruction were found; the PR #32 patrol snapshot was refreshed after docs-only commit `c4d8efa` while keeping support-only boundaries unchanged
 - active_work: Budget Knowledge Vault initialization remains active until PR #31 / PR #32 are resolved, initialization is complete, and no known vault todo remains.
 - no_idle_rule: if no new instruction exists, advance the first safe item in `AUTOMATION.md` / `00_index.md` active work queue.
 - no_change_response_guard: `本 workstream 本輪無新指派。` must not be used while active initialization PRs, support gaps, or known todo items exist.
