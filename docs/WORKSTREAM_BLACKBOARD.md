@@ -42,7 +42,7 @@ Effective immediately:
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 85 | FUNCTIONAL_ACCEPTANCE_PENDING | PR #3 open draft | QF5.4 PR #3 head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body; no PR comments, review threads, or GitHub Actions run found | PR #3 not merged; no GitHub-run validator evidence; Commander functional acceptance pending | Yes | Yes | Review PR #3, decide ready/merge or request GitHub-run validation evidence |
 | Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | MERGE_GATE_BLOCKED | PR #26 / Issue #17 | PR #26 open; head `2be2bb8`; changed files scope clean; R1.5 validators/static guard passed in PR comment `4587140052` | PR not merged; branch is behind current `main`; Codex re-review hit usage limit | No for scope; Yes for final completion acceptance | Yes, reviewer/Codex-equivalent re-review needed | Sync PR #26 to current `main`, rerun validators, then obtain final review / merge gate |
 | MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context | Integration readiness evidence and context windows exist | `BUDGET_ENGINE_ENTRY_BLOCKER` | No, unless product decision is needed | Integration Officer investigation required | Identify current Budget Engine entry before integration harness |
-| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PR #29 not recorded as merged | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final evidence |
+| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | MERGED_TO_MAIN_DOCS_ONLY | PR #23 merged / PR #29 merged / PR #34 open / PR #38 open | PR #29 merged at `c5fc753`; changed file `docs/budget/28-output-documents-integration-usage-note.md`; PR body records renderer static guard `valid: true`, `issue_count: 0`, and no `.xlsx` / `.pdf` scan evidence; PR #34 and PR #38 are open docs-only follow-up packets | PR #29 Functional Acceptance is `NOT_APPLICABLE_DOCS_ONLY`; formal Excel/PDF writer, production artifact storage, and customer-facing final quote are not complete | Yes, for final completion acceptance | No unless formal writer / runtime renderer boundary changes | Commander decides whether docs-only final outcome is accepted; do not claim 100% for formal output |
 | 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
 | Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 75 | IN_PROGRESS | Governance PR / Issue context | Blackboard / issue workflow / patrol rules established | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
 | 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate | Four budget lines not all 100 | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Run read-only Budget Engine entry investigation |
@@ -62,7 +62,7 @@ Next: Identify current Budget Engine entry before integration harness.
 | `quote-factory/price-range-governance` | Yes | 85 | PR #3 open draft; head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body | PR #3 not merged; Functional Acceptance pending; no GitHub Actions validator run found | WAITING |
 | `warehouse/raw-candidate` | Yes | 75 | PR #26 open; head `2be2bb8`; changed files scope clean; R1.5 validators/static guard passed in PR comment `4587140052` | PR not merged; branch is behind current `main`; Codex re-review hit usage limit | BLOCKED |
 | `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists | `BUDGET_ENGINE_ENTRY_BLOCKER` | BLOCKED |
-| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PR #29 merge / final evidence pending | WAITING |
+| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 merged at `c5fc753`; static guard evidence recorded in PR #29 body; PR #34 / PR #38 are open docs-only follow-ups | PR #29 is docs-only and does not prove formal writer / real Excel/PDF / production artifact completion; Commander final acceptance pending | WAITING |
 
 Readiness rule:
 
@@ -188,3 +188,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: Yes for final completion / merge acceptance; no new product decision needed for R1.5 scope.
 - Need Reviewer: Yes, reviewer or Codex-equivalent review needed after current-main sync.
 - Next single action: Sync PR #26 to current `main`, rerun validators, and re-submit final gate evidence.
+
+### 2026-06-01 - Output Documents Final Outcome Re-Report
+
+- Agent: @Output-Documents
+- Workstream: `output/budget-documents`
+- Status: `MERGED_TO_MAIN_DOCS_ONLY`
+- Progress %: 75
+- Evidence: PR #29 merged at `c5fc753`; changed file `docs/budget/28-output-documents-integration-usage-note.md`; PR body records renderer static guard `valid: true`, `issue_count: 0`, no `.xlsx` / `.pdf` scan evidence, and no budget engine rerun / forbidden scope. PR #34 and PR #38 remain open docs-only follow-up packets.
+- Blocker: PR #29 Functional Acceptance is `NOT_APPLICABLE_DOCS_ONLY`; docs-only merge does not prove formal Excel/PDF writer, production artifact storage, or customer-facing final quote completion. Integration Gate remains WAITING due global budget blockers.
+- Need Commander: Yes for final completion acceptance.
+- Need Reviewer: No unless formal writer / runtime renderer boundary changes.
+- Next single action: Commander decides whether PR #29 docs-only outcome is accepted; Output Documents must not claim 100% formal output readiness.
