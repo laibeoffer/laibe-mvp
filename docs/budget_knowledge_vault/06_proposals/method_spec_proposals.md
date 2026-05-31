@@ -12,3 +12,12 @@ Status: proposal register only.
 ## Current Proposals
 
 No formal MethodSpec proposal is approved by this vault.
+
+## Candidate Review Inputs
+
+These are non-binding review inputs for the Integration Officer / MethodSpec owner. They are not approved catalog changes.
+
+| Candidate | Source Signal | Proposed Review Question | Boundary |
+|---|---|---|---|
+| Budget engine entry clarification | `integration_gap_register.md` records `BUDGET_ENGINE_ENTRY_BLOCKER`. | Which deterministic budget engine entry path should receive verified MethodSpec / context-window evidence for dry-run integration? | Do not edit `MethodSpecCatalog`, budget engine code, `PricingRule`, `MaterialSpec`, or `LaborRule`. |
+| Context-window trace status | `00_index.md` records Requirement Form and Plan Puzzle SVG / Quantity Facts windows as trace metadata. | What evidence status is required before each context window can support formal estimate preparation? | Placeholder / linked evidence remains trace-only and must not become estimate authority. |

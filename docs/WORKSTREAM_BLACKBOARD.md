@@ -1424,6 +1424,19 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
 
 ## Update Log
 
+### 2026-06-01T00:49:54+08:00 - Budget Knowledge Vault no-idle task execution
+
+- Workstream: knowledge/budget-vault
+- Branch: `knowledge/budget-vault`
+- Status: `ACTIVE_SUPPORT_NO_IDLE_EXECUTED / PROPOSAL_REGISTERS_REFRESHED / PR32_OPEN_MERGEABLE`
+- Changed: Published this blackboard result entry and advanced the no-idle backlog by refining Budget Knowledge Vault proposal registers as non-binding Integration Officer review inputs.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/budget_knowledge_vault/06_proposals/method_spec_proposals.md`, `docs/budget_knowledge_vault/06_proposals/pricing_review_proposals.md`, `docs/budget_knowledge_vault/06_proposals/unit_conversion_proposals.md`, `docs/budget_knowledge_vault/06_proposals/output_feedback_proposals.md`
+- PR / Commit: PR #32 / this `knowledge/budget-vault` branch update
+- Blocked: PR #31 and PR #32 remain open; this vault cannot merge, close, approve, reject, or make Integration Gate decisions.
+- Next: Continue no-idle scoped maintenance: refresh PR/Issue status snapshots, track explicit decision signals, and update gaps / proposal registers only from scoped evidence.
+- Need Commander: No
+- Need Reviewer: No
+
 ### 2026-05-31T23:02:00+08:00 - Plan Puzzle Builder self-introduction
 
 - Workstream: plancraft/page-ui / plan-puzzle-guide-assistant

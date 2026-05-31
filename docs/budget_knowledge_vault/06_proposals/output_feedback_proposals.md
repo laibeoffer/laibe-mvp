@@ -12,3 +12,12 @@ Status: proposal register only.
 ## Current Proposals
 
 No output feedback proposal is approved by this vault.
+
+## Candidate Review Inputs
+
+These are non-binding review inputs for output feedback. They do not modify renderer behavior.
+
+| Candidate | Source Signal | Proposed Review Question | Boundary |
+|---|---|---|---|
+| Snapshot-only source reminder | Integration readiness notes Output Documents still depends on PR #29 / snapshot-only usage evidence. | Should customer-safe output notes explicitly state that renderer output must come from `BudgetOutputSnapshot` / rendered snapshot contracts only? | Do not change renderer code, layout, file writers, budget engine, pricing rules, or snapshot generation. |
+| Context evidence disclaimer | Requirement and SVG windows may be placeholder / linked / verified / unavailable. | Should preview or dry-run output feedback show context evidence status as an internal trace note before formal output exists? | Do not create customer-facing quote, formal Excel/PDF, or official renderer artifact. |
