@@ -10,6 +10,7 @@ Plan Puzzle Guide Agent initialization contract.
 
 - Formal repo: `laibeoffer/laibe-mvp`.
 - Formal branch: `app/plan-puzzle-guide-agent`.
+- Formal PR: `https://github.com/laibeoffer/laibe-mvp/pull/40`.
 - Formal delivery path: GitHub branch / PR.
 - Local `Z:\laibe_project`: `LOCAL_STATE` / `LOCAL_DRAFT_ONLY`, not formal delivery.
 
@@ -41,6 +42,7 @@ None.
 - Defined `PlanPuzzleQuantityFacts`, `plan_quantity_facts_id`, `svg_artifact_id`, and `quantity_context_status`.
 - Defined SVG / zone / area / wall length / opening count receiving windows using `placeholder` / `linked` / `verified`.
 - Added placeholder JSON example.
+- Opened draft PR #40 as the GitHub-tracked initialization path.
 
 ## Not Completed
 
@@ -65,6 +67,13 @@ Runtime status:
 
 `WEB_RUNTIME_PENDING`
 
+## GitHub Branch / PR Status
+
+- Branch: `app/plan-puzzle-guide-agent`.
+- PR: `https://github.com/laibeoffer/laibe-mvp/pull/40`.
+- PR state: open draft.
+- Scope check: docs-only under `docs/plan_puzzle_guide/`.
+
 ## Next GitHub Action Needed
 
-Open a draft PR from `app/plan-puzzle-guide-agent` to `main`. After PR publication, continue with a narrow mock runtime task only if it stays front-end local, placeholder-only, and does not touch forbidden systems.
+Continue with a narrow mock runtime task only if it stays front-end local, placeholder-only, GitHub-tracked, and does not touch forbidden systems. The next safe target is a minimal facts panel in `preview_floor_plan` that exposes `PlanPuzzleQuantityFacts` without calling Budget Engine or renderer.
