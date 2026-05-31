@@ -9,6 +9,15 @@
 | `BUDGET_ENGINE_ENTRY_BLOCKER` | MethodSpec / Budget Engine | Open | Executable budget integration dry-run cannot be claimed until the engine entry path is clarified. |
 | PR #29 not merged in task brief | Output Documents | Open | Snapshot-only integration usage note is not confirmed as merged shared truth. |
 
+## Support Agent Initialization Gaps
+
+These items are not part of the four-line Integration Gate, but they are active Budget Knowledge Vault work until resolved.
+
+| Gap | Workstream | Status | Why It Matters | Next Vault Action |
+|---|---|---|---|---|
+| PR #32 review / merge pending | `knowledge/budget-vault` | Open | The initial vault structure exists on the branch but is not yet merged shared truth. | Keep scoped patrol on PR #32 comments, assigned issues, and Integration Officer instructions. |
+| No-change response cannot be used yet | `knowledge/budget-vault` | Open until initialization completes | Open initialization work exists, so treating the workstream as idle would hide active work. | Use explicit progress reports until PR #32 is reviewed / merged and no new tasks remain. |
+
 ## Non-Blocker Support Note
 
 Budget Knowledge Vault is `ACTIVE_SUPPORT` and not part of the four-line Integration Gate. It must not raise or lower core readiness percentages.
