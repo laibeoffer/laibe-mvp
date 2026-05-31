@@ -1,4 +1,4 @@
-﻿# NEXT_CODEX_HANDOFF.md
+# NEXT_CODEX_HANDOFF.md
 
 ## Latest Blackboard Rebuild: Compact Current-State Board
 
@@ -10,587 +10,332 @@
 - 新增檔案：無。
 - 已完成：
   - 將過大的 `docs/WORKSTREAM_BLACKBOARD.md` 重建為 compact current-state board。
-  - 新增 `Blackboard Rebuild Announcement`，明確宣告黑板不再承載完整 patrol log / chat transcript / heartbeat history。
+  - 新增 `Blackboard Rebuild Announcement`，宣告黑板不再承載完整 patrol log / chat transcript / heartbeat history。
   - 保留 active agents、Integration Readiness Gate、`BUDGET_ENGINE_ENTRY_BLOCKER` handoff、Support Agents、Future / Standby Agent Backlog 與 compact update format。
   - 明確維持 Integration Gate: `WAITING`。
   - 明確記錄 blocking item：MethodSpec / `BUDGET_ENGINE_ENTRY_BLOCKER`。
   - 明確記錄 owner：`LAIBE_REVIEWER_INTEGRATION_OFFICER`。
   - 明確記錄 next：Identify current Budget Engine entry before integration harness。
-- 未修改：
-  - `src/`
-  - budget engine
-  - `budget-generator.ts`
-  - MethodSpec implementation
-  - Raw Candidate implementation
-  - Output Documents runtime
-  - Plancraft core
-  - payment / auth / webhook / AI API / DB / secrets
-- 已知風險：
-  - 舊黑板正文被 compact board 取代；歷史細節需從 Git history、`docs/NEXT_CODEX_HANDOFF.md`、`docs/CURRENT_PHASE_REVIEW_PACKET.md`、或 `docs/budget_knowledge_vault/` 查。
-  - 本輪未查遠端 GitHub 最新 PR / Issue metadata；重建依據為本機目前文件與使用者最新指示。
-- 下一步建議：
-  - 後續 agent 只用 compact update format 更新黑板。
-  - 詳細工作報告放 handoff、phase packet 或該 workstream 專用文件，不再塞入黑板。
+- 未修改：`src/`、budget engine、`budget-generator.ts`、MethodSpec / Raw Candidate / Output Documents runtime、Plancraft core、payment / auth / webhook / AI API / DB / secrets。
+- 已知風險：舊黑板正文被 compact board 取代；歷史細節需從 Git history、handoff、phase packet 或 `docs/budget_knowledge_vault/` 查。
+- 下一步建議：後續 agent 只用 compact update format 更新黑板；詳細報告放 handoff、phase packet 或該 workstream 專用文件。
 
-## Latest Owner Guide Agent Task: Initialization Contract
+## Latest MethodSpec Documentation Task: Validator Freeze Note
 
-- 本輪任務名稱：Owner Guide Agent initialization contract.
-- 任務類型：Documentation / Builder / Owner requirement intake workstream setup.
-- 指派角色：需求引導官 Agent / Owner Guide Agent.
-- Workstream：`app/owner-guide-agent`.
-- Managed by：`EXECUTION_OFFICER`.
-- 是否允許施工：Yes, docs-only within the explicitly allowed scope.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
+- 本輪任務名稱：MethodSpec validator freeze note。
+- GitHub Issue：#16 `[MethodSpec] Add validator freeze note`。
+- 任務類型：Documentation / Governance checkpoint；本輪只整理 MethodSpec validator 狀態與邊界，不修改 runtime code。
 - 新增檔案：
-  - `docs/owner_guide/OWNER_GUIDE_AGENT.md`
-  - `docs/owner_guide/AUTOMATION.md`
-  - `docs/owner_guide/owner_guide_question_flow.md`
-  - `docs/owner_guide/owner_guide_session_state.md`
-  - `docs/owner_guide/owner_intent_contract.md`
-  - `docs/owner_guide/project_requirement_brief_placeholder.md`
-  - `docs/owner_guide/next_step_recommendation_rules.md`
-  - `docs/owner_guide/owner_guide_web_runtime_check.md`
-  - `docs/owner_guide/examples/owner_intent.sample.json`
-  - `docs/owner_guide/examples/project_requirement_brief.placeholder.json`
-  - `docs/owner_guide/examples/qa_session.sample.json`
-- 已完成：
-  - Added blackboard self-introduction for `Agent Self-Introduction: Owner Guide Agent`.
-  - Recorded `owner-guide-agent-patrol` every 15 minutes.
-  - Recorded no-idle rule: after blackboard report, if no response within 20 minutes, continue the next safe initialization task; do not report `本 workstream 本輪無新指派` before initialization is complete.
-  - Defined basic project, space, style, budget signal, schedule, asset status, and next-step question flow.
-  - Defined `OwnerGuideSessionState`, `QuestionAnswerLog`, `OwnerIntent`, `ProjectRequirementBrief placeholder`, `RequirementGapChecklist`, and next-step recommendation rules.
-  - Added sample `OwnerIntent`, `ProjectRequirementBrief placeholder`, and QA session JSON.
-- 未修改：
-  - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html`
-  - `src/`
-  - `app/`
-  - budget engine
-  - renderer / Output Documents
-  - MethodSpec / Raw Candidate
-  - Plancraft core
-  - payment / escrow / listing fee
-  - DB / auth / AI API / secrets
-- Runtime status：`WEB_RUNTIME_PENDING`.
-- Runtime evidence：
-  - Read-only review of `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` found an existing mock guide panel, text input, mock response area, and plan/budget links.
-  - Browser verification was attempted but the in-app browser could not start in this environment. No source runtime was changed in this docs-only initialization.
-- Missing / blocker：
-  - `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md` is missing locally.
-  - Runtime does not yet visibly output the new `OwnerIntent` / `ProjectRequirementBrief placeholder` contracts.
-  - Browser runtime remains unverified because the in-app browser could not start in this environment.
-  - Local `git` / `gh` executables are unavailable in PATH, so local commit / push / PR could not be completed from this environment.
-- 是否涉及 routing / CTA / header：No code change. Read-only runtime check notes existing plan/budget links.
-- 是否涉及資料模型：No runtime schema change. Docs-only placeholder contracts were created for requirement-intake outputs.
-- 是否涉及敏感區域：No.
-- 是否可供使用者後續主動審查：Yes, as docs-only workstream initialization and contract setup.
-- 下一步建議：
-  1. After scoped authorization, wire the mock owner-guide runtime to show QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`.
-  2. Keep all outputs mock / placeholder and do not connect real AI API, DB, payment, budget engine, renderer, MethodSpec, Raw Candidate, or Output Documents.
-
-## Latest Plan Puzzle Operating Rule: 20-Minute Self-Progression
-
-- 本輪任務名稱：Plan Puzzle 20-minute self-progression rule.
-- 任務類型：Documentation / Workstream operating rule.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 已完成：
-  - 已在黑板記錄 @Plan-Puzzle 不得被動等待最高指揮官回應。
-  - 已升級 @Plan-Puzzle 為 Plan Puzzle workstream responsible owner：可以累積完成工作、驗證證據、review-ready summary 給 Commander 審查，但不能因缺少新指令而停工。
-  - 已明確禁止用 `本輪無新指令` 作為主要回報或停工理由；若沒有新 Commander 指令，必須回報自選的安全下一步與實際 evidence。
-  - 已定義任務回報或 Commander review request 後 20 分鐘無回應時，將等待項目暫記為 `WAITING_COMMANDER_20MIN_SKIPPED`，並轉往下一個安全、同範圍、非高風險任務。
-  - 已列出可自我推進項目：read-only 狀態刷新、docs/handoff/blackboard clarification、可不污染 worktree 的 browser/runtime validation、或不依賴 Commander 回覆的已授權 Plan Puzzle 子任務。
-  - 已列出停止條件：不得 merge/push/close PR or Issue/resolve review thread，不得碰 Plancraft core、budget adapter/runtime/types、formal estimate、renderer、payment、AI API、DB、secrets、package/framework/install、production webhook。
-- 未修改：
-  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
-  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
-  - Plancraft core
-  - budget adapter/runtime
-  - package.json / node_modules / framework setup
-  - AI API / DB / payment / escrow / listing fee / secrets
-- Need Commander：
-  - No for activating this operating rule.
-  - Yes only when a skipped item requires product, merge, or high-risk decision.
-- Need Reviewer：
-  - No for this docs-only operating rule.
-  - Yes only if the next task touches runtime code, data model, budget adapter/runtime, guard, Plancraft core, or merge readiness.
-- 下一步唯一建議：
-  - 若 Commander review invite 20 分鐘內沒有回應，@Plan-Puzzle should proceed to the next safe Plan Puzzle item: read-only PR #25 refresh or browser validation evidence collection, depending on current tooling availability.
-
-## Latest Budget Knowledge Vault Task: Structure + Automation
-
-- 本輪任務名稱：Budget Knowledge Vault structure and automation repair.
-- 任務類型：Documentation / Support Agent Knowledge Vault / Automation setup.
-- 指派角色：預算知識庫 / Budget Knowledge Vault Agent.
-- Workstream：`knowledge/budget-vault`.
-- Managed by：`LAIBE_REVIEWER_INTEGRATION_OFFICER`.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：
-  - `docs/budget_knowledge_vault/00_index.md`
-  - `docs/budget_knowledge_vault/AUTOMATION.md`
-  - `docs/budget_knowledge_vault/01_quote_factory/qf_status_summary.md`
-  - `docs/budget_knowledge_vault/01_quote_factory/qf_export_package_notes.md`
-  - `docs/budget_knowledge_vault/02_raw_candidate/raw_candidate_status_summary.md`
-  - `docs/budget_knowledge_vault/02_raw_candidate/raw_candidate_handoff_notes.md`
-  - `docs/budget_knowledge_vault/03_method_spec/methodspec_status_summary.md`
-  - `docs/budget_knowledge_vault/03_method_spec/methodspec_rule_guard_notes.md`
-  - `docs/budget_knowledge_vault/04_output_documents/output_documents_status_summary.md`
-  - `docs/budget_knowledge_vault/04_output_documents/output_snapshot_renderer_notes.md`
-  - `docs/budget_knowledge_vault/05_integration_backlog/integration_gap_register.md`
-  - `docs/budget_knowledge_vault/05_integration_backlog/integration_readiness_matrix.md`
-  - `docs/budget_knowledge_vault/06_proposals/method_spec_proposals.md`
-  - `docs/budget_knowledge_vault/06_proposals/pricing_review_proposals.md`
-  - `docs/budget_knowledge_vault/06_proposals/unit_conversion_proposals.md`
-  - `docs/budget_knowledge_vault/06_proposals/output_feedback_proposals.md`
-  - `docs/budget_knowledge_vault/07_decision_logs/reviewer_decisions.md`
-  - `docs/budget_knowledge_vault/07_decision_logs/commander_decisions.md`
-- 自動化：
-  - Codex app heartbeat `budget-knowledge-vault-patrol` 已建立。
-  - 巡邏頻率：每 12 分鐘。
-  - Scope：只巡查 `knowledge/budget-vault`，不巡查全專案。
-- 已完成：
-  - 建立 Budget Knowledge Vault Markdown 結構。
-  - 建立 / 記錄 12 分鐘巡邏 automation。
-  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 補上完整 `Agent Self-Introduction: Budget Knowledge Vault`。
-  - 建立四條預算核心線 summary：Quote Factory、Raw Candidate、MethodSpec、Output Documents。
-  - 建立 integration gap register、readiness matrix、proposal registers、reviewer / commander decision logs。
-  - 保留 Requirement Form / ProjectRequirementBrief window 與 Plan Puzzle SVG / Quantity Facts window 邊界。
-- 未碰範圍：`src/`、`app/`、`components/`、Quote Factory repo、raw warehouse implementation、MethodSpec implementation、Output Documents implementation、Budget Engine、PricingRule、BudgetEstimateLine、正式價格、正式報價、n8n、Obsidian runtime、AI API、Supabase / DB、payment / escrow / listing fee、integration harness、Plancraft。
-- 是否涉及 routing / CTA / header：No.
-- 是否涉及資料模型：No runtime schema change; Markdown knowledge-vault summaries only.
-- 是否涉及敏感區域：No.
-- 是否可供使用者後續主動審查：Yes, as docs-only support-agent setup.
-- 已知風險：
-  - 目前本地主工作樹存在大量既有 unrelated dirty changes；本輪未還原、未刪除、未修改那些變更。
-  - `git` 不在 PATH，但 MinGit fallback 可用於 read-only/status 與後續非破壞性 Git 操作。
-- 下一步建議：若要發布到 GitHub，僅 stage `docs/budget_knowledge_vault/`、`docs/WORKSTREAM_BLACKBOARD.md`、`docs/NEXT_CODEX_HANDOFF.md` 後建立 `knowledge/budget-vault` branch / commit / PR；不得把既有 unrelated dirty changes 帶入。
-
-## Latest Plan Puzzle UI IA Correction: ACCEPT_WITH_NOTES
-
-- 本輪任務名稱：Plancraft+ 平面拼圖 UI 區域與工具區重整 - UI IA 修正。
-- Commander conclusion：ACCEPT_WITH_NOTES。
-- 任務類型：Documentation / Governance / plan-puzzle IA clarification。
-- 指派角色：平面拼圖 / Plan Puzzle Builder。
-- 本輪不進入：Tool Catalog Data Model Spike。
+  - `docs/budget/32-method-spec-validator-freeze-note.md`
 - 修改檔案：
   - `docs/NEXT_CODEX_HANDOFF.md`
   - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-- 未修改檔案 / 區域：
-  - 未修改 `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
-  - 未修改 `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
-  - 未修改 `C:\laibe_project\plancraft`
-  - 未修改 Plancraft core
-  - 未修改 budget adapter / budget runtime
-  - 未新增 `package.json`
-  - 未新增 `node_modules`
-  - 未新增 React / Vite / TypeScript app
-  - 未執行 `npm install`
-  - 未解除 `formalEstimateGuard`
-  - 未做正式估價
-  - 未接真 AI API / DB / payment / escrow / listing fee
-- UI 四大區域定義：
-  - 檔案區：處理匯入、檔案來源、底圖狀態、比例校正入口與草稿保存 / 匯出狀態；不負責預算、正式上傳或雲端儲存。
-  - 工具區：放置牆體、門窗、空間標籤、邊界、圖層顯示、項目庫入口與快捷操作；不直接產生正式預算。
-  - 畫布：承載 underlay、grid、牆體、門窗、空間邊界、空間標籤、檢查提示與互動選取；是使用者編輯區，不是 budget input authority。
-  - 狀態區：顯示目前匯入、比例、牆體 / 門窗 / zone、area metadata、系統提醒、送出前檢查與總預覽摘要；不宣稱審查通過或正式估價完成。
-- 10 個產品圖層與現有技術圖層關係：
-  - 丈量底圖 / 原圖層：對應現有 `underlayLayer` 與 grid。
-  - 牆體 / 結構層：對應現有 `wallLayer`、`project.walls`、`nodeGraph.edges`。
-  - 門窗 / 開口層：對應現有 `openingLayer`、`project.openings`。
-  - 空間 / zone 層：對應現有 `zoneLayer` 與 `zonePolygonLayer`。
-  - 衛浴圖層：產品語意圖層；應連到 bathroom zone 與其項目庫項目，不是新的正式預算來源。
-  - 防水圖層：產品語意圖層；應依附衛浴 / 陽台等 zone 與邊界檢查，不等於可直接估價。
-  - 木作櫃圖層：產品語意圖層；應連到家具 / 收納項目，不等於 current technical layer。
-  - 系統櫃圖層：產品語意圖層；應連到系統櫃項目庫與擺放物件，不等於 current technical layer。
-  - 廚具圖層：產品語意圖層；應連到 kitchen zone 與廚具項目，不等於 formal quote line。
-  - 水電 / 空調圖層：產品語意圖層；水電與空調可在 UI 上分組或拆分顯示，但目前只能作需求標記 / 系統提醒，不得直接產生正式工程量。
-- 項目庫定位：
-  - 項目庫不是圖層。
-  - 項目庫是可放置 / 標記的工程或物件分類資料來源，必須跟目前圖層連動，例如選到衛浴 zone 才顯示防水 / 衛浴設備候選項，選到牆或開口才顯示相關門窗 / 牆面項目。
-  - 項目庫後續若要落地資料模型，需另開明確授權任務，不可在本輪偷做。
-- 系統提醒 / 總預覽 / 送出前檢查 / 快捷鍵說明定位：
-  - 系統提醒：顯示缺比例、open boundary、invalid boundary、缺 zone、areaConfidence 低、reviewerRequired 等非阻斷 / 阻斷提示。
-  - 總預覽：彙整目前圖層、zone、area metadata、未完成檢查與草稿狀態；不是 renderer preview，也不是 budget preview。
-  - 送出前檢查：作為草稿交給下一階段前的 gate checklist；不得解除 formal estimate guard。
-  - 快捷鍵說明：只說明畫布操作快捷鍵，不應承擔產品流程、正式送出或預算產生職責。
-- 邊界：
-  - 不得宣稱正式預算完成。
-  - 不得接真 AI API。
-  - 不得把 SVG / renderer preview 當 budget input。
-  - 不得解除 `formalEstimateGuard`。
-  - 不得修改 Plancraft core。
-  - 不得把 candidate area 當 production quantity。
-- 未完成事項：
-  - 尚未做 Tool Catalog Data Model Spike。
-  - 尚未實作完整項目庫互動。
-  - 尚未把 10 個產品圖層全部接成可操作 UI。
-  - 尚未把產品圖層轉成正式 budget adapter input。
-  - 尚未完成 undo / redo history。
-  - 尚未做正式報價、Excel / PDF writer、AI API、真雲端儲存。
-- 測試 / 驗證：
-  - 本輪為文件 IA 修正，未改功能碼。
-  - 重新讀取 `preview_floor_plan/code.html` 與 `plan-puzzle.js` 相關片段確認現有技術圖層與狀態命名。
-  - 本機 `git` executable / PATH 仍不可用，無法執行 `git diff`。
-- Need Commander：Yes。需要最高指揮官確認此 IA 描述是否符合產品方向。
-- Need Reviewer：No。本輪只改治理 / handoff / 黑板 / review packet 文件，未碰功能碼、資料模型、budget runtime、guard、adapter 或 Plancraft core。
-- 下一步唯一建議：Plancraft+ Tool Catalog Interaction Implementation。
+- 未修改：`src/lib/budget/specs/`、`src/lib/budget/output/`、`src/lib/budget/renderers/`、`src/lib/budget/raw-warehouse/`、`src/lib/budget/intake/`、frontend、preview floor plan、plan-puzzle、payment / escrow / listing fee。
+- 目前凍結狀態：PR #4 merged；P0 / P1-A / P1-B MethodSpec validator work complete；MS-12 reviewer verdict is `PASS_WITH_NOTES`。
+- `PASS_WITH_NOTES` 只因歷史 dirty / untracked repo baseline，非 validator boundary failure。
+- Frozen invariants：AI / RAG / raw candidate data 不得直接成為正式價格；`LaborRule` remains reference-only；`MaterialSpec` / `ItemMaterialBinding` / `NoteTemplate` / `InclusionExclusionRule` 不得改 `unit_price`、`amount` 或 `quantity`。
+- UnitConversion coverage remains warning-only and must not rewrite generated quantities.
+- Inclusion / Exclusion scope coverage remains warning / allowed-condition only and must not propagate directly to renderer or output.
+- Regression baseline remains: total amount `231103`, budget line count `12`, review-required line count `5`.
+- 下一步建議：若繼續 MethodSpec，應另開 formal Issue 做 P2 validator planning 或 clean worktree / file ownership proof；不得從本文件直接進 formal price、renderer、raw warehouse publishing 或 schema expansion。
 
-## Latest Blackboard Update: Budget Knowledge Vault Support Agent Boundary
+## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
 
-- 本輪任務名稱：Blackboard - Budget Knowledge Vault support agent boundary.
-- 任務類型：Governance / Documentation / Commander boundary update.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 新增 `Support Agents Managed by Integration Officer` 區塊。
-  - 登記 `預算知識庫 / Budget Knowledge Vault Agent`，workstream 為 `knowledge/budget-vault`。
-  - 明確標示該 agent 由 `LAIBE_REVIEWER_INTEGRATION_OFFICER` 管理，狀態為 `ACTIVE_SUPPORT`，完成比例由整合官回報。
-  - 明確標示該 agent 不列入 Integration Readiness Gate，也不列入四條預算核心完成率。
-  - 補上 Commander 邊界：最高指揮官只記錄存在與引用整合官狀態，不直接派工、不要求補件、不要求改文件、不要求 PR / automation / 全局巡檢。
-- Integration Readiness Gate：仍只包含 `quote-factory/price-range-governance`、`warehouse/raw-candidate`、`warehouse/method-spec`、`output/budget-documents`。
-- 未碰範圍：`src/`、功能碼、budget engine、renderer runtime、payment / auth / webhook、AI API、DB、secrets、GitHub PR / merge / close 狀態。
-- 已知風險：此為本機文件更新；若要成為 GitHub 黑板共同真相，仍需後續用乾淨 branch / PR 發布。
-- 下一步建議：後續 hourly report 若提到 `knowledge/budget-vault`，只寫 `Managed by Integration Officer`；若整合官回報 blocker，轉交整合官；若整合官回報 `Need Commander: Yes`，再摘要給使用者裁決。
-
-## Latest Output Documents Task: Integration Usage Note
-
-- 本輪任務名稱：Output Documents integration usage note.
-- 任務類型：Documentation / Budget Output Warehouse Task.
-- 指派角色：預算成品物流系統 / Output Documents.
-- 是否允許施工：Yes, docs-only within Output Documents scope.
-- 修改檔案：
-  - `docs/NEXT_CODEX_HANDOFF.md`
+- 本輪任務名稱：Strategic Plan Imported / Dispatch Source Clarified。
+- 任務類型：Governance / Documentation / Dispatch Rules；本輪只整合指揮官校正版戰略計畫，不修改功能程式碼。
 - 新增檔案：
-  - `docs/budget/28-output-documents-integration-usage-note.md`
-- 已完成：
-  - 建立 Output Documents 參與 budget integration harness 的使用說明。
-  - 明確規定 Output Documents 只接受 `BudgetOutputSnapshot` 或 snapshot-gated render document。
-  - 明確拒絕 `RawCandidate`、`MethodSpecCatalog`、`PricingRule`、`PriceObservation`、`PriceRange`、RAG / AI response、需求表單文字與 SVG / plan-puzzle artifact 作為直接 renderer input。
-  - 補上 Requirement Context Trace Window 與 Plan / SVG Trace Window，並限制兩者只能透過 snapshot trace 進入 internal trace / reviewer note / customer disclaimer。
-  - 保留 placeholder / dry-run / not customer-facing 標示規則。
-- 未碰範圍：budget engine、pricing、material resolver、raw warehouse、MethodSpecCatalog、RAG / AI API、payment / escrow / listing fee、plan-puzzle、preview_floor_plan、正式 Excel / PDF、customer-facing final quote。
-- 驗證狀態：
-  - 本機 `git` executable / PATH 仍不可用，無法建立 branch、commit、PR 或執行 `git diff`。
-  - 本輪可引用 merged PR #23 evidence 作為 snapshot-only renderer/static-guard baseline。
-- 是否涉及 routing / CTA / header：No.
-- 是否涉及資料模型：No runtime schema change; documentation only mentions trace-window fields for integration usage.
-- 是否涉及敏感區域：No.
-- 是否可供使用者後續主動審查：Yes, as docs-only Output Documents integration note.
-- 下一步建議：若要發布到 GitHub，需先修復 Git PATH 或由有 GitHub branch/PR 權限的環境將本地文件提交到 `output/integration-usage-note` branch 並開 PR `Add Output Documents integration usage note`.
-
-## Latest Blackboard Update: New-Machine Read-only Handoff Patrol Alias
-
-- 本輪任務名稱：Blackboard - New-Machine Read-only Handoff Patrol Alias.
-- 任務類型：Documentation / Blackboard routing note.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 的 `New Computer Takeover Patrol Contact` 段落補上 mention alias：`@laibe-mvp-new-machine-readonly-handoff`.
-  - 將此 alias 定義為 existing read-only handoff patrol 的通知 handle，不建立新角色、不重新命名聊天室。
-  - 要求 Commander 派發 local Git availability diagnostics、repo visibility checks、new-machine handoff intake 任務時，mention `@laibe-mvp-new-machine-readonly-handoff`。
-  - 在黑板 update log 補記本次 `CONTACT_ALIAS_REGISTERED`。
-- 未碰範圍：runtime code、frontend、budget engine、renderer、raw warehouse、MethodSpec runtime、payment / escrow / listing fee、AI API、DB、migrations、secrets、Plancraft core、GitHub PR / Issue state。
-- 已知限制：此機目前仍找不到 Git executable，因此本輪無法用 `git status` / `git diff` 正式驗證工作樹或 diff；本輪只用檔案重讀確認文字落點。
-- 下一步建議：Commander 後續若要喚起本新機 read-only handoff patrol，請在黑板、Issue comment 或指令中明確寫 `@laibe-mvp-new-machine-readonly-handoff`.
-
-## Latest Blackboard Update: New Computer Takeover Patrol Contact
-
-- 本輪任務名稱：Blackboard - New Computer Takeover Patrol Contact.
-- 任務類型：Documentation / Blackboard routing note.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 的 contact 區新增 `New Computer Takeover Patrol Contact`.
-  - 登記 mention handle：`@laibe-mvp-new-computer-takeover-patrol`.
-  - 補上短 mention alias：`@LaibeTakeoverCodex`.
-  - 說明此 thread 只負責 read-only GitHub / repo governance takeover patrol、metadata reconciliation drift、Deputy2 visible ACK、automation stale、final-gate visibility、Commander / Reviewer need checks.
-  - 要求 Commander 派發 read-only takeover patrol、metadata reconciliation、final-gate visibility、Deputy2 ACK visibility、automation stale checks 時，mention `@laibe-mvp-new-computer-takeover-patrol` 或 `@LaibeTakeoverCodex`.
-  - 保留回報 signature：`Source: New Computer Takeover Patrol` followed by `Round Result:`.
-- 未碰範圍：source implementation files、routing code、page UI、budget engine、renderer、formal price、formal Excel/PDF、payment、real AI API、upload、secrets、plancraft、GitHub PR / Issue state、merge / reject / close actions。
-- 下一步建議：Commander 後續若要喚起本接管巡查 thread，請在黑板、Issue comment 或指令中明確寫 `@laibe-mvp-new-computer-takeover-patrol` 或 `@LaibeTakeoverCodex`.
-
-## Latest Blackboard Update: MethodSpec Warehouse Contact
-
-- 本輪任務名稱：Blackboard - MethodSpec Warehouse Patrol Contact.
-- 任務類型：Documentation / Blackboard routing note.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 的 `warehouse/method-spec` 狀態區新增 contact handle：`@MethodSpec Warehouse Patrol`.
-  - 登記角色身分為：配件倉庫：工法與規格 / MethodSpec Warehouse patrol.
-  - 要求 Commander 派發 MethodSpec Warehouse、MethodSpec validator、Issue #16 / PR #22、或 `warehouse/method-spec-validator-freeze-note` 巡檢任務時，mention `@MethodSpec Warehouse Patrol`。
-  - 保留回報 signature：`Source: MethodSpec Builder` followed by `Round Result:`.
-- 未碰範圍：runtime code、schemas、pricing rules、formal prices、`BudgetEstimateLine.unit_price`、renderer/output、raw warehouse、frontend、payment / escrow / listing fee、AI API、DB、migrations、secrets、GitHub PR / Issue state。
-- 下一步建議：Commander 後續若要喚起本 MethodSpec patrol thread，請在黑板、Issue comment 或指令中明確寫 `@MethodSpec Warehouse Patrol`.
-
-## Latest Governance Update: Output Budget Documents Mention Handle
-
-- 本輪任務名稱：Blackboard Output Budget Documents Contact Introduction。
-- 任務類型：Documentation / Blackboard dispatch contact update。
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 已在 `docs/WORKSTREAM_BLACKBOARD.md` 的 Command Structure 區塊新增 `Output Budget Documents Contact`。
-  - 成品物流：預算表單輸出本聊天室 mention handle 設為 `@OutputBudgetDocuments`。
-  - 已註明最高指揮官派發 Output Documents、renderer snapshot-only、static guard、preflight、artifact manifest、dry-run writer 或 placeholder writer hardening 任務時，應在指令中 mention `@OutputBudgetDocuments`。
-  - 已註明本聊天室回報 signature：`Source: OutputBudgetDocuments` followed by `Round Result:`。
-- 未碰範圍：source code、budget engine、pricing rules、material resolver、MethodSpecCatalog、raw warehouse、Plan Puzzle、frontend、payment、DB/API、migration、AI API、secrets、real Excel/PDF output、GitHub PR / Issue 狀態。
-- 已知風險：無；此更新只建立派工識別名稱，不代表新增角色權限或擴大成品物流施工範圍。
-- 下一步建議：最高指揮官若要派發成品物流相關任務，可在任務開頭加入 `@OutputBudgetDocuments`，讓本聊天室辨識任務歸屬。
-
-## Latest Blackboard Update: Triage Officer Contact
-
-- 本輪任務名稱：Blackboard - LaiBE MVP Triage Officer Contact.
-- 任務類型：Documentation / Blackboard routing note.
-- 修改檔案：
-  - `docs/WORKSTREAM_BLACKBOARD.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 的 `Active Deputy Authority` 後方新增 `LaiBE MVP Triage Officer Contact`.
-  - 登記 mention handle：`@LaiBE MVP Triage Officer`.
-  - 說明此角色只負責 routing、lag classification、complexity sorting、state reconciliation、recovery routing.
-  - 要求 Commander 派發 triage / heartbeat / lag classification / workstream routing / stale automation / active-handler silence / PR-Issue state reconciliation 任務時，使用 `@LaiBE MVP Triage Officer`。
-- 未碰範圍：source implementation files、routing code、page UI、budget engine、renderer、formal price、formal Excel/PDF、payment、real AI API、upload、secrets、plancraft、GitHub PR / Issue state。
-- 下一步建議：Commander 後續若要喚起本 triage thread，請在黑板、issue comment 或指令中明確寫 `@LaiBE MVP Triage Officer`.
-
-## Latest Web Flow Builder Update: Flow Simplification Correction
-
-- 本輪任務名稱：Web Flow Builder - Flow Simplification Correction。
-- 任務範圍：依使用者回饋，收斂預算與招標後段頁面邏輯，避免一頁頁拆成不直覺的主流程節點。
-- 修改檔案：
-  - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html`
-  - `src/stitch_laibe_landing_onboarding/preview_budget/code.html`
-  - `src/stitch_laibe_landing_onboarding/budget_document_preview/code.html`
-  - `src/stitch_laibe_landing_onboarding/client_step_4_budget_finalization/code.html`
-  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
-  - `src/stitch_laibe_landing_onboarding/tender_notice/code.html`
-  - `src/stitch_laibe_landing_onboarding/tender_setting/code.html`
-  - `src/stitch_laibe_landing_onboarding/tender_publish_success/code.html`
-  - `src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html`
-  - `docs/WEB_FLOW_PAGE_MATRIX.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - 官方 owner flow 收斂為：需求整理 → 平面拼圖 → 預算生成 → 招標 → Dashboard。
-  - `preview_floor_plan/code.html` 的下一步已改為 `client_step_4_budget_finalization/code.html`，不再先進 `preview_budget`。
-  - `client_step_4_budget_finalization/code.html` 已定位為預算生成頁；預算編輯、確認與摘要預覽在同一頁處理，下一步進 `tender_notice/code.html`。
-  - `preview_budget/code.html` 與 `budget_document_preview/code.html` 降為 compatibility / old-entry 頁，不再是官方 progress 節點。
-  - `tender_notice/code.html` 改為合併後的招標頁；舊的招標說明、招標設定、發布完成三段不再拆成 6/7/8 三步。
-  - `tender_setting/code.html` 與 `tender_publish_success/code.html` 降為 compatibility / old-entry 頁，導回招標頁或 Dashboard。
-  - `onboard_ai_agent/code.html` 的報價單 / 報價健檢入口改指向預算生成頁，避免再導向舊預算預覽頁。
-  - `client_awarding_dashboard/code.html` 已由舊白底 Tailwind 草稿改為黑底金屬 Dashboard 候選頁，移除 `href="#"`，並接回需求整理、平面拼圖、預算生成與招標。
-- 未碰範圍：budget engine、raw warehouse、MethodSpec、output renderer、real AI API、real upload backend、payment / escrow / listing fee、webhook、plancraft core。
-- 已知風險：
-  - `client_awarding_dashboard/code.html` 仍是 Dashboard endpoint candidate，尚未接真登入、真案件資料、真投標資料或正式 award logic。
-  - `preview_budget`、`budget_document_preview`、`tender_setting`、`tender_publish_success` 仍存在作為相容入口；若未來要完全下架，需使用者另行授權，不可自行刪除。
-- 下一步建議：若要繼續後段流程，檢查 `bid_comparison_and_ai_summary/code.html` / `client_document_selection/code.html` 是否應作為 Dashboard 分支；不要接真 backend 或金流。
-
-## Previous Web Flow Builder Update: Tender Batch 1A
-
-- 本輪任務名稱：Web Flow Builder - Tender Batch 1A。
-- 任務範圍：依 `docs/WEB_FLOW_PAGE_MATRIX.md` 的 Batch 1A，將招標說明、招標設定、發布完成三頁作為同一個 owner-flow route cluster 處理。
-- 修改檔案：
-  - `src/stitch_laibe_landing_onboarding/tender_notice/code.html`
-  - `src/stitch_laibe_landing_onboarding/tender_setting/code.html`
-  - `src/stitch_laibe_landing_onboarding/tender_publish_success/code.html`
-  - `docs/WEB_FLOW_PAGE_MATRIX.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - `tender_notice/code.html` 從舊白底 Tailwind / old logo 改為 LaiBE 黑底、水泥紋理、金屬玻璃、cyan 高光、橘色 CTA 的招標說明頁。
-  - `tender_setting/code.html` 從舊白底 Tailwind / old logo 改為同系統招標設定 mock 頁。
-  - `tender_publish_success/code.html` 從舊白底 / 綠色成功頁改為同系統發布完成 mock 頁。
-  - 三頁均使用同一組 header tools dropdown：平面拼圖、預算生成、LiDAR、iScanner。
-  - 三頁均使用 standalone progress banner：需求整理 → 平面拼圖 → 預算預覽 → 預算確認 → 文件預覽 → 招標說明 → 招標設定 → 發布完成。
-  - `tender_setting` 移除舊的 listing fee / payment 路由意圖；金流、圈存、上架費以 disabled / mock-only 說明呈現。
-  - `tender_publish_success` 的下一步導向 `client_awarding_dashboard/code.html` 作為 dashboard 候選頁。
-- 未碰範圍：listing_fee_payment_*、payment / escrow / listing fee、real publish backend、webhook、budget engine、raw warehouse、MethodSpec、output renderer、real AI API、real upload backend、plancraft core。
-- 已知風險：
-  - `client_awarding_dashboard/code.html` 仍是 dashboard 候選頁，尚未 formalize，可能是下一個舊版風格斷點。
-  - `tender_setting/` 在本輪前已是既有 untracked path，本輪只沿用該指定頁施工，未處理其他 dirty worktree。
-- 下一步建議：由使用者確認 dashboard 正式頁候選，再執行 Batch 1B，處理 `client_awarding_dashboard/code.html` / `bid_comparison_and_ai_summary/code.html` / `client_document_selection/code.html` 中被選定的 dashboard cluster。
-
-## Previous Web Flow Builder Update: Budget Preview / Budget Edit Flow Correction
-
-- 本輪任務名稱：Web Flow Builder - Budget Preview / Budget Edit Flow Correction。
-- 任務範圍：修正預算預覽頁與預算生成編輯頁的角色混淆，並同步目前主流程草稿頁的 header tools / progress bar routing。
-- 修改檔案：
-  - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html`
-  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
-  - `src/stitch_laibe_landing_onboarding/preview_budget/code.html`
-  - `src/stitch_laibe_landing_onboarding/client_step_4_budget_finalization/code.html`
-  - `src/stitch_laibe_landing_onboarding/budget_document_preview/code.html`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- 新增檔案：無。
-- 已完成：
-  - `preview_budget/code.html` 明確改為「預算預覽 / Budget Preview」，不再把本頁稱為預算生成編輯頁。
-  - `client_step_4_budget_finalization/code.html` 從舊白底頁改為同一套黑底、水泥紋理、金屬玻璃、cyan 高光、橘色 CTA 的預算確認 / 編輯 mock 頁。
-  - `budget_document_preview/code.html` 從舊白底頁改為同一套黑底草稿，作為「預算確認 → 文件預覽」的 mock-only 頁。
-  - `preview_budget` 的「進入預算確認」保留為進入預算生成後編輯 / 確認頁的入口。
-  - 主流程 progress bar 統一為：需求整理 → 平面拼圖 → 預算預覽 → 預算確認。
-  - 需求整理節點改指向最新版需求頁定位：`../onboard_ai_agent/code.html#guideInput`。
-  - Header tools 的「預算生成」改指向 `../client_step_4_budget_finalization/code.html`，避免把預覽頁誤當編輯頁。
-  - Onboarding header tools 補上 LiDAR / iScanner 外部 app search links，PCM backend 改用現有 landing flow anchor，避免 `#pcm` dead anchor。
-- 未碰範圍：budget engine、raw warehouse、MethodSpec、output renderer、payment / escrow / listing fee、real AI API、real upload backend、plancraft core、homepage。
-- 下一步建議：接著檢查 `tender_notice/code.html` 或 dashboard 候選頁，讓「文件預覽 → 招標 / dashboard」後段流程不要回到舊版或 orphan page。
-
-## Previous Web Flow Builder Update: Budget Preview Formalization
-
-- 本輪任務名稱：Web Flow Builder - Budget Preview Formalization。
-- 任務範圍：只處理網站主流程中的 `preview_budget/code.html`，讓預算生成頁接上目前 landing / onboarding / plan-puzzle 的黑底金屬視覺與 workflow routing。
-- 修改檔案：`src/stitch_laibe_landing_onboarding/preview_budget/code.html`、`docs/NEXT_CODEX_HANDOFF.md`。
-- 新增檔案：無。
-- 已完成：
-  - 將預算生成頁從舊版白底 preview 改為 LaiBE 黑底、水泥紋理、金屬玻璃、細線、cyan 高光與橘色主 CTA 的同系統視覺。
-  - Header 改為與平面拼圖頁一致的 logo / 導覽感，工具入口採 dropdown。
-  - Header tools dropdown 包含：平面拼圖、預算生成、LiDAR、iScanner。
-  - Progress bar 已獨立於 header 下方，節點可點：需求整理、平面拼圖、預算生成、預算確認。
-  - 頁面級 CTA 放在頁面右上方：返回平面拼圖、進入預算確認。
-  - 匯出草稿標記為尚未開放的 disabled 狀態，避免偽裝成已完成功能。
-  - 頁面明確標示 mock mode：不接真 budget engine、不接 AI API、不接真上傳、不產生正式 Excel / PDF。
-- Routing / CTA：
-  - 返回平面拼圖固定指向 `../preview_floor_plan/code.html`，原因是此頁在主流程中明確承接平面拼圖。
-  - 下一步主 CTA 指向 `../client_step_4_budget_finalization/code.html`。
-  - Progress bar 需求整理指向 `../onboard_ai_agent/code.html`，平面拼圖指向 `../preview_floor_plan/code.html`，預算生成指向 `./code.html`，預算確認指向 `../client_step_4_budget_finalization/code.html`。
-- 未碰範圍：budget engine、raw warehouse、MethodSpec、output renderer、payment / escrow / listing fee、real AI API、real upload backend、plancraft core、homepage。
-- 下一步建議：接著小步 formalize `client_step_4_budget_finalization/code.html` 或 `budget_document_preview/code.html`，讓預算生成後的確認 / 文件預覽 flow 不再停在舊版或候選頁。
-
-## Latest Local GPU Worker Resource Status
-
-- 本輪任務名稱：Local GPU Worker Resource Status。
-- 任務類型：Documentation / Local Tooling Governance / Multi-agent Dispatch Note；本輪不修改 production feature code。
-- 新增檔案：`docs/LOCAL_GPU_WORKER_STATUS.md`。
-- 本地 worker 硬體：RTX 4070 12GB、RAM 64GB、Intel i9-11900K。
-- 本地 AI 環境：Ollama `0.24.0`、Codex CLI `0.131.0`、`qwen2.5-coder:7b`。
-- 已確認 Ollama 推理會使用 GPU。
-- `qwen2.5-coder:7b` 可分派工作：指定檔案 read-only 分析、小範圍 bug tracing、程式解釋、unified diff 草稿、測試草稿。
-- `qwen2.5-coder:7b` 不可分派工作：正式改檔、Codex OSS `workspace-write` 自動 patch、跨檔重構、架構決策、高風險 production scope。
-- 禁止本地 GPU worker 觸碰：payment、auth、webhook、`.env`、secrets、real API key、production deployment、正式金流 / 託管 / listing fee。
-- 正式 patch 仍應由 cloud Codex 或人工 review 後執行；本地 GPU worker 只提供分析與草稿。
-- 後續分派任務時，先判斷：是否可交給本地 GPU worker 做 read-only analysis；是否需要 cloud Codex 正式 patch；是否需要使用者人工確認。
-- 未修改：`src/`、production feature code、payment、auth、webhook、`.env`、secrets、`plancraft/`、package / dependency files。
-- 未執行：`npm install`、model pull、workspace-write 測試、commit、merge、push。
-
-## Latest Local AI Workflow Update: Draft Patch Mode
-
-- 本輪任務名稱：Local AI workflow draft patch mode。
-- 任務類型：Documentation / Local Tooling Governance；本輪不修改 production feature code。
-- 已更新 `docs/LOCAL_AI_WORKFLOW.md` 與 `docs/LOCAL_AI_WORKFLOW_TROUBLESHOOTING.md`。
-- `qwen2.5-coder:7b` 已降級為 read-only analysis / patch draft 模式。
-- `qwen2.5-coder:7b` 可用於：解釋程式碼、找 bug 線索、產生 unified diff 草稿、產生測試案例草稿、小範圍技術問答。
-- `qwen2.5-coder:7b` 不得用於：Codex OSS `workspace-write` 自動改檔、production patch、架構決策、payment/auth/webhook/`.env`/secrets 相關操作。
-- 真正改檔應由 cloud Codex、人工 review 後手動套用，或只在 sandbox 內做人工控制 patch。
-- 未修改：`AGENTS.md`、`src/`、production、payment、auth、webhook、`.env`、secrets。
-- 未執行 commit / merge / push。
-
-## Latest Local AI Workflow Task: GPU-backed Codex + Ollama setup
-
-- 本輪任務名稱：Local GPU AI Coding Workflow Setup。
-- 任務類型：Documentation / Local Tooling Setup / Safe Sandbox；本輪不修改 production feature code。
-- 已建立 branch：`local-ai-workflow`。
-- 已安裝 Ollama for Windows，版本 `0.24.0`；目前安裝路徑為 `C:\Users\J\AppData\Local\Programs\Ollama\ollama.exe`。
-- 已確認 Codex CLI 版本 `0.131.0`；PowerShell `.ps1` wrapper 可能受 execution policy 影響，建議使用 `codex.cmd`。
-- 已下載本地模型：`qwen2.5-coder:7b`，大小約 `4.7 GB`。
-- 已驗證 `codex exec --oss --local-provider ollama -m qwen2.5-coder:7b` 可呼叫本地 Ollama provider。
-- 已用 `nvidia-smi` 取樣驗證 RTX 4070 參與 Ollama 推理：推理期間 VRAM 從約 2GB used 上升到約 7GB used，GPU utilization 最高取樣約 29%。
-- 新增檔案：
-  - `docs/LOCAL_AI_WORKFLOW.md`
-  - `local_ai_sandbox/README.md`
-  - `local_ai_sandbox/add-safe.js`
-  - `local_ai_sandbox/test-add-safe.js`
+  - `docs/LAIBE_CODEX_STRATEGIC_PLAN.md`
 - 修改檔案：
   - `AGENTS.md`
-  - `docs/NEXT_CODEX_HANDOFF.md`
-- `AGENTS.md` 僅新增 Local GPU AI Coding Workflow Addendum，規定本地 agent 只能做小步可回復 patch，不得做架構決策，不得碰 payment/auth/webhook/secrets/plancraft，不得大型跨檔重構。
-- `docs/LOCAL_AI_WORKFLOW.md` 記錄日常使用命令、Codex `--oss` 啟動方式、本地/雲端分工、安全規則、Git review 流程與 GPU 驗證方式。
-- `local_ai_sandbox/` 是唯一新增的安全測試區，不屬於 production code。
-- 未修改：`src/` production flow、payment、auth、webhook、`.env`、secrets、`plancraft/`、package files、framework 設定。
-- 注意：目前 repo 在本輪開始前已有大量既有 dirty / untracked / deleted 狀態；本輪未清理、未 reset、未 checkout 還原、未刪除任何既有檔案。
-- 下一步建議：日常使用時先由 cloud Codex/ChatGPT 判斷任務範圍，再用 local Codex + Ollama 做單檔或 sandbox patch，完成後必跑 `git diff --stat`、`git diff` 與最小測試。
-
-## Latest Visual Simulation State Reconciliation: Issue #19 / PR #24
-
-- 本輪任務名稱：Visual Simulation State Reconciliation。
-- GitHub Issue #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet` 已 closed。
-- GitHub PR #24 `Add visual prompt sandbox governance packet` 已 merged。
-- PR #24 merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658` 已確認可由最新 `origin/main` 追溯到。
-- 已同步 `docs/WORKSTREAM_BLACKBOARD.md`，將 Visual Simulation 舊 active dispatch 標記為 completed，避免後續 heartbeat 繼續把 #19 / #24 當成 active stall、pending、blocked 或 needs-review。
-- 已同步 `docs/CURRENT_PHASE_REVIEW_PACKET.md`，補記 Issue #19 / PR #24 合併狀態。
-- 本輪未修改 source code，未修改 `plan-puzzle.js`，未碰 Plancraft geometry、budget official data、renderer、raw warehouse、MethodSpec 或 payment。
-- 本輪沒有 real image API、沒有 API key / `.env`、沒有 reference image upload、沒有 backend/proxy、沒有 production storage、沒有 production asset。
-- Visual Simulation 仍只能作為案件上架與風格溝通輔助，不得宣稱為施工圖、正式設計圖、真實案例、正式報價依據或完工保證。
-- 下一階段若需要新 Issue，只能限於 visual scope matrix、style taxonomy、trust levels、asset naming rules、sandbox preview state policy、placeholder visual card spec、reviewer packet、prompt / negative prompt governance refinement。
-
-## Latest Raw Candidate Warehouse Task: R1.5 Source Quality Scoring / Reviewer Checklist
-
-- 本輪任務名稱：Raw Warehouse R1.5 source quality scoring / reviewer checklist。
-- 任務來源：GitHub Issue #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`。Issue #21 是 duplicate，已被 Deputy Codex 關閉並指向 #17。
-- 修改檔案：
-  - `src/lib/budget/raw-warehouse/types.ts`
-  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `AI_RULES/CODEX_MANDATORY_ENTRY.md`
+  - `AI_RULES/TASK_DISPATCH_RULES.md`
+  - `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
   - `docs/NEXT_CODEX_HANDOFF.md`
   - `docs/WORKSTREAM_BLACKBOARD.md`
-- 新增檔案：
-  - `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
-  - `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
-  - `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
-- R1.5 新增 `SourceQualityAssessment`、`ReviewerChecklistItem`、`SourceQualityGrade` 與 `ReviewerChecklistStatus`，用於 candidate-only source quality scoring。
-- `scoreSourceQualityForCandidates()` 只讀 `RawCatalogSource`、`RawCatalogItem`、`RawCatalogCandidate` 與 `CandidateValidationResult`，輸出 source quality score、grade、reviewer checklist、recommended review status 與 recommendation reason。
-- R1.5 reviewer checklist 檢查 source identity、source date、source reliability、raw item trace、suggested code、unit、currency、observed price evidence-only 與 validation status。
-- `observed_price` 仍只作 evidence；R1.5 不產生正式 `PricingRule`、`MaterialSpec`、`LaborRule`、`BudgetEstimateLine.unit_price`、正式報價或 customer-facing output。
-- `formal_price_generated` 維持 `false`；`price_authority` 維持 `"none"`；`observed_price_is_evidence_only` 為 `true`。
-- Demo command：`node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`。
-- R1.5 demo sample result：16 sources、29 raw items、29 candidates、29 source quality assessments、average quality score `81`、grade counts `excellent: 15`, `good: 8`, `poor: 5`, `blocked: 1`；proposal contract / warehouse export safety / observed price safety / static guard 全部通過。
-- 驗證已執行並通過：
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-warehouse-static-guard.ts`
-  - `node --experimental-strip-types --check src/lib/budget/raw-warehouse/source-quality-scoring.ts`
-  - `node --experimental-strip-types --check src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-negative-source-quality-fixtures.ts`
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-multi-source-fixtures.ts`
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-data-feeding-trial.ts`
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-review-contract-safety.ts`
-  - `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-catalog-warehouse.ts`
-- Known external verification blocker：`node --experimental-strip-types src/lib/budget/demo-generate-budget.ts` 與 `node --experimental-strip-types src/lib/budget/demo-load-budget-warehouse.ts` 目前因 `src/lib/budget/budget-generator.ts` 缺失而失敗；這不是 R1.5 改動造成，且不在 raw warehouse Issue scope 內。
-- 本輪未修改 renderer / Excel / PDF、`BudgetOutputSnapshot`、MethodSpec 主規則、平面拼圖、frontend、DB/API、RAG/AI API、payment、escrow 或 listing fee。
-- 下一步建議：可針對 R1.5 做 reviewer pass，檢查 source quality scoring 是否仍停留在 candidate evidence layer，以及 static guard / price safety 是否仍成立。
+- 整合重點：
+  - 將「預算生成系統」明確拆回三倉：`warehouse/raw-candidate`、`warehouse/method-spec`、`output/budget-documents`。
+  - 獨立標示平面拼圖三層、模擬圖生成、外部 Quote Factory / 預算原料清洗工作線，避免混線。
+  - 明確化 GitHub Issue = 派工單、Blackboard = 戰情板、Heartbeat = 巡邏員。
+  - 副指揮官派工必須有 `To: Agent`，不得只寫 workstream / branch / repo。
+- 未修改檔案：
+  - 未修改 `src/`、budget implementation、plan-puzzle、renderer、payment、AI API、`.env` 或任何 secrets。
+- 已知風險：
+  - 既有主工作樹仍有其他聊天室造成的大量 dirty / untracked 狀態；本輪在乾淨黑板發布 worktree 中進行 docs-only 整合，避免覆蓋他人改動。
+- Need Commander: No，這是使用者提供的戰略計畫落檔與治理索引。
+- Need Reviewer: No，除非後續要求審查治理文件一致性。
 
-## Latest Plan-Puzzle Task: Plancraft+ Zone Area / Boundary Refinement
+## Latest Patrol Task: Quote Factory PR #2 Merged / Triage Queue Initialized
 
-- 本輪任務名稱：Plancraft+ Zone Area / Boundary Refinement。
-- 任務來源：黑板 dispatch 與 GitHub Issue #15 `Plancraft+ Zone Area / Boundary Refinement`。
+- 本輪任務名稱：Quote Factory PR #2 Merged / Triage Queue Initialized。
+- 任務類型：Governance / Patrol / External Repo Merge Gate / Triage Support；本輪只處理 GitHub PR gate、黑板、handoff、執行官 inbox 與分流隊列，不修改 `laibe-mvp` 功能程式碼。
 - 修改檔案：
-  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
-  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- 新增檔案：
+  - `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+- GitHub / blackboard state checked from helper worktree after fast-forward to `3fce287be402fe9981b6a7fe33d2be8b7839e350`.
+- Quote Factory PR #2 `Add PriceRange audit override contract`:
+  - Repo: `laibeoffer/laibe-quote-factory`.
+  - Changed files stayed inside Quote Factory candidate-governance scope.
+  - Codex review result: no major issues.
+  - Review threads: none.
+  - Validation / boundary checks reported: `apply_price_range_review_overrides.py`, `validate_price_ranges.py`, `validate_sample_cloud_payload.py`, no formal price / `PricingRule` / `BudgetEstimateLine.unit_price`, no Supabase / API / migration.
+  - Merge result: merged with merge commit `d075c505d0e950ca288e8d374bdf2efc6b447105`.
+  - Quote Factory Issue #1 is closed by the merge.
+- Deputy decision:
+  - QF5.3 is complete and published in the external Quote Factory repo.
+  - Next Quote Factory task may be QF5.4 dry-run / governance only through a new scoped Issue / dispatch.
+  - No Commander escalation.
+  - No Reviewer escalation.
+- Still active follow-up:
+  - Plan Puzzle Issue #15: no expected branch / PR / claim / validation / blocker found.
+  - Raw Candidate Issue #17: no expected branch / PR / claim / candidate-only validation / blocker found.
+  - Output Documents PR #23: Codex P2 remains unresolved; Need Reviewer remains Yes until fixed and re-reviewed.
+- Triage queue initialized so the Triage Officer can route lagging workstreams through a file-based queue instead of chat-only state.
+
+## Latest Patrol Task: Executive Officer Callouts Processed
+
+- 本輪任務名稱：Executive Officer Callouts Processed。
+- 任務類型：Governance / Patrol / Executive Inbox Decision；本輪只處理執行官 inbox、黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- 新增檔案：無。
+- GitHub / blackboard state checked from helper worktree after fast-forward to `87d0941eeec374a21477e6d2a042329e4719c9ca`.
+- Executive Officer correctly published second-patrol callouts for:
+  - Plan Puzzle Issue #15: no PR URL / claim / validation / blocker; branch `plancraft/zone-area-boundary-refinement` not found.
+  - Raw Candidate Issue #17: no PR URL / claim / candidate-only validation / blocker; branch `warehouse/raw-source-quality-scoring` not found.
+  - Quote Factory Issue #1: branch `qf/qf5-3-audit-override-publish` exists and appears to contain unreported progress, but no PR URL / validation / formal-pricing / Supabase/API/migration checks were reported.
+- Deputy decision:
+  - Accepted Executive Officer callouts.
+  - Moved the three inbox items from pending to processed.
+  - No Commander escalation yet.
+  - No Reviewer escalation yet.
+  - Executive Officer should continue first-line chase for one more patrol cycle.
+  - If Quote Factory still provides no PR / blocker on the next patrol, Deputy may verify branch scope and repair the PR workflow if needed.
+
+## Latest Governance Task: Executive Officer Limited Delegation
+
+- 本輪任務名稱：Executive Officer Limited Delegation。
+- 任務類型：Governance / Patrol Support / Delegation；本輪只更新黑板、handoff，並建立執行官與副指揮官的專用溝通資料夾，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：
+  - `docs/deputy_execution_patrol/README.md`
+  - `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- Commander asked whether Executive Officer needs clearer rules for reporting, named communication, what must route through Deputy Codex, and whether Executive Officer should receive partial authority / assigned chatrooms.
+- Deputy decision:
+  - Executive Officer is a patrol executor for Deputy Codex, not a second Deputy and not a replacement Commander.
+  - Executive Officer may directly chase assigned workstreams, comment on assigned Issues / PRs, and publish concise `EXECUTIVE_FOLLOW_UP`, `EXECUTIVE_CALL_OUT`, or `EXECUTIVE_STATUS_CHECK` entries to `docs/WORKSTREAM_BLACKBOARD.md`.
+  - Executive Officer must route PR merge / reject, Issue close / reopen, final `Need Commander` / `Need Reviewer`, new formal dispatch outside active Issue scope, cross-workstream reassignment, and high-risk scope back to Deputy Codex.
+  - Dedicated inbox for Deputy decisions: `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`.
+- Assigned Executive Officer patrol ownership:
+  - Plan Puzzle Issue #15.
+  - Raw Candidate Issue #17.
+  - Quote Factory Issue #1.
+  - MethodSpec Issue #16 / PR #22 conflict and review follow-up.
+  - Output Documents Issue #18 / PR #23 P2 fix follow-up.
+- Need Commander: No.
+- Need Reviewer: No.
+
+## Latest Patrol Task: PR #23 Codex Review P2 Recorded
+
+- 本輪任務名稱：PR #23 Codex Review P2 Recorded。
+- 任務類型：Governance / Patrol / PR Review Gate；本輪只處理 GitHub PR review 狀態、PR 留言、黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
   - `docs/NEXT_CODEX_HANDOFF.md`
 - 新增檔案：無。
-- `project.version` 已升級為 `0.11.0-zone-area-boundary-refinement`。
-- zone boundary 仍維持人工選邊，不做自動 room closure、不做自動排序複雜邊界、不修改 wall / opening / nodeGraph。
-- 已新增 zone area candidate metadata：`areaSqMm`、`areaM2`、`areaPing`、`areaSource`、`areaStatus`、`areaConfidence`、`areaProductionReady`、`areaAuthority`、`reviewerRequired`、`reviewerReasons`、`areaUpdatedAt`。
-- 當 zone boundary 為 `closed` 且 polygon 有效時，用 shoelace formula 由 mm polygon 計算候選面積；換算 `m²` 與 `坪`，`areaSource` 固定為 `spike_polygon_estimate`。
-- 當 boundary 未封閉、無效、edge 缺失或點數不足時，不計算正式面積，`areaStatus` 會標示 `not_calculated` / `open_boundary` / `invalid`，並保留 reviewer reasons。
-- `areaProductionReady` 永遠是 `false`；本輪沒有讓任何 zone area 進入正式 budget quantity，也沒有修改 budget adapter、budget types、`generateBudgetEstimate()`、Excel / PDF、renderer 或 payment / AI / API。
-- 右側 zone inspector 會顯示候選面積狀態、`m² / 坪`、area source、confidence 與 `productionReady: false`，並提示 area 只作候選估算、不作正式估價。
-- Plancraft+ 草稿 JSON export 會包含最新 zone boundary 與候選 area metadata。
-- 驗收：`node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` 通過。
-- 已知限制：候選面積只支援已形成 closed polygon 的 zone；未做 production-grade area approval、precision policy gate、adapter production mapping 或 formal estimate。
-- 下一步建議：Production Quantity Fact Contract 或 Zone Area Review Gate，仍需保持 candidate-only，不可直接進正式估價。
+- GitHub state checked before this patrol publication: `main` sha `1d0d6ecc266a6302e2cf32c2b20e8fd04065bc15`。
+- PR #23 `Add renderer snapshot-only review packet`:
+  - Codex review result: P2 on `src/lib/budget/renderers/formal-file-writer-policy.ts`.
+  - Review issue: `inferFormalArtifactFormat()` can accept mismatched `renderer` / `format` and infer the wrong artifact format instead of failing closed.
+  - Current PR state: open, not mergeable, head `5ffd0f3e737960b386695d25ad5d0fc4d71a62c2`.
+  - Changed files remain in Output Documents renderer / docs scope, but P2 blocks merge.
+- Deputy action:
+  - Added a PR #23 comment and Issue #18 status update instructing Output Documents to fix renderer / format mismatch handling, preserve snapshot-only boundaries, re-sync latest `main`, rerun checks, and request Codex re-review.
+  - Updated `docs/WORKSTREAM_BLACKBOARD.md` so PR #23 is marked `NEEDS_FIX / P2`.
+  - Updated `laibe-commander-patrol` heartbeat prompt to remove stale hardcoded Issue #19 active-state guidance and require current GitHub / blackboard verification every patrol.
+- Need Commander: No.
+- Need Reviewer: Yes until the P2 is fixed and re-reviewed.
+
+## Latest Patrol Task: PR #24 Merged After Clean Codex Review
+
+- 本輪任務名稱：PR #24 Merged After Clean Codex Review。
+- 任務類型：Governance / Patrol / PR Merge Gate；本輪只依授權處理 clean-scope PR merge，並更新黑板 / handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `cf170e248a48be2df43f6cd6e6db0ef956cd5658`。
+- PR #24 `Add visual prompt sandbox governance packet`:
+  - Codex review result: no major issues.
+  - Mergeability before merge: mergeable.
+  - Changed files: Visual Simulation governance / prompt sandbox docs, `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`, `skills/laibe-visual-sim/SKILL.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, and `docs/NEXT_CODEX_HANDOFF.md`.
+  - Forbidden scope check: no website runtime code, no `plan-puzzle.js`, no Plancraft, no budget / raw warehouse / MethodSpec / renderer, no payment / escrow / listing fee, no real image API, no API key / `.env`, no backend / proxy / upload pipeline, no production storage.
+  - Merge result: merged with merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`; Issue #19 closed by the merge.
+- Current open PRs after merge:
+  - PR #22 remains conflict-gated.
+  - PR #23 remains latest-blackboard-sync / review-gated and must re-sync against latest `main` before merge.
+- Current silent workstreams still under follow-up: Plan Puzzle Issue #15, Raw Candidate Issue #17, and Quote Factory Issue #1 need PR URL, active claim, or exact blocker.
+- Need Commander: No.
+- Need Reviewer: No.
+
+## Latest Visual Simulation Governance Task: Visual Brief Prompt Sandbox Governance Packet
+
+- 本輪任務名稱：Visual Brief Prompt Sandbox Governance Packet。
+- 任務來源：GitHub Issue #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet`。
+- 任務類型：Documentation / Governance / Prompt Brief；本輪只更新 LAIBE_VISUAL_SIM 的 visual brief、prompt、negative prompt、sandbox policy、storage policy 與 reviewer packet 文件。
+- 新增檔案：
+  - `docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`
+- 修改檔案：
+  - `docs/ai_style_visual_chat/PROMPT_SANITIZATION_RULES.md`
+  - `docs/ai_style_visual_chat/IMAGE_API_REQUEST_SCHEMA.md`
+  - `docs/ai_style_visual_chat/GENERATED_IMAGE_STORAGE_POLICY.md`
+  - `docs/ai_style_visual_chat/IMAGE_API_SPIKE_REVIEW_CHECKLIST.md`
+  - `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`
+  - `skills/laibe-visual-sim/SKILL.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 本輪沒有修改網站 runtime code、`plan-puzzle.js`、Plancraft core、budget、raw warehouse、MethodSpec、renderer、routing、CTA、Header、payment、escrow 或 listing fee。
+- 本輪沒有接真 image API，沒有建立 backend / proxy / upload pipeline，沒有新增 API key、`.env`、package、node_modules 或 production storage。
+- `VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md` 定義 visual brief 必備欄位、prompt preview 降溫語氣、negative prompt 必備排除項、sandbox preview workflow、placeholder visual card 規格、Builder 整合邊界與 Reviewer 檢查重點。
+- `styleVisualApiRequest` contract 維持白名單欄位：`roomType`、`primaryStyle`、`secondaryStyle`、`colorTone`、`materialTone`、`budgetLevel`、`purpose: "bid-listing-style-reference"`、`disclaimerRequired: true`、`referenceImage: { allowed: false, reason: "reference image upload requires separate privacy review" }`。
+- `styleVisualApiRequest` 不得包含 `rawPrompt`、`systemPrompt`、`developerPrompt`、`projectId`、`avoid`、`walls`、`openings`、`zones`、`scale`、`plancraftBridge`、正式預算資料、reference image file 或使用者私宅圖片。
+- Prompt 必須由系統 template 組裝，不得直接使用 raw user prompt；negative prompt 必須阻擋施工圖、正式設計圖、真實案例、正式報價依據、完工保證、精準尺寸、材料品牌保證與法規符合宣稱。
+- Generated preview 只能是 sandbox / mock / temporary preview；不得寫入正式案件資料、production assets、budget data、export JSON、Plancraft geometry 或 case dashboard。
+- 固定 disclaimer 必須保留：`本圖僅為風格示意，用於案件上架與溝通參考，不代表最終設計、施工圖、實際尺寸、工法、材料品牌或正式報價內容。`
+- 下一步若繼續 visual simulation，仍只能處理 visual brief / prompt / negative prompt / governance。任何真 API、reference image upload、production storage、正式圖片用途或 server runtime 都需要新的 formal Issue 並視情況標示 Need Commander: Yes。
+
+## Latest Governance Task: Codex Rules Support Patrol Assigned
+
+- 本輪任務名稱：Codex Rules Support Patrol Assigned。
+- 任務類型：Governance / Patrol Support / Prompt Drift Audit；本輪只更新黑板與 handoff，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- Commander offered Codex 指令優化 / `governance/codex-rules` as a helper that can check the blackboard every 20 minutes.
+- Deputy Codex accepted this helper only as governance / prompt-drift support, not Builder work, not Reviewer work, and not Deputy replacement.
+- New helper responsibilities:
+  - read blackboard and governance docs,
+  - detect prompt drift, heartbeat wording drift, dispatch-format gaps, stale workstream routing, and missing blackboard rule coverage,
+  - report `PROMPT_DRIFT_FOUND`, `BLACKBOARD_RULE_GAP_FOUND`, `DISPATCH_FORMAT_GAP_FOUND`, `HEARTBEAT_WORDING_GAP_FOUND`, or `NO_GOVERNANCE_ACTION_NEEDED`,
+  - propose concise corrections for Deputy Codex to decide / publish.
+- Forbidden for this helper: source-code edits, Builder task implementation, PR merge/reject, Issue open/close without Deputy request, product/visual/business decisions, secrets, payment, formal price, formal Excel/PDF, real AI API, upload, destructive git.
+- Deputy Codex remains final routing and blackboard publication authority.
+
+## Latest Patrol Task: Direct Workstream Callouts / PR Conflict Comments
+
+- 本輪任務名稱：Deputy Patrol Direct Workstream Callouts / PR Conflict Comments。
+- 任務類型：Governance / Patrol / Workstream Supervision；本輪只更新黑板、handoff，並在 GitHub Issue / PR 留下副指揮官巡檢留言，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state checked before this patrol publication: `main` sha `33bf191deb7b392ed0fa56e0497a4629abd09fb5`。
+- Reviewer inbox had no pending findings.
+- Open PRs remain:
+  - PR #22 `Add MethodSpec validator freeze note` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict comment added.
+  - PR #23 `Add renderer snapshot-only review packet` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md` and `docs/WORKSTREAM_BLACKBOARD.md`; Deputy conflict comment added.
+  - PR #24 `Add visual prompt sandbox governance packet` - conflict-gated by `docs/NEXT_CODEX_HANDOFF.md`; Deputy conflict comment added.
+- No Codex review comments or review threads were found before Deputy patrol comments were added.
+- Direct no-idle / table-compliance callouts were added to:
+  - Issue #15 Plan Puzzle
+  - Issue #17 Raw Candidate
+  - Quote Factory Issue #1
+- Output Documents PR #23 branch contained a local blackboard `TASK_REQUESTED` asking for the next formal dispatch. Deputy decision: no next Output Documents formal dispatch until PR #23 is merged, explicitly closed, or re-scoped.
+- Need Commander: No.
+- Need Reviewer: No unless future conflict resolution changes scope, touches forbidden files, or Codex review reports NEEDS_FIX / P1 / P2.
+
+## Latest Patrol Task: Reviewer Inbox Findings Processed
+
+- 本輪任務名稱：Reviewer Inbox Findings Processed by Deputy。
+- 任務類型：Governance / Patrol / Reviewer Secretary Intake；本輪只處理審查官 inbox 發現，不修改功能程式碼。
+- 修改檔案：
+  - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 審查官本輪回報三筆 findings：
+  1. Current Global State 顯示 Open PR / Open Issue 為 None 的 stale blackboard 問題。
+  2. PR #22/#23/#24 無 PR comments / review threads 且不 mergeable 的 PR review gate 問題。
+  3. Plan Puzzle 疑似引用 duplicate Issue #20 的 table compliance 問題。
+- 副指揮官裁決：
+  - Finding 1 已由 commit `3f07253` 修正；最新 `main` 已列出 PR #22/#23/#24、Issues #15-#19、Quote Factory Issue #1。
+  - Finding 2 確認仍成立；PR #22/#23/#24 不 merge，等各 owner workstream 更新 latest `main`、保留 Deputy / reviewer patrol entries、解 conflict、回報 review / conflict-resolution status。
+  - Finding 3 在最新 `origin/main` 未重現；Issue #20 只作為 duplicate closed 記錄，Plan Puzzle canonical task 仍是 Issue #15。此 finding 視為 stale local state。
+- Reviewer inbox 現在保留 processed decision 記錄；目前沒有需要 Commander 裁決的 pending reviewer finding。
+- Commander has configured the reviewer secretary heartbeat to run hourly; blackboard current sections now reflect hourly reviewer secretary / patrol support.
+- Next Deputy action: 續巡 PR #22-#24；若審查官下次再上報，先核對它是否讀到最新 `origin/main`，再決定是否發布黑板。
+
+## Latest Patrol Task: PR Conflict Recheck / Reviewer Cadence Wording Sync
+
+- 本輪任務名稱：Deputy Patrol PR Conflict Recheck / Reviewer Cadence Wording Sync。
+- 任務類型：Governance / Patrol / Documentation；本輪只更新黑板狀態與審查官巡檢規則文字，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- GitHub state rechecked: `main` latest sha is `6eb6e95cbd1c7dee0f87617381dbfa637a28123b`.
+- Open PRs remain #22, #23, #24. Each stays inside its expected workstream scope, has no PR comments / review threads, and is still conflict-gated against latest `main`.
+- Active Issues remain #15-#19 in `laibeoffer/laibe-mvp` and #1 in `laibeoffer/laibe-quote-factory`.
+- `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` has no pending reviewer findings at this handoff point.
+- Corrected `Reviewer Patrol Support Rule` wording in the blackboard; it now reflects the latest hourly reviewer secretary / patrol cadence configured by Commander.
+- Next Deputy action: keep watching PR #22-#24 for conflict-resolution updates, Codex review comments, or scope changes; publish any new decision to the blackboard before reporting to Commander.
+
+## Latest Governance Task: Reviewer Patrol Support
+
+- 本輪任務名稱：Reviewer Patrol Support for Deputy Codex。
+- 任務類型：Governance / Automation / Documentation；本輪只更新黑板與審查官 heartbeat，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無；此段已由下方 `Reviewer Patrol Inbox` 段落補充固定交付檔案。
+- Commander initially authorized LAIBE_REVIEWER to wake every 3 hours as read-only patrol support for Deputy Codex; current correction / stabilization cadence is now hourly.
+- LAIBE_REVIEWER remains `none-review-only`; it may audit active Issues / PRs / Codex review results / blackboard entries for review triggers, table-compliance failures, missed progress, duplicate routing, no-idle violations, and high-risk scope.
+- LAIBE_REVIEWER must not implement, edit files, open / close Issues, merge / reject PRs, dispatch Builder tasks, make product decisions, or read / expose secrets.
+- Expected reviewer patrol results: `NO_REVIEW_TRIGGER`, `REVIEW_TRIGGER_FOUND`, `PATROL_RISK_FOUND`, `TABLE_COMPLIANCE_FAIL`, or `MISSED_PROGRESS_BACKFILL_REQUIRED`.
+- Deputy Codex remains the sole active Deputy and final routing / blackboard publication authority.
+- Automation updated: `laibe-reviewer-heartbeat` was first set to 3-hour read-only patrol support; current 2-hour inbox-based prompt is recorded below.
+
+## Latest Governance Task: Reviewer Patrol Inbox
+
+- 本輪任務名稱：Reviewer Patrol Inbox for Deputy Decision。
+- 任務類型：Governance / Automation / Documentation；本輪只新增審查官巡檢交付資料夾與黑板規則，不修改功能程式碼。
+- 新增檔案：
+  - `docs/deputy_reviewer_patrol/README.md`
+  - `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md`
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Reviewer patrol findings now have a dedicated file handoff lane.
+- LAIBE_REVIEWER may append decision-worthy findings only to `docs/deputy_reviewer_patrol/REVIEWER_PATROL_INBOX.md` with `Status: PENDING_DEPUTY_DECISION`.
+- LAIBE_REVIEWER must not update `docs/WORKSTREAM_BLACKBOARD.md` directly, must not edit source code, and must not open / close Issues, merge PRs, dispatch Builder tasks, or make product decisions.
+- Deputy Codex reads the inbox, decides whether action is needed, and publishes official decisions to `docs/WORKSTREAM_BLACKBOARD.md`.
+- Reviewer heartbeat cadence is now hourly during the correction / stabilization period.
+
+## Latest Governance Task: Issue / Blackboard / Heartbeat Patrol Workflow
+
+- 本輪任務名稱：Issue / Blackboard / Heartbeat Patrol Workflow。
+- 任務類型：Governance / Documentation；本輪只更新 GitHub 工作流治理文件，不修改功能程式碼。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/CHATROOM_GITHUB_WORKSTREAMS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：
+  - `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md`
+- 目的：把 GitHub Issue、戰情黑板與各聊天室 heartbeat 巡邏制度正式寫入 repo 文件。
+- 核心規則：GitHub Issue = 正式派工單；PR = 完工驗收單；`docs/WORKSTREAM_BLACKBOARD.md` = 戰情黑板；thread heartbeat 只能喚醒目前聊天室，不能喚醒其他聊天室。
+- Deputy Codex 派工必須包含：`To`、`Workstream`、`Branch / Repo`、`Mission`、`Why this agent`、`Action`、`Need Commander`、`Need Reviewer`。
+- 派工不可只寫 branch、不可只寫 workstream、不可丟給「大家」；跨線任務要指定主責 agent，其他工作線只列 reference。
+- `Need Commander` 預設 No，只在產品方向、視覺方向、商業邏輯、正式金流 / escrow / listing fee、真 AI API、正式價格、正式 Excel/PDF 或其他高風險決策時設 Yes。
+- `Need Reviewer` 預設 No，只在 Codex review NEEDS_FIX / P1 / P2、高風險範圍、明確審查需求、routing / CTA / header 或資料模型邊界時設 Yes。
+- 本輪沒有修改 `src/`、網站頁面、`app/`、`components/`、`assets/`、budget engine、Plancraft core、payment、escrow、listing fee、real AI API、upload backend 或 secrets。
+- PR #12 Issue template 已 merged；本輪後續由 PR #13 追蹤 patrol workflow 文件化。
 
 ## Latest Documentation Task: Plancraft+ Production Adapter Design Doc
 
@@ -1242,6 +987,18 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
 - Phase 3.5 still does not generate real `.xlsx` or `.pdf`; it only establishes controlled writer entry, manifest, local staging policy, placeholder writer guard, and static guard coverage.
 - Phase 3.5 did not modify frontend, floor-plan, preview_floor_plan, plan-puzzle, `code.html`, database migrations, RAG, AI API, Skills, payment, escrow, or listing fee.
 - Task dispatch note: Budget Phase 3.5 is a Builder / Data Model / renderer-contract spike with implementation allowed by user scope. It is ready to be included in phase review materials before any production-grade file writer is attempted.
+
+## Output Documents Issue #18 Handoff
+
+- Workstream: `output/budget-documents`.
+- Branch: `output/renderer-static-guard-review-packet`.
+- GitHub Issue: `#18 [Output Documents] Add renderer snapshot-only review packet / static guard next step`.
+- Added `docs/budget/27-renderer-snapshot-only-review-packet.md` as the snapshot-only review packet for renderer static guard / import denylist / placeholder writer hardening.
+- Added `src/lib/budget/renderers/formal-file-writer-policy.ts` so formal writer preflight / manifest / staging modules have a concrete artifact policy contract.
+- Added `src/lib/budget/renderers/run-renderer-static-guard.ts` as the local command entry for renderer static guard.
+- Static guard command: `node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts`.
+- Writer path remains snapshot-only: formal writer can only consume `renderFormalBudgetDocument()` gated structured output and must pass `runFormalFileWriterPreflight()` first.
+- This issue still does not generate real `.xlsx` or `.pdf`, does not introduce a document library, does not rerun budget engine, does not read pricing rules or material resolver, and does not touch MethodSpecCatalog, raw warehouse, frontend, plan-puzzle, payment, DB, RAG, or AI API.
 ## Latest Visual Simulation Task: Minimal Real Server Runtime Spike Revalidation
 
 - 本輪任務名稱：Minimal Real Server Runtime Spike。
