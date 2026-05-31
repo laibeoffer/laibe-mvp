@@ -1,5 +1,31 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Workflow Task: Budget Workflow Orchestrator Placeholder
+
+- 本輪任務名稱：Budget Workflow Orchestrator placeholder。
+- 任務類型：Documentation / Workflow Governance / n8n Placeholder；本輪只建立 workflow spec、placeholder blueprint、review gate 與 dry-run contract，不啟用 runtime。
+- Workstream：`workflow/budget-orchestrator`。
+- Branch：`workflow/budget-orchestrator`。
+- 新增檔案：
+  - `docs/workflow/budget_orchestrator/BUDGET_WORKFLOW_ORCHESTRATOR_AGENT.md`
+  - `docs/workflow/budget_orchestrator/AUTOMATION.md`
+  - `docs/workflow/budget_orchestrator/n8n_placeholder_workflow.md`
+  - `docs/workflow/budget_orchestrator/workflow_node_map.md`
+  - `docs/workflow/budget_orchestrator/workflow_trigger_contract.md`
+  - `docs/workflow/budget_orchestrator/workflow_node_io_contract.md`
+  - `docs/workflow/budget_orchestrator/workflow_failure_and_review_gates.md`
+  - `docs/workflow/budget_orchestrator/workflow_blackboard_update_contract.md`
+  - `docs/workflow/budget_orchestrator/workflow_knowledge_vault_feedback_contract.md`
+  - `docs/workflow/budget_orchestrator/forbidden_runtime_scope.md`
+  - `docs/workflow/budget_orchestrator/examples/n8n_placeholder_blueprint.json`
+  - `docs/workflow/budget_orchestrator/examples/budget_workflow_dry_run_trace.sample.json`
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 邊界確認：目前尚未啟用 n8n；沒有建立 webhook endpoint、upload backend、API key、secret、credential、DB、Supabase、payment、AI API、production automation、customer notification、formal quote、real Excel 或 real PDF。
+- 動態參數窗口：Requirement Form / `ProjectRequirementBrief` 與 Plan Puzzle SVG / Quantity Facts 只能以 `placeholder`、`linked`、`verified`、`unavailable` 狀態傳遞，不得直接進 `BudgetEstimateLine`、`PricingRule`、Renderer 或 production quantity。
+- 下一步：若繼續此 workstream，仍限 placeholder workflow governance。任何 real n8n / webhook / API / DB / payment / AI API / formal budget output 需要新 dispatch，並標示 Need Commander: Yes / Need Reviewer: Yes。
+
 ## Latest MethodSpec Documentation Task: Validator Freeze Note
 
 - 本輪任務名稱：MethodSpec validator freeze note。
