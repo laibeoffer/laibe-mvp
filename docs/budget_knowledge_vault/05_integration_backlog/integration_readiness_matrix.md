@@ -15,12 +15,12 @@ The Integration Officer, not this vault, determines readiness. This vault must n
 
 ## Latest Vault Patrol
 
-- checked_at: 2026-06-01T00:37:14+08:00
-- source_checked: GitHub branch `knowledge/budget-vault`
+- checked_at: 2026-06-01T01:34:37+08:00
+- source_checked: GitHub branch `knowledge/budget-vault` after syncing latest compact `origin/main` blackboard
 - assigned_pr: PR #32 `Add Budget Knowledge Vault support agent`
-- assigned_pr_status: open, mergeable, not merged, no PR comments found in latest scoped patrol
+- assigned_pr_status: open, mergeable before latest sync, not merged, no PR comments found in latest scoped patrol
 - related_boundary_pr: PR #31 `Register Budget Knowledge Vault support boundary`, open, review signal unavailable because Codex review usage limits were reached
 - active_work: Budget Knowledge Vault initialization remains active until PR #31 / PR #32 are resolved, initialization is complete, and no known vault todo remains.
 - no_idle_rule: if no new instruction exists, advance the first safe item in `AUTOMATION.md` / `00_index.md` active work queue.
 - no_change_response_guard: `本 workstream 本輪無新指派。` must not be used while active initialization PRs, support gaps, or known todo items exist.
-- next_action: continue scoped support-doc maintenance, decision-signal tracking, gap tracking, and evidence refresh without touching implementation code or making gate decisions.
+- next_action: keep PR #32 current with compact blackboard discipline; continue scoped support-doc maintenance, decision-signal tracking, gap tracking, and evidence refresh without touching implementation code or making gate decisions.
