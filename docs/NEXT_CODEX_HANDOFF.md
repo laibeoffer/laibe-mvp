@@ -1,6 +1,26 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
-## Latest Workflow Task: Budget Workflow Orchestrator Placeholder
+## Latest Workflow Task: Budget Workflow Orchestrator Alarm Repair Patrol
+
+- 本輪任務名稱：Budget Workflow Orchestrator alarm repair patrol。
+- 任務類型：Documentation / Patrol / n8n Placeholder；本輪只檢修 placeholder patrol contract 並執行一次立即巡邏，不啟用 runtime。
+- Workstream：`workflow/budget-orchestrator`。
+- Branch：`workflow/budget-orchestrator`。
+- GitHub source of truth：`laibeoffer/laibe-mvp`。
+- 巡邏時間：`2026-06-01T00:35:09+08:00`。
+- 檢查結果：
+  - GitHub `main` checked at `4cb9fe9d902fbd6c4eed16c525629e03ab0c57a1`。
+  - PR #36 checked at head `4efd70ba9152f28ae084ab0a038976a5663a66c9`；status was open / mergeable / not draft。
+  - No matching open Issue was found for `workflow/budget-orchestrator`。
+  - GitHub `main` does not yet contain the Budget Workflow Orchestrator self-introduction because PR #36 is pending merge。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/workflow/budget_orchestrator/AUTOMATION.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 邊界確認：沒有建立 n8n runtime、webhook endpoint、upload backend、scheduler、API key、secret、credential、DB、Supabase、payment、AI API、production automation、customer notification、formal quote、real Excel 或 real PDF。
+- 下一步：繼續 15-minute scoped patrol；若 20 分鐘內沒有回應，仍只能推進 placeholder initialization / patrol documentation，不得回報 `本 workstream 本輪無新指派`。
+
+## Previous Workflow Task: Budget Workflow Orchestrator Placeholder
 
 - 本輪任務名稱：Budget Workflow Orchestrator placeholder。
 - 任務類型：Documentation / Workflow Governance / n8n Placeholder；本輪只建立 workflow spec、placeholder blueprint、review gate 與 dry-run contract，不啟用 runtime。
