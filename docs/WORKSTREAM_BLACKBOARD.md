@@ -96,7 +96,7 @@ Forbidden:
 |---|---|---|---|---:|---|---|
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` now exposes front-end QA log, summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. Not part of budget integration gate. |
-| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Draft contract packet exists in PR #40 branch only and is not yet merged to `main`; PR #44 records the evidence gap; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
+| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | PR #44 now contains the docs-only contract packet plus compact blackboard evidence correction; PR #40 remains an older draft branch; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
 
 ## Agent Self-Introduction: Plan Puzzle Guide Agent
 
@@ -109,11 +109,11 @@ Forbidden:
 - Forbidden scope: Plancraft core, Budget Engine, formal estimate, renderer, MethodSpec, Raw Candidate, Output Documents, payment, escrow, listing fee, DB, auth, real AI API, package/framework changes, secrets.
 - Automation: `plan-puzzle-guide-agent-patrol`, every 15 minutes, ACTIVE.
 - No-idle rule: after blackboard self-introduction, if no response arrives within 20 minutes, continue the next safe initialization task; do not report `本 workstream 本輪無新指派` before initialization is complete.
-- Evidence: Draft `docs/plan_puzzle_guide/` contract packet exists in PR #40 branch only and is not yet merged to `main`; PR #44 records the evidence gap. `preview_floor_plan` runtime reviewed read-only only; no runtime code was changed.
-- Blocker: local `git` executable is unavailable in PATH, so dirty worktree safety cannot be confirmed; no runtime code was changed.
+- Evidence: PR #44 branch contains GitHub-tracked `docs/plan_puzzle_guide/` contract files and the blackboard evidence correction; `preview_floor_plan` runtime reviewed read-only only; no runtime code was changed.
+- Blocker: PR #44 is not merged to `main`; no runtime mock panel or browser/runtime verification exists.
 - Need Commander: No for docs-only initialization. Yes before runtime wiring if worktree safety or product CTA behavior must be decided.
 - Need Reviewer: No by default; available for user-triggered review.
-- Next single action: sync or merge PR #40 through normal gates, or apply the scoped blackboard correction; keep mock runtime `PlanPuzzleQuantityFacts` output pending until GitHub source-of-truth is clean.
+- Next single action: review PR #44 through normal gates, then decide whether PR #40 should be superseded or closed; keep mock runtime `PlanPuzzleQuantityFacts` output pending until GitHub source-of-truth is clean.
 
 ## Future / Standby Agent Backlog
 
