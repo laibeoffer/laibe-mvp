@@ -18,7 +18,8 @@
   - `docs/workflow/budget_orchestrator/AUTOMATION.md`
   - `docs/NEXT_CODEX_HANDOFF.md`
 - 邊界確認：沒有建立 n8n runtime、webhook endpoint、upload backend、scheduler、API key、secret、credential、DB、Supabase、payment、AI API、production automation、customer notification、formal quote、real Excel 或 real PDF。
-- 下一步：繼續 15-minute scoped patrol；若 20 分鐘內沒有回應，仍只能推進 placeholder initialization / patrol documentation，不得回報 `本 workstream 本輪無新指派`。
+- 追加修正：補上 alarm health check protocol、last alarm repair timestamp、GitHub-only patrol checklist，並將 no-idle 禁止回報字串改成 ASCII-safe `NO_NEW_ASSIGNMENT`，避免本地終端 mojibake 造成規則不可讀。
+- 下一步：繼續 15-minute scoped patrol；若 20 分鐘內沒有回應，仍只能推進 placeholder initialization / patrol documentation，不得回報 `NO_NEW_ASSIGNMENT`。此 workstream 每次被喚醒時必須優先巡檢 PR #36 / Issues / review threads / comments / `docs/workflow/budget_orchestrator/`，不得因沒有新 Issue 而跳過 open PR patrol。
 
 ## Previous Workflow Task: Budget Workflow Orchestrator Placeholder
 

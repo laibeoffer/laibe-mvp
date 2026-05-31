@@ -7,6 +7,8 @@ workstream: workflow/budget-orchestrator
 github_source_of_truth: laibeoffer/laibe-mvp
 no_idle_until_initialized: true
 auto_progress_after_minutes_without_response: 20
+alarm_health_status: placeholder_contract_only
+last_alarm_repair_check: 2026-06-01T00:35:46+08:00
 
 ## Runtime Status
 
@@ -44,6 +46,32 @@ production_automation_created: false
 
 note: GitHub `main` remains the source of truth; until PR #36 is merged, this workstream's blackboard self-introduction exists on the PR branch and is pending merge to `main`.
 
+## Alarm Health Check
+
+Current alarm mode:
+`PLACEHOLDER_CONTRACT_ONLY`
+
+Health check result:
+`PASS_WITH_RUNTIME_BLOCKED`
+
+Meaning:
+The patrol contract is present and readable in GitHub, but no real scheduler, cron job, n8n workflow, webhook, or external automation is enabled.
+
+Repair action:
+- Keep the patrol scope GitHub-only.
+- Keep the 15-minute frequency and 20-minute auto-progress rule recorded.
+- Use ASCII-safe status labels so the no-idle rule remains readable even when local terminal encoding corrupts Chinese text.
+- When the Commander or `LAIBE_PATROL_INTEGRATION_OFFICER` wakes this agent, immediately inspect GitHub `main`, this workstream PRs, this workstream Issues, review threads, comments, and this directory.
+- If PR #36 or a later workstream PR is open, patrol it before reporting no new assignment.
+
+Forbidden repair action:
+- Do not create a real scheduler.
+- Do not create a cron job.
+- Do not create a real n8n workflow.
+- Do not create a webhook endpoint.
+- Do not create external runtime automation.
+- Do not store credentials, API keys, tokens, or secrets.
+
 ## Patrol Scope
 
 The patrol scope is limited to:
@@ -60,11 +88,11 @@ After blackboard self-introduction, if no response is received within 20 minutes
 
 Before initialization is complete, this agent may not report:
 
-`本 workstream 本輪無新指派`
+`NO_NEW_ASSIGNMENT`
 
 Only after initialization is complete, and only when there is no open Issue, open PR, or Integration Officer instruction, the agent may report:
 
-`本 workstream 本輪無新指派`
+`NO_NEW_ASSIGNMENT`
 
 No-idle cannot be used as a stop reason.
 
