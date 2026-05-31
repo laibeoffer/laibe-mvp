@@ -1,0 +1,33 @@
+{
+  "session_id": "owner_guide_session_mock_001",
+  "runtime_status": "mock_only",
+  "question_answer_log": [
+    {
+      "qa_log_id": "qa_001",
+      "stage": "basic_project_info",
+      "question": "請先描述房屋類型、坪數、屋況、區域與使用目的。",
+      "owner_answer": "台北 28 坪中古屋，自住，想整理客廳、廚房、浴室和收納。",
+      "extracted_fields": {
+        "region": "台北",
+        "area": "28 坪",
+        "condition": "中古屋",
+        "use_purpose": "自住"
+      },
+      "source": "owner_free_text",
+      "confidence": 0.7,
+      "created_at": "2026-06-01T00:00:00+08:00"
+    },
+    {
+      "qa_log_id": "qa_002",
+      "stage": "budget_preference",
+      "question": "目前有預算區間或上限嗎？",
+      "owner_answer": "還不知道，希望 AI 協助估算方向。",
+      "extracted_fields": {
+        "budget_status": "needs_ai_assistance"
+      },
+      "source": "owner_free_text",
+      "confidence": 0.58,
+      "created_at": "2026-06-01T00:05:00+08:00"
+    }
+  ]
+}
