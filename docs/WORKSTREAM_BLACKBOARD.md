@@ -1,6 +1,7 @@
 # LaiBE MVP Workstream Blackboard
 
 Last rebuilt: 2026-05-31 Asia/Taipei
+Last compact sync: 2026-06-01 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
@@ -41,8 +42,8 @@ Effective immediately:
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 85 | FUNCTIONAL_ACCEPTANCE_PENDING | PR #3 open draft | QF5.4 PR #3 head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body; no PR comments, review threads, or GitHub Actions run found | PR #3 not merged; no GitHub-run validator evidence; Commander functional acceptance pending | Yes | Yes | Review PR #3, decide ready/merge or request GitHub-run validation evidence |
 | Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | MERGE_GATE_BLOCKED | PR #26 / Issue #17 | PR #26 open; head `2be2bb8`; changed files scope clean; R1.5 validators/static guard passed in PR comment `4587140052` | PR not merged; branch is behind current `main`; Codex re-review hit usage limit | No for scope; Yes for final completion acceptance | Yes, reviewer/Codex-equivalent re-review needed | Sync PR #26 to current `main`, rerun validators, then obtain final review / merge gate |
-| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context | Integration readiness evidence and context windows exist | `BUDGET_ENGINE_ENTRY_BLOCKER` | No, unless product decision is needed | Integration Officer investigation required | Identify current Budget Engine entry before integration harness |
-| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PR #29 not recorded as merged | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final evidence |
+| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` / `warehouse/method-spec-integration-readiness` | 75 | PR30_SYNC_REQUIRED / BLOCKED | PR #30 open, non-draft; PR #22 merged; Issue #16 closed | PR #30 adds `docs/budget/33-method-spec-integration-readiness.md` and blackboard update; validator-hardening PASS; changed files docs-only; branch diverged from current `main` | `BUDGET_ENGINE_ENTRY_BLOCKER`; PR #30 not merged; branch sync / review required | No | Yes for PR #30 docs/blackboard review; Integration Officer owns Budget Engine entry investigation | Sync or supersede PR #30 from current `main`; Integration Officer identifies current Budget Engine entry before integration harness |
+| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | MERGED_TO_MAIN / FUNCTIONAL_ACCEPTANCE_PENDING | PR #23 merged; PR #29 merged | Snapshot-only packet and integration usage note are on `main`; static guard evidence recorded; no real xlsx/pdf output | Runtime/formal output functional acceptance not complete; no real Excel/PDF stage | No | No unless real Excel/PDF or renderer boundary changes | Keep as snapshot-only context until formal output phase is explicitly activated |
 | 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
 | Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 75 | IN_PROGRESS | Governance PR / Issue context | Blackboard / issue workflow / patrol rules established | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
 | 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate | Four budget lines not all 100 | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Run read-only Budget Engine entry investigation |
@@ -61,14 +62,15 @@ Next: Identify current Budget Engine entry before integration harness.
 |---|---|---:|---|---|---|
 | `quote-factory/price-range-governance` | Yes | 85 | PR #3 open draft; head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body | PR #3 not merged; Functional Acceptance pending; no GitHub Actions validator run found | WAITING |
 | `warehouse/raw-candidate` | Yes | 75 | PR #26 open; head `2be2bb8`; changed files scope clean; R1.5 validators/static guard passed in PR comment `4587140052` | PR not merged; branch is behind current `main`; Codex re-review hit usage limit | BLOCKED |
-| `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists | `BUDGET_ENGINE_ENTRY_BLOCKER` | BLOCKED |
-| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PR #29 merge / final evidence pending | WAITING |
+| `warehouse/method-spec` | Yes | 75 | PR #30 open/non-draft; integration readiness evidence exists; validator-hardening PASS; PR #22 merged and Issue #16 closed | `BUDGET_ENGINE_ENTRY_BLOCKER`; PR #30 not merged; PR #30 branch diverged from current `main`; docs-only evidence does not prove runtime integration completion | BLOCKED |
+| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 merged; snapshot-only usage note and static guard evidence recorded | Functional acceptance / formal output runtime evidence pending; no real Excel/PDF stage | WAITING |
 
 Readiness rule:
 
 - Integration harness must not start until all four lines are 100% and blocker is `None`.
 - Plan Puzzle and Owner Guide are not part of this four-line gate.
 - Budget Knowledge Vault is not part of this gate and cannot replace completion packets.
+- Governance docs / blackboard / handoff updates must not increase runtime or functional completion percentages.
 
 ## Budget Integration Blocker Handoff
 
@@ -130,8 +132,9 @@ These agents are not current blockers and must not receive new tasks unless expl
 ## Current Global Next Actions
 
 1. `LAIBE_REVIEWER_INTEGRATION_OFFICER`: investigate `BUDGET_ENGINE_ENTRY_BLOCKER` read-only.
-2. Commander: keep Integration Gate as WAITING until the four required lines reach 100%.
-3. All agents: keep blackboard updates compact; move details to the correct handoff / phase / vault document.
+2. MethodSpec owner / Deputy: sync or supersede PR #30 from current `main` before review / merge.
+3. Commander: keep Integration Gate as WAITING until the four required lines reach 100%.
+4. All agents: keep blackboard updates compact; move details to the correct handoff / phase / vault document.
 
 ## Compact Update Format
 
@@ -188,3 +191,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: Yes for final completion / merge acceptance; no new product decision needed for R1.5 scope.
 - Need Reviewer: Yes, reviewer or Codex-equivalent review needed after current-main sync.
 - Next single action: Sync PR #26 to current `main`, rerun validators, and re-submit final gate evidence.
+
+### 2026-06-01 - Compact Blackboard Patrol Sync
+
+- Agent: @MethodSpec / Governance patrol support
+- Workstream: `warehouse/method-spec` / `integration/budget-system-readiness`
+- Status: `BLACKBOARD_SYNC_PR_OPENED`
+- Progress %: 75 for MethodSpec, 75 for Output Documents, 25 for Integration Officer
+- Evidence: PR #30 open/non-draft but diverged from current `main`; PR #29 merged; PR #26 still open and diverged; Quote Factory PR #3 open draft; `docs/WORKSTREAM_BLACKBOARD.md` compact rows synced in PR for current GitHub state.
+- Blocker: `BUDGET_ENGINE_ENTRY_BLOCKER`; PR #30 branch sync/review still required; four-line Integration Gate remains WAITING.
+- Need Commander: No
+- Need Reviewer: Yes for PR #30 after sync, and for raw PR #26 after current-main sync.
+- Next single action: `LAIBE_REVIEWER_INTEGRATION_OFFICER` performs read-only Budget Engine entry investigation.
