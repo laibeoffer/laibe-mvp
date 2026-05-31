@@ -1,4 +1,4 @@
-﻿# Budget Knowledge Vault Automation
+# Budget Knowledge Vault Automation
 
 automation_name: budget-knowledge-vault-patrol
 frequency: every 12 minutes
@@ -17,6 +17,19 @@ status: active heartbeat created in Codex app
 ## No Change Response
 
 本 workstream 本輪無新指派。
+
+## No Change Response Gate
+
+The no-change response may be used only after initialization is complete and all of the following are true:
+
+- no open Issue assigned to this agent
+- no open PR assigned to this agent that needs action
+- no blackboard task assigned to `knowledge/budget-vault`
+- no Integration Officer instruction needs action
+- no known todo remains in this vault
+- no initialization task remains incomplete
+
+If any item above is false, the patrol must report the active work item instead of using the no-change response.
 
 ## Forbidden
 
