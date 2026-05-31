@@ -1,4 +1,4 @@
-﻿# Budget Knowledge Vault Index
+# Budget Knowledge Vault Index
 
 Status: support-only Markdown knowledge vault.
 Workstream: `knowledge/budget-vault`
@@ -58,3 +58,56 @@ The vault preserves two integration context windows:
 - Plan Puzzle SVG / Quantity Facts window
 
 Both windows may support dry-run or trace notes only. They must not directly create prices, formal estimate lines, renderer input, or customer-facing quotes.
+
+## Requirement Form / ProjectRequirementBrief Window
+
+Tracked fields:
+
+- `project_requirement_brief_id`
+- `owner_intent_id`
+- `requirement_context_status`: `placeholder`, `linked`, `verified`, or `unavailable`
+- `budget_preference`
+- `space_requirements`
+- `scope_constraints`
+- `review_flags`
+
+Status rules:
+
+- `placeholder` may support dry-run notes only.
+- `linked` may support trace notes only.
+- `verified` is required before the context can support more formal estimate preparation.
+- `unavailable` means the vault has no usable requirement context evidence.
+
+Forbidden use:
+
+- Free-text requirements must not directly become `BudgetEstimateLine`.
+- Requirement form content must not directly create or mutate `PricingRule`.
+
+## Plan Puzzle SVG / Quantity Facts Window
+
+Tracked fields:
+
+- `plan_id`
+- `svg_artifact_id`
+- `plan_quantity_facts_id`
+- `quantity_context_status`: `placeholder`, `linked`, `verified`, or `unavailable`
+- `zone_id`
+- `area_m2`
+- `wall_length_m`
+- `opening_count`
+- `quantity_confidence`
+- `reviewer_required`
+
+Status rules:
+
+- `placeholder` may support dry-run notes only.
+- `linked` may support trace notes only.
+- `verified` is required before any quantity context can support more formal estimate preparation.
+- `unavailable` means the vault has no usable plan / SVG quantity evidence.
+
+Forbidden use:
+
+- SVG must not directly enter Renderer.
+- SVG must not directly enter `BudgetEstimateLine`.
+- Plan Puzzle candidate area must not become production quantity fact.
+- Unverified SVG must not become formal quantity authority.
