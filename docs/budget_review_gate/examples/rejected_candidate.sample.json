@@ -1,0 +1,17 @@
+{
+  "decision_id": "brg_decision_20260531_0002",
+  "source_artifact_id": "raw_handoff_proposal_unsafe_0001",
+  "source_agent": "warehouse/raw-candidate",
+  "proposal_type": "handoff_proposal",
+  "decision": "rejected",
+  "reviewer_role": "budget_review_gate",
+  "rationale": "The proposal attempted to publish a candidate observed price directly as a formal PricingRule. Candidate evidence must remain in the review queue and cannot directly become a formal rule.",
+  "source_refs": [
+    {
+      "type": "artifact",
+      "path": "exports_to_raw_warehouse/example_unsafe_handoff.json"
+    }
+  ],
+  "created_at": "2026-05-31T15:30:00Z",
+  "updated_at": "2026-05-31T15:30:00Z"
+}

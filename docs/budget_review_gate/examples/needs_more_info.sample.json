@@ -1,0 +1,12 @@
+{
+  "decision_id": "brg_decision_20260531_0003",
+  "source_artifact_id": "material_spec_proposal_0001",
+  "source_agent": "warehouse/method-spec",
+  "proposal_type": "material_spec_proposal",
+  "decision": "needs_more_info",
+  "reviewer_role": "budget_review_gate",
+  "rationale": "The proposal lacks source references and does not identify whether any price-like evidence is candidate-only. More provenance is required before next review.",
+  "source_refs": [],
+  "created_at": "2026-05-31T15:35:00Z",
+  "updated_at": "2026-05-31T15:35:00Z"
+}
