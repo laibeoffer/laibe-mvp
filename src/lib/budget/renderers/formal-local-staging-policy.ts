@@ -1,6 +1,8 @@
 import {
   defaultFormalArtifactPolicy,
   isFormalArtifactStorageTarget,
+  storageTargetAllowsFileWrite,
+  storageTargetIsAllowed,
   type FormalArtifactStorageTarget,
 } from "./formal-file-writer-policy.ts";
 import type { FormalArtifactKind } from "./formal-artifact-manifest.ts";
@@ -20,6 +22,7 @@ export interface FormalLocalStagingValidationResult {
 export interface FormalLocalStagingPolicyOptions {
   storage_target: unknown;
   staging_relative_path?: unknown;
+  write_to_staging?: boolean;
   actual_artifact_kind?: FormalArtifactKind;
   signed_document_exists?: boolean;
 }
@@ -53,9 +56,7 @@ const getExtension = (value: string): string | null => {
 
 const storageTargetAllowed = (value: unknown): value is FormalArtifactStorageTarget =>
   isFormalArtifactStorageTarget(value) &&
-  defaultFormalArtifactPolicy.storage_targets.some(
-    (target) => target.target === value,
-  );
+  storageTargetIsAllowed(defaultFormalArtifactPolicy, value);
 
 export const validateFormalLocalStagingPolicy = (
   options: FormalLocalStagingPolicyOptions,
@@ -69,6 +70,14 @@ export const validateFormalLocalStagingPolicy = (
 
   if (!target) {
     errors.push("Storage target is not allowed by local staging policy.");
+  }
+
+  if (
+    target &&
+    options.write_to_staging === true &&
+    !storageTargetAllowsFileWrite(defaultFormalArtifactPolicy, target)
+  ) {
+    errors.push("Storage target does not allow local staging writes.");
   }
 
   if (options.signed_document_exists === true) {

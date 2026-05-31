@@ -1017,6 +1017,18 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
 - Phase 3.5 still does not generate real `.xlsx` or `.pdf`; it only establishes controlled writer entry, manifest, local staging policy, placeholder writer guard, and static guard coverage.
 - Phase 3.5 did not modify frontend, floor-plan, preview_floor_plan, plan-puzzle, `code.html`, database migrations, RAG, AI API, Skills, payment, escrow, or listing fee.
 - Task dispatch note: Budget Phase 3.5 is a Builder / Data Model / renderer-contract spike with implementation allowed by user scope. It is ready to be included in phase review materials before any production-grade file writer is attempted.
+
+## Output Documents Issue #18 Handoff
+
+- Workstream: `output/budget-documents`.
+- Branch: `output/renderer-static-guard-review-packet`.
+- GitHub Issue: `#18 [Output Documents] Add renderer snapshot-only review packet / static guard next step`.
+- Added `docs/budget/27-renderer-snapshot-only-review-packet.md` as the snapshot-only review packet for renderer static guard / import denylist / placeholder writer hardening.
+- Added `src/lib/budget/renderers/formal-file-writer-policy.ts` so formal writer preflight / manifest / staging modules have a concrete artifact policy contract.
+- Added `src/lib/budget/renderers/run-renderer-static-guard.ts` as the local command entry for renderer static guard.
+- Static guard command: `node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts`.
+- Writer path remains snapshot-only: formal writer can only consume `renderFormalBudgetDocument()` gated structured output and must pass `runFormalFileWriterPreflight()` first.
+- This issue still does not generate real `.xlsx` or `.pdf`, does not introduce a document library, does not rerun budget engine, does not read pricing rules or material resolver, and does not touch MethodSpecCatalog, raw warehouse, frontend, plan-puzzle, payment, DB, RAG, or AI API.
 ## Latest Visual Simulation Task: Minimal Real Server Runtime Spike Revalidation
 
 - 本輪任務名稱：Minimal Real Server Runtime Spike。

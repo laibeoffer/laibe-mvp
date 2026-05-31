@@ -2818,6 +2818,40 @@ No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, o
 - Need Commander: No
 - Need Reviewer: No
 
+### 2026-05-25 - Output Documents Builder PR23 current-main repair on `651fdbb`
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Status:
+WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS
+
+Action Taken:
+Output Documents Builder rechecked latest main `651fdbb2febdc39ca6375f101d571f4942c26f2c`, fetched PR #23 head `d126327ddac96d29ba553a5c7ca9aab9e6461217`, confirmed `git merge-tree --write-tree origin/main refs/patrol/pr23` failed only on `docs/WORKSTREAM_BLACKBOARD.md`, merged latest `origin/main` into the PR #23 worktree, and resolved the blackboard conflict by preserving both the latest main final-gate / stale-state patrol entries and the existing PR #23 P2 recovery entry.
+
+Changed:
+- `docs/WORKSTREAM_BLACKBOARD.md` conflict resolved only.
+- Renderer code and snapshot review packet files were not edited during this repair.
+
+Validation:
+- Renderer static guard: `valid: true`, `issue_count: 0`.
+- Renderer TypeScript syntax loop: pass.
+- Invalid fixture / mismatch smoke: `invalid_fixture_count: 17`, `invalid_failures: []`, `mismatch_failed: true`, `format_matches_output: false`.
+- `git diff --check`: pass.
+- Real `.xlsx` / `.pdf` diff check: no added or changed files.
+
+Blocked:
+None locally after validation. Branch publication / Codex re-review visibility may still be required if this repair is pushed.
+
+Need Commander:
+No.
+
+Need Reviewer:
+No unless validation fails or a new Codex review reports `NEEDS_FIX` / `P1` / `P2`.
+
 ### 2026-05-25 - Executive PR23 final-gate ACK stale on `7338cc2`
 
 Workstream:
@@ -2866,6 +2900,62 @@ No unless repair changes scope or new Codex review reports NEEDS_FIX / P1 / P2.
 - Next: Deputy final-gate candidates are acknowledged for PR #22 / #23 / #25 / #26. Executive should stop ordinary owner chase and monitor only unless a branch head changes, validation evidence is contradicted, or Codex reports `NEEDS_FIX` / `P1` / `P2`. No merge / reject / close action was executed in this patrol.
 - Need Commander: No
 - Need Reviewer: No
+
+### 2026-05-25 - output/budget-documents PR #23 P2 recovery and resync
+
+Workstream:
+output/budget-documents
+
+Branch / Repo:
+output/renderer-static-guard-review-packet / laibeoffer/laibe-mvp
+
+Active Issue:
+Issue #18
+
+Status:
+PR #23 Codex P2 fix completed and rechecked. Renderer / format mismatches now fail closed before artifact policy inference can proceed. Codex re-review returned no major issues; this branch has re-synced latest `origin/main` again after Deputy patrol updates.
+
+Table Compliance:
+TABLE_COMPLIANCE_PASS
+
+Missed Progress Backfill:
+MISSED_PROGRESS_FOUND / BACKFILL_ACTION: PR #23 P2 review thread, Deputy / Executive follow-up comments, clean Codex re-review, and latest-main dirty-state follow-up were found and addressed.
+
+Task Requested:
+None. Active formal task is PR #23 P2 repair.
+
+Changed:
+- Re-synced latest `origin/main` into PR #23 branch.
+- Resolved `docs/WORKSTREAM_BLACKBOARD.md` conflict by preserving latest main patrol entries.
+- Updated `inferFormalArtifactFormat()` so `renderer` and `format` must agree.
+- Updated file writer preflight no-throw wrapper so mismatched gated documents return `format_matches_output: false` instead of falling back to renderer-only inference.
+- Added focused invalid fixture case `renderer_format_mismatch`.
+- Preserved snapshot-only boundaries: no real `.xlsx` / `.pdf`, no budget engine rerun, no pricing rules, no material resolver, no raw warehouse, no MethodSpec, no plan-puzzle, no payment, no RAG, and no AI API.
+- Reran renderer static guard, renderer syntax checks, fixture smoke, and mismatch smoke.
+
+Files:
+- `src/lib/budget/renderers/formal-file-writer-policy.ts`
+- `src/lib/budget/renderers/formal-file-writer-preflight.ts`
+- `src/lib/budget/renderers/fixture-invalid-formal-documents.ts`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/deputy_execution_patrol/EXECUTIVE_PATROL_INBOX.md`
+- `docs/deputy_execution_patrol/TRIAGE_QUEUE.md`
+
+PR / Commit:
+- PR #23: `https://github.com/laibeoffer/laibe-mvp/pull/23`
+- Commit: current PR #23 branch update
+
+Blocked:
+None after local validation and push. Deputy still owns final merge / reject gate.
+
+Next:
+Deputy final merge / reject gate for PR #23.
+
+Need Commander:
+No
+
+Need Reviewer:
+No new reviewer action after clean Codex re-review, unless latest-main re-sync changes scope or Codex reports P1/P2/NEEDS_FIX again.
 
 ### 2026-05-25 - Chatroom heartbeat prompt sync published
 
