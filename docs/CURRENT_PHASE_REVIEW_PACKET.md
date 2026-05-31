@@ -1504,6 +1504,16 @@ Yes, with notes.
 
 配件倉庫：工法與規格目前可進入 phase review。Ready 範圍限 MethodSpecCatalog contract、seed catalog、validator P0 guard、MethodSpec -> BudgetEstimateLine / BudgetOutputSnapshot 邊界文件與 user-triggered review result 結論；不代表正式報價、正式 DB、正式人工審核流程、正式 Excel / PDF 或 renderer 工作已完成。
 
+### Freeze note 補充
+
+- 已新增 `docs/budget/32-method-spec-validator-freeze-note.md`，作為 MS-12 `PASS_WITH_NOTES` 後的 MethodSpec validator checkpoint。
+- freeze note 記錄目前 frozen baseline：PR #4 merged、P0 / P1-A / P1-B validator complete、MS-12 `PASS_WITH_NOTES`、budget regression total `231103`、line count `12`、review-required line count `5`。
+- freeze note 確認 `PricingRule` 仍是目前唯一 deterministic formal price source；AI / RAG / raw candidate data 不得直接變正式價格。
+- freeze note 確認 `LaborRule` 維持 reference-only；`MaterialSpec`、`ItemMaterialBinding`、`NoteTemplate`、`InclusionExclusionRule` 不得改 `quantity`、`unit_price` 或 `amount`。
+- freeze note 確認 UnitConversion coverage 仍是 warning-only，不得重算或改寫已產生 quantity。
+- freeze note 確認 Inclusion / Exclusion scope coverage 仍是 warning / allowed-condition only，不得直接 propagation 到 renderer / output，也不得新增、刪除或改寫正式工項。
+- 本補充沒有修改 runtime code、specs validator implementation、renderer / output、raw warehouse、frontend、plan-puzzle、payment / escrow / listing fee。
+
 ---
 
 ## 原物料採購與倉儲 成果
@@ -1696,6 +1706,9 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - 已建立 placeholder artifact writer，僅允許在 policy 通過後寫 `.json` manifest 或 `.txt` placeholder；Phase 3.5 demo 使用 manifest-only，不實際寫檔。
 - 已強化 renderer static guard，新增 workbook / file writer library 與 file write escape guard。
 - 已完成 Phase 3.0、Phase 3.1、Phase 3.2 User-triggered Review result；Phase 3.2 結論為 `PASS_WITH_NOTES`。Phase 3.3 User-triggered Review result 結論為 `PASS_WITH_NOTES`，允許進入 Phase 3.4。Phase 3.4 User-triggered Review result 結論為 `PASS_WITH_NOTES`，允許進入 Phase 3.5。Phase 3.5 目前完成 builder implementation，可供後續審查。
+- 已依 GitHub Issue #18 補上 renderer snapshot-only review packet，整理 renderer static guard / import denylist / placeholder writer hardening 的下一步審查資料。
+- 已補齊 `formal-file-writer-policy.ts`，讓 writer preflight、artifact manifest、local staging policy 與 controlled writer entry 共用同一份 artifact audience / format / filename / storage / security policy contract。
+- 已補齊 `run-renderer-static-guard.ts`，讓 renderer static guard 可用固定 node command 重跑並輸出 `valid`、issue count、scanned files 與 checked rules。
 
 ### 修改檔案
 
@@ -1725,6 +1738,7 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - `src/lib/budget/renderers/formal-file-writer-policy.ts`
 - `src/lib/budget/renderers/formal-file-writer-preflight.ts`
 - `src/lib/budget/renderers/run-renderer-static-guard.ts`
+- `docs/budget/27-renderer-snapshot-only-review-packet.md`
 - `docs/budget/22-formal-renderer-entry-contract.md`
 - `docs/budget/23-formal-file-writer-preflight.md`
 - `docs/NEXT_CODEX_HANDOFF.md`
@@ -1770,6 +1784,7 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - `src/lib/budget/renderers/fixture-budget-output-snapshot.ts`
 - `src/lib/budget/renderers/demo-formal-file-writer-preflight.ts`
 - `docs/budget/25-file-writer-dry-run-contract.md`
+- `docs/budget/27-renderer-snapshot-only-review-packet.md`
 - `src/lib/budget/renderers/formal-file-writer-dry-run.ts`
 - `src/lib/budget/renderers/fixture-invalid-formal-documents.ts`
 - `src/lib/budget/renderers/demo-file-writer-dry-run-hardening.ts`
@@ -1815,6 +1830,8 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - renderer static guard report 已改列 `forbidden_rules_checked`，並標示 rule type：`full_text`、`import_pattern`、`restricted_usage`。
 - renderer static guard 會檢查 `createFormalRendererToken()` restricted usage，避免 file writer / preflight / dry-run 自行建立 token。
 - renderer static guard 已新增 workbook-style library 與 file write escape 掃描：workbook token、`xlsx` package import、`pdfkit`、`jspdf`、`puppeteer`、`playwright`、`html-pdf`、非 placeholder writer 的 `writeFileSync` / `createWriteStream`。
+- renderer static guard 已有固定命令入口：`node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts`。
+- GitHub Issue #18 review packet 明確列出 snapshot-only、import denylist、placeholder writer hardening 與 remaining risks，供後續 reviewer 抽查。
 - 成品物流不得重新跑 budget engine。
 - 成品物流不得讀 pricing rules。
 - 成品物流不得讀 material resolver。

@@ -1,0 +1,923 @@
+# DELIVERY_LEDGER.md
+
+Purpose:
+Single delivery ledger for Deputy Codex-2, Executive Officer, and Triage Officer. This file tracks who has an Issue, branch, PR, validation result, stale state, and stalled cycles.
+
+Operating rules:
+- GitHub Issue is the dispatch / order.
+- GitHub branch is the work lane.
+- GitHub PR is the delivery artifact.
+- `docs/WORKSTREAM_BLACKBOARD.md` is the battle board.
+- This ledger is the shared delivery tracker; update it when status changes, not only in chat.
+- Executive Officer owns owner chase, missing evidence collection, and workstream callouts.
+- Deputy Codex-2 owns GitHub / branch / worktree state reconciliation and may decide LOW / MEDIUM technical workflow recovery.
+- Triage Officer owns queue sorting, lag classification, and routing suggestions.
+- Deputy Codex owns final command decisions, high-risk escalation, merge / reject / close decisions, and Commander-facing synthesis.
+
+Allowed Deputy Codex-2 decisions:
+- LOW: stale blackboard correction, missing report format, missing Issue / PR link, missing validation evidence.
+- MEDIUM: branch / PR workflow repair, latest-main sync request, repeated missing claim, PR URL recovery, validation rerun request.
+
+Deputy Codex-2 must escalate:
+- HIGH: Codex P1 / P2 / NEEDS_FIX, changed files outside allowed scope, repeated table-compliance failure, cross-workstream scope drift.
+- CRITICAL: formal price, formal Excel / PDF, payment / escrow / listing fee, real AI API / upload / API key, destructive git, large deletion, product direction, visual direction, business logic.
+
+Stall counters:
+- 0: effective artifact found this cycle.
+- 1: one patrol without effective artifact.
+- 2: two patrols without effective artifact; Executive Officer must call out exact owner.
+- 3: Deputy Codex-2 workflow repair or reassignment package required.
+- 4+: Deputy Codex decision required.
+
+Effective artifact examples:
+- Issue claim.
+- Branch name and branch SHA.
+- PR URL.
+- Validation command and result.
+- Exact blocker plus attempted fix.
+- Backfill result: `MISSED_PROGRESS_FOUND`, `LOCAL_STATE_STALE`, `BACKFILL_ACTION`.
+
+Execution-time main rule:
+- If a row or inbox entry embeds an older main SHA, the owner must still fetch and use the latest `origin/main` at repair / validation time. The embedded SHA is evidence, not a permission to repair against stale main.
+
+## Active Deputy Decision Override
+
+### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_PARTIAL_CLEAN / REPEATED_ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 active final-gate metadata reconciliation after PR #25 clean Codex evidence was published.
+- Latest checked `origin/main` is `5014d03c1f86aac91ac99cd8e46f4326eacd006e`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged. REST reports PR #22 / PR #23 / PR #26 `mergeable=true` / `mergeable_state=clean`; PR #25 returned `mergeable=null` / `mergeable_state=unknown`, but its merge ref exists.
+- Current-main merge-tree and diff-check pass for all four active PRs against `5014d03c1f86aac91ac99cd8e46f4326eacd006e`: PR #22 tree `6836b94415ed98d73b864747bb2a4a17be4b38ca`; PR #23 tree `6a26eace420801e81a3f25c4106cf8ed9669405d`; PR #25 tree `371228e0537a780c0996dc849cd5174592c825cc`; PR #26 tree `47c66ed4a32e80f3fb5b1fb38b978a873f4182e9`; all diff-check exits `0`.
+- Sources checked: required docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR issue comments since `2026-05-26T11:05:25Z`, and current-main merge-tree / diff-check outputs.
+- No issue comments appeared on PR #22 / PR #23 / PR #25 / PR #26 after `2026-05-26T11:05:25Z`, and no newer Deputy Codex-2 visible ACK was found after the 11:05 `PENDING_DEPUTY2_ACK` row. This is repeated active-handler silence, not Builder missing work.
+- Required visible follow-up: Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #25 clean Codex result plus active PR current-main simulation against `5014d03`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if any contradictory evidence remains. After Deputy2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
+### 2026-05-26T11:05:25Z - PR #25 post-fix Codex clean found after `6ba84db`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / CODEX_REVIEW_CLEAN_FOUND / PR25_HEAD_STABLE / CURRENT_MAIN_SIMULATION_PASS / REVIEW_GATE_CLEARED / PENDING_DEPUTY2_ACK / DEPUTY_FINAL_GATE_NEXT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #25 post-fix review result reconciliation plus PR #22 / PR #23 / PR #26 active final-gate context.
+- Latest checked `origin/main` is `6ba84db4c024349528509a8d7843a8f2fd88c781`.
+- PR #25 branch head remains `607b2621c97820dc8774831617aba6b59dc984dc`; REST reports PR #25 open, non-draft, `mergeable=true`, and `mergeable_state=clean`.
+- New evidence found after the 10:47 pending-review row: PR #25 Codex clean comment `4543568360` at `2026-05-26T10:44:11Z` reports no major issues after the `607b262` fix. Plan Puzzle Builder also posted `PLAN_PUZZLE_ACTION_TAKEN` comment `4543536945` at `2026-05-26T10:41:00Z`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `6ba84db4c024349528509a8d7843a8f2fd88c781`: PR #22 tree `1b226438e4c409ae825352b4d9e6fb41724cbe5a`; PR #23 tree `b5fa1f78bbc6544d04d53f1d65711e3bcecbc1cc`; PR #25 tree `3f975585ee4ab0d4f003eeefd31af988de933012`; PR #26 tree `51ec97217d9822a1a6e37925a39dfe430b879305`; all diff-check exits `0`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `607b2621c97820dc8774831617aba6b59dc984dc`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; PR #27 remains closed / merged.
+- Sources checked: required docs, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR comments since `2026-05-26T09:45:22Z`, and current-main merge-tree / diff-check outputs.
+- Supersedes the 10:47 PR #25 post-fix review pending row: ordinary Plan Puzzle Builder chase is no longer needed while this clean Codex evidence remains current.
+- Required visible follow-up: Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #25 post-fix Codex clean result and current-main simulation against `6ba84db`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if any contradictory evidence remains. After Deputy2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+
+Need Commander:
+No unless requesting merge / reject.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
+### 2026-05-26T10:47:18Z - PR #25 Codex P2 repaired; post-fix review pending
+
+Status:
+`VALIDATION_REFRESH_FOUND / CODEX_P2_FOUND / WORKFLOW_REPAIR_ATTEMPTED / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / CODEX_REVIEW_REQUESTED / POST_FIX_REVIEW_PENDING / GITHUB_CONNECTOR_TIMEOUT_FALLBACK`
+
+Decision:
+- Primary To: Plan Puzzle Builder.
+- Applies to: PR #25 `plancraft/zone-area-boundary-refinement`.
+- Latest checked `origin/main` is `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`.
+- PR #25 branch head advanced from `7480b24c7b4e23aab5c2783ee6caf21a729b1002` to `607b2621c97820dc8774831617aba6b59dc984dc`.
+- Public PR page fallback shows a new Codex P2 on reviewed commit `7480b24c7b`: collinear non-adjacent self-overlap / retraced edge was not detected before area estimation.
+- Plan Puzzle Builder reported a scoped fix in `607b262`: added `doCollinearSegmentsOverlap()`, called it from `hasPolygonSelfIntersection()`, updated `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md`, and requested `@codex review`.
+- `refs/pull/25/merge` refreshed to `0aaac05d089731d41c57a34b8da9d239f611ce65`.
+- Current-main merge-tree and diff-check for PR #25 pass against `e92d5d2c3620311fc5bf791f799fb5bb1478ea4e`: tree `988d305289a2901b7639064b5779e8d97f564e30`; diff-check exits `0`.
+- PR #25 changed files remain scoped to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- No post-`607b262` clean Codex result was visible at patrol time. This supersedes the `2026-05-26T10:22:27Z` PR #25 Deputy2 ACK request for final-gate validation; PR #25 returns to Builder / Codex-review-result pending until the post-fix result is visible.
+- Required visible follow-up: Plan Puzzle Builder must publish `CODEX_REVIEW_CLEAN`, `NEEDS_FIX` / P1 / P2, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked and latest main / branch / merge-ref SHAs.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+Yes for Codex P2 re-review result; no separate LAIBE_REVIEWER action unless Codex reports a new blocker, scope drifts, or user explicitly requests review.
+
+### 2026-05-26T10:22:27Z - PR #25 repair evidence found after `b489e7a`
+
+Status:
+`VALIDATION_REFRESH_FOUND / WORKFLOW_REPAIR_ATTEMPTED_FOUND / PR25_HEAD_ADVANCED / GITHUB_MERGEABLE_CLEAN / CURRENT_MAIN_SIMULATION_PASS / API_LIMIT_FALLBACK_AFTER_PARTIAL_REST / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #25 `plancraft/zone-area-boundary-refinement` latest-main validation refresh after Plan Puzzle Builder repair evidence.
+- Latest checked `origin/main` is `b489e7a320829772e6b89dd2ad8ad548ec339262`.
+- PR #25 branch head advanced from prior ledger head `2fb56655b9d0a4d8d03613f9deee301e047c7966` to `7480b24c7b4e23aab5c2783ee6caf21a729b1002`.
+- GitHub state before API rate-limit fallback: PR #25 is open, non-draft by prior state, `mergeable=true`, `mergeable_state=clean`, and has visible issue comment `4543310426` at `2026-05-26T10:19:29Z` beginning `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`.
+- Current-main merge-tree and diff-check for PR #25 pass against `b489e7a320829772e6b89dd2ad8ad548ec339262`: tree `da8ef4e2c9b3bde98a007df6bc6d2aae17e26fdd`; diff-check exits `0`.
+- PR #25 changed files remain scoped to `docs/CURRENT_PHASE_REVIEW_PACKET.md`, `docs/NEXT_CODEX_HANDOFF.md`, `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`, and `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- PR #22 / #23 / #26 had no new issue comments after `2026-05-26T10:01:09Z` before API rate-limit fallback; local merge-tree / diff-check still pass against `b489e7a`.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #25 current-main simulation against `b489e7a`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if any blocker remains.
+
+Need Commander:
+No unless requesting merge / reject for PR #25.
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, or scope drifts.
+
+### 2026-05-26T10:01:09Z - Repeated Deputy2 ACK silence after `dadf4e3`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / GITHUB_CONNECTOR_TIMEOUT_FALLBACK / REPEATED_ACTIVE_HANDLER_SILENT / TWO_PATROL_NON_RESPONSE / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 current-main final-gate metadata reconciliation after `main` advanced to `dadf4e3`.
+- Latest checked `origin/main` is `dadf4e359e75df46f99dd44b66161a24c1f4ead4`.
+- Prior PR #27 merge remains adopted: Local GPU Worker is on `main` via merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`; no further Local GPU Worker adoption chase is needed.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #27 remains closed / merged. GitHub connector timed out during this patrol; REST fallback returned `mergeable=null` / `mergeable_state=unknown` for active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `dadf4e359e75df46f99dd44b66161a24c1f4ead4`: PR #22 tree `8011fde33c01dedb87b994cdb147290650ac1329`; PR #23 tree `cba192ca4a9ae04b5ecb9b3d10ccfba6984d25c8`; PR #25 tree `219811567a27739a21c0016986d886c042a2fba7`; PR #26 tree `857ca6b032d771f8c803828bd847c1c2a8aefa7e`; all diff-check exits `0`.
+- No newer Deputy Codex-2 visible ACK was found after the `2026-05-26T09:45:22Z` `PENDING_DEPUTY2_ACK` row, and no PR #23 / PR #26 issue comment or review appeared after that row. This is a repeated active-handler silence / two-patrol non-response.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging active PR current-main simulation against `dadf4e3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
+### 2026-05-26T09:45:22Z - Executive current-main ACK recovery after patrol docs advance to `432b231`
+
+Status:
+`STATE_RECONCILIATION / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / MAIN_ADVANCED_DOCS_ONLY / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 current-main final-gate metadata reconciliation after PR #27 and patrol docs advanced `main`.
+- Latest checked `origin/main` is `432b231fb298f2887e300c17e3a9daf70a6f8f4f`.
+- Prior PR #27 merge remains adopted: Local GPU Worker is on `main` via merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`; no further Local GPU Worker adoption chase is needed.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. REST mergeability returned `unknown` during this patrol, but merge refs exist for all four active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `432b231fb298f2887e300c17e3a9daf70a6f8f4f`: PR #22 tree `9176e6eebd9e062a94177d0c7a768d242324922c`; PR #23 tree `eae47f32288d07e813359d856eb3ab65a941ac2e`; PR #25 tree `37a259e1ca012a9f08bee16130170b1a0a5718f4`; PR #26 tree `cb08d0dfca779d99c25ea9ab7d21f7a5e2a632dc`; all diff-check exits `0`.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issues #15-#19, PR #22 / #23 / #25 / #26 / #27 metadata, PR refs, PR #23 / PR #26 issue comments since `2026-05-26T09:07:05Z`, and current-main merge-tree / diff-check outputs.
+- No newer Deputy Codex-2 visible ACK was found after the 09:07 `PENDING_DEPUTY2_ACK` row, and no PR #23 / PR #26 issue comments appeared after 09:07Z. Required visible follow-up remains: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging active PR current-main simulation against `432b231`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
+### 2026-05-26T09:07:05Z - PR #27 merged; Local GPU Worker adopted on `main` `475ffcc`
+
+Status:
+`STATE_RECONCILIATION / PR27_MERGED / LOCAL_GPU_WORKER_ADOPTED_ON_MAIN / VALIDATION_REFRESH_FOUND / ACTIVE_PR_CURRENT_MAIN_SIMULATION_PASS / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 current-main final-gate metadata reconciliation after PR #27 advanced `main`.
+- PR #27 state: closed / merged at `2026-05-26T09:00:21Z`, merge commit `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`. It only introduced `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`; Local GPU Worker is now a `main` resource.
+- Latest checked `origin/main` is `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. GitHub connector currently reports `mergeable=false` for the open PRs after `main` advanced, so current validation uses local Git merge-tree and diff-check.
+- Current-main merge-tree and diff-check pass for all four active PRs against `475ffcc60b3d6f4e6292e1fc440f99a19c6dab36`: PR #22 tree `70445c6d917b4fa9770bf03c5d793851b95d2082`; PR #23 tree `21268d41f992bbb7d0c3aa475fa1112260fc3d5c`; PR #25 tree `386f6646f97cfef64740ad1fec290e1ec8763de7`; PR #26 tree `1f9272e73f51467c34d3e989c9aef6130966c55a`; all diff-check exits `0`.
+- Local GPU Worker branch gate is closed: do not merge `origin/local-ai-workflow` for this purpose and do not continue the clean-branch adoption route unless a future scoped task asks for cleanup.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging active PR current-main simulation against `475ffcc`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if GitHub mergeability remains contradictory after retry.
+- Why no Builder chase exists: PR #27 was a commander-authorized governance merge and the remaining active PRs pass local current-main simulation. Builders should not be asked for new implementation unless a specific PR later shows a real blocker.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
+### 2026-05-26T08:36:24Z - PR #25 refresh and Local GPU Worker branch gate against `2781e2f`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / PR25_HEAD_ADVANCED / CURRENT_MAIN_SIMULATION_PASS / LOCAL_GPU_BRANCH_PUSHED_NOT_MAIN_READY / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility, now with refreshed PR #25 final-gate context. This remains a patrol / metadata ACK problem, not ordinary Builder missing work.
+- Latest checked `origin/main` is `2781e2f03ad67f534a113151e32854ded36c8caa`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `2fb56655b9d0a4d8d03613f9deee301e047c7966`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #25 REST reports `mergeable=true` / `mergeable_state=clean`; latest Codex review comment `4542137002` at `2026-05-26T08:29:55Z` reports no major issues.
+- Current-main merge-tree and diff-check pass for all four active PRs against `2781e2f03ad67f534a113151e32854ded36c8caa`: PR #22 tree `7ee472b11006a57440611b493064c075e4ac2028`; PR #23 tree `94f1bbb431bcbf59884e78998b36b11e0350a15d`; PR #25 tree `14b96db89128c0cbfe60232f15b376179e3a9fb8`; PR #26 tree `85b27cc17659245b0528fd2a60d97757ef85de7a`; all diff-check exits `0`.
+- Local GPU Worker state: `origin/local-ai-workflow` is pushed at `91da4f3e54b423ac84cc9a3d3136707dd8425412` and contains `AGENTS.md`, `scripts/gpu-readonly.ps1`, and `scripts/gpu-readonly.bat`, but `origin/main` does not yet contain the Local GPU Worker section. Diff from `origin/main` to `origin/local-ai-workflow` is broad, so the branch is not clean-main-ready and must not be merged as-is for worker adoption.
+- Required visible follow-up remains: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `2781e2f`, include PR #25 head `2fb5665` refresh, or publish exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory evidence remains.
+- After Deputy Codex-2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26 and for the Local GPU Worker clean-main adoption route.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing. Yes before final Local GPU Worker adoption or merge into `main`.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, scope drifts, or review is explicitly requested.
+
+### 2026-05-26T07:47:53Z - Executive visible ACK recovery after automation prompt repair against `dca29b3`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_REPAIRED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT / PENDING_DEPUTY2_ACK`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. This remains a patrol/metadata ACK problem, not ordinary Builder missing work.
+- Automation repair: `laibe-mvp-executor-patrol` remains `ACTIVE` as the Executive Officer heartbeat; prompt was refreshed to the current short-report patrol instructions, including PR #23 / PR #25 Deputy2 routing, PR #22 / PR #26 final-gate routing, and the no-duplicate Builder / GitHub-comment rule. Schedule and target thread were preserved.
+- Latest checked `origin/main` is `dca29b344ddab3738142addc39c57e7622052794`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft; REST reports `mergeable=true` and `mergeable_state=clean` for all four. Merge refs exist for all four active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `dca29b344ddab3738142addc39c57e7622052794`: PR #22 tree `57b5aa112a198b3fdaea97dd74e7b0852cd36e2b`; PR #23 tree `7b6372d263e87d109415f548eaced6cbbeda3154`; PR #25 tree `dc914fe0fa673f1ef317ace62d98e13daf628d08`; PR #26 tree `66484eacbcea9b6998d1ac982f9484a45006fb11`; all diff-check exits `0`.
+- Sources checked: `AGENTS.md`, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issue / PR metadata, PR refs, PR #23 / PR #26 comments, and current-main merge-tree / diff-check outputs.
+- No newer Deputy Codex-2 visible ACK was found after the prior `PENDING_DEPUTY2_ACK` row. Required visible follow-up remains: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `dca29b3`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains.
+- After Deputy Codex-2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, or scope drifts.
+
+### 2026-05-26T07:24:01Z - Commander direct order after chatroom recovery against `913ccc5`
+
+Status:
+`CHATROOM_RECOVERY_CONFIRMED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DIRECT_ORDERS_PUBLISHED / DEPUTY2_ACK_REQUIRED / DEPUTY_FINAL_GATE_NEXT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. This remains a patrol/metadata ACK problem, not ordinary Builder missing work.
+- Latest checked `origin/main` is `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub state: PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. REST mergeability returned transient `null`, but merge refs exist for all four active PRs.
+- Current-main merge-tree and diff-check pass for all four active PRs against `913ccc5f9cdf35a0f1fd8a1f14c60e788c44210a`: PR #22 tree `f127e4854fd3f8112add696dbbfb714a4522ba3e`; PR #23 tree `7584f780a951d057e60ff8c6f40b22a5a88df13b`; PR #25 tree `c572ccf97df46a186512c5aafc13fa623b20d756`; PR #26 tree `b5a5d410e2de79304562b8430c61fbe92083492c`; all diff-check exits `0`.
+- Required visible follow-up: Deputy Codex-2 must publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` acknowledging PR #23 / PR #26 metadata recovery against `913ccc5`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains.
+- After Deputy Codex-2 ACK, Primary To becomes Deputy Codex for final-gate visibility or exact blocker across PR #22 / PR #23 / PR #25 / PR #26.
+- Why no Builder chase exists: branch heads, scope evidence, merge-tree, and diff-check are stable. Builders should only report `NO_NEW_EVIDENCE_AFTER_CHECK` if their heartbeat fires; no new implementation is requested.
+
+Need Commander:
+No for ACK / visibility routing.
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / P1 / P2, validation is contradicted, or scope drifts.
+
+### 2026-05-26T06:59:41Z - Deputy2 ACK recovery after automation run-now check against `3528ae0`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_CHECKED / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_STABLE_AFTER_RETRY / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. This is not ordinary Builder missing work; branch heads, PR scope, GitHub metadata after retry, and local current-main simulation remain stable.
+- Latest checked `origin/main` is `3528ae0bf6e60d400365a5c0d13deeaba891878b`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Automation check: `laibe-mvp-executor-patrol` remains `ACTIVE` as heartbeat `laibe-executive-officer-10min-patrol` with `RRULE:FREQ=MINUTELY;INTERVAL=9`.
+- GitHub metadata: PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and final reconciled state is `mergeable=true`; REST and connector retry cleared the transient PR #22 / PR #25 stale `mergeable=false` response.
+- Current-main merge-tree and diff-check pass for all four active PRs against `3528ae0bf6e60d400365a5c0d13deeaba891878b`: PR #22 tree `22e10701e2731dc807e05692cc0335ac30bf3ea6`; PR #23 tree `a427e3e67dabbbfacdfe16fa959accf5855b375c`; PR #25 tree `8b7bcb3477a4cc2621e05abec07611982274939d`; PR #26 tree `14a7b02844364bb4a4f0437ee478874688f66c69`; all diff-check exits `0`.
+- Latest visible Deputy2-target row remains `PENDING_DEPUTY2_ACK`; no newer Deputy Codex-2 visible ACK was found in blackboard / ledger / triage / Executive inbox.
+- Required visible follow-up: Deputy Codex-2 should publish `VALIDATION_REFRESH_FOUND` / `ACTION_TAKEN` for PR #23 / PR #26 metadata recovery against `3528ae0`, or exact `BLOCKER_WITH_ATTEMPTED_FIX` if contradictory merge-ref evidence remains.
+- Why no Builder chase exists: PR #23 / PR #26 are metadata reconciliation / ACK visibility, not missing Builder output. Do not post duplicate GitHub comments while branch heads, scope evidence, metadata, and local validation remain stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-26T04:43:22Z - Deputy2 ACK recovery after metadata resolution against `d6baa1e`
+
+Status:
+`STATE_RECONCILIATION / VISIBLE_ACK_RECOVERY / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_CONTRADICTION_RESOLVED / CURRENT_MAIN_SIMULATION_PASS / ACTIVE_HANDLER_SILENT`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 metadata reconciliation ACK visibility. The previous PR #23 / PR #26 connector `mergeable=false` contradiction is resolved by current connector evidence, but Deputy Codex-2 has not yet published a visible ACK in blackboard / ledger / triage / Executive inbox.
+- Latest `origin/main` is `d6baa1e5bd7b5eacdd55d63617cf46dc80bf21fc`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and `mergeable=true`. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+- Current-main merge-tree and diff-check pass for all four active PRs against `d6baa1e5bd7b5eacdd55d63617cf46dc80bf21fc`: PR #22 tree `bdf4f4b81980fb85cda0812426e17d4e3fbf2336`; PR #23 tree `3f729d2b514c564a1f549f055514675a753c36f6`; PR #25 tree `b2bc08f18bfc3dbe0e44aa0b396583d7f9636a6f`; PR #26 tree `45584f743e6b6aadbd71297bd1d63fb3436bc647`; all diff-check exits `0`.
+- Why no Builder chase exists: PR #23 / PR #26 are metadata reconciliation / ACK visibility, not missing Builder output. Branch heads, scope evidence, and local validation are stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
+### 2026-05-26T03:26:22Z - Active PR metadata contradiction reopened against `eb35b1b`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_REOPENED / DEPUTY2_VALIDATION_REFRESH_REQUIRED / DEPUTY_FINAL_GATE_PAUSED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #23 / PR #26 GitHub metadata / merge-ref reconciliation before Deputy Codex final-gate visibility. PR #22 / PR #25 connector mergeability remains restored. Do not loop PR #23 / PR #26 back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `eb35b1b1532fcd9652687aace616980cfddb7280`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. Connector mergeability: PR #22 `true`; PR #23 `false`; PR #25 `true`; PR #26 `false`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `eb35b1b1532fcd9652687aace616980cfddb7280`: PR #22 tree `9a54b9570b279494ad856cddcd9dd8df3b5c83e0`; PR #23 tree `6dc81cdeaf86593b6dc644fcd71c00f5296a26bb`; PR #25 tree `19cc5e2971702986ee7d77d49208240d9cbc8746`; PR #26 tree `145b85775208a2b37c33727dddd21dbb420addf1`; all diff-check exits `0`.
+- Why no merge / reject / close exists: PR #23 / PR #26 connector metadata contradicts local current-main simulation. Deputy Codex-2 owns LOW / MEDIUM GitHub / branch / worktree reconciliation before Deputy Codex can publish final-gate visibility for those PRs.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-26T03:11:32Z - Active PR metadata contradiction cleared against `70fd324`
+
+Status:
+`STATE_RECONCILIATION / AUTOMATION_DELIVERY_CHECKED / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_RESOLVED / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility after PR #25 connector mergeability recovered. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open, non-draft, and `mergeable=true`. The prior PR #25 metadata contradiction is resolved.
+- Current-main merge-tree and diff-check pass for all four active PRs against `70fd324c5cc1710ee40b4e1afb0cbd8a174601c0`: PR #22 tree `426ca3144945b55434a1b22314e094fc6b3c15cc`; PR #23 tree `46ebbcb07db16745565f57d0e785db6fe31a0212`; PR #25 tree `7be8b59fb2b0ab9e8e60221e589fc50d2e012955`; PR #26 tree `eadedeee5c783714be4236b5018c62afd63821df`; all diff-check exits `0`.
+- Local Codex automation configs for the active patrol/chatroom lanes remain `ACTIVE`; if a target chatroom does not visibly report after manual run-now, classify that target as `AUTOMATION_TARGET_STALE` rather than reassigning Builder work.
+- PR #22 and PR #26 have no review threads. PR #23 and PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; this remains a Deputy final-gate manual-thread policy item.
+- Why no Builder chase exists: active work is Deputy final-gate visibility / exact blocker publication. Builder branch heads, connector mergeability, current-main validation, and scope evidence are stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-26T02:57:55Z - Active PR metadata contradiction narrowed against `393c498`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION_NARROWED / DEPUTY2_VALIDATION_REFRESH_REQUIRED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #25 remaining GitHub metadata / merge-ref reconciliation before Deputy Codex final-gate visibility. PR #22 / PR #23 / PR #26 connector mergeability is restored this patrol. Do not loop PR #25 back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `393c4981381e9f8a7655e1e07fa6b4b0601293a7`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. Connector mergeability: PR #22 `true`; PR #23 `true`; PR #25 `false`; PR #26 `true`. Issue #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+- Current-main merge-tree and diff-check pass for all four active PRs against `393c4981381e9f8a7655e1e07fa6b4b0601293a7`: PR #22 tree `944dcfc6fc6a2d353a71915f7d22187ca52eb36a`; PR #23 tree `cf3742b446be6dfc42a8f7514b342f1418ec9c6f`; PR #25 tree `f5d31a7fa43c92c3af3bce039c108c10644209b7`; PR #26 tree `86784dafc49dd5569af8e6e628a90d23a2834c9c`; all diff-check exits `0`.
+- Latest visible clean / validation evidence remains: PR #22 clean Codex `4531356014` and latest discussion `4531941286`; PR #23 clean Codex `4537316105`; PR #25 clean Codex `4536168380`; PR #26 current-main evidence `4532187707`.
+- PR #22 and PR #26 have no review threads. PR #23 and PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; keep this as a final-gate policy item after metadata reconciliation.
+- Why no merge / reject / close exists: PR #25 connector metadata still contradicts local current-main simulation. Deputy Codex-2 owns LOW / MEDIUM GitHub / branch / worktree reconciliation before Deputy Codex can publish final-gate visibility for PR #25.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T23:39:20Z - Active PR metadata contradiction reopened against `3081bb4`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION / DEPUTY2_VALIDATION_REFRESH_REQUIRED / DEPUTY_FINAL_GATE_PAUSED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 GitHub metadata / merge-ref reconciliation before Deputy Codex final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `3081bb4f6a187d36a463077ff0dd2865b1262283`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft, but reports `mergeable=false` for all four while connector base SHAs still point at older main commits. Issue #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+- Current-main merge-tree and diff-check pass for all four active PRs against `3081bb4f6a187d36a463077ff0dd2865b1262283`: PR #22 tree `1b2b63030765102710c8bb8bcac2d4392f2a30db`; PR #23 tree `75c93211343f7205e9ddc9bb36b7d208a6e8b7db`; PR #25 tree `a728a3b3e15ce2c31d92a9ee834d9b9ef6c1e432`; PR #26 tree `d03968c5466be51d1ca324e6c8d32d11caf87080`; all diff-check exits `0`.
+- Latest visible clean / validation evidence remains: PR #22 clean Codex `4531356014` and latest discussion `4531941286`; PR #23 clean Codex `4537316105`; PR #25 clean Codex `4536168380`; PR #26 current-main evidence `4532187707`.
+- PR #22 and PR #26 have no review threads. PR #23 and PR #25 have unresolved repaired-thread metadata despite fix replies and later clean Codex evidence; keep this as a final-gate policy item after metadata reconciliation.
+- Why no merge / reject / close exists: connector metadata now contradicts local current-main simulation. Deputy Codex-2 owns the LOW / MEDIUM GitHub / branch / worktree reconciliation before Deputy Codex can publish final-gate visibility.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T23:29:19Z - Active PR final-gate watch refreshed against `8586f70`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / NO_NEW_EVIDENCE_AFTER_CHECK / ACTIVE_HANDLER_SILENT / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility after latest-main validation refresh. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes, or Deputy explicitly reroutes repair.
+- Latest `origin/main` is `8586f70dc3a825ed00abe54e24b7c24b96e23fe8`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub REST confirms PR #22 / PR #23 / PR #25 / PR #26 are open, non-draft, and `mergeable=true`; Issue #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed.
+- Current-main merge-tree and diff-check pass for all four active PRs against `8586f70dc3a825ed00abe54e24b7c24b96e23fe8`: PR #22 tree `f28c4f321749ff54853aeed07798c9c676f73cb0`; PR #23 tree `5d6fa6f116907840af1c5cbb18260da004eb877f`; PR #25 tree `035f352986eb90088ce7bc716db2c299b1c53eaa`; PR #26 tree `5723c4761ee3dcc01bd92b32d2cbbc9d5fa4e028`; all diff-check exits `0`.
+- Latest visible PR discussion evidence has no newer Deputy final-gate ACK after the prior clean signals: PR #22 latest discussion `4531941286`; PR #23 clean Codex `4537316105`; PR #25 clean Codex `4536168380`; PR #26 current-main evidence `4532187707`.
+- PR #22 and PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with Builder fix replies and latest clean Codex evidence after `f882b90`. PR #25 has unresolved repaired-thread metadata plus outdated historical thread metadata; latest clean Codex evidence exists after `1835e29`, but one historical P2 fix was reported in review/comment flow rather than inline thread reply.
+- Why no executable Executive change exists: active work remains Deputy final-gate visibility and manual-thread policy. Executive has no authority to merge, reject, close, or decide manual review-thread policy, and should not post duplicate GitHub comments while branch heads, validation, and Codex results remain stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T22:40:19Z - Active PR metadata refresh sustained against `d0bb669`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_STALE_BUT_MERGEABLE / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility after latest-main validation refresh. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes, or Deputy explicitly reroutes repair.
+- Latest `origin/main` is `d0bb6698181933713b016de6ead732cfac310a36`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 are open, non-draft, and `mergeable=true`. Their connector `base_sha` / `merge_commit_sha` values still point at older bases or merge refs, so treat this as stale PR metadata while current-main simulation passes.
+- Current-main merge-tree and diff-check pass for all four active PRs against `d0bb6698181933713b016de6ead732cfac310a36`: PR #22 tree `eb578203f58c6736da7fa8aa476d0fe56507853b`; PR #23 tree `5444319b9f6d3661ef4ba4e8282160bc9fbf5f2d`; PR #25 tree `96190340f18e9a686046bc0e32058b175dad5132`; PR #26 tree `88829855974aa463e78c3f6432c087c2204f7f03`; all diff-check exits `0`.
+- PR #22 and PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with Builder fix replies and latest clean Codex evidence after `f882b90`. PR #25 has unresolved repaired-thread metadata plus outdated historical thread metadata; latest clean Codex evidence exists after `1835e29`, but one historical P2 fix was reported in review/comment flow rather than inline thread reply.
+- Why no ordinary Executive chase exists: active work remains Deputy final-gate visibility and manual-thread policy. Executive should not post duplicate GitHub comments while branch heads, validation, and Codex results remain stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T22:32:46Z - Active PR metadata contradiction cleared against `71c02f0`
+
+Status:
+`STATE_RECONCILIATION / VALIDATION_REFRESH_FOUND / GITHUB_METADATA_CONTRADICTION_RESOLVED / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility after Deputy2 metadata refresh evidence. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes, or Deputy explicitly reroutes repair.
+- Latest `origin/main` is `71c02f0143be0876291d84cd22232d3782b4d7e1`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- GitHub connector confirms Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed/completed. PR #22 / PR #23 / PR #25 / PR #26 are open, non-draft, and `mergeable=true`; the 22:18Z PR #22 / PR #25 / PR #26 metadata contradiction is resolved.
+- Current-main merge-tree and diff-check pass for all four active PRs against `71c02f0143be0876291d84cd22232d3782b4d7e1`: PR #22 tree `63894f62c463dda6d9b527abd86878b951ec369b`; PR #23 tree `ef3f7c37723e41417556b8a718cbb8025da5446c`; PR #25 tree `5b617b3fc555fc0b54598a9be2c6d78420ee8498`; PR #26 tree `76d2db942a573572d1d624294bfa5540c518e74e`; all diff-check exits `0`.
+- PR #22 and PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with Builder fix replies and latest clean Codex evidence after `f882b90`. PR #25 has unresolved repaired-thread metadata plus outdated historical thread metadata; latest clean Codex evidence exists after `1835e29`, but one historical P2 fix was reported in review/comment flow rather than inline thread reply.
+- Why no ordinary Executive chase exists: active work is now Deputy final-gate visibility and manual-thread policy. Executive cannot merge / reject / close and should not post duplicate GitHub comments while branch heads, validation, and Codex results remain stable.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T22:18:02Z - Active PR metadata contradiction against `afac58d`
+
+Status:
+`STATE_RECONCILIATION / LOCAL_STATE_STALE_CORRECTED / CURRENT_MAIN_SIMULATION_PASS / GITHUB_METADATA_CONTRADICTION / DEPUTY2_VALIDATION_REFRESH_REQUIRED`
+
+Decision:
+- Primary To: Deputy Codex-2.
+- Applies to: PR #22 / PR #25 / PR #26 GitHub metadata / merge-ref reconciliation, plus PR #23 final-gate evidence awareness. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `afac58d7951c70888bb71973b8482d3d04fda7da`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `afac58d7951c70888bb71973b8482d3d04fda7da`: PR #22 tree `2b56e353c05a4e06690ad0ce0c15185a4712da88`; PR #23 tree `ab336642d1dee6cb57b192fc6754e381c96b5759`; PR #25 tree `4fc7548de0cd507fe9288c67d68686a2ecf4067d`; PR #26 tree `09ada2794733c7142aabf22144a13ed3ae47ca88`; all diff-check exits `0`.
+- GitHub connector confirms PR #22 / PR #23 / PR #25 / PR #26 remain open and non-draft. PR #23 reports `mergeable=true`; PR #22 / PR #25 / PR #26 report `mergeable=false` while local current-main merge-tree passes. This contradiction requires Deputy Codex-2 validation refresh or blocker publication before Deputy final-gate action.
+- Issue-state evidence remains the 22:09Z connector check: #15 / #16 / #17 / #18 open and #19 closed/completed; no contradictory PR / branch evidence was found this cycle.
+- PR #22 and PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with Builder fix replies and latest clean Codex evidence after `f882b90`. PR #25 has unresolved repaired-thread metadata plus outdated historical thread metadata; latest clean Codex evidence exists after `1835e29`, but one historical P2 fix was reported in review/comment flow rather than inline thread reply.
+- Why no ordinary Executive chase exists: active work is now a metadata reconciliation / final-gate visibility problem, not missing Builder output. Executive should not post duplicate GitHub comments unless Deputy Codex-2 reports no visible ACK next patrol.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T22:09:17Z - Active PR final-gate reconfirmed against `e17da06`
+
+Status:
+`STATE_RECONCILIATION / NO_NEW_EVIDENCE_AFTER_CHECK / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes, or Deputy explicitly reroutes repair.
+- Latest `origin/main` is `e17da0682f8c2ab84646a39b4880eb218f25f2b1`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `e17da0682f8c2ab84646a39b4880eb218f25f2b1`: PR #22 tree `e8ca6838c31c623596495e9de83949242a092085`; PR #23 tree `2060c5c97a43b3e6873e06800ebd4fc0ce98556d`; PR #25 tree `6fcda8ca4afd77856327a08800a25354a721edff`; PR #26 tree `d00650e23e468cf83e4a16ef1e5a5420bce6a83c`; all diff-check exits `0`.
+- GitHub connector confirms Issues #15 / #16 / #17 / #18 open and Issue #19 closed/completed. PR #22 / #23 / #25 / #26 remain open, mergeable, and non-draft.
+- PR #22 and PR #26 have no review threads.
+- PR #23 has unresolved repaired-thread metadata for `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, each with Builder fix replies and latest clean Codex evidence after `f882b90`. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- PR #25 has unresolved repaired-thread metadata for non-outdated `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj`, plus outdated historical `PRRT_kwDORlw1t86EmLZ2` without a visible fix reply. Deputy Codex should decide whether this requires manual thread resolution, validation refresh, or exact blocker publication before final gate.
+- Why no further Executive executable change exists: active handlers are already routed to Deputy final gate; Executive cannot merge / reject / close, and no branch-head, validation, or new Codex blocker evidence appeared after the latest clean results.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T21:51:15Z - Active PR final-gate reconfirmed against `3cb1d07`
+
+Status:
+`LOCAL_STATE_STALE_CORRECTED / NO_NEW_EVIDENCE_AFTER_CHECK / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `3cb1d079804f5dbfd121726b4119b185aae096f6`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `3cb1d079804f5dbfd121726b4119b185aae096f6`: PR #22 tree `dbc3f04460145a8f210c27aba13466fca49a02d1`; PR #23 tree `747c18571705238ddb9ba9d1c4921bc1c6ffad7f`; PR #25 tree `af769b29956be7d3a02a98e31a1f26e2fce5f886`; PR #26 tree `66e1f0738a764a4f541db5cfa57bb9763a1bd8ce`; all diff-check exits `0`.
+- GitHub PR metadata confirms PR #22 / #23 / #25 / #26 remain open, mergeable, and non-draft. `gh` CLI is unavailable and unauthenticated REST issue checks returned 403, so issue-state evidence remains the prior 21:33Z connector check (#15 / #16 / #17 / #18 open, #19 closed) with no contradictory PR / branch evidence found this cycle.
+- PR #23 has clean Codex comment `4537316105` after `f882b90`; unresolved non-outdated review-thread metadata still exists for repaired P2s `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, with Builder fix replies. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- PR #25 has clean Codex comment `4536168380` after `1835e29`; unresolved non-outdated review-thread metadata still exists for repaired P2s `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj`, with Builder fix replies, plus outdated historical P2 metadata. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- Why no further Executive executable change exists: active handlers are already routed to Deputy final gate; Executive cannot merge / reject / close, and no branch-head, validation, or new Codex blocker evidence appeared after the latest clean results.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T21:33:47Z - Active PR final-gate reconfirmed against `46e7654`
+
+Status:
+`NO_NEW_EVIDENCE_AFTER_CHECK / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `46e76543f975b5a01ff03a973cb71dd64d21b835`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `46e76543f975b5a01ff03a973cb71dd64d21b835`: PR #22 tree `5a4631e517f69d8b874af0e85a727ae5c43084f9`; PR #23 tree `8ac12821761b518138b60c15cbdfcce7a4de64e3`; PR #25 tree `88212a9e7b499c9bb80e3eee0022aa197fab47c8`; PR #26 tree `1d15419916131be330476afc7627cdaf1164617d`; all diff-check exits `0`.
+- GitHub connector confirms Issues #15 / #16 / #17 / #18 open and Issue #19 closed; PR #22 / #23 / #25 / #26 remain open. PR #22 and PR #26 have no review threads.
+- PR #23 has clean Codex comment `4537316105` after `f882b90`; unresolved non-outdated review-thread metadata still exists for repaired P2s `PRRT_kwDORlw1t86Ek4WY`, `PRRT_kwDORlw1t86En1Yw`, and `PRRT_kwDORlw1t86EoBgM`, with Builder fix replies. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- PR #25 has clean Codex comment `4536168380` after `1835e29`; unresolved non-outdated review-thread metadata still exists for repaired P2s `PRRT_kwDORlw1t86EiIRW` and `PRRT_kwDORlw1t86EjhCj`, with Builder fix replies. Deputy Codex should decide whether manual thread resolution is required before final gate.
+- Why no further Executive executable change exists: active handlers are already routed to Deputy final gate; Executive cannot merge / reject / close, and no branch-head, validation, or new Codex blocker evidence appeared after the latest clean results.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T21:26:11Z - Active PR final-gate reconfirmed against `9b820a2`
+
+Status:
+`LOCAL_STATE_STALE_CORRECTED / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #23 / PR #25 / PR #26 final-gate visibility. Do not loop back to ordinary Builder chase unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `9b820a25e8c1186331782c8079c0ff703278cfbb`.
+- Branch heads: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`.
+- Current-main merge-tree and diff-check pass for all four active PRs against `9b820a25e8c1186331782c8079c0ff703278cfbb`: PR #22 tree `452091d97c7859dbb49bf5f0549dcfe68a7e7226`; PR #23 tree `efbf407a4a52ef0a327b2998ff76d0934fe386cc`; PR #25 tree `175155b391b36d0eb5348207076c89b1cabc9655`; PR #26 tree `c64863e82216204d2abe784dc712bafe8c8bebf0`; all diff-check exits `0`.
+- PR #23 clean Codex comment `4537316105` after `f882b90` remains controlling; GitHub review-thread metadata still lists older P2 threads as unresolved, with Builder fix replies present. Deputy Codex should treat that as a final-gate check item, not an ordinary Output Documents Builder chase, unless a new Codex blocker appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, repair scope drifts, or Deputy requires manual review-thread resolution.
+
+### 2026-05-25T21:22:48Z - PR23 Codex clean after `f882b90`
+
+Status:
+`CODEX_REVIEW_CLEAN / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #23 final-gate visibility. PR #22 / PR #25 / PR #26 remain separate Deputy final-gate visibility candidates unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `f405d715751bc6c5235b879eac91f7e1092c33f7`; PR #23 head remains `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`.
+- Output Documents Builder `ACTION_TAKEN` comment `4537294884` and review-thread reply `3299985379` fixed the non-array warning P2.
+- Codex returned clean after `f882b90` in PR comment `4537316105` at `2026-05-25T21:22:48Z`.
+- Current-main merge-tree against `f405d715751bc6c5235b879eac91f7e1092c33f7` exits `0` with tree `07a51506c6b3d757d50df3628eb5520ec0263030`; diff-check exits `0`.
+- Executive must not merge / reject / close. Deputy Codex should publish final-gate decision visibility or exact blocker after reconfirming no branch-head change, scope drift, new Codex blocker, validation contradiction, or post-publication merge-tree conflict.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or repair scope drifts.
+
+### 2026-05-25T21:21:59Z - PR23 ACTION_TAKEN found after `f882b90`
+
+Status:
+`SUPERSEDED_BY_2026-05-25T21:22:48Z_CODEX_CLEAN / ACTION_TAKEN_FOUND / CODEX_REVIEW_REQUESTED / CURRENT_MAIN_SIMULATION_PASS / REVIEW_RESULT_PENDING`
+
+Decision:
+- Primary To: Output Documents Builder / Codex re-review watch.
+- Applies to: PR #23 only. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `907802a2ca6f13882a7a88c54e14bda9c0d145e6`; PR #23 head advanced to `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`.
+- Output Documents Builder posted `ACTION_TAKEN` comment `4537294884` and review-thread reply `3299985379`, reporting a non-array guard before `.map()`, focused smoke coverage for `undefined`, `null`, string, object, and mixed-array warning inputs, renderer static guard pass, syntax pass, diff-check pass, no real `.xlsx` / `.pdf` changes, snapshot-only boundary preservation, and `@codex review`.
+- Post-publication current-main merge-tree against `907802a2ca6f13882a7a88c54e14bda9c0d145e6` exits `0` with tree `d1639e4a9a29c2eb5118e809291f2f2ca1d4e6d3`; diff-check exits `0`.
+- No post-`f882b90` clean Codex re-review result is visible yet.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the post-`f882b90` Codex result is clean.
+
+### 2026-05-25T21:15:40Z - PR23 active handler silent after `4537214455`
+
+Status:
+`SUPERSEDED_BY_2026-05-25T21:21:59Z_ACTION_TAKEN / ACTIVE_HANDLER_SILENT / VISIBLE_ACK_RECOVERY / EXECUTIVE_INBOX_FOLLOWUP_PUBLISHED / REVIEW_GATE_BLOCKED`
+
+Decision:
+- Primary To: Output Documents Builder.
+- Applies to: PR #23 only. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless branch, validation, review, or scope evidence changes.
+- Latest `origin/main` is `f8c430a3305978ff320ac3264c77169ccb424f26`; PR #23 head remains `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`.
+- No visible Output Documents Builder ACK, branch-head update, validation refresh, or blocker-with-attempted-fix was found after Executive PR follow-up comment `4537214455`.
+- PR #23 current-main merge-tree is clean against `f8c430a3305978ff320ac3264c77169ccb424f26`: tree `77083d9f26ce0e61ae0492e2649f8ae1f771d0b1`; diff-check exits `0`.
+- Review gate remains Codex review `4358750718`, thread `PRRT_kwDORlw1t86EoBgM`, `src/lib/budget/renderers/customer-warning-sanitizer.ts` lines 20-21, P2 `Guard non-array warnings before mapping`.
+- Executive skipped a duplicate GitHub comment and published a visible inbox follow-up. Required ACK remains `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, repair attempt, validation, and Codex re-review status.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
+### 2026-05-25T21:00:00Z - PR23 follow-up Codex P2 after `f2668e2`
+
+Status:
+`SUPERSEDED_BY_2026-05-25T21:15:40Z_ACTIVE_HANDLER_SILENT / CODEX_P2_FOUND_AFTER_ACTION_TAKEN / REVIEW_GATE_BLOCKED / VISIBLE_ACK_RECOVERY / BUILDER_ACK_REQUIRED`
+
+Decision:
+- Primary To: Output Documents Builder.
+- Applies to: PR #23 only. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless branch, validation, review, or scope evidence changes.
+- Supersedes the `2026-05-25T20:41:28Z` PR #23 P2 row because Output Documents Builder posted `ACTION_TAKEN` comment `4537194620` and advanced PR #23 to `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`, but GitHub MCP then found a new post-fix Codex P2 at `2026-05-25T21:02:05Z`.
+- PR #23 current-main merge-tree is clean against `23cb3572227076e0216b8e757a70c247fd266c89`: tree `666a5611331bfef325a8fcb0970e1013b6a22deb`; diff-check exits `0`.
+- New review gate: Codex review `4358750718`, thread `PRRT_kwDORlw1t86EoBgM`, `src/lib/budget/renderers/customer-warning-sanitizer.ts` lines 20-21, P2 `Guard non-array warnings before mapping`.
+- Executive posted single-primary PR follow-up comment `4537214455` asking Output Documents Builder for `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`.
+- Required repair must preserve snapshot-only boundaries: no real `.xlsx` / `.pdf`, no budget engine rerun, no pricing rules, no formal output, no raw warehouse, no frontend/payment/API/RAG/secrets work.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
+### 2026-05-25T20:41:28Z - PR23 Codex P2 found after final sync
+
+Status:
+`SUPERSEDED_BY_2026-05-25T21:00:00Z_FOLLOWUP_P2 / CODEX_P2_FOUND / REVIEW_GATE_BLOCKED / BUILDER_ACTION_FOUND`
+
+Decision:
+- Primary To: Output Documents Builder.
+- Applies to: PR #23 only. PR #22 / PR #25 / PR #26 remain Deputy final-gate visibility candidates unless branch, validation, review, or scope evidence changes.
+- Supersedes the `2026-05-25T20:33:55Z` PR #23 final-gate routing because GitHub MCP found a post-`47dd4ac` Codex P2 at `2026-05-25T20:36:35Z`.
+- PR #23 final sync is still current-main merge-tree clean against `326db8a39c7e4b2b95ee119c85b07fca376a0301`: tree `6dca710c0206fcee0b661ab5cea39147e653cb28`; diff-check exits `0`.
+- New review gate: Codex review `4358680834`, thread `PRRT_kwDORlw1t86En1Yw`, `src/lib/budget/renderers/customer-warning-sanitizer.ts` line 14, P2 `Handle non-string warnings before sanitizing`.
+- Executive posted single-primary PR follow-up comment `4537133554` asking Output Documents Builder for `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX`; Builder later responded with `ACTION_TAKEN` comment `4537194620`, which was followed by a new Codex P2 at `2026-05-25T21:02:05Z`.
+- Required repair must preserve snapshot-only boundaries: no real `.xlsx` / `.pdf`, no budget engine rerun, no pricing rules, no formal output, no raw warehouse, no frontend/payment/API/RAG/secrets work.
+
+Need Commander:
+No
+
+Need Reviewer:
+Yes until the P2 is fixed and Codex re-review is clean.
+
+### 2026-05-25T20:33:55Z - PR23 final sync found
+
+Status:
+`SUPERSEDED_FOR_PR23_BY_2026-05-25T20:41:28Z_CODEX_P2 / FINAL_SYNC_FOUND / CURRENT_MAIN_MERGE_TREE_PASS / API_LIMIT_FALLBACK`
+
+Decision:
+- Primary To: Deputy Codex.
+- Applies to: PR #22 / PR #25 / PR #26 final gate. PR #23 was superseded by a new post-head Codex P2 found at `2026-05-25T20:36:35Z`.
+- Supersedes the `2026-05-25T20:12:33Z` PR #23 final-sync request. Output Documents Builder final sync is now found by branch-head / ref evidence: PR #23 advanced from `eb7caa738431c0624c30c3242e8d28b0b4b618e9` to `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`.
+- PR #23 final-sync delta changes only patrol docs from the old PR #23 head; no source implementation files changed after the prior clean `eb7caa7` head.
+- PR #23 current-main merge-tree against `6a154321a35861c006653f9b7312e0c1f63ff5a6` exits `0` with tree `1e90b58f84ae516e7c3e6b0dba587ece7499db83`; diff-check exits `0`; `refs/pull/23/merge` exists at `cf1a40400d296c43a8a66574ff6ebd32af0f4dfd`.
+- PR #22 / PR #25 / PR #26 also pass current-main merge-tree and diff-check against `6a15432`: trees `1f54374a6f254985cfdc450e8c43134d8608881b`, `a53c08a2b5b23fd54ab739f18cdb3c10cbafefe3`, and `bcd325953692d599a978125c3a2c04fddad468b9`.
+- GitHub REST comments / review comments are rate-limited this cycle, so refs and local simulations are controlling evidence.
+- Do not issue another ordinary Output Documents Builder sync chase unless PR #23 branch head, validation evidence, review evidence, or scope evidence changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-output risk appears, or scope drifts.
+
+### 2026-05-25T20:12:33Z - PR23 patrol-doc sync loop break
+
+Status:
+`DEPUTY_LOOP_BREAK_DECISION / FINAL_SYNC_REQUESTED / PATROL_DOC_FREEZE_WINDOW`
+
+Decision:
+- Primary To: Output Documents Builder.
+- Applies to: PR #23 `output/renderer-static-guard-review-packet`.
+- Supersedes older PR #23 row states that say only `DEPUTY_LOOP_BREAK_ACK_PENDING_AFTER_A705674`.
+- After this decision publication lands on `main`, Output Documents Builder should fetch latest `origin/main`, sync PR #23 against that latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, preserve PR #23 source / validation scope, rerun renderer static guard and diff-check evidence, then report `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX`.
+- Until that final sync result is visible, patrols should not publish more no-new-evidence docs-only commits for PR #23. Publish again only if a PR branch head changes, a new GitHub comment / review appears, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, or Commander / Reviewer escalation criteria appear.
+
+Final-gate visibility:
+- PR #22 / PR #25 / PR #26 are current-main merge-tree and diff-check clean against pre-publication `404ee842789c2cfca74e925cdd8747c30b93f8e2`; they are held in `HOLD_STABLE_MAIN_WINDOW` until PR #23 final sync lands or new branch / review evidence appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless a branch changes, Codex reports `NEEDS_FIX` / `P1` / `P2`, validation is contradicted, formal-price risk appears, or scope drifts.
+
+## Delivery Table
+
+| Workstream | Issue / PR | Primary Owner | Branch | Branch SHA | PR URL | Current State | Last Effective Artifact | Validation / Checks | Missed Cycles | Current Handler | Next Required Action | Escalation Level | Need Commander | Need Reviewer |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Plan Puzzle | Issue #15 / PR #25 | Plan Puzzle Builder | `plancraft/zone-area-boundary-refinement` | `1835e29` | `https://github.com/laibeoffer/laibe-mvp/pull/25` | `P2_FIX_ACTION_TAKEN / CODEX_REVIEW_CLEAN / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING_AFTER_A705674` | PR #25 advanced to `1835e292caea35b4758276c7002c09d2e9c1dada`. Plan Puzzle Builder published `PLAN_PUZZLE_ACTION_TAKEN` in review `4358124195` at `2026-05-25T17:49:58Z`, targeting Codex P2 `discussion_r3299302339` on endpoint-on-edge self-intersections. Codex returned post-fix clean comment `4536168380` at `2026-05-25T17:54:38Z`. No Deputy Codex merge / reject / blocker ACK is visible after the `20:06` latest-main ACK check. | Current-main simulation against `a7056744ec4668f31d7435a7e26a3d0901de0fc8` passes: `git merge-tree --write-tree origin/main refs/patrol/hb2006/pr25` exits `0` with tree `02636a0e1ce35ac8c139773c81324ed3b3dbf48a`; `git diff --check origin/main..refs/patrol/hb2006/pr25` exits `0`. Builder reported `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` PASS, `git diff --check origin/main...HEAD` PASS, merge-tree PASS, `refs/pull/25/merge` `7e4e592d45501eea0c0bada40cb63a340d7cc18b`, and allowed / forbidden scope PASS. PR diff remains limited to Issue #15 allowed files. | 6 | Deputy Codex | Publish final-gate decision visibility or exact blocker for PR #25. Reconfirm no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict before any merge / reject decision. Stop ordinary Plan Puzzle Builder chase unless evidence changes. | HIGH / DEPUTY_DECISION_REQUIRED_AFTER_A705674 | No | No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drifts |
+| Raw Candidate | Issue #17 / PR #26 | Raw Candidate Builder | `warehouse/raw-source-quality-scoring` | `7853fe7` | `https://github.com/laibeoffer/laibe-mvp/pull/26` | `VALIDATION_REFRESH_FOUND / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING_AFTER_A705674` | PR #26 previously had Executive validation `4531540239`, Codex clean result `4531555287`, and Deputy gate routing `4531573641`. The missing current-main validation refresh was posted in PR comment `4532187707`; Commander patrol on `origin/main` `1c40007` confirms fetched PR head `7853fe7` and `git merge-tree --write-tree origin/main refs/patrol/pr26` exits `0`. No current Deputy Codex merge / reject / blocker ACK is visible after the `20:06` latest-main ACK check. | Current-main R1.5 validation refresh reported pass: source quality scoring, raw warehouse static guard, syntax checks, prior raw demos, proposal contract, warehouse export safety, observed price safety, and forbidden formal-pricing checks. Latest current-main simulation against `a7056744ec4668f31d7435a7e26a3d0901de0fc8` passes: `git merge-tree --write-tree origin/main refs/patrol/hb2006/pr26` exits `0` with tree `4737258e067890bed5163d4bddf83604331987a4`; `git diff --check origin/main..refs/patrol/hb2006/pr26` exits `0`. Evidence remains candidate-only: no formal price, no `PricingRule`, no formal `MaterialSpec` / `LaborRule`, no `BudgetEstimateLine.unit_price`, no renderer / Excel / PDF / `BudgetOutputSnapshot`, no floor-plan / frontend / Supabase/API/migration / RAG / AI API / payment / escrow / listing fee. | 6 | Deputy Codex | Publish final-gate decision visibility or exact blocker for PR #26. No ordinary Raw Candidate chase unless branch head changes, validation evidence is contradicted, formal-price risk appears, or Codex reports NEEDS_FIX / P1 / P2. | HIGH / DEPUTY_DECISION_REQUIRED_AFTER_A705674 | No | No unless new Codex review reports NEEDS_FIX / P1 / P2, formal-price risk, or scope drift |
+| MethodSpec | Issue #16 / PR #22 | MethodSpec Builder | `warehouse/method-spec-validator-freeze-note` | `e338431` | `https://github.com/laibeoffer/laibe-mvp/pull/22` | `DEPUTY_SIGNAL_ACCEPTED / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING_AFTER_A705674` | PR #22 has clean Codex result `4531356014`. Commander patrol on `origin/main` `1c40007` finds fetched PR head `e338431`, `git merge-tree --write-tree origin/main refs/patrol/pr22` exits `0`, and base-to-head changed files remain limited to Issue #16 allowed docs: `docs/budget/32-method-spec-validator-freeze-note.md`, `docs/NEXT_CODEX_HANDOFF.md`, and `docs/CURRENT_PHASE_REVIEW_PACKET.md`. No current Deputy Codex merge / reject / blocker ACK is visible after the `20:06` latest-main ACK check. | No source files, no review threads, and no formal price / renderer / raw warehouse / frontend scope. Latest current-main simulation against `a7056744ec4668f31d7435a7e26a3d0901de0fc8` passes: `git merge-tree --write-tree origin/main refs/patrol/hb2006/pr22` exits `0` with tree `b3d557435e0188e8886125c9048bf08a2d11a9d9`; `git diff --check origin/main..refs/patrol/hb2006/pr22` exits `0`. | 6 | Deputy Codex | Publish final-gate decision visibility or exact blocker for PR #22. Stop ordinary MethodSpec owner chase unless branch head changes; request Codex re-review only if the PR head changes. | HIGH / DEPUTY_DECISION_REQUIRED_AFTER_A705674 | No | No unless branch changes or Codex review reports NEEDS_FIX / P1 / P2 |
+| Output Documents | Issue #18 / PR #23 | Output Documents Builder | `output/renderer-static-guard-review-packet` | `f882b90` | `https://github.com/laibeoffer/laibe-mvp/pull/23` | `CODEX_REVIEW_CLEAN_AFTER_F882B90 / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_VISIBILITY_PENDING` | Output Documents Builder answered the `4537214455` follow-up with `ACTION_TAKEN` comment `4537294884` and review-thread reply `3299985379`; PR #23 advanced to `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b` with commit `fix(renderer): guard non-array customer warnings`, changing only `src/lib/budget/renderers/customer-warning-sanitizer.ts` relative to `f2668e2`. Builder reported non-array warning smoke coverage, renderer static guard pass, renderer TypeScript syntax loop pass, diff-check pass, no real `.xlsx` / `.pdf` changes, snapshot-only boundary preservation, and `@codex review`. Codex returned clean after `f882b90` in PR comment `4537316105` at `2026-05-25T21:22:48Z`. | Current-main simulation against `f405d715751bc6c5235b879eac91f7e1092c33f7` passes: `git merge-tree --write-tree origin/main refs/patrol/hb2115-final/pr23` exits `0` with tree `07a51506c6b3d757d50df3628eb5520ec0263030`; `git diff --check origin/main..refs/patrol/hb2115-final/pr23` exits `0`. Builder's own validation against `f8c430a3305978ff320ac3264c77169ccb424f26` also reported merge-tree pass tree `12cae3e719d9378aa95be8fc50d8d59e54585a48`. | 0 | Deputy Codex | Publish final-gate decision visibility or exact blocker for PR #23. Reconfirm no branch-head change, scope drift, new Codex blocker, validation contradiction, or post-publication merge-tree conflict before any merge / reject decision. Stop ordinary Output Documents Builder chase unless evidence changes. | HIGH / DEPUTY_DECISION_REQUIRED_AFTER_F882B90 | No | No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drifts |
+| Visual Simulation | Issue #19 / PR #24 | Visual Simulation | `visual/simulation-governance` | Completed / historical branch `2e7d2c` | `https://github.com/laibeoffer/laibe-mvp/pull/24` | `COMPLETED_WAITING_NEXT_SCOPED_TASK` | Issue #19 closed by merged PR #24. | No real image API / upload; only governance / brief / prompt tasks may continue. | 0 | Deputy watch | Do not restart #19; draft next safe governance / brief task only when assigned. | LOW | No | No |
+| Quote Factory | External Issue #1 / PR #2 | Quote Factory Builder | `qf/qf5-3-audit-override-publish` | branch `eaa399`; main `d075c5` | `https://github.com/laibeoffer/laibe-quote-factory/pull/2` | `COMPLETED_WAITING_QF5_4_DISPATCH` | QF5.3 PR #2 merged; Issue #1 closed; local blackboard should not say PR pending. | QF5.3 validation already reported; do not start QF5.4 without formal dispatch. | 0 | Deputy watch | Only state reconciliation or QF5.4 formal dispatch may reopen work. | LOW | No | No |
+| Site Builder | None | Site Builder | None | N/A | N/A | `TASK_PREVIEW_MISSING` | No current Commander page / CTA / routing / visual-flow dispatch. | N/A | 0 | Deputy / Commander | Requires exact page, CTA, routing, or flow instruction before work. | LOW | Yes if Commander wants new site task | No |
+| LOGO / Brand Visual | None | Brand Visual | None | N/A | N/A | `TASK_PREVIEW_MISSING` | No current Commander visual direction dispatch. | N/A | 0 | Deputy / Commander | Requires exact visual direction before work. | LOW | Yes if Commander wants brand task | No |
+
+## Current Patrol Notes
+
+- `2026-05-25T22:32:46Z`: Executive Officer rechecked latest `origin/main` `71c02f0143be0876291d84cd22232d3782b4d7e1`, mandatory docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issue / PR metadata, PR comments, Codex review results, review threads, fetched PR heads / merge refs, merge-tree, and diff-check. Active PR heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. GitHub connector now reports all four PRs open / non-draft / `mergeable=true`; the 22:18Z metadata contradiction is resolved.
+
+- `2026-05-25T22:32:46Z`: `VALIDATION_REFRESH_FOUND` for active final gates. Against `71c02f0`, all four current-main merge-tree / diff-check checks pass: PR #22 tree `63894f62c463dda6d9b527abd86878b951ec369b`; PR #23 tree `ef3f7c37723e41417556b8a718cbb8025da5446c`; PR #25 tree `5b617b3fc555fc0b54598a9be2c6d78420ee8498`; PR #26 tree `76d2db942a573572d1d624294bfa5540c518e74e`. Required visible ACK returns to single-primary `To: Deputy Codex`: publish `ACTION_TAKEN` final-gate decision visibility or exact blocker for PR #22 / #23 / #25 / #26, including whether PR #23 / #25 unresolved repaired-thread metadata needs manual resolution.
+
+- `2026-05-25T22:09:17Z`: Executive Officer rechecked latest `origin/main` `e17da0682f8c2ab84646a39b4880eb218f25f2b1`, mandatory docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub Issue / PR metadata via connector, review threads, fetched PR heads / merge refs, merge-tree, and diff-check. Active PR heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. All four current-main merge-tree / diff-check checks pass against `e17da06`: PR #22 tree `e8ca6838c31c623596495e9de83949242a092085`; PR #23 tree `2060c5c97a43b3e6873e06800ebd4fc0ce98556d`; PR #25 tree `6fcda8ca4afd77856327a08800a25354a721edff`; PR #26 tree `d00650e23e468cf83e4a16ef1e5a5420bce6a83c`.
+
+- `2026-05-25T22:09:17Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` for active final gates. Issues #15-#18 remain open and Issue #19 remains closed/completed. PR #22 / PR #26 have no review threads. PR #23 has unresolved repaired-thread metadata with fix replies. PR #25 has unresolved repaired-thread metadata plus outdated historical `PRRT_kwDORlw1t86EmLZ2` without a visible fix reply. Required visible ACK remains single-primary `To: Deputy Codex`: publish `ACTION_TAKEN` final-gate decision visibility or exact blocker for PR #22 / #23 / #25 / #26, including whether PR #23 / #25 manual thread resolution or validation refresh is required.
+
+- `2026-05-25T21:33:47Z`: Executive Officer rechecked latest `origin/main` `46e76543f975b5a01ff03a973cb71dd64d21b835`, mandatory docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR metadata/comments/review threads via connector, Issues #15-#19, fetched PR heads, merge-tree, and diff-check. Active PR heads remain PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`, and PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. All four current-main merge-tree / diff-check checks pass against `46e7654`: PR #22 tree `5a4631e517f69d8b874af0e85a727ae5c43084f9`; PR #23 `8ac12821761b518138b60c15cbdfcce7a4de64e3`; PR #25 `88212a9e7b499c9bb80e3eee0022aa197fab47c8`; PR #26 `1d15419916131be330476afc7627cdaf1164617d`.
+
+- `2026-05-25T21:33:47Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` for active final gates. PR #23 and PR #25 still have unresolved review-thread metadata despite Builder fix replies and later clean Codex comments; this is now recorded as a Deputy final-gate manual-thread decision item, not a Builder chase. PR #22 / PR #26 have no review threads. Required visible ACK remains single-primary `To: Deputy Codex`: publish final-gate decision visibility or exact blocker for PR #22 / #23 / #25 / #26.
+
+- `2026-05-25T21:22:48Z`: GitHub PR #23 comments now show Codex clean result `4537316105` after head `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`. PR #23 has Builder `ACTION_TAKEN` `4537294884`, review-thread fix reply `3299985379`, current-main merge-tree pass against `f405d715751bc6c5235b879eac91f7e1092c33f7` with tree `07a51506c6b3d757d50df3628eb5520ec0263030`, and diff-check `0`. Current Handler moves to Deputy Codex for final-gate visibility; Need Reviewer becomes No unless evidence changes.
+
+- `2026-05-25T21:21:59Z post-push`: Executive Officer re-fetched post-publication `origin/main` `907802a2ca6f13882a7a88c54e14bda9c0d145e6` and PR #22 / #23 / #25 / #26 heads. PR #23 advanced to `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; Builder posted `ACTION_TAKEN` comment `4537294884` and review-thread reply `3299985379`; current-main merge-tree exits `0` with tree `d1639e4a9a29c2eb5118e809291f2f2ca1d4e6d3`; diff-check exits `0`. No post-`f882b90` Codex clean / NEEDS_FIX / P1 / P2 result is visible yet, so PR #23 is review-result pending, not Deputy final-gate clean.
+
+- `2026-05-25T21:21:59Z post-push`: Against `907802a2ca6f13882a7a88c54e14bda9c0d145e6`, all four active PRs pass local current-main merge-tree and diff-check: PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, tree `4dbdfb5af0edbfca6edee25aacd5cd59cde13430`; PR #23 head `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, tree `d1639e4a9a29c2eb5118e809291f2f2ca1d4e6d3`; PR #25 head `1835e292caea35b4758276c7002c09d2e9c1dada`, tree `eb01aca52c4dc74459a4c1b3e5673d4c673f4634`; PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`, tree `cd1d2246d8f7e364e3d628ed0512b5cba7603c56`.
+
+- `2026-05-25T21:15:40Z`: Executive Officer rechecked latest `origin/main` `f8c430a3305978ff320ac3264c77169ccb424f26`, mandatory governance docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR #23 comments and review threads, GitHub REST PR metadata, fetched PR heads, local merge-tree, diff-check, and final `git ls-remote` refs. PR #23 head remains `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`; no Output Documents Builder ACK, branch-head update, validation refresh, or blocker-with-attempted-fix is visible after PR follow-up `4537214455`. Executive skipped a duplicate GitHub comment and published a visible inbox follow-up; missed cycles for PR #23 increased to `2`.
+
+- `2026-05-25T21:15:40Z`: Against `f8c430a3305978ff320ac3264c77169ccb424f26`, all four active PRs pass local current-main merge-tree and diff-check: PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, tree `84729e7a2ccbac3a8cd4e613a76faec5d9999e8a`; PR #23 head `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`, tree `77083d9f26ce0e61ae0492e2649f8ae1f771d0b1`; PR #25 head `1835e292caea35b4758276c7002c09d2e9c1dada`, tree `a7484c5c50bbb94f6600edde5b550bd80b136d40`; PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`, tree `f4dc752c19b80b8ff5809b686b35d7c5a325486e`. PR #23 remains review-gated by Codex P2 thread `PRRT_kwDORlw1t86EoBgM`; PR #22 / #25 / #26 remain Deputy final-gate visibility candidates.
+
+- `2026-05-25T21:00:00Z`: Executive Officer rechecked latest `origin/main` `23cb3572227076e0216b8e757a70c247fd266c89`, mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub MCP PR comments and PR #23 review threads, GitHub REST PR metadata, fetched PR heads, local merge-tree, and diff-check. PR #23 advanced to `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`; Output Documents Builder posted prior P2 `ACTION_TAKEN` comment `4537194620`, but Codex then opened new review `4358750718` with unresolved P2 thread `PRRT_kwDORlw1t86EoBgM` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` lines 20-21: `Guard non-array warnings before mapping`. Executive kept Current Handler as Output Documents Builder and posted PR comment `4537214455` as the single-primary visible follow-up.
+
+- `2026-05-25T21:00:00Z`: Against `23cb3572227076e0216b8e757a70c247fd266c89`, all four active PRs pass local current-main merge-tree and diff-check: PR #22 head `e338431e04811b5b7b0bdcff789f8d3d162ee8df`, tree `d3641953e5435aa817ec4371ae49681fa296b9c4`; PR #23 head `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`, tree `666a5611331bfef325a8fcb0970e1013b6a22deb`; PR #25 head `1835e292caea35b4758276c7002c09d2e9c1dada`, tree `62f345cb24282ce6138f7f43720259a1eee19a01`; PR #26 head `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`, tree `0f39b9eee9df4c529b432636e634cfe776caa8eb`. PR #23 is nevertheless review-gated by the new Codex P2; PR #22 / #25 / #26 remain Deputy final-gate visibility candidates.
+
+- `2026-05-25T20:41:28Z`: Executive Officer rechecked latest `origin/main` `326db8a39c7e4b2b95ee119c85b07fca376a0301`, mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub MCP PR comments and review threads, fetched PR heads / merge refs, local merge-tree, and diff-check. PR #23 head is `47dd4acee2302ddd3b6a7b008cb70cb667abba6d`; final-sync merge-tree remains clean, but GitHub MCP found a new post-head Codex P2 review `4358680834` with unresolved thread `PRRT_kwDORlw1t86En1Yw` on `src/lib/budget/renderers/customer-warning-sanitizer.ts` line 14. Executive changed PR #23 Current Handler back to Output Documents Builder and posted PR comment `4537133554` as the single-primary visible follow-up.
+
+- `2026-05-25T20:41:28Z`: Against `326db8a39c7e4b2b95ee119c85b07fca376a0301`, all four active PRs pass local current-main merge-tree and diff-check: PR #22 tree `823b1ddb9bdafb528ee040a992d767ccbd51115e`; PR #23 tree `6dca710c0206fcee0b661ab5cea39147e653cb28`; PR #25 tree `f737355fb4c000c9f6539fc7c84100935e942cc0`; PR #26 tree `b8c175682180fe767009c938e1173047b9871274`. PR #23 is nevertheless review-gated by the new Codex P2; PR #22 / #25 / #26 remain Deputy final-gate visibility candidates.
+
+- `2026-05-25T20:06:56Z`: Executive Officer rechecked latest `origin/main` `a7056744ec4668f31d7435a7e26a3d0901de0fc8`, mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, PR comments / review comments after `2026-05-25T19:50:59Z`, PR #23 / #25 review threads, fetched PR heads, merge-tree, and diff-check. No PR #22 / #23 / #25 / #26 comments or review comments were found after `19:50:59`, and no Deputy Codex merge / reject / exact-blocker ACK is visible. PR #23 Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling visible ACK; the remaining action is Deputy Codex loop-break / final-gate policy, not another Builder loopback.
+
+- `2026-05-25T20:06:56Z`: Against `a7056744ec4668f31d7435a7e26a3d0901de0fc8`, PR #23 still exits `1` in merge-tree with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`. PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean: PR #22 tree `b3d557435e0188e8886125c9048bf08a2d11a9d9`, PR #25 tree `02636a0e1ce35ac8c139773c81324ed3b3dbf48a`, and PR #26 tree `4737258e067890bed5163d4bddf83604331987a4`. GitHub REST issue metadata confirms Issues #15 / #16 / #17 / #18 open and Issue #19 closed.
+
+- `2026-05-25T19:50:59Z`: Executive Officer caught `origin/main` advancing from `de82362e77bbb3ff152f348960f06e46a2291671` to blackboard-only patrol commit `5766720797b4cc45de85e37334ce11baf4e34163`. Because that commit did not update the delivery ledger / triage queue / Executive inbox, this patrol backfilled the visible ACK state in all required docs. No Deputy Codex merge / reject / exact-blocker ACK is visible after the `19:50` reconfirmation; single-primary request remains `To: Deputy Codex`.
+
+- `2026-05-25T19:50:59Z`: Against `5766720797b4cc45de85e37334ce11baf4e34163`, PR #23 still exits `1` in merge-tree with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`. PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean: PR #22 tree `492a96c37c2c8c3abcc826f4b2ca8cfe04c371c0`, PR #25 tree `87f0b8d3dce91155f70d75c8983af75ff160cdd0`, and PR #26 tree `005a05cfdbc2109876a9ba36fda8b9f3ff0116d4`. GitHub REST Issue detail hit API-limit fallback after Issue #15, so connector comments / review threads, PR refs, and local simulation are controlling.
+
+- `2026-05-25T19:33:39Z`: Executive Officer rechecked latest `origin/main` `8a61d6f09c4572bbd097b9926480cbab1d9fd9a2`, mandatory governance docs, strategic plan, blackboard, chatroom role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, comments and reviews after `19:18`, fetched PR heads, merge-tree, and diff-check. No PR #22 / #23 / #25 / #26 comments or reviews were found after the `19:18` Deputy request. PR #23 Builder `BLOCKER_WITH_ATTEMPTED_FIX` comment `4536634504` remains the controlling visible ACK; the remaining action is Deputy Codex loop-break / final-gate policy, not another Builder loopback.
+
+- `2026-05-25T19:33:39Z`: Against `8a61d6f09c4572bbd097b9926480cbab1d9fd9a2`, PR #23 still exits `1` in merge-tree with conflicts only in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`. PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean: PR #22 tree `5393eb2fdb77ece548cbaecf9221ebf97181cbfb`, PR #25 tree `4a531ccee23d7e661aebb1a8af9486888f870752`, and PR #26 tree `ab53dee2e34bffeedf97ae02911b4a36e0dc83a1`. Single-primary request remains `To: Deputy Codex`.
+
+- `2026-05-25T19:18:16Z`: Executive Officer rechecked latest `origin/main` `b738e110c0ab4323c30aa1bde3d6a9dadce8f63e`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, comments, reviews, fetched PR heads / merge refs, merge-tree, and diff-check. PR #23 has new Output Documents Builder ACK comment `4536634504` with `BLOCKER_WITH_ATTEMPTED_FIX`: Builder verified the conflict is still limited to `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`, validation remains clean, and no forbidden scope changed. Because the current blackboard routes the repeated docs-only sync loop outside Builder, Executive changed PR #23 Current Handler to Deputy Codex for loop-break / final-gate policy.
+
+- `2026-05-25T19:18:16Z`: PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean against `b738e110c0ab4323c30aa1bde3d6a9dadce8f63e`: PR #22 tree `772cb7be00ac00874c3b2a31ef6a09b3d22466d5`, PR #25 tree `b992ea6f0fab1fd179d43705157855c6affdc638`, and PR #26 tree `9cfd0126e03cf4606a8d33e1ea65720fbecc2237`. No Deputy Codex merge / reject / blocker ACK is visible after the `19:05` loop-break request, so Executive refreshed a single-primary `To: Deputy Codex` request in the Executive inbox.
+
+- `2026-05-25T18:55:29Z post-push`: Executive Officer published docs-only patrol state to main `312abfa96f36fcc7f59770ad81771b237c2a5457`, then re-fetched PR #22 / #23 / #25 / #26 heads and reran current-main simulations. PR #23 head remains `eb7caa738431c0624c30c3242e8d28b0b4b618e9` with Builder repair comment `4536480487` and clean Codex comment `4536508595`, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1855-post/pr23` exits `1` with conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`. Executive routed PR #23 back to Output Documents Builder for scoped latest-main sync repair. PR #22 / #25 / #26 remain current-main merge-tree and diff-check clean after `312abfa`.
+
+- `2026-05-25T18:55:29Z`: Executive Officer rechecked latest `origin/main` `65980441e7dd1d51b5976129a1a7f5f2f9097dfe`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, comments, reviews, fetched PR heads / merge refs, merge-tree, and diff-check. PR #23 advanced to `eb7caa738431c0624c30c3242e8d28b0b4b618e9`; Output Documents Builder posted `WORKFLOW_REPAIR_ATTEMPTED` comment `4536480487`, and Codex returned clean comment `4536508595`. `git merge-tree --write-tree origin/main refs/patrol/hb1855/pr23` exits `0` with tree `7f5043ebc67d135cbe4f81d1631722860cd1b62f`; diff-check exits `0`. Executive stopped ordinary Builder sync chase and routed PR #23 to Deputy Codex final-gate visibility.
+
+- `2026-05-25T18:55:29Z`: PR #22, PR #25, and PR #26 also remain current-main merge-tree and diff-check clean against `65980441e7dd1d51b5976129a1a7f5f2f9097dfe`: PR #22 tree `a99860757a85f1b36e7eef7cf35b9815f1c0fead`, PR #25 tree `5f077431c6e00c992ab360818bf616033f255f55`, and PR #26 tree `f3d9fadc438e0fd40b251fe29e2ebb12dbad82a3`. No Deputy Codex merge / reject / blocker ACK is visible after the `18:29` request, so Executive refreshed a single combined `To: Deputy Codex` final-gate visibility request for PR #22 / #23 / #25 / #26.
+
+- `2026-05-25T18:29:23Z`: Executive Officer rechecked latest `origin/main` `cc7174aa67dd581eeeca0508210d4ae03415b02b`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, comments, reviews, fetched PR heads / merge refs, merge-tree, and diff-check. PR #23 head remains `671964aea546871499b5933e213fb0838b111bea`; no new Output Documents Builder ACK is visible after the `17:56` sync-block request, and `git merge-tree --write-tree origin/main refs/patrol/hb1829/pr23` still exits `1` with content conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`. Executive refreshed the single-primary `To: Output Documents Builder` sync-repair request and set missed cycles to `2`.
+
+- `2026-05-25T18:29:23Z`: PR #22, PR #25, and PR #26 remain current-main merge-tree and diff-check clean against `cc7174aa67dd581eeeca0508210d4ae03415b02b`. PR #22 tree `e64a7c98b957ae7592f4be9e40c842d28be41f7c`; PR #25 tree `46ec710631b44886c1273c8e4ad2d5046beecfc5` with clean Codex comment `4536168380`; PR #26 tree `ee4b10f0bb556825c65406d92d222f53e251df35`. No Deputy Codex merge / reject / blocker ACK is visible after the `17:56` final-gate request, so Executive refreshed a single `To: Deputy Codex` decision-visibility request for PR #22 / #25 / #26 and kept Need Commander / Need Reviewer at `No` unless branch, Codex, validation, or scope evidence changes.
+
+- `2026-05-25T17:56:00Z post-push`: Executive Officer published docs-only patrol state to main `874dff894d2da33ce2af34914e9fd5d24cc56960`, re-fetched PR #22 / #23 / #25 / #26 heads and merge refs, and reran local current-main simulations. PR #23 head remains `671964aea546871499b5933e213fb0838b111bea` with Builder sync repair comment `4536113272` and clean Codex comment `4536130930`, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1750-post/pr23` exits `1` with conflicts in `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; diff-check exits `0`. Executive routed PR #23 back to Output Documents Builder for scoped latest-main sync repair.
+
+- `2026-05-25T17:56:00Z post-push`: PR #25 has post-fix clean Codex comment `4536168380` at `2026-05-25T17:54:38Z` after Builder `PLAN_PUZZLE_ACTION_TAKEN` review `4358124195` on head `1835e292caea35b4758276c7002c09d2e9c1dada`. Post-push current-main merge-tree exits `0` with tree `8264b620338e29e30a81be07ddcc4b952c9745ee`, and diff-check exits `0`. Executive routed PR #25 to Deputy Codex final-gate visibility and stopped ordinary Plan Puzzle Builder chase.
+
+- `2026-05-25T17:50:34Z`: Executive Officer rechecked latest `origin/main` `09d06163f3c653f5122cf9b72512bb605df499ad`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata, PR comments / reviews, fetched PR heads / merge refs, local merge-tree, diff-check, and changed-file scope. PR #23 advanced to `671964aea546871499b5933e213fb0838b111bea`; Builder posted sync repair comment `4536113272`, Codex returned clean in comment `4536130930`, GitHub reports `mergeable: true` / `clean`, local merge-tree exits `0` with tree `2238dc5d60debaee7f6f2c45b908206bbfff90ec`, and diff-check exits `0`. Executive routed PR #23 back to Deputy final gate and stopped ordinary Builder chase.
+
+- `2026-05-25T17:50:34Z`: PR #25 advanced to `1835e292caea35b4758276c7002c09d2e9c1dada`; Plan Puzzle Builder posted `PLAN_PUZZLE_ACTION_TAKEN` in review `4358124195` for Codex P2 `discussion_r3299302339`, reported `node --check`, `git diff --check`, merge-tree, merge ref, allowed-scope and forbidden-scope PASS, then requested `@codex review`. Local current-main merge-tree exits `0` with tree `55ee0c4632b81f7640ac4254cbe519527c18bdcc`, and diff-check exits `0`. No post-`1835e29` clean Codex result is visible yet, so PR #25 stays with Plan Puzzle Builder for review-result visibility; no duplicate Builder chase was issued.
+
+- `2026-05-25T17:26:34Z post-push`: Executive Officer pushed docs-only PR #25 P2 routing update to main `c57003bfd044990b327b8b3210a026423ce61d44`, then re-fetched PR refs. PR #23 head remains `1be77d0481cd03893a8253e812094f745341078a` with prior clean Codex comment `4535507114`, but post-push `git merge-tree --write-tree origin/main refs/patrol/hb1726-post/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` content conflict; `git diff --check` exits `0`. Executive updated PR #23 row to Output Documents Builder current-main sync repair and issued a single-primary `To: Output Documents Builder` action request. PR #22 / #25 / #26 still pass current-main merge-tree and diff-check after `c57003b`.
+
+- `2026-05-25T17:26:34Z`: Executive Officer rechecked latest `origin/main` `b8e6489c5dde14a82591a5d5c649d170757b8b78`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips. PR #25 head remains `a83a121d072f653783b8b8b26d8ef3a2fae5aec2`; public PR page now shows Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` at review `4358021349` and Codex review `4358033006` on reviewed commit `a83a121d07`, with P2 `discussion_r3299302339` for missed endpoint-on-edge self-intersections near `plan-puzzle.js` line `4311`. `refs/pull/25/merge` refreshed to `5259954b59a7a0e7306e48331c226e6de847dba7`; local current-main merge-tree and diff-check pass. PR #22 / #23 / #26 also remain current-main merge-tree and diff-check clean. Executive updated PR #25 row to Codex P2 / Builder fix required and issued a single-primary `To: Plan Puzzle Builder` action request in the Executive inbox.
+
+- `2026-05-25T17:13:03Z`: Executive Officer rechecked latest `origin/main` `28fb1cdbf5e99028fc01d4be720e6ce1d9f4a986`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips. PR #25 head advanced to `a83a121d072f653783b8b8b26d8ef3a2fae5aec2` by merging current `origin/main` into the branch after the prior clean `e2decbec` final-gate request. Public PR page shows no post-`a83a121` Codex clean result; `refs/pull/25/merge` remains stale at `19310577152e6ce52bf2556d6d0e469f05621718`, but local current-main merge-tree and diff-check pass. PR #22 / #23 / #26 also remain current-main merge-tree and diff-check clean. Executive updated PR #25 row to Plan Puzzle Builder review-result ACK pending and issued a single-primary `To: Plan Puzzle Builder` request in the Executive inbox.
+
+- `2026-05-25T16:59:14Z`: Executive Officer rechecked latest `origin/main` `1773387fd393c6af1710f8b999bb34ee1be64031`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips. PR #25 advanced to head `e2decbec50d1cb65241123b76372555658e88cde`; public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, refreshed `refs/pull/25/merge` `19310577152e6ce52bf2556d6d0e469f05621718`, `@codex review`, and post-head clean Codex result. `git merge-tree --write-tree origin/main refs/patrol/hb1659/pr25` exits `0` with tree `38bf6304134dbede31361a12ed7e5e513ea24441`; `git diff --check origin/main..refs/patrol/hb1659/pr25` exits `0`. PR #22 / #23 / #26 also remain current-main merge-tree and diff-check clean. Executive routed PR #25 to Deputy Codex final gate and kept missed cycles at `0`; Need Reviewer is `No` unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+- `2026-05-25T16:41:35Z`: Executive Officer rechecked latest `origin/main` `427039f7ee47b5564aad980ca08d5a3e586b8e74`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages, fetched PR heads / merge refs, local merge-tree, diff-check, and PR #25 public Codex review clips. PR #25 advanced to head `f33d3edaeb267faf568e91dfd28571ca3ad2301b`; public PR page shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, refreshed `refs/pull/25/merge` `8081e5557c6b317a7023a6145a76b73841f50997`, `@codex review`, and post-head clean Codex result. `git merge-tree --write-tree origin/main refs/patrol/hb1641/pr25` exits `0` with tree `46ad77c4a1cd239424bf07aefba65bb5ec7faad6`; `git diff --check origin/main..refs/patrol/hb1641/pr25` exits `0`. PR #22 / #23 / #26 also remain current-main merge-tree and diff-check clean. Executive routed PR #25 to Deputy Codex final gate and reset missed cycles to `0`; Need Reviewer is `No` unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift appears.
+- `2026-05-25T16:25:23Z`: Executive Officer rechecked latest `origin/main` `a9524b3e2aa495523bae7553f343ae079c272e37`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages after REST limitations, `git ls-remote`, fetched PR heads / merge refs, and local merge-tree / diff-check simulations. PR #25 head remains `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`; public PR page still shows `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` and `@codex review`, but no post-`e4e9e90` clean Codex result, NEEDS_FIX, P1, or P2 is visible. `refs/pull/25/merge` remains `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`; merge-tree exits `0` with tree `5a87e8f7eb11404663e85a87c4fbfcb20f151731`; diff-check exits `0`. PR #22 / #23 / #26 also remain merge-tree and diff-check clean. Executive opened a single-primary `To: Plan Puzzle Builder` visible ACK request and set PR #25 missed cycles to `1`.
+- `2026-05-25T16:02:17Z`: Executive Officer rechecked latest `origin/main` `1643ea172b248b37b193e4bf60ea49223283ed4d`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub public PR / Issue pages after REST limitations, `git ls-remote`, fetched PR heads / merge refs, changed-file signals, and local merge-tree / diff-check simulations. PR #25 advanced from `01dcb7ee4f1c7ac81395a8474f1538c2fd85cc12` to `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`; Builder posted `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, merged latest main, reran validation, and requested `@codex review`. `refs/pull/25/merge` refreshed to `f8559c75e8d4b0d8017ef61d9f8ecd651fc01e3c`, local merge-tree exits `0`, and diff-check exits `0`, but no post-`e4e9e90` clean Codex result is visible yet, so PR #25 is review-result pending, not Deputy final-gate ready. PR #23 remains head `1be77d0481cd03893a8253e812094f745341078a`; merge-tree exits `0`, diff-check exits `0`, and clean Codex comment `4535507114` remains controlling. PR #22 / PR #26 also remain merge-tree and diff-check clean.
+- `2026-05-25T15:51:46Z`: Commander patrol rechecked latest `origin/main` `f852c11a266cb1c1fd60c8f21bdbec30ebf3941b`, GitHub open PR / Issue metadata, PR comments / reviews, fetched PR refs / merge refs, changed-file signals, and local merge-tree simulations. PR #23 advanced to head `1be77d0481cd03893a8253e812094f745341078a`; Output Documents Builder posted metadata-only staging-write P2 fix evidence in comment `4535482545`, Codex returned clean in comment `4535507114`, `refs/pull/23/merge` exists at `6242d8e023b6f632dbb01895fdeb89ead1744bc8`, and `git merge-tree --write-tree origin/main refs/patrol/hb1551/pr23` exits `0`. PR #25 advanced to `01dcb7ee4f1c7ac81395a8474f1538c2fd85cc12`, Codex returned clean in comment `4535497518`, and merge-tree exits `0`. PR #22 / PR #26 remain merge-tree clean. PR #23 and PR #25 are routed to Deputy Codex final gate; Need Reviewer is No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drifts.
+- `2026-05-25T15:28:39Z`: Executive Officer rechecked latest `origin/main` `c8e307639122d73705a667cc4d66adcfd26cee80`, mandatory governance docs, blackboard, delivery ledger, triage queue, Executive inbox, reviewer inbox, public PR / Issue pages after REST `403`, `git ls-remote`, fetched PR refs / merge refs, and local merge-tree simulations. PR #23 remains at head `01b489c21a71db7a3301918e44bcfea75e60206a`; the public PR page still shows the post-`01b489c` Codex P2 `Block staging writes for metadata-only storage target`. Current-main simulation against `c8e3076` still exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict, and `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #22 / PR #25 / PR #26 remain merge-tree clean against `c8e3076`, and all four PR diff-checks pass. Existing single-primary `To: Output Documents Builder` request from `15:20:08Z` remains current; no duplicate GitHub chase was issued. Need Reviewer remains Yes due Codex P2.
+- `2026-05-25T15:20:08Z`: Commander patrol rechecked latest `origin/main` `b14845cb03314f5eecdcdef59b2337eb56dd15ba`, open PR refs, open Issues, PR #23 public PR page fallback, fetched PR refs / merge refs, and local merge-tree simulations. PR #23 remains at head `01b489c21a71db7a3301918e44bcfea75e60206a`, but the public PR page shows a post-`01b489c` Codex P2: `Block staging writes for metadata-only storage target`, in `src/lib/budget/renderers/formal-file-writer-policy.ts` around lines `+216` to `+220`. GitHub REST comments/reviews returned `403`; public page fallback was used. PR #23 is also latest-main sync-blocked again: `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict, while `git diff --check origin/main..refs/patrol/hb1520/pr23` exits `0`. PR #22 / PR #25 / PR #26 remain merge-tree clean. Current Handler remains Output Documents Builder; Need Reviewer is Yes due Codex P2.
+- `2026-05-25T15:04:07Z`: Executive Officer rechecked latest main `387cada726b3d91fc48ce5044dca80e36bdfa9d8`, mandatory patrol docs, GitHub PR metadata / public PR page fallback after API rate limit, fetched PR refs / merge refs, changed-file lists, and local merge-tree simulations. PR #23 advanced to `01b489c21a71db7a3301918e44bcfea75e60206a`; Builder posted `WORKFLOW_REPAIR_ATTEMPTED` evidence in comment `4535229076`, requested `@codex review`, and `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `b751c23ee0f3b50da1121b16280d66f4c670cce2`. No post-`01b489c` clean Codex result was visible at patrol time. Because this docs-only patrol update will advance `main`, PR #23 remains routed to Output Documents Builder for post-publication latest-main sync / review-result watch rather than Deputy final gate. PR #22 / PR #25 / PR #26 remain merge-tree clean.
+- `2026-05-25T14:50:49Z`: Executive post-push verification found PR #23 became current-main sync-blocked again after patrol docs were published to main `a5c0d357641fea516ad2a2f91eb4cb180a819f26`. `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict; `git diff --check origin/main..refs/patrol/pr23` still exits `0`. PR #22 / PR #25 / PR #26 remain merge-tree clean. This supersedes the pre-publication PR #23 final-gate candidate note; Current Handler returns to Output Documents Builder for latest-main sync repair. No merge / reject / close action was executed.
+- `2026-05-25T14:44:23Z`: Executive Officer rechecked latest main `20808ae85e0847ce606a0208a6fa932f1ba92221`, mandatory patrol docs, GitHub PR metadata / issue comments / review comments for PR #23 and PR #25, PR #22 / #26 metadata, fetched PR refs and merge refs, changed-file lists, and local merge-tree simulations. PR #23 advanced to `976b4cba3ab33743d02a97451f04ddc65a316dc1`; Builder posted `WORKFLOW_REPAIR_ATTEMPTED` evidence in comment `4535080840`; Codex returned clean in comment `4535125308`; GitHub reports `mergeable: true` / `clean`; `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `bc30ceb4fc3223be80648cb2dcbe5c34eaa8ad90`; `git diff --check origin/main..refs/patrol/pr23` exits `0`. PR #23 moved from Builder sync repair to Deputy final gate. PR #22 / PR #25 / PR #26 remain merge-tree clean against latest main. No merge / reject / close action was executed.
+- `2026-05-25T14:22:59Z`: Commander patrol used doctrine-source fallback because the local primary worktree is missing `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`; `origin/main` evidence was used and `LOCAL_STATE_STALE` is noted for the local workspace only. Latest `origin/main` at verification is `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79` after the Executive patrol publication. PR #25 remains `CODEX_REVIEW_CLEAN / CURRENT_MAIN_SIMULATION_PASS / DEPUTY_FINAL_GATE_CANDIDATE`: head `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`, post-head clean Codex comment `4534994840`, and `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr25` exits `0` with tree `fea59880d0ac05e9e0a8502593b51f62f4a398b2`; GitHub merge ref `d7993baa4714ddb2819f7e1c58cee1c6b7eb9d77` is based on prior main `ec89b26`, so local current-main simulation is the controlling readiness evidence until GitHub refreshes the merge ref. PR #23 remains `CODEX_CLEAN_BUT_CURRENT_MAIN_SYNC_BLOCKED_AGAIN / BUILDER_REPAIR_REQUIRED`: head `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`, clean Codex comment `4534905765`, and `git merge-tree --write-tree origin/main refs/patrol/hb1422/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. Output Documents Builder must fetch latest `origin/main` at repair time, not rely on an embedded old SHA.
+- `2026-05-25T14:22:53Z`: Executive Officer rechecked latest main `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`, mandatory patrol docs, GitHub connector PR metadata / comments for PR #23 and PR #25, PR #22 / #26 metadata, open Issues / PRs through REST fallback, fetched PR refs, merge refs, changed-file signals, and local merge-tree simulations. PR #25 advanced to `bdfbe1a0b0cf68e35b1fe2f95b899a5f6d587fba`; Builder posted `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` in review `4357243064`; Codex returned clean in comment `4534994840`; `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `b094fb84ee8ed1f6778b964f00da91d8d93f94af`, so PR #25 is routed back to Deputy final gate. PR #23 remains at `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; latest clean Codex is comment `4534905765`, but `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against `ec89b26`. PR #22 / PR #26 remain merge-tree clean.
+- `2026-05-25T14:12:34Z`: Executive post-push verification found PR #23 advanced to `77eb69ce7bbefd50280ec98266e3dcaa61f1c6d2`; Output Documents Builder posted repair evidence in comment `4534883253` and Codex returned clean in comment `4534905765`. However Executive's patrol-doc push advanced main to `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`, and `git merge-tree --write-tree origin/main refs/patrol/pr23` now exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. PR #25 remains clean against latest main: `git merge-tree --write-tree origin/main refs/patrol/pr25` exits `0` with tree `72ffebd712387d55c3d01fb9709b82e4057046af`; PR #22 / PR #26 also remain merge-tree clean.
+- `2026-05-25T14:04:16Z`: Executive Officer rechecked latest main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0`, mandatory patrol docs, GitHub PR comments / review comments through connector, PR refs, branch heads, merge refs, changed-file signals, and local merge-tree simulations. PR #25 advanced to `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; Builder posted `PLAN_PUZZLE_ACTION_TAKEN` in comment `4534833932`, and Codex returned clean in comment `4534856589`; current-main merge-tree exits `0`, so PR #25 is routed to Deputy final gate. PR #23 still has clean Codex comment `4534721681`, but current-main merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict, so Output Documents Builder remains handler for latest-main sync repair. PR #22 / PR #26 remain merge-tree clean.
+- `2026-05-25T13:59:16Z`: Commander patrol rechecked latest main `7151adcf83fa696f12b8be3dfa2e0703023a101c`, GitHub open PRs / Issues, PR issue comments, PR review comments, fetched PR refs, changed files, and local merge-tree signals. PR #25 advanced to `e61b67acba4fd8dbad1ca9e3df79ca863439d58e`; Builder posted `PLAN_PUZZLE_ACTION_TAKEN`, responded to all three Codex P2 comments, reran validation, requested `@codex review`, and `git merge-tree --write-tree origin/main refs/patrol/hb1359/pr25` exits `0`. No post-`e61b67a` clean Codex result is visible yet, so PR #25 is `P2_FIX_FOUND / CODEX_REVIEW_PENDING` and not final-gate ready. PR #23 has a clean post-`a456641` Codex result, but still exits `1` against latest main with a `docs/WORKSTREAM_BLACKBOARD.md` conflict, so it remains Output Documents Builder sync repair. PR #22 / PR #26 remain merge-tree clean.
+- `2026-05-25T13:39:14Z post-push`: Executive patrol publication advanced main to `feabaac285f5a0d22fdacf877ea88a8aa8bb7bf1`. Post-push merge-tree shows PR #23 is current-main blocked again: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. PR #22 / PR #25 / PR #26 remain merge-tree clean. Current Handler remains Output Documents Builder; next action is latest-main re-sync, not Deputy final gate. PR #25 remains P2-blocked with Current Handler Plan Puzzle Builder.
+- `2026-05-25T13:39:14Z`: Executive Officer rechecked latest main `b16399b4bc7b2816f000ea50d09eadcd16ce01e9`, mandatory patrol docs, public Issue / PR state, PR refs, branch heads, merge refs, changed-file signals, and local merge-tree simulations. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / #23 / #25 / #26 remain open; PR #24 remains merged. PR #23 advanced to `a4566412f100e15bd978f43e6058759de42bef70`; `refs/pull/23/merge` exists at `b09a3346cddc63e0f334bcbe2b80c34dea97ee9a`; pre-publication merge-tree exits `0` with tree `dbab984cc4658a03e4e37527b01b429bc789a48e`, and branch blackboard reports `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS` against `b16399b`. PR #25 remains at `48910be809922fac58b1c89d78cf81b5d7c61210`; merge-tree exits `0`, but no P2 fix head or visible ACK was found after the Codex P2 comments. Executive opened separate single-primary follow-ups for Output Documents Builder and Plan Puzzle Builder.
+- `2026-05-25T13:31:12Z`: Commander patrol rechecked latest main `fca20e853bb1a846ed63379a4cd290439aa56a60`, GitHub open PRs / Issues, PR comments, PR review comments, fetched PR refs, and local merge-tree signals. PR #22 / #25 / #26 merge-tree clean against latest main; PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`. PR #25 is no longer a final-gate candidate because Codex added new P2 review comments on head `48910be`; Current Handler is Plan Puzzle Builder for scoped P2 fixes and re-review. Automation lifecycle audit also found multiple active heartbeats without an explicit no-self-delete guard; treat any workstream self-deleting a heartbeat as `AUTOMATION_SELF_DELETE_VIOLATION`, not task completion.
+- `2026-05-25T13:04:41Z post-push`: Executive patrol publication advanced `main` to `999a32376dbe8490dbc4f756455015b247f4c5c6`. Post-push merge-tree now shows PR #23 is current-main blocked again: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. PR #22 / PR #25 / PR #26 remain merge-tree clean. Current Handler remains Output Documents Builder; next action is latest-main re-sync against `999a323`, not Deputy final gate.
+- `2026-05-25T13:04:41Z`: Executive Officer found effective Output Documents Builder repair on PR #23. Latest main is `a2c3a273fb3f8f1d232a135c1eed162d79af1047`; PR #23 head is `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; `refs/pull/23/merge` exists at `18f079ec64367f6fa37d4005280aaa4b3ed5657c`; local current-main merge-tree exits `0`. The PR branch blackboard contains `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS`. Next executable action is not another blackboard-conflict chase: Output Documents Builder must publish / confirm `CODEX_REVIEW_REQUESTED` or a post-`b503cd3` Codex result before PR #23 returns to Deputy final gate.
+- `2026-05-25T12:56:32Z`: Deputy decision made for PR #23. The delivery-table row still records the stale final-gate blocker, but the active handler for the next executable action is now `Output Documents Builder`, not Deputy Codex. Required next action: re-sync PR #23 against latest main, resolve only `docs/WORKSTREAM_BLACKBOARD.md`, preserve the fail-closed renderer / format mismatch P2 fix, rerun renderer static guard / syntax / mismatch / fixture / invalid fixture / `.xlsx/.pdf` diff / `git diff --check`, and request Codex re-review if branch head changes. Deputy final gate is paused until latest-main merge-tree is clean again.
+- `FINAL_GATE_READY` means Deputy Codex owns merge / reject; Executive Officer should not keep ordinary chase active unless branch state changes.
+- `SYNC_BLOCKED` is not standby. Executive Officer must obtain a true latest-main sync and merge ref before Codex review.
+- `DEPUTY_SIGNAL_DECISION_REQUIRED` means Executive has enough current-main patrol evidence to stop ordinary chase, but Deputy must decide whether that evidence is sufficient for gate routing or whether a repair owner must refresh the branch / validation report.
+- `COMPLETED_WAITING_NEXT_SCOPED_TASK` is valid only after Issue / PR / merge / blackboard state reconciliation is complete.
+- `TASK_PREVIEW_MISSING` is valid only when no active Issue, PR, task preview, stale branch, or Commander instruction exists.
+
+## Executive Visible ACK Watch
+
+- `2026-05-25T21:33:47Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` after latest main `46e76543f975b5a01ff03a973cb71dd64d21b835`. Sources checked: mandatory docs, strategic plan, blackboard, role parameters, delivery ledger, triage queue, Executive inbox, reviewer inbox, GitHub connector PR comments and review threads for PR #22 / #23 / #25 / #26, Issues #15-#19, fetched refs, current-main merge-tree, and diff-check. PR / Issue status: Issues #15 / #16 / #17 / #18 open, Issue #19 closed; PR #22 / #23 / #25 / #26 open. Branch SHAs: PR #22 `e338431e04811b5b7b0bdcff789f8d3d162ee8df`; PR #23 `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #25 `1835e292caea35b4758276c7002c09d2e9c1dada`; PR #26 `7853fe7d15c4ad28a5ac47bc18348e7277eb9bf3`. No executable Executive change exists because all active rows are already Deputy final-gate candidates, Executive cannot merge / reject / close, and no branch-head / validation / new Codex blocker changed after the clean results. Required ACK: `ACTION_TAKEN` from Deputy Codex with final-gate decision visibility or exact blocker, including any manual unresolved-thread requirement for PR #23 / PR #25.
+
+- `2026-05-25T21:22:48Z`: `CODEX_REVIEW_CLEAN` found for PR #23 after `f882b90` in comment `4537316105`. Sources checked: PR #23 issue comments after `21:19Z`, reviews, fetched PR refs, current-main merge-tree / diff-check, and final active PR simulations. Latest main `f405d715751bc6c5235b879eac91f7e1092c33f7`; PR #23 branch `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`; PR #23 merge-tree tree `07a51506c6b3d757d50df3628eb5520ec0263030`; diff-check `0`. Required next visible ACK is single-primary `To: Deputy Codex`: publish final-gate decision visibility or exact blocker for PR #23. No ordinary Builder or Reviewer chase remains while branch and review evidence stay current.
+
+- `2026-05-25T21:21:59Z`: `ACTION_TAKEN` found for PR #23 after the `4537214455` follow-up. Sources checked: PR #23 issue comments, review comments, reviews, commit delta, fetched PR refs, post-publication merge-tree / diff-check, and `git ls-remote`; latest main `907802a2ca6f13882a7a88c54e14bda9c0d145e6`, PR #23 branch `f882b90ca83cda3a65cd59dc8a70ac43cb3b9f3b`, Builder comment `4537294884`, review-thread reply `3299985379`, current-main merge-tree tree `d1639e4a9a29c2eb5118e809291f2f2ca1d4e6d3`, diff-check `0`. Required next visible result is post-`f882b90` `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK` with sources checked. Ordinary Builder chase is paused unless evidence changes.
+
+- `2026-05-25T21:15:40Z`: `ACTIVE_HANDLER_SILENT` remains for PR #23 after PR comment `4537214455`. Sources checked: mandatory docs, GitHub PR #23 comments and review threads, REST PR metadata, fetched PR refs, merge-tree / diff-check, and `git ls-remote`; latest main `f8c430a3305978ff320ac3264c77169ccb424f26`, PR #23 branch `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`, PR #23 open, Codex thread `PRRT_kwDORlw1t86EoBgM` unresolved / not outdated, current-main merge-tree tree `77083d9f26ce0e61ae0492e2649f8ae1f771d0b1`, diff-check `0`. No duplicate GitHub comment was posted; Executive published a visible inbox follow-up. Required ACK remains `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, branch SHA, sources checked, repair attempt, validation, and Codex re-review status.
+
+- `2026-05-25T21:00:00Z`: `ACTION_TAKEN` for the prior PR #23 P2 was found in Builder comment `4537194620`, but GitHub MCP then found new Codex P2 review `4358750718` / thread `PRRT_kwDORlw1t86EoBgM` on head `f2668e2892bd81b5377c5b9c1e2f7fd0a12cfdda`. Current Handler remains Output Documents Builder; Executive issued exactly one single-primary visible follow-up on PR #23, comment `4537214455`. Required ACK: `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, PR head SHA, sources checked, attempted repair, validation, and Codex re-review status. Need Reviewer: Yes until fixed and Codex re-review is clean.
+
+- `2026-05-25T20:41:28Z`: `CODEX_P2_FOUND` for PR #23 after final sync. Current Handler is Output Documents Builder; no post-P2 Builder ACK is visible. Executive issued exactly one single-primary visible follow-up on PR #23, comment `4537133554`. Required ACK: `ACTION_TAKEN`, `WORKFLOW_REPAIR_ATTEMPTED`, or `BLOCKER_WITH_ATTEMPTED_FIX` with latest main SHA, PR head SHA, sources checked, attempted repair, validation, and Codex re-review status. Need Reviewer: Yes until fixed and Codex re-review is clean.
+
+- `2026-05-25T20:06:56Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` after latest main `a7056744ec4668f31d7435a7e26a3d0901de0fc8`: no new Deputy Codex ACK is visible after the `19:50` Executive inbox request. PR #23 has required Builder `BLOCKER_WITH_ATTEMPTED_FIX` ACK `4536634504`; ordinary Builder chase remains paused. Required ACK is single-primary `To: Deputy Codex`: decide PR #23 loop-break policy and publish final-gate visibility or exact blockers for PR #22 / #25 / #26.
+
+- `2026-05-25T19:50:59Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` after latest main `5766720797b4cc45de85e37334ce11baf4e34163`: no new Deputy Codex ACK is visible after the blackboard-only `19:50` reconfirmation. PR #23 has required Builder `BLOCKER_WITH_ATTEMPTED_FIX` ACK `4536634504`; ordinary Builder chase remains paused. Required ACK is single-primary `To: Deputy Codex`: decide PR #23 loop-break policy and publish final-gate visibility or exact blockers for PR #22 / #25 / #26.
+
+- `2026-05-25T19:33:39Z`: `NO_NEW_EVIDENCE_AFTER_CHECK` after latest main `8a61d6f09c4572bbd097b9926480cbab1d9fd9a2`: no new Deputy Codex ACK is visible after the `19:18` Executive inbox request. PR #23 has required Builder `BLOCKER_WITH_ATTEMPTED_FIX` ACK `4536634504`; ordinary Builder chase remains paused. Required ACK is single-primary `To: Deputy Codex`: decide PR #23 loop-break policy and publish final-gate visibility or exact blockers for PR #22 / #25 / #26.
+
+- `2026-05-25T19:18:16Z`: PR #23 has required visible ACK `BLOCKER_WITH_ATTEMPTED_FIX` from Output Documents Builder in comment `4536634504`; ordinary Builder chase is paused because the repeated docs-only sync loop is now a Deputy Codex policy / final-gate decision. Required ACK is single-primary `To: Deputy Codex`: decide loop-break policy for PR #23 and publish final-gate visibility for PR #22 / #25 / #26.
+
+- `2026-05-25T18:55:29Z post-push`: PR #23 clean Codex result is stale for latest-main readiness after Executive docs publication advanced `main` to `312abfa96f36fcc7f59770ad81771b237c2a5457`. Required ACK returns to Output Documents Builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` after resolving only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+
+- `2026-05-25T18:55:29Z post-push`: PR #22 / #25 / #26 remain current-main clean, but no Deputy Codex final-gate decision visibility is visible after the `18:29` request. Required ACK is single-primary `To: Deputy Codex`: publish final-gate decision visibility or exact blocker for PR #22 / #25 / #26.
+
+- `2026-05-25T18:55:29Z`: PR #23 has the required Output Documents Builder `WORKFLOW_REPAIR_ATTEMPTED` ACK and a clean Codex result on head `eb7caa7`; current-main merge-tree / diff-check pass against `6598044`. Required ACK moves to Deputy Codex final-gate visibility. Ordinary Output Documents Builder chase stops unless branch head changes, validation is contradicted, Codex reports NEEDS_FIX / P1 / P2, or repair scope drifts.
+
+- `2026-05-25T18:55:29Z`: PR #22 / #23 / #25 / #26 are all current-main clean final-gate candidates, but no Deputy Codex merge / reject / exact-blocker ACK is visible after the `18:29` request. Required ACK is single-primary `To: Deputy Codex`: publish final-gate decision visibility or exact blocker for all four PRs.
+
+- `2026-05-25T18:29:23Z`: PR #23 remains latest-main sync-blocked against `cc7174aa67dd581eeeca0508210d4ae03415b02b`, and no new Output Documents Builder ACK is visible after the `17:56` Executive request. Required ACK remains single-primary `To: Output Documents Builder`: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` after resolving only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+
+- `2026-05-25T18:29:23Z`: PR #22 / #25 / #26 remain current-main clean, but no Deputy Codex final-gate decision visibility is visible after the `17:56` request. Required ACK is single-primary `To: Deputy Codex`: publish merge / reject / exact blocker visibility for PR #22, PR #25, and PR #26 after reconfirming no branch-head change, scope drift, new Codex blocker, or post-publication merge-tree conflict.
+
+- `2026-05-25T17:56:00Z post-push`: PR #23 clean Codex result is stale for latest-main readiness after Executive docs publication advanced `main` to `874dff894d2da33ce2af34914e9fd5d24cc56960`. Required ACK returns to Output Documents Builder: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` after resolving only `docs/WORKSTREAM_BLACKBOARD.md` and `docs/deputy_execution_patrol/DELIVERY_LEDGER.md`.
+
+- `2026-05-25T17:56:00Z post-push`: PR #25 has a fresh post-fix clean Codex result `4536168380` and current-main merge-tree pass after `874dff8`. Required ACK moves to Deputy Codex final-gate visibility; ordinary Plan Puzzle Builder chase stops unless branch head changes, validation is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
+- `2026-05-25T17:50:34Z`: PR #23 has a fresh Output Documents Builder ACK and clean Codex result on head `671964a`. Required ACK now moves to Deputy Codex final-gate visibility; ordinary Output Documents Builder sync chase stops unless branch head changes, validation is contradicted, or Codex reports NEEDS_FIX / P1 / P2.
+
+- `2026-05-25T17:50:34Z`: PR #25 has fresh Plan Puzzle Builder `ACTION_TAKEN` on head `1835e29`, with validation and `@codex review` requested. Required next visible ACK is the post-`1835e29` Codex result: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. No duplicate Builder chase this cycle.
+
+- `2026-05-25T17:26:34Z post-push`: PR #23 became current-main sync-blocked again after patrol docs advanced main to `c57003bfd044990b327b8b3210a026423ce61d44`. Required ACK: `WORKFLOW_REPAIR_ATTEMPTED` or `BLOCKER_WITH_ATTEMPTED_FIX` from Output Documents Builder after resolving only `docs/WORKSTREAM_BLACKBOARD.md` and rerunning validation.
+
+- `2026-05-25T17:26:34Z`: PR #25 now has a visible post-`a83a121` Codex result, but it is P2, not clean. Codex review `4358033006` on reviewed commit `a83a121d07` added P2 `discussion_r3299302339` for endpoint-on-edge self-intersection handling near `plan-puzzle.js` line `4311`. Executive opened a single-primary `To: Plan Puzzle Builder` fix request. Required ACK: `ACTION_TAKEN` with validation / re-review request, or `BLOCKER_WITH_ATTEMPTED_FIX`.
+
+- `2026-05-25T17:13:03Z`: PR #25 branch changed after the `16:59:14Z` final-gate request. New head `a83a121d072f653783b8b8b26d8ef3a2fae5aec2` is a sync-only merge of current `origin/main` `28fb1cd`; local merge-tree / diff-check pass and allowed-file diff remains clean, but public PR page has no post-`a83a121` Codex clean result. Executive opened a single-primary `To: Plan Puzzle Builder` visible ACK request. Required ACK: `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`.
+
+- `2026-05-25T16:59:14Z`: PR #25 has a fresh visible ACK chain on the new head: Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` for `e2decbec50d1cb65241123b76372555658e88cde`, refreshed merge ref `19310577152e6ce52bf2556d6d0e469f05621718`, current-main merge-tree / diff-check pass against `1773387fd393c6af1710f8b999bb34ee1be64031`, and post-head clean Codex result. Executive opened a single-primary `To: Deputy Codex` final-gate visibility request and stopped ordinary Plan Puzzle Builder chase unless the branch changes or new review / scope risk appears.
+- `2026-05-25T16:41:35Z`: PR #25 has a fresh visible ACK chain on the new head: Builder `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` for `f33d3edaeb267faf568e91dfd28571ca3ad2301b`, refreshed merge ref `8081e5557c6b317a7023a6145a76b73841f50997`, current-main merge-tree / diff-check pass against `427039f7ee47b5564aad980ca08d5a3e586b8e74`, and post-head clean Codex result. Executive opened a single-primary `To: Deputy Codex` final-gate visibility request and stopped ordinary Plan Puzzle Builder chase unless the branch changes or new review / scope risk appears.
+- `2026-05-25T16:25:23Z`: PR #25 still has no post-`e4e9e90` Codex result visible after checking the public PR page, latest `origin/main` `a9524b3e2aa495523bae7553f343ae079c272e37`, fetched PR head / merge ref, local merge-tree, and diff-check. Executive issued a single-primary `To: Plan Puzzle Builder` ACK request for `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. Need Reviewer remains Yes until clean review or Deputy override.
+- `2026-05-25T16:02:17Z`: PR #25 branch changed and has a fresh visible ACK on the public PR page: `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` for head `e4e9e9042a0f4b7acaadfc0fb069e543b4f0afb8`, latest main `1643ea172b248b37b193e4bf60ea49223283ed4d`, validation pass, allowed / forbidden scope checks, and `@codex review`. Executive skipped duplicate GitHub chase this cycle. Required next visible ACK is post-`e4e9e90` `CODEX_REVIEW_CLEAN`, `NEEDS_FIX`, `P1`, `P2`, or `NO_NEW_EVIDENCE_AFTER_CHECK`. PR #23 remains a separate `To: Deputy Codex` final-gate row with current-main merge-tree and diff-check pass.
+- `2026-05-25T15:28:39Z`: PR #23 active handler check repeated against latest `origin/main` `c8e307639122d73705a667cc4d66adcfd26cee80`. No new PR #23 head, no P2 fix comment, and no clean post-`01b489c` Codex result were found. The existing `To: Output Documents Builder` P2 fix / latest-main sync request remains the controlling visible follow-up; Executive skipped duplicate GitHub chase.
+- `2026-05-25T15:20:08Z`: PR #23 no longer qualifies for final-gate watch. It has a visible Builder ACK (`4535229076`), but the post-`01b489c` public Codex review reports P2 and latest-main sync is blocked again. Active follow-up remains single-primary `To: Output Documents Builder` for P2 fix plus latest-main sync repair.
+- `2026-05-25T15:04:07Z`: PR #23 has a fresh Output Documents Builder visible ACK in comment `4535229076` with `WORKFLOW_REPAIR_ATTEMPTED`, validation pass, and `@codex review` on head `01b489c21a71db7a3301918e44bcfea75e60206a`. Executive did not open a duplicate GitHub chase. The active follow-up is a single-primary `To: Output Documents Builder` inbox request to report the post-publication sync state / post-head Codex result after this patrol-doc publication.
+- `2026-05-25T14:50:49Z`: Executive's own patrol-doc publication advanced main to `a5c0d357641fea516ad2a2f91eb4cb180a819f26` and made PR #23 conflict again in `docs/WORKSTREAM_BLACKBOARD.md`. Executive opened a superseding single-primary `To: Output Documents Builder` sync-repair request. The prior `To: Deputy Codex` final-gate request is stale until the Builder re-syncs against latest main and Codex is clean again if the branch changes.
+- `2026-05-25T14:44:23Z`: PR #23 now has the required visible ACK chain after the latest main advance: Output Documents Builder repair comment `4535080840`, post-`976b4cb` clean Codex comment `4535125308`, GitHub `mergeable: true` / `clean`, and local merge-tree pass against `20808ae85e0847ce606a0208a6fa932f1ba92221`. Executive opened a single-primary `To: Deputy Codex` final-gate visibility request and stopped ordinary Output Documents Builder chase unless the branch changes or new review risk appears.
+- `2026-05-25T14:22:59Z`: Commander patrol confirms the active ACK routing still stands after main advanced to `2b6e61360a3b562f3beb0376b9ecb1cfa2655d79`. PR #25 stays routed `To: Deputy Codex` for final-gate visibility; PR #23 stays routed `To: Output Documents Builder` for latest-`origin/main` sync repair. No merge / reject / close action was executed.
+- `2026-05-25T14:22:53Z`: PR #25 has a fresh visible ACK chain on the new head: `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED` in review `4357243064` plus post-`bdfbe1a` clean Codex result `4534994840`; Executive opened a single-primary `To: Deputy Codex` final-gate visibility request. PR #23 still has no visible ACK after latest main `ec89b26a415b229e7b3cec66e93a65d79a9dbaab`; Executive opened a single-primary `To: Output Documents Builder` sync request for the renewed `docs/WORKSTREAM_BLACKBOARD.md` blocker.
+- `2026-05-25T14:12:34Z`: PR #23 has a fresh visible ACK chain (`4534883253` repair report plus clean Codex `4534905765`), but no ACK exists after Executive published main `e8722bd177abdd01f9d0abdac35925b4ca3b3ab0`; Executive opened a single-primary `To: Output Documents Builder` sync request for the renewed `docs/WORKSTREAM_BLACKBOARD.md` blocker. PR #25 still has the clean ACK chain and remains routed `To: Deputy Codex` for final-gate visibility.
+- `2026-05-25T14:04:16Z`: PR #25 now has the missing visible ACK chain: `PLAN_PUZZLE_ACTION_TAKEN` in comment `4534833932` plus post-`e61b67a` clean Codex result `4534856589`; Executive opened a single-primary `To: Deputy Codex` final-gate visibility request. PR #23 remains a separate `To: Output Documents Builder` sync repair because latest main `96dd05e79d9ba8acb94dffa7f3740d532c9e5ae0` reopens the `docs/WORKSTREAM_BLACKBOARD.md` conflict.
+- `2026-05-25T13:39:14Z post-push`: After patrol docs reached main `feabaac285f5a0d22fdacf877ea88a8aa8bb7bf1`, PR #23 returned to `CURRENT_MAIN_SYNC_BLOCKED_AGAIN` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. Executive updated the row and opened a single-primary `To: Output Documents Builder` follow-up for scoped latest-main re-sync. PR #25 remains a separate P2 Builder chase.
+- `2026-05-25T13:39:14Z`: Executive Officer found one effective Output Documents artifact and one Plan Puzzle stalled ACK. Output Documents Builder repaired PR #23 to head `a4566412f100e15bd978f43e6058759de42bef70`; pre-publication merge-tree against `b16399b4bc7b2816f000ea50d09eadcd16ce01e9` exits `0`; remaining visible ACK needed is `CODEX_REVIEW_REQUESTED` or post-`a456641` Codex result, with post-publication re-sync if main advances again. Plan Puzzle Builder remains Current Handler for PR #25: head `48910be809922fac58b1c89d78cf81b5d7c61210`, merge-tree clean, but Codex P2 still lacks a new fix head / visible `PLAN_PUZZLE_ACTION_TAKEN`.
+- `2026-05-25T13:04:41Z post-push`: After publishing patrol docs to main commit `999a32376dbe8490dbc4f756455015b247f4c5c6`, Executive re-ran merge-tree against fetched PR heads. PR #23 now exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict; PR #22 / PR #25 / PR #26 exit `0`. Executive updated the Output Documents row again and opened a single-primary `To: Output Documents Builder` follow-up for latest-main sync repair against `999a323`.
+- `2026-05-25T13:04:41Z`: Executive Officer rechecked latest main `a2c3a273fb3f8f1d232a135c1eed162d79af1047`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, public GitHub issue / PR pages, `git ls-remote` PR refs, fetched PR heads / merge refs, local merge-tree signals, changed files, and branch blackboard evidence. GitHub REST returned `403`, so public pages / refs / local simulation fallback was used. Issues #15 / #16 / #17 / #18 are open; Issue #19 is closed. PR #22 / #23 / #25 / #26 are open; PR #24 is merged. PR #23 head advanced to `b503cd3fb20148fc99d27f041bf8bbfe9580a30f`; PR #23 branch blackboard contains `WORKFLOW_REPAIR_ATTEMPTED / CURRENT_MAIN_SYNC_REPAIRED_LOCALLY / VALIDATION_PASS`; `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `0` with tree `5326a9b9b243aed08945bd628b6c6c5c65f58fcc`; `refs/pull/23/merge` exists at `18f079ec64367f6fa37d4005280aaa4b3ed5657c`. Executive updated the Output Documents row and opened a single-primary `To: Output Documents Builder` follow-up for latest-head Codex re-review / result visibility.
+- `2026-05-25T12:46:29Z`: Executive Officer rechecked latest main `7338cc2b568e32d0988a1a9ec717970b1fb5b664`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, `git ls-remote` PR refs, fetched PR heads / merge refs, local merge-tree signals, and changed-file lists. GitHub REST returned `403`, so patrol used refs / local simulation fallback. Deputy final-gate ACK is visible in `docs/WORKSTREAM_BLACKBOARD.md` at `2026-05-25T12:40:29Z`, but PR #23 became stale after that main advance: `git merge-tree --write-tree origin/main refs/patrol/pr23` exits `1` with a `docs/WORKSTREAM_BLACKBOARD.md` content conflict. PR #22 / PR #25 / PR #26 still merge-tree clean against latest main. Executive updated the PR #23 row to `FINAL_GATE_ACK_STALE / CURRENT_MAIN_SYNC_BLOCKED`, opened a Deputy decision request in the inbox, and added triage for PR #23 workflow repair. No merge / reject / close action was executed.
+- `2026-05-25T12:29:52Z`: Executive Officer rechecked latest main `14e6bd7d5e01149d95683baa5def443c5cf59d69`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, PR comments, PR reviews, PR changed files, `git ls-remote` PR refs, fetched PR heads / merge refs, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #23 remains open / mergeable at head `d126327ddac96d29ba553a5c7ca9aab9e6461217`, `refs/pull/23/merge` `c39436e1d2a73963626e4d3c9466350832139a74`, local merge-tree exit `0` with tree `8eaea53467755ac7b499a29f0658ed68e6ea2f53`, and clean Codex comment `4534133600`; no newer Deputy final-gate ACK was found after the 12:17 Executive request. PR #25 remains open / mergeable at head `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`, `refs/pull/25/merge` `8d796e62b303066b9097b48a59b37fd7ea7fa933`, local merge-tree exit `0` with tree `bcb5315fb1869cb09ccc4eedd95ace01001d1726`, and clean Codex comment `4534078809`; no newer Deputy final-gate ACK was found after the 12:05 Executive request. Executive added a single-primary `To: Deputy Codex` final-gate visibility follow-up to the inbox. No delivery-table row changed.
+- `2026-05-25T12:17:48Z`: Executive Officer rechecked latest main `a4fa97fb846290ac459c5176313ce9a30d55ae89`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads / merge refs, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #23 now has a clean post-`d126327` Codex result in issue comment `4534133600`; PR #23 head is `d126327ddac96d29ba553a5c7ca9aab9e6461217`; `refs/pull/23/merge` is `c39436e1d2a73963626e4d3c9466350832139a74`; current-main merge-tree exits `0` with tree `c23d7d6be4d07f093397b72798ba8671bcc663cb`; row moved from review-result pending to Deputy final-gate candidate. PR #25 remains a Deputy final-gate candidate at head `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; current-main merge-tree exits `0` with tree `6e061c61c7874ebe6e6fedd37b4f7a038c2e21d1`. PR #22 / PR #26 remain monitor-only final-gate candidates with current-main merge-tree exit `0`. Executive inbox and triage queue updated for PR #23 final-gate visibility.
+- `2026-05-25T12:05:40Z`: Executive Officer rechecked latest main `45c560fb46b95ea055363670126c5d9edb889f07`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads / merge refs, base-to-head changed files, commit lists, and local merge-tree signals. `gh` is unavailable in this workspace and GitHub REST metadata returned unauthenticated `403`, so public PR page / refs fallback was used. PR #25 advanced to head `58b42b55cf6da347663b603ba971f3c1ea0cbd1a`; Codex P2 findings on `f545c13` were fixed; public page now shows `PLAN_PUZZLE_ACTION_TAKEN` plus Codex clean result; `refs/pull/25/merge` exists and local merge-tree exits `0`; row moved to Deputy final-gate candidate. PR #23 advanced to head `d126327ddac96d29ba553a5c7ca9aab9e6461217`; public page shows Output Documents workflow repair, checks rerun, `@codex review` requested, `refs/pull/23/merge` exists, and local merge-tree exits `0`; no post-`d126327` clean Codex result was visible yet, so row moved to `CODEX_REVIEW_REQUESTED` / result pending. Executive inbox and triage queue updated.
+- `2026-05-25T11:41:03Z`: Executive Officer rechecked latest main `df7f3b33888c64c5f5bdac4b63eb472d158b2146`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals; GitHub REST metadata hit unauthenticated `403` fallback. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 produced effective Builder artifact: public page exposes `PLAN_PUZZLE_WORKFLOW_REPAIR_ATTEMPTED`, head advanced to `f545c131141b2694765e827d1831822869b4c35a`, `refs/pull/25/merge` exists at `41850dd7af1305b32c8baab85fb978e7f76a3181`, and local merge-tree exits `0` with tree `86583d0681cb1122ccb508760e5e2b048f92c34b`; missed cycles reset to `0`, and next chase is `CODEX_REVIEW_REQUESTED` visibility. PR #23 remains stalled: head `a75e3802a30f13201cf2df5705112142d9251e8c`, no required ACK label found on the public PR page, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict; missed cycles increased to `21`; Executive inbox updated with a single-primary Output Documents Builder follow-up and a Plan Puzzle review-request follow-up.
+- `2026-05-25T11:22:57Z`: Executive Officer rechecked latest main `c576c81c672b068d4cf6d1f90a8fc30f07ee35f3`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 11:12 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `20`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T11:12:52Z`: Executive Officer rechecked latest main `b1a890e15bddeef5efd9030c7b868f1305e3728f`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 11:02 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `19`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T11:02:48Z`: Executive Officer rechecked latest main `a28ceb562f238196638f759ff2ca8b94da0ac172`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 10:52 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `18`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T10:52:48Z`: Executive Officer rechecked latest main `65ae9372ff7099aae57c597e44c9f1bef2461402`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 10:42 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `17`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T10:42:48Z`: Executive Officer rechecked latest main `9d54d93223b29c5ebf3b95acb40870b49083d783`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 10:32 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `16`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T10:32:44Z`: Executive Officer rechecked latest main `5d44c8f2c081d23ad7d2c2c717ebae056d009107`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 10:22 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `15`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T10:22:20Z`: Executive Officer rechecked latest main `ec8e636a5c6c6078757d7b5ec95ebe6be487b131`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 10:13 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `14`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T10:13:29Z`: Executive Officer rechecked latest main `4448a6a739cefcbc2ecec246699acf7a43960071`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR / Issue metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 10:02 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `13`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T10:02:28Z`: Executive Officer rechecked latest main `39d6c2c211473219a288e7444295b1c6a389eee8`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR metadata, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 09:51 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `12`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T09:51:25Z`: Executive Officer rechecked latest main `aacf9befb33f6b331610fd04ed8630b088e325e6`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST PR metadata with `403` fallback, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub refs confirm PR #22 / #23 / #25 / #26 remain open. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 09:41 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `11`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T09:41:25Z`: Executive Officer rechecked latest main `723fe8a8f3f34bdec8aca42d7a83a7acaaf76fd9`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST metadata/comments/reviews with full `403` fallback, public PR pages for PR #23 / PR #25, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub refs confirm PR #22 / #23 / #25 / #26 remain open. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, public page keyword scan found no required ACK labels, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, `refs/pull/23/merge` still exists but is stale / not current-main readiness evidence, public page keyword scan found no required ACK labels, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 09:28 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `10`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T09:28:20Z`: Executive Officer rechecked latest main `bd24fff3f8e588da95a9ac9cae1d0d917ed11e42`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub PR / Issue metadata with REST comment-review `403` fallback, PR #23 / PR #25 public PR pages, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub refs confirm PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open by PR metadata and prior state while direct Issue REST hit rate-limit after #15; Issue #19 remains completed by prior reconciled state. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, latest useful PR page evidence remains local-only handoff / follow-up content, no `refs/pull/25/merge` exists, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, latest useful PR page evidence remains prior resync / reassignment content, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 09:17 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `9`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T09:17:50Z`: Executive Officer rechecked latest main `1b1dec0cdd81be9544b23a9de97e0e261bb84923`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open PR / issue metadata, PR #23 / PR #25 comments and reviews, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 and PR #24 remain closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, latest PR comment remains connector local-only handoff `4531949297`, no `refs/pull/25/merge` exists, and local merge-tree exits `128` / unrelated histories in this worktree while prior Commander evidence preserves `docs/NEXT_CODEX_HANDOFF.md` conflict. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, latest PR comment remains Deputy reassignment recommendation `4531941113`, PR reviews remain historical, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 09:05 Commander direct Builder repair callout. Missed cycles for PR #25 / PR #23 increased to `8`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T09:05:46Z`: Commander patrol rechecked latest main through merge catch-up to `8d903c41d1aeec58fcb3782c7a8529418ca165c9`, GitHub PR metadata through the connector, PR #23 / PR #25 comments and review threads, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, latest PR comment remains `4531941113`, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, latest PR comment remains `4531949297`, no `refs/pull/25/merge` exists, and local merge-tree exits `1` with `docs/NEXT_CODEX_HANDOFF.md` conflict. No Builder visible ACK, branch-head update, or new repair comment was found after the 08:30 / 08:36 direct repair requests. This is now `TWO_PATROL_NON_RESPONSE`; Executive must chase visible chat ACK from each Builder and verify the workstream automation is rebound to the current chatroom if the chat stays silent. No delivery-table row state changed.
+- `2026-05-25T08:59:43Z`: Executive Officer rechecked latest main `322594b1fed29351a938be0f0c0de92b27dc14dc`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open PR / issue metadata, PR #23 / PR #25 comments and reviews, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. GitHub confirms PR #22 / #23 / #25 / #26 remain open; Issues #15 / #16 / #17 / #18 remain open; Issue #19 and PR #24 remain closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, latest PR comment remains connector local-only handoff `4531949297`, no `refs/pull/25/merge` exists, and local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, latest PR comment remains Deputy reassignment recommendation `4531941113`, PR reviews remain historical, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK or branch-head update was found after the 08:49 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `7`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T08:49:39Z`: Executive Officer rechecked latest main `983facfc0e6d564cf2442c0d9e31a357d1395b52`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub REST open-PR API until `403` rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, and local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, `refs/pull/23/merge` exists but is stale / not current-main readiness evidence, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK or branch-head update was found after the 08:36 Executive follow-ups. Missed cycles for PR #25 / PR #23 increased to `6`; Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder.
+- `2026-05-25T08:36:37Z`: Executive Officer rechecked latest main `b563821e94bc3785692bd8a766968aa3b326457e`, required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR metadata before API rate-limit fallback, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #25 remains Current Handler `Plan Puzzle Builder`; head remains `ffbe8e1e72a`, no `refs/pull/25/merge` exists, and local merge-tree exits `128` / unrelated histories in this worktree while the ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. PR #23 remains Current Handler `Output Documents Builder`; head remains `a75e3802a30f`, `refs/pull/23/merge` exists but is stale / not current-main readiness evidence, and local merge-tree exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict. No Builder visible ACK or branch-head update was found after the 08:30 direct repair requests. Executive inbox updated with single-primary follow-ups to Plan Puzzle Builder and Output Documents Builder. No delivery-table row state changed.
+- `2026-05-25T07:29:00Z`: `ACTIVE_HANDLER_SILENT` remains after latest main `8007ae079d438f16ef4e14951aa78d2f1d9a8af9`. Executive Officer checked required governance docs, blackboard, this ledger, triage queue, reviewer inbox, GitHub REST open PR / Issue metadata, PR comments / reviews, fetched PR refs, branch heads, and local merge-tree signals. PR #22 / PR #26 still merge-tree cleanly against latest main and remain Deputy Codex final-gate visibility rows. PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 still has no merge ref and local merge-tree exits `128` / unrelated histories, so both remain Deputy Codex-2 repair-status rows. No table row state changed; `EXECUTIVE_PATROL_INBOX.md` was updated with the 07:29 visible ACK follow-up.
+- `2026-05-25T07:34:01Z`: Commander patrol rechecked latest `origin/main` `1c4000748a18`; GitHub open Issues #15 / #16 / #17 / #18 remain open and #19 remains closed. PR #22 and PR #26 merge-tree cleanly against current main and Deputy visible ACK is now published: both remain final-gate candidates, with no merge/reject executed in patrol. PR #23 still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; PR #25 now reports a concrete `docs/NEXT_CODEX_HANDOFF.md` content conflict rather than only the prior unrelated-history signal. Active-handler silence remains for Deputy Codex-2 repair rows (#23 / #25), which still need repair attempt or blocker-with-attempted-fix.
+- `2026-05-25T07:41:31Z`: Executive Officer rechecked latest main `944b71a95562d06fdf08dfeb2dd828243b59ec65`, required governance docs, blackboard, ledger, triage queue, Executive inbox, reviewer inbox, GitHub open PR / Issue metadata until unauthenticated REST rate limit, `git ls-remote` PR refs, fetched branch heads, and local merge-tree signals. Deputy visible ACK for PR #22 / PR #26 was found in the `2026-05-25T07:34:01Z` Commander patrol entry, so those rows are monitor-only for Executive visible-ACK chase. `ACTIVE_HANDLER_SILENT` remains only for Deputy Codex-2 repair rows PR #23 / PR #25; Executive inbox updated with a 07:41 follow-up. No delivery-table row state changed.
+- `2026-05-25T07:50:01Z`: Commander patrol used `API_LIMIT_FALLBACK` after GitHub REST returned 403. Latest `origin/main` is `829ef3ecf876`; `git ls-remote` shows PR #23 head remains `a75e3802a30f` and PR #25 head remains `ffbe8e1e72a`. Local merge-tree still exits `1` for PR #23 with `docs/WORKSTREAM_BLACKBOARD.md` conflict and exits `1` for PR #25 with `docs/NEXT_CODEX_HANDOFF.md` conflict. No Deputy Codex-2 visible repair ACK was found in blackboard / ledger / Executive inbox; active-handler silence remains for PR #23 / PR #25 only.
+- `2026-05-25T07:57:31Z`: Executive Officer rechecked latest main `dc26429562ba686973495496acac58ceb87b6924`, required governance docs, blackboard, ledger, triage queue, Executive inbox, reviewer inbox, GitHub open Issues / open PR metadata, PR #23 / PR #25 comments and review state, `git ls-remote` PR refs, fetched branch heads, and local merge-tree signals. GitHub Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #26 remain final-gate monitor-only rows with merge-tree exit `0`. PR #23 remains head `a75e3802a30f` with `docs/WORKSTREAM_BLACKBOARD.md` conflict; PR #25 remains head `ffbe8e1e72a` with no merge ref and local merge-tree exit `128` in this worktree. No Deputy Codex-2 visible repair ACK was found after the 07:41 Executive follow-up, so `ACTIVE_HANDLER_SILENT` remains only for Deputy Codex-2 repair rows PR #23 / PR #25. Executive inbox updated with a single-primary `To: Deputy Codex-2` follow-up. No delivery-table row state changed.
+- `2026-05-25T08:05:01Z`: Commander patrol rechecked latest main `1845ccd885f4`, GitHub REST open PR / Issue metadata, PR #23 / PR #25 issue comments, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #23 remains head `a75e3802a30f` and still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; latest PR comment remains Executive reassignment recommendation `4531941113`. PR #25 remains head `ffbe8e1e72a`, still has no `refs/pull/25/merge`, and now consistently reports `docs/NEXT_CODEX_HANDOFF.md` conflict in local merge-tree; latest PR comment remains local-only handoff `4531949297`. No Deputy Codex-2 visible repair ACK was found after the latest Executive single-primary follow-up. No delivery-table row state changed.
+- `2026-05-25T08:13:01Z`: Executive Officer fast-forwarded to latest main `b2a7f45599416822280807b19fda4f670a56ca9d`, rechecked required governance docs, blackboard, this ledger, triage queue, Executive inbox, reviewer inbox, GitHub open Issues / open PR metadata, PR #23 / PR #25 comments and reviews, `git ls-remote` PR refs, fetched PR heads, and local merge-tree signals. Issues #15 / #16 / #17 / #18 remain open and Issue #19 remains closed. PR #22 / PR #26 remain Deputy final-gate monitor-only rows with merge-tree exit `0`. PR #23 remains head `a75e3802a30f` and still conflicts in `docs/WORKSTREAM_BLACKBOARD.md`; latest PR comment remains Executive reassignment recommendation `4531941113`. PR #25 remains head `ffbe8e1e72a`, still has no `refs/pull/25/merge`, latest PR comment remains local-only handoff `4531949297`, and local merge-tree exits `128` / unrelated histories in this worktree while the Commander ledger preserves `docs/NEXT_CODEX_HANDOFF.md` conflict evidence. No Deputy Codex-2 visible repair ACK was found after the 07:57 Executive follow-up and 08:05 Commander reconfirmation, so `ACTIVE_HANDLER_SILENT` remains only for Deputy Codex-2 repair rows PR #23 / PR #25. Executive inbox updated with a single-primary `To: Deputy Codex-2` follow-up. No delivery-table row state changed.
+- `2026-05-25T08:30:06Z`: Commander patrol rechecked latest main `bf39dc4251f3`, PR refs, PR #23 / #25 comments, and local merge-tree signals after direct Builder repair reassignment. Obsolete duplicate Governance Patrol heartbeat automation `automation` / `巡查員` was deleted; canonical Governance Patrol remains `20` / `laibe-governance-patrol-20min`. Workstream automation prompts were verified free of mojibake. PR #23 remains head `a75e3802a30f` with current-main conflict in `docs/WORKSTREAM_BLACKBOARD.md`; latest PR comment remains `4531941113`. PR #25 remains head `ffbe8e1e72a` with current-main conflict in `docs/NEXT_CODEX_HANDOFF.md`; latest PR comment remains `4531949297`. Existing GitHub merge refs for PR #22 / #23 / #26 are stale against older base SHAs and are not current-main merge readiness evidence. Keep PR #25 Current Handler as Plan Puzzle Builder and PR #23 Current Handler as Output Documents Builder pending the next Builder heartbeat visible ACK.

@@ -1,9 +1,9 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
-## Latest Raw Candidate Warehouse Task: R1.5 Source Quality Scoring / Reviewer Checklist
+## Latest Raw Candidate Final Gate Recovery: File Intake / MethodSpec Handoff
 
-- 本輪任務名稱：Raw Candidate Issue #17 Delivery Reconciliation / R1.5 source quality scoring reviewer checklist。
-- 任務來源：GitHub Issue #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist`。
+- 本輪任務名稱：Raw Candidate PR #26 final gate recovery / integration readiness evidence。
+- 任務來源：GitHub Issue #17 `[Raw Candidate] Add R1.5 source quality scoring reviewer checklist` and PR #26 recovery request。
 - Branch：`warehouse/raw-source-quality-scoring`。
 - PR：#26 `Add raw source quality scoring reviewer checklist` - https://github.com/laibeoffer/laibe-mvp/pull/26。
 - 修改檔案：
@@ -13,8 +13,13 @@
   - `docs/WORKSTREAM_BLACKBOARD.md`
 - 新增檔案：
   - `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
+  - `docs/budget/27-raw-candidate-file-intake-contract.md`
+  - `docs/budget/28-raw-to-methodspec-handoff-contract.md`
   - `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
   - `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
+- Recovery scope：merge latest `origin/main` into PR branch without force push / reset / clean, preserve Raw Candidate changed-file scope, and add docs-only integration readiness evidence。
+- File intake contract：documents how a Quote Factory `cloud_ready_export_package.json` may enter a Raw Candidate dry-run as candidate evidence with requirement / plan context windows as metadata only。
+- Raw-to-MethodSpec handoff contract：documents how `HandoffProposal` may be sent to MethodSpec / Pricing Review with allowed actions, blocked actions, and full provenance while keeping formal pricing disabled。
 - R1.5 新增 `SourceQualityAssessment`、`ReviewerChecklistItem`、`SourceQualityGrade` 與 `ReviewerChecklistStatus`，只作候選證據的品質評分與 reviewer checklist。
 - `scoreSourceQualityForCandidates()` 只讀 `RawCatalogSource`、`RawCatalogItem`、`RawCatalogCandidate` 與 `CandidateValidationResult`，輸出 source quality score、grade、reviewer checklist、recommended review status 與 recommendation reason。
 - R1.5 reviewer checklist 檢查 source identity、source date、source reliability、raw item trace、suggested code、unit、currency、observed price evidence-only 與 validation status。
@@ -22,7 +27,26 @@
 - `formal_price_generated` 維持 `false`；`price_authority` 維持 `"none"`；`observed_price_is_evidence_only` 為 `true`。
 - Demo command：`node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`。
 - 本輪未修改 renderer / Excel / PDF、`BudgetOutputSnapshot`、MethodSpec 主規則、平面拼圖、frontend、DB/API、RAG/AI API、payment、escrow 或 listing fee。
-- 下一步建議：PR #26 可進行 checks / Codex review；若審查通過，再由 Deputy / Commander 決定 merge。
+- 下一步建議：若 PR #26 mergeability and validation are clean, final merge remains Deputy / Commander gate。
+
+## Latest MethodSpec Documentation Task: Validator Freeze Note
+
+- 本輪任務名稱：MethodSpec validator freeze note。
+- GitHub Issue：#16 `[MethodSpec] Add validator freeze note`。
+- 任務類型：Documentation / Governance checkpoint；本輪只整理 MethodSpec validator 狀態與邊界，不修改 runtime code。
+- 新增檔案：
+  - `docs/budget/32-method-spec-validator-freeze-note.md`
+- 修改檔案：
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- 未修改：`src/lib/budget/specs/`、`src/lib/budget/output/`、`src/lib/budget/renderers/`、`src/lib/budget/raw-warehouse/`、`src/lib/budget/intake/`、frontend、preview floor plan、plan-puzzle、payment / escrow / listing fee。
+- 目前凍結狀態：PR #4 merged；P0 / P1-A / P1-B MethodSpec validator work complete；MS-12 reviewer verdict is `PASS_WITH_NOTES`。
+- `PASS_WITH_NOTES` 只因歷史 dirty / untracked repo baseline，非 validator boundary failure。
+- Frozen invariants：AI / RAG / raw candidate data 不得直接成為正式價格；`LaborRule` remains reference-only；`MaterialSpec` / `ItemMaterialBinding` / `NoteTemplate` / `InclusionExclusionRule` 不得改 `unit_price`、`amount` 或 `quantity`。
+- UnitConversion coverage remains warning-only and must not rewrite generated quantities.
+- Inclusion / Exclusion scope coverage remains warning / allowed-condition only and must not propagate directly to renderer or output.
+- Regression baseline remains: total amount `231103`, budget line count `12`, review-required line count `5`.
+- 下一步建議：若繼續 MethodSpec，應另開 formal Issue 做 P2 validator planning 或 clean worktree / file ownership proof；不得從本文件直接進 formal price、renderer、raw warehouse publishing 或 schema expansion。
 
 ## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
 
@@ -972,6 +996,18 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
 - Phase 3.5 still does not generate real `.xlsx` or `.pdf`; it only establishes controlled writer entry, manifest, local staging policy, placeholder writer guard, and static guard coverage.
 - Phase 3.5 did not modify frontend, floor-plan, preview_floor_plan, plan-puzzle, `code.html`, database migrations, RAG, AI API, Skills, payment, escrow, or listing fee.
 - Task dispatch note: Budget Phase 3.5 is a Builder / Data Model / renderer-contract spike with implementation allowed by user scope. It is ready to be included in phase review materials before any production-grade file writer is attempted.
+
+## Output Documents Issue #18 Handoff
+
+- Workstream: `output/budget-documents`.
+- Branch: `output/renderer-static-guard-review-packet`.
+- GitHub Issue: `#18 [Output Documents] Add renderer snapshot-only review packet / static guard next step`.
+- Added `docs/budget/27-renderer-snapshot-only-review-packet.md` as the snapshot-only review packet for renderer static guard / import denylist / placeholder writer hardening.
+- Added `src/lib/budget/renderers/formal-file-writer-policy.ts` so formal writer preflight / manifest / staging modules have a concrete artifact policy contract.
+- Added `src/lib/budget/renderers/run-renderer-static-guard.ts` as the local command entry for renderer static guard.
+- Static guard command: `node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts`.
+- Writer path remains snapshot-only: formal writer can only consume `renderFormalBudgetDocument()` gated structured output and must pass `runFormalFileWriterPreflight()` first.
+- This issue still does not generate real `.xlsx` or `.pdf`, does not introduce a document library, does not rerun budget engine, does not read pricing rules or material resolver, and does not touch MethodSpecCatalog, raw warehouse, frontend, plan-puzzle, payment, DB, RAG, or AI API.
 ## Latest Visual Simulation Task: Minimal Real Server Runtime Spike Revalidation
 
 - 本輪任務名稱：Minimal Real Server Runtime Spike。

@@ -68,6 +68,7 @@ export const writeFormalPlaceholderArtifact = (
   const validation = validateFormalLocalStagingPolicy({
     storage_target: manifest.storage_target,
     staging_relative_path: options.staging_relative_path,
+    write_to_staging: options.write_to_staging,
     actual_artifact_kind: manifest.actual_artifact_kind,
     signed_document_exists: options.signed_document_exists,
   });

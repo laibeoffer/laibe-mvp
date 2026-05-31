@@ -35,7 +35,42 @@ PENDING
 
 ## Pending Reviewer Findings
 
-No pending reviewer findings yet.
+### 2026-05-25T15:20:08Z - [CODEX_P2_REVIEW_GATE] - Output Documents
+
+Status:
+RESOLVED_BY_CLEAN_CODEX_REVIEW
+
+Reviewer:
+LAIBE_REVIEWER
+
+Workstream:
+output/budget-documents
+
+Issue / PR:
+`laibeoffer/laibe-mvp` Issue #18 / PR #23
+
+Finding:
+Commander patrol found a post-`01b489c` Codex P2 on the public PR page: `Block staging writes for metadata-only storage target`.
+
+Evidence:
+- PR #23 head: `01b489c21a71db7a3301918e44bcfea75e60206a`.
+- File: `src/lib/budget/renderers/formal-file-writer-policy.ts`, around lines `+216` to `+220`.
+- P2 summary: `review_packet_attachment` declares `allows_file_write: false`, but `storageTargetIsAllowed()` only checks target presence, so `writeFormalBudgetArtifact()` with `storage_target: "review_packet_attachment"` and `write_to_staging: true` can still produce a local placeholder file.
+- Latest-main sync is also blocked: `git merge-tree --write-tree origin/main refs/patrol/hb1520/pr23` exits `1` with `docs/WORKSTREAM_BLACKBOARD.md` conflict against `b14845cb03314f5eecdcdef59b2337eb56dd15ba`.
+
+Recommended Deputy action:
+Keep PR #23 out of final gate. Route the P2 fix and latest-main sync repair to Output Documents Builder, then require Codex re-review before final-gate reconsideration.
+
+Need Commander:
+No
+
+Need Reviewer:
+No unless branch changes, Codex reports NEEDS_FIX / P1 / P2, validation is contradicted, or scope drift is found.
+
+Deputy Decision:
+PR23_P2_FIXED_AND_CLEAN_ON_HEAD_1BE77D0
+Resolution update 2026-05-25T15:51:46Z:
+PR #23 advanced to head `1be77d0481cd03893a8253e812094f745341078a`. Builder posted the P2 fix / validation report in comment `4535482545`, including metadata-only storage target write smoke `status: blocked` / `artifact_written: false`. Codex returned clean in comment `4535507114`, and `git merge-tree --write-tree origin/main refs/patrol/hb1551/pr23` exits `0`. Reviewer watch is closed unless branch changes or Codex reports a new blocker.
 
 ## Processed Reviewer Findings
 
