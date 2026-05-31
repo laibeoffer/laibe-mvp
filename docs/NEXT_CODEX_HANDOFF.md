@@ -1,5 +1,55 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Budget Knowledge Vault Task: Structure + Automation
+
+- 本輪任務名稱：Budget Knowledge Vault structure and automation repair.
+- 任務類型：Documentation / Support Agent Knowledge Vault / Automation setup.
+- 指派角色：預算知識庫 / Budget Knowledge Vault Agent.
+- Workstream：`knowledge/budget-vault`.
+- Managed by：`LAIBE_REVIEWER_INTEGRATION_OFFICER`.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：
+  - `docs/budget_knowledge_vault/00_index.md`
+  - `docs/budget_knowledge_vault/AUTOMATION.md`
+  - `docs/budget_knowledge_vault/01_quote_factory/qf_status_summary.md`
+  - `docs/budget_knowledge_vault/01_quote_factory/qf_export_package_notes.md`
+  - `docs/budget_knowledge_vault/02_raw_candidate/raw_candidate_status_summary.md`
+  - `docs/budget_knowledge_vault/02_raw_candidate/raw_candidate_handoff_notes.md`
+  - `docs/budget_knowledge_vault/03_method_spec/methodspec_status_summary.md`
+  - `docs/budget_knowledge_vault/03_method_spec/methodspec_rule_guard_notes.md`
+  - `docs/budget_knowledge_vault/04_output_documents/output_documents_status_summary.md`
+  - `docs/budget_knowledge_vault/04_output_documents/output_snapshot_renderer_notes.md`
+  - `docs/budget_knowledge_vault/05_integration_backlog/integration_gap_register.md`
+  - `docs/budget_knowledge_vault/05_integration_backlog/integration_readiness_matrix.md`
+  - `docs/budget_knowledge_vault/06_proposals/method_spec_proposals.md`
+  - `docs/budget_knowledge_vault/06_proposals/pricing_review_proposals.md`
+  - `docs/budget_knowledge_vault/06_proposals/unit_conversion_proposals.md`
+  - `docs/budget_knowledge_vault/06_proposals/output_feedback_proposals.md`
+  - `docs/budget_knowledge_vault/07_decision_logs/reviewer_decisions.md`
+  - `docs/budget_knowledge_vault/07_decision_logs/commander_decisions.md`
+- 自動化：
+  - Codex app heartbeat `budget-knowledge-vault-patrol` 已建立。
+  - 巡邏頻率：每 12 分鐘。
+  - Scope：只巡查 `knowledge/budget-vault`，不巡查全專案。
+- 已完成：
+  - 建立 Budget Knowledge Vault Markdown 結構。
+  - 建立 / 記錄 12 分鐘巡邏 automation。
+  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 補上完整 `Agent Self-Introduction: Budget Knowledge Vault`。
+  - 建立四條預算核心線 summary：Quote Factory、Raw Candidate、MethodSpec、Output Documents。
+  - 建立 integration gap register、readiness matrix、proposal registers、reviewer / commander decision logs。
+  - 保留 Requirement Form / ProjectRequirementBrief window 與 Plan Puzzle SVG / Quantity Facts window 邊界。
+- 未碰範圍：`src/`、`app/`、`components/`、Quote Factory repo、raw warehouse implementation、MethodSpec implementation、Output Documents implementation、Budget Engine、PricingRule、BudgetEstimateLine、正式價格、正式報價、n8n、Obsidian runtime、AI API、Supabase / DB、payment / escrow / listing fee、integration harness、Plancraft。
+- 是否涉及 routing / CTA / header：No.
+- 是否涉及資料模型：No runtime schema change; Markdown knowledge-vault summaries only.
+- 是否涉及敏感區域：No.
+- 是否可供使用者後續主動審查：Yes, as docs-only support-agent setup.
+- 已知風險：
+  - 原始工作樹 `Z:\laibe_project` 有大量 unrelated dirty changes；正式提交使用乾淨 worktree `Z:\laibe_project_budget_vault_pr`，只帶入本輪文件。
+  - `git` 不在 PATH，但 MinGit fallback 可用。
+- 下一步建議：由 Integration Officer 檢視 Knowledge Vault proposal 是否越界；不得由此 vault 直接啟動 integration harness。
+
 ## Latest MethodSpec Documentation Task: Validator Freeze Note
 
 - 本輪任務名稱：MethodSpec validator freeze note。

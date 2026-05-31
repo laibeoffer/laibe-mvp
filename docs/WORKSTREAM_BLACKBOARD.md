@@ -1038,6 +1038,85 @@ No.
 Need Reviewer:
 No.
 
+## Support Agents Managed by Integration Officer
+
+| Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
+|---|---|---|---|---:|---|---|
+| 預算知識庫 / Budget Knowledge Vault Agent | knowledge/budget-vault | LAIBE_REVIEWER_INTEGRATION_OFFICER | ACTIVE_SUPPORT | 25% | Yes | 整理四個預算核心 agent 的報告、缺口、提案、決策與回流資料；支援整合官判斷，不參與四條預算核心 readiness gate。 |
+
+### Agent Self-Introduction: Budget Knowledge Vault
+
+Agent:
+預算知識庫 / Budget Knowledge Vault Agent
+
+Workstream:
+knowledge/budget-vault
+
+Managed By:
+審查官兼整合官 / LAIBE_REVIEWER_INTEGRATION_OFFICER
+
+Repo / Branch:
+laibeoffer/laibe-mvp / knowledge/budget-vault
+
+Status:
+ACTIVE_SUPPORT
+
+MVP Scope Completion %:
+25%
+
+Integration Readiness %:
+N/A
+
+Not Part of Integration Gate:
+Yes
+
+Role:
+整理四個預算核心 agent 的報告、缺口、決策、提案與回流資料，建立 Markdown Knowledge Vault，支援整合官判斷預算生成系統是否可以進入 integration harness。
+
+Primary Outputs:
+- status summaries
+- integration gap register
+- proposal register
+- review notes
+- decision logs
+- readiness matrix
+- automation patrol notes
+
+Forbidden:
+- 不產生正式價格
+- 不產生 PricingRule
+- 不產生 MaterialSpec
+- 不產生 LaborRule
+- 不產生 BudgetEstimateLine
+- 不產生 BudgetOutputSnapshot
+- 不產生 customer quote
+- 不接 payment / escrow / listing fee
+- 不接 AI API
+- 不接 Supabase / DB
+- 不啟動 n8n
+- 不啟動 integration harness
+- 不修改 implementation code
+
+Automation:
+budget-knowledge-vault-patrol / every 12 minutes
+
+Requests to Integration Officer:
+請審查本 agent 的任務進度、內容邊界、Knowledge Vault 結構與 proposal 是否越界，並持續指導本 agent 如何支援 Budget Integration Readiness。
+
+Need Commander:
+No
+
+Need Reviewer:
+No，除非整合官發現 proposal 越界、pricing leakage、formal output confusion 或 cross-workstream boundary risk。
+
+Commander boundary:
+- Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER`, not by the Commander / Deputy Commander.
+- Commander may record this support agent's existence and cite Integration Officer status in hourly reports.
+- Commander must not directly dispatch this agent, request edits, request reports, request PRs, request automation, or ask it to patrol global status.
+- If `knowledge/budget-vault` reports a blocker, route it to the Integration Officer.
+- If the Integration Officer reports `Need Commander: Yes`, summarize that decision point for the user.
+- Budget Knowledge Vault Agent must not be listed in the Integration Readiness Gate and must not replace completion packets for `quote-factory/price-range-governance`, `warehouse/raw-candidate`, `warehouse/method-spec`, or `output/budget-documents`.
+
 ## Dispatch Queue
 
 ## Member Report Decision Basis
@@ -1344,6 +1423,32 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-31 - Budget Knowledge Vault structure and automation
+
+Workstream:
+knowledge/budget-vault
+
+Status:
+ACTIVE_SUPPORT_STRUCTURE_CREATED.
+
+Changed:
+- Created `docs/budget_knowledge_vault/` Markdown vault structure for the Budget Knowledge Vault support agent.
+- Added `docs/budget_knowledge_vault/AUTOMATION.md` and created the Codex app heartbeat `budget-knowledge-vault-patrol` on a 12-minute cadence.
+- Added the full `Agent Self-Introduction: Budget Knowledge Vault` block under Integration Officer-managed support agents.
+- Preserved the rule that this agent is not part of the four-line Integration Gate and cannot start the integration harness.
+
+Forbidden scope check:
+- No implementation code.
+- No formal price.
+- No `PricingRule`, `MaterialSpec`, `LaborRule`, `BudgetEstimateLine`, or `BudgetOutputSnapshot`.
+- No payment, AI API, DB, n8n, renderer, or Plancraft changes.
+
+Need Commander:
+No
+
+Need Reviewer:
+No, unless Integration Officer later flags proposal leakage or cross-workstream boundary risk.
 
 ### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
 
