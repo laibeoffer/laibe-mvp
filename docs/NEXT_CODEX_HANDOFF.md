@@ -4,6 +4,8 @@
 
 - 本輪任務名稱：Plancraft+ 平面拼圖引導官 MVP。
 - 任務類型：Builder / UI Interaction / Guide Assistant / plan-puzzle。
+- PR：`https://github.com/laibeoffer/laibe-mvp/pull/39`，draft，供 Commander 確認產品方向。
+- Branch：`plancraft-plan-puzzle-guide-assistant-mvp`。
 - 修改檔案：
   - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
   - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
