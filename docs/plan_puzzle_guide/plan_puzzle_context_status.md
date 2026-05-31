@@ -14,13 +14,13 @@ Runtime status:
 
 Local-only draft status:
 
-`LOCAL_DRAFT_ONLY` until this branch / PR is reviewed as GitHub-tracked source.
+`LOCAL_STATE` only. Local worktree content is not completion evidence.
 
 ## Status Definitions
 
 ### `CONTRACT_ONLY`
 
-Documents and placeholder contracts exist. Runtime may not show the new contract yet.
+Documents and placeholder contracts exist in a GitHub PR branch. Runtime may not show the new contract yet.
 
 ### `MOCK_READY`
 
@@ -42,17 +42,19 @@ The agent cannot proceed safely without user authorization, missing files, unava
 
 GitHub branch evidence:
 
-- `app/plan-puzzle-guide-agent` contains docs-only contract files.
+- `codex/plan-puzzle-guide-blackboard-evidence` / PR #44 contains the docs-only contract files and compact blackboard evidence correction.
+- PR #40 remains an older open draft branch and should be treated as superseded or reconciled after PR #44 review.
 
 Local draft evidence:
 
-- Local `Z:\laibe_project` draft existed before GitHub publication, but it is not the formal delivery source.
+- Local `Z:\laibe_project` may exist as local state, but it is not the formal delivery source.
 
 Current blocker:
 
+- PR #44 is not merged to `main`.
 - Runtime code has not been modified in this branch.
 - Browser runtime verification has not been performed against GitHub source-of-truth.
 
 ## Next GitHub Action Needed
 
-Open a draft PR from `app/plan-puzzle-guide-agent` to `main`, then continue with a small GitHub-tracked runtime mock task only if explicitly safe and scoped.
+Review PR #44 through normal gates, then decide whether PR #40 should be closed, superseded, or reconciled. Continue with a small GitHub-tracked runtime mock task only after the docs contract is accepted or merged and only if explicitly safe and scoped.
