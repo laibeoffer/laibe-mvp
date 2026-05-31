@@ -1,0 +1,136 @@
+{
+  "workflow_run_id": "placeholder-run-001",
+  "workflow_name": "budget-workflow-orchestrator-placeholder",
+  "status": "DRY_RUN_TRACE_SAMPLE_ONLY",
+  "runtime": {
+    "n8n_enabled": false,
+    "webhook_enabled": false,
+    "upload_backend_enabled": false,
+    "schedule_enabled": false,
+    "api_key_included": false,
+    "db_touched": false,
+    "payment_touched": false,
+    "ai_api_touched": false,
+    "formal_output_generated": false
+  },
+  "trigger": {
+    "node_id": "trigger_manual_test",
+    "trigger_type": "manual_placeholder",
+    "trigger_status": "placeholder",
+    "input_package_ref": "sample-package-placeholder-001"
+  },
+  "parameter_windows": {
+    "project_requirement_brief": {
+      "project_requirement_brief_id": "prb-placeholder-001",
+      "owner_intent_id": "owner-intent-placeholder-001",
+      "requirement_context_status": "linked",
+      "budget_preference": "placeholder",
+      "space_requirements": "placeholder",
+      "scope_constraints": "placeholder",
+      "review_flags": ["human_review_required_before_formal_use"]
+    },
+    "plan_puzzle_quantity_facts": {
+      "plan_id": "plan-placeholder-001",
+      "svg_artifact_id": "svg-placeholder-001",
+      "plan_quantity_facts_id": "pqf-placeholder-001",
+      "quantity_context_status": "verified",
+      "zone_id": "zone-placeholder-001",
+      "area_m2": 12.5,
+      "wall_length_m": 14.2,
+      "opening_count": 1,
+      "quantity_confidence": "medium",
+      "reviewer_required": true
+    }
+  },
+  "node_trace": [
+    {
+      "node_id": "validate_input_package",
+      "status": "INPUT_PACKAGE_VALID",
+      "dry_run_only": true,
+      "requires_human_review": false
+    },
+    {
+      "node_id": "quote_factory_export_package",
+      "status": "EXPORT_PACKAGE_REVIEW_REQUIRED",
+      "dry_run_only": true,
+      "requires_human_review": true
+    },
+    {
+      "node_id": "raw_candidate_intake",
+      "status": "RAW_CANDIDATE_REVIEW_REQUIRED",
+      "dry_run_only": true,
+      "requires_human_review": true
+    },
+    {
+      "node_id": "raw_candidate_review_queue",
+      "status": "RAW_REVIEW_APPROVED_FOR_DRY_RUN",
+      "dry_run_only": true,
+      "requires_human_review": true
+    },
+    {
+      "node_id": "method_spec_review_gate",
+      "status": "METHODSPEC_APPROVED_FOR_DRY_RUN",
+      "dry_run_only": true,
+      "requires_human_review": true
+    },
+    {
+      "node_id": "budget_engine_entry_picking",
+      "status": "DRY_RUN_PICKING_READY",
+      "dry_run_only": true,
+      "requires_human_review": true
+    },
+    {
+      "node_id": "budget_engine_dry_run",
+      "status": "DRY_RUN_COMPLETED",
+      "dry_run_only": true,
+      "requires_human_review": true,
+      "formal_budget_generated": false
+    },
+    {
+      "node_id": "budget_output_snapshot",
+      "status": "SNAPSHOT_DRY_RUN_READY",
+      "dry_run_only": true,
+      "requires_human_review": true,
+      "formal_artifact_generated": false
+    },
+    {
+      "node_id": "output_documents_preview",
+      "status": "PREVIEW_ONLY_READY",
+      "dry_run_only": true,
+      "requires_human_review": true,
+      "xlsx_generated": false,
+      "pdf_generated": false
+    },
+    {
+      "node_id": "knowledge_vault_feedback",
+      "status": "FEEDBACK_PROPOSED",
+      "dry_run_only": true,
+      "requires_human_review": true,
+      "direct_rule_mutation": false
+    },
+    {
+      "node_id": "blackboard_status_update",
+      "status": "BLACKBOARD_UPDATE_READY",
+      "dry_run_only": true,
+      "requires_human_review": true
+    }
+  ],
+  "blocked_outputs": [
+    "real_n8n_runtime",
+    "real_webhook_url",
+    "api_key",
+    "db_or_supabase",
+    "payment",
+    "ai_api",
+    "formal_budget",
+    "formal_excel",
+    "formal_pdf",
+    "customer_notification"
+  ],
+  "final_result": {
+    "placeholder_only": true,
+    "blackboard_update_required": true,
+    "need_commander": false,
+    "need_reviewer": false
+  }
+}

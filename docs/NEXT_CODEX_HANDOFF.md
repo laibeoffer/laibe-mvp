@@ -1,5 +1,52 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Workflow Task: Budget Workflow Orchestrator Alarm Repair Patrol
+
+- 本輪任務名稱：Budget Workflow Orchestrator alarm repair patrol。
+- 任務類型：Documentation / Patrol / n8n Placeholder；本輪只檢修 placeholder patrol contract 並執行一次立即巡邏，不啟用 runtime。
+- Workstream：`workflow/budget-orchestrator`。
+- Branch：`workflow/budget-orchestrator`。
+- GitHub source of truth：`laibeoffer/laibe-mvp`。
+- 巡邏時間：`2026-06-01T00:35:09+08:00`。
+- 檢查結果：
+  - GitHub `main` checked at `4cb9fe9d902fbd6c4eed16c525629e03ab0c57a1`。
+  - PR #36 checked at head `4efd70ba9152f28ae084ab0a038976a5663a66c9`；status was open / mergeable / not draft。
+  - No matching open Issue was found for `workflow/budget-orchestrator`。
+  - GitHub `main` does not yet contain the Budget Workflow Orchestrator self-introduction because PR #36 is pending merge。
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/workflow/budget_orchestrator/AUTOMATION.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 邊界確認：沒有建立 n8n runtime、webhook endpoint、upload backend、scheduler、API key、secret、credential、DB、Supabase、payment、AI API、production automation、customer notification、formal quote、real Excel 或 real PDF。
+- 追加修正：補上 alarm health check protocol、last alarm repair timestamp、GitHub-only patrol checklist，並將 no-idle 禁止回報字串改成 ASCII-safe `NO_NEW_ASSIGNMENT`，避免本地終端 mojibake 造成規則不可讀。
+- 下一步：繼續 15-minute scoped patrol；若 20 分鐘內沒有回應，仍只能推進 placeholder initialization / patrol documentation，不得回報 `NO_NEW_ASSIGNMENT`。此 workstream 每次被喚醒時必須優先巡檢 PR #36 / Issues / review threads / comments / `docs/workflow/budget_orchestrator/`，不得因沒有新 Issue 而跳過 open PR patrol。
+
+## Previous Workflow Task: Budget Workflow Orchestrator Placeholder
+
+- 本輪任務名稱：Budget Workflow Orchestrator placeholder。
+- 任務類型：Documentation / Workflow Governance / n8n Placeholder；本輪只建立 workflow spec、placeholder blueprint、review gate 與 dry-run contract，不啟用 runtime。
+- Workstream：`workflow/budget-orchestrator`。
+- Branch：`workflow/budget-orchestrator`。
+- 新增檔案：
+  - `docs/workflow/budget_orchestrator/BUDGET_WORKFLOW_ORCHESTRATOR_AGENT.md`
+  - `docs/workflow/budget_orchestrator/AUTOMATION.md`
+  - `docs/workflow/budget_orchestrator/n8n_placeholder_workflow.md`
+  - `docs/workflow/budget_orchestrator/workflow_node_map.md`
+  - `docs/workflow/budget_orchestrator/workflow_trigger_contract.md`
+  - `docs/workflow/budget_orchestrator/workflow_node_io_contract.md`
+  - `docs/workflow/budget_orchestrator/workflow_failure_and_review_gates.md`
+  - `docs/workflow/budget_orchestrator/workflow_blackboard_update_contract.md`
+  - `docs/workflow/budget_orchestrator/workflow_knowledge_vault_feedback_contract.md`
+  - `docs/workflow/budget_orchestrator/forbidden_runtime_scope.md`
+  - `docs/workflow/budget_orchestrator/examples/n8n_placeholder_blueprint.json`
+  - `docs/workflow/budget_orchestrator/examples/budget_workflow_dry_run_trace.sample.json`
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 邊界確認：目前尚未啟用 n8n；沒有建立 webhook endpoint、upload backend、API key、secret、credential、DB、Supabase、payment、AI API、production automation、customer notification、formal quote、real Excel 或 real PDF。
+- 動態參數窗口：Requirement Form / `ProjectRequirementBrief` 與 Plan Puzzle SVG / Quantity Facts 只能以 `placeholder`、`linked`、`verified`、`unavailable` 狀態傳遞，不得直接進 `BudgetEstimateLine`、`PricingRule`、Renderer 或 production quantity。
+- 下一步：若繼續此 workstream，仍限 placeholder workflow governance。任何 real n8n / webhook / API / DB / payment / AI API / formal budget output 需要新 dispatch，並標示 Need Commander: Yes / Need Reviewer: Yes。
+
 ## Latest MethodSpec Documentation Task: Validator Freeze Note
 
 - 本輪任務名稱：MethodSpec validator freeze note。

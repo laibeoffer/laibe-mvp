@@ -638,6 +638,104 @@ IT 技術相關問題不要升級給使用者。副指揮官可依 `AGENTS.md`�
   - PR #24 Add visual prompt sandbox governance packet, merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658`
   - External Quote Factory PR #2 Add PriceRange audit override contract, merge commit `d075c505d0e950ca288e8d374bdf2efc6b447105`
 
+## Agent Self-Introduction: Budget Workflow Orchestrator Agent
+
+Agent:
+預算流程編排 / Budget Workflow Orchestrator Agent
+n8n Placeholder Agent
+
+Workstream:
+workflow/budget-orchestrator
+
+Managed By:
+LAIBE_PATROL_INTEGRATION_OFFICER
+
+Repo / Branch:
+laibeoffer/laibe-mvp / workflow/budget-orchestrator
+
+Status:
+ACTIVE_INITIALIZATION
+
+Runtime Status:
+N8N_PLACEHOLDER_ONLY
+
+Automation:
+budget-workflow-orchestrator-patrol / every 15 minutes
+
+No-Idle Rule:
+After blackboard self-introduction, if no response is received within 20 minutes, this agent must automatically continue its initialization tasks. It may not report "本 workstream 本輪無新指派" until initialization is complete.
+
+Role:
+設計預算生成 workflow placeholder，包括觸發節點、資料節點、審核節點、錯誤分支、dry-run 條件、blackboard 回報與 Knowledge Vault 回流。不接真 n8n、不接真 webhook、不接 API key。
+
+Primary Outputs:
+- n8n placeholder workflow spec
+- workflow node map
+- node input / output contract
+- failure and retry policy
+- human review gate
+- dry-run only policy
+- blackboard update contract
+- knowledge vault feedback contract
+
+Not Responsible For:
+- actual n8n runtime
+- API key
+- webhook production endpoint
+- payment
+- AI API
+- DB / Supabase
+- Budget Engine implementation
+- pricing rules
+- renderer
+
+Need Commander:
+No，除非需要決定是否正式啟用 n8n / webhook / external automation。
+
+Need Reviewer:
+No by default；若 workflow 準備接 production trigger、API、DB、payment 或正式預算輸出，改為 Yes。
+
+### Immediate Patrol Execution: Budget Workflow Orchestrator Alarm Repair - 2026-06-01T00:35:09+08:00
+
+Workstream:
+workflow/budget-orchestrator
+
+Branch:
+workflow/budget-orchestrator
+
+Status:
+ALARM_REPAIR_RECORDED / IMMEDIATE_PATROL_EXECUTED / ACTIVE_INITIALIZATION
+
+Runtime Status:
+N8N_PLACEHOLDER_ONLY
+
+Changed:
+- Checked GitHub `main` blackboard SHA `4cb9fe9d902fbd6c4eed16c525629e03ab0c57a1`.
+- Checked PR #36 head `4efd70ba9152f28ae084ab0a038976a5663a66c9`.
+- Confirmed PR #36 is open, mergeable, and not draft at patrol time.
+- Confirmed no matching open Issue was found for `workflow/budget-orchestrator`.
+- Confirmed GitHub `main` does not yet contain this agent self-introduction because PR #36 is still pending merge.
+- Recorded alarm repair status in `docs/workflow/budget_orchestrator/AUTOMATION.md`.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/workflow/budget_orchestrator/AUTOMATION.md`
+
+PR / Commit:
+PR #36 / pending patrol-repair commit
+
+Blocked:
+Not blocked for placeholder documentation. Merge to GitHub `main` is still pending through PR #36.
+
+Next:
+Continue 15-minute scoped patrol and no-idle initialization behavior until PR #36 is merged or a new Integration Officer instruction appears.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
+
 ## Workstream Status
 
 ### site/page-formalization

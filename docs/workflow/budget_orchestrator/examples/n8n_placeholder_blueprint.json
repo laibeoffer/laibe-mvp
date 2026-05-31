@@ -1,0 +1,258 @@
+{
+  "workflow_name": "budget-workflow-orchestrator-placeholder",
+  "status": "N8N_PLACEHOLDER_ONLY",
+  "n8n_runtime_enabled": false,
+  "webhook_runtime_enabled": false,
+  "upload_backend_enabled": false,
+  "schedule_runtime_enabled": false,
+  "dry_run_only": true,
+  "formal_output_allowed": false,
+  "contains_real_webhook_url": false,
+  "contains_api_key": false,
+  "contains_secret": false,
+  "contains_credential": false,
+  "contains_production_endpoint": false,
+  "contains_payment_node": false,
+  "contains_db_node": false,
+  "contains_supabase_node": false,
+  "contains_ai_api_node": false,
+  "contains_customer_notification": false,
+  "contains_formal_quote_output": false,
+  "nodes": [
+    {
+      "node_id": "trigger_manual_test",
+      "node_name": "Manual Test Trigger",
+      "trigger_type": "manual_placeholder",
+      "input": ["sample_package_ref", "context_windows"],
+      "output": ["placeholder_event_envelope"],
+      "allowed_status": ["PLACEHOLDER_READY", "SAMPLE_PACKAGE_SELECTED"],
+      "failure_status": ["BLOCKED_MISSING_SAMPLE_PACKAGE", "BLOCKED_FORBIDDEN_RUNTIME_PAYLOAD"],
+      "requires_human_review": false,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["payment_node", "db_node", "ai_api_node", "formal_renderer", "customer_notification"]
+    },
+    {
+      "node_id": "trigger_webhook_placeholder",
+      "node_name": "Webhook Trigger Placeholder",
+      "trigger_type": "webhook_placeholder",
+      "input": ["future_website_button_intent_metadata"],
+      "output": ["placeholder_event_envelope"],
+      "allowed_status": ["PLACEHOLDER_READY", "WEBHOOK_INTENT_DOCUMENTED"],
+      "failure_status": ["BLOCKED_REAL_WEBHOOK_REQUESTED", "BLOCKED_PRODUCTION_ENDPOINT_PRESENT"],
+      "requires_human_review": false,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["webhook_runtime", "api_gateway", "payment_node", "db_node", "ai_api_node", "formal_quote_output"]
+    },
+    {
+      "node_id": "trigger_file_upload_placeholder",
+      "node_name": "File Upload Trigger Placeholder",
+      "trigger_type": "file_upload_placeholder",
+      "input": ["future_upload_intent_metadata"],
+      "output": ["placeholder_event_envelope"],
+      "allowed_status": ["PLACEHOLDER_READY", "UPLOAD_INTENT_DOCUMENTED"],
+      "failure_status": ["BLOCKED_REAL_UPLOAD_REQUESTED", "BLOCKED_STORAGE_OR_DB_REQUESTED"],
+      "requires_human_review": false,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["upload_backend", "file_storage", "parser_runtime", "db_node", "supabase_node", "formal_quote_output"]
+    },
+    {
+      "node_id": "trigger_schedule_review_placeholder",
+      "node_name": "Schedule Review Trigger Placeholder",
+      "trigger_type": "schedule_placeholder",
+      "input": ["future_review_cadence_metadata"],
+      "output": ["placeholder_event_envelope"],
+      "allowed_status": ["PLACEHOLDER_READY", "SCHEDULE_INTENT_DOCUMENTED"],
+      "failure_status": ["BLOCKED_REAL_SCHEDULE_REQUESTED", "BLOCKED_RULE_MUTATION_REQUESTED"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["cron_runtime", "n8n_schedule_runtime", "pricing_rule_mutation", "method_spec_mutation", "db_node", "ai_api_node"]
+    },
+    {
+      "node_id": "validate_input_package",
+      "node_name": "Validate Input Package",
+      "trigger_type": "workflow_step",
+      "input": ["placeholder_event_envelope", "sample_package_manifest", "context_window_statuses"],
+      "output": ["validation_result", "normalized_dry_run_package_ref", "rejected_field_list"],
+      "allowed_status": ["INPUT_PACKAGE_VALID", "INPUT_PACKAGE_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_MISSING_REQUIRED_CONTEXT", "BLOCKED_FORBIDDEN_FIELD_PRESENT", "BLOCKED_FORMAL_OUTPUT_REQUESTED"],
+      "requires_human_review": false,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["budget_engine_dry_run", "pricing_rule_creation", "budget_estimate_line_creation", "renderer", "payment_node"]
+    },
+    {
+      "node_id": "quote_factory_export_package",
+      "node_name": "Quote Factory Export Package",
+      "trigger_type": "workflow_step",
+      "input": ["validated_dry_run_package_ref", "quote_factory_export_package_ref"],
+      "output": ["export_package_metadata", "candidate_evidence_refs", "source_quality_flags"],
+      "allowed_status": ["EXPORT_PACKAGE_LINKED", "EXPORT_PACKAGE_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_MISSING_EXPORT_REF", "BLOCKED_FORMAL_PRICE_PRESENT", "BLOCKED_QF_SCOPE_MISMATCH"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["pricing_rule_creation", "budget_estimate_line_creation", "budget_engine_entry_picking_without_review", "db_node", "payment_node"]
+    },
+    {
+      "node_id": "raw_candidate_intake",
+      "node_name": "Raw Candidate Intake",
+      "trigger_type": "workflow_step",
+      "input": ["export_package_metadata", "candidate_evidence_refs", "source_quality_flags"],
+      "output": ["raw_candidate_intake_packet", "provenance_map", "candidate_review_request"],
+      "allowed_status": ["RAW_CANDIDATE_INTAKE_READY", "RAW_CANDIDATE_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_PROVENANCE_MISSING", "BLOCKED_FORMAL_PRICE_PRESENT", "BLOCKED_SOURCE_QUALITY_TOO_LOW"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["method_spec_review_gate_without_raw_review", "pricing_rule_creation", "budget_engine_entry_picking", "budget_estimate_line_creation", "renderer"]
+    },
+    {
+      "node_id": "raw_candidate_review_queue",
+      "node_name": "Raw Candidate Review Queue",
+      "trigger_type": "human_review_gate",
+      "input": ["raw_candidate_intake_packet", "provenance_map", "candidate_risk_flags"],
+      "output": ["review_decision_summary", "approved_for_dry_run_candidate_refs", "rejected_refs", "needs_more_info_refs"],
+      "allowed_status": ["RAW_REVIEW_APPROVED_FOR_DRY_RUN", "RAW_REVIEW_NEEDS_MORE_INFO", "RAW_REVIEW_REJECTED"],
+      "failure_status": ["BLOCKED_RAW_REVIEW_NOT_COMPLETED", "BLOCKED_CANDIDATE_AUTHORITY_OVERSTATED"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["budget_engine_entry_picking_without_methodspec_review", "pricing_rule_creation", "formal_catalog_publish", "formal_quote_output", "payment_node"]
+    },
+    {
+      "node_id": "method_spec_review_gate",
+      "node_name": "MethodSpec Review Gate",
+      "trigger_type": "human_review_gate",
+      "input": ["approved_for_dry_run_candidate_refs", "methodspec_link_refs", "scope_flags"],
+      "output": ["reviewed_methodspec_selection_package", "unresolved_scope_notes"],
+      "allowed_status": ["METHODSPEC_APPROVED_FOR_DRY_RUN", "METHODSPEC_NEEDS_REVIEW", "METHODSPEC_REJECTED"],
+      "failure_status": ["BLOCKED_METHODSPEC_REVIEW_NOT_COMPLETED", "BLOCKED_SCOPE_RULE_MISSING", "BLOCKED_PRICING_AUTHORITY_MISMATCH"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["budget_engine_dry_run_without_gate", "pricing_rule_creation", "method_spec_mutation", "renderer", "formal_quote_output"]
+    },
+    {
+      "node_id": "budget_engine_entry_picking",
+      "node_name": "Budget Engine Entry & Picking",
+      "trigger_type": "workflow_step",
+      "input": ["reviewed_methodspec_selection_package", "verified_or_linked_requirement_context", "verified_or_linked_quantity_facts"],
+      "output": ["dry_run_picking_plan", "skipped_context_list", "review_assumptions"],
+      "allowed_status": ["DRY_RUN_PICKING_READY", "DRY_RUN_PICKING_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_CONTEXT_UNVERIFIED", "BLOCKED_QUANTITY_PLACEHOLDER_ONLY", "BLOCKED_REVIEW_GATE_MISSING"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["production_budget_engine_run", "pricing_rule_creation", "budget_estimate_line_creation", "renderer", "payment_node"]
+    },
+    {
+      "node_id": "budget_engine_dry_run",
+      "node_name": "Budget Engine Dry-run",
+      "trigger_type": "dry_run_step",
+      "input": ["dry_run_picking_plan", "approved_for_dry_run_refs", "assumptions"],
+      "output": ["dry_run_budget_trace", "non_production_snapshot_candidate", "unresolved_review_flags"],
+      "allowed_status": ["DRY_RUN_COMPLETED", "DRY_RUN_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_DRY_RUN_GUARD_FAILED", "BLOCKED_PRODUCTION_OUTPUT_REQUESTED", "BLOCKED_FORMAL_PRICE_REQUESTED"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["production_budget_engine_run", "formal_budget_estimate_line", "customer_quote_output", "formal_excel_pdf_writer", "payment_node"]
+    },
+    {
+      "node_id": "budget_output_snapshot",
+      "node_name": "BudgetOutputSnapshot",
+      "trigger_type": "snapshot_placeholder",
+      "input": ["dry_run_budget_trace", "unresolved_review_flags"],
+      "output": ["dry_run_budget_output_snapshot_ref", "preview_manifest", "traceability_summary"],
+      "allowed_status": ["SNAPSHOT_DRY_RUN_READY", "SNAPSHOT_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_SNAPSHOT_GUARD_FAILED", "BLOCKED_FORMAL_ARTIFACT_REQUESTED"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["formal_renderer", "formal_excel_pdf_writer", "customer_notification", "db_node", "payment_node"]
+    },
+    {
+      "node_id": "output_documents_preview",
+      "node_name": "Output Documents Preview",
+      "trigger_type": "preview_placeholder",
+      "input": ["dry_run_snapshot_ref", "preview_manifest", "traceability_summary"],
+      "output": ["preview_only_document_summary", "preview_warnings", "formal_output_block_status"],
+      "allowed_status": ["PREVIEW_ONLY_READY", "PREVIEW_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_FORMAL_RENDERER_REQUESTED", "BLOCKED_XLSX_PDF_REQUESTED", "BLOCKED_CUSTOMER_OUTPUT_REQUESTED"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["formal_excel_writer", "formal_pdf_writer", "customer_notification", "payment_node", "production_storage"]
+    },
+    {
+      "node_id": "knowledge_vault_feedback",
+      "node_name": "Knowledge Vault Feedback",
+      "trigger_type": "feedback_placeholder",
+      "input": ["preview_warnings", "rejected_candidates", "unresolved_assumptions", "review_flags"],
+      "output": ["feedback_proposal_packet", "proposed_knowledge_updates", "proposed_rule_review_tickets"],
+      "allowed_status": ["FEEDBACK_PROPOSED", "FEEDBACK_REVIEW_REQUIRED"],
+      "failure_status": ["BLOCKED_DIRECT_RULE_MUTATION", "BLOCKED_DB_WRITE_REQUESTED", "BLOCKED_AI_API_REQUESTED"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["direct_pricing_rule_update", "direct_methodspec_update", "db_node", "ai_api_node", "production_automation"]
+    },
+    {
+      "node_id": "blackboard_status_update",
+      "node_name": "Blackboard Status Update",
+      "trigger_type": "status_placeholder",
+      "input": ["final_dry_run_status", "feedback_proposal_packet", "blocked_scope_summary", "pr_commit_refs"],
+      "output": ["blackboard_short_format_update_draft"],
+      "allowed_status": ["BLACKBOARD_UPDATE_READY", "BLACKBOARD_BLOCKED_UPDATE_READY"],
+      "failure_status": ["BLOCKED_STATUS_MISSING_REQUIRED_FIELDS"],
+      "requires_human_review": true,
+      "dry_run_only": true,
+      "forbidden_next_nodes": ["production_automation", "customer_notification", "payment_node", "db_node", "ai_api_node", "formal_quote_output"]
+    }
+  ],
+  "edges": [
+    ["trigger_manual_test", "validate_input_package"],
+    ["trigger_webhook_placeholder", "validate_input_package"],
+    ["trigger_file_upload_placeholder", "validate_input_package"],
+    ["trigger_schedule_review_placeholder", "validate_input_package"],
+    ["validate_input_package", "quote_factory_export_package"],
+    ["quote_factory_export_package", "raw_candidate_intake"],
+    ["raw_candidate_intake", "raw_candidate_review_queue"],
+    ["raw_candidate_review_queue", "method_spec_review_gate"],
+    ["method_spec_review_gate", "budget_engine_entry_picking"],
+    ["budget_engine_entry_picking", "budget_engine_dry_run"],
+    ["budget_engine_dry_run", "budget_output_snapshot"],
+    ["budget_output_snapshot", "output_documents_preview"],
+    ["output_documents_preview", "knowledge_vault_feedback"],
+    ["knowledge_vault_feedback", "blackboard_status_update"]
+  ],
+  "parameter_windows": {
+    "project_requirement_brief": {
+      "fields": [
+        "project_requirement_brief_id",
+        "owner_intent_id",
+        "requirement_context_status",
+        "budget_preference",
+        "space_requirements",
+        "scope_constraints",
+        "review_flags"
+      ],
+      "allowed_status": ["placeholder", "linked", "verified", "unavailable"],
+      "forbidden": [
+        "free_text_requirement_to_budget_estimate_line",
+        "requirement_form_to_pricing_rule",
+        "requirement_form_bypass_review_gate"
+      ]
+    },
+    "plan_puzzle_quantity_facts": {
+      "fields": [
+        "plan_id",
+        "svg_artifact_id",
+        "plan_quantity_facts_id",
+        "quantity_context_status",
+        "zone_id",
+        "area_m2",
+        "wall_length_m",
+        "opening_count",
+        "quantity_confidence",
+        "reviewer_required"
+      ],
+      "allowed_status": ["placeholder", "linked", "verified", "unavailable"],
+      "forbidden": [
+        "svg_to_renderer",
+        "svg_to_budget_estimate_line",
+        "placeholder_quantity_as_production_quantity"
+      ]
+    }
+  }
+}
