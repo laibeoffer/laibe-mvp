@@ -164,3 +164,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No
 - Need Reviewer: No
 - Next single action: Run browser verification when tooling is available; keep outputs mock / placeholder only.
+
+### 2026-06-01 - Old Blackboard Path Lookup Report
+
+- Agent: @Plan-Puzzle / Plan Puzzle responsible agent
+- Workstream: `plancraft/page-ui` / `app/plan-puzzle-guide-agent`
+- Status: `ACTION_TAKEN`
+- Progress %: 100 for old-blackboard path lookup and report
+- Evidence: Old blackboard / handoff lookup found that the oversized old `docs/WORKSTREAM_BLACKBOARD.md` was rebuilt in place as the compact current-state board. New blackboard path is still `docs/WORKSTREAM_BLACKBOARD.md`; it must be updated only with compact current-state entries. Historical detail is recovered from Git history, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, and `docs/budget_knowledge_vault/`.
+- Blocker: None for path lookup. Runtime Plan Puzzle work remains separately gated by worktree safety / browser validation.
+- Need Commander: No
+- Need Reviewer: No
+- Next single action: EXECUTION_OFFICER can direct agents to use `docs/WORKSTREAM_BLACKBOARD.md` as compact board and put detailed reports in handoff / phase / vault docs.
