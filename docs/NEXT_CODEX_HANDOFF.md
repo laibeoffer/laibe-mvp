@@ -1,5 +1,22 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Commander Governance Announcement: GitHub Is Shared Work Path
+
+- 本輪任務名稱：Announce GitHub as mandatory shared work path.
+- 任務類型：Documentation / Governance / Commander announcement.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 已完成：
+  - 在黑板 `Current Operating Rules` 公告所有 agents：共同作業路徑一律以 GitHub 為準。
+  - 明確規定 local worktree 只能作為 private staging，不是 shared truth。
+  - 要求原本在本地作業的 agent 透過 scoped branch + PR 同步 GitHub；若無法 push，必須在相關 GitHub Issue / PR 回報 local branch、files、diff evidence。
+  - 明確禁止用 unsynced local work 做決策。
+  - 明確禁止把 unrelated dirty work 一起同步；只能發布該 workstream 授權範圍內的 scoped files。
+- 未修改：功能碼、`src/`、budget engine、Plancraft core、payment / auth / webhook / AI API / DB / secrets。
+- 下一步建議：將此公告同步到治理 PR / Issue，讓 GitHub 端可追蹤。
+
 ## Latest Blackboard Rebuild: Compact Current-State Board
 
 - 本輪任務名稱：Rebuild oversized GitHub workstream blackboard.

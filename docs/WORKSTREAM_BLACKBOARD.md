@@ -21,6 +21,10 @@ Effective immediately:
 ## Current Operating Rules
 
 - Source of truth: GitHub `main` plus current open PR / Issue state.
+- Shared work path: GitHub is mandatory for all agents. Local worktrees are private staging only and are not shared truth.
+- Agents with local-only work must sync to GitHub through a scoped branch + PR, or report the exact local branch/files/diff evidence in the relevant GitHub Issue / PR if push is blocked.
+- Do not make decisions from unsynced local work. If local state conflicts with GitHub, treat GitHub as authoritative and mark the local state as stale until reconciled.
+- Do not sync by copying unrelated dirty work. Publish only the scoped files for the assigned workstream.
 - 0% standby agents are not blockers.
 - Do not create new agent tasks for standby agents unless the user explicitly activates them.
 - Every dispatch must have exactly one primary `To`.
@@ -91,7 +95,25 @@ Forbidden:
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
-| 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | INIT_DOCS_DONE | 25 | Yes | Docs-only initialization exists; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
+| 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` now exposes front-end QA log, summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. Not part of budget integration gate. |
+| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
+
+## Agent Self-Introduction: Plan Puzzle Guide Agent
+
+- Agent: 平面拼圖引導官 / Plan Puzzle Guide Agent.
+- Workstream: `app/plan-puzzle-guide-agent`.
+- Managed By: `EXECUTION_OFFICER`.
+- Status: `CONTRACT_ONLY`.
+- Progress %: 25.
+- Responsibility: guide owner through PNG/JPG import, PDF interface warning, underlay calibration, scale setting, wall drawing, door/window/opening marking, zone marking, and placeholder SVG / plan facts output.
+- Forbidden scope: Plancraft core, Budget Engine, formal estimate, renderer, MethodSpec, Raw Candidate, Output Documents, payment, escrow, listing fee, DB, auth, real AI API, package/framework changes, secrets.
+- Automation: `plan-puzzle-guide-agent-patrol`, every 15 minutes, ACTIVE.
+- No-idle rule: after blackboard self-introduction, if no response arrives within 20 minutes, continue the next safe initialization task; do not report `本 workstream 本輪無新指派` before initialization is complete.
+- Evidence: `docs/plan_puzzle_guide/` contract files created; `preview_floor_plan` runtime reviewed read-only.
+- Blocker: local `git` executable is unavailable in PATH, so dirty worktree safety cannot be confirmed; no runtime code was changed.
+- Need Commander: No for docs-only initialization. Yes before runtime wiring if worktree safety or product CTA behavior must be decided.
+- Need Reviewer: No by default; available for user-triggered review.
+- Next single action: after safety confirmation, add mock-only runtime `PlanPuzzleQuantityFacts` output and verify browser runtime.
 
 ## Future / Standby Agent Backlog
 
@@ -130,3 +152,15 @@ Use this format only when changing current status:
 ```
 
 Do not paste full logs or repeated heartbeat text into this file.
+
+### 2026-06-01 - Owner Guide Mock Runtime Surface
+
+- Agent: 需求引導官 / Owner Guide Agent
+- Workstream: `app/owner-guide-agent`
+- Status: `MOCK_READY`
+- Progress %: 45
+- Evidence: `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`.
+- Blocker: Browser runtime tool cannot start in this environment; WindowsApps `node.exe` returns access denied for syntax check.
+- Need Commander: No
+- Need Reviewer: No
+- Next single action: Run browser verification when tooling is available; keep outputs mock / placeholder only.
