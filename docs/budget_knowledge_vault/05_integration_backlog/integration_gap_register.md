@@ -15,8 +15,9 @@ These items are not part of the four-line Integration Gate, but they are active 
 
 | Gap | Workstream | Status | Why It Matters | Next Vault Action |
 |---|---|---|---|---|
+| PR #31 boundary PR review signal pending | `knowledge/budget-vault` / governance boundary | Open | PR #31 records Budget Knowledge Vault support boundary but has review usage-limit comments and a self-check saying not to auto-merge without review signal or explicit Commander merge authorization. | Track as related open boundary PR; do not merge, close, or decide it from this vault. |
 | PR #32 review / merge pending | `knowledge/budget-vault` | Open | The initial vault structure exists on the branch but is not yet merged shared truth. | Keep scoped patrol on PR #32 comments, assigned issues, and Integration Officer instructions. |
-| No-change response cannot be used yet | `knowledge/budget-vault` | Open until initialization completes | Open initialization work exists, so treating the workstream as idle would hide active work. | Use explicit progress reports until PR #32 is reviewed / merged and no new tasks remain. |
+| No-change response cannot be used yet | `knowledge/budget-vault` | Open until initialization completes | Open initialization work exists, so treating the workstream as idle would hide active work. | Use explicit progress reports until PR #31 / PR #32 are resolved, initialization is complete, and no new tasks remain. |
 
 ## Non-Blocker Support Note
 
