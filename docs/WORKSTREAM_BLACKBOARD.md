@@ -40,7 +40,7 @@ Effective immediately:
 | 平面拼圖 UI / Plan Puzzle | `plancraft/page-ui` | `laibeoffer/laibe-mvp` | 85 | IN_PROGRESS | PR #25 / Issue #15 context | UI IA correction recorded in `docs/NEXT_CODEX_HANDOFF.md` and `docs/CURRENT_PHASE_REVIEW_PACKET.md`; functional code not modified in IA round | Runtime / Tool Catalog interaction not complete | Yes, for product direction or next implementation authorization | No by default | Commander may decide whether to authorize Tool Catalog Interaction Implementation |
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 75 | WAITING_REVIEW | PR #3 draft per vault summary | QF5.4 commit `c58ba25`; validators passed; cloud-ready export package exists | PR #3 not recorded as merged / final shared truth pending | No | No by default | Quote Factory owner / Integration Officer confirms final evidence |
-| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #26 | PR #26 refreshed; head `b8d27e3`; mergeable true; validators passed per vault summary | Final review / merge gate pending | No | Only if formal price boundary is touched | Wait for final gate evidence |
+| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | MERGE_GATE_BLOCKED | PR #26 / Issue #17 | PR #26 open; head `2be2bb8`; changed files scope clean; R1.5 validators/static guard passed in PR comment `4587140052` | PR not merged; branch is behind current `main`; Codex re-review hit usage limit | No for scope; Yes for final completion acceptance | Yes, reviewer/Codex-equivalent re-review needed | Sync PR #26 to current `main`, rerun validators, then obtain final review / merge gate |
 | MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context | Integration readiness evidence and context windows exist | `BUDGET_ENGINE_ENTRY_BLOCKER` | No, unless product decision is needed | Integration Officer investigation required | Identify current Budget Engine entry before integration harness |
 | Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PR #29 not recorded as merged | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final evidence |
 | 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
@@ -60,7 +60,7 @@ Next: Identify current Budget Engine entry before integration harness.
 | Workstream | Required for Integration | Completion % | Evidence | Blocker | Gate Status |
 |---|---|---:|---|---|---|
 | `quote-factory/price-range-governance` | Yes | 75 | QF5.4 commit `c58ba25`; validators passed; PR #3 draft per vault summary | Final shared truth / PR #3 merge evidence pending | WAITING |
-| `warehouse/raw-candidate` | Yes | 75 | PR #26 refreshed; head `b8d27e3`; validators passed per vault summary | Final review / merge gate pending | WAITING |
+| `warehouse/raw-candidate` | Yes | 75 | PR #26 open; head `2be2bb8`; changed files scope clean; R1.5 validators/static guard passed in PR comment `4587140052` | PR not merged; branch is behind current `main`; Codex re-review hit usage limit | BLOCKED |
 | `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists | `BUDGET_ENGINE_ENTRY_BLOCKER` | BLOCKED |
 | `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PR #29 merge / final evidence pending | WAITING |
 
@@ -176,3 +176,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No
 - Need Reviewer: No
 - Next single action: EXECUTION_OFFICER can direct agents to use `docs/WORKSTREAM_BLACKBOARD.md` as compact board and put detailed reports in handoff / phase / vault docs.
+
+### 2026-06-01 - Raw Candidate Final Outcome Re-Report
+
+- Agent: @Raw-Candidate
+- Workstream: `warehouse/raw-candidate`
+- Status: `MERGE_GATE_BLOCKED`
+- Progress %: 75
+- Evidence: PR #26 open, head `2be2bb8`; changed files scope clean; R1.5 CLI demo / static guard / syntax / raw warehouse demos passed in PR comment `4587140052`.
+- Blocker: PR #26 is not merged; current `main` is `3754bb7`; PR branch is behind current `main`; `@codex review` request hit usage limit.
+- Need Commander: Yes for final completion / merge acceptance; no new product decision needed for R1.5 scope.
+- Need Reviewer: Yes, reviewer or Codex-equivalent review needed after current-main sync.
+- Next single action: Sync PR #26 to current `main`, rerun validators, and re-submit final gate evidence.
