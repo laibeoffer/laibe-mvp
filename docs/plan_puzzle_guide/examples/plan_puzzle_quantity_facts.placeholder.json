@@ -1,0 +1,89 @@
+{
+  "plan_quantity_facts_id": "plan_quantity_facts_placeholder_001",
+  "schema_name": "PlanPuzzleQuantityFacts",
+  "schema_version": "0.1.0-placeholder",
+  "quantity_context_status": "placeholder",
+  "source": {
+    "workstream": "app/plan-puzzle-guide-agent",
+    "managed_by": "EXECUTION_OFFICER",
+    "runtime_page": "src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html",
+    "runtime_script": "src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js",
+    "source_of_truth": "GitHub branch / PR"
+  },
+  "svg_artifact": {
+    "svg_artifact_id": "svg_artifact_placeholder_001",
+    "artifact_kind": "svg_or_pc_preview_placeholder",
+    "status": "placeholder",
+    "warnings": [
+      "SVG / .pc preview is not a construction drawing.",
+      "SVG / .pc preview is not renderer-approved output."
+    ]
+  },
+  "scale": {
+    "status": "placeholder",
+    "unit": "mm",
+    "px_per_mm": null,
+    "warnings": [
+      "Scale must be calibrated by the user before any geometry is treated as linked context."
+    ]
+  },
+  "zones": [
+    {
+      "zone_id": "zone_placeholder_001",
+      "zone_name": "客廳",
+      "zone_type": "living",
+      "boundary_edge_ids": [],
+      "status": "placeholder",
+      "warnings": [
+        "Zone boundary is not verified."
+      ]
+    }
+  ],
+  "areas": [
+    {
+      "zone_id": "zone_placeholder_001",
+      "area_sqm": null,
+      "area_ping": null,
+      "area_source": "placeholder",
+      "area_confidence": 0,
+      "status": "placeholder",
+      "warnings": [
+        "Zone area is a candidate context signal only and must not be used as formal quantity."
+      ]
+    }
+  ],
+  "wall_lengths": [
+    {
+      "wall_id": "wall_placeholder_001",
+      "length_mm": null,
+      "thickness_mm": null,
+      "wall_status": "existing",
+      "status": "placeholder",
+      "warnings": [
+        "Wall length is a candidate context signal only and must not be used as formal quantity."
+      ]
+    }
+  ],
+  "opening_counts": [
+    {
+      "opening_id": "opening_placeholder_001",
+      "kind": "door",
+      "wall_id": "wall_placeholder_001",
+      "width_mm": null,
+      "height_mm": null,
+      "count": 1,
+      "status": "placeholder",
+      "warnings": [
+        "Opening count is a candidate context signal only and must not be used as formal quantity."
+      ]
+    }
+  ],
+  "forbidden_claims": {
+    "formal_quantity": false,
+    "formal_estimate": false,
+    "budget_engine_called": false,
+    "renderer_called": false,
+    "official_construction_drawing": false,
+    "payment_or_escrow_related": false
+  }
+}
