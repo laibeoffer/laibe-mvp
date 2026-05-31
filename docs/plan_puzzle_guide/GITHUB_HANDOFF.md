@@ -4,15 +4,16 @@ GitHub operating path acknowledged: Yes
 
 ## Task
 
-Plan Puzzle Guide Agent initialization contract.
+Plan Puzzle Guide Agent initialization contract and compact blackboard evidence correction.
 
 ## Source Of Truth
 
 - Formal repo: `laibeoffer/laibe-mvp`.
-- Formal branch: `app/plan-puzzle-guide-agent`.
-- Formal PR: `https://github.com/laibeoffer/laibe-mvp/pull/40`.
+- Current consolidation branch: `codex/plan-puzzle-guide-blackboard-evidence`.
+- Current consolidation PR: `https://github.com/laibeoffer/laibe-mvp/pull/44`.
+- Older draft PR: `https://github.com/laibeoffer/laibe-mvp/pull/40` remains open and should be treated as superseded or reconciled after PR #44 review.
 - Formal delivery path: GitHub branch / PR.
-- Local `Z:\laibe_project`: `LOCAL_STATE` / `LOCAL_DRAFT_ONLY`, not formal delivery.
+- Local `Z:\laibe_project`: `LOCAL_STATE` only, not formal delivery.
 
 ## Created Files
 
@@ -26,6 +27,11 @@ Plan Puzzle Guide Agent initialization contract.
 - `docs/plan_puzzle_guide/examples/plan_puzzle_quantity_facts.placeholder.json`
 - `docs/plan_puzzle_guide/GITHUB_BLACKBOARD_SELF_INTRODUCTION.md`
 - `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+- `docs/plan_puzzle_guide/BLACKBOARD_EVIDENCE_GAP.md`
+
+## Modified Files
+
+- `docs/WORKSTREAM_BLACKBOARD.md`
 
 ## Modified Runtime Files
 
@@ -42,13 +48,15 @@ None.
 - Defined `PlanPuzzleQuantityFacts`, `plan_quantity_facts_id`, `svg_artifact_id`, and `quantity_context_status`.
 - Defined SVG / zone / area / wall length / opening count receiving windows using `placeholder` / `linked` / `verified`.
 - Added placeholder JSON example.
-- Opened draft PR #40 as the GitHub-tracked initialization path.
+- Updated compact blackboard evidence on PR #44 so it no longer treats local or stale main wording as completion evidence.
 
 ## Not Completed
 
+- PR #44 is not merged to `main`.
+- PR #40 remains open and needs a Commander / maintainer decision after PR #44 review.
 - No runtime mock panel has been wired.
 - No browser/runtime verification has been completed.
-- No `WEB_RUNTIME_VERIFIED` claim is made.
+- No `MOCK_READY` or `WEB_RUNTIME_VERIFIED` claim is made.
 
 ## Forbidden Scope Preserved
 
@@ -69,11 +77,11 @@ Runtime status:
 
 ## GitHub Branch / PR Status
 
-- Branch: `app/plan-puzzle-guide-agent`.
-- PR: `https://github.com/laibeoffer/laibe-mvp/pull/40`.
-- PR state: open draft.
-- Scope check: docs-only under `docs/plan_puzzle_guide/`.
+- Branch: `codex/plan-puzzle-guide-blackboard-evidence`.
+- PR: `https://github.com/laibeoffer/laibe-mvp/pull/44`.
+- PR state: open draft, not merged.
+- Scope check: docs-only under `docs/plan_puzzle_guide/` plus compact `docs/WORKSTREAM_BLACKBOARD.md` correction.
 
 ## Next GitHub Action Needed
 
-Continue with a narrow mock runtime task only if it stays front-end local, placeholder-only, GitHub-tracked, and does not touch forbidden systems. The next safe target is a minimal facts panel in `preview_floor_plan` that exposes `PlanPuzzleQuantityFacts` without calling Budget Engine or renderer.
+Review PR #44 through normal gates, then decide whether PR #40 should be closed, superseded, or reconciled. Continue with a narrow mock runtime task only after the docs contract is accepted or merged and only if it stays front-end local, placeholder-only, GitHub-tracked, and does not touch forbidden systems. The next safe runtime target remains a minimal facts panel in `preview_floor_plan` that exposes `PlanPuzzleQuantityFacts` without calling Budget Engine or renderer.
