@@ -15,7 +15,7 @@ Repository / branch:
 `laibeoffer/laibe-mvp` / `budget/review-gate`
 
 Status:
-`ACTIVE_INITIALIZATION`
+`INITIALIZATION_COMPLETE_PENDING_PR_MERGE`
 
 ## Mission
 

@@ -654,7 +654,7 @@ Repo / Branch:
 laibeoffer/laibe-mvp / budget/review-gate
 
 Status:
-ACTIVE_INITIALIZATION
+INITIALIZATION_COMPLETE_PENDING_PR_MERGE
 
 Automation:
 budget-review-gate-patrol / every 15 minutes
@@ -1399,6 +1399,19 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-06-01T00:35:00+08:00 - Budget Review Gate alarm repair and immediate patrol
+
+- Workstream: budget/review-gate
+- Branch / Repo: `budget/review-gate` / `laibeoffer/laibe-mvp`
+- Status: `ALARM_REPAIR_CHECKED / INITIALIZATION_COMPLETE_PENDING_PR_MERGE / PR_READY_FOR_REVIEW`
+- Changed: Rechecked the Budget Review Gate alarm contract, GitHub `main`, active PR #37, open Issues / PRs, and `docs/budget_review_gate/`. Recorded that no runtime heartbeat / scheduler tool is available in this session, so the alarm repair remains documented in `AUTOMATION.md`.
+- Files: `docs/WORKSTREAM_BLACKBOARD.md`, `docs/budget_review_gate/AUTOMATION.md`, `docs/budget_review_gate/BUDGET_REVIEW_GATE_AGENT.md`
+- PR / Commit: PR #37 / alarm repair follow-up commit pending
+- Blocked: No dedicated non-PR Issue for `budget/review-gate` was found. PR #37 is the active workstream artifact.
+- Next: Keep PR #37 ready for Deputy / integration review. After merge, patrol main every 15 minutes per `AUTOMATION.md`. Do not handle other workstream PRs unless formally assigned.
+- Need Commander: No.
+- Need Reviewer: No, unless a proposal attempts to become formal price, PricingRule, MaterialSpec, LaborRule, or BudgetEstimateLine.
 
 ### 2026-05-31T23:20:00+08:00 - Budget Review Gate Agent initialization
 
