@@ -94,7 +94,7 @@ Forbidden:
 
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
-| Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT_PR_OPEN | 40 | Yes | PR #32 initializes the vault and is open / mergeable; PR #31 remains related boundary context with review signal pending. Summaries, gaps, proposals, decisions, and feedback loops live under `docs/budget_knowledge_vault/`. |
+| Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT_PR_OPEN | 40 | Yes | PR #32 initializes the vault and is open / mergeable; PR #31 remains related boundary context and is now routed to Integration Officer disposition issue #41. Summaries, gaps, proposals, decisions, and feedback loops live under `docs/budget_knowledge_vault/`. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` now exposes front-end QA log, summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. Not part of budget integration gate. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
 
@@ -159,11 +159,22 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Workstream: `knowledge/budget-vault`
 - Status: `ACTIVE_SUPPORT_PR_OPEN / BLACKBOARD_COMPACT_SYNCED`
 - Progress %: 40
-- Evidence: New compact blackboard was checked; PR #32 is the active initialization PR and remains open / mergeable in latest patrol; PR #31 remains open as related boundary context with review-limit comments and no approval decision. Detailed no-idle rules, active work queue, readiness snapshot, gap register, decision logs, and proposal registers are in `docs/budget_knowledge_vault/`.
+- Evidence: New compact blackboard was checked; PR #32 is the active initialization PR and remains open / mergeable in latest patrol; PR #31 remains open as related boundary context with review-limit comments, no approval decision, and Integration Officer disposition issue #41. Detailed no-idle rules, active work queue, readiness snapshot, gap register, decision logs, and proposal registers are in `docs/budget_knowledge_vault/`.
 - Blocker: PR #31 and PR #32 are not merged; this vault cannot merge, close, approve, reject, or make Integration Gate decisions.
 - Need Commander: No
 - Need Reviewer: No
 - Next single action: Continue 12-minute scoped patrol; update only compact blackboard current state and vault Markdown when PR comments, Integration Officer instructions, or four-core evidence changes.
+### 2026-06-01 - Budget Knowledge Vault PR31 Disposition Signal
+
+- Agent: Budget Knowledge Vault Agent
+- Workstream: `knowledge/budget-vault`
+- Status: `PR31_DISPOSITION_SIGNAL_TRACKED / PR32_OPEN_MERGEABLE`
+- Progress %: 40
+- Evidence: PR #31 received a Budget Review Gate routing note that places it under Integration Officer disposition issue #41; PR #32 remains open / mergeable clean with no comments or reviews in latest patrol.
+- Blocker: PR #31 / PR #32 remain unmerged; this vault cannot merge, close, supersede, approve, reject, or make Integration Gate decisions.
+- Need Commander: No, unless Integration Officer records that merge / close / supersede authority is needed beyond Integration Officer.
+- Need Reviewer: No; optional non-Codex governance review is an Integration Officer disposition path, not a vault decision.
+- Next single action: Continue tracking PR #31 issue #41 disposition and PR #32 initialization comments while keeping detailed status in `docs/budget_knowledge_vault/`.
 
 ### 2026-06-01 - Owner Guide Mock Runtime Surface
 

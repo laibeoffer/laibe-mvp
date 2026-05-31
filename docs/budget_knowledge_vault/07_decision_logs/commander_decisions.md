@@ -17,4 +17,5 @@ No commander decision is recorded by this vault in this round.
 | Source | Signal | Vault Interpretation | Action |
 |---|---|---|---|
 | PR #31 self-check comment | `Need Commander: Yes only if deciding to merge despite Codex review usage limit.` | This is a conditional merge-authority signal, not a commander decision. Budget Knowledge Vault must not resolve it. | Track as pending context for Integration Officer / Commander; do not merge, close, or dispatch from this vault. |
+| PR #31 routing note / issue #41 | `Need Commander: Only if merge/close/supersede authority is required beyond Integration Officer.` | This is a conditional authority signal, not a commander decision. Integration Officer disposition is the next routing layer. | Track only; do not request Commander unless Integration Officer records that authority is needed. |
 | PR #32 | No commander instruction found during latest scoped patrol. | Initialization remains active, but there is no commander decision to record. | Continue scoped patrol and keep PR #32 mergeable. |
