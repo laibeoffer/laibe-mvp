@@ -1,5 +1,23 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Blackboard Update: Budget Knowledge Vault Support Agent Boundary
+
+- 本輪任務名稱：Blackboard - Budget Knowledge Vault support agent boundary.
+- 任務類型：Governance / Documentation / Commander boundary update.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 已完成：
+  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 新增 `Support Agents Managed by Integration Officer` 區塊。
+  - 登記 `預算知識庫 / Budget Knowledge Vault Agent`，workstream 為 `knowledge/budget-vault`。
+  - 明確標示該 agent 由 `LAIBE_REVIEWER_INTEGRATION_OFFICER` 管理，狀態為 `ACTIVE_SUPPORT`，完成比例由整合官回報。
+  - 明確標示該 agent 不列入 Integration Readiness Gate，也不列入四條預算核心完成率。
+  - 補上 Commander 邊界：最高指揮官只記錄存在與引用整合官狀態，不直接派工、不要求補件、不要求改文件、不要求 PR / automation / 全局巡檢。
+- Integration Readiness Gate：仍只包含 `quote-factory/price-range-governance`、`warehouse/raw-candidate`、`warehouse/method-spec`、`output/budget-documents`。
+- 未碰範圍：`src/`、功能碼、budget engine、renderer runtime、payment / auth / webhook、AI API、DB、secrets、GitHub PR / merge / close 狀態。
+- 下一步建議：後續 hourly report 若提到 `knowledge/budget-vault`，只寫 `Managed by Integration Officer`；若整合官回報 blocker，轉交整合官；若整合官回報 `Need Commander: Yes`，再摘要給使用者裁決。
+
 ## Latest MethodSpec Documentation Task: Validator Freeze Note
 
 - 本輪任務名稱：MethodSpec validator freeze note。

@@ -1038,6 +1038,20 @@ No.
 Need Reviewer:
 No.
 
+## Support Agents Managed by Integration Officer
+
+| Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
+|---|---|---|---|---:|---|---|
+| 預算知識庫 / Budget Knowledge Vault Agent | knowledge/budget-vault | LAIBE_REVIEWER_INTEGRATION_OFFICER | ACTIVE_SUPPORT | 由整合官回報 | Yes | 整理四個預算核心 agent 的報告、缺口、提案、決策與回流資料；支援整合官判斷，不參與四條預算核心 readiness gate。 |
+
+Commander boundary:
+- Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER`, not by the Commander / Deputy Commander.
+- Commander may record this support agent's existence and cite Integration Officer status in hourly reports.
+- Commander must not directly dispatch this agent, request edits, request reports, request PRs, request automation, or ask it to patrol global status.
+- If `knowledge/budget-vault` reports a blocker, route it to the Integration Officer.
+- If the Integration Officer reports `Need Commander: Yes`, summarize that decision point for the user.
+- Budget Knowledge Vault Agent must not be listed in the Integration Readiness Gate and must not replace completion packets for `quote-factory/price-range-governance`, `warehouse/raw-candidate`, `warehouse/method-spec`, or `output/budget-documents`.
+
 ## Dispatch Queue
 
 ## Member Report Decision Basis
@@ -1344,6 +1358,41 @@ These dispatches convert the Commander task preview backlog into issue-ready wor
   - Need Reviewer: No.
 
 ## Update Log
+
+### 2026-05-31 - Budget Knowledge Vault support agent boundary
+
+Workstream:
+command/deputy
+
+Status:
+SUPPORT_AGENT_BOUNDARY_REGISTERED. Budget Knowledge Vault is recorded as Integration Officer-managed support, not a Commander-dispatched workstream.
+
+Changed:
+- Added `Support Agents Managed by Integration Officer`.
+- Registered `預算知識庫 / Budget Knowledge Vault Agent` for `knowledge/budget-vault`.
+- Marked manager as `LAIBE_REVIEWER_INTEGRATION_OFFICER`.
+- Marked status as `ACTIVE_SUPPORT` and progress as reported by the Integration Officer.
+- Confirmed this support agent is not part of the Integration Readiness Gate and does not count toward the four budget-core completion lines.
+- Recorded Commander boundary: no direct dispatch, no direct edit/report/PR/automation requests, blocker routed to Integration Officer, and `Need Commander: Yes` only if reported by the Integration Officer.
+
+Files:
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+
+PR / Commit:
+Pending governance PR.
+
+Blocked:
+None.
+
+Next:
+Hourly reports may cite `knowledge/budget-vault` only as `Managed by Integration Officer`. Do not include it in the readiness gate.
+
+Need Commander:
+No
+
+Need Reviewer:
+No
 
 ### 2026-05-26T12:30:13Z - Repeated Deputy2 ACK silence after `5014d03`
 
