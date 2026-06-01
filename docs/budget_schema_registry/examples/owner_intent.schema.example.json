@@ -1,0 +1,57 @@
+{
+  "schema_name": "OwnerIntent",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "owner_intent_id": "owner_intent_example_001",
+  "session_id": "owner_guide_session_example_001",
+  "project_id": "project_example_001",
+  "source_agent": "app/owner-guide-agent",
+  "source_ref": "docs/owner_guide/owner_intent_contract.md",
+  "renovation_goals": {
+    "primary_goal": "old apartment renovation for family self-use",
+    "must_haves": ["repair bathroom leakage", "improve storage"],
+    "nice_to_haves": ["warm modern style"]
+  },
+  "property_context": {
+    "property_type": "apartment",
+    "area": {
+      "value": 25,
+      "unit": "ping"
+    },
+    "condition": "old_house",
+    "location": "Taipei"
+  },
+  "style_preferences": {
+    "liked_styles": ["warm modern", "light wood"],
+    "reference_image_status": "mood_references_only"
+  },
+  "budget_signal": {
+    "type": "range_signal",
+    "currency": "TWD",
+    "range_low": 800000,
+    "range_high": 1200000,
+    "price_authority": "none"
+  },
+  "schedule_signal": {
+    "target_window": "within_three_months",
+    "urgency": "medium"
+  },
+  "asset_summary": {
+    "has_floor_plan": false,
+    "has_quotes": false,
+    "has_photos": true,
+    "needs_plan_puzzle": true
+  },
+  "question_gaps": [
+    {
+      "field": "asset_summary.has_floor_plan",
+      "severity": "medium",
+      "question_to_ask": "Do you already have a floor plan or should we use plan-puzzle?"
+    }
+  ],
+  "next_recommended_step": "enter_plan_puzzle",
+  "requires_followup": true,
+  "confidence": 0.68,
+  "warnings": ["OwnerIntent is not formal budget authority."],
+  "forbidden_use": ["formal_price", "formal_quote", "PricingRule", "BudgetOutputSnapshot", "renderer_input"]
+}
