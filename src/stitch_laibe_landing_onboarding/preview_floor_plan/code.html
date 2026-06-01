@@ -406,6 +406,194 @@
       backdrop-filter: blur(16px);
     }
 
+    .file-zone {
+      border: 1px solid var(--line-soft);
+      border-radius: 24px;
+      padding: 16px;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.095), rgba(255,255,255,.035)),
+        rgba(5, 7, 10, .72);
+      box-shadow: 0 24px 70px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.14);
+      display: grid;
+      gap: 14px;
+    }
+
+    .file-zone-head {
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 16px;
+      align-items: end;
+    }
+
+    .file-zone-title {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file-zone-title label,
+    .file-panel-label {
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+
+    .file-zone-title input {
+      width: min(100%, 520px);
+      min-height: 44px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+      padding: 0 13px;
+      color: var(--text-main);
+      background: rgba(0,0,0,.24);
+      font: inherit;
+      font-size: 17px;
+      font-weight: 950;
+      outline: none;
+    }
+
+    .file-zone-actions,
+    .file-action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .file-zone-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .file-panel {
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 18px;
+      padding: 13px;
+      background: rgba(0,0,0,.22);
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.6;
+      font-weight: 760;
+      display: grid;
+      gap: 9px;
+      align-content: start;
+    }
+
+    .file-panel strong {
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .compact-status-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .compact-status-list div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .compact-status-list b {
+      color: var(--text-main);
+      text-align: right;
+    }
+
+    .material-tag-row,
+    .layer-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .material-tag,
+    .layer-chip {
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 999px;
+      padding: 5px 8px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.055);
+      font-size: 11px;
+      font-weight: 880;
+    }
+
+    .tool-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tool-row-button {
+      min-height: 42px;
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 14px;
+      padding: 8px 10px;
+      color: var(--text-main);
+      background: rgba(255,255,255,.055);
+      display: grid;
+      grid-template-columns: 24px minmax(0, 1fr) auto;
+      gap: 9px;
+      align-items: center;
+      text-align: left;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .tool-row-button .material-symbols-outlined {
+      color: var(--accent-cyan);
+      font-size: 21px;
+    }
+
+    .tool-row-button small {
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .tool-row-button.is-mode-active,
+    .tool-row-button.is-tool-active {
+      border-color: rgba(98,230,200,.42);
+      background: rgba(98,230,200,.1);
+    }
+
+    .tool-detail {
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 16px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.22);
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 760;
+    }
+
+    .tool-detail summary {
+      color: var(--text-main);
+      cursor: pointer;
+      font-weight: 950;
+    }
+
+    .tool-detail ul {
+      margin: 9px 0 0;
+      padding-left: 18px;
+    }
+
+    .layer-toggle-grid {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .ui-ia-card {
+      border-color: rgba(121,216,255,.18);
+    }
+
     .panel {
       min-width: 0;
       border-right: 1px solid var(--line-soft);
@@ -515,6 +703,12 @@
     .tool-card.is-mode-active {
       border-color: rgba(121,216,255,.5);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 0 22px rgba(121,216,255,.12);
+    }
+
+    .tool-card.is-tool-active,
+    .toolbar-btn.is-tool-active {
+      outline: 2px solid rgba(98,230,200,.58);
+      outline-offset: 2px;
     }
 
     .tool-status {
@@ -989,6 +1183,27 @@
       fill: rgba(240,198,110,.1);
       stroke: rgba(240,198,110,.72);
       stroke-dasharray: 8 7;
+    }
+
+    .zone-boundary-polygon.is-invalid {
+      fill: rgba(255,126,112,.11);
+      stroke: rgba(255,126,112,.78);
+      stroke-dasharray: 5 6;
+    }
+
+    .zone-area-label {
+      fill: #f7fbff;
+      stroke: rgba(5,7,10,.82);
+      stroke-width: 4px;
+      paint-order: stroke fill;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      pointer-events: none;
+    }
+
+    .zone-area-label.is-invalid {
+      fill: var(--danger);
     }
 
     .zone-boundary-edge {
@@ -1734,6 +1949,10 @@
         grid-template-columns: 250px minmax(420px, 1fr);
       }
 
+      .file-zone-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .inspector {
         grid-column: 1 / -1;
         border-left: 0;
@@ -1755,8 +1974,13 @@
       }
 
       .page-intro,
+      .file-zone-head,
       .tool-shell {
         grid-template-columns: 1fr;
+      }
+
+      .file-zone-actions {
+        justify-content: flex-start;
       }
 
       .intro-actions {
@@ -1796,6 +2020,10 @@
         grid-template-columns: 1fr;
       }
 
+      .file-zone-grid {
+        grid-template-columns: 1fr;
+      }
+
       .canvas-toolbar,
       .canvas-footer {
         align-items: flex-start;
@@ -1817,7 +2045,7 @@
           </button>
           <div class="tool-menu" aria-label="工具選單">
             <a href="./code.html"><span>平面拼圖</span><small>current</small></a>
-            <a href="../preview_budget/code.html"><span>預算生成</span><small>next</small></a>
+            <a href="../client_step_4_budget_finalization/code.html"><span>預算生成</span><small>edit page</small></a>
             <a href="https://apps.apple.com/tw/search?term=LiDAR%20Scanner" target="_blank" rel="noreferrer"><span>LiDAR 下載鏈接</span><small>app</small></a>
             <a href="https://apps.apple.com/tw/search?term=iScanner" target="_blank" rel="noreferrer"><span>iScanner 鏈接</span><small>app</small></a>
           </div>
@@ -1832,7 +2060,7 @@
 
   <div class="progress-banner" aria-label="甲方流程進度">
     <div class="progress-inner">
-      <a class="step-pill" href="../onboard_ai_agent/code.html">
+      <a class="step-pill" href="../onboard_ai_agent/code.html#guideInput">
         <span class="step-num">1</span>需求整理
       </a>
       <span>→</span>
@@ -1840,8 +2068,16 @@
         <span class="step-num">2</span>平面拼圖
       </a>
       <span>→</span>
-      <a class="step-pill" href="../preview_budget/code.html">
+      <a class="step-pill" href="../client_step_4_budget_finalization/code.html">
         <span class="step-num">3</span>預算生成
+      </a>
+      <span>→</span>
+      <a class="step-pill" href="../tender_notice/code.html">
+        <span class="step-num">4</span>招標
+      </a>
+      <span>→</span>
+      <a class="step-pill" href="../client_awarding_dashboard/code.html">
+        <span class="step-num">5</span>Dashboard
       </a>
     </div>
   </div>
@@ -1852,15 +2088,83 @@
         <p class="kicker">Plancraft+ Import Interface</p>
         <h1>平面拼圖 Plancraft+</h1>
         <p class="lead">
-          匯入丈量圖、校正比例，建立可銜接 Plancraft 的平面草稿。
+          匯入丈量圖、校正比例，建立可銜接 Plancraft 的平面草稿；本圖僅供招標需求整理，不是施工圖或正式設計圖。
         </p>
       </div>
       <div class="intro-actions" aria-label="平面拼圖操作">
-        <a class="glass-btn" href="../onboard_ai_agent/code.html">返回上一頁</a>
-        <a class="orange-btn" href="../preview_budget/code.html">
-          進行預算生成
+        <a class="glass-btn" href="../onboard_ai_agent/code.html#guideInput">返回需求整理</a>
+        <a class="orange-btn" href="../client_step_4_budget_finalization/code.html">
+          進入預算生成
           <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
         </a>
+      </div>
+    </section>
+
+    <section class="file-zone" aria-label="檔案區">
+      <div class="file-zone-head">
+        <div class="file-zone-title">
+          <label for="draftNameInput">專案名稱 / 草稿名稱</label>
+          <input id="draftNameInput" data-field="draft-name" type="text" value="LaiBE Plancraft+ 草稿" aria-describedby="draftSaveHint">
+          <span id="draftSaveHint" class="inline-message">可匿名儲存本機草稿；雲端儲存與帳號同步尚未接入。</span>
+        </div>
+        <div class="file-zone-actions" aria-label="檔案區操作">
+          <button class="toolbar-btn primary" type="button" data-action="choose-file">
+            <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
+            匯入圖檔
+          </button>
+          <button class="toolbar-btn" type="button" data-action="save-draft-placeholder">
+            <span class="material-symbols-outlined" aria-hidden="true">save</span>
+            儲存草稿
+          </button>
+          <button class="toolbar-btn" type="button" data-action="toggle-preflight-panel">
+            <span class="material-symbols-outlined" aria-hidden="true">fact_check</span>
+            總預覽 / 送出前檢查
+          </button>
+        </div>
+      </div>
+
+      <div class="file-zone-grid">
+        <div class="file-panel">
+          <span class="file-panel-label">匯入狀態</span>
+          <strong id="currentImportFileText">尚未匯入</strong>
+          <span>支援 JPG / JPEG / PNG；PDF 已建立接口但尚未支援直接預覽。</span>
+        </div>
+        <div class="file-panel">
+          <span class="file-panel-label">草稿版本</span>
+          <div class="compact-status-list">
+            <div><span>版本</span><b id="draftVersionText">v0.12 IA draft</b></div>
+            <div><span>狀態</span><b id="draftSaveStatusText">未儲存</b></div>
+            <div><span>最後儲存</span><b id="lastSavedText">尚未儲存</b></div>
+          </div>
+        </div>
+        <div class="file-panel">
+          <span class="file-panel-label">列印 / 匯出</span>
+          <div class="file-action-row">
+            <button class="toolbar-btn" type="button" data-action="print-current-layer">列印目前圖層</button>
+            <button class="toolbar-btn" type="button" data-action="print-total-preview">列印總預覽</button>
+            <button class="toolbar-btn" type="button" data-action="export-draft">草稿 JSON</button>
+            <button class="toolbar-btn" type="button" data-action="export-pc-spike">.pc 測試版</button>
+            <button class="toolbar-btn" type="button" data-action="export-bid-summary-placeholder">招標摘要 placeholder</button>
+          </div>
+        </div>
+        <div class="file-panel">
+          <span class="file-panel-label">已選材質標籤</span>
+          <div class="material-tag-row" aria-label="已選材質">
+            <span class="material-tag">木作櫃</span>
+            <span class="material-tag">系統櫃</span>
+            <span class="material-tag">磁磚</span>
+            <span class="material-tag">廚具</span>
+            <span class="material-tag">門窗</span>
+            <span class="material-tag">五金等級</span>
+          </div>
+          <button class="toolbar-btn" type="button" data-action="toggle-material-tags">展開 / 收合</button>
+        </div>
+      </div>
+
+      <div class="file-panel">
+        <span class="file-panel-label">基本說明</span>
+        <span>四大區域：檔案區、工具區、畫布、狀態區。快捷鍵：Shift 畫斜線、F3 鎖點、F8 一鍵標註、Delete 刪除、Esc 取消、Ctrl+Z / Ctrl+Y placeholder、Space 拖動畫布 placeholder。</span>
+        <strong>本圖僅供招標需求整理，不是施工圖或正式設計圖。</strong>
       </div>
     </section>
 
@@ -1868,9 +2172,79 @@
       <aside class="panel" aria-label="左側工具區">
         <div class="panel-head">
           <div class="panel-eyebrow">Toolbox</div>
-          <div class="panel-title">Plancraft+ 流程</div>
+          <div class="panel-title">工具區</div>
         </div>
         <div class="panel-body">
+          <div class="tool-group">
+            <h2>核心工具</h2>
+            <div class="tool-stack" aria-label="完整工具清單">
+              <button class="tool-row-button" type="button" data-action="set-select-mode" data-mode-button="select" data-ui-tool="select">
+                <span class="material-symbols-outlined" aria-hidden="true">near_me</span><span>選取箭頭</span><small>linked</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="set-ui-tool" data-tool="pan" data-tool-label="手掌 / 移動畫布" data-ui-tool="pan">
+                <span class="material-symbols-outlined" aria-hidden="true">pan_tool</span><span>手掌 / 移動畫布</span><small>placeholder</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="set-ui-tool" data-tool="zoom" data-tool-label="畫布縮放" data-ui-tool="zoom">
+                <span class="material-symbols-outlined" aria-hidden="true">zoom_in</span><span>畫布縮放</span><small>placeholder</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="start-draw-wall" data-mode-button="draw-wall" data-ui-tool="wall">
+                <span class="material-symbols-outlined" aria-hidden="true">polyline</span><span>牆體工具</span><small>linked</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="add-opening" data-opening-kind="door" data-ui-tool="opening">
+                <span class="material-symbols-outlined" aria-hidden="true">door_open</span><span>門窗工具</span><small>linked</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="set-ui-tool" data-tool="item_place" data-tool-label="物件 / 項目放置" data-ui-tool="item_place">
+                <span class="material-symbols-outlined" aria-hidden="true">widgets</span><span>物件 / 項目放置</span><small>placeholder</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="set-ui-tool" data-tool="dimension" data-tool-label="尺寸標註" data-ui-tool="dimension">
+                <span class="material-symbols-outlined" aria-hidden="true">straighten</span><span>尺寸標註</span><small>placeholder</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="set-ui-tool" data-tool="text" data-tool-label="文字" data-ui-tool="text">
+                <span class="material-symbols-outlined" aria-hidden="true">title</span><span>文字</span><small>placeholder</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="set-ui-tool" data-tool="material_bucket" data-tool-label="油漆桶 / 材質" data-ui-tool="material_bucket">
+                <span class="material-symbols-outlined" aria-hidden="true">format_color_fill</span><span>油漆桶 / 材質</span><small>placeholder</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="auto-annotate-placeholder" data-ui-tool="auto_annotate">
+                <span class="material-symbols-outlined" aria-hidden="true">auto_fix_high</span><span>一鍵標註</span><small>F8</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="delete-selected" data-ui-tool="delete">
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span><span>刪除</span><small>linked</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="toggle-snap" data-ui-tool="snap_toggle">
+                <span class="material-symbols-outlined" aria-hidden="true">join_inner</span><span>鎖點開關</span><small>F3</small>
+              </button>
+              <button class="tool-row-button" type="button" data-action="undo-placeholder" data-ui-tool="undo_redo">
+                <span class="material-symbols-outlined" aria-hidden="true">undo</span><span>復原 / 重做</span><small>placeholder</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="tool-group">
+            <h2>工具展開內容</h2>
+            <details class="tool-detail" open>
+              <summary>選取 / 移動畫布 / 縮放</summary>
+              <ul>
+                <li>選取物件、移動物件、拉伸 / 縮放、編輯屬性、切換既有 / 新設 / 拆除 / 保留 / 需確認。</li>
+                <li>手掌模式只拖動畫布，不選取物件；縮放包含放大、縮小、符合畫面、回到 100%。</li>
+              </ul>
+            </details>
+            <details class="tool-detail" open>
+              <summary>牆體 / 門窗 / 開口</summary>
+              <ul>
+                <li>牆體以線段操作，厚度是 draft 參數；既有牆、承重牆、柱、梁不直接刪除。</li>
+                <li>門窗必須依附 nodeGraph edge；opening 使用 offset / width，承重牆、柱、梁開口需專業確認。</li>
+              </ul>
+            </details>
+            <details class="tool-detail" open>
+              <summary>項目庫 / 材質 / 一鍵標註</summary>
+              <ul>
+                <li>項目庫依目前 10 個產品圖層連動，不把木作櫃、系統櫃、廚具、防水當第一層圖層。</li>
+                <li>油漆桶代表材料分類指定，不做正式材料價格；F8 僅對目前圖層新增 draft 標註 placeholder。</li>
+              </ul>
+            </details>
+          </div>
+
           <div class="tool-group">
             <h2>匯入與校正</h2>
             <div class="tool-grid">
@@ -2102,9 +2476,9 @@
           </div>
           <div class="toolbar-right" aria-label="畫布狀態">
             <span class="tool-chip">Import Interface</span>
-            <span class="tool-chip">Opening Editor</span>
-            <span class="tool-chip">Zone Label</span>
-            <span class="tool-chip">Zone Boundary</span>
+            <span class="tool-chip">10 產品圖層</span>
+            <span class="tool-chip">圖層疊加</span>
+            <span class="tool-chip">Zone Area Metadata</span>
             <span class="tool-chip">Renderer Preview</span>
           </div>
         </div>
@@ -2124,8 +2498,8 @@
         </div>
 
         <div class="canvas-footer">
-          <span><strong>Plancraft+</strong> 可將空間標籤連到 nodeGraph edges，建立人工指定的 zone boundary。</span>
-          <span>Plancraft Bridge Renderer Preview Spike</span>
+          <span><strong>Plancraft+</strong> 畫布保留 underlay / wallGraph / nodeGraph / openings / zones / zone boundary / area metadata。</span>
+          <span>產品圖層疊加為 draft view state，不是正式施工圖或 budget input。</span>
         </div>
       </section>
 
@@ -2159,6 +2533,6 @@
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=minimal-server-runtime-spike" defer></script>
+  <script src="./plan-puzzle.js?v=ui-ia-alignment-0-12" defer></script>
 </body>
 </html>

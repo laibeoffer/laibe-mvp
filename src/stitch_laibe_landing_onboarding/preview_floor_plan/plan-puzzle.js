@@ -27,6 +27,391 @@
   };
   const DEFAULT_ZONE_TYPE = "living";
   const ZONE_BOUNDARY_MIN_EDGES = 3;
+  const ZONE_AREA_SQMM_PER_SQM = 1000000;
+  const ZONE_AREA_SQM_PER_PING = 3.305785;
+  const ZONE_AREA_SOURCE = "spike_polygon_estimate";
+  const ZONE_AREA_AUTHORITY = "plancraft_plus_zone_area_candidate";
+  const ZONE_AREA_CONFIDENCE_VALID = 0.7;
+  const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
+  const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
+  const ZONE_AREA_CONFIDENCE_INVALID = 0;
+  const PLAN_PUZZLE_UI_IA_VERSION = "0.12.0-ui-ia-alignment";
+  const PLAN_PUZZLE_TOOL_CATALOG_VERSION = PLAN_PUZZLE_UI_IA_VERSION;
+  const PLAN_PUZZLE_TOOL_CATALOG = [
+    {
+      id: "file-import",
+      area: "file",
+      label: "File import",
+      action: "choose-file",
+      status: "linked",
+      receives: "jpg/png/pdf file chooser",
+      output: "project.importSource / underlay",
+      boundary: "draft only; pdf preview still blocked"
+    },
+    {
+      id: "scale-calibration",
+      area: "file",
+      label: "Scale calibration",
+      action: "start-calibration",
+      status: "linked",
+      receives: "two canvas calibration points",
+      output: "project.scale.pxPerMm",
+      boundary: "local draft calibration only"
+    },
+    {
+      id: "select-mode",
+      area: "canvas",
+      label: "Select mode",
+      action: "set-select-mode",
+      status: "linked",
+      receives: "wall/opening/zone selection",
+      output: "uiState selected ids",
+      boundary: "editing state only"
+    },
+    {
+      id: "wall-draw",
+      area: "tool",
+      label: "Wall draw",
+      action: "start-draw-wall",
+      status: "linked",
+      receives: "two canvas points",
+      output: "project.walls / nodeGraph",
+      boundary: "draft geometry only"
+    },
+    {
+      id: "wall-cleanup",
+      area: "tool",
+      label: "Wall endpoint cleanup",
+      action: "clean-wall-endpoints",
+      status: "linked",
+      receives: "draft wall endpoints",
+      output: "merged nearby endpoints",
+      boundary: "no Plancraft core mutation"
+    },
+    {
+      id: "opening-door",
+      area: "tool",
+      label: "Door opening",
+      action: "add-opening",
+      matchData: { openingKind: "door" },
+      status: "linked",
+      receives: "selected wall edge",
+      output: "project.openings door",
+      boundary: "draft opening only"
+    },
+    {
+      id: "opening-window",
+      area: "tool",
+      label: "Window opening",
+      action: "add-opening",
+      matchData: { openingKind: "window" },
+      status: "linked",
+      receives: "selected wall edge",
+      output: "project.openings window",
+      boundary: "draft opening only"
+    },
+    {
+      id: "zone-label",
+      area: "tool",
+      label: "Zone label",
+      action: "start-place-zone",
+      status: "linked",
+      receives: "canvas click",
+      output: "project.zones labelPosition",
+      boundary: "candidate requirement data only"
+    },
+    {
+      id: "zone-boundary",
+      area: "tool",
+      label: "Zone boundary",
+      action: "start-zone-boundary",
+      status: "linked",
+      receives: "selected zone and nodeGraph edges",
+      output: "zone boundary candidate metadata",
+      boundary: "not formal quantity or estimate"
+    },
+    {
+      id: "draft-export",
+      area: "status",
+      label: "Draft JSON export",
+      action: "export-draft",
+      status: "linked",
+      receives: "current draft project",
+      output: "Plancraft+ draft JSON",
+      boundary: "not production budget input"
+    },
+    {
+      id: "pc-spike-export",
+      area: "status",
+      label: "Plancraft .pc spike export",
+      action: "export-pc-spike",
+      status: "linked",
+      receives: "zone boundary draft",
+      output: ".pc spike file",
+      boundary: "renderer preview only; no budget input"
+    },
+    {
+      id: "furniture-layout",
+      area: "tool",
+      label: "Furniture layout",
+      action: null,
+      status: "placeholder",
+      receives: "future item catalog",
+      output: "not implemented",
+      boundary: "placeholder; must not enter budget"
+    },
+    {
+      id: "pan-canvas",
+      area: "tool",
+      label: "Pan canvas",
+      action: "set-ui-tool",
+      matchData: { tool: "pan" },
+      status: "placeholder",
+      receives: "future drag canvas gesture",
+      output: "uiState.currentTool",
+      boundary: "navigation placeholder only"
+    },
+    {
+      id: "zoom-canvas",
+      area: "tool",
+      label: "Canvas zoom",
+      action: "set-ui-tool",
+      matchData: { tool: "zoom" },
+      status: "placeholder",
+      receives: "future zoom controls",
+      output: "uiState.currentTool",
+      boundary: "view state only"
+    },
+    {
+      id: "item-place",
+      area: "tool",
+      label: "Item placement",
+      action: "set-ui-tool",
+      matchData: { tool: "item_place" },
+      status: "placeholder",
+      receives: "current product layer",
+      output: "layer-linked item library",
+      boundary: "draft item catalog only"
+    },
+    {
+      id: "dimension-annotation",
+      area: "tool",
+      label: "Dimension annotation",
+      action: "set-ui-tool",
+      matchData: { tool: "dimension" },
+      status: "placeholder",
+      receives: "future selected line or two points",
+      output: "draft annotation object",
+      boundary: "not formal construction drawing"
+    },
+    {
+      id: "text-note",
+      area: "tool",
+      label: "Text note",
+      action: "set-ui-tool",
+      matchData: { tool: "text" },
+      status: "placeholder",
+      receives: "owner note text",
+      output: "draft note",
+      boundary: "requirement note only"
+    },
+    {
+      id: "material-bucket",
+      area: "tool",
+      label: "Material bucket",
+      action: "set-ui-tool",
+      matchData: { tool: "material_bucket" },
+      status: "placeholder",
+      receives: "material category selection",
+      output: "draft candidate material tag",
+      boundary: "no material pricing"
+    },
+    {
+      id: "auto-annotate",
+      area: "tool",
+      label: "Auto annotate",
+      action: "auto-annotate-placeholder",
+      status: "placeholder",
+      receives: "current product layer",
+      output: "draft annotation placeholder",
+      boundary: "does not overwrite user notes"
+    },
+    {
+      id: "delete-selected",
+      area: "tool",
+      label: "Delete selected",
+      action: "delete-selected",
+      status: "linked",
+      receives: "selected draft object",
+      output: "draft deletion or demolition marker",
+      boundary: "structural items still require review"
+    },
+    {
+      id: "snap-toggle",
+      area: "tool",
+      label: "Snap toggle",
+      action: "toggle-snap",
+      status: "linked",
+      receives: "F3 or button click",
+      output: "uiState.snapEnabled",
+      boundary: "drawing helper only"
+    },
+    {
+      id: "undo-redo",
+      area: "tool",
+      label: "Undo / redo",
+      action: "undo-placeholder",
+      status: "placeholder",
+      receives: "future history stack",
+      output: "not implemented",
+      boundary: "clearly marked placeholder"
+    }
+  ];
+  const PLAN_PUZZLE_PRODUCT_LAYERS = [
+    {
+      id: "existing_plan",
+      label: "現況圖",
+      shortLabel: "現況",
+      purpose: "承接底圖、既有牆體、既有門窗、既有設備與現況備註。",
+      items: ["既有牆", "既有門窗", "既有櫃體", "既有地坪", "既有天花", "既有廚具", "既有衛浴設備", "現況備註"]
+    },
+    {
+      id: "floor_plan",
+      label: "平面配置圖",
+      shortLabel: "配置",
+      purpose: "整理新設牆、門窗開口、櫃體、廚具、木作與 DECO / 家具示意。",
+      items: ["新設牆", "既有牆標示", "門窗開口", "木作櫃", "系統櫃", "廚具 / 廚房設備", "木作工程", "輕鋼架工程", "門窗工程", "空間標籤", "DECO / 家具示意", "其他需求"]
+    },
+    {
+      id: "partition_dimension",
+      label: "隔間尺寸圖",
+      shortLabel: "隔間",
+      purpose: "整理新設隔間、輕質磚牆、尺寸標註與隔間備註。",
+      items: ["新設隔間", "輕質磚牆", "陶粒磚", "石膏磚", "白磚", "輕鋼架隔間", "木作隔間", "牆段尺寸", "隔間備註", "一鍵標註"]
+    },
+    {
+      id: "ceiling_plan",
+      label: "天花板平面圖",
+      shortLabel: "天花",
+      purpose: "整理木作天花板、輕鋼架天花板、梁位、窗簾盒、間接照明區與天花備註。",
+      items: ["木作天花板", "輕鋼架天花板", "梁位標示", "窗簾盒", "間接照明區", "維修孔 / 檢修口", "一鍵標註", "天花備註"]
+    },
+    {
+      id: "demolition_plan",
+      label: "現況拆除圖",
+      shortLabel: "拆除",
+      purpose: "標示拆除牆、天花、地板、櫃體、門窗、廚具、衛浴設備與拆除備註。",
+      items: ["拆除牆", "拆除天花板", "拆除地板", "拆除櫃體", "拆除門窗", "拆除廚具", "拆除衛浴設備", "拆除備註", "一鍵標註"]
+    },
+    {
+      id: "flooring_plan",
+      label: "地坪平面圖",
+      shortLabel: "地坪",
+      purpose: "整理磁磚、木地板、塑膠地板、石材、架高地板、找平與地坪備註。",
+      items: ["磁磚", "木地板", "塑膠地板", "石材", "架高地板", "地坪找平", "地坪備註", "一鍵標註"]
+    },
+    {
+      id: "lighting_plan",
+      label: "燈具配置圖",
+      shortLabel: "燈具",
+      purpose: "承接系統建議燈具、主燈、崁燈、軌道燈、間接照明、壁燈與燈具備註。",
+      items: ["系統建議燈具", "主燈", "崁燈", "軌道燈", "間接照明", "壁燈", "燈具備註"]
+    },
+    {
+      id: "outlet_low_voltage_plan",
+      label: "插座及弱電配置圖",
+      shortLabel: "插座弱電",
+      purpose: "承接系統建議插座、一般插座、專用插座、電視孔、網路孔、弱電箱與備註。",
+      items: ["系統建議插座", "一般插座", "專用插座", "電視孔", "網路孔", "弱電箱", "插座備註"]
+    },
+    {
+      id: "plumbing_plan",
+      label: "給排水配置圖",
+      shortLabel: "給排水",
+      purpose: "承接廚房、浴室、洗衣機、陽台給排水需求與備註。",
+      items: ["廚房給水", "廚房排水", "浴室給水", "浴室排水", "洗衣機給排水", "陽台排水", "給排水備註"]
+    },
+    {
+      id: "ac_plan",
+      label: "空調配置圖",
+      shortLabel: "空調",
+      purpose: "承接系統建議室內機、室外機與空調備註；屋主不自行設計專業空調路徑。",
+      items: ["系統建議室內機", "系統建議室外機", "空調備註"]
+    }
+  ];
+  const DEFAULT_VISIBLE_LAYERS = {
+    underlay: true,
+    existingPlan: true,
+    floorPlan: true,
+    decoFurniture: true,
+    dimensions: true,
+    lighting: false,
+    outletLowVoltage: false,
+    plumbing: false,
+    demolition: false,
+    systemWarnings: true
+  };
+  const VISIBLE_LAYER_OPTIONS = [
+    ["underlay", "底圖"],
+    ["existingPlan", "現況圖"],
+    ["floorPlan", "平面配置"],
+    ["decoFurniture", "家具 / DECO"],
+    ["dimensions", "尺寸標註"],
+    ["lighting", "燈具配置"],
+    ["outletLowVoltage", "插座及弱電"],
+    ["plumbing", "給排水"],
+    ["demolition", "拆除標記"],
+    ["systemWarnings", "系統提醒標記"]
+  ];
+  const DEFAULT_SELECTED_MATERIAL_TAGS = ["木作櫃", "系統櫃", "磁磚", "廚具", "門窗", "五金等級"];
+  const DEFAULT_PROJECT_PREFERENCES = {
+    materialPriority: "標準",
+    hardwarePreference: "請廠商建議",
+    cabinetMaterialPreference: "一般",
+    kitchenCountertopPreference: "請廠商建議"
+  };
+  const DEFAULT_SYSTEM_REMINDERS = [
+    {
+      id: "reminder-wall-thickness-200",
+      code: "WALL_THICKNESS_REVIEW",
+      message: "隔間牆厚度 200mm 時，請確認是否合理。",
+      severity: "notice",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    },
+    {
+      id: "reminder-bath-waterproofing",
+      code: "BATH_WATERPROOFING_SUGGESTED",
+      message: "若有浴室地坪或給排水變更，建議加入防水工程與試水。",
+      severity: "warning",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    },
+    {
+      id: "reminder-demolition-waste",
+      code: "DEMOLITION_WASTE_SUPPORT",
+      message: "有拆除項目時，系統後續可估算清運、垃圾車、雜工與保護工程。",
+      severity: "notice",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    },
+    {
+      id: "reminder-kitchen-mep",
+      code: "KITCHEN_MEP_CHECK",
+      message: "有廚具項目時，請確認插座與給排水需求。",
+      severity: "notice",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    },
+    {
+      id: "reminder-zone-area",
+      code: "ZONE_AREA_REVIEW",
+      message: "有 zone 面積尚未確認時，不得作為正式預算數量。",
+      severity: "warning",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    }
+  ];
   const ZONE_TYPE_LABELS = {
     living: "客廳",
     bedroom: "臥室",
@@ -91,6 +476,10 @@
   const wallCountStatusText = document.getElementById("wallCountStatusText");
   const nodeCountStatusText = document.getElementById("nodeCountStatusText");
   const issueCountStatusText = document.getElementById("issueCountStatusText");
+  const draftSaveStatusText = document.getElementById("draftSaveStatusText");
+  const lastSavedText = document.getElementById("lastSavedText");
+  const draftVersionText = document.getElementById("draftVersionText");
+  const currentImportFileText = document.getElementById("currentImportFileText");
 
   if (!canvas || !underlayLayer || !wallLayer || !openingLayer || !zonePolygonLayer || !zoneLayer || !wallGraphLayer || !calibrationLayer || !canvasHelper || !inspectorBody || !fileInput) {
     return;
@@ -118,6 +507,12 @@
   Object.defineProperty(window, "laibePlancraftPlusUiState", {
     get() {
       return uiState;
+    }
+  });
+
+  Object.defineProperty(window, "laibePlanPuzzleToolCatalog", {
+    get() {
+      return createToolCatalogRuntimeSnapshot();
     }
   });
 
@@ -150,9 +545,13 @@
   function createInitialProject() {
     return {
       name: "LaiBE Plancraft+ 草稿",
+      draftName: "LaiBE Plancraft+ 草稿",
       product: "Plancraft+",
-      version: "0.10.0-renderer-preview-spike",
+      version: PLAN_PUZZLE_UI_IA_VERSION,
       unit: "mm",
+      draftVersionName: "v0.12 IA draft",
+      saveStatus: "unsaved",
+      lastSavedAt: null,
       importSource: null,
       scale: {
         pxPerMm: null,
@@ -165,6 +564,14 @@
       openings: [],
       zones: [],
       furniture: [],
+      toolCatalog: null,
+      currentLayer: "floor_plan",
+      visibleLayers: { ...DEFAULT_VISIBLE_LAYERS },
+      selectedMaterials: [...DEFAULT_SELECTED_MATERIAL_TAGS],
+      layerNotes: {},
+      projectPreferences: { ...DEFAULT_PROJECT_PREFERENCES },
+      systemReminders: DEFAULT_SYSTEM_REMINDERS.map((reminder) => ({ ...reminder, actions: [...reminder.actions] })),
+      totalPreviewOpen: false,
       plancraftBridge: getPlancraftBridgeStatus()
     };
   }
@@ -210,8 +617,17 @@
       currentOpeningSwing: "left",
       currentZoneType: DEFAULT_ZONE_TYPE,
       currentZoneName: ZONE_TYPE_LABELS[DEFAULT_ZONE_TYPE],
+      currentLayer: "floor_plan",
+      currentTool: "select",
+      selectedObject: null,
+      showOnlyCurrentLayer: false,
+      materialTagsExpanded: false,
+      preflightOpen: false,
+      historyStatus: "placeholder",
       zoneBoundaryState: createInitialZoneBoundaryState(),
       pcConverterReport: createInitialPcConverterReport(),
+      activeToolCatalogId: "select-mode",
+      toolCatalogVerifiedIds: [],
       message: "",
       error: ""
     };
@@ -368,6 +784,115 @@
     };
   }
 
+  function syncCurrentToolForAction(actionButton) {
+    if (!actionButton || !actionButton.dataset) {
+      return;
+    }
+    const action = actionButton.dataset.action;
+    if (action === "set-ui-tool" && actionButton.dataset.tool) {
+      uiState.currentTool = actionButton.dataset.tool;
+      return;
+    }
+    const actionToolMap = {
+      "set-select-mode": "select",
+      "start-draw-wall": "wall",
+      "add-opening": "opening",
+      "start-place-zone": "item_place",
+      "start-zone-boundary": "item_place",
+      "auto-annotate-placeholder": "auto_annotate",
+      "delete-selected": "delete",
+      "toggle-snap": "snap_toggle",
+      "undo-placeholder": "undo_redo",
+      "redo-placeholder": "undo_redo"
+    };
+    if (actionToolMap[action]) {
+      uiState.currentTool = actionToolMap[action];
+    }
+  }
+
+  function setUiTool(tool, label) {
+    if (!tool) {
+      return;
+    }
+    uiState.currentTool = tool;
+    uiState.error = "";
+    const toolLabel = label || getCurrentToolLabel(tool);
+    const placeholderTools = new Set(["pan", "zoom", "item_place", "dimension", "text", "material_bucket"]);
+    uiState.message = placeholderTools.has(tool)
+      ? `${toolLabel} 已選取；本輪先建立 UI IA 與資料承接位置，完整互動仍是 placeholder。`
+      : `${toolLabel} 已選取。`;
+  }
+
+  function saveDraftPlaceholder() {
+    project.saveStatus = "saved";
+    project.lastSavedAt = new Date().toISOString();
+    uiState.error = "";
+    uiState.message = "已標記為本機草稿已儲存。此為 UI placeholder，尚未接雲端儲存。";
+    renderStatusLabels();
+  }
+
+  function exportBidSummaryPlaceholder() {
+    const summary = {
+      type: "plancraft_plus_bid_summary_placeholder",
+      version: project.version,
+      generatedAt: new Date().toISOString(),
+      draftName: project.draftName || project.name,
+      currentLayer: getCurrentProductLayer(),
+      selectedMaterials: project.selectedMaterials,
+      systemReminders: project.systemReminders,
+      boundary: "招標需求摘要 placeholder；不是正式報價、正式估價、正式 PDF 或 budget input。"
+    };
+    downloadTextFile(JSON.stringify(summary, null, 2), "laibe-plancraft-plus-bid-summary-placeholder.json", "application/json");
+    uiState.message = "已匯出招標需求摘要 placeholder JSON；未產生正式報價或 PDF。";
+    uiState.error = "";
+  }
+
+  function autoAnnotatePlaceholder() {
+    uiState.currentTool = "auto_annotate";
+    uiState.message = `F8 一鍵標註已建立入口：目前圖層「${getCurrentProductLayer().label}」只會新增 draft annotation placeholder，不覆蓋手動備註。`;
+    uiState.error = "";
+    render();
+  }
+
+  function deleteSelectedObject() {
+    if (uiState.selectedZoneId) {
+      deleteSelectedZone();
+      return;
+    }
+    if (uiState.selectedOpeningId) {
+      deleteSelectedOpening();
+      return;
+    }
+    if (uiState.selectedWallId) {
+      deleteSelectedWall();
+      return;
+    }
+    uiState.currentTool = "delete";
+    uiState.error = "尚未選取可刪除的 draft 物件。既有 / 結構項目應以拆除或需確認標記處理。";
+    uiState.message = "";
+    render();
+  }
+
+  function updateCurrentProductLayer(layerId) {
+    const layer = PLAN_PUZZLE_PRODUCT_LAYERS.find((item) => item.id === layerId) || PLAN_PUZZLE_PRODUCT_LAYERS[1];
+    uiState.currentLayer = layer.id;
+    project.currentLayer = layer.id;
+    project.saveStatus = "unsaved";
+    uiState.message = `目前圖層已切換為：${layer.label}。`;
+    uiState.error = "";
+  }
+
+  function updateProjectPreference(field, value) {
+    const key = field.replace("project-preference-", "");
+    if (!Object.prototype.hasOwnProperty.call(project.projectPreferences, key)) {
+      return;
+    }
+    project.projectPreferences[key] = value;
+    project.saveStatus = "unsaved";
+    uiState.message = "偏好設備與材料已更新；仍屬需求整理資料，不含品牌或正式價格。";
+    uiState.error = "";
+  }
+
   function handleActionClick(event) {
     const actionButton = event.target.closest("[data-action]");
     if (!actionButton) {
@@ -375,8 +900,54 @@
     }
 
     const action = actionButton.dataset.action;
+    activateToolCatalogEntry(actionButton);
+    syncCurrentToolForAction(actionButton);
     if (action === "choose-file") {
       chooseFile();
+    }
+    if (action === "save-draft-placeholder") {
+      saveDraftPlaceholder();
+    }
+    if (action === "toggle-material-tags") {
+      uiState.materialTagsExpanded = !uiState.materialTagsExpanded;
+      uiState.message = uiState.materialTagsExpanded ? "已展開已選材質標籤。" : "已收合已選材質標籤。";
+    }
+    if (action === "toggle-preflight-panel") {
+      uiState.preflightOpen = !uiState.preflightOpen;
+      project.totalPreviewOpen = uiState.preflightOpen;
+      uiState.message = uiState.preflightOpen ? "已開啟總預覽 / 送出前檢查。" : "已收合總預覽 / 送出前檢查。";
+    }
+    if (action === "print-current-layer") {
+      uiState.message = `請使用瀏覽器列印目前圖層：${getCurrentProductLayer().label}。`;
+    }
+    if (action === "print-total-preview") {
+      uiState.message = "請使用瀏覽器列印總預覽；本輪未接正式 PDF writer。";
+    }
+    if (action === "export-bid-summary-placeholder") {
+      exportBidSummaryPlaceholder();
+    }
+    if (action === "set-ui-tool") {
+      setUiTool(actionButton.dataset.tool, actionButton.dataset.toolLabel);
+    }
+    if (action === "auto-annotate-placeholder") {
+      autoAnnotatePlaceholder();
+    }
+    if (action === "delete-selected") {
+      deleteSelectedObject();
+    }
+    if (action === "toggle-snap") {
+      uiState.snapEnabled = !uiState.snapEnabled;
+      uiState.message = uiState.snapEnabled ? "鎖點 / 吸附已開啟。" : "鎖點 / 吸附已關閉。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "undo-placeholder" || action === "redo-placeholder") {
+      uiState.historyStatus = "placeholder";
+      uiState.message = action === "undo-placeholder"
+        ? "復原目前仍是 UI placeholder，尚未建立完整 history stack。"
+        : "重做目前仍是 UI placeholder，尚未建立完整 history stack。";
+      uiState.error = "";
     }
     if (action === "start-calibration") {
       startCalibration();
@@ -401,6 +972,12 @@
     }
     if (action === "clear-zone-boundary") {
       clearSelectedZoneBoundary();
+    }
+    if (action === "recalculate-zone-area") {
+      recalculateSelectedZoneArea();
+    }
+    if (action === "clear-zone-area") {
+      clearSelectedZoneArea();
     }
     if (action === "clean-wall-endpoints") {
       cleanWallEndpoints();
@@ -435,6 +1012,9 @@
     if (action === "generate-style-visual") {
       startStyleVisualDraft();
     }
+    syncToolCatalogState();
+    renderInspector();
+    syncStaticControls();
   }
 
   function handleDocumentInput(event) {
@@ -449,6 +1029,16 @@
     }
     if (field === "known-length") {
       uiState.knownLengthInput = input.value;
+    }
+    if (field === "draft-name") {
+      project.draftName = input.value.trim() || "未命名 Plancraft+ 草稿";
+      project.name = project.draftName;
+      project.saveStatus = "unsaved";
+      renderStatusLabels();
+    }
+    if (field === "layer-note") {
+      project.layerNotes[uiState.currentLayer] = input.value;
+      project.saveStatus = "unsaved";
     }
     if (field === "current-opening-width") {
       uiState.currentOpeningWidth = readPositiveNumber(input.value, DEFAULT_OPENING_WIDTHS.door);
@@ -478,6 +1068,34 @@
       uiState.currentWallStatus = normalizeWallStatus(input.value);
       uiState.message = `下一段牆將標記為：${getWallStatusLabel(uiState.currentWallStatus)}。`;
       uiState.error = "";
+      render();
+      return;
+    }
+    if (field === "current-product-layer") {
+      updateCurrentProductLayer(input.value);
+      render();
+      return;
+    }
+    if (field === "visible-layer") {
+      const layerKey = input.dataset.layerKey;
+      if (layerKey && Object.prototype.hasOwnProperty.call(project.visibleLayers, layerKey)) {
+        project.visibleLayers[layerKey] = input.checked;
+        project.saveStatus = "unsaved";
+        uiState.message = `${input.checked ? "顯示" : "隱藏"}圖層：${getVisibleLayerLabel(layerKey)}。`;
+        uiState.error = "";
+        render();
+      }
+      return;
+    }
+    if (field === "show-only-current-layer") {
+      uiState.showOnlyCurrentLayer = input.checked;
+      uiState.message = input.checked ? "已切換為只顯示目前圖層。" : "已切換為顯示全部已啟用圖層。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field.startsWith("project-preference-")) {
+      updateProjectPreference(field, input.value);
       render();
       return;
     }
@@ -555,6 +1173,23 @@
       return;
     }
 
+    if (event.ctrlKey && event.key.toLowerCase() === "z") {
+      event.preventDefault();
+      uiState.historyStatus = "placeholder";
+      uiState.message = "Ctrl + Z 復原入口已建立，但完整 history stack 尚未落地。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (event.ctrlKey && event.key.toLowerCase() === "y") {
+      event.preventDefault();
+      uiState.historyStatus = "placeholder";
+      uiState.message = "Ctrl + Y 重做入口已建立，但完整 history stack 尚未落地。";
+      uiState.error = "";
+      render();
+      return;
+    }
+
     if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedZoneId) {
       event.preventDefault();
       deleteSelectedZone();
@@ -568,6 +1203,26 @@
     if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedWallId) {
       event.preventDefault();
       deleteSelectedWall();
+      return;
+    }
+    if (event.key === "F3") {
+      event.preventDefault();
+      uiState.snapEnabled = !uiState.snapEnabled;
+      uiState.message = uiState.snapEnabled ? "F3：鎖點已開啟。" : "F3：鎖點已關閉。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (event.key === "F8") {
+      event.preventDefault();
+      autoAnnotatePlaceholder();
+      return;
+    }
+    if (event.code === "Space") {
+      event.preventDefault();
+      setUiTool("pan", "手掌 / 移動畫布");
+      render();
+      return;
     }
     if (event.key === "Escape") {
       event.preventDefault();
@@ -593,6 +1248,7 @@
 
     if (fileType === "pdf") {
       project.importSource = createImportSource(file, fileType, false, "unsupported-pdf-placeholder", importedAt);
+      project.saveStatus = "unsaved";
       project.underlay = null;
       resetScaleAndInteraction(PDF_NOT_SUPPORTED_MESSAGE);
       render();
@@ -601,6 +1257,7 @@
 
     if (!isPreviewableImageType(fileType)) {
       project.importSource = createImportSource(file, fileType || "unknown", false, "unsupported-pdf-placeholder", importedAt);
+      project.saveStatus = "unsaved";
       project.underlay = null;
       resetScaleAndInteraction("此檔案類型尚未支援預覽。請匯入 JPG、JPEG、PNG，或先將 PDF 轉為圖片。");
       render();
@@ -614,6 +1271,7 @@
       }
       const dataUrl = typeof reader.result === "string" ? reader.result : "";
       project.importSource = createImportSource(file, fileType, true, "underlay-image", importedAt);
+      project.saveStatus = "unsaved";
       project.underlay = {
         id: createId("underlay"),
         fileName: file.name,
@@ -1407,6 +2065,7 @@
     rebuildWallGraph();
     rebuildNodeGraph();
     syncZoneBoundaryMetadata();
+    syncToolCatalogState();
     syncBridge();
     const payload = JSON.parse(JSON.stringify(project));
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -1426,6 +2085,7 @@
     rebuildWallGraph();
     rebuildNodeGraph();
     syncZoneBoundaryMetadata();
+    syncToolCatalogState();
 
     const result = convertPlancraftPlusToPc(project);
     const validation = validateGeneratedPcSpike(result.pcText);
@@ -1894,8 +2554,12 @@
       if (!isActiveBoundaryZone && Array.isArray(zone.polygon) && zone.polygon.length >= 3) {
         renderZonePolygon(zone.polygon, {
           selected: zone.id === uiState.selectedZoneId,
-          open: zone.boundaryStatus !== "closed"
+          open: zone.boundaryStatus !== "closed",
+          invalid: zone.boundaryStatus === "invalid" || zone.areaStatus === "invalid"
         });
+        if (zone.id === uiState.selectedZoneId) {
+          renderZoneAreaLabel(zone);
+        }
       }
 
       if (zone.id === uiState.selectedZoneId && uiState.mode !== "edit-zone-boundary") {
@@ -1913,7 +2577,8 @@
         renderZonePolygon(draft.previewPolygon, {
           selected: true,
           preview: true,
-          open: hasBoundaryIssueType(draft.issues, "zone-boundary-open")
+          open: hasBoundaryIssueType(draft.issues, "zone-boundary-open"),
+          invalid: hasBoundaryIssueType(draft.issues, "zone-polygon-invalid") || hasBoundaryIssueType(draft.issues, "zone-polygon-self-intersection")
         });
       }
     }
@@ -1923,13 +2588,34 @@
     const polygon = document.createElementNS(SVG_NS, "polygon");
     polygon.setAttribute(
       "class",
-      `zone-boundary-polygon${options.selected ? " is-selected" : ""}${options.open ? " is-open" : ""}${options.preview ? " is-preview" : ""}`
+      `zone-boundary-polygon${options.selected ? " is-selected" : ""}${options.open ? " is-open" : ""}${options.invalid ? " is-invalid" : ""}${options.preview ? " is-preview" : ""}`
     );
     polygon.setAttribute("points", points.map((point) => {
       const px = mmToPxPoint(point);
       return `${px.x},${px.y}`;
     }).join(" "));
     zonePolygonLayer.appendChild(polygon);
+  }
+
+  function renderZoneAreaLabel(zone) {
+    if (!Array.isArray(zone.polygon) || zone.polygon.length < ZONE_BOUNDARY_MIN_EDGES) {
+      return;
+    }
+    const center = getPolygonCentroid(zone.polygon);
+    if (!center) {
+      return;
+    }
+    const px = mmToPxPoint(center);
+    const label = document.createElementNS(SVG_NS, "text");
+    label.setAttribute("class", `zone-area-label${zone.areaStatus === "invalid" ? " is-invalid" : ""}`);
+    label.setAttribute("x", String(px.x));
+    label.setAttribute("y", String(px.y));
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("dominant-baseline", "middle");
+    label.textContent = zone.areaStatus === "estimated"
+      ? getZoneAreaReadout(zone)
+      : getZoneAreaStatusLabel(zone.areaStatus);
+    zonePolygonLayer.appendChild(label);
   }
 
   function renderBoundaryEdgeHighlights(edgeIds, className) {
@@ -2373,9 +3059,13 @@
     const selectedWall = getSelectedWall();
     const styleVisualPanel = renderStyleVisualPanel();
     const bridgePanel = `${renderBridgeCard()}${renderPcConverterReportCard()}${renderRendererPreviewReportCard()}`;
+    const toolCatalogPanel = renderToolCatalogCard();
+    const uiIaPanel = renderUiIaStatusPanel();
     if (selectedZone) {
       inspectorBody.innerHTML = `
         ${renderSelectedZoneCard(selectedZone)}
+        ${uiIaPanel}
+        ${toolCatalogPanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
@@ -2388,6 +3078,8 @@
     if (selectedOpening) {
       inspectorBody.innerHTML = `
         ${renderSelectedOpeningCard(selectedOpening)}
+        ${uiIaPanel}
+        ${toolCatalogPanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
@@ -2400,6 +3092,8 @@
     if (selectedWall) {
       inspectorBody.innerHTML = `
         ${renderSelectedWallCard(selectedWall)}
+        ${uiIaPanel}
+        ${toolCatalogPanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
@@ -2415,6 +3109,8 @@
           <h2>Plancraft+ 匯入狀態：尚未匯入</h2>
           <p>比例狀態：尚未校正。下一步請先匯入 JPG 或 PNG 丈量圖。</p>
         </section>
+        ${uiIaPanel}
+        ${toolCatalogPanel}
         ${renderWallWorkflowCard()}
         ${renderZoneWorkflowCard()}
         ${renderWallGraphCard()}
@@ -2429,6 +3125,8 @@
     if (!project.importSource.previewSupported) {
       inspectorBody.innerHTML = `
         ${renderImportSourceCard()}
+        ${uiIaPanel}
+        ${toolCatalogPanel}
         ${renderWallGraphCard()}
         ${renderNodeGraphCard()}
         ${renderMessageBlocks(PDF_NOT_SUPPORTED_MESSAGE)}
@@ -2442,6 +3140,8 @@
       ${renderImportSourceCard()}
       ${renderUnderlayControls()}
       ${renderScaleCard()}
+      ${uiIaPanel}
+      ${toolCatalogPanel}
       ${renderWallWorkflowCard()}
       ${renderZoneWorkflowCard()}
       ${renderWallGraphCard()}
@@ -2529,6 +3229,8 @@
     const boundaryIssueText = boundaryIssues.length
       ? `<div class="issue-list">${boundaryIssues.map(renderZoneBoundaryIssue).join("")}</div>`
       : `<div class="inline-message">目前沒有 zone boundary issue。</div>`;
+    const areaReadout = getZoneAreaReadout(zone);
+    const areaReviewNote = renderZoneAreaReviewNote(zone);
     return `
       <form class="inspector-form" aria-label="空間標籤屬性表單">
         <div class="status-card">
@@ -2540,7 +3242,12 @@
             <div class="status-row"><span>boundaryWallIds</span><span>${zone.boundaryWallIds.length}</span></div>
             <div class="status-row"><span>polygon 點數</span><span>${(isEditingBoundary ? displayDraft.previewPolygon : zone.polygon).length}</span></div>
             <div class="status-row"><span>boundary 狀態</span><span>${escapeHTML(boundaryStatusText)}</span></div>
-            <div class="status-row"><span>area</span><span>${zone.area === null ? "尚未計算" : `${formatNumber(zone.area)} mm²`}</span></div>
+            <div class="status-row"><span>area status</span><span>${escapeHTML(getZoneAreaStatusLabel(zone.areaStatus))}</span></div>
+            <div class="status-row"><span>area</span><span>${escapeHTML(areaReadout)}</span></div>
+            <div class="status-row"><span>area source</span><span>${escapeHTML(zone.areaSource || "-")}</span></div>
+            <div class="status-row"><span>area confidence</span><span>${escapeHTML(getZoneAreaConfidenceLabel(zone))}</span></div>
+            <div class="status-row"><span>productionReady</span><span>${zone.areaProductionReady ? "true" : "false"}</span></div>
+            <div class="status-row"><span>reviewerRequired</span><span>${zone.reviewerRequired ? "true" : "false"}</span></div>
             <div class="status-row"><span>updatedAt</span><span>${escapeHTML(zone.updatedAt)}</span></div>
           </div>
         </div>
@@ -2565,7 +3272,8 @@
           </div>
         </div>
         <div class="project-readout">
-          Zone labelPosition 與 boundary polygon 都使用 mm 座標；area 本輪仍維持 null。
+          Zone labelPosition、boundary polygon 與 candidate area 都使用 mm 基準；area 只做候選估算，不作正式估價。
+          ${areaReviewNote}
         </div>
         <div class="status-card">
           <b>Zone Boundary</b>
@@ -2579,6 +3287,8 @@
             <button class="secondary-btn" type="button" data-action="start-zone-boundary">編輯邊界</button>
             <button class="toolbar-btn primary" type="button" data-action="apply-zone-boundary" ${isEditingBoundary ? "" : "disabled"}>套用邊界</button>
             <button class="secondary-btn" type="button" data-action="clear-zone-boundary">清除邊界</button>
+            <button class="secondary-btn" type="button" data-action="recalculate-zone-area">重算面積</button>
+            <button class="secondary-btn" type="button" data-action="clear-zone-area">清除面積</button>
           </div>
           ${boundaryIssueText}
         </div>
@@ -2766,6 +3476,361 @@
         </div>
       </div>
     `;
+  }
+
+  function renderToolCatalogCard() {
+    const snapshot = createToolCatalogRuntimeSnapshot();
+    const activeTool = snapshot.activeTool || PLAN_PUZZLE_TOOL_CATALOG[0];
+    const statusRows = snapshot.entries.map((entry) => `
+      <div class="status-row">
+        <span>${escapeHTML(entry.area)} / ${escapeHTML(entry.label)}</span>
+        <span>${escapeHTML(entry.runtimeStatus)}</span>
+      </div>
+    `).join("");
+
+    return `
+      <div class="status-card" data-tool-catalog-panel="true">
+        <b>Tool Catalog Runtime</b>
+        <div class="status-grid">
+          <div class="status-row"><span>version</span><span>${escapeHTML(snapshot.version)}</span></div>
+          <div class="status-row"><span>active tool</span><span>${escapeHTML(activeTool.label)}</span></div>
+          <div class="status-row"><span>area</span><span>${escapeHTML(activeTool.area)}</span></div>
+          <div class="status-row"><span>state</span><span>${escapeHTML(activeTool.runtimeStatus || activeTool.status)}</span></div>
+          <div class="status-row"><span>receives</span><span>${escapeHTML(activeTool.receives)}</span></div>
+          <div class="status-row"><span>output</span><span>${escapeHTML(activeTool.output)}</span></div>
+          <div class="status-row"><span>boundary</span><span>${escapeHTML(activeTool.boundary)}</span></div>
+        </div>
+        <div class="project-readout">
+          placeholder = visible but not wired; linked = action is wired to runtime; verified = clicked in this browser session.
+          Tool Catalog state is draft UI metadata only and must not be used as budget quantity, formal estimate, renderer input, payment, AI API, or DB flow.
+        </div>
+        <div class="status-grid">
+          ${statusRows}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderUiIaStatusPanel() {
+    const currentLayer = getCurrentProductLayer();
+    return `
+      ${renderCurrentLayerCard(currentLayer)}
+      ${renderSelectedObjectSummaryCard(currentLayer)}
+      ${renderLayerOverlayCard()}
+      ${renderAiGuideCard(currentLayer)}
+      ${renderLayerNotesCard(currentLayer)}
+      ${renderProjectPreferencesCard()}
+      ${renderSystemRemindersCard()}
+      ${renderBudgetInclusionCard()}
+      ${renderCompletionStatusCard()}
+      ${renderShortcutHelpCard()}
+      ${renderTotalPreviewCard()}
+    `;
+  }
+
+  function renderCurrentLayerCard(currentLayer) {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>目前圖層</b>
+        <div class="field-row full">
+          <label for="current-product-layer">產品圖層</label>
+          <select id="current-product-layer" data-field="current-product-layer">
+            ${PLAN_PUZZLE_PRODUCT_LAYERS.map((layer) => `<option value="${escapeAttribute(layer.id)}" ${layer.id === currentLayer.id ? "selected" : ""}>${escapeHTML(layer.label)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="project-readout">${escapeHTML(currentLayer.purpose)}</div>
+        <div class="tag-row">
+          ${currentLayer.items.map((item) => `<span class="style-tag">${escapeHTML(item)}</span>`).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSelectedObjectSummaryCard(currentLayer) {
+    const selectedObject = getSelectedObjectSummary();
+    return `
+      <div class="status-card ui-ia-card">
+        <b>選取物件屬性</b>
+        <div class="status-grid">
+          <div class="status-row"><span>目前工具</span><span>${escapeHTML(getCurrentToolLabel(uiState.currentTool))}</span></div>
+          <div class="status-row"><span>物件類型</span><span>${escapeHTML(selectedObject.type)}</span></div>
+          <div class="status-row"><span>所屬圖層</span><span>${escapeHTML(selectedObject.layer || currentLayer.label)}</span></div>
+          <div class="status-row"><span>狀態</span><span>${escapeHTML(selectedObject.status)}</span></div>
+          <div class="status-row"><span>納入預算</span><span>${escapeHTML(selectedObject.budgetInclusion)}</span></div>
+          <div class="status-row"><span>專業確認</span><span>${selectedObject.reviewerRequired ? "需要" : "不需要"}</span></div>
+        </div>
+        ${selectedObject.reviewerReasons.length ? `<div class="issue-list">${selectedObject.reviewerReasons.map((reason) => `<div class="issue-button" role="status"><strong>需確認</strong>${escapeHTML(reason)}</div>`).join("")}</div>` : `<div class="inline-message">目前未選取物件時，屬性區顯示目前圖層與預設 draft 設定。</div>`}
+      </div>
+    `;
+  }
+
+  function renderLayerOverlayCard() {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>圖層顯示 / 疊加</b>
+        <div class="layer-toggle-grid">
+          ${VISIBLE_LAYER_OPTIONS.map(([key, label]) => `
+            <label class="toggle-row layer-toggle" for="visible-layer-${escapeAttribute(key)}">
+              <span>${escapeHTML(label)}</span>
+              <input id="visible-layer-${escapeAttribute(key)}" data-field="visible-layer" data-layer-key="${escapeAttribute(key)}" type="checkbox" ${project.visibleLayers[key] ? "checked" : ""}>
+            </label>
+          `).join("")}
+        </div>
+        <label class="toggle-row" for="show-only-current-layer">
+          <span>只顯示目前圖層</span>
+          <input id="show-only-current-layer" data-field="show-only-current-layer" type="checkbox" ${uiState.showOnlyCurrentLayer ? "checked" : ""}>
+        </label>
+        <div class="inline-message">產品圖層疊加是 Plancraft+ draft view state；技術 SVG layers 仍保留 underlay / wall / opening / zone / graph / calibration。</div>
+      </div>
+    `;
+  }
+
+  function renderAiGuideCard(currentLayer) {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>AI 引導官</b>
+        <div class="project-readout">
+          這裡不是 AI 風格圖生成。它只做流程提醒與需求引導：目前在「${escapeHTML(currentLayer.label)}」，請確認項目庫、備註、是否納入預算與缺失清單。
+        </div>
+        <div class="inline-message">不接真 AI API、不產生正式設計、不產生正式估價。</div>
+      </div>
+    `;
+  }
+
+  function renderLayerNotesCard(currentLayer) {
+    const note = project.layerNotes[currentLayer.id] || "";
+    return `
+      <div class="status-card ui-ia-card">
+        <b>備註說明</b>
+        <div class="field-row full">
+          <label for="layer-note">目前圖層備註</label>
+          <input id="layer-note" data-field="layer-note" type="text" value="${escapeAttribute(note)}" placeholder="可記錄業主需求、施工備註、需廠商建議或需專業確認">
+        </div>
+        <div class="inline-message">備註可依附物件、空間、圖層或整體專案；本輪先建立圖層備註承接位置。</div>
+      </div>
+    `;
+  }
+
+  function renderProjectPreferencesCard() {
+    const preferences = project.projectPreferences || DEFAULT_PROJECT_PREFERENCES;
+    return `
+      <div class="status-card ui-ia-card">
+        <b>偏好設備與材料</b>
+        <div class="field-grid">
+          ${renderPreferenceSelect("materialPriority", "材料等級", ["省預算", "標準", "質感優先"], preferences.materialPriority)}
+          ${renderPreferenceSelect("hardwarePreference", "五金", ["台製", "進口", "請廠商建議"], preferences.hardwarePreference)}
+          ${renderPreferenceSelect("cabinetMaterialPreference", "櫃體材料", ["一般", "高級", "請廠商建議"], preferences.cabinetMaterialPreference)}
+          ${renderPreferenceSelect("kitchenCountertopPreference", "廚具檯面", ["人造石", "石英石", "不鏽鋼", "請廠商建議"], preferences.kitchenCountertopPreference)}
+        </div>
+        <div class="inline-message">不列品牌、不產生材料價格；只作需求整理與後續詢價線索。</div>
+      </div>
+    `;
+  }
+
+  function renderPreferenceSelect(key, label, options, currentValue) {
+    return `
+      <div class="field-row">
+        <label for="project-preference-${escapeAttribute(key)}">${escapeHTML(label)}</label>
+        <select id="project-preference-${escapeAttribute(key)}" data-field="project-preference-${escapeAttribute(key)}">
+          ${options.map((option) => `<option value="${escapeAttribute(option)}" ${option === currentValue ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+        </select>
+      </div>
+    `;
+  }
+
+  function renderSystemRemindersCard() {
+    const reminders = project.systemReminders || [];
+    const openCount = reminders.filter((reminder) => reminder.status === "open").length;
+    return `
+      <div class="status-card ui-ia-card">
+        <b>系統提醒 / 缺失清單</b>
+        <div class="status-row"><span>待處理</span><span>${openCount} 項</span></div>
+        <div class="issue-list">
+          ${reminders.map((reminder) => `
+            <div class="issue-button" role="status">
+              <strong>${escapeHTML(reminder.code)}</strong>
+              ${escapeHTML(reminder.message)}
+              <div class="tag-row">
+                <span class="style-tag">加入預算</span>
+                <span class="style-tag">忽略</span>
+                <span class="style-tag">請廠商建議</span>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderBudgetInclusionCard() {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>納入預算勾選</b>
+        <div class="status-grid">
+          <div class="status-row"><span>新設物件 / 工程需求</span><span>預設納入預算候選</span></div>
+          <div class="status-row"><span>DECO / 家具示意</span><span>預設僅作示意</span></div>
+          <div class="status-row"><span>AI 風格示意</span><span>不納入預算</span></div>
+          <div class="status-row"><span>需專業確認</span><span>請廠商建議</span></div>
+        </div>
+        <div class="warning-note">這裡只標示 draft candidate，不會呼叫 Budget Engine，不會產生正式估價。</div>
+      </div>
+    `;
+  }
+
+  function renderCompletionStatusCard() {
+    const budgetReminderCount = (project.systemReminders || []).filter((reminder) => reminder.status === "open").length;
+    return `
+      <div class="status-card ui-ia-card">
+        <b>圖面完成度</b>
+        <div class="status-grid">
+          <div class="status-row"><span>底圖</span><span>${project.underlay ? "已匯入" : "未匯入"}</span></div>
+          <div class="status-row"><span>比例</span><span>${project.scale.calibrated ? "已校正" : "未校正"}</span></div>
+          <div class="status-row"><span>空間</span><span>${project.zones.length ? "已標註" : "未完成"}</span></div>
+          <div class="status-row"><span>拆除</span><span>${hasDemolishedWall() ? "已確認" : "未確認"}</span></div>
+          <div class="status-row"><span>材料</span><span>${project.selectedMaterials.length ? "部分已選" : "未選"}</span></div>
+          <div class="status-row"><span>預算提醒</span><span>${budgetReminderCount} 項待確認</span></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderShortcutHelpCard() {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>快捷鍵說明</b>
+        <div class="status-grid">
+          <div class="status-row"><span>Shift</span><span>畫斜線</span></div>
+          <div class="status-row"><span>F3</span><span>鎖點開 / 關</span></div>
+          <div class="status-row"><span>F8</span><span>一鍵標註</span></div>
+          <div class="status-row"><span>Delete</span><span>刪除</span></div>
+          <div class="status-row"><span>Esc</span><span>取消目前操作</span></div>
+          <div class="status-row"><span>Ctrl + Z</span><span>復原 placeholder</span></div>
+          <div class="status-row"><span>Ctrl + Y</span><span>重做 placeholder</span></div>
+          <div class="status-row"><span>Space</span><span>拖動畫布 placeholder</span></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderTotalPreviewCard() {
+    const isOpen = uiState.preflightOpen || project.totalPreviewOpen;
+    const currentLayer = getCurrentProductLayer();
+    return `
+      <div class="status-card ui-ia-card">
+        <b>總預覽 / 送出前檢查</b>
+        <div class="inspector-actions">
+          <button class="toolbar-btn primary" type="button" data-action="toggle-preflight-panel">${isOpen ? "收合檢查" : "開啟檢查"}</button>
+        </div>
+        ${isOpen ? `
+          <div class="status-grid" style="margin-top: 12px;">
+            <div class="status-row"><span>已畫項目</span><span>${project.walls.length} 牆 / ${project.openings.length} 門窗 / ${project.zones.length} zone</span></div>
+            <div class="status-row"><span>已選材料</span><span>${project.selectedMaterials.length} 項</span></div>
+            <div class="status-row"><span>目前圖層</span><span>${escapeHTML(currentLayer.label)}</span></div>
+            <div class="status-row"><span>是否納入預算</span><span>逐項 draft 勾選</span></div>
+          </div>
+          <div class="issue-list">
+            <div class="issue-button" role="status"><strong>地坪</strong>新增地坪工程時，確認門檻 / 收邊、全室矽利康與地坪保護。</div>
+            <div class="issue-button" role="status"><strong>浴室</strong>浴室地坪或給排水變更時，建議加入防水工程、試水與泥作修補。</div>
+            <div class="issue-button" role="status"><strong>拆除</strong>有拆除項目時，後續預算公式處理雜工、垃圾車、清運費與保護工程。</div>
+            <div class="issue-button" role="status"><strong>櫃體 / 廚具</strong>確認材質、五金、檯面、插座與給排水需求。</div>
+            <div class="issue-button" role="status"><strong>空調</strong>系統依空間與新舊屋條件估算冷房能力；屋主不自行設計專業空調。</div>
+          </div>
+        ` : `<div class="inline-message">入口已建立；展開後可看到已畫項目、已選材料、系統提醒、可能漏項與預算候選狀態。</div>`}
+      </div>
+    `;
+  }
+
+  function getCurrentProductLayer() {
+    return PLAN_PUZZLE_PRODUCT_LAYERS.find((layer) => layer.id === uiState.currentLayer)
+      || PLAN_PUZZLE_PRODUCT_LAYERS.find((layer) => layer.id === project.currentLayer)
+      || PLAN_PUZZLE_PRODUCT_LAYERS[1];
+  }
+
+  function getCurrentToolLabel(tool) {
+    const labels = {
+      select: "選取箭頭",
+      pan: "手掌 / 移動畫布",
+      zoom: "畫布縮放",
+      wall: "牆體工具",
+      opening: "門窗工具",
+      item_place: "物件 / 項目放置",
+      dimension: "尺寸標註",
+      text: "文字",
+      material_bucket: "油漆桶 / 材質",
+      auto_annotate: "一鍵標註",
+      delete: "刪除",
+      snap_toggle: "鎖點開關",
+      undo_redo: "復原 / 重做"
+    };
+    return labels[tool] || "選取箭頭";
+  }
+
+  function getOpeningKindLabel(kind) {
+    const labels = {
+      door: "門",
+      window: "窗",
+      opening: "開口"
+    };
+    return labels[kind] || "門窗 / 開口";
+  }
+
+  function getVisibleLayerLabel(layerKey) {
+    const option = VISIBLE_LAYER_OPTIONS.find(([key]) => key === layerKey);
+    return option ? option[1] : layerKey;
+  }
+
+  function getSelectedObjectSummary() {
+    const selectedWall = getSelectedWall();
+    if (selectedWall) {
+      return {
+        id: selectedWall.id,
+        type: "牆體",
+        layer: getCurrentProductLayer().label,
+        status: getWallStatusLabel(selectedWall.status),
+        budgetInclusion: selectedWall.status === "demolished" ? "拆除候選" : selectedWall.status === "new" ? "納入預算候選" : "既有 / 參考",
+        reviewerRequired: Boolean(selectedWall.structural),
+        reviewerReasons: selectedWall.structural ? ["承重牆、柱、梁或結構相關項目需專業確認。"] : []
+      };
+    }
+    const selectedOpening = getSelectedOpening();
+    if (selectedOpening) {
+      const edge = getEdgeById(selectedOpening.edgeId);
+      return {
+        id: selectedOpening.id,
+        type: "門窗 / 開口",
+        layer: getCurrentProductLayer().label,
+        status: getOpeningKindLabel(selectedOpening.kind),
+        budgetInclusion: "納入預算候選",
+        reviewerRequired: Boolean(edge?.structural),
+        reviewerReasons: edge?.structural ? ["結構牆、柱或梁上的開口需專業確認。"] : []
+      };
+    }
+    const selectedZone = getSelectedZone();
+    if (selectedZone) {
+      ensureZoneBoundaryFields(selectedZone);
+      return {
+        id: selectedZone.id,
+        type: "Zone / 空間",
+        layer: getCurrentProductLayer().label,
+        status: selectedZone.areaStatus || selectedZone.boundaryStatus || "draft",
+        budgetInclusion: selectedZone.areaStatus === "estimated" ? "面積候選，非正式數量" : "待確認",
+        reviewerRequired: selectedZone.reviewerRequired || selectedZone.areaStatus !== "estimated",
+        reviewerReasons: selectedZone.reviewerReasons || (selectedZone.areaStatus !== "estimated" ? ["zone 面積尚未形成可用候選 metadata。"] : [])
+      };
+    }
+    return {
+      id: "-",
+      type: "未選取",
+      layer: getCurrentProductLayer().label,
+      status: "draft",
+      budgetInclusion: "依物件決定",
+      reviewerRequired: false,
+      reviewerReasons: []
+    };
+  }
+
+  function hasDemolishedWall() {
+    return project.walls.some((wall) => wall.status === "demolished");
   }
 
   function renderWallGraphCard() {
@@ -3017,9 +4082,9 @@
 
   function renderZoneBoundaryIssue(issue) {
     return `
-      <div class="issue-button" role="status">
+      <div class="issue-button ${issue.severity === "error" ? "is-active" : ""}" role="status">
         <strong>${escapeHTML(getZoneBoundaryIssueLabel(issue.type))}</strong>
-        ${escapeHTML(issue.message)}
+        ${escapeHTML(issue.message)} (${escapeHTML(issue.code || issue.type)} / ${escapeHTML(issue.severity || "warning")})
       </div>
     `;
   }
@@ -3151,6 +4216,106 @@
     if (issueCountStatusText) {
       issueCountStatusText.textContent = String(project.wallGraph?.issues?.length || 0);
     }
+    if (draftSaveStatusText) {
+      draftSaveStatusText.textContent = getSaveStatusLabel(project.saveStatus);
+    }
+    if (lastSavedText) {
+      lastSavedText.textContent = project.lastSavedAt ? formatDateTime(project.lastSavedAt) : "尚未儲存";
+    }
+    if (draftVersionText) {
+      draftVersionText.textContent = project.draftVersionName || project.version;
+    }
+    if (currentImportFileText) {
+      currentImportFileText.textContent = project.importSource?.fileName || "尚未匯入";
+    }
+  }
+
+  function activateToolCatalogEntry(actionButton) {
+    const entry = findToolCatalogEntryForButton(actionButton);
+    if (!entry) {
+      return false;
+    }
+    uiState.activeToolCatalogId = entry.id;
+    if (entry.status === "linked" && !uiState.toolCatalogVerifiedIds.includes(entry.id)) {
+      uiState.toolCatalogVerifiedIds.push(entry.id);
+    }
+    return true;
+  }
+
+  function findToolCatalogEntryForButton(actionButton) {
+    if (!actionButton || !actionButton.dataset) {
+      return null;
+    }
+    const action = actionButton.dataset.action;
+    return PLAN_PUZZLE_TOOL_CATALOG.find((entry) => {
+      if (entry.action !== action) {
+        return false;
+      }
+      if (!entry.matchData) {
+        return true;
+      }
+      return Object.entries(entry.matchData).every(([key, value]) => actionButton.dataset[key] === value);
+    }) || null;
+  }
+
+  function getToolCatalogRuntimeStatus(entry) {
+    if (!entry || entry.status === "placeholder") {
+      return "placeholder";
+    }
+    return uiState.toolCatalogVerifiedIds.includes(entry.id) ? "verified" : "linked";
+  }
+
+  function getActiveToolCatalogEntry() {
+    return PLAN_PUZZLE_TOOL_CATALOG.find((entry) => entry.id === uiState.activeToolCatalogId)
+      || PLAN_PUZZLE_TOOL_CATALOG.find((entry) => entry.id === "select-mode")
+      || PLAN_PUZZLE_TOOL_CATALOG[0];
+  }
+
+  function createToolCatalogRuntimeSnapshot() {
+    const entries = PLAN_PUZZLE_TOOL_CATALOG.map((entry) => ({
+      id: entry.id,
+      area: entry.area,
+      label: entry.label,
+      action: entry.action,
+      status: entry.status,
+      runtimeStatus: getToolCatalogRuntimeStatus(entry),
+      receives: entry.receives,
+      output: entry.output,
+      boundary: entry.boundary
+    }));
+    const activeTool = entries.find((entry) => entry.id === getActiveToolCatalogEntry().id) || entries[0];
+    return {
+      version: PLAN_PUZZLE_TOOL_CATALOG_VERSION,
+      activeToolId: activeTool.id,
+      activeTool,
+      entries,
+      productLayers: PLAN_PUZZLE_PRODUCT_LAYERS.map((layer) => ({
+        id: layer.id,
+        label: layer.label,
+        itemCount: layer.items.length
+      })),
+      currentLayer: uiState.currentLayer,
+      visibleLayers: { ...project.visibleLayers },
+      forbiddenBoundary: {
+        plancraftCoreTouched: false,
+        budgetEngineCalled: false,
+        formalEstimateGenerated: false,
+        svgAreaIsFormalQuantity: false,
+        paymentTouched: false,
+        aiApiTouched: false
+      }
+    };
+  }
+
+  function syncToolCatalogState() {
+    project.toolCatalog = createToolCatalogRuntimeSnapshot();
+  }
+
+  function syncToolCatalogButtons() {
+    document.querySelectorAll("[data-action]").forEach((button) => {
+      const entry = findToolCatalogEntryForButton(button);
+      button.classList.toggle("is-tool-active", Boolean(entry && entry.id === uiState.activeToolCatalogId));
+    });
   }
 
   function syncStaticControls() {
@@ -3189,9 +4354,21 @@
     if (currentZoneName) {
       currentZoneName.value = uiState.currentZoneName || ZONE_TYPE_LABELS[uiState.currentZoneType];
     }
+    const draftNameInput = document.getElementById("draftNameInput");
+    if (draftNameInput && document.activeElement !== draftNameInput) {
+      draftNameInput.value = project.draftName || project.name;
+    }
+    const currentProductLayer = document.getElementById("current-product-layer");
+    if (currentProductLayer) {
+      currentProductLayer.value = uiState.currentLayer;
+    }
     document.querySelectorAll("[data-mode-button]").forEach((button) => {
       button.classList.toggle("is-mode-active", button.dataset.modeButton === uiState.mode);
     });
+    document.querySelectorAll("[data-ui-tool]").forEach((button) => {
+      button.classList.toggle("is-mode-active", button.dataset.uiTool === uiState.currentTool);
+    });
+    syncToolCatalogButtons();
   }
 
   function selectWall(wallId) {
@@ -3668,6 +4845,17 @@
       boundaryWallIds: [],
       polygon: [],
       area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: ["zone-boundary-empty", "zone-area-candidate-only"],
+      areaUpdatedAt: null,
       boundaryStatus: boundaryDraft.status,
       boundaryIssues: boundaryDraft.issues,
       createdAt: now,
@@ -3834,12 +5022,89 @@
     render();
   }
 
+  function recalculateSelectedZoneArea() {
+    const zone = getSelectedZone();
+    if (!zone) {
+      uiState.error = "請先選取一個空間標籤。";
+      render();
+      return;
+    }
+    ensureZoneBoundaryFields(zone);
+    const draft = createZoneBoundaryDraft(zone.boundaryEdgeIds || []);
+    applyBoundaryDraftToZone(zone, draft, true);
+    uiState.error = "";
+    uiState.message = draft.status === "closed"
+      ? "已重算候選面積；此面積仍需人工確認，不能進正式估價。"
+      : "已重算邊界狀態；目前無法形成正式候選面積。";
+    syncBridge();
+    render();
+  }
+
+  function clearSelectedZoneArea() {
+    const zone = getSelectedZone();
+    if (!zone) {
+      uiState.error = "請先選取一個空間標籤。";
+      render();
+      return;
+    }
+    ensureZoneBoundaryFields(zone);
+    Object.assign(zone, createClearedZoneAreaMetadata(), {
+      updatedAt: new Date().toISOString()
+    });
+    uiState.error = "";
+    uiState.message = "已清除候選面積；boundary 資料保留。";
+    syncBridge();
+    render();
+  }
+
+  function createClearedZoneAreaMetadata() {
+    return {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: ["zone-area-cleared", "zone-area-candidate-only"],
+      areaUpdatedAt: new Date().toISOString()
+    };
+  }
+
   function syncZoneBoundaryMetadata() {
     project.zones.forEach((zone) => {
       ensureZoneBoundaryFields(zone);
+      const clearedAreaMetadata = getClearedZoneAreaMetadata(zone);
       const draft = createZoneBoundaryDraft(zone.boundaryEdgeIds || []);
       applyBoundaryDraftToZone(zone, draft, false);
+      if (clearedAreaMetadata) {
+        Object.assign(zone, clearedAreaMetadata);
+      }
     });
+  }
+
+  function getClearedZoneAreaMetadata(zone) {
+    const reviewerReasons = Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : [];
+    if (zone.areaStatus !== "not_calculated" || !reviewerReasons.includes("zone-area-cleared")) {
+      return null;
+    }
+    return {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: uniqueIds([...reviewerReasons, "zone-area-candidate-only"]),
+      areaUpdatedAt: zone.areaUpdatedAt || null
+    };
   }
 
   function ensureZoneBoundaryFields(zone) {
@@ -3861,18 +5126,200 @@
     if (!Object.prototype.hasOwnProperty.call(zone, "area")) {
       zone.area = null;
     }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaSqMm")) {
+      zone.areaSqMm = Number.isFinite(Number(zone.area)) ? Number(zone.area) : null;
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaM2")) {
+      zone.areaM2 = null;
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaPing")) {
+      zone.areaPing = null;
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaSource")) {
+      zone.areaSource = null;
+    }
+    if (!zone.areaStatus) {
+      zone.areaStatus = "not_calculated";
+    }
+    if (!Number.isFinite(Number(zone.areaConfidence))) {
+      zone.areaConfidence = ZONE_AREA_CONFIDENCE_INVALID;
+    }
+    zone.areaProductionReady = false;
+    if (!zone.areaAuthority) {
+      zone.areaAuthority = ZONE_AREA_AUTHORITY;
+    }
+    if (typeof zone.reviewerRequired !== "boolean") {
+      zone.reviewerRequired = true;
+    }
+    if (!Array.isArray(zone.reviewerReasons)) {
+      zone.reviewerReasons = ["zone-area-candidate-only"];
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaUpdatedAt")) {
+      zone.areaUpdatedAt = null;
+    }
   }
 
   function applyBoundaryDraftToZone(zone, draft, updateTimestamp) {
+    const previousAreaUpdateSignature = getZoneAreaUpdateSignature(zone);
     zone.boundaryEdgeIds = [...draft.edgeIds];
     zone.boundaryWallIds = [...draft.boundaryWallIds];
     zone.polygon = draft.polygon.map((point) => ({ ...point }));
     zone.boundaryStatus = draft.status;
     zone.boundaryIssues = draft.issues.map((issue) => ({ ...issue }));
-    zone.area = null;
+    applyZoneAreaMetadata(zone, draft, previousAreaUpdateSignature);
     if (updateTimestamp) {
       zone.updatedAt = new Date().toISOString();
     }
+  }
+
+  function applyZoneAreaMetadata(zone, draft, previousAreaUpdateSignature) {
+    const metadata = buildZoneAreaMetadata(draft);
+    const nextAreaUpdateSignature = getZoneAreaUpdateSignature({ ...zone, ...metadata });
+    metadata.areaUpdatedAt = previousAreaUpdateSignature === nextAreaUpdateSignature
+      ? zone.areaUpdatedAt || null
+      : new Date().toISOString();
+    Object.assign(zone, metadata);
+  }
+
+  function getZoneAreaUpdateSignature(zone) {
+    return JSON.stringify({
+      boundaryEdgeIds: Array.isArray(zone.boundaryEdgeIds) ? zone.boundaryEdgeIds : [],
+      boundaryWallIds: Array.isArray(zone.boundaryWallIds) ? zone.boundaryWallIds : [],
+      polygon: Array.isArray(zone.polygon) ? zone.polygon : [],
+      area: zone.area ?? null,
+      areaSqMm: zone.areaSqMm ?? null,
+      areaM2: zone.areaM2 ?? null,
+      areaPing: zone.areaPing ?? null,
+      areaSource: zone.areaSource ?? null,
+      areaStatus: zone.areaStatus || "not_calculated",
+      areaConfidence: Number.isFinite(Number(zone.areaConfidence)) ? Number(zone.areaConfidence) : ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: zone.areaAuthority || ZONE_AREA_AUTHORITY,
+      reviewerRequired: zone.reviewerRequired !== false,
+      reviewerReasons: Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : []
+    });
+  }
+
+  function buildZoneAreaMetadata(draft) {
+    const polygon = Array.isArray(draft?.polygon) ? draft.polygon : [];
+    const issues = Array.isArray(draft?.issues) ? draft.issues : [];
+    const reviewerReasons = ["zone-area-candidate-only"];
+    const base = {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons,
+      areaUpdatedAt: null
+    };
+
+    if (draft?.status !== "closed") {
+      const statusReason = draft?.status === "invalid" ? "zone-boundary-invalid" : "zone-boundary-not-closed";
+      const areaStatus = draft?.status === "none"
+        ? "not_calculated"
+        : draft?.status === "invalid"
+          ? "invalid"
+          : "open_boundary";
+      return {
+        ...base,
+        areaStatus,
+        areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+        reviewerReasons: uniqueIds([...reviewerReasons, statusReason, ...issues.map((issue) => issue.type)])
+      };
+    }
+
+    if (polygon.length < ZONE_BOUNDARY_MIN_EDGES) {
+      return {
+        ...base,
+        areaStatus: "invalid",
+        areaConfidence: getZoneAreaConfidenceFromIssues(issues, false),
+        reviewerReasons: uniqueIds([...reviewerReasons, "zone-boundary-polygon-invalid"])
+      };
+    }
+
+    const areaSqMm = calculatePolygonAreaSqMm(polygon);
+    if (!Number.isFinite(areaSqMm) || areaSqMm <= 0) {
+      return {
+        ...base,
+        areaStatus: "invalid",
+        areaConfidence: getZoneAreaConfidenceFromIssues(issues, false),
+        reviewerReasons: uniqueIds([...reviewerReasons, "zone-boundary-area-invalid"])
+      };
+    }
+
+    const roundedAreaSqMm = Math.round(areaSqMm);
+    const areaM2 = roundDecimal(roundedAreaSqMm / ZONE_AREA_SQMM_PER_SQM, 4);
+    const areaPing = roundDecimal(areaM2 / ZONE_AREA_SQM_PER_PING, 4);
+    return {
+      area: roundedAreaSqMm,
+      areaSqMm: roundedAreaSqMm,
+      areaM2,
+      areaPing,
+      areaSource: ZONE_AREA_SOURCE,
+      areaStatus: "estimated",
+      areaConfidence: getZoneAreaConfidenceFromIssues(issues, true),
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: uniqueIds([...reviewerReasons, ...getZoneAreaReviewerReasonsFromIssues(issues)]),
+      areaUpdatedAt: null
+    };
+  }
+
+  function getZoneAreaConfidenceFromIssues(issues, hasValidArea) {
+    if (!hasValidArea) {
+      return hasBoundaryIssueType(issues, "zone-polygon-self-intersection")
+        ? ZONE_AREA_CONFIDENCE_SELF_INTERSECTION
+        : ZONE_AREA_CONFIDENCE_INVALID;
+    }
+    const warningTypes = new Set((issues || []).map((issue) => issue.type));
+    if (warningTypes.has("zone-polygon-self-intersection")) {
+      return ZONE_AREA_CONFIDENCE_SELF_INTERSECTION;
+    }
+    if (warningTypes.size > 0) {
+      return ZONE_AREA_CONFIDENCE_WARNING;
+    }
+    return ZONE_AREA_CONFIDENCE_VALID;
+  }
+
+  function getZoneAreaReviewerReasonsFromIssues(issues) {
+    return (issues || []).map((issue) => issue.type).filter(Boolean);
+  }
+
+  function calculatePolygonAreaSqMm(polygon) {
+    if (!Array.isArray(polygon) || polygon.length < ZONE_BOUNDARY_MIN_EDGES) {
+      return 0;
+    }
+    let sum = 0;
+    for (let index = 0; index < polygon.length; index += 1) {
+      const current = polygon[index];
+      const next = polygon[(index + 1) % polygon.length];
+      if (!isPointLike(current) || !isPointLike(next)) {
+        return 0;
+      }
+      sum += current.x * next.y - next.x * current.y;
+    }
+    return Math.abs(sum) / 2;
+  }
+
+  function getPolygonCentroid(polygon) {
+    if (!Array.isArray(polygon) || polygon.length === 0) {
+      return null;
+    }
+    const total = polygon.reduce((accumulator, point) => ({
+      x: accumulator.x + point.x,
+      y: accumulator.y + point.y
+    }), { x: 0, y: 0 });
+    return roundPoint({
+      x: total.x / polygon.length,
+      y: total.y / polygon.length
+    });
   }
 
   function createZoneBoundaryDraft(edgeIds) {
@@ -3886,6 +5333,7 @@
     const polygonResult = buildBoundaryPolygonFromOrderedEdges(validEdges);
     const boundaryWallIds = uniqueIds(validEdges.map((edge) => edge.sourceWallId));
     const issues = [];
+    const polygonPoints = polygonResult.closed ? polygonResult.polygon : polygonResult.points || [];
 
     if (normalizedEdgeIds.length === 0) {
       issues.push(createZoneBoundaryIssue("zone-boundary-empty", normalizedEdgeIds, "此 zone 尚未指定 boundary edges。"));
@@ -3900,6 +5348,7 @@
       issues.push(createZoneBoundaryIssue("zone-boundary-open", normalizedEdgeIds, "目前邊界尚未形成封閉空間。"));
     }
 
+    enhanceZoneBoundaryIssues(normalizedEdgeIds, missingEdgeIds, polygonResult, polygonPoints, issues);
     const status = getBoundaryStatusFromIssues(normalizedEdgeIds, issues, polygonResult.closed);
     return {
       edgeIds: normalizedEdgeIds,
@@ -3913,7 +5362,7 @@
 
   function buildBoundaryPolygonFromOrderedEdges(edges) {
     if (!edges.length) {
-      return { closed: false, polygon: [] };
+      return { closed: false, polygon: [], points: [] };
     }
 
     const points = [roundPoint(edges[0].from), roundPoint(edges[0].to)];
@@ -3928,21 +5377,78 @@
         points.push(roundPoint(edge.from));
         continue;
       }
-      return { closed: false, polygon: [] };
+      return { closed: false, polygon: [], points: points.map(roundPoint) };
     }
 
     const closed = points.length >= 4 && isSamePoint(points[0], points[points.length - 1]);
     return {
       closed,
-      polygon: closed ? points.slice(0, -1).map(roundPoint) : []
+      polygon: closed ? points.slice(0, -1).map(roundPoint) : [],
+      points: points.map(roundPoint)
     };
   }
 
-  function createZoneBoundaryIssue(type, edgeIds, message) {
+  function enhanceZoneBoundaryIssues(edgeIds, missingEdgeIds, polygonResult, polygonPoints, issues) {
+    if (edgeIds.length >= ZONE_BOUNDARY_MIN_EDGES && missingEdgeIds.length === 0 && !polygonResult.closed) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-boundary-unordered", edgeIds, "Boundary edges may be unordered or disconnected"));
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-area-not-calculated", edgeIds, "Area was not calculated because the boundary is open"));
+    }
+    if (polygonResult.closed && polygonPoints.length < ZONE_BOUNDARY_MIN_EDGES) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-invalid", edgeIds, "Polygon needs at least 3 points", "error"));
+    }
+    if (polygonResult.closed && hasDuplicateConsecutivePoints(polygonPoints)) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-invalid", edgeIds, "Polygon has duplicate consecutive points", "error"));
+    }
+    if (polygonResult.closed && polygonPoints.length >= ZONE_BOUNDARY_MIN_EDGES && calculatePolygonAreaSqMm(polygonPoints) <= 0) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-invalid", edgeIds, "Polygon area is zero or invalid", "error"));
+    }
+    if (polygonResult.closed && hasPolygonSelfIntersection(polygonPoints)) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-self-intersection", edgeIds, "Polygon has a self-intersection and needs review", "error"));
+    }
+    if (polygonResult.closed && issues.length > 0) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-area-needs-review", edgeIds, "Area candidate requires review before budget use"));
+    }
+  }
+
+  function pushUniqueZoneBoundaryIssue(issues, issue) {
+    if (!issues.some((item) => item.type === issue.type && item.id === issue.id)) {
+      issues.push(issue);
+    }
+  }
+
+  function hasDuplicateConsecutivePoints(points) {
+    return (points || []).some((point, index) => index > 0 && isSamePoint(point, points[index - 1]));
+  }
+
+  function hasPolygonSelfIntersection(points) {
+    if (!Array.isArray(points) || points.length < 4) {
+      return false;
+    }
+    const segments = points.map((point, index) => ({
+      from: point,
+      to: points[(index + 1) % points.length]
+    }));
+    for (let firstIndex = 0; firstIndex < segments.length; firstIndex += 1) {
+      for (let secondIndex = firstIndex + 1; secondIndex < segments.length; secondIndex += 1) {
+        const adjacent = Math.abs(firstIndex - secondIndex) === 1 || (firstIndex === 0 && secondIndex === segments.length - 1);
+        if (adjacent) {
+          continue;
+        }
+        const intersection = getSegmentIntersection(segments[firstIndex], segments[secondIndex]);
+        if (intersection && !isPointAtWallEndpoint(segments[firstIndex], intersection) && !isPointAtWallEndpoint(segments[secondIndex], intersection)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function createZoneBoundaryIssue(type, edgeIds, message, severity = "warning") {
     return {
       id: `${type}:${uniqueIdsPreserveOrder(edgeIds).join("|") || "none"}`,
       type,
-      severity: "warning",
+      code: type,
+      severity,
       message,
       edgeIds: uniqueIdsPreserveOrder(edgeIds),
       createdAt: new Date().toISOString()
@@ -3954,6 +5460,9 @@
       return "none";
     }
     if (hasBoundaryIssueType(issues, "zone-boundary-edge-missing")) {
+      return "invalid";
+    }
+    if (hasBoundaryIssueType(issues, "zone-polygon-invalid") || hasBoundaryIssueType(issues, "zone-polygon-self-intersection")) {
       return "invalid";
     }
     if (hasBoundaryIssueType(issues, "zone-boundary-too-few-edges") || hasBoundaryIssueType(issues, "zone-boundary-open")) {
@@ -4013,7 +5522,55 @@
     if (type === "zone-boundary-edge-missing") {
       return "edge 遺失";
     }
+    if (type === "zone-boundary-unordered") {
+      return "Edge order review";
+    }
+    if (type === "zone-polygon-invalid") {
+      return "Invalid polygon";
+    }
+    if (type === "zone-polygon-self-intersection") {
+      return "Self intersection";
+    }
+    if (type === "zone-area-not-calculated") {
+      return "Area not calculated";
+    }
+    if (type === "zone-area-needs-review") {
+      return "Area needs review";
+    }
     return "Boundary issue";
+  }
+
+  function getZoneAreaStatusLabel(status) {
+    if (status === "estimated") {
+      return "候選估算";
+    }
+    if (status === "open_boundary") {
+      return "邊界未封閉";
+    }
+    if (status === "invalid") {
+      return "無效邊界";
+    }
+    return "尚未計算";
+  }
+
+  function getZoneAreaReadout(zone) {
+    if (zone.areaStatus !== "estimated" || !Number.isFinite(Number(zone.areaSqMm))) {
+      return "尚無候選面積";
+    }
+    return `${formatNumber(zone.areaM2)} m² / ${formatNumber(zone.areaPing)} 坪`;
+  }
+
+  function getZoneAreaConfidenceLabel(zone) {
+    const confidence = Number(zone.areaConfidence);
+    return Number.isFinite(confidence) ? String(roundDecimal(confidence, 2)) : "0";
+  }
+
+  function renderZoneAreaReviewNote(zone) {
+    const reasons = Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : [];
+    if (!reasons.length) {
+      return "";
+    }
+    return `<div class="inline-message">Area candidate only: ${escapeHTML(reasons.join(", "))}</div>`;
   }
 
   function isWallInActiveBoundary(wallId) {
@@ -4766,6 +6323,38 @@
     return numeric.toLocaleString("zh-Hant", {
       maximumFractionDigits: numeric < 10 ? 4 : 2
     });
+  }
+
+  function formatDateTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "-";
+    }
+    return date.toLocaleString("zh-Hant", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  function getSaveStatusLabel(status) {
+    if (status === "saved") {
+      return "已儲存";
+    }
+    if (status === "saving") {
+      return "儲存中";
+    }
+    return "未儲存";
+  }
+
+  function roundDecimal(value, decimals) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return null;
+    }
+    const factor = 10 ** decimals;
+    return Math.round(numeric * factor) / factor;
   }
 
   function clamp(value, min, max) {
