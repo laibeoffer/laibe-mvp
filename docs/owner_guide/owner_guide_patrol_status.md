@@ -64,6 +64,34 @@ The mock runtime evidence page was statically scanned for forbidden connection p
 - PR #46 branch is behind `main`; update/rebase strategy is needed before final acceptance.
 - Global `docs/NEXT_CODEX_HANDOFF.md` has not been modified in this PR because the branch version is behind the GitHub `main` handoff history. This scoped patrol status file is used to avoid overwriting shared handoff history.
 
+## 2026-06-01T05:20:41Z Patrol Addendum
+
+GitHub `main` and PR #46 branch were checked again as the source of truth during the `owner-guide-agent-patrol` heartbeat.
+
+Current GitHub PR state:
+
+- PR: #46 `Add Owner Guide Agent contract`
+- Branch: `app/owner-guide-agent`
+- State: draft and open
+- Compare state: diverged, ahead by 5 commits and behind `main` by 11 commits at patrol time
+- Current status: `MOCK_READY`
+- WEB_RUNTIME_VERIFIED: No
+- Functional Acceptance PASS: Not claimed
+- 100% complete: Not claimed
+
+Entry-source comparison:
+
+- GitHub `main` `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` blob SHA: `1b5001ac60312444671d14724793045f68d4350a`
+- PR branch `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` blob SHA: `1b5001ac60312444671d14724793045f68d4350a`
+- Result: entry page source is currently identical between `main` and PR branch.
+
+This means wiring a scoped link from `code.html` to `owner_guide_mock_runtime.html` appears technically low-risk from source comparison. It was not performed in this patrol because the previous GitHub report explicitly left this as an `EXECUTION_OFFICER` decision: keep the mock runtime as standalone evidence, or wire it into the existing onboarding entry page.
+
+Next GitHub action needed: `EXECUTION_OFFICER` should choose one of these scoped actions:
+
+1. keep `owner_guide_mock_runtime.html` as standalone runtime evidence for Deputy review, or
+2. wire it into `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` on PR #46, then run browser/runtime verification from the GitHub-tracked entry path.
+
 ## Next GitHub Action Needed
 
 Ask `EXECUTION_OFFICER` whether to:
