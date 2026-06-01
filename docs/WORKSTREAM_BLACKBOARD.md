@@ -1,50 +1,51 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 Asia/Taipei
+Last rebuilt: 2026-05-31 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
+
+## Blackboard Rebuild Announcement
+
+The previous blackboard had grown too large for effective GitHub coordination. This file has been rebuilt as a compact current-state board.
+
+Effective immediately:
+
+- Keep this file short.
+- Do not append full chat transcripts, long patrol logs, or repeated heartbeat text.
+- Record only current state, evidence, blocker, owner, and next single action.
+- Put detailed handoff notes in `docs/NEXT_CODEX_HANDOFF.md`.
+- Put phase review material in `docs/CURRENT_PHASE_REVIEW_PACKET.md`.
+- Put Budget Knowledge Vault summaries under `docs/budget_knowledge_vault/`.
+- Historical blackboard content remains recoverable from Git history.
 
 ## Current Operating Rules
 
 - Source of truth: GitHub `main` plus current open PR / Issue state.
 - Shared work path: GitHub is mandatory for all agents. Local worktrees are private staging only and are not shared truth.
-- Agents with local-only work must sync to GitHub through a scoped branch + PR, or report exact local branch/files/diff evidence in the relevant GitHub Issue / PR if push is blocked.
-- Do not make decisions from unsynced local work. If local state conflicts with GitHub, treat GitHub as authoritative and mark the local state stale until reconciled.
+- Agents with local-only work must sync to GitHub through a scoped branch + PR, or report the exact local branch/files/diff evidence in the relevant GitHub Issue / PR if push is blocked.
+- Do not make decisions from unsynced local work. If local state conflicts with GitHub, treat GitHub as authoritative and mark the local state as stale until reconciled.
+- Do not sync by copying unrelated dirty work. Publish only the scoped files for the assigned workstream.
 - 0% standby agents are not blockers.
+- Do not create new agent tasks for standby agents unless the user explicitly activates them.
 - Every dispatch must have exactly one primary `To`.
-- Commander owns routine GitHub landing / merge decisions for scope-clean PRs.
-- Product direction, formal payment/auth/webhook/AI API, formal pricing, formal Excel/PDF, production secrets, and material business decisions still require user decision.
+- Do not merge, close, reject, or resolve review threads unless explicitly authorized.
 - Do not modify payment, auth, webhook, `.env`, secrets, production AI API, real DB, or production payment flows.
+- Local GPU Worker may provide read-only analysis / patch drafts only; it must not modify production code.
 - Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER`, not by Commander.
-
-## Completion Rules
-
-GitHub Merge Gate and Functional Acceptance Gate are separate.
-
-`MERGED_TO_MAIN` means only that a PR landed safely. It does not automatically mean `FUNCTIONAL_ACCEPTED`, `INTEGRATION_READY_100`, or `TASK_COMPLETE_100`.
-
-Functional Acceptance requires runtime / validator / demo / browser / static guard evidence appropriate to the workstream.
-
-Docs/governance/blackboard/handoff-only PRs must be marked:
-
-`Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY`
-
-They must not increase runtime or feature progress.
 
 ## Active Agent Progress Board
 
-| Agent | Workstream | Repo / Branch | Progress % | Status | Current Issue / PR | Evidence | Functional Acceptance | Blocker | Need Commander | Need Reviewer | Next |
-|---|---|---|---:|---|---|---|---|---|---|---|---|
-| 平面拼圖 UI / Plan Puzzle | `plancraft/page-ui` | `laibeoffer/laibe-mvp` | 85 | IN_PROGRESS | PR #25 / Issue #15 context | UI IA correction recorded in handoff / phase packet; runtime Tool Catalog not complete | PENDING | Runtime / Tool Catalog interaction not complete | Yes, for product direction or next implementation authorization | No by default | Decide whether to authorize Tool Catalog Interaction Implementation |
-| 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | PASS for candidate adapter contract only | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
-| Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 85 | FUNCTIONAL_ACCEPTANCE_PENDING | PR #3 open draft | QF5.4 PR #3 head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body | PENDING | PR #3 not merged; no GitHub-run validator evidence | Yes for final acceptance | Yes | Review PR #3, decide ready/merge or request GitHub-run validation evidence |
-| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 90 | MERGED_TO_MAIN | PR #26 merged / Issue #17 | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; final PR diff limited to Raw Candidate R1.5 files; validation evidence in PR comments includes CLI demos, static guard, `formal_price_generated:false`, `price_authority:"none"`, no formal pricing/output/payment/API/DB scope | PASS for R1.5 CLI / static guard evidence; final completion packet pending | Final Completion Packet and Integration Officer acceptance still pending | No | No unless final packet reveals formal pricing/output drift | Raw Candidate submits Final Completion Packet; Integration Officer updates gate acceptance |
-| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context / Issue #49 dependency | Integration readiness evidence and context windows exist | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` now routed to `budget/engine-entry-picking` | No unless product decision is needed | Integration Officer investigation required | Wait for Budget Engine Entry / Picking Agent report |
-| 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | `laibeoffer/laibe-mvp` | 25 | ACTIVE_INVESTIGATION | Issue #49 | Issue #49 created for Budget Engine Entry active resolution; asks for `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run entry proposal | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER`; entry path/export not yet identified | No unless product/formal-output boundary is found | Yes only if forbidden flow or ownership dispute appears | Report entry existence and minimal dry-run proposal; do not modify functional code |
-| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PENDING | PR #29 merge / final evidence pending | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final static guard and snapshot-only evidence |
-| 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | NOT_APPLICABLE_DOCS_ONLY for governance; runtime not complete | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
-| Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 85 | GOVERNANCE_DOCS_MERGED | PR #35 merged / Issue #28 | PR #35 merged as compact blackboard rebuild; GitHub source-of-truth and merge-decision authority recorded | NOT_APPLICABLE_DOCS_ONLY | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
-| 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate / Issue #41 / Issue #49 | Four budget lines not all 100; Budget Engine entry investigation dispatched to Issue #49 | PENDING | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Receive Issue #49 result; do not start integration harness |
+| Agent | Workstream | Repo / Branch | Progress % | Status | Current Issue / PR | Evidence | Blocker | Need Commander | Need Reviewer | Next |
+|---|---|---|---:|---|---|---|---|---|---|---|
+| 平面拼圖 UI / Plan Puzzle | `plancraft/page-ui` | `laibeoffer/laibe-mvp` | 90 | PARTIAL | PR #25 / Issue #15 context + local UI IA implementation | `0.12.0-ui-ia-alignment` local runtime verified: file area, complete tool surface, 10 product layers, status area, total preview entry; docs updated; console error 0 | Several tools remain placeholder; GitHub PR / shared branch still pending because local `git` executable unavailable | Yes, for UI IA acceptance | No by default | Implement Tool Catalog interactions or sync scoped branch / PR when GitHub write path is available |
+| 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
+| Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 75 | WAITING_REVIEW | PR #3 draft per vault summary | QF5.4 commit `c58ba25`; validators passed; cloud-ready export package exists | PR #3 not recorded as merged / final shared truth pending | No | No by default | Quote Factory owner / Integration Officer confirms final evidence |
+| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #26 | PR #26 refreshed; head `b8d27e3`; mergeable true; validators passed per vault summary | Final review / merge gate pending | No | Only if formal price boundary is touched | Wait for final gate evidence |
+| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context | Integration readiness evidence and context windows exist | `BUDGET_ENGINE_ENTRY_BLOCKER` | No, unless product decision is needed | Integration Officer investigation required | Identify current Budget Engine entry before integration harness |
+| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PR #29 not recorded as merged | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final evidence |
+| 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
+| Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 75 | IN_PROGRESS | Governance PR / Issue context | Blackboard / issue workflow / patrol rules established | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
+| 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate | Four budget lines not all 100 | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Run read-only Budget Engine entry investigation |
 
 ## Integration Readiness Gate
 
@@ -52,41 +53,35 @@ Status: WAITING
 
 Blocking item: MethodSpec / `BUDGET_ENGINE_ENTRY_BLOCKER`
 
-Current blocker owner: `budget/engine-entry-picking` / 預算生產線入口 / 撿貨系統 Agent
-
-Gate manager: `LAIBE_REVIEWER_INTEGRATION_OFFICER`
+Owner: `LAIBE_REVIEWER_INTEGRATION_OFFICER`
 
 Next: Identify current Budget Engine entry before integration harness.
 
-| Workstream | Required for Integration | Completion % | Evidence | Functional Acceptance | Blocker | Gate Status |
-|---|---|---:|---|---|---|---|
-| `quote-factory/price-range-governance` | Yes | 85 | PR #3 open draft; head `e2fa1e8`; export package / manifest / validator are GitHub-tracked | PENDING | PR #3 not merged; no GitHub-run validator evidence | WAITING |
-| `warehouse/raw-candidate` | Yes | 90 | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; R1.5 CLI demos/static guard passed; candidate-only safety evidence recorded | PASS for R1.5 validation evidence; final packet pending | Final Completion Packet and Integration Officer gate acceptance pending | WAITING |
-| `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists; Issue #49 opened for engine entry blocker | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` routed to `budget/engine-entry-picking` | BLOCKED |
-| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PENDING | PR #29 merge / final evidence pending | WAITING |
+| Workstream | Required for Integration | Completion % | Evidence | Blocker | Gate Status |
+|---|---|---:|---|---|---|
+| `quote-factory/price-range-governance` | Yes | 75 | QF5.4 commit `c58ba25`; validators passed; PR #3 draft per vault summary | Final shared truth / PR #3 merge evidence pending | WAITING |
+| `warehouse/raw-candidate` | Yes | 75 | PR #26 refreshed; head `b8d27e3`; validators passed per vault summary | Final review / merge gate pending | WAITING |
+| `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists | `BUDGET_ENGINE_ENTRY_BLOCKER` | BLOCKED |
+| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PR #29 merge / final evidence pending | WAITING |
 
 Readiness rule:
 
 - Integration harness must not start until all four lines are 100% and blocker is `None`.
 - Plan Puzzle and Owner Guide are not part of this four-line gate.
 - Budget Knowledge Vault is not part of this gate and cannot replace completion packets.
-- PR merge alone must not raise any line to 100%.
 
 ## Budget Integration Blocker Handoff
 
-To: `budget/engine-entry-picking` / 預算生產線入口 / 撿貨系統 Agent
+To: `LAIBE_REVIEWER_INTEGRATION_OFFICER`
 
-Issue: #49
-
-Mission: Budget Engine Entry active resolution for `BUDGET_ENGINE_ENTRY_BLOCKER`.
+Mission: read-only Budget Engine entry investigation.
 
 Required output:
 
-- Whether `budget-generator.ts` exists.
-- Whether an alternative Budget Engine entry exists.
-- Whether `generateBudgetEstimate` still exists.
-- Which entry should receive MethodSpec approved rules.
-- If no entry exists, propose a minimal dry-run entry proposal.
+- Current Budget Engine entry path / export name, if it exists.
+- Whether `budget-generator.ts` is missing, renamed, or intentionally replaced.
+- Which existing files reference the current budget engine entry.
+- Whether a separate scoped implementation task is needed.
 
 Forbidden:
 
@@ -94,15 +89,31 @@ Forbidden:
 - Do not create or patch `budget-generator.ts`.
 - Do not route this blocker to MethodSpec for self-repair.
 - Do not start integration harness.
-- Do not create formal prices, production `PricingRule`, `BudgetEstimateLine`, renderer output, Excel/PDF, `BudgetOutputSnapshot`, payment/auth/webhook/API/DB/secrets.
 
 ## Support Agents Managed Outside Commander
 
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
-| 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
-| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
+| 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` now exposes front-end QA log, summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. Not part of budget integration gate. |
+| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. Not part of budget integration gate. |
+
+## Agent Self-Introduction: Plan Puzzle Guide Agent
+
+- Agent: 平面拼圖引導官 / Plan Puzzle Guide Agent.
+- Workstream: `app/plan-puzzle-guide-agent`.
+- Managed By: `EXECUTION_OFFICER`.
+- Status: `CONTRACT_ONLY`.
+- Progress %: 25.
+- Responsibility: guide owner through PNG/JPG import, PDF interface warning, underlay calibration, scale setting, wall drawing, door/window/opening marking, zone marking, and placeholder SVG / plan facts output.
+- Forbidden scope: Plancraft core, Budget Engine, formal estimate, renderer, MethodSpec, Raw Candidate, Output Documents, payment, escrow, listing fee, DB, auth, real AI API, package/framework changes, secrets.
+- Automation: `plan-puzzle-guide-agent-patrol`, every 15 minutes, ACTIVE.
+- No-idle rule: after blackboard self-introduction, if no response arrives within 20 minutes, continue the next safe initialization task; do not report `本 workstream 本輪無新指派` before initialization is complete.
+- Evidence: `docs/plan_puzzle_guide/` contract files created; `preview_floor_plan` runtime reviewed read-only.
+- Blocker: local `git` executable is unavailable in PATH, so dirty worktree safety cannot be confirmed; no runtime code was changed.
+- Need Commander: No for docs-only initialization. Yes before runtime wiring if worktree safety or product CTA behavior must be decided.
+- Need Reviewer: No by default; available for user-triggered review.
+- Next single action: after safety confirmation, add mock-only runtime `PlanPuzzleQuantityFacts` output and verify browser runtime.
 
 ## Future / Standby Agent Backlog
 
@@ -118,9 +129,9 @@ These agents are not current blockers and must not receive new tasks unless expl
 
 ## Current Global Next Actions
 
-1. `budget/engine-entry-picking`: report Budget Engine entry status and minimal dry-run entry proposal in Issue #49.
-2. `LAIBE_REVIEWER_INTEGRATION_OFFICER`: receive Issue #49 result and keep Integration Gate WAITING until four required lines reach 100%.
-3. `Raw Candidate`: submit Final Completion Packet after PR #26 merge.
+1. `LAIBE_REVIEWER_INTEGRATION_OFFICER`: investigate `BUDGET_ENGINE_ENTRY_BLOCKER` read-only.
+2. Commander: keep Integration Gate as WAITING until the four required lines reach 100%.
+3. All agents: keep blackboard updates compact; move details to the correct handoff / phase / vault document.
 
 ## Compact Update Format
 
@@ -134,7 +145,6 @@ Use this format only when changing current status:
 - Status:
 - Progress %:
 - Evidence:
-- Functional Acceptance:
 - Blocker:
 - Need Commander:
 - Need Reviewer:
@@ -143,15 +153,38 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
-### 2026-06-01 - Budget Engine Entry Blocker Routed
+### 2026-06-01 - Plan Puzzle UI IA Alignment Implementation
 
-- Agent: 預算生產線入口 / 撿貨系統 Agent
-- Workstream: `budget/engine-entry-picking`
-- Status: `ACTIVE_INVESTIGATION`
-- Progress %: 25
-- Evidence: Issue #49 created as dispatch/order for `BUDGET_ENGINE_ENTRY_BLOCKER` active resolution.
-- Functional Acceptance: PENDING
-- Blocker: Budget Engine entry path/export is not yet identified.
-- Need Commander: No unless product/formal-output boundary is found.
-- Need Reviewer: Yes only if forbidden flow or ownership dispute appears.
-- Next single action: report `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run proposal.
+- Agent: 平面拼圖 UI / Plan Puzzle
+- Workstream: `plancraft/page-ui`
+- Status: `PARTIAL`
+- Progress %: 90
+- Evidence: local `0.12.0-ui-ia-alignment` runtime has file area / tool area / canvas / status area, complete tool surface, 10 product layers, layer-linked item library, system reminders, shortcuts, and total preview entry; browser console error count 0; `node --check` passed via bundled Node.
+- Blocker: pan / zoom / item placement / dimension / text / material bucket / undo-redo remain placeholders; GitHub shared PR not produced because local `git` executable is unavailable in PATH.
+- Need Commander: Yes
+- Need Reviewer: No by default
+- Next single action: Plancraft+ Tool Catalog Interaction Implementation
+
+### 2026-06-01 - Owner Guide Mock Runtime Surface
+
+- Agent: 需求引導官 / Owner Guide Agent
+- Workstream: `app/owner-guide-agent`
+- Status: `MOCK_READY`
+- Progress %: 45
+- Evidence: `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`.
+- Blocker: Browser runtime tool cannot start in this environment; WindowsApps `node.exe` returns access denied for syntax check.
+- Need Commander: No
+- Need Reviewer: No
+- Next single action: Run browser verification when tooling is available; keep outputs mock / placeholder only.
+
+### 2026-06-01 - Old Blackboard Path Lookup Report
+
+- Agent: @Plan-Puzzle / Plan Puzzle responsible agent
+- Workstream: `plancraft/page-ui` / `app/plan-puzzle-guide-agent`
+- Status: `ACTION_TAKEN`
+- Progress %: 100 for old-blackboard path lookup and report
+- Evidence: Old blackboard / handoff lookup found that the oversized old `docs/WORKSTREAM_BLACKBOARD.md` was rebuilt in place as the compact current-state board. New blackboard path is still `docs/WORKSTREAM_BLACKBOARD.md`; it must be updated only with compact current-state entries. Historical detail is recovered from Git history, `docs/NEXT_CODEX_HANDOFF.md`, `docs/CURRENT_PHASE_REVIEW_PACKET.md`, and `docs/budget_knowledge_vault/`.
+- Blocker: None for path lookup. Runtime Plan Puzzle work remains separately gated by worktree safety / browser validation.
+- Need Commander: No
+- Need Reviewer: No
+- Next single action: EXECUTION_OFFICER can direct agents to use `docs/WORKSTREAM_BLACKBOARD.md` as compact board and put detailed reports in handoff / phase / vault docs.

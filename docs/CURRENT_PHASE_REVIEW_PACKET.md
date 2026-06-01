@@ -1,6 +1,297 @@
 ﻿# CURRENT PHASE REVIEW PACKET
 
+## Plan Puzzle UI IA Alignment Implementation
+
+### 任務名稱
+
+Plancraft+ 平面拼圖 UI IA Alignment Implementation + Agent Transfer Handoff
+
+### 本輪定位
+
+- Workstream: `plancraft/page-ui`.
+- To: 第二副指揮官 / @Deputy-Codex-2.
+- Status: `PARTIAL`.
+- Functional Acceptance: `RUNTIME_UI_STRUCTURE_VERIFIED_WITH_PLACEHOLDERS`.
+- 本輪是平面拼圖主線 UI IA 修正，不是 `app/plan-puzzle-guide-agent`。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+### 新增檔案
+
+- `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+
+### 已完成
+
+- `project.version` / Tool Catalog runtime version updated to `0.12.0-ui-ia-alignment`.
+- UI now has four clear areas: file area, tool area, canvas, and status area.
+- File area includes draft name, import, local draft save placeholder, draft version/status, print/export controls, material tags, basic instructions, and total preview / pre-submit entry.
+- Tool area includes select, pan, zoom, wall, opening, item placement, dimension, text, material bucket, auto annotate, delete, snap toggle, and undo/redo.
+- Status area includes current layer, selected object properties, layer overlay toggles, AI guide, notes, preferences, system reminders, budget inclusion, completion, shortcuts, and total preview.
+- Ten product layers are defined; bathroom, waterproofing, wood cabinet, system cabinet, kitchen, and door/window engineering are item-library or reminder concepts, not first-level layers.
+- Existing Import Interface, underlay, scale calibration, wall drawing, wallGraph, nodeGraph, openings, zones, zone boundary, zone area metadata, `.pc` converter spike, DSL validation report, renderer preview report, and Tool Catalog runtime were preserved.
+
+### Runtime Evidence
+
+- `C:\Users\USER\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe --check Z:\laibe_project\src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS.
+- PATH `node.exe` returned Access denied; no system PATH changes were made.
+- Browser URL: `http://127.0.0.1:41725/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=ui-ia-alignment-0-12`.
+- Browser validation: page loaded, file area visible, four main UI areas present, status area visible, 10 product layer options present, `plumbing_plan` layer switch works, total preview expands, `Tool Catalog Runtime` visible, console error count 0.
+- `file:///C:/laibe_project/...` not verified because `C:\laibe_project` does not exist in this environment; in-app browser blocked `file:///Z:/...` navigation by URL policy.
+
+### 未完成 / 風險
+
+- Pan / zoom / item placement / dimension / text / material bucket remain UI placeholders.
+- Undo / redo history stack remains placeholder.
+- Total preview is a first-pass UI / checklist entry only.
+- This does not prove production Tool Catalog interaction, formal quantity, Budget Engine integration, renderer input, formal estimate, Excel/PDF output, AI API, DB, cloud storage, or payment/auth flow.
+- Local `git` executable is unavailable in PATH, so no local git status / diff was produced.
+
+### Forbidden Scope Preserved
+
+- No Plancraft core change.
+- No budget runtime / adapter / renderer / MethodSpec / Raw Candidate / Output Documents change.
+- No package / framework / node_modules change.
+- No formal estimate / price / Excel / PDF.
+- No `formalEstimateGuard` change and no `generateBudgetEstimate()` call.
+- No payment / escrow / listing fee / DB / auth / webhook / AI API / secrets.
+- No `git clean` / `git reset`.
+
+### Need Commander / Reviewer
+
+- Need Commander: Yes, for acceptance of the Plan Puzzle UI information architecture.
+- Need Reviewer: No by default; Yes only if future work touches formal quantity, estimate, output, Plancraft core, guard, or other forbidden boundaries.
+
+### Next Single Action
+
+Plancraft+ Tool Catalog Interaction Implementation.
+
 此文件是萊比專案目前階段的總審查資料包。  
+
+## Plan Puzzle Tool Catalog Runtime Interaction
+
+### 任務名稱
+
+Plan Puzzle Tool Catalog Runtime Interaction
+
+### 本輪定位
+
+- Workstream: `plancraft/page-ui`.
+- To: 第二副指揮官 / @Deputy-Codex-2.
+- Status: LOCAL_RUNTIME_PATCH_VERIFIED.
+- Functional Acceptance: PENDING_GITHUB_PR.
+- 本輪是平面拼圖主線，不是 `app/plan-puzzle-guide-agent`。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+
+### 已完成
+
+- 新增 runtime Tool Catalog contract，將工具映射到 file / tool / canvas / status。
+- Inspector 顯示 `Tool Catalog Runtime`，含 active tool、receives、output、boundary。
+- 定義 `placeholder` / `linked` / `verified` 狀態。
+- 點擊既有工具會更新 active tool；本 browser session 點過的 linked 工具標記為 verified。
+- Draft project snapshot 會帶 `toolCatalog`，但只作 UI runtime metadata，不作 production budget input。
+
+### Runtime Evidence
+
+- `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+- Browser URL: `http://127.0.0.1:41725/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=tool-catalog-runtime`.
+- Browser validation: page loaded, `Tool Catalog Runtime` visible, `start-draw-wall` and `start-place-zone` click paths update to verified, console error count 0.
+
+### 未完成 / 風險
+
+- 本地 `git` executable 不可用，尚未產生 clean main-based branch / PR。
+- 尚未建立 production Tool Catalog data model。
+- 家具 / 項目庫仍是 placeholder，尚未完成完整 interaction。
+- 不得把本輪 Tool Catalog UI metadata 誤認為 Budget Engine、formal quantity、formal estimate、renderer 或 output document 功能。
+
+### Forbidden Scope Preserved
+
+- No Plancraft core change.
+- No Budget Engine call.
+- No formal estimate / price / Excel / PDF.
+- No Renderer / MethodSpec / Raw Candidate / Output Documents change.
+- No payment / escrow / listing fee / DB / auth / webhook / AI API / secrets.
+- No package / framework / node_modules change.
+
+### Need Commander / Reviewer
+
+- Need Commander: No unless product direction or PR landing decision is needed.
+- Need Reviewer: No by default; Yes only if future work touches formal quantity / estimate / output or forbidden boundaries.
+
+## Plan Puzzle Guide Agent Initialization Contract
+
+### 任務名稱
+
+Plan Puzzle Guide Agent initialization contract
+
+### 本輪定位
+
+- Workstream: `app/plan-puzzle-guide-agent`.
+- Managed By: `EXECUTION_OFFICER`.
+- Status: `CONTRACT_ONLY`.
+- Runtime status: `WEB_RUNTIME_PENDING`.
+- 本輪只建立 docs contract 與 placeholder example，不修改 runtime code。
+
+### 新增檔案
+
+- `docs/plan_puzzle_guide/PLAN_PUZZLE_GUIDE_AGENT.md`
+- `docs/plan_puzzle_guide/AUTOMATION.md`
+- `docs/plan_puzzle_guide/plan_puzzle_import_flow.md`
+- `docs/plan_puzzle_guide/plan_puzzle_step_guidance.md`
+- `docs/plan_puzzle_guide/plan_puzzle_quantity_facts_contract.md`
+- `docs/plan_puzzle_guide/plan_puzzle_context_status.md`
+- `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+- `docs/plan_puzzle_guide/examples/plan_puzzle_quantity_facts.placeholder.json`
+
+### 修改檔案
+
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+
+### 已完成
+
+- 黑板已新增 Plan Puzzle Guide Agent 自我介紹。
+- 已標明 `Managed By: EXECUTION_OFFICER`。
+- 已記錄 15-minute patrol automation：`plan-puzzle-guide-agent-patrol`，ACTIVE，`FREQ=MINUTELY;INTERVAL=15`。
+- 已記錄 20-minute no-idle auto-progress rule。
+- 已定義 PNG/JPG 匯入、PDF interface-only、底圖校正、比例設定、畫牆、標門窗、標 zone、SVG / `.pc` preview、placeholder plan facts 流程。
+- 已定義 `PlanPuzzleQuantityFacts`、`plan_quantity_facts_id`、`svg_artifact_id`、`quantity_context_status`。
+- 已定義 SVG / zone / area / wall length / opening count receiving windows，狀態只使用 `placeholder` / `linked` / `verified`。
+
+### Runtime Evidence
+
+- Read-only checked `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`.
+- Read-only checked `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- Existing runtime already has import, calibration, wall, opening, zone, zone boundary, draft export, `.pc` spike, and renderer preview spike concepts.
+
+### 未完成 / 風險
+
+- Local `git` executable is unavailable in PATH, so dirty worktree safety could not be confirmed.
+- No runtime code was changed; `PlanPuzzleQuantityFacts` is not yet visible in the page.
+- Browser runtime verification not completed.
+- `docs/ISSUE_BLACKBOARD_PATROL_WORKFLOW.md` is missing locally.
+
+### Forbidden Scope Preserved
+
+- No Plancraft core change.
+- No Budget Engine call.
+- No formal estimate / price.
+- No renderer / MethodSpec / Raw Candidate / Output Documents change.
+- No payment / escrow / listing fee / DB / auth / AI API / secrets.
+- No package / framework change.
+
+## Plan Puzzle UI IA Correction Addendum
+
+### 任務名稱
+
+Plancraft+ 平面拼圖 UI 區域與工具區重整 - UI IA 修正
+
+### Commander Conclusion
+
+ACCEPT_WITH_NOTES
+
+### 本輪定位
+
+- 本輪只補齊 UI 資訊架構描述與邊界。
+- 本輪不進入 Tool Catalog Data Model Spike。
+- 本輪不修改功能碼，不修改 `code.html` / `plan-puzzle.js`。
+- 本輪不宣稱平面拼圖 UI 架構 100% 完成。
+
+### 四大區域
+
+- 檔案區：匯入、檔案來源、底圖狀態、比例校正入口、草稿保存 / 匯出狀態；不負責正式上傳、正式預算或雲端儲存。
+- 工具區：牆體、門窗、空間標籤、邊界、圖層顯示、項目庫入口、快捷操作；不直接產生正式預算。
+- 畫布：underlay、grid、牆體、門窗、空間邊界、空間標籤、檢查提示與互動選取；是編輯區，不是正式 budget input authority。
+- 狀態區：匯入、比例、牆體 / 門窗 / zone、area metadata、系統提醒、送出前檢查、總預覽摘要；不宣稱審查通過或正式估價完成。
+
+### 產品圖層與技術圖層關係
+
+- 丈量底圖 / 原圖層：對應現有 `underlayLayer` 與 grid。
+- 牆體 / 結構層：對應現有 `wallLayer`、`project.walls`、`nodeGraph.edges`。
+- 門窗 / 開口層：對應現有 `openingLayer`、`project.openings`。
+- 空間 / zone 層：對應現有 `zoneLayer` 與 `zonePolygonLayer`。
+- 衛浴圖層：產品語意圖層，應連到 bathroom zone 與衛浴項目庫。
+- 防水圖層：產品語意圖層，應依附衛浴 / 陽台等 zone 與邊界檢查。
+- 木作櫃圖層：產品語意圖層，應連到家具 / 收納項目。
+- 系統櫃圖層：產品語意圖層，應連到系統櫃項目庫與擺放物件。
+- 廚具圖層：產品語意圖層，應連到 kitchen zone 與廚具項目。
+- 水電 / 空調圖層：產品語意圖層，目前只能作需求標記 / 系統提醒；水電、空調可後續拆成獨立顯示層，但不得直接產生正式工程量。
+
+### 項目庫定位
+
+- 項目庫不是圖層。
+- 項目庫是可放置 / 標記的工程或物件分類資料來源，必須跟目前圖層連動。
+- 例：浴室屬於 zone / 產品圖層語意；防水屬於依附 zone 的工程項目；木作櫃、系統櫃、廚具屬於項目庫候選項並可形成產品語意圖層；水電、空調目前應先作系統提醒 / 需求標記，不得變成正式預算輸入。
+
+### 系統提醒 / 總預覽 / 送出前檢查 / 快捷鍵說明
+
+- 系統提醒：顯示缺比例、open boundary、invalid boundary、缺 zone、areaConfidence 低、reviewerRequired 等提示。
+- 總預覽：彙整目前圖層、zone、area metadata、未完成檢查與草稿狀態；不是 renderer preview，也不是 budget preview。
+- 送出前檢查：草稿交給下一階段前的 gate checklist；不得解除 `formalEstimateGuard`。
+- 快捷鍵說明：只說明畫布操作快捷鍵，不承擔正式送出或預算產生職責。
+
+### 邊界
+
+- 不得宣稱正式預算完成。
+- 不得接真 AI API。
+- 不得把 SVG / renderer preview 當 budget input。
+- 不得解除 `formalEstimateGuard`。
+- 不得修改 Plancraft core。
+- 不得把 candidate area 當 production quantity。
+
+### 本輪修改檔案
+
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+### 本輪未修改檔案 / 區域
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `C:\laibe_project\plancraft`
+- Plancraft core
+- budget adapter / budget runtime
+- package / framework / node_modules
+- AI API / DB / payment / escrow / listing fee
+
+### 未完成事項
+
+- 尚未做 Tool Catalog Data Model Spike。
+- 尚未完整實作項目庫互動。
+- 尚未把 10 個產品圖層全部接成可操作 UI。
+- 尚未做 production budget adapter input。
+- 尚未做正式估價、Excel / PDF writer、AI API 或真雲端儲存。
+
+### 驗證
+
+- 本輪為文件 IA 修正，未改功能碼。
+- 已只讀檢查 `preview_floor_plan/code.html` 與 `plan-puzzle.js` 中現有技術圖層、狀態區與 area metadata 相關命名。
+- 本機 `git` executable / PATH 仍不可用，無法執行 `git diff`。
+
+### Need Commander / Reviewer
+
+- Need Commander：Yes，因為 Commander 需確認資訊架構描述與產品方向。
+- Need Reviewer：No，本輪未碰功能碼、資料模型、budget runtime、guard、adapter 或 Plancraft core。
+
+### 下一步唯一建議
+
+Plancraft+ Tool Catalog Interaction Implementation
+
+---
+
 ## Review Status
 
 狀態：
@@ -16,7 +307,6 @@ Draft / Ready for user-triggered review / Reviewed / Needs update before review
 本文件已包含 AI_ARCHITECT_CORE 治理規則層成果。  
 本次追加整理 LAIBE_WEB_FLOW_BUILDER 聊天室負責範圍：landing、onboarding、header、CTA、routing、progress bar、dashboard flow、頁面連接。
 本次追加整理 LAIBE_VISUAL_SIM 聊天室負責範圍：模擬圖、示意圖、圖片 prompt、visual brief、asset spec、對應網站位置、不可宣稱事項。
-本次追加整理 LAIBE_VISUAL_SIM Issue #19 成果：visual brief / prompt / negative prompt / sandbox governance packet、storage policy、reference image policy 與 reviewer packet 邊界。
 
 補充說明：本檔已在後續區段加入本聊天室負責的 budget-system / specDB / method-spec / budget output / estimate / quote / material / labor data，以及 plan-puzzle input adapter 銜接成果。
 
@@ -51,54 +341,6 @@ AI / Codex 中央治理規則層、Web Flow 靜態連接、Budget / specDB / Met
 ## Phase Goal
 
 建立萊比專案的 AI / Codex 中央治理規則層，整理 Web Flow 靜態頁面連接成果，並補齊 budget-system 從 deterministic mock engine、preview floor plan adapter、local warehouse、method-spec warehouse、budget output logistics、snapshot contract 到 renderer gate 的階段性資料契約，讓 LAIBE_REVIEWER 可對治理規則、頁面流程邊界與預算資料層一致性進行階段總審查。
-
----
-
-## LAIBE_VISUAL_SIM Issue #19 成果
-
-### 完成事項
-
-- 建立 `docs/ai_style_visual_chat/VISUAL_BRIEF_PROMPT_SANDBOX_PACKET.md`，集中定義 visual brief、prompt preview、negative prompt、sandbox preview workflow、placeholder visual card、Builder 整合邊界與 Reviewer 審查重點。
-- 修正並收斂 `PROMPT_SANITIZATION_RULES.md`，明確規定 prompt 必須由系統 template 組裝，不得直接使用 raw user prompt。
-- 修正並收斂 `IMAGE_API_REQUEST_SCHEMA.md`，統一 `styleVisualApiRequest` 白名單欄位，並禁止 `rawPrompt`、`systemPrompt`、`developerPrompt`、Plancraft geometry、正式預算資料與 reference image file。
-- 修正並收斂 `GENERATED_IMAGE_STORAGE_POLICY.md`，明確 generated preview 只能是 sandbox / mock / temporary preview，不得寫入正式案件資料或 production assets。
-- 修正並收斂 `IMAGE_API_SPIKE_REVIEW_CHECKLIST.md`，補齊 API key / secret、request schema、prompt sanitization、reference image、generated preview、Plancraft geometry contamination 與 handoff 檢查項目。
-- 更新 `templates/LAIBE_VISUAL_SIM_TASK_TEMPLATE.md`，加入 sandbox governance 必讀文件與禁止事項。
-- 更新 `skills/laibe-visual-sim/SKILL.md`，修復固定輸出格式亂碼並補上 sandbox governance guardrail。
-
-### 產出素材 / Prompt
-
-- 產出的是治理文件、prompt 規則、negative prompt 規則、visual brief 欄位規格與 reviewer checklist。
-- 未產出真圖片。
-- 未呼叫 image generation API。
-- 未建立 API key、`.env`、backend、proxy、upload pipeline 或 production storage。
-
-### 對應網站位置
-
-- 對應未來 Visual Simulation Panel、Prompt Preview、Placeholder Visual Card 與 sandbox preview UI 的文案 / 資料規格。
-- 本輪未修改任何網站 runtime 檔案，未修改 `plan-puzzle.js`、routing、CTA 或 Header。
-
-### 不可宣稱事項
-
-Visual simulation 只能作為案件上架與風格溝通輔助，不得宣稱為：
-
-- 施工圖。
-- 正式設計圖。
-- 真實案例。
-- 竣工圖。
-- 精準尺寸圖。
-- 正式報價依據。
-- 完工保證。
-
-### 已知風險
-
-- 真 image API、reference image upload、production asset storage、正式圖片用途或 server runtime 都尚未開放。
-- 若未來進入真 API / server runtime，需另開 formal Issue，且 API key 不得進 frontend、repo、Markdown、handoff 或 console。
-- Reference image upload 仍需獨立 privacy review。
-
-### 是否 ready for phase review
-
-Ready for user-triggered review。此狀態不代表自動啟動 LAIBE_REVIEWER。
 
 ---
 
@@ -824,6 +1066,54 @@ Yes，可供後續 Reviewer re-check。此段只修正 required blocker，不代
 - 可供後續使用者主動觸發審查。
 - 本輪文件本身可審查，但不代表 Plancraft+ production adapter 已可施工或已通過 production gate。
 
+### 本輪施工：Plancraft+ Zone Area / Boundary Refinement
+
+本輪依黑板 dispatch 與 GitHub Issue #15 進行平面拼圖 Builder 施工，只在 Plancraft+ page UI / draft model 範圍內補上 zone boundary 的候選面積資料。此成果不是 production budget adapter，也不解除 formal estimate guard。
+
+#### 完成事項
+
+- `project.version` 已升級為 `0.11.0-zone-area-boundary-refinement`。
+- 已新增 zone area candidate metadata：`areaSqMm`、`areaM2`、`areaPing`、`areaSource`、`areaStatus`、`areaConfidence`、`areaProductionReady`、`areaAuthority`、`reviewerRequired`、`reviewerReasons`、`areaUpdatedAt`。
+- 已在 closed polygon boundary 上用 shoelace formula 計算候選面積，座標與面積來源皆以 mm polygon 為基準。
+- 已換算候選 `m²` 與 `坪`，但 `areaProductionReady` 固定為 `false`。
+- 未封閉、無效、缺 edge 或點數不足的 zone 不會產生候選面積，會保留 `areaStatus` 與 reviewer reasons。
+- 右側 zone inspector 現在顯示 area status、candidate area、area source、confidence 與 `productionReady: false`。
+- Plancraft+ draft JSON export 會包含最新 zone boundary 與候選 area metadata。
+
+#### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+
+#### 新增檔案
+
+- 無。
+
+#### 未完成事項
+
+- 尚未做 production-grade area approval gate。
+- 尚未把 zone area 轉成正式 budget quantity。
+- 尚未修改 budget adapter、budget runtime、`generateBudgetEstimate()` 或 formal estimate flow。
+- 尚未接 Excel / PDF、renderer production preview、DB / API、AI API、payment / escrow / listing fee。
+
+#### Plan-puzzle 資料影響
+
+- `zones[]` 現在除了 `boundaryEdgeIds / boundaryWallIds / polygon / boundaryStatus / boundaryIssues`，也會輸出 candidate area metadata。
+- `areaSource` 目前固定為 `spike_polygon_estimate`；`areaAuthority` 固定為 `plancraft_plus_zone_area_candidate`。
+- `areaProductionReady` 固定 `false`，用來避免被誤認為正式估價量體。
+
+#### 已知風險
+
+- 面積計算只依使用者人工選取且可閉合的 polygon；若 boundary 順序錯誤或未封閉，面積不可信。
+- 候選面積尚未經 reviewer approval、precision policy、room production contract 或 budget adapter production contract。
+- 若下游直接讀候選 area 欄位，仍可能誤用；正式 adapter 前仍需要 guard / contract tests。
+
+#### 是否 ready for phase review
+
+- 可供後續使用者主動觸發審查。
+- 不代表 Plancraft+ area 已可作正式報價依據。
+
 ---
 
 ## 預算生成 Builder 成果（Budget / specDB / Method-spec）
@@ -949,6 +1239,14 @@ Yes.
 ---
 
 ## LAIBE_VISUAL_SIM 成果
+
+### Issue #19 / PR #24 狀態校正
+
+- GitHub Issue #19 `[Visual Simulation] Add visual brief prompt sandbox governance packet` 已 closed。
+- GitHub PR #24 `Add visual prompt sandbox governance packet` 已 merged。
+- PR #24 merge commit `cf170e248a48be2df43f6cd6e6db0ef956cd5658` 已確認在最新 `origin/main` 歷史中。
+- 本狀態校正只同步 visual governance packet 的完成狀態；未新增 source code、未接 image API、未建立 API key / `.env`、未做 reference image upload、未建立 production storage。
+- Visual Simulation 成果仍只屬於 visual brief / prompt / negative prompt / sandbox governance / reviewer packet，不代表正式圖片功能、施工圖、正式設計圖、真實案例、正式報價依據或完工保證。
 
 ### 完成事項
 
@@ -1504,16 +1802,6 @@ Yes, with notes.
 
 配件倉庫：工法與規格目前可進入 phase review。Ready 範圍限 MethodSpecCatalog contract、seed catalog、validator P0 guard、MethodSpec -> BudgetEstimateLine / BudgetOutputSnapshot 邊界文件與 user-triggered review result 結論；不代表正式報價、正式 DB、正式人工審核流程、正式 Excel / PDF 或 renderer 工作已完成。
 
-### Freeze note 補充
-
-- 已新增 `docs/budget/32-method-spec-validator-freeze-note.md`，作為 MS-12 `PASS_WITH_NOTES` 後的 MethodSpec validator checkpoint。
-- freeze note 記錄目前 frozen baseline：PR #4 merged、P0 / P1-A / P1-B validator complete、MS-12 `PASS_WITH_NOTES`、budget regression total `231103`、line count `12`、review-required line count `5`。
-- freeze note 確認 `PricingRule` 仍是目前唯一 deterministic formal price source；AI / RAG / raw candidate data 不得直接變正式價格。
-- freeze note 確認 `LaborRule` 維持 reference-only；`MaterialSpec`、`ItemMaterialBinding`、`NoteTemplate`、`InclusionExclusionRule` 不得改 `quantity`、`unit_price` 或 `amount`。
-- freeze note 確認 UnitConversion coverage 仍是 warning-only，不得重算或改寫已產生 quantity。
-- freeze note 確認 Inclusion / Exclusion scope coverage 仍是 warning / allowed-condition only，不得直接 propagation 到 renderer / output，也不得新增、刪除或改寫正式工項。
-- 本補充沒有修改 runtime code、specs validator implementation、renderer / output、raw warehouse、frontend、plan-puzzle、payment / escrow / listing fee。
-
 ---
 
 ## 原物料採購與倉儲 成果
@@ -1672,6 +1960,86 @@ Yes，Phase R1.2 可進入 User-triggered Review result。
 
 Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_as_candidate 語意、merge policy prototype 與 local demo；不代表正式採購系統、正式材料定價、正式 catalog publishing 或正式報價完成。
 
+### Phase R1.5 補充：Raw Source Quality Scoring / Reviewer Checklist
+
+#### 完成事項
+
+- 已建立 candidate-only source quality scoring layer。
+- 已新增 `SourceQualityAssessment`，針對每筆 candidate 保留 source、raw item、candidate、validation 與 reviewer checklist 相關資訊。
+- 已新增 reviewer checklist，檢查 source identity、source date、source reliability、raw item trace、suggested code、unit、currency、observed price evidence-only 與 validation status。
+- 已新增 deterministic quality score / grade：`excellent`、`good`、`watch`、`poor`、`blocked`。
+- 已新增 recommended review status：`approved_as_candidate`、`pending`、`needs_more_info`、`needs_merge`、`rejected`。
+- 已新增 R1.5 demo：`demo-raw-source-quality-scoring.ts`。
+- R1.5 demo 會合併 R1.3 multi-source fixtures 與 R1.4 negative/source-quality fixtures，確認每筆 candidate 都有 source quality assessment。
+- 已確認 R1.5 仍維持 `formal_price_generated: false`、`price_authority: "none"`、`observed_price_is_evidence_only: true`。
+- 已確認 proposal contract、warehouse export safety、observed price safety 與 raw warehouse static guard 均通過。
+
+#### 修改檔案
+
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `src/lib/budget/raw-warehouse/types.ts`
+
+#### 新增檔案
+
+- `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
+- `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
+- `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
+
+#### 未完成事項
+
+- 尚未建立人工審核 UI。
+- 尚未把 source quality score 接入正式 downstream review workflow。
+- 尚未接真實資料匯入或 Excel parser。
+- 尚未接 CI；目前仍以 local demo 與 static guard 驗證。
+- 尚未建立正式採購、正式庫存、正式材料價格核准或正式 catalog publishing。
+
+#### 原物料 / 採購 / 倉儲資料影響
+
+- R1.5 讓 raw warehouse 可以對來源證據完整度、可追溯性、商業欄位完整度與風險 penalty 做 deterministic scoring。
+- source quality score 只用來輔助 reviewer 判斷，不代表正式價格、正式上架或正式 catalog approval。
+- price-bearing candidate 的 `observed_price` 仍只停留在 raw / candidate / proposal / assessment evidence layer。
+- negative observed price 仍會被 blocked / rejected，不會產生可誤用的 handoff proposal。
+
+#### 對 MethodSpecCatalog 的影響
+
+- R1.5 不修改 MethodSpec 主規則。
+- R1.5 不新增正式 `MaterialSpec`、`LaborRule` 或 `PricingRule`。
+- Source quality assessment 只可作為後續 MethodSpec / material / pricing 人工審核前的候選證據品質參考。
+
+#### 對 budget-system 的影響
+
+- R1.5 不呼叫 budget engine。
+- R1.5 不產生 `BudgetEstimateLine`，也不寫入 `BudgetEstimateLine.unit_price`。
+- R1.5 不接 renderer、Excel / PDF、`BudgetOutputSnapshot`、preview floor plan 或 plan-puzzle。
+- 對 budget-system 的影響仍限於正式估價前的 raw evidence safety gate。
+
+#### Demo 執行結果
+
+- `node --experimental-strip-types src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts` 通過。
+- R1.5 summary：16 sources、29 raw items、29 candidates、29 source quality assessments、average quality score `81`。
+- Grade counts：`excellent: 15`、`good: 8`、`watch: 0`、`poor: 5`、`blocked: 1`。
+- Checklist status counts：`pass: 218`、`warning: 37`、`fail: 2`、`not_applicable: 4`。
+- Proposal contract valid：true。
+- Warehouse export safety valid：true。
+- Observed price safety valid：true。
+- Static guard valid：true。
+- `formal_price_generated`: false。
+- `price_authority`: `"none"`。
+
+#### 已知風險
+
+- source quality scoring 目前是 deterministic prototype，分數權重仍是 MVP rule-based，未經正式採購 / 工務審核校準。
+- reviewer checklist 目前沒有 UI，只能在 demo / JSON output 中檢視。
+- 既有專案工作樹缺 `src/lib/budget/budget-generator.ts`，導致 `demo-generate-budget.ts` 與 `demo-load-budget-warehouse.ts` 目前失敗；此問題不是 R1.5 造成，且不在 raw warehouse Issue scope 內。
+
+#### 是否 ready for phase review
+
+Yes，Phase R1.5 可進入 User-triggered Review result。
+
+Ready 範圍限 source quality scoring、reviewer checklist、candidate evidence quality assessment 與 local safety demos；不代表正式價格、正式採購、正式 material resolver、正式 catalog publishing 或正式報價完成。
+
 ---
 
 ## 成品物流：預算表單輸出 成果
@@ -1706,9 +2074,6 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - 已建立 placeholder artifact writer，僅允許在 policy 通過後寫 `.json` manifest 或 `.txt` placeholder；Phase 3.5 demo 使用 manifest-only，不實際寫檔。
 - 已強化 renderer static guard，新增 workbook / file writer library 與 file write escape guard。
 - 已完成 Phase 3.0、Phase 3.1、Phase 3.2 User-triggered Review result；Phase 3.2 結論為 `PASS_WITH_NOTES`。Phase 3.3 User-triggered Review result 結論為 `PASS_WITH_NOTES`，允許進入 Phase 3.4。Phase 3.4 User-triggered Review result 結論為 `PASS_WITH_NOTES`，允許進入 Phase 3.5。Phase 3.5 目前完成 builder implementation，可供後續審查。
-- 已依 GitHub Issue #18 補上 renderer snapshot-only review packet，整理 renderer static guard / import denylist / placeholder writer hardening 的下一步審查資料。
-- 已補齊 `formal-file-writer-policy.ts`，讓 writer preflight、artifact manifest、local staging policy 與 controlled writer entry 共用同一份 artifact audience / format / filename / storage / security policy contract。
-- 已補齊 `run-renderer-static-guard.ts`，讓 renderer static guard 可用固定 node command 重跑並輸出 `valid`、issue count、scanned files 與 checked rules。
 
 ### 修改檔案
 
@@ -1738,7 +2103,6 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - `src/lib/budget/renderers/formal-file-writer-policy.ts`
 - `src/lib/budget/renderers/formal-file-writer-preflight.ts`
 - `src/lib/budget/renderers/run-renderer-static-guard.ts`
-- `docs/budget/27-renderer-snapshot-only-review-packet.md`
 - `docs/budget/22-formal-renderer-entry-contract.md`
 - `docs/budget/23-formal-file-writer-preflight.md`
 - `docs/NEXT_CODEX_HANDOFF.md`
@@ -1784,7 +2148,6 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - `src/lib/budget/renderers/fixture-budget-output-snapshot.ts`
 - `src/lib/budget/renderers/demo-formal-file-writer-preflight.ts`
 - `docs/budget/25-file-writer-dry-run-contract.md`
-- `docs/budget/27-renderer-snapshot-only-review-packet.md`
 - `src/lib/budget/renderers/formal-file-writer-dry-run.ts`
 - `src/lib/budget/renderers/fixture-invalid-formal-documents.ts`
 - `src/lib/budget/renderers/demo-file-writer-dry-run-hardening.ts`
@@ -1830,8 +2193,6 @@ Ready 範圍限 raw proposal contract、warehouse export safety scan、approved_
 - renderer static guard report 已改列 `forbidden_rules_checked`，並標示 rule type：`full_text`、`import_pattern`、`restricted_usage`。
 - renderer static guard 會檢查 `createFormalRendererToken()` restricted usage，避免 file writer / preflight / dry-run 自行建立 token。
 - renderer static guard 已新增 workbook-style library 與 file write escape 掃描：workbook token、`xlsx` package import、`pdfkit`、`jspdf`、`puppeteer`、`playwright`、`html-pdf`、非 placeholder writer 的 `writeFileSync` / `createWriteStream`。
-- renderer static guard 已有固定命令入口：`node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts`。
-- GitHub Issue #18 review packet 明確列出 snapshot-only、import denylist、placeholder writer hardening 與 remaining risks，供後續 reviewer 抽查。
 - 成品物流不得重新跑 budget engine。
 - 成品物流不得讀 pricing rules。
 - 成品物流不得讀 material resolver。
@@ -2135,67 +2496,3 @@ Conditional ready。
 - Landing 與 onboarding 的視覺方向、header 母版、前段 CTA 與頁面連接已可進入 phase review。
 - Routing / CTA 尚未全部正式化，因此 phase review 應標示為「可審查目前階段成果，但不代表完整網站流程全通」。
 - Dashboard flow、progress bar 全站一致性、手機版完整 QA 與 placeholder route 收斂仍需下一階段處理。
-
----
-
-## 原物料採購與倉儲 補充成果：R1.5 Source Quality Scoring / Reviewer Checklist
-
-### 完成事項
-
-- 已依 GitHub Issue #17 建立 R1.5 candidate-only source quality scoring / reviewer checklist。
-- 新增 `SourceQualityAssessment`、`ReviewerChecklistItem`、`SourceQualityGrade` 與 `ReviewerChecklistStatus` 型別。
-- 新增 `scoreSourceQualityForCandidates()`，只讀 raw source / raw item / candidate / validation result，輸出 source quality score、grade、reviewer checklist 與 recommended review status。
-- reviewer checklist 檢查 source identity、source date、source reliability、raw item trace、suggested code、unit、currency、observed price evidence-only 與 validation status。
-- demo 合併 R1.3 multi-source fixtures 與 R1.4 negative/source-quality fixtures，確認每筆 candidate 都有 assessment。
-- proposal contract、warehouse export safety、observed price safety 與 static guard 仍通過。
-- `formal_price_generated` 維持 `false`，`price_authority` 維持 `"none"`。
-
-### 修改檔案
-
-- `src/lib/budget/raw-warehouse/types.ts`
-- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
-- `docs/NEXT_CODEX_HANDOFF.md`
-- `docs/WORKSTREAM_BLACKBOARD.md`
-
-### 新增檔案
-
-- `docs/budget/26-raw-source-quality-scoring-reviewer-checklist.md`
-- `src/lib/budget/raw-warehouse/source-quality-scoring.ts`
-- `src/lib/budget/raw-warehouse/demo-raw-source-quality-scoring.ts`
-
-### 未完成事項
-
-- 尚未建立人工審核 UI。
-- 尚未接真實 raw source 匯入或 Excel parser。
-- 尚未接 DB / API / migration。
-- 尚未將 source quality score 接入正式 catalog publishing，且本階段明確禁止。
-
-### 原物料 / 採購 / 倉儲資料影響
-
-- R1.5 只新增候選證據品質評分與 reviewer checklist，協助後續人工審核判斷資料是否完整。
-- `observed_price` 仍只代表觀測證據，不是正式價格。
-- quality score 與 recommended review status 不代表正式上架或正式定價。
-
-### 對 MethodSpecCatalog 的影響
-
-- 不修改 MethodSpec 主規則。
-- 不產生正式 `MaterialSpec`、`LaborRule` 或 `PricingRule`。
-- 未來若要交給 MethodSpec / material / pricing review，只能透過 proposal / review packet 進行人工審核。
-
-### 對 budget-system 的影響
-
-- 不呼叫 `generateBudgetEstimate()`。
-- 不產生 `BudgetEstimateLine` 或 `BudgetEstimateLine.unit_price`。
-- 不影響 deterministic budget engine、renderer、BudgetOutputSnapshot 或平面拼圖 adapter。
-
-### 風險
-
-- quality score 若被下游誤解為價格核准，屬 blocker 級越權風險；文件與 demo 已明確標示不是 formal approval。
-- static guard / safety checks 目前仍是 local demo，尚未接 CI。
-- source quality scoring 規則仍是 MVP rule-based prototype，尚未代表真實採購信用模型。
-
-### 是否 ready for phase review
-
-Yes，ready for user-triggered phase review。
-
-Ready 範圍限 R1.5 candidate-only source quality scoring / reviewer checklist，不代表正式價格、正式 catalog publishing、正式採購系統或正式報價完成。
