@@ -85,6 +85,9 @@ Decision Packet required before waiting:
 | Budget Knowledge Vault | `knowledge/budget-vault` | Prepare docs-only sync / closeout evidence for PR #32 under Integration Officer. | `PARALLEL_SAFE_WORK` | Next integration officer closeout review |
 | Owner Guide Agent | `app/owner-guide-agent` | Continue standalone mock evidence and browser validation notes while routing decision waits. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
 | Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | Continue contract evidence and browser/runtime validation preparation; do not claim 100%. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
+| 預算資料契約 / Schema Registry Agent | `budget/schema-registry` | Prepare docs-only schema registry self-introduction, scope boundary, and first contract map. | `ACTIVE_SOLVING` | Every 15 minutes under Commander patrol |
+| 預算稽核追溯 / Audit Trail Agent | `budget/audit-trail` | Prepare audit-only traceability contract, evidence matrix, and forbidden production authority list. | `ACTIVE_SOLVING` | Every 15 minutes under Commander patrol |
+| 預算生成頁載體 / Budget Workspace UI Agent | `app/budget-workspace-ui` | Prepare IA-only workspace carrier map and UI boundary packet; do not implement runtime UI yet. | `ACTIVE_SOLVING` | Every 15 minutes under Commander patrol |
 
 ## Stalled Agent Watchlist
 
@@ -176,6 +179,107 @@ Forbidden:
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
 | 預算審核閘門 / Budget Review Gate Agent | `budget/review-gate` | `LAIBE_PATROL_INTEGRATION_OFFICER` | FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE | 95 | Yes | PR #37 open; Issue #41 created for Integration Officer queue disposition; docs-only review gate contracts delivered; final Commander acceptance pending. |
+
+## Support Agents Managed by Deputy Commander
+
+These support agents are not part of the four-line Budget Integration Gate. They are initially supervised by Deputy Commander. If their output is later proposed for the budget-system integration harness, `LAIBE_PATROL_INTEGRATION_OFFICER` must perform final integration review first.
+
+Preauthorized safe scope: docs-only, schema-only, audit-only, IA-only, self-introduction, automation notes, no-idle reports, completion packet drafts, closeout reports, and PRs limited to docs / blackboard / handoff.
+
+Forbidden: Budget Engine runtime, `PricingRule`, `BudgetEstimateLine`, `BudgetOutputSnapshot`, renderer runtime, payment, AI API, DB, Supabase, n8n runtime / production webhook, formal price, formal quote, production-ready claim, or Integration Gate promotion.
+
+| Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Automation | Notes |
+|---|---|---|---|---:|---|---|---|
+| 預算資料契約 / Schema Registry Agent | `budget/schema-registry` | Deputy Commander | ACTIVE_SUPPORT_INITIATED | 10 | Yes | 15-minute Commander patrol | Maintains budget data contract registry proposals, schema map, placeholder contracts, and compatibility notes. |
+| 預算稽核追溯 / Audit Trail Agent | `budget/audit-trail` | Deputy Commander | ACTIVE_SUPPORT_INITIATED | 10 | Yes | 15-minute Commander patrol | Maintains audit trail concepts, traceability evidence matrix, decision log proposal, and no-formal-authority guardrails. |
+| 預算生成頁載體 / Budget Workspace UI Agent | `app/budget-workspace-ui` | Deputy Commander | ACTIVE_SUPPORT_INITIATED | 10 | Yes | 15-minute Commander patrol | Maintains IA-only budget workspace carrier map and UI boundary packet; does not implement production UI or runtime wiring. |
+
+## Agent Self-Introduction: Budget Schema Registry Agent
+
+Agent:
+預算資料契約 / Schema Registry Agent
+
+Workstream:
+`budget/schema-registry`
+
+Managed By:
+Deputy Commander
+
+Status:
+`ACTIVE_SUPPORT_INITIATED`
+
+Automation:
+15-minute Commander patrol
+
+Role:
+整理預算系統資料契約、schema registry proposal、placeholder contract map、跨 agent handoff 欄位表與相容性風險。
+
+Allowed:
+docs-only / schema-only proposal, blackboard self-introduction, completion packet draft, Functional Acceptance report draft, and closeout report.
+
+Forbidden:
+No runtime schema migration, no Budget Engine implementation, no `PricingRule`, no `BudgetEstimateLine`, no renderer runtime, no DB / Supabase, no production API, no Integration Gate promotion.
+
+Functional Acceptance:
+`NOT_APPLICABLE_DOCS_ONLY` until a runtime/schema implementation task is explicitly authorized.
+
+## Agent Self-Introduction: Budget Audit Trail Agent
+
+Agent:
+預算稽核追溯 / Audit Trail Agent
+
+Workstream:
+`budget/audit-trail`
+
+Managed By:
+Deputy Commander
+
+Status:
+`ACTIVE_SUPPORT_INITIATED`
+
+Automation:
+15-minute Commander patrol
+
+Role:
+整理預算資料追溯、review decision log、audit event proposal、source-to-output traceability matrix 與禁止正式價格越界的稽核規則。
+
+Allowed:
+docs-only / audit-only proposal, evidence matrix, decision log template, forbidden-flow checklist, completion packet draft, and closeout report.
+
+Forbidden:
+No production audit runtime, no DB / Supabase, no payment, no AI API, no formal price, no formal quote, no `BudgetEstimateLine`, no Integration Gate promotion.
+
+Functional Acceptance:
+`NOT_APPLICABLE_DOCS_ONLY` until an implementation task is explicitly authorized.
+
+## Agent Self-Introduction: Budget Workspace UI Agent
+
+Agent:
+預算生成頁載體 / Budget Workspace UI Agent
+
+Workstream:
+`app/budget-workspace-ui`
+
+Managed By:
+Deputy Commander
+
+Status:
+`ACTIVE_SUPPORT_INITIATED`
+
+Automation:
+15-minute Commander patrol
+
+Role:
+整理預算生成頁載體的 IA-only workspace map、入口 / 出口邊界、placeholder panel contract、狀態區與驗收前 UI boundary。此 agent 不等於網站主流程 Builder。
+
+Allowed:
+docs-only / IA-only proposal, blackboard self-introduction, page carrier map, non-runtime mock contract, completion packet draft, and closeout report.
+
+Forbidden:
+No `src/` UI implementation without explicit task, no routing change, no Budget Engine runtime, no renderer runtime, no payment, no AI API, no DB / Supabase, no production-ready claim, no Integration Gate promotion.
+
+Functional Acceptance:
+`NOT_APPLICABLE_DOCS_ONLY` until a runtime UI task is explicitly authorized and validated.
 
 ## Agent Self-Introduction: Budget E2E Fixture & QA Agent
 
