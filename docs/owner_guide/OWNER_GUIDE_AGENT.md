@@ -8,9 +8,11 @@ Managed by: `EXECUTION_OFFICER`
 
 Status: `ACTIVE_INITIALIZATION`
 
-Runtime status: `WEB_RUNTIME_PENDING`
+Runtime status: `MOCK_READY`
 
 GitHub operating path: GitHub `laibeoffer/laibe-mvp` branch / PR is the source of truth. Local workspace output is draft evidence only until represented on GitHub.
+
+Current GitHub branch / PR: `app/owner-guide-agent` / PR #46.
 
 ## Role
 
@@ -25,6 +27,12 @@ The Owner Guide Agent helps owners describe renovation needs through a ChatGPT-s
 - `ProjectRequirementBrief placeholder`
 - `RequirementGapChecklist`
 - `NextStepRecommendation`
+
+## Current GitHub Evidence
+
+- Contract docs and sample JSON exist under `docs/owner_guide/`.
+- Mock runtime evidence page exists at `src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html`.
+- Runtime is not browser-verified and must not be treated as `WEB_RUNTIME_VERIFIED`.
 
 ## Boundaries
 
