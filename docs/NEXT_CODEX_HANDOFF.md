@@ -1,5 +1,50 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Commander Governance Announcement: Commander-managed Budget Support Agents
+
+- 本輪任務名稱：Register Commander-managed budget support agents.
+- 任務類型：Documentation / Governance / Agent registration.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 新增支援 agents：
+  - 預算資料契約 / Schema Registry Agent: `budget/schema-registry`
+  - 預算稽核追溯 / Audit Trail Agent: `budget/audit-trail`
+  - 預算生成頁載體 / Budget Workspace UI Agent: `app/budget-workspace-ui`
+- 管理邊界：
+  - 三個 agent 先由 Deputy Commander 監管。
+  - 它們不是四條 Budget Integration Gate 核心線。
+  - 它們不歸整合官日常管理。
+  - 若成果要進 budget-system integration harness，必須交由 `LAIBE_PATROL_INTEGRATION_OFFICER` 做 final integration review。
+- 預授權範圍：
+  - docs-only
+  - schema-only
+  - audit-only
+  - IA-only
+  - blackboard self-introduction
+  - 15-minute Commander patrol / automation note
+  - no-idle status report
+  - completion packet draft
+  - docs-only PR
+  - closeout report
+- 禁止範圍：
+  - 不修改 `src/` UI runtime，除非另有明確任務。
+  - 不修改 Budget Engine runtime。
+  - 不新增或修改 `PricingRule`、`BudgetEstimateLine`、`BudgetOutputSnapshot`。
+  - 不修改 renderer runtime。
+  - 不接 payment、AI API、DB、Supabase、n8n runtime / production webhook。
+  - 不產生正式價格或正式報價。
+  - 不提升 Integration Gate。
+  - 不宣稱 runtime verified 或 production ready。
+- Automation：
+  - 已設定 Commander-level 15-minute patrol heartbeat: `commander-support-agents-15m-patrol`。
+- Functional Acceptance：
+  - `NOT_APPLICABLE_DOCS_ONLY`
+  - This registration does not prove runtime completion and must not increase feature progress.
+- 下一步：
+  - 三個支援 agents 應在黑板/PR 中持續回報 safe work，不得用「無新指派」空轉。
+
 ## Latest Commander Governance Announcement: No-idle Agent Operations
 
 - 本輪任務名稱：No-idle Agent Operations governance update.
