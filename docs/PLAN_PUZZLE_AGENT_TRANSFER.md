@@ -1,5 +1,26 @@
 # Plan Puzzle Agent Transfer
 
+## Latest Transfer Update: Compact Workspace / Single-Screen CAD-like Layout
+
+- Task: Plancraft+ Compact Workspace / Single-Screen CAD-like Layout.
+- Branch: `codex/plan-puzzle-compact-workspace-0-15`.
+- `project.version`: `0.15.0-compact-workspace`.
+- Tool Catalog runtime version: `0.15.0-compact-workspace`.
+- Script cache key: `./plan-puzzle.js?v=compact-workspace-0-15`.
+- Main change: layout is compressed from long-page UI into a CAD-like single-screen workspace.
+- File area: compact topbar / ribbon.
+- Tool area: icon-only rail plus flyout; tool clicks update `currentTool`, active state, and flyout content.
+- Canvas: central canvas has priority width and fixed viewport height.
+- Right inspector: tabs for properties, layers, reminders, materials, overview, help.
+- Shortcut help: de-duplicated into help tab.
+- Developer diagnostics: collapsed by default and kept out of homeowner status.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser URL: `http://127.0.0.1:50362/code.html?validation=compact-workspace-0-15`.
+  - Browser console error count: 0.
+  - Body scroll height equals viewport height; main workspace is no longer a long document at desktop viewport.
+- Guard: no Plancraft core, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no AI API / DB / payment / escrow / listing fee.
+
 ## Latest Transfer Update: Status Area Productization / Debug Collapse
 
 - Task: Plancraft+ Status Area Productization / Debug Collapse.
@@ -151,3 +172,23 @@ No by default. 本輪未修改 Plancraft core、budget runtime、formal estimate
 ## 下一步唯一建議
 
 Commit and open scoped PR.
+
+## 2026-06-02 接手補充：0.15.1 Compact Workspace Polish
+
+- 目前版本：`0.15.1-compact-workspace-polish`。
+- 目前 script：`./plan-puzzle.js?v=compact-workspace-polish-0-15-1`。
+- 平面拼圖主頁已改為單螢幕 compact workspace，不再以長頁說明書方式呈現。
+- 四大區域仍存在：compact topbar 檔案區、分類 icon rail 工具區、中央畫布、右側情境式 inspector。
+- 左側工具列分為匯入 / 檢視、繪製 / 編修、空間 / 物件、標註 / 輸出；工具內容改為 floating panel。
+- 右側 inspector 只保留 4 個 tab：屬性、圖層 / 頁面、總覽、說明。
+- 10 個產品圖層仍可在 UI 中切換，圖層疊加 checkbox 仍更新 visibleLayers。
+- 空畫布已有「匯入圖檔」CTA；「建立空白底圖」為 disabled / 尚未開放。
+- 新增專注模式，會收合工具浮動面板與右側 inspector，讓畫布最大化。
+- 快捷鍵說明只保留在說明 tab。
+- AI 風格示意 / 模擬圖預覽不再顯示於平面拼圖主頁主流程。
+- 開發者診斷 / 技術資訊仍預設收合，僅供測試與交接。
+- 未修改 `plancraft/`、Plancraft core、budget runtime、formalEstimateGuard、package.json、node_modules 或任何新 framework。
+- 未接 AI API、image API、DB、payment、escrow、listing fee；未產生正式估價。
+- 驗證：`node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` PASS。
+- Browser evidence：`http://127.0.0.1:50362/code.html?validation=compact-workspace-polish-0-15-1` 可載入；body 不長捲；topbar 72px；rail 56px；canvas shell 1173px；layer switch / visible layer / focus mode / empty CTA 通過。
+- 注意：目前 in-app browser API 無法掛 console listener；未觀察到頁面 runtime break 或 error overlay。
