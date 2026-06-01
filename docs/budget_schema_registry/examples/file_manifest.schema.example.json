@@ -1,0 +1,22 @@
+{
+  "schema_name": "FileManifest",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "file_manifest_id": "file_manifest_example_001",
+  "project_id": "project_example_001",
+  "source_agent": "workflow/budget-orchestrator",
+  "source_ref": "docs-only-example",
+  "files": [
+    {
+      "file_id": "file_example_floorplan_001",
+      "file_role": "floor_plan_reference",
+      "file_name": "floor_plan_placeholder.pdf",
+      "file_status": "placeholder",
+      "storage_status": "unavailable",
+      "contains_personal_data": "unknown",
+      "warnings": ["Reference file is not uploaded or production stored in this docs-only example."]
+    }
+  ],
+  "forbidden_use": ["production_upload", "DB_record", "renderer_input", "formal_quantity", "payment_or_auth_state"],
+  "warnings": ["FileManifest is a planning contract only until upload/storage policy is authorized."]
+}

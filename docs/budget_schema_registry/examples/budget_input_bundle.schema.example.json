@@ -1,0 +1,32 @@
+{
+  "schema_name": "BudgetInputBundle",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "budget_input_bundle_id": "budget_input_bundle_example_001",
+  "project_id": "project_example_001",
+  "source_agent": "budget/schema-registry",
+  "source_ref": "docs-only-example",
+  "requirement_context": {
+    "owner_intent_id": "owner_intent_example_001",
+    "project_requirement_brief_id": "prb_example_001",
+    "requirement_context_status": "placeholder"
+  },
+  "plan_context": {
+    "plan_quantity_facts_id": "plan_quantity_facts_example_001",
+    "plan_id": "plan_draft_example_001",
+    "svg_artifact_id": "svg_artifact_example_001",
+    "plan_context_status": "placeholder"
+  },
+  "method_spec_context": {
+    "method_spec_catalog_id": "method_spec_catalog_example_001",
+    "catalog_status": "unavailable"
+  },
+  "price_context": {
+    "pricing_rule_refs": [],
+    "price_authority": "none"
+  },
+  "run_allowed": false,
+  "run_blockers": ["method_spec_catalog_unavailable", "formal_budget_engine_entry_not_selected"],
+  "warnings": ["BudgetInputBundle is a planning object only in this registry."],
+  "forbidden_use": ["generate_formal_estimate", "formal_price", "BudgetEstimateLine", "renderer_input"]
+}

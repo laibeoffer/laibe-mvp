@@ -1,0 +1,39 @@
+{
+  "schema_name": "RawCandidateHandoff",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "linked",
+  "source_agent": "warehouse/raw-candidate",
+  "source_ref": "docs/budget/20-raw-candidate-warehouse-plan.md",
+  "raw_candidate": {
+    "schema_name": "RawCandidate",
+    "raw_candidate_id": "raw_candidate_example_001",
+    "contract_status": "linked",
+    "source_item_id": "raw_catalog_item_example_001",
+    "candidate_type": "material_price_candidate",
+    "suggested_code": "mat_tile_candidate_example",
+    "suggested_name": "bathroom wall tile candidate",
+    "trade_category": "tiling",
+    "unit": "m2",
+    "observed_price": 900,
+    "observed_currency": "TWD",
+    "confidence": 0.62,
+    "requires_human_review": true,
+    "risk_flags": ["price_bearing_candidate", "needs_source_review"],
+    "formal_price_generated": false,
+    "price_authority": "none"
+  },
+  "handoff_proposal": {
+    "schema_name": "HandoffProposal",
+    "handoff_proposal_id": "handoff_proposal_example_001",
+    "contract_status": "linked",
+    "proposal_type": "material_candidate_proposal",
+    "proposal_status": "needs_human_review",
+    "raw_candidate_id": "raw_candidate_example_001",
+    "target_workstream": "warehouse/method-spec",
+    "review_flags": ["candidate_must_not_publish_directly"],
+    "risk_flags": ["price_bearing_candidate"],
+    "formal_price_generated": false
+  },
+  "warnings": ["HandoffProposal is not a catalog record and must not publish MaterialSpec, LaborRule, PricingRule, or BudgetOutputSnapshot."],
+  "forbidden_use": ["MaterialSpec direct publish", "LaborRule direct publish", "PricingRule direct publish", "BudgetEstimateLine", "BudgetOutputSnapshot"]
+}

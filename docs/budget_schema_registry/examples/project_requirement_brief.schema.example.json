@@ -1,0 +1,41 @@
+{
+  "schema_name": "ProjectRequirementBrief",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "project_requirement_brief_id": "prb_example_001",
+  "owner_intent_id": "owner_intent_example_001",
+  "project_id": "project_example_001",
+  "source_agent": "app/owner-guide-agent",
+  "source_ref": "docs/owner_guide/project_requirement_brief_placeholder.md",
+  "requirement_context_status": "placeholder",
+  "space_requirements": {
+    "kitchen": ["update old kitchen", "confirm appliance list"],
+    "bathrooms": ["repair leakage", "confirm waterproofing scope"],
+    "storage": ["increase entry and bedroom storage"]
+  },
+  "budget_preference": {
+    "type": "range_signal",
+    "currency": "TWD",
+    "range_low": 800000,
+    "range_high": 1200000,
+    "price_authority": "none"
+  },
+  "scope_constraints": {
+    "must_haves": ["bathroom leakage repair", "storage"],
+    "unknowns": ["floor plan", "bathroom count", "kitchen appliance list"],
+    "schedule": "within_three_months"
+  },
+  "review_flags": [
+    {
+      "flag": "missing_floor_plan",
+      "severity": "medium"
+    },
+    {
+      "flag": "bathroom_scope_unverified",
+      "severity": "high"
+    }
+  ],
+  "handoff_targets": ["plan-puzzle", "budget-preview"],
+  "warnings": ["ProjectRequirementBrief placeholder must not feed renderer directly."],
+  "forbidden_use": ["formal_estimate", "BudgetEstimateLine", "PricingRule", "renderer_input", "customer_final_quote"]
+}

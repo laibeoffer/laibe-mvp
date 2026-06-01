@@ -1,0 +1,52 @@
+{
+  "schema_name": "BudgetOutputSnapshot",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "snapshot_id": "budget_output_snapshot_example_001",
+  "project_id": "project_example_001",
+  "estimate_id": "estimate_example_001",
+  "source_agent": "output/budget-documents",
+  "source_ref": "docs/budget/16-budget-output-snapshot-and-material-alignment.md",
+  "snapshot_status": "dry_run_example_only",
+  "customer_view": {
+    "rows": [
+      {
+        "line_no": 1,
+        "item_name": "Bathroom waterproofing preview row",
+        "unit": "m2",
+        "quantity": 4.2,
+        "unit_price": 1800,
+        "amount": 7560,
+        "customer_note": "Dry-run example only; not a formal quote."
+      }
+    ],
+    "totals": {
+      "currency": "TWD",
+      "subtotal": 7560,
+      "total": 7560
+    }
+  },
+  "internal_view": {
+    "rows": [
+      {
+        "line_no": 1,
+        "source_type": "dry_run_fixture",
+        "source_id": "budget_input_bundle_example_001",
+        "recipe_id": "recipe_example_waterproofing",
+        "material_code": "material_spec_example_reference",
+        "quantity_formula": "area_sqm",
+        "price_source": "dry_run_fixture_only",
+        "confidence": 0.5,
+        "requires_review": true,
+        "internal_note": "Example row only. Renderer may read snapshot, but raw data must not create snapshot directly."
+      }
+    ]
+  },
+  "source_summary": {
+    "requirement_context_status": "placeholder",
+    "plan_context_status": "placeholder",
+    "formal_price_generated_by_registry": false
+  },
+  "warnings": ["This example shows the renderer boundary shape only. It is not a formal quote."],
+  "forbidden_use": ["raw_data_direct_snapshot", "customer_final_quote", "rerun_budget_engine_in_renderer"]
+}
