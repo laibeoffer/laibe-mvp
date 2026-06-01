@@ -14,6 +14,7 @@ Role in integration: approved rules / specs / recipes supplier.
 - PR #47 / Issue #49 evidence now records `NO_ENTRY_FOUND_MINIMAL_DRY_RUN_ENTRY_REQUIRED`: `budget-generator.ts`, `demo-generate-budget.ts`, and callable `generateBudgetEstimate()` are not present on GitHub `main`, and no alternative Budget Engine entry is confirmed.
 - Issue #49 now contains the active investigation report against GitHub `main` `896d5dd21ecedaa0754d2052262cedf67d5be82c`; MethodSpec approved rules can only be prepared through `validateMethodSpecCatalog()` and `buildBudgetCatalogFromMethodSpec()` until a separate Budget Engine runtime entry is authorized.
 - Issue #49 now records Commander decision `AUTHORIZED_TO_PREPARE_MINIMAL_DRY_RUN_RUNTIME_IMPLEMENTATION` for the Budget Engine Entry & Picking Agent, with zero-value placeholder amounts only and Integration Gate still `WAITING`.
+- PR #47 now mirrors the authorization-received action signal: the next executable owner remains Budget Engine Entry & Picking Agent under Integration Officer supervision, and this vault only tracks the signal.
 
 ## Evidence To Preserve
 
@@ -28,7 +29,7 @@ Role in integration: approved rules / specs / recipes supplier.
 - `src/lib/budget/budget-generator.ts` is reported absent on GitHub `main` by PR #47 evidence.
 - Current Budget Engine entry path / export name is reported absent by Issue #49.
 - No current engine is confirmed to consume approved MethodSpec catalog / rules for an integration dry-run.
-- Runtime implementation and Functional Acceptance evidence are still pending outside this vault.
+- Runtime implementation plan, CLI/demo evidence, and Functional Acceptance evidence are still pending outside this vault.
 
 ## Next
 
