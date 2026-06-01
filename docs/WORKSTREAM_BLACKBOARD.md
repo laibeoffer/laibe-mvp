@@ -1,6 +1,6 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 Asia/Taipei
+Last updated: 2026-06-01 15:08 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
@@ -168,3 +168,18 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No for docs-only contract; Yes before runtime wiring or final completion acceptance.
 - Need Reviewer: No by default; user-triggered review only.
 - Next single action: Review PR #50 through normal gates, then decide whether PR #40 / PR #44 should be closed, superseded, or reconciled.
+
+### 2026-06-01 - Plan Puzzle Guide Sole Agent Report To Second Deputy
+
+- To: `SECOND_DEPUTY_COMMANDER`
+- From: `Plan Puzzle Guide Agent`
+- Agent: `Plan Puzzle Guide Agent`
+- Workstream: `app/plan-puzzle-guide-agent`
+- Status: `TAKEOVER_ACKNOWLEDGED / CONTRACT_ONLY / WEB_RUNTIME_PENDING`
+- Progress %: 25
+- Evidence: PR #50 branch `codex/plan-puzzle-guide-init-main-sync` is the current GitHub-tracked docs/support lane; this update records that Plan Puzzle Guide Agent is the only active agent for the Plan Puzzle Guide workstream and that PR #39 / PR #40 / PR #44 must not be treated as current completion evidence without reconciliation.
+- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY for the current PR #50 contract; runtime/browser acceptance remains PENDING.
+- Blocker: PR #50 is not merged; runtime guide surface is not wired; browser validation is not complete.
+- Need Commander: Yes before moving from docs/support contract into runtime mock wiring or final acceptance.
+- Need Reviewer: No by default because current scope is docs/support only and does not touch Plancraft core, Budget Engine, formal estimate, renderer, payment, auth, API, DB, secrets, package, or framework files.
+- Next single action: `SECOND_DEPUTY_COMMANDER` confirms whether to review/merge PR #50 first or authorize a narrowly scoped runtime mock follow-up branch for the guide surface.
