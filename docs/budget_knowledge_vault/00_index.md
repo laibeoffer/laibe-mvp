@@ -30,10 +30,10 @@ This queue is used when there is no new instruction. The agent must advance safe
 
 ## Latest Scoped Snapshot
 
-- checked_at: 2026-06-01T19:09:06+08:00
-- PR #32: open, not merged, head at patrol start `da2d975e3ef142730ed8400b2e5be27dfe3b237b`; GitHub reports mergeable false on repeated scoped fetch; no comments or review threads found in scoped patrol.
+- checked_at: 2026-06-01T19:57:56+08:00
+- PR #32: open, not merged, head at patrol start `972b9ef571e6860d523f6a69728df2f377d612e5`; GitHub reports mergeable false on repeated scoped fetch; no comments or review threads found in scoped patrol.
 - PR #31: open, not merged, related boundary context only, GitHub reports mergeable false, and no review threads found in scoped patrol.
-- PR #47 / Issue #49: `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal for `budget/engine-entry-picking`; this vault only mirrors the signal.
+- PR #47 / Issue #49: PR #47 is open and GitHub reports mergeable true; `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal for `budget/engine-entry-picking`; this vault only mirrors the signal.
 - Issue #41: latest scoped signal remains Budget Review Gate PR #37 docs-only final-report status; no vault execution assignment found.
 - Active vault work: keep PR #32 current, track mergeability / support-only evidence, and do not touch runtime code or Integration Gate decisions.
 
