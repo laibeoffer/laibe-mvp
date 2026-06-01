@@ -23,11 +23,11 @@ Issue #41 records that `MERGED_TO_MAIN` is not equal to `FUNCTIONAL_ACCEPTED`.
 
 ## Latest Vault Patrol
 
-- checked_at: 2026-06-01T16:41:21+08:00
+- checked_at: 2026-06-01T16:53:55+08:00
 - source_checked: GitHub PR #32 / PR #31 / PR #47 / Issue #41 / Issue #49 / compact blackboard / four core vault summaries
 - assigned_pr: PR #32 `Add Budget Knowledge Vault support agent`
 - assigned_pr_status: open, mergeable clean, not merged, no PR comments or review threads found in latest scoped patrol
-- assigned_pr_head_sha_at_patrol_start: `5a61a7b8915631814c3377e199c5be7d7427bce2`
+- assigned_pr_head_sha_at_patrol_start: `3018aa4a2f5d3c274bb43e5d0f0556da8504070b`
 - assigned_pr_base_sha: `896d5dd21ecedaa0754d2052262cedf67d5be82c`
 - assigned_pr_comments: none found in scoped patrol
 - related_boundary_pr: PR #31 `Register Budget Knowledge Vault support boundary`, open, mergeability dirty, review signal unavailable because Codex review usage limits were reached, now routed to Integration Officer disposition issue #41
@@ -35,8 +35,8 @@ Issue #41 records that `MERGED_TO_MAIN` is not equal to `FUNCTIONAL_ACCEPTED`.
 - related_boundary_pr_status: open, not merged, mergeability dirty
 - issue_41_comments_checked: Latest scoped Issue #41 update records Budget Review Gate PR #37 final-report execution: PR #37 open / mergeable, docs-only, Functional Acceptance `NOT_APPLICABLE_DOCS_ONLY`, and Need Commander Yes only for final task acceptance / closeout after PR #37 merge or disposition.
 - issue_49_comments_checked: Issue #49 still contains the active Budget Engine Entry Investigation report plus Commander decision `AUTHORIZED_TO_PREPARE_MINIMAL_DRY_RUN_RUNTIME_IMPLEMENTATION`; zero-value placeholder amounts only; no formal prices, customer-facing `BudgetEstimateLine`, AI API, payment, DB, Supabase, production webhook, real pricing authority, integration harness, or MethodSpec self-repair; Integration Gate remains `WAITING`.
-- pr_47_support_evidence: PR #47 is open / mergeable and records docs-only `NO_ENTRY_FOUND_MINIMAL_DRY_RUN_ENTRY_REQUIRED` evidence: `budget-generator.ts`, `demo-generate-budget.ts`, callable `generateBudgetEstimate()`, and an alternative Budget Engine entry are absent on GitHub `main`; latest PR #47 follow-up comment `4590757841` records `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING`, asks the Budget Engine Entry & Picking Agent for a scoped implementation branch / PR plan, exact proposed files, CLI/demo plan, snapshot-compatible output evidence plan, forbidden-flow validation plan, zero-value placeholder confirmation, and whether Integration Officer review is needed before implementation merge; runtime implementation and functional acceptance remain pending.
-- scoped_change_since_last_patrol: PR #32 still has no comments or review threads and GitHub reports it mergeable at patrol-start head `5a61a7b8915631814c3377e199c5be7d7427bce2`; PR #31 has no new disposition comments or review threads; Issue #41 latest PR #37 docs-only final-report status is unchanged; Issue #49 Commander authorization is unchanged; PR #47 added `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` for `budget/engine-entry-picking`; compact blackboard support-only boundaries are unchanged.
+- pr_47_support_evidence: PR #47 is open and records docs-only `NO_ENTRY_FOUND_MINIMAL_DRY_RUN_ENTRY_REQUIRED` evidence: `budget-generator.ts`, `demo-generate-budget.ts`, callable `generateBudgetEstimate()`, and an alternative Budget Engine entry are absent on GitHub `main`; latest PR #47 follow-up comment `4590757841` still records `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING`, asks the Budget Engine Entry & Picking Agent for a scoped implementation branch / PR plan, exact proposed files, CLI/demo plan, snapshot-compatible output evidence plan, forbidden-flow validation plan, zero-value placeholder confirmation, and whether Integration Officer review is needed before implementation merge; runtime implementation and functional acceptance remain pending.
+- scoped_change_since_last_patrol: PR #32 still has no comments or review threads and GitHub reports it mergeable at patrol-start head `3018aa4a2f5d3c274bb43e5d0f0556da8504070b`; PR #31 has no new disposition comments or review threads; Issue #41 latest PR #37 docs-only final-report status is unchanged; Issue #49 Commander authorization is unchanged; PR #47 follow-up `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal; compact blackboard support-only boundaries are unchanged.
 - active_work: Budget Knowledge Vault initialization remains active until PR #31 / PR #32 are resolved, initialization is complete, and no known vault todo remains.
 - no_idle_rule: if no new instruction exists, advance the first safe item in `AUTOMATION.md` / `00_index.md` active work queue.
 - no_change_response_guard: `本 workstream 本輪無新指派。` must not be used while active initialization PRs, support gaps, or known todo items exist.
