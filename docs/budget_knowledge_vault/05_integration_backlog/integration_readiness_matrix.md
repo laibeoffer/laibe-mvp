@@ -34,7 +34,7 @@ Issue #41 records that `MERGED_TO_MAIN` is not equal to `FUNCTIONAL_ACCEPTED`.
 - related_boundary_pr_head_sha: `024289e74b8d7e4200dd40aa210aca5f2ffcb82a`
 - related_boundary_pr_status: open, not merged, mergeability dirty
 - issue_41_comments_checked: Commander Dispatch - Budget Engine Entry Investigation remains the latest scoped instruction mirrored by this vault; it assigns read-only Budget Engine entry investigation outside this vault and preserves the prohibition on patching or creating `budget-generator.ts`
-- scoped_change_since_last_patrol: PR #32 still has no comments or review threads and remains mergeable at docs-only head `6a6b3b9cf7d4cf0fee3f6c9c30fc7d8e2498de84`; PR #31 has no new disposition comments or review threads; Issue #41 has no new scoped instruction; support-only boundaries are unchanged.
+- scoped_change_since_last_patrol: PR #32 still has no comments or review threads; patrol-start head was `6a6b3b9cf7d4cf0fee3f6c9c30fc7d8e2498de84` and GitHub reported the refreshed PR mergeable after push; PR #31 has no new disposition comments or review threads; Issue #41 has no new scoped instruction; support-only boundaries are unchanged.
 - active_work: Budget Knowledge Vault initialization remains active until PR #31 / PR #32 are resolved, initialization is complete, and no known vault todo remains.
 - no_idle_rule: if no new instruction exists, advance the first safe item in `AUTOMATION.md` / `00_index.md` active work queue.
 - no_change_response_guard: `本 workstream 本輪無新指派。` must not be used while active initialization PRs, support gaps, or known todo items exist.
