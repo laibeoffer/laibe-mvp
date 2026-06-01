@@ -1,5 +1,35 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Plan Puzzle Task: Compact Workspace / Single-Screen CAD-like Layout
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-compact-workspace-0-15`.
+- Task: Plancraft+ Compact Workspace / Single-Screen CAD-like Layout.
+- Type: Builder / UI Layout Compression / Interaction Cleanup / Plan Puzzle.
+- Modified files:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+- Added files: none.
+- Completed:
+  - Upgraded `project.version` / Tool Catalog runtime version to `0.15.0-compact-workspace`.
+  - Updated `code.html` script cache key to `./plan-puzzle.js?v=compact-workspace-0-15`.
+  - Reworked the page into a fixed viewport compact workspace: compact topbar, left icon rail, tool flyout, wider central canvas, and compressed right inspector.
+  - Left tool list is now CAD-like icon-only rail; clicking tools updates `currentTool`, active styling, and flyout content.
+  - Right status area is grouped into tabs: properties, layers, reminders, materials, overview, and help.
+  - Shortcut help appears only in the help tab.
+  - Developer diagnostics remain collapsed by default and are marked as handoff/testing information, not homeowner operation.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser URL: `http://127.0.0.1:50362/code.html?validation=compact-workspace-0-15`.
+  - Browser validation: page loaded, console error count 0, body scroll height equals viewport height, compact topbar visible, left icon rail has 14 buttons, tool flyout visible, central canvas visible, right status tabs visible, developer diagnostics collapsed by default.
+- Guard:
+  - No Plancraft core, budget runtime, package / node_modules / framework, `formalEstimateGuard`, `generateBudgetEstimate()`, payment / escrow / listing fee / DB / auth / webhook / secrets / AI API changes.
+- Next single action: commit and open a scoped PR for `codex/plan-puzzle-compact-workspace-0-15` if the user wants this published.
+
 ## Latest Plan Puzzle Task: Status Area Productization / Debug Collapse
 
 - Workstream: `plancraft/page-ui`.
@@ -1576,3 +1606,28 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
 - 本輪沒有 real image API、沒有 OpenAI 或第三方模型呼叫、沒有 API key、沒有 `.env`、沒有 secret、沒有 production endpoint。
 - 若下一步要建立真 server runtime，需先由使用者決定 runtime 選型：local Node server、Python dev server + separate proxy、Netlify Function、Vercel Function、Cloudflare Worker 或其他部署方式。以目前靜態 MVP 與禁止新增 package 的限制看，下一個 local-only spike 可優先評估「內建 Node `http` 的 local same-origin dev server」，但必須另開任務並維持 disabled-by-default / no-secret 規則。
 - 本輪成果可供使用者後續主動交給 LAIBE_REVIEWER 做 runtime boundary review；在進入任何真 server runtime、真 API request、key 注入、production connection 或 reference image upload 前，應先完成使用者觸發的審查。
+
+## Plan Puzzle 0.15.1 Compact Workspace Polish Handoff
+
+- 任務名稱：Plancraft+ Compact Workspace / Single-Screen CAD-like Layout。
+- 本輪版本：`project.version = 0.15.1-compact-workspace-polish`。
+- `code.html` script 版本：`./plan-puzzle.js?v=compact-workspace-polish-0-15-1`。
+- UI 已從長頁式說明頁收斂為 100vh compact workspace：compact topbar、左側分類 icon rail、中央畫布、右側情境式 inspector。
+- 檔案區已壓縮為單列 topbar，保留草稿、樓層、屋型、比例、圖紙、匯入、儲存、總覽、列印、匯出、預算、說明與專注模式入口。
+- 工具區已改為分類式 icon rail + floating tool panel；分類包含匯入 / 檢視、繪製 / 編修、空間 / 物件、標註 / 輸出。
+- 工具 icon 縮小為 compact button，分類色只用於狀態與分組提示；工具點擊會切換 currentTool、active state 或顯示尚未開放狀態。
+- 工具展開內容改為浮動面板，不再常駐占用畫布寬度。
+- 右側狀態區已收斂為 4 個 tab：屬性、圖層 / 頁面、總覽、說明。
+- 圖層 / 頁面 tab 保留 10 個產品圖層切換、圖層疊加、樓層 / 屋型 / 比例 / 圖紙控制。
+- 主畫面英文與工程 debug 詞已移出；Tool Catalog Runtime、WallGraph、NodeGraph、Plancraft Bridge、Converter、Renderer Preview、DSL validation 等只留在收合的「開發者診斷 / 技術資訊」。
+- 模擬圖預覽 / AI 風格示意完整區塊不再顯示於主頁主流程。
+- 空畫布加入可行動 CTA：`匯入圖檔`；`建立空白底圖` disabled 並標示尚未開放。
+- 已加入專注模式：收合 floating tool panel 與右側 inspector，保留左側 icon rail，畫布最大化。
+- 快捷鍵說明只保留在右側「說明」tab。
+- 未修改 Plancraft core、budget runtime、formalEstimateGuard、package.json、node_modules、React / Vite / TypeScript app。
+- 未接 AI API / image API / DB / payment / escrow / listing fee；未產生正式估價。
+- 驗證：`node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` PASS。
+- Browser validation URL：`http://127.0.0.1:50362/code.html?validation=compact-workspace-polish-0-15-1`。
+- Browser validation evidence：body scrollHeight = viewport height、topbar 72px、left rail 56px、canvas shell 1173px wide、4 status tabs、19 rail buttons、4 rail groups、empty canvas CTA present、focus mode hides inspector、layer switching to `lighting_plan` updates item catalog、visible layer checkbox toggles.
+- Browser console listener in current in-app browser API was unavailable; no page error overlay or runtime break was observed, and page rendered / interactions passed.
+- 下一步唯一建議：scope clean 時建立 scoped commit + Draft PR for `codex/plan-puzzle-compact-workspace-polish-0-15-1`。

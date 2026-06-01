@@ -37,7 +37,7 @@ Effective immediately:
 
 | Agent | Workstream | Repo / Branch | Progress % | Status | Current Issue / PR | Evidence | Blocker | Need Commander | Need Reviewer | Next |
 |---|---|---|---:|---|---|---|---|---|---|---|
-| Plan Puzzle UI | `plancraft/page-ui` | `laibeoffer/laibe-mvp` / `codex/plan-puzzle-tool-catalog-interaction` | 99 | BROWSER_VALIDATED | PR #54 base / Tool Catalog + Status Area branch | `0.14.0-status-area-productization` keeps homeowner-facing status cards visible by default and collapses Tool Catalog Runtime / WallGraph / NodeGraph / Plancraft Bridge / Converter / Renderer / DSL / AI sandbox technical state under `開發者診斷 / 技術資訊`; `node --check` passed; browser console error count 0 | Commit / scoped PR still pending | No for scoped implementation; Yes for PR landing | No by default | Commit and open scoped PR |
+| Plan Puzzle UI | `plancraft/page-ui` | `laibeoffer/laibe-mvp` / `codex/plan-puzzle-compact-workspace-0-15` | 99 | BROWSER_VALIDATED | PR #56 base / Compact Workspace branch | `0.15.0-compact-workspace` compresses Plan Puzzle from long-page layout into fixed viewport workspace: compact topbar, left icon rail + flyout, wider canvas, right status tabs, developer diagnostics collapsed; `node --check` passed; browser console error count 0; body scroll height equals viewport height | None for scoped implementation | No for scoped implementation; Yes for PR landing | No by default | Commit and open scoped PR if user wants this published |
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 75 | WAITING_REVIEW | PR #3 draft per vault summary | QF5.4 commit `c58ba25`; validators passed; cloud-ready export package exists | PR #3 not recorded as merged / final shared truth pending | No | No by default | Quote Factory owner / Integration Officer confirms final evidence |
 | Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #26 | PR #26 refreshed; head `b8d27e3`; mergeable true; validators passed per vault summary | Final review / merge gate pending | No | Only if formal price boundary is touched | Wait for final gate evidence |
@@ -200,3 +200,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No
 - Need Reviewer: No
 - Next single action: EXECUTION_OFFICER can direct agents to use `docs/WORKSTREAM_BLACKBOARD.md` as compact board and put detailed reports in handoff / phase / vault docs.
+
+### 2026-06-02 - Plan Puzzle Compact Workspace 0.15.1
+
+- Agent: 平面拼圖 UI / Plan Puzzle
+- Workstream: `plancraft/page-ui`
+- Status: `BROWSER_VALIDATED`
+- Progress %: 99
+- Evidence: `0.15.1-compact-workspace-polish` changes Plancraft+ from long-page UI to compact single-screen workspace; topbar 72px, left categorized icon rail 56px, floating tool panel, canvas shell ~1173px wide at validation viewport, right inspector reduced to 4 tabs, empty canvas CTA present, focus mode hides inspector, 10 product layers remain available, layer switch to `lighting_plan` updates catalog, visible layer checkbox toggles, `node --check` passes.
+- Blocker: Browser console listener unavailable in current in-app browser API; no visible runtime break or error overlay observed.
+- Need Commander: No for scoped implementation; Yes only for PR landing / product acceptance.
+- Need Reviewer: No by default; UI/status/docs only, no Plancraft core, budget runtime, guard, production quantity, formal estimate, AI API, DB, payment, escrow, or listing fee.
+- Next single action: Commit and open scoped Draft PR for `codex/plan-puzzle-compact-workspace-polish-0-15-1`.

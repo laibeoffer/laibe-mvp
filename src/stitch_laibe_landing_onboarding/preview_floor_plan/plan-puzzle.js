@@ -35,7 +35,7 @@
   const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
   const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
   const ZONE_AREA_CONFIDENCE_INVALID = 0;
-  const PLAN_PUZZLE_UI_IA_VERSION = "0.14.0-status-area-productization";
+  const PLAN_PUZZLE_UI_IA_VERSION = "0.15.1-compact-workspace-polish";
   const PLAN_PUZZLE_TOOL_CATALOG_VERSION = PLAN_PUZZLE_UI_IA_VERSION;
   const TOOL_CATALOG_ITEM_STATUS_OPTIONS = ["new", "existing", "demolition", "reference"];
   const TOOL_CATALOG_BUDGET_OPTIONS = ["include", "reference_only", "ask_contractor"];
@@ -569,7 +569,7 @@
       product: "Plancraft+",
       version: PLAN_PUZZLE_UI_IA_VERSION,
       unit: "mm",
-      draftVersionName: "v0.14 Status Area Productization draft",
+      draftVersionName: "0.15.1 精簡工作台",
       saveStatus: "unsaved",
       lastSavedAt: null,
       importSource: null,
@@ -656,6 +656,13 @@
       dimensionDraftStart: null,
       textToolType: "業主需求",
       materialCategory: "請廠商建議",
+      activeStatusTab: "properties",
+      focusMode: false,
+      currentFloor: "1F",
+      houseType: "apartment",
+      sheetScale: "1:50",
+      sheetSize: "A3",
+      sheetOrientation: "landscape",
       message: "",
       error: ""
     };
@@ -828,17 +835,26 @@
       uiState.currentTool = actionButton.dataset.tool;
       return;
     }
+    if (actionButton.dataset.uiTool) {
+      uiState.currentTool = actionButton.dataset.uiTool;
+    }
     const actionToolMap = {
+      "choose-file": "import_view",
+      "start-calibration": "scale",
       "set-select-mode": "select",
       "start-draw-wall": "wall",
       "add-opening": "opening",
-      "start-place-zone": "item_place",
-      "start-zone-boundary": "item_place",
+      "start-place-zone": "zone_label",
+      "start-zone-boundary": "zone_label",
       "auto-annotate-placeholder": "auto_annotate",
       "delete-selected": "delete",
       "toggle-snap": "snap_toggle",
       "undo-placeholder": "undo_redo",
-      "redo-placeholder": "undo_redo"
+      "redo-placeholder": "undo_redo",
+      "print-current-layer": "print_export",
+      "print-total-preview": "print_export",
+      "export-draft": "print_export",
+      "export-pc-spike": "print_export"
     };
     if (actionToolMap[action]) {
       uiState.currentTool = actionToolMap[action];
@@ -862,9 +878,9 @@
     clearZoneBoundaryDraft();
     uiState.error = "";
     const toolLabel = label || getCurrentToolLabel(tool);
-    const placeholderTools = new Set(["pan", "zoom", "item_place", "dimension", "text", "material_bucket"]);
+    const placeholderTools = new Set(["pan", "zoom", "item_place", "dimension", "text", "material_bucket", "furniture"]);
     uiState.message = placeholderTools.has(tool)
-      ? `${toolLabel} 已選取；Tool Catalog runtime 已同步 currentTool，完整幾何操作仍維持 draft interaction 邊界。`
+      ? `${toolLabel} 已選取；工具狀態已同步，完整幾何操作仍維持草稿邊界。`
       : `${toolLabel} 已選取。`;
   }
 
@@ -916,7 +932,7 @@
     project.saveStatus = "saved";
     project.lastSavedAt = new Date().toISOString();
     uiState.error = "";
-    uiState.message = "已標記為本機草稿已儲存。此為 UI placeholder，尚未接雲端儲存。";
+    uiState.message = "已標記為本機草稿已儲存；尚未開放雲端儲存。";
     renderStatusLabels();
   }
 
@@ -932,13 +948,13 @@
       boundary: "招標需求摘要 placeholder；不是正式報價、正式估價、正式 PDF 或 budget input。"
     };
     downloadTextFile(JSON.stringify(summary, null, 2), "laibe-plancraft-plus-bid-summary-placeholder.json", "application/json");
-    uiState.message = "已匯出招標需求摘要 placeholder JSON；未產生正式報價或 PDF。";
+    uiState.message = "已匯出招標需求摘要草稿 JSON；未產生正式報價或 PDF。";
     uiState.error = "";
   }
 
   function autoAnnotatePlaceholder() {
     uiState.currentTool = "auto_annotate";
-    uiState.message = `F8 一鍵標註已建立入口：目前圖層「${getCurrentProductLayer().label}」只會新增 draft annotation placeholder，不覆蓋手動備註。`;
+    uiState.message = `F8 一鍵標註已建立入口：目前圖層「${getCurrentProductLayer().label}」只會新增草稿標註，不覆蓋手動備註。`;
     uiState.error = "";
     render();
   }
@@ -1008,7 +1024,31 @@
     if (action === "toggle-preflight-panel") {
       uiState.preflightOpen = !uiState.preflightOpen;
       project.totalPreviewOpen = uiState.preflightOpen;
+      uiState.activeStatusTab = "overview";
       uiState.message = uiState.preflightOpen ? "已開啟總預覽 / 送出前檢查。" : "已收合總預覽 / 送出前檢查。";
+    }
+    if (action === "toggle-focus-mode") {
+      uiState.focusMode = !uiState.focusMode;
+      uiState.message = uiState.focusMode ? "已開啟專注模式，畫布最大化。" : "已恢復完整工作台。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "set-status-tab") {
+      uiState.activeStatusTab = actionButton.dataset.statusTab || "properties";
+      uiState.message = `右側狀態頁籤已切換為「${getStatusTabLabel(uiState.activeStatusTab)}」。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "zoom-placeholder" || action === "dimension-placeholder") {
+      uiState.message = "此功能仍在草稿階段，尚未正式開放。";
+      uiState.error = "";
+    }
+    if (actionButton.dataset.fieldProxy === "current-wall-status") {
+      uiState.currentWallStatus = normalizeWallStatus(actionButton.dataset.value);
+      uiState.message = `牆體狀態已切換為 ${getWallStatusLabel(uiState.currentWallStatus)}。`;
+      uiState.error = "";
     }
     if (action === "print-current-layer") {
       uiState.message = `請使用瀏覽器列印目前圖層：${getCurrentProductLayer().label}。`;
@@ -1044,8 +1084,8 @@
     if (action === "undo-placeholder" || action === "redo-placeholder") {
       uiState.historyStatus = "placeholder";
       uiState.message = action === "undo-placeholder"
-        ? "復原目前仍是 UI placeholder，尚未建立完整 history stack。"
-        : "重做目前仍是 UI placeholder，尚未建立完整 history stack。";
+        ? "復原目前尚未建立完整歷史紀錄。"
+        : "重做目前尚未建立完整歷史紀錄。";
       uiState.error = "";
     }
     if (action === "start-calibration") {
@@ -1112,6 +1152,7 @@
       startStyleVisualDraft();
     }
     syncToolCatalogState();
+    renderCompactToolPanel();
     renderInspector();
     syncStaticControls();
   }
@@ -1136,7 +1177,7 @@
       renderStatusLabels();
     }
     if (field === "draft-version-name") {
-      project.draftVersionName = input.value.trim() || "v0.14 Status Area Productization draft";
+      project.draftVersionName = input.value.trim() || "0.15.1 精簡工作台";
       project.saveStatus = "unsaved";
       renderStatusLabels();
     }
@@ -1203,6 +1244,41 @@
     }
     if (field.startsWith("project-preference-")) {
       updateProjectPreference(field, input.value);
+      render();
+      return;
+    }
+    if (field === "compact-floor") {
+      uiState.currentFloor = input.value || "1F";
+      uiState.message = `目前頁面 / 樓層：${uiState.currentFloor}。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field === "compact-house-type") {
+      uiState.houseType = getHouseTypeValue(input.value);
+      uiState.message = `屋型已切換為 ${getHouseTypeLabel(uiState.houseType)}。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field === "compact-sheet-scale") {
+      uiState.sheetScale = input.value || "1:50";
+      uiState.message = `圖紙比例已切換為 ${uiState.sheetScale}。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field === "compact-sheet-size") {
+      uiState.sheetSize = input.value || "A3";
+      uiState.message = `圖紙尺寸已切換為 ${uiState.sheetSize}。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field === "compact-sheet-orientation") {
+      uiState.sheetOrientation = input.value || "landscape";
+      uiState.message = `圖紙方向已切換為 ${uiState.sheetOrientation === "portrait" ? "直式" : "橫式"}。`;
+      uiState.error = "";
       render();
       return;
     }
@@ -1788,7 +1864,7 @@
       applyMaterialToSelectedToolCatalogItem(item);
     }
     uiState.error = "";
-    uiState.message = `已選取 Tool Catalog 草稿項目：${item.label}。`;
+    uiState.message = `已選取草稿項目：${item.label}。`;
     render();
   }
 
@@ -2816,8 +2892,300 @@
     renderCalibration();
     renderCanvasHelper();
     renderInspector();
+    renderCompactTopbar();
+    renderCompactToolPanel();
     renderStatusLabels();
     syncStaticControls();
+    syncWorkspaceMode();
+  }
+
+  function renderCompactTopbar() {
+    const fileZone = document.querySelector(".file-zone");
+    if (!fileZone) {
+      return;
+    }
+    fileZone.classList.add("compact-file-bar");
+    fileZone.innerHTML = `
+      <div class="compact-file-main" aria-label="檔案與全局控制">
+        <label class="compact-title-field" for="draftNameInput">
+          <span>草稿</span>
+          <input id="draftNameInput" data-field="draft-name" type="text" value="${escapeAttribute(project.draftName || project.name)}" aria-describedby="draftSaveHint">
+        </label>
+        <span id="draftSaveHint" class="compact-info">僅供招標需求整理，不是施工圖。</span>
+        <div class="compact-select-row" aria-label="圖紙設定">
+          ${renderCompactSelect("compact-floor", "樓層", ["1F", "2F", "3F", "屋頂", "新增頁面"], uiState.currentFloor)}
+          ${renderCompactSelect("compact-house-type", "屋型", ["公寓", "透天", "樓中樓", "商空"], getHouseTypeLabel(uiState.houseType))}
+          ${renderCompactSelect("compact-sheet-scale", "比例", ["1:50", "1:100", "自定義"], uiState.sheetScale)}
+          ${renderCompactSelect("compact-sheet-size", "圖紙", ["A4", "A3"], uiState.sheetSize)}
+        </div>
+        <div class="compact-actions" aria-label="檔案操作">
+          <button class="toolbar-btn primary" type="button" data-action="choose-file" title="匯入圖檔"><span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入</button>
+          <button class="toolbar-btn" type="button" data-action="save-draft-placeholder" title="儲存本機草稿"><span class="material-symbols-outlined" aria-hidden="true">save</span>儲存</button>
+          <button class="toolbar-btn" type="button" data-action="toggle-preflight-panel" title="上架前檢查"><span class="material-symbols-outlined" aria-hidden="true">fact_check</span>總覽</button>
+          <button class="toolbar-btn" type="button" data-action="print-total-preview" title="列印"><span class="material-symbols-outlined" aria-hidden="true">print</span>列印</button>
+          <button class="toolbar-btn" type="button" data-action="export-draft" title="匯出草稿"><span class="material-symbols-outlined" aria-hidden="true">download</span>匯出</button>
+          <a class="toolbar-btn" href="../client_step_4_budget_finalization/code.html" title="進入預算生成"><span class="material-symbols-outlined" aria-hidden="true">request_quote</span>預算</a>
+          <button class="toolbar-btn" type="button" data-action="set-status-tab" data-status-tab="help" title="基本說明"><span class="material-symbols-outlined" aria-hidden="true">help</span></button>
+          <button class="toolbar-btn focus-toggle ${uiState.focusMode ? "is-mode-active" : ""}" type="button" data-action="toggle-focus-mode" title="專注模式"><span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>專注</button>
+        </div>
+        <div class="compact-save-state" aria-label="草稿狀態">
+          <span id="currentImportFileText">${escapeHTML(project.importSource?.fileName || "未匯入")}</span>
+          <span id="draftSaveStatusText">${escapeHTML(getSaveStatusLabel(project.saveStatus))}</span>
+          <span id="draftVersionText">${escapeHTML(project.draftVersionName || project.version)}</span>
+          <span id="lastSavedText">${escapeHTML(project.lastSavedAt ? formatDateTime(project.lastSavedAt) : "尚未儲存")}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCompactSelect(field, label, options, currentValue) {
+    return `
+      <label class="compact-select" for="${escapeAttribute(field)}">
+        <span>${escapeHTML(label)}</span>
+        <select id="${escapeAttribute(field)}" data-field="${escapeAttribute(field)}">
+          ${options.map((option) => `<option value="${escapeAttribute(option)}" ${option === currentValue ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  function renderInspectorSelect(id, field, label, options, currentValue) {
+    return `
+      <label class="compact-select" for="${escapeAttribute(id)}">
+        <span>${escapeHTML(label)}</span>
+        <select id="${escapeAttribute(id)}" data-field="${escapeAttribute(field)}">
+          ${options.map((option) => `<option value="${escapeAttribute(option)}" ${option === currentValue ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  function getHouseTypeLabel(type) {
+    const labels = {
+      apartment: "公寓",
+      townhouse: "透天",
+      maisonette: "樓中樓",
+      commercial: "商空"
+    };
+    return labels[type] || type || "公寓";
+  }
+
+  function getHouseTypeValue(label) {
+    const values = {
+      公寓: "apartment",
+      透天: "townhouse",
+      樓中樓: "maisonette",
+      商空: "commercial"
+    };
+    return values[label] || label || "apartment";
+  }
+
+  function syncWorkspaceMode() {
+    document.body.classList.toggle("is-focus-mode", Boolean(uiState.focusMode));
+  }
+
+  function renderCompactToolPanel() {
+    const toolPanel = document.querySelector(".tool-shell > .panel:not(.inspector)");
+    if (!toolPanel) {
+      return;
+    }
+    toolPanel.classList.add("compact-tool-panel");
+    toolPanel.innerHTML = `
+      <div class="left-icon-rail" aria-label="工具列">
+        ${renderToolRailGroup("匯入 / 檢視", "view", [
+          ["import_view", "upload_file", "匯入圖面", "choose-file", { tool: "import_view", label: "匯入圖面" }],
+          ["scale", "straighten", "比例校正", "start-calibration", { tool: "scale", label: "比例校正" }],
+          ["pan", "pan_tool", "手掌 / 移動畫布", "set-ui-tool", { tool: "pan", label: "手掌 / 移動畫布" }],
+          ["zoom", "zoom_in", "縮放", "set-ui-tool", { tool: "zoom", label: "畫布縮放" }]
+        ])}
+        ${renderToolRailGroup("繪製 / 編修", "draw", [
+          ["select", "near_me", "選取", "set-select-mode"],
+          ["wall", "polyline", "牆體", "start-draw-wall"],
+          ["opening", "door_open", "門窗 / 開口", "add-opening", { openingKind: "door" }],
+          ["delete", "delete", "刪除", "delete-selected"],
+          ["snap_toggle", "join_inner", "鎖點", "toggle-snap"]
+        ])}
+        ${renderToolRailGroup("空間 / 物件", "object", [
+          ["zone_label", "meeting_room", "空間標籤", "start-place-zone", { tool: "zone_label", label: "空間標籤" }],
+          ["item_place", "widgets", "項目放置", "set-ui-tool", { tool: "item_place", label: "項目放置" }],
+          ["furniture", "chair", "家具 / DECO", "set-ui-tool", { tool: "furniture", label: "家具 / DECO" }],
+          ["material_bucket", "format_color_fill", "材質 / 油漆桶", "set-ui-tool", { tool: "material_bucket", label: "材質 / 油漆桶" }]
+        ])}
+        ${renderToolRailGroup("標註 / 輸出", "output", [
+          ["dimension", "straighten", "尺寸", "set-ui-tool", { tool: "dimension", label: "尺寸標註" }],
+          ["text", "title", "文字", "set-ui-tool", { tool: "text", label: "文字" }],
+          ["auto_annotate", "auto_fix_high", "一鍵標註", "auto-annotate-placeholder"],
+          ["print_export", "print", "圖紙 / 列印", "set-status-tab", { statusTab: "overview", tool: "print_export", label: "圖紙 / 列印" }]
+        ])}
+        <div class="rail-pair" aria-label="復原與重做">
+          ${renderToolRailButton("undo_redo", "undo", "復原", "undo-placeholder", {}, "mini")}
+          ${renderToolRailButton("undo_redo", "redo", "重做", "redo-placeholder", {}, "mini")}
+        </div>
+      </div>
+      <div class="tool-flyout" id="toolFlyout" aria-live="polite">
+        ${renderToolFlyoutContent()}
+      </div>
+    `;
+  }
+
+  function renderToolRailGroup(label, category, tools) {
+    return `
+      <div class="rail-section rail-section-${escapeAttribute(category)}" aria-label="${escapeAttribute(label)}">
+        <span class="rail-section-label">${escapeHTML(label)}</span>
+        ${tools.map((tool) => renderToolRailButton(tool[0], tool[1], tool[2], tool[3], tool[4] || {}, "", category)).join("")}
+      </div>
+    `;
+  }
+
+  function renderToolRailButton(tool, icon, label, action, options = {}, variant = "", category = "") {
+    const isActive = uiState.currentTool === tool;
+    const dataset = [
+      `data-action="${escapeAttribute(action)}"`,
+      `data-ui-tool="${escapeAttribute(tool)}"`,
+      options.tool ? `data-tool="${escapeAttribute(options.tool)}"` : "",
+      options.label ? `data-tool-label="${escapeAttribute(options.label)}"` : "",
+      options.statusTab ? `data-status-tab="${escapeAttribute(options.statusTab)}"` : "",
+      options.openingKind ? `data-opening-kind="${escapeAttribute(options.openingKind)}"` : "",
+      action === "set-select-mode" ? `data-mode-button="select"` : "",
+      action === "start-draw-wall" ? `data-mode-button="draw-wall"` : ""
+    ].filter(Boolean).join(" ");
+    return `
+      <button class="rail-tool rail-tool-${escapeAttribute(tool)} ${variant} ${category ? `rail-tool-${escapeAttribute(category)}` : ""} ${isActive ? "is-tool-active" : ""}" type="button" ${dataset} title="${escapeAttribute(label)}" aria-label="${escapeAttribute(label)}" aria-pressed="${isActive ? "true" : "false"}">
+        <span class="material-symbols-outlined" aria-hidden="true">${escapeHTML(icon)}</span>
+        <small>${escapeHTML(label)}</small>
+      </button>
+    `;
+  }
+
+  function renderToolFlyoutContent() {
+    const tool = uiState.currentTool || "select";
+    const title = getCurrentToolLabel(tool);
+    const selectedItems = getSelectedLayerItems(uiState.currentLayer);
+    const commonStatus = `
+      <div class="flyout-status">
+        <span>目前工具</span><b>${escapeHTML(title)}</b>
+      </div>
+    `;
+    const openNote = `<div class="inline-message compact-note">尚未完整開放的功能會保留狀態提示，不會呼叫正式估價或外部服務。</div>`;
+    const panels = {
+      import_view: `
+        ${commonStatus}
+        <button class="toolbar-btn primary" type="button" data-action="choose-file">
+          <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入圖檔
+        </button>
+        <button class="toolbar-btn is-disabled" type="button" data-action="create-blank-underlay" disabled>建立空白底圖 <span class="pill">尚未開放</span></button>
+        <div class="inline-message compact-note">先匯入 JPG / PNG / PDF，再校正比例。</div>
+      `,
+      scale: `
+        ${commonStatus}
+        <button class="toolbar-btn primary" type="button" data-action="start-calibration">開始比例校正</button>
+        <button class="toolbar-btn" type="button" data-action="apply-calibration">套用比例</button>
+        <div class="inline-message compact-note">請在圖面點兩點並輸入實際距離。</div>
+      `,
+      select: `
+        ${commonStatus}
+        <div class="button-row compact-row">
+          ${["existing", "new", "demolished"].map((status) => `<button class="toolbar-btn" type="button" data-field-proxy="current-wall-status" data-value="${escapeAttribute(status)}">${escapeHTML(getWallStatusLabel(status))}</button>`).join("")}
+          <button class="toolbar-btn" type="button" data-field-proxy="current-wall-status" data-value="existing">保留</button>
+          <button class="toolbar-btn is-disabled" type="button" disabled>需確認</button>
+        </div>
+        <div class="inline-message compact-note">選取牆、門窗、空間或項目後，右側屬性頁籤會顯示摘要。</div>
+      `,
+      pan: `${commonStatus}<div class="inline-message compact-note">Space 拖動畫布仍是草稿提示；目前不改變正式幾何資料。</div>`,
+      zoom: `
+        ${commonStatus}
+        <div class="button-row compact-row">
+          <button class="toolbar-btn" type="button" data-action="zoom-placeholder">放大</button>
+          <button class="toolbar-btn" type="button" data-action="zoom-placeholder">縮小</button>
+          <button class="toolbar-btn" type="button" data-action="zoom-placeholder">符合</button>
+          <button class="toolbar-btn" type="button" data-action="zoom-placeholder">100%</button>
+        </div>
+      `,
+      wall: `
+        ${commonStatus}
+        <div class="button-row compact-row">
+          <button class="toolbar-btn" type="button" data-field-proxy="current-wall-status" data-value="existing">既有牆</button>
+          <button class="toolbar-btn" type="button" data-field-proxy="current-wall-status" data-value="new">新設牆</button>
+          <button class="toolbar-btn" type="button" data-field-proxy="current-wall-status" data-value="demolished">拆除牆</button>
+          <button class="toolbar-btn is-disabled" type="button" disabled>承重牆 <span class="pill">需確認</span></button>
+          <button class="toolbar-btn is-disabled" type="button" disabled>柱</button>
+          <button class="toolbar-btn is-disabled" type="button" disabled>梁</button>
+        </div>
+        <div class="compact-field">
+          <label for="current-wall-status">狀態</label>
+          <select id="current-wall-status" data-field="current-wall-status">
+            <option value="existing">既有</option>
+            <option value="new">新設</option>
+            <option value="demolished">拆除</option>
+          </select>
+        </div>
+        <div class="compact-field">
+          <label for="current-wall-thickness">牆厚 mm</label>
+          <select id="current-wall-thickness" data-field="current-wall-thickness">
+            <option value="80">80</option><option value="100">100</option><option value="120">120</option><option value="150">150</option><option value="200">200</option>
+          </select>
+        </div>
+        <button class="toolbar-btn primary" type="button" data-action="clean-wall-endpoints">整理端點</button>
+      `,
+      opening: `
+        ${commonStatus}
+        <div class="button-row compact-row">
+          ${["大門", "房間門", "廚房通風門", "鋁拉門", "落地窗", "橫拉窗", "推射窗", "摺疊門", "平開門", "拉門"].map((label) => `<button class="toolbar-btn" type="button" data-action="add-opening" data-opening-kind="${label.includes("窗") ? "window" : "door"}">${escapeHTML(label)}</button>`).join("")}
+          <button class="toolbar-btn" type="button" data-action="add-opening" data-opening-kind="opening">無門片開口</button>
+        </div>
+        <div class="compact-field"><label for="current-opening-width">寬度 mm</label><input id="current-opening-width" data-field="current-opening-width" type="number" min="300" max="3000" step="50" value="${uiState.currentOpeningWidth}"></div>
+      `,
+      zone_label: `
+        ${commonStatus}
+        <button class="toolbar-btn primary" type="button" data-action="start-place-zone">新增空間標籤</button>
+        <div class="tag-row">${Object.values(ZONE_TYPE_LABELS).map((label) => `<span class="style-tag">${escapeHTML(label)}</span>`).join("")}</div>
+      `,
+      item_place: `
+        ${commonStatus}
+        <div class="tag-row">
+          ${getCurrentProductLayer().items.map((item) => `<button class="style-tag item-chip ${selectedItems.includes(item) ? "is-selected" : ""}" type="button" data-action="toggle-layer-catalog-item" data-layer-id="${escapeAttribute(uiState.currentLayer)}" data-item-name="${escapeAttribute(item)}">${escapeHTML(item)}</button>`).join("")}
+        </div>
+        <div class="inline-message compact-note">依目前圖層顯示可用項目。</div>
+      `,
+      furniture: `
+        ${commonStatus}
+        <div class="button-row compact-row">
+          ${["沙發", "餐桌", "床", "書桌", "收納櫃", "DECO 示意", "其他需求"].map((label) => `<button class="toolbar-btn" type="button" data-action="toggle-layer-catalog-item" data-layer-id="${escapeAttribute(uiState.currentLayer)}" data-item-name="${escapeAttribute(label)}">${escapeHTML(label)}</button>`).join("")}
+        </div>
+        <div class="inline-message compact-note">家具與 DECO 只作需求示意，不直接納入正式預算。</div>
+      `,
+      dimension: `${commonStatus}<div class="button-row compact-row"><button class="toolbar-btn" type="button" data-action="dimension-placeholder">兩點</button><button class="toolbar-btn" type="button" data-action="dimension-placeholder">水平</button><button class="toolbar-btn" type="button" data-action="dimension-placeholder">垂直</button></div>${openNote}`,
+      text: `
+        ${commonStatus}
+        <div class="compact-field"><label for="text-tool-type">文字類型</label><select id="text-tool-type" data-field="text-tool-type">${TEXT_NOTE_TYPES.map((option) => `<option value="${escapeAttribute(option)}">${escapeHTML(option)}</option>`).join("")}</select></div>
+        ${openNote}
+      `,
+      material_bucket: `
+        ${commonStatus}
+        <div class="compact-field"><label for="material-category">材料類別</label><select id="material-category" data-field="material-category">${MATERIAL_CATEGORIES.map((option) => `<option value="${escapeAttribute(option)}">${escapeHTML(option)}</option>`).join("")}</select></div>
+        <div class="tag-row">${project.selectedMaterials.map((tag) => `<span class="style-tag">${escapeHTML(tag)}</span>`).join("")}</div>
+      `,
+      auto_annotate: `${commonStatus}<button class="toolbar-btn primary" type="button" data-action="auto-annotate-placeholder">執行標註</button><div class="inline-message compact-note">F8 草稿標註，尚未完整開放。</div>`,
+      delete: `${commonStatus}<button class="danger-btn" type="button" data-action="delete-selected">刪除選取</button><div class="inline-message compact-note">只處理目前選取的 draft 物件。</div>`,
+      snap_toggle: `${commonStatus}<label class="toggle-row" for="snap-enabled"><span>鎖點</span><input id="snap-enabled" data-field="snap-enabled" type="checkbox" ${uiState.snapEnabled ? "checked" : ""}></label>`,
+      undo_redo: `${commonStatus}<div class="button-row compact-row"><button class="toolbar-btn" type="button" data-action="undo-placeholder">復原</button><button class="toolbar-btn" type="button" data-action="redo-placeholder">重做</button></div><div class="inline-message compact-note">尚未完整開放。</div>`,
+      print_export: `
+        ${commonStatus}
+        <button class="toolbar-btn" type="button" data-action="print-current-layer">列印目前圖層</button>
+        <button class="toolbar-btn" type="button" data-action="print-total-preview">列印總預覽</button>
+        <button class="toolbar-btn" type="button" data-action="export-draft">草稿 JSON</button>
+        <button class="toolbar-btn" type="button" data-action="export-pc-spike">.pc 測試版</button>
+      `
+    };
+    return `
+      <div class="tool-flyout-head">
+        <span>工具</span>
+        <strong>${escapeHTML(title)}</strong>
+      </div>
+      <div class="tool-flyout-body">
+        ${panels[tool] || panels.select}
+      </div>
+    `;
   }
 
   function renderUnderlay() {
@@ -3318,8 +3686,14 @@
     if (!project.importSource) {
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
-          <b>請先匯入業主提供的丈量圖</b>
-          建立 Plancraft+ 底圖基準後，再進行比例校正與牆體描繪。
+          <b>請先匯入丈量圖</b>
+          <p>建立比例後即可畫牆、標空間與整理需求。</p>
+          <div class="canvas-helper-actions">
+            <button class="toolbar-btn primary" type="button" data-action="choose-file">
+              <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入圖檔
+            </button>
+            <button class="toolbar-btn is-disabled" type="button" disabled>建立空白底圖 <span class="pill">尚未開放</span></button>
+          </div>
         </div>
       `;
       return;
@@ -3362,7 +3736,7 @@
         : "邊界已可能封閉，可套用到目前 zone";
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
-          <b>Zone Boundary</b>
+          <b>空間邊界</b>
           ${escapeHTML(uiState.message || openMessage)}
         </div>
       `;
@@ -3831,20 +4205,86 @@
 
   function renderUiIaStatusPanel() {
     const currentLayer = getCurrentProductLayer();
+    const activeTab = uiState.activeStatusTab || "properties";
+    const tabs = [
+      ["properties", "屬性"],
+      ["layers", "圖層 / 頁面"],
+      ["overview", "總覽"],
+      ["help", "說明"]
+    ];
     return `
-      ${renderCurrentLayerCard(currentLayer)}
-      ${renderLayerItemCatalogCard(currentLayer)}
+      <section class="status-tabs-shell" aria-label="平面拼圖狀態區">
+        <div class="status-tab-list" role="tablist" aria-label="狀態分類">
+          ${tabs.map(([id, label]) => `
+            <button class="status-tab-button ${id === activeTab ? "is-active" : ""}" type="button" role="tab" data-action="set-status-tab" data-status-tab="${escapeAttribute(id)}" aria-selected="${id === activeTab ? "true" : "false"}">
+              ${escapeHTML(label)}
+            </button>
+          `).join("")}
+        </div>
+        <div class="status-tab-panel" role="tabpanel">
+          ${renderStatusTabContent(activeTab, currentLayer)}
+        </div>
+      </section>
+    `;
+  }
+
+  function getStatusTabLabel(tabId) {
+    const labels = {
+      properties: "屬性",
+      layers: "圖層 / 頁面",
+      overview: "總覽",
+      help: "說明"
+    };
+    return labels[tabId] || labels.properties;
+  }
+
+  function renderStatusTabContent(tabId, currentLayer) {
+    if (tabId === "layers") {
+      return `
+        ${renderPageSettingsCard()}
+        ${renderCurrentLayerCard(currentLayer)}
+        ${renderLayerOverlayCard()}
+        ${renderLayerItemCatalogCard(currentLayer)}
+      `;
+    }
+    if (tabId === "overview") {
+      return `
+        ${renderAiGuideCard(currentLayer)}
+        ${renderSystemRemindersCard()}
+        ${renderBudgetInclusionCard()}
+        ${renderProjectPreferencesCard()}
+        ${renderCompletionStatusCard()}
+        ${renderTotalPreviewCard()}
+      `;
+    }
+    if (tabId === "help") {
+      return `
+        ${renderAiGuideCard(currentLayer)}
+        ${renderShortcutHelpCard()}
+        <div class="status-card ui-ia-card">
+          <b>使用邊界</b>
+          <div class="inline-message">草稿候選，非正式估價。AI 風格示意不是施工圖、正式設計圖、真實案例或正式報價依據。</div>
+        </div>
+      `;
+    }
+    return `
       ${renderSelectedObjectSummaryCard(currentLayer)}
       ${renderToolCatalogItemEditorCard()}
-      ${renderLayerOverlayCard()}
-      ${renderAiGuideCard(currentLayer)}
       ${renderLayerNotesCard(currentLayer)}
-      ${renderProjectPreferencesCard()}
-      ${renderSystemRemindersCard()}
-      ${renderBudgetInclusionCard()}
-      ${renderCompletionStatusCard()}
-      ${renderShortcutHelpCard()}
-      ${renderTotalPreviewCard()}
+    `;
+  }
+
+  function renderPageSettingsCard() {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>頁面與圖紙</b>
+        <div class="field-grid">
+          ${renderInspectorSelect("inspector-floor", "compact-floor", "樓層", ["1F", "2F", "3F", "屋頂", "新增頁面"], uiState.currentFloor)}
+          ${renderInspectorSelect("inspector-house-type", "compact-house-type", "屋型", ["公寓", "透天", "樓中樓", "商空"], getHouseTypeLabel(uiState.houseType))}
+          ${renderInspectorSelect("inspector-sheet-scale", "compact-sheet-scale", "比例", ["1:50", "1:100", "自定義"], uiState.sheetScale)}
+          ${renderInspectorSelect("inspector-sheet-size", "compact-sheet-size", "圖紙", ["A4", "A3"], uiState.sheetSize)}
+        </div>
+      </div>
     `;
   }
 
@@ -3872,7 +4312,7 @@
       <div class="status-card ui-ia-card">
         <b>項目庫 / 目前圖層</b>
         <div class="status-grid">
-          <div class="status-row"><span>currentLayer</span><span>${escapeHTML(currentLayer.id)}</span></div>
+          <div class="status-row"><span>目前圖層代碼</span><span>${escapeHTML(currentLayer.id)}</span></div>
           <div class="status-row"><span>可選項目</span><span>${currentLayer.items.length} 項</span></div>
           <div class="status-row"><span>已選項目</span><span>${selectedItems.length} 項</span></div>
         </div>
@@ -3916,6 +4356,22 @@
 
   function renderSelectedObjectSummaryCard(currentLayer) {
     const selectedObject = getSelectedObjectSummary();
+    if (selectedObject.id === "-") {
+      return `
+        <div class="status-card ui-ia-card">
+          <b>全局狀態</b>
+          <div class="inline-message">尚未選取物件，請點選牆、櫃體或標註查看屬性。</div>
+          <div class="status-grid">
+            <div class="status-row"><span>目前圖層</span><span>${escapeHTML(currentLayer.label)}</span></div>
+            <div class="status-row"><span>目前工具</span><span>${escapeHTML(getCurrentToolLabel(uiState.currentTool))}</span></div>
+            <div class="status-row"><span>樓層</span><span>${escapeHTML(uiState.currentFloor)}</span></div>
+            <div class="status-row"><span>屋型</span><span>${escapeHTML(getHouseTypeLabel(uiState.houseType))}</span></div>
+            <div class="status-row"><span>比例</span><span>${escapeHTML(uiState.sheetScale)}</span></div>
+            <div class="status-row"><span>匯入狀態</span><span>${project.importSource ? "已匯入" : "尚未匯入"}</span></div>
+          </div>
+        </div>
+      `;
+    }
     return `
       <div class="status-card ui-ia-card">
         <b>選取物件屬性</b>
@@ -3939,7 +4395,7 @@
     }
     return `
       <div class="status-card ui-ia-card">
-        <b>Tool Catalog marker</b>
+        <b>草稿項目</b>
         <div class="field-grid">
           <div class="field-row">
             <label for="selected-tool-item-label">標籤</label>
@@ -3974,10 +4430,10 @@
           ` : ""}
           <div class="field-row full">
             <label for="selected-tool-item-note">備註</label>
-            <input id="selected-tool-item-note" data-field="selected-tool-item-note" type="text" value="${escapeAttribute(item.note || "")}" placeholder="candidate-only 草稿備註">
+            <input id="selected-tool-item-note" data-field="selected-tool-item-note" type="text" value="${escapeAttribute(item.note || "")}" placeholder="草稿備註">
           </div>
         </div>
-        <div class="inline-message">此 marker 只存在於 project.toolCatalogItems，不寫入正式估價、Plancraft core 或 renderer production input。</div>
+        <div class="inline-message">此草稿項目只作需求整理，不寫入正式估價、核心圖形或正式輸出。</div>
       </div>
     `;
   }
@@ -3998,7 +4454,7 @@
           <span>只顯示目前圖層</span>
           <input id="show-only-current-layer" data-field="show-only-current-layer" type="checkbox" ${uiState.showOnlyCurrentLayer ? "checked" : ""}>
         </label>
-        <div class="inline-message">產品圖層疊加是 Plancraft+ draft view state；技術 SVG layers 仍保留 underlay / wall / opening / zone / graph / calibration。</div>
+        <div class="inline-message">產品圖層疊加只影響草稿畫面；底圖、牆體、門窗、空間與校正資料仍保留。</div>
       </div>
     `;
   }
@@ -4129,9 +4585,9 @@
           <div class="status-row"><span>F8</span><span>一鍵標註</span></div>
           <div class="status-row"><span>Delete</span><span>刪除</span></div>
           <div class="status-row"><span>Esc</span><span>取消目前操作</span></div>
-          <div class="status-row"><span>Ctrl + Z</span><span>復原 placeholder</span></div>
-          <div class="status-row"><span>Ctrl + Y</span><span>重做 placeholder</span></div>
-          <div class="status-row"><span>Space</span><span>拖動畫布 placeholder</span></div>
+          <div class="status-row"><span>Ctrl + Z</span><span>復原，尚未完整開放</span></div>
+          <div class="status-row"><span>Ctrl + Y</span><span>重做，尚未完整開放</span></div>
+          <div class="status-row"><span>Space</span><span>拖動畫布，尚未完整開放</span></div>
         </div>
       </div>
     `;
@@ -4159,7 +4615,7 @@
         </div>
         ${isOpen ? `
           <div class="status-grid" style="margin-top: 12px;">
-            <div class="status-row"><span>已畫項目</span><span>${project.walls.length} 牆 / ${project.openings.length} 門窗 / ${project.zones.length} zone</span></div>
+            <div class="status-row"><span>已畫項目</span><span>${project.walls.length} 牆 / ${project.openings.length} 門窗 / ${project.zones.length} 空間</span></div>
             <div class="status-row"><span>已選材料</span><span>${project.selectedMaterials.length} 項</span></div>
             <div class="status-row"><span>已選項目</span><span>${selectedItems.length} 項</span></div>
             <div class="status-row"><span>目前圖層</span><span>${escapeHTML(currentLayer.label)}</span></div>
@@ -4235,7 +4691,7 @@
     uiState.selectedToolCatalogItemId = null;
     project.saveStatus = "unsaved";
     uiState.error = "";
-    uiState.message = `已刪除 Tool Catalog 草稿項目：${item.label}。`;
+    uiState.message = `已刪除草稿項目：${item.label}。`;
     render();
   }
 
@@ -4273,7 +4729,7 @@
 
   function applyMaterialToSelectedToolCatalogItem(item = getSelectedToolCatalogItem()) {
     if (!item) {
-      uiState.message = "請先選取一個 Tool Catalog marker，再套用材料分類。";
+      uiState.message = "請先選取一個草稿項目，再套用材料分類。";
       uiState.error = "";
       return;
     }
@@ -4289,19 +4745,24 @@
 
   function getCurrentToolLabel(tool) {
     const labels = {
+      import_view: "匯入圖面",
+      scale: "比例校正",
       select: "選取箭頭",
       pan: "手掌 / 移動畫布",
       zoom: "畫布縮放",
       wall: "牆體工具",
       opening: "門窗工具",
+      zone_label: "空間標籤",
       item_place: "物件 / 項目放置",
+      furniture: "家具 / DECO",
       dimension: "尺寸標註",
       text: "文字",
       material_bucket: "油漆桶 / 材質",
       auto_annotate: "一鍵標註",
       delete: "刪除",
       snap_toggle: "鎖點開關",
-      undo_redo: "復原 / 重做"
+      undo_redo: "復原 / 重做",
+      print_export: "圖紙 / 列印"
     };
     return labels[tool] || "選取箭頭";
   }
@@ -4363,7 +4824,7 @@
     if (selectedToolItem) {
       return {
         id: selectedToolItem.id,
-        type: selectedToolItem.kind === "text" ? "文字標註" : selectedToolItem.kind === "dimension" ? "尺寸標註" : "Tool Catalog 項目",
+        type: selectedToolItem.kind === "text" ? "文字標註" : selectedToolItem.kind === "dimension" ? "尺寸標註" : "草稿項目",
         layer: getProductLayerLabel(selectedToolItem.layer),
         status: getToolCatalogStatusLabel(selectedToolItem.status),
         budgetInclusion: getToolCatalogBudgetLabel(selectedToolItem.budgetInclusion),
@@ -4401,19 +4862,19 @@
       ensureZoneBoundaryFields(selectedZone);
       return {
         id: selectedZone.id,
-        type: "Zone / 空間",
+        type: "空間",
         layer: getCurrentProductLayer().label,
-        status: selectedZone.areaStatus || selectedZone.boundaryStatus || "draft",
+        status: selectedZone.areaStatus || selectedZone.boundaryStatus || "草稿",
         budgetInclusion: selectedZone.areaStatus === "estimated" ? "面積候選，非正式數量" : "待確認",
         reviewerRequired: selectedZone.reviewerRequired || selectedZone.areaStatus !== "estimated",
-        reviewerReasons: selectedZone.reviewerReasons || (selectedZone.areaStatus !== "estimated" ? ["zone 面積尚未形成可用候選 metadata。"] : [])
+        reviewerReasons: selectedZone.reviewerReasons || (selectedZone.areaStatus !== "estimated" ? ["空間面積尚未形成可用候選資料。"] : [])
       };
     }
     return {
       id: "-",
       type: "未選取",
       layer: getCurrentProductLayer().label,
-      status: "draft",
+      status: "草稿",
       budgetInclusion: "依物件決定",
       reviewerRequired: false,
       reviewerReasons: []
@@ -4818,6 +5279,22 @@
     }
     if (currentImportFileText) {
       currentImportFileText.textContent = project.importSource?.fileName || "尚未匯入";
+    }
+    const dynamicDraftSaveStatusText = document.getElementById("draftSaveStatusText");
+    const dynamicLastSavedText = document.getElementById("lastSavedText");
+    const dynamicDraftVersionText = document.getElementById("draftVersionText");
+    const dynamicCurrentImportFileText = document.getElementById("currentImportFileText");
+    if (dynamicDraftSaveStatusText) {
+      dynamicDraftSaveStatusText.textContent = getSaveStatusLabel(project.saveStatus);
+    }
+    if (dynamicLastSavedText) {
+      dynamicLastSavedText.textContent = project.lastSavedAt ? formatDateTime(project.lastSavedAt) : "尚未儲存";
+    }
+    if (dynamicDraftVersionText) {
+      dynamicDraftVersionText.textContent = project.draftVersionName || project.version;
+    }
+    if (dynamicCurrentImportFileText) {
+      dynamicCurrentImportFileText.textContent = project.importSource?.fileName || "尚未匯入";
     }
   }
 
@@ -6872,12 +7349,12 @@
 
   function getWallStatusLabel(status) {
     if (status === "new") {
-      return "新牆 new";
+      return "新設牆";
     }
     if (status === "demolished") {
-      return "拆除牆 demolished";
+      return "拆除牆";
     }
-    return "既有牆 existing";
+    return "既有牆";
   }
 
   function getModeLabel(mode) {
