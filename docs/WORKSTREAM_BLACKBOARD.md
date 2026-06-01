@@ -150,7 +150,7 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Workstream: `budget/review-gate`
 - Status: `FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE`
 - Progress %: 95
-- Evidence: PR #37 head `534aa781ff7685b727f5ff5df67377b26ed2301f`; GitHub connector reports `mergeable=true` with merge ref `286270fccc1de91f7b966ac8acd06c754d36476d`; Issue #41 created for Integration Officer disposition; `docs/budget_review_gate/` contains review gate contract, queue schema, decision contract, approval policy, decision log, forbidden direct-publish flows, JSON examples, automation record, final completion report, and Integration Officer action packet.
+- Evidence: PR #37 is open / non-draft; GitHub PR metadata is the live source for head SHA and merge ref; Issue #41 created for Integration Officer disposition; `docs/budget_review_gate/` contains review gate contract, queue schema, decision contract, approval policy, decision log, forbidden direct-publish flows, JSON examples, automation record, final completion report, and Integration Officer action packet.
 - Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY; final Commander acceptance still required for task closeout.
 - Blocker: PR #37 is not merged to `main`; GitHub Merge Gate is not complete.
 - Need Commander: Yes, for final task acceptance / closeout after PR merge gate.
