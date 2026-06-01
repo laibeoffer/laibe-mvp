@@ -96,9 +96,21 @@ Entry-source comparison was unchanged:
 
 The next safe runtime action still requires `EXECUTION_OFFICER` direction: either keep `owner_guide_mock_runtime.html` standalone for Deputy review, or wire a scoped entry from `onboard_ai_agent/code.html` before browser verification.
 
+## 2026-06-01T06:29:16Z Browser Verification Attempt
+
+A browser smoke test was attempted against GitHub branch content by loading the raw `owner_guide_mock_runtime.html` content into a temporary browser page.
+
+Result: blocked by browser security policy because the temporary `data:` URL was not allowed.
+
+No workaround, alternate browser surface, raw browser command, or indirect execution path was attempted after the security block.
+
+Status remains `MOCK_READY` only. This is not `WEB_RUNTIME_VERIFIED` because the GitHub-tracked mock runtime has not been opened and exercised through an allowed runtime/browser path, and it is still not wired into `onboard_ai_agent/code.html`.
+
+Next safe GitHub action remains unchanged: `EXECUTION_OFFICER` should choose whether to keep the standalone mock runtime evidence page or wire it into `code.html`. After that, use an allowed browser path for runtime verification.
+
 ## Missing Before WEB_RUNTIME_VERIFIED
 
-- The mock runtime evidence page must be opened and tested in a browser/runtime environment.
+- The mock runtime evidence page must be opened and tested in a browser/runtime environment through an allowed browser path.
 - The corresponding mock page is not yet wired into the existing `code.html` entry page.
 - GitHub branch is currently behind `main`; update/rebase strategy should be determined before final acceptance.
 - Deputy Commander has not approved Functional Acceptance PASS or final completion.
