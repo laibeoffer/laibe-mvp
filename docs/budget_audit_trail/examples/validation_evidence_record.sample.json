@@ -1,0 +1,12 @@
+{
+  "validation_evidence_id": "val_20260601_0001",
+  "artifact_id": "budget_audit_trail_docs_packet",
+  "validation_type": "docs_scope_check",
+  "command": null,
+  "result": "not_run_docs_only",
+  "evidence_summary": "Docs-only contract packet; no runtime validation required.",
+  "evidence_refs": [],
+  "created_at": "2026-06-01T00:00:00+08:00",
+  "updated_at": "2026-06-01T00:00:00+08:00",
+  "risk_flags": []
+}
