@@ -9,6 +9,7 @@ Local-only draft status: `LOCAL_DRAFT_ONLY` remains only for the earlier local e
 ## GitHub Source Reviewed
 
 - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` on GitHub `main`
+- `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` on branch `app/owner-guide-agent`
 - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html` on branch `app/owner-guide-agent`
 
 ## Current GitHub Evidence
@@ -32,6 +33,15 @@ PR #46 adds a corresponding mock runtime evidence page with:
 - visible `OwnerIntent` JSON
 - visible `ProjectRequirementBrief placeholder` JSON
 - explicit mock-only / placeholder-only scope guard
+
+## 2026-06-01T05:20:41Z Entry Source Check
+
+GitHub `main` and PR #46 branch currently have identical `code.html` blob SHAs for the onboarding AI agent entry page:
+
+- `main`: `1b5001ac60312444671d14724793045f68d4350a`
+- `app/owner-guide-agent`: `1b5001ac60312444671d14724793045f68d4350a`
+
+This confirms the entry page has no branch-local divergence at patrol time. A scoped link from `code.html` to `owner_guide_mock_runtime.html` is technically feasible, but it remains an `EXECUTION_OFFICER` decision because the current PR evidence intentionally keeps the runtime mock as a standalone page until instructed otherwise.
 
 ## Missing Before WEB_RUNTIME_VERIFIED
 
