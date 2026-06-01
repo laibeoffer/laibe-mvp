@@ -22,7 +22,7 @@ This queue is used when there is no new instruction. The agent must advance safe
 
 | Priority | Item | Current Status | Next Safe Action |
 |---:|---|---|---|
-| 1 | PR #32 initialization PR | Open and mergeable as of latest patrol; not merged. | Keep PR current with scoped support-doc updates, compact blackboard reconciliation, and PR / Integration Officer instruction tracking. |
+| 1 | PR #32 initialization PR | Open; GitHub reports mergeable false this patrol; not merged. | Keep PR current with scoped support-doc updates, compact blackboard reconciliation, PR / Integration Officer instruction tracking, and mergeability evidence. |
 | 2 | PR #31 boundary PR | Open with review signal unavailable because Codex review usage limits were reached. | Track as related boundary context and keep it separate from PR #32 initialization content. |
 | 3 | Four core summaries | Initial summaries exist; latest scoped evidence records PR #26 merged but final acceptance still pending. | Refresh only from scoped completion reports, final packets, PR comments, compact blackboard signals, or Integration Officer instructions. |
 | 4 | Requirement / SVG context windows | Placeholder metadata exists. | Keep status labels explicit until linked / verified evidence exists. |
@@ -30,12 +30,12 @@ This queue is used when there is no new instruction. The agent must advance safe
 
 ## Latest Scoped Snapshot
 
-- checked_at: 2026-06-01T18:44:59+08:00
-- PR #32: open, mergeable, not merged, head at patrol start `ed50cae95ea41baf6fef8cda8220827b4b328646`, no comments or review threads found in scoped patrol.
+- checked_at: 2026-06-01T19:09:06+08:00
+- PR #32: open, not merged, head at patrol start `da2d975e3ef142730ed8400b2e5be27dfe3b237b`; GitHub reports mergeable false on repeated scoped fetch; no comments or review threads found in scoped patrol.
 - PR #31: open, not merged, related boundary context only, GitHub reports mergeable false, and no review threads found in scoped patrol.
 - PR #47 / Issue #49: `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal for `budget/engine-entry-picking`; this vault only mirrors the signal.
 - Issue #41: latest scoped signal remains Budget Review Gate PR #37 docs-only final-report status; no vault execution assignment found.
-- Active vault work: keep PR #32 current, maintain support-only evidence, and do not touch runtime code or Integration Gate decisions.
+- Active vault work: keep PR #32 current, track mergeability / support-only evidence, and do not touch runtime code or Integration Gate decisions.
 
 ## Allowed Outputs
 
