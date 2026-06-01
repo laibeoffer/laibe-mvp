@@ -1,0 +1,30 @@
+{
+  "schema_name": "FunctionalAcceptanceReport",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "functional_acceptance_report_id": "functional_acceptance_report_example_001",
+  "source_agent": "budget/schema-registry",
+  "workstream": "budget/schema-registry",
+  "functional_acceptance": "NOT_APPLICABLE_DOCS_ONLY",
+  "runtime_verified": false,
+  "integration_ready": false,
+  "evidence_items": [
+    {
+      "evidence_id": "docs_created_example",
+      "evidence_type": "docs_only_file_list",
+      "status": "linked"
+    }
+  ],
+  "forbidden_scope_check": {
+    "implementation_code_changed": false,
+    "formal_price_generated": false,
+    "pricing_rule_changed": false,
+    "budget_estimate_line_generated": false,
+    "payment_ai_api_db_n8n_touched": false
+  },
+  "need_commander": true,
+  "need_integration_officer_review": true,
+  "need_reviewer": false,
+  "warnings": ["Docs-only acceptance does not increase any Budget Integration Gate percentage."],
+  "forbidden_use": ["runtime_acceptance", "integration_harness_start", "formal_quote"]
+}
