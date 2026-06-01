@@ -1,5 +1,46 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Plan Puzzle Guide Agent Handoff
+
+- Task: `Plancraft+ 平面拼圖引導官 MVP`.
+- Workstream: `app/plan-puzzle-guide-agent`.
+- Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50.
+- Current status: `RUNTIME_MOCK_IMPLEMENTED / BROWSER_VALIDATION_BLOCKED_BY_URL_POLICY / WAITING_COMMANDER`.
+- Runtime files changed:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- Coordination files changed:
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- Guide data model:
+  - `project.guide`: local guide mode, disclaimer state, current step, completed steps, pending suggestions, update timestamp.
+  - `project.guideLog`: guide/user/system message records with layer, selected object, reminder relations, timestamp, and saved-to-requirements marker.
+  - `project.requirementNotes`: guide-sourced demand notes with category, layer, related object, priority, summary flag, and timestamp.
+  - `project.guideSummary`: user intent, uncertainties, budget-relevant notes, contractor questions, generated timestamp.
+  - `project.PlanPuzzleQuantityFacts`: placeholder facts object with receiving windows for SVG, zones, areas, wall length, and opening count.
+- Local rule-based guide behavior:
+  - FAQ / keyword answers only.
+  - Quick question buttons.
+  - Step guide flow for start, home condition, main needs, budget preference, drawing reminders, and summary.
+  - Current layer, selected object, and local reminders influence guide suggestions.
+  - No real LLM, OpenAI API, image API, backend, DB, production storage, API key, or formal pricing.
+- Export status:
+  - Draft JSON includes `guide`, `guideLog`, `requirementNotes`, `guideSummary`, and placeholder `PlanPuzzleQuantityFacts`.
+  - These fields are demand/context records only and must not be treated as formal Budget Engine input.
+- Validation:
+  - `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS.
+  - `git diff --check`: PASS, CRLF warning only.
+  - Browser `file://` validation: blocked by in-app Browser URL policy; no console-clean claim.
+- Forbidden scope preserved:
+  - No Plancraft core / Budget Engine / `formalEstimateGuard` / `generateBudgetEstimate()` change.
+  - No package, framework, `node_modules`, payment, escrow, listing fee, DB, auth, AI API, image API, or secrets.
+- Need Commander: Yes.
+- Need Reviewer: Yes, because runtime draft JSON/export shape now includes guide and placeholder facts data.
+- Next single action: Commander or Second Deputy should run/authorize external browser validation for PR #50 and decide review/merge or scoped revision.
+
 ## Latest Commander Governance Announcement: GitHub Is Shared Work Path
 
 - 本輪任務名稱：Announce GitHub as mandatory shared work path.

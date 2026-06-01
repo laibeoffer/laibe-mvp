@@ -2,6 +2,63 @@
 
 GitHub operating path acknowledged: Yes
 
+## Latest Update - 2026-06-01 Runtime Mock Continuation
+
+User / Commander instruction continued the workstream beyond the original contract-only lane and asked the single active Plan Puzzle Guide Agent to execute the main task immediately.
+
+Current status:
+
+`RUNTIME_MOCK_IMPLEMENTED / BROWSER_VALIDATION_BLOCKED_BY_URL_POLICY / WAITING_COMMANDER`
+
+Updated runtime files:
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+
+Updated coordination files:
+
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+- `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+
+Implemented local runtime behavior:
+
+- Right-side inspector now includes `平面拼圖引導官`.
+- The guide is local rule-based only: no LLM, OpenAI API, image API, backend, DB, API key, or production storage.
+- The guide supports FAQ / keyword answers, quick questions, a step-based homeowner guide flow, conversation logging, requirement note capture, local reminders, and summary generation.
+- The guide writes draft data to `project.guide`, `project.guideLog`, `project.requirementNotes`, and `project.guideSummary`.
+- The guide reads current layer, selected object, and local reminder state to generate context suggestions.
+- Draft export keeps guide data as demand/context records only; it is not formal quantity, formal pricing, or Budget Engine input.
+
+Implemented placeholder facts behavior:
+
+- Runtime now exposes placeholder `PlanPuzzleQuantityFacts`.
+- Runtime now maintains `plan_quantity_facts_id`, `svg_artifact_id`, and `quantity_context_status`.
+- Receiving windows are present for SVG, zones, areas, wall length, and opening count.
+- Facts are marked local placeholder-only, `budgetInputEligible: false`, `formalEstimateAllowed: false`, and `productionReady: false`.
+
+Validation:
+
+- `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS.
+- `git diff --check`: PASS, CRLF warning only.
+- Browser `file://` validation: blocked by in-app Browser URL policy; no console-clean claim is made.
+
+Forbidden scope preserved:
+
+- No Plancraft core change.
+- No Budget Engine / budget runtime change.
+- No `generateBudgetEstimate()` path.
+- No `formalEstimateGuard` change.
+- No renderer / MethodSpec / Raw Candidate / Output Documents change.
+- No payment / escrow / listing fee / DB / auth / AI API / image API / secrets.
+- No package / framework / `node_modules` change.
+
+Next GitHub action:
+
+Commander or Second Deputy should run/authorize external browser validation for the PR #50 `file://` page, then decide whether PR #50 enters review/merge or needs another scoped revision.
+
 ## Task
 
 Plan Puzzle Guide Agent initialization contract and compact blackboard evidence correction.
@@ -36,7 +93,10 @@ Plan Puzzle Guide Agent initialization contract and compact blackboard evidence 
 
 ## Modified Runtime Files
 
-None.
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+
+Note: these runtime files were added after the original contract-only initialization when Commander/user instruction continued the workstream into the local runtime mock.
 
 ## Completed
 
@@ -55,9 +115,8 @@ None.
 
 - PR #50 is not merged to `main`.
 - PR #40 and PR #44 remain open and need a Commander / maintainer decision after PR #50 review.
-- No runtime mock panel has been wired.
-- No browser/runtime verification has been completed.
-- No `MOCK_READY` or `WEB_RUNTIME_VERIFIED` claim is made.
+- Browser/runtime verification has not been completed because in-app Browser `file://` access was blocked by URL policy.
+- No `WEB_RUNTIME_VERIFIED` claim is made.
 
 ## Forbidden Scope Preserved
 
@@ -70,19 +129,19 @@ None.
 
 ## Current Status
 
-`CONTRACT_ONLY`
+`RUNTIME_MOCK_IMPLEMENTED / BROWSER_VALIDATION_BLOCKED_BY_URL_POLICY / WAITING_COMMANDER`
 
 Runtime status:
 
-`WEB_RUNTIME_PENDING`
+`RUNTIME_MOCK_IMPLEMENTED`
 
 ## GitHub Branch / PR Status
 
 - Branch: `codex/plan-puzzle-guide-init-main-sync`.
 - PR: `https://github.com/laibeoffer/laibe-mvp/pull/50`.
 - PR state: open draft, not merged.
-- Scope check: docs-only under `docs/plan_puzzle_guide/` plus compact `docs/WORKSTREAM_BLACKBOARD.md` correction.
+- Scope check: local front-end runtime mock plus documentation updates; no forbidden Budget Engine, Plancraft core, AI API, payment, DB, auth, package, or production storage scope.
 
 ## Next GitHub Action Needed
 
-Review PR #50 through normal gates, then decide whether PR #40 and PR #44 should be closed, superseded, or reconciled. Continue with a narrow mock runtime task only after the docs contract is accepted or merged and only if it stays front-end local, placeholder-only, GitHub-tracked, and does not touch forbidden systems. The next safe runtime target remains a minimal facts panel in `preview_floor_plan` that exposes `PlanPuzzleQuantityFacts` without calling Budget Engine or renderer.
+Review PR #50 through normal gates, run or authorize external browser validation for the `file://` plan puzzle page, then decide whether PR #40 and PR #44 should be closed, superseded, or reconciled. Keep the runtime lane front-end local, placeholder-only, GitHub-tracked, and away from Budget Engine, renderer, Plancraft core, AI APIs, payment, DB, auth, packages, and production storage.

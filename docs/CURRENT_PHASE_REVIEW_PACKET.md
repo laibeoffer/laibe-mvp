@@ -2199,3 +2199,30 @@ Conditional ready。
 Yes，ready for user-triggered phase review。
 
 Ready 範圍限 R1.5 candidate-only source quality scoring / reviewer checklist，不代表正式價格、正式 catalog publishing、正式採購系統或正式報價完成。
+## Plan Puzzle Guide Agent Runtime Mock Addendum
+
+- 本輪新增 `Plancraft+ 平面拼圖引導官 MVP` runtime mock。
+- Workstream: `app/plan-puzzle-guide-agent`。
+- Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50。
+- 狀態：`RUNTIME_MOCK_IMPLEMENTED / BROWSER_VALIDATION_BLOCKED_BY_URL_POLICY / WAITING_COMMANDER`。
+- 本輪不是 AI API integration；未接 OpenAI API、image API、LLM API、API key、backend、DB 或 production storage。
+- 本輪不是正式估價；未接 Budget Engine、未修改 `generateBudgetEstimate()`、未解除 `formalEstimateGuard`。
+- 本輪未修改 Plancraft core、renderer、MethodSpec、Raw Candidate、Output Documents、payment、escrow、listing fee、auth 或 webhook。
+- Runtime 變更：
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- Coordination 變更：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- Data model / export 變更：
+  - Draft JSON now includes `project.guide`, `project.guideLog`, `project.requirementNotes`, `project.guideSummary`, and placeholder `project.PlanPuzzleQuantityFacts`.
+  - These records are guide/context records only and are not formal quantity, estimate, quote, or Budget Engine input.
+- Validation：
+  - `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS。
+  - `git diff --check`: PASS，只有 CRLF warning。
+  - Browser `file://` validation 被 in-app Browser URL policy 阻擋，因此尚未取得 console-clean runtime evidence。
+- Need Commander: Yes，需確認產品方向與 functional acceptance。
+- Need Reviewer: Yes，因本輪改到 runtime draft JSON/export shape，雖然未觸碰 Budget Engine 或 guard。

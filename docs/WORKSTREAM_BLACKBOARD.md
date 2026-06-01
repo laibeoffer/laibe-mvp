@@ -1,8 +1,59 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 15:08 Asia/Taipei
+Last updated: 2026-06-01 15:22 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
+
+## Latest Compact Progress Report - Plan Puzzle Guide Agent
+
+- To: `SECOND_DEPUTY_COMMANDER`
+- From: `Plan Puzzle Guide Agent`
+- Agent claim: `Plan Puzzle Guide Agent` is the single active agent for `app/plan-puzzle-guide-agent` in this PR branch.
+- Workstream: `app/plan-puzzle-guide-agent`
+- Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50.
+- Mission: Continue PR #50 from contract-only support lane into a narrow local runtime mock for Plancraft+ plan puzzle guide.
+- Status: `RUNTIME_MOCK_IMPLEMENTED / BROWSER_VALIDATION_BLOCKED_BY_URL_POLICY / WAITING_COMMANDER`
+- Progress: 70%.
+- GitHub Merge Gate: PR #50 not merged; merge commit not available; result `FAIL` until merged or formally superseded.
+- Functional Acceptance Gate: `PENDING`.
+- Runtime Evidence:
+  - `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS.
+  - `git diff --check`: PASS, with CRLF warning only.
+  - Browser `file://` validation: BLOCKED by in-app Browser URL policy, so no console-clean claim is made.
+- Changed runtime files:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- Changed coordination files:
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- Completed:
+  - Added right-side `平面拼圖引導官` UI panel.
+  - Added local rule-based FAQ / guide knowledge and guided flow.
+  - Added `project.guide`, `project.guideLog`, `project.requirementNotes`, and `project.guideSummary` draft JSON data.
+  - Added local reminders tied to current layer, selected object, and plan content.
+  - Added placeholder `PlanPuzzleQuantityFacts`, `plan_quantity_facts_id`, `svg_artifact_id`, `quantity_context_status`, and receiving windows for SVG, zones, areas, wall length, and opening counts.
+  - Kept guide and facts data as demand/context records only, not formal budget input.
+- Not completed:
+  - PR #50 is not merged.
+  - Browser console validation is not complete because the in-app Browser blocked the `file://` page.
+  - No Commander functional acceptance has been granted.
+- Forbidden scope preserved:
+  - No `C:\laibe_project\plancraft` change.
+  - No Plancraft core change.
+  - No Budget Engine / budget runtime change.
+  - No `generateBudgetEstimate()` route.
+  - No `formalEstimateGuard` change.
+  - No package / framework / `node_modules` change.
+  - No OpenAI API, image API, API key, DB, production storage, payment, escrow, or listing fee.
+- Alarm check:
+  - 15-minute report / 20-minute no-idle rule acknowledged and recorded here.
+  - No callable `automation_update` tool is available in this session, so no persistent background alarm was created.
+- Need Commander: Yes.
+- Need Reviewer: Yes, because runtime draft JSON/export shape now includes guide and placeholder facts data, even though Budget Engine and guard boundaries were not touched.
+- Next single action: Commander or Second Deputy should run/authorize external browser validation for the PR #50 `file://` page, then decide review/merge or revision path.
 
 ## Current Operating Rules
 
