@@ -1,0 +1,65 @@
+{
+  "schema_name": "PlanPuzzleQuantityFacts",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "plan_quantity_facts_id": "plan_quantity_facts_example_001",
+  "project_id": "project_example_001",
+  "plan_id": "plan_draft_example_001",
+  "svg_artifact_id": "svg_artifact_example_001",
+  "source_agent": "app/plan-puzzle-guide-agent",
+  "source_ref": "docs/plan_puzzle_guide/plan_puzzle_quantity_facts_contract.md",
+  "quantity_context_status": "placeholder",
+  "plan_context_status": "placeholder",
+  "plan_quantity_source": "plan_puzzle_placeholder",
+  "plan_placeholder": true,
+  "svg_window": {
+    "artifact_kind": "svg_preview",
+    "source": "plan-puzzle",
+    "status": "placeholder",
+    "warnings": ["SVG artifact is context only and is not a construction drawing."]
+  },
+  "zones": [
+    {
+      "zone_id": "zone_bathroom_001",
+      "zone_name": "Bathroom",
+      "zone_type": "bathroom",
+      "boundary_edge_ids": ["edge_001", "edge_002"],
+      "status": "placeholder",
+      "warnings": ["Zone boundary is a candidate context signal only."]
+    }
+  ],
+  "area_facts": [
+    {
+      "zone_id": "zone_bathroom_001",
+      "area_sqm": 4.2,
+      "area_ping": 1.27,
+      "area_source": "draft_canvas",
+      "area_confidence": 0.4,
+      "status": "placeholder",
+      "warnings": ["Zone area must not be used as formal quantity."]
+    }
+  ],
+  "wall_length_facts": [
+    {
+      "wall_id": "wall_001",
+      "length_mm": 2100,
+      "thickness_mm": 120,
+      "wall_status": "draft",
+      "status": "placeholder",
+      "warnings": ["Wall length must not be used as formal quantity."]
+    }
+  ],
+  "opening_count_facts": [
+    {
+      "opening_id": "opening_001",
+      "kind": "door",
+      "wall_id": "wall_001",
+      "width_mm": 800,
+      "height_mm": 2100,
+      "count": 1,
+      "status": "placeholder",
+      "warnings": ["Opening count is context only."]
+    }
+  ],
+  "forbidden_use": ["formal_quantity", "construction_drawing", "formal_estimate_input", "renderer_direct_input"]
+}
