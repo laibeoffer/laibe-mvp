@@ -15,7 +15,7 @@ This file is the compact GitHub blackboard for current LaiBE MVP coordination. I
 - Commander owns routine GitHub landing / merge decisions for scope-clean PRs.
 - Product direction, formal payment/auth/webhook/AI API, formal pricing, formal Excel/PDF, production secrets, and material business decisions still require user decision.
 - Do not modify payment, auth, webhook, `.env`, secrets, production AI API, real DB, or production payment flows.
-- Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER`, not by Commander.
+- Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER` / `LAIBE_PATROL_INTEGRATION_OFFICER`, not by Commander.
 
 ## Completion Rules
 
@@ -38,42 +38,50 @@ They must not increase runtime or feature progress.
 | 平面拼圖 UI / Plan Puzzle | `plancraft/page-ui` | `laibeoffer/laibe-mvp` | 85 | IN_PROGRESS | PR #25 / Issue #15 context | UI IA correction recorded in handoff / phase packet; runtime Tool Catalog not complete | PENDING | Runtime / Tool Catalog interaction not complete | Yes, for product direction or next implementation authorization | No by default | Decide whether to authorize Tool Catalog Interaction Implementation |
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | PASS for candidate adapter contract only | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 85 | FUNCTIONAL_ACCEPTANCE_PENDING | PR #3 open draft | QF5.4 PR #3 head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body | PENDING | PR #3 not merged; no GitHub-run validator evidence | Yes for final acceptance | Yes | Review PR #3, decide ready/merge or request GitHub-run validation evidence |
-| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 90 | MERGED_TO_MAIN | PR #26 merged / Issue #17 | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; final PR diff limited to Raw Candidate R1.5 files; validation evidence in PR comments includes CLI demos, static guard, `formal_price_generated:false`, `price_authority:"none"`, no formal pricing/output/payment/API/DB scope | PASS for R1.5 CLI / static guard evidence; final completion packet pending | Final Completion Packet and Integration Officer acceptance still pending | No | No unless final packet reveals formal pricing/output drift | Raw Candidate submits Final Completion Packet; Integration Officer updates gate acceptance |
-| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context | Integration readiness evidence and context windows exist | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` | No unless product decision is needed | Integration Officer investigation required | Identify current Budget Engine entry before integration harness |
-| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PENDING | PR #29 merge / final evidence pending | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final static guard and snapshot-only evidence |
+| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 100 | FINAL_GATE_PASSED / MERGED_SHARED_TRUTH | PR #26 merged / Issue #17 closed | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; Issue #17 closed; PR body records R1.5 CLI demos, raw warehouse static guard, candidate-only boundaries, no formal pricing/output/payment/API/DB scope | PASS for R1.5 candidate-only raw warehouse readiness | None for Raw Candidate R1.5; candidate evidence still cannot become formal price/rule without review | No | No unless formal pricing/output drift appears | Use as candidate-only evidence handoff; do not treat raw candidate data as formal `PricingRule` or `BudgetEstimateLine.unit_price` |
+| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | WAITING_FOR_BUDGET_ENGINE_ENTRY_DECISION | PR #30 open | PR #30 open, non-draft, mergeable=false; integration readiness evidence and context windows exist | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` | Yes only if deciding whether to restore / create Budget Engine entry | No until runtime / formal rules change | Identify current Budget Engine entry before integration harness |
+| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 100 | READY_SNAPSHOT_ONLY_DRY_RUN / MERGED_SHARED_TRUTH | PR #23 merged / PR #29 merged | PR #23 merged baseline; PR #29 merged as `c5fc75371a8ce0ceb46217662dc5f22207c1ebc0`; changed scope was docs-only integration usage note; static guard evidence recorded; no real xlsx/pdf output | PASS for snapshot-only dry-run output readiness | None for snapshot-only dry-run output readiness | No | No unless real Excel/PDF or renderer runtime boundary changes | Keep Output Documents snapshot-only; 100% here does not authorize formal Excel/PDF or customer-facing final quote |
 | 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | NOT_APPLICABLE_DOCS_ONLY for governance; runtime not complete | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
 | Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 85 | GOVERNANCE_DOCS_MERGED | PR #35 merged / Issue #28 | PR #35 merged as compact blackboard rebuild; GitHub source-of-truth and merge-decision authority recorded | NOT_APPLICABLE_DOCS_ONLY | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
-| 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate / Issue #41 | Four budget lines not all 100 | PENDING | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Run read-only Budget Engine entry investigation |
+| 巡檢官 / 整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 50 | ACTIONABLE_GOVERNANCE_RECOVERY | Issue #41 / blackboard recovery PR | Live GitHub state reconciled for PR #26, Issue #17, PR #29, PR #30, and Quote Factory PR #3 | NOT_APPLICABLE_DOCS_ONLY for this blackboard recovery | Integration Gate still waiting on Quote Factory shared truth and MethodSpec Budget Engine entry blocker | No for this docs-only recovery | No | Keep gate WAITING; resolve Budget Engine entry and Quote Factory shared truth next |
 
 ## Integration Readiness Gate
 
 Status: WAITING
 
-Blocking item: MethodSpec / `BUDGET_ENGINE_ENTRY_BLOCKER`
+Reason:
 
-Owner: `LAIBE_REVIEWER_INTEGRATION_OFFICER`
+- Not waiting because of 0% standby agents.
+- Not waiting because of Budget Knowledge Vault.
+- Quote Factory is not shared truth yet: PR #3 remains draft / not merged.
+- MethodSpec still has `BUDGET_ENGINE_ENTRY_BLOCKER`.
+- Raw Candidate and Output Documents are ready only for their candidate-only / snapshot-only dry-run scopes; they do not authorize formal price, formal rules, formal Excel/PDF, or a customer-facing final quote.
 
-Next: Identify current Budget Engine entry before integration harness.
+Owner: `LAIBE_PATROL_INTEGRATION_OFFICER`
+
+Next: Resolve Budget Engine entry decision before starting any integration harness.
 
 | Workstream | Required for Integration | Completion % | Evidence | Functional Acceptance | Blocker | Gate Status |
 |---|---|---:|---|---|---|---|
-| `quote-factory/price-range-governance` | Yes | 85 | PR #3 open draft; head `e2fa1e8`; export package / manifest / validator are GitHub-tracked | PENDING | PR #3 not merged; no GitHub-run validator evidence | WAITING |
-| `warehouse/raw-candidate` | Yes | 90 | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; R1.5 CLI demos/static guard passed; candidate-only safety evidence recorded | PASS for R1.5 validation evidence; final packet pending | Final Completion Packet and Integration Officer gate acceptance pending | WAITING |
-| `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` | BLOCKED |
-| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PENDING | PR #29 merge / final evidence pending | WAITING |
+| `quote-factory/price-range-governance` | Yes | 85 | PR #3 open draft; head `e2fa1e8`; export package / manifest / validator are GitHub-tracked | PENDING | PR #3 not merged; no GitHub-run validator evidence accepted into shared truth | WAITING |
+| `warehouse/raw-candidate` | Yes | 100 | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; Issue #17 closed; R1.5 CLI demos/static guard passed; candidate-only safety evidence recorded | PASS for R1.5 candidate-only readiness | None for Raw Candidate scope | READY |
+| `warehouse/method-spec` | Yes | 75 | PR #30 open, non-draft, mergeable=false; integration readiness evidence exists | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` | BLOCKED |
+| `output/budget-documents` | Yes | 100 | PR #23 merged; PR #29 merged as `c5fc75371a8ce0ceb46217662dc5f22207c1ebc0`; snapshot-only usage note and static guard evidence exist | PASS for snapshot-only dry-run output readiness | None for snapshot-only dry-run scope | READY |
 
 Readiness rule:
 
 - Integration harness must not start until all four lines are 100% and blocker is `None`.
 - Plan Puzzle and Owner Guide are not part of this four-line gate.
 - Budget Knowledge Vault is not part of this gate and cannot replace completion packets.
-- PR merge alone must not raise any line to 100%.
+- PR merge alone must not raise any line to 100% without matching validator / static guard / runtime / docs-only acceptance evidence.
+- Output Documents 100% means snapshot-only dry-run output readiness. It does not mean formal Excel/PDF, production artifact storage, or customer-facing final quote readiness.
+- Raw Candidate 100% means candidate-only warehouse readiness. It does not mean candidate price may become formal pricing authority.
 
 ## Budget Integration Blocker Handoff
 
-To: `LAIBE_REVIEWER_INTEGRATION_OFFICER`
+To: `LAIBE_PATROL_INTEGRATION_OFFICER`
 
-Mission: read-only Budget Engine entry investigation.
+Mission: resolve Budget Engine entry decision path before integration harness.
 
 Required output:
 
@@ -81,12 +89,12 @@ Required output:
 - Whether `budget-generator.ts` is missing, renamed, or intentionally replaced.
 - Which existing files reference the current budget engine entry.
 - Whether a separate scoped implementation task is needed.
-- Functional Acceptance status for all four budget gate lines.
+- If new / restored Budget Engine entry is required, escalate to Commander before runtime work.
 
 Forbidden:
 
-- Do not modify functional code.
-- Do not create or patch `budget-generator.ts`.
+- Do not modify functional code from this blackboard task.
+- Do not create or patch `budget-generator.ts` from this blackboard task.
 - Do not route this blocker to MethodSpec for self-repair.
 - Do not start integration harness.
 
@@ -94,7 +102,7 @@ Forbidden:
 
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
-| 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
+| 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` / `LAIBE_PATROL_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Support agent only. Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. It is not part of the four-line Integration Gate, does not unlock the gate, and is not directly dispatched by Commander. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
 
@@ -112,9 +120,9 @@ These agents are not current blockers and must not receive new tasks unless expl
 
 ## Current Global Next Actions
 
-1. `LAIBE_REVIEWER_INTEGRATION_OFFICER`: investigate `BUDGET_ENGINE_ENTRY_BLOCKER` read-only.
-2. `Raw Candidate`: submit Final Completion Packet after PR #26 merge.
-3. Commander: keep Integration Gate as WAITING until the four required lines reach 100% with Functional Acceptance evidence.
+1. `LAIBE_PATROL_INTEGRATION_OFFICER`: resolve `BUDGET_ENGINE_ENTRY_BLOCKER` decision path read-only, then escalate only if restore / new Budget Engine runtime entry is required.
+2. Quote Factory: move PR #3 from draft / not-merged state into shared-truth evidence or provide accepted validator evidence.
+3. Commander: keep Integration Gate as WAITING until all four required lines reach 100% with Functional Acceptance evidence and no blocker.
 
 ## Compact Update Format
 
@@ -137,15 +145,15 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
-### 2026-06-01 - Raw Candidate PR #26 Merge Gate Landed
+### 2026-06-01 - Budget Integration Blackboard Stale Recovery
 
-- Agent: @Raw-Candidate
-- Workstream: `warehouse/raw-candidate`
-- Status: `MERGED_TO_MAIN`
-- Progress %: 90
-- Evidence: PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; final diff scope clean for Raw Candidate R1.5; CLI demos/static guard evidence recorded in PR comments.
-- Functional Acceptance: PASS for R1.5 CLI / static guard evidence; final completion packet pending.
-- Blocker: Integration readiness still pending Final Completion Packet and Integration Officer gate acceptance.
-- Need Commander: No
-- Need Reviewer: No unless final packet reveals formal pricing/output drift.
-- Next single action: Raw Candidate submits Final Completion Packet; Integration Officer updates readiness gate.
+- Agent: `LAIBE_PATROL_INTEGRATION_OFFICER`
+- Workstream: `integration/budget-system-readiness`
+- Status: `ACTION_TAKEN`
+- Progress %: 100 for blackboard stale recovery only
+- Evidence: GitHub source-of-truth checked for PR #26, Issue #17, PR #29, PR #30, Quote Factory PR #3, and current `main`; blackboard corrected to mark PR #26 merged / Issue #17 closed and PR #29 merged.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY` for this blackboard recovery.
+- Blocker: Integration Gate remains WAITING because Quote Factory PR #3 is draft / not merged and MethodSpec still has `BUDGET_ENGINE_ENTRY_BLOCKER`.
+- Need Commander: No for this docs-only blackboard recovery. Yes only if deciding whether to restore / create Budget Engine runtime entry.
+- Need Reviewer: No for this docs-only blackboard recovery.
+- Next single action: Resolve Budget Engine entry decision path before any integration harness.
