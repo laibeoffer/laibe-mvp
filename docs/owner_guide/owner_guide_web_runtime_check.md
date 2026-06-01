@@ -1,6 +1,8 @@
 # Owner Guide Web Runtime Check
 
-Status: `MOCK_READY / WEB_RUNTIME_PENDING`
+Status: `WEB_RUNTIME_VERIFIED`
+
+Scope: standalone mock runtime only. This status does not approve production routing, `onboard_ai_agent/code.html` entry changes, Functional Acceptance, merge readiness, final completion, Budget Engine execution, Renderer execution, formal pricing, or formal quote generation.
 
 Managed by: `EXECUTION_OFFICER`
 
@@ -18,6 +20,7 @@ Local-only draft status: `LOCAL_DRAFT_ONLY` remains only for the earlier local e
 - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html` on GitHub `main`
 - `src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html` on branch `app/owner-guide-agent-main-sync`
 - `docs/owner_guide/browser_validation_checklist.md` on branch `app/owner-guide-agent-main-sync`
+- `docs/owner_guide/browser_validation_evidence.md` on branch `app/owner-guide-agent-main-sync`
 
 ## Current GitHub Evidence
 
@@ -42,15 +45,17 @@ PR #53 adds a standalone Owner Guide mock runtime evidence page with:
 - explicit `MOCK_READY`, `PLACEHOLDER_ONLY`, and `NO_REAL_AI_API` labels
 - explicit placeholder-only / context-only scope guard
 
-PR #53 also adds `docs/owner_guide/browser_validation_checklist.md` as the sendable checklist for accepted browser/runtime validation.
+PR #53 also adds:
+
+- `docs/owner_guide/browser_validation_checklist.md`
+- `docs/owner_guide/browser_validation_evidence.md`
 
 ## Branch Sync Evidence
 
-Latest synced replacement commit recorded by PR #53:
+Latest synced replacement path recorded by PR #53:
 
 - Branch: `app/owner-guide-agent-main-sync`
 - PR: #53
-- Current status: `MOCK_READY / WEB_RUNTIME_PENDING`
 - Branch sync evidence: replacement branch was created from GitHub `main` commit `896d5dd21ecedaa0754d2052262cedf67d5be82c`
 - PR #53 changed files remain scoped to `docs/owner_guide/` plus `src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html`
 
@@ -62,7 +67,7 @@ Raw GitHub JSON examples are expected to remain parseable:
 - `docs/owner_guide/examples/project_requirement_brief.placeholder.json`
 - `docs/owner_guide/examples/qa_session.sample.json`
 
-The standalone mock runtime must include these required markers before runtime verification can pass:
+The standalone mock runtime includes these required markers:
 
 - `ownerAnswer`
 - `sendAnswer`
@@ -74,28 +79,45 @@ The standalone mock runtime must include these required markers before runtime v
 - `NO_REAL_AI_API`
 - `PLACEHOLDER_ONLY`
 
-Forbidden pattern scan should continue to find no matches for:
+Forbidden execution scan found no script-level matches for:
 
 - `fetch(`
 - `XMLHttpRequest`
-- `apiKey`
-- `supabase`
-- `createClient`
-- `localStorage`
-- `indexedDB`
-- `BudgetEstimateLine`
-- `generateBudgetEstimate`
+- `PaymentRequest` / Stripe / PayPal / webhook execution
+- Supabase / auth execution
+- Budget Engine / `BudgetEstimateLine` / `generateBudgetEstimate` / `PricingRule` / `BudgetOutputSnapshot` / `renderSnapshot`
 
-## Browser Verification Attempts
+Full-source text contains boundary words such as `payment` only as mock-safety copy and `no_payment` placeholder flags. No payment execution path was present.
 
-Earlier browser/runtime attempts were blocked by environment browser security policy:
+## Browser Verification Evidence
 
-- `data:` URL attempt: blocked.
-- `file://` temporary export attempt: blocked.
+Earlier blocked paths:
 
-No workaround, alternate browser surface, raw browser command, or indirect execution path was attempted after those blocks.
+- `data:` URL attempt: blocked by browser security policy.
+- `file://` temporary export attempt: blocked by browser security policy.
 
-Status remains `MOCK_READY / WEB_RUNTIME_PENDING`. This is not `WEB_RUNTIME_VERIFIED` because the GitHub-tracked mock runtime has not been opened and exercised through an allowed runtime/browser path.
+Successful validation path:
+
+- GitHub raw source was fetched from PR #53.
+- The exact raw HTML was served by a temporary localhost server.
+- Codex in-app browser opened the localhost page.
+- The temporary server was closed after verification.
+
+Evidence file:
+
+- `docs/owner_guide/browser_validation_evidence.md`
+
+Validated behavior:
+
+- Page opened.
+- `MOCK_READY`, `PLACEHOLDER_ONLY`, and `NO_REAL_AI_API` labels were visible.
+- Natural-language input submitted successfully.
+- `QuestionAnswerLog` updated with `qa_01`.
+- Requirement summary updated.
+- Next-step signal updated to `enter_plan_puzzle`.
+- `OwnerIntent` JSON was visible and parseable.
+- `ProjectRequirementBrief placeholder` JSON was visible and parseable.
+- No real AI API, DB, auth, payment, Budget Engine, Renderer, formal pricing, or formal quote execution was observed.
 
 ## `code.html` Entry Status
 
@@ -108,13 +130,12 @@ EXECUTION_OFFICER comment `4590753745` states:
 - `code.html` link status is `deferred_pending_commander_or_second_deputy_decision`.
 - Do not implement the anchor until Commander / Second Deputy explicitly authorizes this routing/entry change.
 
-## Missing Before `WEB_RUNTIME_VERIFIED`
+## Remaining Before Final Acceptance
 
-- The standalone mock runtime evidence page must be opened in an accepted browser/runtime environment.
-- The browser/runtime check must follow `docs/owner_guide/browser_validation_checklist.md`.
-- Evidence must show input submit, QA log update, requirement summary update, next-step CTA, parseable `OwnerIntent`, and parseable `ProjectRequirementBrief placeholder`.
-- Evidence must show no real AI API, DB, auth, payment, Budget Engine, Renderer, formal pricing, or formal quote execution.
-- Deputy Commander has not approved Functional Acceptance PASS, merge readiness, final completion, or workstream closure.
+- Main blackboard still reflects pre-merge status until governance chooses to update it.
+- `onboard_ai_agent/code.html` entry/routing change remains deferred.
+- Commander / Second Deputy approval is required for any onboarding entry/routing change.
+- Deputy Commander approval is required for Functional Acceptance PASS, merge readiness, final completion, or workstream closure.
 
 ## Forbidden Scope Check
 
