@@ -6,10 +6,11 @@
 |---|---|---|---|
 | PR #3 not merged / still draft in task brief | Quote Factory | Open | Shared truth for export package is not confirmed. |
 | Raw Candidate Final Completion Packet pending after PR #26 merge | Raw Candidate | Open | Compact blackboard / Issue #41 context now records PR #26 as merged, but final packet and Integration Officer gate acceptance remain pending. |
-| `BUDGET_ENGINE_ENTRY_BLOCKER` | MethodSpec / Budget Engine | Open | Executable budget integration dry-run cannot be claimed until the engine entry path is clarified. Issue #41 dispatches a read-only investigation and the compact blackboard routes active blocker context through Issue #49 / `budget/engine-entry-picking`. |
+| `BUDGET_ENGINE_ENTRY_BLOCKER` | MethodSpec / Budget Engine | Open | Executable budget integration dry-run cannot be claimed until the engine entry path is clarified. Issue #41 dispatches a read-only investigation, the compact blackboard routes active blocker context through Issue #49 / `budget/engine-entry-picking`, and PR #47 records `NO_ENTRY_FOUND_MINIMAL_DRY_RUN_ENTRY_REQUIRED` as docs-only evidence. |
 | PR #29 not merged in task brief | Output Documents | Open | Snapshot-only integration usage note is not confirmed as merged shared truth. |
 | Functional Acceptance evidence required | All four budget core lines | Open | Issue #41 says `MERGED_TO_MAIN` is not `FUNCTIONAL_ACCEPTED`; no line can become 100 without accepted runtime / validator / static guard / smoke evidence. |
-| Budget Engine entry investigation pending | MethodSpec / Budget Engine | Open | Issue #41 assigns read-only Budget Engine entry investigation outside this vault and forbids patching or creating `budget-generator.ts`, starting integration harness, or marking any line 100 from investigation alone. |
+| Budget Engine entry investigation / resolution report pending | MethodSpec / Budget Engine | Open | Issue #41 assigns read-only Budget Engine entry investigation outside this vault. Issue #49 asks the Budget Engine Entry & Picking Agent to mirror the active resolution report there. PR #47 evidence says `budget-generator.ts`, `demo-generate-budget.ts`, callable `generateBudgetEstimate()`, and an alternative Budget Engine entry are absent on GitHub `main`. Runtime implementation and functional acceptance remain pending. |
+| Minimal dry-run entry authorization pending | MethodSpec / Budget Engine | Open | PR #47 proposes a minimal dry-run Budget Engine entry contract without implementing runtime code and says Commander should decide whether to authorize scoped runtime implementation and placeholder-vs-reviewed deterministic dry-run amounts. This vault must not make that decision. |
 
 ## Support Agent Initialization Gaps
 
