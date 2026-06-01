@@ -43,6 +43,59 @@ GitHub `main` and PR #46 branch currently have identical `code.html` blob SHAs f
 
 This confirms the entry page has no branch-local divergence at patrol time. A scoped link from `code.html` to `owner_guide_mock_runtime.html` is technically feasible, but it remains an `EXECUTION_OFFICER` decision because the current PR evidence intentionally keeps the runtime mock as a standalone page until instructed otherwise.
 
+## 2026-06-01T06:04:34Z Runtime Static Guard
+
+GitHub source-of-truth was checked again during `owner-guide-agent-patrol`.
+
+Current PR state:
+
+- PR: #46 `Add Owner Guide Agent contract`
+- Branch: `app/owner-guide-agent`
+- State: draft and open
+- Current status: `MOCK_READY`
+- WEB_RUNTIME_VERIFIED: No
+- Functional Acceptance PASS: Not claimed
+- 100% complete: Not claimed
+
+GitHub main blackboard still contains the Owner Guide support-agent row with `MOCK_READY` and browser verification pending.
+
+Raw GitHub JSON parse check passed for:
+
+- `docs/owner_guide/examples/owner_intent.sample.json`
+- `docs/owner_guide/examples/project_requirement_brief.placeholder.json`
+- `docs/owner_guide/examples/qa_session.sample.json`
+
+Raw GitHub mock runtime static marker check passed. Required markers were present:
+
+- `ownerAnswer`
+- `sendAnswer`
+- `qaLog`
+- `summary`
+- `nextStepLabel`
+- `ownerIntent`
+- `brief`
+- `NO_REAL_AI_API`
+- `PLACEHOLDER_ONLY`
+
+Forbidden pattern scan found no matches for:
+
+- `fetch(`
+- `XMLHttpRequest`
+- `apiKey`
+- `supabase`
+- `createClient`
+- `localStorage`
+- `indexedDB`
+- `BudgetEstimateLine`
+- `generateBudgetEstimate`
+
+Entry-source comparison was unchanged:
+
+- `main` `code.html`: `1b5001ac60312444671d14724793045f68d4350a`
+- PR branch `code.html`: `1b5001ac60312444671d14724793045f68d4350a`
+
+The next safe runtime action still requires `EXECUTION_OFFICER` direction: either keep `owner_guide_mock_runtime.html` standalone for Deputy review, or wire a scoped entry from `onboard_ai_agent/code.html` before browser verification.
+
 ## Missing Before WEB_RUNTIME_VERIFIED
 
 - The mock runtime evidence page must be opened and tested in a browser/runtime environment.
