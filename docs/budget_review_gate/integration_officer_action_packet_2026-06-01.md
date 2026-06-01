@@ -10,10 +10,18 @@ Source of Truth:
 GitHub repo `laibeoffer/laibe-mvp`
 
 Status:
-ACTION_REQUIRED
+ACTION_REQUIRED / PARTIALLY_EXECUTED
 
 Latest GitHub Main Checked:
-`f42e51ec653b35331e5d91d002276f1722266500`
+`896d5dd21ecedaa0754d2052262cedf67d5be82c`
+
+## Current Update
+
+This packet was first opened when `main` advanced after PR #36. Since then, later GitHub main updates merged some queued governance/status work, including PR #26 and PR #35. The current workstream-specific final report is:
+
+`docs/budget_review_gate/final_completion_report_2026-06-01.md`
+
+For Budget Review Gate itself, PR #37 remains open and not merged. Therefore the GitHub Merge Gate for this workstream is not complete even though the docs-only Functional Acceptance Gate is `NOT_APPLICABLE_DOCS_ONLY`.
 
 ## Trigger
 
@@ -40,7 +48,7 @@ Open PRs requiring refresh, disposition, or explicit hold:
 
 ## Required Integration Officer Disposition
 
-1. Choose the queue order for branch refresh after main `f42e51e`.
+1. Choose the queue order for branch refresh after main updates.
 2. Decide whether PR #35 should be the first governance PR to restore a compact current-state blackboard.
 3. Decide the handling path for PR #31 because Codex review was blocked by usage limits:
    - approve a non-Codex governance review path,

@@ -1,4 +1,41 @@
-﻿# NEXT_CODEX_HANDOFF.md
+# NEXT_CODEX_HANDOFF.md
+
+## Latest Commander Governance Announcement: GitHub Is Shared Work Path
+
+- 本輪任務名稱：Announce GitHub as mandatory shared work path.
+- 任務類型：Documentation / Governance / Commander announcement.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 已完成：
+  - 在黑板 `Current Operating Rules` 公告所有 agents：共同作業路徑一律以 GitHub 為準。
+  - 明確規定 local worktree 只能作為 private staging，不是 shared truth。
+  - 要求原本在本地作業的 agent 透過 scoped branch + PR 同步 GitHub；若無法 push，必須在相關 GitHub Issue / PR 回報 local branch、files、diff evidence。
+  - 明確禁止用 unsynced local work 做決策。
+  - 明確禁止把 unrelated dirty work 一起同步；只能發布該 workstream 授權範圍內的 scoped files。
+- 未修改：功能碼、`src/`、budget engine、Plancraft core、payment / auth / webhook / AI API / DB / secrets。
+- 下一步建議：將此公告同步到治理 PR / Issue，讓 GitHub 端可追蹤。
+
+## Latest Blackboard Rebuild: Compact Current-State Board
+
+- 本輪任務名稱：Rebuild oversized GitHub workstream blackboard.
+- 任務類型：Documentation / Governance.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 已完成：
+  - 將過大的 `docs/WORKSTREAM_BLACKBOARD.md` 重建為 compact current-state board。
+  - 新增 `Blackboard Rebuild Announcement`，宣告黑板不再承載完整 patrol log / chat transcript / heartbeat history。
+  - 保留 active agents、Integration Readiness Gate、`BUDGET_ENGINE_ENTRY_BLOCKER` handoff、Support Agents、Future / Standby Agent Backlog 與 compact update format。
+  - 明確維持 Integration Gate: `WAITING`。
+  - 明確記錄 blocking item：MethodSpec / `BUDGET_ENGINE_ENTRY_BLOCKER`。
+  - 明確記錄 owner：`LAIBE_REVIEWER_INTEGRATION_OFFICER`。
+  - 明確記錄 next：Identify current Budget Engine entry before integration harness。
+- 未修改：`src/`、budget engine、`budget-generator.ts`、MethodSpec / Raw Candidate / Output Documents runtime、Plancraft core、payment / auth / webhook / AI API / DB / secrets。
+- 已知風險：舊黑板正文被 compact board 取代；歷史細節需從 Git history、handoff、phase packet 或 `docs/budget_knowledge_vault/` 查。
+- 下一步建議：後續 agent 只用 compact update format 更新黑板；詳細報告放 handoff、phase packet 或該 workstream 專用文件。
 
 ## Latest Workflow Task: Budget Workflow Orchestrator Alarm Repair Patrol
 

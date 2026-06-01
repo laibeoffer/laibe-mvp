@@ -15,13 +15,17 @@ Repository / branch:
 `laibeoffer/laibe-mvp` / `budget/review-gate`
 
 Status:
-`INITIALIZATION_COMPLETE_PENDING_PR_MERGE`
+`FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE`
 
 ## Mission
 
 The Budget Review Gate Agent defines the gate between candidate evidence and any downstream formal review path. It creates review queue contracts, decision records, approval / rejection / needs-info semantics, and explicit blocked flows so candidate or proposal artifacts cannot silently become formal prices or formal rules.
 
 The gate accepts candidate evidence and proposals from related budget workstreams, records their review state, and preserves provenance. It does not publish formal prices or formal pricing rules.
+
+## Current Closeout Status
+
+As of 2026-06-01, the workstream has submitted its docs-only final report in `final_completion_report_2026-06-01.md` and updated the compact GitHub blackboard. PR #37 is still open, so the GitHub Merge Gate is not complete and Commander final acceptance remains pending.
 
 ## In Scope
 

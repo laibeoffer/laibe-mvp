@@ -37,6 +37,14 @@ export type ReviewStatus =
   | "needs_merge"
   | "deprecated";
 
+export type SourceQualityGrade = "excellent" | "good" | "watch" | "poor" | "blocked";
+
+export type ReviewerChecklistStatus =
+  | "pass"
+  | "warning"
+  | "fail"
+  | "not_applicable";
+
 export type CandidateValidationStatus =
   | "valid_for_review"
   | "needs_more_info"
@@ -214,6 +222,36 @@ export interface CandidateValidationResult {
   errors: string[];
   warnings: string[];
   risk_flags: RawCandidateRiskFlag[];
+}
+
+export interface ReviewerChecklistItem {
+  checklist_code: string;
+  label: string;
+  status: ReviewerChecklistStatus;
+  reason: string;
+  related_risk_flags: RawCandidateRiskFlag[];
+}
+
+export interface SourceQualityAssessment {
+  assessment_id: string;
+  candidate_id: string;
+  source_item_id: string;
+  source_id: string;
+  source_type: RawCatalogSourceType;
+  source_reliability: SourceReliability;
+  source_date: string;
+  quality_score: number;
+  quality_grade: SourceQualityGrade;
+  evidence_completeness_score: number;
+  traceability_score: number;
+  commercial_evidence_score: number;
+  risk_score_penalty: number;
+  reviewer_checklist: ReviewerChecklistItem[];
+  recommended_review_status: ReviewStatus;
+  recommendation_reason: string;
+  formal_price_generated: false;
+  price_authority: RawWarehousePriceAuthority;
+  observed_price_is_evidence_only: true;
 }
 
 export interface CatalogReviewItem {

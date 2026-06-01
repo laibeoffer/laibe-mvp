@@ -46,6 +46,30 @@ If local state differs from GitHub `main`, report:
 
 ## Alarm Repair Log
 
+### 2026-06-01T14:45:01+08:00
+
+Status:
+`ALARM_REPAIR_CHECKED / COMMANDER_FINAL_REPORT_TASK_EXECUTED / COMPACT_BLACKBOARD_UPDATED`
+
+Checked:
+
+- GitHub `main` SHA: `896d5dd21ecedaa0754d2052262cedf67d5be82c`
+- Branch `budget/review-gate` SHA before this repair: `396d8bb6abd0fae063b7803516bbc3f7e4e662ba`
+- PR #37: open, not merged, non-draft
+- Related Integration Officer disposition Issue: #41
+- New compact blackboard rule: PR merge is separate from Functional Acceptance Gate
+
+Repair result:
+
+- Re-ran scoped patrol after Commander final-report dispatch.
+- Refreshed branch against latest GitHub `main`.
+- Updated compact progress report in `docs/WORKSTREAM_BLACKBOARD.md`.
+- Added final completion report for this workstream.
+- Preserved docs-only scope and candidate-to-formal forbidden-flow boundaries.
+
+Next patrol rule:
+Continue checking only GitHub `main`, PR #37, Issue #41, Integration Officer instructions, and `docs/budget_review_gate/`.
+
 ### 2026-06-01T00:35:00+08:00
 
 Status:
