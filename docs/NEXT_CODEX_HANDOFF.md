@@ -1,5 +1,40 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Commander Governance Announcement: No-idle Agent Operations
+
+- 本輪任務名稱：No-idle Agent Operations governance update.
+- 任務類型：Documentation / Governance / Commander operating rules.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 已完成：
+  - 在 GitHub 黑板公告全體 agent 新運作原則：問題先自解；自解不了再升級；升級後不空等；有安全任務就繼續做；上級核准堆積不能成為整體停擺理由。
+  - 新增五種 agent 狀態：`ACTIVE_SOLVING`、`ESCALATED_WAITING_DECISION`、`PARALLEL_SAFE_WORK`、`BLOCKED_NO_SAFE_WORK`、`COMPLETED_PENDING_ARCHIVE`。
+  - 明確區分高風險動作與可自主推進的低風險任務。
+  - 新增 Decision Packet 要求，禁止 agent 只回報 pending approval 後空轉。
+  - 新增黑板治理區塊：`Decision Queue`、`Parallel Safe Work Queue`、`Stalled Agent Watchlist`、`Closeout Queue`。
+  - 明確限制 `本 workstream 本輪無新指派` 的使用條件。
+- 未修改：
+  - `src/`
+  - `app/`
+  - `components/`
+  - Budget Engine runtime
+  - `PricingRule`
+  - `BudgetEstimateLine`
+  - renderer runtime
+  - Plancraft core
+  - payment / auth / webhook / AI API / DB / Supabase / n8n runtime / secrets
+- Integration Gate impact：
+  - 無提升。
+  - `Integration Gate` 仍為 `WAITING`。
+  - `BUDGET_ENGINE_ENTRY_BLOCKER` 仍由 `budget/engine-entry-picking` 處理，並由 `LAIBE_PATROL_INTEGRATION_OFFICER` 監管。
+- Functional Acceptance：
+  - `NOT_APPLICABLE_DOCS_ONLY`
+  - This governance update does not prove runtime completion and must not increase feature progress.
+- 下一步：
+  - Agents with pending decisions must keep safe work moving and report via the new queues instead of idling.
+
 ## Latest Commander Governance Announcement: GitHub Is Shared Work Path
 
 - 本輪任務名稱：Announce GitHub as mandatory shared work path.

@@ -16,6 +16,8 @@ This file is the compact GitHub blackboard for current LaiBE MVP coordination. I
 - Product direction, formal payment/auth/webhook/AI API, formal pricing, formal Excel/PDF, production secrets, and material business decisions still require user decision.
 - Do not modify payment, auth, webhook, `.env`, secrets, production AI API, real DB, or production payment flows.
 - Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER`, not by Commander.
+- No-idle operating rule: problems are solved by the owning agent first; unresolved decisions are escalated with a decision packet; while waiting, agents must continue safe parallel work instead of idling.
+- Pending approvals must not stop unrelated safe progress. `本 workstream 本輪無新指派` is allowed only when initialization is complete, no open PR / Issue / blocker / evidence gap exists, and the supervisor has confirmed standby.
 
 ## Completion Rules
 
@@ -30,6 +32,75 @@ Docs/governance/blackboard/handoff-only PRs must be marked:
 `Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY`
 
 They must not increase runtime or feature progress.
+
+## No-idle Agent Operation Rules
+
+Core sentence for all agents:
+
+問題先自解。自解不了再升級。升級後不空等。有安全任務就繼續做。上級核准堆積不能成為整體停擺理由。
+
+Agent states:
+
+| State | Meaning | Required Behavior |
+|---|---|---|
+| `ACTIVE_SOLVING` | Agent is actively solving a known task or evidence gap. | Continue work inside allowed scope and report evidence. |
+| `ESCALATED_WAITING_DECISION` | A decision packet has been sent to a supervisor. | Do not idle; switch to `PARALLEL_SAFE_WORK`. |
+| `PARALLEL_SAFE_WORK` | Agent is doing safe work while waiting for a decision. | Prepare docs, evidence, validation lists, replacement PR drafts, or status matrices. |
+| `BLOCKED_NO_SAFE_WORK` | No safe work remains and the next step is high-risk. | Rare state; must include who is blocking, what is needed, options, risks, and next report time. |
+| `COMPLETED_PENDING_ARCHIVE` | Work is complete and waiting for closeout / archive. | Stop broad edits; only respond to closeout or evidence requests. |
+
+High-risk actions requiring explicit authorization:
+
+- Merge PR, close Issue, resolve review thread, git clean / reset / rebase / force push, publish a full local worktree, modify functional code, modify Budget Engine runtime, create or modify `PricingRule`, create or modify `BudgetEstimateLine`, connect payment / AI API / DB / Supabase / n8n runtime / production webhook, generate formal price or formal quote, start integration harness, promote placeholder to production, or mark docs-only work as runtime verified.
+
+Safe autonomous work:
+
+- Read-only GitHub main checks, single PR / Issue status checks, docs-only contracts, Final Completion Packet drafts, Functional Acceptance Reports, blocker decision packets, forbidden-scope checklists, validation command lists, handoff contracts, blackboard status proposals, replacement PR drafts without merge, evidence整理, decision logs, mock / placeholder docs, and workstream scope-clean reports.
+
+Decision Packet required before waiting:
+
+| Section | Required Content |
+|---|---|
+| Decision Needed | Who must decide what. |
+| Options | A / B / C options. |
+| Recommendation | Agent recommendation. |
+| Risk | Risk of each option. |
+| Safe Work While Waiting | Safe work the agent will continue. |
+| Next Report Time | When the agent will report again. |
+
+## Decision Queue
+
+| Decision | Owner | Requested By | Options | Recommendation | Waiting Since | Safe Work While Waiting |
+|---|---|---|---|---|---|---|
+| Plan Puzzle Tool Catalog / interaction implementation authorization | Deputy Commander | Plan Puzzle UI | Authorize / request more runtime evidence / defer | Defer until current PR lineage and runtime evidence are clean | 2026-06-01 | Prepare interaction checklist and browser validation plan. |
+| Quote Factory PR #3 final acceptance path | Deputy Commander + Reviewer as needed | Quote Factory | Merge after evidence / request GitHub-run validators / keep draft | Request GitHub-run validation evidence before 100% | 2026-06-01 | Maintain export manifest, validator list, and final packet draft. |
+| Raw Candidate final gate acceptance | Patrol Integration Officer, then Deputy Commander if needed | Raw Candidate | Accept final packet / request more evidence / keep 95% | Integration Officer reviews final packet first | 2026-06-01 | Keep R1.5 evidence matrix and forbidden-flow checklist ready. |
+
+## Parallel Safe Work Queue
+
+| Agent | Workstream | Safe Work | Status | Next Report |
+|---|---|---|---|---|
+| 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | Prepare dry-run entry decision evidence and forbidden-flow checklist for Issue #49. | `ACTIVE_SOLVING` | Next heartbeat / Issue #49 update |
+| Budget Workflow Orchestrator | `workflow/budget-orchestrator` | Prepare docs-only replacement or sync plan for PR #51; do not enable n8n / webhook. | `PARALLEL_SAFE_WORK` | Next integration officer closeout review |
+| Budget Knowledge Vault | `knowledge/budget-vault` | Prepare docs-only sync / closeout evidence for PR #32 under Integration Officer. | `PARALLEL_SAFE_WORK` | Next integration officer closeout review |
+| Owner Guide Agent | `app/owner-guide-agent` | Continue standalone mock evidence and browser validation notes while routing decision waits. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
+| Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | Continue contract evidence and browser/runtime validation preparation; do not claim 100%. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
+
+## Stalled Agent Watchlist
+
+| Agent | Reason | Required Next Action | Supervisor |
+|---|---|---|---|
+| Budget Workflow Orchestrator | PR #51 docs-only but `mergeable=false`. | Prepare safe current-main sync or replacement PR proposal; do not rebase / force push without authorization. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
+| Budget Knowledge Vault | PR #32 docs-only but `mergeable=false`. | Prepare safe current-main sync or replacement PR proposal; do not replace Integration Gate evidence. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
+| MethodSpec | `BUDGET_ENGINE_ENTRY_BLOCKER`. | Wait for Issue #49 result while maintaining MethodSpec evidence; do not self-repair Budget Engine. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
+
+## Closeout Queue
+
+| Agent | Status | Evidence | Archive Condition |
+|---|---|---|---|
+| Budget Review Gate | `COMPLETED_PENDING_ARCHIVE` | PR #37 merged; docs-only support closeout. | Integration Officer confirms archive / standby and no further closeout work. |
+| Budget E2E Fixture & QA | `COMPLETED_PENDING_ARCHIVE` | PR #48 merged; docs-only support closeout. | Integration Officer confirms archive / standby and no further closeout work. |
+| 平面拼圖 Adapter | `COMPLETED_PENDING_ARCHIVE` | PR #9 merged; candidate adapter contract only. | Commander archive PR can move it to Archived Agents without affecting full Plancraft+ progress. |
 
 ## Active Agent Progress Board
 
