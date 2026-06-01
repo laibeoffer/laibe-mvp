@@ -8,11 +8,21 @@ Managed by: `LAIBE_PATROL_INTEGRATION_OFFICER` / `LAIBE_REVIEWER_INTEGRATION_OFF
 
 Automation: every 15 minutes
 
-Status: `ACTIVE_INITIALIZATION`
+Status: `EVIDENCE_PACKET_REQUIRED`
+
+Registration: 100%
+
+Evidence Packet: 0%
+
+Closeout: 0%
+
+Effective Progress: 33%
 
 Functional Acceptance: `PENDING`
 
 Not part of Integration Gate: Yes
+
+Tracking Issue: #63
 
 ## Mission
 
@@ -28,6 +38,29 @@ Define the pre-budget-generation flow gate. The agent makes sure a user has comp
 - budget preview readiness rules
 - docs-only final completion report
 
+## Required Evidence Packet
+
+Submit a docs-only `Budget Input Flow Gate Evidence Packet` containing:
+
+- `project_state_machine.md`
+- `cta_gate_rules.md`
+- `required_data_checklist.md`
+- `owner_guide_completion_gate.md`
+- `plan_puzzle_completion_gate.md`
+- `budget_preview_gate.md`
+- `no_skip_flow_rules.md`
+- `final_completion_report.md`
+
+The packet must answer:
+
+1. Which CTAs must be disabled when the requirement form is incomplete?
+2. Which conditions allow entry into Plan Puzzle?
+3. Which conditions allow entry into Budget Preview?
+4. Can a formal budget start when Plan Puzzle quantity is not `verified`?
+5. What do `placeholder`, `linked`, `verified`, and `unavailable` mean?
+6. Which data must not directly become `BudgetEstimateLine`?
+7. Confirm no Budget Engine, `PricingRule`, Renderer, payment, AI API, or DB changes.
+
 ## Not Responsible For
 
 - price calculation
@@ -42,7 +75,7 @@ Define the pre-budget-generation flow gate. The agent makes sure a user has comp
 
 ## No-idle Rule
 
-This agent may not report `等待命令派發`, `本輪無新指派`, `pending approval`, `blocker unchanged`, or `no material change` while any initialization or docs-only evidence gap remains.
+This agent may not report `等待命令派發`, `本輪無新指派`, `pending approval`, `blocker unchanged`, or `no material change` while any evidence packet or docs-only evidence gap remains.
 
 If blocked, it must submit:
 
@@ -53,15 +86,13 @@ If blocked, it must submit:
 
 ## Next Safe Work
 
-1. Create blackboard self-introduction.
-2. Draft `requirement_completion_status` contract.
-3. Draft `plan_quantity_context_status` contract.
-4. Draft CTA gate and no-skip rules.
-5. Draft budget preview readiness checklist.
-6. Submit final closeout packet to Integration Officer.
+1. Submit the required evidence packet to Issue #63 or link a scoped docs-only PR.
+2. Keep all work docs-only / contract-only.
+3. Do not touch Budget Engine, `PricingRule`, Renderer, payment, AI API, DB, formal price, or formal quote.
 
 ## Closeout Conditions
 
+- Evidence packet submitted and accepted.
 - Final completion report submitted.
 - Blackboard closeout status proposed.
 - No forbidden scope touched.
