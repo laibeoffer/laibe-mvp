@@ -46,12 +46,12 @@ A patrol must not wait for a new instruction when a safe documentation backlog i
 
 ## Latest Heartbeat Patrol Snapshot
 
-- checked_at: 2026-06-01T18:57:06+08:00
+- checked_at: 2026-06-01T19:45:39+08:00
 - source_checked: GitHub PR #32, PR #31, PR #47, Issue #41, Issue #49, and local vault index / automation docs.
-- PR #32: open, mergeable, not merged, head at patrol start `b0be275d3c419d26a48e81fd46da881c70889ba8`; no PR comments or review threads found.
-- PR #31: open, not merged, related boundary context only; GitHub reports mergeable false and no review threads found.
-- PR #47 / Issue #49: `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal and belongs to `budget/engine-entry-picking`, not this vault.
-- Issue #41: latest scoped vault-relevant signal remains the docs-only PR #37 final-report status plus the continuing rule that Budget Knowledge Vault is support-only and not part of the four-line Integration Gate.
+- PR #32: open, GitHub reports mergeable false, not merged, head at patrol start `d5496b326c7f93c0fbd73303e17232b7438a7cfc`; no PR comments or review threads found.
+- PR #31: open, not merged, related boundary context only; GitHub reports mergeable false and no review threads found. Latest scoped disposition signal remains issue comment `4587422644`.
+- PR #47 / Issue #49: PR #47 is open and GitHub reports mergeable true; `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal and belongs to `budget/engine-entry-picking`, not this vault.
+- Issue #41: latest scoped vault-relevant signal remains the docs-only PR #37 final-report status plus the continuing rule that Budget Knowledge Vault is support-only and not part of the four-line Integration Gate; no vault execution assignment found.
 - Vault action: refreshed automation-visible patrol state only; no implementation files touched and no gate decision made.
 
 ## Active Work Queue
@@ -59,7 +59,7 @@ A patrol must not wait for a new instruction when a safe documentation backlog i
 | Item | Status | Allowed Vault Action | Forbidden Action |
 |---|---|---|---|
 | PR #31 boundary PR | Open / review signal pending | Track review usage-limit and Commander conditional input as non-decision signals. | Do not merge, close, approve, reject, or dispatch. |
-| PR #32 initialization PR | Open / mergeable | Keep PR current, keep support docs accurate, track comments and Integration Officer instructions. | Do not merge without authority and do not change implementation files. |
+| PR #32 initialization PR | Open / GitHub mergeable=false | Keep PR current, keep support docs accurate, track comments, review threads, mergeability, and Integration Officer instructions. | Do not merge without authority and do not change implementation files. |
 | Four core evidence summaries | Evidence pending for unresolved core lines | Update summaries only from scoped reports, final packets, PR comments, or Integration Officer instructions. | Do not patrol unrelated project areas or replace core agent completion packets. |
 | Requirement / SVG context windows | Placeholder until linked / verified evidence exists | Maintain status labels and trace fields. | Do not convert requirements, SVG, or candidate quantities into formal price, estimate line, renderer input, or quote. |
 
