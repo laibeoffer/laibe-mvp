@@ -11,6 +11,7 @@ Role in integration: snapshot-only output / renderer document boundary.
 - Snapshot-only integration usage note exists.
 - Static guard is valid.
 - No real xlsx/pdf output.
+- Issue #49 reports Output Documents does not directly rely on `budget-generator.ts`; PR #29 remains valid as snapshot-only guidance, and the blocker is upstream because no current engine entry can create the snapshot-compatible dry-run input.
 
 ## Evidence To Preserve
 
@@ -21,6 +22,7 @@ Role in integration: snapshot-only output / renderer document boundary.
 ## Blockers / Missing
 
 - PR #29 not recorded here as merged.
+- Upstream Budget Engine entry is still missing, so no new snapshot-compatible dry-run input can be claimed from this vault.
 
 ## Next
 
