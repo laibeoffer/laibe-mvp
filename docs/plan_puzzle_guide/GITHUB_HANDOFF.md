@@ -9,9 +9,10 @@ Plan Puzzle Guide Agent initialization contract and compact blackboard evidence 
 ## Source Of Truth
 
 - Formal repo: `laibeoffer/laibe-mvp`.
-- Current consolidation branch: `codex/plan-puzzle-guide-blackboard-evidence`.
-- Current consolidation PR: `https://github.com/laibeoffer/laibe-mvp/pull/44`.
-- Older draft PR: `https://github.com/laibeoffer/laibe-mvp/pull/40` remains open and should be treated as superseded or reconciled after PR #44 review.
+- Current consolidation branch: `codex/plan-puzzle-guide-init-main-sync`.
+- Current consolidation PR: `https://github.com/laibeoffer/laibe-mvp/pull/50`.
+- Older draft PR #44 remains open for traceability, but is not the current-main merge path after `main` moved.
+- Older draft PR #40 remains open for traceability and should be treated as superseded or reconciled after PR #50 review.
 - Formal delivery path: GitHub branch / PR.
 - Local `Z:\laibe_project`: `LOCAL_STATE` only, not formal delivery.
 
@@ -48,12 +49,12 @@ None.
 - Defined `PlanPuzzleQuantityFacts`, `plan_quantity_facts_id`, `svg_artifact_id`, and `quantity_context_status`.
 - Defined SVG / zone / area / wall length / opening count receiving windows using `placeholder` / `linked` / `verified`.
 - Added placeholder JSON example.
-- Updated compact blackboard evidence on PR #44 so it no longer treats local or stale main wording as completion evidence.
+- Updated compact blackboard evidence on PR #50 so it identifies the current-main docs-only PR and does not treat local workspace as completion evidence.
 
 ## Not Completed
 
-- PR #44 is not merged to `main`.
-- PR #40 remains open and needs a Commander / maintainer decision after PR #44 review.
+- PR #50 is not merged to `main`.
+- PR #40 and PR #44 remain open and need a Commander / maintainer decision after PR #50 review.
 - No runtime mock panel has been wired.
 - No browser/runtime verification has been completed.
 - No `MOCK_READY` or `WEB_RUNTIME_VERIFIED` claim is made.
@@ -77,11 +78,11 @@ Runtime status:
 
 ## GitHub Branch / PR Status
 
-- Branch: `codex/plan-puzzle-guide-blackboard-evidence`.
-- PR: `https://github.com/laibeoffer/laibe-mvp/pull/44`.
+- Branch: `codex/plan-puzzle-guide-init-main-sync`.
+- PR: `https://github.com/laibeoffer/laibe-mvp/pull/50`.
 - PR state: open draft, not merged.
 - Scope check: docs-only under `docs/plan_puzzle_guide/` plus compact `docs/WORKSTREAM_BLACKBOARD.md` correction.
 
 ## Next GitHub Action Needed
 
-Review PR #44 through normal gates, then decide whether PR #40 should be closed, superseded, or reconciled. Continue with a narrow mock runtime task only after the docs contract is accepted or merged and only if it stays front-end local, placeholder-only, GitHub-tracked, and does not touch forbidden systems. The next safe runtime target remains a minimal facts panel in `preview_floor_plan` that exposes `PlanPuzzleQuantityFacts` without calling Budget Engine or renderer.
+Review PR #50 through normal gates, then decide whether PR #40 and PR #44 should be closed, superseded, or reconciled. Continue with a narrow mock runtime task only after the docs contract is accepted or merged and only if it stays front-end local, placeholder-only, GitHub-tracked, and does not touch forbidden systems. The next safe runtime target remains a minimal facts panel in `preview_floor_plan` that exposes `PlanPuzzleQuantityFacts` without calling Budget Engine or renderer.
