@@ -1,0 +1,33 @@
+{
+  "schema_name": "BudgetRunPlan",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "placeholder",
+  "budget_run_plan_id": "budget_run_plan_example_001",
+  "budget_input_bundle_id": "budget_input_bundle_example_001",
+  "project_id": "project_example_001",
+  "source_agent": "budget/schema-registry",
+  "run_mode": "dry_run_planning_only",
+  "run_status": "blocked",
+  "planned_steps": [
+    {
+      "step_id": "select_budget_engine_entry",
+      "status": "unavailable",
+      "owner": "budget/engine-entry-picking"
+    },
+    {
+      "step_id": "validate_method_spec_catalog",
+      "status": "unavailable",
+      "owner": "warehouse/method-spec"
+    },
+    {
+      "step_id": "generate_snapshot",
+      "status": "unavailable",
+      "owner": "output/budget-documents"
+    }
+  ],
+  "blocked_reasons": ["Budget Engine entry blocker remains unresolved", "This registry does not execute runtime"],
+  "formal_price_generated": false,
+  "formal_quote_generated": false,
+  "warnings": ["BudgetRunPlan is not permission to run the integration harness."],
+  "forbidden_use": ["start_integration_harness", "generate_formal_price", "generate_formal_quote", "renderer_output"]
+}
