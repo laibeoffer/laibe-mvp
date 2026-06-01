@@ -42,7 +42,7 @@ They must not increase runtime or feature progress.
 | MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context / Issue #49 dependency | Integration readiness evidence and context windows exist | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` now routed to `budget/engine-entry-picking` | No unless product decision is needed | Integration Officer investigation required | Wait for Budget Engine Entry / Picking Agent report |
 | 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | `laibeoffer/laibe-mvp` | 25 | ACTIVE_INVESTIGATION | Issue #49 | Issue #49 created for Budget Engine Entry active resolution; asks for `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run entry proposal | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER`; entry path/export not yet identified | No unless product/formal-output boundary is found | Yes only if forbidden flow or ownership dispute appears | Report entry existence and minimal dry-run proposal; do not modify functional code |
 | Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PENDING | PR #29 merge / final evidence pending | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final static guard and snapshot-only evidence |
-| 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | NOT_APPLICABLE_DOCS_ONLY for governance; runtime not complete | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
+| 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged / PR #33 open nonmergeable status PR | Governance docs / prompt / sandbox rules merged; PR #33 is docs-only status-registration evidence and does not prove runtime; no real image API | NOT_APPLICABLE_DOCS_ONLY for governance; runtime not complete | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Reported progress to Second Deputy Commander; pause unless visual policy changes |
 | Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 85 | GOVERNANCE_DOCS_MERGED | PR #35 merged / Issue #28 | PR #35 merged as compact blackboard rebuild; GitHub source-of-truth and merge-decision authority recorded | NOT_APPLICABLE_DOCS_ONLY | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
 | 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate / Issue #41 / Issue #49 | Four budget lines not all 100; Budget Engine entry investigation dispatched to Issue #49 | PENDING | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Receive Issue #49 result; do not start integration harness |
 
@@ -155,3 +155,16 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No unless product/formal-output boundary is found.
 - Need Reviewer: Yes only if forbidden flow or ownership dispute appears.
 - Next single action: report `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run proposal.
+
+### 2026-06-01 - Visual Simulation Progress Report To Second Deputy Commander
+
+- Agent: 模擬圖生成 / LAIBE_VISUAL_SIM
+- Workstream: `visual/simulation-governance`
+- Status: `READY_CONTEXT_ONLY`
+- Progress %: 75
+- Evidence: PR #24 is merged (`cf170e248a48be2df43f6cd6e6db0ef956cd5658`) for governance docs / prompt / sandbox rules. PR #33 remains open/nonmergeable as docs-only status-registration evidence and is not runtime acceptance. GitHub main `896d5dd21ecedaa0754d2052262cedf67d5be82c` compact board checked; no new scoped visual brief / prompt / sandbox governance task found.
+- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY for governance; web/runtime/image API completion not proven.
+- Blocker: Runtime / production image API is outside current readiness; real image API, reference upload, production assets, Plancraft geometry, budget official data, renderer, payment, and secrets remain forbidden.
+- Need Commander: No unless deciding real image/API direction, visual placement, or product runtime direction.
+- Need Reviewer: No by default.
+- Next single action: Pause unless visual policy changes or a new scoped visual brief / prompt / sandbox governance task is dispatched.
