@@ -28,6 +28,15 @@ This queue is used when there is no new instruction. The agent must advance safe
 | 4 | Requirement / SVG context windows | Placeholder metadata exists. | Keep status labels explicit until linked / verified evidence exists. |
 | 5 | Proposal registers | Initial proposal files exist. | Keep proposals non-binding and route any rule / pricing implications to Integration Officer review. |
 
+## Latest Scoped Snapshot
+
+- checked_at: 2026-06-01T17:05:58+08:00
+- PR #32: open, mergeable, head `844e04ec1ead03a6335b490962c07e7d5d7b8cd6`, no comments or review threads found in scoped patrol.
+- PR #31: open, not merged, related boundary context only, no review threads found in scoped patrol.
+- PR #47 / Issue #49: `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal for `budget/engine-entry-picking`; this vault only mirrors the signal.
+- Issue #41: latest scoped signal remains Budget Review Gate PR #37 docs-only final-report status; no vault execution assignment found.
+- Active vault work: keep PR #32 current, maintain support-only evidence, and do not touch runtime code or Integration Gate decisions.
+
 ## Allowed Outputs
 
 - status summary
