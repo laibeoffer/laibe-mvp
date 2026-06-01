@@ -11,6 +11,22 @@ Target files for future GitHub source-of-truth verification:
 - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
 - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
 
+## Read-Only GitHub Evidence
+
+Checked against GitHub `main` on 2026-06-01 during `plan-puzzle-guide-agent-patrol`.
+
+Observed keyword evidence:
+
+- `code.html`: contains existing PDF, zone, opening, calibration, scale, `.pc`, and budget CTA related UI text / hooks.
+- `plan-puzzle.js`: contains `window.laibePlanPuzzleProject` and `window.laibePlancraftPlusProject` exports plus existing PDF, zone, opening, calibration, scale, `.pc`, and budget CTA related logic.
+- `PlanPuzzleQuantityFacts`: not present in either runtime file on GitHub `main`.
+
+Interpretation:
+
+- The current runtime already has plan-puzzle interaction concepts that can support a future mock facts surface.
+- The current runtime does not yet expose the Plan Puzzle Guide placeholder contract.
+- No runtime file was modified by this docs-only PR.
+
 ## Expected Existing Page Capabilities
 
 Based on current project context, the existing page should include:
