@@ -1,0 +1,45 @@
+{
+  "brief_id": "prb-dryrun-001",
+  "source_system": "placeholder_project_requirement_brief",
+  "schema_version": "0.1-dry-run",
+  "dry_run_only": true,
+  "formal_price_generated": false,
+  "formal_quote_generated": false,
+  "production_write_allowed": false,
+  "external_io_allowed": false,
+  "project_context": {
+    "project_type": "interior-renovation-placeholder",
+    "site_region": "dry-run-region",
+    "currency": null,
+    "currency_authority": "none"
+  },
+  "requirement_facts": [
+    {
+      "fact_id": "req-fact-001",
+      "category": "surface_work",
+      "label": "wall finish refresh",
+      "authority": "placeholder_requirement_dry_run_only",
+      "may_inform": ["assumption_summary", "warning_summary"],
+      "must_not_inform": ["BudgetEstimateLine", "formal_price", "formal_quantity"]
+    },
+    {
+      "fact_id": "req-fact-002",
+      "category": "fixture_scope",
+      "label": "lighting fixture review requested",
+      "authority": "placeholder_requirement_dry_run_only",
+      "may_inform": ["assumption_summary", "warning_summary"],
+      "must_not_inform": ["BudgetEstimateLine", "PricingRule", "formal_price"]
+    }
+  ],
+  "owner_text_raw": {
+    "text": "Owner asks for a rough renovation scope. This is raw free text and must not become a budget line.",
+    "language": "en",
+    "allowed_use": ["assumption_context", "warning_summary"],
+    "forbidden_use": ["BudgetEstimateLine", "PricingRule", "formal_price"]
+  },
+  "assumption_flags": [
+    "placeholder_input",
+    "dry_run_only",
+    "not_formal_requirement_authority"
+  ]
+}

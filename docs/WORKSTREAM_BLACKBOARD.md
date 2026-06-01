@@ -95,8 +95,63 @@ Forbidden:
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
+| 預算 E2E 驗收測試 / Budget E2E Fixture & QA Agent | `budget/e2e-fixture-qa` | `LAIBE_PATROL_INTEGRATION_OFFICER` | ACTIVE_INITIALIZATION | 25 | Yes | Defines dry-run E2E fixtures, expected snapshot contract, acceptance matrix, forbidden-flow QA checks, and final QA report template. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
+
+## Agent Self-Introduction: Budget E2E Fixture & QA Agent
+
+Agent:
+預算 E2E 驗收測試 Agent
+Budget E2E Fixture & QA Agent
+
+Workstream:
+`budget/e2e-fixture-qa`
+
+Managed By:
+`LAIBE_PATROL_INTEGRATION_OFFICER`
+
+Repo / Branch:
+`laibeoffer/laibe-mvp / budget/e2e-fixture-qa`
+
+Status:
+`ACTIVE_INITIALIZATION`
+
+Automation:
+`budget-e2e-fixture-qa-patrol / every 15 minutes`
+
+No-Idle Rule:
+After blackboard self-introduction, if no response is received within 20 minutes, this agent must automatically continue initialization tasks. It may not report `本 workstream 本輪無新指派` until initialization is complete.
+
+Role:
+建立預算生成 dry-run E2E fixtures、驗收矩陣、預期輸出、禁止資料流檢查與 final acceptance checklist，支援整合官驗收 Budget Integration Harness。
+
+Primary Outputs:
+- E2E fixture plan
+- dry-run fixture set contract
+- expected output snapshot contract
+- acceptance matrix
+- forbidden flow QA checklist
+- regression checklist
+- final QA report template
+
+Not Responsible For:
+- implementing Budget Engine
+- running production integration
+- approving prices
+- modifying PricingRule
+- modifying MethodSpec
+- modifying renderer runtime
+- n8n runtime
+- payment
+- AI API
+- DB / Supabase
+
+Need Commander:
+No，除非要決定正式驗收標準或 production release。
+
+Need Reviewer:
+Yes before final integration harness acceptance.
 
 ## Future / Standby Agent Backlog
 

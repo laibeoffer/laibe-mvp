@@ -1,0 +1,46 @@
+{
+  "facts_id": "pqf-dryrun-001",
+  "source_system": "placeholder_plan_puzzle_quantity_facts",
+  "schema_version": "0.1-dry-run",
+  "dry_run_only": true,
+  "formal_price_generated": false,
+  "formal_quote_generated": false,
+  "production_write_allowed": false,
+  "external_io_allowed": false,
+  "quantity_authority": "placeholder_dry_run_only",
+  "source_plan_artifacts": [
+    {
+      "artifact_id": "plan-artifact-placeholder-001",
+      "artifact_type": "plan_puzzle_export",
+      "contains_svg_reference": true,
+      "allowed_use": ["trace_preview", "dry_run_formula_exercise"],
+      "forbidden_use": ["SVG_to_Renderer", "SVG_to_formal_quantity"]
+    }
+  ],
+  "quantity_facts": [
+    {
+      "fact_id": "qty-fact-001",
+      "label": "placeholder wall surface area",
+      "unit": "m2",
+      "value": 18.2,
+      "authority": "placeholder_dry_run_only",
+      "formal_quantity": false,
+      "allowed_use": ["dry_run_formula_exercise", "internal_trace_preview"],
+      "forbidden_use": ["formal_quantity", "formal_BudgetEstimateLine"]
+    },
+    {
+      "fact_id": "qty-fact-002",
+      "label": "placeholder light fixture count",
+      "unit": "each",
+      "value": 3,
+      "authority": "placeholder_dry_run_only",
+      "formal_quantity": false,
+      "allowed_use": ["dry_run_formula_exercise", "internal_trace_preview"],
+      "forbidden_use": ["formal_quantity", "formal_BudgetEstimateLine"]
+    }
+  ],
+  "warnings": [
+    "Values are placeholders for E2E dry-run only.",
+    "SVG references must not be used as renderer input or formal quantity authority."
+  ]
+}
