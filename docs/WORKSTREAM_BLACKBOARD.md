@@ -1,8 +1,176 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 19:24 Asia/Taipei
+Last updated: 2026-06-01 20:38 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
+
+## PR #50 Reviewer and Commander Acceptance Packet - Plan Puzzle Guide Agent
+
+- Task: `Plan Puzzle Guide Agent - Reviewer Packet and Commander Acceptance Packet`
+- Task type: `Self-assigned safe task / Documentation / Acceptance Preparation`
+- To: `SECOND_DEPUTY_COMMANDER`
+- From: `Plan Puzzle Guide Agent`
+- Workstream: `app/plan-puzzle-guide-agent`
+- Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50
+- PR URL: `https://github.com/laibeoffer/laibe-mvp/pull/50`
+- Current PR head observed before this packet: `54dfe4e850abe4c03211d693a156883da116904f`
+- Runtime mock commit: `7ee50f60a464718bb7a13661a77f64229679466c`
+- Browser validation: `PASSED_EXTERNAL`
+- Agent status: `SELF_ASSIGNED_SAFE_TASK_COMPLETED`
+- Functional acceptance status: `READY_FOR_COMMANDER_ACCEPTANCE_REVIEW`
+- Merge readiness: `READY_FOR_REVIEW_AFTER_COMMANDER_AND_REVIEWER_ACK`
+- Browser blocker: `cleared`
+- Remaining blocker: `PR still open draft / GitHub connector reports mergeable:false / Commander and Reviewer acknowledgement still needed`
+- lastSelfAdvanceAt: `2026-06-01 20:38 Asia/Taipei`
+- workCanContinue: `true`
+
+### Browser Validation Evidence
+
+Evidence source: external browser validation result reported by Commander / user in the Codex thread.
+
+- Page loaded successfully: `Yes`
+- Console error count: `0`
+- Guide UI exists: `Yes`
+- Required interactions passed: `Yes`
+- Forbidden call found: `No`
+- Guide-related fields confirmed by source scan: `Yes`
+
+Local static re-check performed after receiving external evidence:
+
+- `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS
+- Forbidden-call source scan:
+  - `fetch(`: no match
+  - `XMLHttpRequest`: no match
+  - `OpenAI` / `OPENAI`: no match
+  - `apiKey` / `api_key`: no match
+  - `generateBudgetEstimate`: no match
+  - `formalEstimateGuard`: no match
+  - `BudgetEngine`: no match
+
+### Reviewer Packet
+
+Review scope:
+
+- Runtime draft JSON shape changed in `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`.
+- UI surface changed in `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`.
+- Documentation / coordination packet changed under `docs/`.
+
+Guide data model:
+
+- `project.guide`
+  - Local guide state: enabled flag, mode, API-backed flag, disclaimer state, current step, completed steps, pending suggestions, last update time.
+- `project.guideLog`
+  - Conversation and system records with role, type, text, layer, selected object metadata, related reminder IDs, timestamp, and saved-to-requirements marker.
+- `project.requirementNotes`
+  - Guide-sourced requirement notes with category, layer, related object, priority, include-in-summary flag, and timestamp.
+- `project.guideSummary`
+  - Generated summary buckets: user intent, uncertainties, budget-relevant notes, contractor questions, generated timestamp.
+- `project.PlanPuzzleQuantityFacts`
+  - Placeholder-only facts object for receiving windows and context; not production quantity or pricing data.
+
+Safety interpretation:
+
+- `guideLog` is a conversation/demand record, not Budget Engine input.
+- `requirementNotes` are requirement notes, not formal quantities.
+- `guideSummary` is an owner/contractor communication summary, not an estimate.
+- `PlanPuzzleQuantityFacts` is local placeholder context only.
+- `PlanPuzzleQuantityFacts.budgetInputEligible === false`.
+- `PlanPuzzleQuantityFacts.formalEstimateAllowed === false`.
+- `PlanPuzzleQuantityFacts.productionReady === false`.
+
+Reviewer checklist:
+
+- Confirm no Budget Engine call was introduced.
+- Confirm no `generateBudgetEstimate()` path was introduced.
+- Confirm no `formalEstimateGuard` change was introduced.
+- Confirm no AI API / OpenAI API / image API call was introduced.
+- Confirm no package / framework / `node_modules` change was introduced.
+- Confirm guide data remains draft JSON context only.
+- Confirm external browser evidence is acceptable for UI smoke validation.
+
+### Commander Acceptance Packet
+
+Completed in PR #50:
+
+- Right-side `平面拼圖引導官` runtime mock.
+- Local rule-based FAQ / guide knowledge.
+- Step-based homeowner guide flow.
+- `guideLog`, `requirementNotes`, and `guideSummary` draft JSON records.
+- Placeholder `PlanPuzzleQuantityFacts` with SVG / zone / area / wall length / opening count receiving windows.
+- External browser validation evidence now available: page loads, console error = 0, guide UI and required interactions pass.
+
+Commander decisions requested:
+
+- Accept external browser validation as PR #50 functional smoke evidence.
+- Decide whether PR #50 can leave draft and enter formal review.
+- Confirm MVP product direction: local rule-based guide is acceptable for this phase; no true LLM / AI API integration.
+- Confirm guide/facts data may remain in draft JSON as context records, not formal quote or Budget Engine input.
+
+Commander acceptance recommendation:
+
+- Browser validation blocker is cleared.
+- PR #50 is ready for Commander acceptance review and Reviewer safety review.
+- Merge should still wait until PR is no longer draft, GitHub mergeability is green, and Reviewer acknowledges the data-model/export boundary.
+
+### Merge Readiness Checklist
+
+- [x] Runtime mock implemented.
+- [x] External browser page load passed.
+- [x] External browser console error count is 0.
+- [x] Guide UI exists.
+- [x] Required interactions passed.
+- [x] Forbidden runtime/API calls not found in source scan.
+- [x] Guide fields confirmed by source scan.
+- [x] `node --check` passed.
+- [x] No Plancraft core change.
+- [x] No Budget Engine / budget runtime change.
+- [x] No AI API / image API / OpenAI API.
+- [x] No package / `node_modules` change.
+- [ ] PR #50 is no longer draft.
+- [ ] GitHub connector reports mergeable:true.
+- [ ] Reviewer acknowledges draft JSON/export shape.
+- [ ] Commander accepts functional direction and evidence.
+
+### Remaining Risks
+
+- PR #50 still reports `mergeable:false` from GitHub connector and remains draft.
+- Browser evidence is externally reported, not produced by Codex in-app Browser.
+- Runtime model adds draft JSON fields, so downstream code must continue treating them as context-only data.
+- Existing blackboard contains older historical entries that may still mention prior pending-browser state; this top packet supersedes them.
+
+### Next Issue Draft
+
+Title: `Plan Puzzle Guide follow-up: acceptance hardening after PR #50 review`
+
+Body draft:
+
+```md
+## Goal
+
+After PR #50 review, harden the Plan Puzzle Guide MVP without expanding scope into Budget Engine, AI API, backend, or production storage.
+
+## Proposed Scope
+
+- Address Commander / Reviewer comments from PR #50.
+- Add small UI copy corrections if needed.
+- Add source-level safeguards or comments clarifying that guideLog, requirementNotes, guideSummary, and PlanPuzzleQuantityFacts are context-only.
+- Add an optional manual smoke-test note if Reviewer requests it.
+
+## Out of Scope
+
+- No LLM / OpenAI API / image API.
+- No Budget Engine integration.
+- No formal estimate or quote.
+- No Plancraft core changes.
+- No package or framework changes.
+- No production storage.
+
+## Acceptance
+
+- PR #50 comments are addressed or deferred.
+- Context-only data boundary remains intact.
+- No forbidden calls are introduced.
+```
 
 ## PR #50 Acceptance Packet - Plan Puzzle Guide Agent
 
@@ -20,16 +188,16 @@ This file is the compact GitHub blackboard for current LaiBE MVP coordination. I
 - PR merged: `No`
 - PR mergeable from GitHub connector: `false`
 - Runtime status: `RUNTIME_MOCK_IMPLEMENTED`
-- Validation status: `BROWSER_VALIDATION_PENDING_EXTERNAL`
-- Merge status: `BLOCKED_UNTIL_BROWSER_VALIDATION`
+- Validation status: `BROWSER_VALIDATION_PASSED_EXTERNAL`
+- Merge status: `BLOCKED_UNTIL_COMMANDER_REVIEWER_ACK_AND_MERGEABILITY`
 - Agent status: `SELF_ASSIGNED_SAFE_TASK_COMPLETED`
 - waitingSince: `2026-06-01 15:22 Asia/Taipei`
-- blockerOwner: `SECOND_DEPUTY_COMMANDER / external browser validator`
-- nextHumanAction: `Open the PR #50 branch page in an external browser, run the checklist below, and report console/runtime evidence.`
+- blockerOwner: `COMMANDER / REVIEWER / GitHub mergeability`
+- nextHumanAction: `Commander and Reviewer review the top PR #50 acceptance packet and decide whether PR #50 can leave draft and enter merge review.`
 - fallbackTask: `Prepared acceptance packet, Commander packet, Reviewer packet, and manual browser checklist.`
 - selfAdvanceAfter: `20 minutes without new command or direct validation path; in-app Browser file:// policy blocked runtime validation.`
-- currentSafeTask: `PR #50 acceptance packet and browser validation checklist`
-- lastSelfAdvanceAt: `2026-06-01 19:24 Asia/Taipei`
+- currentSafeTask: `PR #50 reviewer and commander acceptance packet`
+- lastSelfAdvanceAt: `2026-06-01 20:38 Asia/Taipei`
 - mergeBlocked: `true`
 - workCanContinue: `true`
 
