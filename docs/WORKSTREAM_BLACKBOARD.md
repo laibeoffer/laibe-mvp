@@ -177,6 +177,7 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Workstream: `app/plan-puzzle-guide-agent`
 - Status: `TAKEOVER_ACKNOWLEDGED / CONTRACT_ONLY / WEB_RUNTIME_PENDING`
 - Progress %: 25
+- Automation check: 15-minute patrol and 20-minute no-idle rules acknowledged; Codex has no persistent background alarm in this session, so the required clock check is recorded as immediate execution in this GitHub blackboard update.
 - Evidence: PR #50 branch `codex/plan-puzzle-guide-init-main-sync` is the current GitHub-tracked docs/support lane; this update records that Plan Puzzle Guide Agent is the only active agent for the Plan Puzzle Guide workstream and that PR #39 / PR #40 / PR #44 must not be treated as current completion evidence without reconciliation.
 - Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY for the current PR #50 contract; runtime/browser acceptance remains PENDING.
 - Blocker: PR #50 is not merged; runtime guide surface is not wired; browser validation is not complete.
