@@ -42,8 +42,8 @@ The agent cannot proceed safely without user authorization, missing files, unava
 
 GitHub branch evidence:
 
-- `codex/plan-puzzle-guide-blackboard-evidence` / PR #44 contains the docs-only contract files and compact blackboard evidence correction.
-- PR #40 remains an older open draft branch and should be treated as superseded or reconciled after PR #44 review.
+- `codex/plan-puzzle-guide-init-main-sync` / PR #50 contains the docs-only contract files and compact blackboard evidence correction from current `main`.
+- PR #40 and PR #44 remain older open draft branches and should be treated as traceability drafts until a Commander / maintainer decision closes, supersedes, or reconciles them.
 
 Local draft evidence:
 
@@ -51,10 +51,10 @@ Local draft evidence:
 
 Current blocker:
 
-- PR #44 is not merged to `main`.
+- PR #50 is not merged to `main`.
 - Runtime code has not been modified in this branch.
 - Browser runtime verification has not been performed against GitHub source-of-truth.
 
 ## Next GitHub Action Needed
 
-Review PR #44 through normal gates, then decide whether PR #40 should be closed, superseded, or reconciled. Continue with a small GitHub-tracked runtime mock task only after the docs contract is accepted or merged and only if explicitly safe and scoped.
+Review PR #50 through normal gates, then decide whether PR #40 and PR #44 should be closed, superseded, or reconciled. Continue with a small GitHub-tracked runtime mock task only after the docs contract is accepted or merged and only if explicitly safe and scoped.
