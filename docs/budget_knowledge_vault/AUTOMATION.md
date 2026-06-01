@@ -46,13 +46,13 @@ A patrol must not wait for a new instruction when a safe documentation backlog i
 
 ## Latest Heartbeat Patrol Snapshot
 
-- checked_at: 2026-06-01T19:45:39+08:00
+- checked_at: 2026-06-01T20:09:59+08:00
 - source_checked: GitHub PR #32, PR #31, PR #47, Issue #41, Issue #49, and local vault index / automation docs.
-- PR #32: open, GitHub reports mergeable false, not merged, head at patrol start `d5496b326c7f93c0fbd73303e17232b7438a7cfc`; no PR comments or review threads found.
+- PR #32: open, GitHub reports mergeable false, not merged, head at patrol start `0e4439f03d0d04b1a30e320c3340167052ba7ac0`; no PR comments or review threads found.
 - PR #31: open, not merged, related boundary context only; GitHub reports mergeable false and no review threads found. Latest scoped disposition signal remains issue comment `4587422644`.
 - PR #47 / Issue #49: PR #47 is open and GitHub reports mergeable true; `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal and belongs to `budget/engine-entry-picking`, not this vault.
 - Issue #41: latest scoped vault-relevant signal remains the docs-only PR #37 final-report status plus the continuing rule that Budget Knowledge Vault is support-only and not part of the four-line Integration Gate; no vault execution assignment found.
-- Vault action: refreshed automation-visible patrol state only; no implementation files touched and no gate decision made.
+- Vault action: refreshed automation-visible patrol state and checked compact blackboard entry; no implementation files touched and no gate decision made.
 
 ## Active Work Queue
 
