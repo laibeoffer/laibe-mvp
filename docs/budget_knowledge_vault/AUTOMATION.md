@@ -44,6 +44,16 @@ When no new instruction is present, the patrol must autonomously advance the fir
 
 A patrol must not wait for a new instruction when a safe documentation backlog item exists.
 
+## Latest Heartbeat Patrol Snapshot
+
+- checked_at: 2026-06-01T17:30:38+08:00
+- source_checked: GitHub PR #32, PR #31, PR #47, Issue #41, Issue #49, and local vault index / automation docs.
+- PR #32: open, mergeable, not merged, head `23fa9a0581a5d073bb28fbea44d2318dd4b316b8`; no PR comments or review threads found.
+- PR #31: open, not merged, related boundary context only; no review threads found.
+- PR #47 / Issue #49: `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal and belongs to `budget/engine-entry-picking`, not this vault.
+- Issue #41: latest scoped vault-relevant signal remains the docs-only PR #37 final-report status plus the continuing rule that Budget Knowledge Vault is support-only and not part of the four-line Integration Gate.
+- Vault action: refreshed automation-visible patrol state only; no implementation files touched.
+
 ## Active Work Queue
 
 | Item | Status | Allowed Vault Action | Forbidden Action |
