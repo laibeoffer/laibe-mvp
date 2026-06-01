@@ -1,6 +1,6 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 Asia/Taipei
+Last updated: 2026-06-02 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
@@ -18,6 +18,25 @@ This file is the compact GitHub blackboard for current LaiBE MVP coordination. I
 - Budget Knowledge Vault Agent is managed by `LAIBE_REVIEWER_INTEGRATION_OFFICER`, not by Commander.
 - No-idle operating rule: problems are solved by the owning agent first; unresolved decisions are escalated with a decision packet; while waiting, agents must continue safe parallel work instead of idling.
 - Pending approvals must not stop unrelated safe progress. `本 workstream 本輪無新指派` is allowed only when initialization is complete, no open PR / Issue / blocker / evidence gap exists, and the supervisor has confirmed standby.
+
+## Workspace Registry
+
+| Machine | Local Path | Repo | Allowed Mode | Notes |
+|---|---|---|---|---|
+| JACKY | `C:\laibe_project` | `laibeoffer/laibe-mvp` | assigned-branch only | Local workspace only. Can read server Z drive, but GitHub main / PR / commit SHA remains shared truth. |
+| DESKTOP-5D1DK6S | `Z:\laibe_project` or detected network path such as `\\192.168.0.106\sever_data\laibe_project` | `laibeoffer/laibe-mvp` | assigned-branch only | Local / network workspace only. Do not treat Z drive as cross-computer source of truth. |
+
+Workspace rules:
+
+1. GitHub `main`, PRs, and commit SHAs are the only shared source of truth.
+2. `C:\laibe_project`, `Z:\laibe_project`, and detected UNC paths are all `LOCAL_STATE`.
+3. Task prompts and reports must use repo-relative paths such as `docs/WORKSTREAM_BLACKBOARD.md`.
+4. Do not use local absolute paths to decide project completion state.
+5. One branch may have only one writer agent / one writing machine at a time.
+6. Other machines that need to inspect the same branch must use read-only mode.
+7. Z drive must not be treated as cross-computer synchronization truth.
+8. If local state differs from GitHub `main` or the active PR head, report `LOCAL_STATE_STALE` and use GitHub as authoritative.
+9. If `git` / `gh` tools are unavailable, do not switch to publishing a local workflow. Use GitHub read-only checks or report the tool limitation.
 
 ## Completion Rules
 

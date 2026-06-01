@@ -1,5 +1,39 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Commander Governance Announcement: Multi-computer Workspace Registry
+
+- 本輪任務名稱：建立多電腦工作區規則。
+- 任務類型：Documentation / Governance / Workspace coordination.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- 已完成：
+  - 在 `docs/WORKSTREAM_BLACKBOARD.md` 新增 `Workspace Registry`。
+  - 登錄已知工作區：
+    - JACKY: `C:\laibe_project`
+    - DESKTOP-5D1DK6S: `Z:\laibe_project` 或偵測到的 UNC/network path，例如 `\\192.168.0.106\sever_data\laibe_project`
+  - 明確規定 GitHub `main` / PR / commit SHA 是唯一共同真相。
+  - 明確規定 C 槽、Z 槽與 UNC/network path 都只是 `LOCAL_STATE`。
+  - 明確要求任務 prompt 與回報使用 repo-relative path，例如 `docs/WORKSTREAM_BLACKBOARD.md`。
+  - 明確規定一個 branch 同一時間只允許一個 agent / 一台電腦寫入；其他電腦只能 read-only。
+  - 明確規定 Z 槽不得作為跨電腦同步真相。
+  - 明確規定本機狀態與 GitHub 不一致時要回報 `LOCAL_STATE_STALE`，並以 GitHub 為準。
+  - 明確規定 `git` / `gh` 不可用時不得改走 publish local workflow，只能 GitHub read-only 或回報工具限制。
+- 未修改：
+  - `src/`
+  - `app/`
+  - `components/`
+  - Budget Engine runtime
+  - renderer runtime
+  - payment / AI API / DB / Supabase / n8n runtime
+  - integration harness
+- Functional Acceptance：
+  - `NOT_APPLICABLE_DOCS_ONLY`
+  - This governance update does not prove runtime completion and must not increase feature progress.
+- Integration Gate impact：
+  - 無變更，仍為 `WAITING`。
+
 ## Latest Commander Governance Announcement: Commander-managed Budget Support Agents
 
 - 本輪任務名稱：Register Commander-managed budget support agents.
