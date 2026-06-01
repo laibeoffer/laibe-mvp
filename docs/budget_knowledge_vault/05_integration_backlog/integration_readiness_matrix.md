@@ -23,18 +23,18 @@ Issue #41 records that `MERGED_TO_MAIN` is not equal to `FUNCTIONAL_ACCEPTED`.
 
 ## Latest Vault Patrol
 
-- checked_at: 2026-06-01T13:44:21+08:00
+- checked_at: 2026-06-01T14:07:05+08:00
 - source_checked: GitHub PR #32 / PR #31 / Issue #41 / compact blackboard / four core vault summaries
 - assigned_pr: PR #32 `Add Budget Knowledge Vault support agent`
-- assigned_pr_status: open, not merged, no PR comments or review threads found in latest scoped patrol; pre-refresh mergeability was blocked by compact blackboard changes on `main`
-- assigned_pr_head_sha_at_patrol_start: `cef8d092cd62bee89f5c4a2eb19b71da23081c30`
+- assigned_pr_status: open, mergeable clean, not merged, no PR comments or review threads found in latest scoped patrol
+- assigned_pr_head_sha_at_patrol_start: `6a6b3b9cf7d4cf0fee3f6c9c30fc7d8e2498de84`
 - assigned_pr_base_sha: `896d5dd21ecedaa0754d2052262cedf67d5be82c`
 - assigned_pr_comments: none found in scoped patrol
 - related_boundary_pr: PR #31 `Register Budget Knowledge Vault support boundary`, open, mergeability dirty, review signal unavailable because Codex review usage limits were reached, now routed to Integration Officer disposition issue #41
 - related_boundary_pr_head_sha: `024289e74b8d7e4200dd40aa210aca5f2ffcb82a`
 - related_boundary_pr_status: open, not merged, mergeability dirty
-- issue_41_comments_checked: new Commander Dispatch - Budget Engine Entry Investigation signal found; it assigns read-only Budget Engine entry investigation outside this vault and preserves the prohibition on patching or creating `budget-generator.ts`
-- scoped_change_since_last_patrol: PR #32 still has no comments or review threads; PR #31 has no new disposition comments or review threads; Issue #41 added a Budget Engine entry investigation dispatch, compact blackboard on `main` now records PR #26 merged / Issue #49 blocker routing, and this patrol mirrors those signals without taking over the investigation
+- issue_41_comments_checked: Commander Dispatch - Budget Engine Entry Investigation remains the latest scoped instruction mirrored by this vault; it assigns read-only Budget Engine entry investigation outside this vault and preserves the prohibition on patching or creating `budget-generator.ts`
+- scoped_change_since_last_patrol: PR #32 still has no comments or review threads and remains mergeable at docs-only head `6a6b3b9cf7d4cf0fee3f6c9c30fc7d8e2498de84`; PR #31 has no new disposition comments or review threads; Issue #41 has no new scoped instruction; support-only boundaries are unchanged.
 - active_work: Budget Knowledge Vault initialization remains active until PR #31 / PR #32 are resolved, initialization is complete, and no known vault todo remains.
 - no_idle_rule: if no new instruction exists, advance the first safe item in `AUTOMATION.md` / `00_index.md` active work queue.
 - no_change_response_guard: `本 workstream 本輪無新指派。` must not be used while active initialization PRs, support gaps, or known todo items exist.

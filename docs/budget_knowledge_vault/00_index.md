@@ -22,7 +22,7 @@ This queue is used when there is no new instruction. The agent must advance safe
 
 | Priority | Item | Current Status | Next Safe Action |
 |---:|---|---|---|
-| 1 | PR #32 initialization PR | Open and not merged; latest patrol refreshes the branch against compact blackboard changes on `main`. | Keep PR current with scoped support-doc updates, compact blackboard reconciliation, and PR / Integration Officer instruction tracking. |
+| 1 | PR #32 initialization PR | Open and mergeable as of latest patrol; not merged. | Keep PR current with scoped support-doc updates, compact blackboard reconciliation, and PR / Integration Officer instruction tracking. |
 | 2 | PR #31 boundary PR | Open with review signal unavailable because Codex review usage limits were reached. | Track as related boundary context and keep it separate from PR #32 initialization content. |
 | 3 | Four core summaries | Initial summaries exist; latest scoped evidence records PR #26 merged but final acceptance still pending. | Refresh only from scoped completion reports, final packets, PR comments, compact blackboard signals, or Integration Officer instructions. |
 | 4 | Requirement / SVG context windows | Placeholder metadata exists. | Keep status labels explicit until linked / verified evidence exists. |
