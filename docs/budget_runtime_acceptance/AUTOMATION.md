@@ -8,11 +8,21 @@ Managed by: `LAIBE_PATROL_INTEGRATION_OFFICER` / `LAIBE_REVIEWER_INTEGRATION_OFF
 
 Automation: every 15 minutes
 
-Status: `ACTIVE_INITIALIZATION`
+Status: `EVIDENCE_PACKET_REQUIRED`
+
+Registration: 100%
+
+Evidence Packet: 0%
+
+Closeout: 0%
+
+Effective Progress: 33%
 
 Functional Acceptance: `PENDING`
 
 Not part of Integration Gate: Yes
+
+Tracking Issue: #65
 
 ## Mission
 
@@ -27,6 +37,31 @@ Define how budget-related work is classified as docs-only, mock-ready, browser-v
 - docs-only vs runtime-verified decision rules
 - PR merged is not functional completion rule
 - docs-only final completion report
+
+## Required Evidence Packet
+
+Submit a QA docs / checklist `Budget Runtime Evidence Agent Evidence Packet` containing:
+
+- `functional_acceptance_matrix.md`
+- `runtime_evidence_levels.md`
+- `browser_smoke_checklist.md`
+- `cli_validator_evidence_checklist.md`
+- `docs_only_vs_runtime_verified.md`
+- `pr_merge_not_equal_functional_completion.md`
+- `final_completion_report.md`
+
+The packet must answer:
+
+1. What does `NOT_APPLICABLE_DOCS_ONLY` mean?
+2. What does `CONTRACT_ONLY` mean?
+3. What does `MOCK_READY` mean?
+4. What evidence is required for `WEB_RUNTIME_VERIFIED`?
+5. What evidence is required for `CLI_VALIDATED`?
+6. What evidence is required for `RUNTIME_VERIFIED`?
+7. Why does PR merged not equal functional complete?
+8. Why does docs-only not equal runtime verified?
+9. Which PR / agent currently needs Functional Acceptance?
+10. Confirm no functional code, Budget Engine, Renderer, payment, AI API, DB, or n8n changes.
 
 ## Not Responsible For
 
@@ -45,7 +80,7 @@ Define how budget-related work is classified as docs-only, mock-ready, browser-v
 
 ## No-idle Rule
 
-This agent may not report `等待命令派發`, `本輪無新指派`, `pending approval`, `blocker unchanged`, or `no material change` while any initialization or docs-only evidence gap remains.
+This agent may not report `等待命令派發`, `本輪無新指派`, `pending approval`, `blocker unchanged`, or `no material change` while any evidence packet or docs-only evidence gap remains.
 
 If blocked, it must submit:
 
@@ -56,15 +91,13 @@ If blocked, it must submit:
 
 ## Next Safe Work
 
-1. Create blackboard self-introduction.
-2. Draft Functional Acceptance Matrix.
-3. Draft Runtime Evidence Report template.
-4. Draft Browser Smoke Checklist.
-5. Draft CLI / Validator Evidence Checklist.
-6. Submit final closeout packet to Integration Officer.
+1. Submit the required evidence packet to Issue #65 or link a scoped docs-only PR.
+2. Keep all work QA docs / checklist only.
+3. Do not touch functional code, Budget Engine, Renderer, payment, AI API, DB/Supabase, n8n, formal price, or formal quote.
 
 ## Closeout Conditions
 
+- Evidence packet submitted and accepted.
 - Final completion report submitted.
 - Blackboard closeout status proposed.
 - No forbidden scope touched.
