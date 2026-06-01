@@ -1,8 +1,59 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 Asia/Taipei
+Last updated: 2026-06-01 15:22 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
+
+## Latest Compact Progress Report - Plan Puzzle Guide Agent
+
+- To: `SECOND_DEPUTY_COMMANDER`
+- From: `Plan Puzzle Guide Agent`
+- Agent claim: `Plan Puzzle Guide Agent` is the single active agent for `app/plan-puzzle-guide-agent` in this PR branch.
+- Workstream: `app/plan-puzzle-guide-agent`
+- Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50.
+- Mission: Continue PR #50 from contract-only support lane into a narrow local runtime mock for Plancraft+ plan puzzle guide.
+- Status: `RUNTIME_MOCK_IMPLEMENTED / BROWSER_VALIDATION_BLOCKED_BY_URL_POLICY / WAITING_COMMANDER`
+- Progress: 70%.
+- GitHub Merge Gate: PR #50 not merged; merge commit not available; result `FAIL` until merged or formally superseded.
+- Functional Acceptance Gate: `PENDING`.
+- Runtime Evidence:
+  - `node --check src\stitch_laibe_landing_onboarding\preview_floor_plan\plan-puzzle.js`: PASS.
+  - `git diff --check`: PASS, with CRLF warning only.
+  - Browser `file://` validation: BLOCKED by in-app Browser URL policy, so no console-clean claim is made.
+- Changed runtime files:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- Changed coordination files:
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- Completed:
+  - Added right-side `平面拼圖引導官` UI panel.
+  - Added local rule-based FAQ / guide knowledge and guided flow.
+  - Added `project.guide`, `project.guideLog`, `project.requirementNotes`, and `project.guideSummary` draft JSON data.
+  - Added local reminders tied to current layer, selected object, and plan content.
+  - Added placeholder `PlanPuzzleQuantityFacts`, `plan_quantity_facts_id`, `svg_artifact_id`, `quantity_context_status`, and receiving windows for SVG, zones, areas, wall length, and opening counts.
+  - Kept guide and facts data as demand/context records only, not formal budget input.
+- Not completed:
+  - PR #50 is not merged.
+  - Browser console validation is not complete because the in-app Browser blocked the `file://` page.
+  - No Commander functional acceptance has been granted.
+- Forbidden scope preserved:
+  - No `C:\laibe_project\plancraft` change.
+  - No Plancraft core change.
+  - No Budget Engine / budget runtime change.
+  - No `generateBudgetEstimate()` route.
+  - No `formalEstimateGuard` change.
+  - No package / framework / `node_modules` change.
+  - No OpenAI API, image API, API key, DB, production storage, payment, escrow, or listing fee.
+- Alarm check:
+  - 15-minute report / 20-minute no-idle rule acknowledged and recorded here.
+  - No callable `automation_update` tool is available in this session, so no persistent background alarm was created.
+- Need Commander: Yes.
+- Need Reviewer: Yes, because runtime draft JSON/export shape now includes guide and placeholder facts data, even though Budget Engine and guard boundaries were not touched.
+- Next single action: Commander or Second Deputy should run/authorize external browser validation for the PR #50 `file://` page, then decide review/merge or revision path.
 
 ## Current Operating Rules
 
@@ -102,7 +153,7 @@ Forbidden:
 |---|---|---|---|---:|---|---|
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
-| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
+| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | PR #50 contains the GitHub-tracked docs-only contract under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`; PR #40 / PR #44 remain traceability drafts pending Commander / maintainer decision. |
 
 ## Future / Standby Agent Backlog
 
@@ -155,3 +206,32 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No unless product/formal-output boundary is found.
 - Need Reviewer: Yes only if forbidden flow or ownership dispute appears.
 - Next single action: report `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run proposal.
+
+### 2026-06-01 - Plan Puzzle Guide Current-Main Contract PR
+
+- Agent: 平面拼圖引導官 / Plan Puzzle Guide Agent
+- Workstream: `app/plan-puzzle-guide-agent`
+- Status: `CONTRACT_ONLY`
+- Progress %: 25
+- Evidence: PR #50 branch `codex/plan-puzzle-guide-init-main-sync` adds the GitHub-tracked docs-only contract packet under `docs/plan_puzzle_guide/` from current `main`.
+- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY
+- Blocker: Runtime remains `WEB_RUNTIME_PENDING`; no mock panel or browser/runtime evidence exists.
+- Need Commander: No for docs-only contract; Yes before runtime wiring or final completion acceptance.
+- Need Reviewer: No by default; user-triggered review only.
+- Next single action: Review PR #50 through normal gates, then decide whether PR #40 / PR #44 should be closed, superseded, or reconciled.
+
+### 2026-06-01 - Plan Puzzle Guide Sole Agent Report To Second Deputy
+
+- To: `SECOND_DEPUTY_COMMANDER`
+- From: `Plan Puzzle Guide Agent`
+- Agent: `Plan Puzzle Guide Agent`
+- Workstream: `app/plan-puzzle-guide-agent`
+- Status: `TAKEOVER_ACKNOWLEDGED / CONTRACT_ONLY / WEB_RUNTIME_PENDING`
+- Progress %: 25
+- Automation check: 15-minute patrol and 20-minute no-idle rules acknowledged; Codex has no persistent background alarm in this session, so the required clock check is recorded as immediate execution in this GitHub blackboard update.
+- Evidence: PR #50 branch `codex/plan-puzzle-guide-init-main-sync` is the current GitHub-tracked docs/support lane; this update records that Plan Puzzle Guide Agent is the only active agent for the Plan Puzzle Guide workstream and that PR #39 / PR #40 / PR #44 must not be treated as current completion evidence without reconciliation.
+- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY for the current PR #50 contract; runtime/browser acceptance remains PENDING.
+- Blocker: PR #50 is not merged; runtime guide surface is not wired; browser validation is not complete.
+- Need Commander: Yes before moving from docs/support contract into runtime mock wiring or final acceptance.
+- Need Reviewer: No by default because current scope is docs/support only and does not touch Plancraft core, Budget Engine, formal estimate, renderer, payment, auth, API, DB, secrets, package, or framework files.
+- Next single action: `SECOND_DEPUTY_COMMANDER` confirms whether to review/merge PR #50 first or authorize a narrowly scoped runtime mock follow-up branch for the guide surface.

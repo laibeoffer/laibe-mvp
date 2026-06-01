@@ -1365,6 +1365,298 @@
       font-weight: 900;
     }
 
+    .guide-panel {
+      display: grid;
+      gap: 12px;
+      border-color: rgba(98,230,200,.24);
+      background:
+        linear-gradient(180deg, rgba(98,230,200,.085), rgba(255,255,255,.025)),
+        rgba(0,0,0,.24);
+    }
+
+    .guide-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .guide-heading b {
+      margin-bottom: 4px;
+    }
+
+    .guide-heading p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 760;
+    }
+
+    .guide-mode {
+      flex: 0 0 auto;
+      border: 1px solid rgba(98,230,200,.32);
+      border-radius: 999px;
+      padding: 5px 8px;
+      color: var(--accent-mint);
+      background: rgba(98,230,200,.08);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .guide-disclaimer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid rgba(240,198,110,.28);
+      border-radius: 14px;
+      padding: 10px;
+      color: #ffe7bd;
+      background: rgba(240,198,110,.08);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 820;
+    }
+
+    .guide-disclaimer.is-accepted {
+      border-color: rgba(98,230,200,.25);
+      color: var(--accent-mint);
+      background: rgba(98,230,200,.07);
+    }
+
+    .secondary-btn.compact {
+      min-height: 34px;
+      padding: 0 11px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .guide-status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .guide-status-grid div {
+      min-width: 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 9px;
+      background: rgba(0,0,0,.2);
+    }
+
+    .guide-status-grid span {
+      display: block;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .guide-status-grid strong {
+      display: block;
+      margin-top: 3px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 950;
+      overflow-wrap: anywhere;
+    }
+
+    .guide-thread {
+      max-height: 320px;
+      overflow-y: auto;
+      display: grid;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(0,0,0,.2);
+    }
+
+    .guide-message {
+      display: grid;
+      gap: 6px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .guide-message.is-user {
+      border-color: rgba(121,216,255,.26);
+      background: rgba(121,216,255,.075);
+    }
+
+    .guide-message.is-guide {
+      border-color: rgba(98,230,200,.24);
+      background: rgba(98,230,200,.06);
+    }
+
+    .guide-message.is-system {
+      border-color: rgba(240,198,110,.24);
+      background: rgba(240,198,110,.06);
+    }
+
+    .guide-message-meta,
+    .guide-message-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 10px;
+      line-height: 1.35;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .guide-message-text {
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.62;
+      font-weight: 780;
+      overflow-wrap: anywhere;
+    }
+
+    .guide-save-button,
+    .guide-reminder-actions button {
+      min-height: 28px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      padding: 0 9px;
+      color: var(--text-main);
+      background: rgba(255,255,255,.06);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .guide-saved-label {
+      display: inline-flex;
+      border: 1px solid rgba(98,230,200,.24);
+      border-radius: 999px;
+      padding: 3px 7px;
+      color: var(--accent-mint);
+      background: rgba(98,230,200,.07);
+      font-size: 10px;
+      font-weight: 950;
+    }
+
+    .guide-input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .guide-input {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 13px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      background: rgba(0,0,0,.26);
+      font: inherit;
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 820;
+      outline: none;
+    }
+
+    .guide-input:focus {
+      border-color: rgba(121,216,255,.48);
+      box-shadow: 0 0 0 3px rgba(121,216,255,.12);
+    }
+
+    .guide-section-label {
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .guide-quick-grid,
+    .guide-action-grid,
+    .guide-flow-options,
+    .guide-layer-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .guide-action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .guide-action-grid .danger-btn {
+      grid-column: 1 / -1;
+      min-height: 40px;
+    }
+
+    .guide-chip {
+      min-height: 34px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      padding: 0 10px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.055);
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.3;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .guide-chip.is-active {
+      border-color: rgba(98,230,200,.38);
+      color: var(--text-main);
+      background: rgba(98,230,200,.11);
+    }
+
+    .guide-reminder-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .guide-reminder-card {
+      display: grid;
+      gap: 7px;
+      border: 1px solid rgba(240,198,110,.22);
+      border-radius: 12px;
+      padding: 10px;
+      background: rgba(240,198,110,.06);
+    }
+
+    .guide-reminder-card strong {
+      color: var(--text-main);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 900;
+    }
+
+    .guide-reminder-card span,
+    .guide-reminder-empty {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 760;
+    }
+
+    .guide-reminder-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
     .visual-sim-panel {
       border-color: rgba(203,184,138,.2);
       background:
@@ -2159,6 +2451,6 @@
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=minimal-server-runtime-spike" defer></script>
+  <script src="./plan-puzzle.js?v=plan-puzzle-guide-assistant-mvp" defer></script>
 </body>
 </html>
