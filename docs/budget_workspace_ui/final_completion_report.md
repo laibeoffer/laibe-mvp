@@ -97,12 +97,12 @@ Local / GitHub mismatch marker: `LOCAL_STATE_IGNORED_GITHUB_IS_SOURCE_OF_TRUTH` 
 
 ## 12. PR / Commit
 
-- commit: to be created through the GitHub connector because local `git` and `gh` are unavailable in PATH
-- push: to be represented by a GitHub branch update through the connector
-- PR URL: to be recorded in GitHub PR metadata after creation
-- intended branch: `app/budget-workspace-ui`
-- intended commit message: `docs(ui): add budget workspace UI contract`
-- intended PR title: `Add Budget Workspace UI support agent`
+- commit: `63b6cd899c38e2f5ec64ff5b2234eb7ef5a4b2a1`
+- branch: `app/budget-workspace-ui`
+- PR URL: `https://github.com/laibeoffer/laibe-mvp/pull/62`
+- PR status: open draft
+- commit message: `docs(ui): add budget workspace UI contract`
+- PR title: `Add Budget Workspace UI support agent`
 
 ## 13. Need Commander
 
