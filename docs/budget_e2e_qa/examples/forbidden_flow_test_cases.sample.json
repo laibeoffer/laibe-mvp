@@ -1,0 +1,114 @@
+{
+  "test_suite_id": "budget-forbidden-flow-dryrun-001",
+  "schema_version": "0.1-dry-run",
+  "dry_run_only": true,
+  "formal_price_generated": false,
+  "formal_quote_generated": false,
+  "external_io_allowed": false,
+  "cases": [
+    {
+      "flow_id": "FF-001",
+      "from": "PriceObservation",
+      "to": "BudgetEstimateLine.unit_price",
+      "stimulus": "raw observed price value is mapped to unit_price",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["formal unit price", "BudgetEstimateLine"]
+    },
+    {
+      "flow_id": "FF-002",
+      "from": "PriceRange",
+      "to": "BudgetEstimateLine.unit_price",
+      "stimulus": "price range midpoint is mapped to unit_price",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["formal unit price", "BudgetEstimateLine"]
+    },
+    {
+      "flow_id": "FF-003",
+      "from": "RawCandidate",
+      "to": "PricingRule",
+      "stimulus": "raw candidate is promoted to PricingRule without review",
+      "expected_verdict": "REJECTED",
+      "must_not_create": ["PricingRule"]
+    },
+    {
+      "flow_id": "FF-004",
+      "from": "HandoffProposal",
+      "to": "customer_view",
+      "stimulus": "handoff proposal payload is rendered in customer preview",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["customer-facing handoff content"]
+    },
+    {
+      "flow_id": "FF-005",
+      "from": "SVG",
+      "to": "Renderer",
+      "stimulus": "SVG artifact is passed directly to renderer",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["rendered document"]
+    },
+    {
+      "flow_id": "FF-006",
+      "from": "SVG",
+      "to": "formal quantity",
+      "stimulus": "SVG geometry is treated as formal quantity authority",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["formal quantity"]
+    },
+    {
+      "flow_id": "FF-007",
+      "from": "Owner free text",
+      "to": "BudgetEstimateLine",
+      "stimulus": "raw owner sentence becomes a budget row",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["BudgetEstimateLine"]
+    },
+    {
+      "flow_id": "FF-008",
+      "from": "Renderer",
+      "to": "Budget Engine",
+      "stimulus": "renderer calls or feeds Budget Engine input",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["engine run"]
+    },
+    {
+      "flow_id": "FF-009",
+      "from": "Output Documents",
+      "to": "Raw Warehouse",
+      "stimulus": "output layer reads raw warehouse directly",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["raw warehouse read"]
+    },
+    {
+      "flow_id": "FF-010",
+      "from": "Output Documents",
+      "to": "MethodSpecCatalog",
+      "stimulus": "output layer reads MethodSpec catalog directly",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["MethodSpecCatalog read"]
+    },
+    {
+      "flow_id": "FF-011",
+      "from": "Markdown proposal",
+      "to": "PricingRule without review",
+      "stimulus": "markdown proposal creates PricingRule directly",
+      "expected_verdict": "REJECTED",
+      "must_not_create": ["PricingRule"]
+    },
+    {
+      "flow_id": "FF-012",
+      "from": "AI / RAG",
+      "to": "formal price",
+      "stimulus": "AI or RAG answer supplies a formal price",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["formal price", "formal quote"]
+    },
+    {
+      "flow_id": "FF-013",
+      "from": "payment / escrow / listing fee",
+      "to": "budget harness",
+      "stimulus": "payment, escrow, or listing fee data enters budget harness",
+      "expected_verdict": "BLOCKED",
+      "must_not_create": ["payment interaction", "budget mutation", "external IO"]
+    }
+  ]
+}

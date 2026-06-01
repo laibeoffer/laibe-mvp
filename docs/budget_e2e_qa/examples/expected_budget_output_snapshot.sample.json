@@ -1,0 +1,125 @@
+{
+  "snapshot_id": "budget-output-snapshot-dryrun-001",
+  "snapshot_type": "dry_run_expected_contract",
+  "schema_version": "0.1-dry-run",
+  "dry_run_only": true,
+  "formal_price_generated": false,
+  "formal_quote_generated": false,
+  "production_write_allowed": false,
+  "external_io_allowed": false,
+  "price_authority": "none",
+  "source_package_refs": {
+    "quote_factory_package_id": "qf-export-dryrun-001",
+    "raw_candidate_handoff_proposal_id": "hcp-dryrun-001",
+    "method_spec_catalog_id": "method-spec-approved-seed-dryrun-001",
+    "project_requirement_brief_id": "prb-dryrun-001",
+    "plan_quantity_facts_id": "pqf-dryrun-001"
+  },
+  "customer_preview": {
+    "preview_type": "dry_run_customer_preview",
+    "contains_formal_price": false,
+    "rows": [
+      {
+        "row_id": "preview-row-001",
+        "label": "Wall finish refresh",
+        "quantity_display": "18.2 m2 (dry-run placeholder)",
+        "unit_price": null,
+        "amount": null,
+        "display_price": "DRY_RUN_REDACTED",
+        "price_authority": "none",
+        "warnings": ["not a formal quote", "placeholder quantity"]
+      },
+      {
+        "row_id": "preview-row-002",
+        "label": "Lighting fixture review",
+        "quantity_display": "3 each (dry-run placeholder)",
+        "unit_price": null,
+        "amount": null,
+        "display_price": "DRY_RUN_REDACTED",
+        "price_authority": "none",
+        "warnings": ["not a formal quote", "requires approved deterministic pricing rule"]
+      }
+    ],
+    "must_not_include": [
+      "HandoffProposal payload",
+      "RawCandidate payload",
+      "PriceObservation",
+      "PriceRange",
+      "formal unit price",
+      "formal total"
+    ]
+  },
+  "internal_trace_preview": {
+    "trace_type": "dry_run_internal_trace_preview",
+    "review_gate": {
+      "handoff_proposal_id": "hcp-dryrun-001",
+      "status": "required_before_downstream_use"
+    },
+    "method_spec_rules": [
+      {
+        "rule_id": "ms-rule-dryrun-approved-001",
+        "approval_status": "approved",
+        "allowed_for_budget_engine_fixture": true
+      }
+    ],
+    "blocked_inputs": [
+      "PriceObservation direct unit_price",
+      "PriceRange direct unit_price",
+      "RawCandidate direct PricingRule",
+      "Owner free text direct BudgetEstimateLine",
+      "AI / RAG formal price"
+    ]
+  },
+  "warning_summary": [
+    {
+      "warning_id": "warn-dryrun-001",
+      "severity": "info",
+      "message": "Placeholder requirement brief is dry-run only."
+    },
+    {
+      "warning_id": "warn-dryrun-002",
+      "severity": "info",
+      "message": "Placeholder plan facts are not formal quantity authority."
+    },
+    {
+      "warning_id": "warn-dryrun-003",
+      "severity": "required",
+      "message": "No formal price authority is present; price fields remain null or redacted."
+    }
+  ],
+  "provenance_summary": {
+    "quote_factory": ["reviewed_reference_metadata_only"],
+    "raw_candidate": ["handoff_proposal_review_gate_only"],
+    "method_spec": ["approved_rule_seed_only"],
+    "project_requirement_brief": ["assumption_context_only"],
+    "plan_quantity_facts": ["dry_run_formula_exercise_only"],
+    "output_documents": ["snapshot_read_only"]
+  },
+  "forbidden_flow_report": {
+    "all_required_flows_tested": true,
+    "acceptance_verdict": "PASS_ONLY_IF_ALL_BLOCKED",
+    "cases": [
+      {
+        "flow_id": "FF-001",
+        "from": "PriceObservation",
+        "to": "BudgetEstimateLine.unit_price",
+        "actual_verdict": "BLOCKED",
+        "blocked_reason": "raw observed price cannot set formal unit price"
+      },
+      {
+        "flow_id": "FF-004",
+        "from": "HandoffProposal",
+        "to": "customer_view",
+        "actual_verdict": "BLOCKED",
+        "blocked_reason": "handoff content is internal review material only"
+      },
+      {
+        "flow_id": "FF-012",
+        "from": "AI / RAG",
+        "to": "formal price",
+        "actual_verdict": "BLOCKED",
+        "blocked_reason": "AI / RAG cannot produce formal price"
+      }
+    ]
+  }
+}
