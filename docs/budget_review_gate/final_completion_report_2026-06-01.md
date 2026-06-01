@@ -32,6 +32,9 @@ PR merged does not equal task complete. Final task closure requires Commander de
 - PR number: #37
 - Merged: No
 - Merge commit: Not available; PR is still open.
+- Current PR head: `534aa781ff7685b727f5ff5df67377b26ed2301f`
+- Current mergeability: GitHub connector reports `mergeable=true`
+- Current merge ref: `286270fccc1de91f7b966ac8acd06c754d36476d`
 - Changed files:
   - `docs/WORKSTREAM_BLACKBOARD.md`
   - `docs/budget_review_gate/AUTOMATION.md`
