@@ -1,0 +1,97 @@
+{
+  "workspaceId": "budget-workspace-ui.mock.v1",
+  "projectId": "project-demo-001",
+  "sourceOfTruth": "github",
+  "mode": "mock_contract_only",
+  "modules": {
+    "requirementForm": {
+      "status": "completed",
+      "evidence": ["ProjectRequirementBrief placeholder"],
+      "missing": ["verified reviewer source"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Requirement form is completed but not verified",
+      "nextSafeAction": "Collect verification evidence"
+    },
+    "fileIntake": {
+      "status": "placeholder",
+      "evidence": ["mock file manifest"],
+      "missing": ["verified current-condition drawing"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Required files are placeholder only",
+      "nextSafeAction": "Show file status and missing file list"
+    },
+    "planQuantity": {
+      "status": "linked",
+      "evidence": ["Plan Puzzle draft artifact"],
+      "missing": ["verified quantity facts"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Plan quantity status is not verified",
+      "nextSafeAction": "Request verified quantity source"
+    },
+    "quoteFactory": {
+      "status": "functional acceptance pending",
+      "evidence": ["validator passed"],
+      "missing": ["functional acceptance"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Quote Factory acceptance pending",
+      "nextSafeAction": "Wait for acceptance packet"
+    },
+    "rawCandidate": {
+      "status": "candidate-only",
+      "evidence": ["source quality checklist"],
+      "missing": ["final packet accepted"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Raw Candidate is candidate-only",
+      "nextSafeAction": "Keep no-formal-price warning visible"
+    },
+    "methodSpec": {
+      "status": "blocked by engine entry",
+      "evidence": ["MethodSpec package exists"],
+      "missing": ["Budget Engine entry decision"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "MethodSpec is blocked by engine entry",
+      "nextSafeAction": "Wait for engine entry resolution"
+    },
+    "budgetEngineDryRun": {
+      "status": "blocked",
+      "evidence": [],
+      "missing": ["dry-run entry availability"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Budget Engine dry-run entry is unavailable",
+      "nextSafeAction": "Keep CTA disabled"
+    },
+    "outputPreview": {
+      "status": "no formal Excel/PDF",
+      "evidence": ["snapshot-only contract"],
+      "missing": ["formal writer approval"],
+      "canEnterBudgetDryRun": false,
+      "blockedReason": "Output preview is not formal output",
+      "nextSafeAction": "Show dry-run-only preview label"
+    }
+  },
+  "ctaGate": {
+    "label": "Run budget dry-run",
+    "enabled": false,
+    "disabledReason": "Budget Engine dry-run entry is unavailable",
+    "target": "budget_engine_dry_run",
+    "risk": "Dry-run must not be treated as formal quote"
+  },
+  "warnings": [
+    {
+      "id": "warning-output-not-formal",
+      "severity": "warning",
+      "reason": "Output preview is not formal Excel/PDF"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "blocker-engine-entry-unavailable",
+      "severity": "blocked",
+      "owner": "budget/engine-entry-picking",
+      "reason": "Budget Engine entry is unavailable",
+      "blockingScope": "Budget dry-run CTA",
+      "safeAction": "Show disabled CTA and wait for engine entry decision"
+    }
+  ]
+}
+

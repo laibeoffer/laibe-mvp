@@ -1,0 +1,62 @@
+{
+  "version": "budget-workspace-module-map.mock.v1",
+  "modules": [
+    {
+      "id": "requirementForm",
+      "label": "Requirement form status",
+      "source": "Owner intake / ProjectRequirementBrief placeholder",
+      "allowedStatuses": ["incomplete", "completed", "placeholder", "verified"],
+      "dryRunRule": "May pass only when verified or explicitly accepted for dry-run"
+    },
+    {
+      "id": "fileIntake",
+      "label": "File intake status",
+      "source": "Mock file manifest",
+      "allowedStatuses": ["incomplete", "placeholder", "linked", "verified", "unavailable"],
+      "dryRunRule": "Required files must be verified or marked not required"
+    },
+    {
+      "id": "planQuantity",
+      "label": "Plan Puzzle / SVG / quantity status",
+      "source": "Plan Puzzle draft artifact",
+      "allowedStatuses": ["placeholder", "linked", "verified", "unavailable"],
+      "dryRunRule": "Only verified quantity facts may pass"
+    },
+    {
+      "id": "quoteFactory",
+      "label": "Quote Factory status",
+      "source": "Quote Factory package",
+      "allowedStatuses": ["not started", "package ready", "validator passed", "functional acceptance pending"],
+      "dryRunRule": "Validator and acceptance requirements must be satisfied"
+    },
+    {
+      "id": "rawCandidate",
+      "label": "Raw Candidate status",
+      "source": "Raw Candidate warehouse",
+      "allowedStatuses": ["candidate-only", "reviewed", "final packet accepted"],
+      "dryRunRule": "Candidate-only evidence is not pricing authority"
+    },
+    {
+      "id": "methodSpec",
+      "label": "MethodSpec status",
+      "source": "Method / Spec Warehouse",
+      "allowedStatuses": ["ready", "blocked by engine entry", "validated"],
+      "dryRunRule": "Must not be blocked by engine entry"
+    },
+    {
+      "id": "budgetEngineDryRun",
+      "label": "Budget Engine dry-run status",
+      "source": "Budget Engine entry / dry-run gate",
+      "allowedStatuses": ["unavailable", "pending", "dry-run ready", "blocked"],
+      "dryRunRule": "Controls primary CTA"
+    },
+    {
+      "id": "outputPreview",
+      "label": "Output preview status",
+      "source": "BudgetOutputSnapshot / RenderedBudgetDocument",
+      "allowedStatuses": ["snapshot-only", "customer preview", "internal trace", "no formal Excel/PDF"],
+      "dryRunRule": "Preview must not become formal output"
+    }
+  ]
+}
+

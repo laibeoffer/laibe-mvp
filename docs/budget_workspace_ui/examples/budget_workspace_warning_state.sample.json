@@ -1,0 +1,46 @@
+{
+  "version": "budget-workspace-warning-state.mock.v1",
+  "highestSeverity": "blocked",
+  "primaryDisabledReason": "Budget Engine entry is unavailable",
+  "warnings": [
+    {
+      "id": "missing-current-drawing",
+      "severity": "warning",
+      "module": "fileIntake",
+      "reason": "Current-condition drawing is missing",
+      "ctaImpact": "dry-run CTA disabled if drawing is required"
+    },
+    {
+      "id": "plan-quantity-placeholder",
+      "severity": "blocked",
+      "module": "planQuantity",
+      "reason": "Plan quantity facts are placeholder only",
+      "ctaImpact": "dry-run CTA disabled"
+    },
+    {
+      "id": "raw-candidate-not-final",
+      "severity": "high",
+      "module": "rawCandidate",
+      "reason": "Raw Candidate evidence is candidate-only",
+      "ctaImpact": "cannot be pricing authority"
+    },
+    {
+      "id": "output-no-formal-excel-pdf",
+      "severity": "warning",
+      "module": "outputPreview",
+      "reason": "Formal Excel/PDF writer is not available",
+      "ctaImpact": "preview remains dry-run only"
+    }
+  ],
+  "blockers": [
+    {
+      "id": "budget-engine-entry-unavailable",
+      "severity": "blocked",
+      "owner": "budget/engine-entry-picking",
+      "reason": "Budget Engine dry-run entry is unavailable",
+      "blockingScope": "Budget dry-run CTA",
+      "safeAction": "Keep CTA disabled and show exact blocker"
+    }
+  ]
+}
+
