@@ -103,6 +103,7 @@ Forbidden:
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
+| 預算流程編排 / Budget Workflow Orchestrator Agent | `workflow/budget-orchestrator` | `LAIBE_PATROL_INTEGRATION_OFFICER` | MERGED_DOCS_ONLY | 100 | Yes | PR #36 merged as `f42e51ec653b35331e5d91d002276f1722266500`; placeholder workflow specs, trigger contracts, dry-run gates, blackboard contract, Knowledge Vault feedback contract, and alarm contract are on GitHub `main`; runtime remains `N8N_PLACEHOLDER_ONLY`. |
 
 ## Future / Standby Agent Backlog
 
@@ -142,6 +143,19 @@ Use this format only when changing current status:
 ```
 
 Do not paste full logs or repeated heartbeat text into this file.
+
+### 2026-06-01 - Budget Workflow Orchestrator Final Report Recorded
+
+- Agent: 預算流程編排 / Budget Workflow Orchestrator Agent
+- Workstream: `workflow/budget-orchestrator`
+- Status: `MERGED_DOCS_ONLY`
+- Progress %: 100
+- Evidence: PR #36 merged as `f42e51ec653b35331e5d91d002276f1722266500`; changed files are `docs/WORKSTREAM_BLACKBOARD.md`, `docs/NEXT_CODEX_HANDOFF.md`, and `docs/workflow/budget_orchestrator/`; alarm health check updated after merge.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+- Blocker: None for placeholder docs; real n8n / webhook / API / DB / payment / AI API / formal output remains forbidden until explicit future authorization.
+- Need Commander: No unless deciding real n8n, webhook, external automation, API, DB, payment, AI API, or formal output activation.
+- Need Reviewer: No by default; Yes only if a future task prepares production trigger, API, DB, payment, AI API, formal budget output, or renderer activation.
+- Next single action: Keep 15-minute scoped placeholder patrol under `LAIBE_PATROL_INTEGRATION_OFFICER`; do not start runtime automation.
 
 ### 2026-06-01 - Budget Engine Entry Blocker Routed
 

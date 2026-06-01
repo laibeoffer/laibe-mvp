@@ -1,5 +1,27 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Workflow Task: Budget Workflow Orchestrator Final Report
+
+- 本輪任務名稱：Budget Workflow Orchestrator final report and alarm repair.
+- 任務類型：Documentation / Patrol / Compact Blackboard Update / n8n Placeholder.
+- Workstream：`workflow/budget-orchestrator`.
+- Branch：`workflow/budget-orchestrator-final-report`.
+- GitHub source of truth：`laibeoffer/laibe-mvp`.
+- 檢查結果：
+  - GitHub `main` checked at `896d5dd21ecedaa0754d2052262cedf67d5be82c`.
+  - PR #36 is merged; merge commit `f42e51ec653b35331e5d91d002276f1722266500`.
+  - Compact blackboard existed on `main`, but did not contain a Budget Workflow Orchestrator row after the rebuild.
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/workflow/budget_orchestrator/AUTOMATION.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 完成事項：
+  - Added Budget Workflow Orchestrator to the compact Support Agents table as `MERGED_DOCS_ONLY`, progress `100`.
+  - Added compact final progress report under `docs/WORKSTREAM_BLACKBOARD.md`.
+  - Recorded post-merge alarm check in `AUTOMATION.md`.
+- 邊界確認：沒有建立 n8n runtime、webhook endpoint、upload backend、scheduler、API key、secret、credential、DB、Supabase、payment、AI API、production automation、customer notification、formal quote、real Excel 或 real PDF。
+- 下一步：Keep 15-minute scoped placeholder patrol under `LAIBE_PATROL_INTEGRATION_OFFICER`; do not start runtime automation.
+
 ## Latest Commander Governance Announcement: GitHub Is Shared Work Path
 
 - 本輪任務名稱：Announce GitHub as mandatory shared work path.

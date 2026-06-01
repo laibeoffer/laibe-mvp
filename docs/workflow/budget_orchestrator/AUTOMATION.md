@@ -8,7 +8,7 @@ github_source_of_truth: laibeoffer/laibe-mvp
 no_idle_until_initialized: true
 auto_progress_after_minutes_without_response: 20
 alarm_health_status: placeholder_contract_only
-last_alarm_repair_check: 2026-06-01T00:35:46+08:00
+last_alarm_repair_check: 2026-06-01T14:40:38+08:00
 
 ## Runtime Status
 
@@ -71,6 +71,28 @@ Forbidden repair action:
 - Do not create a webhook endpoint.
 - Do not create external runtime automation.
 - Do not store credentials, API keys, tokens, or secrets.
+
+## Post-Merge Alarm Check - 2026-06-01T14:40:38+08:00
+
+patrol_executed: true
+
+github_main_checked: 896d5dd21ecedaa0754d2052262cedf67d5be82c
+
+merged_pr_checked: https://github.com/laibeoffer/laibe-mvp/pull/36
+
+merge_commit_checked: f42e51ec653b35331e5d91d002276f1722266500
+
+compact_blackboard_status_before_repair: missing_budget_workflow_orchestrator_row
+
+repair_action: added compact support-agent row and final progress report to `docs/WORKSTREAM_BLACKBOARD.md`
+
+alarm_contract_status: merged_docs_only_verified
+
+runtime_created: false
+
+production_automation_created: false
+
+next_alarm_action: keep 15-minute scoped placeholder patrol under `LAIBE_PATROL_INTEGRATION_OFFICER`; do not create runtime automation or report `NO_NEW_ASSIGNMENT` while an open instruction, PR, Issue, or final-report update is pending.
 
 ## Patrol Scope
 
