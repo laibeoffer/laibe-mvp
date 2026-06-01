@@ -13,7 +13,8 @@ This file is the compact GitHub blackboard for current LaiBE MVP coordination. I
 - Workstream: `app/plan-puzzle-guide-agent`
 - Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50
 - PR URL: `https://github.com/laibeoffer/laibe-mvp/pull/50`
-- Head commit: `7ee50f60a464718bb7a13661a77f64229679466c`
+- Head commit: `1a4bfc7e75abe6a376d8beba98f9bba96cc41e0e`
+- Runtime mock commit: `7ee50f60a464718bb7a13661a77f64229679466c`
 - PR state: `open draft`
 - PR merged: `No`
 - PR mergeable from GitHub connector: `false`
