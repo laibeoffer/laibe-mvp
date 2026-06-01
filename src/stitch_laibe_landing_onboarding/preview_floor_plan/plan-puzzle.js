@@ -35,8 +35,12 @@
   const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
   const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
   const ZONE_AREA_CONFIDENCE_INVALID = 0;
-  const PLAN_PUZZLE_UI_IA_VERSION = "0.12.0-ui-ia-alignment";
+  const PLAN_PUZZLE_UI_IA_VERSION = "0.14.0-status-area-productization";
   const PLAN_PUZZLE_TOOL_CATALOG_VERSION = PLAN_PUZZLE_UI_IA_VERSION;
+  const TOOL_CATALOG_ITEM_STATUS_OPTIONS = ["new", "existing", "demolition", "reference"];
+  const TOOL_CATALOG_BUDGET_OPTIONS = ["include", "reference_only", "ask_contractor"];
+  const MATERIAL_CATEGORIES = ["地坪材料", "牆面材料", "櫃體材料", "檯面材料", "門窗材料", "五金等級", "請廠商建議"];
+  const TEXT_NOTE_TYPES = ["一般文字", "業主需求", "施工備註", "請廠商建議", "需專業確認", "保留項目"];
   const PLAN_PUZZLE_TOOL_CATALOG = [
     {
       id: "file-import",
@@ -404,6 +408,22 @@
       actions: ["include_budget", "ignore", "ask_contractor"]
     },
     {
+      id: "reminder-cabinet-hardware",
+      code: "CABINET_HARDWARE_REVIEW",
+      message: "有木作櫃或系統櫃時，請確認櫃體材料、五金等級與收邊細節。",
+      severity: "notice",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    },
+    {
+      id: "reminder-flooring-threshold",
+      code: "FLOORING_THRESHOLD_REVIEW",
+      message: "有地坪材料時，請確認門檻、收邊、矽利康與地坪保護。",
+      severity: "notice",
+      status: "open",
+      actions: ["include_budget", "ignore", "ask_contractor"]
+    },
+    {
       id: "reminder-zone-area",
       code: "ZONE_AREA_REVIEW",
       message: "有 zone 面積尚未確認時，不得作為正式預算數量。",
@@ -549,7 +569,7 @@
       product: "Plancraft+",
       version: PLAN_PUZZLE_UI_IA_VERSION,
       unit: "mm",
-      draftVersionName: "v0.12 IA draft",
+      draftVersionName: "v0.14 Status Area Productization draft",
       saveStatus: "unsaved",
       lastSavedAt: null,
       importSource: null,
@@ -564,10 +584,12 @@
       openings: [],
       zones: [],
       furniture: [],
+      toolCatalogItems: [],
       toolCatalog: null,
       currentLayer: "floor_plan",
       visibleLayers: { ...DEFAULT_VISIBLE_LAYERS },
       selectedMaterials: [...DEFAULT_SELECTED_MATERIAL_TAGS],
+      layerItemSelections: createInitialLayerItemSelections(),
       layerNotes: {},
       projectPreferences: { ...DEFAULT_PROJECT_PREFERENCES },
       systemReminders: DEFAULT_SYSTEM_REMINDERS.map((reminder) => ({ ...reminder, actions: [...reminder.actions] })),
@@ -628,9 +650,22 @@
       pcConverterReport: createInitialPcConverterReport(),
       activeToolCatalogId: "select-mode",
       toolCatalogVerifiedIds: [],
+      selectedToolCatalogItemId: null,
+      selectedItemTemplate: "新設牆",
+      pendingItemPlacement: null,
+      dimensionDraftStart: null,
+      textToolType: "業主需求",
+      materialCategory: "請廠商建議",
       message: "",
       error: ""
     };
+  }
+
+  function createInitialLayerItemSelections() {
+    return PLAN_PUZZLE_PRODUCT_LAYERS.reduce((selections, layer) => {
+      selections[layer.id] = layer.id === "floor_plan" ? layer.items.slice(0, 2) : [];
+      return selections;
+    }, {});
   }
 
   function createInitialZoneBoundaryState() {
@@ -815,12 +850,66 @@
       return;
     }
     uiState.currentTool = tool;
+    uiState.mode = "select";
+    uiState.dimensionDraftStart = null;
+    uiState.pendingItemPlacement = tool === "item_place"
+      ? {
+          layer: uiState.currentLayer,
+          itemType: uiState.selectedItemTemplate || getCurrentProductLayer().items[0]
+        }
+      : null;
+    clearWallDraft();
+    clearZoneBoundaryDraft();
     uiState.error = "";
     const toolLabel = label || getCurrentToolLabel(tool);
     const placeholderTools = new Set(["pan", "zoom", "item_place", "dimension", "text", "material_bucket"]);
     uiState.message = placeholderTools.has(tool)
-      ? `${toolLabel} 已選取；本輪先建立 UI IA 與資料承接位置，完整互動仍是 placeholder。`
+      ? `${toolLabel} 已選取；Tool Catalog runtime 已同步 currentTool，完整幾何操作仍維持 draft interaction 邊界。`
       : `${toolLabel} 已選取。`;
+  }
+
+  function toggleLayerCatalogItem(layerId, itemName) {
+    const layer = PLAN_PUZZLE_PRODUCT_LAYERS.find((item) => item.id === layerId);
+    if (!layer || !layer.items.includes(itemName)) {
+      return;
+    }
+    if (!project.layerItemSelections[layer.id]) {
+      project.layerItemSelections[layer.id] = [];
+    }
+    const selections = project.layerItemSelections[layer.id];
+    const existingIndex = selections.indexOf(itemName);
+    if (existingIndex >= 0) {
+      selections.splice(existingIndex, 1);
+      uiState.message = `已從「${layer.label}」移除項目：${itemName}。`;
+    } else {
+      selections.push(itemName);
+      uiState.message = `已加入「${layer.label}」項目：${itemName}。`;
+    }
+    uiState.selectedItemTemplate = itemName;
+    uiState.pendingItemPlacement = {
+      layer: layer.id,
+      itemType: itemName
+    };
+    uiState.error = "";
+    project.saveStatus = "unsaved";
+  }
+
+  function updateSystemReminder(reminderId, action) {
+    const reminder = project.systemReminders.find((item) => item.id === reminderId);
+    if (!reminder || !reminder.actions.includes(action)) {
+      return;
+    }
+    const statusMap = {
+      include_budget: "included",
+      ignore: "ignored",
+      ask_contractor: "ask_contractor"
+    };
+    reminder.status = statusMap[action] || reminder.status;
+    reminder.resolvedAt = new Date().toISOString();
+    reminder.resolution = action;
+    project.saveStatus = "unsaved";
+    uiState.error = "";
+    uiState.message = `系統提醒「${reminder.code}」已處理：${getReminderActionLabel(action)}。`;
   }
 
   function saveDraftPlaceholder() {
@@ -855,6 +944,10 @@
   }
 
   function deleteSelectedObject() {
+    if (uiState.selectedToolCatalogItemId) {
+      deleteSelectedToolCatalogItem();
+      return;
+    }
     if (uiState.selectedZoneId) {
       deleteSelectedZone();
       return;
@@ -928,6 +1021,12 @@
     }
     if (action === "set-ui-tool") {
       setUiTool(actionButton.dataset.tool, actionButton.dataset.toolLabel);
+    }
+    if (action === "toggle-layer-catalog-item") {
+      toggleLayerCatalogItem(actionButton.dataset.layerId, actionButton.dataset.itemName);
+    }
+    if (action === "resolve-system-reminder") {
+      updateSystemReminder(actionButton.dataset.reminderId, actionButton.dataset.reminderAction);
     }
     if (action === "auto-annotate-placeholder") {
       autoAnnotatePlaceholder();
@@ -1036,9 +1135,17 @@
       project.saveStatus = "unsaved";
       renderStatusLabels();
     }
+    if (field === "draft-version-name") {
+      project.draftVersionName = input.value.trim() || "v0.14 Status Area Productization draft";
+      project.saveStatus = "unsaved";
+      renderStatusLabels();
+    }
     if (field === "layer-note") {
       project.layerNotes[uiState.currentLayer] = input.value;
       project.saveStatus = "unsaved";
+    }
+    if (field.startsWith("selected-tool-item-")) {
+      updateSelectedToolCatalogItemFromField(input);
     }
     if (field === "current-opening-width") {
       uiState.currentOpeningWidth = readPositiveNumber(input.value, DEFAULT_OPENING_WIDTHS.door);
@@ -1096,6 +1203,24 @@
     }
     if (field.startsWith("project-preference-")) {
       updateProjectPreference(field, input.value);
+      render();
+      return;
+    }
+    if (field === "material-category") {
+      uiState.materialCategory = input.value || "請廠商建議";
+      applyMaterialToSelectedToolCatalogItem();
+      render();
+      return;
+    }
+    if (field === "text-tool-type") {
+      uiState.textToolType = input.value || "業主需求";
+      uiState.message = `文字工具類型已切換為 ${uiState.textToolType}。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field.startsWith("selected-tool-item-")) {
+      updateSelectedToolCatalogItemFromField(input);
       render();
       return;
     }
@@ -1190,6 +1315,11 @@
       return;
     }
 
+    if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedToolCatalogItemId) {
+      event.preventDefault();
+      deleteSelectedToolCatalogItem();
+      return;
+    }
     if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedZoneId) {
       event.preventDefault();
       deleteSelectedZone();
@@ -1316,12 +1446,16 @@
     project.openings = [];
     project.zones = [];
     project.furniture = [];
+    project.toolCatalogItems = [];
     uiState.selectedWallId = null;
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
+    uiState.selectedToolCatalogItemId = null;
+    uiState.pendingItemPlacement = null;
+    uiState.dimensionDraftStart = null;
     uiState.wallDraftStart = null;
     uiState.wallDraftStartSnapPoint = null;
     uiState.wallPreviewEnd = null;
@@ -1345,6 +1479,9 @@
     uiState.selectedZoneId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
+    uiState.selectedToolCatalogItemId = null;
+    uiState.pendingItemPlacement = null;
+    uiState.dimensionDraftStart = null;
     uiState.calibrationPoints = [];
     uiState.knownLengthInput = "";
     uiState.wallDraftStart = null;
@@ -1461,6 +1598,7 @@
     uiState.selectedOpeningId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
+    uiState.selectedToolCatalogItemId = null;
     clearWallDraft();
     const draft = createZoneBoundaryDraft(zone.boundaryEdgeIds || []);
     uiState.zoneBoundaryState = {
@@ -1518,6 +1656,21 @@
       return;
     }
 
+    if (uiState.currentTool === "item_place") {
+      placeToolCatalogItem(event);
+      return;
+    }
+
+    if (uiState.currentTool === "text") {
+      placeTextToolItem(event);
+      return;
+    }
+
+    if (uiState.currentTool === "dimension") {
+      handleDimensionToolClick(event);
+      return;
+    }
+
     if (event.target === canvas || event.target === wallLayer || event.target === openingLayer || event.target === zonePolygonLayer) {
       uiState.selectedWallId = null;
       uiState.selectedEdgeId = null;
@@ -1525,6 +1678,7 @@
       uiState.selectedZoneId = null;
       uiState.selectedIssueId = null;
       uiState.selectedNodeId = null;
+      uiState.selectedToolCatalogItemId = null;
       uiState.error = "";
       render();
     }
@@ -1569,6 +1723,152 @@
     uiState.error = "";
     uiState.message = `已新增空間標籤：${zone.name}。`;
     syncBridge();
+    render();
+  }
+
+  function getCanvasDraftPoint(event) {
+    const point = getCanvasPoint(event);
+    return hasValidScale() ? roundPoint(pxToMmPoint(point)) : point;
+  }
+
+  function getToolCatalogMarkerPx(item) {
+    const point = { x: Number(item.x) || 0, y: Number(item.y) || 0 };
+    return hasValidScale() ? mmToPxPoint(point) : point;
+  }
+
+  function getDefaultToolCatalogBudget(itemType, kind) {
+    if (kind === "text" || kind === "dimension") {
+      return "reference_only";
+    }
+    return /DECO|家具|軟裝|參考|reference/i.test(itemType || "") ? "reference_only" : "include";
+  }
+
+  function createToolCatalogItemMarker(point, options = {}) {
+    const currentLayer = getCurrentProductLayer();
+    const kind = options.kind || "item";
+    const itemType = options.itemType || uiState.selectedItemTemplate || currentLayer.items[0] || "未命名項目";
+    const label = options.label || itemType;
+    return {
+      id: createId("tool-item"),
+      kind,
+      layer: options.layer || currentLayer.id,
+      itemType,
+      label,
+      x: point.x,
+      y: point.y,
+      status: options.status || "new",
+      budgetInclusion: options.budgetInclusion || getDefaultToolCatalogBudget(itemType, kind),
+      productionReady: false,
+      reviewerRequired: Boolean(options.reviewerRequired),
+      reviewerReasons: Array.isArray(options.reviewerReasons) ? [...options.reviewerReasons] : [],
+      note: options.note || "",
+      textType: options.textType || null,
+      materialCategory: options.materialCategory || "",
+      dimensionMm: options.dimensionMm || null,
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  function selectToolCatalogItem(itemId) {
+    const item = getSelectedToolCatalogItem(itemId);
+    if (!item) {
+      return;
+    }
+    uiState.selectedToolCatalogItemId = item.id;
+    uiState.selectedWallId = null;
+    uiState.selectedEdgeId = null;
+    uiState.selectedOpeningId = null;
+    uiState.selectedZoneId = null;
+    uiState.selectedIssueId = null;
+    uiState.selectedNodeId = null;
+    uiState.mode = "select";
+    clearWallDraft();
+    clearZoneBoundaryDraft();
+    if (uiState.currentTool === "material_bucket") {
+      applyMaterialToSelectedToolCatalogItem(item);
+    }
+    uiState.error = "";
+    uiState.message = `已選取 Tool Catalog 草稿項目：${item.label}。`;
+    render();
+  }
+
+  function placeToolCatalogItem(event) {
+    event.preventDefault();
+    const point = getCanvasDraftPoint(event);
+    const item = createToolCatalogItemMarker(point, {
+      layer: uiState.currentLayer,
+      itemType: uiState.selectedItemTemplate || getCurrentProductLayer().items[0],
+      label: uiState.selectedItemTemplate || getCurrentProductLayer().items[0]
+    });
+    project.toolCatalogItems.push(item);
+    uiState.selectedToolCatalogItemId = item.id;
+    uiState.pendingItemPlacement = null;
+    project.saveStatus = "unsaved";
+    uiState.error = "";
+    uiState.message = `已在「${getCurrentProductLayer().label}」放置 candidate-only 項目：${item.label}。`;
+    render();
+  }
+
+  function placeTextToolItem(event) {
+    event.preventDefault();
+    const point = getCanvasDraftPoint(event);
+    const item = createToolCatalogItemMarker(point, {
+      kind: "text",
+      itemType: "text_note",
+      label: "請輸入備註",
+      textType: uiState.textToolType,
+      budgetInclusion: "reference_only"
+    });
+    project.toolCatalogItems.push(item);
+    uiState.selectedToolCatalogItemId = item.id;
+    project.saveStatus = "unsaved";
+    uiState.error = "";
+    uiState.message = "已建立文字備註 marker，可在右側屬性區修改文字與類型。";
+    render();
+  }
+
+  function handleDimensionToolClick(event) {
+    event.preventDefault();
+    const selectedWall = getSelectedWall();
+    if (selectedWall) {
+      const midpoint = {
+        x: Math.round((selectedWall.from.x + selectedWall.to.x) / 2),
+        y: Math.round((selectedWall.from.y + selectedWall.to.y) / 2)
+      };
+      const length = Math.round(getDistance(selectedWall.from, selectedWall.to));
+      addDimensionMarker(midpoint, length);
+      return;
+    }
+    const point = getCanvasDraftPoint(event);
+    if (!uiState.dimensionDraftStart) {
+      uiState.dimensionDraftStart = point;
+      uiState.error = "";
+      uiState.message = "尺寸工具已記錄第一點，請點第二點建立 draft dimension marker。";
+      render();
+      return;
+    }
+    const length = Math.round(getDistance(uiState.dimensionDraftStart, point));
+    const midpoint = {
+      x: Math.round((uiState.dimensionDraftStart.x + point.x) / 2),
+      y: Math.round((uiState.dimensionDraftStart.y + point.y) / 2)
+    };
+    addDimensionMarker(midpoint, length);
+    uiState.dimensionDraftStart = null;
+  }
+
+  function addDimensionMarker(point, length) {
+    const item = createToolCatalogItemMarker(point, {
+      kind: "dimension",
+      itemType: "dimension_marker",
+      label: `${length} mm`,
+      dimensionMm: length,
+      budgetInclusion: "reference_only"
+    });
+    project.toolCatalogItems.push(item);
+    uiState.selectedToolCatalogItemId = item.id;
+    project.saveStatus = "unsaved";
+    uiState.error = "";
+    uiState.message = `已建立尺寸 marker：${length} mm。`;
     render();
   }
 
@@ -1799,6 +2099,7 @@
     uiState.selectedZoneId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
+    uiState.selectedToolCatalogItemId = null;
     clearWallDraft();
     clearZoneBoundaryDraft();
     uiState.error = "";
@@ -2510,6 +2811,7 @@
     renderWalls();
     renderOpenings();
     renderZones();
+    renderToolCatalogItems();
     renderWallGraph();
     renderCalibration();
     renderCanvasHelper();
@@ -2767,6 +3069,33 @@
         event.preventDefault();
         event.stopPropagation();
         selectZone(zone.id);
+      });
+      zoneLayer.appendChild(button);
+    });
+  }
+
+  function renderToolCatalogItems() {
+    canvas.classList.toggle("is-item-placement", uiState.currentTool === "item_place");
+    canvas.classList.toggle("is-text-placement", uiState.currentTool === "text");
+    canvas.classList.toggle("is-dimension-placement", uiState.currentTool === "dimension");
+
+    (project.toolCatalogItems || []).forEach((item) => {
+      if (uiState.showOnlyCurrentLayer && item.layer !== uiState.currentLayer) {
+        return;
+      }
+      const point = getToolCatalogMarkerPx(item);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `tool-catalog-marker tool-catalog-marker-${escapeAttribute(item.kind || "item")}${item.id === uiState.selectedToolCatalogItemId ? " is-selected" : ""}`;
+      button.style.left = `${point.x}px`;
+      button.style.top = `${point.y}px`;
+      button.dataset.toolCatalogItemId = item.id;
+      button.title = `${item.label} / ${item.layer}`;
+      button.textContent = item.kind === "dimension" ? item.label : getToolCatalogMarkerLabel(item);
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        selectToolCatalogItem(item.id);
       });
       zoneLayer.appendChild(button);
     });
@@ -3061,44 +3390,38 @@
     const bridgePanel = `${renderBridgeCard()}${renderPcConverterReportCard()}${renderRendererPreviewReportCard()}`;
     const toolCatalogPanel = renderToolCatalogCard();
     const uiIaPanel = renderUiIaStatusPanel();
+    const developerBasePanels = `
+      ${toolCatalogPanel}
+      ${renderWallWorkflowCard()}
+      ${renderZoneWorkflowCard()}
+      ${renderWallGraphCard()}
+      ${renderNodeGraphCard()}
+      ${bridgePanel}
+      ${styleVisualPanel}
+    `;
     if (selectedZone) {
       inspectorBody.innerHTML = `
-        ${renderSelectedZoneCard(selectedZone)}
         ${uiIaPanel}
-        ${toolCatalogPanel}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${renderDeveloperDiagnosticsPanel(`${renderSelectedZoneCard(selectedZone)}${developerBasePanels}`)}
       `;
       return;
     }
 
     if (selectedOpening) {
       inspectorBody.innerHTML = `
-        ${renderSelectedOpeningCard(selectedOpening)}
         ${uiIaPanel}
-        ${toolCatalogPanel}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${renderDeveloperDiagnosticsPanel(`${renderSelectedOpeningCard(selectedOpening)}${developerBasePanels}`)}
       `;
       return;
     }
 
     if (selectedWall) {
       inspectorBody.innerHTML = `
-        ${renderSelectedWallCard(selectedWall)}
         ${uiIaPanel}
-        ${toolCatalogPanel}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${renderDeveloperDiagnosticsPanel(`${renderSelectedWallCard(selectedWall)}${developerBasePanels}`)}
       `;
       return;
     }
@@ -3110,46 +3433,41 @@
           <p>比例狀態：尚未校正。下一步請先匯入 JPG 或 PNG 丈量圖。</p>
         </section>
         ${uiIaPanel}
-        ${toolCatalogPanel}
-        ${renderWallWorkflowCard()}
-        ${renderZoneWorkflowCard()}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
         ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${renderDeveloperDiagnosticsPanel(developerBasePanels)}
       `;
       return;
     }
 
     if (!project.importSource.previewSupported) {
       inspectorBody.innerHTML = `
-        ${renderImportSourceCard()}
         ${uiIaPanel}
-        ${toolCatalogPanel}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
         ${renderMessageBlocks(PDF_NOT_SUPPORTED_MESSAGE)}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${renderDeveloperDiagnosticsPanel(`${renderImportSourceCard()}${developerBasePanels}`)}
       `;
       return;
     }
 
     inspectorBody.innerHTML = `
-      ${renderImportSourceCard()}
-      ${renderUnderlayControls()}
-      ${renderScaleCard()}
       ${uiIaPanel}
-      ${toolCatalogPanel}
-      ${renderWallWorkflowCard()}
-      ${renderZoneWorkflowCard()}
-      ${renderWallGraphCard()}
-      ${renderNodeGraphCard()}
       ${renderMessageBlocks()}
-      ${bridgePanel}
-      ${styleVisualPanel}
+      ${renderDeveloperDiagnosticsPanel(`${renderImportSourceCard()}${renderUnderlayControls()}${renderScaleCard()}${developerBasePanels}`)}
       <div class="inline-message">草稿包含底圖資料，檔案可能較大。</div>
+    `;
+  }
+
+  function renderDeveloperDiagnosticsPanel(content) {
+    return `
+      <details class="status-card developer-diagnostics">
+        <summary>
+          <span>開發者診斷 / 技術資訊</span>
+          <small>預設收合，屋主不需操作</small>
+        </summary>
+        <div class="developer-diagnostics-body">
+          <div class="inline-message">此區保留 Tool Catalog runtime、WallGraph / NodeGraph、Plancraft Bridge、Converter、Renderer Preview、DSL validation 與 AI sandbox 技術狀態；不作正式產品流程、估價或 renderer production input。</div>
+          ${content}
+        </div>
+      </details>
     `;
   }
 
@@ -3515,7 +3833,9 @@
     const currentLayer = getCurrentProductLayer();
     return `
       ${renderCurrentLayerCard(currentLayer)}
+      ${renderLayerItemCatalogCard(currentLayer)}
       ${renderSelectedObjectSummaryCard(currentLayer)}
+      ${renderToolCatalogItemEditorCard()}
       ${renderLayerOverlayCard()}
       ${renderAiGuideCard(currentLayer)}
       ${renderLayerNotesCard(currentLayer)}
@@ -3546,6 +3866,54 @@
     `;
   }
 
+  function renderLayerItemCatalogCard(currentLayer) {
+    const selectedItems = getSelectedLayerItems(currentLayer.id);
+    return `
+      <div class="status-card ui-ia-card">
+        <b>項目庫 / 目前圖層</b>
+        <div class="status-grid">
+          <div class="status-row"><span>currentLayer</span><span>${escapeHTML(currentLayer.id)}</span></div>
+          <div class="status-row"><span>可選項目</span><span>${currentLayer.items.length} 項</span></div>
+          <div class="status-row"><span>已選項目</span><span>${selectedItems.length} 項</span></div>
+        </div>
+        <div class="tag-row" aria-label="目前圖層項目庫">
+          ${currentLayer.items.map((item) => {
+            const isSelected = selectedItems.includes(item);
+            return `
+              <button class="style-tag item-chip ${isSelected ? "is-selected" : ""}" type="button" data-action="toggle-layer-catalog-item" data-layer-id="${escapeAttribute(currentLayer.id)}" data-item-name="${escapeAttribute(item)}" aria-pressed="${isSelected ? "true" : "false"}">
+                ${escapeHTML(item)}
+              </button>
+            `;
+          }).join("")}
+        </div>
+        <div class="inline-message">項目庫會依目前產品圖層切換；這裡只產生 draft requirement selections，不呼叫 Budget Engine。</div>
+      </div>
+    `;
+  }
+
+  function renderToolModeDraftCard() {
+    return `
+      <div class="status-card ui-ia-card">
+        <b>工具草稿設定</b>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="material-category">材料工具分類</label>
+            <select id="material-category" data-field="material-category">
+              ${MATERIAL_CATEGORIES.map((option) => `<option value="${escapeAttribute(option)}" ${option === uiState.materialCategory ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="text-tool-type">文字工具類型</label>
+            <select id="text-tool-type" data-field="text-tool-type">
+              ${TEXT_NOTE_TYPES.map((option) => `<option value="${escapeAttribute(option)}" ${option === uiState.textToolType ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+        <div class="inline-message">材料、文字、尺寸工具只建立 candidate marker，不會產生正式估價或 production renderer input。</div>
+      </div>
+    `;
+  }
+
   function renderSelectedObjectSummaryCard(currentLayer) {
     const selectedObject = getSelectedObjectSummary();
     return `
@@ -3560,6 +3928,56 @@
           <div class="status-row"><span>專業確認</span><span>${selectedObject.reviewerRequired ? "需要" : "不需要"}</span></div>
         </div>
         ${selectedObject.reviewerReasons.length ? `<div class="issue-list">${selectedObject.reviewerReasons.map((reason) => `<div class="issue-button" role="status"><strong>需確認</strong>${escapeHTML(reason)}</div>`).join("")}</div>` : `<div class="inline-message">目前未選取物件時，屬性區顯示目前圖層與預設 draft 設定。</div>`}
+      </div>
+    `;
+  }
+
+  function renderToolCatalogItemEditorCard() {
+    const item = getSelectedToolCatalogItem();
+    if (!item) {
+      return "";
+    }
+    return `
+      <div class="status-card ui-ia-card">
+        <b>Tool Catalog marker</b>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="selected-tool-item-label">標籤</label>
+            <input id="selected-tool-item-label" data-field="selected-tool-item-label" type="text" value="${escapeAttribute(item.label || "")}">
+          </div>
+          <div class="field-row">
+            <label for="selected-tool-item-status">狀態</label>
+            <select id="selected-tool-item-status" data-field="selected-tool-item-status">
+              ${TOOL_CATALOG_ITEM_STATUS_OPTIONS.map((option) => `<option value="${escapeAttribute(option)}" ${option === item.status ? "selected" : ""}>${escapeHTML(getToolCatalogStatusLabel(option))}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="selected-tool-item-budget">預算註記</label>
+            <select id="selected-tool-item-budget" data-field="selected-tool-item-budget">
+              ${TOOL_CATALOG_BUDGET_OPTIONS.map((option) => `<option value="${escapeAttribute(option)}" ${option === item.budgetInclusion ? "selected" : ""}>${escapeHTML(getToolCatalogBudgetLabel(option))}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field-row">
+            <label for="selected-tool-item-material">材料分類</label>
+            <select id="selected-tool-item-material" data-field="selected-tool-item-material">
+              <option value="">未指定</option>
+              ${MATERIAL_CATEGORIES.map((option) => `<option value="${escapeAttribute(option)}" ${option === item.materialCategory ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+            </select>
+          </div>
+          ${item.kind === "text" ? `
+            <div class="field-row">
+              <label for="selected-tool-item-text-type">文字類型</label>
+              <select id="selected-tool-item-text-type" data-field="selected-tool-item-text-type">
+                ${TEXT_NOTE_TYPES.map((option) => `<option value="${escapeAttribute(option)}" ${option === item.textType ? "selected" : ""}>${escapeHTML(option)}</option>`).join("")}
+              </select>
+            </div>
+          ` : ""}
+          <div class="field-row full">
+            <label for="selected-tool-item-note">備註</label>
+            <input id="selected-tool-item-note" data-field="selected-tool-item-note" type="text" value="${escapeAttribute(item.note || "")}" placeholder="candidate-only 草稿備註">
+          </div>
+        </div>
+        <div class="inline-message">此 marker 只存在於 project.toolCatalogItems，不寫入正式估價、Plancraft core 或 renderer production input。</div>
       </div>
     `;
   }
@@ -3650,10 +4068,13 @@
             <div class="issue-button" role="status">
               <strong>${escapeHTML(reminder.code)}</strong>
               ${escapeHTML(reminder.message)}
+              <div class="status-row"><span>處理狀態</span><span>${escapeHTML(getReminderStatusLabel(reminder.status))}</span></div>
               <div class="tag-row">
-                <span class="style-tag">加入預算</span>
-                <span class="style-tag">忽略</span>
-                <span class="style-tag">請廠商建議</span>
+                ${reminder.actions.map((action) => `
+                  <button class="style-tag item-chip ${reminder.resolution === action ? "is-selected" : ""}" type="button" data-action="resolve-system-reminder" data-reminder-id="${escapeAttribute(reminder.id)}" data-reminder-action="${escapeAttribute(action)}" aria-pressed="${reminder.resolution === action ? "true" : "false"}">
+                    ${escapeHTML(getReminderActionLabel(action))}
+                  </button>
+                `).join("")}
               </div>
             </div>
           `).join("")}
@@ -3663,14 +4084,18 @@
   }
 
   function renderBudgetInclusionCard() {
+    const includedCount = (project.systemReminders || []).filter((reminder) => reminder.status === "included").length;
+    const askContractorCount = (project.systemReminders || []).filter((reminder) => reminder.status === "ask_contractor").length;
+    const selectedItemCount = getAllSelectedLayerItems().length;
     return `
       <div class="status-card ui-ia-card">
         <b>納入預算勾選</b>
         <div class="status-grid">
-          <div class="status-row"><span>新設物件 / 工程需求</span><span>預設納入預算候選</span></div>
+          <div class="status-row"><span>新設物件 / 工程需求</span><span>${selectedItemCount} 個圖層項目候選</span></div>
           <div class="status-row"><span>DECO / 家具示意</span><span>預設僅作示意</span></div>
           <div class="status-row"><span>AI 風格示意</span><span>不納入預算</span></div>
-          <div class="status-row"><span>需專業確認</span><span>請廠商建議</span></div>
+          <div class="status-row"><span>系統提醒加入預算</span><span>${includedCount} 項</span></div>
+          <div class="status-row"><span>需專業確認</span><span>${askContractorCount} 項請廠商建議</span></div>
         </div>
         <div class="warning-note">這裡只標示 draft candidate，不會呼叫 Budget Engine，不會產生正式估價。</div>
       </div>
@@ -3715,6 +4140,17 @@
   function renderTotalPreviewCard() {
     const isOpen = uiState.preflightOpen || project.totalPreviewOpen;
     const currentLayer = getCurrentProductLayer();
+    const selectedItems = getAllSelectedLayerItems();
+    const reminderRows = (project.systemReminders || []).map((reminder) => `
+      <div class="issue-button" role="status">
+        <strong>${escapeHTML(reminder.code)}</strong>
+        ${escapeHTML(reminder.message)}
+        <div class="status-row"><span>狀態</span><span>${escapeHTML(getReminderStatusLabel(reminder.status))}</span></div>
+      </div>
+    `).join("");
+    const selectedItemRows = selectedItems.length
+      ? selectedItems.map((entry) => `<div class="status-row"><span>${escapeHTML(entry.layerLabel)}</span><span>${escapeHTML(entry.item)}</span></div>`).join("")
+      : `<div class="status-row"><span>尚未選取</span><span>請從目前圖層項目庫加入需求</span></div>`;
     return `
       <div class="status-card ui-ia-card">
         <b>總預覽 / 送出前檢查</b>
@@ -3725,15 +4161,15 @@
           <div class="status-grid" style="margin-top: 12px;">
             <div class="status-row"><span>已畫項目</span><span>${project.walls.length} 牆 / ${project.openings.length} 門窗 / ${project.zones.length} zone</span></div>
             <div class="status-row"><span>已選材料</span><span>${project.selectedMaterials.length} 項</span></div>
+            <div class="status-row"><span>已選項目</span><span>${selectedItems.length} 項</span></div>
             <div class="status-row"><span>目前圖層</span><span>${escapeHTML(currentLayer.label)}</span></div>
             <div class="status-row"><span>是否納入預算</span><span>逐項 draft 勾選</span></div>
           </div>
+          <div class="status-grid" style="margin-top: 12px;">
+            ${selectedItemRows}
+          </div>
           <div class="issue-list">
-            <div class="issue-button" role="status"><strong>地坪</strong>新增地坪工程時，確認門檻 / 收邊、全室矽利康與地坪保護。</div>
-            <div class="issue-button" role="status"><strong>浴室</strong>浴室地坪或給排水變更時，建議加入防水工程、試水與泥作修補。</div>
-            <div class="issue-button" role="status"><strong>拆除</strong>有拆除項目時，後續預算公式處理雜工、垃圾車、清運費與保護工程。</div>
-            <div class="issue-button" role="status"><strong>櫃體 / 廚具</strong>確認材質、五金、檯面、插座與給排水需求。</div>
-            <div class="issue-button" role="status"><strong>空調</strong>系統依空間與新舊屋條件估算冷房能力；屋主不自行設計專業空調。</div>
+            ${reminderRows}
           </div>
         ` : `<div class="inline-message">入口已建立；展開後可看到已畫項目、已選材料、系統提醒、可能漏項與預算候選狀態。</div>`}
       </div>
@@ -3744,6 +4180,111 @@
     return PLAN_PUZZLE_PRODUCT_LAYERS.find((layer) => layer.id === uiState.currentLayer)
       || PLAN_PUZZLE_PRODUCT_LAYERS.find((layer) => layer.id === project.currentLayer)
       || PLAN_PUZZLE_PRODUCT_LAYERS[1];
+  }
+
+  function getSelectedToolCatalogItem(itemId = uiState.selectedToolCatalogItemId) {
+    if (!itemId) {
+      return null;
+    }
+    return (project.toolCatalogItems || []).find((item) => item.id === itemId) || null;
+  }
+
+  function getProductLayerLabel(layerId) {
+    const layer = PLAN_PUZZLE_PRODUCT_LAYERS.find((item) => item.id === layerId);
+    return layer ? layer.label : layerId;
+  }
+
+  function getToolCatalogMarkerLabel(item) {
+    if (!item) {
+      return "";
+    }
+    if (item.kind === "text") {
+      return "文字";
+    }
+    if (item.kind === "dimension") {
+      return "尺寸";
+    }
+    return item.label || item.itemType || "項目";
+  }
+
+  function getToolCatalogStatusLabel(status) {
+    const labels = {
+      new: "新增",
+      existing: "既有",
+      demolition: "拆除",
+      reference: "參考"
+    };
+    return labels[status] || status || "新增";
+  }
+
+  function getToolCatalogBudgetLabel(value) {
+    const labels = {
+      include: "加入預算候選",
+      reference_only: "僅供參考",
+      ask_contractor: "請廠商建議"
+    };
+    return labels[value] || value || "加入預算候選";
+  }
+
+  function deleteSelectedToolCatalogItem() {
+    const item = getSelectedToolCatalogItem();
+    if (!item) {
+      return;
+    }
+    project.toolCatalogItems = (project.toolCatalogItems || []).filter((entry) => entry.id !== item.id);
+    uiState.selectedToolCatalogItemId = null;
+    project.saveStatus = "unsaved";
+    uiState.error = "";
+    uiState.message = `已刪除 Tool Catalog 草稿項目：${item.label}。`;
+    render();
+  }
+
+  function updateSelectedToolCatalogItemFromField(input) {
+    const item = getSelectedToolCatalogItem();
+    if (!item) {
+      return;
+    }
+    const field = input.dataset.field;
+    if (field === "selected-tool-item-label") {
+      item.label = input.value.trim() || item.label;
+    }
+    if (field === "selected-tool-item-note") {
+      item.note = input.value;
+    }
+    if (field === "selected-tool-item-status" && TOOL_CATALOG_ITEM_STATUS_OPTIONS.includes(input.value)) {
+      item.status = input.value;
+    }
+    if (field === "selected-tool-item-budget" && TOOL_CATALOG_BUDGET_OPTIONS.includes(input.value)) {
+      item.budgetInclusion = input.value;
+    }
+    if (field === "selected-tool-item-text-type") {
+      item.textType = input.value || item.textType;
+    }
+    if (field === "selected-tool-item-material") {
+      item.materialCategory = input.value || "";
+      if (item.materialCategory && !project.selectedMaterials.includes(item.materialCategory)) {
+        project.selectedMaterials.push(item.materialCategory);
+      }
+    }
+    item.updatedAt = new Date().toISOString();
+    project.saveStatus = "unsaved";
+    uiState.error = "";
+  }
+
+  function applyMaterialToSelectedToolCatalogItem(item = getSelectedToolCatalogItem()) {
+    if (!item) {
+      uiState.message = "請先選取一個 Tool Catalog marker，再套用材料分類。";
+      uiState.error = "";
+      return;
+    }
+    item.materialCategory = uiState.materialCategory || "請廠商建議";
+    if (item.materialCategory && !project.selectedMaterials.includes(item.materialCategory)) {
+      project.selectedMaterials.push(item.materialCategory);
+    }
+    item.updatedAt = new Date().toISOString();
+    project.saveStatus = "unsaved";
+    uiState.message = `已將材料分類「${item.materialCategory}」套用到 ${item.label}。`;
+    uiState.error = "";
   }
 
   function getCurrentToolLabel(tool) {
@@ -3779,7 +4320,57 @@
     return option ? option[1] : layerKey;
   }
 
+  function getSelectedLayerItems(layerId) {
+    if (!project.layerItemSelections || typeof project.layerItemSelections !== "object") {
+      project.layerItemSelections = createInitialLayerItemSelections();
+    }
+    if (!Array.isArray(project.layerItemSelections[layerId])) {
+      project.layerItemSelections[layerId] = [];
+    }
+    return project.layerItemSelections[layerId];
+  }
+
+  function getAllSelectedLayerItems() {
+    return PLAN_PUZZLE_PRODUCT_LAYERS.flatMap((layer) => getSelectedLayerItems(layer.id).map((item) => ({
+      layerId: layer.id,
+      layerLabel: layer.label,
+      item
+    })));
+  }
+
+  function getReminderActionLabel(action) {
+    const labels = {
+      include_budget: "加入預算",
+      ignore: "忽略",
+      ask_contractor: "請廠商建議"
+    };
+    return labels[action] || action || "未指定";
+  }
+
+  function getReminderStatusLabel(status) {
+    const labels = {
+      open: "待處理",
+      included: "已加入預算候選",
+      included_budget: "已加入預算候選",
+      ignored: "已忽略",
+      ask_contractor: "請廠商建議"
+    };
+    return labels[status] || status || "待處理";
+  }
+
   function getSelectedObjectSummary() {
+    const selectedToolItem = getSelectedToolCatalogItem();
+    if (selectedToolItem) {
+      return {
+        id: selectedToolItem.id,
+        type: selectedToolItem.kind === "text" ? "文字標註" : selectedToolItem.kind === "dimension" ? "尺寸標註" : "Tool Catalog 項目",
+        layer: getProductLayerLabel(selectedToolItem.layer),
+        status: getToolCatalogStatusLabel(selectedToolItem.status),
+        budgetInclusion: getToolCatalogBudgetLabel(selectedToolItem.budgetInclusion),
+        reviewerRequired: Boolean(selectedToolItem.reviewerRequired),
+        reviewerReasons: selectedToolItem.reviewerReasons || []
+      };
+    }
     const selectedWall = getSelectedWall();
     if (selectedWall) {
       return {
@@ -4296,6 +4887,14 @@
       })),
       currentLayer: uiState.currentLayer,
       visibleLayers: { ...project.visibleLayers },
+      selectedLayerItems: getAllSelectedLayerItems(),
+      toolCatalogItems: (project.toolCatalogItems || []).map((item) => ({ ...item })),
+      systemReminders: project.systemReminders.map((reminder) => ({
+        id: reminder.id,
+        code: reminder.code,
+        status: reminder.status,
+        resolution: reminder.resolution || null
+      })),
       forbiddenBoundary: {
         plancraftCoreTouched: false,
         budgetEngineCalled: false,
@@ -4357,6 +4956,18 @@
     const draftNameInput = document.getElementById("draftNameInput");
     if (draftNameInput && document.activeElement !== draftNameInput) {
       draftNameInput.value = project.draftName || project.name;
+    }
+    const draftVersionInput = document.getElementById("draftVersionNameInput");
+    if (draftVersionInput && document.activeElement !== draftVersionInput) {
+      draftVersionInput.value = project.draftVersionName || project.version;
+    }
+    const materialCategory = document.getElementById("material-category");
+    if (materialCategory) {
+      materialCategory.value = uiState.materialCategory;
+    }
+    const textToolType = document.getElementById("text-tool-type");
+    if (textToolType) {
+      textToolType.value = uiState.textToolType;
     }
     const currentProductLayer = document.getElementById("current-product-layer");
     if (currentProductLayer) {

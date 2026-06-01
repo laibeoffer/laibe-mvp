@@ -1,5 +1,76 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Plan Puzzle Task: Status Area Productization / Debug Collapse
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-tool-catalog-interaction`.
+- Task: Plancraft+ Status Area Productization / Debug Collapse.
+- Type: Builder / UI Cleanup / Status Panel Productization.
+- Modified files:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+- Added files: none.
+- Completed:
+  - Upgraded `project.version` / Tool Catalog runtime version to `0.14.0-status-area-productization`.
+  - Updated `code.html` script cache key to `./plan-puzzle.js?v=status-area-productization-0-14`.
+  - Reworked the right status area so the default visible stack is homeowner-facing product state.
+  - Moved engineering/debug panels into a collapsed `開發者診斷 / 技術資訊` block: Tool Catalog Runtime, Wall Graph, Node Graph, Plancraft Bridge, Converter Report, Renderer Preview Report, DSL / renderer state, and AI sandbox technical panel.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser URL: `http://127.0.0.1:50362/code.html?validation=status-area-productization-0-14`.
+  - Browser validation: page loaded, console error count 0, homeowner-facing status labels present, developer diagnostics collapsed by default, debug panels visible only after opening diagnostics.
+- Guard:
+  - No Plancraft core, budget runtime, package / node_modules / framework, `formalEstimateGuard`, `generateBudgetEstimate()`, payment / escrow / listing fee / DB / auth / webhook / secrets / AI API changes.
+- Next single action: commit and open a scoped PR for `codex/plan-puzzle-tool-catalog-interaction`.
+
+## Latest Plan Puzzle Task: Tool Catalog Interaction Implementation
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-tool-catalog-interaction`.
+- Base: PR #54 / `codex/plan-puzzle-ui-ia-alignment-0-12` / commit `f7384709f63fbf0cf1cd854dc80af8bce0fb5977`.
+- 任務名稱：Plancraft+ Tool Catalog Interaction Implementation.
+- 任務類型：Builder / UI runtime interaction.
+- 指派角色：平面拼圖 UI / Plan Puzzle Builder.
+- 是否允許施工：Yes, scoped to `preview_floor_plan` UI files and Plan Puzzle handoff / blackboard / phase docs.
+- 是否可供使用者後續主動審查：Yes.
+- 是否涉及 routing / CTA / header：No global routing / header changes; only existing Plan Puzzle tool/status controls.
+- 是否涉及資料模型：Only draft UI state (`currentLayer`, `currentTool`, `visibleLayers`, `layerItemSelections`, reminder status); no production budget model.
+- 是否涉及敏感區域：No.
+- 修改檔案：
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+- 新增檔案：無。
+- 已完成：
+  - Updated Plan Puzzle runtime / Tool Catalog version to `0.12.1-tool-catalog-interaction`.
+  - `currentLayer` now changes through the 10-product-layer selector and drives the layer-specific item catalog.
+  - `currentTool` now changes through the tool buttons and remains reflected in the active tool state and inspector.
+  - Tool buttons with `data-ui-tool` sync visual active state from `uiState.currentTool`.
+  - Added draft `layerItemSelections`; item chips toggle selected items for the current product layer.
+  - `visibleLayers` checkboxes update `project.visibleLayers` and remain reflected in the Tool Catalog runtime snapshot.
+  - System reminders now support the three requested actions: `include_budget`, `ignore`, and `ask_contractor`.
+  - Total preview / pre-submit panel expands and renders current reminders plus selected layer items.
+  - Shortcut help remains visible in the inspector.
+  - Preserved import, underlay, scale, wallGraph, nodeGraph, openings, zones, boundary, area metadata, `.pc` spike, DSL / renderer preview report.
+- 未完成 / boundaries:
+  - This is draft UI interaction only. It does not create a production Tool Catalog data model.
+  - No Budget Engine, formal quantity, formal estimate, renderer input, Excel/PDF output, AI API, DB, payment, escrow, listing fee, or storage integration.
+  - Undo / redo remains a clearly marked placeholder history stack.
+- 驗證：
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser runtime URL: `http://127.0.0.1:41854/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=dom-validation`.
+  - Browser validation: page loaded, 10 product layer options present, switching to `plumbing_plan` updates current layer and item catalog, `dimension` tool updates currentTool and active state, plumbing overlay checkbox updates visible state, `浴室給水` item selection toggles, `BATH_WATERPROOFING_SUGGESTED` reminder can be marked `include_budget`, total preview expands and shows reminder / selected item summary, shortcut help visible, validation runner observed console error count 0.
+- Need Commander：No for scoped UI interaction implementation; Yes only for PR landing / product acceptance.
+- Need Reviewer：No by default; if user starts phase review, this is ready for review context.
+- 下一步唯一建議：Commit and open a scoped PR for `codex/plan-puzzle-tool-catalog-interaction`.
+
 ## Latest Plan Puzzle Task: UI IA Alignment Implementation
 
 - To: 第二副指揮官 / @Deputy-Codex-2.

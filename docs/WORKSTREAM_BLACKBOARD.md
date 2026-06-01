@@ -37,7 +37,7 @@ Effective immediately:
 
 | Agent | Workstream | Repo / Branch | Progress % | Status | Current Issue / PR | Evidence | Blocker | Need Commander | Need Reviewer | Next |
 |---|---|---|---:|---|---|---|---|---|---|---|
-| 平面拼圖 UI / Plan Puzzle | `plancraft/page-ui` | `laibeoffer/laibe-mvp` | 90 | PARTIAL | PR #25 / Issue #15 context + local UI IA implementation | `0.12.0-ui-ia-alignment` local runtime verified: file area, complete tool surface, 10 product layers, status area, total preview entry; docs updated; console error 0 | Several tools remain placeholder; GitHub PR / shared branch still pending because local `git` executable unavailable | Yes, for UI IA acceptance | No by default | Implement Tool Catalog interactions or sync scoped branch / PR when GitHub write path is available |
+| Plan Puzzle UI | `plancraft/page-ui` | `laibeoffer/laibe-mvp` / `codex/plan-puzzle-tool-catalog-interaction` | 99 | BROWSER_VALIDATED | PR #54 base / Tool Catalog + Status Area branch | `0.14.0-status-area-productization` keeps homeowner-facing status cards visible by default and collapses Tool Catalog Runtime / WallGraph / NodeGraph / Plancraft Bridge / Converter / Renderer / DSL / AI sandbox technical state under `開發者診斷 / 技術資訊`; `node --check` passed; browser console error count 0 | Commit / scoped PR still pending | No for scoped implementation; Yes for PR landing | No by default | Commit and open scoped PR |
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 75 | WAITING_REVIEW | PR #3 draft per vault summary | QF5.4 commit `c58ba25`; validators passed; cloud-ready export package exists | PR #3 not recorded as merged / final shared truth pending | No | No by default | Quote Factory owner / Integration Officer confirms final evidence |
 | Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #26 | PR #26 refreshed; head `b8d27e3`; mergeable true; validators passed per vault summary | Final review / merge gate pending | No | Only if formal price boundary is touched | Wait for final gate evidence |
@@ -164,6 +164,18 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: Yes
 - Need Reviewer: No by default
 - Next single action: Plancraft+ Tool Catalog Interaction Implementation
+
+### 2026-06-01 - Plan Puzzle Tool Catalog Interaction Implementation
+
+- Agent: 平面拼圖 UI / Plan Puzzle
+- Workstream: `plancraft/page-ui`
+- Status: `BROWSER_VALIDATED`
+- Progress %: 98
+- Evidence: Clean branch `codex/plan-puzzle-tool-catalog-interaction` from PR #54 head; `0.12.1-tool-catalog-interaction` updates `currentLayer`, `currentTool`, tool active state, layer item selections, `visibleLayers`, reminder resolution actions, and total preview summary; `node --check` passed; browser validation observed console error count 0.
+- Blocker: Commit / scoped PR are pending.
+- Need Commander: No for scoped implementation; Yes for PR landing / product acceptance.
+- Need Reviewer: No by default.
+- Next single action: Commit and open scoped PR.
 
 ### 2026-06-01 - Owner Guide Mock Runtime Surface
 

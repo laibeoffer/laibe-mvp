@@ -1664,6 +1664,46 @@
       font-weight: 880;
     }
 
+    button.style-tag {
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .item-chip.is-selected {
+      border-color: rgba(252,157,83,.72);
+      background: rgba(252,157,83,.16);
+      color: var(--orange);
+    }
+
+    .developer-diagnostics {
+      border-style: dashed;
+      background: rgba(255,255,255,.035);
+    }
+
+    .developer-diagnostics summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .developer-diagnostics summary small {
+      color: var(--muted-2);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .developer-diagnostics-body {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
     .sandbox-label-row {
       display: flex;
       flex-wrap: wrap;
@@ -2132,7 +2172,7 @@
         <div class="file-panel">
           <span class="file-panel-label">草稿版本</span>
           <div class="compact-status-list">
-            <div><span>版本</span><b id="draftVersionText">v0.12 IA draft</b></div>
+            <div><span>版本</span><b id="draftVersionText">v0.14 Status Area Productization draft</b></div>
             <div><span>狀態</span><b id="draftSaveStatusText">未儲存</b></div>
             <div><span>最後儲存</span><b id="lastSavedText">尚未儲存</b></div>
           </div>
@@ -2533,6 +2573,6 @@
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=ui-ia-alignment-0-12" defer></script>
+  <script src="./plan-puzzle.js?v=status-area-productization-0-14" defer></script>
 </body>
 </html>

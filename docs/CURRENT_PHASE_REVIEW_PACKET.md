@@ -1,5 +1,126 @@
 ﻿# CURRENT PHASE REVIEW PACKET
 
+## Plan Puzzle Status Area Productization / Debug Collapse
+
+### 任務名稱
+
+Plancraft+ Status Area Productization / Debug Collapse
+
+### 本輪定位
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-tool-catalog-interaction`.
+- Status: `BROWSER_VALIDATED`.
+- Functional Acceptance: `STATUS_AREA_PRODUCTIZED_DEBUG_COLLAPSED`.
+- 本輪是平面拼圖狀態區產品化，不是 Plancraft core、budget runtime、AI API 或 renderer production 任務。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+
+### 已完成
+
+- `project.version` / Tool Catalog runtime version updated to `0.14.0-status-area-productization`.
+- `code.html` script cache key updated to `./plan-puzzle.js?v=status-area-productization-0-14`.
+- Right status area now defaults to homeowner-facing product status cards.
+- Engineering/debug cards are moved under collapsed `開發者診斷 / 技術資訊`.
+- Collapsed diagnostics retains Tool Catalog Runtime, Wall Graph, Node Graph, Plancraft Bridge, Converter Report, Renderer Preview Report, DSL / renderer state, and AI sandbox technical state.
+
+### Runtime Evidence
+
+- `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+- Browser URL: `http://127.0.0.1:50362/code.html?validation=status-area-productization-0-14`.
+- Browser validation: page loaded, console error count 0, `project.version` = `0.14.0-status-area-productization`, script key = `status-area-productization-0-14`, homeowner-facing status labels present, developer diagnostics collapsed by default, debug panels visible after opening diagnostics.
+
+### Forbidden Scope Preserved
+
+- No Plancraft core change.
+- No budget runtime / renderer / MethodSpec / raw warehouse change.
+- No package / framework / node_modules change.
+- No `formalEstimateGuard` change and no `generateBudgetEstimate()` call.
+- No formal estimate, price, Excel, PDF, payment, escrow, listing fee, DB, auth, webhook, secrets, or AI API.
+
+### Next Single Action
+
+Commit and open a scoped PR for `codex/plan-puzzle-tool-catalog-interaction`.
+
+## Plan Puzzle Tool Catalog Interaction Implementation
+
+### 任務名稱
+
+Plancraft+ Tool Catalog Interaction Implementation
+
+### 本輪定位
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-tool-catalog-interaction`.
+- Base: PR #54 / commit `f7384709f63fbf0cf1cd854dc80af8bce0fb5977`.
+- Status: `BROWSER_VALIDATED`.
+- Functional Acceptance: `TOOL_CATALOG_DRAFT_INTERACTION_BROWSER_VERIFIED`.
+- 本輪是平面拼圖主線 Tool Catalog 互動落地，不是 docs-only repair，不是 budget / renderer / Plancraft core 任務。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+
+### 新增檔案
+
+- 無。
+
+### 已完成
+
+- `project.version` / Tool Catalog runtime version updated to `0.12.1-tool-catalog-interaction`.
+- `currentLayer` changes through the 10-product-layer select and updates inspector content.
+- `currentTool` changes through tool buttons and syncs tool active classes.
+- Added per-layer item catalog chips; item list changes with the selected product layer.
+- Added draft `layerItemSelections`, included in total preview and Tool Catalog runtime snapshot.
+- `visibleLayers` checkboxes update `project.visibleLayers` and remain visible in runtime snapshot.
+- System reminders now support `include_budget`, `ignore`, and `ask_contractor` actions.
+- Total preview expands and shows drawn counts, selected materials, selected layer items, current layer, and current reminder statuses.
+- Shortcut help remains available in the status area.
+- Existing import / underlay / scale / wallGraph / nodeGraph / openings / zones / boundary / area metadata / `.pc` spike / DSL report / renderer preview report were preserved.
+
+### Runtime Evidence
+
+- `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+- Browser URL: `http://127.0.0.1:41854/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=dom-validation`.
+- Browser validation: page loaded, 10 product layer options present, switching to `plumbing_plan` updates current layer and item catalog, `dimension` tool updates currentTool and active state, plumbing overlay checkbox updates visible state, `浴室給水` item selection toggles, `BATH_WATERPROOFING_SUGGESTED` reminder can be marked `include_budget`, total preview expands and shows reminder / selected item summary, shortcut help visible, validation runner observed console error count 0.
+
+### 未完成 / 風險
+
+- No production Tool Catalog data model.
+- Undo / redo remains a placeholder history stack.
+- Draft item selections and reminder resolutions are UI state only; they are not formal quantity facts and do not enter Budget Engine.
+- Commit / PR still pending.
+
+### Forbidden Scope Preserved
+
+- No Plancraft core change.
+- No budget runtime / adapter / renderer / MethodSpec / Raw Candidate / Output Documents change.
+- No package / framework / node_modules change.
+- No formal estimate / price / Excel / PDF.
+- No `formalEstimateGuard` change and no `generateBudgetEstimate()` call.
+- No payment / escrow / listing fee / DB / auth / webhook / AI API / secrets.
+
+### Need Commander / Reviewer
+
+- Need Commander: No for scoped implementation; Yes only for PR landing or product acceptance.
+- Need Reviewer: No by default; available if user triggers phase review.
+
+### Next Single Action
+
+Commit and open a scoped PR for `codex/plan-puzzle-tool-catalog-interaction`.
+
 ## Plan Puzzle UI IA Alignment Implementation
 
 ### 任務名稱
