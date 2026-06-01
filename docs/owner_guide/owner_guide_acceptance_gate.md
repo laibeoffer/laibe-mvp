@@ -61,20 +61,36 @@ Do not mark `WEB_RUNTIME_VERIFIED` until all are true:
 
 ## Current Blockers To Runtime Verification
 
-- The mock runtime page is not wired into `src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html`.
+- Branch is not synced to current GitHub `main`.
+- `code.html` link is deferred by `EXECUTION_OFFICER` until branch sync/rebase and changed-file re-check.
 - Browser verification attempt using a temporary `data:` page was blocked by browser security policy.
-- PR #46 is behind GitHub `main`; update/rebase strategy is needed before final acceptance.
 - Deputy Commander has not approved Functional Acceptance PASS, merge readiness, final completion, or task closure.
 
-## Execution Officer Decision Needed
+## Execution Officer Decision Received
 
-`EXECUTION_OFFICER` should choose one scoped path:
+Source: PR #46 comment `4590165805`, referencing earlier decision comment `4589799907`.
 
-1. Keep `owner_guide_mock_runtime.html` as standalone runtime evidence and approve a browser-accessible preview path for verification.
-2. Wire a scoped entry from `onboard_ai_agent/code.html` to `owner_guide_mock_runtime.html`, then run browser verification from that accepted entry path.
-3. Direct a branch update/rebase first, then decide the runtime verification path.
+Decision:
 
-Until this decision is made, the correct workstream status is `MOCK_READY`, not `WEB_RUNTIME_VERIFIED`.
+- Keep `owner_guide_mock_runtime.html` standalone for now.
+- Do not wire `onboard_ai_agent/code.html` until the branch is synced/rebased against current GitHub `main` and changed files are re-checked.
+- After sync, only propose a minimal reversible link if it does not alter onboarding flow, CTA hierarchy, routing, production behavior, or forbidden boundaries.
+- Runtime remains `MOCK_READY / WEB_RUNTIME_PENDING` until browser or browser-equivalent validation opens the intended page and verifies the mock flow.
+
+Required next report:
+
+- Branch synced to current `main`: Yes / No.
+- Changed files after sync.
+- `code.html` link: deferred / proposed.
+- Browser/runtime evidence: Yes / No, with path or URL and flow checked.
+- Forbidden-boundary check.
+- Whether Deputy Commander decision is needed for Functional Acceptance / merge readiness.
+
+## Next GitHub Action Needed
+
+Sync or rebase PR #46 against current GitHub `main`, then re-check changed files.
+
+Until branch sync/rebase is complete, `code.html` link status is `deferred`.
 
 ## Deputy Commander Decision Needed
 
