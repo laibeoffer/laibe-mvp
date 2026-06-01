@@ -1,0 +1,45 @@
+{
+  "schema_name": "QuoteFactoryExportPackage",
+  "schema_version": "0.1.0-docs",
+  "contract_status": "linked",
+  "quote_factory_export_package_id": "qf_export_package_example_001",
+  "source_agent": "quote-factory/price-range-governance",
+  "source_repo": "laibeoffer/laibe-quote-factory",
+  "source_ref": "quote_factory_pr_example",
+  "package_status": "draft_review_evidence",
+  "price_observations": [
+    {
+      "schema_name": "PriceObservation",
+      "price_observation_id": "price_observation_example_001",
+      "contract_status": "linked",
+      "source_item_id": "raw_quote_row_example_001",
+      "observed_name": "bathroom waterproofing observed line",
+      "observed_unit": "m2",
+      "observed_price": 1800,
+      "observed_currency": "TWD",
+      "observed_date": "2026-05-01",
+      "price_authority": "none"
+    }
+  ],
+  "price_ranges": [
+    {
+      "schema_name": "PriceRange",
+      "price_range_id": "price_range_example_001",
+      "contract_status": "linked",
+      "observation_refs": ["price_observation_example_001"],
+      "range_low": 1500,
+      "range_high": 2100,
+      "currency": "TWD",
+      "unit": "m2",
+      "review_status": "needs_human_review",
+      "price_authority": "none"
+    }
+  ],
+  "manifest_summary": {
+    "observation_count": 1,
+    "range_count": 1,
+    "validator_status": "example_only"
+  },
+  "warnings": ["PriceObservation and PriceRange are evidence only, not formal price authority."],
+  "forbidden_use": ["PricingRule", "official_unit_price", "BudgetEstimateLine", "customer_quote", "renderer_input"]
+}
