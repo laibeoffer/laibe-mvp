@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE Owner Guide Mock Runtime</title>
+  <style>
+    :root {
+      --bg: #07090d;
+      --panel: #111820;
+      --panel-2: #17212b;
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f4f7f8;
+      --muted: #9aa7b3;
+      --cyan: #79d8ff;
+      --mint: #62e6c8;
+      --orange: #ff8a2a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: linear-gradient(135deg, #050607, var(--bg) 48%, #10151b);
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(100% - 32px, 1180px);
+      margin: 0 auto;
+      padding: 36px 0;
+    }
+
+    .runtime-shell {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.9fr) minmax(420px, 1.1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: rgba(17, 24, 32, 0.92);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 { font-size: clamp(28px, 4vw, 48px); line-height: 1.08; }
+    h2 { font-size: 18px; }
+    h3 { font-size: 14px; color: var(--cyan); }
+    p { color: #c9d1d7; line-height: 1.7; }
+
+    .badge-row, .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chat-box {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    input, button, a.button {
+      font: inherit;
+      border-radius: 999px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--line);
+      padding: 13px 14px;
+      color: var(--text);
+      background: #090d12;
+      outline: 0;
+    }
+
+    button, a.button {
+      border: 1px solid rgba(121, 216, 255, 0.45);
+      padding: 12px 16px;
+      color: #041016;
+      background: linear-gradient(135deg, var(--cyan), var(--mint));
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    button.secondary, a.secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .log {
+      margin: 0;
+      padding-left: 20px;
+      color: #dce6ec;
+      line-height: 1.65;
+    }
+
+    pre {
+      max-height: 330px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      color: #eaf4f8;
+      background: #050607;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .warning {
+      border-color: rgba(255, 138, 42, 0.42);
+      background: rgba(255, 138, 42, 0.08);
+    }
+
+    @media (max-width: 900px) {
+      .runtime-shell, .grid { grid-template-columns: 1fr; }
+      .chat-box { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="runtime-shell" aria-label="Owner Guide mock runtime">
+      <article class="panel">
+        <div class="badge-row">
+          <span class="badge">MOCK_READY</span>
+          <span class="badge">PLACEHOLDER_ONLY</span>
+          <span class="badge">NO_REAL_AI_API</span>
+        </div>
+        <h1>需求引導官 mock runtime</h1>
+        <p>這個對應頁面用前端本地狀態模擬甲方需求問答，產生問答紀錄、需求摘要、OwnerIntent 與 ProjectRequirementBrief placeholder。它不寫入 DB、不呼叫真 AI、不接 payment，也不產生正式價格。</p>
+        <div class="chat-box" aria-label="mock question input">
+          <input id="ownerAnswer" autocomplete="off" placeholder="例如：台北 28 坪中古屋，自住，想整理客廳、廚房、浴室，預算還不知道" />
+          <button id="sendAnswer" type="button">送出回答</button>
+        </div>
+        <div class="cta-row" aria-label="next step links">
+          <a class="button secondary" id="nextStepLink" href="#ownerAnswer">繼續需求整理</a>
+          <a class="button secondary" href="../preview_floor_plan/code.html">平面拼圖</a>
+          <a class="button secondary" href="../preview_budget/code.html">預算預覽</a>
+        </div>
+        <section class="panel warning" aria-label="scope warning">
+          <h2>Scope guard</h2>
+          <p>Owner Guide output is only `placeholder`, `linked`, or `verified` context. Free text must not become formal budget input without downstream validation.</p>
+        </section>
+      </article>
+
+      <section class="panel" aria-label="mock runtime outputs">
+        <div class="grid">
+          <article>
+            <h2>QuestionAnswerLog</h2>
+            <ol class="log" id="qaLog"><li>尚未送出回答。</li></ol>
+          </article>
+          <article>
+            <h2>Requirement Summary</h2>
+            <p id="summary">等待第一輪回答。</p>
+            <h3 id="nextStepLabel">continue_requirement_intake</h3>
+          </article>
+        </div>
+        <div class="grid">
+          <article>
+            <h2>OwnerIntent</h2>
+            <pre id="ownerIntent"></pre>
+          </article>
+          <article>
+            <h2>ProjectRequirementBrief placeholder</h2>
+            <pre id="brief"></pre>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      session_id: `owner_guide_mock_${Date.now()}`,
+      project_id: "project_mock_unassigned",
+      qa: [],
+      created_at: new Date().toISOString()
+    };
+
+    const input = document.getElementById("ownerAnswer");
+    const send = document.getElementById("sendAnswer");
+    const qaLog = document.getElementById("qaLog");
+    const summary = document.getElementById("summary");
+    const nextStepLabel = document.getElementById("nextStepLabel");
+    const nextStepLink = document.getElementById("nextStepLink");
+    const ownerIntentEl = document.getElementById("ownerIntent");
+    const briefEl = document.getElementById("brief");
+
+    function allText() {
+      return state.qa.map((item) => item.owner_answer).join(" ");
+    }
+
+    function gaps(text) {
+      return [
+        ["property_context", /(公寓|大樓|透天|華廈|老屋|中古屋|新成屋|預售|坪|台北|新北|桃園|台中|台南|高雄)/],
+        ["space_requirements", /(客廳|臥室|房間|廚房|浴室|衛浴|收納|書房|陽台|玄關)/],
+        ["style_preferences", /(風格|北歐|日系|現代|工業|無印|奶油|簡約|不喜歡|參考圖)/],
+        ["budget_signal", /(預算|上限|區間|估算|萬|元|不知道|未知)/],
+        ["schedule_signal", /(時程|一個月|三個月|半年|入住|開工|探索中|還不確定)/],
+        ["asset_status", /(平面圖|照片|報價單|需要平面拼圖)/]
+      ].filter(([, pattern]) => !pattern.test(text)).map(([key]) => key);
+    }
+
+    function nextStep(questionGaps, text) {
+      if (/人工|專人|客服/.test(text)) return "human_assistance";
+      if (/平面圖|需要平面拼圖/.test(text)) return "enter_plan_puzzle";
+      if (/預算|報價單|估算/.test(text) && questionGaps.length <= 3) return "enter_budget_preview";
+      if (questionGaps.length === 0) return "prepare_for_bidding";
+      return "continue_requirement_intake";
+    }
+
+    function routeFor(step) {
+      return {
+        continue_requirement_intake: ["繼續需求整理", "#ownerAnswer"],
+        enter_plan_puzzle: ["進入平面拼圖", "../preview_floor_plan/code.html"],
+        enter_budget_preview: ["進入預算預覽", "../preview_budget/code.html"],
+        prepare_for_bidding: ["進入招標前準備", "../bid_comparison_and_ai_summary/code.html"],
+        human_assistance: ["需要人工協助", "#ownerAnswer"]
+      }[step];
+    }
+
+    function buildOwnerIntent() {
+      const text = allText();
+      const question_gaps = gaps(text);
+      const next_recommended_step = nextStep(question_gaps, text);
+      const budgetMatches = text.match(/\d+(?:\.\d+)?\s*(?:萬|元)/g) || [];
+      return {
+        owner_intent_id: `owner_intent_${state.session_id}`,
+        session_id: state.session_id,
+        project_id: state.project_id,
+        renovation_goals: state.qa.map((item) => item.owner_answer),
+        property_context: { raw_signal: text || "unknown" },
+        style_preferences: { raw_signal: /風格|北歐|日系|現代|簡約/.test(text) ? "mentioned" : "unknown" },
+        budget_signal: {
+          status: budgetMatches.length ? "owner_provided_signal" : /估算|不知道|未知/.test(text) ? "needs_ai_assistance" : "unknown",
+          range_or_ceiling: budgetMatches,
+          formal_pricing_status: "not_allowed"
+        },
+        schedule_signal: { raw_signal: /一個月|三個月|半年|時程|入住|開工/.test(text) ? "mentioned" : "unknown" },
+        asset_summary: {
+          floor_plan: /平面圖/.test(text) ? "mentioned" : "unknown",
+          quote: /報價單/.test(text) ? "mentioned" : "unknown",
+          photos: /照片/.test(text) ? "mentioned" : "unknown",
+          needs_plan_puzzle: /需要平面拼圖|平面圖/.test(text)
+        },
+        question_gaps,
+        next_recommended_step,
+        requires_followup: question_gaps.length > 0,
+        confidence: Math.min(0.72, 0.34 + state.qa.length * 0.08),
+        source_refs: state.qa.map((item) => item.qa_log_id),
+        created_at: state.created_at,
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function buildBrief(intent) {
+      const text = allText();
+      return {
+        project_requirement_brief_id: `prb_placeholder_${state.session_id}`,
+        owner_intent_id: intent.owner_intent_id,
+        requirement_context_status: "placeholder",
+        space_requirements: {
+          living_room: /客廳/.test(text) ? "mentioned" : "unknown",
+          bedroom: /(臥室|房間)/.test(text) ? "mentioned" : "unknown",
+          kitchen: /廚房/.test(text) ? "mentioned" : "unknown",
+          bathroom: /(浴室|衛浴)/.test(text) ? "mentioned" : "unknown",
+          storage: /收納/.test(text) ? "mentioned" : "unknown",
+          other_spaces: []
+        },
+        budget_preference: intent.budget_signal,
+        scope_constraints: {
+          mock_only: true,
+          no_real_ai_api: true,
+          no_db_write: true,
+          no_payment: true,
+          no_formal_price: true,
+          budget_engine_handoff_status: "placeholder_only"
+        },
+        review_flags: ["not_for_formal_estimate", "requires_downstream_validation", "placeholder_window_only"],
+        handoff_targets: ["plan-puzzle", "budget-preview", "bid-preparation"]
+      };
+    }
+
+    function render() {
+      const intent = buildOwnerIntent();
+      const brief = buildBrief(intent);
+      const [label, href] = routeFor(intent.next_recommended_step);
+      qaLog.innerHTML = state.qa.length ? "" : "<li>尚未送出回答。</li>";
+      state.qa.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.qa_log_id}: ${item.owner_answer}`;
+        qaLog.appendChild(li);
+      });
+      summary.textContent = state.qa.length ? `已記錄 ${state.qa.length} 輪回答。待補欄位: ${intent.question_gaps.join(", ") || "none"}.` : "等待第一輪回答。";
+      nextStepLabel.textContent = intent.next_recommended_step;
+      nextStepLink.textContent = label;
+      nextStepLink.href = href;
+      ownerIntentEl.textContent = JSON.stringify(intent, null, 2);
+      briefEl.textContent = JSON.stringify(brief, null, 2);
+    }
+
+    function submitAnswer() {
+      const value = input.value.trim();
+      if (!value) return;
+      state.qa.push({
+        qa_log_id: `qa_${String(state.qa.length + 1).padStart(2, "0")}`,
+        stage: "natural_language_requirement",
+        question: "請用自然語言描述你的裝修需求。",
+        owner_answer: value,
+        source: "front_end_mock",
+        created_at: new Date().toISOString()
+      });
+      input.value = "";
+      render();
+    }
+
+    send.addEventListener("click", submitAnswer);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") submitAnswer();
+    });
+    render();
+  </script>
+</body>
+</html>
