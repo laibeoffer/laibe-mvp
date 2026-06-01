@@ -1,8 +1,190 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-01 15:22 Asia/Taipei
+Last updated: 2026-06-01 19:24 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
+
+## PR #50 Acceptance Packet - Plan Puzzle Guide Agent
+
+- Task: `Plan Puzzle Guide Agent - PR #50 Acceptance Packet and Browser Validation Checklist`
+- Task type: `Self-assigned safe task / Documentation / Validation Preparation`
+- To: `SECOND_DEPUTY_COMMANDER`
+- From: `Plan Puzzle Guide Agent`
+- Workstream: `app/plan-puzzle-guide-agent`
+- Repo / Branch / PR: `laibeoffer/laibe-mvp` / `codex/plan-puzzle-guide-init-main-sync` / PR #50
+- PR URL: `https://github.com/laibeoffer/laibe-mvp/pull/50`
+- Head commit: `7ee50f60a464718bb7a13661a77f64229679466c`
+- PR state: `open draft`
+- PR merged: `No`
+- PR mergeable from GitHub connector: `false`
+- Runtime status: `RUNTIME_MOCK_IMPLEMENTED`
+- Validation status: `BROWSER_VALIDATION_PENDING_EXTERNAL`
+- Merge status: `BLOCKED_UNTIL_BROWSER_VALIDATION`
+- Agent status: `SELF_ASSIGNED_SAFE_TASK_COMPLETED`
+- waitingSince: `2026-06-01 15:22 Asia/Taipei`
+- blockerOwner: `SECOND_DEPUTY_COMMANDER / external browser validator`
+- nextHumanAction: `Open the PR #50 branch page in an external browser, run the checklist below, and report console/runtime evidence.`
+- fallbackTask: `Prepared acceptance packet, Commander packet, Reviewer packet, and manual browser checklist.`
+- selfAdvanceAfter: `20 minutes without new command or direct validation path; in-app Browser file:// policy blocked runtime validation.`
+- currentSafeTask: `PR #50 acceptance packet and browser validation checklist`
+- lastSelfAdvanceAt: `2026-06-01 19:24 Asia/Taipei`
+- mergeBlocked: `true`
+- workCanContinue: `true`
+
+### PR #50 Basic Info
+
+- Changed files: 16.
+- Runtime files:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- Coordination / contract files:
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/plan_puzzle_guide/AUTOMATION.md`
+  - `docs/plan_puzzle_guide/BLACKBOARD_EVIDENCE_GAP.md`
+  - `docs/plan_puzzle_guide/GITHUB_BLACKBOARD_SELF_INTRODUCTION.md`
+  - `docs/plan_puzzle_guide/GITHUB_HANDOFF.md`
+  - `docs/plan_puzzle_guide/PLAN_PUZZLE_GUIDE_AGENT.md`
+  - `docs/plan_puzzle_guide/examples/plan_puzzle_quantity_facts.placeholder.json`
+  - `docs/plan_puzzle_guide/plan_puzzle_context_status.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_import_flow.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_quantity_facts_contract.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_step_guidance.md`
+  - `docs/plan_puzzle_guide/plan_puzzle_web_runtime_check.md`
+- Runtime scope:
+  - Local right-inspector guide UI.
+  - Local rule-based FAQ and guided flow.
+  - Draft JSON guide records.
+  - Placeholder `PlanPuzzleQuantityFacts` context facts.
+- Forbidden scope untouched:
+  - No Plancraft core.
+  - No Budget Engine / budget runtime.
+  - No `generateBudgetEstimate()` route.
+  - No `formalEstimateGuard` change.
+  - No AI API / image API / OpenAI API / API key.
+  - No package / framework / `node_modules`.
+  - No payment / escrow / listing fee / DB / auth / webhook.
+  - No formal estimate or formal quote.
+
+### Functional Acceptance Checklist
+
+External validator should verify:
+
+- [ ] Guide UI appears in the right status / inspector area as `平面拼圖引導官`.
+- [ ] Conversation area exists and scrolls.
+- [ ] Input box exists with the intended homeowner-facing placeholder.
+- [ ] `送出` button exists and sends a local-rule response.
+- [ ] Quick question buttons exist.
+- [ ] Guided-flow buttons exist: start guide, next step, record question, generate summary, clear conversation with second confirmation.
+- [ ] User input writes to `project.guideLog`.
+- [ ] Guide response writes to `project.guideLog`.
+- [ ] A message can be saved into `project.requirementNotes`.
+- [ ] `project.guideSummary` can be generated.
+- [ ] `project.PlanPuzzleQuantityFacts` remains placeholder-only and not production-ready.
+- [ ] Exported draft JSON includes `guide`, `guideLog`, `requirementNotes`, `guideSummary`, and `PlanPuzzleQuantityFacts`.
+- [ ] No guide / facts data is treated as formal Budget Engine input.
+- [ ] `productionReady` does not become true because guide data exists.
+- [ ] Browser console has zero runtime errors after the smoke test.
+
+### External Browser Validation Checklist
+
+Manual validation steps:
+
+1. Checkout / update PR #50 branch: `codex/plan-puzzle-guide-init-main-sync`.
+2. Open `file:///C:/tmp/laibe-mvp-pr50-plan-guide-agent/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html` or the equivalent local checkout path.
+3. Hard reload / clear cache so `code.html` loads the latest `plan-puzzle.js`.
+4. Open DevTools Console before interacting.
+5. Confirm the right-side status area shows `平面拼圖引導官`.
+6. Type `我要怎麼開始？` in the guide input and click `送出`.
+7. Click at least two quick questions, including one about `施工圖` and one about `預算`.
+8. Click `開始引導`, then `繼續下一步`.
+9. Use `記錄目前疑問` or the message-level record action to create a requirement note.
+10. Click `產生需求摘要`.
+11. Export the Plancraft+ draft JSON.
+12. Inspect exported JSON for:
+    - `guide.enabled: true`
+    - `guide.mode: "local_rule_based"`
+    - `guide.apiBacked: false`
+    - non-empty `guideLog`
+    - guide-sourced `requirementNotes`
+    - generated `guideSummary`
+    - placeholder `PlanPuzzleQuantityFacts`
+13. Confirm `PlanPuzzleQuantityFacts.budgetInputEligible === false`.
+14. Confirm `PlanPuzzleQuantityFacts.formalEstimateAllowed === false`.
+15. Confirm `PlanPuzzleQuantityFacts.productionReady === false`.
+16. Confirm browser console runtime errors: `0`.
+
+### Commander Packet
+
+- Completed:
+  - PR #50 now contains runtime mock plus docs/contract packet.
+  - Local guide UI and draft JSON records are implemented.
+  - Placeholder `PlanPuzzleQuantityFacts` is implemented for context only.
+  - Static checks passed before this acceptance-packet update.
+- Why browser validation is blocked:
+  - Codex in-app Browser blocked direct `file://` access by URL policy.
+  - No workaround was attempted, so browser validation is still honest pending evidence.
+- Commander decisions needed:
+  - Whether external browser validation is accepted as functional acceptance evidence.
+  - Whether PR #50 may proceed from draft to review after external validation.
+  - Whether the product direction of the local rule-based guide is acceptable for MVP.
+- Recommendation:
+  - Permit external browser validation as acceptance evidence because the in-app Browser cannot access the required local file URL.
+
+### Reviewer Packet
+
+- Review focus:
+  - Runtime draft JSON shape now includes `project.guide`, `project.guideLog`, `project.requirementNotes`, `project.guideSummary`, and placeholder `project.PlanPuzzleQuantityFacts`.
+  - These records are context / requirement records only.
+  - They must not become formal quantity, formal estimate, formal quote, or Budget Engine input.
+- Safety checks to confirm:
+  - No Budget Engine call.
+  - No `generateBudgetEstimate()` integration.
+  - No `formalEstimateGuard` change.
+  - No AI API / OpenAI API / image API call.
+  - No API key or production secret.
+  - No package / framework / `node_modules`.
+  - `PlanPuzzleQuantityFacts.budgetInputEligible === false`.
+  - `PlanPuzzleQuantityFacts.formalEstimateAllowed === false`.
+  - `PlanPuzzleQuantityFacts.productionReady === false`.
+- Remaining reviewer dependency:
+  - External browser validation is still required before functional acceptance can pass.
+
+### Next Issue Draft
+
+Title: `Validate PR #50 Plan Puzzle Guide runtime in external browser`
+
+Body draft:
+
+```md
+## Goal
+
+Run external browser validation for PR #50 Plan Puzzle Guide runtime mock because Codex in-app Browser blocks direct file:// validation.
+
+## Scope
+
+- Validate the plan puzzle page from branch `codex/plan-puzzle-guide-init-main-sync`.
+- Confirm guide UI, local rule answers, guideLog, requirementNotes, guideSummary, and placeholder PlanPuzzleQuantityFacts export.
+- Capture console error count.
+
+## Acceptance
+
+- Browser page opens from local checkout.
+- Guide UI is visible in the right status area.
+- Local guide interactions work.
+- Exported JSON contains guide / guideLog / requirementNotes / guideSummary / PlanPuzzleQuantityFacts.
+- PlanPuzzleQuantityFacts remains placeholder-only and not budget eligible.
+- Console runtime errors are 0.
+
+## Forbidden
+
+- Do not modify Budget Engine.
+- Do not call AI APIs.
+- Do not add packages.
+- Do not create formal estimates or quotes.
+- Do not merge PR #50 from this issue alone.
+```
 
 ## Latest Compact Progress Report - Plan Puzzle Guide Agent
 
