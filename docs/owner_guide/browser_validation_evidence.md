@@ -2,95 +2,125 @@
 
 Status: `WEB_RUNTIME_VERIFIED`
 
-Scope: standalone mock runtime only.
+Scope: standalone Owner Guide mock runtime on PR #53. This evidence does not approve production routing, `onboard_ai_agent/code.html` entry changes, Functional Acceptance, merge readiness, final completion, DB/auth/payment/real AI API integrations, Budget Engine execution, Renderer execution, formal pricing, or formal quote generation.
 
-This evidence does not approve production routing, `onboard_ai_agent/code.html` entry changes, Functional Acceptance, merge readiness, final completion, DB/auth/payment/real AI API integrations, Budget Engine execution, Renderer execution, formal pricing, or formal quote generation.
+Managed by: `SECOND_DEPUTY_COMMANDER`
 
 ## Source
 
-- GitHub source branch: `app/owner-guide-agent-main-sync`
+- GitHub repository: `laibeoffer/laibe-mvp`
+- GitHub branch: `app/owner-guide-agent-main-sync`
 - PR: #53
-- GitHub raw source: `https://raw.githubusercontent.com/laibeoffer/laibe-mvp/refs/heads/app/owner-guide-agent-main-sync/src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html`
 - Runtime file: `src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html`
-- Evidence route: GitHub raw HTML fetched into an ephemeral localhost server for browser execution.
-- Localhost URL during verification: `http://127.0.0.1:60269/owner_guide_mock_runtime.html`
-- Source length: 11763 bytes
+- Runtime blob SHA observed: `b8c5077fc1e811043b377486cf47ac30ec996b2c`
+- GitHub raw source: `https://raw.githubusercontent.com/laibeoffer/laibe-mvp/app/owner-guide-agent-main-sync/src/stitch_laibe_landing_onboarding/onboard_ai_agent/owner_guide_mock_runtime.html`
+- Evidence route: exact GitHub raw HTML served through a temporary localhost validation server.
+- Localhost URL during verification: `http://127.0.0.1:53986/owner_guide_mock_runtime.html`
 
-The localhost server was temporary validation infrastructure only. It is not delivery source of truth and was closed after verification.
+The localhost server is validation infrastructure only. It is not the source of truth and does not replace GitHub branch / PR evidence.
 
 ## Browser Environment
 
 - Browser surface: Codex in-app browser
-- Validation path: `localhost` served exact GitHub raw source from PR #53
-- Prior blocked paths: `data:` and `file://` were blocked by browser security policy and were not bypassed.
+- Validation path: GitHub raw source from PR #53 rendered in browser through localhost
+- Screenshot captured: yes, final completed state
 
-## Checklist Result
+## Gate Behavior Verified
 
-- Page opened from GitHub-tracked source via accepted temporary localhost export: Pass
-- Mock-only / placeholder-only labels visible: Pass
-- Natural-language input can submit: Pass
-- QA log updates: Pass
-- Requirement summary updates: Pass
-- Next-step CTA visible: Pass
-- `OwnerIntent` JSON visible and parseable: Pass
-- `ProjectRequirementBrief placeholder` JSON visible and parseable: Pass
-- No real AI API / DB / auth / payment / Budget Engine / Renderer / formal pricing execution: Pass
+Initial incomplete state:
 
-## Before Submit Observations
-
-- Page title: `LaiBE Owner Guide Mock Runtime`
-- Heading: `需求引導官 mock runtime`
 - `MOCK_READY`: visible
 - `PLACEHOLDER_ONLY`: visible
 - `NO_REAL_AI_API`: visible
-- Input `ownerAnswer`: present
-- Submit button `sendAnswer`: present
-- `QuestionAnswerLog`: present
-- `Requirement Summary`: present
-- `nextStepLabel`: present
-- `OwnerIntent`: present and parseable
-- `ProjectRequirementBrief placeholder`: present and parseable
+- `NO_UPLOAD_BACKEND`: visible
+- `requirement_completion_status`: `incomplete`
+- Mock upload inputs visible: 3
+- Visible controls before completion:
+  - `儲存目前回答`
+  - `下一題`
+  - `回上一題`
+  - `查看已填內容`
+  - `補充說明`
+  - `儲存補充說明`
+- Downstream CTAs before completion: not visible
+  - `完成需求表單，進入平面拼圖`: not visible
+  - `完成需求表單，進入預算預覽`: not visible
 
-## Test Input
+Ready-for-review state after all required answers and additional notes:
+
+- `OwnerIntent.requirement_completion_status`: `ready_for_review`
+- `完成需求表單` button: visible
+- Downstream plan-puzzle / budget-preview CTAs: still not visible
+
+Completed state after explicit completion action:
+
+- `OwnerIntent.requirement_completion_status`: `completed`
+- `ProjectRequirementBrief.requirement_completion_status`: `completed`
+- Completion copy visible: `需求表單已完成，以下資料將作為後續平面拼圖與預算生成的參數來源。`
+- Downstream CTAs visible only after completion:
+  - `完成需求表單，進入平面拼圖`
+  - `完成需求表單，進入預算預覽`
+
+## Test Inputs
+
+The browser flow used these owner-style answers:
+
+1. `台北 28 坪中古屋，自住，屋況偏舊。`
+2. `想整理客廳、廚房、浴室，另外需要增加收納。`
+3. `喜歡簡約、木質、明亮，不喜歡太暗的工業風。`
+4. Draft budget answer: `先寫 50 萬上限。`
+5. Reverted budget answer replaced with: `預算還不確定，需要先協助估算。`
+6. `三個月內想開始，半年內入住。`
+7. `目前沒有平面圖，有現況照片，需要平面拼圖。`
+8. Additional notes: `家裡有小孩，需要耐髒、好清潔，保留採光。`
+
+## Revision Evidence
+
+- `answer_revision_log` contains a `reverted` revision.
+- `question_answer_log` excludes the reverted `先寫 50 萬上限。` answer from effective output.
+- `budget_signal.raw_signal` keeps the replacement answer: `預算還不確定，需要先協助估算。`
+
+Effective `QuestionAnswerLog` observed:
 
 ```text
-台北 28 坪中古屋，自住，想整理客廳、廚房、浴室，預算還不知道，也需要平面圖。
+qa_01 / property_context：台北 28 坪中古屋，自住，屋況偏舊。
+qa_02 / space_requirements：想整理客廳、廚房、浴室，另外需要增加收納。
+qa_03 / style_preferences：喜歡簡約、木質、明亮，不喜歡太暗的工業風。
+qa_05 / budget_signal：預算還不確定，需要先協助估算。
+qa_06 / schedule_signal：三個月內想開始，半年內入住。
+qa_07 / asset_status：目前沒有平面圖，有現況照片，需要平面拼圖。
 ```
 
-## After Submit Observations
+## Upload Window Evidence
 
-QA log updated to:
+The mock runtime showed all three placeholder upload windows:
 
-```text
-qa_01: 台北 28 坪中古屋，自住，想整理客廳、廚房、浴室，預算還不知道，也需要平面圖。
-```
+- `current_plan_files`: visible as `現況圖 / 平面圖`
+- `current_site_photos`: visible as `現況照片`
+- `style_reference_images`: visible as `期望風格參考圖片`
 
-Requirement summary updated to:
-
-```text
-已記錄 1 輪回答。待補欄位: style_preferences, schedule_signal.
-```
-
-Next-step signal:
-
-```text
-enter_plan_puzzle
-```
+Output windows were present as arrays inside `OwnerIntent.asset_summary` and `ProjectRequirementBrief.space_requirements`. No file transfer, production storage, DB write, or backend upload was executed.
 
 ## OwnerIntent JSON Evidence
 
-The `OwnerIntent` JSON parsed successfully after submit and included these required keys:
+The `OwnerIntent` JSON parsed successfully and included these required keys:
 
 - `owner_intent_id`
 - `session_id`
 - `project_id`
 - `renovation_goals`
 - `property_context`
+- `space_requirements`
 - `style_preferences`
 - `budget_signal`
 - `schedule_signal`
 - `asset_summary`
 - `question_gaps`
+- `requirement_completion_status`
+- `structured_requirement_notes`
+- `question_answer_log`
+- `answer_revision_log`
+- `owner_additional_notes`
 - `next_recommended_step`
 - `requires_followup`
 - `confidence`
@@ -100,54 +130,57 @@ The `OwnerIntent` JSON parsed successfully after submit and included these requi
 
 Observed values:
 
+- `requirement_completion_status`: `completed`
 - `next_recommended_step`: `enter_plan_puzzle`
-- `source_refs`: [`qa_01`]
-- `requires_followup`: `true`
-- `confidence`: `0.42`
+- `owner_additional_notes`: present
+- `asset_summary.current_plan_files`: array
+- `asset_summary.current_site_photos`: array
+- `asset_summary.style_reference_images`: array
 
 ## ProjectRequirementBrief Placeholder JSON Evidence
 
-The `ProjectRequirementBrief placeholder` JSON parsed successfully after submit and included these required keys:
+The `ProjectRequirementBrief placeholder` JSON parsed successfully and included these required keys:
 
 - `project_requirement_brief_id`
 - `owner_intent_id`
 - `requirement_context_status`
+- `requirement_completion_status`
 - `space_requirements`
 - `budget_preference`
 - `scope_constraints`
+- `structured_requirement_notes`
+- `owner_additional_notes`
 - `review_flags`
 - `handoff_targets`
 
 Observed values:
 
 - `requirement_context_status`: `placeholder`
-- `scope_constraints.no_formal_price`: `true`
+- `requirement_completion_status`: `completed`
+- `scope_constraints.no_upload_backend`: `true`
 - `scope_constraints.no_real_ai_api`: `true`
 - `scope_constraints.no_db_write`: `true`
 - `scope_constraints.no_payment`: `true`
+- `scope_constraints.no_formal_price`: `true`
 - `scope_constraints.budget_engine_handoff_status`: `placeholder_only`
 
-## Refined Forbidden Execution Scan
+## Forbidden Execution Scan
 
-Script-level scan after runtime load:
+Runtime source scan found no script-level execution patterns for:
 
-- `fetch(`: not present
-- `XMLHttpRequest`: not present
-- `PaymentRequest` / Stripe / PayPal / webhook integrations: not present
-- Supabase / auth execution patterns: not present
-- Budget Engine / `BudgetEstimateLine` / `generateBudgetEstimate` / `PricingRule` / `BudgetOutputSnapshot` / `renderSnapshot`: not present
+- `fetch(`
+- `XMLHttpRequest`
+- `PaymentRequest`
+- Stripe / PayPal execution
+- Supabase runtime client calls
+- `PricingRule`
+- `BudgetEstimateLine`
 
-Full-source text includes boundary words such as `payment` only as mock-safety copy and `no_payment` placeholder flags. No payment execution path was present.
-
-Observed links:
-
-- `../preview_floor_plan/code.html` / `進入平面拼圖`
-- `../preview_floor_plan/code.html` / `平面拼圖`
-- `../preview_budget/code.html` / `預算預覽`
+Boundary words such as `payment`, `Budget Engine`, and `no_payment` appear only as mock-safety copy or placeholder flags. No forbidden integration or formal pricing path was present.
 
 ## Remaining Boundaries
 
-- `onboard_ai_agent/code.html` remains unchanged.
-- Proposed `code.html` Tools dropdown link remains `deferred_pending_commander_or_second_deputy_decision`.
-- This verification applies only to the standalone mock runtime.
+- `onboard_ai_agent/code.html` remains unchanged in this correction.
+- Production entry/routing remains deferred unless explicitly authorized by Commander / Second Deputy.
+- GitHub branch still diverges from current `main` and needs safe resync before merge readiness or final acceptance.
 - Deputy Commander approval is still required for Functional Acceptance, merge readiness, final completion, or workstream closure.
