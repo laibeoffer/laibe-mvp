@@ -102,7 +102,7 @@ Forbidden:
 |---|---|---|---|---:|---|---|
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
-| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
+| 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | PR #50 contains the GitHub-tracked docs-only contract under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`; PR #40 / PR #44 remain traceability drafts pending Commander / maintainer decision. |
 
 ## Future / Standby Agent Backlog
 
@@ -155,3 +155,16 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No unless product/formal-output boundary is found.
 - Need Reviewer: Yes only if forbidden flow or ownership dispute appears.
 - Next single action: report `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run proposal.
+
+### 2026-06-01 - Plan Puzzle Guide Current-Main Contract PR
+
+- Agent: 平面拼圖引導官 / Plan Puzzle Guide Agent
+- Workstream: `app/plan-puzzle-guide-agent`
+- Status: `CONTRACT_ONLY`
+- Progress %: 25
+- Evidence: PR #50 branch `codex/plan-puzzle-guide-init-main-sync` adds the GitHub-tracked docs-only contract packet under `docs/plan_puzzle_guide/` from current `main`.
+- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY
+- Blocker: Runtime remains `WEB_RUNTIME_PENDING`; no mock panel or browser/runtime evidence exists.
+- Need Commander: No for docs-only contract; Yes before runtime wiring or final completion acceptance.
+- Need Reviewer: No by default; user-triggered review only.
+- Next single action: Review PR #50 through normal gates, then decide whether PR #40 / PR #44 should be closed, superseded, or reconciled.
