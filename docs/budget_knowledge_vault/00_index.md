@@ -30,8 +30,8 @@ This queue is used when there is no new instruction. The agent must advance safe
 
 ## Latest Scoped Snapshot
 
-- checked_at: 2026-06-01T18:18:53+08:00
-- PR #32: open, mergeable, head at patrol start `34e6463d01265ef8de0a5527dcdb0ebc89c0e441`, no comments or review threads found in scoped patrol.
+- checked_at: 2026-06-01T18:44:59+08:00
+- PR #32: open, mergeable, not merged, head at patrol start `ed50cae95ea41baf6fef8cda8220827b4b328646`, no comments or review threads found in scoped patrol.
 - PR #31: open, not merged, related boundary context only, GitHub reports mergeable false, and no review threads found in scoped patrol.
 - PR #47 / Issue #49: `FOLLOW_UP_REQUIRED / IMPLEMENTATION_PLAN_PENDING` remains the latest scoped implementation-plan signal for `budget/engine-entry-picking`; this vault only mirrors the signal.
 - Issue #41: latest scoped signal remains Budget Review Gate PR #37 docs-only final-report status; no vault execution assignment found.
