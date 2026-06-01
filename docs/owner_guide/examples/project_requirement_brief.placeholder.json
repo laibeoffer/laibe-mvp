@@ -1,0 +1,36 @@
+{
+  "project_requirement_brief_id": "prb_placeholder_mock_001",
+  "owner_intent_id": "owner_intent_mock_001",
+  "requirement_context_status": "placeholder",
+  "space_requirements": {
+    "living_room": "mentioned",
+    "bedroom": "unknown",
+    "kitchen": "mentioned",
+    "bathroom": "mentioned",
+    "storage": "mentioned",
+    "other_spaces": []
+  },
+  "budget_preference": {
+    "status": "needs_ai_assistance",
+    "range_or_ceiling": null,
+    "formal_pricing_status": "not_allowed"
+  },
+  "scope_constraints": {
+    "mock_only": true,
+    "no_real_ai_api": true,
+    "no_db_write": true,
+    "no_payment": true,
+    "no_formal_price": true,
+    "budget_engine_handoff_status": "placeholder_only"
+  },
+  "review_flags": [
+    "not_for_formal_estimate",
+    "requires_downstream_validation",
+    "placeholder_window_only"
+  ],
+  "handoff_targets": [
+    "plan-puzzle",
+    "budget-preview",
+    "bid-preparation"
+  ]
+}

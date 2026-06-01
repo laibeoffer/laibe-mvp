@@ -1,0 +1,42 @@
+{
+  "owner_intent_id": "owner_intent_mock_001",
+  "session_id": "owner_guide_session_mock_001",
+  "project_id": "project_mock_001",
+  "renovation_goals": [
+    "整理 28 坪中古屋自住需求",
+    "優先確認客廳、廚房、浴室與收納"
+  ],
+  "property_context": {
+    "property_type": "apartment",
+    "area": "28 坪",
+    "condition": "中古屋",
+    "region": "台北",
+    "use_purpose": "自住"
+  },
+  "style_preferences": {
+    "desired": ["現代", "簡約"],
+    "disliked": [],
+    "reference_images_status": "unavailable"
+  },
+  "budget_signal": {
+    "status": "needs_ai_assistance",
+    "range_or_ceiling": null,
+    "formal_pricing_status": "not_allowed"
+  },
+  "schedule_signal": {
+    "status": "三個月內"
+  },
+  "asset_summary": {
+    "floor_plan": "unavailable",
+    "quote": "unavailable",
+    "photos": "unknown",
+    "needs_plan_puzzle": true
+  },
+  "question_gaps": ["reference_images", "budget_range"],
+  "next_recommended_step": "enter_plan_puzzle",
+  "requires_followup": true,
+  "confidence": 0.62,
+  "source_refs": ["qa_001", "qa_002"],
+  "created_at": "2026-06-01T00:00:00+08:00",
+  "updated_at": "2026-06-01T00:00:00+08:00"
+}
