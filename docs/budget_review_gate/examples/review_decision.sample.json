@@ -1,0 +1,17 @@
+{
+  "decision_id": "brg_decision_20260531_0001",
+  "source_artifact_id": "qf_pricerange_candidate_0001",
+  "source_agent": "quote-factory/price-range-governance",
+  "proposal_type": "price_range_candidate",
+  "decision": "approved_for_next_review",
+  "reviewer_role": "budget_review_gate",
+  "rationale": "Candidate has source references and remains explicitly non-formal. It may proceed to the next review stage but must not become a formal price or PricingRule from this decision.",
+  "source_refs": [
+    {
+      "type": "queue_item",
+      "id": "brg_queue_20260531_0001"
+    }
+  ],
+  "created_at": "2026-05-31T15:25:00Z",
+  "updated_at": "2026-05-31T15:25:00Z"
+}

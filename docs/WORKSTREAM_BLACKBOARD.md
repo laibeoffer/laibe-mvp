@@ -103,6 +103,7 @@ Forbidden:
 | 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
+| 預算審核閘門 / Budget Review Gate Agent | `budget/review-gate` | `LAIBE_PATROL_INTEGRATION_OFFICER` | FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE | 95 | Yes | PR #37 open; Issue #41 created for Integration Officer queue disposition; docs-only review gate contracts delivered; final Commander acceptance pending. |
 
 ## Future / Standby Agent Backlog
 
@@ -142,6 +143,19 @@ Use this format only when changing current status:
 ```
 
 Do not paste full logs or repeated heartbeat text into this file.
+
+### 2026-06-01 - Budget Review Gate Final Report Submitted
+
+- Agent: 預算審核閘門 / Budget Review Gate Agent
+- Workstream: `budget/review-gate`
+- Status: `FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE`
+- Progress %: 95
+- Evidence: PR #37 is open / non-draft; GitHub PR metadata is the live source for head SHA and merge ref; Issue #41 created for Integration Officer disposition; `docs/budget_review_gate/` contains review gate contract, queue schema, decision contract, approval policy, decision log, forbidden direct-publish flows, JSON examples, automation record, final completion report, and Integration Officer action packet.
+- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY; final Commander acceptance still required for task closeout.
+- Blocker: PR #37 is not merged to `main`; GitHub Merge Gate is not complete.
+- Need Commander: Yes, for final task acceptance / closeout after PR merge gate.
+- Need Reviewer: No unless any proposal attempts to become formal price, formal rule, formal quantity, `BudgetEstimateLine`, `BudgetOutputSnapshot`, or customer quote.
+- Next single action: merge or otherwise dispose PR #37, then Commander decides whether `budget/review-gate` is accepted as complete.
 
 ### 2026-06-01 - Budget Engine Entry Blocker Routed
 

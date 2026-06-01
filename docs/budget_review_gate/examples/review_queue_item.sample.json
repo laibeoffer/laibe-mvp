@@ -1,0 +1,47 @@
+{
+  "queue_item_id": "brg_queue_20260531_0001",
+  "source_artifact_id": "qf_pricerange_candidate_0001",
+  "source_agent": "quote-factory/price-range-governance",
+  "proposal_type": "price_range_candidate",
+  "status": "queued",
+  "candidate_only": true,
+  "source_refs": [
+    {
+      "type": "github_pr",
+      "repo": "laibeoffer/laibe-quote-factory",
+      "ref": "PR-EXAMPLE"
+    },
+    {
+      "type": "artifact",
+      "path": "review_queue/sample_price_range_review_decisions.json"
+    }
+  ],
+  "risk_flags": [
+    "candidate_price_only",
+    "not_formal_price",
+    "requires_review_before_formal_rule"
+  ],
+  "reviewer_requirements": {
+    "requires_budget_review_gate": true,
+    "requires_human_formal_rule_approval_for_formalization": true,
+    "need_reviewer_if_formal_target_requested": true
+  },
+  "formalization_lock": {
+    "formal_price_allowed": false,
+    "pricing_rule_publish_allowed": false,
+    "material_spec_publish_allowed": false,
+    "labor_rule_publish_allowed": false,
+    "budget_estimate_line_allowed": false,
+    "budget_output_snapshot_allowed": false,
+    "customer_quote_allowed": false
+  },
+  "payload_summary": {
+    "title": "Observed PriceRange candidate for review",
+    "currency": "TWD",
+    "contains_observed_price": true,
+    "contains_formal_price": false,
+    "contains_pricing_rule": false
+  },
+  "created_at": "2026-05-31T15:20:00Z",
+  "updated_at": "2026-05-31T15:20:00Z"
+}
