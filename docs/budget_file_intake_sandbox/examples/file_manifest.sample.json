@@ -1,0 +1,16 @@
+{
+  "file_id": "file_sample_001",
+  "file_type": "quote_pdf",
+  "file_purpose": "candidate_quote_evidence",
+  "upload_status": "mock_received",
+  "source_window": "owner_guide",
+  "handoff_target": "quote_factory",
+  "storage_uri": null,
+  "ocr_status": "not_run",
+  "candidate_evidence_only": true,
+  "real_upload_backend_enabled": false,
+  "storage_api_connected": false,
+  "ocr_production_enabled": false,
+  "budget_item_generated": false,
+  "formal_price_generated": false
+}
