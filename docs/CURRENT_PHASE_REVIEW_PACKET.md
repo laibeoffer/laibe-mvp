@@ -1,5 +1,61 @@
 ﻿# CURRENT PHASE REVIEW PACKET
 
+## Plan Puzzle Intuitive Workspace Repair 0.15.2
+
+### 任務名稱
+
+Plancraft+ Intuitive Workspace Repair 0.15.2
+
+### 本輪定位
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-intuitive-workspace-repair-0-15-2`.
+- Base: PR #67 / `codex/plan-puzzle-compact-workspace-polish-0-15-1` / head `fb926cd10f56a490f46deee216d5ec7c3d1d8062`.
+- Status: `BROWSER_VALIDATED`.
+- Functional Acceptance Target: `INTUITIVE_COMPACT_WORKSPACE_REPAIR`.
+- 本輪是平面拼圖 compact workspace 的可用性修復，不是 Plancraft core、budget runtime、AI API 或 renderer production 任務。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+- `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+
+### 已完成
+
+- `project.version` / Tool Catalog runtime version updated to `0.15.2-intuitive-workspace-repair`.
+- `code.html` script cache key updated to `./plan-puzzle.js?v=intuitive-workspace-repair-0-15-2`.
+- Compact topbar kept at 60px; Budget is not exposed as a main file button.
+- Left tool area is a 56px category icon rail with a movable / collapsible floating palette.
+- Right status area is a contextual inspector with a concise work summary and four tabs only: `屬性`, `圖層`, `提醒`, `更多`.
+- Inspector tab click hit targets were repaired by giving the tab list explicit height / z-index and by adding pointerdown-safe tab selection.
+- Empty canvas includes an actionable `匯入圖檔` CTA; unavailable blank underlay remains disabled.
+- Developer diagnostics remain collapsed and are marked as testing / handoff information, not homeowner operation.
+- AI visual prompt / sanitized prompt / temporary image details are not shown in the homeowner main workflow.
+
+### Runtime Evidence
+
+- `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+- Browser URL: `http://127.0.0.1:50367/code.html?validation=intuitive-workspace-repair-0-15-2`.
+- Browser console error count: 0.
+- Browser layout evidence: script cache key correct; body `overflow-y: hidden`; document height equals viewport height at desktop validation size; topbar height 60px; rail width 56px; canvas width 951px; inspector width 300px.
+- Browser interaction evidence: 4 inspector tabs switch correctly; 10 product layer buttons render; `燈具配置圖` can be selected; item palette opens; wall tool shows the scale/import prerequisite error; focus mode expands canvas from 951px to 1251px and restores inspector.
+
+### Forbidden Scope Preserved
+
+- No Plancraft core or `plancraft/` change.
+- No budget runtime / renderer / MethodSpec / raw warehouse change.
+- No package / framework / node_modules change.
+- No `formalEstimateGuard` change and no `generateBudgetEstimate()` call.
+- No formal estimate, price, Excel, PDF, payment, escrow, listing fee, DB, auth, webhook, secrets, image API, or AI API.
+
+### Next Single Action
+
+Commit, push, and open a scoped draft PR for `codex/plan-puzzle-intuitive-workspace-repair-0-15-2`.
+
 ## Plan Puzzle Compact Workspace / Single-Screen CAD-like Layout
 
 ### 任務名稱

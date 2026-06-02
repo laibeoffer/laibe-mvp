@@ -1,5 +1,38 @@
 ﻿# NEXT_CODEX_HANDOFF.md
 
+## Latest Plan Puzzle Task: Intuitive Workspace Repair 0.15.2
+
+- Workstream: `plancraft/page-ui`.
+- Branch: `codex/plan-puzzle-intuitive-workspace-repair-0-15-2`.
+- Base: PR #67 / `codex/plan-puzzle-compact-workspace-polish-0-15-1` / head `fb926cd10f56a490f46deee216d5ec7c3d1d8062`.
+- Task: Plancraft+ Intuitive Workspace Repair 0.15.2.
+- Type: Builder / UI Usability Repair / Compact Workspace Revision.
+- Modified files:
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/WORKSTREAM_BLACKBOARD.md`
+  - `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+- Added files: none.
+- Completed:
+  - Upgraded `project.version` / Tool Catalog runtime version to `0.15.2-intuitive-workspace-repair`.
+  - Updated `code.html` script cache key to `./plan-puzzle.js?v=intuitive-workspace-repair-0-15-2`.
+  - Repaired the compact workspace toward a single-screen CAD-like app: compact topbar, 56px left category icon rail, movable/collapsible floating tool palette, central canvas priority, and 300px contextual inspector.
+  - Right inspector now uses four tabs only: `屬性`, `圖層`, `提醒`, `更多`; tab click hit targets were repaired so panels no longer cover the tab buttons.
+  - The inspector keeps a concise always-visible work summary, accordion-style detail cards, and collapsed developer diagnostics at the bottom.
+  - Empty canvas keeps an actionable `匯入圖檔` CTA; unavailable blank-underlay creation is disabled and marked unavailable.
+  - Topbar no longer exposes `預算` or large focus controls as main file buttons; focus mode remains a compact icon and expands canvas width.
+  - Tool palette / layer switching / reminders / shortcut help remain UI-only draft interactions; no production budget or API path was opened.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser URL: `http://127.0.0.1:50367/code.html?validation=intuitive-workspace-repair-0-15-2`.
+  - Browser validation: page loaded, console error count 0, script cache key correct, body `overflow-y: hidden`, document height equals viewport height at desktop validation size, topbar height 60px, rail width 56px, canvas width 951px, inspector width 300px.
+  - Interaction validation: 4 inspector tabs switch correctly; 10 product layer buttons render; `燈具配置圖` can be selected; item palette opens; wall tool shows the scale/import prerequisite error; focus mode expands canvas from 951px to 1251px and restores inspector.
+- Guard:
+  - No Plancraft core, `plancraft/`, budget runtime, package / node_modules / framework, `formalEstimateGuard`, `generateBudgetEstimate()`, payment / escrow / listing fee / DB / auth / webhook / secrets / AI API changes.
+- Next single action: commit, push, and open a scoped draft PR for `codex/plan-puzzle-intuitive-workspace-repair-0-15-2` if publish remains within the current instruction.
+
 ## Latest Plan Puzzle Task: Compact Workspace / Single-Screen CAD-like Layout
 
 - Workstream: `plancraft/page-ui`.

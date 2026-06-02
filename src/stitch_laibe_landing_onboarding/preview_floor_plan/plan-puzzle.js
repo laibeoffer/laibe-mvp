@@ -35,7 +35,7 @@
   const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
   const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
   const ZONE_AREA_CONFIDENCE_INVALID = 0;
-  const PLAN_PUZZLE_UI_IA_VERSION = "0.15.1-compact-workspace-polish";
+  const PLAN_PUZZLE_UI_IA_VERSION = "0.15.2-intuitive-workspace-repair";
   const PLAN_PUZZLE_TOOL_CATALOG_VERSION = PLAN_PUZZLE_UI_IA_VERSION;
   const TOOL_CATALOG_ITEM_STATUS_OPTIONS = ["new", "existing", "demolition", "reference"];
   const TOOL_CATALOG_BUDGET_OPTIONS = ["include", "reference_only", "ask_contractor"];
@@ -511,6 +511,7 @@
   let styleVisualTask = createInitialStyleVisualTask();
   let styleVisualTimer = null;
   let importSequence = 0;
+  let toolPaletteDrag = null;
 
   Object.defineProperty(window, "laibePlancraftPlusProject", {
     get() {
@@ -550,10 +551,15 @@
 
   canvas.style.setProperty("--grid-px", `${GRID_PIXEL_SIZE}px`);
 
+  document.addEventListener("click", handleInspectorTabClick, true);
   document.addEventListener("click", handleActionClick);
   document.addEventListener("input", handleDocumentInput);
   document.addEventListener("change", handleDocumentChange);
   document.addEventListener("keydown", handleDocumentKeydown);
+  document.addEventListener("pointerdown", handleInspectorTabPointerDown, true);
+  document.addEventListener("pointerdown", handleToolPalettePointerDown);
+  document.addEventListener("pointermove", handleToolPalettePointerMove);
+  document.addEventListener("pointerup", handleToolPalettePointerUp);
   fileInput.addEventListener("change", handleFileSelection);
   canvas.addEventListener("click", handleCanvasClick);
   canvas.addEventListener("pointermove", handleCanvasPointerMove);
@@ -569,7 +575,7 @@
       product: "Plancraft+",
       version: PLAN_PUZZLE_UI_IA_VERSION,
       unit: "mm",
-      draftVersionName: "0.15.1 精簡工作台",
+      draftVersionName: "0.15.2 直覺工作台修復",
       saveStatus: "unsaved",
       lastSavedAt: null,
       importSource: null,
@@ -658,6 +664,10 @@
       materialCategory: "請廠商建議",
       activeStatusTab: "properties",
       focusMode: false,
+      openToolPalette: "draw",
+      toolPaletteCollapsed: false,
+      toolPalettePosition: { x: 66, y: 86 },
+      expandedReminderId: null,
       currentFloor: "1F",
       houseType: "apartment",
       sheetScale: "1:50",
@@ -1024,7 +1034,7 @@
     if (action === "toggle-preflight-panel") {
       uiState.preflightOpen = !uiState.preflightOpen;
       project.totalPreviewOpen = uiState.preflightOpen;
-      uiState.activeStatusTab = "overview";
+      uiState.activeStatusTab = "more";
       uiState.message = uiState.preflightOpen ? "已開啟總預覽 / 送出前檢查。" : "已收合總預覽 / 送出前檢查。";
     }
     if (action === "toggle-focus-mode") {
@@ -1038,6 +1048,47 @@
       uiState.activeStatusTab = actionButton.dataset.statusTab || "properties";
       uiState.message = `右側狀態頁籤已切換為「${getStatusTabLabel(uiState.activeStatusTab)}」。`;
       uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "open-tool-palette") {
+      uiState.openToolPalette = actionButton.dataset.paletteId || "draw";
+      uiState.toolPaletteCollapsed = false;
+      uiState.message = `已開啟「${getToolPaletteLabel(uiState.openToolPalette)}」工具板。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "toggle-tool-palette-collapse") {
+      uiState.toolPaletteCollapsed = !uiState.toolPaletteCollapsed;
+      uiState.message = uiState.toolPaletteCollapsed ? "已收合工具板。" : "已展開工具板。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "close-tool-palette") {
+      uiState.openToolPalette = "";
+      uiState.toolPaletteCollapsed = false;
+      uiState.message = "已關閉工具板。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "toggle-reminder-detail") {
+      const reminderId = actionButton.dataset.reminderId || "";
+      uiState.expandedReminderId = uiState.expandedReminderId === reminderId ? null : reminderId;
+      uiState.message = "提醒明細已更新。";
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (action === "apply-material-to-selection") {
+      applyMaterialToSelectedToolCatalogItem();
+      render();
+      return;
+    }
+    if (action === "set-product-layer") {
+      updateCurrentProductLayer(actionButton.dataset.layerId);
       render();
       return;
     }
@@ -1157,6 +1208,44 @@
     syncStaticControls();
   }
 
+  function handleInspectorTabClick(event) {
+    const tabButton = event.target.closest(".status-tab-button[data-action='set-status-tab']");
+    if (!tabButton) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    selectInspectorTab(tabButton.dataset.statusTab || "properties");
+  }
+
+  function handleInspectorTabPointerDown(event) {
+    const tabButton = event.target.closest(".status-tab-button[data-action='set-status-tab']");
+    if (!tabButton) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    selectInspectorTab(tabButton.dataset.statusTab || "properties");
+  }
+
+  function selectInspectorTab(tabId) {
+    const nextTab = ["properties", "layers", "reminders", "more"].includes(tabId) ? tabId : "properties";
+    uiState.activeStatusTab = nextTab;
+    uiState.message = `右側狀態頁籤已切換為「${getStatusTabLabel(nextTab)}」。`;
+    uiState.error = "";
+    render();
+  }
+
+  function bindInspectorTabs() {
+    document.querySelectorAll(".status-tab-button[data-action='set-status-tab']").forEach((tabButton) => {
+      tabButton.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        selectInspectorTab(tabButton.dataset.statusTab || "properties");
+      };
+    });
+  }
+
   function handleDocumentInput(event) {
     const input = event.target.closest("[data-field]");
     if (!input) {
@@ -1177,7 +1266,7 @@
       renderStatusLabels();
     }
     if (field === "draft-version-name") {
-      project.draftVersionName = input.value.trim() || "0.15.1 精簡工作台";
+      project.draftVersionName = input.value.trim() || "0.15.2 直覺工作台修復";
       project.saveStatus = "unsaved";
       renderStatusLabels();
     }
@@ -2892,6 +2981,7 @@
     renderCalibration();
     renderCanvasHelper();
     renderInspector();
+    bindInspectorTabs();
     renderCompactTopbar();
     renderCompactToolPanel();
     renderStatusLabels();
@@ -7463,5 +7553,1028 @@
 
   function escapeAttribute(value) {
     return escapeHTML(value).replace(/`/g, "&#096;");
+  }
+
+  function getFriendlyProductLayerDefinitions() {
+    return [
+      {
+        id: "existing_plan",
+        label: "現況圖",
+        shortLabel: "現況",
+        purpose: "記錄原始丈量、既有牆、既有門窗與保留項目。",
+        items: ["既有牆", "既有門窗", "既有櫃體", "既有地坪", "保留設備", "現況備註"]
+      },
+      {
+        id: "floor_plan",
+        label: "平面配置圖",
+        shortLabel: "配置",
+        purpose: "整理新設牆、門窗、櫃體、家具示意與主要需求。",
+        items: ["新設牆", "門窗工程", "木作櫃", "系統櫃", "廚具 / 廚房設備", "木作工程", "輕鋼架工程", "DECO / 家具示意", "其他需求"]
+      },
+      {
+        id: "partition_dimension",
+        label: "隔間尺寸圖",
+        shortLabel: "隔間",
+        purpose: "標示隔間、牆厚、開口與尺寸需求。",
+        items: ["新設隔間", "牆厚", "門洞尺寸", "開口尺寸", "一鍵標註", "尺寸備註"]
+      },
+      {
+        id: "ceiling_plan",
+        label: "天花板平面圖",
+        shortLabel: "天花",
+        purpose: "整理天花、燈槽、窗簾盒與天花備註。",
+        items: ["新設天花", "燈槽", "窗簾盒", "冷氣包管", "維修孔", "天花備註"]
+      },
+      {
+        id: "demolition_plan",
+        label: "現況拆除圖",
+        shortLabel: "拆除",
+        purpose: "標示拆除牆、拆除櫃體、拆除地坪與保護項目。",
+        items: ["拆除牆", "拆除天花", "拆除地坪", "拆除門窗", "拆除櫃體", "保護項目", "拆除備註"]
+      },
+      {
+        id: "flooring_plan",
+        label: "地坪平面圖",
+        shortLabel: "地坪",
+        purpose: "整理地坪材料、分界、收邊與高低差。",
+        items: ["磁磚", "木地板", "塑膠地板", "石材", "門檻", "地坪收邊", "地坪備註"]
+      },
+      {
+        id: "lighting_plan",
+        label: "燈具配置圖",
+        shortLabel: "燈具",
+        purpose: "整理主燈、崁燈、線燈、壁燈與燈具備註。",
+        items: ["主燈", "崁燈", "線燈", "壁燈", "開關位置", "燈具備註"]
+      },
+      {
+        id: "outlet_low_voltage_plan",
+        label: "插座及弱電配置圖",
+        shortLabel: "插座弱電",
+        purpose: "整理插座、網路、電視、弱電與電源需求。",
+        items: ["一般插座", "專用插座", "網路孔", "電視孔", "弱電箱", "插座備註"]
+      },
+      {
+        id: "plumbing_plan",
+        label: "給排水配置圖",
+        shortLabel: "給排水",
+        purpose: "整理給水、排水、排風、設備點位與管線備註。",
+        items: ["給水點", "排水點", "排風口", "設備給水", "設備排水", "給排水備註"]
+      },
+      {
+        id: "ac_plan",
+        label: "空調配置圖",
+        shortLabel: "空調",
+        purpose: "整理冷氣室內機、室外機、排水與管線需求。",
+        items: ["室內機", "室外機", "冷媒管", "排水管", "空調備註"]
+      }
+    ];
+  }
+
+  function getFriendlyProductLayer(layerId) {
+    const friendly = getFriendlyProductLayerDefinitions().find((layer) => layer.id === layerId)
+      || getFriendlyProductLayerDefinitions()[1];
+    const original = PLAN_PUZZLE_PRODUCT_LAYERS.find((layer) => layer.id === friendly.id) || {};
+    return { ...original, ...friendly, items: [...friendly.items] };
+  }
+
+  function getCurrentProductLayer() {
+    return getFriendlyProductLayer(uiState.currentLayer || project.currentLayer || "floor_plan");
+  }
+
+  function getProductLayerLabel(layerId) {
+    return getFriendlyProductLayer(layerId).label;
+  }
+
+  function createInitialLayerItemSelections() {
+    return getFriendlyProductLayerDefinitions().reduce((selections, layer) => {
+      selections[layer.id] = layer.id === "floor_plan" ? layer.items.slice(0, 2) : [];
+      return selections;
+    }, {});
+  }
+
+  function getFriendlyVisibleLayerOptions() {
+    return [
+      ["underlay", "底圖"],
+      ["existingPlan", "現況"],
+      ["floorPlan", "配置"],
+      ["decoFurniture", "家具示意"],
+      ["dimensions", "尺寸"],
+      ["lighting", "燈具"],
+      ["outletLowVoltage", "插座弱電"],
+      ["plumbing", "給排水"],
+      ["demolition", "拆除"],
+      ["systemWarnings", "提醒"]
+    ];
+  }
+
+  function renderCompactTopbar() {
+    const fileZone = document.querySelector(".file-zone");
+    if (!fileZone) {
+      return;
+    }
+    fileZone.classList.add("compact-file-bar");
+    const importName = project.importSource?.originalFileName || "尚未匯入";
+    fileZone.innerHTML = `
+      <div class="compact-file-main intuitive-topbar" aria-label="檔案與全局控制">
+        <label class="compact-title-field" for="draftNameInput">
+          <span>草稿</span>
+          <input id="draftNameInput" data-field="draft-name" type="text" value="${escapeAttribute(project.draftName || project.name)}" aria-describedby="draftSaveHint">
+        </label>
+        <span id="draftSaveHint" class="compact-info" title="本頁只整理需求，不產生正式施工圖或正式估價。">需求整理草稿</span>
+        <div class="compact-select-row" aria-label="圖紙設定">
+          ${renderCompactSelect("compact-floor", "樓層", ["1F", "2F", "3F", "屋頂", "新增頁面"], uiState.currentFloor)}
+          ${renderCompactSelect("compact-house-type", "屋型", ["公寓", "透天", "樓中樓", "商空"], getHouseTypeLabel(uiState.houseType))}
+          ${renderCompactSelect("compact-sheet-scale", "比例", ["1:50", "1:100", "自定義"], uiState.sheetScale)}
+          ${renderCompactSelect("compact-sheet-size", "圖紙", ["A4", "A3"], uiState.sheetSize)}
+        </div>
+        <div class="compact-actions" aria-label="檔案操作">
+          <button class="toolbar-btn primary" type="button" data-action="choose-file" title="匯入 JPG / PNG；PDF 目前只記錄檔案">
+            <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入
+          </button>
+          <button class="toolbar-btn" type="button" data-action="save-draft-placeholder" title="儲存本機草稿狀態">
+            <span class="material-symbols-outlined" aria-hidden="true">save</span>儲存
+          </button>
+          <button class="toolbar-btn" type="button" data-action="toggle-preflight-panel" title="展開總覽與送出前檢查">
+            <span class="material-symbols-outlined" aria-hidden="true">fact_check</span>總覽
+          </button>
+          <button class="toolbar-btn" type="button" data-action="print-total-preview" title="列印目前整理結果">
+            <span class="material-symbols-outlined" aria-hidden="true">print</span>列印
+          </button>
+          <button class="toolbar-btn" type="button" data-action="export-draft" title="匯出草稿 JSON">
+            <span class="material-symbols-outlined" aria-hidden="true">download</span>匯出
+          </button>
+          <button class="toolbar-btn icon-only" type="button" data-action="set-status-tab" data-status-tab="more" title="說明與快捷鍵">
+            <span class="material-symbols-outlined" aria-hidden="true">help</span>
+          </button>
+          <button class="toolbar-btn icon-only canvas-focus-mini ${uiState.focusMode ? "is-mode-active" : ""}" type="button" data-action="toggle-focus-mode" title="畫布最大化">
+            <span class="material-symbols-outlined" aria-hidden="true">fullscreen</span>
+          </button>
+        </div>
+        <div class="compact-save-state" aria-label="草稿狀態">
+          <span id="currentImportFileText" title="${escapeAttribute(importName)}">${escapeHTML(importName)}</span>
+          <span id="draftSaveStatusText">${escapeHTML(getSaveStatusLabel(project.saveStatus))}</span>
+          <span id="draftVersionText">${escapeHTML(project.draftVersionName || project.version)}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function getToolPaletteDefinitions() {
+    return [
+      { id: "file", label: "檔案 / 匯入", shortLabel: "檔案", icon: "folder_open", tone: "view" },
+      { id: "edit", label: "編輯", shortLabel: "編輯", icon: "edit", tone: "neutral" },
+      { id: "draw", label: "繪製", shortLabel: "繪製", icon: "architecture", tone: "draw" },
+      { id: "items", label: "項目", shortLabel: "項目", icon: "widgets", tone: "object" },
+      { id: "annotate", label: "標註", shortLabel: "標註", icon: "straighten", tone: "output" },
+      { id: "material", label: "材質", shortLabel: "材質", icon: "format_color_fill", tone: "material" },
+      { id: "display", label: "顯示", shortLabel: "顯示", icon: "visibility", tone: "view" }
+    ];
+  }
+
+  function getToolPaletteLabel(paletteId) {
+    const palette = getToolPaletteDefinitions().find((item) => item.id === paletteId);
+    return palette ? palette.label : "工具";
+  }
+
+  function renderCompactToolPanel() {
+    const toolPanel = document.querySelector(".tool-shell > .panel:not(.inspector)");
+    if (!toolPanel) {
+      return;
+    }
+    toolPanel.classList.add("compact-tool-panel");
+    toolPanel.innerHTML = `
+      <div class="left-icon-rail" aria-label="分類工具列">
+        ${getToolPaletteDefinitions().map(renderToolPaletteRailButton).join("")}
+      </div>
+      ${renderToolPalette()}
+    `;
+  }
+
+  function renderToolPaletteRailButton(palette) {
+    const isActive = uiState.openToolPalette === palette.id;
+    return `
+      <button class="rail-tool rail-tool-${escapeAttribute(palette.tone)} ${isActive ? "is-tool-active" : ""}" type="button" data-action="open-tool-palette" data-palette-id="${escapeAttribute(palette.id)}" title="${escapeAttribute(palette.label)}" aria-label="${escapeAttribute(palette.label)}" aria-pressed="${isActive ? "true" : "false"}">
+        <span class="material-symbols-outlined" aria-hidden="true">${escapeHTML(palette.icon)}</span>
+        <small>${escapeHTML(palette.shortLabel)}</small>
+      </button>
+    `;
+  }
+
+  function renderToolPalette() {
+    const paletteId = uiState.openToolPalette || "";
+    if (!paletteId || uiState.focusMode) {
+      return "";
+    }
+    const palette = getToolPaletteDefinitions().find((item) => item.id === paletteId) || getToolPaletteDefinitions()[2];
+    const position = uiState.toolPalettePosition || { x: 66, y: 86 };
+    return `
+      <section id="toolPalette" class="tool-palette tool-palette-${escapeAttribute(palette.tone)} ${uiState.toolPaletteCollapsed ? "is-collapsed" : ""}" style="left:${Number(position.x) || 66}px; top:${Number(position.y) || 86}px;" aria-label="${escapeAttribute(palette.label)}">
+        <header class="tool-palette-head" data-tool-palette-drag="true">
+          <span class="palette-grip material-symbols-outlined" aria-hidden="true">drag_indicator</span>
+          <strong>${escapeHTML(palette.label)}</strong>
+          <div class="palette-head-actions">
+            <button class="palette-icon-btn" type="button" data-action="toggle-tool-palette-collapse" title="${uiState.toolPaletteCollapsed ? "展開工具板" : "收合工具板"}">
+              <span class="material-symbols-outlined" aria-hidden="true">${uiState.toolPaletteCollapsed ? "unfold_more" : "unfold_less"}</span>
+            </button>
+            <button class="palette-icon-btn" type="button" data-action="close-tool-palette" title="關閉工具板">
+              <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            </button>
+          </div>
+        </header>
+        <div class="tool-palette-body">
+          ${uiState.toolPaletteCollapsed ? "" : renderToolPaletteBody(palette.id)}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderToolPaletteBody(paletteId) {
+    if (paletteId === "file") {
+      return `
+        ${renderPaletteButton("匯入圖檔", "upload_file", { action: "choose-file", primary: true, title: "JPG / PNG 會顯示底圖；PDF 目前只記錄檔名" })}
+        ${renderPaletteButton("校正比例", "straighten", { action: "start-calibration", title: "點兩點後輸入實際長度" })}
+        ${renderPaletteButton("草稿 JSON", "data_object", { action: "export-draft" })}
+        ${renderPaletteButton(".pc 測試版", "code", { action: "export-pc-spike", title: ".pc 只供 renderer preview spike，不作預算輸入" })}
+        ${renderDisabledPaletteButton("空白底圖", "note_add", "尚未開放")}
+      `;
+    }
+    if (paletteId === "edit") {
+      return `
+        ${renderPaletteButton("選取", "near_me", { action: "set-select-mode", uiTool: "select", mode: "select", primary: uiState.currentTool === "select" })}
+        ${renderPaletteButton("手掌", "pan_tool", { action: "set-ui-tool", tool: "pan", toolLabel: "手掌 / 移動畫布", title: "Space 可切換；完整拖曳仍是草稿狀態" })}
+        ${renderPaletteButton("縮放", "zoom_in", { action: "set-ui-tool", tool: "zoom", toolLabel: "縮放", title: "縮放控制目前為草稿提示" })}
+        ${renderPaletteButton("刪除", "delete", { action: "delete-selected", danger: true })}
+        ${renderDisabledPaletteButton("復原", "undo", "尚未完整開放")}
+        ${renderDisabledPaletteButton("重做", "redo", "尚未完整開放")}
+      `;
+    }
+    if (paletteId === "draw") {
+      return `
+        ${renderPaletteButton("牆體", "polyline", { action: "start-draw-wall", uiTool: "wall", mode: "draw-wall", primary: uiState.currentTool === "wall" })}
+        <div class="palette-segment">
+          ${["existing:既有牆", "new:新設牆", "demolished:拆除牆"].map((entry) => {
+            const [value, label] = entry.split(":");
+            return `<button class="palette-chip ${uiState.currentWallStatus === value ? "is-selected" : ""}" type="button" data-action="set-wall-status" data-field-proxy="current-wall-status" data-value="${escapeAttribute(value)}">${escapeHTML(label)}</button>`;
+          }).join("")}
+        </div>
+        <label class="palette-field" for="palette-wall-thickness">牆厚 mm
+          <select id="palette-wall-thickness" data-field="current-wall-thickness">
+            ${[120, 150, 200, 240].map((value) => `<option value="${value}" ${Number(uiState.currentWallThickness) === value ? "selected" : ""}>${value}</option>`).join("")}
+          </select>
+        </label>
+        ${renderPaletteButton("門窗", "door_open", { action: "add-opening", uiTool: "opening", openingKind: "door", title: "請先選牆，再新增門窗或開口" })}
+        ${renderPaletteButton("窗", "window", { action: "add-opening", uiTool: "opening", openingKind: "window", title: "請先選牆，再新增窗" })}
+        ${renderPaletteButton("開口", "open_in_full", { action: "add-opening", uiTool: "opening", openingKind: "opening", title: "請先選牆，再新增無門片開口" })}
+        ${renderPaletteButton("空間", "meeting_room", { action: "start-place-zone", uiTool: "zone_label" })}
+        ${renderPaletteButton("邊界", "border_inner", { action: "start-zone-boundary", uiTool: "zone_label", title: "需先選空間，再選邊界牆段" })}
+      `;
+    }
+    if (paletteId === "items") {
+      const currentLayer = getCurrentProductLayer();
+      const selectedItems = getSelectedLayerItems(currentLayer.id);
+      return `
+        <div class="palette-meta">目前圖層：${escapeHTML(currentLayer.label)}</div>
+        ${renderPaletteButton("項目放置", "add_box", { action: "set-ui-tool", tool: "item_place", toolLabel: "項目放置", primary: uiState.currentTool === "item_place" })}
+        <div class="palette-chip-grid">
+          ${currentLayer.items.map((item) => `<button class="palette-chip ${selectedItems.includes(item) ? "is-selected" : ""}" type="button" data-action="toggle-layer-catalog-item" data-ui-tool="item_place" data-layer-id="${escapeAttribute(currentLayer.id)}" data-item-name="${escapeAttribute(item)}">${escapeHTML(item)}</button>`).join("")}
+        </div>
+      `;
+    }
+    if (paletteId === "annotate") {
+      return `
+        ${renderPaletteButton("尺寸", "straighten", { action: "set-ui-tool", tool: "dimension", toolLabel: "尺寸標註", primary: uiState.currentTool === "dimension" })}
+        ${renderPaletteButton("文字", "title", { action: "set-ui-tool", tool: "text", toolLabel: "文字", primary: uiState.currentTool === "text" })}
+        <label class="palette-field" for="palette-text-type">文字類型
+          <select id="palette-text-type" data-field="text-tool-type">
+            ${["一般文字", "業主需求", "施工備註", "請廠商建議", "需專業確認", "保留項目"].map((value) => `<option value="${escapeAttribute(value)}" ${value === uiState.textToolType ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}
+          </select>
+        </label>
+        ${renderPaletteButton("一鍵標註", "auto_fix_high", { action: "auto-annotate-placeholder", uiTool: "auto_annotate", title: "F8，可建立草稿提示，不覆蓋使用者內容" })}
+      `;
+    }
+    if (paletteId === "material") {
+      return `
+        ${renderPaletteButton("材質工具", "format_color_fill", { action: "set-ui-tool", tool: "material_bucket", toolLabel: "材質", primary: uiState.currentTool === "material_bucket" })}
+        <label class="palette-field" for="palette-material-category">材質類型
+          <select id="palette-material-category" data-field="material-category">
+            ${["地坪材料", "牆面材料", "櫃體材料", "檯面材料", "門窗材料", "五金等級", "請廠商建議"].map((value) => `<option value="${escapeAttribute(value)}" ${value === uiState.materialCategory ? "selected" : ""}>${escapeHTML(value)}</option>`).join("")}
+          </select>
+        </label>
+        ${renderPaletteButton("套用材質", "check_circle", { action: "apply-material-to-selection", title: "需先選到項目；沒有選到會顯示提示" })}
+      `;
+    }
+    const visibleOptions = getFriendlyVisibleLayerOptions();
+    return `
+      <label class="toggle-row palette-toggle" for="palette-snap-enabled">
+        <span>鎖點 F3</span>
+        <input id="palette-snap-enabled" data-field="snap-enabled" type="checkbox" ${uiState.snapEnabled ? "checked" : ""}>
+      </label>
+      <label class="toggle-row palette-toggle" for="palette-show-only-current-layer">
+        <span>只看目前圖層</span>
+        <input id="palette-show-only-current-layer" data-field="show-only-current-layer" type="checkbox" ${uiState.showOnlyCurrentLayer ? "checked" : ""}>
+      </label>
+      <div class="palette-chip-grid">
+        ${visibleOptions.slice(0, 7).map(([key, label]) => `
+          <label class="palette-check" for="palette-visible-${escapeAttribute(key)}">
+            <input id="palette-visible-${escapeAttribute(key)}" data-field="visible-layer" data-layer-key="${escapeAttribute(key)}" type="checkbox" ${project.visibleLayers[key] ? "checked" : ""}>
+            <span>${escapeHTML(label)}</span>
+          </label>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderPaletteButton(label, icon, options = {}) {
+    const classes = [
+      "palette-btn",
+      options.primary ? "primary" : "",
+      options.danger ? "danger" : ""
+    ].filter(Boolean).join(" ");
+    const attrs = [
+      options.action ? `data-action="${escapeAttribute(options.action)}"` : "",
+      options.uiTool ? `data-ui-tool="${escapeAttribute(options.uiTool)}"` : "",
+      options.tool ? `data-tool="${escapeAttribute(options.tool)}"` : "",
+      options.toolLabel ? `data-tool-label="${escapeAttribute(options.toolLabel)}"` : "",
+      options.openingKind ? `data-opening-kind="${escapeAttribute(options.openingKind)}"` : "",
+      options.mode ? `data-mode-button="${escapeAttribute(options.mode)}"` : "",
+      options.title ? `title="${escapeAttribute(options.title)}"` : `title="${escapeAttribute(label)}"`
+    ].filter(Boolean).join(" ");
+    return `
+      <button class="${classes}" type="button" ${attrs}>
+        <span class="material-symbols-outlined" aria-hidden="true">${escapeHTML(icon)}</span>
+        <span>${escapeHTML(label)}</span>
+      </button>
+    `;
+  }
+
+  function renderDisabledPaletteButton(label, icon, reason) {
+    return `
+      <button class="palette-btn is-disabled" type="button" disabled title="${escapeAttribute(reason)}">
+        <span class="material-symbols-outlined" aria-hidden="true">${escapeHTML(icon)}</span>
+        <span>${escapeHTML(label)}</span>
+        <small>${escapeHTML(reason)}</small>
+      </button>
+    `;
+  }
+
+  function handleToolPalettePointerDown(event) {
+    const handle = event.target.closest("[data-tool-palette-drag]");
+    if (!handle) {
+      return;
+    }
+    const palette = document.getElementById("toolPalette");
+    if (!palette) {
+      return;
+    }
+    const rect = palette.getBoundingClientRect();
+    toolPaletteDrag = {
+      startX: event.clientX,
+      startY: event.clientY,
+      startLeft: rect.left,
+      startTop: rect.top
+    };
+    event.preventDefault();
+  }
+
+  function handleToolPalettePointerMove(event) {
+    if (!toolPaletteDrag) {
+      return;
+    }
+    const nextX = toolPaletteDrag.startLeft + event.clientX - toolPaletteDrag.startX;
+    const nextY = toolPaletteDrag.startTop + event.clientY - toolPaletteDrag.startY;
+    uiState.toolPalettePosition = {
+      x: clamp(nextX, 56, Math.max(56, window.innerWidth - 280)),
+      y: clamp(nextY, 58, Math.max(58, window.innerHeight - 110))
+    };
+    syncToolPalettePosition();
+  }
+
+  function handleToolPalettePointerUp() {
+    toolPaletteDrag = null;
+  }
+
+  function syncToolPalettePosition() {
+    const palette = document.getElementById("toolPalette");
+    if (!palette || !uiState.toolPalettePosition) {
+      return;
+    }
+    palette.style.left = `${uiState.toolPalettePosition.x}px`;
+    palette.style.top = `${uiState.toolPalettePosition.y}px`;
+  }
+
+  function renderUiIaStatusPanel() {
+    const currentLayer = getCurrentProductLayer();
+    const activeTab = uiState.activeStatusTab || "properties";
+    const tabs = [
+      ["properties", "屬性"],
+      ["layers", "圖層"],
+      ["reminders", "提醒"],
+      ["more", "更多"]
+    ];
+    return `
+      <section class="status-tabs-shell intuitive-inspector" aria-label="平面拼圖狀態區">
+        ${renderInspectorWorkSummary(currentLayer)}
+        <div class="status-tab-list" role="tablist" aria-label="狀態頁籤">
+          ${tabs.map(([id, label]) => `
+            <button class="status-tab-button ${id === activeTab ? "is-active" : ""}" type="button" role="tab" data-action="set-status-tab" data-status-tab="${escapeAttribute(id)}" aria-selected="${id === activeTab ? "true" : "false"}">
+              ${escapeHTML(label)}
+            </button>
+          `).join("")}
+        </div>
+        <div class="status-tab-panel" role="tabpanel">
+          ${renderStatusTabContent(activeTab, currentLayer)}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderInspectorWorkSummary(currentLayer) {
+    const selected = getSelectedObjectSummary();
+    const openReminderCount = (project.systemReminders || []).filter((reminder) => reminder.status === "open").length;
+    return `
+      <div class="status-work-summary" aria-label="工作摘要">
+        <div><span>圖層</span><b>${escapeHTML(currentLayer.label)}</b></div>
+        <div><span>工具</span><b>${escapeHTML(getCurrentToolLabel(uiState.currentTool))}</b></div>
+        <div><span>選取</span><b>${selected.id === "-" ? "尚未選取" : escapeHTML(selected.type)}</b></div>
+        <div><span>提醒</span><b>${openReminderCount} 項</b></div>
+      </div>
+    `;
+  }
+
+  function getStatusTabLabel(tabId) {
+    const labels = {
+      properties: "屬性",
+      layers: "圖層",
+      reminders: "提醒",
+      more: "更多"
+    };
+    return labels[tabId] || labels.properties;
+  }
+
+  function renderStatusTabContent(tabId, currentLayer) {
+    if (tabId === "layers") {
+      return `
+        ${renderPageSettingsCard()}
+        ${renderCurrentLayerCard(currentLayer)}
+        ${renderLayerOverlayCard()}
+      `;
+    }
+    if (tabId === "reminders") {
+      return `
+        ${renderAiGuideCard(currentLayer)}
+        ${renderSystemRemindersCard()}
+      `;
+    }
+    if (tabId === "more") {
+      return `
+        ${renderStatusAccordion("偏好材料", renderProjectPreferencesCard(), false)}
+        ${renderStatusAccordion("完成度", renderCompletionStatusCard(), false)}
+        ${renderStatusAccordion("快捷鍵", renderShortcutHelpCard(), false)}
+        ${renderStatusAccordion("總預覽", renderTotalPreviewCard(), uiState.preflightOpen || project.totalPreviewOpen)}
+        <div class="status-card compact-more-card">
+          <button class="toolbar-btn icon-text" type="button" data-action="toggle-focus-mode">
+            <span class="material-symbols-outlined" aria-hidden="true">${uiState.focusMode ? "fullscreen_exit" : "fullscreen"}</span>
+            ${uiState.focusMode ? "恢復工作台" : "畫布最大化"}
+          </button>
+          <div class="inline-message compact-note">專注模式會收合工具板與右側 inspector，保留左側 icon rail。</div>
+        </div>
+      `;
+    }
+    return renderConciseSelectedObjectCard(currentLayer);
+  }
+
+  function renderStatusAccordion(title, content, open = false) {
+    return `
+      <details class="status-card status-accordion" ${open ? "open" : ""}>
+        <summary>${escapeHTML(title)}</summary>
+        <div class="status-accordion-body">${content}</div>
+      </details>
+    `;
+  }
+
+  function renderConciseSelectedObjectCard(currentLayer) {
+    const selectedObject = getSelectedObjectSummary();
+    if (selectedObject.id === "-") {
+      return `
+        <div class="status-card ui-ia-card compact-property-card">
+          <b>尚未選取物件</b>
+          <div class="inline-message">請點選牆、門窗、空間或標註查看屬性。</div>
+          <div class="status-grid">
+            <div class="status-row"><span>當前圖層</span><span>${escapeHTML(currentLayer.label)}</span></div>
+            <div class="status-row"><span>比例</span><span>${escapeHTML(uiState.sheetScale)}</span></div>
+            <div class="status-row"><span>匯入</span><span>${project.importSource ? escapeHTML(project.importSource.originalFileName) : "尚未匯入"}</span></div>
+          </div>
+        </div>
+      `;
+    }
+    return `
+      <div class="status-card ui-ia-card compact-property-card">
+        <b>${escapeHTML(selectedObject.type)}</b>
+        <div class="status-grid">
+          <div class="status-row"><span>所在圖層</span><span>${escapeHTML(selectedObject.layer || currentLayer.label)}</span></div>
+          <div class="status-row"><span>狀態</span><span>${escapeHTML(selectedObject.status)}</span></div>
+          <div class="status-row"><span>尺寸</span><span>${escapeHTML(selectedObject.size || "-")}</span></div>
+          <div class="status-row"><span>納入預算</span><span>${escapeHTML(selectedObject.budgetInclusion)}</span></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPageSettingsCard() {
+    return `
+      <div class="status-card ui-ia-card compact-page-card">
+        <b>頁面設定</b>
+        <div class="field-grid compact-field-grid">
+          ${renderInspectorSelect("inspector-floor", "compact-floor", "樓層", ["1F", "2F", "3F", "屋頂", "新增頁面"], uiState.currentFloor)}
+          ${renderInspectorSelect("inspector-house-type", "compact-house-type", "屋型", ["公寓", "透天", "樓中樓", "商空"], getHouseTypeLabel(uiState.houseType))}
+          ${renderInspectorSelect("inspector-sheet-scale", "compact-sheet-scale", "比例", ["1:50", "1:100", "自定義"], uiState.sheetScale)}
+          ${renderInspectorSelect("inspector-sheet-size", "compact-sheet-size", "圖紙", ["A4", "A3"], uiState.sheetSize)}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCurrentLayerCard(currentLayer) {
+    return `
+      <div class="status-card ui-ia-card compact-layer-card">
+        <b>產品圖層</b>
+        <div class="field-row full">
+          <label for="current-product-layer">目前圖層</label>
+          <select id="current-product-layer" data-field="current-product-layer">
+            ${getFriendlyProductLayerDefinitions().map((layer) => `<option value="${escapeAttribute(layer.id)}" ${layer.id === currentLayer.id ? "selected" : ""}>${escapeHTML(layer.label)}</option>`).join("")}
+          </select>
+        </div>
+        <div class="layer-mini-grid">
+          ${getFriendlyProductLayerDefinitions().map((layer) => `
+            <button class="layer-mini-btn ${layer.id === currentLayer.id ? "is-selected" : ""}" type="button" data-action="set-product-layer" data-layer-id="${escapeAttribute(layer.id)}" title="${escapeAttribute(layer.purpose)}">
+              ${escapeHTML(layer.shortLabel)}
+            </button>
+          `).join("")}
+        </div>
+        ${renderLayerItemCatalogCard(currentLayer)}
+      </div>
+    `;
+  }
+
+  function renderLayerItemCatalogCard(currentLayer) {
+    const selectedItems = getSelectedLayerItems(currentLayer.id);
+    return `
+      <div class="compact-layer-items">
+        <span>目前可放置</span>
+        <div class="palette-chip-grid">
+          ${currentLayer.items.map((item) => `
+            <button class="palette-chip ${selectedItems.includes(item) ? "is-selected" : ""}" type="button" data-action="toggle-layer-catalog-item" data-ui-tool="item_place" data-layer-id="${escapeAttribute(currentLayer.id)}" data-item-name="${escapeAttribute(item)}">
+              ${escapeHTML(item)}
+            </button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderLayerOverlayCard() {
+    const options = getFriendlyVisibleLayerOptions();
+    return `
+      <div class="status-card ui-ia-card compact-overlay-card">
+        <b>疊加顯示</b>
+        <div class="layer-toggle-grid compact-overlay-grid">
+          ${options.slice(0, 5).map(([key, label]) => renderVisibleLayerToggle(key, label)).join("")}
+        </div>
+        <details class="compact-more-layers">
+          <summary>更多圖層</summary>
+          <div class="layer-toggle-grid compact-overlay-grid">
+            ${options.slice(5).map(([key, label]) => renderVisibleLayerToggle(key, label)).join("")}
+          </div>
+        </details>
+        <label class="toggle-row" for="show-only-current-layer">
+          <span>只看目前圖層</span>
+          <input id="show-only-current-layer" data-field="show-only-current-layer" type="checkbox" ${uiState.showOnlyCurrentLayer ? "checked" : ""}>
+        </label>
+      </div>
+    `;
+  }
+
+  function renderVisibleLayerToggle(key, label) {
+    return `
+      <label class="toggle-row layer-toggle" for="visible-layer-${escapeAttribute(key)}">
+        <span>${escapeHTML(label)}</span>
+        <input id="visible-layer-${escapeAttribute(key)}" data-field="visible-layer" data-layer-key="${escapeAttribute(key)}" type="checkbox" ${project.visibleLayers[key] ? "checked" : ""}>
+      </label>
+    `;
+  }
+
+  function renderAiGuideCard(currentLayer) {
+    const nextStep = !project.importSource
+      ? "先匯入丈量圖。"
+      : !project.scale.calibrated
+        ? "接著校正比例。"
+        : project.walls.length
+          ? "可補空間、門窗與需求。"
+          : "可開始畫牆。";
+    return `
+      <div class="status-card ui-ia-card compact-guide-card">
+        <b>平面拼圖引導</b>
+        <div class="project-readout">${escapeHTML(nextStep)} 目前圖層：${escapeHTML(currentLayer.label)}。</div>
+        <div class="inline-message compact-note">本區只整理提醒，不呼叫 AI API，不產生正式估價。</div>
+      </div>
+    `;
+  }
+
+  function renderSystemRemindersCard() {
+    const reminders = project.systemReminders || [];
+    const openCount = reminders.filter((reminder) => reminder.status === "open").length;
+    return `
+      <div class="status-card ui-ia-card compact-reminder-card">
+        <b>缺失與提醒</b>
+        <div class="status-row"><span>待處理</span><span>${openCount} 項</span></div>
+        <div class="compact-reminder-list">
+          ${reminders.map(renderCompactReminderRow).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCompactReminderRow(reminder) {
+    const isOpen = uiState.expandedReminderId === reminder.id;
+    const title = getReminderTitle(reminder);
+    return `
+      <div class="compact-reminder-row ${isOpen ? "is-open" : ""}">
+        <button class="compact-reminder-main" type="button" data-action="toggle-reminder-detail" data-reminder-id="${escapeAttribute(reminder.id)}">
+          <span>${escapeHTML(title)}</span>
+          <small>${escapeHTML(getReminderStatusLabel(reminder.status))}</small>
+        </button>
+        ${isOpen ? `
+          <div class="compact-reminder-detail">
+            <div class="inline-message">${escapeHTML(reminder.message)}</div>
+            <div class="tag-row">
+              ${reminder.actions.map((action) => `
+                <button class="style-tag item-chip ${reminder.resolution === action ? "is-selected" : ""}" type="button" data-action="resolve-system-reminder" data-reminder-id="${escapeAttribute(reminder.id)}" data-reminder-action="${escapeAttribute(action)}" aria-pressed="${reminder.resolution === action ? "true" : "false"}">
+                  ${escapeHTML(getReminderActionLabel(action))}
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  function getReminderTitle(reminder) {
+    const labels = {
+      WALL_THICKNESS_REVIEW: "牆厚需確認",
+      BATH_WATERPROOFING_SUGGESTED: "浴室防水提醒",
+      DEMOLITION_WASTE_SUPPORT: "拆除清運提醒",
+      KITCHEN_MEP_CHECK: "廚房水電提醒",
+      CABINET_HARDWARE_REVIEW: "櫃體五金提醒",
+      FLOORING_THRESHOLD_REVIEW: "地坪收邊提醒",
+      ZONE_AREA_REVIEW: "空間面積提醒"
+    };
+    return labels[reminder.code] || "需求提醒";
+  }
+
+  function renderProjectPreferencesCard() {
+    const preferences = project.projectPreferences || DEFAULT_PROJECT_PREFERENCES;
+    return `
+      <div class="field-grid compact-field-grid">
+        ${renderPreferenceSelect("materialPriority", "材料優先", ["耐用優先", "預算優先", "請廠商建議"], preferences.materialPriority)}
+        ${renderPreferenceSelect("hardwarePreference", "五金", ["基本", "中階", "請廠商建議"], preferences.hardwarePreference)}
+        ${renderPreferenceSelect("cabinetMaterialPreference", "櫃體", ["木作", "系統板", "請廠商建議"], preferences.cabinetMaterialPreference)}
+        ${renderPreferenceSelect("kitchenCountertopPreference", "檯面", ["石英石", "人造石", "不鏽鋼", "請廠商建議"], preferences.kitchenCountertopPreference)}
+      </div>
+    `;
+  }
+
+  function renderCompletionStatusCard() {
+    const openReminderCount = (project.systemReminders || []).filter((reminder) => reminder.status === "open").length;
+    return `
+      <div class="status-grid">
+        <div class="status-row"><span>底圖</span><span>${project.underlay ? "已匯入" : "尚未匯入"}</span></div>
+        <div class="status-row"><span>比例</span><span>${project.scale.calibrated ? "已校正" : "尚未校正"}</span></div>
+        <div class="status-row"><span>牆段</span><span>${project.walls.length} 段</span></div>
+        <div class="status-row"><span>門窗</span><span>${project.openings.length} 個</span></div>
+        <div class="status-row"><span>空間</span><span>${project.zones.length} 個</span></div>
+        <div class="status-row"><span>待處理提醒</span><span>${openReminderCount} 項</span></div>
+      </div>
+    `;
+  }
+
+  function renderShortcutHelpCard() {
+    return `
+      <div class="status-grid compact-shortcuts">
+        <div class="status-row"><span>Shift</span><span>斜線輔助</span></div>
+        <div class="status-row"><span>F3</span><span>鎖點開關</span></div>
+        <div class="status-row"><span>F8</span><span>一鍵標註</span></div>
+        <div class="status-row"><span>Delete</span><span>刪除</span></div>
+        <div class="status-row"><span>Esc</span><span>取消</span></div>
+        <div class="status-row"><span>Ctrl+Z</span><span>尚未完整開放</span></div>
+        <div class="status-row"><span>Ctrl+Y</span><span>尚未完整開放</span></div>
+        <div class="status-row"><span>Space</span><span>拖動畫布，尚未完整開放</span></div>
+      </div>
+    `;
+  }
+
+  function renderTotalPreviewCard() {
+    const selectedItems = getAllSelectedLayerItems();
+    return `
+      <div class="status-grid">
+        <div class="status-row"><span>牆 / 門窗 / 空間</span><span>${project.walls.length} / ${project.openings.length} / ${project.zones.length}</span></div>
+        <div class="status-row"><span>已選項目</span><span>${selectedItems.length} 項</span></div>
+        <div class="status-row"><span>提醒</span><span>${(project.systemReminders || []).filter((item) => item.status === "open").length} 項待處理</span></div>
+      </div>
+      <div class="tag-row">
+        ${selectedItems.slice(0, 8).map((entry) => `<span class="style-tag">${escapeHTML(entry.layerLabel)}：${escapeHTML(entry.item)}</span>`).join("")}
+      </div>
+      <div class="inline-message compact-note">總預覽是送出前整理，不是正式施工圖或正式估價。</div>
+    `;
+  }
+
+  function renderCanvasHelper() {
+    if (!project.importSource) {
+      canvasHelper.innerHTML = `
+        <div class="canvas-helper-card">
+          <b>請先匯入丈量圖</b>
+          <p>建立比例後即可畫牆、標空間與整理需求。</p>
+          <div class="canvas-helper-actions">
+            <button class="toolbar-btn primary" type="button" data-action="choose-file">
+              <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入圖檔
+            </button>
+            <button class="toolbar-btn is-disabled" type="button" disabled>建立空白底圖 <span class="pill">尚未開放</span></button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    if (!project.importSource.previewSupported) {
+      canvasHelper.innerHTML = `
+        <div class="canvas-helper-card">
+          <b>PDF 匯入已記錄</b>
+          <p>${escapeHTML(PDF_NOT_SUPPORTED_MESSAGE)}</p>
+          <div class="canvas-helper-actions">
+            <button class="toolbar-btn primary" type="button" data-action="choose-file">
+              <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>改匯入 JPG / PNG
+            </button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    if (!project.scale.calibrated) {
+      canvasHelper.innerHTML = `
+        <div class="canvas-helper-card compact">
+          <b>請校正比例</b>
+          <p>點選圖上已知長度，再輸入實際 mm。</p>
+          <div class="canvas-helper-actions">
+            <button class="toolbar-btn primary" type="button" data-action="start-calibration">校正比例</button>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    if (project.walls.length || project.openings.length || project.zones.length || project.toolCatalogItems.length) {
+      canvasHelper.innerHTML = "";
+      return;
+    }
+    canvasHelper.innerHTML = `
+      <div class="canvas-helper-card compact">
+        <b>可以開始畫牆</b>
+        <p>選「繪製 → 牆體」，在畫布上點兩點建立牆段。</p>
+      </div>
+    `;
+  }
+
+  function getSelectedObjectSummary() {
+    const selectedToolItem = getSelectedToolCatalogItem();
+    if (selectedToolItem) {
+      return {
+        id: selectedToolItem.id,
+        type: selectedToolItem.kind === "text" ? "文字標註" : selectedToolItem.kind === "dimension" ? "尺寸標註" : "需求項目",
+        layer: getProductLayerLabel(selectedToolItem.layer),
+        status: getToolCatalogStatusLabel(selectedToolItem.status),
+        size: selectedToolItem.dimensionMm ? `${selectedToolItem.dimensionMm} mm` : "-",
+        budgetInclusion: getToolCatalogBudgetLabel(selectedToolItem.budgetInclusion),
+        reviewerRequired: Boolean(selectedToolItem.reviewerRequired),
+        reviewerReasons: selectedToolItem.reviewerReasons || []
+      };
+    }
+    const selectedWall = getSelectedWall();
+    if (selectedWall) {
+      return {
+        id: selectedWall.id,
+        type: "牆段",
+        layer: getCurrentProductLayer().label,
+        status: getWallStatusLabel(selectedWall.status),
+        size: `${formatNumber(getDistance(selectedWall.from, selectedWall.to))} mm / 厚 ${selectedWall.thickness} mm`,
+        budgetInclusion: selectedWall.status === "new" ? "候選納入" : selectedWall.status === "demolished" ? "拆除候選" : "參考",
+        reviewerRequired: Boolean(selectedWall.structural),
+        reviewerReasons: selectedWall.structural ? ["承重或結構牆需專業確認。"] : []
+      };
+    }
+    const selectedOpening = getSelectedOpening();
+    if (selectedOpening) {
+      return {
+        id: selectedOpening.id,
+        type: getOpeningKindLabel(selectedOpening.kind),
+        layer: getCurrentProductLayer().label,
+        status: "草稿",
+        size: `${selectedOpening.width} mm`,
+        budgetInclusion: "候選納入",
+        reviewerRequired: false,
+        reviewerReasons: []
+      };
+    }
+    const selectedZone = getSelectedZone();
+    if (selectedZone) {
+      ensureZoneBoundaryFields(selectedZone);
+      return {
+        id: selectedZone.id,
+        type: "空間",
+        layer: getCurrentProductLayer().label,
+        status: getZoneAreaStatusLabel(selectedZone.areaStatus),
+        size: getZoneAreaReadout(selectedZone),
+        budgetInclusion: "面積候選",
+        reviewerRequired: selectedZone.reviewerRequired || selectedZone.areaStatus !== "estimated",
+        reviewerReasons: selectedZone.reviewerReasons || []
+      };
+    }
+    return {
+      id: "-",
+      type: "尚未選取",
+      layer: getCurrentProductLayer().label,
+      status: "草稿",
+      size: "-",
+      budgetInclusion: "尚未設定",
+      reviewerRequired: false,
+      reviewerReasons: []
+    };
+  }
+
+  function getCurrentToolLabel(tool) {
+    const labels = {
+      import_view: "匯入",
+      scale: "比例",
+      select: "選取",
+      pan: "手掌",
+      zoom: "縮放",
+      wall: "牆體",
+      opening: "門窗",
+      zone_label: "空間",
+      item_place: "項目",
+      furniture: "家具示意",
+      dimension: "尺寸",
+      text: "文字",
+      material_bucket: "材質",
+      auto_annotate: "一鍵標註",
+      delete: "刪除",
+      snap_toggle: "鎖點",
+      undo_redo: "復原 / 重做",
+      print_export: "輸出"
+    };
+    return labels[tool] || "選取";
+  }
+
+  function getOpeningKindLabel(kind) {
+    const labels = {
+      door: "門",
+      window: "窗",
+      opening: "開口"
+    };
+    return labels[kind] || "門窗";
+  }
+
+  function getWallStatusLabel(status) {
+    if (status === "new") {
+      return "新設";
+    }
+    if (status === "demolished") {
+      return "拆除";
+    }
+    return "既有";
+  }
+
+  function getModeLabel(mode) {
+    if (mode === "calibrate") {
+      return "校正比例";
+    }
+    if (mode === "draw-wall") {
+      return "畫牆";
+    }
+    if (mode === "place-zone") {
+      return "標空間";
+    }
+    if (mode === "edit-zone-boundary") {
+      return "編輯空間邊界";
+    }
+    return "選取";
+  }
+
+  function getHouseTypeLabel(type) {
+    const labels = {
+      apartment: "公寓",
+      townhouse: "透天",
+      maisonette: "樓中樓",
+      commercial: "商空"
+    };
+    return labels[type] || type || "公寓";
+  }
+
+  function getHouseTypeValue(label) {
+    const values = {
+      公寓: "apartment",
+      透天: "townhouse",
+      樓中樓: "maisonette",
+      商空: "commercial"
+    };
+    return values[label] || label || "apartment";
+  }
+
+  function getToolCatalogStatusLabel(status) {
+    const labels = {
+      new: "新設",
+      existing: "既有",
+      demolition: "拆除",
+      reference: "參考"
+    };
+    return labels[status] || status || "新設";
+  }
+
+  function getToolCatalogBudgetLabel(value) {
+    const labels = {
+      include: "候選納入",
+      reference_only: "僅參考",
+      ask_contractor: "請廠商建議"
+    };
+    return labels[value] || value || "候選納入";
+  }
+
+  function toggleLayerCatalogItem(layerId, itemName) {
+    const layer = getFriendlyProductLayer(layerId);
+    if (!layer || !layer.items.includes(itemName)) {
+      return;
+    }
+    if (!project.layerItemSelections) {
+      project.layerItemSelections = createInitialLayerItemSelections();
+    }
+    if (!Array.isArray(project.layerItemSelections[layer.id])) {
+      project.layerItemSelections[layer.id] = [];
+    }
+    const selections = project.layerItemSelections[layer.id];
+    const existingIndex = selections.indexOf(itemName);
+    if (existingIndex >= 0) {
+      selections.splice(existingIndex, 1);
+      uiState.message = `已從「${layer.label}」移除「${itemName}」。`;
+    } else {
+      selections.push(itemName);
+      uiState.message = `已加入「${layer.label}」項目「${itemName}」，可在畫布放置標記。`;
+    }
+    uiState.currentTool = "item_place";
+    uiState.selectedItemTemplate = itemName;
+    uiState.pendingItemPlacement = {
+      layer: layer.id,
+      itemType: itemName
+    };
+    uiState.error = "";
+    project.saveStatus = "unsaved";
+  }
+
+  function updateCurrentProductLayer(layerId) {
+    const layer = getFriendlyProductLayer(layerId);
+    uiState.currentLayer = layer.id;
+    project.currentLayer = layer.id;
+    project.saveStatus = "unsaved";
+    uiState.message = `目前圖層已切換為「${layer.label}」。`;
+    uiState.error = "";
+  }
+
+  function getAllSelectedLayerItems() {
+    return getFriendlyProductLayerDefinitions().flatMap((layer) => getSelectedLayerItems(layer.id).map((item) => ({
+      layerId: layer.id,
+      layerLabel: layer.label,
+      item
+    })));
+  }
+
+  function getVisibleLayerLabel(layerKey) {
+    const option = getFriendlyVisibleLayerOptions().find(([key]) => key === layerKey);
+    return option ? option[1] : layerKey;
+  }
+
+  function getReminderActionLabel(action) {
+    const labels = {
+      include_budget: "加入預算",
+      ignore: "忽略",
+      ask_contractor: "請廠商建議"
+    };
+    return labels[action] || action || "未設定";
+  }
+
+  function getReminderStatusLabel(status) {
+    const labels = {
+      open: "待處理",
+      included: "已加入",
+      included_budget: "已加入",
+      ignored: "已忽略",
+      ask_contractor: "待廠商建議"
+    };
+    return labels[status] || status || "待處理";
   }
 })();
