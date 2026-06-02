@@ -1,6 +1,6 @@
 # Budget Schema Registry Agent Final Completion Report
 
-Status: `FINAL_REPORT_SUBMITTED_PENDING_COMMANDER_ACCEPTANCE`
+Status: `SAFE_WORK_SUPPLEMENT_SUBMITTED_PENDING_COMMANDER_ACCEPTANCE`
 
 Functional acceptance: `NOT_APPLICABLE_DOCS_ONLY`
 
@@ -16,7 +16,7 @@ GitHub PR: https://github.com/laibeoffer/laibe-mvp/pull/61
 ## 2. Automation
 
 - 15-minute patrol: active app heartbeat `budget-schema-registry-patrol`.
-- AUTOMATION.md: created.
+- AUTOMATION.md: created and supplemented with closeout patrol and `AGENT_IDLE_VIOLATION` remediation rules.
 - 20-minute auto-progress rule: recorded.
 
 ## 3. Created Files
@@ -65,6 +65,8 @@ Created `schema_registry_index.md` covering:
 - `RuntimeEvidenceReport`
 - `FinalCompletionPacket`
 
+The index now also lists the safe-work supplement artifacts added after `AGENT_IDLE_VIOLATION`.
+
 ## 5. Cross-Agent Field Mapping
 
 Created `cross_agent_field_mapping.md` for requirement intake, plan-puzzle context, Quote Factory exports, Raw Candidate handoff, MethodSpec references, BudgetInputBundle planning, BudgetRunPlan planning, BudgetOutputSnapshot boundary, and acceptance packets.
@@ -103,9 +105,11 @@ The matrix does not raise any Budget Integration Gate percentage.
 - Output Documents implementation changed: false.
 - integration harness started: false.
 
+A dedicated follow-up checklist now exists at `docs/budget_schema_registry/forbidden_scope_check.md`.
+
 ## 10. Final Completion Status
 
-`FINAL_REPORT_SUBMITTED_PENDING_COMMANDER_ACCEPTANCE`
+`SAFE_WORK_SUPPLEMENT_SUBMITTED_PENDING_COMMANDER_ACCEPTANCE`
 
 Closeout still requires Deputy Commander approval:
 
@@ -116,10 +120,10 @@ Until those are declared, the 15-minute patrol remains active.
 
 ## 11. PR / Commit
 
-- branch: `budget/schema-registry`
-- PR: https://github.com/laibeoffer/laibe-mvp/pull/61
-- commit: branch contains docs-only commits created through GitHub connector.
-- push: completed through GitHub connector.
+- original branch: `budget/schema-registry`
+- original PR: https://github.com/laibeoffer/laibe-mvp/pull/61
+- supplement branch: `codex/budget-schema-registry-safe-work-20260602`
+- supplement scope: docs-only safe-work artifacts under `docs/budget_schema_registry/`
 
 ## 12. Need Commander
 
@@ -132,3 +136,17 @@ Yes, only if these schema registry outputs are proposed for Budget Integration H
 ## 14. Need Reviewer
 
 No by default for docs-only initialization. Reviewer / Integration Officer review is required before any schema document is treated as integration harness input, runtime schema, formal estimate authority, or production boundary.
+
+## 15. AGENT_IDLE_VIOLATION Safe-Work Supplement
+
+The following missing safe-work artifacts were added:
+
+- `docs/budget_schema_registry/evidence_packet.md`
+- `docs/budget_schema_registry/forbidden_scope_check.md`
+- `docs/budget_schema_registry/handoff_contract.md`
+- `docs/budget_schema_registry/closeout_report.md`
+- `docs/budget_schema_registry/sync_ready_manifest.md`
+
+This supplement does not stop the automation. It records the missing closeout evidence and keeps the closeout state at:
+
+`BLOCKED_NEED_COMMANDER_DECISION`
