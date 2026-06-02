@@ -37,7 +37,7 @@ Effective immediately:
 
 | Agent | Workstream | Repo / Branch | Progress % | Status | Current Issue / PR | Evidence | Blocker | Need Commander | Need Reviewer | Next |
 |---|---|---|---:|---|---|---|---|---|---|---|
-| Plan Puzzle UI | `plancraft/page-ui` | `laibeoffer/laibe-mvp` / `codex/plan-puzzle-compact-workspace-0-15` | 99 | BROWSER_VALIDATED | PR #56 base / Compact Workspace branch | `0.15.0-compact-workspace` compresses Plan Puzzle from long-page layout into fixed viewport workspace: compact topbar, left icon rail + flyout, wider canvas, right status tabs, developer diagnostics collapsed; `node --check` passed; browser console error count 0; body scroll height equals viewport height | None for scoped implementation | No for scoped implementation; Yes for PR landing | No by default | Commit and open scoped PR if user wants this published |
+| Plan Puzzle UI | `plancraft/page-ui` | `laibeoffer/laibe-mvp` / `codex/plan-puzzle-one-screen-drawing-workbench-0-16` | 100 | BROWSER_VALIDATED | 0.16 scoped branch / PR pending | `0.16.0-one-screen-drawing-workbench` repairs compact workspace into a one-screen drawing workbench: 58px topbar, visible two-section high-frequency tool rail, draggable/collapsible/resettable floating palette, fixed 5-tab inspector, materials and overview exposed, shortcut help deduped, no main JSON/.pc/blank-underlay CTA; `node --check` passed; `git diff --check` passed with CRLF warning only; browser console error count 0 at `http://127.0.0.1:50369/code.html?validation=one-screen-drawing-workbench-0-16`; wall smoke creates wall elements at `http://127.0.0.1:50369/code.html?validation=one-screen-wall-smoke` | None for scoped implementation | No for scoped implementation; Yes for PR landing | No by default | Commit, push, and open scoped draft PR |
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
 | Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 75 | WAITING_REVIEW | PR #3 draft per vault summary | QF5.4 commit `c58ba25`; validators passed; cloud-ready export package exists | PR #3 not recorded as merged / final shared truth pending | No | No by default | Quote Factory owner / Integration Officer confirms final evidence |
 | Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #26 | PR #26 refreshed; head `b8d27e3`; mergeable true; validators passed per vault summary | Final review / merge gate pending | No | Only if formal price boundary is touched | Wait for final gate evidence |
@@ -212,3 +212,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No for scoped implementation; Yes only for PR landing / product acceptance.
 - Need Reviewer: No by default; UI/status/docs only, no Plancraft core, budget runtime, guard, production quantity, formal estimate, AI API, DB, payment, escrow, or listing fee.
 - Next single action: Commit and open scoped Draft PR for `codex/plan-puzzle-compact-workspace-polish-0-15-1`.
+
+### 2026-06-02 - Plan Puzzle One-Screen Drawing Workbench 0.16
+
+- Agent: Plan Puzzle UI / Plan Puzzle
+- Workstream: `plancraft/page-ui`
+- Status: `BROWSER_VALIDATED`
+- Progress %: 100
+- Evidence: `0.16.0-one-screen-drawing-workbench` uses `./plan-puzzle.js?v=one-screen-drawing-workbench-0-16`; topbar is reduced to 58px; high-frequency tools are visible in `常用` / `繪圖`; floating palette is draggable / collapsible / closable / resettable; right inspector tabs are fixed to `屬性` / `圖層` / `提醒` / `材料` / `總覽`; reminders are compact and expand to `加入預算` / `忽略` / `請廠商建議`; materials and overview are first-level; shortcuts are deduped; browser console error count is 0; wall smoke creates wall elements; `node --check` passes; `git diff --check` passes with CRLF warning only.
+- Blocker: None for scoped implementation.
+- Need Commander: No for scoped implementation; Yes only for PR landing / product acceptance.
+- Need Reviewer: No by default; UI/status/docs only, no Plancraft core, budget runtime, guard, production quantity, formal estimate, AI API, DB, payment, escrow, or listing fee.
+- Next single action: Commit, push, and open scoped Draft PR for `codex/plan-puzzle-one-screen-drawing-workbench-0-16`.

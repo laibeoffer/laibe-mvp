@@ -1,5 +1,28 @@
 # Plan Puzzle Agent Transfer
 
+## Latest Transfer Update: Intuitive Workspace Repair 0.15.2
+
+- Task: Plancraft+ Intuitive Workspace Repair 0.15.2.
+- Branch: `codex/plan-puzzle-intuitive-workspace-repair-0-15-2`.
+- Base: PR #67 / `codex/plan-puzzle-compact-workspace-polish-0-15-1` / head `fb926cd10f56a490f46deee216d5ec7c3d1d8062`.
+- `project.version`: `0.15.2-intuitive-workspace-repair`.
+- Tool Catalog runtime version: `0.15.2-intuitive-workspace-repair`.
+- Script cache key: `./plan-puzzle.js?v=intuitive-workspace-repair-0-15-2`.
+- Main change: 0.15 compact workspace was repaired into a more intuitive, single-screen CAD-like workspace.
+- File area: compact topbar stays short; `預算` is not a main file button.
+- Tool area: 56px icon category rail plus movable / collapsible floating palette.
+- Canvas: central canvas keeps priority width; focus mode hides inspector and expands canvas.
+- Right inspector: concise summary plus four tabs only: `屬性`, `圖層`, `提醒`, `更多`.
+- Inspector tab repair: tab list now has explicit height / z-index and pointerdown-safe switching, so panel cards no longer cover tab buttons.
+- Empty canvas: actionable `匯入圖檔` CTA remains; blank underlay creation remains disabled / unavailable.
+- Developer diagnostics: collapsed by default and marked as testing / handoff information only.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser URL: `http://127.0.0.1:50367/code.html?validation=intuitive-workspace-repair-0-15-2`.
+  - Browser console error count: 0.
+  - 4 inspector tabs switch correctly; 10 product layer buttons render; `燈具配置圖` can be selected; item palette opens; wall tool shows import/scale prerequisite error; focus mode expands canvas from 951px to 1251px and restores inspector.
+- Guard: no Plancraft core, no `plancraft/`, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no image API / AI API / DB / payment / escrow / listing fee.
+
 ## Latest Transfer Update: Compact Workspace / Single-Screen CAD-like Layout
 
 - Task: Plancraft+ Compact Workspace / Single-Screen CAD-like Layout.
@@ -20,6 +43,38 @@
   - Browser console error count: 0.
   - Body scroll height equals viewport height; main workspace is no longer a long document at desktop viewport.
 - Guard: no Plancraft core, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no AI API / DB / payment / escrow / listing fee.
+
+## Latest Transfer Update: One-Screen Drawing Workbench Repair
+
+- Task: Plancraft+ One-Screen Drawing Workbench Repair.
+- Branch: `codex/plan-puzzle-one-screen-drawing-workbench-0-16`.
+- `project.version`: `0.16.0-one-screen-drawing-workbench`.
+- Tool Catalog runtime version: `0.16.0-one-screen-drawing-workbench`.
+- Script cache key: `./plan-puzzle.js?v=one-screen-drawing-workbench-0-16`.
+- Main change: compact workspace is repaired into a one-screen drawing workbench with visible high-frequency tools, reduced topbar, fixed inspector tabs, and wall smoke validation.
+- Topbar: keeps project / floor / house type / scale / sheet / import / save / overview / print / export / help. Main UI no longer exposes budget generation, focus text button, JSON, `.pc`, blank underlay creation, or manual scale explanation as primary homeowner actions.
+- Import: all import CTAs route to the existing file picker; JPG / PNG underlay remains available; PDF remains selectable but not previewed; no pdf.js, storage, OCR, or fake auto-recognition was added.
+- Scale: main UI uses mm baseline language. Pixel / px wording is kept out of homeowner-facing workspace and may only appear in developer diagnostics.
+- Tools: visible two-section tool area: `常用` and `繪圖`.
+- High-frequency tools exposed: select, hand, zoom, undo, redo, delete, snap, wall, openings, items, dimension, text, material.
+- Disabled / placeholder handling: undo and redo are disabled; pan / zoom remain mode hints; no button is left as a silent no-op.
+- Floating palettes: draggable, collapsible, closable, and resettable; wall palette includes existing / new / demolished / structural wall, column, beam, and 120 / 150 / 200 / 240 mm thickness choices.
+- Right inspector: fixed tabs are `屬性`, `圖層`, `提醒`, `材料`, `總覽`; there is no `更多` tab.
+- Reminders: compact rows with expandable/actionable behavior instead of large report cards.
+- Materials and overview: visible as first-level inspector tabs; shortcut help is only in overview.
+- Canvas: one-screen shell uses 100vh; validation at 1440x900 has document scrollHeight equal to viewport height.
+- Developer diagnostics: collapsed by default and still used only for testing / handoff. Do not promote Tool Catalog Runtime, Wall Graph, Node Graph, Plancraft Bridge, Converter Report, Renderer Preview, DSL validation, or internal ids into homeowner UI.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - `git diff --check`: PASS with CRLF warnings only.
+  - Browser URL: `http://127.0.0.1:50369/code.html?validation=one-screen-drawing-workbench-0-16`.
+  - Browser console error count: 0.
+  - Browser evidence: 13 high-frequency tools visible, 5 inspector tabs visible, no `更多` tab, no main JSON / `.pc` / blank-underlay CTA, developer diagnostics collapsed, body/html overflow hidden.
+  - Reminder evidence: reminders are compact by default; opening `牆厚需確認` expands only that row and shows `加入預算` / `忽略` / `請廠商建議`.
+  - Wall smoke URL: `http://127.0.0.1:50369/code.html?validation=one-screen-wall-smoke`.
+  - Wall smoke evidence: click wall tool and two canvas points creates wall elements in `wallLayer`, with console error count 0.
+- Guard: no Plancraft core, no `plancraft/`, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no AI API / image API / DB / payment / escrow / listing fee.
+- Known placeholders: full CAD pan / zoom, undo-redo history stack, PDF preview, OCR, storage, production budget adapter, and formal renderer integration remain out of scope.
 
 ## Latest Transfer Update: Status Area Productization / Debug Collapse
 
