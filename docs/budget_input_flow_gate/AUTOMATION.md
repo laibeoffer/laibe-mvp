@@ -1,6 +1,6 @@
 # Budget Input Flow Gate Agent Automation
 
-Agent: 預算輸入門禁 Agent
+Agent: Budget Input Flow Gate Agent
 
 Workstream: `budget/input-flow-gate`
 
@@ -8,17 +8,17 @@ Managed by: `LAIBE_PATROL_INTEGRATION_OFFICER` / `LAIBE_REVIEWER_INTEGRATION_OFF
 
 Automation: every 15 minutes
 
-Status: `EVIDENCE_PACKET_REQUIRED`
+Status: `REPLACEMENT_EVIDENCE_PACKET_SUBMITTED`
 
 Registration: 100%
 
-Evidence Packet: 0%
+Evidence Packet: 100% for docs-only replacement packet
 
 Closeout: 0%
 
-Effective Progress: 33%
+Effective Progress: 66%
 
-Functional Acceptance: `PENDING`
+Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
 
 Not part of Integration Gate: Yes
 
@@ -28,20 +28,15 @@ Tracking Issue: #63
 
 Define the pre-budget-generation flow gate. The agent makes sure a user has completed required requirement intake, file intake, and plan quantity context status before entering budget preview.
 
-## Responsible For
+## Automation Evidence
 
-- `requirement_completion_status`
-- `plan_quantity_context_status`
-- CTA gate rules
-- no-skip rules
-- required data checklist
-- budget preview readiness rules
-- docs-only final completion report
+- 15-minute patrol: active under Integration Officer support-agent patrol.
+- 20-minute no-idle rule: if no evidence packet, linked PR, or blocker disposition appears within a patrol window, the workstream moves to recovery enforcement.
+- Replacement recovery branch: `codex/support-agent-evidence-recovery-input-gate`.
 
-## Required Evidence Packet
+## Evidence Packet Files
 
-Submit a docs-only `Budget Input Flow Gate Evidence Packet` containing:
-
+- `BUDGET_INPUT_FLOW_GATE_AGENT.md`
 - `project_state_machine.md`
 - `cta_gate_rules.md`
 - `required_data_checklist.md`
@@ -50,51 +45,17 @@ Submit a docs-only `Budget Input Flow Gate Evidence Packet` containing:
 - `budget_preview_gate.md`
 - `no_skip_flow_rules.md`
 - `final_completion_report.md`
+- `examples/project_state.sample.json`
+- `examples/cta_gate_rules.sample.json`
 
-The packet must answer:
+## Forbidden Scope
 
-1. Which CTAs must be disabled when the requirement form is incomplete?
-2. Which conditions allow entry into Plan Puzzle?
-3. Which conditions allow entry into Budget Preview?
-4. Can a formal budget start when Plan Puzzle quantity is not `verified`?
-5. What do `placeholder`, `linked`, `verified`, and `unavailable` mean?
-6. Which data must not directly become `BudgetEstimateLine`?
-7. Confirm no Budget Engine, `PricingRule`, Renderer, payment, AI API, or DB changes.
-
-## Not Responsible For
-
-- price calculation
-- AI API
-- DB / Supabase
-- payment / escrow / listing fee
-- Budget Engine runtime
-- Renderer runtime
-- `PricingRule`
-- `BudgetEstimateLine`
-- formal quote
-
-## No-idle Rule
-
-This agent may not report `等待命令派發`, `本輪無新指派`, `pending approval`, `blocker unchanged`, or `no material change` while any evidence packet or docs-only evidence gap remains.
-
-If blocked, it must submit:
-
-1. self-solve attempt
-2. decision packet if needed
-3. safe work while waiting
-4. next report expectation
-
-## Next Safe Work
-
-1. Submit the required evidence packet to Issue #63 or link a scoped docs-only PR.
-2. Keep all work docs-only / contract-only.
-3. Do not touch Budget Engine, `PricingRule`, Renderer, payment, AI API, DB, formal price, or formal quote.
+No functional code, no Budget Engine runtime, no `PricingRule`, no `BudgetEstimateLine`, no Renderer runtime, no payment, no AI API, no DB/Supabase, no n8n runtime, no formal price, no formal quote, no formal Excel/PDF.
 
 ## Closeout Conditions
 
-- Evidence packet submitted and accepted.
-- Final completion report submitted.
-- Blackboard closeout status proposed.
+- Replacement evidence packet merged.
+- Final completion report accepted.
 - No forbidden scope touched.
 - Integration Officer declares `AGENT_CLOSEOUT_ACCEPTED`.
 - Integration Officer declares `AUTOMATION_STOP_APPROVED`.
