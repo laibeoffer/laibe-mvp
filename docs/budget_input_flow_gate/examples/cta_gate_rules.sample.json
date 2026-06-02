@@ -1,0 +1,24 @@
+{
+  "requirement_incomplete": {
+    "disabled_ctas": [
+      "enter_plan_puzzle",
+      "continue_to_budget_preview",
+      "request_formal_quote",
+      "export_customer_quote"
+    ],
+    "allowed_ctas": ["save_draft_requirement", "continue_requirement_form"]
+  },
+  "plan_quantity_not_verified": {
+    "disabled_ctas": [
+      "continue_to_budget_preview",
+      "request_formal_quote",
+      "export_customer_quote"
+    ],
+    "allowed_ctas": ["return_to_plan_puzzle", "add_plan_reference"]
+  },
+  "forbidden": {
+    "formal_price_generated": false,
+    "budget_estimate_line_generated": false,
+    "renderer_invoked": false
+  }
+}
