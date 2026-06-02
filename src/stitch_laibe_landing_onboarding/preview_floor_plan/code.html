@@ -2314,6 +2314,8 @@
       display: grid;
       gap: 8px;
       min-height: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .status-card,
@@ -2735,6 +2737,9 @@
 
     .status-tab-list {
       grid-template-columns: repeat(4, minmax(0, 1fr));
+      min-height: 30px;
+      position: relative;
+      z-index: 3;
     }
 
     .status-card {
@@ -2803,6 +2808,489 @@
 
       .inspector {
         grid-column: 1 / -1;
+      }
+    }
+
+    /* 0.15.2 intuitive workspace repair: compact CAD-like palettes and layered inspector. */
+    .workspace {
+      grid-template-rows: 60px minmax(0, 1fr);
+      padding: 6px 8px 8px;
+      gap: 6px;
+    }
+
+    .file-zone,
+    .compact-file-bar {
+      max-height: 60px;
+      min-height: 0;
+      padding: 6px 8px;
+      border-radius: 9px;
+      overflow: visible;
+    }
+
+    .compact-file-main.intuitive-topbar {
+      grid-template-columns: minmax(172px, .9fr) auto minmax(300px, auto) auto minmax(118px, .38fr);
+      gap: 8px;
+    }
+
+    .compact-title-field input,
+    .compact-select select {
+      min-height: 29px;
+      font-size: 10px;
+    }
+
+    .compact-actions .toolbar-btn {
+      min-height: 30px;
+      padding-inline: 8px;
+      font-size: 10px;
+    }
+
+    .compact-actions .toolbar-btn.icon-only {
+      width: 30px;
+      padding: 0;
+    }
+
+    .compact-actions .material-symbols-outlined {
+      font-size: 17px;
+    }
+
+    .tool-shell {
+      grid-template-columns: 56px minmax(760px, 1fr) 300px;
+    }
+
+    .compact-tool-panel {
+      width: 56px;
+      min-width: 56px;
+      overflow: visible;
+    }
+
+    .left-icon-rail {
+      width: 56px;
+      gap: 7px;
+      padding: 7px 5px;
+    }
+
+    .left-icon-rail .rail-tool {
+      width: 40px;
+      height: 40px;
+      min-height: 40px;
+      border-radius: 10px;
+      transition: border-color .16s ease, background .16s ease, color .16s ease, transform .16s ease;
+    }
+
+    .left-icon-rail .rail-tool:hover {
+      transform: translateY(-1px);
+    }
+
+    .rail-tool-view.is-tool-active {
+      border-color: rgba(121,216,255,.5);
+      background: rgba(121,216,255,.13);
+    }
+
+    .rail-tool-draw.is-tool-active {
+      border-color: rgba(98,230,200,.5);
+      background: rgba(98,230,200,.13);
+    }
+
+    .rail-tool-object.is-tool-active {
+      border-color: rgba(174,232,123,.48);
+      background: rgba(174,232,123,.12);
+    }
+
+    .rail-tool-output.is-tool-active,
+    .rail-tool-material.is-tool-active {
+      border-color: rgba(255,190,107,.5);
+      background: rgba(255,190,107,.13);
+    }
+
+    .tool-palette {
+      position: fixed;
+      z-index: 80;
+      width: 244px;
+      max-height: min(560px, calc(100vh - 84px));
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 12px;
+      overflow: hidden;
+      color: var(--text-main);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+        rgba(8,10,13,.96);
+      box-shadow: 0 24px 72px rgba(0,0,0,.52), inset 0 1px 0 rgba(255,255,255,.1);
+      backdrop-filter: blur(16px);
+    }
+
+    .tool-palette-head {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 8px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .tool-palette-head strong {
+      flex: 1;
+      font-size: 12px;
+      font-weight: 950;
+    }
+
+    .palette-grip {
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+    .palette-head-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .palette-icon-btn {
+      width: 26px;
+      height: 26px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 7px;
+      display: grid;
+      place-items: center;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.055);
+      cursor: pointer;
+    }
+
+    .palette-icon-btn .material-symbols-outlined {
+      font-size: 16px;
+    }
+
+    .tool-palette-body {
+      max-height: calc(min(560px, 100vh - 84px) - 36px);
+      overflow-y: auto;
+      display: grid;
+      gap: 7px;
+      padding: 8px;
+    }
+
+    .tool-palette.is-collapsed {
+      width: 210px;
+    }
+
+    .tool-palette.is-collapsed .tool-palette-body {
+      display: none;
+    }
+
+    .palette-btn {
+      min-height: 34px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 9px;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.055);
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .palette-btn.primary {
+      color: #fff;
+      border-color: rgba(98,230,200,.45);
+      background: rgba(98,230,200,.13);
+    }
+
+    .palette-btn.danger {
+      color: #ffd7d7;
+      border-color: rgba(255,111,111,.38);
+      background: rgba(255,111,111,.12);
+    }
+
+    .palette-btn .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    .palette-btn small {
+      margin-left: auto;
+      color: var(--text-muted);
+      font-size: 9px;
+    }
+
+    .palette-segment,
+    .palette-chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .palette-chip,
+    .palette-check {
+      min-height: 27px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 0 8px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.05);
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .palette-chip.is-selected,
+    .palette-check:has(input:checked) {
+      color: #fff;
+      border-color: rgba(121,216,255,.42);
+      background: rgba(121,216,255,.13);
+    }
+
+    .palette-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .palette-field {
+      display: grid;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .palette-field select {
+      min-height: 30px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      color: var(--text-main);
+      background: rgba(0,0,0,.3);
+      font: inherit;
+      font-size: 11px;
+    }
+
+    .palette-meta {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .palette-toggle {
+      min-height: 30px;
+    }
+
+    .inspector {
+      grid-template-rows: 40px minmax(0, 1fr);
+    }
+
+    .panel-head {
+      min-height: 40px;
+      padding: 8px 10px;
+    }
+
+    .panel-body {
+      padding: 8px;
+      gap: 8px;
+    }
+
+    .intuitive-inspector {
+      gap: 7px;
+    }
+
+    .status-work-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+      padding: 7px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .status-work-summary div {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .status-work-summary b {
+      min-width: 0;
+      color: var(--text-main);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .status-tab-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .status-tab-button {
+      min-height: 28px;
+      font-size: 10px;
+    }
+
+    .status-card,
+    .status-accordion {
+      padding: 8px;
+      border-radius: 10px;
+    }
+
+    .status-card b {
+      font-size: 11px;
+    }
+
+    .status-accordion summary {
+      min-height: 28px;
+      display: flex;
+      align-items: center;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .status-accordion-body {
+      padding-top: 7px;
+    }
+
+    .compact-property-card .status-grid,
+    .compact-page-card .status-grid,
+    .compact-layer-card .status-grid {
+      gap: 5px;
+    }
+
+    .compact-field-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .layer-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 5px;
+      margin-top: 7px;
+    }
+
+    .layer-mini-btn {
+      min-height: 28px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.045);
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .layer-mini-btn.is-selected {
+      color: #fff;
+      border-color: rgba(98,230,200,.42);
+      background: rgba(98,230,200,.13);
+    }
+
+    .compact-layer-items {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .compact-layer-items > span {
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .compact-overlay-grid {
+      gap: 5px;
+    }
+
+    .compact-more-layers {
+      margin-top: 6px;
+    }
+
+    .compact-more-layers summary {
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .compact-reminder-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .compact-reminder-row {
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 9px;
+      overflow: hidden;
+      background: rgba(255,255,255,.035);
+    }
+
+    .compact-reminder-main {
+      width: 100%;
+      min-height: 30px;
+      border: 0;
+      padding: 0 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text-main);
+      background: transparent;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .compact-reminder-main small {
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .compact-reminder-detail {
+      display: grid;
+      gap: 6px;
+      padding: 7px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .compact-shortcuts .status-row,
+    .compact-property-card .status-row {
+      font-size: 10px;
+    }
+
+    .compact-more-card .icon-text {
+      width: 100%;
+      justify-content: center;
+    }
+
+    body.is-focus-mode .tool-palette,
+    body.is-focus-mode .inspector {
+      display: none !important;
+    }
+
+    body.is-focus-mode .tool-shell {
+      grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    @media (max-width: 1240px) {
+      .tool-shell {
+        grid-template-columns: 56px minmax(560px, 1fr) 286px;
+      }
+
+      .compact-file-main.intuitive-topbar {
+        grid-template-columns: minmax(160px, 1fr) minmax(250px, auto) auto;
+      }
+
+      .compact-info,
+      .compact-save-state {
+        display: none;
       }
     }
   </style>
@@ -2907,7 +3395,7 @@
         <div class="file-panel">
           <span class="file-panel-label">草稿版本</span>
           <div class="compact-status-list">
-            <div><span>版本</span><b id="draftVersionText">0.15.1 精簡工作台</b></div>
+            <div><span>版本</span><b id="draftVersionText">0.15.2 直覺工作台修復</b></div>
             <div><span>狀態</span><b id="draftSaveStatusText">未儲存</b></div>
             <div><span>最後儲存</span><b id="lastSavedText">尚未儲存</b></div>
           </div>
@@ -3308,6 +3796,6 @@
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=compact-workspace-polish-0-15-1" defer></script>
+  <script src="./plan-puzzle.js?v=intuitive-workspace-repair-0-15-2" defer></script>
 </body>
 </html>

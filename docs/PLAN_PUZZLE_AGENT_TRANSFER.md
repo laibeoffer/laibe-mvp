@@ -1,5 +1,28 @@
 # Plan Puzzle Agent Transfer
 
+## Latest Transfer Update: Intuitive Workspace Repair 0.15.2
+
+- Task: Plancraft+ Intuitive Workspace Repair 0.15.2.
+- Branch: `codex/plan-puzzle-intuitive-workspace-repair-0-15-2`.
+- Base: PR #67 / `codex/plan-puzzle-compact-workspace-polish-0-15-1` / head `fb926cd10f56a490f46deee216d5ec7c3d1d8062`.
+- `project.version`: `0.15.2-intuitive-workspace-repair`.
+- Tool Catalog runtime version: `0.15.2-intuitive-workspace-repair`.
+- Script cache key: `./plan-puzzle.js?v=intuitive-workspace-repair-0-15-2`.
+- Main change: 0.15 compact workspace was repaired into a more intuitive, single-screen CAD-like workspace.
+- File area: compact topbar stays short; `預算` is not a main file button.
+- Tool area: 56px icon category rail plus movable / collapsible floating palette.
+- Canvas: central canvas keeps priority width; focus mode hides inspector and expands canvas.
+- Right inspector: concise summary plus four tabs only: `屬性`, `圖層`, `提醒`, `更多`.
+- Inspector tab repair: tab list now has explicit height / z-index and pointerdown-safe switching, so panel cards no longer cover tab buttons.
+- Empty canvas: actionable `匯入圖檔` CTA remains; blank underlay creation remains disabled / unavailable.
+- Developer diagnostics: collapsed by default and marked as testing / handoff information only.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - Browser URL: `http://127.0.0.1:50367/code.html?validation=intuitive-workspace-repair-0-15-2`.
+  - Browser console error count: 0.
+  - 4 inspector tabs switch correctly; 10 product layer buttons render; `燈具配置圖` can be selected; item palette opens; wall tool shows import/scale prerequisite error; focus mode expands canvas from 951px to 1251px and restores inspector.
+- Guard: no Plancraft core, no `plancraft/`, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no image API / AI API / DB / payment / escrow / listing fee.
+
 ## Latest Transfer Update: Compact Workspace / Single-Screen CAD-like Layout
 
 - Task: Plancraft+ Compact Workspace / Single-Screen CAD-like Layout.
