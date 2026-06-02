@@ -1,0 +1,17 @@
+{
+  "window": "quote_factory",
+  "files": [
+    {
+      "file_id": "quote_pdf_001",
+      "file_type": "quote_pdf",
+      "upload_status": "linked",
+      "handoff_target": "quote_factory",
+      "candidate_evidence_only": true,
+      "display_unit_price_to_budget_estimate_line": false,
+      "pricing_rule_generated": false,
+      "formal_price_generated": false
+    }
+  ],
+  "production_ocr_enabled": false,
+  "db_connected": false
+}

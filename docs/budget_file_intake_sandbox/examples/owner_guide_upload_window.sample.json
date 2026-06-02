@@ -1,0 +1,16 @@
+{
+  "window": "owner_guide",
+  "files": [
+    {
+      "file_id": "owner_photo_001",
+      "file_type": "current_state_photo",
+      "file_purpose": "visual_context",
+      "upload_status": "mock_received",
+      "handoff_target": "budget_input_flow_gate",
+      "budget_item_generated": false,
+      "formal_price_generated": false
+    }
+  ],
+  "real_upload_backend_enabled": false,
+  "storage_api_connected": false
+}
