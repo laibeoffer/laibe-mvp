@@ -1,6 +1,6 @@
 # Budget Runtime Acceptance QA Agent Automation
 
-Agent: 預算功能驗收官 Agent
+Agent: Budget Runtime Evidence Agent
 
 Workstream: `qa/budget-runtime-acceptance`
 
@@ -8,17 +8,17 @@ Managed by: `LAIBE_PATROL_INTEGRATION_OFFICER` / `LAIBE_REVIEWER_INTEGRATION_OFF
 
 Automation: every 15 minutes
 
-Status: `EVIDENCE_PACKET_REQUIRED`
+Status: `REPLACEMENT_EVIDENCE_PACKET_SUBMITTED`
 
 Registration: 100%
 
-Evidence Packet: 0%
+Evidence Packet: 100% for docs-only replacement packet
 
 Closeout: 0%
 
-Effective Progress: 33%
+Effective Progress: 66%
 
-Functional Acceptance: `PENDING`
+Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
 
 Not part of Integration Gate: Yes
 
@@ -28,20 +28,15 @@ Tracking Issue: #65
 
 Define how budget-related work is classified as docs-only, mock-ready, browser-verified, runtime-verified, or production-ready. The agent protects the rule that PR merged does not equal functional completion.
 
-## Responsible For
+## Automation Evidence
 
-- Functional Acceptance Matrix
-- Runtime Evidence Report template
-- Browser Smoke Checklist
-- CLI / Validator Evidence Checklist
-- docs-only vs runtime-verified decision rules
-- PR merged is not functional completion rule
-- docs-only final completion report
+- 15-minute patrol: active under Integration Officer support-agent patrol.
+- 20-minute no-idle rule: if no evidence packet, linked PR, or blocker disposition appears within a patrol window, the workstream moves to recovery enforcement.
+- Replacement recovery branch: `codex/support-agent-evidence-recovery-runtime-acceptance`.
 
-## Required Evidence Packet
+## Evidence Packet Files
 
-Submit a QA docs / checklist `Budget Runtime Evidence Agent Evidence Packet` containing:
-
+- `BUDGET_RUNTIME_EVIDENCE_AGENT.md`
 - `functional_acceptance_matrix.md`
 - `runtime_evidence_levels.md`
 - `browser_smoke_checklist.md`
@@ -49,57 +44,17 @@ Submit a QA docs / checklist `Budget Runtime Evidence Agent Evidence Packet` con
 - `docs_only_vs_runtime_verified.md`
 - `pr_merge_not_equal_functional_completion.md`
 - `final_completion_report.md`
+- `examples/functional_acceptance_report.sample.md`
+- `examples/runtime_evidence_matrix.sample.json`
 
-The packet must answer:
+## Forbidden Scope
 
-1. What does `NOT_APPLICABLE_DOCS_ONLY` mean?
-2. What does `CONTRACT_ONLY` mean?
-3. What does `MOCK_READY` mean?
-4. What evidence is required for `WEB_RUNTIME_VERIFIED`?
-5. What evidence is required for `CLI_VALIDATED`?
-6. What evidence is required for `RUNTIME_VERIFIED`?
-7. Why does PR merged not equal functional complete?
-8. Why does docs-only not equal runtime verified?
-9. Which PR / agent currently needs Functional Acceptance?
-10. Confirm no functional code, Budget Engine, Renderer, payment, AI API, DB, or n8n changes.
-
-## Not Responsible For
-
-- writing functional code
-- merging PRs
-- modifying Budget Engine
-- modifying Renderer
-- generating formal prices
-- `PricingRule`
-- `BudgetEstimateLine`
-- payment / escrow / listing fee
-- AI API
-- DB / Supabase
-- n8n runtime
-- formal quote
-
-## No-idle Rule
-
-This agent may not report `等待命令派發`, `本輪無新指派`, `pending approval`, `blocker unchanged`, or `no material change` while any evidence packet or docs-only evidence gap remains.
-
-If blocked, it must submit:
-
-1. self-solve attempt
-2. decision packet if needed
-3. safe work while waiting
-4. next report expectation
-
-## Next Safe Work
-
-1. Submit the required evidence packet to Issue #65 or link a scoped docs-only PR.
-2. Keep all work QA docs / checklist only.
-3. Do not touch functional code, Budget Engine, Renderer, payment, AI API, DB/Supabase, n8n, formal price, or formal quote.
+No functional code, no Budget Engine runtime, no Renderer runtime, no `PricingRule`, no `BudgetEstimateLine`, no payment, no AI API, no DB/Supabase, no n8n runtime, no formal price, no formal quote, no formal Excel/PDF.
 
 ## Closeout Conditions
 
-- Evidence packet submitted and accepted.
-- Final completion report submitted.
-- Blackboard closeout status proposed.
+- Replacement evidence packet merged.
+- Final completion report accepted.
 - No forbidden scope touched.
 - Integration Officer declares `AGENT_CLOSEOUT_ACCEPTED`.
 - Integration Officer declares `AUTOMATION_STOP_APPROVED`.
