@@ -1664,3 +1664,51 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
 - Browser validation evidence：body scrollHeight = viewport height、topbar 72px、left rail 56px、canvas shell 1173px wide、4 status tabs、19 rail buttons、4 rail groups、empty canvas CTA present、focus mode hides inspector、layer switching to `lighting_plan` updates item catalog、visible layer checkbox toggles.
 - Browser console listener in current in-app browser API was unavailable; no page error overlay or runtime break was observed, and page rendered / interactions passed.
 - 下一步唯一建議：scope clean 時建立 scoped commit + Draft PR for `codex/plan-puzzle-compact-workspace-polish-0-15-1`。
+
+## Plan Puzzle 0.16.0 One-Screen Drawing Workbench Handoff
+
+- 任務名稱：Plancraft+ One-Screen Drawing Workbench Repair。
+- 任務類型：Builder / UX Repair / Drawing Tool Interaction / Plan Puzzle。
+- 分支：`codex/plan-puzzle-one-screen-drawing-workbench-0-16`。
+- 本輪版本：`project.version = 0.16.0-one-screen-drawing-workbench`。
+- Tool Catalog runtime version：`0.16.0-one-screen-drawing-workbench`。
+- `code.html` script 版本：`./plan-puzzle.js?v=one-screen-drawing-workbench-0-16`。
+- 主變更：將 0.15.2 的 compact UI 進一步修成單螢幕繪圖工作台，避免主畫面像長文件或說明書。
+- Topbar：保留專案 / 樓層 / 屋型 / 比例 / 圖紙 / 匯入 / 儲存 / 總覽 / 列印 / 匯出 / 說明；主畫面移除或降級預算、專注文字按鈕、JSON、`.pc`、建立空白底圖與比例校正說明。
+- 匯入：所有匯入入口使用同一個既有 file picker；空畫布 CTA 保留 `匯入圖檔`，不再顯示不可用的空白底圖 CTA。
+- 比例：主畫面改用 mm 基準語言，不顯示 pixel / px；PDF 可選但仍不預覽，不接 pdf.js / storage / OCR。
+- 左側工具：改為兩組外露高頻工具 `常用` / `繪圖`，包含選取、手掌、縮放、復原、重做、刪除、鎖點、牆、門窗、項目、尺寸、文字、材質。
+- 工具狀態：復原 / 重做明確 disabled；其他工具點擊會切換 active state、打開對應 floating palette、或顯示可理解提示。
+- Floating palette：保留拖曳、收合、關閉與歸位；牆體 palette 補齊既有牆、新設牆、拆除牆、承重牆、柱、梁與 120 / 150 / 200 / 240 mm 牆厚。
+- 畫布：`body` / `workspace` 鎖在 100vh；1440x900 驗證下 document scrollHeight = viewport height，整頁不再長捲動，畫布與左右工作區一屏可見。
+- 右側 inspector：固定 5 個 tab：屬性、圖層、提醒、材料、總覽；不再使用 `更多` tab。
+- 提醒：改為 compact rows，避免右側狀態區像資料庫報表。
+- 材料與總覽：直接外露為右側 tab；快捷鍵只保留在總覽內。
+- 開發者診斷：仍預設收合，保留 Tool Catalog Runtime、Wall Graph、Node Graph、Plancraft Bridge、Converter Report、Renderer Preview、DSL validation 等交接用資訊。
+- Browser validation：
+  - URL：`http://127.0.0.1:50369/code.html?validation=one-screen-drawing-workbench-0-16`。
+  - viewport：1440x900。
+  - console error count：0。
+  - `body` / `html` overflow hidden；document scrollHeight = 900；topbar height 58px；left rail width 236px；canvas width 842px；right inspector width 301px。
+  - 13 個高頻工具外露；右側 5 個 tab 可見；無 `更多` tab；無主畫面 `預算` 按鈕；無主畫面 `草稿 JSON` / `.pc` / `建立空白底圖`；開發者診斷預設收合。
+  - 材料 tab 顯示材料偏好與已選材料標籤；總覽 tab 顯示完成度、送出前檢查與快捷鍵。
+  - 提醒 tab 預設 compact；點開 `牆厚需確認` 後只展開單項，並顯示 `加入預算` / `忽略` / `請廠商建議`。
+- Wall smoke validation：
+  - URL：`http://127.0.0.1:50369/code.html?validation=one-screen-wall-smoke`。
+  - 點擊 `牆` 工具後在畫布點兩點，`wallLayer` 產生牆段元素；console error count 0。
+- Static validation：
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS。
+  - `git diff --check`: PASS；僅 Windows CRLF warning，非 failure。
+- Guard：
+  - 未修改 `plancraft/` 或 Plancraft core。
+  - 未修改 budget runtime。
+  - 未新增 `package.json` / `node_modules` / framework。
+  - 未解除 `formalEstimateGuard`。
+  - 未呼叫 `generateBudgetEstimate()`。
+  - 未接 AI API / image API / DB / payment / escrow / listing fee。
+- 仍是 placeholder / disabled：
+  - 復原 / 重做 history stack 尚未完整開放。
+  - 手掌 / 縮放是操作提示與模式狀態，尚未完整 CAD 級 pan / zoom。
+  - PDF 僅可選檔，不做本頁預覽。
+  - 不產生正式預算、不把 `.pc` / SVG / candidate facts 作 budget input。
+- 下一步唯一建議：若 scope clean，建立 scoped commit 並開 Draft PR；後續再做高頻工具真實操作深度，例如 pan / zoom / undo-redo stack。

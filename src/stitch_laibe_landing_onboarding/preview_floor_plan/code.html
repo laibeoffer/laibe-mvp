@@ -3293,6 +3293,304 @@
         display: none;
       }
     }
+
+    /* 0.16 one-screen drawing workbench: visible tools, compact inspector tabs, canvas-first layout. */
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .page-intro {
+      display: none;
+    }
+
+    .workspace {
+      width: min(100% - 14px, 100%);
+      height: calc(100vh - 132px);
+      min-height: 0;
+      padding: 6px 7px 7px;
+      gap: 6px;
+      overflow: hidden;
+      grid-template-rows: 58px minmax(0, 1fr);
+    }
+
+    .file-zone,
+    .compact-file-bar {
+      height: 58px;
+      max-height: 58px;
+      overflow: visible;
+    }
+
+    .compact-file-main.intuitive-topbar {
+      grid-template-columns: minmax(156px, .75fr) minmax(94px, auto) minmax(330px, auto) minmax(286px, auto) minmax(104px, .25fr);
+    }
+
+    .tool-shell {
+      height: 100%;
+      min-height: 0;
+      grid-template-columns: 236px minmax(0, 1fr) 318px;
+      gap: 7px;
+      overflow: hidden;
+    }
+
+    .compact-tool-panel {
+      width: 236px;
+      min-width: 236px;
+      overflow: visible;
+    }
+
+    .left-icon-rail.one-screen-tool-rail {
+      width: 236px;
+      height: 100%;
+      align-content: start;
+      gap: 9px;
+      padding: 8px;
+      overflow-y: auto;
+    }
+
+    .workbench-tool-section {
+      display: grid;
+      gap: 6px;
+    }
+
+    .tool-section-title {
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .quick-tool-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .quick-tool-button {
+      min-height: 38px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 9px;
+      display: grid;
+      grid-template-columns: 19px minmax(0, 1fr);
+      align-items: center;
+      gap: 5px;
+      padding: 0 6px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.048);
+      font-size: 10px;
+      font-weight: 950;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .quick-tool-button .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    .quick-tool-button small {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .quick-tool-view.is-tool-active,
+    .quick-tool-draw.is-tool-active {
+      color: #fff;
+      border-color: rgba(98,230,200,.45);
+      background: rgba(98,230,200,.13);
+    }
+
+    .quick-tool-object.is-tool-active,
+    .quick-tool-material.is-tool-active,
+    .quick-tool-output.is-tool-active {
+      color: #fff;
+      border-color: rgba(255,190,107,.45);
+      background: rgba(255,190,107,.13);
+    }
+
+    .quick-tool-danger {
+      color: #ffd7d7;
+      border-color: rgba(255,111,111,.28);
+    }
+
+    .quick-tool-danger.is-tool-active {
+      color: #fff;
+      border-color: rgba(255,111,111,.48);
+      background: rgba(255,111,111,.13);
+    }
+
+    .quick-tool-button.is-disabled {
+      opacity: .42;
+      cursor: not-allowed;
+    }
+
+    .palette-reset-btn {
+      min-height: 32px;
+      border: 1px dashed rgba(255,255,255,.16);
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,.035);
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .palette-reset-btn .material-symbols-outlined {
+      font-size: 16px;
+    }
+
+    .tool-palette {
+      width: 250px;
+      max-height: min(500px, calc(100vh - 104px));
+    }
+
+    .tool-palette-body {
+      max-height: calc(min(500px, 100vh - 104px) - 36px);
+    }
+
+    .canvas-shell {
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .canvas-toolbar {
+      min-height: 42px;
+      padding: 7px 9px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+      gap: 6px;
+    }
+
+    .canvas-toolbar .toolbar-btn {
+      min-height: 30px;
+      padding-inline: 8px;
+      font-size: 10px;
+    }
+
+    .canvas-toolbar .material-symbols-outlined {
+      font-size: 17px;
+    }
+
+    .canvas {
+      min-height: 0;
+      height: 100%;
+    }
+
+    .canvas-footer {
+      min-height: 34px;
+      padding: 0 10px;
+    }
+
+    .inspector {
+      width: 318px;
+      min-width: 318px;
+      grid-template-rows: 34px minmax(0, 1fr);
+    }
+
+    .inspector .panel-body {
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .status-tabs-shell.intuitive-inspector {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding-bottom: 2px;
+      background: rgba(10,13,16,.96);
+    }
+
+    .status-tab-list {
+      position: sticky;
+      top: 0;
+      z-index: 22;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      min-height: 32px;
+      padding: 3px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .status-tab-button {
+      min-height: 28px;
+      border-radius: 8px;
+      font-size: 10px;
+    }
+
+    .status-tab-panel {
+      max-height: calc(100vh - 276px);
+      overflow-y: auto;
+      padding-bottom: 4px;
+    }
+
+    .compact-reminder-main::before {
+      content: "!";
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #111;
+      background: #ffbe6b;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    body.is-focus-mode .tool-palette,
+    body.is-focus-mode .inspector {
+      display: none !important;
+    }
+
+    body.is-focus-mode .tool-shell {
+      grid-template-columns: 64px minmax(0, 1fr);
+    }
+
+    body.is-focus-mode .compact-tool-panel,
+    body.is-focus-mode .left-icon-rail.one-screen-tool-rail {
+      width: 64px;
+      min-width: 64px;
+    }
+
+    body.is-focus-mode .tool-section-title,
+    body.is-focus-mode .quick-tool-button small,
+    body.is-focus-mode .palette-reset-btn {
+      display: none;
+    }
+
+    body.is-focus-mode .quick-tool-grid {
+      grid-template-columns: 1fr;
+    }
+
+    body.is-focus-mode .quick-tool-button {
+      grid-template-columns: 1fr;
+      place-items: center;
+      padding: 0;
+    }
+
+    @media (max-width: 1240px) {
+      .tool-shell {
+        grid-template-columns: 220px minmax(0, 1fr) 300px;
+      }
+
+      .compact-tool-panel,
+      .left-icon-rail.one-screen-tool-rail {
+        width: 220px;
+        min-width: 220px;
+      }
+
+      .quick-tool-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
   </style>
 </head>
 <body>
@@ -3395,7 +3693,7 @@
         <div class="file-panel">
           <span class="file-panel-label">草稿版本</span>
           <div class="compact-status-list">
-            <div><span>版本</span><b id="draftVersionText">0.15.2 直覺工作台修復</b></div>
+            <div><span>版本</span><b id="draftVersionText">0.16.0 單螢幕繪圖工作台</b></div>
             <div><span>狀態</span><b id="draftSaveStatusText">未儲存</b></div>
             <div><span>最後儲存</span><b id="lastSavedText">尚未儲存</b></div>
           </div>
@@ -3796,6 +4094,6 @@
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=intuitive-workspace-repair-0-15-2" defer></script>
+  <script src="./plan-puzzle.js?v=one-screen-drawing-workbench-0-16" defer></script>
 </body>
 </html>

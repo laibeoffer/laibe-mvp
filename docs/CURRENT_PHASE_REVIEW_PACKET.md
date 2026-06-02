@@ -2778,3 +2778,67 @@ Conditional ready。
 - Pan / zoom / dimension / undo / redo 等仍有明確「尚未完整開放」提示。
 - Browser console error count 無法由目前 in-app browser API 精準監聽；以渲染成功與互動通過作替代證據。
 - 仍需後續確認 1440x900 以外斷點的精細排版。
+
+## Plan Puzzle 0.16.0 One-Screen Drawing Workbench Review Packet
+
+### 任務
+
+- Plancraft+ One-Screen Drawing Workbench Repair。
+- 任務類型：Builder / UX Repair / Drawing Tool Interaction / Plan Puzzle。
+- 版本：`0.16.0-one-screen-drawing-workbench`。
+- 分支：`codex/plan-puzzle-one-screen-drawing-workbench-0-16`。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+### 完成事項
+
+- 主工作台收斂為 100vh one-screen drawing workbench；桌面 viewport 下不再整頁長捲動。
+- Topbar 壓縮為全局控制列，主畫面只保留專案、樓層、屋型、比例、圖紙、匯入、儲存、總覽、列印、匯出與說明。
+- 主畫面移除或降級不該外露的預算、專注文字、JSON、`.pc`、建立空白底圖與比例校正說明。
+- 左側工具改為兩組高頻工具：`常用` / `繪圖`。
+- 高頻工具全部外露：選取、手掌、縮放、復原、重做、刪除、鎖點、牆、門窗、項目、尺寸、文字、材質。
+- 工具按鈕皆有互動結果或 disabled 狀態；復原 / 重做明確 disabled。
+- Floating palette 可拖曳、收合、關閉與歸位；牆體 palette 補齊牆型與牆厚。
+- 右側 inspector 固定為 5 個 tab：屬性、圖層、提醒、材料、總覽；不再有 `更多` tab。
+- 提醒改為 compact rows，材料與總覽外露，快捷鍵只保留於總覽。
+- 主 UI 以 mm / cm 語言表達比例基準；pixel / px 僅允許在收合的開發者診斷或技術語境。
+- 開發者診斷仍預設收合；保留 Tool Catalog Runtime、Wall Graph、Node Graph、Plancraft Bridge、Converter Report、Renderer Preview 與 DSL validation。
+- Wall smoke fixture 可在已建立 mm 基準的情境下實際形成牆段。
+
+### 驗證
+
+- `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS。
+- `git diff --check`: PASS；僅 CRLF warning。
+- Browser URL：`http://127.0.0.1:50369/code.html?validation=one-screen-drawing-workbench-0-16`。
+- Browser viewport：1440x900。
+- Browser console error count：0。
+- Browser evidence：document scrollHeight = viewport height；body/html overflow hidden；topbar 58px；left rail 236px；canvas 842px wide；right inspector 301px；13 high-frequency tools visible；5 inspector tabs visible；no `更多` tab；empty canvas has `匯入圖檔` CTA；main UI does not expose `草稿 JSON` / `.pc` / blank underlay CTA；developer diagnostics collapsed.
+- Materials tab evidence：材料偏好與已選材料標籤可見。
+- Overview tab evidence：完成度、總覽 / 送出前檢查與快捷鍵可見。
+- Reminders tab evidence：提醒預設 compact；點開 `牆厚需確認` 後只展開單項，並顯示 `加入預算` / `忽略` / `請廠商建議`。
+- Wall smoke URL：`http://127.0.0.1:50369/code.html?validation=one-screen-wall-smoke`。
+- Wall smoke evidence：click `牆` tool and two canvas points creates wall elements in `wallLayer`; console error count remains 0。
+
+### 邊界
+
+- 未修改 `plancraft/` 或 Plancraft core。
+- 未修改 budget runtime。
+- 未解除 `formalEstimateGuard`。
+- 未新增 `package.json`、`node_modules` 或 framework。
+- 未呼叫 `generateBudgetEstimate()`。
+- 未接 AI API / image API / DB / payment / escrow / listing fee。
+- 未產生正式估價。
+- 未把 `.pc` / SVG / renderer preview / candidate facts 當作 budget input。
+
+### 已知風險
+
+- Pan / zoom / undo / redo 仍未達完整 CAD history / viewport stack，已以 disabled 或提示處理。
+- PDF import 仍只允許選檔，不在本頁做 preview 或 storage。
+- 0.16 修的是 single-screen UX 與高頻工具可驗證互動，不是 production budget、正式施工圖或 Plancraft core integration。

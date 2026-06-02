@@ -44,6 +44,38 @@
   - Body scroll height equals viewport height; main workspace is no longer a long document at desktop viewport.
 - Guard: no Plancraft core, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no AI API / DB / payment / escrow / listing fee.
 
+## Latest Transfer Update: One-Screen Drawing Workbench Repair
+
+- Task: Plancraft+ One-Screen Drawing Workbench Repair.
+- Branch: `codex/plan-puzzle-one-screen-drawing-workbench-0-16`.
+- `project.version`: `0.16.0-one-screen-drawing-workbench`.
+- Tool Catalog runtime version: `0.16.0-one-screen-drawing-workbench`.
+- Script cache key: `./plan-puzzle.js?v=one-screen-drawing-workbench-0-16`.
+- Main change: compact workspace is repaired into a one-screen drawing workbench with visible high-frequency tools, reduced topbar, fixed inspector tabs, and wall smoke validation.
+- Topbar: keeps project / floor / house type / scale / sheet / import / save / overview / print / export / help. Main UI no longer exposes budget generation, focus text button, JSON, `.pc`, blank underlay creation, or manual scale explanation as primary homeowner actions.
+- Import: all import CTAs route to the existing file picker; JPG / PNG underlay remains available; PDF remains selectable but not previewed; no pdf.js, storage, OCR, or fake auto-recognition was added.
+- Scale: main UI uses mm baseline language. Pixel / px wording is kept out of homeowner-facing workspace and may only appear in developer diagnostics.
+- Tools: visible two-section tool area: `常用` and `繪圖`.
+- High-frequency tools exposed: select, hand, zoom, undo, redo, delete, snap, wall, openings, items, dimension, text, material.
+- Disabled / placeholder handling: undo and redo are disabled; pan / zoom remain mode hints; no button is left as a silent no-op.
+- Floating palettes: draggable, collapsible, closable, and resettable; wall palette includes existing / new / demolished / structural wall, column, beam, and 120 / 150 / 200 / 240 mm thickness choices.
+- Right inspector: fixed tabs are `屬性`, `圖層`, `提醒`, `材料`, `總覽`; there is no `更多` tab.
+- Reminders: compact rows with expandable/actionable behavior instead of large report cards.
+- Materials and overview: visible as first-level inspector tabs; shortcut help is only in overview.
+- Canvas: one-screen shell uses 100vh; validation at 1440x900 has document scrollHeight equal to viewport height.
+- Developer diagnostics: collapsed by default and still used only for testing / handoff. Do not promote Tool Catalog Runtime, Wall Graph, Node Graph, Plancraft Bridge, Converter Report, Renderer Preview, DSL validation, or internal ids into homeowner UI.
+- Validation:
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS.
+  - `git diff --check`: PASS with CRLF warnings only.
+  - Browser URL: `http://127.0.0.1:50369/code.html?validation=one-screen-drawing-workbench-0-16`.
+  - Browser console error count: 0.
+  - Browser evidence: 13 high-frequency tools visible, 5 inspector tabs visible, no `更多` tab, no main JSON / `.pc` / blank-underlay CTA, developer diagnostics collapsed, body/html overflow hidden.
+  - Reminder evidence: reminders are compact by default; opening `牆厚需確認` expands only that row and shows `加入預算` / `忽略` / `請廠商建議`.
+  - Wall smoke URL: `http://127.0.0.1:50369/code.html?validation=one-screen-wall-smoke`.
+  - Wall smoke evidence: click wall tool and two canvas points creates wall elements in `wallLayer`, with console error count 0.
+- Guard: no Plancraft core, no `plancraft/`, no budget runtime, no package / node_modules / framework, no `formalEstimateGuard`, no `generateBudgetEstimate()`, no AI API / image API / DB / payment / escrow / listing fee.
+- Known placeholders: full CAD pan / zoom, undo-redo history stack, PDF preview, OCR, storage, production budget adapter, and formal renderer integration remain out of scope.
+
 ## Latest Transfer Update: Status Area Productization / Debug Collapse
 
 - Task: Plancraft+ Status Area Productization / Debug Collapse.

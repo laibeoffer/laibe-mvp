@@ -35,7 +35,7 @@
   const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
   const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
   const ZONE_AREA_CONFIDENCE_INVALID = 0;
-  const PLAN_PUZZLE_UI_IA_VERSION = "0.15.2-intuitive-workspace-repair";
+  const PLAN_PUZZLE_UI_IA_VERSION = "0.16.0-one-screen-drawing-workbench";
   const PLAN_PUZZLE_TOOL_CATALOG_VERSION = PLAN_PUZZLE_UI_IA_VERSION;
   const TOOL_CATALOG_ITEM_STATUS_OPTIONS = ["new", "existing", "demolition", "reference"];
   const TOOL_CATALOG_BUDGET_OPTIONS = ["include", "reference_only", "ask_contractor"];
@@ -566,6 +566,7 @@
   canvas.addEventListener("pointerleave", handleCanvasPointerLeave);
   window.addEventListener("resize", render);
 
+  applyValidationFixtureIfNeeded();
   render();
 
   function createInitialProject() {
@@ -575,7 +576,7 @@
       product: "Plancraft+",
       version: PLAN_PUZZLE_UI_IA_VERSION,
       unit: "mm",
-      draftVersionName: "0.15.2 直覺工作台修復",
+      draftVersionName: "0.16.0 單螢幕繪圖工作台",
       saveStatus: "unsaved",
       lastSavedAt: null,
       importSource: null,
@@ -640,6 +641,7 @@
       orthogonalEnabled: true,
       currentWallStatus: "existing",
       currentWallThickness: DEFAULT_WALL_THICKNESS,
+      currentWallStructural: false,
       currentOpeningKind: "door",
       currentOpeningWidth: DEFAULT_OPENING_WIDTHS.door,
       currentOpeningSwing: "left",
@@ -666,7 +668,7 @@
       focusMode: false,
       openToolPalette: "draw",
       toolPaletteCollapsed: false,
-      toolPalettePosition: { x: 66, y: 86 },
+      toolPalettePosition: { x: 252, y: 118 },
       expandedReminderId: null,
       currentFloor: "1F",
       houseType: "apartment",
@@ -676,6 +678,59 @@
       message: "",
       error: ""
     };
+  }
+
+  function applyValidationFixtureIfNeeded() {
+    const validationMode = new URLSearchParams(window.location.search).get("validation") || "";
+    if (validationMode !== "one-screen-wall-smoke") {
+      return;
+    }
+    const createdAt = new Date().toISOString();
+    const fixtureSvg = [
+      "<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='820' viewBox='0 0 1280 820'>",
+      "<rect width='1280' height='820' fill='%230b1014'/>",
+      "<g stroke='%232c3a42' stroke-width='1'>",
+      Array.from({ length: 33 }, (_, index) => `<line x1='${index * 40}' y1='0' x2='${index * 40}' y2='820'/>`).join(""),
+      Array.from({ length: 22 }, (_, index) => `<line x1='0' y1='${index * 40}' x2='1280' y2='${index * 40}'/>`).join(""),
+      "</g>",
+      "<rect x='240' y='180' width='520' height='300' fill='none' stroke='%23a8c0ca' stroke-width='5'/>",
+      "<text x='260' y='230' fill='%23dbe7ec' font-family='Arial, sans-serif' font-size='26'>驗證底圖</text>",
+      "</svg>"
+    ].join("");
+    project.importSource = {
+      id: "validation-import-one-screen-wall-smoke",
+      originalFileName: "validation-wall-smoke.png",
+      originalFileType: "png",
+      accepted: true,
+      previewSupported: true,
+      normalizedAs: "underlay-image",
+      importedAt: createdAt
+    };
+    project.underlay = {
+      id: "validation-underlay-one-screen-wall-smoke",
+      fileName: "validation-wall-smoke.png",
+      fileType: "png",
+      dataUrl: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(fixtureSvg)}`,
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0,
+      opacity: DEFAULT_UNDERLAY_OPACITY,
+      calibratedBy: {
+        from: { x: 240, y: 180 },
+        to: { x: 760, y: 180 },
+        knownLength: 5200,
+        unit: "mm",
+        source: "validation_fixture"
+      }
+    };
+    project.scale = {
+      pxPerMm: 0.1,
+      calibrated: true,
+      source: "validation_fixture"
+    };
+    uiState.message = "瀏覽器驗證模式已建立 mm 基準，可直接測試兩點畫牆。";
+    uiState.error = "";
   }
 
   function createInitialLayerItemSelections() {
@@ -888,10 +943,15 @@
     clearZoneBoundaryDraft();
     uiState.error = "";
     const toolLabel = label || getCurrentToolLabel(tool);
-    const placeholderTools = new Set(["pan", "zoom", "item_place", "dimension", "text", "material_bucket", "furniture"]);
-    uiState.message = placeholderTools.has(tool)
-      ? `${toolLabel} 已選取；工具狀態已同步，完整幾何操作仍維持草稿邊界。`
-      : `${toolLabel} 已選取。`;
+    const toolMessages = {
+      pan: "手掌已選取；Space 也可切換。拖動畫布仍在草稿階段。",
+      zoom: "縮放已選取；請用工具板中的縮放選項操作，完整縮放仍在草稿階段。",
+      item_place: "項目工具已選取；選擇項目後可點畫布放置需求標記。",
+      dimension: "尺寸工具已選取；可選牆段或在畫布點兩點建立尺寸標記。",
+      text: "文字工具已選取；點畫布可建立文字備註。",
+      material_bucket: "材質工具已選取；請先選取物件再套用材質。"
+    };
+    uiState.message = toolMessages[tool] || `${toolLabel} 已選取。`;
   }
 
   function toggleLayerCatalogItem(layerId, itemName) {
@@ -1021,6 +1081,10 @@
     const action = actionButton.dataset.action;
     activateToolCatalogEntry(actionButton);
     syncCurrentToolForAction(actionButton);
+    if (actionButton.dataset.paletteId) {
+      uiState.openToolPalette = actionButton.dataset.paletteId;
+      uiState.toolPaletteCollapsed = false;
+    }
     if (action === "choose-file") {
       chooseFile();
     }
@@ -1034,7 +1098,7 @@
     if (action === "toggle-preflight-panel") {
       uiState.preflightOpen = !uiState.preflightOpen;
       project.totalPreviewOpen = uiState.preflightOpen;
-      uiState.activeStatusTab = "more";
+      uiState.activeStatusTab = "overview";
       uiState.message = uiState.preflightOpen ? "已開啟總預覽 / 送出前檢查。" : "已收合總預覽 / 送出前檢查。";
     }
     if (action === "toggle-focus-mode") {
@@ -1074,6 +1138,13 @@
       render();
       return;
     }
+    if (action === "reset-tool-palette-position") {
+      uiState.toolPalettePosition = { x: 252, y: 118 };
+      uiState.message = "工具板已回到預設位置。";
+      uiState.error = "";
+      render();
+      return;
+    }
     if (action === "toggle-reminder-detail") {
       const reminderId = actionButton.dataset.reminderId || "";
       uiState.expandedReminderId = uiState.expandedReminderId === reminderId ? null : reminderId;
@@ -1098,7 +1169,16 @@
     }
     if (actionButton.dataset.fieldProxy === "current-wall-status") {
       uiState.currentWallStatus = normalizeWallStatus(actionButton.dataset.value);
+      uiState.currentWallStructural = actionButton.dataset.structural === "true";
       uiState.message = `牆體狀態已切換為 ${getWallStatusLabel(uiState.currentWallStatus)}。`;
+      uiState.error = "";
+    }
+    if (actionButton.dataset.fieldProxy === "current-wall-structural") {
+      uiState.currentWallStatus = normalizeWallStatus(actionButton.dataset.value || "existing");
+      uiState.currentWallStructural = actionButton.dataset.structural === "true";
+      uiState.message = uiState.currentWallStructural
+        ? "下一段牆已標為需專業確認。"
+        : `牆體狀態已切換為 ${getWallStatusLabel(uiState.currentWallStatus)}。`;
       uiState.error = "";
     }
     if (action === "print-current-layer") {
@@ -1229,7 +1309,7 @@
   }
 
   function selectInspectorTab(tabId) {
-    const nextTab = ["properties", "layers", "reminders", "more"].includes(tabId) ? tabId : "properties";
+    const nextTab = ["properties", "layers", "reminders", "materials", "overview"].includes(tabId) ? tabId : "properties";
     uiState.activeStatusTab = nextTab;
     uiState.message = `右側狀態頁籤已切換為「${getStatusTabLabel(nextTab)}」。`;
     uiState.error = "";
@@ -1266,7 +1346,7 @@
       renderStatusLabels();
     }
     if (field === "draft-version-name") {
-      project.draftVersionName = input.value.trim() || "0.15.2 直覺工作台修復";
+      project.draftVersionName = input.value.trim() || "0.16.0 單螢幕繪圖工作台";
       project.saveStatus = "unsaved";
       renderStatusLabels();
     }
@@ -1303,6 +1383,7 @@
     const field = input.dataset.field;
     if (field === "current-wall-status") {
       uiState.currentWallStatus = normalizeWallStatus(input.value);
+      uiState.currentWallStructural = false;
       uiState.message = `下一段牆將標記為：${getWallStatusLabel(uiState.currentWallStatus)}。`;
       uiState.error = "";
       render();
@@ -1579,7 +1660,7 @@
         opacity: DEFAULT_UNDERLAY_OPACITY,
         calibratedBy: null
       };
-      resetScaleAndInteraction("請用圖面上的已知尺寸校正比例。");
+      resetScaleAndInteraction("圖檔已匯入；請依圖面已知尺寸確認 mm 基準。");
       render();
     });
     reader.addEventListener("error", () => {
@@ -1688,9 +1769,12 @@
   }
 
   function startDrawWall() {
+    uiState.currentTool = "wall";
+    uiState.openToolPalette = "draw";
+    uiState.toolPaletteCollapsed = false;
     if (!canDrawWalls()) {
-      uiState.error = "請先匯入底圖並完成比例校正，再開始描牆。";
-      uiState.message = "";
+      uiState.error = "請先匯入圖檔，系統將建立比例基準。";
+      uiState.message = "目前尚未有 mm 基準；完成圖面基準後即可點兩點建立牆段。";
       uiState.mode = "select";
       clearWallDraft();
       render();
@@ -2041,7 +2125,8 @@
     event.preventDefault();
 
     if (!canDrawWalls()) {
-      uiState.error = "請先匯入底圖並完成比例校正，再開始描牆。";
+      uiState.error = "請先匯入圖檔，系統將建立比例基準。";
+      uiState.message = "目前尚未有 mm 基準；完成圖面基準後即可點兩點建立牆段。";
       render();
       return;
     }
@@ -2132,7 +2217,7 @@
       to: roundPoint(to),
       thickness: normalizeThickness(uiState.currentWallThickness),
       status: normalizeWallStatus(uiState.currentWallStatus),
-      structural: false,
+      structural: Boolean(uiState.currentWallStructural),
       layer: "walls",
       createdAt: now,
       updatedAt: now
@@ -2181,7 +2266,7 @@
     };
     uiState.mode = "select";
     uiState.error = "";
-    uiState.message = `比例已校正：${formatNumber(knownLength)} mm = ${formatNumber(pixelDistance)} px`;
+    uiState.message = `比例基準已建立：已知長度 ${formatNumber(knownLength)} mm。`;
     syncBridge();
     render();
   }
@@ -2980,6 +3065,7 @@
     renderWallGraph();
     renderCalibration();
     renderCanvasHelper();
+    renderCanvasToolbar();
     renderInspector();
     bindInspectorTabs();
     renderCompactTopbar();
@@ -3777,12 +3863,11 @@
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
           <b>請先匯入丈量圖</b>
-          <p>建立比例後即可畫牆、標空間與整理需求。</p>
+          <p>系統會依圖面建立 mm 基準，完成後即可畫牆、標空間與整理需求。</p>
           <div class="canvas-helper-actions">
             <button class="toolbar-btn primary" type="button" data-action="choose-file">
               <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入圖檔
             </button>
-            <button class="toolbar-btn is-disabled" type="button" disabled>建立空白底圖 <span class="pill">尚未開放</span></button>
           </div>
         </div>
       `;
@@ -3892,11 +3977,11 @@
 
     if (!project.importSource) {
       inspectorBody.innerHTML = `
-        <section class="empty-state">
-          <h2>Plancraft+ 匯入狀態：尚未匯入</h2>
-          <p>比例狀態：尚未校正。下一步請先匯入 JPG 或 PNG 丈量圖。</p>
-        </section>
         ${uiIaPanel}
+        <section class="empty-state">
+          <h2>尚未匯入圖檔</h2>
+          <p>請先匯入 JPG 或 PNG 丈量圖；系統會依圖面建立 mm 基準。</p>
+        </section>
         ${renderMessageBlocks()}
         ${renderDeveloperDiagnosticsPanel(developerBasePanels)}
       `;
@@ -4295,7 +4380,9 @@
 
   function renderUiIaStatusPanel() {
     const currentLayer = getCurrentProductLayer();
-    const activeTab = uiState.activeStatusTab || "properties";
+    const allowedTabs = ["properties", "layers", "reminders", "materials", "overview"];
+    const activeTab = allowedTabs.includes(uiState.activeStatusTab) ? uiState.activeStatusTab : "properties";
+    uiState.activeStatusTab = activeTab;
     const tabs = [
       ["properties", "屬性"],
       ["layers", "圖層 / 頁面"],
@@ -4819,7 +4906,7 @@
 
   function applyMaterialToSelectedToolCatalogItem(item = getSelectedToolCatalogItem()) {
     if (!item) {
-      uiState.message = "請先選取一個草稿項目，再套用材料分類。";
+      uiState.message = "請先選取物件，再套用材質。";
       uiState.error = "";
       return;
     }
@@ -7413,8 +7500,7 @@
     if (!project.scale.calibrated || project.scale.pxPerMm === null) {
       return "尚未校正";
     }
-    const pixelsPerThousandMm = project.scale.pxPerMm * 1000;
-    return `1 mm = ${formatNumber(project.scale.pxPerMm)} px；1000 mm = ${formatNumber(pixelsPerThousandMm)} px`;
+    return `mm 基準已建立；圖紙比例 ${uiState.sheetScale}`;
   }
 
   function readCoordinateInput(input, fallback) {
@@ -7700,10 +7786,10 @@
           <button class="toolbar-btn" type="button" data-action="print-total-preview" title="列印目前整理結果">
             <span class="material-symbols-outlined" aria-hidden="true">print</span>列印
           </button>
-          <button class="toolbar-btn" type="button" data-action="export-draft" title="匯出草稿 JSON">
+          <button class="toolbar-btn" type="button" data-action="export-draft" title="匯出草稿資料；進階格式放在開發者診斷">
             <span class="material-symbols-outlined" aria-hidden="true">download</span>匯出
           </button>
-          <button class="toolbar-btn icon-only" type="button" data-action="set-status-tab" data-status-tab="more" title="說明與快捷鍵">
+          <button class="toolbar-btn icon-only" type="button" data-action="set-status-tab" data-status-tab="overview" title="說明與快捷鍵">
             <span class="material-symbols-outlined" aria-hidden="true">help</span>
           </button>
           <button class="toolbar-btn icon-only canvas-focus-mini ${uiState.focusMode ? "is-mode-active" : ""}" type="button" data-action="toggle-focus-mode" title="畫布最大化">
@@ -7721,7 +7807,6 @@
 
   function getToolPaletteDefinitions() {
     return [
-      { id: "file", label: "檔案 / 匯入", shortLabel: "檔案", icon: "folder_open", tone: "view" },
       { id: "edit", label: "編輯", shortLabel: "編輯", icon: "edit", tone: "neutral" },
       { id: "draw", label: "繪製", shortLabel: "繪製", icon: "architecture", tone: "draw" },
       { id: "items", label: "項目", shortLabel: "項目", icon: "widgets", tone: "object" },
@@ -7743,19 +7828,75 @@
     }
     toolPanel.classList.add("compact-tool-panel");
     toolPanel.innerHTML = `
-      <div class="left-icon-rail" aria-label="分類工具列">
-        ${getToolPaletteDefinitions().map(renderToolPaletteRailButton).join("")}
+      <div class="left-icon-rail one-screen-tool-rail" aria-label="常用繪圖工具">
+        ${renderWorkbenchToolSection("常用", getWorkbenchTools().common)}
+        ${renderWorkbenchToolSection("繪圖", getWorkbenchTools().drawing)}
+        <button class="palette-reset-btn" type="button" data-action="reset-tool-palette-position" title="工具板回到預設位置">
+          <span class="material-symbols-outlined" aria-hidden="true">center_focus_strong</span>
+          板塊歸位
+        </button>
       </div>
       ${renderToolPalette()}
     `;
   }
 
-  function renderToolPaletteRailButton(palette) {
-    const isActive = uiState.openToolPalette === palette.id;
+  function getWorkbenchTools() {
+    return {
+      common: [
+        { label: "選取", icon: "near_me", action: "set-select-mode", tool: "select", palette: "edit", tone: "view", title: "選取牆、門窗、項目或標註" },
+        { label: "手掌", icon: "pan_tool", action: "set-ui-tool", tool: "pan", toolLabel: "手掌 / 移動畫布", palette: "edit", tone: "view", title: "Space 也可切換，拖動畫布仍在草稿階段" },
+        { label: "縮放", icon: "zoom_in", action: "set-ui-tool", tool: "zoom", toolLabel: "縮放", palette: "edit", tone: "view", title: "縮放操作仍在草稿階段" },
+        { label: "復原", icon: "undo", action: "undo-placeholder", tool: "undo_redo", palette: "edit", tone: "disabled", disabled: true, title: "尚未完整開放" },
+        { label: "重做", icon: "redo", action: "redo-placeholder", tool: "undo_redo", palette: "edit", tone: "disabled", disabled: true, title: "尚未完整開放" },
+        { label: "刪除", icon: "delete", action: "delete-selected", tool: "delete", palette: "edit", tone: "danger", title: "刪除可刪項目；既有或結構項目會要求確認" },
+        { label: "鎖點", icon: "join_inner", action: "toggle-snap", tool: "snap_toggle", palette: "display", tone: "view", title: "F3 切換鎖點" }
+      ],
+      drawing: [
+        { label: "牆", icon: "polyline", action: "start-draw-wall", tool: "wall", palette: "draw", tone: "draw", title: "進入畫牆模式，點兩點建立牆段" },
+        { label: "門窗", icon: "door_open", action: "add-opening", tool: "opening", palette: "draw", tone: "draw", openingKind: "door", title: "需先選取牆段" },
+        { label: "項目", icon: "widgets", action: "set-ui-tool", tool: "item_place", toolLabel: "項目放置", palette: "items", tone: "object", title: "選項目後點畫布放置" },
+        { label: "尺寸", icon: "straighten", action: "set-ui-tool", tool: "dimension", toolLabel: "尺寸標註", palette: "annotate", tone: "output", title: "選牆段或點兩點建立尺寸" },
+        { label: "文字", icon: "title", action: "set-ui-tool", tool: "text", toolLabel: "文字", palette: "annotate", tone: "output", title: "點畫布建立文字備註" },
+        { label: "材質", icon: "format_color_fill", action: "set-ui-tool", tool: "material_bucket", toolLabel: "材質", palette: "material", tone: "material", title: "先選物件再套用材質" }
+      ]
+    };
+  }
+
+  function renderWorkbenchToolSection(title, tools) {
     return `
-      <button class="rail-tool rail-tool-${escapeAttribute(palette.tone)} ${isActive ? "is-tool-active" : ""}" type="button" data-action="open-tool-palette" data-palette-id="${escapeAttribute(palette.id)}" title="${escapeAttribute(palette.label)}" aria-label="${escapeAttribute(palette.label)}" aria-pressed="${isActive ? "true" : "false"}">
-        <span class="material-symbols-outlined" aria-hidden="true">${escapeHTML(palette.icon)}</span>
-        <small>${escapeHTML(palette.shortLabel)}</small>
+      <div class="workbench-tool-section">
+        <div class="tool-section-title">${escapeHTML(title)}</div>
+        <div class="quick-tool-grid">
+          ${tools.map(renderWorkbenchToolButton).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderWorkbenchToolButton(tool) {
+    const isActive = uiState.currentTool === tool.tool || (tool.tool === "wall" && uiState.mode === "draw-wall");
+    const classes = [
+      "quick-tool-button",
+      `quick-tool-${tool.tone}`,
+      isActive ? "is-tool-active" : "",
+      tool.disabled ? "is-disabled" : ""
+    ].filter(Boolean).join(" ");
+    const attrs = tool.disabled
+      ? `disabled aria-disabled="true" title="${escapeAttribute(tool.title || "尚未開放")}"`
+      : [
+          `data-action="${escapeAttribute(tool.action)}"`,
+          `data-ui-tool="${escapeAttribute(tool.tool)}"`,
+          tool.tool ? `data-tool="${escapeAttribute(tool.tool)}"` : "",
+          tool.toolLabel ? `data-tool-label="${escapeAttribute(tool.toolLabel)}"` : "",
+          tool.palette ? `data-palette-id="${escapeAttribute(tool.palette)}"` : "",
+          tool.openingKind ? `data-opening-kind="${escapeAttribute(tool.openingKind)}"` : "",
+          `title="${escapeAttribute(tool.title || tool.label)}"`,
+          `aria-pressed="${isActive ? "true" : "false"}"`
+        ].filter(Boolean).join(" ");
+    return `
+      <button class="${classes}" type="button" ${attrs}>
+        <span class="material-symbols-outlined" aria-hidden="true">${escapeHTML(tool.icon)}</span>
+        <small>${escapeHTML(tool.label)}</small>
       </button>
     `;
   }
@@ -7766,7 +7907,7 @@
       return "";
     }
     const palette = getToolPaletteDefinitions().find((item) => item.id === paletteId) || getToolPaletteDefinitions()[2];
-    const position = uiState.toolPalettePosition || { x: 66, y: 86 };
+    const position = uiState.toolPalettePosition || { x: 252, y: 118 };
     return `
       <section id="toolPalette" class="tool-palette tool-palette-${escapeAttribute(palette.tone)} ${uiState.toolPaletteCollapsed ? "is-collapsed" : ""}" style="left:${Number(position.x) || 66}px; top:${Number(position.y) || 86}px;" aria-label="${escapeAttribute(palette.label)}">
         <header class="tool-palette-head" data-tool-palette-drag="true">
@@ -7775,6 +7916,9 @@
           <div class="palette-head-actions">
             <button class="palette-icon-btn" type="button" data-action="toggle-tool-palette-collapse" title="${uiState.toolPaletteCollapsed ? "展開工具板" : "收合工具板"}">
               <span class="material-symbols-outlined" aria-hidden="true">${uiState.toolPaletteCollapsed ? "unfold_more" : "unfold_less"}</span>
+            </button>
+            <button class="palette-icon-btn" type="button" data-action="reset-tool-palette-position" title="工具板回到預設位置">
+              <span class="material-symbols-outlined" aria-hidden="true">center_focus_strong</span>
             </button>
             <button class="palette-icon-btn" type="button" data-action="close-tool-palette" title="關閉工具板">
               <span class="material-symbols-outlined" aria-hidden="true">close</span>
@@ -7792,10 +7936,7 @@
     if (paletteId === "file") {
       return `
         ${renderPaletteButton("匯入圖檔", "upload_file", { action: "choose-file", primary: true, title: "JPG / PNG 會顯示底圖；PDF 目前只記錄檔名" })}
-        ${renderPaletteButton("校正比例", "straighten", { action: "start-calibration", title: "點兩點後輸入實際長度" })}
-        ${renderPaletteButton("草稿 JSON", "data_object", { action: "export-draft" })}
-        ${renderPaletteButton(".pc 測試版", "code", { action: "export-pc-spike", title: ".pc 只供 renderer preview spike，不作預算輸入" })}
-        ${renderDisabledPaletteButton("空白底圖", "note_add", "尚未開放")}
+        <div class="inline-message compact-note">進階匯出與手動比例確認已移到開發者診斷，避免干擾屋主主流程。</div>
       `;
     }
     if (paletteId === "edit") {
@@ -7812,9 +7953,16 @@
       return `
         ${renderPaletteButton("牆體", "polyline", { action: "start-draw-wall", uiTool: "wall", mode: "draw-wall", primary: uiState.currentTool === "wall" })}
         <div class="palette-segment">
-          ${["existing:既有牆", "new:新設牆", "demolished:拆除牆"].map((entry) => {
-            const [value, label] = entry.split(":");
-            return `<button class="palette-chip ${uiState.currentWallStatus === value ? "is-selected" : ""}" type="button" data-action="set-wall-status" data-field-proxy="current-wall-status" data-value="${escapeAttribute(value)}">${escapeHTML(label)}</button>`;
+          ${[
+            { value: "existing", label: "既有牆", structural: false },
+            { value: "new", label: "新設牆", structural: false },
+            { value: "demolished", label: "拆除牆", structural: false },
+            { value: "existing", label: "承重牆", structural: true },
+            { value: "existing", label: "柱", structural: true },
+            { value: "existing", label: "梁", structural: true }
+          ].map((item) => {
+            const isSelected = uiState.currentWallStatus === item.value && Boolean(uiState.currentWallStructural) === item.structural;
+            return `<button class="palette-chip ${isSelected ? "is-selected" : ""}" type="button" data-action="set-wall-status" data-field-proxy="current-wall-structural" data-value="${escapeAttribute(item.value)}" data-structural="${item.structural ? "true" : "false"}">${escapeHTML(item.label)}</button>`;
           }).join("")}
         </div>
         <label class="palette-field" for="palette-wall-thickness">牆厚 mm
@@ -7943,7 +8091,7 @@
     const nextX = toolPaletteDrag.startLeft + event.clientX - toolPaletteDrag.startX;
     const nextY = toolPaletteDrag.startTop + event.clientY - toolPaletteDrag.startY;
     uiState.toolPalettePosition = {
-      x: clamp(nextX, 56, Math.max(56, window.innerWidth - 280)),
+      x: clamp(nextX, 236, Math.max(236, window.innerWidth - 280)),
       y: clamp(nextY, 58, Math.max(58, window.innerHeight - 110))
     };
     syncToolPalettePosition();
@@ -7964,12 +8112,15 @@
 
   function renderUiIaStatusPanel() {
     const currentLayer = getCurrentProductLayer();
-    const activeTab = uiState.activeStatusTab || "properties";
+    const allowedTabs = ["properties", "layers", "reminders", "materials", "overview"];
+    const activeTab = allowedTabs.includes(uiState.activeStatusTab) ? uiState.activeStatusTab : "properties";
+    uiState.activeStatusTab = activeTab;
     const tabs = [
       ["properties", "屬性"],
       ["layers", "圖層"],
       ["reminders", "提醒"],
-      ["more", "更多"]
+      ["materials", "材料"],
+      ["overview", "總覽"]
     ];
     return `
       <section class="status-tabs-shell intuitive-inspector" aria-label="平面拼圖狀態區">
@@ -8006,7 +8157,8 @@
       properties: "屬性",
       layers: "圖層",
       reminders: "提醒",
-      more: "更多"
+      materials: "材料",
+      overview: "總覽"
     };
     return labels[tabId] || labels.properties;
   }
@@ -8025,22 +8177,55 @@
         ${renderSystemRemindersCard()}
       `;
     }
-    if (tabId === "more") {
+    if (tabId === "materials") {
       return `
-        ${renderStatusAccordion("偏好材料", renderProjectPreferencesCard(), false)}
-        ${renderStatusAccordion("完成度", renderCompletionStatusCard(), false)}
-        ${renderStatusAccordion("快捷鍵", renderShortcutHelpCard(), false)}
-        ${renderStatusAccordion("總預覽", renderTotalPreviewCard(), uiState.preflightOpen || project.totalPreviewOpen)}
+        ${renderMaterialsStatusTab()}
+      `;
+    }
+    if (tabId === "overview") {
+      return `
+        ${renderOverviewStatusTab()}
         <div class="status-card compact-more-card">
           <button class="toolbar-btn icon-text" type="button" data-action="toggle-focus-mode">
             <span class="material-symbols-outlined" aria-hidden="true">${uiState.focusMode ? "fullscreen_exit" : "fullscreen"}</span>
             ${uiState.focusMode ? "恢復工作台" : "畫布最大化"}
           </button>
-          <div class="inline-message compact-note">專注模式會收合工具板與右側 inspector，保留左側 icon rail。</div>
+          <div class="inline-message compact-note">畫布最大化會收合工具板與右側 inspector，保留左側常用工具。</div>
         </div>
       `;
     }
     return renderConciseSelectedObjectCard(currentLayer);
+  }
+
+  function renderMaterialsStatusTab() {
+    const selectedTags = project.selectedMaterials || [];
+    return `
+      <div class="status-card ui-ia-card material-status-card">
+        <b>材料偏好</b>
+        ${renderProjectPreferencesCard()}
+      </div>
+      <div class="status-card ui-ia-card material-tag-card">
+        <b>已選材料標籤</b>
+        <div class="tag-row">
+          ${selectedTags.map((tag) => `<span class="style-tag">${escapeHTML(tag)}</span>`).join("")}
+        </div>
+        <div class="inline-message compact-note">材料只作需求整理與廠商溝通，不產生正式單價。</div>
+      </div>
+    `;
+  }
+
+  function renderOverviewStatusTab() {
+    return `
+      <div class="status-card ui-ia-card overview-status-card">
+        <b>完成度</b>
+        ${renderCompletionStatusCard()}
+      </div>
+      <div class="status-card ui-ia-card overview-preflight-card">
+        <b>總覽 / 送出前檢查</b>
+        ${renderTotalPreviewCard()}
+      </div>
+      ${renderStatusAccordion("快捷鍵", renderShortcutHelpCard(), false)}
+    `;
   }
 
   function renderStatusAccordion(title, content, open = false) {
@@ -8075,6 +8260,7 @@
           <div class="status-row"><span>狀態</span><span>${escapeHTML(selectedObject.status)}</span></div>
           <div class="status-row"><span>尺寸</span><span>${escapeHTML(selectedObject.size || "-")}</span></div>
           <div class="status-row"><span>納入預算</span><span>${escapeHTML(selectedObject.budgetInclusion)}</span></div>
+          <div class="status-row"><span>是否需確認</span><span>${selectedObject.reviewerRequired ? "需要" : "不需"}</span></div>
         </div>
       </div>
     `;
@@ -8167,7 +8353,7 @@
     const nextStep = !project.importSource
       ? "先匯入丈量圖。"
       : !project.scale.calibrated
-        ? "接著校正比例。"
+        ? "等待系統基準，請依圖面已知尺寸確認。"
         : project.walls.length
           ? "可補空間、門窗與需求。"
           : "可開始畫牆。";
@@ -8288,17 +8474,54 @@
     `;
   }
 
+  function renderCanvasToolbar() {
+    const toolbar = document.querySelector(".canvas-toolbar");
+    if (!toolbar) {
+      return;
+    }
+    const basisLabel = project.scale.calibrated ? "mm 基準已建立" : "等待 mm 基準";
+    toolbar.innerHTML = `
+      <div class="toolbar-left" aria-label="畫布操作">
+        <button class="toolbar-btn primary" type="button" data-action="choose-file">
+          <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
+          匯入圖檔
+        </button>
+        <button class="toolbar-btn" type="button" data-action="set-select-mode" data-mode-button="select" data-palette-id="edit" data-ui-tool="select">
+          <span class="material-symbols-outlined" aria-hidden="true">near_me</span>
+          選取
+        </button>
+        <button class="toolbar-btn primary ${uiState.currentTool === "wall" ? "is-mode-active" : ""}" type="button" data-action="start-draw-wall" data-mode-button="draw-wall" data-palette-id="draw" data-ui-tool="wall">
+          <span class="material-symbols-outlined" aria-hidden="true">polyline</span>
+          畫牆
+        </button>
+        <button class="toolbar-btn" type="button" data-action="start-place-zone" data-mode-button="place-zone" data-palette-id="draw" data-ui-tool="zone_label">
+          <span class="material-symbols-outlined" aria-hidden="true">label</span>
+          空間
+        </button>
+        <button class="toolbar-btn" type="button" data-action="set-ui-tool" data-tool="dimension" data-tool-label="尺寸標註" data-palette-id="annotate" data-ui-tool="dimension">
+          <span class="material-symbols-outlined" aria-hidden="true">straighten</span>
+          尺寸
+        </button>
+      </div>
+      <div class="toolbar-right" aria-label="畫布狀態">
+        <span class="tool-chip">${escapeHTML(basisLabel)}</span>
+        <span class="tool-chip">${escapeHTML(getCurrentProductLayer().label)}</span>
+        <span class="tool-chip">牆段 ${project.walls.length}</span>
+        <span class="tool-chip">提醒 ${(project.systemReminders || []).filter((item) => item.status === "open").length}</span>
+      </div>
+    `;
+  }
+
   function renderCanvasHelper() {
     if (!project.importSource) {
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
           <b>請先匯入丈量圖</b>
-          <p>建立比例後即可畫牆、標空間與整理需求。</p>
+          <p>系統會依圖面建立 mm 基準，完成後即可畫牆、標空間與整理需求。</p>
           <div class="canvas-helper-actions">
             <button class="toolbar-btn primary" type="button" data-action="choose-file">
               <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入圖檔
             </button>
-            <button class="toolbar-btn is-disabled" type="button" disabled>建立空白底圖 <span class="pill">尚未開放</span></button>
           </div>
         </div>
       `;
@@ -8321,11 +8544,8 @@
     if (!project.scale.calibrated) {
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card compact">
-          <b>請校正比例</b>
-          <p>點選圖上已知長度，再輸入實際 mm。</p>
-          <div class="canvas-helper-actions">
-            <button class="toolbar-btn primary" type="button" data-action="start-calibration">校正比例</button>
-          </div>
+          <b>等待 mm 基準</b>
+          <p>請依圖面已知尺寸確認；比例確認前會先暫停畫牆。</p>
         </div>
       `;
       return;
