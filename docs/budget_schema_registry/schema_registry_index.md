@@ -1,6 +1,6 @@
 # Budget Schema Registry Index
 
-Status: `ACTIVE_INITIALIZATION`
+Status: `SAFE_WORK_SUPPLEMENT_SUBMITTED`
 
 Functional acceptance: `NOT_APPLICABLE_DOCS_ONLY`
 
@@ -57,6 +57,18 @@ Every cross-agent contract should carry these fields when practical:
 - `examples/budget_run_plan.schema.example.json`
 - `examples/budget_output_snapshot.schema.example.json`
 - `examples/functional_acceptance_report.schema.example.json`
+
+## Supplemental Closeout Artifacts
+
+The following docs-only artifacts were added after `AGENT_IDLE_VIOLATION` to make closeout evidence explicit:
+
+- `evidence_packet.md`
+- `forbidden_scope_check.md`
+- `handoff_contract.md`
+- `closeout_report.md`
+- `sync_ready_manifest.md`
+
+These artifacts are evidence and handoff documents only. They do not create runtime authority, formal estimate authority, formal price, formal quote, renderer input, DB migration, AI API flow, payment flow, or n8n flow.
 
 ## Integration Rule
 
