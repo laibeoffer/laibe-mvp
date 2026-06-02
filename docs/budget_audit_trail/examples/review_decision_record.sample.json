@@ -1,0 +1,14 @@
+{
+  "review_decision_id": "review_20260601_0001",
+  "reviewer_role": "LAIBE_PATROL_INTEGRATION_OFFICER",
+  "review_subject_id": "handoff_proposal_0001",
+  "review_subject_type": "handoff_proposal",
+  "decision": "pending",
+  "decision_reason": "not yet reviewed",
+  "conditions": [],
+  "blocked_reason": null,
+  "created_at": "2026-06-01T00:00:00+08:00",
+  "updated_at": "2026-06-01T00:00:00+08:00",
+  "source_refs": [],
+  "risk_flags": []
+}
