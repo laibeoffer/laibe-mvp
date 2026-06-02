@@ -1,0 +1,22 @@
+{
+  "workstream": "example/workstream",
+  "evidence_level": "NOT_APPLICABLE_DOCS_ONLY",
+  "merge_gate": {
+    "pr_merged": true,
+    "functional_completion_claimed": false
+  },
+  "runtime_evidence": {
+    "browser_smoke": "NOT_RUN",
+    "cli_validator": "NOT_RUN",
+    "runtime_verified": false
+  },
+  "forbidden_scope": {
+    "budget_engine_changed": false,
+    "renderer_touched": false,
+    "pricing_rule_changed": false,
+    "budget_estimate_line_generated": false,
+    "payment_ai_api_db_n8n_touched": false,
+    "formal_price_generated": false,
+    "formal_quote_generated": false
+  }
+}
