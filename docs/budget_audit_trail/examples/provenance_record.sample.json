@@ -1,0 +1,22 @@
+{
+  "provenance_id": "prov_20260601_0001",
+  "artifact_id": "raw_candidate_0001",
+  "artifact_type": "raw_candidate",
+  "workstream": "budget/audit-trail",
+  "source_agent": "Budget Audit Trail Agent",
+  "upstream_artifacts": [],
+  "source_refs": [],
+  "transformation": "docs_only_contract_initialization",
+  "status": "candidate",
+  "decision_state": "not_reviewed",
+  "created_at": "2026-06-01T00:00:00+08:00",
+  "updated_at": "2026-06-01T00:00:00+08:00",
+  "risk_flags": [],
+  "forbidden_scope_check": {
+    "implementation_code_changed": false,
+    "formal_price_generated": false,
+    "pricing_rule_changed": false,
+    "budget_estimate_line_generated": false,
+    "payment_ai_api_db_n8n_touched": false
+  }
+}
