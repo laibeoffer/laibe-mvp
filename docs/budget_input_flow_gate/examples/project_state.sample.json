@@ -1,0 +1,13 @@
+{
+  "project_id": "sample-project",
+  "requirement_completion_status": "complete",
+  "plan_quantity_context_status": "verified",
+  "file_intake_status": "linked",
+  "budget_preview_allowed": true,
+  "dry_run_only": true,
+  "review_required": true,
+  "formal_price_generated": false,
+  "pricing_rule_written": false,
+  "budget_estimate_line_generated": false,
+  "renderer_invoked": false
+}
