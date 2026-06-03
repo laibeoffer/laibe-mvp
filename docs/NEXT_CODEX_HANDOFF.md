@@ -8,7 +8,7 @@
 - GitHub source of truth: `laibeoffer/laibe-mvp` `origin/main` at `9d836c43e25af6eb05380b46296407476054f141`.
 - Branch: `codex/ai-pcm-department-setup`.
 - Draft PR: `https://github.com/laibeoffer/laibe-mvp/pull/77`.
-- PR head SHA: `24271a1dcde6614d30d1b37508b3b58f8ed184c9`.
+- PR creation SHA: `24271a1dcde6614d30d1b37508b3b58f8ed184c9`; read PR #77 for the latest head SHA after follow-up commits.
 - LOCAL_STATE_STALE: `C:\laibe_project` was on `local-ai-workflow` with a dirty worktree, so this round used a clean worktree from GitHub main. Pre-existing AI PCM local draft state was treated as LOCAL_STATE, not shared truth.
 - Added scope:
   - `docs/ai_pcm/AI_PCM_BLACKBOARD.md`
@@ -32,7 +32,7 @@
 - Automation: Codex app heartbeat `ai-pcm-department-15m-patrol` created, every 15 minutes, to inspect the AI PCM blackboard, enforce no-idle, and route permission / decision packets through the AI PCM Supervisor.
 - Forbidden scope preserved: no production LINE API, no production AI API, no DB / Supabase, no payment / escrow / listing fee, no formal legal decision, no formal tender launch, no runtime code, no formal quote / formal price.
 - Task dispatch record: allowed construction = Markdown only; no routing / CTA / header; no data model; sensitive areas avoided; can be included in later user-triggered review if desired.
-- Next step: AI PCM Supervisor should use `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the only department status surface and continue evidence packet / permission queue / closeout tracking there. Source-of-truth verification for this branch has been reconciled by Deputy Commander; PR #77 / head SHA above is the current shared-truth handoff target.
+- Next step: AI PCM Supervisor should use `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the only department status surface and continue evidence packet / permission queue / closeout tracking there. Source-of-truth verification for this branch has been reconciled by Deputy Commander; PR #77 is the current shared-truth handoff target.
 - Note: A lower AI PCM setup section may contain mojibake from previous local draft text; use this canonical summary and `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the current handoff authority.
 
 ## Latest AI PCM Department Setup: Initial Governance Blackboard

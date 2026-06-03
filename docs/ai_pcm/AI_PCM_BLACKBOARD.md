@@ -106,12 +106,12 @@ No-Idle Rule:
 - GitHub source of truth: `laibeoffer/laibe-mvp` `origin/main`.
 - GitHub main SHA checked for this setup: `9d836c43e25af6eb05380b46296407476054f141`.
 - GitHub draft PR: `https://github.com/laibeoffer/laibe-mvp/pull/77`.
-- PR head SHA: `24271a1dcde6614d30d1b37508b3b58f8ed184c9`.
+- PR creation SHA: `24271a1dcde6614d30d1b37508b3b58f8ed184c9`. Read GitHub PR #77 for the latest head SHA after follow-up commits.
 - Local execution workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local branch: `codex/ai-pcm-department-setup`.
 - `Z:\08-Jacky\laibe_pcm` is LOCAL_STATE / execution workspace only; GitHub main / PR / commit SHA remains authoritative.
 - LOCAL_STATE_STALE: `C:\laibe_project` was on `local-ai-workflow` with a dirty worktree and was not used as this round's source of truth.
-- LOCAL_STATE_STALE: pre-existing local AI PCM draft state was reconciled into this blackboard. Shared truth for this setup is now PR #77 and the PR head SHA above.
+- LOCAL_STATE_STALE: pre-existing local AI PCM draft state was reconciled into this blackboard. Shared truth for this setup is now PR #77 and the latest GitHub PR head SHA.
 
 ## Runtime Launch Notes
 
@@ -185,7 +185,7 @@ No-Idle Rule:
 | 2026-06-03 | AI PCM agents | Produced docs-only packets under `docs/ai_pcm/` | `READY_FOR_SUPERVISOR_REVIEW` |
 | 2026-06-03 | Deputy Commander | Reordered blackboard so department principles and command structure are the first active sections | `DONE` |
 | 2026-06-03T04:27:47Z | AI PCM 總監／後台總控 Agent | Heartbeat patrol verified all five managed agent directories have `AUTOMATION.md`, core docs, examples, and `final_completion_report.md`; JSON examples parse; forbidden-scope scan found prohibition language only, no real integration evidence | `READY_FOR_SUPERVISOR_REVIEW_NO_IDLE_VIOLATION_ACTIVE` |
-| 2026-06-03 | Deputy Commander | Opened docs-only draft PR #77 and recorded PR head SHA `24271a1dcde6614d30d1b37508b3b58f8ed184c9` | `DONE` |
+| 2026-06-03 | Deputy Commander | Opened docs-only draft PR #77; use GitHub PR #77 for the latest head SHA after follow-up commits | `DONE` |
 | 2026-06-03 | 招標前置輔助 Agent | Corrected execution rules: self-introduction is task start, Codex app heartbeat created, evidence packet updated with `LOCAL_STATE_STALE`, and patrol stop requires supervisor closeout acceptance plus automation stop approved | `RULES_CORRECTED_PATROL_ACTIVE` |
 | 2026-06-03T12:33:31+08:00 | 付款節點與金流分撥預留 Agent | Confirmed self-introduction is task start only; initialization tasks were already executed immediately: docs directory, `AUTOMATION.md`, agent file, contracts, schema, checklist, policy, examples, evidence packet, closeout checklist, final report, and AI PCM blackboard updates. Patrol remains active every 15 minutes; 20-minute no-response rule triggers next safe task. | `NO_IDLE_RULE_CORRECTED_CONTINUE_PATROL_PENDING_SUPERVISOR_CLOSEOUT` |
 | 2026-06-03T04:31:30Z | 合約資料與證據管理 Agent | Heartbeat patrol found missing dedicated evidence schema doc and completed safe docs-only `evidence_record_schema.md`; updated evidence packet, closeout checklist, and final report; JSON examples still parse; automation remains active until supervisor closeout and stop approval | `SAFE_WORK_CONTINUED_SCHEMA_FILLED` |
