@@ -1,0 +1,17 @@
+{
+  "record_type": "pcm_case_status_sample",
+  "case_id": "mock-case-001",
+  "status": "ready_for_supervisor_review",
+  "source_of_truth": "GitHub PR / commit SHA",
+  "local_is_shared_truth": false,
+  "verified_contract_required": true,
+  "forbidden_actions": [
+    "formal_legal_decision",
+    "automatic_fund_release",
+    "automatic_contract_change",
+    "production_line_api",
+    "production_ai_api",
+    "payment_or_escrow"
+  ],
+  "next_supervisor_action": "review_packet"
+}

@@ -1,0 +1,11 @@
+{
+  "record_type": "pcm_task_queue_sample",
+  "task_id": "mock-task-001",
+  "owner": "AI PCM 總監／後台總控 Agent",
+  "workstream": "pcm/admin-control-center",
+  "status": "active",
+  "no_idle_until_closeout": true,
+  "auto_progress_after_minutes_without_response": 20,
+  "permission_requests_route_to": "AI PCM 總監／後台總控 Agent",
+  "next_safe_action": "review_managed_agent_packet"
+}

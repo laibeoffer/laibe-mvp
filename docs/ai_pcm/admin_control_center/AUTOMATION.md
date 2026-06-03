@@ -1,6 +1,6 @@
 # AI PCM Admin Control Center Automation
 
-- automation_name: ai-pcm-department-15m-patrol
+- automation_name: pcm-admin-control-center-patrol
 - frequency: every 15 minutes
 - automation_id: ai-pcm-department-15m-patrol
 - managed_by: DEPUTY_COMMANDER
@@ -15,7 +15,7 @@
 - permission_requests_route_to: AI PCM 總監／後台總控 Agent
 - agents_must_not_ask_user_directly: true
 - blackboard: docs/ai_pcm/AI_PCM_BLACKBOARD.md
-- forbidden_runtime: production LINE API, production AI API, DB / Supabase, payment, escrow, listing fee, production runtime, formal legal decision, formal quote, formal price
+- forbidden_runtime: production LINE API, production AI API, DB / Supabase, payment, escrow, listing fee, bank API, production runtime, formal legal decision, formal tender launch, formal quote, formal price, automatic fund release, automatic contract change
 - self_intro_is_not_closeout: true
 - agents_must_start_core_work_after_self_intro: true
 - mark_idle_after_self_intro_without_work: AGENT_IDLE_VIOLATION

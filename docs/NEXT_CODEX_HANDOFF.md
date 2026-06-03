@@ -4,6 +4,7 @@
 
 - Task name: AI PCM Department Setup / Initial Governance Blackboard.
 - Task type: Architect / Governance Task + Documentation Task; docs-only; no production runtime.
+- Latest follow-up: AI PCM Department Commander No-Idle Enforcement / Supervisor Deliverables Completion.
 - Local execution workspace: `Z:\08-Jacky\laibe_pcm`.
 - GitHub source of truth: `laibeoffer/laibe-mvp` `origin/main` at `9d836c43e25af6eb05380b46296407476054f141`.
 - Branch: `codex/ai-pcm-department-setup`.
@@ -13,6 +14,12 @@
 - Added scope:
   - `docs/ai_pcm/AI_PCM_BLACKBOARD.md`
   - `docs/ai_pcm/admin_control_center/AUTOMATION.md`
+  - `docs/ai_pcm/admin_control_center/PCM_ADMIN_CONTROL_CENTER_AGENT.md`
+  - `docs/ai_pcm/admin_control_center/pcm_case_status_model.md`
+  - `docs/ai_pcm/admin_control_center/pcm_task_queue.md`
+  - `docs/ai_pcm/admin_control_center/pcm_review_queue.md`
+  - `docs/ai_pcm/admin_control_center/examples/`
+  - `docs/ai_pcm/admin_control_center/final_completion_report.md`
   - `docs/ai_pcm/contract_evidence_admin/`
   - `docs/ai_pcm/issue_routing_contract_decision/`
   - `docs/ai_pcm/party_entry_line_terminal/`
@@ -30,6 +37,8 @@
   - Payment Ledger Placeholder Agent: `pcm/payment-ledger-placeholder`
 - Runtime launch note: 4 sub-agents spawned successfully and submitted read-only reports, then were closed to free capacity. 2 runtime launches were blocked by the current sub-agent thread limit and are marked `ASSIGNED_NOT_SPAWNED` in the AI PCM blackboard. Docs-only assignment exists for all 6 agents.
 - Automation: Codex app heartbeat `ai-pcm-department-15m-patrol` created, every 15 minutes, to inspect the AI PCM blackboard, enforce no-idle, and route permission / decision packets through the AI PCM Supervisor.
+- Automation follow-up: existing heartbeat was updated in Codex app as `PCM Admin Control Center Patrol`, with supervisor automation name `pcm-admin-control-center-patrol`, every 15 minutes.
+- Principle follow-up: AI PCM principles now include `不讓 LINE 訊息覆蓋合約` and `不讓 AI 推測凌駕合約與紀錄`.
 - Forbidden scope preserved: no production LINE API, no production AI API, no DB / Supabase, no payment / escrow / listing fee, no formal legal decision, no formal tender launch, no runtime code, no formal quote / formal price.
 - Task dispatch record: allowed construction = Markdown only; no routing / CTA / header; no data model; sensitive areas avoided; can be included in later user-triggered review if desired.
 - Next step: AI PCM Supervisor should use `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the only department status surface and continue evidence packet / permission queue / closeout tracking there. Source-of-truth verification for this branch has been reconciled by Deputy Commander; PR #77 is the current shared-truth handoff target.

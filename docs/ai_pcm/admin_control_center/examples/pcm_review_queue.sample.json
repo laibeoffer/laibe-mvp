@@ -1,0 +1,15 @@
+{
+  "record_type": "pcm_review_queue_sample",
+  "workstream": "pcm/party-entry-line-terminal",
+  "evidence": "docs/ai_pcm/party_entry_line_terminal/evidence_packet.md",
+  "review_status": "pending_supervisor_review",
+  "checks": {
+    "self_introduction": true,
+    "automation": true,
+    "core_docs": true,
+    "final_completion_report": true,
+    "forbidden_scope_touched": false
+  },
+  "closeout_status": "not_accepted_yet",
+  "automation_stop_approved": false
+}
