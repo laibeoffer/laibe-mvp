@@ -21,3 +21,4 @@ Patrol continues every 15 minutes until both are recorded by AI PCM 總監／後
 | 2026-06-03T05:20:19Z | Missing permission packet template found | Created `line_terminal_permission_packet_template.md` | JSON examples parse; no forbidden yes flags | Continue patrol and route permissions to supervisor |
 | 2026-06-03T05:35:19Z | Missing patrol log found | Created `patrol_log.md` | JSON examples parse; no forbidden yes flags | Continue patrol until closeout acceptance and automation stop approval |
 | 2026-06-03T05:50:20Z | Missing supervisor handoff found | Created `supervisor_handoff.md` | JSON examples parse; no forbidden yes flags | Continue patrol and supervisor review |
+| 2026-06-03T06:05:50Z | Missing risk register found | Created `line_terminal_risk_register.md` | JSON examples parse; no forbidden yes flags | Continue patrol and supervisor review |

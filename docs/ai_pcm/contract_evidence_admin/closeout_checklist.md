@@ -8,13 +8,13 @@ agent: 合約資料與證據管理 Agent
 
 managed_by: AI PCM 總監／後台總控 Agent
 
-current_status: `SUBMITTED_TO_AI_PCM_SUPERVISOR_FOR_CLOSEOUT_ACCEPTANCE`
+current_status: `CLOSEOUT_ACCEPTED_AUTOMATION_STOP_APPROVED`
 
-automation_status: `ACTIVE`
+automation_status: `STOPPED_AFTER_SUPERVISOR_APPROVAL`
 
-automation_stop_allowed: false
+automation_stop_allowed: true
 
-automation_stop_condition: AI PCM 總監／後台總控 Agent must explicitly declare `automation stop approved`.
+automation_stop_condition: AI PCM 總監／後台總控 Agent explicitly recorded `automationStopApproved: true` in `docs/ai_pcm/AI_PCM_BLACKBOARD.md`.
 
 ## Required Completion Items
 
@@ -31,6 +31,7 @@ automation_stop_condition: AI PCM 總監／後台總控 Agent must explicitly de
 | Patrol log created | `done` | `patrol_log.md` |
 | Permission / blocker packet created | `done` | `permission_blocker_packet.md` |
 | Source-of-truth policy created | `done` | `source_of_truth_policy.md` |
+| Evidence status transition log created | `done` | `evidence_status_transition_log.md` |
 | Evidence priority order created | `done` | `evidence_priority_order.md` |
 | Contract attachment registry created | `done` | `contract_attachment_registry.md` |
 | Verified evidence matrix created | `done` | `verified_evidence_matrix.md` |
@@ -39,8 +40,8 @@ automation_stop_condition: AI PCM 總監／後台總控 Agent must explicitly de
 | Examples created | `done` | `examples/*.sample.json` |
 | Evidence packet submitted | `done` | `evidence_packet.md` |
 | Final completion report submitted | `done` | `final_completion_report.md` |
-| AI PCM Supervisor closeout acceptance | `not_yet_recorded` | Supervisor action required |
-| Automation stop approval | `not_yet_recorded` | Supervisor action required |
+| AI PCM Supervisor closeout acceptance | `done` | AI PCM blackboard supervisor closeout state records `pcm/contract-evidence-admin` as `ACCEPT_WITH_NOTES` |
+| Automation stop approval | `done` | AI PCM blackboard records `automationStopApproved: true`; Codex app heartbeat deleted |
 
 ## Closeout Acceptance Criteria
 
@@ -50,14 +51,11 @@ automation_stop_condition: AI PCM 總監／後台總控 Agent must explicitly de
 - LINE messages are not upgraded to standalone contracts.
 - No production LINE API, AI API, DB, Supabase, payment, escrow, listing fee, production runtime, formal quote, formal price, legal enforcement, or contract modification was introduced.
 - Source-of-truth mismatch is marked `LOCAL_STATE_STALE`.
-- Automation remains active until supervisor stop approval.
+- Automation remains stopped after supervisor stop approval.
 
 ## Patrol After Submission
 
-If no external response arrives within 20 minutes:
+Post-stop record:
 
-1. Re-check all required docs.
-2. Re-check examples remain sample-only.
-3. Re-check no forbidden scope drift exists.
-4. Re-check no `verified` project evidence was added without source-of-truth confirmation.
-5. Append only AI PCM blackboard-safe progress if materially useful.
+- `pcm-contract-evidence-admin-patrol` heartbeat deleted after supervisor stop approval.
+- No further agent-specific patrol is required unless AI PCM Supervisor reopens the workstream with a new scoped task.

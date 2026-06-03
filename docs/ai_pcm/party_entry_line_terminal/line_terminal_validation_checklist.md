@@ -19,6 +19,7 @@ Required files:
 - `line_terminal_forbidden_scope.md`
 - `line_terminal_validation_checklist.md`
 - `line_terminal_permission_packet_template.md`
+- `line_terminal_risk_register.md`
 - `patrol_log.md`
 - `supervisor_handoff.md`
 - `closeout_checklist.md`
@@ -74,6 +75,7 @@ Search for and reject any evidence of:
 - `Z:\08-Jacky\laibe_pcm` remains local execution state only.
 - Follow-up local docs changes must be routed through AI PCM 總監／後台總控 Agent for PR / commit handling.
 - Permission or boundary issues must use `line_terminal_permission_packet_template.md` and route to AI PCM 總監／後台總控 Agent.
+- Terminal risks must map to `line_terminal_risk_register.md` and preserve `formal_record_effect: "none"`.
 
 ## Closeout Checks
 

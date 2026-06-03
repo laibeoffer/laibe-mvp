@@ -37,27 +37,23 @@ AI PCM 總監／後台總控 Agent
 ## Acceptance Needed
 
 Closeout acceptance:
-Required from AI PCM 總監／後台總控 Agent.
+CLOSEOUT_ACCEPTED_WITH_NOTES by AI PCM 總監／後台總控 Agent.
 
 Automation stop:
-Not allowed until AI PCM 總監／後台總控 Agent records automation stop approved.
+APPROVED and completed. Codex app heartbeat `pcm-issue-routing-contract-decision-patrol` was deleted on 2026-06-03T06:24:07Z.
 
 ## Continuing Safe Actions
 
-- Patrol document completeness.
-- Validate example JSON.
-- Keep classification rules aligned to required categories.
-- Keep response template aligned to required 8 sections.
-- Keep forbidden scope checks current.
-- Update evidence packet and final completion report when safe docs-only changes occur.
+- No further safe work required unless reopened by AI PCM 總監／後台總控 Agent.
 
 ## Latest Patrol
 
-- Time: 2026-06-03T05:37:19Z
+- Time: 2026-06-03T06:24:07Z
 - Files checked: PASS
 - JSON examples checked: PASS
 - Automation fields checked: PASS
 - Forbidden scope scan: PASS
-- Closeout state: still pending AI PCM 總監 closeout acceptance and automation stop approval.
+- Closeout state: CLOSEOUT_ACCEPTED_WITH_NOTES.
+- Automation stop: APPROVED_AND_DELETED.
 - Source-of-truth boundary: use GitHub PR #77 / latest PR head SHA as shared truth; local workspace remains execution state only.
-- Safe work continued: re-verified repaired JSON examples, updated evidence packet, closeout checklist, final completion report, and AI PCM blackboard patrol record.
+- Safe work completed: re-verified repaired JSON examples, updated evidence packet, closeout checklist, final completion report, and AI PCM blackboard stop record; deleted Codex app heartbeat `pcm-issue-routing-contract-decision-patrol`.

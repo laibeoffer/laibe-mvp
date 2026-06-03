@@ -8,13 +8,13 @@ Status: completed.
 
 ## 2. Automation
 
-Status: active.
+Status: stopped after supervisor closeout acceptance and automation stop approval.
 
 Automation name: `pcm-contract-evidence-admin-patrol`
 
 Cadence: every 15 minutes.
 
-Mode: Codex app heartbeat attached to current thread.
+Mode: Codex app heartbeat attached to current thread; deleted after supervisor stop approval.
 
 ## 3. Created Files
 
@@ -27,11 +27,14 @@ Mode: Codex app heartbeat attached to current thread.
 - `patrol_log.md`
 - `permission_blocker_packet.md`
 - `source_of_truth_policy.md`
+- `evidence_status_transition_log.md`
 - `contract_attachment_registry.md`
 - `verified_evidence_matrix.md`
 - `disputed_evidence_register.md`
 - `superseded_voided_evidence_log.md`
 - `evidence_priority_order.md`
+- `evidence_packet.md`
+- `closeout_checklist.md`
 - `final_completion_report.md`
 - `examples/contract_evidence_record.sample.json`
 - `examples/evidence_status.sample.json`
@@ -99,15 +102,15 @@ No direct user permission request was made.
 
 ## 8. Final Completion Status
 
-Status: `SUBMITTED_TO_AI_PCM_SUPERVISOR_FOR_CLOSEOUT_ACCEPTANCE`
+Status: `CLOSEOUT_ACCEPTED_AUTOMATION_STOP_APPROVED`
 
 This completion report verifies only the evidence administration policy pack. It does not verify any project contract fact.
 
-Automation remains active until AI PCM Supervisor declares closeout acceptance and automation stop approved.
+AI PCM Supervisor closeout acceptance and automation stop approval were recorded on the AI PCM blackboard. Codex app heartbeat `pcm-contract-evidence-admin-patrol` was deleted after that approval.
 
 ## 9. Next Action
 
-Next safe action: continue the 15-minute patrol. If no external response arrives within 20 minutes, inspect this workstream docs directory for missing fields, placeholder misuse, forbidden scope drift, and closeout checklist gaps.
+Next safe action: no agent-specific patrol action is required unless AI PCM Supervisor reopens this workstream with a new scoped task.
 
 ## 10. Rule Correction Confirmation
 
@@ -132,9 +135,10 @@ Confirmed deliverables:
 - Patrol log exists and records no-idle safe work.
 - Permission / blocker packet exists and routes decisions to AI PCM Supervisor.
 - Source-of-truth policy exists and keeps GitHub PR / commit SHA as shared truth.
+- Evidence status transition log exists and records no project evidence transition.
 - JSON examples parse successfully.
 - AI PCM blackboard progress report is posted.
 
-Automation remains active until AI PCM Supervisor closeout acceptance and automation stop approval.
+Automation stopped after AI PCM Supervisor closeout acceptance and automation stop approval.
 
 All permission and blocker packets route to AI PCM 總監／後台總控 Agent.

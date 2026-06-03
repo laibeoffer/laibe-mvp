@@ -46,6 +46,7 @@
 - `docs/ai_pcm/party_entry_line_terminal/line_terminal_forbidden_scope.md`
 - `docs/ai_pcm/party_entry_line_terminal/line_terminal_validation_checklist.md`
 - `docs/ai_pcm/party_entry_line_terminal/line_terminal_permission_packet_template.md`
+- `docs/ai_pcm/party_entry_line_terminal/line_terminal_risk_register.md`
 - `docs/ai_pcm/party_entry_line_terminal/patrol_log.md`
 - `docs/ai_pcm/party_entry_line_terminal/supervisor_handoff.md`
 - `docs/ai_pcm/party_entry_line_terminal/closeout_checklist.md`
@@ -67,6 +68,7 @@
 - policy: `line_terminal_forbidden_scope.md`
 - checklist: `line_terminal_validation_checklist.md`
 - template: `line_terminal_permission_packet_template.md`
+- register: `line_terminal_risk_register.md`
 - log: `patrol_log.md`
 - handoff: `supervisor_handoff.md`
 - checklist: `closeout_checklist.md`

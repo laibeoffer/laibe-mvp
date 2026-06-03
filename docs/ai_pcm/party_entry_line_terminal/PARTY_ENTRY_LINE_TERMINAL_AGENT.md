@@ -75,6 +75,7 @@
 - `line_terminal_forbidden_scope.md`
 - `line_terminal_validation_checklist.md`
 - `line_terminal_permission_packet_template.md`
+- `line_terminal_risk_register.md`
 - `patrol_log.md`
 - `supervisor_handoff.md`
 - `closeout_checklist.md`

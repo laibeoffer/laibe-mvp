@@ -10,7 +10,7 @@ Managed By:
 AI PCM 總監／後台總控 Agent
 
 Status:
-READY_FOR_SUPERVISOR_REVIEW
+CLOSEOUT_ACCEPTED_WITH_NOTES
 
 ## Source of Truth
 
@@ -55,6 +55,7 @@ READY_FOR_SUPERVISOR_REVIEW
 - 2026-06-03T05:06:19Z patrol rechecked required files, UTF-8 JSON examples, automation fields, forbidden production boundaries, and blackboard closeout state. No supervisor closeout acceptance or automation stop approval is recorded.
 - 2026-06-03T05:22:19Z patrol rechecked required files, UTF-8 JSON examples, automation fields, forbidden production boundaries, and blackboard closeout state. No supervisor closeout acceptance or automation stop approval is recorded.
 - 2026-06-03T05:37:19Z patrol rechecked required files, UTF-8 JSON examples, automation fields, forbidden production boundaries, and blackboard closeout state. No supervisor closeout acceptance or automation stop approval is recorded.
+- 2026-06-03T06:24:07Z patrol confirmed AI PCM 總監 closeout acceptance with notes and automation stop approval, rechecked required files, UTF-8 JSON examples, automation fields, and forbidden production boundaries, then deleted Codex app heartbeat `pcm-issue-routing-contract-decision-patrol`.
 - 2026-06-03T05:16:46Z supervisor patrol found two JSON examples corrupted by earlier mojibake and repaired them as ASCII placeholder samples; examples parse and remain non-formal / human-review bounded.
 
 ## Scope Checks
@@ -70,16 +71,16 @@ READY_FOR_SUPERVISOR_REVIEW
 ## Supervisor Packet
 
 Packet type:
-Blocker Packet
+Closeout Packet
 
 Route:
 AI PCM 總監／後台總控 Agent
 
 Issue:
-Local git verification is unavailable in the current shell, while AI PCM blackboard records PR #77 and PR head SHA. Shared truth must remain GitHub main / PR / commit SHA.
+Closeout accepted with notes. Shared truth remains GitHub main / PR / commit SHA; local workspace remains execution state only.
 
 Self-solve attempted:
 Checked required files. Deputy Commander separately verified `git -c safe.directory=* status`, `rev-parse`, and `remote -v` from `Z:\08-Jacky\laibe_pcm`, then pushed the reconciled branch to PR #77.
 
 Safe work continued:
-Completed docs-only workstream initialization, automation metadata, schemas, policies, examples, evidence packet, closeout checklist, and final completion report.
+Completed docs-only workstream initialization, automation metadata, schemas, policies, examples, evidence packet, closeout checklist, and final completion report. No further patrol work is required unless reopened by AI PCM 總監／後台總控 Agent.

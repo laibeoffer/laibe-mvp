@@ -7,10 +7,13 @@ automation_id:
 pcm-issue-routing-contract-decision-patrol
 
 automation_runtime:
-Codex app heartbeat created for this thread
+Codex app heartbeat created for this thread; deleted after AI PCM 總監 closeout acceptance and automation stop approval
 
 frequency:
 every 15 minutes
+
+automation_status:
+STOPPED_AFTER_SUPERVISOR_CLOSEOUT
 
 managed_by:
 AI PCM 總監／後台總控 Agent
@@ -44,6 +47,9 @@ true
 
 automation_stop_rule:
 Only stop after AI PCM 總監／後台總控 Agent records closeout acceptance and automation stop approved.
+
+automation_stop_record:
+2026-06-03T06:24:07Z patrol confirmed `CLOSEOUT_ACCEPTED_WITH_NOTES` and agent-specific automation stop approved, then deleted Codex app heartbeat `pcm-issue-routing-contract-decision-patrol`.
 
 ## Required Startup Flow
 

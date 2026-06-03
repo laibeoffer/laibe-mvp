@@ -1,5 +1,50 @@
 # AI PCM Blackboard
 
+## Supervisor Closeout Review State
+
+status: `CLOSEOUT_READY`
+
+supervisor: `AI PCM 最高指揮官`
+
+review_id: `AI-PCM-SUPERVISOR-CLOSEOUT-20260603-060216Z`
+
+review_file: `docs/ai_pcm/admin_control_center/supervisor_closeout_review.md`
+
+patrolClean: true
+
+headMatchesRemote: true
+
+jsonExamplesValidated: true
+
+forbiddenScopeClean: true
+
+runtimeTouched: false
+
+productionTouched: false
+
+needUser: false
+
+needCommander: false within AI PCM safe closeout scope
+
+closeoutStatus: `CLOSEOUT_READY`
+
+nextState: `IDLE_WAITING_NEW_SCOPED_TASK`
+
+automationStopApproved: true
+
+Managed packets:
+
+| Packet | Decision | Final State |
+|---|---|---|
+| `pcm/contract-evidence-admin` | `ACCEPT_WITH_NOTES` | Governance docs accepted; no project-specific verified evidence registered. |
+| `pcm/issue-routing-contract-decision` | `ACCEPT_WITH_NOTES` | Suggestions remain human-review drafts, not legal rulings. |
+| `pcm/party-entry-line-terminal` | `ACCEPT_WITH_NOTES` | LINE remains notice / input terminal only; production LINE API remains blocked. |
+| `pcm/pre-tender-readiness` | `ACCEPT_WITH_NOTES` | Readiness docs accepted; formal tender launch remains future explicit scope. |
+| `pcm/payment-ledger-placeholder` | `ACCEPT_WITH_NOTES` | Placeholder ledger docs accepted; real payment / escrow / listing fee remain forbidden. |
+
+Next single action:
+Stop patrol loop and wait for explicit new scoped task.
+
 ## AI PCM Department Principles
 
 1. 所有爭議都按照合約走。
@@ -33,12 +78,12 @@
 
 | Agent | Workstream | Managed By | Status | Automation | Progress % | Blocker | Next |
 |---|---|---|---|---|---:|---|---|
-| AI PCM 總監／後台總控 Agent | `pcm/admin-control-center` | 最高指揮官 / Deputy Commander | `ACTIVE_SUPERVISION` | `pcm-admin-control-center-patrol` / every 15 minutes | 98 | None for docs-only governance | Review managed agent closeouts, idle risks, permission queue, and stop approvals |
-| 合約資料與證據管理 Agent | `pcm/contract-evidence-admin` | AI PCM 總監／後台總控 Agent | `READY_FOR_SUPERVISOR_REVIEW` | `ai-pcm-department-15m-patrol` / every 15 minutes | 95 | Supervisor closeout acceptance pending | Verify evidence status never promotes placeholder / LINE / local files to verified facts |
-| 問題分流與合約裁決建議 Agent | `pcm/issue-routing-contract-decision` | AI PCM 總監／後台總控 Agent | `READY_FOR_SUPERVISOR_REVIEW` | `pcm-issue-routing-contract-decision-patrol` / every 15 minutes | 96 | Earlier agent-local git warning reconciled by Deputy Commander; PR #77 is shared truth | Confirm suggestions remain human-review drafts, not legal rulings; supervisor closeout acceptance pending |
-| 甲乙方入口與 LINE 終端 Agent | `pcm/party-entry-line-terminal` | AI PCM 總監／後台總控 Agent | `READY_FOR_SUPERVISOR_REVIEW` | `pcm-party-entry-line-terminal-patrol` / every 15 minutes | 99 | Supervisor closeout acceptance pending | Review `supervisor_handoff.md`; confirm LINE remains notice / input terminal only; patrol continues until automation stop approved |
-| 招標前置輔助 Agent | `pcm/pre-tender-readiness` | AI PCM 總監／後台總控 Agent | `READY_FOR_SUPERVISOR_REVIEW` | `pcm-pre-tender-readiness-patrol` / every 15 minutes | 96 | Runtime sub-agent launch pending due thread limit; PR #77 remains shared truth | Continue patrol until supervisor closeout acceptance and automation stop approved |
-| 付款節點與金流分撥預留 Agent | `pcm/payment-ledger-placeholder` | AI PCM 總監／後台總控 Agent | `READY_FOR_SUPERVISOR_REVIEW` | `pcm-payment-ledger-placeholder-patrol` / every 15 minutes | 96 | Runtime sub-agent launch pending due thread limit; PR #77 is shared truth | Review placeholder ledger evidence packet; do not touch real payment / escrow / listing fee |
+| AI PCM 總監／後台總控 Agent | `pcm/admin-control-center` | 最高指揮官 / Deputy Commander | `CLOSEOUT_READY` | `ai-pcm-department-15m-patrol` / stop approved | 100 | None for safe closeout scope | Stop patrol loop after closeout commit / push; restart only for explicit new scoped task |
+| 合約資料與證據管理 Agent | `pcm/contract-evidence-admin` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-contract-evidence-admin-patrol` / stop approved | 100 | None for docs-only governance | No further safe work required unless reopened |
+| 問題分流與合約裁決建議 Agent | `pcm/issue-routing-contract-decision` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-issue-routing-contract-decision-patrol` / stop approved | 100 | None for docs-only governance | No further safe work required unless reopened |
+| 甲乙方入口與 LINE 終端 Agent | `pcm/party-entry-line-terminal` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-party-entry-line-terminal-patrol` / stop approved | 100 | Production LINE/API/runtime remains future explicit scope | No further safe work required unless reopened |
+| 招標前置輔助 Agent | `pcm/pre-tender-readiness` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-pre-tender-readiness-patrol` / stop approved | 100 | Formal tender launch remains future explicit scope | No further safe work required unless reopened |
+| 付款節點與金流分撥預留 Agent | `pcm/payment-ledger-placeholder` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-payment-ledger-placeholder-patrol` / stop approved | 100 | Real payment / escrow / listing fee remain future explicit scope | No further safe work required unless reopened |
 
 ## Agent Self-Introduction: 招標前置輔助 Agent
 
@@ -55,10 +100,10 @@ Coordination:
 招標副指揮官 / Tender Deputy Planning Officer
 
 Status:
-ACTIVE_INITIALIZATION
+`CLOSEOUT_ACCEPTED_WITH_NOTES`
 
 Automation:
-pcm-pre-tender-readiness-patrol / every 15 minutes
+`pcm-pre-tender-readiness-patrol` / stop approved
 
 Role:
 檢查甲方招標前需求、圖面、現況照片、預算、材料、工法、不包含項目、付款 / 驗收節點是否足以進入招標。
@@ -81,37 +126,37 @@ No-Idle Rule:
 
 | Agent | Task | Status | Next |
 |---|---|---|---|
-| AI PCM 總監／後台總控 Agent | Maintain department blackboard, permission queue, stalled watchlist, closeout queue, case status model, task queue, and review queue | `ACTIVE` | Accept or request minimal fixes for five managed agent packets |
-| 合約資料與證據管理 Agent | Contract/evidence source map and verified evidence policy | `READY_FOR_SUPERVISOR_REVIEW` | Supervisor reviews evidence packet and closeout checklist |
-| 問題分流與合約裁決建議 Agent | Issue taxonomy, RFI / dispute schema, response template, decision-suggestion boundary | `READY_FOR_SUPERVISOR_REVIEW` | Supervisor confirms no legal-ruling language |
-| 甲乙方入口與 LINE 終端 Agent | Party entry and LINE terminal contract / schemas | `READY_FOR_SUPERVISOR_REVIEW` | Supervisor confirms LINE is terminal only |
-| 招標前置輔助 Agent | Pre-tender readiness checklist, missing information list, risk checklist, attachment suggestions, initialization execution rules | `READY_FOR_SUPERVISOR_REVIEW` | Supervisor confirms no formal tender launch and no-idle rules |
-| 付款節點與金流分撥預留 Agent | Payment ledger placeholder contracts, schema, checklist, evidence packet, closeout checklist, examples, and no-real-payment policy | `READY_FOR_SUPERVISOR_REVIEW` | Supervisor confirms no real payment implication and PR #77 source-of-truth boundary |
+| AI PCM 總監／後台總控 Agent | Department closeout review | `CLOSEOUT_READY` | Stop patrol loop after PR commit / push; restart only for explicit new scoped task |
+| 合約資料與證據管理 Agent | Contract/evidence source map and verified evidence policy | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
+| 問題分流與合約裁決建議 Agent | Issue taxonomy, RFI / dispute schema, response template, decision-suggestion boundary | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
+| 甲乙方入口與 LINE 終端 Agent | Party entry and LINE terminal contract / schemas | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
+| 招標前置輔助 Agent | Pre-tender readiness checklist, missing information list, risk checklist, attachment suggestions, initialization execution rules | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
+| 付款節點與金流分撥預留 Agent | Payment ledger placeholder contracts, schema, checklist, evidence packet, closeout checklist, examples, and no-real-payment policy | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
 
 ## Stalled Agent Watchlist
 
 | Agent | Issue | Required Action | Deadline |
 |---|---|---|---|
-| 招標前置輔助 Agent | Runtime sub-agent launch could not be completed because current sub-agent thread limit was reached | Continue docs-only patrol under department automation; retry runtime launch only when capacity is available | Next supervisor patrol |
-| 付款節點與金流分撥預留 Agent | Runtime sub-agent launch could not be completed because current sub-agent thread limit was reached; docs-only packet is complete | Continue docs-only patrol under payment ledger automation; retry runtime launch only when capacity is available | Next supervisor patrol |
+| 招標前置輔助 Agent | Runtime sub-agent launch was not completed because current sub-agent thread limit was reached | Non-blocking note for docs-only closeout; runtime launch belongs to future explicit scoped task | Closed for this docs-only closeout |
+| 付款節點與金流分撥預留 Agent | Runtime sub-agent launch was not completed because current sub-agent thread limit was reached; docs-only packet is complete | Non-blocking note for placeholder-only closeout; runtime launch belongs to future explicit scoped task | Closed for this placeholder-only closeout |
 
 ## Closeout Queue
 
 | Agent | Evidence | Closeout Status | Automation |
 |---|---|---|---|
-| AI PCM 總監／後台總控 Agent | `docs/ai_pcm/admin_control_center/AUTOMATION.md`, `PCM_ADMIN_CONTROL_CENTER_AGENT.md`, `pcm_case_status_model.md`, `pcm_task_queue.md`, `pcm_review_queue.md`, `examples/`, `MANAGED_AGENT_DISPATCH_ORDER.md`, `AGENT_FOLLOWUP_NOTICES.md`, `final_completion_report.md` | `READY_FOR_DEPUTY_CLOSEOUT` | Department heartbeat continues |
-| 合約資料與證據管理 Agent | `docs/ai_pcm/contract_evidence_admin/evidence_packet.md`, `evidence_validation_checklist.md`, `patrol_log.md`, `permission_blocker_packet.md`, `source_of_truth_policy.md`, `closeout_checklist.md`, `final_completion_report.md` | `PENDING_SUPERVISOR_REVIEW` | Continue until supervisor accepts or requests fix |
-| 問題分流與合約裁決建議 Agent | `docs/ai_pcm/issue_routing_contract_decision/evidence_packet.md`, `closeout_checklist.md`, `supervisor_progress_report.md`, `final_completion_report.md`, valid JSON examples | `PENDING_SUPERVISOR_REVIEW` | Continue until supervisor accepts or requests fix |
-| 甲乙方入口與 LINE 終端 Agent | `docs/ai_pcm/party_entry_line_terminal/evidence_packet.md`, `line_terminal_validation_checklist.md`, `line_terminal_permission_packet_template.md`, `patrol_log.md`, `supervisor_handoff.md`, `initialization_progress_report.md`, `closeout_checklist.md`, `final_completion_report.md` | `PENDING_SUPERVISOR_REVIEW` | Continue until supervisor accepts or requests fix |
-| 招標前置輔助 Agent | `docs/ai_pcm/pre_tender_readiness/evidence_packet.md`, `closeout_checklist.md`, `initialization_progress_report.md`, `initialization_execution_rules.md`, `final_completion_report.md`, and readiness docs | `PENDING_SUPERVISOR_REVIEW` | Continue until supervisor closeout acceptance; stop only after automation stop approved |
-| 付款節點與金流分撥預留 Agent | `docs/ai_pcm/payment_ledger_placeholder/evidence_packet.md`, `closeout_checklist.md`, `initialization_progress_report.md`, `final_completion_report.md` | `PENDING_SUPERVISOR_REVIEW` | Continue until supervisor accepts or requests fix; automation stops only after supervisor stop approval |
+| AI PCM 總監／後台總控 Agent | `docs/ai_pcm/admin_control_center/AUTOMATION.md`, `PCM_ADMIN_CONTROL_CENTER_AGENT.md`, `pcm_case_status_model.md`, `pcm_task_queue.md`, `pcm_review_queue.md`, `examples/`, `MANAGED_AGENT_DISPATCH_ORDER.md`, `AGENT_FOLLOWUP_NOTICES.md`, `final_completion_report.md`, `supervisor_closeout_review.md` | `CLOSEOUT_READY` | Department heartbeat stop approved |
+| 合約資料與證據管理 Agent | `docs/ai_pcm/contract_evidence_admin/evidence_packet.md`, `evidence_validation_checklist.md`, `patrol_log.md`, `permission_blocker_packet.md`, `source_of_truth_policy.md`, `evidence_status_transition_log.md`, `closeout_checklist.md`, `final_completion_report.md` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
+| 問題分流與合約裁決建議 Agent | `docs/ai_pcm/issue_routing_contract_decision/evidence_packet.md`, `closeout_checklist.md`, `supervisor_progress_report.md`, `final_completion_report.md`, valid JSON examples | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
+| 甲乙方入口與 LINE 終端 Agent | `docs/ai_pcm/party_entry_line_terminal/evidence_packet.md`, `line_terminal_validation_checklist.md`, `line_terminal_permission_packet_template.md`, `line_terminal_risk_register.md`, `patrol_log.md`, `supervisor_handoff.md`, `initialization_progress_report.md`, `closeout_checklist.md`, `final_completion_report.md` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
+| 招標前置輔助 Agent | `docs/ai_pcm/pre_tender_readiness/evidence_packet.md`, `closeout_checklist.md`, `initialization_progress_report.md`, `initialization_execution_rules.md`, `final_completion_report.md`, and readiness docs | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
+| 付款節點與金流分撥預留 Agent | `docs/ai_pcm/payment_ledger_placeholder/evidence_packet.md`, `closeout_checklist.md`, `initialization_progress_report.md`, `final_completion_report.md` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
 
 ## Source Of Truth / Local State
 
 - GitHub source of truth: `laibeoffer/laibe-mvp` `origin/main`.
 - GitHub main SHA checked for this setup: `9d836c43e25af6eb05380b46296407476054f141`.
 - GitHub draft PR: `https://github.com/laibeoffer/laibe-mvp/pull/77`.
-- Latest known PR head SHA before the 2026-06-03T05:47:06Z supervisor patrol: `5e35ef1983a500eaf7c7af3b64d4af03cb29d234`. Read GitHub PR #77 for the latest head SHA after follow-up commits.
+- Latest known PR head SHA before the 2026-06-03T06:02:16Z supervisor closeout review: `1f24ada0bad5b0d6e8b18724d33f369393db4acd`. Read GitHub PR #77 for the latest head SHA after this closeout commit.
 - Local execution workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local branch: `codex/ai-pcm-department-setup`.
 - `Z:\08-Jacky\laibe_pcm` is LOCAL_STATE / execution workspace only; GitHub main / PR / commit SHA remains authoritative.
@@ -127,22 +172,22 @@ No-Idle Rule:
 | 問題分流與合約裁決建議 Agent | `SPAWNED_READONLY_REPORT_RECEIVED` | Sub-agent `019e8bb0-765f-7e00-b27a-4721bda16099` / nickname `Newton`; closed after report |
 | 甲乙方入口與 LINE 終端 Agent | `SPAWNED_READONLY_REPORT_RECEIVED` | Sub-agent `019e8bb0-7c9b-7e00-b47e-a506dd4fe6d6` / nickname `Kuhn`; closed after report |
 | 招標前置輔助 Agent | `ASSIGNED_NOT_SPAWNED` | Spawn attempt failed because current sub-agent thread limit was reached; docs-only packet exists |
-| 付款節點與金流分撥預留 Agent | `ASSIGNED_NOT_SPAWNED` | Spawn attempt failed because current sub-agent thread limit was reached; docs-only packet exists and patrol continues |
+| 付款節點與金流分撥預留 Agent | `ASSIGNED_NOT_SPAWNED` | Spawn attempt failed because current sub-agent thread limit was reached; docs-only packet exists and closeout is accepted with notes |
 
 ## Agent Work Products
 
 | Agent | Evidence | Status | Supervisor Action |
 |---|---|---|---|
-| AI PCM 總監／後台總控 Agent | `docs/ai_pcm/admin_control_center/` | `INITIALIZED` | Continue patrol and closeout supervision |
-| 合約資料與證據管理 Agent | `docs/ai_pcm/contract_evidence_admin/` | `READY_FOR_SUPERVISOR_REVIEW` | Check verified evidence policy and disputed / superseded logs |
-| 問題分流與合約裁決建議 Agent | `docs/ai_pcm/issue_routing_contract_decision/` | `READY_FOR_SUPERVISOR_REVIEW` | Check legal-ruling boundary and human-review escalation |
-| 甲乙方入口與 LINE 終端 Agent | `docs/ai_pcm/party_entry_line_terminal/` | `READY_FOR_SUPERVISOR_REVIEW` | Check LINE terminal boundary and role permissions |
-| 招標前置輔助 Agent | `docs/ai_pcm/pre_tender_readiness/` | `READY_FOR_SUPERVISOR_REVIEW` | Check readiness status policy and tender-launch prohibition |
-| 付款節點與金流分撥預留 Agent | `docs/ai_pcm/payment_ledger_placeholder/` | `READY_FOR_SUPERVISOR_REVIEW` | Check placeholder-only payment vocabulary, evidence packet, closeout checklist, no-idle compliance, and PR #77 source-of-truth boundary |
+| AI PCM 總監／後台總控 Agent | `docs/ai_pcm/admin_control_center/` | `CLOSEOUT_READY` | Closeout review completed; department patrol stop approved |
+| 合約資料與證據管理 Agent | `docs/ai_pcm/contract_evidence_admin/` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Governance docs accepted; no project-specific verified evidence registered |
+| 問題分流與合約裁決建議 Agent | `docs/ai_pcm/issue_routing_contract_decision/` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Human-review boundary accepted; no legal ruling language approved |
+| 甲乙方入口與 LINE 終端 Agent | `docs/ai_pcm/party_entry_line_terminal/` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | LINE terminal boundary accepted; production LINE API remains future explicit scope |
+| 招標前置輔助 Agent | `docs/ai_pcm/pre_tender_readiness/` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Readiness docs accepted; formal tender launch remains future explicit scope |
+| 付款節點與金流分撥預留 Agent | `docs/ai_pcm/payment_ledger_placeholder/` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Placeholder-only ledger accepted; real payment / escrow / listing fee remain future explicit scope |
 
 ## Automation And No-Idle Rules
 
-- Automation id: `ai-pcm-department-15m-patrol`.
+- Automation id: `ai-pcm-department-15m-patrol` / stop approved after closeout commit and push.
 - Supervisor automation name: `pcm-admin-control-center-patrol`.
 - Pre-tender agent heartbeat automation id: `pcm-pre-tender-readiness-patrol`.
 - Cadence: every 15 minutes.
@@ -158,12 +203,12 @@ No-Idle Rule:
 - Agent: 付款節點與金流分撥預留 Agent
 - Workstream: `pcm/payment-ledger-placeholder`
 - Managed By: AI PCM 總監／後台總控 Agent
-- Status: `READY_FOR_SUPERVISOR_REVIEW`
-- Automation: `pcm-payment-ledger-placeholder-patrol` / every 15 minutes
+- Status: `CLOSEOUT_ACCEPTED_WITH_NOTES`
+- Automation: `pcm-payment-ledger-placeholder-patrol` / stop approved
 - No-idle correction: blackboard self-introduction is task start only, not task completion.
 - Required flow completed: self-introduction, `AUTOMATION.md`, workstream docs, contracts, schema, checklist, policy, examples, evidence packet, closeout checklist, initialization progress report, final completion report, and blackboard status update.
 - Forbidden idle reports: 等待命令派發, 本輪無新指派, 等 AI PCM 總監指示, 等最高指揮官指示, 等使用者核准, no material change, pending approval.
-- Stop rule: continue patrol until AI PCM 總監 declares closeout acceptance and automation stop approved.
+- Stop rule: closeout acceptance and automation stop approved by AI PCM 總監; restart only by explicit new scoped task.
 - Permission / Blocker Packet: earlier `LOCAL_STATE_STALE` gitdir uncertainty has been reconciled by Deputy Commander for docs-only initialization; GitHub PR / commit SHA remains the shared truth boundary.
 - Forbidden scope check: no production LINE API, real payment, escrow, listing fee, DB / Supabase, AI API, production runtime, formal legal decision, formal tender launch, formal quote, or formal price touched.
 
@@ -178,6 +223,18 @@ No-Idle Rule:
 - Formal tender launch: forbidden.
 - Formal quote / formal price: forbidden.
 - Automatic contract change: forbidden.
+
+## Contract Evidence Admin Stop Record
+
+- time: `2026-06-03T06:18:50Z`
+- agent: `合約資料與證據管理 Agent`
+- workstream: `pcm/contract-evidence-admin`
+- supervisor_closeout: `ACCEPT_WITH_NOTES`
+- automation_stop_approved: true
+- automation_deleted: `pcm-contract-evidence-admin-patrol`
+- forbidden_scope_clean: true
+- verified_project_evidence_created: false
+- next: `STOPPED_UNLESS_REOPENED_BY_AI_PCM_SUPERVISOR`
 
 ## Patrol Record
 
@@ -196,11 +253,13 @@ No-Idle Rule:
 | 2026-06-03T05:06:19Z | 問題分流與合約裁決建議 Agent | Heartbeat patrol verified required files, UTF-8 JSON examples, automation fields, forbidden scope, and closeout state; no supervisor closeout acceptance or automation stop approval recorded, so patrol continues | `READY_FOR_SUPERVISOR_REVIEW_PATROL_ACTIVE` |
 | 2026-06-03T05:22:19Z | 問題分流與合約裁決建議 Agent | Heartbeat patrol re-verified repaired JSON examples, required files, automation fields, forbidden scope, and closeout state; no supervisor closeout acceptance or automation stop approval recorded, so patrol continues | `READY_FOR_SUPERVISOR_REVIEW_PATROL_ACTIVE` |
 | 2026-06-03T05:37:19Z | 問題分流與合約裁決建議 Agent | Heartbeat patrol re-verified repaired JSON examples, required files, automation fields, forbidden scope, and closeout state; no supervisor closeout acceptance or automation stop approval recorded, so patrol continues | `READY_FOR_SUPERVISOR_REVIEW_PATROL_ACTIVE` |
+| 2026-06-03T06:24:07Z | 問題分流與合約裁決建議 Agent | Heartbeat patrol detected AI PCM 總監 closeout acceptance with notes and agent-specific automation stop approval; re-verified files, JSON examples, automation fields, and forbidden scope before deleting Codex app heartbeat `pcm-issue-routing-contract-decision-patrol` | `CLOSEOUT_ACCEPTED_AUTOMATION_STOPPED` |
 | 2026-06-03 | Deputy Commander | Opened docs-only draft PR #77; use GitHub PR #77 for the latest head SHA after follow-up commits | `DONE` |
 | 2026-06-03T04:35:30Z | 付款節點與金流分撥預留 Agent | Payment ledger placeholder heartbeat patrol verified 20 workstream files, parsed all 4 JSON examples, confirmed allowed payment / review statuses, confirmed automation `pcm-payment-ledger-placeholder-patrol` remains ACTIVE every 15 minutes, and found no real payment / escrow / listing fee / bank API / DB / AI API / LINE API integration. Earlier agent-local git observation was superseded by Deputy Commander reconciliation; shared truth remains GitHub PR #77 / latest PR head SHA. | `PATROL_COMPLETE_PLACEHOLDER_ONLY_CONTINUE_UNTIL_SUPERVISOR_CLOSEOUT` |
 | 2026-06-03T05:06:19Z | 付款節點與金流分撥預留 Agent | Payment ledger placeholder patrol re-verified 20 workstream files, parsed all 4 JSON examples, checked payment / review status enums, confirmed no active forbidden runtime markers, and confirmed no supervisor closeout acceptance or automation stop approval is recorded. Automation remains ACTIVE and patrol continues within placeholder-only scope. | `PATROL_COMPLETE_PLACEHOLDER_ONLY_AUTOMATION_CONTINUES` |
 | 2026-06-03T05:22:19Z | 付款節點與金流分撥預留 Agent | Payment ledger placeholder patrol re-verified 20 files and 4 JSON examples, found no forbidden runtime markers, and corrected stale source-of-truth wording in payment reports so GitHub PR #77 / latest PR head SHA is the shared truth while local workspace remains execution state only. No supervisor closeout acceptance or automation stop approval is recorded; patrol continues. | `PATROL_COMPLETE_SOURCE_TRUTH_WORDING_CORRECTED_AUTOMATION_CONTINUES` |
 | 2026-06-03T05:37:19Z | 付款節點與金流分撥預留 Agent | Payment ledger placeholder patrol re-verified 20 files, parsed all 4 JSON examples, confirmed no forbidden runtime markers, confirmed automation `pcm-payment-ledger-placeholder-patrol` remains ACTIVE, and confirmed no supervisor closeout acceptance or automation stop approval is recorded. Earlier agent-local git status note was superseded by supervisor reconciliation; source-of-truth wording remains aligned to GitHub PR #77 / latest PR head SHA. | `PATROL_COMPLETE_PLACEHOLDER_ONLY_PR77_BOUNDARY_HELD_AUTOMATION_CONTINUES` |
+| 2026-06-03T06:24:07Z | 付款節點與金流分撥預留 Agent | Heartbeat patrol detected AI PCM 總監 closeout acceptance with notes and agent-specific automation stop approval already recorded for `pcm/payment-ledger-placeholder`; verified 20 files and all 4 JSON examples before stopping; no forbidden payment / escrow / listing fee / bank API / DB / AI API / LINE API integration found. | `CLOSEOUT_ACCEPTED_STOP_APPROVED_AUTOMATION_DELETION_REQUESTED` |
 | 2026-06-03 | 招標前置輔助 Agent | Corrected execution rules: self-introduction is task start, Codex app heartbeat created, source-of-truth boundary recorded as GitHub PR #77, and patrol stop requires supervisor closeout acceptance plus automation stop approved | `RULES_CORRECTED_PATROL_ACTIVE` |
 | 2026-06-03T12:33:31+08:00 | 付款節點與金流分撥預留 Agent | Confirmed self-introduction is task start only; initialization tasks were already executed immediately: docs directory, `AUTOMATION.md`, agent file, contracts, schema, checklist, policy, examples, evidence packet, closeout checklist, final report, and AI PCM blackboard updates. Patrol remains active every 15 minutes; 20-minute no-response rule triggers next safe task. | `NO_IDLE_RULE_CORRECTED_CONTINUE_PATROL_PENDING_SUPERVISOR_CLOSEOUT` |
 | 2026-06-03T04:31:30Z | 合約資料與證據管理 Agent | Heartbeat patrol found missing dedicated evidence schema doc and completed safe docs-only `evidence_record_schema.md`; updated evidence packet, closeout checklist, and final report; JSON examples still parse; automation remains active until supervisor closeout and stop approval | `SAFE_WORK_CONTINUED_SCHEMA_FILLED` |
@@ -208,12 +267,17 @@ No-Idle Rule:
 | 2026-06-03T05:18:49Z | 合約資料與證據管理 Agent | Heartbeat patrol found missing dedicated patrol log and completed safe docs-only `patrol_log.md`; updated evidence packet, closeout checklist, and final report; JSON examples still parse; no verified project evidence or production integration created | `SAFE_WORK_CONTINUED_PATROL_LOG_CREATED` |
 | 2026-06-03T05:33:49Z | 合約資料與證據管理 Agent | Heartbeat patrol found missing dedicated permission / blocker packet and completed safe docs-only `permission_blocker_packet.md`; updated evidence packet, closeout checklist, final report, and patrol log; JSON examples still parse; no user contact, verified project evidence, or production integration created | `SAFE_WORK_CONTINUED_PERMISSION_PACKET_CREATED` |
 | 2026-06-03T05:48:50Z | 合約資料與證據管理 Agent | Heartbeat patrol found missing dedicated source-of-truth policy and completed safe docs-only `source_of_truth_policy.md`; updated evidence packet, closeout checklist, final report, and patrol log; JSON examples still parse; GitHub PR / commit SHA remains shared truth and local workspace remains execution state only | `SAFE_WORK_CONTINUED_SOURCE_TRUTH_POLICY_CREATED` |
+| 2026-06-03T06:03:50Z | 合約資料與證據管理 Agent | Heartbeat patrol found missing dedicated status transition log and completed safe docs-only `evidence_status_transition_log.md`; updated evidence packet, closeout checklist, final report, and patrol log; JSON examples still parse; no evidence status was changed or verified | `SAFE_WORK_CONTINUED_STATUS_TRANSITION_LOG_CREATED` |
+| 2026-06-03T06:18:50Z | 合約資料與證據管理 Agent | Patrol read AI PCM supervisor closeout state, confirmed `ACCEPT_WITH_NOTES` and `automationStopApproved: true`, deleted Codex app heartbeat `pcm-contract-evidence-admin-patrol`, and updated workstream closeout records. No project evidence was promoted or verified. | `CLOSEOUT_ACCEPTED_AUTOMATION_STOPPED` |
 | 2026-06-03T04:33:30Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol found missing dedicated `evidence_packet.md` despite packet being referenced; created docs-only evidence packet and updated indexes; JSON examples still parse; LINE remains terminal only | `SAFE_WORK_CONTINUED_EVIDENCE_PACKET_FILLED` |
 | 2026-06-03T04:48:43Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol verified evidence packet, closeout checklist, and JSON examples; corrected workstream source-of-truth wording to align with GitHub PR #77 / latest PR head SHA while keeping local workspace as execution state only; no production integrations touched | `PATROL_ACTIVE_SOURCE_TRUTH_BOUNDARY_CORRECTED` |
 | 2026-06-03T05:04:49Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol verified closeout still pending, evidence packet present, examples parse, and forbidden flags are clean; added docs-only `line_terminal_validation_checklist.md` for future patrol consistency | `SAFE_WORK_CONTINUED_VALIDATION_CHECKLIST_FILLED` |
 | 2026-06-03T05:20:19Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol confirmed no closeout or automation stop approval yet; added docs-only `line_terminal_permission_packet_template.md` so boundary or permission issues route to AI PCM Supervisor instead of the user; JSON examples still parse and forbidden flags remain clean | `SAFE_WORK_CONTINUED_PERMISSION_PACKET_TEMPLATE_FILLED` |
 | 2026-06-03T05:35:19Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol confirmed no closeout or automation stop approval yet; added docs-only `patrol_log.md` for recurring patrol evidence; JSON examples still parse and forbidden flags remain clean | `SAFE_WORK_CONTINUED_PATROL_LOG_CREATED` |
 | 2026-06-03T05:50:20Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol confirmed no closeout or automation stop approval yet; added docs-only `supervisor_handoff.md` to consolidate review asks, forbidden scope, and stop conditions for AI PCM Supervisor | `SAFE_WORK_CONTINUED_SUPERVISOR_HANDOFF_CREATED` |
+| 2026-06-03T06:05:50Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol found missing risk register and completed safe docs-only `line_terminal_risk_register.md`; updated evidence packet, validation checklist, closeout checklist, final report, and patrol log; JSON examples still parse and forbidden flags remain clean | `SAFE_WORK_CONTINUED_RISK_REGISTER_CREATED` |
+| 2026-06-03 | AI PCM 總監／後台總控 Agent | Reviewed LINE terminal risk register, closeout checklist, final report, examples, and forbidden scope; accepted closeout for 甲乙方入口與 LINE 終端 Agent; approved agent-specific automation stop; no actual `pcm-party-entry-line-terminal-patrol` Codex app heartbeat was found to delete | `LINE_TERMINAL_CLOSEOUT_ACCEPTED_STOP_APPROVED` |
+| 2026-06-03T06:02:16Z | AI PCM 最高指揮官 / AI PCM Supervisor | Completed supervisor closeout review of the five managed packets; all packets are `ACCEPT_WITH_NOTES`, blackboard status is `CLOSEOUT_READY`, forbidden scope is clean, runtime / production code untouched, and department heartbeat stop is approved after commit / push | `SUPERVISOR_CLOSEOUT_REVIEW_COMPLETED` |
 | 2026-06-03T12:37:04+08:00 | 招標前置輔助 Agent | Reconfirmed self-introduction is task start only; verified docs directory, `AUTOMATION.md`, main agent file, core checklist / schema / policy files, examples, evidence packet, closeout checklist, final report, and Codex heartbeat automation. JSON examples parse; patrol remains active every 15 minutes and 20-minute no-response rule advances the next safe task. | `NO_IDLE_RULE_CONFIRMED_CONTINUE_PATROL_PENDING_SUPERVISOR_CLOSEOUT` |
 | 2026-06-03T04:46:13Z | 招標前置輔助 Agent | Heartbeat patrol verified the pre-tender readiness docs packet and JSON examples, preserved formal-tender / payment / DB / AI API prohibitions, and corrected this Agent source-of-truth wording so local Git remains `LOCAL_STATE_STALE` while GitHub PR #77 / commit SHA remains authoritative. | `PATROL_ACTIVE_SOURCE_TRUTH_BOUNDARY_CORRECTED` |
 | 2026-06-03T13:17:51+08:00 | 招標前置輔助 Agent | Heartbeat patrol re-verified pre-tender readiness docs packet and JSON examples, preserved forbidden production boundaries, and recorded an agent-local source-of-truth note under the rule that GitHub PR #77 / latest PR head SHA remains shared truth. | `PATROL_ACTIVE_PR77_BOUNDARY_HELD` |

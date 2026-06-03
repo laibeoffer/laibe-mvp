@@ -37,6 +37,7 @@
 - `line_terminal_forbidden_scope.md`
 - `line_terminal_validation_checklist.md`
 - `line_terminal_permission_packet_template.md`
+- `line_terminal_risk_register.md`
 - `patrol_log.md`
 - `supervisor_handoff.md`
 - `closeout_checklist.md`
@@ -86,10 +87,23 @@ LINE 同步合約已定義為：
 
 ## 9. Final Completion Status
 
-`INIT_PROGRESS_REPORT_SUBMITTED_SUPERVISOR_CLOSEOUT_REVIEW`
+`CLOSEOUT_ACCEPTED_BY_AI_PCM_SUPERVISOR`
 
 本地文件已完成；最高指揮官已驗證 `Z:\08-Jacky\laibe_pcm` 對應 branch `codex/ai-pcm-department-setup` 與 GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`。GitHub PR / commit SHA 仍為共同真相。
 
 ## 10. Next Action
 
-繼續 15 分鐘巡檢與安全 docs-only 補強，直到 AI PCM 總監／後台總控 Agent 宣告 closeout acceptance 與 automation stop approved。
+Agent-specific patrol may stop because AI PCM 總監／後台總控 Agent has approved closeout and automation stop. Department-level patrol continues to monitor AI PCM overall boundaries.
+
+## 11. Supervisor Closeout Decision
+
+- closeout acceptance: approved
+- automation stop: approved for agent-specific patrol
+- no production LINE API connected
+- no DB / Supabase connected
+- no payment / escrow / listing fee connected
+- no production AI API connected
+- no formal identity verification created
+- no formal legal decision created
+- no formal quote / price created
+- `formal_record_effect` remains `none` for LINE terminal examples

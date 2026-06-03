@@ -23,7 +23,7 @@ AI PCM 總監／後台總控 Agent
 
 ## 4. Managed Agent Status
 
-All five managed agents have docs-only packets and remain under supervisor review:
+All five managed agents have docs-only packets and are accepted with notes under supervisor closeout:
 
 - `pcm/contract-evidence-admin`
 - `pcm/issue-routing-contract-decision`
@@ -52,6 +52,28 @@ No current unresolved `AGENT_IDLE_VIOLATION` remains in the committed department
 
 ## 7. Closeout Status
 
-`READY_FOR_DEPUTY_CLOSEOUT`
+`CLOSEOUT_READY`
 
-Automation must continue until closeout acceptance and automation stop approval are explicitly recorded.
+Supervisor closeout review completed at `2026-06-03T06:02:16Z`.
+
+Review file: `docs/ai_pcm/admin_control_center/supervisor_closeout_review.md`
+
+## 8. Managed Packet Disposition
+
+| Packet | Decision | Final State |
+|---|---|---|
+| `pcm/contract-evidence-admin` | `ACCEPT_WITH_NOTES` | Governance docs accepted; no project-specific verified evidence registered. |
+| `pcm/issue-routing-contract-decision` | `ACCEPT_WITH_NOTES` | Suggestions remain human-review drafts, not legal rulings. |
+| `pcm/party-entry-line-terminal` | `ACCEPT_WITH_NOTES` | LINE remains notice / input terminal only; production LINE API remains blocked. |
+| `pcm/pre-tender-readiness` | `ACCEPT_WITH_NOTES` | Readiness docs accepted; formal tender launch remains future explicit scope. |
+| `pcm/payment-ledger-placeholder` | `ACCEPT_WITH_NOTES` | Placeholder ledger docs accepted; real payment / escrow / listing fee remain forbidden. |
+
+## 9. Final State
+
+final_completion_decision: `COMPLETED_WITH_NOTES`
+
+next_state: `IDLE_WAITING_NEW_SCOPED_TASK`
+
+automation_stop_approved: true
+
+Restart only after an explicit new scoped AI PCM task.

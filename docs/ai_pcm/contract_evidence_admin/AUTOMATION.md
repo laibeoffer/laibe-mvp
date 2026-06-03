@@ -6,9 +6,9 @@ Automation: `pcm-contract-evidence-admin-patrol`
 
 Cadence: every 15 minutes
 
-Status: `ACTIVE`
+Status: `STOPPED_AFTER_SUPERVISOR_APPROVAL`
 
-Mode: Codex app heartbeat attached to the current thread.
+Mode: Codex app heartbeat attached to the current thread; deleted after supervisor stop approval.
 
 Workstream: `pcm/contract-evidence-admin`
 
@@ -39,6 +39,9 @@ true
 
 automation_stop_rule:
 Automation must remain active until AI PCM 總監／後台總控 Agent declares closeout acceptance and automation stop approved.
+
+automation_stop_record:
+AI PCM blackboard recorded supervisor closeout readiness and `automationStopApproved: true`. Codex app heartbeat `pcm-contract-evidence-admin-patrol` was deleted on `2026-06-03T06:18:50Z` patrol after stop approval.
 
 startup_rule:
 Blackboard self-introduction is task startup only. It is not task completion and must be followed immediately by docs directory setup, AUTOMATION.md, core policy/schema/checklist files, examples, evidence packet, final completion report, and supervisor report.

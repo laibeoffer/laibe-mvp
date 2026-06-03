@@ -104,13 +104,13 @@ Blocker Packet 已提報 AI PCM 總監／後台總控 Agent：
 
 ## 10. Final Completion Status
 
-READY_FOR_SUPERVISOR_REVIEW。
+CLOSEOUT_ACCEPTED_WITH_NOTES。
 
-已完成 docs-only 初始化交付與 supervisor progress report。patrol 持續有效，直到 AI PCM 總監／後台總控 Agent 宣告 closeout acceptance 與 automation stop approved。
+已完成 docs-only 初始化交付與 supervisor progress report。AI PCM 總監／後台總控 Agent 已宣告 closeout acceptance 與 automation stop approved；Codex app heartbeat `pcm-issue-routing-contract-decision-patrol` 已刪除。
 
 ## 11. Next Action
 
-持續執行 `pcm-issue-routing-contract-decision-patrol`。下一個安全任務：巡檢 evidence packet、closeout checklist、schema、examples 與 forbidden scope；AI PCM 總監完成 closeout acceptance 前不停止 patrol。
+No further safe work required unless reopened by AI PCM 總監／後台總控 Agent.
 
 Latest patrol:
-2026-06-03T05:37:19Z patrol re-verified repaired JSON examples, required files, automation fields, forbidden scope, and blackboard closeout state. No supervisor closeout acceptance or automation stop approval is recorded.
+2026-06-03T06:24:07Z patrol confirmed closeout acceptance with notes and automation stop approval, re-verified repaired JSON examples, required files, automation fields, and forbidden scope, updated closeout records, and deleted Codex app heartbeat `pcm-issue-routing-contract-decision-patrol`.

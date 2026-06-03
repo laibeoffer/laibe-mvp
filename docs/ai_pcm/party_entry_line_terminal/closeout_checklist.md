@@ -9,6 +9,14 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 - closeout acceptance: approved
 - automation stop: approved
 
+## Supervisor Decision
+
+- closeout acceptance: approved
+- automation stop: approved for agent-specific patrol
+- decision by: AI PCM 總監／後台總控 Agent
+- decision note: `line_terminal_risk_register.md`, validation checklist, examples, final report, and forbidden runtime checks passed for docs-only closeout. LINE remains terminal-only and cannot create contract, payment, identity, legal, tender, quote, or verified-evidence effect.
+- automation lookup note: no active Codex app heartbeat named `pcm-party-entry-line-terminal-patrol` was found during supervisor closeout; if an external/thread-local patrol exists, it is approved to stop. Department patrol remains active.
+
 ## Required Evidence
 
 | Evidence | Status |
@@ -25,6 +33,7 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 | Forbidden scope policy | complete |
 | LINE terminal validation checklist | complete |
 | Permission / boundary packet template | complete |
+| LINE terminal risk register | complete |
 | Patrol log | complete |
 | Supervisor handoff | complete |
 | Evidence packet | complete |
@@ -46,6 +55,7 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 - Questions route to platform review, not automatic decisions.
 - Permission requests route to AI PCM 總監／後台總控 Agent.
 - Permission / boundary packet template exists and forbids direct user requests.
+- Risk register maps contract, payment, identity, evidence, conflict, and production integration risks to safe handling.
 - No user-direct permission requests are made.
 
 ## Forbidden Runtime Checks

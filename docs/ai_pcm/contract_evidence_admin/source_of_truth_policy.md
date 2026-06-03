@@ -69,4 +69,4 @@ Current state:
 - Local workspace is execution state only.
 - GitHub PR / commit SHA remains required for shared truth.
 - No project-specific verified evidence is registered by this workstream.
-- Automation remains active until AI PCM Supervisor closeout acceptance and automation stop approval.
+- Automation remained active until AI PCM Supervisor closeout acceptance and automation stop approval; after `automationStopApproved: true`, the Codex app heartbeat `pcm-contract-evidence-admin-patrol` was deleted.

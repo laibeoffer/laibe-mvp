@@ -28,6 +28,7 @@
 | Forbidden scope policy | `line_terminal_forbidden_scope.md` | complete |
 | LINE terminal validation checklist | `line_terminal_validation_checklist.md` | complete |
 | Permission / boundary packet template | `line_terminal_permission_packet_template.md` | complete |
+| LINE terminal risk register | `line_terminal_risk_register.md` | complete |
 | Patrol log | `patrol_log.md` | complete |
 | Supervisor handoff | `supervisor_handoff.md` | complete |
 | Closeout checklist | `closeout_checklist.md` | complete |
@@ -50,6 +51,7 @@
 - JSON examples parse successfully: yes
 - LINE terminal validation checklist present: yes
 - Permission / boundary packet template present: yes
+- LINE terminal risk register present: yes
 - Patrol log present: yes
 - Supervisor handoff present: yes
 - Production LINE API touched: no
