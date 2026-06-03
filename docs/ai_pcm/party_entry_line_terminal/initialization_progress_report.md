@@ -45,6 +45,7 @@
 - `docs/ai_pcm/party_entry_line_terminal/role_permission_draft.md`
 - `docs/ai_pcm/party_entry_line_terminal/line_terminal_forbidden_scope.md`
 - `docs/ai_pcm/party_entry_line_terminal/closeout_checklist.md`
+- `docs/ai_pcm/party_entry_line_terminal/evidence_packet.md`
 - `docs/ai_pcm/party_entry_line_terminal/final_completion_report.md`
 - `docs/ai_pcm/party_entry_line_terminal/initialization_progress_report.md`
 - `docs/ai_pcm/party_entry_line_terminal/examples/line_message_record.sample.json`
@@ -61,6 +62,7 @@
 - policy: `role_permission_draft.md`
 - policy: `line_terminal_forbidden_scope.md`
 - checklist: `closeout_checklist.md`
+- evidence packet: `evidence_packet.md`
 - examples: 3 JSON samples under `examples/`
 - closeout evidence: `final_completion_report.md`
 

@@ -66,9 +66,10 @@ None for production or high-risk scope.
 
 ## 7. Blockers
 
-- Blocker: earlier `LOCAL_STATE_STALE` gitdir uncertainty has been reconciled by Deputy Commander for docs-only initialization.
-- Self-solve attempted: Deputy Commander rechecked with `git -c safe.directory=*` from `Z:\08-Jacky\laibe_pcm` and confirmed branch / SHA against GitHub main.
+- Blocker: `LOCAL_STATE_STALE`; current local shell cannot run git commands in `Z:\08-Jacky\laibe_pcm` and returns `fatal: not a git repository: (NULL)`.
+- Self-solve attempted: checked required files and retried `git -c safe.directory=* status`, `rev-parse`, and `remote -v`; all local git checks failed with the same repository error.
 - Safe work continued: docs-only initialization package completed.
+Shared truth note: AI PCM blackboard currently records GitHub draft PR `https://github.com/laibeoffer/laibe-mvp/pull/77` and PR head SHA `24271a1dcde6614d30d1b37508b3b58f8ed184c9`.
 
 ## 8. Forbidden Scope Check
 

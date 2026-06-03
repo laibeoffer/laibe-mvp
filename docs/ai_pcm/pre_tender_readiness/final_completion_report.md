@@ -81,7 +81,7 @@ Routed to AI PCM 總監／後台總控 Agent:
 
 ## 10. Final Completion Status
 
-`LOCAL_DOCS_COMPLETE_PENDING_SUPERVISOR_REVIEW`
+`READY_FOR_SUPERVISOR_REVIEW_PATROL_ACTIVE`
 
 ## 11. Next Action
 

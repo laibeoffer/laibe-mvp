@@ -10,14 +10,14 @@ Managed By:
 AI PCM 總監／後台總控 Agent
 
 Status:
-LOCAL_DOCS_COMPLETE_PENDING_SUPERVISOR_REVIEW
+READY_FOR_SUPERVISOR_REVIEW_PATROL_ACTIVE
 
 ## Source of Truth
 
 - Shared truth: GitHub main / PR / commit SHA.
 - Local workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local role: LOCAL_STATE / execution workspace only.
-- LOCAL_STATE_STALE_RECONCILED_BY_DEPUTY: earlier git uncertainty was reconciled for docs-only initialization. `Z:\08-Jacky\laibe_pcm` is branch `codex/ai-pcm-department-setup` from GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`; PR / commit SHA remains the shared truth boundary.
+- LOCAL_STATE_STALE_RECONCILED_BY_DEPUTY: earlier git uncertainty was reconciled for docs-only initialization. `Z:\08-Jacky\laibe_pcm` is branch `codex/ai-pcm-department-setup` from GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`; shared truth remains GitHub PR #77 / latest PR head SHA.
 - Shared truth remains GitHub main / PR / commit SHA.
 
 ## Evidence Files

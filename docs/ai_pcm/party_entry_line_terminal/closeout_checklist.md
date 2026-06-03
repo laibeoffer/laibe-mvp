@@ -23,6 +23,7 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 | Party question submission flow | complete |
 | Role permission draft | complete |
 | Forbidden scope policy | complete |
+| Evidence packet | complete |
 | JSON examples | complete |
 | Initialization progress report | complete |
 | Final completion report | complete |

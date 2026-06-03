@@ -36,6 +36,7 @@
 - `role_permission_draft.md`
 - `line_terminal_forbidden_scope.md`
 - `closeout_checklist.md`
+- `evidence_packet.md`
 - `final_completion_report.md`
 - `initialization_progress_report.md`
 - `examples/line_message_record.sample.json`

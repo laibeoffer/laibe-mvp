@@ -15,9 +15,10 @@ READY_FOR_SUPERVISOR_REVIEW
 ## Source of Truth
 
 - Shared truth: GitHub main / PR / commit SHA.
+- AI PCM blackboard currently records GitHub draft PR `https://github.com/laibeoffer/laibe-mvp/pull/77` and PR head SHA `24271a1dcde6614d30d1b37508b3b58f8ed184c9`.
 - Local workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local role: LOCAL_STATE / execution workspace only.
-- LOCAL_STATE_STALE flag: earlier local gitdir uncertainty was reconciled by Deputy Commander. `Z:\08-Jacky\laibe_pcm` is branch `codex/ai-pcm-department-setup` from GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`; PR / commit SHA remains the shared truth boundary.
+- LOCAL_STATE_STALE flag: current local shell still cannot run `git status` in `Z:\08-Jacky\laibe_pcm` and returns `fatal: not a git repository: (NULL)`. Treat local files as execution state only; use GitHub PR / commit SHA as shared truth.
 
 ## Evidence Files
 
@@ -49,6 +50,7 @@ READY_FOR_SUPERVISOR_REVIEW
 - Codex app heartbeat automation was created as `pcm-issue-routing-contract-decision-patrol`.
 - Initialization operating contract confirms self-introduction is task start, not task completion.
 - Supervisor progress report is present for AI PCM 總監／後台總控 Agent review.
+- 2026-06-03T04:35:30Z patrol rechecked required files, UTF-8 JSON examples, automation fields, and forbidden production boundaries.
 
 ## Scope Checks
 
@@ -69,10 +71,10 @@ Route:
 AI PCM 總監／後台總控 Agent
 
 Issue:
-Source-of-truth local verification is complete for docs-only initialization, but shared truth still requires PR / commit SHA.
+Local git verification is unavailable in the current shell, while AI PCM blackboard records PR #77 and PR head SHA. Shared truth must remain GitHub main / PR / commit SHA.
 
 Self-solve attempted:
-Deputy Commander rechecked with `git -c safe.directory=*` from `Z:\08-Jacky\laibe_pcm` and confirmed branch / SHA against GitHub main.
+Checked required files, retried `git -c safe.directory=* status`, `rev-parse`, and `remote -v` from `Z:\08-Jacky\laibe_pcm`; git returned `fatal: not a git repository: (NULL)`.
 
 Safe work continued:
 Completed docs-only workstream initialization, automation metadata, schemas, policies, examples, evidence packet, closeout checklist, and final completion report.

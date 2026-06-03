@@ -98,8 +98,9 @@ Initialization Operating Contract:
 
 Blocker Packet 已提報 AI PCM 總監／後台總控 Agent：
 
-- Source-of-truth verification update：最高指揮官已用 `git -c safe.directory=*` 在 `Z:\08-Jacky\laibe_pcm` 確認 branch `codex/ai-pcm-department-setup` 來自 GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`。PR / commit SHA 仍是共同真相邊界。
-- Requested supervisor action：不需修復 local worktree gitdir；AI PCM 總監只需在 PR / commit SHA 產生後更新 closeout 記錄。
+- Source-of-truth verification update：AI PCM 黑板目前記錄 GitHub draft PR `https://github.com/laibeoffer/laibe-mvp/pull/77` 與 PR head SHA `24271a1dcde6614d30d1b37508b3b58f8ed184c9`。
+- Local verification blocker：本次 patrol 以 `git -c safe.directory=* status`、`rev-parse`、`remote -v` 重新檢查 `Z:\08-Jacky\laibe_pcm`，仍回傳 `fatal: not a git repository: (NULL)`。
+- Requested supervisor action：請 AI PCM 總監以 GitHub PR / commit SHA 作 closeout truth；local workspace 僅視為 LOCAL_STATE。
 
 ## 10. Final Completion Status
 
@@ -109,4 +110,4 @@ READY_FOR_SUPERVISOR_REVIEW。
 
 ## 11. Next Action
 
-持續執行 `pcm-issue-routing-contract-decision-patrol`。下一個安全任務：巡檢 evidence packet、closeout checklist、schema、examples 與 forbidden scope；PR / commit SHA 產生後更新 source-of-truth closeout 記錄。
+持續執行 `pcm-issue-routing-contract-decision-patrol`。下一個安全任務：巡檢 evidence packet、closeout checklist、schema、examples 與 forbidden scope；AI PCM 總監完成 closeout acceptance 前不停止 patrol。
