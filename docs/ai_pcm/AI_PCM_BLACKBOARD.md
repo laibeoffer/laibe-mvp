@@ -47,7 +47,7 @@ Managed packets:
 | `pcm/payment-ledger-placeholder` | `ACCEPT_WITH_NOTES` | Placeholder ledger docs accepted; real payment / escrow / listing fee remain forbidden. |
 
 Next single action:
-Stop patrol loop and wait for explicit new scoped task.
+Department patrol is stopped. Restart only after explicit new scoped task.
 
 ## AI PCM Department Principles
 
@@ -160,7 +160,7 @@ No-Idle Rule:
 - GitHub source of truth: `laibeoffer/laibe-mvp` `origin/main`.
 - GitHub main SHA checked for this setup: `9d836c43e25af6eb05380b46296407476054f141`.
 - GitHub draft PR: `https://github.com/laibeoffer/laibe-mvp/pull/77`.
-- Latest known PR head SHA before the 2026-06-03T06:02:16Z supervisor closeout review: `1f24ada0bad5b0d6e8b18724d33f369393db4acd`. Read GitHub PR #77 for the latest head SHA after this closeout commit.
+- Latest known PR head SHA after the 2026-06-03T07:29:49Z immediate supervisor patrol: `71eab43e6834fc3d8fc4e9cb6cafefd3aa2edb7b`.
 - Local execution workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local branch: `codex/ai-pcm-department-setup`.
 - `Z:\08-Jacky\laibe_pcm` is LOCAL_STATE / execution workspace only; GitHub main / PR / commit SHA remains authoritative.
@@ -283,6 +283,7 @@ No-Idle Rule:
 | 2026-06-03 | AI PCM 總監／後台總控 Agent | Reviewed LINE terminal risk register, closeout checklist, final report, examples, and forbidden scope; accepted closeout for 甲乙方入口與 LINE 終端 Agent; approved agent-specific automation stop; no actual `pcm-party-entry-line-terminal-patrol` Codex app heartbeat was found to delete | `LINE_TERMINAL_CLOSEOUT_ACCEPTED_STOP_APPROVED` |
 | 2026-06-03T06:02:16Z | AI PCM 最高指揮官 / AI PCM Supervisor | Completed supervisor closeout review of the five managed packets; all packets are `ACCEPT_WITH_NOTES`, blackboard status is `CLOSEOUT_READY`, forbidden scope is clean, runtime / production code untouched, and department heartbeat stop is approved after commit / push | `SUPERVISOR_CLOSEOUT_REVIEW_COMPLETED` |
 | 2026-06-03T06:27:28Z | AI PCM 最高指揮官 / AI PCM Supervisor | Deleted Codex heartbeat automation `ai-pcm-department-15m-patrol` after closeout commit / push; department next state remains `IDLE_WAITING_NEW_SCOPED_TASK` | `DEPARTMENT_HEARTBEAT_DELETED` |
+| 2026-06-03T07:29:49Z | AI PCM 最高指揮官 / AI PCM Supervisor | Immediate blackboard patrol checked local HEAD, upstream, PR remote branch, JSON examples, automation deletion, managed packet matrix, closeout queue, and progress table; corrected latest PR head SHA and patrol action wording; all six department rows remain 100% progress | `IMMEDIATE_BLACKBOARD_PATROL_COMPLETED` |
 | 2026-06-03T12:37:04+08:00 | 招標前置輔助 Agent | Reconfirmed self-introduction is task start only; verified docs directory, `AUTOMATION.md`, main agent file, core checklist / schema / policy files, examples, evidence packet, closeout checklist, final report, and Codex heartbeat automation. JSON examples parse; patrol remains active every 15 minutes and 20-minute no-response rule advances the next safe task. | `NO_IDLE_RULE_CONFIRMED_CONTINUE_PATROL_PENDING_SUPERVISOR_CLOSEOUT` |
 | 2026-06-03T04:46:13Z | 招標前置輔助 Agent | Heartbeat patrol verified the pre-tender readiness docs packet and JSON examples, preserved formal-tender / payment / DB / AI API prohibitions, and corrected this Agent source-of-truth wording so local Git remains `LOCAL_STATE_STALE` while GitHub PR #77 / commit SHA remains authoritative. | `PATROL_ACTIVE_SOURCE_TRUTH_BOUNDARY_CORRECTED` |
 | 2026-06-03T13:17:51+08:00 | 招標前置輔助 Agent | Heartbeat patrol re-verified pre-tender readiness docs packet and JSON examples, preserved forbidden production boundaries, and recorded an agent-local source-of-truth note under the rule that GitHub PR #77 / latest PR head SHA remains shared truth. | `PATROL_ACTIVE_PR77_BOUNDARY_HELD` |
