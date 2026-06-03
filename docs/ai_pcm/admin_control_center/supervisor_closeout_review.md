@@ -34,6 +34,7 @@ commander_needed: false within AI PCM safe closeout scope
 | productionTouched | false |
 | needUser | false |
 | needCommander | false within AI PCM safe closeout scope |
+| automationDeleted | true |
 
 ## Managed Packet Disposition Matrix
 
@@ -66,7 +67,7 @@ Five managed packets are accepted or accepted with notes. No packet requires saf
 ## Automation Disposition
 
 - Agent-specific patrols: approved to stop after closeout.
-- Department heartbeat: approved to stop after this closeout record is committed and pushed.
+- Department heartbeat: deleted at `2026-06-03T06:27:28Z` after closeout commit and push.
 - Restart condition: only an explicit new scoped AI PCM task should restart patrol.
 
 ## Guard Check

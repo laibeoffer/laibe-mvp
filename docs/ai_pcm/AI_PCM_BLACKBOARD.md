@@ -32,6 +32,10 @@ nextState: `IDLE_WAITING_NEW_SCOPED_TASK`
 
 automationStopApproved: true
 
+automationDeleted: true
+
+automationDeletedAt: `2026-06-03T06:27:28Z`
+
 Managed packets:
 
 | Packet | Decision | Final State |
@@ -78,7 +82,7 @@ Stop patrol loop and wait for explicit new scoped task.
 
 | Agent | Workstream | Managed By | Status | Automation | Progress % | Blocker | Next |
 |---|---|---|---|---|---:|---|---|
-| AI PCM 總監／後台總控 Agent | `pcm/admin-control-center` | 最高指揮官 / Deputy Commander | `CLOSEOUT_READY` | `ai-pcm-department-15m-patrol` / stop approved | 100 | None for safe closeout scope | Stop patrol loop after closeout commit / push; restart only for explicit new scoped task |
+| AI PCM 總監／後台總控 Agent | `pcm/admin-control-center` | 最高指揮官 / Deputy Commander | `CLOSEOUT_READY` | `ai-pcm-department-15m-patrol` / deleted after closeout | 100 | None for safe closeout scope | Restart only for explicit new scoped task |
 | 合約資料與證據管理 Agent | `pcm/contract-evidence-admin` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-contract-evidence-admin-patrol` / stop approved | 100 | None for docs-only governance | No further safe work required unless reopened |
 | 問題分流與合約裁決建議 Agent | `pcm/issue-routing-contract-decision` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-issue-routing-contract-decision-patrol` / stop approved | 100 | None for docs-only governance | No further safe work required unless reopened |
 | 甲乙方入口與 LINE 終端 Agent | `pcm/party-entry-line-terminal` | AI PCM 總監／後台總控 Agent | `CLOSEOUT_ACCEPTED_WITH_NOTES` | `pcm-party-entry-line-terminal-patrol` / stop approved | 100 | Production LINE/API/runtime remains future explicit scope | No further safe work required unless reopened |
@@ -126,7 +130,7 @@ No-Idle Rule:
 
 | Agent | Task | Status | Next |
 |---|---|---|---|
-| AI PCM 總監／後台總控 Agent | Department closeout review | `CLOSEOUT_READY` | Stop patrol loop after PR commit / push; restart only for explicit new scoped task |
+| AI PCM 總監／後台總控 Agent | Department closeout review | `CLOSEOUT_READY` | Patrol loop stopped; restart only for explicit new scoped task |
 | 合約資料與證據管理 Agent | Contract/evidence source map and verified evidence policy | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
 | 問題分流與合約裁決建議 Agent | Issue taxonomy, RFI / dispute schema, response template, decision-suggestion boundary | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
 | 甲乙方入口與 LINE 終端 Agent | Party entry and LINE terminal contract / schemas | `CLOSEOUT_ACCEPTED_WITH_NOTES` | No further safe work required unless reopened |
@@ -144,7 +148,7 @@ No-Idle Rule:
 
 | Agent | Evidence | Closeout Status | Automation |
 |---|---|---|---|
-| AI PCM 總監／後台總控 Agent | `docs/ai_pcm/admin_control_center/AUTOMATION.md`, `PCM_ADMIN_CONTROL_CENTER_AGENT.md`, `pcm_case_status_model.md`, `pcm_task_queue.md`, `pcm_review_queue.md`, `examples/`, `MANAGED_AGENT_DISPATCH_ORDER.md`, `AGENT_FOLLOWUP_NOTICES.md`, `final_completion_report.md`, `supervisor_closeout_review.md` | `CLOSEOUT_READY` | Department heartbeat stop approved |
+| AI PCM 總監／後台總控 Agent | `docs/ai_pcm/admin_control_center/AUTOMATION.md`, `PCM_ADMIN_CONTROL_CENTER_AGENT.md`, `pcm_case_status_model.md`, `pcm_task_queue.md`, `pcm_review_queue.md`, `examples/`, `MANAGED_AGENT_DISPATCH_ORDER.md`, `AGENT_FOLLOWUP_NOTICES.md`, `final_completion_report.md`, `supervisor_closeout_review.md` | `CLOSEOUT_READY` | Department heartbeat deleted after closeout |
 | 合約資料與證據管理 Agent | `docs/ai_pcm/contract_evidence_admin/evidence_packet.md`, `evidence_validation_checklist.md`, `patrol_log.md`, `permission_blocker_packet.md`, `source_of_truth_policy.md`, `evidence_status_transition_log.md`, `closeout_checklist.md`, `final_completion_report.md` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
 | 問題分流與合約裁決建議 Agent | `docs/ai_pcm/issue_routing_contract_decision/evidence_packet.md`, `closeout_checklist.md`, `supervisor_progress_report.md`, `final_completion_report.md`, valid JSON examples | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
 | 甲乙方入口與 LINE 終端 Agent | `docs/ai_pcm/party_entry_line_terminal/evidence_packet.md`, `line_terminal_validation_checklist.md`, `line_terminal_permission_packet_template.md`, `line_terminal_risk_register.md`, `patrol_log.md`, `supervisor_handoff.md`, `initialization_progress_report.md`, `closeout_checklist.md`, `final_completion_report.md` | `CLOSEOUT_ACCEPTED_WITH_NOTES` | Agent-specific automation stop approved |
@@ -187,7 +191,7 @@ No-Idle Rule:
 
 ## Automation And No-Idle Rules
 
-- Automation id: `ai-pcm-department-15m-patrol` / stop approved after closeout commit and push.
+- Automation id: `ai-pcm-department-15m-patrol` / deleted after closeout commit and push at `2026-06-03T06:27:28Z`.
 - Supervisor automation name: `pcm-admin-control-center-patrol`.
 - Pre-tender agent heartbeat automation id: `pcm-pre-tender-readiness-patrol`.
 - Cadence: every 15 minutes.
@@ -278,6 +282,7 @@ No-Idle Rule:
 | 2026-06-03T06:05:50Z | 甲乙方入口與 LINE 終端 Agent | Heartbeat patrol found missing risk register and completed safe docs-only `line_terminal_risk_register.md`; updated evidence packet, validation checklist, closeout checklist, final report, and patrol log; JSON examples still parse and forbidden flags remain clean | `SAFE_WORK_CONTINUED_RISK_REGISTER_CREATED` |
 | 2026-06-03 | AI PCM 總監／後台總控 Agent | Reviewed LINE terminal risk register, closeout checklist, final report, examples, and forbidden scope; accepted closeout for 甲乙方入口與 LINE 終端 Agent; approved agent-specific automation stop; no actual `pcm-party-entry-line-terminal-patrol` Codex app heartbeat was found to delete | `LINE_TERMINAL_CLOSEOUT_ACCEPTED_STOP_APPROVED` |
 | 2026-06-03T06:02:16Z | AI PCM 最高指揮官 / AI PCM Supervisor | Completed supervisor closeout review of the five managed packets; all packets are `ACCEPT_WITH_NOTES`, blackboard status is `CLOSEOUT_READY`, forbidden scope is clean, runtime / production code untouched, and department heartbeat stop is approved after commit / push | `SUPERVISOR_CLOSEOUT_REVIEW_COMPLETED` |
+| 2026-06-03T06:27:28Z | AI PCM 最高指揮官 / AI PCM Supervisor | Deleted Codex heartbeat automation `ai-pcm-department-15m-patrol` after closeout commit / push; department next state remains `IDLE_WAITING_NEW_SCOPED_TASK` | `DEPARTMENT_HEARTBEAT_DELETED` |
 | 2026-06-03T12:37:04+08:00 | 招標前置輔助 Agent | Reconfirmed self-introduction is task start only; verified docs directory, `AUTOMATION.md`, main agent file, core checklist / schema / policy files, examples, evidence packet, closeout checklist, final report, and Codex heartbeat automation. JSON examples parse; patrol remains active every 15 minutes and 20-minute no-response rule advances the next safe task. | `NO_IDLE_RULE_CONFIRMED_CONTINUE_PATROL_PENDING_SUPERVISOR_CLOSEOUT` |
 | 2026-06-03T04:46:13Z | 招標前置輔助 Agent | Heartbeat patrol verified the pre-tender readiness docs packet and JSON examples, preserved formal-tender / payment / DB / AI API prohibitions, and corrected this Agent source-of-truth wording so local Git remains `LOCAL_STATE_STALE` while GitHub PR #77 / commit SHA remains authoritative. | `PATROL_ACTIVE_SOURCE_TRUTH_BOUNDARY_CORRECTED` |
 | 2026-06-03T13:17:51+08:00 | 招標前置輔助 Agent | Heartbeat patrol re-verified pre-tender readiness docs packet and JSON examples, preserved forbidden production boundaries, and recorded an agent-local source-of-truth note under the rule that GitHub PR #77 / latest PR head SHA remains shared truth. | `PATROL_ACTIVE_PR77_BOUNDARY_HELD` |

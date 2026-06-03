@@ -76,4 +76,8 @@ next_state: `IDLE_WAITING_NEW_SCOPED_TASK`
 
 automation_stop_approved: true
 
+automation_deleted: true
+
+automation_deleted_at: `2026-06-03T06:27:28Z`
+
 Restart only after an explicit new scoped AI PCM task.

@@ -44,7 +44,7 @@
 - Principle follow-up: AI PCM principles now include `不讓 LINE 訊息覆蓋合約` and `不讓 AI 推測凌駕合約與紀錄`.
 - Forbidden scope preserved: no production LINE API, no production AI API, no DB / Supabase, no payment / escrow / listing fee, no formal legal decision, no formal tender launch, no runtime code, no formal quote / formal price.
 - Task dispatch record: allowed construction = Markdown only; no routing / CTA / header; no data model; sensitive areas avoided; can be included in later user-triggered review if desired.
-- Current state: AI PCM Supervisor closeout is `CLOSEOUT_READY`; all five managed packets are `ACCEPT_WITH_NOTES`; patrol stop is approved after the closeout commit is pushed. Restart only after an explicit new scoped AI PCM task. Source-of-truth verification for this branch has been reconciled by Deputy Commander; PR #77 is the current shared-truth handoff target.
+- Current state: AI PCM Supervisor closeout is `CLOSEOUT_READY`; all five managed packets are `ACCEPT_WITH_NOTES`; Codex heartbeat `ai-pcm-department-15m-patrol` was deleted after the closeout commit was pushed. Restart only after an explicit new scoped AI PCM task. Source-of-truth verification for this branch has been reconciled by Deputy Commander; PR #77 is the current shared-truth handoff target.
 - Note: A lower AI PCM setup section may contain mojibake from previous local draft text; use this canonical summary and `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the current handoff authority.
 
 ## Latest AI PCM Department Setup: Initial Governance Blackboard
