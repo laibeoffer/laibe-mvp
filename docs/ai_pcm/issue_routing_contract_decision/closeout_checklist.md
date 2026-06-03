@@ -57,5 +57,5 @@ Not allowed until AI PCM 總監／後台總控 Agent records automation stop app
 - Files checked: PASS
 - JSON examples checked: PASS
 - Automation fields checked: PASS
-- Local git verification: LOCAL_STATE_STALE, `fatal: not a git repository: (NULL)`
+- Local git verification: earlier agent-local warning reconciled by Deputy Commander; use GitHub PR #77 / latest PR head SHA as shared truth.
 - Safe work continued: evidence packet, final completion report, supervisor progress report, and AI PCM blackboard updated.
