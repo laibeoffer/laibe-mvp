@@ -247,3 +247,23 @@ Commit and open scoped PR.
 - 驗證：`node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` PASS。
 - Browser evidence：`http://127.0.0.1:50362/code.html?validation=compact-workspace-polish-0-15-1` 可載入；body 不長捲；topbar 72px；rail 56px；canvas shell 1173px；layer switch / visible layer / focus mode / empty CTA 通過。
 - 注意：目前 in-app browser API 無法掛 console listener；未觀察到頁面 runtime break 或 error overlay。
+
+## 2026-06-02 接手補充：0.16.1 Canvas Tool Wiring
+
+- 目前版本：`0.16.1-canvas-tool-wiring`。
+- 目前 script：`./plan-puzzle.js?v=canvas-tool-wiring-0-16-1`。
+- 目前施工分支：`codex/plan-puzzle-canvas-tool-wiring-0-16-1`。
+- 本輪修復重點是可操作性，不是視覺美化。
+- 匯入功能：topbar、空畫布 CTA、匯入 palette 全部接同一個 hidden file input；JPG / PNG 可成為 underlay；PDF 可選取但明確提示尚未支援直接預覽。
+- 畫牆功能：牆工具會設定 `currentTool = "wall"` 並進入 `draw-wall`；未匯入時可啟用未校正 mm 草稿；點兩點建立 wall segment。
+- Wall data：新牆寫入 `project.walls`；`wallLayer` 顯示牆段；wall 可選取；右側屬性顯示狀態、圖層、長度、厚度、納入預算候選與需確認。
+- Delete：新設且非結構牆可刪；既有 / 承重 / 梁 / 柱不直接刪除，改顯示提示。
+- Button action matrix：按鈕已收斂為 selectsTool、opensPalette、togglesState、triggersFileInput、disabledWithReason、opensPanel 或 runsExistingExport；復原 / 重做仍 disabled。
+- 右側狀態區：仍為 5 tab（屬性、圖層、提醒、材料、總覽）；tab bar sticky；提醒 compact；開發者診斷收合。
+- 主 UI：可見 homeowner workspace 不顯示 `px` / `pixel`；技術詞只留在開發者診斷。
+- JSON / `.pc`：移到總覽 tab 的「進階匯出」accordion；不是主操作，也不是 budget input。
+- 驗證：`node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` PASS；browser console error count 0；image smoke / PDF smoke / wall smoke / Delete smoke 通過。
+- 未修改 `plancraft/`、Plancraft core、budget runtime、formalEstimateGuard、package.json、node_modules 或任何新 framework。
+- 未接 AI API、image API、DB、payment、escrow、listing fee；未產生正式估價；未把 `.pc` / SVG / renderer preview 當 budget input。
+- 仍 disabled / placeholder：undo / redo history stack、完整 CAD pan / zoom、dimension geometry、PDF preview / OCR / storage、production budget adapter、formal renderer integration。
+- 下一步唯一建議：scope clean 時建立 scoped commit + Draft PR；後續另開 `0.16.2` 深化 pan / zoom / undo-redo 或 opening placement。

@@ -3294,7 +3294,23 @@
       }
     }
 
-    /* 0.16 one-screen drawing workbench: visible tools, compact inspector tabs, canvas-first layout. */
+    /* 0.16.1 canvas tool wiring: shared file input, draft wall drawing, compact actionable controls. */
+    .helper-layer {
+      pointer-events: none;
+    }
+
+    .canvas-helper-card,
+    .canvas-helper-actions,
+    .canvas-helper-actions .toolbar-btn {
+      pointer-events: auto;
+    }
+
+    .status-tabs-shell.intuitive-inspector .status-tab-list {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
     html,
     body {
       height: 100%;
@@ -3693,7 +3709,7 @@
         <div class="file-panel">
           <span class="file-panel-label">草稿版本</span>
           <div class="compact-status-list">
-            <div><span>版本</span><b id="draftVersionText">0.16.0 單螢幕繪圖工作台</b></div>
+            <div><span>版本</span><b id="draftVersionText">0.16.1 畫布工具接線</b></div>
             <div><span>狀態</span><b id="draftSaveStatusText">未儲存</b></div>
             <div><span>最後儲存</span><b id="lastSavedText">尚未儲存</b></div>
           </div>
@@ -3703,10 +3719,15 @@
           <div class="file-action-row">
             <button class="toolbar-btn" type="button" data-action="print-current-layer">列印目前圖層</button>
             <button class="toolbar-btn" type="button" data-action="print-total-preview">列印總預覽</button>
-            <button class="toolbar-btn" type="button" data-action="export-draft">草稿 JSON</button>
-            <button class="toolbar-btn" type="button" data-action="export-pc-spike">.pc 測試版</button>
             <button class="toolbar-btn" type="button" data-action="export-bid-summary-placeholder">招標摘要 placeholder</button>
           </div>
+          <details class="status-accordion">
+            <summary>進階匯出</summary>
+            <div class="file-action-row">
+              <button class="toolbar-btn" type="button" data-action="export-draft">草稿 JSON</button>
+              <button class="toolbar-btn" type="button" data-action="export-pc-spike">.pc 測試版</button>
+            </div>
+          </details>
         </div>
         <div class="file-panel">
           <span class="file-panel-label">已選材質標籤</span>
@@ -4094,6 +4115,6 @@
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=one-screen-drawing-workbench-0-16" defer></script>
+  <script src="./plan-puzzle.js?v=canvas-tool-wiring-0-16-1" defer></script>
 </body>
 </html>
