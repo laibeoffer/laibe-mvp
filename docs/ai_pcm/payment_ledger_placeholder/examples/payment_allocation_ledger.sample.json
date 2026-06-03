@@ -1,0 +1,40 @@
+{
+  "ledger_id": "pal-2026-0001",
+  "project_id": "project-placeholder-001",
+  "source_of_truth_ref": "github-main-or-pr-sha-placeholder",
+  "currency": "TWD",
+  "total_placeholder_amount": 300000,
+  "allocations": [
+    {
+      "allocation_id": "alloc-001",
+      "party_ref": "contractor-placeholder-001",
+      "role": "contractor",
+      "placeholder_amount": 240000,
+      "allocation_basis": "milestone",
+      "release_condition_refs": [
+        "rc-2026-0001"
+      ],
+      "disputed_amount_ref": null,
+      "notes": "Placeholder allocation only; no real payment instruction."
+    },
+    {
+      "allocation_id": "alloc-002",
+      "party_ref": "retention-placeholder-pool",
+      "role": "owner",
+      "placeholder_amount": 60000,
+      "allocation_basis": "retention",
+      "release_condition_refs": [
+        "rc-2026-0002"
+      ],
+      "disputed_amount_ref": null,
+      "notes": "Retention placeholder for manual review."
+    }
+  ],
+  "payment_status": "pending_acceptance",
+  "review_status": "pending_manual_review",
+  "manual_approval_required": true,
+  "forbidden_real_payment": true,
+  "created_by_agent": "付款節點與金流分撥預留 Agent",
+  "updated_at": "2026-06-03T00:00:00+08:00"
+}
+

@@ -1,5 +1,112 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest AI PCM Department Setup: Canonical Summary
+
+- Task name: AI PCM Department Setup / Initial Governance Blackboard.
+- Task type: Architect / Governance Task + Documentation Task; docs-only; no production runtime.
+- Local execution workspace: `Z:\08-Jacky\laibe_pcm`.
+- GitHub source of truth: `laibeoffer/laibe-mvp` `origin/main` at `9d836c43e25af6eb05380b46296407476054f141`.
+- Branch: `codex/ai-pcm-department-setup`.
+- LOCAL_STATE_STALE: `C:\laibe_project` was on `local-ai-workflow` with a dirty worktree, so this round used a clean worktree from GitHub main. Pre-existing AI PCM local draft state was treated as LOCAL_STATE, not shared truth.
+- Added scope:
+  - `docs/ai_pcm/AI_PCM_BLACKBOARD.md`
+  - `docs/ai_pcm/admin_control_center/AUTOMATION.md`
+  - `docs/ai_pcm/contract_evidence_admin/`
+  - `docs/ai_pcm/issue_routing_contract_decision/`
+  - `docs/ai_pcm/party_entry_line_terminal/`
+  - `docs/ai_pcm/pre_tender_readiness/`
+  - `docs/ai_pcm/payment_ledger_placeholder/`
+- Modified files:
+  - `docs/WORKSTREAM_BLACKBOARD.md` only added one line: `AI PCM Department: see docs/ai_pcm/AI_PCM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- AI PCM agents assigned:
+  - AI PCM Supervisor / Admin Control Center Agent: `pcm/admin-control-center`
+  - Contract Evidence Admin Agent: `pcm/contract-evidence-admin`
+  - Issue Routing Contract Decision Agent: `pcm/issue-routing-contract-decision`
+  - Party Entry LINE Terminal Agent: `pcm/party-entry-line-terminal`
+  - Pre-tender Readiness Agent: `pcm/pre-tender-readiness`
+  - Payment Ledger Placeholder Agent: `pcm/payment-ledger-placeholder`
+- Runtime launch note: 4 sub-agents spawned successfully and submitted read-only reports, then were closed to free capacity. 2 runtime launches were blocked by the current sub-agent thread limit and are marked `ASSIGNED_NOT_SPAWNED` in the AI PCM blackboard. Docs-only assignment exists for all 6 agents.
+- Automation: Codex app heartbeat `ai-pcm-department-15m-patrol` created, every 15 minutes, to inspect the AI PCM blackboard, enforce no-idle, and route permission / decision packets through the AI PCM Supervisor.
+- Forbidden scope preserved: no production LINE API, no production AI API, no DB / Supabase, no payment / escrow / listing fee, no formal legal decision, no formal tender launch, no runtime code, no formal quote / formal price.
+- Task dispatch record: allowed construction = Markdown only; no routing / CTA / header; no data model; sensitive areas avoided; can be included in later user-triggered review if desired.
+- Next step: AI PCM Supervisor should use `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the only department status surface and continue evidence packet / permission queue / closeout tracking there. Source-of-truth verification for this branch has been reconciled by Deputy Commander; PR / commit SHA remains the shared truth boundary.
+- Note: A lower AI PCM setup section may contain mojibake from previous local draft text; use this canonical summary and `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the current handoff authority.
+
+## Latest AI PCM Department Setup: Initial Governance Blackboard
+
+- 本輪任務名稱：AI PCM Department Setup / Initial Governance Blackboard。
+- 任務類型：Architect / Governance Task + Documentation Task；docs-only，不修改 production runtime。
+- Local execution workspace：`Z:\08-Jacky\laibe_pcm`。
+- GitHub source of truth：`laibeoffer/laibe-mvp` `origin/main` at `9d836c43e25af6eb05380b46296407476054f141`。
+- Branch：`codex/ai-pcm-department-setup`。
+- LOCAL_STATE_STALE：`C:\laibe_project` 當時位於 `local-ai-workflow` 且有大量 dirty / deleted / untracked state；本輪改用 clean worktree from GitHub main。既有 AI PCM local draft 視為 LOCAL_STATE，不作共同真相。
+- 新增檔案：
+  - `docs/ai_pcm/AI_PCM_BLACKBOARD.md`
+  - `docs/ai_pcm/admin_control_center/AUTOMATION.md`
+  - `docs/ai_pcm/contract_evidence_admin/AUTOMATION.md`
+  - `docs/ai_pcm/issue_routing_contract_decision/AUTOMATION.md`
+  - `docs/ai_pcm/party_entry_line_terminal/AUTOMATION.md`
+  - `docs/ai_pcm/pre_tender_readiness/AUTOMATION.md`
+  - `docs/ai_pcm/payment_ledger_placeholder/AUTOMATION.md`
+- 修改檔案：
+  - `docs/WORKSTREAM_BLACKBOARD.md` only added one line: `AI PCM Department: see docs/ai_pcm/AI_PCM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- AI PCM agents assigned:
+  - AI PCM 總監／後台總控 Agent: `pcm/admin-control-center`
+  - 合約資料與證據管理 Agent: `pcm/contract-evidence-admin`
+  - 問題分流與合約裁決建議 Agent: `pcm/issue-routing-contract-decision`
+  - 甲乙方入口與 LINE 終端 Agent: `pcm/party-entry-line-terminal`
+  - 招標前置輔助 Agent: `pcm/pre-tender-readiness`
+  - 付款節點與金流分撥預留 Agent: `pcm/payment-ledger-placeholder`
+- Runtime launch note：4 sub-agents spawned successfully; 2 runtime launches were blocked by current sub-agent thread limit and are marked `ASSIGNED_RUNTIME_PENDING` in the AI PCM blackboard. Docs-only assignment still exists for all 6 agents.
+- Automation：Codex app heartbeat `ai-pcm-department-15m-patrol` created, every 15 minutes, to inspect AI PCM blackboard, enforce no-idle, and route permission / decision packets through the AI PCM Supervisor.
+- Forbidden scope preserved：no production LINE API, no production AI API, no DB / Supabase, no payment / escrow / listing fee, no formal legal decision, no formal tender launch, no runtime code, no formal quote / formal price.
+- Task dispatch record：allowed construction = Markdown only; no routing / CTA / header; no data model; sensitive areas avoided; can be included in later user-triggered review if desired.
+- Next step：AI PCM Supervisor should use `docs/ai_pcm/AI_PCM_BLACKBOARD.md` as the only department status surface and continue evidence packet / permission queue / closeout tracking there.
+
+## Latest AI PCM Task: Contract Evidence Admin Initialization
+
+- Task name: Contract Evidence Admin initialization.
+- Task type: Documentation / Governance.
+- Assigned role: 合約資料與證據管理 Agent.
+- Workstream: `pcm/contract-evidence-admin`.
+- Allowed scope: `docs/ai_pcm/AI_PCM_BLACKBOARD.md`, `docs/ai_pcm/contract_evidence_admin/`, and `docs/NEXT_CODEX_HANDOFF.md`.
+- Added files:
+  - `docs/ai_pcm/contract_evidence_admin/CONTRACT_EVIDENCE_ADMIN_AGENT.md`
+  - `docs/ai_pcm/contract_evidence_admin/AUTOMATION.md`
+  - `docs/ai_pcm/contract_evidence_admin/contract_evidence_index.md`
+  - `docs/ai_pcm/contract_evidence_admin/evidence_status_policy.md`
+  - `docs/ai_pcm/contract_evidence_admin/contract_attachment_registry.md`
+  - `docs/ai_pcm/contract_evidence_admin/verified_evidence_matrix.md`
+  - `docs/ai_pcm/contract_evidence_admin/disputed_evidence_register.md`
+  - `docs/ai_pcm/contract_evidence_admin/superseded_voided_evidence_log.md`
+  - `docs/ai_pcm/contract_evidence_admin/evidence_priority_order.md`
+  - `docs/ai_pcm/contract_evidence_admin/final_completion_report.md`
+  - `docs/ai_pcm/contract_evidence_admin/examples/contract_evidence_record.sample.json`
+  - `docs/ai_pcm/contract_evidence_admin/examples/evidence_status.sample.json`
+  - `docs/ai_pcm/contract_evidence_admin/examples/contract_attachment.sample.json`
+- Modified files:
+  - `docs/ai_pcm/AI_PCM_BLACKBOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Automation:
+  - Codex app heartbeat created: `pcm-contract-evidence-admin-patrol`, every 15 minutes.
+- Evidence status policy:
+  - Allowed statuses are `placeholder`, `linked`, `verified`, `disputed`, `superseded`, `voided`, and `unavailable`.
+  - `placeholder` cannot be used for formal adjudication.
+  - `linked` is trace-only.
+  - Only `verified` may be formal basis.
+  - `disputed` requires human review.
+  - `superseded` is historical only and not current basis.
+  - `voided` must not be used.
+  - `unavailable` must not enter adjudication.
+- Forbidden scope confirmed:
+  - No DB, AI API, LINE API, payment, escrow, listing fee, production webhook, contract edits, legal decision, payment creation, or LINE-message standalone contract upgrade.
+- Source-of-truth status:
+  - Earlier local gitdir uncertainty was reconciled by Deputy Commander with `git -c safe.directory=*` from `Z:\08-Jacky\laibe_pcm`; branch `codex/ai-pcm-department-setup` is based on GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`. Shared truth still requires PR / commit SHA.
+- Review readiness:
+  - This is docs-only and can be reviewed later if the user explicitly asks. It does not verify any project contract fact.
+
 ## Latest Commander Governance Announcement: Multi-computer Workspace Registry
 
 - 本輪任務名稱：建立多電腦工作區規則。

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0-draft",
+  "question_id": "contractor_q_20260603_0001",
+  "case_id": "case_pcm_demo_001",
+  "contract_id": "contract_pcm_demo_001",
+  "party_role": "contractor",
+  "submitter_display_name": "Contractor Demo Contact",
+  "identity_verification_status": "not_verified_by_line_terminal",
+  "question_type": "rfi",
+  "subject": "Request confirmation before proceeding",
+  "body": "Contractor asks whether to proceed with a field adjustment. This is an RFI and does not create a change order.",
+  "requested_action": "owner_or_platform_confirmation",
+  "attachments": [
+    {
+      "attachment_id": "att_demo_002",
+      "type": "image",
+      "filename": "field_condition_pending_review.jpg",
+      "verification_status": "not_verified",
+      "storage_status": "metadata_only"
+    }
+  ],
+  "formal_record_effect": "none",
+  "routing_target": "pcm_issue_routing_contract_decision",
+  "risk_flags": [
+    "identity_not_verified",
+    "attachment_not_verified",
+    "change_order_attempt"
+  ],
+  "submitted_at": "2026-06-03T12:40:00+08:00"
+}

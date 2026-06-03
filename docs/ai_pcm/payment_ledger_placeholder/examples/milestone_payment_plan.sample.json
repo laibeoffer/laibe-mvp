@@ -1,0 +1,41 @@
+{
+  "plan_id": "mpp-2026-0001",
+  "project_id": "project-placeholder-001",
+  "contract_ref": "contract-placeholder-001",
+  "currency": "TWD",
+  "milestones": [
+    {
+      "milestone_id": "ms-001",
+      "title": "Initial acceptance checkpoint",
+      "placeholder_amount": 150000,
+      "acceptance_condition_refs": [
+        "rc-2026-0001"
+      ],
+      "retention_placeholder_ref": "ret-2026-0001",
+      "escrow_placeholder_ref": "escrow-ph-2026-0001",
+      "payment_status": "pending_acceptance",
+      "review_status": "pending_manual_review",
+      "target_review_date": "2026-06-10",
+      "notes": "Ready only for evidence review; no payment execution."
+    },
+    {
+      "milestone_id": "ms-002",
+      "title": "Final acceptance checkpoint",
+      "placeholder_amount": 150000,
+      "acceptance_condition_refs": [
+        "rc-2026-0002"
+      ],
+      "retention_placeholder_ref": null,
+      "escrow_placeholder_ref": null,
+      "payment_status": "not_started",
+      "review_status": "draft",
+      "target_review_date": null,
+      "notes": "Future placeholder milestone."
+    }
+  ],
+  "aggregate_payment_status": "pending_acceptance",
+  "source_of_truth_ref": "github-main-or-pr-sha-placeholder",
+  "manual_approval_required": true,
+  "forbidden_real_payment": true
+}
+

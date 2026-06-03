@@ -1,0 +1,15 @@
+{
+  "condition_id": "rc-2026-0001",
+  "project_id": "project-placeholder-001",
+  "condition_type": "acceptance",
+  "description": "Owner-side acceptance evidence is reviewed for the milestone placeholder.",
+  "evidence_refs": [
+    "acceptance-note-placeholder-001",
+    "inspection-photo-placeholder-001"
+  ],
+  "condition_status": "pending_evidence",
+  "checked_by_agent": "付款節點與金流分撥預留 Agent",
+  "checked_at": "2026-06-03T00:00:00+08:00",
+  "manual_approval_required": true,
+  "forbidden_auto_release": true
+}

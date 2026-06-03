@@ -1,0 +1,70 @@
+{
+  "ticket_id": "PCM-DISPUTE-20260603-001",
+  "ticket_type": "dispute",
+  "status": "under_human_review",
+  "created_at": "2026-06-03T12:00:00+08:00",
+  "created_by": "issue-routing-contract-decision-agent",
+  "project_id": "PROJECT_ID_PLACEHOLDER",
+  "parties": {
+    "requesting_party": "乙方",
+    "responding_party": "甲方"
+  },
+  "issue_summary": "乙方主張新增隔間補強不在原合約範圍內，可能需追加款；甲方認為該項已包含於原報價。",
+  "primary_category": "工項是否包含",
+  "secondary_categories": ["追加款爭議", "合約條款解釋"],
+  "contract_basis": [
+    {
+      "source_type": "contract_clause",
+      "reference": "合約第 X 條",
+      "version": "CONTRACT_VERSION_PLACEHOLDER",
+      "verification_status": "placeholder",
+      "note": "需補充正式合約條文與附件。"
+    },
+    {
+      "source_type": "quotation",
+      "reference": "報價單工項明細",
+      "version": "QUOTE_VERSION_PLACEHOLDER",
+      "verification_status": "placeholder",
+      "note": "需確認是否為雙方簽認版本。"
+    }
+  ],
+  "verified_facts": [
+    {
+      "fact": "爭議內容涉及新增隔間補強是否屬原合約範圍。",
+      "source": "dispute 提問內容",
+      "verified_at": "2026-06-03T12:00:00+08:00"
+    }
+  ],
+  "missing_information": [
+    "正式合約本文與附件",
+    "雙方簽認報價單",
+    "原設計圖與新增隔間圖面版次",
+    "變更指示或會議紀錄",
+    "乙方追加報價與甲方回覆紀錄"
+  ],
+  "risk_flags": {
+    "payment_involved": true,
+    "change_involved": true,
+    "acceptance_involved": false,
+    "legal_or_breach_claim": false,
+    "evidence_conflict": true
+  },
+  "preliminary_assessment": "目前資料不足以直接判斷新增隔間補強是否包含於原合約。此項可能涉及變更單與追加款，建議升級人工審核。",
+  "recommended_next_steps": [
+    "補充正式合約、附件與雙方簽認報價單。",
+    "比對原圖、變更圖與會議紀錄，確認新增隔間補強是否屬原範圍。",
+    "若確認超出原範圍，建議依合約變更程序審查，不直接要求付款。"
+  ],
+  "human_review": {
+    "required": true,
+    "reason": "涉及追加款、變更與合約條款解釋，且目前合約依據仍為 placeholder。",
+    "review_owner": "AI PCM 總監／後台總控 Agent"
+  },
+  "forbidden_scope_check": {
+    "no_legal_verdict": true,
+    "no_auto_breach_decision": true,
+    "no_auto_payment_request": true,
+    "no_auto_construction_order": true,
+    "no_placeholder_as_verified": true
+  }
+}

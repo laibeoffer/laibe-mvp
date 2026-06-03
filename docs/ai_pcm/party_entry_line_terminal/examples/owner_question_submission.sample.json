@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0.0-draft",
+  "question_id": "owner_q_20260603_0001",
+  "case_id": "case_pcm_demo_001",
+  "contract_id": "contract_pcm_demo_001",
+  "party_role": "owner",
+  "submitter_display_name": "Owner Demo Contact",
+  "identity_verification_status": "not_verified_by_line_terminal",
+  "question_type": "contract_interpretation",
+  "subject": "Clarify whether this item is included in the contract",
+  "body": "Please review whether the requested site cleanup is already included in the existing contract scope.",
+  "requested_action": "platform_review",
+  "attachments": [],
+  "formal_record_effect": "none",
+  "routing_target": "pcm_issue_routing_contract_decision",
+  "risk_flags": [
+    "identity_not_verified"
+  ],
+  "submitted_at": "2026-06-03T12:35:00+08:00"
+}

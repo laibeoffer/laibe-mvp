@@ -1,0 +1,34 @@
+{
+  "schema": "laibe.ai_pcm.contract_attachment.sample",
+  "schema_version": "0.1.0",
+  "attachment_id": "ATTACHMENT-SAMPLE-001",
+  "contract_id": "CONTRACT-SAMPLE",
+  "title": "Sample attachment",
+  "attachment_type": "budget_sheet",
+  "status": "placeholder",
+  "version_label": null,
+  "source_uri": null,
+  "source_of_truth": {
+    "github_commit_sha": null,
+    "github_pr": null,
+    "local_workspace": "Z:\\08-Jacky\\laibe_pcm",
+    "source_truth_status": "sample_only"
+  },
+  "contract_clause_reference": null,
+  "effective_date": null,
+  "verification": {
+    "verified_by": null,
+    "verified_at": null,
+    "formal_use_allowed": false
+  },
+  "supersession": {
+    "supersedes": [],
+    "superseded_by": null,
+    "void_reason": null
+  },
+  "notes": [
+    "This is a sample placeholder attachment.",
+    "It cannot be used as formal basis."
+  ]
+}
+
