@@ -87,7 +87,7 @@ Permission requests to AI PCM 總監／後台總控 Agent:
 
 ## 7. Blockers
 
-- blocker: runtime launch remains pending due sub-agent capacity; earlier `LOCAL_STATE_STALE` git uncertainty has been reconciled by Deputy Commander for docs-only initialization.
+- blocker: runtime launch remains pending due sub-agent capacity; earlier agent-local git uncertainty has been reconciled by Deputy Commander for docs-only initialization.
 - self-solve attempted: checked local workspace path, validated JSON examples, inspected `.git`, and kept GitHub main / PR / commit SHA as shared truth.
 - safe work continued: completed docs-only readiness packet without touching formal tender, payment, DB, AI API, production bidding, or legal contract text.
 

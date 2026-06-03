@@ -8,6 +8,7 @@
 - status: `READY_FOR_SUPERVISOR_REVIEW`
 - automation: `pcm-party-entry-line-terminal-patrol / every 15 minutes`
 - source_of_truth: GitHub main / PR / commit SHA
+- current_shared_truth_boundary: GitHub draft PR #77 / latest PR head SHA
 - local_workspace: `Z:\08-Jacky\laibe_pcm`
 - local_state_only: true
 
@@ -58,7 +59,7 @@
 |---|---|---|---|
 | Production/external scheduler beyond Codex heartbeat | Could imply production runtime. | medium | AI PCM 總監／後台總控 Agent |
 | Final role names and authorization boundaries | Current role model is draft-only and does not perform formal identity verification. | medium | AI PCM 總監／後台總控 Agent |
-| GitHub PR / commit SHA reconciliation | Local workspace is execution state only. | medium | AI PCM 總監／後台總控 Agent |
+| GitHub PR update for any follow-up local docs changes | Local workspace is execution state only; shared truth must be PR / commit SHA. | medium | AI PCM 總監／後台總控 Agent |
 
 ## Closeout Request
 

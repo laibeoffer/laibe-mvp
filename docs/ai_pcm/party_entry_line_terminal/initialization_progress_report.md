@@ -72,11 +72,11 @@ Permission requests to AI PCM 總監／後台總控 Agent:
 
 1. Decide whether any production/external scheduler is needed beyond the active Codex thread heartbeat. Production runtime remains forbidden until approved.
 2. Confirm final owner/contractor/platform role names and authorization boundaries before product implementation.
-3. Update source-of-truth closeout once GitHub PR / commit SHA exists.
+3. Route any PR update or commit needed for follow-up local docs changes to AI PCM 總監／後台總控 Agent.
 
 ## 7. Blockers
 
-- blocker: earlier `LOCAL_STATE_STALE` git metadata uncertainty has been reconciled by Deputy Commander for docs-only initialization.
+- blocker: no active docs-only blocker; earlier `LOCAL_STATE_STALE` git metadata uncertainty has been reconciled by Deputy Commander for docs-only initialization.
 - self-solve attempted: Deputy Commander rechecked with `git -c safe.directory=*` from `Z:\08-Jacky\laibe_pcm` and confirmed branch / SHA against GitHub main.
 - safe work continued: completed docs-only evidence packet, examples, automation record, and blackboard update while marking GitHub main / PR / commit SHA as source of truth.
 

@@ -58,9 +58,10 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 ## Source Of Truth Check
 
 - GitHub main / PR / commit SHA remains authoritative.
+- GitHub draft PR #77 is the current shared-truth review boundary for this docs-only setup.
 - Local workspace remains LOCAL_STATE only.
-- Current local Git metadata condition: `LOCAL_STATE_STALE`.
-- Local documents are evidence packet drafts until reconciled with GitHub source of truth.
+- Earlier local Git metadata uncertainty was reconciled by Deputy Commander for docs-only initialization.
+- Local documents remain execution workspace state until represented in GitHub PR / commit SHA.
 
 ## Next Safe Action Before Acceptance
 

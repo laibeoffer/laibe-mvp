@@ -53,9 +53,11 @@ Not allowed until AI PCM 總監／後台總控 Agent records automation stop app
 
 ## Latest Patrol
 
-- Time: 2026-06-03T04:35:30Z
+- Time: 2026-06-03T04:50:43Z
 - Files checked: PASS
 - JSON examples checked: PASS
 - Automation fields checked: PASS
-- Local git verification: earlier agent-local warning reconciled by Deputy Commander; use GitHub PR #77 / latest PR head SHA as shared truth.
-- Safe work continued: evidence packet, final completion report, supervisor progress report, and AI PCM blackboard updated.
+- Forbidden scope scan: PASS
+- Closeout state: still pending AI PCM 總監 closeout acceptance and automation stop approval.
+- Source-of-truth boundary: use GitHub PR #77 / latest PR head SHA as shared truth; local workspace remains execution state only.
+- Safe work continued: evidence packet, closeout checklist, and AI PCM blackboard patrol record updated.
