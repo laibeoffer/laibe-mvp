@@ -87,7 +87,7 @@ Permission requests to AI PCM 總監／後台總控 Agent:
 
 ## 7. Blockers
 
-- blocker: runtime launch remains pending due sub-agent capacity; Deputy Commander / AI PCM Supervisor patrol reconciled local Git status for docs-only initialization, with GitHub PR #77 remaining shared truth.
+- blocker: runtime launch remains pending due sub-agent capacity; AI PCM Supervisor patrol reconciled local Git status for docs-only initialization, with GitHub PR #77 remaining shared truth.
 - self-solve attempted: checked local workspace path, validated JSON examples, inspected `.git`, and kept GitHub main / PR / commit SHA as shared truth.
 - safe work continued: completed docs-only readiness packet without touching formal tender, payment, DB, AI API, production bidding, or legal contract text.
 

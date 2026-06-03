@@ -25,6 +25,8 @@ Mode: Codex app heartbeat attached to current thread.
 - `evidence_record_schema.md`
 - `evidence_validation_checklist.md`
 - `patrol_log.md`
+- `permission_blocker_packet.md`
+- `source_of_truth_policy.md`
 - `contract_attachment_registry.md`
 - `verified_evidence_matrix.md`
 - `disputed_evidence_register.md`
@@ -128,6 +130,8 @@ Confirmed deliverables:
 - Evidence record schema exists.
 - Evidence validation checklist exists.
 - Patrol log exists and records no-idle safe work.
+- Permission / blocker packet exists and routes decisions to AI PCM Supervisor.
+- Source-of-truth policy exists and keeps GitHub PR / commit SHA as shared truth.
 - JSON examples parse successfully.
 - AI PCM blackboard progress report is posted.
 

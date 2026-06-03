@@ -25,6 +25,8 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 | Forbidden scope policy | complete |
 | LINE terminal validation checklist | complete |
 | Permission / boundary packet template | complete |
+| Patrol log | complete |
+| Supervisor handoff | complete |
 | Evidence packet | complete |
 | JSON examples | complete |
 | Initialization progress report | complete |

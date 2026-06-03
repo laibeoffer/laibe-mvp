@@ -37,6 +37,8 @@ source_of_truth_note: Deputy Commander verified `Z:\08-Jacky\laibe_pcm` as branc
 | Evidence record schema | `docs/ai_pcm/contract_evidence_admin/evidence_record_schema.md` | `linked` | Defines record fields, status enum, formal use gate, restrictions, and transition guard. |
 | Evidence validation checklist | `docs/ai_pcm/contract_evidence_admin/evidence_validation_checklist.md` | `linked` | Defines patrol gates before any record may move toward verified. |
 | Patrol log | `docs/ai_pcm/contract_evidence_admin/patrol_log.md` | `linked` | Records no-idle patrol results and safe work without creating verified project evidence. |
+| Permission / blocker packet | `docs/ai_pcm/contract_evidence_admin/permission_blocker_packet.md` | `linked` | Routes permission and blocker issues to AI PCM Supervisor instead of the user. |
+| Source-of-truth policy | `docs/ai_pcm/contract_evidence_admin/source_of_truth_policy.md` | `linked` | Defines GitHub main / PR / commit SHA as shared truth and local workspace as execution state only. |
 | Evidence priority order | `docs/ai_pcm/contract_evidence_admin/evidence_priority_order.md` | `linked` | Contract-first priority order; LINE cannot be standalone contract. |
 | Attachment registry | `docs/ai_pcm/contract_evidence_admin/contract_attachment_registry.md` | `linked` | Placeholder-only registry structure. |
 | Verified matrix | `docs/ai_pcm/contract_evidence_admin/verified_evidence_matrix.md` | `linked` | No project-specific verified evidence registered. |

@@ -29,6 +29,8 @@ automation_stop_condition: AI PCM 總監／後台總控 Agent must explicitly de
 | Evidence record schema created | `done` | `evidence_record_schema.md` |
 | Evidence validation checklist created | `done` | `evidence_validation_checklist.md` |
 | Patrol log created | `done` | `patrol_log.md` |
+| Permission / blocker packet created | `done` | `permission_blocker_packet.md` |
+| Source-of-truth policy created | `done` | `source_of_truth_policy.md` |
 | Evidence priority order created | `done` | `evidence_priority_order.md` |
 | Contract attachment registry created | `done` | `contract_attachment_registry.md` |
 | Verified evidence matrix created | `done` | `verified_evidence_matrix.md` |
