@@ -23,6 +23,8 @@ Mode: Codex app heartbeat attached to current thread.
 - `contract_evidence_index.md`
 - `evidence_status_policy.md`
 - `evidence_record_schema.md`
+- `evidence_validation_checklist.md`
+- `patrol_log.md`
 - `contract_attachment_registry.md`
 - `verified_evidence_matrix.md`
 - `disputed_evidence_register.md`
@@ -124,6 +126,8 @@ Confirmed deliverables:
 - Main agent file exists.
 - Core policy, registry, matrix, checklist, evidence packet, examples, and final completion report exist.
 - Evidence record schema exists.
+- Evidence validation checklist exists.
+- Patrol log exists and records no-idle safe work.
 - JSON examples parse successfully.
 - AI PCM blackboard progress report is posted.
 

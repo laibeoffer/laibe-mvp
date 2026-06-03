@@ -44,13 +44,13 @@ Passed. This package does not connect real payment, escrow, listing fee, bank AP
 
 ## 9. Permission Requests to AI PCM Supervisor
 
-Source-of-truth verification update: Deputy Commander verified `Z:\08-Jacky\laibe_pcm` as branch `codex/ai-pcm-department-setup` from GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`. GitHub PR / commit SHA remains the shared truth boundary.
+Source-of-truth update: GitHub PR #77 / latest PR head SHA is the shared truth boundary. `Z:\08-Jacky\laibe_pcm` remains LOCAL_STATE / execution workspace only.
 
 No permission request is needed for docs-only / placeholder-only work. Future real payment, escrow, listing fee, DB, bank, AI API, LINE API, automatic release, automatic deduction, production runtime, formal legal wording, formal tender launch, formal quote, formal price, or real transaction scope must be escalated.
 
 ## 10. Final Completion Status
 
-READY_FOR_SUPERVISOR_REVIEW_PLACEHOLDER_ONLY_LOCAL_STATE_STALE_SOURCE_OF_TRUTH_CHECK_ROUTED
+READY_FOR_SUPERVISOR_REVIEW_PLACEHOLDER_ONLY_PR77_SOURCE_BOUNDARY_RECORDED
 
 ## 11. Next Action
 

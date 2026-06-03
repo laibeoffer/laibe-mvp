@@ -17,7 +17,8 @@ READY_FOR_SUPERVISOR_REVIEW_PATROL_ACTIVE
 - Shared truth: GitHub main / PR / commit SHA.
 - Local workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local role: LOCAL_STATE / execution workspace only.
-- LOCAL_STATE_STALE_RECONCILED_BY_DEPUTY: earlier agent-local git uncertainty was reconciled for docs-only initialization. Shared truth remains GitHub PR #77 / latest PR head SHA / commit SHA.
+- LOCAL_STATE_RECONCILED_BY_DEPUTY: current Deputy Commander / AI PCM Supervisor patrol verified this execution workspace is branch `codex/ai-pcm-department-setup`; local files remain execution state only until committed and pushed.
+- Shared truth remains GitHub PR #77 / latest PR head SHA / commit SHA.
 
 ## Evidence Files
 

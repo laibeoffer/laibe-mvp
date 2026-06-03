@@ -32,8 +32,9 @@
 - Shared truth: GitHub main / PR / commit SHA.
 - Local workspace: `Z:\08-Jacky\laibe_pcm`.
 - Local workspace role: LOCAL_STATE / execution workspace only.
-- Source-of-truth update: Deputy Commander verified `Z:\08-Jacky\laibe_pcm` as branch `codex/ai-pcm-department-setup` from GitHub main SHA `9d836c43e25af6eb05380b46296407476054f141`; PR / commit SHA remains the shared truth boundary.
-- Routing: source-of-truth verification is routed to AI PCM 總監／後台總控 Agent.
+- Source-of-truth update: GitHub PR #77 / latest PR head SHA is the shared truth boundary.
+- Local workspace note: `Z:\08-Jacky\laibe_pcm` remains LOCAL_STATE / execution workspace only.
+- Routing: source-of-truth boundary confirmation is routed to AI PCM 總監／後台總控 Agent.
 
 ## Forbidden Scope Evidence
 

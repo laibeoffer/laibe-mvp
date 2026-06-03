@@ -44,6 +44,8 @@
 - `docs/ai_pcm/party_entry_line_terminal/party_question_submission_flow.md`
 - `docs/ai_pcm/party_entry_line_terminal/role_permission_draft.md`
 - `docs/ai_pcm/party_entry_line_terminal/line_terminal_forbidden_scope.md`
+- `docs/ai_pcm/party_entry_line_terminal/line_terminal_validation_checklist.md`
+- `docs/ai_pcm/party_entry_line_terminal/line_terminal_permission_packet_template.md`
 - `docs/ai_pcm/party_entry_line_terminal/closeout_checklist.md`
 - `docs/ai_pcm/party_entry_line_terminal/evidence_packet.md`
 - `docs/ai_pcm/party_entry_line_terminal/final_completion_report.md`
@@ -61,6 +63,8 @@
 - flow: `party_question_submission_flow.md`
 - policy: `role_permission_draft.md`
 - policy: `line_terminal_forbidden_scope.md`
+- checklist: `line_terminal_validation_checklist.md`
+- template: `line_terminal_permission_packet_template.md`
 - checklist: `closeout_checklist.md`
 - evidence packet: `evidence_packet.md`
 - examples: 3 JSON samples under `examples/`

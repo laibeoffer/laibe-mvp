@@ -73,6 +73,8 @@
 - `party_question_submission_flow.md`
 - `role_permission_draft.md`
 - `line_terminal_forbidden_scope.md`
+- `line_terminal_validation_checklist.md`
+- `line_terminal_permission_packet_template.md`
 - `closeout_checklist.md`
 - `evidence_packet.md`
 - `examples/*.json`

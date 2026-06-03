@@ -35,6 +35,8 @@ source_of_truth_note: Deputy Commander verified `Z:\08-Jacky\laibe_pcm` as branc
 | Agent charter | `docs/ai_pcm/contract_evidence_admin/CONTRACT_EVIDENCE_ADMIN_AGENT.md` | `linked` | Includes corrected no-idle execution sequence. |
 | Evidence status policy | `docs/ai_pcm/contract_evidence_admin/evidence_status_policy.md` | `linked` | Defines placeholder, linked, verified, disputed, superseded, voided, unavailable. |
 | Evidence record schema | `docs/ai_pcm/contract_evidence_admin/evidence_record_schema.md` | `linked` | Defines record fields, status enum, formal use gate, restrictions, and transition guard. |
+| Evidence validation checklist | `docs/ai_pcm/contract_evidence_admin/evidence_validation_checklist.md` | `linked` | Defines patrol gates before any record may move toward verified. |
+| Patrol log | `docs/ai_pcm/contract_evidence_admin/patrol_log.md` | `linked` | Records no-idle patrol results and safe work without creating verified project evidence. |
 | Evidence priority order | `docs/ai_pcm/contract_evidence_admin/evidence_priority_order.md` | `linked` | Contract-first priority order; LINE cannot be standalone contract. |
 | Attachment registry | `docs/ai_pcm/contract_evidence_admin/contract_attachment_registry.md` | `linked` | Placeholder-only registry structure. |
 | Verified matrix | `docs/ai_pcm/contract_evidence_admin/verified_evidence_matrix.md` | `linked` | No project-specific verified evidence registered. |

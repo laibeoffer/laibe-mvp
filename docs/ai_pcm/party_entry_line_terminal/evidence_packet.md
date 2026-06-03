@@ -26,6 +26,8 @@
 | Question submission flow | `party_question_submission_flow.md` | complete |
 | Role permission policy | `role_permission_draft.md` | complete |
 | Forbidden scope policy | `line_terminal_forbidden_scope.md` | complete |
+| LINE terminal validation checklist | `line_terminal_validation_checklist.md` | complete |
+| Permission / boundary packet template | `line_terminal_permission_packet_template.md` | complete |
 | Closeout checklist | `closeout_checklist.md` | complete |
 | Initialization progress report | `initialization_progress_report.md` | complete |
 | Final completion report | `final_completion_report.md` | complete |
@@ -44,6 +46,8 @@
 
 - Expected workstream files present: yes
 - JSON examples parse successfully: yes
+- LINE terminal validation checklist present: yes
+- Permission / boundary packet template present: yes
 - Production LINE API touched: no
 - Real webhook touched: no
 - DB / Supabase touched: no

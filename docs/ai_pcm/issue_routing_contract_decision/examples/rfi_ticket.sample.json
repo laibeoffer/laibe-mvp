@@ -6,33 +6,28 @@
   "created_by": "issue-routing-contract-decision-agent",
   "project_id": "PROJECT_ID_PLACEHOLDER",
   "parties": {
-    "requesting_party": "乙方",
-    "responding_party": "甲方"
+    "requesting_party": "contractor",
+    "responding_party": "owner"
   },
-  "issue_summary": "乙方詢問客廳天花板燈槽尺寸與收邊方式，現有圖面標註不足以確認施工細節。",
-  "primary_category": "圖面不清",
-  "secondary_categories": ["需求不清"],
+  "issue_summary": "Contractor asks whether a detail in the drawing should be clarified before quoting or scheduling the related work.",
+  "primary_category": "information_request",
+  "secondary_categories": [
+    "drawing_detail"
+  ],
   "contract_basis": [
     {
       "source_type": "drawing",
-      "reference": "室內裝修圖 A-301",
+      "reference": "DRAWING_A-301_PLACEHOLDER",
       "version": "2026-05-20",
       "verification_status": "unverified",
-      "note": "需確認是否為最新核准版。"
+      "note": "Drawing reference must be verified by the contract evidence admin before formal use."
     }
   ],
-  "verified_facts": [
-    {
-      "fact": "目前問題涉及客廳天花板燈槽尺寸與收邊方式。",
-      "source": "RFI 提問內容",
-      "verified_at": "2026-06-03T12:00:00+08:00"
-    }
-  ],
+  "verified_facts": [],
   "missing_information": [
-    "最新核准圖面版次",
-    "燈槽剖面詳圖",
-    "材料收邊規範",
-    "甲方或設計端確認紀錄"
+    "Verified drawing sheet",
+    "Owner clarification",
+    "Contractor impact statement"
   ],
   "risk_flags": {
     "payment_involved": false,
@@ -41,16 +36,16 @@
     "legal_or_breach_claim": false,
     "evidence_conflict": false
   },
-  "preliminary_assessment": "目前資料不足以直接判斷燈槽尺寸與收邊方式，建議補充最新核准圖面與剖面詳圖。",
+  "preliminary_assessment": "This is an information request. AI PCM may organize the question and suggest evidence to collect, but must not convert the answer into a contract change.",
   "recommended_next_steps": [
-    "請補充最新核准圖面版次與燈槽剖面詳圖。",
-    "請確認是否已有正式會議紀錄或設計澄清。",
-    "收到資料後再依合約附件與圖說回覆施工標準。"
+    "Request the verified drawing reference.",
+    "Ask the owner to confirm the intended detail in the platform record.",
+    "Route any change or price impact into a separate human-reviewed ticket."
   ],
   "human_review": {
     "required": false,
-    "reason": "目前屬圖面澄清，尚未涉及付款、變更、驗收或違約主張。",
-    "review_owner": "AI PCM 總監／後台總控 Agent"
+    "reason": "No payment, change, acceptance, legal, or evidence conflict flag is active in this placeholder sample.",
+    "review_owner": "AI PCM Supervisor / Admin Control Center Agent"
   },
   "forbidden_scope_check": {
     "no_legal_verdict": true,

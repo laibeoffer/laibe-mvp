@@ -20,7 +20,7 @@
 - Created main agent file.
 - Created payment allocation, milestone plan, escrow placeholder, retention placeholder, disputed amount, and release condition contracts.
 - Created review status policy, schema, checklist, forbidden scope, examples, evidence packet, closeout checklist, and final completion report.
-- Updated AI PCM blackboard status and source-of-truth blocker routing.
+- Updated AI PCM blackboard status and source-of-truth boundary routing.
 
 ## 3A. No-Idle Execution Confirmation
 
@@ -72,14 +72,14 @@
 
 ## 6. Permission Requests
 
-Source-of-truth verification routed to AI PCM 總監／後台總控 Agent because local `.git` points to missing `C:\laibe_project\.git\worktrees\laibe_pcm`.
+Source-of-truth boundary is routed to AI PCM 總監／後台總控 Agent. GitHub PR #77 / latest PR head SHA is shared truth; local workspace remains execution state only.
 
 No permission request is needed for docs-only / placeholder-only work.
 
 ## 7. Blockers
 
-- blocker: local Git worktree metadata cannot verify branch / PR / commit SHA.
-- self-solve attempted: checked `.git` pointer and target path.
+- blocker: no active payment-ledger blocker for docs-only placeholder patrol.
+- self-solve attempted: reconciled older local `.git` wording against AI PCM blackboard source-of-truth state.
 - safe work continued: completed docs-only contracts, policy, schema, checklist, examples, evidence packet, final report, and blackboard updates.
 
 ## 8. Forbidden Scope Check

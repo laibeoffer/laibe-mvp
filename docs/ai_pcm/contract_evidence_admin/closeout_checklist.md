@@ -27,6 +27,8 @@ automation_stop_condition: AI PCM 總監／後台總控 Agent must explicitly de
 | Agent charter created | `done` | `CONTRACT_EVIDENCE_ADMIN_AGENT.md` |
 | Evidence status policy created | `done` | `evidence_status_policy.md` |
 | Evidence record schema created | `done` | `evidence_record_schema.md` |
+| Evidence validation checklist created | `done` | `evidence_validation_checklist.md` |
+| Patrol log created | `done` | `patrol_log.md` |
 | Evidence priority order created | `done` | `evidence_priority_order.md` |
 | Contract attachment registry created | `done` | `contract_attachment_registry.md` |
 | Verified evidence matrix created | `done` | `verified_evidence_matrix.md` |

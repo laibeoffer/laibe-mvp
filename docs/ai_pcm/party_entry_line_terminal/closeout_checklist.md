@@ -23,6 +23,8 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 | Party question submission flow | complete |
 | Role permission draft | complete |
 | Forbidden scope policy | complete |
+| LINE terminal validation checklist | complete |
+| Permission / boundary packet template | complete |
 | Evidence packet | complete |
 | JSON examples | complete |
 | Initialization progress report | complete |
@@ -41,6 +43,7 @@ Automation can stop only after AI PCM 總監／後台總控 Agent explicitly dec
 - Attachments remain unverified until evidence review.
 - Questions route to platform review, not automatic decisions.
 - Permission requests route to AI PCM 總監／後台總控 Agent.
+- Permission / boundary packet template exists and forbids direct user requests.
 - No user-direct permission requests are made.
 
 ## Forbidden Runtime Checks
