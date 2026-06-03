@@ -1,0 +1,57 @@
+{
+  "ticket_id": "PCM-RFI-20260603-001",
+  "ticket_type": "rfi",
+  "status": "awaiting_information",
+  "created_at": "2026-06-03T12:00:00+08:00",
+  "created_by": "issue-routing-contract-decision-agent",
+  "project_id": "PROJECT_ID_PLACEHOLDER",
+  "parties": {
+    "requesting_party": "contractor",
+    "responding_party": "owner"
+  },
+  "issue_summary": "Contractor asks whether a detail in the drawing should be clarified before quoting or scheduling the related work.",
+  "primary_category": "information_request",
+  "secondary_categories": [
+    "drawing_detail"
+  ],
+  "contract_basis": [
+    {
+      "source_type": "drawing",
+      "reference": "DRAWING_A-301_PLACEHOLDER",
+      "version": "2026-05-20",
+      "verification_status": "unverified",
+      "note": "Drawing reference must be verified by the contract evidence admin before formal use."
+    }
+  ],
+  "verified_facts": [],
+  "missing_information": [
+    "Verified drawing sheet",
+    "Owner clarification",
+    "Contractor impact statement"
+  ],
+  "risk_flags": {
+    "payment_involved": false,
+    "change_involved": false,
+    "acceptance_involved": false,
+    "legal_or_breach_claim": false,
+    "evidence_conflict": false
+  },
+  "preliminary_assessment": "This is an information request. AI PCM may organize the question and suggest evidence to collect, but must not convert the answer into a contract change.",
+  "recommended_next_steps": [
+    "Request the verified drawing reference.",
+    "Ask the owner to confirm the intended detail in the platform record.",
+    "Route any change or price impact into a separate human-reviewed ticket."
+  ],
+  "human_review": {
+    "required": false,
+    "reason": "No payment, change, acceptance, legal, or evidence conflict flag is active in this placeholder sample.",
+    "review_owner": "AI PCM Supervisor / Admin Control Center Agent"
+  },
+  "forbidden_scope_check": {
+    "no_legal_verdict": true,
+    "no_auto_breach_decision": true,
+    "no_auto_payment_request": true,
+    "no_auto_construction_order": true,
+    "no_placeholder_as_verified": true
+  }
+}

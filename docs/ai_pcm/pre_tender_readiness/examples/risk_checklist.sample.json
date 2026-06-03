@@ -1,0 +1,37 @@
+{
+  "case_id": "SAMPLE-PCM-001",
+  "prepared_by": "招標前置輔助 Agent",
+  "managed_by": "AI PCM 總監／後台總控 Agent",
+  "readiness_status": "READY_WITH_WARNINGS",
+  "risks": [
+    {
+      "id": "R-001",
+      "risk": "work_method_ambiguity",
+      "trigger": "Disposal responsibility is not assigned",
+      "impact": "Bid prices may not be comparable and change orders may arise",
+      "mitigation": "Add responsibility matrix before tender",
+      "status_effect": "NOT_READY_FOR_TENDER",
+      "status": "open"
+    },
+    {
+      "id": "R-002",
+      "risk": "poor_photo_coverage",
+      "trigger": "Zone B ceiling condition is not photographed",
+      "impact": "Contractors may price hidden-condition assumptions differently",
+      "mitigation": "Add location-tagged photos or disclose assumption",
+      "status_effect": "READY_WITH_WARNINGS",
+      "status": "open"
+    },
+    {
+      "id": "R-003",
+      "risk": "payment_mismatch",
+      "trigger": "Milestone 2 payment trigger is not tied to measurable acceptance",
+      "impact": "Payment dispute risk",
+      "mitigation": "Route to AI PCM Supervisor for human review",
+      "status_effect": "NEEDS_HUMAN_REVIEW",
+      "status": "open"
+    }
+  ],
+  "permission_requests": []
+}
+

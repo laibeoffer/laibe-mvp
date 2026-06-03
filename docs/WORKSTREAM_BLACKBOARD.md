@@ -4,6 +4,8 @@ Last updated: 2026-06-02 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
+AI PCM Department: see `docs/ai_pcm/AI_PCM_BLACKBOARD.md`
+
 ## Current Operating Rules
 
 - Source of truth: GitHub `main` plus current open PR / Issue state.

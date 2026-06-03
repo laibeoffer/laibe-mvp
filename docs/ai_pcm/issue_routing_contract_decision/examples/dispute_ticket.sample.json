@@ -1,0 +1,67 @@
+{
+  "ticket_id": "PCM-DISPUTE-20260603-001",
+  "ticket_type": "dispute",
+  "status": "under_human_review",
+  "created_at": "2026-06-03T12:00:00+08:00",
+  "created_by": "issue-routing-contract-decision-agent",
+  "project_id": "PROJECT_ID_PLACEHOLDER",
+  "parties": {
+    "requesting_party": "owner",
+    "responding_party": "contractor"
+  },
+  "issue_summary": "Owner reports that a claimed extra charge may not match the contract scope. The sample remains placeholder-only and requires human review.",
+  "primary_category": "scope_or_change_dispute",
+  "secondary_categories": [
+    "evidence_conflict",
+    "contract_basis_needed"
+  ],
+  "contract_basis": [
+    {
+      "source_type": "contract_clause",
+      "reference": "CONTRACT_CLAUSE_PLACEHOLDER",
+      "version": "CONTRACT_VERSION_PLACEHOLDER",
+      "verification_status": "placeholder",
+      "note": "Clause reference must be verified before formal use."
+    },
+    {
+      "source_type": "quotation",
+      "reference": "QUOTE_REFERENCE_PLACEHOLDER",
+      "version": "QUOTE_VERSION_PLACEHOLDER",
+      "verification_status": "placeholder",
+      "note": "Quotation reference is trace-only until verified."
+    }
+  ],
+  "verified_facts": [],
+  "missing_information": [
+    "Verified contract clause",
+    "Verified quotation line item",
+    "Change request record",
+    "Party response record",
+    "Evidence status from contract evidence admin"
+  ],
+  "risk_flags": {
+    "payment_involved": true,
+    "change_involved": true,
+    "acceptance_involved": false,
+    "legal_or_breach_claim": false,
+    "evidence_conflict": true
+  },
+  "preliminary_assessment": "AI PCM may suggest the evidence needed for human review, but must not issue a legal ruling or payment instruction.",
+  "recommended_next_steps": [
+    "Collect verified contract clause and quote references.",
+    "Route disputed evidence to the AI PCM Supervisor.",
+    "Draft a neutral response that marks all placeholder data as non-formal."
+  ],
+  "human_review": {
+    "required": true,
+    "reason": "Dispute involves payment, change scope, and placeholder evidence.",
+    "review_owner": "AI PCM Supervisor / Admin Control Center Agent"
+  },
+  "forbidden_scope_check": {
+    "no_legal_verdict": true,
+    "no_auto_breach_decision": true,
+    "no_auto_payment_request": true,
+    "no_auto_construction_order": true,
+    "no_placeholder_as_verified": true
+  }
+}

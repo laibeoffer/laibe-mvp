@@ -1,0 +1,45 @@
+{
+  "case_id": "SAMPLE-PCM-001",
+  "prepared_by": "招標前置輔助 Agent",
+  "managed_by": "AI PCM 總監／後台總控 Agent",
+  "readiness_status": "NOT_READY_FOR_TENDER",
+  "items": [
+    {
+      "id": "MI-001",
+      "area": "work_method",
+      "question": "Who is responsible for demolition waste hauling and disposal?",
+      "severity": "blocker",
+      "route": "AI PCM Supervisor",
+      "status": "open"
+    },
+    {
+      "id": "MI-002",
+      "area": "photos",
+      "question": "Are there photos showing the Zone B ceiling and access path?",
+      "severity": "warning",
+      "route": "AI PCM Supervisor",
+      "status": "open"
+    },
+    {
+      "id": "MI-003",
+      "area": "payment_acceptance",
+      "question": "What evidence triggers milestone 2 payment release?",
+      "severity": "needs_human_review",
+      "route": "AI PCM Supervisor",
+      "status": "open"
+    }
+  ],
+  "forbidden_scope_check": {
+    "formal_tender_started": false,
+    "formal_quote_created": false,
+    "formal_price_created": false,
+    "payment_connected": false,
+    "escrow_connected": false,
+    "listing_fee_connected": false,
+    "db_connected": false,
+    "ai_api_connected": false,
+    "formal_contract_modified": false,
+    "production_bidding_opened": false
+  }
+}
+

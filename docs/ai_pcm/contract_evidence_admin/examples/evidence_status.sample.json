@@ -1,0 +1,61 @@
+{
+  "schema": "laibe.ai_pcm.evidence_status_policy.sample",
+  "schema_version": "0.1.0",
+  "statuses": [
+    {
+      "status": "placeholder",
+      "formal_basis_allowed": false,
+      "rule": "Cannot be used for formal adjudication.",
+      "allowed_use": ["tracking", "missing-data placeholder"],
+      "requires_human_review": false
+    },
+    {
+      "status": "linked",
+      "formal_basis_allowed": false,
+      "rule": "Trace only until verified.",
+      "allowed_use": ["source tracing", "verification queue"],
+      "requires_human_review": false
+    },
+    {
+      "status": "verified",
+      "formal_basis_allowed": true,
+      "rule": "May be used as formal basis if not superseded, disputed, voided, or unavailable.",
+      "allowed_use": ["formal evidence basis"],
+      "requires_human_review": false
+    },
+    {
+      "status": "disputed",
+      "formal_basis_allowed": false,
+      "rule": "Requires human review before any formal use.",
+      "allowed_use": ["manual review queue"],
+      "requires_human_review": true
+    },
+    {
+      "status": "superseded",
+      "formal_basis_allowed": false,
+      "rule": "Historical trace only; not current basis.",
+      "allowed_use": ["history", "version trace"],
+      "requires_human_review": false
+    },
+    {
+      "status": "voided",
+      "formal_basis_allowed": false,
+      "rule": "Must not be used.",
+      "allowed_use": ["audit log only"],
+      "requires_human_review": false
+    },
+    {
+      "status": "unavailable",
+      "formal_basis_allowed": false,
+      "rule": "Must not enter adjudication.",
+      "allowed_use": ["missing-source blocker"],
+      "requires_human_review": false
+    }
+  ],
+  "global_rules": {
+    "placeholder_as_verified_allowed": false,
+    "line_message_standalone_contract_upgrade_allowed": false,
+    "formal_basis_requires_verified": true
+  }
+}
+

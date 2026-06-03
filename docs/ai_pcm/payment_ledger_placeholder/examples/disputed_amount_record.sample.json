@@ -1,0 +1,18 @@
+{
+  "dispute_id": "dar-2026-0001",
+  "project_id": "project-placeholder-001",
+  "related_ledger_id": "pal-2026-0001",
+  "related_milestone_id": "ms-001",
+  "disputed_placeholder_amount": 45000,
+  "currency": "TWD",
+  "dispute_reason": "acceptance_evidence_incomplete",
+  "evidence_refs": [
+    "evidence-placeholder-001",
+    "site-photo-placeholder-002"
+  ],
+  "payment_status": "partially_disputed",
+  "review_status": "pending_manual_review",
+  "required_human_decision": "Confirm whether disputed placeholder amount should remain on hold, be adjusted, or be cleared.",
+  "forbidden_auto_resolution": true
+}
+
