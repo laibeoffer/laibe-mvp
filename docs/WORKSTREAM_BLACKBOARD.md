@@ -224,3 +224,15 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: No for scoped implementation; Yes only for PR landing / product acceptance.
 - Need Reviewer: No by default; UI/status/docs only, no Plancraft core, budget runtime, guard, production quantity, formal estimate, AI API, DB, payment, escrow, or listing fee.
 - Next single action: Commit, push, and open scoped Draft PR for `codex/plan-puzzle-one-screen-drawing-workbench-0-16`.
+
+### 2026-06-02 - Plan Puzzle Canvas Tool Wiring 0.16.1
+
+- Agent: Plan Puzzle UI / Plan Puzzle
+- Workstream: `plancraft/page-ui`
+- Status: `BROWSER_VALIDATED`
+- Progress %: 100
+- Evidence: `0.16.1-canvas-tool-wiring` uses `./plan-puzzle.js?v=canvas-tool-wiring-0-16-1`; all import entries route to one hidden file input; JPG / PNG smoke creates underlay and updates import source; PDF smoke updates import source but keeps preview unsupported; wall tool enters `draw-wall`; two canvas clicks create a wall segment in `project.walls` and `wallLayer`; selected wall properties show in the inspector; Delete removes new non-structural wall; visible homeowner workspace does not expose `px` / `pixel`; JSON / `.pc` are moved to overview advanced export; `node --check` passes; browser console error count is 0.
+- Blocker: None for scoped implementation.
+- Need Commander: No for scoped implementation; Yes only for PR landing / product acceptance.
+- Need Reviewer: No by default; UI/status/docs only, no Plancraft core, budget runtime, guard, production quantity, formal estimate, AI API, DB, payment, escrow, or listing fee.
+- Next single action: Commit, push, and open scoped Draft PR for `codex/plan-puzzle-canvas-tool-wiring-0-16-1`.

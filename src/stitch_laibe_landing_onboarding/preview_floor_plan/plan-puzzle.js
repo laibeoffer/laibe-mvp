@@ -35,8 +35,10 @@
   const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
   const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
   const ZONE_AREA_CONFIDENCE_INVALID = 0;
-  const PLAN_PUZZLE_UI_IA_VERSION = "0.16.0-one-screen-drawing-workbench";
+  const PLAN_PUZZLE_UI_IA_VERSION = "0.16.1-canvas-tool-wiring";
   const PLAN_PUZZLE_TOOL_CATALOG_VERSION = PLAN_PUZZLE_UI_IA_VERSION;
+  const DRAFT_MM_PX_PER_MM = 0.1;
+  const DRAFT_MM_MODE_MESSAGE = "未校正 mm 草稿已開啟：可先用兩點畫牆整理需求，正式估價前仍需匯入丈量圖或確認比例。";
   const TOOL_CATALOG_ITEM_STATUS_OPTIONS = ["new", "existing", "demolition", "reference"];
   const TOOL_CATALOG_BUDGET_OPTIONS = ["include", "reference_only", "ask_contractor"];
   const MATERIAL_CATEGORIES = ["地坪材料", "牆面材料", "櫃體材料", "檯面材料", "門窗材料", "五金等級", "請廠商建議"];
@@ -576,13 +578,15 @@
       product: "Plancraft+",
       version: PLAN_PUZZLE_UI_IA_VERSION,
       unit: "mm",
-      draftVersionName: "0.16.0 單螢幕繪圖工作台",
+      draftVersionName: "0.16.1 畫布工具接線",
       saveStatus: "unsaved",
       lastSavedAt: null,
       importSource: null,
       scale: {
         pxPerMm: null,
-        calibrated: false
+        calibrated: false,
+        draftMode: false,
+        source: null
       },
       underlay: null,
       walls: [],
@@ -639,7 +643,7 @@
       snapPoint: null,
       snapEnabled: true,
       orthogonalEnabled: true,
-      currentWallStatus: "existing",
+      currentWallStatus: "new",
       currentWallThickness: DEFAULT_WALL_THICKNESS,
       currentWallStructural: false,
       currentOpeningKind: "door",
@@ -653,6 +657,7 @@
       showOnlyCurrentLayer: false,
       materialTagsExpanded: false,
       preflightOpen: false,
+      exportPanelOpen: false,
       historyStatus: "placeholder",
       zoneBoundaryState: createInitialZoneBoundaryState(),
       pcConverterReport: createInitialPcConverterReport(),
@@ -665,6 +670,7 @@
       textToolType: "業主需求",
       materialCategory: "請廠商建議",
       activeStatusTab: "properties",
+      canvasZoom: 1,
       focusMode: false,
       openToolPalette: "draw",
       toolPaletteCollapsed: false,
@@ -682,7 +688,15 @@
 
   function applyValidationFixtureIfNeeded() {
     const validationMode = new URLSearchParams(window.location.search).get("validation") || "";
-    if (validationMode !== "one-screen-wall-smoke") {
+    if (validationMode === "canvas-tool-wiring-image-smoke") {
+      applyValidationImageImportFixture("validation-import-canvas-tool-wiring-image");
+      return;
+    }
+    if (validationMode === "canvas-tool-wiring-pdf-smoke") {
+      applyValidationPdfImportFixture();
+      return;
+    }
+    if (validationMode !== "one-screen-wall-smoke" && validationMode !== "canvas-tool-wiring-wall-smoke") {
       return;
     }
     const createdAt = new Date().toISOString();
@@ -730,6 +744,72 @@
       source: "validation_fixture"
     };
     uiState.message = "瀏覽器驗證模式已建立 mm 基準，可直接測試兩點畫牆。";
+    uiState.error = "";
+  }
+
+  function applyValidationImageImportFixture(idPrefix) {
+    const createdAt = new Date().toISOString();
+    const fixtureSvg = [
+      "<svg xmlns='http://www.w3.org/2000/svg' width='1280' height='820' viewBox='0 0 1280 820'>",
+      "<rect width='1280' height='820' fill='%230b1014'/>",
+      "<g stroke='%232c3a42' stroke-width='1'>",
+      Array.from({ length: 33 }, (_, index) => `<line x1='${index * 40}' y1='0' x2='${index * 40}' y2='820'/>`).join(""),
+      Array.from({ length: 22 }, (_, index) => `<line x1='0' y1='${index * 40}' x2='1280' y2='${index * 40}'/>`).join(""),
+      "</g>",
+      "<rect x='240' y='180' width='520' height='300' fill='none' stroke='%23a8c0ca' stroke-width='5'/>",
+      "<text x='260' y='230' fill='%23dbe7ec' font-family='Arial, sans-serif' font-size='26'>Validation underlay</text>",
+      "</svg>"
+    ].join("");
+    project.importSource = {
+      id: `${idPrefix}-source`,
+      originalFileName: "validation-underlay.png",
+      originalFileType: "png",
+      accepted: true,
+      previewSupported: true,
+      normalizedAs: "underlay-image",
+      importedAt: createdAt
+    };
+    project.underlay = {
+      id: `${idPrefix}-underlay`,
+      fileName: "validation-underlay.png",
+      fileType: "png",
+      dataUrl: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(fixtureSvg)}`,
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0,
+      opacity: DEFAULT_UNDERLAY_OPACITY,
+      calibratedBy: null
+    };
+    project.scale = {
+      pxPerMm: DRAFT_MM_PX_PER_MM,
+      calibrated: false,
+      draftMode: true,
+      source: "validation_fixture_draft_mm"
+    };
+    uiState.message = "驗證圖檔已匯入為 underlay；目前為未校正 mm 草稿。";
+    uiState.error = "";
+  }
+
+  function applyValidationPdfImportFixture() {
+    const createdAt = new Date().toISOString();
+    project.importSource = {
+      id: "validation-import-canvas-tool-wiring-pdf",
+      originalFileName: "validation-floor-plan.pdf",
+      originalFileType: "pdf",
+      accepted: true,
+      previewSupported: false,
+      normalizedAs: "unsupported-pdf-placeholder",
+      importedAt: createdAt
+    };
+    project.underlay = null;
+    project.scale = {
+      pxPerMm: null,
+      calibrated: false,
+      draftMode: false,
+      source: null
+    };
+    uiState.message = PDF_NOT_SUPPORTED_MESSAGE;
     uiState.error = "";
   }
 
@@ -911,6 +991,7 @@
       "add-opening": "opening",
       "start-place-zone": "zone_label",
       "start-zone-boundary": "zone_label",
+      "set-canvas-zoom": "zoom",
       "auto-annotate-placeholder": "auto_annotate",
       "delete-selected": "delete",
       "toggle-snap": "snap_toggle",
@@ -918,6 +999,7 @@
       "redo-placeholder": "undo_redo",
       "print-current-layer": "print_export",
       "print-total-preview": "print_export",
+      "toggle-export-panel": "print_export",
       "export-draft": "print_export",
       "export-pc-spike": "print_export"
     };
@@ -952,6 +1034,20 @@
       material_bucket: "材質工具已選取；請先選取物件再套用材質。"
     };
     uiState.message = toolMessages[tool] || `${toolLabel} 已選取。`;
+  }
+
+  function updateCanvasZoom(mode) {
+    const current = Number(uiState.canvasZoom) || 1;
+    const nextZoomMap = {
+      in: Math.min(2, Number((current + 0.1).toFixed(2))),
+      out: Math.max(0.5, Number((current - 0.1).toFixed(2))),
+      fit: 1,
+      "100": 1
+    };
+    uiState.canvasZoom = nextZoomMap[mode] || 1;
+    uiState.currentTool = "zoom";
+    uiState.message = `視圖倍率已切換為 ${Math.round(uiState.canvasZoom * 100)}%。幾何仍以 mm 草稿基準記錄。`;
+    uiState.error = "";
   }
 
   function toggleLayerCatalogItem(layerId, itemName) {
@@ -1101,6 +1197,16 @@
       uiState.activeStatusTab = "overview";
       uiState.message = uiState.preflightOpen ? "已開啟總預覽 / 送出前檢查。" : "已收合總預覽 / 送出前檢查。";
     }
+    if (action === "toggle-export-panel") {
+      uiState.exportPanelOpen = !uiState.exportPanelOpen;
+      uiState.activeStatusTab = "overview";
+      uiState.message = uiState.exportPanelOpen
+        ? "已開啟進階匯出。草稿 JSON 與 .pc 測試版只供交接與測試，不是預算輸入。"
+        : "已收合進階匯出。";
+      uiState.error = "";
+      render();
+      return;
+    }
     if (action === "toggle-focus-mode") {
       uiState.focusMode = !uiState.focusMode;
       uiState.message = uiState.focusMode ? "已開啟專注模式，畫布最大化。" : "已恢復完整工作台。";
@@ -1167,6 +1273,11 @@
       uiState.message = "此功能仍在草稿階段，尚未正式開放。";
       uiState.error = "";
     }
+    if (action === "set-canvas-zoom") {
+      updateCanvasZoom(actionButton.dataset.zoomMode || "fit");
+      render();
+      return;
+    }
     if (actionButton.dataset.fieldProxy === "current-wall-status") {
       uiState.currentWallStatus = normalizeWallStatus(actionButton.dataset.value);
       uiState.currentWallStructural = actionButton.dataset.structural === "true";
@@ -1185,6 +1296,8 @@
       uiState.message = `請使用瀏覽器列印目前圖層：${getCurrentProductLayer().label}。`;
     }
     if (action === "print-total-preview") {
+      uiState.activeStatusTab = "overview";
+      uiState.preflightOpen = true;
       uiState.message = "請使用瀏覽器列印總預覽；本輪未接正式 PDF writer。";
     }
     if (action === "export-bid-summary-placeholder") {
@@ -1713,7 +1826,9 @@
   function resetScaleAndInteraction(message) {
     project.scale = {
       pxPerMm: null,
-      calibrated: false
+      calibrated: false,
+      draftMode: false,
+      source: null
     };
     if (project.underlay) {
       project.underlay.calibratedBy = null;
@@ -1773,12 +1888,7 @@
     uiState.openToolPalette = "draw";
     uiState.toolPaletteCollapsed = false;
     if (!canDrawWalls()) {
-      uiState.error = "請先匯入圖檔，系統將建立比例基準。";
-      uiState.message = "目前尚未有 mm 基準；完成圖面基準後即可點兩點建立牆段。";
-      uiState.mode = "select";
-      clearWallDraft();
-      render();
-      return;
+      enableDraftMmGrid("牆工具：已啟用未校正 mm 草稿，點兩點即可建立牆段。正式估價前仍需匯入丈量圖或確認比例。");
     }
 
     uiState.mode = "draw-wall";
@@ -1794,7 +1904,9 @@
     uiState.snapPoint = null;
     clearZoneBoundaryDraft();
     uiState.error = "";
-    uiState.message = "畫牆模式：請在底圖上點第一個牆端點。";
+    uiState.message = hasDraftMmScale()
+      ? "牆工具：點兩點建立牆段。目前為未校正 mm 草稿。"
+      : "牆工具：點兩點建立牆段。";
     render();
   }
 
@@ -2125,10 +2237,7 @@
     event.preventDefault();
 
     if (!canDrawWalls()) {
-      uiState.error = "請先匯入圖檔，系統將建立比例基準。";
-      uiState.message = "目前尚未有 mm 基準；完成圖面基準後即可點兩點建立牆段。";
-      render();
-      return;
+      enableDraftMmGrid("牆工具：已啟用未校正 mm 草稿，請點兩點建立牆段。");
     }
 
     const resolved = resolveWallPoint(event, uiState.wallDraftStart);
@@ -2218,7 +2327,8 @@
       thickness: normalizeThickness(uiState.currentWallThickness),
       status: normalizeWallStatus(uiState.currentWallStatus),
       structural: Boolean(uiState.currentWallStructural),
-      layer: "walls",
+      layer: uiState.currentLayer || project.currentLayer || "floor_plan",
+      scaleStatus: hasDraftMmScale() ? "draft_unverified" : "verified_mm",
       createdAt: now,
       updatedAt: now
     };
@@ -2255,7 +2365,9 @@
     const pxPerMm = pixelDistance / knownLength;
     project.scale = {
       pxPerMm: Number(pxPerMm.toFixed(6)),
-      calibrated: true
+      calibrated: true,
+      draftMode: false,
+      source: "manual_calibration"
     };
     project.underlay.calibratedBy = {
       from: { ...from },
@@ -2341,6 +2453,17 @@
       return;
     }
 
+    const wall = getSelectedWall();
+    if (!wall) {
+      return;
+    }
+    if (!isWallDirectlyDeletable(wall)) {
+      uiState.error = "既有牆、承重牆、柱或梁不可直接刪除；請改用「標記拆除」並交由專業確認。";
+      uiState.message = "";
+      render();
+      return;
+    }
+
     project.walls = project.walls.filter((wall) => wall.id !== uiState.selectedWallId);
     project.openings = project.openings.filter((opening) => opening.edgeId !== createEdgeId({ id: uiState.selectedWallId }));
     uiState.selectedWallId = null;
@@ -2356,6 +2479,10 @@
     uiState.message = "已刪除選取牆體。";
     syncBridge();
     render();
+  }
+
+  function isWallDirectlyDeletable(wall) {
+    return Boolean(wall && wall.status === "new" && !wall.structural);
   }
 
   function resetProject() {
@@ -3072,7 +3199,24 @@
     renderCompactToolPanel();
     renderStatusLabels();
     syncStaticControls();
+    syncCanvasValidationState();
     syncWorkspaceMode();
+  }
+
+  function syncCanvasValidationState() {
+    if (!canvas) {
+      return;
+    }
+    canvas.dataset.wallCount = String(project.walls.length);
+    canvas.dataset.importKind = project.importSource?.originalFileType || "";
+    canvas.dataset.importPreview = project.importSource?.previewSupported ? "true" : "false";
+    canvas.dataset.currentTool = uiState.currentTool || "";
+    canvas.dataset.mode = uiState.mode || "";
+    canvas.dataset.scaleStatus = hasDraftMmScale()
+      ? "draft_unverified"
+      : project.scale.calibrated
+        ? "verified"
+        : "missing";
   }
 
   function renderCompactTopbar() {
@@ -5455,7 +5599,7 @@
       draftVersionText.textContent = project.draftVersionName || project.version;
     }
     if (currentImportFileText) {
-      currentImportFileText.textContent = project.importSource?.fileName || "尚未匯入";
+      currentImportFileText.textContent = getCurrentImportFileName();
     }
     const dynamicDraftSaveStatusText = document.getElementById("draftSaveStatusText");
     const dynamicLastSavedText = document.getElementById("lastSavedText");
@@ -5471,8 +5615,12 @@
       dynamicDraftVersionText.textContent = project.draftVersionName || project.version;
     }
     if (dynamicCurrentImportFileText) {
-      dynamicCurrentImportFileText.textContent = project.importSource?.fileName || "尚未匯入";
+      dynamicCurrentImportFileText.textContent = getCurrentImportFileName();
     }
+  }
+
+  function getCurrentImportFileName() {
+    return project.importSource?.originalFileName || project.importSource?.fileName || "尚未匯入";
   }
 
   function activateToolCatalogEntry(actionButton) {
@@ -7026,15 +7174,37 @@
   }
 
   function canDrawWalls() {
-    return Boolean(project.underlay && project.importSource?.previewSupported && hasValidScale());
+    return hasDrawableScale();
   }
 
   function canPlaceZones() {
-    return Boolean(project.underlay && project.importSource?.previewSupported && hasValidScale());
+    return hasDrawableScale();
   }
 
   function hasValidScale() {
-    return project.scale.calibrated && Number.isFinite(project.scale.pxPerMm) && project.scale.pxPerMm > 0;
+    return Boolean((project.scale.calibrated || project.scale.draftMode) && Number.isFinite(project.scale.pxPerMm) && project.scale.pxPerMm > 0);
+  }
+
+  function hasDrawableScale() {
+    return hasValidScale();
+  }
+
+  function hasDraftMmScale() {
+    return Boolean(project.scale.draftMode && Number.isFinite(project.scale.pxPerMm) && project.scale.pxPerMm > 0);
+  }
+
+  function enableDraftMmGrid(message) {
+    if (!hasValidScale()) {
+      project.scale = {
+        pxPerMm: DRAFT_MM_PX_PER_MM,
+        calibrated: false,
+        draftMode: true,
+        source: "draft_mm_grid"
+      };
+    }
+    project.saveStatus = "unsaved";
+    uiState.message = message || DRAFT_MM_MODE_MESSAGE;
+    uiState.error = "";
   }
 
   function getSelectedWall() {
@@ -7489,14 +7659,16 @@
     if (!from || !to) {
       return "";
     }
-    const distance = getDistance(from, to);
     if (project.scale.calibrated && project.underlay?.calibratedBy) {
-      return `${formatNumber(project.underlay.calibratedBy.knownLength)} mm = ${formatNumber(distance)} px`;
+      return `${formatNumber(project.underlay.calibratedBy.knownLength)} mm`;
     }
-    return `${formatNumber(distance)} px`;
+    return "已選距離，請輸入已知 mm";
   }
 
   function getScaleReadout() {
+    if (hasDraftMmScale()) {
+      return "未校正 mm 草稿";
+    }
     if (!project.scale.calibrated || project.scale.pxPerMm === null) {
       return "尚未校正";
     }
@@ -7786,7 +7958,7 @@
           <button class="toolbar-btn" type="button" data-action="print-total-preview" title="列印目前整理結果">
             <span class="material-symbols-outlined" aria-hidden="true">print</span>列印
           </button>
-          <button class="toolbar-btn" type="button" data-action="export-draft" title="匯出草稿資料；進階格式放在開發者診斷">
+          <button class="toolbar-btn" type="button" data-action="toggle-export-panel" title="開啟進階匯出；JSON 與 .pc 測試版不屬主流程">
             <span class="material-symbols-outlined" aria-hidden="true">download</span>匯出
           </button>
           <button class="toolbar-btn icon-only" type="button" data-action="set-status-tab" data-status-tab="overview" title="說明與快捷鍵">
@@ -7944,6 +8116,12 @@
         ${renderPaletteButton("選取", "near_me", { action: "set-select-mode", uiTool: "select", mode: "select", primary: uiState.currentTool === "select" })}
         ${renderPaletteButton("手掌", "pan_tool", { action: "set-ui-tool", tool: "pan", toolLabel: "手掌 / 移動畫布", title: "Space 可切換；完整拖曳仍是草稿狀態" })}
         ${renderPaletteButton("縮放", "zoom_in", { action: "set-ui-tool", tool: "zoom", toolLabel: "縮放", title: "縮放控制目前為草稿提示" })}
+        <div class="palette-segment" aria-label="縮放控制">
+          ${renderPaletteButton("放大", "zoom_in", { action: "set-canvas-zoom", zoomMode: "in", title: "放大視圖狀態" })}
+          ${renderPaletteButton("縮小", "zoom_out", { action: "set-canvas-zoom", zoomMode: "out", title: "縮小視圖狀態" })}
+          ${renderPaletteButton("符合畫面", "fit_screen", { action: "set-canvas-zoom", zoomMode: "fit", title: "回到符合畫面" })}
+          ${renderPaletteButton("100%", "filter_center_focus", { action: "set-canvas-zoom", zoomMode: "100", title: "回到 100%" })}
+        </div>
         ${renderPaletteButton("刪除", "delete", { action: "delete-selected", danger: true })}
         ${renderDisabledPaletteButton("復原", "undo", "尚未完整開放")}
         ${renderDisabledPaletteButton("重做", "redo", "尚未完整開放")}
@@ -8043,6 +8221,7 @@
       options.uiTool ? `data-ui-tool="${escapeAttribute(options.uiTool)}"` : "",
       options.tool ? `data-tool="${escapeAttribute(options.tool)}"` : "",
       options.toolLabel ? `data-tool-label="${escapeAttribute(options.toolLabel)}"` : "",
+      options.zoomMode ? `data-zoom-mode="${escapeAttribute(options.zoomMode)}"` : "",
       options.openingKind ? `data-opening-kind="${escapeAttribute(options.openingKind)}"` : "",
       options.mode ? `data-mode-button="${escapeAttribute(options.mode)}"` : "",
       options.title ? `title="${escapeAttribute(options.title)}"` : `title="${escapeAttribute(label)}"`
@@ -8224,7 +8403,18 @@
         <b>總覽 / 送出前檢查</b>
         ${renderTotalPreviewCard()}
       </div>
+      ${renderStatusAccordion("進階匯出", renderAdvancedExportCard(), uiState.exportPanelOpen)}
       ${renderStatusAccordion("快捷鍵", renderShortcutHelpCard(), false)}
+    `;
+  }
+
+  function renderAdvancedExportCard() {
+    return `
+      <div class="inline-message compact-note">以下格式只供交接、測試與 spike 驗證，不是正式估價或預算輸入。</div>
+      <div class="button-row compact-row">
+        <button class="toolbar-btn" type="button" data-action="export-draft">草稿 JSON</button>
+        <button class="toolbar-btn" type="button" data-action="export-pc-spike">.pc 測試版</button>
+      </div>
     `;
   }
 
@@ -8435,7 +8625,7 @@
     return `
       <div class="status-grid">
         <div class="status-row"><span>底圖</span><span>${project.underlay ? "已匯入" : "尚未匯入"}</span></div>
-        <div class="status-row"><span>比例</span><span>${project.scale.calibrated ? "已校正" : "尚未校正"}</span></div>
+        <div class="status-row"><span>比例</span><span>${project.scale.calibrated ? "已校正" : hasDraftMmScale() ? "未校正草稿" : "尚未校正"}</span></div>
         <div class="status-row"><span>牆段</span><span>${project.walls.length} 段</span></div>
         <div class="status-row"><span>門窗</span><span>${project.openings.length} 個</span></div>
         <div class="status-row"><span>空間</span><span>${project.zones.length} 個</span></div>
@@ -8479,7 +8669,11 @@
     if (!toolbar) {
       return;
     }
-    const basisLabel = project.scale.calibrated ? "mm 基準已建立" : "等待 mm 基準";
+    const basisLabel = project.scale.calibrated
+      ? "mm 基準已建立"
+      : hasDraftMmScale()
+        ? "未校正 mm 草稿"
+        : "尚未建立 mm 基準";
     toolbar.innerHTML = `
       <div class="toolbar-left" aria-label="畫布操作">
         <button class="toolbar-btn primary" type="button" data-action="choose-file">
@@ -8514,13 +8708,17 @@
 
   function renderCanvasHelper() {
     if (!project.importSource) {
+      const wallDraftHint = uiState.currentTool === "wall" || uiState.mode === "draw-wall";
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
-          <b>請先匯入丈量圖</b>
-          <p>系統會依圖面建立 mm 基準，完成後即可畫牆、標空間與整理需求。</p>
+          <b>${wallDraftHint ? "牆工具：點兩點建立牆段" : "請先匯入丈量圖"}</b>
+          <p>${wallDraftHint ? "目前為未校正 mm 草稿；正式估價前仍需匯入丈量圖或確認比例。" : "系統會依圖面建立 mm 基準；也可先用 mm 草稿整理想法。"}</p>
           <div class="canvas-helper-actions">
             <button class="toolbar-btn primary" type="button" data-action="choose-file">
               <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>匯入圖檔
+            </button>
+            <button class="toolbar-btn" type="button" data-action="start-draw-wall">
+              <span class="material-symbols-outlined" aria-hidden="true">polyline</span>先畫草稿
             </button>
           </div>
         </div>
@@ -8544,8 +8742,8 @@
     if (!project.scale.calibrated) {
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card compact">
-          <b>等待 mm 基準</b>
-          <p>請依圖面已知尺寸確認；比例確認前會先暫停畫牆。</p>
+          <b>${hasDraftMmScale() ? "未校正 mm 草稿" : "等待 mm 基準"}</b>
+          <p>${hasDraftMmScale() ? "可先用兩點畫牆整理需求；正式估價前仍需確認比例。" : "請依圖面已知尺寸確認；也可先啟用草稿模式畫牆。"}</p>
         </div>
       `;
       return;
@@ -8581,7 +8779,7 @@
       return {
         id: selectedWall.id,
         type: "牆段",
-        layer: getCurrentProductLayer().label,
+        layer: getProductLayerLabel(selectedWall.layer || project.currentLayer),
         status: getWallStatusLabel(selectedWall.status),
         size: `${formatNumber(getDistance(selectedWall.from, selectedWall.to))} mm / 厚 ${selectedWall.thickness} mm`,
         budgetInclusion: selectedWall.status === "new" ? "候選納入" : selectedWall.status === "demolished" ? "拆除候選" : "參考",

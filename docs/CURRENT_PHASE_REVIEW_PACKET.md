@@ -2842,3 +2842,67 @@ Conditional ready。
 - Pan / zoom / undo / redo 仍未達完整 CAD history / viewport stack，已以 disabled 或提示處理。
 - PDF import 仍只允許選檔，不在本頁做 preview 或 storage。
 - 0.16 修的是 single-screen UX 與高頻工具可驗證互動，不是 production budget、正式施工圖或 Plancraft core integration。
+
+## Plan Puzzle 0.16.1 Canvas Tool Wiring Review Packet
+
+### 任務
+
+- Plancraft+ Canvas Tool Wiring Repair 0.16.1。
+- 任務類型：Builder / UI Interaction Repair / Canvas Tool Wiring / Plan Puzzle。
+- 版本：`0.16.1-canvas-tool-wiring`。
+- 分支：`codex/plan-puzzle-canvas-tool-wiring-0-16-1`。
+
+### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html`
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/NEXT_CODEX_HANDOFF.md`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/PLAN_PUZZLE_AGENT_TRANSFER.md`
+- `docs/WORKSTREAM_BLACKBOARD.md`
+
+### 完成事項
+
+- `project.version` 與 Tool Catalog runtime version 升級為 `0.16.1-canvas-tool-wiring`。
+- `code.html` script query 更新為 `./plan-puzzle.js?v=canvas-tool-wiring-0-16-1`。
+- 三個匯入入口共用同一個 hidden file input，支援 JPG / JPEG / PNG / PDF 選檔。
+- JPG / PNG 可建立 underlay 並更新 import source、檔名與畫布狀態。
+- PDF 可選檔但不假裝預覽；顯示尚未支援直接預覽。
+- 牆工具可進入 `draw-wall` 模式；未匯入時啟用未校正 mm 草稿；點兩點建立 wall segment。
+- 新設 wall 寫入 `project.walls`，`wallLayer` 顯示牆段，牆段可選取並在屬性 tab 顯示。
+- Delete 可刪除新設且非結構牆；既有 / 承重 / 梁 / 柱需提示，不直接刪除。
+- Button action matrix 已落地：按鈕要嘛觸發動作、開 panel / palette、切換 state / tool，要嘛 disabled 並顯示原因。
+- 右側 inspector 維持 5 tab 且 tab bar sticky；提醒 compact，開發者診斷收合。
+- 主 UI 不顯示 `px` / `pixel`；技術詞保留在開發者診斷。
+- 草稿 JSON 與 `.pc` 測試版移到總覽 tab 的「進階匯出」accordion，不與主操作同級。
+
+### 驗證
+
+- `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS。
+- `git diff --check`: PASS；僅 CRLF warning。
+- Browser URL：`http://127.0.0.1:50369/code.html?validation=canvas-tool-wiring-0-16-1`。
+- Browser console error count：0。
+- File input evidence：visible import buttons route to `data-action="choose-file"`，file input accept = `.jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf`。
+- Image smoke URL：`http://127.0.0.1:50369/code.html?validation=canvas-tool-wiring-image-smoke`。
+- Image smoke evidence：`importKind = png`、`importPreview = true`、檔名 `validation-underlay.png`、underlay image count = 1。
+- PDF smoke URL：`http://127.0.0.1:50369/code.html?validation=canvas-tool-wiring-pdf-smoke`。
+- PDF smoke evidence：`importKind = pdf`、`importPreview = false`、檔名 `validation-floor-plan.pdf`、underlay image count = 0。
+- Wall smoke evidence：點擊 `牆` 工具後點兩個畫布位置，`project.walls` 新增 wall，`wallLayer` 顯示牆段；按 Delete 可刪除新設牆。
+- Visible text audit：可見 homeowner workspace 中 `px` / `pixel` count = 0。
+
+### 邊界
+
+- 未修改 `plancraft/` 或 Plancraft core。
+- 未修改 budget runtime。
+- 未解除 `formalEstimateGuard`。
+- 未新增 `package.json`、`node_modules` 或 framework。
+- 未呼叫 Budget Engine / `generateBudgetEstimate()`。
+- 未接 AI API / image API / DB / payment / escrow / listing fee。
+- 未產生正式估價。
+- 未把 `.pc` / SVG / renderer preview / candidate facts 當作 budget input。
+
+### 已知風險
+
+- Undo / redo history stack 仍 disabled。
+- 完整 CAD pan / zoom、dimension geometry、opening placement 深化、PDF preview / OCR / storage 尚未完成。
+- 未校正 mm 草稿只能作需求整理，正式估價前仍需丈量圖與比例確認。

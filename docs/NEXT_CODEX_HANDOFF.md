@@ -1712,3 +1712,42 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
   - PDF 僅可選檔，不做本頁預覽。
   - 不產生正式預算、不把 `.pc` / SVG / candidate facts 作 budget input。
 - 下一步唯一建議：若 scope clean，建立 scoped commit 並開 Draft PR；後續再做高頻工具真實操作深度，例如 pan / zoom / undo-redo stack。
+
+## Plan Puzzle 0.16.1 Canvas Tool Wiring Handoff
+
+- 任務名稱：Plancraft+ Canvas Tool Wiring Repair 0.16.1。
+- 任務類型：Builder / UI Interaction Repair / Canvas Tool Wiring / Plan Puzzle。
+- 分支：`codex/plan-puzzle-canvas-tool-wiring-0-16-1`。
+- 本輪版本：`project.version = 0.16.1-canvas-tool-wiring`。
+- Tool Catalog runtime version：`0.16.1-canvas-tool-wiring`。
+- `code.html` script 版本：`./plan-puzzle.js?v=canvas-tool-wiring-0-16-1`。
+- 匯入：topbar、空畫布 CTA、匯入 palette 全部接同一個 hidden file input；accept 包含 JPG / JPEG / PNG / PDF。
+- JPG / PNG：可讀取為 local underlay，更新 `project.importSource`、畫布底圖、檔名與匯入狀態。
+- PDF：可選檔並更新 `project.importSource`，顯示「PDF 介面已建立，尚未支援直接預覽」，不建立假 underlay、不接 pdf.js、不假裝校正完成。
+- 畫牆：牆工具會設定 `currentTool = "wall"` 與 `mode = "draw-wall"`；未匯入時可啟用未校正 mm 草稿，點兩點建立 wall segment。
+- Wall data：新牆寫入 `project.walls`，`wallLayer` 產生 SVG / DOM 牆段，牆段可選取，右側屬性顯示狀態、圖層、長度、厚度、納入預算候選與需確認狀態。
+- Delete：新設且非結構牆可刪除；既有牆、承重牆、梁、柱或 structural wall 需改用標記拆除 / 專業確認提示，不直接刪除。
+- Button action matrix：匯入觸發 file input；儲存更新本機草稿狀態；總覽開右側總覽；列印開輸出提示；匯出打開總覽內的進階匯出；選取 / 牆 / 文字 / 尺寸 / 材質切換工具或 palette；縮放提供放大、縮小、符合畫面、100%；鎖點切換狀態；刪除處理選取物；復原 / 重做 disabled 並標示尚未完整開放。
+- 右側 inspector：維持固定 5 tab（屬性、圖層、提醒、材料、總覽），tab bar sticky；提醒保持 compact，點擊單項才展開處理。
+- 主 UI：屋主可見工作區已移除 `px` / `pixel` 顯示，比例語言改以 mm / cm / 比例 / 圖紙 / 丈量圖為主；技術詞僅留在收合的開發者診斷。
+- JSON / `.pc`：不再與主操作同級，移到總覽 tab 的「進階匯出」accordion；明確標示草稿 JSON / `.pc` 測試版不是 budget input。
+- 驗證：
+  - `node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`: PASS。
+  - `git diff --check`：PASS；僅 Windows CRLF warning。
+  - Browser validation URL：`http://127.0.0.1:50369/code.html?validation=canvas-tool-wiring-0-16-1`。
+  - Browser console error count：0。
+  - Wall smoke：點擊左側 `牆` 後點兩個畫布位置，`project.walls` 從 0 到 1，`wallLayer` 出現牆段；按 Delete 後新設牆回到 0。
+  - Image smoke：`canvas-tool-wiring-image-smoke` 顯示 `validation-underlay.png`，`importKind = png`，`importPreview = true`，underlay image count = 1。
+  - PDF smoke：`canvas-tool-wiring-pdf-smoke` 顯示 `validation-floor-plan.pdf`，`importKind = pdf`，`importPreview = false`，underlay image count = 0。
+- Guard：
+  - 未修改 `plancraft/` 或 Plancraft core。
+  - 未修改 budget runtime。
+  - 未新增 `package.json`、`node_modules` 或 framework。
+  - 未解除 `formalEstimateGuard`。
+  - 未呼叫 Budget Engine / `generateBudgetEstimate()`。
+  - 未接 AI API / image API / DB / payment / escrow / listing fee。
+- 仍是 placeholder / disabled：
+  - 復原 / 重做 history stack 尚未完整開放。
+  - 完整 CAD 級 pan / zoom 尚未完成，本輪只完成 zoom 狀態與可見提示。
+  - PDF preview、OCR、自動比例識別、storage、production budget adapter、正式 renderer integration 仍未開放。
+- 下一步唯一建議：scope clean 時建立 scoped commit 並開 Draft PR；後續可做 `0.16.2` pan / zoom / undo-redo history stack 或 opening placement 深化。
