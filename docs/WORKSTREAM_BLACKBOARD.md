@@ -423,6 +423,18 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
+### 2026-06-05 - Patrol Commander Report Requested
+
+- To: 巡檢總指揮
+- Workstream: `command/patrol-commander`
+- Status: `REPORT_REQUESTED`
+- Progress %: N/A
+- Evidence: Commander requests the Patrol Commander to submit the latest local-vs-GitHub inspection report to this GitHub blackboard or a scoped current-main PR.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+- Blocker: No visible Patrol Commander report section was found on GitHub `main` during the previous Commander check.
+- Need Commander: No, unless the report requires merge, closeout, runtime, production, payment, AI API, DB, or formal quote decisions.
+- Need Reviewer: No by default.
+- Next single action: Patrol Commander submits a compact report with GitHub main SHA, local path checked, LOCAL_STATE status, changed PR / Issue facts, stale-state findings, owner actions, and exact blocker / closeout recommendations.
 ### 2026-06-05 - Output Documents Snapshot-only Functional Evidence Packet Submitted
 
 - Agent: Output Documents / 預算成品物流系統
