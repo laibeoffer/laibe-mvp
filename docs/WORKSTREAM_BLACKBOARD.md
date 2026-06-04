@@ -1,6 +1,6 @@
-# LaiBE MVP Workstream Blackboard
+﻿# LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-03 Asia/Taipei
+Last updated: 2026-06-05 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
@@ -354,6 +354,36 @@ No，除非要決定正式驗收標準或 production release。
 Need Reviewer:
 Yes before final integration harness acceptance.
 
+## Archived Agents - AI PCM Department
+
+AI PCM department docs-only closeout is accepted according to AI PCM Commander report. This archive only covers documentation, roles, boundaries, reserved flows, and governance rules.
+
+Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+
+Forbidden claims:
+
+- AI PCM production ready
+- LINE API connected
+- AI API connected
+- DB / Supabase connected
+- payment / escrow / listing fee connected
+- formal tender enabled
+- formal legal decision enabled
+- formal quote / price enabled
+- runtime code complete
+
+Reactivation condition: only explicit user activation of AI PCM runtime, LINE terminal, production AI API, DB / Supabase, payment / escrow, formal tender, formal legal decision, or formal quote / price may reactivate these agents.
+
+Integration Gate Impact: None. AI PCM department is not part of the Budget Integration Gate and must not raise budget-system completion progress.
+
+| Agent | Workstream | Status | Evidence | Boundary | Automation | Reactivation Condition |
+|---|---|---|---|---|---|---|
+| AI PCM 總監／後台總控 Agent | `pcm/admin-control-center` | `ARCHIVED_GOVERNANCE_READY` | `CLOSEOUT_READY / 100%` | docs-only, no runtime code, no production API | `DISABLED_AFTER_ARCHIVE` | Explicit user activation of AI PCM runtime / production API scope |
+| 合約資料與證據管理 Agent | `pcm/contract-evidence-admin` | `ARCHIVED_DOCS_ONLY` | `CLOSEOUT_ACCEPTED_WITH_NOTES / 100%` | docs-only, no production contract/legal runtime | `NO_ACTIVE_PATROL_REQUIRED` | Explicit user activation of contract evidence runtime scope |
+| 問題分流與合約裁決建議 Agent | `pcm/issue-routing-contract-decision` | `ARCHIVED_DOCS_ONLY` | `CLOSEOUT_ACCEPTED_WITH_NOTES / 100%` | docs-only, no formal legal decision | `NO_ACTIVE_PATROL_REQUIRED` | Explicit user activation of formal legal decision / runtime routing scope |
+| 甲乙方入口與 LINE 終端 Agent | `pcm/party-entry-line-terminal` | `ARCHIVED_DOCS_ONLY` | `CLOSEOUT_ACCEPTED_WITH_NOTES / 100%` | docs-only, no production LINE API | `NO_ACTIVE_PATROL_REQUIRED` | Explicit user activation of LINE terminal / production API scope |
+| 招標前置輔助 Agent | `pcm/pre-tender-readiness` | `ARCHIVED_DOCS_ONLY` | `CLOSEOUT_ACCEPTED_WITH_NOTES / 100%` | docs-only, no formal tender enabled | `NO_ACTIVE_PATROL_REQUIRED` | Explicit user activation of formal tender scope |
+| 付款節點與金流分撥預留 Agent | `pcm/payment-ledger-placeholder` | `ARCHIVED_DOCS_ONLY` | `CLOSEOUT_ACCEPTED_WITH_NOTES / 100%` | docs-only, no payment / escrow / listing fee | `NO_ACTIVE_PATROL_REQUIRED` | Explicit user activation of payment / escrow / listing fee scope |
 ## Future / Standby Agent Backlog
 
 These agents are not current blockers and must not receive new tasks unless explicitly activated by the user.
@@ -393,6 +423,18 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
+### 2026-06-05 - Output Documents Snapshot-only Functional Evidence Packet Submitted
+
+- Agent: Output Documents / 預算成品物流系統
+- Workstream: `output/budget-documents`
+- Status: `SNAPSHOT_ONLY_FUNCTIONAL_PACKET_SUBMITTED`
+- Progress %: 85
+- Evidence: BudgetOutputSnapshot accepted input and snapshot-gated rendered document boundary recorded; snapshot-only renderer / static guard evidence accepted for snapshot-only readiness; no Budget Engine rerun, no Raw Candidate read, no MethodSpecCatalog read, no real Excel/PDF.
+- Functional Acceptance: `PASS_FOR_SNAPSHOT_ONLY_OUTPUT_READINESS`
+- Blocker: Formal Excel/PDF and formal quote remain out of scope and not closeable.
+- Need Commander: No for snapshot-only closeout; Yes before formal Excel/PDF, formal quote, production renderer, payment, AI API, or DB.
+- Need Reviewer: No unless future evidence crosses into renderer runtime, Budget Engine rerun, direct Raw/MethodSpec read, or formal output.
+- Next single action: Integration Officer may close the snapshot-only queue; do not start integration harness.
 ### 2026-06-04 - Budget Workflow Orchestrator Closeout Disposition Synced
 
 - Agent: Budget Workflow Orchestrator Agent
