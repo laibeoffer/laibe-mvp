@@ -100,7 +100,7 @@ Decision Packet required before waiting:
 | Agent | Workstream | Safe Work | Status | Next Report |
 |---|---|---|---|---|
 | 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | Prepare dry-run entry decision evidence and forbidden-flow checklist for Issue #49. | `ACTIVE_SOLVING` | Next heartbeat / Issue #49 update |
-| Budget Workflow Orchestrator | `workflow/budget-orchestrator` | Prepare docs-only replacement or sync plan for PR #51; do not enable n8n / webhook. | `PARALLEL_SAFE_WORK` | Next integration officer closeout review |
+| Budget Workflow Orchestrator | `workflow/budget-orchestrator` | Closeout disposition recorded; no replacement PR required unless Integration Officer reopens this workstream. Do not enable n8n / webhook. | `COMPLETED_PENDING_ARCHIVE` | Archive confirmation only |
 | Budget Knowledge Vault | `knowledge/budget-vault` | Prepare docs-only sync / closeout evidence for PR #32 under Integration Officer. | `PARALLEL_SAFE_WORK` | Next integration officer closeout review |
 | Owner Guide Agent | `app/owner-guide-agent` | Continue standalone mock evidence and browser validation notes while routing decision waits. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
 | Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | Continue contract evidence and browser/runtime validation preparation; do not claim 100%. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
@@ -112,7 +112,6 @@ Decision Packet required before waiting:
 
 | Agent | Reason | Required Next Action | Supervisor |
 |---|---|---|---|
-| Budget Workflow Orchestrator | PR #51 docs-only but `mergeable=false`. | Prepare safe current-main sync or replacement PR proposal; do not rebase / force push without authorization. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
 | Budget Knowledge Vault | PR #32 docs-only but `mergeable=false`. | Prepare safe current-main sync or replacement PR proposal; do not replace Integration Gate evidence. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
 | MethodSpec | `BUDGET_ENGINE_ENTRY_BLOCKER`. | Wait for Issue #49 result while maintaining MethodSpec evidence; do not self-repair Budget Engine. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
 
@@ -121,6 +120,7 @@ Decision Packet required before waiting:
 | Agent | Status | Evidence | Archive Condition |
 |---|---|---|---|
 | Budget Review Gate | `COMPLETED_PENDING_ARCHIVE` | PR #37 merged; docs-only support closeout. | Integration Officer confirms archive / standby and no further closeout work. |
+| Budget Workflow Orchestrator | `COMPLETED_PENDING_ARCHIVE` | PR #51 Commander disposition: `CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE`; markers `AGENT_CLOSEOUT_ACCEPTED` and `AUTOMATION_STOP_APPROVED`; docs remain placeholder-only. | Integration Officer accepts this blackboard closeout sync; no active runtime automation. |
 | Budget E2E Fixture & QA | `COMPLETED_PENDING_ARCHIVE` | PR #48 merged; docs-only support closeout. | Integration Officer confirms archive / standby and no further closeout work. |
 | 平面拼圖 Adapter | `COMPLETED_PENDING_ARCHIVE` | PR #9 merged; candidate adapter contract only. | Commander archive PR can move it to Archived Agents without affecting full Plancraft+ progress. |
 
@@ -392,6 +392,19 @@ Use this format only when changing current status:
 ```
 
 Do not paste full logs or repeated heartbeat text into this file.
+
+### 2026-06-04 - Budget Workflow Orchestrator Closeout Disposition Synced
+
+- Agent: Budget Workflow Orchestrator Agent
+- Workstream: `workflow/budget-orchestrator`
+- Status: `COMPLETED_PENDING_ARCHIVE`
+- Progress %: 100
+- Evidence: GitHub main patrol found stale PR #51 watchlist text. PR #51 has Commander disposition `CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE`, with `AGENT_CLOSEOUT_ACCEPTED` and `AUTOMATION_STOP_APPROVED`. The active docs on main remain the placeholder workflow package from the accepted baseline.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+- Blocker: None for this workstream closeout; Budget Integration Gate is unaffected.
+- Need Commander: No unless n8n, webhook, external automation, API, DB, payment, AI API, or production quote scope is reopened.
+- Need Reviewer: No by default; Yes only if future work proposes production triggers, runtime automation, formal budget output, or customer-facing notification.
+- Next single action: Archive / standby under `LAIBE_PATROL_INTEGRATION_OFFICER`; do not create runtime automation.
 
 ### 2026-06-01 - Budget Review Gate Final Report Submitted
 

@@ -7,14 +7,36 @@ workstream: workflow/budget-orchestrator
 github_source_of_truth: laibeoffer/laibe-mvp
 no_idle_until_initialized: true
 auto_progress_after_minutes_without_response: 20
-alarm_health_status: placeholder_contract_only
-last_alarm_repair_check: 2026-06-01T00:35:46+08:00
+alarm_health_status: closeout_accepted_stop_approved
+last_alarm_repair_check: 2026-06-04T22:03:12+08:00
 
 ## Runtime Status
 
 No real heartbeat or external automation is created in this repository by this document.
 
 This is a workflow placeholder record only. It records the intended patrol policy for the Budget Workflow Orchestrator Agent while n8n is not enabled.
+
+## Closeout Alarm Check - 2026-06-04T22:03:12+08:00
+
+patrol_executed: true
+
+github_main_checked: 6b0b394d973a93d1e9f8601a55f4a277a28f8bbe
+
+pr_51_disposition: CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE
+
+agent_closeout: AGENT_CLOSEOUT_ACCEPTED
+
+automation_stop: AUTOMATION_STOP_APPROVED
+
+alarm_contract_status: closeout_recorded
+
+next_alarm_action: stop proactive patrol unless LAIBE_PATROL_INTEGRATION_OFFICER reopens this workstream; respond only to explicit closeout, evidence, or audit requests.
+
+runtime_created: false
+
+production_automation_created: false
+
+note: This record does not create a scheduler, cron job, n8n workflow, webhook, or external automation. It only syncs the closeout disposition for the placeholder patrol contract.
 
 ## Alarm Repair Check - 2026-06-01T00:35:09+08:00
 

@@ -1,5 +1,18 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Workflow Task: Budget Workflow Orchestrator Closeout Sync
+
+- Agent: Budget Workflow Orchestrator Agent
+- Workstream: `workflow/budget-orchestrator`
+- GitHub main checked: `6b0b394d973a93d1e9f8601a55f4a277a28f8bbe`
+- Status: `COMPLETED_PENDING_ARCHIVE`
+- Progress: 100%
+- Evidence: PR #51 was closed with Commander disposition `CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE`; `AGENT_CLOSEOUT_ACCEPTED` and `AUTOMATION_STOP_APPROVED` are the active closeout markers.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+- Scope: docs-only blackboard and placeholder automation sync.
+- Forbidden scope check: no n8n runtime, no webhook, no DB/Supabase, no payment, no AI API, no production automation, no formal budget output.
+- Next action: Integration Officer may archive / standby this workstream after accepting the closeout sync. Reopen only with explicit authorization for future runtime scope.
+
 ## Latest Commander Governance Announcement: Multi-computer Workspace Registry
 
 - 本輪任務名稱：建立多電腦工作區規則。
