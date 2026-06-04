@@ -52,6 +52,40 @@ Docs/governance/blackboard/handoff-only PRs must be marked:
 
 They must not increase runtime or feature progress.
 
+## One-shot Execution Report Protocol
+
+Effective immediately for this round: agents must execute all safe, in-scope work for their assigned task before reporting. They must not report small partial progress, wait for more instructions, then continue.
+
+Required behavior:
+
+1. Read current GitHub source of truth first: `main`, active PR / Issue, blackboard, and handoff.
+2. Execute all low-risk / preauthorized work available in the task scope.
+3. Do not stop after the first sub-step if more safe work remains.
+4. Submit one final consolidated report only after completing the task scope or reaching a real blocker.
+5. The final report must include: actions completed, evidence, files / PR / Issue touched, Functional Acceptance, forbidden-scope check, remaining blocker, owner, and next single action.
+6. If blocked, submit an exact blocker packet, not a partial status update.
+7. If waiting for a supervisor decision, continue safe parallel work first, then include the decision packet in the final report.
+
+Allowed one-shot safe work includes docs-only updates, evidence packets, validation command lists, blackboard status proposals, final completion packets, closeout reports, exact blocker packets, and current-main replacement PR preparation.
+
+Stop immediately and report only if the next step requires high-risk authorization:
+
+- merge / close / resolve review thread without prior authorization
+- runtime code changes beyond the assigned scope
+- Budget Engine expansion
+- `PricingRule` / `BudgetEstimateLine`
+- renderer runtime / formal Excel / formal PDF / formal quote
+- payment / AI API / DB / Supabase / n8n / webhook / secrets
+- integration harness start
+- production-ready claim
+
+Forbidden report patterns:
+
+- `本輪無新指派`
+- `waiting only`
+- `no material change`
+- repeated heartbeat-only status
+- partial update with remaining safe work unexecuted
 ## No-idle Agent Operation Rules
 
 Core sentence for all agents:
@@ -492,6 +526,18 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
+### 2026-06-05 - One-shot Execution Report Protocol Activated
+
+- Agent: All active agents and supervisors
+- Workstream: `governance/agent-execution-rules`
+- Status: `ONE_SHOT_EXECUTION_REQUIRED`
+- Progress %: N/A
+- Evidence: Commander instruction requires agents to complete all safe in-scope work first, then submit one consolidated final report.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+- Blocker: None; applies to active tasks immediately.
+- Need Commander: No, unless high-risk authorization is required.
+- Need Reviewer: No, unless runtime / production / formal output boundaries are touched.
+- Next single action: Agents execute assigned safe scope to completion and report once with evidence, blocker packet if any, and next single action.
 ### 2026-06-05 - MethodSpec PR #30 Stale Disposition Issued
 
 - Agent: MethodSpec Owner
