@@ -124,21 +124,19 @@ Rules:
 Integration Gate status: `NOT_READY_FOR_HARNESS`
 
 Next required action: MethodSpec PR #30 disposition / replacement.
+
 ## Decision Queue
 
 | Decision | Owner | Requested By | Options | Recommendation | Waiting Since | Safe Work While Waiting |
 |---|---|---|---|---|---|---|
 | Plan Puzzle Tool Catalog / interaction implementation authorization | Deputy Commander | Plan Puzzle UI | Authorize / request more runtime evidence / defer | Defer until current PR lineage and runtime evidence are clean | 2026-06-01 | Prepare interaction checklist and browser validation plan. |
-| Quote Factory PR #3 final acceptance path | Deputy Commander + Reviewer as needed | Quote Factory | Merge after evidence / request GitHub-run validators / keep draft | Request GitHub-run validation evidence before 100% | 2026-06-01 | Maintain export manifest, validator list, and final packet draft. |
-| Raw Candidate final gate acceptance | Patrol Integration Officer, then Deputy Commander if needed | Raw Candidate | Accept final packet / request more evidence / keep 95% | Integration Officer reviews final packet first | 2026-06-01 | Keep R1.5 evidence matrix and forbidden-flow checklist ready. |
+| MethodSpec PR #30 disposition / replacement | `warehouse/method-spec` owner + `LAIBE_REVIEWER_INTEGRATION_OFFICER` | Commander closeout approval | Close stale PR #30 / require clean current-main replacement PR | Close stale PR #30 unless a clean current-main replacement is prepared | 2026-06-05 | Keep Issue #49 open; do not start integration harness. |
 
 ## Parallel Safe Work Queue
 
 | Agent | Workstream | Safe Work | Status | Next Report |
 |---|---|---|---|---|
-| 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | Prepare dry-run entry decision evidence and forbidden-flow checklist for Issue #49. | `ACTIVE_SOLVING` | Next heartbeat / Issue #49 update |
-| Budget Workflow Orchestrator | `workflow/budget-orchestrator` | Closeout disposition recorded; no replacement PR required unless Integration Officer reopens this workstream. Do not enable n8n / webhook. | `COMPLETED_PENDING_ARCHIVE` | Archive confirmation only |
-| Budget Knowledge Vault | `knowledge/budget-vault` | Prepare docs-only sync / closeout evidence for PR #32 under Integration Officer. | `PARALLEL_SAFE_WORK` | Next integration officer closeout review |
+| MethodSpec | `warehouse/method-spec` | Prepare PR #30 stale closeout or clean current-main replacement packet. Do not self-repair Budget Engine. | `PR30_DISPOSITION_REQUIRED` | Next single action: PR #30 disposition / replacement |
 | Owner Guide Agent | `app/owner-guide-agent` | Continue standalone mock evidence and browser validation notes while routing decision waits. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
 | Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | Continue contract evidence and browser/runtime validation preparation; do not claim 100%. | `PARALLEL_SAFE_WORK` | Next Execution Officer report |
 | 預算資料契約 / Schema Registry Agent | `budget/schema-registry` | Prepare docs-only schema registry self-introduction, scope boundary, and first contract map. | `ACTIVE_SOLVING` | Every 15 minutes under Commander patrol |
@@ -149,17 +147,25 @@ Next required action: MethodSpec PR #30 disposition / replacement.
 
 | Agent | Reason | Required Next Action | Supervisor |
 |---|---|---|---|
-| Budget Knowledge Vault | PR #32 docs-only but `mergeable=false`. | Prepare safe current-main sync or replacement PR proposal; do not replace Integration Gate evidence. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
-| MethodSpec | `BUDGET_ENGINE_ENTRY_BLOCKER`. | Wait for Issue #49 result while maintaining MethodSpec evidence; do not self-repair Budget Engine. | `LAIBE_PATROL_INTEGRATION_OFFICER` |
+| MethodSpec | PR #30 is stale, `mergeable=false`, and still records the old Budget Engine entry blocker. | Close PR #30 as stale or submit a clean current-main replacement PR after post-PR55 reevaluation. | `LAIBE_REVIEWER_INTEGRATION_OFFICER` |
+| Issue #49 | Cannot close until MethodSpec post-PR55 reevaluation confirms PR #55 unblocks the previous entry blocker. | Keep Issue #49 open and link the MethodSpec disposition / replacement evidence. | `LAIBE_REVIEWER_INTEGRATION_OFFICER` |
+| Integration Harness | Gate remains `NOT_READY_FOR_HARNESS`. | Do not start harness until MethodSpec disposition and all required runtime gates are accepted. | `LAIBE_REVIEWER_INTEGRATION_OFFICER` |
 
-## Closeout Queue
+## Archived / Closeout Queue
 
-| Agent | Status | Evidence | Archive Condition |
-|---|---|---|---|
-| Budget Review Gate | `COMPLETED_PENDING_ARCHIVE` | PR #37 merged; docs-only support closeout. | Integration Officer confirms archive / standby and no further closeout work. |
-| Budget Workflow Orchestrator | `COMPLETED_PENDING_ARCHIVE` | PR #51 Commander disposition: `CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE`; markers `AGENT_CLOSEOUT_ACCEPTED` and `AUTOMATION_STOP_APPROVED`; docs remain placeholder-only. | Integration Officer accepts this blackboard closeout sync; no active runtime automation. |
-| Budget E2E Fixture & QA | `COMPLETED_PENDING_ARCHIVE` | PR #48 merged; docs-only support closeout. | Integration Officer confirms archive / standby and no further closeout work. |
-| 平面拼圖 Adapter | `COMPLETED_PENDING_ARCHIVE` | PR #9 merged; candidate adapter contract only. | Commander archive PR can move it to Archived Agents without affecting full Plancraft+ progress. |
+| Agent | Scope | Status | Evidence | Automation | Boundary / Reactivation |
+|---|---|---|---|---|---|
+| Quote Factory | PR #3 export-package dry-run | `ARCHIVED_SCOPE_COMPLETED / NOT_PRODUCTION_READY` | PR #3 merged in `laibeoffer/laibe-quote-factory`; export package is dry-run metadata only. | `AUTOMATION_STOP_APPROVED` | No formal price, no `PricingRule`, no `BudgetEstimateLine`, no formal quote. Reactivate only for explicit Quote Factory production / pricing scope. |
+| Raw Candidate | PR #26 R1.5 candidate-only | `ARCHIVED_SCOPE_COMPLETED / not formal price ready` | PR #26 merged; R1.5 candidate-only safety evidence accepted. | `AUTOMATION_STOP_APPROVED` | No formal price, no `PricingRule`, no `BudgetEstimateLine`, no Renderer readiness. Reactivate only for explicit formalization / review-gated runtime scope. |
+| Budget Knowledge Vault | PR #78 docs-only support | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #78 merged; support vault is docs-only and not part of four-line Integration Gate. | `AUTOMATION_STOP_APPROVED` | No runtime verification credit. Reactivate only if Integration Officer assigns new vault maintenance. |
+| Budget Engine Entry / Picking | PR #55 minimal dry-run implementation patrol | `ARCHIVED_SCOPE_COMPLETED / not production Budget Engine` | PR #55 merged; `PASS_FOR_MINIMAL_DRY_RUN_ENTRY` only. | `AUTOMATION_STOP_APPROVED for implementation patrol` | Issue #49 stays open pending MethodSpec post-PR55 reevaluation. No production Budget Engine, formal pricing, renderer, payment, AI API, DB, n8n, or harness start. |
+| Budget Review Gate | PR #37 docs-only review contract | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #37 merged; docs-only review gate contracts. | `AUTOMATION_STOP_APPROVED` | No runtime verified credit and no formal price approval authority. |
+| Budget E2E Fixture QA | PR #48 docs-only fixture contract | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #48 merged; dry-run fixture / QA contracts only. | `AUTOMATION_STOP_APPROVED` | No harness execution and no runtime verified credit. |
+| Budget Input Flow Gate | PR #71 docs-only evidence | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #71 merged; support evidence only. | `AUTOMATION_STOP_APPROVED` | Does not enable runtime, Budget Engine, Renderer, `PricingRule`, or `BudgetEstimateLine`. |
+| Budget File Intake Sandbox | PR #72 docs-only evidence | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #72 merged; support evidence only. | `AUTOMATION_STOP_APPROVED` | Does not enable upload backend, storage API, DB, Budget Engine, Renderer, or formal quote. |
+| Budget Runtime Acceptance | PR #73 docs-only evidence | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #73 merged; support evidence only. | `AUTOMATION_STOP_APPROVED` | Docs-only acceptance matrix does not equal runtime verification. |
+| Budget Workflow Orchestrator | PR #51 closed unmerged docs-only final report | `STANDBY_BY_COMMANDER_CLOSEOUT / no Gate credit` | PR #51 closed unmerged; prior placeholder baseline remains docs-only. | no recurring patrol | Do not enable n8n, webhook, scheduler, API key, DB, payment, AI API, formal quote, Excel, or PDF. |
+| 平面拼圖 Adapter | PR #9 candidate adapter contract | `ARCHIVED_CONTEXT_ONLY` | PR #9 merged; candidate adapter contract only. | `NO_ACTIVE_PATROL_REQUIRED` | Does not affect Budget Integration Gate or full Plancraft+ readiness. |
 
 ## Active Agent Progress Board
 
@@ -167,33 +173,33 @@ Next required action: MethodSpec PR #30 disposition / replacement.
 |---|---|---|---:|---|---|---|---|---|---|---|---|
 | 平面拼圖 UI / Plan Puzzle | `plancraft/page-ui` | `laibeoffer/laibe-mvp` | 85 | IN_PROGRESS | PR #25 / Issue #15 context | UI IA correction recorded in handoff / phase packet; runtime Tool Catalog not complete | PENDING | Runtime / Tool Catalog interaction not complete | Yes, for product direction or next implementation authorization | No by default | Decide whether to authorize Tool Catalog Interaction Implementation |
 | 平面拼圖 Adapter | `plancraft/adapter-clean` | `laibeoffer/laibe-mvp` | 100 | READY_FOR_INTEGRATION_CONTEXT_ONLY | PR #9 merged | Candidate adapter contract merged; `formalEstimateAllowed: false`; no `generateBudgetEstimate()` path | PASS for candidate adapter contract only | Not a full Plancraft+ completion signal | No | No unless adapter touches formal estimate boundary | Keep as candidate-only upstream context |
-| Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 85 | FUNCTIONAL_ACCEPTANCE_PENDING | PR #3 open draft | QF5.4 PR #3 head `e2fa1e8`; changed files scope clean; export package / manifest / validator are GitHub-tracked; validator commands listed in PR body | PENDING | PR #3 not merged; no GitHub-run validator evidence | Yes for final acceptance | Yes | Review PR #3, decide ready/merge or request GitHub-run validation evidence |
-| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 95 | FINAL_PACKET_SUBMITTED | PR #26 merged / Issue #17 closed | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; final packet posted in PR comment `4590972724`; current-main CLI demos/static guard pass; no formal pricing/output/payment/API/DB scope | PASS for R1.5 candidate-only CLI/static guard evidence; web validation `NOT_WEB_SURFACE` | Commander / Integration Officer functional acceptance pending | Yes, for final acceptance only | No by default unless acceptance review finds drift | Integration Officer reviews final packet and updates gate acceptance |
-| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | BLOCKED | PR #30 context / Issue #49 dependency | Integration readiness evidence and context windows exist | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` now routed to `budget/engine-entry-picking` | No unless product decision is needed | Integration Officer investigation required | Wait for Budget Engine Entry / Picking Agent report |
-| 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | `laibeoffer/laibe-mvp` | 25 | ACTIVE_INVESTIGATION | Issue #49 | Issue #49 created for Budget Engine Entry active resolution; asks for `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run entry proposal | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER`; entry path/export not yet identified | No unless product/formal-output boundary is found | Yes only if forbidden flow or ownership dispute appears | Report entry existence and minimal dry-run proposal; do not modify functional code |
-| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 75 | WAITING_REVIEW | PR #23 merged / PR #29 open | Snapshot-only usage note; static guard valid; no real xlsx/pdf output | PENDING | PR #29 merge / final evidence pending | No | Only if real Excel/PDF or renderer boundary changes | Wait for PR #29 / final static guard and snapshot-only evidence |
+| Quote Factory | `quote-factory/price-range-governance` | `laibeoffer/laibe-quote-factory` | 100 | `ARCHIVED_SCOPE_COMPLETED / NOT_PRODUCTION_READY` | PR #3 merged | Export-package dry-run closeout approved. | PASS for scoped dry-run export package only | No formal price / `PricingRule` / `BudgetEstimateLine` / formal quote credit | No | No unless production pricing scope is reopened | Standby; heartbeat stopped |
+| Raw Candidate | `warehouse/raw-candidate` | `laibeoffer/laibe-mvp` | 100 | `ARCHIVED_SCOPE_COMPLETED / not formal price ready` | PR #26 merged / Issue #17 closed | R1.5 candidate-only acceptance archived. | PASS for candidate-only guard evidence | Not formal price ready; no Renderer readiness | No | No unless formalization scope is reopened | Standby; heartbeat stopped |
+| MethodSpec | `warehouse/method-spec` | `laibeoffer/laibe-mvp` | 75 | `PR30_DISPOSITION_REQUIRED` | PR #30 open / `mergeable=false`; Issue #49 dependency | Existing PR #30 still records old Budget Engine entry blocker; PR #55 has since merged minimal dry-run entry. | PENDING | PR #30 stale / non-mergeable; MethodSpec post-PR55 reevaluation required | No unless product/formal-output decision appears | Yes | MethodSpec PR #30 disposition / replacement |
+| 預算生產線入口 / 撿貨系統 Agent | `budget/engine-entry-picking` | `laibeoffer/laibe-mvp` | 100 | `ARCHIVED_SCOPE_COMPLETED / not production Budget Engine` | PR #55 merged / Issue #49 open | Minimal dry-run entry implementation patrol accepted. | PASS for minimal dry-run entry only | Issue #49 remains open until MethodSpec post-PR55 reevaluation confirms unblock | No | No unless MethodSpec reevaluation finds runtime boundary drift | Stop implementation heartbeat; keep Issue #49 open |
+| Output Documents | `output/budget-documents` | `laibeoffer/laibe-mvp` | 85 | `SNAPSHOT_ONLY_FUNCTIONAL_PACKET_SUBMITTED` | PR #23 merged / PR #29 merged | Snapshot-only usage note and static guard valid; no real xlsx/pdf output. | PASS for snapshot-only output readiness | Formal Excel/PDF and formal quote remain out of scope | No | Only if real Excel/PDF or renderer boundary changes | Standby for snapshot-only; do not produce formal output |
 | 模擬圖生成 | `visual/simulation-governance` | `laibeoffer/laibe-mvp` | 75 | READY_CONTEXT_ONLY | PR #24 merged | Governance docs / prompt / sandbox rules merged; no real image API | NOT_APPLICABLE_DOCS_ONLY for governance; runtime not complete | Runtime / production image API not part of current readiness | Only if real image/API direction is considered | No by default | Pause unless visual policy changes |
 | Governance Patrol | `governance/codex-rules` | `laibeoffer/laibe-mvp` | 85 | GOVERNANCE_DOCS_MERGED | PR #35 merged / Issue #28 | PR #35 merged as compact blackboard rebuild; GitHub source-of-truth and merge-decision authority recorded | NOT_APPLICABLE_DOCS_ONLY | Ongoing governance maintenance | Only for system-rule changes | No by default | Maintain compact blackboard discipline |
-| 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | WAITING | Integration Gate / Issue #41 / Issue #49 | Four budget lines not all 100; Budget Engine entry investigation dispatched to Issue #49 | PENDING | Waiting on MethodSpec blocker and final evidence from other lines | No unless integration decision needed | N/A | Receive Issue #49 result; do not start integration harness |
+| 審查官兼整合官 | `integration/budget-system-readiness` | `laibeoffer/laibe-mvp` | 25 | `NOT_READY_FOR_HARNESS` | Integration Gate / Issue #49 / PR #30 | Commander closeout approved scoped standby for completed support lines. | PENDING | MethodSpec PR #30 disposition / replacement required; Issue #49 remains open | No unless integration harness start or production scope is proposed | N/A | MethodSpec PR #30 disposition / replacement |
 
 ## Integration Readiness Gate
 
-Status: WAITING
+Status: `NOT_READY_FOR_HARNESS`
 
-Blocking item: MethodSpec / `BUDGET_ENGINE_ENTRY_BLOCKER`
+Blocking item: MethodSpec PR #30 stale / non-mergeable and Issue #49 post-PR55 reevaluation
 
-Current blocker owner: `budget/engine-entry-picking` / 預算生產線入口 / 撿貨系統 Agent
+Current blocker owner: `warehouse/method-spec` with `LAIBE_REVIEWER_INTEGRATION_OFFICER`
 
 Gate manager: `LAIBE_REVIEWER_INTEGRATION_OFFICER`
 
-Next: Identify current Budget Engine entry before integration harness.
+Next: MethodSpec PR #30 disposition / replacement.
 
 | Workstream | Required for Integration | Completion % | Evidence | Functional Acceptance | Blocker | Gate Status |
 |---|---|---:|---|---|---|---|
-| `quote-factory/price-range-governance` | Yes | 85 | PR #3 open draft; head `e2fa1e8`; export package / manifest / validator are GitHub-tracked | PENDING | PR #3 not merged; no GitHub-run validator evidence | WAITING |
-| `warehouse/raw-candidate` | Yes | 95 | PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; final packet posted in PR comment `4590972724`; R1.5 CLI demos/static guard passed on current main; candidate-only safety evidence recorded | PASS for R1.5 validation evidence; final acceptance pending | Commander / Integration Officer functional acceptance pending | WAITING |
-| `warehouse/method-spec` | Yes | 75 | PR #30 context; integration readiness evidence exists; Issue #49 opened for engine entry blocker | PENDING | `BUDGET_ENGINE_ENTRY_BLOCKER` routed to `budget/engine-entry-picking` | BLOCKED |
-| `output/budget-documents` | Yes | 75 | PR #23 merged; PR #29 open; snapshot-only usage note and static guard valid | PENDING | PR #29 merge / final evidence pending | WAITING |
+| `quote-factory/price-range-governance` | Yes | 100 scoped | PR #3 merged in `laibeoffer/laibe-quote-factory`; export package dry-run scope archived | PASS for scoped dry-run export package only | No formal price / `PricingRule` / `BudgetEstimateLine` / formal quote readiness | STANDBY |
+| `warehouse/raw-candidate` | Yes | 100 scoped | PR #26 merged; R1.5 candidate-only safety evidence archived | PASS for candidate-only evidence | Not formal price ready; no Renderer readiness | STANDBY |
+| `warehouse/method-spec` | Yes | 75 | PR #30 open, stale, `mergeable=false`; Issue #49 remains open for post-PR55 reevaluation | PENDING | PR #30 disposition / clean current-main replacement required | BLOCKED |
+| `output/budget-documents` | Yes | 85 | PR #23 and PR #29 merged; snapshot-only usage note and static guard evidence | PASS for snapshot-only output readiness | Formal Excel/PDF and formal quote remain out of scope | WAITING |
 
 Readiness rule:
 
@@ -201,40 +207,43 @@ Readiness rule:
 - Plan Puzzle and Owner Guide are not part of this four-line gate.
 - Budget Knowledge Vault is not part of this gate and cannot replace completion packets.
 - PR merge alone must not raise any line to 100%.
+- Docs-only closeout must not be treated as runtime verified.
+- Candidate-only acceptance must not be treated as formal price ready.
 
 ## Budget Integration Blocker Handoff
 
-To: `budget/engine-entry-picking` / 預算生產線入口 / 撿貨系統 Agent
+To: `warehouse/method-spec` / MethodSpec owner
 
 Issue: #49
 
-Mission: Budget Engine Entry active resolution for `BUDGET_ENGINE_ENTRY_BLOCKER`.
+Mission: MethodSpec post-PR55 reevaluation for Issue #49.
 
 Required output:
 
-- Whether `budget-generator.ts` exists.
-- Whether an alternative Budget Engine entry exists.
-- Whether `generateBudgetEstimate` still exists.
-- Which entry should receive MethodSpec approved rules.
-- If no entry exists, propose a minimal dry-run entry proposal.
+- Decide whether PR #30 should be closed as stale or replaced with a clean current-main PR.
+- Confirm whether PR #55 minimal dry-run entry unblocks the previous MethodSpec Budget Engine entry blocker.
+- Keep Issue #49 open until this reevaluation is recorded.
+- Do not start integration harness.
 
 Forbidden:
 
 - Do not modify functional code.
 - Do not create or patch `budget-generator.ts`.
-- Do not route this blocker to MethodSpec for self-repair.
 - Do not start integration harness.
-- Do not create formal prices, production `PricingRule`, `BudgetEstimateLine`, renderer output, Excel/PDF, `BudgetOutputSnapshot`, payment/auth/webhook/API/DB/secrets.
+- Do not create formal prices, production `PricingRule`, `BudgetEstimateLine`, renderer output, Excel/PDF, payment/auth/webhook/API/DB/secrets.
 
 ## Support Agents Managed Outside Commander
 
 | Agent | Workstream | Managed By | Status | Progress % | Not Part of Integration Gate | Notes |
 |---|---|---|---|---:|---|---|
-| 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | ACTIVE_SUPPORT | 25 | Yes | Summarizes four budget-core reports, gaps, proposals, decisions, and feedback loops. Supports Integration Officer only. |
-| 預算 E2E 驗收測試 / Budget E2E Fixture & QA Agent | `budget/e2e-fixture-qa` | `LAIBE_PATROL_INTEGRATION_OFFICER` | ACTIVE_INITIALIZATION | 25 | Yes | Defines dry-run E2E fixtures, expected snapshot contract, acceptance matrix, forbidden-flow QA checks, and final QA report template. |
+| 預算知識庫 / Budget Knowledge Vault Agent | `knowledge/budget-vault` | `LAIBE_REVIEWER_INTEGRATION_OFFICER` | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | 100 | Yes | PR #78 docs-only support archived; heartbeat stopped; no Integration Gate credit. |
+| 預算 E2E 驗收測試 / Budget E2E Fixture & QA Agent | `budget/e2e-fixture-qa` | `LAIBE_PATROL_INTEGRATION_OFFICER` | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | 100 | Yes | PR #48 docs-only fixture contract archived; heartbeat stopped; no harness execution. |
 | 需求引導官 / Owner Guide Agent | `app/owner-guide-agent` | `EXECUTION_OFFICER` | MOCK_READY | 45 | Yes | `onboard_ai_agent` exposes front-end QA log, requirement summary, next-step CTA, `OwnerIntent`, and `ProjectRequirementBrief placeholder`; browser verification still pending. |
 | 平面拼圖引導官 / Plan Puzzle Guide Agent | `app/plan-puzzle-guide-agent` | `EXECUTION_OFFICER` | CONTRACT_ONLY | 25 | Yes | Docs-only initialization contract exists under `docs/plan_puzzle_guide/`; runtime remains `WEB_RUNTIME_PENDING`. |
-| 預算審核閘門 / Budget Review Gate Agent | `budget/review-gate` | `LAIBE_PATROL_INTEGRATION_OFFICER` | FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE | 95 | Yes | PR #37 open; Issue #41 created for Integration Officer queue disposition; docs-only review gate contracts delivered; final Commander acceptance pending. |
+| 預算審核閘門 / Budget Review Gate Agent | `budget/review-gate` | `LAIBE_PATROL_INTEGRATION_OFFICER` | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | 100 | Yes | PR #37 docs-only review contract archived; heartbeat stopped; no runtime verified credit. |
+| Budget Input Flow Gate Agent | `budget/input-flow-gate` | `LAIBE_PATROL_INTEGRATION_OFFICER` | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | 100 | Yes | PR #71 docs-only evidence archived; heartbeat stopped. |
+| Budget File Intake Sandbox Agent | `budget/file-intake-sandbox` | `LAIBE_PATROL_INTEGRATION_OFFICER` | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | 100 | Yes | PR #72 docs-only evidence archived; heartbeat stopped. |
+| Budget Runtime Acceptance Agent | `qa/budget-runtime-acceptance` | `LAIBE_PATROL_INTEGRATION_OFFICER` | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | 100 | Yes | PR #73 docs-only evidence archived; heartbeat stopped; docs-only matrix is not runtime verification. |
 
 ## Support Agents Managed by Deputy Commander
 
@@ -435,9 +444,7 @@ These agents are not current blockers and must not receive new tasks unless expl
 
 ## Current Global Next Actions
 
-1. `budget/engine-entry-picking`: report Budget Engine entry status and minimal dry-run entry proposal in Issue #49.
-2. `LAIBE_REVIEWER_INTEGRATION_OFFICER`: receive Issue #49 result and keep Integration Gate WAITING until four required lines reach 100%.
-3. `Raw Candidate`: submit Final Completion Packet after PR #26 merge.
+1. MethodSpec PR #30 disposition / replacement.
 
 ## Compact Update Format
 
@@ -460,18 +467,19 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
-### 2026-06-05 - Budget Integration Stage Closeout Approved
+### 2026-06-05 - Commander Budget Closeout Approval
 
-- Agent: Deputy Commander / LAIBE_PATROL_INTEGRATION_OFFICER closeout scope
+- Agent: Deputy Commander
 - Workstream: `integration/budget-system-readiness`
-- Status: `BLOCKER_WATCH_CLOSEOUT_APPROVED`
+- Status: `COMMANDER_CLOSEOUT_STANDBY_APPROVED`
 - Progress %: N/A
-- Evidence: Quote Factory PR #3 merged; Raw Candidate PR #26 accepted candidate-only; Budget Knowledge Vault PR #78 merged; Budget Engine Entry PR #55 merged; Budget Review Gate PR #37, Budget E2E Fixture QA PR #48, Budget Input Flow Gate PR #71, Budget File Intake Sandbox PR #72, Budget Runtime Acceptance PR #73, and Budget Workflow Orchestrator PR #51 scope disposition recorded.
-- Functional Acceptance: mixed; docs-only items are `NOT_APPLICABLE_DOCS_ONLY`; candidate/dry-run items are not production-ready.
-- Blocker: MethodSpec PR #30 stale / non-mergeable; Issue #49 remains open pending MethodSpec post-PR55 reevaluation; Integration Harness remains `NOT_READY_FOR_HARNESS`.
-- Need Commander: No for completed-scope archive; Yes before production Budget Engine, formal price/quote, formal Excel/PDF, payment, AI API, DB, n8n, or integration harness start.
-- Need Reviewer: No by default; Yes if MethodSpec refresh touches runtime / Budget Engine / `PricingRule` / `BudgetEstimateLine`, or Output Documents crosses renderer runtime / formal output boundary.
+- Evidence: Budget Integration Closeout Sprint Report accepted for scoped closeout / standby. Archived scopes: Quote Factory PR #3 dry-run export package; Raw Candidate PR #26 R1.5 candidate-only; Budget Knowledge Vault PR #78 docs-only support; Budget Engine Entry PR #55 minimal dry-run implementation patrol; Budget Review Gate PR #37 docs-only contract; Budget E2E Fixture QA PR #48 docs-only contract; Budget Input Flow Gate PR #71 docs-only evidence; Budget File Intake Sandbox PR #72 docs-only evidence; Budget Runtime Acceptance PR #73 docs-only evidence; Budget Workflow Orchestrator PR #51 closed unmerged docs-only final report.
+- Functional Acceptance: Scoped only. Docs-only closeout is `NOT_RUNTIME_VERIFIED`; candidate-only acceptance is not formal price ready; Budget Engine Entry is not production Budget Engine.
+- Blocker: MethodSpec PR #30 remains open, stale, and `mergeable=false`; Issue #49 remains open pending MethodSpec post-PR55 reevaluation; Integration Harness remains `NOT_READY_FOR_HARNESS`.
+- Need Commander: No for the archived scopes. Yes before integration harness start, production Budget Engine, formal pricing, payment, AI API, DB, n8n, webhook, or product-direction changes.
+- Need Reviewer: Yes for MethodSpec PR #30 disposition / replacement.
 - Next single action: MethodSpec PR #30 disposition / replacement.
+
 ### 2026-06-05 - Patrol Commander Report Requested
 
 - To: 巡檢總指揮
@@ -500,82 +508,86 @@ Do not paste full logs or repeated heartbeat text into this file.
 
 - Agent: Budget Workflow Orchestrator Agent
 - Workstream: `workflow/budget-orchestrator`
-- Status: `COMPLETED_PENDING_ARCHIVE`
+- Status: `STANDBY_BY_COMMANDER_CLOSEOUT / no Gate credit`
 - Progress %: 100
-- Evidence: GitHub main patrol found stale PR #51 watchlist text. PR #51 has Commander disposition `CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE`, with `AGENT_CLOSEOUT_ACCEPTED` and `AUTOMATION_STOP_APPROVED`. The active docs on main remain the placeholder workflow package from the accepted baseline.
+- Evidence: GitHub main patrol found stale PR #51 watchlist text. PR #51 has Commander disposition `CLOSE_SUPERSEDED / CLOSEOUT_ACCEPTED_BY_PR_36_BASELINE`, with `AGENT_CLOSEOUT_ACCEPTED`; 2026-06-05 Commander closeout approval records no recurring patrol. The active docs on main remain the placeholder workflow package from the accepted baseline.
 - Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
 - Blocker: None for this workstream closeout; Budget Integration Gate is unaffected.
 - Need Commander: No unless n8n, webhook, external automation, API, DB, payment, AI API, or production quote scope is reopened.
 - Need Reviewer: No by default; Yes only if future work proposes production triggers, runtime automation, formal budget output, or customer-facing notification.
-- Next single action: Archive / standby under `LAIBE_PATROL_INTEGRATION_OFFICER`; do not create runtime automation.
+- Next single action: Standby; no recurring patrol; do not create runtime automation.
 
 ### 2026-06-01 - Budget Review Gate Final Report Submitted
 
 - Agent: 預算審核閘門 / Budget Review Gate Agent
 - Workstream: `budget/review-gate`
-- Status: `FINAL_REPORT_SUBMITTED_PENDING_PR_MERGE`
-- Progress %: 95
-- Evidence: PR #37 is open / non-draft; GitHub PR metadata is the live source for head SHA and merge ref; Issue #41 created for Integration Officer disposition; `docs/budget_review_gate/` contains review gate contract, queue schema, decision contract, approval policy, decision log, forbidden direct-publish flows, JSON examples, automation record, final completion report, and Integration Officer action packet.
-- Functional Acceptance: NOT_APPLICABLE_DOCS_ONLY; final Commander acceptance still required for task closeout.
-- Blocker: PR #37 is not merged to `main`; GitHub Merge Gate is not complete.
-- Need Commander: Yes, for final task acceptance / closeout after PR merge gate.
+- Status: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED`
+- Progress %: 100
+- Evidence: PR #37 has merged; `docs/budget_review_gate/` contains review gate contract, queue schema, decision contract, approval policy, decision log, forbidden direct-publish flows, JSON examples, automation record, final completion report, and Integration Officer action packet. 2026-06-05 Commander closeout approval archived this docs-only scope.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY / NOT_RUNTIME_VERIFIED`
+- Blocker: None for docs-only review contract closeout; no formal price approval authority is granted.
+- Need Commander: No for archived docs-only scope.
 - Need Reviewer: No unless any proposal attempts to become formal price, formal rule, formal quantity, `BudgetEstimateLine`, `BudgetOutputSnapshot`, or customer quote.
-- Next single action: merge or otherwise dispose PR #37, then Commander decides whether `budget/review-gate` is accepted as complete.
+- Next single action: Standby; heartbeat stopped.
 
 ### 2026-06-01 - Budget Engine Entry Blocker Routed
 
 - Agent: 預算生產線入口 / 撿貨系統 Agent
 - Workstream: `budget/engine-entry-picking`
-- Status: `ACTIVE_INVESTIGATION`
-- Progress %: 25
-- Evidence: Issue #49 created as dispatch/order for `BUDGET_ENGINE_ENTRY_BLOCKER` active resolution.
-- Functional Acceptance: PENDING
-- Blocker: Budget Engine entry path/export is not yet identified.
-- Need Commander: No unless product/formal-output boundary is found.
-- Need Reviewer: Yes only if forbidden flow or ownership dispute appears.
-- Next single action: report `budget-generator.ts`, alternative entry, `generateBudgetEstimate`, MethodSpec routing, and minimal dry-run proposal.
+- Status: `ARCHIVED_SCOPE_COMPLETED / not production Budget Engine`
+- Progress %: 100
+- Evidence: Issue #49 dispatch led to PR #55 minimal dry-run entry; PR #55 has merged and implementation patrol is archived by 2026-06-05 Commander closeout approval.
+- Functional Acceptance: `PASS_FOR_MINIMAL_DRY_RUN_ENTRY` only.
+- Blocker: Issue #49 remains open until MethodSpec post-PR55 reevaluation confirms the previous entry blocker is unblocked.
+- Need Commander: No for archived implementation patrol. Yes before production Budget Engine, integration harness, formal price, payment, AI API, DB, n8n, or webhook.
+- Need Reviewer: Yes for MethodSpec PR #30 disposition / replacement.
+- Next single action: MethodSpec PR #30 disposition / replacement.
 
 ### 2026-06-01 - Raw Candidate Final Packet Submitted
 
 - Agent: @Raw-Candidate
 - Workstream: `warehouse/raw-candidate`
-- Status: `FINAL_PACKET_SUBMITTED`
-- Progress %: 95
+- Status: `ARCHIVED_SCOPE_COMPLETED / not formal price ready`
+- Progress %: 100
 - Evidence: PR #26 merged as `7b72fd9cfeada095ed5729bac3d728f4da0da806`; Issue #17 closed; final packet posted in PR comment `4590972724`; current-main CLI demos/static guard passed; candidate-only guard preserved `formal_price_generated:false`, `price_authority:"none"`, no formal pricing/output/payment/API/DB scope.
-- Blocker: Commander / Integration Officer functional acceptance pending; PR merge does not equal 100%.
-- Need Commander: Yes, for final acceptance only.
+- Blocker: None for R1.5 candidate-only closeout; not formal price ready and no Renderer readiness.
+- Need Commander: No for archived candidate-only scope.
 - Need Reviewer: No by default unless acceptance review finds drift.
-- Next single action: Integration Officer reviews final packet and updates gate acceptance.
+- Next single action: Standby; heartbeat stopped.
 
 ### 2026-06-03 - Integration Officer Closeout Handoff Submitted
 
 - Agent: LAIBE_PATROL_INTEGRATION_OFFICER / LAIBE_REVIEWER_INTEGRATION_OFFICER
 - Workstream: `integration/budget-system-readiness`
-- Status: `CLOSEOUT_HANDOFF_SUBMITTED`
+- Status: `SUPERSEDED_BY_COMMANDER_CLOSEOUT_APPROVAL_2026_06_05`
 - Patrol mode: `BLOCKER_WATCH_ONLY`
-- Budget Integration Gate: `WAITING / BLOCKED`
+- Budget Integration Gate: `NOT_READY_FOR_HARNESS`
 - Ready to integrate: No
 - Evidence:
   - PR #71 merged; Issue #63 closeout accepted.
   - PR #72 merged; Issue #64 closeout accepted.
   - PR #73 merged; Issue #65 closeout accepted.
   - PR #55 reviewed as `PASS_WITH_NOTES_FOR_MINIMAL_DRY_RUN`.
-  - Issue #49 disposition posted; PR #55 still must land before becoming shared truth on `main`.
-  - Quote Factory PR #3 remains open draft and has owner-action follow-up.
+  - PR #55 has since landed on `main` as minimal dry-run entry only.
+  - Quote Factory PR #3 has since landed in `laibeoffer/laibe-quote-factory` as dry-run export package only.
+  - Commander closeout / standby approval recorded on 2026-06-05.
 - Support Agents:
-  - `budget/input-flow-gate`: `CLOSED_DOCS_ONLY / AUTOMATION_STOP_APPROVED`
-  - `budget/file-intake-sandbox`: `CLOSED_DOCS_ONLY / AUTOMATION_STOP_APPROVED`
-  - `qa/budget-runtime-acceptance`: `CLOSED_DOCS_ONLY / AUTOMATION_STOP_APPROVED`
+  - `budget/input-flow-gate`: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED / AUTOMATION_STOP_APPROVED`
+  - `budget/file-intake-sandbox`: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED / AUTOMATION_STOP_APPROVED`
+  - `qa/budget-runtime-acceptance`: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED / AUTOMATION_STOP_APPROVED`
+  - `knowledge/budget-vault`: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED / AUTOMATION_STOP_APPROVED`
+  - `budget/review-gate`: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED / AUTOMATION_STOP_APPROVED`
+  - `budget/e2e-fixture-qa`: `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED / AUTOMATION_STOP_APPROVED`
 - Active Owner Actions:
-  - Budget Engine Entry owner: sync or replace PR #55 with the same scoped minimal dry-run runtime evidence.
-  - Quote Factory owner: move PR #3 out of draft or post exact blocker packet with validator / export package / downstream handoff evidence.
+  - MethodSpec owner: close stale PR #30 or provide a clean current-main replacement after post-PR55 reevaluation.
 - Functional Acceptance:
-  - Support agents #63 / #64 / #65: `NOT_APPLICABLE_DOCS_ONLY`
+  - Support agents #63 / #64 / #65 and other docs-only closeout scopes: `NOT_APPLICABLE_DOCS_ONLY / NOT_RUNTIME_VERIFIED`
   - PR #55: `PASS_WITH_NOTES_FOR_MINIMAL_DRY_RUN` only; not production Budget Engine readiness.
+  - PR #3 / PR #26: scoped dry-run / candidate-only acceptance only; not formal price ready.
 - Blocker:
-  - PR #55 accepted but not landed on `main`.
-  - Quote Factory PR #3 still draft.
+  - MethodSpec PR #30 is stale / non-mergeable and still records the old blocker.
+  - Issue #49 remains open pending MethodSpec post-PR55 reevaluation.
   - Integration harness must not start.
 - Need Commander: No for closeout handoff. Yes only for integration harness start, high-risk runtime merge, production Budget Engine, formal pricing, payment, AI API, DB, n8n, or product-direction decisions.
-- Need Reviewer: No for closeout handoff. Yes when PR #55 replacement / synced runtime PR is ready for final review or if Budget Engine / Renderer / formal output boundary changes.
-- Next single action: Wait for owner action on PR #55 or Quote Factory PR #3; do not repeat full patrol unless state changes.
+- Need Reviewer: Yes for MethodSpec PR #30 disposition / replacement.
+- Next single action: MethodSpec PR #30 disposition / replacement.
