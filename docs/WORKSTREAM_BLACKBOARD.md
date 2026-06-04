@@ -87,6 +87,44 @@ Decision Packet required before waiting:
 | Safe Work While Waiting | Safe work the agent will continue. |
 | Next Report Time | When the agent will report again. |
 
+## Budget Integration Stage Closeout / Standby
+
+Source: Integration Officer Budget Integration Closeout Sprint Report.
+
+This section is the current Commander-approved closeout disposition for completed budget-scope agents. If older rows below conflict with this section, this section is authoritative until the next current-main replacement.
+
+Rules:
+
+- Docs-only closeout is not runtime verified.
+- Candidate-only acceptance is not formal price ready.
+- No item below authorizes production `PricingRule`, `BudgetEstimateLine`, formal quote, formal Excel/PDF, payment, AI API, DB, Supabase, n8n, or integration harness start.
+- `AUTOMATION_STOP_APPROVED` means completed-scope heartbeat may stop; it does not delete the agent and does not prevent future explicit reactivation.
+
+| Agent | Scope | Status | Evidence | Boundary | Automation |
+|---|---|---|---|---|---|
+| Quote Factory | PR #3 export-package dry-run | `ARCHIVED_SCOPE_COMPLETED / NOT_PRODUCTION_READY` | PR #3 merged in `laibeoffer/laibe-quote-factory` at `deae69da593b4776aaa20013da3b5c359aa2133c`; Functional Acceptance `PASS_FOR_QF_EXPORT_PACKAGE_DRY_RUN` | Not formal price, not `PricingRule`, not `BudgetEstimateLine`, not formal quote | `AUTOMATION_STOP_APPROVED` |
+| Raw Candidate | PR #26 R1.5 candidate-only | `ARCHIVED_SCOPE_COMPLETED / not formal price ready` | PR #26 merged; Issue #17 closed; candidate-only acceptance | Not formal price, not `PricingRule`, not `BudgetEstimateLine`, not Renderer-ready | `AUTOMATION_STOP_APPROVED` |
+| Budget Knowledge Vault | PR #78 docs-only support | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #78 merged | Docs-only support; no runtime verification; not Budget Integration Gate evidence | `AUTOMATION_STOP_APPROVED` |
+| Budget Engine Entry / Picking | PR #55 minimal dry-run implementation patrol | `ARCHIVED_SCOPE_COMPLETED / not production Budget Engine` | PR #55 merged; Functional Acceptance `PASS_FOR_MINIMAL_DRY_RUN_ENTRY` | Issue #49 remains open until MethodSpec post-PR55 reevaluation confirms unblock | `AUTOMATION_STOP_APPROVED` for implementation patrol |
+| Budget Review Gate | PR #37 docs-only review contract | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #37 docs-only review contract accepted | Does not publish candidate evidence as formal price/rule/output | `AUTOMATION_STOP_APPROVED` |
+| Budget E2E Fixture QA | PR #48 docs-only fixture contract | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #48 docs-only fixture contract accepted | Does not run production integration harness | `AUTOMATION_STOP_APPROVED` |
+| Budget Input Flow Gate | PR #71 docs-only evidence | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #71 merged | Docs-only evidence; no runtime gate | `AUTOMATION_STOP_APPROVED` |
+| Budget File Intake Sandbox | PR #72 docs-only evidence | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #72 merged | Docs-only evidence; no production intake runtime | `AUTOMATION_STOP_APPROVED` |
+| Budget Runtime Acceptance | PR #73 docs-only evidence | `ARCHIVED_DOCS_ONLY / NOT_RUNTIME_VERIFIED` | PR #73 merged | Docs-only evidence; no runtime acceptance execution | `AUTOMATION_STOP_APPROVED` |
+| Budget Workflow Orchestrator | PR #51 closed unmerged docs-only final report | `STANDBY_BY_COMMANDER_CLOSEOUT / no Gate credit` | PR #51 closed unmerged with Commander closeout disposition; PR #85 closeout sync merged | No real n8n, webhook, production automation, formal output, payment, AI API, or DB | no recurring patrol |
+
+### Not Approved For Closeout
+
+| Item | Reason | Required Action |
+|---|---|---|
+| MethodSpec | PR #30 is stale / non-mergeable and still records old blocker state. | Close PR #30 as stale or submit clean current-main replacement PR / exact blocker packet. |
+| Issue #49 | Cannot close until MethodSpec post-PR55 reevaluation confirms PR #55 unblocks the previous Budget Engine entry blocker. | Keep open under blocker-watch. |
+| Integration Harness | Gate remains `NOT_READY_FOR_HARNESS`. | Do not start harness. |
+
+Integration Gate status: `NOT_READY_FOR_HARNESS`
+
+Next required action: MethodSpec PR #30 disposition / replacement.
+
 ## Decision Queue
 
 | Decision | Owner | Requested By | Options | Recommendation | Waiting Since | Safe Work While Waiting |
