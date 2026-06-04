@@ -87,6 +87,38 @@ Decision Packet required before waiting:
 | Safe Work While Waiting | Safe work the agent will continue. |
 | Next Report Time | When the agent will report again. |
 
+## MethodSpec PR #30 Commander Disposition
+
+Status: `WAITING_REPLACEMENT_PR_OR_CLOSE_STALE_PR`
+
+Current PR: #30 stale / non-mergeable
+
+Reason:
+
+- PR #30 still records the old `BUDGET_ENGINE_ENTRY_BLOCKER`.
+- PR #55 minimal dry-run Budget Engine Entry has merged and is accepted for `PASS_FOR_MINIMAL_DRY_RUN_ENTRY` scope.
+- PR #30 can no longer be used as current MethodSpec readiness evidence.
+- PR #30 includes `docs/WORKSTREAM_BLACKBOARD.md`, creating stale-blackboard overwrite risk.
+
+Required Action:
+
+MethodSpec owner must create a clean current-main replacement PR or submit an exact blocker packet by the next blocker-watch cycle.
+
+Fallback:
+
+Commander may close PR #30 as stale if no owner response appears by the next blocker-watch cycle. After closure, create/request a new current-main MethodSpec post-PR55 reevaluation task.
+
+Issue #49: `OPEN_UNTIL_METHODSPEC_REEVALUATION`
+
+Integration Gate: `BLOCKER_WATCH_ONLY / NOT_READY_FOR_HARNESS`
+
+Forbidden:
+
+- Do not start integration harness.
+- Do not modify Budget Engine.
+- Do not let MethodSpec self-repair Budget Engine.
+- Do not treat PR #30 as current readiness evidence.
+- Do not touch `PricingRule`, `BudgetEstimateLine`, Renderer, formal price, formal quote, payment, AI API, DB, Supabase, n8n, or production webhook.
 ## Budget Integration Stage Closeout / Standby
 
 Source: Integration Officer Budget Integration Closeout Sprint Report.
@@ -460,6 +492,18 @@ Use this format only when changing current status:
 
 Do not paste full logs or repeated heartbeat text into this file.
 
+### 2026-06-05 - MethodSpec PR #30 Stale Disposition Issued
+
+- Agent: MethodSpec Owner
+- Workstream: `warehouse/method-spec`
+- Status: `WAITING_REPLACEMENT_PR_OR_CLOSE_STALE_PR`
+- Progress %: 75
+- Evidence: PR #30 is open / non-draft / `mergeable=false`; PR #30 still records old `BUDGET_ENGINE_ENTRY_BLOCKER`; PR #55 minimal dry-run Budget Engine Entry has merged and is accepted for minimal dry-run scope.
+- Functional Acceptance: `PENDING`
+- Blocker: clean current-main MethodSpec post-PR55 reevaluation is missing.
+- Need Commander: No further user decision unless manual confirmation is required to close PR #30.
+- Need Reviewer: Only if replacement PR touches runtime / Budget Engine / `PricingRule` / `BudgetEstimateLine` / Renderer.
+- Next single action: MethodSpec owner submits clean replacement PR or exact blocker packet by the next blocker-watch cycle; otherwise Commander may close PR #30 as stale.
 ### 2026-06-05 - Budget Integration Stage Closeout Approved
 
 - Agent: Deputy Commander / LAIBE_PATROL_INTEGRATION_OFFICER closeout scope
