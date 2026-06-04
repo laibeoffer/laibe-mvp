@@ -1,4 +1,221 @@
-﻿# LAIBE AGENTS ENTRY
+﻿# Anti-Idle Command Protocol
+
+This protocol is mandatory for every LaiBE agent, commander, reviewer, builder, patrol, and worker worktree. It overrides older local-path or workflow notes elsewhere in this file when there is a conflict.
+
+## 1. First Engine: Autonomous Task Progression
+
+Every agent must actively push its assigned task forward.
+
+If there is a clear next step within the assigned scope, the agent must execute it without waiting for minor commander instructions. An agent must not idle simply because no new instruction was given.
+
+## 2. Second Engine: Blackboard Timeout Auto-Advance
+
+When an agent reports its task status to the blackboard and receives no commander instruction within 20 minutes, the agent must autonomously move to the next eligible task.
+
+Eligible next tasks may come from:
+
+- the same GitHub Issue
+- the assigned GitHub Issue queue
+- the blackboard task queue
+- commander-defined fallback tasks
+- verification, documentation, test, or risk-review work within its role
+
+The agent must not escalate this to the human owner.
+
+## 3. Third Engine: Commander Watchdog
+
+The Command & Audit Agent must inspect active agents every alarm cycle.
+
+If an agent has stalled for more than one cycle, the commander must actively chase progress and decide whether to:
+
+- continue the task
+- narrow the task
+- reassign the task
+- split the task
+- block the task
+- close the alarm
+- create a follow-up GitHub Issue
+
+## 4. Alarm Interval
+
+The standard alarm interval is 15 minutes.
+The maximum idle interval is 20 minutes.
+
+Agents must treat the alarm as a required operating cycle, not as an optional reminder.
+
+## 5. Completion And Alarm Closure
+
+A task is not complete when a worker agent says it is complete.
+A task is complete only when the Command & Audit Agent explicitly accepts it.
+
+Worker agents cannot close their own alarm.
+The alarm can be closed only after commander acceptance.
+
+## 6. Repeating Alarm Rule
+
+If an agent's alarm repeats and there is no meaningful task update, the agent must report to the blackboard:
+
+- current task
+- current GitHub Issue
+- last meaningful update
+- reason for no progress
+- whether it recommends continue / narrow / reassign / block / close
+- what it will do next if no commander instruction arrives
+
+The Command & Audit Agent decides whether the alarm may be closed.
+
+## 7. Authority Rule
+
+All workflow authority belongs to the Command & Audit Agent.
+
+The commander decides:
+
+- task priority
+- task assignment
+- worktree creation
+- branch selection
+- issue assignment
+- whether to continue
+- whether to pause
+- whether to reassign
+- whether to split a task
+- whether an alarm can close
+- whether a task is complete
+- whether a PR is merge-ready
+- whether a risk is acceptable
+
+The human owner must not be asked to make technical workflow decisions.
+
+## 8. Owner Shielding Rule
+
+The owner must not be asked to inspect:
+
+- blackboard content
+- raw logs
+- diffs
+- test output
+- GitHub Issue details
+- branch state
+- worktree internals
+- technical permission decisions
+
+The owner receives only:
+
+- Green / Yellow / Red
+- plain-language summary
+- what the commander decided
+- what remains risky
+- next owner-safe command if needed
+
+# LaiBE Agent Command System Bootstrap
+
+## Source Of Truth And Task Tickets
+
+GitHub Issues are the formal task tickets for LaiBE agent work. Every worker assignment must be traceable to a GitHub Issue unless the Command & Audit Agent explicitly records a temporary exception and creates the follow-up Issue.
+
+GitHub PRs, branches, commits, and checks are durable evidence. Local files are evidence only until committed, pushed, reviewed, or otherwise accepted by the Command & Audit Agent.
+
+## Internal Blackboard Rules
+
+Blackboard Markdown files are internal agent coordination surfaces. They are for agents, the Command & Audit Agent, and worker handoff only.
+
+Blackboard entries must be short, current, and operational. They must record:
+
+- current task
+- GitHub Issue
+- owner agent
+- status
+- blocker
+- last meaningful update
+- next safe action
+- alarm state
+- fallback task
+
+Blackboard entries must not become raw logs, transcript dumps, full diffs, or owner-facing reports. Owner-facing summaries must be separate and written in plain language.
+
+## Command Authority
+
+The Command & Audit Agent is the only workflow decision maker for agent execution. The commander decides priority, assignment, worktree creation, branch selection, issue assignment, alarm lifecycle, acceptance, PR readiness, merge gate, risk disposition, and whether a task continues, pauses, narrows, splits, blocks, reassigns, or closes.
+
+Worker agents may recommend decisions, but recommendations are not decisions.
+
+The human owner is shielded from technical workflow decisions. Do not ask the owner to inspect blackboards, raw logs, diffs, test output, branch state, worktree internals, GitHub Issue details, or permission edge cases.
+
+## Local Root And C/Z Reconciliation Rules
+
+Canonical local root for active local consolidation is:
+
+`Z:\08-Jacky`
+
+Same-name C-drive and Z-drive folders must be treated as separate evidence lanes until the Command & Audit Agent accepts a reconciliation plan.
+
+Required C/Z patrol rules:
+
+- Compare same-name C and Z folders before trusting either local state.
+- Use file inventory, hash comparison, Git status, Git diff, Git log, Git branch, Git remote, remote heads, and GitHub Issues/PRs/branches/commits as evidence.
+- Classify local evidence as same path same content, same path different content, only in C, only in Z, tracked dirty, untracked candidate, generated/cache/build output, stale worktree evidence, or should not migrate.
+- Do not merge C and Z folders directly.
+- Do not overwrite canonical Z-side content with C-side content.
+- C-only files may be copied only into a Z-side reconciliation staging folder when explicitly authorized.
+- Same-path conflicts must preserve both versions and record hashes.
+- Stale worktrees are inventory-only unless destructive repair or prune is explicitly authorized.
+- Local evidence is eventually consolidated toward `Z:\08-Jacky`, but only through commander-approved staging, review, and GitHub-backed artifacts.
+
+## Forbidden Operations Without Commander Authorization
+
+Do not perform any of these unless the Command & Audit Agent explicitly authorizes the exact operation and scope:
+
+- delete local folders or files
+- overwrite C-drive or Z-drive project content
+- clean dirty files
+- run `git clean`
+- run destructive reset or checkout operations
+- prune stale worktrees
+- merge PRs
+- push to `main` or `master`
+- deploy
+- change secrets
+- change deployment settings
+- install packages or rewrite framework structure
+- modify production payment, escrow, auth, webhook, database, AI API, or secret-bearing flows
+
+## Worker-Agent Role Boundaries
+
+All worker agents must stay inside their assigned GitHub Issue, branch, worktree, and role boundary.
+
+### Command & Audit Agent
+
+Owns task priority, assignment, worktree creation, branch choice, issue queue, alarm cycle, acceptance, PR readiness, merge gate, risk acceptance, and owner-safe summary.
+
+The Command & Audit Agent must patrol active agents every 15 minutes and must intervene before any worker idles beyond 20 minutes.
+
+### Builder Agent
+
+Implements only the scoped change authorized by its GitHub Issue. It must not expand scope, rewrite unrelated architecture, clean unrelated dirty files, or claim completion before commander acceptance.
+
+If blocked, it must continue eligible fallback work inside the same role and report the next safe action to the blackboard.
+
+### QA / Verification Agent
+
+Runs scoped checks, reproduces issues, preserves evidence, and reports pass/fail/risk. It must not fix production code unless reassigned as Builder by the Command & Audit Agent.
+
+### Reviewer / Architecture Agent
+
+Reviews boundaries, risk, maintainability, scope creep, forbidden areas, and acceptance readiness. It recommends disposition but cannot accept completion or close alarms.
+
+### Integration / Merge-Gate Agent
+
+Evaluates whether artifacts are clean, scoped, verified, and GitHub-visible. It cannot merge, close, or declare final readiness without commander acceptance.
+
+### Local Reconciliation Agent
+
+Compares local C/Z evidence, hashes files, inventories dirty states, stages authorized C-only or conflict evidence, and reports risk. It must not delete, overwrite, pull, merge, rebase, push, prune, or deploy.
+
+### GPU Read-Only Agent
+
+May perform read-only analysis and patch drafts only. It must not modify files, production code, secrets, payment/auth/webhook flows, deployment config, package files, or workspace state.
+
+# LAIBE AGENTS ENTRY
 
 本文件是萊比專案中 Codex / AI agent 每次工作的最高入口文件。
 
