@@ -1,6 +1,6 @@
 # LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-02 Asia/Taipei
+Last updated: 2026-06-03 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
@@ -430,3 +430,36 @@ Do not paste full logs or repeated heartbeat text into this file.
 - Need Commander: Yes, for final acceptance only.
 - Need Reviewer: No by default unless acceptance review finds drift.
 - Next single action: Integration Officer reviews final packet and updates gate acceptance.
+
+### 2026-06-03 - Integration Officer Closeout Handoff Submitted
+
+- Agent: LAIBE_PATROL_INTEGRATION_OFFICER / LAIBE_REVIEWER_INTEGRATION_OFFICER
+- Workstream: `integration/budget-system-readiness`
+- Status: `CLOSEOUT_HANDOFF_SUBMITTED`
+- Patrol mode: `BLOCKER_WATCH_ONLY`
+- Budget Integration Gate: `WAITING / BLOCKED`
+- Ready to integrate: No
+- Evidence:
+  - PR #71 merged; Issue #63 closeout accepted.
+  - PR #72 merged; Issue #64 closeout accepted.
+  - PR #73 merged; Issue #65 closeout accepted.
+  - PR #55 reviewed as `PASS_WITH_NOTES_FOR_MINIMAL_DRY_RUN`.
+  - Issue #49 disposition posted; PR #55 still must land before becoming shared truth on `main`.
+  - Quote Factory PR #3 remains open draft and has owner-action follow-up.
+- Support Agents:
+  - `budget/input-flow-gate`: `CLOSED_DOCS_ONLY / AUTOMATION_STOP_APPROVED`
+  - `budget/file-intake-sandbox`: `CLOSED_DOCS_ONLY / AUTOMATION_STOP_APPROVED`
+  - `qa/budget-runtime-acceptance`: `CLOSED_DOCS_ONLY / AUTOMATION_STOP_APPROVED`
+- Active Owner Actions:
+  - Budget Engine Entry owner: sync or replace PR #55 with the same scoped minimal dry-run runtime evidence.
+  - Quote Factory owner: move PR #3 out of draft or post exact blocker packet with validator / export package / downstream handoff evidence.
+- Functional Acceptance:
+  - Support agents #63 / #64 / #65: `NOT_APPLICABLE_DOCS_ONLY`
+  - PR #55: `PASS_WITH_NOTES_FOR_MINIMAL_DRY_RUN` only; not production Budget Engine readiness.
+- Blocker:
+  - PR #55 accepted but not landed on `main`.
+  - Quote Factory PR #3 still draft.
+  - Integration harness must not start.
+- Need Commander: No for closeout handoff. Yes only for integration harness start, high-risk runtime merge, production Budget Engine, formal pricing, payment, AI API, DB, n8n, or product-direction decisions.
+- Need Reviewer: No for closeout handoff. Yes when PR #55 replacement / synced runtime PR is ready for final review or if Budget Engine / Renderer / formal output boundary changes.
+- Next single action: Wait for owner action on PR #55 or Quote Factory PR #3; do not repeat full patrol unless state changes.
