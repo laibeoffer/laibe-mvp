@@ -24,12 +24,12 @@ This file is the compact GitHub blackboard for current LaiBE MVP coordination. I
 | Machine | Local Path | Repo | Allowed Mode | Notes |
 |---|---|---|---|---|
 | JACKY | `C:\laibe_project` | `laibeoffer/laibe-mvp` | assigned-branch only | Local workspace only. Can read server Z drive, but GitHub main / PR / commit SHA remains shared truth. |
-| DESKTOP-5D1DK6S | `Z:\laibe_project` or detected network path such as `\\192.168.0.106\sever_data\laibe_project` | `laibeoffer/laibe-mvp` | assigned-branch only | Local / network workspace only. Do not treat Z drive as cross-computer source of truth. |
+| DESKTOP-5D1DK6S | `Z:\08-Jacky\laibe_MVP_project` or detected child repo path under this root | `laibeoffer/laibe-mvp` | assigned-branch only | Replaces old `Z:\laibe_project`. Local / network workspace only. Do not treat Z drive as cross-computer source of truth. |
 
 Workspace rules:
 
 1. GitHub `main`, PRs, and commit SHAs are the only shared source of truth.
-2. `C:\laibe_project`, `Z:\laibe_project`, and detected UNC paths are all `LOCAL_STATE`.
+2. `C:\laibe_project`, `Z:\08-Jacky\laibe_MVP_project`, old `Z:\laibe_project`, and detected UNC paths are all `LOCAL_STATE`.
 3. Task prompts and reports must use repo-relative paths such as `docs/WORKSTREAM_BLACKBOARD.md`.
 4. Do not use local absolute paths to decide project completion state.
 5. One branch may have only one writer agent / one writing machine at a time.
@@ -37,6 +37,7 @@ Workspace rules:
 7. Z drive must not be treated as cross-computer synchronization truth.
 8. If local state differs from GitHub `main` or the active PR head, report `LOCAL_STATE_STALE` and use GitHub as authoritative.
 9. If `git` / `gh` tools are unavailable, do not switch to publishing a local workflow. Use GitHub read-only checks or report the tool limitation.
+10. All agents previously instructed to use `Z:\laibe_project` must switch their local root to `Z:\08-Jacky\laibe_MVP_project`; if a repo checkout is nested under that root, identify it explicitly before running git commands.
 
 ## Completion Rules
 
@@ -525,6 +526,19 @@ Use this format only when changing current status:
 ```
 
 Do not paste full logs or repeated heartbeat text into this file.
+
+### 2026-06-05 - Local Workspace Path Migration Notice
+
+- Agent: All agents and supervisors
+- Workstream: `governance/workspace-registry`
+- Status: `LOCAL_WORKSPACE_PATH_UPDATED`
+- Progress %: N/A
+- Evidence: Workspace Registry now states that prior `Z:\laibe_project` local work must move to `Z:\08-Jacky\laibe_MVP_project`; agents must identify any nested repo checkout under that root before git commands.
+- Functional Acceptance: `NOT_APPLICABLE_DOCS_ONLY`
+- Blocker: None for governance notice; GitHub `main` / PR / commit SHA remains the only shared truth.
+- Need Commander: No
+- Need Reviewer: No
+- Next single action: All agents replace old local path references with `Z:\08-Jacky\laibe_MVP_project` and report `LOCAL_STATE_STALE` if their local checkout differs from GitHub.
 
 ### 2026-06-05 - One-shot Execution Report Protocol Activated
 
