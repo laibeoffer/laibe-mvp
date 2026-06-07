@@ -1,6 +1,6 @@
 ﻿# LaiBE MVP Workstream Blackboard
 
-Last updated: 2026-06-05 Asia/Taipei
+Last updated: 2026-06-07 Asia/Taipei
 
 This file is the compact GitHub blackboard for current LaiBE MVP coordination. It is not a patrol log archive.
 
@@ -158,6 +158,8 @@ Forbidden:
 
 Source: Integration Officer Budget Integration Closeout Sprint Report.
 
+Commander approval reaffirmed: 2026-06-07 Asia/Taipei.
+
 This section is the current Commander-approved closeout disposition for completed budget-scope agents. If older rows below conflict with this section, this section is authoritative until the next current-main replacement.
 
 Rules:
@@ -166,6 +168,7 @@ Rules:
 - Candidate-only acceptance is not formal price ready.
 - No item below authorizes production `PricingRule`, `BudgetEstimateLine`, formal quote, formal Excel/PDF, payment, AI API, DB, Supabase, n8n, or integration harness start.
 - `AUTOMATION_STOP_APPROVED` means completed-scope heartbeat may stop; it does not delete the agent and does not prevent future explicit reactivation.
+- Local Codex automation inspection on 2026-06-07 found no active dedicated completed-scope heartbeats for these archived budget support agents; matching broad patrol automations were already paused. Governance status below is the authoritative stop / standby instruction.
 
 | Agent | Scope | Status | Evidence | Boundary | Automation |
 |---|---|---|---|---|---|
