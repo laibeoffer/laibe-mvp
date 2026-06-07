@@ -1,0 +1,95 @@
+{
+  "owner_intent_id": "owner_intent_mock_001",
+  "session_id": "owner_guide_session_mock_001",
+  "project_id": "project_mock_001",
+  "renovation_goals": [
+    "台北 28 坪中古屋，自住，屋況偏舊。",
+    "想整理客廳、廚房、浴室，另外需要增加收納。",
+    "喜歡簡約、木質、明亮，不喜歡太暗的工業風。",
+    "預算還不確定，需要先協助估算。",
+    "三個月內想開始，半年內入住。",
+    "目前沒有平面圖，有現況照片，需要平面拼圖。"
+  ],
+  "property_context": {
+    "raw_signal": "台北 28 坪中古屋，自住，屋況偏舊。"
+  },
+  "space_requirements": {
+    "raw_signal": "想整理客廳、廚房、浴室，另外需要增加收納。"
+  },
+  "style_preferences": {
+    "raw_signal": "喜歡簡約、木質、明亮，不喜歡太暗的工業風。",
+    "reference_image_status": "metadata_captured"
+  },
+  "budget_signal": {
+    "raw_signal": "預算還不確定，需要先協助估算。",
+    "formal_pricing_status": "not_allowed"
+  },
+  "schedule_signal": {
+    "raw_signal": "三個月內想開始，半年內入住。"
+  },
+  "asset_summary": {
+    "raw_signal": "目前沒有平面圖，有現況照片，需要平面拼圖。",
+    "current_plan_files": [
+      {
+        "file_type": "application/pdf",
+        "file_name": "owner-plan-placeholder.pdf",
+        "upload_status": "local_placeholder_metadata_only",
+        "linked_to_plan_puzzle": true,
+        "captured_at": "2026-06-01T00:00:00+08:00"
+      }
+    ],
+    "current_site_photos": [
+      {
+        "room_label": "owner_unspecified",
+        "photo_type": "image/jpeg",
+        "file_name": "living-room-current.jpg",
+        "upload_status": "local_placeholder_metadata_only",
+        "captured_at": "2026-06-01T00:00:00+08:00"
+      }
+    ],
+    "style_reference_images": [
+      {
+        "style_note": "喜歡簡約、木質、明亮，不喜歡太暗的工業風。",
+        "file_name": "style-reference.jpg",
+        "upload_status": "local_placeholder_metadata_only",
+        "captured_at": "2026-06-01T00:00:00+08:00"
+      }
+    ],
+    "mock_upload_only": true,
+    "has_any_upload_metadata": true
+  },
+  "question_gaps": [],
+  "requirement_completion_status": "completed",
+  "structured_requirement_notes": [
+    { "label": "房屋 / 案件資訊", "value": "台北 28 坪中古屋，自住，屋況偏舊。" },
+    { "label": "想整理空間", "value": "想整理客廳、廚房、浴室，另外需要增加收納。" },
+    { "label": "風格偏好", "value": "喜歡簡約、木質、明亮，不喜歡太暗的工業風。" },
+    { "label": "預算狀態", "value": "預算還不確定，需要先協助估算。" },
+    { "label": "時程", "value": "三個月內想開始，半年內入住。" },
+    { "label": "已有資料", "value": "目前沒有平面圖，有現況照片，需要平面拼圖。" },
+    { "label": "業主自行補充說明", "value": "家裡有小孩，需要耐髒、好清潔，保留採光。" }
+  ],
+  "question_answer_log": [
+    { "qa_log_id": "qa_001", "field_key": "property_context", "effective": true },
+    { "qa_log_id": "qa_002", "field_key": "space_requirements", "effective": true },
+    { "qa_log_id": "qa_003", "field_key": "style_preferences", "effective": true }
+  ],
+  "answer_revision_log": [
+    {
+      "revision_id": "rev_001",
+      "field_key": "budget_signal",
+      "qa_log_id": "qa_004",
+      "previous_value": null,
+      "new_value": "預算還不確定，需要先協助估算。",
+      "revision_status": "active",
+      "created_at": "2026-06-01T00:00:00+08:00"
+    }
+  ],
+  "owner_additional_notes": "家裡有小孩，需要耐髒、好清潔，保留採光。",
+  "next_recommended_step": "enter_plan_puzzle",
+  "requires_followup": false,
+  "confidence": 0.82,
+  "source_refs": ["qa_001", "qa_002", "qa_003", "qa_004", "qa_005", "qa_006"],
+  "created_at": "2026-06-01T00:00:00+08:00",
+  "updated_at": "2026-06-01T00:00:00+08:00"
+}
