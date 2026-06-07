@@ -6,12 +6,13 @@ Agent: `配件倉庫：工法與規格 / MethodSpec Warehouse`
 
 Workstream: `warehouse/method-spec`
 
-Replacement target: this document replaces stale PR #30 as current MethodSpec post-PR55 readiness evidence. PR #30 remains open / non-draft / `mergeable=false` and still records the old `BUDGET_ENGINE_ENTRY_BLOCKER`; it must not be used as current readiness evidence.
+Replacement target: PR #30 has already been closed as stale / unmerged / superseded. PR #87 is the current clean replacement evidence for MethodSpec post-PR55 reevaluation.
 
 ## 1. Current PR And Dependency State
 
-- PR #30: open, non-draft, `mergeable=false`.
-- PR #30 stale reason: it records the old missing-entry blocker and carries stale `docs/WORKSTREAM_BLACKBOARD.md` changes.
+- PR #30: closed, unmerged, superseded.
+- PR #30 stale reason: it recorded the old missing-entry blocker and carried stale `docs/WORKSTREAM_BLACKBOARD.md` changes.
+- PR #87: current clean replacement evidence for MethodSpec post-PR55 reevaluation.
 - PR #55: merged and accepted for minimal dry-run Budget Engine Entry scope.
 - PR #55 merge commit: `6b0b394d973a93d1e9f8601a55f4a277a28f8bbe`.
 - Quote Factory PR #3: merged and accepted for export-package dry-run scope.
@@ -177,11 +178,12 @@ Web validation: `NOT_WEB_SURFACE`.
 
 Issue #49 can move toward closeout only if Integration Officer accepts this replacement packet as sufficient MethodSpec post-PR55 reevaluation.
 
-Recommended disposition after this PR is reviewed:
+Current disposition:
 
-1. Mark PR #30 stale / superseded.
-2. Keep Integration Harness `NOT_READY_FOR_HARNESS` until all four required budget lines have current acceptance evidence and no blocker.
-3. Keep formal pricing, production Budget Engine, renderer, payment, AI API, DB, Supabase, n8n, and customer-facing quote output out of scope.
+1. PR #30 has already been closed as stale / unmerged / superseded.
+2. PR #87 is the current clean replacement evidence for MethodSpec post-PR55 reevaluation.
+3. Keep Integration Harness `NOT_READY_FOR_HARNESS` until all four required budget lines have current acceptance evidence and no blocker.
+4. Keep formal pricing, production Budget Engine, renderer, payment, AI API, DB, Supabase, n8n, and customer-facing quote output out of scope.
 
 ## 9. Forbidden Scope Check
 
@@ -200,6 +202,6 @@ Recommended disposition after this PR is reviewed:
 
 ## 10. Need Commander / Reviewer
 
-Need Commander: No for this docs-only replacement PR. Commander is needed to close PR #30 as stale or to authorize any production/harness step.
+Need Commander: No for this docs-only replacement PR. Commander is needed to accept / merge PR #87 or to authorize any production/harness step.
 
 Need Reviewer: No for docs-only replacement. Reviewer is required if any follow-up changes runtime, Budget Engine, Renderer, `PricingRule`, `BudgetEstimateLine`, formal price, formal quote, payment, AI API, DB, Supabase, n8n, or integration harness boundaries.
