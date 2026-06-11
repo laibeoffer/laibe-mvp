@@ -127,6 +127,7 @@
     }
 
     .nav-link,
+    .nav-placeholder,
     .tools-button {
       position: relative;
       padding: 8px 0;
@@ -144,6 +145,7 @@
     }
 
     .nav-link::after,
+    .nav-placeholder::after,
     .tools-button::after {
       content: "";
       position: absolute;
@@ -160,6 +162,15 @@
     .nav-link:hover::after,
     .tools-button:hover::after {
       transform: scaleX(1);
+    }
+
+    .nav-placeholder {
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .nav-placeholder::after {
+      display: none;
     }
 
     .tools-wrap {
@@ -452,6 +463,54 @@
       background: rgba(121, 216, 255, 0.12);
     }
 
+    .upload-boundary {
+      margin: 6px 8px 4px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 850;
+      line-height: 1.45;
+      text-transform: uppercase;
+    }
+
+    .boundary-strip {
+      margin: 12px 2px 0;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.55;
+      text-transform: uppercase;
+    }
+
+    .upload-status {
+      margin: 10px 2px 0;
+      border: 1px solid rgba(121, 216, 255, .28);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--text-secondary);
+      background: rgba(121, 216, 255, .08);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.5;
+    }
+
+    .upload-status strong {
+      color: var(--text-main);
+    }
+
+    .page-boundary {
+      width: min(100% - 48px, var(--section-max));
+      margin: 24px auto 0;
+      border: 1px solid rgba(255, 154, 47, 0.55);
+      border-radius: 18px;
+      padding: 14px 18px;
+      color: #ffe4bd;
+      background: rgba(255, 104, 26, 0.14);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.6;
+      box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+    }
+
     .guide-response {
       margin-top: 24px;
       border: 1px solid rgba(121, 216, 255, 0.22);
@@ -709,19 +768,22 @@
           <div class="tools-menu" id="toolsMenu">
             <a href="../preview_floor_plan/code.html">平面拼圖</a>
             <a href="../preview_budget/code.html">預算生成</a>
-            <span>LiDAR 下載</span>
-            <span>iScanner 下載</span>
+            <span>LiDAR App 預覽未開放</span>
+            <span>iScanner App 預覽未開放</span>
           </div>
         </div>
         <a class="nav-link" href="../laibe_landing_desktop/code.html#flow">流程</a>
         <a class="nav-link" href="../laibe_landing_desktop/code.html#about">About LaiBE</a>
-        <a class="nav-link" href="../laibe_landing_desktop/code.html#pcm">PCM backend</a>
+        <button class="nav-placeholder" type="button" disabled aria-label="AI PCM candidate placeholder; not production">AI PCM mock only</button>
         <a class="login-link" href="#guideInput">甲方入口</a>
       </div>
     </nav>
   </header>
 
   <main>
+    <section class="page-boundary" aria-label="Candidate AI boundary">
+      候選靜態 Mock 預覽 / NOT PRODUCTION: AI 引導與 AI PCM 都不會呼叫 AI API、LINE API、後端或資料庫；不作法律裁決、不作決標決定，也不產生正式報價或正式文件。
+    </section>
     <section class="hero" id="top">
       <div>
         <p class="kicker">AI Guidance Officer</p>
@@ -744,10 +806,15 @@
             <button class="circle-btn send-btn" id="submitGuide" type="button" aria-label="送出需求">›</button>
           </div>
           <div class="upload-menu" id="uploadMenu" aria-label="上傳 mock 選單">
-            <button type="button" data-upload="plan">上傳平面圖</button>
-            <button type="button" data-upload="quote">上傳報價單</button>
+            <button type="button" data-upload="plan">上傳平面圖 mock-only</button>
+            <button type="button" data-upload="quote">上傳報價單 mock-only</button>
+            <p class="upload-boundary">No backend upload / no AI API / no LINE API / not production</p>
           </div>
         </div>
+        <div class="upload-status" id="uploadStatus" aria-live="polite">
+          <strong>Mock upload idle.</strong> 點擊 + 可選 mock-only 平面圖或報價單，不會開啟真上傳。
+        </div>
+        <p class="boundary-strip" data-boundary="mock-only">Mock-only prototype / no backend upload / no AI API / no LINE API / no legal decision / no award decision / AI PCM candidate is placeholder / not production.</p>
 
         <div class="guide-response" id="guideResponse" aria-live="polite">
           <div class="response-head">
@@ -757,7 +824,7 @@
           <div class="response-body" id="responseBody">
             <strong>我會先把資訊整理成需求邊界。</strong><br />
             可以從平面圖、報價單，或幾個基本問題開始。這裡只做前端 mock，不會上傳檔案，也不會呼叫真 AI。
-            <p class="mock-note">No backend / no real upload / no real AI API</p>
+            <p class="mock-note">No backend / no real upload / no AI API / no LINE API / no legal or award decision</p>
           </div>
         </div>
 
@@ -806,7 +873,14 @@
     const submitGuide = document.getElementById("submitGuide");
     const startGuideCta = document.getElementById("startGuideCta");
     const responseBody = document.getElementById("responseBody");
+    const uploadStatus = document.getElementById("uploadStatus");
     const startCards = document.querySelectorAll(".start-card");
+    const routeParams = new URLSearchParams(window.location.search);
+
+    function setUploadStatus(message) {
+      if (!uploadStatus) return;
+      uploadStatus.innerHTML = message;
+    }
 
     function closeMenus(event) {
       if (!event.target.closest(".tools-wrap")) {
@@ -814,7 +888,11 @@
         toolsToggle.setAttribute("aria-expanded", "false");
       }
       if (!event.target.closest(".input-wrap")) {
+        const wasOpen = uploadMenu.classList.contains("open");
         uploadMenu.classList.remove("open");
+        if (wasOpen) {
+          setUploadStatus("<strong>Mock upload menu closed.</strong> 沒有上傳任何檔案。");
+        }
       }
     }
 
@@ -823,16 +901,22 @@
       toolsToggle.setAttribute("aria-expanded", String(isOpen));
     });
 
-    uploadToggle.addEventListener("click", () => {
-      uploadMenu.classList.toggle("open");
+    uploadToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const isOpen = uploadMenu.classList.toggle("open");
+      setUploadStatus(isOpen
+        ? "<strong>Mock upload menu open.</strong> 可選擇前端 mock；不會傳送檔案、不會呼叫 AI API 或 LINE API。"
+        : "<strong>Mock upload menu closed.</strong> 未選擇檔案，沒有任何上傳。");
     });
 
     uploadMenu.addEventListener("click", (event) => {
+      event.stopPropagation();
       const button = event.target.closest("button[data-upload]");
       if (!button) return;
       uploadMenu.classList.remove("open");
       const label = button.dataset.upload === "plan" ? "平面圖" : "報價單";
-      responseBody.innerHTML = `<strong>${label}上傳已模擬接收。</strong><br />目前不會開啟真上傳，也不會傳送任何檔案。我會先用 mock 流程提示下一步：${label === "平面圖" ? "建立空間邊界。" : "做報價健康檢查。"}<p class="mock-note">Front-end mock action only</p>`;
+      setUploadStatus(`<strong>${label} mock selected.</strong> 已顯示前端回饋；沒有真上傳、沒有後端、沒有 AI API、沒有 LINE API。`);
+      responseBody.innerHTML = `<strong>${label}上傳已模擬接收。</strong><br />目前不會開啟真上傳，也不會傳送任何檔案。我會先用 mock 流程提示下一步：${label === "平面圖" ? "建立空間邊界。" : "做報價健康檢查。"}<p class="mock-note">Mock-only / no backend upload / no AI API / not production</p>`;
     });
 
     function submitMockGuide() {
@@ -863,7 +947,7 @@
           return;
         }
         if (mode === "quote") {
-          responseBody.innerHTML = "<strong>報價單路線。</strong><br />這個入口會前往目前的預算 / 報價健檢 placeholder；不會接後端或正式報價。<p class=\"mock-note\">Linked to preview_budget placeholder</p>";
+          responseBody.innerHTML = "<strong>報價草稿路線。</strong><br />這個入口會前往目前的預算 / 報價健檢 placeholder；不會接後端，也不會產生可用於簽約、發案或付款的報價。<p class=\"mock-note\">Linked to preview_budget placeholder / no formal output</p>";
           return;
         }
         if (mode === "blank") {
@@ -872,6 +956,10 @@
         }
       });
     });
+
+    if (routeParams.get("next") === "ai_pcm") {
+      responseBody.innerHTML = "<strong>AI PCM candidate placeholder。</strong><br />這裡只顯示甲方需求整理後可交給治理支援的候選入口；不會呼叫 AI API、LINE API、後端或資料庫，不作法律裁決，也不作決標決定。<p class=\"mock-note\">Candidate placeholder / not production / no AI API / no LINE API / no legal decision / no award decision</p>";
+    }
 
     document.addEventListener("click", closeMenus);
   </script>
