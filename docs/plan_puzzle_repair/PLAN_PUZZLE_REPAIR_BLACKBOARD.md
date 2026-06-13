@@ -3632,3 +3632,53 @@ lastCompletedTarget: Fixed and verified selected opening numeric inspector edit 
 nextTarget: Target Loop 88 - Layer visibility and candidate export preview regression after real PNG import.
 currentSafeTask: Validate wall/opening/furniture layer toggles, inspector layer state, hidden-object non-deletion, candidate JSON preview/readout preservation, and guard boundary.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 88 layer visibility and candidate export preview regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop88LayerPreviewRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_88_LAYER_PREVIEW_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop88-layer-preview-regression-r4.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop88-downloads/loop88-layer-preview-export-r4.json
+- screenshot: docs/plan_puzzle_repair/loop88-layer-preview-regression-r4.png local-only ignored by git
+- checkedAt: 2026-06-14 03:09:05 +08:00
+- testedHead: aad3d9a56a8137385183cf296d90ac9d05c2cd9e
+- decision: LOOP_88_LAYER_PREVIEW_PASS_WITHOUT_PATCH
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - freshPageReload: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - pngImport: PASS_underlay_image_1508x709
+  - manualScaleCalibration: PASS_3000mm_300px_pxPerMm_0_1
+  - createWallOpeningFurniture: PASS_walls_1_openings_1_furniture_1
+  - layerPanelVisible: PASS
+  - hideLayersWithoutDeletingData: PASS_wallLayer_hidden_openingLayer_hidden_furnitureItem_hidden_data_preserved
+  - showLayersRestoresVisibleObjects: PASS
+  - candidateJsonExport: PASS_walls_1_openings_1_furniture_1_layoutObjects_1
+  - candidateJsonPreviewVisibleInOverview: PASS_readout_length_6566
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop88-layer-preview-regression-r1.json
+  - loop88-layer-preview-regression-r2.json
+  - loop88-layer-preview-regression-r3.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 88
+targetDrawingProgress: LAYER_PREVIEW_PASS_WITHOUT_PATCH
+loopResult: LAYER_PREVIEW_PASS_WITHOUT_PATCH
+lastCompletedTarget: Verified layer visibility toggles, data preservation while hidden, visible restore, candidate JSON export, candidate preview in overview, and .pc disabled boundary after real PNG import and manual scale calibration.
+nextTarget: Target Loop 89 - Full current-head smoke packet after Loop85/87 patches.
+currentSafeTask: Consolidate import, scale, wall, opening, furniture, material, layers, export preview, delete/undo/redo, guard, and .pc disabled boundary into one browser smoke packet.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 89 full current-head smoke packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

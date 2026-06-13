@@ -1,0 +1,200 @@
+{
+  "checkedAt": "2026-06-13T19:09:05.242Z",
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop88-layer-preview-r4",
+  "importedPng": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop83-risk-boundary-operability-r2.png",
+  "steps": [
+    {
+      "name": "pageLoad",
+      "status": "PASS",
+      "evidence": {
+        "title": "LaiBE | 平面拼圖 Plancraft+"
+      }
+    },
+    {
+      "name": "freshPageReload",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "name": "pngImport",
+      "status": "PASS",
+      "evidence": {
+        "naturalWidth": 1508,
+        "naturalHeight": 709
+      }
+    },
+    {
+      "name": "manualScaleCalibration",
+      "status": "PASS",
+      "evidence": {
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        },
+        "calibratedBy": {
+          "from": {
+            "x": 300,
+            "y": 300
+          },
+          "to": {
+            "x": 600,
+            "y": 300
+          },
+          "pixelDistance": 300,
+          "knownLength": 3000,
+          "unit": "mm"
+        }
+      }
+    },
+    {
+      "name": "createWallOpeningFurniture",
+      "status": "PASS",
+      "evidence": {
+        "walls": 1,
+        "openings": 1,
+        "furniture": 1,
+        "wallDom": 1,
+        "openingDom": 1,
+        "furnitureDom": 1
+      }
+    },
+    {
+      "name": "layerPanelVisible",
+      "status": "PASS",
+      "evidence": {
+        "layerCard": 1
+      }
+    },
+    {
+      "name": "hideLayersWithoutDeletingData",
+      "status": "PASS",
+      "evidence": {
+        "walls": 1,
+        "openings": 1,
+        "furniture": 1,
+        "wallLayer": {
+          "display": "none",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        "openingLayer": {
+          "display": "none",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        "furnitureChild": {
+          "display": "none",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      }
+    },
+    {
+      "name": "showLayersRestoresVisibleObjects",
+      "status": "PASS",
+      "evidence": {
+        "wallLayer": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        "openingLayer": {
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        "furnitureChild": {
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        "walls": 1,
+        "openings": 1,
+        "furniture": 1
+      }
+    },
+    {
+      "name": "candidateJsonContainsAllObjects",
+      "status": "PASS",
+      "evidence": {
+        "path": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop88-downloads\\loop88-layer-preview-export-r4.json",
+        "fileName": "laibe-plancraft-plus-draft.json",
+        "walls": 1,
+        "openings": 1,
+        "furniture": 1,
+        "layoutObjects": 1,
+        "candidateExportBoundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        }
+      }
+    },
+    {
+      "name": "candidateExportBoundaryGuard",
+      "status": "PASS",
+      "evidence": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    },
+    {
+      "name": "candidateJsonPreviewVisibleInOverview",
+      "status": "PASS",
+      "evidence": {
+        "cardExists": true,
+        "readoutLength": 6566,
+        "text": "\n        候選 JSON 預覽\n        \n          檔名laibe-plancraft-plus-draft.json\n          預覽狀態最新\n          建立時間2026-06-13T19:09:07.950Z\n          牆段1\n          門窗開口1\n          空間標籤0\n          未封閉邊界0\n          家具 / 櫃體1\n          工具目錄項目10\n          版面物件1\n          材料已填\n          正式估價否\n          呼叫預算引擎否\n          可作正式成果否\n        \n        {\n  \"walls\": [\n    {\n      \"id\": \"wall-1781377746444-5fb593\",\n      \"s"
+      }
+    },
+    {
+      "name": "pcProductionExportDisabled",
+      "status": "PASS",
+      "evidence": {
+        "disabled": true
+      }
+    },
+    {
+      "name": "consoleErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "consoleErrors": []
+      }
+    },
+    {
+      "name": "pageErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "pageErrors": []
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarnings": [],
+  "pageErrors": [],
+  "exported": {
+    "path": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop88-downloads\\loop88-layer-preview-export-r4.json",
+    "fileName": "laibe-plancraft-plus-draft.json",
+    "walls": 1,
+    "openings": 1,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "candidateExportBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    }
+  },
+  "final": {
+    "pass": true,
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrorCount": 0,
+    "passedSteps": 14
+  },
+  "screenshot": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop88-layer-preview-regression-r4.png"
+}
