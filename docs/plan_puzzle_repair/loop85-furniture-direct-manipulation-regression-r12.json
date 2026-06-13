@@ -1,0 +1,344 @@
+{
+  "checkedAt": "2026-06-13T18:42:13.449Z",
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop85-furniture-direct-manipulation-r12",
+  "importedPng": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop83-risk-boundary-operability-r2.png",
+  "steps": [
+    {
+      "name": "pageLoad",
+      "status": "PASS",
+      "evidence": {
+        "title": "LaiBE | 平面拼圖 Plancraft+"
+      }
+    },
+    {
+      "name": "freshPageReload",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "name": "pngImport",
+      "status": "PASS",
+      "evidence": {
+        "naturalWidth": 1508,
+        "naturalHeight": 709,
+        "dataUrlLength": 520606,
+        "fileName": "loop83-risk-boundary-operability-r2.png"
+      }
+    },
+    {
+      "name": "manualScaleCalibration",
+      "status": "PASS",
+      "evidence": {
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        },
+        "calibratedBy": {
+          "from": {
+            "x": 300,
+            "y": 305
+          },
+          "to": {
+            "x": 600,
+            "y": 305
+          },
+          "pixelDistance": 300,
+          "knownLength": 3000,
+          "unit": "mm"
+        }
+      }
+    },
+    {
+      "name": "drawWall",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 1,
+        "wall": {
+          "id": "wall-1781376134507-28f47b",
+          "sourceWallId": null,
+          "from": {
+            "x": 3600,
+            "y": 4350
+          },
+          "to": {
+            "x": 7600,
+            "y": 4350
+          },
+          "thickness": 120,
+          "status": "existing",
+          "wallType": "solid_partition",
+          "structural": false,
+          "layer": "walls",
+          "createdAt": "2026-06-13T18:42:14.507Z",
+          "updatedAt": "2026-06-13T18:42:14.507Z"
+        }
+      }
+    },
+    {
+      "name": "placeWardrobeCandidate",
+      "status": "PASS",
+      "evidence": {
+        "furnitureCount": 1,
+        "item": {
+          "id": "furniture-1781376134572-22a64f",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 5400,
+          "y": 5350,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T18:42:14.572Z",
+          "updatedAt": "2026-06-13T18:42:14.572Z"
+        }
+      }
+    },
+    {
+      "name": "furnitureSelectedVisualState",
+      "status": "PASS",
+      "evidence": {
+        "selectedCount": 1
+      }
+    },
+    {
+      "name": "dragFurnitureCandidate",
+      "status": "PASS",
+      "evidence": {
+        "before": {
+          "x": 5400,
+          "y": 5350,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "materialTags": [
+            "wood"
+          ]
+        },
+        "after": {
+          "x": 6300,
+          "y": 5800
+        }
+      }
+    },
+    {
+      "name": "resizeFurnitureCandidateByHandle",
+      "status": "PASS",
+      "evidence": {
+        "before": {
+          "x": 6300,
+          "y": 5800,
+          "widthMm": 1800,
+          "depthMm": 600
+        },
+        "after": {
+          "widthMm": 2550,
+          "depthMm": 1150
+        }
+      }
+    },
+    {
+      "name": "editFurnitureWidthDepthInInspector",
+      "status": "PASS",
+      "evidence": {
+        "widthMm": 2100,
+        "depthMm": 650,
+        "activeId": "selected-furniture-depth",
+        "widthValue": "2100",
+        "depthValue": "650"
+      }
+    },
+    {
+      "name": "editFurnitureNoteInInspector",
+      "status": "PASS",
+      "evidence": {
+        "note": "Loop85 human direct manipulation note",
+        "activeId": "selected-furniture-note",
+        "noteValue": "Loop85 human direct manipulation note"
+      }
+    },
+    {
+      "name": "applyFurnitureMaterialInInspector",
+      "status": "PASS",
+      "evidence": {
+        "materialTags": [
+          "stone"
+        ]
+      }
+    },
+    {
+      "name": "candidateJsonContainsFurniture",
+      "status": "PASS",
+      "evidence": {
+        "furnitureCount": 1,
+        "exportedFurniture": {
+          "id": "furniture-1781376134572-22a64f",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 6300,
+          "y": 5800,
+          "widthMm": 2100,
+          "depthMm": 650,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "stone"
+          ],
+          "note": "Loop85 human direct manipulation note",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T18:42:14.572Z",
+          "updatedAt": "2026-06-13T18:42:16.140Z"
+        }
+      }
+    },
+    {
+      "name": "candidateJsonContainsLayoutObject",
+      "status": "PASS",
+      "evidence": {
+        "layoutObjectsCount": 1,
+        "exportedLayout": {
+          "id": "furniture-1781376134572-22a64f",
+          "objectType": "parametric_furniture_candidate",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "positionMm": {
+            "x": 6300,
+            "y": 5800
+          },
+          "sizeMm": {
+            "width": 2100,
+            "depth": 650,
+            "height": 2400
+          },
+          "rotation": 0,
+          "materialTags": [
+            "stone"
+          ],
+          "note": "Loop85 human direct manipulation note",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true
+        }
+      }
+    },
+    {
+      "name": "candidateJsonPreservesEditedDimensions",
+      "status": "PASS",
+      "evidence": {
+        "widthMm": 2100,
+        "depthMm": 650
+      }
+    },
+    {
+      "name": "candidateJsonPreservesNote",
+      "status": "PASS",
+      "evidence": {
+        "note": "Loop85 human direct manipulation note"
+      }
+    },
+    {
+      "name": "candidateJsonPreservesMaterial",
+      "status": "PASS",
+      "evidence": {
+        "materialTags": [
+          "stone"
+        ]
+      }
+    },
+    {
+      "name": "candidateJsonGuardFlags",
+      "status": "PASS",
+      "evidence": {
+        "budgetCandidate": true,
+        "productionReady": false,
+        "notFormalEstimate": true
+      }
+    },
+    {
+      "name": "candidateExportBoundaryGuard",
+      "status": "PASS",
+      "evidence": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    },
+    {
+      "name": "deleteFurnitureCandidate",
+      "status": "PASS",
+      "evidence": {
+        "furnitureCount": 0,
+        "selectedFurnitureId": null
+      }
+    },
+    {
+      "name": "deletedFurnitureRemovedFromCanvas",
+      "status": "PASS",
+      "evidence": {
+        "canvasFurnitureCount": 0
+      }
+    },
+    {
+      "name": "pcProductionExportDisabled",
+      "status": "PASS",
+      "evidence": {
+        "disabled": true
+      }
+    },
+    {
+      "name": "consoleErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "consoleErrors": []
+      }
+    },
+    {
+      "name": "pageErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "pageErrors": []
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarnings": [],
+  "pageErrors": [],
+  "exported": {
+    "path": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop85-downloads\\loop85-furniture-direct-manipulation-export-r12.json",
+    "fileName": "laibe-plancraft-plus-draft.json",
+    "furnitureCount": 1,
+    "layoutObjectsCount": 1,
+    "toolCatalogItemsCount": 10,
+    "candidateExportBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    }
+  },
+  "final": {
+    "pass": true,
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrorCount": 0,
+    "passedSteps": 24
+  },
+  "screenshot": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop85-furniture-direct-manipulation-regression-r12.png"
+}

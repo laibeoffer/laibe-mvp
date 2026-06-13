@@ -796,8 +796,11 @@
       previewSelectedFurnitureDimensionFromField(input);
       return;
     }
+    if (field === "selected-furniture-name" || field === "selected-furniture-note") {
+      previewSelectedFurnitureTextFromField(input);
+      return;
+    }
     if (field.startsWith("selected-furniture-")) {
-      // Text fields still commit on change so typing notes is not interrupted by re-rendering mid-typing.
       return;
     }
     if (field.startsWith("style-visual-")) {
@@ -886,8 +889,17 @@
       render();
       return;
     }
+    if (
+      field === "selected-furniture-width" ||
+      field === "selected-furniture-depth" ||
+      field === "selected-furniture-height" ||
+      field === "selected-furniture-rotation"
+    ) {
+      previewSelectedFurnitureDimensionFromField(input);
+      return;
+    }
     if (field.startsWith("selected-furniture-")) {
-      updateSelectedFurnitureFromField(input);
+      updateSelectedFurnitureFromField(input, { preserveInspectorFocus: true });
       return;
     }
     if (field.startsWith("selected-zone-")) {
@@ -5212,7 +5224,7 @@
     render();
   }
 
-  function updateSelectedFurnitureFromField(input) {
+  function updateSelectedFurnitureFromField(input, options = {}) {
     const item = getSelectedFurniture();
     if (!item) {
       return;
@@ -5249,6 +5261,10 @@
     uiState.error = "";
     uiState.message = "家具 / 櫃體候選資料已更新；仍不是正式估價。";
     syncBridge();
+    if (options.preserveInspectorFocus) {
+      renderFurnitureCanvasPreview();
+      return;
+    }
     render();
   }
 
@@ -5288,6 +5304,28 @@
     applyLayerVisibility();
     renderStatusLabels();
     syncStaticControls();
+  }
+
+  function previewSelectedFurnitureTextFromField(input) {
+    const item = getSelectedFurniture();
+    if (!item) {
+      return;
+    }
+
+    const field = input.dataset.field;
+    if (field === "selected-furniture-name") {
+      item.name = input.value.trim() || getFurnitureTemplate(item.type).name;
+    }
+    if (field === "selected-furniture-note") {
+      item.note = input.value;
+    }
+
+    item.budgetCandidate = true;
+    item.productionReady = false;
+    item.notFormalEstimate = true;
+    item.updatedAt = new Date().toISOString();
+    uiState.error = "";
+    syncBridge();
   }
 
   function applySelectedFurnitureMaterial(materialTag) {

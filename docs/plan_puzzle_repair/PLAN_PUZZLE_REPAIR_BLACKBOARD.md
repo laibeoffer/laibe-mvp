@@ -3468,3 +3468,63 @@ lastCompletedTarget: Verified current HEAD with actual PNG import, manual scale 
 nextTarget: Target Loop 85 - Current-head reviewer / A2 freshness packet.
 currentSafeTask: Prepare reviewer/A2 freshness packet mapping pushed HEAD to accepted evidence and separating committed evidence from local diagnostic artifacts.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 85 reviewer/A2 freshness packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop85FurnitureDirectManipulationRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_85_FURNITURE_DIRECT_MANIPULATION_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop85-furniture-direct-manipulation-regression-r12.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop85-downloads/loop85-furniture-direct-manipulation-export-r12.json
+- screenshot: docs/plan_puzzle_repair/loop85-furniture-direct-manipulation-regression-r12.png local-only ignored by git
+- checkedAt: 2026-06-14 02:42:13 +08:00
+- testedHead: 0a036c4e5df8a072f115ccbb24d97bfe76e5db32 plus Loop85 scoped furniture inspector patch
+- decision: LOOP_85_FURNITURE_DIRECT_MANIPULATION_PASS_WITH_PATCH
+- runtimePatch: YES
+- patchSummary: Furniture dimension input now avoids full inspector re-render during width/depth edits; furniture name/note input now syncs immediately so candidate JSON preserves human-entered notes before export.
+- localChromeSmoke:
+  - pageLoad: PASS
+  - freshPageReload: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - pngImport: PASS_underlay_image_1508x709
+  - manualScaleCalibration: PASS_3000mm_300px_pxPerMm_0_1
+  - drawWall: PASS_1_wall
+  - placeWardrobeCandidate: PASS_budgetCandidate_true_productionReady_false_notFormalEstimate_true
+  - selectedVisualState: PASS_furniture_item_is_selected
+  - dragFurnitureCandidate: PASS_position_changed
+  - resizeFurnitureCandidateByHandle: PASS_size_changed
+  - inspectorWidthDepthEdit: PASS_width_2100_depth_650
+  - inspectorNoteEdit: PASS_note_preserved
+  - materialApply: PASS_stone_material_tag
+  - candidateJsonExport: PASS_furniture_1_layoutObjects_1_toolCatalogItems_10
+  - candidateJsonEditedData: PASS_dimensions_note_material_preserved
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - deleteFurniture: PASS_project_and_canvas_empty_after_delete
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop85-furniture-direct-manipulation-regression-r1.json through r11.json
+  - loop85-depth-input-diagnostic-r1.json
+  - loop85-depth-input-diagnostic-r2.json
+  - loop85-depth-hit-test-r1.json
+  - loop85-post-resize-depth-diagnostic-r1.json
+  - loop85-note-hit-test-r1.json
+  - loop85-note-hit-test-r2.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 85
+targetDrawingProgress: FURNITURE_DIRECT_MANIPULATION_PASS_WITH_PATCH
+loopResult: FURNITURE_DIRECT_MANIPULATION_PASS_WITH_PATCH
+lastCompletedTarget: Fixed and verified selected furniture/cabinet inspector edit stability and candidate data preservation after real PNG import, manual scale calibration, wall creation, furniture placement, drag, resize, width/depth/note/material edits, candidate JSON export, delete, and .pc disabled boundary.
+nextTarget: Target Loop 86 - Wall classification and demolition/structural status regression after real PNG import.
+currentSafeTask: Validate wall selection color, wall type/status/thickness/structural edits, demolition wall style, candidate JSON preservation, delete/undo/redo, and guard boundary.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 86 wall classification and demolition/structural status regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
