@@ -3377,3 +3377,50 @@ lastCompletedTarget: Verified zone placement, closed boundary editing through wa
 nextTarget: Target Loop 83 - Current-head reviewer evidence freshness / branch sync packet.
 currentSafeTask: Prepare reviewer/A2 freshness packet that maps the latest pushed HEAD to accepted browser evidence and separates local diagnostic artifacts from committed evidence.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 83 reviewer evidence freshness packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop83RiskBoundaryOperability:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_83_RISK_BOUNDARY_OPERABILITY.md
+- machineEvidence: docs/plan_puzzle_repair/loop83-risk-boundary-operability-r2.json
+- exportedBeforeReset: docs/plan_puzzle_repair/loop83-downloads/loop83-before-reset-export-r2.json
+- exportedAfterReset: docs/plan_puzzle_repair/loop83-downloads/loop83-after-reset-export-r2.json
+- screenshot: docs/plan_puzzle_repair/loop83-risk-boundary-operability-r2.png local-only ignored by git
+- checkedAt: 2026-06-14 02:45:00 +08:00
+- testedHead: 193e4636ea726979fefad61c5a9b8b1274da8b61
+- decision: LOOP_83_RISK_BOUNDARY_OPERABILITY_PASS_WITH_NOTES
+- runtimePatch: YES
+- patchSummary: Empty canvas clicks now clear error state only when they actually clear an existing selection, so pre-draft guard messages remain visible after accidental blank-canvas clicks.
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - initialNoDraft: PASS
+  - noSilentMutationBeforeDraft: PASS
+  - guardMessagesVisible: PASS
+  - guardMessagesPersistAfterBlankCanvasClick: PASS
+  - pcExportDisabledInitially: PASS
+  - wallAfterBlankDraft: PASS
+  - windowAfterWall: PASS
+  - furnitureAfterBlankDraft: PASS
+  - beforeResetExportGuard: PASS
+  - resetClearsData: PASS
+  - afterResetExportGuard: PASS
+  - afterResetExportEmpty: PASS
+  - pcProductionExportDisabledAfterReset: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop83-risk-boundary-operability-r1.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 83
+targetDrawingProgress: RISK_BOUNDARY_OPERABILITY_PASS_WITH_NOTES
+loopResult: RISK_BOUNDARY_OPERABILITY_PASS_WITH_NOTES
+lastCompletedTarget: Fixed and verified guarded pre-draft mis-click feedback persistence, normal blank-draft wall/window/furniture workflow, candidate JSON export guard, reset clearing, post-reset empty export, and .pc disabled boundary.
+nextTarget: Target Loop 84 - Current-head full browser smoke spot-check after Loop 83 patch.
+currentSafeTask: Run a compact full workflow smoke after the Loop 83 UI-state patch to ensure import/scale/wall/opening/furniture/export guard still pass.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 84 full smoke spot-check without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

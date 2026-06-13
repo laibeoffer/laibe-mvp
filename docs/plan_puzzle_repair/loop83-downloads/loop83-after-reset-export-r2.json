@@ -1,0 +1,237 @@
+{
+  "name": "LaiBE Plancraft+ 草稿",
+  "product": "Plancraft+",
+  "version": "0.10.0-renderer-preview-spike",
+  "unit": "mm",
+  "importSource": null,
+  "scale": {
+    "pxPerMm": null,
+    "calibrated": false,
+    "autoScaleSuggestion": null,
+    "autoScaleApplied": false
+  },
+  "underlay": null,
+  "walls": [],
+  "wallGraph": {
+    "nodes": [],
+    "issues": [],
+    "lastBuiltAt": "2026-06-13T17:55:46.532Z"
+  },
+  "nodeGraph": {
+    "nodes": [],
+    "edges": [],
+    "issues": [],
+    "lastBuiltAt": "2026-06-13T17:55:46.532Z"
+  },
+  "openings": [],
+  "zones": [],
+  "furniture": [],
+  "plancraftBridge": {
+    "status": "spike",
+    "targetFormat": ".pc",
+    "converterVersion": "0.1.0-spike",
+    "message": "已建立 .pc 候選檔與圖面預覽驗證流程",
+    "reason": "圖面預覽仍是測試流程，尚未進入正式整合",
+    "requiredNextStep": "確認 SVG 預覽品質後，評估共用牆整理或瀏覽器預覽整合",
+    "lastExportedAt": null,
+    "lastExportSummary": null,
+    "warnings": [],
+    "validation": {
+      "status": "not_run",
+      "checkedAt": null,
+      "reason": "靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認 .pc 候選測試檔。",
+      "errors": [],
+      "warnings": []
+    },
+    "preview": {
+      "status": "not_run",
+      "checkedAt": null,
+      "svgOutputPath": null,
+      "command": "cd C:\\laibe_project\r\nnode C:\\laibe_project\\plancraft\\packages\\cli\\dist\\index.js compile C:\\path\\to\\laibe-plancraft-plus-spike.pc --structure-only -o C:\\path\\to\\laibe-plancraft-plus-spike.svg",
+      "errors": [],
+      "warnings": [
+        "靜態頁尚未直接載入正式圖面預覽器；請使用本機驗證流程產生 SVG 預覽。"
+      ]
+    }
+  },
+  "toolCatalogItems": [
+    {
+      "id": "tool-wardrobe",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "widthMm": 1800,
+      "depthMm": 600,
+      "heightMm": 2400,
+      "materialTags": [
+        "wood"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-tall_cabinet",
+      "type": "tall_cabinet",
+      "category": "cabinet",
+      "name": "高櫃",
+      "widthMm": 900,
+      "depthMm": 600,
+      "heightMm": 2400,
+      "materialTags": [
+        "system_panel"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-low_wall_cabinet",
+      "type": "low_wall_cabinet",
+      "category": "cabinet",
+      "name": "矮櫃 / 吊櫃",
+      "widthMm": 1200,
+      "depthMm": 450,
+      "heightMm": 900,
+      "materialTags": [
+        "system_panel"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-tv_cabinet",
+      "type": "tv_cabinet",
+      "category": "cabinet",
+      "name": "電視櫃",
+      "widthMm": 1800,
+      "depthMm": 450,
+      "heightMm": 500,
+      "materialTags": [
+        "wood"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-kitchen_cabinet",
+      "type": "kitchen_cabinet",
+      "category": "cabinet",
+      "name": "廚具",
+      "widthMm": 1800,
+      "depthMm": 600,
+      "heightMm": 900,
+      "materialTags": [
+        "stone",
+        "system_panel"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-bed",
+      "type": "bed",
+      "category": "furniture",
+      "name": "床",
+      "widthMm": 1500,
+      "depthMm": 2000,
+      "heightMm": 500,
+      "materialTags": [
+        "fabric"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-sofa",
+      "type": "sofa",
+      "category": "furniture",
+      "name": "沙發",
+      "widthMm": 2100,
+      "depthMm": 900,
+      "heightMm": 850,
+      "materialTags": [
+        "fabric"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-dining_table",
+      "type": "dining_table",
+      "category": "furniture",
+      "name": "餐桌",
+      "widthMm": 1600,
+      "depthMm": 900,
+      "heightMm": 760,
+      "materialTags": [
+        "wood"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-toilet",
+      "type": "toilet",
+      "category": "fixture",
+      "name": "馬桶",
+      "widthMm": 420,
+      "depthMm": 700,
+      "heightMm": 750,
+      "materialTags": [
+        "ceramic"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-washbasin",
+      "type": "washbasin",
+      "category": "fixture",
+      "name": "洗手台",
+      "widthMm": 600,
+      "depthMm": 500,
+      "heightMm": 850,
+      "materialTags": [
+        "ceramic"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    }
+  ],
+  "layoutObjects": [],
+  "candidateExportBoundary": {
+    "formalEstimate": false,
+    "budgetEngineCalled": false,
+    "productionReady": false,
+    "note": "家具 / 櫃體物件僅為草稿候選資料。"
+  }
+}

@@ -1492,6 +1492,15 @@
     }
 
     if (event.target === canvas || event.target === wallLayer || event.target === openingLayer || event.target === zonePolygonLayer || event.target === zoneLayer) {
+      const hadSelection = Boolean(
+        uiState.selectedWallId ||
+        uiState.selectedEdgeId ||
+        uiState.selectedOpeningId ||
+        uiState.selectedZoneId ||
+        uiState.selectedFurnitureId ||
+        uiState.selectedIssueId ||
+        uiState.selectedNodeId
+      );
       uiState.selectedWallId = null;
       uiState.selectedEdgeId = null;
       uiState.selectedOpeningId = null;
@@ -1499,7 +1508,9 @@
       uiState.selectedFurnitureId = null;
       uiState.selectedIssueId = null;
       uiState.selectedNodeId = null;
-      uiState.error = "";
+      if (hadSelection) {
+        uiState.error = "";
+      }
       render();
     }
   }

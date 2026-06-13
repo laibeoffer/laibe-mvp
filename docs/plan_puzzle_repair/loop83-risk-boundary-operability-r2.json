@@ -1,0 +1,188 @@
+{
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop83-risk-boundary-operability-r2",
+  "checks": {
+    "pageLoad": "PASS",
+    "initialNoDraft": "PASS",
+    "noSilentMutationBeforeDraft": "PASS",
+    "guardMessagesVisible": "PASS",
+    "guardMessagesPersistAfterBlankCanvasClick": "PASS",
+    "pcExportDisabledInitially": "PASS",
+    "wallAfterBlankDraft": "PASS",
+    "windowAfterWall": "PASS",
+    "furnitureAfterBlankDraft": "PASS",
+    "beforeResetExportGuard": "PASS",
+    "resetClearsData": "PASS",
+    "afterResetExportGuard": "PASS",
+    "afterResetExportEmpty": "PASS",
+    "pcExportDisabledAfterReset": "PASS"
+  },
+  "metrics": {
+    "initial": {
+      "mode": "select",
+      "message": "",
+      "error": "",
+      "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。",
+      "walls": 0,
+      "openings": 0,
+      "zones": 0,
+      "furniture": 0,
+      "importSource": null,
+      "calibrated": false,
+      "selectedWallId": null,
+      "selectedOpeningId": null,
+      "selectedZoneId": null,
+      "selectedFurnitureId": null,
+      "pcDisabled": true
+    },
+    "guardClicks": [
+      {
+        "name": "drawWallWithoutDraft",
+        "afterClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先匯入底圖並完成比例校正，再開始描牆。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "afterBlankCanvasClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先匯入底圖並完成比例校正，再開始描牆。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "counts": {
+          "walls": 0,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0
+        }
+      },
+      {
+        "name": "doorWithoutDraft",
+        "afterClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先建立並整理牆端。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "afterBlankCanvasClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先建立並整理牆端。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "counts": {
+          "walls": 0,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0
+        }
+      },
+      {
+        "name": "zoneWithoutDraft",
+        "afterClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先匯入底圖並完成比例校正，再新增空間標籤。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "afterBlankCanvasClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先匯入底圖並完成比例校正，再新增空間標籤。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "counts": {
+          "walls": 0,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0
+        }
+      },
+      {
+        "name": "furnitureWithoutDraft",
+        "afterClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先匯入底圖並完成比例校正，再放置家具或櫃體。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "afterBlankCanvasClick": {
+          "mode": "select",
+          "message": "",
+          "error": "請先匯入底圖並完成比例校正，再放置家具或櫃體。",
+          "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。"
+        },
+        "counts": {
+          "walls": 0,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0
+        }
+      }
+    ],
+    "afterWall": {
+      "walls": 1,
+      "selectedWallId": "wall-1781373345109-0f0d99",
+      "mode": "draw-wall"
+    },
+    "afterWindow": {
+      "openings": 1,
+      "selectedOpeningId": "opening-1781373345283-796083"
+    },
+    "afterFurniture": {
+      "furniture": 1,
+      "selectedFurnitureId": "furniture-1781373345738-937343"
+    },
+    "beforeResetExport": {
+      "walls": 1,
+      "openings": 1,
+      "furniture": 1,
+      "boundary": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    },
+    "afterReset": {
+      "mode": "select",
+      "message": "",
+      "error": "",
+      "helperText": "請先匯入業主提供的丈量圖\nJPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。",
+      "walls": 0,
+      "openings": 0,
+      "zones": 0,
+      "furniture": 0,
+      "importSource": null,
+      "calibrated": false,
+      "selectedWallId": null,
+      "selectedOpeningId": null,
+      "selectedZoneId": null,
+      "selectedFurnitureId": null,
+      "pcDisabled": true
+    },
+    "afterResetExport": {
+      "walls": 0,
+      "openings": 0,
+      "furniture": 0,
+      "boundary": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    }
+  },
+  "notes": [],
+  "exportPaths": {
+    "beforeReset": "docs/plan_puzzle_repair/loop83-downloads/loop83-before-reset-export-r2.json",
+    "afterReset": "docs/plan_puzzle_repair/loop83-downloads/loop83-after-reset-export-r2.json"
+  },
+  "screenshot": "docs/plan_puzzle_repair/loop83-risk-boundary-operability-r2.png",
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "pageErrors": []
+  },
+  "result": "LOOP_83_RISK_BOUNDARY_OPERABILITY_PASS_WITH_NOTES"
+}
