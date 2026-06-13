@@ -3293,3 +3293,40 @@ lastCompletedTarget: Verified reset clears candidate draft data, new blank draft
 nextTarget: Target Loop 81 - High-risk UI copy visibility / Chinese label sweep.
 currentSafeTask: Inspect visible high-risk labels and status messages for mojibake or unclear text that could block human operation.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 81 UI copy visibility sweep without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop81UiTextVisibilityChineseSweep:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_81_UI_TEXT_VISIBILITY_CHINESE_SWEEP.md
+- machineEvidence: docs/plan_puzzle_repair/loop81-ui-copy-visibility-chinese-sweep-r1.json
+- utf8Summary: docs/plan_puzzle_repair/loop81-ui-copy-visibility-chinese-sweep-summary.json
+- screenshot: docs/plan_puzzle_repair/loop81-ui-copy-visibility-chinese-sweep-r1.png local-only ignored by git
+- checkedAt: 2026-06-14 02:05:00 +08:00
+- testedHead: 63fcbcc716334c82102c9ac24f8835b4ad31c81d
+- decision: LOOP_81_UI_TEXT_VISIBILITY_CHINESE_SWEEP_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - titleChineseReadable: PASS_LaiBE_PLAN_PUZZLE_PLANCraft_PLUS
+  - toolAreaChineseReadable: PASS
+  - importLoadChineseReadable: PASS
+  - candidateDraftJsonWording: PASS
+  - highRiskInternalEnglishNeedles: 0
+  - textHeavyToolButtons: 0
+- encodingNote: PowerShell Get-Content may display UTF-8 Chinese as mojibake; Node UTF-8 parsing and Unicode escape checks confirmed browser DOM text is readable Chinese.
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 81
+targetDrawingProgress: UI_TEXT_VISIBILITY_CHINESE_SWEEP_PASS_WITH_NOTES
+loopResult: UI_TEXT_VISIBILITY_CHINESE_SWEEP_PASS_WITH_NOTES
+lastCompletedTarget: Verified browser-visible UI copy remains Chinese-readable with no high-risk internal production labels, no text-heavy tool-card labels, and no console warnings/errors.
+nextTarget: Target Loop 82 - Reviewer/A2 branch freshness and pushed evidence index.
+currentSafeTask: Confirm pushed branch evidence index and prepare A2/reviewer freshness packet without touching runtime unless a new concrete browser defect is assigned.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 82 pushed evidence freshness index without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

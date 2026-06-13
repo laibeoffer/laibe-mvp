@@ -1,0 +1,1050 @@
+{
+  "title": "LaiBE | 平面拼圖 Plancraft+",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop81-ui-copy-visibility-chinese-sweep",
+  "sections": {
+    "fileArea": [],
+    "toolArea": [
+      {
+        "tag": "section",
+        "text": "工具區 Plancraft+ 流程 匯入與校正 匯入圖紙 校正比例 常用 / 牆體 選取 刪除 畫牆 接牆 門窗工具 門 窗 開口 空間標籤 新增空間 編輯邊界 櫃體工具 衣櫃 高櫃 矮櫃 / 吊櫃 廚具 馬桶 洗手台 活動家具 活動家具 放到畫布 審核 / 尚未納入 SVG 圖塊審查 家具包整合 .pc 預覽停用 草稿狀態 底圖 尚未匯入 比例 待比例確認 牆段 0 接牆點 0 提醒 0 輸出狀態 候選草稿 水平 / 寬度 平面拼圖草稿 請先匯入業主提供的丈量圖 JPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據 屬性面板 目前選取物件 屬性 圖層 提醒 材料 總覽 尚未選取物件 請先匯入 JPG 或 PNG 丈量圖。匯入後系統會先檢查檔名尺寸線索；沒有線索時用兩點校正，再開始畫牆與加入物件。",
+        "aria": "平面拼圖工作區",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "tool-shell",
+        "rect": {
+          "x": 34,
+          "y": 105,
+          "w": 1440,
+          "h": 597
+        }
+      }
+    ],
+    "canvasArea": [
+      {
+        "tag": "section",
+        "text": "水平 / 寬度 平面拼圖草稿 請先匯入業主提供的丈量圖 JPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據",
+        "aria": "中間畫布區",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "canvas-shell",
+        "rect": {
+          "x": 231,
+          "y": 106,
+          "w": 940,
+          "h": 595
+        }
+      },
+      {
+        "tag": "div",
+        "text": "請先匯入業主提供的丈量圖 JPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "helper-layer",
+        "rect": {
+          "x": 231,
+          "y": 106,
+          "w": 940,
+          "h": 547
+        }
+      }
+    ],
+    "statusArea": [
+      {
+        "tag": "aside",
+        "text": "屬性面板 目前選取物件 屬性 圖層 提醒 材料 總覽 尚未選取物件 請先匯入 JPG 或 PNG 丈量圖。匯入後系統會先檢查檔名尺寸線索；沒有線索時用兩點校正，再開始畫牆與加入物件。",
+        "aria": "屬性面板",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "panel inspector",
+        "rect": {
+          "x": 1171,
+          "y": 106,
+          "w": 302,
+          "h": 595
+        }
+      },
+      {
+        "tag": "div",
+        "text": "屬性 圖層 提醒 材料 總覽 尚未選取物件 請先匯入 JPG 或 PNG 丈量圖。匯入後系統會先檢查檔名尺寸線索；沒有線索時用兩點校正，再開始畫牆與加入物件。",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "panel-body",
+        "rect": {
+          "x": 1172,
+          "y": 164,
+          "w": 301,
+          "h": 537
+        }
+      }
+    ],
+    "allButtons": [
+      {
+        "tag": "button",
+        "text": "匯入 JPG / PNG（PDF先轉圖）",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "choose-file",
+        "classes": "toolbar-btn primary",
+        "rect": {
+          "x": 495,
+          "y": 21,
+          "w": 208,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "空白毫米草稿",
+        "aria": "",
+        "title": "建立空白毫米草稿，只產生候選資料，不進正式預算。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-blank-mm-draft",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 709,
+          "y": 21,
+          "w": 117,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "校正比例",
+        "aria": "",
+        "title": "若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-calibration",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 832,
+          "y": 21,
+          "w": 95,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "重設草稿",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "reset-project",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 933,
+          "y": 21,
+          "w": 95,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "復原",
+        "aria": "",
+        "title": "目前沒有可復原的繪圖動作",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "undo-action",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 1034,
+          "y": 21,
+          "w": 73,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "重做",
+        "aria": "",
+        "title": "目前沒有可重做的繪圖動作",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "redo-action",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 1113,
+          "y": 21,
+          "w": 73,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "匯出草稿 JSON",
+        "aria": "",
+        "title": "匯出候選草稿 JSON；不是正式估價，也不是 Plancraft 正式輸出。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "export-draft",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 1192,
+          "y": 21,
+          "w": 128,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": ".pc 正式匯出停用",
+        "aria": "",
+        "title": "候選 .pc 預覽停用；不執行正式產出。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "export-pc-spike",
+        "classes": "toolbar-btn",
+        "rect": {
+          "x": 1326,
+          "y": 21,
+          "w": 137,
+          "h": 40
+        }
+      },
+      {
+        "tag": "button",
+        "text": "匯入圖紙",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "choose-file",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 43,
+          "y": 190,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "校正比例",
+        "aria": "",
+        "title": "若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-calibration",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 105,
+          "y": 190,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "選取",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "set-select-mode",
+        "classes": "tool-card is-ready is-mode-active",
+        "rect": {
+          "x": 43,
+          "y": 267,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "刪除",
+        "aria": "",
+        "title": "刪除目前選取的物件；不會刪除未選取物件。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "delete-current-selection",
+        "classes": "tool-card is-ready is-danger-action",
+        "rect": {
+          "x": 105,
+          "y": 267,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "畫牆",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-draw-wall",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 166,
+          "y": 267,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "接牆",
+        "aria": "",
+        "title": "將靠很近的牆端接在一起，像吸附一樣整理斷點。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "clean-wall-endpoints",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 43,
+          "y": 323,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "門",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "add-opening",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 43,
+          "y": 400,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "窗",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "add-opening",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 105,
+          "y": 400,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "開口",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "add-opening",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 166,
+          "y": 400,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "新增空間",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-place-zone",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 43,
+          "y": 477,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "編輯邊界",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-zone-boundary",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 105,
+          "y": 477,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "衣櫃",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 43,
+          "y": 554,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "高櫃",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 105,
+          "y": 554,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "矮櫃 / 吊櫃",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 166,
+          "y": 554,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "廚具",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 43,
+          "y": 610,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "馬桶",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 105,
+          "y": 610,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "洗手台",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 166,
+          "y": 610,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "活動家具",
+        "aria": "",
+        "title": "沙發、床、餐桌等活動家具是平面參考，放在櫃體工具後方，不當作正式計價項。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "select-furniture-template",
+        "classes": "tool-card is-ready tool-card--wide",
+        "rect": {
+          "x": 43,
+          "y": 687,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "放到畫布",
+        "aria": "",
+        "title": "點一下後，到畫布上點位置，把目前選到的家具或櫃體放上去。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "start-place-furniture",
+        "classes": "tool-card is-ready",
+        "rect": {
+          "x": 105,
+          "y": 687,
+          "w": 56,
+          "h": 50
+        }
+      },
+      {
+        "tag": "button",
+        "text": "SVG 圖塊審查",
+        "aria": "",
+        "title": "SVG 家具圖塊需完成 overlay QA，未通過前不得進 runtime 家具包。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "tool-card is-waiting",
+        "rect": {
+          "x": 43,
+          "y": 764,
+          "w": 56,
+          "h": 56
+        }
+      },
+      {
+        "tag": "button",
+        "text": "家具包整合",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "",
+        "classes": "tool-card is-waiting",
+        "rect": {
+          "x": 105,
+          "y": 764,
+          "w": 56,
+          "h": 56
+        }
+      },
+      {
+        "tag": "button",
+        "text": ".pc 預覽停用",
+        "aria": "",
+        "title": "候選 .pc 預覽停用；不執行正式產出。",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "export-pc-spike",
+        "classes": "tool-card is-waiting",
+        "rect": {
+          "x": 166,
+          "y": 764,
+          "w": 56,
+          "h": 56
+        }
+      },
+      {
+        "tag": "button",
+        "text": "屬性",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "set-inspector-tab",
+        "classes": "inspector-tab is-active",
+        "rect": {
+          "x": 1180,
+          "y": 174,
+          "w": 54,
+          "h": 32
+        }
+      },
+      {
+        "tag": "button",
+        "text": "圖層",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "set-inspector-tab",
+        "classes": "inspector-tab",
+        "rect": {
+          "x": 1238,
+          "y": 174,
+          "w": 54,
+          "h": 32
+        }
+      },
+      {
+        "tag": "button",
+        "text": "提醒",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "set-inspector-tab",
+        "classes": "inspector-tab",
+        "rect": {
+          "x": 1296,
+          "y": 174,
+          "w": 54,
+          "h": 32
+        }
+      },
+      {
+        "tag": "button",
+        "text": "材料",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "set-inspector-tab",
+        "classes": "inspector-tab",
+        "rect": {
+          "x": 1354,
+          "y": 174,
+          "w": 54,
+          "h": 32
+        }
+      },
+      {
+        "tag": "button",
+        "text": "總覽",
+        "aria": "",
+        "title": "",
+        "placeholder": "",
+        "role": "",
+        "dataAction": "set-inspector-tab",
+        "classes": "inspector-tab",
+        "rect": {
+          "x": 1411,
+          "y": 174,
+          "w": 54,
+          "h": 32
+        }
+      }
+    ],
+    "selects": [],
+    "inputs": []
+  },
+  "visibleTextCount": 89,
+  "suspicious": [],
+  "textHeavyToolButtons": [],
+  "toolButtons": [
+    {
+      "tag": "button",
+      "text": "匯入圖紙",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "choose-file",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 43,
+        "y": 190,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "校正比例",
+      "aria": "",
+      "title": "若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "start-calibration",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 105,
+        "y": 190,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "選取",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "set-select-mode",
+      "classes": "tool-card is-ready is-mode-active",
+      "rect": {
+        "x": 43,
+        "y": 267,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "刪除",
+      "aria": "",
+      "title": "刪除目前選取的物件；不會刪除未選取物件。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "delete-current-selection",
+      "classes": "tool-card is-ready is-danger-action",
+      "rect": {
+        "x": 105,
+        "y": 267,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "畫牆",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "start-draw-wall",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 166,
+        "y": 267,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "接牆",
+      "aria": "",
+      "title": "將靠很近的牆端接在一起，像吸附一樣整理斷點。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "clean-wall-endpoints",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 43,
+        "y": 323,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "門",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "add-opening",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 43,
+        "y": 400,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "窗",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "add-opening",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 105,
+        "y": 400,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "開口",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "add-opening",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 166,
+        "y": 400,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "新增空間",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "start-place-zone",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 43,
+        "y": 477,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "編輯邊界",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "start-zone-boundary",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 105,
+        "y": 477,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "衣櫃",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 43,
+        "y": 554,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "高櫃",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 105,
+        "y": 554,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "矮櫃 / 吊櫃",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 166,
+        "y": 554,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "廚具",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 43,
+        "y": 610,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "馬桶",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 105,
+        "y": 610,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "洗手台",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 166,
+        "y": 610,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "活動家具",
+      "aria": "",
+      "title": "沙發、床、餐桌等活動家具是平面參考，放在櫃體工具後方，不當作正式計價項。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "select-furniture-template",
+      "classes": "tool-card is-ready tool-card--wide",
+      "rect": {
+        "x": 43,
+        "y": 687,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "放到畫布",
+      "aria": "",
+      "title": "點一下後，到畫布上點位置，把目前選到的家具或櫃體放上去。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "start-place-furniture",
+      "classes": "tool-card is-ready",
+      "rect": {
+        "x": 105,
+        "y": 687,
+        "w": 56,
+        "h": 50
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "SVG 圖塊審查",
+      "aria": "",
+      "title": "SVG 家具圖塊需完成 overlay QA，未通過前不得進 runtime 家具包。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "",
+      "classes": "tool-card is-waiting",
+      "rect": {
+        "x": 43,
+        "y": 764,
+        "w": 56,
+        "h": 56
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": "家具包整合",
+      "aria": "",
+      "title": "",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "",
+      "classes": "tool-card is-waiting",
+      "rect": {
+        "x": 105,
+        "y": 764,
+        "w": 56,
+        "h": 56
+      },
+      "tooTextHeavy": false
+    },
+    {
+      "tag": "button",
+      "text": ".pc 預覽停用",
+      "aria": "",
+      "title": "候選 .pc 預覽停用；不執行正式產出。",
+      "placeholder": "",
+      "role": "",
+      "dataAction": "export-pc-spike",
+      "classes": "tool-card is-waiting",
+      "rect": {
+        "x": 166,
+        "y": 764,
+        "w": 56,
+        "h": 56
+      },
+      "tooTextHeavy": false
+    }
+  ],
+  "scroll": {
+    "x": 0,
+    "y": 0,
+    "width": 1508,
+    "height": 714,
+    "clientWidth": 1508,
+    "clientHeight": 709
+  },
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "count": 0,
+    "pageErrors": []
+  }
+}

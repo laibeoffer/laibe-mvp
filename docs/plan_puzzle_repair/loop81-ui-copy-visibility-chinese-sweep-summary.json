@@ -1,0 +1,18 @@
+{
+  "result": "LOOP_81_UI_COPY_VISIBILITY_CHINESE_SWEEP_PASS_WITH_NOTES",
+  "title": "LaiBE | 平面拼圖 Plancraft+",
+  "titleIncludesPlanPuzzle": true,
+  "visibleChineseChecks": {
+    "toolAreaIncludesPlanPuzzle": true,
+    "toolAreaIncludesImportOrLoad": true,
+    "toolAreaIncludesDraftJson": true
+  },
+  "highRiskEnglishNeedleCount": 0,
+  "textHeavyToolButtons": 0,
+  "consoleErrors": 0,
+  "consoleWarnings": 0,
+  "pageErrors": 0,
+  "screenshot": "docs/plan_puzzle_repair/loop81-ui-copy-visibility-chinese-sweep-r1.png",
+  "evidenceJson": "docs/plan_puzzle_repair/loop81-ui-copy-visibility-chinese-sweep-r1.json",
+  "note": "PowerShell Get-Content may display UTF-8 Chinese as mojibake. This summary is generated with Node UTF-8 parsing and Unicode escape checks."
+}
