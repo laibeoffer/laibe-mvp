@@ -3134,3 +3134,35 @@ lastCompletedTarget: Verified latest pushed HEAD with a full browser workflow co
 nextTarget: Target Loop 77 - PR / reviewer scope packet for current repair branch.
 currentSafeTask: Prepare scoped reviewer packet summarizing runtime changes, evidence, remaining candidate-only boundaries, and exact exclusions.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 77 reviewer packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop77ReviewerScopePacket:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_77_REVIEWER_SCOPE_PACKET.md
+- checkedAt: 2026-06-14 01:16:00 +08:00
+- decision: REVIEWER_SCOPE_PACKET_READY
+- runtimePatch: NO
+- branchUnderReview: codex/plan-puzzle-test-repair-worktree-20260611
+- reviewedHead: 1074a008bd9fe2883282266384a77bd20ca4659f
+- runtimeCommitsToReview:
+  - eac76c0ca Fix plan puzzle wall continuation workflow
+  - 7f4c0eecb Polish selected furniture label affordance
+- evidenceCommitsToReview:
+  - 916fed016 Add plan puzzle narrow viewport evidence
+  - ae564c6f8 Add plan puzzle repair evidence consolidation
+  - 1074a008b Add plan puzzle full human operability evidence
+- recommendedReviewerDecision: PASS_WITH_NOTES_FOR_CANDIDATE_RUNTIME
+- notRecommendedDecision: PRODUCTION_READY
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 77
+targetDrawingProgress: REVIEWER_SCOPE_PACKET_READY
+loopResult: REVIEWER_SCOPE_PACKET_READY
+lastCompletedTarget: Prepared reviewer scope packet for current repair branch with runtime changes, evidence map, guard boundaries, and explicit non-production exclusions.
+nextTarget: Target Loop 78 - A2/reviewer response handling or next concrete human-operability defect repair.
+currentSafeTask: Watch for A2/reviewer decision; if no decision, keep branch as candidate runtime and do not promote production/budget readiness.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, perform read-only response watch and keep SVG/runtime budget boundaries unchanged.
