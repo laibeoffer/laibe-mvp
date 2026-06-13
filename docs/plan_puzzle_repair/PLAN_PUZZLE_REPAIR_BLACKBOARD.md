@@ -2,12 +2,12 @@
 
 workstream: Plancraft+ Plan Puzzle Repair
 commander: B_PLAN_PUZZLE_REPAIR_COMMANDER
-currentPhase: HUNGRY_REPAIR_ACTIVE / TARGET_LOOP_58_REVIEWER_RESPONSE_WATCH_AND_PATCH_SPLIT_READY
+currentPhase: HUNGRY_REPAIR_ACTIVE / TARGET_LOOP_90_A2_REVIEWER_COMPLETION_PACKET_READY
 
 sourcePriority: GitHub / PR98 first; local files are secondary comparison only.
 repo: laibeoffer/laibe-mvp
 activeBranch: codex/plan-puzzle-test-repair-worktree-20260611
-activeHead: 34e9a7c84d32941d5b66e6bd61c7b085c80e3ec5
+activeHead: a745dfe9313df8d37f00ebba295719e3a5d47425
 sourceBranch: a1/github-clean-integration-round-1-20260611
 worktreePath: Z:\08-Jacky\laibe_MVP_project\_codex_worktrees\laibe_project\plan-puzzle-test-repair-worktree-20260611
 
@@ -3745,3 +3745,44 @@ lastCompletedTarget: Verified one-run human-operable candidate draft path across
 nextTarget: Target Loop 90 - Reviewer/A2 completion packet refresh.
 currentSafeTask: Consolidate Loop85-Loop89 browser evidence into a current-head completion package and list remaining non-production boundaries.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 90 completion evidence packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop90A2ReviewerCompletionPacket:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_90_A2_REVIEWER_COMPLETION_PACKET.md
+- checkedAt: 2026-06-14 04:12:00 +08:00
+- currentHead: a745dfe9313df8d37f00ebba295719e3a5d47425
+- decision: LOOP_90_A2_REVIEWER_COMPLETION_PACKET_READY
+- runtimePatch: NO
+- packageScope: Loop85-Loop89 browser evidence consolidation only
+- includes:
+  - Loop85 furniture direct manipulation PASS_WITH_PATCH
+  - Loop86 wall classification / demolition PASS_WITHOUT_PATCH
+  - Loop87 opening inspector PASS_WITH_PATCH
+  - Loop88 layer visibility / candidate preview PASS_WITHOUT_PATCH
+  - Loop89 full current-head human-operability smoke PASS_WITHOUT_PATCH
+- completionBoundary:
+  - humanOperableCandidateDrafting: READY_FOR_A2_REVIEW
+  - productionQuantityFacts: NOT_CLAIMED
+  - BudgetEngineInput: NOT_CLAIMED
+  - formalPcExport: DISABLED
+  - formalExcelPdf: NOT_CLAIMED
+  - svgFurnitureRuntimePackage: BLOCKED_UNTIL_REVIEWER_COMMANDER_ACCEPTS_CANDIDATE_ONLY_DISPOSITIONS_AND_SEPARATE_INTEGRATION_TASK
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 90
+targetDrawingProgress: A2_REVIEWER_COMPLETION_PACKET_READY
+loopResult: A2_REVIEWER_COMPLETION_PACKET_READY
+lastCompletedTarget: Consolidated Loop85-Loop89 browser evidence and guard boundaries into a current-head A2/Reviewer completion packet.
+nextTarget: Target Loop 91 - Reviewer response watch and exact fix intake.
+currentSafeTask: Watch for A2/reviewer acceptance or exact rejection points; if a rejection appears, open the smallest evidence or patch loop for that point only.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, perform a read-only response-watch check and keep SVG runtime include false, Budget Engine untouched, and formal `.pc` export disabled.
