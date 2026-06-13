@@ -1,0 +1,224 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop50-narrow-tap-panel-scroll-r2",
+  "viewport": {
+    "width": 430,
+    "height": 820
+  },
+  "checkedAt": "2026-06-13T13:23:08.307Z",
+  "checks": {
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "#planCanvas exists"
+    },
+    "narrowPageSections": {
+      "status": "PASS",
+      "evidence": "sections present; inspector tabs are relative at <=640px"
+    },
+    "pngImport": {
+      "status": "PASS",
+      "evidence": "scaleStatus=有檔名建議"
+    },
+    "scaleCalibration": {
+      "status": "PASS",
+      "evidence": "scaleStatus=已確認"
+    },
+    "drawWall": {
+      "status": "PASS",
+      "evidence": "walls=1"
+    },
+    "selectWall": {
+      "status": "PASS",
+      "evidence": "selectedWalls=1"
+    },
+    "doorWindowOpening": {
+      "status": "FAIL",
+      "evidence": "openings symbols=0"
+    },
+    "furniturePlacement": {
+      "status": "PASS",
+      "evidence": "furniture=1, handles=2, inside=1"
+    },
+    "furnitureDrag": {
+      "status": "PASS",
+      "evidence": "before=(-258,293), after=(-218,311)"
+    },
+    "furnitureResize": {
+      "status": "PASS",
+      "evidence": "before=905x302, after=1005x371"
+    },
+    "inspectorEdit": {
+      "status": "PASS",
+      "evidence": "width=1230, depth=650, material=system_panel"
+    },
+    "pcProductionExportDisabled": {
+      "status": "PASS",
+      "evidence": "disabled buttons=3"
+    },
+    "candidateJsonExport": {
+      "status": "FAIL",
+      "evidence": "{\"walls\":1,\"openings\":0,\"furniture\":1,\"layoutObjects\":1,\"toolCatalogItems\":10,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furnitureFirst\":{\"id\":\"furniture-1781356991576-70046c\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":440,\"y\":561,\"widthMm\":1230,\"depthMm\":650,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:23:11.576Z\",\"updatedAt\":\"2026-06-13T13:23:12.685Z\"},\"layoutObjectFirst\":{\"id\":\"furniture-1781356991576-70046c\",\"objectType\":\"parametric_furniture_candidate\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"positionMm\":{\"x\":440,\"y\":561},\"sizeMm\":{\"width\":1230,\"depth\":650,\"height\":2400},\"rotation\":0,\"materialTags\":[\"system_panel\"],\"note\":\"\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true}}"
+    },
+    "candidateGuard": {
+      "status": "PASS",
+      "evidence": "candidate-only guard preserved"
+    },
+    "consoleErrors": {
+      "status": "PASS",
+      "evidence": "0 console/page errors"
+    },
+    "consoleWarnings": {
+      "status": "PASS",
+      "evidence": "0 console warnings"
+    }
+  },
+  "console": {
+    "errors": [],
+    "warnings": []
+  },
+  "layout": {
+    "initial": {
+      "viewport": {
+        "width": 430,
+        "height": 820
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0,
+        "documentHeight": 1178
+      },
+      "fileArea": {
+        "x": 12,
+        "y": 10,
+        "width": 406,
+        "height": 302,
+        "visible": true
+      },
+      "leftPanel": {
+        "x": 13,
+        "y": 967,
+        "width": 404,
+        "height": 99,
+        "visible": true
+      },
+      "canvas": {
+        "x": 13,
+        "y": 447,
+        "width": 404,
+        "height": 472,
+        "visible": true
+      },
+      "inspector": {
+        "x": 13,
+        "y": 1066,
+        "width": 404,
+        "height": 99,
+        "visible": true
+      },
+      "inspectorTabPosition": "relative"
+    },
+    "afterActions": {
+      "viewport": {
+        "width": 430,
+        "height": 820
+      },
+      "scroll": {
+        "x": 0,
+        "y": 345,
+        "documentHeight": 1178
+      },
+      "fileArea": {
+        "x": 12,
+        "y": -335,
+        "width": 406,
+        "height": 302,
+        "visible": true
+      },
+      "leftPanel": {
+        "x": 13,
+        "y": 622,
+        "width": 404,
+        "height": 99,
+        "visible": true
+      },
+      "canvas": {
+        "x": 13,
+        "y": 102,
+        "width": 404,
+        "height": 472,
+        "visible": true
+      },
+      "inspector": {
+        "x": 13,
+        "y": 721,
+        "width": 404,
+        "height": 99,
+        "visible": true
+      },
+      "inspectorTabPosition": "relative"
+    }
+  },
+  "exportSummary": {
+    "walls": 1,
+    "openings": 0,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "boundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "furnitureFirst": {
+      "id": "furniture-1781356991576-70046c",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "layer": "furniture",
+      "x": 440,
+      "y": 561,
+      "widthMm": 1230,
+      "depthMm": 650,
+      "heightMm": 2400,
+      "rotation": 0,
+      "status": "candidate",
+      "materialTags": [
+        "system_panel"
+      ],
+      "note": "",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true,
+      "createdAt": "2026-06-13T13:23:11.576Z",
+      "updatedAt": "2026-06-13T13:23:12.685Z"
+    },
+    "layoutObjectFirst": {
+      "id": "furniture-1781356991576-70046c",
+      "objectType": "parametric_furniture_candidate",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "layer": "furniture",
+      "positionMm": {
+        "x": 440,
+        "y": 561
+      },
+      "sizeMm": {
+        "width": 1230,
+        "depth": 650,
+        "height": 2400
+      },
+      "rotation": 0,
+      "materialTags": [
+        "system_panel"
+      ],
+      "note": "",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    }
+  },
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_50_NARROW_VIEWPORT_R2.png",
+  "exportFile": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_50_NARROW_VIEWPORT_R2_EXPORT.json",
+  "overall": "FAIL"
+}

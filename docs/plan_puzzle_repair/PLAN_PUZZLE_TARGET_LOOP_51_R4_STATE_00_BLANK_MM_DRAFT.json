@@ -1,0 +1,266 @@
+{
+  "name": "LaiBE Plancraft+ 草稿",
+  "product": "Plancraft+",
+  "version": "0.10.0-renderer-preview-spike",
+  "unit": "mm",
+  "importSource": {
+    "id": "import-1781358298866-1c68f9",
+    "originalFileName": "blank-mm-draft.svg",
+    "originalFileType": "svg",
+    "accepted": true,
+    "previewSupported": true,
+    "normalizedAs": "blank-mm-draft",
+    "importedAt": "2026-06-13T13:44:58.865Z"
+  },
+  "scale": {
+    "pxPerMm": 0.1,
+    "calibrated": true
+  },
+  "underlay": {
+    "id": "underlay-1781358298866-588271",
+    "fileName": "blank-mm-draft.svg",
+    "fileType": "svg",
+    "dataUrl": "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22600%22%20height%3D%22400%22%20viewBox%3D%220%200%20600%20400%22%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23ffffff%22%2F%3E%0A%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%3Cpattern%20id%3D%22small-grid%22%20width%3D%22100%22%20height%3D%22100%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M%20100%200%20L%200%200%200%20100%22%20fill%3D%22none%22%20stroke%3D%22%23d5dce4%22%20stroke-width%3D%221%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2Fpattern%3E%0A%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22url(%23small-grid)%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%2216%22%20y%3D%2228%22%20fill%3D%22%23475569%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2216%22%3E%E7%A9%BA%E7%99%BD%E6%AF%AB%E7%B1%B3%E8%8D%89%E7%A8%BF%20-%20%E5%83%85%E5%80%99%E9%81%B8%E8%B3%87%E6%96%99%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fsvg%3E",
+    "x": 0,
+    "y": 0,
+    "scale": 1,
+    "rotation": 0,
+    "opacity": 0.32,
+    "calibratedBy": {
+      "from": {
+        "x": 0,
+        "y": 0
+      },
+      "to": {
+        "x": 600,
+        "y": 0
+      },
+      "knownLength": 6000,
+      "calibratedAt": "2026-06-13T13:44:58.865Z",
+      "method": "blank-mm-draft"
+    }
+  },
+  "walls": [],
+  "wallGraph": {
+    "nodes": [],
+    "issues": [],
+    "lastBuiltAt": "2026-06-13T13:44:59.112Z"
+  },
+  "nodeGraph": {
+    "nodes": [],
+    "edges": [],
+    "issues": [],
+    "lastBuiltAt": "2026-06-13T13:44:59.112Z"
+  },
+  "openings": [],
+  "zones": [],
+  "furniture": [],
+  "plancraftBridge": {
+    "status": "spike",
+    "targetFormat": ".pc",
+    "converterVersion": "0.1.0-spike",
+    "message": "已建立 .pc 候選檔與圖面預覽驗證流程",
+    "reason": "圖面預覽仍是測試流程，尚未進入正式整合",
+    "requiredNextStep": "確認 SVG 預覽品質後，評估共用牆整理或瀏覽器預覽整合",
+    "lastExportedAt": null,
+    "lastExportSummary": null,
+    "warnings": [],
+    "validation": {
+      "status": "not_run",
+      "checkedAt": null,
+      "reason": "靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認 .pc 候選測試檔。",
+      "errors": [],
+      "warnings": []
+    },
+    "preview": {
+      "status": "not_run",
+      "checkedAt": null,
+      "svgOutputPath": null,
+      "command": "cd C:\\laibe_project\r\nnode C:\\laibe_project\\plancraft\\packages\\cli\\dist\\index.js compile C:\\path\\to\\laibe-plancraft-plus-spike.pc --structure-only -o C:\\path\\to\\laibe-plancraft-plus-spike.svg",
+      "errors": [],
+      "warnings": [
+        "靜態頁尚未直接載入正式圖面預覽器；請使用本機驗證流程產生 SVG 預覽。"
+      ]
+    }
+  },
+  "toolCatalogItems": [
+    {
+      "id": "tool-wardrobe",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "widthMm": 1800,
+      "depthMm": 600,
+      "heightMm": 2400,
+      "materialTags": [
+        "wood"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-tall_cabinet",
+      "type": "tall_cabinet",
+      "category": "cabinet",
+      "name": "高櫃",
+      "widthMm": 900,
+      "depthMm": 600,
+      "heightMm": 2400,
+      "materialTags": [
+        "system_panel"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-low_wall_cabinet",
+      "type": "low_wall_cabinet",
+      "category": "cabinet",
+      "name": "矮櫃 / 吊櫃",
+      "widthMm": 1200,
+      "depthMm": 450,
+      "heightMm": 900,
+      "materialTags": [
+        "system_panel"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-tv_cabinet",
+      "type": "tv_cabinet",
+      "category": "cabinet",
+      "name": "電視櫃",
+      "widthMm": 1800,
+      "depthMm": 450,
+      "heightMm": 500,
+      "materialTags": [
+        "wood"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-kitchen_cabinet",
+      "type": "kitchen_cabinet",
+      "category": "cabinet",
+      "name": "廚具",
+      "widthMm": 1800,
+      "depthMm": 600,
+      "heightMm": 900,
+      "materialTags": [
+        "stone",
+        "system_panel"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-bed",
+      "type": "bed",
+      "category": "furniture",
+      "name": "床",
+      "widthMm": 1500,
+      "depthMm": 2000,
+      "heightMm": 500,
+      "materialTags": [
+        "fabric"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-sofa",
+      "type": "sofa",
+      "category": "furniture",
+      "name": "沙發",
+      "widthMm": 2100,
+      "depthMm": 900,
+      "heightMm": 850,
+      "materialTags": [
+        "fabric"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-dining_table",
+      "type": "dining_table",
+      "category": "furniture",
+      "name": "餐桌",
+      "widthMm": 1600,
+      "depthMm": 900,
+      "heightMm": 760,
+      "materialTags": [
+        "wood"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-toilet",
+      "type": "toilet",
+      "category": "fixture",
+      "name": "馬桶",
+      "widthMm": 420,
+      "depthMm": 700,
+      "heightMm": 750,
+      "materialTags": [
+        "ceramic"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    },
+    {
+      "id": "tool-washbasin",
+      "type": "washbasin",
+      "category": "fixture",
+      "name": "洗手台",
+      "widthMm": 600,
+      "depthMm": 500,
+      "heightMm": 850,
+      "materialTags": [
+        "ceramic"
+      ],
+      "runtimeSource": "parametric-mvp",
+      "svgPackageSource": "blocked_until_overlay_qa",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    }
+  ],
+  "layoutObjects": [],
+  "candidateExportBoundary": {
+    "formalEstimate": false,
+    "budgetEngineCalled": false,
+    "productionReady": false,
+    "note": "家具 / 櫃體物件僅為草稿候選資料。"
+  }
+}

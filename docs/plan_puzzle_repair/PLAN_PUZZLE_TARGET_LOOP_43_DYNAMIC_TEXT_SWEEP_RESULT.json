@@ -1,0 +1,158 @@
+{
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop43-dynamic-text-sweep",
+  "screenshotPath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_43_DYNAMIC_TEXT_SWEEP.png",
+  "exportPath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_43_DYNAMIC_TEXT_SWEEP_EXPORT.json",
+  "captureCount": 18,
+  "hasPlanPuzzleChinese": true,
+  "hasToolAreaChinese": true,
+  "hasStatusAreaChinese": true,
+  "hasSelectedFurnitureChinese": true,
+  "hasDraftBoundaryChinese": true,
+  "failedCaptureCount": 0,
+  "failedCaptures": [],
+  "consoleErrorCount": 0,
+  "consoleWarningCount": 0,
+  "errors": [],
+  "warnings": [],
+  "exportSummary": {
+    "walls": 1,
+    "openings": 3,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "candidateExportBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    }
+  },
+  "allCaptures": [
+    {
+      "label": "initial",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "請先匯入業主提供的丈量圖\n建立底圖基準後，先自動判讀比例線索，再進行牆體描繪。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n尚未選取物件\n\n請先匯入 JPG 或 PNG 丈量圖。匯入後系統會先判讀比例線索，再開始畫牆與放置物件。"
+    },
+    {
+      "label": "blank-draft",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n空白毫米草稿已建立。這是候選草稿工作區，不呼叫預算引擎，也不產生正式估價。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n尚未選取物件\n\n請點選牆、門窗、空間標籤、家具或櫃體，這裡只顯示該物件的尺寸、材料、備註與刪除操作。\n\n像 PPT 一樣操作：選取物件後，畫布會高亮，右側會顯示可修改欄位。\n空白毫米草稿已建立。這是候選草稿工作區，不呼叫預算引擎，也不產生正式估價。"
+    },
+    {
+      "label": "wall-first-point",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "畫牆模式\n已設定牆起點，移動滑鼠預覽，點第二點建立牆。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n尚未選取物件\n\n請點選牆、門窗、空間標籤、家具或櫃體，這裡只顯示該物件的尺寸、材料、備註與刪除操作。\n\n像 PPT 一樣操作：選取物件後，畫布會高亮，右側會顯示可修改欄位。\n已設定牆起點，移動滑鼠預覽，點第二點建立牆。"
+    },
+    {
+      "label": "wall-created",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "畫牆模式\n已建立 4,400 mm 牆段。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取牆體\n編號\n牆體 1\n長度\n4,400 mm\n狀態\n既有牆\n分類\n分間實牆\n分類說明\n磚牆或石膏磚牆，常見 150mm\n依附牆線\n已連結\n牆段長度\n4,400 mm\n更新時間\n2026-06-13T11:45:40.366Z\n刪除牆體\n新增門\n新增窗\n牆體狀態\n既有牆\n新設牆\n拆除牆\n牆體分類\n既有牆　現況保留牆體\n承重牆 / 分戶牆　深灰實牆，常見 240mm 以上\n輕隔間　灰色雙斜線剖線，常見 100mm\n木隔間　灰色斜線剖線，常見 100mm\n分間實牆　磚牆或石膏磚牆，常見 150mm\n牆厚\n80mm　薄牆、待現場確認\n100mm　木隔間、輕隔間\n120mm　一般室內隔間\n150mm　磚牆、石膏磚牆\n200mm　管道牆、厚隔間\n240mm　分間牆、承重牆\n承重牆常見 240mm；木隔間與輕隔間常見 100mm；磚牆與石膏磚牆常見 150mm，仍以現場確認為準。\n結構牆\n起點 X\n起點 Y\n終點 X\n終點 Y\n牆體座標以毫米儲存；畫面會依目前比例顯示，不需要使用者理解工程係數。\n刪除牆體\n新增門\n新增窗\n自動接牆\n取消選取\n已建立 4,400 mm"
+    },
+    {
+      "label": "wall-selected",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已選取牆體，可在右側編輯座標、牆厚與狀態。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取牆體\n編號\n牆體 1\n長度\n4,400 mm\n狀態\n既有牆\n分類\n分間實牆\n分類說明\n磚牆或石膏磚牆，常見 150mm\n依附牆線\n已連結\n牆段長度\n4,400 mm\n更新時間\n2026-06-13T11:45:40.366Z\n刪除牆體\n新增門\n新增窗\n牆體狀態\n既有牆\n新設牆\n拆除牆\n牆體分類\n既有牆　現況保留牆體\n承重牆 / 分戶牆　深灰實牆，常見 240mm 以上\n輕隔間　灰色雙斜線剖線，常見 100mm\n木隔間　灰色斜線剖線，常見 100mm\n分間實牆　磚牆或石膏磚牆，常見 150mm\n牆厚\n80mm　薄牆、待現場確認\n100mm　木隔間、輕隔間\n120mm　一般室內隔間\n150mm　磚牆、石膏磚牆\n200mm　管道牆、厚隔間\n240mm　分間牆、承重牆\n承重牆常見 240mm；木隔間與輕隔間常見 100mm；磚牆與石膏磚牆常見 150mm，仍以現場確認為準。\n結構牆\n起點 X\n起點 Y\n終點 X\n終點 Y\n牆體座標以毫米儲存；畫面會依目前比例顯示，不需要使用者理解工程係數。\n刪除牆體\n新增門\n新增窗\n自動接牆\n取消選取\n已選取牆體，可在右側編輯"
+    },
+    {
+      "label": "door-added",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已新增 door。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取門窗 / 開口\n編號\n門窗 / 開口 1\n類型\n門\n依附牆線\n已連結\n依附牆體\n牆體 1\n牆段長度\n4,400 mm\n更新時間\n2026-06-13T11:45:40.473Z\n刪除開口\n選取依附牆體\n類型\n門\n窗\n開口\n牆上位置 MM\n寬度 MM\n門片方向\n左開\n右開\n橫拉\n無門片\n窗台高度 MM\n高度 MM\n開口會依附在選取牆段上，牆上位置與寬度都以 mm 儲存，後續只作為候選草稿。\n刪除開口\n取消選取\n已新增 door。"
+    },
+    {
+      "label": "window-added",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已新增 window。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取門窗 / 開口\n編號\n門窗 / 開口 2\n類型\n窗\n依附牆線\n已連結\n依附牆體\n牆體 1\n牆段長度\n4,400 mm\n更新時間\n2026-06-13T11:45:40.519Z\n刪除開口\n選取依附牆體\n類型\n門\n窗\n開口\n牆上位置 MM\n寬度 MM\n門片方向\n左開\n右開\n橫拉\n無門片\n窗台高度 MM\n高度 MM\n開口會依附在選取牆段上，牆上位置與寬度都以 mm 儲存，後續只作為候選草稿。\n刪除開口\n取消選取\n已新增 window。"
+    },
+    {
+      "label": "opening-added",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已新增 opening。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取門窗 / 開口\n編號\n門窗 / 開口 3\n類型\n開口\n依附牆線\n已連結\n依附牆體\n牆體 1\n牆段長度\n4,400 mm\n更新時間\n2026-06-13T11:45:40.551Z\n刪除開口\n選取依附牆體\n類型\n門\n窗\n開口\n牆上位置 MM\n寬度 MM\n門片方向\n左開\n右開\n橫拉\n無門片\n窗台高度 MM\n高度 MM\n開口會依附在選取牆段上，牆上位置與寬度都以 mm 儲存，後續只作為候選草稿。\n刪除開口\n取消選取\n已新增 opening。"
+    },
+    {
+      "label": "wardrobe-placed",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已放置「衣櫃」。這只是候選草稿，不呼叫預算引擎。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n已放置「衣櫃」。這只是候選草稿，不呼叫預算引擎。"
+    },
+    {
+      "label": "material-applied",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已將「木質」套用到「衣櫃」。仍為候選草稿。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n已將「木質」套用到「衣櫃」。仍為候選草稿。"
+    },
+    {
+      "label": "inspector-tab-layers",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已將「木質」套用到「衣櫃」。仍為候選草稿。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n圖層顯示\n底圖\n\n匯入的丈量圖或空白毫米底圖\n牆體\n\n牆段與可點選範圍\n門窗開口\n\n門、窗與通行開口\n空間\n\n空間標籤與邊界\n家具 / 櫃體\n\n可拖曳與調尺寸的候選物件\n診斷圖層\n\n牆體圖形與問題提示\n匯入圖面\n檔名\nblank-mm-draft.svg\n檔案類型\nSVG\n預覽狀態\n可預覽\n匯入模式\nblank-mm-draft\n已將「木質」套用到「衣櫃」。仍為候選草稿。"
+    },
+    {
+      "label": "inspector-tab-reminders",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已將「木質」套用到「衣櫃」。仍為候選草稿。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n提醒待辦\n□ 加入客廳、臥室、浴室等空間標籤\n牆體操作\n目前工具\n選取\n已畫牆段\n1\n下一段狀態\n既有牆\n下一段分類\n分間實牆\n下一段牆厚\n120 mm\n端點吸附\n開啟\n水平 / 垂直輔助\n開啟\n空間標籤\n目前模式\n選取\n標籤數\n0\n預設類型\n客廳\n預設名稱\n客廳\n區域邊界\n下一階段\n新增空間標籤\n已將「木質」套用到「衣櫃」。仍為候選草稿。"
+    },
+    {
+      "label": "inspector-tab-materials",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已將「木質」套用到「衣櫃」。仍為候選草稿。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n材料\n候選材質\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n套用到選取物件\n目前選取「衣櫃」。材質只會寫入候選草稿，不會進正式估價。\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n已將「木質」套用到「衣櫃」。仍為候選草稿。"
+    },
+    {
+      "label": "inspector-tab-overview",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已將「木質」套用到「衣櫃」。仍為候選草稿。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n總覽\n底圖\n已匯入\n比例\n已確認\n牆段\n1\n門窗 / 開口\n3\n空間標籤\n0\n預算候選物件\n1\n下一步\n可繼續畫牆、放物件或匯出候選 JSON\n所有輸出仍是候選草稿；不是施工圖、不是正式估價，也不會呼叫預算引擎。\n匯入圖面\n檔名\nblank-mm-draft.svg\n檔案類型\nSVG\n預覽狀態\n可預覽\n匯入模式\nblank-mm-draft\n底圖控制\n透明度 32%\n重設底圖\n系統正在讀取匯入圖面的尺寸線索。\n自動比例\n比例狀態\n已確認\n比例係數\n0.1\n校正點\n2 / 2\n目前比例\n1 mm = 0.1 px；1000 mm = 100 px\n校正資訊\n6,000 mm = - px\n已知長度 MM\n重新點選\n套用比例\n家具 / 櫃體放置\n目前模式\n選取\n目前項目\n衣櫃\n候選數量\n1\n家具來源\n參數化草稿\n正式成果\n否\n放到圖上\n已將「木質」套用到「衣櫃」。仍為候選草稿。\n進階檢查：牆端接齊與交會\n進階輸出檢查：候選檔案 / 圖面預覽\n風格示意診斷"
+    },
+    {
+      "label": "inspector-tab-properties",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已將「木質」套用到「衣櫃」。仍為候選草稿。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n已將「木質」套用到「衣櫃」。仍為候選草稿。"
+    },
+    {
+      "label": "undo-action",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已復原：套用家具 / 櫃體材質",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n已復原：套用家具 / 櫃體材質"
+    },
+    {
+      "label": "redo-action",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n已重做：重做前狀態",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n已重做：重做前狀態"
+    },
+    {
+      "label": "after-export",
+      "hasBadPattern": false,
+      "suspiciousEnglish": [],
+      "helper": "比例已確認\n候選草稿 JSON 預覽已建立。下載仍只供草稿使用，不呼叫預算引擎，也不產生正式估價。",
+      "inspectorSample": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n候選草稿 JSON 預覽已建立。下載仍只供草稿使用，不呼叫預算引擎，也不產生正式估價。"
+    }
+  ]
+}

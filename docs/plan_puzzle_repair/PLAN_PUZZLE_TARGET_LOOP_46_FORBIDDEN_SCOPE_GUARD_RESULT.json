@@ -1,0 +1,19 @@
+﻿{
+    "timestamp":  "2026-06-13T12:37:25.9033300Z",
+    "exportPath":  "docs\\plan_puzzle_repair\\PLAN_PUZZLE_TARGET_LOOP_46_POSTPATCH_PRECISE_EXPORT.json",
+    "candidateExportBoundary":  {
+                                    "formalEstimate":  false,
+                                    "budgetEngineCalled":  false,
+                                    "productionReady":  false,
+                                    "note":  "家具 / 櫃體物件僅為草稿候選資料。"
+                                },
+    "furnitureCount":  0,
+    "allFurnitureCandidate":  true,
+    "layoutObjectCount":  0,
+    "allLayoutObjectsCandidate":  true,
+    "formalEstimateFalse":  true,
+    "budgetEngineCalledFalse":  true,
+    "noBudgetRuntimeTerms":  true,
+    "noForbiddenRuntimeCall":  true,
+    "note":  "FormalEstimate 字串只出現在 notFormalEstimate:true 或 candidateExportBoundary.formalEstimate:false；不是正式估價輸出。"
+}

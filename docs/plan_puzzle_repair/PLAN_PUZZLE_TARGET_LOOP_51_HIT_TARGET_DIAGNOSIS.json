@@ -1,0 +1,45 @@
+{
+  "wallBefore": {
+    "x": 394.2264404296875,
+    "y": 310.95855712890625,
+    "targetClass": "wall-hit-target",
+    "targetTag": "line",
+    "targetAction": null,
+    "attrs": {
+      "x1": 138.23342499999998,
+      "y1": 210.114806,
+      "x2": 629.8417509999999,
+      "y2": 210.114806
+    }
+  },
+  "wallSelectedAfterClick": 1,
+  "openingInfo": {
+    "x": 581.03759765625,
+    "y": 310.95855712890625,
+    "targetClass": "opening-hit-target",
+    "targetTag": "line",
+    "targetAction": null,
+    "attrs": {
+      "x1": 157.837438,
+      "y1": 210.114806,
+      "x2": 610.2377379999999,
+      "y2": 210.114806
+    }
+  },
+  "openingSelectedAfterClick": 1,
+  "wallAfterOpening": {
+    "x": 807.1774291992188,
+    "y": 310.95855712890625,
+    "targetClass": "opening-hit-target",
+    "targetTag": "line",
+    "targetAction": null,
+    "attrs": {
+      "x1": 138.23342499999998,
+      "y1": 210.114806,
+      "x2": 629.8417509999999,
+      "y2": 210.114806
+    }
+  },
+  "openingCount": 1,
+  "wallCount": 1
+}

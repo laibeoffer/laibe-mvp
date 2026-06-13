@@ -1,0 +1,128 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop47-full-human-operable-regression-r3",
+  "timestamp": "2026-06-13T12:45:31.034Z",
+  "steps": [
+    {
+      "step": "pageLoad",
+      "status": "PASS"
+    },
+    {
+      "step": "pngImport",
+      "status": "PASS",
+      "detail": {
+        "applySuggestionButtons": 1
+      }
+    },
+    {
+      "step": "scaleApply",
+      "status": "FAIL"
+    },
+    {
+      "step": "drawWall",
+      "status": "PASS",
+      "detail": {
+        "walls": 1
+      }
+    },
+    {
+      "step": "doorWindowOpening",
+      "status": "FAIL",
+      "detail": {
+        "openings": 0
+      }
+    },
+    {
+      "step": "furniturePlacement",
+      "status": "PASS",
+      "detail": {
+        "furniture": 1,
+        "selectedFurniture": 1
+      }
+    },
+    {
+      "step": "furnitureDrag",
+      "status": "PASS",
+      "detail": {
+        "attempted": true,
+        "afterBox": {
+          "x": 271.734375,
+          "y": 297.375,
+          "width": 904.796875,
+          "height": 301.59375
+        }
+      }
+    },
+    {
+      "step": "furnitureResize",
+      "status": "FAIL",
+      "detail": {
+        "attempted": true,
+        "afterBox": {
+          "x": 271.734375,
+          "y": 297.375,
+          "width": 904.796875,
+          "height": 301.59375
+        }
+      }
+    },
+    {
+      "step": "inspectorEdit",
+      "status": "PASS",
+      "detail": {
+        "widthInputs": 1,
+        "depthInputs": 1,
+        "noteInputs": 1
+      }
+    },
+    {
+      "step": "candidateJsonExport",
+      "status": "FAIL",
+      "detail": {
+        "downloaded": true,
+        "savePath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_47_FULL_REGRESSION_EXPORT.json",
+        "walls": 1,
+        "openings": 0,
+        "furniture": 1,
+        "layoutObjects": 1,
+        "toolCatalogItems": 10,
+        "furnitureWidth": 1600,
+        "furnitureDepth": 600,
+        "materialTags": [
+          "system_panel"
+        ],
+        "note": "Loop47 ???????",
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "noForbiddenOutput": true
+      }
+    },
+    {
+      "step": "pcProductionExportDisabled",
+      "status": "PASS"
+    }
+  ],
+  "consoleErrorCount": 0,
+  "consoleWarningCount": 0,
+  "consoleMessages": [],
+  "exportChecks": {
+    "downloaded": true,
+    "savePath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_47_FULL_REGRESSION_EXPORT.json",
+    "walls": 1,
+    "openings": 0,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "furnitureWidth": 1600,
+    "furnitureDepth": 600,
+    "materialTags": [
+      "system_panel"
+    ],
+    "note": "Loop47 ???????",
+    "formalEstimate": false,
+    "budgetEngineCalled": false,
+    "productionReady": false,
+    "noForbiddenOutput": true
+  },
+  "overall": "FAIL"
+}

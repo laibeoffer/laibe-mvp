@@ -1,0 +1,79 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop50-narrow-tap-panel-scroll",
+  "viewport": {
+    "width": 430,
+    "height": 820
+  },
+  "checkedAt": "2026-06-13T13:20:33.704Z",
+  "checks": {
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "#planCanvas exists"
+    },
+    "narrowPageSections": {
+      "status": "PASS",
+      "evidence": "file/tools/canvas/inspector present in document flow"
+    },
+    "pngImport": {
+      "status": "PASS",
+      "evidence": "scaleStatus=有檔名建議"
+    }
+  },
+  "console": {
+    "errors": [],
+    "warnings": []
+  },
+  "layout": {
+    "initial": {
+      "viewport": {
+        "width": 430,
+        "height": 820
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0,
+        "documentHeight": 1178
+      },
+      "fileArea": {
+        "x": 12,
+        "y": 10,
+        "width": 406,
+        "height": 302,
+        "visible": true
+      },
+      "leftPanel": {
+        "x": 13,
+        "y": 967,
+        "width": 404,
+        "height": 99,
+        "visible": true
+      },
+      "canvas": {
+        "x": 13,
+        "y": 447,
+        "width": 404,
+        "height": 472,
+        "visible": true
+      },
+      "inspector": {
+        "x": 13,
+        "y": 1066,
+        "width": 404,
+        "height": 99,
+        "visible": true
+      },
+      "mobileShortcuts": {
+        "x": 12,
+        "y": 322,
+        "width": 406,
+        "height": 114,
+        "visible": true
+      }
+    }
+  },
+  "exportSummary": null,
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_50_NARROW_VIEWPORT.png",
+  "exportFile": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_50_NARROW_VIEWPORT_EXPORT.json",
+  "overall": "ERROR",
+  "error": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button[data-action=\"apply-auto-scale-suggestion\"]:visible').first()\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" class=\"toolbar-btn primary\" data-action=\"apply-auto-scale-suggestion\">套用檔名建議</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button type=\"button\" class=\"inspector-tab\" data-action=\"set-inspector-tab\" data-inspector-tab=\"properties\">屬性</button> from <nav aria-label=\"右側屬性面板分頁\" class=\"inspector-tab-strip\">…</nav> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is not stable\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button type=\"button\" class=\"inspector-tab\" data-action=\"set-inspector-tab\" data-inspector-tab=\"properties\">屬性</button> from <nav aria-label=\"右側屬性面板分頁\" class=\"inspector-tab-strip\">…</nav> subtree intercepts pointer events\u001b[22m\n\u001b[2m  56 × retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <button type=\"button\" class=\"inspector-tab\" data-action=\"set-inspector-tab\" data-inspector-tab=\"properties\">屬性</button> from <nav aria-label=\"右側屬性面板分頁\" class=\"inspector-tab-strip\">…</nav> subtree intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\n    at clickFirst ([stdin]:13:222)\n    at async [stdin]:20:1234"
+}

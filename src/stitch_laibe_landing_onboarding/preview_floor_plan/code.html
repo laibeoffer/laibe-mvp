@@ -88,6 +88,12 @@
       box-shadow: 0 10px 34px rgba(0,0,0,.18);
     }
 
+    body.path-workbench .site-header,
+    body.path-workbench .progress-banner,
+    body.path-workbench .candidate-banner {
+      display: none;
+    }
+
     .nav {
       height: 100%;
       padding: 0 24px;
@@ -316,14 +322,22 @@
       width: min(100% - 32px, var(--section-max));
       min-height: calc(100vh - 132px);
       margin: 0 auto;
-      padding: 34px 0 38px;
+      padding: 22px 0 30px;
       display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 22px;
+      grid-template-rows: auto auto auto 1fr;
+      gap: 14px;
+    }
+
+    body.path-workbench .workspace {
+      width: min(100% - 24px, var(--section-max));
+      min-height: 100vh;
+      padding: 10px 0 12px;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 10px;
     }
 
     .page-intro {
-      display: grid;
+      display: none;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 28px;
       align-items: end;
@@ -391,12 +405,437 @@
       color: var(--text-main);
       background: rgba(121,216,255,.12);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+      font: inherit;
       font-weight: 950;
       white-space: nowrap;
+      cursor: pointer;
+      text-align: center;
     }
 
     .mobile-canvas-shortcuts .material-symbols-outlined {
       font-size: 19px;
+    }
+
+    .material-symbols-outlined {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", Inter, system-ui, sans-serif;
+      font-variation-settings: normal;
+      font-feature-settings: normal;
+      font-weight: 950;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+    .tool-icon {
+      --icon-size: 18px;
+      position: relative;
+      display: inline-flex;
+      flex: 0 0 auto;
+      width: var(--icon-size);
+      height: var(--icon-size);
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-cyan);
+      line-height: 1;
+    }
+
+    .tool-icon::before,
+    .tool-icon::after {
+      content: "";
+      position: absolute;
+      box-sizing: border-box;
+      border-color: currentColor;
+    }
+
+    .toolbar-btn .tool-icon,
+    .mobile-canvas-jump .tool-icon {
+      --icon-size: 17px;
+    }
+
+    .tool-card .tool-icon {
+      --icon-size: 20px;
+    }
+
+    .tool-icon--file::before {
+      inset: 2px 4px 2px 5px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .tool-icon--file::after {
+      top: 4px;
+      left: 8px;
+      width: 6px;
+      height: 2px;
+      background: currentColor;
+      box-shadow: 0 4px 0 currentColor, 0 8px 0 currentColor;
+    }
+
+    .tool-icon--new::before,
+    .tool-icon--place::before {
+      left: 8px;
+      top: 3px;
+      width: 3px;
+      height: 12px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .tool-icon--new::after,
+    .tool-icon--place::after {
+      left: 3px;
+      top: 8px;
+      width: 13px;
+      height: 3px;
+      border-radius: 2px;
+      background: currentColor;
+    }
+
+    .tool-icon--ruler::before {
+      left: 2px;
+      top: 9px;
+      width: 15px;
+      height: 5px;
+      border: 2px solid currentColor;
+      border-radius: 2px;
+      transform: rotate(-18deg);
+    }
+
+    .tool-icon--ruler::after {
+      left: 6px;
+      top: 6px;
+      width: 2px;
+      height: 8px;
+      background: currentColor;
+      box-shadow: 5px 0 0 currentColor;
+      transform: rotate(-18deg);
+    }
+
+    .tool-icon--reset::before {
+      inset: 3px;
+      border: 2px solid currentColor;
+      border-left-color: transparent;
+      border-radius: 50%;
+    }
+
+    .tool-icon--reset::after {
+      right: 2px;
+      top: 2px;
+      width: 7px;
+      height: 7px;
+      border-top: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      transform: rotate(2deg);
+    }
+
+    .tool-icon--undo::before,
+    .tool-icon--redo::before {
+      top: 8px;
+      left: 5px;
+      width: 11px;
+      height: 7px;
+      border: 2px solid currentColor;
+      border-left: 0;
+      border-bottom: 0;
+      border-radius: 0 8px 0 0;
+    }
+
+    .tool-icon--undo::after,
+    .tool-icon--redo::after {
+      top: 5px;
+      left: 2px;
+      width: 8px;
+      height: 8px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .tool-icon--redo {
+      transform: scaleX(-1);
+    }
+
+    .tool-icon--save::before {
+      inset: 3px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .tool-icon--save::after {
+      left: 6px;
+      right: 6px;
+      bottom: 4px;
+      height: 5px;
+      border: 2px solid currentColor;
+      border-bottom: 0;
+    }
+
+    .tool-icon--stop::before {
+      inset: 3px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .tool-icon--stop::after {
+      left: 5px;
+      top: 8px;
+      width: 9px;
+      height: 2px;
+      background: currentColor;
+      transform: rotate(-35deg);
+    }
+
+    .tool-icon--next::before {
+      left: 3px;
+      top: 8px;
+      width: 12px;
+      height: 2px;
+      background: currentColor;
+    }
+
+    .tool-icon--next::after {
+      right: 3px;
+      top: 5px;
+      width: 7px;
+      height: 7px;
+      border-top: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .tool-icon--select::before {
+      left: 4px;
+      top: 2px;
+      width: 0;
+      height: 0;
+      border-left: 5px solid currentColor;
+      border-top: 10px solid transparent;
+      border-bottom: 3px solid transparent;
+      transform: rotate(-18deg);
+    }
+
+    .tool-icon--select::after {
+      left: 9px;
+      top: 11px;
+      width: 7px;
+      height: 3px;
+      border-radius: 2px;
+      background: currentColor;
+      transform: rotate(42deg);
+    }
+
+    .tool-icon--wall::before,
+    .tool-icon--snap::before {
+      left: 2px;
+      top: 8px;
+      width: 15px;
+      height: 4px;
+      border-radius: 2px;
+      background: currentColor;
+      transform: rotate(-20deg);
+    }
+
+    .tool-icon--snap::after {
+      left: 1px;
+      top: 3px;
+      width: 5px;
+      height: 5px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      box-shadow: 12px 7px 0 -1px currentColor;
+    }
+
+    .tool-icon--door::before {
+      left: 4px;
+      top: 3px;
+      width: 8px;
+      height: 13px;
+      border-left: 2px solid currentColor;
+      border-top: 2px solid currentColor;
+    }
+
+    .tool-icon--door::after {
+      left: 5px;
+      bottom: 3px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid currentColor;
+      border-top: 0;
+      border-left: 0;
+      border-radius: 0 0 12px 0;
+    }
+
+    .tool-icon--window::before {
+      inset: 4px 2px;
+      border: 2px solid currentColor;
+      border-radius: 2px;
+    }
+
+    .tool-icon--window::after {
+      left: 8px;
+      top: 4px;
+      width: 2px;
+      height: 10px;
+      background: currentColor;
+      box-shadow: -5px 5px 0 -1px currentColor, 5px 5px 0 -1px currentColor;
+    }
+
+    .tool-icon--opening::before {
+      inset: 4px 3px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 2px;
+    }
+
+    .tool-icon--zone::before {
+      inset: 3px;
+      border: 2px solid currentColor;
+      border-radius: 5px;
+    }
+
+    .tool-icon--zone::after {
+      left: 7px;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .tool-icon--boundary::before {
+      left: 3px;
+      top: 4px;
+      width: 12px;
+      height: 11px;
+      border: 2px solid currentColor;
+      clip-path: polygon(12% 20%, 84% 4%, 98% 78%, 30% 100%, 0 56%);
+    }
+
+    .tool-icon--cabinet::before {
+      inset: 3px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .tool-icon--cabinet::after {
+      left: 8px;
+      top: 4px;
+      width: 2px;
+      height: 11px;
+      background: currentColor;
+      box-shadow: -3px 5px 0 -1px currentColor, 3px 5px 0 -1px currentColor;
+    }
+
+    .tool-icon--kitchen::before {
+      left: 2px;
+      top: 5px;
+      width: 15px;
+      height: 9px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .tool-icon--kitchen::after {
+      left: 5px;
+      top: 7px;
+      width: 4px;
+      height: 4px;
+      border: 1.5px solid currentColor;
+      border-radius: 50%;
+      box-shadow: 6px 0 0 -1px currentColor;
+    }
+
+    .tool-icon--furniture::before {
+      left: 3px;
+      top: 8px;
+      width: 13px;
+      height: 6px;
+      border: 2px solid currentColor;
+      border-radius: 6px 6px 3px 3px;
+    }
+
+    .tool-icon--furniture::after {
+      left: 4px;
+      top: 4px;
+      width: 5px;
+      height: 7px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+      box-shadow: 6px 0 0 -2px currentColor;
+    }
+
+    .tool-icon--bath::before {
+      left: 2px;
+      top: 8px;
+      width: 14px;
+      height: 7px;
+      border: 2px solid currentColor;
+      border-radius: 3px 3px 8px 8px;
+    }
+
+    .tool-icon--bath::after {
+      left: 11px;
+      top: 3px;
+      width: 5px;
+      height: 5px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .tool-icon--sink::before {
+      left: 3px;
+      top: 6px;
+      width: 13px;
+      height: 9px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .tool-icon--sink::after {
+      left: 8px;
+      top: 3px;
+      width: 4px;
+      height: 5px;
+      border: 2px solid currentColor;
+      border-bottom: 0;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .tool-icon--delete::before {
+      left: 5px;
+      top: 6px;
+      width: 9px;
+      height: 10px;
+      border: 2px solid currentColor;
+      border-top: 0;
+      border-radius: 0 0 3px 3px;
+    }
+
+    .tool-icon--delete::after {
+      left: 4px;
+      top: 3px;
+      width: 11px;
+      height: 2px;
+      background: currentColor;
+      box-shadow: 3px -2px 0 -1px currentColor;
+    }
+
+    .tool-icon--material::before {
+      left: 3px;
+      top: 4px;
+      width: 12px;
+      height: 10px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+      transform: rotate(-8deg);
+    }
+
+    .tool-icon--material::after {
+      left: 5px;
+      top: 11px;
+      width: 9px;
+      height: 3px;
+      border-radius: 4px;
+      background: currentColor;
     }
 
     .mobile-tool-index {
@@ -425,23 +864,107 @@
       overflow-wrap: anywhere;
     }
 
+    .file-area {
+      position: sticky;
+      top: 140px;
+      z-index: 70;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: grid;
+      grid-template-columns: minmax(210px, .62fr) minmax(0, 1.38fr);
+      gap: 8px 12px;
+      align-items: center;
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.035)),
+        rgba(5, 7, 10, .76);
+      box-shadow: 0 16px 42px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.14);
+      backdrop-filter: blur(16px);
+    }
+
+    body.path-workbench .file-area {
+      position: relative;
+      top: auto;
+    }
+
+    .file-area-head {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .file-area-title {
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .file-area-path {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      color: var(--text-soft);
+      font-size: 10px;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+
+    .file-area-path span {
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 8px;
+      padding: 4px 7px;
+      background: rgba(255,255,255,.055);
+      white-space: nowrap;
+    }
+
+    .file-area-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .file-area-note {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .file-area-note strong {
+      color: var(--warning);
+    }
+
     .glass-btn,
     .orange-btn,
     .tool-chip,
     .toolbar-btn {
-      min-height: 42px;
-      border-radius: 999px;
+      min-height: 31px;
+      border-radius: 8px;
       border: 1px solid var(--line-medium);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 0 15px;
+      gap: 6px;
+      padding: 0 9px;
       color: var(--text-main);
       background: rgba(255,255,255,.065);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.13);
       cursor: pointer;
+      font-size: 11px;
       font-weight: 900;
+    }
+
+    .toolbar-btn .material-symbols-outlined {
+      font-size: 18px;
     }
 
     .tool-chip {
@@ -456,25 +979,35 @@
     }
 
     .tool-shell {
-      min-height: 720px;
+      height: clamp(640px, calc(100vh - 158px), 900px);
+      min-height: 0;
+      scroll-margin-top: 252px;
       display: grid;
-      grid-template-columns: 270px minmax(460px, 1fr) 330px;
+      grid-template-columns: clamp(184px, 13vw, 216px) minmax(620px, 1fr) clamp(286px, 20vw, 330px);
       border: 1px solid var(--line-soft);
-      border-radius: 28px;
+      border-radius: 12px;
       overflow: hidden;
       background:
         linear-gradient(145deg, rgba(255,255,255,.11), rgba(255,255,255,.035)),
         rgba(5, 7, 10, .76);
-      box-shadow: 0 34px 90px rgba(0,0,0,.44), inset 0 1px 0 rgba(255,255,255,.18);
+      box-shadow: 0 26px 72px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.15);
       backdrop-filter: blur(16px);
+    }
+
+    body.path-workbench .tool-shell {
+      height: min(920px, max(360px, calc(100vh - 112px)));
+      scroll-margin-top: 12px;
     }
 
     .panel {
       min-width: 0;
+      min-height: 0;
       border-right: 1px solid var(--line-soft);
       background:
         linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.025)),
         rgba(8,10,13,.78);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
     }
 
     .inspector {
@@ -483,8 +1016,8 @@
     }
 
     .panel-head {
-      min-height: 64px;
-      padding: 18px;
+      min-height: 43px;
+      padding: 10px 12px;
       border-bottom: 1px solid var(--line-soft);
       background: rgba(0,0,0,.18);
     }
@@ -498,22 +1031,78 @@
     }
 
     .panel-title {
-      margin-top: 6px;
+      margin-top: 4px;
       color: var(--text-main);
-      font-size: 16px;
+      font-size: 12px;
       font-weight: 950;
     }
 
     .panel-body {
-      padding: 16px;
+      padding: 8px;
       display: grid;
-      gap: 18px;
+      gap: 9px;
+      min-height: 0;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    #inspectorBody {
+      align-content: start;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .inspector-tab-strip {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 4px;
+      padding: 2px 0 6px;
+      background:
+        linear-gradient(180deg, rgba(15,18,20,.98), rgba(15,18,20,.78));
+      backdrop-filter: blur(12px);
+    }
+
+    .inspector-tab {
+      min-height: 32px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 7px;
+      padding: 0 5px;
+      color: var(--text-secondary);
+      background: rgba(255,255,255,.045);
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 950;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .inspector-tab.is-active {
+      color: var(--text-main);
+      border-color: rgba(121,216,255,.45);
+      background:
+        linear-gradient(135deg, rgba(121,216,255,.18), rgba(98,230,200,.08)),
+        rgba(255,255,255,.045);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+    }
+
+    .inspector-compact-note {
+      border: 1px dashed rgba(121,216,255,.24);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text-secondary);
+      background: rgba(121,216,255,.055);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 780;
     }
 
     .tool-group h2 {
-      margin: 0 0 10px;
+      margin: 0 0 5px;
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 950;
       letter-spacing: .12em;
       text-transform: uppercase;
@@ -523,6 +1112,11 @@
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
+    }
+
+    .panel:not(.inspector) .tool-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
     }
 
     .tool-card {
@@ -538,9 +1132,29 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
     }
 
-    .tool-card .material-symbols-outlined {
+    .panel:not(.inspector) .tool-card {
+      min-height: 50px;
+      border-radius: 10px;
+      padding: 5px 3px;
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 3px;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 14px rgba(0,0,0,.18);
+    }
+
+    .tool-card .material-symbols-outlined,
+    .tool-card .tool-icon {
       color: var(--accent-cyan);
       font-size: 25px;
+    }
+
+    .panel:not(.inspector) .tool-card .material-symbols-outlined,
+    .panel:not(.inspector) .tool-card .tool-icon {
+      --icon-size: 23px;
+      font-size: 18px;
+      line-height: 1;
     }
 
     .tool-card strong {
@@ -548,6 +1162,22 @@
       margin-top: 8px;
       font-size: 13px;
       font-weight: 950;
+    }
+
+    .panel:not(.inspector) .tool-card strong {
+      margin-top: 0;
+      max-width: 100%;
+      font-size: 8.5px;
+      line-height: 1.06;
+      letter-spacing: 0;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .panel:not(.inspector) .tool-card > span:not(.material-symbols-outlined):not(.tool-icon):not(.tool-status) {
+      display: none;
     }
 
     .tool-card span:last-child {
@@ -564,20 +1194,44 @@
       opacity: .56;
     }
 
-    .tool-card.is-active {
+    .tool-card.is-ready {
       border-color: rgba(98,230,200,.38);
       background:
-        linear-gradient(145deg, rgba(98,230,200,.12), rgba(121,216,255,.055)),
+        linear-gradient(145deg, rgba(98,230,200,.075), rgba(121,216,255,.035)),
         rgba(0,0,0,.24);
     }
 
-    .tool-card.is-waiting .material-symbols-outlined {
+    .tool-card.is-waiting .material-symbols-outlined,
+    .tool-card.is-waiting .tool-icon {
       color: var(--metal-champagne);
     }
 
+    .tool-card.is-danger-action {
+      border-color: rgba(255,121,121,.42);
+      background:
+        linear-gradient(145deg, rgba(255,121,121,.16), rgba(255,255,255,.035)),
+        rgba(0,0,0,.26);
+    }
+
+    .tool-card.is-danger-action .tool-icon {
+      color: #ff9c9c;
+    }
+
+    .tool-card.tool-card--wide {
+      grid-column: auto;
+      min-height: 50px;
+    }
+
     .tool-card.is-mode-active {
-      border-color: rgba(121,216,255,.5);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 0 22px rgba(121,216,255,.12);
+      border-color: rgba(121,216,255,.82);
+      background:
+        linear-gradient(145deg, rgba(121,216,255,.22), rgba(98,230,200,.12)),
+        rgba(0,0,0,.26);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 0 0 2px rgba(121,216,255,.18), 0 0 24px rgba(121,216,255,.14);
+    }
+
+    #plan-tools-import {
+      display: none;
     }
 
     .tool-status {
@@ -595,14 +1249,50 @@
       text-transform: uppercase;
     }
 
+    .panel:not(.inspector) .tool-status {
+      display: none !important;
+    }
+
     .tool-control-panel {
-      margin-top: 12px;
+      margin-top: 8px;
       border: 1px solid rgba(255,255,255,.13);
-      border-radius: 18px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 10px;
       background: rgba(0,0,0,.24);
       display: grid;
-      gap: 12px;
+      gap: 8px;
+    }
+
+    .tool-control-panel::before {
+      content: "詳細設定";
+      color: var(--accent-cyan);
+      font-size: 10px;
+      font-weight: 950;
+      letter-spacing: .08em;
+    }
+
+    .panel:not(.inspector) .tool-group {
+      position: relative;
+    }
+
+    .panel:not(.inspector) .tool-control-panel {
+      position: absolute;
+      top: 4px;
+      left: calc(100% + 8px);
+      z-index: 80;
+      width: min(292px, calc(100vw - 340px));
+      max-height: min(72vh, 520px);
+      overflow: auto;
+      display: none;
+      margin-top: 0;
+      border-color: rgba(121,216,255,.24);
+      box-shadow: 0 18px 44px rgba(0,0,0,.42);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel:not(.inspector) .tool-group:hover > .tool-control-panel,
+    .panel:not(.inspector) .tool-group:focus-within > .tool-control-panel {
+      display: grid;
     }
 
     .compact-field {
@@ -615,22 +1305,22 @@
       color: var(--text-muted);
       font-size: 11px;
       font-weight: 950;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     .compact-field select,
     .compact-field input[type="number"],
     .compact-field input[type="text"] {
       width: 100%;
-      min-height: 40px;
+      min-height: 34px;
       border: 1px solid rgba(255,255,255,.14);
-      border-radius: 13px;
-      padding: 0 12px;
+      border-radius: 9px;
+      padding: 0 10px;
       color: var(--text-main);
       background: rgba(0,0,0,.26);
       font: inherit;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 850;
       outline: none;
     }
@@ -672,24 +1362,17 @@
 
     .canvas-shell {
       min-width: 0;
+      min-height: 0;
       position: relative;
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: minmax(0, 1fr) auto;
       background:
         radial-gradient(circle at 40% 34%, rgba(121,216,255,.1), transparent 17rem),
         rgba(5,7,10,.64);
     }
 
     .canvas-toolbar {
-      min-height: 68px;
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--line-soft);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
-      background: rgba(0,0,0,.18);
+      display: none;
     }
 
     .toolbar-left,
@@ -717,6 +1400,30 @@
       color: #fff;
       border-color: rgba(98,230,200,.42);
       background: rgba(98,230,200,.13);
+    }
+
+    .toolbar-select-label {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 950;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .toolbar-select {
+      min-height: 40px;
+      max-width: 170px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 999px;
+      padding: 0 34px 0 13px;
+      color: var(--text-main);
+      background: rgba(255,255,255,.07);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 850;
     }
 
     .toolbar-boundary-note {
@@ -751,7 +1458,7 @@
       --grid-px: 40px;
       position: relative;
       overflow: hidden;
-      min-height: 560px;
+      min-height: 0;
       background:
         radial-gradient(circle at 50% 50%, rgba(255,255,255,.065), transparent 20rem),
         rgba(7,10,13,.88);
@@ -845,7 +1552,7 @@
       width: 100%;
       height: 100%;
       overflow: visible;
-      pointer-events: auto;
+      pointer-events: none;
     }
 
     .zone-layer {
@@ -864,8 +1571,8 @@
 
     .wall-line {
       fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      stroke-linecap: butt;
+      stroke-linejoin: miter;
       vector-effect: non-scaling-stroke;
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.28));
     }
@@ -873,18 +1580,18 @@
     .wall-hit-target {
       fill: none;
       stroke: rgba(255,255,255,0);
-      stroke-linecap: round;
+      stroke-linecap: butt;
       pointer-events: stroke;
       cursor: pointer;
     }
 
     .wall-existing {
-      stroke: rgba(220,230,236,.92);
+      stroke: #3C3C3C;
     }
 
     .wall-new {
-      stroke: var(--accent-mint);
-      filter: drop-shadow(0 0 12px rgba(98,230,200,.32));
+      stroke: #5B5B5B;
+      filter: drop-shadow(0 0 10px rgba(91,91,91,.28));
     }
 
     .wall-demolished {
@@ -893,9 +1600,32 @@
       filter: drop-shadow(0 0 10px rgba(255,154,47,.3));
     }
 
+    .wall-type-existing_wall,
+    .wall-type-bearing_wall {
+      stroke: #3C3C3C;
+    }
+
+    .wall-type-light_partition {
+      stroke: url(#wall-hatch-double);
+    }
+
+    .wall-type-wood_partition {
+      stroke: url(#wall-hatch-single);
+    }
+
+    .wall-type-solid_partition {
+      stroke: #5B5B5B;
+    }
+
+    .wall-line.wall-demolished {
+      stroke: var(--accent-orange-soft);
+      stroke-dasharray: 12 10;
+      filter: drop-shadow(0 0 10px rgba(255,154,47,.3));
+    }
+
     .wall-line.is-selected {
-      stroke: var(--accent-cyan);
-      filter: drop-shadow(0 0 16px rgba(121,216,255,.55));
+      stroke: #00B7FF;
+      filter: drop-shadow(0 0 20px rgba(0,183,255,.78));
     }
 
     .wall-line.is-boundary {
@@ -905,10 +1635,12 @@
 
     .wall-selected-outline {
       fill: none;
-      stroke: rgba(121,216,255,.24);
-      stroke-linecap: round;
+      stroke: rgba(255,218,87,.88);
+      stroke-linecap: butt;
+      stroke-linejoin: miter;
       vector-effect: non-scaling-stroke;
       pointer-events: none;
+      filter: drop-shadow(0 0 14px rgba(255,218,87,.48));
     }
 
     .wall-preview-line {
@@ -916,7 +1648,7 @@
       stroke: rgba(98,230,200,.78);
       stroke-width: 3;
       stroke-dasharray: 8 8;
-      stroke-linecap: round;
+      stroke-linecap: butt;
       vector-effect: non-scaling-stroke;
       pointer-events: none;
       filter: drop-shadow(0 0 10px rgba(98,230,200,.32));
@@ -950,7 +1682,7 @@
     .opening-gap {
       fill: none;
       stroke: rgba(5,7,10,.96);
-      stroke-linecap: round;
+      stroke-linecap: butt;
       vector-effect: non-scaling-stroke;
       pointer-events: none;
     }
@@ -998,8 +1730,14 @@
     }
 
     .opening-symbol.is-selected {
-      stroke: #fff;
-      filter: drop-shadow(0 0 16px rgba(121,216,255,.65));
+      stroke: #00B7FF;
+      filter: drop-shadow(0 0 16px rgba(0,183,255,.62));
+    }
+
+    .opening-symbol.is-selected + .opening-swing,
+    .opening-swing.is-selected {
+      stroke: #FFD95A;
+      stroke-dasharray: 5 4;
     }
 
     .zone-label {
@@ -1049,6 +1787,80 @@
     .zone-label.is-selected::before {
       background: var(--accent-cyan);
       box-shadow: 0 0 14px rgba(121,216,255,.55);
+    }
+
+    .furniture-item {
+      position: absolute;
+      z-index: 6;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(203,184,138,.76);
+      border-radius: 8px;
+      padding: 6px;
+      color: #fff;
+      background:
+        linear-gradient(135deg, rgba(203,184,138,.3), rgba(121,216,255,.12)),
+        rgba(9,12,15,.72);
+      box-shadow: 0 12px 28px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.14);
+      cursor: move;
+      pointer-events: auto;
+      transform-origin: center center;
+      user-select: none;
+    }
+
+    .furniture-item.is-selected {
+      border-color: #00B7FF;
+      background:
+        linear-gradient(145deg, rgba(0,183,255,.2), rgba(98,230,200,.11)),
+        rgba(8,14,20,.94);
+      box-shadow: 0 0 0 3px rgba(255,218,87,.45), 0 0 0 6px rgba(0,183,255,.18), 0 18px 30px rgba(0,0,0,.3);
+    }
+
+    .furniture-label {
+      display: grid;
+      gap: 2px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .furniture-label strong {
+      font-size: 12px;
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .furniture-label span {
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 850;
+    }
+
+    .furniture-resize-handle {
+      position: absolute;
+      right: -9px;
+      bottom: -9px;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(5,7,10,.94);
+      border-radius: 999px;
+      background: var(--accent-cyan);
+      cursor: nwse-resize;
+      box-shadow: 0 0 0 3px rgba(121,216,255,.22), 0 0 16px rgba(121,216,255,.62);
+    }
+
+    .furniture-resize-handle--inside {
+      left: 50%;
+      right: auto;
+      bottom: 8px;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 16px;
+      border-color: rgba(5,7,10,.84);
+    }
+
+    .furniture-resize-handle--corner {
+      right: -9px;
+      bottom: -9px;
     }
 
     .zone-boundary-polygon {
@@ -1113,16 +1925,17 @@
     }
 
     .graph-node {
-      fill: rgba(5,7,10,.92);
-      stroke: rgba(220,230,236,.8);
-      stroke-width: 2;
+      fill: rgba(5,7,10,.55);
+      stroke: rgba(220,230,236,.28);
+      stroke-width: 1.5;
       vector-effect: non-scaling-stroke;
+      opacity: .38;
     }
 
     .graph-node.intersection {
-      fill: var(--warning);
-      stroke: rgba(5,7,10,.94);
-      filter: drop-shadow(0 0 10px rgba(240,198,110,.42));
+      fill: rgba(240,198,110,.75);
+      stroke: rgba(5,7,10,.72);
+      filter: none;
     }
 
     .graph-node.is-highlighted,
@@ -1349,6 +2162,13 @@
 
     .field-row.full {
       grid-column: 1 / -1;
+    }
+
+    .field-grid > .inline-message.full {
+      grid-column: 1 / -1;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.5;
     }
 
     .field-row label {
@@ -1830,8 +2650,10 @@
       font-weight: 950;
     }
 
-    @media (max-width: 1180px) {
+    @media (max-width: 1040px) {
       .tool-shell {
+        height: auto;
+        min-height: 720px;
         grid-template-columns: 250px minmax(420px, 1fr);
       }
 
@@ -1883,8 +2705,13 @@
       }
 
       .page-intro,
+      .file-area,
       .tool-shell {
         grid-template-columns: 1fr;
+      }
+
+      .tool-shell {
+        align-content: start;
       }
 
       .intro-actions {
@@ -1897,6 +2724,7 @@
 
       .canvas-shell {
         order: 1;
+        min-height: 520px;
       }
 
       .panel:not(.inspector) {
@@ -1918,7 +2746,7 @@
       }
     }
 
-    @media (max-width: 580px) {
+    @media (max-width: 640px) {
       .workspace {
         width: min(100% - 20px, var(--section-max));
         padding-top: 24px;
@@ -1934,6 +2762,24 @@
 
       .tool-shell {
         border-radius: 22px;
+      }
+
+      .file-area {
+        border-radius: 18px;
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .file-area-actions {
+        justify-content: flex-start;
+      }
+
+      .file-area-actions .toolbar-btn {
+        flex: 1 1 138px;
+      }
+
+      .file-area-path span {
+        white-space: normal;
       }
 
       .mobile-canvas-shortcuts {
@@ -1973,7 +2819,8 @@
         overflow-wrap: anywhere;
       }
 
-      .tool-card .material-symbols-outlined {
+      .tool-card .material-symbols-outlined,
+      .tool-card .tool-icon {
         font-size: 22px;
       }
 
@@ -1997,7 +2844,56 @@
         gap: 9px;
       }
 
-      .canvas-toolbar,
+      .inspector-tab-strip {
+        position: relative;
+        top: auto;
+      }
+
+      .canvas-toolbar {
+        position: relative;
+        z-index: 2;
+        min-height: 0;
+        padding: 8px 10px;
+        gap: 8px;
+      }
+
+      .canvas-shell {
+        scroll-margin-top: 238px;
+        overflow-x: auto;
+      }
+
+      .toolbar-left {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        overflow: visible;
+        padding-bottom: 0;
+      }
+
+      .toolbar-left > * {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .toolbar-right,
+      .toolbar-boundary-note,
+      .toolbar-select-label {
+        display: none;
+      }
+
+      .toolbar-btn,
+      .toolbar-select {
+        justify-content: center;
+        min-height: 38px;
+        font-size: 12px;
+      }
+
+      .toolbar-select {
+        max-width: none;
+        padding-left: 10px;
+        padding-right: 24px;
+      }
+
       .canvas-footer {
         align-items: flex-start;
         flex-direction: column;
@@ -2005,6 +2901,7 @@
 
       .canvas {
         min-height: 420px;
+        min-width: 760px;
         scroll-margin-top: 180px;
       }
     }
@@ -2067,388 +2964,361 @@
     }
   </style>
 </head>
-<body>
-  <header class="site-header">
-    <nav class="nav" aria-label="主要導覽">
-      <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="返回 LaiBE 首頁">
-        <img class="brand-logo" src="../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
-      </a>
-      <div class="nav-links">
-        <div class="nav-tool">
-          <button class="tool-menu-button active" type="button" aria-haspopup="true">
-            工具 <span aria-hidden="true">▾</span>
-          </button>
-          <div class="tool-menu" aria-label="工具選單">
-            <a href="./code.html"><span>平面拼圖</span><small>current</small></a>
-            <a href="../preview_budget/code.html"><span>預算生成</span><small>next</small></a>
-            <a href="https://apps.apple.com/tw/search?term=LiDAR%20Scanner" target="_blank" rel="noreferrer"><span>LiDAR App 參考</span><small>app</small></a>
-            <a href="https://apps.apple.com/tw/search?term=iScanner" target="_blank" rel="noreferrer"><span>iScanner App 參考</span><small>app</small></a>
-          </div>
-        </div>
-        <a href="../laibe_landing_desktop/code.html#flow">流程</a>
-        <a href="../laibe_landing_desktop/code.html#about">關於萊比</a>
-        <a href="../laibe_landing_desktop/code.html#flow">PCM 後台</a>
-        <a class="login-link" href="../laibe_landing_desktop/code.html">我有帳號</a>
-      </div>
-    </nav>
-  </header>
+<body class="path-workbench">
+  <style id="planPuzzleCleanShellGuard">
+    body.path-workbench > :not(#planPuzzleCleanShell):not(script) {
+      display: none !important;
+    }
 
-  <div class="progress-banner" aria-label="甲方流程進度">
-    <div class="progress-inner">
-      <a class="step-pill" href="../onboard_ai_agent/code.html">
-        <span class="step-num">1</span>需求整理
-      </a>
-      <span>→</span>
-      <a class="step-pill active" href="./code.html">
-        <span class="step-num">2</span>平面拼圖
-      </a>
-      <span>→</span>
-      <a class="step-pill" href="../preview_budget/code.html">
-        <span class="step-num">3</span>預算生成
-      </a>
-    </div>
-  </div>
-
-  <section class="candidate-banner" aria-label="Plan Puzzle candidate safety boundary">
-    <div class="candidate-banner-inner">
-      <strong>Plan Puzzle candidate / not production</strong>
-      <div>No formal estimate / no Plancraft core production / no Budget Engine / no PricingRule / no BudgetEstimateLine.</div>
-      <span>mock only</span>
-    </div>
-  </section>
-
-  <main class="workspace">
-    <section class="page-intro">
-      <div>
-        <p class="kicker">Plancraft+ Import Interface</p>
-        <h1>平面拼圖 Plancraft+</h1>
-        <p class="lead">
-          匯入丈量圖、校正比例，建立可銜接 Plancraft 的平面草稿。
-        </p>
-      </div>
-      <div class="intro-actions" aria-label="平面拼圖操作">
-        <a class="glass-btn" href="../onboard_ai_agent/code.html">返回上一頁</a>
-        <a class="orange-btn" href="../preview_budget/code.html">
-          進行預算生成
-          <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+    #planPuzzleCleanShell {
+      display: contents;
+    }
+  </style>
+  <div id="planPuzzleCleanShell" class="plan-puzzle-clean-shell" data-loop="42-direct-manipulation-visible-ui-recovery">
+    <header class="site-header">
+      <nav class="nav" aria-label="主要導覽">
+        <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="回到 LaiBE 首頁">
+          <img class="brand-logo" src="../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
         </a>
+        <div class="nav-links">
+          <div class="nav-tool">
+            <button class="tool-menu-button active" type="button" aria-haspopup="true">
+              工具 <span aria-hidden="true">▾</span>
+            </button>
+            <div class="tool-menu" aria-label="工具選單">
+              <a href="./code.html"><span>平面拼圖</span><small>目前頁</small></a>
+              <a href="../preview_budget/code.html"><span>預算預覽</span><small>下一步</small></a>
+              <a href="https://apps.apple.com/tw/search?term=LiDAR%20Scanner" target="_blank" rel="noreferrer"><span>LiDAR 掃描器</span><small>開啟 App Store</small></a>
+              <a href="https://apps.apple.com/tw/search?term=iScanner" target="_blank" rel="noreferrer"><span>iScanner 掃描器</span><small>開啟 App Store</small></a>
+            </div>
+          </div>
+          <a href="../laibe_landing_desktop/code.html#flow">流程</a>
+          <a href="../laibe_landing_desktop/code.html#about">關於萊比</a>
+          <a href="../laibe_landing_desktop/code.html#flow">專案管理後台</a>
+          <a class="login-link" href="../laibe_landing_desktop/code.html">我有帳號</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="progress-banner" aria-label="目前流程">
+      <div class="progress-inner">
+        <a class="step-pill" href="../onboard_ai_agent/code.html"><span class="step-num">1</span> 需求整理</a>
+        <span>→</span>
+        <a class="step-pill active" href="./code.html"><span class="step-num">2</span> 平面拼圖</a>
+        <span>→</span>
+        <a class="step-pill" href="../preview_budget/code.html"><span class="step-num">3</span> 預算預覽</a>
+      </div>
+    </div>
+
+    <section class="candidate-banner" aria-label="平面拼圖草稿提醒">
+      <div class="candidate-banner-inner">
+        <strong>平面拼圖候選草稿，尚非正式成果</strong>
+        <div>不產生正式估價，不執行 Plancraft 核心正式生產，不呼叫預算引擎、計價規則或預算估算列。</div>
+        <span>僅供草稿操作</span>
       </div>
     </section>
 
-    <div class="mobile-canvas-shortcuts" aria-label="Mobile Plan Puzzle mock navigation helper">
-      <span class="mobile-canvas-jump" role="note">
-        <span class="material-symbols-outlined" aria-hidden="true">grid_view</span>
-        Canvas guide / plan area below
-      </span>
-      <span>Mock-only shortcut. Tools continue below; no formal estimate, no Budget Engine, no .pc export.</span>
-    </div>
-
-    <section class="tool-shell" aria-label="平面拼圖工作區">
-      <aside class="panel" aria-label="左側工具區">
-        <div class="panel-head">
-          <div class="panel-eyebrow">Toolbox</div>
-          <div class="panel-title">Plancraft+ 流程</div>
-        </div>
-        <div class="panel-body">
-          <nav class="mobile-tool-index" aria-label="Mobile Plan Puzzle tool index">
-            <a href="#plan-tools-import">Import</a>
-            <a href="#plan-tools-wall">Wall</a>
-            <a href="#plan-tools-opening">Opening</a>
-            <a href="#plan-tools-zone">Zone</a>
-          </nav>
-
-          <div class="tool-group" id="plan-tools-import">
-            <h2>匯入與校正</h2>
-            <div class="tool-grid">
-              <button class="tool-card is-active" type="button" data-action="choose-file">
-                <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
-                <strong>匯入圖面</strong>
-                <span>JPG / PNG / PDF 接口</span>
-                <span class="tool-status">Current</span>
-              </button>
-              <button class="tool-card is-active" type="button" data-action="start-calibration">
-                <span class="material-symbols-outlined" aria-hidden="true">straighten</span>
-                <strong>校正比例</strong>
-                <span>以已知尺寸建立 mm 基準</span>
-                <span class="tool-status">Current</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="tool-group" id="plan-tools-wall">
-            <h2>牆體工具</h2>
-            <div class="tool-grid">
-              <button class="tool-card is-active" type="button" data-action="set-select-mode" data-mode-button="select">
-                <span class="material-symbols-outlined" aria-hidden="true">near_me</span>
-                <strong>選取模式</strong>
-                <span>選取與編輯牆段</span>
-                <span class="tool-status">Select</span>
-              </button>
-              <button class="tool-card is-active" type="button" data-action="start-draw-wall" data-mode-button="draw-wall">
-                <span class="material-symbols-outlined" aria-hidden="true">polyline</span>
-                <strong>畫牆</strong>
-                <span>兩點建立 wall segment</span>
-                <span class="tool-status">Current</span>
-              </button>
-              <button class="tool-card is-active" type="button" data-action="clean-wall-endpoints">
-                <span class="material-symbols-outlined" aria-hidden="true">merge_type</span>
-                <strong>整理端點</strong>
-                <span>合併 30mm 內牆端點</span>
-                <span class="tool-status">Cleanup</span>
-              </button>
-            </div>
-            <div class="tool-control-panel" aria-label="牆體工具設定">
-              <div class="compact-field">
-                <label for="current-wall-status">牆體狀態</label>
-                <select id="current-wall-status" data-field="current-wall-status">
-                  <option value="existing">既有牆 existing</option>
-                  <option value="new">新牆 new</option>
-                  <option value="demolished">拆除牆 demolished</option>
-                </select>
-              </div>
-              <div class="compact-field">
-                <label for="current-wall-thickness">牆厚 mm</label>
-                <select id="current-wall-thickness" data-field="current-wall-thickness">
-                  <option value="80">80</option>
-                  <option value="100">100</option>
-                  <option value="120" selected>120</option>
-                  <option value="150">150</option>
-                  <option value="200">200</option>
-                </select>
-              </div>
-              <label class="toggle-row" for="snap-enabled">
-                <span>端點吸附</span>
-                <input id="snap-enabled" data-field="snap-enabled" type="checkbox" checked>
-              </label>
-              <label class="toggle-row" for="orthogonal-enabled">
-                <span>水平 / 垂直輔助</span>
-                <input id="orthogonal-enabled" data-field="orthogonal-enabled" type="checkbox" checked>
-              </label>
-            </div>
-          </div>
-
-          <div class="tool-group" id="plan-tools-opening">
-            <h2>門窗工具</h2>
-            <div class="tool-grid">
-              <button class="tool-card is-active" type="button" data-action="add-opening" data-opening-kind="door">
-                <span class="material-symbols-outlined" aria-hidden="true">door_open</span>
-                <strong>新增門</strong>
-                <span>依附目前選取牆段</span>
-                <span class="tool-status">Door</span>
-              </button>
-              <button class="tool-card is-active" type="button" data-action="add-opening" data-opening-kind="window">
-                <span class="material-symbols-outlined" aria-hidden="true">window</span>
-                <strong>新增窗</strong>
-                <span>依附目前選取牆段</span>
-                <span class="tool-status">Window</span>
-              </button>
-              <button class="tool-card is-active" type="button" data-action="add-opening" data-opening-kind="opening">
-                <span class="material-symbols-outlined" aria-hidden="true">door_back</span>
-                <strong>新增開口</strong>
-                <span>無門片的通行開口</span>
-                <span class="tool-status">Opening</span>
-              </button>
-            </div>
-            <div class="tool-control-panel" aria-label="門窗工具設定">
-              <div class="compact-field">
-                <label for="current-opening-width">開口寬度 mm</label>
-                <input id="current-opening-width" data-field="current-opening-width" type="number" min="300" max="3000" step="50" value="900">
-              </div>
-              <div class="compact-field">
-                <label for="current-opening-swing">門片方向</label>
-                <select id="current-opening-swing" data-field="current-opening-swing">
-                  <option value="left">left</option>
-                  <option value="right">right</option>
-                  <option value="sliding">sliding</option>
-                  <option value="none">none</option>
-                </select>
-              </div>
-              <div class="static-note">
-                <strong>Opening</strong>
-                請先選取一段牆，再新增門窗或開口。
-              </div>
-            </div>
-          </div>
-
-          <div class="tool-group" id="plan-tools-zone">
-            <h2>空間標籤</h2>
-            <div class="tool-grid">
-              <button class="tool-card is-active" type="button" data-action="start-place-zone" data-mode-button="place-zone">
-                <span class="material-symbols-outlined" aria-hidden="true">label</span>
-                <strong>新增空間標籤</strong>
-                <span>在圖面上標註空間名稱</span>
-                <span class="tool-status">Zone</span>
-              </button>
-              <button class="tool-card is-active" type="button" data-action="start-zone-boundary" data-mode-button="edit-zone-boundary">
-                <span class="material-symbols-outlined" aria-hidden="true">polyline</span>
-                <strong>編輯邊界</strong>
-                <span>選取 zone 後指定 nodeGraph edges</span>
-                <span class="tool-status">Boundary</span>
-              </button>
-            </div>
-            <div class="tool-control-panel" aria-label="空間標籤工具設定">
-              <div class="compact-field">
-                <label for="current-zone-type">空間類型</label>
-                <select id="current-zone-type" data-field="current-zone-type">
-                  <option value="living">客廳 living</option>
-                  <option value="bedroom">臥室 bedroom</option>
-                  <option value="kitchen">廚房 kitchen</option>
-                  <option value="bathroom">浴室 bathroom</option>
-                  <option value="dining">餐廳 dining</option>
-                  <option value="balcony">陽台 balcony</option>
-                  <option value="entry">玄關 entry</option>
-                  <option value="storage">儲藏室 storage</option>
-                  <option value="closet">更衣室 closet</option>
-                  <option value="other">空間 other</option>
-                </select>
-              </div>
-              <div class="compact-field">
-                <label for="current-zone-name">預設名稱</label>
-                <input id="current-zone-name" data-field="current-zone-name" type="text" value="客廳">
-              </div>
-              <div class="static-note">
-                <strong>Zone Label</strong>
-                完成比例校正後，點擊畫布放置人工空間標籤。
-              </div>
-            </div>
-          </div>
-
-          <div class="tool-group">
-            <h2>後續工具</h2>
-            <div class="tool-grid">
-              <button class="tool-card is-waiting" type="button" disabled>
-                <span class="material-symbols-outlined" aria-hidden="true">weekend</span>
-                <strong>家具拼圖</strong>
-                <span>家具與設備配置</span>
-                <span class="tool-status">後續階段</span>
-              </button>
-              <button class="tool-card is-waiting" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="Candidate mock preview only; no Plancraft core production">
-                <span class="material-symbols-outlined" aria-hidden="true">account_tree</span>
-                <strong>.pc mock preview</strong>
-                <span>只顯示 renderer preview 狀態；不進 Plancraft core production</span>
-                <span class="tool-status">candidate only</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="tool-group">
-            <h2>草稿狀態</h2>
-            <div class="grid-setting">
-              <div class="setting-row"><span>底圖</span><b id="underlayStatusText">尚未匯入</b></div>
-              <div class="setting-row"><span>比例</span><b id="scaleStatusText">尚未校正</b></div>
-              <div class="setting-row"><span>牆段</span><b id="wallCountStatusText">0</b></div>
-              <div class="setting-row"><span>節點</span><b id="nodeCountStatusText">0</b></div>
-              <div class="setting-row"><span>問題</span><b id="issueCountStatusText">0</b></div>
-              <div class="setting-row"><span>Bridge</span><b>Renderer Preview Spike</b></div>
-            </div>
+    <main class="workspace">
+      <section class="file-area" aria-label="檔案區">
+        <div class="file-area-head">
+          <div class="file-area-title">檔案區 / 路徑模式</div>
+          <div class="file-area-path" aria-label="操作路徑">
+            <span>檔案區</span>
+            <span>工具區</span>
+            <span>畫布</span>
+            <span>屬性面板</span>
           </div>
         </div>
-      </aside>
-
-      <section class="canvas-shell" aria-label="中間畫布區">
-        <input class="visually-hidden" id="planImportInput" type="file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" />
-        <div class="canvas-toolbar">
-          <div class="toolbar-left" aria-label="畫布操作">
-            <button class="toolbar-btn primary" type="button" data-action="choose-file">
-              <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
-              匯入圖面
-            </button>
-            <button class="toolbar-btn" type="button" data-action="start-calibration">
-              <span class="material-symbols-outlined" aria-hidden="true">straighten</span>
-              校正比例
-            </button>
-            <button class="toolbar-btn" type="button" data-action="set-select-mode" data-mode-button="select">
-              <span class="material-symbols-outlined" aria-hidden="true">near_me</span>
-              選取
-            </button>
-            <button class="toolbar-btn primary" type="button" data-action="start-draw-wall" data-mode-button="draw-wall">
-              <span class="material-symbols-outlined" aria-hidden="true">polyline</span>
-              畫牆
-            </button>
-            <button class="toolbar-btn" type="button" data-action="start-place-zone" data-mode-button="place-zone">
-              <span class="material-symbols-outlined" aria-hidden="true">label</span>
-              空間標籤
-            </button>
-            <button class="toolbar-btn" type="button" data-action="clean-wall-endpoints">
-              <span class="material-symbols-outlined" aria-hidden="true">merge_type</span>
-              整理端點
-            </button>
-            <button class="toolbar-btn" type="button" data-action="reset-project">
-              <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
-              重置
-            </button>
-            <button class="toolbar-btn" type="button" disabled data-mock-only="true" data-action="export-draft" title="Candidate mock only; no formal estimate, no Budget Engine">
-              <span class="material-symbols-outlined" aria-hidden="true">visibility_off</span>
-              草稿預覽停用 / mock only
-            </button>
-            <button class="toolbar-btn" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="Candidate mock only; no Plancraft core production">
-              <span class="material-symbols-outlined" aria-hidden="true">block</span>
-              .pc 預覽停用 / no production
-            </button>
-          </div>
-          <div class="toolbar-right" aria-label="畫布狀態">
-            <span class="tool-chip">Import Interface</span>
-            <span class="tool-chip">Opening Editor</span>
-            <span class="tool-chip">Zone Label</span>
-            <span class="tool-chip">Zone Boundary</span>
-            <span class="tool-chip">Renderer Preview</span>
-          </div>
-          <div class="toolbar-boundary-note" aria-label="Export-like controls safety boundary">
-            <strong>Export-like controls disabled.</strong>
-            Candidate mock only / no formal estimate / no Budget Engine / no Plancraft core production.
-          </div>
+        <div class="file-area-actions" aria-label="檔案操作">
+          <button class="toolbar-btn primary" type="button" data-action="choose-file"><span class="tool-icon tool-icon--file" aria-hidden="true"></span> 匯入 JPG / PNG（PDF先轉圖）</button>
+          <button class="toolbar-btn" type="button" data-action="start-blank-mm-draft" title="建立空白毫米草稿，只產生候選資料，不進正式預算。"><span class="tool-icon tool-icon--new" aria-hidden="true"></span> 空白毫米草稿</button>
+          <button class="toolbar-btn" type="button" data-action="start-calibration" title="若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。"><span class="tool-icon tool-icon--ruler" aria-hidden="true"></span> 校正比例</button>
+          <button class="toolbar-btn" type="button" data-action="reset-project"><span class="tool-icon tool-icon--reset" aria-hidden="true"></span> 重設草稿</button>
+          <button class="toolbar-btn" id="undoActionButton" type="button" data-action="undo-action" disabled title="復原上一個可復原操作，也可按 Ctrl+Z。"><span class="tool-icon tool-icon--undo" aria-hidden="true"></span> 復原</button>
+          <button class="toolbar-btn" id="redoActionButton" type="button" data-action="redo-action" disabled title="重做剛復原的操作，也可按 Ctrl+Y。"><span class="tool-icon tool-icon--redo" aria-hidden="true"></span> 重做</button>
+          <button class="toolbar-btn" type="button" data-mock-only="true" data-action="export-draft" title="匯出候選草稿 JSON；不是正式估價，也不是 Plancraft 正式輸出。"><span class="tool-icon tool-icon--save" aria-hidden="true"></span> 匯出草稿 JSON</button>
+          <button class="toolbar-btn" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="候選 .pc 預覽停用；不執行正式產出。"><span class="tool-icon tool-icon--stop" aria-hidden="true"></span> .pc 正式匯出停用</button>
         </div>
-
-        <div class="canvas" id="planCanvas" aria-label="平面拼圖互動畫布">
-          <div class="axis-label axis-x">UNDERLAY / GRID</div>
-          <div class="axis-label axis-y">PLANCRAFT+ DRAFT</div>
-          <div class="underlay-layer" id="underlayLayer" aria-hidden="true"></div>
-          <div class="grid-layer" aria-hidden="true"></div>
-          <svg class="zone-polygon-layer" id="zonePolygonLayer" aria-label="空間邊界圖層"></svg>
-          <svg class="wall-layer" id="wallLayer" aria-label="牆體圖層"></svg>
-          <svg class="opening-layer" id="openingLayer" aria-label="門窗開口圖層"></svg>
-          <div class="zone-layer" id="zoneLayer" aria-label="空間標籤圖層"></div>
-          <svg class="wall-graph-layer" id="wallGraphLayer" aria-label="牆體檢查圖層"></svg>
-          <svg class="calibration-layer" id="calibrationLayer" aria-hidden="true"></svg>
-          <div class="helper-layer" id="canvasHelper" aria-live="polite"></div>
-        </div>
-
-        <div class="canvas-footer">
-          <span><strong>Plan Puzzle candidate</strong> 只把空間標籤連到 nodeGraph edges，供人工檢視 zone boundary。</span>
-          <span>No formal estimate / no Budget Engine / no Plancraft core production</span>
+        <div class="file-area-note">
+          <span>操作路徑：上方檔案區；左側工具區；中間畫布；右側屬性面板。</span>
+          <strong>候選草稿，不產生正式估價，不呼叫預算引擎。</strong>
         </div>
       </section>
 
-      <aside class="panel inspector" aria-label="右側屬性區">
-        <div class="panel-head">
-          <div class="panel-eyebrow">Inspector</div>
-          <div class="panel-title">Plancraft+ 狀態</div>
+      <section class="page-intro">
+        <div>
+          <p class="kicker">Plancraft+ 平面拼圖</p>
+          <h1>平面拼圖 Plancraft+</h1>
+          <p class="lead">匯入業主提供的平面圖或建立空白毫米草稿，先完成可人工操作的牆、門窗、空間與家具候選資料。</p>
         </div>
-        <div class="panel-body" id="inspectorBody">
-          <section class="empty-state">
-            <h2>Plancraft+ 匯入狀態：尚未匯入</h2>
-            <p>請先匯入 JPG 或 PNG 丈量圖，建立 Plancraft+ 底圖基準。</p>
-          </section>
+        <div class="intro-actions" aria-label="平面拼圖入口">
+          <a class="glass-btn" href="../onboard_ai_agent/code.html">回需求整理</a>
+          <a class="orange-btn" href="../preview_budget/code.html">前往預算預覽 <span class="tool-icon tool-icon--next" aria-hidden="true"></span></a>
+        </div>
+      </section>
 
-          <div class="draft-list">
-            <div class="draft-item">
-              <b>比例狀態</b>
-              尚未校正。
+      <div class="mobile-canvas-shortcuts" aria-label="手機畫布捷徑">
+        <button class="mobile-canvas-jump" type="button" data-action="focus-canvas" aria-label="跳到畫布"><span class="tool-icon tool-icon--file" aria-hidden="true"></span> 前往畫布</button>
+        <span>手機版會先顯示工具與畫布。草稿資料只供候選，不會進正式預算，也不會匯出正式 .pc。</span>
+      </div>
+
+      <section class="tool-shell" aria-label="平面拼圖工作區">
+        <aside class="panel" aria-label="工具區">
+          <div class="panel-head">
+            <div class="panel-eyebrow">工具區</div>
+            <div class="panel-title">Plancraft+ 流程</div>
+          </div>
+          <div class="panel-body">
+            <nav class="mobile-tool-index" aria-label="手機工具捷徑">
+              <a href="#plan-tools-wall-clean">牆體</a>
+              <a href="#plan-tools-opening-clean">門窗</a>
+              <a href="#plan-tools-zone-clean">空間</a>
+            </nav>
+
+            <div class="tool-group" id="plan-tools-import-clean">
+              <h2>匯入與校正</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-ready" type="button" data-action="choose-file"><span class="tool-icon tool-icon--file" aria-hidden="true"></span><strong>匯入圖紙</strong><span>JPG / PNG；PDF先轉圖</span><span class="tool-status">可用</span></button>
+                <button class="tool-card is-ready" type="button" data-action="start-calibration" title="若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。"><span class="tool-icon tool-icon--ruler" aria-hidden="true"></span><strong>校正比例</strong><span>檔名線索或兩點</span><span class="tool-status">可用</span></button>
+              </div>
             </div>
-            <div class="draft-item">
-              <b>下一步提示</b>
-              請先匯入 JPG 或 PNG 丈量圖。
+
+            <div class="tool-group" id="plan-tools-wall-clean">
+              <h2>常用 / 牆體</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-ready" type="button" data-action="set-select-mode" data-mode-button="select"><span class="tool-icon tool-icon--select" aria-hidden="true"></span><strong>選取</strong><span>點選牆、門窗、家具</span><span class="tool-status">模式</span></button>
+                <button class="tool-card is-ready is-danger-action" type="button" data-action="delete-current-selection" title="刪除目前選取的物件；不會刪除未選取物件。"><span class="tool-icon tool-icon--delete" aria-hidden="true"></span><strong>刪除</strong><span>刪除選取物件</span><span class="tool-status">Delete</span></button>
+                <button class="tool-card is-ready" type="button" data-action="start-draw-wall" data-mode-button="draw-wall"><span class="tool-icon tool-icon--wall" aria-hidden="true"></span><strong>畫牆</strong><span>點兩點新增牆段</span><span class="tool-status">模式</span></button>
+                <button class="tool-card is-ready" type="button" data-action="clean-wall-endpoints" title="將靠很近的牆端接在一起，像吸附一樣整理斷點。"><span class="tool-icon tool-icon--snap" aria-hidden="true"></span><strong>接牆</strong><span>整理牆端</span><span class="tool-status">輔助</span></button>
+              </div>
+              <div class="tool-control-panel" aria-label="牆體詳細設定">
+                <div class="compact-field">
+                  <label for="current-wall-status">牆體狀態</label>
+                  <select id="current-wall-status" data-field="current-wall-status">
+                    <option value="existing">既有牆</option>
+                    <option value="new">新設牆</option>
+                    <option value="demolished">拆除牆</option>
+                  </select>
+                </div>
+                <div class="compact-field">
+                  <label for="current-wall-type">牆體類型</label>
+                  <select id="current-wall-type" data-field="current-wall-type">
+                    <option value="existing_wall">既有牆 / 分戶牆</option>
+                    <option value="bearing_wall">承重牆 / 結構牆</option>
+                    <option value="light_partition">輕隔間 / 雙斜線 hatch</option>
+                    <option value="wood_partition">木隔間 / 斜線 hatch</option>
+                    <option value="solid_partition" selected>分間實牆 / 磚牆或石膏磚牆</option>
+                  </select>
+                </div>
+                <div class="compact-field">
+                  <label for="current-wall-thickness">牆厚 mm</label>
+                  <select id="current-wall-thickness" data-field="current-wall-thickness">
+                    <option value="80">80mm　薄隔間或裝修牆</option>
+                    <option value="100">100mm　木隔間、輕隔間常見</option>
+                    <option value="120" selected>120mm　一般分間實牆</option>
+                    <option value="150">150mm　較厚磚牆或石膏磚牆</option>
+                    <option value="200">200mm　厚牆或局部結構</option>
+                    <option value="240">240mm　分戶牆、承重牆常見</option>
+                  </select>
+                </div>
+                <div class="static-note"><strong>牆厚說明</strong> 一般承重牆約 240mm；木隔間與輕隔間常見 100mm；磚牆與石膏磚牆需依現場牆厚確認。</div>
+                <label class="toggle-row" for="snap-enabled"><span>端點吸附</span><input id="snap-enabled" data-field="snap-enabled" type="checkbox" checked></label>
+                <label class="toggle-row" for="orthogonal-enabled"><span>水平 / 垂直輔助</span><input id="orthogonal-enabled" data-field="orthogonal-enabled" type="checkbox" checked></label>
+              </div>
+            </div>
+
+            <div class="tool-group" id="plan-tools-opening-clean">
+              <h2>門窗工具</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-ready" type="button" data-action="add-opening" data-opening-kind="door"><span class="tool-icon tool-icon--door" aria-hidden="true"></span><strong>門</strong><span>加在選取牆段上</span><span class="tool-status">門</span></button>
+                <button class="tool-card is-ready" type="button" data-action="add-opening" data-opening-kind="window"><span class="tool-icon tool-icon--window" aria-hidden="true"></span><strong>窗</strong><span>加在選取牆段上</span><span class="tool-status">窗</span></button>
+                <button class="tool-card is-ready" type="button" data-action="add-opening" data-opening-kind="opening"><span class="tool-icon tool-icon--opening" aria-hidden="true"></span><strong>開口</strong><span>不帶門片的洞口</span><span class="tool-status">開口</span></button>
+              </div>
+              <div class="tool-control-panel" aria-label="門窗開口設定">
+                <div class="compact-field"><label for="current-opening-width">開口寬度 mm</label><input id="current-opening-width" data-field="current-opening-width" type="number" min="300" max="3000" step="50" value="900"></div>
+                <div class="compact-field">
+                  <label for="current-opening-swing">門片方向</label>
+                  <select id="current-opening-swing" data-field="current-opening-swing">
+                    <option value="left">左開</option>
+                    <option value="right">右開</option>
+                    <option value="sliding">橫拉</option>
+                    <option value="none">無門片</option>
+                  </select>
+                </div>
+                <div class="static-note"><strong>操作方式</strong> 先選取牆段，再按門、窗或開口；可在右側屬性面板修改寬度與方向。</div>
+              </div>
+            </div>
+
+            <div class="tool-group" id="plan-tools-zone-clean">
+              <h2>空間標籤</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-ready" type="button" data-action="start-place-zone" data-mode-button="place-zone"><span class="tool-icon tool-icon--zone" aria-hidden="true"></span><strong>新增空間</strong><span>客廳、臥室、廚房</span><span class="tool-status">空間</span></button>
+                <button class="tool-card is-ready" type="button" data-action="start-zone-boundary" data-mode-button="edit-zone-boundary"><span class="tool-icon tool-icon--boundary" aria-hidden="true"></span><strong>編輯邊界</strong><span>用多邊形圈出區域</span><span class="tool-status">邊界</span></button>
+              </div>
+              <div class="tool-control-panel" aria-label="空間標籤設定">
+                <div class="compact-field">
+                  <label for="current-zone-type">空間類型</label>
+                  <select id="current-zone-type" data-field="current-zone-type">
+                    <option value="living">客廳</option>
+                    <option value="bedroom">臥室</option>
+                    <option value="kitchen">廚房</option>
+                    <option value="bathroom">浴室</option>
+                    <option value="dining">餐廳</option>
+                    <option value="balcony">陽台</option>
+                    <option value="entry">玄關</option>
+                    <option value="storage">儲藏</option>
+                    <option value="closet">更衣間</option>
+                    <option value="other">其他空間</option>
+                  </select>
+                </div>
+                <div class="compact-field"><label for="current-zone-name">預設名稱</label><input id="current-zone-name" data-field="current-zone-name" type="text" value="客廳"></div>
+                <div class="static-note"><strong>空間用途</strong> 空間標籤只建立候選資料，後續仍需人工確認面積與用途。</div>
+              </div>
+            </div>
+
+            <div class="tool-group" id="plan-tools-items-clean">
+              <h2>櫃體工具</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-ready" type="button" data-action="select-furniture-template" data-furniture-template="wardrobe" data-mode-button="place-furniture"><span class="tool-icon tool-icon--cabinet" aria-hidden="true"></span><strong>衣櫃</strong><span>寬深高可調</span><span class="tool-status">候選</span></button>
+                <button class="tool-card is-ready" type="button" data-action="select-furniture-template" data-furniture-template="tall_cabinet" data-mode-button="place-furniture"><span class="tool-icon tool-icon--cabinet" aria-hidden="true"></span><strong>高櫃</strong><span>收納或電器高櫃</span><span class="tool-status">候選</span></button>
+                <button class="tool-card is-ready" type="button" data-action="select-furniture-template" data-furniture-template="low_wall_cabinet" data-mode-button="place-furniture"><span class="tool-icon tool-icon--cabinet" aria-hidden="true"></span><strong>矮櫃 / 吊櫃</strong><span>牆面或地櫃</span><span class="tool-status">候選</span></button>
+                <button class="tool-card is-ready" type="button" data-action="select-furniture-template" data-furniture-template="kitchen_cabinet" data-mode-button="place-furniture"><span class="tool-icon tool-icon--kitchen" aria-hidden="true"></span><strong>廚具</strong><span>廚房櫃體草稿</span><span class="tool-status">候選</span></button>
+                <button class="tool-card is-ready" type="button" data-action="select-furniture-template" data-furniture-template="toilet" data-mode-button="place-furniture"><span class="tool-icon tool-icon--bath" aria-hidden="true"></span><strong>馬桶</strong><span>衛浴設備候選</span><span class="tool-status">候選</span></button>
+                <button class="tool-card is-ready" type="button" data-action="select-furniture-template" data-furniture-template="washbasin" data-mode-button="place-furniture"><span class="tool-icon tool-icon--sink" aria-hidden="true"></span><strong>洗手台</strong><span>衛浴設備候選</span><span class="tool-status">候選</span></button>
+              </div>
+            </div>
+
+            <div class="tool-group">
+              <h2>活動家具</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-ready tool-card--wide" type="button" data-action="select-furniture-template" data-furniture-template="sofa" data-mode-button="place-furniture" title="沙發、床、餐桌等活動家具是平面參考，放在櫃體工具後方，不當作正式計價項。"><span class="tool-icon tool-icon--furniture" aria-hidden="true"></span><strong>活動家具</strong><span>沙發、床、餐桌</span><span class="tool-status">參考</span></button>
+                <button class="tool-card is-ready" type="button" data-action="start-place-furniture" data-mode-button="place-furniture" title="點一下後，到畫布上點位置，把目前選到的家具或櫃體放上去。"><span class="tool-icon tool-icon--place" aria-hidden="true"></span><strong>放到畫布</strong><span>點畫布放置</span><span class="tool-status">建立</span></button>
+              </div>
+            </div>
+
+            <div class="tool-group">
+              <h2>審核 / 尚未納入</h2>
+              <div class="tool-grid">
+                <button class="tool-card is-waiting" type="button" disabled title="SVG 家具圖塊需完成 overlay QA，未通過前不得進 runtime 家具包。"><span class="tool-icon tool-icon--material" aria-hidden="true"></span><strong>SVG 圖塊審查</strong><span>候選圖塊等待 QA</span><span class="tool-status">QA 中</span></button>
+                <button class="tool-card is-waiting" type="button" disabled><span class="tool-icon tool-icon--material" aria-hidden="true"></span><strong>家具包整合</strong><span>需另開整合任務</span><span class="tool-status">未納入</span></button>
+                <button class="tool-card is-waiting" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="候選 .pc 預覽停用；不執行正式產出。"><span class="tool-icon tool-icon--stop" aria-hidden="true"></span><strong>.pc 預覽停用</strong><span>不接 Plancraft 正式生產</span><span class="tool-status">停用</span></button>
+              </div>
+            </div>
+
+            <div class="tool-group">
+              <h2>草稿狀態</h2>
+              <div class="grid-setting">
+                <div class="setting-row"><span>底圖</span><b id="underlayStatusText">尚未匯入</b></div>
+                <div class="setting-row"><span>比例</span><b id="scaleStatusText">待比例確認</b></div>
+                <div class="setting-row"><span>牆段</span><b id="wallCountStatusText">0</b></div>
+                <div class="setting-row"><span>接牆點</span><b id="nodeCountStatusText">0</b></div>
+                <div class="setting-row"><span>提醒</span><b id="issueCountStatusText">0</b></div>
+                <div class="setting-row"><span>輸出狀態</span><b>候選草稿</b></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="canvas-shell" aria-label="中間畫布區">
+          <input class="visually-hidden" id="planImportInput" type="file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" />
+          <div class="canvas-toolbar">
+            <div class="toolbar-left" aria-label="畫布工具列">
+              <button class="toolbar-btn primary" type="button" data-action="choose-file"><span class="tool-icon tool-icon--file" aria-hidden="true"></span> 匯入圖紙</button>
+              <button class="toolbar-btn" type="button" data-action="start-blank-mm-draft" title="建立空白毫米草稿，只產生候選資料，不進正式預算。"><span class="tool-icon tool-icon--new" aria-hidden="true"></span> 空白毫米草稿</button>
+              <button class="toolbar-btn" type="button" data-action="start-calibration" title="若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。"><span class="tool-icon tool-icon--ruler" aria-hidden="true"></span> 校正比例</button>
+              <button class="toolbar-btn" type="button" data-action="set-select-mode" data-mode-button="select"><span class="tool-icon tool-icon--select" aria-hidden="true"></span> 選取</button>
+              <button class="toolbar-btn" type="button" data-action="delete-current-selection" title="刪除目前選取物件。"><span class="tool-icon tool-icon--delete" aria-hidden="true"></span> 刪除</button>
+              <button class="toolbar-btn primary" type="button" data-action="start-draw-wall" data-mode-button="draw-wall"><span class="tool-icon tool-icon--wall" aria-hidden="true"></span> 畫牆</button>
+              <button class="toolbar-btn" type="button" data-action="add-opening" data-opening-kind="door" title="在選取牆段新增門"><span class="tool-icon tool-icon--door" aria-hidden="true"></span> 門</button>
+              <button class="toolbar-btn" type="button" data-action="add-opening" data-opening-kind="window" title="在選取牆段新增窗"><span class="tool-icon tool-icon--window" aria-hidden="true"></span> 窗</button>
+              <button class="toolbar-btn" type="button" data-action="add-opening" data-opening-kind="opening" title="在選取牆段新增開口"><span class="tool-icon tool-icon--opening" aria-hidden="true"></span> 開口</button>
+              <button class="toolbar-btn" type="button" data-action="start-place-zone" data-mode-button="place-zone"><span class="tool-icon tool-icon--zone" aria-hidden="true"></span> 空間</button>
+              <label class="toolbar-select-label" for="canvas-furniture-template">項目</label>
+              <select class="toolbar-select" id="canvas-furniture-template" data-field="current-furniture-template" title="選擇要放到畫布的候選家具或櫃體。">
+                <option value="wardrobe">衣櫃</option>
+                <option value="tall_cabinet">高櫃</option>
+                <option value="low_wall_cabinet">矮櫃 / 吊櫃</option>
+                <option value="tv_cabinet">電視櫃</option>
+                <option value="kitchen_cabinet">廚具</option>
+                <option value="bed">床</option>
+                <option value="sofa">沙發</option>
+                <option value="dining_table">餐桌</option>
+                <option value="toilet">馬桶</option>
+                <option value="washbasin">洗手台</option>
+              </select>
+              <button class="toolbar-btn primary" type="button" data-action="start-place-furniture" data-mode-button="place-furniture" title="到畫布上點一下，把目前選到的家具或櫃體放上去。"><span class="tool-icon tool-icon--place" aria-hidden="true"></span> 放到畫布</button>
+              <label class="toolbar-select-label" for="canvas-furniture-material">材料</label>
+              <select class="toolbar-select" id="canvas-furniture-material" data-field="current-furniture-material" title="選擇候選材料。">
+                <option value="wood">木作</option>
+                <option value="system_panel">系統板</option>
+                <option value="stone">石材</option>
+                <option value="fabric">布料</option>
+                <option value="ceramic">磁磚</option>
+                <option value="metal">金屬</option>
+                <option value="unspecified">未指定</option>
+              </select>
+              <button class="toolbar-btn" type="button" data-action="apply-current-furniture-material" title="套用目前材料到選取的候選家具或櫃體。"><span class="tool-icon tool-icon--material" aria-hidden="true"></span> 套用材料</button>
+              <button class="toolbar-btn" type="button" data-action="clean-wall-endpoints" title="將靠很近的牆端接在一起。"><span class="tool-icon tool-icon--snap" aria-hidden="true"></span> 接牆</button>
+              <button class="toolbar-btn" type="button" data-action="reset-project"><span class="tool-icon tool-icon--reset" aria-hidden="true"></span> 重設</button>
+              <button class="toolbar-btn" type="button" data-mock-only="true" data-action="export-draft" title="匯出候選草稿 JSON；不是正式估價。"><span class="tool-icon tool-icon--save" aria-hidden="true"></span> 候選草稿 JSON</button>
+              <button class="toolbar-btn" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="候選 .pc 預覽停用；不執行正式產出。"><span class="tool-icon tool-icon--stop" aria-hidden="true"></span> .pc 正式匯出停用</button>
+            </div>
+            <div class="toolbar-right" aria-label="畫布狀態提示">
+              <span class="tool-chip">匯入基準圖</span>
+              <span class="tool-chip">門窗與牆段</span>
+              <span class="tool-chip">空間標籤</span>
+              <span class="tool-chip">圖層狀態</span>
+              <span class="tool-chip">草稿輸出</span>
+            </div>
+            <div class="toolbar-boundary-note" aria-label="輸出邊界">
+              <strong>候選草稿 JSON 才能匯出</strong>
+              目前仍是草稿資料，不是施工圖，不呼叫預算引擎；.pc 正式匯出維持停用。
             </div>
           </div>
 
-          <div class="static-note">
-            <strong>Bridge</strong>
-            Plan Puzzle candidate：僅保留 renderer preview 樣式；靜態頁不執行 Plancraft core production、不啟動 Budget Engine，也不產生正式估算。
+          <div class="canvas" id="planCanvas" aria-label="平面拼圖草稿畫布">
+            <div class="axis-label axis-x">水平 / 寬度</div>
+            <div class="axis-label axis-y">平面拼圖草稿</div>
+            <div class="underlay-layer" id="underlayLayer" aria-hidden="true"></div>
+            <div class="grid-layer" aria-hidden="true"></div>
+            <svg class="zone-polygon-layer" id="zonePolygonLayer" aria-label="空間邊界圖層"></svg>
+            <svg class="wall-layer" id="wallLayer" aria-label="牆體圖層"></svg>
+            <svg class="opening-layer" id="openingLayer" aria-label="門窗開口圖層"></svg>
+            <div class="zone-layer" id="zoneLayer" aria-label="空間與家具圖層"></div>
+            <svg class="wall-graph-layer" id="wallGraphLayer" aria-label="牆體檢查圖層"></svg>
+            <svg class="calibration-layer" id="calibrationLayer" aria-hidden="true"></svg>
+            <div class="helper-layer" id="canvasHelper" aria-live="polite"></div>
           </div>
-        </div>
-      </aside>
-    </section>
-  </main>
-  <script src="./plan-puzzle.js?v=export-boundary-guard-20260609" defer></script>
+
+          <div class="canvas-footer">
+            <span><strong>平面拼圖候選草稿</strong> 只供人工確認、設計討論與後續審核。</span>
+            <span>不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據</span>
+          </div>
+        </section>
+
+        <aside class="panel inspector" aria-label="屬性面板">
+          <div class="panel-head">
+            <div class="panel-eyebrow">屬性面板</div>
+            <div class="panel-title">目前選取物件</div>
+          </div>
+          <div class="panel-body" id="inspectorBody">
+            <section class="empty-state">
+              <h2>Plancraft+ 匯入狀態：尚未匯入</h2>
+              <p>請先匯入 JPG 或 PNG 圖面，或建立空白毫米草稿。</p>
+            </section>
+            <div class="draft-list">
+              <div class="draft-item"><b>比例狀態</b> 若檔名含寬度、高度或 mm 線索會提出比例建議；沒有線索時請用兩點校正。</div>
+              <div class="draft-item"><b>下一步</b> 匯入圖紙後，先畫牆，再加門窗、空間標籤與候選家具。</div>
+            </div>
+            <div class="static-note"><strong>草稿邊界</strong> 平面拼圖只建立候選資料，不是正式施工圖，也不是正式預算輸入。</div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <script>
+    document.title = "LaiBE | 平面拼圖 Plancraft+";
+  </script>
+  <script src="./plan-puzzle.js?v=loop28-ppt-direct-manipulation-ux-20260613" defer></script>
 </body>
 </html>

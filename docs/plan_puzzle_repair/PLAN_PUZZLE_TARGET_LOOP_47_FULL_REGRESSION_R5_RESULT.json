@@ -1,0 +1,139 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop47-full-human-operable-regression-r5",
+  "timestamp": "2026-06-13T12:50:31.271Z",
+  "steps": [
+    {
+      "step": "pageLoad",
+      "status": "PASS"
+    },
+    {
+      "step": "pngImport",
+      "status": "PASS",
+      "detail": {
+        "applySuggestionButtons": 1
+      }
+    },
+    {
+      "step": "scaleApply",
+      "status": "FAIL",
+      "detail": {
+        "scaleStatus": "已確認"
+      }
+    },
+    {
+      "step": "drawWallLongEnough",
+      "status": "PASS",
+      "detail": {
+        "walls": 1
+      }
+    },
+    {
+      "step": "doorWindowOpening",
+      "status": "PASS",
+      "detail": {
+        "openings": 3
+      }
+    },
+    {
+      "step": "furniturePlacement",
+      "status": "PASS",
+      "detail": {
+        "furniture": 1,
+        "selectedFurniture": 1
+      }
+    },
+    {
+      "step": "furnitureDrag",
+      "status": "PASS",
+      "detail": {
+        "attempted": true,
+        "afterBox": {
+          "x": 603.5,
+          "y": 284.3125,
+          "width": 211.109375,
+          "height": 351.859375
+        }
+      }
+    },
+    {
+      "step": "furnitureResizeHandle",
+      "status": "PASS",
+      "detail": {
+        "attempted": true,
+        "beforeBox": {
+          "x": 603.5,
+          "y": 284.3125,
+          "width": 211.109375,
+          "height": 351.859375
+        },
+        "afterBox": {
+          "x": 566.046875,
+          "y": 256.65625,
+          "width": 286.015625,
+          "height": 407.15625
+        }
+      }
+    },
+    {
+      "step": "inspectorEdit",
+      "status": "PASS",
+      "detail": {
+        "widthInputs": 1,
+        "depthInputs": 1,
+        "noteInputs": 1
+      }
+    },
+    {
+      "step": "candidateJsonExport",
+      "status": "PASS",
+      "detail": {
+        "downloaded": true,
+        "savePath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_47_FULL_REGRESSION_R5_EXPORT.json",
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 1,
+        "toolCatalogItems": 10,
+        "furnitureType": "toilet",
+        "furnitureWidth": 900,
+        "furnitureDepth": 810,
+        "materialTags": [
+          "system_panel"
+        ],
+        "note": "Loop47 human regression note",
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "noForbiddenOutput": true
+      }
+    },
+    {
+      "step": "pcProductionExportDisabled",
+      "status": "PASS"
+    }
+  ],
+  "consoleErrorCount": 0,
+  "consoleWarningCount": 0,
+  "consoleMessages": [],
+  "exportChecks": {
+    "downloaded": true,
+    "savePath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_47_FULL_REGRESSION_R5_EXPORT.json",
+    "walls": 1,
+    "openings": 3,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "furnitureType": "toilet",
+    "furnitureWidth": 900,
+    "furnitureDepth": 810,
+    "materialTags": [
+      "system_panel"
+    ],
+    "note": "Loop47 human regression note",
+    "formalEstimate": false,
+    "budgetEngineCalled": false,
+    "productionReady": false,
+    "noForbiddenOutput": true
+  },
+  "overall": "FAIL_OR_PARTIAL"
+}

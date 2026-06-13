@@ -7,6 +7,23 @@
   const MIN_WALL_THICKNESS = 50;
   const MAX_WALL_THICKNESS = 500;
   const DEFAULT_WALL_THICKNESS = 120;
+  const DEFAULT_WALL_TYPE = "solid_partition";
+  const WALL_TYPE_OPTIONS = [
+    { value: "existing_wall", label: "既有牆", detail: "現況保留牆體", color: "#3C3C3C" },
+    { value: "bearing_wall", label: "承重牆 / 分戶牆", detail: "深灰實牆，常見 240mm 以上", color: "#3C3C3C" },
+    { value: "light_partition", label: "輕隔間", detail: "灰色雙斜線剖線，常見 100mm", color: "#8E8E8E" },
+    { value: "wood_partition", label: "木隔間", detail: "灰色斜線剖線，常見 100mm", color: "#8E8E8E" },
+    { value: "solid_partition", label: "分間實牆", detail: "磚牆或石膏磚牆，常見 150mm", color: "#5B5B5B" }
+  ];
+  const WALL_THICKNESS_OPTIONS = [
+    { value: 80, label: "80mm　薄牆、待現場確認" },
+    { value: 100, label: "100mm　木隔間、輕隔間" },
+    { value: 120, label: "120mm　一般室內隔間" },
+    { value: 150, label: "150mm　磚牆、石膏磚牆" },
+    { value: 200, label: "200mm　管道牆、厚隔間" },
+    { value: 240, label: "240mm　分間牆、承重牆" }
+  ];
+  const WALL_THICKNESS_HELP_TEXT = "承重牆常見 240mm；木隔間與輕隔間常見 100mm；磚牆與石膏磚牆常見 150mm，仍以現場確認為準。";
   const ENDPOINT_SNAP_DISTANCE_PX = 12;
   const ORTHOGONAL_TOLERANCE_DEG = 10;
   const NEARBY_ENDPOINT_MIN_DISTANCE = 30;
@@ -15,6 +32,7 @@
   const GEOMETRY_EPSILON = 0.5;
   const PARAMETER_EPSILON = 1e-6;
   const MIN_OPENING_WIDTH = 300;
+  const HISTORY_LIMIT = 50;
   const DEFAULT_OPENING_WIDTHS = {
     door: 900,
     window: 1200,
@@ -26,6 +44,136 @@
     opening: { min: 300, max: 3000 }
   };
   const DEFAULT_ZONE_TYPE = "living";
+  const MIN_FURNITURE_WIDTH_MM = 200;
+  const MIN_FURNITURE_DEPTH_MM = 200;
+  const FURNITURE_TEMPLATES = {
+    wardrobe: {
+      type: "wardrobe",
+      category: "cabinet",
+      name: "衣櫃",
+      widthMm: 1800,
+      depthMm: 600,
+      heightMm: 2400,
+      materialTags: ["wood"]
+    },
+    tall_cabinet: {
+      type: "tall_cabinet",
+      category: "cabinet",
+      name: "高櫃",
+      widthMm: 900,
+      depthMm: 600,
+      heightMm: 2400,
+      materialTags: ["system_panel"]
+    },
+    low_wall_cabinet: {
+      type: "low_wall_cabinet",
+      category: "cabinet",
+      name: "矮櫃 / 吊櫃",
+      widthMm: 1200,
+      depthMm: 450,
+      heightMm: 900,
+      materialTags: ["system_panel"]
+    },
+    tv_cabinet: {
+      type: "tv_cabinet",
+      category: "cabinet",
+      name: "電視櫃",
+      widthMm: 1800,
+      depthMm: 450,
+      heightMm: 500,
+      materialTags: ["wood"]
+    },
+    kitchen_cabinet: {
+      type: "kitchen_cabinet",
+      category: "cabinet",
+      name: "廚具",
+      widthMm: 1800,
+      depthMm: 600,
+      heightMm: 900,
+      materialTags: ["stone", "system_panel"]
+    },
+    bed: {
+      type: "bed",
+      category: "furniture",
+      name: "床",
+      widthMm: 1500,
+      depthMm: 2000,
+      heightMm: 500,
+      materialTags: ["fabric"]
+    },
+    sofa: {
+      type: "sofa",
+      category: "furniture",
+      name: "沙發",
+      widthMm: 2100,
+      depthMm: 900,
+      heightMm: 850,
+      materialTags: ["fabric"]
+    },
+    dining_table: {
+      type: "dining_table",
+      category: "furniture",
+      name: "餐桌",
+      widthMm: 1600,
+      depthMm: 900,
+      heightMm: 760,
+      materialTags: ["wood"]
+    },
+    toilet: {
+      type: "toilet",
+      category: "fixture",
+      name: "馬桶",
+      widthMm: 420,
+      depthMm: 700,
+      heightMm: 750,
+      materialTags: ["ceramic"]
+    },
+    washbasin: {
+      type: "washbasin",
+      category: "fixture",
+      name: "洗手台",
+      widthMm: 600,
+      depthMm: 500,
+      heightMm: 850,
+      materialTags: ["ceramic"]
+    }
+  };
+  const FURNITURE_MATERIAL_TAGS = ["wood", "system_panel", "stone", "fabric", "ceramic", "metal", "unspecified"];
+  const FURNITURE_CATEGORY_LABELS = {
+    cabinet: "櫃體",
+    furniture: "家具",
+    fixture: "設備"
+  };
+  const FURNITURE_MATERIAL_LABELS = {
+    wood: "木質",
+    system_panel: "系統板材",
+    stone: "石材",
+    fabric: "布料",
+    ceramic: "陶瓷",
+    metal: "金屬",
+    unspecified: "未指定"
+  };
+  const OPENING_KIND_LABELS = {
+    door: "門",
+    window: "窗",
+    opening: "開口"
+  };
+  const OPENING_SWING_LABELS = {
+    left: "左開",
+    right: "右開",
+    sliding: "橫拉",
+    none: "無門片"
+  };
+  const BLANK_DRAFT_WIDTH_MM = 6000;
+  const BLANK_DRAFT_HEIGHT_MM = 4000;
+  const BLANK_DRAFT_PX_PER_MM = 0.1;
+  const AUTO_SCALE_MIN_MM = 300;
+  const AUTO_SCALE_MAX_MM = 50000;
+  const AUTO_SCALE_CONFIDENCE_LABELS = {
+    high: "高",
+    medium: "中",
+    low: "低"
+  };
   const ZONE_BOUNDARY_MIN_EDGES = 3;
   const ZONE_TYPE_LABELS = {
     living: "客廳",
@@ -41,18 +189,18 @@
   };
   const DRAFT_FILE_NAME = "laibe-plancraft-plus-draft.json";
   const PC_SPIKE_FILE_NAME = "laibe-plancraft-plus-spike.pc";
-  const PC_SPIKE_NOTICE = "此為 .pc 轉換測試版，尚未經 Plancraft DSL / renderer 驗證。";
+  const PC_SPIKE_NOTICE = "此為 .pc 候選測試檔，尚未完成正式格式與圖面預覽驗證。";
   const PC_VALIDATION_STATUSES = new Set(["not_run", "passed", "failed"]);
   const PC_PREVIEW_STATUSES = new Set(["not_run", "passed", "failed"]);
   const PC_RENDERER_PREVIEW_COMMAND = "cd C:\\laibe_project\r\nnode C:\\laibe_project\\plancraft\\packages\\cli\\dist\\index.js compile C:\\path\\to\\laibe-plancraft-plus-spike.pc --structure-only -o C:\\path\\to\\laibe-plancraft-plus-spike.svg";
   const PC_RENDERER_LAYERS_COMMAND = "node C:\\laibe_project\\plancraft\\packages\\cli\\dist\\index.js compile C:\\path\\to\\laibe-plancraft-plus-spike.pc --layers walls,openings,labels -o C:\\path\\to\\laibe-plancraft-plus-layers.svg";
-  const PDF_NOT_SUPPORTED_MESSAGE = "此版本已建立 PDF 匯入接口，但尚未支援 PDF 直接預覽與校正。請先將丈量圖轉成 JPG 或 PNG 上傳；PDF 轉圖會在後續版本接入 Plancraft+ Import Pipeline。";
+  const PDF_NOT_SUPPORTED_MESSAGE = "此版本已建立 PDF 匯入接口，但尚未支援 PDF 直接預覽與校正。請先將丈量圖轉成 JPG 或 PNG 上傳；PDF 轉圖會在後續版本接入 Plancraft+ 匯入流程。";
   const STYLE_VISUAL_DISCLAIMER = "本圖僅為風格示意，用於案件上架與溝通參考，不代表最終設計、施工圖、實際尺寸、工法、材料品牌或正式報價內容。";
   const STYLE_VISUAL_PROXY_ENABLED = false;
   const STYLE_VISUAL_PROXY_ENDPOINT = "";
   const STYLE_VISUAL_PROXY_ALLOWED_ENDPOINT = "/api/style-visual-image-spike";
-  const STYLE_VISUAL_PROXY_DISABLED_MESSAGE = "Server-side Image API proxy 尚未設定";
-  const STYLE_VISUAL_REFERENCE_IMAGE_NOTICE = "Reference image upload 尚未開放，需經 privacy review。";
+  const STYLE_VISUAL_PROXY_DISABLED_MESSAGE = "圖片示意服務尚未啟用";
+  const STYLE_VISUAL_REFERENCE_IMAGE_NOTICE = "風格參考圖上傳尚未開放，需先完成隱私審查。";
   const STYLE_VISUAL_AVOID = "施工圖、正式設計圖、真實案例、正式報價依據、完工保證、材料品牌承諾、法規符合宣稱、過度豪宅化";
   const STYLE_VISUAL_FIELD_LIMITS = {
     roomType: 20,
@@ -102,6 +250,10 @@
   let styleVisualTask = createInitialStyleVisualTask();
   let styleVisualTimer = null;
   let importSequence = 0;
+  let furniturePointerState = null;
+  let undoStack = [];
+  let redoStack = [];
+  let historySequence = 0;
 
   Object.defineProperty(window, "laibePlancraftPlusProject", {
     get() {
@@ -156,7 +308,9 @@
       importSource: null,
       scale: {
         pxPerMm: null,
-        calibrated: false
+        calibrated: false,
+        autoScaleSuggestion: null,
+        autoScaleApplied: false
       },
       underlay: null,
       walls: [],
@@ -193,6 +347,7 @@
       selectedEdgeId: null,
       selectedOpeningId: null,
       selectedZoneId: null,
+      selectedFurnitureId: null,
       selectedIssueId: null,
       selectedNodeId: null,
       calibrationPoints: [],
@@ -203,18 +358,102 @@
       snapPoint: null,
       snapEnabled: true,
       orthogonalEnabled: true,
+      layerVisibility: createInitialLayerVisibility(),
       currentWallStatus: "existing",
+      currentWallType: DEFAULT_WALL_TYPE,
       currentWallThickness: DEFAULT_WALL_THICKNESS,
       currentOpeningKind: "door",
       currentOpeningWidth: DEFAULT_OPENING_WIDTHS.door,
       currentOpeningSwing: "left",
       currentZoneType: DEFAULT_ZONE_TYPE,
       currentZoneName: ZONE_TYPE_LABELS[DEFAULT_ZONE_TYPE],
+      currentFurnitureTemplateId: "wardrobe",
+      currentFurnitureMaterialTag: "wood",
+      inspectorTab: "properties",
       zoneBoundaryState: createInitialZoneBoundaryState(),
       pcConverterReport: createInitialPcConverterReport(),
+      lastDraftExportPreview: null,
       message: "",
       error: ""
     };
+  }
+
+  function createInitialLayerVisibility() {
+    return {
+      underlay: true,
+      walls: true,
+      openings: true,
+      zones: true,
+      furniture: true,
+      diagnostics: true
+    };
+  }
+
+  function cloneJson(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function createHistorySnapshot(label) {
+    return {
+      id: `history-${++historySequence}`,
+      label,
+      createdAt: new Date().toISOString(),
+      project: cloneJson(project),
+      uiState: cloneJson(uiState),
+      styleVisualRequest: cloneJson(styleVisualRequest),
+      styleVisualTask: cloneJson(styleVisualTask)
+    };
+  }
+
+  function pushHistory(label) {
+    undoStack.push(createHistorySnapshot(label));
+    if (undoStack.length > HISTORY_LIMIT) {
+      undoStack.shift();
+    }
+    redoStack = [];
+  }
+
+  function restoreHistorySnapshot(snapshot, message) {
+    project = cloneJson(snapshot.project);
+    uiState = cloneJson(snapshot.uiState);
+    styleVisualRequest = cloneJson(snapshot.styleVisualRequest);
+    styleVisualTask = cloneJson(snapshot.styleVisualTask);
+    furniturePointerState = null;
+    importSequence += 1;
+    fileInput.value = "";
+    uiState.message = message;
+    uiState.error = "";
+    clearWallDraft();
+    render();
+  }
+
+  function undoLastAction() {
+    if (!undoStack.length) {
+      uiState.error = "";
+      uiState.message = "目前沒有可復原的繪圖動作。";
+      render();
+      return;
+    }
+    const currentSnapshot = createHistorySnapshot("重做前狀態");
+    const previousSnapshot = undoStack.pop();
+    redoStack.push(currentSnapshot);
+    restoreHistorySnapshot(previousSnapshot, `已復原：${previousSnapshot.label}`);
+  }
+
+  function redoLastAction() {
+    if (!redoStack.length) {
+      uiState.error = "";
+      uiState.message = "目前沒有可重做的繪圖動作。";
+      render();
+      return;
+    }
+    const currentSnapshot = createHistorySnapshot("復原前狀態");
+    const nextSnapshot = redoStack.pop();
+    undoStack.push(currentSnapshot);
+    if (undoStack.length > HISTORY_LIMIT) {
+      undoStack.shift();
+    }
+    restoreHistorySnapshot(nextSnapshot, `已重做：${nextSnapshot.label}`);
   }
 
   function createInitialZoneBoundaryState() {
@@ -250,7 +489,7 @@
     return {
       status: "not_run",
       checkedAt: null,
-      reason: "靜態頁尚未直接載入 Plancraft DSL；請使用本機驗證流程確認 .pc。",
+      reason: "靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認 .pc 候選測試檔。",
       errors: [],
       warnings: []
     };
@@ -274,12 +513,12 @@
   function getPcValidationNextAction(validation) {
     const normalized = normalizePcValidationResult(validation);
     if (normalized.status === "passed") {
-      return "DSL validation 已通過；下一步可評估 renderer preview 或 sharedWalls canonicalization。";
+      return "格式檢查已通過；下一步可評估圖面預覽或共用牆整理。";
     }
     if (normalized.status === "failed") {
-      return "請依 validation errors 修正 converter schema 後重新匯出 .pc。";
+      return "請依驗證錯誤修正轉換格式後重新匯出 .pc。";
     }
-    return "靜態頁尚未直接載入 Plancraft DSL；請使用本機 validation command 驗證匯出的 .pc。";
+    return "靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認匯出的 .pc 候選檔。";
   }
 
   function createInitialRendererPreviewResult() {
@@ -290,7 +529,7 @@
       command: PC_RENDERER_PREVIEW_COMMAND,
       errors: [],
       warnings: [
-        "靜態頁尚未直接載入 Plancraft renderer；請使用本機 CLI compile 產生 SVG 預覽。"
+        "靜態頁尚未直接載入正式圖面預覽器；請使用本機驗證流程產生 SVG 預覽。"
       ]
     };
   }
@@ -314,12 +553,12 @@
   function getRendererPreviewNextAction(preview) {
     const normalized = normalizeRendererPreviewResult(preview);
     if (normalized.status === "passed") {
-      return "Renderer preview 已通過代表性檢查；下一步可評估 sharedWalls canonicalization。";
+      return "圖面預覽已通過代表性檢查；下一步可評估共用牆整理。";
     }
     if (normalized.status === "failed") {
-      return "請依 renderer errors 修正 converter schema 或 zone boundary，再重新 compile。";
+      return "請依圖面預覽錯誤修正轉換格式或空間邊界，再重新產生預覽。";
     }
-    return "先匯出 Plancraft .pc 測試版，再用本機 Plancraft CLI compile 產生 SVG 預覽。";
+    return "先匯出 .pc 候選測試檔，再用本機驗證流程產生 SVG 預覽。";
   }
 
   function createInitialStyleVisualRequest() {
@@ -357,9 +596,9 @@
       status: "spike",
       targetFormat: ".pc",
       converterVersion: "0.1.0-spike",
-      message: "已建立 .pc 測試轉換與 renderer preview 驗證流程",
-      reason: "Renderer preview spike，尚未進入 browser production integration",
-      requiredNextStep: "確認 SVG 預覽品質後，評估 sharedWalls canonicalization 或 browser preview integration",
+      message: "已建立 .pc 候選檔與圖面預覽驗證流程",
+      reason: "圖面預覽仍是測試流程，尚未進入正式整合",
+      requiredNextStep: "確認 SVG 預覽品質後，評估共用牆整理或瀏覽器預覽整合",
       lastExportedAt: previousBridge.lastExportedAt || null,
       lastExportSummary: previousBridge.lastExportSummary || null,
       warnings: Array.isArray(previousBridge.warnings) ? [...previousBridge.warnings] : [],
@@ -375,8 +614,27 @@
     }
 
     const action = actionButton.dataset.action;
+    if (action === "focus-canvas") {
+      focusCanvasForHumanAction();
+      return;
+    }
+    if (action === "set-inspector-tab") {
+      setInspectorTab(actionButton.dataset.inspectorTab);
+      return;
+    }
+    if (action === "undo-action") {
+      undoLastAction();
+      return;
+    }
+    if (action === "redo-action") {
+      redoLastAction();
+      return;
+    }
     if (action === "choose-file") {
       chooseFile();
+    }
+    if (action === "start-blank-mm-draft") {
+      startBlankMmDraft();
     }
     if (action === "start-calibration") {
       startCalibration();
@@ -384,14 +642,26 @@
     if (action === "apply-calibration") {
       applyCalibration();
     }
+    if (action === "apply-auto-scale-suggestion") {
+      applyAutoScaleSuggestion();
+    }
     if (action === "set-select-mode") {
       enterSelectMode("已切換為選取模式。");
+    }
+    if (action === "delete-current-selection") {
+      deleteCurrentSelection();
     }
     if (action === "start-draw-wall") {
       startDrawWall();
     }
     if (action === "start-place-zone") {
       startPlaceZone();
+    }
+    if (action === "select-furniture-template") {
+      selectFurnitureTemplate(actionButton.dataset.furnitureTemplate);
+    }
+    if (action === "start-place-furniture") {
+      startPlaceFurniture();
     }
     if (action === "start-zone-boundary") {
       startZoneBoundaryEdit();
@@ -417,11 +687,23 @@
     if (action === "delete-opening") {
       deleteSelectedOpening();
     }
+    if (action === "select-opening-wall") {
+      selectWallForSelectedOpening();
+    }
     if (action === "delete-zone") {
       deleteSelectedZone();
     }
     if (action === "delete-wall") {
       deleteSelectedWall();
+    }
+    if (action === "delete-furniture") {
+      deleteSelectedFurniture();
+    }
+    if (action === "apply-furniture-material") {
+      applySelectedFurnitureMaterial(actionButton.dataset.materialTag);
+    }
+    if (action === "apply-current-furniture-material") {
+      applySelectedFurnitureMaterial(uiState.currentFurnitureMaterialTag);
     }
     if (action === "reset-project") {
       resetProject();
@@ -435,6 +717,36 @@
     if (action === "generate-style-visual") {
       startStyleVisualDraft();
     }
+    if (shouldFocusCanvasAfterAction(action)) {
+      focusCanvasForHumanAction();
+    }
+  }
+
+  function shouldFocusCanvasAfterAction(action) {
+    return [
+      "start-blank-mm-draft",
+      "start-calibration",
+      "apply-auto-scale-suggestion",
+      "set-select-mode",
+      "start-draw-wall",
+      "start-place-zone",
+      "add-opening",
+      "select-furniture-template",
+      "start-place-furniture"
+    ].includes(action);
+  }
+
+  function setInspectorTab(tabName) {
+    const allowedTabs = ["properties", "layers", "reminders", "materials", "overview"];
+    uiState.inspectorTab = allowedTabs.includes(tabName) ? tabName : "properties";
+    render();
+  }
+
+  function focusCanvasForHumanAction() {
+    window.requestAnimationFrame(() => {
+      const shell = canvas.closest(".tool-shell") || canvas.closest(".canvas-shell") || canvas;
+      shell.scrollIntoView({ block: "start", inline: "nearest", behavior: "auto" });
+    });
   }
 
   function handleDocumentInput(event) {
@@ -450,6 +762,10 @@
     if (field === "known-length") {
       uiState.knownLengthInput = input.value;
     }
+    if (field.startsWith("layer-visibility-")) {
+      updateLayerVisibility(input);
+      return;
+    }
     if (field === "current-opening-width") {
       uiState.currentOpeningWidth = readPositiveNumber(input.value, DEFAULT_OPENING_WIDTHS.door);
     }
@@ -461,6 +777,28 @@
     }
     if (field === "selected-zone-x" || field === "selected-zone-y") {
       updateSelectedZoneFromField(input);
+    }
+    if (
+      field === "selected-opening-offset" ||
+      field === "selected-opening-width" ||
+      field === "selected-opening-sill-height" ||
+      field === "selected-opening-height"
+    ) {
+      previewSelectedOpeningDimensionFromField(input);
+      return;
+    }
+    if (
+      field === "selected-furniture-width" ||
+      field === "selected-furniture-depth" ||
+      field === "selected-furniture-height" ||
+      field === "selected-furniture-rotation"
+    ) {
+      previewSelectedFurnitureDimensionFromField(input);
+      return;
+    }
+    if (field.startsWith("selected-furniture-")) {
+      // Text fields still commit on change so typing notes is not interrupted by re-rendering mid-typing.
+      return;
     }
     if (field.startsWith("style-visual-")) {
       updateStyleVisualRequestFromField(input);
@@ -477,6 +815,13 @@
     if (field === "current-wall-status") {
       uiState.currentWallStatus = normalizeWallStatus(input.value);
       uiState.message = `下一段牆將標記為：${getWallStatusLabel(uiState.currentWallStatus)}。`;
+      uiState.error = "";
+      render();
+      return;
+    }
+    if (field === "current-wall-type") {
+      uiState.currentWallType = normalizeWallType(input.value);
+      uiState.message = `下一段牆分類：${getWallTypeLabel(uiState.currentWallType)}。`;
       uiState.error = "";
       render();
       return;
@@ -525,9 +870,24 @@
       render();
       return;
     }
+    if (field === "current-furniture-template") {
+      selectFurnitureTemplate(input.value);
+      focusCanvasForHumanAction();
+      return;
+    }
+    if (field === "current-furniture-material") {
+      uiState.currentFurnitureMaterialTag = normalizeFurnitureMaterialTag(input.value);
+      uiState.error = "";
+      render();
+      return;
+    }
     if (field.startsWith("style-visual-")) {
       updateStyleVisualRequestFromField(input);
       render();
+      return;
+    }
+    if (field.startsWith("selected-furniture-")) {
+      updateSelectedFurnitureFromField(input);
       return;
     }
     if (field.startsWith("selected-zone-")) {
@@ -555,19 +915,22 @@
       return;
     }
 
-    if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedZoneId) {
+    const key = event.key.toLowerCase();
+    if ((event.ctrlKey || event.metaKey) && key === "z" && !event.shiftKey) {
       event.preventDefault();
-      deleteSelectedZone();
+      undoLastAction();
       return;
     }
-    if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedOpeningId) {
+    if ((event.ctrlKey || event.metaKey) && (key === "y" || (key === "z" && event.shiftKey))) {
       event.preventDefault();
-      deleteSelectedOpening();
+      redoLastAction();
       return;
     }
-    if ((event.key === "Delete" || event.key === "Backspace") && uiState.selectedWallId) {
+
+    if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
-      deleteSelectedWall();
+      deleteCurrentSelection();
+      return;
     }
     if (event.key === "Escape") {
       event.preventDefault();
@@ -575,9 +938,99 @@
     }
   }
 
+  function deleteCurrentSelection() {
+    if (uiState.selectedFurnitureId) {
+      deleteSelectedFurniture();
+      return;
+    }
+    if (uiState.selectedZoneId) {
+      deleteSelectedZone();
+      return;
+    }
+    if (uiState.selectedOpeningId) {
+      deleteSelectedOpening();
+      return;
+    }
+    if (uiState.selectedWallId) {
+      deleteSelectedWall();
+      return;
+    }
+    uiState.error = "";
+    uiState.message = "請先選取牆、門窗、空間或家具候選項目，再按 Delete 刪除。";
+    render();
+  }
+
   function chooseFile() {
     fileInput.value = "";
     fileInput.click();
+  }
+
+  function startBlankMmDraft() {
+    const createdAt = new Date().toISOString();
+    pushHistory("建立空白毫米草稿");
+    importSequence += 1;
+    clearGeometryDraft();
+    fileInput.value = "";
+    project.importSource = createImportSource(
+      { name: "blank-mm-draft.svg", type: "image/svg+xml" },
+      "svg",
+      true,
+      "blank-mm-draft",
+      createdAt
+    );
+    project.underlay = {
+      id: createId("underlay"),
+      fileName: "blank-mm-draft.svg",
+      fileType: "svg",
+      dataUrl: createBlankDraftDataUrl(),
+      x: 0,
+      y: 0,
+      scale: 1,
+      rotation: 0,
+      opacity: 0.32,
+      calibratedBy: {
+        from: { x: 0, y: 0 },
+        to: { x: BLANK_DRAFT_WIDTH_MM * BLANK_DRAFT_PX_PER_MM, y: 0 },
+        knownLength: BLANK_DRAFT_WIDTH_MM,
+        calibratedAt: createdAt,
+        method: "blank-mm-draft"
+      }
+    };
+    project.scale = {
+      pxPerMm: BLANK_DRAFT_PX_PER_MM,
+      calibrated: true
+    };
+    uiState.mode = "select";
+    uiState.selectedWallId = null;
+    uiState.selectedEdgeId = null;
+    uiState.selectedOpeningId = null;
+    uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
+    uiState.selectedIssueId = null;
+    uiState.selectedNodeId = null;
+    uiState.calibrationPoints = [];
+    uiState.knownLengthInput = String(BLANK_DRAFT_WIDTH_MM);
+    uiState.error = "";
+    uiState.message = "空白毫米草稿已建立。這是候選草稿工作區，不呼叫預算引擎，也不產生正式估價。";
+    syncBridge();
+    render();
+  }
+
+  function createBlankDraftDataUrl() {
+    const widthPx = BLANK_DRAFT_WIDTH_MM * BLANK_DRAFT_PX_PER_MM;
+    const heightPx = BLANK_DRAFT_HEIGHT_MM * BLANK_DRAFT_PX_PER_MM;
+    const gridPx = 1000 * BLANK_DRAFT_PX_PER_MM;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${heightPx}" viewBox="0 0 ${widthPx} ${heightPx}">
+      <rect width="100%" height="100%" fill="#ffffff"/>
+      <defs>
+        <pattern id="small-grid" width="${gridPx}" height="${gridPx}" patternUnits="userSpaceOnUse">
+          <path d="M ${gridPx} 0 L 0 0 0 ${gridPx}" fill="none" stroke="#d5dce4" stroke-width="1"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#small-grid)"/>
+      <text x="16" y="28" fill="#475569" font-family="Arial, sans-serif" font-size="16">空白毫米草稿 - 僅候選資料</text>
+    </svg>`;
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
   function handleFileSelection(event) {
@@ -589,6 +1042,7 @@
     const fileType = getNormalizedFileType(file);
     const importedAt = new Date().toISOString();
     const sequence = ++importSequence;
+    pushHistory("匯入圖面");
     clearGeometryDraft();
 
     if (fileType === "pdf") {
@@ -619,6 +1073,8 @@
         fileName: file.name,
         fileType,
         dataUrl,
+        naturalWidth: null,
+        naturalHeight: null,
         x: 0,
         y: 0,
         scale: 1,
@@ -626,7 +1082,8 @@
         opacity: DEFAULT_UNDERLAY_OPACITY,
         calibratedBy: null
       };
-      resetScaleAndInteraction("請用圖面上的已知尺寸校正比例。");
+      resetScaleAndInteraction("系統會先檢查檔名是否含寬度、高度或 mm 線索；沒有線索時，請用圖面上的已知尺寸兩點校正。");
+      probeImportedImageForAutoScale(file, dataUrl, sequence);
       render();
     });
     reader.addEventListener("error", () => {
@@ -651,6 +1108,127 @@
     };
   }
 
+  function probeImportedImageForAutoScale(file, dataUrl, sequence) {
+    const image = new Image();
+    image.addEventListener("load", () => {
+      if (sequence !== importSequence || !project.underlay) {
+        return;
+      }
+      const naturalWidth = Number(image.naturalWidth || image.width || 0);
+      const naturalHeight = Number(image.naturalHeight || image.height || 0);
+      project.underlay.naturalWidth = naturalWidth || null;
+      project.underlay.naturalHeight = naturalHeight || null;
+      project.scale.autoScaleSuggestion = createAutoScaleSuggestion(file, naturalWidth, naturalHeight);
+      project.scale.autoScaleApplied = false;
+      if (project.scale.autoScaleSuggestion?.canApply) {
+        uiState.inspectorTab = "overview";
+        uiState.knownLengthInput = String(project.scale.autoScaleSuggestion.knownLengthMm);
+        uiState.message = "系統找到檔名尺寸線索，可先套用建議比例；仍可用兩點校正覆核。";
+      } else if (!project.scale.calibrated) {
+        uiState.message = "檔名未找到可自動套用的尺寸線索，請用兩點校正確認比例。";
+      }
+      syncBridge();
+      render();
+    });
+    image.addEventListener("error", () => {
+      if (sequence !== importSequence || !project.scale) {
+        return;
+      }
+      project.scale.autoScaleSuggestion = createAutoScaleSuggestion(file, 0, 0);
+      render();
+    });
+    image.src = dataUrl;
+  }
+
+  function createAutoScaleSuggestion(file, imageWidthPx, imageHeightPx) {
+    const widthPx = Number.isFinite(imageWidthPx) && imageWidthPx > 0 ? imageWidthPx : null;
+    const heightPx = Number.isFinite(imageHeightPx) && imageHeightPx > 0 ? imageHeightPx : null;
+    const dimensionClue = extractScaleDimensionFromFileName(file?.name || "");
+    const fallbackAxis = widthPx && heightPx && heightPx > widthPx ? "height" : "width";
+    const axis = dimensionClue?.axis || fallbackAxis;
+    const pixelDistance = axis === "height" ? heightPx : widthPx;
+    const knownLengthMm = dimensionClue?.lengthMm || null;
+    const canApply = Boolean(pixelDistance && knownLengthMm);
+    const confidence = dimensionClue?.confidence || "low";
+    const from = axis === "height" ? { x: 0, y: 0 } : { x: 0, y: 0 };
+    const to = axis === "height" ? { x: 0, y: Number(pixelDistance || 0) } : { x: Number(pixelDistance || 0), y: 0 };
+    return {
+      status: canApply ? "suggested" : "needs-manual-confirmation",
+      source: dimensionClue ? "file-name-dimension-clue" : "image-size-without-dimension-clue",
+      sourceLabel: dimensionClue ? dimensionClue.sourceLabel : "圖片尺寸已讀取，但沒有可套用的 mm / cm / m 線索",
+      axis: dimensionClue?.axis || axis,
+      imageWidthPx: widthPx,
+      imageHeightPx: heightPx,
+      pixelDistance: pixelDistance ? Number(pixelDistance.toFixed(2)) : null,
+      knownLengthMm,
+      pxPerMm: canApply ? Number((pixelDistance / knownLengthMm).toFixed(6)) : null,
+      confidence,
+      confidenceLabel: AUTO_SCALE_CONFIDENCE_LABELS[confidence] || AUTO_SCALE_CONFIDENCE_LABELS.low,
+      canApply,
+      from,
+      to,
+      createdAt: new Date().toISOString(),
+      note: canApply
+        ? "系統依匯入檔名中的尺寸線索建立建議比例；仍保留人工校正覆核。"
+        : "檔名未找到可靠尺寸線索，不自動套用比例。"
+    };
+  }
+
+  function extractScaleDimensionFromFileName(fileName) {
+    const normalized = String(fileName || "")
+      .toLowerCase()
+      .replace(/[_]+/g, "-")
+      .replace(/\s+/g, "-");
+    const explicitPatterns = [
+      { regex: /(?:width|wide|w|寬|寬度|長邊|long)-?(\d+(?:\.\d+)?)-?(mm|毫米|cm|公分|m|米)?/, axis: "width" },
+      { regex: /(?:height|high|h|高|高度|短邊)-?(\d+(?:\.\d+)?)-?(mm|毫米|cm|公分|m|米)?/, axis: "height" }
+    ];
+    for (const pattern of explicitPatterns) {
+      const match = normalized.match(pattern.regex);
+      const lengthMm = match ? normalizeLengthToMm(match[1], match[2]) : null;
+      if (lengthMm) {
+        return {
+          axis: pattern.axis,
+          lengthMm,
+          confidence: "high",
+          sourceLabel: `檔名明確標示 ${pattern.axis === "height" ? "高度" : "寬度"} ${formatNumber(lengthMm)} mm`
+        };
+      }
+    }
+
+    const looseMatch = normalized.match(/(?:^|[-(])(\d{3,5}(?:\.\d+)?)-?(mm|毫米|cm|公分|m|米)(?:[-).]|$)/);
+    const looseLengthMm = looseMatch ? normalizeLengthToMm(looseMatch[1], looseMatch[2]) : null;
+    if (looseLengthMm) {
+      return {
+        axis: null,
+        lengthMm: looseLengthMm,
+        confidence: "medium",
+        sourceLabel: `檔名包含 ${formatNumber(looseLengthMm)} mm 尺寸線索，預設對應圖片長邊`
+      };
+    }
+
+    return null;
+  }
+
+  function normalizeLengthToMm(rawValue, rawUnit) {
+    const value = Number.parseFloat(rawValue);
+    if (!Number.isFinite(value) || value <= 0) {
+      return null;
+    }
+    const unit = String(rawUnit || "mm").toLowerCase();
+    let lengthMm = value;
+    if (unit === "cm" || unit === "公分") {
+      lengthMm = value * 10;
+    }
+    if (unit === "m" || unit === "米") {
+      lengthMm = value * 1000;
+    }
+    if (lengthMm < AUTO_SCALE_MIN_MM || lengthMm > AUTO_SCALE_MAX_MM) {
+      return null;
+    }
+    return Number(lengthMm.toFixed(2));
+  }
+
   function clearGeometryDraft() {
     project.walls = [];
     project.wallGraph = createInitialWallGraph();
@@ -662,6 +1240,7 @@
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.wallDraftStart = null;
@@ -675,7 +1254,9 @@
   function resetScaleAndInteraction(message) {
     project.scale = {
       pxPerMm: null,
-      calibrated: false
+      calibrated: false,
+      autoScaleSuggestion: null,
+      autoScaleApplied: false
     };
     if (project.underlay) {
       project.underlay.calibratedBy = null;
@@ -685,6 +1266,7 @@
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.calibrationPoints = [];
@@ -702,17 +1284,19 @@
 
   function startCalibration() {
     if (!project.underlay || !project.importSource?.previewSupported) {
-      uiState.error = "請先匯入可預覽的 JPG、JPEG 或 PNG 丈量圖，才能開始校正比例。";
+      uiState.error = "請先匯入可預覽的 JPG、JPEG 或 PNG 丈量圖，才能檢查檔名比例線索或進行兩點校正。";
       uiState.message = "";
       render();
       return;
     }
 
     uiState.mode = "calibrate";
+    uiState.inspectorTab = "overview";
     uiState.selectedWallId = null;
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.wallDraftStart = null;
@@ -720,10 +1304,19 @@
     uiState.wallPreviewEnd = null;
     uiState.snapPoint = null;
     clearZoneBoundaryDraft();
-    uiState.calibrationPoints = [];
-    uiState.knownLengthInput = "";
+    const suggestion = project.scale?.autoScaleSuggestion;
+    if (suggestion?.canApply) {
+      uiState.calibrationPoints = [{ ...suggestion.from }, { ...suggestion.to }];
+      uiState.knownLengthInput = String(suggestion.knownLengthMm);
+    } else {
+      uiState.calibrationPoints = [];
+      uiState.knownLengthInput = "";
+    }
     uiState.error = "";
     uiState.message = "請在底圖上依序點選已知尺寸的兩端。";
+    if (suggestion?.canApply) {
+      uiState.message = "系統已帶入檔名比例線索；可直接套用，或重新點兩端覆核。";
+    }
     render();
   }
 
@@ -742,6 +1335,7 @@
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.wallDraftStart = null;
@@ -769,12 +1363,44 @@
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     clearWallDraft();
     clearZoneBoundaryDraft();
     uiState.error = "";
     uiState.message = "空間標籤模式：請在畫布上點一下放置標籤。";
+    render();
+  }
+
+  function selectFurnitureTemplate(templateId) {
+    uiState.currentFurnitureTemplateId = getFurnitureTemplate(templateId).type;
+    startPlaceFurniture();
+  }
+
+  function startPlaceFurniture() {
+    if (!canPlaceFurniture()) {
+      uiState.error = "請先匯入底圖並完成比例校正，再放置家具或櫃體。";
+      uiState.message = "";
+      uiState.mode = "select";
+      clearWallDraft();
+      render();
+      return;
+    }
+
+    const template = getFurnitureTemplate(uiState.currentFurnitureTemplateId);
+    uiState.mode = "place-furniture";
+    uiState.selectedWallId = null;
+    uiState.selectedEdgeId = null;
+    uiState.selectedOpeningId = null;
+    uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
+    uiState.selectedIssueId = null;
+    uiState.selectedNodeId = null;
+    clearWallDraft();
+    clearZoneBoundaryDraft();
+    uiState.error = "";
+    uiState.message = `請在畫布上點一下放置「${template.name}」。這只是候選草稿，不是正式估價。`;
     render();
   }
 
@@ -789,7 +1415,7 @@
       return;
     }
     if (!hasValidScale() || !project.nodeGraph?.edges?.length) {
-      uiState.error = "請先完成比例校正並建立牆體節點，再編輯空間邊界。";
+      uiState.error = "請先完成比例校正並建立牆端 / 交點，再編輯空間邊界。";
       uiState.message = "";
       uiState.mode = "select";
       render();
@@ -812,7 +1438,7 @@
       issues: draft.issues
     };
     uiState.error = "";
-    uiState.message = "邊界編輯中：依序點選牆段加入或移除 boundary edges，完成後按「套用邊界」。";
+    uiState.message = "邊界編輯中：依序點選牆段加入或移除邊界，完成後按「套用邊界」。";
     render();
   }
 
@@ -856,15 +1482,21 @@
       return;
     }
 
+    if (uiState.mode === "place-furniture") {
+      handlePlaceFurnitureClick(event);
+      return;
+    }
+
     if (uiState.mode === "edit-zone-boundary") {
       return;
     }
 
-    if (event.target === canvas || event.target === wallLayer || event.target === openingLayer || event.target === zonePolygonLayer) {
+    if (event.target === canvas || event.target === wallLayer || event.target === openingLayer || event.target === zonePolygonLayer || event.target === zoneLayer) {
       uiState.selectedWallId = null;
       uiState.selectedEdgeId = null;
       uiState.selectedOpeningId = null;
       uiState.selectedZoneId = null;
+      uiState.selectedFurnitureId = null;
       uiState.selectedIssueId = null;
       uiState.selectedNodeId = null;
       uiState.error = "";
@@ -899,12 +1531,14 @@
     }
 
     const point = roundPoint(pxToMmPoint(getCanvasPoint(event)));
+    pushHistory("新增空間標籤");
     const zone = createZone(point);
     project.zones.push(zone);
     uiState.selectedZoneId = zone.id;
     uiState.selectedWallId = null;
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.mode = "select";
@@ -912,6 +1546,23 @@
     uiState.message = `已新增空間標籤：${zone.name}。`;
     syncBridge();
     render();
+  }
+
+  function handlePlaceFurnitureClick(event) {
+    event.preventDefault();
+    if (!canPlaceFurniture()) {
+      uiState.error = "請先匯入底圖並完成比例校正，再放置家具或櫃體。";
+      uiState.message = "";
+      uiState.mode = "select";
+      render();
+      return;
+    }
+
+    const point = roundPoint(pxToMmPoint(getCanvasPoint(event)));
+    pushHistory("加入家具 / 櫃體");
+    const item = createFurnitureItem(point);
+    project.furniture.push(item);
+    selectFurniture(item.id, `已放置「${item.name}」。這只是候選草稿，不呼叫預算引擎。`);
   }
 
   function handleDrawWallClick(event) {
@@ -949,12 +1600,14 @@
     }
 
     const wall = createWall(from, to);
+    pushHistory("畫牆");
     project.walls.push(wall);
     uiState.selectedWallId = wall.id;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
     uiState.selectedIssueId = null;
     uiState.selectedEdgeId = createEdgeId(wall);
+    uiState.inspectorTab = "properties";
     clearWallDraft();
     uiState.error = "";
     uiState.message = `已建立 ${formatNumber(length)} mm 牆段。`;
@@ -1002,6 +1655,7 @@
 
   function createWall(from, to) {
     const now = new Date().toISOString();
+    const wallType = normalizeWallType(uiState.currentWallType);
     return {
       id: createId("wall"),
       sourceWallId: null,
@@ -1009,7 +1663,8 @@
       to: roundPoint(to),
       thickness: normalizeThickness(uiState.currentWallThickness),
       status: normalizeWallStatus(uiState.currentWallStatus),
-      structural: false,
+      wallType,
+      structural: wallType === "bearing_wall",
       layer: "walls",
       createdAt: now,
       updatedAt: now
@@ -1045,6 +1700,7 @@
     }
 
     const pxPerMm = pixelDistance / knownLength;
+    pushHistory("套用比例校正");
     project.scale = {
       pxPerMm: Number(pxPerMm.toFixed(6)),
       calibrated: true
@@ -1059,6 +1715,56 @@
     uiState.mode = "select";
     uiState.error = "";
     uiState.message = `比例已校正：${formatNumber(knownLength)} mm = ${formatNumber(pixelDistance)} px`;
+    syncBridge();
+    render();
+  }
+
+  function applyAutoScaleSuggestion() {
+    const suggestion = project.scale?.autoScaleSuggestion;
+    if (!project.underlay || !project.importSource?.previewSupported) {
+      uiState.error = "請先匯入 JPG 或 PNG 圖面，再使用檔名比例建議。";
+      render();
+      return;
+    }
+    if (!suggestion?.canApply || !suggestion.knownLengthMm || !suggestion.pixelDistance) {
+      uiState.error = "檔名沒有足夠的尺寸線索可自動套用，請用兩點校正確認比例。";
+      uiState.inspectorTab = "overview";
+      render();
+      return;
+    }
+
+    const pxPerMm = suggestion.pixelDistance / suggestion.knownLengthMm;
+    if (!Number.isFinite(pxPerMm) || pxPerMm <= 0) {
+      uiState.error = "檔名比例建議無法計算，請改用兩點校正。";
+      render();
+      return;
+    }
+
+    pushHistory("套用檔名比例建議");
+    project.scale = {
+      ...project.scale,
+      pxPerMm: Number(pxPerMm.toFixed(6)),
+      calibrated: true,
+      autoScaleSuggestion: { ...suggestion, appliedAt: new Date().toISOString() },
+      autoScaleApplied: true
+    };
+    project.underlay.calibratedBy = {
+      from: { ...suggestion.from },
+      to: { ...suggestion.to },
+      pixelDistance: Number(suggestion.pixelDistance.toFixed(2)),
+      knownLength: Number(suggestion.knownLengthMm.toFixed(2)),
+      unit: "mm",
+      method: "auto-scale-suggestion",
+      confidence: suggestion.confidence,
+      source: suggestion.source,
+      sourceLabel: suggestion.sourceLabel
+    };
+    uiState.mode = "select";
+    uiState.inspectorTab = "overview";
+    uiState.calibrationPoints = [{ ...suggestion.from }, { ...suggestion.to }];
+    uiState.knownLengthInput = String(suggestion.knownLengthMm);
+    uiState.error = "";
+    uiState.message = `已套用檔名比例建議：${formatNumber(suggestion.knownLengthMm)} mm = ${formatNumber(suggestion.pixelDistance)} px。`;
     syncBridge();
     render();
   }
@@ -1090,6 +1796,12 @@
     if (field === "selected-wall-status") {
       nextWall.status = normalizeWallStatus(input.value);
     }
+    if (field === "selected-wall-type") {
+      nextWall.wallType = normalizeWallType(input.value);
+      if (nextWall.wallType === "bearing_wall") {
+        nextWall.structural = true;
+      }
+    }
     if (field === "selected-wall-thickness") {
       nextWall.thickness = normalizeThickness(input.value);
       if (String(nextWall.thickness) !== String(input.value)) {
@@ -1120,6 +1832,7 @@
       return;
     }
 
+    pushHistory("更新牆體屬性");
     Object.assign(wall, nextWall, { updatedAt: new Date().toISOString() });
     if (!uiState.error) {
       uiState.message = "牆體資料已更新。";
@@ -1133,6 +1846,7 @@
       return;
     }
 
+    pushHistory("刪除牆體");
     project.walls = project.walls.filter((wall) => wall.id !== uiState.selectedWallId);
     project.openings = project.openings.filter((opening) => opening.edgeId !== createEdgeId({ id: uiState.selectedWallId }));
     uiState.selectedWallId = null;
@@ -1150,6 +1864,7 @@
   }
 
   function resetProject() {
+    pushHistory("重設草稿");
     importSequence += 1;
     project = createInitialProject();
     uiState = createInitialUIState();
@@ -1343,7 +2058,7 @@
   async function callStyleVisualImageProxy(styleVisualApiRequest) {
     const safeRequest = buildStyleVisualApiRequest(styleVisualApiRequest);
 
-    // Server-side proxy spike contract only: frontend must never call a model
+    // 伺服端圖片代理測試契約：前端絕不可直接呼叫模型。
     // provider directly or carry API keys. Future work may enable the
     // same-origin path below from a real server runtime after Reviewer gate.
     if (!STYLE_VISUAL_PROXY_ENABLED || STYLE_VISUAL_PROXY_ENDPOINT !== STYLE_VISUAL_PROXY_ALLOWED_ENDPOINT) {
@@ -1387,8 +2102,8 @@
     return {
       id: createId("style-visual-preview"),
       status: safeResponse.status,
-      label: "Sandbox Preview",
-      imageLabel: "AI 示意圖",
+      label: "沙盒預覽",
+      imageLabel: "風格示意圖",
       imageUrl: safeResponse.imageUrl,
       previewDataUrl: safeResponse.previewDataUrl,
       temporaryImageUrl: safeResponse.imageUrl || safeResponse.previewDataUrl,
@@ -1404,12 +2119,12 @@
   }
 
   function exportDraft() {
-    rebuildWallGraph();
-    rebuildNodeGraph();
-    syncZoneBoundaryMetadata();
-    syncBridge();
-    const payload = JSON.parse(JSON.stringify(project));
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    const payload = buildDraftPayload();
+    const jsonText = JSON.stringify(payload, null, 2);
+    uiState.lastDraftExportPreview = createDraftExportPreview(payload, jsonText);
+    uiState.message = "候選草稿 JSON 預覽已建立。下載仍只供草稿使用，不呼叫預算引擎，也不產生正式估價。";
+    uiState.error = "";
+    const blob = new Blob([jsonText], {
       type: "application/json;charset=utf-8"
     });
     const url = URL.createObjectURL(blob);
@@ -1420,6 +2135,111 @@
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+    render();
+  }
+
+  function buildDraftPayload() {
+    rebuildWallGraph();
+    rebuildNodeGraph();
+    syncZoneBoundaryMetadata();
+    syncBridge();
+    const payload = JSON.parse(JSON.stringify(project));
+    payload.walls = project.walls.map((wall) => ({
+      ...wall,
+      status: normalizeWallStatus(wall.status),
+      wallType: normalizeWallType(wall.wallType),
+      structural: Boolean(wall.structural || normalizeWallType(wall.wallType) === "bearing_wall")
+    }));
+    payload.furniture = project.furniture.map(normalizeFurnitureForExport);
+    payload.toolCatalogItems = createToolCatalogFurnitureItems();
+    payload.layoutObjects = project.furniture.map(createFurnitureLayoutObject);
+    payload.candidateExportBoundary = {
+      formalEstimate: false,
+      budgetEngineCalled: false,
+      productionReady: false,
+      note: "家具 / 櫃體物件僅為草稿候選資料。"
+    };
+    return payload;
+  }
+
+  function createDraftExportPreview(payload, jsonText) {
+    const previewPayload = {
+      walls: payload.walls || [],
+      openings: payload.openings || [],
+      zones: payload.zones || [],
+      furniture: payload.furniture || [],
+      toolCatalogItems: payload.toolCatalogItems || [],
+      layoutObjects: payload.layoutObjects || [],
+      candidateExportBoundary: payload.candidateExportBoundary || {}
+    };
+    return {
+      generatedAt: new Date().toISOString(),
+      fileName: DRAFT_FILE_NAME,
+      wallCount: previewPayload.walls.length,
+      openingCount: previewPayload.openings.length,
+      zoneCount: previewPayload.zones.length,
+      openZoneBoundaryCount: previewPayload.zones.filter((zone) => zone.boundaryStatus && zone.boundaryStatus !== "closed").length,
+      furnitureCount: previewPayload.furniture.length,
+      toolCatalogItemCount: previewPayload.toolCatalogItems.length,
+      layoutObjectCount: previewPayload.layoutObjects.length,
+      formalEstimate: Boolean(previewPayload.candidateExportBoundary.formalEstimate),
+      budgetEngineCalled: Boolean(previewPayload.candidateExportBoundary.budgetEngineCalled),
+      productionReady: Boolean(previewPayload.candidateExportBoundary.productionReady),
+      hasMaterialTags: previewPayload.furniture.some((item) => Array.isArray(item.materialTags) && item.materialTags.length > 0),
+      jsonPreview: JSON.stringify(previewPayload, null, 2),
+      stateSignature: createDraftStateSignature(),
+      fullJsonLength: jsonText.length
+    };
+  }
+
+  function createDraftStateSignature() {
+    return JSON.stringify({
+      walls: project.walls.map((wall) => ({
+        id: wall.id,
+        from: wall.from,
+        to: wall.to,
+        thickness: wall.thickness,
+        status: wall.status,
+        wallType: normalizeWallType(wall.wallType),
+        structural: Boolean(wall.structural || normalizeWallType(wall.wallType) === "bearing_wall"),
+        updatedAt: wall.updatedAt || null
+      })),
+      openings: project.openings.map((opening) => ({
+        id: opening.id,
+        edgeId: opening.edgeId,
+        kind: opening.kind,
+        offset: opening.offset,
+        width: opening.width,
+        swing: opening.swing,
+        sillHeight: opening.sillHeight,
+        height: opening.height,
+        updatedAt: opening.updatedAt || null
+      })),
+      zones: project.zones.map((zone) => ({
+        id: zone.id,
+        name: zone.name,
+        type: zone.type,
+        labelPosition: zone.labelPosition,
+        boundaryEdgeIds: zone.boundaryEdgeIds || [],
+        boundaryStatus: zone.boundaryStatus || null,
+        updatedAt: zone.updatedAt || null
+      })),
+      furniture: project.furniture.map((item) => ({
+        id: item.id,
+        type: item.type,
+        category: item.category,
+        name: item.name,
+        x: item.x,
+        y: item.y,
+        widthMm: item.widthMm,
+        depthMm: item.depthMm,
+        heightMm: item.heightMm,
+        rotation: item.rotation,
+        materialTags: item.materialTags || [],
+        note: item.note || "",
+        updatedAt: item.updatedAt || null
+      }))
+    });
   }
 
   function exportPcSpike() {
@@ -1453,7 +2273,7 @@
     };
 
     if (!result.ok) {
-      uiState.error = result.errors[0] || "目前沒有可轉換的封閉 zone boundary，無法匯出 .pc 測試版。";
+      uiState.error = result.errors[0] || "目前沒有可轉換的封閉空間邊界，無法匯出 .pc 候選測試檔。";
       uiState.message = PC_SPIKE_NOTICE;
       render();
       return;
@@ -1480,7 +2300,7 @@
     const rooms = [];
     const labels = [];
 
-    warnings.push("Plancraft+ 目前以畫布左上角為原點；Plancraft renderer 使用建築座標慣例，本 Spike 先原樣輸出 mm 座標，尚未做座標翻轉驗證。");
+    warnings.push("目前以畫布左上角為原點；正式圖面預覽可能使用不同座標慣例，本測試版先原樣輸出 mm 座標，尚未做座標翻轉驗證。");
 
     (sourceProject.zones || []).forEach((zone) => {
       const conversion = convertZoneToPcRoom(zone, edgeMap, warnings);
@@ -1538,7 +2358,7 @@
     });
 
     if (rooms.length === 0) {
-      errors.push("沒有可轉換的封閉 zone boundary。請先建立 zone，指定至少 3 段 boundary edges，並套用可封閉的 polygon。");
+      errors.push("沒有可轉換的封閉空間邊界。請先建立空間標籤，指定至少 3 段牆體邊界，並套用可封閉的邊界。");
     }
 
     const floor = {
@@ -1568,16 +2388,16 @@
 
   function validateGeneratedPcSpike(pcText) {
     const warnings = [
-      "靜態頁尚未直接載入 Plancraft DSL；請使用本機 validation command 驗證 .pc。",
-      "本 Spike 不在 browser bundle 載入 Plancraft DSL，以維持 file:/// 靜態頁可用並避免新增打包流程。"
+      "靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認 .pc 候選測試檔。",
+      "本測試檔不在瀏覽器頁面載入正式檢查器，以維持靜態頁可用並避免新增打包流程。"
     ];
     if (typeof pcText !== "string" || pcText.trim().length === 0) {
-      warnings.push("目前沒有可驗證的 pcText。");
+      warnings.push("目前沒有可驗證的 .pc 候選測試檔內容。");
     }
     return {
       status: "not_run",
       checkedAt: null,
-      reason: "靜態頁未直接載入 Plancraft DSL，需用本機 validation command 驗證",
+      reason: "靜態頁未直接載入正式檔案檢查器，需用本機驗證流程確認",
       errors: [],
       warnings
     };
@@ -1588,7 +2408,7 @@
     if (boundaryEdgeIds.length < ZONE_BOUNDARY_MIN_EDGES) {
       return {
         ok: false,
-        warning: `Zone「${zone.name || zone.id}」缺少可轉換 boundary：boundaryEdgeIds 少於 3。`
+        warning: `空間「${zone.name || zone.id}」缺少可轉換邊界：邊界牆段少於 3 段。`
       };
     }
 
@@ -1596,24 +2416,24 @@
     if (boundary.missingEdgeIds.length > 0) {
       return {
         ok: false,
-        warning: `Zone「${zone.name || zone.id}」有 boundary edge 找不到：${boundary.missingEdgeIds.join(", ")}。`
+        warning: `空間「${zone.name || zone.id}」有邊界牆段找不到：${boundary.missingEdgeIds.join(", ")}。`
       };
     }
     if (!boundary.closed || boundary.orientedEdges.length < ZONE_BOUNDARY_MIN_EDGES) {
       return {
         ok: false,
-        warning: `Zone「${zone.name || zone.id}」boundary 尚未形成封閉 polygon，已略過 .pc room 轉換。`
+        warning: `空間「${zone.name || zone.id}」邊界尚未封閉，已略過 .pc 空間轉換。`
       };
     }
     if (boundary.orientedEdges.some((record) => record.edge.status === "demolished")) {
       return {
         ok: false,
-        warning: `Zone「${zone.name || zone.id}」包含 demolished edge；拆除牆不轉成正式 room wall，該 zone 已略過。`
+        warning: `空間「${zone.name || zone.id}」包含拆除牆；拆除牆不轉成正式空間牆線，該空間已略過。`
       };
     }
 
     if (zone.type) {
-      warnings.push(`Zone「${zone.name || zone.id}」type=${zone.type}：Plancraft .pc room schema 目前沒有 type 欄位，本 Spike 不寫入 type。`);
+      warnings.push(`空間「${zone.name || zone.id}」類型「${zone.type}」目前不寫入 .pc 候選測試檔。`);
     }
 
     const edgeRefs = [];
@@ -1726,24 +2546,24 @@
     if (!edge) {
       return {
         ok: false,
-        warning: `Opening ${opening.id} 找不到 edgeId=${opening.edgeId}，已略過。`
+        warning: `門窗「${getOpeningDisplayName(opening.id)}」找不到依附牆段，已略過。`
       };
     }
     const roomRefs = edgeRoomRefs.get(opening.edgeId) || [];
     if (roomRefs.length === 0) {
       return {
         ok: false,
-        warning: `Opening ${opening.id} 的 edge 不屬於任何已轉換 room boundary，已略過。`
+        warning: `門窗「${getOpeningDisplayName(opening.id)}」不屬於任何已轉換空間邊界，已略過。`
       };
     }
     if (opening.offset < 0 || opening.width <= 0 || opening.offset + opening.width > edge.length + GEOMETRY_EPSILON) {
       return {
         ok: false,
-        warning: `Opening ${opening.id} offset/width 超出 edge 長度，已略過。`
+        warning: `門窗「${getOpeningDisplayName(opening.id)}」的位置或寬度超出牆段長度，已略過。`
       };
     }
     if (roomRefs.length > 1) {
-      warnings.push(`Opening ${opening.id} 位於共用 edge，本 Spike 先掛到第一個匹配 room，shared opening 尚未 canonicalize。`);
+      warnings.push(`門窗「${getOpeningDisplayName(opening.id)}」位於共用牆段，本測試檔先掛到第一個匹配空間；共用門窗仍待整理。`);
     }
 
     const target = roomRefs[0];
@@ -1754,7 +2574,7 @@
     if (!Number.isFinite(pcOffset) || pcOffset < -GEOMETRY_EPSILON) {
       return {
         ok: false,
-        warning: `Opening ${opening.id} 轉換到 room wall offset 時超出範圍，已略過。`
+        warning: `門窗「${getOpeningDisplayName(opening.id)}」轉換到空間牆段時位置超出範圍，已略過。`
       };
     }
 
@@ -1850,12 +2670,62 @@
     renderWalls();
     renderOpenings();
     renderZones();
+    renderFurniture();
     renderWallGraph();
     renderCalibration();
+    applyLayerVisibility();
     renderCanvasHelper();
     renderInspector();
     renderStatusLabels();
     syncStaticControls();
+  }
+
+  function updateLayerVisibility(input) {
+    const layerKey = input.dataset.field.replace("layer-visibility-", "");
+    if (!Object.prototype.hasOwnProperty.call(uiState.layerVisibility, layerKey)) {
+      return;
+    }
+    pushHistory("切換圖層顯示");
+    uiState.layerVisibility[layerKey] = Boolean(input.checked);
+    uiState.message = `${getLayerVisibilityLabel(layerKey)}圖層已${input.checked ? "顯示" : "隱藏"}。`;
+    uiState.error = "";
+    render();
+  }
+
+  function applyLayerVisibility() {
+    const visibility = { ...createInitialLayerVisibility(), ...uiState.layerVisibility };
+    setLayerElementVisibility(underlayLayer, visibility.underlay);
+    setLayerElementVisibility(wallLayer, visibility.walls);
+    setLayerElementVisibility(openingLayer, visibility.openings);
+    setLayerElementVisibility(zonePolygonLayer, visibility.zones);
+    setLayerElementVisibility(wallGraphLayer, visibility.diagnostics);
+    zoneLayer.querySelectorAll(".zone-label").forEach((element) => {
+      setLayerElementVisibility(element, visibility.zones);
+    });
+    zoneLayer.querySelectorAll(".furniture-item").forEach((element) => {
+      setLayerElementVisibility(element, visibility.furniture);
+    });
+  }
+
+  function setLayerElementVisibility(element, isVisible) {
+    if (!element) {
+      return;
+    }
+    element.hidden = !isVisible;
+    element.style.display = isVisible ? "" : "none";
+    element.setAttribute("aria-hidden", isVisible ? "false" : "true");
+  }
+
+  function getLayerVisibilityLabel(layerKey) {
+    const labels = {
+      underlay: "底圖",
+      walls: "牆體",
+      openings: "門窗開口",
+      zones: "空間",
+      furniture: "家具 / 櫃體",
+      diagnostics: "診斷"
+    };
+    return labels[layerKey] || layerKey;
   }
 
   function renderUnderlay() {
@@ -1946,6 +2816,7 @@
   function renderWalls() {
     wallLayer.replaceChildren();
     setSvgViewport(wallLayer);
+    ensureWallPatternDefs();
     canvas.classList.toggle("is-drawing-wall", uiState.mode === "draw-wall");
 
     if (!hasValidScale()) {
@@ -2061,6 +2932,7 @@
   function renderZones() {
     zoneLayer.replaceChildren();
     canvas.classList.toggle("is-placing-zone", uiState.mode === "place-zone");
+    canvas.classList.toggle("is-placing-furniture", uiState.mode === "place-furniture");
     canvas.classList.toggle("is-editing-zone-boundary", uiState.mode === "edit-zone-boundary");
 
     if (!hasValidScale()) {
@@ -2081,6 +2953,112 @@
         event.preventDefault();
         event.stopPropagation();
         selectZone(zone.id);
+      });
+      zoneLayer.appendChild(button);
+    });
+  }
+
+  function startFurniturePointerInteraction(event, furnitureId) {
+    const item = project.furniture.find((entry) => entry.id === furnitureId);
+    if (!item || !hasValidScale()) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    pushHistory(event.target.closest(".furniture-resize-handle") ? "調整家具 / 櫃體尺寸" : "移動家具 / 櫃體");
+    const startPoint = roundPoint(pxToMmPoint(getCanvasPoint(event)));
+    furniturePointerState = {
+      id: item.id,
+      mode: event.target.closest(".furniture-resize-handle") ? "resize" : "drag",
+      startPoint,
+      startX: item.x,
+      startY: item.y,
+      startWidth: item.widthMm,
+      startDepth: item.depthMm
+    };
+    uiState.selectedFurnitureId = item.id;
+    uiState.selectedWallId = null;
+    uiState.selectedEdgeId = null;
+    uiState.selectedOpeningId = null;
+    uiState.selectedZoneId = null;
+    window.addEventListener("pointermove", handleFurniturePointerMove);
+    window.addEventListener("pointerup", endFurniturePointerInteraction, { once: true });
+    render();
+  }
+
+  function handleFurniturePointerMove(event) {
+    if (!furniturePointerState || !hasValidScale()) {
+      return;
+    }
+    const item = project.furniture.find((entry) => entry.id === furniturePointerState.id);
+    if (!item) {
+      return;
+    }
+    event.preventDefault();
+    const currentPoint = roundPoint(pxToMmPoint(getCanvasPoint(event)));
+    const dx = currentPoint.x - furniturePointerState.startPoint.x;
+    const dy = currentPoint.y - furniturePointerState.startPoint.y;
+    if (furniturePointerState.mode === "resize") {
+      item.widthMm = Math.max(MIN_FURNITURE_WIDTH_MM, Math.round(furniturePointerState.startWidth + dx));
+      item.depthMm = Math.max(MIN_FURNITURE_DEPTH_MM, Math.round(furniturePointerState.startDepth + dy));
+    } else {
+      item.x = Math.max(0, Math.round(furniturePointerState.startX + dx));
+      item.y = Math.max(0, Math.round(furniturePointerState.startY + dy));
+    }
+    item.budgetCandidate = true;
+    item.productionReady = false;
+    item.notFormalEstimate = true;
+    item.updatedAt = new Date().toISOString();
+    render();
+  }
+
+  function endFurniturePointerInteraction() {
+    if (furniturePointerState) {
+      const item = project.furniture.find((entry) => entry.id === furniturePointerState.id);
+      uiState.message = item
+        ? `已${furniturePointerState.mode === "resize" ? "調整尺寸" : "移動"}「${item.name}」。仍為候選草稿。`
+        : "";
+    }
+    furniturePointerState = null;
+    window.removeEventListener("pointermove", handleFurniturePointerMove);
+    syncBridge();
+    render();
+  }
+
+  function renderFurniture() {
+    if (!hasValidScale()) {
+      return;
+    }
+
+    project.furniture.forEach((item) => {
+      const center = mmToPxPoint({ x: item.x, y: item.y });
+      const widthPx = Math.max(24, Number(item.widthMm) * project.scale.pxPerMm);
+      const depthPx = Math.max(18, Number(item.depthMm) * project.scale.pxPerMm);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `furniture-item${item.id === uiState.selectedFurnitureId ? " is-selected" : ""}`;
+      button.style.left = `${center.x - widthPx / 2}px`;
+      button.style.top = `${center.y - depthPx / 2}px`;
+      button.style.width = `${widthPx}px`;
+      button.style.height = `${depthPx}px`;
+      button.style.transform = `rotate(${Number(item.rotation) || 0}deg)`;
+      button.dataset.furnitureId = item.id;
+      button.title = `${item.name} / ${item.widthMm} x ${item.depthMm} mm`;
+      button.innerHTML = `
+        <span class="furniture-label">
+          <strong>${escapeHTML(item.name)}</strong>
+          <span>${escapeHTML(getFurnitureTypeLabel(item.type))} / ${formatNumber(item.widthMm)} x ${formatNumber(item.depthMm)} mm</span>
+        </span>
+        <span class="furniture-resize-handle furniture-resize-handle--inside" title="拖曳調整尺寸" aria-label="拖曳調整尺寸"></span>
+        <span class="furniture-resize-handle furniture-resize-handle--corner" title="拖曳角落調整尺寸" aria-label="拖曳角落調整尺寸"></span>
+      `;
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        selectFurniture(item.id);
+      });
+      button.addEventListener("pointerdown", (event) => {
+        startFurniturePointerInteraction(event, item.id);
       });
       zoneLayer.appendChild(button);
     });
@@ -2164,10 +3142,26 @@
     wallGraphLayer.appendChild(marker);
   }
 
+  function ensureWallPatternDefs() {
+    const defs = document.createElementNS(SVG_NS, "defs");
+    defs.innerHTML = `
+      <pattern id="wall-hatch-single" patternUnits="userSpaceOnUse" width="14" height="14" patternTransform="rotate(45)">
+        <rect width="14" height="14" fill="#8E8E8E"></rect>
+        <path d="M 0 0 L 0 14" stroke="#F5F5F5" stroke-width="3" opacity="0.72"></path>
+      </pattern>
+      <pattern id="wall-hatch-double" patternUnits="userSpaceOnUse" width="16" height="16" patternTransform="rotate(45)">
+        <rect width="16" height="16" fill="#8E8E8E"></rect>
+        <path d="M 0 0 L 0 16 M 7 0 L 7 16" stroke="#F5F5F5" stroke-width="2.5" opacity="0.74"></path>
+      </pattern>
+    `;
+    wallLayer.appendChild(defs);
+  }
+
   function renderWall(wall) {
     const from = mmToPxPoint(wall.from);
     const to = mmToPxPoint(wall.to);
     const strokeWidth = getWallStrokeWidth(wall);
+    const wallType = normalizeWallType(wall.wallType);
     const isSelected = wall.id === uiState.selectedWallId;
     const isIssueHighlighted = isWallInSelectedIssue(wall.id);
     const isBoundaryHighlighted = isWallInActiveBoundary(wall.id);
@@ -2178,8 +3172,10 @@
       wallLayer.appendChild(outline);
     }
 
-    const visibleLine = createSvgLine(`wall-line wall-${wall.status}${isSelected || isIssueHighlighted ? " is-selected" : ""}${isBoundaryHighlighted ? " is-boundary" : ""}`, from, to);
+    const visibleLine = createSvgLine(`wall-line wall-${wall.status} wall-type-${wallType}${isSelected || isIssueHighlighted ? " is-selected" : ""}${isBoundaryHighlighted ? " is-boundary" : ""}`, from, to);
     visibleLine.setAttribute("stroke-width", String(strokeWidth));
+    visibleLine.dataset.wallType = wallType;
+    visibleLine.dataset.wallStatus = normalizeWallStatus(wall.status);
     wallLayer.appendChild(visibleLine);
 
     const hitTarget = createSvgLine("wall-hit-target", from, to);
@@ -2304,7 +3300,7 @@
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
           <b>請先匯入業主提供的丈量圖</b>
-          建立 Plancraft+ 底圖基準後，再進行比例校正與牆體描繪。
+          JPG / PNG 可預覽；PDF 請先轉成圖片。檔名若含寬度、高度或 mm 線索，系統會提出比例建議，否則用兩點校正。
         </div>
       `;
       return;
@@ -2340,24 +3336,35 @@
       return;
     }
 
+    if (uiState.mode === "place-furniture") {
+      const template = getFurnitureTemplate(uiState.currentFurnitureTemplateId);
+      canvasHelper.innerHTML = `
+        <div class="canvas-helper-card">
+          <b>加入家具 / 櫃體</b>
+          請在畫布上點一下放置「${escapeHTML(template.name)}」。放好後可拖曳移動、拉控制點調尺寸，右側屬性面板可改寬度、深度、材料與備註。
+        </div>
+      `;
+      return;
+    }
+
     if (uiState.mode === "edit-zone-boundary") {
       const draft = getZoneBoundaryState();
       const openMessage = hasBoundaryIssueType(draft.issues, "zone-boundary-open")
         ? "目前邊界尚未形成封閉空間"
-        : "邊界已可能封閉，可套用到目前 zone";
+        : "邊界已可能封閉，可套用到目前空間";
       canvasHelper.innerHTML = `
         <div class="canvas-helper-card">
-          <b>Zone Boundary</b>
+          <b>空間邊界</b>
           ${escapeHTML(uiState.message || openMessage)}
         </div>
       `;
       return;
     }
 
-    const helperTitle = project.scale.calibrated ? "比例已校正" : "請用圖面上的已知尺寸校正比例";
+    const helperTitle = project.scale.calibrated ? "比例已確認" : "等待比例確認";
     const helperText = uiState.message || (project.scale.calibrated
-      ? `${getScaleReadout()}。可描牆、整理節點、標示門窗，或放置空間標籤。`
-      : "點選「校正比例」，再於圖面上點兩個已知尺寸端點。");
+      ? `${getScaleReadout()}。可描牆、自動接牆、標示門窗，或放置空間標籤。`
+      : "匯入圖面後，系統會先檢查檔名尺寸線索；線索不足時，請用「校正比例」兩點確認。");
 
     canvasHelper.innerHTML = `
       <div class="canvas-helper-card">
@@ -2368,147 +3375,339 @@
   }
 
   function renderInspector() {
+    const selectedFurniture = getSelectedFurniture();
     const selectedZone = getSelectedZone();
     const selectedOpening = getSelectedOpening();
     const selectedWall = getSelectedWall();
     const styleVisualPanel = renderStyleVisualPanel();
     const bridgePanel = `${renderBridgeCard()}${renderPcConverterReportCard()}${renderRendererPreviewReportCard()}`;
-    if (selectedZone) {
+    const exportPreviewPanel = renderCandidateExportPreviewCard();
+    const layerVisibilityPanel = renderLayerVisibilityCard();
+    const diagnosticsPanel = renderInspectorDiagnosticsPanel(bridgePanel, styleVisualPanel);
+    const selectedPropertyCard =
+      selectedFurniture ? renderSelectedFurnitureCard(selectedFurniture) :
+      selectedZone ? renderSelectedZoneCard(selectedZone) :
+      selectedOpening ? renderSelectedOpeningCard(selectedOpening) :
+      selectedWall ? renderSelectedWallCard(selectedWall) :
+      renderNoSelectionPropertyCard();
+    const tabs = renderInspectorTabStrip();
+    const messageBlocks = renderMessageBlocks(!project.importSource?.previewSupported && project.importSource ? PDF_NOT_SUPPORTED_MESSAGE : "");
+
+    if (uiState.inspectorTab === "layers") {
       inspectorBody.innerHTML = `
-        ${renderSelectedZoneCard(selectedZone)}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
-        ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${tabs}
+        ${layerVisibilityPanel}
+        ${renderImportSourceCardIfAvailable()}
+        ${messageBlocks}
       `;
       return;
     }
 
-    if (selectedOpening) {
+    if (uiState.inspectorTab === "reminders") {
       inspectorBody.innerHTML = `
-        ${renderSelectedOpeningCard(selectedOpening)}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
-        ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
-      `;
-      return;
-    }
-
-    if (selectedWall) {
-      inspectorBody.innerHTML = `
-        ${renderSelectedWallCard(selectedWall)}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
-        ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
-      `;
-      return;
-    }
-
-    if (!project.importSource) {
-      inspectorBody.innerHTML = `
-        <section class="empty-state">
-          <h2>Plancraft+ 匯入狀態：尚未匯入</h2>
-          <p>比例狀態：尚未校正。下一步請先匯入 JPG 或 PNG 丈量圖。</p>
-        </section>
+        ${tabs}
+        ${renderReminderTodoCard()}
         ${renderWallWorkflowCard()}
         ${renderZoneWorkflowCard()}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
-        ${renderMessageBlocks()}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${messageBlocks}
       `;
       return;
     }
 
-    if (!project.importSource.previewSupported) {
+    if (uiState.inspectorTab === "materials") {
       inspectorBody.innerHTML = `
-        ${renderImportSourceCard()}
-        ${renderWallGraphCard()}
-        ${renderNodeGraphCard()}
-        ${renderMessageBlocks(PDF_NOT_SUPPORTED_MESSAGE)}
-        ${bridgePanel}
-        ${styleVisualPanel}
+        ${tabs}
+        ${renderMaterialInspectorPanel(selectedFurniture)}
+        ${selectedFurniture ? renderSelectedFurnitureCard(selectedFurniture) : ""}
+        ${messageBlocks}
+      `;
+      return;
+    }
+
+    if (uiState.inspectorTab === "overview") {
+      inspectorBody.innerHTML = `
+        ${tabs}
+        ${renderOverviewInspectorPanel()}
+        ${renderImportSourceCardIfAvailable()}
+        ${project.underlay ? renderUnderlayControls() : ""}
+        ${renderAutoScaleSuggestionCard()}
+        ${renderScaleCard()}
+        ${renderFurnitureWorkflowCard()}
+        ${exportPreviewPanel}
+        ${messageBlocks}
+        ${diagnosticsPanel}
       `;
       return;
     }
 
     inspectorBody.innerHTML = `
-      ${renderImportSourceCard()}
-      ${renderUnderlayControls()}
-      ${renderScaleCard()}
-      ${renderWallWorkflowCard()}
-      ${renderZoneWorkflowCard()}
-      ${renderWallGraphCard()}
-      ${renderNodeGraphCard()}
-      ${renderMessageBlocks()}
-      ${bridgePanel}
-      ${styleVisualPanel}
-      <div class="inline-message">草稿包含底圖資料，檔案可能較大。</div>
+      ${tabs}
+      ${selectedPropertyCard}
+      ${messageBlocks}
+    `;
+  }
+
+  function renderInspectorTabStrip() {
+    const tabs = [
+      ["properties", "屬性"],
+      ["layers", "圖層"],
+      ["reminders", "提醒"],
+      ["materials", "材料"],
+      ["overview", "總覽"]
+    ];
+    const current = uiState.inspectorTab || "properties";
+    return `
+      <nav class="inspector-tab-strip" aria-label="右側屬性面板分頁">
+        ${tabs.map(([key, label]) => (
+          `<button class="inspector-tab${current === key ? " is-active" : ""}" type="button" data-action="set-inspector-tab" data-inspector-tab="${key}">${label}</button>`
+        )).join("")}
+      </nav>
+    `;
+  }
+
+  function renderNoSelectionPropertyCard() {
+    if (!project.importSource) {
+      return `
+        <section class="empty-state">
+          <h2>尚未選取物件</h2>
+          <p>請先匯入 JPG 或 PNG 丈量圖。匯入後系統會先檢查檔名尺寸線索；沒有線索時用兩點校正，再開始畫牆與加入物件。</p>
+        </section>
+      `;
+    }
+
+    if (!project.importSource.previewSupported) {
+      return `
+        <section class="empty-state">
+          <h2>尚未選取物件</h2>
+          <p>目前檔案只能保留為候選來源，請改匯入 JPG 或 PNG 後再進行畫布操作。</p>
+        </section>
+      `;
+    }
+
+    return `
+      <section class="empty-state">
+        <h2>尚未選取物件</h2>
+        <p>請點選牆、門窗、空間標籤、家具或櫃體，這裡只顯示該物件的尺寸、材料、備註與刪除操作。</p>
+      </section>
+      <div class="inspector-compact-note">像 PPT 一樣操作：選取物件後，畫布會高亮，右側會顯示可修改欄位。</div>
+    `;
+  }
+
+  function renderImportSourceCardIfAvailable() {
+    return project.importSource ? renderImportSourceCard() : "";
+  }
+
+  function renderReminderTodoCard() {
+    const reminders = [];
+    if (!project.importSource) {
+      reminders.push("匯入 JPG 或 PNG 丈量圖");
+    }
+    if (project.importSource && !project.scale.calibrated) {
+      reminders.push("確認檔名比例線索，必要時用兩點校正");
+    }
+    if (!project.walls.length) {
+      reminders.push("畫出主要外牆與內牆");
+    }
+    if (!project.openings.length) {
+      reminders.push("在選取牆段上新增門、窗或開口");
+    }
+    if (!project.zones.length) {
+      reminders.push("加入客廳、臥室、浴室等空間標籤");
+    }
+    if (!project.furniture.length) {
+      reminders.push("放置櫃體、廚具、衛浴或活動家具");
+    }
+    if (project.furniture.some((item) => !item.materialTags?.length || item.materialTags.includes("unspecified"))) {
+      reminders.push("確認家具 / 櫃體材料");
+    }
+    if (!reminders.length) {
+      reminders.push("目前沒有明顯缺漏，請用總覽確認候選草稿邊界。");
+    }
+
+    return `
+      <section class="status-card" aria-label="平面拼圖提醒待辦">
+        <b>提醒待辦</b>
+        <div class="draft-list">
+          ${reminders.map((item) => `<div class="draft-item">□ ${escapeHTML(item)}</div>`).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderMaterialInspectorPanel(selectedFurniture) {
+    const currentMaterial = selectedFurniture?.materialTags?.[0] || uiState.currentFurnitureMaterialTag;
+    return `
+      <section class="status-card" aria-label="材料設定">
+        <b>材料</b>
+        <div class="field-grid">
+          <div class="field-row full">
+            <label for="inspector-current-material">材料</label>
+            <select id="inspector-current-material" data-field="current-furniture-material">
+              ${renderFurnitureMaterialOptions(currentMaterial)}
+            </select>
+          </div>
+        </div>
+        <div class="inspector-actions" style="margin-top: 12px;">
+          <button class="secondary-btn" type="button" data-action="apply-current-furniture-material" ${selectedFurniture ? "" : "disabled"}>套用到選取物件</button>
+        </div>
+        <div class="inspector-compact-note">
+          ${selectedFurniture
+            ? `目前選取「${escapeHTML(selectedFurniture.name)}」。材料只會寫入候選草稿，不會進正式估價。`
+            : "請先選取家具、櫃體、廚具或衛浴設備，再套用材料。"}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderOverviewInspectorPanel() {
+    const calibrated = project.scale.calibrated;
+    const canDraft = project.importSource && project.importSource.previewSupported && calibrated;
+    const budgetCandidateCount = project.furniture.filter((item) => item.budgetCandidate).length;
+    return `
+      <section class="status-card" aria-label="平面拼圖總覽">
+        <b>總覽</b>
+        <div class="status-grid">
+          <div class="status-row"><span>底圖</span><span>${project.importSource ? "已匯入" : "尚未匯入"}</span></div>
+          <div class="status-row"><span>比例</span><span>${calibrated ? "已確認" : "待比例確認"}</span></div>
+          <div class="status-row"><span>牆段</span><span>${project.walls.length}</span></div>
+          <div class="status-row"><span>門窗 / 開口</span><span>${project.openings.length}</span></div>
+          <div class="status-row"><span>空間標籤</span><span>${project.zones.length}</span></div>
+          <div class="status-row"><span>預算候選物件</span><span>${budgetCandidateCount}</span></div>
+          <div class="status-row"><span>下一步</span><span>${canDraft ? "可繼續畫牆、放物件或匯出候選 JSON" : "先完成匯入與比例確認"}</span></div>
+        </div>
+        <div class="inspector-compact-note">所有輸出仍是候選草稿；不是施工圖、不是正式估價，也不會呼叫預算引擎。</div>
+      </section>
+    `;
+  }
+
+  function renderInspectorDiagnosticsPanel(bridgePanel, styleVisualPanel) {
+    return `
+      <details class="status-card" data-testid="geometry-diagnostics-panel">
+        <summary>進階檢查：接牆與斷點</summary>
+        ${renderWallGraphCard()}
+        ${renderNodeGraphCard()}
+      </details>
+      <details class="status-card" data-testid="plancraft-diagnostics-panel">
+        <summary>進階輸出檢查：候選檔案 / 圖面預覽</summary>
+        ${bridgePanel}
+      </details>
+      <details class="status-card" data-testid="style-visual-diagnostics-panel">
+        <summary>風格示意診斷</summary>
+        ${styleVisualPanel}
+      </details>
+    `;
+  }
+
+  function renderCandidateExportPreviewCard() {
+    const preview = uiState.lastDraftExportPreview;
+    if (!preview) {
+      return "";
+    }
+    const isStale = preview.stateSignature !== createDraftStateSignature();
+    const previewStatus = isStale ? "stale_after_edits" : "current";
+    const previewMessage = isStale
+      ? "預覽已不是最新。交接前請再按一次「匯出候選 JSON」。"
+      : "目前預覽為最新草稿。下載仍為候選草稿用途，不產生正式估價，也不呼叫預算引擎。";
+    return `
+      <section class="status-card" data-testid="candidate-export-preview">
+        <b>候選 JSON 預覽</b>
+        <div class="status-grid">
+          <div class="status-row"><span>檔名</span><span>${escapeHTML(preview.fileName)}</span></div>
+          <div class="status-row"><span>預覽狀態</span><span>${isStale ? "需重新匯出" : "最新"}</span></div>
+          <div class="status-row"><span>建立時間</span><span>${escapeHTML(preview.generatedAt)}</span></div>
+          <div class="status-row"><span>牆段</span><span>${preview.wallCount}</span></div>
+          <div class="status-row"><span>門窗開口</span><span>${preview.openingCount}</span></div>
+          <div class="status-row"><span>空間標籤</span><span>${preview.zoneCount}</span></div>
+          <div class="status-row"><span>未封閉邊界</span><span>${preview.openZoneBoundaryCount}</span></div>
+          <div class="status-row"><span>家具 / 櫃體</span><span>${preview.furnitureCount}</span></div>
+          <div class="status-row"><span>工具目錄項目</span><span>${preview.toolCatalogItemCount}</span></div>
+          <div class="status-row"><span>版面物件</span><span>${preview.layoutObjectCount}</span></div>
+          <div class="status-row"><span>材料</span><span>${preview.hasMaterialTags ? "已填" : "未填"}</span></div>
+          <div class="status-row"><span>正式估價</span><span>${preview.formalEstimate ? "是" : "否"}</span></div>
+          <div class="status-row"><span>呼叫預算引擎</span><span>${preview.budgetEngineCalled ? "是" : "否"}</span></div>
+          <div class="status-row"><span>可作正式成果</span><span>${preview.productionReady ? "是" : "否"}</span></div>
+        </div>
+        <pre class="project-readout" data-testid="candidate-export-json-preview">${escapeHTML(preview.jsonPreview)}</pre>
+        <div class="inline-message">${escapeHTML(previewMessage)}</div>
+      </section>
     `;
   }
 
   function renderSelectedWallCard(wall) {
     const edge = getEdgeForWall(wall.id);
+    const wallType = normalizeWallType(wall.wallType);
+    const wallDisplayName = getWallDisplayName(wall.id);
     return `
       <form class="inspector-form" aria-label="牆體屬性表單">
         <div class="status-card">
           <b>選取牆體</b>
           <div class="status-grid">
-            <div class="status-row"><span>ID</span><span>${escapeHTML(wall.id)}</span></div>
+            <div class="status-row"><span>編號</span><span>${escapeHTML(wallDisplayName)}</span></div>
             <div class="status-row"><span>長度</span><span>${formatNumber(getDistance(wall.from, wall.to))} mm</span></div>
-            <div class="status-row"><span>edgeId</span><span>${edge ? escapeHTML(edge.id) : "-"}</span></div>
-            <div class="status-row"><span>edge length</span><span>${edge ? `${formatNumber(edge.length)} mm` : "-"}</span></div>
-            <div class="status-row"><span>updatedAt</span><span>${escapeHTML(wall.updatedAt)}</span></div>
+            <div class="status-row"><span>狀態</span><span>${escapeHTML(getWallStatusLabel(wall.status))}</span></div>
+            <div class="status-row"><span>分類</span><span>${escapeHTML(getWallTypeLabel(wallType))}</span></div>
+            <div class="status-row"><span>分類說明</span><span>${escapeHTML(getWallTypeDetail(wallType))}</span></div>
+            <div class="status-row"><span>依附牆線</span><span>${edge ? "已連結" : "-"}</span></div>
+            <div class="status-row"><span>牆段長度</span><span>${edge ? `${formatNumber(edge.length)} mm` : "-"}</span></div>
+            <div class="status-row"><span>更新時間</span><span>${escapeHTML(wall.updatedAt)}</span></div>
+          </div>
+          <div class="inspector-actions" style="margin-top: 12px;">
+            <button class="danger-btn" type="button" data-action="delete-wall">刪除牆體</button>
+            <button class="secondary-btn" type="button" data-action="add-opening" data-opening-kind="door">新增門</button>
+            <button class="secondary-btn" type="button" data-action="add-opening" data-opening-kind="window">新增窗</button>
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row full">
-            <label for="selected-wall-status">Status</label>
+            <label for="selected-wall-status">牆體狀態</label>
             <select id="selected-wall-status" data-field="selected-wall-status">
               ${renderStatusOption("existing", wall.status)}
               ${renderStatusOption("new", wall.status)}
               ${renderStatusOption("demolished", wall.status)}
             </select>
           </div>
-          <div class="field-row">
-            <label for="selected-wall-thickness">Thickness</label>
-            <input id="selected-wall-thickness" data-field="selected-wall-thickness" type="number" min="${MIN_WALL_THICKNESS}" max="${MAX_WALL_THICKNESS}" step="1" value="${wall.thickness}">
+          <div class="field-row full">
+            <label for="selected-wall-type">牆體分類</label>
+            <select id="selected-wall-type" data-field="selected-wall-type">
+              ${renderWallTypeOptions(wallType)}
+            </select>
           </div>
+          <div class="field-row">
+            <label for="selected-wall-thickness">牆厚</label>
+            <select id="selected-wall-thickness" data-field="selected-wall-thickness">
+              ${renderWallThicknessOptions(wall.thickness)}
+            </select>
+          </div>
+          <div class="inline-message full">${escapeHTML(WALL_THICKNESS_HELP_TEXT)}</div>
           <label class="toggle-row" for="selected-wall-structural" style="align-self:end; min-height:42px;">
-            <span>Structural</span>
+            <span>結構牆</span>
             <input id="selected-wall-structural" data-field="selected-wall-structural" type="checkbox" ${wall.structural ? "checked" : ""}>
           </label>
           <div class="field-row">
-            <label for="selected-wall-from-x">From X</label>
+            <label for="selected-wall-from-x">起點 X</label>
             <input id="selected-wall-from-x" data-field="selected-wall-from-x" type="number" step="1" value="${wall.from.x}">
           </div>
           <div class="field-row">
-            <label for="selected-wall-from-y">From Y</label>
+            <label for="selected-wall-from-y">起點 Y</label>
             <input id="selected-wall-from-y" data-field="selected-wall-from-y" type="number" step="1" value="${wall.from.y}">
           </div>
           <div class="field-row">
-            <label for="selected-wall-to-x">To X</label>
+            <label for="selected-wall-to-x">終點 X</label>
             <input id="selected-wall-to-x" data-field="selected-wall-to-x" type="number" step="1" value="${wall.to.x}">
           </div>
           <div class="field-row">
-            <label for="selected-wall-to-y">To Y</label>
+            <label for="selected-wall-to-y">終點 Y</label>
             <input id="selected-wall-to-y" data-field="selected-wall-to-y" type="number" step="1" value="${wall.to.y}">
           </div>
         </div>
         <div class="project-readout">
-          牆體座標以 mm 儲存，畫面顯示時才依 pxPerMm 轉換成 SVG 座標。
+          牆體座標以毫米儲存；畫面會依目前比例顯示，不需要使用者理解工程係數。
         </div>
         <div class="inspector-actions">
           <button class="danger-btn" type="button" data-action="delete-wall">刪除牆體</button>
           <button class="secondary-btn" type="button" data-action="add-opening" data-opening-kind="door">新增門</button>
           <button class="secondary-btn" type="button" data-action="add-opening" data-opening-kind="window">新增窗</button>
-          <button class="secondary-btn" type="button" data-action="clean-wall-endpoints">整理端點</button>
+          <button class="secondary-btn" type="button" data-action="clean-wall-endpoints">自動接牆</button>
           <button class="secondary-btn" type="button" data-action="set-select-mode">取消選取</button>
         </div>
       </form>
@@ -2517,6 +3716,7 @@
 
   function renderSelectedZoneCard(zone) {
     ensureZoneBoundaryFields(zone);
+    const zoneDisplayName = getZoneDisplayName(zone.id);
     const boundaryDraft = getZoneBoundaryState();
     const isEditingBoundary = uiState.mode === "edit-zone-boundary" && boundaryDraft.activeZoneId === zone.id;
     const displayEdgeIds = isEditingBoundary ? boundaryDraft.selectedBoundaryEdgeIds : zone.boundaryEdgeIds;
@@ -2528,52 +3728,52 @@
     const boundaryIssues = isEditingBoundary ? displayDraft.issues : zone.boundaryIssues || displayDraft.issues;
     const boundaryIssueText = boundaryIssues.length
       ? `<div class="issue-list">${boundaryIssues.map(renderZoneBoundaryIssue).join("")}</div>`
-      : `<div class="inline-message">目前沒有 zone boundary issue。</div>`;
+      : `<div class="inline-message">目前沒有空間邊界問題。</div>`;
     return `
       <form class="inspector-form" aria-label="空間標籤屬性表單">
         <div class="status-card">
           <b>選取空間標籤</b>
           <div class="status-grid">
-            <div class="status-row"><span>ID</span><span>${escapeHTML(zone.id)}</span></div>
-            <div class="status-row"><span>type</span><span>${escapeHTML(zone.type)}</span></div>
-            <div class="status-row"><span>boundaryEdgeIds</span><span>${displayEdgeIds.length}</span></div>
-            <div class="status-row"><span>boundaryWallIds</span><span>${zone.boundaryWallIds.length}</span></div>
-            <div class="status-row"><span>polygon 點數</span><span>${(isEditingBoundary ? displayDraft.previewPolygon : zone.polygon).length}</span></div>
-            <div class="status-row"><span>boundary 狀態</span><span>${escapeHTML(boundaryStatusText)}</span></div>
-            <div class="status-row"><span>area</span><span>${zone.area === null ? "尚未計算" : `${formatNumber(zone.area)} mm²`}</span></div>
-            <div class="status-row"><span>updatedAt</span><span>${escapeHTML(zone.updatedAt)}</span></div>
+            <div class="status-row"><span>編號</span><span>${escapeHTML(zoneDisplayName)}</span></div>
+            <div class="status-row"><span>空間類型</span><span>${escapeHTML(getZoneTypeLabel(zone.type))}</span></div>
+            <div class="status-row"><span>邊界線段</span><span>${displayEdgeIds.length}</span></div>
+            <div class="status-row"><span>邊界牆段</span><span>${zone.boundaryWallIds.length}</span></div>
+            <div class="status-row"><span>邊界點數</span><span>${(isEditingBoundary ? displayDraft.previewPolygon : zone.polygon).length}</span></div>
+            <div class="status-row"><span>邊界狀態</span><span>${escapeHTML(boundaryStatusText)}</span></div>
+            <div class="status-row"><span>面積</span><span>${zone.area === null ? "尚未計算" : `${formatNumber(zone.area)} mm²`}</span></div>
+            <div class="status-row"><span>更新時間</span><span>${escapeHTML(zone.updatedAt)}</span></div>
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row full">
-            <label for="selected-zone-name">Name</label>
+            <label for="selected-zone-name">名稱</label>
             <input id="selected-zone-name" data-field="selected-zone-name" type="text" value="${escapeAttribute(zone.name)}">
           </div>
           <div class="field-row full">
-            <label for="selected-zone-type">Type</label>
+            <label for="selected-zone-type">類型</label>
             <select id="selected-zone-type" data-field="selected-zone-type">
               ${renderZoneTypeOptions(zone.type)}
             </select>
           </div>
           <div class="field-row">
-            <label for="selected-zone-x">Label X</label>
+            <label for="selected-zone-x">標籤 X</label>
             <input id="selected-zone-x" data-field="selected-zone-x" type="number" min="0" step="1" value="${zone.labelPosition.x}">
           </div>
           <div class="field-row">
-            <label for="selected-zone-y">Label Y</label>
+            <label for="selected-zone-y">標籤 Y</label>
             <input id="selected-zone-y" data-field="selected-zone-y" type="number" min="0" step="1" value="${zone.labelPosition.y}">
           </div>
         </div>
         <div class="project-readout">
-          Zone labelPosition 與 boundary polygon 都使用 mm 座標；area 本輪仍維持 null。
+          空間標籤與邊界都使用 mm 座標；面積若尚未封閉會維持未計算。
         </div>
         <div class="status-card">
-          <b>Zone Boundary</b>
+          <b>空間邊界</b>
           <div class="status-grid">
             <div class="status-row"><span>編輯模式</span><span>${isEditingBoundary ? "編輯中" : "未啟動"}</span></div>
-            <div class="status-row"><span>目前選取 edge</span><span>${displayEdgeIds.length}</span></div>
-            <div class="status-row"><span>boundaryWallIds</span><span>${zone.boundaryWallIds.length}</span></div>
-            <div class="status-row"><span>polygon 點數</span><span>${(isEditingBoundary ? displayDraft.previewPolygon : zone.polygon).length}</span></div>
+            <div class="status-row"><span>目前選取邊界</span><span>${displayEdgeIds.length}</span></div>
+            <div class="status-row"><span>邊界牆段</span><span>${zone.boundaryWallIds.length}</span></div>
+            <div class="status-row"><span>邊界點數</span><span>${(isEditingBoundary ? displayDraft.previewPolygon : zone.polygon).length}</span></div>
           </div>
           <div class="inspector-actions" style="margin-top: 12px;">
             <button class="secondary-btn" type="button" data-action="start-zone-boundary">編輯邊界</button>
@@ -2592,23 +3792,28 @@
 
   function renderSelectedOpeningCard(opening) {
     const edge = getEdgeById(opening.edgeId);
-    const validation = edge ? validateOpening(opening, edge) : { valid: false, error: "找不到 opening 依附的 edge。" };
+    const validation = edge ? validateOpening(opening, edge) : { valid: false, error: "找不到這個門窗依附的牆線，請重新選取牆體。" };
+    const sourceWallName = opening.sourceWallId ? getWallDisplayName(opening.sourceWallId) : "-";
     return `
       <form class="inspector-form" aria-label="開口屬性表單">
         <div class="status-card">
-          <b>選取開口</b>
+          <b>選取門窗 / 開口</b>
           <div class="status-grid">
-            <div class="status-row"><span>ID</span><span>${escapeHTML(opening.id)}</span></div>
-            <div class="status-row"><span>kind</span><span>${escapeHTML(opening.kind)}</span></div>
-            <div class="status-row"><span>edgeId</span><span>${escapeHTML(opening.edgeId)}</span></div>
-            <div class="status-row"><span>sourceWallId</span><span>${escapeHTML(opening.sourceWallId || "-")}</span></div>
-            <div class="status-row"><span>edge length</span><span>${edge ? `${formatNumber(edge.length)} mm` : "-"}</span></div>
-            <div class="status-row"><span>updatedAt</span><span>${escapeHTML(opening.updatedAt)}</span></div>
+            <div class="status-row"><span>編號</span><span>${escapeHTML(getOpeningDisplayName(opening.id))}</span></div>
+            <div class="status-row"><span>類型</span><span>${escapeHTML(getOpeningKindLabel(opening.kind))}</span></div>
+            <div class="status-row"><span>依附牆線</span><span>已連結</span></div>
+            <div class="status-row"><span>依附牆體</span><span>${escapeHTML(sourceWallName)}</span></div>
+            <div class="status-row"><span>牆段長度</span><span>${edge ? `${formatNumber(edge.length)} mm` : "-"}</span></div>
+            <div class="status-row"><span>更新時間</span><span>${escapeHTML(opening.updatedAt)}</span></div>
+          </div>
+          <div class="inspector-actions" style="margin-top: 12px;">
+            <button class="danger-btn" type="button" data-action="delete-opening">刪除開口</button>
+            <button class="secondary-btn" type="button" data-action="select-opening-wall">選取依附牆體</button>
           </div>
         </div>
         <div class="field-grid">
           <div class="field-row full">
-            <label for="selected-opening-kind">Kind</label>
+            <label for="selected-opening-kind">類型</label>
             <select id="selected-opening-kind" data-field="selected-opening-kind">
               ${renderOpeningKindOption("door", opening.kind)}
               ${renderOpeningKindOption("window", opening.kind)}
@@ -2616,15 +3821,15 @@
             </select>
           </div>
           <div class="field-row">
-            <label for="selected-opening-offset">Offset</label>
+            <label for="selected-opening-offset">牆上位置 mm</label>
             <input id="selected-opening-offset" data-field="selected-opening-offset" type="number" min="0" step="1" value="${opening.offset}">
           </div>
           <div class="field-row">
-            <label for="selected-opening-width">Width</label>
+            <label for="selected-opening-width">寬度 mm</label>
             <input id="selected-opening-width" data-field="selected-opening-width" type="number" min="${MIN_OPENING_WIDTH}" step="1" value="${opening.width}">
           </div>
           <div class="field-row full">
-            <label for="selected-opening-swing">Swing</label>
+            <label for="selected-opening-swing">門片方向</label>
             <select id="selected-opening-swing" data-field="selected-opening-swing">
               ${renderSwingOption("left", opening.swing)}
               ${renderSwingOption("right", opening.swing)}
@@ -2633,17 +3838,17 @@
             </select>
           </div>
           <div class="field-row">
-            <label for="selected-opening-sill-height">Sill Height</label>
+            <label for="selected-opening-sill-height">窗台高度 mm</label>
             <input id="selected-opening-sill-height" data-field="selected-opening-sill-height" type="number" min="0" step="1" value="${opening.sillHeight ?? ""}">
           </div>
           <div class="field-row">
-            <label for="selected-opening-height">Height</label>
+            <label for="selected-opening-height">高度 mm</label>
             <input id="selected-opening-height" data-field="selected-opening-height" type="number" min="0" step="1" value="${opening.height ?? ""}">
           </div>
         </div>
         ${validation.warning ? `<div class="inline-message">${escapeHTML(validation.warning)}</div>` : ""}
         <div class="project-readout">
-          開口依附 nodeGraph edge，offset / width 都以 mm 儲存，後續可供 Plancraft Bridge 轉換。
+          開口會依附在選取牆段上，牆上位置與寬度都以 mm 儲存，後續只作為候選草稿。
         </div>
         <div class="inspector-actions">
           <button class="danger-btn" type="button" data-action="delete-opening">刪除開口</button>
@@ -2653,12 +3858,74 @@
     `;
   }
 
+  function renderSelectedFurnitureCard(item) {
+    return `
+      <form class="inspector-form" aria-label="家具 / 櫃體候選物件屬性">
+        <div class="status-card">
+          <b>選取家具 / 櫃體</b>
+          <div class="status-grid">
+            <div class="status-row"><span>編號</span><span>${escapeHTML(getFurnitureDisplayName(item.id))}</span></div>
+            <div class="status-row"><span>項目類型</span><span>${escapeHTML(getFurnitureTypeLabel(item.type))}</span></div>
+            <div class="status-row"><span>分類</span><span>${escapeHTML(getFurnitureCategoryLabel(item.category))}</span></div>
+            <div class="status-row"><span>圖層</span><span>${escapeHTML(getLayerLabel(item.layer))}</span></div>
+            <div class="status-row"><span>預算候選</span><span>${item.budgetCandidate ? "是" : "否"}</span></div>
+            <div class="status-row"><span>正式成果</span><span>${item.productionReady ? "是" : "否"}</span></div>
+            <div class="status-row"><span>正式估價</span><span>${item.notFormalEstimate ? "否" : "是"}</span></div>
+          </div>
+          <div class="inspector-actions" style="margin-top: 12px;">
+            <button class="danger-btn" type="button" data-action="delete-furniture">刪除家具 / 櫃體</button>
+            <button class="secondary-btn" type="button" data-action="apply-current-furniture-material">套用目前材料</button>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-row full">
+            <label for="selected-furniture-name">項目名稱</label>
+            <input id="selected-furniture-name" data-field="selected-furniture-name" type="text" value="${escapeAttribute(item.name)}">
+          </div>
+          <div class="field-row">
+            <label for="selected-furniture-width">寬度 mm</label>
+            <input id="selected-furniture-width" data-field="selected-furniture-width" type="number" min="${MIN_FURNITURE_WIDTH_MM}" step="10" value="${item.widthMm}">
+          </div>
+          <div class="field-row">
+            <label for="selected-furniture-depth">深度 mm</label>
+            <input id="selected-furniture-depth" data-field="selected-furniture-depth" type="number" min="${MIN_FURNITURE_DEPTH_MM}" step="10" value="${item.depthMm}">
+          </div>
+          <div class="field-row">
+            <label for="selected-furniture-height">高度 mm</label>
+            <input id="selected-furniture-height" data-field="selected-furniture-height" type="number" min="0" step="10" value="${item.heightMm}">
+          </div>
+          <div class="field-row">
+            <label for="selected-furniture-rotation">旋轉角度</label>
+            <input id="selected-furniture-rotation" data-field="selected-furniture-rotation" type="number" step="15" value="${item.rotation}">
+          </div>
+          <div class="field-row full">
+            <label for="selected-furniture-material">材料</label>
+            <select id="selected-furniture-material" data-field="selected-furniture-material">
+              ${renderFurnitureMaterialOptions(item.materialTags?.[0])}
+            </select>
+          </div>
+          <div class="field-row full">
+            <label for="selected-furniture-note">備註</label>
+            <input id="selected-furniture-note" data-field="selected-furniture-note" type="text" value="${escapeAttribute(item.note || "")}" placeholder="例如：靠牆、需收納、待設計師確認">
+          </div>
+        </div>
+        <div class="project-readout">
+          此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。
+        </div>
+        <div class="inspector-actions">
+          ${FURNITURE_MATERIAL_TAGS.map((tag) => `<button class="secondary-btn" type="button" data-action="apply-furniture-material" data-material-tag="${escapeAttribute(tag)}">${escapeHTML(getFurnitureMaterialLabel(tag))}</button>`).join("")}
+          <button class="danger-btn" type="button" data-action="delete-furniture">刪除家具 / 櫃體</button>
+        </div>
+      </form>
+    `;
+  }
+
   function renderOpeningKindOption(value, currentValue) {
-    return `<option value="${value}" ${value === currentValue ? "selected" : ""}>${escapeHTML(value)}</option>`;
+    return `<option value="${value}" ${value === currentValue ? "selected" : ""}>${escapeHTML(getOpeningKindLabel(value))}</option>`;
   }
 
   function renderSwingOption(value, currentValue) {
-    return `<option value="${value}" ${value === currentValue ? "selected" : ""}>${escapeHTML(value)}</option>`;
+    return `<option value="${value}" ${value === currentValue ? "selected" : ""}>${escapeHTML(getOpeningSwingLabel(value))}</option>`;
   }
 
   function renderZoneTypeOptions(currentValue) {
@@ -2669,6 +3936,33 @@
 
   function renderStatusOption(value, currentValue) {
     return `<option value="${value}" ${value === currentValue ? "selected" : ""}>${escapeHTML(getWallStatusLabel(value))}</option>`;
+  }
+
+  function renderLayerVisibilityCard() {
+    const rows = [
+      ["underlay", "底圖", "匯入的丈量圖或空白毫米底圖"],
+      ["walls", "牆體", "牆段與可點選範圍"],
+      ["openings", "門窗開口", "門、窗與通行開口"],
+      ["zones", "空間", "空間標籤與邊界"],
+      ["furniture", "家具 / 櫃體", "可拖曳與調尺寸的候選物件"],
+      ["diagnostics", "診斷圖層", "牆體圖形與問題提示"]
+    ];
+    return `
+      <section class="status-card" data-testid="layer-visibility-card" aria-label="圖層顯示控制">
+        <b>圖層顯示</b>
+        <div class="draft-list">
+          ${rows.map(([key, label, hint]) => {
+            const checked = uiState.layerVisibility[key] !== false;
+            return `
+              <label class="toggle-row" for="layer-visibility-${key}">
+                <span><b>${escapeHTML(label)}</b><br><small>${escapeHTML(hint)}</small></span>
+                <input id="layer-visibility-${key}" data-field="layer-visibility-${key}" type="checkbox"${checked ? " checked" : ""}>
+              </label>
+            `;
+          }).join("")}
+        </div>
+      </section>
+    `;
   }
 
   function renderImportSourceCard() {
@@ -2706,18 +4000,47 @@
     `;
   }
 
+  function renderAutoScaleSuggestionCard() {
+    if (!project.underlay || !project.importSource?.previewSupported) {
+      return "";
+    }
+    const suggestion = project.scale?.autoScaleSuggestion;
+    if (!suggestion) {
+      return `<div class="inline-message">系統正在檢查檔名尺寸線索與圖片尺寸。</div>`;
+    }
+    const statusText = suggestion.canApply
+      ? `可套用，信心 ${escapeHTML(suggestion.confidenceLabel)}`
+      : "檔名未找到可自動套用的尺寸線索";
+    const applyButton = suggestion.canApply
+      ? `<button class="toolbar-btn primary" type="button" data-action="apply-auto-scale-suggestion">套用檔名建議</button>`
+      : `<button class="secondary-btn" type="button" disabled>需手動兩點校正</button>`;
+    return `
+      <div class="inline-message">
+        <strong>檔名比例建議</strong>
+        <div class="status-grid" style="margin-top: 8px;">
+          <div class="status-row"><span>狀態</span><span>${statusText}</span></div>
+          <div class="status-row"><span>來源</span><span>${escapeHTML(suggestion.sourceLabel)}</span></div>
+          <div class="status-row"><span>圖片尺寸</span><span>${suggestion.imageWidthPx || "-"} x ${suggestion.imageHeightPx || "-"} px</span></div>
+          <div class="status-row"><span>建議長度</span><span>${suggestion.knownLengthMm ? `${formatNumber(suggestion.knownLengthMm)} mm` : "-"}</span></div>
+          <div class="status-row"><span>建議比例</span><span>${suggestion.pxPerMm ? `${formatNumber(suggestion.pxPerMm)} px / mm` : "-"}</span></div>
+        </div>
+        <div class="inspector-actions" style="margin-top: 10px;">${applyButton}</div>
+      </div>
+    `;
+  }
+
   function renderScaleCard() {
     const calibratedBy = project.underlay?.calibratedBy;
     const pointCount = uiState.mode === "calibrate" ? uiState.calibrationPoints.length : getCalibrationPointsForRender().length;
-    const scaleReadout = project.scale.calibrated ? getScaleReadout() : "尚未校正";
+    const scaleReadout = project.scale.calibrated ? getScaleReadout() : "待比例確認";
     const pointReadout = pointCount === 0 ? "尚未選點" : `${Math.min(pointCount, 2)} / 2`;
 
     return `
       <div class="status-card">
-        <b>比例校正</b>
-        <div class="status-grid">
-          <div class="status-row"><span>比例狀態</span><span>${project.scale.calibrated ? "已校正" : "尚未校正"}</span></div>
-          <div class="status-row"><span>pxPerMm</span><span>${project.scale.pxPerMm ?? "-"}</span></div>
+          <b>比例確認</b>
+          <div class="status-grid">
+          <div class="status-row"><span>比例狀態</span><span>${project.scale.calibrated ? "已確認" : "待比例確認"}</span></div>
+          <div class="status-row"><span>比例係數</span><span>${project.scale.pxPerMm ?? "-"}</span></div>
           <div class="status-row"><span>校正點</span><span>${pointReadout}</span></div>
           <div class="status-row"><span>目前比例</span><span>${escapeHTML(scaleReadout)}</span></div>
           ${calibratedBy ? `<div class="status-row"><span>校正資訊</span><span>${formatNumber(calibratedBy.knownLength)} mm = ${formatNumber(calibratedBy.pixelDistance)} px</span></div>` : ""}
@@ -2737,14 +4060,15 @@
   function renderWallWorkflowCard() {
     return `
       <div class="status-card">
-        <b>牆體草稿</b>
+        <b>牆體操作</b>
         <div class="status-grid">
-          <div class="status-row"><span>目前模式</span><span>${escapeHTML(getModeLabel(uiState.mode))}</span></div>
-          <div class="status-row"><span>牆段數</span><span>${project.walls.length}</span></div>
+          <div class="status-row"><span>目前工具</span><span>${escapeHTML(getModeLabel(uiState.mode))}</span></div>
+          <div class="status-row"><span>已畫牆段</span><span>${project.walls.length}</span></div>
           <div class="status-row"><span>下一段狀態</span><span>${escapeHTML(getWallStatusLabel(uiState.currentWallStatus))}</span></div>
+          <div class="status-row"><span>下一段分類</span><span>${escapeHTML(getWallTypeLabel(uiState.currentWallType))}</span></div>
           <div class="status-row"><span>下一段牆厚</span><span>${uiState.currentWallThickness} mm</span></div>
           <div class="status-row"><span>端點吸附</span><span>${uiState.snapEnabled ? "開啟" : "關閉"}</span></div>
-          <div class="status-row"><span>正交輔助</span><span>${uiState.orthogonalEnabled ? "開啟" : "關閉"}</span></div>
+          <div class="status-row"><span>水平 / 垂直輔助</span><span>${uiState.orthogonalEnabled ? "開啟" : "關閉"}</span></div>
         </div>
       </div>
     `;
@@ -2768,24 +4092,43 @@
     `;
   }
 
+  function renderFurnitureWorkflowCard() {
+    const template = getFurnitureTemplate(uiState.currentFurnitureTemplateId);
+    return `
+      <div class="status-card">
+        <b>家具 / 櫃體放置</b>
+        <div class="status-grid">
+          <div class="status-row"><span>目前模式</span><span>${escapeHTML(getModeLabel(uiState.mode))}</span></div>
+          <div class="status-row"><span>目前項目</span><span>${escapeHTML(template.name)}</span></div>
+          <div class="status-row"><span>候選數量</span><span>${project.furniture.length}</span></div>
+          <div class="status-row"><span>家具來源</span><span>參數化草稿</span></div>
+          <div class="status-row"><span>正式成果</span><span>否</span></div>
+        </div>
+        <div class="inspector-actions" style="margin-top: 12px;">
+          <button class="secondary-btn" type="button" data-action="start-place-furniture">放到畫布</button>
+        </div>
+      </div>
+    `;
+  }
+
   function renderWallGraphCard() {
     const graph = project.wallGraph || createInitialWallGraph();
     const issues = graph.issues || [];
     const issueList = issues.length
       ? `<div class="issue-list">${issues.map(renderIssueButton).join("")}</div>`
-      : `<div class="inline-message">目前沒有牆體圖形問題。端點、交會與重疊檢查會在新增或編輯牆段後自動更新。</div>`;
+      : `<div class="inline-message">目前沒有明顯的牆端接合問題。若兩段牆很接近但沒有接上，可用「自動接牆」。</div>`;
 
     return `
       <div class="status-card">
-        <b>Wall Graph Cleanup</b>
+        <b>接牆檢查</b>
         <div class="status-grid">
           <div class="status-row"><span>牆段數量</span><span>${project.walls.length}</span></div>
-          <div class="status-row"><span>節點數量</span><span>${graph.nodes.length}</span></div>
-          <div class="status-row"><span>問題數量</span><span>${issues.length}</span></div>
+          <div class="status-row"><span>接點數量</span><span>${graph.nodes.length}</span></div>
+          <div class="status-row"><span>需處理項目</span><span>${issues.length}</span></div>
           <div class="status-row"><span>最後檢查</span><span>${graph.lastBuiltAt ? escapeHTML(graph.lastBuiltAt) : "-"}</span></div>
         </div>
         <div class="inspector-actions" style="margin-top: 12px;">
-          <button class="secondary-btn" type="button" data-action="clean-wall-endpoints">整理端點</button>
+          <button class="secondary-btn" type="button" data-action="clean-wall-endpoints">自動接牆</button>
         </div>
         ${issueList}
       </div>
@@ -2804,19 +4147,19 @@
 
     return `
       <div class="status-card">
-        <b>Node Graph</b>
+        <b>牆線交會檢查</b>
         <div class="status-grid">
-          <div class="status-row"><span>node 數量</span><span>${graph.nodes.length}</span></div>
-          <div class="status-row"><span>edge 數量</span><span>${graph.edges.length}</span></div>
-          <div class="status-row"><span>intersection node</span><span>${intersectionCount}</span></div>
-          <div class="status-row"><span>尚未切分交會</span><span>${unsplitIntersectionCount}</span></div>
-          ${selectedNode ? `<div class="status-row"><span>選取 node</span><span>${escapeHTML(selectedNode.id)}</span></div>` : ""}
+          <div class="status-row"><span>接點數量</span><span>${graph.nodes.length}</span></div>
+          <div class="status-row"><span>牆線段數量</span><span>${graph.edges.length}</span></div>
+          <div class="status-row"><span>交會點</span><span>${intersectionCount}</span></div>
+          <div class="status-row"><span>需切分交會</span><span>${unsplitIntersectionCount}</span></div>
+          ${selectedNode ? `<div class="status-row"><span>選取接點</span><span>${escapeHTML(selectedNode.id)}</span></div>` : ""}
         </div>
         ${canSplitSelectedIssue ? `
           <div class="inspector-actions" style="margin-top: 12px;">
-            <button class="toolbar-btn primary" type="button" data-action="split-wall-intersection">切分交會牆段</button>
+            <button class="toolbar-btn primary" type="button" data-action="split-wall-intersection">把交會牆段切開</button>
           </div>
-        ` : `<div class="inline-message" style="margin-top: 12px;">選取 wall-intersection issue 後，可以手動切分相關牆段。</div>`}
+        ` : `<div class="inline-message" style="margin-top: 12px;">這是進階檢查。一般畫圖時可先忽略；只有牆線交叉卻沒有接上時，才需要切開交會牆段。</div>`}
       </div>
     `;
   }
@@ -2840,14 +4183,14 @@
         <div class="visual-sim-heading">
           <div>
             <b>AI 風格示意</b>
-            <p>Sandbox Preview。僅展示案件上架與風格溝通方向，不接 production，不保存正式案件。</p>
+            <p>沙盒預覽：僅展示案件上架與風格溝通方向，不接正式產線，不保存正式案件。</p>
           </div>
           <span class="visual-sim-status ${statusClass}">${escapeHTML(statusBadgeText)}</span>
         </div>
 
-        <div class="sandbox-label-row" aria-label="sandbox labels">
-          <span class="sandbox-label">Sandbox Preview</span>
-          <span class="sandbox-label">AI 示意圖</span>
+        <div class="sandbox-label-row" aria-label="沙盒標籤">
+          <span class="sandbox-label">沙盒預覽</span>
+          <span class="sandbox-label">風格示意圖</span>
           <span class="sandbox-label is-warning">非正式圖片</span>
           <span class="sandbox-label">不會保存到正式案件</span>
           <span class="sandbox-label">非真實案例</span>
@@ -2866,9 +4209,9 @@
         <div class="status-grid" style="margin-top: 12px;">
           <div class="status-row"><span>任務狀態</span><span>${escapeHTML(statusText)}</span></div>
           <div class="status-row"><span>任務 ID</span><span>${escapeHTML(styleVisualTask.id)}</span></div>
-          <div class="status-row"><span>Proxy</span><span>${escapeHTML(getStyleVisualProxyStatusText(styleVisualTask.proxyStatus))}</span></div>
+          <div class="status-row"><span>代理狀態</span><span>${escapeHTML(getStyleVisualProxyStatusText(styleVisualTask.proxyStatus))}</span></div>
           <div class="status-row"><span>用途</span><span>${escapeHTML(styleVisualRequest.purpose)}</span></div>
-          <div class="status-row"><span>Reference image</span><span>${referenceImagePolicy.allowed ? "enabled" : "disabled"}</span></div>
+          <div class="status-row"><span>參考圖上傳</span><span>${referenceImagePolicy.allowed ? "已開放" : "未開放"}</span></div>
         </div>
 
         <div class="reference-image-notice">${escapeHTML(referenceImagePolicy.notice)}</div>
@@ -2876,12 +4219,12 @@
         ${renderStyleTags()}
 
         <div class="prompt-preview">
-          <strong>AI Prompt Preview</strong>
+          <strong>AI 提示詞預覽</strong>
           ${escapeHTML(promptPreview)}
         </div>
 
         <div class="prompt-preview sandbox-prompt-preview">
-          <strong>Sanitized Prompt</strong>
+          <strong>安全處理後提示詞</strong>
           ${escapeHTML(sanitizedPrompt)}
         </div>
 
@@ -2919,47 +4262,47 @@
       sanitized.budgetLevel
     ].filter(Boolean);
 
-    return `<div class="tag-row" aria-label="style tags">${tags.map((tag) => `<span class="style-tag">${escapeHTML(tag)}</span>`).join("")}</div>`;
+    return `<div class="tag-row" aria-label="風格標籤">${tags.map((tag) => `<span class="style-tag">${escapeHTML(tag)}</span>`).join("")}</div>`;
   }
 
   function renderStyleVisualPreviewCard(briefText, promptPreview, generatedPreview) {
     const isReady = styleVisualTask.status === "ready";
     const isDrafting = styleVisualTask.status === "drafting";
-    const moodLabel = isReady ? "SANDBOX PREVIEW" : isDrafting ? "DRAFTING" : "WAITING";
+    const moodLabel = isReady ? "沙盒預覽" : isDrafting ? "整理中" : "待生成";
     const previewState = generatedPreview?.status || styleVisualTask.proxyStatus || "disabled";
     const previewMessage = generatedPreview?.message || STYLE_VISUAL_PROXY_DISABLED_MESSAGE;
-    const storageLabel = generatedPreview ? "styleVisualTask.generatedPreview" : "local task state pending";
-    const temporaryImageUrl = generatedPreview?.temporaryImageUrl || "not-created-proxy-disabled";
+    const storageLabel = generatedPreview ? "本機暫存預覽狀態" : "本機狀態尚未建立";
+    const temporaryImageUrl = generatedPreview?.temporaryImageUrl || "尚未建立，圖片代理未啟用";
     const cardBrief = isReady ? briefText : isDrafting
       ? "正在將空間、風格、色調與材質語彙整理成示意方向。"
       : "按下生成後，這裡會顯示案件風格示意預覽卡。";
 
     return `
-      <article class="visual-preview-card" aria-label="AI 示意圖預覽卡">
-        <div class="visual-mock-image sandbox-generated-frame${previewState === "disabled" ? " is-disabled" : ""}" aria-label="temporary sandbox image preview">
+      <article class="visual-preview-card" aria-label="風格示意圖預覽卡">
+        <div class="visual-mock-image sandbox-generated-frame${previewState === "disabled" ? " is-disabled" : ""}" aria-label="臨時沙盒圖片預覽">
           <div class="visual-mock-overlay">
             <span class="mood-label">${escapeHTML(moodLabel)}</span>
-            <span class="disclaimer-badge">AI 示意圖</span>
+            <span class="disclaimer-badge">風格示意圖</span>
           </div>
           <div class="sandbox-fallback-message">${escapeHTML(previewMessage)}</div>
         </div>
         <div class="visual-preview-body">
-          <div class="sandbox-label-row" aria-label="preview sandbox labels">
-            <span class="sandbox-label">Sandbox Preview</span>
-            <span class="sandbox-label">AI 示意圖</span>
+          <div class="sandbox-label-row" aria-label="預覽沙盒標籤">
+            <span class="sandbox-label">沙盒預覽</span>
+            <span class="sandbox-label">風格示意圖</span>
             <span class="sandbox-label is-warning">非正式圖片</span>
             <span class="sandbox-label">不會保存到正式案件</span>
             <span class="sandbox-label">非真實案例</span>
             <span class="sandbox-label">非正式成果</span>
           </div>
           <div class="status-row"><span>空間類型</span><span>${escapeHTML(styleVisualRequest.roomType)}</span></div>
-          <div class="status-row"><span>Preview 狀態</span><span>${escapeHTML(getStyleVisualProxyStatusText(previewState))}</span></div>
+          <div class="status-row"><span>預覽狀態</span><span>${escapeHTML(getStyleVisualProxyStatusText(previewState))}</span></div>
           <div class="status-row"><span>儲存範圍</span><span>${escapeHTML(storageLabel)}</span></div>
-          <div class="status-row"><span>Temporary URL</span><span>${escapeHTML(temporaryImageUrl)}</span></div>
+          <div class="status-row"><span>臨時網址</span><span>${escapeHTML(temporaryImageUrl)}</span></div>
           ${renderStyleTags()}
           <p class="visual-brief">${escapeHTML(cardBrief)}</p>
           <div class="prompt-preview">
-            <strong>Sample prompt text</strong>
+            <strong>提示詞範例</strong>
             ${escapeHTML(promptPreview)}
           </div>
           <span class="disclaimer-badge" style="width: fit-content;">非正式成果</span>
@@ -2970,9 +4313,9 @@
 
   function getStyleVisualPlaceholderBrief(status) {
     if (status === "drafting") {
-      return "AI 正在整理風格方向，稍後會建立可供案件上架參考的 visual brief。";
+      return "AI 正在整理風格方向，稍後會建立可供案件上架參考的風格摘要。";
     }
-    return "尚未生成風格示意。輸入風格需求後，可建立 visual brief、style tags 與 prompt preview。";
+    return "尚未生成風格示意。輸入風格需求後，可建立風格摘要、標籤與提示詞預覽。";
   }
 
   function getStyleVisualStatusText(status) {
@@ -2980,27 +4323,27 @@
       return "AI 正在整理風格方向…";
     }
     if (status === "ready") {
-      return "Sandbox 預覽已建立";
+      return "沙盒預覽已建立";
     }
     return "尚未生成風格示意";
   }
 
   function getStyleVisualStatusBadgeText(status) {
     if (status === "ready") {
-      return "Sandbox 預覽已建立";
+      return "沙盒預覽已建立";
     }
     return status;
   }
 
   function getStyleVisualProxyStatusText(status) {
     if (status === "drafting") {
-      return "正在建立 styleVisualApiRequest…";
+      return "正在建立風格示意請求...";
     }
     if (status === "mock_ready") {
-      return "Sandbox 預覽已建立";
+      return "沙盒預覽已建立";
     }
     if (status === "error") {
-      return "Server-side Image API proxy 發生錯誤";
+      return "伺服端圖片代理發生錯誤";
     }
     return STYLE_VISUAL_PROXY_DISABLED_MESSAGE;
   }
@@ -3042,12 +4385,12 @@
     const preview = normalizeRendererPreviewResult(bridge.preview);
     return `
       <div class="bridge-card">
-        <b>Plancraft Bridge</b>
+        <b>進階轉換狀態</b>
         <div class="status-grid">
           <div class="status-row"><span>狀態</span><span>${escapeHTML(bridge.status)}</span></div>
           <div class="status-row"><span>目標格式</span><span>${escapeHTML(bridge.targetFormat)}</span></div>
-          <div class="status-row"><span>DSL validation</span><span>${escapeHTML(validation.status)}</span></div>
-          <div class="status-row"><span>renderer preview</span><span>${escapeHTML(preview.status)}</span></div>
+          <div class="status-row"><span>格式檢查</span><span>${escapeHTML(validation.status)}</span></div>
+          <div class="status-row"><span>圖面預覽</span><span>${escapeHTML(preview.status)}</span></div>
           <div class="status-row"><span>說明</span><span>${escapeHTML(bridge.reason)}</span></div>
         </div>
       </div>
@@ -3059,41 +4402,41 @@
     const summary = report.summary || createInitialPcConverterReport().summary;
     const validation = normalizePcValidationResult(report.validation);
     const validationNotice = validation.status === "not_run"
-      ? `<div class="inline-message">靜態頁尚未直接載入 Plancraft DSL；請使用本機驗證流程確認 .pc。</div>`
+      ? `<div class="inline-message">靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認 .pc 候選測試檔。</div>`
       : "";
     const validationWarningList = validation.warnings.length
-      ? `<div class="issue-list">${validation.warnings.map((warning) => `<div class="issue-button" role="status"><strong>validation warning</strong>${escapeHTML(warning)}</div>`).join("")}</div>`
+      ? `<div class="issue-list">${validation.warnings.map((warning) => `<div class="issue-button" role="status"><strong>驗證警告</strong>${escapeHTML(warning)}</div>`).join("")}</div>`
       : "";
     const validationErrorList = validation.errors.length
-      ? `<div class="issue-list">${validation.errors.map((error) => `<div class="issue-button" role="status"><strong>validation error</strong>${escapeHTML(error)}</div>`).join("")}</div>`
+      ? `<div class="issue-list">${validation.errors.map((error) => `<div class="issue-button" role="status"><strong>驗證錯誤</strong>${escapeHTML(error)}</div>`).join("")}</div>`
       : "";
     const warningList = report.warnings?.length
-      ? `<div class="issue-list">${report.warnings.map((warning) => `<div class="issue-button" role="status"><strong>warning</strong>${escapeHTML(warning)}</div>`).join("")}</div>`
-      : `<div class="inline-message">尚未產生 converter warnings。</div>`;
+      ? `<div class="issue-list">${report.warnings.map((warning) => `<div class="issue-button" role="status"><strong>警告</strong>${escapeHTML(warning)}</div>`).join("")}</div>`
+      : `<div class="inline-message">尚未產生轉換警告。</div>`;
     const errorList = report.errors?.length
-      ? `<div class="issue-list">${report.errors.map((error) => `<div class="issue-button" role="status"><strong>error</strong>${escapeHTML(error)}</div>`).join("")}</div>`
+      ? `<div class="issue-list">${report.errors.map((error) => `<div class="issue-button" role="status"><strong>錯誤</strong>${escapeHTML(error)}</div>`).join("")}</div>`
       : "";
 
     return `
       <div class="status-card">
-        <b>Converter Report</b>
+        <b>轉換報告</b>
         <div class="status-grid">
-          <div class="status-row"><span>converter status</span><span>${escapeHTML(report.status)}</span></div>
-          <div class="status-row"><span>roomCount</span><span>${summary.roomCount}</span></div>
-          <div class="status-row"><span>wallCount</span><span>${summary.wallCount}</span></div>
-          <div class="status-row"><span>openingCount</span><span>${summary.openingCount}</span></div>
-          <div class="status-row"><span>skippedZoneCount</span><span>${summary.skippedZoneCount}</span></div>
-          <div class="status-row"><span>skippedOpeningCount</span><span>${summary.skippedOpeningCount}</span></div>
-          <div class="status-row"><span>exportedAt</span><span>${report.exportedAt ? escapeHTML(report.exportedAt) : "-"}</span></div>
-          <div class="status-row"><span>validation status</span><span>${escapeHTML(validation.status)}</span></div>
-          <div class="status-row"><span>validation checkedAt</span><span>${validation.checkedAt ? escapeHTML(validation.checkedAt) : "-"}</span></div>
-          <div class="status-row"><span>next action</span><span>${escapeHTML(getPcValidationNextAction(validation))}</span></div>
+          <div class="status-row"><span>轉換狀態</span><span>${escapeHTML(report.status)}</span></div>
+          <div class="status-row"><span>空間數</span><span>${summary.roomCount}</span></div>
+          <div class="status-row"><span>牆段數</span><span>${summary.wallCount}</span></div>
+          <div class="status-row"><span>門窗數</span><span>${summary.openingCount}</span></div>
+          <div class="status-row"><span>略過空間</span><span>${summary.skippedZoneCount}</span></div>
+          <div class="status-row"><span>略過門窗</span><span>${summary.skippedOpeningCount}</span></div>
+          <div class="status-row"><span>匯出時間</span><span>${report.exportedAt ? escapeHTML(report.exportedAt) : "-"}</span></div>
+          <div class="status-row"><span>驗證狀態</span><span>${escapeHTML(validation.status)}</span></div>
+          <div class="status-row"><span>驗證時間</span><span>${validation.checkedAt ? escapeHTML(validation.checkedAt) : "-"}</span></div>
+          <div class="status-row"><span>下一步</span><span>${escapeHTML(getPcValidationNextAction(validation))}</span></div>
         </div>
         <div class="project-readout">${escapeHTML(PC_SPIKE_NOTICE)}</div>
         <div class="project-readout">${escapeHTML(validation.reason)}</div>
         ${validationNotice}
         <div class="inspector-actions" style="margin-top: 12px;">
-          <button class="toolbar-btn primary" type="button" data-action="export-pc-spike">匯出 Plancraft .pc 測試版</button>
+          <button class="toolbar-btn primary" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="候選 .pc 預覽停用；不執行正式產出">.pc 正式匯出停用</button>
         </div>
         ${validationErrorList}
         ${validationWarningList}
@@ -3108,23 +4451,23 @@
     const bridge = getPlancraftBridgeStatus(project);
     const preview = normalizeRendererPreviewResult(report.preview || bridge.preview);
     const previewNotice = preview.status === "not_run"
-      ? `<div class="inline-message">靜態頁尚未直接載入 Plancraft renderer；請使用本機 CLI compile 產生 SVG 預覽。</div>`
+      ? `<div class="inline-message">靜態頁尚未直接載入正式圖面預覽器；請使用本機驗證流程產生 SVG 預覽。</div>`
       : "";
     const previewWarningList = preview.warnings.length
-      ? `<div class="issue-list">${preview.warnings.map((warning) => `<div class="issue-button" role="status"><strong>preview warning</strong>${escapeHTML(warning)}</div>`).join("")}</div>`
+      ? `<div class="issue-list">${preview.warnings.map((warning) => `<div class="issue-button" role="status"><strong>預覽警告</strong>${escapeHTML(warning)}</div>`).join("")}</div>`
       : "";
     const previewErrorList = preview.errors.length
-      ? `<div class="issue-list">${preview.errors.map((error) => `<div class="issue-button" role="status"><strong>preview error</strong>${escapeHTML(error)}</div>`).join("")}</div>`
+      ? `<div class="issue-list">${preview.errors.map((error) => `<div class="issue-button" role="status"><strong>預覽錯誤</strong>${escapeHTML(error)}</div>`).join("")}</div>`
       : "";
 
     return `
       <div class="status-card">
-        <b>Renderer Preview Report</b>
+        <b>圖面預覽報告</b>
         <div class="status-grid">
-          <div class="status-row"><span>preview status</span><span>${escapeHTML(preview.status)}</span></div>
-          <div class="status-row"><span>checkedAt</span><span>${preview.checkedAt ? escapeHTML(preview.checkedAt) : "-"}</span></div>
-          <div class="status-row"><span>SVG output path</span><span>${preview.svgOutputPath ? escapeHTML(preview.svgOutputPath) : "-"}</span></div>
-          <div class="status-row"><span>next action</span><span>${escapeHTML(getRendererPreviewNextAction(preview))}</span></div>
+          <div class="status-row"><span>預覽狀態</span><span>${escapeHTML(preview.status)}</span></div>
+          <div class="status-row"><span>檢查時間</span><span>${preview.checkedAt ? escapeHTML(preview.checkedAt) : "-"}</span></div>
+          <div class="status-row"><span>SVG 輸出路徑</span><span>${preview.svgOutputPath ? escapeHTML(preview.svgOutputPath) : "-"}</span></div>
+          <div class="status-row"><span>下一步</span><span>${escapeHTML(getRendererPreviewNextAction(preview))}</span></div>
         </div>
         ${previewNotice}
         <div class="project-readout">${escapeHTML(preview.command)}</div>
@@ -3140,7 +4483,10 @@
       underlayStatusText.textContent = project.underlay ? "已匯入" : "尚未匯入";
     }
     if (scaleStatusText) {
-      scaleStatusText.textContent = project.scale.calibrated ? "已校正" : "尚未校正";
+      scaleStatusText.textContent = project.scale.calibrated ? "已確認" : (project.underlay ? "待兩點校正" : "待比例確認");
+    }
+    if (scaleStatusText && !project.scale.calibrated && project.scale.autoScaleSuggestion?.canApply) {
+      scaleStatusText.textContent = "有檔名建議";
     }
     if (wallCountStatusText) {
       wallCountStatusText.textContent = String(project.walls.length);
@@ -3157,6 +4503,10 @@
     const currentStatus = document.getElementById("current-wall-status");
     if (currentStatus) {
       currentStatus.value = uiState.currentWallStatus;
+    }
+    const currentWallType = document.getElementById("current-wall-type");
+    if (currentWallType) {
+      currentWallType.value = normalizeWallType(uiState.currentWallType);
     }
     const currentThickness = document.getElementById("current-wall-thickness");
     if (currentThickness) {
@@ -3189,8 +4539,26 @@
     if (currentZoneName) {
       currentZoneName.value = uiState.currentZoneName || ZONE_TYPE_LABELS[uiState.currentZoneType];
     }
+    document.querySelectorAll('[data-field="current-furniture-template"]').forEach((currentFurnitureTemplate) => {
+      currentFurnitureTemplate.value = uiState.currentFurnitureTemplateId;
+    });
+    document.querySelectorAll('[data-field="current-furniture-material"]').forEach((currentFurnitureMaterial) => {
+      currentFurnitureMaterial.value = uiState.currentFurnitureMaterialTag;
+    });
     document.querySelectorAll("[data-mode-button]").forEach((button) => {
       button.classList.toggle("is-mode-active", button.dataset.modeButton === uiState.mode);
+    });
+    document.querySelectorAll('[data-action="undo-action"]').forEach((button) => {
+      button.disabled = undoStack.length === 0;
+      button.title = undoStack.length
+        ? `復原上一個繪圖動作：${undoStack[undoStack.length - 1].label}（Ctrl+Z）`
+        : "目前沒有可復原的繪圖動作";
+    });
+    document.querySelectorAll('[data-action="redo-action"]').forEach((button) => {
+      button.disabled = redoStack.length === 0;
+      button.title = redoStack.length
+        ? `重做下一個繪圖動作：${redoStack[redoStack.length - 1].label}（Ctrl+Y）`
+        : "目前沒有可重做的繪圖動作";
     });
   }
 
@@ -3200,9 +4568,11 @@
     uiState.selectedEdgeId = getEdgeForWall(wallId)?.id || null;
     uiState.selectedOpeningId = null;
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.mode = "select";
+    uiState.inspectorTab = "properties";
     clearWallDraft();
     clearZoneBoundaryDraft();
     uiState.error = "";
@@ -3223,14 +4593,37 @@
     uiState.selectedEdgeId = opening.edgeId;
     uiState.selectedWallId = getWallIdFromEdgeId(opening.edgeId);
     uiState.selectedZoneId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.mode = "select";
+    uiState.inspectorTab = "properties";
     clearWallDraft();
     clearZoneBoundaryDraft();
     uiState.error = "";
     uiState.message = "已選取開口，可在右側調整 offset、width 與 swing。";
     render();
+  }
+
+  function selectWallForSelectedOpening() {
+    const opening = getSelectedOpening();
+    if (!opening) {
+      uiState.error = "請先選取門窗或開口。";
+      uiState.message = "";
+      render();
+      return;
+    }
+
+    const wallId = opening.sourceWallId || getWallIdFromEdgeId(opening.edgeId);
+    const wall = project.walls.find((item) => item.id === wallId);
+    if (!wall) {
+      uiState.error = "找不到此開口依附的牆體。";
+      uiState.message = "";
+      render();
+      return;
+    }
+
+    selectWall(wall.id);
   }
 
   function selectZone(zoneId) {
@@ -3242,9 +4635,11 @@
     uiState.selectedWallId = null;
     uiState.selectedEdgeId = null;
     uiState.selectedOpeningId = null;
+    uiState.selectedFurnitureId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
     uiState.mode = "select";
+    uiState.inspectorTab = "properties";
     clearWallDraft();
     clearZoneBoundaryDraft();
     uiState.error = "";
@@ -3296,7 +4691,7 @@
             points: [first.point, second.point],
             endpointRefs: [first.id, second.id],
             distance: Number(distance.toFixed(2)),
-            message: "有牆端點接近但未對齊，建議整理端點。"
+            message: "有牆端點接近但未接上，建議使用「自動接牆」。"
           }));
         }
       }
@@ -3401,7 +4796,8 @@
         to: roundPoint(wall.to),
         thickness: wall.thickness,
         status: normalizeWallStatus(wall.status),
-        structural: Boolean(wall.structural),
+        wallType: normalizeWallType(wall.wallType),
+        structural: Boolean(wall.structural || normalizeWallType(wall.wallType) === "bearing_wall"),
         layer: wall.layer || "walls",
         length,
         createdAt: wall.createdAt || builtAt,
@@ -3427,7 +4823,7 @@
   function splitSelectedIntersectionIssue() {
     const issue = getSelectedIssue();
     if (!issue || issue.type !== "wall-intersection" || !issue.points[0]) {
-      uiState.error = "請先選取一個 wall-intersection issue，再執行切分。";
+      uiState.error = "請先在「接牆檢查」選取一個斷點或交會問題，再執行切分。";
       uiState.message = "";
       render();
       return;
@@ -3481,6 +4877,7 @@
       return;
     }
 
+    pushHistory("切分交會牆段");
     project.walls = nextWalls.filter((wall) => getDistance(wall.from, wall.to) >= MIN_WALL_LENGTH);
     rebuildWallGraph();
     rebuildNodeGraph();
@@ -3491,7 +4888,7 @@
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = createGraphNodeId("intersection", splitPoint);
     uiState.error = "";
-    uiState.message = `已在交會點切分 ${newWallIds.length} 段牆，並重新建立 Node Graph。`;
+    uiState.message = `已在交會點切分 ${newWallIds.length} 段牆，並重新整理牆端圖。`;
     syncBridge();
     render();
   }
@@ -3506,7 +4903,8 @@
       to: roundPoint(to),
       thickness: sourceWall.thickness,
       status: normalizeWallStatus(sourceWall.status),
-      structural: Boolean(sourceWall.structural),
+      wallType: normalizeWallType(sourceWall.wallType),
+      structural: Boolean(sourceWall.structural || normalizeWallType(sourceWall.wallType) === "bearing_wall"),
       layer: sourceWall.layer || "walls",
       createdAt: timestamp,
       updatedAt: timestamp
@@ -3527,7 +4925,7 @@
     if (!edge) {
       uiState.error = project.nodeGraph?.edges?.length
         ? "請先選取一段牆，再新增門窗或開口。"
-        : "請先建立並整理牆體節點。";
+        : "請先建立並整理牆端。";
       uiState.message = "";
       render();
       return;
@@ -3572,6 +4970,7 @@
       return;
     }
 
+    pushHistory(`新增${getOpeningKindLabel(kind)}`);
     project.openings.push(opening);
     uiState.selectedOpeningId = opening.id;
     uiState.selectedEdgeId = edge.id;
@@ -3579,6 +4978,7 @@
     uiState.selectedZoneId = null;
     uiState.selectedIssueId = null;
     uiState.selectedNodeId = null;
+    uiState.inspectorTab = "properties";
     uiState.error = "";
     uiState.message = validation.warning || `已新增 ${kind}。`;
     syncBridge();
@@ -3593,7 +4993,7 @@
 
     const edge = getEdgeById(opening.edgeId);
     if (!edge) {
-      uiState.error = "找不到 opening 依附的 edge，請重新選取牆段。";
+      uiState.error = "找不到這個門窗依附的牆線，請重新選取牆段。";
       render();
       return;
     }
@@ -3635,6 +5035,21 @@
       return;
     }
 
+    const changed = (
+      nextOpening.kind !== opening.kind ||
+      nextOpening.offset !== opening.offset ||
+      nextOpening.width !== opening.width ||
+      nextOpening.swing !== opening.swing ||
+      (nextOpening.sillHeight ?? null) !== (opening.sillHeight ?? null) ||
+      (nextOpening.height ?? null) !== (opening.height ?? null)
+    );
+    if (!changed) {
+      uiState.error = "";
+      render();
+      return;
+    }
+
+    pushHistory("更新開口屬性");
     Object.assign(opening, nextOpening, { updatedAt: new Date().toISOString() });
     uiState.error = "";
     uiState.message = validation.warning || "開口資料已更新。";
@@ -3646,12 +5061,59 @@
     if (!uiState.selectedOpeningId) {
       return;
     }
+    pushHistory("刪除開口");
     project.openings = project.openings.filter((opening) => opening.id !== uiState.selectedOpeningId);
     uiState.selectedOpeningId = null;
     uiState.error = "";
     uiState.message = "已刪除開口。";
     syncBridge();
     render();
+  }
+
+  function previewSelectedOpeningDimensionFromField(input) {
+    const opening = getSelectedOpening();
+    if (!opening) {
+      return;
+    }
+
+    const edge = getEdgeById(opening.edgeId);
+    if (!edge) {
+      uiState.error = "找不到這個門窗依附的牆線，請重新選取牆段。";
+      renderCanvasHelper();
+      return;
+    }
+
+    const nextOpening = { ...opening };
+    const field = input.dataset.field;
+    if (field === "selected-opening-offset") {
+      nextOpening.offset = readCoordinateInput(input, opening.offset);
+    }
+    if (field === "selected-opening-width") {
+      nextOpening.width = readCoordinateInput(input, opening.width);
+    }
+    if (field === "selected-opening-sill-height") {
+      nextOpening.sillHeight = readOptionalNumber(input.value);
+    }
+    if (field === "selected-opening-height") {
+      nextOpening.height = readOptionalNumber(input.value);
+    }
+
+    const validation = validateOpening(nextOpening, edge);
+    if (!validation.valid) {
+      uiState.error = validation.error || "開口資料不合法。";
+      renderCanvasHelper();
+      return;
+    }
+
+    Object.assign(opening, nextOpening, { updatedAt: new Date().toISOString() });
+    uiState.error = "";
+    uiState.message = validation.warning || "門窗 / 開口尺寸已同步到候選草稿。";
+    syncBridge();
+    renderOpenings();
+    applyLayerVisibility();
+    renderCanvasHelper();
+    renderStatusLabels();
+    syncStaticControls();
   }
 
   function createZone(point) {
@@ -3673,6 +5135,163 @@
       createdAt: now,
       updatedAt: now
     };
+  }
+
+  function createFurnitureItem(point) {
+    const now = new Date().toISOString();
+    const template = getFurnitureTemplate(uiState.currentFurnitureTemplateId);
+    return {
+      id: createId("furniture"),
+      type: template.type,
+      category: template.category,
+      name: template.name,
+      layer: "furniture",
+      x: point.x,
+      y: point.y,
+      widthMm: template.widthMm,
+      depthMm: template.depthMm,
+      heightMm: template.heightMm,
+      rotation: 0,
+      status: "candidate",
+      materialTags: [...template.materialTags],
+      note: "",
+      budgetCandidate: true,
+      productionReady: false,
+      notFormalEstimate: true,
+      createdAt: now,
+      updatedAt: now
+    };
+  }
+
+  function selectFurniture(furnitureId, message) {
+    const item = project.furniture.find((entry) => entry.id === furnitureId);
+    if (!item) {
+      return;
+    }
+    uiState.selectedFurnitureId = item.id;
+    uiState.selectedWallId = null;
+    uiState.selectedEdgeId = null;
+    uiState.selectedOpeningId = null;
+    uiState.selectedZoneId = null;
+    uiState.selectedIssueId = null;
+    uiState.selectedNodeId = null;
+    uiState.mode = "select";
+    uiState.inspectorTab = "properties";
+    clearWallDraft();
+    clearZoneBoundaryDraft();
+    uiState.error = "";
+    uiState.message = message || `已選取「${item.name}」。可在右側改尺寸、材料、備註，也可拖曳、調尺寸或刪除。`;
+    syncBridge();
+    render();
+  }
+
+  function updateSelectedFurnitureFromField(input) {
+    const item = getSelectedFurniture();
+    if (!item) {
+      return;
+    }
+
+    pushHistory("更新家具 / 櫃體屬性");
+    const field = input.dataset.field;
+    if (field === "selected-furniture-name") {
+      item.name = input.value.trim() || getFurnitureTemplate(item.type).name;
+    }
+    if (field === "selected-furniture-width") {
+      item.widthMm = normalizeFurnitureDimension(input.value, item.widthMm, MIN_FURNITURE_WIDTH_MM);
+    }
+    if (field === "selected-furniture-depth") {
+      item.depthMm = normalizeFurnitureDimension(input.value, item.depthMm, MIN_FURNITURE_DEPTH_MM);
+    }
+    if (field === "selected-furniture-height") {
+      item.heightMm = normalizeFurnitureDimension(input.value, item.heightMm, 0);
+    }
+    if (field === "selected-furniture-rotation") {
+      item.rotation = normalizeFurnitureRotation(input.value, item.rotation);
+    }
+    if (field === "selected-furniture-material") {
+      item.materialTags = [normalizeFurnitureMaterialTag(input.value)];
+    }
+    if (field === "selected-furniture-note") {
+      item.note = input.value;
+    }
+
+    item.budgetCandidate = true;
+    item.productionReady = false;
+    item.notFormalEstimate = true;
+    item.updatedAt = new Date().toISOString();
+    uiState.error = "";
+    uiState.message = "家具 / 櫃體候選資料已更新；仍不是正式估價。";
+    syncBridge();
+    render();
+  }
+
+  function previewSelectedFurnitureDimensionFromField(input) {
+    const item = getSelectedFurniture();
+    if (!item) {
+      return;
+    }
+
+    const field = input.dataset.field;
+    if (field === "selected-furniture-width") {
+      item.widthMm = normalizeFurnitureDimension(input.value, item.widthMm, MIN_FURNITURE_WIDTH_MM);
+    }
+    if (field === "selected-furniture-depth") {
+      item.depthMm = normalizeFurnitureDimension(input.value, item.depthMm, MIN_FURNITURE_DEPTH_MM);
+    }
+    if (field === "selected-furniture-height") {
+      item.heightMm = normalizeFurnitureDimension(input.value, item.heightMm, 0);
+    }
+    if (field === "selected-furniture-rotation") {
+      item.rotation = normalizeFurnitureRotation(input.value, item.rotation);
+    }
+
+    item.budgetCandidate = true;
+    item.productionReady = false;
+    item.notFormalEstimate = true;
+    item.updatedAt = new Date().toISOString();
+    uiState.error = "";
+    uiState.message = "家具 / 櫃體尺寸已同步到候選草稿；仍不是正式估價。";
+    syncBridge();
+    renderFurnitureCanvasPreview();
+  }
+
+  function renderFurnitureCanvasPreview() {
+    renderZones();
+    renderFurniture();
+    applyLayerVisibility();
+    renderStatusLabels();
+    syncStaticControls();
+  }
+
+  function applySelectedFurnitureMaterial(materialTag) {
+    const item = getSelectedFurniture();
+    if (!item) {
+      uiState.error = "請先選取家具或櫃體，再套用材料。";
+      render();
+      return;
+    }
+    pushHistory("套用家具 / 櫃體材料");
+    item.materialTags = [normalizeFurnitureMaterialTag(materialTag || uiState.currentFurnitureMaterialTag)];
+    item.updatedAt = new Date().toISOString();
+    uiState.error = "";
+    uiState.message = `已將「${getFurnitureMaterialLabel(item.materialTags[0])}」套用到「${item.name}」。仍為候選草稿。`;
+    syncBridge();
+    render();
+  }
+
+  function deleteSelectedFurniture() {
+    if (!uiState.selectedFurnitureId) {
+      uiState.error = "請先選取家具或櫃體，再刪除。";
+      render();
+      return;
+    }
+    pushHistory("刪除家具 / 櫃體");
+    project.furniture = project.furniture.filter((item) => item.id !== uiState.selectedFurnitureId);
+    uiState.selectedFurnitureId = null;
+    uiState.error = "";
+    uiState.message = "已刪除家具 / 櫃體候選物件。";
+    syncBridge();
+    render();
   }
 
   function updateCurrentZoneType(value) {
@@ -3723,6 +5342,7 @@
       nextZone.labelPosition.y = Math.max(0, readCoordinateInput(input, zone.labelPosition.y));
     }
 
+    pushHistory("更新空間標籤");
     Object.assign(zone, nextZone, { updatedAt: new Date().toISOString() });
     uiState.error = "";
     uiState.message = "空間標籤資料已更新。";
@@ -3734,6 +5354,7 @@
     if (!uiState.selectedZoneId) {
       return;
     }
+    pushHistory("刪除空間標籤");
     project.zones = project.zones.filter((zone) => zone.id !== uiState.selectedZoneId);
     if (uiState.zoneBoundaryState?.activeZoneId === uiState.selectedZoneId) {
       clearZoneBoundaryDraft();
@@ -3749,14 +5370,14 @@
     const zone = getSelectedZone();
     const boundaryState = getZoneBoundaryState();
     if (!zone || uiState.mode !== "edit-zone-boundary" || boundaryState.activeZoneId !== zone.id) {
-      uiState.error = "請先選取 zone 並進入編輯邊界模式。";
+      uiState.error = "請先選取空間標籤，並進入編輯邊界模式。";
       render();
       return;
     }
 
     const edge = getEdgeForWall(wallId);
     if (!edge) {
-      uiState.error = "找不到此牆段對應的 nodeGraph edge。";
+      uiState.error = "找不到此牆段對應的牆段連線。";
       render();
       return;
     }
@@ -3787,12 +5408,13 @@
     const zone = getSelectedZone();
     const boundaryState = getZoneBoundaryState();
     if (!zone || boundaryState.activeZoneId !== zone.id) {
-      uiState.error = "請先進入此 zone 的邊界編輯模式。";
+      uiState.error = "請先進入此空間的邊界編輯模式。";
       render();
       return;
     }
 
     const draft = createZoneBoundaryDraft(boundaryState.selectedBoundaryEdgeIds);
+    pushHistory("套用空間邊界");
     applyBoundaryDraftToZone(zone, draft, true);
     uiState.mode = "select";
     clearZoneBoundaryDraft();
@@ -3804,8 +5426,8 @@
     uiState.selectedNodeId = null;
     uiState.error = "";
     uiState.message = draft.status === "closed"
-      ? "已套用 zone boundary，polygon 使用 mm 座標保存。"
-      : "已套用 zone boundary，但目前邊界尚未形成封閉空間。";
+      ? "已套用空間邊界，邊界點使用 mm 座標保存。"
+      : "已套用空間邊界，但目前邊界尚未形成封閉空間。";
     syncBridge();
     render();
   }
@@ -3819,6 +5441,7 @@
     }
 
     const draft = createZoneBoundaryDraft([]);
+    pushHistory("清除空間邊界");
     applyBoundaryDraftToZone(zone, draft, true);
     clearZoneBoundaryDraft();
     uiState.mode = "select";
@@ -3888,13 +5511,13 @@
     const issues = [];
 
     if (normalizedEdgeIds.length === 0) {
-      issues.push(createZoneBoundaryIssue("zone-boundary-empty", normalizedEdgeIds, "此 zone 尚未指定 boundary edges。"));
+      issues.push(createZoneBoundaryIssue("zone-boundary-empty", normalizedEdgeIds, "此空間尚未指定邊界牆段。"));
     }
     if (normalizedEdgeIds.length > 0 && normalizedEdgeIds.length < ZONE_BOUNDARY_MIN_EDGES) {
-      issues.push(createZoneBoundaryIssue("zone-boundary-too-few-edges", normalizedEdgeIds, "boundaryEdgeIds 少於 3，無法形成空間邊界。"));
+      issues.push(createZoneBoundaryIssue("zone-boundary-too-few-edges", normalizedEdgeIds, "邊界牆段少於 3 段，無法形成空間邊界。"));
     }
     missingEdgeIds.forEach((edgeId) => {
-      issues.push(createZoneBoundaryIssue("zone-boundary-edge-missing", [edgeId], `找不到 boundary edge：${edgeId}`));
+      issues.push(createZoneBoundaryIssue("zone-boundary-edge-missing", [edgeId], `找不到邊界牆段：${edgeId}`));
     });
     if (normalizedEdgeIds.length >= ZONE_BOUNDARY_MIN_EDGES && missingEdgeIds.length === 0 && !polygonResult.closed) {
       issues.push(createZoneBoundaryIssue("zone-boundary-open", normalizedEdgeIds, "目前邊界尚未形成封閉空間。"));
@@ -4011,9 +5634,9 @@
       return "邊數不足";
     }
     if (type === "zone-boundary-edge-missing") {
-      return "edge 遺失";
+      return "邊界遺失";
     }
-    return "Boundary issue";
+    return "邊界問題";
   }
 
   function isWallInActiveBoundary(wallId) {
@@ -4168,6 +5791,7 @@
     });
 
     let movedCount = 0;
+    let historyRecorded = false;
     groups.forEach((group) => {
       if (group.length < 2) {
         return;
@@ -4186,6 +5810,10 @@
           return;
         }
         if (!isSamePoint(wall[record.endpoint], target)) {
+          if (!historyRecorded) {
+            pushHistory("自動接牆");
+            historyRecorded = true;
+          }
           wall[record.endpoint] = { ...target };
           wall.updatedAt = new Date().toISOString();
           movedCount += 1;
@@ -4197,7 +5825,7 @@
     uiState.selectedIssueId = null;
     uiState.error = "";
     uiState.message = movedCount > 0
-      ? `已整理 ${movedCount} 個牆端點，並重新建立 wallGraph。`
+      ? `已接好 ${movedCount} 個牆端點。`
       : "沒有找到 30mm 內需要合併的牆端點。";
     syncBridge();
     render();
@@ -4208,6 +5836,10 @@
   }
 
   function canPlaceZones() {
+    return Boolean(project.underlay && project.importSource?.previewSupported && hasValidScale());
+  }
+
+  function canPlaceFurniture() {
     return Boolean(project.underlay && project.importSource?.previewSupported && hasValidScale());
   }
 
@@ -4225,6 +5857,30 @@
 
   function getSelectedZone() {
     return project.zones.find((zone) => zone.id === uiState.selectedZoneId) || null;
+  }
+
+  function getSelectedFurniture() {
+    return project.furniture.find((item) => item.id === uiState.selectedFurnitureId) || null;
+  }
+
+  function getWallDisplayName(wallId) {
+    const index = project.walls.findIndex((wall) => wall.id === wallId);
+    return index >= 0 ? `牆體 ${index + 1}` : "牆體";
+  }
+
+  function getOpeningDisplayName(openingId) {
+    const index = project.openings.findIndex((opening) => opening.id === openingId);
+    return index >= 0 ? `門窗 / 開口 ${index + 1}` : "門窗 / 開口";
+  }
+
+  function getZoneDisplayName(zoneId) {
+    const index = project.zones.findIndex((zone) => zone.id === zoneId);
+    return index >= 0 ? `空間 ${index + 1}` : "空間";
+  }
+
+  function getFurnitureDisplayName(furnitureId) {
+    const index = project.furniture.findIndex((item) => item.id === furnitureId);
+    return index >= 0 ? `家具 / 櫃體 ${index + 1}` : "家具 / 櫃體";
   }
 
   function cloneWall(wall) {
@@ -4517,26 +6173,26 @@
     const width = Number(opening.width);
     const offset = Number(opening.offset);
     if (!edge) {
-      return { valid: false, error: "找不到 opening 依附的 edge。" };
+      return { valid: false, error: "找不到這個門窗依附的牆線，請重新選取牆體。" };
     }
     if (!Number.isFinite(offset) || offset < 0) {
-      return { valid: false, error: "offset 必須大於或等於 0。" };
+      return { valid: false, error: "牆上位置必須大於或等於 0。" };
     }
     if (!Number.isFinite(width) || width <= 0) {
-      return { valid: false, error: "width 必須大於 0。" };
+      return { valid: false, error: "開口寬度必須大於 0。" };
     }
     if (width < MIN_OPENING_WIDTH) {
       return { valid: false, error: `開口寬度不可小於 ${MIN_OPENING_WIDTH}mm。` };
     }
     if (offset + width > edge.length + GEOMETRY_EPSILON) {
-      return { valid: false, error: "offset + width 不可超過牆段長度。" };
+      return { valid: false, error: "開口位置加寬度不可超過牆段長度。" };
     }
 
     const range = OPENING_WIDTH_RANGES[normalizeOpeningKind(opening.kind)];
     if (range && (width < range.min || width > range.max)) {
       return {
         valid: true,
-        warning: `${opening.kind} 寬度建議為 ${range.min}mm 到 ${range.max}mm，請確認是否合適。`
+        warning: `${getOpeningKindLabel(opening.kind)}寬度建議為 ${range.min}mm 到 ${range.max}mm，請確認是否合適。`
       };
     }
     if (edge.length - width < 200) {
@@ -4676,7 +6332,7 @@
 
   function getScaleReadout() {
     if (!project.scale.calibrated || project.scale.pxPerMm === null) {
-      return "尚未校正";
+      return "待比例確認";
     }
     const pixelsPerThousandMm = project.scale.pxPerMm * 1000;
     return `1 mm = ${formatNumber(project.scale.pxPerMm)} px；1000 mm = ${formatNumber(pixelsPerThousandMm)} px`;
@@ -4702,19 +6358,49 @@
     return "existing";
   }
 
+  function normalizeWallType(value) {
+    return WALL_TYPE_OPTIONS.some((option) => option.value === value) ? value : DEFAULT_WALL_TYPE;
+  }
+
+  function getWallTypeOption(value) {
+    return WALL_TYPE_OPTIONS.find((option) => option.value === normalizeWallType(value)) || WALL_TYPE_OPTIONS[0];
+  }
+
+  function getWallTypeLabel(value) {
+    return getWallTypeOption(value).label;
+  }
+
+  function getWallTypeDetail(value) {
+    return getWallTypeOption(value).detail;
+  }
+
   function getWallStatusLabel(status) {
     if (status === "new") {
-      return "新牆 new";
+      return "新設牆";
     }
     if (status === "demolished") {
-      return "拆除牆 demolished";
+      return "拆除牆";
     }
-    return "既有牆 existing";
+    return "既有牆";
+  }
+
+  function renderWallTypeOptions(currentValue) {
+    const normalized = normalizeWallType(currentValue);
+    return WALL_TYPE_OPTIONS.map((option) => (
+      `<option value="${option.value}" ${option.value === normalized ? "selected" : ""}>${escapeHTML(option.label)}　${escapeHTML(option.detail)}</option>`
+    )).join("");
+  }
+
+  function renderWallThicknessOptions(currentValue) {
+    const normalized = normalizeThickness(currentValue);
+    return WALL_THICKNESS_OPTIONS.map((option) => (
+      `<option value="${option.value}" ${option.value === normalized ? "selected" : ""}>${escapeHTML(option.label)}</option>`
+    )).join("");
   }
 
   function getModeLabel(mode) {
     if (mode === "calibrate") {
-      return "校正比例";
+      return "比例校正";
     }
     if (mode === "draw-wall") {
       return "畫牆";
@@ -4722,10 +6408,134 @@
     if (mode === "place-zone") {
       return "新增空間標籤";
     }
+    if (mode === "place-furniture") {
+      return "加入家具 / 櫃體";
+    }
     if (mode === "edit-zone-boundary") {
       return "編輯空間邊界";
     }
     return "選取";
+  }
+
+  function getFurnitureTemplate(templateId) {
+    return FURNITURE_TEMPLATES[templateId] || FURNITURE_TEMPLATES.wardrobe;
+  }
+
+  function getFurnitureTypeLabel(type) {
+    return getFurnitureTemplate(type).name || type;
+  }
+
+  function getFurnitureCategoryLabel(category) {
+    return FURNITURE_CATEGORY_LABELS[category] || category || "未分類";
+  }
+
+  function getFurnitureMaterialLabel(tag) {
+    return FURNITURE_MATERIAL_LABELS[tag] || tag || "未指定";
+  }
+
+  function getOpeningKindLabel(kind) {
+    return OPENING_KIND_LABELS[kind] || kind || "開口";
+  }
+
+  function getOpeningSwingLabel(swing) {
+    return OPENING_SWING_LABELS[swing] || swing || "無門片";
+  }
+
+  function getLayerLabel(layer) {
+    if (layer === "furniture") {
+      return "家具 / 櫃體";
+    }
+    if (layer === "walls") {
+      return "牆體";
+    }
+    if (layer === "openings") {
+      return "門窗開口";
+    }
+    if (layer === "zones") {
+      return "空間";
+    }
+    return layer || "未指定";
+  }
+
+  function normalizeFurnitureDimension(value, fallback, minValue) {
+    const numeric = Number.parseInt(value, 10);
+    if (!Number.isFinite(numeric)) {
+      return fallback;
+    }
+    return Math.max(minValue, numeric);
+  }
+
+  function normalizeFurnitureRotation(value, fallback) {
+    const numeric = Number.parseFloat(value);
+    if (!Number.isFinite(numeric)) {
+      return fallback;
+    }
+    return Math.round(numeric);
+  }
+
+  function normalizeFurnitureMaterialTag(value) {
+    return FURNITURE_MATERIAL_TAGS.includes(value) ? value : "unspecified";
+  }
+
+  function renderFurnitureMaterialOptions(currentValue) {
+    const selected = normalizeFurnitureMaterialTag(currentValue);
+    return FURNITURE_MATERIAL_TAGS.map((tag) => (
+      `<option value="${escapeAttribute(tag)}" ${tag === selected ? "selected" : ""}>${escapeHTML(getFurnitureMaterialLabel(tag))}</option>`
+    )).join("");
+  }
+
+  function normalizeFurnitureForExport(item) {
+    return {
+      ...item,
+      widthMm: normalizeFurnitureDimension(item.widthMm, getFurnitureTemplate(item.type).widthMm, MIN_FURNITURE_WIDTH_MM),
+      depthMm: normalizeFurnitureDimension(item.depthMm, getFurnitureTemplate(item.type).depthMm, MIN_FURNITURE_DEPTH_MM),
+      heightMm: normalizeFurnitureDimension(item.heightMm, getFurnitureTemplate(item.type).heightMm, 0),
+      budgetCandidate: true,
+      productionReady: false,
+      notFormalEstimate: true
+    };
+  }
+
+  function createToolCatalogFurnitureItems() {
+    return Object.values(FURNITURE_TEMPLATES).map((template) => ({
+      id: `tool-${template.type}`,
+      type: template.type,
+      category: template.category,
+      name: template.name,
+      widthMm: template.widthMm,
+      depthMm: template.depthMm,
+      heightMm: template.heightMm,
+      materialTags: [...template.materialTags],
+      runtimeSource: "parametric-mvp",
+      svgPackageSource: "blocked_until_overlay_qa",
+      budgetCandidate: true,
+      productionReady: false,
+      notFormalEstimate: true
+    }));
+  }
+
+  function createFurnitureLayoutObject(item) {
+    const exported = normalizeFurnitureForExport(item);
+    return {
+      id: exported.id,
+      objectType: "parametric_furniture_candidate",
+      type: exported.type,
+      category: exported.category,
+      name: exported.name,
+      layer: exported.layer,
+      positionMm: { x: exported.x, y: exported.y },
+      sizeMm: {
+        width: exported.widthMm,
+        depth: exported.depthMm,
+        height: exported.heightMm
+      },
+      rotation: exported.rotation,
+      materialTags: [...(exported.materialTags || [])],
+      note: exported.note || "",
+      budgetCandidate: true,
+      productionReady: false,
+      notFormalEstimate: true
+    };
   }
 
   function getNormalizedFileType(file) {

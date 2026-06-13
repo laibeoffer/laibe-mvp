@@ -1,0 +1,150 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop52-classification-layer-persistence",
+  "viewport": {
+    "width": 1280,
+    "height": 620
+  },
+  "checkedAt": "2026-06-13T13:50:21.164Z",
+  "result": "LOOP_52_CLASSIFICATION_LAYER_PERSISTENCE_FAIL",
+  "checks": {
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "#planCanvas visible"
+    },
+    "drawWall": {
+      "status": "PASS",
+      "evidence": "wallHitTargets=1"
+    },
+    "addDoor": {
+      "status": "PASS",
+      "evidence": "openingHitTargets=1"
+    },
+    "editOpening": {
+      "status": "PASS",
+      "evidence": "offset=600 width=760 swing=right fields changed"
+    },
+    "editWall": {
+      "status": "PASS",
+      "evidence": "status=demolished type=light_partition thickness=100 fields changed"
+    },
+    "placeFurniture": {
+      "status": "PASS",
+      "evidence": "furnitureItems=1"
+    },
+    "editFurniture": {
+      "status": "PASS",
+      "evidence": "width=1600 depth=550 height=2300 rotation=90 material=system_panel note set"
+    },
+    "candidateJsonExport": {
+      "status": "FAIL",
+      "evidence": "{\"walls\":1,\"openings\":1,\"furniture\":1,\"layoutObjects\":0,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"wall\":{\"id\":\"wall-1781358615399-cc9aa7\",\"sourceWallId\":null,\"from\":{\"x\":610,\"y\":2100},\"to\":{\"x\":7070,\"y\":2100},\"thickness\":100,\"status\":\"demolished\",\"wallType\":\"light_partition\",\"structural\":false,\"layer\":\"walls\",\"createdAt\":\"2026-06-13T13:50:15.399Z\",\"updatedAt\":\"2026-06-13T13:50:18.241Z\"},\"opening\":{\"id\":\"opening-1781358616221-7e9d98\",\"edgeId\":\"edge-wall-1781358615399-cc9aa7\",\"sourceWallId\":\"wall-1781358615399-cc9aa7\",\"kind\":\"door\",\"offset\":600,\"width\":760,\"swing\":\"right\",\"sillHeight\":null,\"height\":2100,\"createdAt\":\"2026-06-13T13:50:16.221Z\",\"updatedAt\":\"2026-06-13T13:50:17.274Z\"},\"furnitureFirst\":{\"id\":\"furniture-1781358618697-d642b1\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":4220,\"y\":3020,\"widthMm\":1600,\"depthMm\":550,\"heightMm\":2300,\"rotation\":90,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"Loop52 candidate note\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:50:18.697Z\",\"updatedAt\":\"2026-06-13T13:50:20.570Z\"},\"layoutObjectFirst\":null}"
+    },
+    "wallPersistence": {
+      "status": "PASS",
+      "evidence": "{\"status\":\"demolished\",\"wallType\":\"light_partition\",\"thickness\":100,\"structural\":false}"
+    },
+    "openingPersistence": {
+      "status": "PASS",
+      "evidence": "{\"kind\":\"door\",\"offset\":600,\"width\":760,\"swing\":\"right\",\"height\":2100}"
+    },
+    "furniturePersistence": {
+      "status": "PASS",
+      "evidence": "{\"widthMm\":1600,\"depthMm\":550,\"heightMm\":2300,\"rotation\":90,\"materialTags\":[\"system_panel\"],\"note\":\"Loop52 candidate note\",\"productionReady\":false,\"notFormalEstimate\":true}"
+    },
+    "layoutObjectPersistence": {
+      "status": "FAIL",
+      "evidence": "null"
+    },
+    "pcProductionExportDisabled": {
+      "status": "PASS",
+      "evidence": "disabledPcButtons=3"
+    },
+    "candidateGuard": {
+      "status": "PASS",
+      "evidence": "{\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furniture\":{\"productionReady\":false,\"notFormalEstimate\":true,\"budgetCandidate\":true}}"
+    },
+    "consoleErrors": {
+      "status": "PASS",
+      "evidence": "0 console/page errors"
+    },
+    "consoleWarnings": {
+      "status": "PASS",
+      "evidence": "0 console warnings"
+    }
+  },
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_52_CLASSIFICATION_LAYER_PERSISTENCE.png",
+  "candidateJson": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_52_CLASSIFICATION_LAYER_PERSISTENCE_EXPORT.json",
+  "summary": {
+    "walls": 1,
+    "openings": 1,
+    "furniture": 1,
+    "layoutObjects": 0,
+    "boundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "wall": {
+      "id": "wall-1781358615399-cc9aa7",
+      "sourceWallId": null,
+      "from": {
+        "x": 610,
+        "y": 2100
+      },
+      "to": {
+        "x": 7070,
+        "y": 2100
+      },
+      "thickness": 100,
+      "status": "demolished",
+      "wallType": "light_partition",
+      "structural": false,
+      "layer": "walls",
+      "createdAt": "2026-06-13T13:50:15.399Z",
+      "updatedAt": "2026-06-13T13:50:18.241Z"
+    },
+    "opening": {
+      "id": "opening-1781358616221-7e9d98",
+      "edgeId": "edge-wall-1781358615399-cc9aa7",
+      "sourceWallId": "wall-1781358615399-cc9aa7",
+      "kind": "door",
+      "offset": 600,
+      "width": 760,
+      "swing": "right",
+      "sillHeight": null,
+      "height": 2100,
+      "createdAt": "2026-06-13T13:50:16.221Z",
+      "updatedAt": "2026-06-13T13:50:17.274Z"
+    },
+    "furnitureFirst": {
+      "id": "furniture-1781358618697-d642b1",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "layer": "furniture",
+      "x": 4220,
+      "y": 3020,
+      "widthMm": 1600,
+      "depthMm": 550,
+      "heightMm": 2300,
+      "rotation": 90,
+      "status": "candidate",
+      "materialTags": [
+        "system_panel"
+      ],
+      "note": "Loop52 candidate note",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true,
+      "createdAt": "2026-06-13T13:50:18.697Z",
+      "updatedAt": "2026-06-13T13:50:20.570Z"
+    },
+    "layoutObjectFirst": null
+  },
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "pageErrors": []
+  }
+}

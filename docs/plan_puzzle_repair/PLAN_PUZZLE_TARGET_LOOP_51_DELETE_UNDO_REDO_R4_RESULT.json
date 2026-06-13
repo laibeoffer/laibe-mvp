@@ -1,0 +1,734 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop51-delete-undo-redo-regression-r4-blank-mm",
+  "viewport": {
+    "width": 1280,
+    "height": 620
+  },
+  "checkedAt": "2026-06-13T13:45:08.150Z",
+  "result": "LOOP_51_DELETE_UNDO_REDO_REGRESSION_PASS",
+  "checks": {
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "#planCanvas visible"
+    },
+    "blankMmDraft": {
+      "status": "PASS",
+      "evidence": "{\"importSource\":\"blank-mm-draft\",\"scale\":{\"pxPerMm\":0.1,\"calibrated\":true}}"
+    },
+    "drawWall": {
+      "status": "PASS",
+      "evidence": "wallHitTargets=1"
+    },
+    "addDoorWindowOpening": {
+      "status": "PASS",
+      "evidence": "openingHitTargets=3; door: openingHitTargets=1; click=284,311 target=wall-hit-target; window: openingHitTargets=2; click=297,311 target=wall-hit-target; opening: openingHitTargets=3; click=310,311 target=wall-hit-target"
+    },
+    "placeFurniture": {
+      "status": "PASS",
+      "evidence": "furnitureItems=1"
+    },
+    "initialCandidateJson": {
+      "status": "PASS",
+      "evidence": "{\"walls\":1,\"openings\":3,\"furniture\":1,\"layoutObjects\":0,\"toolCatalogItems\":10,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"firstFurniture\":{\"id\":\"furniture-1781358302063-3f6f40\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":3840,\"y\":3020,\"widthMm\":1800,\"depthMm\":600,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"wood\"],\"note\":\"\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:45:02.063Z\",\"updatedAt\":\"2026-06-13T13:45:02.063Z\"},\"importSource\":{\"id\":\"import-1781358298866-1c68f9\",\"originalFileName\":\"blank-mm-draft.svg\",\"originalFileType\":\"svg\",\"accepted\":true,\"previewSupported\":true,\"normalizedAs\":\"blank-mm-draft\",\"importedAt\":\"2026-06-13T13:44:58.865Z\"},\"scale\":{\"pxPerMm\":0.1,\"calibrated\":true}}"
+    },
+    "furnitureDeleteUndoRedo": {
+      "status": "PASS",
+      "evidence": "delete=0, undo=1, redo=0, restored=1"
+    },
+    "openingDeleteUndoRedo": {
+      "status": "PASS",
+      "evidence": "selected=1; delete=2, undo=3, redo=2, restored=3; clickTarget=opening-hit-target"
+    },
+    "wallDeleteUndoRedo": {
+      "status": "PASS",
+      "evidence": "selected=1; delete=0/0, undo=1/3, redo=0/0, final=1/3; clickTarget=wall-hit-target"
+    },
+    "pcProductionExportDisabled": {
+      "status": "PASS",
+      "evidence": "disabledPcButtons=3"
+    },
+    "candidateGuard": {
+      "status": "PASS",
+      "evidence": "{\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"firstFurniture\":{\"productionReady\":false,\"notFormalEstimate\":true,\"budgetCandidate\":true}}"
+    },
+    "consoleErrors": {
+      "status": "PASS",
+      "evidence": "0 console/page errors"
+    },
+    "consoleWarnings": {
+      "status": "PASS",
+      "evidence": "0 console warnings"
+    }
+  },
+  "stateExports": {
+    "STATE_00_BLANK_MM_DRAFT": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_00_BLANK_MM_DRAFT.json",
+      "summary": {
+        "walls": 0,
+        "openings": 0,
+        "furniture": 0,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": null,
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_01_INITIAL_WITH_WALL_OPENINGS_FURNITURE": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_01_INITIAL_WITH_WALL_OPENINGS_FURNITURE.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_02_FURNITURE_DELETED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_02_FURNITURE_DELETED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 0,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": null,
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_03_FURNITURE_UNDO_RESTORED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_03_FURNITURE_UNDO_RESTORED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_04_FURNITURE_REDO_DELETED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_04_FURNITURE_REDO_DELETED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 0,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": null,
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_05_FURNITURE_RESTORED_FOR_NEXT_TEST": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_05_FURNITURE_RESTORED_FOR_NEXT_TEST.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_06_OPENING_DELETED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_06_OPENING_DELETED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 2,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_07_OPENING_UNDO_RESTORED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_07_OPENING_UNDO_RESTORED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_08_OPENING_REDO_DELETED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_08_OPENING_REDO_DELETED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 2,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_09_OPENING_RESTORED_FOR_NEXT_TEST": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_09_OPENING_RESTORED_FOR_NEXT_TEST.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_10_WALL_DELETED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_10_WALL_DELETED.json",
+      "summary": {
+        "walls": 0,
+        "openings": 0,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_11_WALL_UNDO_RESTORED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_11_WALL_UNDO_RESTORED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_12_WALL_REDO_DELETED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_12_WALL_REDO_DELETED.json",
+      "summary": {
+        "walls": 0,
+        "openings": 0,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    },
+    "STATE_13_FINAL_RESTORED": {
+      "path": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_R4_STATE_13_FINAL_RESTORED.json",
+      "summary": {
+        "walls": 1,
+        "openings": 3,
+        "furniture": 1,
+        "layoutObjects": 0,
+        "toolCatalogItems": 10,
+        "boundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "firstFurniture": {
+          "id": "furniture-1781358302063-3f6f40",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3840,
+          "y": 3020,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T13:45:02.063Z",
+          "updatedAt": "2026-06-13T13:45:02.063Z"
+        },
+        "importSource": {
+          "id": "import-1781358298866-1c68f9",
+          "originalFileName": "blank-mm-draft.svg",
+          "originalFileType": "svg",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "blank-mm-draft",
+          "importedAt": "2026-06-13T13:44:58.865Z"
+        },
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        }
+      }
+    }
+  },
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_DELETE_UNDO_REDO_R4.png",
+  "finalExport": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_51_DELETE_UNDO_REDO_R4_FINAL_EXPORT.json",
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "pageErrors": []
+  }
+}

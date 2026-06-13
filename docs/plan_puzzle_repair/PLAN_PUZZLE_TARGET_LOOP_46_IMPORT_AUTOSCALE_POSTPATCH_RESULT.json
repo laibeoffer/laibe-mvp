@@ -1,0 +1,109 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-postpatch",
+  "timestamp": "2026-06-13T12:34:56.051Z",
+  "pdfPath": "Z:/08-Jacky/laibe_MVP_project/laibe_project/plancraft/sample.pdf",
+  "pngNoClue": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\PLAN_PUZZLE_TARGET_LOOP_45_FUNCTIONAL_REGRESSION.png",
+  "pngWithClue": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\PLAN_PUZZLE_LOOP46_width-3000mm.png",
+  "states": [
+    {
+      "label": "initial",
+      "visiblePdfDirectLabelGone": true,
+      "visiblePdfConvertLabel": false,
+      "scaleStatusText": "待比例確認",
+      "noAutoDetectText": true,
+      "noImageClueOverclaim": true,
+      "filenameClueWording": false
+    },
+    {
+      "label": "after_pdf_upload",
+      "pdfWarningVisible": false,
+      "pdfConvertInstructionVisible": false,
+      "scaleStillUnconfirmed": false,
+      "autoSuggestionButtonCount": 0
+    },
+    {
+      "label": "after_png_without_dimension_clue",
+      "imported": false,
+      "noApplySuggestion": true,
+      "manualCalibrationVisible": false,
+      "scaleStatusText": "待兩點校正"
+    },
+    {
+      "label": "after_png_with_filename_dimension_clue_apply",
+      "suggestionCount": 1,
+      "suggestionClicked": true,
+      "scaleConfirmedVisible": false,
+      "filenameSuggestionVisible": false,
+      "scaleStatusText": "已確認"
+    }
+  ],
+  "exported": {
+    "downloaded": true,
+    "error": null,
+    "parsed": {
+      "draft_version": "0.10.0-renderer-preview-spike",
+      "importSource": {
+        "id": "import-1781354094469-a91989",
+        "originalFileName": "PLAN_PUZZLE_LOOP46_width-3000mm.png",
+        "originalFileType": "png",
+        "accepted": true,
+        "previewSupported": true,
+        "normalizedAs": "underlay-image",
+        "importedAt": "2026-06-13T12:34:54.460Z"
+      },
+      "scale": {
+        "pxPerMm": 0.502667,
+        "calibrated": true,
+        "autoScaleSuggestion": {
+          "status": "suggested",
+          "source": "file-name-dimension-clue",
+          "sourceLabel": "檔名明確標示 寬度 3,000 mm",
+          "axis": "width",
+          "imageWidthPx": 1508,
+          "imageHeightPx": 760,
+          "pixelDistance": 1508,
+          "knownLengthMm": 3000,
+          "pxPerMm": 0.502667,
+          "confidence": "high",
+          "confidenceLabel": "高",
+          "canApply": true,
+          "from": {
+            "x": 0,
+            "y": 0
+          },
+          "to": {
+            "x": 1508,
+            "y": 0
+          },
+          "createdAt": "2026-06-13T12:34:54.482Z",
+          "note": "系統依匯入檔名中的尺寸線索建立建議比例；仍保留人工校正覆核。",
+          "appliedAt": "2026-06-13T12:34:55.386Z"
+        },
+        "autoScaleApplied": true
+      },
+      "warnings": null,
+      "productionReady": null
+    },
+    "checks": {
+      "hasScale": true,
+      "scaleCalibrated": true,
+      "hasImportSource": true,
+      "productionReadyFalse": false,
+      "noBudgetEstimateLines": true,
+      "noFormalEstimate": false
+    }
+  },
+  "consoleMessages": [],
+  "consoleErrorCount": 0,
+  "pass": {
+    "pageLoad": true,
+    "misleadingPdfLabelRemoved": false,
+    "misleadingAutoDetectRemoved": true,
+    "pdfBlockedAsPlaceholder": false,
+    "pngNoClueNeedsManualCalibration": false,
+    "filenameClueCanApply": false,
+    "exportJsonWorks": true,
+    "noFormalBudgetExport": false,
+    "consoleErrorZero": true
+  }
+}

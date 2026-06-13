@@ -1,0 +1,168 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop49-small-viewport-operability",
+  "viewport": {
+    "width": 1280,
+    "height": 620
+  },
+  "checkedAt": "2026-06-13T13:08:10.572Z",
+  "toolNote": "External Chrome Playwright used because in-app Browser API cannot set file input for PNG import.",
+  "checks": {
+    "smallViewportStructure": {
+      "status": "PARTIAL",
+      "evidence": "{\"viewport\":{\"width\":1280,\"height\":620},\"scroll\":{\"x\":0,\"y\":0,\"documentHeight\":667},\"fileBar\":null,\"workbench\":null,\"toolPanel\":null,\"canvas\":{\"x\":197,\"y\":148,\"width\":784,\"height\":458,\"overflowY\":\"hidden\",\"visible\":true},\"statusPanel\":null,\"canvasVisible\":true,\"toolPanelVisible\":false,\"statusPanelVisible\":false}"
+    },
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "code.html loaded and #planCanvas exists"
+    },
+    "pngImport": {
+      "status": "PASS",
+      "evidence": "import attempted; scaleStatus=有檔名建議"
+    },
+    "scaleCalibration": {
+      "status": "PASS",
+      "evidence": "apply suggestion visible and clicked; scaleStatus=已確認"
+    },
+    "drawWall": {
+      "status": "PASS",
+      "evidence": "walls=1"
+    },
+    "selectWall": {
+      "status": "PASS",
+      "evidence": "selectedWalls=1"
+    },
+    "doorWindowOpening": {
+      "status": "PASS",
+      "evidence": "opening symbols=4"
+    },
+    "furniturePlacement": {
+      "status": "PASS",
+      "evidence": "furniture=1"
+    },
+    "furnitureDrag": {
+      "status": "PASS",
+      "evidence": "before=(121,233), after=(166,253)"
+    },
+    "furnitureResize": {
+      "status": "PARTIAL",
+      "evidence": "resize handle dragged; visual delta was small"
+    },
+    "inspectorEdit": {
+      "status": "PASS",
+      "evidence": "width/depth/note/material controls visible and changed"
+    },
+    "pcProductionExportDisabled": {
+      "status": "PASS",
+      "evidence": "disabled buttons=3"
+    },
+    "candidateJsonExport": {
+      "status": "PASS",
+      "evidence": "{\"walls\":1,\"openings\":3,\"furniture\":1,\"layoutObjects\":1,\"toolCatalogItems\":10,\"formalEstimate\":false,\"budgetEngineCalled\":false,\"furnitureFirst\":{\"id\":\"furniture-1781356093858-2e9de2\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":838,\"y\":603,\"widthMm\":1230,\"depthMm\":650,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"Loop49 small viewport note\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:08:13.858Z\",\"updatedAt\":\"2026-06-13T13:08:15.111Z\"}}"
+    },
+    "candidateGuard": {
+      "status": "FAIL",
+      "evidence": "{\"walls\":1,\"openings\":3,\"furniture\":1,\"layoutObjects\":1,\"toolCatalogItems\":10,\"formalEstimate\":false,\"budgetEngineCalled\":false,\"furnitureFirst\":{\"id\":\"furniture-1781356093858-2e9de2\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":838,\"y\":603,\"widthMm\":1230,\"depthMm\":650,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"Loop49 small viewport note\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:08:13.858Z\",\"updatedAt\":\"2026-06-13T13:08:15.111Z\"}}"
+    },
+    "consoleErrors": {
+      "status": "PASS",
+      "evidence": "0 console/page errors"
+    },
+    "consoleWarnings": {
+      "status": "PASS",
+      "evidence": "0 console warnings"
+    }
+  },
+  "layout": {
+    "initial": {
+      "viewport": {
+        "width": 1280,
+        "height": 620
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0,
+        "documentHeight": 667
+      },
+      "fileBar": null,
+      "workbench": null,
+      "toolPanel": null,
+      "canvas": {
+        "x": 197,
+        "y": 148,
+        "width": 784,
+        "height": 458,
+        "overflowY": "hidden",
+        "visible": true
+      },
+      "statusPanel": null,
+      "canvasVisible": true,
+      "toolPanelVisible": false,
+      "statusPanelVisible": false
+    },
+    "afterActions": {
+      "viewport": {
+        "width": 1280,
+        "height": 620
+      },
+      "scroll": {
+        "x": 0,
+        "y": 47,
+        "documentHeight": 667
+      },
+      "fileBar": null,
+      "workbench": null,
+      "toolPanel": null,
+      "canvas": {
+        "x": 197,
+        "y": 101,
+        "width": 784,
+        "height": 458,
+        "overflowY": "hidden",
+        "visible": true
+      },
+      "statusPanel": null,
+      "canvasVisible": true,
+      "toolPanelVisible": false,
+      "statusPanelVisible": false
+    }
+  },
+  "console": {
+    "errors": [],
+    "warnings": []
+  },
+  "exportSummary": {
+    "walls": 1,
+    "openings": 3,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "formalEstimate": false,
+    "budgetEngineCalled": false,
+    "furnitureFirst": {
+      "id": "furniture-1781356093858-2e9de2",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "layer": "furniture",
+      "x": 838,
+      "y": 603,
+      "widthMm": 1230,
+      "depthMm": 650,
+      "heightMm": 2400,
+      "rotation": 0,
+      "status": "candidate",
+      "materialTags": [
+        "system_panel"
+      ],
+      "note": "Loop49 small viewport note",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true,
+      "createdAt": "2026-06-13T13:08:13.858Z",
+      "updatedAt": "2026-06-13T13:08:15.111Z"
+    }
+  },
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_49_SMALL_VIEWPORT.png",
+  "exportFile": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_49_SMALL_VIEWPORT_EXPORT.json",
+  "overall": "FAIL"
+}

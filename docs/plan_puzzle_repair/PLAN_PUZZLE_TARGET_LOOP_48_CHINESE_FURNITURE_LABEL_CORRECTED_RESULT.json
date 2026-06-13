@@ -1,0 +1,26 @@
+﻿{
+    "validationUrl":  "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop48-chinese-furniture-label",
+    "timestamp":  "2026-06-13T12:57:07.238Z",
+    "labelText":  "馬桶\n馬桶 / 420 x 700 mm",
+    "visibleChineseLabel":  true,
+    "visibleEnglishSlug":  false,
+    "bodyStillHasEnglishSlugInFurnitureLabelArea":  false,
+    "exportChecks":  {
+                         "downloaded":  true,
+                         "savePath":  "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_48_CHINESE_LABEL_EXPORT.json",
+                         "furnitureType":  "toilet",
+                         "furnitureName":  "馬桶",
+                         "formalEstimate":  false,
+                         "budgetEngineCalled":  false,
+                         "productionReady":  false,
+                         "noForbiddenOutput":  true
+                     },
+    "consoleErrorCount":  0,
+    "consoleWarningCount":  0,
+    "consoleMessages":  [
+
+                        ],
+    "overall":  "PASS",
+    "correctedFrom":  "docs\\plan_puzzle_repair\\PLAN_PUZZLE_TARGET_LOOP_48_CHINESE_FURNITURE_LABEL_RESULT.json",
+    "correctionReason":  "Corrected one harness encoding false negative for visibleChineseLabel; labelText is 馬桶 / 420 x 700 mm and contains no English slug."
+}

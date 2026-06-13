@@ -1,0 +1,128 @@
+{
+  "title": "LaiBE | 平面拼圖 Plancraft+",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop56-ppt-like-direct-manipulation-ui-repair-r3",
+  "pathText": "檔案區 > 工具區 > 畫布 > 屬性面板",
+  "inspectorLabel": "屬性面板",
+  "wallCountLabel": "1",
+  "wallLines": 1,
+  "furnitureItems": 1,
+  "selectedFurnitureItems": 1,
+  "resizeHandles": 2,
+  "inspectorHasFurnitureFields": false,
+  "inspectorText": "屬性 圖層 提醒 材料 總覽 選取家具 / 櫃體 編號 家具 / 櫃體 1 項目類型 衣櫃 分類 櫃體 圖層 家具 / 櫃體 預算候選 是 正式成果 否 正式估價 否 刪除家具 / 櫃體 套用目前材料 項目名稱 寬度 MM 深度 MM 高度 MM 旋轉角度 材料 木質 系統板材 石材 布料 陶瓷 金屬 未指定 備註 此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。 木質 系統板材 石材 布料 陶瓷 金屬 未指定 刪除家具 / 櫃體 家具 / 櫃體候選資料已更新；仍不是正式估價。",
+  "forbiddenVisibleWords": [],
+  "toolCardMetrics": [
+    {
+      "text": "匯入圖紙",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "校正比例",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "選取",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "刪除",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "畫牆",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "接牆",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "門",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "窗",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "開口",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "新增空間",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "編輯邊界",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "衣櫃",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "高櫃",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "矮櫃 / 吊櫃",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "廚具",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "馬桶",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "洗手台",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "活動家具",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "放到畫布",
+      "width": 56,
+      "height": 50
+    },
+    {
+      "text": "SVG 圖塊審查",
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": "家具包整合",
+      "width": 56,
+      "height": 56
+    },
+    {
+      "text": ".pc 預覽停用",
+      "width": 56,
+      "height": 56
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarnings": []
+}

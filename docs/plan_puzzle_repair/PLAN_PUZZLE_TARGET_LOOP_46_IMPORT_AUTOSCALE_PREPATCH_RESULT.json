@@ -1,0 +1,126 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-prepatch",
+  "pdfPath": "Z:/08-Jacky/laibe_MVP_project/laibe_project/plancraft/sample.pdf",
+  "pngNoClue": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\PLAN_PUZZLE_TARGET_LOOP_45_FUNCTIONAL_REGRESSION.png",
+  "pngWithClue": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\PLAN_PUZZLE_LOOP46_width-3000mm.png",
+  "timestamp": "2026-06-13T12:29:48.059Z",
+  "states": [
+    {
+      "label": "initial",
+      "href": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-prepatch",
+      "scaleStatusText": "待自動偵測",
+      "stageText": "匯入圖紙 空白毫米草稿 校正比例 選取 刪除 畫牆 門 窗 開口 空間 項目 衣櫃 高櫃 矮櫃 / 吊櫃 電視櫃 廚具 床 沙發 餐桌 馬桶 洗手台 加入圖面 材質 木作 系統板 石材 布料 磁磚 金屬 未指定 套用材質 接齊 重設 候選草稿 JSON .pc 正式匯出停用 匯入基準圖 門窗與牆段 空間標籤 圖層狀態 草稿輸出 候選草稿 JSON 才能匯出 目前仍是草稿資料，不是施工圖，不呼叫預算引擎；.pc 正式匯出維持停用。 水平 / 寬度 平面拼圖草稿 請先匯入業主提供的丈量圖 建立底圖基準後，先自動判讀比例線索，再進行牆體描繪。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據",
+      "importSource": null,
+      "scale": null,
+      "hasAutoScaleSuggestionButton": false,
+      "visibleImportButtons": [
+        "匯入 JPG / PNG / PDF",
+        "校正比例",
+        "匯入圖紙JPG / PNG / PDF 參考圖可用",
+        "校正比例系統建議優先可用",
+        "匯入圖紙",
+        "校正比例"
+      ],
+      "visiblePDFWordCount": 1,
+      "visibleAutoDetectOverclaim": true,
+      "visibleFilenameHonesty": false
+    },
+    {
+      "label": "after_pdf_upload",
+      "href": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-prepatch",
+      "scaleStatusText": "待自動偵測",
+      "stageText": "匯入圖紙 空白毫米草稿 校正比例 選取 刪除 畫牆 門 窗 開口 空間 項目 衣櫃 高櫃 矮櫃 / 吊櫃 電視櫃 廚具 床 沙發 餐桌 馬桶 洗手台 加入圖面 材質 木作 系統板 石材 布料 磁磚 金屬 未指定 套用材質 接齊 重設 候選草稿 JSON .pc 正式匯出停用 匯入基準圖 門窗與牆段 空間標籤 圖層狀態 草稿輸出 候選草稿 JSON 才能匯出 目前仍是草稿資料，不是施工圖，不呼叫預算引擎；.pc 正式匯出維持停用。 水平 / 寬度 平面拼圖草稿 PDF 匯入接口已建立 此版本已建立 PDF 匯入接口，但尚未支援 PDF 直接預覽與校正。請先將丈量圖轉成 JPG 或 PNG 上傳；PDF 轉圖會在後續版本接入 Plancraft+ 匯入流程。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據",
+      "importSource": null,
+      "scale": null,
+      "hasAutoScaleSuggestionButton": false,
+      "visibleImportButtons": [
+        "匯入 JPG / PNG / PDF",
+        "校正比例",
+        "匯入圖紙JPG / PNG / PDF 參考圖可用",
+        "校正比例系統建議優先可用",
+        "匯入圖紙",
+        "校正比例"
+      ],
+      "visiblePDFWordCount": 8,
+      "visibleAutoDetectOverclaim": true,
+      "visibleFilenameHonesty": false
+    },
+    {
+      "label": "after_png_without_dimension_clue",
+      "href": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-prepatch",
+      "scaleStatusText": "自動偵測中",
+      "stageText": "匯入圖紙 空白毫米草稿 校正比例 選取 刪除 畫牆 門 窗 開口 空間 項目 衣櫃 高櫃 矮櫃 / 吊櫃 電視櫃 廚具 床 沙發 餐桌 馬桶 洗手台 加入圖面 材質 木作 系統板 石材 布料 磁磚 金屬 未指定 套用材質 接齊 重設 候選草稿 JSON .pc 正式匯出停用 匯入基準圖 門窗與牆段 空間標籤 圖層狀態 草稿輸出 候選草稿 JSON 才能匯出 目前仍是草稿資料，不是施工圖，不呼叫預算引擎；.pc 正式匯出維持停用。 水平 / 寬度 平面拼圖草稿 等待比例線索 系統未找到可自動套用的尺寸線索，請用兩點校正確認比例。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據",
+      "importSource": null,
+      "scale": null,
+      "hasAutoScaleSuggestionButton": false,
+      "visibleImportButtons": [
+        "匯入 JPG / PNG / PDF",
+        "校正比例",
+        "匯入圖紙JPG / PNG / PDF 參考圖可用",
+        "校正比例系統建議優先可用",
+        "匯入圖紙",
+        "校正比例"
+      ],
+      "visiblePDFWordCount": 1,
+      "visibleAutoDetectOverclaim": true,
+      "visibleFilenameHonesty": false
+    },
+    {
+      "label": "after_png_with_filename_dimension_clue",
+      "href": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-prepatch",
+      "scaleStatusText": "有系統建議",
+      "stageText": "匯入圖紙 空白毫米草稿 校正比例 選取 刪除 畫牆 門 窗 開口 空間 項目 衣櫃 高櫃 矮櫃 / 吊櫃 電視櫃 廚具 床 沙發 餐桌 馬桶 洗手台 加入圖面 材質 木作 系統板 石材 布料 磁磚 金屬 未指定 套用材質 接齊 重設 候選草稿 JSON .pc 正式匯出停用 匯入基準圖 門窗與牆段 空間標籤 圖層狀態 草稿輸出 候選草稿 JSON 才能匯出 目前仍是草稿資料，不是施工圖，不呼叫預算引擎；.pc 正式匯出維持停用。 水平 / 寬度 平面拼圖草稿 等待比例線索 系統找到圖面尺寸線索，可先套用建議比例；仍可用兩點校正覆核。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據",
+      "importSource": null,
+      "scale": null,
+      "hasAutoScaleSuggestionButton": true,
+      "visibleImportButtons": [
+        "匯入 JPG / PNG / PDF",
+        "校正比例",
+        "匯入圖紙JPG / PNG / PDF 參考圖可用",
+        "校正比例系統建議優先可用",
+        "匯入圖紙",
+        "校正比例",
+        "重新點選"
+      ],
+      "visiblePDFWordCount": 1,
+      "visibleAutoDetectOverclaim": true,
+      "visibleFilenameHonesty": true
+    },
+    {
+      "label": "after_apply_filename_suggestion",
+      "href": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-prepatch",
+      "scaleStatusText": "已確認",
+      "stageText": "匯入圖紙 空白毫米草稿 校正比例 選取 刪除 畫牆 門 窗 開口 空間 項目 衣櫃 高櫃 矮櫃 / 吊櫃 電視櫃 廚具 床 沙發 餐桌 馬桶 洗手台 加入圖面 材質 木作 系統板 石材 布料 磁磚 金屬 未指定 套用材質 接齊 重設 候選草稿 JSON .pc 正式匯出停用 匯入基準圖 門窗與牆段 空間標籤 圖層狀態 草稿輸出 候選草稿 JSON 才能匯出 目前仍是草稿資料，不是施工圖，不呼叫預算引擎；.pc 正式匯出維持停用。 水平 / 寬度 平面拼圖草稿 3,000 mm = 1,508 px點 1點 2 比例已確認 已套用系統比例建議：3,000 mm = 1,508 px。 平面拼圖候選草稿 只供人工確認、設計討論與後續審核。 不產生正式估價 / 不輸出正式 .pc / 不作施工圖依據",
+      "importSource": null,
+      "scale": null,
+      "hasAutoScaleSuggestionButton": true,
+      "visibleImportButtons": [
+        "匯入 JPG / PNG / PDF",
+        "校正比例",
+        "匯入圖紙JPG / PNG / PDF 參考圖可用",
+        "校正比例系統建議優先可用",
+        "匯入圖紙",
+        "校正比例",
+        "重新點選"
+      ],
+      "visiblePDFWordCount": 1,
+      "visibleAutoDetectOverclaim": false,
+      "visibleFilenameHonesty": true
+    }
+  ],
+  "applySuggestion": {
+    "attempted": true,
+    "clicked": true,
+    "error": null
+  },
+  "consoleMessages": [],
+  "consoleErrorCount": 0,
+  "defectEvidence": {
+    "importLabelOverstatesPdfSupport": true,
+    "autoScaleWordingOverclaimsImageUnderstanding": true,
+    "pdfCorrectlyBlockedAsPlaceholder": false,
+    "pngWithoutFilenameClueRequiresManualCalibration": false,
+    "pngWithFilenameClueCanApply": false,
+    "applyFilenameSuggestionCalibrates": false
+  }
+}

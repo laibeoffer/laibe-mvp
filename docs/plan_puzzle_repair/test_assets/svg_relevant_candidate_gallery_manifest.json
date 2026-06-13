@@ -1,0 +1,1415 @@
+[
+  {
+    "block_id": "LB-SVG-1541",
+    "semantic_label_zh": "床",
+    "original_relative_path": "床具/平面/AC01D2D.svg",
+    "new_relative_path": "床/平面/床_平面_床_AC01D2D_1562x1864.6mm.svg",
+    "width_mm": "1562",
+    "height_mm": "1864.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\床具\\平面\\AC01D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1542",
+    "semantic_label_zh": "床",
+    "original_relative_path": "床具/平面/AC07D2D.svg",
+    "new_relative_path": "床/平面/床_平面_床_AC07D2D_1522x1719.5mm.svg",
+    "width_mm": "1522",
+    "height_mm": "1719.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\床具\\平面\\AC07D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1543",
+    "semantic_label_zh": "床",
+    "original_relative_path": "床具/平面/AC08D2D.svg",
+    "new_relative_path": "床/平面/床_平面_床_AC08D2D_972x1230.4mm.svg",
+    "width_mm": "972",
+    "height_mm": "1230.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\床具\\平面\\AC08D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1544",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD01D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD01D2D_662x482mm.svg",
+    "width_mm": "662",
+    "height_mm": "482",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD01D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1545",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD02D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD02D2D_742x482mm.svg",
+    "width_mm": "742",
+    "height_mm": "482",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD02D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1546",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD03D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD03D2D_432x432mm.svg",
+    "width_mm": "432",
+    "height_mm": "432",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD03D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1547",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD04D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD04D2D_342x342mm.svg",
+    "width_mm": "342",
+    "height_mm": "342",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD04D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1548",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD05D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD05D2D_442x442mm.svg",
+    "width_mm": "442",
+    "height_mm": "442",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD05D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1549",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD06D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD06D2D_1082x482.3mm.svg",
+    "width_mm": "1082",
+    "height_mm": "482.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD06D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1550",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD07D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD07D2D_842x495.4mm.svg",
+    "width_mm": "842",
+    "height_mm": "495.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD07D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1551",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD08D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD08D2D_1082x582mm.svg",
+    "width_mm": "1082",
+    "height_mm": "582",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD08D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1552",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD09D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD09D2D_882x502mm.svg",
+    "width_mm": "882",
+    "height_mm": "502",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD09D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1553",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD10D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD10D2D_122x122mm.svg",
+    "width_mm": "122",
+    "height_mm": "122",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD10D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1554",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD11D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD11D2D_282.7x282.7mm.svg",
+    "width_mm": "282.7",
+    "height_mm": "282.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD11D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1555",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD12D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD12D2D_602x302mm.svg",
+    "width_mm": "602",
+    "height_mm": "302",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD12D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1556",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD13D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD13D2D_722x494.8mm.svg",
+    "width_mm": "722",
+    "height_mm": "494.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD13D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1557",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD14D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD14D2D_700.9x485.9mm.svg",
+    "width_mm": "700.9",
+    "height_mm": "485.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD14D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1558",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD15D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD15D2D_702x504.9mm.svg",
+    "width_mm": "702",
+    "height_mm": "504.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD15D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1559",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD16D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD16D2D_552x632mm.svg",
+    "width_mm": "552",
+    "height_mm": "632",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD16D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1560",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD17D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD17D2D_802x747mm.svg",
+    "width_mm": "802",
+    "height_mm": "747",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD17D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1561",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD19D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD19D2D_752x568.9mm.svg",
+    "width_mm": "752",
+    "height_mm": "568.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD19D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1562",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/AD20D2D.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_AD20D2D_662x432mm.svg",
+    "width_mm": "662",
+    "height_mm": "432",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\AD20D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1563",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/HETHETHTE.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_HETHETHTE_202x62mm.svg",
+    "width_mm": "202",
+    "height_mm": "62",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\HETHETHTE.svg"
+  },
+  {
+    "block_id": "LB-SVG-1564",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/KITCH1.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_KITCH1_72x44mm.svg",
+    "width_mm": "72",
+    "height_mm": "44",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\KITCH1.svg"
+  },
+  {
+    "block_id": "LB-SVG-1565",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/KITCH13.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_KITCH13_122x57mm.svg",
+    "width_mm": "122",
+    "height_mm": "57",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\KITCH13.svg"
+  },
+  {
+    "block_id": "LB-SVG-1566",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/KITCH45.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_KITCH45_58x61.5mm.svg",
+    "width_mm": "58",
+    "height_mm": "61.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\KITCH45.svg"
+  },
+  {
+    "block_id": "LB-SVG-1567",
+    "semantic_label_zh": "廚具設備",
+    "original_relative_path": "廚具設備/平面/KITCH46.svg",
+    "new_relative_path": "廚具設備/平面/廚具設備_平面_廚具設備_KITCH46_63.2x65.8mm.svg",
+    "width_mm": "63.2",
+    "height_mm": "65.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\廚具設備\\平面\\KITCH46.svg"
+  },
+  {
+    "block_id": "LB-SVG-1568",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB01D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB01D2D_352x352mm.svg",
+    "width_mm": "352",
+    "height_mm": "352",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB01D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1569",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB02D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB02D2D_334.1x326.2mm.svg",
+    "width_mm": "334.1",
+    "height_mm": "326.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB02D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1570",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB03D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB03D2D_372x372mm.svg",
+    "width_mm": "372",
+    "height_mm": "372",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB03D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1571",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB04D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB04D2D_481.9x493.2mm.svg",
+    "width_mm": "481.9",
+    "height_mm": "493.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB04D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1572",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB05D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB05D2D_482.5x462mm.svg",
+    "width_mm": "482.5",
+    "height_mm": "462",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB05D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1573",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB07D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB07D2D_512x461mm.svg",
+    "width_mm": "512",
+    "height_mm": "461",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB07D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1574",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB08D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB08D2D_373.3x389.3mm.svg",
+    "width_mm": "373.3",
+    "height_mm": "389.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB08D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1575",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB09D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB09D2D_469.2x412.7mm.svg",
+    "width_mm": "469.2",
+    "height_mm": "412.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB09D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1576",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB10D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB10D2D_412x441.8mm.svg",
+    "width_mm": "412",
+    "height_mm": "441.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB10D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1577",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB12D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB12D2D_545x434.5mm.svg",
+    "width_mm": "545",
+    "height_mm": "434.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB12D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1578",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB13D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB13D2D_481.8x411mm.svg",
+    "width_mm": "481.8",
+    "height_mm": "411",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB13D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1579",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB14D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB14D2D_352.1x35.4mm.svg",
+    "width_mm": "352.1",
+    "height_mm": "35.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB14D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1580",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB15D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB15D2D_456.3x498.6mm.svg",
+    "width_mm": "456.3",
+    "height_mm": "498.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB15D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1581",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB16D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB16D2D_550.7x594.5mm.svg",
+    "width_mm": "550.7",
+    "height_mm": "594.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB16D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1582",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB21D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB21D2D_383.8x465.7mm.svg",
+    "width_mm": "383.8",
+    "height_mm": "465.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB21D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1583",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB22D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB22D2D_558.6x530.2mm.svg",
+    "width_mm": "558.6",
+    "height_mm": "530.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB22D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1584",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB23D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB23D2D_531.2x512.6mm.svg",
+    "width_mm": "531.2",
+    "height_mm": "512.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB23D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1585",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB24D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB24D2D_544.7x530.3mm.svg",
+    "width_mm": "544.7",
+    "height_mm": "530.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB24D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1586",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB25D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB25D2D_572.7x580.2mm.svg",
+    "width_mm": "572.7",
+    "height_mm": "580.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB25D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1587",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/AB40D2D.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_AB40D2D_1759.9x731.1mm.svg",
+    "width_mm": "1759.9",
+    "height_mm": "731.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\AB40D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1588",
+    "semantic_label_zh": "餐桌椅組",
+    "original_relative_path": "桌椅/平面/Dining_Set_-_36_x_72_in.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_餐桌椅組_Dining_Set_-_36_x_72_in_93x57mm.svg",
+    "width_mm": "93",
+    "height_mm": "57",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\Dining_Set_-_36_x_72_in.svg"
+  },
+  {
+    "block_id": "LB-SVG-1589",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/LIB4-5C.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_LIB4-5C_52x52mm.svg",
+    "width_mm": "52",
+    "height_mm": "52",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\LIB4-5C.svg"
+  },
+  {
+    "block_id": "LB-SVG-1590",
+    "semantic_label_zh": "桌椅",
+    "original_relative_path": "桌椅/平面/LIB4-5H.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_桌椅_LIB4-5H_92x92mm.svg",
+    "width_mm": "92",
+    "height_mm": "92",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\LIB4-5H.svg"
+  },
+  {
+    "block_id": "LB-SVG-1591",
+    "semantic_label_zh": "椅子",
+    "original_relative_path": "桌椅/平面/PCHA049.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_椅子_PCHA049_262x52mm.svg",
+    "width_mm": "262",
+    "height_mm": "52",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\平面\\PCHA049.svg"
+  },
+  {
+    "block_id": "LB-SVG-1593",
+    "semantic_label_zh": "椅子",
+    "original_relative_path": "桌椅/未判定/CHAIR-2.svg",
+    "new_relative_path": "桌椅/平面/桌椅_平面_椅子_CHAIR-2_1207x587mm.svg",
+    "width_mm": "1207",
+    "height_mm": "587",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\桌椅\\未判定\\CHAIR-2.svg"
+  },
+  {
+    "block_id": "LB-SVG-1646",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA01D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA01D2D_586.5x802.6mm.svg",
+    "width_mm": "586.5",
+    "height_mm": "802.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA01D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1647",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA02D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA02D2D_1169.7x832mm.svg",
+    "width_mm": "1169.7",
+    "height_mm": "832",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA02D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1648",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA03D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA03D2D_1649.7x832mm.svg",
+    "width_mm": "1649.7",
+    "height_mm": "832",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA03D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1649",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA04D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA04D2D_2198.9x839.7mm.svg",
+    "width_mm": "2198.9",
+    "height_mm": "839.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA04D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1650",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA06D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA06D2D_840.2x781.3mm.svg",
+    "width_mm": "840.2",
+    "height_mm": "781.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA06D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1651",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA07D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA07D2D_1390.2x781.3mm.svg",
+    "width_mm": "1390.2",
+    "height_mm": "781.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA07D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1652",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA08D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA08D2D_1990.2x781.3mm.svg",
+    "width_mm": "1990.2",
+    "height_mm": "781.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA08D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1653",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA09D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA09D2D_2490.2x802mm.svg",
+    "width_mm": "2490.2",
+    "height_mm": "802",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA09D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1654",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA11D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA11D2D_552x634.7mm.svg",
+    "width_mm": "552",
+    "height_mm": "634.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA11D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1655",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA12D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA12D2D_1102x636mm.svg",
+    "width_mm": "1102",
+    "height_mm": "636",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA12D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1656",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA13D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA13D2D_1702x636mm.svg",
+    "width_mm": "1702",
+    "height_mm": "636",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA13D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1657",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA14D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA14D2D_2202x635mm.svg",
+    "width_mm": "2202",
+    "height_mm": "635",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA14D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1658",
+    "semantic_label_zh": "櫃體",
+    "original_relative_path": "櫃體/平面/AA34D2D.svg",
+    "new_relative_path": "櫃體/平面/櫃體_平面_櫃體_AA34D2D_680.8x774.5mm.svg",
+    "width_mm": "680.8",
+    "height_mm": "774.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\櫃體\\平面\\AA34D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1663",
+    "semantic_label_zh": "沙發",
+    "original_relative_path": "沙發/平面/AF07D2D.svg",
+    "new_relative_path": "沙發/平面/沙發_平面_沙發_AF07D2D_648.4x413.4mm.svg",
+    "width_mm": "648.4",
+    "height_mm": "413.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\沙發\\平面\\AF07D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1664",
+    "semantic_label_zh": "沙發",
+    "original_relative_path": "沙發/平面/AF08D2D.svg",
+    "new_relative_path": "沙發/平面/沙發_平面_沙發_AF08D2D_578.4x310.4mm.svg",
+    "width_mm": "578.4",
+    "height_mm": "310.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\沙發\\平面\\AF08D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1686",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE01D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE01D2D_442x442mm.svg",
+    "width_mm": "442",
+    "height_mm": "442",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE01D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1687",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE02D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE02D2D_512x432mm.svg",
+    "width_mm": "512",
+    "height_mm": "432",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE02D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1688",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE03D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE03D2D_512.2x389.3mm.svg",
+    "width_mm": "512.2",
+    "height_mm": "389.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE03D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1689",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE04D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE04D2D_442.3x402.9mm.svg",
+    "width_mm": "442.3",
+    "height_mm": "402.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE04D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1690",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE07D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE07D2D_462x409.9mm.svg",
+    "width_mm": "462",
+    "height_mm": "409.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE07D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1691",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE14D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE14D2D_355.5x119.2mm.svg",
+    "width_mm": "355.5",
+    "height_mm": "119.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE14D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1692",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE15D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE15D2D_315.9x273mm.svg",
+    "width_mm": "315.9",
+    "height_mm": "273",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE15D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1693",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE16D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE16D2D_362x87mm.svg",
+    "width_mm": "362",
+    "height_mm": "87",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE16D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1694",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE18D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE18D2D_1342x682mm.svg",
+    "width_mm": "1342",
+    "height_mm": "682",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE18D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1695",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE19D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE19D2D_1462x662mm.svg",
+    "width_mm": "1462",
+    "height_mm": "662",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE19D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1696",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE20D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE20D2D_1492x682mm.svg",
+    "width_mm": "1492",
+    "height_mm": "682",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE20D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1697",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE21D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE21D2D_1658.2x788.7mm.svg",
+    "width_mm": "1658.2",
+    "height_mm": "788.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE21D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1698",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE22D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE22D2D_1772x1062mm.svg",
+    "width_mm": "1772",
+    "height_mm": "1062",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE22D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1699",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/AE23D2D.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_AE23D2D_776.4x776.4mm.svg",
+    "width_mm": "776.4",
+    "height_mm": "776.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\AE23D2D.svg"
+  },
+  {
+    "block_id": "LB-SVG-1700",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/HS2.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_HS2_57.5x76mm.svg",
+    "width_mm": "57.5",
+    "height_mm": "76",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\HS2.svg"
+  },
+  {
+    "block_id": "LB-SVG-1701",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/LS2.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_LS2_75.7x80mm.svg",
+    "width_mm": "75.7",
+    "height_mm": "80",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\LS2.svg"
+  },
+  {
+    "block_id": "LB-SVG-1702",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/THAND14.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_THAND14_97x97mm.svg",
+    "width_mm": "97",
+    "height_mm": "97",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\THAND14.svg"
+  },
+  {
+    "block_id": "LB-SVG-1703",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/THAND17.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_THAND17_139x88.3mm.svg",
+    "width_mm": "139",
+    "height_mm": "88.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\THAND17.svg"
+  },
+  {
+    "block_id": "LB-SVG-1704",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/THAND2.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_THAND2_91.7x99.2mm.svg",
+    "width_mm": "91.7",
+    "height_mm": "99.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\THAND2.svg"
+  },
+  {
+    "block_id": "LB-SVG-1705",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/THAND23.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_THAND23_115.5x97mm.svg",
+    "width_mm": "115.5",
+    "height_mm": "97",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\THAND23.svg"
+  },
+  {
+    "block_id": "LB-SVG-1706",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/THAND26.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_THAND26_157x157mm.svg",
+    "width_mm": "157",
+    "height_mm": "157",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\THAND26.svg"
+  },
+  {
+    "block_id": "LB-SVG-1707",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/THAND4.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_THAND4_89.5x89.5mm.svg",
+    "width_mm": "89.5",
+    "height_mm": "89.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\THAND4.svg"
+  },
+  {
+    "block_id": "LB-SVG-1708",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C01.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C01_63.2x48.4mm.svg",
+    "width_mm": "63.2",
+    "height_mm": "48.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C01.svg"
+  },
+  {
+    "block_id": "LB-SVG-1709",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C05.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C05_68.9x46.9mm.svg",
+    "width_mm": "68.9",
+    "height_mm": "46.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C05.svg"
+  },
+  {
+    "block_id": "LB-SVG-1710",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C09.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C09_69.4x51mm.svg",
+    "width_mm": "69.4",
+    "height_mm": "51",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C09.svg"
+  },
+  {
+    "block_id": "LB-SVG-1711",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C13.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C13_75.6x47mm.svg",
+    "width_mm": "75.6",
+    "height_mm": "47",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C13.svg"
+  },
+  {
+    "block_id": "LB-SVG-1712",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C17.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C17_72x42.2mm.svg",
+    "width_mm": "72",
+    "height_mm": "42.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C17.svg"
+  },
+  {
+    "block_id": "LB-SVG-1713",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C21.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C21_65x38.4mm.svg",
+    "width_mm": "65",
+    "height_mm": "38.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C21.svg"
+  },
+  {
+    "block_id": "LB-SVG-1714",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C33.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C33_83.7x30.8mm.svg",
+    "width_mm": "83.7",
+    "height_mm": "30.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C33.svg"
+  },
+  {
+    "block_id": "LB-SVG-1715",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-C37.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C37_64.2x28.9mm.svg",
+    "width_mm": "64.2",
+    "height_mm": "28.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-C37.svg"
+  },
+  {
+    "block_id": "LB-SVG-1716",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-F09.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F09_152x72mm.svg",
+    "width_mm": "152",
+    "height_mm": "72",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-F09.svg"
+  },
+  {
+    "block_id": "LB-SVG-1717",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-F13.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F13_139.5x74mm.svg",
+    "width_mm": "139.5",
+    "height_mm": "74",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-F13.svg"
+  },
+  {
+    "block_id": "LB-SVG-1718",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-F17.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F17_152x74.1mm.svg",
+    "width_mm": "152",
+    "height_mm": "74.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-F17.svg"
+  },
+  {
+    "block_id": "LB-SVG-1721",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L09.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L09_58.1x48mm.svg",
+    "width_mm": "58.1",
+    "height_mm": "48",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L09.svg"
+  },
+  {
+    "block_id": "LB-SVG-1722",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L13.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L13_63.1x51.1mm.svg",
+    "width_mm": "63.1",
+    "height_mm": "51.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L13.svg"
+  },
+  {
+    "block_id": "LB-SVG-1723",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L17.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L17_63.1x53.2mm.svg",
+    "width_mm": "63.1",
+    "height_mm": "53.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L17.svg"
+  },
+  {
+    "block_id": "LB-SVG-1725",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L25.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L25_63.9x53.7mm.svg",
+    "width_mm": "63.9",
+    "height_mm": "53.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L25.svg"
+  },
+  {
+    "block_id": "LB-SVG-1726",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L29.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L29_162x57mm.svg",
+    "width_mm": "162",
+    "height_mm": "57",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L29.svg"
+  },
+  {
+    "block_id": "LB-SVG-1727",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L33.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L33_182x60mm.svg",
+    "width_mm": "182",
+    "height_mm": "60",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L33.svg"
+  },
+  {
+    "block_id": "LB-SVG-1728",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-L37.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L37_192x59.9mm.svg",
+    "width_mm": "192",
+    "height_mm": "59.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-L37.svg"
+  },
+  {
+    "block_id": "LB-SVG-1729",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/平面/TL2P-S01.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-S01_58x48mm.svg",
+    "width_mm": "58",
+    "height_mm": "48",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\平面\\TL2P-S01.svg"
+  },
+  {
+    "block_id": "LB-SVG-1761",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C02.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C02_48.1x82.8mm.svg",
+    "width_mm": "48.1",
+    "height_mm": "82.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C02.svg"
+  },
+  {
+    "block_id": "LB-SVG-1762",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C03.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C03_59.9x82mm.svg",
+    "width_mm": "59.9",
+    "height_mm": "82",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C03.svg"
+  },
+  {
+    "block_id": "LB-SVG-1763",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C06.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C06_43.6x77.5mm.svg",
+    "width_mm": "43.6",
+    "height_mm": "77.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C06.svg"
+  },
+  {
+    "block_id": "LB-SVG-1764",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C08.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C08_68.7x77.7mm.svg",
+    "width_mm": "68.7",
+    "height_mm": "77.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C08.svg"
+  },
+  {
+    "block_id": "LB-SVG-1765",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C10.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C10_51x76.8mm.svg",
+    "width_mm": "51",
+    "height_mm": "76.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C10.svg"
+  },
+  {
+    "block_id": "LB-SVG-1766",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C12.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C12_69.4x76.7mm.svg",
+    "width_mm": "69.4",
+    "height_mm": "76.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C12.svg"
+  },
+  {
+    "block_id": "LB-SVG-1767",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C14.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C14_48.1x95.1mm.svg",
+    "width_mm": "48.1",
+    "height_mm": "95.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C14.svg"
+  },
+  {
+    "block_id": "LB-SVG-1768",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C16.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C16_75.3x94.3mm.svg",
+    "width_mm": "75.3",
+    "height_mm": "94.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C16.svg"
+  },
+  {
+    "block_id": "LB-SVG-1769",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C18.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C18_49.2x50.5mm.svg",
+    "width_mm": "49.2",
+    "height_mm": "50.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C18.svg"
+  },
+  {
+    "block_id": "LB-SVG-1770",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C22.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C22_35.2x73.3mm.svg",
+    "width_mm": "35.2",
+    "height_mm": "73.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C22.svg"
+  },
+  {
+    "block_id": "LB-SVG-1771",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C24.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C24_65.2x73.2mm.svg",
+    "width_mm": "65.2",
+    "height_mm": "73.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C24.svg"
+  },
+  {
+    "block_id": "LB-SVG-1772",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C28.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C28_64.8x47.1mm.svg",
+    "width_mm": "64.8",
+    "height_mm": "47.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C28.svg"
+  },
+  {
+    "block_id": "LB-SVG-1774",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C35.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C35_83.8x39.3mm.svg",
+    "width_mm": "83.8",
+    "height_mm": "39.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C35.svg"
+  },
+  {
+    "block_id": "LB-SVG-1775",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C38.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C38_42x95mm.svg",
+    "width_mm": "42",
+    "height_mm": "95",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C38.svg"
+  },
+  {
+    "block_id": "LB-SVG-1776",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-C39.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-C39_82.1x96.1mm.svg",
+    "width_mm": "82.1",
+    "height_mm": "96.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-C39.svg"
+  },
+  {
+    "block_id": "LB-SVG-1777",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F01.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F01_23.2x126.8mm.svg",
+    "width_mm": "23.2",
+    "height_mm": "126.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F01.svg"
+  },
+  {
+    "block_id": "LB-SVG-1778",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F03.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F03_23.4x127.9mm.svg",
+    "width_mm": "23.4",
+    "height_mm": "127.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F03.svg"
+  },
+  {
+    "block_id": "LB-SVG-1779",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F06.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F06_125.4x163.7mm.svg",
+    "width_mm": "125.4",
+    "height_mm": "163.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F06.svg"
+  },
+  {
+    "block_id": "LB-SVG-1780",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F07.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F07_74x168.4mm.svg",
+    "width_mm": "74",
+    "height_mm": "168.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F07.svg"
+  },
+  {
+    "block_id": "LB-SVG-1781",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F10.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F10_154.6x159.9mm.svg",
+    "width_mm": "154.6",
+    "height_mm": "159.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F10.svg"
+  },
+  {
+    "block_id": "LB-SVG-1782",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F11.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F11_72x160.5mm.svg",
+    "width_mm": "72",
+    "height_mm": "160.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F11.svg"
+  },
+  {
+    "block_id": "LB-SVG-1783",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F14.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F14_139.8x163.2mm.svg",
+    "width_mm": "139.8",
+    "height_mm": "163.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F14.svg"
+  },
+  {
+    "block_id": "LB-SVG-1784",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-F15.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-F15_73.8x167.2mm.svg",
+    "width_mm": "73.8",
+    "height_mm": "167.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-F15.svg"
+  },
+  {
+    "block_id": "LB-SVG-1785",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L03.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L03_39.8x51.6mm.svg",
+    "width_mm": "39.8",
+    "height_mm": "51.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L03.svg"
+  },
+  {
+    "block_id": "LB-SVG-1786",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L06.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L06_44.9x53.6mm.svg",
+    "width_mm": "44.9",
+    "height_mm": "53.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L06.svg"
+  },
+  {
+    "block_id": "LB-SVG-1787",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L07.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L07_32.9x54.4mm.svg",
+    "width_mm": "32.9",
+    "height_mm": "54.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L07.svg"
+  },
+  {
+    "block_id": "LB-SVG-1788",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L10.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L10_57.9x92.3mm.svg",
+    "width_mm": "57.9",
+    "height_mm": "92.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L10.svg"
+  },
+  {
+    "block_id": "LB-SVG-1789",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L11.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L11_47.2x92.4mm.svg",
+    "width_mm": "47.2",
+    "height_mm": "92.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L11.svg"
+  },
+  {
+    "block_id": "LB-SVG-1790",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L14.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L14_63x98.6mm.svg",
+    "width_mm": "63",
+    "height_mm": "98.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L14.svg"
+  },
+  {
+    "block_id": "LB-SVG-1791",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L15.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L15_51.6x98.5mm.svg",
+    "width_mm": "51.6",
+    "height_mm": "98.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L15.svg"
+  },
+  {
+    "block_id": "LB-SVG-1792",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L18.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L18_63.1x92.3mm.svg",
+    "width_mm": "63.1",
+    "height_mm": "92.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L18.svg"
+  },
+  {
+    "block_id": "LB-SVG-1793",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L19.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L19_53x92.9mm.svg",
+    "width_mm": "53",
+    "height_mm": "92.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L19.svg"
+  },
+  {
+    "block_id": "LB-SVG-1794",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L22.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L22_49.9x60.3mm.svg",
+    "width_mm": "49.9",
+    "height_mm": "60.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L22.svg"
+  },
+  {
+    "block_id": "LB-SVG-1795",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L26.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L26_63.3x57.4mm.svg",
+    "width_mm": "63.3",
+    "height_mm": "57.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L26.svg"
+  },
+  {
+    "block_id": "LB-SVG-1796",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L27.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L27_59.3x58.3mm.svg",
+    "width_mm": "59.3",
+    "height_mm": "58.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L27.svg"
+  },
+  {
+    "block_id": "LB-SVG-1797",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L30.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L30_162x55.4mm.svg",
+    "width_mm": "162",
+    "height_mm": "55.4",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L30.svg"
+  },
+  {
+    "block_id": "LB-SVG-1798",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L32.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L32_57.4x55.3mm.svg",
+    "width_mm": "57.4",
+    "height_mm": "55.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L32.svg"
+  },
+  {
+    "block_id": "LB-SVG-1799",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L34.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L34_182x59.2mm.svg",
+    "width_mm": "182",
+    "height_mm": "59.2",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L34.svg"
+  },
+  {
+    "block_id": "LB-SVG-1800",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L36.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L36_60.3x58.5mm.svg",
+    "width_mm": "60.3",
+    "height_mm": "58.5",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L36.svg"
+  },
+  {
+    "block_id": "LB-SVG-1801",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L38.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L38_192x60mm.svg",
+    "width_mm": "192",
+    "height_mm": "60",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L38.svg"
+  },
+  {
+    "block_id": "LB-SVG-1802",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-L40.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-L40_56.7x57.6mm.svg",
+    "width_mm": "56.7",
+    "height_mm": "57.6",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-L40.svg"
+  },
+  {
+    "block_id": "LB-SVG-1803",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-S02.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-S02_58.2x101.7mm.svg",
+    "width_mm": "58.2",
+    "height_mm": "101.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-S02.svg"
+  },
+  {
+    "block_id": "LB-SVG-1804",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-S03.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-S03_47.6x101mm.svg",
+    "width_mm": "47.6",
+    "height_mm": "101",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-S03.svg"
+  },
+  {
+    "block_id": "LB-SVG-1805",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-U04.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-U04_34.7x78.9mm.svg",
+    "width_mm": "34.7",
+    "height_mm": "78.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-U04.svg"
+  },
+  {
+    "block_id": "LB-SVG-1806",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-U06.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-U06_42.5x71.8mm.svg",
+    "width_mm": "42.5",
+    "height_mm": "71.8",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-U06.svg"
+  },
+  {
+    "block_id": "LB-SVG-1807",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-U10.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-U10_47x95.7mm.svg",
+    "width_mm": "47",
+    "height_mm": "95.7",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-U10.svg"
+  },
+  {
+    "block_id": "LB-SVG-1808",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-U12.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-U12_37.3x97.3mm.svg",
+    "width_mm": "37.3",
+    "height_mm": "97.3",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-U12.svg"
+  },
+  {
+    "block_id": "LB-SVG-1809",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-U14.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-U14_48x136.1mm.svg",
+    "width_mm": "48",
+    "height_mm": "136.1",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-U14.svg"
+  },
+  {
+    "block_id": "LB-SVG-1810",
+    "semantic_label_zh": "衛浴設備",
+    "original_relative_path": "衛浴設備/立面/TL2P-U16.svg",
+    "new_relative_path": "衛浴設備/平面/衛浴設備_平面_衛浴設備_TL2P-U16_40.9x135.9mm.svg",
+    "width_mm": "40.9",
+    "height_mm": "135.9",
+    "_path": "Z:\\08-Jacky\\svg_blocks\\衛浴設備\\立面\\TL2P-U16.svg"
+  }
+]

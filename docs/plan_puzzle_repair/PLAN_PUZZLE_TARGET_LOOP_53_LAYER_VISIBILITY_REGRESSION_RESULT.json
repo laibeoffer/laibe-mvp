@@ -1,0 +1,86 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop53-layer-visibility-regression",
+  "viewport": {
+    "width": 1280,
+    "height": 620
+  },
+  "checkedAt": "2026-06-13T13:55:06.867Z",
+  "result": "LOOP_53_LAYER_VISIBILITY_REGRESSION_PASS",
+  "checks": {
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "#planCanvas visible"
+    },
+    "initialSetup": {
+      "status": "PASS",
+      "evidence": "{\"walls\":1,\"openings\":1,\"furniture\":1,\"layoutObjects\":1,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furnitureFirst\":{\"id\":\"furniture-1781358903396-ba91a3\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":3840,\"y\":3020,\"widthMm\":1800,\"depthMm\":600,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:55:03.396Z\",\"updatedAt\":\"2026-06-13T13:55:03.595Z\"}}"
+    },
+    "layerHideVisual": {
+      "status": "PASS",
+      "evidence": "{\"wallsHidden\":true,\"openingsHidden\":true,\"furnitureHiddenCount\":1,\"furnitureTotal\":1,\"wallLineTotal\":1,\"openingSymbolTotal\":1,\"visibleFurniture\":0}"
+    },
+    "layerHideDataPersistence": {
+      "status": "PASS",
+      "evidence": "{\"walls\":1,\"openings\":1,\"furniture\":1,\"layoutObjects\":1,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furnitureFirst\":{\"id\":\"furniture-1781358903396-ba91a3\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":3840,\"y\":3020,\"widthMm\":1800,\"depthMm\":600,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:55:03.396Z\",\"updatedAt\":\"2026-06-13T13:55:03.595Z\"}}"
+    },
+    "layerRestoreVisual": {
+      "status": "PASS",
+      "evidence": "{\"wallsHidden\":false,\"openingsHidden\":false,\"furnitureHiddenCount\":0,\"furnitureTotal\":1,\"wallLineTotal\":1,\"openingSymbolTotal\":1,\"visibleFurniture\":1}"
+    },
+    "layerRestoreDataPersistence": {
+      "status": "PASS",
+      "evidence": "{\"walls\":1,\"openings\":1,\"furniture\":1,\"layoutObjects\":1,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furnitureFirst\":{\"id\":\"furniture-1781358903396-ba91a3\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":3840,\"y\":3020,\"widthMm\":1800,\"depthMm\":600,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:55:03.396Z\",\"updatedAt\":\"2026-06-13T13:55:03.595Z\"}}"
+    },
+    "materialPersistence": {
+      "status": "PASS",
+      "evidence": "{\"materialTags\":[\"system_panel\"]}"
+    },
+    "pcProductionExportDisabled": {
+      "status": "PASS",
+      "evidence": "disabledPcButtons=3"
+    },
+    "candidateGuard": {
+      "status": "PASS",
+      "evidence": "{\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furniture\":{\"productionReady\":false,\"notFormalEstimate\":true,\"budgetCandidate\":true}}"
+    },
+    "consoleErrors": {
+      "status": "PASS",
+      "evidence": "0 console/page errors"
+    },
+    "consoleWarnings": {
+      "status": "PASS",
+      "evidence": "0 console warnings"
+    }
+  },
+  "dom": {
+    "hidden": {
+      "wallsHidden": true,
+      "openingsHidden": true,
+      "furnitureHiddenCount": 1,
+      "furnitureTotal": 1,
+      "wallLineTotal": 1,
+      "openingSymbolTotal": 1,
+      "visibleFurniture": 0
+    },
+    "restored": {
+      "wallsHidden": false,
+      "openingsHidden": false,
+      "furnitureHiddenCount": 0,
+      "furnitureTotal": 1,
+      "wallLineTotal": 1,
+      "openingSymbolTotal": 1,
+      "visibleFurniture": 1
+    }
+  },
+  "exports": {
+    "initial": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_53_LAYER_VISIBILITY_INITIAL_EXPORT.json",
+    "hidden": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_53_LAYER_VISIBILITY_HIDDEN_EXPORT.json",
+    "restored": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_53_LAYER_VISIBILITY_RESTORED_EXPORT.json"
+  },
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_53_LAYER_VISIBILITY_REGRESSION.png",
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "pageErrors": []
+  }
+}

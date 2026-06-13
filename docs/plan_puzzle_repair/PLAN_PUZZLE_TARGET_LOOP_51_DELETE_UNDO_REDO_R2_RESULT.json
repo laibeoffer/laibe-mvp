@@ -1,0 +1,5 @@
+{
+  "result": "LOOP_51_R2_SCRIPT_ERROR",
+  "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.wall-hit-target').first() to be visible\u001b[22m\n\u001b[2m    20 × locator resolved to hidden <line y1=\"210.114806\" y2=\"210.114806\" x2=\"629.8417509999999\" class=\"wall-hit-target\" x1=\"138.23342499999998\" stroke-width=\"74.32004\" data-wall-id=\"wall-1781357766999-ba1c99\"></line>\u001b[22m\n\n    at clickLineAt ([stdin]:79:15)\n    at [stdin]:121:11",
+  "checkedAt": "2026-06-13T13:36:15.509Z"
+}

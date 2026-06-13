@@ -1,0 +1,19 @@
+﻿{
+    "decision":  "PASS_CORRECTED_LABEL_READOUT",
+    "reason":  "Browser label readout is authoritative; field labels are visible as 寬度 mm, 深度 mm, 高度 mm, 材料, 備註. Previous boolean term scan was false due text normalization / case assumptions and is not used for disposition.",
+    "labels":  {
+                   "width":  "寬度 mm",
+                   "depth":  "深度 mm",
+                   "height":  "高度 mm",
+                   "material":  "材料",
+                   "note":  "備註"
+               },
+    "pass":  true,
+    "consoleErrors":  [
+
+                      ],
+    "consoleWarnings":  [
+
+                        ],
+    "checkedAt":  "2026-06-13 22:13:36 +08:00"
+}

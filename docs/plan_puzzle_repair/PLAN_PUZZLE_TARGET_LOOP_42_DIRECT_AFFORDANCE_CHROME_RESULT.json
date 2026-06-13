@@ -1,0 +1,43 @@
+{
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop42-system-chrome-direct-smoke",
+  "screenshotPath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_42_DIRECT_AFFORDANCE_CHROME_POST_PATCH.png",
+  "exportPath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_42_DIRECT_AFFORDANCE_CHROME_EXPORT.json",
+  "initial": {
+    "title": "LaiBE | 平面拼圖 Plancraft+",
+    "cleanShellCount": 1,
+    "hasChinese": true,
+    "hasMojibakeTokens": false,
+    "readyVisibleCount": 19,
+    "activeModes": [
+      "選取"
+    ]
+  },
+  "state": {
+    "underlayStatus": "已匯入",
+    "scaleStatus": "已確認",
+    "wallCountText": "1",
+    "activeModes": [
+      "選取"
+    ],
+    "wallSvgChildren": 9,
+    "openingSvgChildren": 8,
+    "furnitureElements": 1,
+    "pcDisabled": true,
+    "inspectorText": "屬性\n圖層\n提醒\n材料\n總覽\n選取家具 / 櫃體\n編號\n家具 / 櫃體 1\n項目類型\n衣櫃\n分類\n櫃體\n圖層\n家具 / 櫃體\n預算候選\n是\n正式成果\n否\n正式估價\n否\n刪除家具 / 櫃體\n套用目前材質\n項目名稱\n寬度 MM\n深度 MM\n高度 MM\n旋轉角度\n材質偏好\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n備註\n此物件只會作為配置草稿。它不是正式數量、不是報價，也不會送出正式預算。\n木質\n系統板材\n石材\n布料\n陶瓷\n金屬\n未指定\n刪除家具 / 櫃體\n候選草稿 JSON 預覽已建立。下載仍只供草稿使用，不呼叫預算引擎，也不產生正式估價。"
+  },
+  "exportSummary": {
+    "draftVersion": null,
+    "walls": 1,
+    "openings": 2,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "productionReady": null,
+    "formalEstimate": null,
+    "budgetEngineCalled": null
+  },
+  "consoleErrorCount": 0,
+  "consoleWarningCount": 0,
+  "errors": [],
+  "warnings": []
+}

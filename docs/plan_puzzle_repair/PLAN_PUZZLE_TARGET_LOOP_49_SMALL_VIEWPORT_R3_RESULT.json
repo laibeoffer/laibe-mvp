@@ -1,0 +1,255 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop49-small-viewport-operability-r3",
+  "viewport": {
+    "width": 1280,
+    "height": 620
+  },
+  "checkedAt": "2026-06-13T13:15:29.744Z",
+  "checks": {
+    "smallViewportStructure": {
+      "status": "PASS",
+      "evidence": "file area, tools, canvas, and inspector visible"
+    },
+    "pageLoad": {
+      "status": "PASS",
+      "evidence": "#planCanvas exists"
+    },
+    "pngImport": {
+      "status": "PASS",
+      "evidence": "scaleStatus=有檔名建議"
+    },
+    "scaleCalibration": {
+      "status": "PASS",
+      "evidence": "scaleStatus=已確認"
+    },
+    "drawWall": {
+      "status": "PASS",
+      "evidence": "walls=1"
+    },
+    "selectWall": {
+      "status": "PASS",
+      "evidence": "selectedWalls=1"
+    },
+    "doorWindowOpening": {
+      "status": "PASS",
+      "evidence": "opening symbols=4"
+    },
+    "furniturePlacement": {
+      "status": "PASS",
+      "evidence": "furniture=1, handles=2, inside=1"
+    },
+    "furnitureDrag": {
+      "status": "PASS",
+      "evidence": "before=(96,201), after=(152,226)"
+    },
+    "furnitureResize": {
+      "status": "PASS",
+      "evidence": "before=905x302, after=1085x421, inspector=2158x838"
+    },
+    "inspectorEdit": {
+      "status": "PASS",
+      "evidence": "width=1230, depth=650, material=system_panel"
+    },
+    "pcProductionExportDisabled": {
+      "status": "PASS",
+      "evidence": "disabled buttons=3"
+    },
+    "candidateJsonExport": {
+      "status": "PASS",
+      "evidence": "{\"walls\":1,\"openings\":3,\"furniture\":1,\"layoutObjects\":1,\"toolCatalogItems\":10,\"boundary\":{\"formalEstimate\":false,\"budgetEngineCalled\":false,\"productionReady\":false,\"note\":\"家具 / 櫃體物件僅為草稿候選資料。\"},\"furnitureFirst\":{\"id\":\"furniture-1781356532338-3a73a7\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"x\":810,\"y\":549,\"widthMm\":1230,\"depthMm\":650,\"heightMm\":2400,\"rotation\":0,\"status\":\"candidate\",\"materialTags\":[\"system_panel\"],\"note\":\"Loop49 small viewport note\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true,\"createdAt\":\"2026-06-13T13:15:32.338Z\",\"updatedAt\":\"2026-06-13T13:15:33.602Z\"},\"layoutObjectFirst\":{\"id\":\"furniture-1781356532338-3a73a7\",\"objectType\":\"parametric_furniture_candidate\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"layer\":\"furniture\",\"positionMm\":{\"x\":810,\"y\":549},\"sizeMm\":{\"width\":1230,\"depth\":650,\"height\":2400},\"rotation\":0,\"materialTags\":[\"system_panel\"],\"note\":\"Loop49 small viewport note\",\"budgetCandidate\":true,\"productionReady\":false,\"notFormalEstimate\":true}}"
+    },
+    "candidateGuard": {
+      "status": "PASS",
+      "evidence": "candidate-only guard preserved"
+    },
+    "consoleErrors": {
+      "status": "PASS",
+      "evidence": "0 console/page errors"
+    },
+    "consoleWarnings": {
+      "status": "PASS",
+      "evidence": "0 console warnings"
+    }
+  },
+  "console": {
+    "errors": [],
+    "warnings": []
+  },
+  "layout": {
+    "initial": {
+      "viewport": {
+        "width": 1280,
+        "height": 620
+      },
+      "scroll": {
+        "x": 0,
+        "y": 0,
+        "documentHeight": 667
+      },
+      "fileArea": {
+        "x": 12,
+        "y": 10,
+        "width": 1256,
+        "height": 127,
+        "visible": true
+      },
+      "leftPanel": {
+        "x": 13,
+        "y": 148,
+        "width": 184,
+        "height": 506,
+        "visible": true
+      },
+      "canvas": {
+        "x": 197,
+        "y": 148,
+        "width": 784,
+        "height": 458,
+        "visible": true
+      },
+      "inspector": {
+        "x": 981,
+        "y": 148,
+        "width": 286,
+        "height": 506,
+        "visible": true
+      }
+    },
+    "afterActions": {
+      "viewport": {
+        "width": 1280,
+        "height": 620
+      },
+      "scroll": {
+        "x": 0,
+        "y": 47,
+        "documentHeight": 667
+      },
+      "fileArea": {
+        "x": 12,
+        "y": -37,
+        "width": 1256,
+        "height": 127,
+        "visible": true
+      },
+      "leftPanel": {
+        "x": 13,
+        "y": 101,
+        "width": 184,
+        "height": 506,
+        "visible": true
+      },
+      "canvas": {
+        "x": 197,
+        "y": 101,
+        "width": 784,
+        "height": 458,
+        "visible": true
+      },
+      "inspector": {
+        "x": 981,
+        "y": 101,
+        "width": 286,
+        "height": 506,
+        "visible": true
+      }
+    }
+  },
+  "resizeProbe": {
+    "before": {
+      "handleRect": {
+        "x": 596.15625,
+        "y": 501.59375,
+        "w": 16,
+        "h": 16
+      },
+      "itemRect": {
+        "x": 151.765625,
+        "y": 226,
+        "w": 904.796875,
+        "h": 301.59375
+      },
+      "elementFromPoint": {
+        "tag": "SPAN",
+        "className": "furniture-resize-handle furniture-resize-handle--inside"
+      },
+      "width": "1800",
+      "depth": "600"
+    },
+    "after": {
+      "itemRect": {
+        "x": 61.796875,
+        "y": 166.1875,
+        "w": 1084.75,
+        "h": 421.234375
+      },
+      "width": "2158",
+      "depth": "838"
+    }
+  },
+  "exportSummary": {
+    "walls": 1,
+    "openings": 3,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "toolCatalogItems": 10,
+    "boundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "furnitureFirst": {
+      "id": "furniture-1781356532338-3a73a7",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "layer": "furniture",
+      "x": 810,
+      "y": 549,
+      "widthMm": 1230,
+      "depthMm": 650,
+      "heightMm": 2400,
+      "rotation": 0,
+      "status": "candidate",
+      "materialTags": [
+        "system_panel"
+      ],
+      "note": "Loop49 small viewport note",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true,
+      "createdAt": "2026-06-13T13:15:32.338Z",
+      "updatedAt": "2026-06-13T13:15:33.602Z"
+    },
+    "layoutObjectFirst": {
+      "id": "furniture-1781356532338-3a73a7",
+      "objectType": "parametric_furniture_candidate",
+      "type": "wardrobe",
+      "category": "cabinet",
+      "name": "衣櫃",
+      "layer": "furniture",
+      "positionMm": {
+        "x": 810,
+        "y": 549
+      },
+      "sizeMm": {
+        "width": 1230,
+        "depth": 650,
+        "height": 2400
+      },
+      "rotation": 0,
+      "materialTags": [
+        "system_panel"
+      ],
+      "note": "Loop49 small viewport note",
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true
+    }
+  },
+  "screenshot": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_49_SMALL_VIEWPORT_R3.png",
+  "exportFile": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_49_SMALL_VIEWPORT_R3_EXPORT.json",
+  "toolNote": "External Chrome Playwright used because in-app Browser API cannot set file input for PNG import.",
+  "overall": "PASS"
+}

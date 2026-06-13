@@ -1,0 +1,59 @@
+{
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop46-import-autoscale-postpatch-precise",
+  "timestamp": "2026-06-13T12:36:41.963Z",
+  "states": [
+    {
+      "label": "initial",
+      "directPdfLabelGone": true,
+      "pdfConvertLabelVisible": true,
+      "noAutoDetectText": true,
+      "noImageClueText": true,
+      "filenameGuidanceVisible": true,
+      "scaleStatusText": "待比例確認"
+    },
+    {
+      "label": "pdf",
+      "pdfPlaceholderVisible": true,
+      "pdfConvertInstructionVisible": true,
+      "noSuggestionButton": true
+    },
+    {
+      "label": "png_no_clue",
+      "noSuggestionButton": true,
+      "twoPointVisible": true,
+      "scaleStatusText": "待兩點校正"
+    },
+    {
+      "label": "png_clue_applied",
+      "suggestionCount": 1,
+      "clicked": true,
+      "scaleConfirmedVisible": true,
+      "filenameSuggestionVisible": true,
+      "scaleStatusText": "已確認"
+    }
+  ],
+  "exportChecks": {
+    "downloaded": true,
+    "savePath": "docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_46_POSTPATCH_PRECISE_EXPORT.json",
+    "originalFileName": "PLAN_PUZZLE_LOOP46_width-3000mm.png",
+    "scaleCalibrated": true,
+    "scaleSource": "file-name-dimension-clue",
+    "noBudgetEngineOutput": true,
+    "noFormalExport": false
+  },
+  "consoleErrorCount": 0,
+  "consoleMessages": [],
+  "pass": {
+    "pageLoad": true,
+    "misleadingPdfLabelRemoved": true,
+    "pdfConvertClearlyLabeled": true,
+    "misleadingAutoDetectRemoved": true,
+    "filenameScaleGuidanceVisible": true,
+    "pdfBlockedAsPlaceholder": true,
+    "pngNoClueNeedsManualCalibration": true,
+    "filenameClueCanApplyAndExport": true,
+    "noBudgetOrFormalOutput": false,
+    "consoleErrorZero": true
+  },
+  "overall": "PASS_WITH_NOTES"
+}

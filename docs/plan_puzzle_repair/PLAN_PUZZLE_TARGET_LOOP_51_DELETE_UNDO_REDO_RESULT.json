@@ -1,0 +1,5 @@
+{
+  "result": "LOOP_51_SCRIPT_ERROR",
+  "error": "locator.waitFor: Timeout 8000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.opening-hit-target').first() to be visible\u001b[22m\n\n    at clickCenter ([stdin]:86:15)\n    at [stdin]:168:9",
+  "checkedAt": "2026-06-13T13:32:08.447Z"
+}
