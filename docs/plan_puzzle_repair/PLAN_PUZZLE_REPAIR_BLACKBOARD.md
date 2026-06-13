@@ -2729,3 +2729,48 @@ lastCompletedTarget: Verified manual two-point calibration path with no filename
 nextTarget: Target Loop 69 - Opening dimension edit regression.
 currentSafeTask: Verify opening offset, width, swing, sill height, and exported JSON consistency after editing a selected door/window/opening.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 69 opening dimension edit regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop69OpeningDimensionEditRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_69_OPENING_DIMENSION_EDIT_REGRESSION.md
+- checkedAt: 2026-06-14 00:04:44 +08:00
+- decision: LOOP_69_OPENING_DIMENSION_EDIT_REGRESSION_PASS
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - drawWall: PASS
+  - wallLengthMm: 5400
+  - doorOffsetWidthSwingHeightEdit: PASS
+  - windowOffsetWidthSillHeightHeightEdit: PASS
+  - openingOffsetWidthHeightEdit: PASS
+  - canvasOpeningHitTargets: 3
+  - selectedOpeningInspectorVisible: PASS
+  - candidateJsonExport: PASS
+  - pcProductionExportDisabled: PASS
+- editedValues:
+  - door: offset 500mm / width 1000mm / swing right / height 2100mm
+  - window: offset 1900mm / width 1200mm / sillHeight 850mm / height 1100mm
+  - opening: offset 3400mm / width 900mm / height 2050mm
+- exportSummary:
+  - suggestedFilename: laibe-plancraft-plus-draft.json
+  - openings: 3
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 69
+targetDrawingProgress: OPENING_DIMENSION_EDIT_REGRESSION_PASS
+loopResult: LOOP_69_OPENING_DIMENSION_EDIT_REGRESSION_PASS
+lastCompletedTarget: Verified door/window/opening offset, width, swing, sill height, height, canvas symbols, and candidate JSON export consistency.
+nextTarget: Target Loop 70 - Wall type / thickness / demolition classification regression.
+currentSafeTask: Verify selected wall visual differentiation, wall type/thickness/status inspector edits, demolition classification, candidate JSON export, and undo/redo preservation.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 70 wall classification regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
