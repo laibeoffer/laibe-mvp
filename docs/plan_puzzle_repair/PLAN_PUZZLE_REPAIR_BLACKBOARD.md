@@ -3579,3 +3579,56 @@ lastCompletedTarget: Verified selected wall visual state, wall inspector editabi
 nextTarget: Target Loop 87 - Opening inspector regression after real PNG import.
 currentSafeTask: Validate selected door/window/opening visual state, offset/width/swing/kind edits, candidate JSON preservation, delete, undo, redo, and guard boundary.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 87 opening inspector regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop87OpeningInspectorRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_87_OPENING_INSPECTOR_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop87-opening-inspector-regression-r2.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop87-downloads/loop87-opening-inspector-export-r2.json
+- screenshot: docs/plan_puzzle_repair/loop87-opening-inspector-regression-r2.png local-only ignored by git
+- checkedAt: 2026-06-14 02:59:02 +08:00
+- testedHead: f8d764d0c095fdc53976b01c1bf52c3a18d360a3 plus Loop87 scoped opening inspector patch
+- decision: LOOP_87_OPENING_INSPECTOR_PASS_WITH_PATCH
+- runtimePatch: YES
+- patchSummary: Selected opening offset/width/sillHeight/height change events now use the same non-reflow preview path as input events, so consecutive numeric edits are preserved.
+- localChromeSmoke:
+  - pageLoad: PASS
+  - freshPageReload: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - pngImport: PASS_underlay_image_1508x709
+  - manualScaleCalibration: PASS_3000mm_300px_pxPerMm_0_1
+  - drawWallSelected: PASS
+  - addDoorSelectedAndInspectable: PASS_kind_door_selected
+  - editDoorOffsetWidthSwing: PASS_offset_500_width_900_swing_right
+  - editKindToWindowSillHeight: PASS_kind_window_swing_none_sill_950_height_1300
+  - editKindToOpeningWidth: PASS_kind_opening_width_1000_swing_none
+  - candidateJsonExport: PASS_openings_1
+  - candidateJsonEditedOpening: PASS_kind_offset_width_sill_height_preserved
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - deleteSelectedOpening: PASS
+  - undoRestoresOpening: PASS
+  - redoDeletesOpeningAgain: PASS
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop87-opening-inspector-regression-r1.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 87
+targetDrawingProgress: OPENING_INSPECTOR_PASS_WITH_PATCH
+loopResult: OPENING_INSPECTOR_PASS_WITH_PATCH
+lastCompletedTarget: Fixed and verified selected opening numeric inspector edit stability, door/window/opening kind transitions, offset/width/swing/sill/height preservation, candidate JSON export, delete, undo, redo, and .pc disabled boundary.
+nextTarget: Target Loop 88 - Layer visibility and candidate export preview regression after real PNG import.
+currentSafeTask: Validate wall/opening/furniture layer toggles, inspector layer state, hidden-object non-deletion, candidate JSON preview/readout preservation, and guard boundary.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 88 layer visibility and candidate export preview regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

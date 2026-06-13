@@ -902,6 +902,15 @@
       updateSelectedFurnitureFromField(input, { preserveInspectorFocus: true });
       return;
     }
+    if (
+      field === "selected-opening-offset" ||
+      field === "selected-opening-width" ||
+      field === "selected-opening-sill-height" ||
+      field === "selected-opening-height"
+    ) {
+      previewSelectedOpeningDimensionFromField(input);
+      return;
+    }
     if (field.startsWith("selected-zone-")) {
       updateSelectedZoneFromField(input);
       return;

@@ -1,0 +1,282 @@
+{
+  "checkedAt": "2026-06-13T18:59:02.174Z",
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop87-opening-inspector-r2",
+  "importedPng": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop83-risk-boundary-operability-r2.png",
+  "steps": [
+    {
+      "name": "pageLoad",
+      "status": "PASS",
+      "evidence": {
+        "title": "LaiBE | 平面拼圖 Plancraft+"
+      }
+    },
+    {
+      "name": "freshPageReload",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "name": "pngImport",
+      "status": "PASS",
+      "evidence": {
+        "naturalWidth": 1508,
+        "naturalHeight": 709,
+        "dataUrlLength": 520606
+      }
+    },
+    {
+      "name": "manualScaleCalibration",
+      "status": "PASS",
+      "evidence": {
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        },
+        "calibratedBy": {
+          "from": {
+            "x": 300,
+            "y": 305
+          },
+          "to": {
+            "x": 600,
+            "y": 305
+          },
+          "pixelDistance": 300,
+          "knownLength": 3000,
+          "unit": "mm"
+        }
+      }
+    },
+    {
+      "name": "drawWallSelected",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 1,
+        "wall": {
+          "id": "wall-1781377143225-d5e213",
+          "sourceWallId": null,
+          "from": {
+            "x": 3600,
+            "y": 4350
+          },
+          "to": {
+            "x": 7600,
+            "y": 4350
+          },
+          "thickness": 120,
+          "status": "existing",
+          "wallType": "solid_partition",
+          "structural": false,
+          "layer": "walls",
+          "createdAt": "2026-06-13T18:59:03.225Z",
+          "updatedAt": "2026-06-13T18:59:03.225Z"
+        },
+        "selectedClassName": "wall-line wall-existing wall-type-solid_partition is-selected"
+      }
+    },
+    {
+      "name": "addDoorSelectedAndInspectable",
+      "status": "PASS",
+      "evidence": {
+        "opening": {
+          "id": "opening-1781377143283-9c68c8",
+          "edgeId": "edge-wall-1781377143225-d5e213",
+          "sourceWallId": "wall-1781377143225-d5e213",
+          "kind": "door",
+          "offset": 1550,
+          "width": 900,
+          "swing": "left",
+          "sillHeight": null,
+          "height": 2100,
+          "createdAt": "2026-06-13T18:59:03.283Z",
+          "updatedAt": "2026-06-13T18:59:03.283Z"
+        },
+        "selectedClassName": "opening-symbol opening-door is-selected",
+        "selectedTag": "line",
+        "kindInput": "door"
+      }
+    },
+    {
+      "name": "editDoorOffsetWidthSwing",
+      "status": "PASS",
+      "evidence": {
+        "opening": {
+          "id": "opening-1781377143283-9c68c8",
+          "edgeId": "edge-wall-1781377143225-d5e213",
+          "sourceWallId": "wall-1781377143225-d5e213",
+          "kind": "door",
+          "offset": 500,
+          "width": 900,
+          "swing": "right",
+          "sillHeight": null,
+          "height": 2100,
+          "createdAt": "2026-06-13T18:59:03.283Z",
+          "updatedAt": "2026-06-13T18:59:03.308Z"
+        },
+        "offsetValue": "500",
+        "widthValue": "900",
+        "swingValue": "right"
+      }
+    },
+    {
+      "name": "editKindToWindowSillHeight",
+      "status": "PASS",
+      "evidence": {
+        "opening": {
+          "id": "opening-1781377143283-9c68c8",
+          "edgeId": "edge-wall-1781377143225-d5e213",
+          "sourceWallId": "wall-1781377143225-d5e213",
+          "kind": "window",
+          "offset": 500,
+          "width": 900,
+          "swing": "none",
+          "sillHeight": 950,
+          "height": 1300,
+          "createdAt": "2026-06-13T18:59:03.283Z",
+          "updatedAt": "2026-06-13T18:59:03.589Z"
+        },
+        "kindValue": "window",
+        "sillValue": "950",
+        "heightValue": "1300"
+      }
+    },
+    {
+      "name": "editKindToOpeningWidth",
+      "status": "PASS",
+      "evidence": {
+        "opening": {
+          "id": "opening-1781377143283-9c68c8",
+          "edgeId": "edge-wall-1781377143225-d5e213",
+          "sourceWallId": "wall-1781377143225-d5e213",
+          "kind": "opening",
+          "offset": 500,
+          "width": 1000,
+          "swing": "none",
+          "sillHeight": 950,
+          "height": 1300,
+          "createdAt": "2026-06-13T18:59:03.283Z",
+          "updatedAt": "2026-06-13T18:59:03.862Z"
+        },
+        "selectedClassName": "opening-symbol opening-opening is-selected",
+        "kindValue": "opening",
+        "widthValue": "1000"
+      }
+    },
+    {
+      "name": "candidateJsonContainsEditedOpening",
+      "status": "PASS",
+      "evidence": {
+        "exportedOpening": {
+          "id": "opening-1781377143283-9c68c8",
+          "edgeId": "edge-wall-1781377143225-d5e213",
+          "sourceWallId": "wall-1781377143225-d5e213",
+          "kind": "opening",
+          "offset": 500,
+          "width": 1000,
+          "swing": "none",
+          "sillHeight": 950,
+          "height": 1300,
+          "createdAt": "2026-06-13T18:59:03.283Z",
+          "updatedAt": "2026-06-13T18:59:04.145Z"
+        }
+      }
+    },
+    {
+      "name": "candidateExportBoundaryGuard",
+      "status": "PASS",
+      "evidence": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    },
+    {
+      "name": "deleteSelectedOpening",
+      "status": "PASS",
+      "evidence": {
+        "openingCount": 0,
+        "canvasOpeningCount": 0
+      }
+    },
+    {
+      "name": "undoAvailableAfterDelete",
+      "status": "PASS",
+      "evidence": {
+        "undoDisabled": false
+      }
+    },
+    {
+      "name": "undoRestoresOpening",
+      "status": "PASS",
+      "evidence": {
+        "openingCount": 1,
+        "opening": {
+          "id": "opening-1781377143283-9c68c8",
+          "edgeId": "edge-wall-1781377143225-d5e213",
+          "sourceWallId": "wall-1781377143225-d5e213",
+          "kind": "opening",
+          "offset": 500,
+          "width": 1000,
+          "swing": "none",
+          "sillHeight": 950,
+          "height": 1300,
+          "createdAt": "2026-06-13T18:59:03.283Z",
+          "updatedAt": "2026-06-13T18:59:04.145Z"
+        },
+        "canvasOpeningCount": 1
+      }
+    },
+    {
+      "name": "redoDeletesOpeningAgain",
+      "status": "PASS",
+      "evidence": {
+        "openingCount": 0,
+        "canvasOpeningCount": 0
+      }
+    },
+    {
+      "name": "pcProductionExportDisabled",
+      "status": "PASS",
+      "evidence": {
+        "disabled": true
+      }
+    },
+    {
+      "name": "consoleErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "consoleErrors": []
+      }
+    },
+    {
+      "name": "pageErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "pageErrors": []
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarnings": [],
+  "pageErrors": [],
+  "exported": {
+    "path": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop87-downloads\\loop87-opening-inspector-export-r2.json",
+    "fileName": "laibe-plancraft-plus-draft.json",
+    "openingCount": 1,
+    "candidateExportBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    }
+  },
+  "final": {
+    "pass": true,
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrorCount": 0,
+    "passedSteps": 18
+  },
+  "screenshot": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop87-opening-inspector-regression-r2.png"
+}
