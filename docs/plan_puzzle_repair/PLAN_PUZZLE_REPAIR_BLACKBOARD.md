@@ -3330,3 +3330,50 @@ lastCompletedTarget: Verified browser-visible UI copy remains Chinese-readable w
 nextTarget: Target Loop 82 - Reviewer/A2 branch freshness and pushed evidence index.
 currentSafeTask: Confirm pushed branch evidence index and prepare A2/reviewer freshness packet without touching runtime unless a new concrete browser defect is assigned.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 82 pushed evidence freshness index without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop82ZoneInspectorExportRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_82_ZONE_INSPECTOR_EXPORT_REGRESSION.md
+- toolInventory: docs/plan_puzzle_repair/loop82-tool-action-inventory-r1.json
+- machineEvidence: docs/plan_puzzle_repair/loop82-zone-inspector-export-regression-r4.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop82-downloads/loop82-zone-inspector-export-r4.json
+- screenshot: docs/plan_puzzle_repair/loop82-zone-inspector-export-regression-r4.png local-only ignored by git
+- checkedAt: 2026-06-14 02:25:00 +08:00
+- testedHead: 631292430d6e369bcf6d3b9b0ec8613d7e88be5e2
+- decision: LOOP_82_ZONE_INSPECTOR_EXPORT_REGRESSION_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - visibleToolInventory: PASS_35_buttons_1_input
+  - blankDraft: PASS
+  - closedWallRectangle: PASS_4_walls
+  - zonePlacement: PASS
+  - zoneChineseNamePreserved: PASS
+  - boundaryEditStart: PASS
+  - boundaryWallSelection: PASS_4_hit_targets
+  - boundaryApply: PASS_closed
+  - inspectorTabs: PASS_properties_layers_reminders_materials_overview
+  - furnitureCoexistence: PASS_1_candidate
+  - candidateJsonExport: PASS_walls_4_zones_1_furniture_1_layoutObjects_1
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop82-zone-inspector-export-regression-r1.json
+  - failed r2/r3 shell attempts did not produce committed evidence
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 82
+targetDrawingProgress: ZONE_INSPECTOR_EXPORT_REGRESSION_PASS_WITH_NOTES
+loopResult: ZONE_INSPECTOR_EXPORT_REGRESSION_PASS_WITH_NOTES
+lastCompletedTarget: Verified zone placement, closed boundary editing through wall hit targets, Chinese zone name preservation, inspector tab switching, furniture coexistence, candidate JSON export, candidate guard, and .pc disabled boundary on the current pushed head.
+nextTarget: Target Loop 83 - Current-head reviewer evidence freshness / branch sync packet.
+currentSafeTask: Prepare reviewer/A2 freshness packet that maps the latest pushed HEAD to accepted browser evidence and separates local diagnostic artifacts from committed evidence.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 83 reviewer evidence freshness packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

@@ -1,0 +1,169 @@
+{
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop82-zone-inspector-export-regression-r4",
+  "checks": {
+    "pageLoad": "PASS",
+    "blankDraft": "PASS",
+    "closedWallRectangle": "PASS",
+    "zonePlacement": "PASS",
+    "boundaryApplied": "PASS",
+    "boundaryClosedOrWarned": "PASS",
+    "zoneChineseNamePreservedInRuntime": "PASS",
+    "inspectorTabs": {
+      "properties": "PASS",
+      "layers": "PASS",
+      "reminders": "PASS",
+      "materials": "PASS",
+      "overview": "PASS"
+    },
+    "exportIncludesZone": "PASS",
+    "exportPreservesChineseZoneName": "PASS",
+    "exportIncludesFurniture": "PASS",
+    "candidateGuard": "PASS",
+    "pcDisabled": "PASS"
+  },
+  "metrics": {
+    "afterWall": {
+      "walls": 4,
+      "mode": "select",
+      "selectedWallId": "wall-1781372858785-b92e2e",
+      "wallHitTargets": 4
+    },
+    "afterZone": {
+      "zones": 1,
+      "selectedZoneId": "zone-1781372859122-7af682",
+      "mode": "select",
+      "activeTab": "屬性"
+    },
+    "zoneTypeOptions": [
+      "living",
+      "bedroom",
+      "kitchen",
+      "bathroom",
+      "dining",
+      "balcony",
+      "entry",
+      "storage",
+      "closet",
+      "other"
+    ],
+    "boundaryStart": {
+      "mode": "edit-zone-boundary",
+      "selectedZoneId": "zone-1781372859122-7af682",
+      "wallHitTargets": 4,
+      "applyBoundaryExists": true
+    },
+    "hitTargetCountBeforeBoundaryClicks": 4,
+    "beforeApplyBoundary": {
+      "mode": "edit-zone-boundary",
+      "selectedZoneId": "zone-1781372859122-7af682",
+      "selectedWallId": "wall-1781372858785-b92e2e",
+      "boundaryState": {
+        "activeZoneId": "zone-1781372859122-7af682",
+        "selectedBoundaryEdgeIds": [
+          "edge-wall-1781372858330-2ce818",
+          "edge-wall-1781372858501-6e3a61",
+          "edge-wall-1781372858654-6788a1",
+          "edge-wall-1781372858785-b92e2e"
+        ],
+        "previewPolygon": [
+          {
+            "x": 1800,
+            "y": 1500
+          },
+          {
+            "x": 6200,
+            "y": 1500
+          },
+          {
+            "x": 6200,
+            "y": 3700
+          },
+          {
+            "x": 1800,
+            "y": 3700
+          }
+        ],
+        "issues": []
+      },
+      "applyBoundaryExists": true,
+      "inspectorSnippet": "屬性\n圖層\n提醒\n材料\n總覽\n選取空間標籤\n編號\n空間 1\n空間類型\n客廳\n邊界線段\n4\n邊界牆段\n0\n邊界點數\n4\n邊界狀態\n編輯中\n面積\n尚未計算\n更新時間\n2026-06-13T17:47:39.822Z\n名稱\n類型\n客廳 living\n臥室 bedroom\n廚房 kitchen\n浴室 bathroom\n餐廳 dining\n陽台 balcony\n玄關 entry\n儲藏室 storage\n更衣室 closet\n空間 other\n標籤 X\n標籤 Y\n空間標籤與邊界都使用 mm 座標；面積若尚未封閉會維持未計算。\n空間邊界\n編輯模式\n編輯中\n目前選取邊界"
+    },
+    "afterApplyBoundary": {
+      "mode": "select",
+      "zone": {
+        "id": "zone-1781372859122-7af682",
+        "name": "客廳測試區",
+        "type": "living",
+        "labelPosition": {
+          "x": 3800,
+          "y": 2500
+        },
+        "boundaryEdgeIds": [
+          "edge-wall-1781372858330-2ce818",
+          "edge-wall-1781372858501-6e3a61",
+          "edge-wall-1781372858654-6788a1",
+          "edge-wall-1781372858785-b92e2e"
+        ],
+        "boundaryWallIds": [
+          "wall-1781372858330-2ce818",
+          "wall-1781372858501-6e3a61",
+          "wall-1781372858654-6788a1",
+          "wall-1781372858785-b92e2e"
+        ],
+        "polygon": [
+          {
+            "x": 1800,
+            "y": 1500
+          },
+          {
+            "x": 6200,
+            "y": 1500
+          },
+          {
+            "x": 6200,
+            "y": 3700
+          },
+          {
+            "x": 1800,
+            "y": 3700
+          }
+        ],
+        "area": null,
+        "boundaryStatus": "closed",
+        "boundaryIssues": [],
+        "createdAt": "2026-06-13T17:47:39.122Z",
+        "updatedAt": "2026-06-13T17:47:40.817Z"
+      }
+    },
+    "afterFurniture": {
+      "walls": 4,
+      "openings": 0,
+      "zones": 1,
+      "furniture": 1
+    },
+    "export": {
+      "walls": 4,
+      "openings": 0,
+      "zones": 1,
+      "furniture": 1,
+      "layoutObjects": 1,
+      "candidateExportBoundary": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      },
+      "firstZoneName": "客廳測試區",
+      "firstZoneBoundaryStatus": "closed"
+    }
+  },
+  "notes": [],
+  "exportPath": "docs/plan_puzzle_repair/loop82-downloads/loop82-zone-inspector-export-r4.json",
+  "screenshot": "docs/plan_puzzle_repair/loop82-zone-inspector-export-regression-r4.png",
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "pageErrors": []
+  },
+  "result": "LOOP_82_ZONE_INSPECTOR_EXPORT_REGRESSION_PASS_WITH_NOTES"
+}
