@@ -3251,3 +3251,45 @@ lastCompletedTarget: Verified visible major tool hit targets, draw-wall active s
 nextTarget: Target Loop 80 - Final current-head evidence index and open diagnostic artifact inventory.
 currentSafeTask: Consolidate accepted evidence files and list untracked failed diagnostic artifacts so reviewer/A2 can distinguish pass evidence from local diagnostics.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 80 evidence index without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop80ResetGuardEvidenceIndex:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_80_RESET_GUARD_EVIDENCE_INDEX.md
+- machineEvidence: docs/plan_puzzle_repair/loop80-reset-new-draft-guard-regression-r1.json
+- screenshot: docs/plan_puzzle_repair/loop80-reset-new-draft-guard-regression-r1.png local-only ignored by git
+- checkedAt: 2026-06-14 01:45:00 +08:00
+- testedHead: 4f2b6cc18b3c9e37aac7de7e1a4db053a04ff5ac
+- decision: RESET_NEW_DRAFT_GUARD_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - populateCandidateDraft: PASS_1_wall_1_opening_1_furniture
+  - candidateExportBeforeReset: PASS
+  - resetProjectClearsDraft: PASS
+  - candidateExportAfterReset: PASS_empty_guard_preserved
+  - newBlankDraftAfterReset: PASS
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop73-narrow-inspector-regression-r2.json
+  - loop74-selected-furniture-label-regression-r1.json
+  - loop76-current-head-full-human-operability-r1.json
+  - loop76-current-head-full-human-operability-r2.json
+  - loop78-selection-layer-visibility-regression-r1.json
+  - loop79-keyboard-tool-hit-target-regression-r1.json
+  - loop79-keyboard-tool-hit-target-regression-r2.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 80
+targetDrawingProgress: RESET_NEW_DRAFT_GUARD_PASS_WITH_NOTES
+loopResult: RESET_NEW_DRAFT_GUARD_PASS_WITH_NOTES
+lastCompletedTarget: Verified reset clears candidate draft data, new blank draft works after reset, candidate export guard remains false/false/false, and .pc export remains disabled.
+nextTarget: Target Loop 81 - High-risk UI copy visibility / Chinese label sweep.
+currentSafeTask: Inspect visible high-risk labels and status messages for mojibake or unclear text that could block human operation.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 81 UI copy visibility sweep without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

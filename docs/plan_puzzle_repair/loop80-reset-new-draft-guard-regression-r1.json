@@ -1,0 +1,164 @@
+{
+  "result": "PASS_WITH_NOTES",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop80-reset-new-draft-guard-regression-r1",
+  "screenshotPath": "docs/plan_puzzle_repair/loop80-reset-new-draft-guard-regression-r1.png",
+  "steps": [
+    {
+      "step": "page load",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop80-reset-new-draft-guard-regression-r1",
+        "viewport": {
+          "width": 1365,
+          "height": 768
+        }
+      }
+    },
+    {
+      "step": "populate candidate draft and export",
+      "status": "PASS",
+      "evidence": {
+        "populatedState": {
+          "mode": "select",
+          "importSource": {
+            "id": "import-1781371542637-672fd0",
+            "originalFileName": "blank-mm-draft.svg",
+            "originalFileType": "svg",
+            "accepted": true,
+            "previewSupported": true,
+            "normalizedAs": "blank-mm-draft",
+            "importedAt": "2026-06-13T17:25:42.637Z"
+          },
+          "calibrated": true,
+          "pxPerMm": 0.1,
+          "walls": 1,
+          "openings": 1,
+          "zones": 0,
+          "furniture": 1,
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781371543339-f0eb64",
+          "pcDisabled": 3,
+          "pcEnabled": 0
+        },
+        "exportSummary": {
+          "walls": 1,
+          "openings": 1,
+          "furniture": 1,
+          "boundary": {
+            "formalEstimate": false,
+            "budgetEngineCalled": false,
+            "productionReady": false,
+            "note": "家具 / 櫃體物件僅為草稿候選資料。"
+          }
+        }
+      }
+    },
+    {
+      "step": "reset project clears draft and preserves guard",
+      "status": "PASS",
+      "evidence": {
+        "resetState": {
+          "mode": "select",
+          "importSource": null,
+          "calibrated": false,
+          "pxPerMm": null,
+          "walls": 0,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0,
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null,
+          "pcDisabled": 3,
+          "pcEnabled": 0
+        },
+        "exportSummary": {
+          "walls": 0,
+          "openings": 0,
+          "furniture": 0,
+          "boundary": {
+            "formalEstimate": false,
+            "budgetEngineCalled": false,
+            "productionReady": false,
+            "note": "家具 / 櫃體物件僅為草稿候選資料。"
+          }
+        }
+      }
+    },
+    {
+      "step": "new blank draft works after reset",
+      "status": "PASS",
+      "evidence": {
+        "newDraftState": {
+          "mode": "select",
+          "importSource": {
+            "id": "import-1781371543966-22c248",
+            "originalFileName": "blank-mm-draft.svg",
+            "originalFileType": "svg",
+            "accepted": true,
+            "previewSupported": true,
+            "normalizedAs": "blank-mm-draft",
+            "importedAt": "2026-06-13T17:25:43.966Z"
+          },
+          "calibrated": true,
+          "pxPerMm": 0.1,
+          "walls": 0,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0,
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null,
+          "pcDisabled": 3,
+          "pcEnabled": 0
+        },
+        "afterNewWall": {
+          "mode": "draw-wall",
+          "importSource": {
+            "id": "import-1781371543966-22c248",
+            "originalFileName": "blank-mm-draft.svg",
+            "originalFileType": "svg",
+            "accepted": true,
+            "previewSupported": true,
+            "normalizedAs": "blank-mm-draft",
+            "importedAt": "2026-06-13T17:25:43.966Z"
+          },
+          "calibrated": true,
+          "pxPerMm": 0.1,
+          "walls": 1,
+          "openings": 0,
+          "zones": 0,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371544168-2c2380",
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null,
+          "pcDisabled": 3,
+          "pcEnabled": 0
+        },
+        "exportSummary": {
+          "walls": 1,
+          "boundary": {
+            "formalEstimate": false,
+            "budgetEngineCalled": false,
+            "productionReady": false,
+            "note": "家具 / 櫃體物件僅為草稿候選資料。"
+          }
+        }
+      }
+    },
+    {
+      "step": ".pc production export disabled after reset/new draft",
+      "status": "PASS",
+      "evidence": {
+        "pcDisabled": 3,
+        "pcEnabled": 0
+      }
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "all": []
+  }
+}
