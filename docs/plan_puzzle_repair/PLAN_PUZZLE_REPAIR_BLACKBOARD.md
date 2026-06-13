@@ -2626,3 +2626,57 @@ lastCompletedTarget: Verified wall, opening, and furniture layer hide/show behav
 nextTarget: Target Loop 67 - Import / scale / tool-flow Chinese guidance regression.
 currentSafeTask: Verify the import, scale calibration, tool guidance, and no-budget-production boundary wording remain understandable in full Chinese UI.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 67 import / scale / tool-flow Chinese guidance regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop67ImportScaleChineseGuidanceRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_67_IMPORT_SCALE_CHINESE_GUIDANCE_REGRESSION.md
+- checkedAt: 2026-06-13 23:25:58 +08:00
+- decision: LOOP_67_IMPORT_SCALE_CHINESE_GUIDANCE_REGRESSION_PASS
+- runtimePatch: NO
+- fixture:
+  - path: docs/plan_puzzle_repair/loop67-width-5000mm-test-plan.png
+  - note: local PNG fixture ignored by repository `*.png`
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pngImport: PASS
+  - underlayRender: PASS
+  - autoScaleSuggestion: PASS
+  - autoScaleApply: PASS
+  - knownLengthValue: 5000
+  - scaleStatus: 已確認
+  - scaleCalibrated: true
+  - pxPerMm: 0.2
+  - drawWallAfterImportScale: PASS
+  - candidateJsonExport: PASS
+  - visibleChineseGuidance: PASS
+  - replacementCharacterCount: 0
+- requiredPhraseHits:
+  - 匯入 JPG / PNG: PASS
+  - 校正比例: PASS
+  - 候選: PASS
+  - 不產生正式估價: PASS
+  - 不呼叫預算引擎: PASS
+  - 平面拼圖: PASS
+- exportSummary:
+  - importSourcePreviewSupported: true
+  - scaleCalibrated: true
+  - walls: 1
+  - formalEstimate: false
+  - budgetEngineCalled: false
+  - productionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 67
+targetDrawingProgress: IMPORT_SCALE_CHINESE_GUIDANCE_REGRESSION_PASS
+loopResult: LOOP_67_IMPORT_SCALE_CHINESE_GUIDANCE_REGRESSION_PASS
+lastCompletedTarget: Verified PNG import, filename-based auto-scale suggestion, scale apply, wall drawing after import/scale, full Chinese guidance phrases, and candidate-only export boundary.
+nextTarget: Target Loop 68 - Manual two-point calibration regression.
+currentSafeTask: Verify the manual calibration two-point path and compare it against the auto-scale path without changing production/budget boundaries.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 68 manual calibration regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
