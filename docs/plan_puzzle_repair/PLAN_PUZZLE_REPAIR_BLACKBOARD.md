@@ -2680,3 +2680,52 @@ lastCompletedTarget: Verified PNG import, filename-based auto-scale suggestion, 
 nextTarget: Target Loop 68 - Manual two-point calibration regression.
 currentSafeTask: Verify the manual calibration two-point path and compare it against the auto-scale path without changing production/budget boundaries.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 68 manual calibration regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop68ManualCalibrationRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_68_MANUAL_CALIBRATION_REGRESSION.md
+- checkedAt: 2026-06-13 23:33:15 +08:00
+- decision: LOOP_68_MANUAL_CALIBRATION_REGRESSION_PASS
+- runtimePatch: NO
+- fixture:
+  - path: docs/plan_puzzle_repair/loop68-manual-calibration-plan.png
+  - note: local PNG fixture ignored by repository `*.png`
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pngImport: PASS
+  - underlayRender: PASS
+  - noAutoScaleSuggestion: PASS
+  - startManualCalibration: PASS
+  - firstCalibrationPoint: PASS
+  - secondCalibrationPoint: PASS
+  - knownLengthInput: 4000
+  - applyCalibration: PASS
+  - scaleStatus: 已確認
+  - scaleCalibrated: true
+  - pxPerMm: 0.1
+  - calibratedBy: 4000mm = 400px
+  - drawWallAfterManualCalibration: PASS
+  - candidateJsonExport: PASS
+- exportSummary:
+  - importSourcePreviewSupported: true
+  - scaleCalibrated: true
+  - walls: 1
+  - formalEstimate: false
+  - budgetEngineCalled: false
+  - productionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 68
+targetDrawingProgress: MANUAL_CALIBRATION_REGRESSION_PASS
+loopResult: LOOP_68_MANUAL_CALIBRATION_REGRESSION_PASS
+lastCompletedTarget: Verified manual two-point calibration path with no filename dimension clue, scale apply, wall drawing after calibration, and candidate-only export boundary.
+nextTarget: Target Loop 69 - Opening dimension edit regression.
+currentSafeTask: Verify opening offset, width, swing, sill height, and exported JSON consistency after editing a selected door/window/opening.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 69 opening dimension edit regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
