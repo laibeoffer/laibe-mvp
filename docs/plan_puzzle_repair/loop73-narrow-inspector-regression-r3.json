@@ -1,0 +1,616 @@
+{
+  "result": "PASS_WITH_NOTES",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop73-narrow-inspector-regression-r3",
+  "screenshotPath": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop73-narrow-inspector-regression-r3.png",
+  "steps": [
+    {
+      "step": "page load narrow viewport",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop73-narrow-inspector-regression-r3",
+        "viewport": {
+          "width": 1180,
+          "height": 720
+        }
+      }
+    },
+    {
+      "step": "initial layout metrics",
+      "status": "PASS",
+      "evidence": {
+        "viewport": {
+          "w": 1180,
+          "h": 720
+        },
+        "document": {
+          "scrollWidth": 1180,
+          "clientWidth": 1180,
+          "scrollHeight": 767,
+          "clientHeight": 720
+        },
+        "body": {
+          "scrollWidth": 1180,
+          "clientWidth": 1180,
+          "scrollHeight": 767,
+          "clientHeight": 767
+        },
+        "fileArea": {
+          "x": 12,
+          "y": 10,
+          "width": 1156,
+          "height": 126.84375,
+          "bottom": 136.84375,
+          "right": 1168,
+          "scrollHeight": 125,
+          "clientHeight": 125,
+          "scrollWidth": 1154,
+          "clientWidth": 1154,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "toolShell": {
+          "x": 12,
+          "y": 146.84375,
+          "width": 1156,
+          "height": 608,
+          "bottom": 754.84375,
+          "right": 1168,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 1154,
+          "clientWidth": 1154,
+          "overflowY": "hidden",
+          "overflowX": "hidden"
+        },
+        "toolPanel": {
+          "x": 13,
+          "y": 147.84375,
+          "width": 184,
+          "height": 606,
+          "bottom": 753.84375,
+          "right": 197,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 183,
+          "clientWidth": 183,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "canvasShell": {
+          "x": 197,
+          "y": 147.84375,
+          "width": 684,
+          "height": 606,
+          "bottom": 753.84375,
+          "right": 881,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 684,
+          "clientWidth": 684,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "canvas": {
+          "x": 197,
+          "y": 147.84375,
+          "width": 684,
+          "height": 558,
+          "bottom": 705.84375,
+          "right": 881,
+          "scrollHeight": 558,
+          "clientHeight": 558,
+          "scrollWidth": 684,
+          "clientWidth": 684,
+          "overflowY": "hidden",
+          "overflowX": "hidden"
+        },
+        "inspector": {
+          "x": 881,
+          "y": 147.84375,
+          "width": 286,
+          "height": 606,
+          "bottom": 753.84375,
+          "right": 1167,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 285,
+          "clientWidth": 285,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "inspectorBody": {
+          "x": 882,
+          "y": 205.84375,
+          "width": 285,
+          "height": 548,
+          "bottom": 753.84375,
+          "right": 1167,
+          "scrollHeight": 548,
+          "clientHeight": 548,
+          "scrollWidth": 285,
+          "clientWidth": 285,
+          "overflowY": "auto",
+          "overflowX": "auto"
+        },
+        "visibleOverflowingControls": []
+      }
+    },
+    {
+      "step": "draw closed wall rectangle in narrow viewport",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 4,
+        "mode": "select"
+      }
+    },
+    {
+      "step": "door placement/edit in narrow viewport",
+      "status": "PASS",
+      "evidence": {
+        "door": {
+          "id": "opening-1781368881390-d51436",
+          "edgeId": "edge-wall-1781368881056-889b39",
+          "sourceWallId": "wall-1781368881056-889b39",
+          "kind": "door",
+          "offset": 300,
+          "width": 800,
+          "swing": "right",
+          "sillHeight": null,
+          "height": 2100,
+          "createdAt": "2026-06-13T16:41:21.390Z",
+          "updatedAt": "2026-06-13T16:41:21.433Z"
+        }
+      }
+    },
+    {
+      "step": "furniture placement/edit in narrow viewport",
+      "status": "PASS",
+      "evidence": {
+        "furniture": {
+          "id": "furniture-1781368881526-602aed",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 2800,
+          "y": 3090,
+          "widthMm": 1600,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "narrow regression",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T16:41:21.526Z",
+          "updatedAt": "2026-06-13T16:41:21.682Z"
+        }
+      }
+    },
+    {
+      "step": "post interaction layout metrics",
+      "status": "PASS",
+      "evidence": {
+        "viewport": {
+          "w": 1180,
+          "h": 720
+        },
+        "document": {
+          "scrollWidth": 1180,
+          "clientWidth": 1180,
+          "scrollHeight": 767,
+          "clientHeight": 720
+        },
+        "body": {
+          "scrollWidth": 1180,
+          "clientWidth": 1180,
+          "scrollHeight": 767,
+          "clientHeight": 767
+        },
+        "fileArea": {
+          "x": 12,
+          "y": -37,
+          "width": 1156,
+          "height": 126.84375,
+          "bottom": 89.84375,
+          "right": 1168,
+          "scrollHeight": 125,
+          "clientHeight": 125,
+          "scrollWidth": 1154,
+          "clientWidth": 1154,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "toolShell": {
+          "x": 12,
+          "y": 99.84375,
+          "width": 1156,
+          "height": 608,
+          "bottom": 707.84375,
+          "right": 1168,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 1154,
+          "clientWidth": 1154,
+          "overflowY": "hidden",
+          "overflowX": "hidden"
+        },
+        "toolPanel": {
+          "x": 13,
+          "y": 100.84375,
+          "width": 184,
+          "height": 606,
+          "bottom": 706.84375,
+          "right": 197,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 183,
+          "clientWidth": 183,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "canvasShell": {
+          "x": 197,
+          "y": 100.84375,
+          "width": 684,
+          "height": 606,
+          "bottom": 706.84375,
+          "right": 881,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 684,
+          "clientWidth": 684,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "canvas": {
+          "x": 197,
+          "y": 100.84375,
+          "width": 684,
+          "height": 558,
+          "bottom": 658.84375,
+          "right": 881,
+          "scrollHeight": 558,
+          "clientHeight": 558,
+          "scrollWidth": 684,
+          "clientWidth": 684,
+          "overflowY": "hidden",
+          "overflowX": "hidden"
+        },
+        "inspector": {
+          "x": 881,
+          "y": 100.84375,
+          "width": 286,
+          "height": 606,
+          "bottom": 706.84375,
+          "right": 1167,
+          "scrollHeight": 606,
+          "clientHeight": 606,
+          "scrollWidth": 285,
+          "clientWidth": 285,
+          "overflowY": "visible",
+          "overflowX": "visible"
+        },
+        "inspectorBody": {
+          "x": 882,
+          "y": 158.84375,
+          "width": 285,
+          "height": 548,
+          "bottom": 706.84375,
+          "right": 1167,
+          "scrollHeight": 1132,
+          "clientHeight": 548,
+          "scrollWidth": 285,
+          "clientWidth": 285,
+          "overflowY": "auto",
+          "overflowX": "auto"
+        },
+        "visibleOverflowingControls": [
+          {
+            "text": "衣櫃\n衣櫃 / 1,600 x 600 mm",
+            "tag": "BUTTON",
+            "cls": "furniture-item is-selected",
+            "x": 397,
+            "y": 379.84375,
+            "width": 160,
+            "height": 60,
+            "visible": true,
+            "overflow": true
+          }
+        ]
+      }
+    },
+    {
+      "step": "candidate export narrow viewport",
+      "status": "PASS",
+      "evidence": {
+        "walls": 4,
+        "openings": 1,
+        "furniture": 1,
+        "layoutObjects": 1,
+        "guard": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        }
+      }
+    },
+    {
+      "step": ".pc disabled narrow viewport",
+      "status": "PASS",
+      "evidence": {
+        "pcDisabled": 3
+      }
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "all": []
+  },
+  "exportChecks": {
+    "walls": 4,
+    "openings": 1,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "guard": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    }
+  },
+  "layout": {
+    "initial": {
+      "viewport": {
+        "w": 1180,
+        "h": 720
+      },
+      "document": {
+        "scrollWidth": 1180,
+        "clientWidth": 1180,
+        "scrollHeight": 767,
+        "clientHeight": 720
+      },
+      "body": {
+        "scrollWidth": 1180,
+        "clientWidth": 1180,
+        "scrollHeight": 767,
+        "clientHeight": 767
+      },
+      "fileArea": {
+        "x": 12,
+        "y": 10,
+        "width": 1156,
+        "height": 126.84375,
+        "bottom": 136.84375,
+        "right": 1168,
+        "scrollHeight": 125,
+        "clientHeight": 125,
+        "scrollWidth": 1154,
+        "clientWidth": 1154,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "toolShell": {
+        "x": 12,
+        "y": 146.84375,
+        "width": 1156,
+        "height": 608,
+        "bottom": 754.84375,
+        "right": 1168,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 1154,
+        "clientWidth": 1154,
+        "overflowY": "hidden",
+        "overflowX": "hidden"
+      },
+      "toolPanel": {
+        "x": 13,
+        "y": 147.84375,
+        "width": 184,
+        "height": 606,
+        "bottom": 753.84375,
+        "right": 197,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 183,
+        "clientWidth": 183,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "canvasShell": {
+        "x": 197,
+        "y": 147.84375,
+        "width": 684,
+        "height": 606,
+        "bottom": 753.84375,
+        "right": 881,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 684,
+        "clientWidth": 684,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "canvas": {
+        "x": 197,
+        "y": 147.84375,
+        "width": 684,
+        "height": 558,
+        "bottom": 705.84375,
+        "right": 881,
+        "scrollHeight": 558,
+        "clientHeight": 558,
+        "scrollWidth": 684,
+        "clientWidth": 684,
+        "overflowY": "hidden",
+        "overflowX": "hidden"
+      },
+      "inspector": {
+        "x": 881,
+        "y": 147.84375,
+        "width": 286,
+        "height": 606,
+        "bottom": 753.84375,
+        "right": 1167,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 285,
+        "clientWidth": 285,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "inspectorBody": {
+        "x": 882,
+        "y": 205.84375,
+        "width": 285,
+        "height": 548,
+        "bottom": 753.84375,
+        "right": 1167,
+        "scrollHeight": 548,
+        "clientHeight": 548,
+        "scrollWidth": 285,
+        "clientWidth": 285,
+        "overflowY": "auto",
+        "overflowX": "auto"
+      },
+      "visibleOverflowingControls": []
+    },
+    "post": {
+      "viewport": {
+        "w": 1180,
+        "h": 720
+      },
+      "document": {
+        "scrollWidth": 1180,
+        "clientWidth": 1180,
+        "scrollHeight": 767,
+        "clientHeight": 720
+      },
+      "body": {
+        "scrollWidth": 1180,
+        "clientWidth": 1180,
+        "scrollHeight": 767,
+        "clientHeight": 767
+      },
+      "fileArea": {
+        "x": 12,
+        "y": -37,
+        "width": 1156,
+        "height": 126.84375,
+        "bottom": 89.84375,
+        "right": 1168,
+        "scrollHeight": 125,
+        "clientHeight": 125,
+        "scrollWidth": 1154,
+        "clientWidth": 1154,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "toolShell": {
+        "x": 12,
+        "y": 99.84375,
+        "width": 1156,
+        "height": 608,
+        "bottom": 707.84375,
+        "right": 1168,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 1154,
+        "clientWidth": 1154,
+        "overflowY": "hidden",
+        "overflowX": "hidden"
+      },
+      "toolPanel": {
+        "x": 13,
+        "y": 100.84375,
+        "width": 184,
+        "height": 606,
+        "bottom": 706.84375,
+        "right": 197,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 183,
+        "clientWidth": 183,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "canvasShell": {
+        "x": 197,
+        "y": 100.84375,
+        "width": 684,
+        "height": 606,
+        "bottom": 706.84375,
+        "right": 881,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 684,
+        "clientWidth": 684,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "canvas": {
+        "x": 197,
+        "y": 100.84375,
+        "width": 684,
+        "height": 558,
+        "bottom": 658.84375,
+        "right": 881,
+        "scrollHeight": 558,
+        "clientHeight": 558,
+        "scrollWidth": 684,
+        "clientWidth": 684,
+        "overflowY": "hidden",
+        "overflowX": "hidden"
+      },
+      "inspector": {
+        "x": 881,
+        "y": 100.84375,
+        "width": 286,
+        "height": 606,
+        "bottom": 706.84375,
+        "right": 1167,
+        "scrollHeight": 606,
+        "clientHeight": 606,
+        "scrollWidth": 285,
+        "clientWidth": 285,
+        "overflowY": "visible",
+        "overflowX": "visible"
+      },
+      "inspectorBody": {
+        "x": 882,
+        "y": 158.84375,
+        "width": 285,
+        "height": 548,
+        "bottom": 706.84375,
+        "right": 1167,
+        "scrollHeight": 1132,
+        "clientHeight": 548,
+        "scrollWidth": 285,
+        "clientWidth": 285,
+        "overflowY": "auto",
+        "overflowX": "auto"
+      },
+      "visibleOverflowingControls": [
+        {
+          "text": "衣櫃\n衣櫃 / 1,600 x 600 mm",
+          "tag": "BUTTON",
+          "cls": "furniture-item is-selected",
+          "x": 397,
+          "y": 379.84375,
+          "width": 160,
+          "height": 60,
+          "visible": true,
+          "overflow": true
+        }
+      ]
+    }
+  }
+}

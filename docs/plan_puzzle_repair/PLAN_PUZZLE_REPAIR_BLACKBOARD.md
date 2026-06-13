@@ -2951,3 +2951,50 @@ lastCompletedTarget: Fixed continuous wall drawing and closed-outline select-mod
 nextTarget: Target Loop 73 - Narrow viewport and inspector readability regression.
 currentSafeTask: Verify the post-patch drawing flow remains human-operable in a smaller viewport, with inspector labels readable and no horizontal/vertical workflow blockers.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 73 narrow viewport / inspector readability regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop73NarrowViewportInspectorRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_73_NARROW_VIEWPORT_INSPECTOR_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop73-narrow-inspector-regression-r3.json
+- screenshot: docs/plan_puzzle_repair/loop73-narrow-inspector-regression-r3.png local-only ignored by git
+- checkedAt: 2026-06-14 00:41:21 +08:00
+- decision: LOOP_73_NARROW_VIEWPORT_INSPECTOR_READABILITY_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - viewport: 1180x720
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - initialHorizontalOverflow: PASS_scrollWidth_equals_clientWidth
+  - fileToolCanvasInspectorLayout: PASS_left_to_right_workbench
+  - canvasUsableSize: PASS_684x558
+  - inspectorUsableSize: PASS_286_width_internal_scroll
+  - continuousWallRectangle: PASS_4_walls_select_mode
+  - doorPlacementAndEdit: PASS
+  - furniturePlacementAndEdit: PASS_width_depth_material_note
+  - candidateJsonExport: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - walls: 4
+  - openings: 1
+  - furniture: 1
+  - layoutObjects: 1
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- remainingNote:
+  - selectedFurnitureButtonTextOverflow: PASS_WITH_NOTES_no_page_horizontal_overflow_no_workflow_blocker
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 73
+targetDrawingProgress: NARROW_VIEWPORT_INSPECTOR_READABILITY_PASS_WITH_NOTES
+loopResult: LOOP_73_NARROW_VIEWPORT_INSPECTOR_READABILITY_PASS_WITH_NOTES
+lastCompletedTarget: Verified narrow viewport human operation across layout, continuous wall drawing, door placement, furniture placement/editing, candidate JSON export, and .pc disabled boundary without runtime patch.
+nextTarget: Target Loop 74 - Selected furniture compact label / affordance polish or final evidence closeout.
+currentSafeTask: If selected furniture label overflow becomes a human-operability complaint, apply minimal label wrapping or compact affordance polish; otherwise consolidate evidence for reviewer/A2.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, continue Loop 74 selected furniture label/affordance triage without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
