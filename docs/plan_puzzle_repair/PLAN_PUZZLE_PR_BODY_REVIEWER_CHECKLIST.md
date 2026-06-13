@@ -8,14 +8,19 @@
 
 `codex/plan-puzzle-test-repair-worktree-20260611`
 
-## Latest pushed commit
+## Branch Head
 
-`3dca9c369e8652f26b1288ea0570303f657427b7`
+Use the current GitHub branch head for review:
+
+`codex/plan-puzzle-test-repair-worktree-20260611`
+
+Do not treat a hard-coded SHA inside this checklist as authoritative after checklist-only commits. Verify the current remote head from GitHub before merge/review disposition.
 
 Included commit chain:
 
 - `862c3d72dfdd7eff4a1b17a615ef35e1a6373b14` - Plan Puzzle human-operable runtime repair and evidence package.
 - `3dca9c369e8652f26b1288ea0570303f657427b7` - PR body / reviewer checklist.
+- Later checklist-only commits may update this document without changing runtime.
 
 ## Summary
 
