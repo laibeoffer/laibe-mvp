@@ -1,5 +1,34 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest Intake Task: Plan Puzzle / Plancraft+ 0.12 Shared Truth Intake
+
+- Agent: B_PLAN_PUZZLE_REPAIR_COMMANDER / shared-truth intake support.
+- Workstream: `budget/plancraft-plus-shared-truth-intake`
+- Date: 2026-06-13 Asia/Taipei.
+- Scope: PR / file / schema / shared truth inventory only.
+- Files created:
+  - `docs/budget/PLANCRAFT_0_12_SHARED_TRUTH_INTAKE.md`
+  - `docs/budget/PLAN_PUZZLE_TO_BUDGET_INTERFACE_CANDIDATE_CONTRACT.md`
+  - `docs/budget/PLANCRAFT_0_12_PR_MERGE_ORDER_RECOMMENDATION.md`
+- Runtime modified in this intake: No.
+- Budget runtime modified: No.
+- Formal estimate / Excel / PDF / Renderer / DB / API / AI / payment touched: No.
+- Checked open PRs through GitHub REST: 15 total open PRs.
+- Plan Puzzle / Plancraft+ shared-truth candidates checked: #25, #50, #54, #56, #67, #68, #69, #76, #98, #100.
+- Open PRs checked and excluded from this shared-truth decision: #33, #52, #53, #77, #86.
+- 0.12 handoff baseline: PR #54 / `f7384709f63fbf0cf1cd854dc80af8bce0fb5977`.
+- Budget shared truth decision: `CANDIDATE_CONTRACT_ONLY_SHARED_TRUTH`.
+- Budget adapter rule: Do not rely directly on any open draft PR as production quantity truth. Use `docs/budget/PLAN_PUZZLE_TO_BUDGET_INTERFACE_CANDIDATE_CONTRACT.md` until reviewer-approved production schema and adapter gate exist.
+- Missing locally from requested budget stitching docs:
+  - `docs/budget/BUDGET_STITCHING_CONTROL_MANIFEST.md`
+  - `docs/budget/BUDGET_WORKSTREAM_ARTIFACT_REGISTRY.md`
+  - `docs/budget/BUDGET_INTERFACE_GATE_MAP.md`
+  - `docs/budget/BUDGET_RUNTIME_DOCS_DRIFT_AUDIT.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+- Need Commander: Yes, for PR chain disposition / merge authorization.
+- Need Reviewer: Yes, for active Plan Puzzle runtime head and candidate schema acceptance.
+- Next action: Reviewer should decide whether #76 or #100 is the active runtime head for candidate export; Budget may proceed only with candidate-contract stitching and formal estimate guard blocked.
+
 ## Latest Workflow Task: Budget Workflow Orchestrator Closeout Sync
 
 - Agent: Budget Workflow Orchestrator Agent
