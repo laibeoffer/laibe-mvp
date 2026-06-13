@@ -2501,3 +2501,48 @@ lastCompletedTarget: Verified pushed branch with local Chrome after in-app brows
 nextTarget: Target Loop 64 - Candidate JSON preview visibility / reviewer readout hardening.
 currentSafeTask: Harden or document page-side candidate JSON preview attachment so reviewer can inspect export evidence without relying only on download capture.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 64 candidate JSON preview visibility audit and minimal patch plan without touching Plancraft core, budget runtime, or package dependencies.
+
+targetLoop64CandidateJsonPreviewReadout:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_64_CANDIDATE_JSON_PREVIEW_READOUT.md
+- checkedAt: 2026-06-13 23:08:40 +08:00
+- decision: LOOP_64_CANDIDATE_JSON_PREVIEW_READOUT_PASS
+- runtimePatch:
+  - file: src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js
+  - summary: Added candidate export preview panel to the default inspector property render path.
+- validationUrl: http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop64-candidate-preview-readout
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - drawWall: PASS
+  - addDoor: PASS
+  - addWindow: PASS
+  - addOpening: PASS
+  - furniturePlacement: PASS
+  - materialApply: PASS
+  - candidateJsonDownload: PASS
+  - candidateJsonPageReadout: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - walls: 1
+  - openings: 3
+  - furniture: 1
+  - toolCatalogItems: 10
+  - layoutObjects: 1
+  - candidatePreviewAttached: 1
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 64
+targetDrawingProgress: CANDIDATE_JSON_PREVIEW_READOUT_PASS
+loopResult: LOOP_64_CANDIDATE_JSON_PREVIEW_READOUT_PASS
+lastCompletedTarget: Fixed the page-side candidate JSON preview/readout visibility gap and verified both downloaded JSON and DOM readout with local Chrome.
+nextTarget: Target Loop 65 - Delete / undo / redo human-operable regression after export readout patch.
+currentSafeTask: Verify delete, undo, and redo across wall, opening, and furniture with browser evidence and console error 0.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 65 delete / undo / redo regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

@@ -3443,6 +3443,7 @@
     inspectorBody.innerHTML = `
       ${tabs}
       ${selectedPropertyCard}
+      ${exportPreviewPanel}
       ${messageBlocks}
     `;
   }
