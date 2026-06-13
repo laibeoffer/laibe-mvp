@@ -1,0 +1,351 @@
+{
+  "result": "PASS_WITH_NOTES",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop78-selection-layer-visibility-regression-r2",
+  "screenshotPath": "docs/plan_puzzle_repair/loop78-selection-layer-visibility-regression-r2.png",
+  "steps": [
+    {
+      "step": "page load",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop78-selection-layer-visibility-regression-r2",
+        "viewport": {
+          "width": 1365,
+          "height": 768
+        }
+      }
+    },
+    {
+      "step": "wall selection visual feedback",
+      "status": "PASS",
+      "evidence": {
+        "wallState": {
+          "walls": 4,
+          "openings": 0,
+          "furniture": 0,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": "wall-1781370822177-4e48d0",
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        },
+        "wallDom": {
+          "selectedWall": {
+            "exists": true,
+            "className": "wall-line wall-existing wall-type-solid_partition is-selected",
+            "display": "inline",
+            "visibility": "visible",
+            "opacity": "1",
+            "stroke": "rgb(0, 183, 255)",
+            "fill": "none",
+            "borderColor": "rgb(244, 247, 248)",
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(244, 247, 248)",
+            "ariaHidden": null,
+            "rect": {
+              "x": 457,
+              "y": 376.84375,
+              "width": 500,
+              "height": 0
+            }
+          },
+          "wallOutline": {
+            "exists": true,
+            "className": "wall-selected-outline",
+            "display": "inline",
+            "visibility": "visible",
+            "opacity": "1",
+            "stroke": "rgba(255, 218, 87, 0.88)",
+            "fill": "none",
+            "borderColor": "rgb(244, 247, 248)",
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(244, 247, 248)",
+            "ariaHidden": null,
+            "rect": {
+              "x": 457,
+              "y": 376.84375,
+              "width": 500,
+              "height": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "step": "opening selection visual feedback",
+      "status": "PASS",
+      "evidence": {
+        "openingState": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 0,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": "wall-1781370822177-4e48d0",
+          "selectedOpeningId": "opening-1781370822488-aedc9e",
+          "selectedFurnitureId": null
+        },
+        "openingDom": {
+          "selectedOpening": {
+            "exists": true,
+            "className": "opening-symbol opening-door is-selected",
+            "display": "inline",
+            "visibility": "visible",
+            "opacity": "1",
+            "stroke": "rgb(0, 183, 255)",
+            "fill": "none",
+            "borderColor": "rgb(244, 247, 248)",
+            "background": "rgba(0, 0, 0, 0)",
+            "color": "rgb(244, 247, 248)",
+            "ariaHidden": null,
+            "rect": {
+              "x": 662,
+              "y": 329.84375,
+              "width": 90,
+              "height": 0
+            }
+          }
+        }
+      }
+    },
+    {
+      "step": "furniture selection visual feedback",
+      "status": "PASS",
+      "evidence": {
+        "furnitureState": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        },
+        "furnitureDom": {
+          "selectedFurniture": {
+            "exists": true,
+            "className": "furniture-item is-selected",
+            "display": "grid",
+            "visibility": "visible",
+            "opacity": "1",
+            "stroke": "none",
+            "fill": "rgb(0, 0, 0)",
+            "borderColor": "rgb(0, 183, 255)",
+            "background": "rgba(8, 14, 20, 0.94)",
+            "color": "rgb(255, 255, 255)",
+            "ariaHidden": "false",
+            "rect": {
+              "x": 627,
+              "y": 449.84375,
+              "width": 180,
+              "height": 60
+            }
+          }
+        }
+      }
+    },
+    {
+      "step": "opening layer hide show preserves data",
+      "status": "PASS",
+      "evidence": {
+        "beforeLayer": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        },
+        "hiddenState": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": false,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        },
+        "shownState": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        },
+        "openingsHidden": {
+          "display": "none",
+          "ariaHidden": "true",
+          "symbols": 1
+        },
+        "openingsShown": {
+          "display": "block",
+          "ariaHidden": "false",
+          "symbols": 1
+        }
+      }
+    },
+    {
+      "step": "furniture layer hide show preserves data",
+      "status": "PASS",
+      "evidence": {
+        "furnitureHiddenState": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": false,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        },
+        "furnitureShownState": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        },
+        "furnitureHidden": {
+          "itemExists": true,
+          "itemDisplay": "none",
+          "itemAriaHidden": "true"
+        },
+        "furnitureShown": {
+          "itemExists": true,
+          "itemDisplay": "grid",
+          "itemAriaHidden": "false"
+        }
+      }
+    },
+    {
+      "step": "candidate export after layer toggles",
+      "status": "PASS",
+      "evidence": {
+        "walls": 4,
+        "openings": 1,
+        "furniture": 1,
+        "layoutObjects": 1,
+        "candidateBoundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "selectedIds": {
+          "walls": 4,
+          "openings": 1,
+          "furniture": 1,
+          "layerVisibility": {
+            "underlay": true,
+            "walls": true,
+            "openings": true,
+            "zones": true,
+            "furniture": true,
+            "diagnostics": true
+          },
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781370822741-249379"
+        }
+      }
+    },
+    {
+      "step": ".pc production export disabled",
+      "status": "PASS",
+      "evidence": {
+        "disabledPcControls": 3,
+        "anyEnabledPcControls": 0
+      }
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "all": []
+  },
+  "exportChecks": {
+    "walls": 4,
+    "openings": 1,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "candidateBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "selectedIds": {
+      "walls": 4,
+      "openings": 1,
+      "furniture": 1,
+      "layerVisibility": {
+        "underlay": true,
+        "walls": true,
+        "openings": true,
+        "zones": true,
+        "furniture": true,
+        "diagnostics": true
+      },
+      "selectedWallId": null,
+      "selectedOpeningId": null,
+      "selectedFurnitureId": "furniture-1781370822741-249379"
+    }
+  }
+}

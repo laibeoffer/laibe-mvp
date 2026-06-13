@@ -3166,3 +3166,46 @@ lastCompletedTarget: Prepared reviewer scope packet for current repair branch wi
 nextTarget: Target Loop 78 - A2/reviewer response handling or next concrete human-operability defect repair.
 currentSafeTask: Watch for A2/reviewer decision; if no decision, keep branch as candidate runtime and do not promote production/budget readiness.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, perform read-only response watch and keep SVG/runtime budget boundaries unchanged.
+
+targetLoop78SelectionLayerVisibilityRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_78_SELECTION_LAYER_VISIBILITY_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop78-selection-layer-visibility-regression-r2.json
+- screenshot: docs/plan_puzzle_repair/loop78-selection-layer-visibility-regression-r2.png local-only ignored by git
+- checkedAt: 2026-06-14 01:25:00 +08:00
+- testedHead: d7d8ea6b147d5c6bcb73ee6eacae78dac709d8e1
+- decision: SELECTION_VISUAL_AND_LAYER_VISIBILITY_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - wallSelectionVisualFeedback: PASS_cyan_stroke_and_outline
+  - openingSelectionVisualFeedback: PASS_cyan_stroke
+  - furnitureSelectionVisualFeedback: PASS_cyan_border
+  - openingLayerHideShowPreservesData: PASS
+  - furnitureLayerHideShowPreservesData: PASS_item_display_and_aria_hidden_toggle
+  - candidateExportAfterLayerToggles: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - walls: 4
+  - openings: 1
+  - furniture: 1
+  - layoutObjects: 1
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 78
+targetDrawingProgress: SELECTION_VISUAL_AND_LAYER_VISIBILITY_PASS_WITH_NOTES
+loopResult: SELECTION_VISUAL_AND_LAYER_VISIBILITY_PASS_WITH_NOTES
+lastCompletedTarget: Verified selected wall/opening/furniture visual feedback, opening/furniture layer hide-show behavior, candidate export preservation, and .pc disabled guard.
+nextTarget: Target Loop 79 - Keyboard/tool accessibility and toolbar hit-target regression.
+currentSafeTask: Verify keyboard Delete/Ctrl-Z/Ctrl-Y, toolbar hit targets, and tool active states remain human-operable after recent UI repairs.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 79 keyboard/tool accessibility regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
