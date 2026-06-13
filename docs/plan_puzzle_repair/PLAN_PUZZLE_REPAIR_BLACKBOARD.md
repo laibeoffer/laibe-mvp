@@ -3083,3 +3083,54 @@ lastCompletedTarget: Consolidated current repair branch evidence across import, 
 nextTarget: Target Loop 76 - PR / reviewer scope packet or address next concrete A2 human-operability defect.
 currentSafeTask: Prepare PR/reviewer scope packet if requested, or continue focused defect repair if A2 reports a concrete blocker.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare scoped reviewer packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop76CurrentHeadFullHumanOperabilityRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_76_CURRENT_HEAD_FULL_HUMAN_OPERABILITY_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop76-current-head-full-human-operability-r3.json
+- screenshot: docs/plan_puzzle_repair/loop76-current-head-full-human-operability-r3.png local-only ignored by git
+- checkedAt: 2026-06-14 01:09:00 +08:00
+- testedHead: ae564c6f83d47442aeef5249dba8484f28cf671e
+- decision: CURRENT_HEAD_FULL_HUMAN_OPERABILITY_REGRESSION_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pngImport: PASS
+  - manualScaleCalibration: PASS_400px_4000mm_pxPerMm_0_1
+  - continuousWallRectangle: PASS_4_walls_select_mode
+  - doorWindowOpeningPlacement: PASS_3_kinds
+  - furnitureDragResize: PASS
+  - furnitureInspectorWidthDepthMaterialNote: PASS_1880x680_wood_note
+  - deleteUndoRedoSelectedOpening: PASS_3_to_2_to_3_to_2
+  - candidateJsonExport: PASS
+  - pcProductionExportDisabled: PASS
+  - horizontalOverflowGuard: PASS
+- exportSummary:
+  - suggestedFilename: laibe-plancraft-plus-draft.json
+  - walls: 4
+  - openings: 3
+  - openingKinds: door / opening / window
+  - furniture: 1
+  - layoutObjects: 1
+  - furnitureWidthDepth: 1880x680
+  - furnitureMaterial: wood
+  - furnitureNote: Loop 76 human smoke
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 76
+targetDrawingProgress: CURRENT_HEAD_FULL_HUMAN_OPERABILITY_REGRESSION_PASS_WITH_NOTES
+loopResult: CURRENT_HEAD_FULL_HUMAN_OPERABILITY_REGRESSION_PASS_WITH_NOTES
+lastCompletedTarget: Verified latest pushed HEAD with a full browser workflow covering PNG import, manual scale calibration, walls, door/window/opening, furniture drag/resize/inspector edits, delete/undo/redo, candidate JSON export, and guard boundaries.
+nextTarget: Target Loop 77 - PR / reviewer scope packet for current repair branch.
+currentSafeTask: Prepare scoped reviewer packet summarizing runtime changes, evidence, remaining candidate-only boundaries, and exact exclusions.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 77 reviewer packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

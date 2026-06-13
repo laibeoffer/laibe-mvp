@@ -1,0 +1,300 @@
+{
+  "result": "PASS_WITH_NOTES",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop76-current-head-full-human-operability-r3",
+  "screenshotPath": "docs/plan_puzzle_repair/loop76-current-head-full-human-operability-r3.png",
+  "tempPng": "C:\\Users\\USER\\AppData\\Local\\Temp\\laibe-loop76-width-4000mm.png",
+  "steps": [
+    {
+      "step": "page load",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop76-current-head-full-human-operability-r3",
+        "viewport": {
+          "width": 1365,
+          "height": 768
+        }
+      }
+    },
+    {
+      "step": "PNG import",
+      "status": "PASS",
+      "evidence": {
+        "importSource": {
+          "id": "import-1781370181162-f5047c",
+          "originalFileName": "laibe-loop76-width-4000mm.png",
+          "originalFileType": "png",
+          "accepted": true,
+          "previewSupported": true,
+          "normalizedAs": "underlay-image",
+          "importedAt": "2026-06-13T17:03:01.162Z"
+        },
+        "hasUnderlay": true
+      }
+    },
+    {
+      "step": "scale calibration",
+      "status": "PASS",
+      "evidence": {
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        },
+        "calibrationPoints": [
+          {
+            "x": 260,
+            "y": 209
+          },
+          {
+            "x": 660,
+            "y": 209
+          }
+        ]
+      }
+    },
+    {
+      "step": "draw closed wall outline",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 4,
+        "mode": "select"
+      }
+    },
+    {
+      "step": "door window opening placement",
+      "status": "PASS",
+      "evidence": {
+        "openingCount": 3,
+        "kinds": [
+          "door",
+          "window",
+          "opening"
+        ]
+      }
+    },
+    {
+      "step": "furniture drag resize material note",
+      "status": "PASS",
+      "evidence": {
+        "furnitureStart": {
+          "item": {
+            "id": "furniture-1781370182641-d816c4",
+            "type": "wardrobe",
+            "category": "cabinet",
+            "name": "衣櫃",
+            "layer": "furniture",
+            "x": 5200,
+            "y": 3790,
+            "widthMm": 1800,
+            "depthMm": 600,
+            "heightMm": 2400,
+            "rotation": 0,
+            "status": "candidate",
+            "materialTags": [
+              "wood"
+            ],
+            "note": "",
+            "budgetCandidate": true,
+            "productionReady": false,
+            "notFormalEstimate": true,
+            "createdAt": "2026-06-13T17:03:02.641Z",
+            "updatedAt": "2026-06-13T17:03:02.641Z"
+          }
+        },
+        "furnitureAfterDrag": {
+          "item": {
+            "id": "furniture-1781370182641-d816c4",
+            "type": "wardrobe",
+            "category": "cabinet",
+            "name": "衣櫃",
+            "layer": "furniture",
+            "x": 5900,
+            "y": 4240,
+            "widthMm": 1800,
+            "depthMm": 600,
+            "heightMm": 2400,
+            "rotation": 0,
+            "status": "candidate",
+            "materialTags": [
+              "wood"
+            ],
+            "note": "",
+            "budgetCandidate": true,
+            "productionReady": false,
+            "notFormalEstimate": true,
+            "createdAt": "2026-06-13T17:03:02.641Z",
+            "updatedAt": "2026-06-13T17:03:03.182Z"
+          }
+        },
+        "furnitureAfterResize": {
+          "item": {
+            "id": "furniture-1781370182641-d816c4",
+            "type": "wardrobe",
+            "category": "cabinet",
+            "name": "衣櫃",
+            "layer": "furniture",
+            "x": 5900,
+            "y": 4240,
+            "widthMm": 2250,
+            "depthMm": 950,
+            "heightMm": 2400,
+            "rotation": 0,
+            "status": "candidate",
+            "materialTags": [
+              "wood"
+            ],
+            "note": "",
+            "budgetCandidate": true,
+            "productionReady": false,
+            "notFormalEstimate": true,
+            "createdAt": "2026-06-13T17:03:02.641Z",
+            "updatedAt": "2026-06-13T17:03:03.649Z"
+          }
+        },
+        "final": {
+          "furnitureCount": 1,
+          "item": {
+            "id": "furniture-1781370182641-d816c4",
+            "type": "wardrobe",
+            "category": "cabinet",
+            "name": "衣櫃",
+            "layer": "furniture",
+            "x": 5900,
+            "y": 4240,
+            "widthMm": 1880,
+            "depthMm": 680,
+            "heightMm": 2400,
+            "rotation": 0,
+            "status": "candidate",
+            "materialTags": [
+              "wood"
+            ],
+            "note": "Loop 76 human smoke",
+            "budgetCandidate": true,
+            "productionReady": false,
+            "notFormalEstimate": true,
+            "createdAt": "2026-06-13T17:03:02.641Z",
+            "updatedAt": "2026-06-13T17:03:04.298Z"
+          },
+          "labelMetrics": {
+            "clientWidth": 79,
+            "scrollWidth": 79,
+            "clientHeight": 32,
+            "scrollHeight": 32
+          },
+          "buttonMetrics": {
+            "clientWidth": 184,
+            "scrollWidth": 184,
+            "clientHeight": 64,
+            "scrollHeight": 64
+          },
+          "cornerInsideItem": true
+        },
+        "dragged": true,
+        "resized": true
+      }
+    },
+    {
+      "step": "delete undo redo selected opening",
+      "status": "PASS",
+      "evidence": {
+        "beforeDelete": {
+          "openings": 3
+        },
+        "afterDelete": {
+          "openings": 2
+        },
+        "afterUndo": {
+          "openings": 3
+        },
+        "afterRedo": {
+          "openings": 2
+        }
+      }
+    },
+    {
+      "step": "candidate JSON export",
+      "status": "PASS",
+      "evidence": {
+        "suggestedFilename": "laibe-plancraft-plus-draft.json",
+        "walls": 4,
+        "openings": 3,
+        "openingKinds": [
+          "door",
+          "opening",
+          "window"
+        ],
+        "furniture": 1,
+        "layoutObjects": 1,
+        "candidateBoundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "furnitureGuard": {
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "materialTags": [
+            "wood"
+          ],
+          "note": "Loop 76 human smoke",
+          "widthMm": 1880,
+          "depthMm": 680
+        }
+      }
+    },
+    {
+      "step": ".pc production export disabled",
+      "status": "PASS",
+      "evidence": {
+        "disabledPcControls": 3,
+        "anyEnabledPcControls": 0
+      }
+    },
+    {
+      "step": "horizontal overflow guard",
+      "status": "PASS",
+      "evidence": {
+        "documentScrollWidth": 1365,
+        "documentClientWidth": 1365,
+        "bodyScrollWidth": 1365,
+        "bodyClientWidth": 1365
+      }
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "all": []
+  },
+  "exportChecks": {
+    "suggestedFilename": "laibe-plancraft-plus-draft.json",
+    "walls": 4,
+    "openings": 3,
+    "openingKinds": [
+      "door",
+      "opening",
+      "window"
+    ],
+    "furniture": 1,
+    "layoutObjects": 1,
+    "candidateBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "furnitureGuard": {
+      "budgetCandidate": true,
+      "productionReady": false,
+      "notFormalEstimate": true,
+      "materialTags": [
+        "wood"
+      ],
+      "note": "Loop 76 human smoke",
+      "widthMm": 1880,
+      "depthMm": 680
+    }
+  }
+}
