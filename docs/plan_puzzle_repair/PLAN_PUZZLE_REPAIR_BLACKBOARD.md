@@ -2774,3 +2774,54 @@ lastCompletedTarget: Verified door/window/opening offset, width, swing, sill hei
 nextTarget: Target Loop 70 - Wall type / thickness / demolition classification regression.
 currentSafeTask: Verify selected wall visual differentiation, wall type/thickness/status inspector edits, demolition classification, candidate JSON export, and undo/redo preservation.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 70 wall classification regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop70WallClassificationRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_70_WALL_CLASSIFICATION_REGRESSION.md
+- checkedAt: 2026-06-14 00:11:21 +08:00
+- decision: LOOP_70_WALL_CLASSIFICATION_REGRESSION_PASS
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - newWallDetailedSettingsCollapsed: PASS
+  - drawWall: PASS
+  - selectedWallVisualHighlight: PASS
+  - selectedWallInspectorControlsVisible: PASS
+  - selectedWallStatusEdit: PASS
+  - selectedWallTypeEdit: PASS
+  - selectedWallThicknessEdit: PASS
+  - demolishedWallDashStyle: PASS
+  - undoRedo: PASS
+  - candidateJsonExport: PASS
+  - pcProductionExportDisabled: PASS
+- editedValues:
+  - initialWall: existing / solid_partition / 120mm / structural false
+  - editedWall: demolished / bearing_wall / 240mm / structural true
+  - afterUndo: thickness 120mm
+  - afterRedo: thickness 240mm
+- exportSummary:
+  - suggestedFilename: laibe-plancraft-plus-draft.json
+  - wallStatus: demolished
+  - wallType: bearing_wall
+  - wallThickness: 240
+  - structural: true
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 70
+targetDrawingProgress: WALL_CLASSIFICATION_REGRESSION_PASS
+loopResult: LOOP_70_WALL_CLASSIFICATION_REGRESSION_PASS
+lastCompletedTarget: Verified wall status/type/thickness/structural edits, selected wall visual differentiation, demolition dash styling, undo/redo, and candidate JSON export.
+nextTarget: Target Loop 71 - Zone / room label and boundary edit regression.
+currentSafeTask: Verify room label placement, boundary edit controls, open-boundary partial wording, candidate JSON export, and guard preservation.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 71 zone/room boundary regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
