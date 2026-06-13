@@ -1,0 +1,255 @@
+{
+  "checkedAt": "2026-06-13T18:51:42.461Z",
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop86-wall-classification-r3",
+  "importedPng": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop83-risk-boundary-operability-r2.png",
+  "steps": [
+    {
+      "name": "pageLoad",
+      "status": "PASS",
+      "evidence": {
+        "title": "LaiBE | 平面拼圖 Plancraft+"
+      }
+    },
+    {
+      "name": "freshPageReload",
+      "status": "PASS",
+      "evidence": {}
+    },
+    {
+      "name": "pngImport",
+      "status": "PASS",
+      "evidence": {
+        "naturalWidth": 1508,
+        "naturalHeight": 709,
+        "dataUrlLength": 520606,
+        "fileName": "loop83-risk-boundary-operability-r2.png"
+      }
+    },
+    {
+      "name": "manualScaleCalibration",
+      "status": "PASS",
+      "evidence": {
+        "scale": {
+          "pxPerMm": 0.1,
+          "calibrated": true
+        },
+        "calibratedBy": {
+          "from": {
+            "x": 300,
+            "y": 300
+          },
+          "to": {
+            "x": 600,
+            "y": 300
+          },
+          "pixelDistance": 300,
+          "knownLength": 3000,
+          "unit": "mm"
+        }
+      }
+    },
+    {
+      "name": "drawWallSelectedAndInspectable",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 1,
+        "wall": {
+          "id": "wall-1781376703512-2c48cc",
+          "sourceWallId": null,
+          "from": {
+            "x": 3600,
+            "y": 4350
+          },
+          "to": {
+            "x": 7600,
+            "y": 4350
+          },
+          "thickness": 120,
+          "status": "existing",
+          "wallType": "solid_partition",
+          "structural": false,
+          "layer": "walls",
+          "createdAt": "2026-06-13T18:51:43.512Z",
+          "updatedAt": "2026-06-13T18:51:43.512Z"
+        },
+        "selectedVisual": true,
+        "selectedClassName": "wall-line wall-existing wall-type-solid_partition is-selected",
+        "selectedStrokeWidth": "12",
+        "inspectorStatusExists": true
+      }
+    },
+    {
+      "name": "editWallStatusTypeThicknessStructural",
+      "status": "PASS",
+      "evidence": {
+        "wall": {
+          "id": "wall-1781376703512-2c48cc",
+          "sourceWallId": null,
+          "from": {
+            "x": 3600,
+            "y": 4350
+          },
+          "to": {
+            "x": 7600,
+            "y": 4350
+          },
+          "thickness": 240,
+          "status": "demolished",
+          "wallType": "bearing_wall",
+          "structural": true,
+          "layer": "walls",
+          "createdAt": "2026-06-13T18:51:43.512Z",
+          "updatedAt": "2026-06-13T18:51:43.565Z"
+        },
+        "selectedClassName": "wall-line wall-demolished wall-type-bearing_wall is-selected",
+        "selectedDataset": {
+          "wallStatus": "demolished",
+          "wallType": "bearing_wall"
+        },
+        "statusInput": "demolished",
+        "typeInput": "bearing_wall",
+        "thicknessInput": "240",
+        "structuralChecked": true
+      }
+    },
+    {
+      "name": "wallDemolitionStructuralVisualState",
+      "status": "PASS",
+      "evidence": {
+        "selectedClassName": "wall-line wall-demolished wall-type-bearing_wall is-selected",
+        "selectedDataset": {
+          "wallStatus": "demolished",
+          "wallType": "bearing_wall"
+        }
+      }
+    },
+    {
+      "name": "candidateJsonContainsEditedWall",
+      "status": "PASS",
+      "evidence": {
+        "exportedWall": {
+          "id": "wall-1781376703512-2c48cc",
+          "sourceWallId": null,
+          "from": {
+            "x": 3600,
+            "y": 4350
+          },
+          "to": {
+            "x": 7600,
+            "y": 4350
+          },
+          "thickness": 240,
+          "status": "demolished",
+          "wallType": "bearing_wall",
+          "structural": true,
+          "layer": "walls",
+          "createdAt": "2026-06-13T18:51:43.512Z",
+          "updatedAt": "2026-06-13T18:51:43.565Z"
+        }
+      }
+    },
+    {
+      "name": "candidateExportBoundaryGuard",
+      "status": "PASS",
+      "evidence": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    },
+    {
+      "name": "deleteSelectedWall",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 0,
+        "canvasWallCount": 0
+      }
+    },
+    {
+      "name": "undoAvailableAfterDelete",
+      "status": "PASS",
+      "evidence": {
+        "undoDisabled": false
+      }
+    },
+    {
+      "name": "undoRestoresWall",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 1,
+        "wall": {
+          "id": "wall-1781376703512-2c48cc",
+          "sourceWallId": null,
+          "from": {
+            "x": 3600,
+            "y": 4350
+          },
+          "to": {
+            "x": 7600,
+            "y": 4350
+          },
+          "thickness": 240,
+          "status": "demolished",
+          "wallType": "bearing_wall",
+          "structural": true,
+          "layer": "walls",
+          "createdAt": "2026-06-13T18:51:43.512Z",
+          "updatedAt": "2026-06-13T18:51:43.565Z"
+        },
+        "canvasWallCount": 1
+      }
+    },
+    {
+      "name": "redoDeletesWallAgain",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 0,
+        "canvasWallCount": 0
+      }
+    },
+    {
+      "name": "pcProductionExportDisabled",
+      "status": "PASS",
+      "evidence": {
+        "disabled": true
+      }
+    },
+    {
+      "name": "consoleErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "consoleErrors": []
+      }
+    },
+    {
+      "name": "pageErrorsZero",
+      "status": "PASS",
+      "evidence": {
+        "pageErrors": []
+      }
+    }
+  ],
+  "consoleErrors": [],
+  "consoleWarnings": [],
+  "pageErrors": [],
+  "exported": {
+    "path": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop86-downloads\\loop86-wall-classification-export-r3.json",
+    "fileName": "laibe-plancraft-plus-draft.json",
+    "wallCount": 1,
+    "candidateExportBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    }
+  },
+  "final": {
+    "pass": true,
+    "consoleErrorCount": 0,
+    "consoleWarningCount": 0,
+    "pageErrorCount": 0,
+    "passedSteps": 16
+  },
+  "screenshot": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop86-wall-classification-regression-r3.png"
+}

@@ -3528,3 +3528,54 @@ lastCompletedTarget: Fixed and verified selected furniture/cabinet inspector edi
 nextTarget: Target Loop 86 - Wall classification and demolition/structural status regression after real PNG import.
 currentSafeTask: Validate wall selection color, wall type/status/thickness/structural edits, demolition wall style, candidate JSON preservation, delete/undo/redo, and guard boundary.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 86 wall classification and demolition/structural status regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop86WallClassificationRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_86_WALL_CLASSIFICATION_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop86-wall-classification-regression-r3.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop86-downloads/loop86-wall-classification-export-r3.json
+- screenshot: docs/plan_puzzle_repair/loop86-wall-classification-regression-r3.png local-only ignored by git
+- checkedAt: 2026-06-14 02:51:42 +08:00
+- testedHead: 762502d1f00d12992a3d24298beaab005d51157c
+- decision: LOOP_86_WALL_CLASSIFICATION_DEMOLITION_PASS_WITHOUT_PATCH
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - freshPageReload: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - pngImport: PASS_underlay_image_1508x709
+  - manualScaleCalibration: PASS_3000mm_300px_pxPerMm_0_1
+  - drawWallSelectedAndInspectable: PASS_wall_line_is_selected_and_inspector_present
+  - editWallStatusTypeThicknessStructural: PASS_demolished_bearing_wall_240mm_structural_true
+  - wallDemolitionStructuralVisualState: PASS_wall_demolished_wall_type_bearing_wall_is_selected
+  - candidateJsonExport: PASS_walls_1
+  - candidateJsonEditedWall: PASS_status_type_thickness_structural_preserved
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - deleteSelectedWall: PASS
+  - undoRestoresWall: PASS
+  - redoDeletesWallAgain: PASS
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop86-wall-classification-regression-r1.json
+  - loop86-wall-classification-regression-r2.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 86
+targetDrawingProgress: WALL_CLASSIFICATION_DEMOLITION_PASS_WITHOUT_PATCH
+loopResult: WALL_CLASSIFICATION_DEMOLITION_PASS_WITHOUT_PATCH
+lastCompletedTarget: Verified selected wall visual state, wall inspector editability, demolished status, bearing-wall classification, 240mm thickness, structural metadata, candidate JSON preservation, delete, undo, redo, and .pc disabled boundary after real PNG import and manual scale calibration.
+nextTarget: Target Loop 87 - Opening inspector regression after real PNG import.
+currentSafeTask: Validate selected door/window/opening visual state, offset/width/swing/kind edits, candidate JSON preservation, delete, undo, redo, and guard boundary.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 87 opening inspector regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
