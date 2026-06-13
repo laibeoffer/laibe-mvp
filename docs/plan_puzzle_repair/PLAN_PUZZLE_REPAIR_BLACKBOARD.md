@@ -3048,3 +3048,38 @@ lastCompletedTarget: Fixed selected furniture label/resize-handle overflow, then
 nextTarget: Target Loop 75 - Final human-operable pass/fail consolidation for current repair branch.
 currentSafeTask: Consolidate import/scale/wall/opening/furniture/material/export guard evidence into current Plan Puzzle repair branch completion status.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 75 evidence consolidation without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop75CurrentRepairBranchEvidenceConsolidation:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_75_CURRENT_REPAIR_BRANCH_EVIDENCE_CONSOLIDATION.md
+- checkedAt: 2026-06-14 01:02:00 +08:00
+- decision: CURRENT_REPAIR_BRANCH_HUMAN_OPERABLE_PASS_WITH_NOTES
+- runtimePatch: NO
+- consolidatedAreas:
+  - PNG import: PASS
+  - scaleCalibration: PASS
+  - wallDrawing: PASS
+  - wallClassification: PASS
+  - doorWindowOpening: PASS
+  - zoneBoundary: PASS
+  - furnitureCabinetPlacement: PASS_WITH_NOTES
+  - materialPreference: PASS_WITH_NOTES
+  - inspectorStatusPanel: PASS_WITH_NOTES
+  - deleteUndoRedo: PASS
+  - candidateJsonExport: PASS
+  - pcProductionExportDisabled: PASS
+  - svgFurniturePackageRuntime: BLOCKED_BY_DESIGN_0_RUNTIME_INCLUDE
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 75
+targetDrawingProgress: CURRENT_REPAIR_BRANCH_HUMAN_OPERABLE_PASS_WITH_NOTES
+loopResult: CURRENT_REPAIR_BRANCH_HUMAN_OPERABLE_PASS_WITH_NOTES
+lastCompletedTarget: Consolidated current repair branch evidence across import, scale, wall, opening, zone, furniture, material, inspector, undo/redo, candidate JSON export, and guard boundaries.
+nextTarget: Target Loop 76 - PR / reviewer scope packet or address next concrete A2 human-operability defect.
+currentSafeTask: Prepare PR/reviewer scope packet if requested, or continue focused defect repair if A2 reports a concrete blocker.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare scoped reviewer packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
