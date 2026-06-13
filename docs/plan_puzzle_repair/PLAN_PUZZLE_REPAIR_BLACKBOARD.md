@@ -3682,3 +3682,66 @@ lastCompletedTarget: Verified layer visibility toggles, data preservation while 
 nextTarget: Target Loop 89 - Full current-head smoke packet after Loop85/87 patches.
 currentSafeTask: Consolidate import, scale, wall, opening, furniture, material, layers, export preview, delete/undo/redo, guard, and .pc disabled boundary into one browser smoke packet.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 89 full current-head smoke packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop89FullCurrentHeadSmoke:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_89_FULL_CURRENT_HEAD_SMOKE.md
+- machineEvidence: docs/plan_puzzle_repair/loop89-full-current-head-smoke-r2.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop89-downloads/loop89-full-current-head-smoke-export-r2.json
+- screenshot: docs/plan_puzzle_repair/loop89-full-current-head-smoke-r2.png local-only ignored by git
+- checkedAt: 2026-06-14 03:21:45 +08:00
+- testedHead: cbe85ed8ecdc25ed3da6ea38f14a98ccb488361c
+- decision: LOOP_89_FULL_CURRENT_HEAD_SMOKE_PASS_WITHOUT_PATCH
+- runtimePatch: NO
+- r1Note: Test harness selected a hidden duplicate furniture template select; no runtime defect proven.
+- localChromeSmoke:
+  - pageLoad: PASS
+  - freshPageReload: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - pngImport: PASS_underlay_image_1508x709
+  - manualScaleCalibration: PASS_3000mm_300px_pxPerMm_0_1
+  - drawWallAndSelectedVisual: PASS
+  - editWallClassificationAndDemolition: PASS_demolished_bearing_wall_240mm_selected
+  - restoreWallForOpenings: PASS
+  - addDoorSelectedVisual: PASS
+  - editDoorOffsetWidthSwing: PASS_offset_300_width_850_swing_right
+  - addAndEditWindow: PASS_offset_1500_width_1200_sill_950_height_1300
+  - addAndEditPlainOpening: PASS_offset_3100_width_700
+  - placeWardrobeSelectedVisual: PASS
+  - dragFurniture: PASS
+  - resizeFurnitureByHandle: PASS
+  - editFurnitureInspectorMaterialNote: PASS_width_2200_depth_700_material_stone_note_saved
+  - hideLayersPreservesData: PASS_walls_1_openings_3_furniture_1
+  - showLayersRestoresVisibleObjects: PASS
+  - deleteSelectedFurnitureOnly: PASS
+  - undoRestoresFurniture: PASS
+  - redoDeletesFurnitureAgain: PASS
+  - restoreFurnitureForExport: PASS
+  - candidateJsonExport: PASS_walls_1_openings_3_furniture_1_layoutObjects_at_least_1
+  - candidateJsonPreviewVisible: PASS
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - furnitureCandidateGuard: PASS_budgetCandidate_true_productionReady_false_notFormalEstimate_true_material_stone
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop89-full-current-head-smoke-r1.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 89
+targetDrawingProgress: FULL_CURRENT_HEAD_SMOKE_PASS_WITHOUT_PATCH
+loopResult: FULL_CURRENT_HEAD_SMOKE_PASS_WITHOUT_PATCH
+lastCompletedTarget: Verified one-run human-operable candidate draft path across import, scale, wall classification, door/window/opening edits, furniture placement/drag/resize/material/note, layer hide/show, selected-object delete/undo/redo, candidate JSON export/preview, and .pc disabled guard boundary.
+nextTarget: Target Loop 90 - Reviewer/A2 completion packet refresh.
+currentSafeTask: Consolidate Loop85-Loop89 browser evidence into a current-head completion package and list remaining non-production boundaries.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 90 completion evidence packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
