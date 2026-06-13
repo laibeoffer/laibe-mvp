@@ -1,0 +1,461 @@
+{
+  "result": "PASS_WITH_NOTES",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop72-full-mixed-object-regression-r10-pass",
+  "screenshotPath": "Z:\\08-Jacky\\laibe_MVP_project\\_codex_worktrees\\laibe_project\\plan-puzzle-test-repair-worktree-20260611\\docs\\plan_puzzle_repair\\loop72-full-mixed-object-regression-r10.png",
+  "steps": [
+    {
+      "step": "page load",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop72-full-mixed-object-regression-r10-pass"
+      }
+    },
+    {
+      "step": ".pc disabled initial",
+      "status": "PASS",
+      "evidence": {
+        "pcDisabledInitial": 3
+      }
+    },
+    {
+      "step": "continuous wall rectangle auto-closed to select mode",
+      "status": "PASS",
+      "evidence": {
+        "wallCount": 4,
+        "mode": "select",
+        "walls": [
+          {
+            "from": {
+              "x": 1800,
+              "y": 2200
+            },
+            "to": {
+              "x": 6800,
+              "y": 2200
+            }
+          },
+          {
+            "from": {
+              "x": 6800,
+              "y": 2200
+            },
+            "to": {
+              "x": 6800,
+              "y": 5200
+            }
+          },
+          {
+            "from": {
+              "x": 6800,
+              "y": 5200
+            },
+            "to": {
+              "x": 1800,
+              "y": 5200
+            }
+          },
+          {
+            "from": {
+              "x": 1800,
+              "y": 5200
+            },
+            "to": {
+              "x": 1800,
+              "y": 2200
+            }
+          }
+        ]
+      }
+    },
+    {
+      "step": "door placement/edit",
+      "status": "PASS",
+      "evidence": {
+        "door": {
+          "id": "opening-1781368284958-ab8dbe",
+          "edgeId": "edge-wall-1781368284598-673889",
+          "sourceWallId": "wall-1781368284598-673889",
+          "kind": "door",
+          "offset": 400,
+          "width": 800,
+          "swing": "right",
+          "sillHeight": null,
+          "height": 2100,
+          "createdAt": "2026-06-13T16:31:24.958Z",
+          "updatedAt": "2026-06-13T16:31:25.025Z"
+        }
+      }
+    },
+    {
+      "step": "window placement/edit",
+      "status": "PASS",
+      "evidence": {
+        "window": {
+          "id": "opening-1781368285070-eb311a",
+          "edgeId": "edge-wall-1781368284598-673889",
+          "sourceWallId": "wall-1781368284598-673889",
+          "kind": "window",
+          "offset": 1500,
+          "width": 900,
+          "swing": "none",
+          "sillHeight": 850,
+          "height": 1100,
+          "createdAt": "2026-06-13T16:31:25.070Z",
+          "updatedAt": "2026-06-13T16:31:25.139Z"
+        }
+      }
+    },
+    {
+      "step": "opening placement/edit",
+      "status": "PASS",
+      "evidence": {
+        "opening": {
+          "id": "opening-1781368285193-989959",
+          "edgeId": "edge-wall-1781368284598-673889",
+          "sourceWallId": "wall-1781368284598-673889",
+          "kind": "opening",
+          "offset": 2700,
+          "width": 700,
+          "swing": "none",
+          "sillHeight": null,
+          "height": 2050,
+          "createdAt": "2026-06-13T16:31:25.193Z",
+          "updatedAt": "2026-06-13T16:31:25.266Z"
+        }
+      }
+    },
+    {
+      "step": "zone closed boundary",
+      "status": "PASS",
+      "evidence": {
+        "zone": {
+          "id": "zone-1781368285334-12959d",
+          "name": "客廳 A",
+          "type": "living",
+          "labelPosition": {
+            "x": 4300,
+            "y": 3700
+          },
+          "boundaryEdgeIds": [
+            "edge-wall-1781368284598-673889",
+            "edge-wall-1781368284629-367939",
+            "edge-wall-1781368284640-1311ac",
+            "edge-wall-1781368284649-630c22"
+          ],
+          "boundaryWallIds": [
+            "wall-1781368284598-673889",
+            "wall-1781368284629-367939",
+            "wall-1781368284640-1311ac",
+            "wall-1781368284649-630c22"
+          ],
+          "polygon": [
+            {
+              "x": 1800,
+              "y": 2200
+            },
+            {
+              "x": 6800,
+              "y": 2200
+            },
+            {
+              "x": 6800,
+              "y": 5200
+            },
+            {
+              "x": 1800,
+              "y": 5200
+            }
+          ],
+          "area": null,
+          "boundaryStatus": "closed",
+          "boundaryIssues": [],
+          "createdAt": "2026-06-13T16:31:25.334Z",
+          "updatedAt": "2026-06-13T16:31:25.555Z"
+        }
+      }
+    },
+    {
+      "step": "wardrobe placement",
+      "status": "PASS",
+      "evidence": {
+        "furniture": {
+          "id": "furniture-1781368285743-247aa6",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3500,
+          "y": 3450,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T16:31:25.743Z",
+          "updatedAt": "2026-06-13T16:31:25.743Z"
+        }
+      }
+    },
+    {
+      "step": "wardrobe drag",
+      "status": "PASS",
+      "evidence": {
+        "furniture": {
+          "id": "furniture-1781368285743-247aa6",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3900,
+          "y": 3750,
+          "widthMm": 1800,
+          "depthMm": 600,
+          "heightMm": 2400,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T16:31:25.743Z",
+          "updatedAt": "2026-06-13T16:31:26.017Z"
+        }
+      }
+    },
+    {
+      "step": "furniture dimension/material/note edit",
+      "status": "PASS",
+      "evidence": {
+        "furniture": {
+          "id": "furniture-1781368285743-247aa6",
+          "type": "wardrobe",
+          "category": "cabinet",
+          "name": "衣櫃",
+          "layer": "furniture",
+          "x": 3900,
+          "y": 3750,
+          "widthMm": 1800,
+          "depthMm": 650,
+          "heightMm": 2200,
+          "rotation": 0,
+          "status": "candidate",
+          "materialTags": [
+            "wood"
+          ],
+          "note": "混合流程回歸",
+          "budgetCandidate": true,
+          "productionReady": false,
+          "notFormalEstimate": true,
+          "createdAt": "2026-06-13T16:31:25.743Z",
+          "updatedAt": "2026-06-13T16:31:26.272Z"
+        }
+      }
+    },
+    {
+      "step": "opening layer toggle",
+      "status": "PASS",
+      "evidence": {
+        "hiddenState": {
+          "ui": false,
+          "hidden": true,
+          "display": "none",
+          "ariaHidden": "true",
+          "openingHitTargetCount": 3
+        },
+        "visibleState": {
+          "ui": true,
+          "hidden": false,
+          "display": "",
+          "ariaHidden": "false",
+          "openingHitTargetCount": 3
+        }
+      }
+    },
+    {
+      "step": "delete undo redo restore",
+      "status": "PASS",
+      "evidence": {
+        "openingCount": 3
+      }
+    },
+    {
+      "step": "candidate JSON export",
+      "status": "PASS",
+      "evidence": {
+        "walls": 4,
+        "openings": 3,
+        "zones": 1,
+        "furniture": 1,
+        "toolCatalogItems": 10,
+        "layoutObjects": 1,
+        "guard": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "materialTags": [
+          "wood"
+        ]
+      }
+    },
+    {
+      "step": "candidate JSON preview",
+      "status": "PASS",
+      "evidence": {
+        "walls": 4,
+        "openings": 3,
+        "zones": 1,
+        "furniture": 1,
+        "toolCatalogItems": 10,
+        "layoutObjects": 1,
+        "guard": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        }
+      }
+    },
+    {
+      "step": ".pc disabled final",
+      "status": "PASS",
+      "evidence": {
+        "pcDisabledFinal": 3
+      }
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "all": []
+  },
+  "exportChecks": {
+    "walls": 4,
+    "openings": 3,
+    "zones": 1,
+    "furniture": 1,
+    "toolCatalogItems": 10,
+    "layoutObjects": 1,
+    "guard": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "materialTags": [
+      "wood"
+    ]
+  },
+  "projectSummary": {
+    "walls": 4,
+    "openings": 3,
+    "zones": 1,
+    "furniture": 1,
+    "ui": {
+      "mode": "select",
+      "selectedWallId": "wall-1781368284598-673889",
+      "selectedEdgeId": "edge-wall-1781368284598-673889",
+      "selectedOpeningId": "opening-1781368284958-ab8dbe",
+      "selectedZoneId": null,
+      "selectedFurnitureId": null,
+      "selectedIssueId": null,
+      "selectedNodeId": null,
+      "calibrationPoints": [],
+      "knownLengthInput": "6000",
+      "wallDraftStart": null,
+      "wallDraftStartSnapPoint": null,
+      "wallPreviewEnd": null,
+      "snapPoint": null,
+      "snapEnabled": true,
+      "orthogonalEnabled": true,
+      "layerVisibility": {
+        "underlay": true,
+        "walls": true,
+        "openings": true,
+        "zones": true,
+        "furniture": true,
+        "diagnostics": true
+      },
+      "currentWallStatus": "existing",
+      "currentWallType": "solid_partition",
+      "currentWallThickness": 120,
+      "currentOpeningKind": "opening",
+      "currentOpeningWidth": 1000,
+      "currentOpeningSwing": "left",
+      "currentZoneType": "living",
+      "currentZoneName": "客廳",
+      "currentFurnitureTemplateId": "wardrobe",
+      "currentFurnitureMaterialTag": "wood",
+      "inspectorTab": "properties",
+      "zoneBoundaryState": {
+        "activeZoneId": null,
+        "selectedBoundaryEdgeIds": [],
+        "previewPolygon": [],
+        "issues": []
+      },
+      "pcConverterReport": {
+        "status": "idle",
+        "fileName": "laibe-plancraft-plus-spike.pc",
+        "notice": "此為 .pc 候選測試檔，尚未完成正式格式與圖面預覽驗證。",
+        "exportedAt": null,
+        "summary": {
+          "roomCount": 0,
+          "wallCount": 0,
+          "openingCount": 0,
+          "skippedZoneCount": 0,
+          "skippedOpeningCount": 0
+        },
+        "warnings": [],
+        "errors": [],
+        "validation": {
+          "status": "not_run",
+          "checkedAt": null,
+          "reason": "靜態頁尚未直接載入正式檔案檢查器；請使用本機驗證流程確認 .pc 候選測試檔。",
+          "errors": [],
+          "warnings": []
+        },
+        "preview": {
+          "status": "not_run",
+          "checkedAt": null,
+          "svgOutputPath": null,
+          "command": "cd C:\\laibe_project\r\nnode C:\\laibe_project\\plancraft\\packages\\cli\\dist\\index.js compile C:\\path\\to\\laibe-plancraft-plus-spike.pc --structure-only -o C:\\path\\to\\laibe-plancraft-plus-spike.svg",
+          "errors": [],
+          "warnings": [
+            "靜態頁尚未直接載入正式圖面預覽器；請使用本機驗證流程產生 SVG 預覽。"
+          ]
+        }
+      },
+      "lastDraftExportPreview": {
+        "generatedAt": "2026-06-13T16:31:27.437Z",
+        "fileName": "laibe-plancraft-plus-draft.json",
+        "wallCount": 4,
+        "openingCount": 3,
+        "zoneCount": 1,
+        "openZoneBoundaryCount": 0,
+        "furnitureCount": 1,
+        "toolCatalogItemCount": 10,
+        "layoutObjectCount": 1,
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "hasMaterialTags": true,
+        "jsonPreview": "{\n  \"walls\": [\n    {\n      \"id\": \"wall-1781368284598-673889\",\n      \"sourceWallId\": null,\n      \"from\": {\n        \"x\": 1800,\n        \"y\": 2200\n      },\n      \"to\": {\n        \"x\": 6800,\n        \"y\": 2200\n      },\n      \"thickness\": 120,\n      \"status\": \"existing\",\n      \"wallType\": \"solid_partition\",\n      \"structural\": false,\n      \"layer\": \"walls\",\n      \"createdAt\": \"2026-06-13T16:31:24.598Z\",\n      \"updatedAt\": \"2026-06-13T16:31:24.598Z\"\n    },\n    {\n      \"id\": \"wall-1781368284629-367939\",\n      \"sourceWallId\": null,\n      \"from\": {\n        \"x\": 6800,\n        \"y\": 2200\n      },\n      \"to\": {\n        \"x\": 6800,\n        \"y\": 5200\n      },\n      \"thickness\": 120,\n      \"status\": \"existing\",\n      \"wallType\": \"solid_partition\",\n      \"structural\": false,\n      \"layer\": \"walls\",\n      \"createdAt\": \"2026-06-13T16:31:24.629Z\",\n      \"updatedAt\": \"2026-06-13T16:31:24.629Z\"\n    },\n    {\n      \"id\": \"wall-1781368284640-1311ac\",\n      \"sourceWallId\": null,\n      \"from\": {\n        \"x\": 6800,\n        \"y\": 5200\n      },\n      \"to\": {\n        \"x\": 1800,\n        \"y\": 5200\n      },\n      \"thickness\": 120,\n      \"status\": \"existing\",\n      \"wallType\": \"solid_partition\",\n      \"structural\": false,\n      \"layer\": \"walls\",\n      \"createdAt\": \"2026-06-13T16:31:24.640Z\",\n      \"updatedAt\": \"2026-06-13T16:31:24.640Z\"\n    },\n    {\n      \"id\": \"wall-1781368284649-630c22\",\n      \"sourceWallId\": null,\n      \"from\": {\n        \"x\": 1800,\n        \"y\": 5200\n      },\n      \"to\": {\n        \"x\": 1800,\n        \"y\": 2200\n      },\n      \"thickness\": 120,\n      \"status\": \"existing\",\n      \"wallType\": \"solid_partition\",\n      \"structural\": false,\n      \"layer\": \"walls\",\n      \"createdAt\": \"2026-06-13T16:31:24.649Z\",\n      \"updatedAt\": \"2026-06-13T16:31:24.649Z\"\n    }\n  ],\n  \"openings\": [\n    {\n      \"id\": \"opening-1781368284958-ab8dbe\",\n      \"edgeId\": \"edge-wall-1781368284598-673889\",\n      \"sourceWallId\": \"wall-1781368284598-673889\",\n      \"kind\": \"door\",\n      \"offset\": 400,\n      \"width\": 800,\n      \"swing\": \"right\",\n      \"sillHeight\": null,\n      \"height\": 2100,\n      \"createdAt\": \"2026-06-13T16:31:24.958Z\",\n      \"updatedAt\": \"2026-06-13T16:31:25.025Z\"\n    },\n    {\n      \"id\": \"opening-1781368285070-eb311a\",\n      \"edgeId\": \"edge-wall-1781368284598-673889\",\n      \"sourceWallId\": \"wall-1781368284598-673889\",\n      \"kind\": \"window\",\n      \"offset\": 1500,\n      \"width\": 900,\n      \"swing\": \"none\",\n      \"sillHeight\": 850,\n      \"height\": 1100,\n      \"createdAt\": \"2026-06-13T16:31:25.070Z\",\n      \"updatedAt\": \"2026-06-13T16:31:25.139Z\"\n    },\n    {\n      \"id\": \"opening-1781368285193-989959\",\n      \"edgeId\": \"edge-wall-1781368284598-673889\",\n      \"sourceWallId\": \"wall-1781368284598-673889\",\n      \"kind\": \"opening\",\n      \"offset\": 2700,\n      \"width\": 700,\n      \"swing\": \"none\",\n      \"sillHeight\": null,\n      \"height\": 2050,\n      \"createdAt\": \"2026-06-13T16:31:25.193Z\",\n      \"updatedAt\": \"2026-06-13T16:31:25.266Z\"\n    }\n  ],\n  \"zones\": [\n    {\n      \"id\": \"zone-1781368285334-12959d\",\n      \"name\": \"客廳 A\",\n      \"type\": \"living\",\n      \"labelPosition\": {\n        \"x\": 4300,\n        \"y\": 3700\n      },\n      \"boundaryEdgeIds\": [\n        \"edge-wall-1781368284598-673889\",\n        \"edge-wall-1781368284629-367939\",\n        \"edge-wall-1781368284640-1311ac\",\n        \"edge-wall-1781368284649-630c22\"\n      ],\n      \"boundaryWallIds\": [\n        \"wall-1781368284598-673889\",\n        \"wall-1781368284629-367939\",\n        \"wall-1781368284640-1311ac\",\n        \"wall-1781368284649-630c22\"\n      ],\n      \"polygon\": [\n        {\n          \"x\": 1800,\n          \"y\": 2200\n        },\n        {\n          \"x\": 6800,\n          \"y\": 2200\n        },\n        {\n          \"x\": 6800,\n          \"y\": 5200\n        },\n        {\n          \"x\": 1800,\n          \"y\": 5200\n        }\n      ],\n      \"area\": null,\n      \"boundaryStatus\": \"closed\",\n      \"boundaryIssues\": [],\n      \"createdAt\": \"2026-06-13T16:31:25.334Z\",\n      \"updatedAt\": \"2026-06-13T16:31:25.555Z\"\n    }\n  ],\n  \"furniture\": [\n    {\n      \"id\": \"furniture-1781368285743-247aa6\",\n      \"type\": \"wardrobe\",\n      \"category\": \"cabinet\",\n      \"name\": \"衣櫃\",\n      \"layer\": \"furniture\",\n      \"x\": 3900,\n      \"y\": 3750,\n      \"widthMm\": 1800,\n      \"depthMm\": 650,\n      \"heightMm\": 2200,\n      \"rotation\": 0,\n      \"status\": \"candidate\",\n      \"materialTags\": [\n        \"wood\"\n      ],\n      \"note\": \"混合流程回歸\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true,\n      \"createdAt\": \"2026-06-13T16:31:25.743Z\",\n      \"updatedAt\": \"2026-06-13T16:31:26.272Z\"\n    }\n  ],\n  \"toolCatalogItems\": [\n    {\n      \"id\": \"tool-wardrobe\",\n      \"type\": \"wardrobe\",\n      \"category\": \"cabinet\",\n      \"name\": \"衣櫃\",\n      \"widthMm\": 1800,\n      \"depthMm\": 600,\n      \"heightMm\": 2400,\n      \"materialTags\": [\n        \"wood\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-tall_cabinet\",\n      \"type\": \"tall_cabinet\",\n      \"category\": \"cabinet\",\n      \"name\": \"高櫃\",\n      \"widthMm\": 900,\n      \"depthMm\": 600,\n      \"heightMm\": 2400,\n      \"materialTags\": [\n        \"system_panel\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-low_wall_cabinet\",\n      \"type\": \"low_wall_cabinet\",\n      \"category\": \"cabinet\",\n      \"name\": \"矮櫃 / 吊櫃\",\n      \"widthMm\": 1200,\n      \"depthMm\": 450,\n      \"heightMm\": 900,\n      \"materialTags\": [\n        \"system_panel\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-tv_cabinet\",\n      \"type\": \"tv_cabinet\",\n      \"category\": \"cabinet\",\n      \"name\": \"電視櫃\",\n      \"widthMm\": 1800,\n      \"depthMm\": 450,\n      \"heightMm\": 500,\n      \"materialTags\": [\n        \"wood\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-kitchen_cabinet\",\n      \"type\": \"kitchen_cabinet\",\n      \"category\": \"cabinet\",\n      \"name\": \"廚具\",\n      \"widthMm\": 1800,\n      \"depthMm\": 600,\n      \"heightMm\": 900,\n      \"materialTags\": [\n        \"stone\",\n        \"system_panel\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-bed\",\n      \"type\": \"bed\",\n      \"category\": \"furniture\",\n      \"name\": \"床\",\n      \"widthMm\": 1500,\n      \"depthMm\": 2000,\n      \"heightMm\": 500,\n      \"materialTags\": [\n        \"fabric\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-sofa\",\n      \"type\": \"sofa\",\n      \"category\": \"furniture\",\n      \"name\": \"沙發\",\n      \"widthMm\": 2100,\n      \"depthMm\": 900,\n      \"heightMm\": 850,\n      \"materialTags\": [\n        \"fabric\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-dining_table\",\n      \"type\": \"dining_table\",\n      \"category\": \"furniture\",\n      \"name\": \"餐桌\",\n      \"widthMm\": 1600,\n      \"depthMm\": 900,\n      \"heightMm\": 760,\n      \"materialTags\": [\n        \"wood\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-toilet\",\n      \"type\": \"toilet\",\n      \"category\": \"fixture\",\n      \"name\": \"馬桶\",\n      \"widthMm\": 420,\n      \"depthMm\": 700,\n      \"heightMm\": 750,\n      \"materialTags\": [\n        \"ceramic\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    },\n    {\n      \"id\": \"tool-washbasin\",\n      \"type\": \"washbasin\",\n      \"category\": \"fixture\",\n      \"name\": \"洗手台\",\n      \"widthMm\": 600,\n      \"depthMm\": 500,\n      \"heightMm\": 850,\n      \"materialTags\": [\n        \"ceramic\"\n      ],\n      \"runtimeSource\": \"parametric-mvp\",\n      \"svgPackageSource\": \"blocked_until_overlay_qa\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    }\n  ],\n  \"layoutObjects\": [\n    {\n      \"id\": \"furniture-1781368285743-247aa6\",\n      \"objectType\": \"parametric_furniture_candidate\",\n      \"type\": \"wardrobe\",\n      \"category\": \"cabinet\",\n      \"name\": \"衣櫃\",\n      \"layer\": \"furniture\",\n      \"positionMm\": {\n        \"x\": 3900,\n        \"y\": 3750\n      },\n      \"sizeMm\": {\n        \"width\": 1800,\n        \"depth\": 650,\n        \"height\": 2200\n      },\n      \"rotation\": 0,\n      \"materialTags\": [\n        \"wood\"\n      ],\n      \"note\": \"混合流程回歸\",\n      \"budgetCandidate\": true,\n      \"productionReady\": false,\n      \"notFormalEstimate\": true\n    }\n  ],\n  \"candidateExportBoundary\": {\n    \"formalEstimate\": false,\n    \"budgetEngineCalled\": false,\n    \"productionReady\": false,\n    \"note\": \"家具 / 櫃體物件僅為草稿候選資料。\"\n  }\n}",
+        "stateSignature": "{\"walls\":[{\"id\":\"wall-1781368284598-673889\",\"from\":{\"x\":1800,\"y\":2200},\"to\":{\"x\":6800,\"y\":2200},\"thickness\":120,\"status\":\"existing\",\"wallType\":\"solid_partition\",\"structural\":false,\"updatedAt\":\"2026-06-13T16:31:24.598Z\"},{\"id\":\"wall-1781368284629-367939\",\"from\":{\"x\":6800,\"y\":2200},\"to\":{\"x\":6800,\"y\":5200},\"thickness\":120,\"status\":\"existing\",\"wallType\":\"solid_partition\",\"structural\":false,\"updatedAt\":\"2026-06-13T16:31:24.629Z\"},{\"id\":\"wall-1781368284640-1311ac\",\"from\":{\"x\":6800,\"y\":5200},\"to\":{\"x\":1800,\"y\":5200},\"thickness\":120,\"status\":\"existing\",\"wallType\":\"solid_partition\",\"structural\":false,\"updatedAt\":\"2026-06-13T16:31:24.640Z\"},{\"id\":\"wall-1781368284649-630c22\",\"from\":{\"x\":1800,\"y\":5200},\"to\":{\"x\":1800,\"y\":2200},\"thickness\":120,\"status\":\"existing\",\"wallType\":\"solid_partition\",\"structural\":false,\"updatedAt\":\"2026-06-13T16:31:24.649Z\"}],\"openings\":[{\"id\":\"opening-1781368284958-ab8dbe\",\"edgeId\":\"edge-wall-1781368284598-673889\",\"kind\":\"door\",\"offset\":400,\"width\":800,\"swing\":\"right\",\"sillHeight\":null,\"height\":2100,\"updatedAt\":\"2026-06-13T16:31:25.025Z\"},{\"id\":\"opening-1781368285070-eb311a\",\"edgeId\":\"edge-wall-1781368284598-673889\",\"kind\":\"window\",\"offset\":1500,\"width\":900,\"swing\":\"none\",\"sillHeight\":850,\"height\":1100,\"updatedAt\":\"2026-06-13T16:31:25.139Z\"},{\"id\":\"opening-1781368285193-989959\",\"edgeId\":\"edge-wall-1781368284598-673889\",\"kind\":\"opening\",\"offset\":2700,\"width\":700,\"swing\":\"none\",\"sillHeight\":null,\"height\":2050,\"updatedAt\":\"2026-06-13T16:31:25.266Z\"}],\"zones\":[{\"id\":\"zone-1781368285334-12959d\",\"name\":\"客廳 A\",\"type\":\"living\",\"labelPosition\":{\"x\":4300,\"y\":3700},\"boundaryEdgeIds\":[\"edge-wall-1781368284598-673889\",\"edge-wall-1781368284629-367939\",\"edge-wall-1781368284640-1311ac\",\"edge-wall-1781368284649-630c22\"],\"boundaryStatus\":\"closed\",\"updatedAt\":\"2026-06-13T16:31:25.555Z\"}],\"furniture\":[{\"id\":\"furniture-1781368285743-247aa6\",\"type\":\"wardrobe\",\"category\":\"cabinet\",\"name\":\"衣櫃\",\"x\":3900,\"y\":3750,\"widthMm\":1800,\"depthMm\":650,\"heightMm\":2200,\"rotation\":0,\"materialTags\":[\"wood\"],\"note\":\"混合流程回歸\",\"updatedAt\":\"2026-06-13T16:31:26.272Z\"}]}",
+        "fullJsonLength": 18099
+      },
+      "message": "候選草稿 JSON 預覽已建立。下載仍只供草稿使用，不呼叫預算引擎，也不產生正式估價。",
+      "error": ""
+    }
+  }
+}

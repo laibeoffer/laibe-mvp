@@ -1600,6 +1600,9 @@
     }
 
     const wall = createWall(from, to);
+    const closesExistingEndpoint = project.walls.some((existingWall) => (
+      isSamePoint(existingWall.from, to) || isSamePoint(existingWall.to, to)
+    ));
     pushHistory("畫牆");
     project.walls.push(wall);
     uiState.selectedWallId = wall.id;
@@ -1608,9 +1611,18 @@
     uiState.selectedIssueId = null;
     uiState.selectedEdgeId = createEdgeId(wall);
     uiState.inspectorTab = "properties";
-    clearWallDraft();
     uiState.error = "";
-    uiState.message = `已建立 ${formatNumber(length)} mm 牆段。`;
+    if (closesExistingEndpoint) {
+      uiState.mode = "select";
+      clearWallDraft();
+      uiState.message = `已建立 ${formatNumber(length)} mm 牆段，並閉合牆體輪廓。`;
+    } else {
+      uiState.wallDraftStart = wall.to;
+      uiState.wallDraftStartSnapPoint = null;
+      uiState.wallPreviewEnd = null;
+      uiState.snapPoint = null;
+      uiState.message = `已建立 ${formatNumber(length)} mm 牆段。可直接點下一個端點繼續畫牆。`;
+    }
     syncBridge();
     render();
   }

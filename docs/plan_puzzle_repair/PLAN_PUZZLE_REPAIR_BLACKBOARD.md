@@ -2890,3 +2890,64 @@ lastCompletedTarget: Fixed draw-wall endpoint continuation through wall hit targ
 nextTarget: Target Loop 72 - Full mixed-object human workflow regression.
 currentSafeTask: Verify one continuous human workflow covering walls, openings, zone boundary, furniture, material, layers, delete/undo/redo, and candidate JSON export.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 72 full mixed-object regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop72FullMixedObjectWorkflowRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_72_FULL_MIXED_OBJECT_WORKFLOW_REGRESSION.md
+- checkedAt: 2026-06-14 00:32:15 +08:00
+- decision: LOOP_72_FULL_MIXED_OBJECT_WORKFLOW_PASS_WITH_NOTES
+- runtimePatch: YES
+- patchedFiles:
+  - src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js
+- defectsProven:
+  - continuousCornerClicksOnlyCreatedTwoWalls:
+      beforePatch: Loop 72 r2/r3 created only 2 wall segments after five human-style corner clicks.
+      fix: Keep new wall segment end as the next wallDraftStart for continuous drawing.
+  - closedOutlineKeptDraftEndpointAndCouldAddExtraWall:
+      beforePatch: Loop 72 r5 exported 5 walls after closed rectangle plus follow-up wall click.
+      fix: When a new wall ends on an existing endpoint, treat it as a closed outline, clear the wall draft, and return to select mode.
+- localChromeSmoke:
+  - nodeCheck: PASS
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - continuousWallRectangle: PASS
+  - wallCount: 4
+  - closedOutlineReturnedToSelectMode: PASS
+  - doorPlacementAndEdit: PASS
+  - windowPlacementAndEdit: PASS
+  - openingPlacementAndEdit: PASS
+  - zoneClosedBoundary: PASS
+  - furniturePlacement: PASS
+  - furnitureDrag: PASS
+  - furnitureDimensionMaterialNoteEdit: PASS
+  - openingLayerToggle: PASS
+  - deleteUndoRedoRestore: PASS
+  - candidateJsonExport: PASS
+  - candidateJsonPreview: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - walls: 4
+  - openings: 3
+  - zones: 1
+  - furniture: 1
+  - toolCatalogItems: 10
+  - layoutObjects: 1
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 72
+targetDrawingProgress: FULL_MIXED_OBJECT_WORKFLOW_PASS_WITH_NOTES
+loopResult: LOOP_72_FULL_MIXED_OBJECT_WORKFLOW_PASS_WITH_NOTES
+lastCompletedTarget: Fixed continuous wall drawing and closed-outline select-mode behavior, then verified walls, openings, zone boundary, furniture, material, layers, delete/undo/redo, candidate JSON export, candidate preview, and .pc disabled boundary in one browser workflow.
+nextTarget: Target Loop 73 - Narrow viewport and inspector readability regression.
+currentSafeTask: Verify the post-patch drawing flow remains human-operable in a smaller viewport, with inspector labels readable and no horizontal/vertical workflow blockers.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 73 narrow viewport / inspector readability regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
