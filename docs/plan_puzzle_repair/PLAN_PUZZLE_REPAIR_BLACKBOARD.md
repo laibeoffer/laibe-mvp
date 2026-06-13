@@ -2546,3 +2546,42 @@ lastCompletedTarget: Fixed the page-side candidate JSON preview/readout visibili
 nextTarget: Target Loop 65 - Delete / undo / redo human-operable regression after export readout patch.
 currentSafeTask: Verify delete, undo, and redo across wall, opening, and furniture with browser evidence and console error 0.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 65 delete / undo / redo regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop65DeleteUndoRedoRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_65_DELETE_UNDO_REDO_REGRESSION.md
+- checkedAt: 2026-06-13 23:14:21 +08:00
+- decision: LOOP_65_DELETE_UNDO_REDO_REGRESSION_PASS
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - wallDeleteIcon: PASS
+  - wallUndo: PASS
+  - wallRedo: PASS
+  - openingDeleteKey: PASS
+  - openingUndo: PASS
+  - openingRedo: PASS
+  - furnitureDeleteIcon: PASS
+  - furnitureUndo: PASS
+  - furnitureRedo: PASS
+  - candidateJsonAfterRedo: PASS
+- scenarioCounts:
+  - wall: create 1 / delete 0 / undo 1 / redo 0
+  - opening: create 1 / delete 0 / undo 1 / redo 0
+  - furniture: create 1 / delete 0 / undo 1 / redo 0
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 65
+targetDrawingProgress: DELETE_UNDO_REDO_REGRESSION_PASS
+loopResult: LOOP_65_DELETE_UNDO_REDO_REGRESSION_PASS
+lastCompletedTarget: Verified delete, undo, and redo across wall, opening, and furniture with local Chrome and console error 0.
+nextTarget: Target Loop 66 - Layer visibility and object selection foreground regression.
+currentSafeTask: Verify layer toggles hide/show walls, openings, furniture, and keep selected-object foreground/inspector state understandable.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 66 layer visibility / selection foreground regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
