@@ -2585,3 +2585,44 @@ lastCompletedTarget: Verified delete, undo, and redo across wall, opening, and f
 nextTarget: Target Loop 66 - Layer visibility and object selection foreground regression.
 currentSafeTask: Verify layer toggles hide/show walls, openings, furniture, and keep selected-object foreground/inspector state understandable.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 66 layer visibility / selection foreground regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop66LayerSelectionRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_66_LAYER_SELECTION_REGRESSION.md
+- checkedAt: 2026-06-13 23:19:01 +08:00
+- decision: LOOP_66_LAYER_SELECTION_REGRESSION_PASS
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - wallCreation: PASS
+  - doorCreation: PASS
+  - furnitureCreation: PASS
+  - wallLayerHideShow: PASS
+  - openingLayerHideShow: PASS
+  - furnitureLayerHideShow: PASS
+  - selectedFurnitureForegroundAfterLayerRoundTrip: PASS
+  - inspectorStateAfterLayerRoundTrip: PASS
+  - candidateJsonExport: PASS
+- exportSummary:
+  - walls: 1
+  - openings: 1
+  - furniture: 1
+  - formalEstimate: false
+  - budgetEngineCalled: false
+  - productionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 66
+targetDrawingProgress: LAYER_SELECTION_REGRESSION_PASS
+loopResult: LOOP_66_LAYER_SELECTION_REGRESSION_PASS
+lastCompletedTarget: Verified wall, opening, and furniture layer hide/show behavior plus selected furniture foreground and inspector state after layer round trip.
+nextTarget: Target Loop 67 - Import / scale / tool-flow Chinese guidance regression.
+currentSafeTask: Verify the import, scale calibration, tool guidance, and no-budget-production boundary wording remain understandable in full Chinese UI.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 67 import / scale / tool-flow Chinese guidance regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
