@@ -2458,3 +2458,46 @@ lastCompletedTarget: Confirmed all 84 candidate ledger source paths exist under 
 nextTarget: Target Loop 63 - SVG candidate ledger refresh plan.
 currentSafeTask: Prepare future-safe inventory refresh plan for current 1565 SVG source tree without copying assets or changing runtime.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 63 SVG candidate ledger refresh plan without staging, pushing, or publishing.
+
+targetLoop63PostPushBrowserSmoke:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_63_POST_PUSH_BROWSER_SMOKE.md
+- checkedAt: 2026-06-13 23:01:48 +08:00
+- decision: LOOP_63_POST_PUSH_CHROME_SMOKE_PASS_WITH_NOTES
+- remoteHead: d6c91ceed9a032ad39369c798d1ec05427c37c46
+- validationUrl: http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop63-post-push-chrome-smoke-json
+- inAppBrowserDisposition: TOOL_BLOCKED_BY_BROWSER_COMMENT_OVERLAY
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - drawWall: PASS
+  - addDoor: PASS
+  - addWindow: PASS
+  - addOpening: PASS
+  - furniturePlacement: PASS
+  - materialApply: PASS
+  - candidateJsonExport: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - walls: 1
+  - openings: 3
+  - furniture: 1
+  - toolCatalogItems: 10
+  - layoutObjects: 1
+  - candidatePreviewAttached: 0
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 63
+targetDrawingProgress: POST_PUSH_CHROME_SMOKE_PASS_WITH_NOTES
+loopResult: LOOP_63_POST_PUSH_CHROME_SMOKE_PASS_WITH_NOTES
+lastCompletedTarget: Verified pushed branch with local Chrome after in-app browser click path was blocked by Codex comment overlay; candidate JSON download passed with wall, openings, furniture, material, and guard fields.
+nextTarget: Target Loop 64 - Candidate JSON preview visibility / reviewer readout hardening.
+currentSafeTask: Harden or document page-side candidate JSON preview attachment so reviewer can inspect export evidence without relying only on download capture.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 64 candidate JSON preview visibility audit and minimal patch plan without touching Plancraft core, budget runtime, or package dependencies.
