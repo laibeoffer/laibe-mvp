@@ -3424,3 +3424,47 @@ lastCompletedTarget: Fixed and verified guarded pre-draft mis-click feedback per
 nextTarget: Target Loop 84 - Current-head full browser smoke spot-check after Loop 83 patch.
 currentSafeTask: Run a compact full workflow smoke after the Loop 83 UI-state patch to ensure import/scale/wall/opening/furniture/export guard still pass.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 84 full smoke spot-check without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop84CurrentHeadFullSmoke:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_84_CURRENT_HEAD_FULL_SMOKE.md
+- machineEvidence: docs/plan_puzzle_repair/loop84-current-head-full-smoke-r2.json
+- exportedCandidateJson: docs/plan_puzzle_repair/loop84-downloads/loop84-current-head-full-smoke-export-r2.json
+- screenshot: docs/plan_puzzle_repair/loop84-current-head-full-smoke-r2.png local-only ignored by git
+- checkedAt: 2026-06-14 03:05:00 +08:00
+- testedHead: cafd72f640d25347f0d8e52b71fc10d2e6ecb4fc
+- decision: LOOP_84_CURRENT_HEAD_FULL_SMOKE_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - pageErrors: 0
+  - pngImport: PASS_underlay_image_1508x709
+  - autoScaleBoundary: PASS_requires_manual_calibration_without_filename_dimension_clue
+  - manualScaleCalibration: PASS_3000mm_300px_pxPerMm_0_1
+  - drawWall: PASS_1_wall_selected
+  - doorWindowOpening: PASS_3_openings
+  - furniturePlacement: PASS_1_candidate
+  - materialTabAccessible: PASS
+  - overviewTabAccessible: PASS
+  - candidateJsonExport: PASS_walls_1_openings_3_furniture_1_layoutObjects_1
+  - candidateGuard: PASS_formalEstimate_false_budgetEngineCalled_false_productionReady_false
+  - pcProductionExportDisabled: PASS
+- diagnosticArtifactsNotCommitted:
+  - loop84 current-head full smoke r1 timing/selector attempt
+  - loop84-calibration-debug-r1.json
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 84
+targetDrawingProgress: CURRENT_HEAD_FULL_SMOKE_PASS_WITH_NOTES
+loopResult: CURRENT_HEAD_FULL_SMOKE_PASS_WITH_NOTES
+lastCompletedTarget: Verified current HEAD with actual PNG import, manual scale calibration, wall drawing, door/window/opening placement, furniture candidate placement, inspector material/overview access, candidate JSON export, guard boundary, and .pc disabled boundary.
+nextTarget: Target Loop 85 - Current-head reviewer / A2 freshness packet.
+currentSafeTask: Prepare reviewer/A2 freshness packet mapping pushed HEAD to accepted evidence and separating committed evidence from local diagnostic artifacts.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 85 reviewer/A2 freshness packet without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

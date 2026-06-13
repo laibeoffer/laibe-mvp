@@ -1,0 +1,125 @@
+{
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop84-current-head-full-smoke-r2",
+  "importPng": "docs/plan_puzzle_repair/loop83-risk-boundary-operability-r2.png",
+  "checks": {
+    "pageLoad": "PASS",
+    "pngImport": "PASS",
+    "scaleCalibration": "PASS",
+    "drawWall": "PASS",
+    "doorWindowOpening": "PASS",
+    "furniturePlacement": "PASS",
+    "materialTabAccessible": "PASS",
+    "overviewTabAccessible": "PASS",
+    "candidateJsonExport": "PASS",
+    "candidateGuard": "PASS",
+    "pcExportDisabled": "PASS"
+  },
+  "metrics": {
+    "afterImport": {
+      "mode": "select",
+      "message": "檔名未找到可自動套用的尺寸線索，請用兩點校正確認比例。",
+      "error": "",
+      "importSource": {
+        "id": "import-1781373788211-ae4897",
+        "originalFileName": "loop83-risk-boundary-operability-r2.png",
+        "originalFileType": "png",
+        "accepted": true,
+        "previewSupported": true,
+        "normalizedAs": "underlay-image",
+        "importedAt": "2026-06-13T18:03:08.203Z"
+      },
+      "underlay": {
+        "opacity": 0.55,
+        "naturalWidth": 1508,
+        "naturalHeight": 709
+      },
+      "scale": {
+        "pxPerMm": null,
+        "calibrated": false,
+        "autoScaleSuggestion": {
+          "status": "needs-manual-confirmation",
+          "source": "image-size-without-dimension-clue",
+          "sourceLabel": "圖片尺寸已讀取，但沒有可套用的 mm / cm / m 線索",
+          "axis": "width",
+          "imageWidthPx": 1508,
+          "imageHeightPx": 709,
+          "pixelDistance": 1508,
+          "knownLengthMm": null,
+          "pxPerMm": null,
+          "confidence": "low",
+          "confidenceLabel": "低",
+          "canApply": false,
+          "from": {
+            "x": 0,
+            "y": 0
+          },
+          "to": {
+            "x": 1508,
+            "y": 0
+          },
+          "createdAt": "2026-06-13T18:03:08.239Z",
+          "note": "檔名未找到可靠尺寸線索，不自動套用比例。"
+        },
+        "autoScaleApplied": false
+      },
+      "walls": 0,
+      "openings": 0,
+      "zones": 0,
+      "furniture": 0,
+      "selectedWallId": null,
+      "selectedOpeningId": null,
+      "selectedFurnitureId": null,
+      "pcDisabled": true,
+      "activeTab": "屬性"
+    },
+    "afterCalibration": {
+      "scale": {
+        "pxPerMm": 0.1,
+        "calibrated": true
+      },
+      "mode": "select",
+      "message": "比例已校正：3,000 mm = 300 px",
+      "error": ""
+    },
+    "afterWall": {
+      "walls": 1,
+      "selectedWallId": "wall-1781373790701-b35fb2",
+      "mode": "draw-wall"
+    },
+    "afterOpenings": {
+      "openings": 3,
+      "selectedOpeningId": "opening-1781373791432-9fc929"
+    },
+    "afterFurniture": {
+      "furniture": 1,
+      "selectedFurnitureId": "furniture-1781373791914-4d8de0"
+    },
+    "afterTabs": {
+      "walls": 1,
+      "openings": 3,
+      "furniture": 1,
+      "activeTab": "總覽"
+    },
+    "export": {
+      "walls": 1,
+      "openings": 3,
+      "furniture": 1,
+      "layoutObjects": 1,
+      "boundary": {
+        "formalEstimate": false,
+        "budgetEngineCalled": false,
+        "productionReady": false,
+        "note": "家具 / 櫃體物件僅為草稿候選資料。"
+      }
+    }
+  },
+  "notes": [],
+  "exportPath": "docs/plan_puzzle_repair/loop84-downloads/loop84-current-head-full-smoke-export-r2.json",
+  "screenshot": "docs/plan_puzzle_repair/loop84-current-head-full-smoke-r2.png",
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "pageErrors": []
+  },
+  "result": "LOOP_84_CURRENT_HEAD_FULL_SMOKE_PASS_WITH_NOTES"
+}
