@@ -1,0 +1,341 @@
+{
+  "result": "PASS_WITH_NOTES",
+  "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop79-keyboard-tool-hit-target-regression-r3",
+  "screenshotPath": "docs/plan_puzzle_repair/loop79-keyboard-tool-hit-target-regression-r3.png",
+  "steps": [
+    {
+      "step": "page load",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop79-keyboard-tool-hit-target-regression-r3",
+        "viewport": {
+          "width": 1365,
+          "height": 768
+        }
+      }
+    },
+    {
+      "step": "visible major tool hit targets unobstructed",
+      "status": "PASS",
+      "evidence": {
+        "hitTargets": [
+          {
+            "name": "select",
+            "selector": "[data-action=\"set-select-mode\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 21,
+              "y": 261.84375,
+              "width": 51.65625,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "set-select-mode",
+            "hitButtonText": "選取點選牆、門窗、家具模式",
+            "pass": true
+          },
+          {
+            "name": "delete",
+            "selector": "[data-action=\"delete-current-selection\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 78.65625,
+              "y": 261.84375,
+              "width": 51.671875,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "delete-current-selection",
+            "hitButtonText": "刪除刪除選取物件Delete",
+            "pass": true
+          },
+          {
+            "name": "draw-wall",
+            "selector": "[data-action=\"start-draw-wall\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 136.328125,
+              "y": 261.84375,
+              "width": 51.671875,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "start-draw-wall",
+            "hitButtonText": "畫牆點兩點新增牆段模式",
+            "pass": true
+          },
+          {
+            "name": "snap-clean",
+            "selector": "[data-action=\"clean-wall-endpoints\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 21,
+              "y": 317.84375,
+              "width": 51.65625,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "clean-wall-endpoints",
+            "hitButtonText": "接牆整理牆端輔助",
+            "pass": true
+          },
+          {
+            "name": "door",
+            "selector": "[data-action=\"add-opening\"][data-opening-kind=\"door\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 21,
+              "y": 394.84375,
+              "width": 51.65625,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "add-opening",
+            "hitButtonText": "門加在選取牆段上門",
+            "pass": true
+          },
+          {
+            "name": "window",
+            "selector": "[data-action=\"add-opening\"][data-opening-kind=\"window\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 78.65625,
+              "y": 394.84375,
+              "width": 51.671875,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "add-opening",
+            "hitButtonText": "窗加在選取牆段上窗",
+            "pass": true
+          },
+          {
+            "name": "opening",
+            "selector": "[data-action=\"add-opening\"][data-opening-kind=\"opening\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 136.328125,
+              "y": 394.84375,
+              "width": 51.671875,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "add-opening",
+            "hitButtonText": "開口不帶門片的洞口開口",
+            "pass": true
+          },
+          {
+            "name": "wardrobe",
+            "selector": "[data-furniture-template=\"wardrobe\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 21,
+              "y": 548.84375,
+              "width": 51.65625,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "select-furniture-template",
+            "hitButtonText": "衣櫃寬深高可調候選",
+            "pass": true
+          },
+          {
+            "name": "place-furniture",
+            "selector": "[data-action=\"start-place-furniture\"]",
+            "exists": true,
+            "visibleCenter": true,
+            "disabled": false,
+            "rect": {
+              "x": 78.65625,
+              "y": 681.84375,
+              "width": 51.671875,
+              "height": 50
+            },
+            "hitTag": "SPAN",
+            "hitButtonAction": "start-place-furniture",
+            "hitButtonText": "放到畫布點畫布放置建立",
+            "pass": true
+          }
+        ]
+      }
+    },
+    {
+      "step": "draw wall active state",
+      "status": "PASS",
+      "evidence": {
+        "mode": "draw-wall",
+        "activeButtons": [
+          {
+            "mode": "draw-wall",
+            "action": "start-draw-wall",
+            "text": "畫牆點兩點新增牆段模式"
+          },
+          {
+            "mode": "draw-wall",
+            "action": "start-draw-wall",
+            "text": "畫牆"
+          }
+        ]
+      }
+    },
+    {
+      "step": "keyboard delete undo redo wall",
+      "status": "PASS",
+      "evidence": {
+        "selectedWall": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 0,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371236477-bb7007",
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        },
+        "afterDeleteWall": {
+          "mode": "select",
+          "walls": 0,
+          "openings": 0,
+          "furniture": 0,
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        },
+        "afterUndoWall": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 0,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371236477-bb7007",
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        },
+        "afterRedoWall": {
+          "mode": "select",
+          "walls": 0,
+          "openings": 0,
+          "furniture": 0,
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        }
+      }
+    },
+    {
+      "step": "keyboard delete undo redo opening",
+      "status": "PASS",
+      "evidence": {
+        "openingSelected": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 1,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371237480-9f64a0",
+          "selectedOpeningId": "opening-1781371237721-19c5d9",
+          "selectedFurnitureId": null
+        },
+        "afterDeleteOpening": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 0,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371237480-9f64a0",
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        },
+        "afterUndoOpening": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 1,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371237480-9f64a0",
+          "selectedOpeningId": "opening-1781371237721-19c5d9",
+          "selectedFurnitureId": null
+        },
+        "afterRedoOpening": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 0,
+          "furniture": 0,
+          "selectedWallId": "wall-1781371237480-9f64a0",
+          "selectedOpeningId": null,
+          "selectedFurnitureId": null
+        }
+      }
+    },
+    {
+      "step": "candidate export after keyboard workflow",
+      "status": "PASS",
+      "evidence": {
+        "walls": 1,
+        "openings": 1,
+        "furniture": 1,
+        "layoutObjects": 1,
+        "candidateBoundary": {
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "note": "家具 / 櫃體物件僅為草稿候選資料。"
+        },
+        "finalStateBeforeExport": {
+          "mode": "select",
+          "walls": 1,
+          "openings": 1,
+          "furniture": 1,
+          "selectedWallId": null,
+          "selectedOpeningId": null,
+          "selectedFurnitureId": "furniture-1781371238673-2a576f"
+        }
+      }
+    },
+    {
+      "step": ".pc production export disabled",
+      "status": "PASS",
+      "evidence": {
+        "disabledPcControls": 3,
+        "anyEnabledPcControls": 0
+      }
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": [],
+    "all": []
+  },
+  "exportChecks": {
+    "walls": 1,
+    "openings": 1,
+    "furniture": 1,
+    "layoutObjects": 1,
+    "candidateBoundary": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "note": "家具 / 櫃體物件僅為草稿候選資料。"
+    },
+    "finalStateBeforeExport": {
+      "mode": "select",
+      "walls": 1,
+      "openings": 1,
+      "furniture": 1,
+      "selectedWallId": null,
+      "selectedOpeningId": null,
+      "selectedFurnitureId": "furniture-1781371238673-2a576f"
+    }
+  }
+}

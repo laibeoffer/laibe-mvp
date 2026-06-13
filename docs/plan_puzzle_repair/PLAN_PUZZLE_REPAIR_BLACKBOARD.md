@@ -3209,3 +3209,45 @@ lastCompletedTarget: Verified selected wall/opening/furniture visual feedback, o
 nextTarget: Target Loop 79 - Keyboard/tool accessibility and toolbar hit-target regression.
 currentSafeTask: Verify keyboard Delete/Ctrl-Z/Ctrl-Y, toolbar hit targets, and tool active states remain human-operable after recent UI repairs.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 79 keyboard/tool accessibility regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop79KeyboardToolHitTargetRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_79_KEYBOARD_TOOL_HIT_TARGET_REGRESSION.md
+- machineEvidence: docs/plan_puzzle_repair/loop79-keyboard-tool-hit-target-regression-r3.json
+- screenshot: docs/plan_puzzle_repair/loop79-keyboard-tool-hit-target-regression-r3.png local-only ignored by git
+- checkedAt: 2026-06-14 01:34:00 +08:00
+- testedHead: 75038c5e64767609d525825169ff7256c7156f75
+- decision: KEYBOARD_AND_TOOL_HIT_TARGET_PASS_WITH_NOTES
+- runtimePatch: NO
+- localChromeSmoke:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - visibleMajorToolHitTargets: PASS
+  - drawWallActiveState: PASS
+  - keyboardDeleteUndoRedoWall: PASS_1_to_0_to_1_to_0
+  - keyboardDeleteUndoRedoOpening: PASS_1_to_0_to_1_to_0
+  - candidateExportAfterKeyboardWorkflow: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - walls: 1
+  - openings: 1
+  - furniture: 1
+  - layoutObjects: 1
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 79
+targetDrawingProgress: KEYBOARD_AND_TOOL_HIT_TARGET_PASS_WITH_NOTES
+loopResult: KEYBOARD_AND_TOOL_HIT_TARGET_PASS_WITH_NOTES
+lastCompletedTarget: Verified visible major tool hit targets, draw-wall active state, keyboard delete/undo/redo for wall and opening, candidate export, and .pc disabled boundary.
+nextTarget: Target Loop 80 - Final current-head evidence index and open diagnostic artifact inventory.
+currentSafeTask: Consolidate accepted evidence files and list untracked failed diagnostic artifacts so reviewer/A2 can distinguish pass evidence from local diagnostics.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 80 evidence index without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
