@@ -2825,3 +2825,68 @@ lastCompletedTarget: Verified wall status/type/thickness/structural edits, selec
 nextTarget: Target Loop 71 - Zone / room label and boundary edit regression.
 currentSafeTask: Verify room label placement, boundary edit controls, open-boundary partial wording, candidate JSON export, and guard preservation.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 71 zone/room boundary regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop71ZoneBoundaryRegression:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_71_ZONE_BOUNDARY_REGRESSION.md
+- checkedAt: 2026-06-14 00:23:05 +08:00
+- decision: LOOP_71_ZONE_BOUNDARY_REGRESSION_PASS_AFTER_MINIMAL_PATCH
+- runtimePatch: YES
+- patchedFiles:
+  - src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js
+- defectProven:
+  - drawWallModeWallHitTargetInterceptedEndpointContinuation: true
+  - beforePatchResult: clicking consecutive endpoints created only 1 wall instead of 4 connected room walls
+  - rootCause: wall hit target selected wall during draw-wall mode instead of forwarding click to draw-wall handler
+  - fix: wall hit target now calls handleDrawWallClick(event) whenever uiState.mode is draw-wall
+- localChromeSmoke:
+  - nodeCheck: PASS
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - connectedRoomWalls: PASS
+  - wallCount: 4
+  - newZoneDetailedSettingsCollapsed: PASS
+  - zoneLabelPlacement: PASS
+  - zoneChineseNameEdit: PASS
+  - zoneTypeEdit: PASS
+  - zoneLabelCoordinateEdit: PASS
+  - boundaryEditMode: PASS
+  - selectedBoundaryEdges: 4
+  - closedBoundaryApply: PASS
+  - polygonPoints: 4
+  - zoneVisualLabelAndPolygon: PASS
+  - candidateJsonExport: PASS
+  - clearBoundary: PASS
+  - pcProductionExportDisabled: PASS
+- editedValues:
+  - zoneName: 客廳 A
+  - zoneType: bedroom
+  - labelPosition: x 4400 / y 3700
+  - boundaryStatus: closed
+  - afterClearBoundaryStatus: none
+- exportSummary:
+  - suggestedFilename: laibe-plancraft-plus-draft.json
+  - zoneName: 客廳 A
+  - boundaryEdgeIds: 4
+  - boundaryWallIds: 4
+  - polygonPoints: 4
+  - boundaryStatus: closed
+  - candidateBoundaryFormalEstimate: false
+  - candidateBoundaryBudgetEngineCalled: false
+  - candidateBoundaryProductionReady: false
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 71
+targetDrawingProgress: ZONE_BOUNDARY_REGRESSION_PASS_AFTER_PATCH
+loopResult: LOOP_71_ZONE_BOUNDARY_REGRESSION_PASS_AFTER_MINIMAL_PATCH
+lastCompletedTarget: Fixed draw-wall endpoint continuation through wall hit targets, then verified room label placement, closed boundary editing, boundary clearing, candidate JSON export, and guard preservation.
+nextTarget: Target Loop 72 - Full mixed-object human workflow regression.
+currentSafeTask: Verify one continuous human workflow covering walls, openings, zone boundary, furniture, material, layers, delete/undo/redo, and candidate JSON export.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, execute Loop 72 full mixed-object regression without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

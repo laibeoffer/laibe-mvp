@@ -3182,7 +3182,10 @@
     hitTarget.setAttribute("stroke-width", String(Math.max(strokeWidth + 14, 20)));
     hitTarget.dataset.wallId = wall.id;
     hitTarget.addEventListener("click", (event) => {
-      if (uiState.mode === "draw-wall" && uiState.wallDraftStart) {
+      if (uiState.mode === "draw-wall") {
+        event.preventDefault();
+        event.stopPropagation();
+        handleDrawWallClick(event);
         return;
       }
       event.preventDefault();
