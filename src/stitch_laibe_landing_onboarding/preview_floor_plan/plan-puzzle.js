@@ -3059,7 +3059,7 @@
       button.innerHTML = `
         <span class="furniture-label">
           <strong>${escapeHTML(item.name)}</strong>
-          <span>${escapeHTML(getFurnitureTypeLabel(item.type))} / ${formatNumber(item.widthMm)} x ${formatNumber(item.depthMm)} mm</span>
+          <span>${formatNumber(item.widthMm)} x ${formatNumber(item.depthMm)} mm</span>
         </span>
         <span class="furniture-resize-handle furniture-resize-handle--inside" title="拖曳調整尺寸" aria-label="拖曳調整尺寸"></span>
         <span class="furniture-resize-handle furniture-resize-handle--corner" title="拖曳角落調整尺寸" aria-label="拖曳角落調整尺寸"></span>

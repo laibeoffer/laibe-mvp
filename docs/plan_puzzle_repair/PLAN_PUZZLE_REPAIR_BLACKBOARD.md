@@ -2998,3 +2998,53 @@ lastCompletedTarget: Verified narrow viewport human operation across layout, con
 nextTarget: Target Loop 74 - Selected furniture compact label / affordance polish or final evidence closeout.
 currentSafeTask: If selected furniture label overflow becomes a human-operability complaint, apply minimal label wrapping or compact affordance polish; otherwise consolidate evidence for reviewer/A2.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, continue Loop 74 selected furniture label/affordance triage without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.
+
+targetLoop74SelectedFurnitureLabelAffordancePolish:
+- evidenceFile: docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_74_SELECTED_FURNITURE_LABEL_AFFORDANCE_POLISH.md
+- machineEvidence: docs/plan_puzzle_repair/loop74-selected-furniture-label-regression-r2.json
+- screenshot: docs/plan_puzzle_repair/loop74-selected-furniture-label-regression-r2.png local-only ignored by git
+- checkedAt: 2026-06-14 00:49:53 +08:00
+- decision: LOOP_74_SELECTED_FURNITURE_LABEL_AFFORDANCE_POLISH_PASS_WITH_NOTES
+- runtimePatch: YES
+- patchedFiles:
+  - src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html
+  - src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js
+- defectProven:
+  - selectedFurnitureLabelAffordanceOverflow:
+      beforePatch: Loop 74 r1 failed selected furniture compact label despite console 0.
+      rootCause: Outside corner resize handle expanded the furniture button scroll box; label repeated type/name text.
+      fix: Render object text as name + dimensions, constrain label text with ellipsis, increase line height, and keep corner resize handle inside the item frame.
+- localChromeSmoke:
+  - pageLoad: PASS
+  - viewport: 1180x720
+  - consoleErrors: 0
+  - consoleWarnings: 0
+  - blankMmDraft: PASS
+  - furniturePlacement: PASS
+  - selectedFurnitureLabelOverflow: PASS_none
+  - cornerResizeHandleInsideItem: PASS
+  - candidateFurnitureGuard: PASS
+  - narrowHorizontalOverflowGuard: PASS
+  - pcProductionExportDisabled: PASS
+- exportSummary:
+  - furniture: 1
+  - layoutObjectsEligible: 1
+  - budgetCandidate: true
+  - productionReady: false
+  - notFormalEstimate: true
+  - disabledPcControls: 3
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 74
+targetDrawingProgress: SELECTED_FURNITURE_LABEL_AFFORDANCE_POLISH_PASS_WITH_NOTES
+loopResult: LOOP_74_SELECTED_FURNITURE_LABEL_AFFORDANCE_POLISH_PASS_WITH_NOTES
+lastCompletedTarget: Fixed selected furniture label/resize-handle overflow, then verified furniture placement, compact label bounds, candidate-only guard, narrow viewport overflow guard, and .pc disabled boundary.
+nextTarget: Target Loop 75 - Final human-operable pass/fail consolidation for current repair branch.
+currentSafeTask: Consolidate import/scale/wall/opening/furniture/material/export guard evidence into current Plan Puzzle repair branch completion status.
+nextAutomaticTask: If no new instruction arrives in 20 minutes, prepare Loop 75 evidence consolidation without touching Plancraft core, budget runtime, package dependencies, or SVG runtime package.

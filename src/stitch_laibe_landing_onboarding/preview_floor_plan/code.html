@@ -1819,20 +1819,32 @@
     .furniture-label {
       display: grid;
       gap: 2px;
+      min-width: 0;
+      max-width: 100%;
       text-align: center;
       pointer-events: none;
     }
 
     .furniture-label strong {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
       font-size: 12px;
-      line-height: 1.1;
+      line-height: 1.25;
       font-weight: 950;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .furniture-label span {
+      display: block;
+      max-width: 100%;
+      overflow: hidden;
       color: var(--text-secondary);
       font-size: 10px;
       font-weight: 850;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .furniture-resize-handle {
@@ -1859,8 +1871,8 @@
     }
 
     .furniture-resize-handle--corner {
-      right: -9px;
-      bottom: -9px;
+      right: 4px;
+      bottom: 4px;
     }
 
     .zone-boundary-polygon {
