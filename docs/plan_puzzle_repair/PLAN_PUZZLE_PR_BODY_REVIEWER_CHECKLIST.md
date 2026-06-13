@@ -10,7 +10,12 @@
 
 ## Latest pushed commit
 
-`862c3d72dfdd7eff4a1b17a615ef35e1a6373b14`
+`3dca9c369e8652f26b1288ea0570303f657427b7`
+
+Included commit chain:
+
+- `862c3d72dfdd7eff4a1b17a615ef35e1a6373b14` - Plan Puzzle human-operable runtime repair and evidence package.
+- `3dca9c369e8652f26b1288ea0570303f657427b7` - PR body / reviewer checklist.
 
 ## Summary
 
