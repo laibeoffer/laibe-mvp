@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-06-14T02:45:19.416Z",
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop65-window-focused-post-patch-r7",
+  "screenshotPath": "docs/plan_puzzle_repair/loop65-window-focused-post-patch-r7.png",
+  "browser": "Chrome CDP headless",
+  "result": {
+    "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop65-window-focused-post-patch-r7",
+    "pageLoad": "PASS",
+    "wallCountStable": "PASS",
+    "addWindow": "PASS",
+    "deleteWindow": "PASS",
+    "livePreview": "PASS",
+    "guard": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false
+    },
+    "domAfterAdd": {
+      "openingSymbols": 2,
+      "hitTargets": 1,
+      "walls": 1
+    },
+    "previewAfterAdd": {
+      "ok": true,
+      "openings": 1,
+      "walls": 1,
+      "furniture": 0,
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false
+    },
+    "domAfterDelete": {
+      "openingSymbols": 0,
+      "hitTargets": 0,
+      "walls": 1
+    },
+    "previewAfterDelete": {
+      "ok": true,
+      "openings": 0,
+      "walls": 1,
+      "furniture": 0,
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false
+    },
+    "overall": "PASS"
+  },
+  "console": {
+    "exceptionCount": 0,
+    "consoleEventCount": 0,
+    "logEntryCount": 0,
+    "entries": []
+  }
+}

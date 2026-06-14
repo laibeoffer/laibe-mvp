@@ -3786,3 +3786,60 @@ lastCompletedTarget: Consolidated Loop85-Loop89 browser evidence and guard bound
 nextTarget: Target Loop 91 - Reviewer response watch and exact fix intake.
 currentSafeTask: Watch for A2/reviewer acceptance or exact rejection points; if a rejection appears, open the smallest evidence or patch loop for that point only.
 nextAutomaticTask: If no new instruction arrives in 20 minutes, perform a read-only response-watch check and keep SVG runtime include false, Budget Engine untouched, and formal `.pc` export disabled.
+
+targetLoop65DeleteUndoRedoRefresh:
+- checkedAt: 2026-06-14 10:43:00 +08:00
+- task: Plan Puzzle Loop65 Delete / Undo / Redo Human Regression
+- status: PASS_WITH_PATCH
+- runtimePatch: YES_MINIMAL
+- changedFiles:
+  - src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js
+  - docs/plan_puzzle_repair/PLAN_PUZZLE_TARGET_LOOP_65_DELETE_UNDO_REDO_REGRESSION.md
+- evidence:
+  - docs/plan_puzzle_repair/loop65-delete-undo-redo-post-patch-r5.json
+  - docs/plan_puzzle_repair/loop65-delete-undo-redo-post-patch-r5.png
+  - docs/plan_puzzle_repair/loop65-window-focused-post-patch-r7.json
+  - docs/plan_puzzle_repair/loop65-window-focused-post-patch-r7.png
+- browser:
+  - pageLoad: PASS
+  - consoleErrors: 0
+  - consoleEvents: 0
+  - logEntries: 0
+- regression:
+  - wallCreateUndoRedo: PASS
+  - doorDeleteUndoRedo: PASS
+  - windowAddDeleteLivePreview: PASS
+  - openingTool: PASS
+  - furniturePlaceDeleteUndoRedo: PASS
+  - furnitureResizeHandleUndoRedo: PASS
+  - materialApplyUndoRedo: PASS
+  - candidateJsonLivePreviewBeforeExport: PASS
+  - candidateJsonDownloadAfterExport: PASS
+  - pcProductionExportDisabled: PASS
+- patchReason: Candidate JSON preview was absent before first explicit export, so edit-time preview sync could not be proven.
+- patchSummary: renderCandidateExportPreviewCard now falls back to a live preview from buildDraftPayload/createDraftExportPreview when no current export snapshot exists.
+- guardStatus:
+  - PlancraftCoreTouched: NO
+  - plancraftTouched: NO
+  - budgetRuntimeTouched: NO
+  - BudgetEngineCalled: NO
+  - PricingRuleTouched: NO
+  - BudgetEstimateLineTouched: NO
+  - formalEstimateGuardChanged: NO
+  - packageNodeModulesAdded: NO
+  - DBPaymentAiLineN8nTouched: NO
+  - formalQuoteExcelPdfGenerated: NO
+  - svgRuntimeInclude: 0
+
+currentLoop: Loop 65 refresh
+loop65Status: PASS_WITH_PATCH
+deleteRegressionStatus: PASS
+undoRedoStatus: PASS
+candidateJsonSyncStatus: PASS_WITH_PATCH
+inspectorSyncStatus: PASS
+p0Bugs: []
+p1Bugs: []
+alarmStatus: ACTIVE
+heartbeatCloseoutAllowed: false
+globalBlackboardWrite: false
+nextAutomaticTask: If no new instruction arrives in 20 minutes, continue Loop66 layer visibility and object selection foreground regression using current dedicated worktree evidence only.

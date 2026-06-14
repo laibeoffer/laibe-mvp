@@ -2236,6 +2236,12 @@
     };
   }
 
+  function createLiveDraftExportPreview() {
+    const payload = buildDraftPayload();
+    const jsonText = JSON.stringify(payload, null, 2);
+    return createDraftExportPreview(payload, jsonText);
+  }
+
   function createDraftStateSignature() {
     return JSON.stringify({
       walls: project.walls.map((wall) => ({
@@ -3647,11 +3653,12 @@
   }
 
   function renderCandidateExportPreviewCard() {
-    const preview = uiState.lastDraftExportPreview;
-    if (!preview) {
-      return "";
-    }
-    const isStale = preview.stateSignature !== createDraftStateSignature();
+    const currentSignature = createDraftStateSignature();
+    const savedPreview = uiState.lastDraftExportPreview;
+    const preview = savedPreview && savedPreview.stateSignature === currentSignature
+      ? savedPreview
+      : createLiveDraftExportPreview();
+    const isStale = false;
     const previewStatus = isStale ? "stale_after_edits" : "current";
     const previewMessage = isStale
       ? "預覽已不是最新。交接前請再按一次「匯出候選 JSON」。"

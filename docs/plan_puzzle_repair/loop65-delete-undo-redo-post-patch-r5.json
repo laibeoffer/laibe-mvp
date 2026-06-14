@@ -1,0 +1,199 @@
+{
+  "checkedAt": "2026-06-14T02:42:55.254Z",
+  "validationUrl": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop65-delete-undo-redo-post-patch-r5",
+  "screenshotPath": "docs/plan_puzzle_repair/loop65-delete-undo-redo-post-patch-r5.png",
+  "browser": "Chrome CDP headless",
+  "result": {
+    "url": "http://127.0.0.1:50362/src/stitch_laibe_landing_onboarding/preview_floor_plan/code.html?validation=loop65-delete-undo-redo-post-patch-r5",
+    "checks": {
+      "pageLoad": "PASS",
+      "drawWall": "PASS",
+      "addDoor": "PASS",
+      "addWindow": "FAIL",
+      "openingTool": "PASS",
+      "placeFurniture": "PASS",
+      "candidateJsonExport": "PASS",
+      "pcProductionExportDisabled": "PASS",
+      "liveCandidatePreviewBeforeExport": "PASS"
+    },
+    "deleteMatrix": [
+      {
+        "target": "door/opening",
+        "method": "keyboard Delete",
+        "expected": 0,
+        "actual": 0,
+        "status": "PASS"
+      },
+      {
+        "target": "window",
+        "method": "toolbar delete",
+        "expected": 0,
+        "actual": 0,
+        "status": "PASS"
+      },
+      {
+        "target": "furniture",
+        "method": "toolbar delete",
+        "expected": 0,
+        "actual": 0,
+        "status": "PASS"
+      }
+    ],
+    "undoRedoMatrix": [
+      {
+        "test": "wall create",
+        "action": "undo",
+        "expected": 0,
+        "actual": 0,
+        "status": "PASS"
+      },
+      {
+        "test": "wall create",
+        "action": "redo",
+        "expected": 1,
+        "actual": 1,
+        "status": "PASS"
+      },
+      {
+        "test": "door delete",
+        "action": "undo",
+        "expected": 1,
+        "actual": 1,
+        "status": "PASS"
+      },
+      {
+        "test": "door delete",
+        "action": "redo",
+        "expected": 0,
+        "actual": 0,
+        "status": "PASS"
+      },
+      {
+        "test": "furniture resize handle",
+        "action": "resize changed width",
+        "expected": "not 1800",
+        "actual": "2600",
+        "status": "PASS"
+      },
+      {
+        "test": "furniture resize handle",
+        "action": "undo",
+        "expected": "1800",
+        "actual": "1800",
+        "status": "PASS"
+      },
+      {
+        "test": "furniture resize handle",
+        "action": "redo",
+        "expected": "2600",
+        "actual": "2600",
+        "status": "PASS"
+      },
+      {
+        "test": "material apply",
+        "action": "undo",
+        "expected": "wood",
+        "actual": "wood",
+        "status": "PASS"
+      },
+      {
+        "test": "material apply",
+        "action": "redo",
+        "expected": "system_panel",
+        "actual": "system_panel",
+        "status": "PASS"
+      },
+      {
+        "test": "furniture delete",
+        "action": "undo",
+        "expected": 1,
+        "actual": 1,
+        "status": "PASS"
+      },
+      {
+        "test": "furniture delete",
+        "action": "redo",
+        "expected": 0,
+        "actual": 0,
+        "status": "PASS"
+      }
+    ],
+    "candidateJsonSync": [
+      {
+        "action": "final preview/download after delete/undo/redo scenario",
+        "status": "PASS",
+        "counts": {
+          "domWalls": 1,
+          "domOpenings": 1,
+          "domFurniture": 0,
+          "previewOk": true,
+          "previewWalls": 1,
+          "previewOpenings": 1,
+          "previewFurniture": 0,
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "previewTextBytes": 5434
+        },
+        "downloadBytes": 10384
+      },
+      {
+        "action": "live preview before export after wall create",
+        "status": "PASS",
+        "counts": {
+          "domWalls": 1,
+          "domOpenings": 0,
+          "domFurniture": 0,
+          "previewOk": true,
+          "previewWalls": 1,
+          "previewOpenings": 0,
+          "previewFurniture": 0,
+          "formalEstimate": false,
+          "budgetEngineCalled": false,
+          "productionReady": false,
+          "previewTextBytes": 5043
+        }
+      }
+    ],
+    "inspectorSync": [
+      {
+        "action": "selected wall after draw",
+        "expected": "wall inspector",
+        "actual": "visible",
+        "status": "PASS"
+      },
+      {
+        "action": "selected door",
+        "expected": "opening inspector",
+        "actual": "visible",
+        "status": "PASS"
+      },
+      {
+        "action": "selected furniture",
+        "expected": "width/depth/material fields",
+        "actual": "visible",
+        "status": "PASS"
+      }
+    ],
+    "guard": {
+      "formalEstimate": false,
+      "budgetEngineCalled": false,
+      "productionReady": false,
+      "candidateOnly": true,
+      "pcProductionExportDisabled": "PASS"
+    },
+    "failures": [
+      {
+        "check": "addWindow",
+        "status": "FAIL"
+      }
+    ],
+    "result": "PARTIAL"
+  },
+  "console": {
+    "exceptionCount": 0,
+    "consoleEventCount": 0,
+    "logEntryCount": 0,
+    "entries": []
+  }
+}
