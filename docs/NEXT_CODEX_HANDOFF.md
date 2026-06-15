@@ -1,5 +1,1247 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest BG1 Shared Truth File-list Ambiguity Resolution
+
+- Observed at: `2026-06-15T00:00:00+08:00`.
+- Review Officer ambiguity decision: `AMBIGUITY_RESOLVED_INCLUDE_IN_FIRST_DOCS_ONLY_PR`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_EXECUTION_NO_RUNTIME`.
+- Commander decision still active: `AUTHORIZE_DOCS_ONLY_STAGE_COMMIT_PUSH_PR`.
+- Approved file-list packet: `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- Explicitly approved overlap files:
+  - `docs/budget/BG1_BUDGET_GENERATOR_ENTRYPOINT_REPAIR_PLAN.md`
+  - `docs/budget/BG1_BUDGET_ESTIMATE_TYPE_TRACE_PLAN.md`
+- These overlap files are no longer treated as Needs Reviewer Decision blockers in preflight.
+- Allowed stage scope:
+  - only files marked as `Must Include In Shared Truth PR` in `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`;
+  - includes the two explicitly approved overlap files above.
+- Strictly do not stage:
+  - Temporarily Excluded groups;
+  - Needs Reviewer Decision groups, except the two overlap files explicitly approved above;
+  - `docs/bg1_budget_commander/**`;
+  - `src/**`;
+  - runtime files;
+  - Excel / PDF / binary outputs;
+  - temporary files;
+  - build artifacts;
+  - generated non-doc artifacts;
+  - unrelated docs.
+- Still prohibited:
+  - merge;
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - Issue `#89` harness gate removal;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+
+## Latest BG1 Docs-Only Shared Truth PR Preflight Blocker
+
+- Observed at: `2026-06-15T00:00:00+08:00`.
+- Commander decision consumed: `AUTHORIZE_DOCS_ONLY_STAGE_COMMIT_PUSH_PR`.
+- Attempted task: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_EXECUTION_NO_RUNTIME`.
+- Preflight result: `Failed`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_BLOCKED_BY_FILE_LIST_AMBIGUOUS_NO_RUNTIME`.
+- Approved file-list packet: `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- Blocker:
+  - Must Include files overlap Needs Reviewer Decision files.
+- Overlap files:
+  - `docs/budget/BG1_BUDGET_GENERATOR_ENTRYPOINT_REPAIR_PLAN.md`
+  - `docs/budget/BG1_BUDGET_ESTIMATE_TYPE_TRACE_PLAN.md`
+- Why BG1 stopped:
+  - current command authorizes staging only Review Officer approved `Must Include` docs;
+  - current command also strictly forbids staging `Needs Reviewer Decision` groups;
+  - these two files appear in both sections of the approved packet;
+  - BG1 must not guess whether the two files are approved or excluded.
+- Not performed:
+  - no stage;
+  - no commit;
+  - no push;
+  - no PR opened;
+  - no merge;
+  - no runtime implementation;
+  - no harness / tests / build / dev server.
+- Still prohibited:
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - Issue `#89` harness gate removal;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+- NEXT_BG1_TASK_DEMAND: `RESOLVE_SHARED_TRUTH_FILE_LIST_AMBIGUITY_NO_RUNTIME`.
+
+## Latest BG1 Docs-Only Shared Truth PR Execution Authorization
+
+- Observed at: `2026-06-15T00:00:00+08:00`.
+- Commander decision: `AUTHORIZE_DOCS_ONLY_STAGE_COMMIT_PUSH_PR`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_EXECUTION_NO_RUNTIME`.
+- Review Officer prerequisite verdict: `FILE_LIST_APPROVED_WITH_EXCLUSIONS`.
+- Approved file-list packet: `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- Allowed stage scope:
+  - only files marked as `Must Include In Shared Truth PR` in `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- Strictly do not stage:
+  - Temporarily Excluded groups;
+  - Needs Reviewer Decision groups;
+  - `docs/bg1_budget_commander/**`;
+  - `src/**`;
+  - runtime files;
+  - Excel / PDF / binary outputs;
+  - temporary files;
+  - build artifacts;
+  - generated non-doc artifacts;
+  - unrelated docs.
+- Still prohibited:
+  - merge;
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - Issue `#89` harness gate removal;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+- If PR creation succeeds, next status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME`.
+- If branch push succeeds but PR creation is blocked, next status: `BG1_DOCS_ONLY_SHARED_TRUTH_BRANCH_PUSHED_READY_FOR_MANUAL_PR_NO_RUNTIME`.
+- If commit succeeds but push is blocked, next status: `BG1_DOCS_ONLY_SHARED_TRUTH_COMMIT_READY_PUSH_BLOCKED_NO_RUNTIME`.
+
+## Latest BG1 File-list Review Verdict
+
+- Observed at: `2026-06-15T00:00:00+08:00`.
+- Review Officer verdict: `FILE_LIST_APPROVED_WITH_EXCLUSIONS`.
+- Verdict consumed as: Commander docs-only PR authorization pre-review result.
+- Current BG1 budget status: `AWAIT_COMMANDER_DOCS_ONLY_SHARED_TRUTH_PR_AUTHORIZATION_NO_EXECUTION`.
+- Reviewed file-list packet: `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Not performed:
+  - no stage;
+  - no commit;
+  - no push;
+  - no PR opened;
+  - no merge;
+  - no runtime implementation;
+  - no harness / tests / build / dev server.
+- If Commander later authorizes docs-only shared truth PR execution:
+  - BG1 may stage only files marked as `Must Include In Shared Truth PR` in `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- Strictly do not stage:
+  - Temporarily Excluded groups;
+  - Needs Reviewer Decision groups;
+  - `docs/bg1_budget_commander/**`;
+  - `src/**`;
+  - runtime files;
+  - Excel / PDF / binary outputs;
+  - temp files;
+  - generated non-doc artifacts.
+- Still prohibited:
+  - runtime stitching;
+  - harness execution;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - Issue `#89` harness gate removal;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_COMMANDER_DOCS_ONLY_SHARED_TRUTH_PR_AUTHORIZATION_NO_EXECUTION`.
+
+## Latest BG1 Shared Truth File-list Review
+
+- Observed at: `2026-06-15T00:00:00+08:00`.
+- Task completed: `BG1_SHARED_TRUTH_FILE_LIST_REVIEW_REQUIRED_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_SHARED_TRUTH_FILE_LIST_REVIEW_REQUIRED_NO_EXECUTION`.
+- Input decision: `REQUEST_FILE_LIST_REVIEW_BEFORE_AUTHORIZATION`.
+- Input status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_REQUEST_READY_NO_EXECUTION`.
+- Output mode: exact docs-only file-list review packet; no git publication action.
+- Added files:
+  - `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Completed:
+  - listed files that must be included in a future shared truth PR;
+  - listed files temporarily excluded from a future shared truth PR;
+  - listed files that need Reviewer decision before inclusion;
+  - recorded file-level reasons;
+  - recorded docs-only status;
+  - recorded runtime / src / harness / formal estimate / production quantity boundary status;
+  - recorded whether each listed file is safe for docs-only PR.
+- Not performed:
+  - no stage;
+  - no commit;
+  - no push;
+  - no PR opened;
+  - no merge;
+  - no GitHub issue comment;
+  - no runtime implementation;
+  - no harness / tests / build / dev server.
+- Still prohibited:
+  - runtime stitching;
+  - harness execution;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_REVIEW_OFFICER_FILE_LIST_VERDICT_NO_EXECUTION`.
+
+## Latest BG1 Docs-Only Shared Truth PR Request
+
+- Observed at: `2026-06-14T00:00:00+08:00`.
+- Task completed: `PREPARE_DOCS_ONLY_SHARED_TRUTH_PR_REQUEST_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_REQUEST_READY_NO_EXECUTION`.
+- Input status: `BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN_REVIEW_PASSED_NO_EXECUTION`.
+- Output mode: docs-only authorization request; no git publication action.
+- Added files:
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_REQUEST.md`
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_CANDIDATE_FILE_LIST.md`
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_BOUNDARY_CHECKLIST.md`
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_RISK_REVIEW.md`
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_COMMANDER_AUTH_REQUEST.md`
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_EXCLUDED_FILES.md`
+  - `docs/budget/BG1_DOCS_ONLY_SHARED_TRUTH_PR_DRAFT_BODY.md`
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Completed:
+  - docs-only shared truth PR request prepared;
+  - candidate file list prepared;
+  - boundary checklist prepared;
+  - risk review prepared;
+  - Commander authorization request prepared;
+  - excluded file list prepared;
+  - draft PR body prepared.
+- Not performed:
+  - no stage;
+  - no commit;
+  - no push;
+  - no PR opened;
+  - no merge;
+  - no GitHub issue comment;
+  - no runtime implementation;
+  - no harness / tests / build / dev server.
+- Still prohibited:
+  - runtime stitching;
+  - harness execution;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_COMMANDER_DOCS_ONLY_SHARED_TRUTH_PR_AUTHORIZATION_NO_EXECUTION`.
+
+## Latest BG1 Docs-Only Minimal Runtime Repair Design
+
+- Observed at: `2026-06-14T00:00:00+08:00`.
+- Task completed: `BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN_REVIEW_PASSED_NO_EXECUTION`.
+- Input status: `BG1_RUNTIME_TYPE_SOURCE_EVIDENCE_AND_REPAIR_DECISION_PACKET_READY_NO_EXECUTION`.
+- Review intake: Issue `#103` comment `4700465482`, verdict `A4_STITCHING_REVIEW_PASS_READY_NO_EXECUTION`.
+- Review verdict consumption: `docs/budget/BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN_REVIEW_VERDICT_CONSUMPTION.md`.
+- Output mode: docs-only design; no runtime implementation.
+- Added files:
+  - `docs/budget/BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN.md`
+  - `docs/budget/BG1_MINIMAL_RUNTIME_REPAIR_CONTRACT.md`
+  - `docs/budget/BG1_BUDGET_GENERATOR_SKELETON_DESIGN.md`
+  - `docs/budget/BG1_GENERATE_BUDGET_ESTIMATE_GUARD_DESIGN.md`
+  - `docs/budget/BG1_BUDGET_ESTIMATE_BLOCKED_ERROR_DESIGN.md`
+  - `docs/budget/BG1_NO_PRODUCTION_QUANTITY_GUARD_DESIGN.md`
+  - `docs/budget/BG1_NO_FORMAL_ESTIMATE_GUARD_DESIGN.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_NEXT_AUTHORIZATION_PACKET.md`
+  - `docs/budget/BG1_MINIMAL_RUNTIME_REPAIR_SEQUENCE.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_TESTLESS_ACCEPTANCE_CRITERIA.md`
+  - `docs/budget/BG1_PR100_RUNTIME_ADAPTER_PROHIBITION_NOTE.md`
+  - `docs/budget/BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN_REVIEW_VERDICT_CONSUMPTION.md`
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Completed design coverage:
+  - minimal runtime repair design;
+  - minimal runtime repair contract;
+  - future `budget-generator.ts` skeleton design;
+  - future `generateBudgetEstimate` guard design;
+  - future `BudgetEstimateBlockedError` reason-code design;
+  - no-production-quantity guard design;
+  - no-formal-estimate guard design;
+  - PR `#100` runtime adapter prohibition note;
+  - testless acceptance criteria;
+  - next authorization packet.
+- Still blocked:
+  - Issue `#89` still blocks harness execution.
+  - No runtime implementation authorization exists.
+  - Local docs evidence is not GitHub shared truth.
+  - `budget-generator.ts` is still missing and was not created.
+  - `generateBudgetEstimate` is still missing and was not created.
+  - `BudgetEstimateBlockedError` is still missing and was not created.
+- Still prohibited:
+  - runtime implementation;
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n;
+  - stage / push / PR / merge without separate authorization.
+- NEXT_BG1_TASK_DEMAND: `PREPARE_DOCS_ONLY_SHARED_TRUTH_PR_REQUEST_NO_EXECUTION`.
+
+## Latest BG1 Runtime Type Source Evidence Collection
+
+- Observed at: `2026-06-13T17:20:00+08:00`.
+- Task completed: `BG1_COLLECT_RUNTIME_TYPE_SOURCE_EVIDENCE_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_RUNTIME_TYPE_SOURCE_EVIDENCE_AND_REPAIR_DECISION_PACKET_READY_NO_EXECUTION`.
+- Authorization consumed: `AUTHORIZE_READ_ONLY_TYPE_SOURCE_EVIDENCE`.
+- Authorization source: GitHub Issue `#102` - `[A4/BG1] Runtime type/source evidence + repair decision packet - no execution`.
+- Prior blocker resolved for this read-only task: `AWAIT_COMMANDER_REVIEWER_RUNTIME_REPAIR_SCOPE_DECISION_NO_EXECUTION`.
+- Result mode: read-only type/source/import/export/docs-runtime drift evidence collection.
+- Added files:
+  - `docs/budget/BG1_RUNTIME_TYPE_SOURCE_EVIDENCE_COLLECTION_RESULT.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_DECISION_PACKET.md`
+  - `docs/budget/BG1_LOCAL_EVIDENCE_SHARED_TRUTH_INVENTORY.md`
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Evidence observed:
+  - `BudgetEstimate`: `FOUND_IMPORT_REFERENCE_ONLY`; no confirmed exported source in inspected files.
+  - `BudgetEstimateLine`: `FOUND_IMPORT_REFERENCE_ONLY`; no confirmed exported source in inspected files.
+  - `BudgetInputBundle`: `FOUND_TYPE_SOURCE` in `src/lib/budget/integration/types.ts`.
+  - `BudgetOutputSnapshot`: `FOUND_TYPE_SOURCE` in `src/lib/budget/output/types.ts`.
+  - `src/lib/budget/budget-generator.ts`: `MISSING`.
+  - `generateBudgetEstimate`: `MISSING`.
+  - `BudgetEstimateBlockedError`: `FOUND_DOCS_ONLY_REFERENCE`; no confirmed runtime definition.
+  - `src/lib/budget/storage/budget-catalog.ts`: `MISSING`.
+  - `budget-line-enricher.ts`: `FOUND_RUNTIME_SOURCE`, but it imports unresolved `BudgetEstimateLine`, `QuoteItemTemplate`, and missing `budget-catalog.ts`.
+  - `validate-method-spec-catalog.ts`: `FOUND_RUNTIME_SOURCE`, but it imports missing `budget-catalog.ts`.
+  - demo specs importing `../budget-generator.ts`: `FOUND_IMPORT_REFERENCE_ONLY`; they point to a missing entrypoint.
+  - `formalEstimateGuard`: `FOUND_TYPE_SOURCE`; adapter/type guard exists, downstream generator enforcement remains missing.
+  - `renderer-static-guard`: `FOUND_RUNTIME_SOURCE`; source exists, but this task did not execute tests or guards.
+- Issue `#89` boundary:
+  - Issue `#89` remains the harness / review gate.
+  - Harness execution is still blocked.
+  - `READY_FOR_HARNESS_REVIEW` does not authorize execution.
+- Issue `#102` boundary:
+  - Issue `#102` authorizes read-only type/source evidence collection only.
+  - Issue `#102` does not authorize runtime stitching, harness execution, tests/build/dev server, stage/push/PR/merge, formal estimate, production quantity, or formal output.
+- PR `#100` boundary:
+  - PR `#100` remains docs-only active candidate export head with restrictions.
+  - It is not formal budget schema, not production quantity authority, and not formal estimate authority.
+- Still not authorized:
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server;
+  - `src/**` modification;
+  - `budget-generator.ts` creation or repair;
+  - `generateBudgetEstimate` creation;
+  - `BudgetEstimateBlockedError` creation;
+  - `BudgetEstimate` / `BudgetEstimateLine` type creation;
+  - `budget-catalog.ts` creation;
+  - `PricingRule` creation or modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - Plan Puzzle runtime patch;
+  - Renderer production integration;
+  - production quantity;
+  - formal estimate;
+  - formal quote / formal Excel / formal PDF;
+  - DB/API/AI/RAG/payment/LINE/n8n;
+  - stage / push / PR / merge / deploy.
+- Shared truth boundary:
+  - New BG1 docs are local review evidence only until separately promoted through authorized docs-only GitHub flow.
+  - Local evidence remains `LOCAL_REVIEW_EVIDENCE_ONLY` and `NOT_SHARED_TRUTH`.
+- NEXT_BG1_TASK_DEMAND: `BG1_DOCS_ONLY_MINIMAL_RUNTIME_REPAIR_DESIGN_NO_EXECUTION`.
+
+## Latest BG1 Runtime Repair Scope Authorization Request
+
+- Observed at: `2026-06-13T16:35:00+08:00`.
+- Task completed: `REQUEST_COMMANDER_REVIEWER_RUNTIME_REPAIR_SCOPE_AUTHORIZATION_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_RUNTIME_REPAIR_SCOPE_AUTHORIZATION_REQUEST_READY_FOR_MANUAL_REVIEW_NO_EXECUTION`.
+- Input status: `BG1_DOCS_ONLY_RUNTIME_DRIFT_REPAIR_PLAN_READY_NO_EXECUTION`.
+- Request mode: `manual_review_outbox`.
+- Actual Commander / Reviewer submission by this task: `No`.
+- Recommended authorization: `AUTHORIZE_READ_ONLY_TYPE_SOURCE_EVIDENCE`.
+- Recommended next BG1 action if authorized: `BG1_COLLECT_RUNTIME_TYPE_SOURCE_EVIDENCE_NO_EXECUTION`.
+- Current authoritative next action: `AWAIT_COMMANDER_REVIEWER_RUNTIME_REPAIR_SCOPE_DECISION_NO_EXECUTION`.
+- Added files:
+  - `docs/budget/BG1_RUNTIME_REPAIR_SCOPE_AUTHORIZATION_REQUEST.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_SCOPE_AUTHORIZATION_OPTIONS.md`
+  - `docs/budget/BG1_RUNTIME_TYPE_SOURCE_EVIDENCE_COLLECTION_REQUEST.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_AUTHORIZATION_OUTBOX.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_SHARED_TRUTH_PRECONDITION.md`
+- Updated files:
+  - `docs/budget/BG1_RUNTIME_REPAIR_REVIEWER_COMMANDER_AUTH_REQUEST_DRAFT.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Decision options prepared:
+  - `AUTHORIZE_READ_ONLY_TYPE_SOURCE_EVIDENCE` -> `BG1_COLLECT_RUNTIME_TYPE_SOURCE_EVIDENCE_NO_EXECUTION`.
+  - `HOLD_WAIT_FOR_ISSUE_89` -> `AWAIT_ISSUE_89_REVIEWER_GATE_UPDATE_NO_EXECUTION`.
+  - `REQUIRE_DOCS_ONLY_SHARED_TRUTH_PR_FIRST` -> `PREPARE_DOCS_ONLY_SHARED_TRUTH_PR_REQUEST_NO_EXECUTION`.
+  - `REQUIRE_LOCAL_EVIDENCE_INVENTORY_FIRST` -> `BG1_LOCAL_EVIDENCE_INVENTORY_FOR_SHARED_TRUTH_NO_EXECUTION`.
+  - `REJECT_RUNTIME_REPAIR_SCOPE_REQUEST` -> `BG1_RUNTIME_REPAIR_SCOPE_REJECTED_NO_EXECUTION`.
+- Requested scope is only read-only evidence collection:
+  - type/source/import tracing;
+  - file existence checks;
+  - docs/runtime drift comparison;
+  - docs-only evidence report update.
+- Still not authorized:
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server requiring runtime stitching;
+  - `src/**` modification;
+  - `budget-generator.ts` creation or repair;
+  - `generateBudgetEstimate` creation;
+  - `BudgetEstimateBlockedError` creation;
+  - `BudgetEstimateLine` creation or modification;
+  - `PricingRule` creation or modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - PR `#100` embedded script runtime adapter wiring;
+  - production quantity;
+  - formal estimate;
+  - formal quote / formal Excel / formal PDF;
+  - BudgetOutputSnapshot production;
+  - Renderer production output;
+  - DB/API/AI/RAG/payment/LINE/n8n;
+  - stage / push / PR / merge / deploy.
+- Shared truth boundary:
+  - Local BG1 docs are `LOCAL_REVIEW_EVIDENCE_ONLY`.
+  - Local BG1 docs are `NOT_SHARED_TRUTH` until GitHub main/PR or explicit Commander temporary-review acceptance.
+  - PR `#100` remains docs-only active candidate export head with restrictions; it is not formal budget schema, production quantity, or formal estimate authority.
+  - Issue `#89` still blocks harness execution.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_COMMANDER_REVIEWER_RUNTIME_REPAIR_SCOPE_DECISION_NO_EXECUTION`.
+
+## Latest BG1 Docs-Only Runtime Drift Repair Plan
+
+- Observed at: `2026-06-13T15:55:00+08:00`.
+- Task completed: `BG1_DOCS_ONLY_RUNTIME_DRIFT_REPAIR_PLAN_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_RUNTIME_DRIFT_REPAIR_PLAN_READY_NO_EXECUTION`.
+- Input status: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMED_PR100_ALIGNED_NO_EXECUTION`.
+- Added files:
+  - `docs/budget/BG1_DOCS_ONLY_RUNTIME_DRIFT_REPAIR_PLAN.md`
+  - `docs/budget/BG1_RUNTIME_DRIFT_REPAIR_GATE_MATRIX.md`
+  - `docs/budget/BG1_BUDGET_GENERATOR_ENTRYPOINT_REPAIR_PLAN.md`
+  - `docs/budget/BG1_BUDGET_ESTIMATE_TYPE_TRACE_PLAN.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_FORBIDDEN_SCOPE.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_REVIEWER_COMMANDER_AUTH_REQUEST_DRAFT.md`
+  - `docs/budget/BG1_RUNTIME_REPAIR_MINIMAL_PATCH_SEQUENCE_DRAFT.md`
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Read-only runtime evidence observed:
+  - `src/lib/budget/budget-generator.ts` is still missing.
+  - `generateBudgetEstimate` runtime definition is still missing.
+  - `BudgetEstimateBlockedError` runtime definition is still missing.
+  - `BudgetEstimate` / `BudgetEstimateLine` exported source/type remains unverified.
+  - `BudgetInputBundle` is found in `src/lib/budget/integration/types.ts`.
+  - `BudgetOutputSnapshot` is found in `src/lib/budget/output/types.ts`.
+  - `formalEstimateGuard` is found in adapter/types evidence, but downstream generator enforcement is still missing.
+  - `renderer-static-guard.ts` exists and still blocks renderer from budget engine / pricing / AI paths.
+  - `src/lib/budget/storage/budget-catalog.ts` is missing while runtime files import `../storage/budget-catalog.ts`.
+- Already consumed:
+  - Reviewer verdict: PR `#100` docs-only active candidate export head with restrictions.
+  - Plan Puzzle / Plancraft+ 0.12 shared truth aligned with PR `#100` for no-execution planning.
+- Still blocked:
+  - Issue `#89` still blocks harness execution.
+  - Runtime drift remains unresolved.
+  - No runtime repair authorization exists.
+  - No production quantity authority exists.
+  - No formal pricing authority exists.
+- Still prohibited: runtime stitching, harness execution, production quantity, formal estimate, formal Excel/PDF, Budget Engine execution, Renderer production output, PricingRule creation, BudgetEstimateLine creation, `src/**` modification, Plan Puzzle runtime patch, `preview-floor-plan-adapter.ts` patch, `budget-generator.ts` implementation, `generateBudgetEstimate` implementation, `BudgetEstimateBlockedError` implementation, PR `#100` embedded script runtime wiring, DB/API/AI/RAG/payment/LINE/n8n, stage/push/PR/merge/deploy.
+- NEXT_BG1_TASK_DEMAND: `REQUEST_COMMANDER_REVIEWER_RUNTIME_REPAIR_SCOPE_AUTHORIZATION_NO_EXECUTION`.
+
+## Latest BG1 Plan Puzzle 0.12 Shared Truth Intake Consumed
+
+- Observed at: `2026-06-13T15:20:00+08:00`.
+- Task completed: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMPTION_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMED_PR100_ALIGNED_NO_EXECUTION`.
+- Input status: `BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_CONSUMED_PR100_DOCS_ONLY_ACTIVE_HEAD_NO_EXECUTION`.
+- Shared truth evidence:
+  - Found in local BG1 docs and handoff records.
+  - Consumed as docs-only planning evidence only.
+  - Dedicated upstream-named intake files remain absent in this worktree, so this is not runtime authority and not formal shared-truth publication.
+- Added files:
+  - `docs/budget/BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMPTION.md`
+  - `docs/budget/BG1_PR100_PLAN_PUZZLE_0_12_ALIGNMENT.md`
+  - `docs/budget/BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_BLOCKERS.md`
+- Updated files:
+  - `docs/budget/BG1_PLAN_PUZZLE_SHARED_TRUTH_CONSUMPTION.md`
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_CONSUMPTION.md`
+  - `docs/budget/BG1_PR100_DOCS_ONLY_ACTIVE_HEAD_BOUNDARY.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- PR `#100` alignment:
+  - docs-only active candidate export head remains accepted with restrictions.
+  - Candidate area metadata is aligned for no-execution planning only.
+  - `areaProductionReady:false`, reviewer-required semantics, and candidate-only semantics remain required.
+  - PR `#100` is not formal budget schema, not production quantity source, not formal estimate contract, and not runtime adapter authorization.
+  - PR `#100` embedded page script must not be wired as runtime adapter.
+- PR `#76` status:
+  - not selected as active candidate export head;
+  - retained as canvas / wall / import context evidence only.
+- Plan Puzzle / Plancraft+ 0.12 shared truth consumed:
+  - PR `#54` remains UI / IA baseline only;
+  - no formal draft JSON schema consumed;
+  - Plan Puzzle / Plancraft+ output remains candidate-only;
+  - `.pc`, SVG, renderer preview, screenshots, visual simulation, UI mock, and unverified geometry remain forbidden as budget input or quantity source.
+- Still blocked:
+  - Issue `#89` still blocks harness execution.
+  - `src/lib/budget/budget-generator.ts` is still missing.
+  - `generateBudgetEstimate` runtime definition is still missing.
+  - `BudgetEstimateBlockedError` runtime definition is still missing.
+  - `BudgetEstimate` / `BudgetEstimateLine` exported source/type remains unverified.
+  - production quantity authority is missing.
+  - formal pricing authority is missing.
+- Still prohibited: runtime stitching, harness execution, production quantity, formal estimate, formal Excel/PDF, Budget Engine execution, Renderer production output, PricingRule creation, BudgetEstimateLine creation, `src/**` modification, Plan Puzzle runtime patch, `preview-floor-plan-adapter.ts` patch, PR `#100` embedded script runtime wiring, DB/API/AI/RAG/payment/LINE/n8n, stage/push/PR/merge/deploy.
+- NEXT_BG1_TASK_DEMAND: `BG1_DOCS_ONLY_RUNTIME_DRIFT_REPAIR_PLAN_NO_EXECUTION`.
+
+## Latest BG1 Reviewer Candidate Export Head Verdict Consumed
+
+- Observed at: `2026-06-13T14:45:00+08:00`.
+- Task completed: `BG1_CONSUME_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_CONSUMED_PR100_DOCS_ONLY_ACTIVE_HEAD_NO_EXECUTION`.
+- Input status: `BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_REQUEST_READY_FOR_MANUAL_SUBMISSION_NO_EXECUTION`.
+- Reviewer verdict consumed:
+  - Active candidate export head: `PR_100`.
+  - Candidate export contract usability: `USABLE_WITH_RESTRICTIONS`.
+  - Production quantity boundary: `STILL_PROHIBITED`.
+  - Formal estimate boundary: `STILL_PROHIBITED`.
+  - Issue `#89` harness gate: `STILL_BLOCKING`.
+  - Forbidden quantity sources: `CONFIRMED_FORBIDDEN`.
+- Added files:
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_CONSUMPTION.md`
+  - `docs/budget/BG1_PR100_DOCS_ONLY_ACTIVE_HEAD_BOUNDARY.md`
+- Updated files:
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_REQUEST_SUBMISSION.md`
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_REVIEW_REQUEST.md`
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- PR `#100` accepted scope:
+  - docs-only active candidate export head reference;
+  - no-execution candidate contract planning evidence;
+  - candidate area metadata reference only.
+- PR `#100` restrictions:
+  - not formal budget schema;
+  - not formal draft JSON schema;
+  - not production quantity source;
+  - not formal estimate contract;
+  - not runtime adapter authorization;
+  - candidate area metadata must preserve `areaProductionReady:false`, reviewer-required semantics, candidate-only semantics, and non-production quantity semantics;
+  - embedded page script must not be wired directly as runtime adapter.
+- PR `#76` status:
+  - not selected as active candidate export head;
+  - retained as canvas / wall / import context evidence only.
+- Still pending / blocked:
+  - Issue `#89` still blocks harness execution.
+  - `src/lib/budget/budget-generator.ts` is still missing.
+  - `generateBudgetEstimate` runtime definition is still missing.
+  - `BudgetEstimateBlockedError` runtime definition is still missing.
+  - `BudgetEstimate` / `BudgetEstimateLine` exported source/type remains unverified.
+  - Plan Puzzle / Plancraft+ 0.12 shared truth still must be consumed only through no-execution docs-only intake before any later runtime decision.
+- Still prohibited: runtime stitching, harness execution, production quantity, formal estimate, formal Excel/PDF, Budget Engine execution, Renderer production output, PricingRule creation, BudgetEstimateLine creation, `src/**` modification, Plan Puzzle runtime patch, `preview-floor-plan-adapter.ts` patch, PR `#100` embedded script runtime wiring, DB/API/AI/RAG/payment/n8n, stage/push/PR/merge/deploy.
+- NEXT_BG1_TASK_DEMAND: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMPTION_NO_EXECUTION`.
+
+## Latest BG1 Reviewer Candidate Export Head Verdict Request Outbox
+
+- Observed at: `2026-06-13T14:18:00+08:00`.
+- Task completed: `SUBMIT_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_REQUEST_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_REQUEST_READY_FOR_MANUAL_SUBMISSION_NO_EXECUTION`.
+- Input status: `BG1_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET_READY_NO_EXECUTION`.
+- Submission mode: `manual_submission_outbox`.
+- Actual Reviewer submission: `No`.
+- Reason: this task did not separately authorize GitHub comments, thread sends, stage, push, PR, or merge.
+- Added files:
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_REQUEST_SUBMISSION.md`
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_INTAKE_TEMPLATE.md`
+- Updated files:
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_REVIEW_REQUEST.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Evidence attached to outbox:
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET.md`
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_REVIEW_REQUEST.md`
+  - `docs/budget/BG1_CANDIDATE_EXPORT_HEAD_DECISION_CONSUMPTION.md`
+  - `docs/budget/BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE.md`
+  - `docs/budget/BUDGET_RUNTIME_ENTRYPOINT_DISCOVERY.md`
+  - `docs/budget/BUDGET_RUNTIME_DOCS_DRIFT_DECISION_PACKET.md`
+  - `docs/budget/BUDGET_INTERNAL_INTERFACE_PREP.md`
+  - `docs/budget/BUDGET_ISSUE_89_GATE_SNAPSHOT.md`
+- Reviewer request asks:
+  - Which PR, `#76` or `#100`, should be treated as docs-only active candidate export head?
+  - Is the selected candidate export contract sufficient for preview-floor-plan adapter no-execution planning?
+  - Should production quantity remain prohibited?
+  - Should formal estimate remain prohibited?
+  - Does Issue `#89` still block harness execution?
+  - Are PR `#50` guide mock, SVG, renderer preview, `.pc`, visual simulation, screenshots, and unverified geometry still forbidden as budget input / quantity source?
+  - After verdict, may BG1 proceed to docs-only candidate export contract consumption or docs-only runtime drift repair planning?
+- BG1 non-decision:
+  - BG1 does not select PR `#76`.
+  - BG1 does not select PR `#100`.
+  - BG1 does not declare active candidate export head.
+- Still pending:
+  - Reviewer verdict for PR `#76` vs PR `#100`.
+  - Issue `#89` harness gate.
+  - `budget-generator.ts` missing.
+  - `generateBudgetEstimate` runtime missing.
+  - `BudgetEstimateBlockedError` runtime missing.
+  - `BudgetEstimate` / `BudgetEstimateLine` exported source/type not verified.
+  - Plan Puzzle / Plancraft+ 0.12 shared truth not yet consumed as runtime authority by BG1.
+- Still prohibited: runtime stitching, harness execution, production quantity, formal estimate, formal Excel/PDF, Budget Engine execution, Renderer production output, PricingRule creation, BudgetEstimateLine creation, `src/**` modification, Plan Puzzle runtime patch, `preview-floor-plan-adapter.ts` patch, DB/API/AI/RAG/payment/n8n, stage/push/PR/merge/deploy, GitHub comment without separate authorization.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_NO_EXECUTION`.
+
+## Latest BG1 Reviewer Candidate Export Comparison Packet
+
+- Observed at: `2026-06-13T13:55:00+08:00`.
+- Task completed: `BG1_PREPARE_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET_NO_EXECUTION`.
+- Current BG1 budget status: `BG1_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET_READY_NO_EXECUTION`.
+- Input status: `BG1_COMMANDER_DECISION_CONSUMED_REVIEWER_PENDING_NO_EXECUTION`.
+- Added files:
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET.md`
+  - `docs/budget/BG1_REVIEWER_CANDIDATE_EXPORT_REVIEW_REQUEST.md`
+- Updated files:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- PR evidence read-only source:
+  - GitHub connector metadata and diff for PR `#76`: `https://github.com/laibeoffer/laibe-mvp/pull/76`
+  - GitHub connector metadata and diff for PR `#100`: `https://github.com/laibeoffer/laibe-mvp/pull/100`
+  - Local `gh` CLI was unavailable, so no `gh` command transcript was produced.
+- PR `#76` evidence summary:
+  - Title: `Wire Plan Puzzle canvas tools 0.16.1`.
+  - State: open draft; merged `No`.
+  - Head: `codex/plan-puzzle-canvas-tool-wiring-0-16-1` at `3aafbe59fa5edb42d5cc18c77bb1f8a6a9ae548b`.
+  - Relevant evidence: Plan Puzzle canvas/wall/import wiring, draft wall scale markers, `.pc` moved to advanced export and marked not budget input.
+  - Not a verified budget schema, not a formal quantity source, not a Budget Engine runtime head.
+- PR `#100` evidence summary:
+  - Title: `[A1] GitHub clean integration round 2 package`.
+  - State: open draft; merged `No`.
+  - Head: `a1/github-clean-integration-round-2-20260611` at `41959ee1f183ceb90226db98f47a642c72036c0a`.
+  - Relevant evidence: site flow guard plus Plan Puzzle candidate area metadata such as `areaSqMm`, `areaM2`, `areaPing`, `areaSource`, `areaStatus`, `areaConfidence`, `areaProductionReady:false`, `reviewerRequired:true`.
+  - Not a verified budget schema, not a production quantity source, not a Budget Engine runtime head.
+- BG1 non-decision:
+  - BG1 does not select PR `#76`.
+  - BG1 does not select PR `#100`.
+  - BG1 does not declare active candidate export head.
+  - BG1 only prepared Reviewer-facing comparison evidence.
+- Still pending:
+  - Reviewer verdict for PR `#76` vs PR `#100`.
+  - Issue `#89` harness gate.
+  - `budget-generator.ts` missing.
+  - `generateBudgetEstimate` runtime missing.
+  - `BudgetEstimateBlockedError` runtime missing.
+  - `BudgetEstimate` / `BudgetEstimateLine` exported source/type not verified.
+- Still prohibited: runtime stitching, harness execution, production quantity, formal estimate, formal Excel/PDF, Budget Engine execution, Renderer production output, PricingRule creation, BudgetEstimateLine creation, `src/**` modification, Plan Puzzle runtime patch, `preview-floor-plan-adapter.ts` patch, DB/API/AI/RAG/payment/n8n, stage/push/PR/merge/deploy.
+- NEXT_BG1_TASK_DEMAND: `SUBMIT_REVIEWER_CANDIDATE_EXPORT_HEAD_VERDICT_REQUEST_NO_EXECUTION`.
+
+## Latest BG1 Commander Decision Consumption Refresh
+
+- Observed at: `2026-06-13T13:20:00+08:00`.
+- Current A4 budget status: `BUDGET_SAFE_PARALLEL_WORK_COMPLETED_NO_RUNTIME`.
+- Current BG1 budget status: `BG1_COMMANDER_DECISION_CONSUMED_REVIEWER_PENDING_NO_EXECUTION`.
+- Task refreshed: `BG1_CONSUME_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_NO_EXECUTION`.
+- Files updated:
+  - `docs/budget/BG1_CANDIDATE_EXPORT_HEAD_DECISION_CONSUMPTION.md`
+  - `docs/budget/BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Required A4 safe parallel work docs were read and referenced:
+  - `docs/budget/BUDGET_RUNTIME_ENTRYPOINT_DISCOVERY.md`
+  - `docs/budget/BUDGET_RUNTIME_DOCS_DRIFT_DECISION_PACKET.md`
+  - `docs/budget/BUDGET_INTERNAL_INTERFACE_PREP.md`
+  - `docs/budget/BUDGET_ISSUE_89_GATE_SNAPSHOT.md`
+- Commander A-G decision consumption is complete:
+  - `A`: PR `#54` is UI / IA baseline reference only.
+  - `B`: BG1 must not choose PR `#76` or PR `#100`; Reviewer comparison is required.
+  - `C`: PR `#25` is context only; PR `#50`, pure UI shells, SVG, renderer preview, `.pc`, and visual simulation output must not feed budget.
+  - `D`: docs-only candidate-contract stitching plan, docs-only runtime drift repair plan preparation, and Reviewer request preparation are allowed.
+  - `E`: Reviewer must decide candidate export contract usability.
+  - `F`: candidate draft JSON / candidate `QuantityFacts` remain non-production and must not become formal estimate input.
+  - `G`: Issue `#89` remains the harness / review gate.
+- Known blockers:
+  - `src/lib/budget/budget-generator.ts` is missing.
+  - `generateBudgetEstimate` runtime definition is missing.
+  - `BudgetEstimateBlockedError` runtime definition is missing.
+  - `BudgetEstimate` / `BudgetEstimateLine` exported source/type remains not verified by this docs-only task.
+  - Issue `#89` is still open and blocks harness execution.
+  - Reviewer verdict for PR `#76` vs PR `#100` is still pending.
+  - PR `#76` / PR `#100` active candidate export runtime head has not been consumed or approved by BG1.
+- Still prohibited: runtime stitching, `src/**` modification, Plan Puzzle runtime modification, `preview-floor-plan-adapter.ts` patch, `budget-generator.ts` creation or repair, `generateBudgetEstimate` creation, `BudgetEstimateBlockedError` creation, harness execution, production quantity, formal estimate, formal price, formal quote, formal Excel/PDF, production `BudgetOutputSnapshot`, Renderer integration, Budget Engine execution, PricingRule creation, BudgetEstimateLine creation, DB/API/AI/payment/n8n.
+- NEXT_BG1_TASK_DEMAND: `BG1_PREPARE_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET_NO_EXECUTION`.
+
+## Latest BG1 Commander Decision Consumption
+
+- Observed at: `2026-06-13T12:48:00+08:00`.
+- Current BG1 state: `BG1_COMMANDER_DECISION_CONSUMED_REVIEWER_PENDING_NO_EXECUTION`.
+- Task completed: `BG1_CONSUME_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_NO_EXECUTION`.
+- File added:
+  - `docs/budget/BG1_CANDIDATE_EXPORT_HEAD_DECISION_CONSUMPTION.md`
+- Files updated:
+  - `docs/budget/BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Commander A-G provisional decision consumed:
+  - `A`: PR `#54` may serve as Plan Puzzle / Plancraft+ 0.12 UI / IA shared truth baseline only; not budget schema, not formal draft JSON schema, not production adapter input.
+  - `B`: BG1 must not choose PR `#76` or PR `#100`; Reviewer must compare and decide candidate export active head.
+  - `C`: PR `#25` is budget-adapter context only; PR `#50` guide mock, pure UI / IA shells, SVG, renderer preview, `.pc`, and visual simulation output must not feed budget.
+  - `D`: docs-only candidate-contract stitching plan, docs-only runtime drift repair plan preparation, and Reviewer request preparation are allowed.
+  - `E`: Reviewer must decide whether `#76` or `#100` output can serve as candidate export contract and whether it is enough for no-execution preview-floor-plan adapter planning.
+  - `F`: candidate draft JSON / `QuantityFacts` remain non-production; candidate contract must not feed `generateBudgetEstimate`, `BudgetEstimateLine`, `BudgetOutputSnapshot`, or Renderer; production adapter needs Reviewer gate.
+  - `G`: Issue `#89` remains harness / review gate; no Reviewer verdict means no harness execution.
+- Still forbidden: runtime stitching, `budget-generator.ts`, `generateBudgetEstimate`, `BudgetEstimateBlockedError`, harness execution, production quantity, formal estimate, `PricingRule`, `BudgetEstimateLine`, production `BudgetOutputSnapshot`, Renderer integration, Excel/PDF, DB/API/AI/payment/n8n, formal price, formal quote.
+- NEXT_BG1_TASK_DEMAND: `BG1_PREPARE_REVIEWER_CANDIDATE_EXPORT_COMPARISON_PACKET_NO_EXECUTION`.
+
+## Latest BG1 Candidate Export Head Decision Intake
+
+- Observed at: `2026-06-13T12:30:00+08:00`.
+- Current BG1 state: `BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE_READY_NO_EXECUTION`.
+- Task completed: `BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE_NO_EXECUTION`.
+- File added:
+  - `docs/budget/BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE.md`
+- Files updated:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Decision intake cards prepared:
+  - `A`: PR `#54` UI / IA baseline decision.
+  - `B`: PR `#76` vs PR `#100` active candidate export head decision.
+  - `C`: PR disposition order decision.
+  - `D`: docs-only planning authorization decision.
+  - `E`: Reviewer candidate export contract verdict.
+  - `F`: Reviewer boundary confirmation.
+  - `G`: Issue `#89` harness gate confirmation.
+- Compact decision reply expected:
+  - `A: A1 / A2 / A3`
+  - `B: B1 / B2 / B3 / B4`
+  - `C: C1 / C2 / C3 / C4`
+  - `D: D1 / D2 / D3 / D4`
+  - `E: E1 / E2 / E3 / E4`
+  - `F: F1 / F2 / F3`
+  - `G: G1 / G2 / G3`
+- Safe no-execution path would look like `A1 + B1/B2 + C1/C2 + D1 + E1/E2 + F1 + G1`.
+- Still forbidden: runtime implementation, Plan Puzzle runtime edits, `preview-floor-plan-adapter.ts`, `budget-generator.ts`, `generateBudgetEstimate`, `BudgetEstimateBlockedError`, Budget Engine stitching, harness execution, production quantity, formal estimate, `PricingRule`, `BudgetEstimateLine`, production `BudgetOutputSnapshot`, Renderer / Excel / PDF, DB/API/AI/payment/n8n, formal price, formal quote.
+- NEXT_BG1_TASK_DEMAND: `BG1_CONSUME_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_NO_EXECUTION`.
+
+## Latest BG1 Docs-only Candidate Contract Adapter Repair Plan
+
+- Observed at: `2026-06-13T12:12:00+08:00`.
+- Current BG1 state: `BG1_DOCS_ONLY_CANDIDATE_CONTRACT_ADAPTER_REPAIR_PLAN_READY_NO_RUNTIME`.
+- Task completed: `BG1_DOCS_ONLY_CANDIDATE_CONTRACT_ADAPTER_REPAIR_PLAN_NO_RUNTIME`.
+- File added:
+  - `docs/budget/BG1_DOCS_ONLY_CANDIDATE_CONTRACT_ADAPTER_REPAIR_PLAN.md`
+- Files updated:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Plan created for docs-only flow:
+  - Plan Puzzle candidate export
+  - BudgetInputBundle candidate
+  - candidate Spaces
+  - candidate QuantityFacts
+  - unsupported_objects
+  - adapter warnings
+  - formal estimate blocked metadata
+- Plan defines:
+  - candidate export envelope fields;
+  - mapping to `BudgetInputFromFloorPlan`, candidate `Spaces`, and candidate `QuantityFacts`;
+  - BudgetInputBundle candidate bridge with `quantity_confidence` not verified and `reviewer_required:true`;
+  - unsupported object handling;
+  - required adapter warnings;
+  - formal estimate blocked metadata;
+  - future negative test matrix;
+  - Commander / Reviewer decision dependencies.
+- Still forbidden: Plan Puzzle runtime edits, `preview_floor_plan` edits, `plan-puzzle.js`, `code.html`, `preview-floor-plan-adapter.ts`, `budget-generator.ts`, `generateBudgetEstimate`, `BudgetEstimateBlockedError`, Budget Engine runtime stitching, harness execution, production quantity, formal estimate, `PricingRule`, `BudgetEstimateLine`, production `BudgetOutputSnapshot`, Renderer / Excel / PDF, DB/API/AI/payment/n8n.
+- Runtime drift remains:
+  - `src/lib/budget/budget-generator.ts`: missing.
+  - `generateBudgetEstimate`: missing / docs-only reference.
+  - `BudgetEstimateBlockedError`: missing / docs-only reference.
+  - `BudgetEstimate` / `BudgetEstimateLine`: source unclear.
+- Decision needs before runtime work:
+  - Commander / Reviewer must decide whether PR `#76` or PR `#100` is active candidate export head.
+  - Reviewer must confirm candidate export contract.
+  - Commander must separately authorize any runtime repair.
+  - Issue `#89` reviewer verdict and Commander authorization remain required before any harness execution.
+- NEXT_BG1_TASK_DEMAND: `BG1_COMMANDER_REVIEWER_CANDIDATE_EXPORT_HEAD_DECISION_INTAKE_NO_EXECUTION`.
+
+## Latest BG1 Plan Puzzle Shared Truth Consumption
+
+- Observed at: `2026-06-13T11:52:00+08:00`.
+- Current BG1 state: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMED_NO_EXECUTION`.
+- Task completed: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMPTION_NO_EXECUTION`.
+- Intake source consumed: Commander-provided Plan Puzzle / Plancraft+ 0.12 shared truth summary.
+- Named intake files were not found in this BG1 worktree:
+  - `docs/budget/PLANCRAFT_0_12_SHARED_TRUTH_INTAKE.md`
+  - `docs/budget/PLAN_PUZZLE_TO_BUDGET_INTERFACE_CANDIDATE_CONTRACT.md`
+  - `docs/budget/PLANCRAFT_0_12_PR_MERGE_ORDER_RECOMMENDATION.md`
+- Files added:
+  - `docs/budget/BG1_PLAN_PUZZLE_SHARED_TRUTH_CONSUMPTION.md`
+  - `docs/budget/BG1_CANDIDATE_CONTRACT_STITCHING_PLAN.md`
+  - `docs/budget/BG1_RUNTIME_DRIFT_REPAIR_BLOCKER_MAP.md`
+  - `docs/budget/BG1_COMMANDER_REVIEWER_DECISION_REQUEST.md`
+- Files updated:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Consumed Plan Puzzle conclusion:
+  - PR `#54`, commit `f7384709f63fbf0cf1cd854dc80af8bce0fb5977`, is only a UI / IA baseline, not formal budget schema.
+  - Budget-impacting PRs are `#25`, `#76`, `#100`, plus current repair worktree.
+  - `#50` guide mock, pure UI / IA shells, SVG, renderer preview, `.pc`, and visual simulation output must not feed budget.
+  - No formal draft JSON schema was found.
+  - Candidate-contract stitching planning can start; production quantity and formal estimate remain forbidden.
+- Current runtime drift remains:
+  - `src/lib/budget/budget-generator.ts`: missing.
+  - `generateBudgetEstimate`: missing / docs-only reference.
+  - `BudgetEstimateBlockedError`: missing / docs-only reference.
+  - `BudgetEstimate` / `BudgetEstimateLine`: source unclear.
+- Decision needs:
+  - Commander must decide whether PR `#54` is accepted as 0.12 UI / IA baseline.
+  - Commander / Reviewer must decide whether PR `#76` or PR `#100` is candidate export active runtime head.
+  - Reviewer must confirm candidate export contract and preserve no-production / no-formal-estimate boundary.
+- Issue #89 read-only refresh remains: `open`, labels `budget`, `integration`, `review-gate`, comments `2`, latest comment `# Issue #89 Round 5 Harness Review Intake - No Execution`; no independent reviewer verdict observed.
+- Still forbidden: Budget Engine stitching, runtime repair, adapter productionization, `budget-generator.ts` creation, `generateBudgetEstimate` creation, `BudgetEstimateBlockedError` creation, production quantity, formal estimate, `PricingRule`, `BudgetEstimateLine`, `BudgetOutputSnapshot` production, Renderer / Excel / PDF, harness execution, DB/API/AI/payment/n8n.
+- NEXT_BG1_TASK_DEMAND: `BG1_DOCS_ONLY_CANDIDATE_CONTRACT_ADAPTER_REPAIR_PLAN_NO_RUNTIME`.
+
+## Latest BG1 Waiting State: Plan Puzzle 0.12 Shared Truth Intake
+
+- Observed at: `2026-06-13T11:30:00+08:00`.
+- Current BG1 state: `BG1_WAITING_FOR_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_NO_EXECUTION`.
+- Commander decision received: Budget Commander safe parallel prep is complete; runtime stitching remains blocked.
+- Awaiting upstream intake from: Plan Puzzle / Plancraft+ 0.12 shared truth commander.
+- Allowed while waiting:
+  - maintain handoff/status only;
+  - read-only consume the shared truth intake after it is delivered.
+- Forbidden before shared truth intake is delivered:
+  - Budget Engine stitching;
+  - runtime repair;
+  - `budget-generator.ts` creation or repair;
+  - `generateBudgetEstimate` creation or repair;
+  - adapter productionization;
+  - formal estimate;
+  - `BudgetOutputSnapshot` production;
+  - renderer integration;
+  - harness execution;
+  - runtime code modification.
+- Formal boundary remains: formal price `No`; formal quote `No`; formal Excel/PDF `No`; Renderer production output `No`; Budget Engine execution `No`; PricingRule `No`; BudgetEstimateLine `No`.
+- NEXT_BG1_TASK_DEMAND: `BG1_CONSUME_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_NO_EXECUTION_AFTER_DELIVERY`.
+
+## Latest Budget Commander Safe Parallel Work
+
+- Observed at: `2026-06-13T11:18:00+08:00`.
+- Task: `Budget Commander Safe Parallel Work`.
+- Scope completed: docs-only budget internal prep while Plan Puzzle commander handles Plancraft+ / Plan Puzzle 0.12 shared truth.
+- Runtime code modified: `No`.
+- Plan Puzzle runtime modified: `No`; `preview_floor_plan`, `plan-puzzle.js`, and `code.html` untouched.
+- Budget Engine execution: `No`.
+- Harness execution: `No`.
+- Renderer / Excel / PDF connection: `No`.
+- DB / Supabase / API / RAG / AI API / payment / escrow / listing fee touched: `No`.
+- Formal price / formal quote / formal Excel / formal PDF: `No`.
+- Files added:
+  - `docs/budget/BUDGET_RUNTIME_ENTRYPOINT_DISCOVERY.md`
+  - `docs/budget/BUDGET_RUNTIME_DOCS_DRIFT_DECISION_PACKET.md`
+  - `docs/budget/BUDGET_INTERNAL_INTERFACE_PREP.md`
+  - `docs/budget/BUDGET_ISSUE_89_GATE_SNAPSHOT.md`
+- Files updated:
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Runtime discovery result:
+  - `src/lib/budget/budget-generator.ts`: missing.
+  - `generateBudgetEstimate`: no runtime definition found; docs/demo specs only.
+  - `BudgetEstimateBlockedError`: no runtime definition found; docs-only claim.
+  - `BudgetEstimate`: referenced by output code, but exported source/type is unresolved in current searched runtime.
+  - `BudgetEstimateLine`: referenced by output code, but exported source/type is unresolved in current searched runtime.
+  - `BudgetInputBundle`: found in `src/lib/budget/integration/types.ts`.
+  - `dry_run_only`: found and enforced by `build-budget-input-bundle.ts`.
+  - `BudgetOutputSnapshot`: found in `src/lib/budget/output/types.ts`.
+  - `formalEstimateGuard`: found in adapter types/runtime; remains candidate-only guard.
+  - `renderer-static-guard`: found and continues to block renderer from budget engine / pricing / AI / workbook/PDF paths.
+- Issue #89 snapshot:
+  - state `open`; labels `budget`, `integration`, `review-gate`; comments observed `2`.
+  - latest comment `4686888215`, first line `# Issue #89 Round 5 Harness Review Intake - No Execution`.
+  - accepted verdict strings appear only as requested reviewer options inside BG1-submitted packets; no independent reviewer verdict observed.
+  - execution remains unauthorized.
+- Current BG1 decision:
+  - runtime stitching can start now: `No`.
+  - docs-only prep can continue now: `Yes`.
+  - next required intake: Plan Puzzle / Plancraft+ 0.12 shared truth result from the Plan Puzzle commander.
+- NEXT_BG1_TASK_DEMAND: `BG1_PLAN_PUZZLE_0_12_SHARED_TRUTH_INTAKE_CONSUMPTION_NO_EXECUTION`.
+
+## Latest Budget System Stitching Control Manifest
+
+- Observed at: `2026-06-13T10:53:08+08:00`.
+- Task: `Budget System Stitching Control Manifest`.
+- Scope completed: docs-only state stitching for budget-system receiving, interface gates, forbidden flows, runtime/docs drift, and one next action.
+- Files added:
+  - `docs/budget/BUDGET_STITCHING_CONTROL_MANIFEST.md`
+  - `docs/budget/BUDGET_WORKSTREAM_ARTIFACT_REGISTRY.md`
+  - `docs/budget/BUDGET_INTERFACE_GATE_MAP.md`
+  - `docs/budget/BUDGET_RUNTIME_DOCS_DRIFT_AUDIT.md`
+  - `docs/budget/BUDGET_NEXT_STITCHING_ACTIONS.md`
+- Runtime code modified: `No`.
+- Formal output generated: formal price `No`; formal quote `No`; formal Excel/PDF `No`; Renderer production output `No`.
+- External/runtime systems touched: Supabase/DB/API `No`; RAG/AI API `No`; payment/escrow/listing fee `No`; n8n/webhook `No`.
+- Confirmed drift: `src/lib/budget/budget-generator.ts` is missing in this worktree while docs/spec demos reference `generateBudgetEstimate()` / `BudgetEstimateBlockedError`.
+- Confirmed candidate boundary: `src/lib/budget/adapters/preview-floor-plan-adapter.ts` remains candidate-only / no formal-estimate allowed.
+- Confirmed renderer boundary: renderer static guards and skeleton entries are snapshot/skeleton oriented and must not be treated as formal Excel/PDF readiness.
+- Confirmed local-source boundary: `Z:\08-Jacky\laibe_MVP_project\laibe_quote_factory` exists but is local/dirty external state only; `Z:\08-Jacky\laibe_MVP_project\bugget` remains secondary comparison only.
+- Key blockers:
+  - Plan Puzzle / Plancraft+ 0.12+ shared truth is not synchronized in this worktree; relevant PRs remain open/draft.
+  - Budget generator runtime/docs drift is high risk and must not be patched until upstream shared truth and review gate are clear.
+  - Issue #89 remains the harness review gate; no harness execution is authorized.
+- Recommended single next action: `A_SYNC_PLANCraft_0_12_UI_IA_SHARED_TRUTH_BEFORE_BUDGET_STITCHING`.
+- Allowed next action: read-only/shared-truth alignment packet for Plan Puzzle 0.12+ and budget input contract.
+- Forbidden next action: Budget Engine execution, PricingRule write, BudgetEstimateLine creation, Renderer production output, formal quote/price/Excel/PDF, DB/API/AI/payment/n8n, git stage/push/PR without explicit authorization.
+
+## Latest BG1 Watch State: Issue #89 Blocked Watch Active
+
+- Observed at: `2026-06-13T00:36:15+08:00`.
+- Correct BG1 operational state: `BG1_HARNESS_GATE_BLOCKED_WATCH_ACTIVE`.
+- Current blocker scope is limited to:
+  - Issue #89 reviewer verdict missing.
+  - Harness execution not authorized.
+- GitHub Issue #89 readback: `open`; labels `budget`, `integration`, `review-gate`; comments observed `2`; latest comment `4686888215`, first line `# Issue #89 Round 5 Harness Review Intake - No Execution`.
+- Verdict status: no accepted reviewer verdict observed. The four accepted strings inside BG1-submitted comments are reviewer options, not the verdict.
+- Watch/intake files added:
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_BLOCKED_WATCH_BOARD.md`
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEWER_DECISION_INTAKE.md`
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_FOUR_VERDICT_RESPONSE_PLAN.md`
+  - `docs/bg1_budget_commander/BG1_NO_EXECUTION_UNTIL_HARNESS_AUTHORIZATION_GUARD.md`
+  - `docs/bg1_budget_commander/BG1_BLOCKED_WATCH_ACTIVE_REPORT.md`
+- Operation board updated: `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_OPERATION_BOARD.md`.
+- This is a watch-active mechanism, not a new execution round.
+- Execution boundary remains: harness execution `No`; integration harness `No`; Budget Engine runtime `No`; PricingRule `No`; BudgetEstimateLine `No`; formal price/quote/Excel/PDF `No`; production renderer `No`; DB/Supabase/payment/AI API/LINE/n8n `No`.
+- NEXT_BG1_TASK_DEMAND: `BG1_ISSUE_89_VERDICT_WATCH_AND_INTAKE_NO_EXECUTION`.
+
+## Latest BG1 Goal Status: Blocked Waiting For Issue #89 Reviewer Decision
+
+- Observed at: `2026-06-12T11:24:35+08:00`.
+- Goal status decision: `BG1_BLOCKED_WAITING_FOR_ISSUE_89_REVIEWER_DECISION_NO_EXECUTION`.
+- Blocked audit added:
+  - `docs/bg1_budget_commander/BG1_BUDGET_STITCHING_GOAL_BLOCKED_AUDIT.md`
+  - SHA-256 `88D71F37343FDF7C4FBC6E0101BDA092C0FB834165B3C3AFB95BBD6132B24CE7`
+- Exact blocker: Issue #89 reviewer verdict is still missing and harness execution remains unauthorized.
+- Issue #89 readback: `open`; labels `budget`, `integration`, `review-gate`; comments observed `2`; latest comment `4686888215`.
+- A2 latest queue hash observed: `BA6A62D82F7B051BDA1E5E3C1459764A6963D9C602DE5E99CFC56A33F0164610`; it still says `ACTIVE_REVIEW_DECISION_PENDING`, `harness execution authorized: No`, and `Issue #89 reviewer decision received: No`.
+- BG2 Round 5 remains `BG2_ROUND_5_A2_STATIC_ACCEPTANCE_READY_FOR_REVIEW`; no execution.
+- No LAIBE_REVIEWER thread was found via thread search for `reviewer` or `LAIBE_REVIEWER`.
+- Unblock condition: Issue #89 reviewer returns one of `PASS_FOR_HARNESS_REVIEW`, `PASS_WITH_NOTES_FOR_HARNESS_REVIEW`, `NEEDS_FIX_BEFORE_HARNESS_REVIEW`, or `BLOCKED`.
+- Even after review approval, harness execution still requires separate Commander authorization before any execution / production / formal output.
+
+## Latest Issue #89 Gate Refresh: No Execution
+
+- Observed at: `2026-06-12T11:08:34+08:00`.
+- Current active goal: stitch the LaiBE MVP budget generation system successfully under GitHub-first, review-gated, no-execution-before-authorization boundaries.
+- GitHub Issue #89 readback: `open`; labels `budget`, `integration`, `review-gate`; comments observed `2`.
+- Issue #89 comments observed:
+  - `4682668340`: BG1 initial no-execution review packet submission.
+  - `4686888215`: BG1/BG2 Round 5 no-execution review-intake submission.
+- Important distinction: the four labels inside those comments are requested reviewer options, not a reviewer verdict.
+- Current gate: `WAITING_FOR_ISSUE_89_REVIEWER_DECISION_NO_EXECUTION`.
+- A2 active queue now records `ACTIVE_REVIEW_DECISION_PENDING` and accepted labels `PASS_FOR_HARNESS_REVIEW`, `PASS_WITH_NOTES_FOR_HARNESS_REVIEW`, `NEEDS_FIX_BEFORE_HARNESS_REVIEW`, `BLOCKED`.
+- A2 intake acceptance is review-only: `A2_ACCEPTS_BG2_ROUND5_FOR_ISSUE_89_HARNESS_REVIEW_INTAKE_NO_EXECUTION`.
+- A2 reviewer prompt packet is label-aligned:
+  - `Z:\08-Jacky\laibe_MVP_project\_ab_command_center_v2\WORKTREE_PROMPT_PACKETS\A2_ISSUE_89_HARNESS_REVIEW_INTAKE_PACKET_NO_EXECUTION_20260612.md`
+  - SHA-256 `BA80805A908B2CD58CBBB11F0F29AA3B1BF56F87AB2B876FBFE8B996FDEAD847`
+- BG1 local evidence refreshed:
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEW_DECISION_WAITING_REPORT.md` SHA-256 `D0BB00AA062526E9B7AE8BB3A24A88E00A97B24B1AC876C78710158A6744EF5F`
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEWER_DECISION_REQUEST_PACKET.md` SHA-256 `DC23D716176723CAD3D3DE8986020266591647EC89A784337208E6B5CBCDE61E`
+  - `docs/bg1_budget_commander/BG1_BUDGET_STITCHING_GOAL_COMPLETION_AUDIT.md` SHA-256 `E53EC7AA79853C6364DB015E3205567BD31F740ABF45A044C00C62FCBD93ED70`; result `NOT_COMPLETE_REVIEW_GATE_WAITING`
+  - `docs/bg1_budget_commander/BG1_TO_BG2_BUDGET_STITCHING_GOAL_COORDINATION_TRACKER.md` records the refreshed gate.
+- A2 active queue latest observed hash: `489DE437442DEA94CA17526DB47CAC2A349BD25CE3C46BB5424E61083110963C`; it consumed the prior BG1 pointer set, reviewer packet `E3F403...` and completion audit `9533...`, resolving the earlier stale-pointer drift.
+- BG1 then refreshed local evidence again to record A2 consumption, so BG1 latest local hashes supersede the prior pointer set. Do not chase hash ping-pong; update A2 only on its next natural queue/status refresh or if Issue #89 gate changes.
+- A2 no-execution sync was consumed by thread `019eb57b-4257-7d01-a529-925c59b81018`; no harness execution was requested or authorized.
+- Execution boundary: harness execution `No`; integration harness `No`; runtime `No`; formal price/quote/Excel/PDF `No`; production renderer `No`; DB/Supabase/payment/AI API/LINE/n8n `No`.
+- Next safe action: `ISSUE_89_REVIEWER_DECISION_ONLY_NO_EXECUTION`.
+
+## Latest Budget Stitching Goal Coordination: BG1 to BG2
+
+- Active thread goal: stitch the LaiBE MVP budget generation system successfully under GitHub-first, review-gated, no-execution-before-authorization boundaries.
+- Current direction: do not reopen BG1 docs-only PR monitoring. Active budget integration line is now `BG2_BUDGET_SYSTEM_INTEGRATION_COMMANDER`.
+- Coordination artifact added: `docs/bg1_budget_commander/BG1_TO_BG2_BUDGET_STITCHING_GOAL_COORDINATION_TRACKER.md`.
+- BG2 worktree observed:
+  - path: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\BG2_budget_system_integration`
+  - branch: `codex/bg2-budget-system-integration`
+  - HEAD: `639b239993fd65037965ca051605dd394f25e10a`
+  - status observed from BG1: `M docs/NEXT_CODEX_HANDOFF.md`, `?? artifacts/`, `?? scripts/bg2_round0_test_only.py`
+- BG2 Round 0 observed result: `BG2_ROUND_0_TEST_ONLY_OUTPUT_GENERATED`.
+- BG2 Round 1 observed result: `BG2_ROUND_1_FIELD_COMPLETENESS_BASELINE_READY`.
+- BG2 Round 2 observed result: `BG2_ROUND_2_RENDERER_ALIGNMENT_NEEDS_ROW_POLICY`.
+- BG2 Round 3 observed result: `BG2_ROUND_3_WEB_HANDOFF_PACKAGE_READY_FOR_A2_REVIEW`.
+- BG2 Round 4 observed result: `BG2_ROUND_4_TEST_ONLY_ROW_POLICY_REPAIR_READY`.
+- BG2 Round 5 observed result: `BG2_ROUND_5_A2_STATIC_ACCEPTANCE_READY_FOR_REVIEW`.
+- BG2 TEST_ONLY outputs observed:
+  - `budget_input_bundle.TEST_ONLY.DO_NOT_USE_AS_FORMAL_QUOTE.json`
+  - `budget_output_snapshot.TEST_ONLY.DO_NOT_USE_AS_FORMAL_QUOTE.json`
+  - `budget_generation_form.TEST_ONLY.DO_NOT_USE_AS_FORMAL_QUOTE.csv`
+  - `budget_generation_form.TEST_ONLY.DO_NOT_USE_AS_FORMAL_QUOTE.html`
+  - `budget_generation_form_manifest.TEST_ONLY.DO_NOT_USE_AS_FORMAL_QUOTE.json`
+- Boundary: BG2 outputs are TEST_ONLY local artifacts, not formal price, formal quote, formal Excel/PDF, production runtime, or GitHub shared truth.
+- Open gates before goal completion:
+  - A2 review-intake acceptance is proven for Round 5 no-execution review intake only.
+  - Issue #89 reviewer verdict is not present.
+  - Harness execution remains unauthorized.
+  - XLSX output remains blocked by missing dependency and must not be faked.
+- Next safe action: `ISSUE_89_REVIEWER_DECISION_ONLY_NO_EXECUTION`.
+
+## Latest BG1 Issue #89 Review Packet Submission: No Execution
+
+- Agent: `Budget Stitching Sequence Test Agent`.
+- Task: `BG1_ISSUE_89_REVIEW_PACKET_SUBMISSION_DRAFT_NO_EXECUTION`.
+- Workstream: `integration/budget-system-stitching-review`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `PASS_WITH_NOTES_FOR_HARNESS_REVIEW` submitted to Issue #89 for review only.
+- GitHub submission:
+  - Issue: `https://github.com/laibeoffer/laibe-mvp/issues/89`
+  - Comment id: `4682668340`
+  - Comment URL: `https://github.com/laibeoffer/laibe-mvp/issues/89#issuecomment-4682668340`
+- Added local files:
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEW_PACKET_SUBMISSION_DRAFT.md`
+  - `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEW_PACKET_SUBMISSION_REPORT.md`
+- Updated file: `docs/NEXT_CODEX_HANDOFF.md`.
+- Submission path: Issue comment `Yes`; PR `No`; local draft/report `Yes`.
+- Packet included sequence validation, forbidden-flow result, placeholder stop gates, guard flags, snapshot boundary, source-of-truth boundary, missing/blocked items, and requested reviewer verdict options only.
+- Source-of-truth boundary: GitHub Issue comment is now shared review-submission evidence; `docs/bg1_budget_commander/` remains untracked local evidence / `NOT_SHARED_TRUTH` until a scoped docs-only PR is separately authorized and merged. Local `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY`.
+- Execution status: harness execution `No`; integration harness `No`; runtime `No`; formal output `No`; no `READY_FOR_EXECUTION`, `RUNTIME_VERIFIED`, or `PRODUCTION_READY` claim.
+- Need Reviewer: `Yes` for Issue #89 review gate.
+- Need Commander: `No` for review packet; `Yes` before execution, production, formal price, formal quote, formal Excel/PDF, or Renderer production output.
+- NEXT_BG1_TASK_DEMAND: `ISSUE_89_REVIEWER_DECISION_ONLY_NO_EXECUTION`.
+- Forbidden scope status: no `src/` modification, no Budget Engine runtime, no `PricingRule`, no `BudgetEstimateLine`, no Renderer production output, no Plancraft, no DB/Supabase, no payment, no AI API, no LINE API, no n8n/webhook, no formal Excel/PDF, no formal quote/price, no git add/stage/push/merge/deploy/reset/clean/delete.
+
+## Latest BG1 Stitching Sequence Validation: Round 5
+
+- Agent: `Budget Stitching Sequence Test Agent`.
+- Task: `BG1_HARNESS_REVIEW_PACKET_ISSUE_89_ROUND_5_SEQUENCE_VALIDATION`.
+- Workstream: `integration/budget-system-stitching-review`.
+- Worktree: `\\192.168.0.106\sever_data\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `PASS_WITH_NOTES_FOR_HARNESS_REVIEW`.
+- Evidence artifact added: `docs/bg1_budget_commander/BG1_STITCHING_SEQUENCE_VALIDATION_REPORT.md`.
+- Evidence class: `LOCAL_REVIEW_EVIDENCE_ONLY`; `docs/bg1_budget_commander/` is untracked in this worktree and is `NOT_SHARED_TRUTH` until published through an authorized GitHub path.
+- Source-of-truth check: GitHub main remains `639b239993fd65037965ca051605dd394f25e10a`; Issue #89 is open for `Budget Integration Harness Review`; local `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY`.
+- Sequence validation: Quote Factory -> Raw Candidate -> Review Gate -> MethodSpec -> Budget Engine Entry / Picking -> BudgetOutputSnapshot-compatible object -> Output Documents preview is valid for review only.
+- Placeholder gate: `ProjectRequirementBrief` and `PlanPuzzleQuantityFacts` may enter review/dry-run assembly review but block harness execution, formal quote, production quantity, and customer-facing formal output.
+- Forbidden-flow check: no forbidden flow observed; all listed flows recorded as `PASS_NO_FORBIDDEN_FLOW`.
+- Guard evidence: integration static guard and renderer static guard both returned `valid:true`, `issue_count:0`; guard flags are present or equivalently expressed for review scope.
+- Harness decision: Can enter Harness Review `Yes`; Can start Harness Execution `No`; Need Commander `No` for review validation and `Yes` before execution/production/formal output; Need Reviewer `Yes` for Issue #89 gate before execution.
+- NEXT_BG1_TASK_DEMAND: `BG1_ISSUE_89_REVIEW_PACKET_SUBMISSION_DRAFT_NO_EXECUTION`.
+- Forbidden scope status: no harness execution, no production Budget Engine, no `PricingRule`, no `BudgetEstimateLine`, no formal price, no formal quote, no formal Excel/PDF, no Renderer production output, no DB/Supabase, no payment, no AI API, no LINE API, no n8n/webhook, no `src/` modification, no Plancraft modification, no git add/stage/push/merge/deploy/reset/clean/delete.
+
+## Latest BG1 Budget Generation Stitching: Round 4
+
+- Agent: `A4_BG1_BUDGET_COMMANDER`.
+- Task: `BG1_BUDGET_GENERATION_STITCHING_DRY_RUN_ASSEMBLY_ROUND_4`.
+- Mode: `Budget Generation Stitching / Dry-run Assembly`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `READY_FOR_HARNESS_REVIEW`.
+- Source rule: GitHub main / merged PR / open Issue / `docs/WORKSTREAM_BLACKBOARD.md` / accepted final packets are primary. Local `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY / LOCAL_STATE` and is not completion evidence.
+- Added files:
+  - `docs/bg1_budget_commander/BG1_BUDGET_GENERATION_STITCHING_TEAM_ROSTER.md`
+  - `docs/bg1_budget_commander/BG1_BUDGET_GENERATION_STITCHING_EVIDENCE_PACKET.md`
+  - `docs/bg1_budget_commander/BG1_BUDGET_GENERATION_STITCHING_REPORT.md`
+  - `docs/bg1_budget_commander/BG1_HARNESS_REVIEW_PACKET_ROUND_5_START.md`
+- Updated files:
+  - `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_OPERATION_BOARD.md`
+  - `docs/bg1_budget_commander/BG1_TEST_QUEUE.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- GitHub evidence checked:
+  - `origin/main` and worktree HEAD both at `639b239993fd65037965ca051605dd394f25e10a`.
+  - Quote Factory PR #3 merged with merge commit `deae69da593b4776aaa20013da3b5c359aa2133c`; PR comment evidence records `PASS_FOR_QF_EXPORT_PACKAGE_DRY_RUN`.
+  - Raw Candidate PR #26 merged / Issue #17 closed; candidate-only acceptance preserved.
+  - Budget Review Gate PR #37 merged; docs-only review gate evidence.
+  - Budget E2E Fixture QA PR #48 merged; docs-only fixture contract evidence.
+  - Budget Engine Entry PR #55 merged / Issue #49 scoped resolution.
+  - MethodSpec PR #87 merged / Issue #49 closed; routing docs only.
+  - Output Documents PR #23 / PR #29 merged; snapshot-only output readiness.
+  - Issue #89 remains open for Budget Integration Harness Review.
+- Static guard evidence:
+  - Integration static guard: `node --experimental-strip-types src/lib/budget/integration/run-budget-harness-static-guard.ts` returned `valid:true`, `issue_count:0`.
+  - Renderer static guard: `node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts` returned `valid:true`, `issue_count:0`, scanned 23 renderer files.
+- Dry-run artifacts assembled as review objects only:
+  - `BudgetInputBundle`
+  - `BudgetRunPlan`
+  - `BudgetOutputSnapshot-compatible object`
+- Missing inputs recorded:
+  - verified `ProjectRequirementBrief`
+  - verified `PlanPuzzleQuantityFacts`
+  - explicit harness execution approval
+  - runtime forbidden-flow execution transcript
+  - owner quote metadata / terms source decisions
+  - formal pricing authority
+- NEXT_BG1_TASK_DEMAND: `BG1_HARNESS_REVIEW_PACKET_ISSUE_89_ROUND_5`.
+- CONTINUATION_STARTED: `YES`, via `docs/bg1_budget_commander/BG1_HARNESS_REVIEW_PACKET_ROUND_5_START.md`.
+- Forbidden scope status: no harness execution, formal quote, formal price, formal Excel/PDF, production Budget Engine activation, PricingRule modification, BudgetEstimateLine creation/modification, Plancraft core modification, DB/Supabase, payment/escrow/listing fee, AI API/RAG, LINE API/n8n, product source patch, deploy/publish/PR/push/stage/reset/clean/delete.
+- Review readiness: available for Issue #89 Harness Review. This does not authorize harness execution.
+
+## Latest BG1 Owner Quote Test-only Repair Decision: Round 3
+
+- Agent: `A4_BG1_BUDGET_COMMANDER`.
+- Task: `BG1_OWNER_QUOTE_TEST_ONLY_REPAIR_DECISION_ROUND_3`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `BG1_TEST_ONLY_REPAIR_DECISION_READY`.
+- Source rule: GitHub budget files are primary; local `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY`; attachment workbook remains test output format target only.
+- Added files:
+  - `docs/bg1_budget_commander/BG1_OWNER_QUOTE_TEST_ONLY_REPAIR_DECISION_ROUND_3_REPORT.md`
+  - `docs/bg1_budget_commander/BG1_OWNER_QUOTE_TEST_ONLY_REPAIR_DECISION_MATRIX_ROUND_3.md`
+  - `docs/bg1_budget_commander/BG1_APPROVED_TEST_ONLY_REPAIR_QUEUE_ROUND_3.md`
+  - `docs/bg1_budget_commander/BG1_HOLD_FOR_SOURCE_DECISION_ROUND_3.md`
+  - `docs/bg1_budget_commander/BG1_BLOCKED_FORBIDDEN_SCOPE_ROUND_3.md`
+  - `docs/bg1_budget_commander/BG1_A2_DRY_RUN_INTERFACE_BOUNDARY_ROUND_3.md`
+  - `docs/bg1_budget_commander/BG1_OWNER_QUOTE_TEST_FIXTURE_SPEC_ROUND_3.md`
+  - `docs/bg1_budget_commander/BG1_TEST_ONLY_FIXTURE_ASSERTION_PACKET_ROUND_4_START.md`
+- Updated files:
+  - `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_OPERATION_BOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Decision summary: `APPROVE_TEST_ONLY_REPAIR` 9, `HOLD_FOR_SOURCE_DECISION` 2, `HOLD_FOR_COMMANDER_INPUT` 1, `BLOCK_FORBIDDEN_SCOPE` 3, `REFERENCE_ONLY` 2, `NOT_NEEDED` 1.
+- Approved test-only repair items: target owner quote layout/profile, `業主報價` sheet label assertion, candidate case reference from `project_id`, trade section display/numeral assertions, subtotal/total target row profile, amount-in-Chinese formatter requirement, signature labels, A2 dry-run boundary, renderer guard/negative assertions.
+- Holds: project/owner/site/area/house metadata source, project creation date source, customer-safe terms/disclaimer source.
+- Blocked: payment-like clauses, formal Excel/PDF, Budget Engine/PricingRule/BudgetEstimateLine runtime repair.
+- A2 boundary: A2 may later display only mock/dry-run/candidate states with `production_ready:false`, `dry_run_only:true`, `formal_quote:false`, and `formal_excel_pdf:false`; no product source patch happened.
+- Static guard evidence: bundled Node ran `src/lib/budget/renderers/run-renderer-static-guard.ts`; result `valid:true`, `issue_count:0`.
+- NEXT_BG1_TASK_DEMAND: `BG1_TEST_ONLY_FIXTURE_ASSERTION_PACKET_ROUND_4`.
+- CONTINUATION_STARTED: `YES`, via `docs/bg1_budget_commander/BG1_TEST_ONLY_FIXTURE_ASSERTION_PACKET_ROUND_4_START.md`.
+- Forbidden scope status: no formal quote, formal price, formal Excel/PDF, Budget Engine execution, PricingRule execution/modification, BudgetEstimateLine creation/modification, Plancraft core modification, DB/payment/AI API/LINE API/n8n, A2 product source patch, deploy/publish/PR/push/stage/reset/clean/delete.
+
+## Latest BG1 Renderer Dry-run Compatibility: Round 2 Execution
+
+- Agent: `A4_BG1_BUDGET_COMMANDER`.
+- Task: `BG1_RENDERER_DRY_RUN_COMPATIBILITY_ROUND_2_EXECUTION`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `BG1_REPAIR_QUEUE_READY_FOR_COMMANDER`.
+- Source rule: GitHub budget files are primary; local `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY`; attachment workbook is test output format target only.
+- Added files:
+  - `docs/bg1_budget_commander/BG1_RENDERER_DRY_RUN_COMPATIBILITY_ROUND_2_REPORT.md`
+  - `docs/bg1_budget_commander/BG1_RENDERER_DRY_RUN_COMPATIBILITY_MATRIX_ROUND_2.md`
+  - `docs/bg1_budget_commander/BG1_DRY_RUN_FIXTURE_ASSERTION_PLAN_ROUND_2.md`
+  - `docs/bg1_budget_commander/BG1_OWNER_QUOTE_FORMAT_GAP_MATRIX_ROUND_2.md`
+  - `docs/bg1_budget_commander/BG1_RENDERER_FORBIDDEN_SCOPE_GUARD_ROUND_2.md`
+  - `docs/bg1_budget_commander/BG1_REPAIR_QUEUE_ROUND_2.md`
+  - `docs/bg1_budget_commander/BG1_OWNER_QUOTE_TEST_ONLY_REPAIR_DECISION_ROUND_3_START.md`
+- Updated files:
+  - `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_OPERATION_BOARD.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Static guard evidence: bundled Node ran `src/lib/budget/renderers/run-renderer-static-guard.ts`; result `valid:true`, `issue_count:0`, scanned 23 renderer files.
+- Compatibility summary: `SUPPORTED_TEST_ONLY` 12, `PARTIAL_SUPPORTED` 7, `GAP` 7, `REFERENCE_ONLY` 3, `BLOCKED_FORBIDDEN_SCOPE` 2.
+- Key decision: line-item field mapping from `BudgetOutputSnapshot.customer_view` is test-compatible, but full `業主報價` workbook compatibility is not ready because metadata, sheet/profile, subtotal/total target rows, amount-in-words, signature labels, and terms/disclaimer source still need repair decisions.
+- Active repair queue: `docs/bg1_budget_commander/BG1_REPAIR_QUEUE_ROUND_2.md`.
+- NEXT_BG1_TASK_DEMAND: `BG1_OWNER_QUOTE_TEST_ONLY_REPAIR_DECISION_ROUND_3`.
+- CONTINUATION_STARTED: `YES`, via `docs/bg1_budget_commander/BG1_OWNER_QUOTE_TEST_ONLY_REPAIR_DECISION_ROUND_3_START.md`.
+- Forbidden scope status: no formal quote, formal price, formal Excel/PDF, Budget Engine execution, PricingRule execution/modification, BudgetEstimateLine creation/modification, Plancraft core modification, DB/payment/AI API/LINE API/n8n, product source patch, deploy/publish/PR/push/stage/reset/clean/delete.
+
+## Latest BG1 Commander Team Loop: Round 2
+
+- Agent: `A4_BG1_BUDGET_COMMANDER`.
+- Task: `BG1_COMMANDER_TEAM_LOOP_ROUND_2`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `BG1_COMMANDER_TEAM_LOOP_ACTIVE`.
+- Task type: Documentation / Governance Task.
+- Dispatch decision: docs/governance updates only; no routing / CTA / header, no data model, no Plancraft, no package/config/git setting, no budget runtime.
+- Added files:
+  - `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_LOOP_PROTOCOL.md`
+  - `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_OPERATION_BOARD.md`
+  - `docs/bg1_budget_commander/BG1_READONLY_RENDERER_DRY_RUN_COMPATIBILITY_ROUND_2_START.md`
+  - `docs/bg1_budget_commander/BG1_COMMANDER_TEAM_LOOP_ROUND_2_REPORT.md`
+- Updated files:
+  - `docs/bg1_budget_commander/BG1_COMMANDER_CHARTER.md`
+  - `docs/bg1_budget_commander/BG1_SUBGROUP_ROSTER.md`
+  - `docs/bg1_budget_commander/BG1_TEST_QUEUE.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- Commander loop rule now active: every BG1 subgroup must consume a bounded task, produce evidence, record a decision, propose a next demand, and pass a forbidden-scope check.
+- Active subgroup board:
+  - `BG1-CMD`: commander loop and operation board.
+  - `BG1-SRC`: GitHub-first source and local `bugget` secondary-only drift watch.
+  - `BG1-XLS`: attachment target profile and format gaps.
+  - `BG1-MAP`: `BudgetOutputSnapshot.customer_view` to owner quote mapping.
+  - `BG1-RGA`: renderer guard and forbidden reference checks.
+  - `BG1-DRY`: Round 2 dry-run compatibility primary owner.
+  - `BG1-RPL`: blocker / repair queue owner.
+  - `BG1-A2L`: A2 candidate interface liaison.
+- Active continuation artifact: `docs/bg1_budget_commander/BG1_READONLY_RENDERER_DRY_RUN_COMPATIBILITY_ROUND_2_START.md`.
+- NEXT_BG1_TASK_DEMAND: `BG1_READONLY_RENDERER_DRY_RUN_COMPATIBILITY_ROUND_2_REPORT`.
+- Forbidden scope status: no formal quote, formal price, formal Excel/PDF, Budget Engine execution, PricingRule execution/modification, BudgetEstimateLine creation/modification, Plancraft core modification, DB/payment/AI API/LINE API/n8n, deploy/publish/PR/push/stage/reset/clean/delete.
+
+## Latest A4/BG1 Budget Interface Response: A2 To A4 Candidate Contract
+
+- Agent: `A4_BG1_BUDGET_COMMANDER` / `BG1_BUDGET_COMMANDER`.
+- Task: `A2_TO_A4_BUDGET_INTERFACE_REQUIREMENT_PACKET`.
+- Response artifact: `Z:\08-Jacky\laibe_MVP_project\_ab_command_center_v2\A4_BUDGET_INTERFACE\A4_TO_A2_BUDGET_INTERFACE_RESPONSE_PACKET.md`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Result: `A4_TO_A2_PACKET_READY_SAFE_INTERFACE_RESPONSE`.
+- A2 packet hash verified: `F6499137C38D6D68B65BDB01EDFE565D4721609DB6C52ED90D0E25417552839D`.
+- Source boundary: GitHub budget files remain primary; `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY`.
+- Interface disposition: `REVISED_ACCEPTED_WITH_GUARDS`; A2 may connect only to a candidate/dry-run contract with `production_ready:false`, `dry_run_only:true`, `formal_quote_requested:false`, `formal_excel_pdf_requested:false`, `budget_engine_execution_requested:false`, `pricing_rule_execution_requested:false`, and `budget_estimate_line_creation_requested:false`.
+- Dirty worktree classification: `M docs/NEXT_CODEX_HANDOFF.md` is governance handoff; `?? docs/bg1_budget_commander/` is BG1 local governance evidence. Neither is staged and neither proves production budget implementation.
+- GitHub object evidence verified at HEAD: `src/lib/budget` tree `babd4767729a766ee5e0fcfbb84e2b645be85630`; A2 budget-adjacent page blobs match the A2 packet's GitHub baseline.
+- Forbidden scope status: no formal quote, formal price, formal Excel/PDF, Budget Engine execution, PricingRule execution/modification, BudgetEstimateLine creation/modification, Plancraft core modification, DB/payment/AI API/LINE API/n8n, deploy/publish/PR/push/stage/reset/clean/delete.
+- Known gaps: current `BudgetOutputSnapshot` lacks explicit owner quote metadata for case number, project name, owner name, site address, renovation area, house type, amount-in-words, and structured terms/disclaimer block; Plan Puzzle output remains candidate context only.
+- Next A4/BG1 task demand: `A4_READONLY_BUDGET_INTERFACE_CONTRACT_TO_TEST_FIXTURE_PLAN_ROUND_2`.
+
+## Latest BG1 Budget Commander Task: Readonly Source And Format Inventory Round 1
+
+- Agent: `BG1_BUDGET_COMMANDER`.
+- Task: `BG1_READONLY_SOURCE_AND_FORMAT_INVENTORY_ROUND_1`.
+- Worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\bg1-budget-commander-worktree-20260611`.
+- Branch / HEAD: `bg1/budget-commander-worktree-20260611` at `639b239993fd65037965ca051605dd394f25e10a`.
+- Status: `BG1_SOURCE_AND_FORMAT_INVENTORY_READY`.
+- Files added:
+  - `docs/bg1_budget_commander/BG1_GITHUB_BUDGET_SOURCE_INVENTORY.md`
+  - `docs/bg1_budget_commander/BG1_LOCAL_BUGGET_SECONDARY_INVENTORY.md`
+  - `docs/bg1_budget_commander/BG1_OWNER_QUOTE_FORMAT_MAPPING_PLAN.md`
+  - `docs/bg1_budget_commander/BG1_FORBIDDEN_SCOPE_GUARD_MATRIX.md`
+  - `docs/bg1_budget_commander/BG1_READONLY_SOURCE_AND_FORMAT_INVENTORY_ROUND_1_REPORT.md`
+- Files modified: `docs/NEXT_CODEX_HANDOFF.md`.
+- Source boundary: GitHub budget files are primary; `Z:\08-Jacky\laibe_MVP_project\bugget` remains `SECONDARY_COMPARISON_ONLY`.
+- Attachment evidence: `C:\Users\J\Desktop\萊比雜項\UI設計\MVP素材\表單\預算單格式.xls` was opened read-only; target sheet `業主報價` has 148 rows / 11 columns and maps mainly to `BudgetOutputSnapshot.customer_view`.
+- Renderer guard evidence: `node --experimental-strip-types src/lib/budget/renderers/run-renderer-static-guard.ts` returned `valid: true`, `issue_count: 0`.
+- Known gaps: current `BudgetOutputSnapshot` lacks explicit owner quote metadata fields for `案件編號`, `專案名稱`, `客戶名稱`, `施工地點`, `裝修面積`, `房屋類型`, amount-in-words, and structured terms / disclaimer block.
+- Do not touch: no formal quote, no formal price, no formal Excel/PDF, no Budget Engine activation, no `PricingRule`, no `BudgetEstimateLine`, no DB / payment / AI API / LINE API / n8n, no Plancraft, no git add / push / PR / merge.
+- Next BG1 task demand: `BG1_READONLY_RENDERER_DRY_RUN_COMPATIBILITY_ROUND_2`.
+
 ## Latest Workflow Task: Budget Workflow Orchestrator Closeout Sync
 
 - Agent: Budget Workflow Orchestrator Agent
@@ -1212,3 +2454,73 @@ Reviewer chat is only for reviewing Codex work output and boundary compliance. I
 - 本輪沒有 real image API、沒有 OpenAI 或第三方模型呼叫、沒有 API key、沒有 `.env`、沒有 secret、沒有 production endpoint。
 - 若下一步要建立真 server runtime，需先由使用者決定 runtime 選型：local Node server、Python dev server + separate proxy、Netlify Function、Vercel Function、Cloudflare Worker 或其他部署方式。以目前靜態 MVP 與禁止新增 package 的限制看，下一個 local-only spike 可優先評估「內建 Node `http` 的 local same-origin dev server」，但必須另開任務並維持 disabled-by-default / no-secret 規則。
 - 本輪成果可供使用者後續主動交給 LAIBE_REVIEWER 做 runtime boundary review；在進入任何真 server runtime、真 API request、key 注入、production connection 或 reference image upload 前，應先完成使用者觸發的審查。
+
+## BG1 / BG2 Budget Stitching Goal Coordination Update
+
+- updated: 2026-06-12T10:19:34+08:00
+- active goal: budget generation system stitching success
+- BG2 active worktree: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\BG2_budget_system_integration`
+- BG2 Round 1 status: `BG2_ROUND_1_FIELD_COMPLETENESS_BASELINE_READY`
+- BG2 Round 2 status: `BG2_ROUND_2_RENDERER_ALIGNMENT_NEEDS_ROW_POLICY`
+- BG2 Round 3 status: `BG2_ROUND_3_WEB_HANDOFF_PACKAGE_READY_FOR_A2_REVIEW`
+- BG2 Round 4 status: `BG2_ROUND_4_TEST_ONLY_ROW_POLICY_REPAIR_READY`
+- reconciliation evidence: `Z:\08-Jacky\laibe_MVP_project\_ab_command_center_v2\BG2_BUDGET_SYSTEM_INTEGRATION\BG2_ROUND2_PARALLEL_EVIDENCE_RECONCILIATION.md`
+- current next safe action: A2 review of BG2 Round 3 web handoff package plus BG2 Round 4 row policy repair.
+- A2 steering request sent: thread `019eb57b-4257-7d01-a529-925c59b81018`; evidence file `docs/bg1_budget_commander/BG1_A2_ROUND4_REVIEW_REQUEST_SENT.md`.
+- BG2 Round 5 static acceptance result: `BG2_ROUND_5_A2_STATIC_ACCEPTANCE_NEEDS_FIX`.
+- A2 Round 5 gap request sent: thread `019eb57b-4257-7d01-a529-925c59b81018`; evidence file `docs/bg1_budget_commander/BG1_A2_ROUND5_STATIC_ACCEPTANCE_GAPS_SENT.md`.
+- current next safe action: A2 fixes the Round 5 gaps and captures visual/file smoke evidence; BG2 then reruns `scripts/bg2_round5_a2_static_acceptance_test_only.py`.
+- forbidden scope preserved: no production Budget Engine, no PricingRule, no BudgetEstimateLine, no production renderer, no formal price, no formal quote, no formal Excel/PDF, no DB/payment/AI API/LINE/n8n, no git stage/push/merge/deploy.
+- source boundary: local BG2 artifacts and local `bugget` remain review evidence / secondary comparison only, not GitHub shared truth.
+
+## BG1 / BG2 Budget Stitching Round 5 Static Acceptance Update
+
+- updated: 2026-06-12T10:45:57+08:00
+- active goal: budget generation system stitching success
+- evidence class: LOCAL_REVIEW_EVIDENCE_ONLY / NOT_SHARED_TRUTH
+- BG2 Round 5 rerun result: `BG2_ROUND_5_A2_STATIC_ACCEPTANCE_READY_FOR_REVIEW`
+- A2 Round 5 fixes observed: finalization literal `DO_NOT_USE_AS_FORMAL_QUOTE`, Round 4 row-policy id `BG2_TEST_ONLY_OWNER_QUOTE_ROW_POLICY_V1`, and three visual smoke screenshots.
+- BG2 report: `Z:\08-Jacky\laibe_MVP_project\_ab_command_center_v2\BG2_BUDGET_SYSTEM_INTEGRATION\BG2_COMMANDER_REPORT_ROUND5.md`
+- BG2 acceptance artifact: `Z:\08-Jacky\laibe_MVP_project\_budget_worktrees\BG2_budget_system_integration\artifacts\budget_system_integration\a2_budget_patch_static_acceptance_round5.TEST_ONLY.DO_NOT_USE_AS_FORMAL_QUOTE.json`
+- BG1 evidence note: `docs/bg1_budget_commander/BG1_BG2_ROUND5_STATIC_ACCEPTANCE_READY_FOR_REVIEW.md`
+- current next safe action: `ISSUE_89_HARNESS_REVIEW_INTAKE_NO_EXECUTION`
+- still forbidden: harness execution, production Budget Engine, PricingRule, BudgetEstimateLine, production renderer, formal price, formal quote, formal Excel/PDF, DB/payment/AI API/LINE/n8n, git stage/push/merge/deploy.
+
+## BG1 Issue #89 Round 5 Review Intake Submission
+
+- updated: 2026-06-12T10:55:00+08:00
+- task: `ISSUE_89_HARNESS_REVIEW_INTAKE_NO_EXECUTION`
+- Issue #89 comment posted: Yes
+- Issue comment URL: `https://github.com/laibeoffer/laibe-mvp/issues/89#issuecomment-4686888215`
+- local report: `docs/bg1_budget_commander/BG1_ISSUE_89_ROUND5_REVIEW_INTAKE_SUBMISSION_REPORT.md`
+- current result submitted: `BG2_ROUND_5_A2_STATIC_ACCEPTANCE_READY_FOR_REVIEW`
+- next safe action: `ISSUE_89_HARNESS_REVIEW_DECISION_ONLY_NO_EXECUTION`
+- still not authorized: harness execution, runtime verification, production readiness, production renderer, formal price, formal quote, formal Excel/PDF, Budget Engine runtime, PricingRule, BudgetEstimateLine, DB/payment/AI API/LINE/n8n.
+
+## BG1 Issue #89 Reviewer Decision Waiting Check
+
+- updated: 2026-06-12T10:55:58+08:00
+- task: `ISSUE_89_HARNESS_REVIEW_DECISION_ONLY_NO_EXECUTION`
+- Issue #89 comments observed by readback: 2
+- observed comments:
+  - `4682668340`: BG1 initial no-execution review packet submission
+  - `4686888215`: BG1/BG2 Round 5 no-execution review-intake submission
+- reviewer verdict observed: No
+- note: `PASS_WITH_NOTES_FOR_HARNESS_REVIEW` in comment `4682668340` is BG1's submitted packet result, not a separate reviewer decision.
+- local report: `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEW_DECISION_WAITING_REPORT.md`
+- current state: `WAITING_FOR_ISSUE_89_REVIEWER_DECISION_NO_EXECUTION`
+- next safe action: `ISSUE_89_REVIEWER_DECISION_ONLY_NO_EXECUTION`
+- still forbidden: harness execution, integration harness startup, runtime verification claim, production renderer, formal price, formal quote, formal Excel/PDF, Budget Engine runtime, PricingRule, BudgetEstimateLine, DB/payment/AI API/LINE/n8n.
+
+## BG1 Issue #89 Reviewer Decision Prompt Alignment
+
+- updated: 2026-06-12T11:00:00+08:00
+- task: `ISSUE_89_REVIEWER_DECISION_ONLY_NO_EXECUTION`
+- reason: A2 has a no-execution intake packet, but BG1 prepared a reviewer decision packet with the exact Issue #89 decision labels to avoid label drift.
+- reviewer decision packet: `docs/bg1_budget_commander/BG1_ISSUE_89_REVIEWER_DECISION_REQUEST_PACKET.md`
+- required decision options:
+  - `PASS_FOR_HARNESS_REVIEW`
+  - `PASS_WITH_NOTES_FOR_HARNESS_REVIEW`
+  - `NEEDS_FIX_BEFORE_HARNESS_REVIEW`
+  - `BLOCKED`
+- still forbidden: harness execution, runtime verification, production readiness, production renderer, formal price, formal quote, formal Excel/PDF, Budget Engine runtime, PricingRule, BudgetEstimateLine, DB/payment/AI API/LINE/n8n.
