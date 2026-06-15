@@ -30,6 +30,68 @@ export type BudgetProject = {
   user_requirements?: Record<string, unknown>;
 };
 
+export type PriceSource = {
+  type: string;
+  id: string;
+  label: string;
+};
+
+export type TradeCode = string;
+
+export interface QuoteItemTemplate {
+  id: string;
+  item_code: string;
+  trade_code: TradeCode;
+  engineering_category: string;
+  item_name: string;
+  unit: string;
+  default_notes: string;
+  is_active?: boolean;
+}
+
+export interface MethodRecipeOutput {
+  quote_item_template_id: string;
+  item_code?: string;
+  quantity_fact_type: string;
+  unit: string;
+  quantity_formula: string;
+  condition?: {
+    param: string;
+    equals: unknown;
+  };
+  review_reason?: string;
+}
+
+export interface MethodRecipe {
+  recipe_id: string;
+  recipe_code: string;
+  recipe_name: string;
+  version: string;
+  trigger_type: string;
+  object_type?: string;
+  space_type?: string;
+  engineering_category?: string;
+  required_quantity_facts: string[];
+  required_params: string[];
+  outputs: MethodRecipeOutput[];
+  default_assumptions: string[];
+  review_triggers: string[];
+}
+
+export interface PricingRule {
+  price_rule_id: string;
+  quote_item_template_id: string;
+  item_code?: string;
+  pricing_type: string;
+  unit: string;
+  unit_price?: number;
+  percentage_rate?: number;
+  price_source: PriceSource;
+  confidence: number;
+  requires_review: boolean;
+  review_reason?: string;
+}
+
 export type SpaceCandidate = {
   id: string;
   name: string;
