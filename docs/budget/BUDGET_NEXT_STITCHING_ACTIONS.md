@@ -4,6 +4,53 @@ Updated: `2026-06-15`
 
 Scope: one next action only. This document does not authorize implementation, runtime stitching, harness execution, renderer integration, production quantity, formal estimate, or formal output.
 
+## 0N. Latest BG1 Docs-Only Shared Truth PR Opened State
+
+| Field | Value |
+|---|---|
+| Current BG1 status | `BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME` |
+| PR URL | `https://github.com/laibeoffer/laibe-mvp/pull/104` |
+| PR number | `104` |
+| PR mode | `Draft` |
+| Base branch | `main` |
+| Head branch | `bg1/budget-commander-worktree-20260611` |
+| Initial docs-only commit | `0a4b89429bb2f35194210203607a6023f75fc38a` |
+| Approved file-list packet | `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md` |
+| Files changed in PR | `40` |
+| Runtime implementation performed | `No` |
+| Harness / tests / build / dev server performed | `No` |
+| `src/**` modification performed | `No` |
+| Formal estimate / production quantity performed | `No` |
+| Merge performed | `No` |
+
+Authoritative next single action:
+
+`AWAIT_DOCS_ONLY_SHARED_TRUTH_PR_REVIEW_NO_RUNTIME`
+
+Still do not start:
+
+- merge;
+- runtime implementation;
+- runtime stitching;
+- harness execution;
+- tests / build / dev server;
+- `src/**` modification;
+- `budget-generator.ts` creation or repair;
+- `generateBudgetEstimate` creation;
+- `BudgetEstimateBlockedError` creation;
+- `BudgetEstimateLine` creation or modification;
+- `PricingRule` creation or modification;
+- `preview-floor-plan-adapter.ts` patch;
+- PR `#100` embedded script runtime adapter wiring;
+- production quantity;
+- formal estimate;
+- formal quote / Excel / PDF;
+- Renderer production output;
+- DB / Supabase / API / AI / RAG / payment / LINE / n8n;
+- Issue `#89` harness gate removal.
+
+This section supersedes section `0M` as the current BG1 state.
+
 ## 0M. Latest BG1 Shared Truth File-list Ambiguity Resolution State
 
 | Field | Value |

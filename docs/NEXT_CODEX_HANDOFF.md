@@ -1,5 +1,46 @@
 # NEXT_CODEX_HANDOFF.md
 
+## Latest BG1 Docs-Only Shared Truth PR Opened
+
+- Observed at: `2026-06-15T00:00:00+08:00`.
+- Current BG1 budget status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME`.
+- PR URL: `https://github.com/laibeoffer/laibe-mvp/pull/104`.
+- PR number: `104`.
+- PR mode: Draft.
+- Base branch: `main`.
+- Head branch: `bg1/budget-commander-worktree-20260611`.
+- Initial docs-only commit: `0a4b89429bb2f35194210203607a6023f75fc38a`.
+- Approved file-list packet: `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
+- PR changed files at creation: `40`.
+- Completed:
+  - preflight rerun after ambiguity decision;
+  - approved Must Include docs-only files staged with explicit paths;
+  - no Temporarily Excluded group staged;
+  - no unresolved Needs Reviewer Decision group staged;
+  - no `docs/bg1_budget_commander/**` staged;
+  - no `src/**` staged;
+  - docs-only commit created;
+  - branch pushed;
+  - draft PR opened.
+- Still prohibited:
+  - merge;
+  - runtime stitching;
+  - harness execution;
+  - tests / build / dev server;
+  - production quantity;
+  - formal estimate;
+  - formal quote / Excel / PDF;
+  - Budget Engine execution;
+  - Renderer production output;
+  - PricingRule creation;
+  - BudgetEstimateLine creation;
+  - PR `#100` embedded script runtime adapter wiring;
+  - Issue `#89` harness gate removal;
+  - `src/**` modification;
+  - `preview-floor-plan-adapter.ts` patch;
+  - DB/API/AI/RAG/payment/LINE/n8n.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_DOCS_ONLY_SHARED_TRUTH_PR_REVIEW_NO_RUNTIME`.
+
 ## Latest BG1 Shared Truth File-list Ambiguity Resolution
 
 - Observed at: `2026-06-15T00:00:00+08:00`.
