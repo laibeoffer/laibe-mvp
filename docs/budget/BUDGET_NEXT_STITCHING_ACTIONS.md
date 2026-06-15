@@ -4,32 +4,41 @@ Updated: `2026-06-15`
 
 Scope: one next action only. This document does not authorize implementation, runtime stitching, harness execution, renderer integration, production quantity, formal estimate, or formal output.
 
-## 0N. Latest BG1 Docs-Only Shared Truth PR Opened State
+## 0P. Latest BG1 PR104 Ready For Review State
 
 | Field | Value |
 |---|---|
-| Current BG1 status | `BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME` |
-| PR URL | `https://github.com/laibeoffer/laibe-mvp/pull/104` |
-| PR number | `104` |
-| PR mode | `Draft` |
-| Base branch | `main` |
-| Head branch | `bg1/budget-commander-worktree-20260611` |
-| Initial docs-only commit | `0a4b89429bb2f35194210203607a6023f75fc38a` |
-| Approved file-list packet | `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md` |
-| Files changed in PR | `40` |
+| Commander decision | `AUTHORIZE_MARK_PR104_READY_FOR_REVIEW_NO_MERGE` |
+| Task completed | `BG1_MARK_PR104_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME` |
+| Current BG1 status | `BG1_PR104_MARKED_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME` |
+| PR | `https://github.com/laibeoffer/laibe-mvp/pull/104` |
+| PR state | `open` |
+| PR mode | `Ready for review` |
+| PR draft | `No` |
+| PR mergeable | `Yes` |
+| PR merged | `No` |
+| PR base | `main` |
+| PR head | `bg1/budget-commander-worktree-20260611` |
+| PR head SHA | `83cbb954bd3cd908b4b187f99d3192c14a5944ce` |
+| PR commits | `2` |
+| PR changed files | `40` |
+| Changed files all under `docs/**` | `Yes` |
+| `src/**` changed | `No` |
 | Runtime implementation performed | `No` |
 | Harness / tests / build / dev server performed | `No` |
-| `src/**` modification performed | `No` |
 | Formal estimate / production quantity performed | `No` |
 | Merge performed | `No` |
+| Issue `#89` harness gate removed | `No` |
+| PR `#100` production adapter authority | `No` |
 
 Authoritative next single action:
 
-`AWAIT_DOCS_ONLY_SHARED_TRUTH_PR_REVIEW_NO_RUNTIME`
+`AWAIT_PR104_DOCS_ONLY_REVIEW_NO_RUNTIME`
 
 Still do not start:
 
 - merge;
+- auto-merge;
 - runtime implementation;
 - runtime stitching;
 - harness execution;
@@ -49,7 +58,7 @@ Still do not start:
 - DB / Supabase / API / AI / RAG / payment / LINE / n8n;
 - Issue `#89` harness gate removal.
 
-This section supersedes section `0M` as the current BG1 state.
+This section supersedes section `0O` as the current BG1 state.
 
 ## 0M. Latest BG1 Shared Truth File-list Ambiguity Resolution State
 
@@ -82,9 +91,9 @@ Strictly do not stage:
 - generated non-doc artifacts;
 - unrelated docs.
 
-If PR creation succeeds, the next state is:
+PR creation has already succeeded and PR `#104` is now ready for review:
 
-`BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME`
+`BG1_PR104_MARKED_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME`
 
 If the branch is pushed but PR creation is blocked, the next state is:
 
@@ -216,9 +225,9 @@ Strictly do not stage:
 - generated non-doc artifacts;
 - unrelated docs.
 
-If PR creation succeeds, the next state is:
+PR creation has already succeeded and PR `#104` is now ready for review:
 
-`BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME`
+`BG1_PR104_MARKED_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME`
 
 If the branch is pushed but PR creation is blocked, the next state is:
 

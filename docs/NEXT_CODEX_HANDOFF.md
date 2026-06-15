@@ -1,29 +1,43 @@
 # NEXT_CODEX_HANDOFF.md
 
-## Latest BG1 Docs-Only Shared Truth PR Opened
+## Latest BG1 PR104 Ready For Review
 
 - Observed at: `2026-06-15T00:00:00+08:00`.
-- Current BG1 budget status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME`.
-- PR URL: `https://github.com/laibeoffer/laibe-mvp/pull/104`.
-- PR number: `104`.
-- PR mode: Draft.
-- Base branch: `main`.
-- Head branch: `bg1/budget-commander-worktree-20260611`.
-- Initial docs-only commit: `0a4b89429bb2f35194210203607a6023f75fc38a`.
-- Approved file-list packet: `docs/budget/BG1_SHARED_TRUTH_FILE_LIST_REVIEW_PACKET.md`.
-- PR changed files at creation: `40`.
+- Commander decision: `AUTHORIZE_MARK_PR104_READY_FOR_REVIEW_NO_MERGE`.
+- Task completed: `BG1_MARK_PR104_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME`.
+- Current BG1 budget status: `BG1_PR104_MARKED_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME`.
+- PR: `https://github.com/laibeoffer/laibe-mvp/pull/104`.
+- PR status:
+  - open;
+  - draft: No;
+  - ready for review;
+  - mergeable: Yes;
+  - merged: No;
+  - base `main`;
+  - head `bg1/budget-commander-worktree-20260611`;
+  - head SHA `83cbb954bd3cd908b4b187f99d3192c14a5944ce`;
+  - 2 commits;
+  - 40 changed files;
+  - docs-only;
+  - not merged.
 - Completed:
-  - preflight rerun after ambiguity decision;
-  - approved Must Include docs-only files staged with explicit paths;
-  - no Temporarily Excluded group staged;
-  - no unresolved Needs Reviewer Decision group staged;
-  - no `docs/bg1_budget_commander/**` staged;
-  - no `src/**` staged;
-  - docs-only commit created;
-  - branch pushed;
-  - draft PR opened.
+  - preflight confirmed PR `#104` open/draft before transition;
+  - preflight confirmed changed files all under `docs/**`;
+  - preflight confirmed no `src/**` diff;
+  - preflight confirmed no staged files;
+  - PR `#104` marked ready for review using GitHub connector.
+- Not performed:
+  - no merge;
+  - no auto-merge;
+  - no runtime implementation;
+  - no harness / tests / build / dev server;
+  - no formal estimate;
+  - no production quantity.
 - Still prohibited:
-  - merge;
+  - merge until separately authorized;
+  - no runtime authorized;
+  - no harness authorized;
+  - no `src/**` modification;
   - runtime stitching;
   - harness execution;
   - tests / build / dev server;
@@ -39,7 +53,7 @@
   - `src/**` modification;
   - `preview-floor-plan-adapter.ts` patch;
   - DB/API/AI/RAG/payment/LINE/n8n.
-- NEXT_BG1_TASK_DEMAND: `AWAIT_DOCS_ONLY_SHARED_TRUTH_PR_REVIEW_NO_RUNTIME`.
+- NEXT_BG1_TASK_DEMAND: `AWAIT_PR104_DOCS_ONLY_REVIEW_NO_RUNTIME`.
 
 ## Latest BG1 Shared Truth File-list Ambiguity Resolution
 
@@ -165,7 +179,7 @@
   - `src/**` modification;
   - `preview-floor-plan-adapter.ts` patch;
   - DB/API/AI/RAG/payment/LINE/n8n.
-- If PR creation succeeds, next status: `BG1_DOCS_ONLY_SHARED_TRUTH_PR_OPENED_NO_RUNTIME`.
+- PR creation has already succeeded and PR `#104` is now ready for review: `BG1_PR104_MARKED_READY_FOR_REVIEW_NO_MERGE_NO_RUNTIME`.
 - If branch push succeeds but PR creation is blocked, next status: `BG1_DOCS_ONLY_SHARED_TRUTH_BRANCH_PUSHED_READY_FOR_MANUAL_PR_NO_RUNTIME`.
 - If commit succeeds but push is blocked, next status: `BG1_DOCS_ONLY_SHARED_TRUTH_COMMIT_READY_PUSH_BLOCKED_NO_RUNTIME`.
 
