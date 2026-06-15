@@ -12,19 +12,19 @@ const internalTraceTerms = [
 const unsafeWarningFallback =
   "Some budget warnings were omitted because they were not customer-safe.";
 
-const containsInternalTraceTerm = (value) =>
+const containsInternalTraceTerm = (value: string): boolean =>
   internalTraceTerms.some((term) =>
     value.toLowerCase().includes(term.toLowerCase()),
   );
 
-export const sanitizeCustomerWarnings = (warnings) => {
+export const sanitizeCustomerWarnings = (warnings: unknown): string[] => {
   if (!Array.isArray(warnings)) {
     return warnings === null || warnings === undefined
       ? []
       : [unsafeWarningFallback];
   }
 
-  const sanitized = warnings.map((warning) => {
+  const sanitized = warnings.map((warning: unknown): string => {
     if (typeof warning !== "string") {
       return unsafeWarningFallback;
     }
