@@ -1,423 +1,603 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>LaiBE - Step 3：預算生成系統</title>
-    <link rel="icon" href="../../../assets/logo/laibe_header.png" />
-    <link rel="apple-touch-icon" href="../../../assets/logo/laibe_header.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "owner-primary": "#AD5A5A",
-                        "owner-deep": "#8C4747",
-                        "owner-soft": "#F7EEEE",
-                        "charcoal": "#1F1F1F",
-                        "surface": "#111214",
-                        "surface-2": "#17191D",
-                        "surface-3": "#1F2228",
-                        "warm-bg": "#F9F8F6",
-                        "soft-line": "#E8E2DB"
-                    },
-                    fontFamily: {
-                        display: ["Inter", "Noto Sans", "sans-serif"]
-                    },
-                    boxShadow: {
-                        soft: "0 4px 20px rgba(0,0,0,0.04)",
-                        softlg: "0 12px 40px rgba(0,0,0,0.08)"
-                    }
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', "Noto Sans", sans-serif;
-            background: #F9F8F6;
-            color: #1F1F1F;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE - 預算草稿預覽</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #ded8d1;
+      --paper: #fffdfa;
+      --bg: #f8f6f2;
+      --brand: #ad5a5a;
+      --brand-deep: #8c4747;
+      --safe: #1f7a5b;
+      --warn: #a15c00;
+      --disabled: #f0f1f3;
+    }
 
-        /* 隱藏預設捲軸，保持畫面乾淨 */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #E8E2DB;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #d4cdc4;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        .data-row:hover {
-            background-color: #F7EEEE;
-        }
-    </style>
+    body {
+      margin: 0;
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 253, 250, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 12px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--brand);
+      color: white;
+      font-size: 13px;
+    }
+
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .step {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+    }
+
+    .step.active {
+      color: var(--brand-deep);
+      border-color: rgba(173, 90, 90, 0.35);
+      background: #f8eeee;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn,
+    .disabled-btn {
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .btn.primary {
+      color: white;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .disabled-btn {
+      color: #6b7280;
+      background: var(--disabled);
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    main {
+      padding: 34px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr);
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .panel,
+    .notice,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(31, 35, 40, 0.05);
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .eyebrow {
+      color: var(--brand-deep);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .lead {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .notice {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .notice.warning {
+      background: #fff7ed;
+      border-color: #fed7aa;
+      color: #7c2d12;
+    }
+
+    .notice.safe {
+      background: #ecfdf5;
+      border-color: #bbf7d0;
+      color: #064e3b;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .metric {
+      padding: 18px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .metric-value {
+      margin-top: 8px;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .metric-note {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .table-card {
+      overflow: hidden;
+    }
+
+    .table-head {
+      padding: 18px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .scroll-note {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th,
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid #ece7e0;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #475467;
+      background: #fbfaf8;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    td {
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #f2f4f7;
+      color: #475467;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .mobile-list {
+      display: none;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    .mobile-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 14px;
+    }
+
+    .mobile-row dl {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 8px 12px;
+      margin: 0;
+    }
+
+    .mobile-row dt {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .mobile-row dd {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .side-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .side-list div {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .steps {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .btn,
+      .disabled-btn {
+        width: 100%;
+      }
+
+      .hero,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 24px, 1180px);
+      }
+
+      main {
+        padding-top: 22px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .table-wrap {
+        display: none;
+      }
+
+      .mobile-list {
+        display: grid;
+      }
+
+      .table-head {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <div>
+        <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="回到 LaiBE 首頁">
+          <span class="brand-mark">LB</span>
+          <span>LaiBE</span>
+        </a>
+      </div>
+      <nav class="steps" aria-label="預算流程">
+        <a class="step" href="../onboard_ai_agent/code.html">1 需求草稿</a>
+        <a class="step" href="../preview_floor_plan/code.html">2 平面草稿</a>
+        <span class="step active">3 預算草稿</span>
+        <a class="step" href="../client_step_4_budget_finalization/code.html">4 人工確認</a>
+        <span class="step" aria-disabled="true">招標 candidate disabled</span>
+      </nav>
+      <div class="header-actions">
+        <button class="disabled-btn" type="button" disabled aria-disabled="true" data-budget-action="quote-export-disabled" title="disabled dry-run preview, no quote file, no Excel, no PDF">
+          報價單預覽停用 / dry-run only
+        </button>
+        <a class="btn primary" href="../client_step_4_budget_finalization/code.html">前往人工確認</a>
+      </div>
+    </div>
+  </header>
 
-<body class="min-h-screen bg-warm-bg text-charcoal flex flex-col">
-
-    <!-- Header 包含上方流程列與操作按鈕 -->
-    <header class="sticky top-0 z-50 bg-white border-b border-soft-line shadow-sm">
-        <div class="max-w-[1440px] mx-auto px-6 h-[72px] md:h-20 flex items-center justify-between">
-            
-            <!-- Logo & Flow -->
-            <div class="flex items-center gap-10">
-                <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-                    <img src="../../../assets/logo/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
-                </a>
-
-                <!-- 流程步進器 -->
-                <div class="hidden md:flex items-center gap-3 text-sm font-bold">
-                    <div class="flex items-center gap-2 text-charcoal/40">
-                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">1</span>
-                        <span>需求表單 / 引導官頁</span>
-                    </div>
-                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
-                    <div class="flex items-center gap-2 text-charcoal/40">
-                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">2</span>
-                        <span>平面拼圖</span>
-                    </div>
-                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
-                    <div class="flex items-center gap-2 text-owner-primary bg-owner-soft px-3 py-1.5 rounded-full">
-                        <span class="w-6 h-6 rounded-full bg-owner-primary text-white flex items-center justify-center text-xs">3</span>
-                        <span>預算生成</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右側操作按鈕 -->
-            <div class="flex items-center gap-4">
-                <button class="px-5 py-2.5 rounded-lg border border-soft-line text-sm font-bold text-charcoal hover:bg-black/5 transition flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    匯出報價單
-                </button>
-                <a href="../client_step_4_budget_finalization/code.html" class="px-6 py-2.5 rounded-lg bg-owner-primary text-white text-sm font-bold hover:bg-owner-deep transition shadow-soft flex items-center gap-2">完成並預覽
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
-            </div>
+  <main class="shell">
+    <section class="hero">
+      <div class="panel">
+        <div class="eyebrow">Budget candidate preview</div>
+        <h1>Step 3 預算草稿預覽</h1>
+        <p class="lead">
+          這是給屋主檢查方向的 mock 預覽，不會輸出 PDF、Excel 或可簽核報價單。所有金額都必須經人工複核後才可進入下一步。
+        </p>
+      </div>
+      <aside class="notice warning" aria-label="dry-run 邊界提醒">
+        <span aria-hidden="true">!</span>
+        <div>
+          <strong>可簽核輸出停用</strong>
+          <p class="lead">PDF 預覽停用 / mock only；不啟動 Budget Engine，不建立 PricingRule 或 BudgetEstimateLine，不連 DB、付款、AI API、LINE 或 n8n。</p>
         </div>
-    </header>
+      </aside>
+    </section>
 
-    <main class="flex-1 max-w-[1440px] w-full mx-auto px-6 py-8">
-        
-        <div class="mb-8">
-            <h1 class="text-3xl font-black tracking-tight text-charcoal">Step 3：預算生成系統</h1>
-            <p class="text-charcoal/60 mt-2 font-medium">系統已根據您的需求討論與平面拼圖結果，自動生成以下初版預算規劃。</p>
+    <section class="summary-grid" aria-label="預算摘要">
+      <div class="card metric">
+        <div class="metric-label">草稿總額</div>
+        <div class="metric-value">NT$ 1,850,000</div>
+        <div class="metric-note">mock only，人工複核前不可作為報價。</div>
+      </div>
+      <div class="card metric">
+        <div class="metric-label">人工檢查項</div>
+        <div class="metric-value">7</div>
+        <div class="metric-note">材料、數量、工序與備註需逐項確認。</div>
+      </div>
+      <div class="card metric">
+        <div class="metric-label">AI 提示狀態</div>
+        <div class="metric-value">建議參考</div>
+        <div class="metric-note">AI 只提供風險提示，不作裁決。</div>
+      </div>
+    </section>
+
+    <section class="notice safe">
+      <span aria-hidden="true">i</span>
+      <div>
+        <strong>A-G 欄位已用人工可讀標籤呈現</strong>
+        <p class="lead">桌機顯示完整表格；手機改為逐筆卡片，避免項次、品名、單位、數量、單價、金額、備註被藏住。</p>
+      </div>
+    </section>
+
+    <section class="card table-card" aria-label="預算 A-G 草稿表">
+      <div class="table-head">
+        <div>
+          <h2>預算明細 A-G 欄位</h2>
+          <p class="lead">所有列皆為 dry-run candidate，需人工 review。</p>
         </div>
+        <div class="scroll-note">桌機表格可水平捲動；手機下方卡片完整顯示 A-G。</div>
+      </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- 左側主區：報告摘要 + 詳細表格 -->
-            <div class="lg:col-span-8 xl:col-span-9 space-y-6">
-                
-                <!-- 三個摘要卡 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- 預估總價 -->
-                    <div class="bg-white rounded-2xl p-6 border border-soft-line shadow-soft relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-owner-primary"></div>
-                        <div class="text-xs font-bold text-charcoal/50 tracking-wider mb-2">預估總價</div>
-                        <div class="text-3xl font-black text-charcoal tracking-tight">NT$ 1,850,000</div>
-                        <div class="mt-3 flex items-center gap-1.5 text-xs font-medium text-charcoal/50 cursor-pointer hover:text-owner-primary transition">
-                            <span class="material-symbols-outlined text-[14px]">info</span>
-                            <span>查看計算邏輯與公式基準</span>
-                        </div>
-                    </div>
+      <div class="table-wrap" tabindex="0" aria-label="可水平捲動的 A-G 預算表">
+        <table>
+          <thead>
+            <tr>
+              <th>A 項次</th>
+              <th>B 品名</th>
+              <th>C 單位</th>
+              <th class="num">D 數量</th>
+              <th class="num">E 單價</th>
+              <th class="num">F 金額</th>
+              <th>G 備註</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1.1</td>
+              <td>拆除與保護工程</td>
+              <td>式</td>
+              <td class="num">1</td>
+              <td class="num">85,000</td>
+              <td class="num">85,000</td>
+              <td><span class="tag">需現場丈量</span></td>
+            </tr>
+            <tr>
+              <td>2.1</td>
+              <td>泥作與防水基礎</td>
+              <td>坪</td>
+              <td class="num">12</td>
+              <td class="num">9,800</td>
+              <td class="num">117,600</td>
+              <td><span class="tag">需人工確認材料等級</span></td>
+            </tr>
+            <tr>
+              <td>3.1</td>
+              <td>木作櫃體草稿</td>
+              <td>尺</td>
+              <td class="num">22</td>
+              <td class="num">6,500</td>
+              <td class="num">143,000</td>
+              <td><span class="tag">mock 單價，禁止當報價</span></td>
+            </tr>
+            <tr>
+              <td>4.1</td>
+              <td>水電調整候選項</td>
+              <td>式</td>
+              <td class="num">1</td>
+              <td class="num">120,000</td>
+              <td class="num">120,000</td>
+              <td><span class="tag">需技師或廠商複核</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-                    <!-- 每坪均價 -->
-                    <div class="bg-white rounded-2xl p-6 border border-soft-line shadow-soft relative overflow-hidden">
-                        <div class="text-xs font-bold text-charcoal/50 tracking-wider mb-2">每坪均價</div>
-                        <div class="flex items-baseline gap-1">
-                            <div class="text-3xl font-black text-charcoal tracking-tight">92,500</div>
-                            <div class="text-sm font-bold text-charcoal/40">元/坪</div>
-                        </div>
-                        <div class="mt-3 text-xs font-medium text-charcoal/50 bg-charcoal/5 inline-flex px-2 py-1 rounded">
-                            以室內實坪 20 坪計算
-                        </div>
-                    </div>
+      <div class="mobile-list" aria-label="手機版 A-G 預算卡片">
+        <article class="mobile-row">
+          <dl>
+            <dt>A 項次</dt><dd>1.1</dd>
+            <dt>B 品名</dt><dd>拆除與保護工程</dd>
+            <dt>C 單位</dt><dd>式</dd>
+            <dt>D 數量</dt><dd>1</dd>
+            <dt>E 單價</dt><dd>NT$ 85,000</dd>
+            <dt>F 金額</dt><dd>NT$ 85,000</dd>
+            <dt>G 備註</dt><dd>需現場丈量</dd>
+          </dl>
+        </article>
+        <article class="mobile-row">
+          <dl>
+            <dt>A 項次</dt><dd>2.1</dd>
+            <dt>B 品名</dt><dd>泥作與防水基礎</dd>
+            <dt>C 單位</dt><dd>坪</dd>
+            <dt>D 數量</dt><dd>12</dd>
+            <dt>E 單價</dt><dd>NT$ 9,800</dd>
+            <dt>F 金額</dt><dd>NT$ 117,600</dd>
+            <dt>G 備註</dt><dd>需人工確認材料等級</dd>
+          </dl>
+        </article>
+      </div>
+    </section>
 
-                    <!-- AI 建議 -->
-                    <div class="bg-owner-soft rounded-2xl p-6 border border-owner-primary/20 shadow-soft relative overflow-hidden flex flex-col justify-center">
-                        <div class="flex items-center gap-2 text-xs font-bold text-owner-primary tracking-wider mb-2">
-                            <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-                            <span>AI 快速健檢</span>
-                        </div>
-                        <div class="text-sm font-bold text-owner-deep leading-relaxed">
-                            預算分配合理。但因屬中古屋，建議預留 10-15% 作為管線與防水修繕之預備金。
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 詳細預算清單表格 -->
-                <div class="bg-white rounded-2xl border border-soft-line shadow-soft overflow-hidden">
-                    <div class="px-6 py-5 border-b border-soft-line flex items-center justify-between bg-white">
-                        <div>
-                            <h2 class="text-lg font-black text-charcoal flex items-center gap-2">
-                                詳細預算清單
-                                <span class="material-symbols-outlined text-charcoal/30 text-[18px] cursor-help" title="由系統自動帶出，不可於此處點擊編輯">lock</span>
-                            </h2>
-                            <p class="text-xs font-bold text-owner-primary mt-1 bg-owner-primary/10 inline-flex px-2 py-0.5 rounded">
-                                💡 價格僅供參考，實際以後續結果與承攬合約為準
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-warm-bg border-b border-soft-line text-charcoal/60 font-bold uppercase tracking-wider text-xs">
-                                <tr>
-                                    <th class="px-6 py-4">工項名稱</th>
-                                    <th class="px-6 py-4 w-24 text-right">數量</th>
-                                    <th class="px-6 py-4 w-24 text-center">單位</th>
-                                    <th class="px-6 py-4 w-32 text-right">單價預估</th>
-                                    <th class="px-6 py-4 w-32 text-right">小計</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-soft-line text-charcoal font-medium">
-                                <!-- Row 1 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#FFB347]"></span>
-                                            廚房天花板拆除
-                                            <span class="material-symbols-outlined text-charcoal/30 text-[14px] hover:text-owner-primary" title="來自拆除工程邏輯">data_info_alert</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">3.5</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">2,500</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">8,750</td>
-                                </tr>
-                                <!-- Row 2 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#4A90E2]"></span>
-                                            全室電線更新
-                                            <span class="material-symbols-outlined text-charcoal/30 text-[14px] hover:text-owner-primary" title="來自水電工程邏輯">data_info_alert</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">1</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">式</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">120,000</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">120,000</td>
-                                </tr>
-                                <!-- Row 3 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#8B572A]"></span>
-                                            平頂天花板 (防潮石膏板)
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">18</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">5,000</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">90,000</td>
-                                </tr>
-                                <!-- Row 4 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#7ED321]"></span>
-                                            全室乳膠漆 (含批土)
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">55</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">1,800</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">99,000</td>
-                                </tr>
-                                <!-- Row 5 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#D0021B]"></span>
-                                            超耐磨木地板 (直鋪)
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">15</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">4,500</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">67,500</td>
-                                </tr>
-                                <!-- Row 6 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#9013FE]"></span>
-                                            電視牆（300cm 系統櫃）
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">10</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">尺</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">6,500</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">65,000</td>
-                                </tr>
-                                <!-- 省略部分項目... -->
-                                <tr class="bg-black/5">
-                                    <td colspan="5" class="px-6 py-3 text-center text-xs text-charcoal/40 font-bold">
-                                        其他 32 項工項已由系統自動折疊隱藏
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot class="bg-warm-bg border-t-2 border-charcoal/10">
-                                <tr>
-                                    <td colspan="3" class="px-6 py-4 text-right font-bold text-charcoal/60">總計 (含監工管理費及稅金估算)</td>
-                                    <td colspan="2" class="px-6 py-4 text-right font-black text-xl text-owner-primary tabular-nums">NT$ 1,850,000</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- 右側側欄：圖表與 AI 僚機 -->
-            <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-6">
-                
-                <!-- 佔比圖表卡片 -->
-                <div class="bg-white rounded-2xl p-6 border border-soft-line shadow-soft">
-                    <h3 class="text-sm font-bold text-charcoal tracking-wider uppercase mb-5 flex items-center justify-between">
-                        預算佔比分析
-                        <span class="material-symbols-outlined text-charcoal/30 text-[18px]">pie_chart</span>
-                    </h3>
-                    
-                    <div class="relative h-[220px] w-full flex items-center justify-center mb-4">
-                        <canvas id="budgetDonutChart"></canvas>
-                    </div>
-
-                    <div class="space-y-3 mt-6">
-                        <!-- Legend Manually Added for custom styling -->
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#8B572A]"></div><span class="font-medium text-charcoal">木作工程</span></div>
-                            <span class="font-bold text-charcoal/60">35%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#4A90E2]"></div><span class="font-medium text-charcoal">水電工程</span></div>
-                            <span class="font-bold text-charcoal/60">20%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#9013FE]"></div><span class="font-medium text-charcoal">系統櫃體</span></div>
-                            <span class="font-bold text-charcoal/60">15%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#D0021B]"></div><span class="font-medium text-charcoal">地坪工程</span></div>
-                            <span class="font-bold text-charcoal/60">12%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#FFB347]"></div><span class="font-medium text-charcoal">拆除泥作</span></div>
-                            <span class="font-bold text-charcoal/60">10%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#7ED321]"></div><span class="font-medium text-charcoal">油漆工程</span></div>
-                            <span class="font-bold text-charcoal/60">8%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI 導引助理 提示卡 -->
-                <div class="bg-surface text-white rounded-2xl p-6 shadow-softlg relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-white/5">
-                        <span class="material-symbols-outlined text-[120px]">psychiatry</span>
-                    </div>
-                    
-                    <div class="relative z-10">
-                        <div class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[16px] text-owner-primary">smart_toy</span>
-                            AI 導引助理
-                        </div>
-                        
-                        <h3 class="text-lg font-black mb-3 leading-snug">
-                            中古屋翻新，請防範隱藏成本與漏項風險。
-                        </h3>
-                        
-                        <div class="space-y-4 mb-6">
-                            <div class="bg-white/10 rounded-xl p-3 border border-white/5">
-                                <div class="flex items-start gap-2 text-sm text-white/80 font-medium leading-relaxed">
-                                    <span class="material-symbols-outlined text-owner-primary text-[18px] shrink-0 mt-0.5">warning</span>
-                                    <span>根據您的需求分析，目前<b>未包含</b>「鋁窗更新」費用。若遇滲漏水情況，將是被迫追加的高風險項目。</span>
-                                </div>
-                            </div>
-                            <div class="bg-white/10 rounded-xl p-3 border border-white/5">
-                                <div class="flex items-start gap-2 text-sm text-white/80 font-medium leading-relaxed">
-                                    <span class="material-symbols-outlined text-[#4A90E2] text-[18px] shrink-0 mt-0.5">water_drop</span>
-                                    <span>「全室電線更新」與「冷熱水管重拉」已匡列於水電工程中，這是必要的基礎建設投資，系統已將其鎖定確保不被漏算。</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-xs text-white/40 border-t border-white/10 pt-4 font-medium">
-                            本面板為系統單向風險警示，以確保使用者能做出知情同意的決策。
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+    <section class="hero" style="margin-top: 22px;">
+      <div class="panel">
+        <h2>人工確認前不可輸出</h2>
+        <p class="lead">報價、PDF 預覽、Excel、標單與付款相關功能都停用。此頁只讓屋主知道預算結構與需要補充的資訊。</p>
+      </div>
+      <div class="panel">
+        <h2>下一步</h2>
+        <p class="lead">進入 Step 4 後仍是人工 review，不會啟動招標或付款。</p>
+        <div style="margin-top: 16px;">
+          <a class="btn primary" href="../client_step_4_budget_finalization/code.html">前往 Step 4 人工確認</a>
         </div>
-    </main>
-
-    <script>
-        // 初始化 Donut Chart
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('budgetDonutChart').getContext('2d');
-            
-            // 對應 Categories: 拆除泥作, 水電, 木作, 油漆, 地板, 系統
-            const data = {
-                labels: ['拆除泥作', '水電工程', '木作工程', '油漆工程', '地坪工程', '系統櫃體'],
-                datasets: [{
-                    data: [10, 20, 35, 8, 12, 15],
-                    backgroundColor: [
-                        '#FFB347', // 拆除泥作
-                        '#4A90E2', // 水電
-                        '#8B572A', // 木作
-                        '#7ED321', // 油漆
-                        '#D0021B', // 地坪
-                        '#9013FE'  // 系統櫃
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            };
-
-            const config = {
-                type: 'doughnut',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: {
-                            display: false // Hide default legend as we built a custom one
-                        },
-                        tooltip: {
-                            backgroundColor: '#111214',
-                            titleFont: { family: 'Inter', size: 13 },
-                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: true,
-                            boxPadding: 4
-                        }
-                    }
-                }
-            };
-
-            new Chart(ctx, config);
-        });
-    </script>
+      </div>
+    </section>
+  </main>
 </body>
-
 </html>
-

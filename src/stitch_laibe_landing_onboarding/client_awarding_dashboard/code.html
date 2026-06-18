@@ -54,9 +54,9 @@
                     <span>LaiBE</span>
                 </div>
                 <div class="flex items-center gap-6">
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">建立新專案</a>
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">我的案件</a>
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">申請
+                    <a href="../client_awarding_dashboard/code.html?route_state=candidate_static_mock" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal" title="candidate static mock / not production">建立新專案</a>
+                    <a href="../client_awarding_dashboard/code.html?route_state=candidate_static_mock#cases" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal" title="candidate static mock / not production">我的案件</a>
+                    <a href="../project_timeline_and_governance/code.html?entry=dashboard_nav_pcm_candidate" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal" title="AI PCM candidate static mock / no formal PCM request">申請
                         PCM</a>
                     <div
                         class="w-10 h-10 rounded-full bg-terracotta-red/10 flex items-center justify-center text-terracotta-red">
@@ -67,7 +67,13 @@
         </div>
     </header>
 
-    <main class="flex-grow">
+    <main class="flex-grow" data-boundary="candidate-static-mock-not-production">
+
+        <section class="bg-amber-50 border-b border-amber-200 text-amber-900" aria-label="Candidate route boundary">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm sm:text-base font-black leading-relaxed">
+                候選靜態 Mock 預覽 / NOT PRODUCTION: 這不是正式招標系統，不會發布案件、不會收款、不會通知廠商、不會決標或進入工程。所有案件與狀態都是 placeholder。
+            </div>
+        </section>
 
         <!-- HERO -->
         <section class="py-16 lg:py-20 bg-white border-b border-black/5">
@@ -86,14 +92,14 @@
                             先做平面拼圖，系統會自動生成裝修預算。
                         </p>
                         <button
-                            class="bg-terracotta-red text-white px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:opacity-90 transition">
+                            class="bg-terracotta-red text-white px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:opacity-90 transition cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: no formal project creation or tender publish">
                             建立新專案
                         </button>
                     </div>
 
                     <div class="bg-warm-beige rounded-3xl shadow-soft p-8">
                         <div class="text-sm text-charcoal/50 font-bold mb-2">流程提示</div>
-                        <div class="text-2xl font-black mb-6">從規劃到決標</div>
+                        <div class="text-2xl font-black mb-6">候選流程預覽</div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-white rounded-2xl p-4 text-center">
                                 <div
@@ -121,7 +127,7 @@
                                     class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                                     <span class="material-symbols-outlined">groups</span>
                                 </div>
-                                <div class="font-black">4 廠商投標</div>
+                                <div class="font-black">4 廠商回覆預覽</div>
                             </div>
                             <div class="bg-white rounded-2xl p-4 text-center">
                                 <div
@@ -135,7 +141,7 @@
                                     class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                                     <span class="material-symbols-outlined">task_alt</span>
                                 </div>
-                                <div class="font-black">6 決標</div>
+                                <div class="font-black">6 決標未開放</div>
                             </div>
                         </div>
                     </div>
@@ -148,7 +154,7 @@
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-10">
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">建立案件</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">工具優先，先開始規劃，再走向正式發案。</p>
+                    <p class="text-lg text-charcoal/70 font-medium">工具優先，這裡只展示候選流程；不會建立正式發案或招標。</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -162,7 +168,7 @@
                             拖放家具生成平面配置。
                         </p>
                         <button
-                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
+                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: no real floor-plan tool launch">
                             開始拼圖
                         </button>
                     </div>
@@ -177,7 +183,7 @@
                             系統依據需求生成預算。
                         </p>
                         <button
-                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
+                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: no formal budget or quote generation">
                             生成預算
                         </button>
                     </div>
@@ -187,25 +193,29 @@
                             class="w-16 h-16 rounded-2xl bg-terracotta-red/10 text-terracotta-red flex items-center justify-center mb-6">
                             <span class="material-symbols-outlined text-[34px]">publish</span>
                         </div>
-                        <h3 class="text-2xl font-black mb-4">發布招標</h3>
+                        <h3 class="text-2xl font-black mb-4">招標發布預覽未開放</h3>
                         <p class="text-charcoal/75 text-lg leading-relaxed mb-8 font-medium">
-                            上架案件讓廠商投標。
+                            只展示「案件上架」會長什麼樣；不會發布案件、收取上架費或讓廠商送出正式投標。
                         </p>
                         <button
-                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
-                            發布案件
+                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: no formal tender publish">
+                            發布案件未開放 - preview only
                         </button>
+                        <p class="mt-3 text-sm font-bold text-terracotta-red">Disabled reason: candidate static mock, no payment, no tender publish, no vendor notification.</p>
+                        <a href="../tender_setting/code.html?entry=client_dashboard_candidate"
+                            class="inline-flex mt-5 text-sm font-black text-terracotta-red underline underline-offset-4"
+                            title="candidate static mock only: no formal tender submit">查看招標設定 candidate</a>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 我的專案 -->
-        <section class="py-20 bg-white border-y border-black/5">
+        <section class="py-20 bg-white border-y border-black/5" id="cases">
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-10">
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">我的裝修案件</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">查看目前規劃中、招標中與施工中的案件。</p>
+                    <p class="text-lg text-charcoal/70 font-medium">查看 candidate/mock 狀態；不代表已招標、已決標或正在工程中。</p>
                 </div>
 
                 <div class="overflow-hidden rounded-3xl border border-black/5 shadow-soft bg-white">
@@ -213,7 +223,7 @@
                         <div>專案名稱</div>
                         <div>預算</div>
                         <div>案件狀態</div>
-                        <div>投標數</div>
+                        <div>回覆預覽數</div>
                     </div>
 
                     <div class="grid grid-cols-4 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
@@ -240,8 +250,8 @@
                     <div class="grid grid-cols-4 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
                         <div>辦公室整修</div>
                         <div>NT$ 950,000</div>
-                        <div>施工</div>
-                        <div>已決標</div>
+                        <div>工程未開始 - mock</div>
+                        <div>決標未開放</div>
                     </div>
                 </div>
             </div>
@@ -252,7 +262,7 @@
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-10">
                     <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">規劃工具</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">在正式發案之前，先用工具把需求整理清楚。</p>
+                    <p class="text-lg text-charcoal/70 font-medium">先用工具把需求整理清楚；此頁不會建立正式發案。</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -302,13 +312,17 @@
                             需要專業審查嗎？
                         </h2>
                         <p class="text-lg text-white/85 max-w-2xl font-medium">
-                            場勘後的追加報價與施工文件，可由 PCM 進行審查。
+                            PCM 這裡只顯示候選審查入口；不作法律裁決、不作決標決定，也不會呼叫 AI API 或 LINE API。
                         </p>
                     </div>
                     <button
-                        class="bg-white text-terracotta-red px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:scale-[1.02] transition-all">
-                        申請 PCM
+                        class="bg-white text-terracotta-red px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:scale-[1.02] transition-all cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: no formal PCM request">
+                        PCM 候選審查未開放
                     </button>
+                    <a href="../project_timeline_and_governance/code.html?entry=client_dashboard_pcm_candidate"
+                        class="bg-white/10 text-white px-8 py-4 rounded-xl font-black text-lg border border-white/35"
+                        title="AI PCM candidate static mock only: no legal decision, no award decision, no AI API">查看 AI PCM candidate</a>
+                    <p class="text-sm font-bold text-white/80 max-w-xs">Disabled reason: no AI API, no LINE API, no legal decision, no award decision.</p>
                 </div>
             </div>
         </section>
@@ -326,8 +340,8 @@
                 © 2026 LaiBE Inc. All rights reserved.
             </div>
             <div class="flex gap-6 text-sm text-white/50">
-                <a href="#" class="hover:text-white transition-colors">服務條款</a>
-                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+                <span class="cursor-not-allowed" aria-disabled="true" data-mock-only="true" title="candidate static mock footer placeholder">服務條款</span>
+                <span class="cursor-not-allowed" aria-disabled="true" data-mock-only="true" title="candidate static mock footer placeholder">隱私權政策</span>
             </div>
         </div>
     </footer>

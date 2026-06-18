@@ -362,6 +362,69 @@
       gap: 10px;
     }
 
+    .mobile-canvas-shortcuts {
+      display: none;
+      border: 1px solid rgba(121,216,255,.24);
+      border-radius: 18px;
+      padding: 12px 14px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--text-soft);
+      background:
+        linear-gradient(135deg, rgba(121,216,255,.12), rgba(98,230,200,.055)),
+        rgba(0,0,0,.24);
+      font-size: 12px;
+      font-weight: 820;
+      line-height: 1.5;
+    }
+
+    .mobile-canvas-shortcuts .mobile-canvas-jump {
+      min-height: 40px;
+      border: 1px solid rgba(121,216,255,.36);
+      border-radius: 999px;
+      padding: 0 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--text-main);
+      background: rgba(121,216,255,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14);
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .mobile-canvas-shortcuts .material-symbols-outlined {
+      font-size: 19px;
+    }
+
+    .mobile-tool-index {
+      display: none;
+      border: 1px solid rgba(98,230,200,.24);
+      border-radius: 16px;
+      padding: 10px;
+      gap: 8px;
+      background: rgba(98,230,200,.07);
+    }
+
+    .mobile-tool-index a {
+      min-height: 34px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 0 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      background: rgba(255,255,255,.055);
+      font-size: 11px;
+      font-weight: 950;
+      text-decoration: none;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
     .glass-btn,
     .orange-btn,
     .tool-chip,
@@ -624,6 +687,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 14px;
       background: rgba(0,0,0,.18);
     }
@@ -653,6 +717,22 @@
       color: #fff;
       border-color: rgba(98,230,200,.42);
       background: rgba(98,230,200,.13);
+    }
+
+    .toolbar-boundary-note {
+      flex: 1 0 100%;
+      border: 1px solid rgba(240, 198, 110, .24);
+      border-radius: 14px;
+      padding: 9px 12px;
+      color: var(--text-soft);
+      background: rgba(240, 198, 110, .08);
+      font-size: 12px;
+      font-weight: 820;
+      line-height: 1.5;
+    }
+
+    .toolbar-boundary-note strong {
+      color: var(--warning);
     }
 
     .visually-hidden {
@@ -989,6 +1069,27 @@
       fill: rgba(240,198,110,.1);
       stroke: rgba(240,198,110,.72);
       stroke-dasharray: 8 7;
+    }
+
+    .zone-boundary-polygon.is-invalid {
+      fill: rgba(255,126,112,.11);
+      stroke: rgba(255,126,112,.78);
+      stroke-dasharray: 5 6;
+    }
+
+    .zone-area-label {
+      fill: #f7fbff;
+      stroke: rgba(5,7,10,.82);
+      stroke-width: 4px;
+      paint-order: stroke fill;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+      pointer-events: none;
+    }
+
+    .zone-area-label.is-invalid {
+      fill: var(--danger);
     }
 
     .zone-boundary-edge {
@@ -1747,11 +1848,38 @@
       }
 
       .progress-banner {
-        overflow-x: auto;
+        overflow-x: visible;
       }
 
       .progress-inner {
-        min-width: 560px;
+        height: auto;
+        min-height: 56px;
+        min-width: 0;
+        padding: 8px 14px;
+        flex-wrap: wrap;
+        align-content: center;
+        white-space: normal;
+      }
+
+      .progress-inner > span {
+        display: none;
+      }
+
+      .step-pill {
+        flex: 1 1 112px;
+        min-width: 0;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 10px;
+        overflow-wrap: anywhere;
+        font-size: 12px;
+        line-height: 1.2;
+      }
+
+      .step-num {
+        flex: 0 0 18px;
+        width: 18px;
+        height: 18px;
       }
 
       .page-intro,
@@ -1761,6 +1889,22 @@
 
       .intro-actions {
         justify-content: flex-start;
+      }
+
+      .mobile-canvas-shortcuts {
+        display: flex;
+      }
+
+      .canvas-shell {
+        order: 1;
+      }
+
+      .panel:not(.inspector) {
+        order: 2;
+      }
+
+      .inspector {
+        order: 3;
       }
 
       .panel,
@@ -1792,14 +1936,133 @@
         border-radius: 22px;
       }
 
+      .mobile-canvas-shortcuts {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px;
+      }
+
+      .mobile-canvas-shortcuts .mobile-canvas-jump {
+        width: 100%;
+        white-space: normal;
+      }
+
+      .mobile-tool-index {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .panel-body {
+        padding: 12px;
+        gap: 10px;
+      }
+
+      .tool-group h2 {
+        margin-bottom: 8px;
+        font-size: 10px;
+      }
+
       .tool-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .tool-card {
+        min-height: 82px;
+        padding: 9px;
+        overflow-wrap: anywhere;
+      }
+
+      .tool-card .material-symbols-outlined {
+        font-size: 22px;
+      }
+
+      .tool-card strong {
+        margin-top: 4px;
+        font-size: 12px;
+      }
+
+      .tool-card span:last-child {
+        font-size: 10px;
+        line-height: 1.25;
+      }
+
+      .tool-status {
+        margin-top: 6px !important;
+      }
+
+      .tool-control-panel {
+        margin-top: 8px;
+        padding: 10px;
+        gap: 9px;
       }
 
       .canvas-toolbar,
       .canvas-footer {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .canvas {
+        min-height: 420px;
+        scroll-margin-top: 180px;
+      }
+    }
+
+    .candidate-banner {
+      position: sticky;
+      top: 132px;
+      z-index: 44;
+      border-bottom: 1px solid rgba(240, 198, 110, .28);
+      background:
+        linear-gradient(135deg, rgba(240, 198, 110, .18), rgba(121, 216, 255, .08)),
+        rgba(5, 7, 10, .92);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .22);
+    }
+
+    .candidate-banner-inner {
+      width: min(calc(100% - 32px), var(--section-max));
+      min-height: 58px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--text-soft);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .candidate-banner strong {
+      color: var(--text-main);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .candidate-banner span {
+      color: var(--warning);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 820px) {
+      .candidate-banner {
+        top: 126px;
+      }
+
+      .candidate-banner-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+        padding: 12px 0;
+      }
+
+      .candidate-banner strong,
+      .candidate-banner span {
+        white-space: normal;
       }
     }
   </style>
@@ -1818,8 +2081,8 @@
           <div class="tool-menu" aria-label="工具選單">
             <a href="./code.html"><span>平面拼圖</span><small>current</small></a>
             <a href="../preview_budget/code.html"><span>預算生成</span><small>next</small></a>
-            <a href="https://apps.apple.com/tw/search?term=LiDAR%20Scanner" target="_blank" rel="noreferrer"><span>LiDAR 下載鏈接</span><small>app</small></a>
-            <a href="https://apps.apple.com/tw/search?term=iScanner" target="_blank" rel="noreferrer"><span>iScanner 鏈接</span><small>app</small></a>
+            <a href="https://apps.apple.com/tw/search?term=LiDAR%20Scanner" target="_blank" rel="noreferrer"><span>LiDAR App 參考</span><small>app</small></a>
+            <a href="https://apps.apple.com/tw/search?term=iScanner" target="_blank" rel="noreferrer"><span>iScanner App 參考</span><small>app</small></a>
           </div>
         </div>
         <a href="../laibe_landing_desktop/code.html#flow">流程</a>
@@ -1846,6 +2109,14 @@
     </div>
   </div>
 
+  <section class="candidate-banner" aria-label="Plan Puzzle candidate safety boundary">
+    <div class="candidate-banner-inner">
+      <strong>Plan Puzzle candidate / not production</strong>
+      <div>No formal estimate / no Plancraft core production / no Budget Engine / no PricingRule / no BudgetEstimateLine.</div>
+      <span>mock only</span>
+    </div>
+  </section>
+
   <main class="workspace">
     <section class="page-intro">
       <div>
@@ -1864,6 +2135,14 @@
       </div>
     </section>
 
+    <div class="mobile-canvas-shortcuts" aria-label="Mobile Plan Puzzle mock navigation helper">
+      <span class="mobile-canvas-jump" role="note">
+        <span class="material-symbols-outlined" aria-hidden="true">grid_view</span>
+        Canvas guide / plan area below
+      </span>
+      <span>Mock-only shortcut. Tools continue below; no formal estimate, no Budget Engine, no .pc export.</span>
+    </div>
+
     <section class="tool-shell" aria-label="平面拼圖工作區">
       <aside class="panel" aria-label="左側工具區">
         <div class="panel-head">
@@ -1871,7 +2150,14 @@
           <div class="panel-title">Plancraft+ 流程</div>
         </div>
         <div class="panel-body">
-          <div class="tool-group">
+          <nav class="mobile-tool-index" aria-label="Mobile Plan Puzzle tool index">
+            <a href="#plan-tools-import">Import</a>
+            <a href="#plan-tools-wall">Wall</a>
+            <a href="#plan-tools-opening">Opening</a>
+            <a href="#plan-tools-zone">Zone</a>
+          </nav>
+
+          <div class="tool-group" id="plan-tools-import">
             <h2>匯入與校正</h2>
             <div class="tool-grid">
               <button class="tool-card is-active" type="button" data-action="choose-file">
@@ -1889,7 +2175,7 @@
             </div>
           </div>
 
-          <div class="tool-group">
+          <div class="tool-group" id="plan-tools-wall">
             <h2>牆體工具</h2>
             <div class="tool-grid">
               <button class="tool-card is-active" type="button" data-action="set-select-mode" data-mode-button="select">
@@ -1941,7 +2227,7 @@
             </div>
           </div>
 
-          <div class="tool-group">
+          <div class="tool-group" id="plan-tools-opening">
             <h2>門窗工具</h2>
             <div class="tool-grid">
               <button class="tool-card is-active" type="button" data-action="add-opening" data-opening-kind="door">
@@ -1984,7 +2270,7 @@
             </div>
           </div>
 
-          <div class="tool-group">
+          <div class="tool-group" id="plan-tools-zone">
             <h2>空間標籤</h2>
             <div class="tool-grid">
               <button class="tool-card is-active" type="button" data-action="start-place-zone" data-mode-button="place-zone">
@@ -2036,11 +2322,11 @@
                 <span>家具與設備配置</span>
                 <span class="tool-status">後續階段</span>
               </button>
-              <button class="tool-card is-active" type="button" data-action="export-pc-spike">
+              <button class="tool-card is-waiting" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="Candidate mock preview only; no Plancraft core production">
                 <span class="material-symbols-outlined" aria-hidden="true">account_tree</span>
-                <strong>Plancraft .pc 測試版</strong>
-                <span>由 zone boundary 產生 .pc Spike</span>
-                <span class="tool-status">Renderer preview spike</span>
+                <strong>.pc mock preview</strong>
+                <span>只顯示 renderer preview 狀態；不進 Plancraft core production</span>
+                <span class="tool-status">candidate only</span>
               </button>
             </div>
           </div>
@@ -2091,13 +2377,13 @@
               <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>
               重置
             </button>
-            <button class="toolbar-btn" type="button" data-action="export-draft">
-              <span class="material-symbols-outlined" aria-hidden="true">download</span>
-              匯出 Plancraft+ 草稿
+            <button class="toolbar-btn" type="button" disabled data-mock-only="true" data-action="export-draft" title="Candidate mock only; no formal estimate, no Budget Engine">
+              <span class="material-symbols-outlined" aria-hidden="true">visibility_off</span>
+              草稿預覽停用 / mock only
             </button>
-            <button class="toolbar-btn" type="button" data-action="export-pc-spike">
-              <span class="material-symbols-outlined" aria-hidden="true">file_download</span>
-              匯出 Plancraft .pc 測試版
+            <button class="toolbar-btn" type="button" disabled data-mock-only="true" data-action="export-pc-spike" title="Candidate mock only; no Plancraft core production">
+              <span class="material-symbols-outlined" aria-hidden="true">block</span>
+              .pc 預覽停用 / no production
             </button>
           </div>
           <div class="toolbar-right" aria-label="畫布狀態">
@@ -2106,6 +2392,10 @@
             <span class="tool-chip">Zone Label</span>
             <span class="tool-chip">Zone Boundary</span>
             <span class="tool-chip">Renderer Preview</span>
+          </div>
+          <div class="toolbar-boundary-note" aria-label="Export-like controls safety boundary">
+            <strong>Export-like controls disabled.</strong>
+            Candidate mock only / no formal estimate / no Budget Engine / no Plancraft core production.
           </div>
         </div>
 
@@ -2124,8 +2414,8 @@
         </div>
 
         <div class="canvas-footer">
-          <span><strong>Plancraft+</strong> 可將空間標籤連到 nodeGraph edges，建立人工指定的 zone boundary。</span>
-          <span>Plancraft Bridge Renderer Preview Spike</span>
+          <span><strong>Plan Puzzle candidate</strong> 只把空間標籤連到 nodeGraph edges，供人工檢視 zone boundary。</span>
+          <span>No formal estimate / no Budget Engine / no Plancraft core production</span>
         </div>
       </section>
 
@@ -2153,12 +2443,12 @@
 
           <div class="static-note">
             <strong>Bridge</strong>
-            Plancraft Bridge：已建立 .pc 測試版與 renderer preview 本機驗證流程；靜態頁不直接執行 renderer。
+            Plan Puzzle candidate：僅保留 renderer preview 樣式；靜態頁不執行 Plancraft core production、不啟動 Budget Engine，也不產生正式估算。
           </div>
         </div>
       </aside>
     </section>
   </main>
-  <script src="./plan-puzzle.js?v=minimal-server-runtime-spike" defer></script>
+  <script src="./plan-puzzle.js?v=export-boundary-guard-20260609" defer></script>
 </body>
 </html>
