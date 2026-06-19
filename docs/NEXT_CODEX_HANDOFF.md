@@ -1527,6 +1527,37 @@
 - Regression baseline remains: total amount `231103`, budget line count `12`, review-required line count `5`.
 - 下一步建議：若繼續 MethodSpec，應另開 formal Issue 做 P2 validator planning 或 clean worktree / file ownership proof；不得從本文件直接進 formal price、renderer、raw warehouse publishing 或 schema expansion。
 
+## Latest Plan-Puzzle Task: Plancraft+ Zone Area / Boundary Refinement
+
+- 2026-05-26 heartbeat follow-up：已針對 PR #25 Codex P2 `discussion_r3303088652` 修正 collinear self-overlap 判斷。
+- `hasPolygonSelfIntersection()` 現在會先檢查非相鄰邊段是否在同一直線上形成重疊，包含 retraced edge / non-adjacent collinear overlap；這類 malformed closed boundary 會被視為 self-intersection，不會輸出候選面積。
+- 本次 P2 fix 仍維持 candidate-only zone area；沒有修改 Plancraft core、budget adapter/runtime/type、formal quantity、formal estimate、renderer、payment、AI/API 或 secrets。
+- 2026-05-25 heartbeat follow-up：已針對 PR #25 Codex P2 `discussion_r3299302339` 修正 polygon self-intersection 判斷。
+- `hasPolygonSelfIntersection()` 現在會把非相鄰邊段的任何交點都視為 self-intersection，包含 T-junction / endpoint-on-edge 這類 malformed boundary；避免 malformed closed zone 被計算候選面積。
+- 本次 P2 fix 仍維持 candidate-only zone area；沒有修改 Plancraft core、budget adapter/runtime/type、formal quantity、formal estimate、renderer、payment、AI/API 或 secrets。
+- 2026-05-25 heartbeat follow-up：已針對 PR #25 最新 Codex P2 修正 `areaUpdatedAt` 與 invalid closed polygon 行為。
+- `areaUpdatedAt` 現在只在 boundary geometry 或 area metadata signature 實際改變時更新；單純 `render()` / `syncZoneBoundaryMetadata()` 不再刷新時間戳，避免 draft export nondeterministic churn。
+- closed 但 invalid 的 polygon 現在仍保留 `polygon` geometry，讓 canvas 可用 invalid styling 顯示並方便使用者修正，不會因 `boundaryStatus: "invalid"` 被清成空陣列。
+- 本次 follow-up 仍只碰 Issue #15 allowed files；不修改 Plancraft core、budget adapter/runtime/type、formal estimate、renderer、payment、AI/API 或 secrets。
+- 本輪任務名稱：Plancraft+ Zone Area / Boundary Refinement。
+- 任務來源：黑板 dispatch 與 GitHub Issue #15 `Plancraft+ Zone Area / Boundary Refinement`。
+- 修改檔案：
+  - `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+  - `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+  - `docs/NEXT_CODEX_HANDOFF.md`
+- 新增檔案：無。
+- `project.version` 已升級為 `0.11.0-zone-area-boundary-refinement`。
+- zone boundary 仍維持人工選邊，不做自動 room closure、不做自動排序複雜邊界、不修改 wall / opening / nodeGraph。
+- 已新增 zone area candidate metadata：`areaSqMm`、`areaM2`、`areaPing`、`areaSource`、`areaStatus`、`areaConfidence`、`areaProductionReady`、`areaAuthority`、`reviewerRequired`、`reviewerReasons`、`areaUpdatedAt`。
+- 當 zone boundary 為 `closed` 且 polygon 有效時，用 shoelace formula 由 mm polygon 計算候選面積；換算 `m²` 與 `坪`，`areaSource` 固定為 `spike_polygon_estimate`。
+- 當 boundary 未封閉、無效、edge 缺失或點數不足時，不計算正式面積，`areaStatus` 會標示 `not_calculated` / `open_boundary` / `invalid`，並保留 reviewer reasons。
+- `areaProductionReady` 永遠是 `false`；本輪沒有讓任何 zone area 進入正式 budget quantity，也沒有修改 budget adapter、budget types、`generateBudgetEstimate()`、Excel / PDF、renderer 或 payment / AI / API。
+- 右側 zone inspector 會顯示候選面積狀態、`m² / 坪`、area source、confidence 與 `productionReady: false`，並提示 area 只作候選估算、不作正式估價。
+- Plancraft+ 草稿 JSON export 會包含最新 zone boundary 與候選 area metadata。
+- 驗收：`node --check src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js` 通過。
+- 已知限制：候選面積只支援已形成 closed polygon 的 zone；未做 production-grade area approval、precision policy gate、adapter production mapping 或 formal estimate。
+- 下一步建議：Production Quantity Fact Contract 或 Zone Area Review Gate，仍需保持 candidate-only，不可直接進正式估價。
+
 ## Latest Governance Task: Strategic Plan Imported / Dispatch Source Clarified
 
 - 本輪任務名稱：Strategic Plan Imported / Dispatch Source Clarified。

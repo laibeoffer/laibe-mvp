@@ -27,6 +27,14 @@
   };
   const DEFAULT_ZONE_TYPE = "living";
   const ZONE_BOUNDARY_MIN_EDGES = 3;
+  const ZONE_AREA_SQMM_PER_SQM = 1000000;
+  const ZONE_AREA_SQM_PER_PING = 3.305785;
+  const ZONE_AREA_SOURCE = "spike_polygon_estimate";
+  const ZONE_AREA_AUTHORITY = "plancraft_plus_zone_area_candidate";
+  const ZONE_AREA_CONFIDENCE_VALID = 0.7;
+  const ZONE_AREA_CONFIDENCE_WARNING = 0.4;
+  const ZONE_AREA_CONFIDENCE_SELF_INTERSECTION = 0.2;
+  const ZONE_AREA_CONFIDENCE_INVALID = 0;
   const ZONE_TYPE_LABELS = {
     living: "客廳",
     bedroom: "臥室",
@@ -151,7 +159,7 @@
     return {
       name: "LaiBE Plancraft+ 草稿",
       product: "Plancraft+",
-      version: "0.10.0-renderer-preview-spike",
+      version: "0.11.0-zone-area-boundary-refinement",
       unit: "mm",
       importSource: null,
       scale: {
@@ -401,6 +409,12 @@
     }
     if (action === "clear-zone-boundary") {
       clearSelectedZoneBoundary();
+    }
+    if (action === "recalculate-zone-area") {
+      recalculateSelectedZoneArea();
+    }
+    if (action === "clear-zone-area") {
+      clearSelectedZoneArea();
     }
     if (action === "clean-wall-endpoints") {
       cleanWallEndpoints();
@@ -1894,8 +1908,12 @@
       if (!isActiveBoundaryZone && Array.isArray(zone.polygon) && zone.polygon.length >= 3) {
         renderZonePolygon(zone.polygon, {
           selected: zone.id === uiState.selectedZoneId,
-          open: zone.boundaryStatus !== "closed"
+          open: zone.boundaryStatus !== "closed",
+          invalid: zone.boundaryStatus === "invalid" || zone.areaStatus === "invalid"
         });
+        if (zone.id === uiState.selectedZoneId) {
+          renderZoneAreaLabel(zone);
+        }
       }
 
       if (zone.id === uiState.selectedZoneId && uiState.mode !== "edit-zone-boundary") {
@@ -1913,7 +1931,8 @@
         renderZonePolygon(draft.previewPolygon, {
           selected: true,
           preview: true,
-          open: hasBoundaryIssueType(draft.issues, "zone-boundary-open")
+          open: hasBoundaryIssueType(draft.issues, "zone-boundary-open"),
+          invalid: hasBoundaryIssueType(draft.issues, "zone-polygon-invalid") || hasBoundaryIssueType(draft.issues, "zone-polygon-self-intersection")
         });
       }
     }
@@ -1923,13 +1942,34 @@
     const polygon = document.createElementNS(SVG_NS, "polygon");
     polygon.setAttribute(
       "class",
-      `zone-boundary-polygon${options.selected ? " is-selected" : ""}${options.open ? " is-open" : ""}${options.preview ? " is-preview" : ""}`
+      `zone-boundary-polygon${options.selected ? " is-selected" : ""}${options.open ? " is-open" : ""}${options.invalid ? " is-invalid" : ""}${options.preview ? " is-preview" : ""}`
     );
     polygon.setAttribute("points", points.map((point) => {
       const px = mmToPxPoint(point);
       return `${px.x},${px.y}`;
     }).join(" "));
     zonePolygonLayer.appendChild(polygon);
+  }
+
+  function renderZoneAreaLabel(zone) {
+    if (!Array.isArray(zone.polygon) || zone.polygon.length < ZONE_BOUNDARY_MIN_EDGES) {
+      return;
+    }
+    const center = getPolygonCentroid(zone.polygon);
+    if (!center) {
+      return;
+    }
+    const px = mmToPxPoint(center);
+    const label = document.createElementNS(SVG_NS, "text");
+    label.setAttribute("class", `zone-area-label${zone.areaStatus === "invalid" ? " is-invalid" : ""}`);
+    label.setAttribute("x", String(px.x));
+    label.setAttribute("y", String(px.y));
+    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("dominant-baseline", "middle");
+    label.textContent = zone.areaStatus === "estimated"
+      ? getZoneAreaReadout(zone)
+      : getZoneAreaStatusLabel(zone.areaStatus);
+    zonePolygonLayer.appendChild(label);
   }
 
   function renderBoundaryEdgeHighlights(edgeIds, className) {
@@ -2529,6 +2569,8 @@
     const boundaryIssueText = boundaryIssues.length
       ? `<div class="issue-list">${boundaryIssues.map(renderZoneBoundaryIssue).join("")}</div>`
       : `<div class="inline-message">目前沒有 zone boundary issue。</div>`;
+    const areaReadout = getZoneAreaReadout(zone);
+    const areaReviewNote = renderZoneAreaReviewNote(zone);
     return `
       <form class="inspector-form" aria-label="空間標籤屬性表單">
         <div class="status-card">
@@ -2540,7 +2582,12 @@
             <div class="status-row"><span>boundaryWallIds</span><span>${zone.boundaryWallIds.length}</span></div>
             <div class="status-row"><span>polygon 點數</span><span>${(isEditingBoundary ? displayDraft.previewPolygon : zone.polygon).length}</span></div>
             <div class="status-row"><span>boundary 狀態</span><span>${escapeHTML(boundaryStatusText)}</span></div>
-            <div class="status-row"><span>area</span><span>${zone.area === null ? "尚未計算" : `${formatNumber(zone.area)} mm²`}</span></div>
+            <div class="status-row"><span>area status</span><span>${escapeHTML(getZoneAreaStatusLabel(zone.areaStatus))}</span></div>
+            <div class="status-row"><span>area</span><span>${escapeHTML(areaReadout)}</span></div>
+            <div class="status-row"><span>area source</span><span>${escapeHTML(zone.areaSource || "-")}</span></div>
+            <div class="status-row"><span>area confidence</span><span>${escapeHTML(getZoneAreaConfidenceLabel(zone))}</span></div>
+            <div class="status-row"><span>productionReady</span><span>${zone.areaProductionReady ? "true" : "false"}</span></div>
+            <div class="status-row"><span>reviewerRequired</span><span>${zone.reviewerRequired ? "true" : "false"}</span></div>
             <div class="status-row"><span>updatedAt</span><span>${escapeHTML(zone.updatedAt)}</span></div>
           </div>
         </div>
@@ -2565,7 +2612,8 @@
           </div>
         </div>
         <div class="project-readout">
-          Zone labelPosition 與 boundary polygon 都使用 mm 座標；area 本輪仍維持 null。
+          Zone labelPosition、boundary polygon 與 candidate area 都使用 mm 基準；area 只做候選估算，不作正式估價。
+          ${areaReviewNote}
         </div>
         <div class="status-card">
           <b>Zone Boundary</b>
@@ -2579,6 +2627,8 @@
             <button class="secondary-btn" type="button" data-action="start-zone-boundary">編輯邊界</button>
             <button class="toolbar-btn primary" type="button" data-action="apply-zone-boundary" ${isEditingBoundary ? "" : "disabled"}>套用邊界</button>
             <button class="secondary-btn" type="button" data-action="clear-zone-boundary">清除邊界</button>
+            <button class="secondary-btn" type="button" data-action="recalculate-zone-area">重算面積</button>
+            <button class="secondary-btn" type="button" data-action="clear-zone-area">清除面積</button>
           </div>
           ${boundaryIssueText}
         </div>
@@ -3017,9 +3067,9 @@
 
   function renderZoneBoundaryIssue(issue) {
     return `
-      <div class="issue-button" role="status">
+      <div class="issue-button ${issue.severity === "error" ? "is-active" : ""}" role="status">
         <strong>${escapeHTML(getZoneBoundaryIssueLabel(issue.type))}</strong>
-        ${escapeHTML(issue.message)}
+        ${escapeHTML(issue.message)} (${escapeHTML(issue.code || issue.type)} / ${escapeHTML(issue.severity || "warning")})
       </div>
     `;
   }
@@ -3668,6 +3718,17 @@
       boundaryWallIds: [],
       polygon: [],
       area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: ["zone-boundary-empty", "zone-area-candidate-only"],
+      areaUpdatedAt: null,
       boundaryStatus: boundaryDraft.status,
       boundaryIssues: boundaryDraft.issues,
       createdAt: now,
@@ -3834,12 +3895,89 @@
     render();
   }
 
+  function recalculateSelectedZoneArea() {
+    const zone = getSelectedZone();
+    if (!zone) {
+      uiState.error = "請先選取一個空間標籤。";
+      render();
+      return;
+    }
+    ensureZoneBoundaryFields(zone);
+    const draft = createZoneBoundaryDraft(zone.boundaryEdgeIds || []);
+    applyBoundaryDraftToZone(zone, draft, true);
+    uiState.error = "";
+    uiState.message = draft.status === "closed"
+      ? "已重算候選面積；此面積仍需人工確認，不能進正式估價。"
+      : "已重算邊界狀態；目前無法形成正式候選面積。";
+    syncBridge();
+    render();
+  }
+
+  function clearSelectedZoneArea() {
+    const zone = getSelectedZone();
+    if (!zone) {
+      uiState.error = "請先選取一個空間標籤。";
+      render();
+      return;
+    }
+    ensureZoneBoundaryFields(zone);
+    Object.assign(zone, createClearedZoneAreaMetadata(), {
+      updatedAt: new Date().toISOString()
+    });
+    uiState.error = "";
+    uiState.message = "已清除候選面積；boundary 資料保留。";
+    syncBridge();
+    render();
+  }
+
+  function createClearedZoneAreaMetadata() {
+    return {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: ["zone-area-cleared", "zone-area-candidate-only"],
+      areaUpdatedAt: new Date().toISOString()
+    };
+  }
+
   function syncZoneBoundaryMetadata() {
     project.zones.forEach((zone) => {
       ensureZoneBoundaryFields(zone);
+      const clearedAreaMetadata = getClearedZoneAreaMetadata(zone);
       const draft = createZoneBoundaryDraft(zone.boundaryEdgeIds || []);
       applyBoundaryDraftToZone(zone, draft, false);
+      if (clearedAreaMetadata) {
+        Object.assign(zone, clearedAreaMetadata);
+      }
     });
+  }
+
+  function getClearedZoneAreaMetadata(zone) {
+    const reviewerReasons = Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : [];
+    if (zone.areaStatus !== "not_calculated" || !reviewerReasons.includes("zone-area-cleared")) {
+      return null;
+    }
+    return {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: uniqueIds([...reviewerReasons, "zone-area-candidate-only"]),
+      areaUpdatedAt: zone.areaUpdatedAt || null
+    };
   }
 
   function ensureZoneBoundaryFields(zone) {
@@ -3861,18 +3999,200 @@
     if (!Object.prototype.hasOwnProperty.call(zone, "area")) {
       zone.area = null;
     }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaSqMm")) {
+      zone.areaSqMm = Number.isFinite(Number(zone.area)) ? Number(zone.area) : null;
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaM2")) {
+      zone.areaM2 = null;
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaPing")) {
+      zone.areaPing = null;
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaSource")) {
+      zone.areaSource = null;
+    }
+    if (!zone.areaStatus) {
+      zone.areaStatus = "not_calculated";
+    }
+    if (!Number.isFinite(Number(zone.areaConfidence))) {
+      zone.areaConfidence = ZONE_AREA_CONFIDENCE_INVALID;
+    }
+    zone.areaProductionReady = false;
+    if (!zone.areaAuthority) {
+      zone.areaAuthority = ZONE_AREA_AUTHORITY;
+    }
+    if (typeof zone.reviewerRequired !== "boolean") {
+      zone.reviewerRequired = true;
+    }
+    if (!Array.isArray(zone.reviewerReasons)) {
+      zone.reviewerReasons = ["zone-area-candidate-only"];
+    }
+    if (!Object.prototype.hasOwnProperty.call(zone, "areaUpdatedAt")) {
+      zone.areaUpdatedAt = null;
+    }
   }
 
   function applyBoundaryDraftToZone(zone, draft, updateTimestamp) {
+    const previousAreaUpdateSignature = getZoneAreaUpdateSignature(zone);
     zone.boundaryEdgeIds = [...draft.edgeIds];
     zone.boundaryWallIds = [...draft.boundaryWallIds];
     zone.polygon = draft.polygon.map((point) => ({ ...point }));
     zone.boundaryStatus = draft.status;
     zone.boundaryIssues = draft.issues.map((issue) => ({ ...issue }));
-    zone.area = null;
+    applyZoneAreaMetadata(zone, draft, previousAreaUpdateSignature);
     if (updateTimestamp) {
       zone.updatedAt = new Date().toISOString();
     }
+  }
+
+  function applyZoneAreaMetadata(zone, draft, previousAreaUpdateSignature) {
+    const metadata = buildZoneAreaMetadata(draft);
+    const nextAreaUpdateSignature = getZoneAreaUpdateSignature({ ...zone, ...metadata });
+    metadata.areaUpdatedAt = previousAreaUpdateSignature === nextAreaUpdateSignature
+      ? zone.areaUpdatedAt || null
+      : new Date().toISOString();
+    Object.assign(zone, metadata);
+  }
+
+  function getZoneAreaUpdateSignature(zone) {
+    return JSON.stringify({
+      boundaryEdgeIds: Array.isArray(zone.boundaryEdgeIds) ? zone.boundaryEdgeIds : [],
+      boundaryWallIds: Array.isArray(zone.boundaryWallIds) ? zone.boundaryWallIds : [],
+      polygon: Array.isArray(zone.polygon) ? zone.polygon : [],
+      area: zone.area ?? null,
+      areaSqMm: zone.areaSqMm ?? null,
+      areaM2: zone.areaM2 ?? null,
+      areaPing: zone.areaPing ?? null,
+      areaSource: zone.areaSource ?? null,
+      areaStatus: zone.areaStatus || "not_calculated",
+      areaConfidence: Number.isFinite(Number(zone.areaConfidence)) ? Number(zone.areaConfidence) : ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: zone.areaAuthority || ZONE_AREA_AUTHORITY,
+      reviewerRequired: zone.reviewerRequired !== false,
+      reviewerReasons: Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : []
+    });
+  }
+
+  function buildZoneAreaMetadata(draft) {
+    const polygon = Array.isArray(draft?.polygon) ? draft.polygon : [];
+    const issues = Array.isArray(draft?.issues) ? draft.issues : [];
+    const reviewerReasons = ["zone-area-candidate-only"];
+    const base = {
+      area: null,
+      areaSqMm: null,
+      areaM2: null,
+      areaPing: null,
+      areaSource: null,
+      areaStatus: "not_calculated",
+      areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons,
+      areaUpdatedAt: null
+    };
+
+    if (draft?.status !== "closed") {
+      const statusReason = draft?.status === "invalid" ? "zone-boundary-invalid" : "zone-boundary-not-closed";
+      const areaStatus = draft?.status === "none"
+        ? "not_calculated"
+        : draft?.status === "invalid"
+          ? "invalid"
+          : "open_boundary";
+      return {
+        ...base,
+        areaStatus,
+        areaConfidence: ZONE_AREA_CONFIDENCE_INVALID,
+        reviewerReasons: uniqueIds([...reviewerReasons, statusReason, ...issues.map((issue) => issue.type)])
+      };
+    }
+
+    if (polygon.length < ZONE_BOUNDARY_MIN_EDGES) {
+      return {
+        ...base,
+        areaStatus: "invalid",
+        areaConfidence: getZoneAreaConfidenceFromIssues(issues, false),
+        reviewerReasons: uniqueIds([...reviewerReasons, "zone-boundary-polygon-invalid"])
+      };
+    }
+
+    const areaSqMm = calculatePolygonAreaSqMm(polygon);
+    if (!Number.isFinite(areaSqMm) || areaSqMm <= 0) {
+      return {
+        ...base,
+        areaStatus: "invalid",
+        areaConfidence: getZoneAreaConfidenceFromIssues(issues, false),
+        reviewerReasons: uniqueIds([...reviewerReasons, "zone-boundary-area-invalid"])
+      };
+    }
+
+    const roundedAreaSqMm = Math.round(areaSqMm);
+    const areaM2 = roundDecimal(roundedAreaSqMm / ZONE_AREA_SQMM_PER_SQM, 4);
+    const areaPing = roundDecimal(areaM2 / ZONE_AREA_SQM_PER_PING, 4);
+    return {
+      area: roundedAreaSqMm,
+      areaSqMm: roundedAreaSqMm,
+      areaM2,
+      areaPing,
+      areaSource: ZONE_AREA_SOURCE,
+      areaStatus: "estimated",
+      areaConfidence: getZoneAreaConfidenceFromIssues(issues, true),
+      areaProductionReady: false,
+      areaAuthority: ZONE_AREA_AUTHORITY,
+      reviewerRequired: true,
+      reviewerReasons: uniqueIds([...reviewerReasons, ...getZoneAreaReviewerReasonsFromIssues(issues)]),
+      areaUpdatedAt: null
+    };
+  }
+
+  function getZoneAreaConfidenceFromIssues(issues, hasValidArea) {
+    if (!hasValidArea) {
+      return hasBoundaryIssueType(issues, "zone-polygon-self-intersection")
+        ? ZONE_AREA_CONFIDENCE_SELF_INTERSECTION
+        : ZONE_AREA_CONFIDENCE_INVALID;
+    }
+    const warningTypes = new Set((issues || []).map((issue) => issue.type));
+    if (warningTypes.has("zone-polygon-self-intersection")) {
+      return ZONE_AREA_CONFIDENCE_SELF_INTERSECTION;
+    }
+    if (warningTypes.size > 0) {
+      return ZONE_AREA_CONFIDENCE_WARNING;
+    }
+    return ZONE_AREA_CONFIDENCE_VALID;
+  }
+
+  function getZoneAreaReviewerReasonsFromIssues(issues) {
+    return (issues || []).map((issue) => issue.type).filter(Boolean);
+  }
+
+  function calculatePolygonAreaSqMm(polygon) {
+    if (!Array.isArray(polygon) || polygon.length < ZONE_BOUNDARY_MIN_EDGES) {
+      return 0;
+    }
+    let sum = 0;
+    for (let index = 0; index < polygon.length; index += 1) {
+      const current = polygon[index];
+      const next = polygon[(index + 1) % polygon.length];
+      if (!isPointLike(current) || !isPointLike(next)) {
+        return 0;
+      }
+      sum += current.x * next.y - next.x * current.y;
+    }
+    return Math.abs(sum) / 2;
+  }
+
+  function getPolygonCentroid(polygon) {
+    if (!Array.isArray(polygon) || polygon.length === 0) {
+      return null;
+    }
+    const total = polygon.reduce((accumulator, point) => ({
+      x: accumulator.x + point.x,
+      y: accumulator.y + point.y
+    }), { x: 0, y: 0 });
+    return roundPoint({
+      x: total.x / polygon.length,
+      y: total.y / polygon.length
+    });
   }
 
   function createZoneBoundaryDraft(edgeIds) {
@@ -3886,6 +4206,7 @@
     const polygonResult = buildBoundaryPolygonFromOrderedEdges(validEdges);
     const boundaryWallIds = uniqueIds(validEdges.map((edge) => edge.sourceWallId));
     const issues = [];
+    const polygonPoints = polygonResult.closed ? polygonResult.polygon : polygonResult.points || [];
 
     if (normalizedEdgeIds.length === 0) {
       issues.push(createZoneBoundaryIssue("zone-boundary-empty", normalizedEdgeIds, "此 zone 尚未指定 boundary edges。"));
@@ -3900,6 +4221,7 @@
       issues.push(createZoneBoundaryIssue("zone-boundary-open", normalizedEdgeIds, "目前邊界尚未形成封閉空間。"));
     }
 
+    enhanceZoneBoundaryIssues(normalizedEdgeIds, missingEdgeIds, polygonResult, polygonPoints, issues);
     const status = getBoundaryStatusFromIssues(normalizedEdgeIds, issues, polygonResult.closed);
     return {
       edgeIds: normalizedEdgeIds,
@@ -3913,7 +4235,7 @@
 
   function buildBoundaryPolygonFromOrderedEdges(edges) {
     if (!edges.length) {
-      return { closed: false, polygon: [] };
+      return { closed: false, polygon: [], points: [] };
     }
 
     const points = [roundPoint(edges[0].from), roundPoint(edges[0].to)];
@@ -3928,21 +4250,111 @@
         points.push(roundPoint(edge.from));
         continue;
       }
-      return { closed: false, polygon: [] };
+      return { closed: false, polygon: [], points: points.map(roundPoint) };
     }
 
     const closed = points.length >= 4 && isSamePoint(points[0], points[points.length - 1]);
     return {
       closed,
-      polygon: closed ? points.slice(0, -1).map(roundPoint) : []
+      polygon: closed ? points.slice(0, -1).map(roundPoint) : [],
+      points: points.map(roundPoint)
     };
   }
 
-  function createZoneBoundaryIssue(type, edgeIds, message) {
+  function enhanceZoneBoundaryIssues(edgeIds, missingEdgeIds, polygonResult, polygonPoints, issues) {
+    if (edgeIds.length >= ZONE_BOUNDARY_MIN_EDGES && missingEdgeIds.length === 0 && !polygonResult.closed) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-boundary-unordered", edgeIds, "Boundary edges may be unordered or disconnected"));
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-area-not-calculated", edgeIds, "Area was not calculated because the boundary is open"));
+    }
+    if (polygonResult.closed && polygonPoints.length < ZONE_BOUNDARY_MIN_EDGES) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-invalid", edgeIds, "Polygon needs at least 3 points", "error"));
+    }
+    if (polygonResult.closed && hasDuplicateConsecutivePoints(polygonPoints)) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-invalid", edgeIds, "Polygon has duplicate consecutive points", "error"));
+    }
+    if (polygonResult.closed && polygonPoints.length >= ZONE_BOUNDARY_MIN_EDGES && calculatePolygonAreaSqMm(polygonPoints) <= 0) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-invalid", edgeIds, "Polygon area is zero or invalid", "error"));
+    }
+    if (polygonResult.closed && hasPolygonSelfIntersection(polygonPoints)) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-polygon-self-intersection", edgeIds, "Polygon has a self-intersection and needs review", "error"));
+    }
+    if (polygonResult.closed && issues.length > 0) {
+      pushUniqueZoneBoundaryIssue(issues, createZoneBoundaryIssue("zone-area-needs-review", edgeIds, "Area candidate requires review before budget use"));
+    }
+  }
+
+  function pushUniqueZoneBoundaryIssue(issues, issue) {
+    if (!issues.some((item) => item.type === issue.type && item.id === issue.id)) {
+      issues.push(issue);
+    }
+  }
+
+  function hasDuplicateConsecutivePoints(points) {
+    return (points || []).some((point, index) => index > 0 && isSamePoint(point, points[index - 1]));
+  }
+
+  function hasPolygonSelfIntersection(points) {
+    if (!Array.isArray(points) || points.length < 4) {
+      return false;
+    }
+    const segments = points.map((point, index) => ({
+      from: point,
+      to: points[(index + 1) % points.length]
+    }));
+    for (let firstIndex = 0; firstIndex < segments.length; firstIndex += 1) {
+      for (let secondIndex = firstIndex + 1; secondIndex < segments.length; secondIndex += 1) {
+        const adjacent = Math.abs(firstIndex - secondIndex) === 1 || (firstIndex === 0 && secondIndex === segments.length - 1);
+        if (adjacent) {
+          continue;
+        }
+        if (doCollinearSegmentsOverlap(segments[firstIndex], segments[secondIndex])) {
+          return true;
+        }
+        const intersection = getSegmentIntersection(segments[firstIndex], segments[secondIndex]);
+        if (intersection) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function doCollinearSegmentsOverlap(firstSegment, secondSegment) {
+    if (getDistance(firstSegment.from, firstSegment.to) <= GEOMETRY_EPSILON || getDistance(secondSegment.from, secondSegment.to) <= GEOMETRY_EPSILON) {
+      return false;
+    }
+    const firstVector = {
+      x: firstSegment.to.x - firstSegment.from.x,
+      y: firstSegment.to.y - firstSegment.from.y
+    };
+    const secondVector = {
+      x: secondSegment.to.x - secondSegment.from.x,
+      y: secondSegment.to.y - secondSegment.from.y
+    };
+    if (Math.abs(cross(firstVector, secondVector)) > GEOMETRY_EPSILON) {
+      return false;
+    }
+    const offset = {
+      x: secondSegment.from.x - firstSegment.from.x,
+      y: secondSegment.from.y - firstSegment.from.y
+    };
+    if (Math.abs(cross(offset, firstVector)) > GEOMETRY_EPSILON) {
+      return false;
+    }
+    const axis = Math.abs(firstVector.x) >= Math.abs(firstVector.y) ? "x" : "y";
+    const firstRange = sortedPair(firstSegment.from[axis], firstSegment.to[axis]);
+    const secondRange = sortedPair(secondSegment.from[axis], secondSegment.to[axis]);
+    const overlapStart = Math.max(firstRange[0], secondRange[0]);
+    const overlapEnd = Math.min(firstRange[1], secondRange[1]);
+    return overlapEnd - overlapStart > GEOMETRY_EPSILON;
+  }
+
+  function createZoneBoundaryIssue(type, edgeIds, message, severity = "warning") {
     return {
       id: `${type}:${uniqueIdsPreserveOrder(edgeIds).join("|") || "none"}`,
       type,
-      severity: "warning",
+      code: type,
+      severity,
       message,
       edgeIds: uniqueIdsPreserveOrder(edgeIds),
       createdAt: new Date().toISOString()
@@ -3954,6 +4366,9 @@
       return "none";
     }
     if (hasBoundaryIssueType(issues, "zone-boundary-edge-missing")) {
+      return "invalid";
+    }
+    if (hasBoundaryIssueType(issues, "zone-polygon-invalid") || hasBoundaryIssueType(issues, "zone-polygon-self-intersection")) {
       return "invalid";
     }
     if (hasBoundaryIssueType(issues, "zone-boundary-too-few-edges") || hasBoundaryIssueType(issues, "zone-boundary-open")) {
@@ -4013,7 +4428,55 @@
     if (type === "zone-boundary-edge-missing") {
       return "edge 遺失";
     }
+    if (type === "zone-boundary-unordered") {
+      return "Edge order review";
+    }
+    if (type === "zone-polygon-invalid") {
+      return "Invalid polygon";
+    }
+    if (type === "zone-polygon-self-intersection") {
+      return "Self intersection";
+    }
+    if (type === "zone-area-not-calculated") {
+      return "Area not calculated";
+    }
+    if (type === "zone-area-needs-review") {
+      return "Area needs review";
+    }
     return "Boundary issue";
+  }
+
+  function getZoneAreaStatusLabel(status) {
+    if (status === "estimated") {
+      return "候選估算";
+    }
+    if (status === "open_boundary") {
+      return "邊界未封閉";
+    }
+    if (status === "invalid") {
+      return "無效邊界";
+    }
+    return "尚未計算";
+  }
+
+  function getZoneAreaReadout(zone) {
+    if (zone.areaStatus !== "estimated" || !Number.isFinite(Number(zone.areaSqMm))) {
+      return "尚無候選面積";
+    }
+    return `${formatNumber(zone.areaM2)} m² / ${formatNumber(zone.areaPing)} 坪`;
+  }
+
+  function getZoneAreaConfidenceLabel(zone) {
+    const confidence = Number(zone.areaConfidence);
+    return Number.isFinite(confidence) ? String(roundDecimal(confidence, 2)) : "0";
+  }
+
+  function renderZoneAreaReviewNote(zone) {
+    const reasons = Array.isArray(zone.reviewerReasons) ? zone.reviewerReasons : [];
+    if (!reasons.length) {
+      return "";
+    }
+    return `<div class="inline-message">Area candidate only: ${escapeHTML(reasons.join(", "))}</div>`;
   }
 
   function isWallInActiveBoundary(wallId) {
@@ -4766,6 +5229,15 @@
     return numeric.toLocaleString("zh-Hant", {
       maximumFractionDigits: numeric < 10 ? 4 : 2
     });
+  }
+
+  function roundDecimal(value, decimals) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return null;
+    }
+    const factor = 10 ** decimals;
+    return Math.round(numeric * factor) / factor;
   }
 
   function clamp(value, min, max) {
