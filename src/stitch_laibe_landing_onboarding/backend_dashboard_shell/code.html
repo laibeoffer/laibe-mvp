@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE Backend G1 Local Candidate Route Hub</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a0d;
+      --surface: #10161a;
+      --surface-2: #151e23;
+      --line: rgba(224, 232, 229, 0.16);
+      --line-strong: rgba(224, 232, 229, 0.3);
+      --text: #f4f8f7;
+      --muted: #9aa8a6;
+      --mint: #7ee0c3;
+      --cyan: #7cc7e8;
+      --amber: #d9b66f;
+      --red: #ec8e7f;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(126, 224, 195, 0.13), transparent 29rem),
+        radial-gradient(circle at 90% 4%, rgba(124, 199, 232, 0.12), transparent 26rem),
+        linear-gradient(135deg, #06080a 0%, #10161a 54%, #07090b 100%);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", Arial, sans-serif;
+      letter-spacing: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 22px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 64px;
+      margin-bottom: 24px;
+    }
+
+    .brand-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 950;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      color: #06100d;
+      background: var(--mint);
+      font-weight: 950;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .top-actions a,
+    .soft-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 11px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.035);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .hero {
+      display: grid;
+      gap: 18px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.026));
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      color: var(--mint);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 860px;
+      font-size: clamp(32px, 5.2vw, 62px);
+      line-height: 1.02;
+      font-weight: 950;
+    }
+
+    .lead {
+      max-width: 840px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip,
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .chip.safe { color: var(--mint); border-color: rgba(126, 224, 195, 0.4); background: rgba(126, 224, 195, 0.08); }
+    .chip.off { color: var(--red); border-color: rgba(236, 142, 127, 0.4); background: rgba(236, 142, 127, 0.08); }
+    .chip.note { color: var(--amber); border-color: rgba(217, 182, 111, 0.38); background: rgba(217, 182, 111, 0.08); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(16, 22, 26, 0.86);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-body {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .panel h2 { font-size: 19px; line-height: 1.28; }
+    .panel h3 { font-size: 15px; line-height: 1.35; }
+    .panel p { color: var(--muted); line-height: 1.62; }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 40px;
+      border: 1px solid rgba(126, 224, 195, 0.42);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: #06100d;
+      background: var(--mint);
+      font-weight: 950;
+    }
+
+    .disabled-button {
+      min-height: 38px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.035);
+      cursor: not-allowed;
+    }
+
+    .route-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .table-wrap { overflow-x: auto; }
+    .route-name { display: block; font-weight: 950; }
+    .subtext { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .notice {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(217, 182, 111, 0.35);
+      border-radius: 8px;
+      color: #f1d38d;
+      background: rgba(217, 182, 111, 0.07);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 860px) {
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .top-actions { justify-content: flex-start; }
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell" data-a3-stage="stage1-local-candidate" data-boundary="g1-backend-route-hub-mock-only">
+    <header class="topbar" aria-label="LaiBE backend G1 local candidate header">
+      <a class="brand-link" href="../laibe_landing_desktop/code.html#top" aria-label="回到 LaiBE 首頁">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span>LaiBE offer</span>
+      </a>
+      <nav class="top-actions" aria-label="G1 safe navigation">
+        <a href="../laibe_landing_desktop/code.html#laibe-journey">返回首頁流程</a>
+        <span class="soft-button" aria-disabled="true">G2 在 laibe-ops-admin worktree 獨立 QA</span>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="pageTitle">
+        <div class="eyebrow">A3 Stage 1 / G1 local candidate</div>
+        <h1 id="pageTitle">後台 G1 基礎與案件儀表板路由中心</h1>
+        <p class="lead">
+          這是受控的靜態 mock route hub，用來讓 Commander 與 QA 理解 G1 後台候選頁面的角色、入口與禁止範圍。
+          本頁不連接真實後台、不做登入、不讀寫資料庫、不送出案件、不產生正式報價、不啟動 AI / LINE / n8n / payment。
+        </p>
+        <div class="chip-row" aria-label="G1 boundary labels">
+          <span class="chip safe">LOCAL CANDIDATE</span>
+          <span class="chip safe">MOCK ONLY</span>
+          <span class="chip off">NOT PRODUCTION</span>
+          <span class="chip off">NO DB</span>
+          <span class="chip off">NO API</span>
+          <span class="chip off">NO AUTH / RBAC</span>
+          <span class="chip off">NO PAYMENT</span>
+          <span class="chip off">NO AI / LINE / n8n</span>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="G1 route hub cards">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>甲方決標候選預覽</h2>
+              <p>展示決標、簽約、付款與工程狀態的候選 UI 邊界。</p>
+            </div>
+            <span class="badge">guarded</span>
+          </div>
+          <div class="panel-body">
+            <a class="cta" href="../client_awarding_dashboard/code.html?route_state=candidate_guarded">查看甲方候選頁</a>
+            <p>Guard: no final award, no payment, no DB write, no formal tender action.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>乙方投標工作台候選</h2>
+              <p>展示投標欄位、文件、LINE 與送出投標按鈕的禁用狀態。</p>
+            </div>
+            <span class="badge">guarded</span>
+          </div>
+          <div class="panel-body">
+            <a class="cta" href="../pro_bidding_workbench/code.html?route_state=candidate_guarded">查看投標工作台</a>
+            <p>Guard: no LINE API, no upload, no Excel import, no formal bid submit.</p>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>比價與 AI 建議候選</h2>
+              <p>展示比價摘要與 AI 建議，但不形成法律、決標或付款判斷。</p>
+            </div>
+            <span class="badge">advice only</span>
+          </div>
+          <div class="panel-body">
+            <a class="cta" href="../bid_comparison_and_ai_summary/code.html?route_state=ai_advice_only">查看 AI advice only</a>
+            <p>Guard: not legal decision, not final award, no production AI API, no PDF export.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top:18px" aria-labelledby="routeStatusTitle">
+        <div class="panel-head">
+          <div>
+            <h2 id="routeStatusTitle">G1 路由與禁用行為矩陣</h2>
+            <p>所有可點擊入口均導向 local candidate route；正式操作一律 disabled。</p>
+          </div>
+          <span class="badge">mock data</span>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table class="route-table" aria-label="G1 guarded route status">
+              <thead>
+                <tr>
+                  <th>Route</th>
+                  <th>Human-facing purpose</th>
+                  <th>Status</th>
+                  <th>Forbidden action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="route-name">client_awarding_dashboard</span>
+                    <span class="subtext">owner awarding / signing / payment candidate</span>
+                  </td>
+                  <td>協助辨識甲方決標候選 UI，但不做正式決標。</td>
+                  <td><span class="chip safe">candidate guarded</span></td>
+                  <td><button class="disabled-button" type="button" disabled aria-disabled="true">正式決標不可用</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="route-name">pro_bidding_workbench</span>
+                    <span class="subtext">vendor bidding / file / quote candidate</span>
+                  </td>
+                  <td>協助辨識乙方投標工作台候選 UI，但不送出投標。</td>
+                  <td><span class="chip safe">candidate guarded</span></td>
+                  <td><button class="disabled-button" type="button" disabled aria-disabled="true">送出投標不可用</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="route-name">bid_comparison_and_ai_summary</span>
+                    <span class="subtext">AI summary / comparison advice candidate</span>
+                  </td>
+                  <td>協助辨識 AI 建議與比價摘要，但不形成裁決。</td>
+                  <td><span class="chip note">advice only</span></td>
+                  <td><button class="disabled-button" type="button" disabled aria-disabled="true">正式 PDF 匯出不可用</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="notice" aria-label="G1 do not touch summary">
+        Do-not-touch: DB, Supabase, API, auth, RBAC, payment, escrow, production AI, LINE, n8n, Budget Engine,
+        formal quote, formal Excel/PDF, final award, real case management, production admin, G3 AI PCM notifications.
+      </section>
+    </main>
+  </div>
+</body>
+</html>
