@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE Ops Admin G2 Local Candidate</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070a0d;
+      --surface: #10161a;
+      --surface-2: #151e23;
+      --surface-3: #1b252b;
+      --line: rgba(224, 232, 229, 0.16);
+      --line-strong: rgba(224, 232, 229, 0.3);
+      --text: #f4f8f7;
+      --muted: #9aa8a6;
+      --faint: #6e7b78;
+      --mint: #7ee0c3;
+      --cyan: #7cc7e8;
+      --amber: #d9b66f;
+      --red: #ec8e7f;
+      --green: #92d79f;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(126, 224, 195, 0.13), transparent 29rem),
+        radial-gradient(circle at 92% 6%, rgba(124, 199, 232, 0.12), transparent 27rem),
+        linear-gradient(135deg, #06080a 0%, #10161a 54%, #07090b 100%);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", Arial, sans-serif;
+      letter-spacing: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    button, select, input, textarea { font: inherit; }
+    button { border: 0; }
+    a { color: inherit; text-decoration: none; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 22px 18px;
+      border-right: 1px solid var(--line);
+      background: rgba(8, 11, 13, 0.88);
+      backdrop-filter: blur(16px);
+      overflow-y: auto;
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      margin-bottom: 16px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      font-weight: 950;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      color: #06100d;
+      background: var(--mint);
+      font-weight: 950;
+    }
+
+    .brand-note,
+    .role-note,
+    .candidate-route {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .role-box,
+    .candidate-route {
+      margin: 16px 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .role-box label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    select {
+      width: 100%;
+      color: var(--text);
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      padding: 9px 10px;
+      background: #0b0f12;
+    }
+
+    .nav-stack {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav-button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 9px 10px;
+      color: var(--muted);
+      text-align: left;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .nav-button:hover,
+    .nav-button.is-active {
+      color: var(--text);
+      border-color: var(--line-strong);
+      background: rgba(126, 224, 195, 0.08);
+    }
+
+    .nav-count {
+      min-width: 26px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: #06100d;
+      background: var(--mint);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 26px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    .eyebrow {
+      color: var(--mint);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      max-width: 900px;
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1.03;
+      font-weight: 950;
+    }
+
+    .topbar p {
+      max-width: 860px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .status-rail {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      min-width: 260px;
+    }
+
+    .chip,
+    .badge,
+    .state-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .chip.safe,
+    .badge.ready { color: var(--mint); border-color: rgba(126, 224, 195, 0.4); background: rgba(126, 224, 195, 0.08); }
+    .chip.off,
+    .badge.abnormal { color: var(--red); border-color: rgba(236, 142, 127, 0.4); background: rgba(236, 142, 127, 0.08); }
+    .badge.review { color: var(--cyan); border-color: rgba(124, 199, 232, 0.38); background: rgba(124, 199, 232, 0.08); }
+    .badge.manual,
+    .badge.missing { color: var(--amber); border-color: rgba(217, 182, 111, 0.38); background: rgba(217, 182, 111, 0.08); }
+
+    .page-note {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(217, 182, 111, 0.35);
+      border-radius: 8px;
+      color: #f1d38d;
+      background: rgba(217, 182, 111, 0.07);
+      line-height: 1.65;
+    }
+
+    .metric-grid,
+    .ops-layout,
+    .support-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .metric-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .metric,
+    .panel,
+    .support-item {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(16, 22, 26, 0.86);
+      box-shadow: var(--shadow);
+    }
+
+    .metric {
+      padding: 15px;
+    }
+
+    .metric strong {
+      display: block;
+      margin: 8px 0;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .metric span,
+    .metric div {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .ops-layout {
+      grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.9fr);
+      align-items: start;
+    }
+
+    .panel { overflow: hidden; }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-body {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .panel h2 { font-size: 19px; line-height: 1.28; }
+    .panel h3 { font-size: 15px; line-height: 1.35; }
+    .panel p, .support-item p { color: var(--muted); line-height: 1.62; }
+
+    .button-row,
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-button,
+    .light-button,
+    .disabled-button {
+      min-height: 38px;
+      border-radius: 8px;
+      padding: 9px 11px;
+      font-weight: 850;
+    }
+
+    .filter-button,
+    .light-button {
+      border: 1px solid var(--line);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+    }
+
+    .filter-button.is-active,
+    .light-button:hover {
+      color: #06100d;
+      border-color: var(--mint);
+      background: var(--mint);
+    }
+
+    .disabled-button,
+    button:disabled {
+      border: 1px dashed var(--line-strong);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      cursor: not-allowed;
+    }
+
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .case-title { font-weight: 950; }
+    .case-sub { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .detail-list {
+      display: grid;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 10px;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .detail-row:last-child { border-bottom: 0; }
+    .detail-row span { color: var(--faint); font-size: 12px; font-weight: 900; }
+    .detail-row b { color: var(--text); font-size: 13px; line-height: 1.5; }
+
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
+
+    .support-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .support-item { padding: 16px; display: grid; gap: 9px; }
+
+    .mock-form {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mock-form label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .mock-form input,
+    .mock-form textarea {
+      width: 100%;
+      border: 1px dashed var(--line-strong);
+      border-radius: 8px;
+      padding: 9px 10px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .mock-form textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    @media (max-width: 980px) {
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { position: relative; height: auto; }
+      .topbar { flex-direction: column; }
+      .status-rail { justify-content: flex-start; min-width: 0; }
+      .metric-grid,
+      .ops-layout,
+      .support-grid { grid-template-columns: 1fr; }
+      .main { padding: 18px 16px 30px; }
+    }
+
+    @media (max-width: 560px) {
+      .detail-row { grid-template-columns: 1fr; }
+      .panel-head { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" data-a3-stage="stage1-local-candidate" data-boundary="g2-ops-admin-mock-only">
+    <aside class="sidebar" aria-label="LaiBE internal operations mock navigation">
+      <a class="brand-link" href="../laibe_landing_desktop/code.html#top" aria-label="回到 LaiBE 首頁">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span>LaiBE offer</span>
+      </a>
+      <p class="brand-note">後台 G2 營運管理候選頁。這是靜態 mock，不是 production admin。</p>
+
+      <div class="role-box">
+        <label for="roleSwitch">Role switch mock</label>
+        <select id="roleSwitch" aria-describedby="roleNote">
+          <option value="ops_admin">Ops Admin - 可檢視 mock 狀態</option>
+          <option value="pcm_reviewer">PCM Reviewer - 文件與預算檢查</option>
+          <option value="support_staff">Support Staff - 補件與人工處理</option>
+          <option value="readonly">Read-only - 全部操作 disabled</option>
+        </select>
+        <p id="roleNote" class="role-note">Ops Admin mock: 可檢視案件與狀態，但不能核准、退件或寫入資料。</p>
+      </div>
+
+      <nav class="nav-stack" aria-label="Mock admin sections">
+        <button class="nav-button is-active" type="button" data-panel="overview">營運首頁 <span class="nav-count">12</span></button>
+        <button class="nav-button" type="button" data-panel="manual-queue">人工處理 <span class="nav-count">4</span></button>
+        <button class="nav-button" type="button" data-panel="abnormal-missing">異常 / 缺件 <span class="nav-count">5</span></button>
+        <button class="nav-button" type="button" data-panel="document-check">文件檢查 <span class="nav-count">3</span></button>
+        <button class="nav-button" type="button" data-panel="operation-log">操作紀錄 <span class="nav-count">0</span></button>
+        <button class="nav-button" type="button" data-panel="support-entry">客服入口 <span class="nav-count">2</span></button>
+      </nav>
+
+      <div class="candidate-route">
+        <strong>Candidate route</strong><br />
+        `src/stitch_laibe_landing_onboarding/laibe_ops_admin/code.html`<br />
+        未接入正式 production route，未啟用登入、權限、DB 或 API。
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">A3 Stage 1 / G2 local candidate</div>
+          <h1>萊比營運管理後台候選</h1>
+          <p>
+            集中檢視案件狀態、缺件、人工處理、文件檢查、預算文件檢查與客服入口。
+            所有資料都是前端靜態 mock；所有正式操作維持 disabled。
+          </p>
+        </div>
+        <div class="status-rail" aria-label="Forbidden scope indicators">
+          <span class="chip safe">Mock-only</span>
+          <span class="chip off">No DB</span>
+          <span class="chip off">No API</span>
+          <span class="chip off">No Auth / RBAC</span>
+          <span class="chip off">No AI / LINE / n8n</span>
+          <span class="chip off">No Payment</span>
+        </div>
+      </header>
+
+      <section class="page-note" aria-label="Mock boundary notice">
+        <strong>Local candidate only.</strong>
+        <span>本頁不送出資料、不讀取伺服器、不連接 Supabase、不呼叫 AI API / LINE / n8n / webhook、不建立客服單、不產生正式報價、正式 Excel 或正式 PDF。</span>
+      </section>
+
+      <section class="metric-grid" aria-label="G2 mock metrics">
+        <article class="metric">
+          <span>案件總覽</span>
+          <strong id="metricTotal">12</strong>
+          <div>含審核中、缺件、人工處理與候選完成 mock 狀態。</div>
+        </article>
+        <article class="metric">
+          <span>人工處理</span>
+          <strong id="metricManual">4</strong>
+          <div>客服、文件、PCM reviewer 需要人工判斷。</div>
+        </article>
+        <article class="metric">
+          <span>異常 / 缺件</span>
+          <strong id="metricAbnormal">5</strong>
+          <div>預算文件缺圖、狀態衝突、資料缺漏等 mock。</div>
+        </article>
+        <article class="metric">
+          <span>正式後台操作</span>
+          <strong>0</strong>
+          <div>所有 production admin 功能皆 disabled。</div>
+        </article>
+      </section>
+
+      <section id="overview" class="tab-panel panel is-active">
+        <div class="panel-head">
+          <div>
+            <h2>案件檢視與篩選</h2>
+            <p>使用篩選與檢視 mock 按鈕即可更新右側詳情，不會進行任何真實資料存取。</p>
+          </div>
+          <button class="disabled-button" type="button" disabled aria-disabled="true">新增正式案件 - Disabled</button>
+        </div>
+        <div class="panel-body ops-layout">
+          <section aria-label="Mock case table">
+            <div class="filter-row" aria-label="Mock case filters">
+              <button class="filter-button is-active" type="button" data-filter="all">全部</button>
+              <button class="filter-button" type="button" data-filter="under_review">審核中</button>
+              <button class="filter-button" type="button" data-filter="manual_required">人工處理</button>
+              <button class="filter-button" type="button" data-filter="abnormal">異常</button>
+              <button class="filter-button" type="button" data-filter="missing_data">缺件</button>
+              <span class="chip safe" id="filterSummary">顯示 6 筆 mock cases</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <caption style="position:absolute;left:-10000px">Mock internal case overview</caption>
+                <thead>
+                  <tr>
+                    <th>Case</th>
+                    <th>Status</th>
+                    <th>Risk</th>
+                    <th>Assignee</th>
+                    <th>Next safe action</th>
+                    <th>Mock action</th>
+                  </tr>
+                </thead>
+                <tbody id="caseTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="panel" aria-labelledby="detailTitle">
+            <div class="panel-head">
+              <div>
+                <h3 id="detailTitle">案件詳情</h3>
+                <p id="detailSubtitle">選取左側任一 mock 案件查看狀態。</p>
+              </div>
+              <span class="badge review">read only</span>
+            </div>
+            <div class="panel-body">
+              <div class="detail-list" id="detailList"></div>
+              <button class="disabled-button" type="button" disabled aria-disabled="true">正式處理 Disabled</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="manual-queue" class="tab-panel panel">
+        <div class="panel-head">
+          <div>
+            <h2>人工處理佇列</h2>
+            <p>只標出可能需要人工判斷的原因，不做自動核准或正式退件。</p>
+          </div>
+          <button class="disabled-button" type="button" disabled aria-disabled="true">批次核准 - Disabled</button>
+        </div>
+        <div class="panel-body support-grid">
+          <article class="support-item">
+            <h3>文件比例待確認</h3>
+            <p>平面圖比例校正紀錄不足，先列為人工確認。</p>
+            <p><span class="badge manual">Mock queue</span></p>
+          </article>
+          <article class="support-item">
+            <h3>預算文件需要補註</h3>
+            <p>材料規格缺少人工備註，不產生正式報價。</p>
+            <p><span class="badge review">PCM mock</span></p>
+          </article>
+          <article class="support-item">
+            <h3>投標前疑問</h3>
+            <p>尚未整理成公開答覆，先放入人工處理候選清單。</p>
+            <p><span class="badge manual">Candidate</span></p>
+          </article>
+        </div>
+      </section>
+
+      <section id="abnormal-missing" class="tab-panel panel">
+        <div class="panel-head">
+          <div>
+            <h2>異常與缺件</h2>
+            <p>只用狀態徽章與 mock 說明提示缺口，不自動改變案件狀態。</p>
+          </div>
+          <button class="disabled-button" type="button" disabled aria-disabled="true">送出異常結案 - Disabled</button>
+        </div>
+        <div class="panel-body support-grid">
+          <article class="support-item">
+            <h3>狀態衝突</h3>
+            <p>同一案件同時標示審核中與缺件，需要人工確認。</p>
+            <p><span class="badge abnormal">State conflict</span></p>
+          </article>
+          <article class="support-item">
+            <h3>預算風險</h3>
+            <p>只顯示風險提示，不判定正式價格，不呼叫 Budget Engine。</p>
+            <p><span class="badge abnormal">No formal price</span></p>
+          </article>
+          <article class="support-item">
+            <h3>資料缺件</h3>
+            <p>缺少圖面、規格或聯絡資訊，需客服人工提醒。</p>
+            <p><span class="badge missing">Missing data</span></p>
+          </article>
+        </div>
+      </section>
+
+      <section id="document-check" class="tab-panel panel">
+        <div class="panel-head">
+          <div>
+            <h2>文件檢查</h2>
+            <p>文件審核入口以 checklist 呈現。正式鎖版、簽核、版本資料庫都未實作。</p>
+          </div>
+          <button class="disabled-button" type="button" disabled aria-disabled="true">鎖定文件版本 - Disabled</button>
+        </div>
+        <div class="panel-body support-grid">
+          <article class="support-item">
+            <h3>平面圖附件</h3>
+            <p>檢查是否有可讀圖面、比例校正紀錄與非正式示意標示。</p>
+            <p><span class="badge ready">Mock ready</span></p>
+          </article>
+          <article class="support-item">
+            <h3>招標公告候選</h3>
+            <p>確認文件用途與條件一致，不做正式招標發布。</p>
+            <p><span class="badge review">Candidate</span></p>
+          </article>
+          <article class="support-item">
+            <h3>合約支援</h3>
+            <p>只列出合約治理視角 placeholder，不進正式法律審查。</p>
+            <p><span class="badge manual">Human review</span></p>
+          </article>
+        </div>
+      </section>
+
+      <section id="operation-log" class="tab-panel panel">
+        <div class="panel-head">
+          <div>
+            <h2>操作紀錄 placeholder</h2>
+            <p>未來 audit log 樣式預覽。目前完全是靜態 mock，沒有正式稽核資料庫。</p>
+          </div>
+          <button class="disabled-button" type="button" disabled aria-disabled="true">匯出操作紀錄 - Disabled</button>
+        </div>
+        <div class="panel-body">
+          <div class="detail-list">
+            <div class="detail-row"><span>2026-06-07 10:20</span><b>Mock case LB-104 被標記為缺件 / system_mock</b></div>
+            <div class="detail-row"><span>2026-06-07 10:36</span><b>Mock PCM reviewer 檢視預算文件入口 / readonly_event</b></div>
+            <div class="detail-row"><span>2026-06-07 11:05</span><b>客服入口被開啟但未建立正式 ticket / placeholder_only</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="support-entry" class="tab-panel panel">
+        <div class="panel-head">
+          <div>
+            <h2>客服 / 人工處理入口</h2>
+            <p>提供未來客服處理資訊架構。表單欄位全部 disabled，不送出也不儲存。</p>
+          </div>
+          <button class="disabled-button" type="button" disabled aria-disabled="true">送出客服處理 - Disabled</button>
+        </div>
+        <div class="panel-body support-grid">
+          <article class="support-item">
+            <h3>客服摘要</h3>
+            <p>顯示業主疑問、乙方問題、補件提醒與人工備註的候選位置。</p>
+            <p><span class="badge manual">Manual entry</span></p>
+          </article>
+          <article class="support-item">
+            <h3>人工備註</h3>
+            <form class="mock-form">
+              <label>案件編號
+                <input value="LB-20260607-104" disabled />
+              </label>
+              <label>人工處理備註
+                <textarea disabled>Placeholder only. 不會送出、不會儲存。</textarea>
+              </label>
+              <button class="disabled-button" type="button" disabled aria-disabled="true">儲存人工備註 - Disabled</button>
+            </form>
+          </article>
+          <article class="support-item">
+            <h3>整合封鎖</h3>
+            <p>不接真客服、不接 LINE、不接 email webhook、不建立 ticket database。</p>
+            <p><span class="badge abnormal">Integration blocked</span></p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (() => {
+      const mockCases = [
+        {
+          id: "LB-20260607-101",
+          title: "室內裝修 30 坪預算審核",
+          owner: "甲方 A",
+          region: "台北市大安區",
+          budget: "180 - 220 萬",
+          status: "under_review",
+          statusLabel: "審核中",
+          risk: "預算文件已上傳，尚未鎖定正式版本。",
+          assignee: "Ops Admin",
+          next: "文件審核",
+          detail: "平面圖與預算文件已上傳，仍需人工檢查附件完整性。"
+        },
+        {
+          id: "LB-20260607-104",
+          title: "老屋翻修資料補件",
+          owner: "甲方 B",
+          region: "新北市板橋區",
+          budget: "90 - 120 萬",
+          status: "missing_data",
+          statusLabel: "缺件",
+          risk: "缺少水電圖與材料規格。",
+          assignee: "Support Staff",
+          next: "提醒補件",
+          detail: "需要客服協助提醒甲方補齊缺件。"
+        },
+        {
+          id: "LB-20260607-118",
+          title: "投標前疑問整理",
+          owner: "甲方 C",
+          region: "桃園市中壢區",
+          budget: "55 - 70 萬",
+          status: "manual_required",
+          statusLabel: "人工處理",
+          risk: "乙方問題需要人工回覆候選答案。",
+          assignee: "PCM Reviewer",
+          next: "人工彙整",
+          detail: "目前不建立真客服單，只列入手動處理候選清單。"
+        },
+        {
+          id: "LB-20260607-122",
+          title: "案件狀態衝突檢查",
+          owner: "甲方 D",
+          region: "台中市西屯區",
+          budget: "65 - 80 萬",
+          status: "abnormal",
+          statusLabel: "異常",
+          risk: "狀態節點與文件狀態不一致。",
+          assignee: "Ops Admin",
+          next: "人工確認",
+          detail: "狀態稽核只顯示 mock，不會寫入正式 audit log。"
+        },
+        {
+          id: "LB-20260607-131",
+          title: "預算文件人工補註",
+          owner: "甲方 E",
+          region: "台南市東區",
+          budget: "130 - 160 萬",
+          status: "under_review",
+          statusLabel: "審核中",
+          risk: "工法說明不足，需人工補註。",
+          assignee: "PCM Reviewer",
+          next: "預算文件檢查",
+          detail: "不產出正式 Excel / PDF，不呼叫 Budget Engine。"
+        },
+        {
+          id: "LB-20260607-142",
+          title: "候選完成待指揮官檢視",
+          owner: "甲方 F",
+          region: "高雄市鼓山區",
+          budget: "75 - 95 萬",
+          status: "ready",
+          statusLabel: "候選完成",
+          risk: "無高風險，仍為 mock case。",
+          assignee: "Read-only",
+          next: "等待 Commander review",
+          detail: "候選完成不代表 production 上線。"
+        }
+      ];
+
+      const statusClassMap = {
+        under_review: "review",
+        manual_required: "manual",
+        abnormal: "abnormal",
+        missing_data: "missing",
+        ready: "ready"
+      };
+
+      const navButtons = Array.from(document.querySelectorAll(".nav-button"));
+      const panels = Array.from(document.querySelectorAll(".tab-panel"));
+      const filterButtons = Array.from(document.querySelectorAll(".filter-button"));
+      const tableBody = document.getElementById("caseTableBody");
+      const filterSummary = document.getElementById("filterSummary");
+      const detailTitle = document.getElementById("detailTitle");
+      const detailSubtitle = document.getElementById("detailSubtitle");
+      const detailList = document.getElementById("detailList");
+      const roleSwitch = document.getElementById("roleSwitch");
+      const roleNote = document.getElementById("roleNote");
+      let activeFilter = "all";
+      let selectedCaseId = mockCases[0].id;
+
+      const roleNotes = {
+        ops_admin: "Ops Admin mock: 可檢視案件與狀態，但不能核准、退件或寫入資料。",
+        pcm_reviewer: "PCM Reviewer mock: 聚焦文件與預算檢查，仍不產生正式報價。",
+        support_staff: "Support Staff mock: 聚焦補件與人工處理，不建立真客服單。",
+        readonly: "Read-only mock: 所有操作維持 disabled，只允許檢視靜態資訊。"
+      };
+
+      const showPanel = (panelId) => {
+        panels.forEach((panel) => panel.classList.toggle("is-active", panel.id === panelId));
+        navButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.panel === panelId));
+      };
+
+      const getFilteredCases = () => {
+        if (activeFilter === "all") return mockCases;
+        return mockCases.filter((item) => item.status === activeFilter);
+      };
+
+      const setSelectedCase = (caseId) => {
+        selectedCaseId = caseId;
+        const item = mockCases.find((caseItem) => caseItem.id === selectedCaseId) || mockCases[0];
+        detailTitle.textContent = item.title;
+        detailSubtitle.textContent = `${item.id} / ${item.owner} / ${item.region}`;
+        detailList.innerHTML = "";
+        [
+          ["狀態", item.statusLabel],
+          ["預算", item.budget],
+          ["負責角色", item.assignee],
+          ["風險 / 注意", item.risk],
+          ["下一步", item.next],
+          ["Mock 說明", item.detail]
+        ].forEach(([label, value]) => {
+          const row = document.createElement("div");
+          row.className = "detail-row";
+          const labelNode = document.createElement("span");
+          labelNode.textContent = label;
+          const valueNode = document.createElement("b");
+          valueNode.textContent = value;
+          row.append(labelNode, valueNode);
+          detailList.append(row);
+        });
+      };
+
+      const renderTable = () => {
+        const filtered = getFilteredCases();
+        tableBody.innerHTML = "";
+        filtered.forEach((item) => {
+          const tr = document.createElement("tr");
+          const badgeClass = statusClassMap[item.status] || "review";
+          tr.innerHTML = `
+            <td>
+              <div class="case-title">${item.title}</div>
+              <div class="case-sub">${item.id} / ${item.region}</div>
+            </td>
+            <td><span class="badge ${badgeClass}">${item.statusLabel}</span></td>
+            <td>${item.risk}</td>
+            <td>${item.assignee}</td>
+            <td>${item.next}</td>
+            <td>
+              <button class="light-button" type="button" data-case-id="${item.id}">檢視 mock</button>
+              <button class="disabled-button" type="button" disabled aria-disabled="true">正式處理 Disabled</button>
+            </td>
+          `;
+          tableBody.append(tr);
+        });
+        filterSummary.textContent = `顯示 ${filtered.length} 筆 mock cases`;
+        tableBody.querySelectorAll("[data-case-id]").forEach((button) => {
+          button.addEventListener("click", () => setSelectedCase(button.dataset.caseId));
+        });
+      };
+
+      navButtons.forEach((button) => {
+        button.addEventListener("click", () => showPanel(button.dataset.panel));
+      });
+
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeFilter = button.dataset.filter;
+          filterButtons.forEach((item) => item.classList.toggle("is-active", item === button));
+          renderTable();
+        });
+      });
+
+      roleSwitch.addEventListener("change", () => {
+        roleNote.textContent = roleNotes[roleSwitch.value];
+      });
+
+      renderTable();
+      setSelectedCase(selectedCaseId);
+    })();
+  </script>
+</body>
+</html>
