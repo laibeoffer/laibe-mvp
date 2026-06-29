@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE Owner Guide Mock Runtime</title>
+  <style>
+    :root {
+      --bg: #080a0e;
+      --panel: #111820;
+      --panel-2: #17212a;
+      --panel-3: #0d1218;
+      --line: rgba(255, 255, 255, 0.14);
+      --text: #f4f7f8;
+      --muted: #9aa7b3;
+      --cyan: #78d7ff;
+      --mint: #65e4c7;
+      --amber: #ffb454;
+      --rose: #ff8c8c;
+      --ok: #9cf2bf;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: linear-gradient(135deg, #050607, var(--bg) 48%, #11161c);
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    main {
+      width: min(100% - 32px, 1240px);
+      margin: 0 auto;
+      padding: 32px 0;
+    }
+
+    .runtime-shell {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.95fr) minmax(460px, 1.05fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: rgba(17, 24, 32, 0.94);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.26);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: clamp(28px, 4vw, 44px); line-height: 1.08; margin-bottom: 12px; }
+    h2 { font-size: 18px; margin-bottom: 12px; }
+    h3 { font-size: 14px; color: var(--cyan); margin-bottom: 8px; }
+    p { color: #cbd4da; line-height: 1.65; }
+
+    .badge-row, .button-row, .step-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .badge {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.strong { color: #061118; background: linear-gradient(135deg, var(--cyan), var(--mint)); border-color: transparent; }
+    .badge.warn { color: #281807; background: var(--amber); border-color: transparent; }
+
+    .step-tabs { margin-top: 18px; }
+    .step-pill {
+      min-width: 34px;
+      min-height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-weight: 900;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .step-pill.active { color: #071018; background: var(--cyan); border-color: transparent; }
+    .step-pill.done { color: #071018; background: var(--ok); border-color: transparent; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dfe8ed;
+      font-weight: 850;
+    }
+
+    input, textarea, select, button, a.button {
+      font: inherit;
+      border-radius: 8px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      padding: 12px 13px;
+      color: var(--text);
+      background: #090d12;
+      outline: 0;
+    }
+
+    textarea { min-height: 116px; resize: vertical; line-height: 1.55; }
+
+    button, a.button {
+      border: 1px solid rgba(120, 215, 255, 0.45);
+      padding: 11px 14px;
+      color: #041016;
+      background: linear-gradient(135deg, var(--cyan), var(--mint));
+      font-weight: 900;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    button.secondary, a.secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    button.danger {
+      color: #250909;
+      background: var(--rose);
+      border-color: transparent;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+    }
+
+    .question-card {
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .notes-list {
+      margin: 0;
+      padding-left: 22px;
+      color: #e6eef2;
+      line-height: 1.75;
+    }
+
+    .notes-list li.missing { color: var(--muted); }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .upload-box {
+      border: 1px dashed rgba(120, 215, 255, 0.35);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .mini-log {
+      min-height: 24px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .status-line {
+      border: 1px solid rgba(255, 180, 84, 0.44);
+      border-radius: 8px;
+      padding: 12px;
+      color: #ffe3b5;
+      background: rgba(255, 180, 84, 0.08);
+    }
+
+    .status-line.complete {
+      border-color: rgba(156, 242, 191, 0.42);
+      color: #d6ffe3;
+      background: rgba(156, 242, 191, 0.08);
+    }
+
+    .hidden { display: none !important; }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    summary { cursor: pointer; font-weight: 900; color: var(--cyan); }
+
+    pre {
+      max-height: 330px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      color: #eaf4f8;
+      background: #050607;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 920px) {
+      .runtime-shell, .grid { grid-template-columns: 1fr; }
+      button, a.button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="runtime-shell" aria-label="Owner Guide mock runtime">
+      <article class="panel" aria-label="guided requirement form">
+        <div class="badge-row">
+          <span class="badge strong">MOCK_READY</span>
+          <span class="badge">PLACEHOLDER_ONLY</span>
+          <span class="badge">NO_REAL_AI_API</span>
+          <span class="badge">NO_UPLOAD_BACKEND</span>
+        </div>
+        <h1>需求引導官 mock runtime</h1>
+        <p>需求表單是業主必經流程。完成前不提供平面拼圖或預算預覽跳轉；完成後才產生下一步 CTA。此頁只用前端狀態做 mock、local placeholder 與 metadata capture，不寫入 DB、不呼叫 AI API、不接 payment、不產生正式價格。</p>
+
+        <div class="step-tabs" id="stepTabs" aria-label="requirement progress"></div>
+
+        <section class="question-card" aria-label="current requirement question">
+          <h2 id="questionTitle">基本案件資訊</h2>
+          <p id="questionPrompt">請先描述房屋類型、坪數、屋況、所在區域與使用目的。</p>
+          <label for="answerInput" id="answerLabel">目前回答</label>
+          <textarea id="answerInput" placeholder="例如：台北 28 坪中古屋，自住，想整理客廳、廚房、浴室。"></textarea>
+          <div class="button-row" aria-label="requirement controls">
+            <button id="saveAnswer" type="button">儲存目前回答</button>
+            <button id="nextQuestion" class="secondary" type="button">下一題</button>
+            <button id="undoAnswer" class="secondary" type="button">回上一題</button>
+            <button id="viewNotes" class="secondary" type="button">查看已填內容</button>
+            <button id="focusAdditional" class="secondary" type="button">補充說明</button>
+          </div>
+          <p class="mini-log" id="questionHint">尚未完成需求表單，下一步 CTA 已關閉。</p>
+        </section>
+
+        <section class="question-card" aria-label="mock upload metadata capture">
+          <h2>mock 上傳入口</h2>
+          <p>本區只記錄瀏覽器本地檔名與 metadata，不上傳檔案、不寫入 production storage。</p>
+          <div class="upload-grid">
+            <div class="upload-box">
+              <label for="planFiles">現況圖 / 平面圖</label>
+              <input id="planFiles" type="file" multiple accept="image/*,.pdf" />
+              <p class="mini-log" id="planFilesLog">current_plan_files: 尚未選擇。</p>
+            </div>
+            <div class="upload-box">
+              <label for="sitePhotos">現況照片</label>
+              <input id="sitePhotos" type="file" multiple accept="image/*" />
+              <p class="mini-log" id="sitePhotosLog">current_site_photos: 尚未選擇。</p>
+            </div>
+            <div class="upload-box">
+              <label for="styleImages">期望風格參考圖片</label>
+              <input id="styleImages" type="file" multiple accept="image/*" />
+              <p class="mini-log" id="styleImagesLog">style_reference_images: 尚未選擇。</p>
+            </div>
+          </div>
+        </section>
+      </article>
+
+      <section class="panel" aria-label="requirement record and outputs">
+        <section aria-label="completion gate">
+          <h2>需求完成狀態</h2>
+          <p id="completionStatus" class="status-line">requirement_completion_status: incomplete</p>
+          <div id="completionActions" class="button-row"></div>
+        </section>
+
+        <section id="notesPanel" aria-label="owner readable requirement notes">
+          <h2>需求紀錄</h2>
+          <ol class="notes-list" id="structuredNotes"></ol>
+        </section>
+
+        <section aria-label="owner additional notes">
+          <h2>業主自行補充說明</h2>
+          <textarea id="ownerAdditionalNotes" placeholder="可補充生活習慣、家庭成員、寵物、收納、避雷風格、特殊施工限制、希望保留或不要更動的區域。"></textarea>
+          <div class="button-row">
+            <button id="saveAdditionalNotes" type="button">儲存補充說明</button>
+          </div>
+        </section>
+
+        <section aria-label="question answer log">
+          <h2>QuestionAnswerLog</h2>
+          <ol class="notes-list" id="qaLog"><li class="missing">尚未送出回答。</li></ol>
+        </section>
+
+        <details open>
+          <summary>OwnerIntent / ProjectRequirementBrief placeholder</summary>
+          <div class="grid">
+            <article>
+              <h3>OwnerIntent</h3>
+              <pre id="ownerIntent"></pre>
+            </article>
+            <article>
+              <h3>ProjectRequirementBrief placeholder</h3>
+              <pre id="brief"></pre>
+            </article>
+          </div>
+        </details>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const flow = [
+      {
+        key: "property_context",
+        title: "基本案件資訊",
+        prompt: "請描述房屋類型、坪數 / 面積、屋況、所在區域與使用目的。",
+        noteLabel: "基本案件資訊",
+        placeholder: "例如：台北 28 坪中古屋，自住，屋況偏舊。"
+      },
+      {
+        key: "space_requirements",
+        title: "空間需求",
+        prompt: "請列出想整理的空間，例如客廳、臥室、廚房、浴室、收納或其他空間。",
+        noteLabel: "想整理空間",
+        placeholder: "例如：客廳、廚房、浴室，另外需要增加收納。"
+      },
+      {
+        key: "style_preferences",
+        title: "風格偏好",
+        prompt: "請描述喜歡與不喜歡的風格，以及是否已有參考圖片。",
+        noteLabel: "風格偏好",
+        placeholder: "例如：喜歡簡約、木質、明亮，不喜歡太暗的工業風，已有幾張參考圖。"
+      },
+      {
+        key: "budget_signal",
+        title: "預算偏好",
+        prompt: "請描述預算狀態：未知、區間、上限，或需要協助估算。",
+        noteLabel: "預算狀態",
+        placeholder: "例如：預算還不確定，需要先協助估算。"
+      },
+      {
+        key: "schedule_signal",
+        title: "時程偏好",
+        prompt: "請描述時程：探索中、一個月內、三個月內、半年內或未知。",
+        noteLabel: "時程",
+        placeholder: "例如：三個月內想開始，半年內入住。"
+      },
+      {
+        key: "asset_status",
+        title: "檔案狀態",
+        prompt: "請說明是否已有平面圖、報價單、照片，或是否需要平面拼圖。",
+        noteLabel: "已有資料",
+        placeholder: "例如：目前沒有平面圖，有現況照片，需要平面拼圖。"
+      }
+    ];
+
+    const state = {
+      session_id: `owner_guide_mock_${Date.now()}`,
+      project_id: "project_mock_unassigned",
+      currentStep: 0,
+      answers: {},
+      question_answer_log: [],
+      answer_revision_log: [],
+      current_plan_files: [],
+      current_site_photos: [],
+      style_reference_images: [],
+      owner_additional_notes: "",
+      requirement_completion_status: "incomplete",
+      created_at: new Date().toISOString()
+    };
+
+    const stepTabs = document.getElementById("stepTabs");
+    const questionTitle = document.getElementById("questionTitle");
+    const questionPrompt = document.getElementById("questionPrompt");
+    const answerInput = document.getElementById("answerInput");
+    const answerLabel = document.getElementById("answerLabel");
+    const saveAnswer = document.getElementById("saveAnswer");
+    const nextQuestion = document.getElementById("nextQuestion");
+    const undoAnswer = document.getElementById("undoAnswer");
+    const viewNotes = document.getElementById("viewNotes");
+    const focusAdditional = document.getElementById("focusAdditional");
+    const questionHint = document.getElementById("questionHint");
+    const notesPanel = document.getElementById("notesPanel");
+    const structuredNotes = document.getElementById("structuredNotes");
+    const qaLog = document.getElementById("qaLog");
+    const completionStatus = document.getElementById("completionStatus");
+    const completionActions = document.getElementById("completionActions");
+    const ownerAdditionalNotes = document.getElementById("ownerAdditionalNotes");
+    const saveAdditionalNotes = document.getElementById("saveAdditionalNotes");
+    const ownerIntentEl = document.getElementById("ownerIntent");
+    const briefEl = document.getElementById("brief");
+
+    function activeAnswerRefs() {
+      return state.question_answer_log
+        .filter((item) => item.effective)
+        .map((item) => item.qa_log_id);
+    }
+
+    function hasAnswer(key) {
+      return Boolean((state.answers[key] || "").trim());
+    }
+
+    function hasAnyUpload() {
+      return state.current_plan_files.length > 0 || state.current_site_photos.length > 0 || state.style_reference_images.length > 0;
+    }
+
+    function missingRequiredKeys() {
+      const missing = flow.filter((item) => !hasAnswer(item.key)).map((item) => item.key);
+      if (!state.owner_additional_notes.trim()) missing.push("owner_additional_notes");
+      return missing;
+    }
+
+    function refreshCompletionStatus() {
+      const missing = missingRequiredKeys();
+      if (state.requirement_completion_status === "completed" && missing.length) {
+        state.requirement_completion_status = "incomplete";
+      }
+      if (state.requirement_completion_status !== "completed") {
+        state.requirement_completion_status = missing.length ? "incomplete" : "ready_for_review";
+      }
+    }
+
+    function saveCurrentAnswer() {
+      const item = flow[state.currentStep];
+      const value = answerInput.value.trim();
+      if (!value) {
+        questionHint.textContent = "請先填寫目前問題，再儲存回答。";
+        return;
+      }
+      const previousValue = state.answers[item.key] || "";
+      state.answers[item.key] = value;
+      const qa_log_id = `qa_${String(state.question_answer_log.length + 1).padStart(2, "0")}`;
+      state.question_answer_log.push({
+        qa_log_id,
+        field_key: item.key,
+        question: item.prompt,
+        owner_answer: value,
+        effective: true,
+        source: "front_end_mock",
+        created_at: new Date().toISOString()
+      });
+      state.answer_revision_log.push({
+        revision_id: `rev_${String(state.answer_revision_log.length + 1).padStart(2, "0")}`,
+        field_key: item.key,
+        qa_log_id,
+        previous_value: previousValue || null,
+        new_value: value,
+        revision_status: "active",
+        created_at: new Date().toISOString()
+      });
+      state.question_answer_log.forEach((entry) => {
+        if (entry.field_key === item.key && entry.qa_log_id !== qa_log_id) entry.effective = false;
+      });
+      refreshCompletionStatus();
+      questionHint.textContent = "已儲存，目前仍需完成所有需求欄位後才會開啟下一步 CTA。";
+      render();
+    }
+
+    function undoLastAnswer() {
+      const lastActiveRevision = [...state.answer_revision_log].reverse().find((entry) => entry.revision_status === "active");
+      if (!lastActiveRevision) {
+        questionHint.textContent = "目前沒有可撤回的回答。";
+        return;
+      }
+      lastActiveRevision.revision_status = "reverted";
+      const targetLog = state.question_answer_log.find((entry) => entry.qa_log_id === lastActiveRevision.qa_log_id);
+      if (targetLog) targetLog.effective = false;
+      if (lastActiveRevision.previous_value) {
+        state.answers[lastActiveRevision.field_key] = lastActiveRevision.previous_value;
+      } else {
+        delete state.answers[lastActiveRevision.field_key];
+      }
+      const stepIndex = flow.findIndex((item) => item.key === lastActiveRevision.field_key);
+      if (stepIndex >= 0) state.currentStep = stepIndex;
+      refreshCompletionStatus();
+      questionHint.textContent = "已撤回上一個回答；撤回內容不再作為有效需求輸出。";
+      render();
+    }
+
+    function saveNotes() {
+      state.owner_additional_notes = ownerAdditionalNotes.value.trim();
+      refreshCompletionStatus();
+      questionHint.textContent = state.owner_additional_notes ? "已儲存補充說明。" : "補充說明目前為空，需求表單尚未完成。";
+      render();
+    }
+
+    function captureFiles(kind, fileList) {
+      const files = Array.from(fileList || []);
+      const now = new Date().toISOString();
+      if (kind === "plan") {
+        state.current_plan_files = files.map((file) => ({
+          file_type: file.type || "unknown",
+          file_name: file.name,
+          upload_status: "local_placeholder_metadata_only",
+          linked_to_plan_puzzle: true,
+          captured_at: now
+        }));
+      }
+      if (kind === "site") {
+        state.current_site_photos = files.map((file) => ({
+          room_label: "owner_unspecified",
+          photo_type: file.type || "image/unknown",
+          file_name: file.name,
+          upload_status: "local_placeholder_metadata_only",
+          captured_at: now
+        }));
+      }
+      if (kind === "style") {
+        state.style_reference_images = files.map((file) => ({
+          style_note: state.answers.style_preferences || "owner_style_note_pending",
+          file_name: file.name,
+          upload_status: "local_placeholder_metadata_only",
+          captured_at: now
+        }));
+      }
+      render();
+    }
+
+    function requirementNotes() {
+      return [
+        ["房屋 / 案件資訊", state.answers.property_context],
+        ["想整理空間", state.answers.space_requirements],
+        ["風格偏好", state.answers.style_preferences],
+        ["預算狀態", state.answers.budget_signal],
+        ["時程", state.answers.schedule_signal],
+        ["已有資料", state.answers.asset_status],
+        ["現況圖 / 平面圖", state.current_plan_files.length ? `${state.current_plan_files.length} 個 local placeholder` : "尚未提供"],
+        ["現況照片", state.current_site_photos.length ? `${state.current_site_photos.length} 個 local placeholder` : "尚未提供"],
+        ["期望風格參考圖片", state.style_reference_images.length ? `${state.style_reference_images.length} 個 local placeholder` : "尚未提供"],
+        ["業主自行補充說明", state.owner_additional_notes]
+      ];
+    }
+
+    function nextRecommendedStep() {
+      if (state.requirement_completion_status !== "completed") return "continue_requirement_intake";
+      if (/平面圖|平面拼圖|格局/.test(state.answers.asset_status || "")) return "enter_plan_puzzle";
+      if (/預算|估算|報價/.test(state.answers.budget_signal || "")) return "enter_budget_preview";
+      return "enter_plan_puzzle";
+    }
+
+    function buildOwnerIntent() {
+      refreshCompletionStatus();
+      const missing = missingRequiredKeys();
+      return {
+        owner_intent_id: `owner_intent_${state.session_id}`,
+        session_id: state.session_id,
+        project_id: state.project_id,
+        renovation_goals: Object.values(state.answers).filter(Boolean),
+        property_context: { raw_signal: state.answers.property_context || "unknown" },
+        space_requirements: { raw_signal: state.answers.space_requirements || "unknown" },
+        style_preferences: {
+          raw_signal: state.answers.style_preferences || "unknown",
+          reference_image_status: state.style_reference_images.length ? "metadata_captured" : "not_provided"
+        },
+        budget_signal: {
+          raw_signal: state.answers.budget_signal || "unknown",
+          formal_pricing_status: "not_allowed"
+        },
+        schedule_signal: { raw_signal: state.answers.schedule_signal || "unknown" },
+        asset_summary: {
+          raw_signal: state.answers.asset_status || "unknown",
+          current_plan_files: state.current_plan_files,
+          current_site_photos: state.current_site_photos,
+          style_reference_images: state.style_reference_images,
+          mock_upload_only: true,
+          has_any_upload_metadata: hasAnyUpload()
+        },
+        question_gaps: missing,
+        requirement_completion_status: state.requirement_completion_status,
+        structured_requirement_notes: requirementNotes().map(([label, value]) => ({ label, value: value || "尚未提供" })),
+        question_answer_log: state.question_answer_log.filter((entry) => entry.effective),
+        answer_revision_log: state.answer_revision_log,
+        owner_additional_notes: state.owner_additional_notes,
+        next_recommended_step: nextRecommendedStep(),
+        requires_followup: state.requirement_completion_status !== "completed",
+        confidence: state.requirement_completion_status === "completed" ? 0.82 : Math.min(0.68, 0.28 + activeAnswerRefs().length * 0.08),
+        source_refs: activeAnswerRefs(),
+        created_at: state.created_at,
+        updated_at: new Date().toISOString()
+      };
+    }
+
+    function buildBrief(intent) {
+      return {
+        project_requirement_brief_id: `prb_placeholder_${state.session_id}`,
+        owner_intent_id: intent.owner_intent_id,
+        requirement_context_status: "placeholder",
+        requirement_completion_status: intent.requirement_completion_status,
+        space_requirements: {
+          raw_signal: state.answers.space_requirements || "unknown",
+          current_plan_files: state.current_plan_files,
+          current_site_photos: state.current_site_photos,
+          style_reference_images: state.style_reference_images
+        },
+        budget_preference: intent.budget_signal,
+        scope_constraints: {
+          mock_only: true,
+          no_real_ai_api: true,
+          no_upload_backend: true,
+          no_db_write: true,
+          no_payment: true,
+          no_formal_price: true,
+          budget_engine_handoff_status: "placeholder_only"
+        },
+        structured_requirement_notes: intent.structured_requirement_notes,
+        owner_additional_notes: state.owner_additional_notes,
+        review_flags: [
+          "not_for_formal_estimate",
+          "requires_downstream_validation",
+          "placeholder_window_only",
+          "reverted_answers_excluded_from_effective_output"
+        ],
+        handoff_targets: state.requirement_completion_status === "completed" ? ["plan-puzzle", "budget-preview", "bid-preparation"] : ["owner-guide-followup"]
+      };
+    }
+
+    function renderSteps() {
+      stepTabs.innerHTML = "";
+      flow.forEach((item, index) => {
+        const pill = document.createElement("span");
+        pill.className = "step-pill";
+        if (index === state.currentStep) pill.classList.add("active");
+        if (hasAnswer(item.key)) pill.classList.add("done");
+        pill.textContent = String(index + 1);
+        pill.title = item.title;
+        stepTabs.appendChild(pill);
+      });
+    }
+
+    function renderQuestion() {
+      const item = flow[state.currentStep];
+      questionTitle.textContent = item.title;
+      questionPrompt.textContent = item.prompt;
+      answerLabel.textContent = item.noteLabel;
+      answerInput.placeholder = item.placeholder;
+      answerInput.value = state.answers[item.key] || "";
+      nextQuestion.textContent = state.currentStep === flow.length - 1 ? "前往補充說明" : "下一題";
+      undoAnswer.disabled = !state.answer_revision_log.some((entry) => entry.revision_status === "active");
+    }
+
+    function renderNotes() {
+      structuredNotes.innerHTML = "";
+      requirementNotes().forEach(([label, value]) => {
+        const li = document.createElement("li");
+        if (!value) li.classList.add("missing");
+        li.textContent = `${label}：${value || "尚未提供"}`;
+        structuredNotes.appendChild(li);
+      });
+
+      qaLog.innerHTML = "";
+      const activeLogs = state.question_answer_log.filter((entry) => entry.effective);
+      if (!activeLogs.length) {
+        const li = document.createElement("li");
+        li.className = "missing";
+        li.textContent = "尚未送出回答。";
+        qaLog.appendChild(li);
+      }
+      activeLogs.forEach((entry) => {
+        const li = document.createElement("li");
+        li.textContent = `${entry.qa_log_id} / ${entry.field_key}：${entry.owner_answer}`;
+        qaLog.appendChild(li);
+      });
+    }
+
+    function renderUploads() {
+      document.getElementById("planFilesLog").textContent = state.current_plan_files.length ? `current_plan_files: ${state.current_plan_files.map((file) => file.file_name).join("、")}` : "current_plan_files: 尚未選擇。";
+      document.getElementById("sitePhotosLog").textContent = state.current_site_photos.length ? `current_site_photos: ${state.current_site_photos.map((file) => file.file_name).join("、")}` : "current_site_photos: 尚未選擇。";
+      document.getElementById("styleImagesLog").textContent = state.style_reference_images.length ? `style_reference_images: ${state.style_reference_images.map((file) => file.file_name).join("、")}` : "style_reference_images: 尚未選擇。";
+    }
+
+    function renderCompletion(intent) {
+      const missing = missingRequiredKeys();
+      completionActions.innerHTML = "";
+      completionStatus.className = state.requirement_completion_status === "completed" ? "status-line complete" : "status-line";
+      if (state.requirement_completion_status === "completed") {
+        completionStatus.textContent = "需求表單已完成，以下資料將作為後續平面拼圖與預算生成的參數來源。";
+        const planLink = document.createElement("a");
+        planLink.className = "button";
+        planLink.href = "../preview_floor_plan/code.html";
+        planLink.textContent = "完成需求表單，進入平面拼圖";
+        const budgetLink = document.createElement("a");
+        budgetLink.className = "button secondary";
+        budgetLink.href = "../preview_budget/code.html";
+        budgetLink.textContent = "完成需求表單，進入預算預覽";
+        completionActions.append(planLink, budgetLink);
+        return;
+      }
+
+      completionStatus.textContent = `requirement_completion_status: ${state.requirement_completion_status}. 待補欄位: ${missing.join(", ") || "none"}.`;
+      if (state.requirement_completion_status === "ready_for_review") {
+        const completeButton = document.createElement("button");
+        completeButton.type = "button";
+        completeButton.textContent = "完成需求表單";
+        completeButton.addEventListener("click", () => {
+          state.requirement_completion_status = "completed";
+          questionHint.textContent = "需求表單已完成，下一步 CTA 已開啟。";
+          render();
+        });
+        completionActions.appendChild(completeButton);
+      } else {
+        const blocked = document.createElement("span");
+        blocked.className = "badge warn";
+        blocked.textContent = "完成前不開放平面拼圖 / 預算預覽";
+        completionActions.appendChild(blocked);
+      }
+    }
+
+    function render() {
+      refreshCompletionStatus();
+      const intent = buildOwnerIntent();
+      const brief = buildBrief(intent);
+      renderSteps();
+      renderQuestion();
+      renderNotes();
+      renderUploads();
+      renderCompletion(intent);
+      ownerIntentEl.textContent = JSON.stringify(intent, null, 2);
+      briefEl.textContent = JSON.stringify(brief, null, 2);
+    }
+
+    saveAnswer.addEventListener("click", saveCurrentAnswer);
+    nextQuestion.addEventListener("click", () => {
+      if (state.currentStep < flow.length - 1) {
+        state.currentStep += 1;
+        questionHint.textContent = "已切到下一題。";
+      } else {
+        ownerAdditionalNotes.focus();
+        questionHint.textContent = "請補充最後說明並儲存。";
+      }
+      render();
+    });
+    undoAnswer.addEventListener("click", undoLastAnswer);
+    viewNotes.addEventListener("click", () => notesPanel.scrollIntoView({ behavior: "smooth", block: "start" }));
+    focusAdditional.addEventListener("click", () => ownerAdditionalNotes.focus());
+    saveAdditionalNotes.addEventListener("click", saveNotes);
+    document.getElementById("planFiles").addEventListener("change", (event) => captureFiles("plan", event.target.files));
+    document.getElementById("sitePhotos").addEventListener("change", (event) => captureFiles("site", event.target.files));
+    document.getElementById("styleImages").addEventListener("change", (event) => captureFiles("style", event.target.files));
+
+    render();
+  </script>
+</body>
+</html>
