@@ -1,288 +1,510 @@
 <!DOCTYPE html>
-<html class="light" lang="zh-TW"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>LaiBE - 招標文件總覽</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#AD5A5A",
-                        "background-light": "#f7f6f6",
-                        "background-dark": "#1c1616",
-                        "gold-card": "#FDF6E3",
-                        "gold-border": "#D4AF37",
-                        "gold-accent": "#B8860B"
-                    },
-                    fontFamily: {
-                        "display": ["Manrope", "sans-serif"]
-                    },
-                    borderRadius: {
-                        "DEFAULT": "0.5rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                },
-            },
-        }
-    </script>
-<style>
-        body { font-family: 'Manrope', 'Noto Sans TC', sans-serif; }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .document-shadow { box-shadow: 0 4px 20px -2px rgba(0,0,0,0.1); }
-        .gold-gradient { background: linear-gradient(135deg, #FDF6E3 0%, #F5E9CC 100%); }
-    </style>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE - 文件選擇 candidate</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #ded8d1;
+      --paper: #fffdfa;
+      --bg: #f8f6f2;
+      --brand: #ad5a5a;
+      --brand-deep: #8c4747;
+      --gold: #c89b31;
+      --disabled: #eef0f3;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 253, 250, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 0;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--brand);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .steps {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .step {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    .step.active {
+      color: var(--brand-deep);
+      background: #f8eeee;
+      border-color: rgba(173, 90, 90, 0.35);
+    }
+
+    .step.disabled {
+      color: #98a2b3;
+      background: #f2f4f7;
+      cursor: not-allowed;
+    }
+
+    main {
+      padding: 32px 0 58px;
+    }
+
+    .panel,
+    .notice,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(31, 35, 40, 0.05);
+    }
+
+    .panel {
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      color: var(--brand-deep);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-weight: 650;
+      margin-bottom: 0;
+    }
+
+    .notice {
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .warning {
+      color: #7c2d12;
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+
+    .safe {
+      color: #064e3b;
+      background: #ecfdf5;
+      border-color: #bbf7d0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .sidebar {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .side-item {
+      width: 100%;
+      min-height: 42px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: white;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 850;
+      text-align: left;
+    }
+
+    .side-item.active {
+      color: var(--brand-deep);
+      background: #f8eeee;
+      border-color: rgba(173, 90, 90, 0.35);
+    }
+
+    .side-item.disabled {
+      color: #98a2b3;
+      background: #f2f4f7;
+      cursor: not-allowed;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f2f4f7;
+      color: #475467;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .gold-card {
+      background: linear-gradient(135deg, #fff9e8 0%, #fbf0d1 100%);
+      border-color: rgba(200, 155, 49, 0.55);
+      padding: clamp(18px, 4vw, 30px);
+    }
+
+    .doc-preview {
+      margin-top: 18px;
+      background: white;
+      border: 1px solid rgba(200, 155, 49, 0.35);
+      border-radius: 8px;
+      padding: clamp(18px, 4vw, 32px);
+    }
+
+    .doc-preview p {
+      color: #475467;
+      font-weight: 650;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .check {
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .check strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .check span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .btn,
+    .disabled-btn {
+      min-height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 11px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 850;
+      text-align: center;
+    }
+
+    .btn {
+      background: white;
+    }
+
+    .btn.primary {
+      color: white;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .disabled-btn {
+      color: #667085;
+      background: var(--disabled);
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+      padding: 16px;
+    }
+
+    .fake-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid #cbd5e1;
+      background: #f8fafc;
+      flex: 0 0 auto;
+    }
+
+    .confirm-text {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: #475467;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 940px) {
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .steps {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .layout,
+      .checklist {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 24px, 1180px);
+      }
+
+      main {
+        padding-top: 22px;
+      }
+
+      .panel,
+      .gold-card {
+        padding: 18px;
+      }
+
+      .action-bar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .btn,
+      .disabled-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen pb-24">
-<!-- 頂部導航欄 -->
-<header class="sticky top-0 z-50 w-full bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-6 py-3">
-<div class="max-w-[1440px] mx-auto flex items-center justify-between">
-<div class="flex items-center gap-8">
-<a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-    <img src="../../../assets/logo/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
-</a>
-<nav class="hidden md:flex items-center gap-6">
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">導引討論</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">平面配置</a>
-<a class="text-sm font-semibold hover:text-primary transition-colors" href="#">預算編輯</a>
-<a class="text-sm font-semibold text-primary border-b-2 border-primary pb-1" href="#">招標管理</a>
-</nav>
-</div>
-<div class="flex items-center gap-4">
-<div class="relative hidden sm:block">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
-<input class="pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/50" placeholder="搜尋項目..." type="text"/>
-</div>
-<div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-200">
-<img alt="使用者頭像" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQIqZ9XF0wjvA6HQCbLIaJGmye72Le2Q76gWFckyHMHL2OtaPzL264WQpkQ3u2JwggWSlQ8pMo_ficKbRlkq9aqthjf7OLDaq4JmYaHbVEkuJtS1JN3m_wNQn3zmgv0x2y7brnq71842eKYyc4VoPeN41x-J5D6zZnR5nf2GbNe8-9Qex_2D8fmJiwOXtbz9ebDzvPTj5kuIFUmTaS-zNMXrpIYqWf1ErCS8IbEQeukGU7DZZVFwZZF4En5s2XcPQIsNcoHMsQjZw"/>
-</div>
-</div>
-</div>
-</header>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="回到 LaiBE 首頁">
+        <span class="brand-mark">LB</span>
+        <span>LaiBE</span>
+      </a>
+      <nav class="steps" aria-label="文件選擇流程">
+        <a class="step" href="../preview_budget/code.html">3 預算草稿</a>
+        <a class="step" href="../client_step_4_budget_finalization/code.html">4 人工確認</a>
+        <a class="step" href="../budget_document_preview/code.html">5 文件預覽 mock</a>
+        <span class="step active">文件選擇 candidate</span>
+        <span class="step disabled" aria-disabled="true">付款 disabled</span>
+      </nav>
+    </div>
+  </header>
 
-<main class="max-w-[1440px] mx-auto p-6 space-y-6">
-<!-- Breadcrumbs / Page Title Section -->
-<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-<div>
-<nav class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-<a class="hover:text-primary transition-colors" href="#">專案管理</a>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-slate-600 dark:text-slate-300">現代簡約住宅招標</span>
-</nav>
-<h1 class="text-3xl font-extrabold tracking-tight">招標文件總覽</h1>
-</div>
-<div class="flex items-center gap-3">
-<span class="px-3 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-full border border-amber-100 dark:border-amber-800 flex items-center gap-1">
-<span class="material-symbols-outlined text-sm">edit_document</span> 待發布狀態
-            </span>
-</div>
-</div>
+  <main class="shell">
+    <section class="panel">
+      <div class="eyebrow">Candidate document selection</div>
+      <h1>文件選擇 candidate placeholder</h1>
+      <p class="lead">
+        此頁只展示未來可能需要人工 review 的文件清單。PDF、標單、付款、上架費、招標送出、LINE 通知與 DB 儲存都停用。
+      </p>
+    </section>
 
-<!-- Stepper (Revised Steps) -->
-<div class="flex items-center justify-between bg-white dark:bg-background-dark p-4 rounded-xl shadow-sm overflow-x-auto hide-scrollbar border border-slate-200 dark:border-slate-800">
-<button class="flex items-center gap-2 text-slate-400 min-w-max cursor-not-allowed">
-<span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">1</span>
-<span class="text-sm font-medium">需求討論</span>
-<span class="material-symbols-outlined text-sm mx-2">chevron_right</span>
-</button>
-<button class="flex items-center gap-2 text-slate-400 min-w-max cursor-not-allowed">
-<span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">2</span>
-<span class="text-sm font-medium">平面拼圖</span>
-<span class="material-symbols-outlined text-sm mx-2">chevron_right</span>
-</button>
-<button class="flex items-center gap-2 text-slate-400 min-w-max cursor-not-allowed">
-<span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">3</span>
-<span class="text-sm font-medium">預算生成</span>
-<span class="material-symbols-outlined text-sm mx-2">chevron_right</span>
-</button>
-<button class="flex items-center gap-2 text-primary min-w-max">
-<span class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">4</span>
-<span class="text-sm font-bold">合約生成</span>
-<span class="material-symbols-outlined text-sm mx-2">chevron_right</span>
-</button>
-<button class="flex items-center gap-2 text-slate-400 min-w-max cursor-not-allowed">
-<span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">4.5</span>
-<span class="text-sm font-medium">PCM 治理</span>
-<span class="material-symbols-outlined text-sm mx-2">chevron_right</span>
-</button>
-<button class="flex items-center gap-2 text-slate-400 min-w-max cursor-not-allowed">
-<span class="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold">5</span>
-<span class="text-sm font-medium">發布招標</span>
-</button>
-</div>
+    <section class="notice warning">
+      <span aria-hidden="true">!</span>
+      <div>
+        <strong>不可送件，不可付款</strong>
+        <p class="lead">所有 CTA 都是 candidate disabled placeholder。沒有可簽核輸出、沒有付款流程、沒有招標流程，也不連 AI API、LINE、n8n 或 DB。</p>
+      </div>
+    </section>
 
-<!-- Notice Text Block -->
-<div class="bg-primary/5 border border-primary/20 rounded-xl p-4 flex gap-3 items-start">
-<span class="material-symbols-outlined text-primary">info</span>
-<div class="space-y-1">
-    <p class="text-sm font-bold text-slate-800 dark:text-slate-200">文件確認不可逆警告</p>
-    <p class="text-xs font-medium text-slate-600 dark:text-slate-400">
-        本頁為最終發案前文件預覽頁，確認平面圖、預算明細、契約樣稿、招標須知與工法規格書後，系統將鎖定所有文件版本。確認無誤後，即可進入訂閱與繳納上架費流程。一旦進入繳費流程，將無法再次修改上述文件。
-    </p>
-</div>
-</div>
+    <div class="layout">
+      <aside class="card sidebar" aria-label="文件類型">
+        <a class="side-item" href="../budget_document_preview/code.html">
+          <span>預算文件 mock</span>
+          <span class="badge">preview</span>
+        </a>
+        <button class="side-item disabled" type="button" disabled aria-disabled="true" data-document-action="pcm-review-disabled" title="disabled placeholder, no AI API, no legal decision">
+          <span>PCM review placeholder disabled / no AI API / no legal decision</span>
+          <span class="badge">disabled</span>
+        </button>
+        <button class="side-item disabled" type="button" disabled aria-disabled="true" data-document-action="blank-tender-disabled" title="disabled candidate placeholder, no tender file">
+          <span>空白標單預覽停用</span>
+          <span class="badge">disabled</span>
+        </button>
+        <button class="side-item disabled" type="button" disabled aria-disabled="true" data-document-action="payment-disabled" title="disabled candidate placeholder, no payment">
+          <span>付款與上架費停用</span>
+          <span class="badge">disabled</span>
+        </button>
+      </aside>
 
-<!-- Main Content Grid -->
-<div class="grid grid-cols-12 gap-6 items-start">
-
-<!-- Left Sidebar -->
-<aside class="col-span-12 lg:col-span-3 space-y-4">
-<div class="bg-white dark:bg-background-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-<div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-<h3 class="font-bold text-sm flex items-center gap-2">
-<span class="material-symbols-outlined text-primary text-xl">folder_open</span>
-                        文件總覽選單
-                    </h3>
-</div>
-<div class="p-2 space-y-1">
-<button class="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
-<span class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">map</span>
-                            平面圖總覽
-                        </span>
-<span class="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded font-bold">已鎖定</span>
-</button>
-<button class="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
-<span class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">list_alt</span>
-                            預算明細總覽
-                        </span>
-<span class="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded font-bold">已鎖定</span>
-</button>
-<button class="w-full text-left px-4 py-3 rounded-lg text-sm font-bold transition-colors flex items-center justify-between group bg-primary/10 text-primary border border-primary/20">
-<span class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg fill-1">description</span>
-                            契約樣稿總覽
-                        </span>
-<span class="material-symbols-outlined text-sm">chevron_right</span>
-</button>
-<button class="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
-<span class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">campaign</span>
-                            招標須知
-                        </span>
-<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
-</button>
-<button class="w-full text-left px-4 py-3 rounded-lg text-sm font-semibold transition-colors flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400">
-<span class="flex items-center gap-3">
-<span class="material-symbols-outlined text-lg">construction</span>
-                            工法規格書
-                        </span>
-<span class="material-symbols-outlined text-sm opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
-</button>
-</div>
-</div>
-
-<!-- Context Info -->
-<div class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
-<p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">契約包含版本</p>
-<div class="space-y-2">
-<div class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                        PCM 數位合約版本
-                    </div>
-<div class="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                        Offline 實體契約樣稿
-                    </div>
-</div>
-</div>
-</aside>
-
-<!-- Right Content Area -->
-<div class="col-span-12 lg:col-span-9 space-y-6">
-
-<!-- PCM Section (Gold Card Style) -->
-<div class="p-8 border border-gold-border/50 rounded-xl space-y-6 shadow-sm relative overflow-hidden gold-gradient">
-    <div class="flex justify-between items-start border-b border-gold-border/20 pb-4">
-        <div>
-            <h2 class="text-2xl font-extrabold text-slate-800 mb-1">室內裝修承攬契約樣稿</h2>
-            <p class="text-sm font-medium text-slate-600">標準版 | 系統自動生成以供招標使用，不得手動修改條文。</p>
-        </div>
-        <div class="flex items-center gap-2">
-            <button class="px-4 py-2 bg-white/60 hover:bg-white text-slate-700 text-sm font-bold rounded-lg border border-gold-border/30 transition-colors flex items-center gap-2 shadow-sm">
-                <span class="material-symbols-outlined text-lg">download</span>
-                下載 PDF
+      <section>
+        <article class="card gold-card" aria-label="PCM review placeholder">
+          <div style="display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; flex-wrap: wrap;">
+            <div>
+              <span class="badge">CANDIDATE PLACEHOLDER</span>
+              <h2 style="margin-top: 12px;">PCM review 文件草稿</h2>
+              <p class="lead">這是人工審閱的占位畫面，不具備簽署、付款、招標或檔案輸出能力。</p>
+            </div>
+            <button class="disabled-btn" type="button" disabled aria-disabled="true" data-document-action="pdf-disabled" title="PDF preview disabled, mock only">
+              PDF 預覽停用 / mock only
             </button>
-        </div>
+          </div>
+
+          <div class="doc-preview">
+            <h3>人工 review 前置摘要</h3>
+            <p>1. 預算 A-G 欄位需由人工確認項次、品名、單位、數量、單價、金額與備註。</p>
+            <p>2. 文件狀態為 candidate，不會產生可簽核 PDF、Excel、報價單或標單。</p>
+            <p>3. PCM 與 AI 只作為風險提醒與審閱清單，不作裁決。</p>
+          </div>
+        </article>
+
+        <section class="checklist" aria-label="停用範圍">
+          <div class="check">
+            <strong>PDF / Excel</strong>
+            <span>preview disabled, mock only</span>
+          </div>
+          <div class="check">
+            <strong>空白標單</strong>
+            <span>不提供檔案，只顯示停用狀態</span>
+          </div>
+          <div class="check">
+            <strong>付款 / 上架費</strong>
+            <span>candidate placeholder, no payment</span>
+          </div>
+          <div class="check">
+            <strong>招標送出</strong>
+            <span>disabled, no tender flow</span>
+          </div>
+          <div class="check">
+            <strong>AI / PCM</strong>
+            <span>只提示，不裁決</span>
+          </div>
+          <div class="check">
+            <strong>DB / LINE / n8n</strong>
+            <span>not connected</span>
+          </div>
+        </section>
+
+        <section class="card action-bar" aria-label="確認與下一步">
+          <div class="confirm-text">
+            <span class="fake-checkbox" aria-hidden="true"></span>
+            <span>確認 checkbox 停用：此 candidate 頁不可確認送件，不會建立付款或招標流程。</span>
+          </div>
+          <button class="disabled-btn" type="button" disabled aria-disabled="true" data-document-action="proceed-disabled" title="disabled candidate placeholder, no payment, no tender flow">
+            下一步停用 / no payment / no tender
+          </button>
+        </section>
+
+        <section class="notice safe" style="margin-top: 18px;">
+          <span aria-hidden="true">i</span>
+          <div>
+            <strong>手機可讀性</strong>
+            <p class="lead">文件清單、停用狀態與警語在手機版會直向排列，不需要依賴隱藏欄位。</p>
+          </div>
+        </section>
+      </section>
     </div>
-    
-    <div class="bg-white rounded-lg p-6 md:p-10 shadow-inner border border-slate-100 max-h-[500px] overflow-y-auto text-sm text-slate-700 leading-relaxed font-medium space-y-6">
-        <div class="text-center mb-8">
-            <h3 class="text-xl font-bold mb-2">室內裝修承攬契約</h3>
-            <p class="text-slate-500">（本草案僅作招標展示用，決標後將代入得標廠商資訊）</p>
-        </div>
-        
-        <div class="space-y-4">
-            <p><span class="font-bold">立契約書人：</span></p>
-            <p>定作人（甲方）：[系統代入業主資訊]<br>
-            承攬人（乙方）：[決標後代入得標廠商]</p>
-        </div>
-        
-        <div class="space-y-2">
-            <h4 class="font-bold text-base mt-6">第一條：工程名稱及地點</h4>
-            <p>一、工程名稱：現代簡約住宅裝修工程<br>
-            二、工程地點：依甲方指定之施工地址為準。</p>
-        </div>
-
-        <div class="space-y-2">
-            <h4 class="font-bold text-base mt-6">第二條：工程範圍與規格</h4>
-            <p>一、乙方應依據萊比平台(LaiBE)上鎖定之「平面圖總覽」、「預算明細總覽」及「工法規格書」進行施工。<br>
-            二、任何非經 PCM (專業營建管理) 系統化審核通過之變更，皆不具備合約約束力。</p>
-        </div>
-
-        <div class="space-y-2">
-            <h4 class="font-bold text-base mt-6">第三條：工程期限</h4>
-            <p>依招標須知所訂定期限辦理，開工與完工日期將於決標後明訂於正式合約中。遲延完工依每日總工程款千分之一計罰違約金。</p>
-        </div>
-        
-        <div class="space-y-2">
-            <h4 class="font-bold text-base mt-6">第四條：付款辦法</h4>
-            <p>一、本工程採分期付款方式，分為：訂金、粗驗款、細驗款、尾款四期。<br>
-            二、各期款項需經 PCM 審查驗收節點，確認施工進度與品質符合規範後，由甲方透過平台或約定方式撥付。</p>
-        </div>
-    </div>
-</div>
-
-<!-- Bottom Action Bar -->
-<div class="bg-white dark:bg-background-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
-    <div class="flex items-center gap-3">
-        <input type="checkbox" id="confirm_docs" class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"/>
-        <label for="confirm_docs" class="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
-            本人已詳閱且同意所有招標文件內容，並了解確認後將無法修改。
-        </label>
-    </div>
-    
-    <button class="w-full sm:w-auto px-8 py-3.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/30 transition-all flex items-center justify-center gap-2 group opacity-50 cursor-not-allowed" id="btn_proceed">
-        前往繳納上架費
-        <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-    </button>
-</div>
-
-</div>
-</div>
-</main>
-
-<script>
-    // 簡易前端互動：勾選後才啟用按鈕
-    document.getElementById('confirm_docs').addEventListener('change', function(e) {
-        const btn = document.getElementById('btn_proceed');
-        if(e.target.checked) {
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            btn.classList.add('cursor-pointer');
-        } else {
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            btn.classList.remove('cursor-pointer');
-        }
-    });
-</script>
-
-</body></html>
+  </main>
+</body>
+</html>

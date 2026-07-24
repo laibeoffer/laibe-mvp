@@ -396,7 +396,7 @@
       filter: brightness(.62) blur(.8px);
       transition: transform 780ms cubic-bezier(.2,.78,.2,1), opacity 780ms ease, filter 780ms ease, border-color 780ms ease, box-shadow 780ms ease;
       will-change: transform, opacity, filter;
-      pointer-events: auto;
+      pointer-events: none;
       cursor: pointer;
     }
 
@@ -455,6 +455,12 @@
       filter: none;
       border-color: rgba(220,230,236,.34);
       box-shadow: 0 36px 110px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.34), 0 0 44px rgba(121,216,255,.12);
+      pointer-events: auto;
+    }
+
+    .hero-result-card:focus-visible {
+      outline: 3px solid rgba(240,198,110,.92);
+      outline-offset: 8px;
     }
 
     .hero-result-card.prev {
@@ -1073,6 +1079,25 @@
       opacity: 0;
       transform: translateY(5px);
       transition: opacity .18s ease, transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+
+    .hero-card-boundary {
+      position: absolute;
+      left: 18px;
+      bottom: 16px;
+      z-index: 2;
+      min-height: 30px;
+      border-radius: 999px;
+      padding: 0 11px;
+      display: inline-flex;
+      align-items: center;
+      color: rgba(244, 247, 248, .86);
+      background: rgba(240, 198, 110, .12);
+      border: 1px solid rgba(240, 198, 110, .28);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0;
+      pointer-events: none;
     }
 
     .hero-result-card.active .hero-click-hint {
@@ -4210,6 +4235,147 @@
         display: none;
       }
     }
+    /* Human acceptance polish: separate H1, prompt, and carousel so no first-viewport overlap. */
+    .hero-stage {
+      min-height: 820px;
+      height: 92vh;
+      max-height: 980px;
+    }
+
+    .hero-positioning-copy {
+      z-index: 14;
+      top: clamp(88px, 10vh, 112px);
+      width: min(420px, calc(100% - 48px));
+    }
+
+    .hero-positioning-copy h1 {
+      font-size: clamp(32px, 3.35vw, 50px);
+      line-height: 1.08;
+    }
+
+    .hero-positioning-copy p {
+      max-width: 400px;
+      font-size: clamp(14px, 1.02vw, 16px);
+      line-height: 1.58;
+    }
+
+    .hero-prompt-panel {
+      top: clamp(450px, 52vh, 500px);
+      z-index: 13;
+      width: min(720px, calc(100% - 48px));
+    }
+
+    .hero-stage.card-hovering .hero-prompt-panel,
+    .hero-stage.card-selected .hero-prompt-panel,
+    .hero-stage.card-selected.card-hovering .hero-prompt-panel {
+      top: clamp(300px, 42vh, 390px);
+    }
+
+    .hero-result-card {
+      top: 72%;
+      width: clamp(560px, 50vw, 780px);
+      height: clamp(320px, 38vh, 430px);
+    }
+
+    .hero-ui-safe-note {
+      margin: 8px 12px 0;
+      color: rgba(201, 209, 215, .78);
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    @media (max-width: 1000px) {
+      .hero-stage {
+        min-height: 920px;
+        height: auto;
+        max-height: none;
+      }
+
+      .hero-positioning-copy {
+        top: 92px;
+        left: 22px;
+        right: 22px;
+        width: auto;
+      }
+
+      .hero-prompt-panel,
+      .hero-stage.card-hovering .hero-prompt-panel,
+      .hero-stage.card-selected .hero-prompt-panel,
+      .hero-stage.card-selected.card-hovering .hero-prompt-panel {
+        top: 330px;
+        transform: translateX(-50%);
+        width: min(680px, calc(100% - 32px));
+      }
+
+      .hero-result-card {
+        top: 610px;
+        width: min(520px, 88vw);
+        height: 320px;
+        transform: translate(-50%, 0) scale(1);
+      }
+
+      .hero-result-card.active,
+      .hero-result-card:hover {
+        transform: translate(-50%, 0) scale(1);
+      }
+
+      .hero-result-card.prev,
+      .hero-result-card.next,
+      .hero-result-card.far-prev,
+      .hero-result-card.far-next,
+      .hero-result-card.hidden-card {
+        transform: translate(-50%, 0) scale(.84);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .hero-stage {
+        min-height: 900px;
+      }
+
+      .hero-positioning-copy h1 {
+        font-size: 29px;
+      }
+
+      .hero-positioning-copy p {
+        max-width: 330px;
+      }
+
+      .hero-prompt-panel,
+      .hero-stage.card-hovering .hero-prompt-panel,
+      .hero-stage.card-selected .hero-prompt-panel,
+      .hero-stage.card-selected.card-hovering .hero-prompt-panel {
+        top: 318px;
+        padding: 12px;
+        border-radius: 22px;
+      }
+
+      .hero-input-bar {
+        border-radius: 22px;
+        grid-template-columns: 38px minmax(0, 1fr) 38px;
+      }
+
+      .hero-input-field {
+        font-size: 13px;
+      }
+
+      .upload-plus,
+      .submit-arrow {
+        width: 36px;
+        height: 36px;
+      }
+
+      .hero-result-card {
+        top: 570px;
+        height: 290px;
+      }
+
+      .hero-carousel-indicators {
+        bottom: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -4231,15 +4397,15 @@
   </header>
 
   <main id="top">
-    <!-- Prototype placeholder hashes (#requirement-form, #floor-plan-diy, #quote-check, #tender-platform, etc.) are intentionally kept until formal routes are approved. -->
+    <!-- A2 stitching candidate routes: static/mock-only targets, not production flow acceptance. -->
     <section class="hero-stage" aria-label="黑底水泥金屬 hero 測試">
       <div class="hero-positioning-copy" aria-label="萊比首頁主張">
         <h1>甲方別再盲問報價，<br>乙方別再白做估價。</h1>
         <p>萊比先把圖面、需求與規格整理清楚，<br>再讓詢價、招標與比較開始。</p>
       </div>
-      <div class="hero-focus-carousel" id="heroFocusCarousel" aria-hidden="true">
+      <div class="hero-focus-carousel" id="heroFocusCarousel" aria-label="Hero candidate route carousel">
         <div class="hero-card-track">
-          <article class="hero-result-card requirement-form-card gold-priority active" role="link" tabindex="0" data-route="#requirement-form" aria-label="前往需求表單">
+          <article class="hero-result-card requirement-form-card gold-priority active" role="link" tabindex="0" data-route="../onboard_ai_agent/code.html?entry=landing_requirement_card" aria-label="前往需求表單">
             <div class="hero-card-content">
               <div class="card-title-row">
                 <div><div class="mini">REQUIREMENT FORM</div><h3>需求表單</h3></div>
@@ -4254,11 +4420,12 @@
                   <div class="sheet-row"><b>附件</b><span>平面圖 / 報價單</span><span class="state-ok">已上傳</span></div>
                 </div>
               </div>
-              <span class="hero-click-hint">填寫需求 →</span>
+              <span class="hero-card-boundary">Candidate mock / preview-only</span>
+              <span class="hero-click-hint">Mock 表單預覽 →</span>
             </div>
           </article>
 
-          <article class="hero-result-card plan-preview-card gold-priority next" role="link" tabindex="0" data-route="#floor-plan-diy" aria-label="前往平面拼圖">
+          <article class="hero-result-card plan-preview-card gold-priority next" role="link" tabindex="0" data-route="../preview_floor_plan/code.html?entry=landing_plan_card" aria-label="前往平面拼圖">
             <div class="hero-card-content">
               <div class="card-title-row">
                 <div><div class="mini">ENTRY-LEVEL DRAWING TOOL</div><h3>平面拼圖</h3></div>
@@ -4277,11 +4444,12 @@
                   <div class="room selected" style="grid-column: span 3; grid-row: span 2;">衛浴<span class="handle tr"></span><span class="handle br"></span></div>
                 </div>
               </div>
-              <span class="hero-click-hint">進入工具 →</span>
+              <span class="hero-card-boundary">Candidate mock / preview-only</span>
+              <span class="hero-click-hint">Mock 工具預覽 →</span>
             </div>
           </article>
 
-          <article class="hero-result-card quote-check-card gold-priority far-next" role="link" tabindex="0" data-route="#quote-check" aria-label="前往報價健檢">
+          <article class="hero-result-card quote-check-card gold-priority far-next" role="link" tabindex="0" data-route="../preview_budget/code.html?entry=landing_quote_card" aria-label="前往報價健檢">
             <div class="hero-card-content">
               <div class="card-title-row">
                 <div><div class="mini">QUOTE HEALTH</div><h3>報價健檢</h3></div>
@@ -4298,11 +4466,12 @@
                   </div>
                 </div>
               </div>
-              <span class="hero-click-hint">進入工具 →</span>
+              <span class="hero-card-boundary">Candidate mock / preview-only</span>
+              <span class="hero-click-hint">Mock 健檢預覽 →</span>
             </div>
           </article>
 
-          <article class="hero-result-card tender-platform-card gold-priority hidden-card" role="link" tabindex="0" data-route="#tender-platform" aria-label="前往招標平台">
+          <article class="hero-result-card tender-platform-card gold-priority hidden-card" role="link" tabindex="0" data-route="../pro_dashboard/code.html?entry=landing_tender_candidate" aria-label="前往招標平台">
             <div class="hero-card-content">
               <div class="card-title-row">
                 <div><div class="mini">VENDOR TENDER BOARD</div><h3>招標平台</h3><div class="mini" style="margin-top: 6px;">等待決標案件 / 乙方可加入意向</div></div>
@@ -4318,11 +4487,12 @@
                   </div>
                 </div>
               </div>
-              <span class="hero-click-hint">查看招標 →</span>
+              <span class="hero-card-boundary">Candidate mock / preview-only</span>
+              <span class="hero-click-hint">案件 mock 預覽 →</span>
             </div>
           </article>
 
-          <article class="hero-result-card award-dashboard-card far-prev" role="link" tabindex="0" data-route="#award-dashboard" aria-label="前往決標儀表板">
+          <article class="hero-result-card award-dashboard-card far-prev" role="link" tabindex="0" data-route="../client_awarding_dashboard/code.html?entry=landing_award_candidate" aria-label="前往決標儀表板">
             <div class="hero-card-content">
               <div class="card-title-row">
                 <div><div class="mini">AWARD DASHBOARD</div><h3>決標儀表板</h3><div class="mini" style="margin-top: 6px;">投標比較 / 廠商評分 / 決標選項</div></div>
@@ -4337,11 +4507,12 @@
                   <div class="compare-row"><b>廠商 D</b><span>58萬</span><span>88%</span><span class="state-ok">低</span><span>89</span><span class="decision-actions"><label class="decision-pill"><input type="checkbox">淘汰</label><label class="decision-pill"><input type="checkbox">候選</label><label class="decision-pill"><input type="checkbox" checked>單一決標</label></span></div>
                 </div>
               </div>
-              <span class="hero-click-hint">查看決標 →</span>
+              <span class="hero-card-boundary">Candidate mock / preview-only</span>
+              <span class="hero-click-hint">決策 mock 預覽 →</span>
             </div>
           </article>
 
-          <article class="hero-result-card pcm-alert-card prev" role="link" tabindex="0" data-route="#pcm-review-notice" aria-label="前往 PCM 審查通知">
+          <article class="hero-result-card pcm-alert-card prev" role="link" tabindex="0" data-route="../project_timeline_and_governance/code.html?entry=landing_pcm_candidate" aria-label="前往 PCM 審查通知">
             <div class="hero-card-content">
               <div class="card-title-row">
                 <div><div class="mini">PCM REVIEW NOTICE</div><h3>PCM 審查通知</h3></div>
@@ -4362,7 +4533,8 @@
                   <div class="phone-input-mock"><span>›</span><em>訊息</em><span>＋</span></div>
                 </div>
               </div>
-              <span class="hero-click-hint">查看通知 →</span>
+              <span class="hero-card-boundary">Candidate mock / preview-only</span>
+              <span class="hero-click-hint">通知 mock 預覽 →</span>
             </div>
           </article>
         </div>
@@ -4376,16 +4548,17 @@
         </div>
       </div>
       <div class="hero-prompt-panel">
-        <div class="hero-slogan">平面圖 DIY、詢價，你選一樣</div>
+        <div class="hero-slogan">先描述需求，或選擇 mock 上傳入口</div>
         <div class="hero-input-wrap" id="heroInputWrap">
-          <div class="hero-input-bar" role="group" aria-label="AI 對話輸入框">
-            <button class="upload-plus" type="button" id="uploadPlus" aria-label="開啟上傳選單">+</button>
-            <input class="hero-input-field" id="heroInputField" type="text" autocomplete="off" placeholder="上傳平面圖或報價單，或直接輸入你的需求" aria-label="輸入裝修需求" />
-            <button class="submit-arrow" type="button" aria-label="送出">→</button>
+          <div class="hero-input-bar" role="group" aria-label="LaiBE mock requirement input">
+            <button class="upload-plus" type="button" id="uploadPlus" aria-label="開啟 mock 上傳選單">+</button>
+            <input class="hero-input-field" id="heroInputField" type="text" autocomplete="off" placeholder="輸入需求、平面圖狀況或報價疑問" aria-label="輸入裝修需求" />
+            <button class="submit-arrow" type="button" aria-label="送出 mock 需求">→</button>
           </div>
+          <p class="hero-ui-safe-note">Mock-only guidance / no real upload / no formal quote, tender, PDF, payment, DB, AI API, or LINE API.</p>
           <div class="upload-menu" id="uploadMenu" aria-label="上傳選單">
-            <button class="upload-option" type="button" data-target="planInput">上傳平面圖</button>
-            <button class="upload-option" type="button" data-target="quoteInput">上傳報價單</button>
+            <button class="upload-option" type="button" data-target="planInput">平面圖 mock only</button>
+            <button class="upload-option" type="button" data-target="quoteInput">報價單 mock only</button>
           </div>
           <input id="planInput" type="file" accept="image/*,.pdf,.dwg,.dxf" hidden />
           <input id="quoteInput" type="file" accept="image/*,.pdf,.xlsx,.csv" hidden />
@@ -4411,7 +4584,7 @@
             <div class="role-card-code">LAIBE / ROLE ACCESS · CLIENT</div>
           </article>
           <div class="role-card-actions">
-            <a class="role-btn role-btn-primary-orange" href="#">業主入口</a>
+            <a class="role-btn role-btn-primary-orange" href="../onboard_ai_agent/code.html" aria-label="業主入口" data-gate-cta="owner-entry">業主入口</a>
           </div>
         </div>
 
@@ -4438,7 +4611,7 @@
             <div class="role-card-code">LAIBE / ROLE ACCESS · VENDOR</div>
           </article>
           <div class="role-card-actions">
-            <a class="role-btn role-btn-primary-orange" href="#">設計師/承包商入口</a>
+            <a class="role-btn role-btn-primary-orange" href="../pro_dashboard/code.html" aria-label="設計師/承包商入口" data-gate-cta="vendor-entry">設計師/承包商入口</a>
           </div>
         </div>
       </div>
@@ -4492,7 +4665,7 @@
         </div>
       </div>
       <div class="bento-tools free-tool-stack">
-        <a class="bento-card tool-banner" href="../preview_floor_plan/code.html">
+        <a class="bento-card tool-banner" href="../preview_floor_plan/code.html?entry=landing_tool_plan" aria-label="Plan Puzzle 入口" data-gate-cta="plan-puzzle-entry">
           <div>
             <span class="badge client">工具 01</span>
             <h3>平面拼圖</h3>
@@ -4507,7 +4680,7 @@
             </div>
           </div>
         </a>
-        <a class="bento-card tool-banner" href="#">
+        <a class="bento-card tool-banner" href="../preview_budget/code.html?entry=landing_tool_budget" aria-label="Budget Preview 入口" data-gate-cta="budget-preview-entry">
           <div>
             <span class="badge">工具 02</span>
             <h3>預算生成</h3>
@@ -4758,6 +4931,7 @@
     const heroCarousel = document.getElementById("heroFocusCarousel");
     const heroCards = Array.from(document.querySelectorAll(".hero-result-card"));
     const heroDots = Array.from(document.querySelectorAll(".hero-dot"));
+    const HERO_AUTO_ROTATE_ENABLED = false;
     let activeHeroCard = 0;
     let heroCarouselTimer;
     let typingTimer;
@@ -4781,6 +4955,9 @@
         card.classList.remove(...positionClasses);
         const offset = (index - activeHeroCard + heroCards.length) % heroCards.length;
         card.classList.add(positionClasses[offset] || "hidden-card");
+        const isActive = offset === 0;
+        card.tabIndex = isActive ? 0 : -1;
+        card.setAttribute("aria-hidden", String(!isActive));
       });
       heroDots.forEach((dot, index) => {
         dot.classList.toggle("active", index === activeHeroCard);
@@ -4790,9 +4967,14 @@
     function startHeroCarousel() {
       if (!heroCards.length) return;
       window.clearInterval(heroCarouselTimer);
+      if (!HERO_AUTO_ROTATE_ENABLED) return;
       heroCarouselTimer = window.setInterval(() => {
         updateHeroCarousel(activeHeroCard + 1);
-      }, 4000);
+      }, 7000);
+    }
+
+    function pauseHeroCarousel() {
+      window.clearInterval(heroCarouselTimer);
     }
 
     if (heroCarousel) {
@@ -4808,8 +4990,18 @@
       startHeroCarousel();
     }
 
+    function followHeroRoute(route) {
+      if (!route || route === "#") return;
+      if (route.startsWith("#")) {
+        history.replaceState(null, "", route);
+        return;
+      }
+      window.location.assign(route);
+    }
+
     heroCards.forEach((card, index) => {
       card.addEventListener("mouseenter", () => {
+        pauseHeroCarousel();
         window.clearTimeout(heroHoverReleaseTimer);
         if (!heroCardSelected) heroStage.classList.add("card-hovering");
       });
@@ -4819,27 +5011,33 @@
             heroStage.classList.remove("card-hovering");
           }, 90);
         }
+        startHeroCarousel();
+      });
+      card.addEventListener("focus", () => {
+        pauseHeroCarousel();
+      });
+      card.addEventListener("blur", () => {
+        startHeroCarousel();
+      });
+      card.addEventListener("pointerdown", () => {
+        pauseHeroCarousel();
       });
       card.addEventListener("click", (event) => {
         event.preventDefault();
-        const route = card.dataset.route || "#";
+        pauseHeroCarousel();
+        const wasActive = index === activeHeroCard;
         updateHeroCarousel(index);
-        if (route.startsWith("#")) {
-          history.replaceState(null, "", route);
-        }
-        startHeroCarousel();
+        if (!wasActive) return;
+        followHeroRoute(card.dataset.route || "#");
       });
       card.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          const route = card.dataset.route || "#";
           heroCardSelected = false;
           heroStage.classList.remove("card-selected");
+          pauseHeroCarousel();
           updateHeroCarousel(index);
-          if (route.startsWith("#")) {
-            history.replaceState(null, "", route);
-          }
-          startHeroCarousel();
+          followHeroRoute(card.dataset.route || "#");
         }
       });
     });

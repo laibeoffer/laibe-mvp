@@ -1,272 +1,610 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>萊比 Laibe - 預算書預覽</title>
-<!-- Tailwind CSS v3 with plugins -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            laibe: {
-              red: '#AD5A5A',
-              dark: '#3D4D4D',
-              gold: '#E9C46A',
-              light: '#F9F8F6',
-              border: '#E2E8F0'
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'Manrope', 'Noto Sans TC', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
-<style data-purpose="custom-typography">
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
-
-    .document-shadow {
-      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE - 文件預覽 mock</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #ded8d1;
+      --paper: #fffdfa;
+      --bg: #f8f6f2;
+      --brand: #ad5a5a;
+      --brand-deep: #8c4747;
+      --amber: #a15c00;
+      --disabled: #eef0f3;
+      --safe-bg: #ecfdf5;
     }
 
-    .status-badge {
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 253, 250, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 0;
+    }
+
+    .brand {
       display: inline-flex;
       align-items: center;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 500;
+      gap: 10px;
+      font-weight: 900;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--brand);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+    }
+
+    .steps {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .step {
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    .step.active {
+      color: var(--brand-deep);
+      background: #f8eeee;
+      border-color: rgba(173, 90, 90, 0.35);
+    }
+
+    .step.disabled {
+      color: #98a2b3;
+      background: #f2f4f7;
+      cursor: not-allowed;
+    }
+
+    main {
+      padding: 32px 0 58px;
+    }
+
+    .panel,
+    .notice,
+    .document,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(31, 35, 40, 0.05);
+    }
+
+    .panel {
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      color: var(--brand-deep);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin-bottom: 12px;
+      font-size: 20px;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .lead {
+      color: var(--muted);
+      font-weight: 650;
+      margin-bottom: 0;
+    }
+
+    .notice {
+      padding: 15px;
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .notice strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .warning {
+      color: #7c2d12;
+      background: #fff7ed;
+      border-color: #fed7aa;
+    }
+
+    .safe {
+      color: #064e3b;
+      background: var(--safe-bg);
+      border-color: #bbf7d0;
+    }
+
+    .document {
+      position: relative;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .document::before {
+      content: "DRY-RUN MOCK";
+      position: absolute;
+      inset: 38% auto auto 50%;
+      transform: translate(-50%, -50%) rotate(-18deg);
+      color: rgba(173, 90, 90, 0.08);
+      font-size: clamp(44px, 11vw, 112px);
+      font-weight: 950;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .doc-strip {
+      height: 8px;
+      background: var(--brand);
+    }
+
+    .doc-body {
+      position: relative;
+      padding: clamp(22px, 5vw, 56px);
+    }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 28px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #f2f4f7;
+      color: #475467;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .total {
+      margin: 22px 0 8px;
+      color: var(--brand-deep);
+      font-size: clamp(38px, 8vw, 64px);
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 26px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      min-width: 860px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #ece7e0;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #475467;
+      background: #fbfaf8;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    td {
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .mobile-list {
+      display: none;
+      margin-top: 18px;
+      gap: 12px;
+    }
+
+    .mobile-row {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 14px;
+    }
+
+    .mobile-row dl {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 8px 12px;
+      margin: 0;
+    }
+
+    .mobile-row dt {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .mobile-row dd {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .btn,
+    .disabled-btn {
+      min-height: 44px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 11px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 850;
+      text-align: center;
+    }
+
+    .btn {
+      background: white;
+    }
+
+    .btn.primary {
+      color: white;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .disabled-btn {
+      color: #667085;
+      background: var(--disabled);
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .status {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+    }
+
+    .status strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .status span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    @media (max-width: 900px) {
+      .topbar-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .steps {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .doc-header,
+      .action-grid,
+      .status-grid {
+        grid-template-columns: 1fr;
+        flex-direction: column;
+      }
+
+      .status-grid,
+      .action-grid {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100% - 24px, 1120px);
+      }
+
+      main {
+        padding-top: 22px;
+      }
+
+      .panel,
+      .doc-body {
+        padding: 18px;
+      }
+
+      .table-wrap {
+        display: none;
+      }
+
+      .mobile-list {
+        display: grid;
+      }
+
+      .btn,
+      .disabled-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
-<body class="bg-laibe-light font-sans text-slate-800 antialiased min-h-screen">
-<!-- BEGIN: Navigation Header -->
-<header class="bg-white border-b border-laibe-border sticky top-0 z-50">
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-<div class="flex items-center gap-8">
-<a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-    <img src="../../../assets/logo/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
-</a>
-<nav class="hidden md:flex space-x-6 text-sm font-medium text-slate-500">
-<a class="hover:text-laibe-red transition-colors" href="#">導引討論</a>
-<a class="hover:text-laibe-red transition-colors" href="#">平面配置</a>
-<a class="text-laibe-red border-b-2 border-laibe-red pb-1" href="#">預算總覽</a>
-<a class="hover:text-laibe-red transition-colors" href="#">招標管理</a>
-</nav>
-</div>
-<div class="flex items-center gap-4">
-<div class="relative">
-<input class="bg-slate-100 border-none rounded-full py-1.5 pl-4 pr-10 text-sm focus:ring-laibe-red w-48" placeholder="搜尋項目..." type="text"/>
-<svg class="w-4 h-4 absolute right-3 top-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-</div>
-<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
-<img alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXyroKIS02eja4RlkI5gYbHJFUqWoJEu4bfU14zTnSWEJrfzjPMlYakd6qpU8WMrUqZJ5CdGyWOJeDHVnEQ5T5vw8EwTmKR385RjucNGJxq-dS9ixjdvmMTLB88XTqsQzkobCNA9Ctn5GDmPKEPHPS5CrxJKqPq-2N7EH7MHqyFFTbNM6HKUn7PvtVOwC84vNxsTLsX1Wz0f3xc_sVxqIRbL7Zo-g_E32HoF4nFxkG8CJj5O2up7anxklqm4kYCm4wivgA9_ngtcY"/>
-</div>
-</div>
-</div>
-</header>
-<!-- END: Navigation Header -->
-<main class="max-w-5xl mx-auto py-10 px-4">
-<!-- BEGIN: Stepper Component -->
-<section class="mb-12" data-purpose="stepper">
-<div class="flex items-center justify-between max-w-3xl mx-auto">
-<!-- Step 1 -->
-<div class="flex flex-col items-center gap-2 group">
-<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold border-2 border-white shadow-sm">
-<svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>
-</div>
-<span class="text-xs text-slate-400 font-medium">1. 需求討論</span>
-</div>
-<div class="flex-1 h-px bg-slate-200 mb-6"></div>
-<!-- Step 2 -->
-<div class="flex flex-col items-center gap-2">
-<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold border-2 border-white shadow-sm">
-<svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>
-</div>
-<span class="text-xs text-slate-400 font-medium">2. 平面拼圖</span>
-</div>
-<div class="flex-1 h-px bg-slate-200 mb-6"></div>
-<!-- Step 3 -->
-<div class="flex flex-col items-center gap-2">
-<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold border-2 border-white shadow-sm">
-<svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>
-</div>
-<span class="text-xs text-slate-400 font-medium">3. 預算生成</span>
-</div>
-<div class="flex-1 h-px bg-slate-200 mb-6"></div>
-<!-- Step 4 -->
-<div class="flex flex-col items-center gap-2">
-<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs font-bold border-2 border-white shadow-sm">
-<svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>
-</div>
-<span class="text-xs text-slate-400 font-medium">4. 預算編輯</span>
-</div>
-<div class="flex-1 h-px bg-laibe-red mb-6"></div>
-<!-- Step 5 (Active) -->
-<div class="flex flex-col items-center gap-2">
-<div class="w-10 h-10 rounded-full bg-laibe-red text-white flex items-center justify-center text-sm font-bold ring-4 ring-red-100 shadow-md">5</div>
-<span class="text-xs text-laibe-red font-bold">5. 預算書預覽</span>
-</div>
-</div>
-</section>
-<!-- END: Stepper Component -->
-<!-- BEGIN: Main Document Card -->
-<article class="bg-white rounded-xl document-shadow mb-8 overflow-hidden relative" data-purpose="budget-document">
-<!-- Document Header Decor -->
-<div class="h-2 bg-laibe-red w-full"></div>
-<div class="p-12 md:p-16">
-<!-- Badge and Status -->
-<div class="flex justify-between items-start mb-10">
-<div class="flex flex-col gap-1">
-<span class="inline-flex items-center px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold tracking-widest uppercase">
-<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.64.304 1.24.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
-              預算定案總覽
-            </span>
-<p class="text-[10px] text-slate-400 mt-1">版本號：v1.2 (定案版) | 生成時間：2024-05-20</p>
-</div>
-<div class="text-right">
-<h1 class="text-3xl font-bold text-laibe-dark tracking-tight">預算書</h1>
-<p class="text-slate-400 text-xs mt-1">Budget Statement</p>
-</div>
-</div>
-<!-- Project Info -->
-<div class="text-center mb-12">
-<h2 class="text-2xl font-bold text-laibe-dark mb-4">南崗工業區服務中心整修工程</h2>
-<p class="text-slate-400 text-sm mb-6">總預算預估 Estimated Total Budget</p>
-<div class="inline-block relative">
-<span class="text-5xl md:text-6xl font-extrabold text-[#D29D8F] tracking-tight">$18,500,000</span>
-<div class="h-1 bg-[#D29D8F]/20 absolute -bottom-2 left-0 w-full rounded-full"></div>
-</div>
-</div>
-<!-- Budget Table -->
-<div class="mb-12 border-t border-b border-laibe-border py-2">
-<table class="w-full text-left" id="budget-summary-table">
-<thead>
-<tr class="text-xs text-slate-400 uppercase tracking-wider">
-<th class="py-4 font-semibold w-16">項次</th>
-<th class="py-4 font-semibold">工程大項</th>
-<th class="py-4 font-semibold text-right">預估金額 (NT$)</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-slate-100">
-<tr class="hover:bg-slate-50 transition-colors">
-<td class="py-5 text-sm text-slate-400 font-mono">01</td>
-<td class="py-5 text-base font-semibold text-laibe-dark">一、假設工程</td>
-<td class="py-5 text-right font-mono text-lg text-[#D29D8F] font-bold">1,280,000</td>
-</tr>
-<tr class="hover:bg-slate-50 transition-colors">
-<td class="py-5 text-sm text-slate-400 font-mono">02</td>
-<td class="py-5 text-base font-semibold text-laibe-dark">二、拆除工程</td>
-<td class="py-5 text-right font-mono text-lg text-[#D29D8F] font-bold">850,000</td>
-</tr>
-<tr class="hover:bg-slate-50 transition-colors">
-<td class="py-5 text-sm text-slate-400 font-mono">03</td>
-<td class="py-5 text-base font-semibold text-laibe-dark">三、外牆工程</td>
-<td class="py-5 text-right font-mono text-lg text-[#D29D8F] font-bold">2,869,000</td>
-</tr>
-<tr class="hover:bg-slate-50 transition-colors">
-<td class="py-5 text-sm text-slate-400 font-mono">04</td>
-<td class="py-5 text-base font-semibold text-laibe-dark">四、泥作工程</td>
-<td class="py-5 text-right font-mono text-lg text-[#D29D8F] font-bold">1,050,000</td>
-</tr>
-</tbody>
-</table>
-</div>
-<!-- Footer Note -->
-<div class="flex flex-col md:flex-row justify-between items-center gap-6">
-<div class="flex items-start gap-3 bg-slate-50 p-4 rounded-lg flex-1">
-<svg class="w-5 h-5 text-slate-400 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" fill-rule="evenodd"></path></svg>
-<p class="text-xs text-slate-500 leading-relaxed">
-              價格已包含 5% 營業稅與相關管理費用。完整施工工法與材料細節另附於工法說明書，並可隨空白標單或整體明細表一併輸出。
-            </p>
-</div>
-<div class="text-xs text-slate-400 whitespace-nowrap">
-            第 1 頁 / 共 1 頁
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="../laibe_landing_desktop/code.html" aria-label="回到 LaiBE 首頁">
+        <span class="brand-mark">LB</span>
+        <span>LaiBE</span>
+      </a>
+      <nav class="steps" aria-label="文件預覽流程">
+        <a class="step" href="../preview_budget/code.html">3 預算草稿</a>
+        <a class="step" href="../client_step_4_budget_finalization/code.html">4 人工確認</a>
+        <span class="step active">5 文件預覽 mock</span>
+        <span class="step disabled" aria-disabled="true">PDF disabled</span>
+        <span class="step disabled" aria-disabled="true">標單 disabled</span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="panel">
+      <div class="eyebrow">Document candidate preview</div>
+      <h1>預算文件預覽 - mock only</h1>
+      <p class="lead">
+        這不是可簽核文件，只是把預算草稿排成文件樣式供人工檢查。PDF 預覽停用 / 非正式 PDF / mock only，且不提供空白標單檔案。
+      </p>
+    </section>
+
+    <section class="notice warning">
+      <span aria-hidden="true">!</span>
+      <div>
+        <strong>文件輸出停用</strong>
+        <p class="lead">不產生 PDF、Excel、報價單或標單；不啟動招標、付款、上架費、DB、Budget Engine、PricingRule 或 BudgetEstimateLine。</p>
+      </div>
+    </section>
+
+    <section class="status-grid" aria-label="文件狀態">
+      <div class="status">
+        <strong>PDF 預覽停用</strong>
+        <span>disabled mock only</span>
+      </div>
+      <div class="status">
+        <strong>空白標單預覽停用</strong>
+        <span>非正式標單 mock</span>
+      </div>
+      <div class="status">
+        <strong>人工複核未完成</strong>
+        <span>manual review required</span>
+      </div>
+      <div class="status">
+        <strong>付款停用</strong>
+        <span>candidate placeholder</span>
+      </div>
+    </section>
+
+    <article class="document" aria-label="預算文件 mock 預覽">
+      <div class="doc-strip"></div>
+      <div class="doc-body">
+        <div class="doc-header">
+          <div>
+            <span class="badge">DRY-RUN MOCK</span>
+            <p class="lead" style="margin-top: 8px;">版本：preview 0.3，日期：2026-06-08，狀態：人工 review 前。</p>
           </div>
-</div>
-</div>
-</article>
-<!-- END: Main Document Card -->
-<!-- BEGIN: Attachment Status Area -->
-<section class="mb-12 bg-white/50 backdrop-blur-sm border border-laibe-border rounded-xl p-6" data-purpose="attachment-status">
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-<!-- Status 1 -->
-<div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-emerald-100 shadow-sm">
-<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path clip-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" fill-rule="evenodd"></path></svg>
-</div>
-<div>
-<p class="text-xs font-bold text-slate-700">預算書</p>
-<span class="text-[10px] text-emerald-600 font-medium">已生成</span>
-</div>
-</div>
-<!-- Status 2 -->
-<div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-emerald-100 shadow-sm">
-<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM5.884 6.923a1 1 0 10-1.414-1.414l-.707.707a1 1 0 101.414 1.414l.707-.707zm11.314 1.414a1 1 0 00-1.414-1.414l-.707.707a1 1 0 101.414 1.414l.707-.707zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zM5 11a1 1 0 100-2H4a1 1 0 100 2h1zM8 14a1 1 0 100 2h4a1 1 0 100-2H8z"></path></svg>
-</div>
-<div>
-<p class="text-xs font-bold text-slate-700">工法說明書</p>
-<span class="text-[10px] text-emerald-600 font-medium">已連結</span>
-</div>
-</div>
-<!-- Status 3 -->
-<div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-laibe-border shadow-sm">
-<div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" fill-rule="evenodd"></path></svg>
-</div>
-<div>
-<p class="text-xs font-bold text-slate-700">空白標單</p>
-<span class="text-[10px] text-blue-600 font-medium">可下載</span>
-</div>
-</div>
-<!-- Status 4 -->
-<div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-emerald-100 shadow-sm">
-<div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
-<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" fill-rule="evenodd"></path></svg>
-</div>
-<div>
-<p class="text-xs font-bold text-slate-700">圖面對照</p>
-<span class="text-[10px] text-emerald-600 font-medium">已附入</span>
-</div>
-</div>
-</div>
-</section>
-<!-- END: Attachment Status Area -->
-<!-- BEGIN: Bottom Action Cards -->
-<section class="grid grid-cols-1 md:grid-cols-3 gap-6" data-purpose="bottom-actions">
-<!-- Back Card -->
-<button class="flex flex-col items-center justify-center p-8 bg-white border border-laibe-border rounded-2xl hover:bg-slate-50 transition-all group shadow-sm">
-<div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400 group-hover:text-laibe-dark transition-colors">
-<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-</div>
-<h3 class="text-lg font-bold text-laibe-dark mb-1">返回預算總覽</h3>
-<p class="text-xs text-slate-400">返回 Step 4 修改細節</p>
-</button>
-<!-- Download Blank Card -->
-<button class="flex flex-col items-center justify-center p-8 bg-laibe-gold/20 border border-laibe-gold/40 rounded-2xl hover:bg-laibe-gold/30 transition-all group shadow-sm">
-<div class="w-12 h-12 bg-laibe-gold/40 rounded-full flex items-center justify-center mb-4 text-laibe-dark">
-<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-</div>
-<h3 class="text-lg font-bold text-laibe-dark mb-1">下載空白標單</h3>
-<p class="text-xs text-laibe-dark/60">隱藏單價供發包使用</p>
-</button>
-<!-- Primary Export Card -->
-<button class="flex flex-col items-center justify-center p-8 bg-laibe-red text-white rounded-2xl hover:bg-red-800 transition-all group shadow-md shadow-red-200">
-<div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
-<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-</div>
-<h3 class="text-lg font-bold mb-1">匯出正式預算 (PDF)</h3>
-<p class="text-xs text-white/70">產出附錄圖面之完整文件</p>
-</button>
-</section>
-<!-- END: Bottom Action Cards -->
-</main>
-<footer class="mt-20 py-8 text-center text-[10px] text-slate-400 border-t border-laibe-border">
-<p>© 2024 Laibe 智慧家裝室內設計。保留所有權利。僅供專業估算參考使用。</p>
-</footer>
-</body></html>
+          <div style="text-align: right;">
+            <h2>預算草稿摘要</h2>
+            <p class="lead">Budget preview, not a quote</p>
+          </div>
+        </div>
+
+        <h2>住宅裝修預算候選摘要</h2>
+        <p class="lead">金額僅用於展示欄位與文件排版，不可作為報價、付款或招標依據。</p>
+        <div class="total">NT$ 1,850,000</div>
+
+        <div class="table-wrap" tabindex="0" aria-label="可水平捲動的 A-G 文件預覽表">
+          <table>
+            <thead>
+              <tr>
+                <th>A 項次</th>
+                <th>B 品名</th>
+                <th>C 單位</th>
+                <th class="num">D 數量</th>
+                <th class="num">E 單價</th>
+                <th class="num">F 金額</th>
+                <th>G 備註</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1.1</td>
+                <td>拆除與保護工程</td>
+                <td>式</td>
+                <td class="num">1</td>
+                <td class="num">85,000</td>
+                <td class="num">85,000</td>
+                <td>需現場丈量，manual review。</td>
+              </tr>
+              <tr>
+                <td>2.1</td>
+                <td>泥作與防水基礎</td>
+                <td>坪</td>
+                <td class="num">12</td>
+                <td class="num">9,800</td>
+                <td class="num">117,600</td>
+                <td>材料等級需人工確認。</td>
+              </tr>
+              <tr>
+                <td>3.1</td>
+                <td>木作櫃體草稿</td>
+                <td>尺</td>
+                <td class="num">22</td>
+                <td class="num">6,500</td>
+                <td class="num">143,000</td>
+                <td>單價為 candidate，不作報價。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mobile-list" aria-label="手機版 A-G 文件卡片">
+          <article class="mobile-row">
+            <dl>
+              <dt>A 項次</dt><dd>1.1</dd>
+              <dt>B 品名</dt><dd>拆除與保護工程</dd>
+              <dt>C 單位</dt><dd>式</dd>
+              <dt>D 數量</dt><dd>1</dd>
+              <dt>E 單價</dt><dd>NT$ 85,000</dd>
+              <dt>F 金額</dt><dd>NT$ 85,000</dd>
+              <dt>G 備註</dt><dd>需現場丈量，manual review。</dd>
+            </dl>
+          </article>
+          <article class="mobile-row">
+            <dl>
+              <dt>A 項次</dt><dd>2.1</dd>
+              <dt>B 品名</dt><dd>泥作與防水基礎</dd>
+              <dt>C 單位</dt><dd>坪</dd>
+              <dt>D 數量</dt><dd>12</dd>
+              <dt>E 單價</dt><dd>NT$ 9,800</dd>
+              <dt>F 金額</dt><dd>NT$ 117,600</dd>
+              <dt>G 備註</dt><dd>材料等級需人工確認。</dd>
+            </dl>
+          </article>
+        </div>
+      </div>
+    </article>
+
+    <section class="notice safe">
+      <span aria-hidden="true">i</span>
+      <div>
+        <strong>手機可讀性</strong>
+        <p class="lead">手機版不只靠橫向捲動，已提供 A-G 卡片，避免關鍵警語或金額欄位被完全藏住。</p>
+      </div>
+    </section>
+
+    <section class="action-grid" aria-label="文件動作">
+      <a class="btn" href="../client_step_4_budget_finalization/code.html">返回人工確認</a>
+      <button class="disabled-btn" type="button" disabled aria-disabled="true" data-budget-action="blank-tender-disabled" title="disabled preview, mock only, no tender file">
+        空白標單預覽停用 / mock only
+      </button>
+      <button class="disabled-btn" type="button" disabled aria-disabled="true" data-budget-action="pdf-preview-disabled" title="PDF preview disabled, non-production mock only">
+        PDF 預覽停用 / 非正式 PDF mock
+      </button>
+    </section>
+
+    <section class="card" style="margin-top: 14px;">
+      <h2>安全後續</h2>
+      <p class="lead">如需看後續候選流程，下一頁仍只顯示 Dashboard / Tender / PCM placeholder，不會送出付款、招標或任何檔案輸出。</p>
+      <div style="margin-top: 14px;">
+        <a class="btn primary" href="../client_awarding_dashboard/code.html?entry=budget_document_preview_candidate">前往甲方 Dashboard candidate</a>
+        <a class="btn" href="../client_document_selection/code.html?entry=budget_document_preview_candidate">文件選擇 candidate</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

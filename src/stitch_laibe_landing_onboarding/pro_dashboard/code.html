@@ -54,10 +54,9 @@
                     <span>LaiBE</span>
                 </div>
                 <div class="flex items-center gap-6">
-                    <a href="#"
-                        class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">查看招標案件</a>
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">我的投標</a>
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">文件中心</a>
+                    <a href="../tender_notice/code.html?entry=pro_dashboard_candidate" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal" title="candidate static mock / no formal tender">案件預覽 mock</a>
+                    <a href="../pro_dashboard/code.html?route_state=candidate_static_mock#vendor-bids" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal" title="candidate static mock / no formal bid submit">回覆預覽</a>
+                    <a href="../pro_dashboard/code.html?route_state=candidate_static_mock#vendor-documents" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal" title="candidate static mock / no real upload or download">文件預覽</a>
                     <div
                         class="w-10 h-10 rounded-full bg-terracotta-red/10 flex items-center justify-center text-terracotta-red">
                         <span class="material-symbols-outlined">badge</span>
@@ -67,7 +66,13 @@
         </div>
     </header>
 
-    <main class="flex-grow">
+    <main class="flex-grow" data-boundary="candidate-static-mock-not-production">
+
+        <section class="bg-amber-50 border-b border-amber-200 text-amber-900" aria-label="Candidate route boundary">
+            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-4 text-sm sm:text-base font-black leading-relaxed">
+                候選靜態 Mock 預覽 / NOT PRODUCTION: 乙方入口不會開放正式招標、付款、LINE 綁定、文件下載或投標送出。所有案件、回覆、決標與進度都是 placeholder。
+            </div>
+        </section>
 
         <!-- HERO -->
         <section class="py-16 lg:py-20 bg-white border-b border-black/5">
@@ -80,19 +85,20 @@
                             乙方入口首頁
                         </div>
                         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight mb-6">
-                            瀏覽裝修招標案件
+                            瀏覽招標候選預覽
                         </h1>
                         <p class="text-lg sm:text-xl leading-relaxed text-charcoal/75 max-w-2xl mb-10 font-medium">
-                            提交投標文件，參與競標。
+                            這裡只能看 mock 案件與回覆樣式；不能提交投標文件或參與競標。
                         </p>
                         <button
-                            class="bg-terracotta-red text-white px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:opacity-90 transition">
-                            查看招標案件
+                            class="bg-terracotta-red text-white px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:opacity-90 transition cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: not production, no formal tender, no formal bid submit">
+                            查看招標預覽（未開放）
                         </button>
+                        <p class="mt-3 text-sm font-bold text-terracotta-red">Disabled reason: candidate static mock, no formal tender entry, no bid submit, no payment.</p>
                     </div>
 
                     <div class="bg-warm-beige rounded-3xl shadow-soft p-8">
-                        <div class="text-sm text-charcoal/50 font-bold mb-2">投標概覽</div>
+                        <div class="text-sm text-charcoal/50 font-bold mb-2">Mock 狀態概覽</div>
                         <div class="text-2xl font-black mb-6">乙方工作狀態</div>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-white rounded-2xl p-5 text-center">
@@ -100,14 +106,14 @@
                                     class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                                     <span class="material-symbols-outlined">format_list_bulleted</span>
                                 </div>
-                                <div class="font-black">招標案件</div>
+                                <div class="font-black">招標預覽</div>
                             </div>
                             <div class="bg-white rounded-2xl p-5 text-center">
                                 <div
                                     class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                                     <span class="material-symbols-outlined">description</span>
                                 </div>
-                                <div class="font-black">我的投標</div>
+                                <div class="font-black">回覆預覽</div>
                             </div>
                             <div class="bg-white rounded-2xl p-5 text-center">
                                 <div
@@ -133,8 +139,8 @@
         <section class="py-20 bg-warm-beige">
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">招標案件</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">優先查看目前可投標的裝修案件。</p>
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">招標案件候選預覽</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">只展示目前 mock 案件清單；不是正式可投標案件，也不會收取費用或通知業主。</p>
                 </div>
 
                 <div class="overflow-hidden rounded-3xl border border-black/5 shadow-soft bg-white">
@@ -143,7 +149,7 @@
                         <div>地區</div>
                         <div>預算</div>
                         <div>空間類型</div>
-                        <div>投標截止日</div>
+                        <div>回覆預覽日期</div>
                     </div>
 
                     <div class="grid grid-cols-5 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
@@ -173,19 +179,20 @@
 
                 <div class="mt-8">
                     <button
-                        class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
-                        查看案件
+                        class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition cursor-not-allowed opacity-70" disabled data-mock-only="true" title="Candidate static mock: no formal tender entry or bid submit">
+                        查看案件預覽（未開放）
                     </button>
+                    <p class="mt-3 text-sm font-bold text-terracotta-red">Disabled reason: no formal tender route, no bid submit, no payment, no LINE API.</p>
                 </div>
             </div>
         </section>
 
         <!-- 我的投標 -->
-        <section class="py-20 bg-white border-y border-black/5">
+        <section class="py-20 bg-white border-y border-black/5" id="vendor-bids">
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">我的投標</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">查看已投標案件、場勘邀請與決標結果。</p>
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">我的回覆預覽</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">查看 mock 回覆、場勘邀請樣式與決標 placeholder；沒有正式投標送出或決標結果。</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -194,9 +201,9 @@
                             class="w-14 h-14 rounded-full bg-white text-terracotta-red flex items-center justify-center mb-5">
                             <span class="material-symbols-outlined">description</span>
                         </div>
-                        <h3 class="text-2xl font-black mb-3">已投標案件</h3>
+                        <h3 class="text-2xl font-black mb-3">投標送出未開放</h3>
                         <p class="text-charcoal/75 text-lg font-medium leading-relaxed">
-                            查看目前已提交報價與文件的案件。
+                            只顯示回覆草稿狀態；沒有提交報價、文件或正式投標。
                         </p>
                     </div>
 
@@ -216,9 +223,9 @@
                             class="w-14 h-14 rounded-full bg-white text-terracotta-red flex items-center justify-center mb-5">
                             <span class="material-symbols-outlined">emoji_events</span>
                         </div>
-                        <h3 class="text-2xl font-black mb-3">決標結果</h3>
+                        <h3 class="text-2xl font-black mb-3">決標結果未開放</h3>
                         <p class="text-charcoal/75 text-lg font-medium leading-relaxed">
-                            瀏覽投標後的決標與後續進度。
+                            只顯示 candidate placeholder；不代表任何得標、未得標或後續工程進度。
                         </p>
                     </div>
                 </div>
@@ -226,11 +233,11 @@
         </section>
 
         <!-- 文件中心 -->
-        <section class="py-20 bg-warm-beige">
+        <section class="py-20 bg-warm-beige" id="vendor-documents">
             <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="mb-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">文件中心</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">乙方可提交報價與執行相關文件。</p>
+                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">文件中心候選預覽</h2>
+                    <p class="text-lg text-charcoal/70 font-medium">文件中心僅為 candidate / mock-only 預覽；不可提交報價、不可上傳正式文件，也不會送出投標。</p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -239,7 +246,7 @@
                             class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                             <span class="material-symbols-outlined">receipt_long</span>
                         </div>
-                        <div class="font-black text-lg">報價單</div>
+                        <div class="font-black text-lg">報價草稿預覽</div>
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
@@ -247,7 +254,7 @@
                             class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                             <span class="material-symbols-outlined">assignment</span>
                         </div>
-                        <div class="font-black text-lg">施工計畫</div>
+                        <div class="font-black text-lg">工程計畫預覽</div>
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
@@ -255,7 +262,7 @@
                             class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                             <span class="material-symbols-outlined">inventory_2</span>
                         </div>
-                        <div class="font-black text-lg">材料說明</div>
+                        <div class="font-black text-lg">材料說明 mock</div>
                     </div>
 
                     <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
@@ -263,8 +270,12 @@
                             class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
                             <span class="material-symbols-outlined">design_services</span>
                         </div>
-                        <div class="font-black text-lg">設計加工</div>
+                        <div class="font-black text-lg">設計加工 mock</div>
                     </div>
+                </div>
+
+                <div class="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900 font-bold leading-relaxed">
+                    文件提交停用 / mock only：no formal bid submit, no real upload, no download, no LINE API, no payment.
                 </div>
             </div>
         </section>
@@ -278,20 +289,21 @@
                         PCM 審查區
                     </h2>
                     <p class="text-lg text-white/85 max-w-3xl font-medium mb-8">
-                        顯示目前案件的 PCM 審查結果，協助乙方了解需補件或重送的內容。
+                        PCM 區塊只顯示候選審查提示；不作法律裁決、不作決標決定，也不會呼叫 AI API 或 LINE API。
                     </p>
+                    <p class="text-sm font-bold text-white/80 mb-5">Disabled reason: advisory mock only, no legal decision, no award decision, no AI API, no LINE API.</p>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div class="bg-white rounded-2xl p-6 text-charcoal flex items-center justify-between">
-                            <span class="font-black text-xl">PASS</span>
+                            <span class="font-black text-xl">MOCK PASS</span>
                             <span class="material-symbols-outlined text-green-600">task_alt</span>
                         </div>
                         <div class="bg-white rounded-2xl p-6 text-charcoal flex items-center justify-between">
-                            <span class="font-black text-xl">NO</span>
+                            <span class="font-black text-xl">MOCK NO</span>
                             <span class="material-symbols-outlined text-red-600">cancel</span>
                         </div>
                         <div class="bg-white rounded-2xl p-6 text-charcoal flex items-center justify-between">
-                            <span class="font-black text-xl">RESUBMIT</span>
+                            <span class="font-black text-xl">MOCK RESUBMIT</span>
                             <span class="material-symbols-outlined text-amber-600">refresh</span>
                         </div>
                     </div>
@@ -336,8 +348,8 @@
                 © 2026 LaiBE Inc. All rights reserved.
             </div>
             <div class="flex gap-6 text-sm text-white/50">
-                <a href="#" class="hover:text-white transition-colors">服務條款</a>
-                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
+                <span class="cursor-not-allowed" aria-disabled="true" data-mock-only="true" title="candidate static mock footer placeholder">服務條款</span>
+                <span class="cursor-not-allowed" aria-disabled="true" data-mock-only="true" title="candidate static mock footer placeholder">隱私權政策</span>
             </div>
         </div>
     </footer>
