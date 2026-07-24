@@ -1,14 +1,22 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+const sourceRoot = new URL(
+  "../src/stitch_laibe_landing_onboarding/",
+  import.meta.url,
+);
 const previewBudget = readFileSync(
-  new URL("../src/stitch_laibe_landing_onboarding/preview_budget/code.html", import.meta.url),
+  new URL("preview_budget/code.html", sourceRoot),
   "utf8",
 );
 const onboarding = readFileSync(
-  new URL("../src/stitch_laibe_landing_onboarding/onboard_ai_agent/code.html", import.meta.url),
+  new URL("onboard_ai_agent/code.html", sourceRoot),
+  "utf8",
+);
+const sharedHeader = readFileSync(
+  new URL("shared/laibe-header.js", sourceRoot),
   "utf8",
 );
 
@@ -57,6 +65,34 @@ test("canonical preview budget omits retired operations", () => {
 test("onboarding routes STEP 03 to canonical preview budget", () => {
   assert.match(onboarding, /\.\.\/preview_budget\/code\.html/);
   assert.doesNotMatch(onboarding, /\.\.\/candidate_budget_output\/code\.html/);
+});
+
+test("canonical support files resolve without held routes", () => {
+  assert.match(previewBudget, /\.\.\/shared\/laibe-header\.js/);
+  assert.doesNotMatch(previewBudget, /laibe-owner-progress\.js/);
+  assert.match(sharedHeader, /\.\.\/\.\.\/\.\.\/assets\/logo\/laibe_offer\.svg/);
+  assert.match(sharedHeader, /pro_dashboard\/code\.html/);
+  assert.doesNotMatch(
+    sharedHeader,
+    /pro_workspace\/code\.html|ai_pcm_entry_candidate\/code\.html|laibe_offer_light\.png/,
+  );
+
+  const required = [
+    "laibe_landing_desktop/code.html",
+    "onboard_ai_agent/code.html",
+    "preview_floor_plan/code.html",
+    "preview_budget/code.html",
+    "pro_dashboard/code.html",
+    "shared/laibe-header.js",
+  ];
+  required.forEach((path) => {
+    assert.equal(existsSync(new URL(path, sourceRoot)), true, path);
+  });
+  assert.equal(
+    existsSync(new URL("../../../assets/logo/laibe_offer.svg", new URL("preview_budget/", sourceRoot))),
+    true,
+    "assets/logo/laibe_offer.svg",
+  );
 });
 
 test("inline scripts remain syntactically valid", () => {
