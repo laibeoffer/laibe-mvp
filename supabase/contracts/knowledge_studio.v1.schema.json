@@ -11,6 +11,7 @@
         "createDraft",
         "updateDraft",
         "createRevision",
+        "saveAndSubmitReview",
         "submitReview",
         "returnToDraft",
         "publish",
@@ -111,12 +112,31 @@
           "minLength": 1
         },
         "summary": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "content": {
           "type": "object",
+          "required": [
+            "displayType",
+            "owner",
+            "criteria",
+            "nextOwner"
+          ],
           "properties": {
             "displayType": {
+              "type": "string",
+              "minLength": 1
+            },
+            "owner": {
+              "type": "string",
+              "minLength": 1
+            },
+            "criteria": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nextOwner": {
               "type": "string",
               "minLength": 1
             }
@@ -124,7 +144,12 @@
           "additionalProperties": true
         },
         "evidence_summary": {
-          "type": "array"
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "change_note": {
           "type": "string"

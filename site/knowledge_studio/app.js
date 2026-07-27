@@ -46,6 +46,16 @@ const NEXT_ACTION_LABEL = Object.freeze({
   retired: "停止召回並保留版本紀錄",
 });
 
+const REQUIRED_DRAFT_FIELDS = Object.freeze([
+  ["title", "請填寫規則名稱。"],
+  ["type", "請選擇規則類型。"],
+  ["owner", "請填寫負責人。"],
+  ["summary", "請填寫規則摘要。"],
+  ["criteria", "請填寫判斷條件。"],
+  ["nextOwner", "請指定下一位處理者。"],
+  ["evidence", "請填寫來源依據。"],
+]);
+
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
@@ -69,7 +79,14 @@ function nextOwnerForStatus(status) {
   return "PCM 維護人";
 }
 
-function event(action, actor, status, nextOwner, sourceDocument = "") {
+function event(
+  action,
+  actor,
+  status,
+  nextOwner,
+  sourceDocument = "",
+  note = "",
+) {
   return {
     action,
     actor,
@@ -78,8 +95,74 @@ function event(action, actor, status, nextOwner, sourceDocument = "") {
     nextOwner,
     nextAction: nextActionFor(action, status),
     sourceDocument,
+    note,
     formalImpact: "none",
   };
+}
+
+export function createDraftBuffer(initial = {}) {
+  return {
+    id: null,
+    entryId: null,
+    versionId: null,
+    persisted: false,
+    transient: true,
+    dirty: false,
+    title: "",
+    type: "圖說檢查規則",
+    status: STATUS.DRAFT,
+    version: 0,
+    owner: "PCM",
+    nextOwner: "規則整理人",
+    nextAction: "填寫內容後儲存草稿",
+    summary: "",
+    criteria: "",
+    evidence: "",
+    sourceDate: "",
+    updatedAt: "",
+    events: [],
+    ...clone(initial),
+  };
+}
+
+export function discardDraftBuffer() {
+  return null;
+}
+
+export function decideMobileBack({
+  editorMode,
+  dirty,
+  discardConfirmed,
+}) {
+  const hasUnsavedChanges = editorMode === "new" || dirty;
+  if (hasUnsavedChanges && !discardConfirmed) {
+    return { action: "stay", discard: false };
+  }
+  return {
+    action: "list",
+    discard: hasUnsavedChanges,
+  };
+}
+
+export function validateDraft(input = {}) {
+  const errors = {};
+  for (const [field, message] of REQUIRED_DRAFT_FIELDS) {
+    if (!String(input[field] ?? "").trim()) {
+      errors[field] = message;
+    }
+  }
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors,
+    firstInvalid: Object.keys(errors)[0] || null,
+  };
+}
+
+function assertCompleteDraft(input) {
+  const result = validateDraft(input);
+  if (!result.valid) {
+    throw new Error(Object.values(result.errors)[0]);
+  }
 }
 
 export function createDemoRecords() {
@@ -182,7 +265,11 @@ export function createDemoRecords() {
         ),
       ],
     },
-  ];
+  ].map((record) => ({
+    ...record,
+    persisted: false,
+    sample: true,
+  }));
 }
 
 export function filterRecords(records, filters = {}) {
@@ -221,6 +308,7 @@ export class LocalKnowledgeStore {
   constructor(records = []) {
     this.records = clone(records);
     this.sequence = this.records.length + 1;
+    this.mode = "sample";
   }
 
   async list() {
@@ -243,7 +331,7 @@ export class LocalKnowledgeStore {
     const timestamp = now();
     const record = {
       id: `KN-NEW-${String(this.sequence++).padStart(3, "0")}`,
-      title: input.title || "未命名規則",
+      title: input.title || "",
       type: input.type || "圖說檢查規則",
       status: STATUS.DRAFT,
       version: 0,
@@ -255,6 +343,8 @@ export class LocalKnowledgeStore {
       evidence: input.evidence || "",
       sourceDate: input.sourceDate || "",
       updatedAt: timestamp,
+      persisted: true,
+      sample: true,
       events: [
         event(
           "create",
@@ -290,11 +380,30 @@ export class LocalKnowledgeStore {
           STATUS.DRAFT,
           input.nextOwner,
           input.evidence,
+          input.note || "",
         ),
       ],
     };
     this.records[index] = updated;
     return clone(updated);
+  }
+
+  async saveAndSubmitReview(input) {
+    assertCompleteDraft(input);
+    const recordsBefore = clone(this.records);
+    const sequenceBefore = this.sequence;
+    try {
+      const saved = await this.saveDraft(input);
+      return await this.transition(saved.id, "submit_review", {
+        actor: input.actor || "目前使用者",
+        nextOwner: input.nextOwner || "PCM 覆核人",
+        note: input.note || "",
+      });
+    } catch (error) {
+      this.records = recordsBefore;
+      this.sequence = sequenceBefore;
+      throw error;
+    }
   }
 
   async createRevision(id, actor) {
@@ -352,6 +461,9 @@ export class LocalKnowledgeStore {
     if (!transition || !transition.from.includes(current.status)) {
       throw new Error("目前狀態不能執行這個動作。");
     }
+    if (action === "submit_review" || action === "publish") {
+      assertCompleteDraft(current);
+    }
     const updated = {
       ...current,
       status: transition.to,
@@ -369,6 +481,7 @@ export class LocalKnowledgeStore {
           transition.to,
           context.nextOwner || current.nextOwner,
           current.evidence,
+          context.note || "",
         ),
       ],
     };
@@ -383,6 +496,7 @@ export class GatewayAdapter {
     this.projectKey = String(projectKey || "").trim();
     this.tokenProvider = tokenProvider;
     this.fetcher = fetcher;
+    this.mode = "connected";
   }
 
   async request(body) {
@@ -443,7 +557,7 @@ export class GatewayAdapter {
     if (input.payload?.schema_version === "knowledge_studio.v1") {
       return input.payload;
     }
-    const title = String(input.title || "未命名規則").trim();
+    const title = String(input.title || "").trim();
     const domain = input.domain || this.domainForType(input.type);
     const sourceLocator = input.source?.source_locator ||
       input.evidence ||
@@ -457,7 +571,7 @@ export class GatewayAdapter {
       rule = {
         ruleType: "budget_rule",
         ruleCode,
-        ruleKind: "review_guard",
+        ruleKind: "scope_difference",
         unifiedItemCode: "",
         conditions: { criteria: input.criteria || "" },
         output: { summary: input.summary || "" },
@@ -466,7 +580,7 @@ export class GatewayAdapter {
       rule = {
         ruleType: "contract_evidence_rule",
         ruleCode,
-        allowedOutputKind: "evidence_comparison",
+        allowedOutputKind: "comparison",
         clauseTopic: title,
         evidenceRequirements: input.evidence ? [input.evidence] : [],
         comparisonFields: [],
@@ -484,7 +598,7 @@ export class GatewayAdapter {
       rule = {
         ruleType: "drawing_rule",
         ruleCode,
-        ruleKind: "document_consistency",
+        ruleKind: "cross_sheet_consistency",
         pageTypes: ["pdf"],
         conditions: { criteria: input.criteria || "" },
         findingTemplate: "列為待確認並指出圖頁位置。",
@@ -574,7 +688,7 @@ export class GatewayAdapter {
       criteria: version.content?.criteria ||
         version.rule?.conditions?.criteria ||
         "",
-      evidence: version.source?.locator || version.evidenceSummary?.[0] || "",
+      evidence: version.evidenceSummary?.[0] || version.source?.locator || "",
       sourceDate: version.content?.sourceDate || "",
       updatedAt: version.createdAt || new Date().toISOString(),
       events: (record.events || []).map((item) => ({
@@ -585,7 +699,10 @@ export class GatewayAdapter {
         nextOwner: item.nextOwnerRole,
         nextAction: item.nextAction ||
           nextActionFor(item.eventType, item.afterState),
-        sourceDocument: version.source?.locator || "",
+        sourceDocument: version.evidenceSummary?.[0] ||
+          version.source?.locator ||
+          "",
+        note: item.note || "",
         formalImpact: "none",
       })),
     };
@@ -637,6 +754,24 @@ export class GatewayAdapter {
       entryId: result.entryId || entryId,
       versionId: result.versionId || input.versionId,
       status: result.lifecycleState,
+    };
+  }
+
+  async saveAndSubmitReview(input) {
+    assertCompleteDraft(input);
+    const entryId = input.entryId || input.id;
+    const result = await this.request({
+      operation: "saveAndSubmitReview",
+      entryId,
+      versionId: input.versionId,
+      payload: await this.studioPayload(input),
+      note: input.note || "",
+    });
+    return {
+      id: result.entryId || entryId,
+      entryId: result.entryId || entryId,
+      versionId: result.versionId || input.versionId,
+      status: result.lifecycleState || STATUS.PENDING_REVIEW,
     };
   }
 
@@ -732,8 +867,13 @@ function initStudio() {
   const store = createStore();
   const elements = {
     list: document.querySelector("#record-list"),
+    recordPane: document.querySelector(".record-pane"),
+    detailPane: document.querySelector(".detail-pane"),
+    workbench: document.querySelector(".workbench"),
     empty: document.querySelector("#empty-state"),
     banner: document.querySelector("#state-banner"),
+    stateMessage: document.querySelector("#state-message"),
+    retry: document.querySelector("#retry-button"),
     count: document.querySelector("#result-count"),
     form: document.querySelector("#detail-form"),
     placeholder: document.querySelector("#detail-placeholder"),
@@ -742,6 +882,9 @@ function initStudio() {
     typeFilter: document.querySelector("#type-filter"),
     ownerFilter: document.querySelector("#owner-filter"),
     newDraft: document.querySelector("#new-draft-button"),
+    back: document.querySelector("#back-to-list-button"),
+    cancel: document.querySelector("#cancel-button"),
+    unsaved: document.querySelector("#unsaved-indicator"),
     save: document.querySelector("#save-button"),
     submit: document.querySelector("#submit-button"),
     publish: document.querySelector("#publish-button"),
@@ -749,17 +892,57 @@ function initStudio() {
     retire: document.querySelector("#retire-button"),
     revision: document.querySelector("#revision-button"),
     toast: document.querySelector("#toast"),
+    detailHeading: document.querySelector("#detail-title-display"),
+    modeNote: document.querySelector("#mode-note"),
+    confirmation: document.querySelector("#confirmation-dialog"),
+    confirmationTitle: document.querySelector("#confirmation-title"),
+    confirmationImpact: document.querySelector("#confirmation-impact"),
+    confirmationNote: document.querySelector("#confirmation-note"),
+    confirmationError: document.querySelector("#confirmation-error"),
+    confirmationCancel: document.querySelector("#confirmation-cancel"),
+    confirmationConfirm: document.querySelector("#confirmation-confirm"),
     navButtons: Array.from(document.querySelectorAll("[data-view]")),
   };
   let records = [];
   let selectedId = null;
   let selectedRecord = null;
   let activeView = "all";
+  let editorMode = "none";
+  let baseEditorValues = null;
+  let dirty = false;
+  let busy = false;
+  let pendingConfirmation = null;
 
-  function showBanner(message, tone = "neutral") {
-    elements.banner.textContent = message;
+  const confirmationCopy = {
+    return_revision: {
+      title: "退回修正",
+      impact: "此版本會回到待修正，退回原因與處理者會保留在規則紀錄中。",
+      confirm: "確認退回",
+      nextOwner: "規則整理人",
+      success: "已退回修正並保留原因。",
+    },
+    publish: {
+      title: "發布規則",
+      impact:
+        "此版本會提供給受控工作流程檢索；這不是法律核准、工程保證或正式判定。",
+      confirm: "確認發布",
+      nextOwner: "PCM 維護人",
+      success: "規則已發布並保留核准紀錄。",
+    },
+    retire: {
+      title: "停用規則",
+      impact: "此規則將停止提供給新流程，既有版本與處理紀錄仍會保留。",
+      confirm: "確認停用",
+      nextOwner: "PCM 維護人",
+      success: "規則已停用，既有紀錄仍保留。",
+    },
+  };
+
+  function showBanner(message, tone = "neutral", retry = false) {
+    elements.stateMessage.textContent = message;
     elements.banner.dataset.tone = tone;
     elements.banner.hidden = !message;
+    elements.retry.hidden = !retry;
   }
 
   function showToast(message) {
@@ -768,6 +951,75 @@ function initStudio() {
     window.setTimeout(() => {
       elements.toast.hidden = true;
     }, 2400);
+  }
+
+  function isMobile() {
+    return window.matchMedia?.("(max-width: 720px)").matches ?? false;
+  }
+
+  function setMobilePane(pane) {
+    elements.workbench.dataset.mobilePane = pane;
+  }
+
+  function updateUnsavedState() {
+    const transient = editorMode === "new";
+    elements.unsaved.hidden = !transient && !dirty;
+    elements.unsaved.textContent = transient
+      ? "尚未建立草稿"
+      : dirty
+      ? "有未儲存修改"
+      : "";
+    elements.form.dataset.dirty = String(transient || dirty);
+  }
+
+  function currentRecordEditable() {
+    return editorMode === "new" ||
+      selectedRecord?.status === STATUS.DRAFT;
+  }
+
+  function updateControls() {
+    const editable = currentRecordEditable();
+    const persistedDraft = editorMode === "edit" &&
+      selectedRecord?.status === STATUS.DRAFT;
+    const pending = selectedRecord?.status === STATUS.PENDING_REVIEW;
+    const approved = selectedRecord?.status === STATUS.APPROVED;
+
+    Array.from(elements.form.elements).forEach((field) => {
+      if (field.matches("input, textarea, select")) {
+        field.disabled = busy || !editable;
+      }
+    });
+    elements.newDraft.disabled = busy;
+    elements.save.hidden = !editable;
+    elements.save.disabled = busy;
+    elements.cancel.hidden = !editable;
+    elements.cancel.disabled = busy;
+    elements.submit.hidden = !persistedDraft;
+    elements.submit.disabled = busy;
+    elements.return.hidden = !pending;
+    elements.return.disabled = busy;
+    elements.publish.hidden = !pending;
+    elements.publish.disabled = busy;
+    elements.retire.hidden = !approved;
+    elements.retire.disabled = busy;
+    elements.revision.hidden = !approved;
+    elements.revision.disabled = busy;
+  }
+
+  function setBusy(value, message = "") {
+    busy = value;
+    elements.form.setAttribute("aria-busy", String(value));
+    elements.list.setAttribute("aria-busy", String(value));
+    elements.workbench.setAttribute("aria-busy", String(value));
+    if (value && message) showBanner(message);
+    updateControls();
+  }
+
+  function safeErrorMessage(error, fallback) {
+    const message = error instanceof Error ? error.message : "";
+    return /^(請|目前|找不到|只有|已發布|知識)/.test(message)
+      ? message
+      : fallback;
   }
 
   function populateSelect(select, values, label) {
@@ -847,11 +1099,14 @@ function initStudio() {
           record.id === selectedId ? "is-selected" : ""
         }"
             data-record-id="${escapeText(record.id)}"
+            role="option"
+            aria-selected="${record.id === selectedId}"
           >
             <span class="record-main">
               <span class="record-title">${escapeText(record.title)}</span>
               <span class="record-meta">
                 ${escapeText(record.type)} · 版本 ${escapeText(record.version)}
+                ${record.sample ? '<em class="sample-badge">示範</em>' : ""}
               </span>
             </span>
             <span class="record-owner">
@@ -868,7 +1123,7 @@ function initStudio() {
     elements.list.querySelectorAll("[data-record-id]").forEach((button) => {
       button.addEventListener(
         "click",
-        () => selectRecord(button.dataset.recordId),
+        () => void selectRecord(button.dataset.recordId),
       );
     });
     return filtered;
@@ -877,8 +1132,14 @@ function initStudio() {
   function clearSelection() {
     selectedId = null;
     selectedRecord = null;
+    editorMode = "none";
+    baseEditorValues = null;
+    dirty = false;
     elements.form.hidden = true;
     elements.placeholder.hidden = false;
+    clearFieldErrors();
+    updateUnsavedState();
+    updateSelectedRows();
   }
 
   async function reconcileFilteredSelection() {
@@ -898,76 +1159,156 @@ function initStudio() {
     if (field) field.value = value || "";
   }
 
-  async function selectRecord(id) {
+  function updateSelectedRows() {
+    elements.list.querySelectorAll("[data-record-id]").forEach((row) => {
+      const selected = row.dataset.recordId === selectedId;
+      row.classList.toggle("is-selected", selected);
+      row.setAttribute("aria-selected", String(selected));
+    });
+  }
+
+  function editorSnapshot(input = formValue()) {
+    return JSON.stringify({
+      title: input.title,
+      type: input.type,
+      owner: input.owner,
+      summary: input.summary,
+      criteria: input.criteria,
+      nextOwner: input.nextOwner,
+      sourceDate: input.sourceDate,
+      evidence: input.evidence,
+    });
+  }
+
+  function hasUnsavedChanges() {
+    return editorMode === "new" || dirty;
+  }
+
+  function canLeaveEditor() {
+    if (!hasUnsavedChanges()) return true;
+    return window.confirm(
+      "尚有未儲存的內容，離開後不會保留。確定要離開嗎？",
+    );
+  }
+
+  function clearFieldErrors() {
+    elements.form.querySelectorAll(".field-error").forEach((error) => {
+      error.textContent = "";
+      error.hidden = true;
+    });
+    elements.form.querySelectorAll("[aria-invalid]").forEach((field) => {
+      field.removeAttribute("aria-invalid");
+    });
+  }
+
+  function fieldErrorId(name) {
+    return `error-${name === "nextOwner" ? "next-owner" : name}`;
+  }
+
+  function showFieldErrors(errors) {
+    clearFieldErrors();
+    for (const [name, message] of Object.entries(errors)) {
+      const field = elements.form.elements.namedItem(name);
+      const error = document.querySelector(`#${fieldErrorId(name)}`);
+      if (!field || !error) continue;
+      field.setAttribute("aria-invalid", "true");
+      error.textContent = message;
+      error.hidden = false;
+    }
+    const firstName = Object.keys(errors)[0];
+    elements.form.elements.namedItem(firstName)?.focus();
+  }
+
+  function renderDetail(record, mode = "view") {
+    editorMode = mode;
+    selectedRecord = record;
+    elements.placeholder.hidden = true;
+    elements.form.hidden = false;
+    const transient = mode === "new";
+    document.querySelector("#detail-status").textContent = transient
+      ? "尚未儲存"
+      : STATUS_LABEL[record.status];
+    document.querySelector("#detail-status").dataset.status = transient
+      ? "transient"
+      : record.status;
+    elements.detailHeading.textContent = record.title || "新規則草稿";
+    document.querySelector("#detail-version").textContent = transient
+      ? "草稿尚未建立"
+      : `版本 ${record.version}`;
+    [
+      "title",
+      "type",
+      "owner",
+      "summary",
+      "criteria",
+      "nextOwner",
+      "sourceDate",
+      "evidence",
+    ].forEach((name) => setField(name, record[name]));
+    document.querySelector("#evidence-source").textContent =
+      record.evidence || "尚未填寫";
+    document.querySelector("#evidence-next-step").textContent =
+      record.nextAction
+        ? `${record.nextAction}${
+          record.nextOwner ? `，由 ${record.nextOwner} 處理` : ""
+        }`
+        : "尚未指定";
+    document.querySelector("#event-history").innerHTML = [
+      ...(record.events || []),
+    ]
+      .reverse()
+      .map(
+        (item) => `
+          <li>
+            <span class="event-marker" aria-hidden="true"></span>
+            <div>
+              <strong>${escapeText(ACTION_LABEL[item.action] || item.action)}</strong>
+              <span>${escapeText(item.actor)} · ${
+          escapeText(formatTime(item.time))
+        }</span>
+              ${
+          item.note
+            ? `<small>說明：${escapeText(item.note)}</small>`
+            : ""
+        }
+              <small>下一步：${
+          escapeText(item.nextAction || "尚未指定")
+        }；處理者：${escapeText(item.nextOwner || "尚未指定")}</small>
+            </div>
+          </li>
+        `,
+      )
+      .join("");
+    clearFieldErrors();
+    baseEditorValues = editorSnapshot();
+    dirty = false;
+    updateUnsavedState();
+    updateControls();
+  }
+
+  async function selectRecord(
+    id,
+    { skipUnsavedCheck = false, focusDetail = true } = {},
+  ) {
+    if (!skipUnsavedCheck && !canLeaveEditor()) return;
     try {
+      setBusy(true, "正在開啟規則內容。");
       const record = await store.get(id);
       selectedId = id;
-      selectedRecord = record;
-      elements.placeholder.hidden = true;
-      elements.form.hidden = false;
-      document.querySelector("#detail-status").textContent =
-        STATUS_LABEL[record.status];
-      document.querySelector("#detail-status").dataset.status = record.status;
-      document.querySelector("#detail-title-display").textContent =
-        record.title;
-      document.querySelector("#detail-version").textContent =
-        `版本 ${record.version}`;
-      [
-        "title",
-        "type",
-        "owner",
-        "summary",
-        "criteria",
-        "nextOwner",
-        "sourceDate",
-        "evidence",
-      ].forEach((name) => setField(name, record[name]));
-      document.querySelector("#evidence-source").textContent =
-        record.evidence || "尚未填寫";
-      document.querySelector("#evidence-next-step").textContent =
-        record.nextAction
-          ? `${record.nextAction}${
-            record.nextOwner ? `，由 ${record.nextOwner} 處理` : ""
-          }`
-          : "尚未指定";
-      document.querySelector("#event-history").innerHTML = [
-        ...(record.events || []),
-      ]
-        .reverse()
-        .map(
-          (item) => `
-            <li>
-              <span class="event-marker" aria-hidden="true"></span>
-              <div>
-                <strong>${
-            escapeText(ACTION_LABEL[item.action] || item.action)
-          }</strong>
-                <span>${escapeText(item.actor)} · ${
-            escapeText(formatTime(item.time))
-          }</span>
-                <small>下一步：${
-            escapeText(item.nextAction || "尚未指定")
-          }；處理者：${escapeText(item.nextOwner || "尚未指定")}</small>
-              </div>
-            </li>
-          `,
-        )
-        .join("");
-      const editable = record.status === STATUS.DRAFT;
-      Array.from(elements.form.elements).forEach((field) => {
-        if (field.matches("input, textarea, select")) {
-          field.disabled = !editable;
-        }
-      });
-      elements.save.hidden = !editable;
-      elements.submit.hidden = !editable;
-      elements.return.hidden = record.status !== STATUS.PENDING_REVIEW;
-      elements.publish.hidden = record.status !== STATUS.PENDING_REVIEW;
-      elements.retire.hidden = record.status !== STATUS.APPROVED;
-      elements.revision.hidden = record.status !== STATUS.APPROVED;
-      renderList();
+      renderDetail(record, record.status === STATUS.DRAFT ? "edit" : "view");
+      updateSelectedRows();
+      setMobilePane("detail");
+      showBanner("");
+      if (isMobile() && focusDetail) {
+        elements.detailHeading.focus({ preventScroll: true });
+      }
     } catch (error) {
-      showBanner(error.message, "error");
+      showBanner(
+        safeErrorMessage(error, "目前無法開啟這筆規則，請稍後再試。"),
+        "error",
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -990,7 +1331,7 @@ function initStudio() {
   }
 
   async function reload(selectId = selectedId) {
-    showBanner("正在整理規則紀錄。");
+    setBusy(true, "正在整理規則紀錄。");
     try {
       records = await store.list();
       populateSelect(
@@ -1009,83 +1350,274 @@ function initStudio() {
       if (selectId) {
         const nextSelectedId = resolveVisibleSelectionId(filtered, selectId);
         if (nextSelectedId) {
-          await selectRecord(nextSelectedId);
+          await selectRecord(nextSelectedId, {
+            skipUnsavedCheck: true,
+            focusDetail: false,
+          });
         } else {
           clearSelection();
           renderList();
         }
       }
     } catch (error) {
-      showBanner(`${error.message} 請重新整理頁面。`, "error");
+      showBanner(
+        safeErrorMessage(
+          error,
+          "目前無法整理規則紀錄，請重新整理後再試。",
+        ),
+        "error",
+        true,
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
   elements.form.addEventListener("submit", async (eventObject) => {
     eventObject.preventDefault();
+    const input = formValue();
+    const fullValidation = validateDraft(input);
+    const saveErrors = Object.fromEntries(
+      Object.entries(fullValidation.errors).filter(([name]) =>
+        ["title", "type", "owner"].includes(name)
+      ),
+    );
+    if (Object.keys(saveErrors).length > 0) {
+      showFieldErrors(saveErrors);
+      showBanner("請先完成草稿名稱、類型與負責人。", "error");
+      return;
+    }
     try {
-      const record = await store.saveDraft(formValue());
+      setBusy(true, "正在儲存草稿。");
+      const record = editorMode === "new"
+        ? await store.createDraft(input)
+        : await store.saveDraft(input);
+      dirty = false;
       await reload(record.id);
-      showToast("草稿已儲存。");
+      showToast(
+        store.mode === "sample"
+          ? "範例草稿已加入本頁；重新整理後不會保留。"
+          : "草稿已儲存。",
+      );
     } catch (error) {
-      showBanner(error.message, "error");
+      showBanner(
+        safeErrorMessage(error, "目前無法儲存草稿，內容仍保留在畫面中。"),
+        "error",
+      );
+    } finally {
+      setBusy(false);
     }
   });
 
-  elements.newDraft.addEventListener("click", async () => {
-    try {
-      const record = await store.createDraft({
-        title: "未命名規則",
-        type: "圖說檢查規則",
-        owner: "PCM",
-        nextOwner: "規則整理人",
-        actor: "目前使用者",
-      });
-      await setActiveView("all");
-      await reload(record.id);
-      elements.form.elements.title.focus();
-    } catch (error) {
-      showBanner(error.message, "error");
+  elements.newDraft.addEventListener("click", () => {
+    if (!canLeaveEditor()) return;
+    activeView = "all";
+    elements.statusFilter.value = "";
+    elements.navButtons.forEach((button) => {
+      const active = button.dataset.view === "all";
+      button.classList.toggle("is-active", active);
+      button.toggleAttribute("aria-current", active);
+      if (active) button.setAttribute("aria-current", "page");
+    });
+    selectedId = null;
+    const buffer = createDraftBuffer();
+    renderDetail(buffer, "new");
+    updateSelectedRows();
+    setMobilePane("detail");
+    showBanner(
+      "先填寫草稿內容；按下「儲存草稿」後才會建立規則紀錄。",
+    );
+    elements.form.elements.title.focus();
+  });
+
+  elements.cancel.addEventListener("click", () => {
+    if (!canLeaveEditor()) return;
+    if (editorMode === "new") {
+      discardDraftBuffer(selectedRecord);
+      clearSelection();
+      setMobilePane("list");
+      showBanner("");
+      elements.newDraft.focus();
+      return;
+    }
+    if (selectedRecord) {
+      renderDetail(selectedRecord, "edit");
+      showBanner("未儲存的修改已取消。");
     }
   });
 
-  async function runAction(action, nextOwner, successMessage) {
-    if (!selectedId) return;
+  elements.submit.addEventListener("click", async () => {
+    if (!selectedId || editorMode !== "edit") return;
+    const input = formValue();
+    const validation = validateDraft(input);
+    if (!validation.valid) {
+      showFieldErrors(validation.errors);
+      showBanner("請完成標示欄位後再送交覆核。", "error");
+      return;
+    }
     try {
-      const record = await store.transition(selectedId, action, {
-        actor: "目前使用者",
-        nextOwner,
+      setBusy(true, "正在儲存最新內容並送交覆核。");
+      const record = await store.saveAndSubmitReview({
+        ...input,
+        note: "送交 PCM 覆核",
       });
+      dirty = false;
       await reload(record.id);
-      showToast(successMessage);
+      showToast("最新內容已儲存並送交覆核。");
     } catch (error) {
-      showBanner(error.message, "error");
+      dirty = true;
+      updateUnsavedState();
+      showBanner(
+        safeErrorMessage(
+          error,
+          "送交覆核未完成；畫面中的修改仍保留，請稍後再試。",
+        ),
+        "error",
+      );
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  function requestConfirmation(action) {
+    const copy = confirmationCopy[action];
+    if (!copy || !selectedId) return;
+    pendingConfirmation = action;
+    elements.confirmationTitle.textContent = copy.title;
+    elements.confirmationImpact.textContent = copy.impact;
+    elements.confirmationConfirm.textContent = copy.confirm;
+    elements.confirmationNote.value = "";
+    elements.confirmationError.hidden = true;
+    if (typeof elements.confirmation.showModal === "function") {
+      elements.confirmation.showModal();
+    } else {
+      elements.confirmation.setAttribute("open", "");
+    }
+    elements.confirmationNote.focus();
+  }
+
+  function closeConfirmation() {
+    pendingConfirmation = null;
+    if (typeof elements.confirmation.close === "function") {
+      elements.confirmation.close();
+    } else {
+      elements.confirmation.removeAttribute("open");
     }
   }
 
-  elements.submit.addEventListener(
-    "click",
-    () => runAction("submit_review", "PCM 覆核人", "已送交覆核。"),
-  );
+  async function runConfirmedAction(action, note) {
+    const copy = confirmationCopy[action];
+    if (!copy || !selectedId) return;
+    try {
+      setBusy(true, `正在${copy.title}。`);
+      const record = await store.transition(selectedId, action, {
+        versionId: selectedRecord?.versionId,
+        actor: "目前使用者",
+        nextOwner: copy.nextOwner,
+        note,
+      });
+      await reload(record.id);
+      showToast(copy.success);
+    } catch (error) {
+      showBanner(
+        safeErrorMessage(error, `${copy.title}未完成，請稍後再試。`),
+        "error",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   elements.return.addEventListener(
     "click",
-    () => runAction("return_revision", "規則整理人", "已退回修正。"),
+    () => requestConfirmation("return_revision"),
   );
   elements.publish.addEventListener(
     "click",
-    () => runAction("publish", "PCM 維護人", "規則已發布。"),
+    () => requestConfirmation("publish"),
   );
   elements.retire.addEventListener(
     "click",
-    () => runAction("retire", "PCM 維護人", "規則已停用。"),
+    () => requestConfirmation("retire"),
   );
+  elements.confirmationCancel.addEventListener("click", closeConfirmation);
+  elements.confirmation.addEventListener("cancel", (eventObject) => {
+    eventObject.preventDefault();
+    closeConfirmation();
+  });
+  elements.confirmationConfirm.addEventListener("click", () => {
+    const note = elements.confirmationNote.value.trim();
+    if (!note) {
+      elements.confirmationError.textContent = "請填寫此次處理說明。";
+      elements.confirmationError.hidden = false;
+      elements.confirmationNote.focus();
+      return;
+    }
+    const action = pendingConfirmation;
+    closeConfirmation();
+    void runConfirmedAction(action, note);
+  });
+
   elements.revision.addEventListener("click", async () => {
     try {
+      setBusy(true, "正在建立新版本草稿。");
       const record = await store.createRevision(selectedId, "目前使用者");
       await reload(record.id);
       showToast("新版本草稿已建立。");
     } catch (error) {
-      showBanner(error.message, "error");
+      showBanner(
+        safeErrorMessage(error, "目前無法建立新版本，請稍後再試。"),
+        "error",
+      );
+    } finally {
+      setBusy(false);
     }
+  });
+
+  elements.back.addEventListener("click", () => {
+    const decision = decideMobileBack({
+      editorMode,
+      dirty,
+      discardConfirmed: !hasUnsavedChanges() || canLeaveEditor(),
+    });
+    if (decision.action === "stay") return;
+    if (decision.discard && editorMode === "new") {
+      discardDraftBuffer(selectedRecord);
+      clearSelection();
+      showBanner("");
+    } else if (decision.discard && selectedRecord) {
+      renderDetail(selectedRecord, "edit");
+      showBanner("未儲存的修改已取消。");
+    }
+    setMobilePane("list");
+    const selectedRow = elements.list.querySelector(
+      `[data-record-id="${CSS.escape(selectedId || "")}"]`,
+    );
+    (selectedRow || elements.newDraft).focus();
+  });
+
+  elements.retry.addEventListener("click", () => void reload());
+
+  elements.form.addEventListener("input", (eventObject) => {
+    if (!currentRecordEditable()) return;
+    const field = eventObject.target;
+    if (field?.name) {
+      const error = document.querySelector(`#${fieldErrorId(field.name)}`);
+      field.removeAttribute("aria-invalid");
+      if (error) {
+        error.textContent = "";
+        error.hidden = true;
+      }
+    }
+    dirty = editorMode === "new" ||
+      editorSnapshot() !== baseEditorValues;
+    updateUnsavedState();
+  });
+
+  window.addEventListener("beforeunload", (eventObject) => {
+    if (!hasUnsavedChanges()) return;
+    eventObject.preventDefault();
+    eventObject.returnValue = "";
   });
 
   [
@@ -1120,6 +1652,7 @@ function initStudio() {
   });
   elements.navButtons.forEach((button) => {
     button.addEventListener("click", () => {
+      if (!canLeaveEditor()) return;
       void setActiveView(button.dataset.view);
     });
   });
@@ -1147,6 +1680,10 @@ function initStudio() {
     },
   );
 
+  elements.modeNote.textContent = store.mode === "sample"
+    ? "目前顯示的規則僅供流程操作示範，不是案件事實；本頁新增內容重新整理後不會保留。"
+    : "只有完成覆核並發布的規則，才會提供給受控工作流程。";
+  setMobilePane("list");
   reload();
 }
 

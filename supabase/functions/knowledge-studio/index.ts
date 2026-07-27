@@ -16,6 +16,7 @@ const operations = new Set([
   "createDraft",
   "updateDraft",
   "createRevision",
+  "saveAndSubmitReview",
   "submitReview",
   "returnToDraft",
   "publish",
@@ -46,36 +47,51 @@ function isUuid(value: unknown): value is string {
       .test(value);
 }
 
-function corsHeaders(request: Request): HeadersInit {
-  const requestOrigin = request.headers.get("origin") ?? "";
+const CORS_CONFIGURATION_MISSING = "CORS_CONFIGURATION_MISSING";
+const ORIGIN_NOT_ALLOWED = "ORIGIN_NOT_ALLOWED";
+
+type CorsContext = {
+  configured: boolean;
+  originAllowed: boolean;
+  headers: HeadersInit;
+};
+
+function corsContext(request: Request): CorsContext {
+  const requestOrigin = request.headers.get("origin")?.trim() ?? "";
   const allowedOrigins = (
     Deno.env.get("KNOWLEDGE_STUDIO_ALLOWED_ORIGINS") ?? ""
   )
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
-  const origin = allowedOrigins.includes(requestOrigin)
-    ? requestOrigin
-    : allowedOrigins[0] ?? "";
+  const configured = allowedOrigins.length > 0;
+  const originAllowed = !requestOrigin ||
+    allowedOrigins.includes(requestOrigin);
 
   return {
-    ...(origin ? { "Access-Control-Allow-Origin": origin } : {}),
-    "Access-Control-Allow-Headers":
-      "authorization, apikey, content-type, x-client-info",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json; charset=utf-8",
-    "Vary": "Origin",
+    configured,
+    originAllowed,
+    headers: {
+      ...(requestOrigin && originAllowed
+        ? { "Access-Control-Allow-Origin": requestOrigin }
+        : {}),
+      "Access-Control-Allow-Headers":
+        "authorization, apikey, content-type, x-client-info",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Content-Type": "application/json; charset=utf-8",
+      "Vary": "Origin",
+    },
   };
 }
 
 function response(
-  request: Request,
+  headers: HeadersInit,
   status: number,
   body: Record<string, unknown>,
 ): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: corsHeaders(request),
+    headers,
   });
 }
 
@@ -141,6 +157,24 @@ function studioRpc(request: StudioRequest): {
           p_change_note: request.note ?? "",
         },
       };
+    case "saveAndSubmitReview":
+      if (
+        !isUuid(request.entryId) ||
+        !isUuid(request.versionId) ||
+        !request.payload ||
+        request.payload.schema_version !== "knowledge_studio.v1"
+      ) {
+        throw new Error("INVALID_REVIEW_SUBMISSION");
+      }
+      return {
+        name: "knowledge_studio_save_and_submit",
+        payload: {
+          p_entry_id: request.entryId,
+          p_version_id: request.versionId,
+          p_payload: request.payload,
+          p_note: request.note ?? "",
+        },
+      };
     case "submitReview":
       if (!isUuid(request.entryId) || !isUuid(request.versionId)) {
         throw new Error("INVALID_REVIEW");
@@ -192,12 +226,42 @@ function studioRpc(request: StudioRequest): {
 }
 
 Deno.serve(async (request) => {
+  const cors = corsContext(request);
   if (request.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: corsHeaders(request) });
+    if (!cors.configured) {
+      console.error(CORS_CONFIGURATION_MISSING);
+      return response(cors.headers, 503, {
+        ok: false,
+        message: "知識管理服務尚未完成來源設定。",
+      });
+    }
+    if (!cors.originAllowed) {
+      console.warn(ORIGIN_NOT_ALLOWED);
+      return response(cors.headers, 403, {
+        ok: false,
+        message: "此來源無法使用知識管理服務。",
+      });
+    }
+    return new Response(null, { status: 204, headers: cors.headers });
+  }
+
+  if (!cors.configured) {
+    console.error(CORS_CONFIGURATION_MISSING);
+    return response(cors.headers, 503, {
+      ok: false,
+      message: "知識管理服務尚未完成來源設定。",
+    });
+  }
+  if (!cors.originAllowed) {
+    console.warn(ORIGIN_NOT_ALLOWED);
+    return response(cors.headers, 403, {
+      ok: false,
+      message: "此來源無法使用知識管理服務。",
+    });
   }
 
   if (request.method !== "POST") {
-    return response(request, 405, {
+    return response(cors.headers, 405, {
       ok: false,
       message: "此入口只接受指定操作。",
     });
@@ -205,7 +269,7 @@ Deno.serve(async (request) => {
 
   const authorization = request.headers.get("authorization");
   if (!authorization?.startsWith("Bearer ")) {
-    return response(request, 401, {
+    return response(cors.headers, 401, {
       ok: false,
       message: "請重新登入後再試。",
     });
@@ -215,14 +279,14 @@ Deno.serve(async (request) => {
   try {
     body = await request.json();
   } catch {
-    return response(request, 400, {
+    return response(cors.headers, 400, {
       ok: false,
       message: "提交內容格式不正確。",
     });
   }
 
   if (!body.operation || !operations.has(body.operation)) {
-    return response(request, 400, {
+    return response(cors.headers, 400, {
       ok: false,
       message: "這項操作目前不在允許範圍。",
     });
@@ -232,7 +296,7 @@ Deno.serve(async (request) => {
   try {
     rpc = studioRpc(body);
   } catch {
-    return response(request, 400, {
+    return response(cors.headers, 400, {
       ok: false,
       message: "請確認知識條目、版本與操作內容。",
     });
@@ -241,7 +305,7 @@ Deno.serve(async (request) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const projectKey = projectApiKey();
   if (!supabaseUrl || !projectKey) {
-    return response(request, 503, {
+    return response(cors.headers, 503, {
       ok: false,
       message: "知識管理服務正在整理中，請稍後再試。",
     });
@@ -266,7 +330,7 @@ Deno.serve(async (request) => {
         operation: body.operation,
         status: upstream.status,
       });
-      return response(request, upstream.status === 401 ? 401 : 422, {
+      return response(cors.headers, upstream.status === 401 ? 401 : 422, {
         ok: false,
         message: upstream.status === 401
           ? "請重新登入後再試。"
@@ -274,7 +338,7 @@ Deno.serve(async (request) => {
       });
     }
 
-    return response(request, 200, {
+    return response(cors.headers, 200, {
       ok: true,
       operation: body.operation,
       data: await upstream.json(),
@@ -285,7 +349,7 @@ Deno.serve(async (request) => {
       operation: body.operation,
       message: error instanceof Error ? error.message : "unknown",
     });
-    return response(request, 503, {
+    return response(cors.headers, 503, {
       ok: false,
       message: "知識管理服務暫時無法回應，請稍後再試。",
     });

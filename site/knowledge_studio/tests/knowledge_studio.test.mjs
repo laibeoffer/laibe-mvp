@@ -4,24 +4,150 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import {
+import * as Studio from "../app.js";
+
+const {
   createDemoRecords,
   filterRecords,
   GatewayAdapter,
   LocalKnowledgeStore,
   resolveVisibleSelectionId,
   STATUS,
-} from "../app.js";
+} = Studio;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const studioRoot = path.resolve(__dirname, "..");
 
+function completeDraft(overrides = {}) {
+  return {
+    title: "電視櫃跨圖一致性",
+    type: "圖說檢查規則",
+    owner: "PCM 圖說組",
+    summary: "比對家具、插座與弱電圖的必要出口。",
+    criteria: "同一電視櫃位置應有電源、網路與電視出線。",
+    nextOwner: "PCM 覆核人",
+    evidence: "住宅圖說檢查基準／弱電章",
+    sourceDate: "2026-07-27",
+    actor: "目前使用者",
+    ...overrides,
+  };
+}
+
+test("new draft starts as a transient buffer and cancel leaves no record", async () => {
+  const store = new LocalKnowledgeStore(createDemoRecords());
+  const before = await store.list();
+
+  const buffer = Studio.createDraftBuffer();
+  assert.equal(buffer.id, null);
+  assert.equal(buffer.persisted, false);
+  assert.equal(buffer.dirty, false);
+  assert.equal(buffer.title, "");
+
+  const discarded = Studio.discardDraftBuffer(buffer);
+  assert.equal(discarded, null);
+  assert.equal((await store.list()).length, before.length);
+});
+
+test("draft validation reports every required field in human language", () => {
+  const result = Studio.validateDraft({
+    title: "",
+    type: "",
+    owner: "",
+    summary: "",
+    criteria: "",
+    nextOwner: "",
+    evidence: "",
+  });
+
+  assert.equal(result.valid, false);
+  assert.deepEqual(Object.keys(result.errors), [
+    "title",
+    "type",
+    "owner",
+    "summary",
+    "criteria",
+    "nextOwner",
+    "evidence",
+  ]);
+  assert.deepEqual(Object.values(result.errors), [
+    "請填寫規則名稱。",
+    "請選擇規則類型。",
+    "請填寫負責人。",
+    "請填寫規則摘要。",
+    "請填寫判斷條件。",
+    "請指定下一位處理者。",
+    "請填寫來源依據。",
+  ]);
+  assert.equal(Studio.validateDraft(completeDraft()).valid, true);
+});
+
+test("save and submit atomically persists the latest edit", async () => {
+  const store = new LocalKnowledgeStore(createDemoRecords());
+  const draft = await store.createDraft(completeDraft());
+
+  const submitted = await store.saveAndSubmitReview({
+    ...completeDraft(),
+    id: draft.id,
+    title: "送審前最後版本",
+  });
+
+  assert.equal(submitted.status, STATUS.PENDING_REVIEW);
+  assert.equal(submitted.title, "送審前最後版本");
+  assert.equal(submitted.events.at(-1).action, "submit_review");
+  assert.equal((await store.get(draft.id)).title, "送審前最後版本");
+});
+
+test("atomic submission failure restores the original draft and audit events", async () => {
+  class FailingTransitionStore extends LocalKnowledgeStore {
+    async transition(id, action, context) {
+      if (action === "submit_review") {
+        throw new Error("送交覆核失敗");
+      }
+      return super.transition(id, action, context);
+    }
+  }
+
+  const store = new FailingTransitionStore(createDemoRecords());
+  const draft = await store.createDraft(completeDraft());
+  const before = await store.get(draft.id);
+
+  await assert.rejects(
+    () =>
+      store.saveAndSubmitReview({
+        ...completeDraft(),
+        id: draft.id,
+        title: "不應留下的半套更新",
+      }),
+    /送交覆核失敗/,
+  );
+
+  assert.deepEqual(await store.get(draft.id), before);
+});
+
+test("incomplete content cannot be submitted locally", async () => {
+  const store = new LocalKnowledgeStore([]);
+  const draft = await store.createDraft({
+    title: "只有名稱",
+    type: "圖說檢查規則",
+  });
+
+  await assert.rejects(
+    () =>
+      store.saveAndSubmitReview({
+        ...draft,
+        title: "只有名稱",
+        type: "圖說檢查規則",
+      }),
+    /請填寫規則摘要/,
+  );
+  assert.equal((await store.get(draft.id)).status, STATUS.DRAFT);
+});
+
 test("local store supports the complete review lifecycle", async () => {
   const store = new LocalKnowledgeStore(createDemoRecords());
   const draft = await store.createDraft({
+    ...completeDraft(),
     title: "電視櫃弱電出口檢查",
-    type: "圖說檢查規則",
-    owner: "PCM",
   });
 
   await store.transition(draft.id, "submit_review", {
@@ -138,6 +264,13 @@ test("remote adapter sends lifecycle operations to one protected endpoint", asyn
     title: "更新規則",
   });
   await adapter.createRevision(entryId, "王專員");
+  await adapter.saveAndSubmitReview({
+    ...completeDraft(),
+    id: entryId,
+    entryId,
+    versionId,
+    title: "送審前最後版本",
+  });
   await adapter.transition(entryId, "submit_review", {
     versionId,
     actor: "王專員",
@@ -160,6 +293,7 @@ test("remote adapter sends lifecycle operations to one protected endpoint", asyn
       "createDraft",
       "updateDraft",
       "createRevision",
+      "saveAndSubmitReview",
       "submitReview",
       "returnToDraft",
       "publish",
@@ -191,8 +325,11 @@ test("remote adapter sends lifecycle operations to one protected endpoint", asyn
   assert.equal(calls[3].body.entryId, entryId);
   assert.equal(calls[3].body.versionId, versionId);
   assert.equal(calls[3].body.payload.schema_version, "knowledge_studio.v1");
-  assert.equal(calls[5].body.operation, "submitReview");
+  assert.equal(calls[5].body.operation, "saveAndSubmitReview");
   assert.equal(calls[5].body.versionId, versionId);
+  assert.equal(calls[5].body.payload.title, "送審前最後版本");
+  assert.equal(calls[6].body.operation, "submitReview");
+  assert.equal(calls[6].body.versionId, versionId);
   for (const call of calls) {
     assert.equal(call.url, "https://example.test/knowledge-studio");
     assert.equal(call.options.method, "POST");
@@ -240,6 +377,106 @@ test("remote summaries keep next owner and next action as separate fields", () =
 
   assert.equal(normalized.nextOwner, "PCM 覆核人");
   assert.equal(normalized.nextAction, "等待覆核決定");
+});
+
+test("connected Studio payloads use only database-supported rule values", async () => {
+  const adapter = new GatewayAdapter({
+    endpoint: "https://example.test/knowledge-studio",
+    tokenProvider: async () => "short-lived-token",
+  });
+
+  const drawing = await adapter.studioPayload(completeDraft({
+    type: "圖說檢查規則",
+  }));
+  const budget = await adapter.studioPayload(completeDraft({
+    type: "預算守門規則",
+  }));
+  const contract = await adapter.studioPayload(completeDraft({
+    type: "契約邊界",
+  }));
+
+  assert.equal(drawing.rule.ruleKind, "cross_sheet_consistency");
+  assert.equal(budget.rule.ruleKind, "scope_difference");
+  assert.equal(contract.rule.allowedOutputKind, "comparison");
+});
+
+test("remote detail keeps edited evidence and formal-action notes", () => {
+  const adapter = new GatewayAdapter({
+    endpoint: "https://example.test/knowledge-studio",
+    tokenProvider: async () => "short-lived-token",
+  });
+  const normalized = adapter.normalizeDetail({
+    entryId: "11111111-1111-4111-8111-111111111111",
+    domain: "drawing_review",
+    entryState: STATUS.PENDING_REVIEW,
+    versions: [{
+      versionId: "22222222-2222-4222-8222-222222222222",
+      version: 2,
+      title: "跨圖一致性",
+      summary: "已更新",
+      lifecycleState: STATUS.PENDING_REVIEW,
+      content: {
+        displayType: "圖說檢查規則",
+        owner: "PCM 圖說組",
+        criteria: "依最新內容檢查",
+        nextOwner: "PCM 覆核人",
+      },
+      evidenceSummary: ["更新後來源／第 7 頁"],
+      source: { locator: "原始來源／第 1 頁" },
+      rule: {
+        ruleType: "drawing_rule",
+        conditions: { criteria: "依最新內容檢查" },
+      },
+      createdAt: "2026-07-27T00:00:00.000Z",
+    }],
+    events: [{
+      eventType: "returned_to_draft",
+      actorRole: "PCM 覆核人",
+      occurredAt: "2026-07-27T00:01:00.000Z",
+      afterState: STATUS.DRAFT,
+      nextOwnerRole: "規則整理人",
+      note: "請補充來源頁碼",
+    }],
+  });
+
+  assert.equal(normalized.evidence, "更新後來源／第 7 頁");
+  assert.equal(normalized.events[0].note, "請補充來源頁碼");
+  assert.equal(normalized.events[0].sourceDocument, "更新後來源／第 7 頁");
+});
+
+test("mobile back never hides an unsaved editor without an explicit discard", () => {
+  assert.deepEqual(
+    Studio.decideMobileBack({
+      editorMode: "new",
+      dirty: false,
+      discardConfirmed: false,
+    }),
+    { action: "stay", discard: false },
+  );
+  assert.deepEqual(
+    Studio.decideMobileBack({
+      editorMode: "new",
+      dirty: false,
+      discardConfirmed: true,
+    }),
+    { action: "list", discard: true },
+  );
+  assert.deepEqual(
+    Studio.decideMobileBack({
+      editorMode: "edit",
+      dirty: true,
+      discardConfirmed: false,
+    }),
+    { action: "stay", discard: false },
+  );
+  assert.deepEqual(
+    Studio.decideMobileBack({
+      editorMode: "edit",
+      dirty: false,
+      discardConfirmed: false,
+    }),
+    { action: "list", discard: false },
+  );
 });
 
 test("visible studio copy contains no prohibited engineering or legal claims", () => {
