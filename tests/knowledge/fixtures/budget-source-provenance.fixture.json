@@ -1,0 +1,56 @@
+{
+  "source_root_relative": "bugget/清單分類_20260605_0107",
+  "expected_inventory": {
+    "total": 76,
+    "xlsx": 69,
+    "md": 4,
+    "json": 3
+  },
+  "target_schema": "knowledge_staging",
+  "required_provenance_fields": [
+    "relative_path",
+    "file_sha256",
+    "worksheet_name",
+    "row_number"
+  ],
+  "valid_row": {
+    "relative_path": "01_拆除工程/01_拆除牆體.xlsx",
+    "file_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "worksheet_name": "資料",
+    "row_number": 2,
+    "unified_item_name": "拆除牆體",
+    "classification_path": [
+      "拆除工程",
+      "拆除牆體"
+    ],
+    "unit": "式",
+    "historical_price": 1000,
+    "source_kind": "historical_budget_source"
+  },
+  "missing_field_row": {
+    "relative_path": "04_木作櫃/01_衣櫃.xlsx",
+    "file_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "worksheet_name": "資料",
+    "row_number": 7,
+    "unified_item_name": "固定收納櫃",
+    "classification_path": [
+      "木作櫃"
+    ],
+    "unit": null,
+    "source_kind": "historical_budget_source"
+  },
+  "conflict_row": {
+    "relative_path": "05_系統櫃/01_系統衣櫃.xlsx",
+    "file_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "worksheet_name": "資料",
+    "row_number": 9,
+    "unified_item_name": "固定收納櫃",
+    "classification_path": [
+      "系統櫃",
+      "系統衣櫃"
+    ],
+    "conflicting_unified_item_name": "衣櫃",
+    "unit": "尺",
+    "source_kind": "historical_budget_source"
+  }
+}

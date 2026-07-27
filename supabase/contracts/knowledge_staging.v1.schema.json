@@ -1,0 +1,525 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knowledge_staging.v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "idempotency_key",
+    "correlation_key",
+    "source_manifest",
+    "records",
+    "budget_items",
+    "woodwork_candidates",
+    "quality_issues"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "knowledge_staging.v1"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$"
+    },
+    "correlation_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$"
+    },
+    "source_manifest": {
+      "type": "object",
+      "required": [
+        "source_kind",
+        "source_locator",
+        "source_sha256",
+        "source_record_count",
+        "chunk_index",
+        "chunk_count"
+      ],
+      "properties": {
+        "source_kind": {
+          "enum": [
+            "obsidian",
+            "budget_master",
+            "a12_pdf_queue",
+            "manual",
+            "woodwork_mapping"
+          ]
+        },
+        "source_locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "source_record_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "chunk_index": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "chunk_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "notes": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "summary": {
+          "type": "object"
+        },
+        "files": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "object"
+          }
+        },
+        "control_evidence": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "object"
+          }
+        },
+        "chunk_sha256": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "transform_version": {
+          "const": "woodwork_mapping.v1"
+        }
+      },
+      "additionalProperties": false
+    },
+    "records": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": ["source_key", "source_status", "raw_payload"],
+        "properties": {
+          "source_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_status": {
+            "enum": ["收件箱", "待整理", "待確認", "已核准", "已停用"]
+          },
+          "is_budget_candidate": {
+            "type": "boolean"
+          },
+          "auto_trigger_allowed": {
+            "type": "boolean"
+          },
+          "raw_payload": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "budget_items": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": [
+          "source_item_uid",
+          "unified_item_name",
+          "is_budget_candidate",
+          "auto_trigger_allowed",
+          "raw_payload"
+        ],
+        "properties": {
+          "source_record_key": {
+            "type": "string"
+          },
+          "source_item_uid": {
+            "type": "string",
+            "minLength": 1
+          },
+          "unified_item_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category_code": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "is_budget_candidate": {
+            "type": "boolean"
+          },
+          "auto_trigger_allowed": {
+            "type": "boolean"
+          },
+          "historical_price_low": {
+            "type": ["number", "null"],
+            "minimum": 0
+          },
+          "historical_price_high": {
+            "type": ["number", "null"],
+            "minimum": 0
+          },
+          "price_currency": {
+            "type": "string",
+            "default": "TWD"
+          },
+          "raw_payload": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "woodwork_candidates": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "required": [
+          "source_record_key",
+          "mapping_id",
+          "bucket",
+          "pricing_trigger_policy",
+          "source_ref",
+          "original_item",
+          "candidate_evidence",
+          "grade_fields",
+          "evidence_priority_used",
+          "confidence_grade",
+          "review_state_label",
+          "review_reason",
+          "missing_info_items",
+          "next_use"
+        ],
+        "properties": {
+          "source_record_key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mapping_id": {
+            "type": "string",
+            "pattern": "^A1-WD-[0-9]{5}$"
+          },
+          "bucket": {
+            "enum": [
+              "eligible_candidate_reference",
+              "requires_image_or_quote_confirmation",
+              "not_grade_applicable",
+              "needs_manual_review"
+            ]
+          },
+          "pricing_trigger_policy": {
+            "const": "not_a_pricing_trigger"
+          },
+          "source_ref": {
+            "type": "object",
+            "required": [
+              "source_workbook",
+              "source_sheet",
+              "source_row_number",
+              "source_trade",
+              "row_identity"
+            ],
+            "properties": {
+              "source_workbook": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sheet": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_row_number": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "source_trade": {
+                "type": "string",
+                "minLength": 1
+              },
+              "row_identity": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          },
+          "original_item": {
+            "type": "object",
+            "required": [
+              "item_name",
+              "spec_text",
+              "unit",
+              "quantity",
+              "low_price_evidence",
+              "high_price_evidence",
+              "amount_evidence",
+              "note"
+            ],
+            "properties": {
+              "item_name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "spec_text": {
+                "type": ["string", "null"]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": ["number", "string", "null"]
+              },
+              "low_price_evidence": {
+                "type": ["number", "string", "null"]
+              },
+              "high_price_evidence": {
+                "type": ["number", "string", "null"]
+              },
+              "amount_evidence": {
+                "type": ["number", "string", "null"]
+              },
+              "note": {
+                "type": ["string", "null"]
+              }
+            },
+            "additionalProperties": false
+          },
+          "candidate_evidence": {
+            "type": "object",
+            "required": [
+              "woodwork_scope",
+              "component_tags",
+              "classification_basis",
+              "source_confidence_text",
+              "inclusion_reason",
+              "exclusion_reason",
+              "detail_id_candidate"
+            ],
+            "properties": {
+              "woodwork_scope": {
+                "type": "string"
+              },
+              "component_tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "classification_basis": {
+                "type": "string"
+              },
+              "source_confidence_text": {
+                "type": "string"
+              },
+              "inclusion_reason": {
+                "type": "string"
+              },
+              "exclusion_reason": {
+                "type": ["string", "null"]
+              },
+              "detail_id_candidate": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          },
+          "grade_fields": {
+            "type": "object",
+            "required": [
+              "public_grade_candidate",
+              "grade_status",
+              "brand_group_candidate",
+              "material_candidate",
+              "surface_candidate",
+              "hardware_candidate",
+              "method_candidate",
+              "board_type_candidate",
+              "formaldehyde_class_candidate",
+              "moisture_resistance_candidate"
+            ],
+            "properties": {
+              "public_grade_candidate": {
+                "enum": [null, "中級", "高級"]
+              },
+              "grade_status": {
+                "type": "string"
+              },
+              "brand_group_candidate": {
+                "$ref": "#/$defs/stringArray"
+              },
+              "material_candidate": {
+                "$ref": "#/$defs/stringArray"
+              },
+              "surface_candidate": {
+                "$ref": "#/$defs/stringArray"
+              },
+              "hardware_candidate": {
+                "$ref": "#/$defs/stringArray"
+              },
+              "method_candidate": {
+                "type": ["string", "null"]
+              },
+              "board_type_candidate": {
+                "$ref": "#/$defs/stringArray"
+              },
+              "formaldehyde_class_candidate": {
+                "$ref": "#/$defs/stringArray"
+              },
+              "moisture_resistance_candidate": {
+                "$ref": "#/$defs/stringArray"
+              }
+            },
+            "additionalProperties": false
+          },
+          "evidence_priority_used": {
+            "type": "string",
+            "minLength": 1
+          },
+          "confidence_grade": {
+            "enum": ["A", "B", "C", "D", "X"]
+          },
+          "review_state_label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "review_reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "missing_info_items": {
+            "$ref": "#/$defs/stringArray"
+          },
+          "next_use": {
+            "type": "object",
+            "required": [
+              "usable_for_later_matching",
+              "usable_for_evidence_retrieval",
+              "publication_authorized",
+              "candidate_creation_authorized",
+              "direct_pricing_allowed",
+              "auto_trigger_allowed",
+              "auto_select_allowed",
+              "pricing_trigger_note"
+            ],
+            "properties": {
+              "usable_for_later_matching": {
+                "type": "boolean"
+              },
+              "usable_for_evidence_retrieval": {
+                "type": "boolean"
+              },
+              "publication_authorized": {
+                "const": false
+              },
+              "candidate_creation_authorized": {
+                "const": false
+              },
+              "direct_pricing_allowed": {
+                "const": false
+              },
+              "auto_trigger_allowed": {
+                "const": false
+              },
+              "auto_select_allowed": {
+                "const": false
+              },
+              "pricing_trigger_note": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "quality_issues": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "required": ["issue_code", "severity", "description", "evidence"],
+        "properties": {
+          "source_record_key": {
+            "type": "string"
+          },
+          "issue_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "enum": ["info", "warning", "error"]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "object"
+          },
+          "next_reviewer_role": {
+            "enum": ["pcm", "admin"]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source_manifest": {
+            "properties": {
+              "source_kind": {
+                "const": "woodwork_mapping"
+              }
+            },
+            "required": ["source_kind"]
+          }
+        },
+        "required": ["source_manifest"]
+      },
+      "then": {
+        "required": ["woodwork_candidates"],
+        "properties": {
+          "budget_items": {
+            "maxItems": 0
+          },
+          "woodwork_candidates": {
+            "minItems": 1
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "woodwork_candidates": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

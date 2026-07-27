@@ -1,0 +1,7 @@
+{
+  "收件箱": "inbox",
+  "待整理": "draft",
+  "待確認": "pending_review",
+  "已核准": "pending_review",
+  "已停用": "retired"
+}

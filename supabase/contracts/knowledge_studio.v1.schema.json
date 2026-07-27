@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "knowledge_studio.v1",
+  "type": "object",
+  "required": ["operation"],
+  "properties": {
+    "operation": {
+      "enum": [
+        "listRecords",
+        "getRecord",
+        "createDraft",
+        "updateDraft",
+        "createRevision",
+        "submitReview",
+        "returnToDraft",
+        "publish",
+        "retire"
+      ]
+    },
+    "entryId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "versionId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "lifecycle": {
+      "enum": ["inbox", "draft", "pending_review", "approved", "retired"]
+    },
+    "domain": {
+      "enum": ["drawing_review", "budget", "contract"]
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 500
+    },
+    "note": {
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "payload": {
+      "$ref": "#/$defs/draft"
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": [
+        "source_type",
+        "title",
+        "source_locator",
+        "source_sha256",
+        "provenance"
+      ],
+      "properties": {
+        "source_type": {
+          "enum": [
+            "obsidian_note",
+            "budget_master",
+            "pdf_evidence",
+            "manual_reference"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[A-Fa-f0-9]{64}$"
+        },
+        "provenance": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "draft": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "title",
+        "summary",
+        "content",
+        "evidence_summary",
+        "change_note",
+        "rule"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "knowledge_studio.v1"
+        },
+        "domain": {
+          "enum": ["drawing_review", "budget", "contract"]
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9._-]{2,127}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "content": {
+          "type": "object",
+          "properties": {
+            "displayType": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": true
+        },
+        "evidence_summary": {
+          "type": "array"
+        },
+        "change_note": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "rule": {
+          "oneOf": [
+            { "$ref": "#/$defs/drawing_rule" },
+            { "$ref": "#/$defs/acceptance_rule" },
+            { "$ref": "#/$defs/budget_rule" },
+            { "$ref": "#/$defs/contract_rule" }
+          ]
+        }
+      }
+    },
+    "drawing_rule": {
+      "type": "object",
+      "required": [
+        "ruleType",
+        "ruleCode",
+        "ruleKind",
+        "pageTypes",
+        "conditions",
+        "findingTemplate",
+        "supplementTemplate"
+      ],
+      "properties": {
+        "ruleType": { "const": "drawing_rule" },
+        "ruleCode": { "type": "string", "minLength": 1 },
+        "ruleKind": {
+          "enum": [
+            "sheet_completeness",
+            "required_elevation",
+            "cross_sheet_consistency",
+            "dimension_logic",
+            "material_logic",
+            "supplement_request"
+          ]
+        },
+        "pageTypes": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "conditions": { "type": "object" },
+        "findingTemplate": { "type": "string", "minLength": 1 },
+        "supplementTemplate": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "acceptance_rule": {
+      "type": "object",
+      "required": [
+        "ruleType",
+        "ruleCode",
+        "constructionStage",
+        "checkDefinition",
+        "requiredEvidence",
+        "findingTemplate"
+      ],
+      "properties": {
+        "ruleType": { "const": "acceptance_rule" },
+        "ruleCode": { "type": "string", "minLength": 1 },
+        "constructionStage": { "type": "string", "minLength": 1 },
+        "checkDefinition": { "type": "object" },
+        "requiredEvidence": { "type": "array" },
+        "findingTemplate": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "budget_rule": {
+      "type": "object",
+      "required": [
+        "ruleType",
+        "ruleCode",
+        "ruleKind",
+        "conditions",
+        "output"
+      ],
+      "properties": {
+        "ruleType": { "const": "budget_rule" },
+        "ruleCode": { "type": "string", "minLength": 1 },
+        "ruleKind": {
+          "enum": ["trigger", "bundle", "dependency", "quantity", "scope_difference"]
+        },
+        "unifiedItemCode": { "type": "string" },
+        "conditions": { "type": "object" },
+        "output": { "type": "object" }
+      },
+      "additionalProperties": false
+    },
+    "contract_rule": {
+      "type": "object",
+      "required": [
+        "ruleType",
+        "ruleCode",
+        "allowedOutputKind",
+        "clauseTopic",
+        "evidenceRequirements",
+        "comparisonFields"
+      ],
+      "properties": {
+        "ruleType": { "const": "contract_evidence_rule" },
+        "ruleCode": { "type": "string", "minLength": 1 },
+        "allowedOutputKind": {
+          "enum": ["evidence", "comparison", "missing_information", "risk_note"]
+        },
+        "clauseTopic": { "type": "string", "minLength": 1 },
+        "evidenceRequirements": { "type": "array" },
+        "comparisonFields": { "type": "array" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

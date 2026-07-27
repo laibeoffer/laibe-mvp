@@ -1,0 +1,76 @@
+{
+  "records": [
+    {
+      "id": "drawing-approved",
+      "domain": "drawing_review",
+      "status": "approved",
+      "retired_at": null,
+      "source_ref": "pdf:case-1:page-3",
+      "version": 1,
+      "formalImpact": "none"
+    },
+    {
+      "id": "drawing-pending",
+      "domain": "drawing_review",
+      "status": "pending_review",
+      "retired_at": null,
+      "source_ref": "pdf:case-1:page-4",
+      "version": 1,
+      "formalImpact": "none"
+    },
+    {
+      "id": "drawing-retired",
+      "domain": "drawing_review",
+      "status": "approved",
+      "retired_at": "2026-07-26T00:00:00.000Z",
+      "source_ref": "pdf:case-1:page-5",
+      "version": 2,
+      "formalImpact": "none"
+    },
+    {
+      "id": "drawing-no-source",
+      "domain": "drawing_review",
+      "status": "approved",
+      "retired_at": null,
+      "source_ref": null,
+      "version": 1,
+      "formalImpact": "none"
+    },
+    {
+      "id": "drawing-formal-impact",
+      "domain": "drawing_review",
+      "status": "approved",
+      "retired_at": null,
+      "source_ref": "pdf:case-1:page-6",
+      "version": 1,
+      "formalImpact": "binding"
+    },
+    {
+      "id": "budget-approved",
+      "domain": "budget",
+      "status": "approved",
+      "retired_at": null,
+      "source_ref": "budget-source:row-8",
+      "version": 3,
+      "formalImpact": "none"
+    },
+    {
+      "id": "contract-approved",
+      "domain": "contract",
+      "status": "approved",
+      "retired_at": null,
+      "source_ref": "contract-source:clause-2",
+      "version": 4,
+      "formalImpact": "none"
+    }
+  ],
+  "a12_allowed_actions": [
+    "record_pdf_evidence",
+    "record_finding"
+  ],
+  "a12_forbidden_actions": [
+    "create_candidate_budget_line",
+    "select_formal_price",
+    "approve_contract"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "direction": "obsidian_to_staging",
+  "target_schema": "knowledge_staging",
+  "auto_publish": false,
+  "cases": [
+    {
+      "source_status": "收件箱",
+      "expected_status": "inbox"
+    },
+    {
+      "source_status": "待整理",
+      "expected_status": "draft"
+    },
+    {
+      "source_status": "待確認",
+      "expected_status": "pending_review"
+    },
+    {
+      "source_status": "已核准",
+      "expected_status": "pending_review"
+    },
+    {
+      "source_status": "已停用",
+      "expected_status": "retired"
+    }
+  ]
+}

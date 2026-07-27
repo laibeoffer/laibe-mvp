@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="knowledge-endpoint" content="" />
+    <meta name="knowledge-project-key" content="" />
+    <title>萊比知識工作台</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css?v=2026072601" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="主要導覽">
+        <div class="brand-block">
+          <span class="brand-mark" aria-hidden="true">L</span>
+          <div>
+            <strong>萊比</strong>
+            <span>知識工作台</span>
+          </div>
+        </div>
+        <nav class="nav-list">
+          <button
+            class="nav-item is-active"
+            type="button"
+            data-view="all"
+            aria-current="page"
+          >
+            <span aria-hidden="true">▦</span>
+            規則總覽
+          </button>
+          <button class="nav-item" type="button" data-view="review">
+            <span aria-hidden="true">✓</span>
+            覆核工作
+          </button>
+          <button class="nav-item" type="button" data-view="source">
+            <span aria-hidden="true">⌁</span>
+            來源追溯
+          </button>
+        </nav>
+        <div class="role-block">
+          <span>目前角色</span>
+          <strong>PCM 管理者</strong>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="workspace-header">
+          <div>
+            <p class="section-label">知識治理</p>
+            <h1>規則與依據</h1>
+          </div>
+          <button id="new-draft-button" class="primary-button" type="button">
+            <span aria-hidden="true">＋</span>
+            新增草稿
+          </button>
+        </header>
+
+        <aside class="preview-notice" aria-label="使用範圍">
+          <strong>內部規則編修預覽</strong>
+          <span>
+            只有完成覆核並發布的規則，才會提供給其他工作流程；畫面中的範例不代表案件事實。
+          </span>
+        </aside>
+
+        <section class="status-strip" aria-label="規則狀態">
+          <button class="status-summary" data-status="pending_review" type="button">
+            <span class="status-dot review"></span>
+            <span>待覆核</span>
+            <strong id="count-pending">0</strong>
+          </button>
+          <button class="status-summary" data-status="approved" type="button">
+            <span class="status-dot published"></span>
+            <span>已發布</span>
+            <strong id="count-approved">0</strong>
+          </button>
+          <button class="status-summary" data-status="draft" type="button">
+            <span class="status-dot revision"></span>
+            <span>待修正</span>
+            <strong id="count-draft">0</strong>
+          </button>
+          <button class="status-summary" data-status="retired" type="button">
+            <span class="status-dot retired"></span>
+            <span>已停用</span>
+            <strong id="count-retired">0</strong>
+          </button>
+        </section>
+
+        <section class="filter-bar" aria-label="規則篩選">
+          <label class="search-field">
+            <span aria-hidden="true">⌕</span>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="搜尋規則、工項或來源"
+              autocomplete="off"
+            />
+          </label>
+          <label>
+            <span class="sr-only">狀態</span>
+            <select id="status-filter">
+              <option value="">全部狀態</option>
+              <option value="pending_review">待覆核</option>
+              <option value="approved">已發布</option>
+              <option value="draft">待修正</option>
+              <option value="retired">已停用</option>
+            </select>
+          </label>
+          <label>
+            <span class="sr-only">類型</span>
+            <select id="type-filter">
+              <option value="">全部類型</option>
+            </select>
+          </label>
+          <label>
+            <span class="sr-only">下一位處理者</span>
+            <select id="owner-filter">
+              <option value="">全部處理者</option>
+            </select>
+          </label>
+        </section>
+
+        <div id="state-banner" class="state-banner" hidden></div>
+
+        <section class="workbench">
+          <div class="record-pane">
+            <div class="pane-heading">
+              <div>
+                <p class="section-label">目前清單</p>
+                <h2>規則紀錄</h2>
+              </div>
+              <span id="result-count">0 筆</span>
+            </div>
+            <div id="record-list" class="record-list" aria-live="polite"></div>
+            <div id="empty-state" class="empty-state" hidden>
+              <strong>沒有符合條件的規則</strong>
+              <span>調整篩選條件，或建立一份新草稿。</span>
+            </div>
+          </div>
+
+          <div class="detail-pane">
+            <div id="detail-placeholder" class="detail-placeholder">
+              <span class="placeholder-mark" aria-hidden="true">◎</span>
+              <strong>選擇一筆規則</strong>
+              <span>查看版本、來源、下一步與處理紀錄。</span>
+            </div>
+
+            <form id="detail-form" class="detail-form" hidden>
+              <div class="detail-heading">
+                <div>
+                  <p id="detail-status" class="status-badge"></p>
+                  <h2 id="detail-title-display">規則內容</h2>
+                </div>
+                <span id="detail-version" class="version-label">版本 0</span>
+              </div>
+
+              <div class="form-grid">
+                <label class="span-two">
+                  <span>規則名稱</span>
+                  <input id="field-title" name="title" required />
+                </label>
+                <label>
+                  <span>類型</span>
+                  <select id="field-type" name="type">
+                    <option>圖說檢查規則</option>
+                    <option>預算守門規則</option>
+                    <option>驗收依據</option>
+                    <option>契約邊界</option>
+                    <option>材料規格</option>
+                  </select>
+                </label>
+                <label>
+                  <span>負責人</span>
+                  <input id="field-owner" name="owner" />
+                </label>
+                <label class="span-two">
+                  <span>規則摘要</span>
+                  <textarea id="field-summary" name="summary" rows="3"></textarea>
+                </label>
+                <label class="span-two">
+                  <span>判斷條件</span>
+                  <textarea id="field-criteria" name="criteria" rows="4"></textarea>
+                </label>
+                <label>
+                  <span>下一位處理者</span>
+                  <input id="field-next-owner" name="nextOwner" />
+                </label>
+                <label>
+                  <span>依據日期</span>
+                  <input id="field-source-date" name="sourceDate" type="date" />
+                </label>
+                <label class="span-two">
+                  <span>來源依據</span>
+                  <input
+                    id="field-evidence"
+                    name="evidence"
+                    placeholder="文件名稱、頁碼或工作表列號"
+                  />
+                </label>
+              </div>
+
+              <div class="action-bar">
+                <button id="save-button" class="secondary-button" type="submit">
+                  儲存草稿
+                </button>
+                <button
+                  id="revision-button"
+                  class="secondary-button"
+                  type="button"
+                  hidden
+                >
+                  建立新版本
+                </button>
+                <button
+                  id="submit-button"
+                  class="primary-button"
+                  type="button"
+                >
+                  送交覆核
+                </button>
+                <button
+                  id="return-button"
+                  class="warning-button"
+                  type="button"
+                  hidden
+                >
+                  退回修正
+                </button>
+                <button
+                  id="publish-button"
+                  class="primary-button"
+                  type="button"
+                  hidden
+                >
+                  核准發布
+                </button>
+                <button
+                  id="retire-button"
+                  class="quiet-button"
+                  type="button"
+                  hidden
+                >
+                  停用
+                </button>
+              </div>
+
+              <section class="evidence-section">
+                <div class="pane-heading compact">
+                  <div>
+                    <p class="section-label">可追溯依據</p>
+                    <h3>來源與處理紀錄</h3>
+                  </div>
+                </div>
+                <dl class="evidence-ledger">
+                  <div>
+                    <dt>來源</dt>
+                    <dd id="evidence-source">尚未填寫</dd>
+                  </div>
+                  <div>
+                    <dt>下一步</dt>
+                    <dd id="evidence-next-step">尚未指定</dd>
+                  </div>
+                </dl>
+                <ol id="event-history" class="event-history"></ol>
+              </section>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <script type="module" src="./app.js?v=2026072605"></script>
+  </body>
+</html>
