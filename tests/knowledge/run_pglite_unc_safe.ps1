@@ -1,8 +1,17 @@
 [CmdletBinding()]
-param()
+param(
+    [string]$RepoRoot = ''
+)
 
 $ErrorActionPreference = 'Stop'
-$repoRoot = 'Z:\08-Jacky\laibe_MVP_project'
+if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
+    $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $RepoRoot = (Resolve-Path -LiteralPath (Join-Path $scriptRoot '..\..')).Path
+}
+$repoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
+if ($repoRoot.StartsWith('\\')) {
+    throw 'PGlite runner requires a local drive path, not a UNC path'
+}
 $runnerPath = Join-Path $repoRoot 'tests\knowledge\pglite_migration_smoke.test.ts'
 $deno = (Get-Command deno -ErrorAction Stop).Source
 $denoCache = Join-Path $env:LOCALAPPDATA 'deno'
@@ -28,6 +37,11 @@ $contractPaths = [ordered]@{
     remote_event_next_action_contract = 'supabase\tests\remote_event_next_action_contract.sql'
     remote_woodwork_contract = 'tests\knowledge\remote_woodwork_contract.sql'
     remote_unified_items_contract = 'tests\knowledge\remote_unified_items_contract.sql'
+    rpc_surface_contract = 'supabase\tests\rpc_surface_contract.sql'
+    core_preflight = 'supabase\core_reconciliation\000_preflight.sql'
+    core_bundle = 'supabase\core_reconciliation\010_a5_knowledge_foundation.sql'
+    core_verify = 'supabase\core_reconciliation\900_verify.sql'
+    core_rollback = 'supabase\core_reconciliation\990_rollback.sql'
 }
 
 foreach ($contractName in $contractPaths.Keys) {

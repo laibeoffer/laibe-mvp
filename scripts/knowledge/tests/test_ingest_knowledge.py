@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -266,7 +267,13 @@ class VaultScanTests(unittest.TestCase):
 
     def test_repository_vault_has_zero_publishable_records(self):
         root = Path(__file__).resolve().parents[3]
-        result = scan_vault(root / "Laibe-Budget-Vault")
+        vault = Path(
+            os.environ.get(
+                "LAIBE_BUDGET_VAULT_PATH",
+                root / "Laibe-Budget-Vault",
+            )
+        )
+        result = scan_vault(vault)
         self.assertEqual(result["summary"]["markdown_files"], 22)
         self.assertEqual(result["summary"]["publishable_records"], 0)
         self.assertEqual(result["summary"]["excluded_records"], 22)

@@ -17,11 +17,14 @@ TESTS_DIR = Path(__file__).parent
 SCRIPT_DIR = TESTS_DIR.parent
 REPO_ROOT = SCRIPT_DIR.parents[1]
 MODULE_PATH = SCRIPT_DIR / "ingest_woodwork_mapping.py"
-SOURCE_PATH = (
-    REPO_ROOT
-    / "outputs"
-    / "budget_woodwork_items_20260710"
-    / "A1_woodwork_ingest_mapping_20260711.json"
+SOURCE_PATH = Path(
+    os.environ.get(
+        "A1_WOODWORK_MAPPING_PATH",
+        REPO_ROOT
+        / "outputs"
+        / "budget_woodwork_items_20260710"
+        / "A1_woodwork_ingest_mapping_20260711.json",
+    )
 )
 STAGING_SCHEMA_PATH = (
     REPO_ROOT / "supabase" / "contracts" / "knowledge_staging.v1.schema.json"

@@ -4,6 +4,37 @@ This directory is a deployable foundation for the shared PCM knowledge system.
 It is prepared for an isolated development branch and must not modify the
 connected project's default branch during verification.
 
+## 2026-07-27 Core Readiness Candidate
+
+The current Git candidate is RPC-only for browser roles:
+
+- `PUBLIC`, `anon`, and `authenticated` have no direct table or sequence
+  privileges in `knowledge`, `knowledge_staging`, or `casework`.
+- `authenticated` can execute only 16 named public RPCs and two Storage
+  helpers; `anon` can execute none.
+- A12 case findings and linked evidence are filtered to the
+  `drawing_review` domain.
+- Four restrictive Storage guards prevent unrelated permissive policies from
+  bypassing the two A5 private buckets.
+- Studio submission stores the latest draft and transitions it to review in
+  one server operation. Publication also uses the server completeness gate.
+- CORS uses `KNOWLEDGE_STUDIO_ALLOWED_ORIGINS` and
+  `KNOWLEDGE_GATEWAY_ALLOWED_ORIGINS`; missing configuration fails closed.
+
+The local LaiBE Core reconciliation bundle is in
+`supabase/core_reconciliation/`. It targets `zdwuyomhswjcbbpbhpcq`, but it has
+not been applied to that project or any other remote project. A fresh A0 /
+Owner approval is required before any apply, Edge Function deployment, CORS
+configuration, or consumer connection.
+
+The preview branch still contains the older migration set and still reports
+26 authenticated GraphQL table-discoverability advisories for the A5 schemas.
+That remote baseline is intentionally unchanged by this Git recovery work.
+
+Large A1 evidence remains outside this branch. Full tests must provide the
+read-only `A1_WOODWORK_MAPPING_PATH` and `LAIBE_BUDGET_VAULT_PATH`
+environment variables; the tests verify the pinned corpus SHA and counts.
+
 ## Scope
 
 - Private schemas: `knowledge_staging`, `knowledge`, and `casework`.

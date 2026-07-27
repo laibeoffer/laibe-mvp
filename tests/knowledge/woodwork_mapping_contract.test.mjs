@@ -17,12 +17,14 @@ import {
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(HERE, "..", "..");
-const MAPPING_PATH = resolve(
-  REPO_ROOT,
-  "outputs",
-  "budget_woodwork_items_20260710",
-  "A1_woodwork_ingest_mapping_20260711.json",
-);
+const MAPPING_PATH = process.env.A1_WOODWORK_MAPPING_PATH
+  ? resolve(process.env.A1_WOODWORK_MAPPING_PATH)
+  : resolve(
+      REPO_ROOT,
+      "outputs",
+      "budget_woodwork_items_20260710",
+      "A1_woodwork_ingest_mapping_20260711.json",
+    );
 
 const EXPECTED_BYTES = 102_049_538;
 const EXPECTED_SHA256 =
