@@ -1,6 +1,6 @@
 # A5 Knowledge Foundation Core Readiness Report
 
-日期：2026-07-27  
+日期：2026-07-27
 狀態：本機候選可供 A0 審查；尚未套用 LaiBE Core、尚未連接正式 consumer、尚未發布正式知識。
 
 ## 1. Git 回復

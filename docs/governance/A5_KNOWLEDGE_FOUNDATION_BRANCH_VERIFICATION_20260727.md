@@ -1,6 +1,6 @@
 # A5 Knowledge Foundation Branch Verification
 
-日期：2026-07-27  
+日期：2026-07-27
 狀態：隔離分支執行與資料匯入證據可交付 A5 / AA / Owner 審查；不得視為 production-ready、正式知識已發布或 AI PCM 已完成。
 
 > 2026-07-27 recovery addendum：本文件下方內容是先前 preview branch 的歷史驗證紀錄。現在的可審查候選位於 branch `a5/knowledge-foundation-core-readiness-20260727`，byte-exact snapshot commit 為 `d0ce795`。本輪新增 RPC-only hardening、Studio UX 修正與 Core reconciliation bundle，但均未套用到 preview branch 或 LaiBE Core。最新狀態、測試與限制以 `A5_KNOWLEDGE_FOUNDATION_CORE_READINESS_REPORT_20260727.md` 為準。
