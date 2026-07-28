@@ -1,5 +1,8 @@
 # A5 Knowledge Foundation Branch Verification
 
+> [!CAUTION]
+> **SUPERSEDED FOR CURRENT EXECUTION.** 本文件是 2026-07-27 preview branch 的歷史紀錄，不得作為現行命令來源。C-only 可重現位置、fixtures 與 fresh test 證據以 `docs/governance/A5_KNOWLEDGE_FOUNDATION_C_DRIVE_REVALIDATION_20260728.md` 為準。
+
 日期：2026-07-27
 狀態：隔離分支執行與資料匯入證據可交付 A5 / AA / Owner 審查；不得視為 production-ready、正式知識已發布或 AI PCM 已完成。
 
@@ -7,7 +10,7 @@
 
 ## 1. 執行邊界
 
-- 本機根目錄：`Z:\08-Jacky\laibe_MVP_project`
+- 現行唯讀 repo 根目錄：`C:\CodexWork\08-Jacky\laibe_MVP_project`
 - Supabase parent project：`jaxwovullfpdedqhoopx`
 - 隔離 branch：`a5-pcm-knowledge-20260726`
 - branch id：`c25b2b45-6d76-4c10-9ce3-eaf1c6b9ceeb`
@@ -57,7 +60,7 @@
 ### 第二階段：Knowledge Studio 最小版本
 
 - 本機頁面：
-  `Z:\08-Jacky\laibe_MVP_project\site\knowledge_studio\code.html`
+  `C:\CodexWork\08-Jacky\laibe_MVP_project\site\knowledge_studio\code.html`
 - 支援草稿、送交覆核、退回修正、發布、停用及事件留痕。
 - 遠端 adapter 以使用者 JWT 呼叫 `knowledge-studio`，不使用
   service-role credential。
@@ -97,9 +100,9 @@
 12. `20260727095027 knowledge_case_event_next_action`
 
 第 11 筆對應本機 migration：
-`Z:\08-Jacky\laibe_MVP_project\supabase\migrations\20260727161457_pcm_woodwork_candidates_staging.sql`。
+`C:\CodexWork\08-Jacky\laibe_MVP_project\supabase\migrations\20260727161457_pcm_woodwork_candidates_staging.sql`。
 第 12 筆對應本機 migration：
-`Z:\08-Jacky\laibe_MVP_project\supabase\migrations\20260727094259_knowledge_case_event_next_action.sql`。
+`C:\CodexWork\08-Jacky\laibe_MVP_project\supabase\migrations\20260727094259_knowledge_case_event_next_action.sql`。
 遠端 branch 為分段套用歷史，版本號不與本機檔名一一相同；後續不得直接對
 production 執行未經 reconciliation 的 `db push`。
 本機檔名使用台北時間，遠端 migration history 使用分支記錄版本。
@@ -120,9 +123,9 @@ idempotency key，資料庫授權層回 HTTP 422，且沒有新增資料。
 來源：
 
 - Obsidian vault：
-  `Z:\08-Jacky\laibe_MVP_project\Laibe-Budget-Vault`
+  `C:\CodexWork\08-Jacky\laibe_MVP_project\Laibe-Budget-Vault`
 - 預算來源：
-  `Z:\08-Jacky\laibe_MVP_project\bugget\清單分類_20260605_0107`
+  `C:\CodexWork\08-Jacky\laibe_MVP_project\bugget\清單分類_20260605_0107`
 - active workbook：
   `_AI_BUDGET_MASTER_INDEX_OUTPUT_20260617_132725\laibe_budget_ai_master_index.xlsx`
 
@@ -155,7 +158,7 @@ idempotency key，資料庫授權層回 HTTP 422，且沒有新增資料。
 
 來源：
 
-`Z:\08-Jacky\laibe_MVP_project\outputs\budget_woodwork_items_20260710\A1_woodwork_ingest_mapping_20260711.json`
+`C:\CodexWork\08-Jacky\laibe_MVP_project\outputs\budget_woodwork_items_20260710\A1_woodwork_ingest_mapping_20260711.json`
 
 鎖定 SHA-256：
 
@@ -205,7 +208,7 @@ idempotency key，資料庫授權層回 HTTP 422，且沒有新增資料。
 
 1. 來源工作簿含負值歷史價格。
 2. 匯入器原先將負值直接送入具非負約束的 staging 欄位。
-3. Windows `Path.resolve()` 會將 `Z:` 展開為不允許的網路路徑。
+3. Windows `Path.resolve()` 可能將 mapped drive 展開為不允許的網路路徑。
 
 修正：
 
@@ -213,7 +216,7 @@ idempotency key，資料庫授權層回 HTTP 422，且沒有新增資料。
 - `historical_price_low` / `historical_price_high` 的負值改為 `null`。
 - 每筆建立 `negative_historical_price`，狀態為 `pending_review`，
   `next_reviewer_role=pcm`，且 `quarantined=true`。
-- 來源絕對路徑使用不展開 mapped drive 的方法，維持 `Z:`。
+- 來源絕對路徑使用不展開 mapped drive 的方法；目前測試以離線合成 drive fixture 驗證，不要求實際 mapped drive 存在。
 
 驗證：
 

@@ -2,13 +2,14 @@
 
 日期：2026-07-28
 
-狀態：A0 第二輪審查候選。尚未套用 LaiBE Core、尚未部署 Edge Functions、尚未連接正式 consumer、尚未發布正式知識。
+狀態：A0 第三輪審查候選。執行位置證據已由 2026-07-28 C-drive revalidation 取代，詳見 `docs/governance/A5_KNOWLEDGE_FOUNDATION_C_DRIVE_REVALIDATION_20260728.md`。尚未套用 LaiBE Core、尚未部署 Edge Functions、尚未連接正式 consumer、尚未發布正式知識。
 
 ## 1. Git 回復與範圍
 
 - `origin/main` 基線：`e31287e10d78537cd7a0cb901a7e3e1cb5a2f6a5`
 - branch：`a5/knowledge-foundation-core-readiness-20260727`
-- worktree：`Z:\08-Jacky\_codex_worktrees\a5-knowledge-foundation-core-readiness-20260727`
+- runtime revalidation worktree：`C:\CodexWork\08-Jacky\worktrees\laibe_MVP_project\a5-knowledge-foundation-core-readiness-20260727-c-verify`
+- evidence correction worktree：`C:\CodexWork\08-Jacky\worktrees\laibe_MVP_project\a5-pr112-c-drive-evidence-correction-20260728`
 - byte-exact snapshot commit：`d0ce795d8fab316c24c5b4533cc67603dd865292`
 - A0 退回修正前候選：`39f9564743fadb7239e9bc8ea77575d5b047934a`
 - snapshot：50 files、570,943 bytes、SHA256 mismatch 0
@@ -110,8 +111,8 @@ in-app browser、local HTTP 實測：
 - PGlite 證明 partial collision 與 repeat-apply fail-closed、非 A5 sentinel 保留、rollback dependency fail-closed。
 - `casework.document_versions` 是不可變版本紀錄。
 - `casework.case_member_workstreams(case_id,user_id,workstream_type)` 是明確 workstream 授權來源。
-- A14 接受的 LINE adapter contract 來源：`Z:\08-Jacky\A14\worktree-main\docs\integrations\line-bot-core-adapter-contract.md`。
-- 現有 `casework.documents.file_type` 為 PDF-only，而 A14 attachment contract 包含 jpeg/png/pdf；manifest 保留 `pending_a0_a14_confirmation`，未自行改動父文件模型。
+- A14 contract 對齊狀態：`pending_c_drive_a14_phase0_confirmation`。A14 目前仍在 C-only LaiBE Core 物件定位與契約確認階段；本報告不宣稱 adapter contract 已接受。
+- 現有 `casework.documents.file_type` 仍為 PDF-only；jpeg/png parent attachment model 仍 pending，本報告不自行擴大附件模型，也不把附件模型寫成已決策。
 
 此 bundle **尚未套用**到 LaiBE Core，也沒有建立新付費 Supabase branch。
 
@@ -126,7 +127,7 @@ in-app browser、local HTTP 實測：
 | PGlite migration + reconciliation | 3 / 3 |
 | Deno fmt | 4 files pass |
 | Deno check | 4 files pass |
-| JSON parse | 53 / 53 |
+| JSON parse | 54 / 54 |
 | `git diff --check` | pass |
 
 Node 逐檔：
@@ -148,8 +149,8 @@ Node 逐檔：
 Python clean worktree 必須顯式使用：
 
 ```powershell
-$env:A1_WOODWORK_MAPPING_PATH = 'Z:\08-Jacky\laibe_MVP_project\outputs\budget_woodwork_items_20260710\A1_woodwork_ingest_mapping_20260711.json'
-$env:LAIBE_BUDGET_VAULT_PATH = 'Z:\08-Jacky\laibe_MVP_project\Laibe-Budget-Vault'
+$env:A1_WOODWORK_MAPPING_PATH = 'C:\CodexWork\08-Jacky\laibe_MVP_project\outputs\budget_woodwork_items_20260710\A1_woodwork_ingest_mapping_20260711.json'
+$env:LAIBE_BUDGET_VAULT_PATH = 'C:\CodexWork\08-Jacky\laibe_MVP_project\Laibe-Budget-Vault'
 ```
 
 兩個路徑均只讀；分支未複製 102 MB corpus 或 Obsidian vault。

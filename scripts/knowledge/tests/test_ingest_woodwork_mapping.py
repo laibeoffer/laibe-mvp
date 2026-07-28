@@ -375,11 +375,11 @@ class FailClosedTests(unittest.TestCase):
             )
 
     @unittest.skipUnless(os.name == "nt", "Windows drive mapping test")
-    def test_z_drive_path_is_not_expanded_to_unc(self):
+    def test_generic_mapped_drive_path_is_not_expanded_to_unc(self):
         path = woodwork.absolute_source_path(
-            Path(r"Z:\08-Jacky\laibe_MVP_project")
+            Path(r"X:\synthetic-offline-test-root")
         )
-        self.assertTrue(str(path).startswith("Z:\\"))
+        self.assertTrue(str(path).startswith("X:\\"))
         self.assertFalse(str(path).startswith("\\\\"))
 
     def test_post_requires_explicit_short_lived_jwt(self):

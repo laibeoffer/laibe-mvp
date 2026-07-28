@@ -1,5 +1,8 @@
 # A5 Knowledge Foundation Recovery And Core Readiness Implementation Plan
 
+> [!CAUTION]
+> **HISTORICAL_PLAN_SUPERSEDED_FOR_EXECUTION.** 本計畫中的 recovery 命令已完成且不得重跑。任何舊磁碟路徑或 historical placeholder 都是 `HISTORICAL_ONLY_DO_NOT_EXECUTE`；現行 C-only 證據與驗證命令請使用 `docs/governance/A5_KNOWLEDGE_FOUNDATION_C_DRIVE_REVALIDATION_20260728.md`。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Recover the A5 Knowledge Foundation into an independently reviewable Git branch, harden it to an RPC-only PCM reviewer surface, repair the Knowledge Studio human workflow, and produce an unapplied LaiBE Core reconciliation bundle.
@@ -10,9 +13,9 @@
 
 ## Global Constraints
 
-- Source snapshot: exactly 50 A5 files, 570,943 bytes, copied from `Z:\08-Jacky\laibe_MVP_project`.
+- Source snapshot: exactly 50 A5 files, 570,943 bytes, copied from `HISTORICAL_RETIRED_SOURCE_ROOT` (`HISTORICAL_ONLY_DO_NOT_EXECUTE`).
 - Clean base: `origin/main` at `e31287e10d78537cd7a0cb901a7e3e1cb5a2f6a5`.
-- Worktree: `Z:\08-Jacky\_codex_worktrees\a5-knowledge-foundation-core-readiness-20260727`.
+- Historical worktree: `HISTORICAL_RETIRED_WORKTREE` (`HISTORICAL_ONLY_DO_NOT_EXECUTE`).
 - Branch: `a5/knowledge-foundation-core-readiness-20260727`.
 - Exact snapshot commit: `d0ce795` (`checkpoint: recover A5 knowledge foundation exact snapshot`).
 - Do not modify the original dirty workspace, `main`, PR #111, A0 worktree, PCM public routes, or Plan Puzzle.
@@ -29,7 +32,7 @@
 ### Task 1: Bind The Exact Recovery Snapshot
 
 **Files:**
-- Source manifest outside repository: `Z:\08-Jacky\_codex_worktrees\A5_KNOWLEDGE_FOUNDATION_SNAPSHOT_MANIFEST_20260727.json`
+- Historical source manifest outside repository: `HISTORICAL_RETIRED_WORKTREE\A5_KNOWLEDGE_FOUNDATION_SNAPSHOT_MANIFEST_20260727.json` (`HISTORICAL_ONLY_DO_NOT_EXECUTE`)
 - Later copy into repository: `docs/governance/A5_KNOWLEDGE_FOUNDATION_SNAPSHOT_MANIFEST_20260727.json`
 
 **Interfaces:**
@@ -43,8 +46,9 @@ Use GitHub PR #111 to bind the repository to `laibeoffer/laibe-mvp`; do not add 
 - [x] **Step 2: Fetch a clean base through an external control clone**
 
 ```powershell
+# HISTORICAL_ONLY_DO_NOT_EXECUTE
 git clone --no-checkout https://github.com/laibeoffer/laibe-mvp.git `
-  Z:\08-Jacky\_codex_worktrees\a5-knowledge-foundation-core-readiness-control-20260727
+  HISTORICAL_RETIRED_CONTROL_CLONE
 git -c safe.directory=* fetch origin main
 git -c safe.directory=* rev-parse origin/main
 ```
@@ -54,9 +58,10 @@ Expected: `e31287e10d78537cd7a0cb901a7e3e1cb5a2f6a5`.
 - [x] **Step 3: Create the linked worktree and branch**
 
 ```powershell
+# HISTORICAL_ONLY_DO_NOT_EXECUTE
 git -c safe.directory=* worktree add `
   -b a5/knowledge-foundation-core-readiness-20260727 `
-  Z:\08-Jacky\_codex_worktrees\a5-knowledge-foundation-core-readiness-20260727 `
+  HISTORICAL_RETIRED_WORKTREE `
   origin/main
 ```
 

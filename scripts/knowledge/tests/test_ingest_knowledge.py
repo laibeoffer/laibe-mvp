@@ -9,6 +9,7 @@ from xml.sax.saxutils import escape
 
 
 MODULE_DIR = Path(__file__).resolve().parents[1]
+REPO_ROOT = MODULE_DIR.parents[1]
 STAGING_SCHEMA_PATH = (
     MODULE_DIR.parents[1]
     / "supabase"
@@ -658,13 +659,33 @@ class BudgetScanTests(unittest.TestCase):
         self.assertTrue(issue["evidence"]["quarantined"])
 
     @unittest.skipUnless(sys.platform == "win32", "Windows drive mapping test")
-    def test_absolute_source_path_preserves_mapped_drive_letter(self):
-        source = Path(r"Z:\08-Jacky\laibe_MVP_project")
+    def test_mapped_drive_fixture_and_current_evidence_are_offline_safe(self):
+        source = Path(r"X:\synthetic-offline-test-root")
 
         resolved = ingest_module.absolute_source_path(source)
 
-        self.assertTrue(str(resolved).startswith("Z:\\"))
+        self.assertTrue(str(resolved).startswith("X:\\"))
         self.assertFalse(str(resolved).startswith("\\\\"))
+
+        retired_root = "Z:" + "\\08-Jacky"
+        evidence_paths = [
+            REPO_ROOT / "scripts" / "knowledge" / "tests" / "test_ingest_knowledge.py",
+            REPO_ROOT / "scripts" / "knowledge" / "tests" / "test_ingest_woodwork_mapping.py",
+            REPO_ROOT
+            / "docs"
+            / "governance"
+            / "A5_KNOWLEDGE_FOUNDATION_CORE_READINESS_REPORT_20260727.md",
+        ]
+        violations = [
+            str(path.relative_to(REPO_ROOT))
+            for path in evidence_paths
+            if retired_root in path.read_text(encoding="utf-8")
+        ]
+        self.assertEqual(
+            violations,
+            [],
+            f"current C-drive evidence still references the retired mapped-drive root: {violations}",
+        )
 
     def test_payload_writer_supports_json_and_ndjson(self):
         payload = {
