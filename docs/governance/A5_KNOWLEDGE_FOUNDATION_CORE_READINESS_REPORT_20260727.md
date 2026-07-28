@@ -1,95 +1,98 @@
 # A5 Knowledge Foundation Core Readiness Report
 
-日期：2026-07-27
-狀態：本機候選可供 A0 審查；尚未套用 LaiBE Core、尚未連接正式 consumer、尚未發布正式知識。
+日期：2026-07-28
 
-## 1. Git 回復
+狀態：A0 第二輪審查候選。尚未套用 LaiBE Core、尚未部署 Edge Functions、尚未連接正式 consumer、尚未發布正式知識。
+
+## 1. Git 回復與範圍
 
 - `origin/main` 基線：`e31287e10d78537cd7a0cb901a7e3e1cb5a2f6a5`
 - branch：`a5/knowledge-foundation-core-readiness-20260727`
 - worktree：`Z:\08-Jacky\_codex_worktrees\a5-knowledge-foundation-core-readiness-20260727`
-- byte-exact snapshot commit：`d0ce795`
+- byte-exact snapshot commit：`d0ce795d8fab316c24c5b4533cc67603dd865292`
+- A0 退回修正前候選：`39f9564743fadb7239e9bc8ea77575d5b047934a`
 - snapshot：50 files、570,943 bytes、SHA256 mismatch 0
 - manifest：`docs/governance/A5_KNOWLEDGE_FOUNDATION_SNAPSHOT_MANIFEST_20260727.json`
-- 2026-07-27 最終重驗原始 source：50 files、SHA256 mismatch 0。
-- checkpoint 後變更：31 files，全部位於 A5 whitelist；whitelist 外 0。
 - 原始髒工作區未被清理、移動、覆蓋或提交。
+- correction 僅限 A5 Knowledge Foundation、Knowledge Studio、tests、migration、reconciliation 與 governance docs。
+- correction commit、遠端 branch 與 Draft PR 只會在完整本機驗證及獨立 review 後建立；本報告不預先宣稱已發布。
 
-## 2. 權限收斂
+## 2. A0 阻擋項修正
 
-遠端 preview branch `ocxfrteyedumallatdok` 的唯讀 advisor 基線：
+| Finding | 修正 | 主要證據 |
+|---|---|---|
+| 來源依據漂移 | 更新草稿時以新 locator / SHA 建立不可變 `knowledge.sources`，保留舊來源，並將 draft version 重新綁定新 `source_id`；Gateway 由核准版本的實際來源回傳；Studio 事件依各事件不可變 `source_id` 顯示當時來源，不回填目前版本來源。 | `20260728050639_studio_traceability_a14_core_reconciliation.sql`；PGlite「先空來源、後補來源、送審、發布、Gateway 查詢」真實流程；Studio 多版本事件來源測試。 |
+| 操作者留痕 | Studio 保留 SQL `actorId`；以驗證 session 回傳安全姓名或穩定代號與角色；不顯示 email、JWT 或 raw UUID；admin 顯示為管理者。 | `site/knowledge_studio/app.js`、`knowledge_studio_session_context`、瀏覽器 PCM/admin/owner 情境。 |
+| 未儲存內容遺失 | 搜尋、三種篩選、狀態摘要、規則列、導覽、鍵盤導覽、手機返回與新增草稿共用 `runGuardedNavigation`；取消時回復原導覽值並保留編輯內容與 selected record。 | 新草稿與既有草稿單元測試；桌機 native confirm 實測。 |
+| 非同步競態 | busy 時封鎖所有切換篩選、選取、導覽或新請求的控制；`createRequestGate` 使用 generation + `AbortController`，過期回應不得覆蓋最新選擇。 | out-of-order response test、DOM disabled contract。 |
+| 寫入成功但 reload 失敗 | `CommittedMutationCoordinator` 分開 `write_failed` 與 `sync_failed`；後者保留 entry/version/status、鎖住重複操作，只允許重試讀取。 | create/save/submit/publish 四類 test；瀏覽器受控情境 writes 維持 1、reads 由 3 增至 5。 |
+| A14 reconciliation | 新增 append-only `casework.document_versions` 與明確 `casework.case_member_workstreams`；adapter 授權不得從 `case_members` 推測 workstream；既有同名表必須完整符合欄位、PK、FK、unique 與 check contract，否則 fail-fast。 | migration、PGlite rerun/immutability/workstream tests、adversarial constraint-collision test、manifest。 |
+| GitHub 發布 | 完整驗證後才建立 correction commit、push 既有 branch、開 Draft PR 到 `main`；不得 merge。 | 最終 A0 回報提供 SHA 與 URL。 |
 
-| 項目 | 現況 |
-|---|---:|
-| parent project ref | `jaxwovullfpdedqhoopx` |
-| branch id | `c25b2b45-6d76-4c10-9ce3-eaf1c6b9ceeb` |
-| A5 authenticated GraphQL table warnings | 26 |
-| `knowledge` | 11 |
-| `knowledge_staging` | 5 |
-| `casework` | 10 |
-| A5 performance advisor notices | 35（unused index 25、multiple permissive policies 10） |
-| preview migration history | 12，未含本輪 hardening |
+## 3. 權限與 Supabase 邊界
 
-本機最終 schema contract：
+### 遠端只讀現況
 
-- 26 張 A5 table 對 `PUBLIC`、`anon`、`authenticated` 的直接 table / sequence privilege 為 0。
+2026-07-28 重新查證：
+
+| 項目 | A5 preview | LaiBE Core |
+|---|---|---|
+| project ref | `ocxfrteyedumallatdok` | `zdwuyomhswjcbbpbhpcq` |
+| parent | `jaxwovullfpdedqhoopx` | 獨立 project |
+| A5 migrations | 12 | 0 |
+| A5 tables | 26 | 0 |
+| A5 authenticated GraphQL warning | 26 | 0（Core 尚無 A5 table） |
+| security advisor | A5 舊 warning 仍存在 | 0 lint |
+| performance advisor | A5 35 項舊 notice | 1 項全專案 Auth connection strategy info |
+
+preview 的 26 個 GraphQL warning 未消失，因為本輪 hardening 明確未遠端套用。這是「尚未套用」證據，不是 advisor clean 證明。LaiBE Core 的 0 lint 同樣不能當作 A5 已套用證明，因為 Core 仍是 0 migration / 0 A5 table。
+
+### 本機最終 schema contract
+
+- 28 張 A5 table：`knowledge_staging=5`、`knowledge=11`、`casework=12`。
+- 28 張 table / sequence 對 `PUBLIC`、`anon`、`authenticated` 的直接 privilege 為 0。
 - `anon` 可執行 A5 function 為 0。
-- `authenticated` 僅可執行 16 個具名 public RPC 與 2 個 Storage helper。
-- 18 個介面逐一驗證 owner、`SECURITY DEFINER` 與空 `search_path`。
-- A12、budget、contract 同案 finding 依 domain 隔離；linked evidence 同步過濾；PDF document / sheet metadata 只對 `drawing_review` client 回傳。
-- Storage 保留 4 個原有 permissive policy，另加 4 個 `TO PUBLIC` restrictive guard，避免 `anon` 或其他寬鬆 policy 以 OR 繞過 A5 private bucket。
-- Knowledge Studio 只允許 active-session PCM / admin；owner、pro、A12、budget、contract client 均不可進 reviewer surface。
-- CORS 僅讀取 `KNOWLEDGE_STUDIO_ALLOWED_ORIGINS` 與 `KNOWLEDGE_GATEWAY_ALLOWED_ORIGINS`；未設定或 origin 不在清單時 fail-closed。
+- `authenticated` 僅可執行 17 個具名 public RPC 與 3 個具名 helper。
+- 20 個介面逐一檢查 owner、`SECURITY INVOKER/DEFINER` 與空 `search_path`。
+- Studio 只允許 active-session PCM / admin；owner、pro、A12、budget、contract client 不可進 reviewer surface。
+- private Storage 保留 case membership 與 domain 限制；A5 bucket 仍為 `public=false`。
+- CORS 僅讀取 `KNOWLEDGE_STUDIO_ALLOWED_ORIGINS` 與 `KNOWLEDGE_GATEWAY_ALLOWED_ORIGINS`；未設定或不在 allowlist 時 fail-closed。
+- 不 blanket `FORCE RLS`；正式套用前仍需以實際 executor 身分重跑 20 個介面，避免用 FORCE 製造錯誤安全感。
 
-本輪沒有把 hardening 套用到 preview branch，因此遠端 26 個 A5 advisor warning 仍存在。這是「尚未套用」證據，不是本機修正失敗。
+本輪沒有 apply migration、deploy Function、寫入資料、修改設定、merge/rebase/reset Supabase branch，也沒有建立付費 branch。
 
-### FORCE RLS 判定
-
-本輪不 blanket `FORCE RLS`。原因是 public RPC 目前是明確審核的 authorization boundary；盲目 FORCE 不會限制 `postgres` / `BYPASSRLS` owner，反而可能製造錯誤安全感。正式套用前仍需重跑 18 個介面的行為矩陣；若改用 `NOLOGIN NOBYPASSRLS` 專用 executor，再另案評估一致 FORCE RLS。
-
-## 3. Knowledge Studio UX
+## 4. Knowledge Studio UX 與瀏覽器 QA
 
 修正後行為：
 
-- 「新增草稿」只建立記憶體編輯狀態；按「儲存草稿」前不持久化。
-- 取消新草稿不留下「未命名規則」。
-- 「送交覆核」以單一 `saveAndSubmitReview` 操作保存最新內容並轉為 `pending_review`；失敗時 local adapter 回復原狀態。
-- 規則名稱、類型、負責人、摘要、判斷條件、下一位處理者、來源依據均有欄位錯誤。
-- publish 具 server-side completeness gate。
-- 退回、發布、停用使用具影響說明的確認 dialog，並有成功／失敗訊息。
-- 桌機保留 master-detail 與 selected state；手機使用 list → detail 並提供「返回規則清單」。
-- 手機從未儲存的新草稿或已修改內容返回前必須確認；取消確認保留編輯器，確認捨棄才回到清單。
-- 補齊 loading、empty、error、disabled、unsaved-changes 與 retry。
-- 頁面定位改為「PCM 規則治理中心」，並明示示範規則不是案件事實。
-- 不提供甲乙方入口；已簽約甲乙方仍由 LINE Bot 作正式收件／訊息窗口。
+- 「新增草稿」只建立未儲存編輯狀態；按「儲存草稿」前不持久化。
+- 取消新草稿不留下垃圾紀錄。
+- 「送交覆核」以單一 server operation 保存最新內容並轉為 `pending_review`。
+- 送審前驗證名稱、類型、負責人、摘要、判斷條件、下一位處理者與來源依據。
+- publish 有 server-side completeness gate。
+- 退回、發布、停用都有影響說明、處理說明與結果回饋。
+- loading、empty、error、disabled、unsaved、sync-failed 與 read-only retry 狀態都有產品語言。
+- 變更後 asset 為 `app.js?v=2026072803`。
+- 不新增甲乙方入口；已簽約甲乙方的正式收件／訊息窗口仍是 A14 LINE Bot。
 
-瀏覽器實機驗收（in-app browser，local HTTP）：
+in-app browser、local HTTP 實測：
 
-| Viewport | 證據 |
+| Viewport / 情境 | 結果 |
 |---|---|
-| 1440×900 | `innerWidth=1440`、`clientWidth=1425`、`scrollWidth=1425`，無水平爆版；master-detail selected state 為 1；選取後鍵盤焦點保留在該規則列。 |
-| 390×844 | `innerWidth=390`、`clientWidth=375`、`scrollWidth=375`，無水平爆版；新草稿的返回鈕 `top=223px`、標題 `top=285px`，進入 detail 後立即可見；名稱欄取得鍵盤焦點。 |
+| 1440×900 | `overflow=0`；master-detail selected state 正確；新草稿與既有草稿取消離開均保留內容及選取；確認後才切換；下拉篩選取消後回復舊值。 |
+| 390×844 | `overflow=0`；清單點選後 `recordPane=none`、`detailPane=block`，詳情立即可見；「返回規則清單」後反向切換。 |
+| 鍵盤 | 規則總覽按 ArrowRight 後焦點與 `aria-current=page` 移到「覆核工作」，清單同步為待覆核。 |
+| 寫入後同步失敗 | 顯示「操作已完成，但畫面尚未同步」；篩選、導覽、重複寫入均鎖住；只顯示「重新整理」；重試後 writes 仍為 1。 |
+| 身分 | PCM 顯示安全名稱＋角色；admin 顯示「目前角色：管理者」；owner 顯示安全拒絕訊息且規則列 0。 |
+| Console | 一般、受控同步失敗與權限拒絕情境均為 0 error / 0 warning。 |
 
-主要流程實測：
+同步失敗與角色切換使用僅存在於瀏覽器 QA tab 的受控本機回應，沒有加入 production debug UI、沒有寫入 repo 狀態，也沒有任何遠端請求或寫入。
 
-- 新增草稿前後清單均為 4 筆，狀態顯示「尚未儲存」，取消後仍為 4 筆。
-- 必填名稱清空時保留 `待修正`，欄位顯示「請填寫規則名稱」，不得送審。
-- 最新名稱與摘要送審後仍原樣存在，狀態轉為 `待覆核`，事件首筆為「送交覆核」。
-- 退回、發布、停用均顯示影響說明；未填處理說明不得執行；執行後狀態、事件與成功回饋一致。
-- mobile 新草稿進入 detail pane，清單仍為 4 筆；取消後回到 list pane 且不留紀錄。
-- mobile 點「返回規則清單」會出現未儲存確認；dismiss 後仍在 `detail`，accept 後回到 `list`，清單維持 4 筆且 selected 0。
-- console：0 error / 0 warning。
-
-## 4. LaiBE Core Reconciliation
+## 5. LaiBE Core Reconciliation
 
 目標 project ref：`zdwuyomhswjcbbpbhpcq`
 
-2026-07-27 唯讀 inventory：
-
-- A5 application tables：0
-- migration history：0
-
-本機 bundle：
+本機 ordered bundle：
 
 - `supabase/core_reconciliation/000_preflight.sql`
 - `supabase/core_reconciliation/010_a5_knowledge_foundation.sql`
@@ -100,117 +103,69 @@
 
 特性：
 
-- 六個來源 migration 以 SHA256 綁定，順序或額外 migration 不符即停止產生。
-- preflight 對三個 A5 schema、16 個 public RPC、2 個 bucket 與 8 個 Storage policy fail-fast。
-- bundle 是 create-only 基線；相同 bundle 重複套用會在 preflight 零變更停止。
-- apply bundle 只有一個外層 transaction。
-- marker 僅寫入 A5 `knowledge` schema comment，不建立 `public` table。
-- rollback 需要 exact marker，且 26 張 table 與兩個 bucket 都必須沒有資料。
-- rollback 只刪除具名 A5 Storage policy / bucket / public RPC 與三個 A5 schema 內物件；不使用 `CASCADE`。
-- PGlite 證明部分 schema collision 零變更、重複套用被拒、非 A5 sentinel 保留；非 A5 view 依賴 A5 table 時 rollback 整筆回退，移除該依賴後空資料 rollback 才可執行。
+- 七個來源 migration 以 SHA256 綁定；缺少、重排或多出 migration 即停止生成。
+- preflight 對三個 A5 schema、17 個 public RPC、2 個 bucket 與 8 個 Storage policy fail-fast。
+- create-only bundle 只有一個外層 transaction；相同 bundle 重複套用在 preflight 零變更停止。
+- rollback 需要 exact marker，且 28 張 table 與兩個 bucket 均零資料；不使用 `CASCADE`。
+- PGlite 證明 partial collision 與 repeat-apply fail-closed、非 A5 sentinel 保留、rollback dependency fail-closed。
+- `casework.document_versions` 是不可變版本紀錄。
+- `casework.case_member_workstreams(case_id,user_id,workstream_type)` 是明確 workstream 授權來源。
+- A14 接受的 LINE adapter contract 來源：`Z:\08-Jacky\A14\worktree-main\docs\integrations\line-bot-core-adapter-contract.md`。
+- 現有 `casework.documents.file_type` 為 PDF-only，而 A14 attachment contract 包含 jpeg/png/pdf；manifest 保留 `pending_a0_a14_confirmation`，未自行改動父文件模型。
 
-此 bundle **尚未套用**到 LaiBE Core，也未建立新付費 Supabase branch。
+此 bundle **尚未套用**到 LaiBE Core，也沒有建立新付費 Supabase branch。
 
-## 5. 測試
+## 6. 驗證
 
-| 驗證 | 結果 |
+| 驗證 | 新鮮結果 |
 |---|---:|
-| 原 7 個 Node 檔（原基線 62，加本輪 Studio 回歸 8） | 70 / 70 |
-| 本輪新增 4 個 Node 檔 | 23 / 23 |
-| Node 合計 | 93 / 93 |
-| Python | 24 / 24 |
-| PGlite migration + reconciliation | 2 / 2 |
+| 歷史七個 Node test files | 77 / 77 |
+| 新增四個 Node test files | 28 / 28 |
+| Node 合計 | 105 / 105 |
+| Python（需兩個唯讀 fixture env） | 24 / 24 |
+| PGlite migration + reconciliation | 3 / 3 |
 | Deno fmt | 4 files pass |
 | Deno check | 4 files pass |
-| JSON parse | 54 / 54 |
+| JSON parse | 53 / 53 |
+| `git diff --check` | pass |
 
-Node 逐檔結果：
+Node 逐檔：
 
 | Test file | Pass |
 |---|---:|
 | `scripts/knowledge/tests/test_build_core_reconciliation.mjs` | 4 |
 | `scripts/knowledge/tests/test_split_supabase_migration.mjs` | 4 |
-| `site/knowledge_studio/tests/knowledge_studio.test.mjs` | 18 |
-| `site/knowledge_studio/tests/knowledge_studio_dom_contract.test.mjs` | 5 |
-| `supabase/tests/core_readiness_security_contract.test.mjs` | 9 |
+| `site/knowledge_studio/tests/knowledge_studio.test.mjs` | 25 |
+| `site/knowledge_studio/tests/knowledge_studio_dom_contract.test.mjs` | 7 |
+| `supabase/tests/core_readiness_security_contract.test.mjs` | 12 |
 | `supabase/tests/core_reconciliation_contract.test.mjs` | 5 |
-| `supabase/tests/foundation_contract.test.mjs` | 19 |
-| `tests/knowledge/knowledge_system_contract.test.mjs` | 15 |
+| `supabase/tests/foundation_contract.test.mjs` | 20 |
+| `tests/knowledge/knowledge_system_contract.test.mjs` | 14 |
 | `tests/knowledge/unified_items_contract.test.mjs` | 4 |
 | `tests/knowledge/woodwork_foundation_contract.test.mjs` | 5 |
 | `tests/knowledge/woodwork_mapping_contract.test.mjs` | 5 |
 
-原先 A0 可重現的 7 檔基線是 62/62；本輪在原 7 檔的 Studio 測試增加 8 項，故同 7 檔現為 70/70，再加 4 個新檔 23/23，總計 93/93。
-
-完整命令：
+Python clean worktree 必須顯式使用：
 
 ```powershell
 $env:A1_WOODWORK_MAPPING_PATH = 'Z:\08-Jacky\laibe_MVP_project\outputs\budget_woodwork_items_20260710\A1_woodwork_ingest_mapping_20260711.json'
 $env:LAIBE_BUDGET_VAULT_PATH = 'Z:\08-Jacky\laibe_MVP_project\Laibe-Budget-Vault'
-
-node --test --test-reporter=tap `
-  scripts/knowledge/tests/test_build_core_reconciliation.mjs `
-  scripts/knowledge/tests/test_split_supabase_migration.mjs `
-  site/knowledge_studio/tests/knowledge_studio.test.mjs `
-  site/knowledge_studio/tests/knowledge_studio_dom_contract.test.mjs `
-  supabase/tests/core_readiness_security_contract.test.mjs `
-  supabase/tests/core_reconciliation_contract.test.mjs `
-  supabase/tests/foundation_contract.test.mjs `
-  tests/knowledge/knowledge_system_contract.test.mjs `
-  tests/knowledge/unified_items_contract.test.mjs `
-  tests/knowledge/woodwork_foundation_contract.test.mjs `
-  tests/knowledge/woodwork_mapping_contract.test.mjs
-
-py -3 -m unittest discover -s scripts\knowledge\tests -p 'test_*.py' -v
-powershell -NoProfile -ExecutionPolicy Bypass -File tests\knowledge\run_pglite_unc_safe.ps1
-
-deno fmt --check `
-  supabase/functions/knowledge-ingest/index.ts `
-  supabase/functions/knowledge-studio/index.ts `
-  supabase/functions/knowledge-gateway/index.ts `
-  tests/knowledge/pglite_migration_smoke.test.ts
-
-deno check `
-  supabase/functions/knowledge-ingest/index.ts `
-  supabase/functions/knowledge-studio/index.ts `
-  supabase/functions/knowledge-gateway/index.ts `
-  tests/knowledge/pglite_migration_smoke.test.ts
 ```
 
-此獨立 A5 snapshot 沒有 root `package.json`，因此沒有可執行的 npm build / lint script；TypeScript 型別檢查由上述 Deno check 執行。JSON 以 PowerShell `ConvertFrom-Json` 逐檔解析 54/54，`git diff --check d0ce795` 通過。
+兩個路徑均只讀；分支未複製 102 MB corpus 或 Obsidian vault。
 
-完整 woodwork 測試使用唯讀外部 fixture，仍驗證 102,049,538 bytes、固定 SHA256、42,248 筆、四 bucket 與 57 筆隔離異常：
-
-```powershell
-$env:A1_WOODWORK_MAPPING_PATH = `
-  'Z:\08-Jacky\laibe_MVP_project\outputs\budget_woodwork_items_20260710\A1_woodwork_ingest_mapping_20260711.json'
-$env:LAIBE_BUDGET_VAULT_PATH = `
-  'Z:\08-Jacky\laibe_MVP_project\Laibe-Budget-Vault'
-```
-
-分支未複製 A1 的 102 MB corpus 或 Obsidian vault。
-
-### 獨立複核
-
-同一位獨立 reviewer 在修正後重查先前 1 項 Critical 與 6 項 Important，結論為 `NO_REMAINING_CRITICAL_OR_IMPORTANT_FINDINGS`。Reviewer 唯讀重跑 Node 41/41 與 PGlite 2/2，未修改檔案。
-
-保留的測試深化項目：
-
-- repeat-apply 已直接重跑 preflight 並證明 marker / sentinel 零變更；尚未另做完整 catalog 前後快照比較。
-- anon broad Storage policy 已動態驗證 A5 private bucket `SELECT` fail-closed；`INSERT`、`UPDATE`、`DELETE` guard 目前以結構契約驗證。
-- Studio enum、最新 evidence / note 以 adapter 測試驗證；mobile click-confirm 另以 390×844 實機流程驗證。budget / contract payload 尚未透過 PGlite 寫入真實 RPC。
-
-## 6. 尚未串接
+## 7. 尚未串接與待決策
 
 - Studio endpoint 與 project key 仍保持空白。
 - CORS allowlist 尚未設定正式 origin。
 - 沒有正式 PCM reviewer 帳號與 production 身分治理。
 - A12、預算、契約 consumer 尚未接 Gateway。
 - 沒有正式知識、正式價格、預算、契約或案件資料發布。
-- JWT role 降權後仍需由身分治理流程撤銷舊 session。
 - preview branch 與 Core 都沒有套用本輪 hardening。
+- jpeg/png A14 attachment 父文件模型待 A0/A14 確認。
+- 正式 apply、Edge Function deploy、CORS 設定、consumer 接線、正式資料發布均需 A0 / Owner 另行批准。
 
-## 7. 邊界
+## 8. 硬邊界
 
 - `formalImpact` 固定為 `none`。
 - staging 不自動發布。

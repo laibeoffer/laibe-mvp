@@ -76,6 +76,7 @@ drop function if exists public.knowledge_studio_save_and_submit(uuid, uuid, json
 drop function if exists public.knowledge_studio_create_revision(uuid, jsonb, text);
 drop function if exists public.knowledge_studio_update_draft(uuid, uuid, jsonb);
 drop function if exists public.knowledge_studio_create_draft(jsonb);
+drop function if exists public.knowledge_studio_session_context();
 drop function if exists public.knowledge_studio_get(uuid);
 drop function if exists public.knowledge_studio_list(text, text, integer);
 drop function if exists public.knowledge_ingest_woodwork_batch(jsonb);

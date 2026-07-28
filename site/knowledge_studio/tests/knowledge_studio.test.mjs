@@ -409,40 +409,201 @@ test("remote detail keeps edited evidence and formal-action notes", () => {
     entryId: "11111111-1111-4111-8111-111111111111",
     domain: "drawing_review",
     entryState: STATUS.PENDING_REVIEW,
-    versions: [{
-      versionId: "22222222-2222-4222-8222-222222222222",
-      version: 2,
-      title: "跨圖一致性",
-      summary: "已更新",
-      lifecycleState: STATUS.PENDING_REVIEW,
-      content: {
-        displayType: "圖說檢查規則",
-        owner: "PCM 圖說組",
-        criteria: "依最新內容檢查",
-        nextOwner: "PCM 覆核人",
+    versions: [
+      {
+        versionId: "22222222-2222-4222-8222-222222222222",
+        version: 2,
+        title: "跨圖一致性",
+        summary: "已更新",
+        lifecycleState: STATUS.PENDING_REVIEW,
+        content: {
+          displayType: "圖說檢查規則",
+          owner: "PCM 圖說組",
+          criteria: "依最新內容檢查",
+          nextOwner: "PCM 覆核人",
+        },
+        evidenceSummary: ["更新後來源／第 7 頁"],
+        source: { locator: "更新後來源／第 7 頁" },
+        rule: {
+          ruleType: "drawing_rule",
+          conditions: { criteria: "依最新內容檢查" },
+        },
+        createdAt: "2026-07-27T00:02:00.000Z",
       },
-      evidenceSummary: ["更新後來源／第 7 頁"],
-      source: { locator: "原始來源／第 1 頁" },
-      rule: {
-        ruleType: "drawing_rule",
-        conditions: { criteria: "依最新內容檢查" },
+      {
+        versionId: "11111111-2222-4222-8222-222222222222",
+        version: 1,
+        title: "跨圖一致性",
+        summary: "原始內容",
+        lifecycleState: STATUS.DRAFT,
+        evidenceSummary: ["原始來源／第 1 頁"],
+        source: { locator: "原始來源／第 1 頁" },
+        rule: {
+          ruleType: "drawing_rule",
+          conditions: { criteria: "依原始內容檢查" },
+        },
+        createdAt: "2026-07-27T00:00:00.000Z",
       },
-      createdAt: "2026-07-27T00:00:00.000Z",
-    }],
-    events: [{
-      eventType: "returned_to_draft",
-      actorRole: "PCM 覆核人",
-      occurredAt: "2026-07-27T00:01:00.000Z",
-      afterState: STATUS.DRAFT,
-      nextOwnerRole: "規則整理人",
-      note: "請補充來源頁碼",
-    }],
+    ],
+    events: [
+      {
+        eventType: "draft_created",
+        versionId: "11111111-2222-4222-8222-222222222222",
+        sourceDocument: "原始來源／第 1 頁",
+        actorId: "33333333-3333-4333-8333-333333333333",
+        actorLabel: "林專員",
+        actorRole: "PCM 覆核人",
+        occurredAt: "2026-07-27T00:01:00.000Z",
+        afterState: STATUS.DRAFT,
+        nextOwnerRole: "規則整理人",
+        note: "建立草稿",
+      },
+      {
+        eventType: "returned_to_draft",
+        versionId: "22222222-2222-4222-8222-222222222222",
+        sourceDocument: "更新後來源／第 7 頁",
+        actorId: "33333333-3333-4333-8333-333333333333",
+        actorLabel: "林專員",
+        actorRole: "PCM 覆核人",
+        occurredAt: "2026-07-27T00:03:00.000Z",
+        afterState: STATUS.DRAFT,
+        nextOwnerRole: "規則整理人",
+        note: "請補充來源頁碼",
+      },
+    ],
   });
 
   assert.equal(normalized.evidence, "更新後來源／第 7 頁");
-  assert.equal(normalized.events[0].note, "請補充來源頁碼");
-  assert.equal(normalized.events[0].sourceDocument, "更新後來源／第 7 頁");
+  assert.equal(
+    normalized.events[1].actorId,
+    "33333333-3333-4333-8333-333333333333",
+  );
+  assert.equal(normalized.events[1].actor, "林專員（PCM 覆核人）");
+  assert.equal(normalized.events[1].note, "請補充來源頁碼");
+  assert.deepEqual(
+    normalized.events.map((event) => event.sourceDocument),
+    ["原始來源／第 1 頁", "更新後來源／第 7 頁"],
+  );
 });
+
+test("verified actor identity never renders email or a raw UUID", () => {
+  assert.equal(
+    Studio.formatActorIdentity({
+      actorId: "33333333-3333-4333-8333-333333333333",
+      actorLabel: "ADM-7C3A9E21",
+      actorRole: "admin",
+    }),
+    "ADM-7C3A9E21（管理者）",
+  );
+  assert.equal(
+    Studio.formatActorIdentity({
+      actorId: "33333333-3333-4333-8333-333333333333",
+      actorLabel: "reviewer@example.test",
+      actorRole: "pcm",
+    }),
+    "PCM-33333333（PCM）",
+  );
+});
+
+test("new and existing editors share one unsaved navigation decision", () => {
+  for (const state of [
+    { editorMode: "new", dirty: false },
+    { editorMode: "edit", dirty: true },
+  ]) {
+    assert.deepEqual(
+      Studio.decideUnsavedNavigation({
+        ...state,
+        discardConfirmed: false,
+      }),
+      { allow: false, discard: false },
+    );
+    assert.deepEqual(
+      Studio.decideUnsavedNavigation({
+        ...state,
+        discardConfirmed: true,
+      }),
+      { allow: true, discard: true },
+    );
+  }
+  assert.deepEqual(
+    Studio.decideUnsavedNavigation({
+      editorMode: "edit",
+      dirty: false,
+      discardConfirmed: false,
+    }),
+    { allow: true, discard: false },
+  );
+});
+
+test("request gate rejects an out-of-order response", async () => {
+  const gate = Studio.createRequestGate();
+  const commits = [];
+  let releaseFirst;
+  let releaseSecond;
+  const firstResponse = new Promise((resolve) => {
+    releaseFirst = resolve;
+  });
+  const secondResponse = new Promise((resolve) => {
+    releaseSecond = resolve;
+  });
+
+  async function load(response) {
+    const request = gate.begin();
+    const value = await response;
+    if (gate.isCurrent(request)) commits.push(value);
+    gate.finish(request);
+  }
+
+  const first = load(firstResponse);
+  const second = load(secondResponse);
+  releaseSecond("latest");
+  await second;
+  releaseFirst("stale");
+  await first;
+
+  assert.deepEqual(commits, ["latest"]);
+});
+
+for (const action of ["create", "save", "submit", "publish"]) {
+  test(`${action} write success with reload failure retries read only`, async () => {
+    let writes = 0;
+    let reads = 0;
+    const coordinator = new Studio.CommittedMutationCoordinator(
+      async (record) => {
+        reads += 1;
+        if (reads === 1) throw new Error("同步失敗");
+        return { ...record, synced: true };
+      },
+    );
+
+    const result = await coordinator.run(action, async () => {
+      writes += 1;
+      return {
+        id: "11111111-1111-4111-8111-111111111111",
+        versionId: "22222222-2222-4222-8222-222222222222",
+        status: action === "submit" ? STATUS.PENDING_REVIEW : STATUS.DRAFT,
+      };
+    });
+
+    assert.equal(result.status, "sync_failed");
+    assert.equal(writes, 1);
+    assert.equal(coordinator.pending.action, action);
+
+    const blocked = await coordinator.run(action, async () => {
+      writes += 1;
+      return {};
+    });
+    assert.equal(blocked.status, "blocked");
+    assert.equal(writes, 1);
+
+    const retried = await coordinator.retry();
+    assert.equal(retried.status, "synced");
+    assert.equal(retried.record.synced, true);
+    assert.equal(writes, 1);
+    assert.equal(reads, 2);
+    assert.equal(coordinator.pending, null);
+  });
+}
 
 test("mobile back never hides an unsaved editor without an explicit discard", () => {
   assert.deepEqual(

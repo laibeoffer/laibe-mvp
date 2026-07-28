@@ -279,7 +279,7 @@ begin
   where n.nspname in ('knowledge', 'knowledge_staging', 'casework')
     and has_function_privilege('authenticated', p.oid, 'EXECUTE');
 
-  if v_internal_execute <> 2 then
+  if v_internal_execute <> 3 then
     raise exception 'Unexpected authenticated helper surface: %',
       v_internal_execute;
   end if;
@@ -298,6 +298,7 @@ begin
       'knowledge_ingest_woodwork_batch',
       'knowledge_studio_list',
       'knowledge_studio_get',
+      'knowledge_studio_session_context',
       'knowledge_studio_create_draft',
       'knowledge_studio_update_draft',
       'knowledge_studio_create_revision',
@@ -309,7 +310,7 @@ begin
     )
     and has_function_privilege('authenticated', p.oid, 'EXECUTE');
 
-  if v_public_execute <> 16 then
+  if v_public_execute <> 17 then
     raise exception 'Unexpected authenticated public RPC surface: %',
       v_public_execute;
   end if;
@@ -317,6 +318,7 @@ begin
   with expected(signature) as (
     values
       ('casework.can_access_case_document(text, boolean)'),
+      ('casework.has_current_case_workstream(uuid, text)'),
       ('knowledge.is_interactive_reviewer()'),
       ('public.gateway_get_case_evidence(uuid)'),
       ('public.gateway_get_knowledge_entry(uuid)'),
@@ -331,6 +333,7 @@ begin
       ('public.knowledge_studio_create_revision(uuid, jsonb, text)'),
       ('public.knowledge_studio_get(uuid)'),
       ('public.knowledge_studio_list(text, text, integer)'),
+      ('public.knowledge_studio_session_context()'),
       ('public.knowledge_studio_save_and_submit(uuid, uuid, jsonb, text)'),
       ('public.knowledge_studio_update_draft(uuid, uuid, jsonb)'),
       ('public.knowledge_submit_for_review(uuid, uuid, text)')
@@ -530,6 +533,14 @@ begin
       ),
       'evidence_summary', jsonb_build_array('圖說檢查基準／第 2 頁'),
       'change_note', 'save and submit contract fixture',
+      'source', jsonb_build_object(
+        'source_type', 'manual_reference',
+        'title', 'RPC surface revised source',
+        'source_locator', 'contract://rpc-surface-source-v2',
+        'source_sha256',
+          '9797979797979797979797979797979797979797979797979797979797979797',
+        'provenance', '{"revision":2}'::jsonb
+      ),
       'rule', jsonb_build_object(
         'ruleType', 'drawing_rule',
         'ruleCode', 'rpc-surface-drawing-rule',

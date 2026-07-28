@@ -14,17 +14,19 @@
 
 - [ ] 重新取得 Core migration history；預期仍為 0。
 - [ ] 重新列出 `knowledge`、`knowledge_staging`、`casework`；預期仍無物件。
-- [ ] 比對 `supabase/core_reconciliation/manifest.json` 的六個來源 SHA256。
+- [ ] 比對 `supabase/core_reconciliation/manifest.json` 的七個來源 SHA256。
 - [ ] 執行 `000_preflight.sql` 並保存結果。
 - [ ] 確認這是首次套用；相同 create-only bundle 重複套用必須停止，不得當作 upgrade。
-- [ ] 確認 16 個 public RPC signature、2 個 bucket、8 個 Storage policy name 均無碰撞。
+- [ ] 確認 17 個 public RPC signature、2 個 bucket、8 個 Storage policy name 均無碰撞。
+- [ ] 由 A0 / A14 確認 jpeg / png 附件如何對齊目前 PDF-only 父文件模型；`pending_a0_a14_confirmation` 未解除前不得自行放寬文件類型。
+- [ ] 確認 `casework.case_member_workstreams` 是 workstream 授權唯一明確來源，不得從 `casework.case_members` 推測。
 - [ ] 盤點 shared `storage.objects` 全部 policy，確認 restrictive guards 不影響非 A5 bucket。
 - [ ] 建立可還原備份並驗證還原程序。
 - [ ] 盤點非 A5 object 對 A5 schema 的 dependency；任何未知 dependency 均停止。
 
 ## 3. 鎖定與中斷風險
 
-- 建立 26 張 table、type、index、policy 與 function 會取得 DDL lock。
+- 建立 28 張 table、type、index、policy 與 function 會取得 DDL lock。
 - Core 目前沒有 A5 object，預估鎖定時間短；實際時間只能在正式 inventory 後評估。
 - `storage.buckets` insert 與 `storage.objects` policy DDL 會觸及 shared Supabase Storage catalog。
 - apply bundle 為單一 transaction；任一 statement 失敗應整筆 rollback。
@@ -33,11 +35,13 @@
 ## 4. Apply 後立即驗證
 
 - [ ] 執行 `900_verify.sql`。
-- [ ] 三 schema table count 為 5 / 11 / 10，26 張全部 RLS enabled。
-- [ ] `anon` / `authenticated` 對 26 張 table / sequence 的直接 privilege 為 0。
+- [ ] 三 schema table count 為 5 / 11 / 12，28 張全部 RLS enabled。
+- [ ] `anon` / `authenticated` 對 28 張 table / sequence 的直接 privilege 為 0。
 - [ ] `anon` A5 function execute 為 0。
-- [ ] `authenticated` execute 精確為 16 public RPC + 2 helper。
-- [ ] 18 個介面的 owner、mode、空 `search_path` 符合 catalog contract。
+- [ ] `authenticated` execute 精確為 17 public RPC + 3 helper。
+- [ ] 20 個介面的 owner、mode、空 `search_path` 符合 catalog contract。
+- [ ] `casework.document_versions` 更新與刪除均被 append-only guard 拒絕。
+- [ ] `casework.has_current_case_workstream` 只接受 active case membership 與明確 workstream membership 同時成立。
 - [ ] 兩個 bucket 均 `public=false`。
 - [ ] 4 個 A5 Storage guard 均為 `RESTRICTIVE`。
 - [ ] 重新執行 Supabase security / performance advisor 並保存完整輸出。
@@ -58,7 +62,7 @@
 `990_rollback.sql` 不是一般清理工具，僅在以下全部成立時可由 A0 / Owner 再批准：
 
 - [ ] `knowledge` schema comment marker 完全相符。
-- [ ] 26 張 A5 table 全部零資料。
+- [ ] 28 張 A5 table 全部零資料。
 - [ ] 兩個 A5 bucket 零 object。
 - [ ] 無非 A5 dependency。
 - [ ] 已保存 apply 前備份與 apply / verify log。

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -22,6 +22,21 @@ function readHardening() {
     "RPC-surface hardening migration has not been created",
   );
   return readFileSync(hardeningPath, "utf8");
+}
+
+function readMigrationBySuffix(suffix) {
+  const migrationRoot = resolve(supabaseRoot, "migrations");
+  const matches = readdirSync(migrationRoot)
+    .filter((name) => name.endsWith(suffix));
+  assert.equal(
+    matches.length,
+    1,
+    `Expected exactly one migration ending in ${suffix}`,
+  );
+  return {
+    name: matches[0],
+    sql: readFileSync(resolve(migrationRoot, matches[0]), "utf8"),
+  };
 }
 
 function normalizeSignature(value) {
@@ -202,6 +217,99 @@ test("atomic submission and publication share one server completeness gate", () 
   );
 });
 
+test("draft source changes create immutable provenance and rebind the version", () => {
+  const { sql } = readMigrationBySuffix(
+    "_studio_traceability_a14_core_reconciliation.sql",
+  );
+
+  assert.match(
+    sql,
+    /create\s+or\s+replace\s+function\s+knowledge\.resolve_studio_source_revision/i,
+  );
+  assert.match(
+    sql,
+    /knowledge\.create_studio_source\s*\(\s*p_payload\s*->\s*'source'\s*\)/i,
+  );
+  assert.match(
+    sql,
+    /update\s+knowledge\.entry_versions[\s\S]*?source_id\s*=\s*v_next_source_id/i,
+  );
+  assert.doesNotMatch(
+    sql,
+    /update\s+knowledge\.sources[\s\S]*?source_(location|sha256|type|title)\s*=/i,
+    "existing source identity must remain immutable",
+  );
+  assert.match(
+    sql,
+    /create\s+or\s+replace\s+function\s+public\.gateway_get_knowledge_entry/i,
+  );
+  assert.match(
+    sql,
+    /join\s+knowledge\.sources\s+s\s+on\s+s\.id\s*=\s*ev\.source_id/i,
+  );
+});
+
+test("Studio session and event actor identity remain verified and non-sensitive", () => {
+  const { sql } = readMigrationBySuffix(
+    "_studio_traceability_a14_core_reconciliation.sql",
+  );
+
+  assert.match(
+    sql,
+    /create\s+or\s+replace\s+function\s+public\.knowledge_studio_session_context\(\)/i,
+  );
+  assert.match(sql, /knowledge\.has_active_session\(\)/i);
+  assert.match(sql, /raw_app_meta_data\s*->>\s*'display_name'/i);
+  assert.match(sql, /substr\s*\(\s*md5\s*\(\s*pe\.actor_id::text\s*\)/i);
+  assert.doesNotMatch(sql, /'email'\s*,|u\.email/i);
+  assert.match(sql, /'actorId'\s*,\s*pe\.actor_id/i);
+  assert.match(sql, /'actorLabel'/i);
+  assert.match(sql, /'actorRole'/i);
+});
+
+test("A14 reconciliation adds immutable versions and explicit workstream membership", () => {
+  const { sql } = readMigrationBySuffix(
+    "_studio_traceability_a14_core_reconciliation.sql",
+  );
+
+  for (const fragment of [
+    "casework.document_versions",
+    "document_id uuid",
+    "version_number integer",
+    "storage_object_path text",
+    "sha256 text",
+    "mime_type text",
+    "size_bytes bigint",
+    "casework.case_member_workstreams",
+    "workstream_type text",
+    "primary key (case_id, user_id, workstream_type)",
+    "foreign key (case_id, user_id)",
+    "references casework.case_members",
+    "workstream_type in ('design', 'construction')",
+    "enable row level security",
+    "guard_document_versions_immutable",
+    "has_current_case_workstream",
+    "remote_applied=false",
+  ]) {
+    assert.ok(
+      sql.toLowerCase().includes(fragment.toLowerCase()),
+      `A14 reconciliation is missing ${fragment}`,
+    );
+  }
+  assert.doesNotMatch(
+    sql,
+    /alter\s+table\s+casework\.case_members[\s\S]*?add\s+column[\s\S]*?workstream/i,
+  );
+  assert.match(
+    sql,
+    /from\s+casework\.case_members\s+m[\s\S]*?join\s+casework\.case_member_workstreams\s+w/i,
+  );
+  assert.match(
+    sql,
+    /revoke\s+all\s+privileges\s+on\s+casework\.(document_versions|case_member_workstreams)\s+from\s+public\s*,\s*anon\s*,\s*authenticated/i,
+  );
+});
+
 test("Studio JSON schema exposes atomic submit and server-required fields", () => {
   const schema = JSON.parse(
     read("contracts/knowledge_studio.v1.schema.json"),
@@ -209,6 +317,10 @@ test("Studio JSON schema exposes atomic submit and server-required fields", () =
   assert.ok(
     schema.properties.operation.enum.includes("saveAndSubmitReview"),
   );
+  assert.ok(
+    schema.properties.operation.enum.includes("getSessionContext"),
+  );
+  assert.ok(schema.$defs.draft.required.includes("source"));
   assert.equal(schema.$defs.draft.properties.summary.minLength, 1);
   assert.deepEqual(
     schema.$defs.draft.properties.content.required,

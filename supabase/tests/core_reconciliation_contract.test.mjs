@@ -19,7 +19,8 @@ test("Core reconciliation manifest binds the exact local migration components", 
   assert.equal(manifest.schema_version, "a5.core_reconciliation.v1");
   assert.equal(manifest.target_project_ref, "zdwuyomhswjcbbpbhpcq");
   assert.equal(manifest.remote_applied, false);
-  assert.equal(manifest.source_migrations.length, 6);
+  assert.equal(manifest.remote_verification.checked_on, "2026-07-28");
+  assert.equal(manifest.source_migrations.length, 7);
   assert.deepEqual(
     manifest.source_migrations.map((item) => item.path),
     [
@@ -29,8 +30,18 @@ test("Core reconciliation manifest binds the exact local migration components", 
       "supabase/migrations/20260727094259_knowledge_case_event_next_action.sql",
       "supabase/migrations/20260727161457_pcm_woodwork_candidates_staging.sql",
       "supabase/migrations/20260727193000_pcm_knowledge_rpc_surface_hardening.sql",
+      "supabase/migrations/20260728050639_studio_traceability_a14_core_reconciliation.sql",
     ],
   );
+  assert.deepEqual(manifest.a14_line_core_reconciliation, {
+    remote_applied: false,
+    tables: [
+      "casework.document_versions",
+      "casework.case_member_workstreams",
+    ],
+    workstream_source: "explicit_membership_only",
+    image_attachment_parent_model: "pending_a0_a14_confirmation",
+  });
   for (const component of manifest.source_migrations) {
     assert.match(component.sha256, /^[a-f0-9]{64}$/);
     assert.ok(component.bytes > 0);
@@ -57,6 +68,12 @@ test("ordered Core bundle is transaction-bound and carries collision preflight",
   assert.equal((bundle.match(/\bcommit\s*;/gi) || []).length, 1);
   assert.match(bundle, /000_preflight\.sql/i);
   assert.match(bundle, /20260727193000_pcm_knowledge_rpc_surface_hardening\.sql/i);
+  assert.match(
+    bundle,
+    /20260728050639_studio_traceability_a14_core_reconciliation\.sql/i,
+  );
+  assert.match(bundle, /casework\.document_versions/i);
+  assert.match(bundle, /casework\.case_member_workstreams/i);
   assert.match(
     bundle,
     /comment\s+on\s+schema\s+knowledge\s+is\s+'a5\.knowledge_foundation\.core_readiness\.v1;target=zdwuyomhswjcbbpbhpcq'/i,
@@ -117,6 +134,9 @@ test("Core apply README requires a fresh Owner gate and describes rollback limit
     "rollback",
     "非 A5",
     "重複套用會停止",
+    "casework.document_versions",
+    "casework.case_member_workstreams",
+    "pending_a0_a14_confirmation",
   ]) {
     assert.ok(readme.includes(phrase), `README is missing ${phrase}`);
   }

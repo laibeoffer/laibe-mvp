@@ -22,6 +22,7 @@ begin
       'knowledge_ingest_woodwork_batch',
       'knowledge_studio_list',
       'knowledge_studio_get',
+      'knowledge_studio_session_context',
       'knowledge_studio_create_draft',
       'knowledge_studio_update_draft',
       'knowledge_studio_create_revision',

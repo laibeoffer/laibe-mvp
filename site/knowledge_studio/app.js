@@ -144,6 +144,120 @@ export function decideMobileBack({
   };
 }
 
+export function decideUnsavedNavigation({
+  editorMode,
+  dirty,
+  discardConfirmed,
+}) {
+  const hasUnsavedChanges = editorMode === "new" || dirty;
+  if (hasUnsavedChanges && !discardConfirmed) {
+    return { allow: false, discard: false };
+  }
+  return {
+    allow: true,
+    discard: hasUnsavedChanges,
+  };
+}
+
+function roleLabel(role) {
+  if (role === "admin") return "管理者";
+  if (role === "pcm") return "PCM";
+  return String(role || "內部人員");
+}
+
+export function formatActorIdentity({
+  actorId = "",
+  actorLabel = "",
+  actorRole = "",
+} = {}) {
+  const role = roleLabel(actorRole);
+  const candidate = String(actorLabel || "").trim();
+  const safeCandidate = candidate &&
+      !candidate.includes("@") &&
+      !/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(candidate)
+    ? candidate
+    : "";
+  const prefix = actorRole === "admin"
+    ? "ADM"
+    : actorRole === "pcm"
+    ? "PCM"
+    : "USR";
+  const stableId = String(actorId || "")
+    .replace(/[^0-9a-f]/gi, "")
+    .slice(0, 8)
+    .toUpperCase() || "UNKNOWN";
+  return `${safeCandidate || `${prefix}-${stableId}`}（${role}）`;
+}
+
+export function createRequestGate() {
+  let generation = 0;
+  let controller = null;
+  return {
+    begin() {
+      controller?.abort();
+      controller = new AbortController();
+      return {
+        generation: ++generation,
+        signal: controller.signal,
+      };
+    },
+    isCurrent(ticket) {
+      return Boolean(
+        ticket &&
+          ticket.generation === generation &&
+          !ticket.signal.aborted,
+      );
+    },
+    finish(ticket) {
+      return this.isCurrent(ticket);
+    },
+    abort() {
+      generation += 1;
+      controller?.abort();
+      controller = null;
+    },
+  };
+}
+
+export class CommittedMutationCoordinator {
+  constructor(sync) {
+    this.sync = sync;
+    this.pending = null;
+  }
+
+  async run(action, write) {
+    if (this.pending) {
+      return { status: "blocked", pending: this.pending };
+    }
+    let record;
+    try {
+      record = await write();
+    } catch (error) {
+      return { status: "write_failed", error };
+    }
+    try {
+      const synced = await this.sync(record);
+      return { status: "synced", record: synced || record };
+    } catch (error) {
+      this.pending = { action, record, error };
+      return { status: "sync_failed", record, error };
+    }
+  }
+
+  async retry() {
+    if (!this.pending) return { status: "idle" };
+    const pending = this.pending;
+    try {
+      const synced = await this.sync(pending.record);
+      this.pending = null;
+      return { status: "synced", record: synced || pending.record };
+    } catch (error) {
+      this.pending = { ...pending, error };
+      return { status: "sync_failed", record: pending.record, error };
+    }
+  }
+}
+
 export function validateDraft(input = {}) {
   const errors = {};
   for (const [field, message] of REQUIRED_DRAFT_FIELDS) {
@@ -327,6 +441,15 @@ export class LocalKnowledgeStore {
     return clone(record);
   }
 
+  async sessionContext() {
+    return {
+      actorId: "00000000-0000-4000-8000-000000000005",
+      actorLabel: "PCM-DEMO",
+      actorRole: "pcm",
+      formalImpact: "none",
+    };
+  }
+
   async createDraft(input) {
     const timestamp = now();
     const record = {
@@ -499,7 +622,7 @@ export class GatewayAdapter {
     this.mode = "connected";
   }
 
-  async request(body) {
+  async request(body, { signal } = {}) {
     const token = await this.tokenProvider();
     if (!token) throw new Error("登入狀態已失效，請重新登入。");
     if (!this.projectKey) {
@@ -513,6 +636,7 @@ export class GatewayAdapter {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
+      signal,
     });
     if (!response.ok) {
       throw new Error("資料處理失敗，請稍後再試。");
@@ -662,7 +786,11 @@ export class GatewayAdapter {
   }
 
   normalizeDetail(record) {
-    const version = record.versions?.[0] || {};
+    const versions = record.versions || [];
+    const version = versions[0] || {};
+    const versionsById = new Map(
+      versions.map((item) => [item.versionId, item]),
+    );
     const latestEvent = record.events?.at(-1);
     const lifecycleState = version.lifecycleState || record.entryState;
     return {
@@ -691,41 +819,57 @@ export class GatewayAdapter {
       evidence: version.evidenceSummary?.[0] || version.source?.locator || "",
       sourceDate: version.content?.sourceDate || "",
       updatedAt: version.createdAt || new Date().toISOString(),
-      events: (record.events || []).map((item) => ({
-        action: item.eventType,
-        actor: item.actorRole || "PCM",
-        time: item.occurredAt,
-        status: item.afterState,
-        nextOwner: item.nextOwnerRole,
-        nextAction: item.nextAction ||
-          nextActionFor(item.eventType, item.afterState),
-        sourceDocument: version.evidenceSummary?.[0] ||
-          version.source?.locator ||
-          "",
-        note: item.note || "",
-        formalImpact: "none",
-      })),
+      events: (record.events || []).map((item) => {
+        const eventVersion = versionsById.get(item.versionId) || {};
+        return {
+          action: item.eventType,
+          actorId: item.actorId || "",
+          actor: formatActorIdentity({
+            actorId: item.actorId,
+            actorLabel: item.actorLabel,
+            actorRole: item.actorRole,
+          }),
+          time: item.occurredAt,
+          status: item.afterState,
+          nextOwner: item.nextOwnerRole,
+          nextAction: item.nextAction ||
+            nextActionFor(item.eventType, item.afterState),
+          sourceDocument: item.sourceDocument ||
+            item.source?.locator ||
+            eventVersion.evidenceSummary?.[0] ||
+            eventVersion.source?.locator ||
+            "",
+          note: item.note || "",
+          formalImpact: "none",
+        };
+      }),
     };
   }
 
-  async list(filters = {}) {
+  async list(filters = {}, options = {}) {
     const result = await this.request({
       operation: "listRecords",
       lifecycle: filters.status || null,
       domain: filters.domain || null,
       limit: filters.limit || 100,
-    });
+    }, options);
     return Array.isArray(result)
       ? result.map((record) => this.normalizeSummary(record))
       : [];
   }
 
-  async get(id) {
+  async get(id, options = {}) {
     const result = await this.request({
       operation: "getRecord",
       entryId: id,
-    });
+    }, options);
     return this.normalizeDetail(result);
+  }
+
+  async sessionContext(options = {}) {
+    return await this.request({
+      operation: "getSessionContext",
+    }, options);
   }
 
   async createDraft(input) {
@@ -902,6 +1046,9 @@ function initStudio() {
     confirmationCancel: document.querySelector("#confirmation-cancel"),
     confirmationConfirm: document.querySelector("#confirmation-confirm"),
     navButtons: Array.from(document.querySelectorAll("[data-view]")),
+    statusButtons: Array.from(document.querySelectorAll("[data-status]")),
+    activeActorLabel: document.querySelector("#active-actor-label"),
+    activeActorRole: document.querySelector("#active-actor-role"),
   };
   let records = [];
   let selectedId = null;
@@ -912,6 +1059,13 @@ function initStudio() {
   let dirty = false;
   let busy = false;
   let pendingConfirmation = null;
+  let syncPending = null;
+  let sessionContext = null;
+  let acceptedNavigation = null;
+  const requestGate = createRequestGate();
+  const mutationCoordinator = new CommittedMutationCoordinator(
+    async (record) => await reload(record.id),
+  );
 
   const confirmationCopy = {
     return_revision: {
@@ -1004,6 +1158,45 @@ function initStudio() {
     elements.retire.disabled = busy;
     elements.revision.hidden = !approved;
     elements.revision.disabled = busy;
+    elements.search.disabled = busy;
+    elements.statusFilter.disabled = busy;
+    elements.typeFilter.disabled = busy;
+    elements.ownerFilter.disabled = busy;
+    elements.navButtons.forEach((button) => {
+      button.disabled = busy;
+    });
+    elements.statusButtons.forEach((button) => {
+      button.disabled = busy;
+    });
+    elements.retry.disabled = busy;
+    elements.back.disabled = busy;
+    elements.list.querySelectorAll("[data-record-id]").forEach((button) => {
+      button.disabled = busy;
+    });
+
+    if (syncPending) {
+      elements.newDraft.disabled = true;
+      elements.save.disabled = true;
+      elements.submit.disabled = true;
+      elements.return.disabled = true;
+      elements.publish.disabled = true;
+      elements.retire.disabled = true;
+      elements.revision.disabled = true;
+      elements.search.disabled = true;
+      elements.statusFilter.disabled = true;
+      elements.typeFilter.disabled = true;
+      elements.ownerFilter.disabled = true;
+      elements.navButtons.forEach((button) => {
+        button.disabled = true;
+      });
+      elements.statusButtons.forEach((button) => {
+        button.disabled = true;
+      });
+      elements.back.disabled = true;
+      elements.list.querySelectorAll("[data-record-id]").forEach((button) => {
+        button.disabled = true;
+      });
+    }
   }
 
   function setBusy(value, message = "") {
@@ -1066,6 +1259,70 @@ function initStudio() {
     };
   }
 
+  function navigationSnapshot() {
+    return {
+      activeView,
+      query: elements.search.value,
+      status: elements.statusFilter.value,
+      type: elements.typeFilter.value,
+      nextOwner: elements.ownerFilter.value,
+    };
+  }
+
+  function restoreNavigation(snapshot) {
+    if (!snapshot) return;
+    activeView = snapshot.activeView;
+    elements.search.value = snapshot.query;
+    elements.statusFilter.value = snapshot.status;
+    elements.typeFilter.value = snapshot.type;
+    elements.ownerFilter.value = snapshot.nextOwner;
+    elements.navButtons.forEach((button) => {
+      const active = button.dataset.view === activeView;
+      button.classList.toggle("is-active", active);
+      if (active) {
+        button.setAttribute("aria-current", "page");
+      } else {
+        button.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  function discardEditorChanges() {
+    if (editorMode === "new") {
+      discardDraftBuffer(selectedRecord);
+      clearSelection();
+    } else if (selectedRecord) {
+      renderDetail(
+        selectedRecord,
+        selectedRecord.status === STATUS.DRAFT ? "edit" : "view",
+      );
+    }
+  }
+
+  async function runGuardedNavigation(navigate) {
+    if (busy || syncPending) {
+      restoreNavigation(acceptedNavigation);
+      return false;
+    }
+    const hasChanges = hasUnsavedChanges();
+    const discardConfirmed = !hasChanges || window.confirm(
+      "尚有未儲存的內容，離開後不會保留。確定要離開嗎？",
+    );
+    const decision = decideUnsavedNavigation({
+      editorMode,
+      dirty,
+      discardConfirmed,
+    });
+    if (!decision.allow) {
+      restoreNavigation(acceptedNavigation);
+      return false;
+    }
+    if (decision.discard) discardEditorChanges();
+    await navigate();
+    acceptedNavigation = navigationSnapshot();
+    return true;
+  }
+
   async function setActiveView(view, { moveFocus = false } = {}) {
     activeView = view;
     elements.navButtons.forEach((button) => {
@@ -1121,9 +1378,16 @@ function initStudio() {
       )
       .join("");
     elements.list.querySelectorAll("[data-record-id]").forEach((button) => {
+      button.disabled = busy || Boolean(syncPending);
       button.addEventListener(
         "click",
-        () => void selectRecord(button.dataset.recordId),
+        () =>
+          void runGuardedNavigation(
+            () =>
+              selectRecord(button.dataset.recordId, {
+                skipUnsavedCheck: true,
+              }),
+          ),
       );
     });
     return filtered;
@@ -1271,6 +1535,11 @@ function initStudio() {
             ? `<small>說明：${escapeText(item.note)}</small>`
             : ""
         }
+              ${
+          item.sourceDocument
+            ? `<small>依據：${escapeText(item.sourceDocument)}</small>`
+            : ""
+        }
               <small>下一步：${
           escapeText(item.nextAction || "尚未指定")
         }；處理者：${escapeText(item.nextOwner || "尚未指定")}</small>
@@ -1291,9 +1560,11 @@ function initStudio() {
     { skipUnsavedCheck = false, focusDetail = true } = {},
   ) {
     if (!skipUnsavedCheck && !canLeaveEditor()) return;
+    const request = requestGate.begin();
     try {
       setBusy(true, "正在開啟規則內容。");
-      const record = await store.get(id);
+      const record = await store.get(id, { signal: request.signal });
+      if (!requestGate.isCurrent(request)) return null;
       selectedId = id;
       renderDetail(record, record.status === STATUS.DRAFT ? "edit" : "view");
       updateSelectedRows();
@@ -1302,13 +1573,16 @@ function initStudio() {
       if (isMobile() && focusDetail) {
         elements.detailHeading.focus({ preventScroll: true });
       }
+      return record;
     } catch (error) {
+      if (error?.name === "AbortError") return null;
       showBanner(
         safeErrorMessage(error, "目前無法開啟這筆規則，請稍後再試。"),
         "error",
       );
+      throw error;
     } finally {
-      setBusy(false);
+      if (requestGate.finish(request)) setBusy(false);
     }
   }
 
@@ -1326,14 +1600,19 @@ function initStudio() {
       nextOwner: elements.form.elements.nextOwner.value.trim(),
       sourceDate: elements.form.elements.sourceDate.value,
       evidence: elements.form.elements.evidence.value.trim(),
-      actor: "目前使用者",
+      actor: sessionContext
+        ? formatActorIdentity(sessionContext)
+        : "目前操作者",
     };
   }
 
   async function reload(selectId = selectedId) {
+    const request = requestGate.begin();
     setBusy(true, "正在整理規則紀錄。");
     try {
-      records = await store.list();
+      const nextRecords = await store.list({}, { signal: request.signal });
+      if (!requestGate.isCurrent(request)) return null;
+      records = nextRecords;
       populateSelect(
         elements.typeFilter,
         [...new Set(records.map((record) => record.type))],
@@ -1350,16 +1629,25 @@ function initStudio() {
       if (selectId) {
         const nextSelectedId = resolveVisibleSelectionId(filtered, selectId);
         if (nextSelectedId) {
-          await selectRecord(nextSelectedId, {
-            skipUnsavedCheck: true,
-            focusDetail: false,
+          const record = await store.get(nextSelectedId, {
+            signal: request.signal,
           });
+          if (!requestGate.isCurrent(request)) return null;
+          selectedId = nextSelectedId;
+          renderDetail(
+            record,
+            record.status === STATUS.DRAFT ? "edit" : "view",
+          );
+          updateSelectedRows();
         } else {
           clearSelection();
           renderList();
         }
       }
+      acceptedNavigation = navigationSnapshot();
+      return selectedRecord;
     } catch (error) {
+      if (error?.name === "AbortError") return null;
       showBanner(
         safeErrorMessage(
           error,
@@ -1368,9 +1656,78 @@ function initStudio() {
         "error",
         true,
       );
+      throw error;
     } finally {
-      setBusy(false);
+      if (requestGate.finish(request)) setBusy(false);
     }
+  }
+
+  async function runCommittedMutation({
+    action,
+    write,
+    success,
+    writeFailure,
+  }) {
+    setBusy(true, "正在保存這次操作。");
+    const result = await mutationCoordinator.run(action, write);
+    if (result.status === "synced") {
+      syncPending = null;
+      dirty = false;
+      updateUnsavedState();
+      showToast(success);
+    } else if (result.status === "sync_failed") {
+      syncPending = result.record;
+      dirty = false;
+      selectedId = result.record.id || selectedId;
+      updateUnsavedState();
+      showBanner(
+        "操作已完成，但畫面尚未同步。請只重試更新畫面，不需再次送出。",
+        "error",
+        true,
+      );
+    } else if (result.status === "write_failed") {
+      showBanner(
+        safeErrorMessage(
+          result.error,
+          writeFailure || "這次操作未完成，畫面內容仍會保留。",
+        ),
+        "error",
+      );
+    } else {
+      showBanner(
+        "前一次操作已完成，請先更新畫面後再繼續。",
+        "error",
+        true,
+      );
+    }
+    setBusy(false);
+    updateControls();
+    return result;
+  }
+
+  async function retryCommittedSync() {
+    if (!syncPending) {
+      try {
+        await reload();
+      } catch {
+        // reload already presents a product-safe retry message.
+      }
+      return;
+    }
+    const result = await mutationCoordinator.retry();
+    if (result.status === "synced") {
+      syncPending = null;
+      showBanner("");
+      showToast("畫面已更新，先前操作沒有重複送出。");
+    } else {
+      syncPending = mutationCoordinator.pending?.record || syncPending;
+      showBanner(
+        "操作紀錄已保存，但畫面仍無法同步。請稍後再重試更新畫面。",
+        "error",
+        true,
+      );
+    }
+    updateControls();
   }
 
   elements.form.addEventListener("submit", async (eventObject) => {
@@ -1387,63 +1744,53 @@ function initStudio() {
       showBanner("請先完成草稿名稱、類型與負責人。", "error");
       return;
     }
-    try {
-      setBusy(true, "正在儲存草稿。");
-      const record = editorMode === "new"
-        ? await store.createDraft(input)
-        : await store.saveDraft(input);
-      dirty = false;
-      await reload(record.id);
-      showToast(
-        store.mode === "sample"
-          ? "範例草稿已加入本頁；重新整理後不會保留。"
-          : "草稿已儲存。",
-      );
-    } catch (error) {
-      showBanner(
-        safeErrorMessage(error, "目前無法儲存草稿，內容仍保留在畫面中。"),
-        "error",
-      );
-    } finally {
-      setBusy(false);
-    }
+    const creating = editorMode === "new";
+    await runCommittedMutation({
+      action: creating ? "create" : "save",
+      write: () =>
+        creating ? store.createDraft(input) : store.saveDraft(input),
+      success: store.mode === "sample"
+        ? "範例草稿已加入本頁；重新整理後不會保留。"
+        : "草稿已儲存。",
+      writeFailure: "目前無法儲存草稿，內容仍保留在畫面中。",
+    });
   });
 
   elements.newDraft.addEventListener("click", () => {
-    if (!canLeaveEditor()) return;
-    activeView = "all";
-    elements.statusFilter.value = "";
-    elements.navButtons.forEach((button) => {
-      const active = button.dataset.view === "all";
-      button.classList.toggle("is-active", active);
-      button.toggleAttribute("aria-current", active);
-      if (active) button.setAttribute("aria-current", "page");
+    void runGuardedNavigation(async () => {
+      activeView = "all";
+      elements.statusFilter.value = "";
+      elements.navButtons.forEach((button) => {
+        const active = button.dataset.view === "all";
+        button.classList.toggle("is-active", active);
+        button.toggleAttribute("aria-current", active);
+        if (active) button.setAttribute("aria-current", "page");
+      });
+      selectedId = null;
+      const buffer = createDraftBuffer();
+      renderDetail(buffer, "new");
+      updateSelectedRows();
+      setMobilePane("detail");
+      showBanner(
+        "先填寫草稿內容；按下「儲存草稿」後才會建立規則紀錄。",
+      );
+      elements.form.elements.title.focus();
     });
-    selectedId = null;
-    const buffer = createDraftBuffer();
-    renderDetail(buffer, "new");
-    updateSelectedRows();
-    setMobilePane("detail");
-    showBanner(
-      "先填寫草稿內容；按下「儲存草稿」後才會建立規則紀錄。",
-    );
-    elements.form.elements.title.focus();
   });
 
   elements.cancel.addEventListener("click", () => {
-    if (!canLeaveEditor()) return;
-    if (editorMode === "new") {
-      discardDraftBuffer(selectedRecord);
-      clearSelection();
-      setMobilePane("list");
-      showBanner("");
-      elements.newDraft.focus();
-      return;
-    }
-    if (selectedRecord) {
-      renderDetail(selectedRecord, "edit");
-      showBanner("未儲存的修改已取消。");
-    }
+    void runGuardedNavigation(async () => {
+      const wasNew = editorMode === "none";
+      if (wasNew || !selectedRecord) {
+        clearSelection();
+        setMobilePane("list");
+        showBanner("");
+        elements.newDraft.focus();
+      } else {
+        renderDetail(selectedRecord, "edit");
+        showBanner("未儲存的修改已取消。");
+      }
+    });
   });
 
   elements.submit.addEventListener("click", async () => {
@@ -1455,27 +1802,19 @@ function initStudio() {
       showBanner("請完成標示欄位後再送交覆核。", "error");
       return;
     }
-    try {
-      setBusy(true, "正在儲存最新內容並送交覆核。");
-      const record = await store.saveAndSubmitReview({
-        ...input,
-        note: "送交 PCM 覆核",
-      });
-      dirty = false;
-      await reload(record.id);
-      showToast("最新內容已儲存並送交覆核。");
-    } catch (error) {
+    const result = await runCommittedMutation({
+      action: "submit",
+      write: () =>
+        store.saveAndSubmitReview({
+          ...input,
+          note: "送交 PCM 覆核",
+        }),
+      success: "最新內容已儲存並送交覆核。",
+      writeFailure: "送交覆核未完成；畫面中的修改仍保留，請稍後再試。",
+    });
+    if (result.status === "write_failed") {
       dirty = true;
       updateUnsavedState();
-      showBanner(
-        safeErrorMessage(
-          error,
-          "送交覆核未完成；畫面中的修改仍保留，請稍後再試。",
-        ),
-        "error",
-      );
-    } finally {
-      setBusy(false);
     }
   });
 
@@ -1508,24 +1847,20 @@ function initStudio() {
   async function runConfirmedAction(action, note) {
     const copy = confirmationCopy[action];
     if (!copy || !selectedId) return;
-    try {
-      setBusy(true, `正在${copy.title}。`);
-      const record = await store.transition(selectedId, action, {
-        versionId: selectedRecord?.versionId,
-        actor: "目前使用者",
-        nextOwner: copy.nextOwner,
-        note,
-      });
-      await reload(record.id);
-      showToast(copy.success);
-    } catch (error) {
-      showBanner(
-        safeErrorMessage(error, `${copy.title}未完成，請稍後再試。`),
-        "error",
-      );
-    } finally {
-      setBusy(false);
-    }
+    await runCommittedMutation({
+      action,
+      write: () =>
+        store.transition(selectedId, action, {
+          versionId: selectedRecord?.versionId,
+          actor: sessionContext
+            ? formatActorIdentity(sessionContext)
+            : "目前操作者",
+          nextOwner: copy.nextOwner,
+          note,
+        }),
+      success: copy.success,
+      writeFailure: `${copy.title}未完成，請稍後再試。`,
+    });
   }
 
   elements.return.addEventListener(
@@ -1559,44 +1894,29 @@ function initStudio() {
   });
 
   elements.revision.addEventListener("click", async () => {
-    try {
-      setBusy(true, "正在建立新版本草稿。");
-      const record = await store.createRevision(selectedId, "目前使用者");
-      await reload(record.id);
-      showToast("新版本草稿已建立。");
-    } catch (error) {
-      showBanner(
-        safeErrorMessage(error, "目前無法建立新版本，請稍後再試。"),
-        "error",
-      );
-    } finally {
-      setBusy(false);
-    }
+    await runCommittedMutation({
+      action: "create_revision",
+      write: () =>
+        store.createRevision(
+          selectedId,
+          sessionContext ? formatActorIdentity(sessionContext) : "目前操作者",
+        ),
+      success: "新版本草稿已建立。",
+      writeFailure: "目前無法建立新版本，請稍後再試。",
+    });
   });
 
   elements.back.addEventListener("click", () => {
-    const decision = decideMobileBack({
-      editorMode,
-      dirty,
-      discardConfirmed: !hasUnsavedChanges() || canLeaveEditor(),
+    void runGuardedNavigation(async () => {
+      setMobilePane("list");
+      const selectedRow = elements.list.querySelector(
+        `[data-record-id="${CSS.escape(selectedId || "")}"]`,
+      );
+      (selectedRow || elements.newDraft).focus();
     });
-    if (decision.action === "stay") return;
-    if (decision.discard && editorMode === "new") {
-      discardDraftBuffer(selectedRecord);
-      clearSelection();
-      showBanner("");
-    } else if (decision.discard && selectedRecord) {
-      renderDetail(selectedRecord, "edit");
-      showBanner("未儲存的修改已取消。");
-    }
-    setMobilePane("list");
-    const selectedRow = elements.list.querySelector(
-      `[data-record-id="${CSS.escape(selectedId || "")}"]`,
-    );
-    (selectedRow || elements.newDraft).focus();
   });
 
-  elements.retry.addEventListener("click", () => void reload());
+  elements.retry.addEventListener("click", () => void retryCommittedSync());
 
   elements.form.addEventListener("input", (eventObject) => {
     if (!currentRecordEditable()) return;
@@ -1620,40 +1940,43 @@ function initStudio() {
     eventObject.returnValue = "";
   });
 
+  elements.search.addEventListener("input", () => {
+    void runGuardedNavigation(reconcileFilteredSelection);
+  });
   [
-    elements.search,
     elements.statusFilter,
     elements.typeFilter,
     elements.ownerFilter,
   ]
     .forEach((control) =>
-      control.addEventListener("input", () => {
-        void reconcileFilteredSelection();
+      control.addEventListener("change", () => {
+        void runGuardedNavigation(reconcileFilteredSelection);
       })
     );
-  document.querySelectorAll("[data-status]").forEach((button) => {
+  elements.statusButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      activeView = "all";
-      elements.navButtons.forEach((navButton) => {
-        const active = navButton.dataset.view === "all";
-        navButton.classList.toggle("is-active", active);
-        if (active) {
-          navButton.setAttribute("aria-current", "page");
-        } else {
-          navButton.removeAttribute("aria-current");
-        }
+      void runGuardedNavigation(async () => {
+        activeView = "all";
+        elements.navButtons.forEach((navButton) => {
+          const active = navButton.dataset.view === "all";
+          navButton.classList.toggle("is-active", active);
+          if (active) {
+            navButton.setAttribute("aria-current", "page");
+          } else {
+            navButton.removeAttribute("aria-current");
+          }
+        });
+        elements.statusFilter.value =
+          elements.statusFilter.value === button.dataset.status
+            ? ""
+            : button.dataset.status;
+        await reconcileFilteredSelection();
       });
-      elements.statusFilter.value =
-        elements.statusFilter.value === button.dataset.status
-          ? ""
-          : button.dataset.status;
-      void reconcileFilteredSelection();
     });
   });
   elements.navButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      if (!canLeaveEditor()) return;
-      void setActiveView(button.dataset.view);
+      void runGuardedNavigation(() => setActiveView(button.dataset.view));
     });
   });
   document.querySelector(".nav-list").addEventListener(
@@ -1676,7 +1999,9 @@ function initStudio() {
         (Math.max(currentIndex, 0) + direction + elements.navButtons.length) %
         elements.navButtons.length;
       const nextButton = elements.navButtons[nextIndex];
-      void setActiveView(nextButton.dataset.view, { moveFocus: true });
+      void runGuardedNavigation(() =>
+        setActiveView(nextButton.dataset.view, { moveFocus: true })
+      );
     },
   );
 
@@ -1684,7 +2009,32 @@ function initStudio() {
     ? "目前顯示的規則僅供流程操作示範，不是案件事實；本頁新增內容重新整理後不會保留。"
     : "只有完成覆核並發布的規則，才會提供給受控工作流程。";
   setMobilePane("list");
-  reload();
+
+  async function startStudio() {
+    try {
+      sessionContext = await store.sessionContext();
+      if (!["pcm", "admin"].includes(sessionContext?.actorRole)) {
+        throw new Error("此頁僅供已授權的 PCM 與管理者使用。");
+      }
+      elements.activeActorRole.textContent = sessionContext.actorRole === "admin"
+        ? "目前角色：管理者"
+        : "目前角色：PCM";
+      elements.activeActorLabel.textContent =
+        formatActorIdentity(sessionContext);
+      await reload();
+    } catch (error) {
+      elements.activeActorRole.textContent = "目前角色";
+      elements.activeActorLabel.textContent = "身分尚未確認";
+      showBanner(
+        safeErrorMessage(error, "目前無法確認操作身分，請重新登入後再試。"),
+        "error",
+        true,
+      );
+      setBusy(false);
+    }
+  }
+
+  void startStudio();
 }
 
 if (typeof document !== "undefined") {

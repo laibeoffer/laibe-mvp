@@ -14,6 +14,12 @@
 - `900_verify.sql` 只讀確認物件數、RLS、table privilege、RPC grant 與 private Storage。
 - `990_rollback.sql` 只允許 matching marker 且沒有知識發布、案件、staging 或 Storage 資料時執行；不使用 `CASCADE`，任何非 A5 外部依賴都會使整筆交易回退。
 
+## A14 LINE Core adapter 邊界
+
+- `casework.document_versions` 是 append-only 文件版本紀錄，不允許原地更新或刪除。
+- `casework.case_member_workstreams` 是案件角色與工作流授權的唯一明確來源；不得從 `casework.case_members` 推測 design / construction workstream。
+- jpeg / png 附件如何對齊目前 PDF-only 的父文件模型仍標記為 `pending_a0_a14_confirmation`；正式套用前必須由 A0 / A14 確認，不得自行放寬既有文件類型約束。
+
 ## 正式套用前
 
 1. 重新取得 LaiBE Core schema inventory 與 migration history。
@@ -24,6 +30,6 @@
 
 ## 風險
 
-建立 26 張 A5 table、index、RLS policy 與 function 會取得 DDL lock；空白 A5 schema 的預估鎖定時間短，但實際時間必須在正式環境 preflight 後重新估算。bundle marker 僅寫入 A5 `knowledge` schema comment，不建立 `public` table。rollback 不是一般清理工具，只能在零業務資料且 marker 完整時使用。
+建立 28 張 A5 table、index、RLS policy 與 function 會取得 DDL lock；空白 A5 schema 的預估鎖定時間短，但實際時間必須在正式環境 preflight 後重新估算。bundle marker 僅寫入 A5 `knowledge` schema comment，不建立 `public` table。rollback 不是一般清理工具，只能在零業務資料且 marker 完整時使用。
 
 本套件不包含 production consumer、LINE Bot、正式知識發布、付款、託管、代收代付或法律效力功能。

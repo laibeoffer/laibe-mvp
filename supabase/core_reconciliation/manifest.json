@@ -4,10 +4,19 @@
   "target_project_ref": "zdwuyomhswjcbbpbhpcq",
   "remote_applied": false,
   "remote_verification": {
-    "checked_on": "2026-07-27",
+    "checked_on": "2026-07-28",
     "migrations": 0,
     "a5_application_tables": 0,
     "source": "read-only inventory"
+  },
+  "a14_line_core_reconciliation": {
+    "remote_applied": false,
+    "tables": [
+      "casework.document_versions",
+      "casework.case_member_workstreams"
+    ],
+    "workstream_source": "explicit_membership_only",
+    "image_attachment_parent_model": "pending_a0_a14_confirmation"
   },
   "source_migrations": [
     {
@@ -39,33 +48,38 @@
       "path": "supabase/migrations/20260727193000_pcm_knowledge_rpc_surface_hardening.sql",
       "bytes": 23240,
       "sha256": "9830e1fa64559617ce3b350db196f0f5f251f7a029d5d5e734040b7933d16e20"
+    },
+    {
+      "path": "supabase/migrations/20260728050639_studio_traceability_a14_core_reconciliation.sql",
+      "bytes": 21043,
+      "sha256": "d302a0ffec9b6d1d0f7044d52d2469ac08f43acc375be975049726e863759fd6"
     }
   ],
   "artifacts": [
     {
       "path": "supabase/core_reconciliation/000_preflight.sql",
-      "bytes": 1936,
-      "sha256": "cf87ccf08fe53765bc4d39d293c25d584f17c95635ba99fef1d6cad12c11aca6"
+      "bytes": 1978,
+      "sha256": "b8fe4c387e6bd09f6ad0ae1a007b61ce46d6669ad1034b97acc2165133e6db97"
     },
     {
       "path": "supabase/core_reconciliation/010_a5_knowledge_foundation.sql",
-      "bytes": 183620,
-      "sha256": "0a837c85e2ba290b13fdfe7421bb4566bd41b0159cd134a6857354adbb2dd34d"
+      "bytes": 204866,
+      "sha256": "1d49a96d61b68354f6e3953b20a20dd2b25b5cbb0fbfe11936d9f4e4bd785736"
     },
     {
       "path": "supabase/core_reconciliation/900_verify.sql",
-      "bytes": 3327,
-      "sha256": "57713625ca4eea24ae4911bda1c81f3e35cf68745235d6c89c2a0a272d82212d"
+      "bytes": 3411,
+      "sha256": "227c2d1fbda7cf6f367f5bf505a95ec77a371e25d73a83df5c5028b21340a787"
     },
     {
       "path": "supabase/core_reconciliation/990_rollback.sql",
-      "bytes": 10200,
-      "sha256": "b0c02a5bffc3cd6de950706810b74254fb95d4b633a71d48197a0286d446a566"
+      "bytes": 10267,
+      "sha256": "30e902f1578f4f5ae215a9f06cbf0f34209a423eca7b34f5ec544a9acad5834a"
     },
     {
       "path": "supabase/core_reconciliation/README.md",
-      "bytes": 1810,
-      "sha256": "e524849e1938495cd18cf9688d6d378249d2ae75adcc19e3129e203f433df5d4"
+      "bytes": 2316,
+      "sha256": "90e1ea2704387037c7b93ba4b3e34499d969615f33541faba5fe7e35b8143094"
     }
   ]
 }

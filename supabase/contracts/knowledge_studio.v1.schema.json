@@ -6,6 +6,7 @@
   "properties": {
     "operation": {
       "enum": [
+        "getSessionContext",
         "listRecords",
         "getRecord",
         "createDraft",
@@ -94,6 +95,7 @@
         "content",
         "evidence_summary",
         "change_note",
+        "source",
         "rule"
       ],
       "properties": {

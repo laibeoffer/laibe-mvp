@@ -11,6 +11,7 @@ type StudioRequest = {
 };
 
 const operations = new Set([
+  "getSessionContext",
   "listRecords",
   "getRecord",
   "createDraft",
@@ -100,6 +101,11 @@ function studioRpc(request: StudioRequest): {
   payload: Record<string, unknown>;
 } {
   switch (request.operation) {
+    case "getSessionContext":
+      return {
+        name: "knowledge_studio_session_context",
+        payload: {},
+      };
     case "listRecords":
       return {
         name: "knowledge_studio_list",

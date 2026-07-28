@@ -57,6 +57,12 @@ test("Studio controller exposes mobile pane, busy and dirty-state behavior", () 
     "beforeunload",
     "aria-selected",
     "unsaved",
+    "runGuardedNavigation",
+    "createRequestGate",
+    "CommittedMutationCoordinator",
+    "syncPending",
+    "item.sourceDocument",
+    "依據：",
   ]) {
     assert.ok(app.includes(fragment), `Studio controller is missing ${fragment}`);
   }
@@ -65,6 +71,40 @@ test("Studio controller exposes mobile pane, busy and dirty-state behavior", () 
     /newDraft\.addEventListener\([\s\S]{0,500}?store\.createDraft/i,
     "New Draft still creates a persistent record immediately",
   );
+});
+
+test("native select filters enter the unsaved guard after their value changes", () => {
+  const app = read("app.js");
+  assert.match(
+    app,
+    /elements\.search\.addEventListener\("input",[\s\S]{0,180}?runGuardedNavigation/,
+  );
+  assert.match(
+    app,
+    /\[\s*elements\.statusFilter,\s*elements\.typeFilter,\s*elements\.ownerFilter,\s*\][\s\S]{0,220}?addEventListener\("change",[\s\S]{0,120}?runGuardedNavigation/,
+  );
+});
+
+test("all selection-changing controls are disabled while data is loading", () => {
+  const app = read("app.js");
+  for (const control of [
+    "elements.search",
+    "elements.statusFilter",
+    "elements.typeFilter",
+    "elements.ownerFilter",
+    "elements.navButtons",
+    "elements.statusButtons",
+    "elements.retry",
+    "elements.back",
+  ]) {
+    assert.match(
+      app,
+      new RegExp(
+        `${control.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]{0,180}disabled\\s*=\\s*busy`,
+      ),
+      `${control} is not disabled while busy`,
+    );
+  }
 });
 
 test("mobile layout switches list and detail instead of stacking both panes", () => {
@@ -92,5 +132,5 @@ test("product copy identifies internal PCM governance and sample-data limits", (
 test("changed Studio assets carry incremented cache versions", () => {
   const html = read("code.html");
   assert.match(html, /styles\.css\?v=2026072702/);
-  assert.match(html, /app\.js\?v=2026072702/);
+  assert.match(html, /app\.js\?v=2026072803/);
 });

@@ -39,7 +39,7 @@ test("Core reconciliation generation is deterministic and hash-bound", () => {
 
   assert.deepEqual(firstManifest, secondManifest);
   assert.deepEqual(outputSnapshot(first), outputSnapshot(second));
-  assert.equal(firstManifest.source_migrations.length, 6);
+  assert.equal(firstManifest.source_migrations.length, 7);
   assert.ok(
     firstManifest.source_migrations.every((item) =>
       /^[a-f0-9]{64}$/.test(item.sha256) && item.bytes > 0
