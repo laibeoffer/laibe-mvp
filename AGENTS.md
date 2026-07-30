@@ -3,7 +3,7 @@
 Active repository governance for:
 
 ```text
-Z:\08-Jacky\laibe_MVP_project
+C:\CodexWork\08-Jacky\laibe_MVP_project
 ```
 
 This file contains permanent repository rules plus the temporary controls for
@@ -26,6 +26,28 @@ exact conflict to the direct parent. Stale prompts, old boards, archived packets
 nested governance, labels, and previous AA conclusions are inactive unless the
 Human or current parent explicitly reactivates them.
 
+## 1.1 Z Drive Mutation Lock (Read Access Allowed)
+
+`Z:\08-Jacky` is a protected legacy location. Agents are allowed to read and
+inspect it, but all agents are prohibited from changing any file or directory
+under `Z:\08-Jacky`.
+
+Do not create, edit, overwrite, delete, rename, move, sync, mirror, back up,
+generate evidence, write logs, write caches, write temporary files, or run any
+command that can modify data under `Z:\08-Jacky`.
+
+Read-only inspection is permitted, including listing, opening, searching,
+scanning, comparing, and hashing files under `Z:\08-Jacky`. Read-only tools such
+as `Get-Content`, `Get-ChildItem`, `rg`, `Select-String`, and file-hash or
+comparison commands are allowed. Read-only Git inspection is allowed only when
+optional locks are disabled and the command cannot refresh or write the index,
+worktree, refs, logs, or other metadata.
+
+Any tool that would create a cache, index, lock, log, temporary file, build
+artifact, or other output under `Z:\08-Jacky` must redirect that output to
+`C:\CodexWork\08-Jacky` or another Human-approved non-`Z:\08-Jacky` location.
+Active work, checkpoints, evidence, outputs, and temporary files must stay
+outside `Z:\08-Jacky`.
 ## 2. Product Mission And Boundaries
 
 LaiBE is a renovation decision and case-record traceability system. It must help
@@ -163,6 +185,14 @@ Every active packet must contain:
 A packet with placeholders, ambiguous scope, missing skills, missing source
 identity, or unbound evidence is not active dispatch. Report the missing fields
 once and do not construct.
+
+## Hermes 使用規則
+
+Hermes 是可選輔助工具，不得自動安裝、更新、登入、重設或啟動常駐服務。
+
+只有在使用者明確要求使用 Hermes，或任務明確需要 Hermes 且 Hermes MCP 已可用時，Codex 才能使用 Hermes。
+
+若 Hermes MCP 尚未設定或無法連線，只回報需要設定，不得自行修改全域 Codex 設定，也不得啟動多個 Hermes 背景服務。
 
 ## 6. Serial Execution And File Safety
 
