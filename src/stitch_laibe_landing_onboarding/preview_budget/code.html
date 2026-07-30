@@ -1,423 +1,3333 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>LaiBE - Step 3：預算生成系統</title>
-    <link rel="icon" href="../../../assets/logo/laibe_header.png" />
-    <link rel="apple-touch-icon" href="../../../assets/logo/laibe_header.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "owner-primary": "#AD5A5A",
-                        "owner-deep": "#8C4747",
-                        "owner-soft": "#F7EEEE",
-                        "charcoal": "#1F1F1F",
-                        "surface": "#111214",
-                        "surface-2": "#17191D",
-                        "surface-3": "#1F2228",
-                        "warm-bg": "#F9F8F6",
-                        "soft-line": "#E8E2DB"
-                    },
-                    fontFamily: {
-                        display: ["Inter", "Noto Sans", "sans-serif"]
-                    },
-                    boxShadow: {
-                        soft: "0 4px 20px rgba(0,0,0,0.04)",
-                        softlg: "0 12px 40px rgba(0,0,0,0.08)"
-                    }
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', "Noto Sans", sans-serif;
-            background: #F9F8F6;
-            color: #1F1F1F;
-        }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LaiBE offer | 預算資料整理</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07090b;
+      --surface: #0f1418;
+      --surface-2: #151b20;
+      --surface-3: #1c2329;
+      --ink: #f8faf6;
+      --muted: #9da9ad;
+      --soft: #c7d1d3;
+      --line: rgba(213, 226, 225, .13);
+      --line-strong: rgba(213, 226, 225, .24);
+      --orange: #ff5809;
+      --orange-2: #ff7a2f;
+      --blue: #9bd4ff;
+      --green: #70d59b;
+      --gold: #f4c967;
+      --danger: #ff8a70;
+      --max: 1440px;
+      --bottom-bar: 86px;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", "Segoe UI", sans-serif;
+    }
 
-        /* 隱藏預設捲軸，保持畫面乾淨 */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #E8E2DB;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #d4cdc4;
-        }
+    * { box-sizing: border-box; }
 
-        .data-row:hover {
-            background-color: #F7EEEE;
-        }
-    </style>
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(255, 88, 9, .16), transparent 28%),
+        radial-gradient(circle at 88% 6%, rgba(155, 212, 255, .12), transparent 30%),
+        linear-gradient(180deg, #090b0d 0%, #07090b 44%, #050607 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, .018) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, .5), transparent 62%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input, textarea, select {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell-link,
+    .small-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 13px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .06);
+      font-size: 13px;
+      font-weight: 850;
+      color: #edf3ef;
+    }
+
+    #lb-owner-progress {
+      width: 100%;
+      margin: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 58%);
+      background: #000;
+      border-bottom: 1px solid #1E1E1E;
+      overflow: hidden;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    #lb-owner-progress * { box-sizing: border-box; }
+
+    #lb-owner-progress .lbh-l {
+      display: flex;
+      gap: 18px;
+      padding: 30px 20px 30px 28px;
+      align-items: stretch;
+    }
+
+    #lb-owner-progress .lbh-txt {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #lb-owner-progress .lbh-tag {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding-right: 16px;
+      border-right: 3px solid #FF5809;
+    }
+
+    #lb-owner-progress .lbh-tag .s {
+      font-family: Inter, "Helvetica Neue", sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      color: #FF5809;
+    }
+
+    #lb-owner-progress .lbh-tag .n {
+      font-family: Inter, "Helvetica Neue", sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #FF5809;
+    }
+
+    #lb-owner-progress .lbh-crumb {
+      margin-bottom: 10px;
+      color: #9B978D;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    #lb-owner-progress .lbh-crumb i {
+      color: #5E6264;
+      font-style: normal;
+    }
+
+    #lb-owner-progress .lbh-crumb b {
+      color: #C9C4B8;
+      font-weight: 600;
+    }
+
+    #lb-owner-progress h1 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(44px, 4.4vw, 64px);
+      font-weight: 700;
+      line-height: 1.04;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    #lb-owner-progress .lbh-txt p {
+      margin: 12px 0 0;
+      color: #9B978D;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    #lb-owner-progress .lbh-flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      overflow: hidden;
+    }
+
+    #lb-owner-progress .lb-step {
+      position: relative;
+      overflow: visible;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      min-height: 158px;
+      padding: 18px 18px 18px 6px;
+      border-left: 1px solid #1E1E1E;
+      background: #000;
+      text-decoration: none;
+      transition: background .2s ease;
+    }
+
+    #lb-owner-progress .lb-step:nth-child(1) { z-index: 4; }
+    #lb-owner-progress .lb-step:nth-child(2) { z-index: 3; }
+    #lb-owner-progress .lb-step:nth-child(3) { z-index: 2; }
+    #lb-owner-progress .lb-step:nth-child(4) { z-index: 1; }
+
+    #lb-owner-progress .lb-step .fn {
+      flex: none;
+      color: #242424;
+      margin-left: -34px;
+      font-family: Inter, "Helvetica Neue", sans-serif;
+      font-size: 112px;
+      font-weight: 800;
+      line-height: .9;
+      letter-spacing: -.04em;
+    }
+
+    #lb-owner-progress .lb-step:first-child .fn { margin-left: 2px; }
+
+    #lb-owner-progress .lb-tx { display: grid; gap: 4px; min-width: 0; }
+    #lb-owner-progress .lb-step strong { color: #6B6E70; font-size: 15px; font-weight: 700; white-space: nowrap; }
+    #lb-owner-progress .lb-step span.sub { color: #8B8E90; font-size: 12.5px; font-weight: 500; line-height: 1.4; text-wrap: balance; }
+    #lb-owner-progress .lb-step.done .fn { color: #6B6E70; }
+    #lb-owner-progress .lb-step.done strong { color: #C9C4B8; }
+    #lb-owner-progress .lb-step.done span.sub { color: #5FA463; }
+    #lb-owner-progress a.lb-step { cursor: pointer; }
+    #lb-owner-progress a.lb-step:hover strong { color: #fff; }
+
+    #lb-owner-progress .lb-step.current {
+      background: linear-gradient(115deg, #FF7A2F 0%, #FF5809 52%, #D93D00 100%);
+    }
+
+    #lb-owner-progress .lb-step.current .fn,
+    #lb-owner-progress .lb-step.current strong { color: #fff; }
+    #lb-owner-progress .lb-step.current span.sub { color: rgba(255,255,255,.85); }
+    #lb-owner-progress .lb-step.locked { cursor: not-allowed; }
+    #lb-owner-progress .lb-step.locked strong { color: #4A4D4F; }
+
+    main {
+      width: min(var(--max), calc(100vw - 36px));
+      margin: 0 auto;
+      padding: 14px 0 calc(var(--bottom-bar) + 24px);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .summary-panel,
+    .tool-panel,
+    .sheet-panel,
+    .detail-panel {
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(145deg, rgba(23, 29, 34, .94), rgba(12, 16, 19, .94));
+      box-shadow: 0 22px 70px rgba(0, 0, 0, .32);
+    }
+
+    .summary-panel {
+      min-height: 92px;
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      grid-template-columns: minmax(230px, .7fr) minmax(0, 1.6fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .case-kicker {
+      color: var(--orange-2);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 5px;
+      font-size: clamp(22px, 2.4vw, 30px);
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    .case-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .owner-readout {
+      margin-top: 8px;
+      border: 1px solid rgba(255, 88, 9, .28);
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(255, 88, 9, .13), rgba(255, 255, 255, .035));
+      padding: 8px 10px;
+      color: #ffe8dc;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 850;
+      text-wrap: pretty;
+    }
+
+    .pending-review {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 7px;
+      margin-top: 7px;
+      color: #b9c2c5;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 760;
+    }
+
+    .pending-review strong {
+      color: #ffd5c2;
+      font-weight: 950;
+    }
+
+    .pending-review button {
+      min-height: 24px;
+      padding: 0;
+      border: 0;
+      border-bottom: 1px solid rgba(255, 139, 86, .48);
+      background: transparent;
+      color: #ffb28e;
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .pending-review button:hover,
+    .pending-review button:focus-visible {
+      color: #fff0e8;
+      border-bottom-color: #ff8b56;
+      outline: none;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr);
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .budget-financial,
+    .prompt-panel {
+      min-width: 0;
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .045);
+      overflow: hidden;
+    }
+
+    .budget-financial {
+      display: grid;
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      border-color: rgba(255, 88, 9, .24);
+      background:
+        linear-gradient(145deg, rgba(255, 88, 9, .13), rgba(255, 88, 9, .035) 48%),
+        rgba(255, 255, 255, .04);
+    }
+
+    .financial-row {
+      min-height: 0;
+      padding: 7px 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .financial-row + .financial-row {
+      border-top: 1px solid rgba(255, 255, 255, .075);
+    }
+
+    .financial-row .label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .financial-row .value {
+      color: var(--ink);
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: 0;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .financial-row.primary .value {
+      color: #fff4ee;
+      font-size: clamp(22px, 2vw, 29px);
+    }
+
+    .financial-row.delta .value {
+      color: #ffd3c0;
+    }
+
+    .prompt-panel {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .prompt-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .prompt-title {
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .prompt-stats {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .prompt-stat {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .prompt-stat span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .prompt-stat strong {
+      color: #bff6d4;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .prompt-panel .owner-readout {
+      margin-top: 0;
+      padding: 6px 8px;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .prompt-panel .pending-review {
+      margin-top: 0;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .tool-panel {
+      border-radius: 12px;
+      padding: 9px 10px;
+      width: auto;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 8px;
+    }
+
+    .btn {
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .075);
+      color: #f5f7f2;
+      font-size: 13px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, .24);
+      outline: none;
+    }
+
+    .btn.primary {
+      min-height: 38px;
+      background: linear-gradient(135deg, #ff7a2f, #ff5809);
+      border-color: rgba(255, 88, 9, .9);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(255, 88, 9, .22);
+    }
+
+    .btn.secondary {
+      border-color: rgba(155, 212, 255, .28);
+      background: rgba(155, 212, 255, .08);
+      color: #dff1ff;
+    }
+
+    .tool-panel .btn.primary {
+      min-height: 36px;
+    }
+
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 700;
+    }
+
+    .plan-sync {
+      min-height: 34px;
+      margin: 0 0 10px;
+      padding: 6px 10px;
+      border-top: 1px solid rgba(155, 212, 255, .15);
+      border-bottom: 1px solid rgba(155, 212, 255, .12);
+      background: rgba(7, 12, 16, .54);
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 6px;
+      color: #b9c8d2;
+      font-size: 10px;
+      font-weight: 760;
+    }
+
+    .plan-sync strong {
+      color: #dff3ff;
+      font-weight: 900;
+    }
+
+    .plan-sync .sync-dot {
+      flex: 0 0 auto;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #78d7ff;
+      box-shadow: 0 0 8px rgba(120, 215, 255, .64);
+    }
+
+    .plan-sync .sync-separator {
+      color: #536570;
+    }
+
+    .sync-link {
+      min-height: 28px;
+      margin-left: auto;
+      padding: 0;
+      border: 0;
+      border-bottom: 1px solid rgba(155, 212, 255, .42);
+      background: transparent;
+      color: #bfe6ff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .sync-link:hover,
+    .sync-link:focus-visible {
+      color: #fff;
+      border-bottom-color: #dff3ff;
+      outline: none;
+    }
+
+    .trade-tabs-wrap {
+      margin-bottom: 10px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+    }
+
+    .trade-tabs {
+      min-width: max-content;
+      display: flex;
+      align-items: stretch;
+      gap: 1px;
+      border-bottom: 1px solid rgba(155, 212, 255, .17);
+    }
+
+    .trade-tab {
+      min-width: 132px;
+      min-height: 56px;
+      padding: 8px 12px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: rgba(255, 255, 255, .025);
+      color: #9eacb4;
+      display: grid;
+      align-content: center;
+      gap: 3px;
+      text-align: left;
+    }
+
+    .trade-tab strong {
+      color: #dce7ec;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .trade-tab span {
+      font-size: 10px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    .trade-tab:hover,
+    .trade-tab:focus-visible {
+      background: rgba(155, 212, 255, .07);
+      color: #d3e6f2;
+      outline: none;
+    }
+
+    .trade-tab.active {
+      border-bottom-color: #ff5809;
+      background: linear-gradient(180deg, rgba(255, 88, 9, .12), rgba(255, 88, 9, .03));
+      color: #ffb28e;
+    }
+
+    .trade-tab.active strong {
+      color: #fff3ed;
+    }
+
+    .readiness {
+      width: min(1120px, calc(100vw - 40px));
+      margin: 8px auto 10px;
+    }
+
+    .readiness-head {
+      min-height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 2px 4px;
+      color: #71777c;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .draft-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 18px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #e6e7e8;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .draft-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ff5809;
+      box-shadow: 0 0 10px rgba(255, 88, 9, .7);
+    }
+
+    .budget-journey-scroll {
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+    }
+
+    .budget-steps {
+      --journey-blue: #a9cdf1;
+      --journey-blue-hi: #e1f2ff;
+      --journey-blue-soft: #71b7f1;
+      position: relative;
+      isolation: isolate;
+      display: flex;
+      align-items: flex-start;
+      min-width: 760px;
+      height: 84px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 66%, rgba(48, 91, 132, .13), transparent 58%),
+        linear-gradient(180deg, rgba(20, 29, 40, .98), rgba(10, 16, 23, .99));
+      border-top: 1px solid rgba(147, 187, 226, .18);
+      border-bottom: 1px solid rgba(147, 187, 226, .15);
+      box-shadow: inset 0 1px rgba(255, 255, 255, .018);
+    }
+
+    .budget-steps::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      left: 4.5%;
+      right: 4.5%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(70, 130, 184, .72) 6%, rgba(210, 235, 255, .98) 20%, rgba(210, 235, 255, .98) 80%, rgba(70, 130, 184, .72) 94%, transparent);
+      box-shadow: 0 0 2px rgba(210, 235, 255, .95), 0 0 8px rgba(80, 159, 222, .56), 0 0 22px rgba(52, 119, 177, .38);
+    }
+
+    .budget-steps::after { top: 58px; }
+
+    .budget-step {
+      position: relative;
+      z-index: 2;
+      flex: 1 1 0;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 4px 6px 0;
+      text-align: center;
+    }
+
+    .budget-step:not(:last-of-type)::before {
+      content: none;
+    }
+
+    .budget-step-copy {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 31px;
+      margin-bottom: 0;
+      padding: 0 2px;
+    }
+
+    .budget-icon {
+      display: none;
+    }
+
+    .budget-icon svg {
+      display: block;
+      width: 29px;
+      height: 29px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.55;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .budget-step-title {
+      color: #d7e4f1;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.28;
+      white-space: nowrap;
+    }
+
+    .budget-step-status {
+      margin-top: 1px;
+      color: #7f9eba;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .budget-step-desc {
+      display: none;
+    }
+
+    .budget-step-copy::after {
+      content: none;
+    }
+
+    .budget-step.done .budget-step-status { color: #9adfb6; }
+    .budget-step.current .budget-step-status { color: #e8c988; }
+
+    .budget-node {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border: 1px solid rgba(192, 225, 250, .78);
+      border-radius: 50%;
+      background: #02060b;
+      color: var(--journey-blue);
+      box-shadow:
+        inset 0 0 12px rgba(0, 16, 34, .9),
+        0 0 8px rgba(72, 144, 201, .22);
+    }
+
+    .budget-node::before,
+    .budget-node::after {
+      position: absolute;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .budget-node svg {
+      display: none;
+    }
+
+    .budget-node path {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .budget-node .node-glow {
+      stroke: var(--journey-blue-soft);
+      stroke-width: 5.5;
+      opacity: .58;
+      filter: blur(3px);
+    }
+
+    .budget-node .node-core {
+      fill: rgba(16, 26, 36, .92);
+      stroke: #d8edff;
+      stroke-width: 1.45;
+      filter: drop-shadow(0 0 1px rgba(226, 244, 255, .95)) drop-shadow(0 0 5px rgba(92, 164, 221, .4));
+    }
+
+    .budget-node span {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      color: #fff;
+      font-family: "Arial Narrow", "Segoe UI", sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: 0;
+      text-align: center;
+      text-shadow: none;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .budget-step.done .budget-node {
+      border-color: rgba(92, 238, 255, .92);
+      background:
+        radial-gradient(circle at 78% 24%, rgba(124, 255, 249, .92) 0, rgba(20, 196, 255, .56) 12%, transparent 33%),
+        radial-gradient(circle at 43% 78%, rgba(0, 217, 255, .72) 0, rgba(0, 83, 255, .42) 24%, transparent 48%),
+        radial-gradient(circle at 42% 43%, #144be8 0, #07258f 48%, #02084a 76%, #000322 100%);
+      box-shadow:
+        inset -7px -8px 13px rgba(0, 3, 55, .62),
+        inset 5px 5px 10px rgba(54, 174, 255, .18),
+        0 0 3px rgba(132, 252, 255, .95),
+        0 0 10px rgba(0, 193, 255, .68),
+        0 0 20px rgba(0, 83, 255, .42);
+    }
+
+    .budget-step.done .budget-node::before {
+      content: "";
+      inset: -1px;
+      background: conic-gradient(from 318deg, #36ff72 0 5%, #26f7e5 12%, #008cff 30%, #1429ff 53%, #04e7ff 76%, #fff2a2 86%, #ff7300 90%, #36ff72 100%);
+      -webkit-mask: radial-gradient(farthest-side, transparent 88%, #000 93%);
+      mask: radial-gradient(farthest-side, transparent 88%, #000 93%);
+      opacity: .96;
+      filter: drop-shadow(0 0 3px rgba(0, 219, 255, .76));
+    }
+
+    .budget-step.done .budget-node::after {
+      content: "";
+      inset: 3px;
+      background: radial-gradient(circle at 76% 76%, rgba(255, 255, 255, .82) 0 2%, rgba(68, 243, 255, .34) 8%, transparent 27%);
+    }
+
+    .budget-step.pending .budget-node {
+      border-color: rgba(0, 102, 182, .22);
+      background:
+        radial-gradient(circle at 50% 46%, #07111b 0, #02070c 54%, #000 78%);
+      box-shadow:
+        inset 0 0 14px rgba(0, 0, 0, .94),
+        0 0 10px rgba(0, 103, 193, .12);
+    }
+
+    .budget-step.pending .budget-node::before {
+      content: "";
+      inset: 1px;
+      border-top: 1px solid transparent;
+      border-right: 2px solid rgba(100, 244, 255, .92);
+      border-bottom: 2px solid rgba(0, 199, 255, .86);
+      border-left: 1px solid rgba(0, 91, 215, .32);
+      transform: rotate(17deg);
+      box-shadow:
+        inset -2px -2px 5px rgba(25, 226, 255, .34),
+        1px 2px 4px rgba(0, 190, 255, .7),
+        0 0 8px rgba(0, 91, 215, .3);
+    }
+
+    .budget-step.pending .budget-node::after {
+      content: "";
+      inset: -2px;
+      background: radial-gradient(circle at 75% 73%, rgba(255, 255, 255, .95) 0 2%, rgba(48, 232, 255, .9) 4%, rgba(0, 145, 255, .42) 9%, transparent 18%);
+      filter: blur(.2px);
+    }
+
+    .budget-step.pending .budget-node span {
+      color: #d7edf9;
+      text-shadow: none;
+    }
+
+    .budget-step.current .budget-node {
+      border-color: rgba(255, 139, 86, .92);
+      background:
+        linear-gradient(145deg, #ff7b3b 0%, #ff5809 48%, #c53700 100%);
+      color: #fff2eb;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .38),
+        inset 0 -6px 10px rgba(111, 22, 0, .34),
+        0 0 0 1px rgba(255, 104, 37, .25),
+        0 0 7px rgba(255, 111, 44, .72),
+        0 0 16px rgba(255, 88, 9, .42);
+    }
+
+    .budget-step.current .budget-node::before {
+      content: "";
+      inset: 5px;
+      border: 1px solid rgba(255, 237, 225, .42);
+      border-color: rgba(255, 237, 225, .42);
+      box-shadow: inset 0 0 7px rgba(255, 238, 224, .2);
+    }
+
+    .budget-step.current .budget-node span {
+      color: #fff;
+      text-shadow: none;
+    }
+
+    .budget-stem {
+      display: none;
+    }
+
+    .budget-step::after {
+      content: none;
+    }
+
+    .budget-axis,
+    .budget-caption {
+      display: none;
+    }
+
+    .budget-axis {
+      top: 284px;
+      font-size: 8px;
+      letter-spacing: .2em;
+    }
+
+    .budget-axis.start { left: 4.5%; }
+    .budget-axis.finish { right: 4.5%; }
+
+    .budget-caption {
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      color: #4f6c87;
+      font-size: 10px;
+      letter-spacing: .18em;
+      white-space: nowrap;
+    }
+
+    .editor-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .sheet-panel {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .sheet-toolbar {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .sheet-toolbar h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .sheet-toolbar p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .sheet-help {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .sheet-actions {
+      display: grid;
+      justify-items: end;
+      gap: 6px;
+    }
+
+    .budget-filters {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .budget-search {
+      width: min(240px, 28vw);
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid rgba(155, 212, 255, .22);
+      border-radius: 6px;
+      background: rgba(4, 7, 9, .64);
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 760;
+      outline: none;
+    }
+
+    .budget-search::placeholder {
+      color: #778995;
+    }
+
+    .budget-search:focus {
+      border-color: rgba(120, 215, 255, .58);
+      box-shadow: 0 0 0 2px rgba(120, 215, 255, .1);
+    }
+
+    .review-filter {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 10px;
+      border: 1px solid rgba(255, 139, 86, .28);
+      border-radius: 6px;
+      background: rgba(255, 88, 9, .07);
+      color: #ffd6c3;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .review-filter input {
+      width: 15px;
+      height: 15px;
+      accent-color: #ff5809;
+    }
+
+    .help-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border: 1px solid rgba(155, 212, 255, .22);
+      border-radius: 999px;
+      background: rgba(155, 212, 255, .07);
+      color: #dff1ff;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .sheet-wrap {
+      min-height: 330px;
+      overflow-x: auto;
+      overflow-y: visible;
+      background: rgba(4, 6, 7, .38);
+    }
+
+    .empty-filter-row td {
+      padding: 36px 18px;
+      color: #9caab2;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1000px;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: fixed;
+    }
+
+    th, td {
+      border-right: 1px solid rgba(255, 255, 255, .07);
+      border-bottom: 1px solid rgba(255, 255, 255, .07);
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      height: 44px;
+      padding: 0 10px;
+      background: #151b20;
+      color: #c8d4d6;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    td {
+      min-height: 52px;
+      padding: 10px;
+      color: #f0f3ef;
+      background: rgba(255, 255, 255, .034);
+      font-size: 13px;
+      line-height: 1.48;
+      font-weight: 760;
+    }
+
+    tbody tr {
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+
+    tbody tr:hover td {
+      background: rgba(155, 212, 255, .055);
+    }
+
+    tbody tr.active-row td {
+      background: rgba(255, 88, 9, .075);
+    }
+
+    tbody tr.active-row td:first-child {
+      box-shadow: inset 3px 0 0 var(--orange);
+    }
+
+    #budgetTable.is-overview thead {
+      display: none;
+    }
+
+    #budgetTable.is-overview {
+      min-width: 0;
+    }
+
+    .trade-summary-row {
+      cursor: pointer;
+    }
+
+    .trade-summary-row td {
+      padding: 0;
+      border-right: 0;
+    }
+
+    .trade-summary-button {
+      width: 100%;
+      min-height: 58px;
+      padding: 10px 14px;
+      border: 0;
+      background: transparent;
+      display: grid;
+      grid-template-columns: minmax(160px, 1fr) auto auto auto;
+      align-items: center;
+      gap: 18px;
+      color: #dce7ec;
+      text-align: left;
+    }
+
+    .trade-summary-button strong {
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .trade-summary-button span {
+      color: #9fb0ba;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .trade-summary-button .trade-subtotal {
+      min-width: 120px;
+      color: #fff0e7;
+      font-size: 14px;
+      font-weight: 950;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trade-summary-button .trade-review {
+      color: #ffb28e;
+    }
+
+    .trade-summary-row:hover td {
+      background: rgba(155, 212, 255, .055);
+    }
+
+    .trade-total-row td {
+      padding: 11px 12px;
+      background: rgba(255, 88, 9, .06);
+      color: #dce7ec;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .trade-total-row .trade-total-value {
+      color: #fff0e7;
+      text-align: right;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .row-review-note {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      margin-top: 6px;
+      padding: 0 7px;
+      border: 1px solid rgba(255, 139, 86, .35);
+      border-radius: 999px;
+      background: rgba(255, 88, 9, .08);
+      color: #ffb28e;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    td[contenteditable="true"] {
+      outline: none;
+      white-space: pre-wrap;
+      position: relative;
+      cursor: text;
+      box-shadow: inset 0 0 0 1px rgba(155, 212, 255, .12);
+    }
+
+    td[contenteditable="true"]::after {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      width: 6px;
+      height: 6px;
+      border-top: 1px solid rgba(155, 212, 255, .55);
+      border-right: 1px solid rgba(155, 212, 255, .55);
+      opacity: .78;
+      pointer-events: none;
+    }
+
+    td[contenteditable="true"]:hover {
+      background: rgba(155, 212, 255, .052);
+    }
+
+    td[contenteditable="true"]:focus {
+      background: rgba(255, 255, 255, .09);
+      box-shadow: inset 0 0 0 1px rgba(155, 212, 255, .55);
+    }
+
+    td.edited {
+      background-image: linear-gradient(135deg, rgba(255, 88, 9, .16), transparent 34px);
+    }
+
+    .col-no { width: 52px; text-align: center; color: #b7c6c8; }
+    .col-name { width: 150px; }
+    .col-unit { width: 60px; }
+    .col-qty { width: 56px; text-align: center; }
+    .col-price { width: 96px; }
+    .col-total { width: 108px; }
+    .col-spec { width: 220px; }
+    .col-method { width: 238px; }
+    .number, .money { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .col-qty.number { text-align: center; }
+    .money { color: #fff2dc; font-weight: 950; }
+
+    td.expandable-cell {
+      position: relative;
+      cursor: text;
+      box-shadow: inset 0 0 0 1px rgba(155, 212, 255, .12);
+    }
+
+    td.expandable-cell::after {
+      content: "";
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      width: 6px;
+      height: 6px;
+      border-top: 1px solid rgba(155, 212, 255, .55);
+      border-right: 1px solid rgba(155, 212, 255, .55);
+      opacity: .78;
+      pointer-events: none;
+    }
+
+    td.expandable-cell:hover {
+      background: rgba(155, 212, 255, .052);
+    }
+
+    td.expandable-cell:focus-within {
+      background: rgba(255, 255, 255, .09);
+      box-shadow: inset 0 0 0 1px rgba(155, 212, 255, .55);
+    }
+
+    .expandable-editor {
+      max-height: calc(1.48em * 2);
+      overflow: hidden;
+      outline: none;
+      white-space: pre-wrap;
+    }
+
+    .expandable-cell.is-expanded .expandable-editor {
+      max-height: none;
+      overflow: visible;
+    }
+
+    .cell-expand-toggle {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      border: 1px solid rgba(155, 212, 255, .38);
+      border-radius: 50%;
+      color: #cfe8ff;
+      background: #111a22;
+      font-size: 13px;
+      line-height: 18px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .cell-expand-toggle:hover,
+    .cell-expand-toggle:focus-visible {
+      border-color: rgba(155, 212, 255, .82);
+      outline: none;
+    }
+
+    .detail-panel {
+      position: sticky;
+      top: 88px;
+      max-height: calc(100vh - 260px);
+      border-radius: 18px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .detail-head {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 88% 0%, rgba(255, 88, 9, .18), transparent 42%),
+        rgba(255, 255, 255, .035);
+    }
+
+    .detail-head .label {
+      margin-bottom: 7px;
+      color: var(--orange-2);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: .08em;
+    }
+
+    .detail-head h2 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.25;
+    }
+
+    .detail-tools {
+      margin-top: 13px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .subtle-btn {
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      background: rgba(255, 255, 255, .06);
+      color: #f4f7f3;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .subtle-btn:hover,
+    .subtle-btn:focus-visible {
+      border-color: rgba(155, 212, 255, .38);
+      outline: none;
+    }
+
+    .detail-body {
+      display: grid;
+      gap: 13px;
+      padding: 16px;
+    }
+
+    .detail-block {
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, .04);
+      padding: 12px;
+    }
+
+    .detail-block h3 {
+      margin: 0 0 7px;
+      color: #edf5f1;
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .detail-block p,
+    .detail-block li {
+      margin: 0;
+      color: var(--soft);
+      font-size: 12px;
+      line-height: 1.6;
+      font-weight: 740;
+    }
+
+    .detail-block ul {
+      margin: 0;
+      padding-left: 17px;
+    }
+
+    .adjust-grid {
+      display: grid;
+      gap: 9px;
+    }
+
+    .field-label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .field-label select,
+    .field-label input {
+      width: 100%;
+      min-height: 36px;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 9px;
+      background: rgba(4, 6, 7, .58);
+      padding: 0 10px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field-label select:focus,
+    .field-label input:focus {
+      border-color: rgba(155, 212, 255, .55);
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: calc(var(--bottom-bar) + 18px);
+      z-index: 70;
+      transform: translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      border: 1px solid rgba(112, 213, 155, .35);
+      border-radius: 12px;
+      background: rgba(12, 24, 19, .94);
+      color: #d9ffe8;
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 850;
+      transition: opacity .18s ease, transform .18s ease;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, .36);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bottom-summary {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 60;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      background: rgba(8, 10, 12, .93);
+      backdrop-filter: blur(18px);
+    }
+
+    .bottom-inner {
+      width: min(var(--max), calc(100vw - 36px));
+      min-height: var(--bottom-bar);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .bottom-stat {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .bottom-stat strong {
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .bottom-mid {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .bottom-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .print-report {
+      display: none;
+    }
+
+    @media print {
+      body {
+        background: #fff !important;
+        color: #111 !important;
+      }
+
+      body > :not(#printReport) {
+        display: none !important;
+      }
+
+      .print-report {
+        display: block;
+        padding: 18mm 14mm;
+        color: #111;
+        font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      }
+
+      .print-report h1 {
+        margin: 0 0 4px;
+        font-size: 24px;
+      }
+
+      .print-report .print-meta,
+      .print-report .print-note {
+        margin: 0 0 12px;
+        color: #444;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .print-report h2 {
+        margin: 18px 0 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid #888;
+        font-size: 16px;
+      }
+
+      .print-report table {
+        min-width: 0;
+        margin: 0 0 8px;
+        color: #111;
+        table-layout: fixed;
+      }
+
+      .print-report th,
+      .print-report td {
+        position: static;
+        padding: 5px;
+        border: 1px solid #aaa;
+        background: #fff;
+        color: #111;
+        font-size: 9px;
+        line-height: 1.45;
+        vertical-align: top;
+      }
+
+      .print-report .print-subtotal,
+      .print-report .print-total {
+        margin: 5px 0 0;
+        text-align: right;
+        font-weight: 900;
+      }
+
+      .print-report .print-total {
+        margin-top: 16px;
+        font-size: 17px;
+      }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1180px) {
+      .editor-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .detail-panel {
+        position: static;
+        max-height: none;
+        overflow: visible;
+      }
+
+      .sheet-wrap {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 1120px) {
+      #lb-owner-progress {
+        grid-template-columns: 1fr;
+      }
+
+      #lb-owner-progress .lbh-flow {
+        border-top: 1px solid #1E1E1E;
+      }
+    }
+
+    @media (max-width: 960px) {
+      .summary-panel,
+      .tool-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric-grid {
+        grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr);
+      }
+    }
+
+    @media (max-width: 760px) {
+      :root { --bottom-bar: 142px; }
+
+      .readiness {
+        width: calc(100vw - 24px);
+      }
+
+      main,
+      .bottom-inner {
+        width: min(100vw - 24px, var(--max));
+      }
+
+      main {
+        padding-top: 12px;
+      }
+
+      .topbar {
+        gap: 7px;
+        margin-bottom: 8px;
+      }
+
+      #lb-owner-progress .lbh-l {
+        gap: 12px;
+        min-height: 126px;
+        padding: 16px 14px;
+      }
+
+      #lb-owner-progress h1 {
+        font-size: 38px;
+      }
+
+      #lb-owner-progress .lbh-crumb {
+        margin-bottom: 7px;
+        font-size: 12px;
+      }
+
+      #lb-owner-progress .lbh-txt p {
+        margin-top: 7px;
+        font-size: 12px;
+      }
+
+      #lb-owner-progress .lbh-flow {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        overflow: hidden;
+      }
+
+      #lb-owner-progress .lb-step {
+        min-height: 110px;
+        padding: 12px 10px;
+        gap: 8px;
+        border-top: 1px solid #1E1E1E;
+      }
+
+      #lb-owner-progress .lb-step .fn {
+        margin-left: -12px;
+        font-size: 62px;
+      }
+
+      #lb-owner-progress .lb-step:first-child .fn { margin-left: 0; }
+
+      #lb-owner-progress .lb-step strong {
+        font-size: 13px;
+      }
+
+      #lb-owner-progress .lb-step span.sub {
+        font-size: 11px;
+      }
+
+      .summary-panel,
+      .tool-panel,
+      .sheet-panel,
+      .detail-panel {
+        border-radius: 14px;
+      }
+
+      .bottom-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-panel,
+      .tool-panel {
+        padding: 8px;
+      }
+
+      .summary-panel {
+        gap: 5px;
+        padding: 6px;
+      }
+
+      .case-kicker {
+        margin-bottom: 4px;
+        font-size: 10px;
+      }
+
+      h1 {
+        margin-bottom: 5px;
+        font-size: 22px;
+      }
+
+      .case-meta {
+        gap: 5px;
+        font-size: 11px;
+      }
+
+      .owner-readout {
+        display: block;
+      }
+
+      .pending-review {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: thin;
+      }
+
+      .btn.primary {
+        grid-column: 1 / -1;
+      }
+
+      .actions {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 0;
+        overscroll-behavior-x: contain;
+        scrollbar-width: none;
+      }
+
+      .actions::-webkit-scrollbar { display: none; }
+
+      .actions .btn {
+        flex: 0 0 auto;
+        min-width: 142px;
+        white-space: nowrap;
+      }
+
+      .actions .btn.primary {
+        grid-column: auto;
+      }
+
+      .metric-grid {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        overscroll-behavior-x: contain;
+      }
+
+      .budget-financial {
+        flex: 0 0 270px;
+      }
+
+      .prompt-panel {
+        flex: 0 0 330px;
+      }
+
+      .financial-row .label {
+        font-size: 10px;
+      }
+
+      .financial-row .value {
+        font-size: 16px;
+      }
+
+      .financial-row.primary .value {
+        font-size: 22px;
+      }
+
+      .tool-panel {
+        min-height: 0;
+        padding: 4px 6px;
+      }
+
+      .btn {
+        min-height: 36px;
+        padding: 0 8px;
+        font-size: 12px;
+      }
+
+      .note {
+        display: none;
+      }
+
+      .readiness-head {
+        padding-bottom: 4px;
+      }
+
+      .budget-steps {
+        min-width: 760px;
+        height: 84px;
+      }
+
+      .sheet-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+        min-height: 0;
+        padding: 10px;
+      }
+
+      .sheet-actions {
+        width: 100%;
+        justify-items: stretch;
+      }
+
+      .budget-filters {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .budget-search {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .review-filter {
+        flex: 0 0 auto;
+      }
+
+      .sheet-toolbar p {
+        font-size: 11px;
+      }
+
+      .sheet-toolbar .small-pill {
+        display: none;
+      }
+
+      .sheet-help {
+        display: none;
+      }
+
+      .sheet-wrap {
+        min-height: 0;
+        overflow: visible;
+      }
+
+      table,
+      thead,
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+      }
+
+      thead { display: none; }
+
+      table { border-collapse: collapse; }
+
+      tbody {
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      tbody tr {
+        border: 1px solid rgba(255, 255, 255, .1);
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, .035);
+      }
+
+      th, td {
+        border-right: 0;
+      }
+
+      td {
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 10px;
+        min-height: 44px;
+        padding: 10px 12px;
+      }
+
+      .col-no,
+      .col-name,
+      .col-unit,
+      .col-qty,
+      .col-price,
+      .col-total,
+      .col-spec,
+      .col-method {
+        width: 100%;
+      }
+
+      td::before {
+        content: attr(data-label);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .col-no,
+      .number,
+      .money {
+        text-align: left;
+      }
+
+      .bottom-inner {
+        min-height: var(--bottom-bar);
+        padding: 12px 0;
+      }
+
+      .bottom-actions {
+        justify-content: stretch;
+      }
+
+      .bottom-actions .btn {
+        flex: 1 1 140px;
+      }
+
+      .plan-sync {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 4px 7px;
+      }
+
+      .sync-link {
+        margin-left: 0;
+      }
+
+      .trade-tab {
+        min-width: 126px;
+      }
+
+      .trade-summary-button {
+        grid-template-columns: 1fr auto;
+        gap: 6px 12px;
+      }
+
+      .trade-summary-button .trade-subtotal {
+        grid-column: 1 / -1;
+        min-width: 0;
+        text-align: left;
+      }
+
+      .trade-summary-button .trade-review {
+        grid-column: 1 / -1;
+      }
+
+      .toast {
+        left: 12px;
+        right: 12px;
+      }
+    }
+
+    @media print {
+      .print-report table {
+        display: table !important;
+        width: 100% !important;
+      }
+
+      .print-report thead {
+        display: table-header-group !important;
+      }
+
+      .print-report tbody {
+        display: table-row-group !important;
+        padding: 0 !important;
+      }
+
+      .print-report tr {
+        display: table-row !important;
+        background: #fff !important;
+      }
+
+      .print-report th,
+      .print-report td {
+        display: table-cell !important;
+        width: auto !important;
+      }
+    }
+  </style>
 </head>
+<body>
+  <section id="lb-owner-progress" aria-label="發案方流程進度">
+    <div class="lbh-l">
+      <div class="lbh-tag">
+        <span class="s">STEP</span>
+        <span class="n">03</span>
+      </div>
+      <div class="lbh-txt">
+        <div class="lbh-crumb">案件建立 <i>/</i> <b>預算資料整理</b></div>
+        <h1>預算資料整理</h1>
+        <p>確認預算、調整單價與規格，整理成後續可統一發出的標單條件</p>
+      </div>
+    </div>
+    <nav class="lbh-flow" aria-label="流程步驟">
+      <a class="lb-step done" href="../onboard_ai_agent/code.html">
+        <span class="fn">1</span>
+        <span class="lb-tx"><strong>需求整理</strong><span class="sub">已完成，可點選回顧</span></span>
+      </a>
+      <a class="lb-step done" href="../preview_floor_plan/code.html">
+        <span class="fn">2</span>
+        <span class="lb-tx"><strong>平面拼圖</strong><span class="sub">已完成，可點選回顧</span></span>
+      </a>
+      <span class="lb-step current" aria-current="step">
+        <span class="fn">3</span>
+        <span class="lb-tx"><strong>預算資料整理</strong><span class="sub">目前所在頁面</span></span>
+      </span>
+      <span class="lb-step locked" aria-disabled="true">
+        <span class="fn">4</span>
+        <span class="lb-tx"><strong>招標工作</strong><span class="sub">需完成前一步後解鎖</span></span>
+      </span>
+    </nav>
+  </section>
 
-<body class="min-h-screen bg-warm-bg text-charcoal flex flex-col">
-
-    <!-- Header 包含上方流程列與操作按鈕 -->
-    <header class="sticky top-0 z-50 bg-white border-b border-soft-line shadow-sm">
-        <div class="max-w-[1440px] mx-auto px-6 h-[72px] md:h-20 flex items-center justify-between">
-            
-            <!-- Logo & Flow -->
-            <div class="flex items-center gap-10">
-                <a href="../laibe_landing_desktop/code.html" class="flex items-center hover:opacity-80 transition" title="返回首頁">
-                    <img src="../../../assets/logo/laibe_header.png" alt="LaiBE Logo" class="h-[30px] md:h-[40px] w-auto object-contain" />
-                </a>
-
-                <!-- 流程步進器 -->
-                <div class="hidden md:flex items-center gap-3 text-sm font-bold">
-                    <div class="flex items-center gap-2 text-charcoal/40">
-                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">1</span>
-                        <span>需求表單 / 引導官頁</span>
-                    </div>
-                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
-                    <div class="flex items-center gap-2 text-charcoal/40">
-                        <span class="w-6 h-6 rounded-full bg-charcoal/5 text-charcoal/40 flex items-center justify-center text-xs">2</span>
-                        <span>平面拼圖</span>
-                    </div>
-                    <span class="material-symbols-outlined text-charcoal/20 text-sm">chevron_right</span>
-                    <div class="flex items-center gap-2 text-owner-primary bg-owner-soft px-3 py-1.5 rounded-full">
-                        <span class="w-6 h-6 rounded-full bg-owner-primary text-white flex items-center justify-center text-xs">3</span>
-                        <span>預算生成</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 右側操作按鈕 -->
-            <div class="flex items-center gap-4">
-                <button class="px-5 py-2.5 rounded-lg border border-soft-line text-sm font-bold text-charcoal hover:bg-black/5 transition flex items-center gap-2">
-                    <span class="material-symbols-outlined text-sm">download</span>
-                    匯出報價單
-                </button>
-                <a href="../client_step_4_budget_finalization/code.html" class="px-6 py-2.5 rounded-lg bg-owner-primary text-white text-sm font-bold hover:bg-owner-deep transition shadow-soft flex items-center gap-2">完成並預覽
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
-            </div>
+  <section class="readiness" aria-label="預算整理進度">
+    <div class="readiness-head">
+      <span class="draft-badge">草稿儲存中</span>
+      <span>最後儲存：14:32</span>
+    </div>
+    <div class="budget-journey-scroll" role="region" aria-label="預算整理五個階段，可水平捲動" tabindex="0">
+      <div class="budget-steps" role="list">
+        <div class="budget-step done" role="listitem">
+          <span class="budget-step-copy">
+            <span class="budget-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 8h8M8 12h8M8 16h5"></path></svg></span>
+            <strong class="budget-step-title">匯入平面項目</strong>
+            <span class="budget-step-status">已完成</span>
+            <span class="budget-step-desc">確認平面預算項目</span>
+          </span>
+          <span class="budget-node" aria-hidden="true">
+            <svg viewBox="0 0 76 49" preserveAspectRatio="none"><path class="node-glow" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path><path class="node-core" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path></svg>
+            <span>01</span>
+          </span>
+          <span class="budget-stem" aria-hidden="true"></span>
         </div>
-    </header>
-
-    <main class="flex-1 max-w-[1440px] w-full mx-auto px-6 py-8">
-        
-        <div class="mb-8">
-            <h1 class="text-3xl font-black tracking-tight text-charcoal">Step 3：預算生成系統</h1>
-            <p class="text-charcoal/60 mt-2 font-medium">系統已根據您的需求討論與平面拼圖結果，自動生成以下初版預算規劃。</p>
+        <div class="budget-step done" role="listitem">
+          <span class="budget-step-copy">
+            <span class="budget-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5h6M9 3h6a2 2 0 0 1 2 2v1h2a2 2 0 0 1 2 2v12H3V8a2 2 0 0 1 2-2h2V5a2 2 0 0 1 2-2Z"></path><path d="M8 11h8M8 15h6"></path></svg></span>
+            <strong class="budget-step-title">單位數量確認</strong>
+            <span class="budget-step-status">已完成</span>
+            <span class="budget-step-desc">整理單位與數量</span>
+          </span>
+          <span class="budget-node" aria-hidden="true">
+            <svg viewBox="0 0 76 49" preserveAspectRatio="none"><path class="node-glow" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path><path class="node-core" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path></svg>
+            <span>02</span>
+          </span>
+          <span class="budget-stem" aria-hidden="true"></span>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            <!-- 左側主區：報告摘要 + 詳細表格 -->
-            <div class="lg:col-span-8 xl:col-span-9 space-y-6">
-                
-                <!-- 三個摘要卡 -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- 預估總價 -->
-                    <div class="bg-white rounded-2xl p-6 border border-soft-line shadow-soft relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-owner-primary"></div>
-                        <div class="text-xs font-bold text-charcoal/50 tracking-wider mb-2">預估總價</div>
-                        <div class="text-3xl font-black text-charcoal tracking-tight">NT$ 1,850,000</div>
-                        <div class="mt-3 flex items-center gap-1.5 text-xs font-medium text-charcoal/50 cursor-pointer hover:text-owner-primary transition">
-                            <span class="material-symbols-outlined text-[14px]">info</span>
-                            <span>查看計算邏輯與公式基準</span>
-                        </div>
-                    </div>
-
-                    <!-- 每坪均價 -->
-                    <div class="bg-white rounded-2xl p-6 border border-soft-line shadow-soft relative overflow-hidden">
-                        <div class="text-xs font-bold text-charcoal/50 tracking-wider mb-2">每坪均價</div>
-                        <div class="flex items-baseline gap-1">
-                            <div class="text-3xl font-black text-charcoal tracking-tight">92,500</div>
-                            <div class="text-sm font-bold text-charcoal/40">元/坪</div>
-                        </div>
-                        <div class="mt-3 text-xs font-medium text-charcoal/50 bg-charcoal/5 inline-flex px-2 py-1 rounded">
-                            以室內實坪 20 坪計算
-                        </div>
-                    </div>
-
-                    <!-- AI 建議 -->
-                    <div class="bg-owner-soft rounded-2xl p-6 border border-owner-primary/20 shadow-soft relative overflow-hidden flex flex-col justify-center">
-                        <div class="flex items-center gap-2 text-xs font-bold text-owner-primary tracking-wider mb-2">
-                            <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-                            <span>AI 快速健檢</span>
-                        </div>
-                        <div class="text-sm font-bold text-owner-deep leading-relaxed">
-                            預算分配合理。但因屬中古屋，建議預留 10-15% 作為管線與防水修繕之預備金。
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 詳細預算清單表格 -->
-                <div class="bg-white rounded-2xl border border-soft-line shadow-soft overflow-hidden">
-                    <div class="px-6 py-5 border-b border-soft-line flex items-center justify-between bg-white">
-                        <div>
-                            <h2 class="text-lg font-black text-charcoal flex items-center gap-2">
-                                詳細預算清單
-                                <span class="material-symbols-outlined text-charcoal/30 text-[18px] cursor-help" title="由系統自動帶出，不可於此處點擊編輯">lock</span>
-                            </h2>
-                            <p class="text-xs font-bold text-owner-primary mt-1 bg-owner-primary/10 inline-flex px-2 py-0.5 rounded">
-                                💡 價格僅供參考，實際以後續結果與承攬合約為準
-                            </p>
-                        </div>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-warm-bg border-b border-soft-line text-charcoal/60 font-bold uppercase tracking-wider text-xs">
-                                <tr>
-                                    <th class="px-6 py-4">工項名稱</th>
-                                    <th class="px-6 py-4 w-24 text-right">數量</th>
-                                    <th class="px-6 py-4 w-24 text-center">單位</th>
-                                    <th class="px-6 py-4 w-32 text-right">單價預估</th>
-                                    <th class="px-6 py-4 w-32 text-right">小計</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-soft-line text-charcoal font-medium">
-                                <!-- Row 1 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#FFB347]"></span>
-                                            廚房天花板拆除
-                                            <span class="material-symbols-outlined text-charcoal/30 text-[14px] hover:text-owner-primary" title="來自拆除工程邏輯">data_info_alert</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">3.5</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">2,500</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">8,750</td>
-                                </tr>
-                                <!-- Row 2 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#4A90E2]"></span>
-                                            全室電線更新
-                                            <span class="material-symbols-outlined text-charcoal/30 text-[14px] hover:text-owner-primary" title="來自水電工程邏輯">data_info_alert</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">1</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">式</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">120,000</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">120,000</td>
-                                </tr>
-                                <!-- Row 3 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#8B572A]"></span>
-                                            平頂天花板 (防潮石膏板)
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">18</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">5,000</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">90,000</td>
-                                </tr>
-                                <!-- Row 4 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#7ED321]"></span>
-                                            全室乳膠漆 (含批土)
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">55</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">1,800</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">99,000</td>
-                                </tr>
-                                <!-- Row 5 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#D0021B]"></span>
-                                            超耐磨木地板 (直鋪)
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">15</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">坪</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">4,500</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">67,500</td>
-                                </tr>
-                                <!-- Row 6 -->
-                                <tr class="data-row cursor-pointer transition">
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-[#9013FE]"></span>
-                                            電視牆（300cm 系統櫃）
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right font-bold text-charcoal/80">10</td>
-                                    <td class="px-6 py-4 text-center text-charcoal/50">尺</td>
-                                    <td class="px-6 py-4 text-right tabular-nums">6,500</td>
-                                    <td class="px-6 py-4 text-right tabular-nums font-bold">65,000</td>
-                                </tr>
-                                <!-- 省略部分項目... -->
-                                <tr class="bg-black/5">
-                                    <td colspan="5" class="px-6 py-3 text-center text-xs text-charcoal/40 font-bold">
-                                        其他 32 項工項已由系統自動折疊隱藏
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot class="bg-warm-bg border-t-2 border-charcoal/10">
-                                <tr>
-                                    <td colspan="3" class="px-6 py-4 text-right font-bold text-charcoal/60">總計 (含監工管理費及稅金估算)</td>
-                                    <td colspan="2" class="px-6 py-4 text-right font-black text-xl text-owner-primary tabular-nums">NT$ 1,850,000</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- 右側側欄：圖表與 AI 僚機 -->
-            <div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-6">
-                
-                <!-- 佔比圖表卡片 -->
-                <div class="bg-white rounded-2xl p-6 border border-soft-line shadow-soft">
-                    <h3 class="text-sm font-bold text-charcoal tracking-wider uppercase mb-5 flex items-center justify-between">
-                        預算佔比分析
-                        <span class="material-symbols-outlined text-charcoal/30 text-[18px]">pie_chart</span>
-                    </h3>
-                    
-                    <div class="relative h-[220px] w-full flex items-center justify-center mb-4">
-                        <canvas id="budgetDonutChart"></canvas>
-                    </div>
-
-                    <div class="space-y-3 mt-6">
-                        <!-- Legend Manually Added for custom styling -->
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#8B572A]"></div><span class="font-medium text-charcoal">木作工程</span></div>
-                            <span class="font-bold text-charcoal/60">35%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#4A90E2]"></div><span class="font-medium text-charcoal">水電工程</span></div>
-                            <span class="font-bold text-charcoal/60">20%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#9013FE]"></div><span class="font-medium text-charcoal">系統櫃體</span></div>
-                            <span class="font-bold text-charcoal/60">15%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#D0021B]"></div><span class="font-medium text-charcoal">地坪工程</span></div>
-                            <span class="font-bold text-charcoal/60">12%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#FFB347]"></div><span class="font-medium text-charcoal">拆除泥作</span></div>
-                            <span class="font-bold text-charcoal/60">10%</span>
-                        </div>
-                        <div class="flex items-center justify-between text-sm">
-                            <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-[#7ED321]"></div><span class="font-medium text-charcoal">油漆工程</span></div>
-                            <span class="font-bold text-charcoal/60">8%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AI 導引助理 提示卡 -->
-                <div class="bg-surface text-white rounded-2xl p-6 shadow-softlg relative overflow-hidden">
-                    <div class="absolute -right-6 -top-6 text-white/5">
-                        <span class="material-symbols-outlined text-[120px]">psychiatry</span>
-                    </div>
-                    
-                    <div class="relative z-10">
-                        <div class="text-white/40 text-xs font-bold tracking-[0.2em] uppercase mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-[16px] text-owner-primary">smart_toy</span>
-                            AI 導引助理
-                        </div>
-                        
-                        <h3 class="text-lg font-black mb-3 leading-snug">
-                            中古屋翻新，請防範隱藏成本與漏項風險。
-                        </h3>
-                        
-                        <div class="space-y-4 mb-6">
-                            <div class="bg-white/10 rounded-xl p-3 border border-white/5">
-                                <div class="flex items-start gap-2 text-sm text-white/80 font-medium leading-relaxed">
-                                    <span class="material-symbols-outlined text-owner-primary text-[18px] shrink-0 mt-0.5">warning</span>
-                                    <span>根據您的需求分析，目前<b>未包含</b>「鋁窗更新」費用。若遇滲漏水情況，將是被迫追加的高風險項目。</span>
-                                </div>
-                            </div>
-                            <div class="bg-white/10 rounded-xl p-3 border border-white/5">
-                                <div class="flex items-start gap-2 text-sm text-white/80 font-medium leading-relaxed">
-                                    <span class="material-symbols-outlined text-[#4A90E2] text-[18px] shrink-0 mt-0.5">water_drop</span>
-                                    <span>「全室電線更新」與「冷熱水管重拉」已匡列於水電工程中，這是必要的基礎建設投資，系統已將其鎖定確保不被漏算。</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="text-xs text-white/40 border-t border-white/10 pt-4 font-medium">
-                            本面板為系統單向風險警示，以確保使用者能做出知情同意的決策。
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+        <div class="budget-step current" role="listitem" aria-current="step">
+          <span class="budget-step-copy">
+            <span class="budget-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m21.4 11.6-8.9 8.9a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"></path></svg></span>
+            <strong class="budget-step-title">品牌型號調整</strong>
+            <span class="budget-step-status">處理中</span>
+            <span class="budget-step-desc">調整品牌與型號</span>
+          </span>
+          <span class="budget-node" aria-hidden="true">
+            <svg viewBox="0 0 76 49" preserveAspectRatio="none"><path class="node-glow" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path><path class="node-core" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path></svg>
+            <span>03</span>
+          </span>
+          <span class="budget-stem" aria-hidden="true"></span>
         </div>
-    </main>
+        <div class="budget-step pending" role="listitem">
+          <span class="budget-step-copy">
+            <span class="budget-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span>
+            <strong class="budget-step-title">規格工法確認</strong>
+            <span class="budget-step-status">待確認</span>
+            <span class="budget-step-desc">補齊規格與工法</span>
+          </span>
+          <span class="budget-node" aria-hidden="true">
+            <svg viewBox="0 0 76 49" preserveAspectRatio="none"><path class="node-glow" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path><path class="node-core" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path></svg>
+            <span>04</span>
+          </span>
+          <span class="budget-stem" aria-hidden="true"></span>
+        </div>
+        <div class="budget-step pending" role="listitem">
+          <span class="budget-step-copy">
+            <span class="budget-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"></path><path d="M22 2 11 13"></path></svg></span>
+            <strong class="budget-step-title">可匯出標單</strong>
+            <span class="budget-step-status">尚未完成</span>
+            <span class="budget-step-desc">完成檢查後匯出</span>
+          </span>
+          <span class="budget-node" aria-hidden="true">
+            <svg viewBox="0 0 76 49" preserveAspectRatio="none"><path class="node-glow" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path><path class="node-core" d="M2 1v8c0 21 16.1 38 36 38S74 30 74 9V1"></path></svg>
+            <span>05</span>
+          </span>
+          <span class="budget-stem" aria-hidden="true"></span>
+        </div>
+        <span class="budget-axis start" aria-hidden="true">START</span>
+        <span class="budget-axis finish" aria-hidden="true">FINISH</span>
+        <span class="budget-caption" aria-hidden="true">BUDGET PREPARATION</span>
+      </div>
+    </div>
+  </section>
 
-    <script>
-        // 初始化 Donut Chart
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('budgetDonutChart').getContext('2d');
-            
-            // 對應 Categories: 拆除泥作, 水電, 木作, 油漆, 地板, 系統
-            const data = {
-                labels: ['拆除泥作', '水電工程', '木作工程', '油漆工程', '地坪工程', '系統櫃體'],
-                datasets: [{
-                    data: [10, 20, 35, 8, 12, 15],
-                    backgroundColor: [
-                        '#FFB347', // 拆除泥作
-                        '#4A90E2', // 水電
-                        '#8B572A', // 木作
-                        '#7ED321', // 油漆
-                        '#D0021B', // 地坪
-                        '#9013FE'  // 系統櫃
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            };
+  <main>
+    <section class="topbar" aria-label="預算摘要">
+      <div class="summary-panel">
+        <div>
+          <div class="case-kicker">可編輯預算表</div>
+          <h1>莊子誼住宅裝修</h1>
+          <div class="case-meta">
+            <span>預算草稿 v1</span>
+            <span aria-hidden="true">·</span>
+            <span id="savedAt">已於 14:32 儲存</span>
+            <span aria-hidden="true">·</span>
+            <span>點格子即可修改</span>
+          </div>
+        </div>
+        <div class="metric-grid">
+          <section class="budget-financial" aria-label="預算金額">
+            <div class="financial-row primary">
+              <span class="label">目前預算</span>
+              <strong class="value" id="currentBudget">$2,180,000</strong>
+            </div>
+            <div class="financial-row">
+              <span class="label">目標預算</span>
+              <strong class="value">$2,000,000</strong>
+            </div>
+            <div class="financial-row delta">
+              <span class="label">差額</span>
+              <strong class="value" id="budgetDelta">+$180,000</strong>
+            </div>
+          </section>
+          <section class="prompt-panel" aria-label="提示內容">
+            <div class="prompt-head">
+              <strong class="prompt-title">提示內容</strong>
+              <div class="prompt-stats" aria-label="預算完整度">
+                <span class="prompt-stat"><span>可計價項目</span><strong id="pricedCount">12 / 12</strong></span>
+                <span class="prompt-stat"><span>規格完整度</span><strong id="specCount">10 / 12</strong></span>
+              </div>
+            </div>
+            <div class="owner-readout" id="budgetGuide">目前超出目標 9%。先調整表格中的品牌、型號、數量或單價，總額會立即更新。</div>
+            <div class="pending-review" aria-label="待確認項目">
+              <strong>待確認 2 項：</strong>
+              <button type="button" data-budget-row="4">淋浴龍頭型號</button>
+              <span aria-hidden="true">、</span>
+              <button type="button" data-budget-row="2">固定收納櫃門片／色號</button>
+            </div>
+          </section>
+        </div>
+      </div>
 
-            const config = {
-                type: 'doughnut',
-                data: data,
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '75%',
-                    plugins: {
-                        legend: {
-                            display: false // Hide default legend as we built a custom one
-                        },
-                        tooltip: {
-                            backgroundColor: '#111214',
-                            titleFont: { family: 'Inter', size: 13 },
-                            bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: true,
-                            boxPadding: 4
-                        }
-                    }
-                }
-            };
+    </section>
 
-            new Chart(ctx, config);
+    <div class="plan-sync" aria-label="平面拼圖同步狀態">
+      <span class="sync-dot" aria-hidden="true"></span>
+      <strong>平面拼圖已同步</strong>
+      <span class="sync-separator" aria-hidden="true">｜</span>
+      <span>今天 14:32</span>
+      <span class="sync-separator" aria-hidden="true">｜</span>
+      <span>2 個工項已更新</span>
+      <button class="sync-link" type="button" id="viewPlanUpdates">查看更新</button>
+    </div>
+
+    <nav class="trade-tabs-wrap" aria-label="工種預算分頁">
+      <div class="trade-tabs" id="tradeTabs"></div>
+    </nav>
+
+    <section class="editor-layout">
+      <article class="sheet-panel" aria-label="預算編輯表">
+        <div class="sheet-toolbar">
+          <div>
+            <h2 id="sheetTitle">各工種預算總覽</h2>
+             <p id="sheetSubtitle">選擇工種後即可直接修改工項；數量或單價變更時，複價與總額會立即更新。</p>
+           </div>
+           <div class="sheet-actions">
+             <div class="budget-filters" aria-label="工項篩選">
+               <input class="budget-search" id="budgetSearch" type="search" placeholder="搜尋工項、品牌、型號、規格或工法" autocomplete="off">
+               <label class="review-filter"><input id="reviewOnly" type="checkbox">只看需要確認</label>
+             </div>
+             <div class="sheet-help">
+               <span class="help-chip">點一下格子即可修改</span>
+               <span class="help-chip">複價＝數量 × 單價</span>
+               <span class="small-pill">品項名稱採萊比統一名稱</span>
+             </div>
+           </div>
+        </div>
+        <div class="sheet-wrap">
+          <table id="budgetTable">
+            <thead>
+              <tr>
+                <th class="col-no">項次</th>
+                <th class="col-name">品項</th>
+                <th class="col-unit">單位</th>
+                <th class="col-qty number">數量</th>
+                <th class="col-price number">單價</th>
+                <th class="col-total money">複價</th>
+                <th class="col-spec">規格說明</th>
+                <th class="col-method">工法說明</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+
+      <aside class="detail-panel" aria-label="品項細節">
+        <div class="detail-head">
+          <div class="label" id="detailLabel">第 01 項｜目前選取品項</div>
+          <h2 id="detailTitle">浴室防水工程</h2>
+          <div class="detail-tools">
+            <button class="subtle-btn" type="button" id="resetRow">恢復本列建議值</button>
+          </div>
+        </div>
+        <div class="detail-body">
+          <section class="detail-block">
+            <h3>單價與規格依據</h3>
+            <p id="detailBasisType">目前依據：系統建議，待業主確認。</p>
+          </section>
+          <section class="detail-block">
+            <h3>系統原建議</h3>
+            <p id="detailOriginal">系統原建議：彈性水泥三層塗布，單價 $16,000。</p>
+          </section>
+          <section class="detail-block">
+            <h3>你可以調整</h3>
+            <div class="adjust-grid" id="detailAdjustments"></div>
+          </section>
+          <section class="detail-block">
+            <h3>目前採用</h3>
+            <p id="detailCurrent">目前採用：H:240公分，彈性水泥三層塗布，單價 $16,000。</p>
+          </section>
+          <section class="detail-block">
+            <h3>本列施工依據</h3>
+            <p id="detailBasis">防水大樣圖、排水口收邊示意、門檻止水處理。</p>
+          </section>
+          <section class="detail-block">
+            <h3>修改紀錄</h3>
+            <ul id="detailHistory">
+              <li>14:32 建立預算草稿 v1。</li>
+            </ul>
+          </section>
+        </div>
+      </aside>
+    </section>
+
+  </main>
+
+  <section class="print-report" id="printReport" aria-hidden="true"></section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">已更新預算草稿。</div>
+
+  <footer class="bottom-summary" aria-label="預算固定摘要">
+    <div class="bottom-inner">
+      <div class="bottom-stat">
+        <span>目前預算</span>
+        <strong id="bottomBudget">$2,180,000</strong>
+        <span id="bottomDelta">目標差額 +$180,000</span>
+      </div>
+      <div class="bottom-stat bottom-mid">
+        <span id="bottomPricedCount">可計價 12 / 12</span>
+        <span id="bottomSpecCount">規格完整 10 / 12</span>
+      </div>
+      <div class="bottom-actions">
+        <button class="btn primary" type="button" id="saveDraftBottom">儲存預算草稿</button>
+        <button class="btn" type="button" id="downloadPdf">下載預算草稿 PDF</button>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const targetBudget = 2000000;
+      const rows = [
+        {
+          item: "浴室防水工程",
+          trade: "泥作工程",
+          planUpdated: true,
+          unit: "坪",
+          qty: 7.5,
+          price: 16000,
+          spec: "H:240公分，彈性水泥三層塗布，詳見防水大樣圖。",
+          method: "牆地交接、排水口、門檻處依防水大樣施作。",
+          suggestion: "彈性水泥三層塗布可先作為標單條件，防水高度與轉角處理需寫清楚。",
+          basis: "防水大樣圖、排水口收邊示意、門檻止水處理。",
+          adjustments: [
+            ["防水高度", ["H:180公分", "H:210公分", "H:240公分"]],
+            ["塗布層數", ["二層塗布", "三層塗布", "四層塗布"]]
+          ]
+        },
+        {
+          item: "木作天花板工程",
+          trade: "木作工程",
+          unit: "坪",
+          qty: 28,
+          price: 7500,
+          spec: "9mm 矽酸鈣板，詳見天花骨架大樣圖。",
+          method: "短向骨架每 1 台尺固定一支角材，板材需檢附出廠證明。",
+          suggestion: "天花骨架間距、板材厚度與檢附文件要寫進同一列，避免回覆條件不一致。",
+          basis: "天花骨架大樣圖、板材出廠證明。",
+          adjustments: [
+            ["板材厚度", ["6mm 矽酸鈣板", "9mm 矽酸鈣板", "12mm 矽酸鈣板"]],
+            ["骨架間距", ["每 1 台尺", "每 1.2 台尺", "依現場條件確認"]]
+          ]
+        },
+        {
+          item: "固定收納櫃",
+          trade: "系統櫃工程",
+          needsReview: true,
+          reviewLabel: "固定收納櫃門片／色號",
+          unit: "台尺",
+          qty: 80,
+          price: 9800,
+          spec: "龍疆系統板，標準五金，門片與板材顏色待業主確認。",
+          method: "依櫃體結構大樣施作，含層板、封邊、現場固定。",
+          suggestion: "櫃體條件建議拆成板材、五金、門片與檯面，避免只用單一等級描述。",
+          basis: "櫃體結構大樣、門片與板材色卡。",
+          adjustments: [
+            ["板材", ["龍疆系統板", "EGGER 系統板"]],
+            ["五金", ["標準五金", "緩衝五金", "重型滑軌"]],
+            ["門片／色號", ["待業主確認", "平板門片／同板色", "造型門片／另選色號", "玻璃門片／另選框色"]],
+            ["檯面", ["不含檯面", "美耐板檯面", "人造石檯面"]]
+          ]
+        },
+        {
+          item: "木地板與磁磚交接收邊",
+          trade: "木作工程",
+          unit: "米",
+          qty: 18,
+          price: 1500,
+          spec: "木地板與磁磚交接處採平接處理，不施作不鏽鋼壓條。",
+          method: "依現場高度調整，縫隙以同色彈性填縫處理。",
+          suggestion: "交接方式會影響外觀與施工細節，建議把收邊材與縫隙處理寫清楚。",
+          basis: "地坪交接示意、現場高低差確認。",
+          adjustments: [
+            ["收邊方式", ["平接處理", "金屬收邊", "木作收邊"]],
+            ["填縫方式", ["同色彈性填縫", "透明彈性填縫", "不填縫"]]
+          ]
+        },
+        {
+          item: "淋浴龍頭安裝",
+          trade: "設備工程",
+          needsReview: true,
+          reviewLabel: "淋浴龍頭型號",
+          unit: "組",
+          qty: 2,
+          price: 16500,
+          spec: "含冷熱水出口與設備安裝，品牌型號待確認。",
+          method: "依浴室給排水位置施作，牆面修補另列於泥作項目。",
+          suggestion: "衛浴設備可先用偏好品牌與可接受單價估算，型號確認後再更新。",
+          basis: "衛浴設備清單、給排水位置圖。",
+          adjustments: [
+            ["品牌", ["待業主確認", "TOTO", "INAX", "Kohler"]],
+            ["型號", ["淋浴龍頭型號待確認", "依展示間確認", "由業主指定型號"]]
+          ]
+        },
+        {
+          item: "電視櫃弱電與插座",
+          trade: "水電工程",
+          planUpdated: true,
+          unit: "式",
+          qty: 1,
+          price: 28000,
+          spec: "含 3 組雙連插座、1 組網路出口、1 組電視出線口。",
+          method: "依電視櫃位置配置，實際高度與位置現場確認。",
+          suggestion: "插座與弱電數量要具體列出，讓電工與木作能依同一位置討論。",
+          basis: "電視牆立面圖、插座位置示意。",
+          adjustments: [
+            ["插座數量", ["2 組雙連插座", "3 組雙連插座", "4 組雙連插座"]],
+            ["網路出口", ["1 組", "2 組", "不配置"]]
+          ]
+        },
+        {
+          item: "空調系統",
+          trade: "設備工程",
+          unit: "組",
+          qty: 3,
+          price: 96000,
+          spec: "大金壁掛式分離式冷氣，室內外機位置待現場確認。",
+          method: "含基本安裝、銅管與排水配置，管線超出基本長度另列。",
+          suggestion: "設備品牌可以改，例如由大金改為日立；冷房能力與室內外機位置仍要保留。",
+          basis: "空調配置圖、室外機位置確認。",
+          adjustments: [
+            ["品牌", ["大金", "日立", "Panasonic"]],
+            ["安裝條件", ["基本安裝", "含管線包覆", "含排水改善"]]
+          ]
+        },
+        {
+          item: "馬桶設備安裝",
+          trade: "設備工程",
+          unit: "組",
+          qty: 2,
+          price: 39000,
+          spec: "TOTO CW887CRTW，含安裝與既有馬桶拆除。",
+          method: "依浴室尺寸與排水孔距確認，電源位置不足時另列插座工程。",
+          suggestion: "衛浴型號可改；若改型號，請同步確認尺寸、排水孔距與電源位置。",
+          basis: "衛浴設備表、浴室現況尺寸。",
+          adjustments: [
+            ["品牌", ["TOTO", "INAX", "Caesar"]],
+            ["型號", ["CW887CRTW", "CW822NJ", "待展示間確認"]]
+          ]
+        },
+        {
+          item: "廚房中島石英檯面",
+          trade: "廚具工程",
+          unit: "尺",
+          qty: 14,
+          price: 18500,
+          spec: "石英石檯面，厚度 2 公分，顏色待業主確認。",
+          method: "含丈量、加工、運送與現場安裝，水槽與爐具開孔另依設備尺寸確認。",
+          suggestion: "檯面材質、厚度與開孔條件要分開寫，避免只用總稱描述。",
+          basis: "廚具平面圖、設備尺寸表。",
+          adjustments: [
+            ["材質", ["石英石", "人造石", "陶板"]],
+            ["厚度", ["2 公分", "3 公分", "依展示樣確認"]]
+          ]
+        },
+        {
+          item: "油漆工程",
+          trade: "油漆工程",
+          unit: "坪",
+          qty: 56,
+          price: 2400,
+          spec: "水性乳膠漆二底二面，色號待業主確認。",
+          method: "含批土、打磨與面漆施作，特殊色與特殊漆另列。",
+          suggestion: "底漆、面漆與色號確認方式要寫清楚，避免只寫全室油漆。",
+          basis: "色號表、現場牆面範圍確認。",
+          adjustments: [
+            ["施作層數", ["一底二面", "二底二面", "依牆況確認"]],
+            ["漆種", ["水性乳膠漆", "耐擦洗乳膠漆", "特殊漆另列"]]
+          ]
+        },
+        {
+          item: "全室保護工程",
+          trade: "保護工程",
+          unit: "式",
+          qty: 1,
+          price: 58000,
+          spec: "含公共區域、電梯、既有地坪與門窗保護。",
+          method: "施工前完成保護，拆除與進料時需維持動線整潔。",
+          suggestion: "保護範圍要列明，避免公共區域與室內保護責任不清。",
+          basis: "施工動線圖、管委會規範。",
+          adjustments: [
+            ["公共區域", ["基本保護", "加強保護", "依管委會規範"]],
+            ["室內保護", ["既有地坪", "門窗與櫃體", "全室加強"]]
+          ]
+        },
+        {
+          item: "廚衛泥作修補",
+          trade: "泥作工程",
+          unit: "式",
+          qty: 1,
+          price: 160600,
+          spec: "含局部牆地面修補、找平與磁磚基底整理。",
+          method: "依拆除後現況施作，需與防水與磁磚工程銜接。",
+          suggestion: "泥作修補常受拆除後現況影響，建議保留範圍與銜接條件。",
+          basis: "拆除後現況照片、防水與磁磚施工範圍。",
+          adjustments: [
+            ["修補範圍", ["局部修補", "廚衛全區找平", "拆除後確認"]],
+            ["銜接工程", ["防水工程", "磁磚工程", "防水與磁磚工程"]]
+          ]
+        }
+      ];
+
+      const table = document.querySelector("#budgetTable tbody");
+      const currentBudget = document.querySelector("#currentBudget");
+      const budgetDelta = document.querySelector("#budgetDelta");
+      const budgetGuide = document.querySelector("#budgetGuide");
+      const bottomBudget = document.querySelector("#bottomBudget");
+      const bottomDelta = document.querySelector("#bottomDelta");
+      const pricedCount = document.querySelector("#pricedCount");
+      const specCount = document.querySelector("#specCount");
+      const bottomPricedCount = document.querySelector("#bottomPricedCount");
+      const bottomSpecCount = document.querySelector("#bottomSpecCount");
+      const savedAt = document.querySelector("#savedAt");
+      const toast = document.querySelector("#toast");
+      const tradeTabs = document.querySelector("#tradeTabs");
+      const budgetTable = document.querySelector("#budgetTable");
+      const sheetTitle = document.querySelector("#sheetTitle");
+      const sheetSubtitle = document.querySelector("#sheetSubtitle");
+      const pendingReview = document.querySelector(".pending-review");
+      const budgetSearch = document.querySelector("#budgetSearch");
+      const reviewOnly = document.querySelector("#reviewOnly");
+      const printReport = document.querySelector("#printReport");
+      const draftStorageKey = "laibePreviewBudgetDraftV1";
+      const tradeOrder = ["拆除工程", "保護工程", "水電工程", "泥作工程", "木作工程", "系統櫃工程", "廚具工程", "設備工程", "油漆工程", "清潔及其他"];
+      let activeTrade = "總覽";
+      let selectedIndex = 0;
+      let searchQuery = "";
+      let reviewOnlyActive = false;
+      let toastTimer;
+      let autoSaveTimer;
+
+      const labels = ["品項", "單位", "數量", "單價", "複價", "規格說明", "工法說明"];
+      const initialRows = rows.map(row => ({
+        ...row,
+        history: [...(row.history || [])],
+        adjustments: (row.adjustments || []).map(([label, choices]) => [label, [...choices]])
+      }));
+
+      function money(value) {
+        const amount = Math.round(Number(value) || 0);
+        return "$" + amount.toLocaleString("en-US");
+      }
+
+      function numberText(value) {
+        const num = Number(value);
+        if (!Number.isFinite(num)) return "";
+        return String(Number.isInteger(num) ? num : Number(num.toFixed(2)));
+      }
+
+      function parseNumber(value) {
+        return Number(String(value || "").replace(/[$,\s]/g, "")) || 0;
+      }
+
+      function rowTotal(row) {
+        return parseNumber(row.qty) * parseNumber(row.price);
+      }
+
+      function timeText() {
+        return new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", hour12: false });
+      }
+
+      function fieldLabel(field) {
+        return {
+          qty: "數量",
+          price: "單價",
+          spec: "規格",
+          method: "工法",
+          adjustment: "品項條件",
+          plan: "平面數量"
+        }[field] || field;
+      }
+
+      function recordChange(index, field, before, after, reason) {
+        if (String(before) === String(after)) return;
+        const row = rows[index];
+        if (!row) return;
+        row.history = row.history || [];
+        row.history.unshift({
+          time: timeText(),
+          field: fieldLabel(field),
+          before: String(before),
+          after: String(after),
+          reason: reason || "業主調整"
         });
-    </script>
+        row.history = row.history.slice(0, 8);
+      }
+
+      function persistDraft(announce) {
+        const time = timeText();
+        const payload = {
+          version: 1,
+          savedAt: time,
+          rows: rows.map(row => ({
+            item: row.item,
+            qty: row.qty,
+            price: row.price,
+            spec: row.spec,
+            method: row.method,
+            needsReview: !!row.needsReview,
+            history: row.history || []
+          }))
+        };
+        try {
+          localStorage.setItem(draftStorageKey, JSON.stringify(payload));
+          savedAt.textContent = "已於 " + time + " 儲存";
+          if (announce) showToast("預算草稿已儲存。");
+          return true;
+        } catch (error) {
+          if (announce) showToast("目前無法儲存草稿，請稍後再試。");
+          return false;
+        }
+      }
+
+      function scheduleAutoSave() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => persistDraft(false), 450);
+      }
+
+      function restoreDraft() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(draftStorageKey) || "null");
+          if (!saved || !Array.isArray(saved.rows)) return;
+          const byItem = new Map(saved.rows.map(row => [row.item, row]));
+          rows.forEach(row => {
+            const stored = byItem.get(row.item);
+            if (!stored) return;
+            ["qty", "price", "spec", "method"].forEach(field => {
+              if (stored[field] !== undefined) row[field] = stored[field];
+            });
+            row.needsReview = stored.needsReview === true;
+            row.history = Array.isArray(stored.history) ? stored.history.slice(0, 8) : [];
+          });
+          if (saved.savedAt) savedAt.textContent = "已於 " + saved.savedAt + " 儲存";
+        } catch (error) {
+          showToast("先前草稿無法讀取，已保留目前頁面內容。");
+        }
+      }
+
+      function rowMatchesFilters(row) {
+        if (reviewOnlyActive && !row.needsReview) return false;
+        if (!searchQuery) return true;
+        const adjustments = (row.adjustments || []).flatMap(([label, choices]) => [label, ...choices]);
+        const haystack = [row.item, row.trade, row.spec, row.method, row.suggestion, row.basis, ...adjustments]
+          .join(" ")
+          .toLocaleLowerCase("zh-TW");
+        return haystack.includes(searchQuery);
+      }
+
+      function visibleIndexedRows() {
+        return rows
+          .map((row, index) => ({ row, index }))
+          .filter(entry => rowMatchesFilters(entry.row));
+      }
+
+      function renderPendingReview() {
+        const pending = rows
+          .map((row, index) => ({ row, index }))
+          .filter(entry => entry.row.needsReview);
+        pendingReview.replaceChildren();
+        const title = document.createElement("strong");
+        title.textContent = pending.length ? `待確認 ${pending.length} 項：` : "待確認項目已整理完成";
+        pendingReview.appendChild(title);
+        pending.forEach((entry, position) => {
+          if (position > 0) {
+            const separator = document.createElement("span");
+            separator.setAttribute("aria-hidden", "true");
+            separator.textContent = "、";
+            pendingReview.appendChild(separator);
+          }
+          const button = document.createElement("button");
+          button.type = "button";
+          button.dataset.budgetRow = String(entry.index);
+          button.textContent = entry.row.reviewLabel || entry.row.item;
+          pendingReview.appendChild(button);
+        });
+      }
+
+      function clearFilters() {
+        searchQuery = "";
+        reviewOnlyActive = false;
+        budgetSearch.value = "";
+        reviewOnly.checked = false;
+      }
+
+      function rowHasManualChanges(row, index) {
+        const original = initialRows[index];
+        if (!original) return false;
+        return ["qty", "price", "spec", "method"].some(field => String(row[field]) !== String(original[field]));
+      }
+
+      function editableCellFromTarget(target) {
+        const editable = target.closest('[contenteditable="true"]');
+        if (!editable) return null;
+        return editable.matches("td") ? editable : editable.closest("td[data-field]");
+      }
+
+      function editableCellText(cell) {
+        const editor = cell.querySelector(".expandable-editor");
+        return (editor ? editor.innerText : cell.innerText).trim();
+      }
+
+      function syncExpandableCell(cell) {
+        const editor = cell.querySelector(".expandable-editor");
+        const toggle = cell.querySelector(".cell-expand-toggle");
+        if (!editor || !toggle) return;
+        const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 19;
+        const needsToggle = editor.scrollHeight > lineHeight * 2 + 1;
+        toggle.hidden = !needsToggle;
+        if (!needsToggle) {
+          cell.classList.remove("is-expanded");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.textContent = "⌄";
+        }
+      }
+
+      function syncAllExpandableCells() {
+        table.querySelectorAll("td.expandable-cell").forEach(syncExpandableCell);
+      }
+
+      function tradeStats(indexedSource) {
+        const source = indexedSource || rows.map((row, index) => ({ row, index }));
+        return tradeOrder.map(name => {
+          const indexedRows = source.filter(entry => entry.row.trade === name);
+          return {
+            name,
+            indexedRows,
+            count: indexedRows.length,
+            reviewCount: indexedRows.filter(entry => entry.row.needsReview).length,
+            subtotal: indexedRows.reduce((sum, entry) => sum + rowTotal(entry.row), 0)
+          };
+        }).filter(stat => stat.count > 0);
+      }
+
+      function renderTradeTabs() {
+        const stats = tradeStats();
+        const total = rows.reduce((sum, row) => sum + rowTotal(row), 0);
+        const entries = [{ name: "總覽", count: rows.length, subtotal: total }, ...stats];
+        tradeTabs.innerHTML = "";
+        entries.forEach(entry => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "trade-tab" + (entry.name === activeTrade ? " active" : "");
+          button.dataset.trade = entry.name;
+          button.setAttribute("aria-pressed", String(entry.name === activeTrade));
+          const title = document.createElement("strong");
+          title.textContent = entry.name;
+          const meta = document.createElement("span");
+          meta.textContent = `${entry.count} 項｜NT${money(entry.subtotal)}`;
+          button.append(title, meta);
+          tradeTabs.appendChild(button);
+        });
+      }
+
+      function setActiveTrade(trade, preferredIndex) {
+        activeTrade = trade;
+        if (activeTrade !== "總覽") {
+          const matching = rows
+            .map((row, index) => ({ row, index }))
+            .filter(entry => entry.row.trade === activeTrade);
+          const preferredIsVisible = matching.some(entry => entry.index === preferredIndex);
+          selectedIndex = preferredIsVisible ? preferredIndex : (matching[0] ? matching[0].index : selectedIndex);
+        }
+        renderTable();
+      }
+
+      function renderTable() {
+        table.innerHTML = "";
+        renderPendingReview();
+        const filteredRows = visibleIndexedRows();
+        if (activeTrade === "總覽") {
+          budgetTable.classList.add("is-overview");
+          sheetTitle.textContent = "各工種預算總覽";
+          sheetSubtitle.textContent = (searchQuery || reviewOnlyActive)
+            ? `目前顯示 ${filteredRows.length} 個符合條件的工項；選擇工種後可直接整理。`
+            : "先確認各工種小計與待確認數量；選擇工種後即可查看並編輯工項。";
+          const summaryStats = tradeStats(filteredRows);
+          if (!summaryStats.length) {
+            renderEmptyState();
+          }
+          summaryStats.forEach(stat => {
+            const tr = document.createElement("tr");
+            tr.className = "trade-summary-row";
+            tr.dataset.tradeSummary = stat.name;
+            const td = document.createElement("td");
+            td.colSpan = 8;
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "trade-summary-button";
+            button.dataset.tradeSummary = stat.name;
+            const name = document.createElement("strong");
+            name.textContent = stat.name;
+            const count = document.createElement("span");
+            count.textContent = `${stat.count} 項`;
+            const review = document.createElement("span");
+            review.className = "trade-review";
+            review.textContent = `待確認 ${stat.reviewCount} 項`;
+            const subtotal = document.createElement("span");
+            subtotal.className = "trade-subtotal";
+            subtotal.textContent = `NT${money(stat.subtotal)}`;
+            button.append(name, count, review, subtotal);
+            td.appendChild(button);
+            tr.appendChild(td);
+            table.appendChild(tr);
+          });
+          updateSummary();
+          renderTradeTabs();
+          renderDetail();
+          return;
+        }
+
+        budgetTable.classList.remove("is-overview");
+        sheetTitle.textContent = activeTrade;
+        const visibleRows = filteredRows
+          .filter(entry => entry.row.trade === activeTrade);
+        const activeSubtotal = visibleRows.reduce((sum, entry) => sum + rowTotal(entry.row), 0);
+        sheetSubtitle.textContent = `${visibleRows.length} 項｜NT${money(activeSubtotal)}。點一下格子即可修改，複價與總額會立即更新。`;
+
+        if (!visibleRows.length) {
+          renderEmptyState();
+        }
+        visibleRows.forEach(({ row, index }) => {
+          const tr = document.createElement("tr");
+          tr.dataset.index = String(index);
+          if (index === selectedIndex) tr.className = "active-row";
+          if (row.needsReview) tr.classList.add("needs-review");
+
+          const no = document.createElement("td");
+          no.className = "col-no";
+          no.dataset.label = "項次";
+          no.textContent = String(index + 1).padStart(2, "0");
+          tr.appendChild(no);
+
+          const cells = [
+            ["item", row.item, "col-name"],
+            ["unit", row.unit, "col-unit"],
+            ["qty", numberText(row.qty), "col-qty number"],
+            ["price", money(row.price), "col-price number"],
+            ["total", money(rowTotal(row)), "col-total money"],
+            ["spec", row.spec, "col-spec"],
+            ["method", row.method, "col-method"]
+          ];
+
+          cells.forEach(([field, value, className], cellIndex) => {
+            const td = document.createElement("td");
+            td.className = className;
+            td.dataset.field = field;
+            td.dataset.label = labels[cellIndex];
+            if (field === "spec" || field === "method") {
+              td.classList.add("expandable-cell");
+              const editor = document.createElement("div");
+              editor.className = "expandable-editor";
+              editor.contentEditable = "true";
+              editor.spellcheck = false;
+              editor.title = "可直接修改";
+              editor.textContent = value;
+
+              const toggle = document.createElement("button");
+              toggle.type = "button";
+              toggle.className = "cell-expand-toggle";
+              toggle.hidden = true;
+              toggle.textContent = "⌄";
+              toggle.setAttribute("aria-expanded", "false");
+              toggle.setAttribute("aria-label", `${labels[cellIndex]}展開或收起`);
+              td.append(editor, toggle);
+            } else {
+              td.textContent = value;
+            }
+            if (["qty", "price"].includes(field)) {
+              td.contentEditable = "true";
+              td.spellcheck = false;
+              td.title = "可直接修改";
+            } else if (field === "item") {
+              td.title = "品項名稱採萊比統一標單名稱";
+            } else if (field === "unit") {
+              td.title = "單位依萊比統一標單設定";
+            }
+            tr.appendChild(td);
+          });
+
+          table.appendChild(tr);
+        });
+        if (visibleRows.length) {
+          const totalRow = document.createElement("tr");
+          totalRow.className = "trade-total-row";
+          const label = document.createElement("td");
+          label.colSpan = 5;
+          label.textContent = `${activeTrade}小計`;
+          const value = document.createElement("td");
+          value.colSpan = 3;
+          value.className = "trade-total-value";
+          value.textContent = `NT${money(activeSubtotal)}`;
+          totalRow.append(label, value);
+          table.appendChild(totalRow);
+        }
+        updateSummary();
+        renderTradeTabs();
+        renderDetail();
+        requestAnimationFrame(syncAllExpandableCells);
+      }
+
+      function renderEmptyState() {
+        const tr = document.createElement("tr");
+        tr.className = "empty-filter-row";
+        const td = document.createElement("td");
+        td.colSpan = 8;
+        td.textContent = "沒有找到符合的工項，請更換關鍵字或查看其他工種。";
+        tr.appendChild(td);
+        table.appendChild(tr);
+      }
+
+      function syncRowFromCell(cell) {
+        const row = rows[Number(cell.closest("tr").dataset.index)];
+        const field = cell.dataset.field;
+        if (!row || !field || field === "total") return;
+        if (field === "qty" || field === "price") {
+          row[field] = parseNumber(editableCellText(cell));
+        } else {
+          row[field] = editableCellText(cell);
+        }
+        cell.classList.add("edited");
+        const totalCell = cell.closest("tr").querySelector('[data-field="total"]');
+        totalCell.textContent = money(rowTotal(row));
+        updateSummary();
+        renderTradeTabs();
+        if (activeTrade !== "總覽") {
+          const subtotal = rows.filter(entry => entry.trade === activeTrade).reduce((sum, entry) => sum + rowTotal(entry), 0);
+          const subtotalCell = table.querySelector(".trade-total-value");
+          if (subtotalCell) subtotalCell.textContent = `NT${money(subtotal)}`;
+          sheetSubtitle.textContent = `${rows.filter(entry => entry.trade === activeTrade).length} 項｜NT${money(subtotal)}。點一下格子即可修改，複價與總額會立即更新。`;
+        }
+        renderDetail();
+        scheduleAutoSave();
+        requestAnimationFrame(() => syncExpandableCell(cell));
+      }
+
+      function updateSummary() {
+        const total = rows.reduce((sum, row) => sum + rowTotal(row), 0);
+        const delta = total - targetBudget;
+        const priced = rows.filter(row => parseNumber(row.qty) > 0 && parseNumber(row.price) > 0).length;
+        const complete = rows.filter(row => row.spec.trim() && row.method.trim() && !row.needsReview).length;
+        const deltaText = (delta >= 0 ? "+" : "-") + money(Math.abs(delta));
+        currentBudget.textContent = money(total);
+        bottomBudget.textContent = money(total);
+        budgetDelta.textContent = deltaText;
+        pricedCount.textContent = `${priced} / ${rows.length}`;
+        specCount.textContent = `${complete} / ${rows.length}`;
+        bottomPricedCount.textContent = `可計價 ${priced} / ${rows.length}`;
+        bottomSpecCount.textContent = `規格完整 ${complete} / ${rows.length}`;
+        const percent = targetBudget > 0 ? Math.round(Math.abs(delta) / targetBudget * 100) : 0;
+        const direction = delta >= 0 ? "超出" : "低於";
+        bottomDelta.textContent = "目標差額 " + deltaText;
+        budgetGuide.textContent = delta >= 0
+          ? `目前${direction}目標 ${percent}%。建議先看固定收納櫃、空調系統、廚衛泥作修補，這三類通常最有調整空間。`
+          : `目前${direction}目標 ${percent}%。可以先確認規格文字，再決定是否把預算保留為安全緩衝。`;
+      }
+
+      function renderDetail() {
+        const resetButton = document.querySelector("#resetRow");
+        if (activeTrade === "總覽") {
+          document.querySelector("#detailLabel").textContent = "工項調整面板";
+          document.querySelector("#detailTitle").textContent = "請先選擇工種";
+          document.querySelector("#detailBasisType").textContent = "從上方工種分頁或工種小計選擇要整理的內容。";
+          document.querySelector("#detailOriginal").textContent = "選取工項後，這裡會顯示系統原建議與目前採用內容。";
+          document.querySelector("#detailCurrent").textContent = "目前尚未選取工項。";
+          document.querySelector("#detailBasis").textContent = "施工依據會依選取工項顯示。";
+          document.querySelector("#detailAdjustments").innerHTML = "";
+          document.querySelector("#detailHistory").innerHTML = "<li>選擇工種後即可查看該工項的修改紀錄。</li>";
+          resetButton.disabled = true;
+          return;
+        }
+
+        resetButton.disabled = false;
+        const row = rows[selectedIndex] || rows[0];
+        const original = initialRows[selectedIndex] || initialRows[0];
+        const changed = rowHasManualChanges(row, selectedIndex);
+        document.querySelector("#detailLabel").textContent = "第 " + String(selectedIndex + 1).padStart(2, "0") + " 項｜目前選取品項";
+        document.querySelector("#detailTitle").textContent = row.item;
+        document.querySelector("#detailBasisType").textContent = row.needsReview
+          ? "目前依據：平面項目已更新，需要重新確認。"
+          : changed
+            ? "目前依據：業主手動調整。"
+            : "目前依據：系統建議，待業主確認。";
+        document.querySelector("#detailOriginal").textContent = `系統原建議：${original.spec} 單價 ${money(original.price)}。${original.suggestion}`;
+        document.querySelector("#detailCurrent").textContent = changed
+          ? `目前採用：業主自訂內容。${row.spec} 單價 ${money(row.price)}。`
+          : `目前採用：${row.spec} 單價 ${money(row.price)}。`;
+        document.querySelector("#detailBasis").textContent = row.basis || "目前以文字規格為準，後續可補施工示意。";
+        const history = document.querySelector("#detailHistory");
+        history.innerHTML = "";
+        const historyLines = (row.history || []).map(entry =>
+          `${entry.time} ${entry.field}：${entry.before} → ${entry.after}（${entry.reason}）`
+        );
+        if (!historyLines.length) historyLines.push("14:32 建立預算草稿 v1。");
+        historyLines.push(
+          row.spec.includes("詳見") ? "此列含大樣圖文字，請確認文字與圖面沒有互相矛盾。" : "此列目前以文字規格作為主要依據。"
+        );
+        historyLines.forEach(text => {
+          const li = document.createElement("li");
+          li.textContent = text;
+          history.appendChild(li);
+        });
+
+        const adjustments = document.querySelector("#detailAdjustments");
+        adjustments.innerHTML = "";
+        (row.adjustments || []).forEach(([label, choices]) => {
+          const wrap = document.createElement("label");
+          wrap.className = "field-label";
+          wrap.textContent = label;
+          const select = document.createElement("select");
+          choices.forEach(choice => {
+            const option = document.createElement("option");
+            option.textContent = choice;
+            option.value = choice;
+            if ((row.spec + row.method).includes(choice)) option.selected = true;
+            select.appendChild(option);
+          });
+          select.addEventListener("change", () => {
+            const before = row.spec;
+            const next = appendChoice(row.spec, label, select.value);
+            const approved = window.confirm(`要將「${select.value}」套用到「${row.item}」嗎？目前單價 ${money(row.price)} 不會自動變更。`);
+            if (!approved) {
+              renderDetail();
+              return;
+            }
+            row.spec = next;
+            recordChange(selectedIndex, "adjustment", before, next, "業主確認品項條件");
+            if ((label.includes("型號") || label.includes("門片") || label.includes("色號")) && !select.value.includes("待")) {
+              row.needsReview = false;
+            }
+            renderTable();
+            scheduleAutoSave();
+            showToast("已套用品項條件；目前單價維持不變。");
+          });
+          wrap.appendChild(select);
+          adjustments.appendChild(wrap);
+        });
+      }
+
+      function appendChoice(text, label, value) {
+        const phrase = label + "：" + value;
+        const prefix = String(text || "").replace(new RegExp(label + "：[^，。]*[，。]?", "g"), "").trim();
+        return (prefix ? prefix.replace(/[。]*$/, "，") : "") + phrase + "。";
+      }
+
+      function selectRow(rowElement) {
+        const index = Number(rowElement.dataset.index);
+        if (!Number.isInteger(index)) return;
+        selectedIndex = index;
+        document.querySelectorAll("#budgetTable tbody tr").forEach(row => row.classList.remove("active-row"));
+        rowElement.classList.add("active-row");
+        renderDetail();
+      }
+
+      function focusBudgetRow(index) {
+        const targetRow = rows[index];
+        if (!targetRow) return;
+        clearFilters();
+        activeTrade = targetRow.trade;
+        selectedIndex = index;
+        renderTable();
+        const rowElement = table.querySelector(`tr[data-index="${index}"]`);
+        if (!rowElement) return;
+        selectRow(rowElement);
+        const sheetWrap = document.querySelector(".sheet-wrap");
+        sheetWrap.scrollTop = Math.max(0, rowElement.offsetTop - 44);
+        const editorTop = document.querySelector(".editor-layout").getBoundingClientRect().top + window.scrollY - 12;
+        window.scrollTo({ top: Math.max(0, editorTop), behavior: "smooth" });
+        showToast(`已定位到「${rows[index].item}」。`);
+      }
+
+      function resetSelectedRow() {
+        const original = initialRows[selectedIndex];
+        if (!original) return;
+        const current = rows[selectedIndex];
+        const previousSummary = `${current.qty} × ${money(current.price)}；${current.spec}；${current.method}`;
+        const priorHistory = [...(current.history || [])];
+        rows[selectedIndex] = {
+          ...original,
+          history: priorHistory,
+          adjustments: (original.adjustments || []).map(([label, choices]) => [label, [...choices]])
+        };
+        recordChange(
+          selectedIndex,
+          "adjustment",
+          previousSummary,
+          `${original.qty} × ${money(original.price)}；${original.spec}；${original.method}`,
+          "恢復系統建議"
+        );
+        renderTable();
+        scheduleAutoSave();
+        showToast("已恢復本列建議值。");
+      }
+
+      function normalizeEditedCell(cell) {
+        const field = cell.dataset.field;
+        const row = rows[Number(cell.closest("tr").dataset.index)];
+        if (!row) return;
+        if (field === "qty") cell.textContent = numberText(row.qty);
+        if (field === "price") cell.textContent = money(row.price);
+      }
+
+      function saveDraft() {
+        persistDraft(true);
+      }
+
+      function appendPrintText(parent, tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        element.textContent = text;
+        parent.appendChild(element);
+        return element;
+      }
+
+      function buildPrintReport() {
+        printReport.replaceChildren();
+        appendPrintText(printReport, "h1", "", "莊子誼住宅裝修｜預算草稿 v1");
+        appendPrintText(
+          printReport,
+          "p",
+          "print-meta",
+          `整理日期：${new Date().toLocaleDateString("zh-TW")}｜目前預算：${money(rows.reduce((sum, row) => sum + rowTotal(row), 0))}｜待確認：${rows.filter(row => row.needsReview).length} 項`
+        );
+        appendPrintText(
+          printReport,
+          "p",
+          "print-note",
+          "此份內容供招標前預算整理與規格確認使用，實際金額仍依後續統一標單填寫結果為準。"
+        );
+
+        tradeStats().forEach(stat => {
+          appendPrintText(printReport, "h2", "", `${stat.name}｜${stat.count} 項`);
+          const reportTable = document.createElement("table");
+          const head = document.createElement("thead");
+          const headRow = document.createElement("tr");
+          ["項次", "品項", "單位", "數量", "單價", "複價", "規格說明", "工法說明"].forEach(label => {
+            appendPrintText(headRow, "th", "", label);
+          });
+          head.appendChild(headRow);
+          reportTable.appendChild(head);
+          const body = document.createElement("tbody");
+          stat.indexedRows.forEach(({ row, index }) => {
+            const tr = document.createElement("tr");
+            [
+              String(index + 1).padStart(2, "0"),
+              row.item + (row.needsReview ? "（待確認）" : ""),
+              row.unit,
+              numberText(row.qty),
+              money(row.price),
+              money(rowTotal(row)),
+              row.spec,
+              row.method
+            ].forEach(value => appendPrintText(tr, "td", "", value));
+            body.appendChild(tr);
+          });
+          reportTable.appendChild(body);
+          printReport.appendChild(reportTable);
+          appendPrintText(printReport, "p", "print-subtotal", `${stat.name}小計：${money(stat.subtotal)}`);
+        });
+        appendPrintText(
+          printReport,
+          "p",
+          "print-total",
+          `目前預算總額：${money(rows.reduce((sum, row) => sum + rowTotal(row), 0))}`
+        );
+        printReport.setAttribute("aria-hidden", "false");
+      }
+
+      function downloadDraftPdf() {
+        persistDraft(false);
+        buildPrintReport();
+        showToast("正在開啟預算草稿 PDF 儲存畫面。");
+        setTimeout(() => window.print(), 80);
+      }
+
+      function applyPlanUpdates(updates) {
+        const touched = [];
+        updates.forEach(update => {
+          const index = Number(update.index);
+          const row = rows[index];
+          if (!row || !Number.isFinite(Number(update.qty))) return;
+          const manualDecision = ["price", "spec", "method"].some(field => String(row[field]) !== String(initialRows[index][field]));
+          const previousQty = row.qty;
+          row.qty = Number(update.qty);
+          row.planUpdated = true;
+          row.needsReview = manualDecision;
+          recordChange(index, "plan", previousQty, row.qty, update.reason || "平面拼圖調整");
+          touched.push(index);
+        });
+        if (!touched.length) return;
+        scheduleAutoSave();
+        focusBudgetRow(touched[0]);
+        showToast(`${touched.length} 個平面項目已更新；原有品牌、規格、工法與單價均已保留。`);
+      }
+
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+
+      table.addEventListener("click", event => {
+        const tradeSummary = event.target.closest("[data-trade-summary]");
+        if (tradeSummary) {
+          setActiveTrade(tradeSummary.dataset.tradeSummary);
+          return;
+        }
+        const toggle = event.target.closest(".cell-expand-toggle");
+        if (toggle) {
+          event.preventDefault();
+          event.stopPropagation();
+          const cell = toggle.closest("td.expandable-cell");
+          const expanded = cell.classList.toggle("is-expanded");
+          toggle.setAttribute("aria-expanded", String(expanded));
+          toggle.textContent = expanded ? "⌃" : "⌄";
+          return;
+        }
+        const row = event.target.closest("tr");
+        if (row) selectRow(row);
+      });
+
+      table.addEventListener("focusin", event => {
+        const cell = editableCellFromTarget(event.target);
+        if (!cell || cell.dataset.beforeValue !== undefined) return;
+        const row = rows[Number(cell.closest("tr").dataset.index)];
+        if (!row) return;
+        cell.dataset.beforeValue = String(row[cell.dataset.field]);
+      });
+
+      table.addEventListener("input", event => {
+        const cell = editableCellFromTarget(event.target);
+        if (cell) syncRowFromCell(cell);
+      });
+
+      table.addEventListener("blur", event => {
+        const cell = editableCellFromTarget(event.target);
+        if (!cell) return;
+        const index = Number(cell.closest("tr").dataset.index);
+        const row = rows[index];
+        const field = cell.dataset.field;
+        const before = cell.dataset.beforeValue;
+        const after = row && row[field];
+        if (
+          row &&
+          (field === "spec" || field === "method") &&
+          String(before).includes("詳見") &&
+          !String(after).includes("詳見")
+        ) {
+          const approved = window.confirm("移除此施工依據後，標單將只保留目前填寫的文字內容。確定要移除嗎？");
+          if (!approved) {
+            row[field] = before;
+            renderTable();
+            showToast("已保留原本的施工依據。");
+            return;
+          }
+        }
+        if (row && before !== undefined) {
+          recordChange(index, field, before, after, "業主手動調整");
+          delete cell.dataset.beforeValue;
+        }
+        normalizeEditedCell(cell);
+        scheduleAutoSave();
+      }, true);
+
+      window.addEventListener("resize", () => requestAnimationFrame(syncAllExpandableCells));
+      window.addEventListener("afterprint", () => printReport.setAttribute("aria-hidden", "true"));
+
+      window.addEventListener("laibe:plan-budget-sync", event => {
+        const updates = event.detail && Array.isArray(event.detail.updates) ? event.detail.updates : [];
+        applyPlanUpdates(updates);
+      });
+
+      tradeTabs.addEventListener("click", event => {
+        const button = event.target.closest("button[data-trade]");
+        if (button) setActiveTrade(button.dataset.trade);
+      });
+
+      pendingReview.addEventListener("click", event => {
+        const button = event.target.closest("button[data-budget-row]");
+        if (button) focusBudgetRow(Number(button.dataset.budgetRow));
+      });
+
+      budgetSearch.addEventListener("input", () => {
+        searchQuery = budgetSearch.value.trim().toLocaleLowerCase("zh-TW");
+        renderTable();
+      });
+
+      reviewOnly.addEventListener("change", () => {
+        reviewOnlyActive = reviewOnly.checked;
+        renderTable();
+      });
+
+      document.querySelector("#saveDraftBottom").addEventListener("click", saveDraft);
+      document.querySelector("#downloadPdf").addEventListener("click", downloadDraftPdf);
+      document.querySelector("#resetRow").addEventListener("click", resetSelectedRow);
+      document.querySelector("#viewPlanUpdates").addEventListener("click", () => {
+        const updated = rows.map((row, index) => row.planUpdated ? index : -1).filter(index => index >= 0);
+        if (!updated.length) {
+          showToast("目前沒有需要查看的平面項目更新。");
+          return;
+        }
+        focusBudgetRow(updated[0]);
+        showToast(`已定位第一個更新工項；本次共有 ${updated.length} 項。`);
+      });
+
+      restoreDraft();
+      renderPendingReview();
+      renderTable();
+    })();
+  </script>
+  <script src="../shared/laibe-header.js"></script>
 </body>
-
 </html>
-
