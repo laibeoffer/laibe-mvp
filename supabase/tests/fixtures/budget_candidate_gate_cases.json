@@ -1,0 +1,72 @@
+[
+  {
+    "name": "user new object with confirmed scope, decision, and evidence",
+    "source_object_origin": "user_created",
+    "object_status": "new",
+    "scope_confirmed": true,
+    "human_decision_id": "present",
+    "evidence_link_id": "present",
+    "direct_pricing_allowed": false,
+    "expected": "allow"
+  },
+  {
+    "name": "imported source flag cannot create candidate",
+    "source_object_origin": "imported_source",
+    "object_status": "new",
+    "scope_confirmed": true,
+    "human_decision_id": "present",
+    "evidence_link_id": "present",
+    "direct_pricing_allowed": false,
+    "expected": "deny"
+  },
+  {
+    "name": "existing object cannot create candidate",
+    "source_object_origin": "user_created",
+    "object_status": "existing",
+    "scope_confirmed": true,
+    "human_decision_id": "present",
+    "evidence_link_id": "present",
+    "direct_pricing_allowed": false,
+    "expected": "deny"
+  },
+  {
+    "name": "scope must be confirmed",
+    "source_object_origin": "user_created",
+    "object_status": "new",
+    "scope_confirmed": false,
+    "human_decision_id": "present",
+    "evidence_link_id": "present",
+    "direct_pricing_allowed": false,
+    "expected": "deny"
+  },
+  {
+    "name": "human decision is required",
+    "source_object_origin": "user_created",
+    "object_status": "new",
+    "scope_confirmed": true,
+    "human_decision_id": "missing",
+    "evidence_link_id": "present",
+    "direct_pricing_allowed": false,
+    "expected": "deny"
+  },
+  {
+    "name": "evidence is required",
+    "source_object_origin": "user_created",
+    "object_status": "new",
+    "scope_confirmed": true,
+    "human_decision_id": "present",
+    "evidence_link_id": "missing",
+    "direct_pricing_allowed": false,
+    "expected": "deny"
+  },
+  {
+    "name": "imported price cannot become selected price",
+    "source_object_origin": "user_created",
+    "object_status": "new",
+    "scope_confirmed": true,
+    "human_decision_id": "present",
+    "evidence_link_id": "present",
+    "direct_pricing_allowed": true,
+    "expected": "deny"
+  }
+]

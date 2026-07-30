@@ -1,0 +1,263 @@
+{
+    "schema_version":  "1.0",
+    "source_root":  "Z:/08-Jacky/laibe_MVP_project",
+    "origin_main_sha":  "e31287e10d78537cd7a0cb901a7e3e1cb5a2f6a5",
+    "branch":  "a5/knowledge-foundation-core-readiness-20260727",
+    "snapshot_commit_sha":  "d0ce795",
+    "snapshot_commit_full_sha":  "d0ce795d8fab316c24c5b4533cc67603dd865292",
+    "whitelist_file_count":  50,
+    "total_bytes":  570943,
+    "verification":  "byte-exact SHA256 match before checkpoint commit",
+    "files":  [
+                  {
+                      "path":  "docs/governance/A5_KNOWLEDGE_FOUNDATION_BRANCH_VERIFICATION_20260727.md",
+                      "bytes":  16751,
+                      "sha256":  "bf82e49b0c5b2ffc6ba085c0607362ad591cb694a693d997a6e4a3216f2bd7f1"
+                  },
+                  {
+                      "path":  "docs/superpowers/plans/2026-07-26-a5-pcm-knowledge-foundation-studio-gateway.md",
+                      "bytes":  7445,
+                      "sha256":  "4a4706d4fc74bb3a0f3003a08cd097e959ec555ada159f9018c0f058c83aa7c7"
+                  },
+                  {
+                      "path":  "scripts/knowledge/.gitignore",
+                      "bytes":  23,
+                      "sha256":  "6feaded4e28ea86e001a6751b4e3d960e8b7c31b9616ff9936b79297086e809b"
+                  },
+                  {
+                      "path":  "scripts/knowledge/ingest_knowledge.py",
+                      "bytes":  51631,
+                      "sha256":  "0c867aa8a29b33062cd64f4e8db42dea53ef0572c1cd1a41d64069a02298a56a"
+                  },
+                  {
+                      "path":  "scripts/knowledge/ingest_woodwork_mapping.py",
+                      "bytes":  30643,
+                      "sha256":  "307401920a7d80391ba2ac043cb5f1519eda80150c5184b23fe6292601c49455"
+                  },
+                  {
+                      "path":  "scripts/knowledge/knowledge-policy.mjs",
+                      "bytes":  4172,
+                      "sha256":  "276df60434986d43091b1906881cfd43eb5527e733361b965b03de59fa91672f"
+                  },
+                  {
+                      "path":  "scripts/knowledge/split_supabase_migration.mjs",
+                      "bytes":  6360,
+                      "sha256":  "ac55d061ab8868c28c1589f57c7d284a2daaab8c2d8b5a682b5034679e240c5c"
+                  },
+                  {
+                      "path":  "scripts/knowledge/tests/test_ingest_knowledge.py",
+                      "bytes":  26402,
+                      "sha256":  "180d0e49b1119f5b4c92c778a199e1d78997275d6a126c56dc00af285e2d21f4"
+                  },
+                  {
+                      "path":  "scripts/knowledge/tests/test_ingest_woodwork_mapping.py",
+                      "bytes":  17039,
+                      "sha256":  "4d0cbdb33d54964c83306e76e3b550aaac2786c4fe30c355d80a8b6d116c2bce"
+                  },
+                  {
+                      "path":  "scripts/knowledge/tests/test_split_supabase_migration.mjs",
+                      "bytes":  3118,
+                      "sha256":  "2d4cfd73588532c4a0d14fec4188ecf394e72b54e82b7036cc37779ec4e0d68e"
+                  },
+                  {
+                      "path":  "site/knowledge_studio/app.js",
+                      "bytes":  35970,
+                      "sha256":  "aae7afd6636eb76b034730248aaa62d03d37ddac2949b8f63a7e0085239f8e36"
+                  },
+                  {
+                      "path":  "site/knowledge_studio/code.html",
+                      "bytes":  10026,
+                      "sha256":  "0c1d50419d5acb312b2b3b9b2a6041a831b066431000246e79c78e2c23c75eab"
+                  },
+                  {
+                      "path":  "site/knowledge_studio/styles.css",
+                      "bytes":  14944,
+                      "sha256":  "a3eaf0f9a637ff08d943938115e5c75430b54850c4f2f1e2edf60645f50fdbf1"
+                  },
+                  {
+                      "path":  "site/knowledge_studio/tests/knowledge_studio.test.mjs",
+                      "bytes":  8401,
+                      "sha256":  "dca0537d5a60a50c18f07fc8cc0f4998f56520d2d87a0737ff3de85d205d91a5"
+                  },
+                  {
+                      "path":  "supabase/config.toml",
+                      "bytes":  515,
+                      "sha256":  "d88b9cc207e40b9265f402682e00345ce5be14bb6087dfb0ab7336913141317b"
+                  },
+                  {
+                      "path":  "supabase/contracts/knowledge_staging.v1.schema.json",
+                      "bytes":  13901,
+                      "sha256":  "ba25a729eb83a871a48e25aafa94b71596dc98cb3076bc13d5f09d80cdaec4bd"
+                  },
+                  {
+                      "path":  "supabase/contracts/knowledge_studio.v1.schema.json",
+                      "bytes":  6114,
+                      "sha256":  "7256951fece299f272887e8ffd41789cd3ea88b49834adaf14a5493be1d1f0c3"
+                  },
+                  {
+                      "path":  "supabase/functions/knowledge-gateway/deno.json",
+                      "bytes":  58,
+                      "sha256":  "e1340cc44b6eaa94474e14e897caa273811a1a1cf71262a6699f03f4598b0e21"
+                  },
+                  {
+                      "path":  "supabase/functions/knowledge-gateway/index.ts",
+                      "bytes":  6585,
+                      "sha256":  "be337e7f4f05d02d4d49e3e80f3822ae122cb782927f0e59d90dd28cb674b47d"
+                  },
+                  {
+                      "path":  "supabase/functions/knowledge-ingest/deno.json",
+                      "bytes":  58,
+                      "sha256":  "e1340cc44b6eaa94474e14e897caa273811a1a1cf71262a6699f03f4598b0e21"
+                  },
+                  {
+                      "path":  "supabase/functions/knowledge-ingest/index.ts",
+                      "bytes":  8909,
+                      "sha256":  "b9bdf90995bd03fedbc5536a4ccc0eeb9c72827bebd2ade625c245645b0bb6a8"
+                  },
+                  {
+                      "path":  "supabase/functions/knowledge-studio/deno.json",
+                      "bytes":  58,
+                      "sha256":  "e1340cc44b6eaa94474e14e897caa273811a1a1cf71262a6699f03f4598b0e21"
+                  },
+                  {
+                      "path":  "supabase/functions/knowledge-studio/index.ts",
+                      "bytes":  7963,
+                      "sha256":  "8415d6c8eb3ea06f7a0357621a1128c30a7f0e9bda57b6fe7ae75331a331fd58"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260726000100_pcm_knowledge_foundation.sql",
+                      "bytes":  109540,
+                      "sha256":  "62b0c01a28480c31d663663e9c7cb99dd0d57957dd901f9c02b62fdeab58b7f2"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260727070737_pcm_knowledge_domain_rls_hardening.sql",
+                      "bytes":  6629,
+                      "sha256":  "3eb5b6cde410daf947eb876cbad65bad398bbf2c73bd06809227b95726e3b3f6"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260727072627_pcm_knowledge_active_session_hardening.sql",
+                      "bytes":  3975,
+                      "sha256":  "b5c0e65780367f7528a92b98c084351e9ebcb87c6407951718091ec7a5cb7463"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260727094259_knowledge_case_event_next_action.sql",
+                      "bytes":  8415,
+                      "sha256":  "abcad932045bb44063bd1299dc3685468de5a3259caf5b0ec7bc497bfe7bdfca"
+                  },
+                  {
+                      "path":  "supabase/migrations/20260727161457_pcm_woodwork_candidates_staging.sql",
+                      "bytes":  28637,
+                      "sha256":  "3223abd6e97b47e55307f8864b6b896068db833d197c1fb6f186aa04a4a1c2b7"
+                  },
+                  {
+                      "path":  "supabase/README.md",
+                      "bytes":  6505,
+                      "sha256":  "67c14618e2b688c02cfb179fc0e735c7ceb6f43730419e3d4317122ded648abf"
+                  },
+                  {
+                      "path":  "supabase/seed.sql",
+                      "bytes":  2444,
+                      "sha256":  "80fc45e33f34c260d407ed751ec62b28b57024501dc21cd3fe1a1b21f6c84a0e"
+                  },
+                  {
+                      "path":  "supabase/tests/deployment_contract.sql",
+                      "bytes":  12107,
+                      "sha256":  "a0f52a3bbe42bdaad16edd2453baf6071c087d9f8e645769c335802ef85ff8cf"
+                  },
+                  {
+                      "path":  "supabase/tests/fixtures/budget_candidate_gate_cases.json",
+                      "bytes":  2066,
+                      "sha256":  "22ddd070d927d311035532a4c5cab98af8aed12ce136f1fdf8c405c186244376"
+                  },
+                  {
+                      "path":  "supabase/tests/fixtures/source_status_map.json",
+                      "bytes":  143,
+                      "sha256":  "5d142f6bfc6b5964863f992bcc9a2ef8a7d0f77974be0a2433bcff99841ddf02"
+                  },
+                  {
+                      "path":  "supabase/tests/foundation_contract.test.mjs",
+                      "bytes":  20607,
+                      "sha256":  "2aed454a4be3ae2672160752fef4828e3c9565a72cdfabd29942157d71d43265"
+                  },
+                  {
+                      "path":  "supabase/tests/remote_active_session_contract.sql",
+                      "bytes":  1206,
+                      "sha256":  "8d69e2763d83ec01a76d856be5edf5a5b8d950173f3aa6a311dc25181b402953"
+                  },
+                  {
+                      "path":  "supabase/tests/remote_casework_rls_contract.sql",
+                      "bytes":  8502,
+                      "sha256":  "7bc895aa3913d15d53bd677708a08638a6ace6cd4c12292a34b99f0c26d201c4"
+                  },
+                  {
+                      "path":  "supabase/tests/remote_domain_rls_contract.sql",
+                      "bytes":  8364,
+                      "sha256":  "4ea2f280490cec5aca893d76d848bb04262347c4c5b7dc1ece0376d286420eca"
+                  },
+                  {
+                      "path":  "supabase/tests/remote_event_next_action_contract.sql",
+                      "bytes":  4499,
+                      "sha256":  "9c4d4c7a358425aa79ff46c538090b6b891d64a8a4df6c891d4dfcdcf30911a8"
+                  },
+                  {
+                      "path":  "tests/knowledge/FAILURE_BASELINE_20260726.md",
+                      "bytes":  2250,
+                      "sha256":  "b7994151efcce5f059cc66e4e1ee0fa95facfbf1ee99022762c826894ebd7bdd"
+                  },
+                  {
+                      "path":  "tests/knowledge/fixtures/budget-source-provenance.fixture.json",
+                      "bytes":  1592,
+                      "sha256":  "c7d5b718e981635ac3f44202040f32c2dce32912d646e16b1e0a8b5dd2937752"
+                  },
+                  {
+                      "path":  "tests/knowledge/fixtures/gateway-policy.fixture.json",
+                      "bytes":  1798,
+                      "sha256":  "fb937d0b3acc2fc6ef4825ad893c1009f4fe7815ab9b04f2289dfaa94d04d5a3"
+                  },
+                  {
+                      "path":  "tests/knowledge/fixtures/obsidian-status.fixture.json",
+                      "bytes":  553,
+                      "sha256":  "a2e26975bd74922298ece024ebd13fb85665b9130cdbe75910ef2508c1d7875f"
+                  },
+                  {
+                      "path":  "tests/knowledge/knowledge_system_contract.test.mjs",
+                      "bytes":  14578,
+                      "sha256":  "5f581e5fbf9f2d4ae4cfa37b0b74a420da3ec2b3a4b7ae33b6ada08db0189497"
+                  },
+                  {
+                      "path":  "tests/knowledge/pglite_migration_smoke.test.ts",
+                      "bytes":  6674,
+                      "sha256":  "df49de2447e46f2310d0a3a1fa0c14c3b10cee01ac73282d51a14b5df9eed257"
+                  },
+                  {
+                      "path":  "tests/knowledge/remote_unified_items_contract.sql",
+                      "bytes":  8327,
+                      "sha256":  "40f8b242fd3e39ab0c28d81eb6c95725bf4c6c4f96fc971d63e861536ae69d28"
+                  },
+                  {
+                      "path":  "tests/knowledge/remote_woodwork_contract.sql",
+                      "bytes":  11729,
+                      "sha256":  "f0eba0740cca4adaf08d56abea2f5eced1a7d6a9b7403d61f9ce5981eaaeb32f"
+                  },
+                  {
+                      "path":  "tests/knowledge/run_pglite_unc_safe.ps1",
+                      "bytes":  2756,
+                      "sha256":  "d184ee618e9d041374621287f0a01c1b6ebf8cabcc15f8087c049909e8f11162"
+                  },
+                  {
+                      "path":  "tests/knowledge/unified_items_contract.test.mjs",
+                      "bytes":  5765,
+                      "sha256":  "0814ec4428df0e22f591c58684ca02baeb9a515ea23a52a5682ddf639b109942"
+                  },
+                  {
+                      "path":  "tests/knowledge/woodwork_foundation_contract.test.mjs",
+                      "bytes":  8690,
+                      "sha256":  "da74620e603a5e7018cb4e284d32b40653ad7d757f915eba2aa2528f7e3f9a3c"
+                  },
+                  {
+                      "path":  "tests/knowledge/woodwork_mapping_contract.test.mjs",
+                      "bytes":  5506,
+                      "sha256":  "33ee0d213801083a9add8bdc809cf0cf722688597b849b96a07fb5de5e849232"
+                  }
+              ]
+}
