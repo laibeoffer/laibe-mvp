@@ -556,15 +556,31 @@ function buildSource(input: {
   };
 }
 
-function buildItem(
-  input: Omit<RawCatalogItem, "raw_text" | "effective_date" | "region" | "metadata"> & {
-    fixture: string;
-    raw_text?: string;
-    effective_date?: string | null;
-    region?: string;
-    metadata?: Record<string, unknown>;
-  },
-): RawCatalogItem {
+type RawNegativeFixtureItemInput = Omit<
+  RawCatalogItem,
+  | "raw_text"
+  | "effective_date"
+  | "region"
+  | "metadata"
+  | "raw_brand"
+  | "raw_model"
+  | "raw_spec"
+  | "raw_currency"
+  | "vendor_name"
+> & {
+  fixture: string;
+  raw_brand?: string | null;
+  raw_model?: string | null;
+  raw_spec?: string | null;
+  raw_currency?: string | null;
+  vendor_name?: string | null;
+  raw_text?: string;
+  effective_date?: string | null;
+  region?: string;
+  metadata?: Record<string, unknown>;
+};
+
+function buildItem(input: RawNegativeFixtureItemInput): RawCatalogItem {
   return {
     ...input,
     raw_brand: input.raw_brand ?? null,

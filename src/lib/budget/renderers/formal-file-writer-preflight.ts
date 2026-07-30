@@ -161,8 +161,20 @@ const layoutContainsInternalTraceColumns = (layout: unknown): boolean => {
   });
 };
 
+type FormalArtifactFilenameInput = Pick<
+  FormalRenderedSkeletonOutput,
+  "project_id" | "estimate_id" | "audience" | "snapshot_id"
+>;
+
+type FormalArtifactFormatInput = Pick<
+  FormalRenderedSkeletonOutput,
+  "renderer" | "format"
+>;
+
 const normalizePolicy = (policy: unknown): FormalArtifactPolicy =>
-  isRecord(policy) ? (policy as FormalArtifactPolicy) : defaultFormalArtifactPolicy;
+  isRecord(policy)
+    ? (policy as unknown as FormalArtifactPolicy)
+    : defaultFormalArtifactPolicy;
 
 const policyAudiences = (
   policy: FormalArtifactPolicy,
@@ -189,35 +201,63 @@ const safeStorageTargetIsAllowed = (
     }
   })();
 
-const canBuildExpectedFilename = (
+const readFormalArtifactFilenameInput = (
   output: Record<string, unknown> | null,
-  format: unknown,
-): output is Record<string, unknown> & {
-  project_id: string;
-  estimate_id: string;
-  audience: FormalArtifactAudience;
-  snapshot_id: string;
-} =>
-  Boolean(output) &&
-  typeof output?.project_id === "string" &&
-  typeof output?.estimate_id === "string" &&
-  isFormalArtifactAudience(output?.audience) &&
-  typeof output?.snapshot_id === "string" &&
-  isFormalArtifactFormat(format);
+): FormalArtifactFilenameInput | null => {
+  if (
+    !output ||
+    typeof output.project_id !== "string" ||
+    typeof output.estimate_id !== "string" ||
+    !isFormalArtifactAudience(output.audience) ||
+    typeof output.snapshot_id !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    project_id: output.project_id,
+    estimate_id: output.estimate_id,
+    audience: output.audience,
+    snapshot_id: output.snapshot_id,
+  };
+};
+
+const readFormalArtifactFormatInput = (
+  output: Record<string, unknown> | null,
+): FormalArtifactFormatInput | null => {
+  if (!output) {
+    return null;
+  }
+
+  const renderer = output.renderer;
+  const format = output.format;
+
+  if (
+    (renderer !== "formal_excel_skeleton" &&
+      renderer !== "formal_pdf_skeleton") ||
+    (format !== "excel_skeleton" && format !== "pdf_skeleton")
+  ) {
+    return null;
+  }
+
+  return {
+    renderer,
+    format,
+  };
+};
 
 const buildExpectedFilenameNoThrow = (
   output: Record<string, unknown> | null,
   format: unknown,
 ): string | null => {
-  if (!canBuildExpectedFilename(output, format)) {
+  const filenameInput = readFormalArtifactFilenameInput(output);
+
+  if (!filenameInput || !isFormalArtifactFormat(format)) {
     return null;
   }
 
   try {
-    return buildFormalArtifactFilename(
-      output as FormalRenderedSkeletonOutput,
-      format,
-    );
+    return buildFormalArtifactFilename(filenameInput, format);
   } catch {
     return null;
   }
@@ -230,8 +270,13 @@ const inferFormatNoThrow = (
     return null;
   }
 
+  const formatInput = readFormalArtifactFormatInput(output);
+  if (!formatInput) {
+    return null;
+  }
+
   try {
-    return inferFormalArtifactFormat(output as FormalRenderedSkeletonOutput);
+    return inferFormalArtifactFormat(formatInput);
   } catch {
     return null;
   }

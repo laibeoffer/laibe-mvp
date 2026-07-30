@@ -67,12 +67,12 @@ export const makeWriterPreflightOptions = (
   storage_target: "local_artifact_staging",
 });
 
-const omitKey = (
-  value: Record<string, unknown>,
-  key: string,
+const omitKey = <T extends object>(
+  value: T,
+  key: keyof T | string,
 ): Record<string, unknown> => {
-  const copy = { ...value };
-  delete copy[key];
+  const copy = { ...value } as Record<string, unknown>;
+  delete copy[String(key)];
   return copy;
 };
 

@@ -190,7 +190,7 @@ function buildPriceOutlierRecommendations(
   const highThreshold = average * (1 + ratio);
   const lowThreshold = average * (1 - ratio);
 
-  return pricedCandidates.flatMap((candidate) => {
+  return pricedCandidates.flatMap((candidate): MergePolicyRecommendation[] => {
     const price = candidate.observed_price ?? 0;
 
     if (price > highThreshold) {
