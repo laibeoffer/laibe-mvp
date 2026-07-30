@@ -20,6 +20,8 @@ Draft / Ready for user-triggered review / Reviewed / Needs update before review
 
 補充說明：本檔已在後續區段加入本聊天室負責的 budget-system / specDB / method-spec / budget output / estimate / quote / material / labor data，以及 plan-puzzle input adapter 銜接成果。
 
+Plan Puzzle PR #25 follow-up：已補上 latest Codex P2 fixes，讓 `areaUpdatedAt` 只在 boundary / area metadata 實際改變時更新，保留 closed invalid polygon geometry 供 canvas invalid styling 與人工修正，並讓非相鄰邊段的 endpoint-on-edge / T-junction 交點與 collinear self-overlap / retraced edge 也被判定為 polygon self-intersection。本 follow-up 仍維持 candidate-only zone area，未解除 formal estimate guard。
+
 ---
 
 ## Phase Name
@@ -823,6 +825,54 @@ Yes，可供後續 Reviewer re-check。此段只修正 required blocker，不代
 
 - 可供後續使用者主動觸發審查。
 - 本輪文件本身可審查，但不代表 Plancraft+ production adapter 已可施工或已通過 production gate。
+
+### 本輪施工：Plancraft+ Zone Area / Boundary Refinement
+
+本輪依黑板 dispatch 與 GitHub Issue #15 進行平面拼圖 Builder 施工，只在 Plancraft+ page UI / draft model 範圍內補上 zone boundary 的候選面積資料。此成果不是 production budget adapter，也不解除 formal estimate guard。
+
+#### 完成事項
+
+- `project.version` 已升級為 `0.11.0-zone-area-boundary-refinement`。
+- 已新增 zone area candidate metadata：`areaSqMm`、`areaM2`、`areaPing`、`areaSource`、`areaStatus`、`areaConfidence`、`areaProductionReady`、`areaAuthority`、`reviewerRequired`、`reviewerReasons`、`areaUpdatedAt`。
+- 已在 closed polygon boundary 上用 shoelace formula 計算候選面積，座標與面積來源皆以 mm polygon 為基準。
+- 已換算候選 `m²` 與 `坪`，但 `areaProductionReady` 固定為 `false`。
+- 未封閉、無效、缺 edge 或點數不足的 zone 不會產生候選面積，會保留 `areaStatus` 與 reviewer reasons。
+- 右側 zone inspector 現在顯示 area status、candidate area、area source、confidence 與 `productionReady: false`。
+- Plancraft+ draft JSON export 會包含最新 zone boundary 與候選 area metadata。
+
+#### 修改檔案
+
+- `src/stitch_laibe_landing_onboarding/preview_floor_plan/plan-puzzle.js`
+- `docs/CURRENT_PHASE_REVIEW_PACKET.md`
+- `docs/NEXT_CODEX_HANDOFF.md`
+
+#### 新增檔案
+
+- 無。
+
+#### 未完成事項
+
+- 尚未做 production-grade area approval gate。
+- 尚未把 zone area 轉成正式 budget quantity。
+- 尚未修改 budget adapter、budget runtime、`generateBudgetEstimate()` 或 formal estimate flow。
+- 尚未接 Excel / PDF、renderer production preview、DB / API、AI API、payment / escrow / listing fee。
+
+#### Plan-puzzle 資料影響
+
+- `zones[]` 現在除了 `boundaryEdgeIds / boundaryWallIds / polygon / boundaryStatus / boundaryIssues`，也會輸出 candidate area metadata。
+- `areaSource` 目前固定為 `spike_polygon_estimate`；`areaAuthority` 固定為 `plancraft_plus_zone_area_candidate`。
+- `areaProductionReady` 固定 `false`，用來避免被誤認為正式估價量體。
+
+#### 已知風險
+
+- 面積計算只依使用者人工選取且可閉合的 polygon；若 boundary 順序錯誤或未封閉，面積不可信。
+- 候選面積尚未經 reviewer approval、precision policy、room production contract 或 budget adapter production contract。
+- 若下游直接讀候選 area 欄位，仍可能誤用；正式 adapter 前仍需要 guard / contract tests。
+
+#### 是否 ready for phase review
+
+- 可供後續使用者主動觸發審查。
+- 不代表 Plancraft+ area 已可作正式報價依據。
 
 ---
 
