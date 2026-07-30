@@ -1,0 +1,75 @@
+{
+  "session_id": "owner_guide_session_mock_001",
+  "runtime_status": "mock_only",
+  "requirement_completion_status": "completed",
+  "question_answer_log": [
+    {
+      "qa_log_id": "qa_001",
+      "field_key": "property_context",
+      "question": "請描述房屋類型、坪數 / 面積、屋況、所在區域與使用目的。",
+      "owner_answer": "台北 28 坪中古屋，自住，屋況偏舊。",
+      "effective": true,
+      "source": "front_end_mock",
+      "created_at": "2026-06-01T00:00:00+08:00"
+    },
+    {
+      "qa_log_id": "qa_002",
+      "field_key": "space_requirements",
+      "question": "請列出想整理的空間。",
+      "owner_answer": "想整理客廳、廚房、浴室，另外需要增加收納。",
+      "effective": true,
+      "source": "front_end_mock",
+      "created_at": "2026-06-01T00:05:00+08:00"
+    },
+    {
+      "qa_log_id": "qa_003",
+      "field_key": "budget_signal",
+      "question": "請描述預算狀態。",
+      "owner_answer": "先寫 50 萬上限。",
+      "effective": false,
+      "source": "front_end_mock",
+      "created_at": "2026-06-01T00:10:00+08:00"
+    },
+    {
+      "qa_log_id": "qa_004",
+      "field_key": "budget_signal",
+      "question": "請描述預算狀態。",
+      "owner_answer": "預算還不確定，需要先協助估算。",
+      "effective": true,
+      "source": "front_end_mock",
+      "created_at": "2026-06-01T00:12:00+08:00"
+    }
+  ],
+  "answer_revision_log": [
+    {
+      "revision_id": "rev_001",
+      "field_key": "budget_signal",
+      "qa_log_id": "qa_003",
+      "previous_value": null,
+      "new_value": "先寫 50 萬上限。",
+      "revision_status": "reverted",
+      "created_at": "2026-06-01T00:10:00+08:00"
+    },
+    {
+      "revision_id": "rev_002",
+      "field_key": "budget_signal",
+      "qa_log_id": "qa_004",
+      "previous_value": null,
+      "new_value": "預算還不確定，需要先協助估算。",
+      "revision_status": "active",
+      "created_at": "2026-06-01T00:12:00+08:00"
+    }
+  ],
+  "current_plan_files": [
+    {
+      "file_type": "application/pdf",
+      "file_name": "owner-plan-placeholder.pdf",
+      "upload_status": "local_placeholder_metadata_only",
+      "linked_to_plan_puzzle": true,
+      "captured_at": "2026-06-01T00:00:00+08:00"
+    }
+  ],
+  "current_site_photos": [],
+  "style_reference_images": [],
+  "owner_additional_notes": "家裡有小孩，需要耐髒、好清潔，保留採光。"
+}

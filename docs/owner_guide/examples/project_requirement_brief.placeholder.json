@@ -1,0 +1,65 @@
+{
+  "project_requirement_brief_id": "prb_placeholder_mock_001",
+  "owner_intent_id": "owner_intent_mock_001",
+  "requirement_context_status": "placeholder",
+  "requirement_completion_status": "completed",
+  "space_requirements": {
+    "raw_signal": "想整理客廳、廚房、浴室，另外需要增加收納。",
+    "current_plan_files": [
+      {
+        "file_type": "application/pdf",
+        "file_name": "owner-plan-placeholder.pdf",
+        "upload_status": "local_placeholder_metadata_only",
+        "linked_to_plan_puzzle": true,
+        "captured_at": "2026-06-01T00:00:00+08:00"
+      }
+    ],
+    "current_site_photos": [
+      {
+        "room_label": "owner_unspecified",
+        "photo_type": "image/jpeg",
+        "file_name": "living-room-current.jpg",
+        "upload_status": "local_placeholder_metadata_only",
+        "captured_at": "2026-06-01T00:00:00+08:00"
+      }
+    ],
+    "style_reference_images": [
+      {
+        "style_note": "喜歡簡約、木質、明亮，不喜歡太暗的工業風。",
+        "file_name": "style-reference.jpg",
+        "upload_status": "local_placeholder_metadata_only",
+        "captured_at": "2026-06-01T00:00:00+08:00"
+      }
+    ]
+  },
+  "budget_preference": {
+    "raw_signal": "預算還不確定，需要先協助估算。",
+    "formal_pricing_status": "not_allowed"
+  },
+  "scope_constraints": {
+    "mock_only": true,
+    "no_real_ai_api": true,
+    "no_upload_backend": true,
+    "no_db_write": true,
+    "no_payment": true,
+    "no_formal_price": true,
+    "budget_engine_handoff_status": "placeholder_only"
+  },
+  "structured_requirement_notes": [
+    { "label": "房屋 / 案件資訊", "value": "台北 28 坪中古屋，自住，屋況偏舊。" },
+    { "label": "想整理空間", "value": "想整理客廳、廚房、浴室，另外需要增加收納。" },
+    { "label": "業主自行補充說明", "value": "家裡有小孩，需要耐髒、好清潔，保留採光。" }
+  ],
+  "owner_additional_notes": "家裡有小孩，需要耐髒、好清潔，保留採光。",
+  "review_flags": [
+    "not_for_formal_estimate",
+    "requires_downstream_validation",
+    "placeholder_window_only",
+    "reverted_answers_excluded_from_effective_output"
+  ],
+  "handoff_targets": [
+    "plan-puzzle",
+    "budget-preview",
+    "bid-preparation"
+  ]
+}
