@@ -300,13 +300,84 @@ test("public homepage preserves LaiBE tokens and accessibility floors", async ()
   ) {
     assert.match(css, new RegExp(token, "i"));
   }
-  assert.match(css, /--header-height:\s*76px/i);
+  assert.match(css, /--header-height:\s*86px/i);
   assert.match(css, /height:\s*var\(--header-height\)/i);
   assert.match(css, /max-width:\s*1180px/i);
   assert.match(css, /min-height:\s*44px/i);
   assert.match(css, /@media\s*\(max-width:\s*1000px\)/i);
   assert.match(css, /@media\s*\(max-width:\s*680px\)/i);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/i);
+});
+
+test("public homepage aligns Header and CTA controls with the current LaiBE visual language", async () => {
+  const html = await readPcmFile("public_home/code.html");
+  const css = await readPcmFile("public_home/styles.css");
+  const header = html.match(
+    /<header class="site-header"[\s\S]*?<\/header>/,
+  )?.[0] ?? "";
+
+  for (
+    const href of [
+      "#case-flow",
+      "#service-fee",
+      "#milestone-governance",
+      "../owner_start/code.html",
+    ]
+  ) {
+    assert.ok(header.includes(`href="${href}"`));
+  }
+
+  assert.match(
+    css,
+    /\.site-header\s*\{[^}]*z-index:\s*90;[^}]*padding-inline:\s*max\(20px,\s*calc\(\(100vw - 1160px\) \/ 2\)\);[^}]*background:[^}]*rgba\(3,\s*5,\s*7,\s*0\.82\);[^}]*backdrop-filter:\s*blur\(22px\)\s*saturate\(130%\);/i,
+  );
+  assert.match(css, /\.brand img\s*\{[^}]*width:\s*118px;/i);
+  assert.match(css, /\.site-header nav\s*\{[^}]*gap:\s*12px;/i);
+  assert.match(
+    css,
+    /\.site-header nav > a\s*\{[^}]*min-height:\s*44px;[^}]*padding:\s*0 13px;[^}]*border-radius:\s*var\(--pill\);/i,
+  );
+  const navIconRule = css.match(
+    /\.site-header nav > a::before\s*\{[^}]*\}/i,
+  )?.[0] ?? "";
+  assert.match(navIconRule, /width:\s*19px;/i);
+  assert.match(navIconRule, /data:image\/svg\+xml/i);
+  assert.match(
+    css,
+    /\.button--primary\s*\{[^}]*min-height:\s*52px;[^}]*linear-gradient\(135deg,\s*#ffb145,\s*#ff711f 46%,\s*#ff4925\);[^}]*color:\s*#fff;/i,
+  );
+  assert.match(
+    css,
+    /\.button--quiet\s*\{[^}]*min-height:\s*52px;[^}]*rgba\(10,\s*12,\s*14,\s*0\.78\);[^}]*color:\s*#fff;/i,
+  );
+  assert.match(
+    css,
+    /\.hero__actions \.text-link\s*\{[^}]*min-height:\s*52px;[^}]*background:\s*rgba\(101,\s*216,\s*255,\s*0\.1\);[^}]*color:\s*#bdf1ff;/i,
+  );
+  assert.match(
+    css,
+    /a:focus-visible,[\s\S]*?button:focus-visible\s*\{[^}]*outline:\s*2px solid #bdf1ff;[^}]*outline-offset:\s*3px;/i,
+  );
+  assert.match(
+    css,
+    /\.button\[aria-disabled="true"\][\s\S]*?pointer-events:\s*none;/i,
+  );
+  assert.match(
+    css,
+    /\.button\[aria-busy="true"\][\s\S]*?pointer-events:\s*none;/i,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*980px\)[\s\S]*?\.site-header\s*\{[^}]*flex-wrap:\s*wrap;/i,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*620px\)[\s\S]*?\.brand img\s*\{[^}]*width:\s*94px;[\s\S]*?\.hero__actions \.button,[\s\S]*?\.hero__actions \.text-link\s*\{[^}]*width:\s*100%;[^}]*min-height:\s*52px;/i,
+  );
+  assert.doesNotMatch(
+    css,
+    /@media\s*\(max-width:\s*1000px\)[\s\S]*?\.site-header nav > a:not\(\.button\)\s*\{[^}]*display:\s*none;/i,
+  );
 });
 
 test("public homepage composes the desktop hero to keep the action and all six summary steps in view", async () => {

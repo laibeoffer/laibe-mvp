@@ -1,7 +1,7 @@
 # PCM 公開首頁 Header 與 CTA 視覺統一設計
 
-日期：2026-08-01  
-範圍：`pcm_standalone/public_home` 的 Header、導覽與 CTA  
+日期：2026-08-01
+範圍：`pcm_standalone/public_home` 的 Header、導覽與 CTA
 主要使用者：尚未簽約、正在了解 PCM 服務與文件準備方式的甲方
 
 ## 目標
