@@ -7,6 +7,21 @@ import {
 
 const SHA256 = /^[a-f0-9]{64}$/;
 
+const ENVELOPE_FACT_NAMES = Object.freeze([
+  "contractVersionHash",
+  "ownerIdentityVerified",
+  "ownerPartyId",
+  "serviceProviderPartySnapshot",
+  "writerReady",
+  "legalReviewStatus",
+]);
+
+const PROVIDER_FACT_NAMES = Object.freeze([
+  "partyType",
+  "partyId",
+  "signatoryActorId",
+]);
+
 const SECTION_ID_MAP = Object.freeze([
   ["萊比 LaiBE AI PCM 案件治理資訊服務契約", "contract-title"],
   ["第一條", "article-01"], ["第二條", "article-02"], ["第三條", "article-03"],
@@ -43,8 +58,29 @@ export const INITIAL_SIGNING_ENVELOPE = Object.freeze({
   legalReviewStatus: CONTRACT_META.legalReviewStatus,
 });
 
-function isRecord(value) {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
+function extractOwnDataFacts(value, factNames) {
+  if (value === null || typeof value !== "object") return null;
+
+  try {
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== null) return null;
+
+    const facts = [];
+    for (let index = 0; index < factNames.length; index += 1) {
+      const descriptor = Object.getOwnPropertyDescriptor(value, factNames[index]);
+      if (
+        !descriptor ||
+        descriptor.enumerable !== true ||
+        !Object.hasOwn(descriptor, "value")
+      ) {
+        return null;
+      }
+      facts.push(descriptor.value);
+    }
+    return facts;
+  } catch {
+    return null;
+  }
 }
 
 function isNonEmptyString(value) {
@@ -53,8 +89,15 @@ function isNonEmptyString(value) {
 
 export function evaluateSigningReadiness(input = {}) {
   const reasons = [];
-  const envelope = isRecord(input) ? input : {};
-  const contractVersionHash = envelope.contractVersionHash;
+  const envelopeFacts = extractOwnDataFacts(input, ENVELOPE_FACT_NAMES);
+  const [
+    contractVersionHash,
+    ownerIdentityVerified,
+    ownerPartyId,
+    serviceProviderPartySnapshot,
+    writerReady,
+    legalReviewStatus,
+  ] = envelopeFacts ?? [];
 
   if (
     typeof contractVersionHash !== "string" ||
@@ -63,26 +106,32 @@ export function evaluateSigningReadiness(input = {}) {
     reasons.push("正式契約版本尚未固定");
   }
   if (
-    envelope.ownerIdentityVerified !== true ||
-    !isNonEmptyString(envelope.ownerPartyId)
+    ownerIdentityVerified !== true ||
+    !isNonEmptyString(ownerPartyId)
   ) {
     reasons.push("甲方身分尚未完成確認");
   }
 
-  const provider = isRecord(envelope.serviceProviderPartySnapshot)
-    ? envelope.serviceProviderPartySnapshot
-    : null;
+  const providerFacts = extractOwnDataFacts(
+    serviceProviderPartySnapshot,
+    PROVIDER_FACT_NAMES,
+  );
+  const [partyType, providerPartyId, signatoryActorId] = providerFacts ?? [];
   if (
-    provider?.partyType !== "natural_person" ||
-    !isNonEmptyString(provider.partyId) ||
-    !isNonEmptyString(provider.signatoryActorId)
+    typeof partyType !== "string" ||
+    partyType !== "natural_person" ||
+    !isNonEmptyString(providerPartyId) ||
+    !isNonEmptyString(signatoryActorId)
   ) {
     reasons.push("自然人服務方資料尚未完成確認");
   }
-  if (envelope.writerReady !== true) {
+  if (writerReady !== true) {
     reasons.push("正式簽署紀錄功能尚未就緒");
   }
-  if (envelope.legalReviewStatus !== "LEGAL_FINAL") {
+  if (
+    typeof legalReviewStatus !== "string" ||
+    legalReviewStatus !== "LEGAL_FINAL"
+  ) {
     reasons.push("契約仍在法務審閱中");
   }
 

@@ -272,6 +272,156 @@ test("signing readiness accepts only primitive strings without invoking caller c
   }
 });
 
+test("signing readiness accepts only plain own-data envelope records", async () => {
+  const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
+  const readyProvider = {
+    partyType: "natural_person",
+    partyId: "provider-001",
+    signatoryActorId: "actor-001",
+  };
+  const readyEnvelope = {
+    contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    ownerIdentityVerified: true,
+    ownerPartyId: "owner-001",
+    serviceProviderPartySnapshot: readyProvider,
+    writerReady: true,
+    legalReviewStatus: "LEGAL_FINAL",
+  };
+  const exoticEnvelopes = [
+    ["boxed String", Object.assign(new String("boxed"), readyEnvelope)],
+    ["boxed Number", Object.assign(new Number(1), readyEnvelope)],
+    ["boxed Boolean", Object.assign(new Boolean(false), readyEnvelope)],
+    ["Date", Object.assign(new Date(0), readyEnvelope)],
+    ["inherited fields", Object.create(readyEnvelope)],
+  ];
+
+  for (const [label, envelope] of exoticEnvelopes) {
+    let result;
+    assert.doesNotThrow(() => {
+      result = evaluateSigningReadiness(envelope);
+    }, label);
+    assert.equal(result.ready, false, label);
+  }
+
+  assert.deepEqual(evaluateSigningReadiness(readyEnvelope), {
+    ready: true,
+    reasons: [],
+  });
+
+  const nullPrototypeProvider = Object.assign(
+    Object.create(null),
+    readyProvider,
+  );
+  const nullPrototypeEnvelope = Object.assign(Object.create(null), {
+    ...readyEnvelope,
+    serviceProviderPartySnapshot: nullPrototypeProvider,
+  });
+  assert.deepEqual(evaluateSigningReadiness(nullPrototypeEnvelope), {
+    ready: true,
+    reasons: [],
+  });
+});
+
+test("signing readiness accepts only plain own-data provider records", async () => {
+  const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
+  const readyProvider = {
+    partyType: "natural_person",
+    partyId: "provider-001",
+    signatoryActorId: "actor-001",
+  };
+  const readyEnvelope = {
+    contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    ownerIdentityVerified: true,
+    ownerPartyId: "owner-001",
+    serviceProviderPartySnapshot: readyProvider,
+    writerReady: true,
+    legalReviewStatus: "LEGAL_FINAL",
+  };
+  const exoticProviders = [
+    ["boxed provider", Object.assign(new String("boxed"), readyProvider)],
+    ["boxed number provider", Object.assign(new Number(1), readyProvider)],
+    ["Date provider", Object.assign(new Date(0), readyProvider)],
+    ["inherited provider fields", Object.create(readyProvider)],
+  ];
+
+  for (const [label, serviceProviderPartySnapshot] of exoticProviders) {
+    let result;
+    assert.doesNotThrow(() => {
+      result = evaluateSigningReadiness({
+        ...readyEnvelope,
+        serviceProviderPartySnapshot,
+      });
+    }, label);
+    assert.equal(result.ready, false, label);
+  }
+});
+
+test("signing readiness rejects accessors and non-enumerable required facts without reading them", async () => {
+  const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
+  const readyProvider = {
+    partyType: "natural_person",
+    partyId: "provider-001",
+    signatoryActorId: "actor-001",
+  };
+  const readyEnvelope = {
+    contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    ownerIdentityVerified: true,
+    ownerPartyId: "owner-001",
+    serviceProviderPartySnapshot: readyProvider,
+    writerReady: true,
+    legalReviewStatus: "LEGAL_FINAL",
+  };
+
+  let envelopeReadCount = 0;
+  const envelopeWithAccessor = { ...readyEnvelope };
+  Object.defineProperty(envelopeWithAccessor, "ownerPartyId", {
+    enumerable: true,
+    get() {
+      envelopeReadCount += 1;
+      return "owner-001";
+    },
+  });
+  const accessorEnvelopeResult = evaluateSigningReadiness(envelopeWithAccessor);
+  assert.equal(accessorEnvelopeResult.ready, false);
+  assert.equal(envelopeReadCount, 0);
+
+  let providerReadCount = 0;
+  const providerWithAccessor = { ...readyProvider };
+  Object.defineProperty(providerWithAccessor, "partyId", {
+    enumerable: true,
+    get() {
+      providerReadCount += 1;
+      return "provider-001";
+    },
+  });
+  const accessorProviderResult = evaluateSigningReadiness({
+    ...readyEnvelope,
+    serviceProviderPartySnapshot: providerWithAccessor,
+  });
+  assert.equal(accessorProviderResult.ready, false);
+  assert.equal(providerReadCount, 0);
+
+  const nonEnumerableEnvelope = { ...readyEnvelope };
+  Object.defineProperty(nonEnumerableEnvelope, "writerReady", {
+    value: true,
+    enumerable: false,
+  });
+  assert.equal(evaluateSigningReadiness(nonEnumerableEnvelope).ready, false);
+
+  const nonEnumerableProvider = { ...readyProvider };
+  Object.defineProperty(nonEnumerableProvider, "signatoryActorId", {
+    value: "actor-001",
+    enumerable: false,
+  });
+  assert.equal(
+    evaluateSigningReadiness({
+      ...readyEnvelope,
+      serviceProviderPartySnapshot: nonEnumerableProvider,
+    }).ready,
+    false,
+  );
+});
+
 test("contract heading resolver returns unique stable IDs with exact label boundaries", async () => {
   const { CONTRACT_SOURCE } = await import(moduleUrl("contract-content.js"));
   const appModule = await import(moduleUrl("app.js"));
@@ -360,6 +510,19 @@ test("mobile contract navigation controls provide 44px centered touch targets", 
     assert.match(rule[1], /max-width:\s*100%\s*;/, selector);
     assert.match(rule[1], /overflow-wrap:\s*anywhere\s*;/, selector);
   }
+
+  const baseClauseRule = /\.clause__source\s*\{([^}]*)\}/.exec(
+    css.slice(0, mobileStart),
+  );
+  assert.ok(baseClauseRule);
+  assert.match(baseClauseRule[1], /margin-top:\s*auto\s*;/);
+
+  const mobileClauseRule = /\.clause__source\s*\{([^}]*)\}/.exec(mobileCss);
+  assert.ok(mobileClauseRule);
+  assert.match(
+    mobileClauseRule[1],
+    /padding-(?:top|block):\s*0(?:px)?\s*;/,
+  );
 });
 
 test("service contract source has no legacy runtime, signing methods, or preview statuses", async () => {
