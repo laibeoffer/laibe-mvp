@@ -14,6 +14,7 @@ const SECTION_ID_MAP = Object.freeze([
   ["第七條", "article-07"], ["第八條", "article-08"], ["第九條", "article-09"],
   ["第十條", "article-10"], ["第十一條", "article-11"], ["第十二條", "article-12"],
   ["第十三條", "article-13"], ["第十四條", "article-14"], ["第十五條", "article-15"],
+  ["第十五條之一", "article-15-1"], ["第十五條之二", "article-15-2"],
   ["第十六條", "article-16"], ["第十七條", "article-17"], ["第十八條", "article-18"],
   ["第十九條", "article-19"], ["第二十條", "article-20"], ["第二十一條", "article-21"],
   ["第二十二條", "article-22"], ["第二十三條", "article-23"], ["第二十四條", "article-24"],
@@ -42,28 +43,46 @@ export const INITIAL_SIGNING_ENVELOPE = Object.freeze({
   legalReviewStatus: CONTRACT_META.legalReviewStatus,
 });
 
+function isRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 export function evaluateSigningReadiness(input = {}) {
   const reasons = [];
+  const envelope = isRecord(input) ? input : {};
+  const contractVersionHash = envelope.contractVersionHash;
 
-  if (!SHA256.test(input.contractVersionHash ?? "")) {
+  if (
+    typeof contractVersionHash !== "string" ||
+    !SHA256.test(contractVersionHash)
+  ) {
     reasons.push("正式契約版本尚未固定");
   }
-  if (input.ownerIdentityVerified !== true || !input.ownerPartyId?.trim()) {
+  if (
+    envelope.ownerIdentityVerified !== true ||
+    !isNonEmptyString(envelope.ownerPartyId)
+  ) {
     reasons.push("甲方身分尚未完成確認");
   }
 
-  const provider = input.serviceProviderPartySnapshot;
+  const provider = isRecord(envelope.serviceProviderPartySnapshot)
+    ? envelope.serviceProviderPartySnapshot
+    : null;
   if (
     provider?.partyType !== "natural_person" ||
-    !provider.partyId?.trim() ||
-    !provider.signatoryActorId?.trim()
+    !isNonEmptyString(provider.partyId) ||
+    !isNonEmptyString(provider.signatoryActorId)
   ) {
     reasons.push("自然人服務方資料尚未完成確認");
   }
-  if (input.writerReady !== true) {
+  if (envelope.writerReady !== true) {
     reasons.push("正式簽署紀錄功能尚未就緒");
   }
-  if (input.legalReviewStatus !== "LEGAL_FINAL") {
+  if (envelope.legalReviewStatus !== "LEGAL_FINAL") {
     reasons.push("契約仍在法務審閱中");
   }
 
@@ -80,10 +99,19 @@ function createTextElement(tagName, text, className) {
   return element;
 }
 
-function sectionIdFor(heading, fallbackIndex) {
+function hasSectionLabel(heading, label) {
+  if (typeof heading !== "string") return false;
+  if (heading === label) return true;
+  if (heading.slice(0, label.length) !== label) return false;
+
+  const boundary = heading[label.length];
+  return boundary === " " || boundary === "　";
+}
+
+export function resolveContractSectionId(heading, fallbackIndex) {
   for (let index = 0; index < SECTION_ID_MAP.length; index += 1) {
     const [label, id] = SECTION_ID_MAP[index];
-    if (heading.startsWith(label)) return id;
+    if (hasSectionLabel(heading, label)) return id;
   }
   return `contract-section-${fallbackIndex}`;
 }
@@ -101,7 +129,7 @@ function renderKeyClauses() {
     const heading = createTextElement("h3", clause.title);
     const tag = createTextElement("p", `${String(index + 1).padStart(2, "0")}｜${clause.tag}`, "clause__tag");
     const anchor = document.createElement("a");
-    anchor.href = `#${sectionIdFor(clause.anchor, index + 1)}`;
+    anchor.href = `#${resolveContractSectionId(clause.anchor, index + 1)}`;
     anchor.className = "clause__source";
     anchor.textContent = `查看${clause.anchor}`;
     const points = document.createElement("ul");
@@ -165,9 +193,10 @@ function renderContract() {
       appendParagraph();
       headingIndex += 1;
       const level = headingMatch[1].length;
+      const renderedLevel = level + 1;
       const headingText = headingMatch[2];
-      const heading = createTextElement(`h${level}`, headingText);
-      const id = sectionIdFor(headingText, headingIndex);
+      const heading = createTextElement(`h${renderedLevel}`, headingText);
+      const id = resolveContractSectionId(headingText, headingIndex);
       heading.id = id;
       contract.append(heading);
 

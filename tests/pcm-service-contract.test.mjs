@@ -176,6 +176,192 @@ test("signing readiness evaluates the production initial envelope and fails clos
   }
 });
 
+test("signing readiness rejects non-record inputs without throwing", async () => {
+  const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
+  const invalidInputs = [
+    ["null", null],
+    ["undefined", undefined],
+    ["boolean", true],
+    ["number", 42],
+    ["bigint", 42n],
+    ["string", EXPECTED_CONTRACT_SOURCE_SHA256],
+    ["symbol", Symbol("signing-envelope")],
+    ["array", []],
+    ["empty object", {}],
+    ["missing fields", { ownerIdentityVerified: true }],
+  ];
+
+  for (const [label, input] of invalidInputs) {
+    let result;
+    assert.doesNotThrow(() => {
+      result = evaluateSigningReadiness(input);
+    }, label);
+    assert.equal(result.ready, false, label);
+    assert.ok(result.reasons.length > 0, label);
+    assert.equal(Object.isFrozen(result), true, label);
+    assert.equal(Object.isFrozen(result.reasons), true, label);
+  }
+});
+
+test("signing readiness accepts only primitive strings without invoking caller coercion methods", async () => {
+  const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
+  const readyEnvelope = {
+    contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    ownerIdentityVerified: true,
+    ownerPartyId: "owner-001",
+    serviceProviderPartySnapshot: {
+      partyType: "natural_person",
+      partyId: "provider-001",
+      signatoryActorId: "actor-001",
+    },
+    writerReady: true,
+    legalReviewStatus: "LEGAL_FINAL",
+  };
+
+  const readyResult = evaluateSigningReadiness(readyEnvelope);
+  assert.deepEqual(readyResult, { ready: true, reasons: [] });
+  assert.equal(Object.isFrozen(readyResult), true);
+  assert.equal(Object.isFrozen(readyResult.reasons), true);
+
+  let hashMethodCalls = 0;
+  const boxedHash = new String(EXPECTED_CONTRACT_SOURCE_SHA256);
+  boxedHash.toString = () => {
+    hashMethodCalls += 1;
+    return EXPECTED_CONTRACT_SOURCE_SHA256;
+  };
+  const hashLikeObject = {
+    toString() {
+      hashMethodCalls += 1;
+      return EXPECTED_CONTRACT_SOURCE_SHA256;
+    },
+  };
+
+  for (const contractVersionHash of [boxedHash, hashLikeObject]) {
+    const result = evaluateSigningReadiness({
+      ...readyEnvelope,
+      contractVersionHash,
+    });
+    assert.equal(result.ready, false);
+  }
+  assert.equal(hashMethodCalls, 0);
+
+  const idScenarios = [
+    ["owner party id", (envelope, value) => { envelope.ownerPartyId = value; }],
+    ["provider party id", (envelope, value) => { envelope.serviceProviderPartySnapshot.partyId = value; }],
+    ["provider signatory actor id", (envelope, value) => { envelope.serviceProviderPartySnapshot.signatoryActorId = value; }],
+  ];
+
+  for (const [label, mutate] of idScenarios) {
+    let trimMethodCalls = 0;
+    const stringLikeId = {
+      trim() {
+        trimMethodCalls += 1;
+        return "coerced-id";
+      },
+    };
+    const candidate = {
+      ...readyEnvelope,
+      serviceProviderPartySnapshot: {
+        ...readyEnvelope.serviceProviderPartySnapshot,
+      },
+    };
+    mutate(candidate, stringLikeId);
+    const result = evaluateSigningReadiness(candidate);
+    assert.equal(result.ready, false, label);
+    assert.equal(trimMethodCalls, 0, label);
+  }
+});
+
+test("contract heading resolver returns unique stable IDs with exact label boundaries", async () => {
+  const { CONTRACT_SOURCE } = await import(moduleUrl("contract-content.js"));
+  const appModule = await import(moduleUrl("app.js"));
+  const { resolveContractSectionId } = appModule;
+
+  assert.equal(typeof resolveContractSectionId, "function");
+  assert.equal(Object.hasOwn(appModule, "SECTION_ID_MAP"), false);
+
+  const headings = [];
+  const lines = CONTRACT_SOURCE.split("\n");
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = /^(#{1,3})\s+(.+)$/.exec(lines[index]);
+    if (match) headings.push(match[2]);
+  }
+
+  const ids = [];
+  for (let index = 0; index < headings.length; index += 1) {
+    ids.push(resolveContractSectionId(headings[index], index + 1));
+  }
+  assert.equal(new Set(ids).size, ids.length);
+
+  const expectedIds = [
+    ["第一條　契約當事人", "article-01"],
+    ["第十五條　重要事項確認方式", "article-15"],
+    ["第十五條之一　付款節點資料通知", "article-15-1"],
+    ["第十五條之二　指定通訊群組", "article-15-2"],
+    ["第二十八條　簽署", "article-28"],
+    ["附件一　AI PCM 服務範圍表", "annex-01"],
+    ["附件十　案件參與者與授權帳號表", "annex-10"],
+    ["附件十一　指定通訊群組與通知送達規則", "annex-11"],
+    ["附件十二　資料保存、下載與刪除政策", "annex-12"],
+    ["附件十三　第三方技術服務與跨境資料處理清單", "annex-13"],
+    ["附件十四　已履行服務計價表", "annex-14"],
+  ];
+  for (const [heading, expectedId] of expectedIds) {
+    assert.equal(resolveContractSectionId(heading, 999), expectedId, heading);
+  }
+
+  assert.equal(
+    resolveContractSectionId("第十五條之一甲", 901),
+    "contract-section-901",
+  );
+  assert.equal(
+    resolveContractSectionId("附件十一甲", 902),
+    "contract-section-902",
+  );
+});
+
+test("contract rendering demotes source headings and styles all rendered levels", async () => {
+  const [appSource, html, css] = await Promise.all([
+    readFile(path.join(serviceContractDir, "app.js"), "utf8"),
+    readFile(path.join(serviceContractDir, "code.html"), "utf8"),
+    readFile(path.join(serviceContractDir, "styles.css"), "utf8"),
+  ]);
+
+  assert.equal((html.match(/<h1\b/gi) ?? []).length, 1);
+  assert.match(appSource, /const renderedLevel = level \+ 1;/);
+  assert.match(
+    appSource,
+    /createTextElement\(\s*`h\$\{renderedLevel\}`\s*,\s*headingText\s*\)/,
+  );
+  assert.doesNotMatch(
+    appSource,
+    /createTextElement\(\s*`h\$\{level\}`\s*,\s*headingText\s*\)/,
+  );
+  assert.doesNotMatch(css, /\.contract-paper h1\b/);
+  for (const level of [2, 3, 4]) {
+    assert.match(css, new RegExp(`\\.contract-paper h${level}\\s*\\{`));
+  }
+});
+
+test("mobile contract navigation controls provide 44px centered touch targets", async () => {
+  const css = await readFile(path.join(serviceContractDir, "styles.css"), "utf8");
+  const mobileStart = css.indexOf("@media (max-width: 620px)");
+  const mobileEnd = css.indexOf("@media", mobileStart + 1);
+  assert.notEqual(mobileStart, -1);
+  const mobileCss = css.slice(mobileStart, mobileEnd);
+
+  for (const selector of [".contents a", ".clause__source"]) {
+    const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const rule = new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`).exec(mobileCss);
+    assert.ok(rule, `${selector} mobile rule`);
+    assert.match(rule[1], /display:\s*(?:inline-)?flex\s*;/, selector);
+    assert.match(rule[1], /min-height:\s*44px\s*;/, selector);
+    assert.match(rule[1], /align-items:\s*center\s*;/, selector);
+    assert.match(rule[1], /max-width:\s*100%\s*;/, selector);
+    assert.match(rule[1], /overflow-wrap:\s*anywhere\s*;/, selector);
+  }
+});
+
 test("service contract source has no legacy runtime, signing methods, or preview statuses", async () => {
   const source = (
     await Promise.all(
