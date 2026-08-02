@@ -1,337 +1,501 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
-
-<head>
+<html lang="zh-Hant-TW">
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>LaiBE - 甲方入口首頁</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "terracotta-red": "#984B4B",
-                        "warm-beige": "#F9F8F6",
-                        "charcoal": "#333333",
-                        "background": "#F9F8F6",
-                        "soft-line": "#E9E4DD",
-                        "olive-gray": "#EEF1EC",
-                        "soft-blue": "#EDF3F8",
-                        "soft-lilac": "#F2EDF8",
-                    },
-                    fontFamily: {
-                        display: ["Inter", "Noto Sans", "sans-serif"]
-                    },
-                    boxShadow: {
-                        soft: "0 8px 30px rgba(0,0,0,0.06)",
-                        softlg: "0 18px 50px rgba(0,0,0,0.10)"
-                    }
-                },
-            },
-        }
-    </script>
-    <style>
-        body {
-            font-family: 'Inter', "Noto Sans", sans-serif;
-            background: #F9F8F6;
-            color: #333333;
-        }
-    </style>
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="完成 PCM 服務契約後，甲方查看文件版次、書面治理、三方訊息與案件留痕的工作台。"
+    />
+    <title>甲方案件工作台｜LaiBE AI PCM</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="../../../../assets/logo/laibe_offer.svg"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE">
+    <a class="skip-link" href="#main-content">跳到案件內容</a>
 
-<body class="bg-background text-charcoal min-h-screen flex flex-col">
+    <header class="workspace-header" id="top">
+      <div class="workspace-header__inner">
+        <a
+          class="brand"
+          href="../pcm_standalone/public_home/code.html#top"
+          aria-label="回到 LaiBE AI PCM 首頁"
+        >
+          <img
+            src="../../../../assets/logo/laibe_offer.svg"
+            alt="LaiBE offer"
+          />
+          <span class="brand__product">AI PCM</span>
+        </a>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-black/5">
-        <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="h-20 flex items-center justify-between">
-                <div class="flex items-center gap-2 font-black text-2xl tracking-tighter text-charcoal">
-                    <span class="material-symbols-outlined text-[30px] text-terracotta-red">architecture</span>
-                    <span>LaiBE</span>
-                </div>
-                <div class="flex items-center gap-6">
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">建立新專案</a>
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">我的案件</a>
-                    <a href="#" class="hidden sm:block text-sm font-bold text-charcoal/70 hover:text-charcoal">申請
-                        PCM</a>
-                    <div
-                        class="w-10 h-10 rounded-full bg-terracotta-red/10 flex items-center justify-center text-terracotta-red">
-                        <span class="material-symbols-outlined">person</span>
-                    </div>
-                </div>
-            </div>
+        <div class="workspace-header__context" aria-label="工作台角色">
+          <span class="context-chip context-chip--role">甲方</span>
+          <span class="context-chip" data-slot="case-name">尚待案件資料</span>
+          <span
+            class="context-chip context-chip--state"
+            data-slot="header-state"
+          >
+            驗證案件權限中
+          </span>
         </div>
+      </div>
     </header>
 
-    <main class="flex-grow">
+    <main id="main-content">
+      <section class="workspace-intro" aria-labelledby="workspace-title">
+        <div class="workspace-intro__copy">
+          <p class="eyebrow">已完成 PCM 服務契約後</p>
+          <h1 id="workspace-title">甲方案件工作台</h1>
+          <p class="workspace-intro__lead">
+            只限已登入且具案件權限的甲方。這裡把文件版次、PCM 書面檢討、
+            三方公開訊息與後續案件紀錄放在同一條可追溯的決策線上。
+          </p>
+          <div class="workspace-intro__meta" aria-label="工作台目前狀態">
+            <span class="state-pill" data-slot="state-label"
+            >尚待取得案件資料</span>
+            <span data-slot="agreement-label">PCM 服務契約：尚待確認</span>
+          </div>
+        </div>
 
-        <!-- HERO -->
-        <section class="py-16 lg:py-20 bg-white border-b border-black/5">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <div
-                            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-terracotta-red/10 text-terracotta-red text-sm font-bold mb-6">
-                            <span class="material-symbols-outlined text-[18px]">home</span>
-                            甲方入口首頁
-                        </div>
-                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight mb-6">
-                            開始規劃你的裝修
-                        </h1>
-                        <p class="text-lg sm:text-xl leading-relaxed text-charcoal/75 max-w-2xl mb-10 font-medium">
-                            先做平面拼圖，系統會自動生成裝修預算。
-                        </p>
-                        <button
-                            class="bg-terracotta-red text-white px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:opacity-90 transition">
-                            建立新專案
-                        </button>
-                    </div>
-
-                    <div class="bg-warm-beige rounded-3xl shadow-soft p-8">
-                        <div class="text-sm text-charcoal/50 font-bold mb-2">流程提示</div>
-                        <div class="text-2xl font-black mb-6">從規劃到決標</div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-white rounded-2xl p-4 text-center">
-                                <div
-                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                                    <span class="material-symbols-outlined">grid_view</span>
-                                </div>
-                                <div class="font-black">1 平面拼圖</div>
-                            </div>
-                            <div class="bg-white rounded-2xl p-4 text-center">
-                                <div
-                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                                    <span class="material-symbols-outlined">receipt_long</span>
-                                </div>
-                                <div class="font-black">2 預算生成</div>
-                            </div>
-                            <div class="bg-white rounded-2xl p-4 text-center">
-                                <div
-                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                                    <span class="material-symbols-outlined">publish</span>
-                                </div>
-                                <div class="font-black">3 上架案件</div>
-                            </div>
-                            <div class="bg-white rounded-2xl p-4 text-center">
-                                <div
-                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                                    <span class="material-symbols-outlined">groups</span>
-                                </div>
-                                <div class="font-black">4 廠商投標</div>
-                            </div>
-                            <div class="bg-white rounded-2xl p-4 text-center">
-                                <div
-                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                                    <span class="material-symbols-outlined">search_insights</span>
-                                </div>
-                                <div class="font-black">5 場勘</div>
-                            </div>
-                            <div class="bg-white rounded-2xl p-4 text-center">
-                                <div
-                                    class="w-12 h-12 mx-auto mb-3 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                                    <span class="material-symbols-outlined">task_alt</span>
-                                </div>
-                                <div class="font-black">6 決標</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <aside class="handoff-panel" aria-labelledby="handoff-title">
+          <div class="handoff-panel__topline">
+            <p class="eyebrow">現在球在誰手上</p>
+            <span class="signal-dot" aria-hidden="true"></span>
+          </div>
+          <h2 id="handoff-title" data-slot="current-actor">尚待載入</h2>
+          <p class="handoff-panel__action" data-slot="next-action">
+            取得可信案件資料後顯示下一步
+          </p>
+          <dl class="handoff-panel__facts">
+            <div>
+              <dt>誰正在等待誰</dt>
+              <dd data-slot="waiting-relationship">尚待載入</dd>
             </div>
-        </section>
-
-        <!-- 建立案件 -->
-        <section class="py-20 bg-warm-beige">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="mb-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">建立案件</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">工具優先，先開始規劃，再走向正式發案。</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white rounded-3xl shadow-soft p-8">
-                        <div
-                            class="w-16 h-16 rounded-2xl bg-terracotta-red/10 text-terracotta-red flex items-center justify-center mb-6">
-                            <span class="material-symbols-outlined text-[34px]">grid_view</span>
-                        </div>
-                        <h3 class="text-2xl font-black mb-4">平面拼圖</h3>
-                        <p class="text-charcoal/75 text-lg leading-relaxed mb-8 font-medium">
-                            拖放家具生成平面配置。
-                        </p>
-                        <button
-                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
-                            開始拼圖
-                        </button>
-                    </div>
-
-                    <div class="bg-white rounded-3xl shadow-soft p-8">
-                        <div
-                            class="w-16 h-16 rounded-2xl bg-terracotta-red/10 text-terracotta-red flex items-center justify-center mb-6">
-                            <span class="material-symbols-outlined text-[34px]">receipt_long</span>
-                        </div>
-                        <h3 class="text-2xl font-black mb-4">預算生成</h3>
-                        <p class="text-charcoal/75 text-lg leading-relaxed mb-8 font-medium">
-                            系統依據需求生成預算。
-                        </p>
-                        <button
-                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
-                            生成預算
-                        </button>
-                    </div>
-
-                    <div class="bg-white rounded-3xl shadow-soft p-8">
-                        <div
-                            class="w-16 h-16 rounded-2xl bg-terracotta-red/10 text-terracotta-red flex items-center justify-center mb-6">
-                            <span class="material-symbols-outlined text-[34px]">publish</span>
-                        </div>
-                        <h3 class="text-2xl font-black mb-4">發布招標</h3>
-                        <p class="text-charcoal/75 text-lg leading-relaxed mb-8 font-medium">
-                            上架案件讓廠商投標。
-                        </p>
-                        <button
-                            class="bg-terracotta-red text-white px-6 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition">
-                            發布案件
-                        </button>
-                    </div>
-                </div>
+            <div>
+              <dt>預計期限</dt>
+              <dd data-slot="next-due">依案件通知</dd>
             </div>
-        </section>
-
-        <!-- 我的專案 -->
-        <section class="py-20 bg-white border-y border-black/5">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="mb-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">我的裝修案件</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">查看目前規劃中、招標中與施工中的案件。</p>
-                </div>
-
-                <div class="overflow-hidden rounded-3xl border border-black/5 shadow-soft bg-white">
-                    <div class="grid grid-cols-4 bg-warm-beige px-6 py-4 font-black text-charcoal">
-                        <div>專案名稱</div>
-                        <div>預算</div>
-                        <div>案件狀態</div>
-                        <div>投標數</div>
-                    </div>
-
-                    <div class="grid grid-cols-4 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
-                        <div>主臥翻新案</div>
-                        <div>NT$ 580,000</div>
-                        <div>規劃中</div>
-                        <div>0</div>
-                    </div>
-
-                    <div class="grid grid-cols-4 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
-                        <div>中古屋全室裝修</div>
-                        <div>NT$ 1,280,000</div>
-                        <div>招標中</div>
-                        <div>3</div>
-                    </div>
-
-                    <div class="grid grid-cols-4 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
-                        <div>廚房衛浴更新</div>
-                        <div>NT$ 420,000</div>
-                        <div>場勘</div>
-                        <div>2</div>
-                    </div>
-
-                    <div class="grid grid-cols-4 px-6 py-5 border-t border-black/5 text-charcoal/80 font-medium">
-                        <div>辦公室整修</div>
-                        <div>NT$ 950,000</div>
-                        <div>施工</div>
-                        <div>已決標</div>
-                    </div>
-                </div>
+            <div>
+              <dt>最近留痕</dt>
+              <dd data-slot="last-recorded">尚待載入</dd>
             </div>
-        </section>
+          </dl>
+        </aside>
+      </section>
 
-        <!-- 工具入口 -->
-        <section class="py-20 bg-warm-beige">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="mb-10">
-                    <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">規劃工具</h2>
-                    <p class="text-lg text-charcoal/70 font-medium">在正式發案之前，先用工具把需求整理清楚。</p>
-                </div>
+      <section
+        class="access-notice"
+        data-role="access-notice"
+        aria-live="polite"
+        aria-labelledby="access-title"
+      >
+        <div class="access-notice__marker" aria-hidden="true">!</div>
+        <div>
+          <p class="eyebrow">目前狀態</p>
+          <h2 id="access-title" data-slot="access-title">
+            尚未取得可供顯示的案件資料
+          </h2>
+          <p data-slot="access-message">
+            登入、PCM 服務契約與案件權限確認完成後，才會載入你的案件內容。
+          </p>
+        </div>
+        <button
+          class="button button--ghost"
+          type="button"
+          data-action="retry"
+          hidden
+        >
+          重新載入
+        </button>
+      </section>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
-                        <div
-                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                            <span class="material-symbols-outlined">grid_view</span>
-                        </div>
-                        <div class="font-black text-lg">平面拼圖</div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
-                        <div
-                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                            <span class="material-symbols-outlined">receipt_long</span>
-                        </div>
-                        <div class="font-black text-lg">預算生成</div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
-                        <div
-                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                            <span class="material-symbols-outlined">construction</span>
-                        </div>
-                        <div class="font-black text-lg">工法規格書</div>
-                    </div>
-
-                    <div class="bg-white rounded-2xl p-6 shadow-soft text-center">
-                        <div
-                            class="w-14 h-14 mx-auto mb-4 rounded-full bg-terracotta-red/10 text-terracotta-red flex items-center justify-center">
-                            <span class="material-symbols-outlined">fact_check</span>
-                        </div>
-                        <div class="font-black text-lg">報價健檢</div>
-                    </div>
-                </div>
+      <section class="process-poster" aria-labelledby="process-title">
+        <div class="section-heading section-heading--inverse">
+          <p class="eyebrow">案件現在走到哪裡</p>
+          <h2 id="process-title">從文件到案件執行的四個節點</h2>
+          <p>
+            每個節點都固定責任人、文件版次、狀態與下一步，必須依案件紀錄確認完成。
+          </p>
+        </div>
+        <ol class="process-track" data-list="process-steps">
+          <li class="process-step" data-step="documents">
+            <span class="process-step__number">01</span>
+            <div>
+              <h3>文件與版本</h3>
+              <p>確認報價單、施工圖、補件與各自版次。</p>
             </div>
-        </section>
-
-        <!-- PCM 提示 -->
-        <section class="py-20 bg-white border-t border-black/5">
-            <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                <div
-                    class="bg-terracotta-red rounded-3xl px-8 py-10 lg:px-12 lg:py-12 text-white flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-                    <div>
-                        <div class="text-sm font-bold tracking-[0.2em] uppercase text-white/75 mb-3">PCM Support</div>
-                        <h2 class="text-3xl sm:text-4xl font-black leading-tight mb-4">
-                            需要專業審查嗎？
-                        </h2>
-                        <p class="text-lg text-white/85 max-w-2xl font-medium">
-                            場勘後的追加報價與施工文件，可由 PCM 進行審查。
-                        </p>
-                    </div>
-                    <button
-                        class="bg-white text-terracotta-red px-8 py-4 rounded-xl font-black text-lg shadow-soft hover:scale-[1.02] transition-all">
-                        申請 PCM
-                    </button>
-                </div>
+            <span class="process-step__state">尚待案件資料</span>
+          </li>
+          <li class="process-step" data-step="review">
+            <span class="process-step__number">02</span>
+            <div>
+              <h3>PCM 書面檢討</h3>
+              <p>整理完整性、範圍差異、風險與補件項目。</p>
             </div>
-        </section>
+            <span class="process-step__state">尚待案件資料</span>
+          </li>
+          <li class="process-step" data-step="governance">
+            <span class="process-step__number">03</span>
+            <div>
+              <h3>正式治理</h3>
+              <p>處理異議、回覆、暫緩與甲乙雙方書面協議。</p>
+            </div>
+            <span class="process-step__state">尚待案件資料</span>
+          </li>
+          <li class="process-step" data-step="execution">
+            <span class="process-step__number">04</span>
+            <div>
+              <h3>案件執行</h3>
+              <p>串連場勘、提交、變更、施工紀錄與驗收事項。</p>
+            </div>
+            <span class="process-step__state">尚待案件資料</span>
+          </li>
+        </ol>
+      </section>
 
+      <nav class="section-nav" aria-label="甲方工作台分區">
+        <a href="#overview">案件總覽</a>
+        <a href="#documents">文件與報價</a>
+        <a href="#submissions">乙方提交與場勘</a>
+        <a href="#messages">三方公開訊息</a>
+        <a href="#governance">治理檢查</a>
+        <a href="#design-review">設計送審</a>
+        <a href="#construction-records">施工與驗收紀錄</a>
+        <a href="#event-trail">案件留痕</a>
+      </nav>
+
+      <div class="workspace-layout">
+        <div class="workspace-main">
+          <section
+            class="workspace-section"
+            id="overview"
+            aria-labelledby="overview-title"
+          >
+            <div class="section-heading">
+              <p class="eyebrow">先看案件狀態</p>
+              <h2 id="overview-title">案件總覽</h2>
+              <p>先看目前狀態，再決定下一步；未知資料不補成零或假日期。</p>
+            </div>
+            <dl class="summary-grid">
+              <div class="summary-card">
+                <dt>目前文件版本</dt>
+                <dd data-slot="document-summary">尚待載入</dd>
+                <p>報價與施工圖各自綁定不可變版次。</p>
+              </div>
+              <div class="summary-card">
+                <dt>PCM 審查狀態</dt>
+                <dd data-slot="review-summary">尚待載入</dd>
+                <p>書面整理不取代甲方確認或授權 PCM 人員的最終決定。</p>
+              </div>
+              <div class="summary-card">
+                <dt>待確認事項</dt>
+                <dd data-slot="issue-summary">尚待載入</dd>
+                <p>逐項標示提出者、依據與等待對象。</p>
+              </div>
+              <div class="summary-card summary-card--accent">
+                <dt>下一步</dt>
+                <dd data-slot="next-summary">尚待載入</dd>
+                <p data-slot="next-owner-summary">責任人：尚待載入</p>
+              </div>
+            </dl>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="documents"
+            aria-labelledby="documents-title"
+          >
+            <div class="section-heading section-heading--split">
+              <div>
+                <p class="eyebrow">固定文件版次</p>
+                <h2 id="documents-title">文件與報價</h2>
+                <p>每份文件顯示種類、版次、提交者、時間與目前用途。</p>
+              </div>
+              <button class="button button--quiet" type="button" disabled>
+                文件入口正式開放後可使用
+              </button>
+            </div>
+            <ul class="record-list" data-list="documents">
+              <li class="empty-state">
+                <strong>尚未取得可供顯示的文件</strong>
+                <span
+                >確認案件權限後，才會列出可讀取的報價單與施工圖版本。</span>
+              </li>
+            </ul>
+            <p class="boundary-note">
+              基本檢討與報價健檢只整理完整性、範圍與風險提示，不代替任何工程商業判定。
+            </p>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="submissions"
+            aria-labelledby="submissions-title"
+          >
+            <div class="section-heading">
+              <p class="eyebrow">同一份案件資料</p>
+              <h2 id="submissions-title">乙方提交與場勘</h2>
+              <p>比較同一份需求、圖面與文件條件，不以單一數字替代完整判斷。</p>
+            </div>
+            <ul class="record-list" data-list="submissions">
+              <li class="empty-state">
+                <strong>尚未取得乙方提交資料</strong>
+                <span
+                >未有正式紀錄前，不顯示廠商名稱、金額、排序或回覆狀態。</span>
+              </li>
+            </ul>
+            <div class="subsection-grid">
+              <article class="subsection-card">
+                <span class="subsection-card__index">A</span>
+                <h3>場勘與會議</h3>
+                <p>時間、參與者、依據文件與待回覆事項都必須進入案件紀錄。</p>
+                <span class="status-tag">尚待案件資料</span>
+              </article>
+              <article class="subsection-card">
+                <span class="subsection-card__index">B</span>
+                <h3>合作條件檢查</h3>
+                <p>
+                  文件完整、範圍一致與甲乙雙方確認分開呈現，不以單方操作取代。
+                </p>
+                <span class="status-tag">尚待案件資料</span>
+              </article>
+            </div>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="messages"
+            aria-labelledby="messages-title"
+          >
+            <div class="section-heading section-heading--split">
+              <div>
+                <p class="eyebrow">三方可見留痕</p>
+                <h2 id="messages-title">三方公開訊息</h2>
+                <p>
+                  甲方、乙方與 PCM
+                  的正式訊息在案件內三方可見，並保存在萊比後台。
+                </p>
+              </div>
+              <button class="button button--quiet" type="button" disabled>
+                正式訊息入口正在整理中
+              </button>
+            </div>
+            <ul class="message-list" data-list="messages">
+              <li class="empty-state">
+                <strong>尚未取得案件訊息</strong>
+                <span>只有收到可信留痕憑證後，訊息才會顯示為「已記錄」。</span>
+              </li>
+            </ul>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="governance"
+            aria-labelledby="governance-title"
+          >
+            <div class="section-heading">
+              <p class="eyebrow">書面治理</p>
+              <h2 id="governance-title">治理檢查</h2>
+              <p>
+                PCM 逐項整理書面證據、異議與回覆，不冒充現場監工或工程驗收。
+              </p>
+            </div>
+            <div class="governance-grid">
+              <article class="governance-card">
+                <h3>文件條件</h3>
+                <ul class="check-list">
+                  <li>
+                    <span aria-hidden="true"></span>報價單與施工圖版次相符
+                  </li>
+                  <li>
+                    <span aria-hidden="true"></span>範圍、排除項與補件理由可追溯
+                  </li>
+                  <li>
+                    <span aria-hidden="true"></span>甲乙雙方讀到同一份事實
+                  </li>
+                </ul>
+                <p class="status-tag">尚待案件證據</p>
+              </article>
+              <article class="governance-card governance-card--focus">
+                <h3>異議、驗證與暫緩</h3>
+                <p>
+                  甲方提出異議或證據後，PCM 必須逐項檢查並回覆；這是治理程序，
+                  不會直接進入服務結束流程。
+                </p>
+                <p>
+                  甲方可因時間因素提出暫緩，須由乙方明確同意，並留下雙方同意的版本紀錄。
+                </p>
+              </article>
+              <article class="governance-card">
+                <h3>甲乙雙方自行協議</h3>
+                <p>
+                  若乙方提交被要求補件，甲方只有在同一份甲乙協議與明確確認存在時，
+                  才能呈現自行驗收結果。
+                </p>
+                <p class="status-tag">需同一份協議與確認紀錄</p>
+              </article>
+              <article class="governance-card">
+                <h3>PCM 結束介入後</h3>
+                <p>
+                  甲乙雙方仍可讀取案件後台已確認可用的既有內容；下載入口正式開放後，
+                  雙方可各自下載文件與留痕，PCM 不再介入。
+                </p>
+                <p class="status-tag">既有內容維持只供讀取</p>
+              </article>
+            </div>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="design-review"
+            aria-labelledby="design-review-title"
+          >
+            <div class="section-heading">
+              <p class="eyebrow">依文件作決定</p>
+              <h2 id="design-review-title">設計送審</h2>
+              <p>通過或要求修改，都必須綁定同一份文件版次、理由與可信時間。</p>
+            </div>
+            <ul class="record-list" data-list="designReviews">
+              <li class="empty-state">
+                <strong>尚未取得設計送審紀錄</strong>
+                <span>PCM
+                  可提出書面提醒，但不代替甲方接受設計或宣告現場品質。</span>
+              </li>
+            </ul>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="construction-records"
+            aria-labelledby="construction-title"
+          >
+            <div class="section-heading">
+              <p class="eyebrow">今天與下一步</p>
+              <h2 id="construction-title">施工與驗收紀錄</h2>
+              <p>優先回答今天做什麼、缺什麼、誰要決定什麼。</p>
+            </div>
+            <div class="construction-grid">
+              <article>
+                <span>今日焦點</span>
+                <strong data-slot="today-focus">尚待案件資料</strong>
+              </article>
+              <article>
+                <span>待處理事項</span>
+                <strong data-slot="construction-issues">尚待案件資料</strong>
+              </article>
+              <article>
+                <span>下一位處理者</span>
+                <strong data-slot="construction-actor">尚待案件資料</strong>
+              </article>
+            </div>
+            <ul class="record-list" data-list="constructionRecords">
+              <li class="empty-state">
+                <strong>尚未取得施工或驗收事件</strong>
+                <span
+                >施工任務、照片、追加減項與驗收缺失，必須來自案件後台紀錄。</span>
+              </li>
+            </ul>
+          </section>
+
+          <section
+            class="workspace-section"
+            id="event-trail"
+            aria-labelledby="event-trail-title"
+          >
+            <div class="section-heading">
+              <p class="eyebrow">可追溯紀錄</p>
+              <h2 id="event-trail-title">案件留痕</h2>
+              <p>
+                每筆紀錄回答誰、何時、對哪個案件、依哪份文件、做了什麼與下一步。
+              </p>
+            </div>
+            <ol class="timeline" data-list="events">
+              <li class="empty-state">
+                <strong>尚未取得可供顯示的案件留痕</strong>
+                <span
+                >歷史版本不會自動漂移到最新版，再次開啟時仍依案件紀錄顯示。</span>
+              </li>
+            </ol>
+          </section>
+        </div>
+
+        <aside class="workspace-aside" aria-label="案件狀態與快速入口">
+          <section class="aside-panel">
+            <p class="eyebrow">案件脈絡</p>
+            <h2>契約與案件狀態</h2>
+            <dl class="fact-list">
+              <div>
+                <dt>PCM 服務契約</dt>
+                <dd data-slot="agreement-state">尚待確認</dd>
+              </div>
+              <div>
+                <dt>契約版本</dt>
+                <dd data-slot="agreement-version">尚待載入</dd>
+              </div>
+              <div>
+                <dt>案件狀態</dt>
+                <dd data-slot="case-status">尚待載入</dd>
+              </div>
+              <div>
+                <dt>甲方身分</dt>
+                <dd data-slot="actor-label">尚待驗證</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="aside-panel aside-panel--accent">
+            <p class="eyebrow">決策邊界</p>
+            <h2>這裡幫你做什麼</h2>
+            <p>
+              整理文件、比對範圍、標示風險、固定三方訊息與每次決策依據，
+              讓甲方知道目前狀態和下一步。
+            </p>
+          </section>
+
+          <section class="aside-panel">
+            <p class="eyebrow">快速入口</p>
+            <h2>快速入口</h2>
+            <div class="quick-links">
+              <a href="../pcm_standalone/public_home/code.html#top">
+                <span>PCM 首頁</span>
+                <small>查看服務範圍與流程</small>
+              </a>
+              <a href="../pcm_standalone/basic_report/code.html">
+                <span>基本檢討說明</span>
+                <small>了解報告會整理哪些內容</small>
+              </a>
+              <a href="#documents">
+                <span>案件文件</span>
+                <small>查看報價單與施工圖版次</small>
+              </a>
+            </div>
+          </section>
+
+          <section
+            class="aside-panel aside-panel--quiet workspace-readiness-note"
+          >
+            <h2>正式案件入口尚未開放</h2>
+            <p>
+              身分與案件權限完成確認前，本頁不會顯示或建立正式案件紀錄。
+            </p>
+          </section>
+        </aside>
+      </div>
     </main>
 
-    <footer class="bg-charcoal py-12">
-        <div
-            class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-2 font-black text-xl tracking-tighter text-white">
-                <span class="material-symbols-outlined text-[26px]">architecture</span>
-                <span>LaiBE</span>
-            </div>
-            <div class="text-sm text-white/50 font-medium">
-                © 2026 LaiBE Inc. All rights reserved.
-            </div>
-            <div class="flex gap-6 text-sm text-white/50">
-                <a href="#" class="hover:text-white transition-colors">服務條款</a>
-                <a href="#" class="hover:text-white transition-colors">隱私權政策</a>
-            </div>
-        </div>
+    <footer class="workspace-footer">
+      <a
+        class="brand brand--footer"
+        href="../pcm_standalone/public_home/code.html#top"
+      >
+        <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+      </a>
+      <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
     </footer>
-
-</body>
-
+  </body>
 </html>
