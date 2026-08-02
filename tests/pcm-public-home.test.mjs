@@ -625,3 +625,17 @@ test("every configured public route resolves inside the PCM package", async () =
     await access(new URL(pathOnly, new URL("public/", packageUrl)));
   }
 });
+
+test("public homepage exposes the PCM service contract entry and canonical fee", async () => {
+  const html = await readPcmFile("public_home/code.html");
+  const css = await readPcmFile("public_home/styles.css");
+
+  assert.match(html, /href="\.\.\/service_contract\/code\.html"/);
+  assert.match(html, />PCM ??憟?<\/a>/);
+  assert.match(html, /3\.5%/);
+  assert.doesNotMatch(html, /銋\?3%\?\?/);
+  assert.match(
+    css,
+    /\.site-header nav > a:last-child[\s\S]*grid-column:\s*1\s*\/\s*-1/,
+  );
+});
