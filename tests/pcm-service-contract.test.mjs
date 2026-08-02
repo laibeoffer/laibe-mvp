@@ -14,7 +14,7 @@ const serviceContractDir = path.join(
   "service_contract",
 );
 const EXPECTED_CONTRACT_SOURCE_SHA256 =
-  "f207829161de7bab5370dfd8242137adcfaa74d528f35843af685bb6f18674c5";
+  "ceb9aff4abd20b3a7e49cf31f06c1ffad0141134af3b021251cb7a6a9aef6392";
 
 function moduleUrl(fileName) {
   return pathToFileURL(path.join(serviceContractDir, fileName)).href;
@@ -25,7 +25,13 @@ function sourceHash(source) {
 }
 
 test("service contract exports the exact frozen v0.3 content snapshot", async () => {
-  const { CONTRACT_META, CONTRACT_SOURCE, LIFECYCLE } = await import(
+  const {
+    CONTRACT_META,
+    CONTRACT_SOURCE,
+    CONTRACT_SOURCE_SHA256,
+    KEY_CLAUSES,
+    LIFECYCLE,
+  } = await import(
     moduleUrl("contract-content.js"),
   );
 
@@ -38,7 +44,8 @@ test("service contract exports the exact frozen v0.3 content snapshot", async ()
     "OWNER_ACCEPTED_PROVIDER_PENDING",
     "ACTIVE",
   ]);
-  assert.equal(sourceHash(CONTRACT_SOURCE), EXPECTED_CONTRACT_SOURCE_SHA256);
+  assert.equal(CONTRACT_SOURCE_SHA256, EXPECTED_CONTRACT_SOURCE_SHA256);
+  assert.equal(sourceHash(CONTRACT_SOURCE), CONTRACT_SOURCE_SHA256);
 
   for (const heading of [
     "第一條",
@@ -91,14 +98,25 @@ test("service contract exports the exact frozen v0.3 content snapshot", async ()
     assert.match(CONTRACT_SOURCE, new RegExp(`^# ${heading}[　\\s]`, "m"));
   }
 
+  const visibleContractText = `${JSON.stringify(KEY_CLAUSES)}\n${CONTRACT_SOURCE}`;
   for (const forbidden of [
     "localStorage",
+    "MVP",
+    "API",
+    "Evidence Packet",
+    "資料庫",
+    "preview",
+    "memo",
+    "ProjectRequirementBrief",
+    "金流",
+    "代收代付",
+    "服務方未來如提供金流",
     "PREVIEWED",
     "OWNER_SIGNED_PENDING_PCM_REVIEW",
     "PCM_REVIEWER_SIGNED_ACTIVE",
     "LEGAL_FINAL",
   ]) {
-    assert.equal(CONTRACT_SOURCE.includes(forbidden), false, forbidden);
+    assert.equal(visibleContractText.includes(forbidden), false, forbidden);
   }
 });
 
@@ -144,6 +162,7 @@ test("signing readiness evaluates the production initial envelope and fails clos
     ["short SHA-256", (envelope) => { envelope.contractVersionHash = "a".repeat(63); }],
     ["uppercase SHA-256", (envelope) => { envelope.contractVersionHash = EXPECTED_CONTRACT_SOURCE_SHA256.toUpperCase(); }],
     ["nonhex SHA-256", (envelope) => { envelope.contractVersionHash = "g".repeat(64); }],
+    ["different lowercase SHA-256", (envelope) => { envelope.contractVersionHash = "a".repeat(64); }],
     ["owner identity false", (envelope) => { envelope.ownerIdentityVerified = false; }],
     ["missing owner party id", (envelope) => delete envelope.ownerPartyId],
     ["empty owner party id", (envelope) => { envelope.ownerPartyId = ""; }],

@@ -1,11 +1,10 @@
 import {
   CONTRACT_META,
   CONTRACT_SOURCE,
+  CONTRACT_SOURCE_SHA256,
   KEY_CLAUSES,
   LIFECYCLE,
 } from "./contract-content.js";
-
-const SHA256 = /^[a-f0-9]{64}$/;
 
 const ENVELOPE_FACT_NAMES = Object.freeze([
   "contractVersionHash",
@@ -99,10 +98,7 @@ export function evaluateSigningReadiness(input = {}) {
     legalReviewStatus,
   ] = envelopeFacts ?? [];
 
-  if (
-    typeof contractVersionHash !== "string" ||
-    !SHA256.test(contractVersionHash)
-  ) {
+  if (contractVersionHash !== CONTRACT_SOURCE_SHA256) {
     reasons.push("正式契約版本尚未固定");
   }
   if (

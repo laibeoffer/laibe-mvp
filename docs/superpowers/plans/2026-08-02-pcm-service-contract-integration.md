@@ -99,17 +99,20 @@ git commit -m "test(pcm): specify service contract integration"
 - Test: `tests/pcm-service-contract.test.mjs`
 
 **Interfaces:**
-- Produces immutable `CONTRACT_META`, `KEY_CLAUSES`, `CONTRACT_SOURCE` and `LIFECYCLE` exports.
+- Produces immutable `CONTRACT_META`, `CONTRACT_SOURCE_SHA256`, `KEY_CLAUSES`, `CONTRACT_SOURCE` and `LIFECYCLE` exports.
 
 - [ ] **Step 1: Define immutable metadata and lifecycle**
 
 ```js
 export const CONTRACT_META = Object.freeze({
   version: "v0.3",
-  displayVersion: "MVP v0.3 Draft",
+  displayVersion: "v0.3 法務審閱稿",
   ownerServiceFeeRate: "3.5%",
   legalReviewStatus: "READY_FOR_LEGAL_REVIEW",
 });
+
+export const CONTRACT_SOURCE_SHA256 =
+  "ceb9aff4abd20b3a7e49cf31f06c1ffad0141134af3b021251cb7a6a9aef6392";
 
 export const LIFECYCLE = Object.freeze([
   "DRAFT",
@@ -121,7 +124,7 @@ export const LIFECYCLE = Object.freeze([
 
 - [ ] **Step 2: Port only inert legal content**
 
-Copy the exact eight `KEY_CLAUSES` entries and exact `contractSource` text from `C:\CodexWork\08-Jacky\laibe_MVP_project\site\shared\laibe-pcm-contract.js`. Remove all runtime fields and functions. Freeze the exported clause array and export the full source string unchanged, including Articles 1–28 and Annexes 1–14.
+Port the complete eight-clause summary and full Articles 1–28／Annexes 1–14 content from `C:\CodexWork\08-Jacky\laibe_MVP_project\site\shared\laibe-pcm-contract.js`. Remove all runtime fields and functions, replace external engineering/internal packet labels with product/legal wording, and categorically exclude payment custody or processing capability. Deep-freeze exported records and pin the exact resulting source hash.
 
 - [ ] **Step 3: Run focused tests**
 
