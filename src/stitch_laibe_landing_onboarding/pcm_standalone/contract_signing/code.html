@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="LaiBE 甲乙雙方合作契約簽訂頁，逐步核對同一份案件條件與契約版本。" />
+    <title>甲乙雙方合作契約｜LaiBE AI PCM</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-signing-state="CONTEXT_UNAVAILABLE">
+    <a class="skip-link" href="#contract-main">跳到契約內容</a>
+    <header class="contract-header">
+      <a class="brand" href="../public_home/code.html#top" aria-label="返回 LaiBE AI PCM 首頁">
+        <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+        <span>AI PCM</span>
+      </a>
+      <div class="contract-header__status"><span>契約簽訂</span><strong data-slot="header-state">前提尚待確認</strong></div>
+    </header>
+
+    <section class="contract-summary-strip" aria-label="案件契約摘要">
+      <div><span>案件</span><strong data-slot="case-name">尚待案件資料</strong></div>
+      <div><span>甲方</span><strong data-slot="owner-name">身分尚待確認</strong></div>
+      <div><span>乙方</span><strong data-slot="vendor-name">身分尚待確認</strong></div>
+      <div><span>契約版本</span><strong data-slot="contract-version">尚待確認</strong></div>
+      <div><span>下一步責任人</span><strong data-slot="next-actor">尚待確認</strong></div>
+    </section>
+
+    <header class="contract-hero">
+      <p class="eyebrow">甲乙雙方合作條件</p>
+      <h1>把範圍、版本、節點與驗收方式寫進同一份契約</h1>
+      <p>本頁只整理甲乙雙方的案件合作契約；PCM 協助治理與留痕，不取代任何一方簽署或作成最終專業決定。</p>
+    </header>
+
+    <ol class="contract-rail" aria-label="合作契約七個步驟">
+      <li class="contract-step is-current"><span>01</span><strong>確認合作條件</strong><small>範圍與責任</small></li>
+      <li class="contract-step"><span>02</span><strong>帶入案件資料</strong><small>同一案件版本</small></li>
+      <li class="contract-step"><span>03</span><strong>匯入預定進度</strong><small>節點與責任人</small></li>
+      <li class="contract-step"><span>04</span><strong>整理驗收節點</strong><small>確認依據</small></li>
+      <li class="contract-step"><span>05</span><strong>預覽契約與附件</strong><small>完整閱讀</small></li>
+      <li class="contract-step"><span>06</span><strong>甲乙雙方簽署</strong><small>同一版本</small></li>
+      <li class="contract-step"><span>07</span><strong>契約成立版本鎖定</strong><small>形成留痕</small></li>
+    </ol>
+
+    <nav class="contract-view-tabs" aria-label="契約內容分頁">
+      <a class="is-active" href="#conditions">合作條件</a>
+      <a href="#schedule">預定進度</a>
+      <a href="#acceptance">驗收節點</a>
+      <a href="#preview">契約預覽</a>
+      <a href="#signatures">雙方簽署</a>
+    </nav>
+
+    <main id="contract-main" class="contract-layout">
+      <article class="contract-editor" aria-labelledby="conditions-title">
+        <section id="conditions" class="contract-section">
+          <div class="section-heading"><span>STEP 01</span><h2 id="conditions-title">合作條件</h2><p>所有內容都必須連回案件、文件版本與雙方確認紀錄。</p></div>
+          <div class="condition-grid">
+            <label><span>案件名稱</span><input type="text" value="尚待可信案件資料" readonly /></label>
+            <label><span>合作版本</span><input type="text" value="尚待確認" readonly /></label>
+            <label class="wide"><span>工作範圍</span><textarea readonly>可信合作範圍載入後，會在這裡逐項列示。</textarea></label>
+            <label class="wide"><span>排除事項</span><textarea readonly>尚待甲乙雙方以同一版本確認。</textarea></label>
+          </div>
+        </section>
+
+        <section id="schedule" class="contract-section">
+          <div class="section-heading"><span>STEP 03</span><h2>預定進度</h2><p>節點需標示日期、責任人、前置條件與對應紀錄。</p></div>
+          <div class="timeline-empty"><strong>尚未帶入可信進度</strong><p>完成案件與雙方身分確認後，再從既有案件資料建立版本。</p></div>
+        </section>
+
+        <section id="acceptance" class="contract-section">
+          <div class="section-heading"><span>STEP 04</span><h2>驗收節點</h2><p>確認項目、缺失、回覆與完成狀態都必須留下依據。</p></div>
+          <div class="acceptance-table" role="table" aria-label="驗收節點">
+            <div role="row"><strong role="columnheader">節點</strong><strong role="columnheader">確認依據</strong><strong role="columnheader">目前狀態</strong></div>
+            <div role="row"><span>尚待整理</span><span>尚待文件版本</span><span>未建立</span></div>
+          </div>
+        </section>
+
+        <section id="preview" class="contract-section contract-preview">
+          <div class="section-heading"><span>STEP 05</span><h2>契約與附件預覽</h2><p>正式簽署前，甲乙雙方必須閱讀完全相同的版本與附件清單。</p></div>
+          <div class="preview-paper">
+            <p>LAIBE CASE CONTRACT</p>
+            <h3>裝修案件合作契約</h3>
+            <dl><div><dt>契約編號</dt><dd data-slot="contract-id">尚待建立</dd></div><div><dt>版本摘要</dt><dd data-slot="contract-hash">尚待建立</dd></div></dl>
+            <p>目前僅顯示準備狀態；未取得正式版本前不補入條款或簽署資料。</p>
+          </div>
+        </section>
+      </article>
+
+      <aside class="contract-sidebar">
+        <section class="readiness-card">
+          <p class="eyebrow">簽署前檢查</p>
+          <h2 data-slot="readiness-title">目前不能開始簽署</h2>
+          <ol data-list="readiness">
+            <li><span>案件綁定</span><strong>待確認</strong></li>
+            <li><span>甲方身分</span><strong>待確認</strong></li>
+            <li><span>乙方自然人快照</span><strong>待確認</strong></li>
+            <li><span>共同契約版本</span><strong>待確認</strong></li>
+            <li><span>可信寫入條件</span><strong>待確認</strong></li>
+          </ol>
+        </section>
+        <section class="record-card"><span>最近一筆紀錄</span><strong data-slot="last-record">尚待案件資料</strong><p>契約閱讀、接受與簽署結果會回到案件紀錄。</p></section>
+      </aside>
+    </main>
+
+    <section class="signature-area" id="signatures" aria-labelledby="signatures-title">
+      <div class="section-heading"><span>STEP 06</span><h2 id="signatures-title">甲乙雙方簽署</h2><p>兩方必須接受同一份不可變版本；任何前提不完整都不能簽署。</p></div>
+      <div class="signature-grid">
+        <article><span>甲方</span><strong data-slot="owner-signature">尚未簽署</strong><small>身分與版本待確認</small></article>
+        <article><span>乙方</span><strong data-slot="vendor-signature">尚未簽署</strong><small>自然人身分快照待確認</small></article>
+      </div>
+      <div class="signature-actions">
+        <a class="button button--secondary" href="#preview">返回契約預覽</a>
+        <button class="button button--primary" id="signContractButton" type="button" disabled aria-disabled="true">開始雙方簽署</button>
+      </div>
+    </section>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,200 @@
+{
+  "schemaName": "laibe.pcm-full-flow-visual-port-manifest.v1",
+  "schemaVersion": "laibe.pcm-full-flow-visual-port-manifest.v1",
+  "status": "LOCAL_UI_SOURCE_CANDIDATE_ONLY",
+  "base": {
+    "worktree": "C:\\CodexWork\\08-Jacky\\worktrees\\laibe_MVP_project\\aa-pcm-full-flow-visual-port-20260802",
+    "branch": "aa/pcm-full-flow-visual-port-20260802",
+    "head": "b07ff9c0b4b875bd6123e4c65ecaff87e564d39b",
+    "tree": "4fe06a00d470dca85fd79e39b8184ba02d443a76",
+    "parent": "abcaa3eab1a14c4ff47732fec541973738f444ae",
+    "stagedCount": 0,
+    "commitCreated": false
+  },
+  "visualSources": [
+    {
+      "target": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract",
+      "source": "C:\\CodexWork\\08-Jacky\\laibe_MVP_project\\site\\ai_pcm_045_contract_support_candidate\\code.html",
+      "bytes": 23345,
+      "sha256": "12717906fadbf214ac6fbbb92032282eaed5ac613a9c37ae9d10c25dfc21bb3f"
+    },
+    {
+      "target": "src/stitch_laibe_landing_onboarding/client_awarding_dashboard",
+      "source": "C:\\CodexWork\\08-Jacky\\laibe_MVP_project\\site\\owner_workspace\\code.html",
+      "bytes": 126289,
+      "sha256": "5b24d5993e63eccc94400955c1d09829859c3cf95658e1b11f7294c08997caba"
+    },
+    {
+      "target": "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace",
+      "source": "C:\\CodexWork\\08-Jacky\\laibe_MVP_project\\site\\pro_workspace\\code.html",
+      "bytes": 11885,
+      "sha256": "4ae2d88e21f3727c65a9f82e94bf68b55e78715702dd21b62da49736cc63a780"
+    },
+    {
+      "target": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing",
+      "source": "C:\\CodexWork\\08-Jacky\\laibe_MVP_project\\site\\pcm_contract_generator\\code.html",
+      "bytes": 33629,
+      "sha256": "05aedc5fb4ac9bc5bc775c35dcbf1802c58e4b501f3e3b19b920905582bfeb5c"
+    }
+  ],
+  "writeSet": [
+    "docs/governance/pcm-full-flow-visual-port-manifest.v1.json",
+    "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
+    "docs/superpowers/specs/2026-08-02-pcm-full-flow-visual-port-design.md",
+    "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
+    "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/contract-content.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/styles.css",
+    "tests/pcm-full-flow-visual-port.test.mjs",
+    "tests/pcm-service-contract.test.mjs"
+  ],
+  "artifactReceiptPolicy": "ALL_NON_MANIFEST_WRITESET_FILES_RAW_BYTES_GIT_BLOB_SHA1_AND_RAW_SHA256",
+  "artifactReceipts": [
+    {
+      "path": "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
+      "bytes": 7548,
+      "gitBlobSha1": "37124e35f05c6e0b08e06b9dea9833047491046b",
+      "sha256": "15b412719117539b3b14cc4f85a72cbc094736dacc8723e9531b4b64d5d63e8f"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-02-pcm-full-flow-visual-port-design.md",
+      "bytes": 5820,
+      "gitBlobSha1": "a07777962e691d8a8ed05b4672e43a7cf7b7aa8a",
+      "sha256": "e3cec69e5e25cca0618189032a63fec588dd54e8d8bbd4c5f9e9cde66146864c"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
+      "bytes": 22089,
+      "gitBlobSha1": "e33a0c25d2cf60ea1ed0ce16e4c7534d5e48dfa7",
+      "sha256": "ba78ea5599a8f2340d796a0d0c08fcfeb2cf5a500e6d6f3ef91ae294ac3e67e4"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
+      "bytes": 25591,
+      "gitBlobSha1": "25a750808dbbebd05f4b4587154c0ac66e4028b3",
+      "sha256": "897118d6c2bc07b4eddb5aa0968168e224b2b5d2abe95c65ceb465e1887107fc"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/app.js",
+      "bytes": 6351,
+      "gitBlobSha1": "2d9c2ee4a2b91c4008ea688692ee2d7bf056db98",
+      "sha256": "2671825ae7bfe690695b12212f38a461671381027fa83fea4b59d9422f647674"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/code.html",
+      "bytes": 7782,
+      "gitBlobSha1": "093ad4f9769c1f15da8cc725f2f689db1e4da63c",
+      "sha256": "7a7557c777a84fa447f56759e75003498fc872761c663f2e138376b96927618b"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/styles.css",
+      "bytes": 11176,
+      "gitBlobSha1": "2f367bae1b159b34b27c09b9649fd704bf4f91ba",
+      "sha256": "5b19e8e1cf4e11ffb7a8c220cffc5ad9bcc0030787e2dc5bf6f01916b2bebc49"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html",
+      "bytes": 6448,
+      "gitBlobSha1": "59589fe9d815b354b460af8d93a7d45a20e3e689",
+      "sha256": "19c91595f7b8d37aacf01cae5f4515a12392ecb7e5939f7dd69d17498bbfae0a"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/contract-content.js",
+      "bytes": 61723,
+      "gitBlobSha1": "2b0b942830c423565ec1f9edcd16c9fcdeba5f30",
+      "sha256": "cdfda867df2139cf6b1c8604e069f379c0c8011662cdc222c907989a84f80bd8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/styles.css",
+      "bytes": 18593,
+      "gitBlobSha1": "ef978bae86f5c88847a299bfe0dd0f0ab5719eaa",
+      "sha256": "8f0d453b95283c812fc7fc0ab02b82a68a4a2ba5c839418b2d1fdd45cd231ee5"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js",
+      "bytes": 4643,
+      "gitBlobSha1": "93945c31e72c6d0f1d539d3aac86fddc0bf779d1",
+      "sha256": "a649345e722e98dbc692310b99d84a6e484d26358945d0d5d95e7da6a5df997b"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+      "bytes": 6462,
+      "gitBlobSha1": "99ecba193952a44544d5ef1cdd0fde9f9e9dbc8c",
+      "sha256": "307e12fc414b30feb1465c3143de37b45f189844322cf073e90f6dff13b8cc15"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/styles.css",
+      "bytes": 9306,
+      "gitBlobSha1": "facc74ec4f002ab7bf03bbe1f9e288c3db0017c3",
+      "sha256": "0f4166fa9280eee47895b9009262a45a7c953f047849a6f9cea6414da951be11"
+    },
+    {
+      "path": "tests/pcm-full-flow-visual-port.test.mjs",
+      "bytes": 16838,
+      "gitBlobSha1": "20a32ccd51882735cb768c20146a8d9cf92f9152",
+      "sha256": "8f1b109b7b035754f1bf4d681c79719b171c19d5c8bcf2ddb4c78cc13afe3e7d"
+    },
+    {
+      "path": "tests/pcm-service-contract.test.mjs",
+      "bytes": 20970,
+      "gitBlobSha1": "9bee3cf1403b987bfc8d6bdc6419d19b1781cf1f",
+      "sha256": "797157e1f9423f0010a04b519eab0a3d3d7720524f64430f19328dba292abb83"
+    }
+  ],
+  "tddEvidence": {
+    "seedBaseline": "66/66 PASS",
+    "initialFocusedRed": "0/9 PASS; 9 expected failures",
+    "firstFocusedGreen": "9/9 PASS",
+    "expandedFailClosedRed": "9/11 PASS; vendor binding and signing payload/action gates failed as expected",
+    "expandedFocusedGreen": "11/11 PASS",
+    "manifestReceiptRed": "11/12 PASS; focused test receipt changed as expected",
+    "manifestFocusedGreen": "12/12 PASS",
+    "completePcmRegression": "78/78 PASS"
+  },
+  "freshGates": {
+    "nodeCheck": "5/5 PASS",
+    "strictUtf8": "16/16 PASS",
+    "completePcmLegacyMarketplaceScan": "PASS; zero matches",
+    "localHrefSrcAndFragmentResolution": "PASS",
+    "http": "13/13 HTTP 200",
+    "gitDiffCheck": "PASS",
+    "staged": 0
+  },
+  "browserQa": {
+    "desktop": {
+      "scope": "four target pages",
+      "horizontalOverflow": 0,
+      "consoleWarningsOrErrors": 0,
+      "defaultProtectedPayloads": 0,
+      "enabledWriteButtons": 0
+    },
+    "tablet768x1024": {
+      "scope": "four target pages",
+      "horizontalOverflow": 0,
+      "visibleControlsUnder44px": 0
+    },
+    "mobile390x844": {
+      "scope": "four target pages",
+      "horizontalOverflow": 0,
+      "visibleControlsUnder44px": 0
+    },
+    "temporaryServer": "STOPPED; port 8795 listener count 0",
+    "browserOverrides": "CLEARED"
+  },
+  "contentBoundaries": {
+    "serviceContract": "v0.3 / 3.5% / READY_FOR_LEGAL_REVIEW; not LEGAL_FINAL",
+    "signingAction": "disabled in UI source even when pure prerequisites evaluate ready; requires future A6 action and A5 durable writer gates",
+    "authRuntime": "CLOSED",
+    "durableWriter": "CLOSED",
+    "databaseStorage": "CLOSED",
+    "production": "CLOSED",
+    "mergeDeploy": "NOT_PERFORMED"
+  }
+}

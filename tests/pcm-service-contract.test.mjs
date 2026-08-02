@@ -14,7 +14,7 @@ const serviceContractDir = path.join(
   "service_contract",
 );
 const EXPECTED_CONTRACT_SOURCE_SHA256 =
-  "0000676e400fd42f6c87bb289457616f69c3dd54104380cca584130ebb783383";
+  "1b40d6aed828dab049db579eb19324af14f251b631c1c7e587c99a594ee8222a";
 
 function moduleUrl(fileName) {
   return pathToFileURL(path.join(serviceContractDir, fileName)).href;

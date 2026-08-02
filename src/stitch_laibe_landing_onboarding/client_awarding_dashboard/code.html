@@ -11,7 +11,7 @@
     <link
       rel="icon"
       type="image/svg+xml"
-      href="../../../../assets/logo/laibe_offer.svg"
+      href="../../../assets/logo/laibe_offer.svg"
     />
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./app.js"></script>
@@ -27,7 +27,7 @@
           aria-label="回到 LaiBE AI PCM 首頁"
         >
           <img
-            src="../../../../assets/logo/laibe_offer.svg"
+            src="../../../assets/logo/laibe_offer.svg"
             alt="LaiBE offer"
           />
           <span class="brand__product">AI PCM</span>
@@ -47,6 +47,26 @@
     </header>
 
     <main id="main-content">
+      <section class="journey-banner" aria-label="甲方案件流程">
+        <ol class="journey-banner__track">
+          <li class="journey-step is-current">
+            <span class="journey-number">1</span>
+            <div><strong>文件準備</strong><small>確認版本與補件</small></div>
+          </li>
+          <li class="journey-step">
+            <span class="journey-number">2</span>
+            <div><strong>案件總覽</strong><small>掌握責任與進度</small></div>
+          </li>
+          <li class="journey-step">
+            <span class="journey-number">3</span>
+            <div><strong>設計送審</strong><small>整理確認與變更</small></div>
+          </li>
+          <li class="journey-step">
+            <span class="journey-number">4</span>
+            <div><strong>施工與驗收</strong><small>留下執行紀錄</small></div>
+          </li>
+        </ol>
+      </section>
       <section class="workspace-intro" aria-labelledby="workspace-title">
         <div class="workspace-intro__copy">
           <p class="eyebrow">已完成 PCM 服務契約後</p>
@@ -114,6 +134,13 @@
         </button>
       </section>
 
+      <nav class="workspace-tabs" aria-label="甲方工作台主要分頁">
+        <a class="is-active" href="#documents">文件準備</a>
+        <a href="#overview">案件總覽</a>
+        <a href="#design-review">設計送審</a>
+        <a href="#construction-records">施工與驗收</a>
+      </nav>
+
       <section class="process-poster" aria-labelledby="process-title">
         <div class="section-heading section-heading--inverse">
           <p class="eyebrow">案件現在走到哪裡</p>
@@ -169,6 +196,7 @@
         <a href="#event-trail">案件留痕</a>
       </nav>
 
+      <div class="owner-shell-grid">
       <div class="workspace-layout">
         <div class="workspace-main">
           <section
@@ -424,7 +452,8 @@
           </section>
         </div>
 
-        <aside class="workspace-aside" aria-label="案件狀態與快速入口">
+        <aside class="owner-sidebar" aria-label="案件狀態與快速入口">
+          <div class="workspace-aside">
           <section class="aside-panel">
             <p class="eyebrow">案件脈絡</p>
             <h2>契約與案件狀態</h2>
@@ -484,7 +513,9 @@
               身分與案件權限完成確認前，本頁不會顯示或建立正式案件紀錄。
             </p>
           </section>
+          </div>
         </aside>
+      </div>
       </div>
     </main>
 
@@ -493,7 +524,7 @@
         class="brand brand--footer"
         href="../pcm_standalone/public_home/code.html#top"
       >
-        <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+        <img src="../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
       </a>
       <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
     </footer>

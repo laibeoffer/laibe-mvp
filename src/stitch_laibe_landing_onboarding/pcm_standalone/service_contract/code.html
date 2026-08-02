@@ -24,32 +24,37 @@
     </header>
 
     <main id="main-content">
-      <section class="masthead" aria-labelledby="page-title">
-        <div class="masthead__copy">
+      <section class="contract-scene" aria-labelledby="page-title">
+        <div class="contract-scene__heading">
           <p class="eyebrow">PCM 服務契約</p>
-          <h1 id="page-title">先把服務範圍、責任邊界與紀錄方式看清楚</h1>
-          <p class="masthead__lead">這是一份供甲方閱讀的服務契約草稿。正式簽署前，契約內容、自然人服務方資料與簽署前提都需要逐項確認。</p>
-          <div class="status-row" aria-label="契約目前狀態">
-            <span>v0.3</span>
-            <span class="status-row__legal">法務審閱中</span>
-            <span data-lifecycle>草稿</span>
+          <span data-lifecycle>草稿</span>
+        </div>
+        <div class="contract-case">
+          <div class="contract-case__tray" aria-hidden="true">
+            <span class="contract-case__tab">LAIBE</span>
+            <span class="contract-case__label">PCM SERVICE<br />CONTRACT · v0.3</span>
           </div>
+          <article class="contract-sheet contract-sheet--summary">
+            <p class="contract-sheet__kicker">AI PCM 案件治理資訊服務契約</p>
+            <h1 id="page-title">先把服務範圍、責任界線與紀錄方式看清楚</h1>
+            <p>本頁完整保留契約條文、附件與閱讀結構，供甲方逐條確認。正式版本、雙方身分與寫入條件尚未齊備前，簽署入口維持關閉。</p>
+            <dl class="contract-sheet__facts">
+              <div><dt>版本</dt><dd>v0.3</dd></div>
+              <div><dt>甲方服務費</dt><dd>依正式契約版本所載 3.5%</dd></div>
+              <div><dt>文件狀態</dt><dd>法務審閱中</dd></div>
+            </dl>
+          </article>
+          <article class="contract-sheet contract-sheet--statement">
+            <p class="contract-sheet__edition">完整契約與簽署主線</p>
+            <strong>Professional<br />Construction<br />Management</strong>
+            <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
+            <div class="contract-sheet__actions">
+              <a class="button button--paper" href="#full-contract">完整契約</a>
+              <button class="button button--paper" type="button" data-print-button>列印此份草稿</button>
+              <button class="button button--ink" type="button" data-sign-button disabled aria-disabled="true">開始簽署</button>
+            </div>
+          </article>
         </div>
-        <aside class="next-step" aria-label="下一步">
-          <span>目前等待</span>
-          <strong>法務確認契約內容與必要揭露</strong>
-          <p>下一步：完成法務審閱後，再確認簽約雙方資料與正式簽署安排。</p>
-        </aside>
-      </section>
-
-      <section class="document-case" aria-labelledby="case-title">
-        <div class="document-case__mark" aria-hidden="true"><span>LB</span><i></i><i></i><i></i></div>
-        <div>
-          <p class="eyebrow">文件盒</p>
-          <h2 id="case-title">AI PCM 案件治理資訊服務契約</h2>
-          <p>版本 v0.3 草稿｜完整條文、附件與簽署前提集中於此頁，便於比對、討論與留存。</p>
-        </div>
-        <a href="#full-contract">從完整契約開始閱讀</a>
       </section>
 
       <section id="contract-summary" class="summary section" aria-labelledby="summary-title">
@@ -101,8 +106,7 @@
         <div class="readiness__panel">
           <ol data-readiness-list aria-label="簽署前提清單"></ol>
           <div class="readiness__actions">
-            <button class="button button--muted" type="button" data-sign-button disabled aria-disabled="true">開始簽署</button>
-            <button class="button button--primary" type="button" data-print-button>列印此份草稿</button>
+            <a class="button button--primary" href="#full-contract">返回完整契約</a>
           </div>
         </div>
       </section>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="LaiBE AI PCM 乙方案件工作台，集中整理合作文件、任務、訊息與案件紀錄。" />
+    <title>乙方案件工作台｜LaiBE AI PCM</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-vendor-state="ACCESS_DENIED">
+    <a class="skip-link" href="#vendor-main">跳到案件內容</a>
+    <header class="vendor-header">
+      <a class="brand" href="../public_home/code.html#top" aria-label="返回 LaiBE AI PCM 首頁">
+        <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+        <span>AI PCM</span>
+      </a>
+      <div class="vendor-header__identity">
+        <span>乙方</span>
+        <strong data-slot="vendor-name">身分尚待確認</strong>
+      </div>
+    </header>
+
+    <nav class="main-tabs" aria-label="乙方主要工作區">
+      <a href="#invited-cases">受邀案件</a>
+      <a href="#documents">文件準備</a>
+      <a href="#case-focus">合作工作台</a>
+      <a class="is-active" href="#execution">執行中工作台</a>
+    </nav>
+
+    <main class="vendor-app" id="vendor-main">
+      <aside class="case-sidebar" id="invited-cases" aria-label="受邀案件清單">
+        <div class="case-sidebar__heading">
+          <p>MY CASES</p>
+          <h1>乙方案件</h1>
+        </div>
+        <div class="case-sidebar__notice" data-slot="access-message" role="status" aria-live="polite">
+          登入、邀請與案件成員資格確認完成後，才會顯示案件內容。
+        </div>
+        <ol class="case-list" data-list="cases">
+          <li class="case-list__empty">
+            <span>目前沒有可顯示的案件</span>
+            <small>請由邀請入口完成身分確認</small>
+          </li>
+        </ol>
+        <section class="sidebar-next">
+          <span>下一步責任人</span>
+          <strong data-slot="next-actor">尚待確認</strong>
+          <p data-slot="next-action">完成可信案件確認後顯示下一步。</p>
+        </section>
+      </aside>
+
+      <section class="vendor-workspace" aria-labelledby="workspace-title">
+        <header class="workspace-titlebar">
+          <div>
+            <p class="eyebrow">已接受合作版本後</p>
+            <h2 id="workspace-title" data-slot="case-name">尚待案件資料</h2>
+            <p data-slot="case-address">只有具備此案件權限的乙方可查看內容。</p>
+          </div>
+          <div class="workspace-titlebar__state">
+            <span>案件狀態</span>
+            <strong data-slot="case-state">尚待確認</strong>
+          </div>
+        </header>
+
+        <section class="vendor-focus-grid" id="case-focus" aria-label="案件摘要">
+          <article><span>文件版本</span><strong data-slot="document-version">—</strong><small>最近一筆紀錄：尚待確認</small></article>
+          <article><span>待補項目</span><strong data-slot="open-items">—</strong><small>由案件紀錄確認</small></article>
+          <article><span>下一個節點</span><strong data-slot="next-milestone">—</strong><small>責任人：尚待確認</small></article>
+          <article><span>合作狀態</span><strong data-slot="agreement-state">尚待確認</strong><small>依共同版本顯示</small></article>
+        </section>
+
+        <nav class="workspace-sections" aria-label="案件內容分區">
+          <a href="#documents">文件與版本</a>
+          <a href="#changes">補件與變更</a>
+          <a href="#execution">施工任務</a>
+          <a href="#records">案件紀錄</a>
+        </nav>
+
+        <div class="vendor-body-grid">
+          <section class="calendar-panel" id="execution" aria-labelledby="calendar-title">
+            <div class="panel-heading">
+              <div><p class="eyebrow">案件節點</p><h3 id="calendar-title">工作日曆</h3></div>
+              <span data-slot="calendar-month">尚待資料</span>
+            </div>
+            <div class="calendar-week" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+            <div class="calendar-empty" data-slot="calendar-empty">
+              <strong>尚無可信節點</strong>
+              <p>任務、照片與驗收日期會依案件紀錄顯示。</p>
+            </div>
+          </section>
+
+          <section class="message-panel" aria-labelledby="messages-title">
+            <div class="panel-heading">
+              <div><p class="eyebrow">三方公開訊息</p><h3 id="messages-title">案件對話</h3></div>
+              <span>0 則</span>
+            </div>
+            <div class="message-empty" data-list="messages">
+              <span aria-hidden="true">•••</span>
+              <strong>尚無可驗證訊息</strong>
+              <p>訊息需連回案件、發言者、時間與留存紀錄才會顯示。</p>
+            </div>
+            <button type="button" disabled aria-disabled="true">訊息入口整理中</button>
+          </section>
+        </div>
+
+        <div class="detail-grid">
+          <section class="detail-panel" id="documents">
+            <div class="panel-heading"><div><p class="eyebrow">文件準備</p><h3>合作文件與版本</h3></div><span>0 份</span></div>
+            <p class="empty-copy">合作報價、施工圖與補件必須保留版本、摘要值、提交者與時間。</p>
+          </section>
+          <section class="detail-panel" id="changes">
+            <div class="panel-heading"><div><p class="eyebrow">補件與變更</p><h3>待處理事項</h3></div><span>0 項</span></div>
+            <p class="empty-copy">尚未取得可信案件內容，不顯示任何推測資料。</p>
+          </section>
+          <section class="detail-panel detail-panel--wide" id="records">
+            <div class="panel-heading"><div><p class="eyebrow">最近一筆紀錄</p><h3>案件留痕</h3></div><span>尚待確認</span></div>
+            <p class="empty-copy">正式文件、回覆、變更、照片與驗收都會回到同一條案件紀錄。</p>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
