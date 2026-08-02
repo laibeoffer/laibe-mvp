@@ -39,7 +39,7 @@ function visibleCopy(html) {
 }
 
 function canonicalUtf8LfReceipt(rawBytes) {
-  const decoded = new TextDecoder("utf-8", { fatal: true }).decode(rawBytes);
+  const decoded = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(rawBytes);
   const bytes = Buffer.from(new TextEncoder().encode(decoded.replace(/\r\n/g, "\n")));
   return {
     bytes: bytes.length,
@@ -55,6 +55,32 @@ test("canonical receipt policy treats in-memory LF and CRLF UTF-8 as identical",
   const lf = Buffer.from("第一行\nsecond line\n", "utf8");
   const crlf = Buffer.from("第一行\r\nsecond line\r\n", "utf8");
   assert.deepEqual(canonicalUtf8LfReceipt(crlf), canonicalUtf8LfReceipt(lf));
+});
+
+test("canonical receipt policy preserves a UTF-8 BOM as distinct evidence", () => {
+  const withoutBom = Buffer.from("a", "utf8");
+  const withBom = Buffer.from([0xef, 0xbb, 0xbf, 0x61]);
+  assert.notDeepEqual(canonicalUtf8LfReceipt(withBom), canonicalUtf8LfReceipt(withoutBom));
+});
+
+test("canonical receipt policy preserves a lone carriage return byte-for-byte", () => {
+  const raw = Buffer.from("first\rsecond", "utf8");
+  const direct = {
+    bytes: raw.length,
+    sha256: createHash("sha256").update(raw).digest("hex"),
+    gitBlobSha1: createHash("sha1")
+      .update(Buffer.from(`blob ${raw.length}\0`))
+      .update(raw)
+      .digest("hex"),
+  };
+  assert.deepEqual(canonicalUtf8LfReceipt(raw), direct);
+});
+
+test("canonical receipt policy fatally rejects invalid UTF-8", () => {
+  assert.throws(
+    () => canonicalUtf8LfReceipt(Buffer.from([0xc3, 0x28])),
+    { name: "TypeError" },
+  );
 });
 
 test("the package is limited to the exact ten approved new paths", async () => {

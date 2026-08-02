@@ -60,9 +60,9 @@
     },
     {
       "path": "tests/pcm-governance-pages.test.mjs",
-      "bytes": 9142,
-      "sha256": "ad267fee055c149b5c0681c6abae1913a27bbe16967996fc1691d581951aa674",
-      "gitBlobSha1": "ed5573ec10ea0ff7c9d90d488e58dbab93c70fd0"
+      "bytes": 10067,
+      "sha256": "7f707c790c2789d46c4eaf7136de6919f5f45ee620918fc60b48baa8d641c622",
+      "gitBlobSha1": "2f86d957048b51eeeed7041f22462fa594dcf471"
     },
     {
       "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",

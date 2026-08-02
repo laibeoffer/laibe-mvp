@@ -137,9 +137,9 @@
     },
     {
       "path": "tests/pcm-full-flow-visual-port.test.mjs",
-      "bytes": 17333,
-      "gitBlobSha1": "f10427bd74a203db21c1781d531a1089d352ba89",
-      "sha256": "2c07bbfc229f6b6aa3f5038ab8c0fdeab67ad2d6028f2daff1c6769a88e5d0fd"
+      "bytes": 18258,
+      "gitBlobSha1": "d9f8adff9e76b3ec40dfca9f6369654d9611a194",
+      "sha256": "f5f5265ce960dbcc25279bcbc3f0bf8278ecbc44b89dc938458b5d9012f52838"
     },
     {
       "path": "tests/pcm-service-contract.test.mjs",
