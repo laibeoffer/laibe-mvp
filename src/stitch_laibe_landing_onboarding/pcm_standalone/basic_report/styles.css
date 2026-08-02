@@ -1,0 +1,349 @@
+.report-shell {
+  width: min(calc(100% - 48px), var(--max-width));
+  margin-inline: auto;
+}
+
+.report-intro {
+  display: grid;
+  min-height: 720px;
+  padding-block: clamp(94px, 12vw, 158px) clamp(76px, 9vw, 112px);
+  grid-template-columns: minmax(0, 1.08fr) minmax(370px, 0.62fr);
+  align-items: end;
+  gap: clamp(52px, 8vw, 108px);
+}
+
+.report-intro__copy h1 {
+  max-width: 820px;
+  font-size: clamp(3rem, 6vw, 5.8rem);
+}
+
+.report-status {
+  border-top: 1px solid var(--line-soft);
+}
+
+.report-status > div {
+  display: grid;
+  padding-block: 20px;
+  grid-template-columns: minmax(92px, 0.38fr) 1fr;
+  gap: 20px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.report-status dt {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.report-status dd {
+  color: var(--text-secondary);
+  font-weight: 850;
+}
+
+.report-section {
+  padding-block: clamp(86px, 10vw, 132px);
+  border-top: 1px solid var(--line-soft);
+}
+
+.report-section__heading {
+  max-width: 780px;
+  margin-bottom: clamp(42px, 6vw, 68px);
+}
+
+.report-section__heading > p:last-child,
+.evidence-copy > p:last-child,
+.report-next p {
+  margin-top: 22px;
+  color: var(--text-secondary);
+}
+
+.report-scope {
+  padding: 0;
+  border-block: 1px solid var(--line-soft);
+  list-style: none;
+}
+
+.report-scope li {
+  display: grid;
+  min-height: 132px;
+  grid-template-columns: 124px minmax(0, 1fr);
+  align-items: stretch;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.report-scope li:last-child {
+  border-bottom: 0;
+}
+
+.report-scope__index {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(135deg, rgba(255, 214, 42, 0.16), transparent 74%),
+    var(--process-yellow);
+  color: var(--process-ink);
+  font-family:
+    "Bahnschrift Condensed",
+    "Arial Narrow",
+    "Microsoft JhengHei",
+    sans-serif;
+  font-size: clamp(2.9rem, 6vw, 4.8rem);
+  font-weight: 950;
+  letter-spacing: -0.08em;
+}
+
+.report-scope li > div {
+  display: grid;
+  padding: 24px clamp(24px, 4vw, 46px);
+  align-content: center;
+}
+
+.report-scope strong {
+  color: var(--text-main);
+  font-size: clamp(1.05rem, 2vw, 1.42rem);
+}
+
+.report-scope p {
+  max-width: 720px;
+  margin-top: 8px;
+  color: var(--text-muted);
+}
+
+.report-section--evidence {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(420px, 0.74fr);
+  align-items: end;
+  gap: clamp(48px, 8vw, 100px);
+}
+
+.citation-anatomy {
+  border-top: 2px solid var(--process-yellow);
+}
+
+.citation-anatomy > div {
+  display: grid;
+  padding-block: 20px;
+  grid-template-columns: minmax(120px, 0.38fr) 1fr;
+  gap: 24px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.citation-anatomy dt {
+  color: var(--process-yellow);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.citation-anatomy dd {
+  color: var(--text-secondary);
+}
+
+.report-empty {
+  display: grid;
+  min-height: 260px;
+  padding: clamp(28px, 5vw, 56px);
+  grid-template-columns: minmax(110px, 0.28fr) 1fr;
+  align-items: center;
+  gap: clamp(28px, 5vw, 62px);
+  border-block: 1px solid var(--line-soft);
+  background:
+    linear-gradient(90deg, rgba(255, 214, 42, 0.08), transparent 52%),
+    rgba(255, 255, 255, 0.026);
+}
+
+.report-empty > span {
+  color: var(--process-yellow);
+  font-family:
+    "Bahnschrift Condensed",
+    "Arial Narrow",
+    sans-serif;
+  font-size: clamp(4.8rem, 10vw, 8rem);
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  line-height: 1;
+}
+
+.report-empty h3 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.6vw, 2.1rem);
+}
+
+.report-empty p {
+  max-width: 700px;
+  margin-top: 12px;
+  color: var(--text-muted);
+}
+
+.report-results {
+  border-top: 1px solid var(--line-soft);
+}
+
+.report-results[hidden] {
+  display: none;
+}
+
+.report-result {
+  padding-block: clamp(28px, 4vw, 44px);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.report-result__section,
+.report-result__citation-label {
+  color: var(--accent-cyan);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+.report-result h3 {
+  max-width: 780px;
+  margin: 8px 0 0;
+  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+}
+
+.report-result__detail {
+  max-width: 780px;
+  margin-top: 10px;
+  color: var(--text-secondary);
+}
+
+.report-result__citation-label {
+  margin-top: 24px;
+}
+
+.citation-list {
+  display: flex;
+  padding: 0;
+  margin: 10px 0 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+
+.citation-chip {
+  display: inline-flex;
+  min-height: 36px;
+  padding: 7px 12px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(121, 216, 255, 0.34);
+  border-radius: var(--pill);
+  background: rgba(121, 216, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+}
+
+.citation-chip strong {
+  color: var(--accent-cyan);
+}
+
+.report-section--boundary {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(430px, 0.72fr);
+  align-items: start;
+  gap: clamp(48px, 8vw, 100px);
+}
+
+.boundary-ledger {
+  border-top: 1px solid var(--accent-orange);
+}
+
+.boundary-ledger p {
+  padding-block: 18px;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text-secondary);
+}
+
+.report-next {
+  display: grid;
+  padding-block: clamp(82px, 10vw, 126px);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: clamp(36px, 7vw, 92px);
+  border-top: 1px solid var(--line-soft);
+}
+
+.report-next > div {
+  max-width: 780px;
+}
+
+.report-next h2 {
+  font-size: clamp(2rem, 4vw, 3.8rem);
+}
+
+@media (max-width: 1000px) {
+  .report-intro,
+  .report-section--evidence,
+  .report-section--boundary,
+  .report-next {
+    grid-template-columns: 1fr;
+  }
+
+  .report-intro {
+    min-height: auto;
+    padding-top: 92px;
+    align-items: start;
+  }
+
+  .report-status,
+  .citation-anatomy,
+  .boundary-ledger {
+    max-width: 760px;
+  }
+
+  .report-next .button {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 680px) {
+  .report-shell {
+    width: min(calc(100% - 32px), var(--max-width));
+  }
+
+  .report-intro {
+    padding-block: 68px 82px;
+  }
+
+  .report-intro__copy h1 {
+    font-size: clamp(2.65rem, 13vw, 4rem);
+  }
+
+  .report-status > div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .report-scope li {
+    min-height: 116px;
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .report-scope__index {
+    font-size: 2.6rem;
+  }
+
+  .report-scope li > div {
+    padding: 18px 16px;
+  }
+
+  .citation-anatomy > div {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .report-empty {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .report-empty > span {
+    font-size: 4rem;
+  }
+
+  .report-next .button {
+    width: 100%;
+  }
+}

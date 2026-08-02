@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="LaiBE PCM 案件審查工作台，整理案件風險、文件依據、下一步與處理紀錄。"
+    />
+    <title>PCM 案件審查｜LaiBE</title>
+    <link
+      rel="icon"
+      href="../../../assets/logo/laibe_offer.svg"
+      type="image/svg+xml"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到案件內容</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="./code.html#inbox-view" aria-label="回到 PCM 案件列表">
+          <img
+            src="../../../assets/logo/laibe_offer.svg"
+            alt="LaiBE"
+            width="132"
+            height="42"
+          />
+          <span aria-hidden="true"></span>
+          <strong>PCM 案件審查</strong>
+        </a>
+
+        <div class="signed-identity" aria-label="目前登入身分">
+          <span class="identity-mark" aria-hidden="true"></span>
+          <div>
+            <strong>PCM 審查員</strong>
+            <span>你已以 PCM 身分登入 · 試營運書面審查帳號</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" class="page-shell">
+      <section class="page-intro" aria-labelledby="page-title">
+        <div>
+          <p class="page-intro__context">案件決策與留痕</p>
+          <h1 id="page-title">今天先把誰的下一步說清楚</h1>
+          <p>
+            逐案核對文件版本、標註風險、要求補件，並把人工判讀留下可追溯紀錄。
+          </p>
+        </div>
+        <div class="scope-notice">
+          <strong>試營運書面審查資料</strong>
+          <span>目前顯示試營運書面審查案件，正式開放後將載入你的授權案件資料</span>
+          <span>僅依已提交且可辨識的文件版本進行書面核對</span>
+        </div>
+      </section>
+
+      <section id="state-view" aria-live="polite"></section>
+
+      <section id="inbox-view" hidden>
+        <div id="case-metrics" class="metrics-strip" aria-label="案件摘要"></div>
+
+        <div class="inbox-toolbar">
+          <div>
+            <span>我的案件</span>
+            <h2>待審工作列</h2>
+          </div>
+          <div class="filter-bar" aria-label="篩選案件">
+            <button
+              class="filter-button"
+              type="button"
+              data-action="filter"
+              data-filter="ALL"
+              aria-pressed="true"
+            >
+              全部
+            </button>
+            <button
+              class="filter-button"
+              type="button"
+              data-action="filter"
+              data-filter="IN_REVIEW"
+              aria-pressed="false"
+            >
+              待我審查
+            </button>
+            <button
+              class="filter-button"
+              type="button"
+              data-action="filter"
+              data-filter="WAITING_SUPPLEMENT"
+              aria-pressed="false"
+            >
+              等待補件
+            </button>
+            <span id="case-count" class="case-count"></span>
+          </div>
+        </div>
+
+        <div id="case-list" class="case-list"></div>
+      </section>
+
+      <section id="case-view" hidden aria-live="polite"></section>
+    </main>
+
+    <dialog id="supplement-dialog" class="action-dialog">
+      <form id="supplement-form" method="dialog" novalidate>
+        <div class="dialog-heading">
+          <div>
+            <span>建立案件紀錄</span>
+            <h2>要求補件</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-action="close-supplement"
+            aria-label="關閉補件表單"
+          >
+            ×
+          </button>
+        </div>
+        <p class="dialog-intro">
+          指定缺少的依據與下一位處理者。送出後會建立一筆補件紀錄。
+        </p>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>補件原因</span>
+            <select name="reasonCode" required>
+              <option value="">選擇原因</option>
+              <option value="MISSING_SCOPE">範圍說明不足</option>
+              <option value="DOCUMENT_VERSION_MISMATCH">文件版次不一致</option>
+              <option value="MISSING_EVIDENCE">審查依據不足</option>
+              <option value="OTHER">其他需釐清事項</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>依據文件</span>
+            <select id="supplement-document" name="documentId" required></select>
+          </label>
+
+          <label class="field">
+            <span>收件者</span>
+            <select
+              id="supplement-recipient"
+              name="recipientActorId"
+              required
+            ></select>
+          </label>
+
+          <label class="field">
+            <span>處理期限</span>
+            <input name="dueAt" type="date" required />
+          </label>
+
+          <label class="field field--wide">
+            <span>需要補充的內容</span>
+            <textarea
+              name="details"
+              rows="5"
+              required
+              placeholder="說明缺少什麼、應以哪份內容為準，以及補齊後由誰續審"
+            ></textarea>
+          </label>
+        </div>
+
+        <p
+          id="supplement-form-error"
+          class="form-error"
+          role="alert"
+        ></p>
+
+        <div class="dialog-actions">
+          <button
+            class="button button--ghost"
+            type="button"
+            data-action="close-supplement"
+          >
+            取消
+          </button>
+          <button class="button button--primary" type="submit">
+            建立補件紀錄
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
