@@ -30,7 +30,9 @@ const safeHasOwn = Object.hasOwn;
 const safeDefineProperty = Object.defineProperty;
 const safeReflectApply = Reflect.apply;
 const safeStringTrim = String.prototype.trim;
+const safeNumberIsSafeInteger = Number.isSafeInteger;
 const noArguments = Object.freeze([]);
+const MAX_AUTHORITY_ROWS = 1000;
 
 const invalidField = Object.freeze({ ok: false, value: undefined });
 
@@ -60,23 +62,32 @@ function isNonEmptyString(value) {
 function readDenseArray(value) {
   try {
     if (!safeArrayIsArray(value)) return { ok: false, length: 0, items: null };
+    const lengthField = readOwnData(value, "length", false);
+    const length = lengthField.value;
+    if (
+      !lengthField.ok ||
+      typeof length !== "number" ||
+      !safeNumberIsSafeInteger(length) ||
+      length < 0 ||
+      length > MAX_AUTHORITY_ROWS
+    ) {
+      return { ok: false, length: 0, items: null };
+    }
+    const items = new SafeArray(length);
+    for (let index = 0; index < length; index += 1) {
+      const itemField = readOwnData(value, index);
+      if (!itemField.ok) return { ok: false, length: 0, items: null };
+      safeDefineProperty(items, index, {
+        value: itemField.value,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    }
+    return { ok: true, length, items };
   } catch {
     return { ok: false, length: 0, items: null };
   }
-  const lengthField = readOwnData(value, "length", false);
-  if (!lengthField.ok) return { ok: false, length: 0, items: null };
-  const items = new SafeArray(lengthField.value);
-  for (let index = 0; index < lengthField.value; index += 1) {
-    const itemField = readOwnData(value, index);
-    if (!itemField.ok) return { ok: false, length: 0, items: null };
-    safeDefineProperty(items, index, {
-      value: itemField.value,
-      enumerable: true,
-      writable: true,
-      configurable: true,
-    });
-  }
-  return { ok: true, length: lengthField.value, items };
 }
 
 function makeActionsForStatus(status) {
@@ -217,18 +228,35 @@ const copyByState = Object.freeze({
   LOAD_FAILED_RETRYABLE: ["暫時無法確認案件授權", "請稍後重新整理；確認完成前不會顯示案件內容。"],
 });
 
+function copyForState(state) {
+  if (state === PCM_AUTHORIZED_CONSOLE_STATES.ACCESS_CHECKING) return copyByState.ACCESS_CHECKING;
+  if (state === PCM_AUTHORIZED_CONSOLE_STATES.ACCESS_DENIED) return copyByState.ACCESS_DENIED;
+  if (state === PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_EMPTY) return copyByState.AUTHORIZED_EMPTY;
+  if (state === PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY) return copyByState.AUTHORIZED_READY;
+  if (state === PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY) return copyByState.CASE_ARCHIVED_READ_ONLY;
+  if (state === PCM_AUTHORIZED_CONSOLE_STATES.LOAD_FAILED_RETRYABLE) return copyByState.LOAD_FAILED_RETRYABLE;
+  return copyByState.ACCESS_DENIED;
+}
+
 export function renderPcmAuthorizedConsole(result) {
   if (typeof document === "undefined") return;
+  const stateField = readOwnData(result, "state");
+  const state = stateField.ok && typeof stateField.value === "string"
+    ? stateField.value
+    : PCM_AUTHORIZED_CONSOLE_STATES.ACCESS_DENIED;
   const title = document.querySelector("[data-state-title]");
   const detail = document.querySelector("[data-state-detail]");
   const shell = document.querySelector("[data-authorized-shell]");
-  const stateCopy = copyByState[result.state];
-  if (title && detail && stateCopy) [title.textContent, detail.textContent] = stateCopy;
-  if (shell) shell.hidden = ![
-    PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY,
-    PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY,
-  ].includes(result.state);
-  document.documentElement.dataset.consoleState = result.state;
+  const stateCopy = copyForState(state);
+  if (title && detail) {
+    title.textContent = stateCopy[0];
+    detail.textContent = stateCopy[1];
+  }
+  if (shell) {
+    shell.hidden = state !== PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY &&
+      state !== PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY;
+  }
+  document.documentElement.dataset.consoleState = state;
 }
 
 if (typeof document !== "undefined") {

@@ -75,7 +75,7 @@ brand-fidelity: 10
 
 預設 context 解析為 `ACCESS_DENIED`，case payload 為空陣列、enabled actions 為空陣列。所有供 authority 判斷的 context、actor、membership、contract、case binding 與 row 欄位，都必須是 own、enumerable、data descriptor，且只從 descriptor 取值一次；prototype 繼承欄位、accessor、descriptor trap 失敗一律拒絕且不得執行 getter。`actor.id`、`membership.actorId`、`caseBinding.caseId`、`contract.caseId` 與每個 authorized row 的 `id`、`status`、`nextOwner` 都必須是 primitive、trim 後非空字串；object、undefined 與空字串一律拒絕。`membership.caseIds` 必須是 dense closed array，每個 `0..length-1` index 都是 own enumerable data property，且只含 primitive 非空字串；requested case ID 在陣列中必須精確出現一次。
 
-`authorizedCases` 必須是 dense closed valid-row array，不接受 sparse index、null、繼承或 accessor row；revoked Proxy 或其他使 array／descriptor 檢查拋錯的輸入也必須穩定拒絕。requested case 為 0 列時進 `AUTHORIZED_EMPTY`；精確 1 列才可依明文狀態表判斷；同 case 重複列或任何無效 row 一律 `ACCESS_DENIED`，payload／actions 為空。authority path 只以 numeric loop、captured safe intrinsics 與 direct comparison 運作，不依賴可於載入後被改寫的 Array／Set prototype 或 iterator；輸出複製也不走 iterator。狀態表只有：
+`authorizedCases` 必須是 dense closed valid-row array，不接受 sparse index、null、繼承或 accessor row；revoked Proxy 或其他使 array／descriptor 檢查拋錯的輸入也必須穩定拒絕。每個 authority array 的 own data `length` 必須是 primitive number，通過載入時捕捉的 safe-integer 判斷，且範圍為 `0..1000`；NaN、Infinity、負數、小數、超過 1000 或 throwing descriptor 都必須在 allocation／loop 前拒絕。整段 allocation 與 descriptor copy 必須 exception-safe，不得向外漏出 RangeError。requested case 為 0 列時進 `AUTHORIZED_EMPTY`；精確 1 列才可依明文狀態表判斷；同 case 重複列或任何無效 row 一律 `ACCESS_DENIED`，payload／actions 為空。authority path 只以 numeric loop、captured safe intrinsics 與 direct comparison 運作，不依賴可於載入後被改寫的 Array／Set prototype 或 iterator；輸出複製也不走 iterator。狀態表只有：
 
 | 案件明文狀態 | Resolver state | Enabled actions |
 | --- | --- | --- |
@@ -84,7 +84,7 @@ brand-fidelity: 10
 
 未知狀態（包含 `ATTACKER`）不得 fallback READY。新增有效狀態前必須先在本規格與 adversarial tests 逐一列出 state／actions mapping。
 
-shell 顯示時 renderer 文案必須與 state 同步：`AUTHORIZED_READY` 顯示「案件授權已確認／可依案件目前狀態開始文件檢討並留下判斷依據。」；`CASE_ARCHIVED_READ_ONLY` 顯示「案件已封存，限調閱／可調閱既有文件與案件紀錄，目前不提供新的處理動作。」；不得保留未授權文案。
+shell 顯示時 renderer 文案必須與 state 同步：`AUTHORIZED_READY` 顯示「案件授權已確認／可依案件目前狀態開始文件檢討並留下判斷依據。」；`CASE_ARCHIVED_READ_ONLY` 顯示「案件已封存，限調閱／可調閱既有文件與案件紀錄，目前不提供新的處理動作。」；不得保留未授權文案。Renderer 只接受 own enumerable data `state`，並以 direct closed equality 決定 shell visibility；不得使用 `Array.prototype.includes` 或其他可變 shared prototype。unknown、inherited 或 accessor state 一律顯示 denied copy、隱藏 private shell，且不得執行 getter 或拋錯。
 
 ## 內部治理台
 
@@ -115,7 +115,14 @@ shell 顯示時 renderer 文案必須與 state 同步：`AUTHORIZED_READY` 顯�
 | `active` | 非空 | `GOVERNANCE_READY` | `manage_access`、`manual_assignment`、`record_reason` |
 | `read_only` | 空或非空 | `GOVERNANCE_READ_ONLY` | 無 |
 
-mode 缺失或未知一律 `GOVERNANCE_DENIED`，不得因 records 為空而取得管理 actions。shell 顯示時，`GOVERNANCE_READY` 顯示「內部治理權限已確認／可依責任範圍管理帳號、人工指派與異動原因。」；`GOVERNANCE_READ_ONLY` 顯示「內部治理為唯讀／可調閱既有治理紀錄，目前不提供異動操作。」；不得保留未授權文案。
+mode 缺失或未知一律 `GOVERNANCE_DENIED`，不得因 records 為空而取得管理 actions。shell 顯示時，`GOVERNANCE_READY` 顯示「內部治理權限已確認／可依責任範圍管理帳號、人工指派與異動原因。」；`GOVERNANCE_READ_ONLY` 顯示「內部治理為唯讀／可調閱既有治理紀錄，目前不提供異動操作。」；不得保留未授權文案。治理 renderer 同樣只接受 own data state 與 direct closed equality；shared prototype 污染、unknown、inherited 或 accessor state 都不得開啟 private shell。
+
+## Evidence identity
+
+- `originalProductWriteSet` 固定為原始派令 exact10，只描述本工作包最初建立的十個產品／證據路徑。
+- `cumulativeGitPathSet` 必須由測試 fresh 呼叫 Git 比對 base `0b0037ff50a4dc5b1756fe3230588f12a01c5337` 至 working candidate，固定為 exact13；多出的三個 frozen full-flow evidence paths 也必須納入 canonical receipts。
+- Manifest 必須列出從 `eb3aa2458873d970a2f7c479f1cfae3db6f0e360` 至 `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a` 的 correction chain 與每筆 exact parent；本次 bounded correction 的 exact parent 是 `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`，不得把 final parent 寫成初始 base。
+- `artifactReceipts` 覆蓋 cumulative exact13 中除本 manifest 自身外的 12 個 artifacts，沿用 `UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1`，manifest 不自我 hash。
 
 ## 視覺與互動規則
 

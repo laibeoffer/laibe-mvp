@@ -8,7 +8,7 @@
     "tree": "57bb0dc3775af085810a60a6719c5fa898e98a8d",
     "branch": "a3/pcm-governance-pages-source-20260802"
   },
-  "writeSet": [
+  "originalProductWriteSet": [
     "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
     "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
     "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
@@ -20,25 +20,75 @@
     "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
     "docs/governance/pcm-governance-pages-manifest.v1.json"
   ],
+  "cumulativeGitPathSet": [
+    "docs/governance/pcm-full-flow-visual-port-manifest.v1.json",
+    "docs/governance/pcm-governance-pages-manifest.v1.json",
+    "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
+    "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
+    "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
+    "tests/pcm-full-flow-visual-port.test.mjs",
+    "tests/pcm-governance-pages.test.mjs"
+  ],
+  "finalCorrectionParent": "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a",
+  "correctionChain": [
+    {
+      "commit": "eb3aa2458873d970a2f7c479f1cfae3db6f0e360",
+      "parent": "0b0037ff50a4dc5b1756fe3230588f12a01c5337"
+    },
+    {
+      "commit": "199e8edf3aa82a0b4bee624054c00bd67214e90c",
+      "parent": "eb3aa2458873d970a2f7c479f1cfae3db6f0e360"
+    },
+    {
+      "commit": "7c033382164e8f29218bf6ffb4afd3c953e88da6",
+      "parent": "199e8edf3aa82a0b4bee624054c00bd67214e90c"
+    },
+    {
+      "commit": "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d",
+      "parent": "7c033382164e8f29218bf6ffb4afd3c953e88da6"
+    },
+    {
+      "commit": "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a",
+      "parent": "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d"
+    }
+  ],
   "artifactReceiptPolicy": "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1",
   "artifactReceipts": [
     {
-      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
-      "bytes": 6986,
-      "sha256": "d4c9c45238d54293722461d9d80caeb6f6254c96c7f25121622a82f249d9634a",
-      "gitBlobSha1": "d42c1c806b9f09c86f92e15f7aad59e2eb9324a3"
+      "path": "docs/governance/pcm-full-flow-visual-port-manifest.v1.json",
+      "bytes": 8973,
+      "sha256": "a987fb08a9baa9605bcce2c67e8eb2438acafb44e82ac3f120390a10f795765f",
+      "gitBlobSha1": "d72032f668742889e5623449f88a522c2bbaef9e"
     },
     {
-      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
-      "bytes": 8370,
-      "sha256": "950282e599baf55c6f9d851136fcfbcaf1fc4b91539d2172fd665071f0e82981",
-      "gitBlobSha1": "e17c7203593020438c3270d2cfa63f16a140a371"
+      "path": "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
+      "bytes": 7785,
+      "sha256": "80ad3f346cb04b0f14a55b833b0371cc55830b0e296beb778290b20869a10cfb",
+      "gitBlobSha1": "6f3454ed67a0dd3f8bea4294b0de46175bca4356"
     },
     {
-      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
-      "bytes": 9638,
-      "sha256": "5b4c2169e4fe716bc6ef46219fedeb63b041e036e009c8a0b48a5be315a55da7",
-      "gitBlobSha1": "a38b172d119e5609e90d9d13aeab7b64959d7365"
+      "path": "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
+      "bytes": 11242,
+      "sha256": "ebdeec3fde3e619a7256112686e2c268d8ebfafe27c4ae7357176c5618ac274e",
+      "gitBlobSha1": "0c6bc0677806e0476ffbfed224081b9e39d37975"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
+      "bytes": 11117,
+      "sha256": "39e1cf4c21c37dd5316cae9d227554e4d232df9a026db97eae7f6775a77b9363",
+      "gitBlobSha1": "62b1ae0eb9d1985e1864b7b7dd28c53e762d09e6"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
+      "bytes": 9377,
+      "sha256": "466ab318d5e4b2bd10f5b8fb992d9479816b1fb1e2189ef79d1358c7093dc543",
+      "gitBlobSha1": "f96d322de94e83bfaccfb2f1cd0cc453e0c7abc2"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html",
@@ -53,28 +103,34 @@
       "gitBlobSha1": "2251fff4727289766ae4de0c3eadd8ba1a4e00e7"
     },
     {
-      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
-      "bytes": 8215,
-      "sha256": "8b0aa7c2229e996ab3dc2598c758a9c563aeafa0219e07475335f7740647d0bf",
-      "gitBlobSha1": "4fc384b74f120dd06ec486b909c56523faf475b0"
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
+      "bytes": 10801,
+      "sha256": "72de19f95e8dce3206abca70faf834704af5584d13750f32b9c0c7389ed66a92",
+      "gitBlobSha1": "e27c73f2862f4acc121140fff223263e1bc2eb1a"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
+      "bytes": 6986,
+      "sha256": "d4c9c45238d54293722461d9d80caeb6f6254c96c7f25121622a82f249d9634a",
+      "gitBlobSha1": "d42c1c806b9f09c86f92e15f7aad59e2eb9324a3"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
+      "bytes": 8370,
+      "sha256": "950282e599baf55c6f9d851136fcfbcaf1fc4b91539d2172fd665071f0e82981",
+      "gitBlobSha1": "e17c7203593020438c3270d2cfa63f16a140a371"
+    },
+    {
+      "path": "tests/pcm-full-flow-visual-port.test.mjs",
+      "bytes": 18258,
+      "sha256": "f5f5265ce960dbcc25279bcbc3f0bf8278ecbc44b89dc938458b5d9012f52838",
+      "gitBlobSha1": "d9f8adff9e76b3ec40dfca9f6369654d9611a194"
     },
     {
       "path": "tests/pcm-governance-pages.test.mjs",
-      "bytes": 24453,
-      "sha256": "6868d24003a268b882109b0453d304649685bafeb690036e42f8bbd0f362631f",
-      "gitBlobSha1": "536481a65c39f274a5776337ed7b5ef61625ac91"
-    },
-    {
-      "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
-      "bytes": 9417,
-      "sha256": "66bc32adb95fca6d338a1f6bbe9adb4ccb900b2505460be4f00f402b32f13379",
-      "gitBlobSha1": "d45d17ed64e3bf0ca5dca4ea533b8264feedc6c1"
-    },
-    {
-      "path": "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
-      "bytes": 9675,
-      "sha256": "02a5d9a7b2f0715a90b191b834a036f899e527aa207e3f3b61a63656d446d995",
-      "gitBlobSha1": "295d129e6b4e73d5aa001221ddd33e48508d98ec"
+      "bytes": 33032,
+      "sha256": "861d8e7e6d829c7ab42bdda5975a1a9a6f87fc69842137140659b5205a25e17d",
+      "gitBlobSha1": "88880accb681312de712ea0fb61a736bc22be686"
     }
   ]
 }

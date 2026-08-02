@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 import { createHash } from "node:crypto";
+import { execFile } from "node:child_process";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { promisify } from "node:util";
 import test from "node:test";
 
 const root = path.resolve(import.meta.dirname, "..");
 const seedCommit = "0b0037ff50a4dc5b1756fe3230588f12a01c5337";
 const seedTree = "57bb0dc3775af085810a60a6719c5fa898e98a8d";
+const finalCorrectionParent = "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a";
+const execFileAsync = promisify(execFile);
 
 const paths = {
   consoleHtml: "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
@@ -22,8 +26,30 @@ const paths = {
   manifest: "docs/governance/pcm-governance-pages-manifest.v1.json",
 };
 
-const expectedWriteSet = Object.values(paths);
-const artifactPaths = expectedWriteSet.filter((entry) => entry !== paths.manifest);
+const originalProductWriteSet = Object.values(paths);
+const cumulativeGitPathSet = [
+  "docs/governance/pcm-full-flow-visual-port-manifest.v1.json",
+  "docs/governance/pcm-governance-pages-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
+  "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
+  "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/styles.css",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
+  "tests/pcm-full-flow-visual-port.test.mjs",
+  "tests/pcm-governance-pages.test.mjs",
+];
+const cumulativeArtifactPaths = cumulativeGitPathSet.filter((entry) => entry !== paths.manifest);
+const expectedCorrectionChain = [
+  { commit: "eb3aa2458873d970a2f7c479f1cfae3db6f0e360", parent: seedCommit },
+  { commit: "199e8edf3aa82a0b4bee624054c00bd67214e90c", parent: "eb3aa2458873d970a2f7c479f1cfae3db6f0e360" },
+  { commit: "7c033382164e8f29218bf6ffb4afd3c953e88da6", parent: "199e8edf3aa82a0b4bee624054c00bd67214e90c" },
+  { commit: "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d", parent: "7c033382164e8f29218bf6ffb4afd3c953e88da6" },
+  { commit: finalCorrectionParent, parent: "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d" },
+];
 
 async function text(relativePath) {
   return readFile(path.join(root, relativePath), "utf8");
@@ -83,18 +109,38 @@ test("canonical receipt policy fatally rejects invalid UTF-8", () => {
   );
 });
 
-test("the package is limited to the exact ten approved new paths", async () => {
-  for (const relativePath of expectedWriteSet) {
+test("manifest separates original exact10 from fresh Git cumulative exact13 and verifies 12 receipts", async () => {
+  for (const relativePath of cumulativeGitPathSet) {
     assert.equal((await stat(path.join(root, relativePath))).isFile(), true, relativePath);
   }
 
   const manifest = JSON.parse(await text(paths.manifest));
-  assert.deepEqual(manifest.writeSet, expectedWriteSet);
+  assert.deepEqual(manifest.originalProductWriteSet, originalProductWriteSet);
+  assert.deepEqual(manifest.cumulativeGitPathSet, cumulativeGitPathSet);
+  assert.equal(manifest.finalCorrectionParent, finalCorrectionParent);
+  assert.deepEqual(manifest.correctionChain, expectedCorrectionChain);
   assert.equal(manifest.artifactReceiptPolicy, "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1");
   assert.equal(manifest.baseline.commit, seedCommit);
   assert.equal(manifest.baseline.tree, seedTree);
-  assert.equal(manifest.artifactReceipts.length, 9);
-  assert.deepEqual(manifest.artifactReceipts.map(({ path: receiptPath }) => receiptPath), artifactPaths);
+  assert.equal(manifest.artifactReceipts.length, 12);
+  assert.deepEqual(manifest.artifactReceipts.map(({ path: receiptPath }) => receiptPath), cumulativeArtifactPaths);
+
+  const { stdout: cumulativeStdout } = await execFileAsync(
+    "git",
+    ["diff", "--name-only", seedCommit],
+    { cwd: root, encoding: "utf8" },
+  );
+  const actualCumulativePaths = cumulativeStdout.trim().split(/\r?\n/).filter(Boolean);
+  assert.deepEqual(actualCumulativePaths, cumulativeGitPathSet);
+
+  for (const entry of expectedCorrectionChain) {
+    const { stdout: parentStdout } = await execFileAsync(
+      "git",
+      ["rev-parse", `${entry.commit}^`],
+      { cwd: root, encoding: "utf8" },
+    );
+    assert.equal(parentStdout.trim(), entry.parent, `${entry.commit} exact parent`);
+  }
 
   for (const receipt of manifest.artifactReceipts) {
     const canonical = canonicalUtf8LfReceipt(await readFile(path.join(root, receipt.path)));
@@ -464,6 +510,108 @@ test("own-data authority rejects sparse arrays, inherited fields, accessors, and
   assert.equal(accessorReadCount, 0);
 });
 
+function arrayProxyWithLength(lengthValue, throws = false) {
+  return new Proxy([], {
+    getOwnPropertyDescriptor(target, key) {
+      if (key === "length") {
+        if (throws) throw new Error("length descriptor unavailable");
+        return {
+          value: lengthValue,
+          writable: true,
+          enumerable: false,
+          configurable: false,
+        };
+      }
+      return Reflect.getOwnPropertyDescriptor(target, key);
+    },
+  });
+}
+
+test("dense authority arrays reject unbounded or invalid own lengths without throwing", async () => {
+  const consoleModule = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const governanceModule = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+  const invalidLengths = [
+    4294967296,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    -1,
+    1.5,
+    1001,
+    "1",
+    null,
+    undefined,
+    true,
+    {},
+  ];
+
+  for (const lengthValue of invalidLengths) {
+    let pcmResult;
+    assert.doesNotThrow(() => {
+      pcmResult = consoleModule.resolvePcmAuthorizedConsoleState(authorizedContext({
+        membership: {
+          actorId: "pcm-user",
+          status: "active",
+          caseIds: arrayProxyWithLength(lengthValue),
+        },
+      }));
+    }, `PCM length ${String(lengthValue)}`);
+    assertClosed(pcmResult, "casePayload", "ACCESS_DENIED");
+
+    let governanceResult;
+    assert.doesNotThrow(() => {
+      governanceResult = governanceModule.resolveInternalGovernanceState(governanceContext({
+        records: arrayProxyWithLength(lengthValue),
+      }));
+    }, `governance length ${String(lengthValue)}`);
+    assertClosed(governanceResult, "governancePayload", "GOVERNANCE_DENIED");
+  }
+
+  for (const [resolver, context, payloadKey, deniedState] of [
+    [
+      consoleModule.resolvePcmAuthorizedConsoleState,
+      authorizedContext({
+        membership: {
+          actorId: "pcm-user",
+          status: "active",
+          caseIds: arrayProxyWithLength(0, true),
+        },
+      }),
+      "casePayload",
+      "ACCESS_DENIED",
+    ],
+    [
+      governanceModule.resolveInternalGovernanceState,
+      governanceContext({ records: arrayProxyWithLength(0, true) }),
+      "governancePayload",
+      "GOVERNANCE_DENIED",
+    ],
+  ]) {
+    let result;
+    assert.doesNotThrow(() => {
+      result = resolver(context);
+    });
+    assertClosed(result, payloadKey, deniedState);
+  }
+
+  const maximumMembership = new Array(1000);
+  const maximumRecords = new Array(1000);
+  for (let index = 0; index < 1000; index += 1) {
+    maximumMembership[index] = index === 999 ? "case-01" : `case-${index + 2}`;
+    maximumRecords[index] = { id: `record-${index + 1}`, category: "帳號" };
+  }
+  assert.equal(
+    consoleModule.resolvePcmAuthorizedConsoleState(authorizedContext({
+      membership: { actorId: "pcm-user", status: "active", caseIds: maximumMembership },
+    })).state,
+    "AUTHORIZED_READY",
+  );
+  const maximumGovernance = governanceModule.resolveInternalGovernanceState(
+    governanceContext({ records: maximumRecords }),
+  );
+  assert.equal(maximumGovernance.state, "GOVERNANCE_READY");
+  assert.equal(maximumGovernance.governancePayload.length, 1000);
+});
+
 test("authority evaluation is independent from post-load Array, Set, and iterator hooks", async () => {
   const consoleModule = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
   const governanceModule = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
@@ -598,4 +746,49 @@ test("governance ready and read-only renderers replace denied copy whenever the 
   } finally {
     delete globalThis.document;
   }
+});
+
+test("renderers use own-data state and ignore post-load shared prototype hooks", async () => {
+  const consoleModule = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const governanceModule = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+  const originalIncludes = Array.prototype.includes;
+  let accessorReadCount = 0;
+  const accessorState = {};
+  Object.defineProperty(accessorState, "state", {
+    enumerable: true,
+    get() {
+      accessorReadCount += 1;
+      throw new Error("renderer state accessor must not execute");
+    },
+  });
+
+  try {
+    Array.prototype.includes = () => true;
+    const cases = [
+      [consoleModule.renderPcmAuthorizedConsole, "[data-authorized-shell]", "consoleState", { state: "ACCESS_DENIED" }, true],
+      [consoleModule.renderPcmAuthorizedConsole, "[data-authorized-shell]", "consoleState", { state: "AUTHORIZED_READY" }, false],
+      [consoleModule.renderPcmAuthorizedConsole, "[data-authorized-shell]", "consoleState", { state: "CASE_ARCHIVED_READ_ONLY" }, false],
+      [consoleModule.renderPcmAuthorizedConsole, "[data-authorized-shell]", "consoleState", { state: "UNKNOWN" }, true],
+      [consoleModule.renderPcmAuthorizedConsole, "[data-authorized-shell]", "consoleState", Object.create({ state: "AUTHORIZED_READY" }), true],
+      [consoleModule.renderPcmAuthorizedConsole, "[data-authorized-shell]", "consoleState", accessorState, true],
+      [governanceModule.renderInternalGovernance, "[data-governance-shell]", "governanceState", { state: "GOVERNANCE_DENIED" }, true],
+      [governanceModule.renderInternalGovernance, "[data-governance-shell]", "governanceState", { state: "GOVERNANCE_READY" }, false],
+      [governanceModule.renderInternalGovernance, "[data-governance-shell]", "governanceState", { state: "GOVERNANCE_READ_ONLY" }, false],
+      [governanceModule.renderInternalGovernance, "[data-governance-shell]", "governanceState", { state: "UNKNOWN" }, true],
+      [governanceModule.renderInternalGovernance, "[data-governance-shell]", "governanceState", Object.create({ state: "GOVERNANCE_READY" }), true],
+      [governanceModule.renderInternalGovernance, "[data-governance-shell]", "governanceState", accessorState, true],
+    ];
+
+    for (let index = 0; index < cases.length; index += 1) {
+      const [render, shellSelector, datasetKey, result, expectedHidden] = cases[index];
+      const fake = fakeRenderDocument(shellSelector, datasetKey);
+      globalThis.document = fake.document;
+      assert.doesNotThrow(() => render(result));
+      assert.equal(fake.nodes.shell.hidden, expectedHidden);
+    }
+  } finally {
+    Array.prototype.includes = originalIncludes;
+    delete globalThis.document;
+  }
+  assert.equal(accessorReadCount, 0);
 });

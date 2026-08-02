@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 新增 fail-closed 的 PCM 授權案件工作台與內部治理台，並以 exact10 manifest 綁定可交 A6 評估的 UI source candidate。
+**Goal:** 新增 fail-closed 的 PCM 授權案件工作台與內部治理台；分開保存原始 exact10 product write set 與 base→candidate exact13 cumulative Git evidence，供 A0／主線評估 UI source candidate。
 
 **Architecture:** 兩頁各自使用本地 HTML、CSS、ES module，不依賴 shared shell 或 runtime。JavaScript 只提供純狀態解析、view-model 正規化與 fail-closed 初始渲染；正式資料與授權由 A6 未來注入。
 
@@ -15,7 +15,7 @@
 - 預設未授權、零案件 payload、零 enabled action。
 - 所有 Human PCM 為裝潢專業人士；第一版人工指派，不做專業分科、自動分流或媒合。
 - 不出現舊媒合語彙、工程語、金流託管、AI 最終決定或假成功。
-- Final commit parent 固定為 `0b0037ff50a4dc5b1756fe3230588f12a01c5337`。
+- 原始 source commit parent 為 `0b0037ff50a4dc5b1756fe3230588f12a01c5337`；本次 final bounded correction parent 固定為 `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`。
 
 ---
 
@@ -105,22 +105,30 @@ Expected: 該群組 PASS；內部治理與 manifest 仍可失敗。
 - [ ] Authority evaluation 只使用 captured safe intrinsics、numeric loops 與 direct mode/status equality；不呼叫 Array prototype `every`／`filter`／`map`／`includes`、`Set.prototype.has` 或 `Symbol.iterator`，輸出複製亦不用 iterator。
 - [ ] Fresh 重跑 valid READY／READ_ONLY、所有歷次 adversarial probes、renderer copy、LF／CRLF、BOM、lone CR、invalid UTF-8 receipt invariants 與完整 suite；refresh manifest canonical receipts，再做 exact6 diff／commit gate。
 
+### Final bounded length／renderer／evidence correction（parent `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`）
+
+- [ ] 先以 active Array Proxy 回報 `4294967296` length 與 post-load `Array.prototype.includes = () => true` renderer 實際重現 RangeError／private-shell fail open，取得 RED。
+- [ ] Dense array 在 allocation 前要求 own data length 是 captured safe integer 且 `0..1000`；NaN、Infinity、負數、小數、超界、throwing descriptor、revoked Proxy 均不 throw並回 DENIED／zero payload／actions，allocation/copy 全段 exception-safe。
+- [ ] 兩個 renderer 只讀 own enumerable data state，以 direct closed equality 決定 private shell；denied／unknown／inherited／accessor state 均 fail closed，READY／READ_ONLY 不退步。
+- [ ] Manifest 分開 `originalProductWriteSet` exact10 與 fresh Git base→candidate `cumulativeGitPathSet` exact13，列 correction chain exact parents，並驗證 cumulative 中 12 個 non-self-manifest canonical receipts。
+- [ ] Fresh 執行 focused、full suite、syntax、receipt invariants、strict UTF-8、immediate／cumulative exact path、parent、exact6 與 postcommit clean/staged0 gates；只建一筆 local commit，不自我 admission。
+
 - [ ] **Step 4: 執行測試**
 
 Run: `node --test tests/pcm-governance-pages.test.mjs`
 
 Expected: 除 manifest receipt 外全部 PASS。
 
-### Task 4: Exact10 Manifest
+### Task 4: Exact10 Product Set / Exact13 Cumulative Manifest
 
 **Files:**
 - Create: `docs/governance/pcm-governance-pages-manifest.v1.json`
 
 **Interfaces:**
-- Consumes: 9 個非 manifest 新檔；每檔先以 fatal UTF-8 解碼，再只將 CRLF 正規化為 LF。
-- Produces: exact writeSet、baseline commit/tree、`UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1` 的 canonical bytes／SHA-256／Git blob SHA-1；不宣稱 working-tree raw bytes。
+- Consumes: cumulative exact13 中除本 manifest 外的 12 檔；每檔先以 fatal UTF-8 解碼，再只將 CRLF 正規化為 LF。
+- Produces: `originalProductWriteSet` exact10、fresh Git `cumulativeGitPathSet` exact13、correction chain exact parents、baseline commit/tree，以及 `UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1` 的 canonical bytes／SHA-256／Git blob SHA-1；不宣稱 working-tree raw bytes。
 
-- [ ] **Step 1: 計算 9 個 receipts**
+- [ ] **Step 1: 計算 12 個 receipts**
 
 使用與測試相同的 UTF-8/LF canonical helper 計算 immutable receipts；先用 in-memory LF／CRLF 同內容向量證明 bytes、SHA-256 與 Git blob SHA-1 完全一致，不寫暫存檔，也不把 manifest 自身列入 receipts。
 

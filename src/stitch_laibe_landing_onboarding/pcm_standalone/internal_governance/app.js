@@ -28,7 +28,9 @@ const safeHasOwn = Object.hasOwn;
 const safeDefineProperty = Object.defineProperty;
 const safeReflectApply = Reflect.apply;
 const safeStringTrim = String.prototype.trim;
+const safeNumberIsSafeInteger = Number.isSafeInteger;
 const noArguments = Object.freeze([]);
+const MAX_AUTHORITY_ROWS = 1000;
 
 const invalidField = Object.freeze({ ok: false, value: undefined });
 
@@ -58,23 +60,32 @@ function isNonEmptyString(value) {
 function readDenseArray(value) {
   try {
     if (!safeArrayIsArray(value)) return { ok: false, length: 0, items: null };
+    const lengthField = readOwnData(value, "length", false);
+    const length = lengthField.value;
+    if (
+      !lengthField.ok ||
+      typeof length !== "number" ||
+      !safeNumberIsSafeInteger(length) ||
+      length < 0 ||
+      length > MAX_AUTHORITY_ROWS
+    ) {
+      return { ok: false, length: 0, items: null };
+    }
+    const items = new SafeArray(length);
+    for (let index = 0; index < length; index += 1) {
+      const itemField = readOwnData(value, index);
+      if (!itemField.ok) return { ok: false, length: 0, items: null };
+      safeDefineProperty(items, index, {
+        value: itemField.value,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
+    }
+    return { ok: true, length, items };
   } catch {
     return { ok: false, length: 0, items: null };
   }
-  const lengthField = readOwnData(value, "length", false);
-  if (!lengthField.ok) return { ok: false, length: 0, items: null };
-  const items = new SafeArray(lengthField.value);
-  for (let index = 0; index < lengthField.value; index += 1) {
-    const itemField = readOwnData(value, index);
-    if (!itemField.ok) return { ok: false, length: 0, items: null };
-    safeDefineProperty(items, index, {
-      value: itemField.value,
-      enumerable: true,
-      writable: true,
-      configurable: true,
-    });
-  }
-  return { ok: true, length: lengthField.value, items };
 }
 
 function makeGovernanceActions(includeReason) {
@@ -193,18 +204,35 @@ const copyByState = Object.freeze({
   GOVERNANCE_LOAD_FAILED: ["暫時無法確認管理權限", "請稍後重新整理；確認完成前不會顯示內部紀錄。"],
 });
 
+function copyForState(state) {
+  if (state === INTERNAL_GOVERNANCE_STATES.GOVERNANCE_CHECKING) return copyByState.GOVERNANCE_CHECKING;
+  if (state === INTERNAL_GOVERNANCE_STATES.GOVERNANCE_DENIED) return copyByState.GOVERNANCE_DENIED;
+  if (state === INTERNAL_GOVERNANCE_STATES.GOVERNANCE_EMPTY) return copyByState.GOVERNANCE_EMPTY;
+  if (state === INTERNAL_GOVERNANCE_STATES.GOVERNANCE_READY) return copyByState.GOVERNANCE_READY;
+  if (state === INTERNAL_GOVERNANCE_STATES.GOVERNANCE_READ_ONLY) return copyByState.GOVERNANCE_READ_ONLY;
+  if (state === INTERNAL_GOVERNANCE_STATES.GOVERNANCE_LOAD_FAILED) return copyByState.GOVERNANCE_LOAD_FAILED;
+  return copyByState.GOVERNANCE_DENIED;
+}
+
 export function renderInternalGovernance(result) {
   if (typeof document === "undefined") return;
+  const stateField = readOwnData(result, "state");
+  const state = stateField.ok && typeof stateField.value === "string"
+    ? stateField.value
+    : INTERNAL_GOVERNANCE_STATES.GOVERNANCE_DENIED;
   const title = document.querySelector("[data-state-title]");
   const detail = document.querySelector("[data-state-detail]");
   const shell = document.querySelector("[data-governance-shell]");
-  const stateCopy = copyByState[result.state];
-  if (title && detail && stateCopy) [title.textContent, detail.textContent] = stateCopy;
-  if (shell) shell.hidden = ![
-    INTERNAL_GOVERNANCE_STATES.GOVERNANCE_READY,
-    INTERNAL_GOVERNANCE_STATES.GOVERNANCE_READ_ONLY,
-  ].includes(result.state);
-  document.documentElement.dataset.governanceState = result.state;
+  const stateCopy = copyForState(state);
+  if (title && detail) {
+    title.textContent = stateCopy[0];
+    detail.textContent = stateCopy[1];
+  }
+  if (shell) {
+    shell.hidden = state !== INTERNAL_GOVERNANCE_STATES.GOVERNANCE_READY &&
+      state !== INTERNAL_GOVERNANCE_STATES.GOVERNANCE_READ_ONLY;
+  }
+  document.documentElement.dataset.governanceState = state;
 }
 
 if (typeof document !== "undefined") {
