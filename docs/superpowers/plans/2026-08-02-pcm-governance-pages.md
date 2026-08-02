@@ -15,7 +15,7 @@
 - 預設未授權、零案件 payload、零 enabled action。
 - 所有 Human PCM 為裝潢專業人士；第一版人工指派，不做專業分科、自動分流或媒合。
 - 不出現舊媒合語彙、工程語、金流託管、AI 最終決定或假成功。
-- 原始 source commit parent 為 `0b0037ff50a4dc5b1756fe3230588f12a01c5337`；本次 final bounded correction parent 固定為 `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`。
+- 原始 source commit parent 為 `0b0037ff50a4dc5b1756fe3230588f12a01c5337`；本次 evidence-only correction parent 固定為 `ae4f575a3062a48c6f08cc708738e14518f4df72`。
 
 ---
 
@@ -90,14 +90,14 @@ Expected: 該群組 PASS；內部治理與 manifest 仍可失敗。
 
 只有 active admin session、primitive non-empty exact actor IDs、governance administrator actor、active assignment 與 closed mode 完整一致才可繼續。mode 必須先於 records empty branch 驗證：`active`＋empty 為 `GOVERNANCE_EMPTY` 且只提供既定管理 actions；`active`＋records 為 `GOVERNANCE_READY`；`read_only`＋empty／records 都為 `GOVERNANCE_READ_ONLY` 且 actions 永遠空；缺失或未知 mode 一律 `GOVERNANCE_DENIED`。
 
-### Admission fail-closed correction（parent `7c033382164e8f29218bf6ffb4afd3c953e88da6`）
+### Historical correction record：admission fail-closed（parent `7c033382164e8f29218bf6ffb4afd3c953e88da6`）
 
 - [ ] 先用 actual adversarial inputs 驗證 missing／empty／object IDs、undefined／object membership、duplicate rows、unknown case status、missing／unknown mode、read-only empty 與 visible-shell renderer copy，取得 RED。
 - [ ] Resolver 只使用 closed primitive validation、exact cardinality 與 spec 明列 allowlist；禁止 truthy、object identity 或 unknown fallback。
 - [ ] `AUTHORIZED_READY`、`CASE_ARCHIVED_READ_ONLY`、`GOVERNANCE_READY`、`GOVERNANCE_READ_ONLY` 的 renderer copy 必須與可見 shell 同步。
 - [ ] Fresh 重跑 receipt invariants、focused governance 與完整 tests；只提交派令 exact6，A6 不得把 prototype resolver 當 runtime authority。
 
-### Own-data／shared-prototype correction（parent `12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d`）
+### Historical correction record：own-data／shared-prototype（parent `12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d`）
 
 - [ ] 先以 actual adversarial probes 覆蓋 sparse `membership.caseIds`／`authorizedCases`／records、revoked array Proxy、prototype-inherited actor／row、accessor field、null record，以及 post-load Array／Set／iterator hook，確認 RED。
 - [ ] 所有 authority consumed fields 攔在 own enumerable data descriptor，descriptor 單次讀取；accessor、inherited、invalid 或 throwing input 一律 DENIED 且零 payload／actions。
@@ -105,13 +105,20 @@ Expected: 該群組 PASS；內部治理與 manifest 仍可失敗。
 - [ ] Authority evaluation 只使用 captured safe intrinsics、numeric loops 與 direct mode/status equality；不呼叫 Array prototype `every`／`filter`／`map`／`includes`、`Set.prototype.has` 或 `Symbol.iterator`，輸出複製亦不用 iterator。
 - [ ] Fresh 重跑 valid READY／READ_ONLY、所有歷次 adversarial probes、renderer copy、LF／CRLF、BOM、lone CR、invalid UTF-8 receipt invariants 與完整 suite；refresh manifest canonical receipts，再做 exact6 diff／commit gate。
 
-### Final bounded length／renderer／evidence correction（parent `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`）
+### Historical correction record：bounded length／renderer／evidence（parent `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`）
 
 - [ ] 先以 active Array Proxy 回報 `4294967296` length 與 post-load `Array.prototype.includes = () => true` renderer 實際重現 RangeError／private-shell fail open，取得 RED。
 - [ ] Dense array 在 allocation 前要求 own data length 是 captured safe integer 且 `0..1000`；NaN、Infinity、負數、小數、超界、throwing descriptor、revoked Proxy 均不 throw並回 DENIED／zero payload／actions，allocation/copy 全段 exception-safe。
 - [ ] 兩個 renderer 只讀 own enumerable data state，以 direct closed equality 決定 private shell；denied／unknown／inherited／accessor state 均 fail closed，READY／READ_ONLY 不退步。
 - [ ] Manifest 分開 `originalProductWriteSet` exact10 與 fresh Git base→candidate `cumulativeGitPathSet` exact13，列 correction chain exact parents，並驗證 cumulative 中 12 個 non-self-manifest canonical receipts。
 - [ ] Fresh 執行 focused、full suite、syntax、receipt invariants、strict UTF-8、immediate／cumulative exact path、parent、exact6 與 postcommit clean/staged0 gates；只建一筆 local commit，不自我 admission。
+
+### Current evidence-only consistency correction（parent `ae4f575a3062a48c6f08cc708738e14518f4df72`）
+
+- [ ] 新增 actual negative test，禁止把 Git exact10、9 receipts、`manifest.writeSet` 或 seed parent 當成現行驗收指令。
+- [ ] `originalProductWriteSet` 維持原始 exact10 身分；fresh Git immediate correction 必須 exact4，base→candidate cumulative 維持 exact13。
+- [ ] Correction chain 新增 `ae4f575a3062a48c6f08cc708738e14518f4df72` → `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`，`finalCorrectionParent` 更新為 `ae4f575a3062a48c6f08cc708738e14518f4df72`。
+- [ ] 12 份 non-self-manifest canonical receipts 全數重算；只 stage exact4，fresh 執行 focused／full／syntax／canonical／exact4／exact13／diff-check，commit 後 clean／staged0。
 
 - [ ] **Step 4: 執行測試**
 
@@ -170,10 +177,10 @@ git diff --check
 
 Expected: syntax 2/2、tests 0 fail、diff check 0 error。
 
-- [ ] **Step 4: 驗證 exact10 並 commit**
+- [ ] **Step 4: 驗證 immediate exact4 與 cumulative exact13 並 commit**
 
-只 stage exact10，確認 staged set 等於 manifest writeSet，commit message 使用 `feat(pcm): add governance page sources`。
+只 stage 本次 test、manifest、spec、plan exact4；fresh Git 驗證相對 parent 的 immediate exact4，以及 base 至 candidate 的 cumulative exact13。建立一筆 evidence-only local commit。
 
 - [ ] **Step 5: 驗證 immutable result**
 
-確認 commit parent 為 exact seed、worktree clean、staged 0；不 push、merge、deploy 或建立 PR。
+確認 commit parent 為 `ae4f575a3062a48c6f08cc708738e14518f4df72`、worktree clean、staged 0；不 push、merge、deploy 或建立 PR。

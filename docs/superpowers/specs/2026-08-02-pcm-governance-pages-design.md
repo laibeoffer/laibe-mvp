@@ -121,7 +121,7 @@ mode 缺失或未知一律 `GOVERNANCE_DENIED`，不得因 records 為空而取�
 
 - `originalProductWriteSet` 固定為原始派令 exact10，只描述本工作包最初建立的十個產品／證據路徑。
 - `cumulativeGitPathSet` 必須由測試 fresh 呼叫 Git 比對 base `0b0037ff50a4dc5b1756fe3230588f12a01c5337` 至 working candidate，固定為 exact13；多出的三個 frozen full-flow evidence paths 也必須納入 canonical receipts。
-- Manifest 必須列出從 `eb3aa2458873d970a2f7c479f1cfae3db6f0e360` 至 `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a` 的 correction chain 與每筆 exact parent；本次 bounded correction 的 exact parent 是 `5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a`，不得把 final parent 寫成初始 base。
+- Manifest 必須列出從 `eb3aa2458873d970a2f7c479f1cfae3db6f0e360` 至 `ae4f575a3062a48c6f08cc708738e14518f4df72` 的 correction chain 與每筆 exact parent；本次 evidence-only correction 的 exact parent 是 `ae4f575a3062a48c6f08cc708738e14518f4df72`，不得把 final parent 寫成初始 base。
 - `artifactReceipts` 覆蓋 cumulative exact13 中除本 manifest 自身外的 12 個 artifacts，沿用 `UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1`，manifest 不自我 hash。
 
 ## 視覺與互動規則
@@ -148,5 +148,8 @@ mode 缺失或未知一律 `GOVERNANCE_DENIED`，不得因 records 為空而取�
 - Node syntax：兩個 app.js 全通過。
 - Browser：1280×720、768×1024、390×844；無水平溢出、console 0、資產 0 error。
 - 44px：所有 enabled／disabled button、tab、link control 的 computed height 不小於 44px。
-- exact10：Git 變更集合必須等於派令的 10 個新路徑；manifest 收 9 個非自身 receipts。
-- final commit parent 必須為 `0b0037ff50a4dc5b1756fe3230588f12a01c5337`；commit 後 clean、staged 0。
+- 原始產品集合：`originalProductWriteSet` 固定 exact10，只作最初產品／證據路徑身分，不作目前 Git diff 或 staged set 驗收。
+- 本次 immediate correction：相對 parent `ae4f575a3062a48c6f08cc708738e14518f4df72` 必須 exact4，只含 test、manifest、spec、plan。
+- 累積集合：base `0b0037ff50a4dc5b1756fe3230588f12a01c5337` 至 candidate 維持 `cumulativeGitPathSet` exact13。
+- Receipts：manifest 驗證 cumulative exact13 中除自身外的 12 份 canonical receipts，且不自我 hash。
+- Commit：parent 必須為 `ae4f575a3062a48c6f08cc708738e14518f4df72`；commit 後 clean、staged 0。

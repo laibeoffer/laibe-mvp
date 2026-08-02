@@ -10,7 +10,7 @@ import test from "node:test";
 const root = path.resolve(import.meta.dirname, "..");
 const seedCommit = "0b0037ff50a4dc5b1756fe3230588f12a01c5337";
 const seedTree = "57bb0dc3775af085810a60a6719c5fa898e98a8d";
-const finalCorrectionParent = "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a";
+const finalCorrectionParent = "ae4f575a3062a48c6f08cc708738e14518f4df72";
 const execFileAsync = promisify(execFile);
 
 const paths = {
@@ -43,12 +43,19 @@ const cumulativeGitPathSet = [
   "tests/pcm-governance-pages.test.mjs",
 ];
 const cumulativeArtifactPaths = cumulativeGitPathSet.filter((entry) => entry !== paths.manifest);
+const immediateCorrectionPathSet = [
+  "docs/governance/pcm-governance-pages-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
+  "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
+  "tests/pcm-governance-pages.test.mjs",
+];
 const expectedCorrectionChain = [
   { commit: "eb3aa2458873d970a2f7c479f1cfae3db6f0e360", parent: seedCommit },
   { commit: "199e8edf3aa82a0b4bee624054c00bd67214e90c", parent: "eb3aa2458873d970a2f7c479f1cfae3db6f0e360" },
   { commit: "7c033382164e8f29218bf6ffb4afd3c953e88da6", parent: "199e8edf3aa82a0b4bee624054c00bd67214e90c" },
   { commit: "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d", parent: "7c033382164e8f29218bf6ffb4afd3c953e88da6" },
-  { commit: finalCorrectionParent, parent: "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d" },
+  { commit: "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a", parent: "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d" },
+  { commit: finalCorrectionParent, parent: "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a" },
 ];
 
 async function text(relativePath) {
@@ -125,6 +132,14 @@ test("manifest separates original exact10 from fresh Git cumulative exact13 and 
   assert.equal(manifest.artifactReceipts.length, 12);
   assert.deepEqual(manifest.artifactReceipts.map(({ path: receiptPath }) => receiptPath), cumulativeArtifactPaths);
 
+  const { stdout: immediateStdout } = await execFileAsync(
+    "git",
+    ["diff", "--name-only", finalCorrectionParent],
+    { cwd: root, encoding: "utf8" },
+  );
+  const actualImmediatePaths = immediateStdout.trim().split(/\r?\n/).filter(Boolean);
+  assert.deepEqual(actualImmediatePaths, immediateCorrectionPathSet);
+
   const { stdout: cumulativeStdout } = await execFileAsync(
     "git",
     ["diff", "--name-only", seedCommit],
@@ -147,6 +162,21 @@ test("manifest separates original exact10 from fresh Git cumulative exact13 and 
     assert.equal(receipt.bytes, canonical.bytes, `${receipt.path} canonical byte count`);
     assert.equal(receipt.sha256, canonical.sha256, `${receipt.path} canonical SHA-256`);
     assert.equal(receipt.gitBlobSha1, canonical.gitBlobSha1, `${receipt.path} canonical Git blob SHA-1`);
+  }
+});
+
+test("current acceptance documents reject superseded exact10 Git and seed-parent instructions", async () => {
+  const currentAcceptance = `${await text(paths.spec)}\n${await text(paths.plan)}`;
+  const supersededDirectives = [
+    /Git 變更集合必須等於[^\n]*10 個新路徑/,
+    /manifest 收 9 個非自身 receipts/,
+    /final commit parent 必須為 `0b0037ff50a4dc5b1756fe3230588f12a01c5337`/i,
+    /只 stage exact10/,
+    /staged set 等於 manifest writeSet/,
+    /確認 commit parent 為 exact seed/,
+  ];
+  for (const directive of supersededDirectives) {
+    assert.doesNotMatch(currentAcceptance, directive);
   }
 });
 

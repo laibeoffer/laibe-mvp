@@ -35,7 +35,7 @@
     "tests/pcm-full-flow-visual-port.test.mjs",
     "tests/pcm-governance-pages.test.mjs"
   ],
-  "finalCorrectionParent": "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a",
+  "finalCorrectionParent": "ae4f575a3062a48c6f08cc708738e14518f4df72",
   "correctionChain": [
     {
       "commit": "eb3aa2458873d970a2f7c479f1cfae3db6f0e360",
@@ -56,6 +56,10 @@
     {
       "commit": "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a",
       "parent": "12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d"
+    },
+    {
+      "commit": "ae4f575a3062a48c6f08cc708738e14518f4df72",
+      "parent": "5e1fc58ad2a1b7f8f3ec3975d2b8a01b2755fc8a"
     }
   ],
   "artifactReceiptPolicy": "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1",
@@ -74,15 +78,15 @@
     },
     {
       "path": "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
-      "bytes": 11242,
-      "sha256": "ebdeec3fde3e619a7256112686e2c268d8ebfafe27c4ae7357176c5618ac274e",
-      "gitBlobSha1": "0c6bc0677806e0476ffbfed224081b9e39d37975"
+      "bytes": 12229,
+      "sha256": "b268b7fc97813864ec5e48e026061509a879c2d894d9ea29e5b91e0855b50f54",
+      "gitBlobSha1": "bbec82ed8e67cad390176a4e029659cd6def99df"
     },
     {
       "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
-      "bytes": 11117,
-      "sha256": "39e1cf4c21c37dd5316cae9d227554e4d232df9a026db97eae7f6775a77b9363",
-      "gitBlobSha1": "62b1ae0eb9d1985e1864b7b7dd28c53e762d09e6"
+      "bytes": 11547,
+      "sha256": "17d848febc2fa5ccac21843c9f401735fce86135eedff147b5ed824193d8c8da",
+      "gitBlobSha1": "83ce3b56b246be4a75710ac908a9c98c61e26935"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
@@ -128,9 +132,9 @@
     },
     {
       "path": "tests/pcm-governance-pages.test.mjs",
-      "bytes": 33032,
-      "sha256": "861d8e7e6d829c7ab42bdda5975a1a9a6f87fc69842137140659b5205a25e17d",
-      "gitBlobSha1": "88880accb681312de712ea0fb61a736bc22be686"
+      "bytes": 34375,
+      "sha256": "62b0e44c04c1e98de8d252591ec879983aa463323ee6420dc83cbbe4da4c810c",
+      "gitBlobSha1": "92d76f91e9e5bef8f2d0dca09df454b4b655f1c8"
     }
   ]
 }
