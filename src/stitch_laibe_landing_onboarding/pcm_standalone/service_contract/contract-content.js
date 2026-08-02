@@ -12,7 +12,19 @@ export const LIFECYCLE = Object.freeze([
   "ACTIVE",
 ]);
 
-export const KEY_CLAUSES = Object.freeze([
+function deepFreeze(value) {
+  if (value && typeof value === "object" && !Object.isFrozen(value)) {
+    Object.freeze(value);
+
+    for (const nestedValue of Object.values(value)) {
+      deepFreeze(nestedValue);
+    }
+  }
+
+  return value;
+}
+
+export const KEY_CLAUSES = deepFreeze([
     { id: "kc-role",   tag: "服務定位",     anchor: "第三條",  title: "AI PCM 是案件治理資訊服務，不是現場服務",
       points: [ "萊比不派人到工地，不做人類現場服務。", "不是工程承攬人、設計師 / 技師替代者、現場監工或驗收人。", "不是工程品質保證人、付款保證人，也不是司法 / 仲裁 / 調解機關。" ] },
     { id: "kc-scope",  tag: "審查範圍",     anchor: "第十三條", title: "只對「可供審查資料」負責",
