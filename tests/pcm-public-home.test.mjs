@@ -549,8 +549,9 @@ test("public homepage explains fees, public governance and guarded termination",
 
   assert.match(
     html,
-    /PCM 服務費為甲乙確認並納入契約的乙方報價版本之 3%/,
+    /PCM 服務費為甲乙確認並納入契約的乙方報價版本之 3\.5%。該報價版本會列入契約依據。/,
   );
+  assert.doesNotMatch(html, /(?<![\d.])3%(?![\d.])/);
   assert.match(html, /簽約時支付 PCM 總服務費的 10%/);
   assert.match(html, /其餘 90% 依里程碑比例/);
   assert.match(html, /萊比不代收、不託管，也不撥付甲乙方工程款/);
@@ -635,7 +636,7 @@ test("public homepage exposes the PCM service contract as the fifth header entry
   const links = [...headerNav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>/gi)];
 
   assert.match(html, /href="\.\.\/service_contract\/code\.html"/);
-  assert.match(html, />PCM ??憟?<\/a>/);
+  assert.match(html, />PCM 服務契約<\/a>/);
   assert.match(html, /3\.5%/);
   assert.doesNotMatch(html, /(?<![\d.])3%(?![\d.])/);
   assert.equal(links.length, 5);
@@ -647,5 +648,13 @@ test("public homepage exposes the PCM service contract as the fifth header entry
   assert.match(
     css,
     /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header nav\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\);[\s\S]*?\}[\s\S]*?\.site-header nav\s*>\s*a:last-child\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;/i,
+  );
+  assert.match(
+    css,
+    /\.site-header nav\s*>\s*a:nth-child\(5\)::before\s*\{[^}]*--nav-icon:\s*url\(/i,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header nav\s*\{[^}]*min-width:\s*0;[^}]*\}[\s\S]*?\.site-header nav\s*>\s*a:last-child\s*\{[^}]*grid-column:\s*1\s*\/\s*-1;[^}]*min-height:\s*44px;/i,
   );
 });
