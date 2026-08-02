@@ -130,12 +130,12 @@
 - Create: `docs/governance/pcm-full-flow-visual-port-manifest.v1.json`
 
 **Interfaces:**
-- Produces: exact base, changed-path inventory, file bytes/SHA-256, source receipts and gate outcomes.
+- Produces: exact base、changed-path inventory，以及 `UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1` receipts：以 fatal UTF-8 解碼後只將 CRLF 正規化為 LF，再計算 canonical bytes、SHA-256 與 Git blob SHA-1；不宣稱 working-tree raw bytes。
 
 - [ ] **Step 1:** Run all PCM tests and `node --check` on changed JS/MJS.
 - [ ] **Step 2:** Run strict UTF-8, local route/asset, forbidden-copy and `git diff --check`.
 - [ ] **Step 3:** Serve the isolated worktree and inspect four pages at desktop, tablet and mobile.
-- [ ] **Step 4:** Record source hashes and worktree state; do not claim Auth/runtime/writer/production acceptance.
+- [ ] **Step 4:** Record canonical UTF-8/LF source hashes and worktree state，並用 in-memory LF／CRLF vector 驗證 receipt 可攜性；do not claim Auth/runtime/writer/production acceptance.
 
 ## Self-review
 

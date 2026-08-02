@@ -20,6 +20,7 @@
     "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
     "docs/governance/pcm-governance-pages-manifest.v1.json"
   ],
+  "artifactReceiptPolicy": "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1",
   "artifactReceipts": [
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
@@ -59,9 +60,9 @@
     },
     {
       "path": "tests/pcm-governance-pages.test.mjs",
-      "bytes": 8477,
-      "sha256": "42a2444443afcd40a86ce81b0a722deb7e5baee336e36667de76d1c8e55fb5f1",
-      "gitBlobSha1": "1b0411ee9f99df543cd60609dfddc5385fe69d69"
+      "bytes": 9142,
+      "sha256": "ad267fee055c149b5c0681c6abae1913a27bbe16967996fc1691d581951aa674",
+      "gitBlobSha1": "ed5573ec10ea0ff7c9d90d488e58dbab93c70fd0"
     },
     {
       "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
@@ -71,9 +72,9 @@
     },
     {
       "path": "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
-      "bytes": 6815,
-      "sha256": "1b1e0ba4dbf0db862c5b2331b3f4a2d0bdaf4f00b46f8b284b815f936da2ddcd",
-      "gitBlobSha1": "1b08ac298b1fd93354ace010be9656c0b4b96a31"
+      "bytes": 7058,
+      "sha256": "794ce184e5d5c1c87c2861ee54e4eb0a9e25ea9295a3ac655a3698534f8170ba",
+      "gitBlobSha1": "c7cc07a2224fde304e85d9bb346712ee7ad4e43a"
     }
   ]
 }

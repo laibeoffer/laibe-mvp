@@ -1,11 +1,9 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { execFile } from "node:child_process";
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { promisify } from "node:util";
 
 const repositoryRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -17,7 +15,6 @@ const sourceRoot = path.join(
   "stitch_laibe_landing_onboarding",
 );
 const pcmRoot = path.join(sourceRoot, "pcm_standalone");
-const execFileAsync = promisify(execFile);
 
 const targets = Object.freeze({
   service: path.join(pcmRoot, "service_contract"),
@@ -37,6 +34,25 @@ function moduleUrl(target) {
 function count(source, pattern) {
   return source.match(pattern)?.length ?? 0;
 }
+
+function canonicalUtf8LfReceipt(rawBytes) {
+  const decoded = new TextDecoder("utf-8", { fatal: true }).decode(rawBytes);
+  const bytes = Buffer.from(new TextEncoder().encode(decoded.replace(/\r\n/g, "\n")));
+  return {
+    bytes: bytes.length,
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    gitBlobSha1: createHash("sha1")
+      .update(Buffer.from(`blob ${bytes.length}\0`))
+      .update(bytes)
+      .digest("hex"),
+  };
+}
+
+test("canonical receipt policy treats in-memory LF and CRLF UTF-8 as identical", () => {
+  const lf = Buffer.from("第一行\nsecond line\n", "utf8");
+  const crlf = Buffer.from("第一行\r\nsecond line\r\n", "utf8");
+  assert.deepEqual(canonicalUtf8LfReceipt(crlf), canonicalUtf8LfReceipt(lf));
+});
 
 async function collectPageAssets(root) {
   const entries = await readdir(root, { withFileTypes: true });
@@ -474,6 +490,7 @@ test("visual-port manifest closes the exact write set and every non-manifest art
   ];
 
   assert.deepEqual(manifest.writeSet, expectedWriteSet);
+  assert.equal(manifest.artifactReceiptPolicy, "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1");
   assert.equal(manifest.artifactReceipts.length, expectedWriteSet.length - 1);
   assert.deepEqual(
     manifest.artifactReceipts.map(({ path: receiptPath }) => receiptPath),
@@ -481,16 +498,9 @@ test("visual-port manifest closes the exact write set and every non-manifest art
   );
 
   for (const receipt of manifest.artifactReceipts) {
-    const bytes = await readFile(path.join(repositoryRoot, receipt.path));
-    const sha256 = createHash("sha256").update(bytes).digest("hex");
-    const { stdout: gitBlobOutput } = await execFileAsync(
-      "git",
-      ["hash-object", "--", receipt.path],
-      { cwd: repositoryRoot },
-    );
-    const gitBlobSha1 = gitBlobOutput.trim();
-    assert.equal(bytes.length, receipt.bytes, receipt.path);
-    assert.equal(sha256, receipt.sha256, receipt.path);
-    assert.equal(gitBlobSha1, receipt.gitBlobSha1, receipt.path);
+    const canonical = canonicalUtf8LfReceipt(await readFile(path.join(repositoryRoot, receipt.path)));
+    assert.equal(canonical.bytes, receipt.bytes, receipt.path);
+    assert.equal(canonical.sha256, receipt.sha256, receipt.path);
+    assert.equal(canonical.gitBlobSha1, receipt.gitBlobSha1, receipt.path);
   }
 });

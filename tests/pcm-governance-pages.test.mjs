@@ -38,16 +38,24 @@ function visibleCopy(html) {
     .trim();
 }
 
-function sha256(buffer) {
-  return createHash("sha256").update(buffer).digest("hex");
+function canonicalUtf8LfReceipt(rawBytes) {
+  const decoded = new TextDecoder("utf-8", { fatal: true }).decode(rawBytes);
+  const bytes = Buffer.from(new TextEncoder().encode(decoded.replace(/\r\n/g, "\n")));
+  return {
+    bytes: bytes.length,
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    gitBlobSha1: createHash("sha1")
+      .update(Buffer.from(`blob ${bytes.length}\0`))
+      .update(bytes)
+      .digest("hex"),
+  };
 }
 
-function gitBlobSha1(buffer) {
-  return createHash("sha1")
-    .update(Buffer.from(`blob ${buffer.length}\0`))
-    .update(buffer)
-    .digest("hex");
-}
+test("canonical receipt policy treats in-memory LF and CRLF UTF-8 as identical", () => {
+  const lf = Buffer.from("第一行\nsecond line\n", "utf8");
+  const crlf = Buffer.from("第一行\r\nsecond line\r\n", "utf8");
+  assert.deepEqual(canonicalUtf8LfReceipt(crlf), canonicalUtf8LfReceipt(lf));
+});
 
 test("the package is limited to the exact ten approved new paths", async () => {
   for (const relativePath of expectedWriteSet) {
@@ -56,16 +64,17 @@ test("the package is limited to the exact ten approved new paths", async () => {
 
   const manifest = JSON.parse(await text(paths.manifest));
   assert.deepEqual(manifest.writeSet, expectedWriteSet);
+  assert.equal(manifest.artifactReceiptPolicy, "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1");
   assert.equal(manifest.baseline.commit, seedCommit);
   assert.equal(manifest.baseline.tree, seedTree);
   assert.equal(manifest.artifactReceipts.length, 9);
   assert.deepEqual(manifest.artifactReceipts.map(({ path: receiptPath }) => receiptPath), artifactPaths);
 
   for (const receipt of manifest.artifactReceipts) {
-    const bytes = await readFile(path.join(root, receipt.path));
-    assert.equal(receipt.bytes, bytes.length, `${receipt.path} byte count`);
-    assert.equal(receipt.sha256, sha256(bytes), `${receipt.path} SHA-256`);
-    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), `${receipt.path} Git blob SHA-1`);
+    const canonical = canonicalUtf8LfReceipt(await readFile(path.join(root, receipt.path)));
+    assert.equal(receipt.bytes, canonical.bytes, `${receipt.path} canonical byte count`);
+    assert.equal(receipt.sha256, canonical.sha256, `${receipt.path} canonical SHA-256`);
+    assert.equal(receipt.gitBlobSha1, canonical.gitBlobSha1, `${receipt.path} canonical Git blob SHA-1`);
   }
 });
 

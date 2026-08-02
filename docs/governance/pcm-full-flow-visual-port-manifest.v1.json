@@ -55,13 +55,13 @@
     "tests/pcm-full-flow-visual-port.test.mjs",
     "tests/pcm-service-contract.test.mjs"
   ],
-  "artifactReceiptPolicy": "ALL_NON_MANIFEST_WRITESET_FILES_RAW_BYTES_GIT_BLOB_SHA1_AND_RAW_SHA256",
+  "artifactReceiptPolicy": "UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1",
   "artifactReceipts": [
     {
       "path": "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
-      "bytes": 7548,
-      "gitBlobSha1": "37124e35f05c6e0b08e06b9dea9833047491046b",
-      "sha256": "15b412719117539b3b14cc4f85a72cbc094736dacc8723e9531b4b64d5d63e8f"
+      "bytes": 7785,
+      "gitBlobSha1": "6f3454ed67a0dd3f8bea4294b0de46175bca4356",
+      "sha256": "80ad3f346cb04b0f14a55b833b0371cc55830b0e296beb778290b20869a10cfb"
     },
     {
       "path": "docs/superpowers/specs/2026-08-02-pcm-full-flow-visual-port-design.md",
@@ -71,15 +71,15 @@
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
-      "bytes": 22089,
+      "bytes": 21597,
       "gitBlobSha1": "e33a0c25d2cf60ea1ed0ce16e4c7534d5e48dfa7",
-      "sha256": "ba78ea5599a8f2340d796a0d0c08fcfeb2cf5a500e6d6f3ef91ae294ac3e67e4"
+      "sha256": "5904c55b22ade22ec8e5506e145bae9f3156054c3372b4dd3368ec9f313f8325"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
-      "bytes": 25591,
+      "bytes": 24362,
       "gitBlobSha1": "25a750808dbbebd05f4b4587154c0ac66e4028b3",
-      "sha256": "897118d6c2bc07b4eddb5aa0968168e224b2b5d2abe95c65ceb465e1887107fc"
+      "sha256": "4d40ce3a5495538ce839ce682ae2309e71a75a338dfa7e6c8d38e3c0c157005b"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/app.js",
@@ -101,21 +101,21 @@
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html",
-      "bytes": 6448,
+      "bytes": 6368,
       "gitBlobSha1": "59589fe9d815b354b460af8d93a7d45a20e3e689",
-      "sha256": "19c91595f7b8d37aacf01cae5f4515a12392ecb7e5939f7dd69d17498bbfae0a"
+      "sha256": "6f420ed8cb2dd7db8980935a5131e5230366d50f37c097fcdfade418c90d3070"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/contract-content.js",
-      "bytes": 61723,
+      "bytes": 61042,
       "gitBlobSha1": "2b0b942830c423565ec1f9edcd16c9fcdeba5f30",
-      "sha256": "cdfda867df2139cf6b1c8604e069f379c0c8011662cdc222c907989a84f80bd8"
+      "sha256": "3ddc1c2c967697e20cfee2483b8d0e35c28e4bbac8d54fd8c7063fab9aa60a09"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/styles.css",
-      "bytes": 18593,
+      "bytes": 18404,
       "gitBlobSha1": "ef978bae86f5c88847a299bfe0dd0f0ab5719eaa",
-      "sha256": "8f0d453b95283c812fc7fc0ab02b82a68a4a2ba5c839418b2d1fdd45cd231ee5"
+      "sha256": "4f85ec18c5ed082ecd029425d78218e32a1626aa2a571a4aac4adb09e0e21672"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js",
@@ -137,15 +137,15 @@
     },
     {
       "path": "tests/pcm-full-flow-visual-port.test.mjs",
-      "bytes": 16838,
-      "gitBlobSha1": "20a32ccd51882735cb768c20146a8d9cf92f9152",
-      "sha256": "8f1b109b7b035754f1bf4d681c79719b171c19d5c8bcf2ddb4c78cc13afe3e7d"
+      "bytes": 17333,
+      "gitBlobSha1": "f10427bd74a203db21c1781d531a1089d352ba89",
+      "sha256": "2c07bbfc229f6b6aa3f5038ab8c0fdeab67ad2d6028f2daff1c6769a88e5d0fd"
     },
     {
       "path": "tests/pcm-service-contract.test.mjs",
-      "bytes": 20970,
+      "bytes": 20384,
       "gitBlobSha1": "9bee3cf1403b987bfc8d6bdc6419d19b1781cf1f",
-      "sha256": "797157e1f9423f0010a04b519eab0a3d3d7720524f64430f19328dba292abb83"
+      "sha256": "a08b55d1f1628cee0e8ed30a130b852263d0db87ce97ffa45a3ba9ac92cb8329"
     }
   ],
   "tddEvidence": {

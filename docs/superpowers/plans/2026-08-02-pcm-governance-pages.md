@@ -102,12 +102,12 @@ Expected: 除 manifest receipt 外全部 PASS。
 - Create: `docs/governance/pcm-governance-pages-manifest.v1.json`
 
 **Interfaces:**
-- Consumes: 9 個非 manifest 新檔的 final bytes。
-- Produces: exact writeSet、baseline commit/tree、每檔 bytes／SHA-256／Git blob SHA-1。
+- Consumes: 9 個非 manifest 新檔；每檔先以 fatal UTF-8 解碼，再只將 CRLF 正規化為 LF。
+- Produces: exact writeSet、baseline commit/tree、`UTF8_LF_CANONICAL_BYTES_GIT_BLOB_SHA1_V1` 的 canonical bytes／SHA-256／Git blob SHA-1；不宣稱 working-tree raw bytes。
 
 - [ ] **Step 1: 計算 9 個 receipts**
 
-使用 PowerShell `Get-FileHash` 與 `git hash-object -- <path>` 取得 immutable receipts，不把 manifest 自身列入 receipts。
+使用與測試相同的 UTF-8/LF canonical helper 計算 immutable receipts；先用 in-memory LF／CRLF 同內容向量證明 bytes、SHA-256 與 Git blob SHA-1 完全一致，不寫暫存檔，也不把 manifest 自身列入 receipts。
 
 - [ ] **Step 2: 寫入 manifest 並執行 GREEN**
 
