@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "pcm-governance-pages-manifest.v1",
+  "candidateType": "UI_SOURCE_CANDIDATE",
+  "authorityBoundary": "A3 UX/source-only candidate; not runtime, authorization, data, or production authority",
+  "generatedAt": "2026-08-02T00:00:00+08:00",
+  "baseline": {
+    "commit": "0b0037ff50a4dc5b1756fe3230588f12a01c5337",
+    "tree": "57bb0dc3775af085810a60a6719c5fa898e98a8d",
+    "branch": "a3/pcm-governance-pages-source-20260802"
+  },
+  "writeSet": [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
+    "tests/pcm-governance-pages.test.mjs",
+    "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
+    "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
+    "docs/governance/pcm-governance-pages-manifest.v1.json"
+  ],
+  "artifactReceipts": [
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html",
+      "bytes": 6986,
+      "sha256": "d4c9c45238d54293722461d9d80caeb6f6254c96c7f25121622a82f249d9634a",
+      "gitBlobSha1": "d42c1c806b9f09c86f92e15f7aad59e2eb9324a3"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css",
+      "bytes": 8370,
+      "sha256": "950282e599baf55c6f9d851136fcfbcaf1fc4b91539d2172fd665071f0e82981",
+      "gitBlobSha1": "e17c7203593020438c3270d2cfa63f16a140a371"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
+      "bytes": 4097,
+      "sha256": "b72758d42cb65570f86ef5c7f26af16a19d90e20bd89b6586318390c34d1e85b",
+      "gitBlobSha1": "16cad885a2f2367684e26ea5de1ce0907841653b"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html",
+      "bytes": 5702,
+      "sha256": "231b95213bf6a2ab61c4016e80fd4ebe62f3890bcc7eed1fc669467983fc6e7d",
+      "gitBlobSha1": "b539de259305626e0e4d5159593f71cf0c4a35b2"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/styles.css",
+      "bytes": 8323,
+      "sha256": "e3fd148cb14acc52c9c2b8cf7fcdbeb9c30a020951b5bdb013ecc48310d8c903",
+      "gitBlobSha1": "2251fff4727289766ae4de0c3eadd8ba1a4e00e7"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
+      "bytes": 3776,
+      "sha256": "f9f195d2d88e5df71baabac33243ae43cbdca17534bc589ae68bb59907c692bb",
+      "gitBlobSha1": "a1ab2efca38da659786744190569a29ffad86164"
+    },
+    {
+      "path": "tests/pcm-governance-pages.test.mjs",
+      "bytes": 8477,
+      "sha256": "42a2444443afcd40a86ce81b0a722deb7e5baee336e36667de76d1c8e55fb5f1",
+      "gitBlobSha1": "1b0411ee9f99df543cd60609dfddc5385fe69d69"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
+      "bytes": 6353,
+      "sha256": "a4e5d9f5771204ab67b6aca26d9cb75eea3c8d0f7b23513742985c5b1edd5c77",
+      "gitBlobSha1": "21fd5dc7442c4410cecba8464dc2ad44e9ff4e3d"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
+      "bytes": 6815,
+      "sha256": "1b1e0ba4dbf0db862c5b2331b3f4a2d0bdaf4f00b46f8b284b815f936da2ddcd",
+      "gitBlobSha1": "1b08ac298b1fd93354ace010be9656c0b4b96a31"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>PCM 內部治理｜萊比</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要工作區</a>
+    <header class="product-bar">
+      <img src="../../../../assets/logo/laibe_offer.svg" alt="萊比" />
+      <div class="product-name"><span>PCM 私有後台</span><strong>內部治理</strong></div>
+      <span class="privacy-mark">帳號、權限與責任留痕</span>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <section class="authority-strip" aria-label="治理事實脊柱">
+        <div><span>角色</span><strong>內部管理者</strong></div>
+        <div><span>契約狀態</span><strong>尚未確認</strong></div>
+        <div><span>案件狀態</span><strong>未顯示案件</strong></div>
+        <div><span>下一步責任人</span><strong>等待權限確認</strong></div>
+        <div><span>最近紀錄</span><strong>尚無可調閱紀錄</strong></div>
+      </section>
+
+      <section class="access-state" aria-labelledby="access-title" aria-live="polite">
+        <div class="state-symbol" aria-hidden="true">◎</div>
+        <p class="eyebrow">內部資料受角色與責任範圍保護</p>
+        <h1 id="access-title" data-state-title>尚未取得內部治理權限</h1>
+        <p data-state-detail>目前沒有可調閱的內部紀錄或可執行的管理動作。</p>
+        <div class="state-steps" aria-label="治理工作順序">
+          <span>確認管理角色</span><i aria-hidden="true"></i><span>核對責任範圍</span><i aria-hidden="true"></i><span>留下異動原因</span>
+        </div>
+        <button type="button" disabled>重新確認權限</button>
+      </section>
+
+      <div class="governance-shell" data-governance-shell hidden>
+        <aside class="rail" aria-label="內部治理導覽">
+          <p class="rail-label">治理範圍</p>
+          <button type="button" disabled aria-current="page">帳號與成員</button>
+          <button type="button" disabled>角色與契約</button>
+          <button type="button" disabled>存取與異動紀錄</button>
+          <div class="rail-boundary">
+            <strong>權責邊界</strong>
+            <p>管理者維護授權與責任關係；管理者不得取代 Human PCM 的文件判讀與確認結果。</p>
+          </div>
+        </aside>
+
+        <div class="workspace">
+          <section class="workspace-heading">
+            <div>
+              <p class="eyebrow">PCM 內部治理</p>
+              <h1>先確認誰能看，再留下為何異動</h1>
+              <p>所有 Human PCM 都是裝潢專業人士。第一版不依專業分科，由管理者按案件負載逐案人工指派。</p>
+            </div>
+            <button class="primary" type="button" disabled>邀請 PCM 帳號</button>
+          </section>
+
+          <section id="accounts" class="governance-table">
+            <div class="section-title"><div><span class="section-index">01</span><h2>帳號</h2></div><span class="status">待權限</span></div>
+            <p>使用受邀的 Gmail 信箱驗證登入；管理者可啟用或停權，異動前須說明原因。</p>
+            <div class="table-head" aria-hidden="true"><span>帳號</span><span>狀態</span><span>目前案件量</span><span>最近異動</span></div>
+            <div class="empty-row">權限確認完成後才會顯示受邀帳號。</div>
+            <button type="button" disabled>管理帳號狀態</button>
+          </section>
+
+          <div class="governance-grid">
+            <section id="case-members" class="work-section">
+              <div class="section-title"><div><span class="section-index">02</span><h2>案件成員</h2></div><span class="status">人工指派</span></div>
+              <p>依案件負載進行人工指派或改派，清楚說明原負責人、新負責人、原因與生效時間。</p>
+              <button type="button" disabled>調整案件責任</button>
+            </section>
+            <section id="role-permissions" class="work-section">
+              <div class="section-title"><div><span class="section-index">03</span><h2>角色權限</h2></div><span class="status">待權限</span></div>
+              <p>權限只服務登入、案件調閱、案件負載、指派責任與交接留痕；所有 PCM 採相同專業角色。</p>
+              <button type="button" disabled>核對角色權限</button>
+            </section>
+            <section id="contract-governance" class="work-section">
+              <div class="section-title"><div><span class="section-index">04</span><h2>契約版本／狀態</h2></div><span class="status">待權限</span></div>
+              <p>標明目前適用版次、狀態、適用案件與變更依據，不在此頁作 PCM 文件決定。</p>
+              <button type="button" disabled>查看契約版次</button>
+            </section>
+          </div>
+
+          <section id="access-change-records" class="record-ledger">
+            <div class="section-title"><div><span class="section-index">05</span><h2>存取／異動紀錄</h2></div><span class="status">唯讀調閱</span></div>
+            <p>逐筆呈現處理人、時間、影響案件、異動內容、原因與下一位責任人；目前沒有可調閱紀錄。</p>
+            <button type="button" disabled>調閱異動紀錄</button>
+          </section>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>PCM 授權案件工作台｜萊比</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要工作區</a>
+    <header class="product-bar">
+      <img src="../../../../assets/logo/laibe_offer.svg" alt="萊比" />
+      <div class="product-name">
+        <span>PCM 私有後台</span>
+        <strong>授權案件工作台</strong>
+      </div>
+      <span class="privacy-mark">僅顯示已授權案件</span>
+    </header>
+
+    <main id="main-content" tabindex="-1">
+      <section class="authority-strip" aria-label="案件事實脊柱">
+        <div><span>角色</span><strong>Human PCM</strong></div>
+        <div><span>契約狀態</span><strong>尚未確認</strong></div>
+        <div><span>案件狀態</span><strong>未顯示案件</strong></div>
+        <div><span>下一步責任人</span><strong>等待授權確認</strong></div>
+        <div><span>最近紀錄</span><strong>尚無可調閱紀錄</strong></div>
+      </section>
+
+      <section class="access-state" aria-labelledby="access-title" aria-live="polite">
+        <div class="state-symbol" aria-hidden="true">◎</div>
+        <p class="eyebrow">案件內容受授權範圍保護</p>
+        <h1 id="access-title" data-state-title>尚未取得授權案件</h1>
+        <p data-state-detail>目前沒有可調閱的案件內容或可執行的處理動作。</p>
+        <div class="state-steps" aria-label="授權後的工作順序">
+          <span>確認案件</span><i aria-hidden="true"></i><span>核對文件</span><i aria-hidden="true"></i><span>留下判斷依據</span>
+        </div>
+        <button type="button" disabled>重新確認授權</button>
+      </section>
+
+      <div class="console-shell" data-authorized-shell hidden>
+        <aside class="rail" aria-label="案件工作導覽">
+          <p class="rail-label">案件工作</p>
+          <button type="button" disabled aria-current="page">授權案件</button>
+          <button type="button" disabled>文件與風險</button>
+          <button type="button" disabled>決策與里程碑</button>
+          <button type="button" disabled>通訊與案件紀錄</button>
+          <div class="rail-boundary">
+            <strong>判斷責任</strong>
+            <p>AI 僅提供初步檢核；Human PCM 作最後確認並留下依據。</p>
+          </div>
+        </aside>
+
+        <div class="workspace">
+          <section id="authorized-cases" class="workspace-heading">
+            <div>
+              <p class="eyebrow">授權案件清單</p>
+              <h1>先確認案件，再開始文件檢討</h1>
+              <p>只列出已完成權限確認且由目前 PCM 負責的案件。</p>
+            </div>
+            <button class="primary" type="button" disabled>開啟目前案件</button>
+          </section>
+
+          <section id="case-workbench" class="case-table" aria-labelledby="cases-title">
+            <div class="section-title">
+              <div><span class="section-index">01</span><h2 id="cases-title">案件工作台</h2></div>
+              <p>目前沒有可顯示的案件資料。</p>
+            </div>
+            <div class="table-head" aria-hidden="true"><span>案件與階段</span><span>文件版次</span><span>等待關係</span><span>下一步</span></div>
+            <div class="empty-row">授權確認完成後，這裡會顯示案件狀態、文件版次、等待對象與唯一下一步。</div>
+          </section>
+
+          <div class="review-grid">
+            <section id="document-integrity" class="work-section">
+              <div class="section-title"><div><span class="section-index">02</span><h2>文件完整性</h2></div><span class="status">待案件</span></div>
+              <p>核對報價、圖面、附件、提出人與提出時間，辨識缺頁、缺版次或缺少說明的項目。</p>
+              <button type="button" disabled>檢視文件版次</button>
+            </section>
+            <section id="risk-comparison" class="work-section">
+              <div class="section-title"><div><span class="section-index">03</span><h2>文件／風險比對</h2></div><span class="status">待案件</span></div>
+              <p>將 AI 初步檢核與原始文件並列，定位空間、工種、頁次或報價項目；仍需 Human PCM 確認。</p>
+              <button type="button" disabled>開始人工確認</button>
+            </section>
+            <section id="supplement-request" class="work-section">
+              <div class="section-title"><div><span class="section-index">04</span><h2>補件要求</h2></div><span class="status">待案件</span></div>
+              <p>說明缺少內容、引用文件版次、等待對象與期限；正式確認後才會留下案件紀錄。</p>
+              <button type="button" disabled>整理補件內容</button>
+            </section>
+            <section id="written-review" class="work-section">
+              <div class="section-title"><div><span class="section-index">05</span><h2>決策整理／書面檢討</h2></div><span class="status">待案件</span></div>
+              <p>彙整雙方說明、PCM 判斷依據、尚待確認事項與下一位處理人。</p>
+              <button type="button" disabled>整理確認結果</button>
+            </section>
+            <section id="milestone-governance" class="work-section">
+              <div class="section-title"><div><span class="section-index">06</span><h2>里程碑／驗收治理</h2></div><span class="status">待案件</span></div>
+              <p>依契約版次核對里程碑、驗收依據、缺失與責任關係，不處理付款或資金保管。</p>
+              <button type="button" disabled>核對驗收依據</button>
+            </section>
+            <section id="communication-replies" class="work-section">
+              <div class="section-title"><div><span class="section-index">07</span><h2>通訊待回覆</h2></div><span class="status">待案件</span></div>
+              <p>依等待對象排列待回覆事項，保留原始提出內容與引用文件。</p>
+              <button type="button" disabled>查看待回覆事項</button>
+            </section>
+          </div>
+
+          <section id="case-records" class="record-ledger">
+            <div class="section-title"><div><span class="section-index">08</span><h2>案件紀錄調閱</h2></div><span class="status">唯讀調閱</span></div>
+            <p>可依文件、空間、工種、狀態、處理人與時間找到原始紀錄；目前沒有已授權紀錄。</p>
+            <button type="button" disabled>開啟案件歷程</button>
+          </section>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
