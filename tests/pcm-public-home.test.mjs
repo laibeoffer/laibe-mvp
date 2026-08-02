@@ -626,16 +626,26 @@ test("every configured public route resolves inside the PCM package", async () =
   }
 });
 
-test("public homepage exposes the PCM service contract entry and canonical fee", async () => {
+test("public homepage exposes the PCM service contract as the fifth header entry", async () => {
   const html = await readPcmFile("public_home/code.html");
   const css = await readPcmFile("public_home/styles.css");
+  const headerNav = html.match(
+    /<nav\b[^>]*>[\s\S]*?<\/nav>/i,
+  )?.[0] ?? "";
+  const links = [...headerNav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>/gi)];
 
   assert.match(html, /href="\.\.\/service_contract\/code\.html"/);
   assert.match(html, />PCM ??憟?<\/a>/);
   assert.match(html, /3\.5%/);
-  assert.doesNotMatch(html, /銋\?3%\?\?/);
+  assert.doesNotMatch(html, /(?<![\d.])3%(?![\d.])/);
+  assert.equal(links.length, 5);
+  assert.equal(links[4][1], "../service_contract/code.html");
+  assert.equal(
+    links.at(-1)?.[1],
+    "../service_contract/code.html",
+  );
   assert.match(
     css,
-    /\.site-header nav > a:last-child[\s\S]*grid-column:\s*1\s*\/\s*-1/,
+    /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header nav\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\);[\s\S]*?\}[\s\S]*?\.site-header nav\s*>\s*a:last-child\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;/i,
   );
 });
