@@ -223,11 +223,236 @@ test("governance resolver defaults to zero payload and never grants PCM decision
   const ready = module.resolveInternalGovernanceState({
     sessionStatus: "ready",
     actor: { id: "admin-user", role: "governance_admin" },
-    assignment: { actorId: "admin-user", scope: "pcm_internal_governance", status: "active" },
+    assignment: { actorId: "admin-user", scope: "pcm_internal_governance", status: "active", mode: "active" },
     records: [{ id: "record-01", category: "帳號" }],
   });
   assert.equal(ready.state, "GOVERNANCE_READY");
   assert.ok(ready.enabledActions.includes("manage_access"));
   assert.ok(ready.enabledActions.includes("manual_assignment"));
   assert.ok(!ready.enabledActions.includes("confirm_pcm_decision"));
+});
+
+function authorizedContext(overrides = {}) {
+  return {
+    sessionStatus: "ready",
+    actor: { id: "pcm-user", role: "pcm" },
+    membership: { actorId: "pcm-user", status: "active", caseIds: ["case-01"] },
+    contract: { caseId: "case-01", status: "active" },
+    caseBinding: { caseId: "case-01", status: "bound" },
+    authorizedCases: [{ id: "case-01", status: "文件檢討中", nextOwner: "Human PCM" }],
+    ...overrides,
+  };
+}
+
+function governanceContext(overrides = {}) {
+  return {
+    sessionStatus: "ready",
+    actor: { id: "admin-user", role: "governance_admin" },
+    assignment: {
+      actorId: "admin-user",
+      scope: "pcm_internal_governance",
+      status: "active",
+      mode: "active",
+    },
+    records: [{ id: "record-01", category: "帳號" }],
+    ...overrides,
+  };
+}
+
+function assertClosed(result, payloadKey, deniedState) {
+  assert.equal(result.state, deniedState);
+  assert.deepEqual(result[payloadKey], []);
+  assert.deepEqual(result.enabledActions, []);
+}
+
+test("adversarial PCM identifiers and membership values always fail closed", async () => {
+  const module = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const sharedObjectId = {};
+  const mutations = [
+    { actor: { role: "pcm" } },
+    { actor: { id: "", role: "pcm" } },
+    { actor: { id: {}, role: "pcm" } },
+    { caseBinding: { status: "bound" } },
+    { caseBinding: { caseId: "", status: "bound" } },
+    {
+      actor: { id: sharedObjectId, role: "pcm" },
+      membership: { actorId: sharedObjectId, status: "active", caseIds: [sharedObjectId] },
+      contract: { caseId: sharedObjectId, status: "active" },
+      caseBinding: { caseId: sharedObjectId, status: "bound" },
+      authorizedCases: [{ id: sharedObjectId, status: "文件檢討中" }],
+    },
+    { contract: { status: "active" } },
+    { contract: { caseId: "", status: "active" } },
+    { contract: { caseId: {}, status: "active" } },
+    { membership: { actorId: "pcm-user", status: "active" } },
+    { membership: { actorId: "pcm-user", status: "active", caseIds: [undefined] } },
+    { membership: { actorId: "pcm-user", status: "active", caseIds: [""] } },
+    { membership: { actorId: "pcm-user", status: "active", caseIds: [{}] } },
+    { authorizedCases: [{ status: "文件檢討中" }] },
+    { authorizedCases: [{ id: "", status: "文件檢討中" }] },
+    { authorizedCases: [{ id: {}, status: "文件檢討中" }] },
+  ];
+
+  for (const mutation of mutations) {
+    assertClosed(
+      module.resolvePcmAuthorizedConsoleState(authorizedContext(mutation)),
+      "casePayload",
+      "ACCESS_DENIED",
+    );
+  }
+});
+
+test("adversarial PCM row cardinality and unknown status cannot become ready", async () => {
+  const module = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const empty = module.resolvePcmAuthorizedConsoleState(authorizedContext({ authorizedCases: [] }));
+  assert.equal(empty.state, "AUTHORIZED_EMPTY");
+  assert.deepEqual(empty.casePayload, []);
+  assert.deepEqual(empty.enabledActions, []);
+
+  const duplicate = module.resolvePcmAuthorizedConsoleState(authorizedContext({
+    authorizedCases: [
+      { id: "case-01", status: "文件檢討中" },
+      { id: "case-01", status: "文件檢討中" },
+    ],
+  }));
+  assertClosed(duplicate, "casePayload", "ACCESS_DENIED");
+
+  for (const status of ["ATTACKER", "toString", "__proto__"]) {
+    let unknown;
+    assert.doesNotThrow(() => {
+      unknown = module.resolvePcmAuthorizedConsoleState(authorizedContext({
+        authorizedCases: [{ id: "case-01", status }],
+      }));
+    });
+    assertClosed(unknown, "casePayload", "ACCESS_DENIED");
+  }
+
+  assert.equal(
+    module.resolvePcmAuthorizedConsoleState(authorizedContext()).state,
+    "AUTHORIZED_READY",
+  );
+  const archived = module.resolvePcmAuthorizedConsoleState(authorizedContext({
+    authorizedCases: [{ id: "case-01", status: "已封存" }],
+  }));
+  assert.equal(archived.state, "CASE_ARCHIVED_READ_ONLY");
+  assert.deepEqual(archived.enabledActions, []);
+});
+
+test("adversarial governance identifiers and modes fail closed before record branching", async () => {
+  const module = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+  const sharedObjectId = {};
+  const mutations = [
+    { actor: { role: "governance_admin" } },
+    { actor: { id: "", role: "governance_admin" } },
+    { actor: { id: {}, role: "governance_admin" } },
+    {
+      actor: { id: sharedObjectId, role: "governance_admin" },
+      assignment: {
+        actorId: sharedObjectId,
+        scope: "pcm_internal_governance",
+        status: "active",
+        mode: "active",
+      },
+    },
+    { assignment: { actorId: "admin-user", scope: "pcm_internal_governance", status: "active" } },
+    {
+      assignment: {
+        actorId: "admin-user",
+        scope: "pcm_internal_governance",
+        status: "active",
+        mode: "ATTACKER",
+      },
+    },
+  ];
+  for (const mutation of mutations) {
+    for (const records of [[], [{ id: "record-01", category: "帳號" }]]) {
+      assertClosed(
+        module.resolveInternalGovernanceState(governanceContext({ ...mutation, records })),
+        "governancePayload",
+        "GOVERNANCE_DENIED",
+      );
+    }
+  }
+});
+
+test("governance active and read-only modes keep actions closed by explicit state", async () => {
+  const module = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+  const activeEmpty = module.resolveInternalGovernanceState(governanceContext({ records: [] }));
+  assert.equal(activeEmpty.state, "GOVERNANCE_EMPTY");
+  assert.deepEqual(activeEmpty.governancePayload, []);
+  assert.deepEqual(activeEmpty.enabledActions, ["manage_access", "manual_assignment"]);
+
+  for (const records of [[], [{ id: "record-01", category: "帳號" }]]) {
+    const readOnly = module.resolveInternalGovernanceState(governanceContext({
+      assignment: {
+        actorId: "admin-user",
+        scope: "pcm_internal_governance",
+        status: "active",
+        mode: "read_only",
+      },
+      records,
+    }));
+    assert.equal(readOnly.state, "GOVERNANCE_READ_ONLY");
+    assert.deepEqual(readOnly.enabledActions, []);
+  }
+});
+
+function fakeRenderDocument(shellSelector, datasetKey) {
+  const title = { textContent: "尚未取得授權" };
+  const detail = { textContent: "目前未授權。" };
+  const shell = { hidden: true };
+  return {
+    nodes: { title, detail, shell },
+    document: {
+      querySelector(selector) {
+        if (selector === "[data-state-title]") return title;
+        if (selector === "[data-state-detail]") return detail;
+        if (selector === shellSelector) return shell;
+        return null;
+      },
+      documentElement: { dataset: { [datasetKey]: "" } },
+    },
+  };
+}
+
+test("authorized and archived renderers replace denied copy whenever the shell is visible", async () => {
+  const module = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const expected = [
+    ["AUTHORIZED_READY", "案件授權已確認", "可依案件目前狀態開始文件檢討並留下判斷依據。"],
+    ["CASE_ARCHIVED_READ_ONLY", "案件已封存，限調閱", "可調閱既有文件與案件紀錄，目前不提供新的處理動作。"],
+  ];
+  try {
+    for (const [state, titleCopy, detailCopy] of expected) {
+      const fake = fakeRenderDocument("[data-authorized-shell]", "consoleState");
+      globalThis.document = fake.document;
+      module.renderPcmAuthorizedConsole({ state });
+      assert.equal(fake.nodes.shell.hidden, false);
+      assert.equal(fake.nodes.title.textContent, titleCopy);
+      assert.equal(fake.nodes.detail.textContent, detailCopy);
+      assert.doesNotMatch(`${titleCopy} ${detailCopy}`, /未授權|尚未取得/);
+    }
+  } finally {
+    delete globalThis.document;
+  }
+});
+
+test("governance ready and read-only renderers replace denied copy whenever the shell is visible", async () => {
+  const module = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+  const expected = [
+    ["GOVERNANCE_READY", "內部治理權限已確認", "可依責任範圍管理帳號、人工指派與異動原因。"],
+    ["GOVERNANCE_READ_ONLY", "內部治理為唯讀", "可調閱既有治理紀錄，目前不提供異動操作。"],
+  ];
+  try {
+    for (const [state, titleCopy, detailCopy] of expected) {
+      const fake = fakeRenderDocument("[data-governance-shell]", "governanceState");
+      globalThis.document = fake.document;
+      module.renderInternalGovernance({ state });
+      assert.equal(fake.nodes.shell.hidden, false);
+      assert.equal(fake.nodes.title.textContent, titleCopy);
+      assert.equal(fake.nodes.detail.textContent, detailCopy);
+      assert.doesNotMatch(`${titleCopy} ${detailCopy}`, /未授權|尚未取得/);
+    }
+  } finally {
+    delete globalThis.document;
+  }
 });

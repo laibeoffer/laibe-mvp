@@ -59,7 +59,7 @@ Expected: FAIL，原因為新頁或 manifest 尚不存在，不得是 syntax err
 
 - [ ] **Step 3: 實作純狀態解析**
 
-只有 active PCM session、active membership、相同 case binding 與 active contract 才回 `AUTHORIZED_READY`；其他狀態不得帶案件 payload。初始渲染 `ACCESS_DENIED` 且所有 action disabled。
+只有 active PCM session、primitive non-empty actor／case IDs、closed primitive membership array、相同 case binding、active contract 與 requested case 精確一列才可依 closed status table 解析。`文件檢討中` 對應 `AUTHORIZED_READY`；`已封存` 對應 `CASE_ARCHIVED_READ_ONLY`；未知狀態、重複列、object／undefined／empty ID 一律 `ACCESS_DENIED` 且 payload／actions 為空。初始渲染仍為 `ACCESS_DENIED` 且所有 action disabled。
 
 - [ ] **Step 4: 執行目標測試**
 
@@ -88,7 +88,14 @@ Expected: 該群組 PASS；內部治理與 manifest 仍可失敗。
 
 - [ ] **Step 3: 實作治理 fail-closed**
 
-只有 active admin session、governance administrator actor 與 active assignment 完整一致才回 `GOVERNANCE_READY`；預設 payload 全空、action 全 disabled。
+只有 active admin session、primitive non-empty exact actor IDs、governance administrator actor、active assignment 與 closed mode 完整一致才可繼續。mode 必須先於 records empty branch 驗證：`active`＋empty 為 `GOVERNANCE_EMPTY` 且只提供既定管理 actions；`active`＋records 為 `GOVERNANCE_READY`；`read_only`＋empty／records 都為 `GOVERNANCE_READ_ONLY` 且 actions 永遠空；缺失或未知 mode 一律 `GOVERNANCE_DENIED`。
+
+### Admission fail-closed correction（parent `7c033382164e8f29218bf6ffb4afd3c953e88da6`）
+
+- [ ] 先用 actual adversarial inputs 驗證 missing／empty／object IDs、undefined／object membership、duplicate rows、unknown case status、missing／unknown mode、read-only empty 與 visible-shell renderer copy，取得 RED。
+- [ ] Resolver 只使用 closed primitive validation、exact cardinality 與 spec 明列 allowlist；禁止 truthy、object identity 或 unknown fallback。
+- [ ] `AUTHORIZED_READY`、`CASE_ARCHIVED_READ_ONLY`、`GOVERNANCE_READY`、`GOVERNANCE_READ_ONLY` 的 renderer copy 必須與可見 shell 同步。
+- [ ] Fresh 重跑 receipt invariants、focused governance 與完整 tests；只提交派令 exact6，A6 不得把 prototype resolver 當 runtime authority。
 
 - [ ] **Step 4: 執行測試**
 

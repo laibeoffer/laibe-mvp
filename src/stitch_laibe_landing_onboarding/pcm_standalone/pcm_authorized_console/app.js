@@ -23,6 +23,21 @@ const denied = (reasonCode) => ({
   enabledActions: [],
 });
 
+const isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
+
+const CASE_STATE_BY_STATUS = Object.freeze({
+  文件檢討中: Object.freeze({
+    state: PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY,
+    reasonCode: "authorized_ready",
+    enabledActions: Object.freeze(["review_case", "request_documents", "record_decision"]),
+  }),
+  已封存: Object.freeze({
+    state: PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY,
+    reasonCode: "authorized_read_only",
+    enabledActions: Object.freeze([]),
+  }),
+});
+
 export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_CONTEXT) {
   if (!context || context.sessionStatus === "unavailable") return denied("authorization_unavailable");
   if (context.sessionStatus === "checking") {
@@ -44,23 +59,33 @@ export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_C
 
   const actorId = context.actor?.id;
   const caseId = context.caseBinding?.caseId;
+  const membershipCaseIds = context.membership?.caseIds;
   const hasCompleteAuthority =
     context.sessionStatus === "ready" &&
-    Boolean(actorId) &&
+    isNonEmptyString(actorId) &&
+    isNonEmptyString(caseId) &&
+    isNonEmptyString(context.membership?.actorId) &&
+    isNonEmptyString(context.contract?.caseId) &&
     context.actor?.role === "pcm" &&
     context.membership?.actorId === actorId &&
     context.membership?.status === "active" &&
-    Array.isArray(context.membership?.caseIds) &&
-    context.membership.caseIds.includes(caseId) &&
+    Array.isArray(membershipCaseIds) &&
+    membershipCaseIds.every(isNonEmptyString) &&
+    membershipCaseIds.filter((membershipCaseId) => membershipCaseId === caseId).length === 1 &&
     context.caseBinding?.status === "bound" &&
     context.contract?.caseId === caseId &&
     context.contract?.status === "active";
 
   if (!hasCompleteAuthority) return denied("authorization_incomplete");
 
-  const authorizedCases = Array.isArray(context.authorizedCases)
-    ? context.authorizedCases.filter((item) => item?.id === caseId)
-    : [];
+  if (
+    !Array.isArray(context.authorizedCases) ||
+    !context.authorizedCases.every((item) => isNonEmptyString(item?.id))
+  ) {
+    return denied("authorized_rows_invalid");
+  }
+
+  const authorizedCases = context.authorizedCases.filter((item) => item.id === caseId);
 
   if (authorizedCases.length === 0) {
     return {
@@ -71,14 +96,26 @@ export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_C
     };
   }
 
-  const archived = authorizedCases.every((item) => item.status === "已封存");
+  if (authorizedCases.length !== 1) return denied("authorized_row_cardinality_invalid");
+
+  const authorizedCase = authorizedCases[0];
+  if (
+    !isNonEmptyString(authorizedCase.status) ||
+    !Object.hasOwn(CASE_STATE_BY_STATUS, authorizedCase.status)
+  ) {
+    return denied("authorized_status_invalid");
+  }
+  const statusRule = CASE_STATE_BY_STATUS[authorizedCase.status];
+
   return {
-    state: archived
-      ? PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY
-      : PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY,
-    reasonCode: archived ? "authorized_read_only" : "authorized_ready",
-    casePayload: authorizedCases.map(({ id, status, nextOwner }) => ({ id, status, nextOwner })),
-    enabledActions: archived ? [] : ["review_case", "request_documents", "record_decision"],
+    state: statusRule.state,
+    reasonCode: statusRule.reasonCode,
+    casePayload: [{
+      id: authorizedCase.id,
+      status: authorizedCase.status,
+      nextOwner: authorizedCase.nextOwner,
+    }],
+    enabledActions: [...statusRule.enabledActions],
   };
 }
 
@@ -86,6 +123,8 @@ const copyByState = Object.freeze({
   ACCESS_CHECKING: ["正在確認案件授權", "請稍候，確認完成前不會顯示案件內容。"],
   ACCESS_DENIED: ["尚未取得授權案件", "目前沒有可調閱的案件內容或可執行的處理動作。"],
   AUTHORIZED_EMPTY: ["目前沒有待處理案件", "案件完成指派後，會在這裡顯示下一步與最近紀錄。"],
+  AUTHORIZED_READY: ["案件授權已確認", "可依案件目前狀態開始文件檢討並留下判斷依據。"],
+  CASE_ARCHIVED_READ_ONLY: ["案件已封存，限調閱", "可調閱既有文件與案件紀錄，目前不提供新的處理動作。"],
   LOAD_FAILED_RETRYABLE: ["暫時無法確認案件授權", "請稍後重新整理；確認完成前不會顯示案件內容。"],
 });
 

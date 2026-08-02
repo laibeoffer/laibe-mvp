@@ -73,7 +73,18 @@ brand-fidelity: 10
 - `CASE_ARCHIVED_READ_ONLY`
 - `LOAD_FAILED_RETRYABLE`
 
-預設 context 解析為 `ACCESS_DENIED`，case payload 為空陣列、enabled actions 為空陣列。只有 active session、PCM actor、active membership、相同 case binding 與 active contract 完整一致時才可進 `AUTHORIZED_READY`。
+預設 context 解析為 `ACCESS_DENIED`，case payload 為空陣列、enabled actions 為空陣列。`actor.id`、`membership.actorId`、`caseBinding.caseId`、`contract.caseId` 與每個 authorized row `id` 都必須是 primitive、trim 後非空字串；object、undefined 與空字串一律拒絕。`membership.caseIds` 必須是只含 primitive 非空字串的 closed array，requested case ID 在陣列中必須精確出現一次。
+
+`authorizedCases` 必須是 closed valid-row array。requested case 為 0 列時進 `AUTHORIZED_EMPTY`；精確 1 列才可依明文狀態表判斷；同 case 重複列或任何無效 row ID 一律 `ACCESS_DENIED`，payload／actions 為空。狀態表只有：
+
+| 案件明文狀態 | Resolver state | Enabled actions |
+| --- | --- | --- |
+| `文件檢討中` | `AUTHORIZED_READY` | `review_case`、`request_documents`、`record_decision` |
+| `已封存` | `CASE_ARCHIVED_READ_ONLY` | 無 |
+
+未知狀態（包含 `ATTACKER`）不得 fallback READY。新增有效狀態前必須先在本規格與 adversarial tests 逐一列出 state／actions mapping。
+
+shell 顯示時 renderer 文案必須與 state 同步：`AUTHORIZED_READY` 顯示「案件授權已確認／可依案件目前狀態開始文件檢討並留下判斷依據。」；`CASE_ARCHIVED_READ_ONLY` 顯示「案件已封存，限調閱／可調閱既有文件與案件紀錄，目前不提供新的處理動作。」；不得保留未授權文案。
 
 ## 內部治理台
 
@@ -96,7 +107,15 @@ brand-fidelity: 10
 - `GOVERNANCE_READ_ONLY`
 - `GOVERNANCE_LOAD_FAILED`
 
-預設 context 解析為 `GOVERNANCE_DENIED`，帳號、案件成員、契約與紀錄 payload 全為空，enabled actions 為空。只有 active admin session、governance administrator actor 與 active governance assignment 完整一致時才可進 `GOVERNANCE_READY`。
+預設 context 解析為 `GOVERNANCE_DENIED`，帳號、案件成員、契約與紀錄 payload 全為空，enabled actions 為空。actor 與 assignment actor ID 都必須是 primitive、trim 後非空字串且 exact match。assignment mode 採 closed allowlist，必須在 records empty branch 前驗證：
+
+| Assignment mode | Records | Resolver state | Enabled actions |
+| --- | --- | --- | --- |
+| `active` | 空 | `GOVERNANCE_EMPTY` | `manage_access`、`manual_assignment` |
+| `active` | 非空 | `GOVERNANCE_READY` | `manage_access`、`manual_assignment`、`record_reason` |
+| `read_only` | 空或非空 | `GOVERNANCE_READ_ONLY` | 無 |
+
+mode 缺失或未知一律 `GOVERNANCE_DENIED`，不得因 records 為空而取得管理 actions。shell 顯示時，`GOVERNANCE_READY` 顯示「內部治理權限已確認／可依責任範圍管理帳號、人工指派與異動原因。」；`GOVERNANCE_READ_ONLY` 顯示「內部治理為唯讀／可調閱既有治理紀錄，目前不提供異動操作。」；不得保留未授權文案。
 
 ## 視覺與互動規則
 
