@@ -97,6 +97,14 @@ Expected: 該群組 PASS；內部治理與 manifest 仍可失敗。
 - [ ] `AUTHORIZED_READY`、`CASE_ARCHIVED_READ_ONLY`、`GOVERNANCE_READY`、`GOVERNANCE_READ_ONLY` 的 renderer copy 必須與可見 shell 同步。
 - [ ] Fresh 重跑 receipt invariants、focused governance 與完整 tests；只提交派令 exact6，A6 不得把 prototype resolver 當 runtime authority。
 
+### Own-data／shared-prototype correction（parent `12b6fd3210f421e2478ab3b87f6c7b3139cf9e6d`）
+
+- [ ] 先以 actual adversarial probes 覆蓋 sparse `membership.caseIds`／`authorizedCases`／records、revoked array Proxy、prototype-inherited actor／row、accessor field、null record，以及 post-load Array／Set／iterator hook，確認 RED。
+- [ ] 所有 authority consumed fields 攔在 own enumerable data descriptor，descriptor 單次讀取；accessor、inherited、invalid 或 throwing input 一律 DENIED 且零 payload／actions。
+- [ ] 三種 authority arrays 以 own-index dense numeric loop 驗證；authorized row 的 `id`／`status`／`nextOwner` 與 governance record 的 `id`／`category` 都是 primitive non-empty strings。
+- [ ] Authority evaluation 只使用 captured safe intrinsics、numeric loops 與 direct mode/status equality；不呼叫 Array prototype `every`／`filter`／`map`／`includes`、`Set.prototype.has` 或 `Symbol.iterator`，輸出複製亦不用 iterator。
+- [ ] Fresh 重跑 valid READY／READ_ONLY、所有歷次 adversarial probes、renderer copy、LF／CRLF、BOM、lone CR、invalid UTF-8 receipt invariants 與完整 suite；refresh manifest canonical receipts，再做 exact6 diff／commit gate。
+
 - [ ] **Step 4: 執行測試**
 
 Run: `node --test tests/pcm-governance-pages.test.mjs`

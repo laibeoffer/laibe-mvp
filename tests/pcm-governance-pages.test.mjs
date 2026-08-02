@@ -311,8 +311,8 @@ test("adversarial PCM row cardinality and unknown status cannot become ready", a
 
   const duplicate = module.resolvePcmAuthorizedConsoleState(authorizedContext({
     authorizedCases: [
-      { id: "case-01", status: "文件檢討中" },
-      { id: "case-01", status: "文件檢討中" },
+      { id: "case-01", status: "文件檢討中", nextOwner: "Human PCM" },
+      { id: "case-01", status: "文件檢討中", nextOwner: "Human PCM" },
     ],
   }));
   assertClosed(duplicate, "casePayload", "ACCESS_DENIED");
@@ -321,7 +321,7 @@ test("adversarial PCM row cardinality and unknown status cannot become ready", a
     let unknown;
     assert.doesNotThrow(() => {
       unknown = module.resolvePcmAuthorizedConsoleState(authorizedContext({
-        authorizedCases: [{ id: "case-01", status }],
+        authorizedCases: [{ id: "case-01", status, nextOwner: "Human PCM" }],
       }));
     });
     assertClosed(unknown, "casePayload", "ACCESS_DENIED");
@@ -332,7 +332,7 @@ test("adversarial PCM row cardinality and unknown status cannot become ready", a
     "AUTHORIZED_READY",
   );
   const archived = module.resolvePcmAuthorizedConsoleState(authorizedContext({
-    authorizedCases: [{ id: "case-01", status: "已封存" }],
+    authorizedCases: [{ id: "case-01", status: "已封存", nextOwner: "Human PCM" }],
   }));
   assert.equal(archived.state, "CASE_ARCHIVED_READ_ONLY");
   assert.deepEqual(archived.enabledActions, []);
@@ -395,6 +395,149 @@ test("governance active and read-only modes keep actions closed by explicit stat
     assert.equal(readOnly.state, "GOVERNANCE_READ_ONLY");
     assert.deepEqual(readOnly.enabledActions, []);
   }
+});
+
+test("own-data authority rejects sparse arrays, inherited fields, accessors, and malformed rows", async () => {
+  const consoleModule = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const governanceModule = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+
+  const sparseMembership = new Array(2);
+  sparseMembership[1] = "case-01";
+  const sparseCases = new Array(2);
+  sparseCases[1] = { id: "case-01", status: "文件檢討中", nextOwner: "Human PCM" };
+  const sparseRecords = new Array(2);
+  sparseRecords[1] = { id: "record-01", category: "帳號" };
+
+  const inheritedActor = Object.create({ id: "pcm-user", role: "pcm" });
+  const inheritedCase = Object.create({
+    id: "case-01",
+    status: "文件檢討中",
+    nextOwner: "Human PCM",
+  });
+  const inheritedRecord = Object.create({ id: "record-01", category: "帳號" });
+
+  let accessorReadCount = 0;
+  const accessorActor = { role: "pcm" };
+  Object.defineProperty(accessorActor, "id", {
+    enumerable: true,
+    get() {
+      accessorReadCount += 1;
+      throw new Error("authority accessor must not execute");
+    },
+  });
+  const revokedMembership = Proxy.revocable([], {});
+  revokedMembership.revoke();
+  const revokedRecords = Proxy.revocable([], {});
+  revokedRecords.revoke();
+
+  const pcmInputs = [
+    authorizedContext({ membership: { actorId: "pcm-user", status: "active", caseIds: sparseMembership } }),
+    authorizedContext({ authorizedCases: sparseCases }),
+    authorizedContext({ actor: inheritedActor }),
+    authorizedContext({ authorizedCases: [inheritedCase] }),
+    authorizedContext({ actor: accessorActor }),
+    authorizedContext({
+      membership: { actorId: "pcm-user", status: "active", caseIds: revokedMembership.proxy },
+    }),
+  ];
+  for (const input of pcmInputs) {
+    let result;
+    assert.doesNotThrow(() => {
+      result = consoleModule.resolvePcmAuthorizedConsoleState(input);
+    });
+    assertClosed(result, "casePayload", "ACCESS_DENIED");
+  }
+
+  const governanceInputs = [
+    governanceContext({ records: sparseRecords }),
+    governanceContext({ records: [null] }),
+    governanceContext({ records: [inheritedRecord] }),
+    governanceContext({ records: revokedRecords.proxy }),
+  ];
+  for (const input of governanceInputs) {
+    let result;
+    assert.doesNotThrow(() => {
+      result = governanceModule.resolveInternalGovernanceState(input);
+    });
+    assertClosed(result, "governancePayload", "GOVERNANCE_DENIED");
+  }
+  assert.equal(accessorReadCount, 0);
+});
+
+test("authority evaluation is independent from post-load Array, Set, and iterator hooks", async () => {
+  const consoleModule = await import(pathToFileURL(path.join(root, paths.consoleJs)).href);
+  const governanceModule = await import(pathToFileURL(path.join(root, paths.governanceJs)).href);
+  const pcmReadyInput = authorizedContext();
+  const pcmSparseInput = authorizedContext({ authorizedCases: new Array(1) });
+  const governanceReadyInput = governanceContext();
+  const governanceReadOnlyInput = governanceContext({
+    assignment: {
+      actorId: "admin-user",
+      scope: "pcm_internal_governance",
+      status: "active",
+      mode: "read_only",
+    },
+    records: [],
+  });
+  const governanceEvilInput = governanceContext({
+    assignment: {
+      actorId: "admin-user",
+      scope: "pcm_internal_governance",
+      status: "active",
+      mode: "evil",
+    },
+    records: [],
+  });
+
+  const originals = {
+    every: Array.prototype.every,
+    filter: Array.prototype.filter,
+    map: Array.prototype.map,
+    includes: Array.prototype.includes,
+    iterator: Array.prototype[Symbol.iterator],
+    setHas: Set.prototype.has,
+  };
+  let authorityHookReads = 0;
+  let results;
+  try {
+    for (const name of ["every", "filter", "map", "includes"]) {
+      Array.prototype[name] = function (...args) {
+        authorityHookReads += 1;
+        return Reflect.apply(originals[name], this, args);
+      };
+    }
+    Array.prototype[Symbol.iterator] = function (...args) {
+      authorityHookReads += 1;
+      return Reflect.apply(originals.iterator, this, args);
+    };
+    Set.prototype.has = function () {
+      authorityHookReads += 1;
+      return true;
+    };
+
+    results = {
+      pcmReady: consoleModule.resolvePcmAuthorizedConsoleState(pcmReadyInput),
+      pcmSparse: consoleModule.resolvePcmAuthorizedConsoleState(pcmSparseInput),
+      governanceReady: governanceModule.resolveInternalGovernanceState(governanceReadyInput),
+      governanceReadOnly: governanceModule.resolveInternalGovernanceState(governanceReadOnlyInput),
+      governanceEvil: governanceModule.resolveInternalGovernanceState(governanceEvilInput),
+    };
+  } finally {
+    Array.prototype.every = originals.every;
+    Array.prototype.filter = originals.filter;
+    Array.prototype.map = originals.map;
+    Array.prototype.includes = originals.includes;
+    Array.prototype[Symbol.iterator] = originals.iterator;
+    Set.prototype.has = originals.setHas;
+  }
+
+  assert.equal(authorityHookReads, 0);
+  assert.equal(results.pcmReady.state, "AUTHORIZED_READY");
+  assertClosed(results.pcmSparse, "casePayload", "ACCESS_DENIED");
+  assert.equal(results.governanceReady.state, "GOVERNANCE_READY");
+  assert.equal(results.governanceReadOnly.state, "GOVERNANCE_READ_ONLY");
+  assert.deepEqual(results.governanceReadOnly.enabledActions, []);
+  assertClosed(results.governanceEvil, "governancePayload", "GOVERNANCE_DENIED");
 });
 
 function fakeRenderDocument(shellSelector, datasetKey) {

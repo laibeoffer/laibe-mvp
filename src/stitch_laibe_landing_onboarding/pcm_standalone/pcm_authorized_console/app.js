@@ -23,24 +23,78 @@ const denied = (reasonCode) => ({
   enabledActions: [],
 });
 
-const isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
+const safeArrayIsArray = Array.isArray;
+const SafeArray = Array;
+const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const safeHasOwn = Object.hasOwn;
+const safeDefineProperty = Object.defineProperty;
+const safeReflectApply = Reflect.apply;
+const safeStringTrim = String.prototype.trim;
+const noArguments = Object.freeze([]);
 
-const CASE_STATE_BY_STATUS = Object.freeze({
-  文件檢討中: Object.freeze({
-    state: PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY,
-    reasonCode: "authorized_ready",
-    enabledActions: Object.freeze(["review_case", "request_documents", "record_decision"]),
-  }),
-  已封存: Object.freeze({
-    state: PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY,
-    reasonCode: "authorized_read_only",
-    enabledActions: Object.freeze([]),
-  }),
-});
+const invalidField = Object.freeze({ ok: false, value: undefined });
+
+function readOwnData(target, key, requireEnumerable = true) {
+  if (target === null || (typeof target !== "object" && typeof target !== "function")) {
+    return invalidField;
+  }
+  try {
+    const descriptor = safeGetOwnPropertyDescriptor(target, key);
+    if (
+      !descriptor ||
+      !safeHasOwn(descriptor, "value") ||
+      (requireEnumerable && descriptor.enumerable !== true)
+    ) {
+      return invalidField;
+    }
+    return { ok: true, value: descriptor.value };
+  } catch {
+    return invalidField;
+  }
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && safeReflectApply(safeStringTrim, value, noArguments).length > 0;
+}
+
+function readDenseArray(value) {
+  try {
+    if (!safeArrayIsArray(value)) return { ok: false, length: 0, items: null };
+  } catch {
+    return { ok: false, length: 0, items: null };
+  }
+  const lengthField = readOwnData(value, "length", false);
+  if (!lengthField.ok) return { ok: false, length: 0, items: null };
+  const items = new SafeArray(lengthField.value);
+  for (let index = 0; index < lengthField.value; index += 1) {
+    const itemField = readOwnData(value, index);
+    if (!itemField.ok) return { ok: false, length: 0, items: null };
+    safeDefineProperty(items, index, {
+      value: itemField.value,
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+  }
+  return { ok: true, length: lengthField.value, items };
+}
+
+function makeActionsForStatus(status) {
+  if (status === "已封存") return [];
+  const actions = new SafeArray(3);
+  safeDefineProperty(actions, 0, { value: "review_case", enumerable: true, writable: true, configurable: true });
+  safeDefineProperty(actions, 1, { value: "request_documents", enumerable: true, writable: true, configurable: true });
+  safeDefineProperty(actions, 2, { value: "record_decision", enumerable: true, writable: true, configurable: true });
+  return actions;
+}
 
 export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_CONTEXT) {
-  if (!context || context.sessionStatus === "unavailable") return denied("authorization_unavailable");
-  if (context.sessionStatus === "checking") {
+  const sessionStatusField = readOwnData(context, "sessionStatus");
+  if (!sessionStatusField.ok || sessionStatusField.value === "unavailable") {
+    return denied("authorization_unavailable");
+  }
+  const sessionStatus = sessionStatusField.value;
+  if (sessionStatus === "checking") {
     return {
       state: PCM_AUTHORIZED_CONSOLE_STATES.ACCESS_CHECKING,
       reasonCode: "authorization_checking",
@@ -48,7 +102,7 @@ export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_C
       enabledActions: [],
     };
   }
-  if (context.sessionStatus === "error") {
+  if (sessionStatus === "error") {
     return {
       state: PCM_AUTHORIZED_CONSOLE_STATES.LOAD_FAILED_RETRYABLE,
       reasonCode: "authorization_check_failed",
@@ -57,37 +111,75 @@ export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_C
     };
   }
 
-  const actorId = context.actor?.id;
-  const caseId = context.caseBinding?.caseId;
-  const membershipCaseIds = context.membership?.caseIds;
-  const hasCompleteAuthority =
-    context.sessionStatus === "ready" &&
-    isNonEmptyString(actorId) &&
-    isNonEmptyString(caseId) &&
-    isNonEmptyString(context.membership?.actorId) &&
-    isNonEmptyString(context.contract?.caseId) &&
-    context.actor?.role === "pcm" &&
-    context.membership?.actorId === actorId &&
-    context.membership?.status === "active" &&
-    Array.isArray(membershipCaseIds) &&
-    membershipCaseIds.every(isNonEmptyString) &&
-    membershipCaseIds.filter((membershipCaseId) => membershipCaseId === caseId).length === 1 &&
-    context.caseBinding?.status === "bound" &&
-    context.contract?.caseId === caseId &&
-    context.contract?.status === "active";
-
-  if (!hasCompleteAuthority) return denied("authorization_incomplete");
-
-  if (
-    !Array.isArray(context.authorizedCases) ||
-    !context.authorizedCases.every((item) => isNonEmptyString(item?.id))
-  ) {
-    return denied("authorized_rows_invalid");
+  const actorField = readOwnData(context, "actor");
+  const membershipField = readOwnData(context, "membership");
+  const contractField = readOwnData(context, "contract");
+  const bindingField = readOwnData(context, "caseBinding");
+  const casesField = readOwnData(context, "authorizedCases");
+  if (!actorField.ok || !membershipField.ok || !contractField.ok || !bindingField.ok || !casesField.ok) {
+    return denied("authorization_incomplete");
   }
 
-  const authorizedCases = context.authorizedCases.filter((item) => item.id === caseId);
+  const actorIdField = readOwnData(actorField.value, "id");
+  const actorRoleField = readOwnData(actorField.value, "role");
+  const memberActorIdField = readOwnData(membershipField.value, "actorId");
+  const memberStatusField = readOwnData(membershipField.value, "status");
+  const memberCasesField = readOwnData(membershipField.value, "caseIds");
+  const contractCaseIdField = readOwnData(contractField.value, "caseId");
+  const contractStatusField = readOwnData(contractField.value, "status");
+  const bindingCaseIdField = readOwnData(bindingField.value, "caseId");
+  const bindingStatusField = readOwnData(bindingField.value, "status");
+  if (
+    sessionStatus !== "ready" ||
+    !actorIdField.ok || !isNonEmptyString(actorIdField.value) ||
+    !actorRoleField.ok || actorRoleField.value !== "pcm" ||
+    !memberActorIdField.ok || !isNonEmptyString(memberActorIdField.value) ||
+    memberActorIdField.value !== actorIdField.value ||
+    !memberStatusField.ok || memberStatusField.value !== "active" ||
+    !memberCasesField.ok ||
+    !contractCaseIdField.ok || !isNonEmptyString(contractCaseIdField.value) ||
+    !contractStatusField.ok || contractStatusField.value !== "active" ||
+    !bindingCaseIdField.ok || !isNonEmptyString(bindingCaseIdField.value) ||
+    !bindingStatusField.ok || bindingStatusField.value !== "bound" ||
+    contractCaseIdField.value !== bindingCaseIdField.value
+  ) {
+    return denied("authorization_incomplete");
+  }
 
-  if (authorizedCases.length === 0) {
+  const caseId = bindingCaseIdField.value;
+  const membershipCaseIds = readDenseArray(memberCasesField.value);
+  if (!membershipCaseIds.ok) return denied("authorization_incomplete");
+  let membershipMatches = 0;
+  for (let index = 0; index < membershipCaseIds.length; index += 1) {
+    const memberCaseId = membershipCaseIds.items[index];
+    if (!isNonEmptyString(memberCaseId)) return denied("authorization_incomplete");
+    if (memberCaseId === caseId) membershipMatches += 1;
+  }
+  if (membershipMatches !== 1) return denied("authorization_incomplete");
+
+  const authorizedCases = readDenseArray(casesField.value);
+  if (!authorizedCases.ok) return denied("authorized_rows_invalid");
+  let authorizedMatchCount = 0;
+  let authorizedCase = null;
+  for (let index = 0; index < authorizedCases.length; index += 1) {
+    const row = authorizedCases.items[index];
+    const idField = readOwnData(row, "id");
+    const statusField = readOwnData(row, "status");
+    const nextOwnerField = readOwnData(row, "nextOwner");
+    if (
+      !idField.ok || !isNonEmptyString(idField.value) ||
+      !statusField.ok || !isNonEmptyString(statusField.value) ||
+      !nextOwnerField.ok || !isNonEmptyString(nextOwnerField.value)
+    ) {
+      return denied("authorized_rows_invalid");
+    }
+    if (idField.value === caseId) {
+      authorizedMatchCount += 1;
+      authorizedCase = { id: idField.value, status: statusField.value, nextOwner: nextOwnerField.value };
+    }
+  }
+
+  if (authorizedMatchCount === 0) {
     return {
       state: PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_EMPTY,
       reasonCode: "no_authorized_cases",
@@ -96,26 +188,23 @@ export function resolvePcmAuthorizedConsoleState(context = INITIAL_PCM_CONSOLE_C
     };
   }
 
-  if (authorizedCases.length !== 1) return denied("authorized_row_cardinality_invalid");
-
-  const authorizedCase = authorizedCases[0];
-  if (
-    !isNonEmptyString(authorizedCase.status) ||
-    !Object.hasOwn(CASE_STATE_BY_STATUS, authorizedCase.status)
-  ) {
+  if (authorizedMatchCount !== 1) return denied("authorized_row_cardinality_invalid");
+  if (authorizedCase.status !== "文件檢討中" && authorizedCase.status !== "已封存") {
     return denied("authorized_status_invalid");
   }
-  const statusRule = CASE_STATE_BY_STATUS[authorizedCase.status];
+  const isArchived = authorizedCase.status === "已封存";
 
   return {
-    state: statusRule.state,
-    reasonCode: statusRule.reasonCode,
+    state: isArchived
+      ? PCM_AUTHORIZED_CONSOLE_STATES.CASE_ARCHIVED_READ_ONLY
+      : PCM_AUTHORIZED_CONSOLE_STATES.AUTHORIZED_READY,
+    reasonCode: isArchived ? "authorized_read_only" : "authorized_ready",
     casePayload: [{
       id: authorizedCase.id,
       status: authorizedCase.status,
       nextOwner: authorizedCase.nextOwner,
     }],
-    enabledActions: [...statusRule.enabledActions],
+    enabledActions: makeActionsForStatus(authorizedCase.status),
   };
 }
 

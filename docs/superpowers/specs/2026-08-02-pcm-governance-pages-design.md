@@ -73,9 +73,9 @@ brand-fidelity: 10
 - `CASE_ARCHIVED_READ_ONLY`
 - `LOAD_FAILED_RETRYABLE`
 
-預設 context 解析為 `ACCESS_DENIED`，case payload 為空陣列、enabled actions 為空陣列。`actor.id`、`membership.actorId`、`caseBinding.caseId`、`contract.caseId` 與每個 authorized row `id` 都必須是 primitive、trim 後非空字串；object、undefined 與空字串一律拒絕。`membership.caseIds` 必須是只含 primitive 非空字串的 closed array，requested case ID 在陣列中必須精確出現一次。
+預設 context 解析為 `ACCESS_DENIED`，case payload 為空陣列、enabled actions 為空陣列。所有供 authority 判斷的 context、actor、membership、contract、case binding 與 row 欄位，都必須是 own、enumerable、data descriptor，且只從 descriptor 取值一次；prototype 繼承欄位、accessor、descriptor trap 失敗一律拒絕且不得執行 getter。`actor.id`、`membership.actorId`、`caseBinding.caseId`、`contract.caseId` 與每個 authorized row 的 `id`、`status`、`nextOwner` 都必須是 primitive、trim 後非空字串；object、undefined 與空字串一律拒絕。`membership.caseIds` 必須是 dense closed array，每個 `0..length-1` index 都是 own enumerable data property，且只含 primitive 非空字串；requested case ID 在陣列中必須精確出現一次。
 
-`authorizedCases` 必須是 closed valid-row array。requested case 為 0 列時進 `AUTHORIZED_EMPTY`；精確 1 列才可依明文狀態表判斷；同 case 重複列或任何無效 row ID 一律 `ACCESS_DENIED`，payload／actions 為空。狀態表只有：
+`authorizedCases` 必須是 dense closed valid-row array，不接受 sparse index、null、繼承或 accessor row；revoked Proxy 或其他使 array／descriptor 檢查拋錯的輸入也必須穩定拒絕。requested case 為 0 列時進 `AUTHORIZED_EMPTY`；精確 1 列才可依明文狀態表判斷；同 case 重複列或任何無效 row 一律 `ACCESS_DENIED`，payload／actions 為空。authority path 只以 numeric loop、captured safe intrinsics 與 direct comparison 運作，不依賴可於載入後被改寫的 Array／Set prototype 或 iterator；輸出複製也不走 iterator。狀態表只有：
 
 | 案件明文狀態 | Resolver state | Enabled actions |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ shell 顯示時 renderer 文案必須與 state 同步：`AUTHORIZED_READY` 顯�
 - `GOVERNANCE_READ_ONLY`
 - `GOVERNANCE_LOAD_FAILED`
 
-預設 context 解析為 `GOVERNANCE_DENIED`，帳號、案件成員、契約與紀錄 payload 全為空，enabled actions 為空。actor 與 assignment actor ID 都必須是 primitive、trim 後非空字串且 exact match。assignment mode 採 closed allowlist，必須在 records empty branch 前驗證：
+預設 context 解析為 `GOVERNANCE_DENIED`，帳號、案件成員、契約與紀錄 payload 全為空，enabled actions 為空。actor、assignment 與 records consumed fields 必須是 own enumerable data descriptor；繼承、accessor、invalid descriptor 或讀取失敗一律 fail closed。actor 與 assignment actor ID 都必須是 primitive、trim 後非空字串且 exact match。records 必須是 dense array，每列 `id`、`category` 都是 own primitive 非空字串；sparse、null 或畸形列一律拒絕。assignment mode 使用 direct closed equality，不得依賴 mutable `Set.prototype`，並必須在 records empty branch 前驗證：
 
 | Assignment mode | Records | Resolver state | Enabled actions |
 | --- | --- | --- | --- |

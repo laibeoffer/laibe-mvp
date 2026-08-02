@@ -36,9 +36,9 @@
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js",
-      "bytes": 5470,
-      "sha256": "5756b60b32aeaa068be8631fedb762a3ebb81477e5807a1180ab601760b5de4c",
-      "gitBlobSha1": "5843521d02328bbc756339cde0a997e7c7c68c6d"
+      "bytes": 9638,
+      "sha256": "5b4c2169e4fe716bc6ef46219fedeb63b041e036e009c8a0b48a5be315a55da7",
+      "gitBlobSha1": "a38b172d119e5609e90d9d13aeab7b64959d7365"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html",
@@ -54,27 +54,27 @@
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js",
-      "bytes": 4474,
-      "sha256": "7dc319688adf7c5955303403548ca3f4df327a7a534a3594b7120e243b561642",
-      "gitBlobSha1": "8b4a9621ca82d81ffcaaa9e14c857165e5fbdc0e"
+      "bytes": 8215,
+      "sha256": "8b0aa7c2229e996ab3dc2598c758a9c563aeafa0219e07475335f7740647d0bf",
+      "gitBlobSha1": "4fc384b74f120dd06ec486b909c56523faf475b0"
     },
     {
       "path": "tests/pcm-governance-pages.test.mjs",
-      "bytes": 18913,
-      "sha256": "e6b11d110e66a26dca98a7298f0deccd3020ef5b54406b8108fa200f523629fe",
-      "gitBlobSha1": "91d184dfa804ff8d720b21b5f6b7fbfbf583467e"
+      "bytes": 24453,
+      "sha256": "6868d24003a268b882109b0453d304649685bafeb690036e42f8bbd0f362631f",
+      "gitBlobSha1": "536481a65c39f274a5776337ed7b5ef61625ac91"
     },
     {
       "path": "docs/superpowers/specs/2026-08-02-pcm-governance-pages-design.md",
-      "bytes": 8330,
-      "sha256": "59c748e316b5b74372c93c28e5d1e9209f83f1bfe17582ecda1da35faa55779f",
-      "gitBlobSha1": "e1ccb3a4f7b1a3738fccb72e7d5c191774b00008"
+      "bytes": 9417,
+      "sha256": "66bc32adb95fca6d338a1f6bbe9adb4ccb900b2505460be4f00f402b32f13379",
+      "gitBlobSha1": "d45d17ed64e3bf0ca5dca4ea533b8264feedc6c1"
     },
     {
       "path": "docs/superpowers/plans/2026-08-02-pcm-governance-pages.md",
-      "bytes": 8415,
-      "sha256": "3f29d9219f9baab546493e6c736611bd76e5bbcd45d15ea623a436f22831e141",
-      "gitBlobSha1": "88604800389c362e070978fa6fa00089aebf2bbc"
+      "bytes": 9675,
+      "sha256": "02a5d9a7b2f0715a90b191b834a036f899e527aa207e3f3b61a63656d446d995",
+      "gitBlobSha1": "295d129e6b4e73d5aa001221ddd33e48508d98ec"
     }
   ]
 }
