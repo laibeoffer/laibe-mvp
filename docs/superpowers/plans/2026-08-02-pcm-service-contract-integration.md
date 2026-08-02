@@ -112,7 +112,7 @@ export const CONTRACT_META = Object.freeze({
 });
 
 export const CONTRACT_SOURCE_SHA256 =
-  "ceb9aff4abd20b3a7e49cf31f06c1ffad0141134af3b021251cb7a6a9aef6392";
+  "0000676e400fd42f6c87bb289457616f69c3dd54104380cca584130ebb783383";
 
 export const LIFECYCLE = Object.freeze([
   "DRAFT",

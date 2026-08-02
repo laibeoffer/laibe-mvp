@@ -14,7 +14,7 @@ const serviceContractDir = path.join(
   "service_contract",
 );
 const EXPECTED_CONTRACT_SOURCE_SHA256 =
-  "ceb9aff4abd20b3a7e49cf31f06c1ffad0141134af3b021251cb7a6a9aef6392";
+  "0000676e400fd42f6c87bb289457616f69c3dd54104380cca584130ebb783383";
 
 function moduleUrl(fileName) {
   return pathToFileURL(path.join(serviceContractDir, fileName)).href;
@@ -111,6 +111,7 @@ test("service contract exports the exact frozen v0.3 content snapshot", async ()
     "金流",
     "代收代付",
     "服務方未來如提供金流",
+    "除雙方另有明確書面約定外，服務方不收受",
     "PREVIEWED",
     "OWNER_SIGNED_PENDING_PCM_REVIEW",
     "PCM_REVIEWER_SIGNED_ACTIVE",
@@ -118,6 +119,7 @@ test("service contract exports the exact frozen v0.3 content snapshot", async ()
   ]) {
     assert.equal(visibleContractText.includes(forbidden), false, forbidden);
   }
+  assert.doesNotMatch(CONTRACT_SOURCE, /\[\[[^\]]+\]\]/);
 });
 
 test("signing readiness evaluates the production initial envelope and fails closed for every mutation", async () => {

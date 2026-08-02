@@ -6,7 +6,7 @@
 - Canonical content selection: `v0.3 法務審閱稿`, owner service fee `3.5%`, complete contract and signing mainline.
 - Legal status remains `READY_FOR_LEGAL_REVIEW`. The page must never claim `LEGAL_FINAL`, lawyer approval, or production-signature readiness.
 - The externally rendered contract uses product/legal language only. It does not expose MVP/API/database/internal packet names and does not reserve future payment-custody or payment-processing capabilities.
-- Signing readiness must exact-bind contract source SHA-256 `ceb9aff4abd20b3a7e49cf31f06c1ffad0141134af3b021251cb7a6a9aef6392`; a different well-formed SHA-256 is not authoritative.
+- Signing readiness must exact-bind contract source SHA-256 `0000676e400fd42f6c87bb289457616f69c3dd54104380cca584130ebb783383`; a different well-formed SHA-256 is not authoritative.
 - `A0｜design` remains frozen. The integration work does not write to its dirty workspace.
 
 ## Immutable source identity
