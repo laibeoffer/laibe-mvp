@@ -147,6 +147,12 @@ File size, page count, readability, and corruption remain pending without truste
 
 The failure contract includes `FILE_FORMAT_INVALID`, `FILE_TOO_LARGE`, `PAGE_COUNT_INVALID`, `FILE_UNREADABLE`, `FILE_CORRUPTED`, `DUPLICATE_SUBMISSION`, `VERSION_CONFLICT`, and `QUOTE_ONLY_DRAWING_MISSING`. Every row has a plain reason, executable next action, responsible role, return step, recovery step, closed payload policy, `mutationAllowed: false`, null case data, and no actions. Unknown, malformed, accessor-backed, inherited, Proxy, and post-load intrinsic-polluted input resolves to `CONTEXT_UNAVAILABLE` with zero case data.
 
+The no-action value is a frozen null-prototype zero-action iterable, not an empty Array. It exposes only an own zero length and an own empty iterator, so post-load Array index or iterator pollution cannot inject an action through direct indexing or spread. Failure remains exception-safe and never derives authority from shared mutable prototypes.
+
+Replacing a previously accepted local PDF label with an invalid selection clears the prior filename and the native file input before the failure appears. Recovery keeps those two surfaces consistent. Every state transition focuses the new panel heading (or its primary operation if a heading is unavailable), providing a visible focus target without returning focus to BODY.
+
+The short-viewport continuation repeats only the current status, next step, and one primary action inside the hero service boundary. It preserves the full five-fact spine below, while ensuring 390×640 and 1280×768 can show those three decision facts together without changing the page's routes, contract state, or G1-only boundary.
+
 T3 activates only `quoteCheck` at `../quote_check/code.html` and makes only the `home` to `quoteCheck` edge clickable. `drawingCheck` and `accountAccess` remain planned with null hrefs; compatibility pages remain aliases and never become canonical steps.
 
 ## Verification contract

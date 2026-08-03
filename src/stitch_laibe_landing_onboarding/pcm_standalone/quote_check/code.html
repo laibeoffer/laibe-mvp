@@ -41,6 +41,17 @@
           <span>目前服務狀態</span>
           <strong>文件準備與結果格式預覽</strong>
           <p>不送出文件、不建立案件，也不產生正式報價健檢結果。</p>
+          <div class="quote-hero__continuation" aria-label="目前狀態與下一步">
+            <p>
+              <span>目前狀態</span>
+              <strong data-current-status>先看報價能替下一步回答什麼</strong>
+            </p>
+            <p>
+              <span>下一步</span>
+              <strong><span data-current-responsibility>甲方</span>｜<span data-current-next>閱讀服務邊界後，進入同意步驟。</span></strong>
+            </p>
+            <button class="owner-first-primary-action" type="button" data-next-step="CONSENT" data-hero-start>開始報價健檢準備</button>
+          </div>
         </aside>
       </section>
 
@@ -84,7 +95,7 @@
         <div class="quote-stage">
           <section data-flow-panel="INTRODUCTION" aria-labelledby="intro-title">
             <p class="quote-stage__eyebrow">先了解服務</p>
-            <h2 id="intro-title">服務說明</h2>
+            <h2 id="intro-title" tabindex="-1" data-panel-focus>服務說明</h2>
             <p class="quote-stage__summary">
               PCM 報價健檢會把「能從報價看出的事」與「仍需施工圖或乙方補充的事」分開，讓甲方知道下一個問題應交給誰。
             </p>
@@ -101,7 +112,7 @@
 
           <section data-flow-panel="CONSENT" aria-labelledby="consent-title" hidden>
             <p class="quote-stage__eyebrow">確認使用方式</p>
-            <h2 id="consent-title">同意本機檢視</h2>
+            <h2 id="consent-title" tabindex="-1" data-panel-focus>同意本機檢視</h2>
             <p class="quote-stage__summary">
               本頁只讀取你選擇的檔名與瀏覽器提供的檔案標示，尚未送出或保存；離開或重新整理後，選擇狀態不會保留。
             </p>
@@ -117,7 +128,7 @@
 
           <section data-flow-panel="SELECT_FILE" aria-labelledby="select-title" hidden>
             <p class="quote-stage__eyebrow">選擇本機文件</p>
-            <h2 id="select-title">選擇報價 PDF</h2>
+            <h2 id="select-title" tabindex="-1" data-panel-focus>選擇報價 PDF</h2>
             <p class="quote-stage__summary">
               選擇乙方提供的報價檔。檔案只在本頁暫時檢視，尚未送出或保存。
             </p>
@@ -134,7 +145,7 @@
 
           <section data-flow-panel="VALIDATION_PENDING" aria-labelledby="validation-title" hidden>
             <p class="quote-stage__eyebrow">條件待確認</p>
-            <h2 id="validation-title">檔案標示與後續確認</h2>
+            <h2 id="validation-title" tabindex="-1" data-panel-focus>檔案標示與後續確認</h2>
             <p class="selected-file">本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
             <dl class="validation-list">
               <div><dt>檔案標示</dt><dd class="status-ok">瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證</dd></div>
@@ -151,7 +162,7 @@
 
           <section data-flow-panel="CORRECTION_REQUIRED" aria-labelledby="correction-title" hidden>
             <p class="quote-stage__eyebrow">待確認事項</p>
-            <h2 id="correction-title">待確認清單</h2>
+            <h2 id="correction-title" tabindex="-1" data-panel-focus>待確認清單</h2>
             <p class="quote-stage__summary">這份清單只說明正式提交前要確認什麼，不代表檔案已有錯誤。</p>
             <ol class="correction-list">
               <li><span>01</span><div><strong>確認唯一有效版次</strong><p>檔名與報價內頁應能看出要採用哪一版。</p></div><em>甲方向乙方確認</em></li>
@@ -167,7 +178,7 @@
 
           <section data-flow-panel="RESELECT_FILE" aria-labelledby="reselect-title" hidden>
             <p class="quote-stage__eyebrow">重新選擇文件</p>
-            <h2 id="reselect-title">重新選擇</h2>
+            <h2 id="reselect-title" tabindex="-1" data-panel-focus>重新選擇</h2>
             <p class="quote-stage__summary">前一份檔案沒有送出或保存。改選後，只會重新顯示瀏覽器提供的檔案標示。</p>
             <p class="selected-file">前次本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
             <div class="owner-first-actions">
@@ -178,7 +189,7 @@
 
           <section data-flow-panel="RESULT_FORMAT" aria-labelledby="format-title" hidden>
             <p class="quote-stage__eyebrow">結果格式示意</p>
-            <h2 id="format-title">結果格式示意</h2>
+            <h2 id="format-title" tabindex="-1" data-panel-focus>結果格式示意</h2>
             <p class="format-disclaimer">結果格式示意，非真實案件；不包含姓名、價格、日期或完成判定。</p>
             <dl class="result-format">
               <div><dt>引用文件</dt><dd>正式收件後才顯示檔名、版次與提供者。</dd></div>
@@ -202,7 +213,7 @@
 
           <section data-flow-panel="RESULT_UNAVAILABLE" aria-labelledby="closed-title" hidden>
             <p class="quote-stage__eyebrow">目前結果狀態</p>
-            <h2 id="closed-title">尚未形成正式案件結果</h2>
+            <h2 id="closed-title" tabindex="-1" data-panel-focus>尚未形成正式案件結果</h2>
             <p class="quote-stage__summary">
               本頁沒有身分確認、文件送出、正式解析或案件建立，因此不會顯示真實報價健檢結論。
             </p>
@@ -220,7 +231,7 @@
 
           <section data-flow-panel="FAILURE" aria-labelledby="failure-heading" hidden>
             <p class="quote-stage__eyebrow">文件處理提醒</p>
-            <h2 id="failure-heading" data-failure-title>這份檔案目前不能繼續</h2>
+            <h2 id="failure-heading" tabindex="-1" data-panel-focus data-failure-title>這份檔案目前不能繼續</h2>
             <div class="failure-copy">
               <p><span>原因</span><strong data-failure-reason></strong></p>
               <p><span>下一步</span><strong data-failure-next></strong></p>

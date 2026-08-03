@@ -1,10 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { promisify } from "node:util";
 import { runInNewContext } from "node:vm";
 
 const testDir = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +38,8 @@ const specPath = resolve(
   repoRoot,
   "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
 );
+const execFileAsync = promisify(execFile);
+const immutableT3Candidate = "238f8180af9e6a1a8d7dd7a71303cd4031324775";
 
 const exactNine = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
@@ -77,6 +81,16 @@ const ownDataBoundarySix = Object.freeze([
   "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
 ]);
 
+const finalExactSeven = Object.freeze([
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+  "tests/pcm-owner-first-quote-check.test.mjs",
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+]);
+
 const requiredSteps = Object.freeze([
   "INTRODUCTION",
   "CONSENT",
@@ -107,6 +121,23 @@ async function readOrEmpty(path) {
   }
 }
 
+async function immutableCandidateBytes(path) {
+  const { stdout } = await execFileAsync(
+    "git",
+    ["show", `${immutableT3Candidate}:${path}`],
+    { cwd: repoRoot, encoding: null, maxBuffer: 16 * 1024 * 1024 },
+  );
+  return stdout;
+}
+
+async function assertResolvableBlob(blob, label) {
+  const { stdout } = await execFileAsync("git", ["cat-file", "-t", blob], {
+    cwd: repoRoot,
+    encoding: "utf8",
+  });
+  assert.equal(stdout.trim(), "blob", label);
+}
+
 function stripNonVisibleHtml(html) {
   return html
     .replace(/<script\b[\s\S]*?<\/script>/gi, "")
@@ -121,6 +152,14 @@ function gitBlobSha1(bytes) {
     .update(`blob ${bytes.length}\0`)
     .update(bytes)
     .digest("hex");
+}
+
+function assertZeroAuthorityActions(actions, label) {
+  assert.equal(Object.getPrototypeOf(actions), null, `${label} prototype`);
+  assert.equal(actions.length, 0, `${label} length`);
+  assert.equal(actions[0], undefined, `${label} index`);
+  assert.deepEqual([...actions], [], `${label} spread`);
+  assert.equal(Object.isFrozen(actions), true, `${label} frozen`);
 }
 
 const harnessDefineProperty = Object.defineProperty;
@@ -180,11 +219,22 @@ function browserFile(name, type) {
 }
 
 function createFileHandlerHarness() {
+  let focusedPanelCode = null;
   const stateCodes = [...requiredSteps, "FAILURE"];
-  const panels = stateCodes.map((code) => ({
-    dataset: { flowPanel: code },
-    hidden: code !== "INTRODUCTION",
-  }));
+  const panels = stateCodes.map((code) => {
+    const focusTarget = {
+      focus() {
+        focusedPanelCode = code;
+      },
+    };
+    return {
+      dataset: { flowPanel: code },
+      hidden: code !== "INTRODUCTION",
+      querySelector(selector) {
+        return selector === "[data-panel-focus]" ? focusTarget : null;
+      },
+    };
+  });
   const railItems = requiredSteps.map((code) => ({
     dataset: { flowStep: code },
     setAttribute() {},
@@ -198,6 +248,16 @@ function createFileHandlerHarness() {
     "[data-failure-role]": { textContent: "" },
   };
   const listeners = new Map();
+  const failureRecover = {
+    addEventListener(type, listener) {
+      listeners.set(`failureRecover:${type}`, listener);
+    },
+  };
+  const failureReturn = {
+    addEventListener(type, listener) {
+      listeners.set(`failureReturn:${type}`, listener);
+    },
+  };
   const fileInput = new HarnessHtmlInputElement();
   fileInput.value = "";
   fileInput.addEventListener = (type, listener) => {
@@ -207,6 +267,8 @@ function createFileHandlerHarness() {
   const root = {
     querySelector(selector) {
       if (selector === "#quote-file") return fileInput;
+      if (selector === "[data-failure-recover]") return failureRecover;
+      if (selector === "[data-failure-return]") return failureReturn;
       return failureTargets[selector] ?? null;
     },
     querySelectorAll(selector) {
@@ -224,15 +286,23 @@ function createFileHandlerHarness() {
     },
     fileInput,
     dispatchFile(file) {
+      fileInput.value = file ? "C:\\fakepath\\selection.pdf" : "";
       fileInput.files = new HarnessFileList(file ? [file] : []);
       return listeners.get("change")?.();
     },
     dispatchFiles(files) {
+      fileInput.value = "C:\\fakepath\\selection.pdf";
       fileInput.files = files;
       return listeners.get("change")?.();
     },
     dispatchChange() {
       return listeners.get("change")?.();
+    },
+    dispatchRecover() {
+      return listeners.get("failureRecover:click")?.();
+    },
+    dispatchReturn() {
+      return listeners.get("failureReturn:click")?.();
     },
     visibleState() {
       return panels.find((panel) => panel.hidden === false)?.dataset.flowPanel;
@@ -242,6 +312,12 @@ function createFileHandlerHarness() {
     },
     selectedName() {
       return fileNameTarget.textContent;
+    },
+    inputValue() {
+      return fileInput.value;
+    },
+    focusedPanel() {
+      return focusedPanelCode;
     },
   };
 }
@@ -376,7 +452,7 @@ test("failure states are closed actionable responsible and recoverable", async (
     assert.equal(typeof state.payloadPolicy, "string");
     assert.equal(state.mutationAllowed, false);
     assert.equal(state.caseData, null);
-    assert.deepEqual(state.actions, []);
+    assertZeroAuthorityActions(state.actions, code);
     assert.ok(Object.isFrozen(state));
   }
 });
@@ -429,7 +505,7 @@ test("state resolver is strict closed and survives hostile post-load intrinsics"
     assert.equal(unknown.payloadPolicy, "ZERO_CASE_DATA");
     assert.equal(unknown.caseData, null);
     assert.equal(unknown.mutationAllowed, false);
-    assert.deepEqual(unknown.actions, []);
+    assertZeroAuthorityActions(unknown.actions, "unknown state");
     assert.equal(resolveState({}).code, "CONTEXT_UNAVAILABLE");
     assert.equal(resolveState(null).code, "CONTEXT_UNAVAILABLE");
     assert.equal(resolveState(Object.create({ step: "RESULT_FORMAT" })).code, "CONTEXT_UNAVAILABLE");
@@ -457,6 +533,86 @@ test("state resolver is strict closed and survives hostile post-load intrinsics"
       else delete target[property];
     }
   }
+});
+
+test("zero-authority actions reject inherited array slots and iterator injection", async () => {
+  const module = await import(`${pathToFileURL(appPath).href}?zero-actions-pollution`);
+  const indexDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+  const iteratorDescriptor = Object.getOwnPropertyDescriptor(
+    Array.prototype,
+    Symbol.iterator,
+  );
+  Object.defineProperty(Array.prototype, "0", {
+    configurable: true,
+    value: { action: "INJECTED" },
+  });
+  Object.defineProperty(Array.prototype, Symbol.iterator, {
+    configurable: true,
+    value: function* poisonedArrayIterator() {
+      yield { action: "INJECTED" };
+    },
+  });
+  const observations = Object.create(null);
+  try {
+    const introductionActions = module.QUOTE_CHECK_STATES.INTRODUCTION.actions;
+    const failureActions = module.QUOTE_CHECK_FAILURES.FILE_FORMAT_INVALID.actions;
+    const unknownActions = module.resolveQuoteCheckState({ step: "UNKNOWN" }).actions;
+    observations.introduction = {
+      prototype: Object.getPrototypeOf(introductionActions),
+      index: introductionActions[0],
+      spread: [...introductionActions],
+    };
+    observations.failure = {
+      prototype: Object.getPrototypeOf(failureActions),
+      index: failureActions[0],
+      spread: [...failureActions],
+    };
+    observations.unknown = {
+      prototype: Object.getPrototypeOf(unknownActions),
+      index: unknownActions[0],
+      spread: [...unknownActions],
+    };
+  } finally {
+    if (indexDescriptor) Object.defineProperty(Array.prototype, "0", indexDescriptor);
+    else delete Array.prototype[0];
+    if (iteratorDescriptor) {
+      Object.defineProperty(Array.prototype, Symbol.iterator, iteratorDescriptor);
+    } else {
+      delete Array.prototype[Symbol.iterator];
+    }
+  }
+  for (const [label, observation] of Object.entries(observations)) {
+    assert.equal(observation.prototype, null, `${label} prototype`);
+    assert.equal(observation.index, undefined, `${label} index`);
+    assert.deepEqual(observation.spread, [], `${label} spread`);
+  }
+});
+
+test("zero-authority actions remain safely iterable when the shared iterator throws", async () => {
+  const module = await import(`${pathToFileURL(appPath).href}?zero-actions-throwing-iterator`);
+  const iteratorDescriptor = Object.getOwnPropertyDescriptor(
+    Array.prototype,
+    Symbol.iterator,
+  );
+  Object.defineProperty(Array.prototype, Symbol.iterator, {
+    configurable: true,
+    value() {
+      throw new Error("shared array iterator must not be consulted");
+    },
+  });
+  let spreadResult;
+  let spreadError = null;
+  try {
+    try {
+      spreadResult = [...module.QUOTE_CHECK_STATES.INTRODUCTION.actions];
+    } catch (error) {
+      spreadError = error;
+    }
+  } finally {
+    Object.defineProperty(Array.prototype, Symbol.iterator, iteratorDescriptor);
+  }
+  assert.equal(spreadError, null);
+  assert.deepEqual(spreadResult, []);
 });
 
 test("actual file handler rejects ordinary text and text renamed as PDF", async () => {
@@ -726,6 +882,25 @@ test("actual file handler keeps browser PDF metadata in validation pending", asy
   assert.equal(harness.selectedName(), "報價.txt");
 });
 
+test("invalid replacement clears stale file identity and recovery moves focus", async () => {
+  const harness = await initializeFileHandlerHarness("clear-stale-file-and-focus");
+  harness.dispatchFile(browserFile("目前報價.pdf", "application/pdf"));
+  assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  assert.equal(harness.selectedName(), "目前報價.pdf");
+
+  harness.dispatchFile(browserFile("錯誤格式.txt", "text/plain"));
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+  assert.equal(harness.inputValue(), "");
+  assert.equal(harness.focusedPanel(), "FAILURE");
+
+  harness.dispatchRecover();
+  assert.equal(harness.visibleState(), "RESELECT_FILE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+  assert.equal(harness.inputValue(), "");
+  assert.equal(harness.focusedPanel(), "RESELECT_FILE");
+});
+
 test("validation pending state describes metadata without claiming content recognition", async () => {
   const appModule = await import(
     `${pathToFileURL(appPath).href}?truthful-validation-copy`
@@ -771,6 +946,21 @@ test("only quoteCheck activates and compatibility pages remain aliases", async (
   for (const alias of ["ownerStart", "documentCorrections", "basicReport", "selfServiceArchive"]) {
     assert.equal(canonicalIds.has(alias), false, alias);
   }
+});
+
+test("continuation facts and focus targets stay visible at short viewports", async () => {
+  const [html, styles] = await Promise.all([
+    readOrEmpty(htmlPath),
+    readOrEmpty(cssPath),
+  ]);
+  assert.equal((html.match(/data-current-status/g) ?? []).length, 2);
+  assert.equal((html.match(/data-current-next/g) ?? []).length, 2);
+  assert.match(html, /data-hero-start/);
+  assert.equal((html.match(/data-panel-focus/g) ?? []).length, 9);
+  assert.equal((html.match(/data-panel-focus[^>]*tabindex="-1"|tabindex="-1"[^>]*data-panel-focus/g) ?? []).length, 9);
+  assert.match(styles, /\[data-panel-focus\]:focus/);
+  assert.match(styles, /max-height:\s*700px/);
+  assert.match(styles, /quote-hero__continuation/);
 });
 
 test("visible product language excludes market payment and implementation vocabulary", async () => {
@@ -844,7 +1034,7 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
 
   assert.equal(t3.artifactReceipts.length, 8);
   for (const receipt of t3.artifactReceipts) {
-    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    const bytes = await immutableCandidateBytes(receipt.path);
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(
       receipt.sha256,
@@ -852,7 +1042,8 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
       receipt.path,
     );
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
-    assert.equal(receipt.scope, "current_worktree_bytes");
+    assert.equal(receipt.scope, "immutable_git_object_bytes");
+    await assertResolvableBlob(receipt.gitBlobSha1, receipt.path);
   }
 
   const normalized = JSON.parse(manifestBytes.toString("utf8"));
@@ -916,11 +1107,12 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
     correctionArtifactPaths.sort(),
   );
   for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    const bytes = await immutableCandidateBytes(receipt.path);
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
-    assert.equal(receipt.scope, "current_worktree_bytes");
+    assert.equal(receipt.scope, "immutable_git_object_bytes");
+    await assertResolvableBlob(receipt.gitBlobSha1, receipt.path);
   }
   assert.equal(correction.independentReview.critical, 0);
   assert.equal(correction.independentReview.important, 0);
@@ -963,11 +1155,12 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
     inputSafetyArtifactPaths.sort(),
   );
   for (const receipt of inputSafety.artifactReceipts) {
-    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    const bytes = await immutableCandidateBytes(receipt.path);
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
-    assert.equal(receipt.scope, "current_worktree_bytes");
+    assert.equal(receipt.scope, "immutable_git_object_bytes");
+    await assertResolvableBlob(receipt.gitBlobSha1, receipt.path);
   }
   assert.equal(inputSafety.independentReview.critical, 0);
   assert.equal(inputSafety.independentReview.important, 0);
@@ -1076,12 +1269,23 @@ test("T3 own-data boundary correction closes exact-six evidence", async () => {
     artifactPaths.sort(),
   );
   for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    const bytes = await immutableCandidateBytes(receipt.path);
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
-    assert.equal(receipt.scope, "current_worktree_bytes");
+    assert.equal(receipt.scope, "immutable_git_object_bytes");
+    await assertResolvableBlob(receipt.gitBlobSha1, receipt.path);
   }
+  const governanceTestReceipt = correction.artifactReceipts.find(
+    (receipt) => receipt.path === "tests/pcm-governance-pages.test.mjs",
+  );
+  assert.deepEqual(governanceTestReceipt, {
+    path: "tests/pcm-governance-pages.test.mjs",
+    bytes: 35231,
+    sha256: "c2439594515904fa3f62b5f7dc54ccccfa2d935f6f7b277819ff7aa3f1dd54f1",
+    gitBlobSha1: "fe869c3bbeed3c371be91f21d20d208400377e54",
+    scope: "immutable_git_object_bytes",
+  });
   assert.equal(correction.manifestReceiptRef, "t3.selfRecorderReceipt");
   assert.equal(correction.independentReview.critical, 0);
   assert.equal(correction.independentReview.important, 0);
@@ -1089,4 +1293,69 @@ test("T3 own-data boundary correction closes exact-six evidence", async () => {
   assert.match(plan, /immutable historical candidate/);
   assert.match(spec, /captured WebIDL/i);
   assert.match(spec, /immutable Git object/i);
+});
+
+test("T3 final exact-seven correction records the bounded product and receipt closure", async () => {
+  const [manifestBytes, plan, spec] = await Promise.all([
+    readFile(governancePath),
+    readFile(planPath, "utf8"),
+    readFile(specPath, "utf8"),
+  ]);
+  const governance = JSON.parse(manifestBytes.toString("utf8"));
+  const correction = governance.t3FinalExact7Correction;
+  assert.ok(correction, "final exact-seven correction evidence must exist");
+  assert.equal(correction.parent, immutableT3Candidate);
+  assert.equal(correction.parentTree, "2b7587f85c893b7571305ce3edf37007c605e869");
+  assert.deepEqual(
+    [...correction.immediateWriteSet].sort(),
+    [...finalExactSeven].sort(),
+  );
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.tdd.red, {
+    tests: 29,
+    passed: 21,
+    failed: 8,
+    exitCode: 1,
+  });
+  assert.equal(correction.zeroAuthorityActions.prototype, "NULL");
+  assert.equal(correction.zeroAuthorityActions.length, 0);
+  assert.equal(correction.zeroAuthorityActions.sharedArrayIteratorConsulted, false);
+  assert.equal(correction.fileRecovery.staleFileNameCleared, true);
+  assert.equal(correction.fileRecovery.inputValueCleared, true);
+  assert.equal(correction.focusPolicy.transitionTarget, "ACTIVE_PANEL_HEADING_OR_PRIMARY_OPERATION");
+  assert.equal(correction.receiptAuthority.commit, immutableT3Candidate);
+  assert.equal(correction.receiptAuthority.receipts, "5/5");
+  assert.equal(correction.receiptAuthority.checkoutBytesTrusted, false);
+  assert.deepEqual(correction.freshVerification.focused, {
+    files: 1,
+    tests: 30,
+    passed: 30,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.currentTrain, {
+    files: 4,
+    tests: 68,
+    passed: 68,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.fullSuiteTruth, {
+    files: 11,
+    tests: 183,
+    passed: 183,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.equal(correction.browser.horizontalOverflow, 0);
+  assert.equal(correction.browser.visibleControlsUnder44, 0);
+  assert.equal(correction.browser.consoleWarningsOrErrors, 0);
+  assert.equal(correction.browser.networkFailures, 0);
+  assert.equal(correction.browser.previewListenerAfterCleanup, 0);
+  assert.equal(correction.independentReview.critical, 0);
+  assert.equal(correction.independentReview.important, 0);
+  assert.equal(correction.independentReview.minor, 0);
+  assert.match(plan, /Actual bounded final exact-seven correction write set/);
+  assert.match(spec, /null-prototype zero-action iterable/i);
+  assert.match(spec, /short-viewport continuation/i);
 });

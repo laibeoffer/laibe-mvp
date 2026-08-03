@@ -11,7 +11,58 @@ const safeStructuredClone =
     ? globalThis.structuredClone
     : null;
 const ordinaryObjectPrototype = Object.prototype;
-const NO_ACTIONS = safeFreeze([]);
+const EMPTY_ACTION_ITERATION_RESULT = safeCreate(null);
+safeDefineProperty(EMPTY_ACTION_ITERATION_RESULT, "done", {
+  configurable: false,
+  enumerable: true,
+  value: true,
+  writable: false,
+});
+safeDefineProperty(EMPTY_ACTION_ITERATION_RESULT, "value", {
+  configurable: false,
+  enumerable: true,
+  value: undefined,
+  writable: false,
+});
+safeFreeze(EMPTY_ACTION_ITERATION_RESULT);
+
+function finishEmptyActionIteration() {
+  return EMPTY_ACTION_ITERATION_RESULT;
+}
+
+const EMPTY_ACTION_ITERATOR = safeCreate(null);
+safeDefineProperty(EMPTY_ACTION_ITERATOR, "next", {
+  configurable: false,
+  enumerable: false,
+  value: finishEmptyActionIteration,
+  writable: false,
+});
+safeDefineProperty(EMPTY_ACTION_ITERATOR, Symbol.iterator, {
+  configurable: false,
+  enumerable: false,
+  value() {
+    return EMPTY_ACTION_ITERATOR;
+  },
+  writable: false,
+});
+safeFreeze(EMPTY_ACTION_ITERATOR);
+
+const NO_ACTIONS = safeCreate(null);
+safeDefineProperty(NO_ACTIONS, "length", {
+  configurable: false,
+  enumerable: false,
+  value: 0,
+  writable: false,
+});
+safeDefineProperty(NO_ACTIONS, Symbol.iterator, {
+  configurable: false,
+  enumerable: false,
+  value() {
+    return EMPTY_ACTION_ITERATOR;
+  },
+  writable: false,
+});
+safeFreeze(NO_ACTIONS);
 const SAFE_EMPTY_ARGUMENTS = safeCreate(null);
 safeDefineProperty(SAFE_EMPTY_ARGUMENTS, "length", {
   configurable: false,
@@ -381,9 +432,9 @@ function initializeQuoteCheckPage() {
   const consent = root.querySelector("#local-consent");
   const consentContinue = root.querySelector("[data-consent-continue]");
   const fileNameTargets = root.querySelectorAll("[data-selected-file-name]");
-  const statusTarget = root.querySelector("[data-current-status]");
-  const nextTarget = root.querySelector("[data-current-next]");
-  const roleTarget = root.querySelector("[data-current-responsibility]");
+  const statusTargets = root.querySelectorAll("[data-current-status]");
+  const nextTargets = root.querySelectorAll("[data-current-next]");
+  const roleTargets = root.querySelectorAll("[data-current-responsibility]");
   const liveTarget = root.querySelector("[data-state-live]");
   const failureTitle = root.querySelector("[data-failure-title]");
   const failureReason = root.querySelector("[data-failure-reason]");
@@ -412,10 +463,41 @@ function initializeQuoteCheckPage() {
     return -1;
   }
 
-  function renderState(state, panelCode = state.code) {
+  function focusPanel(panel) {
+    try {
+      const focusTarget = panel && panel.querySelector("[data-panel-focus]");
+      if (!focusTarget || typeof focusTarget.focus !== "function") return;
+      try {
+        focusTarget.focus({ preventScroll: true });
+      } catch {
+        focusTarget.focus();
+      }
+    } catch {
+      // The state remains closed if the surrounding document changed.
+    }
+  }
+
+  function clearFileSelection() {
+    try {
+      if (fileInput) fileInput.value = "";
+    } catch {
+      // A hostile input cannot preserve display authority.
+    }
+    for (let index = 0; index < fileNameTargets.length; index += 1) {
+      try {
+        fileNameTargets[index].textContent = "尚未選擇";
+      } catch {
+        // Keep clearing the remaining product labels.
+      }
+    }
+  }
+
+  function renderState(state, panelCode = state.code, shouldFocus = false) {
     currentStep = panelCode;
+    let activePanel = null;
     for (let index = 0; index < panels.length; index += 1) {
       panels[index].hidden = panels[index].dataset.flowPanel !== panelCode;
+      if (!panels[index].hidden) activePanel = panels[index];
     }
     const activeIndex = stepIndex(panelCode);
     for (let index = 0; index < railItems.length; index += 1) {
@@ -429,15 +511,22 @@ function initializeQuoteCheckPage() {
       if (itemIndex === activeIndex) item.setAttribute("aria-current", "step");
       else item.removeAttribute("aria-current");
     }
-    if (statusTarget) statusTarget.textContent = state.title;
-    if (nextTarget) nextTarget.textContent = state.nextAction;
-    if (roleTarget) roleTarget.textContent = state.responsibleRole;
+    for (let index = 0; index < statusTargets.length; index += 1) {
+      statusTargets[index].textContent = state.title;
+    }
+    for (let index = 0; index < nextTargets.length; index += 1) {
+      nextTargets[index].textContent = state.nextAction;
+    }
+    for (let index = 0; index < roleTargets.length; index += 1) {
+      roleTargets[index].textContent = state.responsibleRole;
+    }
     if (liveTarget) liveTarget.textContent = `目前狀態：${state.title}。下一步：${state.nextAction}`;
+    if (shouldFocus) focusPanel(activePanel);
   }
 
   function moveTo(step) {
     currentFailure = null;
-    renderState(resolveQuoteCheckState({ step }), step);
+    renderState(resolveQuoteCheckState({ step }), step, true);
   }
 
   function showFailure(code) {
@@ -446,7 +535,7 @@ function initializeQuoteCheckPage() {
     if (failureReason) failureReason.textContent = currentFailure.reason;
     if (failureNext) failureNext.textContent = currentFailure.nextAction;
     if (failureRole) failureRole.textContent = currentFailure.responsibleRole;
-    renderState(currentFailure, "FAILURE");
+    renderState(currentFailure, "FAILURE", true);
   }
 
   function readSelectedFileMetadata(input) {
@@ -529,12 +618,13 @@ function initializeQuoteCheckPage() {
   }
 
   function showFileSelectionFailure() {
+    clearFileSelection();
     try {
       showFailure("FILE_FORMAT_INVALID");
     } catch {
       currentFailure = QUOTE_CHECK_FAILURES.FILE_FORMAT_INVALID;
       try {
-        renderState(currentFailure, "FAILURE");
+        renderState(currentFailure, "FAILURE", true);
       } catch {
         // Keep the event boundary closed even if the surrounding DOM changed.
       }
@@ -566,6 +656,7 @@ function initializeQuoteCheckPage() {
     fileInput.addEventListener("change", () => {
       const selection = readSelectedFileMetadata(fileInput);
       if (selection === EMPTY_FILE_SELECTION) {
+        clearFileSelection();
         moveTo(currentStep === "RESELECT_FILE" ? "RESELECT_FILE" : "SELECT_FILE");
         return;
       }

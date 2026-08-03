@@ -213,6 +213,21 @@
 - [x] Inspect 1280 by 900, 768 by 1024, 390 by 844, and 640 by 450. The introduction, consent, selection, invalid-file failure, recovery, and closed result structure remain usable; horizontal overflow, controls below 44px, planned clickable controls, broken assets, and console warning/error are 0. Keyboard focus is visible on the skip control. The loopback preview was stopped with listener count 0.
 - [x] Record final exact-six receipts, obtain independent Critical 0 / Important 0 review, create the bounded correction commit, and stop for A0 focused admission. T4 and G2-G4 remain closed.
 
+**Actual bounded final exact-seven correction write set (parent `238f8180af9e6a1a8d7dd7a71303cd4031324775`):**
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js`
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html`
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css`
+- `tests/pcm-owner-first-quote-check.test.mjs`
+- `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+- `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
+- `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
+
+- [x] Preserve the immutable-receipt RED: the checked-out governance test has 36,031 bytes while `238f818:tests/pcm-governance-pages.test.mjs` has 35,231 bytes, yet the prior focused gate still passed 25/25. The exact-seven behavioral RED then ran 29 tests with 21 passed and 8 failed.
+- [x] Replace the inherited empty Array with a frozen null-prototype zero-action iterable. Post-load Array index or iterator pollution cannot create `actions[0]`, alter spread, throw, or grant an action.
+- [x] Clear the browser file input and every displayed filename when a later selection is invalid. Failure and recovery move focus to the active panel heading rather than leaving it on BODY or a control from the previous state.
+- [x] Add one compact hero continuation block without changing routes or service scope. At 390×640 and 1280×768, current status, next step, and the primary CTA are visible together; 1280×900, 768×1024, and 390×844 retain zero horizontal overflow, zero visible controls below 44px, zero broken assets, and zero planned clickable controls.
+- [x] Close the normalized self-receipt, fresh focused/current/full suites, and three independent Critical 0 / Important 0 reviews. This bounded commit records the exact-seven correction and stops for A0 admission; T4/T5 and G2-G4 remain closed.
+
 ---
 
 ### Task T4: Single-page drawing check

@@ -163,6 +163,44 @@ button {
   line-height: 1.65;
 }
 
+.quote-hero__continuation {
+  display: grid;
+  gap: 12px;
+  margin-block-start: 18px;
+  padding-block-start: 16px;
+  border-block-start: 1px solid var(--owner-first-line-soft);
+}
+
+.quote-hero__continuation p {
+  display: grid;
+  grid-template-columns: minmax(78px, 0.32fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+}
+
+.quote-hero__continuation p > span {
+  padding-block-start: 2px;
+}
+
+.quote-hero__continuation p > strong {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.quote-hero__continuation p > strong span {
+  display: inline;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.quote-hero__continuation .owner-first-primary-action {
+  inline-size: 100%;
+  margin-block-start: 2px;
+}
+
 .owner-first-facts {
   margin-block-start: clamp(34px, 5vw, 58px);
 }
@@ -566,6 +604,11 @@ button {
   outline-offset: 3px;
 }
 
+[data-panel-focus]:focus {
+  outline: 3px solid var(--owner-first-focus);
+  outline-offset: 5px;
+}
+
 @media (max-width: 900px) {
   .quote-hero,
   .quote-workspace {
@@ -679,6 +722,80 @@ button {
 
   .correction-list > li > span {
     margin-block-end: 2px;
+  }
+}
+
+@media (max-width: 620px) and (max-height: 700px) {
+  .quote-header,
+  .quote-header__inner {
+    min-block-size: 58px;
+  }
+
+  .quote-shell {
+    padding-block-start: 14px;
+  }
+
+  .quote-hero {
+    gap: 13px;
+  }
+
+  .quote-eyebrow {
+    margin-block-end: 6px;
+    font-size: 0.68rem;
+  }
+
+  .quote-hero h1 {
+    max-inline-size: 16ch;
+    font-size: clamp(2rem, 10.4vw, 2.35rem);
+    line-height: 1.01;
+  }
+
+  .quote-hero__lead {
+    display: -webkit-box;
+    margin-block-start: 10px;
+    overflow: hidden;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .quote-hero__boundary {
+    padding-block: 10px 12px;
+  }
+
+  .quote-hero__boundary > span,
+  .quote-hero__boundary > strong,
+  .quote-hero__boundary > p {
+    display: none;
+  }
+
+  .quote-hero__continuation {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .quote-hero__continuation p {
+    display: block;
+  }
+
+  .quote-hero__continuation p > span {
+    display: block;
+    margin-block-end: 4px;
+  }
+
+  .quote-hero__continuation p > strong {
+    display: block;
+    font-size: 0.76rem;
+    line-height: 1.35;
+  }
+
+  .quote-hero__continuation .owner-first-primary-action {
+    grid-column: 1 / -1;
+    min-block-size: 46px;
   }
 }
 
