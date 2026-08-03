@@ -131,14 +131,22 @@
 
 ### Task T2: Public homepage and three explicit entries
 
-**Exact proposed write set:** `pcm_standalone/public_home/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-public-home.test.mjs`, current spec/plan/manifest.
+**Original bounded commit:** `ba22b765c727732b774a60259f111ac6a361f941`, containing the public-home HTML, CSS and JavaScript, the focused homepage test, and the governance manifest.
+
+**Actual bounded correction write set (parent `ba22b765c727732b774a60259f111ac6a361f941`):**
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js`
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html`
+- `tests/pcm-owner-first-public-home.test.mjs`
+- `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+- `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
 
 **Produces:** Hero → qualification → what PCM checks → result-format example → four-stage explanation → fee/boundary → final action, plus explicit report-check, drawing-review, and shared account controls. Planned controls remain non-clickable until T3–T5 activate their routes.
 
-- [ ] Write RED for the seven-section order, three route-bound controls, preserved anchors/logo, one primary action per section, no duplicate six-step content, and no 404.
-- [ ] Implement minimal GREEN using shared tokens and `PUBLIC_ROUTES` null-aware binding.
-- [ ] Verify 1280/768/390, console, overflow, focus, touch targets, and current-train regressions.
-- [ ] Commit `feat(pcm): focus homepage on three owner entry choices`.
+- [x] Wrote and reproduced the homepage hierarchy RED plus the bounded-correction RED for post-load intrinsic pollution, unknown/traversal route candidates, visible forbidden payment vocabulary, and missing evidence closure.
+- [x] Implemented the owner-first homepage and the fail-closed binder. A control becomes active only when its explicit route name and candidate href exactly match the module-load trusted `PUBLIC_ROUTES` own-data binding; planned quote/drawing/account controls remain closed until their trusted routes exist.
+- [x] Removed the visible forbidden payment vocabulary and retained plain-language service boundaries without implying G2/G3/G4 capability.
+- [x] Verified 1280/768/390, console, overflow, focus, touch targets, local references, and current-train regressions. This correction's fresh focused suite is 16/16, homepage pair is 38/38, and current train is 132/132. Fresh full truth is 152/153; the only failure is the frozen A3 cumulative-path assertion. The original T2 baseline remains recorded separately as historical 149/150 evidence.
+- [x] Original bounded commit recorded above; this correction remains a separate bounded commit with exact parent `ba22b765c727732b774a60259f111ac6a361f941` for A0 review.
 
 ---
 

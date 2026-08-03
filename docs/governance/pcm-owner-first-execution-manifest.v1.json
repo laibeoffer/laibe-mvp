@@ -207,6 +207,173 @@
       "G4_PRODUCTION": "closed"
     }
   },
+  "t2Correction": {
+    "status": "ready_for_a0_review",
+    "parent": "ba22b765c727732b774a60259f111ac6a361f941",
+    "parentTree": "71412d6e6943148750adc6f0a327e9df131b602d",
+    "a0VerdictOnParent": "CHANGES_REQUIRED_NOT_ADMITTED_G1",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
+      "tests/pcm-owner-first-public-home.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md"
+    ],
+    "outsideWriteSet": 0,
+    "tdd": {
+      "red": {
+        "command": "node --test tests/pcm-owner-first-public-home.test.mjs",
+        "tests": 16,
+        "passed": 12,
+        "failed": 4,
+        "exitCode": 1,
+        "failures": [
+          "post-load shared forEach pollution threw",
+          "unknown own safe-looking href became active",
+          "correction evidence was absent",
+          "visible forbidden payment vocabulary remained"
+        ]
+      },
+      "green": {
+        "command": "node --test tests/pcm-owner-first-public-home.test.mjs",
+        "tests": 16,
+        "passed": 16,
+        "failed": 0,
+        "exitCode": 0
+      }
+    },
+    "baselineFullTruth": {
+      "tests": 150,
+      "passed": 149,
+      "failed": 1,
+      "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
+    },
+    "freshVerification": {
+      "focused": {
+        "tests": 16,
+        "passed": 16,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "homepagePair": {
+        "tests": 38,
+        "passed": 38,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "currentTrain": {
+        "files": 9,
+        "tests": 132,
+        "passed": 132,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "fullSuiteTruth": {
+        "files": 10,
+        "tests": 153,
+        "passed": 152,
+        "failed": 1,
+        "exitCode": 1,
+        "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
+      },
+      "browser": {
+        "viewports": ["1280x900", "768x1024", "390x844"],
+        "horizontalOverflow": 0,
+        "consoleWarningsOrErrors": 0,
+        "brokenAssets": 0,
+        "plannedClickableControls": 0,
+        "visibleControlsUnder44Px": 0,
+        "visibleForbiddenTerms": 0,
+        "accountEntryVisible": true,
+        "primaryCtaInFirstViewport": true,
+        "focusVisible": true,
+        "reducedMotion": true
+      },
+      "staticGates": {
+        "strictUtf8": "5/5",
+        "replacementCharacters": 0,
+        "jsonParse": "pass",
+        "duplicateKeyGuard": "pass",
+        "localReferences": "pass",
+        "outsideWriteSet": 0,
+        "diffCheck": "pass"
+      }
+    },
+    "receiptConvention": {
+      "artifactScope": "current_worktree_bytes",
+      "hashes": ["SHA256", "GIT_BLOB_SHA1"],
+      "selfRecorderPolicy": "Set only t2Correction.selfRecorderReceipt.sha256 and gitBlobSha1 to fixed zero strings, then JSON serialize with two-space indentation as UTF-8, LF, and one trailing LF."
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+        "bytes": 4642,
+        "sha256": "bc3276c989bc4ee6ad819791dd53dcebfb00c6cacaccf330efd6cb87d6998bad",
+        "gitBlobSha1": "6f016dbe23c4da7ac2496c90e4e34edb4305f25e",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
+        "bytes": 27959,
+        "sha256": "aea590245576f0024958c6235bccd11707be0d803615a1eefb060c35f583c0a5",
+        "gitBlobSha1": "ff81381c3ae98bbbd3fb3e5934f2c232e025a696",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-public-home.test.mjs",
+        "bytes": 19709,
+        "sha256": "007a2f71077aea6d8417f83f1b13b091f550cb7ee1f6356e70adef76b8649f35",
+        "gitBlobSha1": "a926130d0dda76387d2e39c8b94948e146eeccc0",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 26734,
+        "sha256": "06a2674e54c0921ffb086a45e02aa03412d29593968acdd16f0299f37a4c1728",
+        "gitBlobSha1": "5a799ee533d4d624ab0ef03f70933dddb2b195aa",
+        "scope": "current_worktree_bytes"
+      }
+    ],
+    "selfRecorderReceipt": {
+      "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "bytes": 25556,
+      "normalizedBytes": 26828,
+      "sha256": "a4378ef018dfa1624ce9dfd6077b70e2033f5936118003cd0428f41e1b044961",
+      "gitBlobSha1": "ea35438f19affd248a691d0c26935a4d9b5a096d",
+      "scope": "current_manifest_normalized_self_receipt",
+      "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
+      "bytesByteDomain": "final_raw_manifest_bytes",
+      "hashByteDomain": "normalized_serialization_bytes"
+    },
+    "independentReview": {
+      "status": "complete",
+      "firstPass": {
+        "critical": 0,
+        "important": 1,
+        "finding": "Fresh correction evidence was not distinguished from the historical 149/150 baseline."
+      },
+      "finalPass": {
+        "critical": 0,
+        "important": 0
+      },
+      "corrections": [
+        "Separated historical baseline evidence from current correction verification.",
+        "Declared raw and normalized byte domains for the self-recorder receipt."
+      ]
+    },
+    "reviewVerdict": {
+      "critical": 0,
+      "important": 0,
+      "status": "independent_read_only_review_complete"
+    },
+    "gates": {
+      "G1_UI_SOURCE": "correction_ready_for_a0_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T3": "closed"
+    }
+  },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
     { "id": "G2_AUTH_RUNTIME", "owner": "A6", "status": "closed", "scope": "identity/membership/role/contract runtime" },

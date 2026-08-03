@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -13,6 +14,27 @@ const governanceUrl = new URL(
   "../docs/governance/pcm-owner-first-execution-manifest.v1.json",
   import.meta.url,
 );
+const planUrl = new URL(
+  "../docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  import.meta.url,
+);
+
+function makeRouteControl(route) {
+  return {
+    dataset: { route },
+    attributes: new Map(),
+    setAttribute(name, value) { this.attributes.set(name, String(value)); },
+    removeAttribute(name) { this.attributes.delete(name); },
+    getAttribute(name) { return this.attributes.get(name) ?? null; },
+  };
+}
+
+function assertRouteClosed(control) {
+  assert.equal(control.getAttribute("href"), null);
+  assert.equal(control.getAttribute("aria-disabled"), "true");
+  assert.equal(control.getAttribute("tabindex"), "-1");
+  assert.equal(control.dataset.routeState, "planned");
+}
 
 test("homepage follows the seven-section owner decision hierarchy", async () => {
   const html = await readFile(htmlUrl, "utf8");
@@ -201,6 +223,118 @@ test("route binding rejects inherited, non-string, non-local, and unknown href v
   }
 });
 
+test("route binding ignores post-load shared intrinsic and collection forEach pollution", async () => {
+  const { bindPublicRoutes } = await import(`${appUrl.href}?intrinsics=${Date.now()}`);
+  const trimDescriptor = Object.getOwnPropertyDescriptor(String.prototype, "trim");
+  const testDescriptor = Object.getOwnPropertyDescriptor(RegExp.prototype, "test");
+  const arrayForEachDescriptor = Object.getOwnPropertyDescriptor(Array.prototype, "forEach");
+  let trimCalls = 0;
+  let regexpCalls = 0;
+  let nodeListForEachReads = 0;
+
+  try {
+    Object.defineProperty(String.prototype, "trim", {
+      ...trimDescriptor,
+      value() {
+        trimCalls += 1;
+        throw new Error("polluted String.prototype.trim");
+      },
+    });
+    Object.defineProperty(RegExp.prototype, "test", {
+      ...testDescriptor,
+      value() {
+        regexpCalls += 1;
+        throw new Error("polluted RegExp.prototype.test");
+      },
+    });
+    Object.defineProperty(Array.prototype, "forEach", {
+      ...arrayForEachDescriptor,
+      value() {
+        throw new Error("polluted Array.prototype.forEach");
+      },
+    });
+
+    const arrayControl = makeRouteControl("serviceContract");
+    assert.doesNotThrow(() => {
+      bindPublicRoutes(
+        { querySelectorAll: () => [arrayControl] },
+        { serviceContract: "https://untrusted.example/contract" },
+      );
+    });
+    assertRouteClosed(arrayControl);
+
+    const nodeListControl = makeRouteControl("serviceContract");
+    const pollutedNodeListPrototype = Object.create(null, {
+      forEach: {
+        configurable: true,
+        get() {
+          nodeListForEachReads += 1;
+          throw new Error("polluted NodeList.prototype.forEach");
+        },
+      },
+    });
+    const nodeListLike = Object.create(pollutedNodeListPrototype);
+    nodeListLike[0] = nodeListControl;
+    nodeListLike.length = 1;
+    assert.doesNotThrow(() => {
+      bindPublicRoutes(
+        { querySelectorAll: () => nodeListLike },
+        { serviceContract: "https://untrusted.example/contract" },
+      );
+    });
+    assertRouteClosed(nodeListControl);
+    assert.equal(nodeListForEachReads, 0);
+    assert.equal(trimCalls, 0);
+    assert.equal(regexpCalls, 0);
+  } finally {
+    Object.defineProperty(String.prototype, "trim", trimDescriptor);
+    Object.defineProperty(RegExp.prototype, "test", testDescriptor);
+    Object.defineProperty(Array.prototype, "forEach", arrayForEachDescriptor);
+  }
+});
+
+test("route binding requires an exact trusted route name and href pair", async () => {
+  const { bindPublicRoutes } = await import(`${appUrl.href}?trusted=${Date.now()}`);
+  const closedCases = [
+    ["unknownRoute", "../service_contract/code.html"],
+    ["serviceContract", "../../../../outside.html"],
+    ["process", "#missing-fragment"],
+    ["serviceContract", "http://untrusted.example/contract"],
+    ["serviceContract", "https://untrusted.example/contract"],
+    ["serviceContract", "data:text/html,untrusted"],
+    ["serviceContract", "javascript:alert(1)"],
+  ];
+
+  for (const [routeName, candidateHref] of closedCases) {
+    const control = makeRouteControl(routeName);
+    bindPublicRoutes(
+      { querySelectorAll: () => [control] },
+      { [routeName]: candidateHref },
+    );
+    assertRouteClosed(control);
+  }
+
+  const active = makeRouteControl("serviceContract");
+  bindPublicRoutes(
+    { querySelectorAll: () => [active] },
+    { serviceContract: "../service_contract/code.html" },
+  );
+  assert.equal(active.getAttribute("href"), "../service_contract/code.html");
+  assert.equal(active.getAttribute("aria-disabled"), null);
+  assert.equal(active.getAttribute("tabindex"), null);
+  assert.equal(active.dataset.routeState, "active");
+
+  const plannedQuote = makeRouteControl("quoteCheck");
+  bindPublicRoutes(
+    { querySelectorAll: () => [plannedQuote] },
+    { quoteCheck: "../quote_check/code.html" },
+  );
+  assertRouteClosed(plannedQuote);
+
+  const appSource = await readFile(appUrl, "utf8");
+  assert.match(appSource, /case "quoteCheck":/);
+});
+
 test("footer links only to visible owner-first sections", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const footer = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0] ?? "";
@@ -220,15 +354,136 @@ test("T2 evidence distinguishes current exact-five writes from the authorized hi
   assert.equal(manifest.t2.recovery.classification, "authorized_historical_external_hold");
 });
 
+test("T2 correction evidence closes its exact write set, receipts, RED GREEN, and plan state", async () => {
+  const manifest = JSON.parse(await readFile(governanceUrl, "utf8"));
+  const plan = await readFile(planUrl, "utf8");
+  const expectedPaths = [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
+    "tests/pcm-owner-first-public-home.test.mjs",
+    "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+    "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  ].sort();
+  const correction = manifest.t2Correction;
+
+  assert.equal(correction.parent, "ba22b765c727732b774a60259f111ac6a361f941");
+  assert.deepEqual([...correction.writeSet].sort(), expectedPaths);
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.ok(correction.tdd.red.failed > 0);
+  assert.equal(correction.tdd.red.exitCode, 1);
+  assert.equal(correction.tdd.green.failed, 0);
+  assert.equal(correction.tdd.green.exitCode, 0);
+
+  const receipts = [
+    ...correction.artifactReceipts,
+    correction.selfRecorderReceipt,
+  ];
+  assert.deepEqual(receipts.map((receipt) => receipt.path).sort(), expectedPaths);
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(new URL(`../${receipt.path}`, import.meta.url));
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    const gitBlobSha1 = createHash("sha1")
+      .update(`blob ${bytes.length}\0`)
+      .update(bytes)
+      .digest("hex");
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, sha256, receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1, receipt.path);
+    assert.equal(receipt.scope, "current_worktree_bytes");
+  }
+  const manifestBytes = await readFile(governanceUrl);
+  const normalizedManifest = JSON.parse(manifestBytes.toString("utf8"));
+  const normalizedSelfReceipt = normalizedManifest.t2Correction.selfRecorderReceipt;
+  normalizedSelfReceipt.sha256 = "0".repeat(64);
+  normalizedSelfReceipt.gitBlobSha1 = "0".repeat(40);
+  const normalizedBytes = Buffer.from(
+    `${JSON.stringify(normalizedManifest, null, 2)}\n`,
+    "utf8",
+  );
+  const normalizedSha256 = createHash("sha256")
+    .update(normalizedBytes)
+    .digest("hex");
+  const normalizedGitBlobSha1 = createHash("sha1")
+    .update(`blob ${normalizedBytes.length}\0`)
+    .update(normalizedBytes)
+    .digest("hex");
+  assert.equal(correction.selfRecorderReceipt.bytes, manifestBytes.length);
+  assert.equal(
+    correction.selfRecorderReceipt.scope,
+    "current_manifest_normalized_self_receipt",
+  );
+  assert.equal(
+    correction.selfRecorderReceipt.convention,
+    "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
+  );
+  assert.equal(
+    correction.selfRecorderReceipt.bytesByteDomain,
+    "final_raw_manifest_bytes",
+  );
+  assert.equal(
+    correction.selfRecorderReceipt.hashByteDomain,
+    "normalized_serialization_bytes",
+  );
+  assert.equal(correction.selfRecorderReceipt.normalizedBytes, normalizedBytes.length);
+  assert.equal(correction.selfRecorderReceipt.sha256, normalizedSha256);
+  assert.equal(
+    correction.selfRecorderReceipt.gitBlobSha1,
+    normalizedGitBlobSha1,
+  );
+
+  const t2Plan = plan.match(/### Task T2:[\s\S]*?(?=\n---)/)?.[0] ?? "";
+  assert.doesNotMatch(t2Plan, /Exact proposed write set|\- \[ \]/);
+  assert.match(t2Plan, /Actual bounded correction write set/);
+  for (const path of expectedPaths) {
+    assert.match(t2Plan, new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.deepEqual(correction.freshVerification.focused, {
+    tests: 16,
+    passed: 16,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.homepagePair, {
+    tests: 38,
+    passed: 38,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.currentTrain, {
+    files: 9,
+    tests: 132,
+    passed: 132,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.fullSuiteTruth, {
+    files: 10,
+    tests: 153,
+    passed: 152,
+    failed: 1,
+    exitCode: 1,
+    onlyFailure:
+      "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion",
+  });
+  assert.match(t2Plan, /152\/153[\s\S]*frozen A3 cumulative-path/);
+});
+
 test("fee, boundaries, final actions, local links, and accessible control floors remain truthful", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
-  const visibleText = html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
+  const visibleMarkup = html.replace(/<template\b[\s\S]*?<\/template>/gi, "");
+  const visibleText = visibleMarkup.replace(/<[^>]+>/g, "").replace(/\s+/g, " ");
 
   assert.match(html, /費用以正式 PCM 服務契約所載版本為準/);
   assert.doesNotMatch(visibleText, /canonical/i);
-  assert.match(visibleText, /PCM 不保管工程款/);
-  assert.match(visibleText, /不提供金流託管、代收代付或付款保障/);
+  assert.match(
+    visibleText,
+    /PCM 僅提供文件審查與決策整理；甲乙方工程款安排不屬於本服務/,
+  );
+  assert.doesNotMatch(
+    visibleMarkup,
+    /代收|不託管|付款授權|金流託管|代收代付|付款保障/,
+  );
   assert.match(html, /PCM 協助核對與整理，不取代甲方作最後決定/);
   assert.match(html, /不取代設計師、統包或施工單位履行專業責任/);
   assert.match(html, /正式權利義務以服務契約為準/);

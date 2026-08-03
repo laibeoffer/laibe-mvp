@@ -6,55 +6,96 @@ import {
 } from "../integrations/a14-line-contract.js";
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-const SAFE_LOCAL_ROUTE_HREF =
-  /^(?:#[A-Za-z][A-Za-z0-9_-]*|(?:(?:\.{1,2})\/)+(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.html(?:#[A-Za-z][A-Za-z0-9_-]*)?)$/;
 
-function getSafeLocalRouteHref(routes, routeName) {
+function readOwnDataValue(input, property) {
   try {
     if (
-      routes === null ||
-      (typeof routes !== "object" && typeof routes !== "function") ||
-      typeof routeName !== "string"
+      input === null ||
+      (typeof input !== "object" && typeof input !== "function")
     ) {
-      return null;
+      return undefined;
     }
-
-    const routeDescriptor = getOwnPropertyDescriptor(routes, routeName);
-    if (!routeDescriptor) return null;
-
-    const valueDescriptor = getOwnPropertyDescriptor(routeDescriptor, "value");
-    const href = valueDescriptor?.value;
-    if (
-      typeof href !== "string" ||
-      href.trim() !== href ||
-      !SAFE_LOCAL_ROUTE_HREF.test(href)
-    ) {
-      return null;
-    }
-
-    return href;
+    const descriptor = getOwnPropertyDescriptor(input, property);
+    if (!descriptor) return undefined;
+    return getOwnPropertyDescriptor(descriptor, "value")?.value;
   } catch {
-    return null;
+    return undefined;
   }
 }
 
-export function bindPublicRoutes(root, routes = PUBLIC_ROUTES) {
-  root.querySelectorAll("[data-route]").forEach((element) => {
-    const routeName = element.dataset.route;
-    const href = getSafeLocalRouteHref(routes, routeName);
-    if (href) {
-      element.setAttribute("href", href);
-      element.removeAttribute("aria-disabled");
-      element.removeAttribute("tabindex");
-      element.dataset.routeState = "active";
-      return;
-    }
+const trustedHomeHref = readOwnDataValue(PUBLIC_ROUTES, "home");
+const trustedStartCaseHref = readOwnDataValue(PUBLIC_ROUTES, "startCase");
+const trustedReportHref = readOwnDataValue(PUBLIC_ROUTES, "basicReport");
+const trustedProcessHref = readOwnDataValue(PUBLIC_ROUTES, "process");
+const trustedQuoteCheckHref = readOwnDataValue(PUBLIC_ROUTES, "quoteCheck");
+const trustedDrawingCheckHref = readOwnDataValue(PUBLIC_ROUTES, "drawingCheck");
+const trustedAccountAccessHref = readOwnDataValue(PUBLIC_ROUTES, "accountAccess");
+const trustedServiceContractHref = readOwnDataValue(
+  PUBLIC_ROUTES,
+  "serviceContract",
+);
 
-    element.removeAttribute("href");
-    element.setAttribute("aria-disabled", "true");
-    element.setAttribute("tabindex", "-1");
-    element.dataset.routeState = "planned";
-  });
+function trustedRouteHref(routeName) {
+  switch (routeName) {
+    case "home":
+      return trustedHomeHref;
+    case "startCase":
+      return trustedStartCaseHref;
+    case "basicReport":
+      return trustedReportHref;
+    case "process":
+      return trustedProcessHref;
+    case "quoteCheck":
+      return trustedQuoteCheckHref;
+    case "drawingCheck":
+      return trustedDrawingCheckHref;
+    case "accountAccess":
+      return trustedAccountAccessHref;
+    case "serviceContract":
+      return trustedServiceContractHref;
+    default:
+      return undefined;
+  }
+}
+
+function getTrustedRouteHref(routes, routeName) {
+  const trustedHref = trustedRouteHref(routeName);
+  const candidateHref = readOwnDataValue(routes, routeName);
+  return typeof trustedHref === "string" && candidateHref === trustedHref
+    ? trustedHref
+    : null;
+}
+
+function closeRouteControl(element) {
+  element.removeAttribute("href");
+  element.setAttribute("aria-disabled", "true");
+  element.setAttribute("tabindex", "-1");
+  element.dataset.routeState = "planned";
+}
+
+export function bindPublicRoutes(root, routes = PUBLIC_ROUTES) {
+  try {
+    const controls = root.querySelectorAll("[data-route]");
+    const controlCount = controls.length;
+    if (!Number.isInteger(controlCount) || controlCount < 0) return;
+
+    for (let index = 0; index < controlCount; index += 1) {
+      const element = controls[index];
+      const routeName = element?.dataset?.route;
+      const href = getTrustedRouteHref(routes, routeName);
+      if (href) {
+        element.setAttribute("href", href);
+        element.removeAttribute("aria-disabled");
+        element.removeAttribute("tabindex");
+        element.dataset.routeState = "active";
+        continue;
+      }
+
+      closeRouteControl(element);
+    }
+  } catch {
+    return;
+  }
 }
 
 export function resolvePublicIntegrationStatus(config = {}) {
