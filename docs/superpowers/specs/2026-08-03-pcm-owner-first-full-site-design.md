@@ -46,6 +46,8 @@ This is the only canonical quotation-check page. Introduction, consent, PDF sele
 
 This is the only canonical drawing-review page. Introduction, consent, upload, format checks, corrections, resubmission, and result are states of one page. It is not split by account state. T4 source commit `ca90ecdd3fb0191c8f3ae4f420c2011758908521` is admitted G1 source, and the serial integration activates its local route at `../drawing_check/code.html` without granting upload, parsing, Auth, durable-data, or production authority.
 
+The first serial route candidate `fd7a5719f545033a6b27c51ce028f95ba3f35a9f` is superseded evidence, not an admitted source: it made the shared graph clickable while the quotation page still said drawing review was unavailable. The bounded route-truth correction uses that exact commit as parent, keeps the shared route and public contract byte-frozen, and gives the quotation result and `QUOTE_ONLY_DRAWING_MISSING` recovery one exact local, keyboard-operable `../drawing_check/code.html` destination. An executable production-listener mutation probe proves that removing the guard permits hostile navigation; the current listener instead rejects missing, traversal, JavaScript, data, and external hrefs even after relevant browser intrinsics are polluted. The page continues to state that no upload, save, case creation, or formal result occurs at this G1 gate.
+
 ### `/account/access`
 
 This is the single shared registration and sign-in entrance for owners and invited vendors. The PCM homepage must expose a clear future entrance without creating a clickable 404. Until T5 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.

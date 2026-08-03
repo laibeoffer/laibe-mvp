@@ -85,6 +85,20 @@ safeDefineProperty(SAFE_FILE_INDEX_ARGUMENTS, "length", {
   writable: false,
 });
 safeFreeze(SAFE_FILE_INDEX_ARGUMENTS);
+const SAFE_HREF_ARGUMENTS = safeCreate(null);
+safeDefineProperty(SAFE_HREF_ARGUMENTS, "0", {
+  configurable: false,
+  enumerable: true,
+  value: "href",
+  writable: false,
+});
+safeDefineProperty(SAFE_HREF_ARGUMENTS, "length", {
+  configurable: false,
+  enumerable: false,
+  value: 1,
+  writable: false,
+});
+safeFreeze(SAFE_HREF_ARGUMENTS);
 const nonWhitespaceFileNamePattern = /\S/u;
 const safeHasNonWhitespaceFileName = RegExp.prototype.test.bind(
   nonWhitespaceFileNamePattern,
@@ -157,6 +171,49 @@ const trustedFileListItem =
 const trustedFileNameGetter = readOwnGetter(trustedFilePrototype, "name");
 const trustedBlobTypeGetter = readOwnGetter(trustedBlobPrototype, "type");
 const trustedInputFilesGetter = readOwnGetter(trustedInputPrototype, "files");
+const trustedElementPrototype = readConstructorPrototype(
+  readOwnGlobalFunction("Element"),
+);
+const trustedHtmlElementPrototype = readConstructorPrototype(
+  readOwnGlobalFunction("HTMLElement"),
+);
+const trustedEventPrototype = readConstructorPrototype(
+  readOwnGlobalFunction("Event"),
+);
+const trustedGetAttributeDescriptor = readOwnDataValue(
+  trustedElementPrototype,
+  "getAttribute",
+);
+const trustedGetAttribute =
+  trustedGetAttributeDescriptor &&
+  typeof trustedGetAttributeDescriptor.value === "function"
+    ? trustedGetAttributeDescriptor.value
+    : null;
+const trustedClickDescriptor = readOwnDataValue(
+  trustedHtmlElementPrototype,
+  "click",
+);
+const trustedClick =
+  trustedClickDescriptor && typeof trustedClickDescriptor.value === "function"
+    ? trustedClickDescriptor.value
+    : null;
+const trustedPreventDefaultDescriptor = readOwnDataValue(
+  trustedEventPrototype,
+  "preventDefault",
+);
+const trustedPreventDefault =
+  trustedPreventDefaultDescriptor &&
+  typeof trustedPreventDefaultDescriptor.value === "function"
+    ? trustedPreventDefaultDescriptor.value
+    : null;
+
+const DRAWING_CHECK_HREF = "../drawing_check/code.html";
+
+export function resolveQuoteDrawingRoute(candidate) {
+  return typeof candidate === "string" && candidate === DRAWING_CHECK_HREF
+    ? DRAWING_CHECK_HREF
+    : null;
+}
 
 function fileSelectionResult(kind, name = null) {
   const result = safeCreate(null);
@@ -330,9 +387,9 @@ export const QUOTE_CHECK_FAILURES = safeFreeze({
   QUOTE_ONLY_DRAWING_MISSING: failureState({
     code: "QUOTE_ONLY_DRAWING_MISSING",
     reason: "目前只有報價，尚缺施工圖，不能形成完整的範圍核對。",
-    nextAction: "先查看結果格式；圖說檢討入口開放後，再準備施工圖。",
+    nextAction: "前往圖說檢討準備施工圖；本頁不會送出或保存文件。",
     returnStep: "RESULT_FORMAT",
-    recoveryStep: "RESULT_FORMAT",
+    recoveryStep: "DRAWING_CHECK",
     payloadPolicy: "FILE_METADATA_ONLY",
   }),
 });
@@ -361,7 +418,7 @@ HERO_ACTIONS.FILE_UNREADABLE = createHeroAction("依建議恢復", true, "RESELE
 HERO_ACTIONS.FILE_CORRUPTED = createHeroAction("依建議恢復", true, "RESELECT_FILE");
 HERO_ACTIONS.DUPLICATE_SUBMISSION = createHeroAction("依建議恢復", true, "RESELECT_FILE");
 HERO_ACTIONS.VERSION_CONFLICT = createHeroAction("依建議恢復", true, "RESELECT_FILE");
-HERO_ACTIONS.QUOTE_ONLY_DRAWING_MISSING = createHeroAction("依建議恢復", true, "RESULT_FORMAT");
+HERO_ACTIONS.QUOTE_ONLY_DRAWING_MISSING = createHeroAction("前往圖說檢討", true, "DRAWING_CHECK");
 safeFreeze(HERO_ACTIONS);
 const NO_HERO_ACTION = createHeroAction("目前沒有可執行的下一步", false);
 
@@ -492,6 +549,9 @@ function initializeQuoteCheckPage() {
   const failureRole = root.querySelector("[data-failure-role]");
   const failureRecover = root.querySelector("[data-failure-recover]");
   const failureReturn = root.querySelector("[data-failure-return]");
+  const failureDrawingRecover = root.querySelector("[data-failure-drawing-recover]");
+  const primaryDrawingCheckLink = root.querySelector("[data-drawing-check-primary]");
+  const drawingCheckLinks = root.querySelectorAll("[data-drawing-check-link]");
   const heroStart = root.querySelector("[data-hero-start]");
   const openFileControls = root.querySelectorAll("[data-open-file]");
   const stepOrder = safeFreeze([
@@ -606,7 +666,43 @@ function initializeQuoteCheckPage() {
     if (failureReason) failureReason.textContent = currentFailure.reason;
     if (failureNext) failureNext.textContent = currentFailure.nextAction;
     if (failureRole) failureRole.textContent = currentFailure.responsibleRole;
+    const usesDrawingRecovery =
+      currentFailure === QUOTE_CHECK_FAILURES.QUOTE_ONLY_DRAWING_MISSING;
+    if (failureRecover) failureRecover.hidden = usesDrawingRecovery;
+    if (failureDrawingRecover) failureDrawingRecover.hidden = !usesDrawingRecovery;
     renderState(currentFailure, "FAILURE", true);
+  }
+
+  function readDrawingCheckHref(link) {
+    if (!link || !trustedGetAttribute) return null;
+    try {
+      return resolveQuoteDrawingRoute(
+        safeApply(trustedGetAttribute, link, SAFE_HREF_ARGUMENTS),
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  function preventUnsafeDrawingNavigation(event) {
+    if (!event || !trustedPreventDefault) return;
+    try {
+      safeApply(trustedPreventDefault, event, SAFE_EMPTY_ARGUMENTS);
+    } catch {
+      // An unsafe or changed route remains closed.
+    }
+  }
+
+  function navigateToDrawingCheck() {
+    const link = currentFailure === QUOTE_CHECK_FAILURES.QUOTE_ONLY_DRAWING_MISSING
+      ? failureDrawingRecover
+      : primaryDrawingCheckLink;
+    if (!readDrawingCheckHref(link) || !trustedClick) return;
+    try {
+      safeApply(trustedClick, link, SAFE_EMPTY_ARGUMENTS);
+    } catch {
+      // Navigation stays closed if the trusted browser primitive is unavailable.
+    }
   }
 
   function readSelectedFileMetadata(input) {
@@ -726,6 +822,9 @@ function initializeQuoteCheckPage() {
       case "OPEN_FILE":
         openFilePicker();
         return;
+      case "DRAWING_CHECK":
+        navigateToDrawingCheck();
+        return;
       default:
         return;
     }
@@ -748,6 +847,13 @@ function initializeQuoteCheckPage() {
   for (let index = 0; index < openFileControls.length; index += 1) {
     openFileControls[index].addEventListener("click", () => {
       openFilePicker();
+    });
+  }
+
+  for (let index = 0; index < drawingCheckLinks.length; index += 1) {
+    const link = drawingCheckLinks[index];
+    link.addEventListener("click", (event) => {
+      if (!readDrawingCheckHref(link)) preventUnsafeDrawingNavigation(event);
     });
   }
 
@@ -782,7 +888,12 @@ function initializeQuoteCheckPage() {
 
   if (failureRecover) {
     failureRecover.addEventListener("click", () => {
-      if (currentFailure) moveTo(currentFailure.recoveryStep);
+      if (!currentFailure) return;
+      if (currentFailure.recoveryStep === "DRAWING_CHECK") {
+        navigateToDrawingCheck();
+        return;
+      }
+      moveTo(currentFailure.recoveryStep);
     });
   }
   if (failureReturn) {

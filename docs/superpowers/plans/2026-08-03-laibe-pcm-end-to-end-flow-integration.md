@@ -247,7 +247,12 @@
 - [x] Add an executable exact-seven receipt gate before evidence closure. After adding the route-lookup adversarial regression, its final intentional RED is focused 88/90 and full PCM 211/213; the only two failures are the intentionally empty T4 receipt set and the not-yet-recomputed normalized manifest self receipt, with zero product or route regression.
 - [x] Close the post-load `Array.prototype.find` seam with a child-process RED 0/1 then GREEN 1/1; trusted route lookup now uses fixed-count direct own slots and records zero shared `find` calls.
 - [x] Complete the mainline focused rereview at Critical 0 / Important 0 / Minor 0 after the delegated review process was interrupted by a safety-classifier error; the classifier interruption is not counted as evidence.
-- [ ] Close immutable receipts, normalized self receipt, fresh 213/213 full suite, bounded commit, and A0 focused admission gates.
+- [x] Create bounded integration commit `fd7a571`; A0 correctly returns `CHANGES_REQUIRED` because the frozen quotation page still said drawing review was unavailable while the shared graph exposed a clickable quote-to-drawing edge. Treat `fd7a571` as superseded immutable evidence, not admission.
+- [x] Establish route-truth RED at 51/53: the quotation page has no exact drawing anchor and current suite metadata says 11 files instead of the enumerated 12.
+- [x] Add exact local anchors to the quotation result and quote-only failure recovery, align state copy/hero/recovery with `DRAWING_CHECK`, and reject unknown, traversal, data, JavaScript, and external route values without shared string-method authority. Product quote tests are GREEN at 38/38.
+- [x] Run actual quote-to-drawing browser journeys at 1280×900, 768×1024, and 390×844: destination 3/3, keyboard focus 3/3, exact href 3/3, overflow 0, controls below 44px 0, console/network failures 0.
+- [x] Close the read-only review Important finding with an executable production-listener mutation probe: removing the guard demonstrably permits hostile navigation, while current source keeps unsafe hrefs and post-load `getAttribute`, `preventDefault`, and `click` pollution at zero navigation and zero polluted calls.
+- [ ] Close the twelve-file current inventory, exact-seven receipts, normalized self receipt, fresh 101/101 focused and 216/216 full suites, bounded commit, and A0 focused admission gates.
 
 ---
 

@@ -167,7 +167,7 @@
             <ol class="correction-list">
               <li><span>01</span><div><strong>確認唯一有效版次</strong><p>檔名與報價內頁應能看出要採用哪一版。</p></div><em>甲方向乙方確認</em></li>
               <li><span>02</span><div><strong>確認頁面完整</strong><p>先用一般 PDF 閱讀工具檢查是否能正常開啟與翻頁。</p></div><em>甲方處理</em></li>
-              <li><span>03</span><div><strong>準備施工圖</strong><p>只有報價仍無法完成施工範圍對照；圖說檢討入口尚在整理。</p></div><em>甲方向乙方取得</em></li>
+              <li><span>03</span><div><strong>準備施工圖</strong><p>只有報價仍無法完成施工範圍對照；可前往圖說檢討準備施工圖。</p></div><em>甲方向乙方取得</em></li>
               <li><span>04</span><div><strong>保留文件依據</strong><p>正式收件開放後，才會記錄檔名、版次、提供者與處理狀態。</p></div><em>正式服務後留痕</em></li>
             </ol>
             <div class="owner-first-actions">
@@ -202,8 +202,8 @@
             <div class="paired-file-state" aria-label="缺少配對文件">
               <span>配對文件狀態</span>
               <strong>只有報價，尚缺施工圖</strong>
-              <p>圖說檢討正在整理中，目前沒有可點入口。</p>
-              <span class="planned-control" aria-disabled="true">圖說檢討尚未開放</span>
+              <p>可先前往圖說檢討準備施工圖；這個入口不會在本頁送出或保存文件。</p>
+              <a class="owner-first-primary-action" href="../drawing_check/code.html" data-drawing-check-link data-drawing-check-primary>前往圖說檢討</a>
             </div>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-next-step="RESULT_UNAVAILABLE">查看目前結果狀態</button>
@@ -239,6 +239,7 @@
               <p><span>案件資料</span><strong>零案件資料；未送出或保存</strong></p>
             </div>
             <div class="owner-first-actions">
+              <a class="owner-first-primary-action" href="../drawing_check/code.html" data-drawing-check-link data-failure-drawing-recover hidden>前往圖說檢討</a>
               <button class="owner-first-primary-action" type="button" data-failure-recover>依建議恢復</button>
               <button class="owner-first-secondary-action" type="button" data-failure-return>返回前一步</button>
             </div>

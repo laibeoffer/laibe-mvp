@@ -413,6 +413,92 @@ function createFileHandlerHarness() {
   };
 }
 
+function runProductionDrawingRouteListenerProbe(appSource) {
+  const listeners = new WeakMap();
+
+  class RouteEvent {
+    constructor() {
+      this.defaultPrevented = false;
+    }
+
+    preventDefault() {
+      this.defaultPrevented = true;
+    }
+  }
+
+  class RouteElement {
+    constructor(href) {
+      this.hrefValue = href;
+      this.navigationCount = 0;
+      listeners.set(this, new Map());
+    }
+
+    getAttribute(name) {
+      return name === "href" ? this.hrefValue : null;
+    }
+
+    addEventListener(type, listener) {
+      listeners.get(this).set(type, listener);
+    }
+  }
+
+  class RouteHtmlElement extends RouteElement {
+    click() {
+      const event = new RouteEvent();
+      listeners.get(this).get("click")?.(event);
+      if (!event.defaultPrevented) this.navigationCount += 1;
+    }
+  }
+
+  const dispatchTrustedClick = RouteHtmlElement.prototype.click;
+  const primary = new RouteHtmlElement("../drawing_check/code.html");
+  const failure = new RouteHtmlElement("../drawing_check/code.html");
+  primary.hidden = false;
+  failure.hidden = true;
+  const root = {
+    querySelector(selector) {
+      if (selector === "[data-drawing-check-primary]") return primary;
+      if (selector === "[data-failure-drawing-recover]") return failure;
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === "[data-drawing-check-link]") return [primary, failure];
+      return [];
+    },
+  };
+  const document = {
+    querySelector(selector) {
+      return selector === "[data-quote-check-page]" ? root : null;
+    },
+  };
+  const executable = appSource.replace(/^export\s+/gm, "");
+  runInNewContext(executable, {
+    Blob,
+    Event: RouteEvent,
+    Element: RouteElement,
+    File,
+    FileList: HarnessFileList,
+    HTMLElement: RouteHtmlElement,
+    HTMLInputElement: HarnessHtmlInputElement,
+    console,
+    document,
+    structuredClone,
+  }, { timeout: 1000 });
+
+  return {
+    classes: {
+      Element: RouteElement,
+      Event: RouteEvent,
+      HTMLElement: RouteHtmlElement,
+    },
+    dispatchPrimary() {
+      dispatchTrustedClick.call(primary);
+      return primary.navigationCount;
+    },
+    primary,
+  };
+}
+
 async function initializeFileHandlerHarness(tag) {
   const harness = createFileHandlerHarness();
   const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
@@ -1063,9 +1149,12 @@ test("hero action projection is closed, state-owned, and leaves no target when a
 
   for (const failure of Object.values(appModule.QUOTE_CHECK_FAILURES)) {
     const action = appModule.projectQuoteCheckHeroAction(failure);
+    const label = failure === appModule.QUOTE_CHECK_FAILURES.QUOTE_ONLY_DRAWING_MISSING
+      ? "前往圖說檢討"
+      : "依建議恢復";
     assert.deepEqual(
       { label: action.label, enabled: action.enabled, target: action.target },
-      { label: "依建議恢復", enabled: true, target: failure.recoveryStep },
+      { label, enabled: true, target: failure.recoveryStep },
       failure.code,
     );
   }
@@ -1206,6 +1295,125 @@ test("quoteCheck remains active after admitted drawing integration and compatibi
   const canonicalIds = new Set(nodes.map((node) => node.id));
   for (const alias of ["ownerStart", "documentCorrections", "basicReport", "selfServiceArchive"]) {
     assert.equal(canonicalIds.has(alias), false, alias);
+  }
+});
+
+test("quote-only recovery exposes one exact guarded drawing-check route", async () => {
+  const [html, appModule, manifestModule] = await Promise.all([
+    readOrEmpty(htmlPath),
+    import(`${pathToFileURL(appPath).href}?drawing-recovery-contract`),
+    import(`${pathToFileURL(routeManifestPath).href}?drawing-recovery-route`),
+  ]);
+  const visible = stripNonVisibleHtml(html);
+  const exactHref = "../drawing_check/code.html";
+  const hrefs = [...html.matchAll(/<a\b[^>]*\bhref="([^"]*)"[^>]*\bdata-drawing-check-link\b[^>]*>/gi)]
+    .map((match) => match[1]);
+
+  assert.ok(hrefs.length >= 2, "result and failure recovery both expose an anchor");
+  assert.deepEqual(new Set(hrefs), new Set([exactHref]));
+  assert.doesNotMatch(
+    visible,
+    /圖說檢討(?:入口)?尚未開放|圖說檢討正在整理中|目前沒有可點入口|圖說檢討入口開放後/,
+  );
+  assert.equal(
+    appModule.QUOTE_CHECK_FAILURES.QUOTE_ONLY_DRAWING_MISSING.recoveryStep,
+    "DRAWING_CHECK",
+  );
+  assert.match(
+    appModule.QUOTE_CHECK_FAILURES.QUOTE_ONLY_DRAWING_MISSING.nextAction,
+    /前往圖說檢討/,
+  );
+  const action = appModule.projectQuoteCheckHeroAction(
+    appModule.QUOTE_CHECK_FAILURES.QUOTE_ONLY_DRAWING_MISSING,
+  );
+  assert.equal(action.label, "前往圖說檢討");
+  assert.equal(action.enabled, true);
+  assert.equal(action.target, "DRAWING_CHECK");
+
+  assert.equal(appModule.resolveQuoteDrawingRoute(exactHref), exactHref);
+  for (const unsafe of [
+    null,
+    undefined,
+    "",
+    "drawing_check/code.html",
+    "../../outside.html",
+    "javascript:alert(1)",
+    "data:text/html,unsafe",
+    "https://example.com/drawing",
+    Object.create({ toString: () => exactHref }),
+    new Proxy({}, { get() { throw new Error("route getter"); } }),
+  ]) {
+    assert.equal(appModule.resolveQuoteDrawingRoute(unsafe), null);
+  }
+
+  const edge = manifestModule.PCM_FLOW_EDGES.find(
+    (candidate) => candidate.from === "quoteCheck" && candidate.to === "drawingCheck",
+  );
+  assert.equal(edge.clickable, true);
+});
+
+test("production drawing listener closes hostile hrefs after post-load intrinsic pollution", async () => {
+  const source = await readFile(appPath, "utf8");
+  const mutant = source.replace(
+    "if (!readDrawingCheckHref(link)) preventUnsafeDrawingNavigation(event);",
+    "void event;",
+  );
+  assert.notEqual(mutant, source, "mutation probe must remove the production guard");
+  const mutated = runProductionDrawingRouteListenerProbe(mutant);
+  mutated.primary.hrefValue = "javascript:alert(1)";
+  assert.equal(
+    mutated.dispatchPrimary(),
+    1,
+    "the mutation probe proves the regression test can observe unsafe navigation",
+  );
+
+  const probe = runProductionDrawingRouteListenerProbe(source);
+  assert.equal(probe.dispatchPrimary(), 1, "exact local href remains keyboard/click operable");
+  for (const href of [
+    null,
+    "",
+    "../../outside.html",
+    "javascript:alert(1)",
+    "data:text/html,unsafe",
+    "https://example.com/drawing",
+  ]) {
+    probe.primary.hrefValue = href;
+    assert.equal(probe.dispatchPrimary(), 1, String(href));
+  }
+
+  const descriptors = {
+    click: Object.getOwnPropertyDescriptor(probe.classes.HTMLElement.prototype, "click"),
+    getAttribute: Object.getOwnPropertyDescriptor(probe.classes.Element.prototype, "getAttribute"),
+    preventDefault: Object.getOwnPropertyDescriptor(probe.classes.Event.prototype, "preventDefault"),
+  };
+  let pollutedCalls = 0;
+  try {
+    Object.defineProperty(probe.classes.Element.prototype, "getAttribute", {
+      configurable: true,
+      value() {
+        pollutedCalls += 1;
+        return "../drawing_check/code.html";
+      },
+    });
+    Object.defineProperty(probe.classes.Event.prototype, "preventDefault", {
+      configurable: true,
+      value() {
+        pollutedCalls += 1;
+      },
+    });
+    Object.defineProperty(probe.classes.HTMLElement.prototype, "click", {
+      configurable: true,
+      value() {
+        pollutedCalls += 1;
+      },
+    });
+    probe.primary.hrefValue = "javascript:alert(1)";
+    assert.equal(probe.dispatchPrimary(), 1);
+    assert.equal(pollutedCalls, 0, "post-load intrinsic pollution has zero authority");
+  } finally {
+    Object.defineProperty(probe.classes.HTMLElement.prototype, "click", descriptors.click);
+    Object.defineProperty(probe.classes.Element.prototype, "getAttribute", descriptors.getAttribute);
+    Object.defineProperty(probe.classes.Event.prototype, "preventDefault", descriptors.preventDefault);
   }
 });
 

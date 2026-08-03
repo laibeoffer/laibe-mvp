@@ -629,7 +629,8 @@ test("T4 serial integration evidence binds admitted source, exact-seven bytes, a
     "docs/governance/pcm-owner-first-execution-manifest.v1.json",
   ];
 
-  assert.equal(integration.status, "ready_for_a0_focused_review");
+  assert.equal(integration.status, "SUPERSEDED_BY_T4_ROUTE_TRUTH_CORRECTION");
+  assert.equal(integration.candidateCommit, "fd7a5719f545033a6b27c51ce028f95ba3f35a9f");
   assert.equal(integration.sourceAdmission, "ADMITTED_G1_UI_SOURCE_ONLY");
   assert.equal(integration.sourceCommit, "ca90ecdd3fb0191c8f3ae4f420c2011758908521");
   assert.equal(integration.integrationParent, "7464e8332932ce48b48044d5b738a2534335156b");
@@ -638,7 +639,7 @@ test("T4 serial integration evidence binds admitted source, exact-seven bytes, a
   assert.equal(integration.publicContractByteFrozen, true);
   assert.deepEqual(integration.fullSuite, {
     command: "node --test tests/pcm-*.test.mjs",
-    files: 11,
+    files: 12,
     tests: 213,
     passed: 213,
     failed: 0,
@@ -650,7 +651,7 @@ test("T4 serial integration evidence binds admitted source, exact-seven bytes, a
   assert.equal(integration.browser.consoleWarningsOrErrors, 0);
   assert.equal(integration.browser.networkFailuresOrNon2xx, 0);
   assert.equal(integration.independentReview.critical, 0);
-  assert.equal(integration.independentReview.important, 0);
+  assert.equal(integration.independentReview.important, 1);
   assert.equal(integration.gates.G2_AUTH_RUNTIME, "closed");
   assert.equal(integration.gates.G3_DURABLE_DATA, "closed");
   assert.equal(integration.gates.G4_PRODUCTION, "closed");
@@ -663,13 +664,82 @@ test("T4 serial integration evidence binds admitted source, exact-seven bytes, a
     artifactPaths,
   );
   for (const receipt of integration.artifactReceipts) {
-    const bytes = await readFile(new URL(receipt.path, repositoryRoot));
+    const immutable = spawnSync(
+      "git",
+      ["show", `${integration.candidateCommit}:${receipt.path}`],
+      { cwd: repositoryRoot, encoding: null, maxBuffer: 16 * 1024 * 1024 },
+    );
+    assert.equal(immutable.status, 0, immutable.stderr?.toString() ?? receipt.path);
+    const bytes = immutable.stdout;
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(
       receipt.sha256,
       createHash("sha256").update(bytes).digest("hex"),
       receipt.path,
     );
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "immutable_fd7_commit_blob_bytes", receipt.path);
+  }
+});
+
+test("T4 route-truth correction binds exact-seven current bytes and the twelve-file suite", async () => {
+  const manifest = JSON.parse(await readFile(governanceManifestUrl, "utf8"));
+  const correction = manifest.t4RouteTruthCorrection;
+  const expectedWriteSet = [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+    "tests/pcm-owner-first-quote-check.test.mjs",
+    "tests/pcm-owner-first-route-manifest.test.mjs",
+    "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+    "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+    "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  ];
+  const expectedFiles = [
+    "pcm-contracted-owner-workspace.test.mjs",
+    "pcm-full-flow-visual-port.test.mjs",
+    "pcm-governance-pages.test.mjs",
+    "pcm-missing-flow-pages.test.mjs",
+    "pcm-owner-first-drawing-check.test.mjs",
+    "pcm-owner-first-public-home.test.mjs",
+    "pcm-owner-first-quote-check.test.mjs",
+    "pcm-owner-first-route-manifest.test.mjs",
+    "pcm-owner-first-shared-system.test.mjs",
+    "pcm-public-home.test.mjs",
+    "pcm-service-contract.test.mjs",
+    "pcm-standalone-core.test.mjs",
+  ];
+
+  assert.equal(correction.status, "ready_for_a0_focused_review");
+  assert.equal(correction.parent, "fd7a5719f545033a6b27c51ce028f95ba3f35a9f");
+  assert.deepEqual(correction.writeSet, expectedWriteSet);
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.fullSuite, {
+    command: "node --test tests/pcm-*.test.mjs",
+    files: 12,
+    fileInventory: expectedFiles,
+    tests: 216,
+    passed: 216,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.equal(correction.browser.journey, "quote_check -> drawing_check");
+  assert.deepEqual(correction.browser.viewports, ["1280x900", "768x1024", "390x844"]);
+  assert.equal(correction.browser.destinationReached, "3/3");
+  assert.equal(correction.browser.horizontalOverflow, 0);
+  assert.equal(correction.browser.visibleControlsUnder44, 0);
+  assert.equal(correction.browser.consoleWarningsOrErrors, 0);
+  assert.equal(correction.browser.networkFailuresOrNon2xx, 0);
+  assert.equal(correction.independentReview.critical, 0);
+  assert.equal(correction.independentReview.important, 0);
+
+  const artifactPaths = expectedWriteSet.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(correction.artifactReceipts.map(({ path }) => path), artifactPaths);
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(new URL(receipt.path, repositoryRoot));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
     assert.equal(receipt.scope, "candidate_git_blob_bytes", receipt.path);
   }
