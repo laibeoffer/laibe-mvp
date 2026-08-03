@@ -55,6 +55,14 @@ const correctionEight = Object.freeze([
   "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
 ]);
 
+const inputSafetyFive = Object.freeze([
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+  "tests/pcm-owner-first-quote-check.test.mjs",
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+]);
+
 const requiredSteps = Object.freeze([
   "INTRODUCTION",
   "CONSENT",
@@ -149,6 +157,13 @@ function createFileHandlerHarness() {
     fileInput,
     dispatchFile(file) {
       fileInput.files = file ? [file] : [];
+      return listeners.get("change")?.();
+    },
+    dispatchFiles(files) {
+      fileInput.files = files;
+      return listeners.get("change")?.();
+    },
+    dispatchChange() {
       return listeners.get("change")?.();
     },
     visibleState() {
@@ -363,6 +378,96 @@ test("actual file handler rejects ordinary text and text renamed as PDF", async 
   });
   assert.equal(harness.visibleState(), "FAILURE");
   assert.match(harness.failureReason(), /PDF/);
+});
+
+test("actual file handler fails closed when the selected file list is hostile", async () => {
+  const throwingFiles = await initializeFileHandlerHarness("throwing-files-getter");
+  Object.defineProperty(throwingFiles.fileInput, "files", {
+    configurable: true,
+    get() {
+      throw new Error("files getter must not escape");
+    },
+  });
+  assert.doesNotThrow(() => throwingFiles.dispatchChange());
+  assert.equal(throwingFiles.visibleState(), "FAILURE");
+
+  const throwingLength = await initializeFileHandlerHarness("throwing-files-length");
+  throwingLength.fileInput.files = new Proxy({}, {
+    get(_target, property) {
+      if (property === "length") throw new Error("length must not escape");
+      return undefined;
+    },
+  });
+  assert.doesNotThrow(() => throwingLength.dispatchChange());
+  assert.equal(throwingLength.visibleState(), "FAILURE");
+
+  const sparseList = await initializeFileHandlerHarness("sparse-files-list");
+  assert.doesNotThrow(() => sparseList.dispatchFiles(new Array(1)));
+  assert.equal(sparseList.visibleState(), "FAILURE");
+
+  const throwingIndex = await initializeFileHandlerHarness("throwing-files-index");
+  const hostileIndex = { length: 1 };
+  Object.defineProperty(hostileIndex, "0", {
+    configurable: true,
+    get() {
+      throw new Error("index must not escape");
+    },
+  });
+  assert.doesNotThrow(() => throwingIndex.dispatchFiles(hostileIndex));
+  assert.equal(throwingIndex.visibleState(), "FAILURE");
+
+  const revokedList = await initializeFileHandlerHarness("revoked-files-proxy");
+  const revoked = Proxy.revocable({ 0: { name: "estimate.pdf", type: "application/pdf" }, length: 1 }, {});
+  revoked.revoke();
+  assert.doesNotThrow(() => revokedList.dispatchFiles(revoked.proxy));
+  assert.equal(revokedList.visibleState(), "FAILURE");
+
+  const emptyList = await initializeFileHandlerHarness("empty-files-list");
+  assert.doesNotThrow(() => emptyList.dispatchFiles([]));
+  assert.equal(emptyList.visibleState(), "SELECT_FILE");
+});
+
+test("actual file handler rejects unsafe metadata without claiming file bytes are not PDF", async () => {
+  const throwingName = {};
+  Object.defineProperty(throwingName, "name", {
+    configurable: true,
+    get() {
+      throw new Error("name must not escape");
+    },
+  });
+  Object.defineProperty(throwingName, "type", {
+    configurable: true,
+    value: "application/pdf",
+  });
+
+  const throwingType = { name: "estimate.pdf" };
+  Object.defineProperty(throwingType, "type", {
+    configurable: true,
+    get() {
+      throw new Error("type must not escape");
+    },
+  });
+
+  const invalidMetadata = [
+    ["throwing-name", throwingName],
+    ["throwing-type", throwingType],
+    ["blank-name", { name: "", type: "application/pdf" }],
+    ["whitespace-name", { name: " \t\n", type: "application/pdf" }],
+    ["non-string-name", { name: 42, type: "application/pdf" }],
+    ["missing-type", { name: "estimate.pdf" }],
+    ["empty-type", { name: "estimate.pdf", type: "" }],
+    ["whitespace-type", { name: "estimate.pdf", type: "   " }],
+    ["non-string-type", { name: "estimate.pdf", type: 42 }],
+    ["non-pdf-type", { name: "estimate.pdf", type: "text/plain" }],
+  ];
+
+  for (const [tag, file] of invalidMetadata) {
+    const harness = await initializeFileHandlerHarness(`invalid-metadata-${tag}`);
+    assert.doesNotThrow(() => harness.dispatchFile(file), tag);
+    assert.equal(harness.visibleState(), "FAILURE", tag);
+    assert.match(harness.failureReason(), /瀏覽器.*未提供.*PDF.*內容格式.*仍未驗證/, tag);
+    assert.doesNotMatch(harness.failureReason(), /檔案內容.*不是 PDF|不是可辨識的 PDF/, tag);
+  }
 });
 
 test("actual file handler ignores post-load slice and lowercase rewriting", async () => {
@@ -645,4 +750,51 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
   }
   assert.equal(correction.independentReview.critical, 0);
   assert.equal(correction.independentReview.important, 0);
+
+  const inputSafety = governance.t3InputSafetyCorrection;
+  assert.ok(inputSafety, "T3 input safety correction evidence must exist");
+  assert.equal(inputSafety.parent, "ece1fb380c9a1a5ab85b98a20175773cb3f8006f");
+  assert.equal(inputSafety.parentTree, "186f27de8d7f6b96e557cb53e90a8736aaed8006");
+  assert.deepEqual([...inputSafety.immediateWriteSet].sort(), [...inputSafetyFive].sort());
+  assert.equal(inputSafety.outsideWriteSet, 0);
+  assert.deepEqual(inputSafety.tdd.red, {
+    tests: 18,
+    passed: 15,
+    failed: 3,
+    exitCode: 1,
+  });
+  assert.deepEqual(inputSafety.tdd.productGreenBeforeReceipts, {
+    tests: 18,
+    passed: 17,
+    failed: 1,
+    exitCode: 1,
+    onlyFailure: "current receipt evidence pending",
+  });
+  assert.deepEqual(inputSafety.tdd.green, {
+    tests: 18,
+    passed: 18,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.equal(inputSafety.inputPolicy.browserPdfLabel, "application/pdf");
+  assert.equal(inputSafety.inputPolicy.blankNameAccepted, false);
+  assert.equal(inputSafety.inputPolicy.unsafeAccess, "FAILURE_ZERO_CASE_DATA_NO_THROW");
+  assert.equal(inputSafety.inputPolicy.contentBytesClassified, false);
+  assert.equal(inputSafety.manifestReceiptRef, "t3.selfRecorderReceipt");
+  const inputSafetyArtifactPaths = inputSafetyFive.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    inputSafety.artifactReceipts.map((receipt) => receipt.path).sort(),
+    inputSafetyArtifactPaths.sort(),
+  );
+  for (const receipt of inputSafety.artifactReceipts) {
+    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "current_worktree_bytes");
+  }
+  assert.equal(inputSafety.independentReview.critical, 0);
+  assert.equal(inputSafety.independentReview.important, 0);
 });

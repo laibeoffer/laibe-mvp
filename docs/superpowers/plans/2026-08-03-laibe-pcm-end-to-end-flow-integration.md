@@ -185,6 +185,18 @@
 - [x] Regress the actual browser flow at 1280×900, 768×1024, and 390×844. Introduction → consent → selection → validation → correction → reselection → result format → closed result completed; renamed text, ordinary text, valid MIME, rewrite pollution, and throwing pollution were exercised. Horizontal overflow, broken assets, planned clickable controls, controls below 44px, and console warnings/errors were all 0. Focus-visible and reduced-motion behavior remained effective.
 - [x] Final current-train truth is 54/54. Full-suite truth is 168/169; the sole failure remains `tests/pcm-governance-pages.test.mjs`, the frozen A3 cumulative-path admission assertion. T4 and G2–G4 remain closed pending A0 admission.
 
+**Actual bounded input-safety correction write set (parent `ece1fb380c9a1a5ab85b98a20175773cb3f8006f`):**
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js`
+- `tests/pcm-owner-first-quote-check.test.mjs`
+- `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+- `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
+- `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
+
+- [x] Reproduce the actual event-boundary RED against `ece1fb3`: focused 18 tests, 15 passed, 3 failed, exit 1. Throwing `files` and `name` getters escaped the change handler; the third failure was the intentionally stale receipt gate. A separate read-only hostile matrix also reproduced repeated `files` access, throwing length/index, sparse lists, blank names, and unsafe MIME metadata against the exact parent.
+- [x] Apply one minimal input boundary: snapshot `files`, exact length, index, name, and MIME once inside an exception-safe reader. Empty selection remains a normal cancellation; malformed, sparse, throwing, missing, blank, or non-PDF metadata enters the same closed product failure with null case data and no actions.
+- [x] Keep the product language evidence-limited. Invalid metadata says the browser did not provide a confirmable PDF label and that content format remains unverified; it never classifies the file bytes. Exact nonblank name plus `application/pdf` remains pending, while suffix-only and post-load string intrinsic pollution stay closed.
+- [x] Record exact-five receipts, three-viewport browser evidence, and independent Critical 0 / Important 0 review. The commit gate requires a fresh focused 18/18 and current train 56/56; full-suite truth remains 170/171 with only the frozen A3 assertion. T4 and G2–G4 remain closed.
+
 ---
 
 ### Task T4: Single-page drawing check

@@ -10,6 +10,20 @@ const safeStructuredClone =
     : null;
 const ordinaryObjectPrototype = Object.prototype;
 const NO_ACTIONS = safeFreeze([]);
+const nonWhitespaceFileNamePattern = /\S/u;
+const safeHasNonWhitespaceFileName = RegExp.prototype.test.bind(
+  nonWhitespaceFileNamePattern,
+);
+
+function fileSelectionResult(kind, name = null) {
+  const result = safeCreate(null);
+  result.kind = kind;
+  result.name = name;
+  return safeFreeze(result);
+}
+
+const EMPTY_FILE_SELECTION = fileSelectionResult("EMPTY");
+const INVALID_FILE_SELECTION = fileSelectionResult("INVALID");
 
 function freezeState(record) {
   return safeFreeze({
@@ -134,8 +148,9 @@ function failureState({
 export const QUOTE_CHECK_FAILURES = safeFreeze({
   FILE_FORMAT_INVALID: failureState({
     code: "FILE_FORMAT_INVALID",
-    reason: "選擇的檔案不是可辨識的 PDF。",
-    nextAction: "回到檔案選擇，改選由乙方提供的報價 PDF。",
+    reason: "瀏覽器未提供可確認的 PDF 檔案標示；內容格式仍未驗證。",
+    nextAction: "回到檔案選擇，改選瀏覽器標示為 PDF 的乙方報價檔。",
+    payloadPolicy: "ZERO_CASE_DATA",
   }),
   FILE_TOO_LARGE: failureState({
     code: "FILE_TOO_LARGE",
@@ -342,12 +357,51 @@ function initializeQuoteCheckPage() {
     renderState(currentFailure, "FAILURE");
   }
 
-  function hasPdfMetadata(file) {
+  function readSelectedFileMetadata(input) {
     try {
-      if (!file || typeof file.name !== "string" || typeof file.type !== "string") return false;
-      return file.type === "application/pdf";
+      const files = input.files;
+      if (files === null || files === undefined) return INVALID_FILE_SELECTION;
+
+      const length = files.length;
+      if (length === 0) return EMPTY_FILE_SELECTION;
+      if (length !== 1) return INVALID_FILE_SELECTION;
+
+      const file = files[0];
+      if (
+        file === null ||
+        file === undefined ||
+        (typeof file !== "object" && typeof file !== "function")
+      ) {
+        return INVALID_FILE_SELECTION;
+      }
+
+      const name = file.name;
+      const type = file.type;
+      if (
+        typeof name !== "string" ||
+        !safeHasNonWhitespaceFileName(name) ||
+        typeof type !== "string" ||
+        type !== "application/pdf"
+      ) {
+        return INVALID_FILE_SELECTION;
+      }
+
+      return fileSelectionResult("PDF_METADATA", name);
     } catch {
-      return false;
+      return INVALID_FILE_SELECTION;
+    }
+  }
+
+  function showFileSelectionFailure() {
+    try {
+      showFailure("FILE_FORMAT_INVALID");
+    } catch {
+      currentFailure = QUOTE_CHECK_FAILURES.FILE_FORMAT_INVALID;
+      try {
+        renderState(currentFailure, "FAILURE");
+      } catch {
+        // Keep the event boundary closed even if the surrounding DOM changed.
+      }
     }
   }
 
@@ -374,21 +428,23 @@ function initializeQuoteCheckPage() {
 
   if (fileInput) {
     fileInput.addEventListener("change", () => {
-      const file = fileInput.files && fileInput.files.length === 1
-        ? fileInput.files[0]
-        : null;
-      if (!file) {
+      const selection = readSelectedFileMetadata(fileInput);
+      if (selection === EMPTY_FILE_SELECTION) {
         moveTo(currentStep === "RESELECT_FILE" ? "RESELECT_FILE" : "SELECT_FILE");
         return;
       }
-      for (let index = 0; index < fileNameTargets.length; index += 1) {
-        fileNameTargets[index].textContent = file.name;
-      }
-      if (!hasPdfMetadata(file)) {
-        showFailure("FILE_FORMAT_INVALID");
+      if (selection.kind !== "PDF_METADATA") {
+        showFileSelectionFailure();
         return;
       }
-      moveTo("VALIDATION_PENDING");
+      try {
+        for (let index = 0; index < fileNameTargets.length; index += 1) {
+          fileNameTargets[index].textContent = selection.name;
+        }
+        moveTo("VALIDATION_PENDING");
+      } catch {
+        showFileSelectionFailure();
+      }
     });
   }
 
