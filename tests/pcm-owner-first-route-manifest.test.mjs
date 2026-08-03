@@ -9,6 +9,131 @@ const pcmRoot = new URL(
 );
 const publicContractUrl = new URL("public/public-contract.js", pcmRoot);
 const routeManifestUrl = new URL("public/pcm-flow-route-manifest.js", pcmRoot);
+const governanceManifestUrl = new URL(
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  repositoryRoot,
+);
+
+function scanJsonObjectKeys(source) {
+  let index = 0;
+  const objectCounts = new Map();
+
+  const skipWhitespace = () => {
+    while (/\s/u.test(source[index] ?? "")) {
+      index += 1;
+    }
+  };
+
+  const parseString = () => {
+    if (source[index] !== '"') {
+      throw new SyntaxError(`Expected string at byte ${index}`);
+    }
+    const start = index;
+    index += 1;
+    while (index < source.length) {
+      const character = source[index];
+      if (character === "\\") {
+        index += 2;
+        continue;
+      }
+      index += 1;
+      if (character === '"') {
+        return JSON.parse(source.slice(start, index));
+      }
+    }
+    throw new SyntaxError("Unterminated JSON string");
+  };
+
+  const parseValue = (path) => {
+    skipWhitespace();
+    if (source[index] === "{") {
+      parseObject(path);
+      return;
+    }
+    if (source[index] === "[") {
+      parseArray(path);
+      return;
+    }
+    if (source[index] === '"') {
+      parseString();
+      return;
+    }
+    const primitive = source
+      .slice(index)
+      .match(/^(?:true|false|null|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)/u);
+    if (!primitive) {
+      throw new SyntaxError(`Invalid JSON value at byte ${index}`);
+    }
+    index += primitive[0].length;
+  };
+
+  const parseObject = (path) => {
+    index += 1;
+    skipWhitespace();
+    const counts = new Map();
+    objectCounts.set(path, counts);
+    if (source[index] === "}") {
+      index += 1;
+      return;
+    }
+    while (index < source.length) {
+      skipWhitespace();
+      const key = parseString();
+      const count = (counts.get(key) ?? 0) + 1;
+      counts.set(key, count);
+      if (count !== 1) {
+        throw new SyntaxError(`Duplicate JSON key at ${path}.${key}`);
+      }
+      skipWhitespace();
+      if (source[index] !== ":") {
+        throw new SyntaxError(`Expected colon at byte ${index}`);
+      }
+      index += 1;
+      parseValue(`${path}.${key}`);
+      skipWhitespace();
+      if (source[index] === "}") {
+        index += 1;
+        return;
+      }
+      if (source[index] !== ",") {
+        throw new SyntaxError(`Expected comma at byte ${index}`);
+      }
+      index += 1;
+    }
+    throw new SyntaxError("Unterminated JSON object");
+  };
+
+  const parseArray = (path) => {
+    index += 1;
+    skipWhitespace();
+    if (source[index] === "]") {
+      index += 1;
+      return;
+    }
+    let itemIndex = 0;
+    while (index < source.length) {
+      parseValue(`${path}[${itemIndex}]`);
+      itemIndex += 1;
+      skipWhitespace();
+      if (source[index] === "]") {
+        index += 1;
+        return;
+      }
+      if (source[index] !== ",") {
+        throw new SyntaxError(`Expected comma at byte ${index}`);
+      }
+      index += 1;
+    }
+    throw new SyntaxError("Unterminated JSON array");
+  };
+
+  parseValue("$");
+  skipWhitespace();
+  if (index !== source.length) {
+    throw new SyntaxError(`Unexpected JSON content at byte ${index}`);
+  }
+  return objectCounts;
+}
 
 const requiredCanonicalNodes = Object.freeze([
   "home",
@@ -342,6 +467,112 @@ test("resolver remains closed after prototype and intrinsic pollution", async ()
       delete Object.prototype.INJECTED_INTENT;
     }
   }
+});
+
+test("resolver ignores post-load Array iterator pollution for internal context", async () => {
+  const { resolvePcmFlowContinuation } = await import(publicContractUrl.href);
+  const originalDescriptor = Object.getOwnPropertyDescriptor(
+    Array.prototype,
+    Symbol.iterator,
+  );
+  let thrown = null;
+  let unknown;
+  let owner;
+  let vendor;
+
+  try {
+    Object.defineProperty(Array.prototype, Symbol.iterator, {
+      configurable: true,
+      writable: true,
+      value: function* poisonedAuthorityIterator() {
+        yield "PCM_EXITED_READ_ONLY";
+        yield "owner";
+      },
+    });
+    try {
+      unknown = resolvePcmFlowContinuation({ intent: "UNKNOWN" });
+      owner = resolvePcmFlowContinuation({
+        intent: "PCM_EXITED_READ_ONLY",
+        role: "owner",
+      });
+      vendor = resolvePcmFlowContinuation({
+        intent: "CASE_CLOSED_READ_ONLY",
+        role: "vendor",
+      });
+    } catch (error) {
+      thrown = error;
+    }
+  } finally {
+    if (originalDescriptor) {
+      Object.defineProperty(
+        Array.prototype,
+        Symbol.iterator,
+        originalDescriptor,
+      );
+    } else {
+      delete Array.prototype[Symbol.iterator];
+    }
+  }
+
+  assert.equal(thrown, null);
+  assert.equal(unknown.routeKey, "accessUnavailable");
+  assert.equal(unknown.payloadPolicy, "ZERO_CASE_DATA");
+  assert.equal(unknown.canMutate, false);
+  assert.equal(owner.routeKey, "ownerWorkspace");
+  assert.equal(owner.canMutate, false);
+  assert.equal(vendor.routeKey, "vendorWorkspace");
+  assert.equal(vendor.canMutate, false);
+});
+
+test("governance manifest raw JSON has no duplicate object keys", async () => {
+  const raw = await readFile(governanceManifestUrl, "utf8");
+  const objectCounts = scanJsonObjectKeys(raw);
+  const t0Counts = objectCounts.get("$.t0");
+
+  for (const key of [
+    "currentTrainRegression",
+    "fullSuiteTruth",
+    "staticGates",
+    "independentReview",
+  ]) {
+    assert.equal(t0Counts.get(key), 1, `$.t0.${key}`);
+  }
+});
+
+test("governance manifest t0 exposes one current evidence truth", async () => {
+  const manifest = JSON.parse(await readFile(governanceManifestUrl, "utf8"));
+
+  assert.deepEqual(manifest.t0.currentTrainRegression, {
+    tests: 65,
+    passed: 65,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(manifest.t0.fullSuiteTruth, {
+    files: 9,
+    tests: 134,
+    passed: 133,
+    failed: 1,
+    exitCode: 1,
+    onlyFailure:
+      "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion",
+  });
+  assert.deepEqual(manifest.t0.staticGates, {
+    strictUtf8: "6/6",
+    json: "valid",
+    localRouteReferences: 22,
+    localFragments: 3,
+    missingLocalReferences: 0,
+    plannedClickable: 0,
+    forbiddenProductTerms: 0,
+    deprecatedReadOnlyState: 0,
+    gitDiffCheck: "clean",
+  });
+  assert.deepEqual(manifest.t0.independentReview, {
+    critical: 0,
+    important: 0,
+    adversarialMatrix: "pass",
+  });
 });
 
 test("public contract exposes future entries without turning planned routes into links", async () => {

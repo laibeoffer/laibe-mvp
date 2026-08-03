@@ -139,15 +139,16 @@
     "unknown": "must resolve to accessUnavailable with ZERO_CASE_DATA and no mutation",
     "authority": "URL, hash, browser storage, and caller booleans never grant G2, G3, or G4",
     "strictContext": "only intent and optional role keys are accepted; both must be own data properties on a plain or null-prototype object",
-    "resolverSafety": "captured intrinsics, structured-clone Proxy rejection, and closed equality/switch routing; hostile reflection and prototype pollution fail closed"
+    "resolverSafety": "captured intrinsics, structured-clone Proxy rejection, scalar reads from a frozen null-prototype parsed record, and closed equality/switch routing; hostile reflection, prototype pollution, and shared Array iterators fail closed"
   },
   "readOnlyOutcomes": [
     { "code": "PCM_EXITED_READ_ONLY", "workspaceByRole": { "owner": "ownerWorkspace", "vendor": "vendorWorkspace" }, "authorityGate": "G2_AUTH_RUNTIME", "unknownRoleRoute": "accessUnavailable", "unknownRolePayloadPolicy": "ZERO_CASE_DATA", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] },
     { "code": "CASE_CLOSED_READ_ONLY", "workspaceByRole": { "owner": "ownerWorkspace", "vendor": "vendorWorkspace" }, "authorityGate": "G2_AUTH_RUNTIME", "unknownRoleRoute": "accessUnavailable", "unknownRolePayloadPolicy": "ZERO_CASE_DATA", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] }
   ],
   "t0": {
-    "status": "superseded_by_focused_admission_correction",
-    "commit": "9e268212f5b3050a1770f7e559508521f4cff4ec",
+    "status": "superseded_by_array_iterator_evidence_correction",
+    "commit": "403e4f7b84b3e5ee999db583bd23b65732e369d4",
+    "parent": "2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7",
     "admission": "CHANGES_REQUIRED",
     "writeSet": [
       "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
@@ -182,13 +183,6 @@
       "includesHostileInputRecovery": true
     },
     "currentTrainRegression": {
-      "command": "node --test tests/pcm-public-home.test.mjs tests/pcm-missing-flow-pages.test.mjs tests/pcm-service-contract.test.mjs",
-      "tests": 46,
-      "passed": 46,
-      "failed": 0,
-      "exitCode": 0
-    },
-    "currentTrainRegression": {
       "tests": 65,
       "passed": 65,
       "failed": 0,
@@ -218,34 +212,6 @@
       "important": 0,
       "adversarialMatrix": "pass"
     },
-    "fullSuiteTruth": {
-      "tests": 124,
-      "passed": 123,
-      "failed": 1,
-      "exitCode": 1,
-      "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen cumulative-path admission assertion"
-    },
-    "staticGates": {
-      "strictUtf8": "6/6",
-      "json": "valid",
-      "activeAndCompatibilityLocal404": 0,
-      "plannedClickable": 0,
-      "visibleOrUnexpectedForbiddenTerms": 0,
-      "rawForbiddenEnumerationOnly": 5,
-      "diffPaths": 6,
-      "outsideWriteSet": 0,
-      "gitDiffCheck": "clean"
-    },
-    "independentReview": {
-      "specCritical": 0,
-      "specImportant": 0,
-      "qualityCritical": 0,
-      "qualityImportant": 0,
-      "fixedBeforeCommit": [
-        "hostile reflection input now fails closed",
-        "owner and vendor original workspace scope is explicit"
-      ]
-    },
     "historicalCandidateSpecificTest": {
       "test": "tests/pcm-governance-pages.test.mjs",
       "classification": "frozen A3 admission cumulative-path assertion",
@@ -253,7 +219,9 @@
     }
   },
   "t0FocusedAdmissionCorrection": {
-    "status": "candidate_pending_a0_admission",
+    "status": "superseded_by_array_iterator_evidence_correction",
+    "commit": "403e4f7b84b3e5ee999db583bd23b65732e369d4",
+    "admission": "CHANGES_REQUIRED",
     "parent": "2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7",
     "writeSet": [
       "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
@@ -288,6 +256,82 @@
       "owner and vendor read-only outcomes never cross-map",
       "post-load Object and Set intrinsic pollution cannot select authority",
       "overdue supplement recovery is read-only and mutationAllowed remains false",
+      "G2, G3, and G4 remain closed"
+    ]
+  },
+  "t0ArrayIteratorEvidenceCorrection": {
+    "status": "candidate_pending_a0_admission",
+    "parent": "403e4f7b84b3e5ee999db583bd23b65732e369d4",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md"
+    ],
+    "t2Hold": {
+      "status": "byte_identical_external_hold",
+      "path": "C:\\CodexWork\\08-Jacky\\qa_temp\\a0-owner-first-t2-hold-20260803",
+      "restoreAuthority": "after A0 focused admission only"
+    },
+    "red": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 14,
+      "passed": 11,
+      "failed": 3,
+      "exitCode": 1
+    },
+    "targetedGreen": {
+      "arrayIterator": "1/1",
+      "governanceEvidence": "2/2"
+    },
+    "green": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 14,
+      "passed": 14,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "freshVerification": {
+      "currentTrain": {
+        "tests": 68,
+        "passed": 68,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "fullSuite": {
+        "files": 9,
+        "tests": 137,
+        "passed": 136,
+        "failed": 1,
+        "exitCode": 1,
+        "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
+      }
+    },
+    "staticGates": {
+      "javascriptSyntax": "valid",
+      "strictUtf8": "5/5",
+      "json": "valid",
+      "rawDuplicateKeyGuard": "pass",
+      "exactPaths": 5,
+      "outsideWriteSet": 0,
+      "routeManifest": "frozen",
+      "forbiddenProductTerms": 0,
+      "deprecatedReadOnlyState": 0,
+      "gitDiffCheck": "clean",
+      "t2HoldReceipts": "6/6"
+    },
+    "independentReview": {
+      "critical": 0,
+      "important": 0,
+      "adversarialMatrix": "pass"
+    },
+    "invariants": [
+      "parsed intent and role never travel through an Array or shared iterator",
+      "unknown intent remains accessUnavailable with ZERO_CASE_DATA under Array iterator pollution",
+      "owner and vendor read-only routes do not cross-map under Array iterator pollution",
+      "raw governance JSON has no duplicate object keys",
+      "t0 canonical evidence remains current-train 65/65 and full-suite 133/134 with only the frozen A3 assertion",
       "G2, G3, and G4 remain closed"
     ]
   },

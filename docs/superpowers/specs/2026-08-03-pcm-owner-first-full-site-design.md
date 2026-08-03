@@ -10,8 +10,9 @@
 - Intermediate commit `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION` and is not admissible.
 - First correction `9e268212f5b3050a1770f7e559508521f4cff4ec` received `CHANGES_REQUIRED` and is not admitted as the final T0 contract.
 - Shared-system commit `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` is the exact parent of the focused admission correction.
-- T2 homepage work is byte-identically held outside the repository until this correction receives A0 focused admission.
-- The current review target is the bounded exact-six correction commit that contains this specification and has `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` as its parent.
+- Focused admission commit `403e4f7b84b3e5ee999db583bd23b65732e369d4` received `CHANGES_REQUIRED` because internal parsed context still depended on the shared Array iterator and the governance JSON contained duplicate evidence keys.
+- T2 homepage work is byte-identically held outside the repository until the Array-iterator/evidence correction receives A0 focused admission.
+- The current review target is the bounded exact-five correction commit that contains this specification and has `403e4f7b84b3e5ee999db583bd23b65732e369d4` as its parent.
 - This train owns G1 source only. G2 identity/role, G3 durable records, and G4 production remain closed.
 
 ## Product outcome
@@ -102,6 +103,7 @@ The required matrix covers invitation declined/expired/withdrawn/resend, missing
 - URL fragments, query values, browser storage, and caller booleans never grant G2, G3, or G4.
 - Continuation context accepts only own data `intent` and optional own data `role` keys on a plain or null-prototype input. Captured structured cloning rejects Proxy input before routing; accessors, inherited values, extra caller assertions, hostile proxies, and revoked proxies fail closed.
 - Authority decisions use closed equality/switch branches and module-load captured reflection primitives. Post-load `Object` or `Set` prototype pollution cannot select a protected route or escape the resolver.
+- Parsed intent and role travel only through a frozen null-prototype own-data record and are read as scalar fields. No Array, destructuring, iterator, or other shared iterable can rewrite the internal authority decision.
 
 ## Shared first-screen facts
 

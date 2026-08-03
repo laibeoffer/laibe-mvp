@@ -4,6 +4,7 @@ import {
 } from "./pcm-flow-route-manifest.js";
 
 const safeArrayIsArray = Array.isArray;
+const safeCreate = Object.create;
 const safeFreeze = Object.freeze;
 const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const safeGetPrototypeOf = Object.getPrototypeOf;
@@ -92,7 +93,10 @@ function readStrictContext(input) {
       return null;
     }
     safeStructuredClone(input);
-    return [intent, role];
+    const strictContext = safeCreate(null);
+    strictContext.intent = intent;
+    strictContext.role = role;
+    return safeFreeze(strictContext);
   } catch {
     return null;
   }
@@ -194,7 +198,8 @@ export function resolvePcmFlowContinuation(context) {
     if (!strictContext) {
       return recoveryResult();
     }
-    const [intent, role] = strictContext;
+    const intent = strictContext.intent;
+    const role = strictContext.role;
 
     if (intent === "PCM_EXITED_READ_ONLY" || intent === "CASE_CLOSED_READ_ONLY") {
       return readOnlyResult(role);

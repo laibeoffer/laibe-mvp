@@ -14,6 +14,7 @@
 - `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION` and is not admissible.
 - `9e268212f5b3050a1770f7e559508521f4cff4ec` is the first T0 correction, received `CHANGES_REQUIRED`, and is not the final admitted T0 contract.
 - `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` is the exact parent for the focused admission correction. T2 remains byte-identically held outside the repository until A0 admits that correction.
+- `403e4f7b84b3e5ee999db583bd23b65732e369d4` is the focused admission commit, received `CHANGES_REQUIRED`, and is the exact parent for the Array-iterator/evidence correction.
 - Execute T0–T18 serially with one writer. Record the exact package write set before changing product source.
 - G1 source is active. G2 identity/role, G3 durable data, and G4 production remain closed.
 - Do not modify `apps/**`, `packages/**`, `supabase/**`, `src/lib/contracts/**`, root package/lock/config, or A1/R0/A9/A14-owned source.
@@ -87,6 +88,18 @@
 - [x] Static gates: strict UTF-8 6/6, JSON valid, 22 local route references and 3 fragments resolved, planned clickable routes 0, forbidden product terms 0, deprecated read-only state 0, and `git diff --check` clean.
 - [x] Independent adversarial review = Critical 0 / Important 0.
 - [x] Keep T2 held and stop for A0 focused admission after creating one exact-six correction commit with parent `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7`; do not restore or continue T2 before that verdict.
+
+#### Array-iterator and evidence correction
+
+- [x] Keep the T2 hold untouched and restore no page source.
+- [x] Add actual RED against `403e4f7b84b3e5ee999db583bd23b65732e369d4`: focused 14 tests, 11 pass, 3 fail, exit 1. Failures reproduced Array-iterator route rewriting, raw duplicate JSON keys, and the stale 123/124 evidence value.
+- [x] Replace the parsed-context Array with a frozen null-prototype own-data record and read intent/role as direct scalar fields. Targeted Array-iterator GREEN = 1/1.
+- [x] Add a raw structural duplicate-key guard and merge `t0.currentTrainRegression`, `t0.fullSuiteTruth`, `t0.staticGates`, and `t0.independentReview` to one key each. Targeted governance GREEN = 2/2.
+- [x] Focused GREEN = 14/14.
+- [x] Fresh current-train suite = 68/68. Fresh full repository truth = 136/137; the only failure remains the unchanged frozen A3 cumulative-path admission assertion.
+- [x] Static gates: Node syntax valid, strict UTF-8 5/5, JSON valid, raw duplicate-key guard pass, exact-five outside 0, route manifest frozen, forbidden/deprecated terms 0, `git diff --check` clean, and T2 hold 6/6.
+- [x] Independent adversarial review = Critical 0 / Important 0.
+- [x] Create one bounded exact-five commit with parent `403e4f7b84b3e5ee999db583bd23b65732e369d4`, keep T2 held, and stop for A0 focused admission.
 
 ---
 
