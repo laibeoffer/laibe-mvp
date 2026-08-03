@@ -101,6 +101,14 @@ The required matrix covers invitation declined/expired/withdrawn/resend, missing
 
 Operational pages show role, PCM contract state, case state, next responsible actor/action, and latest record. Loading, empty, failure, and recovery copy uses Traditional Chinese product language. The interface does not expose implementation vocabulary, raw data, stack traces, fabricated cases, payment custody/collection, investment claims, or claims that AI makes the final decision.
 
+### T1 shared G1 contract
+
+- `owner-first-tokens.css` defines the restrained near-black surfaces, orange-red primary action, cyan viewing action, typography, spacing, focus, and 44px control floor without claiming a page has adopted them.
+- `owner-first-shell.css` provides one five-fact information spine, state copy layout, primary/secondary controls, 1280/768/390-safe sizing, clear keyboard focus, and reduced-motion behavior. It does not create a card wall or a second navigation system.
+- `owner-first-state.js` exposes only frozen product-language state descriptions. Missing, malformed, inherited, hostile, URL-derived, or caller-asserted context resolves to `CONTEXT_UNAVAILABLE` with `ZERO_CASE_DATA` and no actions.
+- The closed set is `CONTEXT_UNAVAILABLE`, `AUTH_REQUIRED`, `ACCESS_DENIED`, `PREREQUISITES_PENDING`, `SERVICE_PREPARING`, `PCM_EXITED_READ_ONLY`, and `CASE_CLOSED_READ_ONLY`.
+- The two approved read-only outcomes preserve only previously authorized existing content in the original owner or vendor workspace. They never create a separate archive workspace and never enable mutation.
+
 ## Visual and interaction system
 
 - Near-black restrained surfaces, the real LaiBE logo, orange-red primary action, and cyan secondary viewing action.

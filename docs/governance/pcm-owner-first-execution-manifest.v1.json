@@ -45,6 +45,74 @@
     "historicalBytes": "UNKNOWN",
     "historicalSha256": "UNKNOWN"
   },
+  "t1": {
+    "status": "complete_in_bounded_commit",
+    "parent": "9e268212f5b3050a1770f7e559508521f4cff4ec",
+    "parentTree": "bdfd5bf44cf1e1ec032fcde1132d9275e8855a77",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-shell.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-state.js",
+      "tests/pcm-owner-first-shared-system.test.mjs",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "outsideWriteSet": 0,
+    "red": {
+      "command": "node --test tests/pcm-owner-first-shared-system.test.mjs",
+      "tests": 8,
+      "passed": 0,
+      "failed": 8,
+      "exitCode": 1,
+      "reason": "the three approved shared assets did not exist"
+    },
+    "green": {
+      "command": "node --test tests/pcm-owner-first-shared-system.test.mjs",
+      "tests": 8,
+      "passed": 8,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "currentTrainRegression": {
+      "tests": 63,
+      "passed": 63,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "fullSuiteTruth": {
+      "tests": 132,
+      "passed": 131,
+      "failed": 1,
+      "exitCode": 1,
+      "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen cumulative-path admission assertion"
+    },
+    "staticGates": {
+      "strictUtf8": "7/7",
+      "json": "valid",
+      "javascriptSyntax": "valid",
+      "cssBraces": "valid",
+      "externalCssUrls": 0,
+      "forbiddenProductTerms": 0,
+      "deprecatedStandaloneArchiveState": 0,
+      "outsideWriteSet": 0,
+      "gitDiffCheck": "clean"
+    },
+    "ignoredExactPath": {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css",
+      "rule": ".gitignore:45:*token*",
+      "stagingPolicy": "exact-path forced add only"
+    },
+    "independentReview": {
+      "specCritical": 0,
+      "specImportant": 0,
+      "qualityCritical": 0,
+      "qualityImportant": 0,
+      "fixedBeforeCommit": [
+        "prototype-name state lookup now fails closed"
+      ]
+    }
+  },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
     { "id": "G2_AUTH_RUNTIME", "owner": "A6", "status": "closed", "scope": "identity/membership/role/contract runtime" },

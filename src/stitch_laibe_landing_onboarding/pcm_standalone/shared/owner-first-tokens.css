@@ -1,0 +1,38 @@
+:root {
+  color-scheme: dark;
+  --owner-first-bg: #030507;
+  --owner-first-bg-deep: #010203;
+  --owner-first-surface: rgba(12, 16, 19, 0.78);
+  --owner-first-surface-strong: rgba(16, 21, 25, 0.94);
+  --owner-first-surface-soft: rgba(255, 255, 255, 0.045);
+  --owner-first-line: rgba(255, 255, 255, 0.12);
+  --owner-first-line-soft: rgba(255, 255, 255, 0.075);
+  --owner-first-text: #f6f8f9;
+  --owner-first-muted: #aeb8be;
+  --owner-first-subtle: #7f8b92;
+  --owner-first-primary-start: #ffb145;
+  --owner-first-primary-mid: #ff711f;
+  --owner-first-primary-end: #ff4925;
+  --owner-first-primary: linear-gradient(
+    135deg,
+    var(--owner-first-primary-start),
+    var(--owner-first-primary-mid) 46%,
+    var(--owner-first-primary-end)
+  );
+  --owner-first-secondary: rgba(101, 216, 255, 0.1);
+  --owner-first-secondary-text: #bdf1ff;
+  --owner-first-secondary-line: rgba(101, 216, 255, 0.28);
+  --owner-first-danger: #ff8f7b;
+  --owner-first-warning: #ffd27a;
+  --owner-first-success: #9de4bd;
+  --owner-first-focus: #8fe8ff;
+  --owner-first-control-min: 44px;
+  --owner-first-content-max: 1160px;
+  --owner-first-radius-sm: 10px;
+  --owner-first-radius-md: 16px;
+  --owner-first-radius-pill: 999px;
+  --owner-first-shadow-soft: 0 18px 56px rgba(0, 0, 0, 0.34);
+  --owner-first-shadow-action: 0 14px 34px rgba(255, 92, 34, 0.2);
+  --owner-first-transition: 180ms ease;
+  --owner-first-font: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}

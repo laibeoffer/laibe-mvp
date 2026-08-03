@@ -86,10 +86,18 @@
 
 **Produces:** LaiBE dark tokens, orange-red primary action, cyan viewing action, five-fact spine, accessible loading/empty/error/recovery shells, and closed states including `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` with zero mutation actions.
 
-- [ ] Record the exact seven paths and the corrected T0 parent.
-- [ ] Write RED for tokens, five facts, six baseline closed states, the two approved read-only outcomes, 44px controls, focus, reduced motion, and overflow safety.
-- [ ] Run RED, implement minimal GREEN, and verify focused/current-train regression tests.
-- [ ] Review Critical/Important findings to zero and commit `feat(pcm): add owner-first shared interface system`.
+- [x] Record the exact seven paths and corrected T0 parent `9e268212f5b3050a1770f7e559508521f4cff4ec` (tree `bdfd5bf44cf1e1ec032fcde1132d9275e8855a77`).
+- [x] Write RED for tokens, five facts, corrected closed states, the two approved read-only outcomes, 44px controls, focus, reduced motion, and overflow safety.
+
+  Actual RED: 8 tests, 0 pass, 8 fail because all three approved shared assets were absent.
+
+- [x] Run RED, implement minimal GREEN, and verify focused/current-train regression tests.
+
+  Fresh result: T1 focused 8/8 PASS; T0 plus homepage, missing-flow, and service-contract current-train suite 63/63 PASS. Full repository truth is 131/132 PASS with the same single frozen A3 cumulative-path admission assertion; no current-train product regression was added.
+
+- [x] Review Critical/Important findings to zero and commit `feat(pcm): add owner-first shared interface system`.
+
+  Review fixed prototype-name state lookup before commit. Strict UTF-8 7/7, JSON and JavaScript syntax valid, CSS braces valid, external CSS URLs 0, forbidden product-language matches 0, deprecated standalone archive state 0, and exact7 outside 0. The exact token file matches the repository's broad `*token*` ignore rule and therefore must be staged only with an exact-path forced add.
 
 ---
 
