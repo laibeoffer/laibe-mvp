@@ -113,6 +113,100 @@
       ]
     }
   },
+  "t2": {
+    "status": "verification_complete_review_clean",
+    "parent": "3b644f2fc766f071d5613d9518e0f2d92d848a0e",
+    "parentTree": "ad818d45de0486610451302fdfa5f4dc557971de",
+    "parentAdmission": "ADMITTED_G1_UI_SOURCE_ONLY",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/styles.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+      "tests/pcm-owner-first-public-home.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "outsideWriteSet": 0,
+    "outsideWriteSetScope": "current_repository_git_diff_only",
+    "recovery": {
+      "source": "C:\\CodexWork\\08-Jacky\\qa_temp\\a0-owner-first-t2-hold-20260803",
+      "classification": "authorized_historical_external_hold",
+      "currentWrite": false,
+      "authority": "CHIEF_T2_RESUME_AFTER_T0_ADMISSION_20260803",
+      "holdReceipts": "6/6",
+      "ordinaryNonReparse": true,
+      "normalizedContentEqual": "4/4",
+      "unicodeReplacementCharacters": 0,
+      "manualWriteMethod": "apply_patch_only",
+      "nodeUse": "read_only"
+    },
+    "tdd": {
+      "restoredBaseline": { "tests": 8, "passed": 8, "failed": 0, "exitCode": 0 },
+      "accountEntryRed": { "tests": 9, "passed": 8, "failed": 1, "exitCode": 1 },
+      "mobileHeaderRed": { "tests": 10, "passed": 9, "failed": 1, "exitCode": 1 },
+      "reviewRed": { "tests": 13, "passed": 9, "failed": 4, "exitCode": 1 },
+      "green": { "tests": 13, "passed": 13, "failed": 0, "exitCode": 0 }
+    },
+    "freshVerification": {
+      "homepagePair": { "tests": 35, "passed": 35, "failed": 0, "exitCode": 0 },
+      "currentTrain": { "tests": 129, "passed": 129, "failed": 0, "exitCode": 0 },
+      "fullSuite": {
+        "files": 10,
+        "tests": 150,
+        "passed": 149,
+        "failed": 1,
+        "exitCode": 1,
+        "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
+      }
+    },
+    "browserAcceptance": {
+      "url": "http://127.0.0.1:8782/src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html#top",
+      "viewports": [
+        { "width": 1280, "height": 900, "headerHeight": 86, "overflowX": 0 },
+        { "width": 768, "height": 1024, "headerHeight": 148, "overflowX": 0 },
+        { "width": 390, "height": 844, "headerHeight": 124, "overflowX": 0 }
+      ],
+      "primaryCtaInFirstViewport": "3/3",
+      "accountEntryVisible": "3/3",
+      "accountEntryTarget": "../account_service_status/code.html",
+      "accountPageCasePayload": 0,
+      "plannedClickable": 0,
+      "brokenAssets": 0,
+      "hiddenFooterTargets": 0,
+      "undersizedVisibleControls": 0,
+      "consoleWarningsOrErrors": 0,
+      "focusVisible": "pass",
+      "reducedMotion": "pass"
+    },
+    "staticGates": {
+      "strictUtf8": "5/5",
+      "json": "valid",
+      "rawDuplicateKeyGuard": "pass",
+      "localReferences": 23,
+      "missingLocalReferences": 0,
+      "forbiddenVisibleTerms": 0,
+      "plannedClickable": 0,
+      "cssBraceDepth": 0,
+      "outsideWriteSet": 0,
+      "gitDiffCheck": "clean"
+    },
+    "independentReview": {
+      "status": "complete",
+      "firstPass": { "critical": 0, "important": 4 },
+      "finalPass": { "critical": 0, "important": 0 },
+      "corrections": [
+        "footer links now target visible owner-first sections",
+        "route binding accepts only own-data validated local href values",
+        "visible fee copy uses product language",
+        "repo exact-five writes are distinguished from the authorized historical external hold"
+      ]
+    },
+    "gates": {
+      "G1_UI_SOURCE": "active",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed"
+    }
+  },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
     { "id": "G2_AUTH_RUNTIME", "owner": "A6", "status": "closed", "scope": "identity/membership/role/contract runtime" },

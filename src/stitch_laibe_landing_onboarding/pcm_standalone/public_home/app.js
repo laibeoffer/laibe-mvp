@@ -5,12 +5,55 @@ import {
   resolveA14LinePresentation,
 } from "../integrations/a14-line-contract.js";
 
+const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const SAFE_LOCAL_ROUTE_HREF =
+  /^(?:#[A-Za-z][A-Za-z0-9_-]*|(?:(?:\.{1,2})\/)+(?:[A-Za-z0-9_-]+\/)*[A-Za-z0-9_-]+\.html(?:#[A-Za-z][A-Za-z0-9_-]*)?)$/;
+
+function getSafeLocalRouteHref(routes, routeName) {
+  try {
+    if (
+      routes === null ||
+      (typeof routes !== "object" && typeof routes !== "function") ||
+      typeof routeName !== "string"
+    ) {
+      return null;
+    }
+
+    const routeDescriptor = getOwnPropertyDescriptor(routes, routeName);
+    if (!routeDescriptor) return null;
+
+    const valueDescriptor = getOwnPropertyDescriptor(routeDescriptor, "value");
+    const href = valueDescriptor?.value;
+    if (
+      typeof href !== "string" ||
+      href.trim() !== href ||
+      !SAFE_LOCAL_ROUTE_HREF.test(href)
+    ) {
+      return null;
+    }
+
+    return href;
+  } catch {
+    return null;
+  }
+}
+
 export function bindPublicRoutes(root, routes = PUBLIC_ROUTES) {
   root.querySelectorAll("[data-route]").forEach((element) => {
     const routeName = element.dataset.route;
-    if (routes[routeName]) {
-      element.setAttribute("href", routes[routeName]);
+    const href = getSafeLocalRouteHref(routes, routeName);
+    if (href) {
+      element.setAttribute("href", href);
+      element.removeAttribute("aria-disabled");
+      element.removeAttribute("tabindex");
+      element.dataset.routeState = "active";
+      return;
     }
+
+    element.removeAttribute("href");
+    element.setAttribute("aria-disabled", "true");
+    element.setAttribute("tabindex", "-1");
+    element.dataset.routeState = "planned";
   });
 }
 

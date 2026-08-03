@@ -13,6 +13,7 @@
       type="image/svg+xml"
       href="../../../../assets/logo/laibe_offer.svg"
     />
+    <link rel="stylesheet" href="../shared/owner-first-shell.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -25,6 +26,12 @@
         />
         <span>AI PCM</span>
       </a>
+      <a
+        class="header-account-entry"
+        data-account-entry
+        data-canonical-route="/account/access"
+        href="../account_service_status/code.html"
+      >註冊／登入</a>
       <nav aria-label="主選單">
         <a href="#case-flow">完整流程</a>
         <a href="#service-fee">費用方式</a>
@@ -68,7 +75,52 @@
           </p>
         </div>
 
-        <div class="same-fact-rail" aria-label="甲方從文件到里程碑治理的六階段流程">
+        <div class="entry-choices" aria-labelledby="entry-choice-title">
+          <div class="entry-choices__heading">
+            <span>依你現在手上的文件開始</span>
+            <strong id="entry-choice-title">三個入口會依序開放，目前先看清楚用途</strong>
+          </div>
+          <div class="entry-choices__list">
+            <a
+              class="entry-choice"
+              data-route="quoteCheck"
+              data-route-state="planned"
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              <span>01</span>
+              <strong>查看報價健檢</strong>
+              <small>核對報價範圍、缺漏與版本差異</small>
+              <em>正在整理中</em>
+            </a>
+            <a
+              class="entry-choice"
+              data-route="drawingCheck"
+              data-route-state="planned"
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              <span>02</span>
+              <strong>查看圖說檢討</strong>
+              <small>確認圖面可讀性、範圍與待補資料</small>
+              <em>正在整理中</em>
+            </a>
+            <a
+              class="entry-choice"
+              data-route="accountAccess"
+              data-route-state="planned"
+              aria-disabled="true"
+              tabindex="-1"
+            >
+              <span>03</span>
+              <strong>註冊／登入</strong>
+              <small>甲乙方共用入口，身分確認後再進案件</small>
+              <em>正在整理中</em>
+            </a>
+          </div>
+        </div>
+
+        <div class="same-fact-rail" hidden aria-label="甲方從文件到里程碑治理的六階段流程">
           <div class="rail-heading">
             <span>PCM 獨立上線流程</span>
             <strong>先看懂文件，再決定是否進入三方治理</strong>
@@ -120,6 +172,21 @@
         </div>
       </section>
 
+      <section id="application-check" class="section application-check" aria-labelledby="application-check-title">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">申請前確認</p>
+            <h2 id="application-check-title">先看你現在是否適合開始</h2>
+          </div>
+          <p>三項都符合，就能先整理文件與檢討方向；尚未備齊也不用猜，先回原提供者取得正確版本。</p>
+        </div>
+        <ul class="qualification-list">
+          <li data-qualification-item><span>01</span><strong>已取得乙方報價單 PDF</strong><p>需能看出項目、數量、單價或計價方式與版本。</p></li>
+          <li data-qualification-item><span>02</span><strong>已取得施工圖 PDF，至少包含平面圖</strong><p>圖面需可讀，並能與報價所述施工範圍互相核對。</p></li>
+          <li data-qualification-item><span>03</span><strong>希望先確認文件差異、缺漏與待釐清事項</strong><p>PCM 先整理問題，最後決定仍由甲方作成。</p></li>
+        </ul>
+      </section>
+
       <section id="pcm-scope" class="section section--scope" aria-labelledby="scope-title">
         <div class="section-heading section-heading--split">
           <div>
@@ -133,6 +200,13 @@
             結果僅限書面可查核資料，不構成現場施工品質保證。
           </p>
         </div>
+        <ul class="pcm-check-list" aria-label="PCM 替甲方核對的五項內容">
+          <li data-pcm-check><span>01</span><strong>報價與圖說是否使用同一施工範圍</strong></li>
+          <li data-pcm-check><span>02</span><strong>是否有漏列、重複或說法不一致</strong></li>
+          <li data-pcm-check><span>03</span><strong>追加或變更前，哪些事項應先確認</strong></li>
+          <li data-pcm-check><span>04</span><strong>驗收及付款前，哪些文件與紀錄仍不完整</strong></li>
+          <li data-pcm-check><span>05</span><strong>哪些問題應由甲方、乙方或 PCM 接續處理</strong></li>
+        </ul>
         <ul class="output-list" aria-label="基本檢討內容">
           <li>
             <span class="output-list__number" aria-hidden="true">1</span>
@@ -196,6 +270,25 @@
         </div>
       </section>
 
+      <section id="result-example" class="section result-example" aria-labelledby="result-example-title">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">基本檢討結果示意</p>
+            <h2 id="result-example-title">先把判斷需要的事實放在同一頁</h2>
+          </div>
+          <p class="preview-disclosure">格式示意，非真實案件；不代表完成能力、個案結果或效果保證。</p>
+        </div>
+        <dl class="result-facts">
+          <div><dt>引用版本</dt><dd>列出本次引用的報價與圖面名稱、版次；文件提交後才顯示。</dd></div>
+          <div><dt>已確認內容</dt><dd>只列書面資料足以支持的核對結果，不代替現場專業判斷。</dd></div>
+          <div><dt>差異與缺漏</dt><dd>逐項連回來源文件，說明不一致或尚缺的內容。</dd></div>
+          <div><dt>仍不確定事項</dt><dd>清楚標示目前資料無法回答、需要誰補充。</dd></div>
+          <div><dt>建議下一步</dt><dd>依影響順序整理先補件、先確認或暫停的事項。</dd></div>
+          <div><dt>下一責任人</dt><dd>標示由甲方、乙方或 PCM 接續處理，不讓問題停在半路。</dd></div>
+          <div><dt>案件紀錄</dt><dd>保留文件依據、確認內容、責任人與後續狀態。</dd></div>
+        </dl>
+      </section>
+
       <section id="case-flow" class="section" aria-labelledby="flow-title">
         <div class="section-heading">
           <p class="eyebrow">完整流程</p>
@@ -204,7 +297,13 @@
             每一步都顯示目前狀態、下一責任人與留下的紀錄；沒有完成前一步，不會跳過權限與版本確認。
           </p>
         </div>
-        <ol class="flow-list">
+        <ol class="home-flow" aria-label="PCM 首頁四階段流程">
+          <li data-home-stage="1"><span>01</span><strong>準備報價與圖說</strong><p>先確認兩份 PDF 可讀、版本清楚，施工圖至少包含平面圖。</p></li>
+          <li data-home-stage="2"><span>02</span><strong>取得基本檢討結果</strong><p>查看引用版本、已確認內容、差異缺漏、下一步與責任人。</p></li>
+          <li data-home-stage="3"><span>03</span><strong>決定是否申請正式 PCM 服務</strong><p>先看懂結果，再由甲方決定是否進入正式服務與契約流程。</p></li>
+          <li data-home-stage="4"><span>04</span><strong>進入案件治理與紀錄</strong><p>甲乙方與 PCM 回到同一份文件、決定、責任與案件留痕。</p></li>
+        </ol>
+        <ol class="flow-list" hidden>
           <li><span>1</span><strong>甲方註冊</strong><p>建立甲方身分與自己的案件入口。</p><p data-flow-actor>留下：甲方身分與案件建立時間｜下一位：甲方</p></li>
           <li><span>2</span><strong>上傳必備文件</strong><p>提供乙方報價單 PDF 與施工圖 PDF（至少平面圖）。</p><p data-flow-actor>留下：文件名稱、版次、提供者與上傳時間｜下一位：萊比</p></li>
           <li><span>3</span><strong>取得基本檢討</strong><p>查閱引用版本、差異、缺件與下一步建議。</p><p data-flow-actor>留下：報告版本、引用文件與待確認事項｜下一位：甲方</p></li>
@@ -216,6 +315,7 @@
 
       <section
         id="workspace-preview"
+        hidden
         class="section section--workspace"
         aria-labelledby="preview-title"
       >
@@ -255,7 +355,7 @@
         </div>
       </section>
 
-      <section id="role-entry" class="section" aria-labelledby="role-title">
+      <section id="role-entry" hidden class="section" aria-labelledby="role-title">
         <div class="section-heading section-heading--split">
           <div>
             <p class="eyebrow">主要服務對象</p>
@@ -298,6 +398,7 @@
         <div class="identity-heading">
           <p class="eyebrow">費用方式</p>
           <h2 id="fee-title">PCM 收自己的服務費，不碰甲乙方工程款</h2>
+          <p>費用以正式 PCM 服務契約所載版本為準；首頁只說明計算基礎與服務邊界，不展開長篇條款。</p>
         </div>
         <div class="identity-details">
           <div>
@@ -320,10 +421,18 @@
             </p>
           </div>
         </div>
+        <div id="milestone-governance" class="service-boundaries" aria-label="PCM 服務邊界">
+          <p><strong>PCM 提供：</strong>文件審查、決策整理與案件治理協助。</p>
+          <p><strong>工程款：</strong>PCM 不保管工程款，不提供金流託管、代收<span class="copy-join"></span>代付或付款<span class="copy-join"></span>保障。</p>
+          <p><strong>最後決定：</strong>PCM 協助核對與整理，不取代甲方作最後決定。</p>
+          <p><strong>專業責任：</strong>PCM 不取代設計師、統包或施工單位履行專業責任。</p>
+          <p><strong>正式依據：</strong>正式權利義務以服務契約為準。</p>
+        </div>
       </section>
 
       <section
-        id="milestone-governance"
+        id="legacy-milestone-governance"
+        hidden
         class="section section--governance"
         aria-labelledby="governance-title"
       >
@@ -368,6 +477,7 @@
 
       <section
         id="service-identity"
+        hidden
         class="section section--identity"
         aria-labelledby="identity-title"
       >
@@ -414,11 +524,12 @@
       </section>
 
       <section
-        id="service-boundary"
-        class="section section--boundary"
-        aria-labelledby="boundary-title"
+        id="final-action"
+        class="section section--boundary section--final-action"
+        aria-labelledby="final-action-title"
       >
-        <div class="boundary-copy">
+        <span id="service-boundary" hidden></span>
+        <div class="boundary-copy" hidden>
           <p class="eyebrow">48 小時補正與服務終止</p>
           <h2 id="boundary-title">只有無合理回應的最後補正到期，PCM 才停止介入</h2>
           <p>
@@ -438,15 +549,21 @@
           </p>
         </div>
         <div class="final-action">
-          <span>下一步由甲方：先查看申請條件並備妥兩份 PDF</span>
-          <a
-            class="button button--primary"
-            data-kind="primary"
-            data-route="startCase"
-            href="../owner_start/code.html"
-          >
-            查看申請與文件準備
-          </a>
+          <div>
+            <span>下一步由甲方</span>
+            <h2 id="final-action-title">先確認文件是否備齊，再決定要不要進入 PCM 服務</h2>
+          </div>
+          <div class="final-action__controls">
+            <a
+              class="button button--primary"
+              data-kind="primary"
+              data-route="startCase"
+              href="../owner_start/code.html"
+            >
+              查看申請與文件準備
+            </a>
+            <a class="button button--quiet" href="../service_contract/code.html">閱讀 PCM 服務契約</a>
+          </div>
         </div>
       </section>
     </main>
@@ -457,8 +574,8 @@
       </a>
       <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
       <div class="footer-links">
-        <a href="#service-identity">簽約與訊息</a>
-        <a href="#service-boundary">終止與資料權限</a>
+        <a href="#case-flow">服務流程</a>
+        <a href="#service-fee">費用與服務邊界</a>
         <a href="#top">回到頁首</a>
       </div>
     </footer>
