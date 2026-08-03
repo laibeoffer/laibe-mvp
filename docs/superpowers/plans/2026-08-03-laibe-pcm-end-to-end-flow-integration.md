@@ -197,6 +197,22 @@
 - [x] Keep the product language evidence-limited. Invalid metadata says the browser did not provide a confirmable PDF label and that content format remains unverified; it never classifies the file bytes. Exact nonblank name plus `application/pdf` remains pending, while suffix-only and post-load string intrinsic pollution stay closed.
 - [x] Record exact-five receipts, three-viewport browser evidence, and independent Critical 0 / Important 0 review. The commit gate requires a fresh focused 18/18 and current train 56/56; full-suite truth remains 170/171 with only the frozen A3 assertion. T4 and G2–G4 remain closed.
 
+**Actual bounded own-data boundary correction write set (parent `3b856f9ebd82daf1991ab436c959aca8e634eba2`):**
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js`
+- `tests/pcm-owner-first-quote-check.test.mjs`
+- `tests/pcm-governance-pages.test.mjs`
+- `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+- `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
+- `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
+
+- [x] Preserve the actual 170/171 baseline RED. The sole failure came from an open-ended historical A3 diff reading the descendant integration HEAD rather than its immutable historical candidate.
+- [x] Reproduce inherited-authority RED: focused 21 tests, 17 passed, 4 failed. A shared Array slot, inherited file metadata, inherited length, and stale receipts exposed the boundary.
+- [x] Apply captured WebIDL brand checks for the input, `FileList`, and `File`; require an own file-list slot corroborated by native `item()`, reject own metadata shadows and plain-object identity, and continue to accept genuine branded subclasses. A second hostile review produced a 23-test brand-identity RED before the product assertions reached 23/23.
+- [x] Bound the historical test to immutable candidate `3f6bddea936bdebd36846a239bc5d13c37e1d331`: immediate `ae4f575a3062a48c6f08cc708738e14518f4df72..3f6bdde` and cumulative `0b0037ff50a4dc5b1756fe3230588f12a01c5337..3f6bdde`. Historical receipts now come from that immutable Git object, never current descendant bytes.
+- [x] Add the exact-six evidence gate. Its actual RED is 25 tests, 23 passed, 2 failed: stale current receipts and the absent correction record. The final gate requires focused 25/25, current train 63/63, and full PCM 178/178.
+- [x] Inspect 1280 by 900, 768 by 1024, 390 by 844, and 640 by 450. The introduction, consent, selection, invalid-file failure, recovery, and closed result structure remain usable; horizontal overflow, controls below 44px, planned clickable controls, broken assets, and console warning/error are 0. Keyboard focus is visible on the skip control. The loopback preview was stopped with listener count 0.
+- [x] Record final exact-six receipts, obtain independent Critical 0 / Important 0 review, create the bounded correction commit, and stop for A0 focused admission. T4 and G2-G4 remain closed.
+
 ---
 
 ### Task T4: Single-page drawing check

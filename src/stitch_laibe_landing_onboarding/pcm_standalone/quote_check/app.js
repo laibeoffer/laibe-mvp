@@ -1,5 +1,7 @@
 const safeArrayIsArray = Array.isArray;
+const safeApply = Reflect.apply;
 const safeCreate = Object.create;
+const safeDefineProperty = Object.defineProperty;
 const safeFreeze = Object.freeze;
 const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const safeGetPrototypeOf = Object.getPrototypeOf;
@@ -10,10 +12,100 @@ const safeStructuredClone =
     : null;
 const ordinaryObjectPrototype = Object.prototype;
 const NO_ACTIONS = safeFreeze([]);
+const SAFE_EMPTY_ARGUMENTS = safeCreate(null);
+safeDefineProperty(SAFE_EMPTY_ARGUMENTS, "length", {
+  configurable: false,
+  enumerable: false,
+  value: 0,
+  writable: false,
+});
+safeFreeze(SAFE_EMPTY_ARGUMENTS);
+const SAFE_FILE_INDEX_ARGUMENTS = safeCreate(null);
+safeDefineProperty(SAFE_FILE_INDEX_ARGUMENTS, "0", {
+  configurable: false,
+  enumerable: true,
+  value: 0,
+  writable: false,
+});
+safeDefineProperty(SAFE_FILE_INDEX_ARGUMENTS, "length", {
+  configurable: false,
+  enumerable: false,
+  value: 1,
+  writable: false,
+});
+safeFreeze(SAFE_FILE_INDEX_ARGUMENTS);
 const nonWhitespaceFileNamePattern = /\S/u;
 const safeHasNonWhitespaceFileName = RegExp.prototype.test.bind(
   nonWhitespaceFileNamePattern,
 );
+
+function readOwnDataValue(input, property) {
+  if (
+    input === null ||
+    input === undefined ||
+    (typeof input !== "object" && typeof input !== "function")
+  ) {
+    return null;
+  }
+  const descriptor = safeGetOwnPropertyDescriptor(input, property);
+  if (!descriptor) return null;
+  const valueDescriptor = safeGetOwnPropertyDescriptor(descriptor, "value");
+  return valueDescriptor || null;
+}
+
+function readOwnGlobalFunction(name) {
+  const valueDescriptor = readOwnDataValue(globalThis, name);
+  return valueDescriptor && typeof valueDescriptor.value === "function"
+    ? valueDescriptor.value
+    : null;
+}
+
+function readConstructorPrototype(constructor) {
+  if (!constructor) return null;
+  const valueDescriptor = readOwnDataValue(constructor, "prototype");
+  return valueDescriptor && valueDescriptor.value
+    ? valueDescriptor.value
+    : null;
+}
+
+function readOwnGetter(prototype, property) {
+  if (!prototype) return null;
+  const descriptor = safeGetOwnPropertyDescriptor(prototype, property);
+  if (!descriptor) return null;
+  const getterDescriptor = safeGetOwnPropertyDescriptor(descriptor, "get");
+  return getterDescriptor && typeof getterDescriptor.value === "function"
+    ? getterDescriptor.value
+    : null;
+}
+
+const trustedFileListPrototype = readConstructorPrototype(
+  readOwnGlobalFunction("FileList"),
+);
+const trustedFilePrototype = readConstructorPrototype(
+  readOwnGlobalFunction("File"),
+);
+const trustedBlobPrototype = readConstructorPrototype(
+  readOwnGlobalFunction("Blob"),
+);
+const trustedInputPrototype = readConstructorPrototype(
+  readOwnGlobalFunction("HTMLInputElement"),
+);
+const trustedFileListLengthGetter = readOwnGetter(
+  trustedFileListPrototype,
+  "length",
+);
+const trustedFileListItemDescriptor = readOwnDataValue(
+  trustedFileListPrototype,
+  "item",
+);
+const trustedFileListItem =
+  trustedFileListItemDescriptor &&
+  typeof trustedFileListItemDescriptor.value === "function"
+    ? trustedFileListItemDescriptor.value
+    : null;
+const trustedFileNameGetter = readOwnGetter(trustedFilePrototype, "name");
+const trustedBlobTypeGetter = readOwnGetter(trustedBlobPrototype, "type");
+const trustedInputFilesGetter = readOwnGetter(trustedInputPrototype, "files");
 
 function fileSelectionResult(kind, name = null) {
   const result = safeCreate(null);
@@ -359,24 +451,68 @@ function initializeQuoteCheckPage() {
 
   function readSelectedFileMetadata(input) {
     try {
-      const files = input.files;
-      if (files === null || files === undefined) return INVALID_FILE_SELECTION;
-
-      const length = files.length;
-      if (length === 0) return EMPTY_FILE_SELECTION;
-      if (length !== 1) return INVALID_FILE_SELECTION;
-
-      const file = files[0];
       if (
-        file === null ||
-        file === undefined ||
-        (typeof file !== "object" && typeof file !== "function")
+        !trustedInputFilesGetter ||
+        safeGetOwnPropertyDescriptor(input, "files")
+      ) {
+        return INVALID_FILE_SELECTION;
+      }
+      const files = safeApply(
+        trustedInputFilesGetter,
+        input,
+        SAFE_EMPTY_ARGUMENTS,
+      );
+      if (files === null || files === undefined) return INVALID_FILE_SELECTION;
+      if (
+        !trustedFileListLengthGetter ||
+        !trustedFileListItem
       ) {
         return INVALID_FILE_SELECTION;
       }
 
-      const name = file.name;
-      const type = file.type;
+      const length = safeApply(
+        trustedFileListLengthGetter,
+        files,
+        SAFE_EMPTY_ARGUMENTS,
+      );
+      if (length === 0) return EMPTY_FILE_SELECTION;
+      if (length !== 1) return INVALID_FILE_SELECTION;
+
+      const slotDescriptor = readOwnDataValue(files, "0");
+      if (!slotDescriptor) return INVALID_FILE_SELECTION;
+      const file = slotDescriptor.value;
+      const itemFile = safeApply(
+        trustedFileListItem,
+        files,
+        SAFE_FILE_INDEX_ARGUMENTS,
+      );
+      if (
+        itemFile !== file ||
+        file === null ||
+        file === undefined ||
+        typeof file !== "object" ||
+        !trustedFileNameGetter ||
+        !trustedBlobTypeGetter
+      ) {
+        return INVALID_FILE_SELECTION;
+      }
+
+      const ownNameDescriptor = safeGetOwnPropertyDescriptor(file, "name");
+      const ownTypeDescriptor = safeGetOwnPropertyDescriptor(file, "type");
+      if (ownNameDescriptor || ownTypeDescriptor) {
+        return INVALID_FILE_SELECTION;
+      }
+
+      const name = safeApply(
+        trustedFileNameGetter,
+        file,
+        SAFE_EMPTY_ARGUMENTS,
+      );
+      const type = safeApply(
+        trustedBlobTypeGetter,
+        file,
+        SAFE_EMPTY_ARGUMENTS,
+      );
       if (
         typeof name !== "string" ||
         !safeHasNonWhitespaceFileName(name) ||

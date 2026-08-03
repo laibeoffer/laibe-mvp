@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile, stat } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
 import path from "node:path";
@@ -11,6 +11,8 @@ const root = path.resolve(import.meta.dirname, "..");
 const seedCommit = "0b0037ff50a4dc5b1756fe3230588f12a01c5337";
 const seedTree = "57bb0dc3775af085810a60a6719c5fa898e98a8d";
 const finalCorrectionParent = "ae4f575a3062a48c6f08cc708738e14518f4df72";
+const historicalUpperBound = "3f6bddea936bdebd36846a239bc5d13c37e1d331";
+const historicalUpperTree = "9f30aff364f3f0f9ed513098a2f7ae24962627d5";
 const execFileAsync = promisify(execFile);
 
 const paths = {
@@ -60,6 +62,15 @@ const expectedCorrectionChain = [
 
 async function text(relativePath) {
   return readFile(path.join(root, relativePath), "utf8");
+}
+
+async function historicalBytes(relativePath) {
+  const { stdout } = await execFileAsync(
+    "git",
+    ["show", `${historicalUpperBound}:${relativePath}`],
+    { cwd: root, encoding: null },
+  );
+  return stdout;
 }
 
 function visibleCopy(html) {
@@ -116,12 +127,11 @@ test("canonical receipt policy fatally rejects invalid UTF-8", () => {
   );
 });
 
-test("manifest separates original exact10 from fresh Git cumulative exact13 and verifies 12 receipts", async () => {
-  for (const relativePath of cumulativeGitPathSet) {
-    assert.equal((await stat(path.join(root, relativePath))).isFile(), true, relativePath);
-  }
-
-  const manifest = JSON.parse(await text(paths.manifest));
+test("immutable historical manifest separates original exact10 from cumulative exact13 and verifies 12 receipts", async () => {
+  const manifestBytes = await historicalBytes(paths.manifest);
+  const manifest = JSON.parse(
+    new TextDecoder("utf-8", { fatal: true }).decode(manifestBytes),
+  );
   assert.deepEqual(manifest.originalProductWriteSet, originalProductWriteSet);
   assert.deepEqual(manifest.cumulativeGitPathSet, cumulativeGitPathSet);
   assert.equal(manifest.finalCorrectionParent, finalCorrectionParent);
@@ -134,7 +144,7 @@ test("manifest separates original exact10 from fresh Git cumulative exact13 and 
 
   const { stdout: immediateStdout } = await execFileAsync(
     "git",
-    ["diff", "--name-only", finalCorrectionParent],
+    ["diff", "--name-only", finalCorrectionParent, historicalUpperBound, "--"],
     { cwd: root, encoding: "utf8" },
   );
   const actualImmediatePaths = immediateStdout.trim().split(/\r?\n/).filter(Boolean);
@@ -142,11 +152,26 @@ test("manifest separates original exact10 from fresh Git cumulative exact13 and 
 
   const { stdout: cumulativeStdout } = await execFileAsync(
     "git",
-    ["diff", "--name-only", seedCommit],
+    ["diff", "--name-only", seedCommit, historicalUpperBound, "--"],
     { cwd: root, encoding: "utf8" },
   );
   const actualCumulativePaths = cumulativeStdout.trim().split(/\r?\n/).filter(Boolean);
   assert.deepEqual(actualCumulativePaths, cumulativeGitPathSet);
+
+  const [{ stdout: upperParentStdout }, { stdout: upperTreeStdout }] = await Promise.all([
+    execFileAsync(
+      "git",
+      ["rev-parse", `${historicalUpperBound}^`],
+      { cwd: root, encoding: "utf8" },
+    ),
+    execFileAsync(
+      "git",
+      ["rev-parse", `${historicalUpperBound}^{tree}`],
+      { cwd: root, encoding: "utf8" },
+    ),
+  ]);
+  assert.equal(upperParentStdout.trim(), finalCorrectionParent);
+  assert.equal(upperTreeStdout.trim(), historicalUpperTree);
 
   for (const entry of expectedCorrectionChain) {
     const { stdout: parentStdout } = await execFileAsync(
@@ -158,7 +183,7 @@ test("manifest separates original exact10 from fresh Git cumulative exact13 and 
   }
 
   for (const receipt of manifest.artifactReceipts) {
-    const canonical = canonicalUtf8LfReceipt(await readFile(path.join(root, receipt.path)));
+    const canonical = canonicalUtf8LfReceipt(await historicalBytes(receipt.path));
     assert.equal(receipt.bytes, canonical.bytes, `${receipt.path} canonical byte count`);
     assert.equal(receipt.sha256, canonical.sha256, `${receipt.path} canonical SHA-256`);
     assert.equal(receipt.gitBlobSha1, canonical.gitBlobSha1, `${receipt.path} canonical Git blob SHA-1`);

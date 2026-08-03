@@ -123,6 +123,7 @@ Operational pages show role, PCM contract state, case state, next responsible ac
 - One primary action per section; no card wall, thick borders, excessive gradients, emoji icons, or decorative motion.
 - Visible controls at least 44×44 CSS pixels, clear `:focus-visible`, reduced-motion support, and zero horizontal overflow at 1280×900, 768×1024, and 390×844.
 - Workspace pages favor task scanning, calendars, messages, responsibility, and records rather than marketing-sized headings.
+- The quotation-check correction is also accepted at a 640 by 450 CSS viewport as the 200% zoom equivalent, with the same zero-overflow and 44px-target requirements.
 
 ## T3 single-page quotation check
 
@@ -140,7 +141,7 @@ Operational pages show role, PCM contract state, case state, next responsible ac
 
 The ordered page states are `INTRODUCTION`, `CONSENT`, `SELECT_FILE`, `VALIDATION_PENDING`, `CORRECTION_REQUIRED`, `RESELECT_FILE`, `RESULT_FORMAT`, and `RESULT_UNAVAILABLE`. The browser may temporarily display the selected filename and the browser-provided MIME label. Only the exact `application/pdf` label may advance to `VALIDATION_PENDING`; a `.pdf` suffix alone is never format evidence. Even for that MIME label, the page states that the content format is still unverified because G1 has no byte parser. It must not use URL/hash/storage authority, persist the file, claim upload, claim case creation, or synthesize a quotation result.
 
-The file-selection event is one fail-closed boundary. It snapshots the file list, exact length, selected entry, primitive nonblank name, and exact MIME label without allowing accessors, sparse collections, revoked or throwing proxies, or post-load string intrinsic changes to escape the event handler. Empty selection is treated only as cancellation. Any other unreadable or malformed metadata enters `FILE_FORMAT_INVALID` with null case data, no actions, and product copy that says the browser label is unavailable while the file contents remain unverified; it never infers that the bytes are not PDF.
+The file-selection event is one fail-closed boundary. It uses module-load captured WebIDL getters and methods to brand-check the real input, `FileList`, and `File` objects. Selection requires exactly one own `FileList` data slot corroborated by the captured `item()` result, then reads the filename and MIME label through captured native getters. Inherited slots or metadata, caller-created plain objects, own metadata shadows, sparse collections, revoked or throwing proxies, and post-load shared-prototype changes never become authority. Genuine branded `File` subclasses remain supported without exact-prototype matching. Empty selection is treated only as cancellation. Any other unreadable or malformed metadata enters `FILE_FORMAT_INVALID` with null case data, no actions, and product copy that says the browser label is unavailable while the file contents remain unverified; it never infers that the bytes are not PDF.
 
 File size, page count, readability, and corruption remain pending without trusted rules or parsing. The result area is labeled as a format example and contains no person, case, price, date, statistic, or completion claim. The closed result uses zero case data and points back to file selection or the PCM homepage.
 
@@ -150,4 +151,4 @@ T3 activates only `quoteCheck` at `../quote_check/code.html` and makes only the 
 
 ## Verification contract
 
-Every package records an exact write set, establishes actual RED, implements minimal GREEN, runs focused and current-train regression checks, verifies syntax/UTF-8/JSON/local references/forbidden visible language/diff scope, receives a Critical 0 and Important 0 review, creates one bounded local commit, and returns to a clean worktree. Candidate-specific historical admission assertions remain truthful historical checks and are not rewritten to pretend the integration branch is the old candidate.
+Every package records an exact write set, establishes actual RED, implements minimal GREEN, runs focused and current-train regression checks, verifies syntax/UTF-8/JSON/local references/forbidden visible language/diff scope, receives a Critical 0 and Important 0 review, creates one bounded local commit, and returns to a clean worktree. Candidate-specific historical admission assertions read receipts from the immutable Git object and use the approved candidate as an explicit upper bound; they never inspect a later descendant worktree or pretend the integration branch is the old candidate.

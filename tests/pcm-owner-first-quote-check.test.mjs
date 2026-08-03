@@ -5,6 +5,7 @@ import { existsSync } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { runInNewContext } from "node:vm";
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(testDir, "..");
@@ -30,6 +31,10 @@ const governancePath = resolve(
 const planPath = resolve(
   repoRoot,
   "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+);
+const specPath = resolve(
+  repoRoot,
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
 );
 
 const exactNine = Object.freeze([
@@ -58,6 +63,15 @@ const correctionEight = Object.freeze([
 const inputSafetyFive = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
   "tests/pcm-owner-first-quote-check.test.mjs",
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+]);
+
+const ownDataBoundarySix = Object.freeze([
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+  "tests/pcm-owner-first-quote-check.test.mjs",
+  "tests/pcm-governance-pages.test.mjs",
   "docs/governance/pcm-owner-first-execution-manifest.v1.json",
   "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
   "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
@@ -109,6 +123,62 @@ function gitBlobSha1(bytes) {
     .digest("hex");
 }
 
+const harnessDefineProperty = Object.defineProperty;
+const harnessFileListData = new WeakMap();
+const harnessInputFiles = new WeakMap();
+
+class HarnessFileList {
+  constructor(files) {
+    const data = { length: files.length };
+    for (let index = 0; index < files.length; index += 1) {
+      data[index] = files[index];
+      harnessDefineProperty(this, String(index), {
+        configurable: true,
+        enumerable: true,
+        value: files[index],
+        writable: false,
+      });
+    }
+    harnessFileListData.set(this, data);
+  }
+
+  get length() {
+    const data = harnessFileListData.get(this);
+    if (!data) throw new TypeError("Illegal FileList receiver");
+    return data.length;
+  }
+
+  item(index) {
+    const data = harnessFileListData.get(this);
+    if (!data) throw new TypeError("Illegal FileList receiver");
+    return data[index] ?? null;
+  }
+}
+
+class HarnessHtmlInputElement {
+  constructor() {
+    harnessInputFiles.set(this, new HarnessFileList([]));
+  }
+
+  get files() {
+    if (!harnessInputFiles.has(this)) {
+      throw new TypeError("Illegal HTMLInputElement receiver");
+    }
+    return harnessInputFiles.get(this);
+  }
+
+  set files(value) {
+    if (!harnessInputFiles.has(this)) {
+      throw new TypeError("Illegal HTMLInputElement receiver");
+    }
+    harnessInputFiles.set(this, value);
+  }
+}
+
+function browserFile(name, type) {
+  return new File(["local test bytes"], name, { type });
+}
+
 function createFileHandlerHarness() {
   const stateCodes = [...requiredSteps, "FAILURE"];
   const panels = stateCodes.map((code) => ({
@@ -128,14 +198,12 @@ function createFileHandlerHarness() {
     "[data-failure-role]": { textContent: "" },
   };
   const listeners = new Map();
-  const fileInput = {
-    files: [],
-    value: "",
-    addEventListener(type, listener) {
-      listeners.set(type, listener);
-    },
-    click() {},
+  const fileInput = new HarnessHtmlInputElement();
+  fileInput.value = "";
+  fileInput.addEventListener = (type, listener) => {
+    listeners.set(type, listener);
   };
+  fileInput.click = () => {};
   const root = {
     querySelector(selector) {
       if (selector === "#quote-file") return fileInput;
@@ -156,7 +224,7 @@ function createFileHandlerHarness() {
     },
     fileInput,
     dispatchFile(file) {
-      fileInput.files = file ? [file] : [];
+      fileInput.files = new HarnessFileList(file ? [file] : []);
       return listeners.get("change")?.();
     },
     dispatchFiles(files) {
@@ -181,9 +249,22 @@ function createFileHandlerHarness() {
 async function initializeFileHandlerHarness(tag) {
   const harness = createFileHandlerHarness();
   const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const fileListDescriptor = Object.getOwnPropertyDescriptor(globalThis, "FileList");
+  const inputDescriptor = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "HTMLInputElement",
+  );
   Object.defineProperty(globalThis, "document", {
     configurable: true,
     value: harness.document,
+  });
+  Object.defineProperty(globalThis, "FileList", {
+    configurable: true,
+    value: HarnessFileList,
+  });
+  Object.defineProperty(globalThis, "HTMLInputElement", {
+    configurable: true,
+    value: HarnessHtmlInputElement,
   });
   try {
     await import(`${pathToFileURL(appPath).href}?${tag}`);
@@ -192,6 +273,16 @@ async function initializeFileHandlerHarness(tag) {
       Object.defineProperty(globalThis, "document", documentDescriptor);
     } else {
       delete globalThis.document;
+    }
+    if (fileListDescriptor) {
+      Object.defineProperty(globalThis, "FileList", fileListDescriptor);
+    } else {
+      delete globalThis.FileList;
+    }
+    if (inputDescriptor) {
+      Object.defineProperty(globalThis, "HTMLInputElement", inputDescriptor);
+    } else {
+      delete globalThis.HTMLInputElement;
     }
   }
   return harness;
@@ -371,10 +462,10 @@ test("state resolver is strict closed and survives hostile post-load intrinsics"
 test("actual file handler rejects ordinary text and text renamed as PDF", async () => {
   assert.equal(existsSync(appPath), true, "app.js must exist before import");
   const harness = await initializeFileHandlerHarness("renamed-text-handler");
-  harness.dispatchFile({ name: "報價.txt", type: "text/plain" });
+  harness.dispatchFile(browserFile("報價.txt", "text/plain"));
   assert.equal(harness.visibleState(), "FAILURE");
   assert.doesNotThrow(() => {
-    harness.dispatchFile({ name: "報價.pdf", type: "text/plain" });
+    harness.dispatchFile(browserFile("報價.pdf", "text/plain"));
   });
   assert.equal(harness.visibleState(), "FAILURE");
   assert.match(harness.failureReason(), /PDF/);
@@ -423,12 +514,95 @@ test("actual file handler fails closed when the selected file list is hostile", 
   assert.equal(revokedList.visibleState(), "FAILURE");
 
   const emptyList = await initializeFileHandlerHarness("empty-files-list");
-  assert.doesNotThrow(() => emptyList.dispatchFiles([]));
+  assert.doesNotThrow(() => emptyList.dispatchFile(null));
   assert.equal(emptyList.visibleState(), "SELECT_FILE");
 });
 
+test("actual file handler rejects inherited Array file slots", async () => {
+  const harness = await initializeFileHandlerHarness("inherited-array-slot");
+  const inheritedFiles = runInNewContext(
+    "Array.prototype[0] = file; new Array(1)",
+    { file: browserFile("繼承報價.pdf", "application/pdf") },
+  );
+  assert.doesNotThrow(() => harness.dispatchFiles(inheritedFiles));
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+});
+
+test("actual file handler rejects inherited file metadata", async () => {
+  const harness = await initializeFileHandlerHarness("inherited-file-metadata");
+  const inheritedMetadata = runInNewContext(
+    'Object.prototype.name = "繼承報價.pdf"; Object.prototype.type = "application/pdf"; ({})',
+  );
+  assert.doesNotThrow(() => harness.dispatchFile(inheritedMetadata));
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+});
+
+test("actual file handler rejects inherited file-list length", async () => {
+  const harness = await initializeFileHandlerHarness("inherited-file-list-length");
+  const inheritedList = Object.create({ length: 1 });
+  Object.defineProperty(inheritedList, "0", {
+    configurable: true,
+    enumerable: true,
+    value: browserFile("繼承長度.pdf", "application/pdf"),
+  });
+  assert.doesNotThrow(() => harness.dispatchFiles(inheritedList));
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+});
+
+test("actual file handler rejects forged File prototype identity", async () => {
+  const harness = await initializeFileHandlerHarness("forged-file-prototype");
+  const forgedFile = Object.create(File.prototype);
+  Object.defineProperty(forgedFile, "name", {
+    configurable: true,
+    enumerable: true,
+    value: "偽造報價.pdf",
+  });
+  Object.defineProperty(forgedFile, "type", {
+    configurable: true,
+    enumerable: true,
+    value: "application/pdf",
+  });
+  assert.doesNotThrow(() => harness.dispatchFile(forgedFile));
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+});
+
+test("actual file handler rejects own metadata shadows on a genuine File", async () => {
+  const harness = await initializeFileHandlerHarness("genuine-file-own-shadows");
+  const shadowedFile = browserFile("原始文字.txt", "text/plain");
+  Object.defineProperty(shadowedFile, "name", {
+    configurable: true,
+    enumerable: true,
+    value: "偽造報價.pdf",
+  });
+  Object.defineProperty(shadowedFile, "type", {
+    configurable: true,
+    enumerable: true,
+    value: "application/pdf",
+  });
+  assert.doesNotThrow(() => harness.dispatchFile(shadowedFile));
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.selectedName(), "尚未選擇");
+});
+
+test("actual file handler accepts a genuine branded File subclass", async () => {
+  class BrowserFileSubclass extends File {}
+  const harness = await initializeFileHandlerHarness("genuine-file-subclass");
+  const file = new BrowserFileSubclass(
+    ["local test bytes"],
+    "子類報價.pdf",
+    { type: "application/pdf" },
+  );
+  assert.doesNotThrow(() => harness.dispatchFile(file));
+  assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  assert.equal(harness.selectedName(), "子類報價.pdf");
+});
+
 test("actual file handler rejects unsafe metadata without claiming file bytes are not PDF", async () => {
-  const throwingName = {};
+  const throwingName = browserFile("estimate.pdf", "application/pdf");
   Object.defineProperty(throwingName, "name", {
     configurable: true,
     get() {
@@ -440,7 +614,7 @@ test("actual file handler rejects unsafe metadata without claiming file bytes ar
     value: "application/pdf",
   });
 
-  const throwingType = { name: "estimate.pdf" };
+  const throwingType = browserFile("estimate.pdf", "application/pdf");
   Object.defineProperty(throwingType, "type", {
     configurable: true,
     get() {
@@ -491,11 +665,11 @@ test("actual file handler ignores post-load slice and lowercase rewriting", asyn
   });
   try {
     assert.doesNotThrow(() => {
-      harness.dispatchFile({ name: "報價.txt", type: "text/plain" });
+      harness.dispatchFile(browserFile("報價.txt", "text/plain"));
     });
     assert.equal(harness.visibleState(), "FAILURE");
     assert.doesNotThrow(() => {
-      harness.dispatchFile({ name: "報價.pdf", type: "application/pdf" });
+      harness.dispatchFile(browserFile("報價.pdf", "application/pdf"));
     });
     assert.equal(harness.visibleState(), "VALIDATION_PENDING");
   } finally {
@@ -525,11 +699,11 @@ test("actual file handler stays closed when post-load string methods throw", asy
   });
   try {
     assert.doesNotThrow(() => {
-      harness.dispatchFile({ name: "報價.txt", type: "text/plain" });
+      harness.dispatchFile(browserFile("報價.txt", "text/plain"));
     });
     assert.equal(harness.visibleState(), "FAILURE");
     assert.doesNotThrow(() => {
-      harness.dispatchFile({ name: "報價.pdf", type: "application/pdf" });
+      harness.dispatchFile(browserFile("報價.pdf", "application/pdf"));
     });
     assert.equal(harness.visibleState(), "VALIDATION_PENDING");
   } finally {
@@ -541,12 +715,12 @@ test("actual file handler stays closed when post-load string methods throw", asy
 test("actual file handler keeps browser PDF metadata in validation pending", async () => {
   const harness = await initializeFileHandlerHarness("pdf-metadata-handler");
   assert.doesNotThrow(() => {
-    harness.dispatchFile({ name: "報價.pdf", type: "application/pdf" });
+    harness.dispatchFile(browserFile("報價.pdf", "application/pdf"));
   });
   assert.equal(harness.visibleState(), "VALIDATION_PENDING");
   assert.equal(harness.selectedName(), "報價.pdf");
   assert.doesNotThrow(() => {
-    harness.dispatchFile({ name: "報價.txt", type: "application/pdf" });
+    harness.dispatchFile(browserFile("報價.txt", "application/pdf"));
   });
   assert.equal(harness.visibleState(), "VALIDATION_PENDING");
   assert.equal(harness.selectedName(), "報價.txt");
@@ -797,4 +971,122 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
   }
   assert.equal(inputSafety.independentReview.critical, 0);
   assert.equal(inputSafety.independentReview.important, 0);
+});
+
+test("T3 own-data boundary correction closes exact-six evidence", async () => {
+  const [manifestBytes, plan, spec] = await Promise.all([
+    readFile(governancePath),
+    readFile(planPath, "utf8"),
+    readFile(specPath, "utf8"),
+  ]);
+  const governance = JSON.parse(manifestBytes.toString("utf8"));
+  const correction = governance.t3OwnDataBoundaryCorrection;
+
+  assert.ok(correction, "own-data boundary correction evidence must exist");
+  assert.equal(correction.parent, "3b856f9ebd82daf1991ab436c959aca8e634eba2");
+  assert.equal(correction.parentTree, "5b79d78e8379e4e1d80c46bb7814457aaf6d852a");
+  assert.deepEqual(
+    [...correction.immediateWriteSet].sort(),
+    [...ownDataBoundarySix].sort(),
+  );
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.tdd.baselineFullRed, {
+    files: 11,
+    tests: 171,
+    passed: 170,
+    failed: 1,
+    exitCode: 1,
+    onlyFailure: "open-ended historical A3 cumulative-path assertion",
+  });
+  assert.deepEqual(correction.tdd.inheritedAuthorityRed, {
+    tests: 21,
+    passed: 17,
+    failed: 4,
+    exitCode: 1,
+  });
+  assert.deepEqual(correction.tdd.brandIdentityRed, {
+    tests: 23,
+    passed: 20,
+    failed: 3,
+    exitCode: 1,
+  });
+  assert.deepEqual(correction.tdd.productGreenBeforeReceipts, {
+    tests: 24,
+    passed: 23,
+    failed: 1,
+    exitCode: 1,
+    onlyFailure: "current receipt evidence pending",
+  });
+  assert.deepEqual(correction.tdd.evidenceRed, {
+    tests: 25,
+    passed: 23,
+    failed: 2,
+    exitCode: 1,
+  });
+  assert.deepEqual(correction.tdd.green, {
+    tests: 25,
+    passed: 25,
+    failed: 0,
+    exitCode: 0,
+  });
+
+  assert.deepEqual(correction.historicalCandidate, {
+    upperBound: "3f6bddea936bdebd36846a239bc5d13c37e1d331",
+    parent: "ae4f575a3062a48c6f08cc708738e14518f4df72",
+    tree: "9f30aff364f3f0f9ed513098a2f7ae24962627d5",
+    immediateRange: "ae4f575a3062a48c6f08cc708738e14518f4df72..3f6bddea936bdebd36846a239bc5d13c37e1d331",
+    cumulativeRange: "0b0037ff50a4dc5b1756fe3230588f12a01c5337..3f6bddea936bdebd36846a239bc5d13c37e1d331",
+    receiptScope: "immutable_git_object_bytes",
+  });
+  assert.equal(correction.inputPolicy.selectedFileList, "CAPTURED_WEBIDL_BRAND_CHECK");
+  assert.equal(correction.inputPolicy.selectedSlot, "OWN_FILELIST_DATA_SLOT_CORROBORATED_BY_ITEM");
+  assert.equal(correction.inputPolicy.selectedFile, "CAPTURED_FILE_AND_BLOB_WEBIDL_BRAND_CHECKS");
+  assert.equal(correction.inputPolicy.ownMetadataShadowsAccepted, false);
+  assert.equal(correction.inputPolicy.inheritedMetadataAccepted, false);
+  assert.equal(correction.inputPolicy.plainObjectIdentityAccepted, false);
+  assert.equal(correction.inputPolicy.failurePayloadPolicy, "ZERO_CASE_DATA");
+
+  assert.deepEqual(correction.freshVerification.focused, {
+    files: 1,
+    tests: 25,
+    passed: 25,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.currentTrain, {
+    files: 4,
+    tests: 63,
+    passed: 63,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.fullSuiteTruth, {
+    files: 11,
+    tests: 178,
+    passed: 178,
+    failed: 0,
+    exitCode: 0,
+  });
+
+  const artifactPaths = ownDataBoundarySix.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    correction.artifactReceipts.map((receipt) => receipt.path).sort(),
+    artifactPaths.sort(),
+  );
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "current_worktree_bytes");
+  }
+  assert.equal(correction.manifestReceiptRef, "t3.selfRecorderReceipt");
+  assert.equal(correction.independentReview.critical, 0);
+  assert.equal(correction.independentReview.important, 0);
+  assert.match(plan, /Actual bounded own-data boundary correction write set/);
+  assert.match(plan, /immutable historical candidate/);
+  assert.match(spec, /captured WebIDL/i);
+  assert.match(spec, /immutable Git object/i);
 });
