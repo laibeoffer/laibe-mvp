@@ -569,10 +569,10 @@
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 59412,
-      "normalizedBytes": 62034,
-      "sha256": "e947e2cb3ceb3d5779c2057ba139739cc8578a65ef257243efd2f15c8b9d2f02",
-      "gitBlobSha1": "be1262922464665153bc3d8ef4f93a2903175fc5",
+      "bytes": 64744,
+      "normalizedBytes": 67704,
+      "sha256": "86ff3ebb872091eff612f3468ab42d4aa88de83a453c9202e78337cc2bce363a",
+      "gitBlobSha1": "8eb557b2b9a2de867e9996012474e9e4e3eccb00",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -1195,6 +1195,153 @@
         "web-design-engineer",
         "browser:control-in-app-browser",
         "requesting-code-review",
+        "verification-before-completion"
+      ]
+    },
+    "gates": {
+      "G1_UI_SOURCE": "correction_ready_for_a0_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T4": "closed"
+    }
+  },
+  "t3ContrastCorrection": {
+    "status": "ready_for_a0_focused_review",
+    "parent": "0b4aecee2bd7e4317a4734dbcf9c7b1096b269fc",
+    "parentTree": "833efce0e6af27992c1a7f668a6bc7ef8d018cc2",
+    "a0VerdictOnParent": "CHANGES_REQUIRED_NOT_ADMITTED_G1",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md"
+    ],
+    "outsideWriteSet": 0,
+    "tdd": {
+      "red": {
+        "tests": 31,
+        "passed": 30,
+        "failed": 1,
+        "exitCode": 1,
+        "ratios": [1.7, 2.58, 3.16]
+      },
+      "green": {
+        "tests": 32,
+        "passed": 32,
+        "failed": 0,
+        "exitCode": 0,
+        "ratios": [10.93, 7.17, 5.86]
+      }
+    },
+    "contrast": {
+      "scope": "QUOTE_CHECK_PRIMARY_ACTIONS_ONLY",
+      "fontSize": "14px",
+      "foreground": "#080b0d",
+      "gradientStops": ["#ffb145", "#ff711f", "#ff4925"],
+      "minimumRequired": 4.5,
+      "minimumMeasured": 5.86,
+      "sharedT1Modified": false,
+      "secondaryActionsModified": false
+    },
+    "browser": {
+      "origin": "http://127.0.0.1:8800",
+      "viewports": ["1280x900", "768x1024", "390x844", "390x640", "1280x768", "640x450"],
+      "computedForeground": "rgb(8, 11, 13)",
+      "computedFontSize": "14px",
+      "computedGradient": "linear-gradient(135deg, rgb(255, 177, 69), rgb(255, 113, 31) 46%, rgb(255, 73, 37))",
+      "shortViewportDecisionFactsVisible": "2/2",
+      "horizontalOverflow": 0,
+      "visibleControlsUnder44": 0,
+      "plannedClickableControls": 0,
+      "brokenAssets": 0,
+      "consoleWarningsOrErrors": 0,
+      "networkFailures": 0,
+      "transitionFocus": "consent-title",
+      "failureFocus": "failure-heading",
+      "failureRecoveryFocus": "reselect-title",
+      "bodyFocusAfterTransition": false,
+      "invalidFileInputValue": "",
+      "invalidFileDisplay": "尚未選擇",
+      "previewListenerAfterCleanup": 0
+    },
+    "freshVerification": {
+      "focused": { "files": 1, "tests": 32, "passed": 32, "failed": 0, "exitCode": 0 },
+      "currentTrain": { "files": 4, "tests": 70, "passed": 70, "failed": 0, "exitCode": 0 },
+      "fullSuiteTruth": { "files": 11, "tests": 185, "passed": 185, "failed": 0, "exitCode": 0 },
+      "staticGates": {
+        "strictUtf8ExactFive": "pass",
+        "replacementCharacters": 0,
+        "jsonParse": "pass",
+        "duplicateKeyGuard": "pass",
+        "localReferencesAndFragments": "pass",
+        "visibleForbiddenTerms": 0,
+        "artifactReceipts": "4/4",
+        "manifestSelfReceipt": "normalized",
+        "historicalA3Receipts": "12/12",
+        "outsideWriteSet": 0,
+        "diffCheck": "pass"
+      }
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+        "bytes": 15927,
+        "sha256": "071562dd7a2c49764082730706b5f7a08a110a2ae38b840892742b2a512179f4",
+        "gitBlobSha1": "ab95405d2bca96d0b9aeaab0ca2a4f0b37066118",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-quote-check.test.mjs",
+        "bytes": 58065,
+        "sha256": "f94f696904410b6c6e2dd92d5fd54181d7ce13c9043bc7e00963b66e0859aa8d",
+        "gitBlobSha1": "b31472134a0e75495e019ec6d21043ff66b970ce",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 37239,
+        "sha256": "e74201af2c74e7a1702d35042e41508f80f663b7b14d6fd147216f374c7045a7",
+        "gitBlobSha1": "78002289e55c30496d7eddd7f91b84fe8b462645",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 16171,
+        "sha256": "10820330a66fc407b904d9f62fffbbe698d2a1b4d6ebb93efd69ae83046583e0",
+        "gitBlobSha1": "5a466144590df6cb5323f21bd31d4d3a389a266e",
+        "scope": "candidate_git_blob_bytes"
+      }
+    ],
+    "manifestReceiptRef": "t3.selfRecorderReceipt",
+    "independentReview": {
+      "status": "clean",
+      "critical": 0,
+      "important": 0,
+      "minor": 0,
+      "ratios": [10.92738, 7.174623, 5.856861],
+      "scope": "exact5_outside0"
+    },
+    "skillEvidence": {
+      "main": [
+        "using-superpowers",
+        "receiving-code-review",
+        "systematic-debugging",
+        "test-driven-development",
+        "executing-plans",
+        "frontend-design",
+        "web-design-engineer",
+        "browser:control-in-app-browser",
+        "requesting-code-review",
+        "verification-before-completion"
+      ],
+      "readOnlyAudit": [
+        "using-superpowers",
+        "receiving-code-review",
+        "systematic-debugging",
+        "frontend-design",
+        "web-design-engineer",
         "verification-before-completion"
       ]
     },

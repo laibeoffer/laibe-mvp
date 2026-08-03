@@ -18,6 +18,8 @@ const quoteDir = resolve(
 const htmlPath = resolve(quoteDir, "code.html");
 const cssPath = resolve(quoteDir, "styles.css");
 const appPath = resolve(quoteDir, "app.js");
+const sharedTokenPath = resolve(quoteDir, "../shared/owner-first-tokens.css");
+const sharedShellPath = resolve(quoteDir, "../shared/owner-first-shell.css");
 const routeManifestPath = resolve(
   repoRoot,
   "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
@@ -91,6 +93,14 @@ const finalExactSeven = Object.freeze([
   "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
 ]);
 
+const contrastExactFive = Object.freeze([
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+  "tests/pcm-owner-first-quote-check.test.mjs",
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+]);
+
 const requiredSteps = Object.freeze([
   "INTRODUCTION",
   "CONSENT",
@@ -152,6 +162,25 @@ function gitBlobSha1(bytes) {
     .update(`blob ${bytes.length}\0`)
     .update(bytes)
     .digest("hex");
+}
+
+function rgbChannels(hex) {
+  const normalized = hex.replace("#", "");
+  return [0, 2, 4].map((offset) => Number.parseInt(normalized.slice(offset, offset + 2), 16));
+}
+
+function relativeLuminance(hex) {
+  const channels = rgbChannels(hex).map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2]);
+}
+
+function contrastRatio(foreground, background) {
+  const light = Math.max(relativeLuminance(foreground), relativeLuminance(background));
+  const dark = Math.min(relativeLuminance(foreground), relativeLuminance(background));
+  return (light + 0.05) / (dark + 0.05);
 }
 
 function assertZeroAuthorityActions(actions, label) {
@@ -402,6 +431,42 @@ test("first screen states role status next responsibility and trace boundary", a
   assert.match(visible, /案件紀錄/);
   assert.match(visible, /尚未建立案件紀錄/);
   assert.match(visible, /返回 PCM 首頁/);
+});
+
+test("primary CTA 14px text keeps 4.5 to 1 contrast at every gradient stop", async () => {
+  const [css, sharedTokens, sharedShell] = await Promise.all([
+    readFile(cssPath, "utf8"),
+    readFile(sharedTokenPath, "utf8"),
+    readFile(sharedShellPath, "utf8"),
+  ]);
+  const localColor = css.match(
+    /\[data-quote-check-page\]\s+\.owner-first-primary-action\s*\{[^}]*color:\s*(#[0-9a-f]{6})/i,
+  )?.[1]?.toLowerCase();
+  const inheritedColorVariable = sharedShell.match(
+    /\.owner-first-control,[\s\S]*?\.owner-first-secondary-action\s*\{[^}]*color:\s*var\((--[a-z0-9-]+)\)/i,
+  )?.[1];
+  assert.ok(inheritedColorVariable, "shared primary action text color must stay traceable");
+  const inheritedColor = sharedTokens.match(
+    new RegExp(`${inheritedColorVariable}:\\s*(#[0-9a-f]{6})`, "i"),
+  )?.[1]?.toLowerCase();
+  const textColor = localColor ?? inheritedColor;
+  assert.ok(textColor, "effective primary CTA text color must resolve to a hex value");
+  assert.match(sharedShell, /font:\s*900\s+0\.875rem\/1\s+var\(--owner-first-font\)/i);
+
+  const stops = ["start", "mid", "end"].map((name) => {
+    const value = sharedTokens.match(
+      new RegExp(`--owner-first-primary-${name}:\\s*(#[0-9a-f]{6})`, "i"),
+    )?.[1]?.toLowerCase();
+    assert.ok(value, `primary gradient ${name} stop must exist`);
+    return value;
+  });
+  const results = stops.map((background) => ({
+    background,
+    contrast: Number(contrastRatio(textColor, background).toFixed(2)),
+    foreground: textColor,
+  }));
+  const failures = results.filter(({ contrast }) => contrast < 4.5);
+  assert.deepEqual(failures, [], `CTA contrast nodes: ${JSON.stringify(results)}`);
 });
 
 test("selection stays local and never claims durable upload or a formal result", async () => {
@@ -1358,4 +1423,94 @@ test("T3 final exact-seven correction records the bounded product and receipt cl
   assert.match(plan, /Actual bounded final exact-seven correction write set/);
   assert.match(spec, /null-prototype zero-action iterable/i);
   assert.match(spec, /short-viewport continuation/i);
+});
+
+test("T3 CTA contrast correction records bounded quantitative evidence", async () => {
+  const [manifestBytes, plan, spec] = await Promise.all([
+    readFile(governancePath),
+    readFile(planPath, "utf8"),
+    readFile(specPath, "utf8"),
+  ]);
+  const governance = JSON.parse(manifestBytes.toString("utf8"));
+  const correction = governance.t3ContrastCorrection;
+  assert.ok(correction, "CTA contrast correction evidence must exist");
+  assert.equal(correction.parent, "0b4aecee2bd7e4317a4734dbcf9c7b1096b269fc");
+  assert.equal(correction.parentTree, "833efce0e6af27992c1a7f668a6bc7ef8d018cc2");
+  assert.deepEqual([...correction.writeSet].sort(), [...contrastExactFive].sort());
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.tdd.red, {
+    tests: 31,
+    passed: 30,
+    failed: 1,
+    exitCode: 1,
+    ratios: [1.7, 2.58, 3.16],
+  });
+  assert.deepEqual(correction.tdd.green, {
+    tests: 32,
+    passed: 32,
+    failed: 0,
+    exitCode: 0,
+    ratios: [10.93, 7.17, 5.86],
+  });
+  assert.equal(correction.contrast.fontSize, "14px");
+  assert.equal(correction.contrast.foreground, "#080b0d");
+  assert.deepEqual(correction.contrast.gradientStops, ["#ffb145", "#ff711f", "#ff4925"]);
+  assert.equal(correction.contrast.minimumRequired, 4.5);
+  assert.equal(correction.contrast.minimumMeasured, 5.86);
+  assert.deepEqual(correction.freshVerification.focused, {
+    files: 1,
+    tests: 32,
+    passed: 32,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.currentTrain, {
+    files: 4,
+    tests: 70,
+    passed: 70,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.fullSuiteTruth, {
+    files: 11,
+    tests: 185,
+    passed: 185,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.browser.viewports, [
+    "1280x900",
+    "768x1024",
+    "390x844",
+    "390x640",
+    "1280x768",
+    "640x450",
+  ]);
+  assert.equal(correction.browser.horizontalOverflow, 0);
+  assert.equal(correction.browser.visibleControlsUnder44, 0);
+  assert.equal(correction.browser.consoleWarningsOrErrors, 0);
+  assert.equal(correction.browser.networkFailures, 0);
+  assert.equal(correction.browser.brokenAssets, 0);
+  assert.equal(correction.browser.plannedClickableControls, 0);
+  assert.equal(correction.browser.failureRecoveryFocus, "reselect-title");
+
+  const artifactPaths = contrastExactFive.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    correction.artifactReceipts.map((receipt) => receipt.path).sort(),
+    [...artifactPaths].sort(),
+  );
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "candidate_git_blob_bytes");
+  }
+  assert.equal(correction.manifestReceiptRef, "t3.selfRecorderReceipt");
+  assert.equal(correction.independentReview.critical, 0);
+  assert.equal(correction.independentReview.important, 0);
+  assert.match(plan, /Actual bounded CTA contrast correction write set/);
+  assert.match(spec, /quantitative CTA contrast/i);
 });

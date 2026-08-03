@@ -399,6 +399,15 @@
 - [ ] Capture full-page evidence, create the ZIP inside `outputs/pcm-owner-first-20260803/`, verify receipts, and commit `test(pcm): verify owner-first source journey`.
 - [ ] Report exact identity, commits, files, tests, browser evidence, closed G2–G4 capabilities, and return authority without merge/push/deploy.
 
+## T3 bounded CTA contrast correction
+
+**Actual bounded CTA contrast correction write set:** `quote_check/styles.css`, `tests/pcm-owner-first-quote-check.test.mjs`, this plan, the current owner-first specification, and the governance manifest. Parent is `0b4aecee2bd7e4317a4734dbcf9c7b1096b269fc`; outside this exact-five set is zero.
+
+- [x] Reproduce the quantitative RED at 14px: inherited `#f6f8f9` measured 1.70:1, 2.58:1, and 3.16:1 against the three primary gradient stops.
+- [x] Apply the local quote-page override `#080b0d` without changing the shared system, markup, routes, interactions, or secondary actions. The resulting ratios are 10.93:1, 7.17:1, and 5.86:1.
+- [x] Verify all six required viewports, the invalid-file recovery focus, exact-five scope, fresh focused/current/full suites, normalized self-receipt, and independent Critical 0 / Important 0 review.
+- [x] Keep T4 and G2–G4 closed and stop for A0 admission after the bounded commit.
+
 ## Self-review
 
 - Coverage: the corrected schedule has exactly T0–T18 and maps every Human-ordered source package once.

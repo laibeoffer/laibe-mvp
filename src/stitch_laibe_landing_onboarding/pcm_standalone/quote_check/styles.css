@@ -201,6 +201,10 @@ button {
   margin-block-start: 2px;
 }
 
+[data-quote-check-page] .owner-first-primary-action {
+  color: #080b0d;
+}
+
 .owner-first-facts {
   margin-block-start: clamp(34px, 5vw, 58px);
 }

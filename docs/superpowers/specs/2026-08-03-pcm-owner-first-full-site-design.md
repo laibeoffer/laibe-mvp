@@ -155,6 +155,10 @@ The short-viewport continuation repeats only the current status, next step, and 
 
 T3 activates only `quoteCheck` at `../quote_check/code.html` and makes only the `home` to `quoteCheck` edge clickable. `drawingCheck` and `accountAccess` remain planned with null hrefs; compatibility pages remain aliases and never become canonical steps.
 
+### Quantitative CTA contrast
+
+Quotation-check primary actions retain the shared orange gradient but use a page-local `#080b0d` foreground. At the computed 14px size, contrast against `#ffb145`, `#ff711f`, and `#ff4925` is respectively 10.93:1, 7.17:1, and 5.86:1. Each gradient node therefore exceeds the 4.5:1 normal-text requirement without changing the shared T1 system, secondary actions, focus treatment, layout, or interaction behavior.
+
 ## Verification contract
 
 Every package records an exact write set, establishes actual RED, implements minimal GREEN, runs focused and current-train regression checks, verifies syntax/UTF-8/JSON/local references/forbidden visible language/diff scope, receives a Critical 0 and Important 0 review, creates one bounded local commit, and returns to a clean worktree. Candidate-specific historical admission assertions read receipts from the immutable Git object and use the approved candidate as an explicit upper bound; they never inspect a later descendant worktree or pretend the integration branch is the old candidate.
