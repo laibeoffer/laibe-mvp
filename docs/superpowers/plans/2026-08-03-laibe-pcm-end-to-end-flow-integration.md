@@ -167,7 +167,23 @@
 
 - [x] Write RED for the complete state sequence, safe file failures, trace facts, route activation, hostile inputs, local references, and exact-nine evidence. Actual RED against the exact parent: 11 tests, 1 pass, 10 fail, exit 1; the page, active route, and T3 evidence were absent as expected.
 - [x] Create the page and activate only `quoteCheck`. The focused product assertions are GREEN before evidence closure; drawing/account remain planned, compatibility aliases remain non-canonical, and local references resolve. Browser QA at 1280×900, 768×1024, and 390×844 covered introduction → consent → selection/validation → correction → reselection → result-format → closed outcome plus invalid-format recovery. All three widths have horizontal overflow 0, visible controls below 44px 0, planned clickable controls 0, broken assets 0, and console warning/error 0. The valid-file path used an in-memory browser PDF fixture so no out-of-scope test artifact was written.
-- [x] Record current exact-nine receipts and complete independent review at Critical 0 / Important 0 before the bounded commit. Fresh post-receipt truth is focused 11/11 PASS, current owner-first train 45/49, and full suite 159/164. The four current-train failures are superseded pre-T3 assertions that still hard-code `quoteCheck` as planned or T2 self-receipts as immutable; full-suite truth also retains the frozen A3 cumulative-path assertion. None is presented as T3 product GREEN. T4 and G2–G4 remain closed pending A0 admission.
+- [x] Record the original T3 exact-nine receipts and complete the first independent review at Critical 0 / Important 0 before the bounded feature commit.
+
+**Actual bounded correction write set (parent `b54f9a51c968640541f4e69ee3ad75a22dc46dc2`):**
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js`
+- `src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html`
+- `tests/pcm-owner-first-quote-check.test.mjs`
+- `tests/pcm-owner-first-public-home.test.mjs`
+- `tests/pcm-owner-first-route-manifest.test.mjs`
+- `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+- `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
+- `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
+
+- [x] Reproduce metadata RED against `b54f9a5`: focused 15 tests, 11 passed, 4 failed, exit 1. A renamed `text/plain` file and post-load string-method rewriting could incorrectly reach validation; copy also overstated browser metadata as content recognition.
+- [x] Apply the minimal fail-closed correction. Only an exact browser MIME label of `application/pdf` reaches `VALIDATION_PENDING`, which now says the content format is still unverified. Suffix-only, malformed, hostile rewrite, and hostile throw paths do not throw and never gain trust.
+- [x] Bind T2 receipts to immutable admitted commit `3c525bb6625e8a6a8c30fecc1f9b7f506f313ad7` instead of comparing historical receipts with T3 worktree bytes. Current T3 and this correction are recorded separately.
+- [x] Regress the actual browser flow at 1280×900, 768×1024, and 390×844. Introduction → consent → selection → validation → correction → reselection → result format → closed result completed; renamed text, ordinary text, valid MIME, rewrite pollution, and throwing pollution were exercised. Horizontal overflow, broken assets, planned clickable controls, controls below 44px, and console warnings/errors were all 0. Focus-visible and reduced-motion behavior remained effective.
+- [x] Final current-train truth is 54/54. Full-suite truth is 168/169; the sole failure remains `tests/pcm-governance-pages.test.mjs`, the frozen A3 cumulative-path admission assertion. T4 and G2–G4 remain closed pending A0 admission.
 
 ---
 

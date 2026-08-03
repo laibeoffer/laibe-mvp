@@ -212,11 +212,16 @@ test("canonical graph uses one quote check, one drawing check, and one shared ac
   );
 });
 
-test("future canonical entry routes are planned, non-clickable, and 404-safe", async () => {
+test("quote check is active while future canonical entries remain planned and 404-safe", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
   const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
 
-  for (const routeId of ["quoteCheck", "drawingCheck", "accountAccess"]) {
+  const quoteCheck = byId.get("quoteCheck");
+  assert.equal(quoteCheck.lifecycle, "active");
+  assert.equal(quoteCheck.href, "../quote_check/code.html");
+  await access(new URL(quoteCheck.href, routeManifestUrl));
+
+  for (const routeId of ["drawingCheck", "accountAccess"]) {
     const node = byId.get(routeId);
     assert.equal(node.lifecycle, "planned");
     assert.equal(node.href, null);
@@ -575,12 +580,12 @@ test("governance manifest t0 exposes one current evidence truth", async () => {
   });
 });
 
-test("public contract exposes future entries without turning planned routes into links", async () => {
+test("public contract exposes quote check while keeping future entries non-clickable", async () => {
   const { PUBLIC_ROUTES, resolvePcmFlowContinuation } = await import(
     publicContractUrl.href
   );
 
-  assert.equal(PUBLIC_ROUTES.quoteCheck, null);
+  assert.equal(PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
   assert.equal(PUBLIC_ROUTES.drawingCheck, null);
   assert.equal(PUBLIC_ROUTES.accountAccess, null);
   assert.equal(PUBLIC_ROUTES.ownerStart, "../owner_start/code.html");
@@ -588,11 +593,12 @@ test("public contract exposes future entries without turning planned routes into
   assert.equal(PUBLIC_ROUTES.basicReport, "../basic_report/code.html");
   assert.equal(PUBLIC_ROUTES.selfServiceArchive, "../self_service_archive/code.html");
 
-  for (const intent of [
-    "START_QUOTE_CHECK",
-    "START_DRAWING_CHECK",
-    "OPEN_ACCOUNT_ACCESS",
-  ]) {
+  const quoteResult = resolvePcmFlowContinuation({ intent: "START_QUOTE_CHECK" });
+  assert.equal(quoteResult.routeKey, "quoteCheck");
+  assert.equal(quoteResult.href, "../quote_check/code.html");
+  assert.equal(quoteResult.canMutate, false);
+
+  for (const intent of ["START_DRAWING_CHECK", "OPEN_ACCOUNT_ACCESS"]) {
     const result = resolvePcmFlowContinuation({ intent });
     assert.equal(result.routeKey, "accessUnavailable");
     assert.equal(result.reason, "ROUTE_PREPARING");

@@ -39,7 +39,7 @@ Preserve the real LaiBE logo, dark professional background, orange-red primary a
 
 ### `/pcm/quote-check`
 
-This is the only canonical quotation-check page. Introduction, consent, PDF selection, format checks, correction list, resubmission, and result are states of one page. It is not split into anonymous and registered variants. Until T3 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.
+This is the only canonical quotation-check page. Introduction, consent, PDF selection, format checks, correction list, resubmission, and result are states of one page. It is not split into anonymous and registered variants. T3 activates this page at `../quote_check/code.html`; the drawing and account entrances remain planned with null hrefs.
 
 ### `/pcm/drawing-check`
 
@@ -138,7 +138,7 @@ Operational pages show role, PCM contract state, case state, next responsible ac
 
 ### State and data contract
 
-The ordered page states are `INTRODUCTION`, `CONSENT`, `SELECT_FILE`, `VALIDATION_PENDING`, `CORRECTION_REQUIRED`, `RESELECT_FILE`, `RESULT_FORMAT`, and `RESULT_UNAVAILABLE`. The browser may temporarily display the selected filename and whether the file presents as PDF. It must not use URL/hash/storage authority, persist the file, claim upload, claim case creation, or synthesize a quotation result.
+The ordered page states are `INTRODUCTION`, `CONSENT`, `SELECT_FILE`, `VALIDATION_PENDING`, `CORRECTION_REQUIRED`, `RESELECT_FILE`, `RESULT_FORMAT`, and `RESULT_UNAVAILABLE`. The browser may temporarily display the selected filename and the browser-provided MIME label. Only the exact `application/pdf` label may advance to `VALIDATION_PENDING`; a `.pdf` suffix alone is never format evidence. Even for that MIME label, the page states that the content format is still unverified because G1 has no byte parser. It must not use URL/hash/storage authority, persist the file, claim upload, claim case creation, or synthesize a quotation result.
 
 File size, page count, readability, and corruption remain pending without trusted rules or parsing. The result area is labeled as a format example and contains no person, case, price, date, statistic, or completion claim. The closed result uses zero case data and points back to file selection or the PCM homepage.
 

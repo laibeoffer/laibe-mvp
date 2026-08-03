@@ -34,7 +34,7 @@
           <p class="quote-eyebrow">報價健檢｜給已取得乙方報價單的甲方</p>
           <h1 id="quote-title">先確認這份報價，能不能支持下一步討論</h1>
           <p class="quote-hero__lead">
-            先整理格式、版本與待確認事項；正式收件與解析開放前，本頁只在你的裝置暫時檢視檔名與 PDF 格式。
+            先整理檔名、版本與待確認事項；正式收件與解析開放前，本頁只在你的裝置暫時檢視檔名與瀏覽器提供的檔案標示。
           </p>
         </div>
         <aside class="quote-hero__boundary" aria-label="服務邊界">
@@ -103,7 +103,7 @@
             <p class="quote-stage__eyebrow">確認使用方式</p>
             <h2 id="consent-title">同意本機檢視</h2>
             <p class="quote-stage__summary">
-              本頁只讀取你選擇的檔名與格式，尚未送出或保存；離開或重新整理後，選擇狀態不會保留。
+              本頁只讀取你選擇的檔名與瀏覽器提供的檔案標示，尚未送出或保存；離開或重新整理後，選擇狀態不會保留。
             </p>
             <label class="consent-line" for="local-consent">
               <input id="local-consent" type="checkbox" />
@@ -134,15 +134,15 @@
 
           <section data-flow-panel="VALIDATION_PENDING" aria-labelledby="validation-title" hidden>
             <p class="quote-stage__eyebrow">條件待確認</p>
-            <h2 id="validation-title">格式與可讀性確認</h2>
+            <h2 id="validation-title">檔案標示與後續確認</h2>
             <p class="selected-file">本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
             <dl class="validation-list">
-              <div><dt>PDF 格式</dt><dd class="status-ok">已在本機辨識</dd></div>
+              <div><dt>檔案標示</dt><dd class="status-ok">瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證</dd></div>
               <div><dt>檔案大小</dt><dd>大小待正式規則確認</dd></div>
               <div><dt>文件頁數</dt><dd>頁數待正式解析</dd></div>
               <div><dt>文字與表格</dt><dd>可讀性待正式解析</dd></div>
             </dl>
-            <p class="quote-note">目前沒有正式檢查結果，也不會把「待確認」顯示成通過。</p>
+            <p class="quote-note">目前沒有內容格式或正式檢查結果，也不會把「待確認」顯示成通過。</p>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-next-step="CORRECTION_REQUIRED">查看待確認清單</button>
               <button class="owner-first-secondary-action" type="button" data-next-step="RESELECT_FILE">重新選擇</button>
@@ -168,7 +168,7 @@
           <section data-flow-panel="RESELECT_FILE" aria-labelledby="reselect-title" hidden>
             <p class="quote-stage__eyebrow">重新選擇文件</p>
             <h2 id="reselect-title">重新選擇</h2>
-            <p class="quote-stage__summary">前一份檔案沒有送出或保存。改選後，只會重新顯示本機格式狀態。</p>
+            <p class="quote-stage__summary">前一份檔案沒有送出或保存。改選後，只會重新顯示瀏覽器提供的檔案標示。</p>
             <p class="selected-file">前次本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-open-file>選擇另一份 PDF</button>

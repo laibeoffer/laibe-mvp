@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
@@ -128,7 +129,7 @@ test("visible service flow has four stages and old six-step details are non-rend
   assert.match(section, /class="flow-list"[^>]*hidden/);
 });
 
-test("three canonical entry controls stay explicit and non-clickable while planned", async () => {
+test("canonical entry controls start fail-closed before trusted route binding", async () => {
   const html = await readFile(htmlUrl, "utf8");
 
   for (const [route, label] of [
@@ -324,12 +325,15 @@ test("route binding requires an exact trusted route name and href pair", async (
   assert.equal(active.getAttribute("tabindex"), null);
   assert.equal(active.dataset.routeState, "active");
 
-  const plannedQuote = makeRouteControl("quoteCheck");
+  const activeQuote = makeRouteControl("quoteCheck");
   bindPublicRoutes(
-    { querySelectorAll: () => [plannedQuote] },
+    { querySelectorAll: () => [activeQuote] },
     { quoteCheck: "../quote_check/code.html" },
   );
-  assertRouteClosed(plannedQuote);
+  assert.equal(activeQuote.getAttribute("href"), "../quote_check/code.html");
+  assert.equal(activeQuote.getAttribute("aria-disabled"), null);
+  assert.equal(activeQuote.getAttribute("tabindex"), null);
+  assert.equal(activeQuote.dataset.routeState, "active");
 
   const appSource = await readFile(appUrl, "utf8");
   assert.match(appSource, /case "quoteCheck":/);
@@ -354,7 +358,7 @@ test("T2 evidence distinguishes current exact-five writes from the authorized hi
   assert.equal(manifest.t2.recovery.classification, "authorized_historical_external_hold");
 });
 
-test("T2 correction evidence closes its exact write set, receipts, RED GREEN, and plan state", async () => {
+test("T2 correction evidence is bound to its immutable admitted commit", async () => {
   const manifest = JSON.parse(await readFile(governanceUrl, "utf8"));
   const plan = await readFile(planUrl, "utf8");
   const expectedPaths = [
@@ -366,7 +370,21 @@ test("T2 correction evidence closes its exact write set, receipts, RED GREEN, an
   ].sort();
   const correction = manifest.t2Correction;
 
+  assert.equal(correction.status, "admitted_g1_ui_source_only_historical");
+  assert.equal(correction.commit, "3c525bb6625e8a6a8c30fecc1f9b7f506f313ad7");
+  assert.equal(correction.tree, "44ab599c45d6f167cb171846e345761f75fe0937");
   assert.equal(correction.parent, "ba22b765c727732b774a60259f111ac6a361f941");
+  const repositoryRoot = new URL("../", import.meta.url);
+  const gitText = (...args) => execFileSync("git", args, {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  }).trim();
+  assert.equal(gitText("rev-parse", `${correction.commit}^`), correction.parent);
+  assert.equal(gitText("show", "-s", "--format=%T", correction.commit), correction.tree);
+  assert.equal(
+    gitText("show", "-s", "--format=%T", correction.parent),
+    correction.parentTree,
+  );
   assert.deepEqual([...correction.writeSet].sort(), expectedPaths);
   assert.equal(correction.outsideWriteSet, 0);
   assert.ok(correction.tdd.red.failed > 0);
@@ -379,8 +397,19 @@ test("T2 correction evidence closes its exact write set, receipts, RED GREEN, an
     correction.selfRecorderReceipt,
   ];
   assert.deepEqual(receipts.map((receipt) => receipt.path).sort(), expectedPaths);
+  assert.equal(correction.receiptConvention.artifactScope, "immutable_t2_commit_blobs");
+  assert.equal(correction.receiptConvention.immutableCommit, correction.commit);
+  const expectedBlobs = new Map([
+    ["src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js", "6f016dbe23c4da7ac2496c90e4e34edb4305f25e"],
+    ["src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html", "ff81381c3ae98bbbd3fb3e5934f2c232e025a696"],
+    ["tests/pcm-owner-first-public-home.test.mjs", "a926130d0dda76387d2e39c8b94948e146eeccc0"],
+    ["docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md", "5a799ee533d4d624ab0ef03f70933dddb2b195aa"],
+  ]);
   for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(new URL(`../${receipt.path}`, import.meta.url));
+    const bytes = execFileSync("git", ["show", `${correction.commit}:${receipt.path}`], {
+      cwd: repositoryRoot,
+      encoding: null,
+    });
     const sha256 = createHash("sha256").update(bytes).digest("hex");
     const gitBlobSha1 = createHash("sha1")
       .update(`blob ${bytes.length}\0`)
@@ -389,46 +418,41 @@ test("T2 correction evidence closes its exact write set, receipts, RED GREEN, an
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, sha256, receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1, receipt.path);
-    assert.equal(receipt.scope, "current_worktree_bytes");
+    assert.equal(receipt.gitBlobSha1, expectedBlobs.get(receipt.path), receipt.path);
+    assert.equal(receipt.scope, "immutable_t2_commit_blob");
   }
-  const manifestBytes = await readFile(governanceUrl);
-  const normalizedManifest = JSON.parse(manifestBytes.toString("utf8"));
-  const normalizedSelfReceipt = normalizedManifest.t2Correction.selfRecorderReceipt;
-  normalizedSelfReceipt.sha256 = "0".repeat(64);
-  normalizedSelfReceipt.gitBlobSha1 = "0".repeat(40);
-  const normalizedBytes = Buffer.from(
-    `${JSON.stringify(normalizedManifest, null, 2)}\n`,
+  assert.equal(correction.selfRecorderReceipt.scope, "immutable_t2_commit_manifest_snapshot");
+  const historicalManifestBytes = execFileSync(
+    "git",
+    ["show", `${correction.commit}:${correction.selfRecorderReceipt.path}`],
+    { cwd: repositoryRoot, encoding: null },
+  );
+  const historicalManifest = JSON.parse(historicalManifestBytes.toString("utf8"));
+  historicalManifest.t2Correction.selfRecorderReceipt.sha256 = "0".repeat(64);
+  historicalManifest.t2Correction.selfRecorderReceipt.gitBlobSha1 = "0".repeat(40);
+  const normalizedHistoricalBytes = Buffer.from(
+    `${JSON.stringify(historicalManifest, null, 2)}\n`,
     "utf8",
   );
-  const normalizedSha256 = createHash("sha256")
-    .update(normalizedBytes)
-    .digest("hex");
-  const normalizedGitBlobSha1 = createHash("sha1")
-    .update(`blob ${normalizedBytes.length}\0`)
-    .update(normalizedBytes)
-    .digest("hex");
-  assert.equal(correction.selfRecorderReceipt.bytes, manifestBytes.length);
+  assert.equal(correction.selfRecorderReceipt.bytes, historicalManifestBytes.length);
   assert.equal(
-    correction.selfRecorderReceipt.scope,
-    "current_manifest_normalized_self_receipt",
+    correction.selfRecorderReceipt.normalizedBytes,
+    normalizedHistoricalBytes.length,
   );
   assert.equal(
-    correction.selfRecorderReceipt.convention,
-    "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
+    correction.selfRecorderReceipt.sha256,
+    createHash("sha256").update(normalizedHistoricalBytes).digest("hex"),
   );
-  assert.equal(
-    correction.selfRecorderReceipt.bytesByteDomain,
-    "final_raw_manifest_bytes",
-  );
-  assert.equal(
-    correction.selfRecorderReceipt.hashByteDomain,
-    "normalized_serialization_bytes",
-  );
-  assert.equal(correction.selfRecorderReceipt.normalizedBytes, normalizedBytes.length);
-  assert.equal(correction.selfRecorderReceipt.sha256, normalizedSha256);
   assert.equal(
     correction.selfRecorderReceipt.gitBlobSha1,
-    normalizedGitBlobSha1,
+    createHash("sha1")
+      .update(`blob ${normalizedHistoricalBytes.length}\0`)
+      .update(normalizedHistoricalBytes)
+      .digest("hex"),
+  );
+  assert.equal(
+    correction.selfRecorderReceipt.snapshotGitBlobSha1,
+    "26add6c71469cd15aaa7de7233a90396b32e021a",
   );
 
   const t2Plan = plan.match(/### Task T2:[\s\S]*?(?=\n---)/)?.[0] ?? "";

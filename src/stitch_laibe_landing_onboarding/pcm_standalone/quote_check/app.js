@@ -46,7 +46,7 @@ export const QUOTE_CHECK_STATES = safeFreeze({
     code: "CONSENT",
     type: "OPEN",
     title: "確認本機檢視範圍",
-    reason: "本頁只暫時讀取你選擇的檔名與格式，不會送出或保存。",
+    reason: "本頁只暫時讀取你選擇的檔名與瀏覽器提供的檔案標示，不會送出或保存。",
     nextAction: "勾選同意後選擇報價 PDF。",
     responsibleRole: "甲方",
     payloadPolicy: "NO_CASE_DATA",
@@ -55,7 +55,7 @@ export const QUOTE_CHECK_STATES = safeFreeze({
     code: "SELECT_FILE",
     type: "OPEN",
     title: "選擇報價 PDF",
-    reason: "先確認檔案格式；大小、頁數與可讀性仍需正式規則與解析。",
+    reason: "先查看瀏覽器提供的檔案標示；內容格式、大小、頁數與可讀性仍需正式規則與解析。",
     nextAction: "從你的裝置選擇一份報價 PDF。",
     responsibleRole: "甲方",
     payloadPolicy: "LOCAL_FILE_METADATA_ONLY",
@@ -63,8 +63,8 @@ export const QUOTE_CHECK_STATES = safeFreeze({
   VALIDATION_PENDING: freezeState({
     code: "VALIDATION_PENDING",
     type: "OPEN",
-    title: "格式已辨識，其餘條件待確認",
-    reason: "目前只能確認選擇的是 PDF；大小、頁數、文字與圖面可讀性尚未判定。",
+    title: "PDF 標示已取得，內容格式待驗證",
+    reason: "瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證。大小、頁數、文字與圖面可讀性也尚未判定。",
     nextAction: "查看待確認清單，決定是否重新選擇檔案。",
     responsibleRole: "甲方",
     payloadPolicy: "LOCAL_FILE_METADATA_ONLY",
@@ -342,12 +342,10 @@ function initializeQuoteCheckPage() {
     renderState(currentFailure, "FAILURE");
   }
 
-  function isPdf(file) {
+  function hasPdfMetadata(file) {
     try {
       if (!file || typeof file.name !== "string" || typeof file.type !== "string") return false;
-      const name = file.name;
-      const suffix = name.length >= 4 ? name.slice(name.length - 4).toLowerCase() : "";
-      return file.type === "application/pdf" || suffix === ".pdf";
+      return file.type === "application/pdf";
     } catch {
       return false;
     }
@@ -386,7 +384,7 @@ function initializeQuoteCheckPage() {
       for (let index = 0; index < fileNameTargets.length; index += 1) {
         fileNameTargets[index].textContent = file.name;
       }
-      if (!isPdf(file)) {
+      if (!hasPdfMetadata(file)) {
         showFailure("FILE_FORMAT_INVALID");
         return;
       }

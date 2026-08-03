@@ -208,7 +208,9 @@
     }
   },
   "t2Correction": {
-    "status": "ready_for_a0_review",
+    "status": "admitted_g1_ui_source_only_historical",
+    "commit": "3c525bb6625e8a6a8c30fecc1f9b7f506f313ad7",
+    "tree": "44ab599c45d6f167cb171846e345761f75fe0937",
     "parent": "ba22b765c727732b774a60259f111ac6a361f941",
     "parentTree": "71412d6e6943148750adc6f0a327e9df131b602d",
     "a0VerdictOnParent": "CHANGES_REQUIRED_NOT_ADMITTED_G1",
@@ -300,9 +302,11 @@
       }
     },
     "receiptConvention": {
-      "artifactScope": "current_worktree_bytes",
+      "artifactScope": "immutable_t2_commit_blobs",
+      "immutableCommit": "3c525bb6625e8a6a8c30fecc1f9b7f506f313ad7",
+      "currentWorktreeComparison": false,
       "hashes": ["SHA256", "GIT_BLOB_SHA1"],
-      "selfRecorderPolicy": "Set only t2Correction.selfRecorderReceipt.sha256 and gitBlobSha1 to fixed zero strings, then JSON serialize with two-space indentation as UTF-8, LF, and one trailing LF."
+      "selfRecorderPolicy": "Historical normalized self-receipt retained from the admitted T2 commit; current T3 bytes are verified separately."
     },
     "artifactReceipts": [
       {
@@ -310,28 +314,28 @@
         "bytes": 4642,
         "sha256": "bc3276c989bc4ee6ad819791dd53dcebfb00c6cacaccf330efd6cb87d6998bad",
         "gitBlobSha1": "6f016dbe23c4da7ac2496c90e4e34edb4305f25e",
-        "scope": "current_worktree_bytes"
+        "scope": "immutable_t2_commit_blob"
       },
       {
         "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
         "bytes": 27959,
         "sha256": "aea590245576f0024958c6235bccd11707be0d803615a1eefb060c35f583c0a5",
         "gitBlobSha1": "ff81381c3ae98bbbd3fb3e5934f2c232e025a696",
-        "scope": "current_worktree_bytes"
+        "scope": "immutable_t2_commit_blob"
       },
       {
         "path": "tests/pcm-owner-first-public-home.test.mjs",
         "bytes": 19709,
         "sha256": "007a2f71077aea6d8417f83f1b13b091f550cb7ee1f6356e70adef76b8649f35",
         "gitBlobSha1": "a926130d0dda76387d2e39c8b94948e146eeccc0",
-        "scope": "current_worktree_bytes"
+        "scope": "immutable_t2_commit_blob"
       },
       {
         "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
         "bytes": 26734,
         "sha256": "06a2674e54c0921ffb086a45e02aa03412d29593968acdd16f0299f37a4c1728",
         "gitBlobSha1": "5a799ee533d4d624ab0ef03f70933dddb2b195aa",
-        "scope": "current_worktree_bytes"
+        "scope": "immutable_t2_commit_blob"
       }
     ],
     "selfRecorderReceipt": {
@@ -340,7 +344,8 @@
       "normalizedBytes": 26828,
       "sha256": "a4378ef018dfa1624ce9dfd6077b70e2033f5936118003cd0428f41e1b044961",
       "gitBlobSha1": "ea35438f19affd248a691d0c26935a4d9b5a096d",
-      "scope": "current_manifest_normalized_self_receipt",
+      "snapshotGitBlobSha1": "26add6c71469cd15aaa7de7233a90396b32e021a",
+      "scope": "immutable_t2_commit_manifest_snapshot",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
       "hashByteDomain": "normalized_serialization_bytes"
@@ -429,42 +434,34 @@
     "freshVerification": {
       "focused": {
         "files": 1,
-        "tests": 11,
-        "passed": 11,
+        "tests": 16,
+        "passed": 16,
         "failed": 0,
         "exitCode": 0
       },
       "currentTrain": {
         "files": 4,
-        "tests": 49,
-        "passed": 45,
-        "failed": 4,
-        "exitCode": 1,
-        "historicalFailures": [
-          "tests/pcm-owner-first-public-home.test.mjs still expects quoteCheck to remain planned",
-          "tests/pcm-owner-first-public-home.test.mjs recalculates the historical T2 self-receipt after T3 changes shared evidence",
-          "tests/pcm-owner-first-route-manifest.test.mjs still expects every future entry including quoteCheck to remain planned",
-          "tests/pcm-owner-first-route-manifest.test.mjs still expects PUBLIC_ROUTES.quoteCheck to be null"
-        ]
+        "tests": 54,
+        "passed": 54,
+        "failed": 0,
+        "exitCode": 0
       },
       "fullSuiteTruth": {
         "files": 11,
-        "tests": 164,
-        "passed": 159,
-        "failed": 5,
+        "tests": 169,
+        "passed": 168,
+        "failed": 1,
         "exitCode": 1,
-        "historicalFailures": [
-          "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion",
-          "four superseded current-train assertions listed in t3.freshVerification.currentTrain.historicalFailures"
-        ]
+        "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
       },
       "browser": {
-        "origin": "http://127.0.0.1:8783",
+        "origin": "http://127.0.0.1:8792",
         "viewports": [
           "1280x900",
           "768x1024",
           "390x844"
         ],
+        "viewportScreenshotsInspected": 3,
         "walkedStates": [
           "INTRODUCTION",
           "CONSENT",
@@ -474,7 +471,12 @@
           "RESELECT_FILE",
           "RESULT_FORMAT",
           "RESULT_UNAVAILABLE",
-          "FILE_FORMAT_INVALID recovery"
+          "FILE_FORMAT_INVALID recovery",
+          "renamed text/plain rejection",
+          "ordinary text/plain rejection",
+          "application/pdf metadata pending",
+          "post-load string rewrite resistance",
+          "post-load string throw resistance"
         ],
         "validFileFixture": "in-memory browser PDF fixture; no repository or external test artifact written",
         "horizontalOverflow": 0,
@@ -482,9 +484,12 @@
         "plannedClickableControls": 0,
         "consoleWarningsOrErrors": 0,
         "brokenAssets": 0,
+        "previewListenerAfterCleanup": 0,
         "homepageQuoteEntry": "active local link resolved without 404",
+        "finalVisibleCopy": "瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證",
         "focusVisible": "3px cyan outline with 3px offset on primary actions and visible file-choice target",
-        "reducedMotion": "matched; transition and animation duration 0.01ms"
+        "reducedMotion": "matched; transition and animation duration 0.01ms",
+        "finalBrowserWalk": "application/pdf with .txt stayed VALIDATION_PENDING; text/plain renamed .pdf stayed FAILURE; both handlers completed without throw"
       },
       "staticGates": {
         "nodeSyntax": "pass",
@@ -506,9 +511,9 @@
     "artifactReceipts": [
       {
         "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
-        "bytes": 15647,
-        "sha256": "7f3b4db192ff2af514871e1d81ef802966ea4f3c173e4bd04d61fc188d345858",
-        "gitBlobSha1": "f8910a1693ec5cdb4d8c200c88dc44a18455f6ab",
+        "bytes": 15774,
+        "sha256": "467bfef9bba264784d208b8a2daa46f1c510db8b1077a3d9f953cfacc25fe514",
+        "gitBlobSha1": "7d6f9013e34f438977c80d5e5ec5212b48f3f834",
         "scope": "current_worktree_bytes"
       },
       {
@@ -520,16 +525,16 @@
       },
       {
         "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
-        "bytes": 15312,
-        "sha256": "33c2e0e71336606ef0ad9525ec3cfe391255d0849bd41c1bfef2ea7654c9948f",
-        "gitBlobSha1": "2403da7036f3f38a1d1e5545fd32cdcd58dab343",
+        "bytes": 15291,
+        "sha256": "a4ffaaf69119da39991abbf19018a4b6f23725bf901e4bb6eddf9e6187f8c70f",
+        "gitBlobSha1": "5bfdf7465462e5ae13fa6f67188005991c04c44c",
         "scope": "current_worktree_bytes"
       },
       {
         "path": "tests/pcm-owner-first-quote-check.test.mjs",
-        "bytes": 15292,
-        "sha256": "21618898cb08638056d723dc583fe7e9951f1102f4ea1e5bc7aabe57544c93d7",
-        "gitBlobSha1": "d29177e6f3a660886366f1a5e76d2e3e2b978d14",
+        "bytes": 24437,
+        "sha256": "cf746141830335d4ba3aae636bea5fa1e8d14cb9d09f1282e22850292400b9f3",
+        "gitBlobSha1": "ad77ef643019c039f3bf9cb87b006f0a881d04f7",
         "scope": "current_worktree_bytes"
       },
       {
@@ -548,25 +553,25 @@
       },
       {
         "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
-        "bytes": 13214,
-        "sha256": "7c688833dfb1bb1a3fe54007eb0515b9dcb126d965964736033dffe5e4c8ad3d",
-        "gitBlobSha1": "5c9407c395850e3af7c4f36026c6fab87fb0d3f1",
+        "bytes": 13479,
+        "sha256": "c4b1e4ab5efb9a6e6fb100a03deb5b611393d947b6e7324c9bf93b07e44a76f8",
+        "gitBlobSha1": "98b5dbb1da04ad8cf2692731745f7a39d2e337a2",
         "scope": "current_worktree_bytes"
       },
       {
         "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
-        "bytes": 28480,
-        "sha256": "72368f4b0745e38f43d8837f9301043f12510501277f7469744eb3164d78a18a",
-        "gitBlobSha1": "3f90a1ff81fccbcb115eb4d8b8a4bcbdbced1bda",
+        "bytes": 30196,
+        "sha256": "a26c70df93b1adc5199d330dd60953e1a590b436fc177cdc7f467161ec157ba2",
+        "gitBlobSha1": "9e09fb81f8af915ab3348afd3dc9feed16cc8667",
         "scope": "current_worktree_bytes"
       }
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 34189,
-      "normalizedBytes": 35485,
-      "sha256": "fa6bbb1d74d0f5bad1873a64a1e03e6c18ce1c886f84f5aa43f6d62a831f2bf8",
-      "gitBlobSha1": "b3f5d2b83a16e3a53a65384db99a28fd16614277",
+      "bytes": 40944,
+      "normalizedBytes": 42448,
+      "sha256": "8c15e4ce8550351598ba25440d2fccd58f90774e8362ce32060ea6d3d19028bf",
+      "gitBlobSha1": "fb72098eaf321742b5dd1b2890abe5fdd086f72b",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -580,6 +585,154 @@
     },
     "gates": {
       "G1_UI_SOURCE": "t3_ready_for_a0_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T4": "closed"
+    }
+  },
+  "t3Correction": {
+    "status": "ready_for_a0_focused_review",
+    "parent": "b54f9a51c968640541f4e69ee3ad75a22dc46dc2",
+    "parentTree": "950f0043ffe6fd992b2b04384734b181ceb54817",
+    "a0VerdictOnParent": "CHANGES_REQUIRED_NOT_ADMITTED_G1",
+    "immediateWriteSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "tests/pcm-owner-first-public-home.test.mjs",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md"
+    ],
+    "cumulativeT3WriteSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "tests/pcm-owner-first-public-home.test.mjs",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "outsideWriteSet": 0,
+    "tdd": {
+      "red": { "tests": 15, "passed": 11, "failed": 4, "exitCode": 1 },
+      "green": { "tests": 16, "passed": 16, "failed": 0, "exitCode": 0 }
+    },
+    "metadataPolicy": {
+      "trustedBrowserLabel": "application/pdf",
+      "suffixOnlyTrusted": false,
+      "contentFormatVerified": false,
+      "hostilePostLoadStringMethods": "no_throw_and_fail_closed"
+    },
+    "t2Lineage": {
+      "status": "admitted_g1_ui_source_only_historical",
+      "commit": "3c525bb6625e8a6a8c30fecc1f9b7f506f313ad7",
+      "tree": "44ab599c45d6f167cb171846e345761f75fe0937",
+      "receiptScope": "immutable_t2_commit_blobs",
+      "currentWorktreeComparison": false
+    },
+    "freshVerification": {
+      "focused": { "files": 1, "tests": 16, "passed": 16, "failed": 0, "exitCode": 0 },
+      "currentTrain": { "files": 4, "tests": 54, "passed": 54, "failed": 0, "exitCode": 0 },
+      "fullSuiteTruth": {
+        "files": 11,
+        "tests": 169,
+        "passed": 168,
+        "failed": 1,
+        "exitCode": 1,
+        "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
+      },
+      "browser": {
+        "origin": "http://127.0.0.1:8792",
+        "viewports": ["1280x900", "768x1024", "390x844"],
+        "viewportScreenshotsInspected": 3,
+        "horizontalOverflow": 0,
+        "consoleWarningsOrErrors": 0,
+        "brokenAssets": 0,
+        "plannedClickableControls": 0,
+        "visibleControlsUnder44": 0,
+        "focusVisible": "3px solid rgb(143, 232, 255) with 3px offset on the primary action",
+        "reducedMotion": "matchMedia true; transition and animation duration 0.00001s",
+        "finalVisibleCopy": "瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證",
+        "previewListenerAfterCleanup": 0
+      }
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+        "bytes": 15291,
+        "sha256": "a4ffaaf69119da39991abbf19018a4b6f23725bf901e4bb6eddf9e6187f8c70f",
+        "gitBlobSha1": "5bfdf7465462e5ae13fa6f67188005991c04c44c",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+        "bytes": 15774,
+        "sha256": "467bfef9bba264784d208b8a2daa46f1c510db8b1077a3d9f953cfacc25fe514",
+        "gitBlobSha1": "7d6f9013e34f438977c80d5e5ec5212b48f3f834",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-quote-check.test.mjs",
+        "bytes": 24437,
+        "sha256": "cf746141830335d4ba3aae636bea5fa1e8d14cb9d09f1282e22850292400b9f3",
+        "gitBlobSha1": "ad77ef643019c039f3bf9cb87b006f0a881d04f7",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-public-home.test.mjs",
+        "bytes": 21345,
+        "sha256": "3f996e185669d20e7f1de69c4d2d1dc2c343bd1a9cb2c82355a7a9216bf39792",
+        "gitBlobSha1": "ca95a47d226cd7263b3bfb68bb381afb9416775b",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-route-manifest.test.mjs",
+        "bytes": 23257,
+        "sha256": "1fcc27405c76c6b4d45197c1a11e92fdea276d80d05f269b9fe0bf3d85e4e2e0",
+        "gitBlobSha1": "7b645d14b70b7ee244c6272ba7344fb5078d6a2f",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 30196,
+        "sha256": "a26c70df93b1adc5199d330dd60953e1a590b436fc177cdc7f467161ec157ba2",
+        "gitBlobSha1": "9e09fb81f8af915ab3348afd3dc9feed16cc8667",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 13479,
+        "sha256": "c4b1e4ab5efb9a6e6fb100a03deb5b611393d947b6e7324c9bf93b07e44a76f8",
+        "gitBlobSha1": "98b5dbb1da04ad8cf2692731745f7a39d2e337a2",
+        "scope": "current_worktree_bytes"
+      }
+    ],
+    "manifestReceiptRef": "t3.selfRecorderReceipt",
+    "independentReview": {
+      "status": "second_pass_clean",
+      "firstPass": {
+        "critical": 0,
+        "important": 1,
+        "finding": "PDF pending copy combined filename and browser MIME evidence."
+      },
+      "correction": "Copy now states that the browser labels the file as PDF, while the filename is identification only and the content format remains unverified.",
+      "secondPass": {
+        "critical": 0,
+        "important": 0,
+        "nonManifestReceiptMismatches": 0
+      },
+      "critical": 0,
+      "important": 0
+    },
+    "gates": {
+      "G1_UI_SOURCE": "correction_ready_for_a0_review",
       "G2_AUTH_RUNTIME": "closed",
       "G3_DURABLE_DATA": "closed",
       "G4_PRODUCTION": "closed",

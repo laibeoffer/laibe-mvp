@@ -44,6 +44,17 @@ const exactNine = Object.freeze([
   "docs/governance/pcm-owner-first-execution-manifest.v1.json",
 ]);
 
+const correctionEight = Object.freeze([
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+  "tests/pcm-owner-first-quote-check.test.mjs",
+  "tests/pcm-owner-first-public-home.test.mjs",
+  "tests/pcm-owner-first-route-manifest.test.mjs",
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+]);
+
 const requiredSteps = Object.freeze([
   "INTRODUCTION",
   "CONSENT",
@@ -90,6 +101,87 @@ function gitBlobSha1(bytes) {
     .digest("hex");
 }
 
+function createFileHandlerHarness() {
+  const stateCodes = [...requiredSteps, "FAILURE"];
+  const panels = stateCodes.map((code) => ({
+    dataset: { flowPanel: code },
+    hidden: code !== "INTRODUCTION",
+  }));
+  const railItems = requiredSteps.map((code) => ({
+    dataset: { flowStep: code },
+    setAttribute() {},
+    removeAttribute() {},
+  }));
+  const fileNameTarget = { textContent: "尚未選擇" };
+  const failureTargets = {
+    "[data-failure-title]": { textContent: "" },
+    "[data-failure-reason]": { textContent: "" },
+    "[data-failure-next]": { textContent: "" },
+    "[data-failure-role]": { textContent: "" },
+  };
+  const listeners = new Map();
+  const fileInput = {
+    files: [],
+    value: "",
+    addEventListener(type, listener) {
+      listeners.set(type, listener);
+    },
+    click() {},
+  };
+  const root = {
+    querySelector(selector) {
+      if (selector === "#quote-file") return fileInput;
+      return failureTargets[selector] ?? null;
+    },
+    querySelectorAll(selector) {
+      if (selector === "[data-flow-panel]") return panels;
+      if (selector === "[data-flow-step]") return railItems;
+      if (selector === "[data-selected-file-name]") return [fileNameTarget];
+      return [];
+    },
+  };
+  return {
+    document: {
+      querySelector(selector) {
+        return selector === "[data-quote-check-page]" ? root : null;
+      },
+    },
+    fileInput,
+    dispatchFile(file) {
+      fileInput.files = file ? [file] : [];
+      return listeners.get("change")?.();
+    },
+    visibleState() {
+      return panels.find((panel) => panel.hidden === false)?.dataset.flowPanel;
+    },
+    failureReason() {
+      return failureTargets["[data-failure-reason]"].textContent;
+    },
+    selectedName() {
+      return fileNameTarget.textContent;
+    },
+  };
+}
+
+async function initializeFileHandlerHarness(tag) {
+  const harness = createFileHandlerHarness();
+  const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: harness.document,
+  });
+  try {
+    await import(`${pathToFileURL(appPath).href}?${tag}`);
+  } finally {
+    if (documentDescriptor) {
+      Object.defineProperty(globalThis, "document", documentDescriptor);
+    } else {
+      delete globalThis.document;
+    }
+  }
+  return harness;
+}
+
 test("quote check starts as one canonical three-file page", async () => {
   assert.equal(existsSync(quoteDir), true, "quote_check directory must exist");
   const files = [htmlPath, cssPath, appPath];
@@ -112,7 +204,7 @@ test("one page exposes the complete owner-first state sequence", async () => {
   assert.match(html, /服務說明/);
   assert.match(html, /同意本機檢視/);
   assert.match(html, /選擇報價 PDF/);
-  assert.match(html, /格式與可讀性確認/);
+  assert.match(html, /檔案標示與後續確認/);
   assert.match(html, /待確認清單/);
   assert.match(html, /重新選擇/);
   assert.match(html, /結果格式示意/);
@@ -149,6 +241,8 @@ test("selection stays local and never claims durable upload or a formal result",
 test("unknown file rules stay pending instead of inventing numeric limits", async () => {
   const html = await readOrEmpty(htmlPath);
   const visible = stripNonVisibleHtml(html);
+  assert.match(visible, /瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證/);
+  assert.doesNotMatch(visible, /格式已辨識|已在本機辨識/);
   assert.match(visible, /大小待正式規則確認/);
   assert.match(visible, /頁數待正式解析/);
   assert.match(visible, /可讀性待正式解析/);
@@ -257,6 +351,111 @@ test("state resolver is strict closed and survives hostile post-load intrinsics"
       else delete target[property];
     }
   }
+});
+
+test("actual file handler rejects ordinary text and text renamed as PDF", async () => {
+  assert.equal(existsSync(appPath), true, "app.js must exist before import");
+  const harness = await initializeFileHandlerHarness("renamed-text-handler");
+  harness.dispatchFile({ name: "報價.txt", type: "text/plain" });
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.doesNotThrow(() => {
+    harness.dispatchFile({ name: "報價.pdf", type: "text/plain" });
+  });
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.match(harness.failureReason(), /PDF/);
+});
+
+test("actual file handler ignores post-load slice and lowercase rewriting", async () => {
+  const harness = await initializeFileHandlerHarness("rewritten-string-handler");
+  const sliceDescriptor = Object.getOwnPropertyDescriptor(String.prototype, "slice");
+  const lowerDescriptor = Object.getOwnPropertyDescriptor(
+    String.prototype,
+    "toLowerCase",
+  );
+  Object.defineProperty(String.prototype, "slice", {
+    configurable: true,
+    value() {
+      return ".pdf";
+    },
+  });
+  Object.defineProperty(String.prototype, "toLowerCase", {
+    configurable: true,
+    value() {
+      return ".pdf";
+    },
+  });
+  try {
+    assert.doesNotThrow(() => {
+      harness.dispatchFile({ name: "報價.txt", type: "text/plain" });
+    });
+    assert.equal(harness.visibleState(), "FAILURE");
+    assert.doesNotThrow(() => {
+      harness.dispatchFile({ name: "報價.pdf", type: "application/pdf" });
+    });
+    assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  } finally {
+    Object.defineProperty(String.prototype, "slice", sliceDescriptor);
+    Object.defineProperty(String.prototype, "toLowerCase", lowerDescriptor);
+  }
+});
+
+test("actual file handler stays closed when post-load string methods throw", async () => {
+  const harness = await initializeFileHandlerHarness("throwing-string-handler");
+  const sliceDescriptor = Object.getOwnPropertyDescriptor(String.prototype, "slice");
+  const lowerDescriptor = Object.getOwnPropertyDescriptor(
+    String.prototype,
+    "toLowerCase",
+  );
+  Object.defineProperty(String.prototype, "slice", {
+    configurable: true,
+    value() {
+      throw new Error("poisoned slice");
+    },
+  });
+  Object.defineProperty(String.prototype, "toLowerCase", {
+    configurable: true,
+    value() {
+      throw new Error("poisoned toLowerCase");
+    },
+  });
+  try {
+    assert.doesNotThrow(() => {
+      harness.dispatchFile({ name: "報價.txt", type: "text/plain" });
+    });
+    assert.equal(harness.visibleState(), "FAILURE");
+    assert.doesNotThrow(() => {
+      harness.dispatchFile({ name: "報價.pdf", type: "application/pdf" });
+    });
+    assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  } finally {
+    Object.defineProperty(String.prototype, "slice", sliceDescriptor);
+    Object.defineProperty(String.prototype, "toLowerCase", lowerDescriptor);
+  }
+});
+
+test("actual file handler keeps browser PDF metadata in validation pending", async () => {
+  const harness = await initializeFileHandlerHarness("pdf-metadata-handler");
+  assert.doesNotThrow(() => {
+    harness.dispatchFile({ name: "報價.pdf", type: "application/pdf" });
+  });
+  assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  assert.equal(harness.selectedName(), "報價.pdf");
+  assert.doesNotThrow(() => {
+    harness.dispatchFile({ name: "報價.txt", type: "application/pdf" });
+  });
+  assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  assert.equal(harness.selectedName(), "報價.txt");
+});
+
+test("validation pending state describes metadata without claiming content recognition", async () => {
+  const appModule = await import(
+    `${pathToFileURL(appPath).href}?truthful-validation-copy`
+  );
+  const pending = appModule.QUOTE_CHECK_STATES.VALIDATION_PENDING;
+  assert.match(pending.title, /標示.*內容格式待驗證/);
+  assert.match(pending.reason, /瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證/);
+  assert.doesNotMatch(pending.reason, /檔名.*為 PDF/);
+  assert.doesNotMatch(`${pending.title} ${pending.reason}`, /格式已辨識|已在本機辨識/);
 });
 
 test("only quoteCheck activates and compatibility pages remain aliases", async () => {
@@ -395,4 +594,55 @@ test("T3 governance evidence closes exact-nine current receipts", async () => {
   );
   assert.match(plan, /### Task T3:[\s\S]*?Actual bounded write set/);
   assert.match(plan, /### Task T3:[\s\S]*?focused[^\n]*PASS/i);
+
+  const correction = governance.t3Correction;
+  assert.ok(correction, "T3 correction evidence must exist");
+  assert.equal(correction.parent, "b54f9a51c968640541f4e69ee3ad75a22dc46dc2");
+  assert.equal(correction.parentTree, "950f0043ffe6fd992b2b04384734b181ceb54817");
+  assert.deepEqual([...correction.immediateWriteSet].sort(), [...correctionEight].sort());
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.tdd.red, {
+    tests: 15,
+    passed: 11,
+    failed: 4,
+    exitCode: 1,
+  });
+  assert.deepEqual(correction.tdd.green, {
+    tests: 16,
+    passed: 16,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.currentTrain, {
+    files: 4,
+    tests: 54,
+    passed: 54,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.freshVerification.fullSuiteTruth, {
+    files: 11,
+    tests: 169,
+    passed: 168,
+    failed: 1,
+    exitCode: 1,
+    onlyFailure: "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion",
+  });
+  assert.equal(correction.manifestReceiptRef, "t3.selfRecorderReceipt");
+  const correctionArtifactPaths = correctionEight.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    correction.artifactReceipts.map((receipt) => receipt.path).sort(),
+    correctionArtifactPaths.sort(),
+  );
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "current_worktree_bytes");
+  }
+  assert.equal(correction.independentReview.critical, 0);
+  assert.equal(correction.independentReview.important, 0);
 });
