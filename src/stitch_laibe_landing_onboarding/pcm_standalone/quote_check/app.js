@@ -177,7 +177,7 @@ function freezeState(record) {
   });
 }
 
-const CONTEXT_UNAVAILABLE = freezeState({
+export const CONTEXT_UNAVAILABLE = freezeState({
   code: "CONTEXT_UNAVAILABLE",
   type: "CLOSED",
   title: "目前無法判斷報價健檢步驟",
@@ -337,6 +337,61 @@ export const QUOTE_CHECK_FAILURES = safeFreeze({
   }),
 });
 
+function createHeroAction(label, enabled, target = null) {
+  const action = safeCreate(null);
+  action.label = label;
+  action.enabled = enabled;
+  action.target = target;
+  return safeFreeze(action);
+}
+
+const HERO_ACTIONS = safeCreate(null);
+HERO_ACTIONS.INTRODUCTION = createHeroAction("開始報價健檢準備", true, "CONSENT");
+HERO_ACTIONS.CONSENT = createHeroAction("請先同意本機檢視", false);
+HERO_ACTIONS.SELECT_FILE = createHeroAction("選擇報價 PDF", true, "OPEN_FILE");
+HERO_ACTIONS.VALIDATION_PENDING = createHeroAction("查看待確認清單", true, "CORRECTION_REQUIRED");
+HERO_ACTIONS.CORRECTION_REQUIRED = createHeroAction("重新選擇報價 PDF", true, "RESELECT_FILE");
+HERO_ACTIONS.RESELECT_FILE = createHeroAction("選擇另一份 PDF", true, "OPEN_FILE");
+HERO_ACTIONS.RESULT_FORMAT = createHeroAction("查看目前結果狀態", true, "RESULT_UNAVAILABLE");
+HERO_ACTIONS.RESULT_UNAVAILABLE = createHeroAction("重新選擇報價 PDF", true, "SELECT_FILE");
+HERO_ACTIONS.FILE_FORMAT_INVALID = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.FILE_TOO_LARGE = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.PAGE_COUNT_INVALID = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.FILE_UNREADABLE = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.FILE_CORRUPTED = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.DUPLICATE_SUBMISSION = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.VERSION_CONFLICT = createHeroAction("依建議恢復", true, "RESELECT_FILE");
+HERO_ACTIONS.QUOTE_ONLY_DRAWING_MISSING = createHeroAction("依建議恢復", true, "RESULT_FORMAT");
+safeFreeze(HERO_ACTIONS);
+const NO_HERO_ACTION = createHeroAction("目前沒有可執行的下一步", false);
+
+export function projectQuoteCheckHeroAction(state) {
+  try {
+    if (!state || typeof state !== "object") return NO_HERO_ACTION;
+    switch (state.code) {
+      case "INTRODUCTION": return HERO_ACTIONS.INTRODUCTION;
+      case "CONSENT": return HERO_ACTIONS.CONSENT;
+      case "SELECT_FILE": return HERO_ACTIONS.SELECT_FILE;
+      case "VALIDATION_PENDING": return HERO_ACTIONS.VALIDATION_PENDING;
+      case "CORRECTION_REQUIRED": return HERO_ACTIONS.CORRECTION_REQUIRED;
+      case "RESELECT_FILE": return HERO_ACTIONS.RESELECT_FILE;
+      case "RESULT_FORMAT": return HERO_ACTIONS.RESULT_FORMAT;
+      case "RESULT_UNAVAILABLE": return HERO_ACTIONS.RESULT_UNAVAILABLE;
+      case "FILE_FORMAT_INVALID": return HERO_ACTIONS.FILE_FORMAT_INVALID;
+      case "FILE_TOO_LARGE": return HERO_ACTIONS.FILE_TOO_LARGE;
+      case "PAGE_COUNT_INVALID": return HERO_ACTIONS.PAGE_COUNT_INVALID;
+      case "FILE_UNREADABLE": return HERO_ACTIONS.FILE_UNREADABLE;
+      case "FILE_CORRUPTED": return HERO_ACTIONS.FILE_CORRUPTED;
+      case "DUPLICATE_SUBMISSION": return HERO_ACTIONS.DUPLICATE_SUBMISSION;
+      case "VERSION_CONFLICT": return HERO_ACTIONS.VERSION_CONFLICT;
+      case "QUOTE_ONLY_DRAWING_MISSING": return HERO_ACTIONS.QUOTE_ONLY_DRAWING_MISSING;
+      default: return NO_HERO_ACTION;
+    }
+  } catch {
+    return NO_HERO_ACTION;
+  }
+}
+
 function readOwnDataString(input, property) {
   const descriptor = safeGetOwnPropertyDescriptor(input, property);
   if (!descriptor) return null;
@@ -442,6 +497,7 @@ function initializeQuoteCheckPage() {
   const failureRole = root.querySelector("[data-failure-role]");
   const failureRecover = root.querySelector("[data-failure-recover]");
   const failureReturn = root.querySelector("[data-failure-return]");
+  const heroStart = root.querySelector("[data-hero-start]");
   const openFileControls = root.querySelectorAll("[data-open-file]");
   const stepOrder = safeFreeze([
     "INTRODUCTION",
@@ -455,6 +511,7 @@ function initializeQuoteCheckPage() {
   ]);
   let currentStep = "INTRODUCTION";
   let currentFailure = null;
+  let currentHeroAction = NO_HERO_ACTION;
 
   function stepIndex(step) {
     for (let index = 0; index < stepOrder.length; index += 1) {
@@ -492,6 +549,24 @@ function initializeQuoteCheckPage() {
     }
   }
 
+  function renderHeroAction(action) {
+    currentHeroAction = action;
+    if (!heroStart) return;
+    try {
+      heroStart.textContent = action.label;
+      heroStart.disabled = !action.enabled;
+      heroStart.setAttribute("aria-disabled", action.enabled ? "false" : "true");
+      delete heroStart.dataset.nextStep;
+      if (action.enabled && action.target) {
+        heroStart.dataset.heroTarget = action.target;
+      } else {
+        delete heroStart.dataset.heroTarget;
+      }
+    } catch {
+      currentHeroAction = NO_HERO_ACTION;
+    }
+  }
+
   function renderState(state, panelCode = state.code, shouldFocus = false) {
     currentStep = panelCode;
     let activePanel = null;
@@ -521,6 +596,7 @@ function initializeQuoteCheckPage() {
       roleTargets[index].textContent = state.responsibleRole;
     }
     if (liveTarget) liveTarget.textContent = `目前狀態：${state.title}。下一步：${state.nextAction}`;
+    renderHeroAction(projectQuoteCheckHeroAction(state));
     if (shouldFocus) focusPanel(activePanel);
   }
 
@@ -631,9 +707,40 @@ function initializeQuoteCheckPage() {
     }
   }
 
+  function openFilePicker() {
+    try {
+      if (!fileInput) return;
+      fileInput.value = "";
+      fileInput.click();
+    } catch {
+      showFileSelectionFailure();
+    }
+  }
+
+  function runHeroAction(action) {
+    if (!action.enabled || !action.target) return;
+    switch (action.target) {
+      case "CONSENT":
+      case "SELECT_FILE":
+      case "CORRECTION_REQUIRED":
+      case "RESELECT_FILE":
+      case "RESULT_FORMAT":
+      case "RESULT_UNAVAILABLE":
+        moveTo(action.target);
+        return;
+      case "OPEN_FILE":
+        openFilePicker();
+        return;
+      default:
+        return;
+    }
+  }
+
   for (let index = 0; index < nextControls.length; index += 1) {
-    nextControls[index].addEventListener("click", () => {
-      moveTo(nextControls[index].dataset.nextStep);
+    const nextControl = nextControls[index];
+    if (nextControl === heroStart) continue;
+    nextControl.addEventListener("click", () => {
+      moveTo(nextControl.dataset.nextStep);
     });
   }
 
@@ -645,10 +752,13 @@ function initializeQuoteCheckPage() {
 
   for (let index = 0; index < openFileControls.length; index += 1) {
     openFileControls[index].addEventListener("click", () => {
-      if (fileInput) {
-        fileInput.value = "";
-        fileInput.click();
-      }
+      openFilePicker();
+    });
+  }
+
+  if (heroStart) {
+    heroStart.addEventListener("click", () => {
+      runHeroAction(currentHeroAction);
     });
   }
 

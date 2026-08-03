@@ -42,6 +42,7 @@ const specPath = resolve(
 );
 const execFileAsync = promisify(execFile);
 const immutableT3Candidate = "238f8180af9e6a1a8d7dd7a71303cd4031324775";
+const immutableT3ContrastCandidate = "74b606297c391615d76de505759bceda4756ec57";
 
 const exactNine = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
@@ -101,6 +102,14 @@ const contrastExactFive = Object.freeze([
   "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
 ]);
 
+const heroActionExactFive = Object.freeze([
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+  "tests/pcm-owner-first-quote-check.test.mjs",
+  "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+]);
+
 const requiredSteps = Object.freeze([
   "INTRODUCTION",
   "CONSENT",
@@ -131,13 +140,17 @@ async function readOrEmpty(path) {
   }
 }
 
-async function immutableCandidateBytes(path) {
+async function immutableCommitBytes(commit, path) {
   const { stdout } = await execFileAsync(
     "git",
-    ["show", `${immutableT3Candidate}:${path}`],
+    ["show", `${commit}:${path}`],
     { cwd: repoRoot, encoding: null, maxBuffer: 16 * 1024 * 1024 },
   );
   return stdout;
+}
+
+async function immutableCandidateBytes(path) {
+  return immutableCommitBytes(immutableT3Candidate, path);
 }
 
 async function assertResolvableBlob(blob, label) {
@@ -277,6 +290,31 @@ function createFileHandlerHarness() {
     "[data-failure-role]": { textContent: "" },
   };
   const listeners = new Map();
+  const heroStart = {
+    attributes: new Map(),
+    dataset: { heroStart: "", nextStep: "CONSENT" },
+    disabled: false,
+    textContent: "開始報價健檢準備",
+    addEventListener(type, listener) {
+      const key = `heroStart:${type}`;
+      const prior = listeners.get(key);
+      listeners.set(
+        key,
+        prior
+          ? (...args) => {
+            prior(...args);
+            listener(...args);
+          }
+          : listener,
+      );
+    },
+    setAttribute(name, value) {
+      this.attributes.set(name, String(value));
+    },
+    removeAttribute(name) {
+      this.attributes.delete(name);
+    },
+  };
   const failureRecover = {
     addEventListener(type, listener) {
       listeners.set(`failureRecover:${type}`, listener);
@@ -296,6 +334,7 @@ function createFileHandlerHarness() {
   const root = {
     querySelector(selector) {
       if (selector === "#quote-file") return fileInput;
+      if (selector === "[data-hero-start]") return heroStart;
       if (selector === "[data-failure-recover]") return failureRecover;
       if (selector === "[data-failure-return]") return failureReturn;
       return failureTargets[selector] ?? null;
@@ -303,6 +342,7 @@ function createFileHandlerHarness() {
     querySelectorAll(selector) {
       if (selector === "[data-flow-panel]") return panels;
       if (selector === "[data-flow-step]") return railItems;
+      if (selector === "[data-next-step]") return [heroStart];
       if (selector === "[data-selected-file-name]") return [fileNameTarget];
       return [];
     },
@@ -327,6 +367,9 @@ function createFileHandlerHarness() {
     dispatchChange() {
       return listeners.get("change")?.();
     },
+    dispatchHero() {
+      return listeners.get("heroStart:click")?.();
+    },
     dispatchRecover() {
       return listeners.get("failureRecover:click")?.();
     },
@@ -347,6 +390,14 @@ function createFileHandlerHarness() {
     },
     focusedPanel() {
       return focusedPanelCode;
+    },
+    heroAction() {
+      return {
+        ariaDisabled: heroStart.attributes.get("aria-disabled") ?? null,
+        disabled: heroStart.disabled,
+        label: heroStart.textContent,
+        target: heroStart.dataset.heroTarget ?? null,
+      };
     },
   };
 }
@@ -947,6 +998,76 @@ test("actual file handler keeps browser PDF metadata in validation pending", asy
   assert.equal(harness.selectedName(), "報價.txt");
 });
 
+test("actual hero listener projects validation pending to its legal next step instead of CONSENT", async () => {
+  const harness = await initializeFileHandlerHarness("hero-validation-pending-listener");
+
+  assert.deepEqual(harness.heroAction(), {
+    ariaDisabled: "false",
+    disabled: false,
+    label: "開始報價健檢準備",
+    target: "CONSENT",
+  });
+  harness.dispatchHero();
+  assert.equal(harness.visibleState(), "CONSENT");
+
+  harness.dispatchFile(browserFile("報價.pdf", "application/pdf"));
+  assert.equal(harness.visibleState(), "VALIDATION_PENDING");
+  assert.deepEqual(harness.heroAction(), {
+    ariaDisabled: "false",
+    disabled: false,
+    label: "查看待確認清單",
+    target: "CORRECTION_REQUIRED",
+  });
+
+  harness.dispatchHero();
+  assert.equal(harness.visibleState(), "CORRECTION_REQUIRED");
+  assert.notEqual(harness.visibleState(), "CONSENT");
+});
+
+test("hero action projection is closed, state-owned, and leaves no target when a next step is gated", async () => {
+  const appModule = await import(
+    `${pathToFileURL(appPath).href}?hero-action-projection-contract`,
+  );
+  const expectedOpenStates = [
+    ["INTRODUCTION", "開始報價健檢準備", true, "CONSENT"],
+    ["CONSENT", "請先同意本機檢視", false, null],
+    ["SELECT_FILE", "選擇報價 PDF", true, "OPEN_FILE"],
+    ["VALIDATION_PENDING", "查看待確認清單", true, "CORRECTION_REQUIRED"],
+    ["CORRECTION_REQUIRED", "重新選擇報價 PDF", true, "RESELECT_FILE"],
+    ["RESELECT_FILE", "選擇另一份 PDF", true, "OPEN_FILE"],
+    ["RESULT_FORMAT", "查看目前結果狀態", true, "RESULT_UNAVAILABLE"],
+    ["RESULT_UNAVAILABLE", "重新選擇報價 PDF", true, "SELECT_FILE"],
+  ];
+
+  for (const [code, label, enabled, target] of expectedOpenStates) {
+    const action = appModule.projectQuoteCheckHeroAction(
+      appModule.QUOTE_CHECK_STATES[code],
+    );
+    assert.deepEqual(
+      { label: action.label, enabled: action.enabled, target: action.target },
+      { label, enabled, target },
+      code,
+    );
+  }
+
+  for (const failure of Object.values(appModule.QUOTE_CHECK_FAILURES)) {
+    const action = appModule.projectQuoteCheckHeroAction(failure);
+    assert.deepEqual(
+      { label: action.label, enabled: action.enabled, target: action.target },
+      { label: "依建議恢復", enabled: true, target: failure.recoveryStep },
+      failure.code,
+    );
+  }
+
+  const unavailable = appModule.projectQuoteCheckHeroAction(
+    appModule.CONTEXT_UNAVAILABLE,
+  );
+  assert.deepEqual(
+    { label: unavailable.label, enabled: unavailable.enabled, target: unavailable.target },
+    { label: "目前沒有可執行的下一步", enabled: false, target: null },
+  );
+});
+
 test("invalid replacement clears stale file identity and recovery moves focus", async () => {
   const harness = await initializeFileHandlerHarness("clear-stale-file-and-focus");
   harness.dispatchFile(browserFile("目前報價.pdf", "application/pdf"));
@@ -1434,6 +1555,7 @@ test("T3 CTA contrast correction records bounded quantitative evidence", async (
   const governance = JSON.parse(manifestBytes.toString("utf8"));
   const correction = governance.t3ContrastCorrection;
   assert.ok(correction, "CTA contrast correction evidence must exist");
+  assert.equal(correction.commit, immutableT3ContrastCandidate);
   assert.equal(correction.parent, "0b4aecee2bd7e4317a4734dbcf9c7b1096b269fc");
   assert.equal(correction.parentTree, "833efce0e6af27992c1a7f668a6bc7ef8d018cc2");
   assert.deepEqual([...correction.writeSet].sort(), [...contrastExactFive].sort());
@@ -1502,7 +1624,7 @@ test("T3 CTA contrast correction records bounded quantitative evidence", async (
     [...artifactPaths].sort(),
   );
   for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    const bytes = await immutableCommitBytes(immutableT3ContrastCandidate, receipt.path);
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
@@ -1513,4 +1635,56 @@ test("T3 CTA contrast correction records bounded quantitative evidence", async (
   assert.equal(correction.independentReview.important, 0);
   assert.match(plan, /Actual bounded CTA contrast correction write set/);
   assert.match(spec, /quantitative CTA contrast/i);
+});
+
+test("T3 hero action correction records the current review parent and immutable candidate receipts", async () => {
+  const [manifestBytes, plan, spec] = await Promise.all([
+    readFile(governancePath),
+    readFile(planPath, "utf8"),
+    readFile(specPath, "utf8"),
+  ]);
+  const governance = JSON.parse(manifestBytes.toString("utf8"));
+  const correction = governance.t3HeroActionCorrection;
+  assert.ok(correction, "hero action correction evidence must exist");
+  assert.equal(correction.parent, immutableT3ContrastCandidate);
+  assert.equal(correction.parentTree, "5eff127610e86b85667e4d2e8d523c082ea9db00");
+  assert.deepEqual([...correction.writeSet].sort(), [...heroActionExactFive].sort());
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.tdd.red, {
+    tests: 35,
+    passed: 33,
+    failed: 2,
+    exitCode: 1,
+  });
+  assert.deepEqual(correction.tdd.green, {
+    tests: 35,
+    passed: 35,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.equal(correction.heroAction.authority, "CLOSED_STATE_PROJECTION_ONLY");
+  assert.equal(correction.heroAction.validationPending.target, "CORRECTION_REQUIRED");
+  assert.equal(correction.heroAction.consent.enabled, false);
+  assert.equal(correction.heroAction.consent.target, null);
+  assert.equal(correction.heroAction.noAction.target, null);
+  assert.equal(correction.heroAction.noAction.ariaDisabled, true);
+  assert.equal(correction.manifestReceiptRef, "t3.selfRecorderReceipt");
+  const artifactPaths = heroActionExactFive.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    correction.artifactReceipts.map((receipt) => receipt.path).sort(),
+    [...artifactPaths].sort(),
+  );
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "candidate_git_blob_bytes");
+  }
+  assert.equal(correction.independentReview.critical, 0);
+  assert.equal(correction.independentReview.important, 0);
+  assert.match(plan, /T3 hero action correction/);
+  assert.match(spec, /state-owned hero action projection/i);
 });

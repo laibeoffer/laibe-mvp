@@ -408,6 +408,16 @@
 - [x] Verify all six required viewports, the invalid-file recovery focus, exact-five scope, fresh focused/current/full suites, normalized self-receipt, and independent Critical 0 / Important 0 review.
 - [x] Keep T4 and G2–G4 closed and stop for A0 admission after the bounded commit.
 
+## T3 hero action correction
+
+**Actual bounded hero action correction write set:** `quote_check/app.js`, `tests/pcm-owner-first-quote-check.test.mjs`, this plan, the current owner-first specification, and the governance manifest. Parent is `74b606297c391615d76de505759bceda4756ec57`; outside this exact-five set is zero.
+
+- [x] Reproduce the production listener RED: after an exact browser PDF label reached `VALIDATION_PENDING`, the hero CTA still displayed its introduction label and initial `CONSENT` target. Clicking it returned the user to consent. The focused run reported 35 tests, 33 passed, and 2 failed; the second failure was the expected stale historical receipt assertion before it was bound to its immutable candidate.
+- [x] Add one closed state-to-hero-action projection for the label, enabled state, and target. The render path owns the displayed action, while the click listener dispatches only the current projected action and never reads a stale DOM dataset for authority.
+- [x] Keep gated and closed states safe: consent has no hero target until the in-panel consent step, no-action states are disabled with `aria-disabled` and no target, `VALIDATION_PENDING` leads only to `CORRECTION_REQUIRED`, and failure recovery remains closed to its declared recovery step.
+- [x] Preserve hostile input, MIME/FileList, zero-action, contrast, file recovery, and G2-G4 closure coverage. Refresh immutable historical receipts for the prior contrast correction from commit `74b6062`, then record the exact-five correction and one normalized manifest self-receipt.
+- [x] Verify the focused suite, current T0-T3 train, full PCM suite against the parent 185/185 baseline, syntax/UTF-8/JSON/duplicate-key/local-reference/forbidden-copy/diff gates, six viewport smoke, and independent Critical 0 / Important 0 review before the bounded local commit.
+
 ## Self-review
 
 - Coverage: the corrected schedule has exactly T0–T18 and maps every Human-ordered source package once.

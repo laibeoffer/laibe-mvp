@@ -12,7 +12,8 @@
 - Shared-system commit `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` is the exact parent of the focused admission correction.
 - Focused admission commit `403e4f7b84b3e5ee999db583bd23b65732e369d4` received `CHANGES_REQUIRED` because internal parsed context still depended on the shared Array iterator and the governance JSON contained duplicate evidence keys.
 - T2 homepage work is byte-identically held outside the repository until the Array-iterator/evidence correction receives A0 focused admission.
-- The current review target is the bounded exact-five correction commit that contains this specification and has `403e4f7b84b3e5ee999db583bd23b65732e369d4` as its parent.
+- `403e4f7b84b3e5ee999db583bd23b65732e369d4` is historical T0 evidence only and is not the current review target.
+- The current review target is the T3 hero-action correction whose sole correction parent is `74b606297c391615d76de505759bceda4756ec57`.
 - This train owns G1 source only. G2 identity/role, G3 durable records, and G4 production remain closed.
 
 ## Product outcome
@@ -152,6 +153,8 @@ The no-action value is a frozen null-prototype zero-action iterable, not an empt
 Replacing a previously accepted local PDF label with an invalid selection clears the prior filename and the native file input before the failure appears. Recovery keeps those two surfaces consistent. Every state transition focuses the new panel heading (or its primary operation if a heading is unavailable), providing a visible focus target without returning focus to BODY.
 
 The short-viewport continuation repeats only the current status, next step, and one primary action inside the hero service boundary. It preserves the full five-fact spine below, while ensuring 390×640 and 1280×768 can show those three decision facts together without changing the page's routes, contract state, or G1-only boundary.
+
+The hero action uses one closed, state-owned hero action projection for its label, enabled state, and target. Rendering never takes authority from the button's initial dataset or another caller. `VALIDATION_PENDING` leads only to `CORRECTION_REQUIRED`; it cannot return to consent. The consent state has no legal hero next action until the in-panel consent control is completed, so the hero action is disabled with `aria-disabled="true"` and no target. Every state without a legal next action has the same disabled, target-free behavior.
 
 T3 activates only `quoteCheck` at `../quote_check/code.html` and makes only the `home` to `quoteCheck` edge clickable. `drawingCheck` and `accountAccess` remain planned with null hrefs; compatibility pages remain aliases and never become canonical steps.
 

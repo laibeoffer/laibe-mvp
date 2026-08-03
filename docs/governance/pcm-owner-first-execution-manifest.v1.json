@@ -569,10 +569,10 @@
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 64744,
-      "normalizedBytes": 67704,
-      "sha256": "86ff3ebb872091eff612f3468ab42d4aa88de83a453c9202e78337cc2bce363a",
-      "gitBlobSha1": "8eb557b2b9a2de867e9996012474e9e4e3eccb00",
+      "bytes": 68083,
+      "normalizedBytes": 71231,
+      "sha256": "241c9d2f5522ef830f6db8e84400ef6ef4b391d37fb54d89ddd286241f31ff63",
+      "gitBlobSha1": "87567a5deb2e180231fcf5553d044f5b9c822ed8",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -1208,6 +1208,7 @@
   },
   "t3ContrastCorrection": {
     "status": "ready_for_a0_focused_review",
+    "commit": "74b606297c391615d76de505759bceda4756ec57",
     "parent": "0b4aecee2bd7e4317a4734dbcf9c7b1096b269fc",
     "parentTree": "833efce0e6af27992c1a7f668a6bc7ef8d018cc2",
     "a0VerdictOnParent": "CHANGES_REQUIRED_NOT_ADMITTED_G1",
@@ -1351,6 +1352,85 @@
       "G3_DURABLE_DATA": "closed",
       "G4_PRODUCTION": "closed",
       "T4": "closed"
+    }
+  },
+  "t3HeroActionCorrection": {
+    "status": "ready_for_a0_focused_review",
+    "parent": "74b606297c391615d76de505759bceda4756ec57",
+    "parentTree": "5eff127610e86b85667e4d2e8d523c082ea9db00",
+    "a0VerdictOnParent": "CHANGES_REQUIRED_NOT_ADMITTED_G1",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md"
+    ],
+    "outsideWriteSet": 0,
+    "tdd": {
+      "red": { "tests": 35, "passed": 33, "failed": 2, "exitCode": 1 },
+      "green": { "tests": 35, "passed": 35, "failed": 0, "exitCode": 0 }
+    },
+    "heroAction": {
+      "authority": "CLOSED_STATE_PROJECTION_ONLY",
+      "validationPending": { "label": "查看待確認清單", "enabled": true, "target": "CORRECTION_REQUIRED" },
+      "consent": { "label": "請先同意本機檢視", "enabled": false, "target": null },
+      "noAction": { "enabled": false, "target": null, "ariaDisabled": true }
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+        "bytes": 28126,
+        "sha256": "5e7d8de5c33f9d84a7f6c544b12eca83dd16681a78b4254ac63003fa4b90eacb",
+        "gitBlobSha1": "414bc48b58c38bc0bf467b0bcbbe4cb6de583a77",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-quote-check.test.mjs",
+        "bytes": 64906,
+        "sha256": "59d414d579c92a7c217e954f727c51ddc0ee7e4a9e74514e8bf34d4a6e7d4a71",
+        "gitBlobSha1": "66436a89d284d45dba35eb7599aa22da7ce0cdf5",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 39091,
+        "sha256": "ab055f7fb1a47b78d3c284f71a7757e6b51326179d93b71d13c5bedd8ad6c4c5",
+        "gitBlobSha1": "30b60e62bcbd60a2bc5ceed63c2e78feb6d2898c",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 16790,
+        "sha256": "baef6c1070ccfe21144e5521d0c3fe6e29079321250922fc1ebd7ae75a3ebd26",
+        "gitBlobSha1": "4460d0dec15c84d94348218c522d46d876e63c19",
+        "scope": "candidate_git_blob_bytes"
+      }
+    ],
+    "manifestReceiptRef": "t3.selfRecorderReceipt",
+    "independentReview": { "critical": 0, "important": 0, "minor": 0 },
+    "skillEvidence": {
+      "main": [
+        "using-superpowers",
+        "receiving-code-review",
+        "systematic-debugging",
+        "using-git-worktrees",
+        "test-driven-development",
+        "executing-plans",
+        "frontend-design",
+        "web-design-engineer",
+        "browser:control-in-app-browser",
+        "requesting-code-review",
+        "verification-before-completion"
+      ]
+    },
+    "gates": {
+      "G1_UI_SOURCE": "correction_ready_for_a0_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T4": "closed",
+      "T5": "closed"
     }
   },
   "gates": [
