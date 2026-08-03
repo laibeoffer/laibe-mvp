@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="LaiBE AI PCM 圖說檢討，協助甲方先整理圖說版本、可讀性、待確認事項與下一步。"
+    />
+    <title>LaiBE AI PCM｜圖說檢討</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="../shared/owner-first-shell.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要內容</a>
+    <header class="drawing-header" id="top">
+      <div class="drawing-header__inner">
+        <a class="drawing-brand" href="../public_home/code.html#top" aria-label="返回 PCM 首頁">
+          <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+          <span>AI PCM</span>
+        </a>
+        <a class="drawing-header__back" href="../public_home/code.html#top">返回 PCM 首頁</a>
+      </div>
+    </header>
+
+    <main
+      class="owner-first-shell drawing-shell"
+      id="main-content"
+      data-drawing-check-page
+    >
+      <section class="drawing-hero" aria-labelledby="drawing-title">
+        <div>
+          <p class="drawing-eyebrow">圖說檢討｜給準備施工圖 PDF 的甲方</p>
+          <h1 id="drawing-title">先整理圖說版本與可讀性，再談施工範圍</h1>
+          <p class="drawing-hero__lead">
+            先釐清圖說是什麼版本、哪些頁面要討論，以及哪些內容仍需報價或乙方說明；正式收件與解析開放前，本頁只在你的裝置暫時檢視檔名與瀏覽器提供的檔案標示。
+          </p>
+        </div>
+        <aside class="drawing-hero__boundary" aria-label="服務邊界">
+          <span>目前服務狀態</span>
+          <strong>圖說準備與結果格式預覽</strong>
+          <p>不送出文件、不建立案件，也不產生正式圖說檢討結果。</p>
+          <div class="drawing-hero__continuation" aria-label="目前狀態與下一步">
+            <p>
+              <span>目前狀態</span>
+              <strong data-current-status>先看圖說能替下一步回答什麼</strong>
+            </p>
+            <p>
+              <span>下一步</span>
+              <strong><span data-current-responsibility>甲方</span>｜<span data-current-next>閱讀服務邊界後，進入同意步驟。</span></strong>
+            </p>
+            <button class="owner-first-primary-action" type="button" data-next-step="CONSENT" data-hero-start>開始圖說檢討準備</button>
+          </div>
+        </aside>
+      </section>
+
+      <section class="owner-first-facts" aria-label="目前處理事實">
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">角色</span>
+          <strong class="owner-first-fact-value">甲方／圖說準備者</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">PCM 契約</span>
+          <strong class="owner-first-fact-value">尚未進入正式服務</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">案件狀態</span>
+          <strong class="owner-first-fact-value">尚未建立案件</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">下一步／責任人</span>
+          <strong class="owner-first-fact-value"><span data-current-responsibility>甲方</span>｜<span data-current-next>閱讀服務邊界後，進入同意步驟。</span></strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">最近紀錄</span>
+          <strong class="owner-first-fact-value">尚無案件紀錄</strong>
+        </div>
+      </section>
+
+      <nav class="flow-rail" aria-label="圖說檢討進度">
+        <ol>
+          <li data-flow-step="INTRODUCTION" data-step-state="current"><span>01</span>服務說明</li>
+          <li data-flow-step="CONSENT"><span>02</span>同意</li>
+          <li data-flow-step="SELECT_FILE"><span>03</span>選擇 PDF</li>
+          <li data-flow-step="VALIDATION_PENDING"><span>04</span>條件確認</li>
+          <li data-flow-step="CORRECTION_REQUIRED"><span>05</span>待確認清單</li>
+          <li data-flow-step="RESELECT_FILE"><span>06</span>重新選擇</li>
+          <li data-flow-step="RESULT_FORMAT"><span>07</span>結果格式</li>
+          <li data-flow-step="RESULT_UNAVAILABLE"><span>08</span>目前結果</li>
+        </ol>
+      </nav>
+
+      <div class="drawing-workspace">
+        <div class="drawing-stage">
+          <section data-flow-panel="INTRODUCTION" aria-labelledby="intro-title">
+            <p class="drawing-stage__eyebrow">先了解服務</p>
+            <h2 id="intro-title" tabindex="-1" data-panel-focus>服務說明</h2>
+            <p class="drawing-stage__summary">
+              PCM 圖說檢討會把「圖面現在能支持的討論」與「仍需報價、細部圖或乙方說明的決策問題」分開，讓甲方知道下一個問題要交給誰。
+            </p>
+            <div class="drawing-check-list" role="list">
+              <p role="listitem"><span>01</span>圖說是否有明確檔名、版次與提供者。</p>
+              <p role="listitem"><span>02</span>圖號、頁面範圍與空間名稱是否足以辨識。</p>
+              <p role="listitem"><span>03</span>尺寸、文字與細部索引是否清楚到可討論。</p>
+              <p role="listitem"><span>04</span>哪些問題仍需報價或乙方補充才能判斷。</p>
+            </div>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-next-step="CONSENT">開始圖說檢討準備</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="CONSENT" aria-labelledby="consent-title" hidden>
+            <p class="drawing-stage__eyebrow">確認使用方式</p>
+            <h2 id="consent-title" tabindex="-1" data-panel-focus>同意本機檢視</h2>
+            <p class="drawing-stage__summary">
+              本頁只讀取你選擇的檔名與瀏覽器提供的檔案標示，尚未送出或保存；離開或重新整理後，選擇狀態不會保留。
+            </p>
+            <label class="consent-line" for="local-consent">
+              <input id="local-consent" type="checkbox" />
+              <span><strong>我了解目前只做本機文件準備。</strong> 正式收件、案件建立、圖面解析與結果產生都尚未進行。</span>
+            </label>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-next-step="SELECT_FILE" data-consent-continue disabled>同意並選擇圖說 PDF</button>
+              <button class="owner-first-secondary-action" type="button" data-next-step="INTRODUCTION">返回服務說明</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="SELECT_FILE" aria-labelledby="select-title" hidden>
+            <p class="drawing-stage__eyebrow">選擇本機文件</p>
+            <h2 id="select-title" tabindex="-1" data-panel-focus>選擇圖說 PDF</h2>
+            <p class="drawing-stage__summary">
+              選擇要討論的施工圖檔。檔案只在本頁暫時檢視，尚未送出或保存。
+            </p>
+            <label class="file-choice" for="drawing-file">
+              <span class="file-choice__mark" aria-hidden="true">PDF</span>
+              <span><strong>從裝置選擇圖說 PDF</strong><small>接受瀏覽器標示為 PDF 的單一檔案；其餘條件會先顯示待確認。</small></span>
+              <span class="file-choice__action">選擇檔案</span>
+            </label>
+            <input id="drawing-file" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" />
+            <div class="owner-first-actions">
+              <button class="owner-first-secondary-action" type="button" data-next-step="CONSENT">返回同意內容</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="VALIDATION_PENDING" aria-labelledby="validation-title" hidden>
+            <p class="drawing-stage__eyebrow">條件待確認</p>
+            <h2 id="validation-title" tabindex="-1" data-panel-focus>檔案標示與後續確認</h2>
+            <p class="selected-file">本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
+            <dl class="validation-list">
+              <div><dt>檔案標示</dt><dd class="status-pending">瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證</dd></div>
+              <div><dt>檔案大小</dt><dd>大小待正式規則確認</dd></div>
+              <div><dt>圖說頁數</dt><dd>頁數待正式解析</dd></div>
+              <div><dt>尺寸與文字</dt><dd>圖面可讀性待正式解析</dd></div>
+            </dl>
+            <p class="drawing-note">目前沒有讀取圖面內容，也沒有正式檢討結果；「待確認」不等於通過。</p>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-next-step="CORRECTION_REQUIRED">查看待確認清單</button>
+              <button class="owner-first-secondary-action" type="button" data-next-step="RESELECT_FILE">重新選擇</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="CORRECTION_REQUIRED" aria-labelledby="correction-title" hidden>
+            <p class="drawing-stage__eyebrow">待確認事項</p>
+            <h2 id="correction-title" tabindex="-1" data-panel-focus>待確認清單</h2>
+            <p class="drawing-stage__summary">這份清單只說明正式檢討前要確認什麼，不代表檔案已有錯誤或已完成檢查。</p>
+            <ol class="correction-list">
+              <li><span>01</span><div><strong>確認唯一有效版次</strong><p>檔名或圖框應能看出這次討論要採用哪一版。</p></div><em>甲方向乙方確認</em></li>
+              <li><span>02</span><div><strong>確認頁面範圍</strong><p>若有圖號或目錄，先核對要討論的頁面是否齊全。</p></div><em>甲方處理</em></li>
+              <li><span>03</span><div><strong>確認圖面可讀</strong><p>先用一般 PDF 閱讀工具查看尺寸、文字與細部索引是否清楚。</p></div><em>甲方處理</em></li>
+              <li><span>04</span><div><strong>準備配對報價</strong><p>只有圖說仍無法對照施工範圍、項目說法與價格依據。</p></div><em>甲方向乙方取得</em></li>
+            </ol>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-next-step="RESELECT_FILE">重新選擇圖說 PDF</button>
+              <button class="owner-first-secondary-action" type="button" data-next-step="RESULT_FORMAT">查看結果格式示意</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="RESELECT_FILE" aria-labelledby="reselect-title" hidden>
+            <p class="drawing-stage__eyebrow">重新選擇文件</p>
+            <h2 id="reselect-title" tabindex="-1" data-panel-focus>重新選擇</h2>
+            <p class="drawing-stage__summary">前一份檔案沒有送出或保存。改選後，只會重新顯示瀏覽器提供的檔案標示。</p>
+            <p class="selected-file">前次本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-open-file>選擇另一份 PDF</button>
+              <button class="owner-first-secondary-action" type="button" data-next-step="RESULT_FORMAT">先查看結果格式</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="RESULT_FORMAT" aria-labelledby="format-title" hidden>
+            <p class="drawing-stage__eyebrow">結果格式示意</p>
+            <h2 id="format-title" tabindex="-1" data-panel-focus>結果格式示意</h2>
+            <p class="format-disclaimer">結果格式示意，非真實案件；不包含姓名、日期、版次判定或完成結論。</p>
+            <dl class="result-format">
+              <div><dt>引用圖說</dt><dd>正式收件後才顯示檔名、版次、頁面與提供者。</dd></div>
+              <div><dt>檢討範圍</dt><dd>說明這次要討論的空間、圖號與決策問題。</dd></div>
+              <div><dt>已確認內容</dt><dd>只列文件足以支持的圖面事實。</dd></div>
+              <div><dt>差異與缺漏</dt><dd>逐項連回引用頁面與待補理由。</dd></div>
+              <div><dt>仍不確定事項</dt><dd>說明目前圖說不能回答的問題。</dd></div>
+              <div><dt>下一責任人</dt><dd>標示由甲方、乙方或 PCM 接續處理。</dd></div>
+              <div><dt>案件紀錄</dt><dd>正式案件才會留下文件依據、確認與狀態。</dd></div>
+            </dl>
+            <div class="paired-file-state" aria-label="缺少配對文件">
+              <span>配對文件狀態</span>
+              <strong>只有圖說，尚缺報價</strong>
+              <p>先準備乙方報價 PDF，才能把圖面範圍與報價項目放在同一個基準下討論。</p>
+              <a class="owner-first-secondary-action" href="../quote_check/code.html">前往報價健檢準備</a>
+            </div>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-next-step="RESULT_UNAVAILABLE">查看目前結果狀態</button>
+              <button class="owner-first-secondary-action" type="button" data-next-step="RESELECT_FILE">重新選擇</button>
+            </div>
+          </section>
+
+          <section data-flow-panel="RESULT_UNAVAILABLE" aria-labelledby="closed-title" hidden>
+            <p class="drawing-stage__eyebrow">目前結果狀態</p>
+            <h2 id="closed-title" tabindex="-1" data-panel-focus>尚未形成正式案件結果</h2>
+            <p class="drawing-stage__summary">
+              本頁沒有身分確認、文件送出、圖面解析或案件建立，因此不會顯示真實圖說檢討結論。
+            </p>
+            <div class="closed-facts">
+              <p><span>原因</span>目前只有本機文件準備與結果格式示意。</p>
+              <p><span>下一步</span>甲方可重新選擇 PDF，或先準備配對報價。</p>
+              <p><span>責任人</span>甲方</p>
+              <p><span>紀錄</span>零案件資料，沒有送出或保存。</p>
+            </div>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-next-step="SELECT_FILE">重新選擇圖說 PDF</button>
+              <a class="owner-first-secondary-action" href="../public_home/code.html#top">返回 PCM 首頁</a>
+            </div>
+          </section>
+
+          <section data-flow-panel="FAILURE" aria-labelledby="failure-heading" hidden>
+            <p class="drawing-stage__eyebrow">文件處理提醒</p>
+            <h2 id="failure-heading" tabindex="-1" data-panel-focus data-failure-title>這份檔案目前不能繼續</h2>
+            <div class="failure-copy">
+              <p><span>原因</span><strong data-failure-reason></strong></p>
+              <p><span>下一步</span><strong data-failure-next></strong></p>
+              <p><span>責任人</span><strong data-failure-role></strong></p>
+              <p><span>案件資料</span><strong>零案件資料；未送出或保存</strong></p>
+            </div>
+            <div class="owner-first-actions">
+              <button class="owner-first-primary-action" type="button" data-failure-recover>依建議恢復</button>
+              <button class="owner-first-secondary-action" type="button" data-failure-return>返回前一步</button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="drawing-aside" aria-label="這一頁會留下什麼">
+          <p class="drawing-stage__eyebrow">案件留痕邊界</p>
+          <h2>會留下哪些文件與決策紀錄？</h2>
+          <p>目前不會留下案件紀錄。正式服務開放後，預計依序記錄：</p>
+          <ol>
+            <li><span>01</span>圖說名稱、版次、頁面與提供者</li>
+            <li><span>02</span>檢討範圍、引用頁面與待確認事項</li>
+            <li><span>03</span>甲方選擇、責任人與下一步</li>
+            <li><span>04</span>後續補件、回覆與版本變更</li>
+          </ol>
+          <p class="drawing-aside__note">正式開放前，畫面只協助你理解準備順序，不代表文件已收件或完成檢討。</p>
+        </aside>
+      </div>
+
+      <p class="state-live" data-state-live aria-live="polite"></p>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
