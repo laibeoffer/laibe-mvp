@@ -569,10 +569,10 @@
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 73641,
-      "normalizedBytes": 77039,
-      "sha256": "4f3bb084fc5afd3bd3b74b1d1c91e3a86dff46bb3e5e6aefac2e2a36cd63e338",
-      "gitBlobSha1": "381acb5528f558d877b1f1e1a695741ba0d42715",
+      "bytes": 81534,
+      "normalizedBytes": 84998,
+      "sha256": "5b651811e3ff533d545dd6f2783c7d2a341a55f56d32271efbf9b545bf377329",
+      "gitBlobSha1": "a3bac45d955bee94a681b50606c1644ba01a47ab",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -1581,6 +1581,202 @@
       "T5": "closed"
     }
   },
+  "t4SourceIntegration": {
+    "status": "ready_for_a0_focused_review",
+    "sourceAdmission": "ADMITTED_G1_UI_SOURCE_ONLY",
+    "sourceCommit": "ca90ecdd3fb0191c8f3ae4f420c2011758908521",
+    "sourceParent": "f16b6d8191634eba9cc7037237e17f471363e312",
+    "sourceTree": "0e0496f175d5888886706f9207af1ffea00ad9ec",
+    "sourceWriteSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/app.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/code.html",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/styles.css",
+      "tests/pcm-owner-first-drawing-check.test.mjs"
+    ],
+    "sourceAbsorptionCommit": "7464e8332932ce48b48044d5b738a2534335156b",
+    "sourceAbsorptionTree": "0e0496f175d5888886706f9207af1ffea00ad9ec",
+    "integrationParent": "7464e8332932ce48b48044d5b738a2534335156b",
+    "integrationReviewTarget": "COMMIT_CONTAINING_THIS_MANIFEST",
+    "integrationWriteSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests/pcm-owner-first-public-home.test.mjs",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "outsideWriteSet": 0,
+    "publicContractByteFrozen": true,
+    "red": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs tests/pcm-owner-first-public-home.test.mjs",
+      "tests": 30,
+      "passed": 27,
+      "failed": 3,
+      "exitCode": 1,
+      "failures": [
+        "drawing node remained planned",
+        "PUBLIC_ROUTES.drawingCheck remained null",
+        "homepage trusted drawing route remained closed"
+      ]
+    },
+    "focusedGreen": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs tests/pcm-owner-first-public-home.test.mjs",
+      "tests": 30,
+      "passed": 30,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "routeOutcome": {
+      "quoteCheck": { "lifecycle": "active", "href": "../quote_check/code.html" },
+      "drawingCheck": { "lifecycle": "active", "href": "../drawing_check/code.html" },
+      "accountAccess": { "lifecycle": "planned", "href": null },
+      "clickableEdges": [
+        "home->drawingCheck",
+        "quoteCheck->drawingCheck",
+        "drawingCheck->quoteCheck"
+      ]
+    },
+    "preReceiptActiveTrain": {
+      "files": 4,
+      "tests": 88,
+      "passed": 87,
+      "failed": 1,
+      "exitCode": 1,
+      "onlyFailure": "t3 normalized self receipt intentionally pending final manifest bytes"
+    },
+    "preReceiptFullSuite": {
+      "command": "node --test tests/pcm-*.test.mjs",
+      "files": 11,
+      "tests": 211,
+      "passed": 210,
+      "failed": 1,
+      "exitCode": 1,
+      "onlyFailure": "t3 normalized self receipt intentionally pending final manifest bytes"
+    },
+    "evidenceClosureRed": {
+      "focused": {
+        "files": 4,
+        "tests": 90,
+        "passed": 88,
+        "failed": 2,
+        "exitCode": 1
+      },
+      "fullSuite": {
+        "command": "node --test tests/pcm-*.test.mjs",
+        "files": 11,
+        "tests": 213,
+        "passed": 211,
+        "failed": 2,
+        "exitCode": 1
+      },
+      "onlyFailures": [
+        "new T4 integration receipt gate intentionally not yet populated",
+        "t3 normalized self receipt intentionally pending final manifest bytes"
+      ],
+      "productOrRouteFailures": 0
+    },
+    "routeLookupHardening": {
+      "finding": "post-load Array.prototype.find replacement could substitute an untrusted route record before public-contract import",
+      "red": "child-process production import probe 0/1; polluted find returned javascript href",
+      "correction": "fixed-count direct own-slot route and compatibility lookup; no shared Array.find call",
+      "green": "child-process production import probe 1/1; findCalls=0 and exact trusted hrefs retained",
+      "reviewDisposition": "mainline focused rereview after the delegated reviewer was interrupted by an unrelated safety-classifier error"
+    },
+    "fullSuite": {
+      "command": "node --test tests/pcm-*.test.mjs",
+      "files": 11,
+      "tests": 213,
+      "passed": 213,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "browser": {
+      "engine": "Playwright with installed local Chrome; no download or installation",
+      "origin": "http://127.0.0.1:8815",
+      "journey": "public_home drawingCheck control -> drawing_check/code.html",
+      "viewports": [
+        "1280x900",
+        "768x1024",
+        "390x844",
+        "390x640",
+        "640x450_200pct_equivalent"
+      ],
+      "drawingEntryActive": "5/5",
+      "drawingDestinationReached": "5/5",
+      "fiveFactSpine": "5/5 at every viewport",
+      "horizontalOverflow": 0,
+      "visibleControlsUnder44": 0,
+      "consoleWarningsOrErrors": 0,
+      "networkFailuresOrNon2xx": 0,
+      "primaryCtaVisible": "5/5",
+      "primaryCtaInFirstViewport": "4/5",
+      "scrollRequiredAt": "640x450_200pct_equivalent"
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+        "bytes": 19213,
+        "sha256": "4d6b0ff62ad7c82b3e3b468abd29b1663f3f0080e064a49c14312a56ca5e5f3f",
+        "gitBlobSha1": "3fee94c9176fcdc7512c8751cd46d56760385ed9",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-route-manifest.test.mjs",
+        "bytes": 28943,
+        "sha256": "a5bcf749adb63581645a155773e074c30079266501d286b1dee01f7d57b1bff7",
+        "gitBlobSha1": "8e27f0a4bf511c383cd8c1005c914bba5d88a5d7",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-public-home.test.mjs",
+        "bytes": 21852,
+        "sha256": "b9dc6d13a2bcd437f085f22ef321b2d47a6b2c808b10ba7e86851d1e5ace7bf4",
+        "gitBlobSha1": "fc08b4b1c073d62999b14327aa152450b7900ca4",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-quote-check.test.mjs",
+        "bytes": 70864,
+        "sha256": "c4c4681f36d92b1e142863aa83d3604a6034669ec140ff978bbff6f599f87711",
+        "gitBlobSha1": "d468125f8af34d10bb854e01342161c4a96d4310",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 18099,
+        "sha256": "bf6eadb8d3e3644e757849a70e5fae6142d01b3db393a6ab45ff299ed81b5eea",
+        "gitBlobSha1": "1f53a62baf1b4c9940d2d302b54bc5a06dd695cd",
+        "scope": "candidate_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 44223,
+        "sha256": "d13d4857f45be2761f248e9c71766eec0a2e6ae61ccccffdc657604d72aafe86",
+        "gitBlobSha1": "679edd66523e1f207aafd5fad474ca3ea8b6e73c",
+        "scope": "candidate_git_blob_bytes"
+      }
+    ],
+    "manifestReceiptRef": "t3.selfRecorderReceipt",
+    "independentReview": {
+      "status": "COMPLETE_MAINLINE_FOCUSED_REREVIEW",
+      "critical": 0,
+      "important": 0,
+      "minor": 0,
+      "evidence": [
+        "full exact-seven diff reviewed after the Array.find correction",
+        "actual child-process import-order probe proves zero shared find calls",
+        "route, product-language, browser, receipt, and closed downstream-gate assertions retained"
+      ]
+    },
+    "gates": {
+      "G1_UI_SOURCE": "integration_candidate_ready_for_a0_focused_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T5": "source_correction_running"
+    }
+  },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
     { "id": "G2_AUTH_RUNTIME", "owner": "A6", "status": "closed", "scope": "identity/membership/role/contract runtime" },
@@ -1589,7 +1785,7 @@
   ],
   "canonicalRoutes": [
     { "id": "quoteCheck", "publicPath": "/pcm/quote-check", "lifecycle": "active", "href": "../quote_check/code.html", "owner": "A0" },
-    { "id": "drawingCheck", "publicPath": "/pcm/drawing-check", "lifecycle": "planned", "href": null, "owner": "A0" },
+    { "id": "drawingCheck", "publicPath": "/pcm/drawing-check", "lifecycle": "active", "href": "../drawing_check/code.html", "owner": "A0" },
     { "id": "accountAccess", "publicPath": "/account/access", "lifecycle": "planned", "href": null, "owner": "A0" }
   ],
   "compatibilityAliases": [

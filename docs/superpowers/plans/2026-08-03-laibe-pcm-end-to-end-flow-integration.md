@@ -232,13 +232,22 @@
 
 ### Task T4: Single-page drawing check
 
-**Exact proposed write set:** create `pcm_standalone/drawing_check/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-drawing-check.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
+**Admitted disjoint source write set:** `pcm_standalone/drawing_check/{code.html,styles.css,app.js}` and `tests/pcm-owner-first-drawing-check.test.mjs` at exact source commit `ca90ecdd3fb0191c8f3ae4f420c2011758908521` (parent `f16b6d8191634eba9cc7037237e17f471363e312`).
+
+**Serial integration write set:** route manifest, route-manifest test, public-home test, the existing quote-check route-regression assertion, this plan, the current design spec, and the governance manifest. `public-contract.js` remains byte-frozen because it derives `drawingCheck` from the trusted route manifest.
 
 **Produces:** one page state machine for introduction, consent, upload, format checks, corrections, resubmission, and result, with paired-file recovery back to quotation check.
 
-- [ ] Write RED for the state sequence, drawing-specific readability/page checks, responsibilities, and planned route.
-- [ ] Create the page, activate only `drawingCheck`, run GREEN and cross-viewport checks.
-- [ ] Commit `feat(pcm): add single-page drawing check`.
+- [x] Create the source page with an isolated RED→GREEN cycle and obtain formal `ADMITTED_G1_UI_SOURCE_ONLY` for exact `ca90ecd`; focused drawing tests are 22/22 and A0's fresh PCM suite is 211/211.
+- [x] Absorb the admitted exact-four source into the unique integration writer as local commit `7464e83`, without T5 or C1 bytes.
+- [x] Establish route-integration RED: route plus homepage focused tests are 27/30, with exactly the three expected drawing-route failures while account access remains closed.
+- [x] Activate only `drawingCheck`, its homepage edge, and the two quote/drawing completion edges. Focused route plus homepage tests are GREEN at 30/30; `accountAccess` remains `planned` with `href: null`.
+- [x] Run the first active-train checkpoint. It is RED at 86/88 only because the historical T3 assertion still required drawing to remain planned and the current manifest self receipt was intentionally not yet closed. Update the route-regression assertion as part of this serial integration; leave self receipt closure until final evidence is fixed.
+- [x] Run browser QA through the actual homepage drawing entry at 1280×900, 768×1024, 390×844, 390×640, and a 640×450 200%-reflow equivalent. All five reach the drawing page with five decision facts, overflow 0, controls below 44px 0, console/network failures 0, and a visible primary CTA. The 640×450 CTA requires scrolling and is recorded as such rather than claimed first-screen visible.
+- [x] Add an executable exact-seven receipt gate before evidence closure. After adding the route-lookup adversarial regression, its final intentional RED is focused 88/90 and full PCM 211/213; the only two failures are the intentionally empty T4 receipt set and the not-yet-recomputed normalized manifest self receipt, with zero product or route regression.
+- [x] Close the post-load `Array.prototype.find` seam with a child-process RED 0/1 then GREEN 1/1; trusted route lookup now uses fixed-count direct own slots and records zero shared `find` calls.
+- [x] Complete the mainline focused rereview at Critical 0 / Important 0 / Minor 0 after the delegated review process was interrupted by a safety-classifier error; the classifier interruption is not counted as evidence.
+- [ ] Close immutable receipts, normalized self receipt, fresh 213/213 full suite, bounded commit, and A0 focused admission gates.
 
 ---
 

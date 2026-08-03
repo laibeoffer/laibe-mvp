@@ -335,8 +335,19 @@ test("route binding requires an exact trusted route name and href pair", async (
   assert.equal(activeQuote.getAttribute("tabindex"), null);
   assert.equal(activeQuote.dataset.routeState, "active");
 
+  const activeDrawing = makeRouteControl("drawingCheck");
+  bindPublicRoutes(
+    { querySelectorAll: () => [activeDrawing] },
+    { drawingCheck: "../drawing_check/code.html" },
+  );
+  assert.equal(activeDrawing.getAttribute("href"), "../drawing_check/code.html");
+  assert.equal(activeDrawing.getAttribute("aria-disabled"), null);
+  assert.equal(activeDrawing.getAttribute("tabindex"), null);
+  assert.equal(activeDrawing.dataset.routeState, "active");
+
   const appSource = await readFile(appUrl, "utf8");
   assert.match(appSource, /case "quoteCheck":/);
+  assert.match(appSource, /case "drawingCheck":/);
 });
 
 test("footer links only to visible owner-first sections", async () => {

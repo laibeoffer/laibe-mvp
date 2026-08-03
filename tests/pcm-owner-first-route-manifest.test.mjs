@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -13,6 +15,13 @@ const governanceManifestUrl = new URL(
   "docs/governance/pcm-owner-first-execution-manifest.v1.json",
   repositoryRoot,
 );
+
+function gitBlobSha1(bytes) {
+  return createHash("sha1")
+    .update(`blob ${bytes.length}\0`)
+    .update(bytes)
+    .digest("hex");
+}
 
 function scanJsonObjectKeys(source) {
   let index = 0;
@@ -212,7 +221,7 @@ test("canonical graph uses one quote check, one drawing check, and one shared ac
   );
 });
 
-test("quote check is active while future canonical entries remain planned and 404-safe", async () => {
+test("quote and drawing checks are active while account access remains planned and 404-safe", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
   const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
 
@@ -221,11 +230,14 @@ test("quote check is active while future canonical entries remain planned and 40
   assert.equal(quoteCheck.href, "../quote_check/code.html");
   await access(new URL(quoteCheck.href, routeManifestUrl));
 
-  for (const routeId of ["drawingCheck", "accountAccess"]) {
-    const node = byId.get(routeId);
-    assert.equal(node.lifecycle, "planned");
-    assert.equal(node.href, null);
-  }
+  const drawingCheck = byId.get("drawingCheck");
+  assert.equal(drawingCheck.lifecycle, "active");
+  assert.equal(drawingCheck.href, "../drawing_check/code.html");
+  await access(new URL(drawingCheck.href, routeManifestUrl));
+
+  const accountAccess = byId.get("accountAccess");
+  assert.equal(accountAccess.lifecycle, "planned");
+  assert.equal(accountAccess.href, null);
   assert.equal(byId.get("quoteCheck").publicPath, "/pcm/quote-check");
   assert.equal(byId.get("drawingCheck").publicPath, "/pcm/drawing-check");
   assert.equal(byId.get("accountAccess").publicPath, "/account/access");
@@ -246,6 +258,17 @@ test("quote check is active while future canonical entries remain planned and 40
     if (target.lifecycle === "planned") {
       assert.equal(edge.clickable, false, `${edge.from} -> ${edge.to}`);
     }
+  }
+
+  for (const [from, to] of [
+    ["home", "drawingCheck"],
+    ["quoteCheck", "drawingCheck"],
+    ["drawingCheck", "quoteCheck"],
+  ]) {
+    const edge = PCM_FLOW_ROUTE_MANIFEST.edges.find(
+      (candidate) => candidate.from === from && candidate.to === to,
+    );
+    assert.equal(edge?.clickable, true, `${from} -> ${to}`);
   }
 });
 
@@ -529,6 +552,55 @@ test("resolver ignores post-load Array iterator pollution for internal context",
   assert.equal(vendor.canMutate, false);
 });
 
+test("trusted route lookup ignores post-load Array.find pollution before consumers load", () => {
+  const childSource = `
+    const route = await import(${JSON.stringify(routeManifestUrl.href)});
+    const originalFind = Array.prototype.find;
+    let findCalls = 0;
+    Object.defineProperty(Array.prototype, "find", {
+      configurable: true,
+      writable: true,
+      value: function (...args) {
+        findCalls += 1;
+        if (this === route.PCM_FLOW_NODES) {
+          return Object.freeze({ id: "drawingCheck", lifecycle: "active", href: "javascript:alert(1)" });
+        }
+        if (this === route.PCM_FLOW_COMPATIBILITY_ALIASES) {
+          return Object.freeze({ id: "ownerStart", compatibilityHref: "javascript:alert(2)" });
+        }
+        return Reflect.apply(originalFind, this, args);
+      },
+    });
+    const contract = await import(${JSON.stringify(`${publicContractUrl.href}?array-find-child`)});
+    const result = contract.resolvePcmFlowContinuation({ intent: "START_DRAWING_CHECK" });
+    process.stdout.write(JSON.stringify({
+      findCalls,
+      drawingHref: contract.PUBLIC_ROUTES.drawingCheck,
+      compatibilityHref: contract.PUBLIC_ROUTES.ownerStart,
+      result,
+    }));
+  `;
+  const child = spawnSync(
+    process.execPath,
+    ["--input-type=module", "--eval", childSource],
+    { encoding: "utf8" },
+  );
+
+  assert.equal(child.status, 0, child.stderr);
+  const evidence = JSON.parse(child.stdout);
+  assert.equal(evidence.findCalls, 0);
+  assert.equal(evidence.drawingHref, "../drawing_check/code.html");
+  assert.equal(evidence.compatibilityHref, "../owner_start/code.html");
+  assert.deepEqual(evidence.result, {
+    routeKey: "drawingCheck",
+    href: "../drawing_check/code.html",
+    gate: "G1_UI_SOURCE",
+    reason: "PUBLIC_ROUTE",
+    payloadPolicy: "NO_CASE_DATA",
+    canMutate: false,
+  });
+});
+
 test("governance manifest raw JSON has no duplicate object keys", async () => {
   const raw = await readFile(governanceManifestUrl, "utf8");
   const objectCounts = scanJsonObjectKeys(raw);
@@ -541,6 +613,65 @@ test("governance manifest raw JSON has no duplicate object keys", async () => {
     "independentReview",
   ]) {
     assert.equal(t0Counts.get(key), 1, `$.t0.${key}`);
+  }
+});
+
+test("T4 serial integration evidence binds admitted source, exact-seven bytes, and closed downstream gates", async () => {
+  const manifest = JSON.parse(await readFile(governanceManifestUrl, "utf8"));
+  const integration = manifest.t4SourceIntegration;
+  const expectedWriteSet = [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+    "tests/pcm-owner-first-route-manifest.test.mjs",
+    "tests/pcm-owner-first-public-home.test.mjs",
+    "tests/pcm-owner-first-quote-check.test.mjs",
+    "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+    "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+    "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  ];
+
+  assert.equal(integration.status, "ready_for_a0_focused_review");
+  assert.equal(integration.sourceAdmission, "ADMITTED_G1_UI_SOURCE_ONLY");
+  assert.equal(integration.sourceCommit, "ca90ecdd3fb0191c8f3ae4f420c2011758908521");
+  assert.equal(integration.integrationParent, "7464e8332932ce48b48044d5b738a2534335156b");
+  assert.deepEqual(integration.integrationWriteSet, expectedWriteSet);
+  assert.equal(integration.outsideWriteSet, 0);
+  assert.equal(integration.publicContractByteFrozen, true);
+  assert.deepEqual(integration.fullSuite, {
+    command: "node --test tests/pcm-*.test.mjs",
+    files: 11,
+    tests: 213,
+    passed: 213,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.equal(integration.browser.drawingEntryActive, "5/5");
+  assert.equal(integration.browser.horizontalOverflow, 0);
+  assert.equal(integration.browser.visibleControlsUnder44, 0);
+  assert.equal(integration.browser.consoleWarningsOrErrors, 0);
+  assert.equal(integration.browser.networkFailuresOrNon2xx, 0);
+  assert.equal(integration.independentReview.critical, 0);
+  assert.equal(integration.independentReview.important, 0);
+  assert.equal(integration.gates.G2_AUTH_RUNTIME, "closed");
+  assert.equal(integration.gates.G3_DURABLE_DATA, "closed");
+  assert.equal(integration.gates.G4_PRODUCTION, "closed");
+
+  const artifactPaths = expectedWriteSet.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    integration.artifactReceipts.map(({ path }) => path),
+    artifactPaths,
+  );
+  for (const receipt of integration.artifactReceipts) {
+    const bytes = await readFile(new URL(receipt.path, repositoryRoot));
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(
+      receipt.sha256,
+      createHash("sha256").update(bytes).digest("hex"),
+      receipt.path,
+    );
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "candidate_git_blob_bytes", receipt.path);
   }
 });
 
@@ -580,13 +711,13 @@ test("governance manifest t0 exposes one current evidence truth", async () => {
   });
 });
 
-test("public contract exposes quote check while keeping future entries non-clickable", async () => {
+test("public contract exposes quote and drawing checks while keeping account access non-clickable", async () => {
   const { PUBLIC_ROUTES, resolvePcmFlowContinuation } = await import(
     publicContractUrl.href
   );
 
   assert.equal(PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
-  assert.equal(PUBLIC_ROUTES.drawingCheck, null);
+  assert.equal(PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
   assert.equal(PUBLIC_ROUTES.accountAccess, null);
   assert.equal(PUBLIC_ROUTES.ownerStart, "../owner_start/code.html");
   assert.equal(PUBLIC_ROUTES.documentCorrections, "../document_corrections/code.html");
@@ -598,12 +729,16 @@ test("public contract exposes quote check while keeping future entries non-click
   assert.equal(quoteResult.href, "../quote_check/code.html");
   assert.equal(quoteResult.canMutate, false);
 
-  for (const intent of ["START_DRAWING_CHECK", "OPEN_ACCOUNT_ACCESS"]) {
-    const result = resolvePcmFlowContinuation({ intent });
-    assert.equal(result.routeKey, "accessUnavailable");
-    assert.equal(result.reason, "ROUTE_PREPARING");
-    assert.equal(result.canMutate, false);
-  }
+  const drawingResult = resolvePcmFlowContinuation({ intent: "START_DRAWING_CHECK" });
+  assert.equal(drawingResult.routeKey, "drawingCheck");
+  assert.equal(drawingResult.href, "../drawing_check/code.html");
+  assert.equal(drawingResult.reason, "PUBLIC_ROUTE");
+  assert.equal(drawingResult.canMutate, false);
+
+  const accountResult = resolvePcmFlowContinuation({ intent: "OPEN_ACCOUNT_ACCESS" });
+  assert.equal(accountResult.routeKey, "accessUnavailable");
+  assert.equal(accountResult.reason, "ROUTE_PREPARING");
+  assert.equal(accountResult.canMutate, false);
 
   assert.deepEqual(resolvePcmFlowContinuation({ intent: "READ_CONTRACT" }), {
     routeKey: "serviceContract",

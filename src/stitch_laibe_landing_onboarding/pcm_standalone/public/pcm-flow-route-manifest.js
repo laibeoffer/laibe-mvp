@@ -10,7 +10,7 @@ export const PCM_FLOW_GATES = Object.freeze([
 export const PCM_FLOW_NODES = Object.freeze([
   freezeRecord({ id: "home", publicPath: "/pcm", label: "PCM 公開首頁", role: "一般屋主", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../public_home/code.html#top" }),
   freezeRecord({ id: "quoteCheck", publicPath: "/pcm/quote-check", label: "報價健檢", role: "甲方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../quote_check/code.html" }),
-  freezeRecord({ id: "drawingCheck", publicPath: "/pcm/drawing-check", label: "圖說檢討", role: "甲方", owner: "A0", lifecycle: "planned", gate: "G1_UI_SOURCE", href: null }),
+  freezeRecord({ id: "drawingCheck", publicPath: "/pcm/drawing-check", label: "圖說檢討", role: "甲方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../drawing_check/code.html" }),
   freezeRecord({ id: "accountAccess", publicPath: "/account/access", label: "甲乙方註冊與登入", role: "甲方與乙方", owner: "A0", lifecycle: "planned", gate: "G1_UI_SOURCE", href: null }),
   freezeRecord({ id: "caseSetup", publicPath: "/pcm/case/setup", label: "案件建立與正式 PCM 申請", role: "甲方", owner: "A0", lifecycle: "planned", gate: "G2_AUTH_RUNTIME", href: null }),
   freezeRecord({ id: "serviceContract", publicPath: "/pcm/service-contract", label: "PCM 服務契約", role: "甲方與受邀乙方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../service_contract/code.html" }),
@@ -38,13 +38,13 @@ export const PCM_FLOW_COMPATIBILITY_ALIASES = Object.freeze([
 
 export const PCM_FLOW_EDGES = Object.freeze([
   freezeRecord({ from: "home", to: "quoteCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往報價健檢", clickable: true }),
-  freezeRecord({ from: "home", to: "drawingCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往圖說檢討", clickable: false }),
+  freezeRecord({ from: "home", to: "drawingCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往圖說檢討", clickable: true }),
   freezeRecord({ from: "home", to: "accountAccess", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往註冊或登入", clickable: false }),
   freezeRecord({ from: "quoteCheck", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),
   freezeRecord({ from: "drawingCheck", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),
   freezeRecord({ from: "accountAccess", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),
-  freezeRecord({ from: "quoteCheck", to: "drawingCheck", kind: "pending", gate: "G1_UI_SOURCE", owner: "A0", action: "補上圖說檢討", clickable: false }),
-  freezeRecord({ from: "drawingCheck", to: "quoteCheck", kind: "pending", gate: "G1_UI_SOURCE", owner: "A0", action: "補上報價健檢", clickable: false }),
+  freezeRecord({ from: "quoteCheck", to: "drawingCheck", kind: "pending", gate: "G1_UI_SOURCE", owner: "A0", action: "補上圖說檢討", clickable: true }),
+  freezeRecord({ from: "drawingCheck", to: "quoteCheck", kind: "pending", gate: "G1_UI_SOURCE", owner: "A0", action: "補上報價健檢", clickable: true }),
   freezeRecord({ from: "quoteCheck", to: "caseSetup", kind: "forward", gate: "G2_AUTH_RUNTIME", owner: "A6", action: "建立案件並關聯文件", clickable: false }),
   freezeRecord({ from: "drawingCheck", to: "caseSetup", kind: "forward", gate: "G2_AUTH_RUNTIME", owner: "A6", action: "建立案件並關聯文件", clickable: false }),
   freezeRecord({ from: "accountAccess", to: "caseSetup", kind: "forward", gate: "G2_AUTH_RUNTIME", owner: "A6", action: "完成身分確認後建立案件", clickable: false }),
@@ -143,12 +143,29 @@ export const PCM_FLOW_ROUTE_MANIFEST = Object.freeze({
   failureEdges: PCM_FLOW_FAILURE_EDGES,
 });
 
+const FLOW_NODE_COUNT = PCM_FLOW_NODES.length;
+const COMPATIBILITY_ALIAS_COUNT = PCM_FLOW_COMPATIBILITY_ALIASES.length;
+
+function findExactRecordById(records, count, recordId) {
+  for (let index = 0; index < count; index += 1) {
+    const record = records[index];
+    if (record.id === recordId) {
+      return record;
+    }
+  }
+  return null;
+}
+
 export function getActiveRouteHref(routeKey) {
-  const node = PCM_FLOW_NODES.find(({ id }) => id === routeKey);
+  const node = findExactRecordById(PCM_FLOW_NODES, FLOW_NODE_COUNT, routeKey);
   return node?.lifecycle === "active" ? node.href : null;
 }
 
 export function getCompatibilityRouteHref(aliasKey) {
-  return PCM_FLOW_COMPATIBILITY_ALIASES.find(({ id }) => id === aliasKey)
-    ?.compatibilityHref ?? null;
+  const alias = findExactRecordById(
+    PCM_FLOW_COMPATIBILITY_ALIASES,
+    COMPATIBILITY_ALIAS_COUNT,
+    aliasKey,
+  );
+  return alias?.compatibilityHref ?? null;
 }

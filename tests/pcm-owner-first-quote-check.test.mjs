@@ -1173,7 +1173,7 @@ test("validation pending state describes metadata without claiming content recog
   assert.doesNotMatch(`${pending.title} ${pending.reason}`, /格式已辨識|已在本機辨識/);
 });
 
-test("only quoteCheck activates and compatibility pages remain aliases", async () => {
+test("quoteCheck remains active after admitted drawing integration and compatibility pages remain aliases", async () => {
   const manifestModule = await import(
     `${pathToFileURL(routeManifestPath).href}?t3-route-contract`
   );
@@ -1192,8 +1192,8 @@ test("only quoteCheck activates and compatibility pages remain aliases", async (
     gate: "G1_UI_SOURCE",
     href: "../quote_check/code.html",
   });
-  assert.equal(byId.drawingCheck.lifecycle, "planned");
-  assert.equal(byId.drawingCheck.href, null);
+  assert.equal(byId.drawingCheck.lifecycle, "active");
+  assert.equal(byId.drawingCheck.href, "../drawing_check/code.html");
   assert.equal(byId.accountAccess.lifecycle, "planned");
   assert.equal(byId.accountAccess.href, null);
   const quoteEdge = manifestModule.PCM_FLOW_EDGES.find(
@@ -1201,7 +1201,7 @@ test("only quoteCheck activates and compatibility pages remain aliases", async (
   );
   assert.equal(quoteEdge.clickable, true);
   assert.equal(contractModule.PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
-  assert.equal(contractModule.PUBLIC_ROUTES.drawingCheck, null);
+  assert.equal(contractModule.PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
   assert.equal(contractModule.PUBLIC_ROUTES.accountAccess, null);
   const canonicalIds = new Set(nodes.map((node) => node.id));
   for (const alias of ["ownerStart", "documentCorrections", "basicReport", "selfServiceArchive"]) {

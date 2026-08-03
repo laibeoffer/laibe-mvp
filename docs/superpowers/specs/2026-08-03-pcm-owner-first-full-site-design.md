@@ -40,11 +40,11 @@ Preserve the real LaiBE logo, dark professional background, orange-red primary a
 
 ### `/pcm/quote-check`
 
-This is the only canonical quotation-check page. Introduction, consent, PDF selection, format checks, correction list, resubmission, and result are states of one page. It is not split into anonymous and registered variants. T3 activates this page at `../quote_check/code.html`; the drawing and account entrances remain planned with null hrefs.
+This is the only canonical quotation-check page. Introduction, consent, PDF selection, format checks, correction list, resubmission, and result are states of one page. It is not split into anonymous and registered variants. T3 activates this page at `../quote_check/code.html`; T4 activates the paired drawing-check entrance, while account access remains planned with a null href.
 
 ### `/pcm/drawing-check`
 
-This is the only canonical drawing-review page. Introduction, consent, upload, format checks, corrections, resubmission, and result are states of one page. It is not split by account state. Until T4 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.
+This is the only canonical drawing-review page. Introduction, consent, upload, format checks, corrections, resubmission, and result are states of one page. It is not split by account state. T4 source commit `ca90ecdd3fb0191c8f3ae4f420c2011758908521` is admitted G1 source, and the serial integration activates its local route at `../drawing_check/code.html` without granting upload, parsing, Auth, durable-data, or production authority.
 
 ### `/account/access`
 
@@ -158,7 +158,7 @@ The hero action uses one closed, state-owned hero action projection for its labe
 
 Hero projection authority is the canonical object identity exported by `QUOTE_CHECK_STATES`, `QUOTE_CHECK_FAILURES`, or `CONTEXT_UNAVAILABLE`, never a caller-provided `code` property. Plain own-data lookalikes, extra-key records, null-prototype records, inherited values from a custom prototype or `Object.prototype`, accessor-backed records, functions, and Proxies all receive the disabled target-free action. Projection performs no getter or Proxy trap call on those inputs. It uses direct identity comparisons rather than Map, Set, Array, or another mutable-prototype collection as authority, while preserving the complete built-in state and failure action matrix.
 
-T3 activates only `quoteCheck` at `../quote_check/code.html` and makes only the `home` to `quoteCheck` edge clickable. `drawingCheck` and `accountAccess` remain planned with null hrefs; compatibility pages remain aliases and never become canonical steps.
+T3 activates `quoteCheck` at `../quote_check/code.html`. After T4 source admission, the serial integration activates `drawingCheck` at `../drawing_check/code.html`, makes the homepage drawing entry and the two quote/drawing completion edges clickable, and leaves `accountAccess` planned with a null href. Compatibility pages remain aliases and never become canonical steps.
 
 ### Quantitative CTA contrast
 
