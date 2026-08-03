@@ -11,7 +11,9 @@
 ## Global constraints
 
 - Work only in `C:\CodexWork\08-Jacky\worktrees\laibe_MVP_project\a0-design-pcm-owner-first-integration-20260803` on `a0/design-pcm-owner-first-integration-20260803`.
-- `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION`; it is the correction parent and is not admissible.
+- `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION` and is not admissible.
+- `9e268212f5b3050a1770f7e559508521f4cff4ec` is the first T0 correction, received `CHANGES_REQUIRED`, and is not the final admitted T0 contract.
+- `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` is the exact parent for the focused admission correction. T2 remains byte-identically held outside the repository until A0 admits that correction.
 - Execute T0–T18 serially with one writer. Record the exact package write set before changing product source.
 - G1 source is active. G2 identity/role, G3 durable data, and G4 production remain closed.
 - Do not modify `apps/**`, `packages/**`, `supabase/**`, `src/lib/contracts/**`, root package/lock/config, or A1/R0/A9/A14-owned source.
@@ -72,6 +74,19 @@
 - [x] **Step 7: Commit the exact-six correction with parent `888af2fb98f8a202e76ce3135d8e3f0ad66087fb`.**
 
   Commit message: `fix(pcm): correct owner-first canonical route contract`
+
+#### Focused admission correction after T1
+
+- [x] Stop T2 and preserve its exact five dirty files in the authorized C-only hold directory before restoring the source worktree to clean `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7`.
+- [x] Preserve the existing focused coverage and add negative tests for inherited intent pollution, poisoned post-load intrinsics, strict own primitive roles, vendor-to-owner isolation, and non-mutating overdue recovery.
+- [x] Run actual RED against parent `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7`: 11 tests, 8 pass, 3 fail, exit 1. The three failures reproduced unsafe inherited intent routing, missing role-bound read-only routing, and owner-only read-only fallback.
+- [x] During read-only review, add one narrower forged-Proxy RED: 11 tests, 10 pass, 1 fail, exit 1. This proved a transparent Proxy could still forge own descriptors before captured structured-clone rejection was added.
+- [x] Implement minimal GREEN with captured reflection primitives, an exact own-key/data-descriptor contract, captured structured-clone Proxy rejection, closed switch/equality routing, an exception-safe outer resolver, exact owner/vendor workspace mapping, and read-only overdue copy.
+- [x] Focused GREEN: `node --test tests\pcm-owner-first-route-manifest.test.mjs` = 11/11 pass.
+- [x] Current-train suite = 65/65 pass. Full repository truth = 133/134 pass; the only failure is the unchanged frozen A3 cumulative-path admission assertion in `tests/pcm-governance-pages.test.mjs`.
+- [x] Static gates: strict UTF-8 6/6, JSON valid, 22 local route references and 3 fragments resolved, planned clickable routes 0, forbidden product terms 0, deprecated read-only state 0, and `git diff --check` clean.
+- [x] Independent adversarial review = Critical 0 / Important 0.
+- [x] Keep T2 held and stop for A0 focused admission after creating one exact-six correction commit with parent `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7`; do not restore or continue T2 before that verdict.
 
 ---
 

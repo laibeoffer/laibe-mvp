@@ -61,22 +61,34 @@ export const PCM_FLOW_EDGES = Object.freeze([
   freezeRecord({ from: "internalGovernance", to: "accessUnavailable", kind: "recovery", gate: "G1_UI_SOURCE", owner: "A0", action: "安全返回", clickable: true }),
 ]);
 
-const ORIGINAL_CASE_WORKSPACES = Object.freeze(["ownerWorkspace", "vendorWorkspace"]);
+const ORIGINAL_CASE_WORKSPACE_BY_ROLE = freezeRecord({
+  owner: "ownerWorkspace",
+  vendor: "vendorWorkspace",
+});
 
-const closedState = ({ code, reason, nextAction, responsibleRole, returnRoute, recoveryRoute, payloadPolicy, actions }) =>
+const closedState = ({
+  code,
+  reason,
+  nextAction,
+  responsibleRole,
+  returnRoute,
+  recoveryRoute,
+  payloadPolicy,
+  actions,
+  workspaceByRole,
+}) =>
   freezeRecord({
     code,
     type: "CLOSED",
     reason,
     nextAction,
     responsibleRole,
+    responsibleActor: responsibleRole,
     returnRoute,
     recoveryRoute,
     payloadPolicy,
     mutationAllowed: false,
-    ...(payloadPolicy === "PRESERVE_EXISTING_CASE_READ_ONLY"
-      ? { workspaceRoutes: ORIGINAL_CASE_WORKSPACES }
-      : {}),
+    ...(workspaceByRole ? { workspaceByRole } : {}),
     ...(actions ? { actions: Object.freeze([...actions]) } : {}),
   });
 
@@ -99,10 +111,10 @@ export const PCM_FLOW_FAILURE_MATRIX = Object.freeze({
   IDENTITY_UNCONFIRMED: closedState({ code: "IDENTITY_UNCONFIRMED", reason: "目前無法確認使用者身分。", nextAction: "回到共用註冊與登入入口，完成身分確認。", responsibleRole: "目前使用者", returnRoute: "accessUnavailable", recoveryRoute: "accountAccess", payloadPolicy: "ZERO_CASE_DATA" }),
   MEMBERSHIP_UNCONFIRMED: closedState({ code: "MEMBERSHIP_UNCONFIRMED", reason: "目前無法確認你是否為這個案件的成員。", nextAction: "確認登入帳號與案件邀請是否一致。", responsibleRole: "目前使用者", returnRoute: "accessUnavailable", recoveryRoute: "accountAccess", payloadPolicy: "ZERO_CASE_DATA" }),
   ACCESS_UNCONFIRMED: closedState({ code: "ACCESS_UNCONFIRMED", reason: "目前無法確認你是否能查看這個案件。", nextAction: "安全返回，再由案件邀請或已確認入口重新進入。", responsibleRole: "目前使用者", returnRoute: "accessUnavailable", recoveryRoute: "accessUnavailable", payloadPolicy: "ZERO_CASE_DATA" }),
-  SUPPLEMENT_OVERDUE: closedState({ code: "SUPPLEMENT_OVERDUE", reason: "待補文件已超過原訂處理時間。", nextAction: "由待補責任人確認新處理時間，並在原工作台留下說明。", responsibleRole: "待補項目責任人", returnRoute: "ownerWorkspace", recoveryRoute: "ownerWorkspace", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY" }),
-  CASE_CANCELLED: closedState({ code: "CASE_CANCELLED", reason: "案件已取消，目前不再接受新的處理動作。", nextAction: "留在原工作台查看取消依據與既有紀錄。", responsibleRole: "案件三方", returnRoute: "ownerWorkspace", recoveryRoute: "ownerWorkspace", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY", actions: [] }),
-  PCM_EXITED_READ_ONLY: closedState({ code: "PCM_EXITED_READ_ONLY", reason: "PCM 已退出服務，甲乙方仍可在原工作台查閱既有內容。", nextAction: "留在原工作台查看文件、決定與既有紀錄。", responsibleRole: "甲方與乙方", returnRoute: "ownerWorkspace", recoveryRoute: "ownerWorkspace", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY", actions: [] }),
-  CASE_CLOSED_READ_ONLY: closedState({ code: "CASE_CLOSED_READ_ONLY", reason: "案件已結案，原工作台保留完整內容供三方查閱。", nextAction: "留在原工作台查看結案依據、三方確認與既有紀錄。", responsibleRole: "案件三方", returnRoute: "ownerWorkspace", recoveryRoute: "ownerWorkspace", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY", actions: [] }),
+  SUPPLEMENT_OVERDUE: closedState({ code: "SUPPLEMENT_OVERDUE", reason: "待補文件已超過原訂處理時間。", nextAction: "查看待補內容與責任人；需要確認處理時間時，請聯絡待補責任人或返回原工作台。", responsibleRole: "待補項目責任人", returnRoute: "ownerWorkspace", recoveryRoute: "ownerWorkspace", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY" }),
+  CASE_CANCELLED: closedState({ code: "CASE_CANCELLED", reason: "案件已取消，目前不再接受新的處理動作。", nextAction: "依已確認角色返回原工作台，查看取消依據與既有紀錄。", responsibleRole: "案件三方", returnRoute: "accessUnavailable", recoveryRoute: "accessUnavailable", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY", actions: [], workspaceByRole: ORIGINAL_CASE_WORKSPACE_BY_ROLE }),
+  PCM_EXITED_READ_ONLY: closedState({ code: "PCM_EXITED_READ_ONLY", reason: "PCM 已退出服務，甲乙方仍可在原工作台查閱既有內容。", nextAction: "依已確認角色返回原工作台，查看文件、決定與既有紀錄。", responsibleRole: "甲方與乙方", returnRoute: "accessUnavailable", recoveryRoute: "accessUnavailable", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY", actions: [], workspaceByRole: ORIGINAL_CASE_WORKSPACE_BY_ROLE }),
+  CASE_CLOSED_READ_ONLY: closedState({ code: "CASE_CLOSED_READ_ONLY", reason: "案件已結案，原工作台保留完整內容供三方查閱。", nextAction: "依已確認角色返回原工作台，查看結案依據、三方確認與既有紀錄。", responsibleRole: "案件三方", returnRoute: "accessUnavailable", recoveryRoute: "accessUnavailable", payloadPolicy: "PRESERVE_EXISTING_CASE_READ_ONLY", actions: [], workspaceByRole: ORIGINAL_CASE_WORKSPACE_BY_ROLE }),
 });
 
 export const PCM_FLOW_FAILURE_EDGES = Object.freeze(

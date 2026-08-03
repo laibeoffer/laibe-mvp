@@ -173,6 +173,7 @@ test("failure matrix is complete, typed closed, actionable, and recoverable", as
     assert.notEqual(state.nextAction.trim(), "");
     assert.equal(typeof state.responsibleRole, "string");
     assert.notEqual(state.responsibleRole.trim(), "");
+    assert.equal(state.responsibleActor, state.responsibleRole);
     assert.equal(nodeIds.has(state.returnRoute), true, `${code}.returnRoute`);
     assert.equal(nodeIds.has(state.recoveryRoute), true, `${code}.recoveryRoute`);
     assert.equal(typeof state.payloadPolicy, "string");
@@ -204,18 +205,143 @@ test("read-only outcomes stay in original workspaces with no mutation actions", 
 
   for (const code of ["PCM_EXITED_READ_ONLY", "CASE_CLOSED_READ_ONLY"]) {
     const state = PCM_FLOW_ROUTE_MANIFEST.failureMatrix[code];
-    assert.equal(state.returnRoute, "ownerWorkspace");
-    assert.equal(state.recoveryRoute, "ownerWorkspace");
+    assert.equal(state.returnRoute, "accessUnavailable");
+    assert.equal(state.recoveryRoute, "accessUnavailable");
     assert.equal(state.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
     assert.equal(state.mutationAllowed, false);
     assert.deepEqual(state.actions, []);
-    assert.deepEqual(state.workspaceRoutes, ["ownerWorkspace", "vendorWorkspace"]);
+    assert.deepEqual(state.workspaceByRole, {
+      owner: "ownerWorkspace",
+      vendor: "vendorWorkspace",
+    });
   }
 
-  assert.deepEqual(
-    PCM_FLOW_ROUTE_MANIFEST.failureMatrix.CASE_CANCELLED.workspaceRoutes,
-    ["ownerWorkspace", "vendorWorkspace"],
+  const overdue = PCM_FLOW_ROUTE_MANIFEST.failureMatrix.SUPPLEMENT_OVERDUE;
+  assert.equal(overdue.responsibleActor, overdue.responsibleRole);
+  assert.equal(overdue.mutationAllowed, false);
+  assert.equal(overdue.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
+  assert.equal(overdue.returnRoute, "ownerWorkspace");
+  assert.equal(overdue.recoveryRoute, "ownerWorkspace");
+  assert.doesNotMatch(overdue.nextAction, /留下|新增|寫入|記錄|提交|更新/);
+  assert.match(overdue.nextAction, /查看|聯絡|返回/);
+
+  const cancelled = PCM_FLOW_ROUTE_MANIFEST.failureMatrix.CASE_CANCELLED;
+  assert.equal(cancelled.returnRoute, "accessUnavailable");
+  assert.equal(cancelled.recoveryRoute, "accessUnavailable");
+  assert.deepEqual(cancelled.workspaceByRole, {
+    owner: "ownerWorkspace",
+    vendor: "vendorWorkspace",
+  });
+});
+
+test("read-only outcomes bind exact primitive roles without vendor-to-owner fallback", async () => {
+  const { resolvePcmFlowContinuation } = await import(publicContractUrl.href);
+
+  for (const intent of ["PCM_EXITED_READ_ONLY", "CASE_CLOSED_READ_ONLY"]) {
+    const owner = resolvePcmFlowContinuation({ intent, role: "owner" });
+    assert.equal(owner.routeKey, "ownerWorkspace");
+    assert.equal(typeof owner.href, "string");
+    assert.equal(owner.authorityGate, "G2_AUTH_RUNTIME");
+    assert.equal(owner.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
+    assert.equal(owner.canMutate, false);
+
+    const vendor = resolvePcmFlowContinuation({ intent, role: "vendor" });
+    assert.equal(vendor.routeKey, "vendorWorkspace");
+    assert.notEqual(vendor.routeKey, "ownerWorkspace");
+    assert.equal(vendor.href, null);
+    assert.equal(vendor.authorityGate, "G2_AUTH_RUNTIME");
+    assert.equal(vendor.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
+    assert.equal(vendor.canMutate, false);
+
+    const inherited = Object.create({ role: "owner" });
+    Object.defineProperty(inherited, "intent", { value: intent, enumerable: true });
+    const accessor = { intent };
+    Object.defineProperty(accessor, "role", { get: () => "owner" });
+
+    for (const context of [
+      { intent },
+      { intent, role: "pcm" },
+      { intent, role: { id: "owner" } },
+      inherited,
+      accessor,
+    ]) {
+      const result = resolvePcmFlowContinuation(context);
+      assert.equal(result.routeKey, "accessUnavailable");
+      assert.equal(result.payloadPolicy, "ZERO_CASE_DATA");
+      assert.equal(result.canMutate, false);
+    }
+  }
+});
+
+test("resolver remains closed after prototype and intrinsic pollution", async () => {
+  const { resolvePcmFlowContinuation } = await import(publicContractUrl.href);
+  const forgedProxy = new Proxy({}, {
+    getPrototypeOf: () => Object.prototype,
+    getOwnPropertyDescriptor: (_target, property) => {
+      if (property === "intent") {
+        return { configurable: true, enumerable: true, value: "PCM_EXITED_READ_ONLY" };
+      }
+      if (property === "role") {
+        return { configurable: true, enumerable: true, value: "owner" };
+      }
+      return undefined;
+    },
+    ownKeys: () => ["intent", "role"],
+  });
+  const injectedDescriptor = Object.getOwnPropertyDescriptor(
+    Object.prototype,
+    "INJECTED_INTENT",
   );
+  const originalSetHas = Set.prototype.has;
+  const originalGetPrototypeOf = Object.getPrototypeOf;
+  const originalGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+
+  try {
+    const forgedResult = resolvePcmFlowContinuation(forgedProxy);
+    assert.equal(forgedResult.routeKey, "accessUnavailable");
+    assert.equal(forgedResult.payloadPolicy, "ZERO_CASE_DATA");
+
+    Object.defineProperty(Object.prototype, "INJECTED_INTENT", {
+      configurable: true,
+      value: "ownerWorkspace",
+    });
+    let result = resolvePcmFlowContinuation({ intent: "INJECTED_INTENT" });
+    assert.equal(result.routeKey, "accessUnavailable");
+    assert.equal(result.payloadPolicy, "ZERO_CASE_DATA");
+
+    Set.prototype.has = () => {
+      throw new Error("poisoned Set.prototype.has");
+    };
+    Object.getPrototypeOf = () => Object.prototype;
+    Object.getOwnPropertyDescriptor = (_target, property) =>
+      property === "intent" ? { value: "READ_CONTRACT" } : undefined;
+
+    assert.doesNotThrow(() => {
+      result = resolvePcmFlowContinuation({ intent: "UNKNOWN" });
+    });
+    assert.equal(result.routeKey, "accessUnavailable");
+    assert.equal(result.payloadPolicy, "ZERO_CASE_DATA");
+
+    Object.getPrototypeOf = () => {
+      throw new Error("poisoned Object.getPrototypeOf");
+    };
+    Object.getOwnPropertyDescriptor = () => {
+      throw new Error("poisoned Object.getOwnPropertyDescriptor");
+    };
+    assert.doesNotThrow(() => {
+      result = resolvePcmFlowContinuation({ intent: "READ_CONTRACT" });
+    });
+    assert.equal(result.routeKey, "serviceContract");
+  } finally {
+    Set.prototype.has = originalSetHas;
+    Object.getPrototypeOf = originalGetPrototypeOf;
+    Object.getOwnPropertyDescriptor = originalGetOwnPropertyDescriptor;
+    if (injectedDescriptor) {
+      Object.defineProperty(Object.prototype, "INJECTED_INTENT", injectedDescriptor);
+    } else {
+      delete Object.prototype.INJECTED_INTENT;
+    }
+  }
 });
 
 test("public contract exposes future entries without turning planned routes into links", async () => {

@@ -137,14 +137,18 @@
     "compatibility": "must remain outside canonical nodes and canonical edges",
     "retired": "must expose no live href and must name a canonical replacement",
     "unknown": "must resolve to accessUnavailable with ZERO_CASE_DATA and no mutation",
-    "authority": "URL, hash, browser storage, and caller booleans never grant G2, G3, or G4"
+    "authority": "URL, hash, browser storage, and caller booleans never grant G2, G3, or G4",
+    "strictContext": "only intent and optional role keys are accepted; both must be own data properties on a plain or null-prototype object",
+    "resolverSafety": "captured intrinsics, structured-clone Proxy rejection, and closed equality/switch routing; hostile reflection and prototype pollution fail closed"
   },
   "readOnlyOutcomes": [
-    { "code": "PCM_EXITED_READ_ONLY", "workspace": "original owner/vendor workspace", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] },
-    { "code": "CASE_CLOSED_READ_ONLY", "workspace": "original owner/vendor workspace", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] }
+    { "code": "PCM_EXITED_READ_ONLY", "workspaceByRole": { "owner": "ownerWorkspace", "vendor": "vendorWorkspace" }, "authorityGate": "G2_AUTH_RUNTIME", "unknownRoleRoute": "accessUnavailable", "unknownRolePayloadPolicy": "ZERO_CASE_DATA", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] },
+    { "code": "CASE_CLOSED_READ_ONLY", "workspaceByRole": { "owner": "ownerWorkspace", "vendor": "vendorWorkspace" }, "authorityGate": "G2_AUTH_RUNTIME", "unknownRoleRoute": "accessUnavailable", "unknownRolePayloadPolicy": "ZERO_CASE_DATA", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] }
   ],
   "t0": {
-    "status": "complete_in_correction_commit",
+    "status": "superseded_by_focused_admission_correction",
+    "commit": "9e268212f5b3050a1770f7e559508521f4cff4ec",
+    "admission": "CHANGES_REQUIRED",
     "writeSet": [
       "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
       "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
@@ -161,6 +165,14 @@
       "failed": 8,
       "exitCode": 1
     },
+    "reviewRed": {
+      "reason": "forged Proxy descriptor path found during read-only review",
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 11,
+      "passed": 10,
+      "failed": 1,
+      "exitCode": 1
+    },
     "green": {
       "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
       "tests": 9,
@@ -175,6 +187,36 @@
       "passed": 46,
       "failed": 0,
       "exitCode": 0
+    },
+    "currentTrainRegression": {
+      "tests": 65,
+      "passed": 65,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "fullSuiteTruth": {
+      "files": 9,
+      "tests": 134,
+      "passed": 133,
+      "failed": 1,
+      "exitCode": 1,
+      "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion"
+    },
+    "staticGates": {
+      "strictUtf8": "6/6",
+      "json": "valid",
+      "localRouteReferences": 22,
+      "localFragments": 3,
+      "missingLocalReferences": 0,
+      "plannedClickable": 0,
+      "forbiddenProductTerms": 0,
+      "deprecatedReadOnlyState": 0,
+      "gitDiffCheck": "clean"
+    },
+    "independentReview": {
+      "critical": 0,
+      "important": 0,
+      "adversarialMatrix": "pass"
     },
     "fullSuiteTruth": {
       "tests": 124,
@@ -209,6 +251,45 @@
       "classification": "frozen A3 admission cumulative-path assertion",
       "action": "not modified by T0 correction"
     }
+  },
+  "t0FocusedAdmissionCorrection": {
+    "status": "candidate_pending_a0_admission",
+    "parent": "2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "t2Hold": {
+      "status": "byte_identical_external_hold",
+      "path": "C:\\CodexWork\\08-Jacky\\qa_temp\\a0-owner-first-t2-hold-20260803",
+      "restoreAuthority": "after A0 focused admission only"
+    },
+    "red": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 11,
+      "passed": 8,
+      "failed": 3,
+      "exitCode": 1
+    },
+    "green": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "invariants": [
+      "unknown or hostile context resolves to accessUnavailable with ZERO_CASE_DATA",
+      "transparent, hostile, and revoked Proxy contexts fail closed before route selection",
+      "owner and vendor read-only outcomes never cross-map",
+      "post-load Object and Set intrinsic pollution cannot select authority",
+      "overdue supplement recovery is read-only and mutationAllowed remains false",
+      "G2, G3, and G4 remain closed"
+    ]
   },
   "schedule": [
     { "id": "T0", "title": "corrected route and failure contract" },

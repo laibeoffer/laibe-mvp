@@ -8,7 +8,10 @@
 - Seed: `3f6bddea936bdebd36846a239bc5d13c37e1d331`
 - S0 integration: `0d81189e8cc7f7563fb390e17b524afabb5b3b54`
 - Intermediate commit `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION` and is not admissible.
-- The review target is the correction commit that contains this specification and has `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` as its parent.
+- First correction `9e268212f5b3050a1770f7e559508521f4cff4ec` received `CHANGES_REQUIRED` and is not admitted as the final T0 contract.
+- Shared-system commit `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` is the exact parent of the focused admission correction.
+- T2 homepage work is byte-identically held outside the repository until this correction receives A0 focused admission.
+- The current review target is the bounded exact-six correction commit that contains this specification and has `2f1c9ac61128dd4646e7239ac38e9fbdd1620cc7` as its parent.
 - This train owns G1 source only. G2 identity/role, G3 durable records, and G4 production remain closed.
 
 ## Product outcome
@@ -70,7 +73,7 @@ PCM 公開首頁
 
 ## Read-only outcomes
 
-Only `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` are canonical read-only outcomes. They do not create another workspace. Owners and vendors remain in their original workspaces, existing content stays visible, PCM no longer intervenes after exit, `mutationAllowed` is false, and `actions` is an empty list. Cancelled cases use the same original-workspace principle and retain only existing traceable content.
+Only `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` are canonical read-only outcomes. They do not create another workspace. An own primitive role of `owner` maps only to `ownerWorkspace`; an own primitive role of `vendor` maps only to `vendorWorkspace`. Missing, inherited, accessor-backed, non-primitive, or unknown roles fail closed to `accessUnavailable` with `ZERO_CASE_DATA`. Existing content stays visible only after G2 confirms authority, PCM no longer intervenes after exit, `mutationAllowed` is false, and `actions` is an empty list. Cancelled cases use the same role-bound original-workspace principle and retain only existing traceable content.
 
 ## Failure and recovery contract
 
@@ -80,12 +83,13 @@ Only `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` are canonical read-only 
 - plain-language `reason`
 - `nextAction`
 - `responsibleRole`
+- `responsibleActor`, equal to the responsible role in this G1 contract
 - `returnRoute`
 - `recoveryRoute`
 - an explicit closed `payloadPolicy`
 - `mutationAllowed: false`
 
-Identity, membership, access, and pre-membership invitation failures use `ZERO_CASE_DATA`. File failures retain only limited file metadata or submission/version references. Contract failures retain only contract references. Cancelled, PCM-exited, and closed cases preserve already-authorized case content as read-only without enabling new actions. Every failure code has a non-mutating recovery edge.
+Identity, membership, access, and pre-membership invitation failures use `ZERO_CASE_DATA`. File failures retain only limited file metadata or submission/version references. Contract failures retain only contract references. Cancelled, PCM-exited, and closed cases preserve already-authorized case content as read-only without enabling new actions. The overdue-supplement state permits only viewing pending details, contacting the responsible actor, or returning to the original workspace; it does not claim a write or record action. Every failure code has a non-mutating recovery edge.
 
 The required matrix covers invitation declined/expired/withdrawn/resend, missing paired quotation or drawing, invalid/oversized/wrong-page-count/unreadable/corrupted files, duplicate submission, version conflict, contract prerequisites, mutual version acceptance, identity/membership/access confirmation, overdue supplement, cancellation, PCM exit, and case closeout.
 
@@ -96,6 +100,8 @@ The required matrix covers invitation declined/expired/withdrawn/resend, missing
 - Retired nodes name a canonical replacement and expose no live `href`.
 - Unknown, missing, malformed, or caller-asserted authority resolves to `accessUnavailable` with `ZERO_CASE_DATA` and no mutation.
 - URL fragments, query values, browser storage, and caller booleans never grant G2, G3, or G4.
+- Continuation context accepts only own data `intent` and optional own data `role` keys on a plain or null-prototype input. Captured structured cloning rejects Proxy input before routing; accessors, inherited values, extra caller assertions, hostile proxies, and revoked proxies fail closed.
+- Authority decisions use closed equality/switch branches and module-load captured reflection primitives. Post-load `Object` or `Set` prototype pollution cannot select a protected route or escape the resolver.
 
 ## Shared first-screen facts
 
