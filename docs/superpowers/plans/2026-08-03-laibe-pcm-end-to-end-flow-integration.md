@@ -2,59 +2,53 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build one truthful, recoverable, owner-first PCM source flow from the public homepage through document preparation, report, service decision, contract, workspaces, records, closeout, and legacy retirement.
+**Goal:** Build one truthful owner-first PCM source journey with single-page quotation and drawing checks, one shared owner/vendor account entrance, recoverable contract and workspace flows, and traceable read-only outcomes in the original workspaces.
 
-**Architecture:** A route manifest defines lifecycle, role, gate, owner, and graph edges. A shared fail-closed state layer renders role/state/next-actor/trace facts without case payload when G2 or G3 is closed. Each page remains static-source compatible and receives a bounded RED→GREEN package before the final cross-page browser gate.
+**Architecture:** `pcm-flow-route-manifest.js` owns canonical/planned/retired routes, compatibility aliases, failure states, and recovery edges. `public-contract.js` preserves current enumerable homepage aliases while exposing future canonical routes as non-clickable `null` values until their pages exist. Later packages activate one route only after its source page and tests exist.
 
-**Tech Stack:** Static HTML, CSS, ES modules, Node.js built-in test runner, Python loopback preview, and browser-based acceptance.
+**Tech Stack:** Static HTML, CSS, ES modules, Node.js built-in test runner, loopback-only preview, and browser acceptance.
 
-## Global Constraints
+## Global constraints
 
 - Work only in `C:\CodexWork\08-Jacky\worktrees\laibe_MVP_project\a0-design-pcm-owner-first-integration-20260803` on `a0/design-pcm-owner-first-integration-20260803`.
-- Use one writer and execute T0–T18 serially; do not modify shared files in parallel.
-- G1 is the only active implementation gate. G2, G3, and G4 remain closed.
+- `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION`; it is the correction parent and is not admissible.
+- Execute T0–T18 serially with one writer. Record the exact package write set before changing product source.
+- G1 source is active. G2 identity/role, G3 durable data, and G4 production remain closed.
 - Do not modify `apps/**`, `packages/**`, `supabase/**`, `src/lib/contracts/**`, root package/lock/config, or A1/R0/A9/A14-owned source.
-- Do not merge, rebase, push, open a pull request, deploy, apply migrations, write production, or alter secrets.
-- Visible UI uses Traditional Chinese and contains no market-bidding vocabulary, payment custody/collection, old-house investment, fabricated results, or external engineering language.
-- Existing valid routes, fragment compatibility, LaiBE logo assets, and canonical contract content are protected.
-- Every package starts with an actual failing test and ends with fresh verification, exact-path review, one bounded local commit, and a clean worktree.
-- T18 must verify 1280×900, 768×1024, and 390×844, zero horizontal overflow, zero console warning/error, zero visible controls smaller than 44×44, valid local routes/assets/fragments, and evidence bound to one commit.
+- Do not reset, rebase, stash, merge, push, open a pull request, deploy, apply migrations, change secrets, or write production.
+- Active local routes must exist; planned routes use `href: null`; compatibility pages never appear in canonical nodes or edges.
+- Visible UI uses Traditional Chinese and contains no market-bidding language, fund custody/collection, investment promises, fabricated results, external implementation terminology, or claims that AI makes the final decision.
+- Every package follows actual RED → minimal GREEN → refactor → focused verification → exact-path review → bounded local commit → clean worktree.
 
 ---
 
-### Task T0: Canonical route manifest and fail-closed continuation
+### Task T0: Corrected route, compatibility, and failure contract
 
 **Files:**
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js`
+- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js`
 - Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js`
-- Create: `tests/pcm-owner-first-route-manifest.test.mjs`
-- Create: `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
-- Create: `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
-- Create: `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+- Modify: `tests/pcm-owner-first-route-manifest.test.mjs`
+- Modify: `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
+- Modify: `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
+- Modify: `docs/governance/pcm-owner-first-execution-manifest.v1.json`
 
 **Interfaces:**
-- Produces: `PCM_FLOW_ROUTE_MANIFEST`, `getActiveRouteHref(routeKey)`, `PUBLIC_ROUTES`, and `resolvePcmFlowContinuation(context)`.
-- Consumes: existing local page paths from the A3 seed and S0 new-only inclusion.
+- Produces: canonical `/pcm/quote-check`, `/pcm/drawing-check`, `/account/access`; compatibility aliases; typed failure matrix; recovery edges; strict closed continuation.
+- Preserves: original enumerable homepage route aliases and every existing compatibility file.
 
-- [x] **Step 1: Write the failing route-manifest test**
+- [x] **Step 1: Add correction RED to the existing focused test.**
 
-  Assert G1–G4, active/planned/retired nodes, all four edge kinds, active local destinations, non-clickable planned nodes, complete public route vocabulary, and strict closed continuation.
+  Preserve valid G1–G4, active-path, four-edge-kind, and strict-closed coverage. Add negative assertions for split canonical pages, owner-only account entry, independent archive routes, the old read-only state, missing failure rows, and clickable planned routes.
 
-- [x] **Step 2: Run RED**
+- [x] **Step 2: Run actual RED against `888af2fb98f8a202e76ce3135d8e3f0ad66087fb`.**
 
-  Run: `node --test tests/pcm-owner-first-route-manifest.test.mjs`
+  Result: 9 tests, 1 pass, 8 fail. The retained edge-coverage test passed; all Human-corrected canonical and failure requirements failed for the expected missing behavior.
 
-  Expected: fail because `pcm-flow-route-manifest.js`, canonical route properties, and `resolvePcmFlowContinuation` do not exist.
+- [x] **Step 3: Implement minimal GREEN in the other five approved paths.**
 
-- [x] **Step 3: Implement minimal GREEN**
+  Add one quote node, one drawing node, one shared account node, compatibility-only aliases, approved read-only outcomes, complete failure rows/edges, and the corrected T2–T18 schedule.
 
-  Create immutable nodes, edges, and gates. Add backward-compatible direct route properties. Resolve only public G1 intents; route unknown, missing, malformed, or protected intents to `accessUnavailable` without payload or mutation.
-
-- [x] **Step 4: Record the approved design and execution contract**
-
-  Save the route hierarchy, four gates, shared fact spine, content rules, T0–T18 packages, and exact write sets in the spec, plan, and governance manifest.
-
-- [x] **Step 5: Verify T0**
+- [x] **Step 4: Run the corrected focused suite and current-train regressions.**
 
   Run:
 
@@ -63,397 +57,240 @@
   node --test tests\pcm-public-home.test.mjs tests\pcm-missing-flow-pages.test.mjs
   node --check src\stitch_laibe_landing_onboarding\pcm_standalone\public\pcm-flow-route-manifest.js
   node --check src\stitch_laibe_landing_onboarding\pcm_standalone\public\public-contract.js
-  git diff --check
   ```
 
-  Expected: all tests pass, syntax checks exit 0, and diff check is clean.
+  Fresh result: corrected focused suite 9/9 PASS; current-train homepage, missing-flow, and service-contract regressions 46/46 PASS. The full repository suite is 123/124 PASS; the only failure is the frozen A3 cumulative-path admission assertion in `tests/pcm-governance-pages.test.mjs`, which intentionally describes its historical candidate rather than this integration train and remains unmodified.
 
-- [x] **Step 6: Commit T0**
+- [x] **Step 5: Run UTF-8, JSON, forbidden-language, local href/src/fragment, planned-null, exact-six, and `git diff --check` gates.**
 
-  Stage only the six T0 paths and run `git commit -m "feat(pcm): define owner-first route contract"`.
+  Fresh result: strict UTF-8 6/6, JSON valid, active and compatibility local references 404 0, planned clickable routes 0, visible or unexpected forbidden-language matches 0, exact-six outside 0, and `git diff --check` clean. Five raw-source matches are confined to the existing `FORBIDDEN_PUBLIC_TERMS` rejection list and are not product copy.
+
+- [x] **Step 6: Complete independent spec/quality review with Critical 0 and Important 0.**
+
+  Review fixed hostile-reflection fail-closed handling and made the original owner/vendor workspace scope explicit for cancellation and approved read-only outcomes. Fresh review result: Critical 0, Important 0.
+
+- [x] **Step 7: Commit the exact-six correction with parent `888af2fb98f8a202e76ce3135d8e3f0ad66087fb`.**
+
+  Commit message: `fix(pcm): correct owner-first canonical route contract`
 
 ---
 
-### Task T1: Shared visual tokens and fail-closed state system
+### Task T1: Shared visual system and corrected closed states
 
-**Files:**
+**Exact proposed write set:**
 - Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css`
 - Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-shell.css`
 - Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-state.js`
 - Create: `tests/pcm-owner-first-shared-system.test.mjs`
-- Modify: the T0 spec, plan, and governance manifest.
+- Modify: current spec, plan, and governance manifest.
 
-**Interfaces:**
-- Produces: shared CSS tokens/classes and `resolveOwnerFirstState(input)` for safe fact-spine state.
-- Consumes: G1–G4 names and `accessUnavailable` recovery route from T0.
+**Produces:** LaiBE dark tokens, orange-red primary action, cyan viewing action, five-fact spine, accessible loading/empty/error/recovery shells, and closed states including `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` with zero mutation actions.
 
-- [ ] **Step 1: Record the exact seven-path T1 write set in the plan and governance manifest.**
-- [ ] **Step 2: Write RED tests for the six closed states, zero payload/mutation, product-language copy, 44px controls, focus-visible, reduced motion, and 1280/768/390 overflow rules.**
-- [ ] **Step 3: Run `node --test tests/pcm-owner-first-shared-system.test.mjs` and confirm the expected missing-module/style failures.**
-- [ ] **Step 4: Implement the minimal shared tokens, shell, fact spine, and state resolver.**
-- [ ] **Step 5: Run the focused test, all existing PCM tests, JavaScript syntax checks, UTF-8 checks, forbidden-language checks, and `git diff --check`.**
-- [ ] **Step 6: Review Critical/Important findings to zero and commit with `git commit -m "feat(pcm): add owner-first shared interface system"`.**
+- [ ] Record the exact seven paths and the corrected T0 parent.
+- [ ] Write RED for tokens, five facts, six baseline closed states, the two approved read-only outcomes, 44px controls, focus, reduced motion, and overflow safety.
+- [ ] Run RED, implement minimal GREEN, and verify focused/current-train regression tests.
+- [ ] Review Critical/Important findings to zero and commit `feat(pcm): add owner-first shared interface system`.
 
 ---
 
-### Task T2: Public homepage hierarchy
+### Task T2: Public homepage and three explicit entries
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/styles.css`
-- Modify only if route binding requires it: `src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js`
-- Create: `tests/pcm-owner-first-public-home.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** `pcm_standalone/public_home/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-public-home.test.mjs`, current spec/plan/manifest.
 
-**Interfaces:**
-- Consumes: `PUBLIC_ROUTES`, shared tokens, shared shell, and safe route continuation.
-- Produces: Hero → qualification → PCM checks → clearly labeled result-format example → four-stage flow → fee/boundary → final CTA.
+**Produces:** Hero → qualification → what PCM checks → result-format example → four-stage explanation → fee/boundary → final action, plus explicit report-check, drawing-review, and shared account controls. Planned controls remain non-clickable until T3–T5 activate their routes.
 
-- [ ] **Step 1: Record the exact T2 write set, including whether `app.js` is needed.**
-- [ ] **Step 2: Write RED assertions for the seven-section order, one primary CTA per section, preserved `#case-flow` and `#service-fee`, removed duplicate six-step content, and valid contract/owner-start destinations.**
-- [ ] **Step 3: Run the focused test and confirm hierarchy failures.**
-- [ ] **Step 4: Recompose only the homepage using existing brand assets and shared tokens.**
-- [ ] **Step 5: Verify focused and regression tests plus 1280/768/390 browser behavior, console, overflow, focus, and touch targets.**
-- [ ] **Step 6: Commit with `git commit -m "feat(pcm): focus public home on owner decisions"`.**
+- [ ] Write RED for the seven-section order, three route-bound controls, preserved anchors/logo, one primary action per section, no duplicate six-step content, and no 404.
+- [ ] Implement minimal GREEN using shared tokens and `PUBLIC_ROUTES` null-aware binding.
+- [ ] Verify 1280/768/390, console, overflow, focus, touch targets, and current-train regressions.
+- [ ] Commit `feat(pcm): focus homepage on three owner entry choices`.
 
 ---
 
-### Task T3: Owner entry and account preparation
+### Task T3: Single-page quotation check
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/owner_start/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/owner_start/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/owner_start/app.js`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public_intake/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public_intake/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/public_intake/app.js`
-- Create: `tests/pcm-owner-first-owner-entry.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/quote_check/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-quote-check.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Consumes: shared states and public route contract.
-- Produces: truthful registration-preparation, login-preparation, and document-intake states without claiming G2 or G3 readiness.
+**Produces:** one page state machine for introduction, consent, PDF selection, format checks, correction list, resubmission, and clearly labeled non-case result structure. Read `site/preview_budget/code.html` only as a C-only interaction/layout reference; do not carry old market, payment, or implementation language.
 
-- [ ] **Step 1: Record the exact T3 write set.**
-- [ ] **Step 2: Write RED tests for role/purpose/state/next actor/trace, preserved form field contracts, readable empty/error states, and safe recovery.**
-- [ ] **Step 3: Run the focused test and confirm failures against the current manual-like entry pages.**
-- [ ] **Step 4: Implement the smallest owner-first entry and intake changes without adding a writer.**
-- [ ] **Step 5: Verify focused/regression tests, syntax, routes, and responsive controls.**
-- [ ] **Step 6: Commit with `git commit -m "feat(pcm): clarify owner entry and intake"`.**
+- [ ] Write RED for the complete state sequence, safe file failures, trace facts, and route still null before the file exists.
+- [ ] Create the page, activate only `quoteCheck`, and run GREEN plus local-reference/browser checks.
+- [ ] Commit `feat(pcm): add single-page quotation check`.
 
 ---
 
-### Task T4: Document checks, corrections, and resubmission
+### Task T4: Single-page drawing check
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/app.js`
-- Create: `tests/pcm-owner-first-document-corrections.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/drawing_check/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-drawing-check.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Consumes: shared fact spine and route contract.
-- Produces: format, file-size, page-count, readability, correction-responsibility, and resubmission states.
+**Produces:** one page state machine for introduction, consent, upload, format checks, corrections, resubmission, and result, with paired-file recovery back to quotation check.
 
-- [ ] **Step 1: Record the exact T4 write set.**
-- [ ] **Step 2: Write RED tests for the four check types, next actor, preserved return/continue routes, and no fabricated upload success.**
-- [ ] **Step 3: Run RED, implement minimal GREEN, and run focused tests.**
-- [ ] **Step 4: Verify all PCM tests, syntax, local links, and responsive states.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): add truthful document correction flow"`.**
+- [ ] Write RED for the state sequence, drawing-specific readability/page checks, responsibilities, and planned route.
+- [ ] Create the page, activate only `drawingCheck`, run GREEN and cross-viewport checks.
+- [ ] Commit `feat(pcm): add single-page drawing check`.
 
 ---
 
-### Task T5: Three result views for owner decisions
+### Task T5: Shared owner and vendor account access
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/basic_report/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/basic_report/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/basic_report/app.js`
-- Create: `tests/pcm-owner-first-basic-results.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/account_access/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-account-access.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: quotation result, drawing result, and combined basic-review result tabs; each shows referenced version, confirmed items, differences/missing items, uncertainty, next step, next actor, and trace method.
+**Produces:** one registration/sign-in page for owners and invited vendors, with role choice, truthful G2-closed state, identity recovery, and no case payload. Read `site/register_vendor/code.html` only as a C-only visual/interaction reference and remove old market and payment semantics.
 
-- [ ] **Step 1: Record the exact T5 write set.**
-- [ ] **Step 2: Write RED tests for all three result structures and the label `格式示意，非真實案件`.**
-- [ ] **Step 3: Verify RED, implement minimal GREEN without invented case data, and re-run focused tests.**
-- [ ] **Step 4: Verify fragment tab behavior, keyboard operation, regressions, and responsive layouts.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): structure owner-facing basic results"`.**
+- [ ] Write RED for shared roles, login/registration modes, preserved form semantics, access failures, and route still null.
+- [ ] Create the page, activate only `accountAccess`, run GREEN and browser checks.
+- [ ] Commit `feat(pcm): add shared account access`.
 
 ---
 
-### Task T6: Formal PCM or self-service decision branch
+### Task T6: Case setup, document linking, and formal PCM decision
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/app.js`
-- Create: `tests/pcm-owner-first-service-decision.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/case_setup/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-case-setup.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: explicit `申請正式 PCM` and `暫不申請` outcomes, with service-contract and self-service-archive destinations.
+**Produces:** one source-only flow for creating a case, associating quotation/drawing references, showing missing-pair states, and choosing whether to apply for formal PCM. No archive workspace is created; declining formal service leaves the user in the original owner context with no invented durable write.
 
-- [ ] **Step 1: Record the exact T6 write set and write RED route/copy/state tests.**
-- [ ] **Step 2: Run RED, implement the branch without storing a fake decision, and run GREEN.**
-- [ ] **Step 3: Verify regression, local destinations, keyboard focus, and 44px targets.**
-- [ ] **Step 4: Commit with `git commit -m "feat(pcm): add explicit service decision branch"`.**
+- [ ] RED the pairing, decision, zero-writer, responsibility, and recovery contracts.
+- [ ] Create and activate `caseSetup`, run GREEN/regressions/browser checks.
+- [ ] Commit `feat(pcm): add case setup and PCM service decision`.
 
 ---
 
-### Task T7: Self-service read-only archive
+### Task T7: PCM service contract
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/app.js`
-- Create: `tests/pcm-owner-first-self-service-archive.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** `pcm_standalone/service_contract/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-service-contract.test.mjs`, current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: `ARCHIVED_READ_ONLY` UI with owner-visible documents/report structure, no fabricated content, and return-to-service-decision path.
+**Produces:** preserved v0.3, 3.5%, legal-review state, full DOM/print text, readable mobile navigation, and truthful prerequisite/signing gates.
 
-- [ ] **Step 1: Record the exact T7 write set and write RED read-only/zero-mutation/recovery tests.**
-- [ ] **Step 2: Run RED, implement minimal GREEN, and run focused tests.**
-- [ ] **Step 3: Verify regressions and responsive empty/read-only states.**
-- [ ] **Step 4: Commit with `git commit -m "feat(pcm): provide self-service read-only archive"`.**
+- [ ] RED preservation, mobile reading, and gate behavior.
+- [ ] Implement minimal reading changes, verify full text/print/regressions, and commit `feat(pcm): improve service contract reading`.
 
 ---
 
-### Task T8: PCM service contract reading experience
+### Task T8: Contract prerequisites and supplementation
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/app.js`
-- Create: `tests/pcm-owner-first-service-contract.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** `pcm_standalone/contract_prerequisites/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-contract-prerequisites.test.mjs`, current spec/plan/governance manifest.
 
-**Interfaces:**
-- Preserves: v0.3, 3.5%, legal-review state, full contract text, and print completeness.
-- Produces: mobile table of contents, collapsible reading sections, and gated next actions.
+**Produces:** missing item, responsible role, due-state, overdue recovery, return route, and no enabled signing action.
 
-- [ ] **Step 1: Record the exact T8 write set and write RED preservation/mobile-reading/gating tests.**
-- [ ] **Step 2: Run RED, implement the smallest reading improvement, and run GREEN.**
-- [ ] **Step 3: Verify full text remains in the DOM and print expands all sections.**
-- [ ] **Step 4: Verify regressions, responsive height/overflow, and local routes.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): improve service contract reading"`.**
+- [ ] RED prerequisite, supplement-overdue, responsibility, and zero-mutation states.
+- [ ] Implement GREEN, verify responsive recovery, and commit `feat(pcm): clarify contract prerequisites`.
 
 ---
 
-### Task T9: Contract prerequisite recovery
+### Task T9: STEP 01–07 contract signing
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/app.js`
-- Create: `tests/pcm-owner-first-contract-prerequisites.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** `pcm_standalone/contract_signing/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-contract-signing.test.mjs`, current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: missing item, responsibility, return destination, and `PREREQUISITES_PENDING` state without revealing case data.
+**Produces:** complete STEP 01–07 content, exact mutual-version requirements, disabled signing until trusted G2/G3 readiness, and safe failure recovery.
 
-- [ ] **Step 1: Record the exact T9 write set and write RED tests for missing-item responsibility and recovery routes.**
-- [ ] **Step 2: Run RED, implement minimal GREEN, and run focused tests.**
-- [ ] **Step 3: Verify regressions, zero mutation, and responsive states.**
-- [ ] **Step 4: Commit with `git commit -m "feat(pcm): clarify contract prerequisite recovery"`.**
+- [ ] RED steps 01–07, strict inputs, mutual version, writer readiness, and disabled/loading behavior.
+- [ ] Implement GREEN, verify no URL/hash/storage boolean unlock, and commit `feat(pcm): complete gated signing steps`.
 
 ---
 
-### Task T10: Complete STEP 01–07 contract signing source
+### Task T10: Calendar-first owner workspace
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/app.js`
-- Create: `tests/pcm-owner-first-contract-signing.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** `src/stitch_laibe_landing_onboarding/client_awarding_dashboard/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-owner-workspace.test.mjs`, current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: continuous STEP 01–07 content and a disabled signing action until exact trusted identity and writer readiness are supplied by later gates.
+**Produces:** calendar main view, case-message side panel, compact state spine, and document/risk/change/acceptance/record drawers; default zero data and no live external-messaging claim.
 
-- [ ] **Step 1: Record the exact T10 write set and write RED tests for steps 01–07, responsibility, prerequisites, immutable identity, and closed writer behavior.**
-- [ ] **Step 2: Run RED, implement the complete visible sequence, and run GREEN.**
-- [ ] **Step 3: Verify no URL/hash/storage/caller boolean unlocks signing or owner-workspace continuation.**
-- [ ] **Step 4: Verify regressions, responsive reading, focus, and disabled/loading behavior.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): complete gated contract signing steps"`.**
+- [ ] RED calendar/message/fact-spine/adapter/read-only behavior.
+- [ ] Implement GREEN using the vendor workspace grammar, verify 1280/768/390, and commit `feat(pcm): make owner workspace calendar-first`.
 
 ---
 
-### Task T11: Calendar-first owner workspace
+### Task T11: Vendor invitation, membership, and workspace
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/client_awarding_dashboard/app.js`
-- Create: `tests/pcm-owner-first-owner-workspace.test.mjs`
-- Modify: the spec, plan, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/vendor_invitation/{code.html,styles.css,app.js}`, modify `pcm_standalone/vendor_workspace/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-vendor-flow.test.mjs`, modify route manifest and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Consumes: a trusted adapter seam with default zero data.
-- Produces: calendar main view, case-message side panel, compact state spine, and documents/risks/changes/acceptance/records tabs or drawers.
+**Produces:** declined/expired/withdrawn/resend invitation states, shared account recovery, membership confirmation, authorized shell, and original-workspace read-only outcomes.
 
-- [ ] **Step 1: Record the exact T11 write set and write RED layout, state, zero-data, and adapter-boundary tests.**
-- [ ] **Step 2: Run RED, adapt the verified vendor calendar/message grammar for the owner role, and run GREEN.**
-- [ ] **Step 3: Verify the message panel is described as case communication, not a live external messaging claim.**
-- [ ] **Step 4: Verify desktop/tablet/mobile behavior, regressions, console, overflow, and controls.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): make owner workspace calendar-first"`.**
+- [ ] RED invitation/membership/zero-data/read-only contracts.
+- [ ] Implement GREEN, activate only destinations that exist and pass G1, verify regressions/browser, and commit `feat(pcm): add gated vendor journey`.
 
 ---
 
-### Task T12: Vendor invitation, membership, and workspace
+### Task T12: PCM login, authorized cases, and case workspace
 
-**Files:**
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_invitation/code.html`
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_invitation/styles.css`
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_invitation/app.js`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js`
-- Create: `tests/pcm-owner-first-vendor-flow.test.mjs`
-- Modify: the spec, plan, route manifest, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/pcm_login/{code.html,styles.css,app.js}`, modify `pcm_standalone/pcm_authorized_console/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-pcm-console.test.mjs`, modify route manifest and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: invitation, identity, membership, access-denied, and authorized-shell states; default remains closed at G2.
+**Produces:** login-required, zero authorized cases, authorized list, selected case, denied/recovery, and PCM-exited no-action state; G2 remains closed by default.
 
-- [ ] **Step 1: Record the exact T12 write set and write RED route/membership/closed-state tests.**
-- [ ] **Step 2: Run RED, implement source-only invitation and workspace states, and run GREEN.**
-- [ ] **Step 3: Verify no case payload appears without a trusted adapter and all failures recover safely.**
-- [ ] **Step 4: Verify regressions and cross-viewport workspace behavior.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): add gated vendor entry and workspace"`.**
+- [ ] RED identity/authorization/cardinality/recovery/exit behavior.
+- [ ] Implement GREEN without unauthorized case content, verify regressions/browser, and commit `feat(pcm): add gated PCM console journey`.
 
 ---
 
-### Task T13: PCM login, authorized list, and case workspace
+### Task T13: Internal governance
 
-**Files:**
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_login/code.html`
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_login/styles.css`
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_login/app.js`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/pcm_authorized_console/app.js`
-- Create: `tests/pcm-owner-first-pcm-console.test.mjs`
-- Modify: the spec, plan, route manifest, and governance manifest.
+**Exact proposed write set:** `pcm_standalone/internal_governance/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-internal-governance.test.mjs`, route manifest and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: auth-required, authorized-list, no-authorized-case, selected-case, denied, and recovery shells; G2 remains closed by default.
+**Produces:** auth-required, permission-denied, authorized-list, and recovery states with no public navigation entry and no delegated Human decision authority.
 
-- [ ] **Step 1: Record the exact T13 write set and write RED authentication/list/case/recovery tests.**
-- [ ] **Step 2: Run RED, implement source-only fail-closed states, and run GREEN.**
-- [ ] **Step 3: Verify no unauthorized case content or enabled mutation appears.**
-- [ ] **Step 4: Verify regressions, local routes, responsive behavior, and console.**
-- [ ] **Step 5: Commit with `git commit -m "feat(pcm): add gated PCM console journey"`.**
+- [ ] RED permissions/list/recovery/public-entry absence.
+- [ ] Implement GREEN, verify zero unauthorized data, and commit `feat(pcm): add governance recovery flow`.
 
 ---
 
-### Task T14: Internal governance entry and recovery
+### Task T14: Case record center
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/internal_governance/app.js`
-- Create: `tests/pcm-owner-first-internal-governance.test.mjs`
-- Modify: the spec, plan, route manifest, and governance manifest.
+**Exact proposed write set:** create `pcm_standalone/case_record_center/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-record-center.test.mjs`, modify route manifest and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: auth-required, permission-denied, authorized-list, and recovery states with no public navigation entry.
+**Produces:** source-only structure for documents, decisions, messages, changes, tasks, acceptance, actor, source version, state, next responsibility, and safe zero-data context.
 
-- [ ] **Step 1: Record the exact T14 write set and write RED permission/list/recovery tests.**
-- [ ] **Step 2: Run RED, implement minimal GREEN, and verify no public header exposes this entry.**
-- [ ] **Step 3: Verify regressions, responsive states, and zero unauthorized data.**
-- [ ] **Step 4: Commit with `git commit -m "feat(pcm): add internal governance recovery path"`.**
+- [ ] RED taxonomy/facts/zero-data/recovery and keyboard filters.
+- [ ] Implement GREEN, verify operational density/responsive behavior, and commit `feat(pcm): add traceable case record center`.
 
 ---
 
-### Task T15: Case record center
+### Task T15: PCM exit, case cancellation, closeout, and three-party confirmation
 
-**Files:**
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/case_record_center/code.html`
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/case_record_center/styles.css`
-- Create: `src/stitch_laibe_landing_onboarding/pcm_standalone/case_record_center/app.js`
-- Create: `tests/pcm-owner-first-record-center.test.mjs`
-- Modify: the spec, plan, route manifest, and governance manifest.
+**Exact proposed write set:** owner workspace, vendor workspace, PCM console, `pcm_standalone/case_closeout/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-case-lifecycle.test.mjs`, route manifest and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: filterable source-only structure for documents, decisions, messages, changes, construction tasks, acceptance, actor, source version, state, and next responsibility; default is context unavailable.
+**Produces:** original-workspace `PCM_EXITED_READ_ONLY`, `CASE_CLOSED_READ_ONLY`, and cancelled-case states; existing content remains visible, PCM exit removes PCM intervention, `mutationAllowed` is false, `actions` is empty, and no archive workspace is created.
 
-- [ ] **Step 1: Record the exact T15 write set and write RED taxonomy/fact-spine/zero-data/recovery tests.**
-- [ ] **Step 2: Run RED, implement minimal GREEN without fabricated events, and run focused tests.**
-- [ ] **Step 3: Verify keyboard tabs/filters, regressions, and responsive density.**
-- [ ] **Step 4: Commit with `git commit -m "feat(pcm): add traceable case record center"`.**
+- [ ] RED state names, original-workspace retention, action removal, three-party confirmation, and recovery.
+- [ ] Implement GREEN, verify no alternate workspace route, and commit `feat(pcm): close case lifecycle in original workspaces`.
 
 ---
 
-### Task T16: Closeout, three-party confirmation, and archive
+### Task T16: Cross-role failure recovery and flow consistency
 
-**Files:**
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/styles.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/app.js`
-- Create: `tests/pcm-owner-first-case-closeout.test.mjs`
-- Modify: the spec, plan, route manifest, and governance manifest.
+**Exact proposed write set:** only affected `pcm_standalone/**` pages identified by RED, `tests/pcm-owner-first-cross-role-recovery.test.mjs`, route manifest/public contract and current spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: pending-confirmation, disputed-item, confirmed, and read-only archive states; no confirmation can be written at G3 closed.
+**Produces:** consistent reason, next action, responsible role, return/recovery route, payload policy, and disabled mutation for every failure matrix row across owner, vendor, PCM, and governance surfaces.
 
-- [ ] **Step 1: Record the exact T16 write set and write RED state/responsibility/archive/zero-writer tests.**
-- [ ] **Step 2: Run RED, implement minimal GREEN, and run focused tests.**
-- [ ] **Step 3: Verify regressions, recovery links, responsive layouts, and disabled actions.**
-- [ ] **Step 4: Commit with `git commit -m "feat(pcm): structure case closeout and archive"`.**
+- [ ] Record affected paths before writing; RED every matrix row against its visible source.
+- [ ] Apply only bounded consistency fixes, run full current-train tests/browser routes, and commit `fix(pcm): align cross-role recovery states`.
 
 ---
 
-### Task T17: Retire legacy entry points
+### Task T17: Legacy entry retirement
 
-**Files:**
-- Modify the existing `code.html` in each approved directory under `site/`: `ai_pcm_035_pre_tender_candidate`, `ai_pcm_045_contract_support_candidate`, `ai_pcm_entry_candidate`, `client_awarding_dashboard`, `owner_workspace`, `pcm_contract_generator`, `pcm_contract_preview`, `pcm_contract_review`, `pcm_contract_sign`, `pcm_inbox`, `pcm_login`, `pcm_mobile`, `pcm_review_workbench`, `pro_workspace`, and `register_vendor`.
-- Create: `site/shared/pcm-retirement.css`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/code.html`
-- Modify: `src/stitch_laibe_landing_onboarding/pcm_standalone/app.js`
-- Create: `tests/pcm-owner-first-legacy-retirement.test.mjs`
-- Modify: the spec, plan, route manifest, and governance manifest.
+**Exact proposed write set:** the existing `code.html` in `site/ai_pcm_035_pre_tender_candidate`, `site/ai_pcm_045_contract_support_candidate`, `site/ai_pcm_entry_candidate`, `site/client_awarding_dashboard`, `site/owner_workspace`, `site/pcm_contract_generator`, `site/pcm_contract_preview`, `site/pcm_contract_review`, `site/pcm_contract_sign`, `site/pcm_inbox`, `site/pcm_login`, `site/pcm_mobile`, `site/pcm_review_workbench`, `site/pro_workspace`, and `site/register_vendor`; create `site/shared/pcm-retirement.css`; modify `pcm_standalone/{code.html,app.js}`; create `tests/pcm-owner-first-legacy-retirement.test.mjs`; modify current route/spec/plan/governance manifest.
 
-**Interfaces:**
-- Produces: consistent retirement shells with canonical return destinations and no demo cases, demo adapter, or old market-flow actions.
+**Produces:** consistent retirement shells and canonical return destinations, with no demo cases, old market actions, or dead links. Compatibility source pages are handled only by the approved retirement list.
 
-- [ ] **Step 1: Record the exact T17 file list and verify each approved file exists before writing.**
-- [ ] **Step 2: Write RED tests that open every legacy entry, require the retirement message and canonical destination, and forbid old demo/case actions.**
-- [ ] **Step 3: Run RED, replace only the approved entry files and shared retirement CSS, and run GREEN.**
-- [ ] **Step 4: Verify no retired entry yields a 404 and no canonical page links back to a retired route.**
-- [ ] **Step 5: Run regressions, forbidden-language scan, syntax checks, and exact-path review.**
-- [ ] **Step 6: Commit with `git commit -m "chore(pcm): retire legacy PCM entry points"`.**
+- [ ] Verify every approved file exists, RED all old entries, replace only the recorded paths, run GREEN/local-route/forbidden-language checks.
+- [ ] Commit `chore(pcm): retire legacy PCM entries`.
 
 ---
 
 ### Task T18: Full route graph and browser acceptance
 
-**Files:**
-- Create or modify only PCM owner-first tests under `tests/`.
-- Modify: the spec, plan, and governance manifest.
-- Create: `outputs/pcm-owner-first-20260803/route-report.json`
-- Create: `outputs/pcm-owner-first-20260803/acceptance-report.md`
-- Create: screenshots under `outputs/pcm-owner-first-20260803/screenshots/`
-- Create: `outputs/pcm-owner-first-20260803/pcm-owner-first-evidence.zip`
+**Exact proposed write set:** PCM owner-first tests, current spec/plan/governance manifest, and `outputs/pcm-owner-first-20260803/**` only.
 
-**Interfaces:**
-- Consumes: the immutable T17 candidate.
-- Produces: one commit-bound route report, browser evidence set, acceptance report, and ZIP.
+**Produces:** commit-bound route report, full-page screenshots at 1280×900/768×1024/390×844, acceptance report, and evidence ZIP.
 
-- [ ] **Step 1: Read `web-design-engineer/references/browser-acceptance.md`, record the exact T18 write set, and bind the candidate HEAD/tree.**
-- [ ] **Step 2: Run the full Node test suite, all changed JavaScript syntax checks, HTML/local href/src/fragment verification, UTF-8 checks, forbidden visible-language scan, and `git diff --check`.**
-- [ ] **Step 3: Start or recover one loopback-only preview on the assigned port without terminating an unknown process.**
-- [ ] **Step 4: Traverse every active forward, back, pending, and recovery edge at 1280×900, 768×1024, and 390×844.**
-- [ ] **Step 5: Record screenshots and assert horizontal overflow 0, console warning/error 0, and visible controls smaller than 44×44 equal 0.**
-- [ ] **Step 6: Verify every first screen identifies role, purpose, current state, next actor/action, and trace behavior; record any still-closed G2/G3/G4 capability truthfully.**
-- [ ] **Step 7: Build the evidence ZIP inside `outputs/pcm-owner-first-20260803/`, rerun integrity checks, and commit with `git commit -m "test(pcm): verify owner-first source journey"`.**
-- [ ] **Step 8: Report exact worktree, branch, HEAD, parent, tree, commits, changed files, test/browser evidence, remaining closed gates, and return authority to A0 without merge/push/deploy.**
+- [ ] Read `web-design-engineer/references/browser-acceptance.md` and bind the immutable T17 HEAD/tree.
+- [ ] Run full current-train tests, candidate-specific historical checks in their proper frozen context, syntax, UTF-8, JSON, local href/src/fragment, forbidden visible language, exact-path, and `git diff --check`.
+- [ ] Traverse every active forward/back/pending/recovery route at all three viewports; record 404 0, console warning/error 0, horizontal overflow 0, and visible controls under 44×44 equal 0.
+- [ ] Capture full-page evidence, create the ZIP inside `outputs/pcm-owner-first-20260803/`, verify receipts, and commit `test(pcm): verify owner-first source journey`.
+- [ ] Report exact identity, commits, files, tests, browser evidence, closed G2–G4 capabilities, and return authority without merge/push/deploy.
 
 ## Self-review
 
-- Spec coverage: T0–T18 map to every Human-ordered page, route, state, retirement, and acceptance requirement.
-- Placeholder scan: no unfinished implementation placeholders are used; planned capabilities are named and explicitly gate-closed.
-- Interface consistency: route IDs and G1–G4 gate names match the T0 manifest and are consumed consistently by later tasks.
-- Scope: every task is independently testable and produces one bounded commit before the next task begins.
+- Coverage: the corrected schedule has exactly T0–T18 and maps every Human-ordered source package once.
+- Route consistency: quotation, drawing, and account access each have one canonical node; compatibility pages have no canonical edge.
+- Read-only consistency: PCM exit and case closeout stay in original workspaces with no actions.
+- Testability: each package has an independently rejectable RED/GREEN/commit boundary.
+- Scope: no package grants Auth, durable data, or production authority.

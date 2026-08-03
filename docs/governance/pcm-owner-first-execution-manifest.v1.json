@@ -20,115 +20,148 @@
     "changeMode": "new-only",
     "status": "complete"
   },
+  "candidateCorrection": {
+    "supersededIntermediate": {
+      "head": "888af2fb98f8a202e76ce3135d8e3f0ad66087fb",
+      "parent": "0d81189e8cc7f7563fb390e17b524afabb5b3b54",
+      "tree": "d99f6e383370d009dfc609427e544184255f2e70",
+      "status": "SUPERSEDED_PRE_CORRECTION",
+      "admissible": false
+    },
+    "correctionParent": "888af2fb98f8a202e76ce3135d8e3f0ad66087fb",
+    "reviewTarget": "CORRECTION_COMMIT_CONTAINING_THIS_MANIFEST"
+  },
+  "t1Containment": {
+    "status": "stopped_before_commit",
+    "files": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-shell.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-state.js",
+      "tests/pcm-owner-first-shared-system.test.mjs"
+    ],
+    "ownership": "agent-created-uncommitted",
+    "userOwnedData": false,
+    "removedBeforeCorrection": true,
+    "historicalBytes": "UNKNOWN",
+    "historicalSha256": "UNKNOWN"
+  },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
     { "id": "G2_AUTH_RUNTIME", "owner": "A6", "status": "closed", "scope": "identity/membership/role/contract runtime" },
     { "id": "G3_DURABLE_DATA", "owner": "A5 and canonical producers", "status": "closed", "scope": "writers/storage/signing/events/canonical case data" },
     { "id": "G4_PRODUCTION", "owner": "A0 final", "status": "closed", "scope": "migration/secrets/deployment/monitoring/production writes" }
   ],
+  "canonicalRoutes": [
+    { "id": "quoteCheck", "publicPath": "/pcm/quote-check", "lifecycle": "planned", "href": null, "owner": "A0" },
+    { "id": "drawingCheck", "publicPath": "/pcm/drawing-check", "lifecycle": "planned", "href": null, "owner": "A0" },
+    { "id": "accountAccess", "publicPath": "/account/access", "lifecycle": "planned", "href": null, "owner": "A0" }
+  ],
+  "compatibilityAliases": [
+    { "id": "ownerStart", "lifecycle": "RETIRED_COMPATIBILITY", "canonicalHref": null },
+    { "id": "documentCorrections", "lifecycle": "RETIRED_COMPATIBILITY", "canonicalHref": null },
+    { "id": "basicReport", "lifecycle": "RETIRED_COMPATIBILITY", "canonicalHref": null },
+    { "id": "selfServiceArchive", "lifecycle": "RETIRED_COMPATIBILITY", "canonicalHref": null }
+  ],
   "routeManifest": "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
   "routeRules": {
     "active": "must expose an existing local href",
-    "planned": "must not expose a clickable href",
-    "retired": "must name a canonical replacement",
-    "unknown": "must resolve to accessUnavailable without case payload or mutation",
+    "planned": "must expose href null and no clickable edge",
+    "compatibility": "must remain outside canonical nodes and canonical edges",
+    "retired": "must expose no live href and must name a canonical replacement",
+    "unknown": "must resolve to accessUnavailable with ZERO_CASE_DATA and no mutation",
     "authority": "URL, hash, browser storage, and caller booleans never grant G2, G3, or G4"
   },
-  "tasks": [
-    {
-      "id": "T0",
-      "title": "route manifest",
-      "status": "verified",
-      "writeSet": [
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
-        "tests/pcm-owner-first-route-manifest.test.mjs",
-        "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
-        "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
-        "docs/governance/pcm-owner-first-execution-manifest.v1.json"
-      ],
-      "verification": {
-        "red": "6 tests failed because the route manifest, canonical route properties, and resolver were absent",
-        "green": "6/6 route-manifest tests passed",
-        "focusedRegression": "40/40 route, homepage, and missing-flow tests passed",
-        "candidateSpecificExclusion": {
-          "test": "tests/pcm-governance-pages.test.mjs",
-          "reason": "This frozen A3 admission test asserts the original seed-to-candidate cumulative path set. S0 intentionally adds 22 new-only A2 paths, so the assertion is not an integration-train invariant and is not modified by T0 authority."
-        }
-      }
+  "readOnlyOutcomes": [
+    { "code": "PCM_EXITED_READ_ONLY", "workspace": "original owner/vendor workspace", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] },
+    { "code": "CASE_CLOSED_READ_ONLY", "workspace": "original owner/vendor workspace", "payloadPolicy": "PRESERVE_EXISTING_CASE_READ_ONLY", "mutationAllowed": false, "actions": [] }
+  ],
+  "t0": {
+    "status": "complete_in_correction_commit",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "red": {
+      "parent": "888af2fb98f8a202e76ce3135d8e3f0ad66087fb",
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 9,
+      "passed": 1,
+      "failed": 8,
+      "exitCode": 1
     },
-    {
-      "id": "T1",
-      "title": "shared visual and failure states",
-      "status": "planned",
-      "writeSet": [
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css",
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-shell.css",
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-state.js",
-        "tests/pcm-owner-first-shared-system.test.mjs",
-        "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
-        "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
-        "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    "green": {
+      "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "exitCode": 0,
+      "includesHostileInputRecovery": true
+    },
+    "currentTrainRegression": {
+      "command": "node --test tests/pcm-public-home.test.mjs tests/pcm-missing-flow-pages.test.mjs tests/pcm-service-contract.test.mjs",
+      "tests": 46,
+      "passed": 46,
+      "failed": 0,
+      "exitCode": 0
+    },
+    "fullSuiteTruth": {
+      "tests": 124,
+      "passed": 123,
+      "failed": 1,
+      "exitCode": 1,
+      "onlyFailure": "tests/pcm-governance-pages.test.mjs frozen cumulative-path admission assertion"
+    },
+    "staticGates": {
+      "strictUtf8": "6/6",
+      "json": "valid",
+      "activeAndCompatibilityLocal404": 0,
+      "plannedClickable": 0,
+      "visibleOrUnexpectedForbiddenTerms": 0,
+      "rawForbiddenEnumerationOnly": 5,
+      "diffPaths": 6,
+      "outsideWriteSet": 0,
+      "gitDiffCheck": "clean"
+    },
+    "independentReview": {
+      "specCritical": 0,
+      "specImportant": 0,
+      "qualityCritical": 0,
+      "qualityImportant": 0,
+      "fixedBeforeCommit": [
+        "hostile reflection input now fails closed",
+        "owner and vendor original workspace scope is explicit"
       ]
     },
-    { "id": "T2", "title": "public homepage", "status": "planned", "scope": ["pcm_standalone/public_home/**", "tests/pcm-owner-first-public-home.test.mjs", "spec/plan/manifest"] },
-    { "id": "T3", "title": "owner entry and account preparation", "status": "planned", "scope": ["pcm_standalone/owner_start/**", "pcm_standalone/public_intake/**", "tests/pcm-owner-first-owner-entry.test.mjs", "spec/plan/manifest"] },
-    { "id": "T4", "title": "document checks and corrections", "status": "planned", "scope": ["pcm_standalone/document_corrections/**", "tests/pcm-owner-first-document-corrections.test.mjs", "spec/plan/manifest"] },
-    { "id": "T5", "title": "three result views", "status": "planned", "scope": ["pcm_standalone/basic_report/**", "tests/pcm-owner-first-basic-results.test.mjs", "spec/plan/manifest"] },
-    { "id": "T6", "title": "service decision", "status": "planned", "scope": ["pcm_standalone/account_service_status/**", "tests/pcm-owner-first-service-decision.test.mjs", "spec/plan/manifest"] },
-    { "id": "T7", "title": "self-service archive", "status": "planned", "scope": ["pcm_standalone/self_service_archive/**", "tests/pcm-owner-first-self-service-archive.test.mjs", "spec/plan/manifest"] },
-    { "id": "T8", "title": "service contract", "status": "planned", "scope": ["pcm_standalone/service_contract/**", "tests/pcm-owner-first-service-contract.test.mjs", "spec/plan/manifest"] },
-    { "id": "T9", "title": "contract prerequisites", "status": "planned", "scope": ["pcm_standalone/contract_prerequisites/**", "tests/pcm-owner-first-contract-prerequisites.test.mjs", "spec/plan/manifest"] },
-    { "id": "T10", "title": "contract signing STEP 01-07", "status": "planned", "scope": ["pcm_standalone/contract_signing/**", "tests/pcm-owner-first-contract-signing.test.mjs", "spec/plan/manifest"] },
-    { "id": "T11", "title": "calendar-first owner workspace", "status": "planned", "scope": ["client_awarding_dashboard/**", "tests/pcm-owner-first-owner-workspace.test.mjs", "spec/plan/manifest"] },
-    { "id": "T12", "title": "vendor invitation and workspace", "status": "planned", "scope": ["pcm_standalone/vendor_invitation/**", "pcm_standalone/vendor_workspace/**", "tests/pcm-owner-first-vendor-flow.test.mjs", "route/spec/plan/manifest"] },
-    { "id": "T13", "title": "PCM login, list, and case console", "status": "planned", "scope": ["pcm_standalone/pcm_login/**", "pcm_standalone/pcm_authorized_console/**", "tests/pcm-owner-first-pcm-console.test.mjs", "route/spec/plan/manifest"] },
-    { "id": "T14", "title": "internal governance", "status": "planned", "scope": ["pcm_standalone/internal_governance/**", "tests/pcm-owner-first-internal-governance.test.mjs", "route/spec/plan/manifest"] },
-    { "id": "T15", "title": "case record center", "status": "planned", "scope": ["pcm_standalone/case_record_center/**", "tests/pcm-owner-first-record-center.test.mjs", "route/spec/plan/manifest"] },
-    { "id": "T16", "title": "closeout and archive", "status": "planned", "scope": ["pcm_standalone/case_closeout/**", "tests/pcm-owner-first-case-closeout.test.mjs", "route/spec/plan/manifest"] },
-    {
-      "id": "T17",
-      "title": "legacy retirement",
-      "status": "planned",
-      "legacyEntries": [
-        "site/ai_pcm_035_pre_tender_candidate/code.html",
-        "site/ai_pcm_045_contract_support_candidate/code.html",
-        "site/ai_pcm_entry_candidate/code.html",
-        "site/client_awarding_dashboard/code.html",
-        "site/owner_workspace/code.html",
-        "site/pcm_contract_generator/code.html",
-        "site/pcm_contract_preview/code.html",
-        "site/pcm_contract_review/code.html",
-        "site/pcm_contract_sign/code.html",
-        "site/pcm_inbox/code.html",
-        "site/pcm_login/code.html",
-        "site/pcm_mobile/code.html",
-        "site/pcm_review_workbench/code.html",
-        "site/pro_workspace/code.html",
-        "site/register_vendor/code.html"
-      ],
-      "additionalScope": [
-        "site/shared/pcm-retirement.css",
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/code.html",
-        "src/stitch_laibe_landing_onboarding/pcm_standalone/app.js",
-        "tests/pcm-owner-first-legacy-retirement.test.mjs",
-        "route/spec/plan/manifest"
-      ]
-    },
-    {
-      "id": "T18",
-      "title": "full route and browser acceptance",
-      "status": "planned",
-      "scope": [
-        "tests/pcm-owner-first-*.test.mjs",
-        "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
-        "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
-        "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-        "outputs/pcm-owner-first-20260803/**"
-      ],
-      "viewports": ["1280x900", "768x1024", "390x844"],
-      "targets": { "http404": 0, "consoleWarnings": 0, "consoleErrors": 0, "horizontalOverflow": 0, "visibleControlsUnder44": 0 }
+    "historicalCandidateSpecificTest": {
+      "test": "tests/pcm-governance-pages.test.mjs",
+      "classification": "frozen A3 admission cumulative-path assertion",
+      "action": "not modified by T0 correction"
     }
+  },
+  "schedule": [
+    { "id": "T0", "title": "corrected route and failure contract" },
+    { "id": "T1", "title": "shared visual system and corrected closed states" },
+    { "id": "T2", "title": "public homepage and three explicit entries" },
+    { "id": "T3", "title": "single-page quotation check" },
+    { "id": "T4", "title": "single-page drawing check" },
+    { "id": "T5", "title": "shared owner and vendor account access" },
+    { "id": "T6", "title": "case setup, document linking, and formal PCM decision" },
+    { "id": "T7", "title": "PCM service contract" },
+    { "id": "T8", "title": "contract prerequisites and supplementation" },
+    { "id": "T9", "title": "STEP 01-07 contract signing" },
+    { "id": "T10", "title": "calendar-first owner workspace" },
+    { "id": "T11", "title": "vendor invitation, membership, and workspace" },
+    { "id": "T12", "title": "PCM login, authorized cases, and case workspace" },
+    { "id": "T13", "title": "internal governance" },
+    { "id": "T14", "title": "case record center" },
+    { "id": "T15", "title": "PCM exit, cancellation, closeout, and confirmation" },
+    { "id": "T16", "title": "cross-role failure recovery and flow consistency" },
+    { "id": "T17", "title": "legacy entry retirement" },
+    { "id": "T18", "title": "full route graph and browser acceptance" }
   ],
   "protectedPaths": [
     "apps/**",
@@ -141,8 +174,10 @@
     "yarn.lock"
   ],
   "publishing": {
-    "merge": false,
+    "reset": false,
     "rebase": false,
+    "stash": false,
+    "merge": false,
     "push": false,
     "pullRequest": false,
     "deploy": false,

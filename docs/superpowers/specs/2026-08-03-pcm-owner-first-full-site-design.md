@@ -1,20 +1,25 @@
 # LaiBE PCM Owner-First Full-Site Design
 
-## Decision record
+## Authority and candidate identity
 
-- Owner: A0｜design
-- Mode: redesign-preserve with bounded source integration
+- Design/source owner: A0｜design
 - Worktree: `C:\CodexWork\08-Jacky\worktrees\laibe_MVP_project\a0-design-pcm-owner-first-integration-20260803`
 - Branch: `a0/design-pcm-owner-first-integration-20260803`
 - Seed: `3f6bddea936bdebd36846a239bc5d13c37e1d331`
-- S0 inclusion: `266a567c4881a14b438921a5ff1d8ba6165270ca`, integrated as `0d81189e8cc7f7563fb390e17b524afabb5b3b54`
-- Product goal: let a first-time homeowner understand, enter, recover, and follow the PCM journey without any interface pretending that identity, signing, durable records, or production services are available before their gates pass.
+- S0 integration: `0d81189e8cc7f7563fb390e17b524afabb5b3b54`
+- Intermediate commit `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` is `SUPERSEDED_PRE_CORRECTION` and is not admissible.
+- The review target is the correction commit that contains this specification and has `888af2fb98f8a202e76ce3135d8e3f0ad66087fb` as its parent.
+- This train owns G1 source only. G2 identity/role, G3 durable records, and G4 production remain closed.
+
+## Product outcome
+
+The owner-first PCM journey must let a Taiwan homeowner understand what can be checked, choose a quotation check or drawing check, register or sign in through one shared account entrance, create a case, decide whether to apply for formal PCM service, read and complete the contract flow, and then work with the three roles in traceable workspaces. Every failure has a plain-language reason, a responsible role, an executable next action, and a safe return or recovery route.
 
 ## Design Read
 
 ```yaml
-artifact: public landing page plus owner-first service flow
-audience: Taiwan homeowners first; invited vendors, PCM staff, and governance staff only after their gates
+artifact: public landing page plus owner-first PCM service flow
+audience: homeowners first; invited vendors, PCM staff, and governance staff after their gates
 visual-language: restrained dark LaiBE glass with evidence-first operational hierarchy
 mode: redesign-preserve
 visual-variance: 4
@@ -24,146 +29,85 @@ asset-dependence: 4
 brand-fidelity: 10
 ```
 
-The visual variance is concentrated in the homepage sequence and calendar-first workspace. Motion is limited to short state feedback. Operational pages use a stable grid and progressive disclosure. The existing LaiBE logo, dark background, orange-red primary action, cyan secondary information, routes, anchors, and Traditional Chinese voice remain protected.
+Preserve the real LaiBE logo, dark professional background, orange-red primary action, cyan viewing action, clear large typography, and existing valid route/anchor behavior. Improve state clarity, recovery, document responsibility, and responsive scanning. Remove duplicate process descriptions, dead destinations, demo cases, and any visual claim that G2–G4 is available.
 
-## Preserve, improve, remove
+## Canonical entry routes
 
-### Preserve
+### `/pcm/quote-check`
 
-- Existing LaiBE logo assets and dark, restrained visual identity.
-- Orange-red primary action and cyan secondary viewing action.
-- Existing valid local routes and anchor compatibility.
-- Existing service contract v0.3, 3.5% fee presentation, and legal-review status.
-- Fail-closed authorization behavior and zero-case-data defaults.
+This is the only canonical quotation-check page. Introduction, consent, PDF selection, format checks, correction list, resubmission, and result are states of one page. It is not split into anonymous and registered variants. Until T3 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.
 
-### Improve
+### `/pcm/drawing-check`
 
-- One owner-first route graph with visible forward, back, pending, and recovery paths.
-- A shared first-screen fact spine: role, PCM contract state, case state, next actor, and latest record.
-- Homepage content hierarchy for five-second comprehension.
-- Basic report as a decision result rather than a service manual.
-- Owner workspace as calendar-first work with case-message support.
-- Keyboard focus, touch targets, reduced motion, overflow control, and truthful loading/empty/error states.
+This is the only canonical drawing-review page. Introduction, consent, upload, format checks, corrections, resubmission, and result are states of one page. It is not split by account state. Until T4 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.
 
-### Remove or retire
+### `/account/access`
 
-- Duplicate six-step explanations on the homepage.
-- Long contract, pause, termination, and governance details from the public homepage.
-- Old demo-case entry points and market-comparison semantics.
-- Any clickable route that has no existing destination.
-- Any UI that implies identity, signing, durable writes, or production readiness before its gate passes.
+This is the single shared registration and sign-in entrance for owners and invited vendors. The PCM homepage must expose a clear future entrance without creating a clickable 404. Until T5 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.
 
-## Product architecture
+## Compatibility-only pages
 
-### Canonical owner-first journey
+`owner_start`, `document_corrections`, `basic_report`, and `self_service_archive` remain physically present during this train but are not canonical nodes and do not participate in canonical edges. They are listed only in `compatibilityAliases` with lifecycle `RETIRED_COMPATIBILITY`, a real compatibility file path, `canonicalHref: null`, and a replacement route. T17 performs the approved retirement work.
+
+## Canonical owner-first journey
 
 ```text
 PCM 公開首頁
-→ 甲方註冊與文件準備
-→ 文件檢查、修正與重新提交
-→ 報價／圖說／整體基本檢討結果
-→ 是否申請正式 PCM
-   ├─ 暫不申請 → 唯讀文件與報告區
-   └─ 申請 → PCM 服務契約
-             ├─ 前提不足 → 契約待補項目
-             └─ 前提齊備 → STEP 01–07 契約簽訂
-                            → 甲方 calendar-first 工作台
+├─ 報價健檢（單頁狀態機）
+├─ 圖說檢討（單頁狀態機）
+└─ 甲乙方共用註冊／登入
+   → 案件建立、文件關聯與正式 PCM 申請分流
+   → PCM 服務契約
+   → 契約前置／待補
+   → STEP 01–07 簽訂
+   → 甲方 calendar-first 工作台
+   → 乙方邀請／成員／工作台
+   → PCM 授權案件與案件工作台
+   → 內部治理
+   → 案件紀錄中心
+   → PCM 退出／案件取消／結案與三方確認
 ```
 
-The source layer renders all destinations truthfully. Protected destinations remain safe, non-mutating views until identity and durable-data gates are admitted.
+## Read-only outcomes
 
-### Four gates
+Only `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` are canonical read-only outcomes. They do not create another workspace. Owners and vendors remain in their original workspaces, existing content stays visible, PCM no longer intervenes after exit, `mutationAllowed` is false, and `actions` is an empty list. Cancelled cases use the same original-workspace principle and retain only existing traceable content.
 
-| Gate | Meaning | Owner | Current train authority |
-|---|---|---|---|
-| G1_UI_SOURCE | HTML, CSS, JavaScript, route graph, and browser-visible source | A0 | Active |
-| G2_AUTH_RUNTIME | Authenticated identity, membership, and role | A6 | Closed |
-| G3_DURABLE_DATA | Writers, Storage, signing records, events, and canonical case data | A5 and canonical producers | Closed |
-| G4_PRODUCTION | Migration, secrets, deployment, monitoring, and production writes | A0 final | Closed |
+## Failure and recovery contract
 
-No query string, fragment, browser storage value, or caller-provided boolean grants a higher gate. Unknown, missing, malformed, or protected continuation context resolves to the safe recovery page with no case payload and no mutation capability.
+`PCM_FLOW_FAILURE_MATRIX` is an immutable, typed-closed matrix. Each row contains:
 
-## Route contract
+- `code`
+- plain-language `reason`
+- `nextAction`
+- `responsibleRole`
+- `returnRoute`
+- `recoveryRoute`
+- an explicit closed `payloadPolicy`
+- `mutationAllowed: false`
 
-`public/pcm-flow-route-manifest.js` is the canonical G1 route inventory. Every node declares lifecycle, role, owner, and gate. Active nodes expose an existing local `href`; planned nodes do not expose a clickable destination; retired nodes name a canonical replacement. Every edge declares its kind, gate, owner, and human-readable action.
+Identity, membership, access, and pre-membership invitation failures use `ZERO_CASE_DATA`. File failures retain only limited file metadata or submission/version references. Contract failures retain only contract references. Cancelled, PCM-exited, and closed cases preserve already-authorized case content as read-only without enabling new actions. Every failure code has a non-mutating recovery edge.
 
-`public/public-contract.js` retains the original enumerable route aliases for existing homepage consumers and adds direct canonical route properties. `resolvePcmFlowContinuation(context)` is a pure, fail-closed resolver. It permits public G1 intents and refuses protected continuation regardless of caller-asserted authority.
+The required matrix covers invitation declined/expired/withdrawn/resend, missing paired quotation or drawing, invalid/oversized/wrong-page-count/unreadable/corrupted files, duplicate submission, version conflict, contract prerequisites, mutual version acceptance, identity/membership/access confirmation, overdue supplement, cancellation, PCM exit, and case closeout.
 
-## Shared interface system
+## Route safety
 
-### Visual tokens
+- Active nodes expose an existing local `href`.
+- Planned nodes expose `href: null` and every edge targeting them has `clickable: false`.
+- Retired nodes name a canonical replacement and expose no live `href`.
+- Unknown, missing, malformed, or caller-asserted authority resolves to `accessUnavailable` with `ZERO_CASE_DATA` and no mutation.
+- URL fragments, query values, browser storage, and caller booleans never grant G2, G3, or G4.
 
-- Near-black background and restrained translucent surfaces.
-- Existing LaiBE orange-red gradient for the single primary action in a section.
-- Cyan for viewing, understanding, comparison, or explanatory actions.
-- Hairline borders, soft depth, disciplined radius grammar, and generous negative space.
-- Existing real logo assets only; no emoji or substitute identity marks.
+## Shared first-screen facts
 
-### Shared fact spine
+Operational pages show role, PCM contract state, case state, next responsible actor/action, and latest record. Loading, empty, failure, and recovery copy uses Traditional Chinese product language. The interface does not expose implementation vocabulary, raw data, stack traces, fabricated cases, payment custody/collection, investment claims, or claims that AI makes the final decision.
 
-Every protected or operational page presents, above the working content:
+## Visual and interaction system
 
-1. role;
-2. PCM contract state;
-3. case state;
-4. next responsible actor and action;
-5. latest recorded event.
+- Near-black restrained surfaces, the real LaiBE logo, orange-red primary action, and cyan secondary viewing action.
+- One primary action per section; no card wall, thick borders, excessive gradients, emoji icons, or decorative motion.
+- Visible controls at least 44×44 CSS pixels, clear `:focus-visible`, reduced-motion support, and zero horizontal overflow at 1280×900, 768×1024, and 390×844.
+- Workspace pages favor task scanning, calendars, messages, responsibility, and records rather than marketing-sized headings.
 
-When the context is unavailable, the fact spine contains no case values and instead states the safe recovery action in product language.
+## Verification contract
 
-### Closed and recovery states
-
-- `CONTEXT_UNAVAILABLE`
-- `AUTH_REQUIRED`
-- `ACCESS_DENIED`
-- `PREREQUISITES_PENDING`
-- `ARCHIVED_READ_ONLY`
-- `SERVICE_PREPARING`
-
-All closed states carry zero case payload and zero mutation capability. Loading, empty, error, and recovery copy explains what the user can do next without exposing implementation terminology.
-
-## Page responsibilities
-
-- Homepage: explain what PCM checks, who qualifies, what result arrives first, and the next action.
-- Owner start: clarify qualification and document preparation; preserve honest account/intake boundaries.
-- Document corrections: list format, file size, page count, readability, and resubmission actions.
-- Basic report: present quotation, drawing, and combined-result structures without fabricated people, prices, dates, or statistics.
-- Service decision: make the formal-service versus self-service branch explicit.
-- Self-service archive: provide a truthful read-only information state and a return path.
-- Service contract: preserve full canonical draft content and expose a readable mobile structure.
-- Contract prerequisites: identify missing prerequisites, responsible actor, and return path.
-- Contract signing: show a complete STEP 01–07 sequence while keeping signing disabled until trusted identity and durable writer readiness exist.
-- Owner workspace: calendar-first main view with a LINE-like case-message side panel; it must never claim to be a live LINE thread.
-- Vendor, PCM, and governance surfaces: show invitation, identity, permission, and recovery states before any case content.
-- Record center, closeout, and archive: organize documents, decisions, messages, changes, acceptance, responsibilities, and final read-only trace.
-
-## Content rules
-
-- Traditional Chinese for Taiwan users.
-- Every page answers: audience, purpose, current state, next actor, next action, and what will be recorded.
-- PCM supports document checking, decision organization, and case governance; it does not replace the owner’s final decision or the professional responsibility of the designer or contractor.
-- No price-guarantee, risk-guarantee, fund custody, payment collection, payment protection, investment-return, or final-decision claims.
-- No fabricated cases, names, ratings, counts, completion states, or working capabilities.
-- No external engineering vocabulary, raw data objects, stack traces, or console failures.
-
-## Interaction and accessibility
-
-- Visible controls are at least 44 by 44 CSS pixels.
-- Focus-visible styles remain clear against the dark background.
-- Hover movement is subtle and active state returns to rest.
-- Disabled and loading controls do not submit repeatedly.
-- Reduced-motion mode removes nonessential movement without changing content order.
-- 1280×900, 768×1024, and 390×844 have zero horizontal overflow.
-
-## Acceptance contract
-
-Each package follows actual RED → minimal GREEN → refactor → focused verification → exact-path review → bounded local commit. T18 verifies the canonical route graph, all local href/src/fragment targets, forbidden visible language, UTF-8, JavaScript syntax, console cleanliness, responsive overflow, touch targets, focus, reduced motion, and screenshot evidence. No merge, push, pull request, deployment, migration, secret change, or production write belongs to this train.
-
-## T0 write set
-
-1. `src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js`
-2. `src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js`
-3. `tests/pcm-owner-first-route-manifest.test.mjs`
-4. `docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md`
-5. `docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md`
-6. `docs/governance/pcm-owner-first-execution-manifest.v1.json`
+Every package records an exact write set, establishes actual RED, implements minimal GREEN, runs focused and current-train regression checks, verifies syntax/UTF-8/JSON/local references/forbidden visible language/diff scope, receives a Critical 0 and Important 0 review, creates one bounded local commit, and returns to a clean worktree. Candidate-specific historical admission assertions remain truthful historical checks and are not rewritten to pretend the integration branch is the old candidate.
