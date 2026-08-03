@@ -569,10 +569,10 @@
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 68083,
-      "normalizedBytes": 71231,
-      "sha256": "241c9d2f5522ef830f6db8e84400ef6ef4b391d37fb54d89ddd286241f31ff63",
-      "gitBlobSha1": "87567a5deb2e180231fcf5553d044f5b9c822ed8",
+      "bytes": 73641,
+      "normalizedBytes": 77039,
+      "sha256": "4f3bb084fc5afd3bd3b74b1d1c91e3a86dff46bb3e5e6aefac2e2a36cd63e338",
+      "gitBlobSha1": "381acb5528f558d877b1f1e1a695741ba0d42715",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -1383,28 +1383,28 @@
         "bytes": 28126,
         "sha256": "5e7d8de5c33f9d84a7f6c544b12eca83dd16681a78b4254ac63003fa4b90eacb",
         "gitBlobSha1": "414bc48b58c38bc0bf467b0bcbbe4cb6de583a77",
-        "scope": "candidate_git_blob_bytes"
+        "scope": "declared_git_blob_bytes"
       },
       {
         "path": "tests/pcm-owner-first-quote-check.test.mjs",
         "bytes": 64906,
         "sha256": "59d414d579c92a7c217e954f727c51ddc0ee7e4a9e74514e8bf34d4a6e7d4a71",
         "gitBlobSha1": "66436a89d284d45dba35eb7599aa22da7ce0cdf5",
-        "scope": "candidate_git_blob_bytes"
+        "scope": "declared_git_blob_bytes"
       },
       {
         "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
         "bytes": 39091,
         "sha256": "ab055f7fb1a47b78d3c284f71a7757e6b51326179d93b71d13c5bedd8ad6c4c5",
         "gitBlobSha1": "30b60e62bcbd60a2bc5ceed63c2e78feb6d2898c",
-        "scope": "candidate_git_blob_bytes"
+        "scope": "declared_git_blob_bytes"
       },
       {
         "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
         "bytes": 16790,
         "sha256": "baef6c1070ccfe21144e5521d0c3fe6e29079321250922fc1ebd7ae75a3ebd26",
         "gitBlobSha1": "4460d0dec15c84d94348218c522d46d876e63c19",
-        "scope": "candidate_git_blob_bytes"
+        "scope": "declared_git_blob_bytes"
       }
     ],
     "manifestReceiptRef": "t3.selfRecorderReceipt",
@@ -1424,6 +1424,154 @@
         "verification-before-completion"
       ]
     },
+    "gates": {
+      "G1_UI_SOURCE": "correction_ready_for_a0_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T4": "closed",
+      "T5": "closed"
+    }
+  },
+  "t3CanonicalIdentityCorrection": {
+    "status": "ready_for_a0_focused_review",
+    "parent": "e7a12315d5d7a8aff6b6d12778a9e404b68a96a6",
+    "parentTree": "70bca99a98baeb3d5157320905b6a54af2da905f",
+    "historicalCandidatePreserved": {
+      "record": "t3HeroActionCorrection",
+      "candidate": "e7a12315d5d7a8aff6b6d12778a9e404b68a96a6",
+      "parent": "74b606297c391615d76de505759bceda4756ec57",
+      "usedAsCurrentCorrection": false
+    },
+    "immediateWriteSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md"
+    ],
+    "outsideWriteSet": 0,
+    "reviewFindings": {
+      "initial": { "critical": 0, "important": 1, "minor": 1 },
+      "important": "caller-provided code values could gain an enabled canonical CTA",
+      "minor": "current receipt assertions trusted mutable checkout bytes",
+      "resolved": true
+    },
+    "tdd": {
+      "initialFocusedRed": {
+        "tests": 36,
+        "passed": 34,
+        "failed": 2,
+        "exitCode": 1,
+        "fixtureCollisionCorrected": true
+      },
+      "causalRed": {
+        "tests": 1,
+        "passed": 0,
+        "failed": 1,
+        "exitCode": 1,
+        "failure": "hostile lookalike projected an enabled INTRODUCTION action"
+      },
+      "receiptRed": {
+        "tests": 1,
+        "passed": 0,
+        "failed": 1,
+        "exitCode": 1,
+        "failure": "candidate_git_blob_bytes did not satisfy declared_git_blob_bytes"
+      },
+      "green": { "tests": 36, "passed": 36, "failed": 0, "exitCode": 0 }
+    },
+    "heroAction": {
+      "authority": "CANONICAL_OBJECT_IDENTITY_ONLY",
+      "acceptedObjects": "QUOTE_CHECK_STATES_QUOTE_CHECK_FAILURES_CONTEXT_UNAVAILABLE",
+      "hostileVariants": 8,
+      "getterCalls": 0,
+      "proxyGetCalls": 0,
+      "mutableCollectionAuthority": false,
+      "validationPendingTarget": "CORRECTION_REQUIRED",
+      "consent": { "enabled": false, "target": null },
+      "unknown": { "enabled": false, "target": null }
+    },
+    "receiptAuthority": {
+      "source": "DECLARED_GIT_BLOB_BYTES",
+      "checkoutBytesTrusted": false,
+      "declaredBlobExistenceRequired": true,
+      "historicalWorktreeDriftObserved": true
+    },
+    "freshVerification": {
+      "focused": { "files": 1, "tests": 36, "passed": 36, "failed": 0, "exitCode": 0 },
+      "currentTrain": { "files": 4, "tests": 74, "passed": 74, "failed": 0, "exitCode": 0 },
+      "fullSuiteTruth": {
+        "files": 11,
+        "tests": 189,
+        "passed": 189,
+        "failed": 0,
+        "exitCode": 0,
+        "parentBaseline": "188/188"
+      },
+      "staticGates": {
+        "javascriptSyntax": "pass",
+        "strictUtf8ExactFive": "pass",
+        "replacementCharacters": 0,
+        "jsonParse": "pass",
+        "duplicateKeyGuard": "pass",
+        "outsideWriteSet": 0,
+        "diffCheck": "pass"
+      }
+    },
+    "browser": {
+      "origin": "http://127.0.0.1:8800",
+      "serverRoot": "repository_root",
+      "browser": "installed_chrome_via_playwright",
+      "viewports": ["390x640", "1280x768"],
+      "pageStatus": 200,
+      "logoStatus": 200,
+      "initialState": "INTRODUCTION",
+      "initialActionTarget": "CONSENT",
+      "statusAndNextCopiesAgree": true,
+      "horizontalOverflow": 0,
+      "visibleControlsUnder44": 0,
+      "consoleWarningsOrErrors": 0,
+      "networkFailures": 0,
+      "keyboardFocusVisible": true,
+      "consentDisabledWithoutTarget": true,
+      "validationPendingTarget": "CORRECTION_REQUIRED",
+      "staleDatasetResult": "CORRECTION_REQUIRED",
+      "invalidFileInputValue": "",
+      "failureRecoveryFocus": "reselect-title"
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+        "bytes": 28340,
+        "sha256": "38eb837d00efce480503486a0a2376e756dd998ad835108c6dfd8e5894b624e0",
+        "gitBlobSha1": "a0a1763c35177aab67c27694ed8a625154ba5c0d",
+        "scope": "declared_git_blob_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-quote-check.test.mjs",
+        "bytes": 70782,
+        "sha256": "e7e66e333cd23527d7ceeabfb3f2f229c6d5dfd904286875d49623da257179ec",
+        "gitBlobSha1": "f88bb83f18bab0e1c23df67f08c000c08e8972bf",
+        "scope": "declared_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 41772,
+        "sha256": "dad6be9460ddf9e97fc071b47da9f439070eb9e5aa244b01230bc3ce6ad32746",
+        "gitBlobSha1": "739d01ab7451cecca1ea612bf709ae52b57ef8fe",
+        "scope": "declared_git_blob_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 17791,
+        "sha256": "01822fea6a314d99f208cdff3a71f23cfb6d6349cb8c6fe9fee950b149b63c75",
+        "gitBlobSha1": "139bbd417349b7b3f48120794e43cec9d87637e6",
+        "scope": "declared_git_blob_bytes"
+      }
+    ],
+    "manifestReceiptRef": "t3.selfRecorderReceipt",
+    "independentReview": { "critical": 0, "important": 0, "minor": 0 },
     "gates": {
       "G1_UI_SOURCE": "correction_ready_for_a0_review",
       "G2_AUTH_RUNTIME": "closed",

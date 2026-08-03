@@ -43,6 +43,7 @@ const specPath = resolve(
 const execFileAsync = promisify(execFile);
 const immutableT3Candidate = "238f8180af9e6a1a8d7dd7a71303cd4031324775";
 const immutableT3ContrastCandidate = "74b606297c391615d76de505759bceda4756ec57";
+const immutableT3HeroActionCandidate = "e7a12315d5d7a8aff6b6d12778a9e404b68a96a6";
 
 const exactNine = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
@@ -151,6 +152,16 @@ async function immutableCommitBytes(commit, path) {
 
 async function immutableCandidateBytes(path) {
   return immutableCommitBytes(immutableT3Candidate, path);
+}
+
+async function immutableDeclaredBlobBytes(blob, label) {
+  const { stdout } = await execFileAsync("git", ["cat-file", "blob", blob], {
+    cwd: repoRoot,
+    encoding: null,
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  assert.ok(Buffer.isBuffer(stdout), label);
+  return stdout;
 }
 
 async function assertResolvableBlob(blob, label) {
@@ -1068,6 +1079,70 @@ test("hero action projection is closed, state-owned, and leaves no target when a
   );
 });
 
+test("hero action projection rejects hostile caller lookalikes without reading caller properties", async () => {
+  const appModule = await import(
+    `${pathToFileURL(appPath).href}?hero-action-canonical-identity-boundary`,
+  );
+  let getterCalls = 0;
+  let proxyGetCalls = 0;
+  const ownAccessor = {};
+  Object.defineProperty(ownAccessor, "code", {
+    configurable: true,
+    get() {
+      getterCalls += 1;
+      return "INTRODUCTION";
+    },
+  });
+  const proxyCaller = new Proxy({}, {
+    get() {
+      proxyGetCalls += 1;
+      return "INTRODUCTION";
+    },
+  });
+  const functionCaller = function hostileCaller() {};
+  Object.defineProperty(functionCaller, "code", {
+    configurable: true,
+    value: "INTRODUCTION",
+  });
+  const priorObjectPrototypeCode = Object.getOwnPropertyDescriptor(
+    Object.prototype,
+    "code",
+  );
+  Object.defineProperty(Object.prototype, "code", {
+    configurable: true,
+    value: "INTRODUCTION",
+    writable: true,
+  });
+
+  try {
+    const hostileCallers = [
+      {},
+      Object.create({ code: "INTRODUCTION" }),
+      ownAccessor,
+      proxyCaller,
+      { code: "INTRODUCTION" },
+      { code: "INTRODUCTION", extra: true },
+      Object.assign(Object.create(null), { code: "INTRODUCTION" }),
+      functionCaller,
+    ];
+
+    for (const caller of hostileCallers) {
+      const action = appModule.projectQuoteCheckHeroAction(caller);
+      assert.equal(action.enabled, false);
+      assert.equal(action.target, null);
+    }
+  } finally {
+    if (priorObjectPrototypeCode) {
+      Object.defineProperty(Object.prototype, "code", priorObjectPrototypeCode);
+    } else {
+      delete Object.prototype.code;
+    }
+  }
+
+  assert.equal(getterCalls, 0);
+  assert.equal(proxyGetCalls, 0);
+});
+
 test("invalid replacement clears stale file identity and recovery moves focus", async () => {
   const harness = await initializeFileHandlerHarness("clear-stale-file-and-focus");
   harness.dispatchFile(browserFile("目前報價.pdf", "application/pdf"));
@@ -1637,7 +1712,7 @@ test("T3 CTA contrast correction records bounded quantitative evidence", async (
   assert.match(spec, /quantitative CTA contrast/i);
 });
 
-test("T3 hero action correction records the current review parent and immutable candidate receipts", async () => {
+test("T3 preserves the historical hero candidate and records the current canonical identity correction", async () => {
   const [manifestBytes, plan, spec] = await Promise.all([
     readFile(governancePath),
     readFile(planPath, "utf8"),
@@ -1676,15 +1751,100 @@ test("T3 hero action correction records the current review parent and immutable 
     correction.artifactReceipts.map((receipt) => receipt.path).sort(),
     [...artifactPaths].sort(),
   );
+  const driftedCheckoutPaths = [];
   for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(resolve(repoRoot, receipt.path));
+    const bytes = await immutableDeclaredBlobBytes(receipt.gitBlobSha1, receipt.path);
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
-    assert.equal(receipt.scope, "candidate_git_blob_bytes");
+    assert.equal(receipt.scope, "declared_git_blob_bytes");
+    await assertResolvableBlob(receipt.gitBlobSha1, receipt.path);
+    const checkoutBytes = await readFile(resolve(repoRoot, receipt.path));
+    if (!checkoutBytes.equals(bytes)) driftedCheckoutPaths.push(receipt.path);
   }
+  assert.ok(
+    driftedCheckoutPaths.includes(
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+    ),
+  );
+  assert.ok(
+    driftedCheckoutPaths.includes("tests/pcm-owner-first-quote-check.test.mjs"),
+  );
   assert.equal(correction.independentReview.critical, 0);
   assert.equal(correction.independentReview.important, 0);
   assert.match(plan, /T3 hero action correction/);
   assert.match(spec, /state-owned hero action projection/i);
+
+  const current = governance.t3CanonicalIdentityCorrection;
+  assert.ok(current, "current canonical-identity correction evidence must exist");
+  assert.equal(current.parent, immutableT3HeroActionCandidate);
+  assert.equal(current.parentTree, "70bca99a98baeb3d5157320905b6a54af2da905f");
+  assert.deepEqual([...current.immediateWriteSet].sort(), [...heroActionExactFive].sort());
+  assert.equal(current.outsideWriteSet, 0);
+  assert.deepEqual(current.tdd.causalRed, {
+    tests: 1,
+    passed: 0,
+    failed: 1,
+    exitCode: 1,
+    failure: "hostile lookalike projected an enabled INTRODUCTION action",
+  });
+  assert.deepEqual(current.tdd.green, {
+    tests: 36,
+    passed: 36,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.equal(current.heroAction.authority, "CANONICAL_OBJECT_IDENTITY_ONLY");
+  assert.equal(current.heroAction.hostileVariants, 8);
+  assert.equal(current.heroAction.getterCalls, 0);
+  assert.equal(current.heroAction.proxyGetCalls, 0);
+  assert.equal(current.heroAction.mutableCollectionAuthority, false);
+  assert.equal(current.receiptAuthority.source, "DECLARED_GIT_BLOB_BYTES");
+  assert.equal(current.receiptAuthority.checkoutBytesTrusted, false);
+  assert.equal(current.receiptAuthority.declaredBlobExistenceRequired, true);
+  assert.deepEqual(current.freshVerification.currentTrain, {
+    files: 4,
+    tests: 74,
+    passed: 74,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(current.freshVerification.fullSuiteTruth, {
+    files: 11,
+    tests: 189,
+    passed: 189,
+    failed: 0,
+    exitCode: 0,
+    parentBaseline: "188/188",
+  });
+  assert.deepEqual(current.browser.viewports, ["390x640", "1280x768"]);
+  assert.equal(current.browser.pageStatus, 200);
+  assert.equal(current.browser.logoStatus, 200);
+  assert.equal(current.browser.horizontalOverflow, 0);
+  assert.equal(current.browser.visibleControlsUnder44, 0);
+  assert.equal(current.browser.consoleWarningsOrErrors, 0);
+  assert.equal(current.browser.networkFailures, 0);
+  assert.equal(current.browser.staleDatasetResult, "CORRECTION_REQUIRED");
+  assert.equal(current.browser.failureRecoveryFocus, "reselect-title");
+  const currentArtifactPaths = heroActionExactFive.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(
+    current.artifactReceipts.map((receipt) => receipt.path).sort(),
+    [...currentArtifactPaths].sort(),
+  );
+  for (const receipt of current.artifactReceipts) {
+    const bytes = await immutableDeclaredBlobBytes(receipt.gitBlobSha1, receipt.path);
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
+    assert.equal(receipt.scope, "declared_git_blob_bytes");
+    await assertResolvableBlob(receipt.gitBlobSha1, receipt.path);
+  }
+  assert.equal(current.manifestReceiptRef, "t3.selfRecorderReceipt");
+  assert.equal(current.independentReview.critical, 0);
+  assert.equal(current.independentReview.important, 0);
+  assert.equal(current.independentReview.minor, 0);
+  assert.match(plan, /T3 final bounded canonical identity correction/i);
+  assert.match(spec, /canonical object identity/i);
 });
