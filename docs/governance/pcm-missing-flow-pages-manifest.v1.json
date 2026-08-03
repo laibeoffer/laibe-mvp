@@ -1,0 +1,168 @@
+{
+  "schema": "laibe.pcm.missing-flow-pages-manifest",
+  "version": 1,
+  "baseCommit": "0b0037ff50a4dc5b1756fe3230588f12a01c5337",
+  "baseTree": "57bb0dc3775af085810a60a6719c5fa898e98a8d",
+  "writeSet": [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/app.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/app.js",
+    "tests/pcm-missing-flow-pages.test.mjs",
+    "docs/superpowers/specs/2026-08-02-pcm-missing-flow-pages-design.md",
+    "docs/superpowers/plans/2026-08-02-pcm-missing-flow-pages.md",
+    "docs/governance/pcm-missing-flow-pages-manifest.v1.json"
+  ],
+  "receiptConvention": {
+    "id": "UTF8_LF",
+    "decoder": "TextDecoder('utf-8',{fatal:true,ignoreBOM:true})",
+    "newlineNormalization": "CRLF_TO_LF_LONE_CR_PRESERVED",
+    "bom": "PRESERVED",
+    "hashes": [
+      "SHA256",
+      "GIT_BLOB_SHA1"
+    ]
+  },
+  "artifactReceipts": [
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/code.html",
+      "bytes": 4767,
+      "sha256": "ae6d9cce357dcd2c5a80f694d571feb44b1e4d4e27e2d37ed27f4ab31183ca7a",
+      "gitBlobSha1": "967cab0322b94c6b603272321b9ae39076d29859"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/styles.css",
+      "bytes": 9358,
+      "sha256": "a87850b45bf9dffa94682f0f51a19eef4c06c6b8109fea8f74ddbb7907e86b8c",
+      "gitBlobSha1": "56d463cb6b79e693f89ec9b982aab77e2f64d6a8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/account_service_status/app.js",
+      "bytes": 764,
+      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
+      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/code.html",
+      "bytes": 4785,
+      "sha256": "fbee290989257aaeb501cce0a2520a20833cc29db542e711c3bdd24d75c492cf",
+      "gitBlobSha1": "ee16a189429d99124fcd307f2aa102b2a146eabe"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/styles.css",
+      "bytes": 9358,
+      "sha256": "a87850b45bf9dffa94682f0f51a19eef4c06c6b8109fea8f74ddbb7907e86b8c",
+      "gitBlobSha1": "56d463cb6b79e693f89ec9b982aab77e2f64d6a8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/app.js",
+      "bytes": 764,
+      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
+      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/code.html",
+      "bytes": 4916,
+      "sha256": "6767f98d52eb96dd8596468c0b16e17d2bcd9c7417efec746ede7457fe958087",
+      "gitBlobSha1": "b5957eec966056f9e379c90022b2f64634038806"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/styles.css",
+      "bytes": 9358,
+      "sha256": "a87850b45bf9dffa94682f0f51a19eef4c06c6b8109fea8f74ddbb7907e86b8c",
+      "gitBlobSha1": "56d463cb6b79e693f89ec9b982aab77e2f64d6a8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/app.js",
+      "bytes": 764,
+      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
+      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/code.html",
+      "bytes": 4901,
+      "sha256": "a8f1248de44f047632d329653ce3640216ad42f99288dac94963079234e57337",
+      "gitBlobSha1": "e5fbe026dd543e8836adda7778c9a1f0f82749ca"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/styles.css",
+      "bytes": 9358,
+      "sha256": "a87850b45bf9dffa94682f0f51a19eef4c06c6b8109fea8f74ddbb7907e86b8c",
+      "gitBlobSha1": "56d463cb6b79e693f89ec9b982aab77e2f64d6a8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/app.js",
+      "bytes": 764,
+      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
+      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html",
+      "bytes": 4939,
+      "sha256": "217560d133618aeea95defbb2804321ff8fc25e24735df9dc24e103f83479e22",
+      "gitBlobSha1": "3dbd21fe375312bda5811390a0fc9baa3fa964f2"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/styles.css",
+      "bytes": 9358,
+      "sha256": "a87850b45bf9dffa94682f0f51a19eef4c06c6b8109fea8f74ddbb7907e86b8c",
+      "gitBlobSha1": "56d463cb6b79e693f89ec9b982aab77e2f64d6a8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/app.js",
+      "bytes": 764,
+      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
+      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/code.html",
+      "bytes": 4938,
+      "sha256": "b9bd511aaa3b0e3d28bdc8a154a1bfa108252b99d4ac998b4470dfddedc558d0",
+      "gitBlobSha1": "a9cd123801babfbed3c356aaa45583c213c9cc3f"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/styles.css",
+      "bytes": 9358,
+      "sha256": "a87850b45bf9dffa94682f0f51a19eef4c06c6b8109fea8f74ddbb7907e86b8c",
+      "gitBlobSha1": "56d463cb6b79e693f89ec9b982aab77e2f64d6a8"
+    },
+    {
+      "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/case_closeout/app.js",
+      "bytes": 764,
+      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
+      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+    },
+    {
+      "path": "tests/pcm-missing-flow-pages.test.mjs",
+      "bytes": 11866,
+      "sha256": "8b785617da3472a1701027e0fa1fd5e5e6e750cbc8cdfef592455d196720964e",
+      "gitBlobSha1": "1f418fcab5cada24047fa847ddbd3d54baafb3b8"
+    },
+    {
+      "path": "docs/superpowers/specs/2026-08-02-pcm-missing-flow-pages-design.md",
+      "bytes": 5873,
+      "sha256": "d167f14cc982ec84faef5a2f6fb6349f517815a3c8c7a5635b68dac7cfc13a0d",
+      "gitBlobSha1": "0889a77578743cd66e52a34a844782c166e4d876"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-08-02-pcm-missing-flow-pages.md",
+      "bytes": 8981,
+      "sha256": "a8039a5b231743587369349ee0746bc74cf4aa49beae937c6dfbbda36cfe8b89",
+      "gitBlobSha1": "1533f40cb85f41f35f00fea21ddc6cf91ce6d878"
+    }
+  ]
+}
