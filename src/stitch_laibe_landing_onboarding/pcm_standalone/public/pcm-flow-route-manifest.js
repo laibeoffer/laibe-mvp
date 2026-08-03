@@ -9,7 +9,7 @@ export const PCM_FLOW_GATES = Object.freeze([
 
 export const PCM_FLOW_NODES = Object.freeze([
   freezeRecord({ id: "home", publicPath: "/pcm", label: "PCM 公開首頁", role: "一般屋主", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../public_home/code.html#top" }),
-  freezeRecord({ id: "quoteCheck", publicPath: "/pcm/quote-check", label: "報價健檢", role: "甲方", owner: "A0", lifecycle: "planned", gate: "G1_UI_SOURCE", href: null }),
+  freezeRecord({ id: "quoteCheck", publicPath: "/pcm/quote-check", label: "報價健檢", role: "甲方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../quote_check/code.html" }),
   freezeRecord({ id: "drawingCheck", publicPath: "/pcm/drawing-check", label: "圖說檢討", role: "甲方", owner: "A0", lifecycle: "planned", gate: "G1_UI_SOURCE", href: null }),
   freezeRecord({ id: "accountAccess", publicPath: "/account/access", label: "甲乙方註冊與登入", role: "甲方與乙方", owner: "A0", lifecycle: "planned", gate: "G1_UI_SOURCE", href: null }),
   freezeRecord({ id: "caseSetup", publicPath: "/pcm/case/setup", label: "案件建立與正式 PCM 申請", role: "甲方", owner: "A0", lifecycle: "planned", gate: "G2_AUTH_RUNTIME", href: null }),
@@ -37,7 +37,7 @@ export const PCM_FLOW_COMPATIBILITY_ALIASES = Object.freeze([
 ]);
 
 export const PCM_FLOW_EDGES = Object.freeze([
-  freezeRecord({ from: "home", to: "quoteCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往報價健檢", clickable: false }),
+  freezeRecord({ from: "home", to: "quoteCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往報價健檢", clickable: true }),
   freezeRecord({ from: "home", to: "drawingCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往圖說檢討", clickable: false }),
   freezeRecord({ from: "home", to: "accountAccess", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往註冊或登入", clickable: false }),
   freezeRecord({ from: "quoteCheck", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),

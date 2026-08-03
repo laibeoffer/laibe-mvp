@@ -374,6 +374,218 @@
       "T3": "closed"
     }
   },
+  "t3": {
+    "status": "ready_for_a0_review",
+    "parent": "3c525bb6625e8a6a8c30fecc1f9b7f506f313ad7",
+    "parentTree": "44ab599c45d6f167cb171846e345761f75fe0937",
+    "parentAdmission": "ADMITTED_G1_UI_SOURCE_ONLY",
+    "writeSet": [
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+      "tests/pcm-owner-first-quote-check.test.mjs",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+    ],
+    "outsideWriteSet": 0,
+    "design": {
+      "canonicalPath": "/pcm/quote-check",
+      "sourceHref": "../quote_check/code.html",
+      "mode": "extension",
+      "stateSequence": [
+        "INTRODUCTION",
+        "CONSENT",
+        "SELECT_FILE",
+        "VALIDATION_PENDING",
+        "CORRECTION_REQUIRED",
+        "RESELECT_FILE",
+        "RESULT_FORMAT",
+        "RESULT_UNAVAILABLE"
+      ],
+      "localSelectionOnly": true,
+      "formalResultAvailable": false,
+      "durableMutationAllowed": false
+    },
+    "tdd": {
+      "red": {
+        "command": "node --test tests/pcm-owner-first-quote-check.test.mjs",
+        "tests": 11,
+        "passed": 1,
+        "failed": 10,
+        "exitCode": 1,
+        "reason": "The canonical page, active route, and T3 evidence did not exist at the admitted parent."
+      },
+      "green": {
+        "command": "node --test tests/pcm-owner-first-quote-check.test.mjs",
+        "tests": 11,
+        "passed": 11,
+        "failed": 0,
+        "exitCode": 0
+      }
+    },
+    "freshVerification": {
+      "focused": {
+        "files": 1,
+        "tests": 11,
+        "passed": 11,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "currentTrain": {
+        "files": 4,
+        "tests": 49,
+        "passed": 45,
+        "failed": 4,
+        "exitCode": 1,
+        "historicalFailures": [
+          "tests/pcm-owner-first-public-home.test.mjs still expects quoteCheck to remain planned",
+          "tests/pcm-owner-first-public-home.test.mjs recalculates the historical T2 self-receipt after T3 changes shared evidence",
+          "tests/pcm-owner-first-route-manifest.test.mjs still expects every future entry including quoteCheck to remain planned",
+          "tests/pcm-owner-first-route-manifest.test.mjs still expects PUBLIC_ROUTES.quoteCheck to be null"
+        ]
+      },
+      "fullSuiteTruth": {
+        "files": 11,
+        "tests": 164,
+        "passed": 159,
+        "failed": 5,
+        "exitCode": 1,
+        "historicalFailures": [
+          "tests/pcm-governance-pages.test.mjs frozen A3 cumulative-path admission assertion",
+          "four superseded current-train assertions listed in t3.freshVerification.currentTrain.historicalFailures"
+        ]
+      },
+      "browser": {
+        "origin": "http://127.0.0.1:8783",
+        "viewports": [
+          "1280x900",
+          "768x1024",
+          "390x844"
+        ],
+        "walkedStates": [
+          "INTRODUCTION",
+          "CONSENT",
+          "SELECT_FILE",
+          "VALIDATION_PENDING",
+          "CORRECTION_REQUIRED",
+          "RESELECT_FILE",
+          "RESULT_FORMAT",
+          "RESULT_UNAVAILABLE",
+          "FILE_FORMAT_INVALID recovery"
+        ],
+        "validFileFixture": "in-memory browser PDF fixture; no repository or external test artifact written",
+        "horizontalOverflow": 0,
+        "visibleControlsUnder44": 0,
+        "plannedClickableControls": 0,
+        "consoleWarningsOrErrors": 0,
+        "brokenAssets": 0,
+        "homepageQuoteEntry": "active local link resolved without 404",
+        "focusVisible": "3px cyan outline with 3px offset on primary actions and visible file-choice target",
+        "reducedMotion": "matched; transition and animation duration 0.01ms"
+      },
+      "staticGates": {
+        "nodeSyntax": "pass",
+        "strictUtf8ExactNine": "pass",
+        "replacementCharacters": 0,
+        "jsonParse": "pass",
+        "duplicateKeyGuard": "pass",
+        "localReferencesAndFragments": "pass",
+        "visibleForbiddenTerms": 0,
+        "outsideWriteSet": 0,
+        "diffCheck": "pass"
+      }
+    },
+    "receiptConvention": {
+      "artifactScope": "current_worktree_bytes",
+      "hashes": ["SHA256", "GIT_BLOB_SHA1"],
+      "selfRecorderPolicy": "Set only t3.selfRecorderReceipt.sha256 and gitBlobSha1 to fixed zero strings, then JSON serialize with two-space indentation as UTF-8, LF, and one trailing LF."
+    },
+    "artifactReceipts": [
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+        "bytes": 15647,
+        "sha256": "7f3b4db192ff2af514871e1d81ef802966ea4f3c173e4bd04d61fc188d345858",
+        "gitBlobSha1": "f8910a1693ec5cdb4d8c200c88dc44a18455f6ab",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+        "bytes": 13676,
+        "sha256": "a6176c9903acaf7d160dcf8666d9a9aa8d6ccf56217e9938e75f5d70bb26d7d6",
+        "gitBlobSha1": "24bf5de598e1f4a1956b49bee9392f8f00bbd5cc",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
+        "bytes": 15312,
+        "sha256": "33c2e0e71336606ef0ad9525ec3cfe391255d0849bd41c1bfef2ea7654c9948f",
+        "gitBlobSha1": "2403da7036f3f38a1d1e5545fd32cdcd58dab343",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-quote-check.test.mjs",
+        "bytes": 15292,
+        "sha256": "21618898cb08638056d723dc583fe7e9951f1102f4ea1e5bc7aabe57544c93d7",
+        "gitBlobSha1": "d29177e6f3a660886366f1a5e76d2e3e2b978d14",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+        "bytes": 18773,
+        "sha256": "86a27aa7091c3d604e98388c3f9b36038d04f7ad4be91fb479e1402e20a9702e",
+        "gitBlobSha1": "0bc92044948d3f995214e69108917204b0c72532",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+        "bytes": 7066,
+        "sha256": "160e68d38c58bc01214644b295374a872098a4b3dcbe599c73528c5199cbc20d",
+        "gitBlobSha1": "9797f0961c0cb856947aa65ae0eab6cd94e9a91c",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 13214,
+        "sha256": "7c688833dfb1bb1a3fe54007eb0515b9dcb126d965964736033dffe5e4c8ad3d",
+        "gitBlobSha1": "5c9407c395850e3af7c4f36026c6fab87fb0d3f1",
+        "scope": "current_worktree_bytes"
+      },
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 28480,
+        "sha256": "72368f4b0745e38f43d8837f9301043f12510501277f7469744eb3164d78a18a",
+        "gitBlobSha1": "3f90a1ff81fccbcb115eb4d8b8a4bcbdbced1bda",
+        "scope": "current_worktree_bytes"
+      }
+    ],
+    "selfRecorderReceipt": {
+      "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+      "bytes": 34189,
+      "normalizedBytes": 35485,
+      "sha256": "fa6bbb1d74d0f5bad1873a64a1e03e6c18ce1c886f84f5aa43f6d62a831f2bf8",
+      "gitBlobSha1": "b3f5d2b83a16e3a53a65384db99a28fd16614277",
+      "scope": "current_manifest_normalized_self_receipt",
+      "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
+      "bytesByteDomain": "final_raw_manifest_bytes",
+      "hashByteDomain": "normalized_serialization_bytes"
+    },
+    "independentReview": {
+      "status": "clean",
+      "critical": 0,
+      "important": 0,
+      "reviewNotes": "Visible internal labels were replaced with Traditional Chinese product copy and file-selection focus now appears on the visible target. The frozen homepage status note remains truthful for G2 readiness and is advisory only."
+    },
+    "gates": {
+      "G1_UI_SOURCE": "t3_ready_for_a0_review",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "T4": "closed"
+    }
+  },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
     { "id": "G2_AUTH_RUNTIME", "owner": "A6", "status": "closed", "scope": "identity/membership/role/contract runtime" },
@@ -381,7 +593,7 @@
     { "id": "G4_PRODUCTION", "owner": "A0 final", "status": "closed", "scope": "migration/secrets/deployment/monitoring/production writes" }
   ],
   "canonicalRoutes": [
-    { "id": "quoteCheck", "publicPath": "/pcm/quote-check", "lifecycle": "planned", "href": null, "owner": "A0" },
+    { "id": "quoteCheck", "publicPath": "/pcm/quote-check", "lifecycle": "active", "href": "../quote_check/code.html", "owner": "A0" },
     { "id": "drawingCheck", "publicPath": "/pcm/drawing-check", "lifecycle": "planned", "href": null, "owner": "A0" },
     { "id": "accountAccess", "publicPath": "/account/access", "lifecycle": "planned", "href": null, "owner": "A0" }
   ],

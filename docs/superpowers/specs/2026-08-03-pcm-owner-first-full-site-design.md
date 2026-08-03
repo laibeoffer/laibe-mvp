@@ -124,6 +124,28 @@ Operational pages show role, PCM contract state, case state, next responsible ac
 - Visible controls at least 44×44 CSS pixels, clear `:focus-visible`, reduced-motion support, and zero horizontal overflow at 1280×900, 768×1024, and 390×844.
 - Workspace pages favor task scanning, calendars, messages, responsibility, and records rather than marketing-sized headings.
 
+## T3 single-page quotation check
+
+`/pcm/quote-check` is one canonical page for owners who already have a vendor quotation PDF. It is an extension of the admitted LaiBE owner-first system, not a separate anonymous flow or an account flow.
+
+### Design decision
+
+- Mode: extension; brand fidelity 10, visual variance 4, motion 2, information density 6, asset dependence 2.
+- Preserve: the real LaiBE logo, restrained dark surfaces, orange-red primary action, cyan viewing status, the five-fact spine, local routes, focus treatment, and reduced-motion support.
+- Improve from the read-only `preview_budget` reference: retain its clear step orientation and main-work/side-context split, while removing external dependencies, fabricated totals, market language, payment actions, and unrelated route meaning.
+- Signature: an eight-position document-inspection rail that keeps service explanation, consent, file selection, pending validation, correction, reselection, result format, and the closed outcome on one page.
+- Highest-risk change: a local file choice could be mistaken for a durable upload. Every state therefore repeats the boundary that no file is sent or saved, and no case or formal result is created.
+
+### State and data contract
+
+The ordered page states are `INTRODUCTION`, `CONSENT`, `SELECT_FILE`, `VALIDATION_PENDING`, `CORRECTION_REQUIRED`, `RESELECT_FILE`, `RESULT_FORMAT`, and `RESULT_UNAVAILABLE`. The browser may temporarily display the selected filename and whether the file presents as PDF. It must not use URL/hash/storage authority, persist the file, claim upload, claim case creation, or synthesize a quotation result.
+
+File size, page count, readability, and corruption remain pending without trusted rules or parsing. The result area is labeled as a format example and contains no person, case, price, date, statistic, or completion claim. The closed result uses zero case data and points back to file selection or the PCM homepage.
+
+The failure contract includes `FILE_FORMAT_INVALID`, `FILE_TOO_LARGE`, `PAGE_COUNT_INVALID`, `FILE_UNREADABLE`, `FILE_CORRUPTED`, `DUPLICATE_SUBMISSION`, `VERSION_CONFLICT`, and `QUOTE_ONLY_DRAWING_MISSING`. Every row has a plain reason, executable next action, responsible role, return step, recovery step, closed payload policy, `mutationAllowed: false`, null case data, and no actions. Unknown, malformed, accessor-backed, inherited, Proxy, and post-load intrinsic-polluted input resolves to `CONTEXT_UNAVAILABLE` with zero case data.
+
+T3 activates only `quoteCheck` at `../quote_check/code.html` and makes only the `home` to `quoteCheck` edge clickable. `drawingCheck` and `accountAccess` remain planned with null hrefs; compatibility pages remain aliases and never become canonical steps.
+
 ## Verification contract
 
 Every package records an exact write set, establishes actual RED, implements minimal GREEN, runs focused and current-train regression checks, verifies syntax/UTF-8/JSON/local references/forbidden visible language/diff scope, receives a Critical 0 and Important 0 review, creates one bounded local commit, and returns to a clean worktree. Candidate-specific historical admission assertions remain truthful historical checks and are not rewritten to pretend the integration branch is the old candidate.

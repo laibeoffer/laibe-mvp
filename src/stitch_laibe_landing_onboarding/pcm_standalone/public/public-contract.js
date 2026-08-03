@@ -32,7 +32,8 @@ const publicRoutes = {
 };
 
 // Keep original enumerable aliases stable for the current homepage. Canonical
-// routes are direct properties; planned routes stay null until their page exists.
+// routes are resolved only from the trusted manifest; each route stays null until
+// its own source package is admitted and activated.
 Object.defineProperties(publicRoutes, {
   quoteCheck: { value: getActiveRouteHref("quoteCheck"), enumerable: false },
   drawingCheck: { value: getActiveRouteHref("drawingCheck"), enumerable: false },
