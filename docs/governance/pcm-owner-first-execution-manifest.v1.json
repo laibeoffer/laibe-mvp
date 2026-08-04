@@ -569,10 +569,10 @@
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 100915,
-      "normalizedBytes": 104505,
-      "sha256": "2b9f8973acccc2e851717485a547dd0314f52befa557dc198df236e24b49ae7c",
-      "gitBlobSha1": "3cc9c9b7eb17bef55053386e47ea5e8291ebd84b",
+      "bytes": 108347,
+      "normalizedBytes": 112081,
+      "sha256": "b5daff7829f0cb922092a0dacd9ca579532298dec94bc0ebe5be3d227c11f11f",
+      "gitBlobSha1": "4724de31f97541cec08bee82dc5e34463be78c57",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -2212,6 +2212,173 @@
       "T6": "closed_pending_corrected_t5_admission",
       "T7": "closed_pending_corrected_t5_admission"
     }
+  },
+  "t6T7SharedIntegration": {
+    "status": "BOUNDED_LOCAL_G1_CANDIDATE_A0_FOCUSED_REVIEW_REQUIRED",
+    "absorptionCommit": {
+      "head": "6bc25bab3b4cadaa16c6deae6b24207bc7d4007c",
+      "parent": "64539be0b93170a916106dbd61e9ca5841f83b2b",
+      "tree": "53532e3c91af2c4dcfb7d446157e6875b53ebd1b",
+      "exactPaths": 8,
+      "outsidePaths": 0
+    },
+    "productCommit": {
+      "head": "a98c558e650603ca077d04045bb84316cd1e5ae8",
+      "parent": "6bc25bab3b4cadaa16c6deae6b24207bc7d4007c",
+      "tree": "0a7b34483b08f99bfd215a82c37aed3da2fed903",
+      "subject": "feat(pcm): integrate T6 and T7 shared flow",
+      "exactPaths": 10,
+      "outsidePaths": 0
+    },
+    "evidenceCommit": {
+      "reviewTarget": "CORRECTION_COMMIT_CONTAINING_THIS_MANIFEST",
+      "expectedParent": "a98c558e650603ca077d04045bb84316cd1e5ae8",
+      "exactPaths": [
+        "docs/governance/pcm-owner-first-execution-manifest.v1.json"
+      ],
+      "outsidePaths": 0
+    },
+    "sourceAdmissions": {
+      "t6CaseSetup": "bfcfd2461443864cac4b2fbb4874dbc45a8084cc",
+      "t7ServiceContract": "db289177da74283d3075383d7714318aa9760951",
+      "verifiedCurrentBlobCount": 7,
+      "verifiedCurrentBlobMismatchCount": 0,
+      "note": "T6 product source3 and T7 product source3 plus focused test remain exact admitted Git blobs; the T6 focused test changes only immutable evidence lineage."
+    },
+    "writeSet": [
+      "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+      "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+      "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-state.js",
+      "tests/pcm-full-flow-visual-port.test.mjs",
+      "tests/pcm-owner-first-case-setup.test.mjs",
+      "tests/pcm-owner-first-public-home.test.mjs",
+      "tests/pcm-owner-first-route-manifest.test.mjs",
+      "tests/pcm-owner-first-shared-system.test.mjs"
+    ],
+    "outsideWriteSet": 0,
+    "artifactReceipts": [
+      {
+        "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+        "bytes": 51411,
+        "sha256": "7903ca68e7e837c97a119437d4654261856714a786e8996ef063cf980b4ef236",
+        "gitBlobSha1": "d7a0f7c36c2354c3d1eeddbcb4b02494ec08f6f9",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "bytes": 24237,
+        "sha256": "d3f5b9e3faf5e9a1700e010dde59b141532e05cf7b04f04efe127d7b4ecbe67f",
+        "gitBlobSha1": "0c55d0dd1486c326f64fe5251ded55efc58c3c59",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+        "bytes": 21423,
+        "sha256": "e1ca35ca38c41a9ef9e71cf13b2e6626fb5c264217c27d57811672f360f89c91",
+        "gitBlobSha1": "5ce9d1af14a6609ca9f7d76262d7e6455e9e5204",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+        "bytes": 9053,
+        "sha256": "162b022a16300c4b104e1dc473258aa76e993e015471472cd7141ba242b8e761",
+        "gitBlobSha1": "50425752b7515b48747f83d77df4d62f97fd4046",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-state.js",
+        "bytes": 7544,
+        "sha256": "1cb1ebbcd6384339c6a7a948b53f034436ee0a084031a2eec667b911b5f36aa4",
+        "gitBlobSha1": "b2c09f015d17d7145984225f0595fc6fcec6fad4",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "tests/pcm-full-flow-visual-port.test.mjs",
+        "bytes": 18666,
+        "sha256": "6d0ba331f168491e9b536cdf3499a1aa4917e15097c0f05d0e7a080d02a1ded5",
+        "gitBlobSha1": "ed5d63e4a500ecc80cc8e90ad275d601b3d1b235",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-case-setup.test.mjs",
+        "bytes": 8573,
+        "sha256": "9d330898aeab2442958177e0d34c77a9703f8138470653508ce4da1015d52be4",
+        "gitBlobSha1": "1e7904ed27db8cc31d310c163436c41301589b78",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-public-home.test.mjs",
+        "bytes": 30837,
+        "sha256": "21f7638a211c808764b17e22ac479ac1a2b9cbac3b57be43c37ed460a1873c19",
+        "gitBlobSha1": "fc68c53f8a6195da8b49317187081106106b12e2",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-route-manifest.test.mjs",
+        "bytes": 39787,
+        "sha256": "89fbcc7e0d0fe1e27db21e6e5880408c192dbb0e496eeee98d6a09f1ee7ddd71",
+        "gitBlobSha1": "316c6d7865f17b563d239ec348e1b6a3c8206d49",
+        "scope": "product_commit_git_object_bytes"
+      },
+      {
+        "path": "tests/pcm-owner-first-shared-system.test.mjs",
+        "bytes": 8922,
+        "sha256": "95de72d30334bca95ddc0c86a008fa49af637e03e0b4a2ab76d202274bb993e4",
+        "gitBlobSha1": "389ef1dcfc5215e59e5d88d67f4fdafcfe1cd876",
+        "scope": "product_commit_git_object_bytes"
+      }
+    ],
+    "tdd": {
+      "descendantLineageRed": "full PCM 260/264 and focused 63/71 before immutable evidence and P4 semantic correction",
+      "arrayPrototypeRed": "route focused 18/19; continuation actions inherited forged index and shared iterator",
+      "focusedGreen": "73/73 PASS",
+      "fullGreen": "15 files / 266/266 PASS"
+    },
+    "browser": {
+      "pages": ["caseSetup", "serviceContract"],
+      "viewports": ["1280x900", "768x1024", "390x844", "390x640", "1280x768", "640x450_200pct_reflow"],
+      "horizontalOverflow": 0,
+      "visibleControlsUnder44Px": 0,
+      "brokenFragments": 0,
+      "brokenImages": 0,
+      "enabledWriteControls": 0,
+      "consoleWarningsOrErrors": 0,
+      "directLocalResourcesHttp200": 6,
+      "caseSetupPrimaryAction": "focuses #preparation",
+      "serviceContractPrimaryAction": "reaches #full-contract",
+      "serviceContractSigningEnabled": false
+    },
+    "pcmExitSemantics": {
+      "canonicalState": "PCM_EXITED_BILATERAL_CONTINUATION",
+      "caseMode": "BILATERAL_CONTINUATION",
+      "pcmMode": "HISTORICAL_READ_ONLY",
+      "newPcmOperationsAllowed": false,
+      "rejoinRequiresNewAuthorization": true,
+      "preserveResources": [
+        "workspaces", "contract", "documents", "messages", "schedules",
+        "evidence", "acceptance", "changes", "addenda", "caseRecords"
+      ],
+      "arrayPrototypeAuthority": false
+    },
+    "independentReview": {
+      "status": "COMPLETE",
+      "critical": 0,
+      "important": 0,
+      "freshFocused": "19/19 PASS",
+      "freshFull": "15 files / 266/266 PASS",
+      "reviewedState": "exact10 dirty bytes over HEAD 6bc25bab before bounded product commit; reviewer made no writes"
+    },
+    "gates": {
+      "G1_UI_SOURCE": "candidate_pending_a0_focused_admission",
+      "G2_AUTH_RUNTIME": "closed",
+      "G3_DURABLE_DATA": "closed",
+      "G4_PRODUCTION": "closed",
+      "caseSetupRoute": "planned_g2_href_null",
+      "serviceContractSigning": "closed"
+    },
+    "manifestReceiptRef": "t3.selfRecorderReceipt"
   },
   "gates": [
     { "id": "G1_UI_SOURCE", "owner": "A0", "status": "active", "scope": "HTML/CSS/JS/route/browser source" },
