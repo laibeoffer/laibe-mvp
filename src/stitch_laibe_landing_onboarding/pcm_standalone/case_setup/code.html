@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="萊比 PCM 案件準備頁，協助甲方整理報價、圖說與正式服務前置資料。" />
+    <title>案件準備｜LaiBE PCM</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="../shared/owner-first-shell.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到案件準備內容</a>
+    <header class="case-header" id="top">
+      <div class="case-header__inner">
+        <a class="case-brand" href="../public_home/code.html#top" aria-label="返回 PCM 首頁">
+          <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+          <span>AI PCM</span>
+        </a>
+        <a class="case-header__back" href="../public_home/code.html#case-flow">返回準備流程</a>
+      </div>
+    </header>
+
+    <main class="owner-first-shell case-shell" id="main-content" data-case-setup-page>
+      <section class="case-hero" aria-labelledby="case-title">
+        <div class="case-hero__copy">
+          <p class="case-eyebrow">甲方 · 正式服務前的案件準備</p>
+          <h1 id="case-title">把報價、圖說與前置資料整理成同一份案件基準</h1>
+          <p>
+            這一頁協助你確認目前缺什麼、下一步由誰處理，以及資料齊備後是否申請正式 PCM 服務。現在尚未建立案件，也不會保存任何資料。
+          </p>
+          <a href="#preparation" class="owner-first-primary-action">查看案件準備項目</a>
+        </div>
+        <aside class="case-now" aria-label="目前案件準備狀態">
+          <div><span>目前狀態</span><strong>案件資料準備中</strong></div>
+          <div><span>下一步</span><strong>核對報價、圖說與契約前置資料</strong></div>
+          <div><span>下一責任人</span><strong>甲方</strong></div>
+          <div><span>最近紀錄</span><strong>尚未建立案件，因此沒有案件紀錄</strong></div>
+        </aside>
+      </section>
+
+      <section class="owner-first-facts" aria-label="案件準備五項事實">
+        <div data-owner-fact><span class="owner-first-fact-label">這頁給誰</span><strong class="owner-first-fact-value">準備建立案件的甲方</strong></div>
+        <div data-owner-fact><span class="owner-first-fact-label">報價狀態</span><strong class="owner-first-fact-value">尚待可信流程確認</strong></div>
+        <div data-owner-fact><span class="owner-first-fact-label">圖說狀態</span><strong class="owner-first-fact-value">尚待可信流程確認</strong></div>
+        <div data-owner-fact><span class="owner-first-fact-label">PCM 決定</span><strong class="owner-first-fact-value">資料齊備後再決定</strong></div>
+        <div data-owner-fact><span class="owner-first-fact-label">留痕邊界</span><strong class="owner-first-fact-value">尚未建立案件或紀錄</strong></div>
+      </section>
+
+      <section class="case-section" id="preparation" tabindex="-1" aria-labelledby="preparation-title">
+        <div class="case-section__heading">
+          <p class="case-eyebrow">01 · 文件配對</p>
+          <h2 id="preparation-title">先讓報價與圖說指向同一個討論基準</h2>
+          <p>目前沒有可信案件資料，因此以下只提供準備入口，不顯示完成狀態。</p>
+        </div>
+        <div class="document-pair">
+          <article>
+            <span>報價健檢資料</span>
+            <strong>尚待確認</strong>
+            <p>先整理報價 PDF 的條件、可讀性與待修正項目。</p>
+            <a class="owner-first-secondary-action" href="../quote_check/code.html">前往報價健檢</a>
+          </article>
+          <article>
+            <span>圖說檢討資料</span>
+            <strong>尚待確認</strong>
+            <p>先整理圖說 PDF 的格式、版本與待補項目。</p>
+            <a class="owner-first-secondary-action" href="../drawing_check/code.html">前往圖說檢討</a>
+          </article>
+        </div>
+        <div class="closed-actions" aria-label="尚未開放的案件寫入操作">
+          <button type="button" data-case-write disabled>儲存案件草稿</button>
+          <button type="button" data-case-write disabled>送出前置資料</button>
+        </div>
+      </section>
+
+      <section class="case-section" aria-labelledby="recovery-title">
+        <div class="case-section__heading">
+          <p class="case-eyebrow">02 · 缺漏與恢復</p>
+          <h2 id="recovery-title">每一種缺漏都有明確返回路徑</h2>
+        </div>
+        <div class="recovery-list">
+          <article><strong>只有報價、缺圖說</strong><p>原因：尚無圖說可共同檢查。下一步：甲方前往圖說檢討頁準備資料。</p><a href="../drawing_check/code.html">返回圖說準備</a></article>
+          <article><strong>只有圖說、缺報價</strong><p>原因：尚無報價可核對條件。下一步：甲方前往報價健檢頁準備資料。</p><a href="../quote_check/code.html">返回報價準備</a></article>
+          <article><strong>兩份資料都尚未準備</strong><p>原因：還沒有可引用的文件基準。下一步：甲方先選擇任一健檢流程開始。</p><a href="../public_home/code.html#case-flow">返回 PCM 準備流程</a></article>
+          <article><strong>文件條件仍待確認</strong><p>原因：格式、大小、頁數或可讀性仍未確認。下一步：甲方回到原健檢頁查看待補條件。</p><a href="#preparation">回到文件配對</a></article>
+          <article><strong>文件版本不一致</strong><p>原因：報價與圖說引用版本不同。下一步：甲乙雙方先確認同一版本，再由甲方重整。</p><a href="#preparation">重新核對版本</a></article>
+          <article><strong>契約前置資料缺漏</strong><p>原因：案件基本資料或參與角色尚未齊備。下一步：甲方彙整缺漏，乙方依被要求項目補充。</p><a href="#pcm-decision">查看服務決定條件</a></article>
+        </div>
+      </section>
+
+      <section class="case-section pcm-decision" id="pcm-decision" aria-labelledby="pcm-decision-title">
+        <div class="case-section__heading">
+          <p class="case-eyebrow">03 · 服務決定</p>
+          <h2 id="pcm-decision-title">是否申請正式 PCM 服務</h2>
+          <p>只有資料齊備、身分與案件權限都可確認後，甲方才進行正式決定。現在尚未建立案件，以下選項不可操作。</p>
+        </div>
+        <fieldset disabled>
+          <legend>甲方決定</legend>
+          <label><input type="radio" name="pcm-decision" disabled /> 申請正式 PCM 服務</label>
+          <label><input type="radio" name="pcm-decision" disabled /> 暫不申請，留在原甲方準備流程</label>
+        </fieldset>
+        <button type="button" data-case-write disabled>確認服務決定</button>
+        <p class="case-boundary">PCM 退出時，甲乙雙方仍在原工作台繼續案件；只有新的 PCM 操作停止。此頁不會把整案改成唯讀，也不會替任何一方作決定。</p>
+      </section>
+    </main>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

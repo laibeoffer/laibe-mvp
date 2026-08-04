@@ -16,44 +16,60 @@
         <span>AI PCM</span>
       </a>
       <nav aria-label="契約頁導覽">
-        <a href="#contract-summary">服務摘要</a>
+        <a href="#contract-flow">確認流程</a>
         <a href="#full-contract">完整契約</a>
-        <a href="#signing-readiness">簽署前提</a>
         <a class="header-return" href="../public_home/code.html">返回 PCM 首頁</a>
       </nav>
     </header>
 
     <main id="main-content">
-      <section class="contract-scene" aria-labelledby="page-title">
+      <section id="contract-status" class="contract-scene" aria-labelledby="page-title">
         <div class="contract-scene__heading">
-          <p class="eyebrow">PCM 服務契約</p>
-          <span data-lifecycle>草稿</span>
+          <p class="eyebrow">甲方服務契約閱讀</p>
+          <span data-lifecycle>草稿 · 尚未進入簽署</span>
         </div>
-        <div class="contract-case">
-          <div class="contract-case__tray" aria-hidden="true">
-            <span class="contract-case__tab">LAIBE</span>
-            <span class="contract-case__label">PCM SERVICE<br />CONTRACT · v0.3</span>
-          </div>
-          <article class="contract-sheet contract-sheet--summary">
-            <p class="contract-sheet__kicker">AI PCM 案件治理資訊服務契約</p>
-            <h1 id="page-title">先把服務範圍、責任界線與紀錄方式看清楚</h1>
-            <p>本頁完整保留契約條文、附件與閱讀結構，供甲方逐條確認。正式版本、雙方身分與寫入條件尚未齊備前，簽署入口維持關閉。</p>
-            <dl class="contract-sheet__facts">
-              <div><dt>版本</dt><dd>v0.3</dd></div>
-              <div><dt>甲方服務費</dt><dd>依正式契約版本所載 3.5%</dd></div>
-              <div><dt>文件狀態</dt><dd>法務審閱中</dd></div>
-            </dl>
-          </article>
-          <article class="contract-sheet contract-sheet--statement">
-            <p class="contract-sheet__edition">完整契約與簽署主線</p>
-            <strong>Professional<br />Construction<br />Management</strong>
-            <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
-            <div class="contract-sheet__actions">
-              <a class="button button--paper" href="#full-contract">完整契約</a>
-              <button class="button button--paper" type="button" data-print-button>列印此份草稿</button>
-              <button class="button button--ink" type="button" data-sign-button disabled aria-disabled="true">開始簽署</button>
+        <div class="contract-dossier">
+          <aside class="status-board" aria-label="目前契約與案件狀態">
+            <div class="status-board__header">
+              <p>目前角色</p>
+              <strong>甲方</strong>
             </div>
-          </article>
+            <dl class="status-list">
+              <div>
+                <dt>契約狀態</dt>
+                <dd><strong>v0.3</strong>｜法務審閱中</dd>
+              </div>
+              <div>
+                <dt>案件狀態</dt>
+                <dd data-case-status>尚未載入案件資料</dd>
+              </div>
+              <div>
+                <dt>下一責任人</dt>
+                <dd data-next-responsible>甲方｜先閱讀契約與流程</dd>
+              </div>
+              <div>
+                <dt>最近紀錄</dt>
+                <dd data-recent-record>尚無可顯示的案件紀錄</dd>
+              </div>
+            </dl>
+            <a class="button button--primary status-board__cta" href="#full-contract">開始閱讀完整契約</a>
+            <p class="status-board__note" data-context-note>案件資料帶入後，才會依實際文件顯示負責人與最近紀錄。</p>
+          </aside>
+
+          <div class="dossier-copy">
+            <p class="dossier-copy__kicker">LAIBE · PCM SERVICE CONTRACT · v0.3</p>
+            <h1 id="page-title">先讀懂責任界線，再決定是否提送簽署草稿</h1>
+            <p class="dossier-copy__lead">這是一份供甲方閱讀的 PCM 服務契約法務審閱稿。完整正文與附件維持 v0.3 原文；它不是法律定稿，目前也尚未進入正式接受或簽署。</p>
+            <dl class="dossier-facts">
+              <div><dt>甲方服務費</dt><dd>總工程款 × <strong>3.5%</strong></dd></div>
+              <div><dt>本頁可做</dt><dd>閱讀目錄、逐節查看、列印或本機預覽</dd></div>
+            </dl>
+            <div class="dossier-actions">
+              <button class="button button--muted" type="button" data-print-button>列印 / 本機預覽</button>
+              <button class="button button--closed" type="button" data-sign-button disabled aria-disabled="true">尚未進入簽署</button>
+            </div>
+            <p class="availability-note">正式接受、簽署與可追溯收據尚未開放；本頁不會寫入確認或簽署紀錄。</p>
+          </div>
         </div>
       </section>
 
@@ -69,6 +85,51 @@
           <div><dt>工程款邊界</dt><dd>萊比不收受、不保管、不分配甲乙雙方的工程相關款項。</dd></div>
           <div><dt>案件留痕</dt><dd>需求、圖面、報價、問題、確認、變更與施工紀錄需連回對應依據。</dd></div>
         </dl>
+      </section>
+
+      <section id="contract-flow" class="workflow section" aria-labelledby="workflow-title">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">預定確認流程</p>
+            <h2 id="workflow-title">每次提送、審查與修訂，都要回到同一版本</h2>
+          </div>
+          <p>本頁僅說明預定流程，不代表案件流程已串接。正式接受、簽署與可追溯收據尚未開放。</p>
+        </div>
+        <div class="workflow-layout">
+          <ol class="handoff" aria-label="契約草稿確認順序">
+            <li>
+              <span>甲方</span>
+              <div><strong>甲方僅提送合約簽署草稿</strong><p>先確認契約主文與要討論的條件，不代替乙方填寫附件。</p></div>
+            </li>
+            <li>
+              <span>乙方</span>
+              <div><strong>其餘附件由乙方於平台編輯後提送</strong><p>附件要連回目前契約版本，保留提送人與修訂依據。</p></div>
+            </li>
+            <li>
+              <span>PCM</span>
+              <div><strong>PCM 公開提出審查意見</strong><p>意見供甲乙雙方共同查看；PCM 協助標示風險，不代替任何一方決定。</p></div>
+            </li>
+            <li>
+              <span>乙方</span>
+              <div><strong>協商後，乙方可不限次修訂</strong><p>每次修訂都應產生新版本，並保留前後差異與回覆紀錄。</p></div>
+            </li>
+            <li>
+              <span>雙方</span>
+              <div><strong>雙方對同一版本無異議</strong><p>版本不同、意見未處理或任一方尚未確認時，都不能往下。</p></div>
+            </li>
+            <li>
+              <span>甲方</span>
+              <div><strong>甲方最終確認後，才會進入簽署準備</strong><p>目前頁面只供閱讀與說明，不提供這項正式操作。</p></div>
+            </li>
+          </ol>
+
+          <aside class="governance-note" aria-label="契約生效後的版本規則">
+            <p class="governance-note__label">生效後的版本邊界</p>
+            <h3>原契約不覆寫，後續只新增補充草稿</h3>
+            <p>已生效的原契約維持不變；後續調整只新增標記為 <span class="state-token">ADDENDUM_DRAFT</span> 的補充草稿，待雙方另行確認。</p>
+            <p>PCM 退出後，甲乙雙方可依既有紀錄繼續協商；PCM 不成為締約、簽署或付款決定人。</p>
+          </aside>
+        </div>
       </section>
 
       <section class="key-clauses section" aria-labelledby="clauses-title">
@@ -97,11 +158,35 @@
         </div>
       </section>
 
+      <section class="recovery section" aria-labelledby="recovery-title">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">不能往下時</p>
+            <h2 id="recovery-title">每個停下原因，都要有人負責與可恢復</h2>
+          </div>
+          <p>目前沒有案件資料，因此不推測個案狀態。案件帶入後，會依下列順序判讀並指向對應紀錄。</p>
+        </div>
+        <div class="recovery-table" role="region" aria-label="契約確認失敗狀態與恢復方式" tabindex="0">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">狀況</th>
+                <th scope="col">原因</th>
+                <th scope="col">下一步</th>
+                <th scope="col">負責人</th>
+                <th scope="col">恢復方式</th>
+              </tr>
+            </thead>
+            <tbody data-failure-states></tbody>
+          </table>
+        </div>
+      </section>
+
       <section id="signing-readiness" class="readiness section" aria-labelledby="readiness-title">
         <div class="readiness__copy">
           <p class="eyebrow">簽署前提</p>
-          <h2 id="readiness-title">目前不能開始簽署</h2>
-          <p data-readiness-summary>目前仍有簽署前提待確認，請先閱讀並列印留存本份草稿。</p>
+          <h2 id="readiness-title">目前尚未進入簽署</h2>
+          <p data-readiness-summary>目前是 v0.3 法務審閱稿，尚未進入正式接受或簽署；請先閱讀完整契約與預定流程。</p>
         </div>
         <div class="readiness__panel">
           <ol data-readiness-list aria-label="簽署前提清單"></ol>

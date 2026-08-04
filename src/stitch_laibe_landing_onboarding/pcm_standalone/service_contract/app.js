@@ -6,6 +6,18 @@ import {
   LIFECYCLE,
 } from "./contract-content.js";
 
+const ReflectApply = Reflect.apply;
+const ObjectCreate = Object.create;
+const ObjectDefineProperty = Object.defineProperty;
+const ObjectFreeze = Object.freeze;
+const ObjectGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const ObjectGetPrototypeOf = Object.getPrototypeOf;
+const ObjectHasOwn = Object.hasOwn;
+const ObjectPrototype = Object.prototype;
+const ArrayPrototypePush = Array.prototype.push;
+const StringPrototypeTrim = String.prototype.trim;
+const EMPTY_ARGUMENTS = ObjectFreeze([]);
+
 const ENVELOPE_FACT_NAMES = Object.freeze([
   "contractVersionHash",
   "ownerIdentityVerified",
@@ -20,6 +32,80 @@ const PROVIDER_FACT_NAMES = Object.freeze([
   "partyId",
   "signatoryActorId",
 ]);
+
+const CONTRACT_CONTEXT_FACT_NAMES = Object.freeze([
+  "caseId",
+  "prerequisitesComplete",
+  "ownerVersionHash",
+  "providerVersionHash",
+  "ownerAcceptedSameVersion",
+  "providerAcceptedSameVersion",
+  "pcmReviewState",
+]);
+
+export const G1_CAPABILITIES = Object.freeze({
+  ownerDraftSubmission: false,
+  formalAcceptance: false,
+  signing: false,
+  authentication: false,
+  durableReceipt: false,
+});
+
+export const INITIAL_CONTRACT_CONTEXT = Object.freeze({
+  caseId: "",
+  prerequisitesComplete: false,
+  ownerVersionHash: "",
+  providerVersionHash: "",
+  ownerAcceptedSameVersion: false,
+  providerAcceptedSameVersion: false,
+  pcmReviewState: "",
+});
+
+export const CONTRACT_FAILURE_STATES = Object.freeze({
+  PREREQUISITES_MISSING: Object.freeze({
+    code: "PREREQUISITES_MISSING",
+    reason: "簽署前置資料或必要附件尚未齊全。",
+    next: "先依案件文件清單補齊缺漏，再重新確認版本。",
+    responsible: "甲方與案件乙方",
+    recovery: "缺漏補齊並留下提送紀錄後，回到同版確認。",
+  }),
+  VERSION_MISMATCH: Object.freeze({
+    code: "VERSION_MISMATCH",
+    reason: "甲乙雙方目前查看的契約版本不同。",
+    next: "停止確認，先比對版本與修訂紀錄。",
+    responsible: "案件乙方",
+    recovery: "乙方提送最新版本並標明修訂內容後，請雙方重新閱讀。",
+  }),
+  SAME_VERSION_NOT_ACCEPTED: Object.freeze({
+    code: "SAME_VERSION_NOT_ACCEPTED",
+    reason: "甲乙雙方尚未對同一版本表示無異議。",
+    next: "逐項處理未確認事項，不進入簽署準備。",
+    responsible: "尚未確認的一方",
+    recovery: "雙方針對同版完成確認並留下紀錄後，再由甲方最終確認。",
+  }),
+  PCM_REVIEW_PENDING: Object.freeze({
+    code: "PCM_REVIEW_PENDING",
+    reason: "PCM 公開審查意見仍有待處理項目。",
+    next: "先回應審查意見；需要修訂時由乙方更新版本。",
+    responsible: "案件乙方",
+    recovery: "意見逐項回覆、修訂與公開紀錄完成後，再回到雙方確認。",
+  }),
+  CONTEXT_UNAVAILABLE: Object.freeze({
+    code: "CONTEXT_UNAVAILABLE",
+    reason: "尚未載入可供判讀的案件資料。",
+    next: "先返回案件入口，確認要閱讀的案件與文件。",
+    responsible: "甲方",
+    recovery: "案件資料帶入後，系統會重新檢查前置、版本與審查狀態。",
+  }),
+});
+
+const FAILURE_STATE_LABELS = Object.freeze({
+  PREREQUISITES_MISSING: "前置資料缺漏",
+  VERSION_MISMATCH: "版本不同",
+  SAME_VERSION_NOT_ACCEPTED: "雙方尚未接受同版",
+  PCM_REVIEW_PENDING: "PCM 意見待處理",
+  CONTEXT_UNAVAILABLE: "尚未載入案件",
+});
 
 const SECTION_ID_MAP = Object.freeze([
   ["萊比 LaiBE AI PCM 案件治理資訊服務契約", "contract-title"],
@@ -61,42 +147,52 @@ function extractOwnDataFacts(value, factNames) {
   if (value === null || typeof value !== "object") return null;
 
   try {
-    const prototype = Object.getPrototypeOf(value);
-    if (prototype !== Object.prototype && prototype !== null) return null;
+    const prototype = ObjectGetPrototypeOf(value);
+    if (prototype !== ObjectPrototype && prototype !== null) return null;
 
-    const facts = [];
+    const facts = ObjectCreate(null);
     for (let index = 0; index < factNames.length; index += 1) {
-      const descriptor = Object.getOwnPropertyDescriptor(value, factNames[index]);
+      const factName = factNames[index];
+      const descriptor = ObjectGetOwnPropertyDescriptor(value, factName);
       if (
         !descriptor ||
         descriptor.enumerable !== true ||
-        !Object.hasOwn(descriptor, "value")
+        !ObjectHasOwn(descriptor, "value")
       ) {
         return null;
       }
-      facts.push(descriptor.value);
+      facts[factName] = descriptor.value;
     }
-    return facts;
+    return ObjectFreeze(facts);
   } catch {
     return null;
   }
 }
 
 function isNonEmptyString(value) {
-  return typeof value === "string" && value.trim().length > 0;
+  if (typeof value !== "string") return false;
+  try {
+    return ReflectApply(StringPrototypeTrim, value, EMPTY_ARGUMENTS).length > 0;
+  } catch {
+    return false;
+  }
 }
 
 export function evaluateSigningReadiness(input = {}) {
   const reasons = [];
+  ObjectDefineProperty(reasons, "push", {
+    value: ArrayPrototypePush,
+    configurable: false,
+    enumerable: false,
+    writable: false,
+  });
   const envelopeFacts = extractOwnDataFacts(input, ENVELOPE_FACT_NAMES);
-  const [
-    contractVersionHash,
-    ownerIdentityVerified,
-    ownerPartyId,
-    serviceProviderPartySnapshot,
-    writerReady,
-    legalReviewStatus,
-  ] = envelopeFacts ?? [];
+  const contractVersionHash = envelopeFacts?.contractVersionHash;
+  const ownerIdentityVerified = envelopeFacts?.ownerIdentityVerified;
+  const ownerPartyId = envelopeFacts?.ownerPartyId;
+  const serviceProviderPartySnapshot = envelopeFacts?.serviceProviderPartySnapshot;
+  const writerReady = envelopeFacts?.writerReady;
+  const legalReviewStatus = envelopeFacts?.legalReviewStatus;
 
   if (contractVersionHash !== CONTRACT_SOURCE_SHA256) {
     reasons.push("正式契約版本尚未固定");
@@ -112,7 +208,9 @@ export function evaluateSigningReadiness(input = {}) {
     serviceProviderPartySnapshot,
     PROVIDER_FACT_NAMES,
   );
-  const [partyType, providerPartyId, signatoryActorId] = providerFacts ?? [];
+  const partyType = providerFacts?.partyType;
+  const providerPartyId = providerFacts?.partyId;
+  const signatoryActorId = providerFacts?.signatoryActorId;
   if (
     typeof partyType !== "string" ||
     partyType !== "natural_person" ||
@@ -131,10 +229,58 @@ export function evaluateSigningReadiness(input = {}) {
     reasons.push("契約仍在法務審閱中");
   }
 
-  return Object.freeze({
+  return ObjectFreeze({
     ready: reasons.length === 0,
-    reasons: Object.freeze(reasons),
+    reasons: ObjectFreeze(reasons),
   });
+}
+
+function createContextResult(failure, readyForFinalOwnerConfirmation = false) {
+  return ObjectFreeze({
+    readyForFinalOwnerConfirmation,
+    signingEnabled: false,
+    failure,
+  });
+}
+
+export function resolveContractContext(input = {}) {
+  const contextFacts = extractOwnDataFacts(input, CONTRACT_CONTEXT_FACT_NAMES);
+  if (!contextFacts) {
+    return createContextResult(CONTRACT_FAILURE_STATES.CONTEXT_UNAVAILABLE);
+  }
+
+  const caseId = contextFacts.caseId;
+  const prerequisitesComplete = contextFacts.prerequisitesComplete;
+  const ownerVersionHash = contextFacts.ownerVersionHash;
+  const providerVersionHash = contextFacts.providerVersionHash;
+  const ownerAcceptedSameVersion = contextFacts.ownerAcceptedSameVersion;
+  const providerAcceptedSameVersion = contextFacts.providerAcceptedSameVersion;
+  const pcmReviewState = contextFacts.pcmReviewState;
+
+  if (!isNonEmptyString(caseId)) {
+    return createContextResult(CONTRACT_FAILURE_STATES.CONTEXT_UNAVAILABLE);
+  }
+  if (prerequisitesComplete !== true) {
+    return createContextResult(CONTRACT_FAILURE_STATES.PREREQUISITES_MISSING);
+  }
+  if (
+    ownerVersionHash !== CONTRACT_SOURCE_SHA256 ||
+    providerVersionHash !== CONTRACT_SOURCE_SHA256 ||
+    ownerVersionHash !== providerVersionHash
+  ) {
+    return createContextResult(CONTRACT_FAILURE_STATES.VERSION_MISMATCH);
+  }
+  if (
+    ownerAcceptedSameVersion !== true ||
+    providerAcceptedSameVersion !== true
+  ) {
+    return createContextResult(CONTRACT_FAILURE_STATES.SAME_VERSION_NOT_ACCEPTED);
+  }
+  if (pcmReviewState !== "PUBLISHED_RESOLVED") {
+    return createContextResult(CONTRACT_FAILURE_STATES.PCM_REVIEW_PENDING);
+  }
+
+  return createContextResult(null, true);
 }
 
 function createTextElement(tagName, text, className) {
@@ -286,16 +432,65 @@ function renderReadiness(readiness) {
     checklist.append(item);
   }
 
-  signButton.disabled = !readiness.ready;
-  signButton.setAttribute("aria-disabled", String(!readiness.ready));
+  signButton.disabled = true;
+  signButton.setAttribute("aria-disabled", "true");
   summary.textContent = readiness.ready
-    ? "簽署前提已確認，可進入下一步。"
-    : "目前仍有簽署前提待確認，請先閱讀並列印留存本份草稿。";
+    ? "簽署前提已可供核對，但正式接受與簽署尚未開放。"
+    : "目前是 v0.3 法務審閱稿，尚未進入正式接受或簽署；請先閱讀完整契約與預定流程。";
+}
+
+function renderContractContext(contextResult) {
+  const caseStatus = document.querySelector("[data-case-status]");
+  const nextResponsible = document.querySelector("[data-next-responsible]");
+  const recentRecord = document.querySelector("[data-recent-record]");
+  const contextNote = document.querySelector("[data-context-note]");
+  if (!caseStatus || !nextResponsible || !recentRecord || !contextNote) return;
+
+  if (contextResult.failure?.code === "CONTEXT_UNAVAILABLE") {
+    caseStatus.textContent = "尚未載入案件資料";
+    nextResponsible.textContent = "甲方｜先閱讀契約與流程";
+    recentRecord.textContent = "尚無可顯示的案件紀錄";
+    contextNote.textContent = "案件資料帶入後，才會依實際文件顯示負責人與最近紀錄。";
+    return;
+  }
+
+  if (contextResult.failure) {
+    caseStatus.textContent = contextResult.failure.reason;
+    nextResponsible.textContent = `${contextResult.failure.responsible}｜${contextResult.failure.next}`;
+    recentRecord.textContent = "請回到案件紀錄確認最近一次提送或修訂。";
+    contextNote.textContent = contextResult.failure.recovery;
+    return;
+  }
+
+  caseStatus.textContent = "同版確認與 PCM 意見處理已完成";
+  nextResponsible.textContent = "甲方｜進行最終確認前複核";
+  recentRecord.textContent = "請回到案件紀錄核對最新版本與確認人。";
+  contextNote.textContent = "本頁仍不提供正式確認或簽署入口。";
+}
+
+function renderFailureStates() {
+  const body = document.querySelector("[data-failure-states]");
+  if (!body) return;
+
+  const codes = Object.keys(CONTRACT_FAILURE_STATES);
+  for (let index = 0; index < codes.length; index += 1) {
+    const code = codes[index];
+    const state = CONTRACT_FAILURE_STATES[code];
+    const row = document.createElement("tr");
+    row.append(createTextElement("th", FAILURE_STATE_LABELS[code]));
+    row.append(createTextElement("td", state.reason));
+    row.append(createTextElement("td", state.next));
+    row.append(createTextElement("td", state.responsible));
+    row.append(createTextElement("td", state.recovery));
+    body.append(row);
+  }
 }
 
 function initialisePage() {
   renderKeyClauses();
   renderContract();
+  renderFailureStates();
+  renderContractContext(resolveContractContext(INITIAL_CONTRACT_CONTEXT));
   const readiness = evaluateSigningReadiness(INITIAL_SIGNING_ENVELOPE);
   renderReadiness(readiness);
 
@@ -305,7 +500,11 @@ function initialisePage() {
   }
 
   const lifecycle = document.querySelector("[data-lifecycle]");
-  if (lifecycle) lifecycle.textContent = LIFECYCLE[0] === "DRAFT" ? "草稿" : "尚未開始";
+  if (lifecycle) {
+    lifecycle.textContent = LIFECYCLE[0] === "DRAFT"
+      ? "草稿 · 尚未進入簽署"
+      : "尚未開始";
+  }
 }
 
 if (typeof document !== "undefined") initialisePage();
