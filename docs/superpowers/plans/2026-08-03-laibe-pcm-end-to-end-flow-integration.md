@@ -451,6 +451,16 @@
 - [x] Fresh GREEN is focused 36/36, current T0-T3 train 74/74, and full PCM 189/189 against the e7a parent baseline 188/188. Chrome acceptance from the repository-root server at 390x640 and 1280x768 recorded page/logo 200, initial CTA/status/next agreement, horizontal overflow 0, visible controls under 44px 0, console warning/error 0, network failure 0, visible keyboard focus, consent disabled with no target, stale dataset still reaching `CORRECTION_REQUIRED`, and invalid-file recovery focus on `reselect-title`.
 - [x] Keep T4/T5 and G2-G4 closed. Run syntax, strict UTF-8, JSON parse and raw duplicate-key, exact-five/outside-zero, diff-check, and an independent C0/I0/M0 final review before the bounded local commit.
 
+## T5 immutable receipt provenance correction
+
+**Actual evidence-only write set (parent `b64238044b480e5570ef99dbc7a807e59b893b6e`):** the public-home focused test, this plan, the current owner-first specification, and the governance manifest. Product source, route manifest, public contract, account source, T0-T4, and T6+ are byte-frozen; outside this exact-four set is zero.
+
+- [x] Establish the actual RED: the prior verifier read mutable checkout files, exposed no `reviewTarget`, and gave its four artifact receipts no immutable scope.
+- [x] Bind the evidence to `CORRECTION_COMMIT_CONTAINING_THIS_MANIFEST`, exact parent b642380, and the exact-four correction diff.
+- [x] Require each declared blob to exist, equal the review-target tree entry, and reproduce its byte count, SHA-256, and Git blob identity from immutable object bytes.
+- [x] Prove in-memory checkout drift cannot change the immutable result; wrong blob, missing blob, wrong parent, and extra path fail closed.
+- [ ] Create the one bounded local commit, rerun focused 36/36 and full PCM 243/243 from the immutable commit, refresh the normalized self-receipt, obtain Critical 0 / Important 0 review, and return to A0 for the final G1 verdict.
+
 ## Self-review
 
 - Coverage: the corrected schedule has exactly T0–T18 and maps every Human-ordered source package once.

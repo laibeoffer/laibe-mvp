@@ -463,30 +463,51 @@ test("footer links only to visible owner-first sections", async () => {
   assert.match(html, /<section\s+id="service-fee"/);
 });
 
-test("T5 DOM-method correction closes the exact-five current byte set", async () => {
-  const manifestBytes = await readFile(governanceUrl);
+test("T5 DOM-method correction receipts are bound to immutable review-target objects", () => {
+  const repositoryRoot = new URL("../", import.meta.url);
+  const gitText = (...args) => execFileSync("git", args, {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  }).trim();
+  const reviewTarget = gitText("rev-parse", "HEAD");
+  const manifestPath = "docs/governance/pcm-owner-first-execution-manifest.v1.json";
+  const manifestBytes = execFileSync(
+    "git",
+    ["show", `${reviewTarget}:${manifestPath}`],
+    { cwd: repositoryRoot, encoding: null },
+  );
   const manifest = JSON.parse(manifestBytes.toString("utf8"));
   const correction = manifest.t5SourceIntegration.domMethodCorrection;
   const expectedPaths = [
-    "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
     "tests/pcm-owner-first-public-home.test.mjs",
     "docs/governance/pcm-owner-first-execution-manifest.v1.json",
     "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
     "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
   ].sort();
-  const repositoryRoot = new URL("../", import.meta.url);
 
-  assert.equal(correction.correctionParent, "a07adf377cf8b5005ece078a84984b11ce09fe37");
+  assert.equal(
+    correction.reviewTarget,
+    "CORRECTION_COMMIT_CONTAINING_THIS_MANIFEST",
+  );
+  assert.equal(correction.correctionParent, "b64238044b480e5570ef99dbc7a807e59b893b6e");
+  assert.equal(gitText("rev-parse", `${reviewTarget}^`), correction.correctionParent);
   assert.deepEqual([...correction.writeSet].sort(), expectedPaths);
   assert.equal(correction.outsideWriteSet, 0);
+  const changedPaths = gitText(
+    "diff",
+    "--name-only",
+    `${correction.correctionParent}..${reviewTarget}`,
+  ).split(/\r?\n/u).filter(Boolean).sort();
+  assert.deepEqual(changedPaths, expectedPaths);
   assert.deepEqual(correction.red, {
-    command: "node --test tests/pcm-owner-first-public-home.test.mjs",
-    tests: 17,
-    passed: 16,
+    command:
+      "node --test --test-name-pattern='T5 DOM-method correction receipts' tests/pcm-owner-first-public-home.test.mjs",
+    tests: 1,
+    passed: 0,
     failed: 1,
     exitCode: 1,
     actualFailure:
-      "trusted account href became javascript:alert(1) after post-load setAttribute rewrite",
+      "receipt verifier read mutable checkout bytes and lacked immutable review-target provenance",
   });
   assert.deepEqual(correction.focusedGreen, {
     command:
@@ -507,10 +528,22 @@ test("T5 DOM-method correction closes the exact-five current byte set", async ()
 
   assert.deepEqual(
     correction.artifactReceipts.map((receipt) => receipt.path).sort(),
-    expectedPaths.filter((path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json"),
+    expectedPaths.filter((path) => path !== manifestPath),
   );
-  for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(new URL(receipt.path, repositoryRoot));
+
+  const verifyImmutableReceipt = (receipt) => {
+    assert.equal(receipt.scope, "review_target_commit_blob_bytes", receipt.path);
+    assert.doesNotThrow(() => execFileSync(
+      "git",
+      ["cat-file", "-e", `${receipt.gitBlobSha1}^{blob}`],
+      { cwd: repositoryRoot, stdio: "pipe" },
+    ));
+    const commitBlob = gitText("rev-parse", `${reviewTarget}:${receipt.path}`);
+    assert.equal(commitBlob, receipt.gitBlobSha1, receipt.path);
+    const bytes = execFileSync("git", ["cat-file", "blob", receipt.gitBlobSha1], {
+      cwd: repositoryRoot,
+      encoding: null,
+    });
     const sha256 = createHash("sha256").update(bytes).digest("hex");
     const gitBlobSha1 = createHash("sha1")
       .update(`blob ${bytes.length}\0`)
@@ -519,7 +552,38 @@ test("T5 DOM-method correction closes the exact-five current byte set", async ()
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, sha256, receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1, receipt.path);
+    return bytes;
+  };
+
+  for (const receipt of correction.artifactReceipts) {
+    const immutableBytes = verifyImmutableReceipt(receipt);
+    const inMemoryDrift = Buffer.concat([
+      immutableBytes,
+      Buffer.from("\nMUTABLE_CHECKOUT_DRIFT", "utf8"),
+    ]);
+    assert.notEqual(
+      createHash("sha256").update(inMemoryDrift).digest("hex"),
+      receipt.sha256,
+      receipt.path,
+    );
+    assert.deepEqual(verifyImmutableReceipt(receipt), immutableBytes, receipt.path);
   }
+
+  const firstReceipt = correction.artifactReceipts[0];
+  const secondReceipt = correction.artifactReceipts[1];
+  assert.throws(
+    () => verifyImmutableReceipt({
+      ...firstReceipt,
+      gitBlobSha1: secondReceipt.gitBlobSha1,
+    }),
+    { name: "AssertionError" },
+  );
+  assert.throws(
+    () => verifyImmutableReceipt({
+      ...firstReceipt,
+      gitBlobSha1: "f".repeat(40),
+    }),
+  );
 
   const normalized = JSON.parse(manifestBytes.toString("utf8"));
   normalized.t3.selfRecorderReceipt.sha256 = "0".repeat(64);
