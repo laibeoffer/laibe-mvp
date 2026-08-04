@@ -146,16 +146,18 @@ test("canonical entry controls start fail-closed before trusted route binding", 
   }
 });
 
-test("header exposes a visible shared account entry through the existing safe status source", async () => {
+test("header starts fail closed and delegates the canonical shared account entry to route binding", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
   const accountEntry = header.match(
-    /<a\b(?=[^>]*data-account-entry)(?=[^>]*data-canonical-route="\/account\/access")(?=[^>]*href="\.\.\/account_service_status\/code\.html")[^>]*>[\s\S]*?註冊／登入[\s\S]*?<\/a>/,
+    /<a\b(?=[^>]*data-account-entry)(?=[^>]*data-route="accountAccess")(?=[^>]*data-canonical-route="\/account\/access")[^>]*>[\s\S]*?註冊／登入[\s\S]*?<\/a>/,
   )?.[0] ?? "";
 
   assert.notEqual(accountEntry, "");
-  assert.doesNotMatch(accountEntry, /aria-disabled="true"|tabindex="-1"/);
-  await access(new URL("../account_service_status/code.html", htmlUrl));
+  assert.match(accountEntry, /aria-disabled="true"/);
+  assert.match(accountEntry, /tabindex="-1"/);
+  assert.match(accountEntry, /data-route-state="planned"/);
+  assert.doesNotMatch(accountEntry, /\shref=/);
 });
 
 test("mobile header keeps account and decision actions without stacking secondary anchors", async () => {

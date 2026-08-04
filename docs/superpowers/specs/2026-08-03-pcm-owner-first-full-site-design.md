@@ -50,7 +50,7 @@ The first serial route candidate `fd7a5719f545033a6b27c51ce028f95ba3f35a9f` is s
 
 ### `/account/access`
 
-This is the single shared registration and sign-in entrance for owners and invited vendors. The PCM homepage must expose a clear future entrance without creating a clickable 404. Until T5 creates the page, its manifest lifecycle is `planned` and its local `href` is `null`.
+This is the single shared registration and sign-in entrance for owners and invited vendors. The admitted source commit is exact `1b62e12712178451b47b6b85c2fca859c26bde83`; its forms, role guidance, and recovery states remain disabled under `CONTEXT_UNAVAILABLE`, expose zero case data, and perform no Auth, network, persistence, or durable write. The unique integration writer absorbs those exact four blobs at `bd3e0678eba2bd272f05b7e787ef99a954cbb9ee`, then activates only the local G1 route `../account_access/code.html` and the homepage entry. The header begins fail closed and receives its href only from trusted route binding; it no longer points at the compatibility account-status page.
 
 ## Compatibility-only pages
 
@@ -160,7 +160,7 @@ The hero action uses one closed, state-owned hero action projection for its labe
 
 Hero projection authority is the canonical object identity exported by `QUOTE_CHECK_STATES`, `QUOTE_CHECK_FAILURES`, or `CONTEXT_UNAVAILABLE`, never a caller-provided `code` property. Plain own-data lookalikes, extra-key records, null-prototype records, inherited values from a custom prototype or `Object.prototype`, accessor-backed records, functions, and Proxies all receive the disabled target-free action. Projection performs no getter or Proxy trap call on those inputs. It uses direct identity comparisons rather than Map, Set, Array, or another mutable-prototype collection as authority, while preserving the complete built-in state and failure action matrix.
 
-T3 activates `quoteCheck` at `../quote_check/code.html`. After T4 source admission, the serial integration activates `drawingCheck` at `../drawing_check/code.html`, makes the homepage drawing entry and the two quote/drawing completion edges clickable, and leaves `accountAccess` planned with a null href. Compatibility pages remain aliases and never become canonical steps.
+T3 activates `quoteCheck` at `../quote_check/code.html`. T4 serial integration activates `drawingCheck` at `../drawing_check/code.html` and the two quote/drawing completion edges. T5 serial integration activates `accountAccess` at `../account_access/code.html` and the homepage account edge while preserving zero case data and no write authority. Compatibility pages remain aliases and never become canonical steps.
 
 ### Quantitative CTA contrast
 

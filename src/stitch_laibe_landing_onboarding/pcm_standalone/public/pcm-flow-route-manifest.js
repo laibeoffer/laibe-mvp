@@ -11,7 +11,7 @@ export const PCM_FLOW_NODES = Object.freeze([
   freezeRecord({ id: "home", publicPath: "/pcm", label: "PCM 公開首頁", role: "一般屋主", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../public_home/code.html#top" }),
   freezeRecord({ id: "quoteCheck", publicPath: "/pcm/quote-check", label: "報價健檢", role: "甲方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../quote_check/code.html" }),
   freezeRecord({ id: "drawingCheck", publicPath: "/pcm/drawing-check", label: "圖說檢討", role: "甲方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../drawing_check/code.html" }),
-  freezeRecord({ id: "accountAccess", publicPath: "/account/access", label: "甲乙方註冊與登入", role: "甲方與乙方", owner: "A0", lifecycle: "planned", gate: "G1_UI_SOURCE", href: null }),
+  freezeRecord({ id: "accountAccess", publicPath: "/account/access", label: "甲乙方註冊與登入", role: "甲方與乙方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../account_access/code.html" }),
   freezeRecord({ id: "caseSetup", publicPath: "/pcm/case/setup", label: "案件建立與正式 PCM 申請", role: "甲方", owner: "A0", lifecycle: "planned", gate: "G2_AUTH_RUNTIME", href: null }),
   freezeRecord({ id: "serviceContract", publicPath: "/pcm/service-contract", label: "PCM 服務契約", role: "甲方與受邀乙方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../service_contract/code.html" }),
   freezeRecord({ id: "contractPrerequisites", publicPath: "/pcm/contract/prerequisites", label: "契約待補項目", role: "甲方與受邀乙方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../contract_prerequisites/code.html" }),
@@ -39,7 +39,7 @@ export const PCM_FLOW_COMPATIBILITY_ALIASES = Object.freeze([
 export const PCM_FLOW_EDGES = Object.freeze([
   freezeRecord({ from: "home", to: "quoteCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往報價健檢", clickable: true }),
   freezeRecord({ from: "home", to: "drawingCheck", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往圖說檢討", clickable: true }),
-  freezeRecord({ from: "home", to: "accountAccess", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往註冊或登入", clickable: false }),
+  freezeRecord({ from: "home", to: "accountAccess", kind: "forward", gate: "G1_UI_SOURCE", owner: "A0", action: "前往註冊或登入", clickable: true }),
   freezeRecord({ from: "quoteCheck", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),
   freezeRecord({ from: "drawingCheck", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),
   freezeRecord({ from: "accountAccess", to: "home", kind: "back", gate: "G1_UI_SOURCE", owner: "A0", action: "返回 PCM 首頁", clickable: true }),
@@ -132,7 +132,7 @@ export const PCM_FLOW_FAILURE_EDGES = Object.freeze(
 );
 
 export const PCM_FLOW_ROUTE_MANIFEST = Object.freeze({
-  version: "1.1.0",
+  version: "1.2.0",
   owner: "A0",
   defaultRoute: "accessUnavailable",
   gates: PCM_FLOW_GATES,

@@ -252,19 +252,25 @@
 - [x] Add exact local anchors to the quotation result and quote-only failure recovery, align state copy/hero/recovery with `DRAWING_CHECK`, and reject unknown, traversal, data, JavaScript, and external route values without shared string-method authority. Product quote tests are GREEN at 38/38.
 - [x] Run actual quote-to-drawing browser journeys at 1280×900, 768×1024, and 390×844: destination 3/3, keyboard focus 3/3, exact href 3/3, overflow 0, controls below 44px 0, console/network failures 0.
 - [x] Close the read-only review Important finding with an executable production-listener mutation probe: removing the guard demonstrably permits hostile navigation, while current source keeps unsafe hrefs and post-load `getAttribute`, `preventDefault`, and `click` pollution at zero navigation and zero polluted calls.
-- [ ] Close the twelve-file current inventory, exact-seven receipts, normalized self receipt, fresh 101/101 focused and 216/216 full suites, bounded commit, and A0 focused admission gates.
+- [x] Close the twelve-file current inventory, exact-seven receipts, normalized self receipt, fresh 101/101 focused and 216/216 full suites, bounded commit, and A0 focused admission gates. Exact `35bb499b9c549e1a0013eace1c8f7d3070014bca` is `ADMITTED_G1_UI_SOURCE_ONLY`.
 
 ---
 
 ### Task T5: Shared owner and vendor account access
 
-**Exact proposed write set:** create `pcm_standalone/account_access/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-account-access.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
+**Bounded source lane:** exact four paths only: `pcm_standalone/account_access/{code.html,styles.css,app.js}` and `tests/pcm-owner-first-account-access.test.mjs`. Shared route, public contract, homepage, spec, plan, and governance files remain frozen in the source lane.
+
+**Serial integration write set:** `public/pcm-flow-route-manifest.js`, `public_home/code.html`, the route, homepage, account-access, and quotation active-train tests, and the current spec/plan/governance manifest. `public-contract.js` remains byte-frozen and derives the active href only from the trusted route manifest.
 
 **Produces:** one registration/sign-in page for owners and invited vendors, with role choice, truthful G2-closed state, identity recovery, and no case payload. Read `site/register_vendor/code.html` only as a C-only visual/interaction reference and remove old market and payment semantics.
 
-- [ ] Write RED for shared roles, login/registration modes, preserved form semantics, access failures, and route still null.
-- [ ] Create the page, activate only `accountAccess`, run GREEN and browser checks.
-- [ ] Commit `feat(pcm): add shared account access`.
+- [x] Complete the disjoint source RED→GREEN and A0 review. Exact source `1b62e12712178451b47b6b85c2fca859c26bde83` is `ADMITTED_G1_UI_SOURCE_ONLY`; focused account tests are 24/24 and the source worktree is clean.
+- [x] Mechanically absorb the four admitted blobs into the unique integration writer as local commit `bd3e0678eba2bd272f05b7e787ef99a954cbb9ee`; all four blob IDs equal the admitted source.
+- [x] Establish serial integration RED at 29/33: account node and public contract were still planned, the header still targeted the compatibility status page, and the historical T4 receipt test incorrectly read mutable checkout bytes.
+- [x] Activate only `accountAccess` at `../account_access/code.html`, make `home→accountAccess` clickable, and convert the header to a fail-closed `data-route="accountAccess"` control that becomes active only through trusted route binding. No Auth, case payload, network, persistence, or write authority is granted.
+- [x] Run the first full-suite checkpoint: 238/241, with exactly two intentional active-train assertions still requiring account `planned` plus the normalized manifest self receipt pending. Bring those two tests into the same serial integration package; no source page behavior changed.
+- [x] Close exact-nine receipts, normalized self receipt, fresh 34/34 route/home focused, 241/241 full suite, and the 1280×900／768×1024／390×844 homepage→account journey. All three destinations are `CONTEXT_UNAVAILABLE` with case payload 0, enabled write controls 0, and overflow／under-44px／console／network failures 0.
+- [ ] Create the bounded local integration commit and obtain A0 focused admission before T6/T7 source lanes begin.
 
 ---
 

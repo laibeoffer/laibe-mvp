@@ -898,7 +898,7 @@ test("all local page resources links and fragments resolve without external requ
   }
 });
 
-test("G1 remains source-only and leaves canonical route authority closed", async () => {
+test("G1 account access route can activate without granting Auth case data or write authority", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(
     `${routeManifestUrl.href}?source-only=${Date.now()}`
   );
@@ -910,7 +910,7 @@ test("G1 remains source-only and leaves canonical route authority closed", async
 
   assert.ok(accountAccess);
   assert.equal(accountAccess.publicPath, "/account/access");
-  assert.equal(accountAccess.lifecycle, "planned");
+  assert.equal(accountAccess.lifecycle, "active");
   assert.equal(accountAccess.gate, "G1_UI_SOURCE");
-  assert.equal(accountAccess.href, null);
+  assert.equal(accountAccess.href, "../account_access/code.html");
 });

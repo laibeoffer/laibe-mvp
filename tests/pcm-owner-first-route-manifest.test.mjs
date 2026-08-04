@@ -221,7 +221,7 @@ test("canonical graph uses one quote check, one drawing check, and one shared ac
   );
 });
 
-test("quote and drawing checks are active while account access remains planned and 404-safe", async () => {
+test("quote drawing and account checks are active while later runtime routes remain planned and 404-safe", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
   const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
 
@@ -236,8 +236,9 @@ test("quote and drawing checks are active while account access remains planned a
   await access(new URL(drawingCheck.href, routeManifestUrl));
 
   const accountAccess = byId.get("accountAccess");
-  assert.equal(accountAccess.lifecycle, "planned");
-  assert.equal(accountAccess.href, null);
+  assert.equal(accountAccess.lifecycle, "active");
+  assert.equal(accountAccess.href, "../account_access/code.html");
+  await access(new URL(accountAccess.href, routeManifestUrl));
   assert.equal(byId.get("quoteCheck").publicPath, "/pcm/quote-check");
   assert.equal(byId.get("drawingCheck").publicPath, "/pcm/drawing-check");
   assert.equal(byId.get("accountAccess").publicPath, "/account/access");
@@ -262,6 +263,7 @@ test("quote and drawing checks are active while account access remains planned a
 
   for (const [from, to] of [
     ["home", "drawingCheck"],
+    ["home", "accountAccess"],
     ["quoteCheck", "drawingCheck"],
     ["drawingCheck", "quoteCheck"],
   ]) {
@@ -685,6 +687,7 @@ test("T4 serial integration evidence binds admitted source, exact-seven bytes, a
 test("T4 route-truth correction binds exact-seven current bytes and the twelve-file suite", async () => {
   const manifest = JSON.parse(await readFile(governanceManifestUrl, "utf8"));
   const correction = manifest.t4RouteTruthCorrection;
+  assert.equal(correction.candidateCommit, "35bb499b9c549e1a0013eace1c8f7d3070014bca");
   const expectedWriteSet = [
     "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
     "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
@@ -709,7 +712,7 @@ test("T4 route-truth correction binds exact-seven current bytes and the twelve-f
     "pcm-standalone-core.test.mjs",
   ];
 
-  assert.equal(correction.status, "ready_for_a0_focused_review");
+  assert.equal(correction.status, "ADMITTED_G1_UI_SOURCE_ONLY");
   assert.equal(correction.parent, "fd7a5719f545033a6b27c51ce028f95ba3f35a9f");
   assert.deepEqual(correction.writeSet, expectedWriteSet);
   assert.equal(correction.outsideWriteSet, 0);
@@ -737,12 +740,94 @@ test("T4 route-truth correction binds exact-seven current bytes and the twelve-f
   );
   assert.deepEqual(correction.artifactReceipts.map(({ path }) => path), artifactPaths);
   for (const receipt of correction.artifactReceipts) {
-    const bytes = await readFile(new URL(receipt.path, repositoryRoot));
+    const immutable = spawnSync(
+      "git",
+      ["show", `${correction.candidateCommit}:${receipt.path}`],
+      { cwd: repositoryRoot, encoding: null, maxBuffer: 16 * 1024 * 1024 },
+    );
+    assert.equal(immutable.status, 0, immutable.stderr?.toString() ?? receipt.path);
+    const bytes = immutable.stdout;
     assert.equal(receipt.bytes, bytes.length, receipt.path);
     assert.equal(receipt.sha256, createHash("sha256").update(bytes).digest("hex"), receipt.path);
     assert.equal(receipt.gitBlobSha1, gitBlobSha1(bytes), receipt.path);
-    assert.equal(receipt.scope, "candidate_git_blob_bytes", receipt.path);
+    assert.equal(receipt.scope, "immutable_35bb_commit_blob_bytes", receipt.path);
   }
+});
+
+test("T5 serial integration binds admitted account source and an active zero-authority public route", async () => {
+  const manifest = JSON.parse(await readFile(governanceManifestUrl, "utf8"));
+  const integration = manifest.t5SourceIntegration;
+  const sourceWriteSet = [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/styles.css",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js",
+    "tests/pcm-owner-first-account-access.test.mjs",
+  ];
+  const integrationWriteSet = [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
+    "tests/pcm-owner-first-route-manifest.test.mjs",
+    "tests/pcm-owner-first-public-home.test.mjs",
+    "tests/pcm-owner-first-account-access.test.mjs",
+    "tests/pcm-owner-first-quote-check.test.mjs",
+    "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+    "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+    "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  ];
+
+  assert.equal(integration.status, "ready_for_a0_focused_review");
+  assert.equal(integration.sourceAdmission, "ADMITTED_G1_UI_SOURCE_ONLY");
+  assert.equal(integration.sourceCommit, "1b62e12712178451b47b6b85c2fca859c26bde83");
+  assert.equal(integration.sourceAbsorptionCommit, "bd3e0678eba2bd272f05b7e787ef99a954cbb9ee");
+  assert.equal(integration.integrationParent, "bd3e0678eba2bd272f05b7e787ef99a954cbb9ee");
+  assert.deepEqual(integration.sourceWriteSet, sourceWriteSet);
+  assert.deepEqual(integration.integrationWriteSet, integrationWriteSet);
+  assert.equal(integration.outsideWriteSet, 0);
+  assert.deepEqual(integration.routeOutcome, {
+    publicPath: "/account/access",
+    lifecycle: "active",
+    href: "../account_access/code.html",
+    homeEdgeClickable: true,
+    payloadPolicy: "NO_CASE_DATA",
+    writeAuthority: "NONE",
+  });
+  assert.deepEqual(integration.fullSuite, {
+    command: "node --test tests/pcm-*.test.mjs",
+    files: 13,
+    tests: 241,
+    passed: 241,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(integration.browser.viewports, ["1280x900", "768x1024", "390x844"]);
+  assert.equal(integration.browser.destinationReached, "3/3");
+  assert.equal(integration.browser.enabledWriteControls, 0);
+  assert.equal(integration.browser.horizontalOverflow, 0);
+  assert.equal(integration.browser.visibleControlsUnder44, 0);
+  assert.equal(integration.browser.consoleWarningsOrErrors, 0);
+  assert.equal(integration.browser.networkFailuresOrNon2xx, 0);
+  assert.equal(integration.gates.G2_AUTH_RUNTIME, "closed");
+  assert.equal(integration.gates.G3_DURABLE_DATA, "closed");
+  assert.equal(integration.gates.G4_PRODUCTION, "closed");
+
+  const artifactPaths = integrationWriteSet.filter(
+    (path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+  );
+  assert.deepEqual(integration.artifactReceipts.map(({ path }) => path), artifactPaths);
+  for (const receipt of integration.artifactReceipts) {
+    const immutable = spawnSync("git", ["cat-file", "blob", receipt.gitBlobSha1], {
+      cwd: repositoryRoot,
+      encoding: null,
+      maxBuffer: 16 * 1024 * 1024,
+    });
+    assert.equal(immutable.status, 0, immutable.stderr?.toString() ?? receipt.path);
+    assert.equal(receipt.bytes, immutable.stdout.length, receipt.path);
+    assert.equal(receipt.sha256, createHash("sha256").update(immutable.stdout).digest("hex"), receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1(immutable.stdout), receipt.path);
+    assert.equal(receipt.scope, "declared_git_blob_bytes", receipt.path);
+  }
+  assert.equal(integration.independentReview.critical, 0);
+  assert.equal(integration.independentReview.important, 0);
 });
 
 test("governance manifest t0 exposes one current evidence truth", async () => {
@@ -781,14 +866,14 @@ test("governance manifest t0 exposes one current evidence truth", async () => {
   });
 });
 
-test("public contract exposes quote and drawing checks while keeping account access non-clickable", async () => {
+test("public contract exposes quote drawing and account checks without granting runtime authority", async () => {
   const { PUBLIC_ROUTES, resolvePcmFlowContinuation } = await import(
     publicContractUrl.href
   );
 
   assert.equal(PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
   assert.equal(PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
-  assert.equal(PUBLIC_ROUTES.accountAccess, null);
+  assert.equal(PUBLIC_ROUTES.accountAccess, "../account_access/code.html");
   assert.equal(PUBLIC_ROUTES.ownerStart, "../owner_start/code.html");
   assert.equal(PUBLIC_ROUTES.documentCorrections, "../document_corrections/code.html");
   assert.equal(PUBLIC_ROUTES.basicReport, "../basic_report/code.html");
@@ -806,8 +891,10 @@ test("public contract exposes quote and drawing checks while keeping account acc
   assert.equal(drawingResult.canMutate, false);
 
   const accountResult = resolvePcmFlowContinuation({ intent: "OPEN_ACCOUNT_ACCESS" });
-  assert.equal(accountResult.routeKey, "accessUnavailable");
-  assert.equal(accountResult.reason, "ROUTE_PREPARING");
+  assert.equal(accountResult.routeKey, "accountAccess");
+  assert.equal(accountResult.href, "../account_access/code.html");
+  assert.equal(accountResult.reason, "PUBLIC_ROUTE");
+  assert.equal(accountResult.payloadPolicy, "NO_CASE_DATA");
   assert.equal(accountResult.canMutate, false);
 
   assert.deepEqual(resolvePcmFlowContinuation({ intent: "READ_CONTRACT" }), {
