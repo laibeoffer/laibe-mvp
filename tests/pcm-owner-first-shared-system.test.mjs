@@ -74,20 +74,54 @@ test("state contract defines the five shared facts and approved closed states", 
     "ACCESS_DENIED",
     "PREREQUISITES_PENDING",
     "SERVICE_PREPARING",
-    "PCM_EXITED_READ_ONLY",
+    "PCM_EXITED_BILATERAL_CONTINUATION",
     "CASE_CLOSED_READ_ONLY",
   ]);
 
   for (const item of Object.values(state.OWNER_FIRST_CLOSED_STATES)) {
-    assert.equal(item.type, "CLOSED");
+    assert.equal(item.type, item.code === "PCM_EXITED_BILATERAL_CONTINUATION" ? "CONTINUATION" : "CLOSED");
     assert.equal(item.mutationAllowed, false);
-    assert.deepEqual(item.actions, []);
+    assert.equal(Array.isArray(item.actions), true);
+    assert.equal(item.actions.length, 0);
+    assert.equal(Object.getPrototypeOf(item.actions), null);
+    assert.equal(Object.hasOwn(item.actions, "0"), false);
+    assert.deepEqual([...item.actions], []);
     assert.equal(typeof item.title, "string");
     assert.equal(typeof item.reason, "string");
     assert.equal(typeof item.nextAction, "string");
     assert.equal(typeof item.responsibleRole, "string");
     assert.equal(typeof item.recoveryLabel, "string");
     assert.equal(Object.isFrozen(item), true);
+  }
+});
+
+test("shared zero-authority actions and resolver resist post-load prototype pollution", async () => {
+  const state = await import(`${stateUrl.href}?pollution=${Date.now()}`);
+  const originalIndex = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+  const originalIterator = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);
+  const originalGetPrototypeOf = Object.getPrototypeOf;
+  const originalDescriptor = Object.getOwnPropertyDescriptor;
+  try {
+    Object.defineProperty(Array.prototype, "0", { configurable: true, value: { authority: "forged" } });
+    Object.defineProperty(Array.prototype, Symbol.iterator, {
+      configurable: true,
+      value: function* forgedIterator() { yield { authority: "forged" }; },
+    });
+    Object.getPrototypeOf = () => { throw new Error("poisoned getPrototypeOf"); };
+    Object.getOwnPropertyDescriptor = () => { throw new Error("poisoned descriptor"); };
+    const continuation = state.resolveOwnerFirstState({ code: "PCM_EXITED_BILATERAL_CONTINUATION" });
+    const unknown = state.resolveOwnerFirstState({ code: "UNKNOWN" });
+    assert.equal(continuation.code, "PCM_EXITED_BILATERAL_CONTINUATION");
+    assert.equal(continuation.actions[0], undefined);
+    assert.deepEqual([...continuation.actions], []);
+    assert.equal(unknown.code, "CONTEXT_UNAVAILABLE");
+  } finally {
+    if (originalIndex) Object.defineProperty(Array.prototype, "0", originalIndex);
+    else delete Array.prototype[0];
+    if (originalIterator) Object.defineProperty(Array.prototype, Symbol.iterator, originalIterator);
+    else delete Array.prototype[Symbol.iterator];
+    Object.getPrototypeOf = originalGetPrototypeOf;
+    Object.getOwnPropertyDescriptor = originalDescriptor;
   }
 });
 
@@ -123,7 +157,7 @@ test("unknown and caller-asserted context always returns zero-case-data recovery
     { code: "toString" },
     { code: "constructor" },
     { code: "__proto__" },
-    Object.create({ code: "PCM_EXITED_READ_ONLY" }),
+    Object.create({ code: "PCM_EXITED_BILATERAL_CONTINUATION" }),
     new Proxy({}, { getPrototypeOf() { throw new Error("do not trust reflection"); } }),
     revoked.proxy,
   ];
@@ -133,23 +167,35 @@ test("unknown and caller-asserted context always returns zero-case-data recovery
     assert.equal(result.code, "CONTEXT_UNAVAILABLE");
     assert.equal(result.payloadPolicy, "ZERO_CASE_DATA");
     assert.equal(result.mutationAllowed, false);
-    assert.deepEqual(result.actions, []);
+    assert.equal(result.actions.length, 0);
+    assert.equal(Object.getPrototypeOf(result.actions), null);
+    assert.equal(Object.hasOwn(result.actions, Symbol.iterator), true);
     assert.equal("payload" in result, false);
     assert.equal("caseData" in result, false);
   }
 });
 
-test("approved read-only outcomes preserve only authorized existing content semantics", async () => {
+test("PCM exit preserves bilateral work while case close remains authorized read-only", async () => {
   const { resolveOwnerFirstState } = await import(`${stateUrl.href}?readonly=${Date.now()}`);
 
-  for (const code of ["PCM_EXITED_READ_ONLY", "CASE_CLOSED_READ_ONLY"]) {
-    const result = resolveOwnerFirstState({ code });
-    assert.equal(result.code, code);
-    assert.equal(result.payloadPolicy, "PRESERVE_AUTHORIZED_EXISTING_CONTENT");
-    assert.equal(result.mutationAllowed, false);
-    assert.deepEqual(result.actions, []);
-    assert.deepEqual(result.workspaceRoutes, ["ownerWorkspace", "vendorWorkspace"]);
-  }
+  const continuation = resolveOwnerFirstState({ code: "PCM_EXITED_BILATERAL_CONTINUATION" });
+  assert.equal(continuation.payloadPolicy, "PRESERVE_BILATERAL_CASE_CONTINUATION");
+  assert.equal(continuation.caseMode, "BILATERAL_CONTINUATION");
+  assert.equal(continuation.pcmMode, "HISTORICAL_READ_ONLY");
+  assert.equal(continuation.caseClosed, false);
+  assert.equal(continuation.caseArchived, false);
+  assert.equal(continuation.newPcmOperationsAllowed, false);
+  assert.equal(continuation.rejoinRequiresNewAuthorization, true);
+  assert.deepEqual([...continuation.preserveResources], [
+    "workspaces", "contract", "documents", "messages", "schedules",
+    "evidence", "acceptance", "changes", "addenda", "caseRecords",
+  ]);
+  assert.deepEqual([...continuation.workspaceRoutes], ["ownerWorkspace", "vendorWorkspace"]);
+
+  const closed = resolveOwnerFirstState({ code: "CASE_CLOSED_READ_ONLY" });
+  assert.equal(closed.payloadPolicy, "PRESERVE_AUTHORIZED_EXISTING_CONTENT");
+  assert.equal(closed.mutationAllowed, false);
+  assert.deepEqual([...closed.workspaceRoutes], ["ownerWorkspace", "vendorWorkspace"]);
 });
 
 test("shared implementation excludes the deprecated standalone archive state", async () => {
@@ -160,4 +206,5 @@ test("shared implementation excludes the deprecated standalone archive state", a
   ]);
   const deprecatedState = ["ARCHIVED", "READ", "ONLY"].join("_");
   assert.doesNotMatch(source.join("\n"), new RegExp(`\\b${deprecatedState}\\b`));
+  assert.doesNotMatch(source.join("\n"), /\bPCM_EXITED_READ_ONLY\b/);
 });

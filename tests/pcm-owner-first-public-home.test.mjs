@@ -463,13 +463,13 @@ test("footer links only to visible owner-first sections", async () => {
   assert.match(html, /<section\s+id="service-fee"/);
 });
 
-test("T5 DOM-method correction receipts are bound to immutable review-target objects", () => {
+test("T5 DOM-method correction receipts stay bound to the admitted immutable evidence commit", () => {
   const repositoryRoot = new URL("../", import.meta.url);
   const gitText = (...args) => execFileSync("git", args, {
     cwd: repositoryRoot,
     encoding: "utf8",
   }).trim();
-  const reviewTarget = gitText("rev-parse", "HEAD");
+  const reviewTarget = "64539be0b93170a916106dbd61e9ca5841f83b2b";
   const manifestPath = "docs/governance/pcm-owner-first-execution-manifest.v1.json";
   const manifestBytes = execFileSync(
     "git",

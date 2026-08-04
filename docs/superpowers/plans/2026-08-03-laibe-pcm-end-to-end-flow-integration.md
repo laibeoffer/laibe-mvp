@@ -112,7 +112,7 @@
 - Create: `tests/pcm-owner-first-shared-system.test.mjs`
 - Modify: current spec, plan, and governance manifest.
 
-**Produces:** LaiBE dark tokens, orange-red primary action, cyan viewing action, five-fact spine, accessible loading/empty/error/recovery shells, and closed states including `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` with zero mutation actions.
+**Produces:** LaiBE dark tokens, orange-red primary action, cyan viewing action, five-fact spine, accessible loading/empty/error/recovery shells, the distinct `PCM_EXITED_BILATERAL_CONTINUATION` state, and `CASE_CLOSED_READ_ONLY`, with no G1 mutation authority.
 
 - [x] Record the exact seven paths and corrected T0 parent `9e268212f5b3050a1770f7e559508521f4cff4ec` (tree `bdfd5bf44cf1e1ec032fcde1132d9275e8855a77`).
 - [x] Write RED for tokens, five facts, corrected closed states, the two approved read-only outcomes, 44px controls, focus, reduced motion, and overflow safety.
@@ -272,31 +272,38 @@
 - [x] Close exact-nine receipts, normalized self receipt, fresh 34/34 route/home focused, 241/241 full suite, and the 1280×900／768×1024／390×844 homepage→account journey. All three destinations are `CONTEXT_UNAVAILABLE` with case payload 0, enabled write controls 0, and overflow／under-44px／console／network failures 0.
 - [x] Reproduce the A0 hostile DOM-method finding against exact `a07adf3`: post-load `setAttribute` rewrote the trusted account href to `javascript:`, while a no-op `removeAttribute` left an unsafe href on a closed control. The new production-function regression was 16/17 RED before implementation.
 - [x] Capture the branded `Element.prototype` set/remove/get methods and `Reflect.apply` at module load, read the route name through the captured getter, close every control before activation, and verify the exact href and closed attributes after each operation. Rewritten, no-op, and throwing post-load hooks now have zero authority; the focused production-function suite is 17/17 GREEN.
-- [ ] Close the bounded exact-five correction receipts, fresh focused/full/browser evidence, local commit, and A0 focused admission. T6/T7 remain closed until that exact admission.
-- [ ] Create the bounded local integration commit and obtain A0 focused admission before T6/T7 source lanes begin.
+- [x] Close the bounded correction and evidence lineage. Exact `64539be0b93170a916106dbd61e9ca5841f83b2b` is `ADMITTED_G1_UI_SOURCE_ONLY`; G2/G3/G4 remain closed.
+- [x] Begin T6 and T7 only as disjoint source lanes after that admission. Shared integration remains serialized under the unique writer.
 
 ---
 
 ### Task T6: Case setup, document linking, and formal PCM decision
 
-**Exact proposed write set:** create `pcm_standalone/case_setup/{code.html,styles.css,app.js}`, create `tests/pcm-owner-first-case-setup.test.mjs`, modify route manifest/public contract and current spec/plan/governance manifest.
+**Source write set:** `pcm_standalone/case_setup/{code.html,styles.css,app.js}` and `tests/pcm-owner-first-case-setup.test.mjs` only. Shared route/public contract/spec/plan/governance changes belong to the later serial integration package.
 
 **Produces:** one source-only flow for creating a case, associating quotation/drawing references, showing missing-pair states, and choosing whether to apply for formal PCM. No archive workspace is created; declining formal service leaves the user in the original owner context with no invented durable write.
 
-- [ ] RED the pairing, decision, zero-writer, responsibility, and recovery contracts.
-- [ ] Create and activate `caseSetup`, run GREEN/regressions/browser checks.
-- [ ] Commit `feat(pcm): add case setup and PCM service decision`.
+- [x] RED/GREEN the pairing, decision, zero-writer, responsibility, recovery, responsive, and hostile-context contracts.
+- [x] Obtain source-only admission at exact `bfcfd2461443864cac4b2fbb4874dbc45a8084cc`.
+- [x] Mechanically absorb the four admitted source/test blobs in unique-writer commit `6bc25bab3b4cadaa16c6deae6b24207bc7d4007c`.
+- [ ] Close the serial evidence lineage and full-suite gate. `caseSetup` intentionally remains `planned`, `G2_AUTH_RUNTIME`, and `href:null`; G1 must not activate an Auth-dependent route.
 
 ---
 
 ### Task T7: PCM service contract
 
-**Exact proposed write set:** `pcm_standalone/service_contract/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-service-contract.test.mjs`, current spec/plan/governance manifest.
+**Source write set:** `pcm_standalone/service_contract/{code.html,styles.css,app.js}` and `tests/pcm-owner-first-service-contract.test.mjs` only. Shared evidence and route integration remain serial.
 
 **Produces:** preserved v0.3, 3.5%, legal-review state, full DOM/print text, readable mobile navigation, and truthful prerequisite/signing gates.
 
-- [ ] RED preservation, mobile reading, and gate behavior.
-- [ ] Implement minimal reading changes, verify full text/print/regressions, and commit `feat(pcm): improve service contract reading`.
+- [x] RED/GREEN preservation, mobile reading, strict readiness/context authority, hostile intrinsic behavior, and disabled signing.
+- [x] Obtain source-only admission at exact `db289177da74283d3075383d7714318aa9760951`.
+- [x] Mechanically absorb the four admitted source/test blobs in unique-writer commit `6bc25bab3b4cadaa16c6deae6b24207bc7d4007c`.
+- [x] Replace four descendant-hostile shared assertions with immutable Git-object lineage and close the first focused RED from 63/71 to GREEN.
+- [x] Replace the prior whole-case PCM-exit state with `PCM_EXITED_BILATERAL_CONTINUATION`, preserving the exact ten bilateral resources while stopping new PCM operations and requiring new authorization for re-entry.
+- [x] Reproduce post-load Array index/iterator injection at 18/19 RED, then harden continuation actions/resources/workspaces as frozen null-prototype own-iterator lists in all three public/shared sources.
+- [x] Fresh focused = 73/73; complete PCM enumeration = 15 files and 266/266. Browser acceptance at 1280×900, 768×1024, 390×844, 390×640, 1280×768, and 640×450 has overflow 0, visible under-44px controls 0, broken fragments/images 0, enabled writes 0, console warning/error 0, and six direct local resources HTTP 200. Case setup focuses `#preparation`; service contract reaches `#full-contract` with signing disabled.
+- [ ] Create the bounded product/test/docs commit with parent `6bc25bab3b4cadaa16c6deae6b24207bc7d4007c`, then close its immutable governance receipts in a separate evidence-only commit and obtain A0 focused admission. G2/G3/G4 remain closed.
 
 ---
 
@@ -381,7 +388,7 @@
 
 **Exact proposed write set:** owner workspace, vendor workspace, PCM console, `pcm_standalone/case_closeout/{code.html,styles.css,app.js}`, `tests/pcm-owner-first-case-lifecycle.test.mjs`, route manifest and current spec/plan/governance manifest.
 
-**Produces:** original-workspace `PCM_EXITED_READ_ONLY`, `CASE_CLOSED_READ_ONLY`, and cancelled-case states; existing content remains visible, PCM exit removes PCM intervention, `mutationAllowed` is false, `actions` is empty, and no archive workspace is created.
+**Produces:** original-workspace `PCM_EXITED_BILATERAL_CONTINUATION`, `CASE_CLOSED_READ_ONLY`, and cancelled-case states. PCM exit keeps owner/vendor workspaces, documents, messages, schedules, evidence, acceptance, changes, addenda, and case records operational while stopping new PCM operations and retaining historical PCM records read-only. Case close is the distinct whole-case read-only outcome; no archive workspace is created.
 
 - [ ] RED state names, original-workspace retention, action removal, three-party confirmation, and recovery.
 - [ ] Implement GREEN, verify no alternate workspace route, and commit `feat(pcm): close case lifecycle in original workspaces`.

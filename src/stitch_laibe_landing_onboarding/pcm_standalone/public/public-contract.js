@@ -5,15 +5,63 @@ import {
 
 const safeArrayIsArray = Array.isArray;
 const safeCreate = Object.create;
+const safeDefineProperty = Object.defineProperty;
 const safeFreeze = Object.freeze;
 const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const safeGetPrototypeOf = Object.getPrototypeOf;
+const safeSetPrototypeOf = Object.setPrototypeOf;
 const safeOwnKeys = Reflect.ownKeys;
 const safeStructuredClone =
   typeof globalThis.structuredClone === "function"
     ? globalThis.structuredClone
     : null;
 const ordinaryObjectPrototype = Object.prototype;
+const iteratorKey = Symbol.iterator;
+
+function iteratorResult(done, value) {
+  const result = safeCreate(null);
+  safeDefineProperty(result, "done", { value: done, enumerable: true });
+  safeDefineProperty(result, "value", { value, enumerable: true });
+  return safeFreeze(result);
+}
+
+function freezeOwnList(...items) {
+  const list = [];
+  safeSetPrototypeOf(list, null);
+  for (let index = 0; index < items.length; index += 1) {
+    safeDefineProperty(list, String(index), {
+      value: items[index],
+      enumerable: true,
+    });
+  }
+  safeDefineProperty(list, iteratorKey, {
+    value: () => {
+      let index = 0;
+      const iterator = safeCreate(null);
+      safeDefineProperty(iterator, "next", {
+        value: () => index < list.length
+          ? iteratorResult(false, list[index++])
+          : iteratorResult(true, undefined),
+      });
+      safeDefineProperty(iterator, iteratorKey, { value: () => iterator });
+      return safeFreeze(iterator);
+    },
+  });
+  return safeFreeze(list);
+}
+
+const BILATERAL_CONTINUATION_RESOURCES = freezeOwnList(
+  "workspaces",
+  "contract",
+  "documents",
+  "messages",
+  "schedules",
+  "evidence",
+  "acceptance",
+  "changes",
+  "addenda",
+  "caseRecords",
+);
 
 export const PUBLIC_IDENTITIES = Object.freeze([
   Object.freeze({
@@ -169,7 +217,7 @@ function isAuthorityRequiredIntent(intent) {
   }
 }
 
-function readOnlyResult(role) {
+function workspaceOutcome(intent, role) {
   let routeKey;
   let href;
   if (role === "owner") {
@@ -180,6 +228,26 @@ function readOnlyResult(role) {
     href = PUBLIC_ROUTES.vendorWorkspace;
   } else {
     return recoveryResult();
+  }
+
+  if (intent === "PCM_EXITED_BILATERAL_CONTINUATION") {
+    return safeFreeze({
+      routeKey,
+      href,
+      gate: "G1_UI_SOURCE",
+      authorityGate: "G2_AUTH_RUNTIME",
+      reason: "PCM_EXITED_BILATERAL_CONTINUATION",
+      payloadPolicy: "PRESERVE_BILATERAL_CASE_CONTINUATION",
+      canMutate: false,
+      caseMode: "BILATERAL_CONTINUATION",
+      pcmMode: "HISTORICAL_READ_ONLY",
+      caseClosed: false,
+      caseArchived: false,
+      bilateralContinuationAllowed: true,
+      newPcmOperationsAllowed: false,
+      rejoinRequiresNewAuthorization: true,
+      preserveResources: BILATERAL_CONTINUATION_RESOURCES,
+    });
   }
 
   return safeFreeze({
@@ -202,8 +270,8 @@ export function resolvePcmFlowContinuation(context) {
     const intent = strictContext.intent;
     const role = strictContext.role;
 
-    if (intent === "PCM_EXITED_READ_ONLY" || intent === "CASE_CLOSED_READ_ONLY") {
-      return readOnlyResult(role);
+    if (intent === "PCM_EXITED_BILATERAL_CONTINUATION" || intent === "CASE_CLOSED_READ_ONLY") {
+      return workspaceOutcome(intent, role);
     }
 
     if (isAuthorityRequiredIntent(intent)) {

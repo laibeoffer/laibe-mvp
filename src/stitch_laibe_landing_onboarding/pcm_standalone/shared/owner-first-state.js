@@ -1,7 +1,61 @@
-const NO_ACTIONS = Object.freeze([]);
-const ORIGINAL_WORKSPACES = Object.freeze(["ownerWorkspace", "vendorWorkspace"]);
+const safeArrayIsArray = Array.isArray;
+const safeCreate = Object.create;
+const safeDefineProperty = Object.defineProperty;
+const safeFreeze = Object.freeze;
+const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const safeGetPrototypeOf = Object.getPrototypeOf;
+const safeSetPrototypeOf = Object.setPrototypeOf;
+const ordinaryObjectPrototype = Object.prototype;
+const iteratorKey = Symbol.iterator;
 
-const freezeRecord = (record) => Object.freeze({
+function iteratorResult(done, value) {
+  const result = safeCreate(null);
+  safeDefineProperty(result, "done", { value: done, enumerable: true });
+  safeDefineProperty(result, "value", { value, enumerable: true });
+  return safeFreeze(result);
+}
+
+function freezeOwnList(...items) {
+  const list = [];
+  safeSetPrototypeOf(list, null);
+  for (let index = 0; index < items.length; index += 1) {
+    safeDefineProperty(list, String(index), {
+      value: items[index],
+      enumerable: true,
+    });
+  }
+  safeDefineProperty(list, iteratorKey, {
+    value: () => {
+      let index = 0;
+      const iterator = safeCreate(null);
+      safeDefineProperty(iterator, "next", {
+        value: () => index < list.length
+          ? iteratorResult(false, list[index++])
+          : iteratorResult(true, undefined),
+      });
+      safeDefineProperty(iterator, iteratorKey, { value: () => iterator });
+      return safeFreeze(iterator);
+    },
+  });
+  return safeFreeze(list);
+}
+
+const NO_ACTIONS = freezeOwnList();
+const ORIGINAL_WORKSPACES = freezeOwnList("ownerWorkspace", "vendorWorkspace");
+const BILATERAL_CONTINUATION_RESOURCES = freezeOwnList(
+  "workspaces",
+  "contract",
+  "documents",
+  "messages",
+  "schedules",
+  "evidence",
+  "acceptance",
+  "changes",
+  "addenda",
+  "caseRecords",
+);
+
+const freezeRecord = (record) => safeFreeze({
   ...record,
   actions: NO_ACTIONS,
   ...(record.workspaceRoutes ? { workspaceRoutes: ORIGINAL_WORKSPACES } : {}),
@@ -71,17 +125,25 @@ export const OWNER_FIRST_CLOSED_STATES = Object.freeze({
     payloadPolicy: "ZERO_CASE_DATA",
     mutationAllowed: false,
   }),
-  PCM_EXITED_READ_ONLY: freezeRecord({
-    code: "PCM_EXITED_READ_ONLY",
-    type: "CLOSED",
-    title: "PCM 已退出，案件內容保留查閱",
-    reason: "甲乙方仍留在原工作台查看已授權的既有文件、決定與紀錄。",
-    nextAction: "留在原工作台確認目前狀態與最近紀錄。",
+  PCM_EXITED_BILATERAL_CONTINUATION: freezeRecord({
+    code: "PCM_EXITED_BILATERAL_CONTINUATION",
+    type: "CONTINUATION",
+    title: "PCM 已退出，甲乙雙方繼續案件",
+    reason: "原工作台、文件、訊息、排程、證據、驗收、變更、附約與案件紀錄持續可用；新的 PCM 操作停止。",
+    nextAction: "甲乙雙方依原案件紀錄繼續處理；需要 PCM 重新加入時，另行取得新授權。",
     responsibleRole: "甲方與乙方",
     recoveryLabel: "返回原工作台",
-    payloadPolicy: "PRESERVE_AUTHORIZED_EXISTING_CONTENT",
+    payloadPolicy: "PRESERVE_BILATERAL_CASE_CONTINUATION",
     mutationAllowed: false,
     workspaceRoutes: ORIGINAL_WORKSPACES,
+    caseMode: "BILATERAL_CONTINUATION",
+    pcmMode: "HISTORICAL_READ_ONLY",
+    caseClosed: false,
+    caseArchived: false,
+    bilateralContinuationAllowed: true,
+    newPcmOperationsAllowed: false,
+    rejoinRequiresNewAuthorization: true,
+    preserveResources: BILATERAL_CONTINUATION_RESOURCES,
   }),
   CASE_CLOSED_READ_ONLY: freezeRecord({
     code: "CASE_CLOSED_READ_ONLY",
@@ -126,14 +188,14 @@ function readClosedStateCode(input) {
   }
 
   try {
-    if (Array.isArray(input)) {
+    if (safeArrayIsArray(input)) {
       return null;
     }
-    const prototype = Object.getPrototypeOf(input);
-    if (prototype !== Object.prototype && prototype !== null) {
+    const prototype = safeGetPrototypeOf(input);
+    if (prototype !== ordinaryObjectPrototype && prototype !== null) {
       return null;
     }
-    const descriptor = Object.getOwnPropertyDescriptor(input, "code");
+    const descriptor = safeGetOwnPropertyDescriptor(input, "code");
     if (!descriptor || !("value" in descriptor) || typeof descriptor.value !== "string") {
       return null;
     }
@@ -146,7 +208,7 @@ function readClosedStateCode(input) {
 export function resolveOwnerFirstState(input) {
   const code = readClosedStateCode(input);
   const descriptor = code
-    ? Object.getOwnPropertyDescriptor(OWNER_FIRST_CLOSED_STATES, code)
+    ? safeGetOwnPropertyDescriptor(OWNER_FIRST_CLOSED_STATES, code)
     : null;
   return descriptor?.value ?? OWNER_FIRST_CLOSED_STATES.CONTEXT_UNAVAILABLE;
 }

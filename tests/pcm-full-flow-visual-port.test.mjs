@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
@@ -15,6 +16,7 @@ const sourceRoot = path.join(
   "stitch_laibe_landing_onboarding",
 );
 const pcmRoot = path.join(sourceRoot, "pcm_standalone");
+const VISUAL_PORT_EVIDENCE_COMMIT = "7c033382164e8f29218bf6ffb4afd3c953e88da6";
 
 const targets = Object.freeze({
   service: path.join(pcmRoot, "service_contract"),
@@ -106,28 +108,29 @@ test("four canonical PCM visual-port pages exist with local CSS and module runti
   }
 });
 
-test("service contract preserves the orange document-case and complete reading controls", async () => {
+test("service contract preserves the orange contract language and current decision-first reading controls", async () => {
   const [html, css] = await Promise.all([
     readTarget("service", "code.html"),
     readTarget("service", "styles.css"),
   ]);
 
   for (const landmark of [
-    "contract-case",
-    "contract-case__tray",
-    "contract-sheet",
-    "contract-sheet--summary",
-    "contract-sheet--statement",
+    "contract-scene",
+    "contract-dossier",
+    "status-board",
+    "dossier-copy",
+    "contract-paper",
     "完整契約",
-    "列印此份草稿",
-    "開始簽署",
+    "列印 / 本機預覽",
+    "尚未進入簽署",
   ]) {
     assert.match(html, new RegExp(landmark));
   }
-  assert.equal(count(html, /class="contract-sheet(?:\s|")/g), 2);
+  assert.equal(count(html, /data-contract/g), 1);
   assert.match(css, /--source-orange:\s*#e5581e/i);
-  assert.match(css, /\.contract-case\s*\{/);
-  assert.match(css, /\.contract-sheet\s*\{/);
+  assert.match(css, /\.contract-scene\s*\{/);
+  assert.match(css, /\.contract-dossier\s*\{/);
+  assert.match(css, /\.contract-paper\s*\{/);
   assert.match(css, /@media\s+print/);
 });
 
@@ -488,14 +491,14 @@ test("visual ports retain responsive, focus, disabled and reduced-motion states"
   }
 });
 
-test("visual-port manifest closes the exact write set and every non-manifest artifact receipt", async () => {
-  const manifestPath = path.join(
-    repositoryRoot,
-    "docs",
-    "governance",
-    "pcm-full-flow-visual-port-manifest.v1.json",
+test("historical visual-port manifest stays bound to its immutable evidence commit", async () => {
+  const manifestRelativePath = "docs/governance/pcm-full-flow-visual-port-manifest.v1.json";
+  const manifestBytes = execFileSync(
+    "git",
+    ["show", `${VISUAL_PORT_EVIDENCE_COMMIT}:${manifestRelativePath}`],
+    { cwd: repositoryRoot, encoding: null },
   );
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const manifest = JSON.parse(manifestBytes.toString("utf8"));
   const expectedWriteSet = [
     "docs/governance/pcm-full-flow-visual-port-manifest.v1.json",
     "docs/superpowers/plans/2026-08-02-pcm-full-flow-visual-port.md",
@@ -524,7 +527,12 @@ test("visual-port manifest closes the exact write set and every non-manifest art
   );
 
   for (const receipt of manifest.artifactReceipts) {
-    const canonical = canonicalUtf8LfReceipt(await readFile(path.join(repositoryRoot, receipt.path)));
+    const historicalBytes = execFileSync(
+      "git",
+      ["show", `${VISUAL_PORT_EVIDENCE_COMMIT}:${receipt.path}`],
+      { cwd: repositoryRoot, encoding: null },
+    );
+    const canonical = canonicalUtf8LfReceipt(historicalBytes);
     assert.equal(canonical.bytes, receipt.bytes, receipt.path);
     assert.equal(canonical.sha256, receipt.sha256, receipt.path);
     assert.equal(canonical.gitBlobSha1, receipt.gitBlobSha1, receipt.path);

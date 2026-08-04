@@ -193,7 +193,7 @@ const requiredFailureCodes = Object.freeze([
   "ACCESS_UNCONFIRMED",
   "SUPPLEMENT_OVERDUE",
   "CASE_CANCELLED",
-  "PCM_EXITED_READ_ONLY",
+  "PCM_EXITED_BILATERAL_CONTINUATION",
   "CASE_CLOSED_READ_ONLY",
 ]);
 
@@ -310,7 +310,7 @@ test("legacy pages remain compatibility aliases and never become canonical steps
   }
 });
 
-test("failure matrix is complete, typed closed, actionable, and recoverable", async () => {
+test("failure and continuation matrix is complete, typed, actionable, and recoverable", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
   const matrix = PCM_FLOW_ROUTE_MANIFEST.failureMatrix;
   const edges = PCM_FLOW_ROUTE_MANIFEST.failureEdges;
@@ -320,7 +320,7 @@ test("failure matrix is complete, typed closed, actionable, and recoverable", as
   for (const code of requiredFailureCodes) {
     const state = matrix[code];
     assert.equal(state.code, code);
-    assert.equal(state.type, "CLOSED");
+    assert.equal(state.type, code === "PCM_EXITED_BILATERAL_CONTINUATION" ? "CONTINUATION" : "CLOSED");
     assert.equal(state.mutationAllowed, false);
     assert.equal(typeof state.reason, "string");
     assert.notEqual(state.reason.trim(), "");
@@ -355,21 +355,31 @@ test("failure matrix is complete, typed closed, actionable, and recoverable", as
   }
 });
 
-test("read-only outcomes stay in original workspaces with no mutation actions", async () => {
+test("PCM exit preserves bilateral continuation while closed cases remain read-only", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
 
-  for (const code of ["PCM_EXITED_READ_ONLY", "CASE_CLOSED_READ_ONLY"]) {
-    const state = PCM_FLOW_ROUTE_MANIFEST.failureMatrix[code];
-    assert.equal(state.returnRoute, "accessUnavailable");
-    assert.equal(state.recoveryRoute, "accessUnavailable");
-    assert.equal(state.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
-    assert.equal(state.mutationAllowed, false);
-    assert.deepEqual(state.actions, []);
-    assert.deepEqual(state.workspaceByRole, {
-      owner: "ownerWorkspace",
-      vendor: "vendorWorkspace",
-    });
-  }
+  const continuation = PCM_FLOW_ROUTE_MANIFEST.failureMatrix.PCM_EXITED_BILATERAL_CONTINUATION;
+  assert.equal(continuation.type, "CONTINUATION");
+  assert.equal(continuation.payloadPolicy, "PRESERVE_BILATERAL_CASE_CONTINUATION");
+  assert.equal(continuation.mutationAllowed, false);
+  assert.equal(continuation.caseMode, "BILATERAL_CONTINUATION");
+  assert.equal(continuation.pcmMode, "HISTORICAL_READ_ONLY");
+  assert.equal(continuation.caseClosed, false);
+  assert.equal(continuation.caseArchived, false);
+  assert.equal(continuation.bilateralContinuationAllowed, true);
+  assert.equal(continuation.newPcmOperationsAllowed, false);
+  assert.equal(continuation.rejoinRequiresNewAuthorization, true);
+  assert.deepEqual([...continuation.preserveResources], [
+    "workspaces", "contract", "documents", "messages", "schedules",
+    "evidence", "acceptance", "changes", "addenda", "caseRecords",
+  ]);
+  assert.deepEqual(continuation.workspaceByRole, { owner: "ownerWorkspace", vendor: "vendorWorkspace" });
+
+  const closed = PCM_FLOW_ROUTE_MANIFEST.failureMatrix.CASE_CLOSED_READ_ONLY;
+  assert.equal(closed.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
+  assert.equal(closed.mutationAllowed, false);
+  assert.deepEqual([...closed.actions], []);
+  assert.deepEqual(closed.workspaceByRole, { owner: "ownerWorkspace", vendor: "vendorWorkspace" });
 
   const overdue = PCM_FLOW_ROUTE_MANIFEST.failureMatrix.SUPPLEMENT_OVERDUE;
   assert.equal(overdue.responsibleActor, overdue.responsibleRole);
@@ -389,15 +399,61 @@ test("read-only outcomes stay in original workspaces with no mutation actions", 
   });
 });
 
-test("read-only outcomes bind exact primitive roles without vendor-to-owner fallback", async () => {
+test("PCM continuation actions and exact resource list reject post-load Array pollution", async () => {
+  const { PCM_FLOW_ROUTE_MANIFEST } = await import(`${routeManifestUrl.href}?continuation-list=${Date.now()}`);
+  const { resolvePcmFlowContinuation } = await import(`${publicContractUrl.href}?continuation-list=${Date.now()}`);
+  const originalIndex = Object.getOwnPropertyDescriptor(Array.prototype, "0");
+  const originalIterator = Object.getOwnPropertyDescriptor(Array.prototype, Symbol.iterator);
+  let manifestAction;
+  let manifestResources;
+  let resolverResources;
+
+  try {
+    Object.defineProperty(Array.prototype, "0", {
+      configurable: true,
+      value: "forged-action",
+    });
+    Object.defineProperty(Array.prototype, Symbol.iterator, {
+      configurable: true,
+      value: function* forgedContinuationIterator() {
+        yield "forged-resource";
+      },
+    });
+
+    const continuation = PCM_FLOW_ROUTE_MANIFEST.failureMatrix.PCM_EXITED_BILATERAL_CONTINUATION;
+    manifestAction = continuation.actions[0];
+    manifestResources = [...continuation.preserveResources].join("|");
+    resolverResources = [
+      ...resolvePcmFlowContinuation({
+        intent: "PCM_EXITED_BILATERAL_CONTINUATION",
+        role: "owner",
+      }).preserveResources,
+    ].join("|");
+  } finally {
+    if (originalIndex) Object.defineProperty(Array.prototype, "0", originalIndex);
+    else delete Array.prototype[0];
+    if (originalIterator) Object.defineProperty(Array.prototype, Symbol.iterator, originalIterator);
+    else delete Array.prototype[Symbol.iterator];
+  }
+
+  const exactResources = "workspaces|contract|documents|messages|schedules|evidence|acceptance|changes|addenda|caseRecords";
+  assert.equal(manifestAction, undefined);
+  assert.equal(manifestResources, exactResources);
+  assert.equal(resolverResources, exactResources);
+});
+
+test("continuation and closed outcomes bind exact primitive roles without vendor-to-owner fallback", async () => {
   const { resolvePcmFlowContinuation } = await import(publicContractUrl.href);
 
-  for (const intent of ["PCM_EXITED_READ_ONLY", "CASE_CLOSED_READ_ONLY"]) {
+  for (const intent of ["PCM_EXITED_BILATERAL_CONTINUATION", "CASE_CLOSED_READ_ONLY"]) {
+    const expectedPolicy = intent === "PCM_EXITED_BILATERAL_CONTINUATION"
+      ? "PRESERVE_BILATERAL_CASE_CONTINUATION"
+      : "PRESERVE_EXISTING_CASE_READ_ONLY";
     const owner = resolvePcmFlowContinuation({ intent, role: "owner" });
     assert.equal(owner.routeKey, "ownerWorkspace");
     assert.equal(typeof owner.href, "string");
     assert.equal(owner.authorityGate, "G2_AUTH_RUNTIME");
-    assert.equal(owner.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
+    assert.equal(owner.payloadPolicy, expectedPolicy);
     assert.equal(owner.canMutate, false);
 
     const vendor = resolvePcmFlowContinuation({ intent, role: "vendor" });
@@ -405,7 +461,7 @@ test("read-only outcomes bind exact primitive roles without vendor-to-owner fall
     assert.notEqual(vendor.routeKey, "ownerWorkspace");
     assert.equal(vendor.href, null);
     assert.equal(vendor.authorityGate, "G2_AUTH_RUNTIME");
-    assert.equal(vendor.payloadPolicy, "PRESERVE_EXISTING_CASE_READ_ONLY");
+    assert.equal(vendor.payloadPolicy, expectedPolicy);
     assert.equal(vendor.canMutate, false);
 
     const inherited = Object.create({ role: "owner" });
@@ -434,7 +490,7 @@ test("resolver remains closed after prototype and intrinsic pollution", async ()
     getPrototypeOf: () => Object.prototype,
     getOwnPropertyDescriptor: (_target, property) => {
       if (property === "intent") {
-        return { configurable: true, enumerable: true, value: "PCM_EXITED_READ_ONLY" };
+        return { configurable: true, enumerable: true, value: "PCM_EXITED_BILATERAL_CONTINUATION" };
       }
       if (property === "role") {
         return { configurable: true, enumerable: true, value: "owner" };
@@ -515,14 +571,14 @@ test("resolver ignores post-load Array iterator pollution for internal context",
       configurable: true,
       writable: true,
       value: function* poisonedAuthorityIterator() {
-        yield "PCM_EXITED_READ_ONLY";
+        yield "PCM_EXITED_BILATERAL_CONTINUATION";
         yield "owner";
       },
     });
     try {
       unknown = resolvePcmFlowContinuation({ intent: "UNKNOWN" });
       owner = resolvePcmFlowContinuation({
-        intent: "PCM_EXITED_READ_ONLY",
+        intent: "PCM_EXITED_BILATERAL_CONTINUATION",
         role: "owner",
       });
       vendor = resolvePcmFlowContinuation({
@@ -941,20 +997,20 @@ test("unknown and caller-asserted authority returns zero-case-data recovery", as
   }
 });
 
-test("current contract and current plan contain only approved read-only state names and schedule", async () => {
+test("current contract and plan use bilateral PCM-exit continuation and approved closed state names", async () => {
   const currentFiles = [
     "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
     "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
     "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
     "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
-    "docs/governance/pcm-owner-first-execution-manifest.v1.json",
   ];
   const currentContract = (
     await Promise.all(currentFiles.map((path) => readFile(new URL(path, repositoryRoot), "utf8")))
   ).join("\n");
 
   assert.doesNotMatch(currentContract, /\bARCHIVED_READ_ONLY\b/);
-  assert.match(currentContract, /PCM_EXITED_READ_ONLY/);
+  assert.doesNotMatch(currentContract, /PCM_EXITED_READ_ONLY/);
+  assert.match(currentContract, /PCM_EXITED_BILATERAL_CONTINUATION/);
   assert.match(currentContract, /CASE_CLOSED_READ_ONLY/);
   assert.match(currentContract, /888af2fb98f8a202e76ce3135d8e3f0ad66087fb/);
   assert.match(currentContract, /SUPERSEDED_PRE_CORRECTION/);

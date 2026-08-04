@@ -12,6 +12,7 @@ const HTML_URL = new URL("code.html", PAGE_ROOT);
 const CSS_URL = new URL("styles.css", PAGE_ROOT);
 const APP_URL = new URL("app.js", PAGE_ROOT);
 const SEED = "64539be0b93170a916106dbd61e9ca5841f83b2b";
+const ADMITTED_SOURCE = "bfcfd2461443864cac4b2fbb4874dbc45a8084cc";
 const EXACT_PATHS = [
   "src/stitch_laibe_landing_onboarding/pcm_standalone/case_setup/code.html",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/case_setup/styles.css",
@@ -190,27 +191,20 @@ test("primary action sends keyboard focus to the preparation section", async () 
   );
 });
 
-test("T6 source candidate is immediate exact four with outside zero", () => {
+test("T6 source admission remains immutable after serial integration", () => {
   const cwd = ROOT;
-  const head = execFileSync("git", ["rev-parse", "HEAD"], { cwd, encoding: "utf8" }).trim();
-  let changed;
-  if (head === SEED) {
-    changed = execFileSync("git", ["status", "--porcelain=v1", "--untracked-files=all"], {
-      cwd,
-      encoding: "utf8",
-    })
-      .split(/\r?\n/u)
-      .filter(Boolean)
-      .map((line) => line.slice(3).replaceAll("\\", "/"));
-  } else {
-    assert.equal(execFileSync("git", ["rev-parse", "HEAD^"], { cwd, encoding: "utf8" }).trim(), SEED);
-    changed = execFileSync("git", ["diff", "--name-only", `${SEED}..${head}`], {
-      cwd,
-      encoding: "utf8",
-    })
-      .trim()
-      .split(/\r?\n/u)
-      .filter(Boolean);
+  const gitText = (...args) => execFileSync("git", args, {
+    cwd,
+    encoding: "utf8",
+  }).trim();
+  assert.equal(gitText("rev-parse", `${ADMITTED_SOURCE}^`), SEED);
+  const changed = gitText("diff", "--name-only", `${SEED}..${ADMITTED_SOURCE}`)
+    .split(/\r?\n/u)
+    .filter(Boolean)
+    .sort();
+  assert.deepEqual(changed, EXACT_PATHS);
+  for (const path of EXACT_PATHS.filter((item) => !item.startsWith("tests/"))) {
+    assert.equal(gitText("rev-parse", `HEAD:${path}`), gitText("rev-parse", `${ADMITTED_SOURCE}:${path}`), path);
   }
-  assert.deepEqual(changed.sort(), EXACT_PATHS);
+  assert.equal(gitText("cat-file", "-t", `${ADMITTED_SOURCE}:tests/pcm-owner-first-case-setup.test.mjs`), "blob");
 });

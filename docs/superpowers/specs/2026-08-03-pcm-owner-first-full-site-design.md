@@ -13,7 +13,9 @@
 - Focused admission commit `403e4f7b84b3e5ee999db583bd23b65732e369d4` received `CHANGES_REQUIRED` because internal parsed context still depended on the shared Array iterator and the governance JSON contained duplicate evidence keys.
 - T2 homepage work is byte-identically held outside the repository until the Array-iterator/evidence correction receives A0 focused admission.
 - `403e4f7b84b3e5ee999db583bd23b65732e369d4` is historical T0 evidence only and is not the current review target.
-- The current review target is the T3 hero-action correction whose sole correction parent is `74b606297c391615d76de505759bceda4756ec57`.
+- T3 quotation check is admitted at exact `f16b6d8191634eba9cc7037237e17f471363e312`.
+- T6 case-setup source is admitted at exact `bfcfd2461443864cac4b2fbb4874dbc45a8084cc`; T7 service-contract source is admitted at exact `db289177da74283d3075383d7714318aa9760951`.
+- The unique integration writer mechanically absorbed the admitted T6 and T7 product/test blobs in local commit `6bc25bab3b4cadaa16c6deae6b24207bc7d4007c`. Shared route, state, evidence, and browser integration remain a separate serial gate.
 - This train owns G1 source only. G2 identity/role, G3 durable records, and G4 production remain closed.
 
 ## Product outcome
@@ -75,9 +77,11 @@ PCM 公開首頁
    → PCM 退出／案件取消／結案與三方確認
 ```
 
-## Read-only outcomes
+## PCM exit and read-only outcomes
 
-Only `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` are canonical read-only outcomes. They do not create another workspace. An own primitive role of `owner` maps only to `ownerWorkspace`; an own primitive role of `vendor` maps only to `vendorWorkspace`. Missing, inherited, accessor-backed, non-primitive, or unknown roles fail closed to `accessUnavailable` with `ZERO_CASE_DATA`. Existing content stays visible only after G2 confirms authority, PCM no longer intervenes after exit, `mutationAllowed` is false, and `actions` is an empty list. Cancelled cases use the same role-bound original-workspace principle and retain only existing traceable content.
+`PCM_EXITED_BILATERAL_CONTINUATION` is the canonical PCM-exit state. It does not close or archive the case and does not create another workspace. The owner and vendor remain in their original workspaces, where contract, documents, messages, schedules, evidence, acceptance, changes, addenda, and case records continue under later G2/G3 authority. New PCM reviews, supplement requests, and PCM operations stop; historical PCM records remain read-only. PCM re-entry requires new authorization and cannot retroactively approve decisions made during the exit period.
+
+`CASE_CLOSED_READ_ONLY` is the separate closed-case outcome. An own primitive role of `owner` maps only to `ownerWorkspace`; an own primitive role of `vendor` maps only to `vendorWorkspace`. Missing, inherited, accessor-backed, non-primitive, or unknown roles fail closed to `accessUnavailable` with `ZERO_CASE_DATA`. G1 exposes no mutation authority for either state; later runtime adapters must enforce the bilateral-versus-closed distinction rather than treating PCM exit as whole-case read-only.
 
 ## Failure and recovery contract
 
@@ -93,7 +97,7 @@ Only `PCM_EXITED_READ_ONLY` and `CASE_CLOSED_READ_ONLY` are canonical read-only 
 - an explicit closed `payloadPolicy`
 - `mutationAllowed: false`
 
-Identity, membership, access, and pre-membership invitation failures use `ZERO_CASE_DATA`. File failures retain only limited file metadata or submission/version references. Contract failures retain only contract references. Cancelled, PCM-exited, and closed cases preserve already-authorized case content as read-only without enabling new actions. The overdue-supplement state permits only viewing pending details, contacting the responsible actor, or returning to the original workspace; it does not claim a write or record action. Every failure code has a non-mutating recovery edge.
+Identity, membership, access, and pre-membership invitation failures use `ZERO_CASE_DATA`. File failures retain only limited file metadata or submission/version references. Contract failures retain only contract references. Cancelled and closed cases preserve only already-authorized content as read-only. PCM exit instead preserves bilateral case continuation while removing new PCM authority; the exact continuation resource set is `workspaces`, `contract`, `documents`, `messages`, `schedules`, `evidence`, `acceptance`, `changes`, `addenda`, and `caseRecords`. The overdue-supplement state permits only viewing pending details, contacting the responsible actor, or returning to the original workspace; it does not claim a write or record action. Every failure code has a non-mutating G1 recovery edge.
 
 The required matrix covers invitation declined/expired/withdrawn/resend, missing paired quotation or drawing, invalid/oversized/wrong-page-count/unreadable/corrupted files, duplicate submission, version conflict, contract prerequisites, mutual version acceptance, identity/membership/access confirmation, overdue supplement, cancellation, PCM exit, and case closeout.
 
@@ -117,8 +121,16 @@ Operational pages show role, PCM contract state, case state, next responsible ac
 - `owner-first-tokens.css` defines the restrained near-black surfaces, orange-red primary action, cyan viewing action, typography, spacing, focus, and 44px control floor without claiming a page has adopted them.
 - `owner-first-shell.css` provides one five-fact information spine, state copy layout, primary/secondary controls, 1280/768/390-safe sizing, clear keyboard focus, and reduced-motion behavior. It does not create a card wall or a second navigation system.
 - `owner-first-state.js` exposes only frozen product-language state descriptions. Missing, malformed, inherited, hostile, URL-derived, or caller-asserted context resolves to `CONTEXT_UNAVAILABLE` with `ZERO_CASE_DATA` and no actions.
-- The closed set is `CONTEXT_UNAVAILABLE`, `AUTH_REQUIRED`, `ACCESS_DENIED`, `PREREQUISITES_PENDING`, `SERVICE_PREPARING`, `PCM_EXITED_READ_ONLY`, and `CASE_CLOSED_READ_ONLY`.
-- The two approved read-only outcomes preserve only previously authorized existing content in the original owner or vendor workspace. They never create a separate archive workspace and never enable mutation.
+- The fail-closed set is `CONTEXT_UNAVAILABLE`, `AUTH_REQUIRED`, `ACCESS_DENIED`, `PREREQUISITES_PENDING`, `SERVICE_PREPARING`, and `CASE_CLOSED_READ_ONLY`; `PCM_EXITED_BILATERAL_CONTINUATION` is a distinct continuation state.
+- PCM exit preserves the exact bilateral resource set in the original owner and vendor workspaces while disabling new PCM operations. Case close preserves only previously authorized content read-only. Neither state creates a separate archive workspace, and G1 grants no mutation.
+
+## T6 and T7 serial integration candidate
+
+The unique integration writer uses exact parent `6bc25bab3b4cadaa16c6deae6b24207bc7d4007c`. Its bounded product/evidence write set is the three shared route/state sources, five focused shared tests, this specification, and the current execution plan. The admitted T6 and T7 page/test blobs remain byte-frozen from `bfcfd2461443864cac4b2fbb4874dbc45a8084cc` and `db289177da74283d3075383d7714318aa9760951`.
+
+The initial direct-descendant full suite was 260/264: four failures were stale evidence assertions that treated the descendant HEAD as an older immutable review commit or expected the pre-T7 visual structure. Focused TDD then reproduced the old PCM-exit semantics at 63/71. The serial correction binds historical evidence to its declared immutable Git commit, defines `PCM_EXITED_BILATERAL_CONTINUATION`, keeps `caseSetup` planned at G2 with `href:null`, and preserves the G1 service-contract reading route without enabling signing. A further actual Array-prototype RED was 18/19; continuation actions, workspace lists, and the exact ten-resource set now use frozen null-prototype lists with own iterators across the route manifest, public resolver, and shared state. Fresh focused evidence is 73/73 and the complete enumerated PCM suite is 15 files, 266/266.
+
+Fresh browser acceptance covers both pages at 1280×900, 768×1024, 390×844, 390×640, 1280×768, and the 640×450 CSS viewport used for 200% reflow. Every run has horizontal overflow 0, visible controls below 44px 0, broken fragments/images 0, enabled write controls 0, and visible role/current state/next responsibility/recent record. Six directly requested local HTML/CSS/logo resources returned HTTP 200 and browser console warnings/errors were 0. The case-setup CTA reaches and focuses `#preparation`; the service-contract CTA reaches `#full-contract`, while the signing control remains disabled and local print preview remains available.
 
 ## Visual and interaction system
 
