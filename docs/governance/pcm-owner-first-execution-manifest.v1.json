@@ -569,10 +569,10 @@
     ],
     "selfRecorderReceipt": {
       "path": "docs/governance/pcm-owner-first-execution-manifest.v1.json",
-      "bytes": 95300,
-      "normalizedBytes": 98850,
-      "sha256": "1a22646eafa4384fc4d9dd6a2912231bbdc56ad1d2f7e6d9884e199895e82e83",
-      "gitBlobSha1": "1df364441dc521948684d09ce8ae7481c41fbdd4",
+      "bytes": 100282,
+      "normalizedBytes": 103872,
+      "sha256": "97c629907f4b644f80f5379b71b5ce1ebca2cdee4513559a40131c266b4be700",
+      "gitBlobSha1": "80f165e09f3e6df9a3ec60154593c8fa2a0f38fe",
       "scope": "current_manifest_normalized_self_receipt",
       "convention": "ZERO_SELF_HASH_FIELDS_JSON_2SP_UTF8_LF_ONE_TRAILING_LF",
       "bytesByteDomain": "final_raw_manifest_bytes",
@@ -1955,6 +1955,15 @@
     ],
     "outsideWriteSet": 0,
     "publicContractByteFrozen": true,
+    "initialIntegrationCandidate": {
+      "head": "a07adf377cf8b5005ece078a84984b11ce09fe37",
+      "parent": "bd3e0678eba2bd272f05b7e787ef99a954cbb9ee",
+      "tree": "e4f5ab4d0559eb313fda4963065c4691ba4a7487",
+      "verdict": "CHANGES_REQUIRED_G1_ADMISSION_CLOSED",
+      "critical": 0,
+      "important": 1,
+      "finding": "post-load control setAttribute could rewrite an exact trusted href and a polluted removeAttribute could leave an unsafe href on a closed control"
+    },
     "red": {
       "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs tests/pcm-owner-first-public-home.test.mjs",
       "tests": 33,
@@ -2082,9 +2091,103 @@
         "scope": "declared_git_blob_bytes"
       }
     ],
+    "artifactReceiptCommit": "a07adf377cf8b5005ece078a84984b11ce09fe37",
+    "domMethodCorrection": {
+      "authorityVerdict": "A0_T5_SHARED_INTEGRATION_A07ADF3_FOCUSED_G1_CHANGES_REQUIRED_20260804",
+      "correctionParent": "a07adf377cf8b5005ece078a84984b11ce09fe37",
+      "writeSet": [
+        "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+        "tests/pcm-owner-first-public-home.test.mjs",
+        "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+        "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+        "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md"
+      ],
+      "outsideWriteSet": 0,
+      "frozen": [
+        "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+        "src/stitch_laibe_landing_onboarding/pcm_standalone/public/public-contract.js",
+        "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
+        "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/styles.css",
+        "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access",
+        "T0-T4 and T6+ product sources"
+      ],
+      "red": {
+        "command": "node --test tests/pcm-owner-first-public-home.test.mjs",
+        "tests": 17,
+        "passed": 16,
+        "failed": 1,
+        "exitCode": 1,
+        "actualFailure": "trusted account href became javascript:alert(1) after post-load setAttribute rewrite"
+      },
+      "implementation": {
+        "domMethods": "module-load captured branded Element.prototype setAttribute/removeAttribute/getAttribute with captured Reflect.apply",
+        "routeNameRead": "captured getAttribute data-route",
+        "activationOrder": "verified closed projection before exact trusted href write and exact readback",
+        "failurePolicy": "no throw; failed write or verification returns to no-href planned state"
+      },
+      "focusedGreen": {
+        "command": "node --test tests/pcm-owner-first-route-manifest.test.mjs tests/pcm-owner-first-public-home.test.mjs",
+        "tests": 36,
+        "passed": 36,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "fullSuite": {
+        "command": "fresh enumeration of tests/pcm-*.test.mjs",
+        "files": 13,
+        "tests": 243,
+        "passed": 243,
+        "failed": 0,
+        "exitCode": 0
+      },
+      "browser": {
+        "engine": "Playwright with installed local Chrome; no download or installation",
+        "origin": "http://127.0.0.1:8832",
+        "viewports": ["1280x900", "768x1024", "390x844"],
+        "normalAccountJourney": "3/3 exact local destination HTTP 200",
+        "destinationContext": "CONTEXT_UNAVAILABLE_3/3",
+        "destinationEnabledWrites": 0,
+        "destinationCasePayloadMarkers": 0,
+        "horizontalOverflow": 0,
+        "visibleControlsUnder44": 0,
+        "consoleWarningsOrErrors": 0,
+        "networkFailuresOrNon2xx": 0,
+        "hostileDomProbe": "3/3 exact account href retained; unknown unsafe href removed; aria-disabled true; tabindex -1"
+      },
+      "artifactReceipts": [
+        {
+          "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+          "bytes": 7005,
+          "sha256": "66439451e1f8689acd22ba053bb451eafef6a15d7d922281f011bfed999153a3",
+          "gitBlobSha1": "d72c590d4537bdd3e1ffe73dd767ef075d6a6852"
+        },
+        {
+          "path": "tests/pcm-owner-first-public-home.test.mjs",
+          "bytes": 28773,
+          "sha256": "56db8416a5b366f1f2283551058f422b9c366e0b2cd7e339502c134a4ee0f722",
+          "gitBlobSha1": "0c3f2e11da73aca16b6b273a14916c13bde6f39e"
+        },
+        {
+          "path": "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+          "bytes": 20061,
+          "sha256": "b049d1f4fda3069d2e0306298580e2955c98872b5c9dc85da69c73fd0ab837ff",
+          "gitBlobSha1": "ff87c07d52b49f7172540372c718231880bade9d"
+        },
+        {
+          "path": "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+          "bytes": 48301,
+          "sha256": "02ac27e3d7f5d3400914d7af6b07021c3247cac53258c7d5bcb7703103e0bccb",
+          "gitBlobSha1": "bedaa588febedef933e96874a864317889a844c4"
+        }
+      ],
+      "review": {
+        "mainline": "critical0_important0_after_fresh_adversarial_and_full_browser_gates",
+        "a0FocusedReview": "pending_exact_immutable_correction_commit"
+      }
+    },
     "manifestReceiptRef": "t3.selfRecorderReceipt",
     "independentReview": {
-      "status": "mainline_complete_a0_focused_review_pending",
+      "status": "mainline_c0_i0_superseded_by_separate_a0_finding",
       "critical": 0,
       "important": 0,
       "minor": 0,
@@ -2092,16 +2195,16 @@
         "admitted account source blobs are byte-identical after mechanical absorption",
         "canonical account route remains G1-only and resolves with zero case data and no write authority",
         "historical T4 receipts are bound to immutable exact 35bb499 commit bytes",
-        "delegated read-only review was stopped after it produced no verdict; mainline exact-nine review is C0/I0 and A0 remains the independent admission reviewer"
+        "this mainline review is historical only; the separate initialIntegrationCandidate field records the later A0 Important finding"
       ]
     },
     "gates": {
-      "G1_UI_SOURCE": "candidate_pending_a0_review",
+      "G1_UI_SOURCE": "bounded_correction_pending_immutable_commit_and_a0_review",
       "G2_AUTH_RUNTIME": "closed",
       "G3_DURABLE_DATA": "closed",
       "G4_PRODUCTION": "closed",
-      "T6": "closed_pending_t5_admission",
-      "T7": "closed_pending_t5_admission"
+      "T6": "closed_pending_corrected_t5_admission",
+      "T7": "closed_pending_corrected_t5_admission"
     }
   },
   "gates": [

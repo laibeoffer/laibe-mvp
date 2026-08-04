@@ -162,6 +162,8 @@ Hero projection authority is the canonical object identity exported by `QUOTE_CH
 
 T3 activates `quoteCheck` at `../quote_check/code.html`. T4 serial integration activates `drawingCheck` at `../drawing_check/code.html` and the two quote/drawing completion edges. T5 serial integration activates `accountAccess` at `../account_access/code.html` and the homepage account edge while preserving zero case data and no write authority. Compatibility pages remain aliases and never become canonical steps.
 
+The T5 homepage binder treats DOM mutation methods as part of the authority boundary. It captures the branded `Element.prototype.setAttribute`, `removeAttribute`, and `getAttribute` methods plus `Reflect.apply` at module load; post-load control/prototype overrides cannot rewrite an admitted local href or prevent a closed control from losing an unsafe href. A route control is first projected to a verified no-`href` closed state, then activated only when the exact trusted route pair can be written and read back unchanged. Any failed write or verification returns the control to the closed projection without navigation authority.
+
 ### Quantitative CTA contrast
 
 Quotation-check primary actions retain the shared orange gradient but use a page-local `#080b0d` foreground. At the computed 14px size, contrast against `#ffb145`, `#ff711f`, and `#ff4925` is respectively 10.93:1, 7.17:1, and 5.86:1. Each gradient node therefore exceeds the 4.5:1 normal-text requirement without changing the shared T1 system, secondary actions, focus treatment, layout, or interaction behavior.

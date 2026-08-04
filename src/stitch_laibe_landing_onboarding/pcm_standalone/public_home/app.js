@@ -6,6 +6,7 @@ import {
 } from "../integrations/a14-line-contract.js";
 
 const getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const reflectApply = Reflect.apply;
 
 function readOwnDataValue(input, property) {
   try {
@@ -20,6 +21,39 @@ function readOwnDataValue(input, property) {
     return getOwnPropertyDescriptor(descriptor, "value")?.value;
   } catch {
     return undefined;
+  }
+}
+
+const elementConstructor = readOwnDataValue(globalThis, "Element");
+const elementPrototype = readOwnDataValue(elementConstructor, "prototype");
+const elementSetAttribute = readOwnDataValue(elementPrototype, "setAttribute");
+const elementRemoveAttribute = readOwnDataValue(elementPrototype, "removeAttribute");
+const elementGetAttribute = readOwnDataValue(elementPrototype, "getAttribute");
+
+function callElementMethod(method, element, args) {
+  try {
+    if (typeof method !== "function" || typeof reflectApply !== "function") {
+      return false;
+    }
+    reflectApply(method, element, args);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function readElementAttribute(element, name) {
+  try {
+    if (
+      typeof elementGetAttribute !== "function" ||
+      typeof reflectApply !== "function"
+    ) {
+      return null;
+    }
+    const value = reflectApply(elementGetAttribute, element, [name]);
+    return typeof value === "string" ? value : null;
+  } catch {
+    return null;
   }
 }
 
@@ -67,10 +101,57 @@ function getTrustedRouteHref(routes, routeName) {
 }
 
 function closeRouteControl(element) {
-  element.removeAttribute("href");
-  element.setAttribute("aria-disabled", "true");
-  element.setAttribute("tabindex", "-1");
-  element.dataset.routeState = "planned";
+  const hrefRemoved = callElementMethod(elementRemoveAttribute, element, ["href"]);
+  const disabledSet = callElementMethod(elementSetAttribute, element, [
+    "aria-disabled",
+    "true",
+  ]);
+  const tabindexSet = callElementMethod(elementSetAttribute, element, [
+    "tabindex",
+    "-1",
+  ]);
+  const stateSet = callElementMethod(elementSetAttribute, element, [
+    "data-route-state",
+    "planned",
+  ]);
+  return (
+    hrefRemoved &&
+    disabledSet &&
+    tabindexSet &&
+    stateSet &&
+    readElementAttribute(element, "href") === null &&
+    readElementAttribute(element, "aria-disabled") === "true" &&
+    readElementAttribute(element, "tabindex") === "-1" &&
+    readElementAttribute(element, "data-route-state") === "planned"
+  );
+}
+
+function activateRouteControl(element, href) {
+  if (!closeRouteControl(element)) return false;
+
+  const hrefSet = callElementMethod(elementSetAttribute, element, ["href", href]);
+  const disabledRemoved = callElementMethod(elementRemoveAttribute, element, [
+    "aria-disabled",
+  ]);
+  const tabindexRemoved = callElementMethod(elementRemoveAttribute, element, [
+    "tabindex",
+  ]);
+  const stateSet = callElementMethod(elementSetAttribute, element, [
+    "data-route-state",
+    "active",
+  ]);
+  const activated =
+    hrefSet &&
+    disabledRemoved &&
+    tabindexRemoved &&
+    stateSet &&
+    readElementAttribute(element, "href") === href &&
+    readElementAttribute(element, "aria-disabled") === null &&
+    readElementAttribute(element, "tabindex") === null &&
+    readElementAttribute(element, "data-route-state") === "active";
+
+  if (!activated) closeRouteControl(element);
+  return activated;
 }
 
 export function bindPublicRoutes(root, routes = PUBLIC_ROUTES) {
@@ -81,17 +162,9 @@ export function bindPublicRoutes(root, routes = PUBLIC_ROUTES) {
 
     for (let index = 0; index < controlCount; index += 1) {
       const element = controls[index];
-      const routeName = element?.dataset?.route;
+      const routeName = readElementAttribute(element, "data-route");
       const href = getTrustedRouteHref(routes, routeName);
-      if (href) {
-        element.setAttribute("href", href);
-        element.removeAttribute("aria-disabled");
-        element.removeAttribute("tabindex");
-        element.dataset.routeState = "active";
-        continue;
-      }
-
-      closeRouteControl(element);
+      if (!href || !activateRouteControl(element, href)) closeRouteControl(element);
     }
   } catch {
     return;

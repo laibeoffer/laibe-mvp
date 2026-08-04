@@ -20,14 +20,35 @@ const planUrl = new URL(
   import.meta.url,
 );
 
+class RouteTestElement {
+  constructor(route) {
+    this.dataset = { route };
+    this.attributes = new Map([["data-route", route]]);
+  }
+
+  setAttribute(name, value) {
+    const stringValue = String(value);
+    this.attributes.set(name, stringValue);
+    if (name === "data-route-state") this.dataset.routeState = stringValue;
+  }
+
+  removeAttribute(name) {
+    this.attributes.delete(name);
+    if (name === "data-route-state") delete this.dataset.routeState;
+  }
+
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+}
+
+Object.defineProperty(globalThis, "Element", {
+  configurable: true,
+  value: RouteTestElement,
+});
+
 function makeRouteControl(route) {
-  return {
-    dataset: { route },
-    attributes: new Map(),
-    setAttribute(name, value) { this.attributes.set(name, String(value)); },
-    removeAttribute(name) { this.attributes.delete(name); },
-    getAttribute(name) { return this.attributes.get(name) ?? null; },
-  };
+  return new RouteTestElement(route);
 }
 
 function assertRouteClosed(control) {
@@ -175,15 +196,8 @@ test("mobile header keeps account and decision actions without stacking secondar
 
 test("route binding activates only routes with a real href", async () => {
   const { bindPublicRoutes } = await import(`${appUrl.href}?bind=${Date.now()}`);
-  const makeControl = (route) => ({
-    dataset: { route },
-    attributes: new Map(),
-    setAttribute(name, value) { this.attributes.set(name, String(value)); },
-    removeAttribute(name) { this.attributes.delete(name); },
-    getAttribute(name) { return this.attributes.get(name) ?? null; },
-  });
-  const planned = makeControl("quoteCheck");
-  const active = makeControl("serviceContract");
+  const planned = makeRouteControl("quoteCheck");
+  const active = makeRouteControl("serviceContract");
   const root = { querySelectorAll: () => [planned, active] };
 
   bindPublicRoutes(root, {
@@ -203,19 +217,12 @@ test("route binding activates only routes with a real href", async () => {
 
 test("route binding rejects inherited, non-string, non-local, and unknown href values", async () => {
   const { bindPublicRoutes } = await import(`${appUrl.href}?closed=${Date.now()}`);
-  const makeControl = (route) => ({
-    dataset: { route },
-    attributes: new Map(),
-    setAttribute(name, value) { this.attributes.set(name, String(value)); },
-    removeAttribute(name) { this.attributes.delete(name); },
-    getAttribute(name) { return this.attributes.get(name) ?? null; },
-  });
   const cases = [
-    { control: makeControl("quoteCheck"), routes: Object.create({ quoteCheck: "javascript:alert(1)" }) },
-    { control: makeControl("quoteCheck"), routes: { quoteCheck: "javascript:alert(1)" } },
-    { control: makeControl("quoteCheck"), routes: { quoteCheck: { href: "../quote_check/code.html" } } },
-    { control: makeControl("quoteCheck"), routes: { quoteCheck: " ../quote_check/code.html" } },
-    { control: makeControl("unknownRoute"), routes: { serviceContract: "../service_contract/code.html" } },
+    { control: makeRouteControl("quoteCheck"), routes: Object.create({ quoteCheck: "javascript:alert(1)" }) },
+    { control: makeRouteControl("quoteCheck"), routes: { quoteCheck: "javascript:alert(1)" } },
+    { control: makeRouteControl("quoteCheck"), routes: { quoteCheck: { href: "../quote_check/code.html" } } },
+    { control: makeRouteControl("quoteCheck"), routes: { quoteCheck: " ../quote_check/code.html" } },
+    { control: makeRouteControl("unknownRoute"), routes: { serviceContract: "../service_contract/code.html" } },
   ];
 
   for (const item of cases) {
@@ -223,6 +230,100 @@ test("route binding rejects inherited, non-string, non-local, and unknown href v
     assert.equal(item.control.getAttribute("href"), null);
     assert.equal(item.control.getAttribute("aria-disabled"), "true");
     assert.equal(item.control.dataset.routeState, "planned");
+  }
+});
+
+test("route binding uses module-load captured DOM methods for exact href writes and closed removal", async () => {
+  const { bindPublicRoutes } = await import(`${appUrl.href}?dom-methods=${Date.now()}`);
+  const setDescriptor = Object.getOwnPropertyDescriptor(RouteTestElement.prototype, "setAttribute");
+  const removeDescriptor = Object.getOwnPropertyDescriptor(RouteTestElement.prototype, "removeAttribute");
+  const getDescriptor = Object.getOwnPropertyDescriptor(RouteTestElement.prototype, "getAttribute");
+  const trusted = makeRouteControl("accountAccess");
+  const closed = makeRouteControl("unknownRoute");
+  closed.attributes.set("href", "javascript:alert(2)");
+  let poisonedSetCalls = 0;
+  let poisonedRemoveCalls = 0;
+  let poisonedGetCalls = 0;
+
+  try {
+    Object.defineProperty(RouteTestElement.prototype, "setAttribute", {
+      ...setDescriptor,
+      value(name, value) {
+        poisonedSetCalls += 1;
+        this.attributes.set(name, name === "href" ? "javascript:alert(1)" : String(value));
+      },
+    });
+    Object.defineProperty(RouteTestElement.prototype, "removeAttribute", {
+      ...removeDescriptor,
+      value() {
+        poisonedRemoveCalls += 1;
+      },
+    });
+    Object.defineProperty(RouteTestElement.prototype, "getAttribute", {
+      ...getDescriptor,
+      value() {
+        poisonedGetCalls += 1;
+        return "javascript:alert(3)";
+      },
+    });
+
+    assert.doesNotThrow(() => {
+      bindPublicRoutes(
+        { querySelectorAll: () => [trusted, closed] },
+        { accountAccess: "../account_access/code.html" },
+      );
+    });
+
+    assert.equal(trusted.attributes.get("href"), "../account_access/code.html");
+    assert.equal(trusted.attributes.has("aria-disabled"), false);
+    assert.equal(trusted.attributes.has("tabindex"), false);
+    assert.equal(trusted.attributes.get("data-route-state"), "active");
+    assert.equal(closed.attributes.has("href"), false);
+    assert.equal(closed.attributes.get("aria-disabled"), "true");
+    assert.equal(closed.attributes.get("tabindex"), "-1");
+    assert.equal(closed.attributes.get("data-route-state"), "planned");
+    assert.equal(poisonedSetCalls, 0);
+    assert.equal(poisonedRemoveCalls, 0);
+    assert.equal(poisonedGetCalls, 0);
+
+    const throwingTrusted = makeRouteControl("accountAccess");
+    const throwingClosed = makeRouteControl("unknownRoute");
+    throwingClosed.attributes.set("href", "data:text/html,unsafe");
+    Object.defineProperty(RouteTestElement.prototype, "setAttribute", {
+      ...setDescriptor,
+      value() {
+        throw new Error("polluted setAttribute");
+      },
+    });
+    Object.defineProperty(RouteTestElement.prototype, "removeAttribute", {
+      ...removeDescriptor,
+      value() {
+        throw new Error("polluted removeAttribute");
+      },
+    });
+    Object.defineProperty(RouteTestElement.prototype, "getAttribute", {
+      ...getDescriptor,
+      value() {
+        throw new Error("polluted getAttribute");
+      },
+    });
+
+    assert.doesNotThrow(() => {
+      bindPublicRoutes(
+        { querySelectorAll: () => [throwingTrusted, throwingClosed] },
+        { accountAccess: "../account_access/code.html" },
+      );
+    });
+    assert.equal(throwingTrusted.attributes.get("href"), "../account_access/code.html");
+    assert.equal(throwingTrusted.attributes.get("data-route-state"), "active");
+    assert.equal(throwingClosed.attributes.has("href"), false);
+    assert.equal(throwingClosed.attributes.get("aria-disabled"), "true");
+    assert.equal(throwingClosed.attributes.get("tabindex"), "-1");
+    assert.equal(throwingClosed.attributes.get("data-route-state"), "planned");
+  } finally {
+    Object.defineProperty(RouteTestElement.prototype, "setAttribute", setDescriptor);
+    Object.defineProperty(RouteTestElement.prototype, "removeAttribute", removeDescriptor);
+    Object.defineProperty(RouteTestElement.prototype, "getAttribute", getDescriptor);
   }
 });
 
@@ -360,6 +461,84 @@ test("footer links only to visible owner-first sections", async () => {
   assert.match(footer, /href="#service-fee"[^>]*>\s*費用與服務邊界\s*<\/a>/);
   assert.match(html, /<section\s+id="case-flow"/);
   assert.match(html, /<section\s+id="service-fee"/);
+});
+
+test("T5 DOM-method correction closes the exact-five current byte set", async () => {
+  const manifestBytes = await readFile(governanceUrl);
+  const manifest = JSON.parse(manifestBytes.toString("utf8"));
+  const correction = manifest.t5SourceIntegration.domMethodCorrection;
+  const expectedPaths = [
+    "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/app.js",
+    "tests/pcm-owner-first-public-home.test.mjs",
+    "docs/governance/pcm-owner-first-execution-manifest.v1.json",
+    "docs/superpowers/specs/2026-08-03-pcm-owner-first-full-site-design.md",
+    "docs/superpowers/plans/2026-08-03-laibe-pcm-end-to-end-flow-integration.md",
+  ].sort();
+  const repositoryRoot = new URL("../", import.meta.url);
+
+  assert.equal(correction.correctionParent, "a07adf377cf8b5005ece078a84984b11ce09fe37");
+  assert.deepEqual([...correction.writeSet].sort(), expectedPaths);
+  assert.equal(correction.outsideWriteSet, 0);
+  assert.deepEqual(correction.red, {
+    command: "node --test tests/pcm-owner-first-public-home.test.mjs",
+    tests: 17,
+    passed: 16,
+    failed: 1,
+    exitCode: 1,
+    actualFailure:
+      "trusted account href became javascript:alert(1) after post-load setAttribute rewrite",
+  });
+  assert.deepEqual(correction.focusedGreen, {
+    command:
+      "node --test tests/pcm-owner-first-route-manifest.test.mjs tests/pcm-owner-first-public-home.test.mjs",
+    tests: 36,
+    passed: 36,
+    failed: 0,
+    exitCode: 0,
+  });
+  assert.deepEqual(correction.fullSuite, {
+    command: "fresh enumeration of tests/pcm-*.test.mjs",
+    files: 13,
+    tests: 243,
+    passed: 243,
+    failed: 0,
+    exitCode: 0,
+  });
+
+  assert.deepEqual(
+    correction.artifactReceipts.map((receipt) => receipt.path).sort(),
+    expectedPaths.filter((path) => path !== "docs/governance/pcm-owner-first-execution-manifest.v1.json"),
+  );
+  for (const receipt of correction.artifactReceipts) {
+    const bytes = await readFile(new URL(receipt.path, repositoryRoot));
+    const sha256 = createHash("sha256").update(bytes).digest("hex");
+    const gitBlobSha1 = createHash("sha1")
+      .update(`blob ${bytes.length}\0`)
+      .update(bytes)
+      .digest("hex");
+    assert.equal(receipt.bytes, bytes.length, receipt.path);
+    assert.equal(receipt.sha256, sha256, receipt.path);
+    assert.equal(receipt.gitBlobSha1, gitBlobSha1, receipt.path);
+  }
+
+  const normalized = JSON.parse(manifestBytes.toString("utf8"));
+  normalized.t3.selfRecorderReceipt.sha256 = "0".repeat(64);
+  normalized.t3.selfRecorderReceipt.gitBlobSha1 = "0".repeat(40);
+  const normalizedBytes = Buffer.from(`${JSON.stringify(normalized, null, 2)}\n`, "utf8");
+  const selfReceipt = manifest.t3.selfRecorderReceipt;
+  assert.equal(selfReceipt.bytes, manifestBytes.length);
+  assert.equal(selfReceipt.normalizedBytes, normalizedBytes.length);
+  assert.equal(
+    selfReceipt.sha256,
+    createHash("sha256").update(normalizedBytes).digest("hex"),
+  );
+  assert.equal(
+    selfReceipt.gitBlobSha1,
+    createHash("sha1")
+      .update(`blob ${normalizedBytes.length}\0`)
+      .update(normalizedBytes)
+      .digest("hex"),
+  );
 });
 
 test("T2 evidence distinguishes current exact-five writes from the authorized historical hold", async () => {

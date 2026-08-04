@@ -270,6 +270,9 @@
 - [x] Activate only `accountAccess` at `../account_access/code.html`, make `home→accountAccess` clickable, and convert the header to a fail-closed `data-route="accountAccess"` control that becomes active only through trusted route binding. No Auth, case payload, network, persistence, or write authority is granted.
 - [x] Run the first full-suite checkpoint: 238/241, with exactly two intentional active-train assertions still requiring account `planned` plus the normalized manifest self receipt pending. Bring those two tests into the same serial integration package; no source page behavior changed.
 - [x] Close exact-nine receipts, normalized self receipt, fresh 34/34 route/home focused, 241/241 full suite, and the 1280×900／768×1024／390×844 homepage→account journey. All three destinations are `CONTEXT_UNAVAILABLE` with case payload 0, enabled write controls 0, and overflow／under-44px／console／network failures 0.
+- [x] Reproduce the A0 hostile DOM-method finding against exact `a07adf3`: post-load `setAttribute` rewrote the trusted account href to `javascript:`, while a no-op `removeAttribute` left an unsafe href on a closed control. The new production-function regression was 16/17 RED before implementation.
+- [x] Capture the branded `Element.prototype` set/remove/get methods and `Reflect.apply` at module load, read the route name through the captured getter, close every control before activation, and verify the exact href and closed attributes after each operation. Rewritten, no-op, and throwing post-load hooks now have zero authority; the focused production-function suite is 17/17 GREEN.
+- [ ] Close the bounded exact-five correction receipts, fresh focused/full/browser evidence, local commit, and A0 focused admission. T6/T7 remain closed until that exact admission.
 - [ ] Create the bounded local integration commit and obtain A0 focused admission before T6/T7 source lanes begin.
 
 ---
