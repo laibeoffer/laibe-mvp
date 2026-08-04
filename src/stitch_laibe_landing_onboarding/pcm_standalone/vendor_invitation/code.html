@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="LaiBE AI PCM 乙方邀請狀態頁，說明身分、案件成員、授權與下一步。"
+    />
+    <title>乙方案件邀請｜LaiBE AI PCM</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="../shared/owner-first-shell.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-invitation-state="CONTEXT_UNAVAILABLE">
+    <a class="skip-link" href="#invitation-main">跳到邀請內容</a>
+
+    <header class="invitation-header" id="top">
+      <div class="invitation-header__inner">
+        <a class="invitation-brand" href="../public_home/code.html#top" aria-label="返回 LaiBE AI PCM 首頁">
+          <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+          <span>AI PCM</span>
+        </a>
+        <a class="invitation-header__back" href="../public_home/code.html#top">返回 PCM 首頁</a>
+      </div>
+    </header>
+
+    <main class="owner-first-shell invitation-shell" id="invitation-main">
+      <section class="invitation-hero" aria-labelledby="invitation-title">
+        <div class="invitation-hero__copy">
+          <p class="invitation-eyebrow">乙方案件邀請｜由甲方案件發起</p>
+          <h1 id="invitation-title">你只能從甲方的案件邀請進入</h1>
+          <p class="invitation-hero__lead">
+            乙方沒有公開加入案件入口。第一版不按專業分科；先確認帳號、邀請、案件成員與可查看範圍，才會提供工作台入口。
+          </p>
+        </div>
+
+        <aside class="invitation-gate" aria-label="目前邀請狀態">
+          <span>目前邀請狀態</span>
+          <strong>尚未確認邀請情境</strong>
+          <p>目前不顯示姓名、地址、文件或其他案件內容，也不會接受任何回覆。</p>
+          <a
+            class="owner-first-primary-action invitation-primary-action"
+            data-primary-action
+            data-canonical-route="/account/access"
+            href="../account_access/code.html"
+          >前往共用帳號入口</a>
+        </aside>
+      </section>
+
+      <section class="owner-first-facts invitation-facts" aria-label="目前邀請與案件事實">
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">角色</span>
+          <strong class="owner-first-fact-value">受邀乙方</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">契約狀態</span>
+          <strong class="owner-first-fact-value">尚未確認共同版本</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">案件狀態</span>
+          <strong class="owner-first-fact-value">尚未顯示案件資料</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">下一步／責任人</span>
+          <strong class="owner-first-fact-value">目前使用者｜先確認帳號</strong>
+        </div>
+        <div data-owner-fact>
+          <span class="owner-first-fact-label">最近紀錄</span>
+          <strong class="owner-first-fact-value">尚無可顯示紀錄</strong>
+        </div>
+      </section>
+
+      <section class="invitation-zero" aria-label="資料顯示邊界">
+        <strong>未確認，就不帶入案件。</strong>
+        <p>身分、案件成員或案件權限任何一項無法確認，都維持零案件資料、不送出變更，也不前往受保護的案件入口。</p>
+      </section>
+
+      <section class="invitation-details" id="invitation-details" aria-labelledby="invitation-details-title">
+        <div class="invitation-details__intro">
+          <div>
+            <p class="invitation-section-kicker">邀請到工作台</p>
+            <h2 id="invitation-details-title">每一步都先確認誰在等誰</h2>
+          </div>
+          <p>
+            接受邀請只代表願意繼續確認，不等於已加入案件。案件成員與權限完成確認後，才可能進入乙方工作台。
+          </p>
+        </div>
+
+        <ol class="invitation-track" aria-label="邀請確認順序">
+          <li><span>1</span><strong>甲方建立案件邀請</strong><small>同一案件、同一受邀對象</small></li>
+          <li><span>2</span><strong>乙方確認帳號與邀請</strong><small>接受前不顯示案件內容</small></li>
+          <li><span>3</span><strong>確認案件成員與權限</strong><small>任何未知都停止</small></li>
+          <li><span>4</span><strong>進入原乙方工作台</strong><small>只看被邀請或已加入案件</small></li>
+        </ol>
+
+        <div class="invitation-actions" aria-label="邀請回覆狀態">
+          <div>
+            <span>回覆功能</span>
+            <strong>正在整理中</strong>
+            <p>本頁目前只說明狀態，不會送出或保存回覆。</p>
+          </div>
+          <div class="invitation-actions__controls">
+            <button type="button" data-write-action disabled aria-disabled="true">接受邀請</button>
+            <button type="button" data-write-action disabled aria-disabled="true">婉拒邀請</button>
+            <button type="button" data-write-action disabled aria-disabled="true">請甲方重新邀請</button>
+          </div>
+        </div>
+
+        <section class="state-catalog" aria-labelledby="state-catalog-title">
+          <header class="state-catalog__header">
+            <div>
+              <p class="invitation-section-kicker">所有邀請結果</p>
+              <h3 id="state-catalog-title">原因、下一步與恢復方式</h3>
+            </div>
+            <p>拒絕、逾期與撤回後，原邀請不能再次接受；重新邀請必須建立新的邀請識別。</p>
+          </header>
+
+          <div class="state-list">
+            <details data-state-code="INVITATION_PENDING" open>
+              <summary><span>等待回覆</span><strong>邀請等待乙方回覆</strong><em>受邀乙方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>甲方已提出案件邀請，乙方尚未完成回覆。</dd></div>
+                <div><dt>下一步</dt><dd>乙方先從共用帳號入口確認身分，再閱讀邀請內容。</dd></div>
+                <div><dt>責任人</dt><dd>受邀乙方</dd></div>
+                <div><dt>返回位置</dt><dd>共用帳號入口</dd></div>
+                <div><dt>恢復方式</dt><dd>確認帳號與通知一致後，由原邀請入口重新進入。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="DECLINED">
+              <summary><span>已結束</span><strong>邀請已被婉拒</strong><em>甲方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>乙方已拒絕這次案件邀請，原邀請不能再接受。</dd></div>
+                <div><dt>下一步</dt><dd>甲方決定是否改邀其他乙方，或建立全新的邀請。</dd></div>
+                <div><dt>責任人</dt><dd>甲方</dd></div>
+                <div><dt>返回位置</dt><dd>共用帳號入口或 PCM 首頁</dd></div>
+                <div><dt>恢復方式</dt><dd>若雙方重新確認合作，由甲方使用新的邀請識別重新邀請。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="EXPIRED">
+              <summary><span>已結束</span><strong>邀請已逾期</strong><em>甲方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>原邀請已超過可回覆期間，不能用原入口繼續接受。</dd></div>
+                <div><dt>下一步</dt><dd>甲方重新確認合作對象與聯絡資料。</dd></div>
+                <div><dt>責任人</dt><dd>甲方</dd></div>
+                <div><dt>返回位置</dt><dd>共用帳號入口或 PCM 首頁</dd></div>
+                <div><dt>恢復方式</dt><dd>由甲方建立新的邀請識別後，再通知乙方重新進入。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="WITHDRAWN">
+              <summary><span>已結束</span><strong>邀請已由甲方撤回</strong><em>甲方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>甲方已收回這次案件邀請，原邀請不再有效。</dd></div>
+                <div><dt>下一步</dt><dd>乙方不需重複嘗試；由甲方決定後續安排。</dd></div>
+                <div><dt>責任人</dt><dd>甲方</dd></div>
+                <div><dt>返回位置</dt><dd>共用帳號入口或 PCM 首頁</dd></div>
+                <div><dt>恢復方式</dt><dd>若要再次合作，甲方必須建立新的邀請識別。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="RESENT_PENDING">
+              <summary><span>新邀請</span><strong>新邀請等待乙方回覆</strong><em>受邀乙方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>甲方已用新的邀請識別重新提出案件邀請。</dd></div>
+                <div><dt>下一步</dt><dd>乙方核對新通知、身分與案件摘要後再決定。</dd></div>
+                <div><dt>責任人</dt><dd>受邀乙方</dd></div>
+                <div><dt>返回位置</dt><dd>新邀請入口</dd></div>
+                <div><dt>恢復方式</dt><dd>新通知無法使用時，回到共用帳號入口重新確認。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="ACCEPTANCE_PENDING_MEMBERSHIP">
+              <summary><span>確認中</span><strong>已回覆接受，等待成員確認</strong><em>甲方與萊比</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>接受意向不等於已取得案件權限，案件成員關係仍待確認。</dd></div>
+                <div><dt>下一步</dt><dd>確認帳號、邀請對象與案件成員資料是否一致。</dd></div>
+                <div><dt>責任人</dt><dd>甲方與萊比</dd></div>
+                <div><dt>返回位置</dt><dd>乙方邀請狀態頁</dd></div>
+                <div><dt>恢復方式</dt><dd>成員確認完成後才會提供正式工作台入口。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="MEMBERSHIP_UNCONFIRMED">
+              <summary><span>需核對</span><strong>案件成員仍無法確認</strong><em>甲方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>目前無法證明這個帳號是該案件受邀加入的乙方。</dd></div>
+                <div><dt>下一步</dt><dd>甲方核對受邀 Email 與案件成員資料。</dd></div>
+                <div><dt>責任人</dt><dd>甲方</dd></div>
+                <div><dt>返回位置</dt><dd>乙方邀請狀態頁</dd></div>
+                <div><dt>恢復方式</dt><dd>資料一致後重新確認；確認前維持零案件資料。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="AUTHORIZED_VENDOR_WORKSPACE">
+              <summary><span>可進入</span><strong>乙方工作台資格已確認</strong><em>受邀乙方</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>身分、案件成員與案件授權均已由可信流程確認。</dd></div>
+                <div><dt>下一步</dt><dd>由正式案件入口進入原乙方工作台。</dd></div>
+                <div><dt>責任人</dt><dd>受邀乙方</dd></div>
+                <div><dt>返回位置</dt><dd>乙方邀請狀態頁</dd></div>
+                <div><dt>恢復方式</dt><dd>權限出現差異時停止進入，回到邀請狀態重新確認。</dd></div>
+              </dl>
+            </details>
+
+            <details data-state-code="CONTEXT_UNAVAILABLE">
+              <summary><span>安全預設</span><strong>目前無法確認邀請情境</strong><em>目前使用者</em></summary>
+              <dl>
+                <div><dt>原因</dt><dd>這個入口沒有足夠資料可確認身分、邀請或案件成員關係。</dd></div>
+                <div><dt>下一步</dt><dd>先前往共用帳號入口確認目前使用者。</dd></div>
+                <div><dt>責任人</dt><dd>目前使用者</dd></div>
+                <div><dt>返回位置</dt><dd>共用帳號入口</dd></div>
+                <div><dt>恢復方式</dt><dd>確認帳號後，從甲方正式通知的邀請入口重新進入。</dd></div>
+              </dl>
+            </details>
+          </div>
+        </section>
+      </section>
+
+      <section class="invitation-boundary" aria-labelledby="invitation-boundary-title">
+        <div>
+          <p class="invitation-section-kicker">產品邊界</p>
+          <h2 id="invitation-boundary-title">邀請是案件入口，不是公開找案入口</h2>
+        </div>
+        <p>
+          乙方只會看到被邀請或已加入的案件範圍。每次邀請、回覆、重發、成員確認與權限結果，都必須能連回人、時間、案件與下一位處理者。
+        </p>
+      </section>
+    </main>
+
+    <footer class="invitation-footer">
+      <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+      <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
