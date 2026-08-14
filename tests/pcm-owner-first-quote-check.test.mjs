@@ -683,14 +683,17 @@ test("document tabs connect the selected capsule to the active panel with access
   assert.match(css, /\.document-tabs button:focus-visible/u);
 });
 
-test("document tabs keep readable snap targets on mobile and respect reduced motion", async () => {
+test("document tabs keep every actionable target fully visible on mobile and respect reduced motion", async () => {
   const css = await readFile(cssPath, "utf8");
 
   assert.match(
     css,
-    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs\s*\{[^}]*scroll-snap-type:\s*x mandatory/u,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*overflow-x:\s*visible/u,
   );
-  assert.match(css, /\.document-tabs button\s*\{[^}]*scroll-snap-align:\s*center/u);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs button\s*\{[^}]*width:\s*100%;[^}]*min-width:\s*0/u,
+  );
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/u);
 });
 

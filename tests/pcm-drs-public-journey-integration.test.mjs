@@ -89,6 +89,31 @@ test("public home no longer requests the missing hero SVG", async () => {
   }
 });
 
+test("public home presents the fixed pre-contract journey and external contract copy hides internal enums", async () => {
+  const [home, contract] = await Promise.all([
+    readFile(paths.publicHome, "utf8"),
+    readFile(resolve(pcmRoot, "service_contract/code.html"), "utf8"),
+  ]);
+  const homeText = visibleText(home);
+  const contractText = visibleText(contract);
+
+  for (const phrase of [
+    "免費文件健檢",
+    "基本報告",
+    "2 分鐘摘要",
+    "建立帳號",
+    "註冊後",
+    "完整需求",
+    "DRS 服務與契約",
+  ]) {
+    assert.match(homeText, new RegExp(phrase));
+  }
+  assert.match(homeText, /正式 DRS[\s\S]*完成服務契約後/u);
+  assert.doesNotMatch(homeText, /建立案件協作|案件進行中/u);
+  assert.match(contractText, /附約草案/u);
+  assert.doesNotMatch(contractText, /ADDENDUM_DRAFT/u);
+});
+
 test("owner preparation header collapses the expanded brand before the 390px breakpoint", async () => {
   const [html, css] = await Promise.all([
     readFile(paths.ownerStart, "utf8"),

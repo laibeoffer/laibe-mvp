@@ -114,6 +114,30 @@ test("unregistered visitors receive an actionable four-stage DRS path immediatel
   );
 });
 
+test("unregistered visitor stages match the fixed journey without claiming early collaboration", async () => {
+  const html = await readFile(htmlUrl, "utf8");
+  const guide = readSection(html, "guest-guidance");
+
+  assert.match(guide, /免費文件健檢/);
+  assert.match(guide, /基本報告[\s\S]*2 分鐘摘要/);
+  assert.match(guide, /建立帳號[\s\S]*保存/);
+  assert.match(guide, /註冊後[\s\S]*完整需求[\s\S]*DRS 服務與契約/);
+  assert.match(guide, /正式 DRS[\s\S]*完成服務契約後/);
+  assert.match(guide, /帳號與保存功能正在整理中/);
+  assert.doesNotMatch(guide, /建立案件協作|案件進行中/);
+});
+
+test("owner risk cards become a true single-column mobile layout without hidden horizontal content", async () => {
+  const css = await readFile(cssUrl, "utf8");
+  const mobile = css.slice(css.lastIndexOf("@media (max-width: 680px)"));
+
+  assert.match(mobile, /\.risk-map__viewport\s*\{[^}]*overflow-x:\s*visible;/s);
+  assert.match(mobile, /\.risk-map\s*\{[^}]*min-width:\s*0;[^}]*grid-template-columns:\s*1fr;/s);
+  assert.match(mobile, /\.risk-map__item\s*\{[^}]*margin-left:\s*0;/s);
+  assert.match(mobile, /\.risk-map__card\s*\{[^}]*margin-left:\s*0;[^}]*border-radius:\s*18px;/s);
+  assert.match(mobile, /\.risk-map__icon\s*\{[^}]*display:\s*none;/s);
+});
+
 test("owner-confirmed application check stays hash-bound after the approved heading refinement", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const hashes = Object.fromEntries(

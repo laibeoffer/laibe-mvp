@@ -129,7 +129,8 @@ test("page explains the bounded draft-review-revision-confirmation sequence with
   assert.match(html, /本頁僅說明預定流程/);
   assert.match(html, /正式接受、簽署與可追溯收據尚未開放/);
   assert.match(html, /已生效的原契約維持不變/);
-  assert.match(html, /ADDENDUM_DRAFT/);
+  assert.match(html, /附約草案/);
+  assert.doesNotMatch(html, /ADDENDUM_DRAFT/);
   assert.match(html, /PCM 退出後[\s\S]*甲乙雙方可依既有紀錄繼續協商/);
   assert.match(html, /PCM 不成為締約、簽署或付款決定人/);
 });

@@ -4791,3 +4791,77 @@ a.entry-choice:focus-visible {
     width: 100%;
   }
 }
+
+/* 手機版風險清單改為真正單欄；所有說明都留在可視寬度內。 */
+@media (max-width: 680px) {
+  .risk-map__viewport {
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+
+  .risk-map {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 0;
+  }
+
+  .risk-map__core {
+    grid-column: 1;
+    grid-row: auto;
+    width: 136px;
+    height: 136px;
+    justify-self: start;
+    transform: none;
+  }
+
+  .risk-map__core-face {
+    width: 98px;
+    height: 98px;
+  }
+
+  .risk-map__core::after,
+  .risk-map__trunk,
+  .risk-map__branch,
+  .risk-map__card::before {
+    display: none;
+  }
+
+  .risk-map__list {
+    grid-column: 1;
+    grid-row: auto;
+    grid-auto-rows: auto;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .risk-map__item {
+    min-height: 0;
+    margin-left: 0;
+  }
+
+  .risk-map__item--far,
+  .risk-map__item--near {
+    margin-left: 0;
+  }
+
+  .risk-map__card {
+    grid-template-columns: minmax(0, 1fr) 48px;
+    height: auto;
+    min-height: 126px;
+    margin-left: 0;
+    padding: 18px;
+    gap: 12px;
+    border-radius: 18px;
+  }
+
+  .risk-map__number {
+    grid-column: 2;
+  }
+
+  .risk-map__icon {
+    display: none;
+  }
+}
