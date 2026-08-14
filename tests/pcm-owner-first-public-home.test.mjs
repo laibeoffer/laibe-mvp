@@ -88,6 +88,33 @@ test("homepage follows the full-screen hero then owner decision hierarchy", asyn
   assert.doesNotMatch(html, /data-hero-status/);
 });
 
+test("unregistered visitors receive an actionable four-stage DRS path immediately after the hero", async () => {
+  const [html, css] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(cssUrl, "utf8"),
+  ]);
+  const guide = readSection(html, "guest-guidance");
+  const stages = [...guide.matchAll(/<li\b[^>]*data-guest-stage="(\d)"[^>]*>[\s\S]*?<strong>([^<]+)<\/strong>/g)];
+
+  assert.ok(html.indexOf('id="guest-guidance"') > html.indexOf('id="hero"'));
+  assert.ok(html.indexOf('id="guest-guidance"') < html.indexOf('id="decision-prompts"'));
+  assert.match(guide, /LaiBE DRS/);
+  assert.match(guide, /目前尚未建立案件/);
+  assert.equal(stages.length, 4);
+  assert.deepEqual(stages.map((stage) => stage[1]), ["1", "2", "3", "4"]);
+  assert.match(guide, /data-guest-stage="1"[^>]*data-stage-state="active"/);
+  assert.match(
+    guide,
+    /data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?>\s*免費文件健檢\s*<\/a>/,
+  );
+  assert.match(css, /\.guest-guidance__stages\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(css, /\.guest-guidance__stage\[data-stage-state="active"\]\s*\{/);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*680px\)[\s\S]*?\.guest-guidance__stages\s*\{[^}]*grid-template-columns:\s*1fr;/,
+  );
+});
+
 test("owner-confirmed application check stays hash-bound after the approved heading refinement", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const hashes = Object.fromEntries(

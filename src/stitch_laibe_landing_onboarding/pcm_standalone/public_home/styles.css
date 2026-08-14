@@ -3069,6 +3069,211 @@ a.entry-choice:focus-visible {
   }
 }
 
+/* 未建立案件的訪客先看到可採取的第一步；四個數字是進程，不是裝飾。 */
+.guest-guidance {
+  width: min(calc(100% - 40px), 1480px);
+  margin: 0 auto;
+  padding: clamp(76px, 9vw, 132px) 0 clamp(88px, 10vw, 148px);
+  border-top: 1px solid rgba(201, 209, 215, 0.24);
+  scroll-margin-top: calc(var(--header-height) + 48px);
+}
+
+.guest-guidance__intro {
+  display: grid;
+  max-width: 760px;
+  gap: 12px;
+}
+
+.guest-guidance__eyebrow,
+.guest-guidance__state {
+  color: var(--accent-cyan);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.guest-guidance__status {
+  width: fit-content;
+  padding: 4px 10px;
+  border: 1px solid rgba(218, 175, 139, 0.56);
+  border-radius: var(--pill);
+  color: #ead7c6;
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.guest-guidance h2 {
+  max-width: 13ch;
+  margin-top: 8px;
+  color: var(--chapter-ink);
+  font-family: "Noto Serif TC", "Noto Serif HK", "PMingLiU", serif;
+  font-size: clamp(2.35rem, 4.8vw, 4.65rem);
+  line-height: 1.14;
+  letter-spacing: -0.04em;
+  text-wrap: pretty;
+}
+
+.guest-guidance__intro > p:last-child {
+  max-width: 48rem;
+  color: var(--chapter-copy);
+  font-size: clamp(1rem, 1.5vw, 1.14rem);
+}
+
+.guest-guidance__stages {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(18px, 2.8vw, 46px);
+  margin-top: clamp(46px, 6vw, 78px);
+  padding: 0;
+  list-style: none;
+}
+
+.guest-guidance__stages::before {
+  position: absolute;
+  z-index: 0;
+  top: 28px;
+  right: clamp(18px, 3vw, 50px);
+  left: clamp(18px, 3vw, 50px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent-orange), rgba(201, 209, 215, 0.2));
+  content: "";
+}
+
+.guest-guidance__stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 0;
+  gap: 20px;
+  padding-top: 0;
+}
+
+.guest-guidance__number {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid rgba(201, 209, 215, 0.35);
+  border-radius: 50%;
+  background: var(--bg-charcoal);
+  color: var(--chapter-copy);
+  font-family: "Noto Serif TC", "PMingLiU", serif;
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+.guest-guidance__stage[data-stage-state="active"] .guest-guidance__number {
+  border-color: var(--accent-orange);
+  background: var(--accent-orange);
+  box-shadow: 0 0 0 7px rgba(255, 88, 9, 0.13);
+  color: #1c0a02;
+}
+
+.guest-guidance__copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.guest-guidance__stage[data-stage-state="active"] {
+  padding: 16px;
+  margin: -16px;
+  border: 1px solid rgba(255, 88, 9, 0.36);
+  background: linear-gradient(145deg, rgba(255, 88, 9, 0.14), rgba(255, 255, 255, 0.018));
+}
+
+.guest-guidance__stage[data-stage-state="active"] .guest-guidance__state {
+  color: #ffd1b9;
+}
+
+.guest-guidance__copy strong {
+  color: var(--chapter-ink);
+  font-size: clamp(1.12rem, 1.55vw, 1.38rem);
+  line-height: 1.35;
+}
+
+.guest-guidance__copy p {
+  color: var(--chapter-copy);
+  font-size: 0.96rem;
+  line-height: 1.75;
+}
+
+.guest-guidance__action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 28px;
+  margin-top: clamp(52px, 7vw, 88px);
+  padding-top: 26px;
+  border-top: 1px solid rgba(201, 209, 215, 0.2);
+}
+
+.guest-guidance__action p {
+  color: var(--chapter-copy);
+  font-weight: 700;
+}
+
+.guest-guidance__action .button {
+  min-height: 52px;
+  padding-inline: 26px;
+}
+
+@media (max-width: 680px) {
+  .guest-guidance {
+    width: min(calc(100% - 32px), var(--max-width));
+    padding-block: 70px 84px;
+  }
+
+  .guest-guidance h2 {
+    max-width: 10ch;
+    font-size: clamp(2.2rem, 10vw, 3.25rem);
+  }
+
+  .guest-guidance__stages {
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: 46px;
+  }
+
+  .guest-guidance__stages::before {
+    top: 30px;
+    bottom: 30px;
+    left: 28px;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(180deg, var(--accent-orange), rgba(201, 209, 215, 0.18));
+  }
+
+  .guest-guidance__stage,
+  .guest-guidance__stage[data-stage-state="active"] {
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 18px;
+    margin: 0;
+    padding: 0 0 30px;
+    border: 0;
+    background: none;
+  }
+
+  .guest-guidance__stage[data-stage-state="active"] .guest-guidance__copy {
+    padding: 15px 16px;
+    border: 1px solid rgba(255, 88, 9, 0.36);
+    background: linear-gradient(145deg, rgba(255, 88, 9, 0.14), rgba(255, 255, 255, 0.018));
+  }
+
+  .guest-guidance__action {
+    display: grid;
+    margin-top: 18px;
+  }
+
+  .guest-guidance__action .button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Owner narrative: sections 4–9 only. The confirmed first three sections stay untouched. */
 .narrative-section {
   position: relative;

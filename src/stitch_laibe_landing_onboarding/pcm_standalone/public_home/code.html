@@ -233,6 +233,69 @@
       </section>
 
       <section
+        id="guest-guidance"
+        class="guest-guidance"
+        aria-labelledby="guest-guidance-title"
+      >
+        <div class="guest-guidance__intro">
+          <p class="guest-guidance__eyebrow">LaiBE DRS · Decision &amp; Record System</p>
+          <p class="guest-guidance__status">目前尚未建立案件 · 先從手上的文件開始</p>
+          <h2 id="guest-guidance-title">先釐清依據，再決定下一步。</h2>
+          <p>
+            LaiBE DRS 是裝潢決策系統：先把文件、差異與待確認事項整理清楚，
+            再決定是否進入案件協作與後續紀錄。
+          </p>
+        </div>
+
+        <ol class="guest-guidance__stages" aria-label="未建立案件時的四階段導引">
+          <li class="guest-guidance__stage" data-guest-stage="1" data-stage-state="active">
+            <span class="guest-guidance__number" aria-hidden="true">01</span>
+            <div class="guest-guidance__copy">
+              <span class="guest-guidance__state">你現在在這裡</span>
+              <strong>免費文件健檢</strong>
+              <p>上傳手上的報價單或施工圖，先看範圍、版本與缺漏是否需要釐清。</p>
+            </div>
+          </li>
+          <li class="guest-guidance__stage" data-guest-stage="2" data-stage-state="upcoming">
+            <span class="guest-guidance__number" aria-hidden="true">02</span>
+            <div class="guest-guidance__copy">
+              <span class="guest-guidance__state">接著進行</span>
+              <strong>看懂核對重點</strong>
+              <p>把需要確認的項目與文件版本放在同一個脈絡裡，避免只用總價做判斷。</p>
+            </div>
+          </li>
+          <li class="guest-guidance__stage" data-guest-stage="3" data-stage-state="upcoming">
+            <span class="guest-guidance__number" aria-hidden="true">03</span>
+            <div class="guest-guidance__copy">
+              <span class="guest-guidance__state">需要時再開始</span>
+              <strong>建立案件協作</strong>
+              <p>確認需要持續處理後，再邀請相關角色以同一份文件與待辦事項協作。</p>
+            </div>
+          </li>
+          <li class="guest-guidance__stage" data-guest-stage="4" data-stage-state="upcoming">
+            <span class="guest-guidance__number" aria-hidden="true">04</span>
+            <div class="guest-guidance__copy">
+              <span class="guest-guidance__state">案件進行中</span>
+              <strong>決定與紀錄一起留下</strong>
+              <p>把回覆、確認與變更整理成可回看的案件紀錄，讓後續每一步都有依據。</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="guest-guidance__action">
+          <p>先完成一次文件健檢，再決定是否建立案件。</p>
+          <a
+            class="button button--primary"
+            data-route="quoteCheck"
+            data-route-state="planned"
+            aria-disabled="true"
+            tabindex="-1"
+            href="../quote_check/code.html"
+          >免費文件健檢</a>
+        </div>
+      </section>
+
+      <section
         id="decision-prompts"
         class="decision-prompts-section"
         aria-labelledby="decision-prompts-title"
