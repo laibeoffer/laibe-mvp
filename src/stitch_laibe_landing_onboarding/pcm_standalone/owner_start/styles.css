@@ -896,6 +896,21 @@ button {
   }
 }
 
+.browsing-draft {
+  padding: 24px;
+  border: 1px solid var(--line);
+  background: #f7faf8;
+}
+
+.browsing-draft h2 { margin: 0; color: var(--ink); }
+.browsing-draft > p:not(.registration-eyebrow) { color: var(--muted); line-height: 1.6; }
+.browsing-draft__list { margin: 18px 0; border-top: 1px solid var(--line); }
+.browsing-draft__list div { display: grid; grid-template-columns: 145px 1fr; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.browsing-draft__list dt { color: var(--muted); font-size: .9rem; }.browsing-draft__list dd { margin: 0; font-weight: 700; white-space: pre-wrap; }
+.browsing-draft__notice { margin-bottom: 0; font-size: .92rem; }
+
+@media (max-width: 640px) { .browsing-draft__list div { grid-template-columns: 1fr; gap: 4px; } }
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

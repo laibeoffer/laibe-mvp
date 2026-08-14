@@ -11,6 +11,29 @@ import {
 
 const boundDocumentForms = new WeakMap();
 const boundOwnerStarts = new WeakMap();
+const BROWSING_DRAFT_FIELDS = Object.freeze([
+  "space",
+  "documents",
+  "budget",
+  "partner",
+  "problem",
+]);
+
+function applyBrowsingDraft(root) {
+  const panel = root.querySelector?.("[data-browsing-draft]");
+  const search = root.defaultView?.location?.search ?? "";
+  const params = new URLSearchParams(search);
+  if (!panel || params.get("draft") !== "1") return null;
+
+  BROWSING_DRAFT_FIELDS.forEach((field) => {
+    const target = panel.querySelector(`[data-draft-${field}]`);
+    if (target) target.textContent = params.get(field) || "未填寫";
+  });
+  panel.hidden = false;
+  return Object.freeze(Object.fromEntries(
+    BROWSING_DRAFT_FIELDS.map((field) => [field, params.get(field) || ""]),
+  ));
+}
 
 function collectOwnerDocuments(form) {
   const documents = {};
@@ -525,6 +548,7 @@ export function initializeOwnerStart(
 
   bindOwnerStartEvents(binding);
   boundOwnerStarts.set(root, binding);
+  applyBrowsingDraft(root);
   refreshOwnerStart(binding);
   return binding;
 }
