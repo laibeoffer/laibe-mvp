@@ -1,3 +1,8 @@
+:root {
+  --account-bg: #05080a;
+  --account-accent: #ff5809;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -97,6 +102,25 @@ label {
   align-items: center;
   min-block-size: var(--owner-first-control-min);
   color: var(--owner-first-text);
+}
+
+.account-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.account-header__action {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--owner-first-control-min);
+  padding-inline: 16px;
+  color: #fff;
+  border: 1px solid color-mix(in srgb, var(--account-accent) 72%, transparent);
+  border-radius: var(--owner-first-radius-pill);
+  background: var(--account-accent);
+  font-size: 0.82rem;
+  font-weight: 900;
 }
 
 .account-brand {
@@ -203,11 +227,16 @@ label {
 .account-gate .account-primary-action {
   inline-size: 100%;
   margin-block-start: 18px;
-  color: #080b0d;
+  color: #fff;
+  background: var(--account-accent);
 }
 
 .account-facts {
   margin-block-start: clamp(34px, 5vw, 58px);
+}
+
+.account-status-strip {
+  border-block: 1px solid var(--owner-first-line-soft);
 }
 
 .access-workspace {
@@ -243,6 +272,10 @@ label {
   align-items: center;
   gap: 12px;
   margin-block-start: 28px;
+}
+
+.account-role-choice {
+  position: relative;
 }
 
 .role-guide__rail::before,
@@ -678,7 +711,7 @@ label {
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 760px) {
   .account-header,
   .account-header__inner {
     min-block-size: 66px;
@@ -765,7 +798,7 @@ label {
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 440px) {
   .account-shell .owner-first-facts {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -839,7 +872,7 @@ label {
   }
 }
 
-@media (max-width: 680px) and (max-height: 700px) {
+@media (max-width: 760px) and (max-height: 700px) {
   .account-header,
   .account-header__inner {
     min-block-size: 58px;

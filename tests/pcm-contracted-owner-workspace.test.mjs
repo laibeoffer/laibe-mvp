@@ -79,7 +79,11 @@ test("頁面使用本地樣式與 module runtime，不依賴外部 UI CDN", asyn
   const html = await readPageFile("code.html");
 
   assert.match(html, /href="\.\/styles\.css"/);
-  assert.match(html, /type="module"\s+src="\.\/app\.js"/);
+  assert.match(
+    html,
+    /type="module"\s+src="\.\/owner-workspace-bootstrap\.js"/,
+  );
+  assert.doesNotMatch(html, /type="module"\s+src="\.\/app\.js"/);
   assert.doesNotMatch(html, /tailwindcss|fonts\.googleapis|material-symbols/i);
 });
 
@@ -630,4 +634,598 @@ test("頁面保留 skip link 與真實同源快速入口", async () => {
   );
   assert.match(html, /href="\.\.\/pcm_standalone\/basic_report\/code\.html"/);
   assert.match(html, /href="#documents"/);
+});
+
+const CANONICAL_OWNER_CASE_ID = "9e000000-0000-4000-8000-000000000201";
+const OWNER_USER_ID = "9e000000-0000-4000-8000-000000000001";
+const SNAPSHOT_VERSION = "db19715d-deab-4a9f-8dc0-4502269e4702";
+const SNAPSHOT_SHA256 =
+  "2a30f7736c8a62f5ae7a3cc82fe1fe10270ae215d1f4c9ed35d843538badeb4c";
+const SNAPSHOT_BYTES = 1535;
+const READ_AT = "2026-08-09T11:30:00.000Z";
+const GOLDEN_SNAPSHOT_PREIMAGE = '{"case": {"title": "Owner case", "caseId": "9e000000-0000-4000-8000-000000000201", "status": "active"}, "status": "CASE_DATA_AVAILABLE", "viewer": {"role": "owner", "userId": "9e000000-0000-4000-8000-000000000001", "identityStatus": "line_bound", "identityVerified": true}, "actions": ["view_case", "view_public_messages"], "pcmDomain": {"code": "contract"}, "schemaName": "laibe.owner-workspace-read.v1", "caseBinding": {"boundAt": "2026-08-09T11:29:44.000Z", "bindingStatus": "active", "assignmentKind": "participant"}, "schemaVersion": "laibe.owner-workspace-read.v1", "publicMessages": [{"body": "Owner workspace public message", "actor": {"role": "owner", "userId": "9e000000-0000-4000-8000-000000000001"}, "messageId": "9e000000-0000-4000-8000-000000000501", "bodySha256": "00ca5b0783937736eae3f21ed8fc46ad19214e9b768d9cf276ca292283ae3263", "recordReceipt": {"caseId": "9e000000-0000-4000-8000-000000000201", "messageId": "9e000000-0000-4000-8000-000000000501", "receiptId": "9e000000-0000-4000-8000-000000000601", "bodySha256": "00ca5b0783937736eae3f21ed8fc46ad19214e9b768d9cf276ca292283ae3263", "recordedAt": "2026-08-09T11:29:44.000Z", "schemaName": "laibe.owner-workspace-message-record-receipt.v1", "schemaVersion": "laibe.owner-workspace-message-record-receipt.v1"}}], "snapshotVersion": "db19715d-deab-4a9f-8dc0-4502269e4702", "serviceAgreement": {"status": "active", "endedAt": null, "agreementId": "9e000000-0000-4000-8000-000000000401", "versionNumber": 1, "agreementVersionId": "9e000000-0000-4000-8000-000000000301"}}';
+
+function loadBootstrap() {
+  return import(new URL("owner-workspace-bootstrap.js", pageRoot).href);
+}
+
+function ownerRuntimeWorkspace(options = {}) {
+  const payload = JSON.parse(GOLDEN_SNAPSHOT_PREIMAGE);
+  if ("status" in options) payload.status = options.status;
+  if ("agreementStatus" in options) {
+    payload.serviceAgreement.status = options.agreementStatus;
+    payload.serviceAgreement.endedAt = options.agreementStatus === "ended"
+      ? "2026-08-09T11:29:59.000Z"
+      : null;
+  }
+  if ("actions" in options) payload.actions = options.actions;
+  if ("caseStatus" in options) payload.case.status = options.caseStatus;
+  if ("publicMessages" in options) {
+    payload.publicMessages = options.publicMessages;
+  }
+  if (payload.status === "ZERO_CASE_DATA") {
+    payload.publicMessages = [];
+    payload.actions = [];
+  }
+  if (payload.serviceAgreement.status === "ended") {
+    payload.actions = [];
+  }
+  if (Reflect.ownKeys(options).length > 0) {
+    payload.snapshotVersion =
+      options.snapshotVersion ?? "aa000000-0000-4000-8000-000000000202";
+  }
+  const snapshotPreimage = Reflect.ownKeys(options).length === 0
+    ? GOLDEN_SNAPSHOT_PREIMAGE
+    : JSON.stringify(payload);
+  const snapshotSha256 = sha256(snapshotPreimage);
+  return {
+    ...JSON.parse(snapshotPreimage),
+    readAt: READ_AT,
+    canonicalization: {
+      id: "laibe.server-issued-json-text.utf8.v1",
+      version: 1,
+      encoding: "UTF-8",
+    },
+    snapshotPreimage,
+    readReceipt: {
+      schemaName: "laibe.owner-workspace-read-receipt.v1",
+      schemaVersion: "laibe.owner-workspace-read-receipt.v1",
+      receiptId: "9e000000-0000-4000-8000-000000000702",
+      caseId: CANONICAL_OWNER_CASE_ID,
+      snapshotVersion: payload.snapshotVersion,
+      snapshotSha256,
+      snapshotByteLength: Buffer.byteLength(snapshotPreimage, "utf8"),
+      canonicalizationId: "laibe.server-issued-json-text.utf8.v1",
+      canonicalizationVersion: 1,
+      issuedAt: READ_AT,
+    },
+  };
+}
+
+function messageFor(index, body) {
+  const suffix = String(index + 1).padStart(12, "0");
+  const receiptSuffix = String(index + 1001).padStart(12, "0");
+  const bodySha256 = sha256(body);
+  const messageId = "9e000000-0000-4000-8000-" + suffix;
+  return {
+    body,
+    actor: {
+      role: "owner",
+      userId: OWNER_USER_ID,
+    },
+    messageId,
+    bodySha256,
+    recordReceipt: {
+      caseId: CANONICAL_OWNER_CASE_ID,
+      messageId,
+      receiptId: "9e000000-0000-4000-8000-" + receiptSuffix,
+      bodySha256,
+      recordedAt: "2026-08-09T11:29:44.000Z",
+      schemaName: "laibe.owner-workspace-message-record-receipt.v1",
+      schemaVersion: "laibe.owner-workspace-message-record-receipt.v1",
+    },
+  };
+}
+
+test("canonical owner workspace bootstrap uses only explicit trusted injection", async () => {
+  const source = await readPageFile("owner-workspace-bootstrap.js");
+
+  assert.doesNotMatch(
+    source,
+    /URLSearchParams|location\.|document\.cookie|localStorage|sessionStorage|indexedDB|dataset|querySelector\([^)]*script|LaibePcmCanonicalRuntime|globalThis\[/i,
+  );
+  assert.match(source, /authorizedCaseId/);
+  assert.match(source, /loadOwnerWorkspace/);
+});
+
+test("invalid bootstrap dependencies fail closed before provider invocation", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  let calls = 0;
+  const loadOwnerWorkspace = async () => {
+    calls += 1;
+    return ownerRuntimeWorkspace();
+  };
+  const accessorInput = { root: null, loadOwnerWorkspace };
+  Object.defineProperty(accessorInput, "authorizedCaseId", {
+    enumerable: true,
+    get() {
+      calls += 100;
+      return CANONICAL_OWNER_CASE_ID;
+    },
+  });
+  const proxyInput = new Proxy({}, {
+    ownKeys() {
+      throw new Error("private trap detail");
+    },
+  });
+  const cases = [
+    undefined,
+    {
+      root: null,
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID.toUpperCase(),
+      loadOwnerWorkspace,
+    },
+    {
+      root: null,
+      authorizedCaseId: new String(CANONICAL_OWNER_CASE_ID),
+      loadOwnerWorkspace,
+    },
+    accessorInput,
+    proxyInput,
+  ];
+
+  for (const input of cases) {
+    const controller = createOwnerWorkspaceBootstrap(input);
+    const model = await controller.initialize();
+    assert.equal(model.state, "CONTRACT_CONTEXT_UNAVAILABLE");
+    assert.deepEqual(model.documents, []);
+    assert.deepEqual(model.messages, []);
+  }
+  assert.equal(calls, 0);
+});
+
+test("bootstrap sends the canonical selector and maps ready zero and ended states", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const observed = [];
+  const run = async (workspace) => {
+    const controller = createOwnerWorkspaceBootstrap({
+      root: null,
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+      async loadOwnerWorkspace(selector) {
+        observed.push(selector);
+        return workspace;
+      },
+    });
+    return controller.initialize();
+  };
+
+  const ready = await run(ownerRuntimeWorkspace());
+  assert.equal(ready.state, "AUTHORIZED_READY");
+  assert.equal(ready.caseName, "Owner case");
+  assert.equal(ready.messages.length, 1);
+
+  const zero = await run(ownerRuntimeWorkspace({ status: "ZERO_CASE_DATA" }));
+  assert.equal(zero.state, "AUTHORIZED_EMPTY");
+  assert.deepEqual(zero.messages, []);
+
+  const ended = await run(ownerRuntimeWorkspace({ agreementStatus: "ended" }));
+  assert.equal(ended.state, "PCM_SERVICE_ENDED_READ_ONLY");
+  assert.equal(ended.readOnly, true);
+  assert.deepEqual(ended.permittedActions, []);
+
+  assert.equal(observed.length, 3);
+  for (const selector of observed) {
+    assert.deepEqual(Reflect.ownKeys(selector), ["caseId"]);
+    assert.equal(selector.caseId, CANONICAL_OWNER_CASE_ID);
+  }
+});
+
+test("denied and retryable provider results expose fixed product states without stale data", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  let turn = 0;
+  const controller = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      turn += 1;
+      if (turn === 1) return ownerRuntimeWorkspace();
+      if (turn === 2) {
+        throw Object.assign(new Error("server secret"), {
+          code: "OWNER_ACCESS_DENIED",
+        });
+      }
+      throw Object.assign(new Error("transport secret"), {
+        code: "OWNER_WORKSPACE_READ_RETRYABLE",
+      });
+    },
+  });
+
+  const ready = await controller.initialize();
+  assert.equal(ready.state, "AUTHORIZED_READY");
+  assert.equal(ready.messages.length, 1);
+
+  const denied = await controller.initialize();
+  assert.equal(denied.state, "ACCESS_DENIED");
+  assert.deepEqual(denied.documents, []);
+  assert.deepEqual(denied.messages, []);
+  assert.doesNotMatch(JSON.stringify(denied), /server secret/);
+
+  const retryable = await controller.initialize();
+  assert.equal(retryable.state, "LOAD_FAILED_RETRYABLE");
+  assert.deepEqual(retryable.documents, []);
+  assert.deepEqual(retryable.messages, []);
+  assert.doesNotMatch(JSON.stringify(retryable), /transport secret/);
+});
+test("replays the exact accepted A6 normalized vector", async () => {
+  assert.equal(sha256(GOLDEN_SNAPSHOT_PREIMAGE), SNAPSHOT_SHA256);
+  assert.equal(
+    Buffer.byteLength(GOLDEN_SNAPSHOT_PREIMAGE, "utf8"),
+    SNAPSHOT_BYTES,
+  );
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const controller = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      return ownerRuntimeWorkspace();
+    },
+  });
+  const model = await controller.initialize();
+
+  assert.equal(model.state, "AUTHORIZED_READY");
+  assert.equal(model.caseName, "Owner case");
+  assert.equal(model.messages.length, 1);
+  assert.equal(model.messages[0].body, "Owner workspace public message");
+});
+
+test("preserves complete message bytes and the full A6 message collection", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const longBody = "Line one  with  spaces\n" + "x".repeat(600);
+  const messages = Array.from(
+    { length: 101 },
+    (_, index) => messageFor(index, index === 0 ? longBody : "message " + index),
+  );
+  const controller = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      return ownerRuntimeWorkspace({ publicMessages: messages });
+    },
+  });
+  const model = await controller.initialize();
+
+  assert.equal(model.state, "AUTHORIZED_READY");
+  assert.equal(model.messages.length, 101);
+  assert.equal(model.messages[0].body, longBody);
+  assert.equal(model.messages[0].bodySha256, sha256(longBody));
+});
+
+test("keeps one controller and one retry listener across trusted injection", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const listeners = [];
+  const retry = {
+    hidden: true,
+    addEventListener(type, listener) {
+      listeners.push([type, listener]);
+    },
+  };
+  const root = {
+    body: { dataset: {} },
+    querySelector(selector) {
+      return selector === '[data-action="retry"]' ? retry : null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+  let calls = 0;
+  const page = createOwnerWorkspaceBootstrap({
+    root,
+    authorizedCaseId: null,
+    loadOwnerWorkspace: null,
+  });
+
+  assert.equal((await page.initialize()).state, "CONTRACT_CONTEXT_UNAVAILABLE");
+  const ready = await page.configureOwnerWorkspace({
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      calls += 1;
+      return ownerRuntimeWorkspace();
+    },
+  });
+  assert.equal(ready.state, "AUTHORIZED_READY");
+  assert.equal(calls, 1);
+  assert.equal(listeners.length, 1);
+  assert.equal(listeners[0][0], "click");
+
+  listeners[0][1]();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(calls, 2);
+  assert.equal(listeners.length, 1);
+});
+
+test("rejects receipt drift and coercive normalized fields without invoking hooks", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  let coercions = 0;
+  const cases = [];
+
+  const badDigest = ownerRuntimeWorkspace();
+  badDigest.readReceipt.snapshotSha256 = "b".repeat(64);
+  cases.push(badDigest);
+
+  const badSchema = ownerRuntimeWorkspace();
+  badSchema.schemaName = "browser.workspace";
+  cases.push(badSchema);
+
+  const badVersion = ownerRuntimeWorkspace();
+  badVersion.serviceAgreement.versionNumber = {
+    [Symbol.toPrimitive]() {
+      coercions += 1;
+      throw new Error("private coercion detail");
+    },
+  };
+  cases.push(badVersion);
+
+  for (const workspace of cases) {
+    const controller = createOwnerWorkspaceBootstrap({
+      root: null,
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+      async loadOwnerWorkspace() {
+        return workspace;
+      },
+    });
+    const model = await controller.initialize();
+    assert.equal(model.state, "ACCESS_DENIED");
+    assert.deepEqual(model.messages, []);
+  }
+  assert.equal(coercions, 0);
+});
+// WEB-STITCH-REWORK2-RACE-RED
+function deferredResult() {
+  let resolve;
+  let reject;
+  const promise = new Promise((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, reject, resolve };
+}
+
+test("latest owner workspace load wins across authoritative reconfiguration", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const older = deferredResult();
+  const page = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      return older.promise;
+    },
+  });
+
+  const olderLoad = page.initialize();
+  const newer = await page.configureOwnerWorkspace({
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      const workspace = ownerRuntimeWorkspace({ caseStatus: "on_hold" });
+      workspace.case.title = "Newer owner case";
+      const payload = JSON.parse(workspace.snapshotPreimage);
+      payload.case.title = "Newer owner case";
+      workspace.snapshotPreimage = JSON.stringify(payload);
+      workspace.readReceipt.snapshotSha256 = sha256(workspace.snapshotPreimage);
+      workspace.readReceipt.snapshotByteLength = Buffer.byteLength(
+        workspace.snapshotPreimage,
+        "utf8",
+      );
+      return workspace;
+    },
+  });
+  assert.equal(newer.state, "AUTHORIZED_READY");
+  assert.equal(newer.caseName, "Newer owner case");
+
+  older.resolve(ownerRuntimeWorkspace());
+  const staleCompletion = await olderLoad;
+  assert.equal(staleCompletion.state, "AUTHORIZED_READY");
+  assert.equal(staleCompletion.caseName, "Newer owner case");
+});
+
+test("late authorized data cannot overwrite a newer denial or retry result", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const first = deferredResult();
+  const second = deferredResult();
+  let call = 0;
+  const page = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      call += 1;
+      return call === 1 ? first.promise : second.promise;
+    },
+  });
+
+  const olderLoad = page.initialize();
+  const newerLoad = page.initialize();
+  second.reject(Object.assign(new Error("new denial"), {
+    code: "OWNER_ACCESS_DENIED",
+  }));
+  const denied = await newerLoad;
+  assert.equal(denied.state, "ACCESS_DENIED");
+
+  first.resolve(ownerRuntimeWorkspace());
+  const staleCompletion = await olderLoad;
+  assert.equal(staleCompletion.state, "ACCESS_DENIED");
+  assert.deepEqual(staleCompletion.messages, []);
+});
+
+test("bootstrap mirrors the closed A6 action message and case-state invariants", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const validActions = ownerRuntimeWorkspace({
+    actions: ["view_case", "view_documents", "view_public_messages"],
+  });
+  const validController = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      return validActions;
+    },
+  });
+  assert.equal((await validController.initialize()).state, "AUTHORIZED_READY");
+
+  const duplicateActions = ownerRuntimeWorkspace({
+    actions: ["view_case", "view_case"],
+  });
+  const unknownAction = ownerRuntimeWorkspace({ actions: ["view_case", "edit_case"] });
+  const invalidActorId = messageFor(20, "valid body");
+  invalidActorId.actor.userId = invalidActorId.actor.userId.toUpperCase();
+  const invalidActorRole = messageFor(21, "valid body");
+  invalidActorRole.actor.role = "designer";
+  const malformedBody = messageFor(22, "\ud800");
+  const overlongBody = messageFor(23, "x".repeat(20001));
+  const invalidCases = [
+    duplicateActions,
+    unknownAction,
+    ownerRuntimeWorkspace({ publicMessages: [invalidActorId] }),
+    ownerRuntimeWorkspace({ publicMessages: [invalidActorRole] }),
+    ownerRuntimeWorkspace({ publicMessages: [malformedBody] }),
+    ownerRuntimeWorkspace({ publicMessages: [overlongBody] }),
+    ownerRuntimeWorkspace({ caseStatus: "archived" }),
+  ];
+
+  for (const workspace of invalidCases) {
+    const controller = createOwnerWorkspaceBootstrap({
+      root: null,
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+      async loadOwnerWorkspace() {
+        return workspace;
+      },
+    });
+    const model = await controller.initialize();
+    assert.equal(model.state, "ACCESS_DENIED");
+    assert.deepEqual(model.messages, []);
+  }
+});
+
+test("valid A6 roles and case states retain precise Traditional Chinese meaning", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const roleCases = [
+    ["owner", "\u696d\u4e3b"],
+    ["pro", "\u8a2d\u8a08\u5e2b\uff0f\u7d71\u5305"],
+    ["pcm", "PCM"],
+    ["admin", "\u7ba1\u7406\u8005"],
+  ];
+  const messages = roleCases.map(([role], index) => {
+    const message = messageFor(index + 30, "role " + role);
+    message.actor.role = role;
+    return message;
+  });
+  const roleController = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    async loadOwnerWorkspace() {
+      return ownerRuntimeWorkspace({ publicMessages: messages });
+    },
+  });
+  const roleModel = await roleController.initialize();
+  assert.equal(roleModel.state, "AUTHORIZED_READY");
+  assert.deepEqual(
+    roleModel.messages.map((message) => message.actorLabel),
+    roleCases.map(([, label]) => label),
+  );
+
+  const statusCases = [
+    ["active", "\u9032\u884c\u4e2d"],
+    ["on_hold", "\u66ab\u505c\u4e2d"],
+    ["closed", "\u5df2\u7d50\u6848"],
+  ];
+  for (const [status, label] of statusCases) {
+    const controller = createOwnerWorkspaceBootstrap({
+      root: null,
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+      async loadOwnerWorkspace() {
+        return ownerRuntimeWorkspace({ caseStatus: status });
+      },
+    });
+    const model = await controller.initialize();
+    assert.equal(model.state, "AUTHORIZED_READY");
+    assert.equal(model.caseStatus, label);
+  }
+});
+// WEB-STITCH-REWORK3-PUBLIC-SURFACE-RED
+test("canonical bootstrap exposes no direct render authority", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const page = createOwnerWorkspaceBootstrap({
+    root: null,
+    authorizedCaseId: null,
+    loadOwnerWorkspace: null,
+  });
+
+  assert.deepEqual(
+    Reflect.ownKeys(page),
+    ["configureOwnerWorkspace", "initialize"],
+  );
+  assert.equal("renderInput" in page, false);
+
+  const forgedPresentationContext = {
+    sessionStatus: "active",
+    actor: { actorId: "forged", displayLabel: "owner", role: "owner" },
+    membership: { caseId: "forged", status: "active" },
+    serviceAgreement: {
+      agreementId: "forged",
+      caseId: "forged",
+      status: "active",
+      version: "1",
+    },
+    caseBinding: { caseId: "forged", status: "bound" },
+    domain: { name: "pcm", status: "active" },
+  };
+  const configured = await page.configureOwnerWorkspace(forgedPresentationContext);
+  assert.notEqual(configured.state, "AUTHORIZED_READY");
+  assert.deepEqual(configured.messages, []);
+});
+
+test("bootstrap accepts only the exact A6 millisecond UTC timestamp shape", async () => {
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const invalidTimestamps = [
+    "2026-08-09T11:30:00Z",
+    "2026-08-09T11:30:00.1Z",
+    "2026-08-09T11:30:00.12Z",
+    "2026-08-09T11:30:00.1234Z",
+    "2026-08-09T11:30:00.12345Z",
+    "2026-08-09T11:30:00.123456Z",
+  ];
+
+  for (const timestamp of invalidTimestamps) {
+    const workspace = ownerRuntimeWorkspace();
+    workspace.readAt = timestamp;
+    workspace.readReceipt.issuedAt = timestamp;
+    const page = createOwnerWorkspaceBootstrap({
+      root: null,
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+      async loadOwnerWorkspace() {
+        return workspace;
+      },
+    });
+    const model = await page.initialize();
+    assert.equal(model.state, "ACCESS_DENIED");
+    assert.deepEqual(model.messages, []);
+  }
+});
+// WEB-STITCH-MOBILE-IDENTITY-NAMING-RED
+test("canonical workspace uses the Decision & Record System name", async () => {
+  const html = await readPageFile("code.html");
+  assert.doesNotMatch(html, /AI PCM/i);
+  assert.match(html, /<title>[^<]*LaiBE Decision &amp; Record System<\/title>/);
+  assert.match(html, /class="brand__product">Decision &amp; Record System<\/span>/);
+  assert.match(html, /aria-label="回到 LaiBE Decision &amp; Record System 首頁"/);
+});
+
+test("mobile header keeps the current case identity visible", async () => {
+  const css = await readPageFile("styles.css");
+  assert.doesNotMatch(
+    css,
+    /context-chip\[data-slot="case-name"\]\s*\{[^}]*display:\s*none/i,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*context-chip\[data-slot="case-name"\][\s\S]*grid-column:\s*1\s*\/\s*-1/i,
+  );
 });

@@ -104,19 +104,23 @@ test("account access starts as one exact three-file source package", async () =>
   assert.deepEqual(await accountAccessFiles(), ["app.js", "code.html", "styles.css"]);
 });
 
-test("first screen names the shared roles and exposes the five decision facts", async () => {
+test("first screen uses the public-home shell and leads with role recognition", async () => {
   const html = await readSource(htmlUrl);
 
   assert.match(html, /<html\s+lang="zh-Hant-TW"/u);
   assert.match(html, /<body[^>]+data-view-state="CONTEXT_UNAVAILABLE"/u);
-  assert.match(html, /甲方與乙方，共用註冊／登入入口/u);
-  assert.match(html, /帳號與契約服務尚未確認/u);
+  assert.match(html, /href="\.\/styles\.css"/u);
+  assert.match(html, /class="account-header"/u);
+  assert.match(html, /class="account-header__action[^>]+href="\.\.\/quote_check\/code\.html"/u);
+  assert.match(html, /進入你的 DRS 案件/u);
+  assert.match(html, /我是甲方/u);
+  assert.match(html, /我收到案件邀請/u);
+  assert.match(html, /等待服務開放/u);
 
   const factRows = html.match(/data-owner-fact(?:\s|>)/gu) ?? [];
-  assert.equal(factRows.length, 5);
+  assert.equal(factRows.length, 4);
   for (const label of [
-    "角色",
-    "帳號／契約服務",
+    "目前狀態",
     "案件狀態",
     "下一步／責任人",
     "最近紀錄",
@@ -124,19 +128,20 @@ test("first screen names the shared roles and exposes the five decision facts", 
     assert.match(html, new RegExp(label, "u"));
   }
 
-  assert.match(html, /甲方與乙方/u);
+  assert.match(html, /尚未開放帳號資料送出/u);
   assert.match(html, /尚未取得案件資料/u);
   assert.match(html, /目前使用者/u);
   assert.match(html, /尚無可顯示紀錄/u);
 });
 
-test("the only primary CTA returns safely to the PCM homepage", async () => {
+test("the only enabled primary CTA starts the live quote check", async () => {
   const html = await readSource(htmlUrl);
   const primaryActions = html.match(/<a\b[^>]*data-primary-action[^>]*>/gu) ?? [];
 
   assert.equal(primaryActions.length, 1);
-  assert.match(primaryActions[0], /href="\.\.\/public_home\/code\.html#top"/u);
-  assert.match(html, />安全返回 PCM 首頁<\/a>/u);
+  assert.match(primaryActions[0], /href="\.\.\/quote_check\/code\.html"/u);
+  assert.match(html, />返回首頁開始報價健檢<\/a>/u);
+  assert.match(html, />返回 DRS 首頁<\/a>/u);
   assert.doesNotMatch(html, /href=(?:""|'')/u);
   assert.doesNotMatch(html, /href="#"/u);
 });
@@ -170,7 +175,7 @@ test("owner and invited-vendor guides describe future direction without granting
 
   assert.match(html, /data-role-guide="owner"/u);
   assert.match(html, /data-role-guide="vendor"/u);
-  assert.match(html, /只說明未來去向，不會設定你的身分/u);
+  assert.match(html, /選擇只會切換說明，不會設定你的身分/u);
   assert.match(html, /甲方完成身分確認後，仍要另行確認案件建立條件/u);
   assert.match(html, /乙方須先收到甲方邀請/u);
   assert.match(html, /案件成員與權限確認後/u);
@@ -860,11 +865,15 @@ test("layout covers all requested responsive accessibility and short-screen floo
   const css = await readSource(cssUrl);
 
   assert.match(css, /overflow-x:\s*(?:clip|hidden)/u);
+  assert.match(css, /--account-bg:\s*#05080a/iu);
+  assert.match(css, /--account-accent:\s*#ff5809/iu);
+  assert.match(css, /\.account-role-choice\s*\{/u);
+  assert.match(css, /\.account-status-strip\s*\{/u);
   assert.match(css, /min-(?:block-)?size:\s*(?:var\(--owner-first-control-min\)|44px)/u);
   assert.match(css, /:focus-visible/u);
   assert.match(css, /@media\s*\(max-width:\s*900px\)/u);
-  assert.match(css, /@media\s*\(max-width:\s*680px\)/u);
-  assert.match(css, /@media\s*\(max-width:\s*420px\)/u);
+  assert.match(css, /@media\s*\(max-width:\s*760px\)/u);
+  assert.match(css, /@media\s*\(max-width:\s*440px\)/u);
   assert.match(css, /max-height:\s*700px/u);
   assert.match(css, /prefers-reduced-motion:\s*reduce/u);
   assert.match(css, /grid-template-columns/u);

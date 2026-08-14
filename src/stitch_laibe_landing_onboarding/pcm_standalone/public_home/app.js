@@ -212,12 +212,38 @@ export function applyPublicIntegrationStatus(
   return status;
 }
 
+export function bindQualificationDetailReveal(root) {
+  try {
+    const cards = root.querySelectorAll("[data-qualification-item]");
+    for (const card of cards) {
+      if (
+        typeof card?.addEventListener !== "function" ||
+        typeof card?.classList?.add !== "function" ||
+        typeof card?.setAttribute !== "function"
+      ) {
+        continue;
+      }
+
+      const reveal = () => {
+        card.classList.add("is-detail-revealed");
+        card.setAttribute("data-detail-revealed", "true");
+      };
+
+      card.addEventListener("pointerenter", reveal, { once: true });
+      card.addEventListener("focusin", reveal, { once: true });
+    }
+  } catch {
+    return;
+  }
+}
+
 export function initPublicHome(
   root = document,
   integrationConfig = globalThis.PCM_PUBLIC_INTEGRATION_CONFIG ?? {},
 ) {
   bindPublicRoutes(root);
   applyPublicIntegrationStatus(root, integrationConfig);
+  bindQualificationDetailReveal(root);
   root.documentElement?.classList.add("is-ready");
 }
 

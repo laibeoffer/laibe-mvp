@@ -77,6 +77,46 @@ test("owner-first first fold states role, contract status, case status, responsi
   assert.doesNotMatch(html, /https?:\/\/|\/\/cdn\.|scrollIntoView|localStorage/);
 });
 
+test("HERO is one physical contract-box reader with two rings and four vertical contract tabs", async () => {
+  const [html, css] = await Promise.all([
+    readFile(path.join(serviceContractDir, "code.html"), "utf8"),
+    readFile(path.join(serviceContractDir, "styles.css"), "utf8"),
+  ]);
+
+  const firstFold = html.slice(0, html.indexOf('id="contract-summary"'));
+  assert.match(firstFold, /class="contract-dossier contract-book"/);
+  assert.match(firstFold, /class="contract-book__spine"[^>]*aria-hidden="true"/);
+  assert.equal((firstFold.match(/class="contract-ring"/g) ?? []).length, 2);
+  assert.match(firstFold, /id="full-contract"[^>]*class="contract-book__reader contract-reading"/);
+  assert.match(firstFold, /role="tablist"[^>]*aria-orientation="vertical"/);
+  assert.equal((firstFold.match(/data-contract-tab=/g) ?? []).length, 4);
+  assert.equal((firstFold.match(/data-contract-page=/g) ?? []).length, 0);
+  for (const label of ["契約與服務", "費用與付款", "責任與紀錄", "權益與簽署"]) {
+    assert.match(firstFold, new RegExp(label));
+  }
+  assert.doesNotMatch(html, /<section class="key-clauses section"/);
+  assert.equal((html.match(/\sdata-contract(?:\s|=)/g) ?? []).length, 1);
+  assert.match(
+    html,
+    /<script type="module" src="\.\/app\.js\?v=20260811-contract-book-reader"><\/script>/,
+  );
+
+  assert.match(
+    css,
+    /\.contract-book\s*\{[\s\S]*?grid-template-columns:\s*minmax\(260px,\s*30fr\)\s+58px\s+minmax\(0,\s*65fr\)/,
+  );
+  assert.match(css, /\.contract-ring\s*\{/);
+  assert.match(css, /\.contract-page-tab\s*\{[^}]*writing-mode:\s*vertical-rl/);
+  assert.match(
+    css,
+    /\.contract-page-tab\[aria-selected="true"\]\s*\{[^}]*background:\s*#FF5809/,
+  );
+  assert.match(css, /@keyframes contract-page-enter-next/);
+  assert.match(css, /@keyframes contract-page-leave-next/);
+  assert.match(css, /@keyframes contract-page-enter-previous/);
+  assert.match(css, /@keyframes contract-page-leave-previous/);
+});
+
 test("page explains the bounded draft-review-revision-confirmation sequence without claiming it is connected", async () => {
   const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
 
@@ -450,9 +490,7 @@ class TestDocument {
 test("complete DOM renders every frozen heading and print works while signing stays disabled", async () => {
   const { CONTRACT_SOURCE } = await import(moduleUrl("contract-content.js"));
   const nodes = new Map([
-    ["[data-key-clauses]", new TestElement("div")],
     ["[data-contract]", new TestElement("article")],
-    ["[data-contents]", new TestElement("ol")],
     ["[data-readiness-list]", new TestElement("ol")],
     ["[data-sign-button]", new TestElement("button")],
     ["[data-readiness-summary]", new TestElement("p")],
@@ -475,12 +513,31 @@ test("complete DOM renders every frozen heading and print works while signing st
     const expectedHeadings = CONTRACT_SOURCE.split("\n")
       .filter((line) => /^(#{1,3})\s+/.test(line))
       .map((line) => line.replace(/^(#{1,3})\s+/, ""));
-    const renderedHeadings = nodes.get("[data-contract]").children
+    const descendants = [];
+    const collect = (element) => {
+      for (const child of element.children) {
+        descendants.push(child);
+        collect(child);
+      }
+    };
+    const contractBodies = [];
+    for (const panel of nodes.get("[data-contract]").children) {
+      for (const child of panel.children) {
+        if (child.className === "contract-part__body") contractBodies.push(child);
+      }
+    }
+    for (const body of contractBodies) collect(body);
+    const renderedHeadings = descendants
       .filter((element) => /^H[2-4]$/.test(element.tagName))
       .map((element) => element.textContent);
 
     assert.deepEqual(renderedHeadings, expectedHeadings);
-    assert.ok(nodes.get("[data-contents]").children.length >= 29);
+    assert.equal(
+      nodes.get("[data-contract]").children.filter(
+        (element) => element.getAttribute("role") === "tabpanel",
+      ).length,
+      4,
+    );
     assert.equal(
       nodes.get("[data-lifecycle]").textContent,
       "草稿 · 尚未進入簽署",
@@ -507,6 +564,8 @@ test("print stylesheet emits only the complete contract and readiness notice", a
   assert.match(printCss, /\.contract-paper\s*\{[^}]*box-shadow:\s*none/);
   assert.match(printCss, /\.contract-paper p\s*\{[^}]*break-inside:\s*avoid/);
   assert.match(printCss, /\.contract-reading\s*\{[^}]*padding-top:\s*0/);
+  assert.match(printCss, /\.contract-page-panel\s*\{[^}]*display:\s*block\s*!important/);
+  assert.match(printCss, /\.contract-book__spine[\s\S]*display:\s*none\s*!important/);
   assert.match(printCss, /\.site-header[\s\S]*display:\s*none\s*!important/);
   assert.doesNotMatch(printCss, /\.contract-paper[^}]*display:\s*none/);
 });

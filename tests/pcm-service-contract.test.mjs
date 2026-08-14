@@ -491,6 +491,33 @@ test("contract heading resolver returns unique stable IDs with exact label bound
   );
 });
 
+test("contract reader maps frozen articles into four stable pages and uses vertical direction semantics", async () => {
+  const {
+    CONTRACT_PARTS,
+    resolveContractPageDirection,
+    resolveContractPartIndex,
+  } = await import(moduleUrl("app.js"));
+
+  assert.deepEqual(
+    CONTRACT_PARTS.map(({ number, title }) => [number, title]),
+    [
+      ["01", "契約與服務"],
+      ["02", "費用與付款"],
+      ["03", "責任與紀錄"],
+      ["04", "權益與簽署"],
+    ],
+  );
+  assert.equal(resolveContractPartIndex("第一條　契約當事人", 3), 0);
+  assert.equal(resolveContractPartIndex("第七條　服務費", 0), 1);
+  assert.equal(resolveContractPartIndex("第十一條　服務方義務", 0), 2);
+  assert.equal(resolveContractPartIndex("第二十一條　退費", 0), 3);
+  assert.equal(resolveContractPartIndex("附件十四　已履行服務計價表", 0), 3);
+  assert.equal(resolveContractPartIndex("萊比 LaiBE AI PCM 案件治理資訊服務契約", 2), 2);
+  assert.equal(resolveContractPageDirection(0, 1), "next");
+  assert.equal(resolveContractPageDirection(3, 1), "previous");
+  assert.equal(resolveContractPageDirection(2, 2), "current");
+});
+
 test("contract rendering demotes source headings and styles all rendered levels", async () => {
   const [appSource, html, css] = await Promise.all([
     readFile(path.join(serviceContractDir, "app.js"), "utf8"),
@@ -521,7 +548,7 @@ test("mobile contract navigation controls provide 44px centered touch targets", 
   assert.notEqual(mobileStart, -1);
   const mobileCss = css.slice(mobileStart, mobileEnd);
 
-  for (const selector of [".contents a", ".clause__source"]) {
+  for (const selector of [".contract-page-tab", ".contract-page-control", ".clause__source"]) {
     const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const rule = new RegExp(`${escapedSelector}\\s*\\{([^}]*)\\}`).exec(mobileCss);
     assert.ok(rule, `${selector} mobile rule`);
@@ -544,6 +571,9 @@ test("mobile contract navigation controls provide 44px centered touch targets", 
     mobileClauseRule[1],
     /padding-(?:top|block):\s*0(?:px)?\s*;/,
   );
+
+  assert.match(css, /\.brand\s*>\s*span\s*\{/);
+  assert.doesNotMatch(css, /\.brand\s+span\s*\{/);
 });
 
 test("service contract source has no legacy runtime, signing methods, or preview statuses", async () => {
@@ -575,7 +605,7 @@ test("service contract page uses the production initial envelope and disables si
   const appSource = await readFile(path.join(serviceContractDir, "app.js"), "utf8");
   const signButton = [...html.matchAll(/<button\b[\s\S]*?<\/button>/gi)]
     .map(([button]) => button)
-    .find((button) => /簽署|sign/i.test(button));
+    .find((button) => /\bdata-sign-button\b/i.test(button));
 
   assert.ok(signButton);
   assert.match(signButton, /\bdisabled(?:\s*=\s*["']disabled["'])?/i);

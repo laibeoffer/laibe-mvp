@@ -3,22 +3,26 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="LaiBE AI PCM 服務契約草稿：提供服務範圍、責任邊界與案件紀錄規則的完整閱讀。" />
-    <title>LaiBE AI PCM｜服務契約草稿</title>
+    <meta name="description" content="LaiBE DRS 服務契約草稿：提供服務範圍、責任邊界與案件紀錄規則的完整閱讀。" />
+    <title>LaiBE DRS｜服務契約草稿</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260811-contract-book-reader" />
+    <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要內容</a>
     <header class="site-header" id="top">
-      <a class="brand" href="../public_home/code.html" aria-label="回到 LaiBE AI PCM 首頁">
+      <a class="brand" href="../public_home/code.html" aria-label="回到 LaiBE DRS 裝潢決策系統首頁">
         <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
-        <span>AI PCM</span>
+        <span class="drs-brand-lockup">
+          <span class="drs-brand-wordmark" aria-label="Decision &amp; Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
+          <small class="drs-brand-name">裝潢決策系統</small>
+        </span>
       </a>
       <nav aria-label="契約頁導覽">
         <a href="#contract-flow">確認流程</a>
         <a href="#full-contract">完整契約</a>
-        <a class="header-return" href="../public_home/code.html">返回 PCM 首頁</a>
+        <a class="header-return" href="../public_home/code.html">返回 DRS 首頁</a>
       </nav>
     </header>
 
@@ -28,8 +32,15 @@
           <p class="eyebrow">甲方服務契約閱讀</p>
           <span data-lifecycle>草稿 · 尚未進入簽署</span>
         </div>
-        <div class="contract-dossier">
-          <aside class="status-board" aria-label="目前契約與案件狀態">
+        <div class="contract-dossier contract-book">
+          <aside class="status-board contract-book__page contract-book__page--index" aria-label="目前契約與案件狀態">
+            <div class="contract-book__title-row">
+              <div>
+                <p>DRS 服務契約</p>
+                <h2>合約與履約審查<br />輔助工作台</h2>
+              </div>
+              <span>v0.3 · 法務審閱稿</span>
+            </div>
             <div class="status-board__header">
               <p>目前角色</p>
               <strong>甲方</strong>
@@ -52,24 +63,68 @@
                 <dd data-recent-record>尚無可顯示的案件紀錄</dd>
               </div>
             </dl>
+            <div class="contract-book__progress" aria-label="契約閱讀進度">
+              <span>目前分冊</span>
+              <strong><span data-contract-progress>01</span> / 04</strong>
+            </div>
             <a class="button button--primary status-board__cta" href="#full-contract">開始閱讀完整契約</a>
             <p class="status-board__note" data-context-note>案件資料帶入後，才會依實際文件顯示負責人與最近紀錄。</p>
           </aside>
 
-          <div class="dossier-copy">
-            <p class="dossier-copy__kicker">LAIBE · PCM SERVICE CONTRACT · v0.3</p>
-            <h1 id="page-title">先讀懂責任界線，再決定是否提送簽署草稿</h1>
-            <p class="dossier-copy__lead">這是一份供甲方閱讀的 PCM 服務契約法務審閱稿。完整正文與附件維持 v0.3 原文；它不是法律定稿，目前也尚未進入正式接受或簽署。</p>
-            <dl class="dossier-facts">
-              <div><dt>甲方服務費</dt><dd>總工程款 × <strong>3.5%</strong></dd></div>
-              <div><dt>本頁可做</dt><dd>閱讀目錄、逐節查看、列印或本機預覽</dd></div>
-            </dl>
+          <div class="contract-book__spine" aria-hidden="true">
+            <span class="contract-ring"></span>
+            <span class="contract-ring"></span>
+          </div>
+
+          <section id="full-contract" class="contract-book__reader contract-reading" aria-labelledby="page-title">
+            <div class="contract-reader__intro">
+              <p class="dossier-copy__kicker">LAIBE · DRS SERVICE CONTRACT · v0.3</p>
+              <h1 id="page-title">資訊說清楚、紀錄留清楚、風險看清楚，最後由人決策。</h1>
+              <p class="dossier-copy__lead">這是一份供甲方閱讀的 DRS 服務契約法務審閱稿。先看每組條款重點，再逐條核對完整正文；它不是法律定稿，目前也尚未進入正式接受或簽署。</p>
+              <dl class="dossier-facts">
+                <div><dt>甲方服務費</dt><dd>總工程款 × <strong>3.5%</strong></dd></div>
+                <div><dt>閱讀方式</dt><dd>選擇右側分冊，或以上一組／下一組切換</dd></div>
+              </dl>
+            </div>
+
+            <div class="reading-grid contract-reader__layout">
+              <div class="contract-page-deck" data-contract aria-live="polite"></div>
+              <div class="contract-page-tabs" role="tablist" aria-label="契約條款分冊" aria-orientation="vertical">
+                <button class="contract-page-tab" id="contract-tab-01" type="button" role="tab" aria-selected="true" aria-controls="contract-page-01" data-contract-tab="0">
+                  <span class="contract-page-tab__number">01</span>
+                  <span class="contract-page-tab__label">契約與服務</span>
+                  <span class="contract-page-tab__dot" aria-hidden="true"></span>
+                </button>
+                <button class="contract-page-tab" id="contract-tab-02" type="button" role="tab" aria-selected="false" aria-controls="contract-page-02" data-contract-tab="1" tabindex="-1">
+                  <span class="contract-page-tab__number">02</span>
+                  <span class="contract-page-tab__label">費用與付款</span>
+                  <span class="contract-page-tab__dot" aria-hidden="true"></span>
+                </button>
+                <button class="contract-page-tab" id="contract-tab-03" type="button" role="tab" aria-selected="false" aria-controls="contract-page-03" data-contract-tab="2" tabindex="-1">
+                  <span class="contract-page-tab__number">03</span>
+                  <span class="contract-page-tab__label">責任與紀錄</span>
+                  <span class="contract-page-tab__dot" aria-hidden="true"></span>
+                </button>
+                <button class="contract-page-tab" id="contract-tab-04" type="button" role="tab" aria-selected="false" aria-controls="contract-page-04" data-contract-tab="3" tabindex="-1">
+                  <span class="contract-page-tab__number">04</span>
+                  <span class="contract-page-tab__label">權益與簽署</span>
+                  <span class="contract-page-tab__dot" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+
+            <div class="contract-page-controls" aria-label="契約分冊切換">
+              <button class="contract-page-control" type="button" data-contract-previous disabled>↑ 上一組</button>
+              <p><span data-contract-current>01</span> / 04 · <span data-contract-current-title>契約與服務</span></p>
+              <button class="contract-page-control" type="button" data-contract-next>下一組 ↓</button>
+            </div>
+
             <div class="dossier-actions">
               <button class="button button--muted" type="button" data-print-button>列印 / 本機預覽</button>
-              <button class="button button--closed" type="button" data-sign-button disabled aria-disabled="true">尚未進入簽署</button>
+              <button class="button button--closed" type="button" data-sign-button disabled aria-disabled="true">填寫並簽署（尚未開放）</button>
             </div>
             <p class="availability-note">正式接受、簽署與可追溯收據尚未開放；本頁不會寫入確認或簽署紀錄。</p>
-          </div>
+          </section>
         </div>
       </section>
 
@@ -132,32 +187,6 @@
         </div>
       </section>
 
-      <section class="key-clauses section" aria-labelledby="clauses-title">
-        <div class="section-heading section-heading--split">
-          <div>
-            <p class="eyebrow">八項重點條款</p>
-            <h2 id="clauses-title">閱讀前，先掌握影響決策的規則</h2>
-          </div>
-          <p>下列重點方便討論；完整權利義務仍以本頁完整條文與附件為準。</p>
-        </div>
-        <div class="clauses" data-key-clauses></div>
-      </section>
-
-      <section id="full-contract" class="contract-reading section" aria-labelledby="contract-reading-title">
-        <div class="section-heading">
-          <p class="eyebrow">完整契約</p>
-          <h2 id="contract-reading-title">逐條閱讀，對照每一份後續紀錄</h2>
-          <p>目前為草稿，未確認欄位會保留原樣，避免在正式確認前補入未經核對的資料。</p>
-        </div>
-        <div class="reading-grid">
-          <aside class="contents" aria-label="契約目錄">
-            <p>契約目錄</p>
-            <ol data-contents></ol>
-          </aside>
-          <article class="contract-paper" data-contract aria-label="完整 PCM 服務契約內容"></article>
-        </div>
-      </section>
-
       <section class="recovery section" aria-labelledby="recovery-title">
         <div class="section-heading section-heading--split">
           <div>
@@ -196,7 +225,7 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer">LaiBE AI PCM｜讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</footer>
-    <script type="module" src="./app.js"></script>
+    <footer class="site-footer">LaiBE DRS｜讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</footer>
+    <script type="module" src="./app.js?v=20260811-contract-book-reader"></script>
   </body>
 </html>

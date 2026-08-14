@@ -126,6 +126,29 @@ const SECTION_ID_MAP = Object.freeze([
   ["附件十二", "annex-12"], ["附件十三", "annex-13"], ["附件十四", "annex-14"],
 ]);
 
+export const CONTRACT_PARTS = ObjectFreeze([
+  ObjectFreeze({
+    number: "01",
+    title: "契約與服務",
+    summary: "契約當事人、服務目的與範圍、DRS 責任邊界、案件類型與服務期間。",
+  }),
+  ObjectFreeze({
+    number: "02",
+    title: "費用與付款",
+    summary: "服務費率 3.5%、付款節點、非服務方收入款項、甲方義務與現場疑慮揭露。",
+  }),
+  ObjectFreeze({
+    number: "03",
+    title: "責任與紀錄",
+    summary: "服務方義務、AI 使用限制、案件紀錄、電子文件效力、個資與保密。",
+  }),
+  ObjectFreeze({
+    number: "04",
+    title: "權益與簽署",
+    summary: "退費、責任限制、爭議處理、契約審閱、準據法、簽署與附件。",
+  }),
+]);
+
 const READINESS_ITEMS = Object.freeze([
   ["正式契約版本", "正式契約版本尚未固定"],
   ["甲方身分", "甲方身分尚未完成確認"],
@@ -307,12 +330,35 @@ export function resolveContractSectionId(heading, fallbackIndex) {
   return `contract-section-${fallbackIndex}`;
 }
 
-function renderKeyClauses() {
-  const container = document.querySelector("[data-key-clauses]");
-  if (!container) return;
+export function resolveContractPartIndex(heading, fallbackIndex = 0) {
+  const safeFallback = Number.isInteger(fallbackIndex) && fallbackIndex >= 0 && fallbackIndex < 4
+    ? fallbackIndex
+    : 0;
+  if (typeof heading !== "string") return safeFallback;
 
+  const sectionId = resolveContractSectionId(heading, -1);
+  if (sectionId.slice(0, 6) === "annex-") return 3;
+  const articleMatch = /^article-(\d+)/.exec(sectionId);
+  if (!articleMatch) return safeFallback;
+
+  const articleNumber = Number.parseInt(articleMatch[1], 10);
+  if (articleNumber >= 21) return 3;
+  if (articleNumber >= 11) return 2;
+  if (articleNumber >= 7) return 1;
+  return 0;
+}
+
+export function resolveContractPageDirection(currentIndex, nextIndex) {
+  if (nextIndex === currentIndex) return "current";
+  return nextIndex > currentIndex ? "next" : "previous";
+}
+
+function renderKeyClauses(pages) {
+  if (!pages || pages.length !== CONTRACT_PARTS.length) return;
   for (let index = 0; index < KEY_CLAUSES.length; index += 1) {
     const clause = KEY_CLAUSES[index];
+    const pageIndex = resolveContractPartIndex(clause.anchor, 0);
+    const container = pages[pageIndex].highlights;
     const article = document.createElement("article");
     article.className = "clause";
     article.id = clause.id;
@@ -363,16 +409,48 @@ function renderClauseTable(tableData) {
 
 function renderContract() {
   const contract = document.querySelector("[data-contract]");
-  const contents = document.querySelector("[data-contents]");
-  if (!contract || !contents) return;
+  if (!contract) return [];
+
+  const pages = [];
+  for (let pageIndex = 0; pageIndex < CONTRACT_PARTS.length; pageIndex += 1) {
+    const part = CONTRACT_PARTS[pageIndex];
+    const panel = document.createElement("article");
+    panel.className = pageIndex === 0
+      ? "contract-paper contract-page-panel is-active"
+      : "contract-paper contract-page-panel";
+    panel.id = `contract-page-${part.number}`;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", `contract-tab-${part.number}`);
+    panel.setAttribute("data-contract-page", String(pageIndex));
+    panel.hidden = pageIndex !== 0;
+
+    const summary = document.createElement("header");
+    summary.className = "contract-part__summary";
+    const partLabel = createTextElement("p", `PART ${part.number}`, "contract-part__number");
+    const partTitle = createTextElement("p", part.title, "contract-part__title");
+    const partSummary = createTextElement("p", part.summary, "contract-part__description");
+    summary.append(partLabel, partTitle, partSummary);
+
+    const highlights = document.createElement("section");
+    highlights.className = "contract-part__highlights";
+    highlights.setAttribute("aria-label", `${part.title}條款重點`);
+    highlights.append(createTextElement("p", "本頁條款重點", "contract-part__highlights-label"));
+
+    const body = document.createElement("div");
+    body.className = "contract-part__body";
+    panel.append(summary, highlights, body);
+    contract.append(panel);
+    pages.push({ panel, highlights, body });
+  }
 
   const lines = CONTRACT_SOURCE.split("\n");
   let headingIndex = 0;
+  let currentPartIndex = 0;
   let currentParagraph = [];
 
   function appendParagraph() {
     if (currentParagraph.length === 0) return;
-    contract.append(createTextElement("p", currentParagraph.join("\n")));
+    pages[currentPartIndex].body.append(createTextElement("p", currentParagraph.join("\n")));
     currentParagraph = [];
   }
 
@@ -386,25 +464,17 @@ function renderContract() {
       const level = headingMatch[1].length;
       const renderedLevel = level + 1;
       const headingText = headingMatch[2];
+      currentPartIndex = resolveContractPartIndex(headingText, currentPartIndex);
       const heading = createTextElement(`h${renderedLevel}`, headingText);
       const id = resolveContractSectionId(headingText, headingIndex);
       heading.id = id;
-      contract.append(heading);
-
-      if (level === 1 || /^第[一二三四五六七八九十百]+條/.test(headingText)) {
-        const item = document.createElement("li");
-        const link = document.createElement("a");
-        link.href = `#${id}`;
-        link.textContent = headingText;
-        item.append(link);
-        contents.append(item);
-      }
+      pages[currentPartIndex].body.append(heading);
       continue;
     }
 
     if (line === "---") {
       appendParagraph();
-      contract.append(document.createElement("hr"));
+      pages[currentPartIndex].body.append(document.createElement("hr"));
       continue;
     }
     if (line.trim() === "") {
@@ -414,6 +484,110 @@ function renderContract() {
     currentParagraph.push(line);
   }
   appendParagraph();
+  return pages;
+}
+
+function initialiseContractPager(pages) {
+  if (
+    !pages ||
+    pages.length !== CONTRACT_PARTS.length ||
+    typeof document.querySelectorAll !== "function"
+  ) {
+    return;
+  }
+
+  const tabs = Array.from(document.querySelectorAll("[data-contract-tab]"));
+  if (tabs.length !== CONTRACT_PARTS.length) return;
+
+  const previousButton = document.querySelector("[data-contract-previous]");
+  const nextButton = document.querySelector("[data-contract-next]");
+  const currentNumber = document.querySelector("[data-contract-current]");
+  const currentTitle = document.querySelector("[data-contract-current-title]");
+  const progress = document.querySelector("[data-contract-progress]");
+  const scrollPositions = new Array(CONTRACT_PARTS.length).fill(0);
+  let currentIndex = 0;
+  let cleanupTimer = null;
+
+  function clearMotionClasses() {
+    for (let index = 0; index < pages.length; index += 1) {
+      pages[index].panel.classList.remove(
+        "is-entering-next",
+        "is-leaving-next",
+        "is-entering-previous",
+        "is-leaving-previous",
+      );
+      if (index !== currentIndex) pages[index].panel.hidden = true;
+    }
+  }
+
+  function updateControls() {
+    const part = CONTRACT_PARTS[currentIndex];
+    for (let index = 0; index < tabs.length; index += 1) {
+      const selected = index === currentIndex;
+      tabs[index].setAttribute("aria-selected", selected ? "true" : "false");
+      tabs[index].tabIndex = selected ? 0 : -1;
+    }
+    if (previousButton) previousButton.disabled = currentIndex === 0;
+    if (nextButton) nextButton.disabled = currentIndex === CONTRACT_PARTS.length - 1;
+    if (currentNumber) currentNumber.textContent = part.number;
+    if (currentTitle) currentTitle.textContent = part.title;
+    if (progress) progress.textContent = part.number;
+  }
+
+  function activatePage(nextIndex, focusTab = false) {
+    if (!Number.isInteger(nextIndex) || nextIndex < 0 || nextIndex >= pages.length) return;
+    const direction = resolveContractPageDirection(currentIndex, nextIndex);
+    if (direction === "current") {
+      if (focusTab) tabs[nextIndex].focus();
+      return;
+    }
+
+    if (cleanupTimer !== null && typeof window.clearTimeout === "function") {
+      window.clearTimeout(cleanupTimer);
+    }
+    clearMotionClasses();
+
+    const outgoing = pages[currentIndex].panel;
+    const incoming = pages[nextIndex].panel;
+    scrollPositions[currentIndex] = outgoing.scrollTop;
+    outgoing.classList.remove("is-active");
+    outgoing.classList.add(`is-leaving-${direction}`);
+    incoming.hidden = false;
+    incoming.scrollTop = scrollPositions[nextIndex];
+    incoming.classList.add("is-active", `is-entering-${direction}`);
+    currentIndex = nextIndex;
+    updateControls();
+    if (focusTab) tabs[nextIndex].focus();
+
+    if (typeof window.setTimeout === "function") {
+      cleanupTimer = window.setTimeout(() => {
+        clearMotionClasses();
+        cleanupTimer = null;
+      }, 360);
+    }
+  }
+
+  for (let index = 0; index < tabs.length; index += 1) {
+    tabs[index].addEventListener("click", () => activatePage(index));
+    tabs[index].addEventListener("keydown", (event) => {
+      let targetIndex = currentIndex;
+      if (event.key === "ArrowDown") targetIndex = Math.min(currentIndex + 1, tabs.length - 1);
+      else if (event.key === "ArrowUp") targetIndex = Math.max(currentIndex - 1, 0);
+      else if (event.key === "Home") targetIndex = 0;
+      else if (event.key === "End") targetIndex = tabs.length - 1;
+      else return;
+      event.preventDefault();
+      activatePage(targetIndex, true);
+    });
+  }
+
+  if (previousButton) {
+    previousButton.addEventListener("click", () => activatePage(currentIndex - 1));
+  }
+  if (nextButton) {
+    nextButton.addEventListener("click", () => activatePage(currentIndex + 1));
+  }
+  updateControls();
 }
 
 function renderReadiness(readiness) {
@@ -487,8 +661,9 @@ function renderFailureStates() {
 }
 
 function initialisePage() {
-  renderKeyClauses();
-  renderContract();
+  const contractPages = renderContract();
+  renderKeyClauses(contractPages);
+  initialiseContractPager(contractPages);
   renderFailureStates();
   renderContractContext(resolveContractContext(INITIAL_CONTRACT_CONTEXT));
   const readiness = evaluateSigningReadiness(INITIAL_SIGNING_ENVELOPE);

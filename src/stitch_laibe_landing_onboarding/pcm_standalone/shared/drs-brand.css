@@ -1,0 +1,189 @@
+:root {
+  --drs-gold-deep: #9a6518;
+  --drs-gold: #e8b64f;
+  --drs-gold-bright: #fff4c2;
+  --drs-champagne: #d8c79d;
+  --drs-silver: #b9c4d0;
+  --drs-silver-bright: #f4f8fc;
+  --drs-divider: rgba(236, 241, 247, 0.24);
+}
+
+.drs-brand-lockup.drs-brand-lockup {
+  position: relative;
+  display: inline-grid;
+  width: auto;
+  min-width: 154px;
+  margin: 0;
+  padding: 3px 0 3px 13px;
+  border: 0;
+  border-left: 1px solid var(--drs-divider);
+  align-content: center;
+  gap: 3px;
+  background: none;
+  color: inherit;
+  line-height: 1;
+  text-align: left;
+  text-decoration: none;
+  justify-items: stretch;
+}
+
+.drs-brand-wordmark {
+  display: block;
+  margin: 0;
+  padding: 0;
+  color: var(--drs-champagne);
+  background: linear-gradient(105deg, #b88a37 0%, var(--drs-champagne) 34%, #f4dfaa 52%, var(--drs-champagne) 70%, #b88a37 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-family: "Bahnschrift SemiCondensed", "DIN Alternate", sans-serif;
+  font-size: 0.72rem;
+  font-stretch: condensed;
+  font-weight: 760;
+  letter-spacing: 0.035em;
+  line-height: 1.04;
+  white-space: nowrap;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 5px rgba(255, 228, 161, 0.1);
+}
+
+.drs-brand-term,
+.drs-brand-rest,
+.drs-brand-initial,
+.drs-brand-amp {
+  display: inline;
+}
+
+.drs-brand-initial {
+  color: var(--drs-gold-bright);
+  background: linear-gradient(115deg, var(--drs-gold) 0%, var(--drs-gold-bright) 52%, #c68d2c 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-size: 1.12em;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  -webkit-text-fill-color: transparent;
+}
+
+.drs-brand-rest {
+  color: var(--drs-champagne);
+}
+
+.drs-brand-amp {
+  color: var(--drs-gold);
+  font-size: 0.88em;
+  font-weight: 680;
+  opacity: 0.76;
+}
+
+.drs-brand-lockup .drs-brand-name {
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--drs-silver-bright);
+  background: linear-gradient(100deg, #8592a1 0%, var(--drs-silver-bright) 46%, var(--drs-silver) 72%, #f8fbff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-family: "Microsoft JhengHei UI", "Noto Sans TC", sans-serif;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 860;
+  letter-spacing: 0.04em;
+  line-height: 1.16;
+  text-align: justify;
+  text-align-last: justify;
+  white-space: nowrap;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 4px rgba(225, 236, 247, 0.2));
+}
+
+.drs-brand-lockup--expanded.drs-brand-lockup--expanded {
+  min-width: 168px;
+  padding: 3px 0 4px 17px;
+  border-left: 0;
+  align-items: start;
+  gap: 2px;
+}
+
+.drs-brand-lockup--expanded::before {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 1px;
+  content: "";
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 232, 174, 0.18) 12%,
+    rgba(232, 182, 79, 0.46) 42%,
+    rgba(220, 228, 237, 0.24) 78%,
+    transparent 100%
+  );
+  box-shadow: 0 0 8px rgba(232, 182, 79, 0.12);
+}
+
+.drs-brand-lockup--expanded .drs-brand-wordmark {
+  inline-size: 100%;
+  font-size: 0.84rem;
+}
+
+.drs-brand-lockup--expanded .drs-brand-name {
+  inline-size: 100%;
+  margin-top: 2px;
+  font-size: 0.90rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+.drs-brand-context {
+  color: var(--drs-silver);
+  font-size: 0.68rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .drs-brand-lockup.drs-brand-lockup {
+    min-width: 132px;
+    padding-left: 9px;
+    gap: 2px;
+  }
+
+  .drs-brand-wordmark {
+    font-size: 0.64rem;
+    letter-spacing: 0.02em;
+  }
+
+  .drs-brand-lockup .drs-brand-name {
+    font-size: 0.64rem;
+    letter-spacing: 0.06em;
+  }
+
+  .drs-brand-lockup--expanded.drs-brand-lockup--expanded {
+    min-width: 146px;
+    padding-left: 11px;
+  }
+
+  .drs-brand-lockup--expanded .drs-brand-wordmark {
+    font-size: 0.66rem;
+    letter-spacing: 0.018em;
+  }
+
+  .drs-brand-lockup--expanded .drs-brand-name {
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.035em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drs-brand-wordmark,
+  .drs-brand-initial {
+    background-position: 45% 50%;
+  }
+}

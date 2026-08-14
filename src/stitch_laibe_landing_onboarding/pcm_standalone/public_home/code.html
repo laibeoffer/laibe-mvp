@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="LaiBE AI PCM 協助甲方先整理乙方報價、施工圖、風險與案件決策紀錄。"
+      content="LaiBE DRS 協助甲方先整理乙方報價、施工圖、風險與案件決策紀錄。"
     />
-    <title>LaiBE AI PCM｜甲方的裝修文件與里程碑治理</title>
+    <title>LaiBE DRS｜甲方的裝修文件與里程碑治理</title>
     <link
       rel="icon"
       type="image/svg+xml"
       href="../../../../assets/logo/laibe_offer.svg"
     />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260813-hero-subtitle-warm" />
+    <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs-full-name" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">跳到主要內容</a>
@@ -24,102 +25,158 @@
           src="../../../../assets/logo/laibe_offer.svg"
           alt="LaiBE offer"
         />
-        <span>AI PCM</span>
+        <span class="drs-brand-lockup drs-brand-lockup--expanded">
+          <span class="drs-brand-wordmark" aria-label="Decision &amp; Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
+          <small class="drs-brand-name">裝潢決策系統</small>
+        </span>
       </a>
-      <a
-        class="header-account-entry"
-        data-account-entry
-        data-route="accountAccess"
-        data-route-state="planned"
-        data-canonical-route="/account/access"
-        aria-disabled="true"
-        tabindex="-1"
-      >註冊／登入</a>
-      <nav aria-label="主選單">
-        <a href="#case-flow">完整流程</a>
-        <a href="#service-fee">費用方式</a>
-        <a href="#milestone-governance">里程碑治理</a>
+      <nav class="header-actions" aria-label="主要入口">
         <a
-          class="button button--quiet"
-          data-route="startCase"
-          href="../owner_start/code.html"
-        >查看申請與文件準備</a>
-        <a href="../service_contract/code.html">PCM 服務契約</a>
+          class="header-action header-action--primary"
+          data-route="quoteCheck"
+          href="../quote_check/code.html"
+        >開始健檢</a>
+        <a
+          class="header-action header-action--account"
+          data-account-entry
+          data-route="accountAccess"
+          data-route-state="planned"
+          data-canonical-route="/account/access"
+          aria-disabled="true"
+          tabindex="-1"
+        >註冊／登入</a>
+        <a class="header-action header-action--context" href="../about_drs/code.html">關於DRS</a>
+        <a
+          class="header-action header-action--context"
+          data-route="serviceContract"
+          data-route-state="planned"
+          aria-disabled="true"
+          tabindex="-1"
+        >DRS服務合約</a>
       </nav>
     </header>
 
     <main id="main-content">
       <section id="hero" class="hero" aria-labelledby="hero-title">
         <div class="hero__copy">
-          <p class="eyebrow">給已取得乙方報價與施工圖的甲方</p>
-          <h1 id="hero-title">
-            在裝潢上，專業的事讓專業彼此核對。
-            重要的決定，由你來做。
+          <h1
+            id="hero-title"
+            class="hero-title-lockup"
+            aria-label="在裝潢上，專業的事讓專業彼此核對。重要的決定，由你來做。"
+          >
+            <span class="hero-title__horizontal" aria-hidden="true">
+              <span>在裝潢上，</span>
+              <span>專業的事讓專業</span>
+              <span>彼此核對。</span>
+            </span>
+            <span aria-hidden="true" class="hero-title__vertical">重要的決定，由你來做。</span>
           </h1>
-          <p class="hero__lead">
-            PCM 是甲方的決策顧問，替你審查報價、圖說、追加與施工紀錄。先過濾差異與缺漏，再把清楚的結果交給你確認。
-          </p>
-          <div class="hero__actions">
-            <a
-              class="button button--primary"
-              data-kind="primary"
-              data-route="startCase"
-              href="../owner_start/code.html"
-            >
-              查看申請與文件準備
-            </a>
-            <a class="text-link" data-route="process" href="#case-flow">
-              查看完整流程
-            </a>
-          </div>
-          <p class="record-note hero__status" data-hero-status>
-            目前可查看申請條件與乙方報價單、施工圖兩份 PDF 的準備方式；正式註冊與文件收件開放後，才可送出。
-            施工圖至少包含平面圖；準備文件不等於簽署 PCM 服務契約。
+          <p class="hero-subtitle">
+            <img
+              class="hero-subtitle__brand-mark"
+              src="./assets/d_rs_03_compact_d0e0e3.svg"
+              alt="D&amp;RS"
+              width="96"
+              height="72"
+              decoding="async"
+            />
+            <span>在公共工程上，有PCM替政府審查專業流程。</span>
+            <span>在裝潢市場上，DRS系統是你做出決策的底氣。</span>
+            <span>AI時代的裝修過程，新手上路需要一位副駕駛。</span>
           </p>
         </div>
 
-        <div class="entry-choices" aria-labelledby="entry-choice-title">
-          <div class="entry-choices__heading">
-            <span>依你現在手上的文件開始</span>
-            <strong id="entry-choice-title">三個入口會依序開放，目前先看清楚用途</strong>
-          </div>
+        <div class="entry-choices">
           <div class="entry-choices__list">
             <a
-              class="entry-choice"
+              class="entry-choice entry-choice--quote"
+              data-entry-step="01"
               data-route="quoteCheck"
               data-route-state="planned"
               aria-disabled="true"
               tabindex="-1"
             >
-              <span>01</span>
-              <strong>查看報價健檢</strong>
-              <small>核對報價範圍、缺漏與版本差異</small>
-              <em>正在整理中</em>
+              <span class="entry-choice__kicker">文件核對</span>
+              <div class="entry-choice__copy">
+                <strong>報價資料健檢</strong>
+                <div class="entry-choice__details">
+                  <small>核對報價範圍、缺漏與版本差異</small>
+                  <span class="entry-choice__status">可先查看</span>
+                </div>
+              </div>
+              <span class="entry-choice__monogram" aria-hidden="true">檢</span>
+              <span class="entry-choice__number" aria-hidden="true">01</span>
             </a>
             <a
-              class="entry-choice"
-              data-route="drawingCheck"
+              class="entry-choice entry-choice--contract"
+              data-entry-step="02"
+              data-route="serviceContract"
               data-route-state="planned"
               aria-disabled="true"
               tabindex="-1"
             >
-              <span>02</span>
-              <strong>查看圖說檢討</strong>
-              <small>確認圖面可讀性、範圍與待補資料</small>
-              <em>正在整理中</em>
+              <span class="entry-choice__kicker">服務確認</span>
+              <div class="entry-choice__copy">
+                <strong>簽署服務契約</strong>
+                <div class="entry-choice__details">
+                  <small>先閱讀服務範圍，確認必要資料後再完成簽署</small>
+                  <span class="entry-choice__status">先閱讀服務契約</span>
+                </div>
+              </div>
+              <span class="entry-choice__monogram" aria-hidden="true">約</span>
+              <span class="entry-choice__number" aria-hidden="true">02</span>
             </a>
-            <a
-              class="entry-choice"
-              data-route="accountAccess"
-              data-route-state="planned"
+            <div
+              class="entry-choice entry-choice--invite entry-choice--planned"
+              data-entry-step="03"
+              data-entry-state="planned"
               aria-disabled="true"
-              tabindex="-1"
             >
-              <span>03</span>
-              <strong>註冊／登入</strong>
-              <small>甲乙方共用入口，身分確認後再進案件</small>
-              <em>正在整理中</em>
-            </a>
+              <span class="entry-choice__kicker">成員加入</span>
+              <div class="entry-choice__copy">
+                <strong>邀請乙方加入</strong>
+                <div class="entry-choice__details">
+                  <small>完成契約後，由甲方邀請乙方進入同一案件</small>
+                  <span class="entry-choice__status">完成契約後開放</span>
+                </div>
+              </div>
+              <span class="entry-choice__monogram" aria-hidden="true">邀</span>
+              <span class="entry-choice__number" aria-hidden="true">03</span>
+            </div>
+            <div
+              class="entry-choice entry-choice--decision entry-choice--planned"
+              data-entry-step="04"
+              data-entry-state="planned"
+              aria-disabled="true"
+            >
+              <span class="entry-choice__kicker">案件治理</span>
+              <div class="entry-choice__copy">
+                <strong>案件決策輔助</strong>
+                <div class="entry-choice__details">
+                  <small>進入已授權案件後，查看風險、待確認事項與決策紀錄</small>
+                  <span class="entry-choice__status">進入案件後使用</span>
+                </div>
+              </div>
+              <span class="entry-choice__monogram" aria-hidden="true">決</span>
+              <span class="entry-choice__number" aria-hidden="true">04</span>
+            </div>
+            <div
+              class="entry-choice entry-choice--acceptance entry-choice--planned"
+              data-entry-step="05"
+              data-entry-state="planned"
+              aria-disabled="true"
+            >
+              <span class="entry-choice__kicker">驗收確認</span>
+              <div class="entry-choice__copy">
+                <strong>撥款驗收書面審核</strong>
+                <div class="entry-choice__details">
+                  <small>核對驗收紀錄、缺失改善與撥款依據是否齊備</small>
+                  <span class="entry-choice__status">書面確認後進行</span>
+                </div>
+              </div>
+              <span class="entry-choice__monogram" aria-hidden="true">驗</span>
+              <span class="entry-choice__number" aria-hidden="true">05</span>
+            </div>
           </div>
         </div>
 
@@ -139,8 +196,8 @@
             <li data-process-step="02">
               <span class="rail-index">02</span>
               <div class="process-step__copy">
-                <small>註冊上傳</small>
-                <strong>建立甲方帳號並提供兩份 PDF</strong>
+                <small>申請登入</small>
+                <strong>甲方以有效 Email 申請一次性登入，登入後完成 LINE 綁定</strong>
               </div>
             </li>
             <li data-process-step="03">
@@ -175,397 +232,450 @@
         </div>
       </section>
 
+      <section
+        id="decision-prompts"
+        class="decision-prompts-section"
+        aria-labelledby="decision-prompts-title"
+      >
+        <div class="decision-prompts__intro">
+          <p class="eyebrow">裝潢決策前的專業問題</p>
+          <h2 id="decision-prompts-title">你真正需要確認的，不應該只是總價。</h2>
+          <p class="decision-prompts__lead">
+            材料、報價、圖說與追加，只要有一處不清楚，都是工程中增加費用與爭議的種子。
+          </p>
+        </div>
+
+        <div class="decision-path">
+          <div class="decision-path__questions-stage">
+            <span class="decision-path__spine" aria-hidden="true"></span>
+            <ol class="decision-path__questions" aria-label="開始決策前需要核對的五個問題">
+            <li class="decision-node decision-node--left decision-node--action" data-decision-node="Q01">
+              <article class="decision-node__copy">
+                <span class="decision-node__index">Q01</span>
+                <div class="decision-node__heading">
+                  <h3>材料是否安全？</h3>
+                  <a
+                    class="decision-node__tool"
+                    data-decision-tool="specification"
+                    data-route="quoteCheck"
+                    href="../quote_check/code.html"
+                  >
+                    <span class="decision-node__tool-label">
+                      <span class="decision-node__tool-subject">規格</span><span class="decision-node__tool-action">檢查</span>
+                    </span>
+                    <svg class="decision-node__tool-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M5 12h13m-5-5 5 5-5 5" />
+                    </svg>
+                  </a>
+                </div>
+                <p>文件是否清楚交代材料型號、規格與可供核對的資料？<br />沒有書面依據，就不能只靠一句「應該沒問題」。</p>
+              </article>
+              <span class="decision-node__ring" aria-hidden="true">
+                <span class="decision-node__core"></span>
+              </span>
+            </li>
+            <li class="decision-node decision-node--right decision-node--action" data-decision-node="Q02">
+              <article class="decision-node__copy">
+                <span class="decision-node__index">Q02</span>
+                <div class="decision-node__heading">
+                  <h3>報價合不合理？</h3>
+                  <a
+                    class="decision-node__tool"
+                    data-decision-tool="quote"
+                    data-route="quoteCheck"
+                    href="../quote_check/code.html"
+                  >
+                    <span class="decision-node__tool-label">
+                      <span class="decision-node__tool-subject">報價</span><span class="decision-node__tool-action">健檢</span>
+                    </span>
+                    <svg class="decision-node__tool-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M5 12h13m-5-5 5 5-5 5" />
+                    </svg>
+                  </a>
+                </div>
+                <p>總價只是最後一個數字。<br />項目、數量、單價、計價方式與版本是否完整一致，才是判斷前需要先看清楚的事。</p>
+              </article>
+              <span class="decision-node__ring" aria-hidden="true">
+                <span class="decision-node__core"></span>
+              </span>
+            </li>
+            <li class="decision-node decision-node--left decision-node--action" data-decision-node="Q03">
+              <article class="decision-node__copy">
+                <span class="decision-node__index">Q03</span>
+                <div class="decision-node__heading">
+                  <h3>圖說是否缺漏？</h3>
+                  <a
+                    class="decision-node__tool"
+                    data-decision-tool="drawing"
+                    data-route="quoteCheck"
+                    href="../quote_check/code.html"
+                  >
+                    <span class="decision-node__tool-label">
+                      <span class="decision-node__tool-subject">圖說</span><span class="decision-node__tool-action">檢查</span>
+                    </span>
+                    <svg class="decision-node__tool-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M5 12h13m-5-5 5 5-5 5" />
+                    </svg>
+                  </a>
+                </div>
+                <p>報價寫到的工作，圖面有沒有交代；<br />圖面畫到的內容，報價有沒有列入，都需要互相對照。</p>
+              </article>
+              <span class="decision-node__ring" aria-hidden="true">
+                <span class="decision-node__core"></span>
+              </span>
+            </li>
+            <li class="decision-node decision-node--right" data-decision-node="Q04">
+              <article class="decision-node__copy">
+                <span class="decision-node__index">Q04</span>
+                <h3>追加是否正常？</h3>
+                <p>追加提出時，要先對回原報價、圖說與約定範圍。<br />確認這是新增工作，還是原本就應該包含的內容。</p>
+              </article>
+              <span class="decision-node__ring" aria-hidden="true">
+                <span class="decision-node__core"></span>
+              </span>
+            </li>
+            <li class="decision-node decision-node--left decision-node--action" data-decision-node="Q05">
+              <article class="decision-node__copy">
+                <span class="decision-node__index">Q05</span>
+                <div class="decision-node__heading">
+                  <h3>合約是否公平？</h3>
+                  <a
+                    class="decision-node__tool"
+                    data-decision-tool="contract"
+                    data-route="serviceContract"
+                    href="../service_contract/code.html"
+                  >
+                    <span class="decision-node__tool-label">
+                      <span class="decision-node__tool-subject">訂製化</span><span class="decision-node__tool-action">合約</span>
+                    </span>
+                    <svg class="decision-node__tool-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M5 12h13m-5-5 5 5-5 5" />
+                    </svg>
+                  </a>
+                </div>
+                <p>定型化契約與乙方提供的契約版本，每期付款金額過大，這是所有屋主在契約上的痛點。</p>
+              </article>
+              <span class="decision-node__ring" aria-hidden="true">
+                <span class="decision-node__core"></span>
+              </span>
+            </li>
+            </ol>
+          </div>
+
+          <div class="decision-convergence">
+            <span class="decision-convergence__ring" aria-hidden="true">
+              <span class="decision-convergence__core">DRS</span>
+            </span>
+            <div class="decision-convergence__copy">
+              <strong>這些專業問題，先讓萊比幫你對回書面依據。</strong>
+              <p>DRS 不替你猜，也不替任何一方說話。<br />它會整理哪些內容已有依據、哪些資訊仍有缺漏，以及下一步需要誰補充，讓你不必只靠口頭解釋做決定。</p>
+            </div>
+          </div>
+
+          <span class="decision-path__arrow" aria-hidden="true"></span>
+          <div class="decision-cta">
+            <p class="decision-cta__microcopy">先從手上的報價單與施工圖開始</p>
+            <a
+              class="button button--primary"
+              data-kind="primary"
+              data-route="quoteCheck"
+              href="../quote_check/code.html"
+            >
+              <span class="decision-cta__primary-label">直接試做報價健檢</span>
+              <span class="decision-cta__primary-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="decision-cta__secondary decision-cta__glass decision-cta__glass--info" href="#pcm-scope">
+              <span class="decision-cta__glass-label">先看 DRS 如何核對</span>
+              <span class="decision-cta__glass-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="pcm-scope" class="section narrative-section narrative-section--questions" aria-labelledby="scope-title">
+        <div class="risk-map-heading">
+          <p class="eyebrow">DRS 在幫你做什麼</p>
+          <h2 id="scope-title">裝潢最貴的，往往不是報價本身，<br />而是那些一開始沒說清楚的事。</h2>
+          <div class="risk-map-heading__copy">
+            <p>DRS是專業第三方，經由AI輔助鑑別，把你看不懂、不好意思說的問題找出來。</p>
+            <p>你不需要自己變成工程專家，也不用只靠乙方口頭解釋來做決定。</p>
+            <p class="risk-map-heading__boundary">依現有書面資料協助核對，不代替現場查驗與法定專業判定。</p>
+          </div>
+        </div>
+        <div class="risk-map__viewport">
+          <div class="risk-map">
+            <div class="risk-map__core" aria-label="DRS 在甲方決定前先核對五種風險">
+              <div class="risk-map__core-face">
+                <span>甲方決定前</span>
+                <strong>DRS</strong>
+                <small>先核對五種風險</small>
+              </div>
+            </div>
+            <span class="risk-map__trunk" aria-hidden="true"></span>
+            <ol class="risk-map__list" aria-label="甲方最怕遇到的五種裝潢風險">
+              <li data-owner-risk="01" class="risk-map__item risk-map__item--far">
+                <span class="risk-map__branch" aria-hidden="true"></span>
+                <article class="risk-map__card">
+                  <div class="risk-map__copy">
+                    <strong>沒有白紙黑字，最後就只能各說各話。</strong>
+                    <p>DRS 先核對雙方確認的報價、施工圖與既有紀錄。裝潢不是先靠信任再補文件，而是先把約定留下來，再照約定往下走。</p>
+                  </div>
+                  <span class="risk-map__number"><small>風險</small><b>01</b></span>
+                  <span class="risk-map__icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><path d="M9 5h10l5 5v17H9z"/><path d="M19 5v6h5M12 16h9M12 20h9"/></svg>
+                  </span>
+                </article>
+              </li>
+              <li data-owner-risk="02" class="risk-map__item risk-map__item--near">
+                <span class="risk-map__branch" aria-hidden="true"></span>
+                <article class="risk-map__card">
+                  <div class="risk-map__copy">
+                    <strong>漏一張圖、漏一個項目，都可能變成後面的追加。</strong>
+                    <p>圖說缺漏、報價漏項、版本不同或資訊不完整，DRS 先標出來。因為文件越模糊，施工過程越容易出現「我以為有」、「你以為沒有」。</p>
+                  </div>
+                  <span class="risk-map__number"><small>風險</small><b>02</b></span>
+                  <span class="risk-map__icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><path d="M8 7h16v18H8z"/><path d="M12 12h8M12 16h5M21 19v5M21 27v.2"/></svg>
+                  </span>
+                </article>
+              </li>
+              <li data-owner-risk="03" class="risk-map__item risk-map__item--far">
+                <span class="risk-map__branch" aria-hidden="true"></span>
+                <article class="risk-map__card">
+                  <div class="risk-map__copy">
+                    <strong>這筆追加，你真的需要再付一次嗎？</strong>
+                    <p>乙方提出追加或變更時，DRS 先對回原報價、圖說與約定範圍，確認這到底是新增工作，還是原本就應該包含的內容？單價是否合理？</p>
+                  </div>
+                  <span class="risk-map__number"><small>風險</small><b>03</b></span>
+                  <span class="risk-map__icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="9"/><path d="M16 10v12M20 12.5c-1-1-2.3-1.5-4-1.5-2 0-3.5 1.1-3.5 2.7 0 4.3 7.5 1.8 7.5 6 0 1.6-1.5 2.8-3.8 2.8-1.8 0-3.4-.6-4.5-1.8"/></svg>
+                  </span>
+                </article>
+              </li>
+              <li data-owner-risk="04" class="risk-map__item risk-map__item--near">
+                <span class="risk-map__branch" aria-hidden="true"></span>
+                <article class="risk-map__card">
+                  <div class="risk-map__copy">
+                    <strong>材料進場就付款30%，安全嗎?</strong>
+                    <p>磁磚貼好了，才問防水有沒有測？錢付了，才發現這期其實沒驗？ 裝潢真正危險的，往往不是沒有驗收，而是錯過了「還看得到、還能要求改善」的時間點。</p>
+                  </div>
+                  <span class="risk-map__number"><small>風險</small><b>04</b></span>
+                  <span class="risk-map__icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><path d="M7 8h18v14H7z"/><path d="M12 26h8M16 22v4M16 11v6M16 19v.2"/></svg>
+                  </span>
+                </article>
+              </li>
+              <li data-owner-risk="05" class="risk-map__item risk-map__item--far">
+                <span class="risk-map__branch" aria-hidden="true"></span>
+                <article class="risk-map__card">
+                  <div class="risk-map__copy">
+                    <strong>責任不清，事情最後就停在「要不要妥協」？</strong>
+                    <p>甲乙雙方的信任破裂，往往出現在甲方不好意思開口，乙方認為你沒說就算了。但是，問題只是正在滾雪球</p>
+                  </div>
+                  <span class="risk-map__number"><small>風險</small><b>05</b></span>
+                  <span class="risk-map__icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32"><circle cx="12" cy="12" r="4"/><circle cx="22" cy="13" r="3"/><path d="M5 25c.8-4 3-6 7-6s6.2 2 7 6M20 20c3.8 0 5.8 1.7 6.5 5"/></svg>
+                  </span>
+                </article>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section id="result-example" class="section narrative-section narrative-section--results" aria-labelledby="result-example-title">
+        <div class="narrative-heading narrative-heading--split">
+          <div>
+            <p class="eyebrow">DRS 審查之後</p>
+            <h2 id="result-example-title">複雜的資料交給 DRS，<br />你只負責決策自己的需求。</h2>
+          </div>
+        </div>
+        <ol class="result-strip" aria-label="DRS 整理後的四個結果">
+          <li data-decision-result><span>01</span><strong>有沒有依據</strong><p>這項說法能不能從雙方確認的報價、圖說或案件紀錄找到支持。</p></li>
+          <li data-decision-result><span>02</span><strong>哪裡有差異</strong><p>把原約、最新版與這次提出的內容放在一起比較，指出真正不同的地方。</p></li>
+          <li data-decision-result><span>03</span><strong>還缺什麼</strong><p>哪些資料不足、哪些事情目前還不能確認，直接列出來。</p></li>
+          <li class="result-strip__decision" data-decision-result><span>04</span><strong>你現在要決定什麼</strong><p>DRS 把問題整理到可以作決定的程度，最後選擇仍然由甲方作成。</p></li>
+        </ol>
+      </section>
+
+      <section id="workspace-preview" class="section narrative-section narrative-section--decision" aria-labelledby="preview-title">
+        <div class="narrative-heading narrative-heading--split">
+          <div>
+            <p class="eyebrow">甲方的決策畫面</p>
+            <h2 id="preview-title">不用自己拼答案。<br />DRS 把決策需要的事放在同一頁。</h2>
+          </div>
+        </div>
+        <dl class="decision-board" aria-label="甲方作決定前看到的六項資訊">
+          <div data-decision-fact><dt>DRS 怎麼看</dt><dd>依目前文件，這件事可以確認到什麼程度。</dd></div>
+          <div data-decision-fact><dt>依據在哪裡</dt><dd>清楚指出引用哪一份報價、哪一版圖說或哪一筆案件紀錄。</dd></div>
+          <div data-decision-fact><dt>哪裡不一致</dt><dd>原約、最新版與本次提出內容之間，真正不同的是什麼。</dd></div>
+          <div data-decision-fact><dt>還缺什麼</dt><dd>哪些資料不足，因此目前還不能作出完整判斷。</dd></div>
+          <div data-decision-fact><dt>選了會怎樣</dt><dd>接受、要求補充、暫緩確認，各自可能造成什麼後續影響。</dd></div>
+          <div class="decision-board__owner" data-decision-fact><dt>最後由你決定</dt><dd>DRS 負責把專業問題整理到可以決定；甲方保留最後決定權。</dd></div>
+        </dl>
+        <blockquote class="brand-conviction">專業的事，讓專業彼此核對；<br />重要的決定，由你來做。</blockquote>
+      </section>
+
+      <section id="case-flow" class="section narrative-section narrative-section--timeline" aria-labelledby="flow-title">
+        <div class="narrative-heading narrative-heading--split">
+          <div>
+            <p class="eyebrow">從第一次核對，到每一次重要決定</p>
+            <h2 id="flow-title">工程一直往前，<br />DRS 就一直替你守住決策依據。</h2>
+          </div>
+          <div class="narrative-heading__copy">
+            <p>第一次先從你手上的報價與施工圖開始。</p>
+            <p>正式啟用後，每次追加、變更、確認、驗收與付款，都回到同一套文件、版本與案件紀錄。</p>
+          </div>
+        </div>
+        <ol class="decision-timeline" aria-label="DRS 持續作用的四個階段">
+          <li data-home-stage="1"><span>01</span><strong>先看現有資料</strong><p>先整理目前報價、施工圖、版本與缺漏，確認真正可以作為後續依據的是哪些資料。</p></li>
+          <li data-home-stage="2"><span>02</span><strong>建立共同依據</strong><p>正式啟用 DRS 後，甲乙雙方以共同確認的文件、版本與程序繼續案件。</p></li>
+          <li data-home-stage="3"><span>03</span><strong>每個重要節點重新核對</strong><p>追加、變更、驗收或付款前，DRS 重新整理本次內容與既有約定之間的差異、缺件與待確認事項。</p></li>
+          <li data-home-stage="4"><span>04</span><strong>決定與紀錄一起留下</strong><p>甲方作出最後決定；使用的文件版本、依據、回覆與責任人同步成為案件紀錄。</p></li>
+        </ol>
+      </section>
+
+      <section id="cooperation-scope" class="section narrative-section narrative-section--roles" aria-labelledby="roles-title">
+        <div class="narrative-heading narrative-heading--split">
+          <div>
+            <p class="eyebrow">三方各做自己最擅長的事</p>
+            <h2 id="roles-title">乙方放大自己的專業，<br />DRS負責核對，<br />決策你來做。</h2>
+          </div>
+          <div class="narrative-heading__copy">
+            <p>DRS 不是取代乙方，也不是替甲方施工。</p>
+            <p>它補上的，是甲方與專業資訊之間原本缺少的那一道核對、整理與決策輔助。</p>
+          </div>
+        </div>
+        <div class="role-band" aria-label="甲方、乙方與 DRS 的分工">
+          <article data-collaboration-role><span>乙方</span><strong>提出專業內容</strong><p>提出報價、施工圖、追加、變更與施工紀錄，並對自己提出的專業內容負責。</p></article>
+          <article class="role-band__drs" data-collaboration-role><span>DRS</span><strong>專業與專業對口</strong><p>依雙方確認的文件，整理差異、缺漏、待確認事項、可能影響與下一步。</p></article>
+          <article data-collaboration-role><span>甲方</span><strong>掌握結果，作最後決定，一切留痕。</strong><p>不必自己研究所有工程細節；看懂整理後的結果、確認重要事實，再決定是否接受與如何往下走。</p></article>
+        </div>
+        <p class="role-band__takeaway">DRS 替甲方把關，<br />但不替甲方作主。</p>
+        <p class="responsibility-note">DRS 提供書面資料審查與決策輔助，不代替甲乙雙方進行現場查驗，也不保證施工品質或取代法定專業判定。</p>
+      </section>
+
       <section id="application-check" class="section application-check" aria-labelledby="application-check-title">
         <div class="section-heading section-heading--split">
           <div>
             <p class="eyebrow">申請前確認</p>
-            <h2 id="application-check-title">先看你現在是否適合開始</h2>
+            <h2 id="application-check-title">先看現在是否適合開始</h2>
           </div>
-          <p>三項都符合，就能先整理文件與檢討方向；尚未備齊也不用猜，先回原提供者取得正確版本。</p>
+          <p>先確認手上資源，再認識萊比DRS。然後，才會有最準確的決策憑據。</p>
         </div>
-        <ul class="qualification-list">
-          <li data-qualification-item><span>01</span><strong>已取得乙方報價單 PDF</strong><p>需能看出項目、數量、單價或計價方式與版本。</p></li>
-          <li data-qualification-item><span>02</span><strong>已取得施工圖 PDF，至少包含平面圖</strong><p>圖面需可讀，並能與報價所述施工範圍互相核對。</p></li>
-          <li data-qualification-item><span>03</span><strong>希望先確認文件差異、缺漏與待釐清事項</strong><p>PCM 先整理問題，最後決定仍由甲方作成。</p></li>
-        </ul>
-      </section>
-
-      <section id="pcm-scope" class="section section--scope" aria-labelledby="scope-title">
-        <div class="section-heading section-heading--split">
-          <div>
-            <p class="eyebrow">基本檢討報告</p>
-            <h2 id="scope-title">先回答「文件能不能支持下一步決定」</h2>
-          </div>
-          <p>
-            基本檢討不是工程驗收、監造、法律意見或價格保證。
-            PCM 對書面規則、文件核對、程序、期限與留痕負責；
-            每一項提醒都要回到甲方提交的乙方報價、施工圖與明確版次。
-            結果僅限書面可查核資料，不構成現場施工品質保證。
-          </p>
-        </div>
-        <ul class="pcm-check-list" aria-label="PCM 替甲方核對的五項內容">
-          <li data-pcm-check><span>01</span><strong>報價與圖說是否使用同一施工範圍</strong></li>
-          <li data-pcm-check><span>02</span><strong>是否有漏列、重複或說法不一致</strong></li>
-          <li data-pcm-check><span>03</span><strong>追加或變更前，哪些事項應先確認</strong></li>
-          <li data-pcm-check><span>04</span><strong>驗收及付款前，哪些文件與紀錄仍不完整</strong></li>
-          <li data-pcm-check><span>05</span><strong>哪些問題應由甲方、乙方或 PCM 接續處理</strong></li>
-        </ul>
-        <ul class="output-list" aria-label="基本檢討內容">
-          <li>
-            <span class="output-list__number" aria-hidden="true">1</span>
-            <div class="output-list__copy">
-              <svg class="output-list__icon" viewBox="0 0 32 32" aria-hidden="true">
-                <path d="M8 4h11l5 5v19H8z" />
-                <path d="M19 4v6h6M12 16h8M12 21h5" />
-                <path d="m18.5 25 2 2 4-5" />
+        <div class="qualification-showcase">
+          <ol class="qualification-list" aria-label="啟動萊比 DRS 前的五項確認">
+            <li class="qualification-object" data-qualification-item tabindex="0">
+              <span class="qualification-object__shadow" aria-hidden="true"></span>
+              <span class="qualification-object__side" aria-hidden="true"></span>
+              <span class="qualification-object__bottom" aria-hidden="true"></span>
+              <span class="qualification-object__face" aria-hidden="true"></span>
+              <span class="qualification-object__number" aria-hidden="true">
+                <span class="qualification-object__number-digit">1</span>
+              </span>
+              <svg class="qualification-object__icon" viewBox="0 0 32 32" aria-hidden="true">
+                <circle cx="16" cy="16" r="10" />
+                <path d="M16 3v3M29 16h-3M16 29v-3M3 16h3" />
+                <path class="icon-accent" d="m11 16 3 3 7-8" />
               </svg>
-              <strong>文件完整性</strong>
-              <p>確認報價與施工圖是否可讀、是否有明確版次。</p>
-            </div>
-          </li>
-          <li>
-            <span class="output-list__number" aria-hidden="true">2</span>
-            <div class="output-list__copy">
-              <svg class="output-list__icon" viewBox="0 0 32 32" aria-hidden="true">
-                <circle cx="14" cy="14" r="7" />
-                <path d="m19 19 8 8M11 12h6M11 16h4" />
-              </svg>
-              <strong>範圍對照</strong>
-              <p>標示報價項目與圖面範圍可對應及待釐清之處。</p>
-            </div>
-          </li>
-          <li>
-            <span class="output-list__number" aria-hidden="true">3</span>
-            <div class="output-list__copy">
-              <svg class="output-list__icon" viewBox="0 0 32 32" aria-hidden="true">
-                <path d="M16 4 29 27H3z" />
-                <path d="M16 11v8M16 23v1" />
-              </svg>
-              <strong>初步風險</strong>
-              <p>指出缺件、矛盾與可能影響後續討論的事項。</p>
-            </div>
-          </li>
-          <li>
-            <span class="output-list__number" aria-hidden="true">4</span>
-            <div class="output-list__copy">
-              <svg class="output-list__icon" viewBox="0 0 32 32" aria-hidden="true">
-                <path d="M10 6H6v22h20V6h-4" />
-                <path d="M12 4h8v5h-8zM11 15h10M11 20h10M11 25h6" />
-              </svg>
-              <strong>補件清單</strong>
-              <p>說明應由甲方或乙方補充的文件與理由。</p>
-            </div>
-          </li>
-        </ul>
-        <div class="output-next" aria-labelledby="output-next-title">
-          <div>
-            <span>收到報告後</span>
-            <h3 id="output-next-title">甲方接著可以怎麼做</h3>
-            <p>先核對引用版本與待確認事項，再決定補件、暫停，或在正式入口開放後申請 PCM 服務。</p>
-          </div>
-          <a
-            class="button button--quiet report-format-link"
-            data-route="basicReport"
-            href="../basic_report/code.html"
-          >
-            查看基本檢討報告格式
-          </a>
-        </div>
-      </section>
-
-      <section id="result-example" class="section result-example" aria-labelledby="result-example-title">
-        <div class="section-heading section-heading--split">
-          <div>
-            <p class="eyebrow">基本檢討結果示意</p>
-            <h2 id="result-example-title">先把判斷需要的事實放在同一頁</h2>
-          </div>
-          <p class="preview-disclosure">格式示意，非真實案件；不代表完成能力、個案結果或效果保證。</p>
-        </div>
-        <dl class="result-facts">
-          <div><dt>引用版本</dt><dd>列出本次引用的報價與圖面名稱、版次；文件提交後才顯示。</dd></div>
-          <div><dt>已確認內容</dt><dd>只列書面資料足以支持的核對結果，不代替現場專業判斷。</dd></div>
-          <div><dt>差異與缺漏</dt><dd>逐項連回來源文件，說明不一致或尚缺的內容。</dd></div>
-          <div><dt>仍不確定事項</dt><dd>清楚標示目前資料無法回答、需要誰補充。</dd></div>
-          <div><dt>建議下一步</dt><dd>依影響順序整理先補件、先確認或暫停的事項。</dd></div>
-          <div><dt>下一責任人</dt><dd>標示由甲方、乙方或 PCM 接續處理，不讓問題停在半路。</dd></div>
-          <div><dt>案件紀錄</dt><dd>保留文件依據、確認內容、責任人與後續狀態。</dd></div>
-        </dl>
-      </section>
-
-      <section id="case-flow" class="section" aria-labelledby="flow-title">
-        <div class="section-heading">
-          <p class="eyebrow">完整流程</p>
-          <h2 id="flow-title">文件先行，服務契約與乙方邀請在後</h2>
-          <p>
-            每一步都顯示目前狀態、下一責任人與留下的紀錄；沒有完成前一步，不會跳過權限與版本確認。
-          </p>
-        </div>
-        <ol class="home-flow" aria-label="PCM 首頁四階段流程">
-          <li data-home-stage="1"><span>01</span><strong>準備報價與圖說</strong><p>先確認兩份 PDF 可讀、版本清楚，施工圖至少包含平面圖。</p></li>
-          <li data-home-stage="2"><span>02</span><strong>取得基本檢討結果</strong><p>查看引用版本、已確認內容、差異缺漏、下一步與責任人。</p></li>
-          <li data-home-stage="3"><span>03</span><strong>決定是否申請正式 PCM 服務</strong><p>先看懂結果，再由甲方決定是否進入正式服務與契約流程。</p></li>
-          <li data-home-stage="4"><span>04</span><strong>進入案件治理與紀錄</strong><p>甲乙方與 PCM 回到同一份文件、決定、責任與案件留痕。</p></li>
-        </ol>
-        <ol class="flow-list" hidden>
-          <li><span>1</span><strong>甲方註冊</strong><p>建立甲方身分與自己的案件入口。</p><p data-flow-actor>留下：甲方身分與案件建立時間｜下一位：甲方</p></li>
-          <li><span>2</span><strong>上傳必備文件</strong><p>提供乙方報價單 PDF 與施工圖 PDF（至少平面圖）。</p><p data-flow-actor>留下：文件名稱、版次、提供者與上傳時間｜下一位：萊比</p></li>
-          <li><span>3</span><strong>取得基本檢討</strong><p>查閱引用版本、差異、缺件與下一步建議。</p><p data-flow-actor>留下：報告版本、引用文件與待確認事項｜下一位：甲方</p></li>
-          <li><span>4</span><strong>簽署 PCM 服務</strong><p>甲方與萊比確認服務契約的精確版本、費用、留痕與終止規則。</p><p data-flow-actor>留下：契約版本、服務範圍與雙方確認｜下一位：甲方與萊比</p></li>
-          <li><span>5</span><strong>邀請乙方</strong><p>乙方確認參與身分，並對同一份 PCM 程序版本明示同意。</p><p data-flow-actor>留下：邀請、身分與文件版本確認｜下一位：乙方</p></li>
-          <li><span>6</span><strong>三方里程碑治理</strong><p>乙方提送、PCM 檢討、甲方驗證，所有異議與確認保存在案件內。</p><p data-flow-actor>留下：提送、意見、異議與確認紀錄｜下一位：依案件狀態顯示</p></li>
-        </ol>
-      </section>
-
-      <section
-        id="workspace-preview"
-        hidden
-        class="section section--workspace"
-        aria-labelledby="preview-title"
-      >
-        <div class="workspace-copy">
-          <p class="eyebrow">里程碑紀錄示意</p>
-          <h2 id="preview-title">不是一張通過章，而是一份可追溯的判讀</h2>
-          <p>
-            下方只示意未來案件頁的資訊層級，不含真實姓名、案件內容或客戶成果。
-          </p>
-          <p class="preview-disclosure">
-            示意成果／非真實客戶案件／不代表效果保證
-          </p>
-        </div>
-        <div class="workspace-sheet" aria-label="里程碑紀錄格式示意">
-          <div class="workspace-sheet__top">
-            <span>待甲方驗證</span>
-            <strong>同一份意見，連回同一份文件與版次</strong>
-          </div>
-          <dl>
-            <div>
-              <dt>版本依據</dt>
-              <dd>乙方報價 v3、施工圖 v2、PCM 檢討意見 v1</dd>
-            </div>
-            <div>
-              <dt>待確認事項</dt>
-              <dd>逐項顯示差異、PCM 理由及甲乙雙方補充資料</dd>
-            </div>
-            <div>
-              <dt>目前處理者</dt>
-              <dd>甲方；可簽核、提出異議或申請暫緩驗收</dd>
-            </div>
-            <div>
-              <dt>下一步</dt>
-              <dd>甲方完成驗證後進入下一里程碑；有異議則交回 PCM 回復</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
-
-      <section id="role-entry" hidden class="section" aria-labelledby="role-title">
-        <div class="section-heading section-heading--split">
-          <div>
-            <p class="eyebrow">主要服務對象</p>
-            <h2 id="role-title">PCM 獨立上線先服務甲方</h2>
-          </div>
-          <p>
-            甲方是案件發起人，也是是否採用 PCM 服務的決定者。
-            乙方不從公開頁接案或自行加入；甲方完成 PCM 服務簽署後，
-            才由案件邀請乙方加入並確認同一份文件與里程碑責任。PCM 目前為獨立試營運，
-            每案會先評估文件條件與書面治理適合度；正式收件前會顯示個資、保存期間與權限說明。
-          </p>
-        </div>
-        <div class="role-grid role-grid--owner-first">
-          <article class="role-link" data-public-role="owner">
-            <span class="role-link__label">甲方／業主</span>
-            <strong>先把你手上的報價與圖面變成可判讀的案件依據</strong>
-            <p>
-              你可以在簽約前先提供乙方報價單與施工圖，收到基本檢討後再決定。
-            </p>
-            <p class="role-link__handoff">
-              下一步：註冊、上傳兩份 PDF，等待萊比提出基本檢討。
-            </p>
-          </article>
-          <aside class="invite-note" aria-label="乙方加入方式">
-            <span>乙方加入方式</span>
-            <strong>簽約後，由甲方從案件內邀請</strong>
-            <p>
-              乙方加入後可查閱自己參與案件的文件、補件、三方訊息與里程碑紀錄，
-              但不能查看其他案件。
-            </p>
-          </aside>
-        </div>
-      </section>
-
-      <section
-        id="service-fee"
-        class="section section--identity"
-        aria-labelledby="fee-title"
-      >
-        <div class="identity-heading">
-          <p class="eyebrow">費用方式</p>
-          <h2 id="fee-title">PCM 服務費與工程款安排分開確認</h2>
-          <p>費用以正式 PCM 服務契約所載版本為準；首頁只說明計算基礎與服務邊界，不展開長篇條款。</p>
-        </div>
-        <div class="identity-details">
-          <div>
-            <strong>服務費計算</strong>
-            <p>PCM 服務費為甲乙確認並納入契約的乙方報價版本之 3.5%。該報價版本會列入契約依據。</p>
-          </div>
-          <div>
-            <strong>簽約款與里程碑</strong>
-            <p>
-              簽約時支付 PCM 總服務費的 10%；其餘 90% 依里程碑比例，
-              在乙方提送、PCM 發表意見及甲方完成確認後依約成立。
-            </p>
-          </div>
-          <div>
-            <strong>工程款安排</strong>
-            <p>PCM 僅提供文件審查與決策整理；甲乙方工程款安排不屬於本服務。</p>
-          </div>
-        </div>
-        <div id="milestone-governance" class="service-boundaries" aria-label="PCM 服務邊界">
-          <p><strong>PCM 提供：</strong>文件審查、決策整理與案件治理協助。</p>
-          <p><strong>工程款安排：</strong>由甲乙方依雙方約定自行確認。</p>
-          <p><strong>最後決定：</strong>PCM 協助核對與整理，不取代甲方作最後決定。</p>
-          <p><strong>專業責任：</strong>PCM 不取代設計師、統包或施工單位履行專業責任。</p>
-          <p><strong>正式依據：</strong>正式權利義務以服務契約為準。</p>
-        </div>
-      </section>
-
-      <template data-legacy-fee-copy>
-        萊比不代收、不託管，也不撥付甲乙方工程款
-      </template>
-
-      <section
-        id="legacy-milestone-governance"
-        hidden
-        class="section section--governance"
-        aria-labelledby="governance-title"
-      >
-        <div class="section-heading section-heading--split">
-          <div>
-            <p class="eyebrow">異議、暫緩與自行驗收</p>
-            <h2 id="governance-title">甲方有完整驗證時間，PCM 也要對自己的意見負責</h2>
-          </div>
-          <p>
-            三方服務期間，甲乙方與 PCM 的案件訊息對案件參與者公開，
-            並保存在萊比後台；重要決定必須引用文件版次並形成案件紀錄。
-          </p>
-        </div>
-        <div class="governance-grid">
-          <article>
-            <span>01</span>
-            <strong>提出異議不是終止</strong>
-            <p>
-              甲方提出異議或證據後，任何終止倒數立即取消。
-              PCM 必須逐項檢查並回復，再給甲方一段新的完整驗收時間。
-            </p>
-          </article>
-          <article>
-            <span>02</span>
-            <strong>可經雙方同意暫緩</strong>
-            <p>
-              甲方可提出暫緩驗收及新日期，須由乙方明示同意同一版本；
-              等待乙方決定期間不會啟動終止程序。
-            </p>
-          </article>
-          <article>
-            <span>03</span>
-            <strong>甲方可依協議自行確認</strong>
-            <p>
-              PCM 要求補件、無法判定或認為書面條件不成立時，甲乙雙方可確認同一份自主協議。
-              甲方完成後顯示「甲方依甲乙雙方協議自行確認本里程碑；
-              PCM 書面審查結果仍為條件不成立」，且不代表 PCM 認定現場品質。
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section
-        id="service-identity"
-        hidden
-        class="section section--identity"
-        aria-labelledby="identity-title"
-      >
-        <div class="identity-heading">
-          <p class="eyebrow">個人工作室／自然人簽約</p>
-          <h2 id="identity-title">文件可先整理，服務關係稍後再確認</h2>
-        </div>
-        <div class="identity-details">
-          <div>
-            <strong>簽約前</strong>
-            <p>
-              甲方先建立帳號、提供必備文件並取得基本檢討，不因此自動成立 PCM 服務契約。
-            </p>
-          </div>
-          <div>
-            <strong>簽約時</strong>
-            <p>
-              正式建立服務關係前，會揭露自然人簽約身分、服務內容、費用、
-              個資與資料權限，再由甲方明示確認同一契約版本。
-            </p>
-          </div>
-          <div>
-            <strong>案件訊息</strong>
-            <p>
-              案件頁是文件、訊息與重要決定的共同紀錄；外部通知只提醒你回到案件處理，
-              不取代萊比後台留存的案件事實。
-            </p>
-            <dl class="integration-readiness" aria-label="案件功能開放狀態">
-              <div>
-                <dt>案件資料與留痕</dt>
-                <dd data-case-data-readiness>
-                  案件知識與留痕功能正在整理中，正式開放後會提供完整操作入口。
-                </dd>
+              <div class="qualification-object__copy">
+                <p class="qualification-object__lead">確認自己需要萊比決策系統輔助。</p>
+                <p class="qualification-object__detail">如果你有非常豐富的裝潢經驗，建議使用萊比的免費功能即可。</p>
               </div>
-              <div>
-                <dt>個人案件通知</dt>
-                <dd data-notification-readiness>
-                  案件通知入口將於設定完成後開放。
-                </dd>
+            </li>
+            <li class="qualification-object" data-qualification-item tabindex="0">
+              <span class="qualification-object__shadow" aria-hidden="true"></span>
+              <span class="qualification-object__side" aria-hidden="true"></span>
+              <span class="qualification-object__bottom" aria-hidden="true"></span>
+              <span class="qualification-object__face" aria-hidden="true"></span>
+              <span class="qualification-object__number" aria-hidden="true">
+                <span class="qualification-object__number-digit">2</span>
+              </span>
+              <svg class="qualification-object__icon" viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M8 4h11l5 5v19H8zM19 4v6h6" />
+                <path class="icon-accent" d="M12 16h8M12 21h6" />
+              </svg>
+              <div class="qualification-object__copy">
+                <strong class="qualification-object__lead">已取得乙方報價單 PDF</strong>
+                <p class="qualification-object__detail">需能看出項目、數量、單價或計價方式與版本。</p>
               </div>
-            </dl>
-          </div>
+            </li>
+            <li class="qualification-object" data-qualification-item tabindex="0">
+              <span class="qualification-object__shadow" aria-hidden="true"></span>
+              <span class="qualification-object__side" aria-hidden="true"></span>
+              <span class="qualification-object__bottom" aria-hidden="true"></span>
+              <span class="qualification-object__face" aria-hidden="true"></span>
+              <span class="qualification-object__number" aria-hidden="true">
+                <span class="qualification-object__number-digit">3</span>
+              </span>
+              <svg class="qualification-object__icon" viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M5 5v22h22V16H17V5zM17 5v11H5M17 16h10" />
+                <path class="icon-accent" d="M10 21h5M12.5 18.5v5" />
+              </svg>
+              <div class="qualification-object__copy">
+                <strong class="qualification-object__lead">已取得施工圖 PDF，至少包含平面圖</strong>
+                <p class="qualification-object__detail">圖面需可讀，並能與報價所述施工範圍互相核對。</p>
+              </div>
+            </li>
+            <li class="qualification-object" data-qualification-item tabindex="0">
+              <span class="qualification-object__shadow" aria-hidden="true"></span>
+              <span class="qualification-object__side" aria-hidden="true"></span>
+              <span class="qualification-object__bottom" aria-hidden="true"></span>
+              <span class="qualification-object__face" aria-hidden="true"></span>
+              <span class="qualification-object__number" aria-hidden="true">
+                <span class="qualification-object__number-digit">4</span>
+              </span>
+              <svg class="qualification-object__icon" viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M7 4h13l5 5v9M20 4v6h6" />
+                <circle cx="17" cy="20" r="5" />
+                <path class="icon-accent" d="m21 24 6 5" />
+              </svg>
+              <div class="qualification-object__copy">
+                <strong class="qualification-object__lead">上傳檔案後取得基本報告，</strong>
+                <p class="qualification-object__detail">再決定是否啟動萊比DRS系統，輔助整體案件從設計到施工過程的書面審查，提供你做正確的決策。</p>
+              </div>
+            </li>
+            <li class="qualification-object" data-qualification-item tabindex="0">
+              <span class="qualification-object__shadow" aria-hidden="true"></span>
+              <span class="qualification-object__side" aria-hidden="true"></span>
+              <span class="qualification-object__bottom" aria-hidden="true"></span>
+              <span class="qualification-object__face" aria-hidden="true"></span>
+              <span class="qualification-object__number" aria-hidden="true">
+                <span class="qualification-object__number-digit">5</span>
+              </span>
+              <svg class="qualification-object__icon" viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M7 4h13l5 5v19H7zM20 4v6h6" />
+                <path d="m13.5 20 1.8 1.8 3.7-4" />
+                <path class="icon-accent" d="M16 14l6 2v4c0 4-2.4 6.4-6 8-3.6-1.6-6-4-6-8v-4z" />
+              </svg>
+              <div class="qualification-object__copy">
+                <strong class="qualification-object__lead">萊比DRS系統只針對書面證據做第三方審核，</strong>
+                <p class="qualification-object__detail">不是甲方的砍價武器，也不是挑乙方毛病的AI系統。</p>
+              </div>
+            </li>
+          </ol>
         </div>
       </section>
 
-      <section
-        id="final-action"
-        class="section section--boundary section--final-action"
-        aria-labelledby="final-action-title"
-      >
-        <span id="service-boundary" hidden></span>
-        <div class="boundary-copy" hidden>
-          <p class="eyebrow">48 小時補正與服務終止</p>
-          <h2 id="boundary-title">只有無合理回應的最後補正到期，PCM 才停止介入</h2>
-          <p>
-            48 小時補正不是一般驗收期限。只有 PCM 已依提交文件確認書面條件成立、
-            完整意見與文件可讀取與下載、原驗證期限已屆滿，
-            甲方沒有簽核、異議、證據或待處理的暫緩申請，
-            且正式通知可證明送達後，才會啟動 48 小時補正。
-          </p>
-          <p class="boundary-note">
-            補正期間仍無合理回應時，PCM 服務才依契約終止：
-            依雙方核准的 PCM 服務契約版本，PCM 與甲方同意服務契約自動解除；
-            尚未發生的 PCM 服務費停止請款；已支付的 10% 簽約款抵充已完成服務，
-            不另行退款或追加請款。甲乙方帳號與各自有權資料仍可讀取、下載與匯出，
-            雙方可繼續記錄直接協議、工程爭議或調停結果；
-            此時書面治理條件失效，PCM 不再介入。
-            正式法律用語與效果仍以核准契約版本及法律強制規定為準。
-          </p>
-        </div>
-        <div class="final-action">
-          <div>
-            <span>下一步由甲方</span>
-            <h2 id="final-action-title">先確認文件是否備齊，再決定要不要進入 PCM 服務</h2>
+      <section id="final-action" class="section narrative-section narrative-section--final" aria-labelledby="final-action-title">
+        <div class="narrative-final">
+          <div class="narrative-final__copy">
+            <p class="eyebrow">從你手上的資料開始</p>
+            <h2 id="final-action-title">不用先相信 DRS。<br />先讓 DRS 替你核對一次。</h2>
+            <p>把目前的報價與施工圖交進來。</p>
+            <p>先看看哪些已經說清楚、哪些還有缺漏、哪些事情值得你在下一步之前先確認。</p>
           </div>
-          <div class="final-action__controls">
+          <div class="narrative-final__controls">
+            <a class="button button--primary" data-kind="primary" data-route="quoteCheck" href="../quote_check/code.html">直接試做報價健檢</a>
             <a
-              class="button button--primary"
-              data-kind="primary"
-              data-route="startCase"
-              href="../owner_start/code.html"
-            >
-              查看申請與文件準備
-            </a>
-            <a class="button button--quiet" href="../service_contract/code.html">閱讀 PCM 服務契約</a>
+              class="button button--quiet"
+              data-account-entry
+              data-route="accountAccess"
+              data-route-state="planned"
+              data-canonical-route="/account/access"
+              aria-disabled="true"
+              tabindex="-1"
+            >登入／進入工作台</a>
           </div>
         </div>
       </section>
@@ -577,11 +687,12 @@
       </a>
       <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
       <div class="footer-links">
-        <a href="#case-flow">服務流程</a>
-        <a href="#service-fee">費用與服務邊界</a>
+        <a href="#pcm-scope">DRS 怎麼運作</a>
+        <a href="#case-flow">持續核對</a>
+        <a href="#cooperation-scope">三方分工</a>
         <a href="#top">回到頁首</a>
       </div>
     </footer>
-    <script type="module" src="./app.js"></script>
+    <script type="module" src="./app.js?v=20260811-rounded-reveal"></script>
   </body>
 </html>

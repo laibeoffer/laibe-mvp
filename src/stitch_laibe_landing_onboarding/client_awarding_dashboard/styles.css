@@ -1110,13 +1110,29 @@ body[data-workspace-state="PCM_SERVICE_ENDED_READ_ONLY"]
 }
 
 @media (max-width: 760px) {
+  .workspace-header__inner {
+    flex-wrap: wrap;
+    padding: 10px 0;
+    gap: 10px;
+  }
+
+  .workspace-header__context {
+    display: grid;
+    flex: 1 1 100%;
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-content: stretch;
+  }
+
   .workspace-header__context .context-chip[data-slot="case-name"] {
-    display: none;
+    display: inline-flex;
+    width: 100%;
+    max-width: 100%;
+    grid-column: 1 / -1;
   }
 
   .workspace-header__context .context-chip--state {
     overflow: hidden;
-    max-width: 132px;
+    max-width: 100%;
     text-overflow: ellipsis;
     white-space: nowrap;
   }

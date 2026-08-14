@@ -184,7 +184,7 @@ function rotateRight(value, places) {
   return (value >>> places) | (value << (32 - places));
 }
 
-function sha256Hex(value) {
+export function sha256Hex(value) {
   const bytes = new TextEncoder().encode(value);
   const bitLength = bytes.length * 8;
   const paddedLength = Math.ceil((bytes.length + 9) / 64) * 64;
@@ -294,36 +294,34 @@ function normalizeRecords(value, fields) {
 }
 
 function normalizePublicMessages(value) {
-  return asArray(value)
-    .slice(0, 100)
-    .map((record) => {
-      const source = record && typeof record === "object" ? record : {};
-      const receipt =
-        source.recordReceipt && typeof source.recordReceipt === "object"
-          ? source.recordReceipt
-          : {};
-      return {
-        ...normalizeRecord(source, [
-          "caseId",
-          "messageId",
-          "bodySha256",
-          "actorLabel",
-          "messageTypeLabel",
-          "body",
-          "documentVersionLabel",
-          "recordedAtLabel",
-          "nextActionLabel",
-        ]),
-        recordReceipt: normalizeRecord(receipt, [
-          "receiptId",
-          "status",
-          "recordedAt",
-          "caseId",
-          "messageId",
-          "bodySha256",
-        ]),
-      };
-    });
+  return asArray(value).map((record) => {
+    const source = record && typeof record === "object" ? record : {};
+    const receipt =
+      source.recordReceipt && typeof source.recordReceipt === "object"
+        ? source.recordReceipt
+        : {};
+    return {
+      ...normalizeRecord(source, [
+        "caseId",
+        "messageId",
+        "bodySha256",
+        "actorLabel",
+        "messageTypeLabel",
+        "documentVersionLabel",
+        "recordedAtLabel",
+        "nextActionLabel",
+      ]),
+      body: typeof source.body === "string" ? source.body : "",
+      recordReceipt: normalizeRecord(receipt, [
+        "receiptId",
+        "status",
+        "recordedAt",
+        "caseId",
+        "messageId",
+        "bodySha256",
+      ]),
+    };
+  });
 }
 
 export function normalizeOwnerWorkspaceContext(input = {}) {
@@ -525,7 +523,7 @@ export function publicMessageRecordLabel(message, expectedCaseId) {
     : {};
   const caseId = asText(source.caseId);
   const messageId = asText(source.messageId);
-  const body = asText(source.body);
+  const body = typeof source.body === "string" ? source.body : "";
   const bodySha256 = asText(source.bodySha256);
   const recordedAt = canonicalRecordedAt(receipt.recordedAt);
   const sha256Pattern = /^[0-9a-f]{64}$/;
@@ -834,13 +832,15 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   const documentRef = root ??
     (typeof document === "undefined" ? null : document);
   let currentAdapter = adapter;
+  let loadGeneration = 0;
+  let currentModel = null;
 
   function renderInput(input) {
-    if (!documentRef) {
-      return buildOwnerWorkspaceViewModel(input);
-    }
     const model = buildOwnerWorkspaceViewModel(input);
-    renderModel(documentRef, model);
+    currentModel = model;
+    if (documentRef) {
+      renderModel(documentRef, model);
+    }
     return model;
   }
 
@@ -854,6 +854,7 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
       statusMessage: STATE_COPY[state].message,
       retryVisible: state === "LOAD_FAILED_RETRYABLE",
     };
+    currentModel = model;
     if (documentRef) {
       renderModel(documentRef, model);
     }
@@ -861,9 +862,13 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   }
 
   async function initialize() {
+    const generation = loadGeneration + 1;
+    loadGeneration = generation;
+    const adapterSnapshot = currentAdapter;
     renderNamedState("ACCESS_CHECKING", "ACCESS_CHECK_IN_PROGRESS");
     if (
-      !currentAdapter || typeof currentAdapter.loadOwnerWorkspace !== "function"
+      !adapterSnapshot ||
+      typeof adapterSnapshot.loadOwnerWorkspace !== "function"
     ) {
       return renderNamedState(
         "CONTRACT_CONTEXT_UNAVAILABLE",
@@ -872,9 +877,21 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
     }
 
     try {
-      const context = await currentAdapter.loadOwnerWorkspace();
+      const context = await adapterSnapshot.loadOwnerWorkspace();
+      if (
+        generation !== loadGeneration ||
+        adapterSnapshot !== currentAdapter
+      ) {
+        return currentModel;
+      }
       return renderInput(context);
     } catch (error) {
+      if (
+        generation !== loadGeneration ||
+        adapterSnapshot !== currentAdapter
+      ) {
+        return currentModel;
+      }
       const status = Number(error?.status);
       if (status === 401 || status === 403) {
         return renderNamedState("ACCESS_DENIED", "OWNER_ACCESS_NOT_CONFIRMED");
@@ -890,6 +907,7 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   }
 
   function setAdapter(nextAdapter) {
+    loadGeneration += 1;
     currentAdapter = nextAdapter;
   }
 
@@ -901,9 +919,4 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   }
 
   return Object.freeze({ initialize, renderInput, setAdapter });
-}
-
-if (typeof document !== "undefined") {
-  const controller = createOwnerWorkspaceController({ root: document });
-  void controller.initialize();
 }

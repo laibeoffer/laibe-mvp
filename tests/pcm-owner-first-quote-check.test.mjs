@@ -550,6 +550,62 @@ test("quote check starts as one canonical three-file page", async () => {
   }
 });
 
+test("legacy owner journey is absent", async () => {
+  const html = await readFile(htmlPath, "utf8");
+
+  assert.doesNotMatch(html, /owner-journey/u);
+  assert.doesNotMatch(html, /文件健檢三個階段/u);
+  assert.doesNotMatch(html, /data-stage-item/u);
+});
+
+test("quote check header keeps the current page and DRS home visible", async () => {
+  const [html, styles] = await Promise.all([
+    readFile(htmlPath, "utf8"),
+    readFile(cssPath, "utf8"),
+  ]);
+
+  assert.match(
+    html,
+    /<nav class="quote-header__nav" aria-label="DRS 主要導覽">[\s\S]*?href="\.\.\/public_home\/code\.html#top"[\s\S]*?>DRS 首頁<\/a>[\s\S]*?aria-current="page"[\s\S]*?>文件健檢<\/a>[\s\S]*?<\/nav>/u,
+  );
+  assert.match(
+    html,
+    /class="quote-context-bar"[^>]*data-quote-context[\s\S]*?<strong>文件健檢<\/strong>[\s\S]*?data-current-status[\s\S]*?data-current-next/u,
+  );
+  assert.doesNotMatch(html, /PCM 首頁/u);
+  assert.match(styles, /\.quote-header__nav a\s*\{[^}]*white-space:\s*nowrap;/u);
+  assert.match(
+    styles,
+    /\.quote-header \.quote-brand \.drs-brand-lockup\s*\{[^}]*display:\s*none;/u,
+  );
+});
+
+test("quote check completion path explains why to return home", async () => {
+  const [html, app] = await Promise.all([
+    readFile(htmlPath, "utf8"),
+    readFile(appPath, "utf8"),
+  ]);
+
+  assert.match(
+    html,
+    /href="\.\.\/public_home\/code\.html#application-check"[^>]*>回 DRS 首頁，確認案件是否適合<\/a>/u,
+  );
+  assert.match(html, /href="#document-workspace"[^>]*>回到文件選擇<\/a>/u);
+  assert.match(
+    app,
+    /三類檢查方向已看完；回首頁確認案件是否適合使用 DRS。/u,
+  );
+});
+
+test("hero assurances put document risk before registration and assisted decisions", async () => {
+  const html = await readFile(htmlPath, "utf8");
+
+  assert.match(
+    html,
+    /<ul class="quote-assurances"[^>]*>[\s\S]*?<li>先不著急註冊<\/li>[\s\S]*?<li>檢查手上資料漏洞要緊<\/li>[\s\S]*?<li>了解DRS隨時可叫停的契約方案<\/li>[\s\S]*?<li>再決定要不要我們輔助你的決策<\/li>[\s\S]*?<\/ul>/u,
+  );
+});
+
 test("one page exposes the complete owner-first state sequence", async () => {
   const [html, app] = await Promise.all([
     readOrEmpty(htmlPath),
@@ -578,7 +634,7 @@ test("first screen states role status next responsibility and trace boundary", a
   assert.match(visible, /責任人/);
   assert.match(visible, /案件紀錄/);
   assert.match(visible, /尚未建立案件紀錄/);
-  assert.match(visible, /返回 PCM 首頁/);
+  assert.match(visible, /DRS 首頁/);
 });
 
 test("primary CTA 14px text keeps 4.5 to 1 contrast at every gradient stop", async () => {
@@ -615,6 +671,27 @@ test("primary CTA 14px text keeps 4.5 to 1 contrast at every gradient stop", asy
   }));
   const failures = results.filter(({ contrast }) => contrast < 4.5);
   assert.deepEqual(failures, [], `CTA contrast nodes: ${JSON.stringify(results)}`);
+});
+
+test("document tabs connect the selected capsule to the active panel with accessible focus", async () => {
+  const css = await readFile(cssPath, "utf8");
+
+  assert.match(css, /\.document-tabs\s*\{[^}]*--tab-panel-surface:/u);
+  assert.match(css, /\.document-tabs\s*\{[^}]*border-radius:\s*999px/u);
+  assert.match(css, /\.document-tabs button\[aria-selected="true"\]::before/u);
+  assert.match(css, /\.document-tabs button\[aria-selected="true"\]::after/u);
+  assert.match(css, /\.document-tabs button:focus-visible/u);
+});
+
+test("document tabs keep readable snap targets on mobile and respect reduced motion", async () => {
+  const css = await readFile(cssPath, "utf8");
+
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs\s*\{[^}]*scroll-snap-type:\s*x mandatory/u,
+  );
+  assert.match(css, /\.document-tabs button\s*\{[^}]*scroll-snap-align:\s*center/u);
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/u);
 });
 
 test("selection stays local and never claims durable upload or a formal result", async () => {
@@ -1422,14 +1499,23 @@ test("continuation facts and focus targets stay visible at short viewports", asy
     readOrEmpty(htmlPath),
     readOrEmpty(cssPath),
   ]);
-  assert.equal((html.match(/data-current-status/g) ?? []).length, 2);
-  assert.equal((html.match(/data-current-next/g) ?? []).length, 2);
+  assert.equal((html.match(/data-current-status/g) ?? []).length, 3);
+  assert.equal((html.match(/data-current-next/g) ?? []).length, 3);
   assert.match(html, /data-hero-start/);
   assert.equal((html.match(/data-panel-focus/g) ?? []).length, 9);
   assert.equal((html.match(/data-panel-focus[^>]*tabindex="-1"|tabindex="-1"[^>]*data-panel-focus/g) ?? []).length, 9);
   assert.match(styles, /\[data-panel-focus\]:focus/);
   assert.match(styles, /max-height:\s*700px/);
   assert.match(styles, /quote-hero__continuation/);
+  assert.match(styles, /\.quote-context-bar\s*\{[^}]*position:\s*sticky;/u);
+  assert.match(
+    styles,
+    /\.quote-context-bar p:last-child strong\s*\{[^}]*white-space:\s*normal;/u,
+  );
+  assert.match(
+    styles,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.quote-header__nav\s*\{[^}]*display:\s*grid;/u,
+  );
 });
 
 test("visible product language excludes market payment and implementation vocabulary", async () => {
@@ -1475,7 +1561,8 @@ test("all local page references and fragments resolve", async () => {
       assert.match(html, new RegExp(`id=["']${reference.slice(1)}["']`), reference);
       continue;
     }
-    const [path, fragment] = reference.split("#");
+    const [pathAndQuery, fragment] = reference.split("#");
+    const path = pathAndQuery.split("?")[0];
     const target = resolve(quoteDir, path);
     assert.equal(existsSync(target), true, reference);
     if (fragment) {

@@ -528,9 +528,397 @@ export function resolveQuoteCheckState(input) {
   }
 }
 
+export const DOCUMENT_WORKSPACE_KINDS = safeFreeze([
+  "quote",
+  "contract",
+  "drawing",
+]);
+
+function isDocumentWorkspaceKind(kind) {
+  return kind === "quote" || kind === "contract" || kind === "drawing";
+}
+
+function freezeDocumentSelection(selection) {
+  if (!selection) return null;
+  return safeFreeze({ name: selection.name });
+}
+
+function freezeDocumentWorkspaceState(activeTab, documents) {
+  return safeFreeze({
+    activeTab,
+    documents: safeFreeze({
+      quote: freezeDocumentSelection(documents.quote),
+      contract: freezeDocumentSelection(documents.contract),
+      drawing: freezeDocumentSelection(documents.drawing),
+    }),
+  });
+}
+
+export function createDocumentWorkspaceState() {
+  return freezeDocumentWorkspaceState("quote", {
+    quote: null,
+    contract: null,
+    drawing: null,
+  });
+}
+
+export function selectDocumentWorkspaceTab(state, kind) {
+  if (!state || !state.documents || !isDocumentWorkspaceKind(kind)) return state;
+  if (state.activeTab === kind) return state;
+  return freezeDocumentWorkspaceState(kind, state.documents);
+}
+
+export function recordDocumentSelection(state, kind, selection) {
+  if (!state || !state.documents || !isDocumentWorkspaceKind(kind)) return state;
+  const selectionKind = readOwnDataString(selection, "kind");
+  const selectionName = readOwnDataString(selection, "name");
+  if (
+    selectionKind !== "PDF_METADATA" ||
+    !selectionName ||
+    !safeHasNonWhitespaceFileName(selectionName)
+  ) {
+    return state;
+  }
+  return freezeDocumentWorkspaceState(kind, {
+    ...state.documents,
+    [kind]: { name: selectionName },
+  });
+}
+
+export function projectDocumentWorkspace(state) {
+  const documents = state && state.documents ? state.documents : createDocumentWorkspaceState().documents;
+  let uploadedCount = 0;
+  if (documents.quote) uploadedCount += 1;
+  if (documents.contract) uploadedCount += 1;
+  if (documents.drawing) uploadedCount += 1;
+  return safeFreeze({
+    uploadedCount,
+    stage: uploadedCount === 0 ? 1 : uploadedCount === 3 ? 3 : 2,
+    crossFileReady: uploadedCount === 3,
+    nextMissing: !documents.quote
+      ? "quote"
+      : !documents.contract
+        ? "contract"
+        : !documents.drawing
+          ? "drawing"
+          : null,
+  });
+}
+
+function readTrustedPdfFileList(files) {
+  try {
+    if (
+      files === null ||
+      files === undefined ||
+      !trustedFileListLengthGetter ||
+      !trustedFileListItem
+    ) {
+      return INVALID_FILE_SELECTION;
+    }
+    const length = safeApply(
+      trustedFileListLengthGetter,
+      files,
+      SAFE_EMPTY_ARGUMENTS,
+    );
+    if (length === 0) return EMPTY_FILE_SELECTION;
+    if (length !== 1) return INVALID_FILE_SELECTION;
+
+    const slotDescriptor = readOwnDataValue(files, "0");
+    if (!slotDescriptor) return INVALID_FILE_SELECTION;
+    const file = slotDescriptor.value;
+    const itemFile = safeApply(
+      trustedFileListItem,
+      files,
+      SAFE_FILE_INDEX_ARGUMENTS,
+    );
+    if (
+      itemFile !== file ||
+      file === null ||
+      file === undefined ||
+      typeof file !== "object" ||
+      !trustedFileNameGetter ||
+      !trustedBlobTypeGetter ||
+      safeGetOwnPropertyDescriptor(file, "name") ||
+      safeGetOwnPropertyDescriptor(file, "type")
+    ) {
+      return INVALID_FILE_SELECTION;
+    }
+    const name = safeApply(trustedFileNameGetter, file, SAFE_EMPTY_ARGUMENTS);
+    const type = safeApply(trustedBlobTypeGetter, file, SAFE_EMPTY_ARGUMENTS);
+    if (
+      typeof name !== "string" ||
+      !safeHasNonWhitespaceFileName(name) ||
+      type !== "application/pdf"
+    ) {
+      return INVALID_FILE_SELECTION;
+    }
+    return fileSelectionResult("PDF_METADATA", name);
+  } catch {
+    return INVALID_FILE_SELECTION;
+  }
+}
+
+function readDocumentInputSelection(input) {
+  try {
+    if (
+      !input ||
+      !trustedInputFilesGetter ||
+      safeGetOwnPropertyDescriptor(input, "files")
+    ) {
+      return INVALID_FILE_SELECTION;
+    }
+    const files = safeApply(
+      trustedInputFilesGetter,
+      input,
+      SAFE_EMPTY_ARGUMENTS,
+    );
+    return readTrustedPdfFileList(files);
+  } catch {
+    return INVALID_FILE_SELECTION;
+  }
+}
+
+function initializeDocumentWorkspace(root, workspaceRoot) {
+  const tabs = root.querySelectorAll("[data-document-tab]");
+  const panels = root.querySelectorAll("[data-document-panel]");
+  const fileInputs = root.querySelectorAll("[data-document-file]");
+  const dropzones = root.querySelectorAll("[data-document-dropzone]");
+  const nextTabControls = root.querySelectorAll("[data-next-document-tab]");
+  const statusTargets = root.querySelectorAll("[data-current-status]");
+  const nextTargets = root.querySelectorAll("[data-current-next]");
+  const liveTarget = root.querySelector("[data-state-live]");
+  const crossSummary = root.querySelector("[data-cross-file-summary]");
+  const foundationStatus = root.querySelector("[data-foundation-status]");
+  const viewCrossSummary = root.querySelector("[data-view-cross-summary]");
+  const workspaceStart = root.querySelector("[data-workspace-start]");
+  const saveReport = root.querySelector("[data-save-report]");
+  const saveGate = root.querySelector("[data-save-gate]");
+  let workspaceState = createDocumentWorkspaceState();
+
+  function tabKind(tab) {
+    const candidate = tab && tab.dataset ? tab.dataset.documentTab : null;
+    return isDocumentWorkspaceKind(candidate) ? candidate : null;
+  }
+
+  function setTextFor(selector, text) {
+    const targets = root.querySelectorAll(selector);
+    for (let index = 0; index < targets.length; index += 1) {
+      targets[index].textContent = text;
+    }
+  }
+
+  function moveViewportTo(target) {
+    if (!target) return;
+    const targetTop = window.scrollY + target.getBoundingClientRect().top - 92;
+    window.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: "smooth",
+    });
+  }
+
+  function describeNextStep(projection) {
+    if (projection.uploadedCount === 0) return "先從手上已有的 PDF 開始。";
+    if (projection.crossFileReady) return "三類檢查方向已看完；回首頁確認案件是否適合使用 DRS。";
+    if (projection.nextMissing === "quote") return "補上報價，讓施工範圍有計價依據。";
+    if (projection.nextMissing === "contract") return "接著補上契約，核對責任與付款條件。";
+    return "接著補上施工圖，核對實際施工範圍。";
+  }
+
+  function renderDocumentStatus(kind) {
+    const documentSelection = workspaceState.documents[kind];
+    const selected = Boolean(documentSelection);
+    setTextFor(
+      `[data-document-status="${kind}"]`,
+      selected ? "已選擇（尚未送出）" : "尚未選擇",
+    );
+    setTextFor(
+      `[data-document-filename="${kind}"]`,
+      selected ? documentSelection.name : "尚未選擇檔案",
+    );
+    setTextFor(
+      `[data-tab-status="${kind}"]`,
+      selected ? "本次瀏覽已選擇" : "尚未選擇",
+    );
+    const ledger = root.querySelector(`[data-ledger-kind="${kind}"]`);
+    if (ledger) ledger.dataset.documentState = selected ? "selected" : "empty";
+    const report = root.querySelector(`[data-basic-report="${kind}"]`);
+    if (report) report.hidden = !selected;
+  }
+
+  function render() {
+    const projection = projectDocumentWorkspace(workspaceState);
+    for (let index = 0; index < tabs.length; index += 1) {
+      const tab = tabs[index];
+      const active = tabKind(tab) === workspaceState.activeTab;
+      tab.setAttribute("aria-selected", active ? "true" : "false");
+      tab.tabIndex = active ? 0 : -1;
+    }
+    for (let index = 0; index < panels.length; index += 1) {
+      panels[index].hidden = panels[index].dataset.documentPanel !== workspaceState.activeTab;
+    }
+    for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentStatus(kind);
+
+    setTextFor(
+      '[data-prior-file-status="quote"]',
+      workspaceState.documents.quote ? "已取得報價 ✓" : "報價尚未選擇",
+    );
+    setTextFor(
+      '[data-prior-file-status="contract"]',
+      workspaceState.documents.contract ? "已取得契約 ✓" : "契約尚未選擇",
+    );
+
+    const currentStatus = projection.uploadedCount === 0
+      ? "尚未選擇文件"
+      : projection.crossFileReady
+        ? "本次瀏覽已選齊三份文件"
+        : `已選擇 ${projection.uploadedCount}／3 份文件`;
+    for (let index = 0; index < statusTargets.length; index += 1) {
+      statusTargets[index].textContent = currentStatus;
+    }
+    for (let index = 0; index < nextTargets.length; index += 1) {
+      nextTargets[index].textContent = describeNextStep(projection);
+    }
+    if (crossSummary) crossSummary.hidden = !projection.crossFileReady;
+    if (viewCrossSummary) viewCrossSummary.disabled = !projection.crossFileReady;
+    if (foundationStatus) {
+      foundationStatus.textContent = projection.crossFileReady
+        ? "三份文件已選齊，可以查看跨文件整理架構。"
+        : "仍可先補齊報價、契約與施工圖。";
+    }
+    if (liveTarget) {
+      liveTarget.textContent = `目前狀態：${currentStatus}。下一步：${describeNextStep(projection)}`;
+    }
+  }
+
+  function activateTab(kind, shouldFocus = true) {
+    const nextState = selectDocumentWorkspaceTab(workspaceState, kind);
+    if (nextState === workspaceState && workspaceState.activeTab !== kind) return;
+    workspaceState = nextState;
+    render();
+    if (!shouldFocus) return;
+    for (let index = 0; index < tabs.length; index += 1) {
+      if (tabKind(tabs[index]) === kind) {
+        tabs[index].focus();
+        break;
+      }
+    }
+  }
+
+  function acceptSelection(kind, selection) {
+    const feedback = root.querySelector(`[data-document-feedback="${kind}"]`);
+    if (selection === EMPTY_FILE_SELECTION) {
+      if (feedback) feedback.textContent = "沒有選擇檔案；原本的本次瀏覽狀態未變更。";
+      return;
+    }
+    if (selection.kind !== "PDF_METADATA") {
+      if (feedback) {
+        feedback.textContent = "這份檔案目前不能繼續：請改選瀏覽器標示為 PDF 的文件。檔案沒有送出。";
+        feedback.dataset.feedbackState = "error";
+      }
+      return;
+    }
+    workspaceState = recordDocumentSelection(workspaceState, kind, selection);
+    if (feedback) {
+      feedback.textContent = `本次瀏覽已選擇：${selection.name}。內容格式仍待正式分析。`;
+      feedback.dataset.feedbackState = "selected";
+    }
+    render();
+  }
+
+  for (let index = 0; index < tabs.length; index += 1) {
+    const tab = tabs[index];
+    tab.addEventListener("click", () => {
+      const kind = tabKind(tab);
+      if (kind) activateTab(kind, false);
+    });
+    tab.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      const offset = event.key === "ArrowRight" ? 1 : -1;
+      const nextIndex = (index + offset + tabs.length) % tabs.length;
+      const kind = tabKind(tabs[nextIndex]);
+      if (kind) activateTab(kind);
+    });
+  }
+
+  for (let index = 0; index < fileInputs.length; index += 1) {
+    const input = fileInputs[index];
+    input.addEventListener("change", () => {
+      const kind = input.dataset.documentFile;
+      if (!isDocumentWorkspaceKind(kind)) return;
+      acceptSelection(kind, readDocumentInputSelection(input));
+    });
+  }
+
+  for (let index = 0; index < dropzones.length; index += 1) {
+    const dropzone = dropzones[index];
+    const kind = dropzone.dataset.documentDropzone;
+    if (!isDocumentWorkspaceKind(kind)) continue;
+    dropzone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dropzone.dataset.dragState = "over";
+    });
+    dropzone.addEventListener("dragleave", () => {
+      delete dropzone.dataset.dragState;
+    });
+    dropzone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      delete dropzone.dataset.dragState;
+      let files = null;
+      try {
+        files = event.dataTransfer ? event.dataTransfer.files : null;
+      } catch {
+        files = null;
+      }
+      acceptSelection(kind, readTrustedPdfFileList(files));
+    });
+  }
+
+  for (let index = 0; index < nextTabControls.length; index += 1) {
+    const control = nextTabControls[index];
+    control.addEventListener("click", () => {
+      const kind = control.dataset.nextDocumentTab;
+      if (isDocumentWorkspaceKind(kind)) activateTab(kind);
+      moveViewportTo(workspaceRoot);
+    });
+  }
+
+  if (workspaceStart) {
+    workspaceStart.addEventListener("click", () => {
+      activateTab("quote", false);
+      moveViewportTo(workspaceRoot);
+      const activeTab = root.querySelector('[data-document-tab="quote"]');
+      if (activeTab) activeTab.focus();
+    });
+  }
+
+  if (viewCrossSummary && crossSummary) {
+    viewCrossSummary.addEventListener("click", () => {
+      if (viewCrossSummary.disabled) return;
+      moveViewportTo(crossSummary);
+    });
+  }
+
+  if (saveReport && saveGate) {
+    saveReport.addEventListener("click", () => {
+      saveGate.hidden = false;
+      saveGate.setAttribute("tabindex", "-1");
+      saveGate.focus();
+    });
+  }
+
+  render();
+}
+
 function initializeQuoteCheckPage() {
   const root = document.querySelector("[data-quote-check-page]");
   if (!root) return;
+
+  const workspaceRoot = root.querySelector("[data-document-workspace-root]");
+  if (workspaceRoot) {
+    initializeDocumentWorkspace(root, workspaceRoot);
+    return;
+  }
 
   const panels = root.querySelectorAll("[data-flow-panel]");
   const railItems = root.querySelectorAll("[data-flow-step]");
