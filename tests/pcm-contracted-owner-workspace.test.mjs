@@ -64,15 +64,18 @@ function authorizedContext(overrides = {}) {
   };
 }
 
-test("頁面明確定位為完成 PCM 服務契約後的甲方工作台", async () => {
+test("未簽 DRS 服務契約的甲方有保存、整理與準備決策的工作台", async () => {
   const html = await readPageFile("code.html");
 
-  assert.match(html, /甲方案件工作台/);
-  assert.match(html, /完成 PCM 服務契約後/);
-  assert.match(html, /只限已登入且具案件權限的甲方/);
-  assert.match(html, /目前狀態/);
-  assert.match(html, /下一步/);
-  assert.match(html, /誰正在等待誰/);
+  assert.match(html, /已註冊，先把資料整理成可討論的決策基礎/);
+  assert.match(html, /已保存文件健檢/);
+  assert.match(html, /已保存案件摘要/);
+  assert.match(html, /完整需求整理/);
+  assert.match(html, /補齊必要文件/);
+  assert.match(html, /查看 DRS 服務方案/);
+  assert.match(html, /確認 DRS 服務契約/);
+  assert.match(html, /承接你先前完成的兩分鐘摘要/);
+  assert.match(html, /尚未連結正式案件內容/);
 });
 
 test("頁面使用本地樣式與 module runtime，不依賴外部 UI CDN", async () => {

@@ -30,9 +30,9 @@ const STATE_COPY = Object.freeze({
     message: "請由 PCM 首頁的甲方入口重新登入；此頁不會透露未授權案件內容。",
   }),
   CONTRACT_CONTEXT_UNAVAILABLE: Object.freeze({
-    label: "尚待取得案件資料",
-    title: "尚未取得可供顯示的案件資料",
-    message: "登入、PCM 服務契約與案件權限確認完成後，才會載入你的案件內容。",
+    label: "決策準備中",
+    title: "尚未連結正式案件內容",
+    message: "你可以先整理已保存的摘要與文件；確認 DRS 服務契約後，正式案件內容才會在這裡提供。",
   }),
   AUTHORIZED_EMPTY: Object.freeze({
     label: "案件權限已確認",

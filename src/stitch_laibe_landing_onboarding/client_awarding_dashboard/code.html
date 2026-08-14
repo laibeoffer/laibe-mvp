@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="完成 PCM 服務契約後，甲方查看文件版次、書面治理、三方訊息與案件留痕的工作台。"
+      content="已註冊的甲方先保存資料、整理需求與準備裝修決策的 LaiBE DRS 工作台。"
     />
     <title>甲方案件工作台｜LaiBE Decision &amp; Record System</title>
     <link
@@ -34,19 +34,65 @@
         </a>
 
         <div class="workspace-header__context" aria-label="工作台角色">
-          <span class="context-chip context-chip--role">甲方</span>
-          <span class="context-chip" data-slot="case-name">尚待案件資料</span>
+          <span class="context-chip context-chip--role">已註冊甲方</span>
+          <span class="context-chip" data-slot="case-name">決策準備工作台</span>
           <span
             class="context-chip context-chip--state"
             data-slot="header-state"
           >
-            驗證案件權限中
+            準備資料中
           </span>
         </div>
       </div>
     </header>
 
     <main id="main-content">
+      <section class="precontract-workspace" aria-labelledby="precontract-title">
+        <div class="precontract-workspace__heading">
+          <p class="eyebrow">LaiBE DRS・Decision &amp; Record System</p>
+          <p class="precontract-workspace__status">已註冊・尚未簽 DRS 服務契約</p>
+          <h1 id="precontract-title">已註冊，先把資料整理成可討論的決策基礎</h1>
+          <p>
+            你已完成摘要保存。接下來可以延續既有內容、補齊判斷需要的資料；
+            在確認服務契約前，這裡是你的保存、整理與準備決策 workspace。
+          </p>
+        </div>
+
+        <ol class="precontract-steps" aria-label="DRS 準備進度">
+          <li class="is-complete"><span>✓</span><strong>已保存文件健檢</strong><small>已保留可回看的檢查重點</small></li>
+          <li class="is-complete"><span>✓</span><strong>已保存案件摘要</strong><small>兩分鐘摘要已成為後續整理起點</small></li>
+          <li class="is-current"><span>●</span><strong>完整需求整理</strong><small>承接你先前完成的兩分鐘摘要，不重問相同資料</small></li>
+          <li><span>○</span><strong>補齊必要文件</strong><small>整理後再確認需要補上的資料</small></li>
+          <li><span>○</span><strong>查看 DRS 服務方案</strong><small>了解正式服務如何協助後續決策</small></li>
+          <li><span>○</span><strong>確認 DRS 服務契約</strong><small>確認後才會進入正式 DRS 案件流程</small></li>
+        </ol>
+
+        <div class="precontract-grid">
+          <section class="precontract-card precontract-card--primary" aria-labelledby="continue-title">
+            <p class="eyebrow">下一步</p>
+            <h2 id="continue-title">把摘要整理成完整需求</h2>
+            <p>依已保存的空間、預算與生活需求繼續補充。尚未需要重新輸入已提供的內容。</p>
+            <a class="button button--primary" href="../pcm_standalone/owner_start/code.html">開始完整需求整理</a>
+          </section>
+          <section class="precontract-card" aria-labelledby="check-title">
+            <p class="eyebrow">已保存內容</p>
+            <h2 id="check-title">文件健檢與案件摘要</h2>
+            <p>已保存的檢查與摘要可作為後續討論的依據；目前不會將它們標示為正式案件紀錄。</p>
+            <a class="text-link" href="../pcm_standalone/basic_report/code.html">查看已保存摘要</a>
+          </section>
+          <section class="precontract-card" aria-labelledby="contract-title">
+            <p class="eyebrow">正式服務前</p>
+            <h2 id="contract-title">先了解 DRS 服務方案</h2>
+            <p>確認適合後再閱讀服務契約。正式案件、三方協作與可追溯紀錄會在完成確認後提供。</p>
+            <a class="text-link" href="../pcm_standalone/service_contract/code.html">查看 DRS 服務方案</a>
+          </section>
+        </div>
+
+        <aside class="precontract-notice" aria-label="目前工作台狀態">
+          <span aria-hidden="true">i</span>
+          <p><strong>尚未連結正式案件內容</strong>目前可整理保存資料與準備決策；服務確認前，不顯示正式案件、文件版本或三方紀錄。</p>
+        </aside>
+      </section>
       <section class="journey-banner" aria-label="甲方案件流程">
         <ol class="journey-banner__track">
           <li class="journey-step is-current">
@@ -118,10 +164,10 @@
         <div>
           <p class="eyebrow">目前狀態</p>
           <h2 id="access-title" data-slot="access-title">
-            尚未取得可供顯示的案件資料
+            尚未連結正式案件內容
           </h2>
           <p data-slot="access-message">
-            登入、PCM 服務契約與案件權限確認完成後，才會載入你的案件內容。
+            你可以先整理已保存的摘要與文件；確認 DRS 服務契約後，正式案件內容才會在這裡提供。
           </p>
         </div>
         <button
