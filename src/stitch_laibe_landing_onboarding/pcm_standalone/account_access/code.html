@@ -1,118 +1,132 @@
 <!doctype html>
-<html lang="zh-Hant-TW" data-account-mode="registration" data-guide-view="shared">
+<html lang="zh-Hant-TW" data-account-mode="register">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="DRS 帳號與案件入口：先確認你的角色、案件狀態與下一步。" />
-    <title>DRS｜帳號與案件入口</title>
+    <meta name="description" content="建立或登入 LaiBE 帳號，確認使用角色並開始整理裝修資料。" />
+    <title>LaiBE DRS｜帳號入口</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
-    <link rel="stylesheet" href="../shared/owner-first-shell.css" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
-  <body data-view-state="CONTEXT_UNAVAILABLE">
+  <body>
     <a class="skip-link" href="#main-content">跳到主要內容</a>
 
     <header class="account-header" id="top">
       <div class="account-header__inner">
         <a class="account-brand" href="../public_home/code.html#top" aria-label="返回 LaiBE DRS 首頁">
-          <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+          <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE" />
           <span class="drs-brand-lockup drs-brand-lockup--expanded">
-            <span class="drs-brand-wordmark" aria-label="Decision &amp; Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
+            <span class="drs-brand-wordmark" aria-label="Decision and Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
             <small class="drs-brand-name">裝潢決策系統</small>
           </span>
         </a>
-        <nav class="account-header__actions" aria-label="帳號入口導覽">
-          <a class="account-header__back" href="../public_home/code.html#top">返回 DRS 首頁</a>
-          <a class="account-header__action" href="../quote_check/code.html">開始健檢</a>
-        </nav>
+        <a class="account-header__back" href="../public_home/code.html#top">返回 DRS 首頁</a>
       </div>
     </header>
 
-    <main class="owner-first-shell account-shell" id="main-content" data-account-access-page>
-      <section class="account-hero" aria-labelledby="account-title">
-        <div class="account-hero__copy">
-          <p class="account-eyebrow">DRS 案件入口</p>
-          <h1 id="account-title">進入你的 DRS 案件，查看待確認事項與決策紀錄。</h1>
-          <p class="account-hero__lead">先選擇你現在的情境。甲方先看自己的案件與待確認事項；受邀乙方則從案件邀請進入。系統開放前，不需要交出帳號資料。</p>
+    <main class="account-shell" id="main-content" data-account-access-page>
+      <section class="account-grid" aria-labelledby="account-title">
+        <div class="account-intro">
+          <p class="account-eyebrow">LAIBE ACCOUNT</p>
+          <h1 id="account-title">建立或登入<br />LaiBE 帳號</h1>
+          <p class="account-lead">這裡是帳號入口。先確認你是甲方或受邀乙方，再開始整理後續需要的裝修資料；現在註冊不會直接建立正式案件。</p>
+
+          <div class="journey-steps" aria-label="帳號使用三步驟">
+            <article class="journey-step">
+              <span>01</span>
+              <div><h2>建立帳號</h2><p>填寫基本聯絡資料，建立日後可辨識的使用入口。</p></div>
+            </article>
+            <article class="journey-step">
+              <span>02</span>
+              <div><h2>確認使用角色</h2><p>選擇甲方，或確認你是收到合作邀請的受邀乙方。</p></div>
+            </article>
+            <article class="journey-step">
+              <span>03</span>
+              <div><h2>開始整理資料</h2><p>帳號服務開放後，再依角色進入需求、文件與案件準備流程。</p></div>
+            </article>
+          </div>
+
+          <aside class="account-boundary" aria-label="帳號與 DRS 服務界線">
+            <strong>帳號不等於正式案件</strong>
+            <p>註冊只會建立帳號與辨識使用角色，不代表已建立正式 DRS 案件，也不代表已完成 DRS 服務契約。</p>
+            <p>PCM 專業協作僅會在完成 DRS 服務契約後啟用。</p>
+          </aside>
         </div>
-        <aside class="account-gate" aria-label="帳號服務狀態">
-          <span>目前狀態</span>
-          <strong>等待服務開放</strong>
-          <p>帳號與案件權限仍在整理中；你現在可以先從報價資料健檢開始。</p>
-          <a class="owner-first-primary-action account-primary-action" data-primary-action href="../quote_check/code.html">返回首頁開始報價健檢</a>
-        </aside>
-      </section>
 
-      <section class="owner-first-facts account-facts account-status-strip" aria-label="目前帳號與案件事實">
-        <div data-owner-fact><span class="owner-first-fact-label">目前狀態</span><strong class="owner-first-fact-value">尚未開放帳號資料送出</strong></div>
-        <div data-owner-fact><span class="owner-first-fact-label">案件狀態</span><strong class="owner-first-fact-value">尚未取得案件資料</strong></div>
-        <div data-owner-fact><span class="owner-first-fact-label">下一步／責任人</span><strong class="owner-first-fact-value">目前使用者｜先確認入口說明</strong></div>
-        <div data-owner-fact><span class="owner-first-fact-label">最近紀錄</span><strong class="owner-first-fact-value">尚無可顯示紀錄</strong></div>
-      </section>
+        <section class="account-card" aria-labelledby="account-card-title">
+          <header class="account-card__header">
+            <div>
+              <p>帳號入口</p>
+              <h2 id="account-card-title" data-card-title>建立 LaiBE 帳號</h2>
+            </div>
+            <span data-mode-badge>註冊</span>
+          </header>
 
-      <section class="access-workspace" aria-label="角色說明與帳號表單">
-        <article class="role-guide" aria-labelledby="role-guide-title">
-          <p class="account-section-kicker">先確認你的位置</p>
-          <h2 id="role-guide-title">我是甲方，或我收到案件邀請。</h2>
-          <p class="role-guide__intro">選擇只會切換說明，不會設定你的身分，也不會帶入任何案件。</p>
-          <div class="role-guide__rail account-role-choice" aria-label="查看角色流程">
-            <button type="button" data-role-guide="owner" aria-pressed="false">我是甲方</button>
-            <span aria-hidden="true">角色說明</span>
-            <button type="button" data-role-guide="vendor" aria-pressed="false">我收到案件邀請</button>
+          <div class="account-tabs" role="tablist" aria-label="選擇註冊或登入">
+            <button type="button" role="tab" data-mode-tab="register" aria-selected="true" aria-controls="register-form">註冊</button>
+            <button type="button" role="tab" data-mode-tab="login" aria-selected="false" aria-controls="login-form">登入</button>
           </div>
-          <div class="role-guide__projection" aria-live="polite">
-            <span data-guide-status>尚未選擇流程說明</span>
-            <h3 data-guide-title>先辨識你的情境，再走進正確的案件入口</h3>
-            <p data-guide-copy>正式開放後，系統會先確認帳號情境，再判斷是否能進入後續流程。</p>
-            <p data-guide-next>目前下一步：閱讀入口說明，或返回 DRS 首頁開始健檢。</p>
-          </div>
-          <div class="role-guide__truth" aria-label="兩種角色的服務邊界">
-            <p><strong>甲方</strong>甲方完成身分確認後，仍要另行確認案件建立條件，才會進入案件準備。</p>
-            <p><strong>乙方</strong>乙方須先收到甲方邀請；案件成員與權限確認後，才會前往受邀案件。</p>
-          </div>
-        </article>
+          <p class="mode-description" data-mode-description>第一次使用？先選擇角色並填寫基本資料。</p>
 
-        <section class="account-panel" aria-labelledby="account-panel-title">
-          <header class="account-panel__header"><div><p class="account-section-kicker">帳號服務</p><h2 id="account-panel-title">服務正在整理中</h2></div><span>安全預設</span></header>
-          <div class="account-mode" role="tablist" aria-label="切換帳號表單說明">
-            <button type="button" role="tab" data-mode-control="registration" aria-selected="true" aria-controls="registration-form">註冊</button>
-            <button type="button" role="tab" data-mode-control="login" aria-selected="false" aria-controls="login-form">登入</button>
-          </div>
-          <p class="account-service-note" data-account-mode-note>正式開放後才會提供完整註冊入口；目前不會送出或保存帳號資料。</p>
-          <form id="registration-form" class="account-form" data-access-form="registration" aria-describedby="registration-status">
-            <div class="account-field"><label for="contact-name">姓名／聯絡人</label><input id="contact-name" name="contact_name" autocomplete="name" type="text" placeholder="正式開放後填寫" data-write-action disabled aria-disabled="true" /></div>
-            <div class="account-field"><label for="registration-email">Email</label><input id="registration-email" name="registration_email" type="email" autocomplete="email" placeholder="name@example.com" data-write-action disabled aria-disabled="true" /></div>
-            <div class="account-field"><label for="registration-password">設定密碼</label><input id="registration-password" name="registration_password" type="password" autocomplete="new-password" placeholder="正式開放後設定" data-write-action disabled aria-disabled="true" /></div>
-            <p id="registration-status" class="account-form__status">帳號服務開放後，會在此提供完整欄位、確認方式與使用說明。</p>
-            <button class="account-write-closed" type="submit" data-write-action disabled aria-disabled="true">正式開放後可註冊</button>
+          <form class="account-form" id="register-form" data-account-form="register" novalidate>
+            <fieldset class="role-fieldset">
+              <legend>你的使用角色</legend>
+              <div class="role-options">
+                <button type="button" data-role-option="owner" aria-pressed="false"><strong>甲方</strong><span>整理自己的裝修需求與文件</span></button>
+                <button type="button" data-role-option="invited-partner" aria-pressed="false"><strong>受邀乙方</strong><span>收到甲方邀請後加入協作</span></button>
+              </div>
+              <input type="hidden" name="role" value="" />
+              <p class="field-error" data-field-error="register-role"></p>
+            </fieldset>
+
+            <div class="field">
+              <label for="register-name">姓名</label>
+              <input id="register-name" name="name" type="text" autocomplete="name" placeholder="請輸入姓名" />
+              <p class="field-error" data-field-error="register-name"></p>
+            </div>
+            <div class="field">
+              <label for="register-email">Email</label>
+              <input id="register-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" />
+              <p class="field-error" data-field-error="register-email"></p>
+            </div>
+            <div class="field-pair">
+              <div class="field">
+                <label for="register-password">密碼</label>
+                <input id="register-password" name="password" type="password" autocomplete="new-password" placeholder="至少 8 碼" />
+                <p class="field-error" data-field-error="register-password"></p>
+              </div>
+              <div class="field">
+                <label for="register-password-confirm">確認密碼</label>
+                <input id="register-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" placeholder="再次輸入密碼" />
+                <p class="field-error" data-field-error="register-password-confirm"></p>
+              </div>
+            </div>
+
+            <button class="submit-button" type="submit" data-submit-button><span data-submit-label>建立帳號</span><span class="button-spinner" aria-hidden="true"></span></button>
+            <p class="form-status" data-form-status="register" aria-live="polite">尚未送出任何資料。</p>
           </form>
-          <form id="login-form" class="account-form" data-access-form="login" aria-describedby="login-status" hidden>
-            <div class="account-field"><label for="login-email">Email</label><input id="login-email" name="login_email" type="email" autocomplete="email" placeholder="name@example.com" data-write-action disabled aria-disabled="true" /></div>
-            <div class="account-field"><label for="login-password">密碼</label><input id="login-password" name="login_password" type="password" autocomplete="current-password" placeholder="正式開放後輸入" data-write-action disabled aria-disabled="true" /></div>
-            <p id="login-status" class="account-form__status">正式服務開放後，身分確認與案件權限確認會分開進行。</p>
-            <button class="account-write-closed" type="submit" data-write-action disabled aria-disabled="true">正式開放後可登入</button>
+
+          <form class="account-form" id="login-form" data-account-form="login" novalidate hidden>
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input id="login-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" />
+              <p class="field-error" data-field-error="login-email"></p>
+            </div>
+            <div class="field">
+              <label for="login-password">密碼</label>
+              <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" />
+              <p class="field-error" data-field-error="login-password"></p>
+            </div>
+            <button class="submit-button" type="submit" data-submit-button><span data-submit-label>登入帳號</span><span class="button-spinner" aria-hidden="true"></span></button>
+            <p class="form-status" data-form-status="login" aria-live="polite">請輸入帳號資料。</p>
           </form>
-          <p class="account-live" data-account-live aria-live="polite"></p>
+
+          <p class="account-card__truth">本頁不會保存或傳送你輸入的內容。帳號功能正式開放後，會提供完整操作入口。</p>
         </section>
       </section>
-
-      <section class="record-boundary" aria-labelledby="record-boundary-title"><div><p class="account-section-kicker">案件留痕邊界</p><h2 id="record-boundary-title">目前不會留下帳號或案件紀錄</h2></div><p>正式開放後，才會依權限記錄帳號確認、邀請狀態與案件成員驗證；本頁現在維持零案件資料，也不產生上述紀錄。</p></section>
-
-      <section class="recovery-section" aria-labelledby="recovery-title">
-        <header class="recovery-section__header"><div><p class="account-section-kicker">遇到狀況時</p><h2 id="recovery-title">看懂原因、責任人與恢復路徑</h2></div><p>每個狀況都不會顯示案件內容，也不會自動授予存取權。</p></header>
-        <div class="recovery-list">
-          <details data-recovery-code="IDENTITY_UNCONFIRMED" open><summary><span>01</span><strong>身分無法確認</strong><em>目前使用者</em></summary><dl><div><dt>原因</dt><dd>目前無法確認使用者是不是帳號本人。</dd></div><div><dt>下一步</dt><dd>重新確認使用的 Email 與正式通知是否一致。</dd></div><div><dt>責任人</dt><dd>目前使用者</dd></div><div><dt>恢復路徑</dt><dd>回到共用入口重新確認；仍無法處理時，安全返回 PCM 首頁。</dd></div></dl></details>
-          <details data-recovery-code="MEMBERSHIP_UNCONFIRMED"><summary><span>02</span><strong>案件成員無法確認</strong><em>目前使用者</em></summary><dl><div><dt>原因</dt><dd>帳號目前無法證明是該案件的成員。</dd></div><div><dt>下一步</dt><dd>確認登入帳號與案件邀請使用的是同一個 Email。</dd></div><div><dt>責任人</dt><dd>目前使用者</dd></div><div><dt>恢復路徑</dt><dd>回到共用入口等待案件成員確認；案件仍不顯示時，安全返回 PCM 首頁。</dd></div></dl></details>
-          <details data-recovery-code="VENDOR_INVITATION_DECLINED"><summary><span>03</span><strong>邀請已拒絕</strong><em>甲方</em></summary><dl><div><dt>原因</dt><dd>乙方已婉拒這次案件邀請。</dd></div><div><dt>下一步</dt><dd>甲方決定是否改邀其他乙方，或先保留目前安排。</dd></div><div><dt>責任人</dt><dd>甲方</dd></div><div><dt>恢復路徑</dt><dd>乙方目前不需處理；甲方待案件服務開放後重新安排，或安全返回 PCM 首頁。</dd></div></dl></details>
-          <details data-recovery-code="VENDOR_INVITATION_EXPIRED"><summary><span>04</span><strong>邀請已逾期</strong><em>甲方</em></summary><dl><div><dt>原因</dt><dd>原邀請已超過可使用期間，不能繼續確認。</dd></div><div><dt>下一步</dt><dd>甲方重新確認合作對象與聯絡資料。</dd></div><div><dt>責任人</dt><dd>甲方</dd></div><div><dt>恢復路徑</dt><dd>正式服務開放後由甲方送出新邀請；現在先安全返回 PCM 首頁。</dd></div></dl></details>
-          <details data-recovery-code="VENDOR_INVITATION_WITHDRAWN"><summary><span>05</span><strong>邀請已撤回</strong><em>甲方</em></summary><dl><div><dt>原因</dt><dd>甲方已收回這次案件邀請。</dd></div><div><dt>下一步</dt><dd>乙方不需重複嘗試；由甲方決定是否再次邀請。</dd></div><div><dt>責任人</dt><dd>甲方</dd></div><div><dt>恢復路徑</dt><dd>等待甲方的新通知；未收到前，安全返回 PCM 首頁。</dd></div></dl></details>
-          <details data-recovery-code="VENDOR_INVITATION_RESEND_REQUIRED"><summary><span>06</span><strong>邀請需要重發</strong><em>甲方</em></summary><dl><div><dt>原因</dt><dd>原邀請資料不完整或已不能繼續使用。</dd></div><div><dt>下一步</dt><dd>甲方確認乙方 Email 後，重新送出案件邀請。</dd></div><div><dt>責任人</dt><dd>甲方</dd></div><div><dt>恢復路徑</dt><dd>乙方等待新邀請；新通知尚未送達前，安全返回 PCM 首頁。</dd></div></dl></details>
-          <details data-recovery-code="PERMISSION_UNCONFIRMED"><summary><span>07</span><strong>案件權限無法確認</strong><em>甲方</em></summary><dl><div><dt>原因</dt><dd>目前無法確認這個帳號可以查看或處理哪些案件內容。</dd></div><div><dt>下一步</dt><dd>請甲方確認邀請對象與預計開放的案件範圍。</dd></div><div><dt>責任人</dt><dd>甲方</dd></div><div><dt>恢復路徑</dt><dd>等待甲方完成權限確認；確認前不顯示案件內容，並可安全返回 PCM 首頁。</dd></div></dl></details>
-        </div>
-      </section>
     </main>
-    <footer class="account-footer"><img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" /><p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p></footer>
+
     <script type="module" src="./app.js"></script>
   </body>
 </html>

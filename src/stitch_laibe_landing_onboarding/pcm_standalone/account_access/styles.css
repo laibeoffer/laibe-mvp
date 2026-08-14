@@ -1,31 +1,42 @@
 :root {
-  --account-bg: #05080a;
-  --account-accent: #ff5809;
+  color-scheme: dark;
+  --account-bg: #05090d;
+  --account-surface: rgba(12, 22, 29, 0.92);
+  --account-surface-soft: rgba(255, 255, 255, 0.035);
+  --account-text: #f3f8fb;
+  --account-muted: #a9bac5;
+  --account-subtle: #718692;
+  --account-line: rgba(181, 222, 239, 0.16);
+  --account-line-strong: rgba(129, 217, 244, 0.34);
+  --account-cyan: #64d8f6;
+  --account-blue: #2489c8;
+  --account-warning: #ffd18c;
+  --account-danger: #ff9b91;
+  --account-radius: 20px;
+  --account-shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
+  font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html {
+html,
+body {
   min-width: 0;
+  min-height: 100%;
+  margin: 0;
   overflow-x: clip;
-  background: var(--owner-first-bg);
-  scroll-behavior: smooth;
+  background: var(--account-bg);
 }
 
 body {
-  min-width: 0;
-  min-height: 100vh;
-  margin: 0;
-  overflow-x: clip;
-  color: var(--owner-first-text);
+  color: var(--account-text);
   background:
-    radial-gradient(circle at 12% 10%, rgba(101, 216, 255, 0.07), transparent 28rem),
-    radial-gradient(circle at 88% 34%, rgba(255, 113, 31, 0.06), transparent 30rem),
-    repeating-linear-gradient(118deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 19px),
-    var(--owner-first-bg);
-  font-family: var(--owner-first-font);
+    radial-gradient(circle at 10% 8%, rgba(38, 155, 210, 0.16), transparent 30rem),
+    radial-gradient(circle at 86% 16%, rgba(100, 216, 246, 0.09), transparent 34rem),
+    linear-gradient(125deg, rgba(255, 255, 255, 0.016) 0 1px, transparent 1px 18px),
+    var(--account-bg);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -48,27 +59,17 @@ img {
   max-width: 100%;
 }
 
-p,
-dd,
-li,
-summary,
-button,
-label {
-  text-wrap: pretty;
-}
-
 .skip-link {
   position: fixed;
   z-index: 1000;
   inset: 10px auto auto 10px;
-  min-block-size: var(--owner-first-control-min);
-  padding: 12px 16px;
-  color: var(--owner-first-bg);
-  background: var(--owner-first-focus);
-  border-radius: var(--owner-first-radius-sm);
+  padding: 11px 16px;
+  color: #021019;
+  background: var(--account-cyan);
+  border-radius: 9px;
   font-weight: 900;
-  transform: translateY(-170%);
-  transition: transform var(--owner-first-transition);
+  transform: translateY(-160%);
+  transition: transform 160ms ease;
 }
 
 .skip-link:focus {
@@ -76,857 +77,484 @@ label {
 }
 
 .account-header {
-  position: sticky;
-  z-index: 100;
-  top: 0;
-  min-block-size: 76px;
-  border-bottom: 1px solid var(--owner-first-line-soft);
-  background: rgba(3, 5, 7, 0.88);
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(22px) saturate(130%);
+  position: relative;
+  border-bottom: 1px solid var(--account-line);
+  background: rgba(5, 9, 13, 0.78);
+  backdrop-filter: blur(18px);
 }
 
 .account-header__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  inline-size: min(var(--owner-first-content-max), calc(100% - 40px));
-  min-block-size: 76px;
+  width: min(1120px, calc(100% - 44px));
+  min-height: 76px;
   margin-inline: auto;
   gap: 20px;
 }
 
-.account-brand,
-.account-header__back {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: var(--owner-first-control-min);
-  color: var(--owner-first-text);
-}
-
-.account-header__actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.account-header__action {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: var(--owner-first-control-min);
-  padding-inline: 16px;
-  color: #fff;
-  border: 1px solid color-mix(in srgb, var(--account-accent) 72%, transparent);
-  border-radius: var(--owner-first-radius-pill);
-  background: var(--account-accent);
-  font-size: 0.82rem;
-  font-weight: 900;
-}
-
 .account-brand {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
   gap: 14px;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.14em;
 }
 
-.account-brand img {
-  inline-size: 118px;
+.account-brand > img {
+  width: 112px;
+  flex: 0 0 auto;
 }
 
-.account-brand span {
+.account-brand > .drs-brand-lockup {
   padding-inline-start: 14px;
-  color: var(--owner-first-secondary-text);
-  border-inline-start: 1px solid var(--owner-first-line);
+  border-inline-start: 1px solid var(--account-line);
 }
 
 .account-header__back {
-  padding-inline: 16px;
-  border: 1px solid var(--owner-first-line);
-  border-radius: var(--owner-first-radius-pill);
-  background: var(--owner-first-surface-soft);
-  font-size: 0.82rem;
-  font-weight: 900;
-}
-
-.account-shell {
-  padding-block: clamp(34px, 5vw, 66px) 84px;
-}
-
-.account-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.32fr) minmax(280px, 0.68fr);
-  align-items: end;
-  gap: clamp(30px, 6vw, 82px);
-}
-
-.account-hero__copy,
-.account-gate,
-.role-guide,
-.account-panel,
-.record-boundary,
-.recovery-section {
-  min-inline-size: 0;
-}
-
-.account-eyebrow,
-.account-section-kicker {
-  margin: 0 0 12px;
-  color: var(--owner-first-secondary-text);
-  font-size: 0.75rem;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-}
-
-.account-hero h1 {
-  max-inline-size: 13ch;
-  margin: 0;
-  font-size: clamp(2.7rem, 6vw, 5.55rem);
-  line-height: 0.98;
-  letter-spacing: -0.064em;
-  text-wrap: balance;
-}
-
-.account-hero__lead {
-  max-inline-size: 66ch;
-  margin: 24px 0 0;
-  color: var(--owner-first-muted);
-  font-size: clamp(1rem, 1.4vw, 1.15rem);
-  line-height: 1.78;
-}
-
-.account-gate {
-  padding-block: 20px;
-  border-block: 1px solid var(--owner-first-line);
-}
-
-.account-gate > span,
-.account-gate > strong {
-  display: block;
-}
-
-.account-gate > span {
-  color: var(--owner-first-subtle);
-  font-size: 0.75rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-}
-
-.account-gate > strong {
-  margin-block: 8px;
-  color: var(--owner-first-warning);
-  font-size: 1.18rem;
-}
-
-.account-gate > p {
-  margin: 0;
-  color: var(--owner-first-muted);
-  line-height: 1.65;
-}
-
-.account-gate .account-primary-action {
-  inline-size: 100%;
-  margin-block-start: 18px;
-  color: #fff;
-  background: var(--account-accent);
-}
-
-.account-facts {
-  margin-block-start: clamp(34px, 5vw, 58px);
-}
-
-.account-status-strip {
-  border-block: 1px solid var(--owner-first-line-soft);
-}
-
-.access-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 430px);
-  align-items: start;
-  gap: clamp(40px, 7vw, 88px);
-  padding-block: clamp(44px, 7vw, 82px);
-  border-bottom: 1px solid var(--owner-first-line-soft);
-}
-
-.role-guide h2,
-.account-panel h2,
-.record-boundary h2,
-.recovery-section h2 {
-  margin: 0;
-  font-size: clamp(1.8rem, 3.7vw, 3.45rem);
-  line-height: 1.04;
-  letter-spacing: -0.048em;
-  text-wrap: balance;
-}
-
-.role-guide__intro {
-  max-inline-size: 62ch;
-  margin: 18px 0 0;
-  color: var(--owner-first-muted);
-  line-height: 1.75;
-}
-
-.role-guide__rail {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  margin-block-start: 28px;
-}
-
-.account-role-choice {
-  position: relative;
-}
-
-.role-guide__rail::before,
-.role-guide__rail::after {
-  position: absolute;
-  inline-size: 0;
-  block-size: 0;
-  content: "";
-}
-
-.role-guide__rail button,
-.account-mode button {
-  min-block-size: var(--owner-first-control-min);
-  padding: 10px 16px;
-  border: 1px solid var(--owner-first-secondary-line);
-  border-radius: var(--owner-first-radius-pill);
-  background: var(--owner-first-secondary);
-  color: var(--owner-first-secondary-text);
-  font-size: 0.84rem;
-  font-weight: 900;
-  cursor: pointer;
-  transition:
-    transform var(--owner-first-transition),
-    border-color var(--owner-first-transition),
-    background-color var(--owner-first-transition);
-}
-
-.role-guide__rail button[aria-pressed="true"],
-.account-mode button[aria-selected="true"] {
-  border-color: rgba(255, 177, 69, 0.52);
-  background: rgba(255, 113, 31, 0.13);
-  color: var(--owner-first-text);
-}
-
-.role-guide__rail > span {
-  color: var(--owner-first-subtle);
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--account-line);
+  border-radius: 999px;
+  color: var(--account-muted);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 0.82rem;
+  font-weight: 850;
   white-space: nowrap;
 }
 
-.role-guide__projection {
-  position: relative;
-  margin-block-start: 28px;
-  padding: 26px 0 26px 24px;
-  border-block: 1px solid var(--owner-first-line);
+.account-shell {
+  width: min(1120px, calc(100% - 44px));
+  margin-inline: auto;
+  padding: clamp(42px, 6vw, 74px) 0 80px;
 }
 
-.role-guide__projection::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  inline-size: 2px;
-  content: "";
-  background: linear-gradient(180deg, transparent, rgba(101, 216, 255, 0.72), transparent);
-}
-
-.role-guide__projection > span {
-  display: block;
-  color: var(--owner-first-subtle);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-}
-
-.role-guide__projection h3 {
-  margin: 9px 0 10px;
-  font-size: clamp(1.22rem, 2.4vw, 1.72rem);
-  line-height: 1.25;
-}
-
-.role-guide__projection p {
-  max-inline-size: 62ch;
-  margin: 0;
-  color: var(--owner-first-muted);
-  line-height: 1.68;
-}
-
-.role-guide__projection p + p {
-  margin-block-start: 10px;
-  color: var(--owner-first-secondary-text);
-  font-size: 0.88rem;
-}
-
-.role-guide__truth {
+.account-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 22px;
-  margin-block-start: 26px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+  align-items: start;
+  gap: clamp(38px, 7vw, 88px);
 }
 
-.role-guide__truth p {
+.account-intro,
+.account-card {
+  min-width: 0;
+}
+
+.account-eyebrow {
+  margin: 0 0 14px;
+  color: var(--account-cyan);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.account-intro h1 {
+  max-width: 12ch;
   margin: 0;
-  color: var(--owner-first-muted);
+  font-size: clamp(2.65rem, 5.4vw, 4.9rem);
+  line-height: 1.01;
+  letter-spacing: -0.058em;
+  text-wrap: balance;
+}
+
+.account-lead {
+  max-width: 46rem;
+  margin: 22px 0 0;
+  color: var(--account-muted);
+  font-size: clamp(0.98rem, 1.35vw, 1.08rem);
+  line-height: 1.8;
+}
+
+.journey-steps {
+  display: grid;
+  gap: 17px;
+  margin-top: 34px;
+}
+
+.journey-step {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: start;
+  gap: 14px;
+}
+
+.journey-step > span {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: var(--account-cyan);
+  border: 1px solid var(--account-line-strong);
+  border-radius: 11px;
+  background: rgba(100, 216, 246, 0.07);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+}
+
+.journey-step h2 {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.journey-step p {
+  margin: 4px 0 0;
+  color: var(--account-subtle);
+  font-size: 0.84rem;
+  line-height: 1.62;
+}
+
+.account-boundary {
+  margin-top: 30px;
+  padding: 18px 19px;
+  border: 1px solid var(--account-line);
+  border-radius: 14px;
+  background: var(--account-surface-soft);
+}
+
+.account-boundary strong {
+  color: var(--account-text);
   font-size: 0.88rem;
+}
+
+.account-boundary p {
+  margin: 7px 0 0;
+  color: var(--account-muted);
+  font-size: 0.79rem;
   line-height: 1.65;
 }
 
-.role-guide__truth strong {
-  display: block;
-  margin-block-end: 5px;
-  color: var(--owner-first-text);
-}
-
-.account-panel {
+.account-card {
   overflow: hidden;
-  border: 1px solid var(--owner-first-line);
-  border-radius: 20px;
-  background: var(--owner-first-surface);
-  box-shadow: var(--owner-first-shadow-soft);
+  border: 1px solid var(--account-line-strong);
+  border-radius: var(--account-radius);
+  background: linear-gradient(160deg, rgba(16, 29, 38, 0.98), var(--account-surface));
+  box-shadow: var(--account-shadow);
 }
 
-.account-panel__header {
+.account-card__header {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 24px 24px 20px;
-  border-bottom: 1px solid var(--owner-first-line-soft);
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--account-line);
 }
 
-.account-panel__header h2 {
-  max-inline-size: 14ch;
-  font-size: 1.5rem;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
+.account-card__header p {
+  margin: 0 0 5px;
+  color: var(--account-subtle);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
 }
 
-.account-panel__header > span {
-  flex: 0 0 auto;
-  padding: 5px 9px;
-  color: var(--owner-first-warning);
-  border: 1px solid rgba(255, 210, 122, 0.28);
-  border-radius: var(--owner-first-radius-pill);
+.account-card__header h2 {
+  margin: 0;
+  font-size: 1.22rem;
+  line-height: 1.35;
+}
+
+.account-card__header > span {
+  padding: 5px 10px;
+  color: var(--account-cyan);
+  border: 1px solid var(--account-line-strong);
+  border-radius: 999px;
   font-size: 0.7rem;
   font-weight: 900;
 }
 
-.account-mode {
+.account-tabs {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  padding: 18px 24px 0;
+  gap: 7px;
+  margin: 18px 24px 0;
+  padding: 4px;
+  border: 1px solid var(--account-line);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.18);
 }
 
-.account-mode button {
-  inline-size: 100%;
-}
-
-.account-service-note {
-  margin: 16px 24px 0;
-  padding: 12px 0;
-  color: var(--owner-first-warning);
-  border-block: 1px solid var(--owner-first-line-soft);
+.account-tabs button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--account-muted);
+  background: transparent;
   font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.account-tabs button[aria-selected="true"] {
+  color: #031118;
+  background: linear-gradient(180deg, #83e7ff, var(--account-cyan));
+  box-shadow: 0 7px 20px rgba(36, 137, 200, 0.24);
+}
+
+.mode-description {
+  margin: 14px 24px 0;
+  color: var(--account-subtle);
+  font-size: 0.77rem;
   line-height: 1.55;
 }
 
 .account-form {
   display: grid;
-  gap: 15px;
-  padding: 20px 24px 24px;
+  gap: 14px;
+  padding: 19px 24px 22px;
 }
 
 .account-form[hidden] {
   display: none;
 }
 
-.account-field {
-  display: grid;
-  gap: 7px;
+.role-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
-.account-field label {
-  color: var(--owner-first-muted);
-  font-size: 0.78rem;
+.role-fieldset legend,
+.field label {
+  margin-bottom: 7px;
+  color: var(--account-muted);
+  font-size: 0.76rem;
   font-weight: 850;
 }
 
-.account-field input {
-  inline-size: 100%;
-  min-block-size: 48px;
-  padding-inline: 14px;
-  color: var(--owner-first-muted);
-  border: 1px solid var(--owner-first-line);
+.role-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.role-options button {
+  min-width: 0;
+  min-height: 68px;
+  padding: 11px 12px;
+  text-align: left;
+  border: 1px solid var(--account-line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.024);
+  cursor: pointer;
+}
+
+.role-options button[aria-pressed="true"] {
+  border-color: var(--account-cyan);
+  background: rgba(100, 216, 246, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(100, 216, 246, 0.18);
+}
+
+.role-options strong,
+.role-options span {
+  display: block;
+}
+
+.role-options strong {
+  font-size: 0.84rem;
+}
+
+.role-options span {
+  margin-top: 4px;
+  color: var(--account-subtle);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.field,
+.field-pair {
+  min-width: 0;
+}
+
+.field {
+  display: grid;
+}
+
+.field-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  color: var(--account-text);
+  border: 1px solid var(--account-line);
   border-radius: 11px;
-  background: rgba(0, 0, 0, 0.26);
+  outline: 0;
+  background: rgba(0, 0, 0, 0.24);
+  font-size: 0.86rem;
 }
 
-.account-field input::placeholder {
-  color: var(--owner-first-subtle);
+.field input::placeholder {
+  color: #5f737e;
 }
 
-.account-field input:disabled {
-  cursor: not-allowed;
+.field input:focus {
+  border-color: var(--account-cyan);
+  box-shadow: 0 0 0 3px rgba(100, 216, 246, 0.12);
+}
+
+.field input[aria-invalid="true"] {
+  border-color: var(--account-danger);
+}
+
+.field-error {
+  min-height: 1.2em;
+  margin: 5px 0 0;
+  color: var(--account-danger);
+  font-size: 0.7rem;
+  line-height: 1.35;
+}
+
+.submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 49px;
+  margin-top: 1px;
+  border: 0;
+  border-radius: 999px;
+  color: #031118;
+  background: linear-gradient(180deg, #82e9ff, #4dc8ec);
+  box-shadow: 0 12px 26px rgba(36, 137, 200, 0.23);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.submit-button:disabled {
+  cursor: wait;
   opacity: 0.72;
 }
 
-.account-form__status {
-  margin: 0;
-  color: var(--owner-first-muted);
-  font-size: 0.8rem;
-  line-height: 1.58;
-}
-
-.account-write-closed {
-  min-block-size: 50px;
-  padding-inline: 16px;
-  color: var(--owner-first-subtle);
-  border: 1px solid var(--owner-first-line);
-  border-radius: var(--owner-first-radius-pill);
-  background: var(--owner-first-surface-soft);
-  font-size: 0.86rem;
-  font-weight: 900;
-  cursor: not-allowed;
-}
-
-.account-live {
-  position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-}
-
-.record-boundary {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
-  align-items: end;
-  gap: clamp(32px, 6vw, 78px);
-  padding-block: clamp(42px, 7vw, 76px);
-  border-bottom: 1px solid var(--owner-first-line-soft);
-}
-
-.record-boundary h2 {
-  font-size: clamp(1.75rem, 3.4vw, 3rem);
-}
-
-.record-boundary > p {
-  margin: 0;
-  color: var(--owner-first-muted);
-  line-height: 1.78;
-}
-
-.recovery-section {
-  padding-block: clamp(46px, 8vw, 90px) 8px;
-}
-
-.recovery-section__header {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.5fr);
-  align-items: end;
-  gap: 34px;
-}
-
-.recovery-section__header h2 {
-  max-inline-size: 16ch;
-}
-
-.recovery-section__header > p {
-  margin: 0;
-  color: var(--owner-first-muted);
-  line-height: 1.68;
-}
-
-.recovery-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 42px;
-  margin-block-start: 36px;
-  border-top: 1px solid var(--owner-first-line);
-}
-
-.recovery-list details {
-  min-inline-size: 0;
-  border-bottom: 1px solid var(--owner-first-line-soft);
-}
-
-.recovery-list details[data-recovery-code="PERMISSION_UNCONFIRMED"] {
-  grid-column: 1 / -1;
-}
-
-.recovery-list details[data-recovery-code="PERMISSION_UNCONFIRMED"] dl {
-  max-inline-size: 860px;
-}
-
-.recovery-list summary {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  min-block-size: 64px;
-  padding-block: 12px;
-  cursor: pointer;
-  list-style: none;
-}
-
-.recovery-list summary::-webkit-details-marker {
+.button-spinner {
   display: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(3, 17, 24, 0.28);
+  border-top-color: #031118;
+  border-radius: 50%;
+  animation: account-spin 700ms linear infinite;
 }
 
-.recovery-list summary span {
-  color: var(--owner-first-secondary-text);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+.account-form[aria-busy="true"] .button-spinner {
+  display: block;
 }
 
-.recovery-list summary strong {
-  min-inline-size: 0;
-  font-size: 0.98rem;
+.form-status {
+  min-height: 1.4em;
+  margin: -2px 0 0;
+  color: var(--account-subtle);
+  font-size: 0.73rem;
+  line-height: 1.5;
 }
 
-.recovery-list summary em {
-  color: var(--owner-first-warning);
-  font-size: 0.74rem;
-  font-style: normal;
-  font-weight: 850;
-  white-space: nowrap;
+.form-status[data-tone="error"] {
+  color: var(--account-danger);
 }
 
-.recovery-list details[open] summary {
-  color: var(--owner-first-text);
+.form-status[data-tone="notice"] {
+  color: var(--account-warning);
 }
 
-.recovery-list dl {
-  margin: 0 0 18px 46px;
-}
-
-.recovery-list dl div {
-  display: grid;
-  grid-template-columns: 78px minmax(0, 1fr);
-  gap: 12px;
-  padding-block: 9px;
-  border-top: 1px solid var(--owner-first-line-soft);
-}
-
-.recovery-list dt {
-  color: var(--owner-first-subtle);
-  font-size: 0.72rem;
-  font-weight: 900;
-}
-
-.recovery-list dd {
+.account-card__truth {
   margin: 0;
-  color: var(--owner-first-muted);
-  font-size: 0.84rem;
-  line-height: 1.58;
+  padding: 15px 24px 18px;
+  color: var(--account-subtle);
+  border-top: 1px solid var(--account-line);
+  background: rgba(0, 0, 0, 0.13);
+  font-size: 0.7rem;
+  line-height: 1.55;
 }
 
-.account-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  inline-size: min(var(--owner-first-content-max), calc(100% - 40px));
-  min-block-size: 90px;
-  margin-inline: auto;
-  gap: 24px;
-  color: var(--owner-first-subtle);
-  border-top: 1px solid var(--owner-first-line-soft);
-  font-family: var(--owner-first-font);
-  font-size: 0.78rem;
-}
-
-.account-footer img {
-  inline-size: 96px;
-  opacity: 0.8;
-}
-
-.account-footer p {
-  margin: 0;
-}
-
-:where(a, button, input, summary):focus-visible {
-  outline: 3px solid var(--owner-first-focus);
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(100, 216, 246, 0.42);
   outline-offset: 3px;
 }
 
-.role-guide__rail button:hover,
-.account-mode button:hover,
-.account-header__back:hover {
-  transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.24);
+@keyframes account-spin {
+  to { transform: rotate(360deg); }
 }
 
-@media (max-width: 900px) {
-  .account-hero,
-  .access-workspace,
-  .record-boundary,
-  .recovery-section__header {
+@media (max-width: 880px) {
+  .account-grid {
     grid-template-columns: 1fr;
   }
 
-  .account-hero {
-    gap: 26px;
+  .account-intro h1 {
+    max-width: 15ch;
   }
 
-  .account-hero h1 {
-    max-inline-size: 15ch;
-  }
-
-  .account-gate {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.55fr);
-    align-items: center;
-    column-gap: 24px;
-  }
-
-  .account-gate > span,
-  .account-gate > strong,
-  .account-gate > p {
-    grid-column: 1;
-  }
-
-  .account-gate .account-primary-action {
-    grid-column: 2;
-    grid-row: 1 / span 3;
-    margin: 0;
-  }
-
-  .access-workspace {
-    gap: 44px;
-  }
-
-  .account-panel {
-    inline-size: min(100%, 560px);
-  }
-
-  .record-boundary,
-  .recovery-section__header {
-    align-items: start;
-    gap: 18px;
+  .account-card {
+    width: min(100%, 560px);
   }
 }
 
-@media (max-width: 760px) {
-  .account-header,
-  .account-header__inner {
-    min-block-size: 66px;
-  }
-
+@media (max-width: 540px) {
   .account-header__inner,
-  .account-footer {
-    inline-size: calc(100% - 24px);
+  .account-shell {
+    width: min(100% - 28px, 1120px);
   }
 
-  .account-brand img {
-    inline-size: 96px;
+  .account-header__inner {
+    min-height: 68px;
   }
 
-  .account-brand span {
+  .account-brand > img {
+    width: 96px;
+  }
+
+  .account-brand > .drs-brand-lockup {
     display: none;
   }
 
   .account-header__back {
-    padding-inline: 13px;
-    font-size: 0.76rem;
-  }
-
-  .account-shell {
-    padding-block-start: 30px;
-  }
-
-  .account-hero h1 {
-    font-size: clamp(2.3rem, 11.5vw, 3.15rem);
-  }
-
-  .account-hero__lead {
-    margin-block-start: 18px;
-    line-height: 1.62;
-  }
-
-  .account-gate {
-    display: block;
-  }
-
-  .account-gate .account-primary-action {
-    margin-block-start: 15px;
-  }
-
-  .role-guide__rail {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .role-guide__rail > span {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    text-align: center;
-  }
-
-  .role-guide__truth,
-  .recovery-list {
-    grid-template-columns: 1fr;
-  }
-
-  .recovery-list {
-    column-gap: 0;
-  }
-
-  .account-panel__header,
-  .account-mode,
-  .account-form {
-    padding-inline: 18px;
-  }
-
-  .account-service-note {
-    margin-inline: 18px;
-  }
-
-  .record-boundary {
-    padding-block: 42px;
-  }
-
-  .account-footer {
-    min-block-size: 112px;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-  }
-}
-
-@media (max-width: 440px) {
-  .account-shell .owner-first-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .account-shell .owner-first-facts [data-owner-fact] {
-    padding: 11px 8px;
-  }
-
-  .account-shell .owner-first-facts [data-owner-fact] + [data-owner-fact] {
-    border-block-start: 0;
-    border-inline-start: 0;
-  }
-
-  .account-shell .owner-first-facts [data-owner-fact]:nth-child(even) {
-    border-inline-start: 1px solid var(--owner-first-line-soft);
-  }
-
-  .account-shell .owner-first-facts [data-owner-fact]:nth-child(n + 3) {
-    border-block-start: 1px solid var(--owner-first-line-soft);
-  }
-
-  .account-shell .owner-first-facts [data-owner-fact]:last-child {
-    grid-column: 1 / -1;
-  }
-
-  .account-shell .owner-first-fact-label {
-    margin-block-end: 3px;
-    font-size: 0.64rem;
-  }
-
-  .account-shell .owner-first-fact-value {
+    min-height: 38px;
+    padding-inline: 12px;
     font-size: 0.74rem;
-    line-height: 1.35;
-  }
-
-  .role-guide__rail button {
-    padding-inline: 10px;
-    font-size: 0.76rem;
-  }
-
-  .role-guide__projection {
-    padding-inline-start: 17px;
-  }
-
-  .account-panel__header {
-    display: block;
-  }
-
-  .account-panel__header > span {
-    display: inline-flex;
-    margin-block-start: 12px;
-  }
-
-  .recovery-list summary {
-    grid-template-columns: 30px minmax(0, 1fr);
-  }
-
-  .recovery-list summary em {
-    grid-column: 2;
-    white-space: normal;
-  }
-
-  .recovery-list dl {
-    margin-inline-start: 42px;
-  }
-
-  .recovery-list dl div {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-}
-
-@media (max-width: 760px) and (max-height: 700px) {
-  .account-header,
-  .account-header__inner {
-    min-block-size: 58px;
   }
 
   .account-shell {
-    padding-block-start: 12px;
+    padding-top: 36px;
   }
 
-  .account-hero {
-    gap: 10px;
+  .account-intro h1 {
+    font-size: clamp(2.45rem, 13vw, 3.55rem);
   }
 
-  .account-eyebrow {
-    margin-block-end: 5px;
-    font-size: 0.66rem;
+  .account-lead {
+    font-size: 0.94rem;
   }
 
-  .account-hero h1 {
-    max-inline-size: 16ch;
-    font-size: clamp(2.02rem, 10.1vw, 2.38rem);
-    line-height: 1;
+  .account-card__header,
+  .account-form {
+    padding-inline: 19px;
   }
 
-  .account-hero__lead {
-    display: -webkit-box;
-    margin-block-start: 8px;
-    overflow: hidden;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+  .account-tabs,
+  .mode-description {
+    margin-inline: 19px;
   }
 
-  .account-gate {
-    padding-block: 9px 11px;
+  .field-pair {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 
-  .account-gate > p {
-    display: none;
-  }
-
-  .account-gate > strong {
-    margin-block: 3px 7px;
-    font-size: 0.9rem;
-  }
-
-  .account-gate .account-primary-action {
-    min-block-size: 46px;
-    margin-block-start: 4px;
-  }
-
-  .account-facts {
-    margin-block-start: 10px;
+  .role-options span {
+    font-size: 0.65rem;
   }
 }
 
@@ -935,8 +563,8 @@ label {
   *::before,
   *::after {
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+    animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
   }
 }
