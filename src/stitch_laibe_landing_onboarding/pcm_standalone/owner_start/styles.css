@@ -807,6 +807,10 @@ button {
     font-size: 0.62rem;
   }
 
+  .registration-logo .drs-brand-lockup.drs-brand-lockup {
+    display: none;
+  }
+
   .registration-logo img {
     width: 96px;
   }

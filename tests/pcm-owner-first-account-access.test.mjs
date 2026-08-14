@@ -37,8 +37,16 @@ test("roles and three steps explain the account-only journey", () => {
 test("registration is not presented as a formal DRS case or contract", () => {
   assert.match(html, /註冊只會建立帳號與辨識使用角色/);
   assert.match(html, /不代表已建立正式 DRS 案件，也不代表已完成 DRS 服務契約/);
-  assert.match(html, /PCM 專業協作僅會在完成 DRS 服務契約後啟用/);
+  assert.match(html, /專業檢討與正式案件協作只會在完成 DRS 服務契約後啟用/);
   assert.doesNotMatch(html, /帳號已建立|案件已建立|已完成簽約|已正式啟用/);
+});
+
+test("browsing draft stays URL-bound and leads only to a truthful preparation preview", () => {
+  assert.match(html, /data-browsing-draft/);
+  assert.match(html, /註冊後準備工作台預覽/);
+  assert.match(app, /URLSearchParams/);
+  assert.match(app, /client_awarding_dashboard\/code\.html/);
+  assert.doesNotMatch(app, /localStorage|sessionStorage/);
 });
 
 test("forms expose understandable labels validation and status regions", () => {

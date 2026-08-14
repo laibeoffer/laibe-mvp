@@ -16,8 +16,8 @@ const caseSummaryHtml = resolve(caseSummaryDir, "code.html");
 const caseSummaryCss = resolve(caseSummaryDir, "styles.css");
 const caseSummaryApp = resolve(caseSummaryDir, "app.js");
 const basicReportHtml = resolve(pcmRoot, "basic_report/code.html");
-const ownerStartHtml = resolve(pcmRoot, "owner_start/code.html");
-const ownerStartApp = resolve(pcmRoot, "owner_start/app.js");
+const accountAccessHtml = resolve(pcmRoot, "account_access/code.html");
+const accountAccessApp = resolve(pcmRoot, "account_access/app.js");
 
 test("basic report leads to a dedicated five-question case-summary route", async () => {
   for (const path of [caseSummaryHtml, caseSummaryCss, caseSummaryApp]) {
@@ -43,18 +43,18 @@ test("basic report leads to a dedicated five-question case-summary route", async
   assert.doesNotMatch(summary, /正式案件已建立|已保存到案件/u);
 });
 
-test("case summary hands the explicit browsing draft to the owner-start entry without browser storage", async () => {
-  const [summaryApp, ownerHtml, ownerApp] = await Promise.all([
+test("case summary hands the explicit browsing draft to the account entry without browser storage", async () => {
+  const [summaryApp, accountHtml, accountApp] = await Promise.all([
     readFile(caseSummaryApp, "utf8"),
-    readFile(ownerStartHtml, "utf8"),
-    readFile(ownerStartApp, "utf8"),
+    readFile(accountAccessHtml, "utf8"),
+    readFile(accountAccessApp, "utf8"),
   ]);
 
-  assert.match(summaryApp, /\.\.\/owner_start\/code\.html\?/u);
+  assert.match(summaryApp, /\.\.\/account_access\/code\.html\?/u);
   assert.match(summaryApp, /URLSearchParams/u);
   assert.doesNotMatch(summaryApp, /localStorage|sessionStorage/u);
-  assert.match(ownerHtml, /本次瀏覽草稿/u);
-  assert.match(ownerHtml, /正式註冊與保存入口仍在整理中/u);
-  assert.match(ownerApp, /URLSearchParams/u);
-  assert.doesNotMatch(ownerApp, /localStorage|sessionStorage/u);
+  assert.match(accountHtml, /本次瀏覽草稿/u);
+  assert.match(accountHtml, /註冊後準備工作台預覽/u);
+  assert.match(accountApp, /URLSearchParams/u);
+  assert.doesNotMatch(accountApp, /localStorage|sessionStorage/u);
 });

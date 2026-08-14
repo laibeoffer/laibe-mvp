@@ -18,16 +18,18 @@ export const OWNER_WORKSPACE_ACCESS = Object.freeze({
   domainStatus: "active",
 });
 
+export const PRECONTRACT_BOUNDARY = "REGISTERED != CONTRACTED";
+
 const STATE_COPY = Object.freeze({
   ACCESS_CHECKING: Object.freeze({
     label: "正在確認案件權限",
     title: "正在取得你的案件資料",
-    message: "完成身分、PCM 服務契約與案件權限確認後，才會顯示案件內容。",
+    message: "完成身分、DRS 服務契約與案件權限確認後，才會顯示案件內容。",
   }),
   ACCESS_DENIED: Object.freeze({
     label: "無法開啟案件",
     title: "目前無法開啟此甲方工作台",
-    message: "請由 PCM 首頁的甲方入口重新登入；此頁不會透露未授權案件內容。",
+    message: "請由 DRS 首頁的甲方入口重新登入；此頁不會透露未授權案件內容。",
   }),
   CONTRACT_CONTEXT_UNAVAILABLE: Object.freeze({
     label: "決策準備中",
@@ -45,9 +47,9 @@ const STATE_COPY = Object.freeze({
     message: "所有文件、訊息與決策狀態都依案件後台的最新可信紀錄顯示。",
   }),
   PCM_SERVICE_ENDED_READ_ONLY: Object.freeze({
-    label: "PCM 已結束介入",
+    label: "專業協作已結束",
     title: "既有案件內容維持可讀",
-    message: "既有文件與紀錄仍可讀取；甲乙雙方後續可直接協議，PCM 不再介入。",
+    message: "既有文件與紀錄仍可讀取；甲乙雙方後續可直接協議，專業協作不再介入。",
   }),
   LOAD_FAILED_RETRYABLE: Object.freeze({
     label: "案件資料暫時無法載入",
@@ -71,7 +73,7 @@ const EMPTY_LIST_COPY = Object.freeze({
   }),
   designReviews: Object.freeze({
     title: "尚未取得設計送審紀錄",
-    body: "PCM 可提出書面提醒，但不代替甲方接受設計或宣告現場品質。",
+    body: "專業檢討可提出書面提醒，但不代替甲方接受設計或宣告現場品質。",
   }),
   constructionRecords: Object.freeze({
     title: "尚未取得施工或驗收事件",
@@ -586,12 +588,12 @@ export function buildOwnerWorkspaceViewModel(input) {
     caseName: summary?.displayName || "尚待案件資料",
     actorLabel: (identityVisible && context.actor.displayLabel) || "尚待驗證",
     agreementLabel: !identityVisible
-      ? "PCM 服務契約：尚待確認"
+      ? "DRS 服務契約：尚待確認"
       : context.serviceAgreement.status === "active"
-      ? "PCM 服務契約：有效"
+      ? "DRS 服務契約：有效"
       : context.serviceAgreement.status === "ended"
-      ? "PCM 服務契約：已結束"
-      : "PCM 服務契約：尚待確認",
+      ? "DRS 服務契約：已結束"
+      : "DRS 服務契約：尚待確認",
     agreementState: !identityVisible
       ? "尚待確認"
       : context.serviceAgreement.status === "active"

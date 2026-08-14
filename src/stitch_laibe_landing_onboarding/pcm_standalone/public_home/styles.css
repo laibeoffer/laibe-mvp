@@ -455,6 +455,8 @@ h1 {
 
 .hero-subtitle__brand-mark {
   position: absolute;
+  display: grid;
+  place-items: center;
   top: 50%;
   left: calc(clamp(18px, 1.8vw, 26px) - 80px);
   width: 96px;
@@ -463,6 +465,12 @@ h1 {
   object-fit: contain;
   object-position: center;
   pointer-events: none;
+  border: 1px solid rgb(218 175 139 / 42%);
+  border-radius: 18px;
+  color: #f0c8a5;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.28));
 }
 

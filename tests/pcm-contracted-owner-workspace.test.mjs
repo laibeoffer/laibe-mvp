@@ -64,18 +64,19 @@ function authorizedContext(overrides = {}) {
   };
 }
 
-test("未簽 DRS 服務契約的甲方有保存、整理與準備決策的工作台", async () => {
+test("未簽 DRS 服務契約前只顯示誠實的註冊後準備預覽", async () => {
   const html = await readPageFile("code.html");
 
-  assert.match(html, /已註冊，先把資料整理成可討論的決策基礎/);
-  assert.match(html, /已保存文件健檢/);
-  assert.match(html, /已保存案件摘要/);
-  assert.match(html, /完整需求整理/);
+  assert.match(html, /註冊後，可以先把資料整理成可討論的決策基礎/);
+  assert.match(html, /尚未驗證註冊/);
+  assert.match(html, /摘要也尚未真正保存/);
+  assert.match(html, /完整需求整理入口準備中/);
   assert.match(html, /補齊必要文件/);
   assert.match(html, /查看 DRS 服務方案/);
   assert.match(html, /確認 DRS 服務契約/);
-  assert.match(html, /承接你先前完成的兩分鐘摘要/);
-  assert.match(html, /尚未連結正式案件內容/);
+  assert.match(html, /註冊與保存開放後才可正式保留/);
+  assert.match(html, /尚未連結帳號或正式案件/);
+  assert.doesNotMatch(html, /href="\.\.\/pcm_standalone\/owner_start\/code\.html"/);
 });
 
 test("頁面使用本地樣式與 module runtime，不依賴外部 UI CDN", async () => {
@@ -635,7 +636,9 @@ test("頁面保留 skip link 與真實同源快速入口", async () => {
     html,
     /href="\.\.\/pcm_standalone\/public_home\/code\.html#top"/,
   );
-  assert.match(html, /href="\.\.\/pcm_standalone\/basic_report\/code\.html"/);
+  assert.match(html, /href="\.\.\/pcm_standalone\/case_summary\/code\.html"/);
+  assert.match(html, /href="\.\.\/pcm_standalone\/about_drs\/code\.html"/);
+  assert.match(html, /href="\.\.\/pcm_standalone\/service_contract\/code\.html"/);
   assert.match(html, /href="#documents"/);
 });
 

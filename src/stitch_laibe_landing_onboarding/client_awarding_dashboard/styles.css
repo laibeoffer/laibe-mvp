@@ -157,6 +157,9 @@ body::before {
 .precontract-card p:not(.eyebrow) { margin: 0 0 24px; color: var(--paper-soft); line-height: 1.72; }
 .precontract-card .button, .precontract-card .text-link { margin-top: auto; }
 .text-link { color: var(--yellow); font-weight: 800; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.precontract-card__links { display: grid; gap: 10px; margin-top: auto; }
+.precontract-card__links .text-link { margin-top: 0; }
+.is-disabled { cursor: not-allowed; opacity: 0.68; }
 
 .precontract-notice {
   display: flex;

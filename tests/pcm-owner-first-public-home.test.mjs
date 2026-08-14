@@ -11,7 +11,6 @@ const pageRoot = new URL(
 const htmlUrl = new URL("code.html", pageRoot);
 const cssUrl = new URL("styles.css", pageRoot);
 const appUrl = new URL("app.js", pageRoot);
-const heroDrsMarkUrl = new URL("assets/d_rs_03_compact_d0e0e3.svg", pageRoot);
 const governanceUrl = new URL(
   "../docs/governance/pcm-owner-first-execution-manifest.v1.json",
   import.meta.url,
@@ -144,7 +143,7 @@ test("homepage hero adds the owner-approved smaller subtitle below the protected
   assert.match(heroCopy, /<\/h1>\s*<p class="hero-subtitle">/);
   assert.match(
     subtitle,
-    /<span>在公共工程上，有PCM替政府審查專業流程。<\/span>\s*<span>在裝潢市場上，DRS系統是你做出決策的底氣。<\/span>\s*<span>AI時代的裝修過程，新手上路需要一位副駕駛。<\/span>/,
+    /<span>在大型工程裡，專業團隊會彼此核對重要流程。<\/span>\s*<span>在裝潢市場上，DRS系統是你做出決策的底氣。<\/span>\s*<span>AI時代的裝修過程，新手上路需要一位副駕駛。<\/span>/,
   );
   assert.equal((subtitle.match(/<span>/g) ?? []).length, 3);
   assert.match(css, /\.hero__copy\s*\{[^}]*position:\s*relative;/s);
@@ -159,7 +158,7 @@ test("homepage hero adds the owner-approved smaller subtitle below the protected
   );
 });
 
-test("homepage hero pairs the approved DRS mark with the pilot subtitle", async () => {
+test("homepage hero pairs a self-contained text DRS mark with the pilot subtitle", async () => {
   const [html, css] = await Promise.all([
     readFile(htmlUrl, "utf8"),
     readFile(cssUrl, "utf8"),
@@ -167,20 +166,15 @@ test("homepage hero pairs the approved DRS mark with the pilot subtitle", async 
   const heroCopy = html.match(/<div class="hero__copy">[\s\S]*?<\/div>\s*<div class="entry-choices"/)?.[0] ?? "";
   const subtitle = heroCopy.match(/<p class="hero-subtitle">[\s\S]*?<\/p>/)?.[0] ?? "";
 
-  await access(heroDrsMarkUrl);
-  const markBytes = await readFile(heroDrsMarkUrl);
-  assert.ok(markBytes.byteLength > 8000);
-  assert.match(markBytes.toString("utf8"), /viewBox="0 0 560 420"/);
-  assert.match(markBytes.toString("utf8"), /#d0e0e3/i);
-  assert.match(markBytes.toString("utf8"), /#ff4a0b/i);
   assert.match(
     subtitle,
-    /<img\s+class="hero-subtitle__brand-mark"\s+src="\.\/assets\/d_rs_03_compact_d0e0e3\.svg"\s+alt="D&amp;RS"\s+width="96"\s+height="72"\s+decoding="async"\s*\/>/,
+    /<span class="hero-subtitle__brand-mark" aria-hidden="true">D&amp;RS<\/span>/,
   );
+  assert.doesNotMatch(subtitle, /d_rs_03_compact_d0e0e3\.svg/);
   assert.match(subtitle, /AI時代的裝修過程，新手上路需要一位副駕駛。/);
   assert.match(
     css,
-    /\.hero-subtitle__brand-mark\s*\{[^}]*position:\s*absolute;[^}]*width:\s*96px;[^}]*height:\s*72px;[^}]*object-fit:\s*contain;/s,
+    /\.hero-subtitle__brand-mark\s*\{[^}]*position:\s*absolute;[^}]*display:\s*grid;[^}]*width:\s*96px;[^}]*height:\s*72px;[^}]*font-family:/s,
   );
   assert.match(
     css,

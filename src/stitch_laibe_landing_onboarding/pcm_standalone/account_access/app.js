@@ -1,6 +1,27 @@
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BROWSING_DRAFT_FIELDS = Object.freeze(["space", "documents", "budget", "partner", "problem"]);
 
 export const UNAVAILABLE_MESSAGE = "帳號功能正在整理中，正式開放後會提供完整操作入口。";
+
+export function applyBrowsingDraft(root, search = root.defaultView?.location?.search ?? "") {
+  const panel = root.querySelector?.("[data-browsing-draft]");
+  const params = new URLSearchParams(search);
+  if (!panel || params.get("draft") !== "1") return null;
+
+  for (const field of BROWSING_DRAFT_FIELDS) {
+    const target = panel.querySelector(`[data-draft-${field}]`);
+    if (target) target.textContent = params.get(field) || "未填寫";
+  }
+
+  const preview = panel.querySelector("[data-workspace-preview]");
+  if (preview) {
+    const previewParams = new URLSearchParams(params);
+    previewParams.set("preview", "registered-preparation");
+    preview.href = `../../client_awarding_dashboard/code.html?${previewParams.toString()}`;
+  }
+  panel.hidden = false;
+  return params;
+}
 
 function valueOf(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -177,6 +198,7 @@ export function initAccountAccess(root = document) {
     });
   });
 
+  applyBrowsingDraft(root);
   selectMode(root, "register");
 }
 

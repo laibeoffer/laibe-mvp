@@ -29,7 +29,7 @@ export function initializeCaseSummary(root = document) {
       return;
     }
     const query = createBrowsingDraft(form);
-    window.location.assign(`../owner_start/code.html?${query.toString()}`);
+    window.location.assign(`../account_access/code.html?${query.toString()}`);
   });
   return form;
 }

@@ -588,7 +588,7 @@ test("quote check completion path explains why to return home", async () => {
 
   assert.match(
     html,
-    /href="\.\.\/public_home\/code\.html#application-check"[^>]*>回 DRS 首頁，確認案件是否適合<\/a>/u,
+    /href="\.\.\/basic_report\/code\.html"[^>]*>查看基本報告範例<\/a>/u,
   );
   assert.match(html, /href="#document-workspace"[^>]*>回到文件選擇<\/a>/u);
   assert.match(
