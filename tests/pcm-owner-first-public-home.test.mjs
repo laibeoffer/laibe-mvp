@@ -11,6 +11,7 @@ const pageRoot = new URL(
 const htmlUrl = new URL("code.html", pageRoot);
 const cssUrl = new URL("styles.css", pageRoot);
 const appUrl = new URL("app.js", pageRoot);
+const heroDrsMarkUrl = new URL("assets/d_rs_03_compact_434343.svg", pageRoot);
 const governanceUrl = new URL(
   "../docs/governance/pcm-owner-first-execution-manifest.v1.json",
   import.meta.url,
@@ -87,55 +88,16 @@ test("homepage follows the full-screen hero then owner decision hierarchy", asyn
   assert.doesNotMatch(html, /data-hero-status/);
 });
 
-test("unregistered visitors receive an actionable four-stage DRS path immediately after the hero", async () => {
-  const [html, css] = await Promise.all([
-    readFile(htmlUrl, "utf8"),
-    readFile(cssUrl, "utf8"),
-  ]);
-  const guide = readSection(html, "guest-guidance");
-  const stages = [...guide.matchAll(/<li\b[^>]*data-guest-stage="(\d)"[^>]*>[\s\S]*?<strong>([^<]+)<\/strong>/g)];
-
-  assert.ok(html.indexOf('id="guest-guidance"') > html.indexOf('id="hero"'));
-  assert.ok(html.indexOf('id="guest-guidance"') < html.indexOf('id="decision-prompts"'));
-  assert.match(guide, /LaiBE DRS/);
-  assert.match(guide, /目前尚未建立案件/);
-  assert.equal(stages.length, 4);
-  assert.deepEqual(stages.map((stage) => stage[1]), ["1", "2", "3", "4"]);
-  assert.match(guide, /data-guest-stage="1"[^>]*data-stage-state="active"/);
-  assert.match(
-    guide,
-    /data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?>\s*免費文件健檢\s*<\/a>/,
-  );
-  assert.match(css, /\.guest-guidance__stages\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/s);
-  assert.match(css, /\.guest-guidance__stage\[data-stage-state="active"\]\s*\{/);
-  assert.match(
-    css,
-    /@media\s*\(max-width:\s*680px\)[\s\S]*?\.guest-guidance__stages\s*\{[^}]*grid-template-columns:\s*1fr;/,
-  );
-});
-
-test("unregistered visitor stages match the fixed journey without claiming early collaboration", async () => {
+test("guest guidance is removed without disturbing its neighboring sections", async () => {
   const html = await readFile(htmlUrl, "utf8");
-  const guide = readSection(html, "guest-guidance");
+  const heroPosition = html.indexOf('id="hero"');
+  const decisionPromptsPosition = html.indexOf('id="decision-prompts"');
 
-  assert.match(guide, /免費文件健檢/);
-  assert.match(guide, /基本報告[\s\S]*2 分鐘摘要/);
-  assert.match(guide, /建立帳號[\s\S]*保存/);
-  assert.match(guide, /註冊後[\s\S]*完整需求[\s\S]*DRS 服務與契約/);
-  assert.match(guide, /正式 DRS[\s\S]*完成服務契約後/);
-  assert.match(guide, /帳號與保存功能正在整理中/);
-  assert.doesNotMatch(guide, /建立案件協作|案件進行中/);
-});
-
-test("owner risk cards become a true single-column mobile layout without hidden horizontal content", async () => {
-  const css = await readFile(cssUrl, "utf8");
-  const mobile = css.slice(css.lastIndexOf("@media (max-width: 680px)"));
-
-  assert.match(mobile, /\.risk-map__viewport\s*\{[^}]*overflow-x:\s*visible;/s);
-  assert.match(mobile, /\.risk-map\s*\{[^}]*min-width:\s*0;[^}]*grid-template-columns:\s*1fr;/s);
-  assert.match(mobile, /\.risk-map__item\s*\{[^}]*margin-left:\s*0;/s);
-  assert.match(mobile, /\.risk-map__card\s*\{[^}]*margin-left:\s*0;[^}]*border-radius:\s*18px;/s);
-  assert.match(mobile, /\.risk-map__icon\s*\{[^}]*display:\s*none;/s);
+  assert.ok(heroPosition >= 0);
+  assert.ok(decisionPromptsPosition > heroPosition);
+  assert.doesNotMatch(html, /id="guest-guidance"/);
+  assert.doesNotMatch(html, /guest-guidance__/);
+  assert.doesNotMatch(html, /data-guest-stage=/);
 });
 
 test("owner-confirmed application check stays hash-bound after the approved heading refinement", async () => {
@@ -167,7 +129,7 @@ test("homepage hero adds the owner-approved smaller subtitle below the protected
   assert.match(heroCopy, /<\/h1>\s*<p class="hero-subtitle">/);
   assert.match(
     subtitle,
-    /<span>在大型工程裡，專業團隊會彼此核對重要流程。<\/span>\s*<span>在裝潢市場上，DRS系統是你做出決策的底氣。<\/span>\s*<span>AI時代的裝修過程，新手上路需要一位副駕駛。<\/span>/,
+    /<span>在公共工程上，有PCM替政府審查專業流程。<\/span>\s*<span>在裝潢市場上，DRS系統是你做出決策的底氣。<\/span>\s*<span>AI時代的裝修過程，新手上路需要一位副駕駛。<\/span>/,
   );
   assert.equal((subtitle.match(/<span>/g) ?? []).length, 3);
   assert.match(css, /\.hero__copy\s*\{[^}]*position:\s*relative;/s);
@@ -178,11 +140,11 @@ test("homepage hero adds the owner-approved smaller subtitle below the protected
   assert.match(css, /\.hero-subtitle\s+span\s*\{[^}]*display:\s*block;/s);
   assert.match(
     css,
-    /@media\s*\(max-width:\s*680px\)[\s\S]*?\.hero-subtitle\s*\{[^}]*position:\s*relative;[^}]*font-size:\s*clamp\(0\.9rem,\s*3\.8vw,\s*1rem\);/s,
+    /@media\s*\(max-width:\s*680px\)[\s\S]*?\.hero-subtitle\s*\{[^}]*position:\s*static;[^}]*font-size:\s*clamp\(0\.9rem,\s*3\.8vw,\s*1rem\);/s,
   );
 });
 
-test("homepage hero pairs a self-contained text DRS mark with the pilot subtitle", async () => {
+test("homepage hero pairs the approved DRS mark with the pilot subtitle", async () => {
   const [html, css] = await Promise.all([
     readFile(htmlUrl, "utf8"),
     readFile(cssUrl, "utf8"),
@@ -192,17 +154,53 @@ test("homepage hero pairs a self-contained text DRS mark with the pilot subtitle
 
   assert.match(
     subtitle,
-    /<span class="hero-subtitle__brand-mark" aria-hidden="true">D&amp;RS<\/span>/,
+    /<img\s+class="hero-subtitle__brand-mark"\s+src="\.\/assets\/d_rs_03_compact_434343\.svg"\s+alt="D&amp;RS"\s+width="96"\s+height="72"\s+decoding="async"\s*\/>/,
   );
-  assert.doesNotMatch(subtitle, /d_rs_03_compact_d0e0e3\.svg/);
+  await access(heroDrsMarkUrl);
+  const markBytes = await readFile(heroDrsMarkUrl);
+  const markSource = markBytes.toString("utf8");
+  assert.ok(markBytes.byteLength > 8000);
+  assert.match(markSource, /viewBox="0 0 560 420"/);
+  assert.match(markSource, /#434343/i);
+  assert.match(markSource, /#ff4a0b/i);
   assert.match(subtitle, /AI時代的裝修過程，新手上路需要一位副駕駛。/);
   assert.match(
     css,
-    /\.hero-subtitle__brand-mark\s*\{[^}]*position:\s*absolute;[^}]*display:\s*grid;[^}]*width:\s*96px;[^}]*height:\s*72px;[^}]*font-family:/s,
+    /\.hero-subtitle\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*96px minmax\(0,\s*max-content\);[^}]*align-items:\s*center;[^}]*justify-content:\s*center;[^}]*column-gap:/s,
+  );
+  assert.match(css, /\.hero-subtitle\s*\{[^}]*text-align:\s*center;/s);
+  assert.match(
+    css,
+    /\.hero-subtitle__brand-mark\s*\{[^}]*position:\s*static;[^}]*grid-column:\s*1;[^}]*grid-row:\s*1\s*\/\s*span 3;[^}]*width:\s*96px;[^}]*height:\s*72px;[^}]*transform:\s*none;[^}]*object-fit:\s*contain;/s,
   );
   assert.match(
     css,
     /@media\s*\(max-width:\s*680px\)[\s\S]*?\.hero-subtitle__brand-mark\s*\{[^}]*width:\s*72px;[^}]*height:\s*54px;/s,
+  );
+});
+
+test("hero lower lockup stays close to the visible title column and readable at both acceptance widths", async () => {
+  const css = await readFile(cssUrl, "utf8");
+  const mobileHeroStart = css.indexOf("@media (max-width: 680px)");
+  const mobileHeroEnd = css.indexOf("  .same-fact-rail", mobileHeroStart);
+  const mobileHero = css.slice(mobileHeroStart, mobileHeroEnd);
+
+  assert.match(
+    css,
+    /\.hero-subtitle\s*\{[^}]*--hero-subtitle-inline-shift:\s*clamp\(48px,\s*3\.75vw,\s*55px\);[^}]*--hero-subtitle-gap:\s*clamp\(24px,\s*2vw,\s*32px\);[^}]*--hero-horizontal-half-height:\s*clamp\(84px,\s*6\.2vw,\s*92px\);/s,
+  );
+  assert.match(
+    css,
+    /\.hero-subtitle\s*\{[^}]*top:\s*calc\(50% \+ var\(--hero-horizontal-half-height\) \+ var\(--hero-subtitle-gap\)\);[^}]*bottom:\s*auto;[^}]*transform:\s*translateX\(calc\(-50% - var\(--hero-subtitle-inline-shift\)\)\);/s,
+  );
+  assert.match(
+    css,
+    /\.hero-subtitle__brand-mark\s*\{[^}]*padding:\s*7px 9px;[^}]*border:\s*1px solid rgba\(255, 74, 11, 0\.42\);[^}]*background:\s*#f4f7f8;[^}]*filter:\s*drop-shadow\(0 12px 24px rgba\(0, 0, 0, 0\.34\)\);/s,
+  );
+  assert.match(mobileHero, /\.hero__copy\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;[^}]*align-items:\s*stretch;/s);
+  assert.match(
+    mobileHero,
+    /\.hero-subtitle\s*\{[^}]*position:\s*static;[^}]*margin-top:\s*clamp\(24px,\s*7vw,\s*32px\);[^}]*grid-template-columns:\s*72px minmax\(0,\s*1fr\);[^}]*transform:\s*none;/s,
   );
 });
 
@@ -337,7 +335,7 @@ test("three owner-facing chapters inherit the HERO palette, type hierarchy, and 
   assert.match(css, /\.risk-map__copy p\s*\{[^}]*color:\s*var\(--chapter-copy\)/s);
 });
 
-test("section 4 recreates the reference hub-and-five-branches risk map", async () => {
+test("section 4 uses curved DRS branches and luminous glass risk cards without compact-width overflow", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const section = readSection(html, "pcm-scope");
@@ -366,6 +364,11 @@ test("section 4 recreates the reference hub-and-five-branches risk map", async (
   assert.match(section, /甲乙雙方的信任破裂，往往出現在甲方不好意思開口，乙方認為你沒說就算了。但是，問題只是正在滾雪球/);
   assert.equal((section.match(/class="risk-map__core"/g) ?? []).length, 1);
   assert.equal((section.match(/class="risk-map__trunk"/g) ?? []).length, 1);
+  assert.equal((section.match(/class="risk-map__curve risk-map__curve--\d{2}"/g) ?? []).length, 5);
+  assert.deepEqual(
+    [...section.matchAll(/data-risk-curve="(\d{2})"/g)].map((match) => match[1]),
+    ["01", "02", "03", "04", "05"],
+  );
   assert.equal((section.match(/class="risk-map__branch"/g) ?? []).length, 5);
   assert.equal((section.match(/class="risk-map__card"/g) ?? []).length, 5);
   assert.equal((section.match(/class="risk-map__icon"/g) ?? []).length, 5);
@@ -381,27 +384,34 @@ test("section 4 recreates the reference hub-and-five-branches risk map", async (
   assert.match(scopeStyles, /--map-card:\s*var\(--chapter-surface\);/);
   assert.match(scopeStyles, /--map-line:\s*rgba\(201, 209, 215, 0\.32\);/);
   assert.match(scopeStyles, /--map-ink:\s*var\(--chapter-ink\);/);
-  assert.match(scopeStyles, /--map-core-size:\s*clamp\(152px, 17vw, 184px\);/);
-  assert.match(scopeStyles, /--map-row-height:\s*148px;/);
-  assert.match(scopeStyles, /--map-row-gap:\s*14px;/);
-  assert.match(scopeStyles, /--map-row-shift:\s*28px;/);
-  assert.match(scopeStyles, /--map-core-offset:\s*24px;/);
-  assert.match(scopeStyles, /--map-arrow-depth:\s*56px;/);
-  assert.match(scopeStyles, /max-width:\s*1040px;/);
-  assert.match(scopeStyles, /padding:\s*42px 34px 42px 14px;/);
+  assert.match(scopeStyles, /--map-core-size:\s*clamp\(138px, 15vw, 164px\);/);
+  assert.match(scopeStyles, /--map-row-height:\s*126px;/);
+  assert.match(scopeStyles, /--map-row-gap:\s*24px;/);
+  assert.match(scopeStyles, /--map-row-shift:\s*16px;/);
+  assert.match(scopeStyles, /--map-core-offset:\s*0px;/);
+  assert.match(scopeStyles, /max-width:\s*1080px;/);
+  assert.match(scopeStyles, /min-width:\s*0;/);
+  assert.match(scopeStyles, /padding:\s*38px 28px 38px 10px;/);
+  assert.match(scopeStyles, /\.risk-map__viewport\s*\{[^}]*overflow-x:\s*clip;/s);
   assert.match(scopeStyles, /\.risk-map__item--far\s*\{[^}]*--item-shift:\s*var\(--map-row-shift\);/s);
   assert.match(scopeStyles, /\.risk-map__item--near\s*\{[^}]*--item-shift:\s*0px;/s);
-  assert.match(scopeStyles, /\.risk-map__core::after\s*\{[^}]*width:\s*calc\(\(var\(--map-core-column\) - var\(--map-core-size\)\) \/ 2 \+ var\(--map-link-column\) \/ 2\);/s);
+  assert.match(scopeStyles, /\.risk-map__core::after\s*\{[^}]*display:\s*none;/s);
   assert.match(scopeStyles, /\.risk-map__core\s*\{[^}]*transform:\s*translateY\(var\(--map-core-offset\)\);/s);
-  assert.match(scopeStyles, /\.risk-map__card\s*\{[^}]*grid-template-columns:\s*minmax\(0, 1fr\) clamp\(62px, 6vw, 74px\);/s);
-  assert.match(scopeStyles, /\.risk-map__card\s*\{[^}]*border:\s*1px solid color-mix\(in srgb, var\(--risk-step\) 36%, rgba\(244, 247, 248, 0\.12\)\);/s);
-  assert.match(scopeStyles, /\.risk-map__icon\s*\{[^}]*width:\s*clamp\(72px, 8vw, 82px\);/s);
-  assert.doesNotMatch(scopeStyles, /\.risk-map__card::after/);
+  assert.match(scopeStyles, /\.risk-map__curves\s*\{[^}]*pointer-events:\s*none;/s);
+  assert.match(scopeStyles, /\.risk-map__curve\s*\{[^}]*fill:\s*none;[^}]*stroke-linecap:\s*round;/s);
+  assert.match(scopeStyles, /\.risk-map__card\s*\{[^}]*border-radius:\s*26px;/s);
+  assert.match(scopeStyles, /\.risk-map__card\s*\{[^}]*backdrop-filter:\s*blur\(26px\) saturate\(150%\);/s);
+  assert.match(scopeStyles, /\.risk-map__card\s*\{[^}]*box-shadow:[^;}]*inset 0 -18px 26px color-mix\(in srgb, var\(--risk-step\) 36%, transparent\)/s);
+  assert.match(scopeStyles, /\.risk-map__card::after\s*\{[^}]*radial-gradient\(ellipse at center bottom,[^}]*filter:\s*blur\(7px\);/s);
+  assert.match(scopeStyles, /\.risk-map__number\s*\{[^}]*clip-path:\s*polygon\(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%\);/s);
+  assert.match(scopeStyles, /\.risk-map__icon\s*\{[^}]*width:\s*50px;/s);
   assert.doesNotMatch(scopeStyles, /\.risk-map__card\s*\{[^}]*border:\s*2px solid var\(--map-bg\)/s);
+  assert.match(scopeStyles, /@media\s*\(max-width:\s*960px\)[\s\S]*?\.risk-map\s*\{[^}]*grid-template-columns:\s*1fr;/s);
+  assert.match(scopeStyles, /@media\s*\(max-width:\s*960px\)[\s\S]*?\.risk-map__curves,[\s\S]*?\.risk-map__trunk,[\s\S]*?\.risk-map__branch\s*\{[^}]*display:\s*none;/s);
   assert.match(scopeStyles, /\.narrative-section--questions\s*\{[^}]*background:\s*transparent;/s);
   assert.match(scopeStyles, /\.risk-map-heading h2\s*\{[^}]*color:\s*var\(--map-ink\);/s);
   assert.match(scopeStyles, /\.risk-map-heading__copy\s*\{[^}]*color:\s*var\(--chapter-copy\);/s);
-  assert.doesNotMatch(scopeStyles, /#FF5809|--risk-accent|clip-path/);
+  assert.doesNotMatch(scopeStyles, /#FF5809|--risk-accent/);
 });
 
 test("owner annotations refine the application heading and warm only the lead risk copy", async () => {
@@ -590,7 +600,7 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
   assert.match(css, /\.entry-choice::before\s*\{[^}]*clip-path:\s*polygon\(7% 0,\s*93% 0,\s*100% 50%,\s*93% 100%,\s*7% 100%,\s*0 50%\);/s);
   assert.match(css, /\.entry-choice__number\s*\{[^}]*clip-path:\s*polygon\(25% 0,\s*75% 0,\s*100% 50%,\s*75% 100%,\s*25% 100%,\s*0 50%\);/s);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.entry-choice\s*\{/);
-  assert.match(html, /href="\.\/styles\.css\?v=20260813-hero-subtitle-warm"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260814-risk-luminous-curves"/);
 });
 
 test("entry stages reproduce the owner-approved interlocking honeycomb infographic without changing the protected hero copy", async () => {
@@ -624,7 +634,7 @@ test("entry stage kickers move into the alternating blank tips as bold vermilion
   const css = await readFile(cssUrl, "utf8");
   const kickerLabels = ["文件核對", "服務確認", "成員加入", "案件治理", "驗收確認"];
 
-  assert.match(html, /href="\.\/styles\.css\?v=20260813-hero-subtitle-warm"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260814-risk-luminous-curves"/);
 
   for (const [index, label] of kickerLabels.entries()) {
     const step = String(index + 1).padStart(2, "0");
@@ -793,7 +803,7 @@ test("four decision branches end in aqua-glass actions with truthful destination
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const decisionSection = readSection(html, "decision-prompts");
-  assert.match(html, /href="\.\/styles\.css\?v=20260813-hero-subtitle-warm"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260814-risk-luminous-curves"/);
   const nodes = [...decisionSection.matchAll(/<li\b[^>]*class="decision-node decision-node--(?:left|right)(?: decision-node--action)?"[\s\S]*?<\/li>/g)].map(
     (match) => match[0],
   );
@@ -919,7 +929,8 @@ test("mobile header keeps only the primary audit and account actions visible", a
   const actions = [...header.matchAll(/class="header-action(?: [^"]*)?"/g)];
 
   assert.equal(actions.length, 4);
-  assert.match(header, /開始健檢/);
+  assert.match(header, /文件健檢/);
+  assert.doesNotMatch(header, /開始健檢/);
   assert.match(header, /註冊／登入/);
   assert.match(header, /關於DRS/);
   assert.match(header, /DRS服務合約/);
@@ -1547,7 +1558,7 @@ test("homepage consolidates the owner journey into one truthful conversion hiera
 
   assert.ok(positions.every((position) => position >= 0));
   assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
-  assert.match(header, /class="header-action header-action--primary"[\s\S]*?data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?>開始健檢<\/a>/);
+  assert.match(header, /class="header-action header-action--primary"[\s\S]*?data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?>文件健檢<\/a>/);
   assert.match(header, /class="header-action header-action--account"[\s\S]*?data-account-entry[\s\S]*?>註冊／登入<\/a>/);
   assert.doesNotMatch(header, /header-action--workspace|<span>工作台<\/span>/);
   assert.equal(convergenceActions.length, 2);
