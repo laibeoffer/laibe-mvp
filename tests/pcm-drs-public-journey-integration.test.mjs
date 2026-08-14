@@ -27,14 +27,13 @@ function visibleText(markup) {
   return markup.replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ");
 }
 
-test("public journey links each truthful stage without inventing registration or persistence", async () => {
-  const [quote, report, summaryApp, account, accountApp, workspace] = await Promise.all([
+test("public journey reaches standalone account access without inventing persistence", async () => {
+  const [quote, report, summaryApp, account, accountApp] = await Promise.all([
     readFile(paths.quoteCheck, "utf8"),
     readFile(paths.basicReport, "utf8"),
     readFile(paths.caseSummaryApp, "utf8"),
     readFile(paths.accountAccess, "utf8"),
     readFile(paths.accountAccessApp, "utf8"),
-    readFile(paths.ownerWorkspace, "utf8"),
   ]);
 
   assert.match(quote, /href="\.\.\/basic_report\/code\.html"[^>]*>[^<]*查看基本報告範例/u);
@@ -45,39 +44,27 @@ test("public journey links each truthful stage without inventing registration or
 
   assert.match(summaryApp, /\.\.\/account_access\/code\.html\?/u);
   assert.doesNotMatch(summaryApp, /localStorage|sessionStorage/u);
-  assert.match(account, /data-browsing-draft/u);
-  assert.match(account, /註冊後準備工作台預覽/u);
-  assert.match(accountApp, /URLSearchParams/u);
-  assert.match(accountApp, /client_awarding_dashboard\/code\.html/u);
-  assert.doesNotMatch(accountApp, /localStorage|sessionStorage/u);
-
-  assert.match(workspace, /註冊後準備工作台預覽/u);
-  assert.match(workspace, /尚未驗證註冊|尚未真正保存/u);
-  assert.doesNotMatch(workspace, /href="\.\.\/pcm_standalone\/owner_start\/code\.html"/u);
-  assert.match(workspace, /href="\.\.\/pcm_standalone\/case_summary\/code\.html/u);
-  assert.match(workspace, /href="\.\.\/pcm_standalone\/about_drs\/code\.html"/u);
-  assert.match(workspace, /href="\.\.\/pcm_standalone\/service_contract\/code\.html"/u);
+  assert.match(account, /data-account-form="register"/u);
+  assert.match(account, /data-account-form="login"/u);
+  assert.match(account, /帳號功能正式開放後，會提供完整操作入口/u);
+  assert.match(account, /目前不會建立帳號或傳送資料/u);
+  assert.doesNotMatch(account, /data-browsing-draft|本次瀏覽草稿|註冊後準備工作台預覽/u);
+  assert.doesNotMatch(accountApp, /URLSearchParams|client_awarding_dashboard|localStorage|sessionStorage/u);
 });
 
-test("public-facing pages remove PCM and workspace wording while keeping DRS contract boundaries", async () => {
-  const files = [
-    paths.publicHome,
-    paths.basicReport,
-    paths.ownerStart,
-    paths.accountAccess,
-    paths.ownerWorkspace,
-  ];
-  for (const path of files) {
-    const text = visibleText(await readFile(path, "utf8"));
-    assert.doesNotMatch(text, /PCM|workspace/u, `${path} must use public product language`);
-  }
+test("account copy is PCM-free while public home keeps the approved contextual comparison hidden from the legacy rail", async () => {
+  const [home, account] = await Promise.all([
+    readFile(paths.publicHome, "utf8"),
+    readFile(paths.accountAccess, "utf8"),
+  ]);
+  const accountText = visibleText(account);
 
-  const account = await readFile(paths.accountAccess, "utf8");
-  assert.match(account, /註冊只會建立帳號與辨識使用角色/u);
-  assert.match(account, /不代表已建立正式 DRS 案件，也不代表已完成 DRS 服務契約/u);
-
-  const workspaceApp = await readFile(paths.ownerWorkspaceApp, "utf8");
-  assert.match(workspaceApp, /REGISTERED != CONTRACTED/u);
+  assert.doesNotMatch(accountText, /PCM|workspace|工作台/u);
+  assert.match(home, /<span>在公共工程上，有PCM替政府審查專業流程。<\/span>/u);
+  assert.match(home, /<span>在裝潢市場上，DRS系統是你做出決策的底氣。<\/span>/u);
+  assert.match(home, /<div class="same-fact-rail" hidden/u);
+  assert.match(account, /帳號功能正式開放後，會提供完整操作入口/u);
+  assert.match(account, /目前不會建立帳號或傳送資料/u);
 });
 
 test("public home no longer requests the missing hero SVG", async () => {
@@ -89,7 +76,7 @@ test("public home no longer requests the missing hero SVG", async () => {
   }
 });
 
-test("public home presents the fixed pre-contract journey and external contract copy hides internal enums", async () => {
+test("public home omits rejected guest guidance and external contract copy hides internal enums", async () => {
   const [home, contract] = await Promise.all([
     readFile(paths.publicHome, "utf8"),
     readFile(resolve(pcmRoot, "service_contract/code.html"), "utf8"),
@@ -97,18 +84,7 @@ test("public home presents the fixed pre-contract journey and external contract 
   const homeText = visibleText(home);
   const contractText = visibleText(contract);
 
-  for (const phrase of [
-    "免費文件健檢",
-    "基本報告",
-    "2 分鐘摘要",
-    "建立帳號",
-    "註冊後",
-    "完整需求",
-    "DRS 服務與契約",
-  ]) {
-    assert.match(homeText, new RegExp(phrase));
-  }
-  assert.match(homeText, /正式 DRS[\s\S]*完成服務契約後/u);
+  assert.doesNotMatch(home, /id="guest-guidance"|guest-guidance__/u);
   assert.doesNotMatch(homeText, /建立案件協作|案件進行中/u);
   assert.match(contractText, /附約草案/u);
   assert.doesNotMatch(contractText, /ADDENDUM_DRAFT/u);

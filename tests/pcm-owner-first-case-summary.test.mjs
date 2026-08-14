@@ -43,7 +43,7 @@ test("basic report leads to a dedicated five-question case-summary route", async
   assert.doesNotMatch(summary, /正式案件已建立|已保存到案件/u);
 });
 
-test("case summary hands the explicit browsing draft to the account entry without browser storage", async () => {
+test("case summary may navigate to standalone account access without claiming draft persistence", async () => {
   const [summaryApp, accountHtml, accountApp] = await Promise.all([
     readFile(caseSummaryApp, "utf8"),
     readFile(accountAccessHtml, "utf8"),
@@ -53,8 +53,10 @@ test("case summary hands the explicit browsing draft to the account entry withou
   assert.match(summaryApp, /\.\.\/account_access\/code\.html\?/u);
   assert.match(summaryApp, /URLSearchParams/u);
   assert.doesNotMatch(summaryApp, /localStorage|sessionStorage/u);
-  assert.match(accountHtml, /本次瀏覽草稿/u);
-  assert.match(accountHtml, /註冊後準備工作台預覽/u);
-  assert.match(accountApp, /URLSearchParams/u);
-  assert.doesNotMatch(accountApp, /localStorage|sessionStorage/u);
+  assert.match(accountHtml, /data-account-form="register"/u);
+  assert.match(accountHtml, /data-account-form="login"/u);
+  assert.match(accountHtml, /帳號功能正式開放後，會提供完整操作入口/u);
+  assert.match(accountHtml, /目前不會建立帳號或傳送資料/u);
+  assert.doesNotMatch(accountHtml, /本次瀏覽草稿|註冊後準備工作台預覽|工作台/u);
+  assert.doesNotMatch(accountApp, /URLSearchParams|client_awarding_dashboard|localStorage|sessionStorage/u);
 });
