@@ -1,147 +1,136 @@
 <!doctype html>
-<html lang="zh-Hant-TW" data-account-mode="register">
+<html lang="zh-Hant-TW">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="建立或登入 LaiBE 帳號，確認使用角色並開始整理裝修資料。" />
+    <meta name="description" content="建立或登入 LaiBE DRS 帳號。" />
     <title>LaiBE DRS｜帳號入口</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
-    <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="../shared/drs-brand.css" />
   </head>
-  <body>
+  <body data-laibe-page="register-owner" data-account-mode="register">
     <a class="skip-link" href="#main-content">跳到主要內容</a>
-
-    <header class="account-header" id="top">
-      <div class="account-header__inner">
-        <a class="account-brand" href="../public_home/code.html#top" aria-label="返回 LaiBE DRS 首頁">
-          <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE" />
-          <span class="drs-brand-lockup drs-brand-lockup--expanded">
-            <span class="drs-brand-wordmark" aria-label="Decision and Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
-            <small class="drs-brand-name">裝潢決策系統</small>
-          </span>
-        </a>
-        <a class="account-header__back" href="../public_home/code.html#top">返回 DRS 首頁</a>
-      </div>
+    <header class="site-header" id="top">
+      <a class="brand" href="../public_home/code.html#top" aria-label="返回 LaiBE DRS 首頁">
+        <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
+        <span class="drs-brand-lockup drs-brand-lockup--expanded">
+          <span class="drs-brand-wordmark" aria-label="Decision &amp; Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
+          <small class="drs-brand-name">裝潢決策系統</small>
+        </span>
+      </a>
+      <nav class="header-actions" aria-label="頁面導覽">
+        <a class="header-action" href="../public_home/code.html#top">返回 DRS 首頁</a>
+        <a class="header-action header-action--primary" href="../quote_check/code.html">開始健檢</a>
+      </nav>
     </header>
-
-    <main class="account-shell" id="main-content" data-account-access-page>
-      <section class="account-grid" aria-labelledby="account-title">
-        <div class="account-intro">
-          <p class="account-eyebrow">LAIBE ACCOUNT</p>
-          <h1 id="account-title">建立或登入<br />LaiBE 帳號</h1>
-          <p class="account-lead">這裡是帳號入口。先確認你是甲方或受邀乙方，再開始整理後續需要的裝修資料；現在註冊不會直接建立正式案件。</p>
-
-          <div class="journey-steps" aria-label="帳號使用三步驟">
-            <article class="journey-step">
-              <span>01</span>
-              <div><h2>建立帳號</h2><p>填寫基本聯絡資料，建立日後可辨識的使用入口。</p></div>
-            </article>
-            <article class="journey-step">
-              <span>02</span>
-              <div><h2>確認使用角色</h2><p>選擇甲方，或確認你是收到合作邀請的受邀乙方。</p></div>
-            </article>
-            <article class="journey-step">
-              <span>03</span>
-              <div><h2>開始整理資料</h2><p>帳號服務開放後，再依角色進入需求、文件與案件準備流程。</p></div>
-            </article>
-          </div>
-
-          <aside class="account-boundary" aria-label="帳號與 DRS 服務界線">
-            <strong>帳號不等於正式案件</strong>
-            <p>註冊只會建立帳號與辨識使用角色，不代表已建立正式 DRS 案件，也不代表已完成 DRS 服務契約。</p>
-            <p>專業檢討與正式案件協作只會在完成 DRS 服務契約後啟用。</p>
-          </aside>
-
-          <aside class="browsing-draft" data-browsing-draft hidden aria-labelledby="account-draft-title">
-            <p class="account-eyebrow">本次瀏覽草稿</p>
-            <h2 id="account-draft-title">你剛才整理的五個討論起點</h2>
-            <p>草稿只隨網址帶到帳號入口，尚未保存，也不會自動建立帳號或案件。</p>
-            <dl class="browsing-draft__list">
-              <div><dt>主要處理空間</dt><dd data-draft-space>—</dd></div>
-              <div><dt>現有文件</dt><dd data-draft-documents>—</dd></div>
-              <div><dt>預算區間</dt><dd data-draft-budget>—</dd></div>
-              <div><dt>是否已有設計／施工方</dt><dd data-draft-partner>—</dd></div>
-              <div><dt>最困擾問題</dt><dd data-draft-problem>—</dd></div>
-            </dl>
-            <a class="preview-link" data-workspace-preview href="../../client_awarding_dashboard/code.html?preview=registered-preparation">註冊後準備工作台預覽</a>
-            <p class="preview-boundary">這只是流程預覽；不代表註冊成功、草稿已保存或服務契約已完成。</p>
-          </aside>
-        </div>
-
-        <section class="account-card" aria-labelledby="account-card-title">
-          <header class="account-card__header">
+    <main class="shell" id="main-content" data-account-access-page data-screen-label="帳號入口">
+      <div class="reg-grid">
+        <section class="form-card" aria-labelledby="fcTitle">
+          <header class="fc-h" id="fcHead">
             <div>
               <p>帳號入口</p>
-              <h2 id="account-card-title" data-card-title>建立 LaiBE 帳號</h2>
+              <h1 id="fcTitle">建立 LaiBE DRS 帳號</h1>
             </div>
-            <span data-mode-badge>註冊</span>
+            <p id="fcSwitch">已有帳號？<button id="toLogin" type="button" data-mode-tab="login">登入</button></p>
           </header>
 
-          <div class="account-tabs" role="tablist" aria-label="選擇註冊或登入">
-            <button type="button" role="tab" data-mode-tab="register" aria-selected="true" aria-controls="register-form">註冊</button>
-            <button type="button" role="tab" data-mode-tab="login" aria-selected="false" aria-controls="login-form">登入</button>
+          <div class="role-binding" aria-labelledby="role-title">
+            <p id="role-title">選擇你的使用角色 <span aria-hidden="true">*</span></p>
+            <div class="role-options">
+              <button type="button" data-role-option="owner" aria-pressed="false"><strong>甲方</strong><span>整理自己的裝修資料</span></button>
+              <button type="button" data-role-option="invited-partner" aria-pressed="false"><strong>受邀乙方</strong><span>依邀請加入後續協作</span></button>
+            </div>
+            <p class="field-error" data-field-error="register-role" aria-live="polite"></p>
           </div>
-          <p class="mode-description" data-mode-description>第一次使用？先選擇角色並填寫基本資料。</p>
 
-          <form class="account-form" id="register-form" data-account-form="register" novalidate>
-            <fieldset class="role-fieldset">
-              <legend>你的使用角色</legend>
-              <div class="role-options">
-                <button type="button" data-role-option="owner" aria-pressed="false"><strong>甲方</strong><span>整理自己的裝修需求與文件</span></button>
-                <button type="button" data-role-option="invited-partner" aria-pressed="false"><strong>受邀乙方</strong><span>收到甲方邀請後加入協作</span></button>
-              </div>
-              <input type="hidden" name="role" value="" />
-              <p class="field-error" data-field-error="register-role"></p>
-            </fieldset>
+          <form class="fc-b" id="regForm" data-account-form="register" novalidate>
+            <input name="role" type="hidden" value="" />
+            <input name="accountType" type="hidden" value="personal" />
 
             <div class="field">
-              <label for="register-name">姓名</label>
-              <input id="register-name" name="name" type="text" autocomplete="name" placeholder="請輸入姓名" />
+              <label>帳號類型</label>
+              <div class="acct-type" id="acctType">
+                <button class="at on" type="button" data-type="personal" aria-pressed="true"><strong>個人帳號</strong><span>以個人身分使用</span></button>
+                <button class="at" type="button" data-type="company" aria-pressed="false"><strong>公司帳號</strong><span>以公司名義使用</span></button>
+              </div>
+            </div>
+
+            <div class="field" id="companyField" hidden>
+              <label for="company">公司名稱 <span aria-hidden="true">*</span></label>
+              <input id="company" name="company" type="text" autocomplete="organization" placeholder="請輸入公司名稱" />
+              <p class="field-error" data-field-error="register-company"></p>
+            </div>
+            <div class="field">
+              <label for="name">姓名 <span aria-hidden="true">*</span></label>
+              <input id="name" name="name" type="text" autocomplete="name" placeholder="請輸入姓名" />
               <p class="field-error" data-field-error="register-name"></p>
             </div>
+            <div class="two">
+              <div class="field">
+                <label for="phone">聯絡電話 <span aria-hidden="true">*</span></label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="09xx-xxx-xxx" />
+                <p class="field-error" data-field-error="register-phone"></p>
+              </div>
+              <div class="field">
+                <label for="region">所在縣市 <span aria-hidden="true">*</span></label>
+                <select id="region" name="region" autocomplete="address-level1">
+                  <option value="">請選擇</option><option>台北市</option><option>新北市</option><option>桃園市</option><option>台中市</option><option>台南市</option><option>高雄市</option><option>其他</option>
+                </select>
+                <p class="field-error" data-field-error="register-region"></p>
+              </div>
+            </div>
             <div class="field">
-              <label for="register-email">Email</label>
-              <input id="register-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" />
+              <label for="email">Email <span aria-hidden="true">*</span></label>
+              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" />
               <p class="field-error" data-field-error="register-email"></p>
             </div>
-            <div class="field-pair">
-              <div class="field">
-                <label for="register-password">密碼</label>
-                <input id="register-password" name="password" type="password" autocomplete="new-password" placeholder="至少 8 碼" />
-                <p class="field-error" data-field-error="register-password"></p>
-              </div>
-              <div class="field">
-                <label for="register-password-confirm">確認密碼</label>
-                <input id="register-password-confirm" name="passwordConfirm" type="password" autocomplete="new-password" placeholder="再次輸入密碼" />
-                <p class="field-error" data-field-error="register-password-confirm"></p>
-              </div>
+            <div class="field">
+              <label for="password">密碼 <span aria-hidden="true">*</span></label>
+              <input id="password" name="password" type="password" autocomplete="new-password" placeholder="至少 8 碼" />
+              <p class="field-error" data-field-error="register-password"></p>
             </div>
-
-            <button class="submit-button" type="submit" data-submit-button><span data-submit-label>建立帳號</span><span class="button-spinner" aria-hidden="true"></span></button>
-            <p class="form-status" data-form-status="register" aria-live="polite">尚未送出任何資料。</p>
+            <label class="agree"><input id="agree" name="agree" type="checkbox" />我已閱讀並同意使用說明。</label>
+            <p class="field-error" data-field-error="register-agree"></p>
+            <button class="btn primary" type="submit" data-submit-button><span data-submit-label>送出申請</span></button>
+            <p class="form-status" data-form-status="register" aria-live="polite"></p>
+            <p class="alt-line">帳號功能正式開放後，會提供完整操作入口。</p>
           </form>
 
-          <form class="account-form" id="login-form" data-account-form="login" novalidate hidden>
-            <div class="field">
-              <label for="login-email">Email</label>
-              <input id="login-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" />
-              <p class="field-error" data-field-error="login-email"></p>
-            </div>
-            <div class="field">
-              <label for="login-password">密碼</label>
-              <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" />
-              <p class="field-error" data-field-error="login-password"></p>
-            </div>
-            <button class="submit-button" type="submit" data-submit-button><span data-submit-label>登入帳號</span><span class="button-spinner" aria-hidden="true"></span></button>
-            <p class="form-status" data-form-status="login" aria-live="polite">請輸入帳號資料。</p>
+          <form class="fc-b" id="loginForm" data-account-form="login" novalidate hidden>
+            <div class="field"><label for="login-email">Email</label><input id="login-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" /><p class="field-error" data-field-error="login-email"></p></div>
+            <div class="field"><label for="login-password">密碼</label><input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" /><p class="field-error" data-field-error="login-password"></p></div>
+            <button class="btn primary" type="submit" data-submit-button><span data-submit-label>登入帳號</span></button>
+            <p class="form-status" data-form-status="login" aria-live="polite"></p>
+            <p class="alt-line">尚未有帳號？<button type="button" data-mode-tab="register">建立帳號</button></p>
           </form>
 
-          <p class="account-card__truth">本頁不會保存或傳送你輸入的內容。帳號功能正式開放後，會提供完整操作入口。</p>
+          <section id="okState" hidden aria-live="polite"></section>
         </section>
-      </section>
-    </main>
 
+        <section class="intro" aria-labelledby="account-title">
+          <p class="eyebrow">LAIBE DRS</p>
+          <h2 id="account-title">建立帳號，開始整理裝修決策。</h2>
+          <p class="lead">先建立可辨識的帳號入口；正式開放後，才能依你的角色整理需求、文件與後續決策紀錄。</p>
+
+          <div class="switch" aria-label="帳號模式">
+            <button class="on" type="button" data-mode-tab="register" aria-pressed="true">建立帳號</button>
+            <button type="button" data-mode-tab="login" aria-pressed="false">登入帳號</button>
+          </div>
+
+          <div class="steps" aria-label="建立帳號步驟">
+            <article class="step"><span class="n">01</span><div><h3>填寫資料</h3><p>留下日後辨識與聯繫所需的基本資料。</p></div></article>
+            <article class="step"><span class="n">02</span><div><h3>確認角色</h3><p>確認你是甲方，或是收到邀請加入的受邀乙方。</p></div></article>
+            <article class="step"><span class="n">03</span><div><h3>完成申請</h3><p>帳號入口開放後，依通知完成後續操作。</p></div></article>
+          </div>
+
+          <aside class="reassure">
+            <strong>帳號資料會先停留在本頁。</strong>
+            <p>目前不會建立帳號或傳送資料；正式開放後會提供完整操作入口。</p>
+          </aside>
+        </section>
+      </div>
+    </main>
     <script type="module" src="./app.js"></script>
   </body>
 </html>
