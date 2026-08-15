@@ -2312,6 +2312,12 @@ footer > a:last-child {
 
 }
 
+@media (max-width: 440px) {
+  .site-header .brand > .drs-brand-lockup {
+    display: none;
+  }
+}
+
 @media (max-width: 680px) {
   .hero,
   .decision-prompts-section,

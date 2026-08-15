@@ -601,7 +601,7 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
   assert.match(css, /\.entry-choice::before\s*\{[^}]*clip-path:\s*polygon\(7% 0,\s*93% 0,\s*100% 50%,\s*93% 100%,\s*7% 100%,\s*0 50%\);/s);
   assert.match(css, /\.entry-choice__number\s*\{[^}]*clip-path:\s*polygon\(25% 0,\s*75% 0,\s*100% 50%,\s*75% 100%,\s*25% 100%,\s*0 50%\);/s);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.entry-choice\s*\{/);
-  assert.match(html, /href="\.\/styles\.css\?v=20260814-risk-luminous-curves"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
 });
 
 test("entry stages reproduce the owner-approved interlocking honeycomb infographic without changing the protected hero copy", async () => {
@@ -635,7 +635,7 @@ test("entry stage kickers move into the alternating blank tips as bold vermilion
   const css = await readFile(cssUrl, "utf8");
   const kickerLabels = ["文件核對", "服務確認", "成員加入", "案件治理", "驗收確認"];
 
-  assert.match(html, /href="\.\/styles\.css\?v=20260814-risk-luminous-curves"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
 
   for (const [index, label] of kickerLabels.entries()) {
     const step = String(index + 1).padStart(2, "0");
@@ -804,7 +804,7 @@ test("four decision branches end in aqua-glass actions with truthful destination
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const decisionSection = readSection(html, "decision-prompts");
-  assert.match(html, /href="\.\/styles\.css\?v=20260814-risk-luminous-curves"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
   const nodes = [...decisionSection.matchAll(/<li\b[^>]*class="decision-node decision-node--(?:left|right)(?: decision-node--action)?"[\s\S]*?<\/li>/g)].map(
     (match) => match[0],
   );
@@ -913,14 +913,16 @@ test("header starts fail closed and delegates the canonical shared account entry
   const html = await readFile(htmlUrl, "utf8");
   const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
   const accountEntry = header.match(
-    /<a\b(?=[^>]*data-account-entry)(?=[^>]*data-route="accountAccess")(?=[^>]*data-canonical-route="\/account\/access")[^>]*>[\s\S]*?註冊／登入[\s\S]*?<\/a>/,
+    /<a\b(?=[^>]*class="header-action header-action--account")(?=[^>]*data-account-entry)(?=[^>]*data-route="accountAccess")(?=[^>]*data-canonical-route="\/account\/access")[^>]*>[\s\S]*?甲／乙方工作台[\s\S]*?<\/a>/,
   )?.[0] ?? "";
 
   assert.notEqual(accountEntry, "");
+  assert.equal((header.match(/甲／乙方工作台/g) ?? []).length, 1);
   assert.match(accountEntry, /aria-disabled="true"/);
   assert.match(accountEntry, /tabindex="-1"/);
   assert.match(accountEntry, /data-route-state="planned"/);
   assert.doesNotMatch(accountEntry, /\shref=/);
+  assert.doesNotMatch(header, /ownerWorkspace|vendorWorkspace|client_awarding_dashboard|vendor_workspace/);
 });
 
 test("mobile header keeps only the primary audit and account actions visible", async () => {
@@ -932,15 +934,90 @@ test("mobile header keeps only the primary audit and account actions visible", a
   assert.equal(actions.length, 4);
   assert.match(header, /文件健檢/);
   assert.doesNotMatch(header, /開始健檢/);
-  assert.match(header, /註冊／登入/);
+  assert.match(header, /甲／乙方工作台/);
   assert.match(header, /關於DRS/);
   assert.match(header, /DRS服務合約/);
-  assert.doesNotMatch(header, /header-action--workspace|工作台[\s\S]*?甲／乙方/);
+  assert.doesNotMatch(header, /header-action--workspace|data-route="ownerWorkspace"|data-route="vendorWorkspace"/);
   assert.doesNotMatch(header, /完整流程|合作方式|里程碑治理|申請 Email 一次性登入|甲方登入／乙方受邀/);
   assert.match(css, /\.header-actions\s*\{[^}]*margin-left:\s*auto[^}]*justify-content:\s*flex-end/s);
   assert.match(css, /\.header-action\s*\{[^}]*flex:\s*0\s+0\s+auto[^}]*width:\s*auto/s);
   assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header\s*\{[^}]*height:\s*72px[^}]*flex-wrap:\s*nowrap[\s\S]*?\.header-actions\s*\{[^}]*display:\s*flex[\s\S]*?\.header-action--context\s*\{[^}]*display:\s*none/s);
+  assert.match(css, /@media\s*\(max-width:\s*440px\)\s*\{[\s\S]*?\.site-header\s+\.brand\s*>\s*\.drs-brand-lockup\s*\{[^}]*display:\s*none/s);
   assert.doesNotMatch(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.header-action\s*\{[^}]*width:\s*100%/s);
+});
+
+test("public home version-binds the fitted mobile header stylesheet", async () => {
+  const html = await readFile(htmlUrl, "utf8");
+
+  assert.match(
+    html,
+    /<link rel="stylesheet" href="\.\/styles\.css\?v=20260815-mobile-header-fit" \/>/,
+  );
+  assert.equal((html.match(/\.\/styles\.css\?v=/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /20260814-risk-luminous-curves/);
+});
+
+test("footer return-to-top keeps the preserved header anchor", async () => {
+  const html = await readFile(htmlUrl, "utf8");
+  const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
+  const footer = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0] ?? "";
+
+  assert.match(header, /<header\b[^>]*\bid="top"/);
+  assert.match(footer, /<a href="#top">回到頁首<\/a>/);
+});
+
+test("same-hash footer top recovery scrolls only when #top is already active", async () => {
+  const module = await import(`${appUrl.href}?same-hash-top=${Date.now()}`);
+  const { bindSameHashTopRecovery } = module;
+  assert.equal(typeof bindSameHashTopRecovery, "function");
+
+  let clickHandler = null;
+  let prevented = 0;
+  const selectors = [];
+  const topTarget = {};
+  const topLink = {
+    addEventListener(type, handler) {
+      assert.equal(type, "click");
+      clickHandler = handler;
+    },
+  };
+  const root = {
+    getElementById(id) {
+      return id === "top" ? topTarget : null;
+    },
+    querySelector(selector) {
+      selectors.push(selector);
+      return selector === 'a[href="#top"]' ? topLink : null;
+    },
+  };
+  const scrollCalls = [];
+  const view = {
+    location: { hash: "#top" },
+    scrollTo(...args) {
+      scrollCalls.push(args);
+    },
+  };
+
+  bindSameHashTopRecovery(root, view);
+  assert.deepEqual(selectors, ['a[href="#top"]']);
+  assert.equal(typeof clickHandler, "function");
+
+  clickHandler({ preventDefault() { prevented += 1; } });
+  assert.deepEqual(scrollCalls, [[0, 0]]);
+  assert.equal(prevented, 0);
+  assert.equal(view.location.hash, "#top");
+
+  view.location.hash = "#case-flow";
+  clickHandler({ preventDefault() { prevented += 1; } });
+  assert.deepEqual(scrollCalls, [[0, 0]]);
+  assert.equal(prevented, 0);
+  assert.equal(view.location.hash, "#case-flow");
+
+  assert.doesNotThrow(() => bindSameHashTopRecovery({}, {}));
+  assert.doesNotThrow(() => bindSameHashTopRecovery({
+    getElementById: () => null,
+    querySelector: () => topLink,
+  }, view));
 });
 
 test("route binding activates only routes with a real href", async () => {
@@ -1560,7 +1637,7 @@ test("homepage consolidates the owner journey into one truthful conversion hiera
   assert.ok(positions.every((position) => position >= 0));
   assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
   assert.match(header, /class="header-action header-action--primary"[\s\S]*?data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?>文件健檢<\/a>/);
-  assert.match(header, /class="header-action header-action--account"[\s\S]*?data-account-entry[\s\S]*?>註冊／登入<\/a>/);
+  assert.match(header, /class="header-action header-action--account"[\s\S]*?data-account-entry[\s\S]*?>甲／乙方工作台<\/a>/);
   assert.doesNotMatch(header, /header-action--workspace|<span>工作台<\/span>/);
   assert.equal(convergenceActions.length, 2);
   assert.match(decisionSection, /decision-cta__glass--info[\s\S]*?先看 DRS 如何核對/);

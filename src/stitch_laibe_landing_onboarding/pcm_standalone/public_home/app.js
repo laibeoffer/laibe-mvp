@@ -171,6 +171,27 @@ export function bindPublicRoutes(root, routes = PUBLIC_ROUTES) {
   }
 }
 
+export function bindSameHashTopRecovery(root = document, view = globalThis) {
+  try {
+    const topTarget = root.getElementById("top");
+    const topControl = root.querySelector('a[href="#top"]');
+    if (!topTarget || typeof topControl?.addEventListener !== "function") return;
+
+    topControl.addEventListener("click", () => {
+      try {
+        if (view.location?.hash !== "#top" || typeof view.scrollTo !== "function") {
+          return;
+        }
+        view.scrollTo(0, 0);
+      } catch {
+        return;
+      }
+    });
+  } catch {
+    return;
+  }
+}
+
 export function resolvePublicIntegrationStatus(config = {}) {
   const a5Readiness = assessA5CoreReadiness(config.a5);
   const a14Readiness = assessA14LineReadiness(config.a14);
@@ -242,6 +263,7 @@ export function initPublicHome(
   integrationConfig = globalThis.PCM_PUBLIC_INTEGRATION_CONFIG ?? {},
 ) {
   bindPublicRoutes(root);
+  bindSameHashTopRecovery(root);
   applyPublicIntegrationStatus(root, integrationConfig);
   bindQualificationDetailReveal(root);
   root.documentElement?.classList.add("is-ready");
