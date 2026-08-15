@@ -86,7 +86,7 @@ test("owner-first first fold states role, contract status, case status, responsi
   assert.match(firstFold, /最近紀錄[\s\S]*尚無可顯示的案件紀錄/);
   assert.match(firstFold, /class="contract-page-controls"[^>]*aria-label="契約分冊切換"/);
   assert.doesNotMatch(firstFold, /開始閱讀完整契約/);
-  assert.match(firstFold, /data-print-button[\s\S]*列印 \/ 本機預覽/);
+  assert.match(firstFold, /data-print-button[\s\S]*列印 \/ 預覽/);
   assert.match(firstFold, /data-sign-button[^>]*\bdisabled\b[^>]*aria-disabled="true"/);
   assert.match(firstFold, /尚未進入簽署/);
   assert.doesNotMatch(firstFold, /甲方服務費|3\.5%/);

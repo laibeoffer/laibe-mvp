@@ -71,6 +71,19 @@ test("page exposes two native contract routes and keeps signing fail closed", as
   assert.match(html, /data-sign-button[^>]*\bdisabled\b[^>]*aria-disabled="true"/);
 });
 
+test("external contract actions use product language without local-preview jargon", async () => {
+  const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
+  const app = await import(moduleUrl("app.js"));
+
+  assert.match(html, /data-print-button>列印 \/ 預覽<\/button>/);
+  assert.doesNotMatch(html, /本機預覽/);
+  assert.equal(
+    app.CONTRACT_VIEW_CONFIGS.design.availability,
+    "設計契約仍待法務與政策確認，且沒有真實簽署能力；目前只提供完整閱讀與條文確認。",
+  );
+  assert.doesNotMatch(app.CONTRACT_VIEW_CONFIGS.design.availability, /本機預覽/);
+});
+
 test("service contract document and assets refuse stale preview caching", async () => {
   const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
 

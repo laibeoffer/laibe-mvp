@@ -266,7 +266,7 @@ export const CONTRACT_VIEW_CONFIGS = ObjectFreeze({
     highlightRules: DESIGN_HIGHLIGHT_RULES,
     boundaryNotice: "DRS 不審查美感、風格、配色、創意或其他主觀設計判斷；只檢視工程理解／執行所需書面資訊是否足夠、一致、可追溯。",
     readinessSummary: "目前是 v0.1 候選草案；法務、設計費調整政策、必要欄位與正式簽署能力尚待確認。",
-    availability: "設計契約仍待法務與政策確認，且沒有真實簽署能力；目前只提供完整閱讀與本機預覽。",
+    availability: "設計契約仍待法務與政策確認，且沒有真實簽署能力；目前只提供完整閱讀與條文確認。",
     showEngineeringSections: false,
   }),
 });
