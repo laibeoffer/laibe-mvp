@@ -152,6 +152,7 @@ button { color: inherit; }
 .role-options strong, .at strong { font-size: 0.82rem; }
 .role-options span, .at span { margin-top: 4px; color: var(--muted); font-size: 0.67rem; line-height: 1.42; }
 .role-options button[aria-pressed="true"], .at.on { border-color: var(--accent); background: rgba(255, 138, 43, 0.095); box-shadow: inset 0 0 0 1px rgba(255, 138, 43, 0.18); }
+.role-binding[aria-invalid="true"] { outline: 2px solid var(--danger); outline-offset: -8px; border-radius: 16px; background: rgba(239, 100, 100, 0.04); }
 
 .fc-b { padding-bottom: 22px; }
 .fc-b[hidden] { display: none; }

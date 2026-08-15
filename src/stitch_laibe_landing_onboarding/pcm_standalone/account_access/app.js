@@ -97,7 +97,7 @@ function handleSubmit(root, form) {
   const errors = mode === "register" ? validateRegister(formValues(form)) : validateLogin(formValues(form));
   showErrors(root, form, mode, errors);
   if (Object.keys(errors).length) {
-    setStatus(form, "請確認標示欄位後再送出。", "error");
+    setStatus(form, errors.role ? "請先選擇使用角色後再送出。" : "請確認標示欄位後再送出。", "error");
     focusFirstError(root, form, errors);
     return;
   }
@@ -149,6 +149,8 @@ function selectRole(root, selected) {
   const roleError = root.querySelector('[data-field-error="register-role"]');
   if (roleError) roleError.textContent = "";
   root.querySelector(".role-binding")?.removeAttribute("aria-invalid");
+  const status = form?.querySelector("[data-form-status]");
+  if (status?.dataset.tone === "error" && status.textContent.includes("使用角色")) setStatus(form, "");
 }
 
 export function initAccountAccess(root = document) {

@@ -439,7 +439,7 @@ h1 {
   align-content: center;
   align-items: center;
   justify-content: center;
-  column-gap: clamp(16px, 2vw, 24px);
+  column-gap: 0;
   min-height: 96px;
   text-align: center;
   z-index: 1;
@@ -2553,7 +2553,7 @@ footer > a:last-child {
     margin-top: clamp(24px, 7vw, 32px);
     padding: 0;
     grid-template-columns: 72px minmax(0, 1fr);
-    column-gap: 12px;
+    column-gap: 0;
     transform: none;
     font-size: clamp(0.9rem, 3.8vw, 1rem);
     line-height: 1.7;

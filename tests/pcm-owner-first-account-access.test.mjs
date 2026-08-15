@@ -7,6 +7,89 @@ const html = await readFile(new URL("code.html", root), "utf8");
 const css = await readFile(new URL("styles.css", root), "utf8");
 const app = await readFile(new URL("app.js", root), "utf8");
 
+function createRegistrationDomHarness() {
+  const state = { activeElement: null };
+
+  function element({ dataset = {}, type = "", value = "", checked = false } = {}) {
+    const attributes = new Map();
+    const listeners = new Map();
+    return {
+      dataset: { ...dataset },
+      type,
+      value,
+      checked,
+      hidden: false,
+      disabled: false,
+      textContent: "",
+      classList: { toggle() {} },
+      addEventListener(eventName, listener) {
+        const handlers = listeners.get(eventName) ?? [];
+        handlers.push(listener);
+        listeners.set(eventName, handlers);
+      },
+      dispatch(eventName) {
+        const event = { defaultPrevented: false, preventDefault() { this.defaultPrevented = true; } };
+        for (const listener of listeners.get(eventName) ?? []) listener(event);
+        return event;
+      },
+      setAttribute(name, nextValue) { attributes.set(name, String(nextValue)); },
+      getAttribute(name) { return attributes.get(name) ?? null; },
+      removeAttribute(name) { attributes.delete(name); },
+      focus() { state.activeElement = this; },
+    };
+  }
+
+  const fields = {
+    accountType: element({ type: "hidden", value: "personal" }),
+    company: element(),
+    name: element({ value: "王小明" }),
+    phone: element({ value: "0912345678" }),
+    region: element({ value: "臺北市" }),
+    email: element({ value: "owner@example.com" }),
+    password: element({ type: "password", value: "account88" }),
+    agree: element({ type: "checkbox", checked: true }),
+    role: element({ type: "hidden" }),
+  };
+  const status = element({ dataset: {} });
+  const roleError = element();
+  const roleBinding = element();
+  const owner = element({ dataset: { roleOption: "owner" } });
+  const invitedPartner = element({ dataset: { roleOption: "invited-partner" } });
+  const submit = element();
+  submit.querySelector = () => null;
+
+  const form = element({ dataset: { accountForm: "register" } });
+  form.elements = { namedItem(name) { return fields[name] ?? null; } };
+  form.querySelector = (selector) => {
+    if (selector === "[data-form-status]") return status;
+    if (selector === "[data-submit-button]") return submit;
+    return null;
+  };
+  form.querySelectorAll = (selector) => selector === "[aria-invalid]"
+    ? Object.values(fields).filter((field) => field.getAttribute("aria-invalid") !== null)
+    : [];
+
+  const rootDocument = {
+    documentElement: { dataset: {} },
+    querySelector(selector) {
+      if (selector === "[data-account-access-page]") return {};
+      if (selector === '[data-account-form="register"]') return form;
+      if (selector === ".role-binding") return roleBinding;
+      if (selector === '[data-field-error="register-role"]') return roleError;
+      if (selector === "[data-role-option]") return owner;
+      return null;
+    },
+    querySelectorAll(selector) {
+      if (selector === "[data-role-option]") return [owner, invitedPartner];
+      if (selector === "[data-account-form]") return [form];
+      if (selector === '[data-field-error^="register-"]') return [roleError];
+      return [];
+    },
+  };
+
+  return { rootDocument, form, fields, status, roleError, roleBinding, owner, invitedPartner, state };
+}
+
 test("account access is the canonical three-file registration surface", () => {
   assert.match(html, /href="\.\/styles\.css"/);
   assert.match(html, /src="\.\/app\.js"/);
@@ -88,6 +171,35 @@ test("registration binds the only permitted DRS roles outside the form with a vi
   assert.match(app, /function selectRole\(root, selected\)/);
   assert.match(app, /root\.querySelectorAll\("\[data-role-option\]"\)/);
   assert.match(app, /roleError\.textContent\s*=\s*""/);
+});
+
+test("missing role submit gives unmistakable role feedback and clears it when a role is selected", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?dom=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  module.initAccountAccess(harness.rootDocument);
+
+  const submitEvent = harness.form.dispatch("submit");
+
+  assert.equal(submitEvent.defaultPrevented, true);
+  assert.equal(harness.status.textContent, "請先選擇使用角色後再送出。");
+  assert.equal(harness.status.dataset.tone, "error");
+  assert.equal(harness.roleError.textContent, "請選擇你目前的使用角色。");
+  assert.equal(harness.roleBinding.getAttribute("aria-invalid"), "true");
+  assert.equal(harness.state.activeElement, harness.owner);
+  assert.match(css, /\.role-binding\[aria-invalid="true"\]\s*\{[^}]*outline:\s*2px solid var\(--danger\)/s);
+
+  harness.owner.dispatch("click");
+  assert.equal(harness.fields.role.value, "owner");
+  assert.equal(harness.owner.getAttribute("aria-pressed"), "true");
+  assert.equal(harness.invitedPartner.getAttribute("aria-pressed"), "false");
+  assert.equal(harness.roleError.textContent, "");
+  assert.equal(harness.roleBinding.getAttribute("aria-invalid"), null);
+  assert.equal(harness.status.textContent, "");
+
+  harness.invitedPartner.dispatch("click");
+  assert.equal(harness.fields.role.value, "invited-partner");
+  assert.equal(harness.owner.getAttribute("aria-pressed"), "false");
+  assert.equal(harness.invitedPartner.getAttribute("aria-pressed"), "true");
 });
 
 test("registration stays a truthful unavailable account entry", async () => {

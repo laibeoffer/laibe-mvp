@@ -14,7 +14,7 @@ const serviceContractDir = path.join(
   "service_contract",
 );
 const EXPECTED_CONTRACT_SOURCE_SHA256 =
-  "1b40d6aed828dab049db579eb19324af14f251b631c1c7e587c99a594ee8222a";
+  "811a9dddd1cfaeb440338ff64a0380cb7182f7a34ee5144d78aa866f68603fbf";
 
 function moduleUrl(fileName) {
   return pathToFileURL(path.join(serviceContractDir, fileName)).href;
@@ -24,7 +24,7 @@ function sourceHash(source) {
   return createHash("sha256").update(source, "utf8").digest("hex");
 }
 
-test("service contract exports the exact frozen v0.3 content snapshot", async () => {
+test("service contract exports the exact frozen v0.4 content snapshot", async () => {
   const {
     CONTRACT_META,
     CONTRACT_SOURCE,
@@ -35,9 +35,9 @@ test("service contract exports the exact frozen v0.3 content snapshot", async ()
     moduleUrl("contract-content.js"),
   );
 
-  assert.equal(CONTRACT_META.version, "v0.3");
+  assert.equal(CONTRACT_META.version, "v0.4");
   assert.equal(CONTRACT_META.ownerServiceFeeRate, "3.5%");
-  assert.equal(CONTRACT_META.legalReviewStatus, "READY_FOR_LEGAL_REVIEW");
+  assert.equal(CONTRACT_META.legalReviewStatus, "LAWYER_FINAL_REVIEW_REQUIRED");
   assert.deepEqual(LIFECYCLE, [
     "DRAFT",
     "OWNER_ACCEPTANCE_PENDING",
@@ -120,6 +120,53 @@ test("service contract exports the exact frozen v0.3 content snapshot", async ()
     assert.equal(visibleContractText.includes(forbidden), false, forbidden);
   }
   assert.doesNotMatch(CONTRACT_SOURCE, /\[\[[^\]]+\]\]/);
+});
+
+test("beginner contract uses DRS naming and marks decisive clauses with bold red underlines", async () => {
+  const {
+    BEGINNER_HIGHLIGHT_RULES,
+    CONTRACT_SOURCE,
+    KEY_CLAUSES,
+  } = await import(moduleUrl("contract-content.js"));
+  const [appSource, html, css] = await Promise.all([
+    readFile(path.join(serviceContractDir, "app.js"), "utf8"),
+    readFile(path.join(serviceContractDir, "code.html"), "utf8"),
+    readFile(path.join(serviceContractDir, "styles.css"), "utf8"),
+  ]);
+
+  assert.match(html, /<h1[^>]*>萊比 DRS 案件治理資訊服務契約<\/h1>/);
+  assert.match(CONTRACT_SOURCE, /^# 萊比 DRS 案件治理資訊服務契約$/m);
+  assert.doesNotMatch(`${CONTRACT_SOURCE}\n${JSON.stringify(KEY_CLAUSES)}\n${html}`, /PCM/);
+
+  assert.ok(Array.isArray(BEGINNER_HIGHLIGHT_RULES));
+  assert.ok(BEGINNER_HIGHLIGHT_RULES.length >= 10);
+  assert.equal(
+    new Set(BEGINNER_HIGHLIGHT_RULES.map(({ id }) => id)).size,
+    BEGINNER_HIGHLIGHT_RULES.length,
+  );
+  for (const { id, match } of BEGINNER_HIGHLIGHT_RULES) {
+    assert.equal(typeof id, "string");
+    assert.ok(id.length > 0);
+    assert.equal(typeof match, "string");
+    assert.ok(match.length >= 8);
+    assert.equal(CONTRACT_SOURCE.includes(match), true, `${id}: ${match}`);
+  }
+
+  assert.match(html, /紅色底線[^<]*簽署前務必確認/);
+  assert.match(
+    appSource,
+    /from "\.\/contract-content\.js\?v=20260814-fee-model-v3";/,
+  );
+  assert.match(appSource, /BEGINNER_HIGHLIGHT_RULES/);
+  assert.match(appSource, /contract-key-clause/);
+  assert.match(appSource, /<strong|createTextElement\("strong"/);
+
+  const highlightRule = /\.contract-key-clause\s+strong\s*\{([^}]*)\}/.exec(css);
+  assert.ok(highlightRule, "contract key clause strong rule");
+  assert.match(highlightRule[1], /font-weight:\s*(?:8\d\d|9\d\d|bold)\s*;/);
+  assert.match(highlightRule[1], /text-decoration-line:\s*underline\s*;/);
+  assert.match(highlightRule[1], /text-decoration-color:\s*#[a-f\d]{6}\s*;/i);
+  assert.match(highlightRule[1], /text-decoration-thickness:\s*(?:[2-9]px|\.\d+em)\s*;/);
 });
 
 test("signing readiness evaluates the production initial envelope and fails closed for every mutation", async () => {
@@ -470,7 +517,7 @@ test("contract heading resolver returns unique stable IDs with exact label bound
     ["第十五條之一　付款節點資料通知", "article-15-1"],
     ["第十五條之二　指定通訊群組", "article-15-2"],
     ["第二十八條　簽署", "article-28"],
-    ["附件一　AI PCM 服務範圍表", "annex-01"],
+    ["附件一　AI DRS 服務範圍表", "annex-01"],
     ["附件十　案件參與者與授權帳號表", "annex-10"],
     ["附件十一　指定通訊群組與通知送達規則", "annex-11"],
     ["附件十二　資料保存、下載與刪除政策", "annex-12"],
@@ -512,7 +559,7 @@ test("contract reader maps frozen articles into four stable pages and uses verti
   assert.equal(resolveContractPartIndex("第十一條　服務方義務", 0), 2);
   assert.equal(resolveContractPartIndex("第二十一條　退費", 0), 3);
   assert.equal(resolveContractPartIndex("附件十四　已履行服務計價表", 0), 3);
-  assert.equal(resolveContractPartIndex("萊比 LaiBE AI PCM 案件治理資訊服務契約", 2), 2);
+  assert.equal(resolveContractPartIndex("萊比DRS案件治理資訊服務契約", 2), 2);
   assert.equal(resolveContractPageDirection(0, 1), "next");
   assert.equal(resolveContractPageDirection(3, 1), "previous");
   assert.equal(resolveContractPageDirection(2, 2), "current");

@@ -3,10 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="LaiBE DRS 服務契約草稿：提供服務範圍、責任邊界與案件紀錄規則的完整閱讀。" />
-    <title>LaiBE DRS｜服務契約草稿</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="description" content="萊比DRS案件治理資訊服務契約：提供服務範圍、責任邊界與案件紀錄規則的完整閱讀。" />
+    <title>萊比 DRS 案件治理資訊服務契約｜v0.4 法務審閱稿</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260811-contract-book-reader" />
+    <link rel="stylesheet" href="./styles.css?v=20260815-w2-integrated-no-cache" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
   </head>
   <body>
@@ -20,7 +23,7 @@
         </span>
       </a>
       <nav aria-label="契約頁導覽">
-        <a href="#contract-flow">確認流程</a>
+        <a href="#contract-flow" data-contract-flow-link>確認流程</a>
         <a href="#full-contract">完整契約</a>
         <a class="header-return" href="../public_home/code.html">返回 DRS 首頁</a>
       </nav>
@@ -29,18 +32,25 @@
     <main id="main-content">
       <section id="contract-status" class="contract-scene" aria-labelledby="page-title">
         <div class="contract-scene__heading">
-          <p class="eyebrow">甲方服務契約閱讀</p>
+          <div>
+            <p class="eyebrow">甲方服務契約閱讀</p>
+            <nav class="contract-type-switch" aria-label="契約類型切換">
+              <a class="is-active" data-contract-type-link="engineering" href="./code.html?contract=engineering#full-contract" aria-current="page">統包／工程</a>
+              <a data-contract-type-link="design" href="./code.html?contract=design#full-contract" aria-current="false">設計服務</a>
+            </nav>
+          </div>
           <span data-lifecycle>草稿 · 尚未進入簽署</span>
         </div>
         <div class="contract-dossier contract-book">
           <aside class="status-board contract-book__page contract-book__page--index" aria-label="目前契約與案件狀態">
             <div class="contract-book__title-row">
-              <div>
-                <p>DRS 服務契約</p>
-                <h2>合約與履約審查<br />輔助工作台</h2>
+              <div class="contract-book__brand">
+                <p class="contract-book__brand-kicker">DRS 服務契約</p>
+                <h1 id="page-title" class="contract-book__brand-title" data-contract-view-title>萊比 DRS 案件治理資訊服務契約</h1>
               </div>
-              <span>v0.3 · 法務審閱稿</span>
+              <span data-contract-version-label>v0.4 法務審閱稿</span>
             </div>
+            <p class="contract-type-boundary" data-contract-boundary>DRS 依可供審查文件提供程序品質與完整性審查，不取代現場、專業或甲方決策。</p>
             <div class="status-board__header">
               <p>目前角色</p>
               <strong>甲方</strong>
@@ -48,7 +58,7 @@
             <dl class="status-list">
               <div>
                 <dt>契約狀態</dt>
-                <dd><strong>v0.3</strong>｜法務審閱中</dd>
+                <dd><strong data-contract-version>v0.4</strong>｜<span data-contract-legal-label>法務審閱中</span></dd>
               </div>
               <div>
                 <dt>案件狀態</dt>
@@ -67,26 +77,26 @@
               <span>目前分冊</span>
               <strong><span data-contract-progress>01</span> / 04</strong>
             </div>
-            <a class="button button--primary status-board__cta" href="#full-contract">開始閱讀完整契約</a>
             <p class="status-board__note" data-context-note>案件資料帶入後，才會依實際文件顯示負責人與最近紀錄。</p>
+            <div class="contract-book-footer" aria-label="契約閱讀與文件操作">
+              <div class="contract-page-controls" aria-label="契約分冊切換">
+                <button class="contract-page-control" type="button" data-contract-previous disabled>↑ 上一組</button>
+                <p><span data-contract-current>01</span> / 04 · <span data-contract-current-title>契約與服務</span></p>
+                <button class="contract-page-control" type="button" data-contract-next>下一組 ↓</button>
+              </div>
+
+              <div class="dossier-actions">
+                <button class="button button--muted" type="button" data-print-button>列印 / 本機預覽</button>
+                <button class="button button--closed" type="button" data-sign-button disabled aria-disabled="true">填寫並簽署（尚未開放）</button>
+              </div>
+              <p class="availability-note" data-contract-availability>正式接受、簽署與可追溯收據尚未開放；本頁不會寫入確認或簽署紀錄。</p>
+            </div>
           </aside>
 
-          <div class="contract-book__spine" aria-hidden="true">
-            <span class="contract-ring"></span>
-            <span class="contract-ring"></span>
-          </div>
+          <div class="contract-book__spine" aria-hidden="true"></div>
 
-          <section id="full-contract" class="contract-book__reader contract-reading" aria-labelledby="page-title">
-            <div class="contract-reader__intro">
-              <p class="dossier-copy__kicker">LAIBE · DRS SERVICE CONTRACT · v0.3</p>
-              <h1 id="page-title">資訊說清楚、紀錄留清楚、風險看清楚，最後由人決策。</h1>
-              <p class="dossier-copy__lead">這是一份供甲方閱讀的 DRS 服務契約法務審閱稿。先看每組條款重點，再逐條核對完整正文；它不是法律定稿，目前也尚未進入正式接受或簽署。</p>
-              <dl class="dossier-facts">
-                <div><dt>甲方服務費</dt><dd>總工程款 × <strong>3.5%</strong></dd></div>
-                <div><dt>閱讀方式</dt><dd>選擇右側分冊，或以上一組／下一組切換</dd></div>
-              </dl>
-            </div>
-
+          <section id="full-contract" class="contract-book__reader contract-reading" aria-labelledby="page-title" data-contract-reader>
+            <p class="contract-highlight-legend contract-reader__legend">紅色底線標示簽署前務必確認的條文。</p>
             <div class="reading-grid contract-reader__layout">
               <div class="contract-page-deck" data-contract aria-live="polite"></div>
               <div class="contract-page-tabs" role="tablist" aria-label="契約條款分冊" aria-orientation="vertical">
@@ -113,22 +123,11 @@
               </div>
             </div>
 
-            <div class="contract-page-controls" aria-label="契約分冊切換">
-              <button class="contract-page-control" type="button" data-contract-previous disabled>↑ 上一組</button>
-              <p><span data-contract-current>01</span> / 04 · <span data-contract-current-title>契約與服務</span></p>
-              <button class="contract-page-control" type="button" data-contract-next>下一組 ↓</button>
-            </div>
-
-            <div class="dossier-actions">
-              <button class="button button--muted" type="button" data-print-button>列印 / 本機預覽</button>
-              <button class="button button--closed" type="button" data-sign-button disabled aria-disabled="true">填寫並簽署（尚未開放）</button>
-            </div>
-            <p class="availability-note">正式接受、簽署與可追溯收據尚未開放；本頁不會寫入確認或簽署紀錄。</p>
           </section>
         </div>
       </section>
 
-      <section id="contract-summary" class="summary section" aria-labelledby="summary-title">
+      <section id="contract-summary" class="summary section" aria-labelledby="summary-title" data-engineering-only>
         <div class="section-heading">
           <p class="eyebrow">服務摘要</p>
           <h2 id="summary-title">萊比協助三方回到同一份案件事實</h2>
@@ -142,7 +141,7 @@
         </dl>
       </section>
 
-      <section id="contract-flow" class="workflow section" aria-labelledby="workflow-title">
+      <section id="contract-flow" class="workflow section" aria-labelledby="workflow-title" data-engineering-only>
         <div class="section-heading section-heading--split">
           <div>
             <p class="eyebrow">預定確認流程</p>
@@ -161,12 +160,12 @@
               <div><strong>其餘附件由乙方於平台編輯後提送</strong><p>附件要連回目前契約版本，保留提送人與修訂依據。</p></div>
             </li>
             <li>
-              <span>PCM</span>
-              <div><strong>PCM 公開提出審查意見</strong><p>意見供甲乙雙方共同查看；PCM 協助標示風險，不代替任何一方決定。</p></div>
+              <span>DRS</span>
+              <div><strong>DRS 公開提出審查意見</strong><p>意見供甲乙雙方共同查看；DRS 協助標示風險，不代替任何一方決定。</p></div>
             </li>
             <li>
               <span>乙方</span>
-              <div><strong>協商後，乙方可不限次修訂</strong><p>每次修訂都應產生新版本，並保留前後差異與回覆紀錄。</p></div>
+              <div><strong>因應工程的必然不確定性，乙方得依實際調度情況調整文件版本</strong><p>每次修訂都應產生新版本，並保留前後差異與回覆紀錄。</p></div>
             </li>
             <li>
               <span>雙方</span>
@@ -181,13 +180,13 @@
           <aside class="governance-note" aria-label="契約生效後的版本規則">
             <p class="governance-note__label">生效後的版本邊界</p>
             <h3>原契約不覆寫，後續只新增補充草稿</h3>
-            <p>已生效的原契約維持不變；後續調整只新增標記為 <span class="state-token">附約草案</span> 的補充草稿，待雙方另行確認。</p>
-            <p>PCM 退出後，甲乙雙方可依既有紀錄繼續協商；PCM 不成為締約、簽署或付款決定人。</p>
+            <p>已生效的原契約維持不變；後續調整只新增「補充契約草稿」，待雙方另行確認。</p>
+            <p>DRS 退出後，甲乙雙方可依既有紀錄繼續協商；DRS 不成為締約、簽署或付款決定人。</p>
           </aside>
         </div>
       </section>
 
-      <section class="recovery section" aria-labelledby="recovery-title">
+      <section class="recovery section" aria-labelledby="recovery-title" data-engineering-only>
         <div class="section-heading section-heading--split">
           <div>
             <p class="eyebrow">不能往下時</p>
@@ -215,7 +214,7 @@
         <div class="readiness__copy">
           <p class="eyebrow">簽署前提</p>
           <h2 id="readiness-title">目前尚未進入簽署</h2>
-          <p data-readiness-summary>目前是 v0.3 法務審閱稿，尚未進入正式接受或簽署；請先閱讀完整契約與預定流程。</p>
+          <p data-readiness-summary>目前是 v0.4 法務審閱稿；必要欄位與正式簽署能力尚待確認。</p>
         </div>
         <div class="readiness__panel">
           <ol data-readiness-list aria-label="簽署前提清單"></ol>
@@ -226,6 +225,6 @@
       </section>
     </main>
     <footer class="site-footer">LaiBE DRS｜讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</footer>
-    <script type="module" src="./app.js?v=20260811-contract-book-reader"></script>
+    <script type="module" src="./app.js?v=20260815-w2-integrated-no-cache"></script>
   </body>
 </html>

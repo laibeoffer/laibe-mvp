@@ -168,6 +168,7 @@ test("homepage hero pairs the approved DRS mark with the pilot subtitle", async 
     css,
     /\.hero-subtitle\s*\{[^}]*display:\s*grid;[^}]*grid-template-columns:\s*96px minmax\(0,\s*max-content\);[^}]*align-items:\s*center;[^}]*justify-content:\s*center;[^}]*column-gap:/s,
   );
+  assert.equal(css.match(/\.hero-subtitle\s*\{[^}]*column-gap:\s*0;/gs)?.length, 2);
   assert.match(css, /\.hero-subtitle\s*\{[^}]*text-align:\s*center;/s);
   assert.match(
     css,
