@@ -673,14 +673,48 @@ test("primary CTA 14px text keeps 4.5 to 1 contrast at every gradient stop", asy
   assert.deepEqual(failures, [], `CTA contrast nodes: ${JSON.stringify(results)}`);
 });
 
-test("document tabs connect the selected capsule to the active panel with accessible focus", async () => {
+test("document tabs use a coordinated radius scale while connecting the active panel", async () => {
   const css = await readFile(cssPath, "utf8");
 
   assert.match(css, /\.document-tabs\s*\{[^}]*--tab-panel-surface:/u);
-  assert.match(css, /\.document-tabs\s*\{[^}]*border-radius:\s*999px/u);
+  assert.match(css, /\.document-tabs\s*\{[^}]*border-radius:\s*22px 22px 0 0;/u);
+  assert.match(css, /\.document-tabs button\s*\{[^}]*border-radius:\s*18px;/u);
+  assert.match(css, /\.document-tabs button\[aria-selected="true"\]\s*\{[^}]*border-radius:\s*18px 18px 0 0;/u);
   assert.match(css, /\.document-tabs button\[aria-selected="true"\]::before/u);
   assert.match(css, /\.document-tabs button\[aria-selected="true"\]::after/u);
   assert.match(css, /\.document-tabs button:focus-visible/u);
+});
+
+test("document tabs move a restrained one-shot LaiBE backlight with aria-selected state", async () => {
+  const css = await readFile(cssPath, "utf8");
+  const inactiveSurface = css.match(/\.document-tabs button\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const activeSurface =
+    css.match(/\.document-tabs button\[aria-selected="true"\]\s*\{([^}]*)\}/u)?.[1] ?? "";
+
+  assert.match(inactiveSurface, /border:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.1\)/u);
+  assert.match(inactiveSurface, /background:\s*linear-gradient\(180deg,[\s\S]*linear-gradient\(112deg,/u);
+  assert.match(inactiveSurface, /backdrop-filter:\s*blur\(14px\) saturate\(125%\)/u);
+  assert.match(inactiveSurface, /box-shadow:[\s\S]*inset 0 1px 0[\s\S]*inset 0 -12px 18px/u);
+  assert.doesNotMatch(inactiveSurface, /0 0 18px rgba\(255,\s*88,\s*9,/u);
+
+  assert.match(activeSurface, /border-color:\s*rgba\(255,\s*88,\s*9,\s*0\.88\)/u);
+  assert.match(activeSurface, /background:[\s\S]*var\(--tab-panel-surface\)/u);
+  assert.match(
+    activeSurface,
+    /box-shadow:[\s\S]*0 0 0 1px rgba\(255,\s*122,\s*56,[\s\S]*0 0 18px rgba\(255,\s*88,\s*9,[\s\S]*0 18px 30px -14px rgba\(255,\s*88,\s*9,[\s\S]*inset 0 0 18px rgba\(255,\s*88,\s*9,/u,
+  );
+  assert.match(
+    activeSurface,
+    /animation:\s*quote-tab-backlight-settle 420ms cubic-bezier\(0\.22,\s*1,\s*0\.36,\s*1\) 1 both/u,
+  );
+  assert.match(
+    css,
+    /@keyframes quote-tab-backlight-settle\s*\{[\s\S]*?from\s*\{[^}]*box-shadow:[^}]*\}[\s\S]*?to\s*\{[^}]*box-shadow:/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.document-tabs button\[aria-selected="true"\]\s*\{[^}]*animation:\s*none !important/u,
+  );
 });
 
 test("document tabs keep every actionable target fully visible on mobile and respect reduced motion", async () => {

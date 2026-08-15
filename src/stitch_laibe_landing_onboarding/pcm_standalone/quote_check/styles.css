@@ -436,7 +436,7 @@ button {
   padding: 8px 26px 0;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: 0;
-  border-radius: 999px 999px 0 0;
+  border-radius: 22px 22px 0 0;
   background: var(--tab-rail-surface);
 }
 
@@ -453,17 +453,30 @@ button {
   min-height: 72px;
   padding: 13px 18px;
   color: #929da3;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0, rgba(255, 255, 255, 0.025) 32%, rgba(5, 8, 12, 0.24) 62%, rgba(255, 88, 9, 0.06) 100%),
+    linear-gradient(112deg, rgba(255, 122, 56, 0.08), transparent 46%),
+    rgba(10, 14, 18, 0.78);
+  box-shadow:
+    0 14px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -12px 18px rgba(255, 88, 9, 0.045);
+  backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
   text-align: start;
   scroll-snap-align: center;
-  transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
 }
 
 .document-tabs button:hover {
   color: #dce2e5;
-  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 122, 56, 0.26);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0, rgba(255, 255, 255, 0.035) 32%, rgba(5, 8, 12, 0.22) 62%, rgba(255, 88, 9, 0.08) 100%),
+    linear-gradient(112deg, rgba(255, 122, 56, 0.11), transparent 46%),
+    rgba(12, 16, 20, 0.84);
 }
 
 .document-tabs button:focus-visible {
@@ -474,9 +487,42 @@ button {
 .document-tabs button[aria-selected="true"] {
   z-index: 3;
   color: #f6f8f9;
-  border-radius: 28px 28px 0 0;
-  background: var(--tab-panel-surface);
-  box-shadow: inset 0 2px 0 #ff5809;
+  border-color: rgba(255, 88, 9, 0.88);
+  border-radius: 18px 18px 0 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0, rgba(255, 122, 56, 0.06) 34%, rgba(9, 13, 17, 0.97) 72%),
+    linear-gradient(112deg, rgba(255, 88, 9, 0.16), transparent 48%),
+    var(--tab-panel-surface);
+  box-shadow:
+    0 0 0 1px rgba(255, 122, 56, 0.38),
+    0 0 18px rgba(255, 88, 9, 0.26),
+    0 18px 30px -14px rgba(255, 88, 9, 0.58),
+    inset 0 1px 0 rgba(255, 185, 146, 0.44),
+    inset 0 0 18px rgba(255, 88, 9, 0.15),
+    inset 0 -12px 20px rgba(255, 88, 9, 0.12);
+  animation: quote-tab-backlight-settle 420ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+@keyframes quote-tab-backlight-settle {
+  from {
+    box-shadow:
+      0 0 0 1px rgba(255, 122, 56, 0.62),
+      0 0 26px rgba(255, 88, 9, 0.42),
+      0 22px 38px -12px rgba(255, 88, 9, 0.72),
+      inset 0 1px 0 rgba(255, 205, 174, 0.58),
+      inset 0 0 24px rgba(255, 88, 9, 0.24),
+      inset 0 -14px 24px rgba(255, 88, 9, 0.2);
+  }
+
+  to {
+    box-shadow:
+      0 0 0 1px rgba(255, 122, 56, 0.38),
+      0 0 18px rgba(255, 88, 9, 0.26),
+      0 18px 30px -14px rgba(255, 88, 9, 0.58),
+      inset 0 1px 0 rgba(255, 185, 146, 0.44),
+      inset 0 0 18px rgba(255, 88, 9, 0.15),
+      inset 0 -12px 20px rgba(255, 88, 9, 0.12);
+  }
 }
 
 .document-tabs button[aria-selected="true"]::before,
@@ -1272,6 +1318,10 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .document-tabs button[aria-selected="true"] {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {
