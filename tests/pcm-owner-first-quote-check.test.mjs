@@ -550,6 +550,13 @@ test("quote check starts as one canonical three-file page", async () => {
   }
 });
 
+test("quote check final runtime asset identity binds only the changed stylesheet", async () => {
+  const html = await readFile(htmlPath, "utf8");
+
+  assert.match(html, /href="\.\/styles\.css\?v=20260815-final-runtime"/);
+  assert.match(html, /src="\.\/app\.js\?v=20260814-context-journey-2"/);
+});
+
 test("legacy owner journey is absent", async () => {
   const html = await readFile(htmlPath, "utf8");
 

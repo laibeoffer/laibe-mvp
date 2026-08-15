@@ -295,7 +295,7 @@ test("qualification objects round every visible plane and retain revealed detail
   ]);
   const section = html.match(/<section id="application-check"[\s\S]*?<\/section>/)?.[0] ?? "";
 
-  assert.match(html, /<script type="module" src="\.\/app\.js\?v=20260811-rounded-reveal"><\/script>/);
+  assert.match(html, /<script type="module" src="\.\/app\.js\?v=20260815-final-runtime"><\/script>/);
   assert.equal((section.match(/data-qualification-item/g) ?? []).length, 5);
   assert.equal((section.match(/tabindex="0"/g) ?? []).length, 5);
   assert.match(css, /\.qualification-object__detail\s*\{[^}]*opacity:\s*0[^}]*visibility:\s*hidden[^}]*transform:\s*translateY\(6px\)/s);
@@ -946,7 +946,7 @@ test("mobile header keeps only the primary audit and account actions visible", a
   assert.doesNotMatch(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.header-action\s*\{[^}]*width:\s*100%/s);
 });
 
-test("public home version-binds the fitted mobile header stylesheet", async () => {
+test("public home final runtime asset identity preserves the fitted mobile header stylesheet", async () => {
   const html = await readFile(htmlUrl, "utf8");
 
   assert.match(
@@ -955,6 +955,7 @@ test("public home version-binds the fitted mobile header stylesheet", async () =
   );
   assert.equal((html.match(/\.\/styles\.css\?v=/g) ?? []).length, 1);
   assert.doesNotMatch(html, /20260814-risk-luminous-curves/);
+  assert.match(html, /<script type="module" src="\.\/app\.js\?v=20260815-final-runtime"><\/script>/);
 });
 
 test("footer return-to-top keeps the preserved header anchor", async () => {

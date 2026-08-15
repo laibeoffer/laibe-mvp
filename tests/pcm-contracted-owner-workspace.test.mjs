@@ -79,10 +79,10 @@ test("未簽 DRS 服務契約前只顯示誠實的註冊後準備預覽", async 
   assert.doesNotMatch(html, /href="\.\.\/pcm_standalone\/owner_start\/code\.html"/);
 });
 
-test("頁面使用本地樣式與 module runtime，不依賴外部 UI CDN", async () => {
+test("甲方工作台 final runtime asset identity 保留既有 module runtime", async () => {
   const html = await readPageFile("code.html");
 
-  assert.match(html, /href="\.\/styles\.css"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260815-final-runtime"/);
   assert.match(
     html,
     /type="module"\s+src="\.\/owner-workspace-bootstrap\.js"/,

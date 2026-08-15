@@ -98,9 +98,9 @@ function createRegistrationDomHarness() {
   return { rootDocument, form, loginForm, fields, status, roleError, roleBinding, owner, invitedPartner, registerTab, loginTab, title, switcher, state };
 }
 
-test("account access is the canonical three-file registration surface", () => {
-  assert.match(html, /href="\.\/styles\.css"/);
-  assert.match(html, /src="\.\/app\.js"/);
+test("account access final runtime asset identity binds both changed assets", () => {
+  assert.match(html, /href="\.\/styles\.css\?v=20260815-final-runtime"/);
+  assert.match(html, /src="\.\/app\.js\?v=20260815-final-runtime"/);
   assert.ok(css.length > 1000);
   assert.ok(app.length > 500);
 });
