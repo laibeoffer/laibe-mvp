@@ -47,8 +47,15 @@
     </header>
 
     <main id="main-content">
-      <section class="precontract-workspace" aria-labelledby="precontract-title">
-        <div class="precontract-workspace__heading">
+      <section
+        class="precontract-workspace"
+        data-layout="precontract-command-surface"
+        aria-labelledby="precontract-title"
+      >
+        <div
+          class="precontract-workspace__heading"
+          data-layout="precontract-command-header"
+        >
           <p class="eyebrow">LaiBE DRS・Decision &amp; Record System</p>
           <p class="precontract-workspace__status">流程預覽・尚未驗證註冊・尚未簽 DRS 服務契約</p>
           <h1 id="precontract-title">註冊後，可以先把資料整理成可討論的決策基礎</h1>
@@ -57,6 +64,30 @@
             帳號與保存功能開放後，才會承接可信資料並顯示個人內容。
           </p>
         </div>
+
+        <dl class="precontract-command-summary" aria-label="準備預覽摘要">
+          <div>
+            <dt>目前狀態</dt>
+            <dd>尚未驗證註冊與 DRS 服務契約</dd>
+          </div>
+          <div>
+            <dt>目前由誰處理</dt>
+            <dd>由你決定是否繼續整理</dd>
+          </div>
+          <div>
+            <dt>建議下一步</dt>
+            <dd>回看案件摘要或先了解 DRS 服務</dd>
+          </div>
+          <div>
+            <dt>紀錄界線</dt>
+            <dd>此預覽不建立正式案件紀錄</dd>
+          </div>
+        </dl>
+
+        <aside class="precontract-notice" aria-label="目前工作台狀態">
+          <span aria-hidden="true">i</span>
+          <p><strong>尚未連結帳號或正式案件</strong>此頁僅供了解註冊後流程；真正保存與正式案件內容都尚未開放。</p>
+        </aside>
 
         <ol class="precontract-steps" aria-label="DRS 準備進度">
           <li><span>○</span><strong>文件健檢方向</strong><small>本次檢查不會自動保存</small></li>
@@ -91,32 +122,12 @@
           </section>
         </div>
 
-        <aside class="precontract-notice" aria-label="目前工作台狀態">
-          <span aria-hidden="true">i</span>
-          <p><strong>尚未連結帳號或正式案件</strong>此頁僅供了解註冊後流程；真正保存與正式案件內容都尚未開放。</p>
-        </aside>
       </section>
-      <section class="journey-banner" aria-label="甲方案件流程">
-        <ol class="journey-banner__track">
-          <li class="journey-step is-current">
-            <span class="journey-number">1</span>
-            <div><strong>文件準備</strong><small>確認版本與補件</small></div>
-          </li>
-          <li class="journey-step">
-            <span class="journey-number">2</span>
-            <div><strong>案件總覽</strong><small>掌握責任與進度</small></div>
-          </li>
-          <li class="journey-step">
-            <span class="journey-number">3</span>
-            <div><strong>設計送審</strong><small>整理確認與變更</small></div>
-          </li>
-          <li class="journey-step">
-            <span class="journey-number">4</span>
-            <div><strong>施工與驗收</strong><small>留下執行紀錄</small></div>
-          </li>
-        </ol>
-      </section>
-      <section class="workspace-intro" aria-labelledby="workspace-title">
+      <section
+        class="workspace-intro"
+        data-layout="owner-command-header"
+        aria-labelledby="workspace-title"
+      >
         <div class="workspace-intro__copy">
           <p class="eyebrow">已完成 DRS 服務契約後</p>
           <h1 id="workspace-title">甲方案件工作台</h1>
@@ -131,7 +142,11 @@
           </div>
         </div>
 
-        <aside class="handoff-panel" aria-labelledby="handoff-title">
+        <aside
+          class="handoff-panel"
+          data-layout="owner-responsibility-panel"
+          aria-labelledby="handoff-title"
+        >
           <div class="handoff-panel__topline">
             <p class="eyebrow">現在球在誰手上</p>
             <span class="signal-dot" aria-hidden="true"></span>
@@ -155,6 +170,31 @@
             </div>
           </dl>
         </aside>
+      </section>
+
+      <section
+        class="journey-banner"
+        data-layout="owner-stage-summary"
+        aria-label="甲方案件流程"
+      >
+        <ol class="journey-banner__track">
+          <li class="journey-step is-current">
+            <span class="journey-number">1</span>
+            <div><strong>文件準備</strong><small>確認版本與補件</small></div>
+          </li>
+          <li class="journey-step">
+            <span class="journey-number">2</span>
+            <div><strong>案件總覽</strong><small>掌握責任與進度</small></div>
+          </li>
+          <li class="journey-step">
+            <span class="journey-number">3</span>
+            <div><strong>設計送審</strong><small>整理確認與變更</small></div>
+          </li>
+          <li class="journey-step">
+            <span class="journey-number">4</span>
+            <div><strong>施工與驗收</strong><small>留下執行紀錄</small></div>
+          </li>
+        </ol>
       </section>
 
       <section
@@ -183,58 +223,22 @@
         </button>
       </section>
 
-      <nav class="workspace-tabs" aria-label="甲方工作台主要分頁">
+      <nav
+        class="workspace-tabs"
+        data-layout="owner-section-tabs"
+        aria-label="甲方工作台主要分頁"
+      >
         <a class="is-active" href="#documents">文件準備</a>
         <a href="#overview">案件總覽</a>
         <a href="#design-review">設計送審</a>
         <a href="#construction-records">施工與驗收</a>
       </nav>
 
-      <section class="process-poster" aria-labelledby="process-title">
-        <div class="section-heading section-heading--inverse">
-          <p class="eyebrow">案件現在走到哪裡</p>
-          <h2 id="process-title">從文件到案件執行的四個節點</h2>
-          <p>
-            每個節點都固定責任人、文件版次、狀態與下一步，必須依案件紀錄確認完成。
-          </p>
-        </div>
-        <ol class="process-track" data-list="process-steps">
-          <li class="process-step" data-step="documents">
-            <span class="process-step__number">01</span>
-            <div>
-              <h3>文件與版本</h3>
-              <p>確認報價單、施工圖、補件與各自版次。</p>
-            </div>
-            <span class="process-step__state">尚待案件資料</span>
-          </li>
-          <li class="process-step" data-step="review">
-            <span class="process-step__number">02</span>
-            <div>
-              <h3>專業書面檢討</h3>
-              <p>整理完整性、範圍差異、風險與補件項目。</p>
-            </div>
-            <span class="process-step__state">尚待案件資料</span>
-          </li>
-          <li class="process-step" data-step="governance">
-            <span class="process-step__number">03</span>
-            <div>
-              <h3>正式治理</h3>
-              <p>處理異議、回覆、暫緩與甲乙雙方書面協議。</p>
-            </div>
-            <span class="process-step__state">尚待案件資料</span>
-          </li>
-          <li class="process-step" data-step="execution">
-            <span class="process-step__number">04</span>
-            <div>
-              <h3>案件執行</h3>
-              <p>串連場勘、提交、變更、施工紀錄與驗收事項。</p>
-            </div>
-            <span class="process-step__state">尚待案件資料</span>
-          </li>
-        </ol>
-      </section>
-
-      <nav class="section-nav" aria-label="甲方工作台分區">
+      <nav
+        class="section-nav"
+        data-layout="owner-section-nav"
+        aria-label="甲方工作台分區"
+      >
         <a href="#overview">案件總覽</a>
         <a href="#documents">文件與報價</a>
         <a href="#submissions">乙方提交與場勘</a>
@@ -245,9 +249,9 @@
         <a href="#event-trail">案件留痕</a>
       </nav>
 
-      <div class="owner-shell-grid">
-      <div class="workspace-layout">
-        <div class="workspace-main">
+      <div class="owner-shell-grid" data-layout="owner-operational-shell">
+      <div class="workspace-layout" data-layout="owner-workspace-split">
+        <div class="workspace-main" data-layout="owner-workspace-main">
           <section
             class="workspace-section"
             id="overview"
@@ -258,7 +262,7 @@
               <h2 id="overview-title">案件總覽</h2>
               <p>先看目前狀態，再決定下一步；未知資料不補成零或假日期。</p>
             </div>
-            <dl class="summary-grid">
+            <dl class="summary-grid" data-layout="owner-status-summary">
               <div class="summary-card">
                 <dt>目前文件版本</dt>
                 <dd data-slot="document-summary">尚待載入</dd>
@@ -280,6 +284,54 @@
                 <p data-slot="next-owner-summary">責任人：尚待載入</p>
               </div>
             </dl>
+          </section>
+
+          <section
+            class="process-poster"
+            data-layout="owner-stage-detail"
+            aria-labelledby="process-title"
+          >
+            <div class="section-heading section-heading--inverse">
+              <p class="eyebrow">案件現在走到哪裡</p>
+              <h2 id="process-title">從文件到案件執行的四個節點</h2>
+              <p>
+                每個節點都固定責任人、文件版次、狀態與下一步，必須依案件紀錄確認完成。
+              </p>
+            </div>
+            <ol class="process-track" data-list="process-steps">
+              <li class="process-step" data-step="documents">
+                <span class="process-step__number">01</span>
+                <div>
+                  <h3>文件與版本</h3>
+                  <p>確認報價單、施工圖、補件與各自版次。</p>
+                </div>
+                <span class="process-step__state">尚待案件資料</span>
+              </li>
+              <li class="process-step" data-step="review">
+                <span class="process-step__number">02</span>
+                <div>
+                  <h3>專業書面檢討</h3>
+                  <p>整理完整性、範圍差異、風險與補件項目。</p>
+                </div>
+                <span class="process-step__state">尚待案件資料</span>
+              </li>
+              <li class="process-step" data-step="governance">
+                <span class="process-step__number">03</span>
+                <div>
+                  <h3>正式治理</h3>
+                  <p>處理異議、回覆、暫緩與甲乙雙方書面協議。</p>
+                </div>
+                <span class="process-step__state">尚待案件資料</span>
+              </li>
+              <li class="process-step" data-step="execution">
+                <span class="process-step__number">04</span>
+                <div>
+                  <h3>案件執行</h3>
+                  <p>串連場勘、提交、變更、施工紀錄與驗收事項。</p>
+                </div>
+                <span class="process-step__state">尚待案件資料</span>
+              </li>
+            </ol>
           </section>
 
           <section
@@ -501,7 +553,11 @@
           </section>
         </div>
 
-        <aside class="owner-sidebar" aria-label="案件狀態與快速入口">
+        <aside
+          class="owner-sidebar"
+          data-layout="owner-context-rail"
+          aria-label="案件狀態與快速入口"
+        >
           <div class="workspace-aside">
           <section class="aside-panel">
             <p class="eyebrow">案件脈絡</p>

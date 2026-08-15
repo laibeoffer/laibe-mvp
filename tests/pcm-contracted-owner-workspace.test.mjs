@@ -111,6 +111,82 @@ test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
   }
 });
 
+test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+
+  const hierarchy = [
+    ["workspace-intro", "owner-command-header"],
+    ["handoff-panel", "owner-responsibility-panel"],
+    ["journey-banner", "owner-stage-summary"],
+    ["workspace-tabs", "owner-section-tabs"],
+    ["process-poster", "owner-stage-detail"],
+    ["section-nav", "owner-section-nav"],
+    ["owner-shell-grid", "owner-operational-shell"],
+    ["workspace-layout", "owner-workspace-split"],
+    ["workspace-main", "owner-workspace-main"],
+    ["summary-grid", "owner-status-summary"],
+    ["owner-sidebar", "owner-context-rail"],
+  ];
+
+  for (const [className, layoutRole] of hierarchy) {
+    assert.match(
+      html,
+      new RegExp(`class="${className}"\\s+data-layout="${layoutRole}"`),
+    );
+  }
+
+  const commandIndex = html.indexOf('data-layout="owner-command-header"');
+  const stageIndex = html.indexOf('data-layout="owner-stage-summary"');
+  const sectionNavIndex = html.indexOf('data-layout="owner-section-nav"');
+  const shellIndex = html.indexOf('data-layout="owner-operational-shell"');
+  assert.ok(commandIndex < stageIndex);
+  assert.ok(stageIndex < sectionNavIndex);
+  assert.ok(sectionNavIndex < shellIndex);
+
+  assert.match(
+    html,
+    /class="handoff-panel"\s+data-layout="owner-responsibility-panel"[\s\S]*data-slot="current-actor"[\s\S]*data-slot="next-action"[\s\S]*data-slot="waiting-relationship"[\s\S]*data-slot="next-due"[\s\S]*data-slot="last-recorded"/,
+  );
+  assert.match(html, /class="precontract-command-summary"/);
+  assert.match(html, /目前由誰處理[\s\S]*建議下一步[\s\S]*紀錄界線/);
+
+  for (const slot of [
+    "case-name",
+    "header-state",
+    "state-label",
+    "agreement-label",
+    "document-summary",
+    "review-summary",
+    "issue-summary",
+    "next-summary",
+  ]) {
+    assert.match(html, new RegExp(`data-slot="${slot}"`));
+  }
+  for (const list of [
+    "process-steps",
+    "documents",
+    "submissions",
+    "messages",
+    "designReviews",
+    "constructionRecords",
+    "events",
+  ]) {
+    assert.match(html, new RegExp(`data-list="${list}"`));
+  }
+
+  assert.match(css, /\[data-layout="owner-command-header"\]\s*\{[\s\S]{0,500}grid-template-columns:/i);
+  assert.match(css, /\[data-layout="owner-status-summary"\]\s*\{[\s\S]{0,320}grid-template-columns:\s*repeat\(4,/i);
+  assert.match(css, /\[data-layout="owner-workspace-split"\]\s*\{[\s\S]{0,320}grid-template-columns:/i);
+  assert.match(css, /\[data-layout="owner-context-rail"\]\s*\{[\s\S]{0,320}position:\s*sticky/i);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*980px\)[\s\S]*\[data-layout="owner-workspace-split"\]\s*\{[\s\S]{0,180}grid-template-columns:\s*1fr/i,
+  );
+});
+
 test("公開預設頁不含硬編案件、金額、身分或正式決定", async () => {
   const [html, runtime] = await Promise.all([
     readPageFile("code.html"),
