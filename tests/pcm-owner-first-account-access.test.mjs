@@ -55,6 +55,10 @@ function createRegistrationDomHarness() {
   const roleBinding = element();
   const owner = element({ dataset: { roleOption: "owner" } });
   const invitedPartner = element({ dataset: { roleOption: "invited-partner" } });
+  const registerTab = element({ dataset: { modeTab: "register" } });
+  const loginTab = element({ dataset: { modeTab: "login" } });
+  const title = element();
+  const switcher = element();
   const submit = element();
   submit.querySelector = () => null;
 
@@ -68,6 +72,7 @@ function createRegistrationDomHarness() {
   form.querySelectorAll = (selector) => selector === "[aria-invalid]"
     ? Object.values(fields).filter((field) => field.getAttribute("aria-invalid") !== null)
     : [];
+  const loginForm = element({ dataset: { accountForm: "login" } });
 
   const rootDocument = {
     documentElement: { dataset: {} },
@@ -77,17 +82,20 @@ function createRegistrationDomHarness() {
       if (selector === ".role-binding") return roleBinding;
       if (selector === '[data-field-error="register-role"]') return roleError;
       if (selector === "[data-role-option]") return owner;
+      if (selector === "#fcTitle") return title;
+      if (selector === "#fcSwitch") return switcher;
       return null;
     },
     querySelectorAll(selector) {
       if (selector === "[data-role-option]") return [owner, invitedPartner];
-      if (selector === "[data-account-form]") return [form];
+      if (selector === "[data-mode-tab]") return [registerTab, loginTab];
+      if (selector === "[data-account-form]") return [form, loginForm];
       if (selector === '[data-field-error^="register-"]') return [roleError];
       return [];
     },
   };
 
-  return { rootDocument, form, fields, status, roleError, roleBinding, owner, invitedPartner, state };
+  return { rootDocument, form, loginForm, fields, status, roleError, roleBinding, owner, invitedPartner, registerTab, loginTab, title, switcher, state };
 }
 
 test("account access is the canonical three-file registration surface", () => {
@@ -187,6 +195,7 @@ test("missing role submit gives unmistakable role feedback and clears it when a 
   assert.equal(harness.roleBinding.getAttribute("aria-invalid"), "true");
   assert.equal(harness.state.activeElement, harness.owner);
   assert.match(css, /\.role-binding\[aria-invalid="true"\]\s*\{[^}]*outline:\s*2px solid var\(--danger\)/s);
+  assert.match(css, /\.role-binding\[aria-invalid="true"\]\s*\{[^}]*padding-bottom:\s*16px/s);
 
   harness.owner.dispatch("click");
   assert.equal(harness.fields.role.value, "owner");
@@ -200,6 +209,27 @@ test("missing role submit gives unmistakable role feedback and clears it when a 
   assert.equal(harness.fields.role.value, "invited-partner");
   assert.equal(harness.owner.getAttribute("aria-pressed"), "false");
   assert.equal(harness.invitedPartner.getAttribute("aria-pressed"), "true");
+});
+
+test("registration roles stay hidden while the login form is active", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?mode=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  module.initAccountAccess(harness.rootDocument);
+
+  assert.equal(harness.roleBinding.hidden, false);
+  assert.equal(harness.form.hidden, false);
+  assert.equal(harness.loginForm.hidden, true);
+
+  harness.loginTab.dispatch("click");
+  assert.equal(harness.roleBinding.hidden, true);
+  assert.equal(harness.form.hidden, true);
+  assert.equal(harness.loginForm.hidden, false);
+
+  harness.registerTab.dispatch("click");
+  assert.equal(harness.roleBinding.hidden, false);
+  assert.equal(harness.form.hidden, false);
+  assert.equal(harness.loginForm.hidden, true);
+  assert.match(css, /\.role-binding\[hidden\]\s*,\s*\.fc-b\[hidden\]\s*\{[^}]*display:\s*none/s);
 });
 
 test("registration stays a truthful unavailable account entry", async () => {

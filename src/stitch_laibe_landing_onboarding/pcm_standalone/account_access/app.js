@@ -120,6 +120,8 @@ function selectMode(root, mode) {
     button.setAttribute("aria-pressed", String(active));
   });
   root.querySelectorAll("[data-account-form]").forEach((form) => { form.hidden = form.dataset.accountForm !== mode; });
+  const roleBinding = root.querySelector(".role-binding");
+  if (roleBinding) roleBinding.hidden = mode !== "register";
   const title = root.querySelector("#fcTitle");
   const switcher = root.querySelector("#fcSwitch");
   if (title) title.textContent = mode === "register" ? "建立 LaiBE DRS 帳號" : "登入 LaiBE DRS 帳號";
