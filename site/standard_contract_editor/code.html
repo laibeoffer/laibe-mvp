@@ -1,0 +1,1027 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>LaiBE｜專案契約唯讀預覽</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23eb581e'/%3E%3Ctext x='16' y='22' font-size='16' font-family='sans-serif' font-weight='900' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0a0c0f;
+      --surface: #12161a;
+      --surface-soft: #171b20;
+      --text: #f4f1ea;
+      --muted: #9aa3ad;
+      --orange: #ff8a2b;
+      --orange-deep: #eb581e;
+      --source-orange: #e5581e;
+      --paper: #f7f1e6;
+      --paper-ink: #29231e;
+      --paper-muted: #6d6358;
+      --paper-line: #d8cdbc;
+      --line: rgba(244, 241, 234, .16);
+      --line-strong: rgba(244, 241, 234, .28);
+      --green: #76c7a0;
+      --copper: #c98b5d;
+      --risk: #e16b62;
+      --shadow: 0 34px 90px rgba(0, 0, 0, .48);
+      --font: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      color: var(--text);
+      font-family: var(--font);
+      background:
+        radial-gradient(900px 520px at 85% -12%, rgba(229, 88, 30, .14), transparent 62%),
+        radial-gradient(720px 440px at -8% 105%, rgba(255, 138, 43, .07), transparent 58%),
+        var(--bg);
+    }
+    button { font: inherit; }
+    button { color: inherit; }
+    a { color: inherit; }
+    [hidden] { display: none !important; }
+
+    :focus-visible {
+      outline: 3px solid #ffd2ad;
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 10px;
+      left: 10px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: #21150d;
+      background: #fff4e8;
+      transform: translateY(-150%);
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: sticky;
+      z-index: 50;
+      top: 0;
+      border-bottom: 1px solid var(--line);
+      background: rgba(10, 12, 15, .88);
+      backdrop-filter: blur(20px);
+    }
+    .topbar__inner {
+      width: min(1180px, calc(100% - 36px));
+      min-height: 68px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand { display: inline-flex; align-items: center; text-decoration: none; }
+    .brand > span { color: #fff; font-size: 23px; font-weight: 950; letter-spacing: -.045em; }
+    .topbar__divider { width: 1px; height: 25px; background: var(--line-strong); }
+    .topbar__title { font-size: 13px; font-weight: 850; letter-spacing: .04em; }
+    .topbar__meta { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .legal-pill, .version-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .03em;
+    }
+    .legal-pill::before {
+      width: 6px;
+      height: 6px;
+      margin-right: 7px;
+      border-radius: 50%;
+      background: var(--copper);
+      content: "";
+    }
+
+    .shell { width: min(1180px, calc(100% - 36px)); margin: 0 auto; padding: 36px 0 100px; }
+    .intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+    .eyebrow {
+      margin: 0 0 9px;
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+    .intro h1 {
+      max-width: 750px;
+      margin: 0;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+    .intro__copy {
+      max-width: 700px;
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.8;
+    }
+
+    .type-switch {
+      max-width: 460px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 5px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(18, 22, 26, .82);
+    }
+    .type-switch button {
+      min-width: 106px;
+      min-height: 44px;
+      padding: 6px 12px;
+      border: 0;
+      border-radius: 8px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+    .type-switch button:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .type-switch button[aria-pressed="true"] {
+      color: #fff;
+      background: linear-gradient(135deg, var(--orange), var(--orange-deep) 58%, #c93e12);
+      box-shadow: 0 8px 20px rgba(229, 88, 30, .26);
+    }
+
+    .source-state {
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      border: 1px solid rgba(225, 107, 98, .42);
+      border-radius: 8px;
+      color: #ffd7d3;
+      background: rgba(225, 107, 98, .09);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .preview-status-strip {
+      margin: 0 0 18px;
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 1.05fr .9fr .9fr .9fr 2.25fr;
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+    }
+    .preview-status-item { min-width: 0; padding: 10px 12px; background: rgba(18, 22, 26, .96); }
+    .preview-status-item span { display: block; margin-bottom: 5px; color: var(--muted); font-size: 9px; font-weight: 850; letter-spacing: .08em; }
+    .preview-status-item strong { display: block; overflow-wrap: anywhere; color: var(--text); font-size: 12px; line-height: 1.55; }
+
+    .contract-book {
+      display: grid;
+      grid-template-columns: 286px minmax(0, 1fr) 254px;
+      min-height: 760px;
+      overflow: hidden;
+      border: 18px solid var(--source-orange);
+      border-radius: 7px;
+      background: var(--source-orange);
+      box-shadow: var(--shadow);
+    }
+
+    .status-board {
+      position: relative;
+      min-width: 0;
+      padding: 26px 24px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 95% 0, rgba(255,255,255,.14), transparent 27%),
+        linear-gradient(155deg, #ef6a2c 0%, var(--source-orange) 45%, #c73c13 100%);
+    }
+    .status-board::after {
+      position: absolute;
+      right: -90px;
+      bottom: -110px;
+      width: 240px;
+      height: 240px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 50%;
+      content: "";
+    }
+    .status-board__kicker { margin: 0 0 20px; font-size: 10px; font-weight: 900; letter-spacing: .2em; opacity: .84; }
+    .status-board h2 { margin: 0; font-size: 29px; line-height: 1.12; letter-spacing: -.04em; }
+    .status-board__title {
+      min-height: 60px;
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.7;
+    }
+    .contract-state-card {
+      position: relative;
+      z-index: 1;
+      margin-top: 22px;
+      padding: 15px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 8px;
+      background: rgba(69, 17, 5, .17);
+    }
+    .contract-state-card span { display: block; margin-bottom: 6px; font-size: 10px; font-weight: 850; letter-spacing: .15em; opacity: .72; }
+    .contract-state-card strong { display: block; font-size: 17px; }
+    .contract-state-card p { margin: 7px 0 0; font-size: 12px; line-height: 1.65; opacity: .84; }
+
+    .status-spine { position: relative; z-index: 1; margin: 24px 0 0; padding: 0; list-style: none; }
+    .status-spine li {
+      position: relative;
+      min-height: 58px;
+      padding: 0 0 15px 31px;
+      color: rgba(255,255,255,.7);
+      font-size: 11px;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+    .status-spine li::before {
+      position: absolute;
+      top: 1px;
+      left: 0;
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(255,255,255,.48);
+      border-radius: 50%;
+      background: rgba(0,0,0,.10);
+      content: "";
+    }
+    .status-spine li::after {
+      position: absolute;
+      top: 22px;
+      bottom: -1px;
+      left: 9px;
+      width: 1px;
+      background: rgba(255,255,255,.31);
+      content: "";
+    }
+    .status-spine li:last-child::after { display: none; }
+    .status-spine li.is-current { color: #fff; }
+    .status-spine li.is-current::before {
+      border: 5px solid #fff;
+      background: var(--orange-deep);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.13);
+    }
+    .status-spine li.is-done::before { border-color: #fff; background: #fff; }
+    .status-spine strong { display: block; margin-bottom: 2px; font-size: 12px; }
+    .status-board__footer {
+      position: relative;
+      z-index: 1;
+      margin-top: auto;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.23);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.7;
+      opacity: .78;
+    }
+
+    .paper {
+      min-width: 0;
+      color: var(--paper-ink);
+      background:
+        linear-gradient(rgba(117, 92, 64, .035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 100% 28px;
+    }
+    .paper__mast { padding: 30px 34px 24px; border-bottom: 1px solid var(--paper-line); background: rgba(247, 241, 230, .94); }
+    .paper__label { color: var(--orange-deep); font-size: 10px; font-weight: 950; letter-spacing: .17em; text-transform: uppercase; }
+    .paper__mast h2 {
+      margin: 8px 0 0;
+      font-family: "Noto Serif TC", "PMingLiU", serif;
+      font-size: clamp(23px, 2.7vw, 34px);
+      line-height: 1.28;
+      letter-spacing: -.035em;
+    }
+    .paper__meta { margin-top: 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--paper-muted); font-size: 11px; font-weight: 750; }
+    .paper__meta span { padding: 5px 8px; border: 1px solid var(--paper-line); border-radius: 999px; background: rgba(255,255,255,.38); }
+    .paper__body { padding: 4px 34px 42px; }
+    .paper-section { padding: 27px 0; border-bottom: 1px solid var(--paper-line); scroll-margin-top: 92px; }
+    .paper-section:last-child { border-bottom: 0; }
+    .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .section-heading__index { display: block; margin-bottom: 5px; color: var(--orange-deep); font: 900 9px/1.2 Arial, sans-serif; letter-spacing: .2em; }
+    .section-heading h3 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+    .section-heading p { max-width: 330px; margin: 0; color: var(--paper-muted); font-size: 11px; font-weight: 650; line-height: 1.6; text-align: right; }
+
+    .fact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .fact { min-width: 0; padding: 13px 14px; border: 1px solid var(--paper-line); border-radius: 6px; background: rgba(255,255,255,.34); }
+    .fact span { display: block; margin-bottom: 6px; color: var(--paper-muted); font-size: 10px; font-weight: 800; letter-spacing: .04em; }
+    .fact strong { display: block; overflow-wrap: anywhere; font-size: 13px; line-height: 1.5; }
+    .fact-value { min-height: 22px; }
+    .placeholder { color: #9b5c33; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+
+    .payment-stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .payment-profile { min-width: 0; overflow: hidden; border: 1px solid var(--paper-line); border-radius: 7px; background: rgba(255,255,255,.43); }
+    .payment-profile__head { padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--paper-line); }
+    .payment-profile__head > * { min-width: 0; }
+    .payment-profile__head h4 { margin: 0; font-size: 14px; }
+    .payment-profile__head p { margin: 4px 0 0; color: var(--paper-muted); font-size: 11px; }
+    .payment-profile__amount { overflow-wrap: anywhere; color: #9b5c33; font: 800 11px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: right; }
+    .payment-stages { padding: 5px 16px; }
+    .payment-stage { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 11px; padding: 12px 0; border-bottom: 1px solid rgba(120, 97, 72, .16); }
+    .payment-stage:last-child { border-bottom: 0; }
+    .payment-stage__number { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--orange-deep); font: 900 10px/1 Arial, sans-serif; }
+    .payment-stage strong { display: block; font-size: 12px; line-height: 1.5; }
+    .payment-stage small { overflow-wrap: anywhere; color: var(--paper-muted); font-size: 10px; line-height: 1.5; }
+    .payment-stage__rate { color: var(--orange-deep); font-size: 17px; font-weight: 950; }
+    .engine-note { margin: 0 16px 16px; padding: 12px 13px; border-left: 3px solid var(--copper); color: #604a39; background: #f0e4d5; font-size: 11px; font-weight: 700; line-height: 1.7; }
+
+    .article-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
+    .article-toolbar p { margin: 0; color: var(--paper-muted); font-size: 11px; line-height: 1.6; }
+    .paper-button { min-height: 36px; padding: 0 12px; border: 1px solid #b9a997; border-radius: 5px; color: var(--paper-ink); background: rgba(255,255,255,.56); cursor: pointer; font-size: 11px; font-weight: 850; }
+    .paper-button:hover { border-color: var(--orange-deep); color: #9c3a17; }
+
+    .articles { display: grid; gap: 8px; }
+    .article { border: 1px solid var(--paper-line); border-radius: 6px; background: rgba(255,255,255,.34); }
+    .article summary { min-height: 50px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; list-style: none; font-size: 12px; font-weight: 900; line-height: 1.5; }
+    .article summary::-webkit-details-marker { display: none; }
+    .article summary::after { color: var(--orange-deep); content: "+"; font-size: 18px; }
+    .article[open] summary::after { content: "−"; }
+    .article__content { padding: 0 14px 16px; }
+    .article__identity { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+    .article__identity span, .chip { padding: 4px 7px; border: 1px solid var(--paper-line); border-radius: 999px; color: var(--paper-muted); background: rgba(255,255,255,.38); font-size: 9px; font-weight: 800; overflow-wrap: anywhere; }
+    .article-body { min-height: 70px; padding: 11px 12px; overflow-wrap: anywhere; border: 1px solid transparent; border-radius: 5px; color: #3b342d; font-size: 12px; line-height: 1.95; white-space: pre-wrap; }
+    .article__refs { margin-top: 10px; color: var(--paper-muted); font-size: 10px; line-height: 1.65; }
+
+    .appendix { padding: 16px; border: 1px solid #c99a70; border-radius: 7px; background: #efe0cf; }
+    .appendix h4 { margin: 0 0 6px; font-size: 15px; }
+    .appendix > p { margin: 0 0 13px; color: #604a39; font-size: 11px; line-height: 1.7; }
+    .document-note { min-width: 0; padding: 14px; overflow-wrap: anywhere; border: 1px solid var(--paper-line); border-radius: 6px; color: var(--paper-muted); background: rgba(255,255,255,.35); font-size: 11px; font-weight: 650; line-height: 1.75; }
+
+    .rail { min-width: 0; padding: 22px 18px 26px; color: var(--text); background: #101317; box-shadow: inset 1px 0 0 var(--line); }
+    .rail-card { padding: 17px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 92px; }
+    .rail-card:first-child { padding-top: 0; }
+    .rail-card:last-child { border-bottom: 0; }
+    .rail-card__label { margin: 0 0 9px; color: var(--orange); font-size: 9px; font-weight: 950; letter-spacing: .18em; text-transform: uppercase; }
+    .rail-card h3 { margin: 0; font-size: 14px; line-height: 1.45; }
+    .rail-card > p { margin: 7px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+    .count-badge { display: inline-grid; min-width: 26px; height: 26px; margin-left: 7px; padding: 0 7px; place-items: center; border-radius: 999px; color: #fff; background: var(--orange-deep); font: 900 11px/1 Arial, sans-serif; vertical-align: middle; }
+    .missing-list, .attachment-list, .review-list { margin: 12px 0 0; padding: 0; display: grid; gap: 7px; list-style: none; }
+    .missing-list li, .attachment-list li, .review-list li { padding: 9px 10px; border: 1px solid var(--line); border-radius: 5px; color: #dce0e4; background: rgba(255,255,255,.025); font-size: 10px; font-weight: 700; line-height: 1.55; overflow-wrap: anywhere; }
+    .missing-list small, .attachment-list small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+
+    .rail-button, .primary-action, .secondary-action { width: 100%; min-height: 44px; padding: 10px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 900; line-height: 1.4; }
+    .primary-action { border: 0; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-deep) 58%, #c93e12); box-shadow: 0 10px 24px rgba(229, 88, 30, .25); }
+    .secondary-action, .rail-button { border: 1px solid var(--line-strong); color: var(--text); background: rgba(255,255,255,.04); }
+    .rail-button { margin-top: 10px; min-height: 38px; color: #d7dbe0; font-size: 10px; }
+    .secondary-action:hover, .rail-button:hover { border-color: rgba(255, 138, 43, .65); }
+    .action-stack { display: grid; gap: 8px; margin-top: 13px; }
+    button:disabled { cursor: not-allowed; color: #777f87; border-color: rgba(255,255,255,.08); background: rgba(255,255,255,.025); box-shadow: none; }
+    .formal-note { margin-top: 9px !important; font-size: 10px !important; }
+    .separation-map { margin-top: 12px; display: grid; gap: 6px; }
+    .separation-map div { padding: 9px 10px; border-left: 2px solid var(--copper); color: #dfe3e6; background: rgba(255,255,255,.03); font-size: 10px; line-height: 1.65; }
+    .separation-map strong { color: #fff; }
+
+    .mobile-next-action { position: fixed; z-index: 55; right: 12px; bottom: 12px; left: 12px; display: none; align-items: center; gap: 12px; padding: 10px 10px 10px 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: rgba(14, 17, 20, .95); box-shadow: 0 16px 45px rgba(0,0,0,.5); backdrop-filter: blur(18px); }
+    .mobile-next-action div { min-width: 0; flex: 1; }
+    .mobile-next-action span { display: block; color: var(--muted); font-size: 9px; font-weight: 800; }
+    .mobile-next-action strong { display: block; margin-top: 3px; overflow: hidden; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+
+    @media (max-width: 1080px) {
+      .intro { grid-template-columns: 1fr; align-items: start; }
+      .type-switch { max-width: none; }
+      .contract-book { grid-template-columns: 248px minmax(0, 1fr); }
+      .rail { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+      .rail-card { padding: 16px 0; border-bottom: 0; }
+      .rail-card:not(:nth-child(3n)) { padding-right: 16px; border-right: 1px solid var(--line); }
+    }
+
+    @media (max-width: 760px) {
+      .topbar__inner, .shell { width: min(100% - 24px, 1180px); }
+      .topbar__inner { min-height: 60px; gap: 10px; }
+      .brand img { width: 84px; }
+      .topbar__divider, .topbar__title, .legal-pill { display: none; }
+      .version-pill { margin-left: auto; }
+      .shell { padding: 24px 0 110px; }
+      .intro { gap: 16px; margin-bottom: 14px; }
+      .intro h1 { font-size: 31px; }
+      .intro__copy { font-size: 12px; }
+      .type-switch { width: 100%; overflow: hidden; }
+      .type-switch button { min-width: 0; padding: 6px 4px; font-size: 10px; }
+      .contract-book { display: block; min-height: 0; border-width: 8px; }
+      .status-board { min-height: 0; padding: 20px 18px; }
+      .status-board h2 { font-size: 24px; }
+      .status-board__title { min-height: 0; }
+      .contract-state-card { margin-top: 16px; }
+      .status-spine { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 18px; }
+      .status-spine li { min-height: 0; padding: 27px 5px 0; text-align: center; font-size: 0; }
+      .status-spine li strong { font-size: 9px; line-height: 1.35; }
+      .status-spine li::before { top: 0; left: 50%; transform: translateX(-50%); }
+      .status-spine li::after { top: 9px; right: -50%; bottom: auto; left: 50%; width: 100%; height: 1px; }
+      .status-board__footer { margin-top: 20px; }
+      .paper__mast { padding: 24px 19px 20px; }
+      .paper__body { padding: 2px 19px 32px; }
+      .paper-section { padding: 23px 0; }
+      .section-heading { display: block; }
+      .section-heading p { margin-top: 7px; text-align: left; }
+      .fact-grid { grid-template-columns: 1fr; }
+      .payment-profile__head { display: block; }
+      .payment-profile__amount { margin-top: 7px; text-align: left; }
+      .payment-stage { grid-template-columns: 34px minmax(0, 1fr) auto; gap: 8px; }
+      .article-toolbar { align-items: flex-start; }
+      .article-toolbar p { max-width: 62%; }
+      .preview-status-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .preview-status-item:last-child { grid-column: 1 / -1; }
+      .rail { display: block; padding: 20px 18px; }
+      .rail-card { padding: 18px 0; border-right: 0 !important; border-bottom: 1px solid var(--line); }
+      .mobile-next-action { display: flex; }
+    }
+
+    /* Direct visual port of the accepted service-contract physical book shell. */
+    @media screen {
+      .shell { width: min(1400px, calc(100% - 36px)); }
+
+      .contract-book {
+        --book-cover: #C94318;
+        --book-cover-deep: #75220D;
+        --book-active: #FF5809;
+        --book-paper: #F5F0E7;
+        --book-ink: #211D18;
+        --book-gold: #E4C56C;
+        position: relative;
+        display: grid;
+        width: min(1400px, 100%);
+        height: min(820px, calc(100dvh - 96px));
+        min-height: 640px;
+        margin-inline: auto;
+        padding: 18px;
+        grid-template-columns: minmax(330px, 36fr) 58px minmax(0, 64fr);
+        grid-template-areas: "status spine reader";
+        gap: 0;
+        overflow: visible;
+        border: 1px solid rgb(255 113 48 / 72%);
+        border-radius: 6px;
+        background:
+          linear-gradient(145deg, rgb(255 255 255 / 12%), transparent 20% 78%, rgb(69 14 3 / 28%)),
+          linear-gradient(90deg, var(--book-cover) 0 32%, var(--book-cover-deep) 32% 36%, #A53212 36% 100%);
+        box-shadow:
+          0 34px 86px rgb(0 0 0 / 52%),
+          inset 0 0 0 1px rgb(255 255 255 / 9%),
+          inset 0 -18px 30px rgb(68 14 2 / 22%);
+        isolation: isolate;
+      }
+
+      .contract-book::after { display: none; }
+
+      .contract-book__page--index {
+        position: static;
+        display: flex;
+        height: 100%;
+        min-height: 0;
+        padding: clamp(24px, 2.5vw, 34px);
+        grid-area: status;
+        align-self: start;
+        flex-direction: column;
+        overflow-y: auto;
+        border: 1px solid rgb(255 172 132 / 25%);
+        border-radius: 3px 0 0 3px;
+        background:
+          linear-gradient(150deg, rgb(255 255 255 / 11%), transparent 24%),
+          linear-gradient(180deg, #C94318, #A63313 68%, #8A290F);
+        box-shadow:
+          inset 0 0 34px rgb(76 16 4 / 30%),
+          inset -14px 0 22px rgb(69 14 3 / 18%),
+          0 12px 28px rgb(70 13 2 / 34%);
+        color: #FFF9F3;
+      }
+
+      .contract-book__page--index::after { display: none; }
+
+      .contract-book__title-row {
+        position: relative;
+        display: block;
+        margin-bottom: 20px;
+      }
+
+      .contract-book__brand {
+        position: relative;
+        width: 100%;
+        min-width: 0;
+        padding: 16px 17px 18px;
+        border-block: 1px solid rgb(239 207 128 / 24%);
+        box-shadow:
+          inset 0 1px 0 rgb(255 234 176 / 12%),
+          inset 0 -1px 0 rgb(75 20 5 / 42%),
+          0 1px 0 rgb(255 235 186 / 9%);
+      }
+
+      .contract-book__brand::before {
+        position: absolute;
+        top: 16px;
+        bottom: 18px;
+        left: 0;
+        width: 2px;
+        background: var(--book-gold);
+        box-shadow: 1px 0 0 rgb(82 30 8 / 74%);
+        content: "";
+      }
+
+      .contract-book .contract-book__brand-kicker {
+        margin: 0;
+        color: rgb(239 216 153 / 82%);
+        text-shadow: 0 -1px 0 rgb(76 24 7 / 72%), 0 1px 0 rgb(255 241 198 / 16%);
+      }
+
+      .contract-book .contract-book__brand-title {
+        width: 100%;
+        min-height: 0;
+        margin: 8px 0 0;
+        color: var(--book-gold);
+        font-family: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+        font-size: clamp(1.36rem, 2.15vw, 1.86rem);
+        font-weight: 900;
+        letter-spacing: .025em;
+        line-height: 1.32;
+        line-break: strict;
+        text-wrap: balance;
+        -webkit-text-stroke: .25px rgb(89 40 12 / 62%);
+        text-shadow:
+          0 -1px 0 rgb(73 23 6 / 92%),
+          0 1px 0 rgb(255 240 184 / 72%),
+          0 3px 8px rgb(62 16 3 / 34%);
+      }
+
+      .contract-book__page--index > h2 {
+        margin: 0 0 2px;
+        color: #FFF9F3;
+        font-size: 1.18rem;
+        line-height: 1.35;
+      }
+
+      .contract-book__page--index .contract-state-card,
+      .contract-book__page--index .status-board__footer {
+        position: relative;
+        z-index: 1;
+        border-color: rgb(255 244 235 / 20%);
+      }
+
+      .contract-book__progress {
+        display: flex;
+        margin-top: 22px;
+        padding: 13px 0;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid rgb(255 244 235 / 20%);
+        border-bottom: 1px solid rgb(255 244 235 / 20%);
+        color: rgb(255 239 226 / 78%);
+        font-size: .76rem;
+        font-weight: 850;
+      }
+
+      .contract-book__progress strong { color: #FFF9F3; font-size: 1rem; letter-spacing: .08em; }
+
+      .contract-book__spine {
+        position: relative;
+        z-index: 8;
+        grid-area: spine;
+        min-width: 58px;
+        background:
+          linear-gradient(90deg, rgb(59 13 3 / 58%), rgb(255 126 65 / 20%) 48%, rgb(44 10 3 / 62%)),
+          var(--book-cover-deep);
+        box-shadow:
+          inset 10px 0 18px rgb(34 6 1 / 28%),
+          inset -10px 0 18px rgb(34 6 1 / 34%);
+      }
+
+      .contract-book__reader {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        grid-area: reader;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgb(255 255 255 / 38%);
+        border-radius: 0 3px 3px 0;
+        background: var(--book-paper);
+        box-shadow:
+          inset 0 0 34px rgb(102 73 46 / 9%),
+          0 12px 28px rgb(70 13 2 / 34%);
+        color: var(--book-ink);
+      }
+
+      .contract-reader__layout {
+        display: grid;
+        height: 100%;
+        min-height: 0;
+        margin-top: 0;
+        grid-template-columns: minmax(0, 1fr) auto;
+        flex: 1 1 auto;
+        gap: 0;
+        overflow: hidden;
+      }
+
+      .contract-page-deck {
+        position: relative;
+        min-width: 0;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior-y: auto;
+        scrollbar-gutter: stable;
+        background: var(--book-paper);
+      }
+
+      .contract-page-deck .paper {
+        min-height: 100%;
+        background:
+          linear-gradient(90deg, rgb(196 177 148 / 15%) 0, transparent 20px),
+          var(--book-paper);
+      }
+
+      .contract-page-deck .paper__mast {
+        position: sticky;
+        z-index: 4;
+        top: 0;
+        background: rgb(248 243 234 / 96%);
+        backdrop-filter: blur(10px);
+      }
+
+      .contract-page-tabs {
+        position: sticky;
+        display: flex;
+        top: 78px;
+        height: auto;
+        align-items: stretch;
+        align-self: stretch;
+        background: #18140F;
+        box-shadow: inset 8px 0 14px rgb(0 0 0 / 24%);
+      }
+
+      .contract-page-tab {
+        display: flex;
+        width: clamp(38px, 3.4vw, 52px);
+        min-width: 38px;
+        height: auto;
+        min-height: 0;
+        max-width: 100%;
+        padding: 14px 8px;
+        align-items: center;
+        flex-direction: column;
+        gap: 10px;
+        border: 0;
+        border-left: 1px solid rgb(245 237 225 / 33%);
+        border-radius: 0;
+        background: linear-gradient(180deg, #1E1914, #100E0B);
+        color: #E8E0D5;
+        font: inherit;
+        font-weight: 950;
+        cursor: pointer;
+        overflow-wrap: anywhere;
+        text-decoration: none;
+        transition: background 180ms ease, color 180ms ease, filter 180ms ease;
+        writing-mode: vertical-rl;
+      }
+
+      .contract-page-tab:hover { filter: brightness(1.18); }
+
+      .contract-page-tab[aria-current="page"],
+      .contract-page-tab:focus-visible {
+        background: #FF5809;
+        color: #FFFFFF;
+        box-shadow: inset 4px 0 0 rgb(255 255 255 / 24%);
+      }
+
+      .contract-page-tab__number { writing-mode: horizontal-tb; font-size: .82rem; letter-spacing: .04em; }
+      .contract-page-tab__label { letter-spacing: .13em; line-height: 1.12; text-orientation: upright; }
+      .contract-page-tab__dot { width: 7px; height: 7px; margin-top: auto; border-radius: 50%; background: var(--book-active); }
+      .contract-page-tab[aria-current="page"] .contract-page-tab__dot { background: #FFFFFF; }
+
+      .contract-page-deck .rail {
+        display: grid;
+        padding: 24px 28px 30px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 24px;
+        color: var(--book-ink);
+        background: #EFE8DC;
+        box-shadow: inset 0 1px 0 #D8CDBD;
+      }
+
+      .contract-page-deck .rail-card { padding: 20px 0; border-color: #D8CDBD; }
+      .contract-page-deck .rail-card__label { color: #A9461E; }
+      .contract-page-deck .rail-card h3 { color: var(--book-ink); }
+      .contract-page-deck .rail-card > p { color: #6D6459; }
+      .contract-page-deck .missing-list li,
+      .contract-page-deck .attachment-list li,
+      .contract-page-deck .review-list li,
+      .contract-page-deck .separation-map div {
+        border-color: #D8CDBD;
+        color: #3B342D;
+        background: rgb(255 255 255 / 42%);
+      }
+      .contract-page-deck .missing-list small,
+      .contract-page-deck .attachment-list small { color: #6D6459; }
+      .contract-page-deck .separation-map strong { color: var(--book-ink); }
+      .contract-page-deck .secondary-action,
+      .contract-page-deck .rail-button { border-color: #8E7E6E; color: var(--book-ink); background: rgb(255 255 255 / 45%); }
+      .contract-page-deck button:disabled { color: #8D847B; border-color: #C9BFAF; background: rgb(255 255 255 / 24%); }
+      .contract-page-deck .formal-note { color: #6D6459; }
+    }
+
+    @media screen and (max-width: 980px) {
+      .contract-book {
+        height: auto;
+        min-height: 0;
+        grid-template-columns: 1fr;
+        grid-template-areas: "status" "spine" "reader";
+      }
+      .contract-book__page--index {
+        position: static;
+        height: auto;
+        min-height: auto;
+        align-self: stretch;
+        overflow-y: visible;
+        border-radius: 3px 3px 0 0;
+      }
+      .contract-book__spine {
+        min-width: 0;
+        min-height: 44px;
+        background: linear-gradient(180deg, rgb(61 13 3 / 62%), rgb(255 126 65 / 18%), rgb(42 9 2 / 62%));
+      }
+      .contract-book__reader { height: min(72dvh, 680px); min-height: 520px; border-radius: 0 0 3px 3px; }
+      .contract-reader__layout { height: 100%; }
+      .contract-page-deck { height: min(72dvh, 680px); }
+    }
+
+    @media screen and (max-width: 620px) {
+      .contract-book { padding: 7px; }
+      .contract-book__page--index { padding: 22px 20px; }
+      .contract-book__brand { width: 100%; }
+      .contract-book .contract-book__brand-title { max-width: none; font-size: clamp(1.45rem, 7vw, 1.9rem); }
+      .contract-reader__layout { grid-template-columns: minmax(0, 1fr) 66px; }
+      .contract-page-tabs { top: 96px; width: 66px; height: 100%; flex-direction: column; }
+      .contract-page-tab {
+        width: 66px;
+        min-width: 66px;
+        height: auto;
+        min-height: 44px;
+        max-width: 100%;
+        padding: 8px 4px;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 0;
+        border-top: 1px solid rgb(245 237 225 / 28%);
+        border-left: 0;
+        overflow-wrap: anywhere;
+        writing-mode: vertical-rl;
+      }
+      .contract-page-tab__label { display: inline; font-size: 12px; letter-spacing: .08em; }
+      .contract-page-tab__dot { display: none; }
+      .contract-page-deck .rail { display: block; padding: 22px 18px 26px; }
+      .contract-page-deck .rail-card { padding: 18px 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 13mm; }
+      :root { color-scheme: light; }
+      body { min-width: 0; color: #111; background: #fff; }
+      .topbar, .intro, .source-state, .preview-status-strip, .status-board, .rail, .mobile-next-action, .article-toolbar, .contract-book__spine, .contract-page-tabs { display: none !important; }
+      .shell { width: auto; margin: 0; padding: 0; }
+      .contract-book { display: block; min-height: 0; border: 0; box-shadow: none; }
+      .paper { background: #fff; }
+      .paper__mast, .paper__body { padding-right: 0; padding-left: 0; }
+      .paper-section { break-inside: avoid; }
+      .article { break-inside: avoid; background: #fff; }
+      .article:not([open]) .article__content { display: block; }
+      .article summary::after { display: none; }
+    }
+  </style>
+</head>
+<body id="top">
+  <a class="skip-link" href="#contract-workbench">跳至契約工作檯</a>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="brand" href="#top" aria-label="LaiBE，回到契約預覽頂端"><span aria-hidden="true">LaiBE</span></a>
+      <span class="topbar__divider" aria-hidden="true"></span>
+      <span class="topbar__title">專案契約唯讀預覽</span>
+      <div class="topbar__meta">
+        <span class="legal-pill" id="legal-status">法務審閱待完成</span>
+        <span class="version-pill" id="template-version">v0.2</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell" id="contract-workbench">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">萊比・專案契約唯讀預覽</p>
+        <h1 id="page-title">在同一份來源上，檢視專案契約。</h1>
+        <p class="intro__copy">這是唯讀預覽。你可以切換契約類型、展開條文與列印目前版本；本頁不修改、不儲存，也不會代替甲方決策、乙方回應或雙方合意。</p>
+      </div>
+      <div class="type-switch" id="contract-type-switch" role="group" aria-label="選擇契約類型">
+        <button type="button" data-contract-type="DESIGN" aria-pressed="false">設計契約</button>
+        <button type="button" data-contract-type="WORKS" aria-pressed="false">工程契約</button>
+        <button type="button" data-contract-type="DESIGN_BUILD" aria-pressed="true">設計＋工程</button>
+      </div>
+    </section>
+
+    <div class="source-state" id="source-state" role="status" aria-live="polite">契約來源載入中</div>
+
+    <section class="preview-status-strip" id="preview-status-strip" aria-label="目前預覽狀態">
+      <div class="preview-status-item"><span>預覽脈絡</span><strong id="preview-context-kind">中性範本預覽</strong></div>
+      <div class="preview-status-item"><span>目前角色</span><strong id="preview-role">未帶入案件角色</strong></div>
+      <div class="preview-status-item"><span>目前版本</span><strong id="preview-version">載入中</strong></div>
+      <div class="preview-status-item"><span>目前狀態</span><strong id="preview-status">未連結案件</strong></div>
+      <div class="preview-status-item"><span>下一責任人</span><strong id="preview-next-owner">若要檢視案件版本，請從有授權的案件入口開啟。</strong></div>
+    </section>
+
+    <section class="contract-dossier contract-book" id="contract-book" aria-label="專案契約唯讀預覽">
+      <aside class="status-board contract-book__page contract-book__page--index" aria-labelledby="status-board-title">
+        <div class="contract-book__title-row">
+          <div class="contract-book__brand">
+            <p class="contract-book__brand-kicker">專案契約總冊</p>
+            <p class="contract-book__brand-title" id="status-contract-title">載入契約類型</p>
+          </div>
+        </div>
+        <h2 id="status-board-title">契約狀態<br>脊線</h2>
+        <div class="contract-state-card" id="contract-state">
+          <span>目前狀態</span>
+          <strong id="contract-state-name">中性範本預覽</strong>
+          <p id="contract-state-detail">目前未連結案件，不顯示任何案件識別。</p>
+        </div>
+        <ol class="status-spine" id="contract-status-spine">
+          <li class="is-done"><strong>類型</strong>目前選取</li>
+          <li class="is-done"><strong>版本</strong>清楚標示</li>
+          <li class="is-current"><strong>預覽</strong>逐條檢視</li>
+          <li><strong>回應與決策</strong>回到案件流程</li>
+          <li><strong>雙方合意</strong>另行驗證</li>
+        </ol>
+        <div class="contract-book__progress" aria-hidden="true">
+          <span>目前分冊</span>
+          <strong>01 / 04</strong>
+        </div>
+        <p class="status-board__footer">本頁只顯示契約來源與目前預覽脈絡。任何回應、決策、合意、簽署或付款都必須回到各自流程並留下紀錄。</p>
+      </aside>
+
+      <div class="contract-book__spine" aria-hidden="true"></div>
+
+      <section class="contract-book__reader contract-reading" aria-labelledby="contract-title">
+        <div class="contract-reader__layout reading-grid">
+          <div class="contract-page-deck">
+      <article class="paper" aria-labelledby="contract-title">
+        <header class="paper__mast">
+          <span class="paper__label">專案契約・唯讀預覽</span>
+          <h2 id="contract-title">契約內容載入中</h2>
+          <div class="paper__meta">
+            <span id="contract-type-label">契約類型待確認</span>
+            <span id="contract-version-label">目前版本載入中</span>
+            <span id="contract-preview-label">中性範本預覽</span>
+          </div>
+        </header>
+
+        <div class="paper__body">
+          <section class="paper-section" id="party-project-summary" aria-labelledby="party-title">
+            <div class="section-heading">
+              <div><span class="section-heading__index">01・雙方與專案</span><h3 id="party-title">雙方與專案</h3></div>
+              <p>只有通過唯讀案件脈絡驗證時才顯示案件識別；否則維持中性範本。</p>
+            </div>
+            <div class="fact-grid" id="party-project-facts"></div>
+          </section>
+
+          <section class="paper-section" id="payment-stages" aria-labelledby="payment-title">
+            <div class="section-heading">
+              <div><span class="section-heading__index">02・付款依據</span><h3 id="payment-title">付款依據與階段</h3></div>
+              <p>付款條件來自目前契約版本；DRS 文件審閱與甲方付款決策分開記錄。</p>
+            </div>
+            <div class="payment-stack" id="payment-render-root"></div>
+          </section>
+
+          <section class="paper-section" id="contract-articles" aria-labelledby="articles-title">
+            <div class="section-heading">
+              <div><span class="section-heading__index">03・契約條文</span><h3 id="articles-title">契約條文</h3></div>
+              <p>條文、欄位與附件引用均由同一份契約來源產生。</p>
+            </div>
+            <div class="article-toolbar">
+              <p id="article-count">正在整理條文</p>
+            </div>
+            <div class="articles" id="articles-render-root"></div>
+          </section>
+
+          <section class="paper-section" id="common-procedure" aria-labelledby="appendix-title">
+            <div class="section-heading">
+              <div><span class="section-heading__index">04・共同程序</span><h3 id="appendix-title">共同治理程序附件</h3></div>
+              <p>所有契約類型共用一次，不在各條文重複建立第二份內容。</p>
+            </div>
+            <div id="appendix-render-root"></div>
+          </section>
+
+          <section class="paper-section" id="preview-boundary" aria-labelledby="preview-boundary-title">
+            <div class="section-heading">
+              <div><span class="section-heading__index">05・預覽邊界</span><h3 id="preview-boundary-title">唯讀預覽邊界</h3></div>
+              <p>檢視、回應、決策、合意與付款是不同狀態，不由這個頁面混在一起。</p>
+            </div>
+            <div class="document-note">本頁只讀取目前選取的契約類型與版本。切換類型只會更新預覽與網址，不會取得新的案件脈絡；列印內容會與畫面上的類型和版本一致。</div>
+          </section>
+        </div>
+      </article>
+
+      <aside class="rail" aria-label="契約依據與下一步">
+        <section class="rail-card" aria-labelledby="preview-mode-title">
+          <p class="rail-card__label">唯讀邊界</p>
+          <h3 id="preview-mode-title">此頁只供檢視</h3>
+          <p>內容由契約來源產生。頁面不提供條文修改、附件變更、簽署或付款操作。</p>
+        </section>
+
+        <section class="rail-card" id="contract-attachments" aria-labelledby="attachment-title">
+          <p class="rail-card__label">依據文件</p>
+          <h3 id="attachment-title">附件與依據</h3>
+          <p>每份附件都應對應版本、確認人與確認時間，避免各自引用不同基準。</p>
+          <ul class="attachment-list" id="attachment-list"></ul>
+        </section>
+
+        <section class="rail-card" aria-labelledby="decision-title">
+          <p class="rail-card__label">決策分流</p>
+          <h3 id="decision-title">審閱不等於決策</h3>
+          <div class="separation-map">
+            <div><strong>DRS 文件審閱</strong><br>整理文件、差異、缺漏與待決事項。</div>
+            <div><strong>甲方決策</strong><br>由甲方明確作成，不會自動觸發付款。</div>
+            <div><strong>乙方回應</strong><br>由乙方回覆、補件或提出異議，不能代替甲方決策。</div>
+            <div><strong>雙方合意</strong><br>須可驗證甲方與乙方的真實意思表示。</div>
+            <div><strong>付款</strong><br>只顯示契約條件；付款狀態與操作另行處理。</div>
+          </div>
+          <ul class="review-list" id="review-status-list"></ul>
+        </section>
+
+        <section class="rail-card" id="next-action" aria-labelledby="next-action-title">
+          <p class="rail-card__label">下一位負責人</p>
+          <h3 id="next-action-title">下一步：從授權案件入口開啟</h3>
+          <p id="next-action-detail">這是中性範本，不代表任何案件已建立契約。</p>
+          <div class="action-stack">
+            <button class="secondary-action" type="button" id="expand-articles-action">展開契約全文</button>
+            <button class="primary-action" type="button" id="print-preview">列印目前預覽</button>
+          </div>
+          <p class="formal-note">列印只反映目前選取的契約類型與版本，不會建立新的案件紀錄或改變任何狀態。</p>
+        </section>
+      </aside>
+          </div>
+
+          <nav class="contract-page-tabs" aria-label="契約內容分冊">
+            <a class="contract-page-tab" href="#party-project-summary" aria-label="第 1 冊：雙方與專案" aria-current="page">
+              <span class="contract-page-tab__number">01</span>
+              <span class="contract-page-tab__label">雙方與專案</span>
+              <span class="contract-page-tab__dot" aria-hidden="true"></span>
+            </a>
+            <a class="contract-page-tab" href="#payment-stages" aria-label="第 2 冊：付款與階段">
+              <span class="contract-page-tab__number">02</span>
+              <span class="contract-page-tab__label">付款與階段</span>
+              <span class="contract-page-tab__dot" aria-hidden="true"></span>
+            </a>
+            <a class="contract-page-tab" href="#contract-articles" aria-label="第 3 冊：契約條文">
+              <span class="contract-page-tab__number">03</span>
+              <span class="contract-page-tab__label">契約條文</span>
+              <span class="contract-page-tab__dot" aria-hidden="true"></span>
+            </a>
+            <a class="contract-page-tab" href="#common-procedure" aria-label="第 4 冊：附件與程序">
+              <span class="contract-page-tab__number">04</span>
+              <span class="contract-page-tab__label">附件與程序</span>
+              <span class="contract-page-tab__dot" aria-hidden="true"></span>
+            </a>
+          </nav>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="mobile-next-action" id="mobile-next-action">
+    <div><span>目前真正下一步</span><strong id="mobile-next-action-label">從授權案件入口開啟</strong></div>
+  </div>
+
+  <script src="../shared/laibe-project-contract-source.js"></script>
+  <script src="../shared/laibe-project-contract-engine.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
