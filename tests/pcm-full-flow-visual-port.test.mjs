@@ -180,7 +180,8 @@ test("vendor workspace keeps the source shell and fails closed without a trusted
     "case-sidebar",
     "vendor-focus-grid",
     "calendar-panel",
-    "message-panel",
+    "vendor-workspace-tabs",
+    "contract-confirmation",
   ]) {
     assert.match(html, new RegExp(landmark));
   }

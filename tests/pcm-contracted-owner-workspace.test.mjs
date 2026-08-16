@@ -111,6 +111,76 @@ test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
   }
 });
 
+test("甲方 HERO 內提供三個治理分頁且只有設計案與主面板一體成形", async () => {
+  const [html, css, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+    readPageFile("app.js"),
+  ]);
+
+  const heroIndex = html.indexOf('data-layout="owner-command-header"');
+  const dashboardIndex = html.indexOf('data-layout="owner-hero-dashboard"');
+  const stageIndex = html.indexOf('data-layout="owner-stage-summary"');
+  assert.ok(heroIndex >= 0 && dashboardIndex > heroIndex);
+  assert.ok(stageIndex > dashboardIndex);
+
+  assert.match(
+    html,
+    /role="tablist"[\s\S]*data-owner-tab="design"[\s\S]*>\s*設計案管理\s*</,
+  );
+  assert.match(
+    html,
+    /data-owner-tab="construction"[\s\S]*>\s*工程案管理\s*</,
+  );
+  assert.match(
+    html,
+    /data-owner-tab="contract"[\s\S]*>\s*契約管理\s*</,
+  );
+  assert.equal((html.match(/data-owner-tab=/g) || []).length, 3);
+  assert.equal((html.match(/role="tabpanel"/g) || []).length, 3);
+
+  assert.match(
+    css,
+    /\[data-active-owner-tab="design"\][\s\S]{0,900}\.owner-hero-dashboard__panel[\s\S]{0,220}border-top-left-radius:\s*0/i,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*\.owner-hero-dashboard__panel[\s\S]{0,260}border-radius:/i,
+  );
+  assert.match(runtime, /export function initializeOwnerDashboardTabs/);
+  assert.match(runtime, /ArrowRight|ArrowLeft/);
+});
+
+test("甲方儀表板在桌機左側並把誠實的 LINE 對話窗放在右側，手機則上下排列", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+
+  const dashboardStart = html.indexOf('data-layout="owner-hero-dashboard"');
+  const workspaceStart = html.indexOf('data-layout="owner-hero-workspace"', dashboardStart);
+  const conversationStart = html.indexOf('data-layout="owner-line-conversation"', dashboardStart);
+  assert.ok(dashboardStart >= 0, "owner hero dashboard exists");
+  assert.ok(workspaceStart > dashboardStart, "owner workspace is inside the dashboard");
+  assert.ok(conversationStart > workspaceStart, "LINE conversation follows the dashboard in reading order");
+
+  assert.match(html, /data-layout="owner-line-conversation"[^>]*aria-label="案件 LINE 對話"/u);
+  assert.match(html, /尚未連結案件對話/u);
+  assert.match(html, /目前沒有可顯示的對話/u);
+  assert.match(html, /<textarea[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(html, /<button[^>]*data-line-send[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.doesNotMatch(html, /訊息已送出|已傳送訊息/u);
+
+  assert.match(
+    css,
+    /\.owner-hero-dashboard\s*\{[\s\S]{0,360}grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(260px,\s*320px\)/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\[data-layout="owner-hero-workspace"\]\s*\{[\s\S]{0,100}order:\s*1[\s\S]*?\[data-layout="owner-line-conversation"\]\s*\{[\s\S]{0,100}order:\s*2/u,
+  );
+});
+
 test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),

@@ -3,6 +3,7 @@ const safeDefineProperty = Object.defineProperty;
 const safeFreeze = Object.freeze;
 const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const safeGetPrototypeOf = Object.getPrototypeOf;
+const safeApply = Reflect.apply;
 const iteratorKey = Symbol.iterator;
 
 function freezeRecord(entries) {
@@ -116,6 +117,35 @@ function freezeCompatibilityList(...items) {
     writable: false,
   });
   return safeFreeze(list);
+}
+
+export const VENDOR_WORKSPACE_TAB_KEYS = freezeList(
+  "design",
+  "construction",
+  "contract",
+);
+
+function isVendorWorkspaceTabKey(value) {
+  return value === "design" || value === "construction" || value === "contract";
+}
+
+export function resolveVendorWorkspaceTabKey(activeTab, key) {
+  const current = isVendorWorkspaceTabKey(activeTab) ? activeTab : "design";
+  if (key === "Home") return "design";
+  if (key === "End") return "contract";
+  if (key !== "ArrowLeft" && key !== "ArrowRight") return current;
+  let currentIndex = 0;
+  for (let index = 0; index < VENDOR_WORKSPACE_TAB_KEYS.length; index += 1) {
+    if (VENDOR_WORKSPACE_TAB_KEYS[index] === current) {
+      currentIndex = index;
+      break;
+    }
+  }
+  const offset = key === "ArrowRight" ? 1 : -1;
+  const nextIndex = (
+    currentIndex + offset + VENDOR_WORKSPACE_TAB_KEYS.length
+  ) % VENDOR_WORKSPACE_TAB_KEYS.length;
+  return VENDOR_WORKSPACE_TAB_KEYS[nextIndex];
 }
 
 function resource(code, label, submissionBoundary, pcmExitMode) {
@@ -454,9 +484,39 @@ export function resolveVendorWorkspaceState(context) {
   }
 }
 
-function safeGlobalDocument() {
-  let owner = globalThis;
-  for (let depth = 0; depth < 4 && owner; depth += 1) {
+const EMPTY_ARGUMENTS = freezeList();
+
+function safeMethod(candidate, key) {
+  try {
+    return typeof candidate[key] === "function";
+  } catch {
+    return false;
+  }
+}
+
+function isVendorDocument(candidate) {
+  if (!candidate || (typeof candidate !== "object" && typeof candidate !== "function")) {
+    return false;
+  }
+  let body;
+  try {
+    body = candidate.body;
+  } catch {
+    return false;
+  }
+  return Boolean(body)
+    && safeMethod(body, "setAttribute")
+    && safeMethod(candidate, "querySelector")
+    && safeMethod(candidate, "querySelectorAll");
+}
+
+export function resolveVendorDocument(globalObject) {
+  if (!globalObject || (typeof globalObject !== "object" && typeof globalObject !== "function")) {
+    return null;
+  }
+  const receiver = globalObject;
+  let owner = globalObject;
+  for (let depth = 0; depth < 6 && owner; depth += 1) {
     let descriptor;
     try {
       descriptor = safeGetOwnPropertyDescriptor(owner, "document");
@@ -464,8 +524,21 @@ function safeGlobalDocument() {
       return null;
     }
     if (descriptor) {
-      if (!("value" in descriptor)) return null;
-      return descriptor.value ?? null;
+      let candidate;
+      try {
+        const valueDescriptor = safeGetOwnPropertyDescriptor(descriptor, "value");
+        if (valueDescriptor) {
+          candidate = valueDescriptor.value;
+        } else {
+          const getterDescriptor = safeGetOwnPropertyDescriptor(descriptor, "get");
+          const getter = getterDescriptor?.value;
+          if (typeof getter !== "function") return null;
+          candidate = safeApply(getter, receiver, EMPTY_ARGUMENTS);
+        }
+      } catch {
+        return null;
+      }
+      return isVendorDocument(candidate) ? candidate : null;
     }
     try {
       owner = safeGetPrototypeOf(owner);
@@ -486,6 +559,182 @@ function closeControl(control) {
     control.setAttribute("aria-disabled", "true");
   } catch {
     // Static markup remains closed.
+  }
+}
+
+export function resolveVendorWorkspaceTabForFragment(fragment) {
+  if (fragment === "#execution") return "construction";
+  if (fragment === "#documents" || fragment === "#reviews" || fragment === "#records") {
+    return "contract";
+  }
+  return null;
+}
+
+export function initializeVendorWorkspaceTabs(root) {
+  let tabs;
+  let panels;
+  let liveTarget;
+  let routeLinks;
+  try {
+    tabs = root.querySelectorAll("[data-vendor-workspace-tab]");
+    panels = root.querySelectorAll("[data-vendor-workspace-panel]");
+    liveTarget = root.querySelector("[data-vendor-workspace-live]");
+    routeLinks = root.querySelectorAll("[data-vendor-workspace-route]");
+  } catch {
+    return;
+  }
+  if (!tabs || !panels || tabs.length !== 3 || panels.length !== 3) return;
+
+  let activeTab = "design";
+
+  function tabKey(tab) {
+    try {
+      const key = tab.dataset.vendorWorkspaceTab;
+      return isVendorWorkspaceTabKey(key) ? key : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function activate(nextTab, shouldFocus) {
+    if (!isVendorWorkspaceTabKey(nextTab)) return;
+    activeTab = nextTab;
+    for (let index = 0; index < tabs.length; index += 1) {
+      const tab = tabs[index];
+      const active = tabKey(tab) === activeTab;
+      try {
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+        tab.tabIndex = active ? 0 : -1;
+        if (active && shouldFocus) tab.focus();
+      } catch {
+        // The static fail-closed page remains usable if a node changes.
+      }
+    }
+    for (let index = 0; index < panels.length; index += 1) {
+      try {
+        panels[index].hidden = panels[index].dataset.vendorWorkspacePanel !== activeTab;
+      } catch {
+        // Unknown panels stay in their static hidden state.
+      }
+    }
+    if (liveTarget) {
+      const label = activeTab === "design"
+        ? "設計案管理"
+        : activeTab === "construction"
+          ? "工程案管理"
+          : "契約管理";
+      try {
+        liveTarget.textContent = `已切換至${label}。目前仍需先確認案件授權。`;
+      } catch {
+        // Live-region failure does not grant workspace authority.
+      }
+    }
+  }
+
+  function activateFragment(fragment, shouldFocus) {
+    const key = resolveVendorWorkspaceTabForFragment(fragment);
+    if (!key) return false;
+    activate(key, shouldFocus);
+    return true;
+  }
+
+  function currentFragment(view) {
+    try {
+      return view?.location?.["hash"] ?? "";
+    } catch {
+      return "";
+    }
+  }
+
+  function moveToCurrentFragment(view) {
+    const fragment = currentFragment(view);
+    if (!resolveVendorWorkspaceTabForFragment(fragment)) return;
+    let target;
+    try {
+      target = root.querySelector(fragment);
+    } catch {
+      return;
+    }
+    if (!target) return;
+    try {
+      const top = view.scrollY + target.getBoundingClientRect().top - 80;
+      view.scrollTo({ top: top > 0 ? top : 0, behavior: "auto" });
+    } catch {
+      // The correct panel remains active even when fragment movement is unavailable.
+    }
+  }
+
+  for (let index = 0; index < tabs.length; index += 1) {
+    const tab = tabs[index];
+    try {
+      tab.addEventListener("click", () => {
+        const key = tabKey(tab);
+        if (key) activate(key, false);
+      });
+      tab.addEventListener("keydown", (event) => {
+        const key = event && event.key;
+        if (
+          key !== "ArrowLeft"
+          && key !== "ArrowRight"
+          && key !== "Home"
+          && key !== "End"
+        ) {
+          return;
+        }
+        try {
+          event.preventDefault();
+        } catch {
+          // Navigation remains bounded to the current tab.
+        }
+        activate(resolveVendorWorkspaceTabKey(activeTab, key), true);
+      });
+    } catch {
+      continue;
+    }
+  }
+
+  if (routeLinks) {
+    let routeLength = 0;
+    try {
+      routeLength = routeLinks.length;
+    } catch {
+      routeLength = 0;
+    }
+    if (typeof routeLength === "number" && routeLength >= 0 && routeLength <= 16) {
+      for (let index = 0; index < routeLength; index += 1) {
+        const link = routeLinks[index];
+        try {
+          link.addEventListener("click", () => {
+            const fragment = link.getAttribute("href");
+            activateFragment(fragment, true);
+          });
+        } catch {
+          continue;
+        }
+      }
+    }
+  }
+
+  let view = null;
+  try {
+    view = root.defaultView;
+  } catch {
+    view = null;
+  }
+  if (view) {
+    try {
+      view.addEventListener("hashchange", () => {
+        if (activateFragment(currentFragment(view), true)) moveToCurrentFragment(view);
+      });
+    } catch {
+      // Tab interaction remains available without a window event target.
+    }
+  }
+
+  if (activateFragment(currentFragment(view), true)) {
+    moveToCurrentFragment(view);
+  } else {
+    activate("design", false);
   }
 }
 
@@ -518,8 +767,9 @@ export function initializeVendorWorkspace(root) {
       continue;
     }
   }
+  initializeVendorWorkspaceTabs(root);
   return CONTEXT_UNAVAILABLE;
 }
 
-const documentRoot = safeGlobalDocument();
+const documentRoot = resolveVendorDocument(globalThis);
 if (documentRoot) initializeVendorWorkspace(documentRoot);

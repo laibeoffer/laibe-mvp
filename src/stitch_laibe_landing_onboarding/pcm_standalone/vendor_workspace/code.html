@@ -3,301 +3,189 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="LaiBE AI PCM 乙方案件工作台，只整理受邀或已加入案件的授權範圍、文件、責任與紀錄。"
-    />
+    <meta name="description" content="LaiBE AI PCM 乙方案件工作台，只整理受邀或已加入案件的需求、圖面、契約、施工責任與案件紀錄。" />
     <title>乙方案件工作台｜LaiBE AI PCM</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
-    <link rel="stylesheet" href="../shared/owner-first-shell.css" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-vendor-state="CONTEXT_UNAVAILABLE">
     <a class="skip-link" href="#vendor-main">跳到案件內容</a>
-
     <header class="vendor-header" id="top">
       <div class="vendor-header__inner">
-        <a class="brand" href="../public_home/code.html#top" aria-label="返回 LaiBE AI PCM 首頁">
+        <a class="vendor-brand" href="../public_home/code.html#top" aria-label="返回 LaiBE AI PCM 首頁">
           <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
           <span>AI PCM</span>
         </a>
-        <div class="vendor-header__identity">
-          <span>受邀乙方</span>
-          <strong>身分尚待確認</strong>
-        </div>
+        <div class="vendor-header__identity"><span>設計師／統包</span><strong>身分與案件範圍尚待確認</strong></div>
       </div>
     </header>
 
     <nav class="main-tabs" aria-label="乙方主要工作區">
       <a class="is-active" href="#invited-cases">受邀案件</a>
-      <a href="#documents">文件準備</a>
+      <a data-vendor-workspace-route href="#documents">文件準備</a>
       <a href="#case-focus">合作工作台</a>
-      <a href="#execution">執行中工作台</a>
+      <a data-vendor-workspace-route href="#execution">執行中工作台</a>
     </nav>
 
     <main id="vendor-main">
-      <section class="owner-first-shell workspace-intro" aria-labelledby="workspace-title">
+      <section class="vendor-shell workspace-intro" aria-labelledby="workspace-title">
         <div class="workspace-intro__hero">
           <div>
-            <p class="eyebrow">乙方案件工作台｜邀請制</p>
-            <h1 id="workspace-title">只顯示你受邀或已加入的案件</h1>
-            <p class="workspace-intro__lead">
-              這裡不是公開案件入口。身分、案件成員與案件授權必須同時確認，才會顯示可處理的文件、責任與案件紀錄。
-            </p>
+            <p class="eyebrow">乙方案件工作台｜受邀或已加入案件</p>
+            <h1 id="workspace-title">把提案、施工與契約放回同一份案件事實</h1>
+            <p class="workspace-intro__lead">給受邀設計師與統包的案件治理工作台。先確認身分與案件授權，才能依有效版本處理甲方待確認、施工責任、契約補件與留痕。</p>
           </div>
           <aside class="workspace-gate" aria-label="目前工作台狀態">
-            <span>目前工作台狀態</span>
-            <strong>尚未確認可查看範圍</strong>
-            <p>未確認的案件不會顯示，也不會提供修改或送出入口。</p>
-            <a
-              class="owner-first-primary-action workspace-primary-action"
-              data-primary-action
-              href="../vendor_invitation/code.html"
-            >返回乙方邀請入口</a>
+            <span>目前工作台狀態</span><strong>尚未確認可查看範圍</strong>
+            <p>未確認的案件不顯示內容，也不提供修改、送出或簽署入口。</p>
+            <a class="vendor-primary-action workspace-primary-action" data-primary-action href="../vendor_invitation/code.html">返回乙方邀請入口</a>
           </aside>
         </div>
 
-        <section class="owner-first-facts vendor-focus-grid" id="case-focus" aria-label="目前案件事實">
-          <div data-owner-fact>
-            <span class="owner-first-fact-label">角色</span>
-            <strong class="owner-first-fact-value">受邀乙方</strong>
-          </div>
-          <div data-owner-fact>
-            <span class="owner-first-fact-label">契約狀態</span>
-            <strong class="owner-first-fact-value">尚未取得已確認版本</strong>
-          </div>
-          <div data-owner-fact>
-            <span class="owner-first-fact-label">案件狀態</span>
-            <strong class="owner-first-fact-value">尚未顯示案件資料</strong>
-          </div>
-          <div data-owner-fact>
-            <span class="owner-first-fact-label">下一步／責任人</span>
-            <strong class="owner-first-fact-value">目前使用者｜返回邀請確認</strong>
-          </div>
-          <div data-owner-fact>
-            <span class="owner-first-fact-label">最近紀錄</span>
-            <strong class="owner-first-fact-value">尚無可顯示的案件紀錄</strong>
-          </div>
+        <section class="vendor-focus-grid" id="case-focus" aria-label="目前案件事實">
+          <div data-vendor-fact><span class="vendor-fact-label">角色</span><strong class="vendor-fact-value">受邀設計師／統包</strong></div>
+          <div data-vendor-fact><span class="vendor-fact-label">契約狀態</span><strong class="vendor-fact-value">尚未取得已確認版本</strong></div>
+          <div data-vendor-fact><span class="vendor-fact-label">案件狀態</span><strong class="vendor-fact-value">尚未顯示案件資料</strong></div>
+          <div data-vendor-fact><span class="vendor-fact-label">下一步／責任人</span><strong class="vendor-fact-value">目前使用者｜返回邀請確認</strong></div>
+          <div data-vendor-fact><span class="vendor-fact-label">最近紀錄</span><strong class="vendor-fact-value">尚無可顯示的案件紀錄</strong></div>
         </section>
+        <div class="workspace-scope"><strong>權限任何一項未知，就維持零案件資料。</strong><p>正式開放後也只會顯示已授權案件；每次提送、補件、變更與確認，都必須留下時間、依據、狀態與下一責任人。</p></div>
 
-        <div class="workspace-scope">
-          <strong>權限任何一項未知，就維持零案件資料。</strong>
-          <p>目前所有接受、送出、修改、儲存與簽署功能都不可使用；正式開放後仍只會處理已授權案件。</p>
-        </div>
-      </section>
-
-      <section class="workspace-resources" id="workspace-resources" aria-labelledby="resources-title">
-        <div class="vendor-app">
-          <aside class="case-sidebar" id="invited-cases" aria-label="受邀案件清單">
-            <div class="case-sidebar__heading">
-              <p>案件範圍</p>
-              <h2>受邀案件</h2>
-            </div>
-            <div class="case-sidebar__notice" role="status" aria-live="polite">
-              尚未確認身分、案件成員與可查看範圍。
-            </div>
-            <ol class="case-list">
-              <li class="case-list__empty">
-                <strong>目前沒有可顯示的案件</strong>
-                <span>請由甲方正式通知的邀請入口重新確認。</span>
-              </li>
-            </ol>
-            <section class="sidebar-next">
-              <span>下一步責任人</span>
-              <strong>目前使用者</strong>
-              <p>先回到乙方邀請入口；確認前不顯示案件內容。</p>
-            </section>
-          </aside>
-
-          <div class="vendor-workspace">
-            <header class="workspace-titlebar">
-              <div>
-                <p class="eyebrow">授權後的原工作台</p>
-                <h2 id="resources-title">文件、履約與紀錄在同一個案件脈絡</h2>
-                <p>目前是安全空狀態；下列區域只說明工作台將管理的內容，不代表已有案件資料。</p>
-              </div>
-              <div class="workspace-titlebar__state">
-                <span>可見案件</span>
-                <strong>0 件</strong>
+        <div class="vendor-app vendor-hero-dashboard" id="workspace-resources" data-layout="vendor-hero-dashboard" aria-labelledby="resources-title">
+          <div class="vendor-workspace" data-vendor-workspace-root data-layout="vendor-hero-workspace">
+            <header class="vendor-workspace-heading">
+              <div><p class="eyebrow">案件治理工作區</p><h2 id="resources-title">先確認正在處理哪一段，再把下一個決定交給正確的人。</h2><p>以下是授權後的工作區結構；目前沒有案件資料，也不代表任何文件、版本或任務已完成。</p></div>
+              <div class="vendor-workspace-now" aria-label="目前狀態、下一步與責任人">
+                <p><span>目前狀態</span><strong data-vendor-current-status>尚未確認案件授權</strong></p>
+                <p><span>下一步</span><strong data-vendor-current-next>返回邀請入口確認身分與案件範圍</strong></p>
+                <p><span>下一步責任人</span><strong data-vendor-current-responsible>目前使用者</strong></p>
               </div>
             </header>
 
-            <nav class="workspace-sections" aria-label="案件內容分區">
-              <a href="#documents">契約與附件</a>
-              <a href="#reviews">公開審查</a>
-              <a href="#execution">履約處理</a>
-              <a href="#records">案件紀錄</a>
-            </nav>
-
-            <section class="resource-ledger" aria-label="乙方工作台十項資源">
-              <div class="resource-group" id="documents">
-                <header>
-                  <div><p class="eyebrow">共同文件基準</p><h3>契約、附件與審查</h3></div>
-                  <span>目前 0 份</span>
-                </header>
-                <p class="resource-boundary">
-                  甲方只提送契約簽署草稿；乙方可在平台編輯與提送其餘附件，並可不限次數送交 PCM 審查。
-                </p>
-                <ol class="resource-list">
-                  <li data-resource-code="CONTRACT_DRAFT_VERSIONS"><strong>契約草稿版本</strong><span>甲方提送的簽署草稿與版本關係</span><em>尚無資料</em></li>
-                  <li data-resource-code="ATTACHMENTS"><strong>附件</strong><span>乙方編輯、提送與版本紀錄</span><em>尚無資料</em></li>
-                  <li data-resource-code="PUBLIC_PCM_REVIEWS"><strong>公開審查意見</strong><span>PCM 意見對甲乙雙方公開</span><em>尚無資料</em></li>
-                  <li data-resource-code="SUPPLEMENTS"><strong>補件</strong><span>原因、責任人、期限與回覆版本</span><em>尚無資料</em></li>
-                </ol>
-                <button type="button" data-write-action disabled aria-disabled="true">附件編輯與提送正在整理中</button>
-              </div>
-
-              <div class="resource-group" id="execution">
-                <header>
-                  <div><p class="eyebrow">履約事實</p><h3>排程、證據、驗收與變更</h3></div>
-                  <span>目前 0 項</span>
-                </header>
-                <ol class="resource-list">
-                  <li data-resource-code="SCHEDULES"><strong>排程</strong><span>節點、責任人與時間變更</span><em>尚無資料</em></li>
-                  <li data-resource-code="EVIDENCE"><strong>證據</strong><span>施工照片、文件依據與提交者</span><em>尚無資料</em></li>
-                  <li data-resource-code="ACCEPTANCE"><strong>驗收</strong><span>缺失、確認項目與處理結果</span><em>尚無資料</em></li>
-                  <li data-resource-code="CHANGES"><strong>變更</strong><span>追加減項、原因、影響與雙方確認</span><em>尚無資料</em></li>
-                </ol>
-                <button type="button" data-write-action disabled aria-disabled="true">履約事項編輯正在整理中</button>
-              </div>
-
-              <div class="resource-group resource-group--wide" id="records">
-                <header>
-                  <div><p class="eyebrow">不可覆寫的脈絡</p><h3>附約與案件紀錄</h3></div>
-                  <span>目前 0 筆</span>
-                </header>
-                <p class="resource-boundary">
-                  已執行的原契約與簽章不可變；後續變更要另建附約草稿，並保留提出者、時間、依據、狀態與下一責任人。
-                </p>
-                <ol class="resource-list resource-list--two">
-                  <li data-resource-code="ADDENDA"><strong>附約</strong><span>另建附約草稿，不改寫原契約</span><em>尚無資料</em></li>
-                  <li data-resource-code="CASE_RECORDS"><strong>案件紀錄</strong><span>文件、決定、變更與驗收的完整留痕</span><em>尚無資料</em></li>
-                </ol>
-                <button type="button" data-write-action disabled aria-disabled="true">附約草稿與紀錄功能正在整理中</button>
-              </div>
-            </section>
-
-            <div class="vendor-body-grid">
-              <section class="calendar-panel" aria-labelledby="calendar-title">
-                <div class="panel-heading">
-                  <div><p class="eyebrow">下一個案件節點</p><h3 id="calendar-title">排程與責任</h3></div>
-                  <span>尚未取得資料</span>
-                </div>
-                <div class="calendar-empty">
-                  <strong>目前沒有可顯示的排程</strong>
-                  <p>授權後，節點會標示誰、在什麼時間、依據哪一份文件處理。</p>
-                </div>
-                <button type="button" data-write-action disabled aria-disabled="true">儲存排程</button>
-              </section>
-
-              <section class="message-panel" id="reviews" aria-labelledby="reviews-title">
-                <div class="panel-heading">
-                  <div><p class="eyebrow">對甲乙雙方公開</p><h3 id="reviews-title">PCM 公開審查意見</h3></div>
-                  <span>0 則</span>
-                </div>
-                <div class="message-empty">
-                  <strong>尚無可顯示的公開審查意見</strong>
-                  <p>意見必須連回文件版本、提出時間、審查者、狀態與下一步。</p>
-                </div>
-                <button type="button" data-write-action disabled aria-disabled="true">提送 PCM 審查</button>
-              </section>
+            <div class="vendor-workspace-tabs" role="tablist" aria-label="乙方案件管理類型">
+              <button id="vendor-workspace-tab-design" role="tab" type="button" data-vendor-workspace-tab="design" aria-selected="true" aria-controls="vendor-workspace-panel-design"><span>01</span><strong>設計案管理</strong><small>需求、圖面、提案版本</small></button>
+              <button id="vendor-workspace-tab-construction" role="tab" type="button" data-vendor-workspace-tab="construction" aria-selected="false" aria-controls="vendor-workspace-panel-construction" tabindex="-1"><span>02</span><strong>工程案管理</strong><small>任務、照片、變更、驗收</small></button>
+              <button id="vendor-workspace-tab-contract" role="tab" type="button" data-vendor-workspace-tab="contract" aria-selected="false" aria-controls="vendor-workspace-panel-contract" tabindex="-1"><span>03</span><strong>契約管理</strong><small>版本、附件、公開意見</small></button>
             </div>
 
+            <section class="vendor-workspace-panel" id="vendor-workspace-panel-design" role="tabpanel" aria-labelledby="vendor-workspace-tab-design" data-vendor-workspace-panel="design">
+              <aside class="vendor-workspace-panel__summary">
+                <p class="eyebrow">設計案管理</p><h3>先讓提案有明確版本，再請甲方做決定。</h3>
+                <dl><div><dt>目前階段</dt><dd>案件授權尚待確認</dd></div><div><dt>核心問題</dt><dd>尚無法確認需求、圖面與提案的有效版本。</dd></div><div><dt>乙方要理解</dt><dd>提案送出不等於甲方已確認；每次回覆都要連回版本與決策依據。</dd></div></dl>
+              </aside>
+              <div class="vendor-workspace-panel__body">
+                <header class="panel-heading"><div><p class="eyebrow">待確認與版本依據</p><h3>需求、圖面與提案</h3></div><span>目前 0 項</span></header>
+                <p class="panel-boundary">目前是安全空狀態。授權完成後，只顯示這個案件的需求基準、圖面版次與待甲方確認項目。</p>
+                <ol class="decision-list">
+                  <li><span>需求基準</span><strong>尚未取得案件需求</strong><small>依據版本與提出時間將在授權後顯示</small><em>待確認</em></li>
+                  <li><span>圖面版次</span><strong>尚未取得有效圖面</strong><small>不以檔名或口頭說法取代版本確認</small><em>待確認</em></li>
+                  <li><span>提案版本</span><strong>尚未取得可比較提案</strong><small>甲方確認、要求修改與理由都會留下紀錄</small><em>待確認</em></li>
+                  <li><span>設計說明</span><strong>尚無可顯示的提案說明</strong><small>設計理由、圖面版次與待甲方確認事項</small><em>待確認</em></li>
+                </ol>
+                <button type="button" data-write-action disabled aria-disabled="true">確認案件後才能整理提案版本</button>
+              </div>
+              <footer class="vendor-workspace-panel__next"><p><span>下一步</span><strong>先確認邀請與案件成員，才能取得需求與圖面基準。</strong><small>責任人｜目前使用者</small></p><a class="vendor-panel-action" href="../vendor_invitation/code.html">返回邀請確認 <span aria-hidden="true">→</span></a></footer>
+            </section>
+
+            <section class="vendor-workspace-panel" id="vendor-workspace-panel-construction" role="tabpanel" aria-labelledby="vendor-workspace-tab-construction" data-vendor-workspace-panel="construction" hidden>
+              <aside class="vendor-workspace-panel__summary">
+                <p class="eyebrow">工程案管理</p><h3>把現場事實連回任務、責任與有效文件。</h3>
+                <dl><div><dt>目前階段</dt><dd>案件授權尚待確認</dd></div><div><dt>核心問題</dt><dd>目前無法判斷施工任務、照片、變更或驗收狀態。</dd></div><div><dt>乙方要理解</dt><dd>照片不是單獨存放；必須標明時間、任務、文件依據與下一責任人。</dd></div></dl>
+              </aside>
+              <div class="vendor-workspace-panel__body" id="execution">
+                <header class="panel-heading"><div><p class="eyebrow">施工責任與現場留痕</p><h3>任務、照片、變更與驗收</h3></div><span>目前 0 項</span></header>
+                <p class="panel-boundary">每個施工事項都要回答誰處理、何時發生、依據哪份文件、目前狀態，以及下一步交給誰。</p>
+                <div class="calendar-panel" aria-labelledby="construction-status-title"><h4 id="construction-status-title">目前沒有可顯示的施工節點</h4><p>授權後才會列出已分派的任務、期限與待確認責任。</p></div>
+                <ol class="decision-list decision-list--compact">
+                  <li data-resource-code="SCHEDULES"><span>施工任務</span><strong>排程與責任</strong><small>節點、責任人與時間變更</small><em>0 項</em></li>
+                  <li data-resource-code="EVIDENCE"><span>施工照片</span><strong>現場證據</strong><small>拍攝時間、位置、任務與提交者</small><em>0 份</em></li>
+                  <li data-resource-code="CHANGES"><span>追加減項</span><strong>變更依據</strong><small>原因、影響、提出者與雙方確認</small><em>0 項</em></li>
+                  <li data-resource-code="ACCEPTANCE"><span>驗收</span><strong>缺失與確認項目</strong><small>處理結果、確認者與回覆紀錄</small><em>0 項</em></li>
+                </ol>
+                <button type="button" data-write-action disabled aria-disabled="true">確認案件後才能新增施工紀錄</button>
+              </div>
+              <footer class="vendor-workspace-panel__next"><p><span>下一步</span><strong>先確認案件授權，再依有效圖面查看乙方待處理任務。</strong><small>責任人｜目前使用者</small></p><a class="vendor-panel-action" href="../vendor_invitation/code.html">返回邀請確認 <span aria-hidden="true">→</span></a></footer>
+            </section>
+
+            <section class="vendor-workspace-panel" id="vendor-workspace-panel-contract" role="tabpanel" aria-labelledby="vendor-workspace-tab-contract" data-vendor-workspace-panel="contract" hidden>
+              <aside class="vendor-workspace-panel__summary">
+                <p class="eyebrow">契約管理</p><h3>只用雙方正在確認的版本討論責任。</h3>
+                <dl><div><dt>目前階段</dt><dd>尚未取得已確認版本</dd></div><div><dt>核心問題</dt><dd>目前無法確認契約、附件或補件是否屬於授權案件。</dd></div><div><dt>乙方要理解</dt><dd>PCM 公開意見不取代雙方確認；已執行契約與簽章不可被後續版本覆寫。</dd></div></dl>
+              </aside>
+              <div class="vendor-workspace-panel__body" id="documents">
+                <header class="panel-heading"><div><p class="eyebrow">共同文件基準</p><h3>契約版本、附件與補件</h3></div><span>目前 0 份</span></header>
+                <p class="panel-boundary">甲方只提送契約簽署草稿；乙方可在平台編輯與提送其餘附件，並可不限次數送交 PCM 審查。</p>
+                <nav class="contract-resource-nav" aria-label="契約資料定位">
+                  <a data-vendor-workspace-route href="#documents">契約與附件</a>
+                  <a data-vendor-workspace-route href="#reviews">PCM 公開意見</a>
+                  <a data-vendor-workspace-route href="#records">附約與案件紀錄</a>
+                </nav>
+                <ol class="decision-list">
+                  <li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>契約草稿版本</strong><small>甲方提送的簽署草稿與版本關係</small><em>0 份</em></li>
+                  <li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版本、提送者與雙方確認關係</small><em>0 份</em></li>
+                  <li id="reviews" data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開意見</span><strong>PCM 公開審查意見</strong><small>意見對甲乙雙方公開，並連回文件版本</small><em>0 則</em></li>
+                  <li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>原因與回覆版本</strong><small>責任人、期限、提出時間與處理狀態</small><em>0 項</em></li>
+                  <li data-resource-code="ADDENDA"><span>附約</span><strong>另建附約草稿</strong><small>不改寫原契約，保留變更依據</small><em>0 份</em></li>
+                  <li id="records" data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>契約決定與確認留痕</strong><small>版本、附件、公開意見與雙方決定的追溯脈絡</small><em>0 筆</em></li>
+                </ol>
+                <dl class="contract-confirmation">
+                  <div><dt>雙方確認狀態</dt><dd>尚未取得可確認版本</dd></div>
+                  <div><dt>決策依據</dt><dd>有效契約版本、附件與公開 PCM 意見</dd></div>
+                  <div><dt>下一步責任人</dt><dd>目前使用者｜先確認案件授權</dd></div>
+                </dl>
+                <p class="contract-immutability">已執行的原契約與簽章不可變；後續變更要另建附約草稿，並保留提出者、時間、依據、狀態與下一責任人。</p>
+                <button type="button" data-write-action disabled aria-disabled="true">契約附件與補件入口正在整理中</button>
+              </div>
+              <footer class="vendor-workspace-panel__next"><p><span>下一步</span><strong>先確認案件授權，再核對目前有效契約與待補文件。</strong><small>責任人｜目前使用者</small></p><a class="vendor-panel-action" href="../vendor_invitation/code.html">返回邀請確認 <span aria-hidden="true">→</span></a></footer>
+            </section>
+
             <section class="conversation-boundary" aria-labelledby="conversation-boundary-title">
-              <div>
-                <p class="eyebrow">溝通邊界</p>
-                <h3 id="conversation-boundary-title">只留下與案件決定有關的公開事實</h3>
-              </div>
-              <div>
-                <p>甲乙雙方可以在平台外私下協商，但萊比不顯示甲乙雙方的私人對話。</p>
-                <p>甲方與 PCM 的一對一介面不會出現在乙方工作台；乙方只會看到對雙方公開的 PCM 審查意見與案件紀錄。</p>
-              </div>
+              <div><p class="eyebrow">溝通邊界</p><h3 id="conversation-boundary-title">只留下與案件決定有關的公開事實</h3></div>
+              <div><p>甲乙雙方可以在平台外私下協商，但萊比不顯示甲乙雙方的私人對話。</p><p>甲方與 PCM 的一對一介面不會出現在乙方工作台；乙方只會看到對雙方公開的 PCM 審查意見與案件紀錄。</p></div>
             </section>
 
             <section class="workspace-outcomes" aria-labelledby="workspace-outcomes-title">
-              <header>
-                <div><p class="eyebrow">工作台結果</p><h3 id="workspace-outcomes-title">不同終局，不改用另一個工作台</h3></div>
-                <p>每個結果都保留原因、下一步、責任人、返回位置與恢復方式。</p>
-              </header>
-
+              <header><div><p class="eyebrow">工作台狀態說明</p><h3 id="workspace-outcomes-title">不同終局，仍保留原案件的追溯脈絡</h3></div><p>每個結果都保留原因、下一步、責任人、返回位置與恢復方式。</p></header>
               <div class="outcome-list">
-                <details data-state-code="CONTEXT_UNAVAILABLE" open>
-                  <summary><strong>目前無法確認工作台情境</strong><em>目前使用者</em></summary>
-                  <dl>
-                    <div><dt>原因</dt><dd>沒有足夠資料可確認身分、案件成員或案件權限。</dd></div>
-                    <div><dt>下一步</dt><dd>返回乙方邀請入口重新確認。</dd></div>
-                    <div><dt>責任人</dt><dd>目前使用者</dd></div>
-                    <div><dt>返回位置</dt><dd>乙方邀請入口</dd></div>
-                    <div><dt>恢復方式</dt><dd>從甲方正式通知重新進入；確認完成前維持零案件資料。</dd></div>
-                  </dl>
-                </details>
-
-                <details data-state-code="MEMBERSHIP_UNCONFIRMED">
-                  <summary><strong>案件成員仍無法確認</strong><em>甲方</em></summary>
-                  <dl>
-                    <div><dt>原因</dt><dd>目前帳號無法證明是被邀請或已加入這個案件的乙方。</dd></div>
-                    <div><dt>下一步</dt><dd>甲方核對邀請對象與案件成員資料。</dd></div>
-                    <div><dt>責任人</dt><dd>甲方</dd></div>
-                    <div><dt>返回位置</dt><dd>乙方邀請入口</dd></div>
-                    <div><dt>恢復方式</dt><dd>成員資料一致後，再由邀請入口重新確認。</dd></div>
-                  </dl>
-                </details>
-
-                <details data-state-code="AUTHORIZED_VENDOR_WORKSPACE">
-                  <summary><strong>乙方案件授權已確認</strong><em>受邀乙方</em></summary>
-                  <dl>
-                    <div><dt>原因</dt><dd>可信流程已確認身分、案件成員與可查看的案件範圍。</dd></div>
-                    <div><dt>下一步</dt><dd>在原乙方工作台依案件紀錄處理下一項責任。</dd></div>
-                    <div><dt>責任人</dt><dd>受邀乙方</dd></div>
-                    <div><dt>返回位置</dt><dd>原乙方工作台</dd></div>
-                    <div><dt>恢復方式</dt><dd>權限出現差異時停止操作，回到邀請入口重新確認。</dd></div>
-                  </dl>
-                </details>
-
-                <details data-state-code="PCM_EXITED_BILATERAL_CONTINUATION">
-                  <summary><strong>PCM 已退出，甲乙雙方繼續案件</strong><em>甲方與乙方</em></summary>
-                  <dl>
-                    <div><dt>原因</dt><dd>原工作台與十項案件資源繼續運作；新的 PCM 操作停止，歷史 PCM 資料只供查閱。</dd></div>
-                    <div><dt>下一步</dt><dd>甲乙雙方依原案件紀錄繼續；需要 PCM 再加入時取得新授權。</dd></div>
-                    <div><dt>責任人</dt><dd>甲方與乙方</dd></div>
-                    <div><dt>返回位置</dt><dd>原甲乙工作台</dd></div>
-                    <div><dt>恢復方式</dt><dd>保留原案件脈絡；PCM 再加入必須完成新的授權。</dd></div>
-                  </dl>
-                </details>
-
-                <details data-state-code="CASE_CLOSED_READ_ONLY">
-                  <summary><strong>案件已結案，原工作台保留查閱</strong><em>案件甲乙雙方</em></summary>
-                  <dl>
-                    <div><dt>原因</dt><dd>案件已完成結案，既有文件、決定與案件紀錄留在原工作台。</dd></div>
-                    <div><dt>下一步</dt><dd>查看結案依據、確認結果與最近紀錄。</dd></div>
-                    <div><dt>責任人</dt><dd>案件甲乙雙方</dd></div>
-                    <div><dt>返回位置</dt><dd>原乙方工作台</dd></div>
-                    <div><dt>恢復方式</dt><dd>後續處理另建可追溯事項，不修改既有結案內容。</dd></div>
-                  </dl>
-                </details>
-
-                <details data-state-code="CANCELLED">
-                  <summary><strong>案件已取消，原工作台保留取消依據</strong><em>案件甲乙雙方</em></summary>
-                  <dl>
-                    <div><dt>原因</dt><dd>案件在結案前取消；取消原因、既有文件與案件紀錄仍保留追溯。</dd></div>
-                    <div><dt>下一步</dt><dd>查看取消依據與最後一筆有效紀錄。</dd></div>
-                    <div><dt>責任人</dt><dd>案件甲乙雙方</dd></div>
-                    <div><dt>返回位置</dt><dd>原乙方工作台</dd></div>
-                    <div><dt>恢復方式</dt><dd>日後重新合作時另以新的案件與授權開始。</dd></div>
-                  </dl>
-                </details>
+                <details data-state-code="CONTEXT_UNAVAILABLE" open><summary><strong>目前無法確認工作台情境</strong><em>目前使用者</em></summary><dl><div><dt>原因</dt><dd>沒有足夠資料可確認身分、案件成員或案件權限。</dd></div><div><dt>下一步</dt><dd>返回乙方邀請入口重新確認。</dd></div><div><dt>責任人</dt><dd>目前使用者</dd></div><div><dt>返回位置</dt><dd>乙方邀請入口</dd></div><div><dt>恢復方式</dt><dd>從甲方正式通知重新進入；確認完成前維持零案件資料。</dd></div></dl></details>
+                <details data-state-code="MEMBERSHIP_UNCONFIRMED"><summary><strong>案件成員仍無法確認</strong><em>甲方</em></summary><dl><div><dt>原因</dt><dd>目前帳號無法證明是被邀請或已加入這個案件的乙方。</dd></div><div><dt>下一步</dt><dd>甲方核對邀請對象與案件成員資料。</dd></div><div><dt>責任人</dt><dd>甲方</dd></div><div><dt>返回位置</dt><dd>乙方邀請入口</dd></div><div><dt>恢復方式</dt><dd>成員資料一致後，再由邀請入口重新確認。</dd></div></dl></details>
+                <details data-state-code="AUTHORIZED_VENDOR_WORKSPACE"><summary><strong>乙方案件授權已確認</strong><em>受邀乙方</em></summary><dl><div><dt>原因</dt><dd>可信流程已確認身分、案件成員與可查看的案件範圍。</dd></div><div><dt>下一步</dt><dd>在原乙方工作台依案件紀錄處理下一項責任。</dd></div><div><dt>責任人</dt><dd>受邀乙方</dd></div><div><dt>返回位置</dt><dd>原乙方工作台</dd></div><div><dt>恢復方式</dt><dd>權限出現差異時停止操作，回到邀請入口重新確認。</dd></div></dl></details>
+                <details data-state-code="PCM_EXITED_BILATERAL_CONTINUATION"><summary><strong>PCM 已退出，甲乙雙方繼續案件</strong><em>甲方與乙方</em></summary><dl><div><dt>原因</dt><dd>原工作台與十項案件資源繼續運作；新的 PCM 操作停止，歷史 PCM 資料只供查閱。</dd></div><div><dt>下一步</dt><dd>甲乙雙方依原案件紀錄繼續；需要 PCM 再加入時取得新授權。</dd></div><div><dt>責任人</dt><dd>甲方與乙方</dd></div><div><dt>返回位置</dt><dd>原甲乙工作台</dd></div><div><dt>恢復方式</dt><dd>保留原案件脈絡；PCM 再加入必須完成新的授權。</dd></div></dl></details>
+                <details data-state-code="CASE_CLOSED_READ_ONLY"><summary><strong>案件已結案，原工作台保留查閱</strong><em>案件甲乙雙方</em></summary><dl><div><dt>原因</dt><dd>案件已完成結案，既有文件、決定與案件紀錄留在原工作台。</dd></div><div><dt>下一步</dt><dd>查看結案依據、確認結果與最近紀錄。</dd></div><div><dt>責任人</dt><dd>案件甲乙雙方</dd></div><div><dt>返回位置</dt><dd>原乙方工作台</dd></div><div><dt>恢復方式</dt><dd>後續處理另建可追溯事項，不修改既有結案內容。</dd></div></dl></details>
+                <details data-state-code="CANCELLED"><summary><strong>案件已取消，原工作台保留取消依據</strong><em>案件甲乙雙方</em></summary><dl><div><dt>原因</dt><dd>案件在結案前取消；取消原因、既有文件與案件紀錄仍保留追溯。</dd></div><div><dt>下一步</dt><dd>查看取消依據與最後一筆有效紀錄。</dd></div><div><dt>責任人</dt><dd>案件甲乙雙方</dd></div><div><dt>返回位置</dt><dd>原乙方工作台</dd></div><div><dt>恢復方式</dt><dd>日後重新合作時另以新的案件與授權開始。</dd></div></dl></details>
               </div>
             </section>
           </div>
+
+          <aside class="case-sidebar line-conversation" id="invited-cases" data-layout="vendor-line-conversation" aria-label="案件 LINE 對話">
+            <header class="line-conversation__heading">
+              <div><p>案件 LINE 對話</p><h2>與本案成員對話</h2></div>
+              <span>尚未連結</span>
+            </header>
+            <div class="case-sidebar__notice" role="status" aria-live="polite">尚未連結案件對話</div>
+            <section class="line-conversation__stream" aria-labelledby="vendor-line-empty-title">
+              <p>對話紀錄</p>
+              <h3 id="vendor-line-empty-title">目前沒有可顯示的對話</h3>
+              <p>完成身分、案件成員與可查看範圍確認後，才會顯示與這個案件有關的 LINE 對話紀錄。</p>
+            </section>
+            <dl class="line-conversation__facts">
+              <div><dt>目前案件</dt><dd>尚未顯示案件資料</dd></div>
+              <div><dt>對話成員</dt><dd>尚待確認案件成員</dd></div>
+              <div><dt>最近留痕</dt><dd>尚無可顯示的對話紀錄</dd></div>
+            </dl>
+            <form class="line-conversation__composer" aria-label="案件 LINE 訊息輸入">
+              <label for="vendor-line-message">訊息</label>
+              <textarea id="vendor-line-message" rows="3" disabled aria-disabled="true" placeholder="連結案件對話後才能輸入"></textarea>
+              <button type="button" data-line-send disabled aria-disabled="true">尚未開放傳送</button>
+              <p>目前不會送出或保存訊息；請先完成案件授權確認。</p>
+            </form>
+          </aside>
         </div>
       </section>
     </main>
 
-    <footer class="vendor-footer">
-      <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
-      <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
-    </footer>
-
+    <footer class="vendor-footer"><img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" /><p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p></footer>
+    <p class="vendor-live" data-vendor-workspace-live aria-live="polite"></p>
     <script type="module" src="./app.js"></script>
   </body>
 </html>

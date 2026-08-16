@@ -830,12 +830,82 @@ function renderModel(root, model) {
   });
 }
 
+export function initializeOwnerDashboardTabs(
+  root = typeof document === "undefined" ? null : document,
+) {
+  if (!root || typeof root.querySelector !== "function") {
+    return null;
+  }
+
+  const dashboard = root.querySelector('[data-layout="owner-hero-dashboard"]');
+  if (!dashboard || dashboard.dataset.ownerTabsReady === "true") {
+    return null;
+  }
+
+  const tabs = Array.from(dashboard.querySelectorAll("[data-owner-tab]"));
+  const panels = Array.from(dashboard.querySelectorAll("[data-owner-panel]"));
+  if (tabs.length !== 3 || panels.length !== 3) {
+    return null;
+  }
+
+  const tabKeys = tabs.map((tab) => tab.dataset.ownerTab);
+
+  function selectTab(key, { focus = false } = {}) {
+    if (!tabKeys.includes(key)) {
+      return false;
+    }
+
+    dashboard.dataset.activeOwnerTab = key;
+    for (const tab of tabs) {
+      const selected = tab.dataset.ownerTab === key;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected && focus) {
+        tab.focus();
+      }
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.ownerPanel !== key;
+    }
+    return true;
+  }
+
+  for (const tab of tabs) {
+    tab.addEventListener("click", () => {
+      selectTab(tab.dataset.ownerTab);
+    });
+    tab.addEventListener("keydown", (event) => {
+      const currentIndex = tabs.indexOf(tab);
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIndex = (currentIndex + 1) % tabs.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = tabs.length - 1;
+      } else {
+        return;
+      }
+      event.preventDefault();
+      selectTab(tabs[nextIndex].dataset.ownerTab, { focus: true });
+    });
+  }
+
+  dashboard.dataset.ownerTabsReady = "true";
+  selectTab(dashboard.dataset.activeOwnerTab || tabKeys[0]);
+  return Object.freeze({ selectTab });
+}
+
 export function createOwnerWorkspaceController({ root, adapter } = {}) {
   const documentRef = root ??
     (typeof document === "undefined" ? null : document);
   let currentAdapter = adapter;
   let loadGeneration = 0;
   let currentModel = null;
+
+  initializeOwnerDashboardTabs(documentRef);
 
   function renderInput(input) {
     const model = buildOwnerWorkspaceViewModel(input);

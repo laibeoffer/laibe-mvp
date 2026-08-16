@@ -129,11 +129,11 @@
         aria-labelledby="workspace-title"
       >
         <div class="workspace-intro__copy">
-          <p class="eyebrow">已完成 DRS 服務契約後</p>
+          <p class="eyebrow">甲方工作台｜案件治理預覽</p>
           <h1 id="workspace-title">甲方案件工作台</h1>
           <p class="workspace-intro__lead">
-            只限已登入且具案件權限的甲方。這裡把文件版次、專業書面檢討、
-            三方公開訊息與後續案件紀錄放在同一條可追溯的決策線上。
+            這裡把文件版次、專業書面檢討、三方公開訊息與後續案件紀錄放在同一條可追溯的決策線上；
+            身分與案件權限尚未確認時，只顯示工作台結構與誠實空狀態。
           </p>
           <div class="workspace-intro__meta" aria-label="工作台目前狀態">
             <span class="state-pill" data-slot="state-label"
@@ -170,6 +170,205 @@
             </div>
           </dl>
         </aside>
+
+        <div
+          class="owner-hero-dashboard"
+          data-layout="owner-hero-dashboard"
+          data-active-owner-tab="design"
+        >
+          <div class="owner-hero-workspace" data-layout="owner-hero-workspace">
+            <div
+              class="workspace-tabs"
+              data-layout="owner-section-tabs"
+              role="tablist"
+              aria-label="甲方工作台主要分頁"
+            >
+              <button
+                id="owner-dashboard-tab-design"
+                class="owner-dashboard-tab"
+                type="button"
+                role="tab"
+                data-action="select-owner-dashboard-tab"
+                data-owner-tab="design"
+                aria-selected="true"
+                aria-controls="owner-dashboard-panel-design"
+              >
+                <span>01</span>
+                <strong>設計案管理</strong>
+                <small>需求、圖面、版本與待確認</small>
+              </button>
+              <button
+                id="owner-dashboard-tab-construction"
+                class="owner-dashboard-tab"
+                type="button"
+                role="tab"
+                data-action="select-owner-dashboard-tab"
+                data-owner-tab="construction"
+                aria-selected="false"
+                aria-controls="owner-dashboard-panel-construction"
+                tabindex="-1"
+              >
+                <span>02</span>
+                <strong>工程案管理</strong>
+                <small>任務、照片、變更與驗收</small>
+              </button>
+              <button
+                id="owner-dashboard-tab-contract"
+                class="owner-dashboard-tab"
+                type="button"
+                role="tab"
+                data-action="select-owner-dashboard-tab"
+                data-owner-tab="contract"
+                aria-selected="false"
+                aria-controls="owner-dashboard-panel-contract"
+                tabindex="-1"
+              >
+                <span>03</span>
+                <strong>契約管理</strong>
+                <small>契約版本、附件與治理紀錄</small>
+              </button>
+            </div>
+
+            <section
+              class="owner-hero-dashboard__panel"
+              id="owner-dashboard-panel-design"
+              role="tabpanel"
+              data-owner-panel="design"
+              aria-labelledby="owner-dashboard-tab-design"
+            >
+              <aside class="owner-hero-dashboard__summary">
+                <p class="eyebrow">設計案管理</p>
+                <h3>先確認依據哪一版，再決定接受或要求修改。</h3>
+                <p>需求、圖面與設計回覆必須綁定版本、提出者與待確認事項。</p>
+              </aside>
+              <div class="owner-hero-dashboard__body">
+                <header>
+                  <div>
+                    <p class="eyebrow">目前狀態與版本依據</p>
+                    <h3>設計決策工作區</h3>
+                  </div>
+                  <span data-slot="state-label">尚待取得案件資料</span>
+                </header>
+                <dl class="owner-dashboard-facts">
+                  <div><dt>文件版本</dt><dd data-slot="document-summary">尚待載入</dd></div>
+                  <div><dt>書面檢討</dt><dd data-slot="review-summary">尚待載入</dd></div>
+                  <div><dt>待確認事項</dt><dd data-slot="issue-summary">尚待載入</dd></div>
+                </dl>
+              </div>
+              <footer class="owner-hero-dashboard__next">
+                <p>
+                  <span>下一步</span>
+                  <strong data-slot="next-summary">尚待載入</strong>
+                  <small data-slot="next-owner-summary">責任人：尚待載入</small>
+                </p>
+                <a href="#design-review">查看設計案紀錄 <span aria-hidden="true">→</span></a>
+              </footer>
+            </section>
+
+            <section
+              class="owner-hero-dashboard__panel"
+              id="owner-dashboard-panel-construction"
+              role="tabpanel"
+              data-owner-panel="construction"
+              aria-labelledby="owner-dashboard-tab-construction"
+              hidden
+            >
+              <aside class="owner-hero-dashboard__summary">
+                <p class="eyebrow">工程案管理</p>
+                <h3>把現場進度連回任務、照片、變更與驗收責任。</h3>
+                <p>每個施工事件都要說清楚時間、依據文件、目前狀態與下一位處理者。</p>
+              </aside>
+              <div class="owner-hero-dashboard__body">
+                <header>
+                  <div>
+                    <p class="eyebrow">今天與下一步</p>
+                    <h3>施工責任工作區</h3>
+                  </div>
+                  <span data-slot="case-status">尚待載入</span>
+                </header>
+                <dl class="owner-dashboard-facts">
+                  <div><dt>今日焦點</dt><dd data-slot="today-focus">尚待案件資料</dd></div>
+                  <div><dt>待處理事項</dt><dd data-slot="construction-issues">尚待案件資料</dd></div>
+                  <div><dt>下一位處理者</dt><dd data-slot="construction-actor">尚待案件資料</dd></div>
+                </dl>
+              </div>
+              <footer class="owner-hero-dashboard__next">
+                <p><span>紀錄原則</span><strong>只顯示案件後台已有的施工與驗收留痕。</strong></p>
+                <a href="#construction-records">查看工程案紀錄 <span aria-hidden="true">→</span></a>
+              </footer>
+            </section>
+
+            <section
+              class="owner-hero-dashboard__panel"
+              id="owner-dashboard-panel-contract"
+              role="tabpanel"
+              data-owner-panel="contract"
+              aria-labelledby="owner-dashboard-tab-contract"
+              hidden
+            >
+              <aside class="owner-hero-dashboard__summary">
+                <p class="eyebrow">契約管理</p>
+                <h3>只用雙方正在確認的契約與附件版本討論責任。</h3>
+                <p>專業書面意見協助整理風險，不取代甲乙雙方確認或最終決定。</p>
+              </aside>
+              <div class="owner-hero-dashboard__body">
+                <header>
+                  <div>
+                    <p class="eyebrow">契約與案件脈絡</p>
+                    <h3>契約治理工作區</h3>
+                  </div>
+                  <span data-slot="agreement-state">尚待確認</span>
+                </header>
+                <dl class="owner-dashboard-facts">
+                  <div><dt>DRS 服務契約</dt><dd data-slot="agreement-state">尚待確認</dd></div>
+                  <div><dt>契約版本</dt><dd data-slot="agreement-version">尚待載入</dd></div>
+                  <div><dt>甲方身分</dt><dd data-slot="actor-label">尚待驗證</dd></div>
+                </dl>
+              </div>
+              <footer class="owner-hero-dashboard__next">
+                <p><span>紀錄原則</span><strong>契約、附件、異議與回覆都保留原版本關係。</strong></p>
+                <a href="#governance">查看契約治理紀錄 <span aria-hidden="true">→</span></a>
+              </footer>
+            </section>
+          </div>
+
+          <aside
+            class="owner-hero-dashboard__rail owner-line-conversation"
+            data-layout="owner-line-conversation"
+            aria-label="案件 LINE 對話"
+          >
+            <header class="owner-line-conversation__heading">
+              <div><p class="eyebrow">案件 LINE 對話</p><h2 data-slot="case-name">尚未連結正式案件</h2></div>
+              <span class="owner-hero-dashboard__rail-state" data-slot="header-state">決策準備中</span>
+            </header>
+            <p class="owner-line-conversation__notice" role="status" aria-live="polite">尚未連結案件對話</p>
+            <section class="owner-line-conversation__stream" aria-labelledby="owner-line-empty-title">
+              <p class="eyebrow">對話紀錄</p>
+              <h3 id="owner-line-empty-title">目前沒有可顯示的對話</h3>
+              <p>完成甲方身分與案件權限確認後，才會顯示與這個案件有關的 LINE 對話紀錄。</p>
+            </section>
+            <dl>
+              <div>
+                <dt>目前由誰處理</dt>
+                <dd data-slot="current-actor">尚待載入</dd>
+              </div>
+              <div>
+                <dt>建議下一步</dt>
+                <dd data-slot="next-action">取得可信案件資料後顯示下一步</dd>
+              </div>
+              <div>
+                <dt>最近留痕</dt>
+                <dd data-slot="last-recorded">尚待載入</dd>
+              </div>
+            </dl>
+            <form class="owner-line-conversation__composer" aria-label="案件 LINE 訊息輸入">
+              <label for="owner-line-message">訊息</label>
+              <textarea id="owner-line-message" rows="3" disabled aria-disabled="true" placeholder="連結案件對話後才能輸入"></textarea>
+              <button type="button" data-line-send disabled aria-disabled="true">尚未開放傳送</button>
+              <p>目前不會送出或保存訊息；請先完成案件與權限確認。</p>
+            </form>
+          </aside>
+        </div>
       </section>
 
       <section
@@ -222,17 +421,6 @@
           重新載入
         </button>
       </section>
-
-      <nav
-        class="workspace-tabs"
-        data-layout="owner-section-tabs"
-        aria-label="甲方工作台主要分頁"
-      >
-        <a class="is-active" href="#documents">文件準備</a>
-        <a href="#overview">案件總覽</a>
-        <a href="#design-review">設計送審</a>
-        <a href="#construction-records">施工與驗收</a>
-      </nav>
 
       <nav
         class="section-nav"
