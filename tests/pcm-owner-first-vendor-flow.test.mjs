@@ -733,6 +733,329 @@ test("vendor resource ownership matches the three governance panels", async () =
   }
 });
 
+test("vendor contract draft classifies every material impact as a change proposal", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-classification"));
+  const impactKeys = ownListValues(
+    runtime.VENDOR_CONTRACT_IMPACT_KEYS,
+    "VENDOR_CONTRACT_IMPACT_KEYS",
+  );
+
+  assert.deepEqual(impactKeys, [
+    "SCOPE",
+    "PRICE",
+    "TIME",
+    "PAYMENT",
+    "ACCEPTANCE",
+    "MATERIAL",
+    "WARRANTY",
+  ]);
+  assert.equal(runtime.classifyVendorContractEntry([]), "SUPPLEMENT");
+  for (const key of impactKeys) {
+    assert.equal(runtime.classifyVendorContractEntry([key]), "CHANGE_PROPOSAL", key);
+  }
+  assert.equal(
+    runtime.classifyVendorContractEntry(["UNRECOGNIZED_IMPACT"]),
+    "CHANGE_PROPOSAL",
+    "unknown impact must not be under-classified as a supplement",
+  );
+});
+
+test("vendor contract reducer keeps a session-only draft without synthesizing formal states", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-reducer"));
+  const initial = runtime.createVendorContractDraftState();
+
+  assert.equal(initial.description, "");
+  assert.deepEqual(ownListValues(initial.impactKeys, "impact keys"), []);
+  assert.equal(initial.classification, "SUPPLEMENT");
+  assert.equal(initial.relatedVersion, "");
+  assert.deepEqual(
+    Object.fromEntries(Object.entries(initial.attachmentMetadata)),
+    { fileName: "", versionLabel: "", note: "" },
+  );
+  assert.equal(initial.vendorResponseIntent, "");
+  assert.equal(initial.ownerDecisionStatus, "NOT_RECORDED");
+  assert.equal(initial.partyAgreementStatus, "NOT_RECORDED");
+  assert.equal(initial.drsReviewStatus, "NOT_REQUESTED");
+  assert.equal(initial.paymentStatus, "NOT_RECORDED");
+  assert.equal(initial.persistenceStatus, "SESSION_ONLY");
+
+  const described = runtime.reduceVendorContractDraft(initial, {
+    type: "DESCRIPTION_CHANGED",
+    value: "玄關收邊材料補充說明",
+    ownerDecisionStatus: "APPROVED",
+    partyAgreementStatus: "AGREED",
+    paymentStatus: "RELEASED",
+    persistenceStatus: "SAVED",
+  });
+  const impacted = runtime.reduceVendorContractDraft(described, {
+    type: "IMPACT_TOGGLED",
+    key: "MATERIAL",
+  });
+  const versioned = runtime.reduceVendorContractDraft(impacted, {
+    type: "RELATED_VERSION_CHANGED",
+    value: "契約 v3",
+  });
+  const attached = runtime.reduceVendorContractDraft(versioned, {
+    type: "ATTACHMENT_METADATA_CHANGED",
+    field: "fileName",
+    value: "玄關材料說明.pdf",
+  });
+  const responded = runtime.reduceVendorContractDraft(attached, {
+    type: "VENDOR_RESPONSE_INTENT_CHANGED",
+    value: "REQUEST_OWNER_REVIEW",
+  });
+
+  assert.equal(responded.description, "玄關收邊材料補充說明");
+  assert.deepEqual(ownListValues(responded.impactKeys, "impact keys"), ["MATERIAL"]);
+  assert.equal(responded.classification, "CHANGE_PROPOSAL");
+  assert.equal(responded.relatedVersion, "契約 v3");
+  assert.equal(responded.attachmentMetadata.fileName, "玄關材料說明.pdf");
+  assert.equal(responded.vendorResponseIntent, "REQUEST_OWNER_REVIEW");
+  assert.equal(responded.ownerDecisionStatus, "NOT_RECORDED");
+  assert.equal(responded.partyAgreementStatus, "NOT_RECORDED");
+  assert.equal(responded.drsReviewStatus, "NOT_REQUESTED");
+  assert.equal(responded.paymentStatus, "NOT_RECORDED");
+  assert.equal(responded.persistenceStatus, "SESSION_ONLY");
+
+  const toggledOff = runtime.reduceVendorContractDraft(responded, {
+    type: "IMPACT_TOGGLED",
+    key: "MATERIAL",
+  });
+  assert.equal(toggledOff.classification, "SUPPLEMENT");
+  assert.deepEqual(ownListValues(toggledOff.impactKeys, "impact keys"), []);
+  assert.deepEqual(
+    runtime.reduceVendorContractDraft(toggledOff, { type: "CLEAR" }),
+    runtime.createVendorContractDraftState(),
+  );
+});
+
+test("vendor contract reducer normalizes hostile session-shaped state on every event", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-hostile-state"));
+  const forged = {
+    description: "浴室材料替代說明",
+    impactKeys: ["MATERIAL"],
+    classification: "SUPPLEMENT",
+    relatedVersion: "契約 v4",
+    attachmentMetadata: {
+      fileName: "材料表.pdf",
+      versionLabel: "v2",
+      note: "供甲方確認",
+    },
+    vendorResponseIntent: "REQUEST_OWNER_REVIEW",
+    ownerDecisionStatus: "APPROVED",
+    partyAgreementStatus: "AGREED",
+    drsReviewStatus: "APPROVED",
+    paymentStatus: "RELEASED",
+    persistenceStatus: "SESSION_ONLY",
+    formalSubmissionStatus: "SUBMITTED",
+    signatureStatus: "SIGNED",
+    extraAuthority: true,
+  };
+
+  const normalized = runtime.reduceVendorContractDraft(forged, { type: "UNKNOWN_EVENT" });
+
+  assert.notEqual(normalized, forged);
+  assert.equal(normalized.description, "浴室材料替代說明");
+  assert.deepEqual(ownListValues(normalized.impactKeys, "normalized impacts"), ["MATERIAL"]);
+  assert.equal(normalized.classification, "CHANGE_PROPOSAL");
+  assert.equal(normalized.relatedVersion, "契約 v4");
+  assert.equal(normalized.attachmentMetadata.fileName, "材料表.pdf");
+  assert.equal(normalized.vendorResponseIntent, "REQUEST_OWNER_REVIEW");
+  assert.equal(normalized.ownerDecisionStatus, "NOT_RECORDED");
+  assert.equal(normalized.partyAgreementStatus, "NOT_RECORDED");
+  assert.equal(normalized.drsReviewStatus, "NOT_REQUESTED");
+  assert.equal(normalized.paymentStatus, "NOT_RECORDED");
+  assert.equal(normalized.persistenceStatus, "SESSION_ONLY");
+  assert.equal(Object.hasOwn(normalized, "formalSubmissionStatus"), false);
+  assert.equal(Object.hasOwn(normalized, "signatureStatus"), false);
+  assert.equal(Object.hasOwn(normalized, "extraAuthority"), false);
+});
+
+test("only the trusted authorized render state enables session contract controls", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-authority"));
+
+  function control() {
+    const attributes = new Map();
+    return {
+      disabled: false,
+      getAttribute(name) { return attributes.get(name) ?? null; },
+      removeAttribute(name) { attributes.delete(name); },
+      setAttribute(name, value) { attributes.set(name, String(value)); },
+    };
+  }
+
+  function rootFor(generalControl, contractControl) {
+    return {
+      body: { setAttribute() {} },
+      querySelector() { return null; },
+      querySelectorAll(selector) {
+        if (selector === "[data-write-action]") return [generalControl, contractControl];
+        if (selector === "[data-vendor-contract-control]") return [contractControl];
+        return [];
+      },
+    };
+  }
+
+  const deniedGeneral = control();
+  const deniedContract = control();
+  const denied = runtime.initializeVendorWorkspace(
+    rootFor(deniedGeneral, deniedContract),
+    { code: "AUTHORIZED_VENDOR_WORKSPACE" },
+  );
+  assert.equal(denied, runtime.CONTEXT_UNAVAILABLE);
+  assert.equal(deniedGeneral.disabled, true);
+  assert.equal(deniedContract.disabled, true);
+  assert.equal(deniedContract.getAttribute("aria-disabled"), "true");
+
+  const authorizedGeneral = control();
+  const authorizedContract = control();
+  const authorizedState = runtime.VENDOR_WORKSPACE_CANONICAL_STATES.AUTHORIZED_VENDOR_WORKSPACE;
+  const authorized = runtime.initializeVendorWorkspace(
+    rootFor(authorizedGeneral, authorizedContract),
+    authorizedState,
+  );
+  assert.equal(authorized, authorizedState);
+  assert.equal(authorizedGeneral.disabled, true, "unrelated workspace writes stay closed");
+  assert.equal(authorizedContract.disabled, false);
+  assert.equal(authorizedContract.getAttribute("aria-disabled"), "false");
+});
+
+test("trusted vendor contract session dispatches DOM input change and reset through the reducer", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-dom-session"));
+
+  function element({ checked = false, value = "" } = {}) {
+    const attributes = new Map();
+    const listeners = new Map();
+    return {
+      checked,
+      disabled: true,
+      textContent: "",
+      value,
+      addEventListener(type, listener) { listeners.set(type, listener); },
+      emit(type, event = {}) { listeners.get(type)?.(event); },
+      getAttribute(name) { return attributes.get(name) ?? null; },
+      setAttribute(name, nextValue) { attributes.set(name, String(nextValue)); },
+    };
+  }
+
+  const form = element();
+  const description = element();
+  const materialImpact = element();
+  materialImpact.value = "MATERIAL";
+  const relatedVersion = element();
+  const fileName = element();
+  const versionLabel = element();
+  const attachmentNote = element();
+  const response = element();
+  const classificationOutput = element();
+  const responseOutput = element();
+  const draftStatusOutput = element();
+  const hierarchyStatusOutput = element();
+  const controls = [
+    description,
+    materialImpact,
+    relatedVersion,
+    fileName,
+    versionLabel,
+    attachmentNote,
+    response,
+  ];
+  const nodes = new Map([
+    ["[data-vendor-contract-form]", form],
+    ["[data-vendor-contract-description]", description],
+    ["[data-vendor-contract-related-version]", relatedVersion],
+    ["[data-vendor-contract-attachment-file-name]", fileName],
+    ["[data-vendor-contract-attachment-version-label]", versionLabel],
+    ["[data-vendor-contract-attachment-note]", attachmentNote],
+    ["[data-vendor-contract-response]", response],
+    ["[data-vendor-contract-classification]", classificationOutput],
+    ["[data-vendor-contract-response-status]", responseOutput],
+    ["[data-vendor-contract-draft-status]", draftStatusOutput],
+    ["[data-vendor-contract-hierarchy-status]", hierarchyStatusOutput],
+  ]);
+  const root = {
+    body: { setAttribute() {} },
+    querySelector(selector) { return nodes.get(selector) ?? null; },
+    querySelectorAll(selector) {
+      if (selector === "[data-write-action]") return controls;
+      if (selector === "[data-vendor-contract-control]") return controls;
+      if (selector === "[data-vendor-contract-impact]") return [materialImpact];
+      return [];
+    },
+  };
+
+  const authorizedState = runtime.VENDOR_WORKSPACE_CANONICAL_STATES.AUTHORIZED_VENDOR_WORKSPACE;
+  assert.equal(runtime.initializeVendorWorkspace(root, authorizedState), authorizedState);
+  assert.equal(classificationOutput.textContent, "補件");
+  assert.equal(responseOutput.textContent, "尚未選擇");
+  assert.equal(draftStatusOutput.textContent, "本頁草稿尚未修改");
+  assert.equal(hierarchyStatusOutput.textContent, "尚未建立本次補件／變更草稿");
+
+  description.value = "調整浴室壁磚材料";
+  description.emit("input");
+  assert.equal(draftStatusOutput.textContent, "本頁草稿已修改（尚未送出或保存）");
+  assert.equal(
+    hierarchyStatusOutput.textContent,
+    "本次補件／變更草稿已修改（尚未送出或保存）",
+  );
+
+  materialImpact.checked = true;
+  materialImpact.emit("change");
+  assert.equal(classificationOutput.textContent, "變更提案");
+
+  response.value = "REQUEST_OWNER_REVIEW";
+  response.emit("change");
+  assert.equal(responseOutput.textContent, "請甲方決定");
+
+  form.emit("reset");
+  assert.equal(classificationOutput.textContent, "補件");
+  assert.equal(responseOutput.textContent, "尚未選擇");
+  assert.equal(draftStatusOutput.textContent, "本頁草稿尚未修改");
+  assert.equal(hierarchyStatusOutput.textContent, "尚未建立本次補件／變更草稿");
+});
+
+test("vendor contract tab exposes one truthful session-only supplement and change workspace", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const contractPanel = html.match(
+    /<section class="vendor-workspace-panel"[^>]*data-vendor-workspace-panel="contract"[\s\S]*?<\/section>/u,
+  )?.[0] ?? "";
+
+  assert.match(contractPanel, /契約類型／有效版本/u);
+  assert.match(contractPanel, /目前回應狀態/u);
+  assert.match(contractPanel, /下一步責任人/u);
+  assert.equal(count(contractPanel, /\bdata-vendor-contract-primary-action\b/gu), 1);
+  assert.match(contractPanel, /整理本次補件／變更/u);
+  assert.match(contractPanel, /data-vendor-contract-editor/u);
+  assert.match(contractPanel, /data-vendor-contract-form/u);
+  assert.match(contractPanel, /data-vendor-contract-classification/u);
+  assert.match(contractPanel, /data-vendor-contract-response-status/u);
+  assert.match(contractPanel, /data-vendor-contract-draft-status/u);
+  assert.match(contractPanel, /data-vendor-contract-hierarchy-status/u);
+  assert.match(contractPanel, /補件說明/u);
+  assert.match(contractPanel, /影響分類/u);
+  assert.match(contractPanel, /關聯版本/u);
+  assert.match(contractPanel, /附件資料/u);
+  assert.match(contractPanel, /乙方回應/u);
+  assert.match(contractPanel, /甲方決定/u);
+  assert.match(contractPanel, /雙方另行合意/u);
+  assert.match(contractPanel, /DRS 審查/u);
+  assert.match(contractPanel, /付款狀態/u);
+  assert.match(contractPanel, /尚未正式送出，也未保存為案件紀錄/u);
+  assert.match(contractPanel, /補件不會改變契約/u);
+  assert.match(contractPanel, /變更提案/u);
+  assert.match(contractPanel, /data-vendor-contract-control[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.doesNotMatch(contractPanel, /已送出|已保存|已簽署|已同意|已付款/u);
+  assert.match(css, /\.vendor-contract-editor\s*\{/u);
+  assert.match(css, /\.vendor-contract-status-grid\s*\{/u);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*768px\)[\s\S]*?\.vendor-contract-form-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/u,
+  );
+});
+
 test("vendor governance dashboard lives inside the hero and only the first active tab joins its panel", async () => {
   const [html, css] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),

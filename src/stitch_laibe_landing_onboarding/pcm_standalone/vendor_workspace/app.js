@@ -148,6 +148,188 @@ export function resolveVendorWorkspaceTabKey(activeTab, key) {
   return VENDOR_WORKSPACE_TAB_KEYS[nextIndex];
 }
 
+export const VENDOR_CONTRACT_IMPACT_KEYS = freezeList(
+  "SCOPE",
+  "PRICE",
+  "TIME",
+  "PAYMENT",
+  "ACCEPTANCE",
+  "MATERIAL",
+  "WARRANTY",
+);
+
+function ownValue(record, key) {
+  if (!record || (typeof record !== "object" && typeof record !== "function")) {
+    return undefined;
+  }
+  try {
+    return safeGetOwnPropertyDescriptor(record, key)?.value;
+  } catch {
+    return undefined;
+  }
+}
+
+function ownListLength(list) {
+  const length = ownValue(list, "length");
+  return typeof length === "number" && length >= 0 && length <= 32 && length % 1 === 0
+    ? length
+    : null;
+}
+
+function isVendorContractImpactKey(value) {
+  for (let index = 0; index < VENDOR_CONTRACT_IMPACT_KEYS.length; index += 1) {
+    if (VENDOR_CONTRACT_IMPACT_KEYS[index] === value) return true;
+  }
+  return false;
+}
+
+export function classifyVendorContractEntry(impactKeys) {
+  const length = ownListLength(impactKeys);
+  if (length === 0) return "SUPPLEMENT";
+  if (length === null) return "CHANGE_PROPOSAL";
+  for (let index = 0; index < length; index += 1) {
+    const key = ownValue(impactKeys, String(index));
+    if (!isVendorContractImpactKey(key)) return "CHANGE_PROPOSAL";
+  }
+  return "CHANGE_PROPOSAL";
+}
+
+function textValue(value) {
+  return typeof value === "string" ? value : "";
+}
+
+function vendorResponseIntentValue(value) {
+  if (
+    value === "PROVIDE_INFORMATION"
+    || value === "REQUEST_OWNER_REVIEW"
+    || value === "REQUEST_DRS_REVIEW"
+  ) {
+    return value;
+  }
+  return "";
+}
+
+function attachmentMetadata(source) {
+  return freezeRecord([
+    ["fileName", textValue(ownValue(source, "fileName"))],
+    ["versionLabel", textValue(ownValue(source, "versionLabel"))],
+    ["note", textValue(ownValue(source, "note"))],
+  ]);
+}
+
+function normalizedImpactKeys(source) {
+  const nextKeys = [];
+  const length = ownListLength(source);
+  if (length === null) return freezeList();
+  for (let index = 0; index < length; index += 1) {
+    const key = ownValue(source, String(index));
+    if (!isVendorContractImpactKey(key)) continue;
+    let duplicate = false;
+    for (let nextIndex = 0; nextIndex < nextKeys.length; nextIndex += 1) {
+      if (nextKeys[nextIndex] === key) duplicate = true;
+    }
+    if (!duplicate) nextKeys.push(key);
+  }
+  return freezeList(...nextKeys);
+}
+
+function contractDraftState(fields) {
+  const impactKeys = normalizedImpactKeys(ownValue(fields, "impactKeys"));
+  return freezeRecord([
+    ["description", textValue(ownValue(fields, "description"))],
+    ["impactKeys", impactKeys],
+    ["classification", classifyVendorContractEntry(impactKeys)],
+    ["relatedVersion", textValue(ownValue(fields, "relatedVersion"))],
+    ["attachmentMetadata", attachmentMetadata(ownValue(fields, "attachmentMetadata"))],
+    ["vendorResponseIntent", vendorResponseIntentValue(ownValue(fields, "vendorResponseIntent"))],
+    ["ownerDecisionStatus", "NOT_RECORDED"],
+    ["partyAgreementStatus", "NOT_RECORDED"],
+    ["drsReviewStatus", "NOT_REQUESTED"],
+    ["paymentStatus", "NOT_RECORDED"],
+    ["persistenceStatus", "SESSION_ONLY"],
+  ]);
+}
+
+export function createVendorContractDraftState() {
+  return contractDraftState(freezeRecord([
+    ["description", ""],
+    ["impactKeys", freezeList()],
+    ["relatedVersion", ""],
+    ["attachmentMetadata", attachmentMetadata(null)],
+    ["vendorResponseIntent", ""],
+  ]));
+}
+
+function normalizeVendorContractDraftState(state) {
+  return contractDraftState(freezeRecord([
+    ["description", ownValue(state, "description")],
+    ["impactKeys", ownValue(state, "impactKeys")],
+    ["relatedVersion", ownValue(state, "relatedVersion")],
+    ["attachmentMetadata", ownValue(state, "attachmentMetadata")],
+    ["vendorResponseIntent", ownValue(state, "vendorResponseIntent")],
+  ]));
+}
+
+function replaceDraft(current, changes) {
+  return contractDraftState(freezeRecord([
+    ["description", ownValue(changes, "description") ?? ownValue(current, "description")],
+    ["impactKeys", ownValue(changes, "impactKeys") ?? ownValue(current, "impactKeys")],
+    ["relatedVersion", ownValue(changes, "relatedVersion") ?? ownValue(current, "relatedVersion")],
+    ["attachmentMetadata", ownValue(changes, "attachmentMetadata") ?? ownValue(current, "attachmentMetadata")],
+    ["vendorResponseIntent", ownValue(changes, "vendorResponseIntent") ?? ownValue(current, "vendorResponseIntent")],
+  ]));
+}
+
+function toggleImpactKeys(currentKeys, key) {
+  if (!isVendorContractImpactKey(key)) return currentKeys;
+  const nextKeys = [];
+  let removed = false;
+  const length = ownListLength(currentKeys) ?? 0;
+  for (let index = 0; index < length; index += 1) {
+    const currentKey = ownValue(currentKeys, String(index));
+    if (currentKey === key) {
+      removed = true;
+    } else if (isVendorContractImpactKey(currentKey)) {
+      nextKeys.push(currentKey);
+    }
+  }
+  if (!removed) nextKeys.push(key);
+  return freezeList(...nextKeys);
+}
+
+export function reduceVendorContractDraft(state, event) {
+  const current = normalizeVendorContractDraftState(state);
+  const type = ownValue(event, "type");
+  if (type === "CLEAR") return createVendorContractDraftState();
+  if (type === "DESCRIPTION_CHANGED") {
+    return replaceDraft(current, freezeRecord([["description", textValue(ownValue(event, "value"))]]));
+  }
+  if (type === "IMPACT_TOGGLED") {
+    return replaceDraft(current, freezeRecord([[
+      "impactKeys",
+      toggleImpactKeys(ownValue(current, "impactKeys"), ownValue(event, "key")),
+    ]]));
+  }
+  if (type === "RELATED_VERSION_CHANGED") {
+    return replaceDraft(current, freezeRecord([["relatedVersion", textValue(ownValue(event, "value"))]]));
+  }
+  if (type === "ATTACHMENT_METADATA_CHANGED") {
+    const field = ownValue(event, "field");
+    if (field !== "fileName" && field !== "versionLabel" && field !== "note") return current;
+    const existing = ownValue(current, "attachmentMetadata");
+    const changed = freezeRecord([
+      ["fileName", field === "fileName" ? textValue(ownValue(event, "value")) : ownValue(existing, "fileName")],
+      ["versionLabel", field === "versionLabel" ? textValue(ownValue(event, "value")) : ownValue(existing, "versionLabel")],
+      ["note", field === "note" ? textValue(ownValue(event, "value")) : ownValue(existing, "note")],
+    ]);
+    return replaceDraft(current, freezeRecord([["attachmentMetadata", changed]]));
+  }
+  if (type === "VENDOR_RESPONSE_INTENT_CHANGED") {
+    return replaceDraft(current, freezeRecord([["vendorResponseIntent", textValue(ownValue(event, "value"))]]));
+  }
+  return current;
+}
+
 function resource(code, label, submissionBoundary, pcmExitMode) {
   return freezeRecord([
     ["code", code],
@@ -562,6 +744,209 @@ function closeControl(control) {
   }
 }
 
+function enableSessionControl(control) {
+  try {
+    control.disabled = false;
+  } catch {
+    return;
+  }
+  try {
+    control.setAttribute("aria-disabled", "false");
+  } catch {
+    // Native disabled state is the authority boundary.
+  }
+}
+
+function vendorContractNode(root, selector) {
+  try {
+    return root.querySelector(selector);
+  } catch {
+    return null;
+  }
+}
+
+function vendorContractNodes(root, selector) {
+  try {
+    return root.querySelectorAll(selector);
+  } catch {
+    return null;
+  }
+}
+
+function vendorContractNodeValue(node) {
+  try {
+    return typeof node?.value === "string" ? node.value : "";
+  } catch {
+    return "";
+  }
+}
+
+function vendorContractNodeChecked(node) {
+  try {
+    return node?.checked === true;
+  } catch {
+    return false;
+  }
+}
+
+function setVendorContractText(node, value) {
+  if (!node) return;
+  try {
+    node.textContent = value;
+  } catch {
+    // Missing status output cannot create formal state.
+  }
+}
+
+function listenVendorContract(node, eventName, listener) {
+  if (!node) return;
+  try {
+    node.addEventListener(eventName, listener);
+  } catch {
+    // The remaining session fields stay native and non-persistent.
+  }
+}
+
+function vendorResponseLabel(intent) {
+  if (intent === "PROVIDE_INFORMATION") return "補充資料供確認";
+  if (intent === "REQUEST_OWNER_REVIEW") return "請甲方決定";
+  if (intent === "REQUEST_DRS_REVIEW") return "請 DRS 協助整理風險";
+  return "尚未選擇";
+}
+
+function draftHasImpact(state, key) {
+  const impactKeys = ownValue(state, "impactKeys");
+  const length = ownListLength(impactKeys) ?? 0;
+  for (let index = 0; index < length; index += 1) {
+    if (ownValue(impactKeys, String(index)) === key) return true;
+  }
+  return false;
+}
+
+function initializeVendorContractSession(root) {
+  const form = vendorContractNode(root, "[data-vendor-contract-form]");
+  const classificationOutput = vendorContractNode(
+    root,
+    "[data-vendor-contract-classification]",
+  );
+  const responseOutput = vendorContractNode(root, "[data-vendor-contract-response-status]");
+  const draftStatusOutput = vendorContractNode(root, "[data-vendor-contract-draft-status]");
+  const hierarchyStatusOutput = vendorContractNode(
+    root,
+    "[data-vendor-contract-hierarchy-status]",
+  );
+  if (
+    !form
+    || !classificationOutput
+    || !responseOutput
+    || !draftStatusOutput
+    || !hierarchyStatusOutput
+  ) {
+    return;
+  }
+
+  let state = createVendorContractDraftState();
+  let dirty = false;
+
+  function render() {
+    setVendorContractText(
+      classificationOutput,
+      ownValue(state, "classification") === "CHANGE_PROPOSAL" ? "變更提案" : "補件",
+    );
+    setVendorContractText(
+      responseOutput,
+      vendorResponseLabel(ownValue(state, "vendorResponseIntent")),
+    );
+    setVendorContractText(
+      draftStatusOutput,
+      dirty ? "本頁草稿已修改（尚未送出或保存）" : "本頁草稿尚未修改",
+    );
+    setVendorContractText(
+      hierarchyStatusOutput,
+      dirty
+        ? "本次補件／變更草稿已修改（尚未送出或保存）"
+        : "尚未建立本次補件／變更草稿",
+    );
+  }
+
+  function dispatch(event) {
+    state = reduceVendorContractDraft(state, event);
+    dirty = true;
+    render();
+  }
+
+  const description = vendorContractNode(root, "[data-vendor-contract-description]");
+  listenVendorContract(description, "input", () => {
+    dispatch(freezeRecord([
+      ["type", "DESCRIPTION_CHANGED"],
+      ["value", vendorContractNodeValue(description)],
+    ]));
+  });
+
+  const impacts = vendorContractNodes(root, "[data-vendor-contract-impact]");
+  let impactLength = 0;
+  try {
+    impactLength = impacts?.length ?? 0;
+  } catch {
+    impactLength = 0;
+  }
+  if (
+    typeof impactLength === "number"
+    && impactLength >= 0
+    && impactLength <= VENDOR_CONTRACT_IMPACT_KEYS.length
+    && impactLength % 1 === 0
+  ) {
+    for (let index = 0; index < impactLength; index += 1) {
+      const impact = impacts[index];
+      listenVendorContract(impact, "change", () => {
+        const key = vendorContractNodeValue(impact);
+        if (vendorContractNodeChecked(impact) === draftHasImpact(state, key)) return;
+        dispatch(freezeRecord([
+          ["type", "IMPACT_TOGGLED"],
+          ["key", key],
+        ]));
+      });
+    }
+  }
+
+  const relatedVersion = vendorContractNode(root, "[data-vendor-contract-related-version]");
+  listenVendorContract(relatedVersion, "input", () => {
+    dispatch(freezeRecord([
+      ["type", "RELATED_VERSION_CHANGED"],
+      ["value", vendorContractNodeValue(relatedVersion)],
+    ]));
+  });
+
+  function bindAttachmentInput(selector, field) {
+    const attachmentInput = vendorContractNode(root, selector);
+    listenVendorContract(attachmentInput, "input", () => {
+      dispatch(freezeRecord([
+        ["type", "ATTACHMENT_METADATA_CHANGED"],
+        ["field", field],
+        ["value", vendorContractNodeValue(attachmentInput)],
+      ]));
+    });
+  }
+  bindAttachmentInput("[data-vendor-contract-attachment-file-name]", "fileName");
+  bindAttachmentInput("[data-vendor-contract-attachment-version-label]", "versionLabel");
+  bindAttachmentInput("[data-vendor-contract-attachment-note]", "note");
+
+  const response = vendorContractNode(root, "[data-vendor-contract-response]");
+  listenVendorContract(response, "change", () => {
+    dispatch(freezeRecord([
+      ["type", "VENDOR_RESPONSE_INTENT_CHANGED"],
+      ["value", vendorContractNodeValue(response)],
+    ]));
+  });
+
+  listenVendorContract(form, "reset", () => {
+    state = reduceVendorContractDraft(state, freezeRecord([["type", "CLEAR"]]));
+    dirty = false;
+    render();
+  });
+  render();
+}
+
 export function resolveVendorWorkspaceTabForFragment(fragment) {
   if (fragment === "#execution") return "construction";
   if (fragment === "#documents" || fragment === "#reviews" || fragment === "#records") {
@@ -738,10 +1123,14 @@ export function initializeVendorWorkspaceTabs(root) {
   }
 }
 
-export function initializeVendorWorkspace(root) {
+export function initializeVendorWorkspace(root, renderState = CONTEXT_UNAVAILABLE) {
   if (!root) return CONTEXT_UNAVAILABLE;
+  const trustedAuthorized = renderState === AUTHORIZED_VENDOR_WORKSPACE;
   try {
-    root.body?.setAttribute("data-vendor-state", CONTEXT_UNAVAILABLE.code);
+    root.body?.setAttribute(
+      "data-vendor-state",
+      trustedAuthorized ? AUTHORIZED_VENDOR_WORKSPACE.code : CONTEXT_UNAVAILABLE.code,
+    );
   } catch {
     // Static markup already declares the closed state.
   }
@@ -767,8 +1156,34 @@ export function initializeVendorWorkspace(root) {
       continue;
     }
   }
+  if (trustedAuthorized) {
+    let contractControls;
+    try {
+      contractControls = root.querySelectorAll("[data-vendor-contract-control]");
+    } catch {
+      return CONTEXT_UNAVAILABLE;
+    }
+    let contractLength = 0;
+    try {
+      contractLength = contractControls.length;
+    } catch {
+      return CONTEXT_UNAVAILABLE;
+    }
+    if (
+      typeof contractLength !== "number"
+      || contractLength < 0
+      || contractLength > 32
+      || contractLength % 1 !== 0
+    ) {
+      return CONTEXT_UNAVAILABLE;
+    }
+    for (let index = 0; index < contractLength; index += 1) {
+      enableSessionControl(contractControls[index]);
+    }
+    initializeVendorContractSession(root);
+  }
   initializeVendorWorkspaceTabs(root);
-  return CONTEXT_UNAVAILABLE;
+  return trustedAuthorized ? AUTHORIZED_VENDOR_WORKSPACE : CONTEXT_UNAVAILABLE;
 }
 
 const documentRoot = resolveVendorDocument(globalThis);
