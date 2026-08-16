@@ -5,7 +5,7 @@ import {
   CONTRACT_SOURCE_SHA256,
   KEY_CLAUSES,
   LIFECYCLE,
-} from "./contract-content.js?v=20260814-fee-model-v3";
+} from "./contract-content.js?v=20260816-turnkey-fee-v5-rework";
 
 export const CONTRACT_TYPES = Object.freeze({
   ENGINEERING: "engineering",
@@ -222,7 +222,7 @@ export const CONTRACT_PARTS = ObjectFreeze([
   ObjectFreeze({
     number: "02",
     title: "費用與付款",
-    summary: "服務費率 3.5%、付款節點、非服務方收入款項、甲方義務與現場疑慮揭露。",
+    summary: "統包的設計審查 10% 與工程審查／治理 3.5% 分開計價、分開列示 DRS 付款節點，並區分甲乙契約工程款。",
   }),
   ObjectFreeze({
     number: "03",
@@ -249,7 +249,8 @@ export const CONTRACT_VIEW_CONFIGS = ObjectFreeze({
     keyClauses: KEY_CLAUSES,
     highlightRules: BEGINNER_HIGHLIGHT_RULES,
     boundaryNotice: "DRS 依可供審查文件提供程序品質與完整性審查，不取代現場、專業或甲方決策。",
-    readinessSummary: "目前是 v0.4 法務審閱稿；必要欄位與正式簽署能力尚待確認。",
+    serviceFeeSummary: "DRS 統包審查服務費＝設計費 × 10%＋工程款 × 3.5%；兩項計價基準與 DRS 付款節點分開列示。",
+    readinessSummary: "目前是 v0.5 法務審閱稿；設計費與工程款基準、必要欄位及正式簽署能力尚待確認。",
     availability: "正式接受、簽署與可追溯收據尚未開放；本頁不會寫入確認或簽署紀錄。",
     showEngineeringSections: true,
   }),
@@ -809,7 +810,7 @@ function initialiseContractPager(pages, parts = CONTRACT_PARTS) {
   updateControls();
 }
 
-function applyContractView(config) {
+export function applyContractView(config) {
   document.body?.setAttribute("data-contract-type", config.type);
 
   const title = document.querySelector("[data-contract-view-title]");
@@ -820,6 +821,7 @@ function applyContractView(config) {
   const availability = document.querySelector("[data-contract-availability]");
   const reader = document.querySelector("[data-contract-reader]");
   const flowLink = document.querySelector("[data-contract-flow-link]");
+  const serviceFeeSummary = document.querySelector("[data-service-fee-summary]");
 
   if (title) title.textContent = config.title;
   if (versionLabel) versionLabel.textContent = config.versionLabel;
@@ -827,6 +829,9 @@ function applyContractView(config) {
   if (legalLabel) legalLabel.textContent = config.legalLabel;
   if (boundaryNotice) boundaryNotice.textContent = config.boundaryNotice;
   if (availability) availability.textContent = config.availability;
+  if (serviceFeeSummary && config.serviceFeeSummary) {
+    serviceFeeSummary.textContent = config.serviceFeeSummary;
+  }
   if (reader) reader.setAttribute("aria-label", `${config.title}完整條文`);
 
   if (flowLink) {
@@ -999,7 +1004,7 @@ async function initialisePage() {
     lifecycle.textContent = contractType === CONTRACT_TYPES.DESIGN
       ? "候選草案 · 法務與政策待確認"
       : LIFECYCLE[0] === "DRAFT"
-        ? "v0.4 法務審閱稿 · 尚未進入簽署"
+        ? "v0.5 法務審閱稿 · 尚未進入簽署"
         : "尚未開始";
   }
 }

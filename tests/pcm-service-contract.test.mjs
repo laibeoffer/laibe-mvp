@@ -14,7 +14,7 @@ const serviceContractDir = path.join(
   "service_contract",
 );
 const EXPECTED_CONTRACT_SOURCE_SHA256 =
-  "811a9dddd1cfaeb440338ff64a0380cb7182f7a34ee5144d78aa866f68603fbf";
+  "d398182f197a4d6e8f8adba08a8b720aab274f5e9a8756c49aef359b2bf78359";
 
 function moduleUrl(fileName) {
   return pathToFileURL(path.join(serviceContractDir, fileName)).href;
@@ -24,7 +24,7 @@ function sourceHash(source) {
   return createHash("sha256").update(source, "utf8").digest("hex");
 }
 
-test("service contract exports the exact frozen v0.4 content snapshot", async () => {
+test("service contract exports the exact v0.5 legal-review content snapshot", async () => {
   const {
     CONTRACT_META,
     CONTRACT_SOURCE,
@@ -35,8 +35,13 @@ test("service contract exports the exact frozen v0.4 content snapshot", async ()
     moduleUrl("contract-content.js"),
   );
 
-  assert.equal(CONTRACT_META.version, "v0.4");
-  assert.equal(CONTRACT_META.ownerServiceFeeRate, "3.5%");
+  assert.equal(CONTRACT_META.version, "v0.5");
+  assert.equal(CONTRACT_META.designReviewFeeRate, "10%");
+  assert.equal(CONTRACT_META.engineeringGovernanceFeeRate, "3.5%");
+  assert.deepEqual(
+    Object.keys(CONTRACT_META).filter((key) => key.endsWith("FeeRate")),
+    ["designReviewFeeRate", "engineeringGovernanceFeeRate"],
+  );
   assert.equal(CONTRACT_META.legalReviewStatus, "LAWYER_FINAL_REVIEW_REQUIRED");
   assert.deepEqual(LIFECYCLE, [
     "DRAFT",
@@ -155,7 +160,7 @@ test("beginner contract uses DRS naming and marks decisive clauses with bold red
   assert.match(html, /紅色底線[^<]*簽署前務必確認/);
   assert.match(
     appSource,
-    /from "\.\/contract-content\.js\?v=20260814-fee-model-v3";/,
+    /from "\.\/contract-content\.js\?v=20260816-turnkey-fee-v5-rework";/,
   );
   assert.match(appSource, /BEGINNER_HIGHLIGHT_RULES/);
   assert.match(appSource, /contract-key-clause/);

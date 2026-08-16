@@ -16,9 +16,9 @@ const serviceContractDir = path.join(
 );
 const frozenContractPath = path.join(serviceContractDir, "contract-content.js");
 const FROZEN_CONTRACT_FILE_SHA256 =
-  "fb36c084915aa434e3ef6b6f89720a3d872358bdede46bb68cfc1dbff5b0feed";
+  "2d8fa0dab74a7e4903f93ef49368effb722cc32937f617d66fea0646a25f8f11";
 const FROZEN_CONTRACT_SOURCE_SHA256 =
-  "811a9dddd1cfaeb440338ff64a0380cb7182f7a34ee5144d78aa866f68603fbf";
+  "d398182f197a4d6e8f8adba08a8b720aab274f5e9a8756c49aef359b2bf78359";
 
 function moduleUrl(fileName, query = "") {
   return `${pathToFileURL(path.join(serviceContractDir, fileName)).href}${query}`;
@@ -28,15 +28,14 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-test("T7 keeps the complete v0.4 contract-content file byte-for-byte frozen", async () => {
+test("T7 binds the complete v0.5 legal-review contract-content file byte-for-byte", async () => {
   const frozenBytes = await readFile(frozenContractPath);
   const { CONTRACT_META, CONTRACT_SOURCE, CONTRACT_SOURCE_SHA256 } = await import(
     moduleUrl("contract-content.js")
   );
 
   assert.equal(sha256(frozenBytes), FROZEN_CONTRACT_FILE_SHA256);
-  assert.equal(CONTRACT_META.version, "v0.4");
-  assert.equal(CONTRACT_META.ownerServiceFeeRate, "3.5%");
+  assert.equal(CONTRACT_META.version, "v0.5");
   assert.equal(CONTRACT_META.legalReviewStatus, "LAWYER_FINAL_REVIEW_REQUIRED");
   assert.equal(CONTRACT_SOURCE_SHA256, FROZEN_CONTRACT_SOURCE_SHA256);
   assert.equal(sha256(Buffer.from(CONTRACT_SOURCE, "utf8")), CONTRACT_SOURCE_SHA256);
@@ -45,33 +44,29 @@ test("T7 keeps the complete v0.4 contract-content file byte-for-byte frozen", as
   assert.match(CONTRACT_SOURCE, /^# 附件十四[　\s]/m);
 });
 
-test("service fee keeps 3.5 percent, starts with ten percent of the total service fee, and settles termination without routine refunds", async () => {
+test("turnkey DRS fees separate design and engineering bases, additions, and termination settlement", async () => {
   const { CONTRACT_SOURCE, KEY_CLAUSES } = await import(moduleUrl("contract-content.js"));
   const appSource = await readFile(path.join(serviceContractDir, "app.js"), "utf8");
   const paymentClause = KEY_CLAUSES.find(({ id }) => id === "kc-pay");
 
-  assert.match(CONTRACT_SOURCE, /總工程款 × 3\.5%/);
-  assert.match(CONTRACT_SOURCE, /總服務費之百分之十/);
-  assert.match(CONTRACT_SOURCE, /總工程款 × 3\.5% × 10%/);
-  assert.match(CONTRACT_SOURCE, /動工前之契約、報價、圖說及可供審查案件文件預審/);
-  assert.match(CONTRACT_SOURCE, /案件乙方簽約款百分之五不另計收 AI DRS 服務費/);
-  assert.match(CONTRACT_SOURCE, /共八期，每期收取總服務費之百分之十/);
-  assert.match(CONTRACT_SOURCE, /尾款驗收時僅收取總服務費剩餘百分之十/);
-  assert.match(
-    CONTRACT_SOURCE,
-    /該期服務費入帳且最低必要資料可供審查後，開始對應付款驗收節點之正式書面審查/,
-  );
+  assert.match(CONTRACT_SOURCE, /DRS 統包審查服務費＝設計費 × 10%＋工程款 × 3\.5%/);
+  assert.match(CONTRACT_SOURCE, /TOTAL_DESIGN_FEE 之 2%；3D 確認階段收 2%/);
+  assert.match(CONTRACT_SOURCE, /PROJECT_TOTAL_AMOUNT 之 3\.5%/);
+  assert.match(CONTRACT_SOURCE, /啟動預審收該項服務費之 10%/);
+  assert.match(CONTRACT_SOURCE, /後續八期審查各收該項服務費之 10%/);
+  assert.match(CONTRACT_SOURCE, /尾款審查收剩餘 10%/);
+  assert.doesNotMatch(CONTRACT_SOURCE, /案件乙方(?: 5%|簽約款百分之五)/);
   assert.match(CONTRACT_SOURCE, /每次追加施工前/);
-  assert.match(CONTRACT_SOURCE, /追加工程服務費＝該次追加報價金額 × 3\.5%/);
-  assert.match(CONTRACT_SOURCE, /不納入原工程尾款之服務費結算/);
+  assert.match(CONTRACT_SOURCE, /追加工程 DRS 服務費＝已確認追加報價 × 3\.5%/);
+  assert.match(CONTRACT_SOURCE, /獨立計收，不納入原工程尾款/);
   assert.doesNotMatch(CONTRACT_SOURCE, /追加減服務費/);
   assert.match(CONTRACT_SOURCE, /尚未付費且尚未開始之後續階段，不再履行或計收/);
   assert.match(CONTRACT_SOURCE, /重複付款、計算錯誤或依法令強制規定/);
   assert.doesNotMatch(CONTRACT_SOURCE, /^## 第二十一條　退費$/m);
   assert.doesNotMatch(CONTRACT_SOURCE, /未履行部分是否按比例退還/);
   assert.ok(paymentClause);
-  assert.match(paymentClause.title, /總工程款 × 3\.5%/);
-  assert.match(paymentClause.title, /先付費、後審查/);
+  assert.match(paymentClause.title, /設計費 × 10%＋工程款 × 3\.5%/);
+  assert.doesNotMatch(JSON.stringify(paymentClause.table), /案件乙方簽約|工程款 5%|不另計/);
   assert.match(appSource, /summary: "契約終止與服務費結算、責任限制、爭議處理/);
 });
 
@@ -80,7 +75,8 @@ test("owner-first first fold states role, contract status, case status, responsi
   const firstFold = html.slice(0, html.indexOf('id="contract-summary"'));
 
   assert.match(firstFold, /目前角色[\s\S]*甲方/);
-  assert.match(firstFold, /契約狀態[\s\S]*v0\.4[\s\S]*法務審閱中/);
+  assert.match(firstFold, /契約狀態[\s\S]*v0\.5[\s\S]*法務審閱中/);
+  assert.doesNotMatch(firstFold, /v0\.4/);
   assert.match(firstFold, /案件狀態[\s\S]*尚未載入案件資料/);
   assert.match(firstFold, /下一責任人[\s\S]*甲方[\s\S]*先閱讀契約與流程/);
   assert.match(firstFold, /最近紀錄[\s\S]*尚無可顯示的案件紀錄/);
@@ -129,7 +125,7 @@ test("HERO is one physical contract-box reader without decorative rings and with
   assert.equal((html.match(/\sdata-contract(?:\s|=)/g) ?? []).length, 1);
   assert.match(
     html,
-    /<script type="module" src="\.\/app\.js\?v=20260815-w2-integrated-no-cache"><\/script>/,
+    /<script type="module" src="\.\/app\.js\?v=20260816-turnkey-fee-v5-static-fallback"><\/script>/,
   );
 
   assert.match(
@@ -630,6 +626,7 @@ test("complete DOM renders every frozen heading and print works while signing st
     ["[data-readiness-summary]", new TestElement("p")],
     ["[data-print-button]", new TestElement("button")],
     ["[data-lifecycle]", new TestElement("span")],
+    ["[data-service-fee-summary]", new TestElement("dd")],
   ]);
   nodes.get("[data-sign-button]").disabled = true;
   let printCalls = 0;
@@ -674,7 +671,11 @@ test("complete DOM renders every frozen heading and print works while signing st
     );
     assert.equal(
       nodes.get("[data-lifecycle]").textContent,
-      "v0.4 法務審閱稿 · 尚未進入簽署",
+      "v0.5 法務審閱稿 · 尚未進入簽署",
+    );
+    assert.equal(
+      nodes.get("[data-service-fee-summary]").textContent,
+      "DRS 統包審查服務費＝設計費 × 10%＋工程款 × 3.5%；兩項計價基準與 DRS 付款節點分開列示。",
     );
     assert.equal(nodes.get("[data-sign-button]").disabled, true);
     assert.equal(nodes.get("[data-sign-button]").getAttribute("aria-disabled"), "true");
