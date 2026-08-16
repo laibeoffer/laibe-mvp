@@ -20,6 +20,119 @@ export const OWNER_WORKSPACE_ACCESS = Object.freeze({
 
 export const PRECONTRACT_BOUNDARY = "REGISTERED != CONTRACTED";
 
+export const OWNER_CONTRACT_IMPACT_KEYS = Object.freeze([
+  "scope",
+  "price",
+  "time",
+  "payment",
+  "acceptance",
+  "material",
+  "warranty",
+]);
+
+const OWNER_CONTRACT_IMPACT_LABELS = Object.freeze({
+  scope: "工作範圍",
+  price: "價格",
+  time: "工期",
+  payment: "付款條件",
+  acceptance: "驗收",
+  material: "材料",
+  warranty: "保固",
+});
+
+function ownerContractText(value, maximumLength) {
+  return typeof value === "string"
+    ? value.trim().replace(/\r\n?/g, "\n").slice(0, maximumLength)
+    : "";
+}
+
+function frozenOwnerContractDraft(source = {}) {
+  const requestedImpacts = Array.isArray(source.impactKeys)
+    ? new Set(source.impactKeys)
+    : new Set();
+  const impactKeys = Object.freeze(
+    OWNER_CONTRACT_IMPACT_KEYS.filter((key) => requestedImpacts.has(key)),
+  );
+  const attachments = Object.freeze(
+    (Array.isArray(source.attachments) ? source.attachments : [])
+      .slice(0, 8)
+      .map((attachment) => Object.freeze({
+        name: ownerContractText(attachment?.name, 180),
+        note: ownerContractText(attachment?.note, 300),
+      }))
+      .filter((attachment) => attachment.name !== ""),
+  );
+  return Object.freeze({
+    title: ownerContractText(source.title, 120),
+    detail: ownerContractText(source.detail, 2000),
+    impactKeys,
+    classification: classifyOwnerContractEntry(impactKeys),
+    attachments,
+    ownerConfirmationIntent: source.ownerConfirmationIntent === true,
+    partyAgreement: false,
+    formallyPersisted: false,
+  });
+}
+
+export function classifyOwnerContractEntry(impactKeys) {
+  const keys = Array.isArray(impactKeys) ? impactKeys : [];
+  return keys.some((key) => OWNER_CONTRACT_IMPACT_KEYS.includes(key))
+    ? "CHANGE_PROPOSAL"
+    : "SUPPLEMENT";
+}
+
+export function createOwnerContractDraftState() {
+  return frozenOwnerContractDraft();
+}
+
+export function reduceOwnerContractDraft(state, event) {
+  const current = frozenOwnerContractDraft(state);
+  const action = event && typeof event === "object" ? event : {};
+  switch (action.type) {
+    case "SET_TITLE":
+      return frozenOwnerContractDraft({ ...current, title: action.value });
+    case "SET_DETAIL":
+      return frozenOwnerContractDraft({ ...current, detail: action.value });
+    case "TOGGLE_IMPACT": {
+      if (!OWNER_CONTRACT_IMPACT_KEYS.includes(action.key)) {
+        return current;
+      }
+      const selected = new Set(current.impactKeys);
+      if (selected.has(action.key)) {
+        selected.delete(action.key);
+      } else {
+        selected.add(action.key);
+      }
+      return frozenOwnerContractDraft({
+        ...current,
+        impactKeys: [...selected],
+      });
+    }
+    case "ADD_ATTACHMENT_METADATA": {
+      const name = ownerContractText(action.name, 180);
+      if (!name) {
+        return current;
+      }
+      return frozenOwnerContractDraft({
+        ...current,
+        attachments: [
+          ...current.attachments,
+          { name, note: ownerContractText(action.note, 300) },
+        ],
+      });
+    }
+    case "SET_OWNER_CONFIRMATION_INTENT":
+      return frozenOwnerContractDraft({
+        ...current,
+        ownerConfirmationIntent: action.value === true,
+      });
+    case "CLEAR":
+      return createOwnerContractDraftState();
+    default:
+      return current;
+  }
+}
+
 const STATE_COPY = Object.freeze({
   ACCESS_CHECKING: Object.freeze({
     label: "正在確認案件權限",
@@ -667,6 +780,163 @@ function clearNode(node) {
   }
 }
 
+function initializeOwnerContractWorkspace(root) {
+  if (!root || typeof root.querySelector !== "function") {
+    return null;
+  }
+  const workspace = root.querySelector("#owner-dashboard-panel-contract");
+  if (!workspace) {
+    return null;
+  }
+
+  const controls = Array.from(
+    workspace.querySelectorAll("[data-owner-contract-control]"),
+  );
+  const titleInput = workspace.querySelector("[data-owner-contract-title]");
+  const detailInput = workspace.querySelector("[data-owner-contract-detail]");
+  const confirmationInput = workspace.querySelector(
+    "[data-owner-contract-confirmation]",
+  );
+  const attachmentNameInput = workspace.querySelector(
+    "[data-owner-contract-attachment-name]",
+  );
+  const attachmentNoteInput = workspace.querySelector(
+    "[data-owner-contract-attachment-note]",
+  );
+  const impactInputs = Array.from(
+    workspace.querySelectorAll("[data-owner-contract-impact]"),
+  );
+  const editor = workspace.querySelector("[data-owner-contract-editor]");
+  const sessionStatus = workspace.querySelector(
+    "[data-owner-contract-session-status]",
+  );
+  let draft = createOwnerContractDraftState();
+  let enabled = false;
+
+  function preview(name, value) {
+    const node = workspace.querySelector(
+      `[data-owner-contract-preview="${name}"]`,
+    );
+    if (node) {
+      node.textContent = value;
+    }
+  }
+
+  function renderDraft() {
+    const classificationLabel = draft.classification === "CHANGE_PROPOSAL"
+      ? "變更提案"
+      : "補充說明";
+    const classification = workspace.querySelector(
+      "[data-owner-contract-classification]",
+    );
+    if (classification) {
+      classification.textContent = classificationLabel;
+    }
+    preview("classification", classificationLabel);
+    preview("title", draft.title || "尚未填寫");
+    preview("detail", draft.detail || "尚未填寫");
+    preview(
+      "impacts",
+      draft.impactKeys.length
+        ? draft.impactKeys.map((key) => OWNER_CONTRACT_IMPACT_LABELS[key]).join("、")
+        : "尚未選擇",
+    );
+    preview(
+      "attachments",
+      draft.attachments.length
+        ? draft.attachments.map((attachment) => attachment.name).join("、")
+        : "尚未加入",
+    );
+    preview(
+      "intent",
+      draft.ownerConfirmationIntent ? "已標記本次檢查意向" : "尚未標記",
+    );
+  }
+
+  function syncInputs() {
+    if (titleInput) titleInput.value = draft.title;
+    if (detailInput) detailInput.value = draft.detail;
+    if (confirmationInput) {
+      confirmationInput.checked = draft.ownerConfirmationIntent;
+    }
+    for (const input of impactInputs) {
+      input.checked = draft.impactKeys.includes(input.value);
+    }
+    if (attachmentNameInput) attachmentNameInput.value = "";
+    if (attachmentNoteInput) attachmentNoteInput.value = "";
+  }
+
+  function dispatch(event) {
+    if (!enabled) {
+      return draft;
+    }
+    draft = reduceOwnerContractDraft(draft, event);
+    renderDraft();
+    return draft;
+  }
+
+  function setEnabled(nextEnabled) {
+    const allowEditing = nextEnabled === true;
+    if (!allowEditing) {
+      draft = createOwnerContractDraftState();
+      syncInputs();
+      renderDraft();
+    }
+    enabled = allowEditing;
+    for (const control of controls) {
+      control.disabled = !allowEditing;
+      control.setAttribute("aria-disabled", String(!allowEditing));
+    }
+    if (sessionStatus) {
+      sessionStatus.textContent = allowEditing
+        ? "本次草稿尚未正式儲存或送出，重新整理後不會保留；目前也不會建立簽署、付款或雙方合意紀錄。"
+        : "完成甲方身分、有效契約與案件綁定確認後才可整理；本次草稿尚未正式儲存或送出，重新整理後不會保留。";
+    }
+  }
+
+  workspace.querySelector('[data-action="start-owner-contract-draft"]')
+    ?.addEventListener("click", () => {
+      if (!enabled) return;
+      if (editor) editor.open = true;
+      titleInput?.focus();
+    });
+  titleInput?.addEventListener("input", () => {
+    dispatch({ type: "SET_TITLE", value: titleInput.value });
+  });
+  detailInput?.addEventListener("input", () => {
+    dispatch({ type: "SET_DETAIL", value: detailInput.value });
+  });
+  for (const input of impactInputs) {
+    input.addEventListener("change", () => {
+      dispatch({ type: "TOGGLE_IMPACT", key: input.value });
+    });
+  }
+  confirmationInput?.addEventListener("change", () => {
+    dispatch({
+      type: "SET_OWNER_CONFIRMATION_INTENT",
+      value: confirmationInput.checked,
+    });
+  });
+  workspace.querySelector('[data-action="add-owner-contract-attachment"]')
+    ?.addEventListener("click", () => {
+      dispatch({
+        type: "ADD_ATTACHMENT_METADATA",
+        name: attachmentNameInput?.value,
+        note: attachmentNoteInput?.value,
+      });
+      if (attachmentNameInput) attachmentNameInput.value = "";
+      if (attachmentNoteInput) attachmentNoteInput.value = "";
+    });
+  workspace.querySelector('[data-action="clear-owner-contract-draft"]')
+    ?.addEventListener("click", () => {
+      dispatch({ type: "CLEAR" });
+      syncInputs();
+    });
+
+  setEnabled(false);
+  return Object.freeze({ setEnabled });
+}
+
 function renderList(root, name, records, renderer) {
   const list = root.querySelector(`[data-list="${name}"]`);
   if (!list) {
@@ -906,14 +1176,20 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   let currentModel = null;
 
   initializeOwnerDashboardTabs(documentRef);
+  const contractWorkspace = initializeOwnerContractWorkspace(documentRef);
 
-  function renderInput(input) {
-    const model = buildOwnerWorkspaceViewModel(input);
+  function commitModel(model) {
     currentModel = model;
     if (documentRef) {
       renderModel(documentRef, model);
     }
+    contractWorkspace?.setEnabled(model.state === "AUTHORIZED_READY");
     return model;
+  }
+
+  function renderInput(input) {
+    const model = buildOwnerWorkspaceViewModel(input);
+    return commitModel(model);
   }
 
   function renderNamedState(state, reasonCode) {
@@ -926,11 +1202,7 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
       statusMessage: STATE_COPY[state].message,
       retryVisible: state === "LOAD_FAILED_RETRYABLE",
     };
-    currentModel = model;
-    if (documentRef) {
-      renderModel(documentRef, model);
-    }
-    return model;
+    return commitModel(model);
   }
 
   async function initialize() {
