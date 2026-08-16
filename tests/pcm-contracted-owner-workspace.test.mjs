@@ -1381,3 +1381,191 @@ test("mobile header keeps the current case identity visible", async () => {
     /@media\s*\(max-width:\s*760px\)[\s\S]*context-chip\[data-slot="case-name"\][\s\S]*grid-column:\s*1\s*\/\s*-1/i,
   );
 });
+
+test("甲方契約工作區先交代角色、版本、狀態、責任與唯一主要行動", async () => {
+  const html = await readPageFile("code.html");
+  const panelStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const panelEnd = html.indexOf("</section>", panelStart);
+  const panel = html.slice(panelStart, panelEnd);
+
+  assert.ok(panelStart >= 0, "contract panel exists");
+  assert.match(panel, /目前角色/u);
+  assert.match(panel, /甲方（業主）/u);
+  assert.match(panel, /契約類型與版本/u);
+  assert.match(panel, /目前狀態/u);
+  assert.match(panel, /下一位處理者/u);
+  assert.match(panel, /整理本次契約草稿/u);
+  assert.equal((panel.match(/owner-contract-primary-action/g) || []).length, 1);
+  assert.match(panel, /disabled[^>]*aria-disabled="true"/u);
+});
+
+test("甲方契約工作區以漸進方式涵蓋七類影響、四方責任與 session 邊界", async () => {
+  const html = await readPageFile("code.html");
+  const requiredImpactKeys = [
+    "scope",
+    "price",
+    "time",
+    "payment",
+    "acceptance",
+    "material",
+    "warranty",
+  ];
+
+  for (const key of requiredImpactKeys) {
+    assert.match(html, new RegExp(`data-owner-contract-impact="${key}"`));
+  }
+  for (const label of ["DRS Review", "甲方決策", "乙方回覆", "雙方合意"]) {
+    assert.match(html, new RegExp(label));
+  }
+  assert.match(html, /版本歷程/u);
+  assert.match(html, /結構化補充/u);
+  assert.match(html, /附件資訊草稿/u);
+  assert.match(html, /本次操作紀錄預覽/u);
+  assert.match(html, /尚未正式儲存或送出/u);
+  assert.match(html, /重新整理後不會保留/u);
+  assert.match(html, /只記錄檔名與說明，不會上傳檔案/u);
+  assert.doesNotMatch(html, /上傳成功|已簽署|付款完成|正式合意/u);
+});
+
+test("甲方契約分類只有七類影響且任何一類都會成為變更提案", async () => {
+  const {
+    OWNER_CONTRACT_IMPACT_KEYS,
+    classifyOwnerContractEntry,
+  } = await loadRuntime();
+
+  assert.deepEqual(OWNER_CONTRACT_IMPACT_KEYS, [
+    "scope",
+    "price",
+    "time",
+    "payment",
+    "acceptance",
+    "material",
+    "warranty",
+  ]);
+  assert.equal(Object.isFrozen(OWNER_CONTRACT_IMPACT_KEYS), true);
+  assert.equal(classifyOwnerContractEntry([]), "SUPPLEMENT");
+  for (const key of OWNER_CONTRACT_IMPACT_KEYS) {
+    assert.equal(classifyOwnerContractEntry([key]), "CHANGE_PROPOSAL");
+  }
+  assert.equal(classifyOwnerContractEntry(["unknown"]), "SUPPLEMENT");
+});
+
+test("甲方契約草稿初始為空且所有可變容器都不可變", async () => {
+  const { createOwnerContractDraftState } = await loadRuntime();
+  const draft = createOwnerContractDraftState();
+
+  assert.deepEqual(draft, {
+    title: "",
+    detail: "",
+    impactKeys: [],
+    classification: "SUPPLEMENT",
+    attachments: [],
+    ownerConfirmationIntent: false,
+    partyAgreement: false,
+    formallyPersisted: false,
+  });
+  assert.equal(Object.isFrozen(draft), true);
+  assert.equal(Object.isFrozen(draft.impactKeys), true);
+  assert.equal(Object.isFrozen(draft.attachments), true);
+});
+
+test("甲方契約 reducer 只維護本次草稿且永不建立雙方合意或正式保存", async () => {
+  const {
+    createOwnerContractDraftState,
+    reduceOwnerContractDraft,
+  } = await loadRuntime();
+  const initial = createOwnerContractDraftState();
+  const withTitle = reduceOwnerContractDraft(initial, {
+    type: "SET_TITLE",
+    value: "調整廚房櫃體範圍",
+  });
+  const withDetail = reduceOwnerContractDraft(withTitle, {
+    type: "SET_DETAIL",
+    value: "請依目前圖面逐項確認。",
+  });
+  const withImpact = reduceOwnerContractDraft(withDetail, {
+    type: "TOGGLE_IMPACT",
+    key: "scope",
+  });
+  const withAttachment = reduceOwnerContractDraft(withImpact, {
+    type: "ADD_ATTACHMENT_METADATA",
+    name: "廚房圖面.pdf",
+    note: "本次討論參考名稱",
+  });
+  const withIntent = reduceOwnerContractDraft(withAttachment, {
+    type: "SET_OWNER_CONFIRMATION_INTENT",
+    value: true,
+    partyAgreement: true,
+    formallyPersisted: true,
+  });
+
+  assert.equal(initial.title, "", "previous state remains unchanged");
+  assert.equal(withIntent.title, "調整廚房櫃體範圍");
+  assert.equal(withIntent.detail, "請依目前圖面逐項確認。");
+  assert.deepEqual(withIntent.impactKeys, ["scope"]);
+  assert.equal(withIntent.classification, "CHANGE_PROPOSAL");
+  assert.deepEqual(withIntent.attachments, [{
+    name: "廚房圖面.pdf",
+    note: "本次討論參考名稱",
+  }]);
+  assert.equal(Object.isFrozen(withIntent.attachments[0]), true);
+  assert.equal(withIntent.ownerConfirmationIntent, true);
+  assert.equal(withIntent.partyAgreement, false);
+  assert.equal(withIntent.formallyPersisted, false);
+
+  const toggledOff = reduceOwnerContractDraft(withIntent, {
+    type: "TOGGLE_IMPACT",
+    key: "scope",
+  });
+  assert.deepEqual(toggledOff.impactKeys, []);
+  assert.equal(toggledOff.classification, "SUPPLEMENT");
+
+  const cleared = reduceOwnerContractDraft(withIntent, { type: "CLEAR" });
+  assert.deepEqual(cleared, createOwnerContractDraftState());
+});
+
+test("甲方契約編輯權只由 AUTHORIZED_READY render path 切換", async () => {
+  const runtime = await readPageFile("app.js");
+
+  assert.match(
+    runtime,
+    /setEnabled\(model\.state === "AUTHORIZED_READY"\)/,
+  );
+  assert.doesNotMatch(
+    runtime,
+    /localStorage|sessionStorage|indexedDB|URLSearchParams|location\.search|document\.cookie/i,
+  );
+});
+
+test("甲方契約 reviewer journey 在分頁內保留治理紀錄次要入口", async () => {
+  const html = await readPageFile("code.html");
+  const panelStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const panelEnd = html.indexOf("</section>", panelStart);
+  const panel = html.slice(panelStart, panelEnd);
+
+  assert.match(
+    panel,
+    /class="owner-hero-dashboard__next owner-contract-governance-link"[\s\S]*href="#governance"[\s\S]*查看契約治理紀錄/u,
+  );
+  assert.equal((panel.match(/owner-contract-primary-action/g) || []).length, 1);
+  assert.equal((panel.match(/整理本次契約草稿/g) || []).length, 1);
+});
+
+test("甲方契約 reviewer overflow guard 與草稿長度契約限制極端內容", async () => {
+  const [html, css, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+    readPageFile("app.js"),
+  ]);
+
+  assert.match(
+    css,
+    /\.owner-contract-status dd,\s*\.owner-contract-preview dd,\s*\.owner-contract-version-line dd\s*\{[^}]*overflow-wrap:\s*anywhere/iu,
+  );
+  assert.match(html, /data-owner-contract-title[\s\S]{0,180}maxlength="120"|maxlength="120"[\s\S]{0,180}data-owner-contract-title/u);
+  assert.match(html, /data-owner-contract-detail[\s\S]{0,180}maxlength="2000"|maxlength="2000"[\s\S]{0,180}data-owner-contract-detail/u);
+  assert.match(runtime, /title:\s*ownerContractText\(source\.title,\s*120\)/u);
+  assert.match(runtime, /detail:\s*ownerContractText\(source\.detail,\s*2000\)/u);
+  assert.match(runtime, /name:\s*ownerContractText\(attachment\?\.name,\s*180\)/u);
+  assert.match(runtime, /note:\s*ownerContractText\(attachment\?\.note,\s*300\)/u);
+});

@@ -299,34 +299,143 @@
             </section>
 
             <section
-              class="owner-hero-dashboard__panel"
+              class="owner-hero-dashboard__panel owner-contract-workspace"
               id="owner-dashboard-panel-contract"
               role="tabpanel"
               data-owner-panel="contract"
               aria-labelledby="owner-dashboard-tab-contract"
               hidden
             >
-              <aside class="owner-hero-dashboard__summary">
-                <p class="eyebrow">契約管理</p>
-                <h3>只用雙方正在確認的契約與附件版本討論責任。</h3>
-                <p>專業書面意見協助整理風險，不取代甲乙雙方確認或最終決定。</p>
-              </aside>
-              <div class="owner-hero-dashboard__body">
-                <header>
-                  <div>
-                    <p class="eyebrow">契約與案件脈絡</p>
-                    <h3>契約治理工作區</h3>
+              <header class="owner-contract-command">
+                <div>
+                  <p class="eyebrow">契約管理｜甲方決策工作區</p>
+                  <h3>先把要補充或變更的內容整理清楚，再交由各方逐步確認。</h3>
+                  <p>這裡只整理本次瀏覽的草稿。DRS Review 協助標示風險，不代替甲方決策、乙方回覆或雙方合意。</p>
+                </div>
+                <button
+                  class="owner-contract-primary-action"
+                  type="button"
+                  data-action="start-owner-contract-draft"
+                  data-owner-contract-control
+                  disabled
+                  aria-disabled="true"
+                >整理本次契約草稿</button>
+              </header>
+
+              <dl class="owner-contract-status" aria-label="目前契約責任摘要">
+                <div><dt>目前角色</dt><dd>甲方（業主）</dd></div>
+                <div><dt>契約類型與版本</dt><dd>DRS 服務契約・<span data-slot="agreement-version">尚待載入</span></dd></div>
+                <div><dt>目前狀態</dt><dd data-slot="agreement-state">尚待確認</dd></div>
+                <div><dt>下一位處理者</dt><dd data-slot="current-actor">尚待載入</dd></div>
+              </dl>
+
+              <p class="owner-contract-session-note" role="status" data-owner-contract-session-status>
+                本次草稿尚未正式儲存或送出，重新整理後不會保留；目前也不會建立簽署、付款或雙方合意紀錄。
+              </p>
+
+              <div class="owner-contract-progressive">
+                <details>
+                  <summary><span>01</span><strong>版本歷程</strong><small>先確認討論依據</small></summary>
+                  <div class="owner-contract-detail-body">
+                    <dl class="owner-contract-version-line">
+                      <div><dt>目前依據版本</dt><dd data-slot="agreement-version">尚待載入</dd></div>
+                      <div><dt>版本狀態</dt><dd data-slot="agreement-state">尚待確認</dd></div>
+                    </dl>
+                    <p>正式版本紀錄將依可信案件資料顯示；本次草稿不會自行建立新版本。</p>
                   </div>
-                  <span data-slot="agreement-state">尚待確認</span>
-                </header>
-                <dl class="owner-dashboard-facts">
-                  <div><dt>DRS 服務契約</dt><dd data-slot="agreement-state">尚待確認</dd></div>
-                  <div><dt>契約版本</dt><dd data-slot="agreement-version">尚待載入</dd></div>
-                  <div><dt>甲方身分</dt><dd data-slot="actor-label">尚待驗證</dd></div>
-                </dl>
+                </details>
+
+                <details data-owner-contract-editor>
+                  <summary><span>02</span><strong>結構化補充</strong><small>補充說明或變更提案</small></summary>
+                  <div class="owner-contract-detail-body owner-contract-editor">
+                    <div class="owner-contract-editor__heading">
+                      <p>目前分類</p>
+                      <strong data-owner-contract-classification>補充說明</strong>
+                    </div>
+                    <label>
+                      <span>草稿標題</span>
+                      <input
+                        type="text"
+                        maxlength="120"
+                        data-owner-contract-title
+                        data-owner-contract-control
+                        disabled
+                        aria-disabled="true"
+                        placeholder="例如：補充廚房櫃體討論範圍"
+                      />
+                    </label>
+                    <label>
+                      <span>要釐清的內容</span>
+                      <textarea
+                        rows="5"
+                        maxlength="2000"
+                        data-owner-contract-detail
+                        data-owner-contract-control
+                        disabled
+                        aria-disabled="true"
+                        placeholder="請寫下依據哪一版文件、希望釐清什麼，以及下一步要由誰回覆。"
+                      ></textarea>
+                    </label>
+                    <fieldset class="owner-contract-impacts">
+                      <legend>影響類別</legend>
+                      <p>未勾選維持「補充說明」；勾選任一類別即標記為「變更提案」。</p>
+                      <div>
+                        <label><input type="checkbox" value="scope" data-owner-contract-impact="scope" data-owner-contract-control disabled aria-disabled="true" /><span>工作範圍</span></label>
+                        <label><input type="checkbox" value="price" data-owner-contract-impact="price" data-owner-contract-control disabled aria-disabled="true" /><span>價格</span></label>
+                        <label><input type="checkbox" value="time" data-owner-contract-impact="time" data-owner-contract-control disabled aria-disabled="true" /><span>工期</span></label>
+                        <label><input type="checkbox" value="payment" data-owner-contract-impact="payment" data-owner-contract-control disabled aria-disabled="true" /><span>付款條件</span></label>
+                        <label><input type="checkbox" value="acceptance" data-owner-contract-impact="acceptance" data-owner-contract-control disabled aria-disabled="true" /><span>驗收</span></label>
+                        <label><input type="checkbox" value="material" data-owner-contract-impact="material" data-owner-contract-control disabled aria-disabled="true" /><span>材料</span></label>
+                        <label><input type="checkbox" value="warranty" data-owner-contract-impact="warranty" data-owner-contract-control disabled aria-disabled="true" /><span>保固</span></label>
+                      </div>
+                    </fieldset>
+                  </div>
+                </details>
+
+                <details>
+                  <summary><span>03</span><strong>確認責任</strong><small>四個不同層次</small></summary>
+                  <div class="owner-contract-detail-body">
+                    <ol class="owner-contract-responsibilities">
+                      <li><strong>DRS Review</strong><span>整理文件差異與風險提醒，不替任何一方作決定。</span></li>
+                      <li><strong>甲方決策</strong><span>確認是否提出本次補充或變更草稿。</span></li>
+                      <li><strong>乙方回覆</strong><span>逐項說明可行性、影響與需要補充的依據。</span></li>
+                      <li><strong>雙方合意</strong><span>必須另有雙方明確確認；本頁草稿不代表雙方已同意。</span></li>
+                    </ol>
+                    <label class="owner-contract-intent">
+                      <input type="checkbox" data-owner-contract-confirmation data-owner-contract-control disabled aria-disabled="true" />
+                      <span><strong>標記甲方確認意向</strong>只表示本次瀏覽已檢查草稿，不是簽署或雙方合意。</span>
+                    </label>
+                  </div>
+                </details>
+
+                <details>
+                  <summary><span>04</span><strong>附件資訊草稿</strong><small>只整理檔名與說明</small></summary>
+                  <div class="owner-contract-detail-body owner-contract-attachment-editor">
+                    <p>只記錄檔名與說明，不會上傳檔案，也不會顯示上傳或保存成功。</p>
+                    <label><span>附件檔名</span><input type="text" data-owner-contract-attachment-name data-owner-contract-control disabled aria-disabled="true" placeholder="例如：廚房圖面.pdf" /></label>
+                    <label><span>附件說明</span><input type="text" data-owner-contract-attachment-note data-owner-contract-control disabled aria-disabled="true" placeholder="說明這份資料與哪一項討論有關" /></label>
+                    <button type="button" data-action="add-owner-contract-attachment" data-owner-contract-control disabled aria-disabled="true">加入附件資訊</button>
+                  </div>
+                </details>
+
+                <details>
+                  <summary><span>05</span><strong>本次操作紀錄預覽</strong><small>重新整理後清除</small></summary>
+                  <div class="owner-contract-detail-body owner-contract-preview" aria-live="polite">
+                    <dl>
+                      <div><dt>草稿分類</dt><dd data-owner-contract-preview="classification">補充說明</dd></div>
+                      <div><dt>草稿標題</dt><dd data-owner-contract-preview="title">尚未填寫</dd></div>
+                      <div><dt>內容摘要</dt><dd data-owner-contract-preview="detail">尚未填寫</dd></div>
+                      <div><dt>影響類別</dt><dd data-owner-contract-preview="impacts">尚未選擇</dd></div>
+                      <div><dt>附件資訊</dt><dd data-owner-contract-preview="attachments">尚未加入</dd></div>
+                      <div><dt>甲方確認意向</dt><dd data-owner-contract-preview="intent">尚未標記</dd></div>
+                    </dl>
+                    <button type="button" data-action="clear-owner-contract-draft" data-owner-contract-control disabled aria-disabled="true">清除本次草稿</button>
+                    <p>這只是本次操作預覽，尚未正式儲存或送出，重新整理後不會保留。</p>
+                  </div>
+                </details>
               </div>
-              <footer class="owner-hero-dashboard__next">
-                <p><span>紀錄原則</span><strong>契約、附件、異議與回覆都保留原版本關係。</strong></p>
+              <footer class="owner-hero-dashboard__next owner-contract-governance-link">
+                <p><span>正式案件留痕</span><strong>回到治理紀錄核對已保存的契約、附件、異議與回覆版本。</strong></p>
                 <a href="#governance">查看契約治理紀錄 <span aria-hidden="true">→</span></a>
               </footer>
             </section>
