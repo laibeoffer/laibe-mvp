@@ -470,13 +470,13 @@ h1 {
   grid-row: 1 / span 3;
   width: 96px;
   height: 72px;
-  padding: 7px 9px;
+  padding: 0;
   align-self: center;
   justify-self: center;
   transform: none;
-  border: 1px solid rgba(255, 74, 11, 0.42);
+  border: 0;
   border-radius: 16px;
-  background: #f4f7f8;
+  background: transparent;
   object-fit: contain;
   object-position: center;
   pointer-events: none;

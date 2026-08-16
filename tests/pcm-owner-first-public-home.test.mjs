@@ -11,7 +11,7 @@ const pageRoot = new URL(
 const htmlUrl = new URL("code.html", pageRoot);
 const cssUrl = new URL("styles.css", pageRoot);
 const appUrl = new URL("app.js", pageRoot);
-const heroDrsMarkUrl = new URL("assets/d_rs_03_compact_434343.svg", pageRoot);
+const heroDrsMarkUrl = new URL("assets/d_rs_03_compact_d0e0e3.png", pageRoot);
 const governanceUrl = new URL(
   "../docs/governance/pcm-owner-first-execution-manifest.v1.json",
   import.meta.url,
@@ -154,15 +154,16 @@ test("homepage hero pairs the approved DRS mark with the pilot subtitle", async 
 
   assert.match(
     subtitle,
-    /<img\s+class="hero-subtitle__brand-mark"\s+src="\.\/assets\/d_rs_03_compact_434343\.svg"\s+alt="D&amp;RS"\s+width="96"\s+height="72"\s+decoding="async"\s*\/>/,
+    /<img\s+class="hero-subtitle__brand-mark"\s+src="\.\/assets\/d_rs_03_compact_d0e0e3\.png"\s+alt="D&amp;RS"\s+width="96"\s+height="72"\s+decoding="async"\s*\/>/,
   );
   await access(heroDrsMarkUrl);
   const markBytes = await readFile(heroDrsMarkUrl);
-  const markSource = markBytes.toString("utf8");
-  assert.ok(markBytes.byteLength > 8000);
-  assert.match(markSource, /viewBox="0 0 560 420"/);
-  assert.match(markSource, /#434343/i);
-  assert.match(markSource, /#ff4a0b/i);
+  assert.equal(markBytes.byteLength, 31345);
+  assert.equal(markBytes.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+  assert.equal(
+    createHash("sha256").update(markBytes).digest("hex"),
+    "665237465718c3beb59810136d7427a8dbfd53f7fcc45fedf2c225de42d62ba6",
+  );
   assert.match(subtitle, /AI時代的裝修過程，新手上路需要一位副駕駛。/);
   assert.match(
     css,
@@ -196,7 +197,7 @@ test("hero lower lockup stays close to the visible title column and readable at 
   );
   assert.match(
     css,
-    /\.hero-subtitle__brand-mark\s*\{[^}]*padding:\s*7px 9px;[^}]*border:\s*1px solid rgba\(255, 74, 11, 0\.42\);[^}]*background:\s*#f4f7f8;[^}]*filter:\s*drop-shadow\(0 12px 24px rgba\(0, 0, 0, 0\.34\)\);/s,
+    /\.hero-subtitle__brand-mark\s*\{[^}]*padding:\s*0;[^}]*border:\s*0;[^}]*background:\s*transparent;[^}]*filter:\s*drop-shadow\(0 12px 24px rgba\(0, 0, 0, 0\.34\)\);/s,
   );
   assert.match(mobileHero, /\.hero__copy\s*\{[^}]*display:\s*flex;[^}]*flex-direction:\s*column;[^}]*align-items:\s*stretch;/s);
   assert.match(
