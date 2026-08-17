@@ -599,13 +599,16 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
     assert.doesNotMatch(planned, /\shref=|data-route=/);
   }
 
-  assert.match(css, /\.entry-choice::before\s*\{[^}]*clip-path:\s*polygon\(7% 0,\s*93% 0,\s*100% 50%,\s*93% 100%,\s*7% 100%,\s*0 50%\);/s);
-  assert.match(css, /\.entry-choice__number\s*\{[^}]*clip-path:\s*polygon\(25% 0,\s*75% 0,\s*100% 50%,\s*75% 100%,\s*25% 100%,\s*0 50%\);/s);
+  const entryNumberCss = css.match(/\.entry-choice__number\s*\{[^}]*\}/s)?.[0] ?? "";
+  assert.match(css, /\.entry-choice\s*\{[^}]*border-radius:\s*24px;/s);
+  assert.match(entryNumberCss, /border-radius:\s*16px;/);
+  assert.doesNotMatch(entryNumberCss, /clip-path|polygon/);
+  assert.doesNotMatch(section, /risk-map__number|>\s*風險\s*</);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.entry-choice\s*\{/);
   assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
 });
 
-test("entry stages reproduce the owner-approved interlocking honeycomb infographic without changing the protected hero copy", async () => {
+test("entry stages adopt luminous risk-card glass with clear neutral sequence plaques", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const protectedCopy = html.match(/<div class="hero__copy">[\s\S]*?<\/div>\s*<div class="entry-choices"/)?.[0] ?? "";
@@ -615,23 +618,51 @@ test("entry stages reproduce the owner-approved interlocking honeycomb infograph
   assert.match(css, /\.hero\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*62fr\)\s+minmax\(0,\s*38fr\);/s);
   assert.match(css, /@media\s*\(min-width:\s*1001px\)[\s\S]*?\.entry-choices\s*\{[^}]*width:\s*min\(100%,\s*420px\);[^}]*justify-self:\s*start;/);
 
-  assert.match(css, /\.entry-choices__list\s*\{[^}]*gap:\s*10px;[^}]*padding:\s*14px 12px;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
-  assert.match(css, /\.entry-choice\s*\{[^}]*min-height:\s*94px;[^}]*overflow:\s*visible;[^}]*background:\s*transparent;/s);
-  assert.match(css, /\.entry-choice::before\s*\{[^}]*inset:\s*7px 0;[^}]*clip-path:\s*polygon\(7% 0,\s*93% 0,\s*100% 50%,\s*93% 100%,\s*7% 100%,\s*0 50%\);[^}]*background:\s*linear-gradient\(105deg,\s*#557a14 0%,\s*#86a90b 48%,\s*#bfd318 100%\);/s);
-  assert.match(css, /\.entry-choice:nth-child\(even\)::before\s*\{[^}]*background:\s*linear-gradient\(105deg,\s*#bfd318 0%,\s*#86a90b 52%,\s*#557a14 100%\);/s);
-  assert.match(css, /\.entry-choice__number\s*\{[^}]*width:\s*112px;[^}]*height:\s*104px;[^}]*clip-path:\s*polygon\(25% 0,\s*75% 0,\s*100% 50%,\s*75% 100%,\s*25% 100%,\s*0 50%\);[^}]*background:\s*linear-gradient\(145deg,\s*#ffffff 0%,\s*#f7f7f2 38%,\s*#c7cbc2 72%,\s*#ffffff 100%\);/s);
-  assert.match(css, /\.entry-choice__number\s*\{[^}]*filter:\s*drop-shadow\(-2px -2px 0 rgba\(255, 255, 255, 0\.72\)\)\s*drop-shadow\(2px 3px 1px rgba\(82, 91, 55, 0\.4\)\)\s*drop-shadow\(7px 10px 8px rgba\(20, 27, 5, 0\.5\)\);/s);
-  assert.match(css, /\.entry-choice__number::before\s*\{[^}]*inset:\s*9px;[^}]*background:\s*linear-gradient\(145deg,\s*rgba\(255, 255, 255, 0\.26\),\s*transparent 34%\),\s*linear-gradient\(135deg,\s*#688f0d,\s*#bad116\);[^}]*box-shadow:[^}]*inset 2px 2px 2px rgba\(255, 255, 255, 0\.28\)[^}]*inset -3px -4px 5px rgba\(57, 74, 8, 0\.34\);/s);
-  assert.match(css, /\.entry-choice:nth-child\(odd\) \.entry-choice__number\s*\{[^}]*left:\s*62%;/s);
-  assert.match(css, /\.entry-choice:nth-child\(even\) \.entry-choice__number\s*\{[^}]*left:\s*38%;/s);
-  assert.match(css, /\.entry-choice__number\s*\{[^}]*font-family:\s*"Arial Narrow",\s*"Roboto Condensed",\s*"Noto Sans TC",\s*sans-serif;[^}]*font-size:\s*2\.35rem;/s);
-  assert.match(css, /\.entry-choice:nth-child\(odd\) \.entry-choice__copy\s*\{[^}]*left:\s*6%;[^}]*width:\s*43%;/s);
-  assert.match(css, /\.entry-choice:nth-child\(even\) \.entry-choice__copy\s*\{[^}]*right:\s*6%;[^}]*width:\s*43%;/s);
-  assert.doesNotMatch(css, /@media\s*\(max-width:\s*420px\)\s*\{[\s\S]*?\.entry-choice::before\s*\{[^}]*width:\s*74px;/);
-  assert.doesNotMatch(css, /@media\s*\(max-width:\s*420px\)\s*\{[\s\S]*?\.entry-choice::after\s*\{[^}]*left:\s*74px;/);
+  const entrySection = html.slice(
+    html.indexOf('class="entry-choices"'),
+    html.indexOf('class="same-fact-rail"'),
+  );
+  const cardCss = css.match(/\.entry-choice\s*\{[^}]*\}/s)?.[0] ?? "";
+  const numberCss = css.match(/\.entry-choice__number\s*\{[^}]*\}/s)?.[0] ?? "";
+  const numberBeforeCss = css.match(/\.entry-choice__number::before\s*\{[^}]*\}/s)?.[0] ?? "";
+
+  assert.match(css, /\.entry-choices__list\s*\{[^}]*gap:\s*14px;[^}]*padding:\s*18px 12px;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;/s);
+  assert.match(cardCss, /--entry-step:\s*var\(--chapter-step-01\);/);
+  assert.match(cardCss, /display:\s*grid;/);
+  assert.match(cardCss, /grid-template-columns:\s*64px minmax\(0,\s*1fr\) 44px;/);
+  assert.match(cardCss, /min-height:\s*110px;/);
+  assert.match(cardCss, /border:\s*1px solid color-mix\(in srgb, var\(--entry-step\) 48%, rgba\(244, 247, 248, 0\.2\)\);/);
+  assert.match(cardCss, /border-radius:\s*24px;/);
+  assert.match(cardCss, /color-mix\(in srgb, var\(--chapter-surface\) 88%, transparent\)/);
+  assert.match(cardCss, /backdrop-filter:\s*blur\(26px\) saturate\(150%\);/);
+  assert.match(cardCss, /inset 0 -18px 26px color-mix\(in srgb, var\(--entry-step\) 36%, transparent\)/);
+  assert.match(css, /\.entry-choice::before\s*\{[^}]*border-radius:\s*inherit;[^}]*linear-gradient\(124deg,\s*rgba\(255, 255, 255, 0\.16\),\s*transparent 24% 72%,\s*color-mix\(in srgb, var\(--entry-step\) 11%, transparent\)\);/s);
+  assert.match(css, /\.entry-choice::after\s*\{[^}]*radial-gradient\(ellipse at center bottom,[^}]*filter:\s*blur\(7px\);/s);
+  assert.match(css, /\.entry-choice:nth-child\(2\)\s*\{[^}]*--entry-step:\s*var\(--accent-cyan\);/s);
+  assert.match(css, /\.entry-choice:nth-child\(3\)\s*\{[^}]*--entry-step:\s*var\(--accent-orange\);/s);
+  assert.match(css, /\.entry-choice:nth-child\(5\)\s*\{[^}]*--entry-step:\s*var\(--pcm\);/s);
+
+  assert.match(numberCss, /width:\s*62px;/);
+  assert.match(numberCss, /height:\s*74px;/);
+  assert.match(numberCss, /border:\s*1px solid rgba\(255, 255, 255, 0\.72\);/);
+  assert.match(numberCss, /border-radius:\s*16px;/);
+  assert.match(numberCss, /background:\s*transparent;/);
+  assert.match(numberCss, /-webkit-backdrop-filter:\s*none;/);
+  assert.match(numberCss, /backdrop-filter:\s*none;/);
+  assert.doesNotMatch(numberCss, /background:[^;}]*(?:color-mix|rgba\(5, 8, 12)/s);
+  assert.match(numberCss, /color:\s*rgba\(255, 255, 255, 0\.94\);/);
+  assert.match(numberCss, /0 0 14px rgba\(255, 255, 255, 0\.18\)/);
+  assert.match(numberCss, /text-shadow:[^;}]*0 0 14px rgba\(255, 255, 255, 0\.38\)/s);
+  assert.doesNotMatch(numberCss, /var\(--entry-step\)|color-mix/);
+  assert.match(numberBeforeCss, /background:\s*transparent;/);
+  assert.match(numberBeforeCss, /0 0 8px rgba\(255, 255, 255, 0\.12\)/);
+  assert.doesNotMatch(numberBeforeCss, /var\(--entry-step\)|color-mix/);
+  assert.doesNotMatch(numberCss, /clip-path|polygon/);
+  assert.doesNotMatch(entrySection, /risk-map__number|>\s*風險\s*</);
+  assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.entry-choice\s*\{[^}]*grid-template-columns:\s*56px minmax\(0,\s*1fr\) 40px;/s);
 });
 
-test("entry stage kickers move into the alternating blank tips as bold vermilion labels", async () => {
+test("entry stage kickers remain readable inside the glass card hierarchy", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const kickerLabels = ["文件核對", "服務確認", "成員加入", "案件治理", "驗收確認"];
@@ -649,10 +680,9 @@ test("entry stage kickers move into the alternating blank tips as bold vermilion
   assert.doesNotMatch(html, /<div class="entry-choice__copy">\s*<span class="entry-choice__kicker">/);
   assert.match(
     css,
-    /\.entry-choice__kicker\s*\{[^}]*display:\s*grid;[^}]*width:\s*2\.6em;[^}]*height:\s*2\.3em;[^}]*place-items:\s*center;[^}]*color:\s*#D94600;[^}]*font-size:\s*clamp\(1rem,\s*1\.4vw,\s*1\.125rem\);[^}]*font-weight:\s*900;[^}]*letter-spacing:\s*0\.02em;[^}]*line-height:\s*1\.05;[^}]*white-space:\s*normal;[^}]*overflow-wrap:\s*anywhere;[^}]*text-shadow:\s*0 1px 1px rgba\(18,\s*25,\s*4,\s*0\.28\);[^}]*transform:\s*translateY\(-50%\);/s,
+    /\.entry-choice__kicker\s*\{[^}]*grid-column:\s*2;[^}]*grid-row:\s*1;[^}]*align-self:\s*end;[^}]*color:\s*color-mix\(in srgb, var\(--entry-step\) 82%, #fff\);[^}]*font-size:\s*0\.68rem;[^}]*font-weight:\s*800;[^}]*letter-spacing:\s*0\.12em;[^}]*line-height:\s*1\.2;/s,
   );
-  assert.match(css, /\.entry-choice:nth-child\(odd\)\s*>\s*\.entry-choice__kicker\s*\{[^}]*right:\s*9%;[^}]*text-align:\s*center;/s);
-  assert.match(css, /\.entry-choice:nth-child\(even\)\s*>\s*\.entry-choice__kicker\s*\{[^}]*left:\s*9%;[^}]*text-align:\s*center;/s);
+  assert.doesNotMatch(css, /\.entry-choice:nth-child\((?:odd|even)\)\s*>\s*\.entry-choice__kicker/);
 });
 
 test("entry stage cards keep supporting copy visible in the editorial reading flow", async () => {
