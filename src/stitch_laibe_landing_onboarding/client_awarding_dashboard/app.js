@@ -30,6 +30,45 @@ export const OWNER_CONTRACT_IMPACT_KEYS = Object.freeze([
   "warranty",
 ]);
 
+export const OWNER_CONTRACT_FACT_KEYS = Object.freeze([
+  "ownerName",
+  "vendorName",
+  "projectName",
+  "projectAddress",
+  "designScope",
+  "worksScope",
+  "designAmount",
+  "worksAmount",
+  "startDate",
+  "endDate",
+  "paymentBasis",
+  "acceptanceBasis",
+  "warrantyBasis",
+]);
+
+const OWNER_CONTRACT_FACT_LABELS = Object.freeze({
+  ownerName: "甲方姓名／名稱",
+  vendorName: "乙方姓名／公司",
+  projectName: "專案名稱",
+  projectAddress: "專案地址",
+  designScope: "設計服務範圍",
+  worksScope: "工程施作範圍",
+  designAmount: "設計費總額",
+  worksAmount: "工程費總額",
+  startDate: "預定開始日",
+  endDate: "預定完成日",
+  paymentBasis: "付款依據",
+  acceptanceBasis: "驗收依據",
+  warrantyBasis: "保固依據",
+});
+
+export const OWNER_CONTRACT_VIEW_KEYS = Object.freeze([
+  "overview",
+  "facts",
+  "changes",
+  "records",
+]);
+
 const OWNER_CONTRACT_IMPACT_LABELS = Object.freeze({
   scope: "工作範圍",
   price: "價格",
@@ -131,6 +170,77 @@ export function reduceOwnerContractDraft(state, event) {
     default:
       return current;
   }
+}
+
+function frozenOwnerContractFactsDraft(source = {}) {
+  const values = {};
+  for (const key of OWNER_CONTRACT_FACT_KEYS) {
+    const maximumLength = [
+      "designScope",
+      "worksScope",
+      "paymentBasis",
+      "acceptanceBasis",
+      "warrantyBasis",
+    ].includes(key) ? 1000 : 240;
+    values[key] = ownerContractText(source[key], maximumLength);
+  }
+  return Object.freeze({
+    ...values,
+    formallyPersisted: false,
+    sharedWithVendor: false,
+  });
+}
+
+export function createOwnerContractFactsDraftState() {
+  return frozenOwnerContractFactsDraft();
+}
+
+export function reduceOwnerContractFactsDraft(state, event) {
+  const current = frozenOwnerContractFactsDraft(state);
+  const action = event && typeof event === "object" ? event : {};
+  if (
+    action.type === "SET_FIELD" &&
+    OWNER_CONTRACT_FACT_KEYS.includes(action.field)
+  ) {
+    return frozenOwnerContractFactsDraft({
+      ...current,
+      [action.field]: action.value,
+    });
+  }
+  if (action.type === "CLEAR") {
+    return createOwnerContractFactsDraftState();
+  }
+  return current;
+}
+
+export function summarizeOwnerContractFactsDraft(state) {
+  const current = frozenOwnerContractFactsDraft(state);
+  const completed = OWNER_CONTRACT_FACT_KEYS.filter(
+    (key) => current[key] !== "",
+  ).length;
+  return Object.freeze({
+    completed,
+    total: OWNER_CONTRACT_FACT_KEYS.length,
+    nextField: OWNER_CONTRACT_FACT_KEYS.find((key) => current[key] === "") ?? null,
+    formallyPersisted: false,
+    sharedWithVendor: false,
+  });
+}
+
+export function resolveOwnerContractViewKey(currentKey, key) {
+  const currentIndex = OWNER_CONTRACT_VIEW_KEYS.indexOf(currentKey);
+  if (currentIndex < 0) return OWNER_CONTRACT_VIEW_KEYS[0];
+  if (key === "ArrowRight" || key === "ArrowDown") {
+    return OWNER_CONTRACT_VIEW_KEYS[(currentIndex + 1) % OWNER_CONTRACT_VIEW_KEYS.length];
+  }
+  if (key === "ArrowLeft" || key === "ArrowUp") {
+    return OWNER_CONTRACT_VIEW_KEYS[
+      (currentIndex - 1 + OWNER_CONTRACT_VIEW_KEYS.length) % OWNER_CONTRACT_VIEW_KEYS.length
+    ];
+  }
+  if (key === "Home") return OWNER_CONTRACT_VIEW_KEYS[0];
+  if (key === "End") return OWNER_CONTRACT_VIEW_KEYS.at(-1);
+  return currentKey;
 }
 
 const STATE_COPY = Object.freeze({
@@ -780,6 +890,74 @@ function clearNode(node) {
   }
 }
 
+export function resolveOwnerContractViewFromHash(hash) {
+  if (hash === "#owner-contract-view-panel-overview") return "overview";
+  if (hash === "#owner-contract-view-panel-facts") return "facts";
+  if (hash === "#owner-contract-view-panel-changes") return "changes";
+  if (hash === "#owner-contract-view-panel-records") return "records";
+  return null;
+}
+
+function initializeOwnerContractViewTabs(workspace, view = null) {
+  if (!workspace || typeof workspace.querySelectorAll !== "function") {
+    return null;
+  }
+  const tabs = Array.from(
+    workspace.querySelectorAll("[data-owner-contract-view]"),
+  );
+  const panels = Array.from(
+    workspace.querySelectorAll("[data-owner-contract-view-panel]"),
+  );
+  if (
+    tabs.length !== OWNER_CONTRACT_VIEW_KEYS.length ||
+    panels.length !== OWNER_CONTRACT_VIEW_KEYS.length
+  ) {
+    return null;
+  }
+
+  function selectView(key, { focus = false } = {}) {
+    if (!OWNER_CONTRACT_VIEW_KEYS.includes(key)) return false;
+    workspace.dataset.activeOwnerContractView = key;
+    for (const tab of tabs) {
+      const selected = tab.dataset.ownerContractView === key;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected && focus) tab.focus();
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.ownerContractViewPanel !== key;
+    }
+    return true;
+  }
+
+  for (const tab of tabs) {
+    tab.addEventListener("click", () => {
+      selectView(tab.dataset.ownerContractView);
+    });
+    tab.addEventListener("keydown", (event) => {
+      const nextKey = resolveOwnerContractViewKey(
+        tab.dataset.ownerContractView,
+        event.key,
+      );
+      if (nextKey === tab.dataset.ownerContractView) return;
+      event.preventDefault();
+      selectView(nextKey, { focus: true });
+    });
+  }
+
+  const selectFromHash = () => {
+    const requestedView = resolveOwnerContractViewFromHash(view?.location?.hash);
+    if (requestedView) selectView(requestedView);
+  };
+
+  selectView(
+    resolveOwnerContractViewFromHash(view?.location?.hash) ||
+      OWNER_CONTRACT_VIEW_KEYS[0],
+  );
+  view?.addEventListener?.("hashchange", selectFromHash);
+  return Object.freeze({ selectView });
+}
+
 function initializeOwnerContractWorkspace(root) {
   if (!root || typeof root.querySelector !== "function") {
     return null;
@@ -788,6 +966,10 @@ function initializeOwnerContractWorkspace(root) {
   if (!workspace) {
     return null;
   }
+
+  const view = root.defaultView ??
+    (typeof window === "undefined" ? null : window);
+  const contractViews = initializeOwnerContractViewTabs(workspace, view);
 
   const controls = Array.from(
     workspace.querySelectorAll("[data-owner-contract-control]"),
@@ -810,7 +992,17 @@ function initializeOwnerContractWorkspace(root) {
   const sessionStatus = workspace.querySelector(
     "[data-owner-contract-session-status]",
   );
+  const factInputs = Array.from(
+    workspace.querySelectorAll("[data-owner-contract-fact]"),
+  );
+  const factsProgress = workspace.querySelector(
+    "[data-owner-contract-facts-progress]",
+  );
+  const factsSummary = workspace.querySelector(
+    "[data-owner-contract-facts-summary]",
+  );
   let draft = createOwnerContractDraftState();
+  let factsDraft = createOwnerContractFactsDraftState();
   let enabled = false;
 
   function preview(name, value) {
@@ -853,6 +1045,18 @@ function initializeOwnerContractWorkspace(root) {
     );
   }
 
+  function renderFactsDraft() {
+    const summary = summarizeOwnerContractFactsDraft(factsDraft);
+    if (factsProgress) {
+      factsProgress.textContent = `已填 ${summary.completed} / ${summary.total}`;
+    }
+    if (factsSummary) {
+      factsSummary.textContent = summary.nextField
+        ? `下一項：${OWNER_CONTRACT_FACT_LABELS[summary.nextField]}`
+        : "本頁 13 項資料已填齊；仍須完成案件授權後才能建立正式版本。";
+    }
+  }
+
   function syncInputs() {
     if (titleInput) titleInput.value = draft.title;
     if (detailInput) detailInput.value = draft.detail;
@@ -864,6 +1068,9 @@ function initializeOwnerContractWorkspace(root) {
     }
     if (attachmentNameInput) attachmentNameInput.value = "";
     if (attachmentNoteInput) attachmentNoteInput.value = "";
+    for (const input of factInputs) {
+      input.value = factsDraft[input.dataset.ownerContractFact] ?? "";
+    }
   }
 
   function dispatch(event) {
@@ -875,12 +1082,21 @@ function initializeOwnerContractWorkspace(root) {
     return draft;
   }
 
+  function dispatchFact(event) {
+    if (!enabled) return factsDraft;
+    factsDraft = reduceOwnerContractFactsDraft(factsDraft, event);
+    renderFactsDraft();
+    return factsDraft;
+  }
+
   function setEnabled(nextEnabled) {
     const allowEditing = nextEnabled === true;
     if (!allowEditing) {
       draft = createOwnerContractDraftState();
+      factsDraft = createOwnerContractFactsDraftState();
       syncInputs();
       renderDraft();
+      renderFactsDraft();
     }
     enabled = allowEditing;
     for (const control of controls) {
@@ -897,9 +1113,18 @@ function initializeOwnerContractWorkspace(root) {
   workspace.querySelector('[data-action="start-owner-contract-draft"]')
     ?.addEventListener("click", () => {
       if (!enabled) return;
-      if (editor) editor.open = true;
-      titleInput?.focus();
+      contractViews?.selectView("facts");
+      factInputs[0]?.focus();
     });
+  for (const input of factInputs) {
+    input.addEventListener("input", () => {
+      dispatchFact({
+        type: "SET_FIELD",
+        field: input.dataset.ownerContractFact,
+        value: input.value,
+      });
+    });
+  }
   titleInput?.addEventListener("input", () => {
     dispatch({ type: "SET_TITLE", value: titleInput.value });
   });
@@ -931,6 +1156,12 @@ function initializeOwnerContractWorkspace(root) {
     ?.addEventListener("click", () => {
       dispatch({ type: "CLEAR" });
       syncInputs();
+    });
+  workspace.querySelector('[data-action="clear-owner-contract-facts"]')
+    ?.addEventListener("click", () => {
+      dispatchFact({ type: "CLEAR" });
+      syncInputs();
+      factInputs[0]?.focus();
     });
 
   setEnabled(false);
@@ -1100,8 +1331,22 @@ function renderModel(root, model) {
   });
 }
 
+export function resolveOwnerDashboardTabFromHash(hash) {
+  if (
+    hash === "#owner-dashboard-panel-contract" ||
+    hash === "#governance" ||
+    resolveOwnerContractViewFromHash(hash)
+  ) {
+    return "contract";
+  }
+  if (hash === "#construction-records") return "construction";
+  if (hash === "#design-review") return "design";
+  return null;
+}
+
 export function initializeOwnerDashboardTabs(
   root = typeof document === "undefined" ? null : document,
+  view = typeof window === "undefined" ? null : window,
 ) {
   if (!root || typeof root.querySelector !== "function") {
     return null;
@@ -1163,8 +1408,13 @@ export function initializeOwnerDashboardTabs(
     });
   }
 
+  const hashTab = resolveOwnerDashboardTabFromHash(view?.location?.hash);
   dashboard.dataset.ownerTabsReady = "true";
-  selectTab(dashboard.dataset.activeOwnerTab || tabKeys[0]);
+  selectTab(hashTab || dashboard.dataset.activeOwnerTab || tabKeys[0]);
+  view?.addEventListener?.("hashchange", () => {
+    const nextTab = resolveOwnerDashboardTabFromHash(view.location?.hash);
+    if (nextTab) selectTab(nextTab);
+  });
   return Object.freeze({ selectTab });
 }
 

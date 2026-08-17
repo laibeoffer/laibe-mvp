@@ -16,6 +16,12 @@ function loadRuntime() {
   return import(new URL("app.js", pageRoot).href);
 }
 
+function ownerContractPanel(html) {
+  const start = html.indexOf('id="owner-dashboard-panel-contract"');
+  const end = html.indexOf('data-layout="owner-line-conversation"', start);
+  return start >= 0 && end > start ? html.slice(start, end) : "";
+}
+
 function sha256(value) {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
@@ -137,7 +143,7 @@ test("甲方 HERO 內提供三個治理分頁且只有設計案與主面板一�
     /data-owner-tab="contract"[\s\S]*>\s*契約管理\s*</,
   );
   assert.equal((html.match(/data-owner-tab=/g) || []).length, 3);
-  assert.equal((html.match(/role="tabpanel"/g) || []).length, 3);
+  assert.equal((html.match(/data-owner-panel=/g) || []).length, 3);
 
   assert.match(
     css,
@@ -1384,19 +1390,57 @@ test("mobile header keeps the current case identity visible", async () => {
 
 test("甲方契約工作區先交代角色、版本、狀態、責任與唯一主要行動", async () => {
   const html = await readPageFile("code.html");
-  const panelStart = html.indexOf('id="owner-dashboard-panel-contract"');
-  const panelEnd = html.indexOf("</section>", panelStart);
-  const panel = html.slice(panelStart, panelEnd);
+  const panel = ownerContractPanel(html);
 
-  assert.ok(panelStart >= 0, "contract panel exists");
+  assert.ok(panel, "contract panel exists");
   assert.match(panel, /目前角色/u);
   assert.match(panel, /甲方（業主）/u);
-  assert.match(panel, /契約類型與版本/u);
+  assert.match(panel, /本案契約/u);
   assert.match(panel, /目前狀態/u);
   assert.match(panel, /下一位處理者/u);
-  assert.match(panel, /整理本次契約草稿/u);
+  assert.match(panel, /繼續填寫本案契約/u);
   assert.equal((panel.match(/owner-contract-primary-action/g) || []).length, 1);
   assert.match(panel, /disabled[^>]*aria-disabled="true"/u);
+});
+
+test("甲方契約工作區先顯示甲乙共用契約全文，再進入補充或變更草稿", async () => {
+  const html = await readPageFile("code.html");
+  const panel = ownerContractPanel(html);
+  const sharedContractStart = panel.indexOf("data-shared-contract");
+  const draftEditorStart = panel.indexOf("data-owner-contract-editor");
+
+  assert.ok(sharedContractStart >= 0, "shared contract card exists");
+  assert.ok(draftEditorStart > sharedContractStart, "shared contract precedes the draft editor");
+  assert.match(panel, /data-shared-contract-id="LAIBE-DESIGN-BUILD-V02"/u);
+  assert.match(panel, /data-shared-contract-type="DESIGN_BUILD"/u);
+  assert.match(panel, /建築物室內裝修設計及工程承攬契約/u);
+  assert.match(panel, /雙方看到同一份唯讀條文/u);
+  assert.match(
+    panel,
+    /data-shared-contract-preview[^>]*href="\.\.\/\.\.\/\.\.\/site\/standard_contract_editor\/code\.html\?contractType=DESIGN_BUILD&amp;returnTo=owner"/u,
+  );
+  assert.match(panel, /查看契約全文/u);
+});
+
+test("甲方契約編輯依總覽、待填、變更與紀錄分頁呈現且草稿編輯器預設展開", async () => {
+  const html = await readPageFile("code.html");
+  const panel = ownerContractPanel(html);
+  const previewStart = panel.indexOf("data-shared-contract");
+  const factsStart = panel.indexOf('data-owner-contract-view-panel="facts"');
+  const editorStart = panel.indexOf("data-owner-contract-editor");
+  const recordsStart = panel.indexOf('data-owner-contract-view-panel="records"');
+
+  assert.ok(previewStart >= 0, "shared preview exists");
+  assert.ok(factsStart > previewStart, "facts task follows the preview");
+  assert.ok(editorStart > factsStart, "change editor follows the facts task");
+  assert.ok(recordsStart > editorStart, "records follow the change editor");
+  assert.match(panel, /本案契約資料草稿/u);
+  assert.match(panel, /雙方與專案/u);
+  assert.match(panel, /工作範圍、價金與工期/u);
+  assert.match(panel, /付款、驗收與保固/u);
+  assert.match(panel, /<details[^>]*data-owner-contract-editor[^>]*open/u);
+  assert.match(panel, /不會直接改動契約全文/u);
+  assert.match(panel, /目前只保留在這個頁面/u);
 });
 
 test("甲方契約工作區以漸進方式涵蓋七類影響、四方責任與 session 邊界", async () => {
@@ -1414,13 +1458,13 @@ test("甲方契約工作區以漸進方式涵蓋七類影響、四方責任與 s
   for (const key of requiredImpactKeys) {
     assert.match(html, new RegExp(`data-owner-contract-impact="${key}"`));
   }
-  for (const label of ["DRS Review", "甲方決策", "乙方回覆", "雙方合意"]) {
+  for (const label of ["萊比風險整理", "甲方提出", "乙方回覆", "雙方確認"]) {
     assert.match(html, new RegExp(label));
   }
-  assert.match(html, /版本歷程/u);
-  assert.match(html, /結構化補充/u);
+  assert.match(html, /版本與案件紀錄/u);
+  assert.match(html, /補充與變更/u);
   assert.match(html, /附件資訊草稿/u);
-  assert.match(html, /本次操作紀錄預覽/u);
+  assert.match(html, /本次草稿預覽/u);
   assert.match(html, /尚未正式儲存或送出/u);
   assert.match(html, /重新整理後不會保留/u);
   assert.match(html, /只記錄檔名與說明，不會上傳檔案/u);
@@ -1539,16 +1583,14 @@ test("甲方契約編輯權只由 AUTHORIZED_READY render path 切換", async ()
 
 test("甲方契約 reviewer journey 在分頁內保留治理紀錄次要入口", async () => {
   const html = await readPageFile("code.html");
-  const panelStart = html.indexOf('id="owner-dashboard-panel-contract"');
-  const panelEnd = html.indexOf("</section>", panelStart);
-  const panel = html.slice(panelStart, panelEnd);
+  const panel = ownerContractPanel(html);
 
   assert.match(
     panel,
     /class="owner-hero-dashboard__next owner-contract-governance-link"[\s\S]*href="#governance"[\s\S]*查看契約治理紀錄/u,
   );
   assert.equal((panel.match(/owner-contract-primary-action/g) || []).length, 1);
-  assert.equal((panel.match(/整理本次契約草稿/g) || []).length, 1);
+  assert.equal((panel.match(/繼續填寫本案契約/g) || []).length, 1);
 });
 
 test("甲方契約 reviewer overflow guard 與草稿長度契約限制極端內容", async () => {
@@ -1568,4 +1610,120 @@ test("甲方契約 reviewer overflow guard 與草稿長度契約限制極端內�
   assert.match(runtime, /detail:\s*ownerContractText\(source\.detail,\s*2000\)/u);
   assert.match(runtime, /name:\s*ownerContractText\(attachment\?\.name,\s*180\)/u);
   assert.match(runtime, /note:\s*ownerContractText\(attachment\?\.note,\s*300\)/u);
+});
+
+test("甲方契約管理以四個小白任務分頁分開服務資格、專案契約與本次草稿", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const panelStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const panel = html.slice(panelStart, html.indexOf("</section>", panelStart));
+
+  assert.equal((panel.match(/data-owner-contract-view="(?:overview|facts|changes|records)"/g) || []).length, 4);
+  for (const label of ["契約總覽", "待我填寫", "補充與變更", "版本與紀錄"]) {
+    assert.match(panel, new RegExp(label));
+  }
+  assert.match(panel, /萊比服務資格/u);
+  assert.match(panel, /本案甲乙契約/u);
+  assert.match(panel, /繼續填寫本案契約/u);
+  assert.doesNotMatch(panel, /開始編輯契約資料/u);
+  assert.match(panel, /contractType=DESIGN_BUILD&amp;returnTo=owner/u);
+  assert.match(panel, /雙方看到同一份唯讀條文；本頁草稿尚未保存，也尚未同步給另一方/u);
+  assert.match(css, /\.owner-contract-view-tabs\s*\{/u);
+});
+
+test("契約預覽返回甲方工作台時直接開啟待我填寫而不是契約總覽", async () => {
+  const runtime = await loadRuntime();
+
+  assert.equal(
+    runtime.resolveOwnerDashboardTabFromHash("#owner-contract-view-panel-facts"),
+    "contract",
+  );
+  assert.equal(
+    runtime.resolveOwnerContractViewFromHash("#owner-contract-view-panel-facts"),
+    "facts",
+  );
+  assert.equal(
+    runtime.resolveOwnerContractViewFromHash("#owner-contract-view-panel-changes"),
+    "changes",
+  );
+  assert.equal(
+    runtime.resolveOwnerContractViewFromHash("#owner-contract-view-panel-records"),
+    "records",
+  );
+  assert.equal(runtime.resolveOwnerContractViewFromHash("#design-review"), null);
+});
+
+test("甲方本案契約資料草稿涵蓋雙方、專案、價金工期、付款驗收與保固", async () => {
+  const html = await readPageFile("code.html");
+  const requiredFields = [
+    "ownerName",
+    "vendorName",
+    "projectName",
+    "projectAddress",
+    "designScope",
+    "worksScope",
+    "designAmount",
+    "worksAmount",
+    "startDate",
+    "endDate",
+    "paymentBasis",
+    "acceptanceBasis",
+    "warrantyBasis",
+  ];
+  for (const field of requiredFields) {
+    assert.match(html, new RegExp(`data-owner-contract-fact="${field}"`));
+  }
+  assert.match(html, /目前只保留在這個頁面/u);
+  assert.match(html, /重新整理後需重新輸入/u);
+  assert.doesNotMatch(html, /已同步給乙方|已正式儲存|已建立正式版本/u);
+});
+
+test("甲方契約資料 reducer 只維護本頁草稿並計算完成進度", async () => {
+  const {
+    OWNER_CONTRACT_FACT_KEYS,
+    createOwnerContractFactsDraftState,
+    reduceOwnerContractFactsDraft,
+    summarizeOwnerContractFactsDraft,
+  } = await loadRuntime();
+
+  assert.equal(OWNER_CONTRACT_FACT_KEYS.length, 13);
+  const initial = createOwnerContractFactsDraftState();
+  const withOwner = reduceOwnerContractFactsDraft(initial, {
+    type: "SET_FIELD",
+    field: "ownerName",
+    value: "  林小姐  ",
+  });
+  const withProject = reduceOwnerContractFactsDraft(withOwner, {
+    type: "SET_FIELD",
+    field: "projectName",
+    value: "自宅裝修",
+  });
+  const ignored = reduceOwnerContractFactsDraft(withProject, {
+    type: "SET_FIELD",
+    field: "unknown",
+    value: "不得寫入",
+  });
+
+  assert.equal(initial.ownerName, "");
+  assert.equal(withOwner.ownerName, "林小姐");
+  assert.equal(Object.hasOwn(ignored, "unknown"), false);
+  assert.deepEqual(summarizeOwnerContractFactsDraft(withProject), {
+    completed: 2,
+    total: 13,
+    nextField: "vendorName",
+    formallyPersisted: false,
+    sharedWithVendor: false,
+  });
+  assert.equal(Object.isFrozen(withProject), true);
+});
+
+test("甲方工作台可由契約預覽返回連結直接開啟契約管理", async () => {
+  const { resolveOwnerDashboardTabFromHash } = await loadRuntime();
+  assert.equal(resolveOwnerDashboardTabFromHash("#owner-dashboard-panel-contract"), "contract");
+  assert.equal(resolveOwnerDashboardTabFromHash("#governance"), "contract");
+  assert.equal(resolveOwnerDashboardTabFromHash("#construction-records"), "construction");
+  assert.equal(resolveOwnerDashboardTabFromHash("#design-review"), "design");
+  assert.equal(resolveOwnerDashboardTabFromHash("#unknown"), null);
 });

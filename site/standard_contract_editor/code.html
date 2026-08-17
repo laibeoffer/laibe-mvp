@@ -88,6 +88,19 @@
     .topbar__divider { width: 1px; height: 25px; background: var(--line-strong); }
     .topbar__title { font-size: 13px; font-weight: 850; letter-spacing: .04em; }
     .topbar__meta { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .topbar__return {
+      display: inline-flex;
+      min-height: 34px;
+      padding: 0 13px;
+      align-items: center;
+      border: 1px solid rgba(255, 138, 43, .5);
+      border-radius: 999px;
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .topbar__return:hover { background: rgba(255, 138, 43, .1); }
     .legal-pill, .version-pill {
       display: inline-flex;
       align-items: center;
@@ -140,6 +153,7 @@
       font-weight: 650;
       line-height: 1.8;
     }
+    .preview-template-note { margin: 7px 0 0; color: #c7a98f; font-size: 12px; font-weight: 750; }
 
     .type-switch {
       max-width: 460px;
@@ -389,6 +403,8 @@
 
     .rail-button, .primary-action, .secondary-action { width: 100%; min-height: 44px; padding: 10px 14px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 900; line-height: 1.4; }
     .primary-action { border: 0; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-deep) 58%, #c93e12); box-shadow: 0 10px 24px rgba(229, 88, 30, .25); }
+    a.primary-action { display: inline-flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; }
+    a.primary-action:hover { filter: brightness(1.06); }
     .secondary-action, .rail-button { border: 1px solid var(--line-strong); color: var(--text); background: rgba(255,255,255,.04); }
     .rail-button { margin-top: 10px; min-height: 38px; color: #d7dbe0; font-size: 10px; }
     .secondary-action:hover, .rail-button:hover { border-color: rgba(255, 138, 43, .65); }
@@ -775,30 +791,54 @@
 
     @media screen and (max-width: 620px) {
       .contract-book { padding: 7px; }
-      .contract-book__page--index { padding: 22px 20px; }
+      .contract-book__page--index { min-height: 0; padding: 17px 18px; }
       .contract-book__brand { width: 100%; }
       .contract-book .contract-book__brand-title { max-width: none; font-size: clamp(1.45rem, 7vw, 1.9rem); }
-      .contract-reader__layout { grid-template-columns: minmax(0, 1fr) 66px; }
-      .contract-page-tabs { top: 96px; width: 66px; height: 100%; flex-direction: column; }
-      .contract-page-tab {
-        width: 66px;
-        min-width: 66px;
+      .contract-book__page--index > h2,
+      .contract-book__page--index .status-spine,
+      .contract-book__page--index .contract-book__progress,
+      .contract-book__page--index .status-board__footer { display: none; }
+      .contract-book__page--index .contract-state-card { margin-top: 14px; padding: 14px; }
+      .contract-reader__layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+      .contract-page-tabs {
+        position: sticky;
+        z-index: 4;
+        top: 68px;
+        width: 100%;
         height: auto;
-        min-height: 44px;
+        order: -1;
+        flex-direction: row;
+      }
+      .contract-page-tab {
+        width: 25%;
+        min-width: 0;
+        height: 54px;
+        min-height: 54px;
         max-width: 100%;
-        padding: 8px 4px;
+        padding: 7px 3px;
         align-items: center;
         justify-content: center;
         flex: 1 1 0;
-        border-top: 1px solid rgb(245 237 225 / 28%);
-        border-left: 0;
+        border-top: 0;
+        border-left: 1px solid rgb(245 237 225 / 28%);
         overflow-wrap: anywhere;
-        writing-mode: vertical-rl;
+        writing-mode: horizontal-tb;
       }
-      .contract-page-tab__label { display: inline; font-size: 12px; letter-spacing: .08em; }
+      .contract-page-tab:first-child { border-left: 0; }
+      .contract-page-tab__number { font-size: 9px; }
+      .contract-page-tab__label { display: inline; font-size: 10px; letter-spacing: .01em; line-height: 1.2; text-align: center; }
       .contract-page-tab__dot { display: none; }
       .contract-page-deck .rail { display: block; padding: 22px 18px 26px; }
       .contract-page-deck .rail-card { padding: 18px 0; }
+      .topbar__title { display: none; }
+      .topbar__return { margin-left: auto; padding-inline: 11px; }
+      .topbar__meta { margin-left: 0; }
+      .legal-pill { display: none; }
+      .mobile-next-action { gap: 10px; }
+      .mobile-next-action__return { color: var(--orange); font-size: 12px; font-weight: 850; text-decoration: none; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -828,6 +868,7 @@
       <a class="brand" href="#top" aria-label="LaiBE，回到契約預覽頂端"><span aria-hidden="true">LaiBE</span></a>
       <span class="topbar__divider" aria-hidden="true"></span>
       <span class="topbar__title">專案契約唯讀預覽</span>
+      <a class="topbar__return" id="return-to-workspace" hidden>返回契約管理</a>
       <div class="topbar__meta">
         <span class="legal-pill" id="legal-status">法務審閱待完成</span>
         <span class="version-pill" id="template-version">v0.2</span>
@@ -841,6 +882,7 @@
         <p class="eyebrow">萊比・專案契約唯讀預覽</p>
         <h1 id="page-title">在同一份來源上，檢視專案契約。</h1>
         <p class="intro__copy">這是唯讀預覽。你可以切換契約類型、展開條文與列印目前版本；本頁不修改、不儲存，也不會代替甲方決策、乙方回應或雙方合意。</p>
+        <p class="preview-template-note">未連結案件時，切換只切換範本，不會修改案件。</p>
       </div>
       <div class="type-switch" id="contract-type-switch" role="group" aria-label="選擇契約類型">
         <button type="button" data-contract-type="DESIGN" aria-pressed="false">設計契約</button>
@@ -981,6 +1023,7 @@
           <h3 id="next-action-title">下一步：從授權案件入口開啟</h3>
           <p id="next-action-detail">這是中性範本，不代表任何案件已建立契約。</p>
           <div class="action-stack">
+            <a class="primary-action reader-return-action" id="reader-return-to-workspace" hidden>回工作台繼續處理</a>
             <button class="secondary-action" type="button" id="expand-articles-action">展開契約全文</button>
             <button class="primary-action" type="button" id="print-preview">列印目前預覽</button>
           </div>
@@ -1018,6 +1061,7 @@
 
   <div class="mobile-next-action" id="mobile-next-action">
     <div><span>目前真正下一步</span><strong id="mobile-next-action-label">從授權案件入口開啟</strong></div>
+    <a class="mobile-next-action__return" id="mobile-return-to-workspace" hidden>返回契約管理</a>
   </div>
 
   <script src="../shared/laibe-project-contract-source.js"></script>

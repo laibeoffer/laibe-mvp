@@ -75,6 +75,18 @@ function count(source, pattern) {
   return source.match(pattern)?.length ?? 0;
 }
 
+function vendorWorkspacePanel(html, kind) {
+  const start = html.indexOf(`data-vendor-workspace-panel="${kind}"`);
+  if (start < 0) return "";
+  const nextMarker = kind === "design"
+    ? 'data-vendor-workspace-panel="construction"'
+    : kind === "construction"
+      ? 'data-vendor-workspace-panel="contract"'
+      : 'class="conversation-boundary"';
+  const end = html.indexOf(nextMarker, start);
+  return end > start ? html.slice(start, end) : "";
+}
+
 function restoreDescriptor(target, key, descriptor) {
   if (descriptor) {
     Object.defineProperty(target, key, descriptor);
@@ -114,7 +126,8 @@ async function assertLocalReferences(directory) {
 
   for (const reference of references) {
     assert.doesNotMatch(reference, /^(?:https?:)?\/\//iu, reference);
-    const [relativePath, fragment] = reference.split("#");
+    const [relativeUrl, fragment] = reference.split("#");
+    const [relativePath] = relativeUrl.split("?");
     if (!relativePath) {
       assert.match(html, new RegExp(`id=["']${fragment}["']`, "u"), reference);
       continue;
@@ -461,9 +474,9 @@ test("workspace copy preserves the contract attachment review and conversation b
     assert.match(html, new RegExp(label, "u"), label);
   }
   assert.equal(count(html, /\bdata-resource-code=/gu), 10);
-  assert.match(html, /甲方只提送[^<]*契約簽署草稿/u);
-  assert.match(html, /乙方[^<]*附件[^<]*不限次數[^<]*PCM[^<]*審查/u);
-  assert.match(html, /已執行[^<]*原契約[^<]*簽章[^<]*不可變/u);
+  assert.match(html, /雙方看到同一份唯讀條文/u);
+  assert.match(html, /本頁草稿尚未保存，也尚未同步給另一方/u);
+  assert.match(html, /已成立的原契約不會被本頁草稿改寫/u);
   assert.match(html, /另建[^<]*附約草稿/u);
   assert.match(html, /公開[^<]*PCM[^<]*審查意見/u);
   assert.match(html, /平台外[^<]*協商/u);
@@ -702,9 +715,7 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
 
 test("vendor resource ownership matches the three governance panels", async () => {
   const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
-  const panel = (kind) => html.match(
-    new RegExp(`<section class="vendor-workspace-panel"[^>]*data-vendor-workspace-panel="${kind}"[\\s\\S]*?<\\/section>`, "u"),
-  )?.[0] ?? "";
+  const panel = (kind) => vendorWorkspacePanel(html, kind);
   const resourceCodes = (source) => [...source.matchAll(/data-resource-code="([A-Z_]+)"/gu)]
     .map((match) => match[1]);
 
@@ -1019,32 +1030,30 @@ test("vendor contract tab exposes one truthful session-only supplement and chang
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
   ]);
-  const contractPanel = html.match(
-    /<section class="vendor-workspace-panel"[^>]*data-vendor-workspace-panel="contract"[\s\S]*?<\/section>/u,
-  )?.[0] ?? "";
+  const contractPanel = vendorWorkspacePanel(html, "contract");
 
-  assert.match(contractPanel, /契約類型／有效版本/u);
+  assert.match(contractPanel, /本案契約/u);
   assert.match(contractPanel, /目前回應狀態/u);
   assert.match(contractPanel, /下一步責任人/u);
   assert.equal(count(contractPanel, /\bdata-vendor-contract-primary-action\b/gu), 1);
-  assert.match(contractPanel, /整理本次補件／變更/u);
+  assert.match(contractPanel, /整理本次回覆/u);
   assert.match(contractPanel, /data-vendor-contract-editor/u);
   assert.match(contractPanel, /data-vendor-contract-form/u);
   assert.match(contractPanel, /data-vendor-contract-classification/u);
   assert.match(contractPanel, /data-vendor-contract-response-status/u);
   assert.match(contractPanel, /data-vendor-contract-draft-status/u);
   assert.match(contractPanel, /data-vendor-contract-hierarchy-status/u);
-  assert.match(contractPanel, /補件說明/u);
-  assert.match(contractPanel, /影響分類/u);
-  assert.match(contractPanel, /關聯版本/u);
+  assert.match(contractPanel, /要回覆什麼/u);
+  assert.match(contractPanel, /哪些契約條件可能受影響/u);
+  assert.match(contractPanel, /依據哪個版本/u);
   assert.match(contractPanel, /附件資料/u);
   assert.match(contractPanel, /乙方回應/u);
   assert.match(contractPanel, /甲方決定/u);
-  assert.match(contractPanel, /雙方另行合意/u);
-  assert.match(contractPanel, /DRS 審查/u);
-  assert.match(contractPanel, /付款狀態/u);
+  assert.match(contractPanel, /雙方另行確認/u);
+  assert.match(contractPanel, /萊比風險整理/u);
+  assert.match(contractPanel, /正式版本/u);
   assert.match(contractPanel, /尚未正式送出，也未保存為案件紀錄/u);
-  assert.match(contractPanel, /補件不會改變契約/u);
+  assert.match(contractPanel, /沒有影響契約條件時屬於補充資料/u);
   assert.match(contractPanel, /變更提案/u);
   assert.match(contractPanel, /data-vendor-contract-control[^>]*disabled[^>]*aria-disabled="true"/u);
   assert.doesNotMatch(contractPanel, /已送出|已保存|已簽署|已同意|已付款/u);
@@ -1054,6 +1063,69 @@ test("vendor contract tab exposes one truthful session-only supplement and chang
     css,
     /@media\s*\(max-width:\s*768px\)[\s\S]*?\.vendor-contract-form-grid\s*\{[\s\S]*?grid-template-columns:\s*1fr/u,
   );
+});
+
+test("owner and vendor contract tabs share one contract identity and orange book preview source", async () => {
+  const ownerPage = path.join(
+    repositoryRoot,
+    "src",
+    "stitch_laibe_landing_onboarding",
+    "client_awarding_dashboard",
+    "code.html",
+  );
+  const previewPage = path.join(
+    repositoryRoot,
+    "site",
+    "standard_contract_editor",
+    "code.html",
+  );
+  const [ownerHtml, vendorHtml, previewHtml] = await Promise.all([
+    readFile(ownerPage, "utf8"),
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(previewPage, "utf8"),
+  ]);
+  const ownerCard = ownerHtml.match(/<article\s+class="shared-contract-card"[\s\S]*?<\/article>/u)?.[0] ?? "";
+  const vendorCard = vendorHtml.match(/<article\s+class="shared-contract-card"[\s\S]*?<\/article>/u)?.[0] ?? "";
+  const ownerHref = ownerCard.match(/data-shared-contract-preview[^>]*href="([^"]+)"/u)?.[1] ?? "";
+  const vendorHref = vendorCard.match(/data-shared-contract-preview[^>]*href="([^"]+)"/u)?.[1] ?? "";
+  const ownerPreviewUrl = new URL(ownerHref.replaceAll("&amp;", "&"), pathToFileURL(ownerPage));
+  const vendorPreviewUrl = new URL(vendorHref.replaceAll("&amp;", "&"), pathToFileURL(pagePath(workspaceDir, "code.html")));
+
+  assert.match(ownerCard, /data-shared-contract-id="LAIBE-DESIGN-BUILD-V02"/u);
+  assert.match(vendorCard, /data-shared-contract-id="LAIBE-DESIGN-BUILD-V02"/u);
+  assert.match(ownerCard, /data-shared-contract-type="DESIGN_BUILD"/u);
+  assert.match(vendorCard, /data-shared-contract-type="DESIGN_BUILD"/u);
+  assert.equal(ownerPreviewUrl.pathname, vendorPreviewUrl.pathname);
+  assert.equal(ownerPreviewUrl.searchParams.get("contractType"), "DESIGN_BUILD");
+  assert.equal(vendorPreviewUrl.searchParams.get("contractType"), "DESIGN_BUILD");
+  assert.equal(ownerPreviewUrl.searchParams.get("returnTo"), "owner");
+  assert.equal(vendorPreviewUrl.searchParams.get("returnTo"), "vendor");
+  assert.ok(vendorHtml.indexOf("data-shared-contract") < vendorHtml.indexOf("data-vendor-contract-editor"));
+  assert.match(ownerCard, /雙方看到同一份唯讀條文/u);
+  assert.match(vendorCard, /雙方看到同一份唯讀條文/u);
+  assert.match(previewHtml, /--book-cover:\s*#C94318/iu);
+  assert.match(previewHtml, /class="contract-book__spine"/u);
+  assert.match(previewHtml, /class="contract-book__reader contract-reading"/u);
+  assert.match(previewHtml, /id="contract-book"[^>]*aria-label="專案契約唯讀預覽"/u);
+});
+
+test("vendor contract editing scope is separated into task tabs and keeps owner facts protected", async () => {
+  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  const panel = vendorWorkspacePanel(html, "contract");
+  const tabsStart = panel.indexOf("data-vendor-contract-edit-overview");
+  const previewStart = panel.indexOf("data-shared-contract");
+  const editorStart = panel.indexOf("data-vendor-contract-editor");
+
+  assert.ok(previewStart >= 0, "shared preview exists");
+  assert.ok(tabsStart >= 0 && tabsStart < previewStart, "task tabs precede the preview");
+  assert.ok(editorStart > previewStart, "reply editor follows the shared preview");
+  assert.match(panel, /待我回覆/u);
+  assert.match(panel, /補充資料或說明影響/u);
+  assert.match(panel, /附件資料/u);
+  assert.match(panel, /請甲方決定/u);
+  assert.match(panel, /<details[^>]*data-vendor-contract-editor[^>]*open/u);
+  assert.match(panel, /乙方回覆不等於甲方同意/u);
+  assert.doesNotMatch(panel, /data-owner-contract-fact/u);
 });
 
 test("vendor governance dashboard lives inside the hero and only the first active tab joins its panel", async () => {
@@ -1181,4 +1253,58 @@ test("local references language UTF-8 and accessibility source stay bounded", as
       stdio: "pipe",
     });
   }
+});
+
+test("vendor 契約管理以四個任務分頁說清共同預覽、待回覆、決定與紀錄", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const contractPanel = html.match(
+    /<section class="vendor-workspace-panel"[^>]*data-vendor-workspace-panel="contract"[\s\S]*?<\/section>/u,
+  )?.[0] ?? "";
+
+  assert.equal((contractPanel.match(/data-vendor-contract-view="(?:overview|reply|decision|records)"/g) || []).length, 4);
+  for (const label of ["契約總覽", "待我回覆", "變更與決定", "版本與紀錄"]) {
+    assert.match(contractPanel, new RegExp(label));
+  }
+  assert.match(contractPanel, /contractType=DESIGN_BUILD&amp;returnTo=vendor/u);
+  assert.match(contractPanel, /雙方看到同一份唯讀條文；本頁草稿尚未保存，也尚未同步給另一方/u);
+  assert.doesNotMatch(contractPanel, /甲乙內容一致/u);
+  assert.match(css, /\.vendor-contract-view-tabs\s*\{/u);
+});
+
+test("vendor 契約內層任務分頁支援循環方向鍵與 Home End", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-view-tabs"));
+  assert.deepEqual(
+    ownListValues(runtime.VENDOR_CONTRACT_VIEW_KEYS, "VENDOR_CONTRACT_VIEW_KEYS"),
+    ["overview", "reply", "decision", "records"],
+  );
+  assert.equal(runtime.resolveVendorContractViewKey("overview", "ArrowRight"), "reply");
+  assert.equal(runtime.resolveVendorContractViewKey("overview", "ArrowLeft"), "records");
+  assert.equal(runtime.resolveVendorContractViewKey("decision", "Home"), "overview");
+  assert.equal(runtime.resolveVendorContractViewKey("reply", "End"), "records");
+  assert.equal(runtime.resolveVendorContractViewKey("reply", "Escape"), "reply");
+});
+
+test("契約預覽返回乙方工作台時直接開啟待我回覆而不是契約總覽", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "contract-return-task"));
+
+  assert.equal(
+    runtime.resolveVendorWorkspaceTabForFragment("#vendor-contract-view-panel-reply"),
+    "contract",
+  );
+  assert.equal(
+    runtime.resolveVendorContractViewFromFragment("#vendor-contract-view-panel-reply"),
+    "reply",
+  );
+  assert.equal(
+    runtime.resolveVendorContractViewFromFragment("#vendor-contract-view-panel-decision"),
+    "decision",
+  );
+  assert.equal(
+    runtime.resolveVendorContractViewFromFragment("#vendor-contract-view-panel-records"),
+    "records",
+  );
+  assert.equal(runtime.resolveVendorContractViewFromFragment("#execution"), null);
 });

@@ -10,6 +10,16 @@
 
   var CONTRACT_TYPES = ["DESIGN", "WORKS", "DESIGN_BUILD"];
   var PREVIEW_ROUTE = "/site/standard_contract_editor/code.html";
+  var RETURN_TARGETS = Object.freeze({
+    owner: Object.freeze({
+      label: "回甲方工作台繼續填寫",
+      href: "../../src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html#owner-contract-view-panel-facts",
+    }),
+    vendor: Object.freeze({
+      label: "回乙方工作台繼續回覆",
+      href: "../../src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html#vendor-contract-view-panel-reply",
+    }),
+  });
   var TYPE_LABELS = {
     DESIGN: "設計契約",
     WORKS: "工程承攬契約",
@@ -173,6 +183,10 @@
     return CONTRACT_TYPES.indexOf(value) >= 0 ? value : "DESIGN";
   }
 
+  function normalizePreviewReturnTarget(value) {
+    return value === "owner" || value === "vendor" ? value : null;
+  }
+
   function isOrdinaryRecord(candidate) {
     if (!candidate || typeof candidate !== "object") return false;
     try {
@@ -224,8 +238,12 @@
     });
   }
 
-  function buildProjectContractPreviewHref(contractType) {
-    return PREVIEW_ROUTE + "?contractType=" + encodeURIComponent(normalizePreviewContractType(contractType));
+  function buildProjectContractPreviewHref(contractType, returnTarget) {
+    var href = PREVIEW_ROUTE + "?contractType=" + encodeURIComponent(normalizePreviewContractType(contractType));
+    var normalizedReturnTarget = normalizePreviewReturnTarget(returnTarget);
+    return normalizedReturnTarget
+      ? href + "&returnTo=" + encodeURIComponent(normalizedReturnTarget)
+      : href;
   }
 
   function assembleProjectContractPreview(engine, contractType, context) {
@@ -299,6 +317,7 @@
       contract: null,
       context: resolveProjectContractPreviewContext(root.LaibeProjectContractPreviewContext),
       contextAllowed: false,
+      returnTarget: null,
     };
 
     function byId(id) {
@@ -320,8 +339,25 @@
         "payment-render-root", "articles-render-root", "article-count", "appendix-render-root",
         "attachment-list", "review-status-list", "next-action-title", "next-action-detail",
         "mobile-next-action-label", "preview-context-kind", "preview-role", "preview-version",
-        "preview-status", "preview-next-owner",
+        "preview-status", "preview-next-owner", "return-to-workspace", "reader-return-to-workspace",
+        "mobile-return-to-workspace",
       ].forEach(function collect(id) { refs[id] = byId(id); });
+    }
+
+    function renderReturnNavigation() {
+      var config = state.returnTarget ? RETURN_TARGETS[state.returnTarget] : null;
+      [
+        refs["return-to-workspace"],
+        refs["reader-return-to-workspace"],
+        refs["mobile-return-to-workspace"],
+      ].forEach(function update(link) {
+        if (!link) return;
+        link.hidden = !config;
+        if (config) {
+          link.href = config.href;
+          link.textContent = config.label;
+        }
+      });
     }
 
     function roleLabel(role) {
@@ -375,7 +411,7 @@
       refs["next-action-title"].textContent = context ? "下一步：依角色完成案件檢視" : "下一步：從授權案件入口開啟";
       refs["next-action-detail"].textContent = context
         ? "請依目前角色核對條文、付款依據與附件。DRS 文件審閱可整理差異；甲方決策、乙方回應與雙方合意仍須各自留下紀錄。"
-        : "這是中性範本，不代表任何案件已建立契約。需要案件版本時，請回到有權限的案件頁進入。";
+        : "這是中性範本，不代表任何案件已建立契約；切換只切換範本，不會修改案件。需要案件版本時，請回到有權限的案件頁進入。";
       refs["mobile-next-action-label"].textContent = context ? "依目前角色完成案件檢視" : "從授權案件入口開啟";
       return context;
     }
@@ -492,9 +528,10 @@
       );
     }
 
-    function updateActiveType(type) {
+    function updateActiveType(type, context) {
       document.querySelectorAll("[data-contract-type]").forEach(function update(button) {
         button.setAttribute("aria-pressed", String(button.dataset.contractType === type));
+        button.disabled = Boolean(context && button.dataset.contractType !== context.contractType);
       });
     }
 
@@ -512,7 +549,7 @@
       state.selectedType = selectedType;
       state.contract = contract;
       state.contextAllowed = Boolean(allowContext);
-      updateActiveType(selectedType);
+      updateActiveType(selectedType, trustedContext);
       renderContext(selectedType);
       refs["status-contract-title"].textContent = visibleContractText(state.contract.title);
       refs["contract-title"].textContent = visibleContractText(state.contract.title);
@@ -528,7 +565,7 @@
       renderAppendix();
       renderAttachments();
       renderReviews();
-      if (updateUrl) root.history.replaceState({}, "", buildProjectContractPreviewHref(selectedType));
+      if (updateUrl) root.history.replaceState({}, "", buildProjectContractPreviewHref(selectedType, state.returnTarget));
     }
 
     function renderUnavailable() {
@@ -603,7 +640,10 @@
       return;
     }
     bindEvents();
-    var requestedType = new URLSearchParams(root.location.search).get("contractType");
+    var previewQuery = new URLSearchParams(root.location.search);
+    var requestedType = previewQuery.get("contractType");
+    state.returnTarget = normalizePreviewReturnTarget(previewQuery.get("returnTo"));
+    renderReturnNavigation();
     var exactQueryType = CONTRACT_TYPES.indexOf(requestedType) >= 0;
     var initialType = normalizePreviewContractType(requestedType);
     var initialContextAllowed = Boolean(exactQueryType && state.context && state.context.contractType === initialType);
@@ -612,6 +652,7 @@
 
   return Object.freeze({
     normalizePreviewContractType: normalizePreviewContractType,
+    normalizePreviewReturnTarget: normalizePreviewReturnTarget,
     resolveProjectContractPreviewContext: resolveProjectContractPreviewContext,
     buildProjectContractPreviewHref: buildProjectContractPreviewHref,
     assembleProjectContractPreview: assembleProjectContractPreview,

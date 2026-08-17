@@ -109,93 +109,101 @@
 
             <section class="vendor-workspace-panel" id="vendor-workspace-panel-contract" role="tabpanel" aria-labelledby="vendor-workspace-tab-contract" data-vendor-workspace-panel="contract" hidden>
               <aside class="vendor-workspace-panel__summary">
-                <p class="eyebrow">契約管理</p><h3>先分清補件與變更，再回到有效版本討論。</h3>
+                <p class="eyebrow">契約管理｜乙方工作台</p><h3>先看共同契約，再回覆甲方需要確認的內容。</h3>
                 <dl>
                   <div><dt>角色</dt><dd>受邀設計師／統包</dd></div>
-                  <div><dt>契約類型／有效版本</dt><dd>尚未取得已確認版本</dd></div>
+                  <div><dt>本案契約</dt><dd>設計＋工程｜尚未取得已確認版本</dd></div>
                   <div><dt>目前回應狀態</dt><dd data-vendor-contract-hierarchy-status>尚未建立本次補件／變更草稿</dd></div>
                   <div><dt>下一步責任人</dt><dd>目前使用者｜先確認案件授權</dd></div>
                 </dl>
               </aside>
               <div class="vendor-workspace-panel__body" id="documents">
-                <header class="panel-heading"><div><p class="eyebrow">本次處理</p><h3>補件／變更工作區</h3></div><span data-vendor-contract-draft-status>本頁草稿尚未修改</span></header>
-                <p class="panel-boundary">補件不會改變契約。只要影響範圍、價金、工期、付款、驗收、材料或保固，就屬於變更提案；在甲方明確決定並另有雙方合意紀錄前，維持待確認。</p>
+                <div class="vendor-contract-view-tabs" role="tablist" aria-label="本案契約處理步驟" data-vendor-contract-edit-overview>
+                  <button id="vendor-contract-view-tab-overview" type="button" role="tab" data-vendor-contract-view="overview" aria-selected="true" aria-controls="vendor-contract-view-panel-overview" tabindex="0"><span>01</span>契約總覽</button>
+                  <button id="vendor-contract-view-tab-reply" type="button" role="tab" data-vendor-contract-view="reply" aria-selected="false" aria-controls="vendor-contract-view-panel-reply" tabindex="-1"><span>02</span>待我回覆</button>
+                  <button id="vendor-contract-view-tab-decision" type="button" role="tab" data-vendor-contract-view="decision" aria-selected="false" aria-controls="vendor-contract-view-panel-decision" tabindex="-1"><span>03</span>變更與決定</button>
+                  <button id="vendor-contract-view-tab-records" type="button" role="tab" data-vendor-contract-view="records" aria-selected="false" aria-controls="vendor-contract-view-panel-records" tabindex="-1"><span>04</span>版本與紀錄</button>
+                </div>
 
-                <details class="vendor-contract-editor" data-vendor-contract-editor>
-                  <summary data-vendor-contract-primary-action>整理本次補件／變更 <span aria-hidden="true">＋</span></summary>
-                  <form class="vendor-contract-form" data-vendor-contract-form aria-label="本次補件或變更草稿">
-                    <div class="vendor-contract-form-grid">
-                      <label class="vendor-contract-field vendor-contract-field--wide" for="vendor-contract-description">
-                        <span>補件說明</span>
-                        <textarea id="vendor-contract-description" name="description" rows="4" maxlength="600" data-write-action data-vendor-contract-control data-vendor-contract-description disabled aria-disabled="true" placeholder="說明提出原因、現況與希望甲方確認的事項"></textarea>
-                      </label>
-                      <fieldset class="vendor-contract-impact vendor-contract-field--wide">
-                        <legend>影響分類</legend>
-                        <p>未勾選時視為補件；勾選任一項即為變更提案。目前分類：<strong data-vendor-contract-classification>補件</strong></p>
-                        <div>
-                          <label><input type="checkbox" name="impact" value="SCOPE" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />範圍</label>
-                          <label><input type="checkbox" name="impact" value="PRICE" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />價金</label>
-                          <label><input type="checkbox" name="impact" value="TIME" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />工期</label>
-                          <label><input type="checkbox" name="impact" value="PAYMENT" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />付款</label>
-                          <label><input type="checkbox" name="impact" value="ACCEPTANCE" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />驗收</label>
-                          <label><input type="checkbox" name="impact" value="MATERIAL" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />材料</label>
-                          <label><input type="checkbox" name="impact" value="WARRANTY" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />保固</label>
-                        </div>
-                      </fieldset>
-                      <label class="vendor-contract-field" for="vendor-contract-version">
-                        <span>關聯版本</span>
-                        <input id="vendor-contract-version" name="related-version" type="text" maxlength="80" data-write-action data-vendor-contract-control data-vendor-contract-related-version disabled aria-disabled="true" placeholder="例如：契約 v3／附件 A-02" />
-                      </label>
-                      <label class="vendor-contract-field" for="vendor-contract-response">
-                        <span>乙方回應</span>
-                        <select id="vendor-contract-response" name="vendor-response" data-write-action data-vendor-contract-control data-vendor-contract-response disabled aria-disabled="true">
-                          <option value="">尚未選擇</option>
-                          <option value="PROVIDE_INFORMATION">補充資料供確認</option>
-                          <option value="REQUEST_OWNER_REVIEW">請甲方決定</option>
-                          <option value="REQUEST_DRS_REVIEW">請 DRS 協助整理風險</option>
-                        </select>
-                      </label>
-                      <fieldset class="vendor-contract-attachment vendor-contract-field--wide">
-                        <legend>附件資料</legend>
-                        <div>
-                          <label for="vendor-contract-file-name"><span>檔名</span><input id="vendor-contract-file-name" name="attachment-name" type="text" maxlength="120" data-write-action data-vendor-contract-control data-vendor-contract-attachment-file-name disabled aria-disabled="true" placeholder="只描述附件名稱，不會上傳檔案" /></label>
-                          <label for="vendor-contract-file-version"><span>版次</span><input id="vendor-contract-file-version" name="attachment-version" type="text" maxlength="60" data-write-action data-vendor-contract-control data-vendor-contract-attachment-version-label disabled aria-disabled="true" placeholder="例如：v2" /></label>
-                          <label for="vendor-contract-file-note"><span>備註</span><input id="vendor-contract-file-note" name="attachment-note" type="text" maxlength="160" data-write-action data-vendor-contract-control data-vendor-contract-attachment-note disabled aria-disabled="true" placeholder="說明附件與本次事項的關係" /></label>
-                        </div>
-                      </fieldset>
+                <section id="vendor-contract-view-panel-overview" role="tabpanel" data-vendor-contract-view-panel="overview" aria-labelledby="vendor-contract-view-tab-overview">
+                  <header class="panel-heading"><div><p class="eyebrow">本案共同契約</p><h3>先讀條文，再回到工作台處理事項</h3></div><span>唯讀預覽</span></header>
+                  <article class="shared-contract-card" data-shared-contract data-shared-contract-id="LAIBE-DESIGN-BUILD-V02" data-shared-contract-type="DESIGN_BUILD">
+                    <div class="shared-contract-card__cover" aria-hidden="true"><span>PROJECT CONTRACT</span><strong>甲乙共同契約</strong><small>v0.2</small></div>
+                    <div class="shared-contract-card__content">
+                      <p class="eyebrow">本案甲乙契約｜共同預覽</p>
+                      <h4>建築物室內裝修設計及工程承攬契約</h4>
+                      <p>雙方看到同一份唯讀條文；本頁草稿尚未保存，也尚未同步給另一方</p>
+                      <dl aria-label="共同契約摘要"><div><dt>契約類型</dt><dd>設計＋工程</dd></div><div><dt>預覽版本</dt><dd>v0.2</dd></div><div><dt>案件版本</dt><dd>尚未連結案件確認版本</dd></div></dl>
+                      <a class="shared-contract-card__action" data-shared-contract-preview href="../../../../site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&amp;returnTo=vendor">查看契約全文 <span aria-hidden="true">→</span></a>
                     </div>
-                    <div class="vendor-contract-status-grid" aria-label="契約事項狀態">
-                      <p><span>乙方回應</span><strong data-vendor-contract-response-status>尚未選擇</strong></p>
-                      <p><span>甲方決定</span><strong>尚無決定紀錄</strong></p>
-                      <p><span>雙方另行合意</span><strong>尚無合意紀錄</strong></p>
-                      <p><span>DRS 審查</span><strong>尚未提出審查</strong></p>
-                      <p><span>付款狀態</span><strong>尚無付款狀態紀錄</strong></p>
-                    </div>
-                    <p class="vendor-contract-session-note" role="note">本次內容只保留在目前頁面，尚未正式送出，也未保存為案件紀錄。離開或重新整理後需重新輸入。</p>
-                    <button class="vendor-contract-clear" type="reset" data-write-action data-vendor-contract-control disabled aria-disabled="true">清除本頁草稿</button>
-                  </form>
-                </details>
+                  </article>
+                  <p class="panel-boundary">契約全文是甲乙共同檢查的依據。若甲方尚未建立正式案件版本，乙方可以先閱讀範本，但不能把預覽當成已成立契約。</p>
+                </section>
 
-                <nav class="contract-resource-nav" aria-label="契約資料定位">
-                  <a data-vendor-workspace-route href="#documents">契約與附件</a>
-                  <a data-vendor-workspace-route href="#reviews">PCM 公開意見</a>
-                  <a data-vendor-workspace-route href="#records">附約與案件紀錄</a>
-                </nav>
-                <p class="contract-resource-note">正式開放後，甲方只提送契約簽署草稿；乙方可依授權處理其餘附件，並可不限次數交由 PCM 審查。目前頁面只提供未保存的本次草稿整理。</p>
-                <ol class="decision-list">
-                  <li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>契約草稿版本</strong><small>甲方提送的簽署草稿與版本關係</small><em>0 份</em></li>
-                  <li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版本、提送者與雙方確認關係</small><em>0 份</em></li>
-                  <li id="reviews" data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開意見</span><strong>PCM 公開審查意見</strong><small>意見對甲乙雙方公開，並連回文件版本</small><em>0 則</em></li>
-                  <li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>原因與回覆版本</strong><small>責任人、期限、提出時間與處理狀態</small><em>0 項</em></li>
-                  <li data-resource-code="ADDENDA"><span>附約</span><strong>另建附約草稿</strong><small>不改寫原契約，保留變更依據</small><em>0 份</em></li>
-                  <li id="records" data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>契約決定與確認留痕</strong><small>版本、附件、公開意見與雙方決定的追溯脈絡</small><em>0 筆</em></li>
-                </ol>
-                <dl class="contract-confirmation">
-                  <div><dt>雙方確認狀態</dt><dd>尚未取得可確認版本</dd></div>
-                  <div><dt>決策依據</dt><dd>有效契約版本、附件與公開 PCM 意見</dd></div>
-                  <div><dt>下一步責任人</dt><dd>目前使用者｜先確認案件授權</dd></div>
-                </dl>
-                <p class="contract-immutability">已執行的原契約與簽章不可變；後續變更要另建附約草稿，並保留提出者、時間、依據、狀態與下一責任人。</p>
+                <section id="vendor-contract-view-panel-reply" role="tabpanel" data-vendor-contract-view-panel="reply" aria-labelledby="vendor-contract-view-tab-reply" hidden>
+                  <header class="vendor-contract-secondary-heading">
+                    <div><p class="eyebrow">待我回覆</p><h4>補充資料或說明影響</h4></div>
+                    <span data-vendor-contract-draft-status>本頁草稿尚未修改</span>
+                  </header>
+                  <p class="panel-boundary">沒有影響契約條件時屬於補充資料；若影響範圍、價金、工期、付款、驗收、材料或保固，請標示為變更提案，交由甲方決定。</p>
+                  <details class="vendor-contract-editor" data-vendor-contract-editor open>
+                    <summary data-vendor-contract-primary-action>整理本次回覆 <span aria-hidden="true">＋</span></summary>
+                    <form class="vendor-contract-form" data-vendor-contract-form aria-label="本次補件或變更草稿">
+                      <div class="vendor-contract-form-grid">
+                        <label class="vendor-contract-field vendor-contract-field--wide" for="vendor-contract-description"><span>要回覆什麼</span><textarea id="vendor-contract-description" name="description" rows="4" maxlength="600" data-write-action data-vendor-contract-control data-vendor-contract-description disabled aria-disabled="true" placeholder="說明提出原因、現況與希望甲方確認的事項"></textarea></label>
+                        <fieldset class="vendor-contract-impact vendor-contract-field--wide">
+                          <legend>哪些契約條件可能受影響？</legend>
+                          <p>未勾選時視為補件；勾選任一項即為變更提案。目前分類：<strong data-vendor-contract-classification>補件</strong></p>
+                          <div>
+                            <label><input type="checkbox" name="impact" value="SCOPE" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />範圍</label>
+                            <label><input type="checkbox" name="impact" value="PRICE" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />價金</label>
+                            <label><input type="checkbox" name="impact" value="TIME" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />工期</label>
+                            <label><input type="checkbox" name="impact" value="PAYMENT" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />付款</label>
+                            <label><input type="checkbox" name="impact" value="ACCEPTANCE" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />驗收</label>
+                            <label><input type="checkbox" name="impact" value="MATERIAL" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />材料</label>
+                            <label><input type="checkbox" name="impact" value="WARRANTY" data-write-action data-vendor-contract-control data-vendor-contract-impact disabled aria-disabled="true" />保固</label>
+                          </div>
+                        </fieldset>
+                        <label class="vendor-contract-field" for="vendor-contract-version"><span>依據哪個版本</span><input id="vendor-contract-version" name="related-version" type="text" maxlength="80" data-write-action data-vendor-contract-control data-vendor-contract-related-version disabled aria-disabled="true" placeholder="例如：契約 v3／附件 A-02" /></label>
+                        <label class="vendor-contract-field" for="vendor-contract-response"><span>希望下一步怎麼處理</span><select id="vendor-contract-response" name="vendor-response" data-write-action data-vendor-contract-control data-vendor-contract-response disabled aria-disabled="true"><option value="">尚未選擇</option><option value="PROVIDE_INFORMATION">補充資料供確認</option><option value="REQUEST_OWNER_REVIEW">請甲方決定</option><option value="REQUEST_DRS_REVIEW">請萊比協助整理風險</option></select></label>
+                        <fieldset class="vendor-contract-attachment vendor-contract-field--wide">
+                          <legend>附件資料</legend>
+                          <div><label for="vendor-contract-file-name"><span>檔名</span><input id="vendor-contract-file-name" name="attachment-name" type="text" maxlength="120" data-write-action data-vendor-contract-control data-vendor-contract-attachment-file-name disabled aria-disabled="true" placeholder="只描述附件名稱，不會上傳檔案" /></label><label for="vendor-contract-file-version"><span>版次</span><input id="vendor-contract-file-version" name="attachment-version" type="text" maxlength="60" data-write-action data-vendor-contract-control data-vendor-contract-attachment-version-label disabled aria-disabled="true" placeholder="例如：v2" /></label><label for="vendor-contract-file-note"><span>備註</span><input id="vendor-contract-file-note" name="attachment-note" type="text" maxlength="160" data-write-action data-vendor-contract-control data-vendor-contract-attachment-note disabled aria-disabled="true" placeholder="說明附件與本次事項的關係" /></label></div>
+                        </fieldset>
+                      </div>
+                      <p class="vendor-contract-session-note" role="note">本次內容只保留在目前頁面，尚未正式送出，也未保存為案件紀錄。離開或重新整理後需重新輸入。</p>
+                      <button class="vendor-contract-clear" type="reset" data-write-action data-vendor-contract-control disabled aria-disabled="true">清除本頁草稿</button>
+                    </form>
+                  </details>
+                </section>
+
+                <section id="vendor-contract-view-panel-decision" role="tabpanel" data-vendor-contract-view-panel="decision" aria-labelledby="vendor-contract-view-tab-decision" hidden>
+                  <header class="panel-heading"><div><p class="eyebrow">變更與決定</p><h3>確認現在輪到誰處理</h3></div><span>尚待案件資料</span></header>
+                  <div class="vendor-contract-status-grid" aria-label="契約事項狀態">
+                    <p><span>乙方回應</span><strong data-vendor-contract-response-status>尚未選擇</strong></p>
+                    <p><span>甲方決定</span><strong>尚無決定紀錄</strong></p>
+                    <p><span>雙方另行確認</span><strong>尚無合意紀錄</strong></p>
+                    <p><span>萊比風險整理</span><strong>尚未提出整理</strong></p>
+                    <p><span>正式版本</span><strong>尚未建立</strong></p>
+                  </div>
+                  <p class="panel-boundary">乙方回覆不等於甲方同意；甲方決定也不等於契約已變更。只有雙方另有明確紀錄並建立新版本，才會成為後續依據。</p>
+                </section>
+
+                <section id="vendor-contract-view-panel-records" role="tabpanel" data-vendor-contract-view-panel="records" aria-labelledby="vendor-contract-view-tab-records" hidden>
+                  <header class="panel-heading"><div><p class="eyebrow">版本與紀錄</p><h3>只顯示已留下的案件事實</h3></div><span>目前 0 筆</span></header>
+                  <nav class="contract-resource-nav" aria-label="契約資料定位"><a data-vendor-workspace-route href="#documents">契約與附件</a><a data-vendor-workspace-route href="#reviews">PCM 公開意見</a><a data-vendor-workspace-route href="#records">附約與案件紀錄</a></nav>
+                  <p class="contract-resource-note">目前頁面只提供未保存的本次草稿整理。完成案件授權後，正式版本、附件、公開意見與雙方決定才會依案件紀錄顯示。</p>
+                  <ol class="decision-list">
+                    <li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>契約草稿版本</strong><small>甲方提出的草稿與版本關係</small><em>0 份</em></li>
+                    <li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版本、提送者與雙方確認關係</small><em>0 份</em></li>
+                    <li id="reviews" data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開意見</span><strong>PCM 公開審查意見</strong><small>意見對甲乙雙方公開，並連回文件版本</small><em>0 則</em></li>
+                    <li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>原因與回覆版本</strong><small>責任人、期限、提出時間與處理狀態</small><em>0 項</em></li>
+                    <li data-resource-code="ADDENDA"><span>附約</span><strong>另建附約草稿</strong><small>不改寫原契約，保留變更依據</small><em>0 份</em></li>
+                    <li id="records" data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>契約決定與確認留痕</strong><small>版本、附件、公開意見與雙方決定的追溯脈絡</small><em>0 筆</em></li>
+                  </ol>
+                  <dl class="contract-confirmation"><div><dt>雙方確認狀態</dt><dd>尚未取得可確認版本</dd></div><div><dt>決策依據</dt><dd>有效契約版本、附件與公開 PCM 意見</dd></div><div><dt>下一步責任人</dt><dd>目前使用者｜先確認案件授權</dd></div></dl>
+                  <p class="contract-immutability">已成立的原契約不會被本頁草稿改寫；後續變更要另建可追溯版本，並保留提出者、時間、依據、狀態與下一責任人。</p>
+                </section>
               </div>
               <footer class="vendor-workspace-panel__next"><p><span>下一步</span><strong>先確認案件授權，再核對目前有效契約與待補文件。</strong><small>責任人｜目前使用者</small></p><a class="vendor-panel-action" href="../vendor_invitation/code.html">返回邀請確認 <span aria-hidden="true">→</span></a></footer>
             </section>

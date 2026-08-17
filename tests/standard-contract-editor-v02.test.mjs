@@ -150,3 +150,29 @@ test("protected source and engine identities remain exact and prohibited claims 
   assert.doesNotMatch(combined, /SIGNED_CONTRACT_SHA256\s*[:=]\s*["'][a-f0-9]{16,}/i);
   assert.doesNotMatch(combined, /王小明|陳大華|範例有限公司/);
 });
+
+test("preview provides a prominent role-aware return to the exact editing task without treating the URL as case authority", () => {
+  assert.match(html, /id=["']return-to-workspace["']/);
+  assert.match(html, /class=["'][^"']*primary-action[^"']*["'][^>]*id=["']reader-return-to-workspace["'][^>]*hidden|id=["']reader-return-to-workspace["'][^>]*class=["'][^"']*primary-action[^"']*["'][^>]*hidden/);
+  assert.match(html, /id=["']mobile-return-to-workspace["']/);
+  assert.match(app, /function normalizePreviewReturnTarget/);
+  assert.match(app, /owner[\s\S]{0,260}label:\s*["']回甲方工作台繼續填寫["'][\s\S]{0,260}client_awarding_dashboard\/code\.html#owner-contract-view-panel-facts/);
+  assert.match(app, /vendor[\s\S]{0,260}label:\s*["']回乙方工作台繼續回覆["'][\s\S]{0,260}vendor_workspace\/code\.html#vendor-contract-view-panel-reply/);
+  assert.match(app, /refs\["reader-return-to-workspace"\]/);
+  assert.match(app, /buildProjectContractPreviewHref\(selectedType,\s*state\.returnTarget\)/);
+  assert.doesNotMatch(app, /returnTarget[\s\S]{0,120}(?:caseId|contractId|version)/);
+});
+
+test("mobile book keeps the orange cover but uses horizontal section tabs and a direct return action", () => {
+  const mobile = html.match(/@media screen and \(max-width: 620px\) \{[\s\S]*?\n\s*\}/u)?.[0] ?? "";
+  assert.match(html, /@media screen and \(max-width: 620px\)[\s\S]*\.contract-reader__layout\s*\{[^}]*grid-template-columns:\s*1fr/);
+  assert.match(html, /@media screen and \(max-width: 620px\)[\s\S]*\.contract-page-tabs\s*\{[^}]*width:\s*100%[^}]*flex-direction:\s*row/);
+  assert.match(html, /@media screen and \(max-width: 620px\)[\s\S]*\.contract-page-tab\s*\{[^}]*writing-mode:\s*horizontal-tb/);
+  assert.match(html, /@media screen and \(max-width: 620px\)[\s\S]*\.contract-book__page--index\s*>\s*h2[^}]*display:\s*none/);
+  assert.ok(mobile.length > 0);
+});
+
+test("trusted case preview locks unrelated contract types while neutral templates stay switchable", () => {
+  assert.match(app, /button\.disabled\s*=\s*Boolean\(context\s*&&\s*button\.dataset\.contractType\s*!==\s*context\.contractType\)/);
+  assert.match(app, /只切換範本，不會修改案件/);
+});

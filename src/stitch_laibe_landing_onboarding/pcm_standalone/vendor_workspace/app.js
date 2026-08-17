@@ -125,6 +125,47 @@ export const VENDOR_WORKSPACE_TAB_KEYS = freezeList(
   "contract",
 );
 
+export const VENDOR_CONTRACT_VIEW_KEYS = freezeList(
+  "overview",
+  "reply",
+  "decision",
+  "records",
+);
+
+function isVendorContractViewKey(value) {
+  return value === "overview"
+    || value === "reply"
+    || value === "decision"
+    || value === "records";
+}
+
+export function resolveVendorContractViewKey(activeView, key) {
+  const current = isVendorContractViewKey(activeView) ? activeView : "overview";
+  if (key === "Home") return "overview";
+  if (key === "End") return "records";
+  if (
+    key !== "ArrowLeft"
+    && key !== "ArrowRight"
+    && key !== "ArrowUp"
+    && key !== "ArrowDown"
+  ) {
+    return current;
+  }
+  let currentIndex = 0;
+  for (let index = 0; index < VENDOR_CONTRACT_VIEW_KEYS.length; index += 1) {
+    if (VENDOR_CONTRACT_VIEW_KEYS[index] === current) {
+      currentIndex = index;
+      break;
+    }
+  }
+  const forward = key === "ArrowRight" || key === "ArrowDown";
+  const offset = forward ? 1 : -1;
+  const nextIndex = (
+    currentIndex + offset + VENDOR_CONTRACT_VIEW_KEYS.length
+  ) % VENDOR_CONTRACT_VIEW_KEYS.length;
+  return VENDOR_CONTRACT_VIEW_KEYS[nextIndex];
+}
+
 function isVendorWorkspaceTabKey(value) {
   return value === "design" || value === "construction" || value === "contract";
 }
@@ -810,7 +851,7 @@ function listenVendorContract(node, eventName, listener) {
 function vendorResponseLabel(intent) {
   if (intent === "PROVIDE_INFORMATION") return "補充資料供確認";
   if (intent === "REQUEST_OWNER_REVIEW") return "請甲方決定";
-  if (intent === "REQUEST_DRS_REVIEW") return "請 DRS 協助整理風險";
+  if (intent === "REQUEST_DRS_REVIEW") return "請萊比協助整理風險";
   return "尚未選擇";
 }
 
@@ -949,10 +990,113 @@ function initializeVendorContractSession(root) {
 
 export function resolveVendorWorkspaceTabForFragment(fragment) {
   if (fragment === "#execution") return "construction";
-  if (fragment === "#documents" || fragment === "#reviews" || fragment === "#records") {
+  if (
+    fragment === "#documents" ||
+    fragment === "#reviews" ||
+    fragment === "#records" ||
+    resolveVendorContractViewFromFragment(fragment)
+  ) {
     return "contract";
   }
   return null;
+}
+
+export function resolveVendorContractViewFromFragment(fragment) {
+  if (fragment === "#reviews" || fragment === "#records") return "records";
+  if (fragment === "#documents") return "overview";
+  if (fragment === "#vendor-contract-view-panel-overview") return "overview";
+  if (fragment === "#vendor-contract-view-panel-reply") return "reply";
+  if (fragment === "#vendor-contract-view-panel-decision") return "decision";
+  if (fragment === "#vendor-contract-view-panel-records") return "records";
+  return null;
+}
+
+export function initializeVendorContractViewTabs(root) {
+  let tabs;
+  let panels;
+  try {
+    tabs = root.querySelectorAll("[data-vendor-contract-view]");
+    panels = root.querySelectorAll("[data-vendor-contract-view-panel]");
+  } catch {
+    return null;
+  }
+  if (
+    !tabs
+    || !panels
+    || tabs.length !== VENDOR_CONTRACT_VIEW_KEYS.length
+    || panels.length !== VENDOR_CONTRACT_VIEW_KEYS.length
+  ) {
+    return null;
+  }
+
+  let activeView = "overview";
+
+  function activate(nextView, shouldFocus = false) {
+    if (!isVendorContractViewKey(nextView)) return false;
+    activeView = nextView;
+    for (let index = 0; index < tabs.length; index += 1) {
+      const tab = tabs[index];
+      try {
+        const selected = tab.dataset.vendorContractView === activeView;
+        tab.setAttribute("aria-selected", selected ? "true" : "false");
+        tab.tabIndex = selected ? 0 : -1;
+        if (selected && shouldFocus) tab.focus();
+      } catch {
+        // Static tab state remains readable.
+      }
+    }
+    for (let index = 0; index < panels.length; index += 1) {
+      try {
+        panels[index].hidden = panels[index].dataset.vendorContractViewPanel !== activeView;
+      } catch {
+        // Unknown panels remain in their static hidden state.
+      }
+    }
+    return true;
+  }
+
+  for (let index = 0; index < tabs.length; index += 1) {
+    const tab = tabs[index];
+    try {
+      tab.addEventListener("click", () => {
+        activate(tab.dataset.vendorContractView, false);
+      });
+      tab.addEventListener("keydown", (event) => {
+        const nextView = resolveVendorContractViewKey(activeView, event?.key);
+        if (nextView === activeView) return;
+        event.preventDefault?.();
+        activate(nextView, true);
+      });
+    } catch {
+      continue;
+    }
+  }
+
+  let view = null;
+  try {
+    view = root.defaultView;
+  } catch {
+    view = null;
+  }
+  const selectFromFragment = () => {
+    let fragment = "";
+    try {
+      fragment = view?.location?.["hash"] ?? "";
+    } catch {
+      fragment = "";
+    }
+    const nextView = resolveVendorContractViewFromFragment(fragment);
+    if (nextView) activate(nextView, false);
+  };
+  try {
+    view?.addEventListener("hashchange", selectFromFragment);
+  } catch {
+    // Manual task tabs remain available.
+  }
+
+  activate("overview", false);
+  selectFromFragment();
+  return freezeRecord([["activate", activate]]);
 }
 
 export function initializeVendorWorkspaceTabs(root) {
@@ -1182,6 +1326,7 @@ export function initializeVendorWorkspace(root, renderState = CONTEXT_UNAVAILABL
     }
     initializeVendorContractSession(root);
   }
+  initializeVendorContractViewTabs(root);
   initializeVendorWorkspaceTabs(root);
   return trustedAuthorized ? AUTHORIZED_VENDOR_WORKSPACE : CONTEXT_UNAVAILABLE;
 }
