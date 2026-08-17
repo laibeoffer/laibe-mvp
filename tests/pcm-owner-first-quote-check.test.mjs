@@ -550,11 +550,11 @@ test("quote check starts as one canonical three-file page", async () => {
   }
 });
 
-test("quote check final runtime asset identity binds only the changed stylesheet", async () => {
+test("quote check final runtime asset identity binds the changed page assets", async () => {
   const html = await readFile(htmlPath, "utf8");
 
-  assert.match(html, /href="\.\/styles\.css\?v=20260815-final-runtime"/);
-  assert.match(html, /src="\.\/app\.js\?v=20260814-context-journey-2"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260816-document-report"/);
+  assert.match(html, /src="\.\/app\.js\?v=20260816-document-report"/);
 });
 
 test("legacy owner journey is absent", async () => {
@@ -575,10 +575,7 @@ test("quote check header keeps the current page and DRS home visible", async () 
     html,
     /<nav class="quote-header__nav" aria-label="DRS 主要導覽">[\s\S]*?href="\.\.\/public_home\/code\.html#top"[\s\S]*?>DRS 首頁<\/a>[\s\S]*?aria-current="page"[\s\S]*?>文件健檢<\/a>[\s\S]*?<\/nav>/u,
   );
-  assert.match(
-    html,
-    /class="quote-context-bar"[^>]*data-quote-context[\s\S]*?<strong>文件健檢<\/strong>[\s\S]*?data-current-status[\s\S]*?data-current-next/u,
-  );
+  assert.doesNotMatch(html, /quote-context-bar|data-quote-context/u);
   assert.doesNotMatch(html, /PCM 首頁/u);
   assert.match(styles, /\.quote-header__nav a\s*\{[^}]*white-space:\s*nowrap;/u);
   assert.match(
@@ -680,43 +677,116 @@ test("primary CTA 14px text keeps 4.5 to 1 contrast at every gradient stop", asy
   assert.deepEqual(failures, [], `CTA contrast nodes: ${JSON.stringify(results)}`);
 });
 
-test("document tabs use a coordinated radius scale while connecting the active panel", async () => {
+test("document tabs stay standalone above an independent neutral glass panel", async () => {
   const css = await readFile(cssPath, "utf8");
+  const glassStart = css.indexOf(".document-workspace {");
+  const glassEnd = css.indexOf(".inspection-output {");
+  const glassSource = css.slice(glassStart, glassEnd);
+  const workspaceSurface = css.match(/\.document-workspace\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const greenDominantColors = [...glassSource.matchAll(/rgba\(\s*(\d+),\s*(\d+),\s*(\d+),/gu)]
+    .map((match) => match.slice(1, 4).map(Number))
+    .filter(([red, green, blue]) => green > red + 4 && green > blue + 4);
+  const greenDominantHexColors = [...glassSource.matchAll(/#([\da-f]{2})([\da-f]{2})([\da-f]{2})\b/giu)]
+    .map((match) => match.slice(1, 4).map((channel) => Number.parseInt(channel, 16)))
+    .filter(([red, green, blue]) => green > red + 4 && green > blue + 4);
 
+  assert.ok(glassStart >= 0 && glassEnd > glassStart);
+  assert.deepEqual(greenDominantColors, []);
+  assert.deepEqual(greenDominantHexColors, []);
+  assert.match(css, /\.document-workspace\s*\{[^}]*--workspace-glass-core:\s*rgba\(8,\s*11,\s*13,\s*0\.62\);[^}]*--workspace-glass-edge:\s*rgba\(255,\s*255,\s*255,\s*0\.24\);/u);
+  assert.doesNotMatch(workspaceSurface, /display:\s*grid|grid-template/u);
+  assert.doesNotMatch(css, /\.document-workspace::before\s*\{/u);
+  assert.doesNotMatch(css, /\.document-tabs,\s*\.document-panel\s*\{[^}]*inline-size:/u);
   assert.match(css, /\.document-tabs\s*\{[^}]*--tab-panel-surface:/u);
-  assert.match(css, /\.document-tabs\s*\{[^}]*border-radius:\s*22px 22px 0 0;/u);
-  assert.match(css, /\.document-tabs button\s*\{[^}]*border-radius:\s*18px;/u);
-  assert.match(css, /\.document-tabs button\[aria-selected="true"\]\s*\{[^}]*border-radius:\s*18px 18px 0 0;/u);
-  assert.match(css, /\.document-tabs button\[aria-selected="true"\]::before/u);
-  assert.match(css, /\.document-tabs button\[aria-selected="true"\]::after/u);
+  assert.match(css, /\.document-tabs\s*\{[^}]*--tab-neon-cool:\s*#8b82ff;[^}]*--tab-neon-pink:\s*#ff70c7;[^}]*--tab-edge-clearance:\s*32px;[^}]*align-items:\s*start;[^}]*gap:\s*28px;[^}]*min-height:\s*84px;[^}]*margin-block-end:\s*18px;[^}]*padding:\s*0 var\(--tab-edge-clearance\);[^}]*border:\s*0;[^}]*background:\s*transparent;/u);
+  assert.match(css, /\.document-tabs button\s*\{[^}]*border:\s*1px solid transparent;[^}]*border-radius:\s*22px;[^}]*background:[^}]*repeating-linear-gradient/u);
+  assert.match(css, /\.document-tabs button::before\s*\{[^}]*inset:\s*0;[^}]*padding:\s*1px;[^}]*background:\s*linear-gradient\(105deg,[^}]*mask-composite:\s*exclude;[^}]*pointer-events:\s*none;/u);
+  assert.match(css, /\.document-tabs button\[aria-selected="true"\]\s*\{[^}]*border-radius:\s*22px;[^}]*background:[^}]*rgba\(255,\s*255,\s*255,\s*0\.11\)[^}]*animation:\s*document-tab-backlight/u);
+  assert.doesNotMatch(css, /#document-tab-quote\[aria-selected="true"\](?:::(?:before|after))?\s*\{/u);
+  assert.doesNotMatch(css, /\.document-tabs:has\(/u);
+  assert.match(css, /\.document-panel\s*\{[^}]*border:\s*1px solid var\(--workspace-glass-edge\);[^}]*border-radius:\s*36px;[^}]*background:[^}]*repeating-linear-gradient[^}]*backdrop-filter:\s*blur\(30px\)[^}]*box-shadow:/u);
+  assert.doesNotMatch(css.match(/\.document-panel\s*\{([^}]*)\}/u)?.[1] ?? "", /border-top:\s*0/u);
+  assert.match(css, /\.document-panel::after\s*\{[^}]*inset:\s*0;[^}]*border:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.08\);[^}]*box-shadow:/u);
+  assert.doesNotMatch(css.match(/\.document-panel::after\s*\{([^}]*)\}/u)?.[1] ?? "", /border-top:\s*0/u);
+  assert.match(css, /\.document-panel__intro\s*\{[^}]*border-inline-end:\s*0;/u);
+  assert.doesNotMatch(css, /\.document-panel__next\s*\{/u);
+  assert.match(css, /@keyframes\s+document-tab-backlight/u);
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.document-tabs button\[aria-selected="true"\]\s*\{[^}]*animation:\s*none/u);
   assert.match(css, /\.document-tabs button:focus-visible/u);
 });
 
-test("document tabs move a restrained one-shot LaiBE backlight with aria-selected state", async () => {
+test("workspace removes the upper status strip and panel-forward buttons, then outputs a truthful inspection report", async () => {
+  const [html, app, styles] = await Promise.all([
+    readFile(htmlPath, "utf8"),
+    readFile(appPath, "utf8"),
+    readFile(cssPath, "utf8"),
+  ]);
+
+  assert.doesNotMatch(html, /quote-context-bar|data-quote-context/u);
+  assert.doesNotMatch(html, /document-panel__next|data-next-document-tab|data-view-cross-summary/u);
+  assert.doesNotMatch(html, /接著檢查契約|接著檢查施工圖|查看跨文件整理/u);
+  assert.match(
+    html,
+    /<\/section>\s*<section class="inspection-output"[^>]*data-inspection-output[^>]*aria-labelledby="inspection-output-title"/u,
+  );
+  assert.match(html, /id="inspection-output-title">檢查報告輸出<\/h2>/u);
+  assert.match(html, /data-inspection-report-status[^>]*>等待選擇 PDF<\/span>/u);
+  assert.match(html, /data-inspection-report-type[^>]*>報價健檢<\/strong>/u);
+  assert.match(html, /data-inspection-report-filename[^>]*>尚未選擇<\/strong>/u);
+  assert.match(html, /data-inspection-report-directions/u);
+  assert.match(html, /data-inspection-report-next/u);
+  assert.match(html, /文件內容、數量、條款與圖面細節仍待正式判讀/u);
+  assert.match(html, /不等於 PDF 內容分析或正式判定，也不會建立案件紀錄/u);
+
+  assert.match(app, /function renderInspectionReport\(\)/u);
+  assert.match(app, /已建立檢查方向摘要/u);
+  assert.match(app, /等待選擇 PDF/u);
+  assert.match(app, /data-inspection-report-(?:status|type|filename|directions|next)/u);
+  assert.match(styles, /\.inspection-output\s*\{/u);
+  assert.match(styles, /\.inspection-output__summary\s*\{/u);
+  assert.match(styles, /@media\s*\(max-width:\s*760px\)[\s\S]*?\.inspection-output__summary\s*\{[^}]*grid-template-columns:\s*1fr;/u);
+
+  const visible = stripNonVisibleHtml(html);
+  assert.doesNotMatch(visible, /健檢完成|正式健檢結果|已完成 PDF 分析|風險評分/u);
+});
+
+test("document tabs use a restrained cool-to-magenta neon outline with distinct states", async () => {
   const css = await readFile(cssPath, "utf8");
   const inactiveSurface = css.match(/\.document-tabs button\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const hoverSurface = css.match(/\.document-tabs button:hover\s*\{([^}]*)\}/u)?.[1] ?? "";
   const activeSurface =
     css.match(/\.document-tabs button\[aria-selected="true"\]\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const focusSurface = css.match(/\.document-tabs button:focus-visible\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const neonRing = css.match(/\.document-tabs button::before\s*\{([^}]*)\}/u)?.[1] ?? "";
 
-  assert.match(inactiveSurface, /border:\s*1px solid rgba\(255,\s*255,\s*255,\s*0\.1\)/u);
-  assert.match(inactiveSurface, /background:\s*linear-gradient\(180deg,[\s\S]*linear-gradient\(112deg,/u);
-  assert.match(inactiveSurface, /backdrop-filter:\s*blur\(14px\) saturate\(125%\)/u);
-  assert.match(inactiveSurface, /box-shadow:[\s\S]*inset 0 1px 0[\s\S]*inset 0 -12px 18px/u);
-  assert.doesNotMatch(inactiveSurface, /0 0 18px rgba\(255,\s*88,\s*9,/u);
+  assert.match(inactiveSurface, /border:\s*1px solid transparent/u);
+  assert.match(inactiveSurface, /--tab-neon-start:\s*rgba\(139,\s*130,\s*255,\s*0\.58\);[\s\S]*--tab-neon-end:\s*rgba\(255,\s*112,\s*199,\s*0\.58\);/u);
+  assert.match(inactiveSurface, /background:\s*radial-gradient\(circle at 72% -20%,[\s\S]*repeating-linear-gradient/u);
+  assert.doesNotMatch(inactiveSurface, /linear-gradient\(105deg/u);
+  assert.match(inactiveSurface, /backdrop-filter:\s*blur\(22px\) saturate\(135%\)/u);
+  assert.match(inactiveSurface, /box-shadow:[\s\S]*-4px 0 12px rgba\(139,\s*130,\s*255,\s*0\.1\)[\s\S]*4px 0 12px rgba\(255,\s*112,\s*199,\s*0\.08\)[\s\S]*inset 5px 0 14px rgba\(139,\s*130,\s*255,\s*0\.04\)[\s\S]*inset -5px 0 14px rgba\(255,\s*112,\s*199,\s*0\.035\)/u);
+  assert.match(neonRing, /background:\s*linear-gradient\(105deg,\s*var\(--tab-neon-start\),\s*var\(--tab-neon-mid\) 50%,\s*var\(--tab-neon-end\)\)/u);
+  assert.match(neonRing, /-webkit-mask:[\s\S]*content-box[\s\S]*-webkit-mask-composite:\s*xor;[\s\S]*mask-composite:\s*exclude;/u);
 
-  assert.match(activeSurface, /border-color:\s*rgba\(255,\s*88,\s*9,\s*0\.88\)/u);
+  assert.match(hoverSurface, /--tab-neon-start:\s*rgba\(139,\s*130,\s*255,\s*0\.78\);[\s\S]*--tab-neon-end:\s*rgba\(255,\s*112,\s*199,\s*0\.78\);/u);
+  assert.match(hoverSurface, /box-shadow:[\s\S]*-5px 0 14px rgba\(139,\s*130,\s*255,\s*0\.17\)[\s\S]*5px 0 14px rgba\(255,\s*112,\s*199,\s*0\.15\)/u);
+
+  assert.match(activeSurface, /border-color:\s*transparent/u);
+  assert.match(activeSurface, /--tab-neon-start:\s*var\(--tab-neon-cool\);[\s\S]*--tab-neon-end:\s*var\(--tab-neon-pink\);/u);
   assert.match(activeSurface, /background:[\s\S]*var\(--tab-panel-surface\)/u);
   assert.match(
     activeSurface,
-    /box-shadow:[\s\S]*0 0 0 1px rgba\(255,\s*122,\s*56,[\s\S]*0 0 18px rgba\(255,\s*88,\s*9,[\s\S]*0 18px 30px -14px rgba\(255,\s*88,\s*9,[\s\S]*inset 0 0 18px rgba\(255,\s*88,\s*9,/u,
+    /box-shadow:[\s\S]*-6px 0 14px rgba\(139,\s*130,\s*255,\s*0\.26\)[\s\S]*6px 0 14px rgba\(255,\s*112,\s*199,\s*0\.24\)[\s\S]*inset 7px 0 16px rgba\(139,\s*130,\s*255,\s*0\.1\)[\s\S]*inset -7px 0 16px rgba\(255,\s*112,\s*199,\s*0\.09\)/u,
   );
+  assert.match(focusSurface, /outline:\s*2px solid #f3f5ff;[^}]*outline-offset:\s*3px;/u);
+  assert.doesNotMatch(focusSurface, /box-shadow|filter|drop-shadow/u);
   assert.match(
     activeSurface,
-    /animation:\s*quote-tab-backlight-settle 420ms cubic-bezier\(0\.22,\s*1,\s*0\.36,\s*1\) 1 both/u,
+    /animation:\s*document-tab-backlight 360ms cubic-bezier\(0\.22,\s*1,\s*0\.36,\s*1\)/u,
   );
   assert.match(
     css,
-    /@keyframes quote-tab-backlight-settle\s*\{[\s\S]*?from\s*\{[^}]*box-shadow:[^}]*\}[\s\S]*?to\s*\{[^}]*box-shadow:/u,
+    /@keyframes document-tab-backlight\s*\{[\s\S]*?0%\s*\{[^}]*box-shadow:[^}]*\}[\s\S]*?54%\s*\{[^}]*box-shadow:/u,
   );
   assert.match(
     css,
@@ -724,17 +794,50 @@ test("document tabs move a restrained one-shot LaiBE backlight with aria-selecte
   );
 });
 
+test("tab edge clearance contains the strongest halo animation and focus indicator", async () => {
+  const css = await readFile(cssPath, "utf8");
+  const tabsSurface = css.match(/\.document-tabs\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const activeSurface =
+    css.match(/\.document-tabs button\[aria-selected="true"\]\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const focusSurface = css.match(/\.document-tabs button:focus-visible\s*\{([^}]*)\}/u)?.[1] ?? "";
+  const animationPeak = css.match(
+    /@keyframes document-tab-backlight\s*\{[\s\S]*?54%\s*\{[^}]*box-shadow:\s*(-?\d+)px\s+0\s+(\d+)px/u,
+  );
+  const activeHalo = activeSurface.match(/box-shadow:\s*(-?\d+)px\s+0\s+(\d+)px/u);
+  const edgeClearance = Number(tabsSurface.match(/--tab-edge-clearance:\s*(\d+)px/u)?.[1]);
+  const focusWidth = Number(focusSurface.match(/outline:\s*(\d+)px/u)?.[1]);
+  const focusOffset = Number(focusSurface.match(/outline-offset:\s*(\d+)px/u)?.[1]);
+  const activeExtent = Math.abs(Number(activeHalo?.[1])) + Number(activeHalo?.[2]);
+  const animatedExtent = Math.abs(Number(animationPeak?.[1])) + Number(animationPeak?.[2]);
+  const focusExtent = focusWidth + focusOffset;
+
+  assert.equal(edgeClearance, 32);
+  assert.equal(activeExtent, 20);
+  assert.equal(animatedExtent, 26);
+  assert.equal(focusExtent, 5);
+  assert.ok(edgeClearance > activeExtent, "steady halo must remain inside the shell gutter");
+  assert.ok(edgeClearance > animatedExtent, "animated halo peak must remain inside the shell gutter");
+  assert.ok(edgeClearance > focusExtent, "focus ring must remain inside the shell gutter");
+  assert.match(tabsSurface, /padding:\s*0 var\(--tab-edge-clearance\)/u);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs\s*\{[^}]*gap:\s*28px;[^}]*margin-block-end:\s*12px;[^}]*padding:\s*8px var\(--tab-edge-clearance\);/u,
+  );
+});
+
 test("document tabs keep every actionable target fully visible on mobile and respect reduced motion", async () => {
   const css = await readFile(cssPath, "utf8");
+  const mobileSource = css.match(/@media\s*\(max-width:\s*760px\)\s*\{([\s\S]*?)\n\}/u)?.[1] ?? "";
 
   assert.match(
     css,
-    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*overflow-x:\s*visible/u,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs\s*\{[^}]*grid-template-columns:\s*1fr;[^}]*gap:\s*28px;[^}]*margin-block-end:\s*12px;[^}]*overflow-x:\s*visible/u,
   );
   assert.match(
     css,
     /@media\s*\(max-width:\s*760px\)[\s\S]*?\.document-tabs button\s*\{[^}]*width:\s*100%;[^}]*min-width:\s*0/u,
   );
+  assert.doesNotMatch(mobileSource, /border-bottom:/u);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/u);
 });
 
@@ -1543,19 +1646,15 @@ test("continuation facts and focus targets stay visible at short viewports", asy
     readOrEmpty(htmlPath),
     readOrEmpty(cssPath),
   ]);
-  assert.equal((html.match(/data-current-status/g) ?? []).length, 3);
-  assert.equal((html.match(/data-current-next/g) ?? []).length, 3);
+  assert.equal((html.match(/data-current-status/g) ?? []).length, 2);
+  assert.equal((html.match(/data-current-next/g) ?? []).length, 2);
   assert.match(html, /data-hero-start/);
   assert.equal((html.match(/data-panel-focus/g) ?? []).length, 9);
   assert.equal((html.match(/data-panel-focus[^>]*tabindex="-1"|tabindex="-1"[^>]*data-panel-focus/g) ?? []).length, 9);
   assert.match(styles, /\[data-panel-focus\]:focus/);
   assert.match(styles, /max-height:\s*700px/);
   assert.match(styles, /quote-hero__continuation/);
-  assert.match(styles, /\.quote-context-bar\s*\{[^}]*position:\s*sticky;/u);
-  assert.match(
-    styles,
-    /\.quote-context-bar p:last-child strong\s*\{[^}]*white-space:\s*normal;/u,
-  );
+  assert.doesNotMatch(styles, /\.quote-context-bar\s*\{/u);
   assert.match(
     styles,
     /@media\s*\(max-width:\s*760px\)[\s\S]*?\.quote-header__nav\s*\{[^}]*display:\s*grid;/u,

@@ -10,7 +10,7 @@
     <title>LaiBE DRS｜文件健檢工作台</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260815-final-runtime" />
+    <link rel="stylesheet" href="./styles.css?v=20260816-document-report" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
   </head>
   <body>
@@ -37,12 +37,6 @@
       data-quote-check-page
       data-document-workspace
     >
-      <aside class="quote-context-bar" data-quote-context aria-label="文件健檢目前進度">
-        <p><span>目前頁面</span><strong>文件健檢</strong></p>
-        <p><span>目前狀態</span><strong data-current-status>尚未選擇文件</strong></p>
-        <p><span>下一步</span><strong data-current-next>先從手上已有的 PDF 開始。</strong></p>
-      </aside>
-
       <section class="quote-hero" aria-labelledby="quote-title">
         <div class="quote-hero__copy">
           <p class="quote-eyebrow">DRS 文件健檢｜給已經拿到乙方資料的甲方</p>
@@ -166,10 +160,6 @@
               <p class="basic-report__boundary">這是固定的檢查方向預覽，目前未分析文件內容，不是這份文件的正式判定。</p>
             </section>
           </div>
-          <div class="document-panel__next">
-            <p><span>接著核對</span><strong>報價說了什麼，再看契約有沒有把責任寫進去。</strong></p>
-            <button type="button" class="text-route" data-next-document-tab="contract">接著檢查契約 <span aria-hidden="true">→</span></button>
-          </div>
         </div>
 
         <div class="document-panel" id="document-panel-contract" role="tabpanel" aria-labelledby="document-tab-contract" data-document-panel="contract" hidden>
@@ -200,10 +190,6 @@
               </ol>
               <p class="basic-report__boundary">這是固定的檢查方向預覽，目前未分析文件內容，不是法律意見或正式契約判定。</p>
             </section>
-          </div>
-          <div class="document-panel__next">
-            <p><span>接著核對</span><strong>契約把責任寫下來後，再看圖面能不能支持施工。</strong></p>
-            <button type="button" class="text-route" data-next-document-tab="drawing">接著檢查施工圖 <span aria-hidden="true">→</span></button>
           </div>
         </div>
 
@@ -240,11 +226,36 @@
               <p class="basic-report__boundary">這是固定的檢查方向預覽，目前未分析文件內容，也不等於施工可行性或安全認證。</p>
             </section>
           </div>
-          <div class="document-panel__next">
-            <p><span>三份文件都齊了之後</span><strong data-foundation-status>仍可先補齊報價、契約與施工圖。</strong></p>
-            <button type="button" class="text-route" data-view-cross-summary disabled>查看跨文件整理 <span aria-hidden="true">↓</span></button>
-          </div>
         </div>
+      </section>
+
+      <section class="inspection-output" data-inspection-output aria-labelledby="inspection-output-title" aria-live="polite">
+        <header class="inspection-output__header">
+          <div>
+            <p>本次文件檢查</p>
+            <h2 id="inspection-output-title">檢查報告輸出</h2>
+          </div>
+          <span class="inspection-output__status" data-inspection-report-status data-report-state="waiting">等待選擇 PDF</span>
+        </header>
+        <div class="inspection-output__identity">
+          <p><span>文件類型</span><strong data-inspection-report-type>報價健檢</strong></p>
+          <p><span>文件名稱</span><strong data-inspection-report-filename>尚未選擇</strong></p>
+        </div>
+        <div class="inspection-output__summary">
+          <article>
+            <span>本次檢查方向</span>
+            <p data-inspection-report-directions>缺漏項目、模糊說明、數量與單位、追加風險、圖說核對。</p>
+          </article>
+          <article>
+            <span>仍待確認</span>
+            <p>文件內容、數量、條款與圖面細節仍待正式判讀。</p>
+          </article>
+          <article>
+            <span>下一步</span>
+            <p data-inspection-report-next>先選擇報價 PDF，再依檢查方向逐項確認。</p>
+          </article>
+        </div>
+        <p class="inspection-output__boundary">此輸出只整理本頁可提供的檢查方向，不等於 PDF 內容分析或正式判定，也不會建立案件紀錄。</p>
       </section>
 
       <section class="cross-file-summary" data-cross-file-summary hidden aria-labelledby="cross-file-title">
@@ -315,6 +326,6 @@
       <span class="state-live">返回 DRS 首頁</span>
     </main>
 
-    <script type="module" src="./app.js?v=20260814-context-journey-2"></script>
+    <script type="module" src="./app.js?v=20260816-document-report"></script>
   </body>
 </html>

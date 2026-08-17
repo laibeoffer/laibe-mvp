@@ -683,13 +683,15 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
   const panels = root.querySelectorAll("[data-document-panel]");
   const fileInputs = root.querySelectorAll("[data-document-file]");
   const dropzones = root.querySelectorAll("[data-document-dropzone]");
-  const nextTabControls = root.querySelectorAll("[data-next-document-tab]");
   const statusTargets = root.querySelectorAll("[data-current-status]");
   const nextTargets = root.querySelectorAll("[data-current-next]");
   const liveTarget = root.querySelector("[data-state-live]");
   const crossSummary = root.querySelector("[data-cross-file-summary]");
-  const foundationStatus = root.querySelector("[data-foundation-status]");
-  const viewCrossSummary = root.querySelector("[data-view-cross-summary]");
+  const inspectionReportStatus = root.querySelector("[data-inspection-report-status]");
+  const inspectionReportType = root.querySelector("[data-inspection-report-type]");
+  const inspectionReportFilename = root.querySelector("[data-inspection-report-filename]");
+  const inspectionReportDirections = root.querySelector("[data-inspection-report-directions]");
+  const inspectionReportNext = root.querySelector("[data-inspection-report-next]");
   const workspaceStart = root.querySelector("[data-workspace-start]");
   const saveReport = root.querySelector("[data-save-report]");
   const saveGate = root.querySelector("[data-save-gate]");
@@ -722,6 +724,45 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
     if (projection.nextMissing === "quote") return "補上報價，讓施工範圍有計價依據。";
     if (projection.nextMissing === "contract") return "接著補上契約，核對責任與付款條件。";
     return "接著補上施工圖，核對實際施工範圍。";
+  }
+
+  function describeInspectionType(kind) {
+    if (kind === "contract") return "契約健檢";
+    if (kind === "drawing") return "圖說健檢";
+    return "報價健檢";
+  }
+
+  function describeInspectionDirections(kind) {
+    if (kind === "contract") return "服務範圍、付款節點、工期與延誤、變更追加、驗收方式與雙方責任。";
+    if (kind === "drawing") return "圖名與版次、必要平面圖、缺少圖面、施工範圍、模糊漏標與跨文件對照。";
+    return "缺漏項目、模糊說明、數量與單位、追加風險、圖說核對。";
+  }
+
+  function describeInspectionNext(kind, selected) {
+    if (selected) return "依檢查方向逐項確認，並記下需要乙方補充的資料。";
+    if (kind === "contract") return "先選擇契約 PDF，再依檢查方向逐項確認。";
+    if (kind === "drawing") return "先選擇施工圖 PDF，再依檢查方向逐項確認。";
+    return "先選擇報價 PDF，再依檢查方向逐項確認。";
+  }
+
+  function renderInspectionReport() {
+    const kind = workspaceState.activeTab;
+    const documentSelection = workspaceState.documents[kind];
+    const selected = Boolean(documentSelection);
+    if (inspectionReportStatus) {
+      inspectionReportStatus.textContent = selected ? "已建立檢查方向摘要" : "等待選擇 PDF";
+      inspectionReportStatus.dataset.reportState = selected ? "direction-ready" : "waiting";
+    }
+    if (inspectionReportType) inspectionReportType.textContent = describeInspectionType(kind);
+    if (inspectionReportFilename) {
+      inspectionReportFilename.textContent = selected ? documentSelection.name : "尚未選擇";
+    }
+    if (inspectionReportDirections) {
+      inspectionReportDirections.textContent = describeInspectionDirections(kind);
+    }
+    if (inspectionReportNext) {
+      inspectionReportNext.textContent = describeInspectionNext(kind, selected);
+    }
   }
 
   function renderDocumentStatus(kind) {
@@ -757,6 +798,7 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
       panels[index].hidden = panels[index].dataset.documentPanel !== workspaceState.activeTab;
     }
     for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentStatus(kind);
+    renderInspectionReport();
 
     setTextFor(
       '[data-prior-file-status="quote"]',
@@ -779,12 +821,6 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
       nextTargets[index].textContent = describeNextStep(projection);
     }
     if (crossSummary) crossSummary.hidden = !projection.crossFileReady;
-    if (viewCrossSummary) viewCrossSummary.disabled = !projection.crossFileReady;
-    if (foundationStatus) {
-      foundationStatus.textContent = projection.crossFileReady
-        ? "三份文件已選齊，可以查看跨文件整理架構。"
-        : "仍可先補齊報價、契約與施工圖。";
-    }
     if (liveTarget) {
       liveTarget.textContent = `目前狀態：${currentStatus}。下一步：${describeNextStep(projection)}`;
     }
@@ -874,28 +910,12 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
     });
   }
 
-  for (let index = 0; index < nextTabControls.length; index += 1) {
-    const control = nextTabControls[index];
-    control.addEventListener("click", () => {
-      const kind = control.dataset.nextDocumentTab;
-      if (isDocumentWorkspaceKind(kind)) activateTab(kind);
-      moveViewportTo(workspaceRoot);
-    });
-  }
-
   if (workspaceStart) {
     workspaceStart.addEventListener("click", () => {
       activateTab("quote", false);
       moveViewportTo(workspaceRoot);
       const activeTab = root.querySelector('[data-document-tab="quote"]');
       if (activeTab) activeTab.focus();
-    });
-  }
-
-  if (viewCrossSummary && crossSummary) {
-    viewCrossSummary.addEventListener("click", () => {
-      if (viewCrossSummary.disabled) return;
-      moveViewportTo(crossSummary);
     });
   }
 
