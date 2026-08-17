@@ -777,7 +777,7 @@ test("Public Home header DRS service contract binds its dedicated manifest-only 
   assert.equal(selectedControl.dataset.routeState, "active");
 });
 
-test("entry stages adopt luminous risk-card glass with clear neutral sequence plaques", async () => {
+test("entry stages adopt luminous risk-card glass with per-stage polished metal sequence plaques", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const protectedCopy = html.match(/<div class="hero__copy">[\s\S]*?<\/div>\s*<div class="entry-choices"/)?.[0] ?? "";
@@ -813,20 +813,25 @@ test("entry stages adopt luminous risk-card glass with clear neutral sequence pl
 
   assert.match(numberCss, /width:\s*62px;/);
   assert.match(numberCss, /height:\s*74px;/);
-  assert.match(numberCss, /border:\s*1px solid rgba\(255, 255, 255, 0\.72\);/);
+  assert.match(numberCss, /--number-metal-deep:\s*color-mix\(in srgb,\s*var\(--entry-step\) 56%,\s*var\(--bg-black\)\);/);
+  assert.match(numberCss, /--number-metal-hot:\s*color-mix\(in srgb,\s*var\(--entry-step\) 42%,\s*#fff\);/);
+  assert.match(numberCss, /--number-well:\s*color-mix\(in srgb,\s*var\(--entry-step\) 10%,\s*var\(--chapter-surface\)\);/);
+  assert.match(numberCss, /border:\s*1px solid var\(--number-metal-hot\);/);
   assert.match(numberCss, /border-radius:\s*16px;/);
-  assert.match(numberCss, /background:\s*transparent;/);
+  assert.match(numberCss, /background:\s*conic-gradient\(\s*from 215deg,/s);
+  assert.match(numberCss, /var\(--number-metal-deep\)[\s\S]*?var\(--number-metal-hot\)[\s\S]*?var\(--number-metal-mid\)/);
   assert.match(numberCss, /-webkit-backdrop-filter:\s*none;/);
   assert.match(numberCss, /backdrop-filter:\s*none;/);
-  assert.doesNotMatch(numberCss, /background:[^;}]*(?:color-mix|rgba\(5, 8, 12)/s);
-  assert.match(numberCss, /color:\s*rgba\(255, 255, 255, 0\.94\);/);
-  assert.match(numberCss, /0 0 14px rgba\(255, 255, 255, 0\.18\)/);
-  assert.match(numberCss, /text-shadow:[^;}]*0 0 14px rgba\(255, 255, 255, 0\.38\)/s);
-  assert.doesNotMatch(numberCss, /var\(--entry-step\)|color-mix/);
-  assert.match(numberBeforeCss, /background:\s*transparent;/);
-  assert.match(numberBeforeCss, /0 0 8px rgba\(255, 255, 255, 0\.12\)/);
-  assert.doesNotMatch(numberBeforeCss, /var\(--entry-step\)|color-mix/);
+  assert.match(numberCss, /color:\s*color-mix\(in srgb,\s*var\(--entry-step\) 16%,\s*#fff\);/);
+  assert.match(numberCss, /0 0 10px color-mix\(in srgb,\s*var\(--entry-step\) 20%,\s*transparent\)/);
+  assert.match(numberCss, /text-shadow:[^;}]*0 2px 5px rgba\(0, 0, 0, 0\.76\)/s);
+  assert.match(numberBeforeCss, /inset:\s*4px;/);
+  assert.match(numberBeforeCss, /background:\s*radial-gradient\(circle at 34% 24%,[^}]*linear-gradient\(145deg,\s*var\(--number-well\)/s);
+  assert.match(numberBeforeCss, /inset -3px -4px 7px rgba\(0, 0, 0, 0\.62\)/);
+  assert.doesNotMatch(numberCss, /background:\s*transparent/);
+  assert.doesNotMatch(numberBeforeCss, /background:\s*transparent/);
   assert.doesNotMatch(numberCss, /clip-path|polygon/);
+  assert.doesNotMatch(css, /\.entry-choice__number::after\s*\{/);
   assert.doesNotMatch(entrySection, /risk-map__number|>\s*風險\s*</);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.entry-choice\s*\{[^}]*grid-template-columns:\s*56px minmax\(0,\s*1fr\) 40px;/s);
 });
@@ -1079,25 +1084,31 @@ test("three decision branches consume their dedicated manifest-only quote-check 
   assert.match(css, /\.decision-node__heading h3\s*\{[^}]*margin:\s*1em 0 0/s);
   const toolCss = css.match(/\.decision-node__tool\s*\{[^}]*\}/s)?.[0] ?? "";
   assert.match(toolCss, /--tool-glass:[^;]*var\(--decision-step\)/s);
+  assert.match(toolCss, /--tool-frame-deep:[^;]*var\(--tool-glass\)/s);
+  assert.match(toolCss, /--tool-frame-hot:[^;]*var\(--tool-edge\)/s);
+  assert.match(toolCss, /--tool-well:[^;]*var\(--decision-step\)[^;]*var\(--chapter-surface\)/s);
   assert.match(toolCss, /display:\s*inline-flex;[\s\S]*?min-height:\s*48px/);
-  assert.match(toolCss, /border-radius:\s*var\(--pill\);[\s\S]*?overflow:\s*hidden/);
-  assert.match(toolCss, /radial-gradient\(ellipse at 50% 88%/);
-  assert.match(toolCss, /linear-gradient\([\s\S]*?var\(--tool-glass\)/);
-  assert.match(toolCss, /box-shadow:[\s\S]*?inset 0 -12px 14px/);
+  assert.match(toolCss, /border-radius:\s*4px;[\s\S]*?overflow:\s*hidden/);
+  assert.match(toolCss, /background:\s*linear-gradient\(\s*118deg,[^}]*var\(--tool-frame-hot\)[^}]*var\(--tool-frame-deep\)/s);
+  assert.match(toolCss, /box-shadow:[\s\S]*?inset 0 1px 0 rgba\(255, 255, 255, 0\.58\)[\s\S]*?0 6px 14px -10px var\(--tool-glow\)/s);
+  assert.doesNotMatch(toolCss, /border-radius:\s*var\(--pill\)|radial-gradient\(ellipse at 50% 88%|clip-path/);
   assert.match(toolCss, /font-weight:\s*800;[\s\S]*?letter-spacing:\s*0\.065em/);
-  assert.match(css, /\.decision-node__tool::before\s*\{[^}]*inset:\s*3px 8px 52%;[^}]*border-radius:[^}]*background:\s*linear-gradient\(180deg,[^}]*rgba\(255,\s*255,\s*255,\s*0\.82\)[^}]*content:\s*""/s);
-  assert.match(css, /\.decision-node__tool::after\s*\{[^}]*inset:\s*auto 14% -13px;[^}]*height:\s*20px;[^}]*background:[^}]*var\(--tool-glow\)[^}]*filter:\s*blur\(8px\)/s);
+  assert.match(css, /\.decision-node__tool::before\s*\{[^}]*inset:\s*2px;[^}]*border-radius:\s*inherit;[^}]*background:\s*linear-gradient\(105deg,\s*var\(--tool-well\)[^}]*inset -2px -2px 4px rgba\(0, 0, 0, 0\.68\)[^}]*content:\s*""/s);
+  assert.match(css, /\.decision-node__tool::after\s*\{[^}]*inset:\s*3px;[^}]*border-radius:\s*inherit;[^}]*background:\s*repeating-linear-gradient\(100deg,[^}]*filter:\s*none;[^}]*opacity:\s*0\.32/s);
   assert.match(css, /\.decision-node__tool-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*0\.14em;[^}]*transform:\s*translateY\(-1px\);[^}]*text-shadow:[^}]*rgba\(0,\s*0,\s*0,\s*0\.54\)/s);
   assert.match(css, /\.decision-node__tool-subject\s*\{[^}]*color:\s*#fff;[^}]*font-weight:\s*900/s);
   assert.match(css, /\.decision-node__tool-action\s*\{[^}]*color:\s*rgba\(245,\s*251,\s*253,\s*0\.82\);[^}]*font-weight:\s*720/s);
   assert.match(css, /\.decision-node__tool-icon\s*\{[^}]*z-index:\s*1;[^}]*stroke-width:\s*2\.35/s);
   assert.match(css, /\.decision-node:nth-child\(5\)\s+\.decision-node__tool\s*\{[^}]*--tool-glass:/s);
-  assert.match(css, /\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*-1/s);
+  assert.match(css, /\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*-1;[^}]*border-radius:\s*28px 4px 4px 18px/s);
+  assert.match(css, /\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*4px 28px 18px 4px/s);
   assert.match(css, /\.decision-node--action\s+\.decision-node__copy p\s*\{[^}]*margin-top:\s*clamp\(34px,\s*3vw,\s*42px\)/s);
   assert.match(css, /\.decision-node__tool:hover\s*\{[^}]*transform:\s*translateY\(calc\(50%\s*-\s*2px\)\)/s);
   assert.match(css, /\.decision-node__tool:focus-visible\s*\{[^}]*outline:\s*2px solid #fff/s);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*0/s);
+  assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*4px 22px 15px 4px/s);
   assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node__tool\s*\{[^}]*min-height:\s*44px;[^}]*font-size:\s*0\.68rem/s);
+  assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*4px 18px 12px 4px/s);
 
   const { PUBLIC_ROUTES } = await import(
     `${publicContractUrl.href}?home-decision-routes=${Date.now()}`
