@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="LaiBE DRS 文件健檢工作台，協助甲方先了解報價、契約與施工圖的檢查方向，再決定下一步。"
+      content="LaiBE DRS 報價文件自查工作台，協助業主依固定清單整理報價、契約與施工圖的待確認事項。"
     />
-    <title>LaiBE DRS｜文件健檢工作台</title>
+    <title>LaiBE DRS｜報價文件自查</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260817-workspace-hero" />
+    <link rel="stylesheet" href="./styles.css?v=20260817-self-check-v2" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
   </head>
   <body>
@@ -31,224 +31,245 @@
       </div>
     </header>
 
-    <main
-      class="owner-first-shell quote-shell"
-      id="main-content"
-      data-quote-check-page
-      data-document-workspace
-    >
-      <section class="document-workspace document-workspace--hero" id="document-workspace" data-document-workspace-root aria-labelledby="workspace-title">
-        <div class="workspace-heading">
-          <div>
-            <p class="workspace-heading__eyebrow">從手上已有的文件開始</p>
-            <h1 id="workspace-title">選一份文件，先看哪裡不能只靠口頭帶過。</h1>
-          </div>
-          <div class="workspace-now" aria-label="目前狀態與下一步">
-            <p><span>目前狀態</span><strong data-current-status>尚未選擇文件</strong></p>
-            <p><span>下一步／責任人</span><strong><span data-current-responsibility>甲方</span>｜<span data-current-next>先從手上已有的 PDF 開始。</span></strong></p>
-          </div>
+    <main class="owner-first-shell quote-shell" id="main-content" data-quote-check-page data-document-workspace>
+      <section class="self-check-hero" aria-labelledby="workspace-title">
+        <p class="workspace-heading__eyebrow">給已拿到報價、契約或圖說的業主</p>
+        <h1 id="workspace-title">報價文件自查</h1>
+        <p class="self-check-hero__lead">先依九個固定問題整理哪些地方已說清楚、哪些需要補件，再把問題交給正確的人。</p>
+        <p class="self-check-hero__boundary">目前版本提供固定自查清單，不會讀取或分析 PDF 內容。選擇檔案只會在本次瀏覽顯示檔名，不會送出或保存。</p>
+        <div class="self-check-hero__actions">
+          <button class="owner-first-primary-action" type="button" data-start-self-check>開始第一項自查</button>
+          <a class="owner-first-secondary-action" href="#self-check-summary">查看本次進度</a>
         </div>
+        <div class="workspace-now" aria-label="目前狀態與下一步">
+          <p><span>目前狀態</span><strong data-current-status>9 項尚未確認</strong></p>
+          <p><span>下一步／責任人</span><strong><span data-current-responsibility>我（甲方）</span>｜<span data-current-next>先回答第一個報價問題。</span></strong></p>
+        </div>
+      </section>
 
-        <div class="document-tabs" role="tablist" aria-label="文件健檢類型">
-          <button
-            id="document-tab-quote"
-            role="tab"
-            type="button"
-            data-document-tab="quote"
-            aria-selected="true"
-            aria-controls="document-panel-quote"
-          ><span>01</span><strong>報價健檢</strong><small data-tab-status="quote">尚未選擇</small></button>
-          <button
-            id="document-tab-contract"
-            role="tab"
-            type="button"
-            data-document-tab="contract"
-            aria-selected="false"
-            aria-controls="document-panel-contract"
-            tabindex="-1"
-          ><span>02</span><strong>契約健檢</strong><small data-tab-status="contract">尚未選擇</small></button>
-          <button
-            id="document-tab-drawing"
-            role="tab"
-            type="button"
-            data-document-tab="drawing"
-            aria-selected="false"
-            aria-controls="document-panel-drawing"
-            tabindex="-1"
-          ><span>03</span><strong>圖說健檢</strong><small data-tab-status="drawing">尚未選擇</small></button>
+      <section class="document-workspace" id="document-workspace" data-document-workspace-root aria-labelledby="checklist-title">
+        <header class="workspace-heading workspace-heading--compact">
+          <div>
+            <p class="workspace-heading__eyebrow">固定自查清單</p>
+            <h2 id="checklist-title">逐項確認，不必先選 PDF</h2>
+          </div>
+          <p>每題只能選一個狀態；選擇「需要補件」或「我不確定」後，可補上備註與下一位處理人。</p>
+        </header>
+
+        <div class="document-tabs" role="tablist" aria-label="自查文件類型">
+          <button id="document-tab-quote" role="tab" type="button" data-document-tab="quote" aria-selected="true" aria-controls="document-panel-quote"><span>01</span><strong>報價內容</strong><small data-tab-status="quote">0/3 已確認</small></button>
+          <button id="document-tab-contract" role="tab" type="button" data-document-tab="contract" aria-selected="false" aria-controls="document-panel-contract" tabindex="-1"><span>02</span><strong>契約條款</strong><small data-tab-status="contract">0/3 已確認</small></button>
+          <button id="document-tab-drawing" role="tab" type="button" data-document-tab="drawing" aria-selected="false" aria-controls="document-panel-drawing" tabindex="-1"><span>03</span><strong>施工圖說</strong><small data-tab-status="drawing">0/3 已確認</small></button>
         </div>
 
         <div class="document-panel" id="document-panel-quote" role="tabpanel" aria-labelledby="document-tab-quote" data-document-panel="quote">
-          <div class="document-panel__intro">
-            <p>報價健檢</p>
-            <h3>先看這份報價，有哪些地方值得你先問清楚。</h3>
-            <p>本頁先列出項目寫法、數量單位、施工範圍與追加風險的檢查方向；目前不會分析這份報價內容。</p>
-          </div>
+          <header class="document-panel__intro">
+            <p>報價內容</p>
+            <h2>先確認報價能不能成為共同討論依據</h2>
+            <p>從規格、數量與圖說對照開始，找出日後容易變成追加或認知落差的地方。</p>
+          </header>
           <div class="document-panel__body">
-            <label class="document-dropzone" for="document-file-quote" data-document-dropzone="quote">
-              <span class="document-dropzone__format" aria-hidden="true">PDF</span>
-              <span><strong>把乙方報價拖到這裡</strong><small>或選擇 PDF；檔案目前只在本頁暫時檢視，尚未送出或保存。</small></span>
-              <span class="document-dropzone__action">選擇檔案</span>
-            </label>
-            <input id="document-file-quote" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="quote" />
-            <p class="document-feedback" data-document-feedback="quote" aria-live="polite">尚未選擇報價 PDF。</p>
-
-            <div class="document-checkpoints" aria-label="報價基本健檢方向">
-              <span>缺漏項目</span><span>模糊說明</span><span>數量與單位</span><span>追加風險</span><span>需要圖說核對</span><span>目前不能判斷</span>
+            <div class="self-check-list">
+              <fieldset class="self-check-item" id="check-quote-scope" data-check-item data-check-kind="quote" data-check-id="quote-scope" data-check-category="報價內容" tabindex="-1">
+                <legend><span>01</span>是否有項目只寫名稱，沒有規格或範圍？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-quote-scope" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-scope" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-scope" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-scope" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：木作櫃體只寫一式，缺少尺寸與材質"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
+              <fieldset class="self-check-item" id="check-quote-quantity" data-check-item data-check-kind="quote" data-check-id="quote-quantity" data-check-category="報價內容" tabindex="-1">
+                <legend><span>02</span>數量與單位能不能對回實際施工內容？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-quote-quantity" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-quantity" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-quantity" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-quantity" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：油漆坪數與現場丈量範圍不同"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
+              <fieldset class="self-check-item" id="check-quote-drawing" data-check-item data-check-kind="quote" data-check-id="quote-drawing" data-check-category="報價內容" tabindex="-1">
+                <legend><span>03</span>哪些項目必須配合施工圖才能判斷？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-quote-drawing" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-drawing" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-drawing" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-quote-drawing" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：天花燈具數量需要對照配置圖"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
             </div>
-            <div class="report-rule">
-              <p><strong>目前提供的是檢查方向</strong><span>不會依總價、頁數或文件內容產生個別結果</span></p>
-            </div>
-            <section class="basic-report" data-basic-report="quote" hidden aria-labelledby="quote-report-title">
-              <p>檢查方向預覽</p>
-              <h4 id="quote-report-title">先確認這些問題，再討論要不要答應。</h4>
-              <ol>
-                <li><span>01</span><div><strong>是否有項目只寫名稱，沒有規格或範圍？</strong><p>寫得太簡略，後續很難判斷是否屬於原報價。</p><small>下一份需要：規格、數量或對應圖說</small></div></li>
-                <li><span>02</span><div><strong>數量與單位能不能對回實際施工內容？</strong><p>總價看得懂，不代表計價依據已經說清楚。</p><small>下一份需要：數量明細或丈量依據</small></div></li>
-                <li><span>03</span><div><strong>哪些項目必須配合施工圖才能判斷？</strong><p>只有報價，仍不足以確認完整施工範圍。</p><small>下一份需要：施工圖 PDF</small></div></li>
-              </ol>
-              <p class="basic-report__boundary">這是固定的檢查方向預覽，目前未分析文件內容，不是這份文件的正式判定。</p>
+            <section class="optional-file" aria-labelledby="optional-file-quote-title">
+              <div><p>輔助辨識</p><h3 id="optional-file-quote-title">選擇 PDF（選填）</h3><p>只顯示檔名，選不選都能完成自查。</p></div>
+              <label class="document-dropzone" for="document-file-quote" data-document-dropzone="quote"><span class="document-dropzone__format" aria-hidden="true">PDF</span><span><strong>選擇報價 PDF</strong><small>不會讀取、上傳或分析內容</small></span></label>
+              <input id="document-file-quote" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="quote" aria-describedby="document-feedback-quote" aria-invalid="false" />
+              <p class="document-feedback" id="document-feedback-quote" data-document-feedback="quote">尚未選擇檔案。</p>
+              <p class="selected-file" data-selected-file="quote" hidden><span>檔名</span><strong data-document-filename="quote"></strong></p>
             </section>
           </div>
         </div>
 
         <div class="document-panel" id="document-panel-contract" role="tabpanel" aria-labelledby="document-tab-contract" data-document-panel="contract" hidden>
-          <div class="document-panel__intro">
-            <p>契約健檢</p>
-            <h3>簽下去以前，先看看哪些責任還沒有說清楚。</h3>
-            <p>本頁先列出付款、工期、變更、驗收與雙方責任的檢查方向；目前不會分析這份契約內容。</p>
-          </div>
+          <header class="document-panel__intro">
+            <p>契約條款</p>
+            <h2>簽名前先找出最難回頭的責任邊界</h2>
+            <p>付款、變更與文件優先順序都要有共同依據，不能只靠口頭記憶。</p>
+          </header>
           <div class="document-panel__body">
-            <div class="prior-file-note"><span data-prior-file-status="quote">報價尚未選擇</span><strong>已取得報價後，可與本次契約一起核對，不用重新選擇。</strong></div>
-            <label class="document-dropzone" for="document-file-contract" data-document-dropzone="contract">
-              <span class="document-dropzone__format" aria-hidden="true">PDF</span>
-              <span><strong>把目前的工程或設計契約拖到這裡</strong><small>或選擇 PDF；尚未簽署的版本也可以先看。</small></span>
-              <span class="document-dropzone__action">選擇檔案</span>
-            </label>
-            <input id="document-file-contract" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="contract" />
-            <p class="document-feedback" data-document-feedback="contract" aria-live="polite">尚未選擇契約 PDF。</p>
-            <div class="document-checkpoints" aria-label="契約基本健檢方向">
-              <span>服務範圍</span><span>付款節點</span><span>工期與延誤</span><span>變更與追加</span><span>驗收方式</span><span>雙方責任</span><span>報價圖說是否一致</span>
+            <div class="self-check-list">
+              <fieldset class="self-check-item" id="check-contract-payment" data-check-item data-check-kind="contract" data-check-id="contract-payment" data-check-category="契約條款" tabindex="-1">
+                <legend><span>01</span>付款節點有沒有對應可以確認的成果？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-contract-payment" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-payment" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-payment" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-payment" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：第二期款只有日期，沒有完成項目"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
+              <fieldset class="self-check-item" id="check-contract-change" data-check-item data-check-kind="contract" data-check-id="contract-change" data-check-category="契約條款" tabindex="-1">
+                <legend><span>02</span>追加與變更由誰提出、誰確認？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-contract-change" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-change" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-change" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-change" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：未寫明變更前是否要先報價並確認"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
+              <fieldset class="self-check-item" id="check-contract-match" data-check-item data-check-kind="contract" data-check-id="contract-match" data-check-category="契約條款" tabindex="-1">
+                <legend><span>03</span>契約範圍能不能對回報價與圖說？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-contract-match" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-match" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-match" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-contract-match" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：契約附件未列報價與圖說版次"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
             </div>
-            <section class="basic-report" data-basic-report="contract" hidden aria-labelledby="contract-report-title">
-              <p>檢查方向預覽</p>
-              <h4 id="contract-report-title">先找出簽下去後最難回頭的地方。</h4>
-              <ol>
-                <li><span>01</span><div><strong>付款節點有沒有對應可以確認的成果？</strong><p>只有日期或比例，甲方仍可能不知道什麼狀態才該付款。</p><small>下一份需要：付款條件與驗收依據</small></div></li>
-                <li><span>02</span><div><strong>追加與變更由誰提出、誰確認？</strong><p>流程沒有寫清楚，口頭變更容易成為後續爭議。</p><small>下一份需要：書面變更約定</small></div></li>
-                <li><span>03</span><div><strong>契約範圍能不能對回報價與圖說？</strong><p>三份文件說法不一致時，責任邊界會變模糊。</p><small>下一份需要：有效報價與施工圖</small></div></li>
-              </ol>
-              <p class="basic-report__boundary">這是固定的檢查方向預覽，目前未分析文件內容，不是法律意見或正式契約判定。</p>
+            <section class="optional-file" aria-labelledby="optional-file-contract-title">
+              <div><p>輔助辨識</p><h3 id="optional-file-contract-title">選擇 PDF（選填）</h3><p>只顯示檔名，選不選都能完成自查。</p></div>
+              <label class="document-dropzone" for="document-file-contract" data-document-dropzone="contract"><span class="document-dropzone__format" aria-hidden="true">PDF</span><span><strong>選擇契約 PDF</strong><small>不會讀取、上傳或分析內容</small></span></label>
+              <input id="document-file-contract" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="contract" aria-describedby="document-feedback-contract" aria-invalid="false" />
+              <p class="document-feedback" id="document-feedback-contract" data-document-feedback="contract">尚未選擇檔案。</p>
+              <p class="selected-file" data-selected-file="contract" hidden><span>檔名</span><strong data-document-filename="contract"></strong></p>
             </section>
           </div>
         </div>
 
         <div class="document-panel" id="document-panel-drawing" role="tabpanel" aria-labelledby="document-tab-drawing" data-document-panel="drawing" hidden>
-          <div class="document-panel__intro">
-            <p>圖說健檢</p>
-            <h3>施工圖不是有就好，還要看它能不能真的拿來施工。</h3>
-            <p>有完整施工圖最好；目前只有平面圖也能先看檢查方向，但本頁不會判斷圖說是否完整或可供施工。</p>
-          </div>
+          <header class="document-panel__intro">
+            <p>施工圖說</p>
+            <h2>確認大家討論的是同一套有效圖面</h2>
+            <p>版次、缺圖與施工範圍都要能回到報價與契約，才有共同事實可追溯。</p>
+          </header>
           <div class="document-panel__body">
-            <div class="prior-file-note prior-file-note--double">
-              <span data-prior-file-status="quote">報價尚未選擇</span>
-              <span data-prior-file-status="contract">契約尚未選擇</span>
-              <strong>已選擇的文件會保留在本次瀏覽，不用重複選擇。</strong>
+            <div class="self-check-list">
+              <fieldset class="self-check-item" id="check-drawing-version" data-check-item data-check-kind="drawing" data-check-id="drawing-version" data-check-category="施工圖說" tabindex="-1">
+                <legend><span>01</span>圖名、日期與版次是否能辨識？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-drawing-version" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-version" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-version" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-version" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：兩份平面圖日期相同但內容不同"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
+              <fieldset class="self-check-item" id="check-drawing-missing" data-check-item data-check-kind="drawing" data-check-id="drawing-missing" data-check-category="施工圖說" tabindex="-1">
+                <legend><span>02</span>平面配置外，哪些施工內容還沒有對應圖面？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-drawing-missing" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-missing" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-missing" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-missing" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：缺少天花、插座與櫃體詳圖"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
+              <fieldset class="self-check-item" id="check-drawing-match" data-check-item data-check-kind="drawing" data-check-id="drawing-match" data-check-category="施工圖說" tabindex="-1">
+                <legend><span>03</span>圖上範圍能不能對回報價與契約？</legend>
+                <div class="self-check-options">
+                  <label class="self-check-option"><input type="radio" name="check-drawing-match" value="unconfirmed" checked />尚未確認</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-match" value="clear" />已說清楚</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-match" value="needs-info" />需要補件</label>
+                  <label class="self-check-option"><input type="radio" name="check-drawing-match" value="uncertain" />我不確定</label>
+                </div>
+                <div class="self-check-details" data-check-details hidden>
+                  <label>補充備註（選填）<textarea rows="2" data-check-note placeholder="例如：圖上有櫃體，報價與契約都未列"></textarea></label>
+                  <label>下一步由誰處理<select data-check-owner><option value="owner">我（甲方）</option><option value="provider">設計師／統包</option></select></label>
+                </div>
+              </fieldset>
             </div>
-            <label class="document-dropzone" for="document-file-drawing" data-document-dropzone="drawing">
-              <span class="document-dropzone__format" aria-hidden="true">PDF</span>
-              <span><strong>把施工圖拖到這裡</strong><small>或選擇 PDF；只有平面圖也能先開始，但不會被視為圖說完整。</small></span>
-              <span class="document-dropzone__action">選擇檔案</span>
-            </label>
-            <input id="document-file-drawing" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="drawing" />
-            <p class="document-feedback" data-document-feedback="drawing" aria-live="polite">尚未選擇施工圖 PDF。</p>
-            <div class="document-checkpoints" aria-label="圖說基本健檢方向">
-              <span>圖名與版次</span><span>必要平面圖</span><span>缺少的圖面</span><span>施工範圍</span><span>模糊或漏標</span><span>報價契約對照</span>
-            </div>
-            <section class="basic-report" data-basic-report="drawing" hidden aria-labelledby="drawing-report-title">
-              <p>檢查方向預覽</p>
-              <h4 id="drawing-report-title">先確認這套圖能不能成為共同施工依據。</h4>
-              <ol>
-                <li><span>01</span><div><strong>圖名、日期與版次是否能辨識？</strong><p>沒有唯一有效版次，就容易拿不同版本討論。</p><small>下一份需要：有效版本確認</small></div></li>
-                <li><span>02</span><div><strong>平面配置外，哪些施工內容還沒有對應圖面？</strong><p>只有一張平面圖，通常不足以確認所有細部。</p><small>下一份需要：缺少圖面清單</small></div></li>
-                <li><span>03</span><div><strong>圖上範圍能不能對回報價與契約？</strong><p>文件沒有互相對照，漏項與追加較難提前發現。</p><small>下一份需要：報價、契約與圖說有效版</small></div></li>
-              </ol>
-              <p class="basic-report__boundary">這是固定的檢查方向預覽，目前未分析文件內容，也不等於施工可行性或安全認證。</p>
+            <section class="optional-file" aria-labelledby="optional-file-drawing-title">
+              <div><p>輔助辨識</p><h3 id="optional-file-drawing-title">選擇 PDF（選填）</h3><p>只顯示檔名，選不選都能完成自查。</p></div>
+              <label class="document-dropzone" for="document-file-drawing" data-document-dropzone="drawing"><span class="document-dropzone__format" aria-hidden="true">PDF</span><span><strong>選擇施工圖 PDF</strong><small>不會讀取、上傳或分析內容</small></span></label>
+              <input id="document-file-drawing" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="drawing" aria-describedby="document-feedback-drawing" aria-invalid="false" />
+              <p class="document-feedback" id="document-feedback-drawing" data-document-feedback="drawing">尚未選擇檔案。</p>
+              <p class="selected-file" data-selected-file="drawing" hidden><span>檔名</span><strong data-document-filename="drawing"></strong></p>
             </section>
           </div>
         </div>
       </section>
 
-      <section class="inspection-output" data-inspection-output aria-labelledby="inspection-output-title" aria-live="polite">
-        <header class="inspection-output__header">
-          <div>
-            <p>本次文件檢查</p>
-            <h2 id="inspection-output-title">檢查報告輸出</h2>
-          </div>
-          <span class="inspection-output__status" data-inspection-report-status data-report-state="waiting">等待選擇 PDF</span>
+      <section class="self-check-summary" id="self-check-summary" data-self-check-summary aria-labelledby="self-check-summary-title">
+        <header>
+          <div><p>本次瀏覽的即時整理</p><h2 id="self-check-summary-title">本次自查進度</h2></div>
+          <p>狀態與責任人會跟著你的選擇更新，但不會自動保存。</p>
         </header>
-        <div class="inspection-output__identity">
-          <p><span>文件類型</span><strong data-inspection-report-type>報價健檢</strong></p>
-          <p><span>文件名稱</span><strong data-inspection-report-filename>尚未選擇</strong></p>
+        <div class="self-check-summary__counts">
+          <p><span>已確認</span><strong data-summary-confirmed>0/9</strong></p>
+          <p><span>待補件</span><strong data-summary-needs-info>0</strong></p>
+          <p><span>尚不確定</span><strong data-summary-uncertain>0</strong></p>
+          <p><span>下一步由我（甲方）處理</span><strong data-summary-owner>0</strong></p>
+          <p><span>等待設計師／統包處理</span><strong data-summary-provider>0</strong></p>
         </div>
-        <div class="inspection-output__summary">
-          <article>
-            <span>本次檢查方向</span>
-            <p data-inspection-report-directions>缺漏項目、模糊說明、數量與單位、追加風險、圖說核對。</p>
-          </article>
-          <article>
-            <span>仍待確認</span>
-            <p>文件內容、數量、條款與圖面細節仍待正式判讀。</p>
-          </article>
-          <article>
-            <span>下一步</span>
-            <p data-inspection-report-next>先選擇報價 PDF，再依檢查方向逐項確認。</p>
-          </article>
-        </div>
-        <p class="inspection-output__boundary">此輸出只整理本頁可提供的檢查方向，不等於 PDF 內容分析或正式判定，也不會建立案件紀錄。</p>
+        <p class="file-selection-summary" data-file-selection-summary>PDF 為選填，目前未選擇檔名。</p>
       </section>
 
-      <section class="cross-file-summary" data-cross-file-summary hidden aria-labelledby="cross-file-title">
-        <div class="cross-file-summary__intro">
-          <p>跨文件整理｜文件基礎已建立</p>
-          <h2 id="cross-file-title">先看正式比對時，會整理哪些事情。</h2>
-          <p>目前只確認三種 PDF 已在本次瀏覽被選擇；以下是正式比對會使用的整理架構，不是已完成的案件結論。</p>
-        </div>
-        <ol>
-          <li><span>01</span><div><strong>說得一致的地方</strong><p>找出報價、契約與圖說對同一範圍是否有共同說法。</p></div></li>
-          <li><span>02</span><div><strong>對不起來的地方</strong><p>標出項目、責任、版次或範圍互相矛盾的位置。</p></div></li>
-          <li><span>03</span><div><strong>目前還缺的東西</strong><p>把無法判斷的原因與需要補的文件逐項列清楚。</p></div></li>
-          <li><span>04</span><div><strong>你接下來要先決定什麼</strong><p>把問題交回正確責任人，再由甲方做最後決定。</p></div></li>
-        </ol>
-      </section>
-
-      <section class="conversion-section" aria-labelledby="conversion-title">
-        <div>
-          <p>看完檢查方向後，先了解報告會怎麼整理</p>
-            <h2 id="conversion-title">先看基本報告範例，再整理這次討論的起點。</h2>
-        </div>
-        <div class="conversion-section__body">
-          <p>下一頁是固定的閱讀指南，不會把本次選擇誤寫成個別分析。看完後可用兩分鐘整理摘要，再決定是否註冊。</p>
-          <div class="conversion-actions">
-            <a class="owner-first-primary-action" href="../basic_report/code.html">查看基本報告範例</a>
-            <a class="owner-first-secondary-action" href="#document-workspace">回到文件選擇</a>
-            <button class="owner-first-secondary-action" type="button" data-save-report>了解保存方式</button>
-          </div>
-          <div class="save-gate" data-save-gate hidden>
-            <strong>目前無法保存本次檢查結果。</strong>
-            <p>保存功能與登入入口仍在整理中；你可以先查看檢查方向，檔案不會自動送出，也不會建立正式案件。</p>
-          </div>
-        </div>
+      <section class="pending-items" id="pending-items" aria-labelledby="pending-items-title">
+        <header>
+          <div><p>帶進下一次討論</p><h2 id="pending-items-title">待確認事項</h2></div>
+          <button class="owner-first-secondary-action" type="button" data-copy-pending disabled>複製待確認事項</button>
+        </header>
+        <p class="pending-items__empty" data-pending-empty>目前沒有待確認事項。你仍可繼續檢查其他項目。</p>
+        <ol class="pending-items__list" data-pending-list hidden></ol>
+        <p class="copy-feedback" data-copy-feedback></p>
       </section>
 
       <section class="processing-boundary" aria-label="目前處理邊界">
         <strong>尚未建立案件紀錄</strong>
-        <p>檔案只在本次瀏覽暫時檢視。瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證。大小待正式規則確認、頁數待正式解析、可讀性待正式解析。</p>
-        <p>尚未形成正式案件結果；結果格式示意，非真實案件。正式 DRS 開放後，案件紀錄才會回答誰、何時、依據哪一份文件、目前狀態與下一步責任人。</p>
+        <p>本次自查內容只保留在目前頁面；重新整理或離開後會消失，尚未建立案件紀錄。</p>
+        <p>若要留下可追溯的決策紀錄，仍需在正式案件中確認文件版本、處理人與完成時間。</p>
       </section>
 
       <template data-internal-state-contract>
-        INTRODUCTION｜服務說明｜給已取得乙方報價單的甲方
+        INTRODUCTION｜服務說明｜給已取得設計師或統包報價單的甲方
         CONSENT｜同意本機檢視
         SELECT_FILE｜選擇報價 PDF
         VALIDATION_PENDING｜檔案標示與後續確認
@@ -273,9 +294,8 @@
         <span data-panel-focus tabindex="-1">這份檔案目前不能繼續</span>
       </div>
       <p class="state-live" data-state-live aria-live="polite"></p>
-      <span class="state-live">返回 DRS 首頁</span>
     </main>
 
-    <script type="module" src="./app.js?v=20260816-document-report"></script>
+    <script type="module" src="./app.js?v=20260817-self-check-v2"></script>
   </body>
 </html>

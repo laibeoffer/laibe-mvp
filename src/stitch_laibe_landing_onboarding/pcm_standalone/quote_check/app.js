@@ -103,6 +103,8 @@ const nonWhitespaceFileNamePattern = /\S/u;
 const safeHasNonWhitespaceFileName = RegExp.prototype.test.bind(
   nonWhitespaceFileNamePattern,
 );
+const pdfFileNamePattern = /\.pdf$/iu;
+const safeHasPdfFileName = RegExp.prototype.test.bind(pdfFileNamePattern);
 
 function readOwnDataValue(input, property) {
   if (
@@ -349,7 +351,7 @@ export const QUOTE_CHECK_FAILURES = safeFreeze({
   FILE_FORMAT_INVALID: failureState({
     code: "FILE_FORMAT_INVALID",
     reason: "瀏覽器未提供可確認的 PDF 檔案標示；內容格式仍未驗證。",
-    nextAction: "回到檔案選擇，改選瀏覽器標示為 PDF 的乙方報價檔。",
+    nextAction: "回到檔案選擇，改選瀏覽器標示為 PDF 的設計師／統包報價檔。",
     payloadPolicy: "ZERO_CASE_DATA",
   }),
   FILE_TOO_LARGE: failureState({
@@ -370,7 +372,7 @@ export const QUOTE_CHECK_FAILURES = safeFreeze({
   FILE_CORRUPTED: failureState({
     code: "FILE_CORRUPTED",
     reason: "檔案若無法正常開啟，就不能進入後續書面核對。",
-    nextAction: "請乙方重新匯出可正常開啟的 PDF，再重新選擇。",
+    nextAction: "請設計師／統包重新匯出可正常開啟的 PDF，再重新選擇。",
   }),
   DUPLICATE_SUBMISSION: failureState({
     code: "DUPLICATE_SUBMISSION",
@@ -381,7 +383,7 @@ export const QUOTE_CHECK_FAILURES = safeFreeze({
   VERSION_CONFLICT: failureState({
     code: "VERSION_CONFLICT",
     reason: "檔名或文件內容若指向不同版本，就無法確認核對依據。",
-    nextAction: "請乙方確認唯一有效版次，再重新選擇。",
+    nextAction: "請設計師／統包確認唯一有效版次，再重新選擇。",
     payloadPolicy: "VERSION_REFERENCE_ONLY",
   }),
   QUOTE_ONLY_DRAWING_MISSING: failureState({
@@ -534,6 +536,18 @@ export const DOCUMENT_WORKSPACE_KINDS = safeFreeze([
   "drawing",
 ]);
 
+const SELF_CHECK_STATUS_LABELS = safeFreeze({
+  unconfirmed: "尚未確認",
+  clear: "已說清楚",
+  "needs-info": "需要補件",
+  uncertain: "我不確定",
+});
+
+const SELF_CHECK_OWNER_LABELS = safeFreeze({
+  owner: "我（甲方）",
+  provider: "設計師／統包",
+});
+
 function isDocumentWorkspaceKind(kind) {
   return kind === "quote" || kind === "contract" || kind === "drawing";
 }
@@ -546,6 +560,20 @@ export function resolveDocumentWorkspaceMode(search = "") {
   } catch {
     return "quote";
   }
+}
+
+export function resolveDocumentWorkspaceHash(hash = "") {
+  if (typeof hash !== "string" || hash.length < 2) return null;
+  let id = "";
+  try {
+    id = decodeURIComponent(hash.slice(1));
+  } catch {
+    return null;
+  }
+  if (/^(?:document-(?:tab|panel)-quote|check-quote-)/u.test(id)) return "quote";
+  if (/^(?:document-(?:tab|panel)-contract|check-contract-)/u.test(id)) return "contract";
+  if (/^(?:document-(?:tab|panel)-drawing|check-drawing-)/u.test(id)) return "drawing";
+  return null;
 }
 
 function freezeDocumentSelection(selection) {
@@ -595,6 +623,15 @@ export function recordDocumentSelection(state, kind, selection) {
   });
 }
 
+export function clearDocumentSelection(state, kind) {
+  if (!state || !state.documents || !isDocumentWorkspaceKind(kind)) return state;
+  if (!state.documents[kind]) return state;
+  return freezeDocumentWorkspaceState(state.activeTab, {
+    ...state.documents,
+    [kind]: null,
+  });
+}
+
 export function projectDocumentWorkspace(state) {
   const documents = state && state.documents ? state.documents : createDocumentWorkspaceState().documents;
   let uploadedCount = 0;
@@ -613,6 +650,70 @@ export function projectDocumentWorkspace(state) {
           ? "drawing"
           : null,
   });
+}
+
+export function isAcceptedPdfFileMetadata(name, type = "") {
+  return typeof name === "string" &&
+    typeof type === "string" &&
+    safeHasNonWhitespaceFileName(name) &&
+    (type === "application/pdf" || safeHasPdfFileName(name));
+}
+
+export function projectSelfCheckItems(items = []) {
+  const summary = {
+    total: 0,
+    confirmed: 0,
+    clear: 0,
+    needsInfo: 0,
+    uncertain: 0,
+    unconfirmed: 0,
+    owner: 0,
+    provider: 0,
+  };
+  const pending = [];
+  if (!safeArrayIsArray(items)) return safeFreeze({ ...summary, pending: safeFreeze(pending) });
+
+  for (let index = 0; index < items.length; index += 1) {
+    const item = items[index];
+    if (!item || typeof item !== "object") continue;
+    const status = item.status;
+    if (!Object.hasOwn(SELF_CHECK_STATUS_LABELS, status)) continue;
+    summary.total += 1;
+    if (status === "unconfirmed") {
+      summary.unconfirmed += 1;
+      continue;
+    }
+    summary.confirmed += 1;
+    if (status === "clear") summary.clear += 1;
+    if (status === "needs-info") summary.needsInfo += 1;
+    if (status === "uncertain") summary.uncertain += 1;
+    if (status !== "needs-info" && status !== "uncertain") continue;
+    const owner = item.owner === "provider" ? "provider" : "owner";
+    summary[owner] += 1;
+    pending.push(safeFreeze({
+      category: typeof item.category === "string" ? item.category : "文件自查",
+      id: typeof item.id === "string" ? item.id : "",
+      note: typeof item.note === "string" ? item.note : "",
+      owner,
+      question: typeof item.question === "string" ? item.question : "待確認項目",
+      status,
+    }));
+  }
+
+  return safeFreeze({ ...summary, pending: safeFreeze(pending) });
+}
+
+export function formatPendingItems(items = []) {
+  const projection = projectSelfCheckItems(items);
+  if (projection.pending.length === 0) return "";
+  const lines = ["待確認事項"];
+  for (let index = 0; index < projection.pending.length; index += 1) {
+    const item = projection.pending[index];
+    lines.push(`${index + 1}. 【${item.category}｜${SELF_CHECK_STATUS_LABELS[item.status]}】${item.question}`);
+    lines.push(`備註：${item.note || "未填寫"}`);
+    lines.push(`下一步：${SELF_CHECK_OWNER_LABELS[item.owner]}`);
+  }
+  return lines.join("\n");
 }
 
 function readTrustedPdfFileList(files) {
@@ -655,11 +756,7 @@ function readTrustedPdfFileList(files) {
     }
     const name = safeApply(trustedFileNameGetter, file, SAFE_EMPTY_ARGUMENTS);
     const type = safeApply(trustedBlobTypeGetter, file, SAFE_EMPTY_ARGUMENTS);
-    if (
-      typeof name !== "string" ||
-      !safeHasNonWhitespaceFileName(name) ||
-      type !== "application/pdf"
-    ) {
+    if (!isAcceptedPdfFileMetadata(name, type)) {
       return INVALID_FILE_SELECTION;
     }
     return fileSelectionResult("PDF_METADATA", name);
@@ -688,24 +785,24 @@ function readDocumentInputSelection(input) {
   }
 }
 
-function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
+function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHash = "") {
   const tabs = root.querySelectorAll("[data-document-tab]");
   const panels = root.querySelectorAll("[data-document-panel]");
   const fileInputs = root.querySelectorAll("[data-document-file]");
   const dropzones = root.querySelectorAll("[data-document-dropzone]");
+  const checkItems = root.querySelectorAll("[data-check-item]");
   const statusTargets = root.querySelectorAll("[data-current-status]");
   const nextTargets = root.querySelectorAll("[data-current-next]");
+  const responsibilityTargets = root.querySelectorAll("[data-current-responsibility]");
   const liveTarget = root.querySelector("[data-state-live]");
-  const crossSummary = root.querySelector("[data-cross-file-summary]");
-  const inspectionReportStatus = root.querySelector("[data-inspection-report-status]");
-  const inspectionReportType = root.querySelector("[data-inspection-report-type]");
-  const inspectionReportFilename = root.querySelector("[data-inspection-report-filename]");
-  const inspectionReportDirections = root.querySelector("[data-inspection-report-directions]");
-  const inspectionReportNext = root.querySelector("[data-inspection-report-next]");
-  const workspaceStart = root.querySelector("[data-workspace-start]");
-  const saveReport = root.querySelector("[data-save-report]");
-  const saveGate = root.querySelector("[data-save-gate]");
+  const workspaceStart = root.querySelector("[data-start-self-check]");
+  const pendingList = root.querySelector("[data-pending-list]");
+  const pendingEmpty = root.querySelector("[data-pending-empty]");
+  const copyPending = root.querySelector("[data-copy-pending]");
+  const copyFeedback = root.querySelector("[data-copy-feedback]");
+  const domFactory = root.ownerDocument || null;
   let workspaceState = createDocumentWorkspaceState(initialMode);
+  let pendingCopyText = "";
 
   function tabKind(tab) {
     const candidate = tab && tab.dataset ? tab.dataset.documentTab : null;
@@ -720,84 +817,56 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
   }
 
   function moveViewportTo(target) {
-    if (!target) return;
+    if (!target || typeof target.getBoundingClientRect !== "function") return;
+    if (typeof window === "undefined" || typeof window.scrollTo !== "function") return;
     const targetTop = window.scrollY + target.getBoundingClientRect().top - 92;
+    const reduceMotion = typeof window.matchMedia === "function" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollTo({
       top: Math.max(0, targetTop),
-      behavior: "smooth",
+      behavior: reduceMotion ? "auto" : "smooth",
     });
   }
 
-  function describeNextStep(projection) {
-    if (projection.uploadedCount === 0) return "先從手上已有的 PDF 開始。";
-    if (projection.crossFileReady) return "三類檢查方向已看完；回首頁確認案件是否適合使用 DRS。";
-    if (projection.nextMissing === "quote") return "補上報價，讓施工範圍有計價依據。";
-    if (projection.nextMissing === "contract") return "接著補上契約，核對責任與付款條件。";
-    return "接著補上施工圖，核對實際施工範圍。";
+  function readCheckItem(item) {
+    const selected = item.querySelector('input[type="radio"]:checked');
+    const legend = item.querySelector("legend");
+    const note = item.querySelector("[data-check-note]");
+    const owner = item.querySelector("[data-check-owner]");
+    const question = legend && typeof legend.textContent === "string"
+      ? legend.textContent.replace(/^\s*\d+\s*/u, "").trim()
+      : "待確認項目";
+    return {
+      category: item.dataset.checkCategory || "文件自查",
+      id: item.dataset.checkId || "",
+      kind: item.dataset.checkKind || "quote",
+      note: note && typeof note.value === "string" ? note.value.trim() : "",
+      owner: owner && owner.value === "provider" ? "provider" : "owner",
+      question,
+      status: selected && Object.hasOwn(SELF_CHECK_STATUS_LABELS, selected.value)
+        ? selected.value
+        : "unconfirmed",
+    };
   }
 
-  function describeInspectionType(kind) {
-    if (kind === "contract") return "契約健檢";
-    if (kind === "drawing") return "圖說健檢";
-    return "報價健檢";
+  function readAllCheckItems() {
+    const records = [];
+    for (let index = 0; index < checkItems.length; index += 1) {
+      records.push(readCheckItem(checkItems[index]));
+    }
+    return records;
   }
 
-  function describeInspectionDirections(kind) {
-    if (kind === "contract") return "服務範圍、付款節點、工期與延誤、變更追加、驗收方式與雙方責任。";
-    if (kind === "drawing") return "圖名與版次、必要平面圖、缺少圖面、施工範圍、模糊漏標與跨文件對照。";
-    return "缺漏項目、模糊說明、數量與單位、追加風險、圖說核對。";
-  }
-
-  function describeInspectionNext(kind, selected) {
-    if (selected) return "依檢查方向逐項確認，並記下需要乙方補充的資料。";
-    if (kind === "contract") return "先選擇契約 PDF，再依檢查方向逐項確認。";
-    if (kind === "drawing") return "先選擇施工圖 PDF，再依檢查方向逐項確認。";
-    return "先選擇報價 PDF，再依檢查方向逐項確認。";
-  }
-
-  function renderInspectionReport() {
-    const kind = workspaceState.activeTab;
+  function renderDocumentSelection(kind) {
     const documentSelection = workspaceState.documents[kind];
     const selected = Boolean(documentSelection);
-    if (inspectionReportStatus) {
-      inspectionReportStatus.textContent = selected ? "已建立檢查方向摘要" : "等待選擇 PDF";
-      inspectionReportStatus.dataset.reportState = selected ? "direction-ready" : "waiting";
-    }
-    if (inspectionReportType) inspectionReportType.textContent = describeInspectionType(kind);
-    if (inspectionReportFilename) {
-      inspectionReportFilename.textContent = selected ? documentSelection.name : "尚未選擇";
-    }
-    if (inspectionReportDirections) {
-      inspectionReportDirections.textContent = describeInspectionDirections(kind);
-    }
-    if (inspectionReportNext) {
-      inspectionReportNext.textContent = describeInspectionNext(kind, selected);
-    }
+    const filename = root.querySelector(`[data-document-filename="${kind}"]`);
+    const filenameRow = root.querySelector(`[data-selected-file="${kind}"]`);
+    if (filename) filename.textContent = selected ? documentSelection.name : "";
+    if (filenameRow) filenameRow.hidden = !selected;
   }
 
-  function renderDocumentStatus(kind) {
-    const documentSelection = workspaceState.documents[kind];
-    const selected = Boolean(documentSelection);
-    setTextFor(
-      `[data-document-status="${kind}"]`,
-      selected ? "已選擇（尚未送出）" : "尚未選擇",
-    );
-    setTextFor(
-      `[data-document-filename="${kind}"]`,
-      selected ? documentSelection.name : "尚未選擇檔案",
-    );
-    setTextFor(
-      `[data-tab-status="${kind}"]`,
-      selected ? "本次瀏覽已選擇" : "尚未選擇",
-    );
-    const ledger = root.querySelector(`[data-ledger-kind="${kind}"]`);
-    if (ledger) ledger.dataset.documentState = selected ? "selected" : "empty";
-    const report = root.querySelector(`[data-basic-report="${kind}"]`);
-    if (report) report.hidden = !selected;
-  }
-
-  function render() {
-    const projection = projectDocumentWorkspace(workspaceState);
+  function renderTabsAndPanels() {
     for (let index = 0; index < tabs.length; index += 1) {
       const tab = tabs[index];
       const active = tabKind(tab) === workspaceState.activeTab;
@@ -807,68 +876,195 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
     for (let index = 0; index < panels.length; index += 1) {
       panels[index].hidden = panels[index].dataset.documentPanel !== workspaceState.activeTab;
     }
-    for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentStatus(kind);
-    renderInspectionReport();
+  }
 
-    setTextFor(
-      '[data-prior-file-status="quote"]',
-      workspaceState.documents.quote ? "已取得報價 ✓" : "報價尚未選擇",
-    );
-    setTextFor(
-      '[data-prior-file-status="contract"]',
-      workspaceState.documents.contract ? "已取得契約 ✓" : "契約尚未選擇",
-    );
+  function renderPendingItems(records, projection) {
+    pendingCopyText = formatPendingItems(records);
+    if (pendingEmpty) pendingEmpty.hidden = projection.pending.length > 0;
+    if (pendingList) {
+      pendingList.hidden = projection.pending.length === 0;
+      if (typeof pendingList.replaceChildren === "function") pendingList.replaceChildren();
+      if (domFactory && typeof domFactory.createElement === "function") {
+        for (let index = 0; index < projection.pending.length; index += 1) {
+          const item = projection.pending[index];
+          const row = domFactory.createElement("li");
+          const heading = domFactory.createElement("strong");
+          const question = domFactory.createElement("p");
+          const note = domFactory.createElement("p");
+          const owner = domFactory.createElement("p");
+          heading.textContent = `${item.category}｜${SELF_CHECK_STATUS_LABELS[item.status]}`;
+          question.textContent = item.question;
+          note.textContent = `備註：${item.note || "未填寫"}`;
+          owner.textContent = `下一步：${SELF_CHECK_OWNER_LABELS[item.owner]}`;
+          row.append(heading, question, note, owner);
+          pendingList.append(row);
+        }
+      }
+    }
+    if (copyPending) copyPending.disabled = projection.pending.length === 0;
+  }
 
-    const currentStatus = projection.uploadedCount === 0
-      ? "尚未選擇文件"
-      : projection.crossFileReady
-        ? "本次瀏覽已選齊三份文件"
-        : `已選擇 ${projection.uploadedCount}／3 份文件`;
+  function renderSelfCheck() {
+    const records = readAllCheckItems();
+    const projection = projectSelfCheckItems(records);
+    for (let index = 0; index < checkItems.length; index += 1) {
+      const item = checkItems[index];
+      const details = item.querySelector("[data-check-details]");
+      const status = records[index]?.status || "unconfirmed";
+      if (details) details.hidden = status !== "needs-info" && status !== "uncertain";
+      item.dataset.checkState = status;
+    }
+
+    for (const kind of DOCUMENT_WORKSPACE_KINDS) {
+      let completed = 0;
+      for (let index = 0; index < records.length; index += 1) {
+        if (records[index].kind === kind && records[index].status !== "unconfirmed") completed += 1;
+      }
+      setTextFor(`[data-tab-status="${kind}"]`, `${completed}/3 已確認`);
+    }
+
+    setTextFor("[data-summary-confirmed]", `${projection.confirmed}/${projection.total || 9}`);
+    setTextFor("[data-summary-needs-info]", String(projection.needsInfo));
+    setTextFor("[data-summary-uncertain]", String(projection.uncertain));
+    setTextFor("[data-summary-owner]", String(projection.owner));
+    setTextFor("[data-summary-provider]", String(projection.provider));
+    renderPendingItems(records, projection);
+
+    const currentStatus = projection.unconfirmed > 0
+      ? `${projection.unconfirmed} 項尚未確認`
+      : projection.pending.length > 0
+        ? `${projection.total} 項已確認，${projection.pending.length} 項待處理`
+        : `${projection.total} 項已確認，沒有待確認事項`;
+    const firstUnconfirmed = records.find((item) => item.status === "unconfirmed");
+    const firstPending = projection.pending[0] || null;
+    const nextStep = firstUnconfirmed
+      ? `繼續確認「${firstUnconfirmed.question}」`
+      : firstPending
+        ? `處理「${firstPending.question}」`
+        : "可複製整理結果，或返回 DRS 首頁。";
+    const responsibleRole = firstUnconfirmed
+      ? "我（甲方）"
+      : firstPending
+        ? SELF_CHECK_OWNER_LABELS[firstPending.owner]
+        : "我（甲方）";
     for (let index = 0; index < statusTargets.length; index += 1) {
       statusTargets[index].textContent = currentStatus;
     }
     for (let index = 0; index < nextTargets.length; index += 1) {
-      nextTargets[index].textContent = describeNextStep(projection);
+      nextTargets[index].textContent = nextStep;
     }
-    if (crossSummary) crossSummary.hidden = !projection.crossFileReady;
-    if (liveTarget) {
-      liveTarget.textContent = `目前狀態：${currentStatus}。下一步：${describeNextStep(projection)}`;
+    for (let index = 0; index < responsibilityTargets.length; index += 1) {
+      responsibilityTargets[index].textContent = responsibleRole;
     }
+    return { currentStatus, nextStep, projection, records };
+  }
+
+  function render() {
+    renderTabsAndPanels();
+    for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentSelection(kind);
+    const documentProjection = projectDocumentWorkspace(workspaceState);
+    const fileSummary = documentProjection.uploadedCount === 0
+      ? "PDF 為選填，目前未選擇檔名。"
+      : documentProjection.uploadedCount === 3
+        ? "三類檔名已選擇，尚未分析或比對。"
+        : `${documentProjection.uploadedCount}/3 類檔名已選擇，尚未分析內容。`;
+    setTextFor("[data-file-selection-summary]", fileSummary);
+    return renderSelfCheck();
+  }
+
+  function announce(message) {
+    if (liveTarget) liveTarget.textContent = message;
   }
 
   function activateTab(kind, shouldFocus = true) {
     const nextState = selectDocumentWorkspaceTab(workspaceState, kind);
     if (nextState === workspaceState && workspaceState.activeTab !== kind) return;
     workspaceState = nextState;
-    render();
+    renderTabsAndPanels();
     if (!shouldFocus) return;
     for (let index = 0; index < tabs.length; index += 1) {
       if (tabKind(tabs[index]) === kind) {
-        tabs[index].focus();
+        if (typeof tabs[index].focus === "function") tabs[index].focus();
         break;
       }
     }
   }
 
-  function acceptSelection(kind, selection) {
+  function acceptSelection(kind, selection, input = null) {
     const feedback = root.querySelector(`[data-document-feedback="${kind}"]`);
-    if (selection === EMPTY_FILE_SELECTION) {
-      if (feedback) feedback.textContent = "沒有選擇檔案；原本的本次瀏覽狀態未變更。";
-      return;
-    }
-    if (selection.kind !== "PDF_METADATA") {
+    if (selection === EMPTY_FILE_SELECTION) return;
+    if (!selection || selection.kind !== "PDF_METADATA") {
+      workspaceState = clearDocumentSelection(workspaceState, kind);
+      if (input) {
+        try {
+          input.value = "";
+        } catch {
+          // Browsers allow clearing a file input, but keep the visible state truthful if a host blocks it.
+        }
+      }
       if (feedback) {
-        feedback.textContent = "這份檔案目前不能繼續：請改選瀏覽器標示為 PDF 的文件。檔案沒有送出。";
+        feedback.textContent = "無法選用此檔案，請重新選擇 PDF。";
         feedback.dataset.feedbackState = "error";
       }
+      if (input && typeof input.setAttribute === "function") input.setAttribute("aria-invalid", "true");
+      render();
+      announce("無法選用此檔案，請重新選擇 PDF。");
       return;
     }
     workspaceState = recordDocumentSelection(workspaceState, kind, selection);
     if (feedback) {
-      feedback.textContent = `本次瀏覽已選擇：${selection.name}。內容格式仍待正式分析。`;
+      feedback.textContent = "已選擇檔案，尚未分析內容。";
       feedback.dataset.feedbackState = "selected";
     }
+    if (input && typeof input.setAttribute === "function") input.setAttribute("aria-invalid", "false");
+    const projection = projectDocumentWorkspace(workspaceState);
     render();
+    announce(projection.uploadedCount === 3
+      ? "三類檔名已選擇，尚未分析或比對。"
+      : "已選擇檔案，尚未分析內容。");
+  }
+
+  function focusFirstUnconfirmed() {
+    for (let index = 0; index < checkItems.length; index += 1) {
+      const record = readCheckItem(checkItems[index]);
+      if (record.status !== "unconfirmed") continue;
+      activateTab(record.kind, false);
+      moveViewportTo(checkItems[index]);
+      if (typeof checkItems[index].focus === "function") checkItems[index].focus();
+      announce(`已移到第一個尚未確認項目：${record.question}`);
+      return;
+    }
+    const summary = root.querySelector("[data-self-check-summary]");
+    moveViewportTo(summary);
+    if (summary && typeof summary.focus === "function") summary.focus();
+    announce("所有項目都已確認，已移到本次自查進度。");
+  }
+
+  function applyHashTarget(hash) {
+    if (typeof hash !== "string" || hash.length < 2) return;
+    let id = "";
+    try {
+      id = decodeURIComponent(hash.slice(1));
+    } catch {
+      return;
+    }
+    if (!/^[A-Za-z][A-Za-z0-9:_-]*$/u.test(id)) return;
+    const target = domFactory && typeof domFactory.getElementById === "function"
+      ? domFactory.getElementById(id)
+      : null;
+    if (!target || !root.contains?.(target)) return;
+    const panel = typeof target.closest === "function" ? target.closest("[data-document-panel]") : null;
+    const kind = panel?.dataset?.documentPanel;
+    if (isDocumentWorkspaceKind(kind)) activateTab(kind, false);
+    const focusTarget = () => {
+      moveViewportTo(target);
+      if (typeof target.focus === "function") target.focus({ preventScroll: true });
+    };
+    if (typeof globalThis.requestAnimationFrame === "function") {
+      globalThis.requestAnimationFrame(focusTarget);
+    } else {
+      focusTarget();
+    }
   }
 
   for (let index = 0; index < tabs.length; index += 1) {
@@ -878,10 +1074,13 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
       if (kind) activateTab(kind, false);
     });
     tab.addEventListener("keydown", (event) => {
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
       event.preventDefault();
-      const offset = event.key === "ArrowRight" ? 1 : -1;
-      const nextIndex = (index + offset + tabs.length) % tabs.length;
+      let nextIndex = index;
+      if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
+      if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
+      if (event.key === "Home") nextIndex = 0;
+      if (event.key === "End") nextIndex = tabs.length - 1;
       const kind = tabKind(tabs[nextIndex]);
       if (kind) activateTab(kind);
     });
@@ -892,7 +1091,7 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
     input.addEventListener("change", () => {
       const kind = input.dataset.documentFile;
       if (!isDocumentWorkspaceKind(kind)) return;
-      acceptSelection(kind, readDocumentInputSelection(input));
+      acceptSelection(kind, readDocumentInputSelection(input), input);
     });
   }
 
@@ -916,28 +1115,64 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
       } catch {
         files = null;
       }
-      acceptSelection(kind, readTrustedPdfFileList(files));
+      const input = root.querySelector(`[data-document-file="${kind}"]`);
+      acceptSelection(kind, readTrustedPdfFileList(files), input);
+    });
+  }
+
+  for (let index = 0; index < checkItems.length; index += 1) {
+    const item = checkItems[index];
+    item.addEventListener("change", () => {
+      const state = renderSelfCheck();
+      const record = readCheckItem(item);
+      announce(`${record.question}：${SELF_CHECK_STATUS_LABELS[record.status]}。${state.currentStatus}。`);
+    });
+    item.addEventListener("input", () => {
+      renderSelfCheck();
     });
   }
 
   if (workspaceStart) {
     workspaceStart.addEventListener("click", () => {
-      activateTab("quote", false);
-      moveViewportTo(workspaceRoot);
-      const activeTab = root.querySelector('[data-document-tab="quote"]');
-      if (activeTab) activeTab.focus();
+      focusFirstUnconfirmed();
     });
   }
 
-  if (saveReport && saveGate) {
-    saveReport.addEventListener("click", () => {
-      saveGate.hidden = false;
-      saveGate.setAttribute("tabindex", "-1");
-      saveGate.focus();
+  if (copyPending) {
+    copyPending.addEventListener("click", async () => {
+      if (!pendingCopyText) return;
+      try {
+        if (!globalThis.navigator?.clipboard || typeof globalThis.navigator.clipboard.writeText !== "function") {
+          throw new Error("clipboard unavailable");
+        }
+        await globalThis.navigator.clipboard.writeText(pendingCopyText);
+        if (copyFeedback) copyFeedback.textContent = "已複製待確認事項。";
+        announce("已複製待確認事項。");
+      } catch {
+        if (copyFeedback) copyFeedback.textContent = "目前無法自動複製，請手動選取待確認事項。";
+        announce("目前無法自動複製，請手動選取待確認事項。");
+      }
     });
   }
 
   render();
+  if (initialHash) {
+    const applyInitialHash = () => applyHashTarget(initialHash);
+    if (typeof globalThis.requestAnimationFrame === "function") {
+      globalThis.requestAnimationFrame(applyInitialHash);
+    } else {
+      applyInitialHash();
+    }
+  }
+  if (typeof globalThis.addEventListener === "function") {
+    globalThis.addEventListener("hashchange", () => {
+      try {
+        applyHashTarget(typeof location !== "undefined" ? location.hash : "");
+      } catch {
+        applyHashTarget("");
+      }
+    });
+  }
 }
 
 export function initializeQuoteCheckPage(documentRoot = document, locationSource = globalThis.location) {
@@ -954,8 +1189,14 @@ export function initializeQuoteCheckPage(documentRoot = document, locationSource
     } catch {
       search = "";
     }
-    const initialMode = resolveDocumentWorkspaceMode(search);
-    initializeDocumentWorkspace(root, workspaceRoot, initialMode);
+    let hash = "";
+    try {
+      hash = typeof locationSource?.hash === "string" ? locationSource.hash : "";
+    } catch {
+      hash = "";
+    }
+    const initialMode = resolveDocumentWorkspaceHash(hash) || resolveDocumentWorkspaceMode(search);
+    initializeDocumentWorkspace(root, workspaceRoot, initialMode, hash);
     return;
   }
 
@@ -1196,12 +1437,7 @@ export function initializeQuoteCheckPage(documentRoot = document, locationSource
         file,
         SAFE_EMPTY_ARGUMENTS,
       );
-      if (
-        typeof name !== "string" ||
-        !safeHasNonWhitespaceFileName(name) ||
-        typeof type !== "string" ||
-        type !== "application/pdf"
-      ) {
+      if (!isAcceptedPdfFileMetadata(name, type)) {
         return INVALID_FILE_SELECTION;
       }
 
