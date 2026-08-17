@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>案件執行總覽｜LaiBE DRS</title>
+  <style>
+    :root {
+      --ink: #18201d;
+      --muted: #65716c;
+      --line: #dbe2de;
+      --paper: #f5f7f5;
+      --white: #ffffff;
+      --forest: #183f35;
+      --mint: #d9eee5;
+      --jade: #2c7a61;
+      --amber: #a26318;
+      --amber-soft: #fff2dc;
+      --blue: #315f89;
+      --blue-soft: #eaf2f8;
+      --danger: #a43b3b;
+      --danger-soft: #faeaea;
+      --shadow: 0 18px 48px rgba(28, 48, 40, .09);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+      line-height: 1.55;
+    }
+    button { font: inherit; }
+    button:focus-visible, a:focus-visible {
+      outline: 3px solid #f0a345;
+      outline-offset: 3px;
+    }
+    button:disabled { cursor: not-allowed; opacity: .48; }
+    [hidden] { display: none !important; }
+
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 264px minmax(0, 1fr); }
+    .rail {
+      background: var(--forest);
+      color: #f8fbf9;
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .brand { font-weight: 900; letter-spacing: -.02em; font-size: 1.25rem; }
+    .brand span { color: #9ed3be; }
+    .rail-note { margin: 0; color: #c4d8cf; font-size: .88rem; }
+    .rail-nav { display: grid; gap: 8px; }
+    .rail-nav a {
+      color: #c4d8cf;
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+    .rail-nav a[aria-current="page"] { color: var(--forest); background: #f4f7f5; }
+    .rail-boundary {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,.14);
+      color: #b9cec5;
+      font-size: .78rem;
+    }
+
+    main { min-width: 0; padding: 34px clamp(20px, 4vw, 58px) 64px; }
+    .topbar { display: flex; gap: 20px; align-items: flex-start; justify-content: space-between; }
+    .eyebrow { margin: 0 0 8px; color: var(--jade); font-size: .76rem; font-weight: 900; letter-spacing: .13em; }
+    h1 { margin: 0; font-size: clamp(1.8rem, 3vw, 3rem); line-height: 1.12; letter-spacing: -.035em; }
+    .intro { max-width: 760px; margin: 12px 0 0; color: var(--muted); }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; }
+    .button {
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 17px;
+      background: var(--white);
+      color: var(--ink);
+      font-weight: 850;
+      cursor: pointer;
+    }
+    .button.primary { background: var(--forest); border-color: var(--forest); color: white; }
+    .button.subtle { background: transparent; }
+
+    .notice {
+      margin: 22px 0;
+      padding: 14px 16px;
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue);
+      color: #294d6d;
+      border-radius: 4px 12px 12px 4px;
+      font-size: .88rem;
+    }
+    .sample-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: var(--amber);
+      background: var(--amber-soft);
+      font-size: .76rem;
+      font-weight: 900;
+    }
+
+    .state-card {
+      margin-top: 28px;
+      min-height: 320px;
+      border: 1px dashed #b9c7c0;
+      border-radius: 26px;
+      background: rgba(255,255,255,.62);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 38px 22px;
+    }
+    .state-card.error { border-color: #d9abab; background: var(--danger-soft); }
+    .state-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 16px;
+      border-radius: 18px;
+      background: var(--mint);
+      color: var(--forest);
+      font-size: 1.5rem;
+      font-weight: 900;
+    }
+    .state-card.error .state-icon { background: #f3caca; color: var(--danger); }
+    .state-card h2 { margin: 0; font-size: 1.3rem; }
+    .state-card p { margin: 8px auto 20px; color: var(--muted); max-width: 570px; }
+
+    .summary { display: grid; gap: 18px; margin-top: 28px; }
+    .responsibility {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr 1.5fr 1.2fr;
+      background: var(--forest);
+      color: white;
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .responsibility > div { min-width: 0; padding: 18px 20px; border-right: 1px solid rgba(255,255,255,.14); }
+    .responsibility > div:last-child { border-right: 0; }
+    .responsibility small { display: block; color: #9fc7b7; font-weight: 850; margin-bottom: 5px; }
+    .responsibility strong { display: block; font-size: .95rem; }
+
+    .identity-card, .panel {
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 28px rgba(32, 50, 42, .045);
+    }
+    .identity-card { padding: 22px; }
+    .identity-head { display: flex; gap: 16px; justify-content: space-between; align-items: flex-start; }
+    .identity-head h2 { margin: 3px 0 6px; font-size: 1.35rem; }
+    .identity-head p { margin: 0; color: var(--muted); }
+    .type-chip { flex: none; color: var(--forest); background: var(--mint); border-radius: 999px; padding: 7px 12px; font-weight: 900; font-size: .78rem; }
+    .identity-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 12px; margin-top: 20px; }
+    .datum { min-width: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+    .datum dt { color: var(--muted); font-size: .72rem; font-weight: 800; }
+    .datum dd { margin: 4px 0 0; font-weight: 850; overflow-wrap: anywhere; }
+
+    .lane-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; }
+    .panel-head { padding: 19px 20px 15px; border-bottom: 1px solid var(--line); }
+    .panel-head h2 { margin: 0; font-size: 1.08rem; }
+    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: .82rem; }
+    .panel-body { padding: 8px 20px 18px; }
+    .stage { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .stage:last-child { border-bottom: 0; }
+    .stage strong, .stage span { display: block; }
+    .stage small { color: var(--muted); }
+    .amount { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .amount b { color: var(--jade); }
+
+    .payment-rule {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 1px;
+      background: var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      margin: 14px 0 8px;
+    }
+    .payment-rule div { background: #f9fbfa; padding: 12px; }
+    .payment-rule small { display: block; color: var(--muted); }
+    .payment-rule b { font-size: 1.2rem; }
+
+    .wide-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 18px; }
+    .file-row, .gate-row, .change-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .file-row:last-child, .gate-row:last-child, .change-row:last-child { border-bottom: 0; }
+    .file-kind { min-width: 64px; color: var(--blue); font-size: .73rem; font-weight: 900; }
+    .file-row strong, .gate-row strong, .change-row strong { display: block; }
+    .file-row small, .gate-row small, .change-row small { color: var(--muted); }
+    .gate-dot { flex: none; width: 10px; height: 10px; margin-top: 7px; border-radius: 50%; background: var(--amber); }
+    .gate-dot.done { background: var(--jade); }
+
+    .boundary {
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      background: #f0f3f1;
+      color: #52605a;
+      font-size: .84rem;
+    }
+    .boundary strong { color: var(--ink); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 1080px) {
+      .shell { grid-template-columns: 210px minmax(0,1fr); }
+      .responsibility { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .responsibility > div:nth-child(2) { border-right: 0; }
+      .responsibility > div:nth-child(-n+2) { border-bottom: 1px solid rgba(255,255,255,.14); }
+      .identity-grid { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    }
+
+    @media (max-width: 720px) {
+      .shell { display: block; }
+      .rail { min-height: 0; padding: 18px 20px; gap: 12px; }
+      .rail-nav, .rail-boundary { display: none; }
+      main { padding: 24px 16px 48px; }
+      .topbar { display: block; }
+      .actions { justify-content: flex-start; margin-top: 18px; }
+      .actions .button { flex: 1 1 auto; }
+      .responsibility, .lane-grid, .wide-grid, .identity-grid { grid-template-columns: 1fr; }
+      .responsibility > div { border-right: 0; border-bottom: 1px solid rgba(255,255,255,.14); }
+      .responsibility > div:last-child { border-bottom: 0; }
+      .identity-head { display: block; }
+      .type-chip { display: inline-block; margin-top: 14px; }
+      .payment-rule { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .stage { grid-template-columns: 1fr; }
+      .amount { text-align: left; }
+    }
+
+    @media print {
+      body { background: white; }
+      .rail, .actions, .notice, #emptyState, #errorState { display: none !important; }
+      .shell { display: block; }
+      main { padding: 0; }
+      .summary { margin: 0; }
+      .identity-card, .panel, .responsibility { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="rail" aria-label="LaiBE DRS 導覽">
+      <div class="brand">LaiBE <span>DRS</span></div>
+      <p class="rail-note">讓案件依同一份契約、報價、圖說與紀錄往前走。</p>
+      <nav class="rail-nav">
+        <a href="../pro_dashboard/code.html">案件清單</a>
+        <a href="./code.html" aria-current="page">案件執行總覽</a>
+        <a href="../pro_workspace/code.html">工作區</a>
+      </nav>
+      <div class="rail-boundary">本頁是案件資料的讀取與整理畫面，不會代替當事人簽署、付款或作成最終決定。</div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">甲乙案件 · 契約執行</p>
+          <h1>案件執行總覽</h1>
+          <p class="intro">把契約版本、設計交付、工程節點、付款條件、文件與變更放回同一份案件依據，清楚看見現在狀態與下一責任人。</p>
+        </div>
+        <div class="actions">
+          <button class="button primary" id="loadSample" type="button">載入教學範例</button>
+          <button class="button subtle" id="clearView" type="button" disabled>清除本頁資料</button>
+          <button class="button" id="printSummary" type="button" disabled>列印目前總覽</button>
+        </div>
+      </header>
+
+      <div class="notice">目前只在本頁顯示，不會保存或同步到其他頁面。正式案件資料、跨頁同步、正式簽署與保存入口仍在整理中。</div>
+      <div id="statusAnnouncer" class="sr-only" aria-live="polite"></div>
+
+      <section class="state-card" id="emptyState" aria-labelledby="emptyTitle">
+        <div>
+          <div class="state-icon" aria-hidden="true">＋</div>
+          <h2 id="emptyTitle">尚未載入案件契約</h2>
+          <p>請載入已整理的案件資料，或先用教學範例了解這份總覽。</p>
+          <button class="button primary" id="loadSampleEmpty" type="button">載入教學範例</button>
+        </div>
+      </section>
+
+      <section class="state-card error" id="errorState" role="alert" hidden>
+        <div>
+          <div class="state-icon" aria-hidden="true">!</div>
+          <h2 id="errorTitle">案件資料無法安全顯示</h2>
+          <p id="errorMessage">案件、當事人、契約版本或依據文件未能一致對上，請先確認資料後再載入。</p>
+          <button class="button" id="retrySample" type="button">重新載入教學範例</button>
+        </div>
+      </section>
+
+      <section class="summary" id="summary" aria-label="案件契約執行內容" hidden>
+        <div><span class="sample-mark">教學範例 · 僅在本頁顯示</span></div>
+
+        <section class="responsibility" aria-label="目前責任與下一步">
+          <div><small>現在狀態</small><strong id="currentState"></strong></div>
+          <div><small>誰正在等待誰</small><strong id="waitingOn"></strong></div>
+          <div><small>下一步</small><strong id="nextAction"></strong></div>
+          <div><small>本次會留下什麼</small><strong id="recordNotice"></strong></div>
+        </section>
+
+        <section class="identity-card" aria-labelledby="caseTitle">
+          <div class="identity-head">
+            <div>
+              <p class="eyebrow">案件與契約身分</p>
+              <h2 id="caseTitle"></h2>
+              <p id="caseAddress"></p>
+            </div>
+            <span class="type-chip" id="contractType"></span>
+          </div>
+          <dl class="identity-grid">
+            <div class="datum"><dt>甲方</dt><dd id="ownerName"></dd></div>
+            <div class="datum"><dt>乙方</dt><dd id="contractorName"></dd></div>
+            <div class="datum"><dt>案件／契約／版本</dt><dd id="caseIdentity"></dd></div>
+            <div class="datum"><dt>報價依據</dt><dd id="quotationIdentity"></dd></div>
+            <div class="datum"><dt>施工進度依據</dt><dd id="scheduleIdentity"></dd></div>
+          </dl>
+        </section>
+
+        <div class="lane-grid">
+          <section class="panel" id="designPanel" aria-labelledby="designTitle">
+            <div class="panel-head"><h2 id="designTitle">設計交付與付款</h2><p id="designBasis">設計費與工程款分開；每一階段依設計交付排程呈現。</p></div>
+            <div class="panel-body" id="designStages"></div>
+          </section>
+
+          <section class="panel" id="worksPanel" aria-labelledby="worksTitle">
+            <div class="panel-head"><h2 id="worksTitle">工程里程碑與付款</h2><p id="worksBasis"></p></div>
+            <div class="panel-body">
+              <div class="payment-rule" id="paymentRule"></div>
+              <div id="worksStages"></div>
+            </div>
+          </section>
+        </div>
+
+        <div class="wide-grid">
+          <section class="panel" aria-labelledby="documentsTitle">
+            <div class="panel-head"><h2 id="documentsTitle">文件與變更依據</h2><p>每筆資料都綁定案件、文件與版本；變更不覆寫原契約。</p></div>
+            <div class="panel-body">
+              <div id="documents"></div>
+              <div id="changes"></div>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="gateTitle">
+            <div class="panel-head"><h2 id="gateTitle">尾款條件</h2><p>DRS 整理結果不會自動形成付款。</p></div>
+            <div class="panel-body" id="finalGate"></div>
+          </section>
+        </div>
+
+        <div class="boundary"><strong>目前能力邊界：</strong>這個頁面只讀取並整理本頁載入的案件資料；尚未提供正式簽署與保存，也不會建立付款、送出審查、通知他方或同步到其他頁面。契約文字仍需依實際案件完成法律專業審查。</div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../shared/laibe-project-contract-source.js"></script>
+  <script src="../shared/laibe-project-contract-engine.js"></script>
+  <script id="contract-consumer-api">
+(function exposeRunCaseConsumer(root, factory) {
+  "use strict";
+  var api = factory();
+  root.LaibeRunCaseContractConsumer = api;
+  if (typeof module === "object" && module.exports) module.exports = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function createRunCaseConsumerApi() {
+  "use strict";
+
+  var TYPE_LABELS = {
+    DESIGN: "設計契約",
+    WORKS: "工程承攬契約",
+    DESIGN_BUILD: "設計＋工程契約",
+  };
+  var WAIT_LABELS = {
+    OWNER: "乙方與 DRS 等待甲方決定",
+    CONTRACTOR: "甲方與 DRS 等待乙方補件",
+    DRS: "甲乙雙方等待 DRS 整理結果",
+    BOTH_PARTIES: "等待甲乙雙方確認",
+  };
+
+  function requireValue(condition) {
+    if (!condition) throw new Error("RUN_CASE_CONSUMER_REJECTED");
+  }
+
+  function same(left, right) {
+    requireValue(typeof left === "string" && left.length > 0 && left === right);
+  }
+
+  function money(value) {
+    var number = Number(value);
+    requireValue(Number.isFinite(number));
+    return new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0,
+    }).format(number);
+  }
+
+  function errorState() {
+    return {
+      state: "ERROR",
+      title: "案件資料無法安全顯示",
+      message: "案件、當事人、契約版本或依據文件未能一致對上，請先確認資料後再載入。",
+    };
+  }
+
+  function emptyState() {
+    return {
+      state: "EMPTY",
+      title: "尚未載入案件契約",
+      message: "請載入已整理的案件資料，或先用教學範例了解這份總覽。",
+    };
+  }
+
+  function createConsumer(dependencies) {
+    dependencies = dependencies || {};
+    var source = dependencies.source;
+    var engine = dependencies.engine;
+    requireValue(source && source.sourceId === "LAIBE-PROJECT-CONTRACT-SOURCE-v0.2");
+    requireValue(engine && engine.source === source);
+    ["normalizeCanonicalData", "createCase", "createParty", "createProjectContract", "createContractVersion",
+      "createSchedule", "createChangeRequest", "createWarrantyPledge", "calculateDesignPayments",
+      "generateWorksMilestones", "assembleProjectContract", "createFinalPaymentState",
+      "applyFinalPaymentEvent"].forEach(function requireEngineMethod(method) {
+      requireValue(typeof engine[method] === "function");
+    });
+
+    function consume(rawInput) {
+      if (rawInput === undefined || rawInput === null) return emptyState();
+      try {
+        var input = engine.normalizeCanonicalData(rawInput);
+        requireValue(source.contractTypes.indexOf(input.contractType) !== -1);
+        same(input.sourceId, source.sourceId);
+        same(input.templateVersion, source.templateVersion);
+
+        var caseRecord = engine.createCase(input.caseData);
+        var owner = engine.createParty(input.parties && input.parties.owner);
+        var contractor = engine.createParty(input.parties && input.parties.contractor);
+        requireValue(owner.role === "OWNER" && contractor.role === "CONTRACTOR");
+        requireValue(owner.partyId !== contractor.partyId);
+        same(caseRecord.ownerId, owner.partyId);
+        same(input.caseData.contractorId, contractor.partyId);
+        requireValue(typeof input.caseData.projectContractId === "string");
+
+        var projectContract = engine.createProjectContract(engine.normalizeCanonicalData({
+          contractId: input.caseData.projectContractId,
+          caseId: caseRecord.caseId,
+          contractType: input.contractType,
+          templateVersion: input.templateVersion,
+          status: "DRAFT",
+          ownerId: owner.partyId,
+          contractorId: contractor.partyId,
+        }));
+        var version = engine.createContractVersion(input.versionMetadata);
+        same(version.contractId, projectContract.contractId);
+        requireValue(version.status === "DRAFT");
+
+        same(input.values.CASE_ID, caseRecord.caseId);
+        same(input.values.PROJECT_CONTRACT_ID, projectContract.contractId);
+        same(input.values.PROJECT_CONTRACT_VERSION, version.versionId);
+        same(input.values.PROJECT_CONTRACT_TYPE, input.contractType);
+        same(input.values.OWNER_ID, owner.partyId);
+        same(input.values.CONTRACTOR_ID, contractor.partyId);
+        same(input.values.OWNER_LEGAL_NAME, owner.legalName);
+        same(input.values.CONTRACTOR_LEGAL_NAME, contractor.legalName);
+
+        var hasDesign = input.contractType === "DESIGN" || input.contractType === "DESIGN_BUILD";
+        var hasWorks = input.contractType === "WORKS" || input.contractType === "DESIGN_BUILD";
+        var designPayments = null;
+        var worksPlan = null;
+        var designChanges = null;
+        var worksChanges = null;
+        var finalGate = null;
+
+        if (hasDesign) {
+          requireValue(input.designSchedule && Array.isArray(input.designSchedule.nodes) && input.designSchedule.nodes.length > 0);
+          same(input.designSchedule.caseId, caseRecord.caseId);
+          var designScheduleRef = input.designSchedule.scheduleId + "@" + input.designSchedule.version;
+          same(input.designSchedule.DESIGN_DELIVERABLE_SCHEDULE, designScheduleRef);
+          same(input.values.DESIGN_DELIVERABLE_SCHEDULE, designScheduleRef);
+          designPayments = engine.calculateDesignPayments(input.values.TOTAL_DESIGN_FEE).stages;
+          designChanges = input.designChanges;
+          requireValue(Array.isArray(designChanges));
+          designChanges.forEach(function validateDesignChange(change) {
+            var validated = engine.createChangeRequest(change);
+            same(validated.caseId, caseRecord.caseId);
+            same(validated.baselineVersion, version.versionId);
+            requireValue(validated.changeType !== "WORK_CHANGE" && validated.changeType !== "CHANGE_ORDER");
+          });
+        } else {
+          requireValue(input.designSchedule === undefined && input.designChanges === undefined);
+        }
+
+        if (hasWorks) {
+          requireValue(input.quotation && Array.isArray(input.quotation.items));
+          same(input.quotation.caseId, caseRecord.caseId);
+          same(input.quotation.projectContractId, projectContract.contractId);
+          same(input.values.PROJECT_TOTAL_AMOUNT, input.quotation.total);
+          var checkedSchedule = engine.createSchedule(input.constructionSchedule);
+          same(checkedSchedule.caseId, caseRecord.caseId);
+          same(input.values.CONSTRUCTION_SCHEDULE_ID, checkedSchedule.scheduleId);
+          same(input.values.CONSTRUCTION_SCHEDULE_VERSION, checkedSchedule.version);
+          worksPlan = engine.generateWorksMilestones(engine.normalizeCanonicalData({
+            caseId: caseRecord.caseId,
+            projectTotalAmount: input.quotation.total,
+            quotation: input.quotation,
+            schedule: input.constructionSchedule,
+          }));
+          requireValue(worksPlan && worksPlan.ok === true);
+          worksChanges = input.worksChanges;
+          requireValue(Array.isArray(worksChanges));
+          worksChanges.forEach(function validateWorksChange(change) {
+            var validated = engine.createChangeRequest(change);
+            same(validated.caseId, caseRecord.caseId);
+            same(validated.baselineVersion, version.versionId);
+            validated.quotationRefs.forEach(function bindQuotation(reference) {
+              same(reference.quotationId, input.quotation.quotationId);
+              same(reference.version, input.quotation.version);
+            });
+            validated.paymentImpacts.forEach(function bindPayment(reference) {
+              requireValue(worksPlan.paymentStages.some(function hasStage(stage) {
+                return stage.paymentStageId === reference.paymentStageId;
+              }));
+            });
+          });
+
+          requireValue(input.warranty && input.warranty.terms && input.warranty.pledge);
+          var pledge = engine.createWarrantyPledge(input.warranty.pledge);
+          same(pledge.caseId, caseRecord.caseId);
+          same(pledge.projectContractId, projectContract.contractId);
+          same(pledge.contractVersion, version.versionId);
+          same(pledge.warrantyTermsRef.documentId, input.warranty.terms.documentId);
+          same(pledge.warrantyTermsRef.version, input.warranty.terms.version);
+
+          finalGate = {
+            ready: false,
+            status: "FORMAL_RECORD_ADAPTER_PENDING",
+            requirements: [
+              { key: "FINAL_ACCEPTANCE_COMPLETED", label: "完工驗收已有甲方確認紀錄", met: false },
+              { key: "WARRANTY_PLEDGE_SIGNED", label: "保固切結已有乙方簽署紀錄", met: false },
+              { key: "OWNER_DECISION_APPROVE", label: "甲方已依審查資料明確核准", met: false },
+            ],
+          };
+          if (input.finalPaymentRecords !== undefined) {
+            var records = input.finalPaymentRecords;
+            requireValue(records && records.acceptanceEvent && records.warrantyEvent &&
+              records.reviewEvent && records.decisionEvent);
+            requireValue(records.acceptanceEvent.record && records.acceptanceEvent.record.ownerProof &&
+              records.warrantyEvent.record && records.warrantyEvent.record.signingProof);
+            requireValue(records.acceptanceEvent.record.ownerProof.proofId !==
+              records.warrantyEvent.record.signingProof.proofId);
+            requireValue(Array.isArray(records.reviewEvent.record.basis) && records.reviewEvent.record.basis.length > 0);
+            requireValue(Array.isArray(records.decisionEvent.record.evidence) && records.decisionEvent.record.evidence.length > 0);
+            same(records.warrantyEvent.record.warrantyTermsRef.documentId, input.warranty.terms.documentId);
+            same(records.warrantyEvent.record.warrantyTermsRef.version, input.warranty.terms.version);
+
+            var finalState = engine.createFinalPaymentState(engine.normalizeCanonicalData({
+              caseId: caseRecord.caseId,
+              subjectId: records.subjectId,
+              projectContractId: projectContract.contractId,
+              contractVersion: version.versionId,
+              ownerId: owner.partyId,
+              contractorId: contractor.partyId,
+            }));
+            finalState = engine.applyFinalPaymentEvent(finalState, engine.normalizeCanonicalData({
+              type: "FINAL_ACCEPTANCE_COMPLETED",
+              eventId: records.acceptanceEvent.eventId,
+              acceptanceRecord: records.acceptanceEvent.record,
+              occurredAt: records.acceptanceEvent.occurredAt,
+            }));
+            finalState = engine.applyFinalPaymentEvent(finalState, engine.normalizeCanonicalData({
+              type: "WARRANTY_PLEDGE_SIGNED",
+              eventId: records.warrantyEvent.eventId,
+              warrantyPledge: records.warrantyEvent.record,
+              occurredAt: records.warrantyEvent.occurredAt,
+            }));
+            finalState = engine.applyFinalPaymentEvent(finalState, engine.normalizeCanonicalData({
+              type: "DRS_DOCUMENT_AND_PROCEDURE_REVIEW_COMPLETED",
+              eventId: records.reviewEvent.eventId,
+              review: records.reviewEvent.record,
+              occurredAt: records.reviewEvent.occurredAt,
+            }));
+            finalState = engine.applyFinalPaymentEvent(finalState, engine.normalizeCanonicalData({
+              type: "OWNER_DECISION_RECORDED",
+              eventId: records.decisionEvent.eventId,
+              ownerDecision: records.decisionEvent.record,
+              occurredAt: records.decisionEvent.occurredAt,
+            }));
+            finalGate.requirements[0].met = finalState.finalAcceptanceCompleted === true;
+            finalGate.requirements[1].met = finalState.warrantyPledgeSigned === true;
+            finalGate.requirements[2].met = !!finalState.ownerDecision && finalState.ownerDecision.decision === "APPROVE";
+          }
+        } else {
+          requireValue(input.quotation === undefined && input.constructionSchedule === undefined &&
+            input.worksChanges === undefined && input.warranty === undefined);
+          requireValue(input.finalPaymentRecords === undefined &&
+            !Object.prototype.hasOwnProperty.call(rawInput, "finalPaymentRecords") &&
+            !Object.prototype.hasOwnProperty.call(input, "finalPaymentRecords"));
+        }
+
+        requireValue(input.workflow && Object.prototype.hasOwnProperty.call(WAIT_LABELS, input.workflow.waitingOn));
+        requireValue(typeof input.workflow.currentState === "string" && input.workflow.currentState.length > 0);
+        requireValue(typeof input.workflow.nextAction === "string" && input.workflow.nextAction.length > 0);
+        requireValue(typeof input.workflow.recordNotice === "string" && input.workflow.recordNotice.length > 0);
+
+        var assemblyInput = {
+          contractType: input.contractType,
+          templateVersion: input.templateVersion,
+          caseData: input.caseData,
+          parties: input.parties,
+          values: input.values,
+          versionMetadata: input.versionMetadata,
+        };
+        if (hasDesign) {
+          assemblyInput.designSchedule = input.designSchedule;
+          assemblyInput.designPaymentStages = designPayments;
+          assemblyInput.designChanges = designChanges;
+        }
+        if (hasWorks) {
+          assemblyInput.quotation = input.quotation;
+          assemblyInput.constructionSchedule = input.constructionSchedule;
+          assemblyInput.milestones = worksPlan.milestones;
+          assemblyInput.paymentStages = worksPlan.paymentStages;
+          assemblyInput.worksChanges = worksChanges;
+          assemblyInput.warrantyTerms = input.warranty.terms;
+        }
+        var assembly = engine.assembleProjectContract(engine.normalizeCanonicalData(assemblyInput));
+        requireValue(assembly.status === "DRAFT");
+        requireValue(assembly.unresolvedBindings.length === 0);
+        requireValue(assembly.unresolvedPlaceholders.length === 0);
+        same(assembly.metadata.caseId, caseRecord.caseId);
+        same(assembly.metadata.version.versionId, version.versionId);
+
+        var result = {
+          state: "READY",
+          workflow: {
+            currentState: input.workflow.currentState,
+            waitingOn: WAIT_LABELS[input.workflow.waitingOn],
+            nextAction: input.workflow.nextAction,
+            recordNotice: input.workflow.recordNotice,
+          },
+          case: {
+            projectName: caseRecord.projectName,
+            projectAddress: input.values.PROJECT_ADDRESS,
+            ownerName: owner.legalName,
+            contractorName: contractor.legalName,
+          },
+          identity: {
+            sourceId: source.sourceId,
+            contractType: input.contractType,
+            contractTypeLabel: TYPE_LABELS[input.contractType],
+            caseId: caseRecord.caseId,
+            contractId: projectContract.contractId,
+            versionId: version.versionId,
+            quotation: hasWorks ? input.quotation.quotationId + "@" + input.quotation.version : "不適用",
+            constructionSchedule: hasWorks ? input.constructionSchedule.scheduleId + "@" + input.constructionSchedule.version : "不適用",
+            truthIdentity: assembly.structuredContract.truthIdentity,
+          },
+          design: hasDesign ? {
+            scheduleRef: input.designSchedule.scheduleId + "@" + input.designSchedule.version,
+            paymentStages: designPayments,
+          } : null,
+          works: hasWorks ? {
+            milestones: worksPlan.milestones,
+            paymentStages: worksPlan.paymentStages,
+            paymentSummary: worksPlan.totals,
+            finalGate: finalGate,
+          } : null,
+          documents: [
+            { kind: "契約", name: assembly.title, ref: projectContract.contractId + "@" + version.versionId },
+            { kind: "設計排程", name: "設計交付預定表", ref: hasDesign ? input.designSchedule.scheduleId + "@" + input.designSchedule.version : "不適用" },
+            { kind: "工程報價", name: "工程報價單", ref: hasWorks ? input.quotation.quotationId + "@" + input.quotation.version : "不適用" },
+            { kind: "施工排程", name: "施工進度預定表", ref: hasWorks ? input.constructionSchedule.scheduleId + "@" + input.constructionSchedule.version : "不適用" },
+            { kind: "保固條件", name: "保固範圍與期間", ref: hasWorks ? input.warranty.terms.documentId + "@" + input.warranty.terms.version : "不適用" },
+          ].filter(function applicableDocument(document) { return document.ref !== "不適用"; }),
+          changes: (designChanges || []).concat(worksChanges || []).map(function changeView(change) {
+            return { id: change.changeId, reason: change.reason, status: change.status, baselineVersion: change.baselineVersion };
+          }),
+        };
+        return result;
+      } catch (error) {
+        return errorState();
+      }
+    }
+
+    return Object.freeze({ consume: consume });
+  }
+
+  function createSampleInput() {
+    var quotationId = "QUOTATION-DEMO-001";
+    var quotationVersion = "v3";
+    var amounts = ["320000.00", "320000.00", "320000.00", "320000.00", "320000.00",
+      "320000.00", "320000.00", "320000.00", "320000.00", "320000.00"];
+    var names = ["拆除與保護", "泥作基礎", "水電配管", "防水施作", "木作骨架",
+      "天花封板", "地坪鋪設", "系統櫃安裝", "設備安裝", "清潔與完工整理"];
+    var nodes = names.map(function sampleNode(name, index) {
+      var sequence = index + 1;
+      return {
+        nodeId: "NODE-DEMO-" + String(sequence).padStart(2, "0"),
+        name: name,
+        scheduleSemantic: "WORK_PHASE_" + String(sequence).padStart(2, "0"),
+        startAt: "2026-09-" + String(sequence).padStart(2, "0") + "T08:00:00+08:00",
+        dueAt: "2026-09-" + String(sequence).padStart(2, "0") + "T18:00:00+08:00",
+        workItems: ["WORK-DEMO-" + String(sequence).padStart(2, "0")],
+        quotationRefs: [{
+          quotationId: quotationId,
+          version: quotationVersion,
+          itemId: "QI-DEMO-" + String(sequence).padStart(2, "0"),
+          allocation: amounts[index],
+        }],
+        drawingRefs: [{ drawingId: "DRAWING-DEMO-001", version: "v4", sheetId: "S-" + sequence }],
+        workValue: amounts[index],
+        requiredEvidence: [{ evidenceType: "PHOTO", basisRef: "WORKS-04-SCHEDULE-MILESTONE" }],
+        holdPoint: name === "防水施作" || name === "天花封板",
+      };
+    });
+    var values = {
+      CASE_ID: "CASE-DEMO-001",
+      PROJECT_CONTRACT_ID: "CONTRACT-DEMO-001",
+      PROJECT_CONTRACT_TYPE: "DESIGN_BUILD",
+      PROJECT_CONTRACT_VERSION: "CV-DEMO-001",
+      PROJECT_CONTRACT_GENERATED_AT: "2026-08-15 14:00",
+      OWNER_ID: "OWNER-DEMO-001",
+      OWNER_LEGAL_NAME: "林先生",
+      OWNER_ID_NUMBER: "教學範例",
+      OWNER_PHONE: "教學範例",
+      OWNER_EMAIL: "教學範例",
+      OWNER_ADDRESS: "桃園市中壢區（教學範例）",
+      CONTRACTOR_ID: "CONTRACTOR-DEMO-001",
+      CONTRACTOR_LEGAL_NAME: "安居室內裝修有限公司",
+      CONTRACTOR_REGISTRATION_NUMBER: "教學範例",
+      CONTRACTOR_REPRESENTATIVE: "陳小姐",
+      CONTRACTOR_PHONE: "教學範例",
+      CONTRACTOR_EMAIL: "教學範例",
+      CONTRACTOR_ADDRESS: "台北市中山區（教學範例）",
+      PROJECT_NAME: "青埔住宅設計與裝修案（教學範例）",
+      PROJECT_ADDRESS: "桃園市中壢區青埔段（教學範例）",
+      DRS_ENABLED: "教學範例頁面顯示",
+      DRS_SERVICE_CONTRACT_ID: "DRS-DEMO-001",
+      DRS_PROCEDURE_VERSION: "v0.2",
+      DESIGNATED_COMMUNICATION_CHANNEL: "案件指定聯絡管道（教學範例）",
+      DRS_FALLBACK_CHANNEL: "契約約定備援管道（教學範例）",
+      PROJECT_CONTRACT_SIGNED_AT: "尚未簽署",
+      SIGNED_CONTRACT_VERSION: "尚未產生",
+      SIGNED_CONTRACT_SHA256: "尚未產生",
+      SIGNED_PDF_DOCUMENT_ID: "尚未產生",
+      DESIGN_AREA: "28 坪",
+      DESIGN_SCOPE: "住宅空間規劃、細部設計與工程整合",
+      DESIGN_DELIVERABLE_SCHEDULE: "DESIGN-SCHEDULE-DEMO-001@v2",
+      TOTAL_DESIGN_FEE: "480000.00",
+      PROJECT_TOTAL_AMOUNT: "3200000.00",
+      PROJECT_START_AT: "2026-09-01T08:00:00+08:00",
+      PROJECT_END_AT: "2026-09-10T18:00:00+08:00",
+      CONSTRUCTION_SCHEDULE_ID: "SCHEDULE-DEMO-001",
+      CONSTRUCTION_SCHEDULE_VERSION: "v2",
+    };
+    return {
+      sourceId: "LAIBE-PROJECT-CONTRACT-SOURCE-v0.2",
+      templateVersion: "v0.2",
+      contractType: "DESIGN_BUILD",
+      caseData: {
+        caseId: "CASE-DEMO-001",
+        ownerId: "OWNER-DEMO-001",
+        contractorId: "CONTRACTOR-DEMO-001",
+        projectContractId: "CONTRACT-DEMO-001",
+        projectName: values.PROJECT_NAME,
+        projectAddress: values.PROJECT_ADDRESS,
+        status: "CONTRACT_EXECUTION_PREPARATION",
+        createdAt: "2026-08-15T09:00:00+08:00",
+      },
+      parties: {
+        owner: { partyId: "OWNER-DEMO-001", role: "OWNER", legalName: values.OWNER_LEGAL_NAME },
+        contractor: { partyId: "CONTRACTOR-DEMO-001", role: "CONTRACTOR", legalName: values.CONTRACTOR_LEGAL_NAME },
+      },
+      values: values,
+      versionMetadata: {
+        versionId: "CV-DEMO-001",
+        contractId: "CONTRACT-DEMO-001",
+        parentVersionId: null,
+        status: "DRAFT",
+        createdAt: "2026-08-15T14:00:00+08:00",
+        createdBy: "OWNER-DEMO-001",
+        changeSummary: "教學範例初稿",
+        structuredContent: { sourceId: "LAIBE-PROJECT-CONTRACT-SOURCE-v0.2" },
+      },
+      designSchedule: {
+        scheduleId: "DESIGN-SCHEDULE-DEMO-001",
+        caseId: "CASE-DEMO-001",
+        version: "v2",
+        DESIGN_DELIVERABLE_SCHEDULE: "DESIGN-SCHEDULE-DEMO-001@v2",
+        nodes: [
+          { nodeId: "DESIGN-DEMO-01", name: "需求與平面配置", dueAt: "2026-08-20T18:00:00+08:00", deliverableRefs: [{ documentId: "DESIGN-DOC-01", version: "v2" }] },
+          { nodeId: "DESIGN-DEMO-02", name: "3D 與平面／系統圖", dueAt: "2026-08-27T18:00:00+08:00", deliverableRefs: [{ documentId: "DESIGN-DOC-02", version: "v1" }] },
+          { nodeId: "DESIGN-DEMO-03", name: "第一次細部施工圖與報價單", dueAt: "2026-09-03T18:00:00+08:00", deliverableRefs: [{ documentId: "DESIGN-DOC-03", version: "v1" }] },
+          { nodeId: "DESIGN-DEMO-04", name: "整體設計交付", dueAt: "2026-09-10T18:00:00+08:00", deliverableRefs: [{ documentId: "DESIGN-DOC-04", version: "v1" }] },
+        ],
+      },
+      quotation: {
+        quotationId: quotationId,
+        version: quotationVersion,
+        caseId: "CASE-DEMO-001",
+        projectContractId: "CONTRACT-DEMO-001",
+        total: "3200000.00",
+        items: nodes.map(function quotationItem(node, index) {
+          return { itemId: node.quotationRefs[0].itemId, amount: amounts[index], name: node.name };
+        }),
+      },
+      constructionSchedule: {
+        scheduleId: "SCHEDULE-DEMO-001",
+        caseId: "CASE-DEMO-001",
+        version: "v2",
+        nodes: nodes,
+      },
+      designChanges: [],
+      worksChanges: [{
+        changeId: "CHANGE-DEMO-001",
+        caseId: "CASE-DEMO-001",
+        changeType: "WORK_CHANGE",
+        requestedBy: "OWNER-DEMO-001",
+        reason: "玄關櫃深度調整，待甲乙雙方確認",
+        baselineVersion: "CV-DEMO-001",
+        quotationRefs: [{ quotationId: quotationId, version: quotationVersion }],
+        drawingRefs: [{ drawingId: "DRAWING-DEMO-001", version: "v4" }],
+        amountImpact: "18000.00",
+        scheduleImpact: { days: 1 },
+        versionImpact: { from: "CV-DEMO-001", proposed: "CV-DEMO-002" },
+        paymentImpacts: [{ paymentStageId: "WORKS-PROGRESS-NODE-DEMO-08", delta: "18000.00" }],
+        status: "REQUESTED",
+      }],
+      warranty: {
+        terms: { documentId: "WARRANTY-TERMS-DEMO-001", version: "v1" },
+        pledge: {
+          pledgeId: "WARRANTY-PLEDGE-DEMO-001",
+          caseId: "CASE-DEMO-001",
+          projectContractId: "CONTRACT-DEMO-001",
+          contractVersion: "CV-DEMO-001",
+          warrantyTermsRef: { documentId: "WARRANTY-TERMS-DEMO-001", version: "v1" },
+          status: "DRAFT",
+          signingProof: { status: "NOT_SIGNED" },
+        },
+      },
+      workflow: {
+        currentState: "契約執行資料待甲乙確認",
+        waitingOn: "CONTRACTOR",
+        nextAction: "乙方確認玄關櫃變更內容，再由甲方決定是否納入新版本",
+        recordNotice: "載入來源、版本與待確認變更",
+      },
+    };
+  }
+
+  return Object.freeze({ createConsumer: createConsumer, createSampleInput: createSampleInput });
+});
+  </script>
+  <script>
+(function initialiseRunCasePage() {
+  "use strict";
+  var api = window.LaibeRunCaseContractConsumer;
+  var consumer;
+  var byId = function byId(id) { return document.getElementById(id); };
+
+  function setText(id, value) { byId(id).textContent = value === undefined || value === null ? "—" : String(value); }
+  function clearNode(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+  function element(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function formatMoney(value) {
+    return new Intl.NumberFormat("zh-TW", { style: "currency", currency: "TWD", maximumFractionDigits: 0 }).format(Number(value));
+  }
+
+  function renderStages(container, stages, labelKey, amountKey) {
+    clearNode(container);
+    stages.forEach(function renderStage(stage) {
+      var row = element("div", "stage");
+      var copy = element("div");
+      copy.appendChild(element("strong", "", stage[labelKey] || stage.name));
+      var stateText = stage.state
+        ? (stage.state === "PENDING_OWNER_DECISION" ? "付款：待甲方明確決定" : "付款狀態需確認")
+        : "DRS：" + (stage.drsReviewState === "PENDING" ? "待整理" : "已有狀態") +
+          " · 甲方：" + (stage.ownerDecisionState === "PENDING" ? "待決定" : "已有決定") +
+          " · 付款：" + (stage.paymentState === "PENDING" ? "待條件齊備" : "已有狀態");
+      copy.appendChild(element("small", "", (stage.stageId || stage.milestoneId) + " · " + stateText));
+      var amount = element("div", "amount");
+      amount.appendChild(element("b", "", stage.rate !== undefined ? stage.rate + "%" : stage.paymentRate + "%"));
+      amount.appendChild(element("small", "", formatMoney(stage[amountKey])));
+      row.appendChild(copy);
+      row.appendChild(amount);
+      container.appendChild(row);
+    });
+  }
+
+  function renderDocuments(result) {
+    var container = byId("documents");
+    clearNode(container);
+    result.documents.forEach(function renderDocument(documentRecord) {
+      var row = element("div", "file-row");
+      row.appendChild(element("span", "file-kind", documentRecord.kind));
+      var copy = element("div");
+      copy.appendChild(element("strong", "", documentRecord.name));
+      copy.appendChild(element("small", "", documentRecord.ref));
+      row.appendChild(copy);
+      container.appendChild(row);
+    });
+    var changes = byId("changes");
+    clearNode(changes);
+    result.changes.forEach(function renderChange(change) {
+      var row = element("div", "change-row");
+      row.appendChild(element("span", "file-kind", "待確認變更"));
+      var copy = element("div");
+      copy.appendChild(element("strong", "", change.reason));
+      copy.appendChild(element("small", "", change.id + " · 依據契約版本 " + change.baselineVersion + " · 尚未改寫原契約"));
+      row.appendChild(copy);
+      changes.appendChild(row);
+    });
+  }
+
+  function renderGate(gate) {
+    var container = byId("finalGate");
+    clearNode(container);
+    gate.requirements.forEach(function renderRequirement(requirement) {
+      var row = element("div", "gate-row");
+      row.appendChild(element("span", "gate-dot" + (requirement.met ? " done" : "")));
+      var copy = element("div");
+      copy.appendChild(element("strong", "", requirement.label));
+      copy.appendChild(element("small", "", requirement.met ? "已有可讀取紀錄" : "目前尚未具備"));
+      row.appendChild(copy);
+      container.appendChild(row);
+    });
+    var status = element("div", "boundary");
+    var completeRecordSet = gate.requirements.every(function isRecorded(requirement) { return requirement.met; });
+    status.appendChild(element("strong", "", completeRecordSet
+      ? "已讀取條件紀錄，但正式案件紀錄尚未接續"
+      : "尾款條件紀錄尚未齊備，正式案件紀錄尚未接續"));
+    status.appendChild(document.createTextNode("；本頁不判定可付款，也不會因 DRS 整理結果而自動付款。"));
+    container.appendChild(status);
+  }
+
+  function render(result) {
+    byId("emptyState").hidden = result.state !== "EMPTY";
+    byId("errorState").hidden = result.state !== "ERROR";
+    byId("summary").hidden = result.state !== "READY";
+    byId("clearView").disabled = result.state !== "READY";
+    byId("printSummary").disabled = result.state !== "READY";
+    setText("statusAnnouncer", result.state === "READY" ? "教學範例已載入" : result.title);
+    if (result.state !== "READY") {
+      if (result.state === "ERROR") {
+        setText("errorTitle", result.title);
+        setText("errorMessage", result.message);
+      }
+      return;
+    }
+
+    setText("currentState", result.workflow.currentState);
+    setText("waitingOn", result.workflow.waitingOn);
+    setText("nextAction", result.workflow.nextAction);
+    setText("recordNotice", result.workflow.recordNotice);
+    setText("caseTitle", result.case.projectName);
+    setText("caseAddress", result.case.projectAddress);
+    setText("contractType", result.identity.contractTypeLabel + " · " + result.identity.contractType);
+    setText("ownerName", result.case.ownerName + "（甲方）");
+    setText("contractorName", result.case.contractorName + "（乙方）");
+    setText("caseIdentity", result.identity.caseId + " / " + result.identity.contractId + " / " + result.identity.versionId);
+    setText("quotationIdentity", result.identity.quotation);
+    setText("scheduleIdentity", result.identity.constructionSchedule);
+
+    byId("designPanel").hidden = !result.design;
+    byId("worksPanel").hidden = !result.works;
+    if (result.design) {
+      setText("designBasis", "設計交付排程 " + result.design.scheduleRef + "；設計費與工程款分開呈現。");
+      renderStages(byId("designStages"), result.design.paymentStages, "trigger", "amount");
+    }
+    if (result.works) {
+      setText("worksBasis", "由 " + result.identity.quotation + " 與 " + result.identity.constructionSchedule + " 形成 " + result.works.milestones.length + " 個實際施工節點。");
+      var rules = byId("paymentRule");
+      clearNode(rules);
+      [
+        ["簽約款", result.works.paymentSummary.signingRate + "%"],
+        ["進度款合計", result.works.paymentSummary.progressRate + "%"],
+        ["每一施工節點", "最多 10%"],
+        ["尾款", result.works.paymentSummary.finalRate + "%"],
+      ].forEach(function renderRule(rule) {
+        var item = element("div");
+        item.appendChild(element("small", "", rule[0]));
+        item.appendChild(element("b", "", rule[1]));
+        rules.appendChild(item);
+      });
+      renderStages(byId("worksStages"), result.works.milestones, "name", "paymentAmount");
+      renderGate(result.works.finalGate);
+    }
+    renderDocuments(result);
+  }
+
+  function loadSample() {
+    var sample = api.createSampleInput();
+    render(consumer.consume(sample));
+  }
+
+  try {
+    consumer = api.createConsumer({
+      source: window.LaibeProjectContractSource,
+      engine: window.LaibeProjectContractEngine,
+    });
+  } catch (error) {
+    render({
+      state: "ERROR",
+      title: "案件資料無法安全顯示",
+      message: "契約資料來源暫時無法使用，請稍後再試。",
+    });
+    return;
+  }
+
+  byId("loadSample").addEventListener("click", loadSample);
+  byId("loadSampleEmpty").addEventListener("click", loadSample);
+  byId("retrySample").addEventListener("click", loadSample);
+  byId("clearView").addEventListener("click", function clearView() { render(consumer.consume()); });
+  byId("printSummary").addEventListener("click", function printSummary() { window.print(); });
+  render(consumer.consume());
+})();
+  </script>
+</body>
+</html>

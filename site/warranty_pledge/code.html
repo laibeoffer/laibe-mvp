@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LaiBE DRS｜工程保固切結書草稿</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23FF5809'/%3E%3Ctext x='16' y='22' font-size='16' font-family='sans-serif' font-weight='900' fill='white' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --orange: #ff5a1f; --orange-soft: #ff8a5f;
+      --ink: #f5f2eb; --muted: #aaa9a5; --quiet: #777a7e;
+      --night: #0c0e11; --line: rgba(255, 255, 255, .12); --line-strong: rgba(255, 255, 255, .22);
+      --paper: #f5f0e7; --paper-ink: #28251f; --paper-muted: #756f64; --paper-line: #d8d0c1;
+      --warn: #f1bd68; --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--ink);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      background: radial-gradient(900px 420px at 95% -5%, rgba(255, 90, 31, .12), transparent 62%), linear-gradient(180deg, #0c0e11, #090b0e);
+    }
+    button, input, textarea { font: inherit; }
+    button { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(255, 138, 95, .55); outline-offset: 3px; }
+    .topbar { position: sticky; top: 0; z-index: 30; border-bottom: 1px solid var(--line); background: rgba(10, 12, 15, .9); backdrop-filter: blur(18px); }
+    .topbar-inner { width: min(1360px, calc(100% - 40px)); min-height: 68px; margin: auto; display: flex; align-items: center; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; text-decoration: none; }
+    .brand img { width: 98px; max-height: 40px; object-fit: contain; }
+    .crumb { padding-left: 16px; border-left: 1px solid var(--line); color: var(--muted); font-size: 13px; font-weight: 750; }
+    .top-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .btn {
+      min-height: 42px; border: 1px solid var(--line-strong); border-radius: 999px; padding: 0 17px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 255, 255, .055);
+      font-size: 13px; font-weight: 850; cursor: pointer; text-decoration: none;
+      transition: border-color .16s ease, background .16s ease, transform .16s ease;
+    }
+    .btn:hover:not(:disabled) { border-color: rgba(255, 255, 255, .38); background: rgba(255, 255, 255, .09); transform: translateY(-1px); }
+    .btn:disabled { opacity: .42; cursor: not-allowed; }
+    .btn.primary { border-color: transparent; background: linear-gradient(120deg, var(--orange-soft), var(--orange)); color: #fff; box-shadow: 0 12px 28px rgba(255, 90, 31, .24); }
+    .btn.quiet { border-color: transparent; background: transparent; color: var(--muted); }
+    .shell { width: min(1360px, calc(100% - 40px)); margin: 0 auto; padding: 28px 0 88px; display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 26px; align-items: start; }
+    .case-index { position: sticky; top: 96px; min-height: 610px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #08090b; box-shadow: 0 28px 70px rgba(0, 0, 0, .36); }
+    .ledger-mark { height: 7px; background: linear-gradient(90deg, var(--orange), #ff9d76 48%, rgba(255, 255, 255, .15)); }
+    .index-body { padding: 26px 24px; display: flex; min-height: 603px; flex-direction: column; }
+    .eyebrow { color: var(--orange-soft); font-size: 11px; font-weight: 900; letter-spacing: .17em; text-transform: uppercase; }
+    .case-index h1 { margin: 15px 0 10px; color: #fff; font-size: 34px; line-height: 1.16; letter-spacing: -.035em; }
+    .lead { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.75; }
+    .status-seal { margin: 22px 0 20px; padding: 15px; border: 1px solid rgba(241, 189, 104, .32); border-radius: 14px; background: rgba(241, 189, 104, .08); }
+    .status-seal small { display: block; color: var(--warn); font-size: 11px; font-weight: 900; letter-spacing: .08em; }
+    .status-seal strong { display: block; margin-top: 7px; color: #ffe5b9; font-size: 16px; line-height: 1.45; }
+    .status-seal p { margin: 8px 0 0; color: #c7b99f; font-size: 12px; line-height: 1.65; }
+    .index-list { display: grid; border-top: 1px solid var(--line); }
+    .index-item { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .index-item b { color: var(--orange-soft); font: 850 11px/1.5 ui-monospace, "Cascadia Mono", monospace; }
+    .index-item span { color: #d3d1cc; font-size: 12px; font-weight: 750; line-height: 1.5; }
+    .next-owner { margin-top: auto; padding-top: 22px; }
+    .next-owner small { color: var(--quiet); font-size: 11px; font-weight: 800; }
+    .next-owner p { margin: 7px 0 0; color: #fff; font-size: 13px; font-weight: 800; line-height: 1.65; }
+    .workspace { min-width: 0; }
+    .hero { padding: 8px 4px 24px; border-bottom: 1px solid var(--line); }
+    .hero-kicker { color: var(--orange-soft); font-size: 12px; font-weight: 900; letter-spacing: .12em; }
+    .hero h2 { max-width: 820px; margin: 10px 0 9px; font-size: clamp(28px, 4vw, 47px); line-height: 1.08; letter-spacing: -.045em; }
+    .hero p { max-width: 760px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .hero strong { color: #fff; }
+    .action-row { padding: 18px 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); }
+    .action-note { margin-left: auto; color: var(--quiet); font-size: 12px; line-height: 1.5; }
+    .notice { margin: 20px 0; padding: 15px 17px; border: 1px solid rgba(241, 189, 104, .3); border-radius: 14px; background: rgba(241, 189, 104, .075); color: #f4dab0; font-size: 13px; font-weight: 750; line-height: 1.7; }
+    .notice.error { border-color: rgba(255, 143, 159, .38); background: rgba(255, 143, 159, .08); color: #ffd4da; }
+    .section { padding: 26px 4px; border-bottom: 1px solid var(--line); }
+    .section-heading { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 14px; margin-bottom: 20px; }
+    .section-number { color: var(--orange-soft); font: 900 12px/1.4 ui-monospace, "Cascadia Mono", monospace; padding-top: 4px; }
+    .section-heading h3 { margin: 0; font-size: 20px; letter-spacing: -.02em; }
+    .section-heading p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 18px; }
+    .field { display: grid; gap: 7px; }
+    .field.full { grid-column: 1 / -1; }
+    .field label { color: #d9d6cf; font-size: 12px; font-weight: 850; }
+    .field em { color: var(--orange-soft); font-style: normal; }
+    .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line-strong); border-radius: 11px; background: rgba(255, 255, 255, .045); color: #fff; padding: 11px 12px; font-size: 14px; line-height: 1.5; }
+    .field select option { background: #171a1f; color: #fff; }
+    .field textarea { min-height: 104px; resize: vertical; }
+    .field input::placeholder, .field textarea::placeholder { color: #686b70; }
+    .field input[readonly], .field textarea[readonly] { background: rgba(255, 255, 255, .025); color: #bbb9b4; }
+    .hint { color: var(--quiet); font-size: 11px; line-height: 1.55; }
+    .source-clause { position: relative; padding: 23px 24px 23px 30px; border-radius: 14px; background: var(--paper); color: var(--paper-ink); overflow: hidden; }
+    .source-clause::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 7px; background: var(--orange); }
+    .source-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; color: var(--paper-muted); font-size: 11px; font-weight: 850; }
+    .source-clause h4 { margin: 14px 0 9px; font-size: 18px; }
+    .source-clause p { margin: 0; color: #4d483e; font-size: 13px; line-height: 1.9; }
+    .rule-line { margin-top: 14px !important; padding-top: 14px; border-top: 1px solid var(--paper-line); font-weight: 900; color: #30291f !important; }
+    .gate-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .gate { min-height: 150px; padding: 17px; border-right: 1px solid var(--line); background: rgba(255, 255, 255, .025); }
+    .gate:last-child { border-right: 0; }
+    .gate small { color: var(--quiet); font-size: 10px; font-weight: 900; letter-spacing: .08em; }
+    .gate strong { display: block; margin: 13px 0 7px; color: var(--warn); font-size: 14px; line-height: 1.45; }
+    .gate p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.65; }
+    .draft-panel { margin-top: 26px; border-radius: var(--radius); background: var(--paper); color: var(--paper-ink); overflow: hidden; box-shadow: 0 24px 60px rgba(0, 0, 0, .3); }
+    .draft-head { padding: 25px 28px 20px; display: flex; gap: 20px; align-items: start; border-bottom: 1px solid var(--paper-line); }
+    .draft-head > div { min-width: 0; }
+    .draft-head small { color: #a3461f; font-size: 11px; font-weight: 950; letter-spacing: .12em; }
+    .draft-head h3 { margin: 8px 0 5px; font-size: 24px; }
+    .draft-head p { margin: 0; color: var(--paper-muted); font-size: 12px; line-height: 1.65; }
+    .draft-state { margin-left: auto; flex: none; padding: 7px 11px; border: 1px solid #d3a784; border-radius: 999px; color: #8b431f; background: #fff6ea; font-size: 11px; font-weight: 950; }
+    .draft-body { padding: 26px 28px 30px; }
+    .binding-grid { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--paper-line); }
+    .binding-grid div { padding: 12px 0; display: grid; grid-template-columns: 145px minmax(0, 1fr); gap: 12px; border-bottom: 1px solid var(--paper-line); }
+    .binding-grid div:nth-child(odd) { padding-right: 18px; }
+    .binding-grid dt { color: var(--paper-muted); font-size: 11px; font-weight: 850; }
+    .binding-grid dd { margin: 0; color: #25211b; font: 800 12px/1.5 ui-monospace, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+    .draft-copy { margin-top: 25px; }
+    .draft-copy h4 { margin: 20px 0 7px; font-size: 14px; }
+    .draft-copy p { margin: 0; color: #514b40; font-size: 13px; line-height: 1.85; white-space: pre-wrap; }
+    .draft-empty { padding: 32px 28px; color: var(--paper-muted); font-size: 13px; line-height: 1.7; }
+    body.view-mode [data-path] { pointer-events: none; }
+    body.view-mode .field input, body.view-mode .field select, body.view-mode .field textarea { background: rgba(255, 255, 255, .02); border-color: var(--line); color: #b9b7b1; }
+    @media (max-width: 1080px) {
+      .shell { grid-template-columns: 1fr; }
+      .case-index { position: static; min-height: 0; }
+      .index-body { min-height: 0; }
+      .next-owner { margin-top: 20px; }
+      .gate-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .gate:nth-child(2) { border-right: 0; }
+      .gate:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+    }
+    @media (max-width: 760px) {
+      .topbar-inner, .shell { width: min(100% - 24px, 1360px); }
+      .btn { min-height: 44px; }
+      .topbar-inner { min-height: 60px; }
+      .crumb { display: none; }
+      .top-actions .btn:first-child { display: none; }
+      .shell { padding-top: 14px; gap: 18px; }
+      .case-index h1 { font-size: 28px; }
+      .hero { padding-top: 3px; }
+      .action-row { align-items: stretch; }
+      .action-row .btn { flex: 1 1 140px; }
+      .action-note { flex: 1 0 100%; margin-left: 0; }
+      .section { padding: 22px 2px; }
+      .section-heading { grid-template-columns: 36px minmax(0, 1fr); gap: 8px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .gate-list { grid-template-columns: 1fr; }
+      .gate, .gate:nth-child(2) { min-height: 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .gate:last-child { border-bottom: 0; }
+      .draft-head { padding: 21px; flex-direction: column; }
+      .draft-state { margin-left: 0; }
+      .draft-body { padding: 22px 21px; }
+      .binding-grid { grid-template-columns: 1fr; }
+      .binding-grid div:nth-child(odd) { padding-right: 0; }
+    }
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      body { background: #fff; color: #111; }
+      .topbar, .case-index, .hero, .action-row, .notice, .section { display: none !important; }
+      .shell { display: block; width: auto; margin: 0; padding: 0; }
+      .draft-panel { margin: 0; box-shadow: none; border: 0; }
+      .draft-empty { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="../laibe_landing_desktop/code.html#top" aria-label="LaiBE DRS 首頁"><img src="../laibe_offer_light.png" alt="LaiBE" /></a>
+      <span class="crumb">工程承攬契約／附件／工程保固切結書</span>
+      <div class="top-actions">
+        <a class="btn" href="../pcm_contract_generator/code.html">返回契約準備</a>
+        <button class="btn" id="printDraftBtn" type="button" disabled>列印草稿</button>
+      </div>
+    </div>
+  </header>
+  <main class="shell">
+    <aside class="case-index" aria-label="文件狀態與下一步">
+      <div class="ledger-mark"></div>
+      <div class="index-body">
+        <div class="eyebrow">Decision &amp; Record System</div>
+        <h1>工程保固<br />切結書草稿</h1>
+        <p class="lead">供業主與承攬方依同一份工程契約，整理保固範圍、期間、報修方式與改善責任。</p>
+        <div class="status-seal" id="statusSeal"><small>目前狀態</small><strong id="statusTitle">目前缺少案件契約資料</strong><p id="statusDescription">先載入範例或填妥案件綁定與保固條款，才能產生可供檢視的草稿。</p></div>
+        <div class="index-list" aria-label="準備順序">
+          <div class="index-item"><b>01</b><span>確認案件、契約版本與甲乙雙方</span></div>
+          <div class="index-item"><b>02</b><span>依契約條款整理保固內容</span></div>
+          <div class="index-item"><b>03</b><span>產生經規則檢查的草稿預覽</span></div>
+          <div class="index-item"><b>04</b><span>業主決定與雙方同意另行完成</span></div>
+        </div>
+        <div class="next-owner"><small>下一責任人</small><p id="nextOwnerText">下一步由乙方整理保固條款，再交由業主檢視。</p></div>
+      </div>
+    </aside>
+    <div class="workspace">
+      <section class="hero">
+        <div class="hero-kicker">契約附件 · v0.2</div>
+        <h2>先把保固責任綁回同一份案件契約，再形成草稿。</h2>
+        <p>本頁讀取 LaiBE DRS 的契約來源與規則，只產生 <strong>工程保固切結書草稿</strong>。本案不設保固金；保固責任、業主決定、雙方同意、正式版本與簽署仍各自保留。</p>
+      </section>
+      <div class="action-row" aria-label="草稿操作">
+        <button class="btn" id="loadSampleBtn" type="button">載入範例資料</button>
+        <button class="btn quiet" id="clearBtn" type="button">清除本次內容</button>
+        <button class="btn" id="modeBtn" type="button" aria-pressed="false">切換檢視模式</button>
+        <button class="btn primary" id="createDraftBtn" type="button">檢查並產生草稿</button>
+        <span class="action-note">內容只存在目前頁面；關閉後不會保留。</span>
+      </div>
+      <div class="notice" id="emptyNotice">目前缺少案件契約資料。你可以明確載入範例，或自行填寫下方欄位；系統不會預先帶入案件。</div>
+      <div class="notice error" id="errorNotice" role="alert" hidden></div>
+      <section class="section" aria-labelledby="bindingTitle">
+        <div class="section-heading"><span class="section-number">01</span><div><h3 id="bindingTitle">案件與契約綁定</h3><p>五項識別必須與工程契約完全一致；不一致時不會產生草稿。</p></div></div>
+        <div class="form-grid">
+          <div class="field"><label for="contractType">適用契約類型 <em>必填</em></label><select id="contractType" data-path="context.contractType"><option value="">請選擇</option><option value="WORKS">工程承攬契約</option><option value="DESIGN_BUILD">設計統包契約的工程部分</option></select></div>
+          <div class="field"><label for="caseId">案件識別 <em>必填</em></label><input id="caseId" data-path="context.caseId" autocomplete="off" placeholder="例如 CASE-2026-0815" /></div>
+          <div class="field"><label for="projectContractId">工程契約識別 <em>必填</em></label><input id="projectContractId" data-path="context.projectContractId" autocomplete="off" placeholder="例如 PC-WORKS-2026-0815" /></div>
+          <div class="field"><label for="contractVersion">契約版本 <em>必填</em></label><input id="contractVersion" data-path="context.contractVersion" autocomplete="off" placeholder="例如 CV-2026-0815-01" /></div>
+          <div class="field"><label for="pledgeId">切結書草稿識別 <em>必填</em></label><input id="pledgeId" data-path="pledge.pledgeId" autocomplete="off" placeholder="例如 WP-CASE-2026-0815-01" /></div>
+          <div class="field"><label for="ownerId">業主識別 <em>必填</em></label><input id="ownerId" data-path="context.ownerId" autocomplete="off" placeholder="例如 OWNER-0815" /></div>
+          <div class="field"><label for="ownerName">業主姓名／名稱 <em>必填</em></label><input id="ownerName" data-path="parties.owner.legalName" autocomplete="off" placeholder="業主姓名或名稱" /></div>
+          <div class="field"><label for="contractorId">承攬方識別 <em>必填</em></label><input id="contractorId" data-path="context.contractorId" autocomplete="off" placeholder="例如 CONTRACTOR-0815" /></div>
+          <div class="field"><label for="contractorName">承攬方名稱 <em>必填</em></label><input id="contractorName" data-path="parties.contractor.legalName" autocomplete="off" placeholder="公司或承攬人名稱" /></div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="sourceTitle">
+        <div class="section-heading"><span class="section-number">02</span><div><h3 id="sourceTitle">契約中的保固依據</h3><p>此段直接讀取工程承攬契約來源，不在本頁另造一份契約模板。</p></div></div>
+        <div class="source-clause">
+          <div class="source-meta"><span id="sourceArticleId">尚未讀取</span><span id="sourceVersion">來源版本未確認</span></div>
+          <h4 id="sourceArticleTitle">保固條款</h4><p id="sourceArticleBody">契約來源載入後，會在這裡顯示保固條款依據。</p><p class="rule-line" id="depositRule">本案不設保固金。</p>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="termsTitle">
+        <div class="section-heading"><span class="section-number">03</span><div><h3 id="termsTitle">保固條款與紀錄依據</h3><p>填寫保固起算、範圍、期間、報修方式、合理改善方式與排除事項。</p></div></div>
+        <div class="form-grid">
+          <div class="field"><label for="warrantyDocumentId">保固條款文件識別 <em>必填</em></label><input id="warrantyDocumentId" data-path="context.warrantyTermsRef.documentId" autocomplete="off" placeholder="例如 WT-CASE-2026-0815" /><span class="hint">這是本切結書所依據的保固條款紀錄。</span></div>
+          <div class="field"><label for="warrantyDocumentVersion">保固條款文件版本 <em>必填</em></label><input id="warrantyDocumentVersion" data-path="context.warrantyTermsRef.version" autocomplete="off" placeholder="例如 WT-v1" /></div>
+          <div class="field"><label for="warrantyStartDate">保固起算日 <em>必填</em></label><input id="warrantyStartDate" data-path="pledge.warrantyStartDate" type="date" /></div>
+          <div class="field"><label for="equipmentPeriod">設備類期間 <em>必填</em></label><input id="equipmentPeriod" data-path="pledge.terms.equipmentPeriod" placeholder="例如 依原廠保固文件" /></div>
+          <div class="field"><label for="finishingPeriod">裝潢項目期間 <em>必填</em></label><input id="finishingPeriod" data-path="pledge.terms.finishingPeriod" placeholder="例如 18 個月" /></div>
+          <div class="field"><label for="foundationPeriod">基礎工程期間 <em>必填</em></label><input id="foundationPeriod" data-path="pledge.terms.foundationPeriod" placeholder="例如 36 個月" /></div>
+          <div class="field full"><label for="warrantyScope">保固範圍 <em>必填</em></label><textarea id="warrantyScope" data-path="pledge.terms.scope" placeholder="說明哪些工程項目與施工責任納入保固"></textarea></div>
+          <div class="field full"><label for="repairMethod">報修與合理改善方式 <em>必填</em></label><textarea id="repairMethod" data-path="pledge.terms.repairMethod" placeholder="說明通知資料、回覆、查勘與修繕方式"></textarea></div>
+          <div class="field full"><label for="exclusions">排除事項 <em>必填</em></label><textarea id="exclusions" data-path="pledge.terms.exclusions" placeholder="說明非承攬方施工責任或不可歸責情形"></textarea></div>
+        </div>
+      </section>
+      <section class="section" aria-labelledby="gatesTitle">
+        <div class="section-heading"><span class="section-number">04</span><div><h3 id="gatesTitle">草稿之後仍要完成的關卡</h3><p>產生草稿不會越過任何人的決定或意思表示，也不會建立正式版本。</p></div></div>
+        <div class="gate-list">
+          <div class="gate"><small>本頁輸出</small><strong id="draftGate">尚未產生草稿</strong><p>通過案件綁定、日期、當事人與文件依據檢查後，才會形成草稿預覽。</p></div>
+          <div class="gate" id="ownerDecisionGate"><small>業主決定</small><strong>尚未提供</strong><p>業主須另行檢視內容並作成明示決定；本頁不代為決定。</p></div>
+          <div class="gate" id="partyAgreementGate"><small>雙方同意</small><strong>尚未提供</strong><p>甲乙雙方的可驗證意思表示須另行完成；單方草稿不等於雙方同意。</p></div>
+          <div class="gate" id="formalVersionGate"><small>正式版本與簽署</small><strong>尚未開放</strong><p>正式保存、雙方同意與簽署尚未開放，本頁不會宣稱已成立。</p></div>
+        </div>
+      </section>
+      <section class="draft-panel" id="draftPanel" aria-labelledby="draftTitle">
+        <div class="draft-head"><div><small>WARRANTY PLEDGE</small><h3 id="draftTitle">工程保固切結書草稿</h3><p>供雙方檢視內容與契約綁定；不是正式保存、雙方同意或簽署證明。</p></div><span class="draft-state" id="draftState">尚未產生</span></div>
+        <div class="draft-empty" id="draftEmpty">填妥資料並通過檢查後，這裡會顯示可列印的草稿預覽。</div>
+        <div class="draft-body" id="draftBody" hidden>
+          <dl class="binding-grid">
+            <div><dt>切結書草稿識別</dt><dd id="previewPledgeId">—</dd></div><div><dt>案件識別</dt><dd id="previewCaseId">—</dd></div>
+            <div><dt>工程契約識別</dt><dd id="previewContractId">—</dd></div><div><dt>契約版本</dt><dd id="previewContractVersion">—</dd></div>
+            <div><dt>適用契約類型</dt><dd id="previewContractType">—</dd></div><div><dt>契約來源版本</dt><dd id="previewTemplateVersion">—</dd></div>
+            <div><dt>業主</dt><dd id="previewOwner">—</dd></div><div><dt>承攬方</dt><dd id="previewContractor">—</dd></div>
+            <div><dt>保固條款依據</dt><dd id="previewTermsRef">—</dd></div><div><dt>草稿狀態</dt><dd id="previewStatus">—</dd></div>
+          </dl>
+          <div class="draft-copy">
+            <h4>保固起算日</h4><p id="previewStartDate">—</p><h4>保固期間</h4><p id="previewPeriods">—</p>
+            <h4>保固範圍</h4><p id="previewScope">—</p><h4>報修與合理改善方式</h4><p id="previewRepair">—</p>
+            <h4>排除事項</h4><p id="previewExclusions">—</p><h4>保固金規則</h4><p id="previewDeposit">本案不設保固金。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="../shared/laibe-project-contract-source.js"></script>
+  <script src="../shared/laibe-project-contract-engine.js"></script>
+  <script id="warranty-pledge-page-logic">
+  (function exposeWarrantyPledgeConsumer(root, factory) {
+    "use strict";
+    var consumer = factory(root.LaibeProjectContractSource, root.LaibeProjectContractEngine);
+    root.LaibeWarrantyPledgeConsumer = consumer;
+    if (typeof document !== "undefined") consumer.bootstrap(document, root);
+  })(typeof globalThis !== "undefined" ? globalThis : this, function createWarrantyPledgeConsumer(source, engine) {
+    "use strict";
+    if (!source || source.sourceId !== "LAIBE-PROJECT-CONTRACT-SOURCE-v0.2") throw new Error("WARRANTY_CANONICAL_SOURCE_REQUIRED");
+    if (!engine || engine.source !== source || typeof engine.createWarrantyPledge !== "function") throw new Error("WARRANTY_CANONICAL_ENGINE_REQUIRED");
+    var warrantyArticle = source.templates.WORKS.articles.find(function findWarrantyArticle(article) { return article.articleId === "WORKS-13-WARRANTY"; });
+    if (!warrantyArticle) throw new Error("WARRANTY_CANONICAL_ARTICLE_REQUIRED");
+
+    function clone(value) { return JSON.parse(JSON.stringify(value)); }
+    function fail(code) { var error = new Error(code); error.code = code; throw error; }
+    function identifierIsValid(value) { return typeof value === "string" && /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/.test(value); }
+    function dateIsValid(value) {
+      var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
+      if (!match) return false;
+      var year = Number(match[1]); var month = Number(match[2]); var day = Number(match[3]);
+      var date = new Date(Date.UTC(year, month - 1, day));
+      return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+    }
+    function canonicalArticle() { return { articleId: warrantyArticle.articleId, title: warrantyArticle.title, body: warrantyArticle.body, sourceVersion: source.templateVersion }; }
+    function presentWarrantyArticle() {
+      return {
+        articleId: warrantyArticle.articleId,
+        title: warrantyArticle.title,
+        sourceVersion: source.templateVersion,
+        body: warrantyArticle.body
+          .replace(/WARRANTY_OBLIGATION/g, "保固責任")
+          .replace(/WARRANTY_PLEDGE_SIGNED/g, "完成工程保固切結的正式簽署"),
+      };
+    }
+    function createEmptyState() {
+      return {
+        sampleFixture: false, canonicalArticle: canonicalArticle(),
+        context: {
+          caseId: "", projectContractId: "", contractVersion: "", ownerId: "", contractorId: "",
+          contractType: "", templateVersion: source.templateVersion, status: "DRAFT",
+          warrantyTermsRef: { documentId: "", version: "" },
+        },
+        projectContract: {
+          contractId: "", caseId: "", contractVersion: "", ownerId: "", contractorId: "",
+          contractType: "", templateVersion: source.templateVersion, status: "DRAFT",
+        },
+        parties: { owner: { partyId: "", role: "OWNER", legalName: "" }, contractor: { partyId: "", role: "CONTRACTOR", legalName: "" } },
+        pledge: {
+          pledgeId: "", caseId: "", projectContractId: "", contractVersion: "", ownerId: "", contractorId: "",
+          warrantyTermsRef: { documentId: "", version: "" }, warrantyStartDate: "",
+          terms: { equipmentPeriod: "", finishingPeriod: "", foundationPeriod: "", scope: "", repairMethod: "", exclusions: "" },
+          status: "DRAFT", signingProof: { status: "NOT_AVAILABLE" },
+        },
+      };
+    }
+    function createSampleState() {
+      var state = createEmptyState();
+      state.sampleFixture = true;
+      state.context = {
+        caseId: "CASE-2026-0815", projectContractId: "PC-WORKS-2026-0815", contractVersion: "CV-2026-0815-01", ownerId: "OWNER-0815", contractorId: "CONTRACTOR-0815",
+        contractType: "WORKS", templateVersion: source.templateVersion, status: "DRAFT",
+        warrantyTermsRef: { documentId: "WT-CASE-2026-0815", version: "WT-v1" },
+      };
+      state.projectContract = {
+        contractId: "PC-WORKS-2026-0815", caseId: "CASE-2026-0815", contractVersion: "CV-2026-0815-01", ownerId: "OWNER-0815", contractorId: "CONTRACTOR-0815",
+        contractType: "WORKS", templateVersion: source.templateVersion, status: "DRAFT",
+      };
+      state.parties = { owner: { partyId: "OWNER-0815", role: "OWNER", legalName: "林小姐" }, contractor: { partyId: "CONTRACTOR-0815", role: "CONTRACTOR", legalName: "森築室內裝修有限公司" } };
+      state.pledge = {
+        pledgeId: "WP-CASE-2026-0815-01", caseId: "CASE-2026-0815", projectContractId: "PC-WORKS-2026-0815", contractVersion: "CV-2026-0815-01", ownerId: "OWNER-0815", contractorId: "CONTRACTOR-0815",
+        warrantyTermsRef: { documentId: "WT-CASE-2026-0815", version: "WT-v1" }, warrantyStartDate: "2026-08-15",
+        terms: {
+          equipmentPeriod: "依原廠保固文件", finishingPeriod: "18 個月", foundationPeriod: "36 個月",
+          scope: "乙方依工程契約、確認圖說與報價實際承攬的工程項目，以及可歸責於乙方施工或安裝的瑕疵。",
+          repairMethod: "業主提出位置、發現日期、照片與問題說明；乙方於合理期間回覆、安排查勘，確認責任後提出並完成合理改善。",
+          exclusions: "使用不當、第三人施工、既有建物問題、不可抗力、自然耗損，以及非乙方承攬範圍的事項。",
+        }, status: "DRAFT", signingProof: { status: "NOT_AVAILABLE" },
+      };
+      return state;
+    }
+    function evaluateState(rawState) {
+      var state = rawState || createEmptyState(); var missing = [];
+      var required = [
+        [state.context && state.context.contractType, "適用契約類型"],
+        [state.context && state.context.caseId, "案件識別"], [state.context && state.context.projectContractId, "工程契約識別"],
+        [state.context && state.context.contractVersion, "契約版本"], [state.context && state.context.ownerId, "業主識別"], [state.context && state.context.contractorId, "承攬方識別"],
+        [state.context && state.context.warrantyTermsRef && state.context.warrantyTermsRef.documentId, "保固條款文件識別"], [state.context && state.context.warrantyTermsRef && state.context.warrantyTermsRef.version, "保固條款文件版本"],
+        [state.projectContract && state.projectContract.contractId, "工程契約紀錄"], [state.projectContract && state.projectContract.contractType, "工程契約紀錄類型"],
+        [state.parties && state.parties.owner && state.parties.owner.legalName, "業主姓名或名稱"], [state.parties && state.parties.contractor && state.parties.contractor.legalName, "承攬方名稱"],
+        [state.pledge && state.pledge.pledgeId, "切結書草稿識別"], [state.pledge && state.pledge.warrantyTermsRef && state.pledge.warrantyTermsRef.documentId, "保固條款文件識別"],
+        [state.pledge && state.pledge.warrantyTermsRef && state.pledge.warrantyTermsRef.version, "保固條款文件版本"], [state.pledge && state.pledge.warrantyStartDate, "保固起算日"],
+        [state.pledge && state.pledge.terms && state.pledge.terms.equipmentPeriod, "設備類保固期間"], [state.pledge && state.pledge.terms && state.pledge.terms.finishingPeriod, "裝潢項目保固期間"],
+        [state.pledge && state.pledge.terms && state.pledge.terms.foundationPeriod, "基礎工程保固期間"], [state.pledge && state.pledge.terms && state.pledge.terms.scope, "保固範圍"],
+        [state.pledge && state.pledge.terms && state.pledge.terms.repairMethod, "報修與改善方式"], [state.pledge && state.pledge.terms && state.pledge.terms.exclusions, "排除事項"],
+      ];
+      required.forEach(function collectMissing(entry) { if (typeof entry[0] !== "string" || !entry[0].trim()) missing.push(entry[1]); });
+      return { status: missing.length ? "DATA_INSUFFICIENT" : "READY_FOR_DRAFT", missing: missing };
+    }
+    function normalizeForEngine(value) { return engine.normalizeCanonicalData(value); }
+    function createDraft(rawState) {
+      var evaluation = evaluateState(rawState);
+      if (evaluation.missing.length) fail("WARRANTY_DRAFT_INVALID");
+      var state = normalizeForEngine(rawState);
+      if (["WORKS", "DESIGN_BUILD"].indexOf(state.context.contractType) === -1) fail("WARRANTY_CONTRACT_TYPE_NOT_APPLICABLE");
+      var identifiers = ["caseId", "projectContractId", "contractVersion", "ownerId", "contractorId"];
+      identifiers.forEach(function validateContextIdentifier(field) { if (!identifierIsValid(state.context[field])) fail("INVALID_IDENTIFIER"); });
+      if (!dateIsValid(state.pledge.warrantyStartDate)) fail("INVALID_WARRANTY_DATE");
+      if (state.pledge.status !== "DRAFT") fail("WARRANTY_DRAFT_STATUS_REQUIRED");
+      if (state.parties.owner.role !== "OWNER" || state.parties.contractor.role !== "CONTRACTOR") fail("INVALID_ENUM_VALUE");
+      var owner = engine.createParty(normalizeForEngine(state.parties.owner));
+      var contractor = engine.createParty(normalizeForEngine(state.parties.contractor));
+      if (owner.partyId === contractor.partyId) fail("WARRANTY_PARTIES_MUST_BE_DISTINCT");
+      if (owner.partyId !== state.context.ownerId || contractor.partyId !== state.context.contractorId) fail("WARRANTY_CONTEXT_PARTY_MISMATCH");
+      var actualProjectContract = engine.createProjectContract(normalizeForEngine(state.projectContract));
+      var expectedProjectContract = {
+        contractId: state.context.projectContractId, caseId: state.context.caseId, contractVersion: state.context.contractVersion,
+        ownerId: state.context.ownerId, contractorId: state.context.contractorId, contractType: state.context.contractType,
+        templateVersion: state.context.templateVersion, status: state.context.status,
+      };
+      if (state.context.templateVersion !== source.templateVersion) fail("WARRANTY_PROJECT_CONTRACT_BINDING_MISMATCH");
+      Object.keys(expectedProjectContract).forEach(function validateProjectContractBinding(field) {
+        if (actualProjectContract[field] !== expectedProjectContract[field]) fail("WARRANTY_PROJECT_CONTRACT_BINDING_MISMATCH");
+      });
+      identifiers.forEach(function validateBinding(field) { if (state.pledge[field] !== state.context[field]) fail("WARRANTY_PLEDGE_BINDING_MISMATCH"); });
+      ["documentId", "version"].forEach(function validateWarrantyTermsBinding(field) {
+        if (!state.context.warrantyTermsRef || !state.pledge.warrantyTermsRef || state.pledge.warrantyTermsRef[field] !== state.context.warrantyTermsRef[field]) fail("WARRANTY_TERMS_BINDING_MISMATCH");
+      });
+      var pledgeInput = normalizeForEngine({
+        pledgeId: state.pledge.pledgeId, caseId: state.pledge.caseId, projectContractId: state.pledge.projectContractId, contractVersion: state.pledge.contractVersion,
+        ownerId: state.pledge.ownerId, contractorId: state.pledge.contractorId, warrantyTermsRef: state.pledge.warrantyTermsRef,
+        warrantyStartDate: state.pledge.warrantyStartDate, terms: state.pledge.terms, status: "DRAFT", signingProof: { status: "NOT_AVAILABLE" },
+        canonicalArticleRef: { articleId: warrantyArticle.articleId, sourceVersion: source.templateVersion },
+        ownerDecision: { status: "NOT_AVAILABLE", nextActor: state.context.ownerId },
+        partyAgreement: { status: "NOT_AVAILABLE", requiredParties: [state.context.ownerId, state.context.contractorId] }, formalVersion: { status: "NOT_AVAILABLE" },
+        projectContract: actualProjectContract,
+      });
+      return engine.createWarrantyPledge(pledgeInput);
+    }
+    function getPath(object, path) { return path.split(".").reduce(function readPath(value, key) { return value && value[key]; }, object); }
+    function setPath(object, path, value) { var keys = path.split("."); var target = object; keys.slice(0, -1).forEach(function descend(key) { target = target[key]; }); target[keys[keys.length - 1]] = value; }
+    function syncBindings(state) {
+      state.parties.owner.partyId = state.context.ownerId; state.parties.contractor.partyId = state.context.contractorId;
+      ["caseId", "projectContractId", "contractVersion", "ownerId", "contractorId"].forEach(function copyBinding(field) { state.pledge[field] = state.context[field]; });
+      state.pledge.warrantyTermsRef = clone(state.context.warrantyTermsRef);
+      state.projectContract = {
+        contractId: state.context.projectContractId, caseId: state.context.caseId, contractVersion: state.context.contractVersion,
+        ownerId: state.context.ownerId, contractorId: state.context.contractorId, contractType: state.context.contractType,
+        templateVersion: state.context.templateVersion, status: state.context.status,
+      };
+    }
+    function friendlyError(error) {
+      var code = error && (error.code || error.message) || "";
+      if (/CONTRACT_TYPE_NOT_APPLICABLE/.test(code)) return "工程保固切結只適用工程承攬契約，或設計統包契約中的工程部分。請確認契約類型。";
+      if (/WARRANTY_TERMS_BINDING_MISMATCH/.test(code)) return "保固條款文件識別或版本與案件契約資料不一致，請重新確認依據。";
+      if (/BINDING_MISMATCH|CONTEXT_PARTY_MISMATCH/.test(code)) return "案件、契約版本或當事人與切結書資料不一致，請回到案件綁定逐項確認。";
+      if (/INVALID_WARRANTY_DATE/.test(code)) return "保固起算日不是有效日期，請重新選擇。";
+      if (/PARTIES_MUST_BE_DISTINCT|INVALID_ENUM_VALUE/.test(code)) return "業主與承攬方必須是不同且角色正確的當事人。";
+      if (/WARRANTY_TERMS_REF|INVALID_IDENTIFIER/.test(code)) return "識別或文件版本格式不正確，請使用英數字、句點、底線、冒號或連字號。";
+      return "資料尚未通過檢查。請補齊必填欄位，並確認案件、契約版本、當事人與保固條款依據。";
+    }
+    function bootstrap(doc, windowObject) {
+      var state = createEmptyState(); var currentDraft = null; var controls = Array.prototype.slice.call(doc.querySelectorAll("[data-path]"));
+      function text(id, value) { doc.getElementById(id).textContent = value; }
+      function populateControls() { controls.forEach(function populate(control) { var value = getPath(state, control.getAttribute("data-path")); control.value = typeof value === "string" ? value : ""; }); }
+      function renderSource() {
+        var presentation = presentWarrantyArticle();
+        text("sourceArticleId", presentation.articleId); text("sourceVersion", "契約來源 " + presentation.sourceVersion);
+        text("sourceArticleTitle", presentation.title); text("sourceArticleBody", presentation.body);
+        text("depositRule", source.templates.WORKS.paymentProfiles.worksAmount.warrantyDeposit === "NONE" ? "本案不設保固金。" : "保固金規則尚待確認。");
+      }
+      function renderStatus() {
+        var evaluation = evaluateState(state); var ready = evaluation.status === "READY_FOR_DRAFT";
+        text("statusTitle", ready ? "資料可進行草稿檢查" : "目前缺少案件契約資料");
+        text("statusDescription", ready ? "案件綁定與保固條款已填寫；產生草稿後仍須另行完成決定、同意與簽署。" : "尚缺 " + evaluation.missing.length + " 項資料。先載入範例或填妥欄位，才能產生草稿。");
+        text("nextOwnerText", currentDraft ? "下一步由業主檢視草稿；如需調整，再由乙方修改。" : "下一步由乙方整理保固條款，再交由業主檢視。");
+        doc.getElementById("emptyNotice").hidden = ready;
+      }
+      function renderDraft() {
+        var hasDraft = Boolean(currentDraft); doc.getElementById("draftEmpty").hidden = hasDraft; doc.getElementById("draftBody").hidden = !hasDraft; doc.getElementById("printDraftBtn").disabled = !hasDraft;
+        text("draftGate", hasDraft ? "草稿已通過規則檢查" : "尚未產生草稿"); text("draftState", hasDraft ? "草稿" : "尚未產生");
+        if (!hasDraft) return;
+        text("previewPledgeId", currentDraft.pledgeId); text("previewCaseId", currentDraft.caseId); text("previewContractId", currentDraft.projectContractId); text("previewContractVersion", currentDraft.contractVersion);
+        text("previewContractType", currentDraft.projectContract.contractType === "DESIGN_BUILD" ? "設計統包契約的工程部分" : "工程承攬契約"); text("previewTemplateVersion", currentDraft.projectContract.templateVersion);
+        text("previewOwner", state.parties.owner.legalName + "／" + currentDraft.ownerId); text("previewContractor", state.parties.contractor.legalName + "／" + currentDraft.contractorId);
+        text("previewTermsRef", currentDraft.warrantyTermsRef.documentId + "／" + currentDraft.warrantyTermsRef.version); text("previewStatus", "草稿；未正式保存、未取得雙方同意、未簽署");
+        text("previewStartDate", currentDraft.warrantyStartDate); text("previewPeriods", "設備類：" + currentDraft.terms.equipmentPeriod + "\n裝潢項目：" + currentDraft.terms.finishingPeriod + "\n基礎工程：" + currentDraft.terms.foundationPeriod);
+        text("previewScope", currentDraft.terms.scope); text("previewRepair", currentDraft.terms.repairMethod); text("previewExclusions", currentDraft.terms.exclusions);
+        text("previewDeposit", currentDraft.warrantyDeposit === "NONE" ? "本案不設保固金。" : "保固金規則尚待確認。");
+      }
+      function clearError() { var notice = doc.getElementById("errorNotice"); notice.hidden = true; notice.textContent = ""; }
+      function invalidateDraft() { currentDraft = null; renderDraft(); }
+      controls.forEach(function bindControl(control) { control.addEventListener("input", function updateState() { setPath(state, control.getAttribute("data-path"), control.value); syncBindings(state); clearError(); invalidateDraft(); renderStatus(); }); });
+      doc.getElementById("loadSampleBtn").addEventListener("click", function loadSample() { state = clone(createSampleState()); currentDraft = null; populateControls(); clearError(); renderStatus(); renderDraft(); });
+      doc.getElementById("clearBtn").addEventListener("click", function clearState() { state = createEmptyState(); currentDraft = null; populateControls(); clearError(); renderStatus(); renderDraft(); });
+      doc.getElementById("modeBtn").addEventListener("click", function toggleMode(event) {
+        var viewing = !doc.body.classList.contains("view-mode");
+        doc.body.classList.toggle("view-mode", viewing);
+        controls.forEach(function setControlMode(control) {
+          if (control.tagName === "SELECT") {
+            control.disabled = viewing;
+            control.setAttribute("aria-disabled", viewing ? "true" : "false");
+            return;
+          }
+          control.readOnly = viewing;
+          control.setAttribute("aria-readonly", viewing ? "true" : "false");
+        });
+        event.currentTarget.setAttribute("aria-pressed", viewing ? "true" : "false"); event.currentTarget.textContent = viewing ? "返回編輯模式" : "切換檢視模式";
+      });
+      doc.getElementById("createDraftBtn").addEventListener("click", function generateDraft() {
+        syncBindings(state); clearError();
+        try { currentDraft = createDraft(state); renderStatus(); renderDraft(); doc.getElementById("draftPanel").scrollIntoView({ behavior: "smooth", block: "start" }); }
+        catch (error) { currentDraft = null; renderDraft(); var notice = doc.getElementById("errorNotice"); notice.textContent = friendlyError(error); notice.hidden = false; }
+      });
+      doc.getElementById("printDraftBtn").addEventListener("click", function printDraft() { if (currentDraft) windowObject.print(); });
+      populateControls(); renderSource(); renderStatus(); renderDraft();
+    }
+    return Object.freeze({ source: source, engine: engine, createEmptyState: createEmptyState, createSampleState: createSampleState, evaluateState: evaluateState, createDraft: createDraft, presentWarrantyArticle: presentWarrantyArticle, bootstrap: bootstrap });
+  });
+  </script>
+</body>
+</html>

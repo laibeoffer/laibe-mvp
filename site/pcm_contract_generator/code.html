@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LaiBE｜設計與工程甲乙主契約草稿組裝</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f4f7f8;
+      --muted: #9ba9af;
+      --quiet: #74848b;
+      --bg: #071014;
+      --surface: #0d181d;
+      --surface-2: #122128;
+      --line: #25363e;
+      --accent: #4dd9c0;
+      --accent-soft: rgba(77, 217, 192, .12);
+      --warn: #f3c36b;
+      --danger: #ff8f82;
+      --ok: #7be3a5;
+      --radius: 16px;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .28);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: radial-gradient(circle at 18% 0%, #10262b 0, transparent 34rem), var(--bg); color: var(--ink); }
+    button, input, select, textarea { font: inherit; }
+    button, select { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .48; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid rgba(77, 217, 192, .8); outline-offset: 3px; }
+    [hidden] { display: none !important; }
+
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 38px 0 80px; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 34px; align-items: end; padding: 38px 0 30px; }
+    .eyebrow { margin: 0 0 12px; color: var(--accent); font-size: .78rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 780px; font-family: "Noto Serif TC", "PMingLiU", serif; font-size: clamp(2.15rem, 5vw, 4.5rem); font-weight: 700; line-height: 1.08; letter-spacing: -.04em; }
+    .lede { margin: 20px 0 0; max-width: 700px; color: #c4cfd3; font-size: 1.05rem; line-height: 1.8; }
+    .hero-note { padding: 22px; border-left: 2px solid var(--accent); background: linear-gradient(90deg, var(--accent-soft), transparent); color: #c9d5d8; line-height: 1.75; }
+    .hero-note strong { display: block; margin-bottom: 5px; color: var(--ink); }
+
+    .decision-band { display: grid; grid-template-columns: 1fr 1.35fr 1fr; margin: 12px 0 32px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(13, 24, 29, .9); box-shadow: var(--shadow); overflow: hidden; }
+    .decision-cell { min-width: 0; padding: 20px 22px; }
+    .decision-cell + .decision-cell { border-left: 1px solid var(--line); }
+    .decision-label { display: block; margin-bottom: 8px; color: var(--quiet); font-size: .74rem; font-weight: 800; letter-spacing: .12em; }
+    .decision-value { margin: 0; font-size: .98rem; line-height: 1.55; }
+    .decision-value[data-tone="warn"] { color: var(--warn); }
+    .decision-value[data-tone="ok"] { color: var(--ok); }
+
+    .state-message { margin: 0 0 18px; padding: 15px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); line-height: 1.6; }
+    .state-message.error { border-color: rgba(255, 143, 130, .46); color: #ffd1cb; }
+    .state-message.permission { border-color: rgba(243, 195, 107, .38); color: #f9dca5; }
+
+    .journey-nav { position: sticky; top: 12px; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: rgba(7, 16, 20, .92); backdrop-filter: blur(16px); }
+    .journey-nav a { padding: 9px 12px; border-radius: 9px; color: var(--muted); font-size: .86rem; text-decoration: none; }
+    .journey-nav a:hover { background: var(--surface-2); color: var(--ink); }
+
+    .section { margin-top: 20px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(13, 24, 29, .92); }
+    .section-head { display: flex; justify-content: space-between; gap: 22px; align-items: flex-start; margin-bottom: 24px; }
+    .section-kicker { margin: 0 0 6px; color: var(--accent); font-size: .74rem; font-weight: 800; letter-spacing: .12em; }
+    h2 { margin: 0; font-size: clamp(1.3rem, 2.8vw, 1.9rem); line-height: 1.25; }
+    .section-copy { margin: 8px 0 0; max-width: 680px; color: var(--muted); line-height: 1.7; }
+    .tag { flex: 0 0 auto; padding: 7px 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .78rem; }
+
+    .type-row { display: grid; grid-template-columns: minmax(240px, 1fr) auto; gap: 14px; align-items: end; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .form-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .subform { min-width: 0; padding: 20px; border-top: 1px solid var(--line); }
+    .subform h3 { margin: 0 0 16px; font-size: 1rem; }
+    .party-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 26px -20px 0; }
+    .party-grid .subform + .subform { border-left: 1px solid var(--line); }
+    .field { min-width: 0; }
+    label, .label { display: block; margin-bottom: 7px; color: #d1dade; font-size: .84rem; font-weight: 700; }
+    .hint { display: block; margin-top: 6px; color: var(--quiet); font-size: .76rem; line-height: 1.45; }
+    input, select, textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid #324750; border-radius: 10px; background: #081217; color: var(--ink); }
+    textarea { min-height: 88px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: #62747c; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn { min-height: 44px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); color: var(--ink); font-weight: 800; }
+    .btn:hover:not(:disabled) { border-color: #48616c; transform: translateY(-1px); }
+    .btn.primary { border-color: var(--accent); background: var(--accent); color: #03110e; }
+    .btn.ghost { background: transparent; }
+    .btn.danger { color: #ffb1a8; }
+
+    .work-table { width: 100%; border-collapse: collapse; }
+    .work-table th { padding: 10px 8px; color: var(--quiet); font-size: .72rem; letter-spacing: .08em; text-align: left; }
+    .work-table td { padding: 12px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+    .work-table input { min-width: 120px; }
+    .work-table .wide { min-width: 190px; }
+    .work-table .check-cell { width: 80px; text-align: center; }
+    .work-table input[type="checkbox"] { width: 20px; min-width: 20px; min-height: 20px; margin-top: 12px; }
+    .empty { padding: 28px; border: 1px dashed #36505b; border-radius: 12px; color: var(--muted); text-align: center; line-height: 1.7; }
+    .table-scroll { overflow-x: auto; }
+
+    .result-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; }
+    .result-panel { min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: #091318; }
+    .result-panel h3 { margin: 0 0 14px; font-size: 1rem; }
+    .status-line { display: flex; justify-content: space-between; gap: 15px; padding: 10px 0; border-top: 1px solid var(--line); color: var(--muted); }
+    .status-line strong { color: var(--ink); text-align: right; }
+    .notice { padding: 14px; border-left: 3px solid var(--warn); background: rgba(243, 195, 107, .08); color: #ecd5aa; line-height: 1.65; }
+    .issue-list { margin: 12px 0 0; padding-left: 22px; color: #efcfa0; line-height: 1.7; }
+    details { border-top: 1px solid var(--line); }
+    details:first-child { border-top: 0; }
+    summary { padding: 15px 0; cursor: pointer; font-weight: 800; }
+    .detail-body { padding: 0 0 16px; color: var(--muted); line-height: 1.75; }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 9px; }
+    .article-meta code { padding: 4px 7px; border-radius: 6px; background: #132229; color: #b7c8cf; font-size: .73rem; }
+
+    .boundary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 18px; }
+    .boundary { padding: 17px; border: 1px solid var(--line); border-radius: 12px; }
+    .boundary span { display: block; margin-bottom: 8px; color: var(--quiet); font-size: .73rem; font-weight: 800; letter-spacing: .08em; }
+    .boundary strong { display: block; margin-bottom: 8px; }
+    .boundary p { margin: 0; color: var(--muted); font-size: .84rem; line-height: 1.55; }
+
+    .draft-preview { min-height: 220px; max-height: 560px; overflow: auto; padding: 26px; border: 1px solid var(--line); border-radius: 12px; background: #f4f1e9; color: #20282b; white-space: pre-wrap; font-family: "Noto Serif TC", "PMingLiU", serif; line-height: 1.85; }
+    .draft-watermark { display: none; }
+    .footer-note { margin-top: 20px; color: var(--quiet); font-size: .8rem; line-height: 1.6; }
+
+    @media (max-width: 860px) {
+      .shell { width: min(100% - 24px, 680px); padding-top: 18px; }
+      .hero, .result-grid { grid-template-columns: 1fr; }
+      .decision-band { grid-template-columns: 1fr; }
+      .decision-cell + .decision-cell { border-left: 0; border-top: 1px solid var(--line); }
+      .party-grid, .form-grid.three { grid-template-columns: 1fr; }
+      .party-grid .subform + .subform { border-left: 0; }
+      .type-row { grid-template-columns: 1fr; }
+      .boundary-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .shell { width: calc(100% - 16px); }
+      .hero { padding-top: 18px; }
+      .section { padding: 20px 16px; }
+      .section-head { display: block; }
+      .tag { display: inline-block; margin-top: 12px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .journey-nav { position: static; overflow-x: auto; flex-wrap: nowrap; }
+      .journey-nav a { white-space: nowrap; }
+      .btn-row .btn { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+    }
+
+    @media print {
+      @page { margin: 18mm; }
+      body { background: #fff; color: #111; }
+      body * { visibility: hidden; }
+      #draftPreview, #draftPreview *, .draft-watermark { visibility: visible; }
+      #draftPreview { position: absolute; inset: 22mm 15mm auto; max-height: none; overflow: visible; border: 0; background: #fff; color: #111; }
+      .draft-watermark { display: block; position: fixed; top: 6mm; left: 15mm; right: 15mm; padding-bottom: 5mm; border-bottom: 1px solid #888; color: #555; font-weight: 700; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div id="laibe-header"></div>
+  <main class="shell" id="appShell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Project contract assembly</p>
+        <h1 id="pageTitle">設計甲乙主契約草稿組裝</h1>
+        <p class="lede">由業主與設計師／統包依同一份案件、價金、報價與進度資料組裝草稿。先補齊依據，再查看付款節點與條文；這裡不會代替任何一方作成同意。</p>
+      </div>
+      <aside class="hero-note">
+        <strong>這一頁給誰使用？</strong>
+        給準備主契約的業主與設計師／統包。草稿內容可供雙方檢視，正式版本與簽署仍需另行完成。
+      </aside>
+    </header>
+
+    <section class="decision-band" aria-label="契約草稿目前狀態">
+      <div class="decision-cell">
+        <span class="decision-label">目前狀態</span>
+        <p class="decision-value" id="currentStatus" data-tone="warn">資料不足</p>
+      </div>
+      <div class="decision-cell">
+        <span class="decision-label">缺少依據</span>
+        <p class="decision-value" id="missingSummary">尚未填寫案件與雙方資料</p>
+      </div>
+      <div class="decision-cell">
+        <span class="decision-label">下一步</span>
+        <p class="decision-value" id="nextOwner">業主與設計師／統包共同補齊資料</p>
+      </div>
+    </section>
+
+    <p class="state-message" id="loadingState" role="status" hidden>正在依目前資料整理草稿，請稍候。</p>
+    <p class="state-message error" id="errorState" role="alert" hidden></p>
+    <p class="state-message permission" id="permissionState" hidden>你目前只能查看這份草稿。若要修改，請由案件參與人提供編輯權限。</p>
+
+    <nav class="journey-nav" aria-label="契約草稿組裝步驟">
+      <a href="#contractSetup">契約類型</a>
+      <a href="#caseParties">案件與雙方</a>
+      <a href="#basisData">價金與進度</a>
+      <a href="#contractResult">付款與條文</a>
+    </nav>
+
+    <section class="section" id="contractSetup">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">01 · 選擇契約</p>
+          <h2>先確認這次要組裝哪一種甲乙主契約</h2>
+          <p class="section-copy">類型會決定要補設計交付、工程報價與施工進度，或兩者都要補。</p>
+        </div>
+        <span class="tag">未正式保存</span>
+      </div>
+      <div class="type-row">
+        <div class="field">
+          <label for="contractType">契約類型</label>
+          <select id="contractType">
+            <option value="DESIGN">設計甲乙主契約</option>
+            <option value="WORKS">工程甲乙主契約</option>
+            <option value="DESIGN_BUILD">設計及工程甲乙主契約</option>
+          </select>
+        </div>
+        <button class="btn ghost" id="loadSampleBtn" type="button">載入範例案件</button>
+      </div>
+      <p class="footer-note" id="sampleNotice">範例只會在你主動載入後出現，用來了解欄位與草稿呈現；不代表正式案件資料，也不會自動保存。</p>
+    </section>
+
+    <section class="section" id="caseParties">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">02 · 建立共同依據</p>
+          <h2>填寫案件、業主與設計師／統包資料</h2>
+          <p class="section-copy">雙方看到的是同一組案件身分與聯絡資料。草稿識別只用於本次預覽，不是正式版本。</p>
+        </div>
+        <span class="tag">甲乙雙方</span>
+      </div>
+      <div class="party-grid">
+        <form class="subform" id="caseForm" novalidate>
+          <h3>案件</h3>
+          <div class="form-grid">
+            <div class="field"><label for="caseId">案件識別</label><input id="caseId" data-path="case.caseId" placeholder="例如 CASE-001"></div>
+            <div class="field"><label for="projectContractId">草稿識別</label><input id="projectContractId" data-path="case.projectContractId" placeholder="例如 DRAFT-001"><span class="hint">僅為草稿組裝識別</span></div>
+            <div class="field"><label for="contractVersion">草稿代號</label><input id="contractVersion" data-path="case.contractVersion" placeholder="例如 PREVIEW-A"><span class="hint">不代表正式契約版本</span></div>
+            <div class="field"><label for="projectName">案件名稱</label><input id="projectName" data-path="case.projectName" placeholder="例如 中山區住宅裝修"></div>
+            <div class="field" style="grid-column:1/-1"><label for="projectAddress">工程地址</label><input id="projectAddress" data-path="case.projectAddress" autocomplete="street-address"></div>
+          </div>
+        </form>
+        <form class="subform" id="ownerForm" novalidate>
+          <h3>甲方｜業主</h3>
+          <div class="form-grid">
+            <div class="field"><label for="ownerId">當事人識別</label><input id="ownerId" data-path="owner.partyId"></div>
+            <div class="field"><label for="ownerName">姓名／名稱</label><input id="ownerName" data-path="owner.legalName" autocomplete="name"></div>
+            <div class="field"><label for="ownerPhone">電話</label><input id="ownerPhone" data-path="owner.phone" autocomplete="tel"></div>
+            <div class="field"><label for="ownerEmail">電子信箱</label><input id="ownerEmail" data-path="owner.email" type="email" autocomplete="email"></div>
+          </div>
+        </form>
+        <form class="subform" id="contractorForm" novalidate>
+          <h3>乙方｜設計師／統包</h3>
+          <div class="form-grid">
+            <div class="field"><label for="contractorId">當事人識別</label><input id="contractorId" data-path="contractor.partyId"></div>
+            <div class="field"><label for="contractorName">姓名／公司名稱</label><input id="contractorName" data-path="contractor.legalName" autocomplete="organization"></div>
+            <div class="field"><label for="contractorRep">代表人</label><input id="contractorRep" data-path="contractor.representative"></div>
+            <div class="field"><label for="contractorPhone">電話</label><input id="contractorPhone" data-path="contractor.phone" autocomplete="tel"></div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" id="basisData">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">03 · 補齊契約依據</p>
+          <h2>把價金、交付與施工節點放在同一份事實上</h2>
+          <p class="section-copy">設計費與工程款分開；工程付款節點依實際報價工項與施工進度計算，不預設固定期數。</p>
+        </div>
+        <span class="tag" id="basisTag">設計資料</span>
+      </div>
+
+      <div id="designBasis">
+        <div class="form-grid three">
+          <div class="field"><label for="designFee">設計費（元）</label><input id="designFee" data-path="values.designFee" inputmode="decimal" placeholder="例如 300000.00"></div>
+          <div class="field"><label for="designArea">設計範圍／坪數</label><input id="designArea" data-path="values.designArea" placeholder="例如 室內 30 坪"></div>
+          <div class="field"><label for="designScope">設計工作範圍</label><input id="designScope" data-path="values.designScope" placeholder="例如 全室室內設計"></div>
+          <div class="field"><label for="designScheduleId">設計交付表識別</label><input id="designScheduleId" data-path="designSchedule.scheduleId"></div>
+          <div class="field"><label for="designScheduleVersion">設計交付表版本</label><input id="designScheduleVersion" data-path="designSchedule.version"></div>
+        </div>
+        <div class="section-head" style="margin-top:28px">
+          <div>
+            <h2 style="font-size:1.12rem">設計交付節點與文件</h2>
+            <p class="section-copy">每列都要填寫實際交付節點、日期，以及該次交付文件的識別與版本；未填內容不會由系統代為補入。</p>
+          </div>
+          <button class="btn" id="addDesignRowBtn" type="button">新增設計交付節點</button>
+        </div>
+        <div class="empty" id="designRowsEmpty">尚未新增設計交付節點。請依雙方約定的設計交付表新增一列。</div>
+        <div class="table-scroll" id="designRowsWrap" hidden>
+          <table class="work-table">
+            <thead><tr><th>交付節點</th><th>日期</th><th>交付文件</th><th>操作</th></tr></thead>
+            <tbody id="designRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="worksBasis" hidden>
+        <div class="form-grid three" style="margin-top:22px">
+          <div class="field"><label for="worksAmount">工程總價（元）</label><input id="worksAmount" data-path="values.worksAmount" inputmode="decimal" placeholder="需與報價總額一致"></div>
+          <div class="field"><label for="quotationId">報價單識別</label><input id="quotationId" data-path="quotation.quotationId"></div>
+          <div class="field"><label for="quotationVersion">報價單版本</label><input id="quotationVersion" data-path="quotation.version"></div>
+          <div class="field"><label for="scheduleId">施工進度表識別</label><input id="scheduleId" data-path="constructionSchedule.scheduleId"></div>
+          <div class="field"><label for="scheduleVersion">施工進度表版本</label><input id="scheduleVersion" data-path="constructionSchedule.version"></div>
+          <div class="field"><label for="warrantyRef">保固條款文件識別</label><input id="warrantyRef" data-path="warrantyTerms.documentId"></div>
+          <div class="field"><label for="warrantyVersion">保固條款文件版本</label><input id="warrantyVersion" data-path="warrantyTerms.version"></div>
+        </div>
+        <div class="section-head" style="margin-top:28px">
+          <div>
+            <h2 style="font-size:1.12rem">報價工項與施工節點</h2>
+            <p class="section-copy">每列都要說明工項、工程價值、施工語意、日期、圖說、佐證依據識別與是否為停留查核點。</p>
+          </div>
+          <button class="btn" id="addWorkRowBtn" type="button">新增工程節點</button>
+        </div>
+        <div class="empty" id="workRowsEmpty">尚未新增工程節點。請先依報價單與施工進度新增一列。</div>
+        <div class="table-scroll" id="workRowsWrap" hidden>
+          <table class="work-table">
+            <thead><tr><th>報價工項／工程價值</th><th>施工語意／日期</th><th>圖說／佐證</th><th>停留點</th><th>操作</th></tr></thead>
+            <tbody id="workRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contractResult">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">04 · 組裝與審閱</p>
+          <h2>先看付款與缺件，再產生條文草稿</h2>
+          <p class="section-copy">計算與條文只讀取目前共同依據。若資料不足，會指出應補內容，不會把程序缺件判成工程品質問題。</p>
+        </div>
+        <span class="tag" id="draftStatusTag">尚未組裝</span>
+      </div>
+      <div class="btn-row" style="margin-bottom:18px">
+        <button class="btn primary" id="assembleBtn" type="button">產生／更新草稿</button>
+        <button class="btn" id="expandPaymentsBtn" type="button" aria-expanded="true">收合付款節點</button>
+        <button class="btn" id="expandArticlesBtn" type="button" aria-expanded="true">收合條文</button>
+        <button class="btn ghost" id="printDraftBtn" type="button" disabled>列印草稿預覽</button>
+      </div>
+
+      <div class="result-grid">
+        <section class="result-panel" id="paymentPanel" aria-labelledby="paymentHeading">
+          <h3 id="paymentHeading">付款節點</h3>
+          <div id="paymentContent" class="empty">填寫價金後，這裡會依契約類型顯示付款節點。</div>
+        </section>
+        <section class="result-panel" id="articlePanel" aria-labelledby="articleHeading">
+          <h3 id="articleHeading">條文與依據</h3>
+          <div id="articleContent" class="empty">產生草稿後，可展開查看條文識別、來源類型與尚未帶入的欄位。</div>
+        </section>
+      </div>
+
+      <div class="boundary-grid" aria-label="審查與同意邊界">
+        <div class="boundary"><span>審查狀態</span><strong id="reviewState">尚未進入審查</strong><p>系統只顯示目前草稿依據與缺件，不會代替任何一方作決定。</p></div>
+        <div class="boundary"><span>業主決策</span><strong id="ownerDecisionState">尚未作成</strong><p>業主決策需在正式案件流程中明示記錄；本頁不提供送出動作。</p></div>
+        <div class="boundary"><span>雙方同意</span><strong id="partyAgreementState">尚未成立</strong><p>草稿預覽不等於甲乙雙方已同意，也不會產生簽署結果。</p></div>
+      </div>
+
+      <div style="margin-top:22px">
+        <h3>草稿預覽</h3>
+        <p class="notice">草稿預覽，尚未完成正式保存或簽署。</p>
+        <div class="draft-watermark">草稿預覽，尚未完成正式保存或簽署</div>
+        <div class="draft-preview" id="draftPreview" tabindex="0">尚未產生草稿。請先補齊資料，再選擇「產生／更新草稿」。</div>
+      </div>
+
+      <div class="btn-row" style="margin-top:18px">
+        <button class="btn" type="button" disabled>正式建立版本</button>
+        <button class="btn" type="button" disabled>進入簽署</button>
+        <span class="footer-note">正式建立版本與簽署入口尚未開放。</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="../shared/laibe-header.js"></script>
+  <script src="../shared/laibe-project-contract-source.js"></script>
+  <script src="../shared/laibe-project-contract-engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
