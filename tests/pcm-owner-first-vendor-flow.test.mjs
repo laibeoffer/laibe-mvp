@@ -1287,6 +1287,18 @@ test("vendor 契約內層任務分頁支援循環方向鍵與 Home End", async (
   assert.equal(runtime.resolveVendorContractViewKey("reply", "Escape"), "reply");
 });
 
+test("vendor 契約內層任務分頁以已定義 token 顯示非僅靠顏色的鍵盤焦點", async () => {
+  const css = await readFile(pagePath(workspaceDir, "styles.css"), "utf8");
+  const focusRule = css.match(
+    /\.vendor-contract-view-tabs button:focus-visible\s*\{([^}]*)\}/u,
+  )?.[1] ?? "";
+
+  assert.match(css, /--workspace-paper:\s*#[0-9a-f]{6}\s*;/iu);
+  assert.match(focusRule, /outline:\s*2px solid var\(--workspace-paper\)\s*;/u);
+  assert.match(focusRule, /outline-offset:\s*3px\s*;/u);
+  assert.doesNotMatch(focusRule, /var\(--paper\)/u);
+});
+
 test("契約預覽返回乙方工作台時直接開啟待我回覆而不是契約總覽", async () => {
   const runtime = await import(moduleUrl(workspaceDir, "contract-return-task"));
 
