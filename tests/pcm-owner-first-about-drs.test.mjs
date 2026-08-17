@@ -9,6 +9,7 @@ const aboutRoot = new URL("about_drs/", pcmRoot);
 const aboutHtmlUrl = new URL("code.html", aboutRoot);
 const aboutCssUrl = new URL("styles.css", aboutRoot);
 const homeHtmlUrl = new URL("public_home/code.html", pcmRoot);
+const routeManifestUrl = new URL("public/pcm-flow-route-manifest.js", pcmRoot);
 
 async function source(url) {
   return existsSync(url) ? readFile(url, "utf8") : "";
@@ -23,8 +24,16 @@ function visibleText(html) {
     .trim();
 }
 
+function canonicalLinkHref(routeManifest, linkId) {
+  const match = routeManifest.match(new RegExp(`id: "${linkId}"[\\s\\S]*?relativeHref: "([^"]+)"`));
+  assert.ok(match, `missing canonical link: ${linkId}`);
+  return match[1];
+}
+
 test("about DRS page is a complete local public route with a beginner-first DRS shell", async () => {
-  const [html, css, home] = await Promise.all([source(aboutHtmlUrl), source(aboutCssUrl), source(homeHtmlUrl)]);
+  const [html, css, home, routeManifest] = await Promise.all([source(aboutHtmlUrl), source(aboutCssUrl), source(homeHtmlUrl), source(routeManifestUrl)]);
+  const headerHomeHref = canonicalLinkHref(routeManifest, "aboutDrsHeaderHomeToHome");
+  const startDocumentCheckHref = canonicalLinkHref(routeManifest, "aboutDrsHeaderStartDocumentCheckToQuoteCheck");
 
   assert.ok(html.length > 0, "missing about DRS page");
   assert.ok(css.length > 0, "missing about DRS styles");
@@ -34,13 +43,17 @@ test("about DRS page is a complete local public route with a beginner-first DRS 
   assert.match(html, /DRS 是甲方委託使用的裝修書面資料核對與決策留痕系統/u);
   assert.match(html, /專業的事，讓專業彼此核對；重要的決定，由你來做/u);
   assert.match(html, /class="about-header"/u);
-  assert.match(html, /關於DRS<\/a>/u);
-  assert.match(html, /aria-current="page"/u);
-  assert.match(html, /href="\.\.\/public_home\/code\.html#top"/u);
-  assert.match(html, /href="\.\.\/quote_check\/code\.html"/u);
-  assert.match(html, /開始文件健檢/u);
+  assert.match(html, /<a class="about-brand" href="\.\.\/public_home\/code\.html#top" aria-label="LaiBE DRS 首頁">/u);
+  assert.match(html, /<span(?=[^>]*class="[^"]*is-active[^"]*")(?=[^>]*aria-current="page")[^>]*>關於 DRS<\/span>/u);
+  assert.doesNotMatch(html, /<a[^>]*aria-current="page"/u);
+  assert.doesNotMatch(html, /<a\b[^>]*>\s*關於 DRS\s*<\/a>/u);
+  assert.equal(headerHomeHref, "../public_home/code.html#top");
+  assert.ok(html.includes(`<a class="about-header__home" href="${headerHomeHref}">DRS 首頁</a>`));
+  assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.ok(html.includes(`<a class="about-header__cta" href="${startDocumentCheckHref}">開始文件健檢</a>`));
   assert.match(html, /返回 DRS 首頁/u);
-  assert.match(home, /<a class="header-action header-action--context" href="\.\.\/about_drs\/code\.html">關於DRS<\/a>/u);
+  assert.match(home, /<a class="header-action header-action--context" href="\.\.\/about_drs\/code\.html">關於 DRS<\/a>/u);
+  assert.match(css, /\.about-brand\s*\{[^}]*min-block-size:\s*44px/su);
 });
 
 test("about DRS puts the definition, outcomes, collaboration, and service boundaries in decision order", async () => {

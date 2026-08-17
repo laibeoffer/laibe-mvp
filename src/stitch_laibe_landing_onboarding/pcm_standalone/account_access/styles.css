@@ -196,7 +196,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .brand { gap: 8px; }
   .brand img { width: 82px; }
   .header-actions { min-width: 0; gap: 5px; }
-  .header-action { min-height: 40px; padding-inline: 9px; font-size: 0.66rem; }
+  .header-action { min-height: 44px; padding-inline: 9px; font-size: 0.66rem; }
   .header-action:first-child { display: none; }
 }
 

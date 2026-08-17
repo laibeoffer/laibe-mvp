@@ -28,6 +28,214 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function currentHtmlAnchor(html, marker) {
+  const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const matches = html.match(
+    new RegExp(`<a\\b[^>]*${escapedMarker}(?=\\s|>)[^>]*>[\\s\\S]*?<\\/a>`, "gu"),
+  ) ?? [];
+  assert.equal(matches.length, 1, `current HTML must contain one ${marker} anchor`);
+  const source = matches[0];
+  const opening = source.match(/^<a\b([^>]*)>/u);
+  assert.ok(opening, `${marker} opening tag`);
+  const attributes = new Map();
+  for (const attribute of opening[1].matchAll(/([:\w-]+)(?:\s*=\s*"([^"]*)")?/gu)) {
+    attributes.set(attribute[1], attribute[2] ?? "");
+  }
+  const classes = new Set((attributes.get("class") ?? "").split(/\s+/u).filter(Boolean));
+  return {
+    source,
+    textContent: source.replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ").trim(),
+    classList: {
+      toggle(name, enabled) {
+        if (enabled) classes.add(name);
+        else classes.delete(name);
+        attributes.set("class", [...classes].join(" "));
+      },
+    },
+    setAttribute(name, value) {
+      attributes.set(name, String(value));
+    },
+    getAttribute(name) {
+      return attributes.get(name) ?? null;
+    },
+    hasAttribute(name) {
+      return attributes.has(name);
+    },
+    removeAttribute(name) {
+      attributes.delete(name);
+    },
+    get href() {
+      return attributes.get("href") ?? "";
+    },
+    set href(value) {
+      attributes.set("href", String(value));
+    },
+  };
+}
+
+function createServiceHeaderHarness(html) {
+  const nodes = new Map([
+    ["[data-service-brand-link]", currentHtmlAnchor(html, "data-service-brand-link")],
+    ["[data-service-header-return]", currentHtmlAnchor(html, "data-service-header-return")],
+  ]);
+  return {
+    nodes,
+    root: {
+      querySelector(selector) {
+        return nodes.get(selector) ?? null;
+      },
+    },
+  };
+}
+
+test("service contract header uses the official common lockup and manifest-owned links", async () => {
+  const [html, ownerHtml, css] = await Promise.all([
+    readFile(path.join(serviceContractDir, "code.html"), "utf8"),
+    readFile(path.join(serviceContractDir, "..", "..", "client_awarding_dashboard", "code.html"), "utf8"),
+    readFile(path.join(serviceContractDir, "styles.css"), "utf8"),
+  ]);
+  const header = html.slice(
+    html.indexOf('<header class="site-header"'),
+    html.indexOf("</header>"),
+  );
+
+  assert.match(header, /data-service-brand-link/u);
+  assert.match(header, /class="drs-brand-lockup drs-brand-lockup--expanded"/u);
+  assert.match(header, /aria-label="LaiBE DRS 首頁"/u);
+  assert.match(header, /Decision[\s\S]*Record[\s\S]*System/u);
+  assert.match(header, /class="drs-brand-name">裝潢決策系統<\/small>/u);
+  assert.match(header, /data-service-header-return[^>]*>返回 DRS 首頁<\/a>/u);
+  assert.doesNotMatch(header, /data-service-(?:brand-link|header-return)[^>]*\shref=/u);
+  assert.match(header, /href="#contract-flow"[\s\S]*確認流程/u);
+  assert.match(header, /href="#full-contract"[\s\S]*完整契約/u);
+  assert.match(css, /\.site-header nav a\s*\{[^}]*min-height:\s*44px/is);
+  assert.match(css, /@media\s*(?:screen\s*and\s*)?\(max-width:\s*620px\)[\s\S]*\.site-header[\s\S]*flex-wrap:\s*wrap/is);
+  assert.match(css, /@media\s*(?:screen\s*and\s*)?\(max-width:\s*620px\)[\s\S]*\.site-header nav[\s\S]*width:\s*100%/is);
+
+  const serviceBrand = currentHtmlAnchor(html, "data-service-brand-link");
+  const ownerBrand = currentHtmlAnchor(ownerHtml, "data-owner-brand-link");
+  const lockupPattern = /<span class="drs-brand-lockup drs-brand-lockup--expanded">[\s\S]*?<small class="drs-brand-name">裝潢決策系統<\/small>\s*<\/span>/u;
+  assert.equal(serviceBrand.getAttribute("aria-label"), "LaiBE DRS 首頁");
+  assert.equal(ownerBrand.getAttribute("aria-label"), "LaiBE DRS 首頁");
+  assert.equal(
+    serviceBrand.source.match(lockupPattern)?.[0].replace(/\s+/gu, " "),
+    ownerBrand.source.match(lockupPattern)?.[0].replace(/\s+/gu, " "),
+  );
+});
+
+test("service contract header resolves the exact single trusted owner return and keeps brand canonical", async () => {
+  const { bindServiceContractHeaderRoutes } = await import(moduleUrl("app.js"));
+  const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
+
+  for (const [search, expectedLabel, expectedHref] of [
+    ["", "返回 DRS 首頁", "../public_home/code.html#top"],
+    ["?returnTo=", "返回 DRS 首頁", "../public_home/code.html#top"],
+    ["?returnTo=Owner-contract", "返回 DRS 首頁", "../public_home/code.html#top"],
+    ["?returnTo=vendor", "返回 DRS 首頁", "../public_home/code.html#top"],
+    ["?returnTo=owner-contract", "返回契約管理", "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract"],
+    ["?contract=design&returnTo=owner-contract", "返回契約管理", "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract"],
+    ["?returnTo=owner-contract&returnTo=owner-contract", "返回 DRS 首頁", "../public_home/code.html#top"],
+    ["?returnTo=owner-contract&returnTo=vendor", "返回 DRS 首頁", "../public_home/code.html#top"],
+  ]) {
+    const { root, nodes } = createServiceHeaderHarness(html);
+    assert.equal(bindServiceContractHeaderRoutes(root, { search }), true, search);
+    assert.equal(nodes.get("[data-service-brand-link]").getAttribute("href"), "../public_home/code.html#top", search);
+    assert.equal(nodes.get("[data-service-header-return]").textContent, expectedLabel, search);
+    assert.equal(nodes.get("[data-service-header-return]").getAttribute("href"), expectedHref, search);
+    assert.equal(nodes.get("[data-service-header-return]").hasAttribute("aria-disabled"), false, search);
+    assert.equal(nodes.get("[data-service-header-return]").hasAttribute("tabindex"), false, search);
+  }
+});
+
+test("service contract conditional return safely falls back to valid home and otherwise fails closed", async () => {
+  const { bindServiceContractHeaderRoutes } = await import(moduleUrl("app.js"));
+  const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
+  const homeHref = "../public_home/code.html#top";
+  const defaultGetter = (id) => id === "serviceContractBrandToHome" || id === "serviceContractHeaderHomeToHome"
+    ? homeHref
+    : null;
+
+  for (const conditionalFailure of [
+    defaultGetter,
+    (id) => {
+      if (id === "serviceContractTrustedOwnerReturnToOwnerContractManagement") throw new Error("unavailable");
+      return defaultGetter(id);
+    },
+    (id) => id === "serviceContractTrustedOwnerReturnToOwnerContractManagement"
+      ? "../../wrong.html"
+      : defaultGetter(id),
+  ]) {
+    const { root, nodes } = createServiceHeaderHarness(html);
+    assert.equal(bindServiceContractHeaderRoutes(root, { search: "?returnTo=owner-contract" }, conditionalFailure), true);
+    assert.equal(nodes.get("[data-service-header-return]").textContent, "返回 DRS 首頁");
+    assert.equal(nodes.get("[data-service-header-return]").getAttribute("href"), homeHref);
+  }
+
+  for (const failedGetter of [() => "../wrong.html", () => { throw new Error("unavailable"); }]) {
+    const { root, nodes } = createServiceHeaderHarness(html);
+    assert.equal(bindServiceContractHeaderRoutes(root, { search: "?returnTo=owner-contract" }, failedGetter), false);
+    assert.equal(nodes.get("[data-service-brand-link]").hasAttribute("href"), false);
+    assert.equal(nodes.get("[data-service-header-return]").hasAttribute("href"), false);
+    assert.equal(nodes.get("[data-service-header-return]").textContent, "返回 DRS 首頁");
+    assert.equal(nodes.get("[data-service-header-return]").getAttribute("aria-disabled"), "true");
+  }
+});
+
+test("trusted owner return survives engineering and design type journeys while invalid contexts are dropped", async () => {
+  const {
+    CONTRACT_TYPES,
+    CONTRACT_VIEW_CONFIGS,
+    applyContractView,
+    buildContractTypeHref,
+  } = await import(moduleUrl("app.js"));
+  const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
+  const typeLinks = [
+    currentHtmlAnchor(html, 'data-contract-type-link="engineering"'),
+    currentHtmlAnchor(html, 'data-contract-type-link="design"'),
+  ];
+  const previousDocument = globalThis.document;
+  globalThis.document = {
+    body: { setAttribute() {} },
+    querySelector() { return null; },
+    querySelectorAll(selector) {
+      return selector === "[data-contract-type-link]" ? typeLinks : [];
+    },
+  };
+
+  try {
+    for (const [search, trusted] of [
+      ["?contract=engineering&returnTo=owner-contract", true],
+      ["?contract=design&returnTo=owner-contract", true],
+      ["", false],
+      ["?returnTo=", false],
+      ["?returnTo=Owner-contract", false],
+      ["?returnTo=vendor", false],
+      ["?returnTo=owner-contract&returnTo=owner-contract", false],
+      ["?returnTo=owner-contract&returnTo=vendor", false],
+    ]) {
+      const locationLike = { search };
+      const expectedSuffix = trusted ? "&returnTo=owner-contract#full-contract" : "#full-contract";
+      assert.equal(
+        buildContractTypeHref(CONTRACT_TYPES.ENGINEERING, locationLike),
+        `./code.html?contract=engineering${expectedSuffix}`,
+        search,
+      );
+      assert.equal(
+        buildContractTypeHref(CONTRACT_TYPES.DESIGN, locationLike),
+        `./code.html?contract=design${expectedSuffix}`,
+        search,
+      );
+
+      applyContractView(CONTRACT_VIEW_CONFIGS[CONTRACT_TYPES.DESIGN], locationLike);
+      assert.equal(typeLinks[0].href, `./code.html?contract=engineering${expectedSuffix}`, search);
+      assert.equal(typeLinks[1].href, `./code.html?contract=design${expectedSuffix}`, search);
+    }
+  } finally {
+    if (previousDocument === undefined) delete globalThis.document;
+    else globalThis.document = previousDocument;
+  }
+});
+
 test("T7 binds the complete v0.5 legal-review contract-content file byte-for-byte", async () => {
   const frozenBytes = await readFile(frozenContractPath);
   const { CONTRACT_META, CONTRACT_SOURCE, CONTRACT_SOURCE_SHA256 } = await import(

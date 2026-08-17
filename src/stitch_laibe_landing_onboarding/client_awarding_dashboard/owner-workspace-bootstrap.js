@@ -1,7 +1,9 @@
 import {
+  bindOwnerWorkspaceCanonicalLinks,
   createOwnerWorkspaceController,
   sha256Hex,
 } from "./app.js";
+import { getActiveCanonicalLinkHref } from "../pcm_standalone/public/pcm-flow-route-manifest.js";
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -630,6 +632,7 @@ function adapterFor(dependencies) {
 export function createOwnerWorkspaceBootstrap(untrustedDependencies) {
   const dependencies = initialDependencies(untrustedDependencies);
   const root = dependencies?.root ?? safeRoot(untrustedDependencies);
+  bindOwnerWorkspaceCanonicalLinks(root, getActiveCanonicalLinkHref);
   const controller = createOwnerWorkspaceController({ root });
   if (dependencies) controller.setAdapter(adapterFor(dependencies));
 

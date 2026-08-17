@@ -14,6 +14,7 @@
       href="../../../assets/logo/laibe_offer.svg"
     />
     <link rel="stylesheet" href="./styles.css?v=20260815-final-runtime" />
+    <link rel="stylesheet" href="../pcm_standalone/shared/drs-brand.css?v=20260810-drs" />
     <script type="module" src="./owner-workspace-bootstrap.js"></script>
   </head>
   <body data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE">
@@ -23,24 +24,31 @@
       <div class="workspace-header__inner">
         <a
           class="brand"
-          href="../pcm_standalone/public_home/code.html#top"
-          aria-label="回到 LaiBE Decision &amp; Record System 首頁"
+          data-owner-brand-link
+          aria-label="LaiBE DRS 首頁"
         >
           <img
             src="../../../assets/logo/laibe_offer.svg"
             alt="LaiBE offer"
           />
-          <span class="brand__product">Decision &amp; Record System</span>
+          <span class="drs-brand-lockup drs-brand-lockup--expanded">
+            <span class="drs-brand-wordmark" aria-label="Decision &amp; Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
+            <small class="drs-brand-name">裝潢決策系統</small>
+          </span>
         </a>
 
-        <div class="workspace-header__context" aria-label="工作台角色">
-          <span class="context-chip context-chip--role">甲方準備預覽</span>
-          <span class="context-chip" data-slot="case-name">註冊後準備工作台預覽</span>
-          <span
-            class="context-chip context-chip--state"
-            data-slot="header-state"
-          >
-            準備資料中
+        <div class="workspace-header__context" aria-label="工作台角色、案件與服務契約狀態">
+          <span class="context-chip context-chip--role">
+            <span class="context-chip__label">工作台角色</span>
+            <span class="context-chip__value">甲方</span>
+          </span>
+          <span class="context-chip context-chip--case">
+            <span class="context-chip__label">案件</span>
+            <span class="context-chip__value" data-slot="case-name" data-header-context-value="case">尚未連結正式案件</span>
+          </span>
+          <span class="context-chip context-chip--agreement">
+            <span class="context-chip__label">服務契約</span>
+            <span class="context-chip__value" data-slot="agreement-label" data-header-context-value="agreement">尚未確認</span>
           </span>
         </div>
       </div>
@@ -61,7 +69,7 @@
           <h1 id="precontract-title">註冊後，可以先把資料整理成可討論的決策基礎</h1>
           <p>
             這裡只預覽註冊後的整理方式；目前尚未驗證註冊，摘要也尚未真正保存。
-            帳號與保存功能開放後，才會承接可信資料並顯示個人內容。
+            帳號與保存功能開放後，才會承接已確認的資料並顯示個人內容。
           </p>
         </div>
 
@@ -92,7 +100,7 @@
         <ol class="precontract-steps" aria-label="DRS 準備進度">
           <li><span>○</span><strong>文件健檢方向</strong><small>本次檢查不會自動保存</small></li>
           <li><span>○</span><strong>案件摘要草稿</strong><small>註冊與保存開放後才可正式保留</small></li>
-          <li class="is-current"><span>●</span><strong>完整需求整理</strong><small>入口開放後再承接可信摘要，避免重問相同資料</small></li>
+          <li class="is-current"><span>●</span><strong>完整需求整理</strong><small>入口開放後再承接已確認的摘要，避免重問相同資料</small></li>
           <li><span>○</span><strong>補齊必要文件</strong><small>整理後再確認需要補上的資料</small></li>
           <li><span>○</span><strong>查看 DRS 服務方案</strong><small>了解正式服務如何協助後續決策</small></li>
           <li><span>○</span><strong>確認 DRS 服務契約</strong><small>確認後才會進入正式 DRS 案件流程</small></li>
@@ -129,15 +137,15 @@
         aria-labelledby="workspace-title"
       >
         <div class="workspace-intro__copy">
-          <p class="eyebrow">甲方工作台｜案件治理預覽</p>
+          <p class="eyebrow">甲方工作台｜裝修決策與案件紀錄系統</p>
           <h1 id="workspace-title">甲方案件工作台</h1>
           <p class="workspace-intro__lead">
-            這裡把文件版次、專業書面檢討、三方公開訊息與後續案件紀錄放在同一條可追溯的決策線上；
-            身分與案件權限尚未確認時，只顯示工作台結構與誠實空狀態。
+            這裡把需求、圖面、契約與三方確認整理成同一份可追溯的案件依據；
+            目前尚未連結正式案件，先完成服務與案件入口確認，才會開放正式內容。
           </p>
           <div class="workspace-intro__meta" aria-label="工作台目前狀態">
             <span class="state-pill" data-slot="state-label"
-            >尚待取得案件資料</span>
+            >尚未連結正式案件</span>
             <span data-slot="agreement-label">DRS 服務契約：尚待確認</span>
           </div>
         </div>
@@ -148,26 +156,39 @@
           aria-labelledby="handoff-title"
         >
           <div class="handoff-panel__topline">
-            <p class="eyebrow">現在球在誰手上</p>
+            <p class="eyebrow">目前狀態｜尚未連結正式案件</p>
             <span class="signal-dot" aria-hidden="true"></span>
           </div>
-          <h2 id="handoff-title" data-slot="current-actor">尚待載入</h2>
+          <span class="handoff-panel__actor-label">現在由誰處理</span>
+          <h2 id="handoff-title" data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</h2>
           <p class="handoff-panel__action" data-slot="next-action">
-            取得可信案件資料後顯示下一步
+            下一步：了解並確認 DRS 服務契約
           </p>
           <dl class="handoff-panel__facts">
             <div>
-              <dt>誰正在等待誰</dt>
-              <dd data-slot="waiting-relationship">尚待載入</dd>
+              <dt>尚未開放原因</dt>
+              <dd data-slot="waiting-relationship">甲方身分、DRS 服務契約與案件權限尚未完成確認</dd>
             </div>
             <div>
-              <dt>預計期限</dt>
-              <dd data-slot="next-due">依案件通知</dd>
+              <dt>完成後</dt>
+              <dd data-slot="next-due">完成後才會開放本案契約填寫與案件對話</dd>
             </div>
             <div>
               <dt>最近留痕</dt>
-              <dd data-slot="last-recorded">尚待載入</dd>
+              <dd data-slot="last-recorded">尚未建立正式案件紀錄</dd>
             </div>
+          </dl>
+          <dl
+            class="handoff-panel__mobile-summary"
+            data-layout="owner-responsibility-mobile-summary"
+            aria-label="手機版責任摘要"
+          >
+            <div><dt>目前狀態</dt><dd data-slot="state-label">尚未連結正式案件</dd></div>
+            <div><dt>現在由誰處理</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
+            <div><dt>下一步</dt><dd data-slot="next-action">了解並確認 DRS 服務契約</dd></div>
+            <div><dt>尚未開放原因</dt><dd data-slot="waiting-relationship">甲方身分、DRS 服務契約與案件權限尚未完成確認</dd></div>
+            <div><dt>完成後</dt><dd data-slot="next-due">完成後才會開放本案契約填寫與案件對話</dd></div>
+            <div><dt>最近留痕</dt><dd data-slot="last-recorded">尚未建立正式案件紀錄</dd></div>
           </dl>
         </aside>
 
@@ -193,7 +214,6 @@
                 aria-selected="true"
                 aria-controls="owner-dashboard-panel-design"
               >
-                <span>01</span>
                 <strong>設計案管理</strong>
                 <small>需求、圖面、版本與待確認</small>
               </button>
@@ -208,7 +228,6 @@
                 aria-controls="owner-dashboard-panel-construction"
                 tabindex="-1"
               >
-                <span>02</span>
                 <strong>工程案管理</strong>
                 <small>任務、照片、變更與驗收</small>
               </button>
@@ -223,7 +242,6 @@
                 aria-controls="owner-dashboard-panel-contract"
                 tabindex="-1"
               >
-                <span>03</span>
                 <strong>契約管理</strong>
                 <small>契約版本、附件與治理紀錄</small>
               </button>
@@ -250,18 +268,18 @@
                   <span data-slot="state-label">尚待取得案件資料</span>
                 </header>
                 <dl class="owner-dashboard-facts">
-                  <div><dt>文件版本</dt><dd data-slot="document-summary">尚待載入</dd></div>
-                  <div><dt>書面檢討</dt><dd data-slot="review-summary">尚待載入</dd></div>
-                  <div><dt>待確認事項</dt><dd data-slot="issue-summary">尚待載入</dd></div>
+                  <div><dt>文件版本</dt><dd data-slot="document-summary">尚未連結正式案件</dd></div>
+                  <div><dt>書面檢討</dt><dd data-slot="review-summary">尚未連結正式案件</dd></div>
+                  <div><dt>待確認事項</dt><dd data-slot="issue-summary">尚未連結正式案件</dd></div>
                 </dl>
               </div>
               <footer class="owner-hero-dashboard__next">
                 <p>
                   <span>下一步</span>
-                  <strong data-slot="next-summary">尚待載入</strong>
-                  <small data-slot="next-owner-summary">責任人：尚待載入</small>
+                  <strong data-slot="next-summary">了解並確認 DRS 服務契約</strong>
+                  <small data-slot="next-owner-summary">責任人：甲方</small>
                 </p>
-                <a href="#design-review">查看設計案紀錄 <span aria-hidden="true">→</span></a>
+                <span class="owner-dashboard-static-note">尚未建立可查看的設計案紀錄</span>
               </footer>
             </section>
 
@@ -284,7 +302,7 @@
                     <p class="eyebrow">今天與下一步</p>
                     <h3>施工責任工作區</h3>
                   </div>
-                  <span data-slot="case-status">尚待載入</span>
+                  <span data-slot="case-status">尚未連結正式案件</span>
                 </header>
                 <dl class="owner-dashboard-facts">
                   <div><dt>今日焦點</dt><dd data-slot="today-focus">尚待案件資料</dd></div>
@@ -293,8 +311,8 @@
                 </dl>
               </div>
               <footer class="owner-hero-dashboard__next">
-                <p><span>紀錄原則</span><strong>只顯示案件後台已有的施工與驗收留痕。</strong></p>
-                <a href="#construction-records">查看工程案紀錄 <span aria-hidden="true">→</span></a>
+                <p><span>紀錄原則</span><strong>只顯示正式案件已有的施工與驗收留痕。</strong></p>
+                <span class="owner-dashboard-static-note">尚未建立可查看的工程案紀錄</span>
               </footer>
             </section>
 
@@ -309,13 +327,18 @@
               <header class="owner-contract-command">
                 <div>
                   <p class="eyebrow">專案契約｜甲方工作台</p>
-                  <h3>先完成本案契約，再處理補充或變更。</h3>
+                  <h3>先確認目前可進行的步驟，再整理本案契約。</h3>
                   <p>從下方四個分頁開始：先看契約、補齊本案資料，再整理需要乙方回覆的變更。萊比只協助整理風險與紀錄，不替雙方作決定。</p>
                 </div>
+                <a
+                  class="owner-contract-recovery-action"
+                  data-owner-service-contract-link
+                >了解並確認 DRS 服務契約</a>
                 <button
                   class="owner-contract-primary-action"
                   type="button"
                   data-action="start-owner-contract-draft"
+                  data-owner-contract-trusted-action
                   data-owner-contract-control
                   disabled
                   aria-disabled="true"
@@ -343,7 +366,7 @@
                     <p>這裡只說明案件服務的資格與目前狀態，不是甲乙雙方的工程契約。</p>
                     <dl>
                       <div><dt>服務狀態</dt><dd data-slot="agreement-state">尚待確認</dd></div>
-                      <div><dt>服務版本</dt><dd data-slot="agreement-version">尚待載入</dd></div>
+                      <div><dt>服務版本</dt><dd data-slot="agreement-version">尚未確認服務版本</dd></div>
                     </dl>
                   </article>
 
@@ -361,14 +384,14 @@
                   data-shared-contract-type="DESIGN_BUILD"
                 >
                   <div class="shared-contract-card__cover" aria-hidden="true">
-                    <span>PROJECT CONTRACT</span>
+                    <span>本案契約預覽</span>
                     <strong>甲乙共同契約</strong>
                     <small>v0.2</small>
                   </div>
                   <div class="shared-contract-card__content">
                     <p class="eyebrow">本案甲乙契約｜共同預覽</p>
                     <h4>建築物室內裝修設計及工程承攬契約</h4>
-                    <p>雙方看到同一份唯讀條文；本頁草稿尚未保存，也尚未同步給另一方</p>
+                    <p>目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方。</p>
                     <dl aria-label="共同契約摘要">
                       <div><dt>契約類型</dt><dd>設計＋工程</dd></div>
                       <div><dt>預覽版本</dt><dd>v0.2</dd></div>
@@ -386,7 +409,7 @@
                   <div><dt>目前角色</dt><dd>甲方（業主）</dd></div>
                   <div><dt>本案契約</dt><dd>設計＋工程・草稿資料待補</dd></div>
                   <div><dt>目前狀態</dt><dd>尚待確認</dd></div>
-                  <div><dt>下一位處理者</dt><dd data-slot="current-actor">尚待載入</dd></div>
+                  <div><dt>下一位處理者</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
                 </dl>
               </section>
 
@@ -402,9 +425,23 @@
                   <div><p class="eyebrow">本案契約資料草稿</p><h4>依序補齊 13 項資料</h4></div>
                   <strong data-owner-contract-facts-progress>已填 0 / 13</strong>
                 </header>
-                <p class="owner-contract-session-note" role="status">目前只保留在這個頁面；重新整理後需重新輸入，也不會自動分享給乙方。</p>
+                <div class="owner-contract-unavailable-preparation" data-owner-contract-unavailable-preparation role="status">
+                  <strong>目前尚不能填寫</strong>
+                  <p data-slot="access-message">甲方身分、DRS 服務契約與案件權限尚未完成確認。</p>
+                  <p>正式案件可編輯後，才會開放 13 項資料。</p>
+                  <details>
+                    <summary>查看之後需要準備的資料</summary>
+                    <dl>
+                      <div><dt>雙方與專案</dt><dd>甲方可先準備姓名、專案名稱與地址；乙方資料可待雙方確認。</dd></div>
+                      <div><dt>工作範圍、價金與工期</dt><dd>依雙方文件核對，不以印象或口頭說法代替。</dd></div>
+                      <div><dt>付款、驗收與保固</dt><dd>依契約與附件確認；不知道時保留待確認，不要自行猜測。</dd></div>
+                    </dl>
+                  </details>
+                </div>
+                <div data-owner-contract-trusted-facts>
+                  <p class="owner-contract-session-note" role="status">目前只保留在這個頁面；重新整理後需重新輸入，也不會自動分享給乙方。</p>
 
-                <div class="owner-contract-facts-form">
+                  <div class="owner-contract-facts-form">
                   <fieldset>
                     <legend><span>01</span>雙方與專案</legend>
                     <div>
@@ -433,11 +470,12 @@
                       <label><span>保固依據</span><textarea rows="3" data-owner-contract-fact="warrantyBasis" data-owner-contract-control disabled aria-disabled="true" placeholder="例如：保固期間與除外事項"></textarea></label>
                     </div>
                   </fieldset>
+                  </div>
+                  <footer class="owner-contract-facts-footer">
+                    <p data-owner-contract-facts-summary>下一項：甲方姓名／名稱</p>
+                    <button type="button" data-action="clear-owner-contract-facts" data-owner-contract-control disabled aria-disabled="true">清除本頁填寫</button>
+                  </footer>
                 </div>
-                <footer class="owner-contract-facts-footer">
-                  <p data-owner-contract-facts-summary>下一項：甲方姓名／名稱</p>
-                  <button type="button" data-action="clear-owner-contract-facts" data-owner-contract-control disabled aria-disabled="true">清除本頁填寫</button>
-                </footer>
               </section>
 
               <section
@@ -534,13 +572,13 @@
                   <strong>尚未建立本案契約正式版本</strong>
                   <p>本頁填寫與補充草稿目前都不會自行保存。完成案件身分與權限確認後，才會在這裡顯示雙方可追溯的版本、附件與決定紀錄。</p>
                   <dl class="owner-contract-version-line" data-owner-contract-version-history>
-                    <div><dt>目前服務版本</dt><dd data-slot="agreement-version">尚待載入</dd></div>
+                    <div><dt>目前服務版本</dt><dd data-slot="agreement-version">尚未確認服務版本</dd></div>
                     <div><dt>服務狀態</dt><dd data-slot="agreement-state">尚待確認</dd></div>
                   </dl>
                 </div>
                 <footer class="owner-hero-dashboard__next owner-contract-governance-link">
                   <p><span>正式案件留痕</span><strong>回到治理紀錄核對已保存的契約、附件、異議與回覆版本。</strong></p>
-                  <a href="#governance">查看契約治理紀錄 <span aria-hidden="true">→</span></a>
+                  <span class="owner-dashboard-static-note">尚未建立可查看的契約治理紀錄</span>
                 </footer>
               </section>
             </section>
@@ -551,36 +589,43 @@
             data-layout="owner-line-conversation"
             aria-label="案件 LINE 對話"
           >
-            <header class="owner-line-conversation__heading">
-              <div><p class="eyebrow">案件 LINE 對話</p><h2 data-slot="case-name">尚未連結正式案件</h2></div>
-              <span class="owner-hero-dashboard__rail-state" data-slot="header-state">決策準備中</span>
-            </header>
-            <p class="owner-line-conversation__notice" role="status" aria-live="polite">尚未連結案件對話</p>
-            <section class="owner-line-conversation__stream" aria-labelledby="owner-line-empty-title">
-              <p class="eyebrow">對話紀錄</p>
-              <h3 id="owner-line-empty-title">目前沒有可顯示的對話</h3>
-              <p>完成甲方身分與案件權限確認後，才會顯示與這個案件有關的 LINE 對話紀錄。</p>
+            <section class="owner-line-conversation__unavailable" aria-labelledby="owner-line-unavailable-title">
+              <p class="eyebrow">案件對話</p>
+              <h2 id="owner-line-unavailable-title">案件對話尚未連結</h2>
+              <p>完成正式案件與權限確認後，才會顯示本案對話紀錄。</p>
             </section>
-            <dl>
-              <div>
-                <dt>目前由誰處理</dt>
-                <dd data-slot="current-actor">尚待載入</dd>
-              </div>
-              <div>
-                <dt>建議下一步</dt>
-                <dd data-slot="next-action">取得可信案件資料後顯示下一步</dd>
-              </div>
-              <div>
-                <dt>最近留痕</dt>
-                <dd data-slot="last-recorded">尚待載入</dd>
-              </div>
-            </dl>
-            <form class="owner-line-conversation__composer" aria-label="案件 LINE 訊息輸入">
-              <label for="owner-line-message">訊息</label>
-              <textarea id="owner-line-message" rows="3" disabled aria-disabled="true" placeholder="連結案件對話後才能輸入"></textarea>
-              <button type="button" data-line-send disabled aria-disabled="true">尚未開放傳送</button>
-              <p>目前不會送出或保存訊息；請先完成案件與權限確認。</p>
-            </form>
+            <div data-owner-line-trusted-content>
+              <header class="owner-line-conversation__heading">
+                <div><p class="eyebrow">案件 LINE 對話</p><h2 data-slot="case-name">尚未連結正式案件</h2></div>
+                <span class="owner-hero-dashboard__rail-state" data-slot="header-state">決策準備中</span>
+              </header>
+              <p class="owner-line-conversation__notice" role="status" aria-live="polite">案件對話尚未連結</p>
+              <section class="owner-line-conversation__stream" aria-labelledby="owner-line-empty-title">
+                <p class="eyebrow">對話紀錄</p>
+                <h3 id="owner-line-empty-title">目前沒有可顯示的對話</h3>
+                <p>完成甲方身分與案件權限確認後，才會顯示與這個案件有關的 LINE 對話紀錄。</p>
+              </section>
+              <dl>
+                <div>
+                  <dt>目前由誰處理</dt>
+                  <dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd>
+                </div>
+                <div>
+                  <dt>建議下一步</dt>
+                  <dd data-slot="next-action">了解並確認 DRS 服務契約</dd>
+                </div>
+                <div>
+                  <dt>最近留痕</dt>
+                  <dd data-slot="last-recorded">尚未建立正式案件紀錄</dd>
+                </div>
+              </dl>
+              <form class="owner-line-conversation__composer" aria-label="案件 LINE 訊息輸入">
+                <label for="owner-line-message">訊息</label>
+                <textarea id="owner-line-message" rows="3" disabled aria-disabled="true" placeholder="連結案件對話後才能輸入"></textarea>
+                <button type="button" data-line-send disabled aria-disabled="true">尚未開放傳送</button>
+                <p>目前不會送出或保存訊息；請先完成案件與權限確認。</p>
+              </form>
+            </div>
           </aside>
         </div>
       </section>
@@ -667,23 +712,23 @@
             <dl class="summary-grid" data-layout="owner-status-summary">
               <div class="summary-card">
                 <dt>目前文件版本</dt>
-                <dd data-slot="document-summary">尚待載入</dd>
+                <dd data-slot="document-summary">尚未連結正式案件</dd>
                 <p>報價與施工圖各自綁定不可變版次。</p>
               </div>
               <div class="summary-card">
                 <dt>專業檢討狀態</dt>
-                <dd data-slot="review-summary">尚待載入</dd>
+                <dd data-slot="review-summary">尚未連結正式案件</dd>
                 <p>書面整理不取代甲方確認，也不代替任何一方做最終決定。</p>
               </div>
               <div class="summary-card">
                 <dt>待確認事項</dt>
-                <dd data-slot="issue-summary">尚待載入</dd>
+                <dd data-slot="issue-summary">尚未連結正式案件</dd>
                 <p>逐項標示提出者、依據與等待對象。</p>
               </div>
               <div class="summary-card summary-card--accent">
                 <dt>下一步</dt>
-                <dd data-slot="next-summary">尚待載入</dd>
-                <p data-slot="next-owner-summary">責任人：尚待載入</p>
+                <dd data-slot="next-summary">了解並確認 DRS 服務契約</dd>
+                <p data-slot="next-owner-summary">責任人：甲方</p>
               </div>
             </dl>
           </section>
@@ -809,7 +854,7 @@
                 <h2 id="messages-title">三方公開訊息</h2>
                 <p>
                   甲方、乙方與專業檢討人員
-                  的正式訊息在案件內三方可見，並保存在萊比後台。
+                  的正式訊息在案件內三方可見，並保存在案件紀錄中。
                 </p>
               </div>
               <button class="button button--quiet" type="button" disabled>
@@ -819,7 +864,7 @@
             <ul class="message-list" data-list="messages">
               <li class="empty-state">
                 <strong>尚未取得案件訊息</strong>
-                <span>只有收到可信留痕憑證後，訊息才會顯示為「已記錄」。</span>
+                <span>只有正式留下案件紀錄後，訊息才會顯示為「已記錄」。</span>
               </li>
             </ul>
           </section>
@@ -873,7 +918,7 @@
               <article class="governance-card">
                 <h3>專業協作結束後</h3>
                 <p>
-                  甲乙雙方仍可讀取案件後台已確認可用的既有內容；下載入口正式開放後，
+                  甲乙雙方仍可讀取正式案件中已確認可用的既有內容；下載入口正式開放後，
                   雙方可各自下載文件與留痕，專業協作不再介入。
                 </p>
                 <p class="status-tag">既有內容維持只供讀取</p>
@@ -889,7 +934,7 @@
             <div class="section-heading">
               <p class="eyebrow">依文件作決定</p>
               <h2 id="design-review-title">設計送審</h2>
-              <p>通過或要求修改，都必須綁定同一份文件版次、理由與可信時間。</p>
+              <p>通過或要求修改，都必須綁定同一份文件版次、理由與記錄時間。</p>
             </div>
             <ul class="record-list" data-list="designReviews">
               <li class="empty-state">
@@ -928,7 +973,7 @@
               <li class="empty-state">
                 <strong>尚未取得施工或驗收事件</strong>
                 <span
-                >施工任務、照片、追加減項與驗收缺失，必須來自案件後台紀錄。</span>
+                >施工任務、照片、追加減項與驗收缺失，必須來自正式案件紀錄。</span>
               </li>
             </ul>
           </section>
@@ -971,11 +1016,11 @@
               </div>
               <div>
                 <dt>契約版本</dt>
-                <dd data-slot="agreement-version">尚待載入</dd>
+                <dd data-slot="agreement-version">尚未確認服務版本</dd>
               </div>
               <div>
                 <dt>案件狀態</dt>
-                <dd data-slot="case-status">尚待載入</dd>
+                <dd data-slot="case-status">尚未連結正式案件</dd>
               </div>
               <div>
                 <dt>甲方身分</dt>

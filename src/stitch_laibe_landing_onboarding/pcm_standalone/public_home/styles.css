@@ -179,7 +179,7 @@ dd {
 
 .header-action {
   display: inline-flex;
-  min-height: 42px;
+  min-height: 44px;
   flex: 0 0 auto;
   width: auto;
   padding: 0 15px;
@@ -2301,7 +2301,7 @@ footer > a:last-child {
   }
 
   .header-action {
-    min-height: 40px;
+    min-height: 44px;
     padding: 0 9px;
     font-size: 10.5px;
   }
@@ -2438,7 +2438,7 @@ footer > a:last-child {
 
   .decision-node__tool {
     min-width: 108px;
-    min-height: 42px;
+    min-height: 44px;
     padding: 0 11px 0 13px;
     gap: 6px;
     font-size: 0.72rem;
@@ -4386,7 +4386,7 @@ a.entry-choice:focus-visible {
 
   .decision-node__tool {
     min-width: 90px;
-    min-height: 38px;
+    min-height: 44px;
     padding: 0 9px 0 11px;
     gap: 5px;
     font-size: 0.68rem;

@@ -1,9 +1,16 @@
+import { PUBLIC_ROUTES } from "../public/public-contract.js";
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const UNAVAILABLE_MESSAGE = "帳號功能正在整理中，正式開放後會提供完整操作入口。";
+export const ROUTE_UNAVAILABLE_MESSAGE = "目前無法開啟工作台，請稍後再試。";
 
 function valueOf(value) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function isPermittedRole(role) {
+  return role === "owner" || role === "invited-partner";
 }
 
 export function validateRegister(values = {}) {
@@ -24,7 +31,7 @@ export function validateRegister(values = {}) {
   if (!EMAIL_PATTERN.test(email)) errors.email = "請輸入有效的 Email。";
   if (password.length < 8) errors.password = "密碼至少需要 8 碼。";
   if (!values.agree) errors.agree = "請先閱讀並同意使用說明。";
-  if (!role) errors.role = "請選擇你目前的使用角色。";
+  if (!isPermittedRole(role)) errors.role = "請選擇你目前的使用角色。";
   return errors;
 }
 
@@ -32,6 +39,7 @@ export function validateLogin(values = {}) {
   const errors = {};
   if (!EMAIL_PATTERN.test(valueOf(values.email))) errors.email = "請輸入有效的 Email。";
   if (!valueOf(values.password)) errors.password = "請輸入密碼。";
+  if (!isPermittedRole(valueOf(values.role))) errors.role = "請選擇你目前的使用角色。";
   return errors;
 }
 
@@ -56,6 +64,9 @@ function formValues(form) {
 function clearErrors(root, form, mode) {
   form.querySelectorAll("[aria-invalid]").forEach((field) => field.removeAttribute("aria-invalid"));
   root.querySelectorAll(`[data-field-error^="${mode}-"]`).forEach((target) => { target.textContent = ""; });
+  const roleError = root.querySelector("[data-role-error]");
+  if (roleError) roleError.textContent = "";
+  root.querySelector(".role-binding")?.removeAttribute("aria-invalid");
 }
 
 function showErrors(root, form, mode, errors) {
@@ -64,7 +75,9 @@ function showErrors(root, form, mode, errors) {
     const input = form.elements.namedItem(fieldName);
     if (input && input.type !== "hidden") input.setAttribute("aria-invalid", "true");
     if (fieldName === "role") root.querySelector(".role-binding")?.setAttribute("aria-invalid", "true");
-    const target = root.querySelector(`[data-field-error="${mode}-${errorFieldKey(fieldName)}"]`);
+    const target = fieldName === "role"
+      ? root.querySelector("[data-role-error]")
+      : root.querySelector(`[data-field-error="${mode}-${errorFieldKey(fieldName)}"]`);
     if (target) target.textContent = message;
   }
 }
@@ -86,15 +99,25 @@ function setBusy(form, busy) {
 }
 
 function focusFirstError(root, form, errors) {
+  if (errors.role) {
+    root.querySelector("[data-role-option]")?.focus();
+    return;
+  }
   const first = Object.keys(errors).find((name) => name !== "role" && name !== "agree");
   if (first) form.elements.namedItem(first)?.focus();
-  else if (errors.role) root.querySelector("[data-role-option]")?.focus();
   else form.elements.namedItem("agree")?.focus();
 }
 
-function handleSubmit(root, form) {
+function loginRouteForRole(role, routes) {
+  if (role === "owner") return routes?.accountAccessOwnerLoginToOwnerWorkspace ?? null;
+  if (role === "invited-partner") return routes?.accountAccessInvitedPartnerLoginToVendorWorkspace ?? null;
+  return null;
+}
+
+function handleSubmit(root, form, runtime) {
   const mode = form.dataset.accountForm;
-  const errors = mode === "register" ? validateRegister(formValues(form)) : validateLogin(formValues(form));
+  const values = formValues(form);
+  const errors = mode === "register" ? validateRegister(values) : validateLogin(values);
   showErrors(root, form, mode, errors);
   if (Object.keys(errors).length) {
     setStatus(form, errors.role ? "請先選擇使用角色後再送出。" : "請確認標示欄位後再送出。", "error");
@@ -102,9 +125,21 @@ function handleSubmit(root, form) {
     return;
   }
 
+  if (mode === "login") {
+    const href = loginRouteForRole(values.role, runtime.routes);
+    if (typeof href !== "string" || !href.trim() || typeof runtime.navigate !== "function") {
+      setStatus(form, ROUTE_UNAVAILABLE_MESSAGE, "error");
+      const password = form.elements.namedItem("password");
+      if (password) password.value = "";
+      return;
+    }
+    runtime.navigate(href);
+    return;
+  }
+
   setBusy(form, true);
   setStatus(form, "正在確認帳號服務狀態…");
-  window.setTimeout(() => {
+  runtime.schedule(() => {
     setBusy(form, false);
     setStatus(form, UNAVAILABLE_MESSAGE, "notice");
     const password = form.elements.namedItem("password");
@@ -121,7 +156,7 @@ function selectMode(root, mode) {
   });
   root.querySelectorAll("[data-account-form]").forEach((form) => { form.hidden = form.dataset.accountForm !== mode; });
   const roleBinding = root.querySelector(".role-binding");
-  if (roleBinding) roleBinding.hidden = mode !== "register";
+  if (roleBinding) roleBinding.hidden = false;
   const title = root.querySelector("#fcTitle");
   const switcher = root.querySelector("#fcSwitch");
   if (title) title.textContent = mode === "register" ? "建立 LaiBE DRS 帳號" : "登入 LaiBE DRS 帳號";
@@ -142,20 +177,31 @@ function selectAccountType(root, selected) {
 }
 
 function selectRole(root, selected) {
-  const form = root.querySelector('[data-account-form="register"]');
-  const roleInput = form?.elements.namedItem("role");
+  const role = selected.dataset.roleOption ?? "";
   root.querySelectorAll("[data-role-option]").forEach((button) => {
     button.setAttribute("aria-pressed", String(button === selected));
   });
-  if (roleInput) roleInput.value = selected.dataset.roleOption ?? "";
-  const roleError = root.querySelector('[data-field-error="register-role"]');
+  root.querySelectorAll("[data-account-form]").forEach((form) => {
+    const roleInput = form.elements.namedItem("role");
+    if (roleInput) roleInput.value = role;
+  });
+  const roleError = root.querySelector("[data-role-error]");
   if (roleError) roleError.textContent = "";
   root.querySelector(".role-binding")?.removeAttribute("aria-invalid");
-  const status = form?.querySelector("[data-form-status]");
-  if (status?.dataset.tone === "error" && status.textContent.includes("使用角色")) setStatus(form, "");
+  root.querySelectorAll("[data-account-form]").forEach((form) => {
+    const status = form.querySelector("[data-form-status]");
+    if (status?.dataset.tone === "error" && status.textContent.includes("使用角色")) setStatus(form, "");
+  });
 }
 
-export function initAccountAccess(root = document) {
+const defaultNavigate = (href) => window.location.assign(href);
+const defaultSchedule = (next, delay) => window.setTimeout(next, delay);
+
+export function initAccountAccess(root = document, {
+  navigate = defaultNavigate,
+  routes = PUBLIC_ROUTES,
+  schedule = defaultSchedule,
+} = {}) {
   const page = root.querySelector("[data-account-access-page]");
   if (!page) return;
 
@@ -169,7 +215,10 @@ export function initAccountAccess(root = document) {
     button.addEventListener("click", () => selectRole(root, button));
   });
   root.querySelectorAll("[data-account-form]").forEach((form) => {
-    form.addEventListener("submit", (event) => { event.preventDefault(); handleSubmit(root, form); });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      handleSubmit(root, form, { navigate, routes, schedule });
+    });
   });
   selectMode(root, "register");
 }

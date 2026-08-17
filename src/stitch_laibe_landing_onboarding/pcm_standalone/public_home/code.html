@@ -20,7 +20,7 @@
   <body>
     <a class="skip-link" href="#main-content">跳到主要內容</a>
     <header class="site-header" id="top">
-      <a class="brand" data-route="home" href="../public_home/code.html#top">
+      <a class="brand" href="#top" aria-label="LaiBE DRS 首頁">
         <img
           src="../../../../assets/logo/laibe_offer.svg"
           alt="LaiBE offer"
@@ -34,7 +34,9 @@
         <a
           class="header-action header-action--primary"
           data-route="quoteCheck"
-          href="../quote_check/code.html"
+          data-route-state="planned"
+          aria-disabled="true"
+          tabindex="-1"
         >文件健檢</a>
         <a
           class="header-action header-action--account"
@@ -44,15 +46,15 @@
           data-canonical-route="/account/access"
           aria-disabled="true"
           tabindex="-1"
-        >甲／乙方工作台</a>
-        <a class="header-action header-action--context" href="../about_drs/code.html">關於DRS</a>
+        >登入／進入工作台</a>
+        <a class="header-action header-action--context" href="../about_drs/code.html">關於 DRS</a>
         <a
           class="header-action header-action--context"
-          data-route="serviceContract"
+          data-route="homeHeaderServiceContractToOwnerContractManagement"
           data-route-state="planned"
           aria-disabled="true"
           tabindex="-1"
-        >DRS服務合約</a>
+        >DRS 契約管理</a>
       </nav>
     </header>
 
@@ -110,17 +112,17 @@
             <a
               class="entry-choice entry-choice--contract"
               data-entry-step="02"
-              data-route="serviceContract"
+              data-route="homeServiceConfirmationToOwnerContractManagement"
               data-route-state="planned"
               aria-disabled="true"
               tabindex="-1"
             >
-              <span class="entry-choice__kicker">服務確認</span>
+              <span class="entry-choice__kicker">契約管理</span>
               <div class="entry-choice__copy">
-                <strong>簽署服務契約</strong>
+                <strong>管理 DRS 契約</strong>
                 <div class="entry-choice__details">
-                  <small>先閱讀服務範圍，確認必要資料後再完成簽署</small>
-                  <span class="entry-choice__status">先閱讀服務契約</span>
+                  <small>查看契約狀態、待補資料與雙方確認事項</small>
+                  <span class="entry-choice__status">前往契約管理</span>
                 </div>
               </div>
               <span class="entry-choice__monogram" aria-hidden="true">約</span>
@@ -249,25 +251,10 @@
           <div class="decision-path__questions-stage">
             <span class="decision-path__spine" aria-hidden="true"></span>
             <ol class="decision-path__questions" aria-label="開始決策前需要核對的五個問題">
-            <li class="decision-node decision-node--left decision-node--action" data-decision-node="Q01">
+            <li class="decision-node decision-node--left" data-decision-node="Q01">
               <article class="decision-node__copy">
                 <span class="decision-node__index">Q01</span>
-                <div class="decision-node__heading">
-                  <h3>材料是否安全？</h3>
-                  <a
-                    class="decision-node__tool"
-                    data-decision-tool="specification"
-                    data-route="quoteCheck"
-                    href="../quote_check/code.html"
-                  >
-                    <span class="decision-node__tool-label">
-                      <span class="decision-node__tool-subject">規格</span><span class="decision-node__tool-action">檢查</span>
-                    </span>
-                    <svg class="decision-node__tool-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                      <path d="M5 12h13m-5-5 5 5-5 5" />
-                    </svg>
-                  </a>
-                </div>
+                <h3>材料是否安全？</h3>
                 <p>文件是否清楚交代材料型號、規格與可供核對的資料？<br />沒有書面依據，就不能只靠一句「應該沒問題」。</p>
               </article>
               <span class="decision-node__ring" aria-hidden="true">
@@ -282,8 +269,10 @@
                   <a
                     class="decision-node__tool"
                     data-decision-tool="quote"
-                    data-route="quoteCheck"
-                    href="../quote_check/code.html"
+                    data-route="homeDecisionQuoteCheckToQuoteCheck"
+                    data-route-state="planned"
+                    aria-disabled="true"
+                    tabindex="-1"
                   >
                     <span class="decision-node__tool-label">
                       <span class="decision-node__tool-subject">報價</span><span class="decision-node__tool-action">健檢</span>
@@ -307,8 +296,10 @@
                   <a
                     class="decision-node__tool"
                     data-decision-tool="drawing"
-                    data-route="quoteCheck"
-                    href="../quote_check/code.html"
+                    data-route="homeDecisionDrawingCheckToQuoteCheck"
+                    data-route-state="planned"
+                    aria-disabled="true"
+                    tabindex="-1"
                   >
                     <span class="decision-node__tool-label">
                       <span class="decision-node__tool-subject">圖說</span><span class="decision-node__tool-action">檢查</span>
@@ -342,11 +333,13 @@
                   <a
                     class="decision-node__tool"
                     data-decision-tool="contract"
-                    data-route="serviceContract"
-                    href="../service_contract/code.html"
+                    data-route="homeDecisionCustomContractToQuoteCheck"
+                    data-route-state="planned"
+                    aria-disabled="true"
+                    tabindex="-1"
                   >
                     <span class="decision-node__tool-label">
-                      <span class="decision-node__tool-subject">訂製化</span><span class="decision-node__tool-action">合約</span>
+                      <span class="decision-node__tool-subject">契約</span><span class="decision-node__tool-action">健檢</span>
                     </span>
                     <svg class="decision-node__tool-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                       <path d="M5 12h13m-5-5 5 5-5 5" />
@@ -379,7 +372,9 @@
               class="button button--primary"
               data-kind="primary"
               data-route="quoteCheck"
-              href="../quote_check/code.html"
+              data-route-state="planned"
+              aria-disabled="true"
+              tabindex="-1"
             >
               <span class="decision-cta__primary-label">直接試做報價健檢</span>
               <span class="decision-cta__primary-arrow" aria-hidden="true">→</span>
@@ -679,7 +674,7 @@
             <p>先看看哪些已經說清楚、哪些還有缺漏、哪些事情值得你在下一步之前先確認。</p>
           </div>
           <div class="narrative-final__controls">
-            <a class="button button--primary" data-kind="primary" data-route="quoteCheck" href="../quote_check/code.html">直接試做報價健檢</a>
+            <a class="button button--primary" data-kind="primary" data-route="quoteCheck" data-route-state="planned" aria-disabled="true" tabindex="-1">直接試做報價健檢</a>
             <a
               class="button button--quiet"
               data-account-entry

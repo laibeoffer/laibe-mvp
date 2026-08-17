@@ -6,6 +6,7 @@ import {
   KEY_CLAUSES,
   LIFECYCLE,
 } from "./contract-content.js?v=20260816-turnkey-fee-v5-rework";
+import { getActiveCanonicalLinkHref } from "../public/pcm-flow-route-manifest.js";
 
 export const CONTRACT_TYPES = Object.freeze({
   ENGINEERING: "engineering",
@@ -280,11 +281,14 @@ export function resolveContractTypeFromLocation(locationLike = {}) {
     : CONTRACT_TYPES.ENGINEERING;
 }
 
-export function buildContractTypeHref(contractType) {
+export function buildContractTypeHref(contractType, locationLike = {}) {
   const safeType = contractType === CONTRACT_TYPES.DESIGN
     ? CONTRACT_TYPES.DESIGN
     : CONTRACT_TYPES.ENGINEERING;
-  return `./code.html?contract=${safeType}#full-contract`;
+  const trustedReturn = hasSingleTrustedOwnerReturn(locationLike)
+    ? "&returnTo=owner-contract"
+    : "";
+  return `./code.html?contract=${safeType}${trustedReturn}#full-contract`;
 }
 
 function bytesToHex(bytes) {
@@ -810,7 +814,7 @@ function initialiseContractPager(pages, parts = CONTRACT_PARTS) {
   updateControls();
 }
 
-export function applyContractView(config) {
+export function applyContractView(config, locationLike = {}) {
   document.body?.setAttribute("data-contract-type", config.type);
 
   const title = document.querySelector("[data-contract-view-title]");
@@ -843,7 +847,9 @@ export function applyContractView(config) {
     ? Array.from(document.querySelectorAll("[data-contract-type-link]"))
     : [];
   for (let index = 0; index < links.length; index += 1) {
-    const selected = links[index].getAttribute("data-contract-type-link") === config.type;
+    const linkType = links[index].getAttribute("data-contract-type-link");
+    const selected = linkType === config.type;
+    links[index].setAttribute("href", buildContractTypeHref(linkType, locationLike));
     links[index].setAttribute("aria-current", selected ? "page" : "false");
     links[index].classList.toggle("is-active", selected);
   }
@@ -963,11 +969,97 @@ function renderFailureStates() {
   }
 }
 
+const SERVICE_HEADER_HOME_HREF = "../public_home/code.html#top";
+const SERVICE_HEADER_OWNER_HREF =
+  "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract";
+
+function closeServiceHeaderLink(node) {
+  node?.removeAttribute?.("href");
+  node?.setAttribute?.("aria-disabled", "true");
+  node?.setAttribute?.("tabindex", "-1");
+}
+
+function openServiceHeaderLink(node, href) {
+  node.setAttribute("href", href);
+  node.removeAttribute("aria-disabled");
+  node.removeAttribute("tabindex");
+}
+
+function hasSingleTrustedOwnerReturn(locationLike = {}) {
+  try {
+    const search = typeof locationLike.search === "string"
+      ? locationLike.search
+      : "";
+    const values = new URLSearchParams(search).getAll("returnTo");
+    return values.length === 1 && values[0] === "owner-contract";
+  } catch {
+    return false;
+  }
+}
+
+export function bindServiceContractHeaderRoutes(
+  root,
+  locationLike,
+  getCanonicalHref = getActiveCanonicalLinkHref,
+) {
+  if (!root || typeof root.querySelector !== "function") return false;
+  const brand = root.querySelector("[data-service-brand-link]");
+  const headerReturn = root.querySelector("[data-service-header-return]");
+  closeServiceHeaderLink(brand);
+  closeServiceHeaderLink(headerReturn);
+  if (headerReturn) headerReturn.textContent = "返回 DRS 首頁";
+  if (!brand || !headerReturn || typeof getCanonicalHref !== "function") {
+    return false;
+  }
+
+  let brandHref;
+  let defaultReturnHref;
+  try {
+    brandHref = getCanonicalHref("serviceContractBrandToHome");
+    defaultReturnHref = getCanonicalHref("serviceContractHeaderHomeToHome");
+  } catch {
+    return false;
+  }
+  if (
+    brandHref !== SERVICE_HEADER_HOME_HREF ||
+    defaultReturnHref !== SERVICE_HEADER_HOME_HREF
+  ) {
+    return false;
+  }
+
+  let returnHref = defaultReturnHref;
+  let returnLabel = "返回 DRS 首頁";
+  if (hasSingleTrustedOwnerReturn(locationLike)) {
+    try {
+      const trustedHref = getCanonicalHref(
+        "serviceContractTrustedOwnerReturnToOwnerContractManagement",
+        "returnTo=owner-contract",
+      );
+      if (trustedHref === SERVICE_HEADER_OWNER_HREF) {
+        returnHref = trustedHref;
+        returnLabel = "返回契約管理";
+      }
+    } catch {
+      returnHref = defaultReturnHref;
+    }
+  }
+
+  openServiceHeaderLink(brand, brandHref);
+  openServiceHeaderLink(headerReturn, returnHref);
+  headerReturn.textContent = returnLabel;
+  return true;
+}
+
 async function initialisePage() {
   const locationLike = globalThis.location ?? globalThis.window?.location ?? {};
+  bindServiceContractHeaderRoutes(
+    document,
+    locationLike,
+    getActiveCanonicalLinkHref,
+  );
   const contractType = resolveContractTypeFromLocation(locationLike);
   const config = CONTRACT_VIEW_CONFIGS[contractType];
-  applyContractView(config);
+  applyContractView(config, locationLike);
 
   let contractSource = CONTRACT_SOURCE;
   if (contractType === CONTRACT_TYPES.DESIGN) {

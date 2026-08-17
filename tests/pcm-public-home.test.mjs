@@ -627,34 +627,36 @@ test("every configured public route resolves inside the PCM package", async () =
   }
 });
 
-test("public homepage exposes the PCM service contract as the fifth header entry", async () => {
+test("public homepage exposes DRS contract management as the fourth formal header entry", async () => {
   const html = await readPcmFile("public_home/code.html");
-  const css = await readPcmFile("public_home/styles.css");
   const headerNav = html.match(
     /<nav\b[^>]*>[\s\S]*?<\/nav>/i,
   )?.[0] ?? "";
-  const links = [...headerNav.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>/gi)];
+  const links = [...headerNav.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].map(
+    ([, attributes, content]) => ({
+      attributes,
+      label: content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+    }),
+  );
+  const { PCM_FLOW_ROUTE_MANIFEST, getActiveCanonicalLinkHref } = await import(
+    new URL("public/pcm-flow-route-manifest.js", packageUrl).href
+  );
+  const routeId = "homeHeaderServiceContractToOwnerContractManagement";
+  const route = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.find(({ id }) => id === routeId);
 
-  assert.match(html, /href="\.\.\/service_contract\/code\.html"/);
-  assert.match(html, />PCM 服務契約<\/a>/);
-  assert.match(html, /3\.5%/);
-  assert.doesNotMatch(html, /(?<![\d.])3%(?![\d.])/);
-  assert.equal(links.length, 5);
-  assert.equal(links[4][1], "../service_contract/code.html");
-  assert.equal(
-    links.at(-1)?.[1],
-    "../service_contract/code.html",
-  );
-  assert.match(
-    css,
-    /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header nav\s*\{[\s\S]*?display:\s*grid;[\s\S]*?grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\);[\s\S]*?\}[\s\S]*?\.site-header nav\s*>\s*a:last-child\s*\{[\s\S]*?grid-column:\s*1\s*\/\s*-1;/i,
-  );
-  assert.match(
-    css,
-    /\.site-header nav\s*>\s*a:nth-child\(5\)::before\s*\{[^}]*--nav-icon:\s*url\(/i,
-  );
-  assert.match(
-    css,
-    /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header nav\s*\{[^}]*min-width:\s*0;[^}]*\}[\s\S]*?\.site-header nav\s*>\s*a:last-child\s*\{[^}]*grid-column:\s*1\s*\/\s*-1;[^}]*min-height:\s*44px;/i,
-  );
+  assert.equal(links.length, 4);
+  assert.deepEqual(links.map(({ label }) => label), [
+    "文件健檢",
+    "登入／進入工作台",
+    "關於 DRS",
+    "DRS 契約管理",
+  ]);
+  assert.match(links[3].attributes, /data-route="homeHeaderServiceContractToOwnerContractManagement"/);
+  assert.doesNotMatch(links[3].attributes, /\shref=/);
+  assert.equal(route?.trigger, "DRS 契約管理");
+  assert.equal(route?.relativeHref, "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
+  assert.equal(route?.targetAnchor, "#owner-dashboard-panel-contract");
+  assert.equal(getActiveCanonicalLinkHref(routeId), route.relativeHref);
+  assert.doesNotMatch(headerNav, /href="[^\"]*service_contract/i);
+  assert.doesNotMatch(headerNav, />\s*PCM 服務契約\s*</i);
 });

@@ -64,6 +64,26 @@ const trustedProcessHref = readOwnDataValue(PUBLIC_ROUTES, "process");
 const trustedQuoteCheckHref = readOwnDataValue(PUBLIC_ROUTES, "quoteCheck");
 const trustedDrawingCheckHref = readOwnDataValue(PUBLIC_ROUTES, "drawingCheck");
 const trustedAccountAccessHref = readOwnDataValue(PUBLIC_ROUTES, "accountAccess");
+const trustedOwnerContractManagementHref = readOwnDataValue(
+  PUBLIC_ROUTES,
+  "homeServiceConfirmationToOwnerContractManagement",
+);
+const trustedHeaderOwnerContractManagementHref = readOwnDataValue(
+  PUBLIC_ROUTES,
+  "homeHeaderServiceContractToOwnerContractManagement",
+);
+const trustedDecisionQuoteCheckHref = readOwnDataValue(
+  PUBLIC_ROUTES,
+  "homeDecisionQuoteCheckToQuoteCheck",
+);
+const trustedDecisionDrawingCheckHref = readOwnDataValue(
+  PUBLIC_ROUTES,
+  "homeDecisionDrawingCheckToQuoteCheck",
+);
+const trustedDecisionCustomContractHref = readOwnDataValue(
+  PUBLIC_ROUTES,
+  "homeDecisionCustomContractToQuoteCheck",
+);
 const trustedServiceContractHref = readOwnDataValue(
   PUBLIC_ROUTES,
   "serviceContract",
@@ -85,6 +105,16 @@ function trustedRouteHref(routeName) {
       return trustedDrawingCheckHref;
     case "accountAccess":
       return trustedAccountAccessHref;
+    case "homeServiceConfirmationToOwnerContractManagement":
+      return trustedOwnerContractManagementHref;
+    case "homeHeaderServiceContractToOwnerContractManagement":
+      return trustedHeaderOwnerContractManagementHref;
+    case "homeDecisionQuoteCheckToQuoteCheck":
+      return trustedDecisionQuoteCheckHref;
+    case "homeDecisionDrawingCheckToQuoteCheck":
+      return trustedDecisionDrawingCheckHref;
+    case "homeDecisionCustomContractToQuoteCheck":
+      return trustedDecisionCustomContractHref;
     case "serviceContract":
       return trustedServiceContractHref;
     default:

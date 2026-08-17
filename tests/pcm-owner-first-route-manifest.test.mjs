@@ -146,6 +146,7 @@ function scanJsonObjectKeys(source) {
 
 const requiredCanonicalNodes = Object.freeze([
   "home",
+  "aboutDrs",
   "quoteCheck",
   "drawingCheck",
   "accountAccess",
@@ -221,7 +222,361 @@ test("canonical graph uses one quote check, one drawing check, and one shared ac
   );
 });
 
-test("quote drawing and account checks are active while later runtime routes remain planned and 404-safe", async () => {
+test("Public Home service confirmation publishes one explicit owner contract-management link", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?home-contract-management=${Date.now()}`);
+  const routeId = "homeServiceConfirmationToOwnerContractManagement";
+
+  assert.ok(Array.isArray(PCM_FLOW_ROUTE_MANIFEST.canonicalLinks));
+  const matches = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+    (link) => link.id === routeId,
+  );
+  assert.equal(matches.length, 1);
+  assert.deepEqual(matches[0], {
+    id: routeId,
+    fromPage: "home",
+    trigger: "前往契約管理",
+    toPage: "ownerWorkspace",
+    targetAnchor: "#owner-dashboard-panel-contract",
+    relativeHref: "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
+    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
+    expectedVisibleState: "甲方工作台「契約管理」主分頁已選取，預設子分頁「契約總覽」可見，案件仍保留未確認或空白的誠實狀態。",
+    returnRoute: "home",
+    routeState: "active",
+  });
+  assert.equal(
+    getActiveCanonicalLinkHref(routeId),
+    matches[0].relativeHref,
+  );
+  await access(new URL(matches[0].relativeHref.split(/[?#]/, 1)[0], routeManifestUrl));
+
+  const serviceContract = PCM_FLOW_ROUTE_MANIFEST.nodes.find(
+    (node) => node.id === "serviceContract",
+  );
+  assert.equal(serviceContract.href, "../service_contract/code.html");
+  assert.notEqual(serviceContract.href, matches[0].relativeHref);
+});
+
+test("Public Home header DRS service contract publishes its own owner contract-management link", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?home-header-contract-management=${Date.now()}`);
+  const routeId = "homeHeaderServiceContractToOwnerContractManagement";
+  const expected = {
+    id: routeId,
+    fromPage: "home",
+    trigger: "DRS 契約管理",
+    toPage: "ownerWorkspace",
+    targetAnchor: "#owner-dashboard-panel-contract",
+    relativeHref: "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
+    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
+    expectedVisibleState: "甲方工作台「契約管理」主分頁已選取，預設子分頁「契約總覽」可見，案件仍保留未確認或空白的誠實狀態。",
+    returnRoute: "home",
+    routeState: "active",
+  };
+  const matches = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+    (link) => link.id === routeId,
+  );
+
+  assert.equal(matches.length, 1);
+  assert.deepEqual(matches[0], expected);
+  assert.equal(getActiveCanonicalLinkHref(routeId), expected.relativeHref);
+  await access(new URL(expected.relativeHref.split(/[?#]/, 1)[0], routeManifestUrl));
+  assert.equal(PCM_FLOW_ROUTE_MANIFEST.version, "1.9.1");
+
+  const selectedCardLink = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.find(
+    (link) => link.id === "homeServiceConfirmationToOwnerContractManagement",
+  );
+  assert.equal(selectedCardLink.trigger, "前往契約管理");
+  assert.equal(selectedCardLink.relativeHref, expected.relativeHref);
+  assert.notEqual(selectedCardLink.id, routeId);
+
+  const serviceContract = PCM_FLOW_ROUTE_MANIFEST.nodes.find(
+    (node) => node.id === "serviceContract",
+  );
+  assert.equal(serviceContract.href, "../service_contract/code.html");
+  assert.notEqual(serviceContract.href, expected.relativeHref);
+});
+
+test("Public Home decision controls publish exactly three real quote-check modes", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?home-decision-quote-check=${Date.now()}`);
+  const expectedLinks = [
+    {
+      id: "homeDecisionQuoteCheckToQuoteCheck",
+      trigger: "報價健檢",
+      relativeHref: "../quote_check/code.html?mode=quote#document-workspace",
+    },
+    {
+      id: "homeDecisionDrawingCheckToQuoteCheck",
+      trigger: "圖說檢查",
+      relativeHref: "../quote_check/code.html?mode=drawing#document-workspace",
+    },
+    {
+      id: "homeDecisionCustomContractToQuoteCheck",
+      trigger: "契約健檢",
+      relativeHref: "../quote_check/code.html?mode=contract#document-workspace",
+    },
+  ];
+
+  assert.equal(PCM_FLOW_ROUTE_MANIFEST.version, "1.9.1");
+  assert.equal(
+    PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.some(
+      ({ id }) => id === "homeDecisionSpecificationCheckToQuoteCheck",
+    ),
+    false,
+  );
+  assert.equal(
+    getActiveCanonicalLinkHref("homeDecisionSpecificationCheckToQuoteCheck"),
+    null,
+  );
+  for (const expected of expectedLinks) {
+    const ownedLinks = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+      (link) => link.id === expected.id,
+    );
+    assert.equal(ownedLinks.length, 1, expected.id);
+    assert.equal(ownedLinks[0].fromPage, "home");
+    assert.equal(ownedLinks[0].trigger, expected.trigger);
+    assert.equal(ownedLinks[0].toPage, "quoteCheck");
+    assert.equal(ownedLinks[0].targetAnchor, "#document-workspace");
+    assert.equal(ownedLinks[0].relativeHref, expected.relativeHref);
+    assert.equal(
+      ownedLinks[0].canonicalHttpUrl,
+      new URL(
+        expected.relativeHref,
+        "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+      ).href,
+    );
+    assert.equal(ownedLinks[0].returnRoute, "home");
+    assert.equal(ownedLinks[0].routeState, "active");
+    assert.equal(getActiveCanonicalLinkHref(expected.id), expected.relativeHref);
+    await access(new URL(expected.relativeHref.split(/[?#]/, 1)[0], routeManifestUrl));
+  }
+
+  assert.deepEqual(
+    expectedLinks.map(({ id }) => id),
+    [...new Set(expectedLinks.map(({ id }) => id))],
+  );
+  assert.deepEqual(
+    expectedLinks.map(({ trigger }) => trigger),
+    [...new Set(expectedLinks.map(({ trigger }) => trigger))],
+  );
+
+  const serviceContract = PCM_FLOW_ROUTE_MANIFEST.nodes.find(
+    (node) => node.id === "serviceContract",
+  );
+  assert.equal(serviceContract.href, "../service_contract/code.html");
+  assert.notEqual(serviceContract.href, expectedLinks[0].relativeHref);
+});
+
+test("canonical header brand and CTA links cover public returns without inventing invitation access", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?canonical-header-routes=${Date.now()}`);
+  const byNodeId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
+  const byLinkId = new Map(PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.map((link) => [link.id, link]));
+  const homeHref = "../public_home/code.html#top";
+
+  assert.deepEqual(byNodeId.get("aboutDrs"), {
+    id: "aboutDrs",
+    publicPath: "/pcm/about-drs",
+    label: "關於 DRS",
+    role: "一般屋主",
+    owner: "A0",
+    lifecycle: "active",
+    gate: "G1_UI_SOURCE",
+    href: "../about_drs/code.html",
+  });
+  assert.equal(byLinkId.get("homeHeaderAboutDrsToAboutDrs")?.relativeHref, "../about_drs/code.html");
+  assert.equal(byLinkId.get("homeHeaderAboutDrsToAboutDrs")?.trigger, "關於 DRS");
+
+  for (const id of [
+    "quoteCheckBrandToHome",
+    "quoteCheckHeaderHomeToHome",
+    "accountAccessBrandToHome",
+    "accountAccessHeaderHomeToHome",
+    "aboutDrsBrandToHome",
+    "aboutDrsHeaderHomeToHome",
+    "serviceContractBrandToHome",
+    "serviceContractHeaderHomeToHome",
+    "ownerWorkspaceBrandToHome",
+    "vendorWorkspaceBrandToHome",
+  ]) {
+    const link = byLinkId.get(id);
+    assert.equal(link?.toPage, "home", id);
+    assert.equal(link?.relativeHref, homeHref, id);
+    assert.equal(link?.routeState, "active", id);
+    assert.equal(getActiveCanonicalLinkHref(id), homeHref, id);
+  }
+
+  const accountCheck = byLinkId.get("accountAccessHeaderStartDocumentCheckToQuoteCheck");
+  assert.equal(accountCheck?.trigger, "開始文件健檢");
+  assert.equal(accountCheck?.relativeHref, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.equal(accountCheck?.targetAnchor, "#document-workspace");
+
+  const conditionalOwnerReturn = byLinkId.get("serviceContractTrustedOwnerReturnToOwnerContractManagement");
+  assert.equal(conditionalOwnerReturn?.relativeHref, "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
+  assert.equal(conditionalOwnerReturn?.trigger, "returnTo=owner-contract");
+  assert.equal(conditionalOwnerReturn?.routeState, "conditional");
+  assert.equal(
+    getActiveCanonicalLinkHref("serviceContractTrustedOwnerReturnToOwnerContractManagement"),
+    null,
+  );
+  assert.equal(
+    getActiveCanonicalLinkHref(
+      "serviceContractTrustedOwnerReturnToOwnerContractManagement",
+      "returnTo=owner-contract",
+    ),
+    conditionalOwnerReturn.relativeHref,
+  );
+  assert.equal(
+    getActiveCanonicalLinkHref(
+      "serviceContractTrustedOwnerReturnToOwnerContractManagement",
+      "returnTo=vendor",
+    ),
+    null,
+  );
+
+  assert.equal(byNodeId.get("vendorInvitation")?.lifecycle, "planned");
+  assert.equal(byNodeId.get("vendorInvitation")?.href, null);
+});
+
+test("Owner Workspace publishes one service-contract entry with a trusted contract-management return", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?owner-service-contract=${Date.now()}`);
+  const routeId = "ownerWorkspaceContractManagementToServiceContract";
+  const matches = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+    (link) => link.id === routeId,
+  );
+
+  assert.equal(PCM_FLOW_ROUTE_MANIFEST.version, "1.9.1");
+  assert.equal(matches.length, 1);
+  assert.deepEqual(matches[0], {
+    id: routeId,
+    fromPage: "ownerWorkspace",
+    trigger: "了解並確認 DRS 服務契約",
+    toPage: "serviceContract",
+    targetAnchor: "#full-contract",
+    relativeHref: "../pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract",
+    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract",
+    expectedVisibleState: "從甲方工作台契約管理進入 DRS 服務契約完整內容；服務契約頁可返回甲方契約管理。",
+    returnRoute: "ownerWorkspace",
+    routeState: "active",
+  });
+  assert.equal(getActiveCanonicalLinkHref(routeId), matches[0].relativeHref);
+  const ownerWorkspacePageUrl = new URL(
+    "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
+    repositoryRoot,
+  );
+  await access(new URL(matches[0].relativeHref.split(/[?#]/, 1)[0], ownerWorkspacePageUrl));
+
+  const conditionalOwnerReturn = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.find(
+    (link) => link.id === "serviceContractTrustedOwnerReturnToOwnerContractManagement",
+  );
+  assert.equal(conditionalOwnerReturn.trigger, "returnTo=owner-contract");
+  assert.equal(conditionalOwnerReturn.routeState, "conditional");
+  assert.notEqual(matches[0].id, conditionalOwnerReturn.id);
+});
+
+test("Vendor Workspace publishes one active account-access recovery link while invitation stays planned", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?vendor-access-recovery=${Date.now()}`);
+  const routeId = "vendorWorkspaceAccessRecoveryToAccountAccess";
+  const expected = {
+    id: routeId,
+    fromPage: "vendorWorkspace",
+    trigger: "返回登入／帳號入口",
+    toPage: "accountAccess",
+    targetAnchor: "#top",
+    relativeHref: "../account_access/code.html#top",
+    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html#top",
+    expectedVisibleState: "使用者回到帳號入口選擇或確認角色，不帶入任何案件資料。",
+    returnRoute: "vendorWorkspace",
+    routeState: "active",
+  };
+  const matches = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+    (link) => link.id === routeId,
+  );
+  const invitation = PCM_FLOW_ROUTE_MANIFEST.nodes.find(
+    (node) => node.id === "vendorInvitation",
+  );
+
+  assert.equal(PCM_FLOW_ROUTE_MANIFEST.version, "1.9.1");
+  assert.equal(matches.length, 1);
+  assert.deepEqual(matches[0], expected);
+  assert.equal(getActiveCanonicalLinkHref(routeId), expected.relativeHref);
+  assert.equal(invitation?.lifecycle, "planned");
+  assert.equal(invitation?.href, null);
+  await access(new URL(expected.relativeHref.split(/[?#]/, 1)[0], routeManifestUrl));
+});
+
+test("Account Access publishes exactly two active role-specific login workspace links", async () => {
+  const {
+    PCM_FLOW_ROUTE_MANIFEST,
+    getActiveCanonicalLinkHref,
+  } = await import(`${routeManifestUrl.href}?account-role-routes=${Date.now()}`);
+  const expectedLinks = [
+    {
+      id: "accountAccessOwnerLoginToOwnerWorkspace",
+      fromPage: "accountAccess",
+      trigger: "valid login submit with owner role selected",
+      toPage: "ownerWorkspace",
+      targetAnchor: null,
+      relativeHref: "../../client_awarding_dashboard/code.html",
+      canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
+      expectedVisibleState: "甲方案件工作台載入；身分與案件權限未確認時只顯示工作台結構與誠實空狀態。",
+      returnRoute: "accountAccess",
+      routeState: "active",
+    },
+    {
+      id: "accountAccessInvitedPartnerLoginToVendorWorkspace",
+      fromPage: "accountAccess",
+      trigger: "valid login submit with invited-partner role selected",
+      toPage: "vendorWorkspace",
+      targetAnchor: null,
+      relativeHref: "../vendor_workspace/code.html",
+      canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+      expectedVisibleState: "乙方案件工作台載入；身分與案件範圍未確認時維持零案件資料與安全空狀態。",
+      returnRoute: "accountAccess",
+      routeState: "active",
+    },
+  ];
+
+  assert.equal(PCM_FLOW_ROUTE_MANIFEST.version, "1.9.1");
+  for (const expected of expectedLinks) {
+    const matches = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+      (link) => link.id === expected.id,
+    );
+    assert.equal(matches.length, 1, expected.id);
+    assert.deepEqual(matches[0], expected);
+    assert.equal(getActiveCanonicalLinkHref(expected.id), expected.relativeHref);
+    await access(new URL(expected.relativeHref, routeManifestUrl));
+  }
+
+  const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
+  assert.deepEqual(byId.get("vendorWorkspace"), {
+    id: "vendorWorkspace",
+    publicPath: "/pcm/vendor/workspace",
+    label: "乙方案件工作台",
+    role: "已授權乙方",
+    owner: "A6",
+    lifecycle: "active",
+    gate: "G1_UI_SOURCE",
+    href: "../vendor_workspace/code.html",
+  });
+});
+
+test("admitted UI routes are active while the remaining runtime routes stay planned and 404-safe", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
   const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
 
@@ -459,7 +814,7 @@ test("continuation and closed outcomes bind exact primitive roles without vendor
     const vendor = resolvePcmFlowContinuation({ intent, role: "vendor" });
     assert.equal(vendor.routeKey, "vendorWorkspace");
     assert.notEqual(vendor.routeKey, "ownerWorkspace");
-    assert.equal(vendor.href, null);
+    assert.equal(vendor.href, "../vendor_workspace/code.html");
     assert.equal(vendor.authorityGate, "G2_AUTH_RUNTIME");
     assert.equal(vendor.payloadPolicy, expectedPolicy);
     assert.equal(vendor.canMutate, false);
@@ -922,14 +1277,68 @@ test("governance manifest t0 exposes one current evidence truth", async () => {
   });
 });
 
-test("public contract exposes quote drawing and account checks without granting runtime authority", async () => {
+test("public contract preserves its compatibility own-key schema while manifest owns new canonical links", async () => {
   const { PUBLIC_ROUTES, resolvePcmFlowContinuation } = await import(
     publicContractUrl.href
   );
 
+  assert.deepEqual(Object.getOwnPropertyNames(PUBLIC_ROUTES), [
+    "home",
+    "startCase",
+    "basicReport",
+    "process",
+    "quoteCheck",
+    "drawingCheck",
+    "accountAccess",
+    "caseSetup",
+    "serviceContract",
+    "contractPrerequisites",
+    "contractSigning",
+    "ownerWorkspace",
+    "homeServiceConfirmationToOwnerContractManagement",
+    "homeHeaderServiceContractToOwnerContractManagement",
+    "homeDecisionQuoteCheckToQuoteCheck",
+    "homeDecisionDrawingCheckToQuoteCheck",
+    "homeDecisionCustomContractToQuoteCheck",
+    "accountAccessOwnerLoginToOwnerWorkspace",
+    "accountAccessInvitedPartnerLoginToVendorWorkspace",
+    "vendorWorkspace",
+    "accessUnavailable",
+    "ownerStart",
+    "documentCorrections",
+    "selfServiceArchive",
+  ]);
+
   assert.equal(PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
   assert.equal(PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
   assert.equal(PUBLIC_ROUTES.accountAccess, "../account_access/code.html");
+  assert.equal(PUBLIC_ROUTES.homeDecisionQuoteCheckToQuoteCheck, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.equal(PUBLIC_ROUTES.homeDecisionDrawingCheckToQuoteCheck, "../quote_check/code.html?mode=drawing#document-workspace");
+  assert.equal(PUBLIC_ROUTES.homeDecisionCustomContractToQuoteCheck, "../quote_check/code.html?mode=contract#document-workspace");
+  for (const routeKey of [
+    "aboutDrs",
+    "homeHeaderAboutDrsToAboutDrs",
+    "homeDecisionSpecificationCheckToQuoteCheck",
+    "quoteCheckBrandToHome",
+    "quoteCheckHeaderHomeToHome",
+    "accountAccessBrandToHome",
+    "accountAccessHeaderHomeToHome",
+    "accountAccessHeaderStartDocumentCheckToQuoteCheck",
+    "aboutDrsBrandToHome",
+    "aboutDrsHeaderHomeToHome",
+    "aboutDrsHeaderStartDocumentCheckToQuoteCheck",
+    "serviceContractBrandToHome",
+    "serviceContractHeaderHomeToHome",
+    "serviceContractTrustedOwnerReturnToOwnerContractManagement",
+    "ownerWorkspaceBrandToHome",
+    "ownerWorkspaceContractManagementToServiceContract",
+    "vendorWorkspaceBrandToHome",
+    "vendorWorkspaceAccessRecoveryToAccountAccess",
+  ]) {
+    assert.equal(Object.hasOwn(PUBLIC_ROUTES, routeKey), false, routeKey);
+  }
+  assert.equal(PUBLIC_ROUTES.accountAccessOwnerLoginToOwnerWorkspace, "../../client_awarding_dashboard/code.html");
+  assert.equal(PUBLIC_ROUTES.accountAccessInvitedPartnerLoginToVendorWorkspace, "../vendor_workspace/code.html");
   assert.equal(PUBLIC_ROUTES.ownerStart, "../owner_start/code.html");
   assert.equal(PUBLIC_ROUTES.documentCorrections, "../document_corrections/code.html");
   assert.equal(PUBLIC_ROUTES.basicReport, "../basic_report/code.html");

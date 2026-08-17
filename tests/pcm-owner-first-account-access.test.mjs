@@ -6,6 +6,30 @@ const root = new URL("../src/stitch_laibe_landing_onboarding/pcm_standalone/acco
 const html = await readFile(new URL("code.html", root), "utf8");
 const css = await readFile(new URL("styles.css", root), "utf8");
 const app = await readFile(new URL("app.js", root), "utf8");
+const publicContract = await readFile(new URL("../public/public-contract.js", root), "utf8");
+const routeManifest = await readFile(new URL("../public/pcm-flow-route-manifest.js", root), "utf8");
+const { PUBLIC_ROUTES } = await import(new URL("../public/public-contract.js", root));
+
+function canonicalLinkHref(linkId) {
+  const match = routeManifest.match(new RegExp(`id: "${linkId}"[\\s\\S]*?relativeHref: "([^"]+)"`));
+  assert.ok(match, `missing canonical link: ${linkId}`);
+  return match[1];
+}
+
+function runWithBrowserWindow(callback) {
+  const hadWindow = Object.prototype.hasOwnProperty.call(globalThis, "window");
+  const previousWindow = globalThis.window;
+  globalThis.window = {
+    location: { assign() {} },
+    setTimeout(next) { next(); },
+  };
+  try {
+    return callback();
+  } finally {
+    if (hadWindow) globalThis.window = previousWindow;
+    else delete globalThis.window;
+  }
+}
 
 function createRegistrationDomHarness() {
   const state = { activeElement: null };
@@ -51,6 +75,14 @@ function createRegistrationDomHarness() {
     role: element({ type: "hidden" }),
   };
   const status = element({ dataset: {} });
+  const loginFields = {
+    email: element({ value: "member@example.com" }),
+    password: element({ type: "password", value: "account88" }),
+    role: element({ type: "hidden" }),
+  };
+  const loginStatus = element({ dataset: {} });
+  const loginEmailError = element();
+  const loginPasswordError = element();
   const roleError = element();
   const roleBinding = element();
   const owner = element({ dataset: { roleOption: "owner" } });
@@ -73,14 +105,28 @@ function createRegistrationDomHarness() {
     ? Object.values(fields).filter((field) => field.getAttribute("aria-invalid") !== null)
     : [];
   const loginForm = element({ dataset: { accountForm: "login" } });
+  loginForm.elements = { namedItem(name) { return loginFields[name] ?? null; } };
+  loginForm.querySelector = (selector) => {
+    if (selector === "[data-form-status]") return loginStatus;
+    if (selector === "[data-submit-button]") return submit;
+    return null;
+  };
+  loginForm.querySelectorAll = (selector) => selector === "[aria-invalid]"
+    ? Object.values(loginFields).filter((field) => field.getAttribute("aria-invalid") !== null)
+    : [];
 
   const rootDocument = {
     documentElement: { dataset: {} },
     querySelector(selector) {
       if (selector === "[data-account-access-page]") return {};
       if (selector === '[data-account-form="register"]') return form;
+      if (selector === '[data-account-form="login"]') return loginForm;
       if (selector === ".role-binding") return roleBinding;
       if (selector === '[data-field-error="register-role"]') return roleError;
+      if (selector === '[data-field-error="login-role"]') return roleError;
+      if (selector === '[data-field-error="login-email"]') return loginEmailError;
+      if (selector === '[data-field-error="login-password"]') return loginPasswordError;
+      if (selector === "[data-role-error]") return roleError;
       if (selector === "[data-role-option]") return owner;
       if (selector === "#fcTitle") return title;
       if (selector === "#fcSwitch") return switcher;
@@ -91,11 +137,12 @@ function createRegistrationDomHarness() {
       if (selector === "[data-mode-tab]") return [registerTab, loginTab];
       if (selector === "[data-account-form]") return [form, loginForm];
       if (selector === '[data-field-error^="register-"]') return [roleError];
+      if (selector === '[data-field-error^="login-"]') return [loginEmailError, loginPasswordError, roleError];
       return [];
     },
   };
 
-  return { rootDocument, form, loginForm, fields, status, roleError, roleBinding, owner, invitedPartner, registerTab, loginTab, title, switcher, state };
+  return { rootDocument, form, loginForm, fields, loginFields, status, loginStatus, loginEmailError, loginPasswordError, roleError, roleBinding, owner, invitedPartner, registerTab, loginTab, title, switcher, state };
 }
 
 test("account access final runtime asset identity binds both changed assets", () => {
@@ -106,14 +153,18 @@ test("account access final runtime asset identity binds both changed assets", ()
 });
 
 test("registration keeps the existing LaiBE DRS header and real navigation", () => {
+  const startDocumentCheckHref = canonicalLinkHref("accountAccessHeaderStartDocumentCheckToQuoteCheck");
+
   assert.match(html, /<header class="site-header" id="top">/);
-  assert.match(html, /class="brand"[^>]*href="\.\.\/public_home\/code\.html#top"/);
+  assert.match(html, /<a class="brand" href="\.\.\/public_home\/code\.html#top" aria-label="LaiBE DRS 首頁">/);
   assert.match(html, /Decision &amp; Record System/);
   assert.match(html, /裝潢決策系統/);
   assert.match(html, /class="header-action"[^>]*href="\.\.\/public_home\/code\.html#top"[^>]*>返回 DRS 首頁<\/a>/);
-  assert.match(html, /class="header-action header-action--primary"[^>]*href="\.\.\/quote_check\/code\.html"[^>]*>開始健檢<\/a>/);
+  assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.ok(html.includes(`<a class="header-action header-action--primary" href="${startDocumentCheckHref}">開始文件健檢</a>`));
   assert.match(css, /\.site-header\s*\{/);
   assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*\.site-header\s*\{/);
+  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*\.header-action\s*\{[^}]*min-height:\s*44px/s);
 });
 
 test("direct transplant preserves the canonical registration shell and left-hand explanation", () => {
@@ -175,6 +226,7 @@ test("registration binds the only permitted DRS roles outside the form with a vi
   assert.match(html, /data-role-option="invited-partner"/);
   assert.match(html, /受邀乙方/);
   assert.match(html, /<input[^>]*name="role"[^>]*type="hidden"/);
+  assert.equal((html.match(/<input[^>]*name="role"[^>]*type="hidden"/g) ?? []).length, 2);
   assert.match(html, /data-field-error="register-role"/);
   assert.match(app, /function selectRole\(root, selected\)/);
   assert.match(app, /root\.querySelectorAll\("\[data-role-option\]"\)/);
@@ -199,6 +251,7 @@ test("missing role submit gives unmistakable role feedback and clears it when a 
 
   harness.owner.dispatch("click");
   assert.equal(harness.fields.role.value, "owner");
+  assert.equal(harness.loginFields.role.value, "owner");
   assert.equal(harness.owner.getAttribute("aria-pressed"), "true");
   assert.equal(harness.invitedPartner.getAttribute("aria-pressed"), "false");
   assert.equal(harness.roleError.textContent, "");
@@ -207,11 +260,12 @@ test("missing role submit gives unmistakable role feedback and clears it when a 
 
   harness.invitedPartner.dispatch("click");
   assert.equal(harness.fields.role.value, "invited-partner");
+  assert.equal(harness.loginFields.role.value, "invited-partner");
   assert.equal(harness.owner.getAttribute("aria-pressed"), "false");
   assert.equal(harness.invitedPartner.getAttribute("aria-pressed"), "true");
 });
 
-test("registration roles stay hidden while the login form is active", async () => {
+test("the same explicit role selector stays visible in registration and login modes", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?mode=${Date.now()}`, import.meta.url));
   const harness = createRegistrationDomHarness();
   module.initAccountAccess(harness.rootDocument);
@@ -221,7 +275,7 @@ test("registration roles stay hidden while the login form is active", async () =
   assert.equal(harness.loginForm.hidden, true);
 
   harness.loginTab.dispatch("click");
-  assert.equal(harness.roleBinding.hidden, true);
+  assert.equal(harness.roleBinding.hidden, false);
   assert.equal(harness.form.hidden, true);
   assert.equal(harness.loginForm.hidden, false);
 
@@ -232,6 +286,143 @@ test("registration roles stay hidden while the login form is active", async () =
   assert.match(css, /\.role-binding\[hidden\]\s*,\s*\.fc-b\[hidden\]\s*\{[^}]*display:\s*none/s);
 });
 
+test("login requires an explicit role, marks the shared control invalid, and focuses a role choice", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?login-role=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  const navigations = [];
+  module.initAccountAccess(harness.rootDocument, {
+    navigate: (href) => navigations.push(href),
+    routes: {
+      accountAccessOwnerLoginToOwnerWorkspace: "owner-route-from-contract",
+      accountAccessInvitedPartnerLoginToVendorWorkspace: "vendor-route-from-contract",
+    },
+  });
+  harness.loginTab.dispatch("click");
+
+  const submitEvent = runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
+
+  assert.equal(submitEvent.defaultPrevented, true);
+  assert.equal(harness.loginStatus.textContent, "請先選擇使用角色後再送出。");
+  assert.equal(harness.loginStatus.dataset.tone, "error");
+  assert.equal(harness.roleError.textContent, "請選擇你目前的使用角色。");
+  assert.equal(harness.roleBinding.getAttribute("aria-invalid"), "true");
+  assert.equal(harness.state.activeElement, harness.owner);
+  assert.deepEqual(navigations, []);
+  assert.deepEqual(module.validateLogin({
+    email: "member@example.com",
+    password: "account88",
+    role: "unexpected-role",
+  }), { role: "請選擇你目前的使用角色。" });
+});
+
+test("login submit rejects an invalid email before role-based navigation", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?invalid-login-email=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  const navigations = [];
+  module.initAccountAccess(harness.rootDocument, {
+    navigate: (href) => navigations.push(href),
+    routes: {
+      accountAccessOwnerLoginToOwnerWorkspace: "owner-route-from-contract",
+      accountAccessInvitedPartnerLoginToVendorWorkspace: "vendor-route-from-contract",
+    },
+  });
+  harness.owner.dispatch("click");
+  harness.loginTab.dispatch("click");
+  harness.loginFields.email.value = "not-an-email";
+
+  const submitEvent = runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
+
+  assert.equal(submitEvent.defaultPrevented, true);
+  assert.deepEqual(navigations, []);
+  assert.equal(harness.loginFields.email.getAttribute("aria-invalid"), "true");
+  assert.equal(harness.loginFields.password.getAttribute("aria-invalid"), null);
+  assert.equal(harness.loginEmailError.textContent, "請輸入有效的 Email。");
+  assert.equal(harness.loginPasswordError.textContent, "");
+  assert.equal(harness.loginStatus.textContent, "請確認標示欄位後再送出。");
+  assert.equal(harness.loginStatus.dataset.tone, "error");
+  assert.equal(harness.state.activeElement, harness.loginFields.email);
+});
+
+test("login submit rejects an empty password before role-based navigation", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?empty-login-password=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  const navigations = [];
+  module.initAccountAccess(harness.rootDocument, {
+    navigate: (href) => navigations.push(href),
+    routes: {
+      accountAccessOwnerLoginToOwnerWorkspace: "owner-route-from-contract",
+      accountAccessInvitedPartnerLoginToVendorWorkspace: "vendor-route-from-contract",
+    },
+  });
+  harness.owner.dispatch("click");
+  harness.loginTab.dispatch("click");
+  harness.loginFields.password.value = "";
+
+  const submitEvent = runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
+
+  assert.equal(submitEvent.defaultPrevented, true);
+  assert.deepEqual(navigations, []);
+  assert.equal(harness.loginFields.email.getAttribute("aria-invalid"), null);
+  assert.equal(harness.loginFields.password.getAttribute("aria-invalid"), "true");
+  assert.equal(harness.loginEmailError.textContent, "");
+  assert.equal(harness.loginPasswordError.textContent, "請輸入密碼。");
+  assert.equal(harness.loginStatus.textContent, "請確認標示欄位後再送出。");
+  assert.equal(harness.loginStatus.dataset.tone, "error");
+  assert.equal(harness.state.activeElement, harness.loginFields.password);
+});
+
+test("valid local login sends each explicit role only to its manifest-derived workspace route", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?role-route=${Date.now()}`, import.meta.url));
+  const routes = {
+    accountAccessOwnerLoginToOwnerWorkspace: PUBLIC_ROUTES.accountAccessOwnerLoginToOwnerWorkspace,
+    accountAccessInvitedPartnerLoginToVendorWorkspace: PUBLIC_ROUTES.accountAccessInvitedPartnerLoginToVendorWorkspace,
+  };
+
+  assert.equal(routes.accountAccessOwnerLoginToOwnerWorkspace, canonicalLinkHref("accountAccessOwnerLoginToOwnerWorkspace"));
+  assert.equal(routes.accountAccessInvitedPartnerLoginToVendorWorkspace, canonicalLinkHref("accountAccessInvitedPartnerLoginToVendorWorkspace"));
+
+  for (const [roleKey, expectedHref] of [
+    ["owner", routes.accountAccessOwnerLoginToOwnerWorkspace],
+    ["invited-partner", routes.accountAccessInvitedPartnerLoginToVendorWorkspace],
+  ]) {
+    const harness = createRegistrationDomHarness();
+    const navigations = [];
+    module.initAccountAccess(harness.rootDocument, {
+      navigate: (href) => navigations.push(href),
+      routes,
+    });
+    const roleButton = roleKey === "owner" ? harness.owner : harness.invitedPartner;
+    roleButton.dispatch("click");
+    harness.loginTab.dispatch("click");
+    runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
+
+    assert.deepEqual(navigations, [expectedHref]);
+    assert.equal(navigations[0].includes(harness.loginFields.email.value), false);
+    assert.equal(navigations[0].includes(harness.loginFields.password.value), false);
+  }
+});
+
+test("login fails closed in user-facing language when canonical route truth is unavailable", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?route-unavailable=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  const navigations = [];
+  module.initAccountAccess(harness.rootDocument, {
+    navigate: (href) => navigations.push(href),
+    routes: {
+      accountAccessOwnerLoginToOwnerWorkspace: null,
+      accountAccessInvitedPartnerLoginToVendorWorkspace: null,
+    },
+  });
+  harness.owner.dispatch("click");
+  harness.loginTab.dispatch("click");
+  runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
+
+  assert.deepEqual(navigations, []);
+  assert.equal(harness.loginStatus.textContent, "目前無法開啟工作台，請稍後再試。");
+  assert.equal(harness.loginStatus.dataset.tone, "error");
+  assert.equal(harness.loginFields.password.value, "");
+});
+
 test("registration stays a truthful unavailable account entry", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?test=${Date.now()}`, import.meta.url));
   assert.deepEqual(module.validateRegister({
@@ -240,6 +431,10 @@ test("registration stays a truthful unavailable account entry", async () => {
     company: "請輸入公司名稱。", name: "請輸入姓名。", phone: "請輸入聯絡電話。", region: "請選擇所在縣市。", email: "請輸入有效的 Email。", password: "密碼至少需要 8 碼。", agree: "請先閱讀並同意使用說明。", role: "請選擇你目前的使用角色。",
   });
   assert.equal(module.UNAVAILABLE_MESSAGE, "帳號功能正在整理中，正式開放後會提供完整操作入口。");
+});
+
+test("login explains the safe workspace handoff without claiming confirmed case access", () => {
+  assert.match(html, /進入後會先看到對應工作台結構；案件資料會在身分與權限確認後顯示。/);
 });
 
 test("canonical geometry and visual tokens survive the split", () => {
@@ -263,8 +458,19 @@ test("hidden company field cannot be made visible by the field grid rule", () =>
 test("no untruthful integration, prohibited product framing, or engineering language is introduced", () => {
   assert.doesNotMatch(app, /fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sessionStorage|indexedDB/i);
   assert.doesNotMatch(app, /location\s*=|location\.href|window\.open|帳號已建立|登入成功/);
+  assert.match(app, /window\.location\.assign/);
+  assert.match(app, /from\s+"\.\.\/public\/public-contract\.js"/);
+  for (const forbiddenTarget of [
+    "../../client_awarding_dashboard/code.html",
+    "../vendor_workspace/code.html",
+  ]) {
+    assert.equal(app.includes(forbiddenTarget), false, `app duplicates canonical href: ${forbiddenTarget}`);
+    assert.equal(html.includes(forbiddenTarget), false, `html duplicates canonical href: ${forbiddenTarget}`);
+    assert.equal(publicContract.includes(forbiddenTarget), false, `public contract duplicates canonical href: ${forbiddenTarget}`);
+    assert.equal(routeManifest.includes(forbiddenTarget), true, `manifest owns canonical href: ${forbiddenTarget}`);
+  }
   assert.match(app, /UNAVAILABLE_MESSAGE/);
   assert.match(app, /password\.value\s*=\s*""/);
-  const forbidden = ["媒合", "標案", "招標", "付款", "金流託管", "老屋投資", "投資報酬", "raw JSON", "stack trace", "mock-only", "debug", "無 DB", "API 未開", "案件", "工作台", "onboarding"];
+  const forbidden = ["媒合", "標案", "招標", "付款", "金流託管", "老屋投資", "投資報酬", "raw JSON", "stack trace", "mock-only", "debug", "無 DB", "API 未開", "onboarding"];
   for (const term of forbidden) assert.equal(html.includes(term), false, `forbidden visible term: ${term}`);
 });

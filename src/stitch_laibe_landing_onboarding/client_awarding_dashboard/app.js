@@ -69,6 +69,19 @@ export const OWNER_CONTRACT_VIEW_KEYS = Object.freeze([
   "records",
 ]);
 
+export const OWNER_DASHBOARD_HASHES = Object.freeze({
+  design: "#design-review",
+  construction: "#construction-records",
+  contract: "#owner-dashboard-panel-contract",
+});
+
+export const OWNER_CONTRACT_VIEW_HASHES = Object.freeze({
+  overview: "#owner-contract-view-panel-overview",
+  facts: "#owner-contract-view-panel-facts",
+  changes: "#owner-contract-view-panel-changes",
+  records: "#owner-contract-view-panel-records",
+});
+
 const OWNER_CONTRACT_IMPACT_LABELS = Object.freeze({
   scope: "工作範圍",
   price: "價格",
@@ -255,9 +268,9 @@ const STATE_COPY = Object.freeze({
     message: "請由 DRS 首頁的甲方入口重新登入；此頁不會透露未授權案件內容。",
   }),
   CONTRACT_CONTEXT_UNAVAILABLE: Object.freeze({
-    label: "決策準備中",
-    title: "尚未連結正式案件內容",
-    message: "你可以先整理已保存的摘要與文件；確認 DRS 服務契約後，正式案件內容才會在這裡提供。",
+    label: "尚未連結正式案件",
+    title: "尚未連結正式案件",
+    message: "甲方身分、DRS 服務契約與案件權限尚未完成確認。",
   }),
   AUTHORIZED_EMPTY: Object.freeze({
     label: "案件權限已確認",
@@ -267,7 +280,7 @@ const STATE_COPY = Object.freeze({
   AUTHORIZED_READY: Object.freeze({
     label: "案件資料已確認",
     title: "你正在查看已授權的甲方案件",
-    message: "所有文件、訊息與決策狀態都依案件後台的最新可信紀錄顯示。",
+    message: "所有文件、訊息與決策狀態都依正式案件的最新紀錄顯示。",
   }),
   PCM_SERVICE_ENDED_READ_ONLY: Object.freeze({
     label: "專業協作已結束",
@@ -300,7 +313,7 @@ const EMPTY_LIST_COPY = Object.freeze({
   }),
   constructionRecords: Object.freeze({
     title: "尚未取得施工或驗收事件",
-    body: "施工任務、照片、追加減項與驗收缺失，必須來自案件後台紀錄。",
+    body: "施工任務、照片、追加減項與驗收缺失，必須來自正式案件紀錄。",
   }),
   events: Object.freeze({
     title: "尚未取得可供顯示的案件留痕",
@@ -778,6 +791,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     STATE_COPY.CONTRACT_CONTEXT_UNAVAILABLE;
   const ended = resolution.state === "PCM_SERVICE_ENDED_READ_ONLY";
   const ready = resolution.state === "AUTHORIZED_READY";
+  const unavailable = resolution.state === "CONTRACT_CONTEXT_UNAVAILABLE";
   const identityVisible = ready || ended ||
     resolution.state === "AUTHORIZED_EMPTY";
   const payloadVisible = ready || ended;
@@ -808,7 +822,8 @@ export function buildOwnerWorkspaceViewModel(input) {
     readOnly: ended || !ready,
     pcmInvolved: ready,
     retryVisible: resolution.state === "LOAD_FAILED_RETRYABLE",
-    caseName: summary?.displayName || "尚待案件資料",
+    caseName: summary?.displayName ||
+      (unavailable ? "尚未連結正式案件" : "尚待案件資料"),
     actorLabel: (identityVisible && context.actor.displayLabel) || "尚待驗證",
     agreementLabel: !identityVisible
       ? "DRS 服務契約：尚待確認"
@@ -825,18 +840,32 @@ export function buildOwnerWorkspaceViewModel(input) {
       ? "已結束"
       : "尚待確認",
     agreementVersion: (identityVisible && context.serviceAgreement.version) ||
-      "尚待載入",
-    caseStatus: summary?.statusLabel || "尚待載入",
-    currentActor: summary?.currentActorLabel || "尚待載入",
-    nextAction: summary?.nextActionLabel || "取得可信案件資料後顯示下一步",
-    nextDue: summary?.nextDueLabel || "依案件通知",
-    lastRecorded: summary?.lastRecordedAtLabel || "尚待載入",
-    waitingRelationship: summary?.waitingRelationshipLabel || "尚待載入",
-    documentSummary: summary?.documentSummaryLabel || "尚待載入",
-    reviewSummary: summary?.reviewSummaryLabel || "尚待載入",
-    issueSummary: summary?.issueSummaryLabel || "尚待載入",
-    nextSummary: summary?.nextActionLabel || "尚待載入",
-    nextOwnerSummary: `責任人：${summary?.currentActorLabel || "尚待載入"}`,
+      "尚未確認服務版本",
+    caseStatus: summary?.statusLabel ||
+      (unavailable ? "尚未連結正式案件" : "尚待案件資料"),
+    currentActor: summary?.currentActorLabel ||
+      (unavailable
+        ? "由甲方先確認 DRS 服務與案件入口"
+        : "尚待案件資料"),
+    nextAction: summary?.nextActionLabel ||
+      (unavailable ? "了解並確認 DRS 服務契約" : "依案件狀態確認下一步"),
+    nextDue: summary?.nextDueLabel ||
+      (unavailable
+        ? "完成後才會開放本案契約填寫與案件對話"
+        : "依案件通知"),
+    lastRecorded: summary?.lastRecordedAtLabel ||
+      (unavailable ? "尚未建立正式案件紀錄" : "尚無案件留痕"),
+    waitingRelationship: summary?.waitingRelationshipLabel ||
+      (unavailable
+        ? "甲方身分、DRS 服務契約與案件權限尚未完成確認"
+        : "尚待案件確認"),
+    documentSummary: summary?.documentSummaryLabel || "尚未連結正式案件",
+    reviewSummary: summary?.reviewSummaryLabel || "尚未連結正式案件",
+    issueSummary: summary?.issueSummaryLabel || "尚未連結正式案件",
+    nextSummary: summary?.nextActionLabel ||
+      (unavailable ? "了解並確認 DRS 服務契約" : "依案件狀態確認下一步"),
+    nextOwnerSummary: `責任人：${summary?.currentActorLabel ||
+      (unavailable ? "甲方" : "尚待案件確認")}`,
     todayFocus: summary?.todayFocusLabel || "尚待案件資料",
     constructionIssues: summary?.constructionIssueLabel || "尚待案件資料",
     constructionActor: summary?.currentActorLabel || "尚待案件資料",
@@ -891,14 +920,24 @@ function clearNode(node) {
 }
 
 export function resolveOwnerContractViewFromHash(hash) {
-  if (hash === "#owner-contract-view-panel-overview") return "overview";
-  if (hash === "#owner-contract-view-panel-facts") return "facts";
-  if (hash === "#owner-contract-view-panel-changes") return "changes";
-  if (hash === "#owner-contract-view-panel-records") return "records";
-  return null;
+  return Object.entries(OWNER_CONTRACT_VIEW_HASHES).find(
+    ([, canonicalHash]) => canonicalHash === hash,
+  )?.[0] ?? null;
 }
 
-function initializeOwnerContractViewTabs(workspace, view = null) {
+function replaceOwnerWorkspaceHash(view, hash) {
+  if (
+    !hash ||
+    view?.location?.hash === hash ||
+    typeof view?.history?.replaceState !== "function"
+  ) {
+    return false;
+  }
+  view.history.replaceState(view.history.state ?? null, "", hash);
+  return true;
+}
+
+export function initializeOwnerContractViewTabs(workspace, view = null) {
   if (!workspace || typeof workspace.querySelectorAll !== "function") {
     return null;
   }
@@ -915,7 +954,7 @@ function initializeOwnerContractViewTabs(workspace, view = null) {
     return null;
   }
 
-  function selectView(key, { focus = false } = {}) {
+  function selectView(key, { focus = false, syncHash = true } = {}) {
     if (!OWNER_CONTRACT_VIEW_KEYS.includes(key)) return false;
     workspace.dataset.activeOwnerContractView = key;
     for (const tab of tabs) {
@@ -926,6 +965,9 @@ function initializeOwnerContractViewTabs(workspace, view = null) {
     }
     for (const panel of panels) {
       panel.hidden = panel.dataset.ownerContractViewPanel !== key;
+    }
+    if (syncHash) {
+      replaceOwnerWorkspaceHash(view, OWNER_CONTRACT_VIEW_HASHES[key]);
     }
     return true;
   }
@@ -947,12 +989,13 @@ function initializeOwnerContractViewTabs(workspace, view = null) {
 
   const selectFromHash = () => {
     const requestedView = resolveOwnerContractViewFromHash(view?.location?.hash);
-    if (requestedView) selectView(requestedView);
+    if (requestedView) selectView(requestedView, { syncHash: false });
   };
 
   selectView(
     resolveOwnerContractViewFromHash(view?.location?.hash) ||
       OWNER_CONTRACT_VIEW_KEYS[0],
+    { syncHash: false },
   );
   view?.addEventListener?.("hashchange", selectFromHash);
   return Object.freeze({ selectView });
@@ -1165,7 +1208,10 @@ function initializeOwnerContractWorkspace(root) {
     });
 
   setEnabled(false);
-  return Object.freeze({ setEnabled });
+  return Object.freeze({
+    setEnabled,
+    selectView: contractViews?.selectView,
+  });
 }
 
 function renderList(root, name, records, renderer) {
@@ -1197,6 +1243,78 @@ function renderProcessSteps(root, records) {
       label.textContent = statusByKey.get(key) || "尚待案件資料";
     }
   }
+}
+
+const OWNER_HEADER_ROUTE_BINDINGS = Object.freeze([
+  Object.freeze({
+    selector: "[data-owner-brand-link]",
+    routeId: "ownerWorkspaceBrandToHome",
+    expectedHref: "../public_home/code.html#top",
+  }),
+  Object.freeze({
+    selector: "[data-owner-service-contract-link]",
+    routeId: "ownerWorkspaceContractManagementToServiceContract",
+    expectedHref: "../pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract",
+  }),
+]);
+
+function closeOwnerHeaderLink(node) {
+  node?.removeAttribute?.("href");
+  node?.setAttribute?.("aria-disabled", "true");
+  node?.setAttribute?.("tabindex", "-1");
+}
+
+function openOwnerHeaderLink(node, href) {
+  node.setAttribute("href", href);
+  node.removeAttribute("aria-disabled");
+  node.removeAttribute("tabindex");
+}
+
+export function bindOwnerWorkspaceCanonicalLinks(root, getCanonicalHref) {
+  if (!root || typeof root.querySelector !== "function") return false;
+  const bindings = OWNER_HEADER_ROUTE_BINDINGS.map((binding) => ({
+    ...binding,
+    node: root.querySelector(binding.selector),
+  }));
+  for (const binding of bindings) closeOwnerHeaderLink(binding.node);
+  if (
+    bindings.some(({ node }) => !node) ||
+    typeof getCanonicalHref !== "function"
+  ) {
+    return false;
+  }
+
+  let resolved;
+  try {
+    resolved = bindings.map((binding) => ({
+      ...binding,
+      href: getCanonicalHref(binding.routeId),
+    }));
+  } catch {
+    return false;
+  }
+  if (resolved.some(({ href, expectedHref }) => href !== expectedHref)) {
+    return false;
+  }
+  for (const binding of resolved) openOwnerHeaderLink(binding.node, binding.href);
+  return true;
+}
+
+export function renderOwnerHeaderContext(root, model = {}) {
+  if (!root || typeof root.querySelector !== "function") return false;
+  const caseValue = root.querySelector('[data-header-context-value="case"]');
+  const agreementValue = root.querySelector('[data-header-context-value="agreement"]');
+  if (!caseValue || !agreementValue) return false;
+
+  if (typeof model.caseName === "string" && model.caseName.trim()) {
+    caseValue.textContent = model.caseName;
+  }
+  if (typeof model.agreementLabel === "string" && model.agreementLabel.trim()) {
+    agreementValue.textContent = model.agreementLabel
+      .replace(/^DRS 服務契約：/u, "")
+      .trim();
+  }
+  return true;
 }
 
 function renderModel(root, model) {
@@ -1231,8 +1349,11 @@ function renderModel(root, model) {
     "actor-label": model.actorLabel,
   };
 
+  renderOwnerHeaderContext(root, model);
+
   for (const [name, value] of Object.entries(slots)) {
     for (const node of root.querySelectorAll(`[data-slot="${name}"]`)) {
+      if (node.hasAttribute?.("data-header-context-value")) continue;
       node.textContent = value;
     }
   }
@@ -1344,9 +1465,114 @@ export function resolveOwnerDashboardTabFromHash(hash) {
   return null;
 }
 
+export function stabilizeOwnerDashboardDirectEntry(root, view) {
+  const documentElement = root?.documentElement;
+  const entryHash = view?.location?.hash;
+  const isContractDirectEntry =
+    entryHash === OWNER_DASHBOARD_HASHES.contract ||
+    Boolean(resolveOwnerContractViewFromHash(entryHash));
+  if (
+    !documentElement?.dataset ||
+    documentElement.dataset.ownerDirectEntryStabilized === "true" ||
+    !isContractDirectEntry ||
+    typeof view?.scrollTo !== "function"
+  ) {
+    return false;
+  }
+
+  documentElement.dataset.ownerDirectEntryStabilized = "true";
+  const cancellationEvents = Object.freeze([
+    "pointerdown",
+    "keydown",
+    "wheel",
+    "touchstart",
+    "hashchange",
+  ]);
+  let cancelled = false;
+  let settled = false;
+  let firstFrameId = null;
+  let secondFrameId = null;
+
+  const resetDirectEntryScroll = () => {
+    view.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+  const entryIsCurrent = () =>
+    !cancelled && !settled && view.location?.hash === entryHash;
+  const cancelPendingFrames = () => {
+    if (typeof view.cancelAnimationFrame === "function") {
+      if (firstFrameId !== null) view.cancelAnimationFrame(firstFrameId);
+      if (secondFrameId !== null) view.cancelAnimationFrame(secondFrameId);
+    }
+    firstFrameId = null;
+    secondFrameId = null;
+  };
+  const cleanup = () => {
+    cancelPendingFrames();
+    for (const eventName of cancellationEvents) {
+      view.removeEventListener?.(eventName, cancelPendingSettle, {
+        capture: true,
+      });
+    }
+    view.removeEventListener?.("load", schedulePostLoadSettle);
+  };
+  const cancelPendingSettle = () => {
+    cancelled = true;
+    cleanup();
+  };
+  const finishSettle = () => {
+    if (!entryIsCurrent()) {
+      cleanup();
+      return;
+    }
+    resetDirectEntryScroll();
+    settled = true;
+    cleanup();
+  };
+  const schedulePostLoadSettle = () => {
+    if (!entryIsCurrent()) {
+      cleanup();
+      return;
+    }
+    if (typeof view.requestAnimationFrame !== "function") {
+      finishSettle();
+      return;
+    }
+    firstFrameId = view.requestAnimationFrame(() => {
+      firstFrameId = null;
+      if (!entryIsCurrent()) {
+        cleanup();
+        return;
+      }
+      secondFrameId = view.requestAnimationFrame(() => {
+        secondFrameId = null;
+        if (!entryIsCurrent()) {
+          cleanup();
+          return;
+        }
+        finishSettle();
+      });
+    });
+  };
+
+  for (const eventName of cancellationEvents) {
+    view.addEventListener?.(eventName, cancelPendingSettle, {
+      capture: true,
+      passive: true,
+    });
+  }
+  resetDirectEntryScroll();
+  if (root.readyState === "complete") {
+    schedulePostLoadSettle();
+  } else {
+    view.addEventListener?.("load", schedulePostLoadSettle, { once: true });
+  }
+  return true;
+}
+
 export function initializeOwnerDashboardTabs(
   root = typeof document === "undefined" ? null : document,
   view = typeof window === "undefined" ? null : window,
+  { onContractMainSelected = null } = {},
 ) {
   if (!root || typeof root.querySelector !== "function") {
     return null;
@@ -1365,7 +1591,14 @@ export function initializeOwnerDashboardTabs(
 
   const tabKeys = tabs.map((tab) => tab.dataset.ownerTab);
 
-  function selectTab(key, { focus = false } = {}) {
+  function selectTab(
+    key,
+    {
+      focus = false,
+      syncHash = true,
+      resetContractView = syncHash,
+    } = {},
+  ) {
     if (!tabKeys.includes(key)) {
       return false;
     }
@@ -1381,6 +1614,16 @@ export function initializeOwnerDashboardTabs(
     }
     for (const panel of panels) {
       panel.hidden = panel.dataset.ownerPanel !== key;
+    }
+    if (
+      key === "contract" &&
+      resetContractView &&
+      typeof onContractMainSelected === "function"
+    ) {
+      onContractMainSelected();
+    }
+    if (syncHash) {
+      replaceOwnerWorkspaceHash(view, OWNER_DASHBOARD_HASHES[key]);
     }
     return true;
   }
@@ -1410,10 +1653,21 @@ export function initializeOwnerDashboardTabs(
 
   const hashTab = resolveOwnerDashboardTabFromHash(view?.location?.hash);
   dashboard.dataset.ownerTabsReady = "true";
-  selectTab(hashTab || dashboard.dataset.activeOwnerTab || tabKeys[0]);
+  selectTab(hashTab || dashboard.dataset.activeOwnerTab || tabKeys[0], {
+    syncHash: false,
+    resetContractView:
+      view?.location?.hash === OWNER_DASHBOARD_HASHES.contract,
+  });
+  stabilizeOwnerDashboardDirectEntry(root, view);
   view?.addEventListener?.("hashchange", () => {
     const nextTab = resolveOwnerDashboardTabFromHash(view.location?.hash);
-    if (nextTab) selectTab(nextTab);
+    if (nextTab) {
+      selectTab(nextTab, {
+        syncHash: false,
+        resetContractView:
+          view.location?.hash === OWNER_DASHBOARD_HASHES.contract,
+      });
+    }
   });
   return Object.freeze({ selectTab });
 }
@@ -1425,8 +1679,14 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   let loadGeneration = 0;
   let currentModel = null;
 
-  initializeOwnerDashboardTabs(documentRef);
   const contractWorkspace = initializeOwnerContractWorkspace(documentRef);
+  const view = documentRef?.defaultView ??
+    (typeof window === "undefined" ? null : window);
+  initializeOwnerDashboardTabs(documentRef, view, {
+    onContractMainSelected() {
+      contractWorkspace?.selectView?.("overview", { syncHash: false });
+    },
+  });
 
   function commitModel(model) {
     currentModel = model;

@@ -1,3 +1,5 @@
+import { getActiveCanonicalLinkHref } from "../public/pcm-flow-route-manifest.js";
+
 const safeCreate = Object.create;
 const safeDefineProperty = Object.defineProperty;
 const safeFreeze = Object.freeze;
@@ -5,6 +7,10 @@ const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const safeGetPrototypeOf = Object.getPrototypeOf;
 const safeApply = Reflect.apply;
 const iteratorKey = Symbol.iterator;
+
+export const VENDOR_WORKSPACE_ACCESS_RECOVERY_LINK_ID =
+  "vendorWorkspaceAccessRecoveryToAccountAccess";
+const VENDOR_WORKSPACE_ACCESS_RECOVERY_HREF = "../account_access/code.html#top";
 
 function freezeRecord(entries) {
   const record = safeCreate(null);
@@ -535,7 +541,7 @@ const MEMBERSHIP_UNCONFIRMED = workspaceState({
   recovery: "成員資料一致後，再由邀請入口重新確認。",
 });
 
-const AUTHORIZED_VENDOR_WORKSPACE = workspaceState({
+export const AUTHORIZED_VENDOR_WORKSPACE = workspaceState({
   code: "AUTHORIZED_VENDOR_WORKSPACE",
   title: "乙方案件授權已確認",
   reason: "可信流程已確認身分、案件成員與可查看的案件範圍。",
@@ -785,6 +791,133 @@ function closeControl(control) {
   }
 }
 
+function closeWriteControls(scope) {
+  let controls;
+  try {
+    controls = scope.querySelectorAll("[data-write-action]");
+  } catch {
+    return false;
+  }
+  let length = 0;
+  try {
+    length = controls.length;
+  } catch {
+    return false;
+  }
+  if (typeof length !== "number" || length < 0 || length > 64 || length % 1 !== 0) {
+    return false;
+  }
+  for (let index = 0; index < length; index += 1) closeControl(controls[index]);
+  return true;
+}
+
+function resolveVendorView(root) {
+  try {
+    if (root.defaultView) return root.defaultView;
+  } catch {
+    // A cloned Element normally resolves its view through ownerDocument.
+  }
+  try {
+    return root.ownerDocument?.defaultView ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function bindVendorWorkspaceRecoveryRoute(
+  root,
+  routeGetter = getActiveCanonicalLinkHref,
+) {
+  let action = null;
+  try {
+    action = root?.querySelector?.("[data-vendor-access-recovery]") ?? null;
+  } catch {
+    action = null;
+  }
+  if (!action) return null;
+
+  let href = null;
+  try {
+    href = typeof routeGetter === "function"
+      ? routeGetter(VENDOR_WORKSPACE_ACCESS_RECOVERY_LINK_ID)
+      : null;
+  } catch {
+    href = null;
+  }
+
+  if (href === VENDOR_WORKSPACE_ACCESS_RECOVERY_HREF) {
+    try {
+      action.setAttribute("href", href);
+      action.setAttribute("aria-disabled", "false");
+      return href;
+    } catch {
+      // Fall through and remove any partial or stale navigation target.
+    }
+  }
+
+  try {
+    action.removeAttribute("href");
+  } catch {
+    // Static markup has no fallback href, so navigation remains closed.
+  }
+  try {
+    action.setAttribute("aria-disabled", "true");
+  } catch {
+    // Missing route state must never create a guessed destination.
+  }
+  return null;
+}
+
+function resetVendorWorkspace(root) {
+  try {
+    root.body?.setAttribute("data-vendor-state", CONTEXT_UNAVAILABLE.code);
+  } catch {
+    // Continue clearing any previously published authorized surface.
+  }
+
+  closeWriteControls(root);
+
+  let mount = null;
+  let gate = null;
+  let headerState = null;
+  try {
+    mount = root.querySelector("#vendor-authorized-workspace-mount");
+  } catch {
+    mount = null;
+  }
+  try {
+    gate = root.querySelector("#invited-cases");
+  } catch {
+    gate = null;
+  }
+  try {
+    headerState = root.querySelector("[data-vendor-header-state]");
+  } catch {
+    headerState = null;
+  }
+
+  try {
+    mount?.replaceChildren();
+  } catch {
+    // Controls were closed before the failed clear attempt.
+  }
+  try {
+    if (mount) mount.hidden = true;
+  } catch {
+    // Clearing remains the primary stale-workspace revocation.
+  }
+  try {
+    if (gate) gate.hidden = false;
+  } catch {
+    // The static gate is visible unless an earlier authorized render hid it.
+  }
+  try {
+    if (headerState) headerState.textContent = "身分與案件範圍尚待確認";
+  } catch {
+    // The static header already carries the closed-state copy.
+  }
+}
+
 function enableSessionControl(control) {
   try {
     control.disabled = false;
@@ -1014,9 +1147,11 @@ export function resolveVendorContractViewFromFragment(fragment) {
 export function initializeVendorContractViewTabs(root) {
   let tabs;
   let panels;
+  let liveTarget;
   try {
     tabs = root.querySelectorAll("[data-vendor-contract-view]");
     panels = root.querySelectorAll("[data-vendor-contract-view-panel]");
+    liveTarget = root.querySelector("[data-vendor-workspace-live]");
   } catch {
     return null;
   }
@@ -1052,6 +1187,20 @@ export function initializeVendorContractViewTabs(root) {
         // Unknown panels remain in their static hidden state.
       }
     }
+    if (liveTarget) {
+      const label = activeView === "overview"
+        ? "契約總覽"
+        : activeView === "reply"
+          ? "待我回覆"
+          : activeView === "decision"
+            ? "變更與決定"
+            : "版本與紀錄";
+      try {
+        liveTarget.textContent = `已切換至${label}。`;
+      } catch {
+        // The selected tab and visible panel remain the primary state.
+      }
+    }
     return true;
   }
 
@@ -1072,12 +1221,7 @@ export function initializeVendorContractViewTabs(root) {
     }
   }
 
-  let view = null;
-  try {
-    view = root.defaultView;
-  } catch {
-    view = null;
-  }
+  const view = resolveVendorView(root);
   const selectFromFragment = () => {
     let fragment = "";
     try {
@@ -1099,7 +1243,7 @@ export function initializeVendorContractViewTabs(root) {
   return freezeRecord([["activate", activate]]);
 }
 
-export function initializeVendorWorkspaceTabs(root) {
+export function initializeVendorWorkspaceTabs(root, contractController = null) {
   let tabs;
   let panels;
   let liveTarget;
@@ -1148,14 +1292,40 @@ export function initializeVendorWorkspaceTabs(root) {
     }
     if (liveTarget) {
       const label = activeTab === "design"
-        ? "設計案管理"
+        ? "設計管理"
         : activeTab === "construction"
-          ? "工程案管理"
+          ? "工程管理"
           : "契約管理";
       try {
-        liveTarget.textContent = `已切換至${label}。目前仍需先確認案件授權。`;
+        liveTarget.textContent = `已切換至${label}。`;
       } catch {
         // Live-region failure does not grant workspace authority.
+      }
+    }
+  }
+
+  function updateRouteCurrent(fragment) {
+    if (!routeLinks) return;
+    let routeLength = 0;
+    try {
+      routeLength = routeLinks.length;
+    } catch {
+      return;
+    }
+    for (let index = 0; index < routeLength; index += 1) {
+      const link = routeLinks[index];
+      let selected = false;
+      try {
+        selected = link.getAttribute("href") === fragment;
+        if (selected) {
+          link.setAttribute("aria-current", "location");
+        } else if (typeof link.removeAttribute === "function") {
+          link.removeAttribute("aria-current");
+        } else {
+          link.setAttribute("aria-current", "false");
+        }
+      } catch {
+        continue;
       }
     }
   }
@@ -1164,6 +1334,15 @@ export function initializeVendorWorkspaceTabs(root) {
     const key = resolveVendorWorkspaceTabForFragment(fragment);
     if (!key) return false;
     activate(key, shouldFocus);
+    const childView = resolveVendorContractViewFromFragment(fragment);
+    if (childView) {
+      try {
+        contractController?.activate?.(childView, false);
+      } catch {
+        // Parent panel remains visible if the child controller is unavailable.
+      }
+    }
+    updateRouteCurrent(fragment);
     return true;
   }
 
@@ -1198,7 +1377,10 @@ export function initializeVendorWorkspaceTabs(root) {
     try {
       tab.addEventListener("click", () => {
         const key = tabKey(tab);
-        if (key) activate(key, false);
+        if (key) {
+          activate(key, false);
+          updateRouteCurrent("");
+        }
       });
       tab.addEventListener("keydown", (event) => {
         const key = event && event.key;
@@ -1216,6 +1398,7 @@ export function initializeVendorWorkspaceTabs(root) {
           // Navigation remains bounded to the current tab.
         }
         activate(resolveVendorWorkspaceTabKey(activeTab, key), true);
+        updateRouteCurrent("");
       });
     } catch {
       continue;
@@ -1244,12 +1427,7 @@ export function initializeVendorWorkspaceTabs(root) {
     }
   }
 
-  let view = null;
-  try {
-    view = root.defaultView;
-  } catch {
-    view = null;
-  }
+  const view = resolveVendorView(root);
   if (view) {
     try {
       view.addEventListener("hashchange", () => {
@@ -1270,65 +1448,48 @@ export function initializeVendorWorkspaceTabs(root) {
 export function initializeVendorWorkspace(root, renderState = CONTEXT_UNAVAILABLE) {
   if (!root) return CONTEXT_UNAVAILABLE;
   const trustedAuthorized = renderState === AUTHORIZED_VENDOR_WORKSPACE;
-  try {
-    root.body?.setAttribute(
-      "data-vendor-state",
-      trustedAuthorized ? AUTHORIZED_VENDOR_WORKSPACE.code : CONTEXT_UNAVAILABLE.code,
-    );
-  } catch {
-    // Static markup already declares the closed state.
-  }
-  let controls;
-  try {
-    controls = root.querySelectorAll("[data-write-action]");
-  } catch {
+  resetVendorWorkspace(root);
+  bindVendorWorkspaceRecoveryRoute(root);
+  if (!trustedAuthorized) {
     return CONTEXT_UNAVAILABLE;
   }
-  let length = 0;
+
+  let template;
+  let mount;
   try {
-    length = controls.length;
+    template = root.querySelector("#vendor-authorized-workspace-template");
+    mount = root.querySelector("#vendor-authorized-workspace-mount");
   } catch {
     return CONTEXT_UNAVAILABLE;
   }
-  if (typeof length !== "number" || length < 0 || length > 64 || length % 1 !== 0) {
+  if (!template?.content || !mount || typeof mount.replaceChildren !== "function") {
     return CONTEXT_UNAVAILABLE;
   }
-  for (let index = 0; index < length; index += 1) {
-    try {
-      closeControl(controls[index]);
-    } catch {
-      continue;
-    }
+  let fragment;
+  try {
+    fragment = template.content.cloneNode(true);
+    if (!closeWriteControls(fragment)) return CONTEXT_UNAVAILABLE;
+    mount.replaceChildren(fragment);
+  } catch {
+    resetVendorWorkspace(root);
+    return CONTEXT_UNAVAILABLE;
   }
-  if (trustedAuthorized) {
-    let contractControls;
-    try {
-      contractControls = root.querySelectorAll("[data-vendor-contract-control]");
-    } catch {
-      return CONTEXT_UNAVAILABLE;
-    }
-    let contractLength = 0;
-    try {
-      contractLength = contractControls.length;
-    } catch {
-      return CONTEXT_UNAVAILABLE;
-    }
-    if (
-      typeof contractLength !== "number"
-      || contractLength < 0
-      || contractLength > 32
-      || contractLength % 1 !== 0
-    ) {
-      return CONTEXT_UNAVAILABLE;
-    }
-    for (let index = 0; index < contractLength; index += 1) {
-      enableSessionControl(contractControls[index]);
-    }
-    initializeVendorContractSession(root);
+
+  try {
+    if (!closeWriteControls(mount)) throw new Error("workspace controls unavailable");
+    const contractController = initializeVendorContractViewTabs(mount);
+    initializeVendorWorkspaceTabs(mount, contractController);
+    root.body?.setAttribute("data-vendor-state", AUTHORIZED_VENDOR_WORKSPACE.code);
+    const gate = root.querySelector("#invited-cases");
+    if (gate) gate.hidden = true;
+    const headerState = root.querySelector("[data-vendor-header-state]");
+    if (headerState) headerState.textContent = "案件工作台已開啟";
+    mount.hidden = false;
+  } catch {
+    resetVendorWorkspace(root);
+    return CONTEXT_UNAVAILABLE;
   }
-  initializeVendorContractViewTabs(root);
-  initializeVendorWorkspaceTabs(root);
-  return trustedAuthorized ? AUTHORIZED_VENDOR_WORKSPACE : CONTEXT_UNAVAILABLE;
+  return AUTHORIZED_VENDOR_WORKSPACE;
 }
 
 const documentRoot = resolveVendorDocument(globalThis);

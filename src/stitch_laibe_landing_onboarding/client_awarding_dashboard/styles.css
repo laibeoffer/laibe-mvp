@@ -4137,3 +4137,410 @@ body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Owner-workspace novice recovery: preserve the existing shell, clarify only
+   the unavailable state and its direct-entry behavior. */
+.owner-dashboard-tab {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.owner-dashboard-static-note {
+  max-width: 260px;
+  color: var(--muted);
+  font-size: .78rem;
+  font-weight: 750;
+  line-height: 1.5;
+  text-align: right;
+  text-wrap: pretty;
+}
+
+.handoff-panel__actor-label {
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  grid-column: 1;
+}
+
+.owner-contract-recovery-action {
+  display: none;
+  min-height: 48px;
+  padding: 0 20px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--source-active);
+  border-radius: 999px;
+  background: var(--source-active);
+  color: #0b0d0f;
+  font-size: .875rem;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+}
+
+.owner-contract-recovery-action:hover,
+.owner-contract-recovery-action:focus-visible {
+  background: var(--orange);
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
+  .owner-contract-recovery-action {
+  display: inline-flex;
+}
+
+body:not([data-workspace-state="AUTHORIZED_READY"])
+  [data-owner-contract-trusted-action] {
+  display: none;
+}
+
+.owner-contract-unavailable-preparation {
+  display: none;
+  margin: 0 28px 26px;
+  padding: 22px 0 0;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.owner-contract-unavailable-preparation > strong {
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.owner-contract-unavailable-preparation > p,
+.owner-contract-unavailable-preparation dd {
+  margin: 0;
+  color: var(--paper-soft);
+  font-size: .875rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.owner-contract-unavailable-preparation details {
+  margin-top: 8px;
+}
+
+.owner-contract-unavailable-preparation summary {
+  min-height: 44px;
+  padding: 11px 0;
+  color: var(--yellow);
+  font-size: .875rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.owner-contract-unavailable-preparation summary:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 3px;
+}
+
+.owner-contract-unavailable-preparation dl {
+  display: grid;
+  margin: 4px 0 0;
+  gap: 0;
+}
+
+.owner-contract-unavailable-preparation dl > div {
+  display: grid;
+  padding: 12px 0;
+  grid-template-columns: minmax(150px, .45fr) minmax(0, 1fr);
+  gap: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.owner-contract-unavailable-preparation dt {
+  color: var(--paper);
+  font-size: .875rem;
+  font-weight: 850;
+}
+
+body[data-workspace-state="ACCESS_CHECKING"] [data-owner-contract-unavailable-preparation],
+body[data-workspace-state="ACCESS_DENIED"] [data-owner-contract-unavailable-preparation],
+body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"] [data-owner-contract-unavailable-preparation],
+body[data-workspace-state="AUTHORIZED_EMPTY"] [data-owner-contract-unavailable-preparation],
+body[data-workspace-state="LOAD_FAILED_RETRYABLE"] [data-owner-contract-unavailable-preparation] {
+  display: grid;
+}
+
+[data-owner-contract-trusted-facts] {
+  display: none;
+}
+
+[data-owner-contract-facts-progress] {
+  display: none;
+}
+
+body[data-workspace-state="AUTHORIZED_READY"]
+  [data-owner-contract-trusted-facts],
+body[data-workspace-state="PCM_SERVICE_ENDED_READ_ONLY"]
+  [data-owner-contract-trusted-facts] {
+  display: block;
+}
+
+body[data-workspace-state="AUTHORIZED_READY"]
+  [data-owner-contract-unavailable-preparation],
+body[data-workspace-state="PCM_SERVICE_ENDED_READ_ONLY"]
+  [data-owner-contract-unavailable-preparation] {
+  display: none;
+}
+
+body[data-workspace-state="AUTHORIZED_READY"]
+  [data-owner-contract-facts-progress],
+body[data-workspace-state="PCM_SERVICE_ENDED_READ_ONLY"]
+  [data-owner-contract-facts-progress] {
+  display: inline;
+}
+
+.owner-line-conversation__unavailable {
+  display: grid;
+  padding: 24px 22px;
+  align-content: start;
+  gap: 8px;
+}
+
+.owner-line-conversation__unavailable h2,
+.owner-line-conversation__unavailable p {
+  margin: 0;
+}
+
+.owner-line-conversation__unavailable h2 {
+  color: var(--paper);
+  font-size: 1.18rem;
+  line-height: 1.3;
+}
+
+.owner-line-conversation__unavailable > p:last-child {
+  color: var(--paper-soft);
+  font-size: .875rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+[data-owner-line-trusted-content] {
+  display: none;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+body[data-workspace-state="AUTHORIZED_READY"]
+  [data-owner-line-trusted-content],
+body[data-workspace-state="PCM_SERVICE_ENDED_READ_ONLY"]
+  [data-owner-line-trusted-content] {
+  display: flex;
+}
+
+body[data-workspace-state="AUTHORIZED_READY"]
+  .owner-line-conversation__unavailable,
+body[data-workspace-state="PCM_SERVICE_ENDED_READ_ONLY"]
+  .owner-line-conversation__unavailable {
+  display: none;
+}
+
+[data-owner-line-trusted-content] > dl {
+  margin: 0;
+  padding-inline: 20px;
+}
+
+[data-owner-line-trusted-content] > dl div {
+  display: grid;
+  padding: 11px 0;
+  gap: 3px;
+  border-top: 1px solid var(--line);
+}
+
+body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
+  .owner-hero-dashboard {
+  align-items: start;
+}
+
+#workspace-title,
+[data-owner-tab],
+[data-owner-contract-view] {
+  scroll-margin-top: 92px;
+}
+
+.handoff-panel__mobile-summary {
+  display: none;
+}
+
+/* Core owner-workspace text is never auxiliary-sized. */
+[data-layout="owner-responsibility-panel"] dd,
+.workspace-intro__meta,
+.state-pill,
+.owner-dashboard-tab strong,
+.owner-dashboard-tab small,
+.owner-contract-command > div > p:last-child,
+.owner-contract-primary-action,
+.owner-contract-recovery-action,
+.owner-contract-view-tabs button,
+.shared-contract-card__action,
+.owner-hero-dashboard__next strong,
+.owner-hero-dashboard__next small,
+.owner-dashboard-static-note,
+.owner-contract-status dd,
+.owner-dashboard-facts dd,
+.owner-contract-facts-form input,
+.owner-contract-facts-form textarea,
+.owner-contract-facts-footer,
+.owner-contract-detail-body input,
+.owner-contract-detail-body textarea,
+.owner-contract-detail-body button,
+.contract-kind-card > p:not(.eyebrow),
+.shared-contract-card__content > p:not(.eyebrow) {
+  font-size: .875rem;
+}
+/* End core owner-workspace typography. */
+
+@media (max-width: 760px) {
+  [data-layout="owner-command-header"] [data-layout="owner-responsibility-panel"] {
+    display: grid;
+    padding: 14px 16px;
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  [data-layout="owner-responsibility-panel"] .handoff-panel__topline,
+  [data-layout="owner-responsibility-panel"] .handoff-panel__actor-label,
+  [data-layout="owner-responsibility-panel"] h2,
+  [data-layout="owner-responsibility-panel"] .handoff-panel__action,
+  [data-layout="owner-responsibility-panel"] .handoff-panel__facts {
+    display: none;
+  }
+
+  [data-layout="owner-responsibility-mobile-summary"] {
+    display: block;
+    margin: 0;
+  }
+
+  [data-layout="owner-responsibility-mobile-summary"] div {
+    display: grid;
+    padding: 3px 0;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  [data-layout="owner-responsibility-mobile-summary"] dt {
+    margin: 0;
+    color: var(--muted);
+    font-size: .72rem;
+    font-weight: 800;
+  }
+
+  [data-layout="owner-responsibility-mobile-summary"] dd {
+    margin: 0;
+    color: var(--paper-soft);
+    font-size: .875rem;
+    line-height: 1.35;
+    text-align: left;
+  }
+
+  .owner-dashboard-tab,
+  [data-active-owner-tab="design"]
+    .owner-dashboard-tab[data-owner-tab="design"] {
+    min-height: 64px;
+  }
+
+  .owner-dashboard-tab strong,
+  .owner-dashboard-tab small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .owner-dashboard-static-note {
+    max-width: none;
+    text-align: left;
+  }
+
+  .owner-contract-recovery-action {
+    width: 100%;
+  }
+
+  .owner-contract-unavailable-preparation {
+    margin: 0 20px 22px;
+  }
+
+  .owner-contract-unavailable-preparation dl > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .owner-line-conversation__unavailable {
+    padding: 20px;
+  }
+
+  .owner-contract-view-tabs button,
+  .owner-contract-command > div > p:last-child,
+  .contract-kind-card > p:not(.eyebrow),
+  .shared-contract-card__content > p:not(.eyebrow),
+  .shared-contract-card__content dd,
+  .shared-contract-card__action,
+  .owner-contract-status dd,
+  .owner-contract-section-heading > strong,
+  .owner-contract-section-heading > span,
+  .owner-contract-facts-form label,
+  .owner-contract-facts-form input,
+  .owner-contract-facts-form textarea,
+  .owner-contract-facts-footer,
+  .owner-contract-session-note,
+  .owner-contract-detail-body label,
+  .owner-contract-detail-body input,
+  .owner-contract-detail-body textarea,
+  .owner-contract-detail-body button {
+    font-size: .875rem;
+  }
+}
+
+/* Task5: official DRS header lockup and explicit owner context. */
+.workspace-header__context {
+  flex-wrap: wrap;
+}
+
+.workspace-header__context .context-chip {
+  max-width: none;
+  min-height: 40px;
+  padding: 6px 10px;
+  flex-wrap: wrap;
+  gap: 3px 8px;
+  overflow: visible;
+  white-space: normal;
+}
+
+.context-chip__label {
+  color: var(--muted);
+  font-size: .67rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+.context-chip__value {
+  color: var(--paper);
+  font-size: .78rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .workspace-header__inner {
+    display: flex;
+    padding: 10px 0;
+    flex-wrap: wrap;
+  }
+
+  .workspace-header__context {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .workspace-header__context .context-chip {
+    width: 100%;
+    min-height: 44px;
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

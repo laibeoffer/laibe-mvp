@@ -538,6 +538,16 @@ function isDocumentWorkspaceKind(kind) {
   return kind === "quote" || kind === "contract" || kind === "drawing";
 }
 
+export function resolveDocumentWorkspaceMode(search = "") {
+  try {
+    if (typeof search !== "string") return "quote";
+    const mode = new URLSearchParams(search).get("mode");
+    return isDocumentWorkspaceKind(mode) ? mode : "quote";
+  } catch {
+    return "quote";
+  }
+}
+
 function freezeDocumentSelection(selection) {
   if (!selection) return null;
   return safeFreeze({ name: selection.name });
@@ -554,8 +564,8 @@ function freezeDocumentWorkspaceState(activeTab, documents) {
   });
 }
 
-export function createDocumentWorkspaceState() {
-  return freezeDocumentWorkspaceState("quote", {
+export function createDocumentWorkspaceState(initialMode = "quote") {
+  return freezeDocumentWorkspaceState(isDocumentWorkspaceKind(initialMode) ? initialMode : "quote", {
     quote: null,
     contract: null,
     drawing: null,
@@ -678,7 +688,7 @@ function readDocumentInputSelection(input) {
   }
 }
 
-function initializeDocumentWorkspace(root, workspaceRoot) {
+function initializeDocumentWorkspace(root, workspaceRoot, initialMode) {
   const tabs = root.querySelectorAll("[data-document-tab]");
   const panels = root.querySelectorAll("[data-document-panel]");
   const fileInputs = root.querySelectorAll("[data-document-file]");
@@ -695,7 +705,7 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
   const workspaceStart = root.querySelector("[data-workspace-start]");
   const saveReport = root.querySelector("[data-save-report]");
   const saveGate = root.querySelector("[data-save-gate]");
-  let workspaceState = createDocumentWorkspaceState();
+  let workspaceState = createDocumentWorkspaceState(initialMode);
 
   function tabKind(tab) {
     const candidate = tab && tab.dataset ? tab.dataset.documentTab : null;
@@ -930,13 +940,22 @@ function initializeDocumentWorkspace(root, workspaceRoot) {
   render();
 }
 
-function initializeQuoteCheckPage() {
-  const root = document.querySelector("[data-quote-check-page]");
+export function initializeQuoteCheckPage(documentRoot = document, locationSource = globalThis.location) {
+  const root = documentRoot.querySelector("[data-quote-check-page]");
   if (!root) return;
 
   const workspaceRoot = root.querySelector("[data-document-workspace-root]");
   if (workspaceRoot) {
-    initializeDocumentWorkspace(root, workspaceRoot);
+    let search = "";
+    try {
+      search = typeof locationSource?.search === "string"
+        ? locationSource.search
+        : "";
+    } catch {
+      search = "";
+    }
+    const initialMode = resolveDocumentWorkspaceMode(search);
+    initializeDocumentWorkspace(root, workspaceRoot, initialMode);
     return;
   }
 

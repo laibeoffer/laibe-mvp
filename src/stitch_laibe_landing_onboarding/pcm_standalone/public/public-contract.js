@@ -1,4 +1,5 @@
 import {
+  getActiveCanonicalLinkHref,
   getActiveRouteHref,
   getCompatibilityRouteHref,
 } from "./pcm-flow-route-manifest.js";
@@ -91,6 +92,13 @@ Object.defineProperties(publicRoutes, {
   contractPrerequisites: { value: getActiveRouteHref("contractPrerequisites"), enumerable: false },
   contractSigning: { value: getActiveRouteHref("contractSigning"), enumerable: false },
   ownerWorkspace: { value: getActiveRouteHref("ownerWorkspace"), enumerable: false },
+  homeServiceConfirmationToOwnerContractManagement: { value: getActiveCanonicalLinkHref("homeServiceConfirmationToOwnerContractManagement"), enumerable: false },
+  homeHeaderServiceContractToOwnerContractManagement: { value: getActiveCanonicalLinkHref("homeHeaderServiceContractToOwnerContractManagement"), enumerable: false },
+  homeDecisionQuoteCheckToQuoteCheck: { value: getActiveCanonicalLinkHref("homeDecisionQuoteCheckToQuoteCheck"), enumerable: false },
+  homeDecisionDrawingCheckToQuoteCheck: { value: getActiveCanonicalLinkHref("homeDecisionDrawingCheckToQuoteCheck"), enumerable: false },
+  homeDecisionCustomContractToQuoteCheck: { value: getActiveCanonicalLinkHref("homeDecisionCustomContractToQuoteCheck"), enumerable: false },
+  accountAccessOwnerLoginToOwnerWorkspace: { value: getActiveCanonicalLinkHref("accountAccessOwnerLoginToOwnerWorkspace"), enumerable: false },
+  accountAccessInvitedPartnerLoginToVendorWorkspace: { value: getActiveCanonicalLinkHref("accountAccessInvitedPartnerLoginToVendorWorkspace"), enumerable: false },
   vendorWorkspace: { value: getActiveRouteHref("vendorWorkspace"), enumerable: false },
   accessUnavailable: { value: getActiveRouteHref("accessUnavailable"), enumerable: false },
   ownerStart: { value: getCompatibilityRouteHref("ownerStart"), enumerable: false },

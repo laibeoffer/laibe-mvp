@@ -553,7 +553,7 @@ test("quote check starts as one canonical three-file page", async () => {
 test("quote check final runtime asset identity binds the changed page assets", async () => {
   const html = await readFile(htmlPath, "utf8");
 
-  assert.match(html, /href="\.\/styles\.css\?v=20260816-document-report"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260817-workspace-hero"/);
   assert.match(html, /src="\.\/app\.js\?v=20260816-document-report"/);
 });
 
@@ -575,6 +575,10 @@ test("quote check header keeps the current page and DRS home visible", async () 
     html,
     /<nav class="quote-header__nav" aria-label="DRS 主要導覽">[\s\S]*?href="\.\.\/public_home\/code\.html#top"[\s\S]*?>DRS 首頁<\/a>[\s\S]*?aria-current="page"[\s\S]*?>文件健檢<\/a>[\s\S]*?<\/nav>/u,
   );
+  assert.match(
+    html,
+    /<a\b(?=[^>]*class="quote-brand")(?=[^>]*href="\.\.\/public_home\/code\.html#top")(?=[^>]*aria-label="LaiBE DRS 首頁")[^>]*>[\s\S]*?laibe_offer\.svg[\s\S]*?drs-brand-lockup drs-brand-lockup--expanded/u,
+  );
   assert.doesNotMatch(html, /quote-context-bar|data-quote-context/u);
   assert.doesNotMatch(html, /PCM 首頁/u);
   assert.match(styles, /\.quote-header__nav a\s*\{[^}]*white-space:\s*nowrap;/u);
@@ -582,6 +586,100 @@ test("quote check header keeps the current page and DRS home visible", async () 
     styles,
     /\.quote-header \.quote-brand \.drs-brand-lockup\s*\{[^}]*display:\s*none;/u,
   );
+  assert.match(
+    styles,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.quote-header__nav a\s*\{[^}]*min-block-size:\s*44px;/u,
+  );
+});
+
+test("mode query maps quote drawing and contract before the document workspace renders", async () => {
+  const app = await import(`${pathToFileURL(appPath).href}?document-mode-map=${Date.now()}`);
+  assert.equal(typeof app.resolveDocumentWorkspaceMode, "function");
+  assert.equal(app.resolveDocumentWorkspaceMode("?mode=quote"), "quote");
+  assert.equal(app.resolveDocumentWorkspaceMode("?mode=drawing"), "drawing");
+  assert.equal(app.resolveDocumentWorkspaceMode("?mode=contract"), "contract");
+
+  const source = await readFile(appPath, "utf8");
+  assert.match(source, /new URLSearchParams\(/u);
+  assert.match(
+    source,
+    /let workspaceState = createDocumentWorkspaceState\(initialMode\);[\s\S]*?render\(\);/u,
+  );
+});
+
+test("production bootstrap applies mode to the first rendered tab and panel state", async () => {
+  const app = await import(`${pathToFileURL(appPath).href}?document-bootstrap=${Date.now()}`);
+  assert.equal(typeof app.initializeQuoteCheckPage, "function");
+
+  function createBootstrapHarness() {
+    const tabs = ["quote", "contract", "drawing"].map((kind) => ({
+      dataset: { documentTab: kind },
+      attributes: new Map(),
+      tabIndex: -1,
+      addEventListener() {},
+      focus() {},
+      setAttribute(name, value) {
+        this.attributes.set(name, String(value));
+      },
+      getAttribute(name) {
+        return this.attributes.get(name) ?? null;
+      },
+    }));
+    const panels = ["quote", "contract", "drawing"].map((kind) => ({
+      dataset: { documentPanel: kind },
+      hidden: true,
+    }));
+    const workspaceRoot = {};
+    const pageRoot = {
+      querySelectorAll(selector) {
+        if (selector === "[data-document-tab]") return tabs;
+        if (selector === "[data-document-panel]") return panels;
+        return [];
+      },
+      querySelector(selector) {
+        if (selector === "[data-document-workspace-root]") return workspaceRoot;
+        return null;
+      },
+    };
+    const documentRoot = {
+      querySelector(selector) {
+        return selector === "[data-quote-check-page]" ? pageRoot : null;
+      },
+    };
+    return { documentRoot, panels, tabs };
+  }
+
+  const cases = [
+    ["?mode=quote", "quote"],
+    ["?mode=drawing", "drawing"],
+    ["?mode=contract", "contract"],
+    ["", "quote"],
+    ["?mode=", "quote"],
+    ["?mode=specification", "quote"],
+    ["?mode=QUOTE", "quote"],
+  ];
+
+  for (const [search, expectedKind] of cases) {
+    const harness = createBootstrapHarness();
+    app.initializeQuoteCheckPage(harness.documentRoot, { search });
+    for (const tab of harness.tabs) {
+      const active = tab.dataset.documentTab === expectedKind;
+      assert.equal(tab.getAttribute("aria-selected"), active ? "true" : "false", search);
+      assert.equal(tab.tabIndex, active ? 0 : -1, search);
+    }
+    for (const panel of harness.panels) {
+      const active = panel.dataset.documentPanel === expectedKind;
+      assert.equal(panel.hidden, !active, search);
+    }
+  }
+});
+
+test("missing or invalid mode query falls back quietly to quote", async () => {
+  const app = await import(`${pathToFileURL(appPath).href}?document-mode-fallback=${Date.now()}`);
+  assert.equal(typeof app.resolveDocumentWorkspaceMode, "function");
+  for (const search of ["", "?mode=", "?mode=specification", "?mode=QUOTE", "?other=drawing"]) {
+    assert.equal(app.resolveDocumentWorkspaceMode(search), "quote", search);
+  }
 });
 
 test("quote check completion path explains why to return home", async () => {
@@ -601,12 +699,51 @@ test("quote check completion path explains why to return home", async () => {
   );
 });
 
-test("hero assurances put document risk before registration and assisted decisions", async () => {
+test("document workspace is the sole hero immediately after the global header", async () => {
   const html = await readFile(htmlPath, "utf8");
+  const mainSource = html.match(
+    /<main\b[^>]*data-quote-check-page[^>]*>([\s\S]*?)<\/main>/u,
+  )?.[1];
 
+  assert.ok(mainSource, "quote check main content must exist");
   assert.match(
     html,
-    /<ul class="quote-assurances"[^>]*>[\s\S]*?<li>先不著急註冊<\/li>[\s\S]*?<li>檢查手上資料漏洞要緊<\/li>[\s\S]*?<li>了解DRS隨時可叫停的契約方案<\/li>[\s\S]*?<li>再決定要不要我們輔助你的決策<\/li>[\s\S]*?<\/ul>/u,
+    /<\/header>\s*<main\b[^>]*data-quote-check-page[^>]*>\s*<section class="document-workspace document-workspace--hero" id="document-workspace" data-document-workspace-root aria-labelledby="workspace-title">/u,
+  );
+  assert.match(
+    mainSource,
+    /^\s*<section class="document-workspace document-workspace--hero" id="document-workspace" data-document-workspace-root aria-labelledby="workspace-title">[\s\S]*?<p class="workspace-heading__eyebrow">從手上已有的文件開始<\/p>\s*<h1 id="workspace-title">選一份文件，先看哪裡不能只靠口頭帶過。<\/h1>/u,
+  );
+  assert.equal((html.match(/<h1\b/gu) ?? []).length, 1);
+  assert.equal((html.match(/從手上已有的文件開始/gu) ?? []).length, 1);
+  assert.equal(
+    (html.match(/選一份文件，先看哪裡不能只靠口頭帶過。/gu) ?? []).length,
+    1,
+  );
+  assert.equal((html.match(/class="workspace-now"/gu) ?? []).length, 1);
+  assert.equal((html.match(/role="tablist"/gu) ?? []).length, 1);
+  assert.equal((html.match(/data-document-tab=/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-document-panel=/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-document-file=/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-document-dropzone=/gu) ?? []).length, 3);
+  for (const id of [
+    "document-workspace",
+    "workspace-title",
+    "document-tab-quote",
+    "document-tab-contract",
+    "document-tab-drawing",
+    "document-panel-quote",
+    "document-panel-contract",
+    "document-panel-drawing",
+    "document-file-quote",
+    "document-file-contract",
+    "document-file-drawing",
+  ]) {
+    assert.equal((html.match(new RegExp(`id="${id}"`, "gu")) ?? []).length, 1, id);
+  }
+  assert.doesNotMatch(
+    html,
+    /id="quote-title"|quote-hero__copy|quote-assurances|document-ledger|data-hero-start|data-workspace-start/u,
   );
 });
 
@@ -853,8 +990,9 @@ test("selection stays local and never claims durable upload or a formal result",
   assert.doesNotMatch(visible, /上傳成功|已保存|已建立案件|健檢完成|正式健檢結果/);
   assert.doesNotMatch(
     `${html}\n${await readOrEmpty(appPath)}`,
-    /localStorage|sessionStorage|URLSearchParams|location\.(?:search|hash)|raw JSON/i,
+    /localStorage|sessionStorage|location\.hash|raw JSON/i,
   );
+  assert.match(await readOrEmpty(appPath), /URLSearchParams/u);
 });
 
 test("unknown file rules stay pending instead of inventing numeric limits", async () => {
@@ -1641,19 +1779,19 @@ test("production drawing listener closes hostile hrefs after post-load intrinsic
   }
 });
 
-test("continuation facts and focus targets stay visible at short viewports", async () => {
+test("promoted workspace facts and focus targets stay visible at short viewports", async () => {
   const [html, styles] = await Promise.all([
     readOrEmpty(htmlPath),
     readOrEmpty(cssPath),
   ]);
   assert.equal((html.match(/data-current-status/g) ?? []).length, 2);
   assert.equal((html.match(/data-current-next/g) ?? []).length, 2);
-  assert.match(html, /data-hero-start/);
+  assert.doesNotMatch(html, /data-hero-start/);
   assert.equal((html.match(/data-panel-focus/g) ?? []).length, 9);
   assert.equal((html.match(/data-panel-focus[^>]*tabindex="-1"|tabindex="-1"[^>]*data-panel-focus/g) ?? []).length, 9);
   assert.match(styles, /\[data-panel-focus\]:focus/);
   assert.match(styles, /max-height:\s*700px/);
-  assert.match(styles, /quote-hero__continuation/);
+  assert.match(styles, /document-workspace--hero/);
   assert.doesNotMatch(styles, /\.quote-context-bar\s*\{/u);
   assert.match(
     styles,

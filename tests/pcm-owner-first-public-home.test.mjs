@@ -11,6 +11,8 @@ const pageRoot = new URL(
 const htmlUrl = new URL("code.html", pageRoot);
 const cssUrl = new URL("styles.css", pageRoot);
 const appUrl = new URL("app.js", pageRoot);
+const publicContractUrl = new URL("../public/public-contract.js", pageRoot);
+const routeManifestUrl = new URL("../public/pcm-flow-route-manifest.js", pageRoot);
 const heroDrsMarkUrl = new URL("assets/d_rs_03_compact_d0e0e3.png", pageRoot);
 const governanceUrl = new URL(
   "../docs/governance/pcm-owner-first-execution-manifest.v1.json",
@@ -545,12 +547,18 @@ test("section 8 assigns one clear responsibility to the contractor, DRS, and own
 test("section 9 leads with the first document review rather than login technology", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const section = readSection(html, "final-action");
+  const quoteAction = section.match(
+    /<a\b(?=[^>]*data-route="quoteCheck")[^>]*>[\s\S]*?直接試做報價健檢[\s\S]*?<\/a>/,
+  )?.[0] ?? "";
 
   assert.match(section, /從你手上的資料開始/);
   assert.match(section, /不用先相信 DRS[\s\S]*先讓 DRS 替你核對一次/);
   assert.match(section, /直接試做報價健檢/);
   assert.match(section, /登入／進入工作台/);
-  assert.match(section, /data-route="quoteCheck"[\s\S]*href="\.\.\/quote_check\/code\.html"/);
+  assert.match(quoteAction, /data-route-state="planned"/);
+  assert.match(quoteAction, /aria-disabled="true"/);
+  assert.match(quoteAction, /tabindex="-1"/);
+  assert.doesNotMatch(quoteAction, /\shref=/);
   assert.match(section, /data-route="accountAccess"[\s\S]*data-route-state="planned"/);
   assert.doesNotMatch(section, /申請 Email 一次性登入/);
 });
@@ -563,7 +571,7 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
   const section = html.slice(sectionStart, sectionEnd);
   const labels = [
     "報價資料健檢",
-    "簽署服務契約",
+    "管理 DRS 契約",
     "邀請乙方加入",
     "案件決策輔助",
     "撥款驗收書面審核",
@@ -577,7 +585,7 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
 
   for (const [step, route, label] of [
     ["01", "quoteCheck", "報價資料健檢"],
-    ["02", "serviceContract", "簽署服務契約"],
+    ["02", "homeServiceConfirmationToOwnerContractManagement", "管理 DRS 契約"],
   ]) {
     const control = html.match(
       new RegExp(`<a\\b(?=[^>]*data-entry-step="${step}")(?=[^>]*data-route="${route}")[^>]*>[\\s\\S]*?${label}[\\s\\S]*?<\\/a>`),
@@ -606,6 +614,167 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
   assert.doesNotMatch(section, /risk-map__number|>\s*風險\s*</);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.entry-choice\s*\{/);
   assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
+});
+
+test("Public Home canonical header and decision entries use the approved DRS routes", async () => {
+  const [html, appSource] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(appUrl, "utf8"),
+  ]);
+  const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
+  const decisionSection = readSection(html, "decision-prompts");
+  const contractCard = html.match(
+    /<a\b(?=[^>]*class="entry-choice entry-choice--contract")(?=[^>]*data-entry-step="02")[^>]*>[\s\S]*?<\/a>/,
+  )?.[0] ?? "";
+
+  assert.match(
+    header,
+    /<a\b(?=[^>]*class="brand")(?=[^>]*href="#top")(?=[^>]*aria-label="LaiBE DRS 首頁")[^>]*>[\s\S]*?laibe_offer\.svg[\s\S]*?drs-brand-lockup/,
+  );
+  for (const label of ["文件健檢", "登入／進入工作台", "關於 DRS", "DRS 契約管理"]) {
+    assert.match(header, new RegExp(label));
+  }
+  assert.match(
+    header,
+    /data-route="homeHeaderServiceContractToOwnerContractManagement"[\s\S]*?>DRS 契約管理<\/a>/,
+  );
+  assert.match(
+    contractCard,
+    /data-route="homeServiceConfirmationToOwnerContractManagement"[\s\S]*?契約管理[\s\S]*?前往契約管理/,
+  );
+  assert.doesNotMatch(contractCard, /簽署|完成簽署|先閱讀服務契約/);
+
+  assert.match(decisionSection, /data-decision-node="Q01"[\s\S]*?材料是否安全？[\s\S]*?材料型號、規格/);
+  assert.doesNotMatch(
+    `${decisionSection}\n${appSource}`,
+    /data-decision-tool="specification"|homeDecisionSpecificationCheckToQuoteCheck/,
+  );
+
+  const expectedModes = [
+    ["homeDecisionQuoteCheckToQuoteCheck", "報價", "健檢", "../quote_check/code.html?mode=quote#document-workspace"],
+    ["homeDecisionDrawingCheckToQuoteCheck", "圖說", "檢查", "../quote_check/code.html?mode=drawing#document-workspace"],
+    ["homeDecisionCustomContractToQuoteCheck", "契約", "健檢", "../quote_check/code.html?mode=contract#document-workspace"],
+  ];
+  const { PUBLIC_ROUTES } = await import(
+    `${publicContractUrl.href}?home-approved-entry-modes=${Date.now()}`
+  );
+  const { bindPublicRoutes } = await import(
+    `${appUrl.href}?home-approved-entry-modes=${Date.now()}`
+  );
+  const controls = expectedModes.map(([routeId]) => makeRouteControl(routeId));
+  bindPublicRoutes(
+    { querySelectorAll: () => controls },
+    Object.fromEntries(expectedModes.map(([routeId]) => [routeId, PUBLIC_ROUTES[routeId]])),
+  );
+  for (const [index, [routeId, subject, action, href]] of expectedModes.entries()) {
+    assert.match(
+      decisionSection,
+      new RegExp(`data-route="${routeId}"[\\s\\S]*?decision-node__tool-subject">${subject}<[\\s\\S]*?decision-node__tool-action">${action}<`),
+    );
+    assert.equal(PUBLIC_ROUTES[routeId], href);
+    assert.equal(controls[index].getAttribute("href"), href);
+  }
+});
+
+test("selected service-confirmation card consumes the manifest-only owner contract-management href", async () => {
+  const routeId = "homeServiceConfirmationToOwnerContractManagement";
+  const formalHref = "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract";
+  const [html, appSource, publicContractSource] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(appUrl, "utf8"),
+    readFile(publicContractUrl, "utf8"),
+  ]);
+  const { PCM_FLOW_ROUTE_MANIFEST } = await import(
+    `${routeManifestUrl.href}?home-card-contract-management=${Date.now()}`
+  );
+  const selectedCard = html.match(
+    /<a\b(?=[^>]*class="entry-choice entry-choice--contract")(?=[^>]*data-entry-step="02")[^>]*>[\s\S]*?<\/a>/,
+  )?.[0] ?? "";
+  const ownedLinks = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(
+    (link) => link.id === routeId,
+  );
+
+  assert.match(selectedCard, new RegExp(`data-route="${routeId}"`));
+  assert.match(selectedCard, /契約管理[\s\S]*管理 DRS 契約[\s\S]*查看契約狀態、待補資料與雙方確認事項[\s\S]*前往契約管理[\s\S]*約[\s\S]*02/);
+  assert.doesNotMatch(selectedCard, /簽署|完成簽署|先閱讀服務契約/);
+  assert.doesNotMatch(selectedCard, /data-route="serviceContract"|\.\.\/service_contract\/code\.html|\shref=/);
+  assert.equal(ownedLinks.length, 1);
+  assert.equal(ownedLinks[0].relativeHref, formalHref);
+  for (const consumerSource of [html, appSource, publicContractSource]) {
+    assert.equal(consumerSource.includes(formalHref), false);
+  }
+  assert.match(publicContractSource, /getActiveCanonicalLinkHref\("homeServiceConfirmationToOwnerContractManagement"\)/);
+
+  const { PUBLIC_ROUTES } = await import(`${publicContractUrl.href}?home-contract-management=${Date.now()}`);
+  const { bindPublicRoutes } = await import(`${appUrl.href}?home-contract-management=${Date.now()}`);
+  assert.equal(PUBLIC_ROUTES[routeId], formalHref);
+  assert.equal(PUBLIC_ROUTES.serviceContract, "../service_contract/code.html");
+
+  const selectedControl = makeRouteControl(routeId);
+  bindPublicRoutes(
+    { querySelectorAll: () => [selectedControl] },
+    { [routeId]: PUBLIC_ROUTES[routeId] },
+  );
+  assert.equal(selectedControl.getAttribute("href"), formalHref);
+  assert.equal(selectedControl.getAttribute("aria-disabled"), null);
+  assert.equal(selectedControl.getAttribute("tabindex"), null);
+  assert.equal(selectedControl.dataset.routeState, "active");
+
+  assert.equal(html.includes("../quote_check/code.html"), false);
+});
+
+test("Public Home header DRS service contract binds its dedicated manifest-only owner contract-management href", async () => {
+  const routeId = "homeHeaderServiceContractToOwnerContractManagement";
+  const formalHref = "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract";
+  const [html, appSource, publicContractSource] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(appUrl, "utf8"),
+    readFile(publicContractUrl, "utf8"),
+  ]);
+  const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
+  const headerActions = [
+    ...header.matchAll(/<a\b(?=[^>]*class="header-action(?: [^"]*)?")[^>]*>[\s\S]*?<\/a>/g),
+  ].map((match) => match[0]);
+  const headerControl = headerActions[3] ?? "";
+
+  assert.equal(headerActions.length, 4);
+  assert.match(headerControl, /DRS 契約管理/);
+  assert.match(headerControl, new RegExp(`data-route="${routeId}"`));
+  assert.match(headerControl, /data-route-state="planned"/);
+  assert.match(headerControl, /aria-disabled="true"/);
+  assert.match(headerControl, /tabindex="-1"/);
+  assert.doesNotMatch(headerControl, /data-route="serviceContract"|\shref=/);
+
+  for (const consumerSource of [html, appSource, publicContractSource]) {
+    assert.equal(consumerSource.includes(formalHref), false);
+  }
+  assert.match(
+    publicContractSource,
+    /getActiveCanonicalLinkHref\("homeHeaderServiceContractToOwnerContractManagement"\)/,
+  );
+  assert.match(
+    appSource,
+    /case "homeHeaderServiceContractToOwnerContractManagement":/,
+  );
+
+  const { PUBLIC_ROUTES } = await import(
+    `${publicContractUrl.href}?home-header-contract-management=${Date.now()}`
+  );
+  const { bindPublicRoutes } = await import(
+    `${appUrl.href}?home-header-contract-management=${Date.now()}`
+  );
+  assert.equal(PUBLIC_ROUTES[routeId], formalHref);
+  assert.equal(PUBLIC_ROUTES.serviceContract, "../service_contract/code.html");
+
+  const selectedControl = makeRouteControl(routeId);
+  bindPublicRoutes(
+    { querySelectorAll: () => [selectedControl] },
+    { [routeId]: PUBLIC_ROUTES[routeId] },
+  );
+  assert.equal(selectedControl.getAttribute("href"), formalHref);
+  assert.equal(selectedControl.getAttribute("aria-disabled"), null);
+  assert.equal(selectedControl.getAttribute("tabindex"), null);
+  assert.equal(selectedControl.dataset.routeState, "active");
 });
 
 test("entry stages adopt luminous risk-card glass with clear neutral sequence plaques", async () => {
@@ -665,7 +834,7 @@ test("entry stages adopt luminous risk-card glass with clear neutral sequence pl
 test("entry stage kickers remain readable inside the glass card hierarchy", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
-  const kickerLabels = ["文件核對", "服務確認", "成員加入", "案件治理", "驗收確認"];
+  const kickerLabels = ["文件核對", "契約管理", "成員加入", "案件治理", "驗收確認"];
 
   assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
 
@@ -697,7 +866,7 @@ test("entry stage cards keep supporting copy visible in the editorial reading fl
 
   assert.equal((section.match(/class="entry-choice__details"/g) ?? []).length, 5);
   assert.match(section, /class="entry-choice__details">\s*<small>核對報價範圍、缺漏與版本差異<\/small>\s*<span class="entry-choice__status">可先查看<\/span>/);
-  assert.match(section, /class="entry-choice__details">\s*<small>先閱讀服務範圍，確認必要資料後再完成簽署<\/small>\s*<span class="entry-choice__status">先閱讀服務契約<\/span>/);
+  assert.match(section, /class="entry-choice__details">\s*<small>查看契約狀態、待補資料與雙方確認事項<\/small>\s*<span class="entry-choice__status">前往契約管理<\/span>/);
   assert.match(section, /class="entry-choice__details">\s*<small>核對驗收紀錄、缺失改善與撥款依據是否齊備<\/small>\s*<span class="entry-choice__status">書面確認後進行<\/span>/);
   assert.match(css, /\.entry-choice__details\s*\{[^}]*max-height:\s*none;[^}]*overflow:\s*visible;[^}]*opacity:\s*1/s);
   assert.match(css, /\.entry-choices__list\s*\{[^}]*display:\s*grid/s);
@@ -794,7 +963,7 @@ test("homepage turns five owner concerns into a central DRS decision path", asyn
   assert.match(decisionSection, /它會整理哪些內容已有依據、哪些資訊仍有缺漏，以及下一步需要誰補充，讓你不必只靠口頭解釋做決定。/);
   assert.match(decisionSection, /class="decision-path__arrow"/);
   assert.match(decisionSection, /class="decision-cta__microcopy">先從手上的報價單與施工圖開始<\/p>/);
-  assert.match(decisionSection, /data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?<span class="decision-cta__primary-label">直接試做報價健檢<\/span>[\s\S]*?<\/a>/);
+  assert.match(decisionSection, /<a\b(?=[^>]*data-route="quoteCheck")(?=[^>]*data-route-state="planned")(?=[^>]*aria-disabled="true")(?=[^>]*tabindex="-1")(?![^>]*\shref=)[^>]*>[\s\S]*?<span class="decision-cta__primary-label">直接試做報價健檢<\/span>[\s\S]*?<\/a>/);
   assert.match(decisionSection, /<a class="decision-cta__secondary decision-cta__glass decision-cta__glass--info" href="#pcm-scope">[\s\S]*?先看 DRS 如何核對[\s\S]*?<\/a>/);
   assert.doesNotMatch(decisionSection, /關於萊比？/);
   assert.match(css, /\.hero\s*\{[^}]*width:\s*min\(calc\(100% - 40px\),\s*1480px\);[^}]*min-height:\s*calc\(100svh - var\(--header-height\)\);[^}]*grid-template-columns:\s*minmax\(0,\s*62fr\)\s+minmax\(0,\s*38fr\)/s);
@@ -831,39 +1000,77 @@ test("homepage turns five owner concerns into a central DRS decision path", asyn
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.decision-path__spine,[\s\S]*?\.decision-node,[\s\S]*?\.decision-convergence,[\s\S]*?\.decision-cta\s*\{[^}]*animation:\s*none/s);
 });
 
-test("four decision branches end in aqua-glass actions with truthful destinations", async () => {
-  const html = await readFile(htmlUrl, "utf8");
-  const css = await readFile(cssUrl, "utf8");
+test("three decision branches consume their dedicated manifest-only quote-check mode routes", async () => {
+  const [html, css, appSource, publicContractSource] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(cssUrl, "utf8"),
+    readFile(appUrl, "utf8"),
+    readFile(publicContractUrl, "utf8"),
+  ]);
   const decisionSection = readSection(html, "decision-prompts");
   assert.match(html, /href="\.\/styles\.css\?v=20260815-mobile-header-fit"/);
   const nodes = [...decisionSection.matchAll(/<li\b[^>]*class="decision-node decision-node--(?:left|right)(?: decision-node--action)?"[\s\S]*?<\/li>/g)].map(
     (match) => match[0],
   );
-  const quoteTools = [...decisionSection.matchAll(
-    /<a\b(?=[^>]*class="decision-node__tool")(?=[^>]*data-decision-tool)(?=[^>]*data-route="quoteCheck")(?=[^>]*href="\.\.\/quote_check\/code\.html")[^>]*>[\s\S]*?<\/a>/g,
-  )].map((match) => match[0]);
-  const contractTool = decisionSection.match(
-    /<a\b(?=[^>]*class="decision-node__tool")(?=[^>]*data-decision-tool="contract")(?=[^>]*data-route="serviceContract")(?=[^>]*href="\.\.\/service_contract\/code\.html")[^>]*>[\s\S]*?<\/a>/,
-  )?.[0] ?? "";
-  const tools = [...quoteTools, contractTool].filter(Boolean);
+  const expectedTools = [
+    {
+      decisionTool: "quote",
+      routeId: "homeDecisionQuoteCheckToQuoteCheck",
+      subject: "報價",
+      action: "健檢",
+      href: "../quote_check/code.html?mode=quote#document-workspace",
+    },
+    {
+      decisionTool: "drawing",
+      routeId: "homeDecisionDrawingCheckToQuoteCheck",
+      subject: "圖說",
+      action: "檢查",
+      href: "../quote_check/code.html?mode=drawing#document-workspace",
+    },
+    {
+      decisionTool: "contract",
+      routeId: "homeDecisionCustomContractToQuoteCheck",
+      subject: "契約",
+      action: "健檢",
+      href: "../quote_check/code.html?mode=contract#document-workspace",
+    },
+  ];
+  const tools = expectedTools.map(({ decisionTool }) => decisionSection.match(
+    new RegExp(`<a\\b(?=[^>]*class="decision-node__tool")(?=[^>]*data-decision-tool="${decisionTool}")[^>]*>[\\s\\S]*?<\\/a>`),
+  )?.[0] ?? "");
 
   assert.equal(nodes.length, 5);
-  assert.equal(quoteTools.length, 3);
-  assert.equal(tools.length, 4);
+  assert.equal(tools.length, 3);
   assert.deepEqual(
     tools.map((tool) => ({
       subject: tool.match(/<span class="decision-node__tool-subject">([^<]+)<\/span>/)?.[1],
       action: tool.match(/<span class="decision-node__tool-action">([^<]+)<\/span>/)?.[1],
     })),
-    [
-      { subject: "規格", action: "檢查" },
-      { subject: "報價", action: "健檢" },
-      { subject: "圖說", action: "檢查" },
-      { subject: "訂製化", action: "合約" },
-    ],
+    expectedTools.map(({ subject, action }) => ({ subject, action })),
   );
+  for (const [index, expected] of expectedTools.entries()) {
+    const tool = tools[index];
+    assert.match(tool, new RegExp(`data-route="${expected.routeId}"`));
+    assert.match(tool, /data-route-state="planned"/);
+    assert.match(tool, /aria-disabled="true"/);
+    assert.match(tool, /tabindex="-1"/);
+    assert.doesNotMatch(tool, /\shref=|\.\.\/quote_check\/code\.html|\.\.\/service_contract\/code\.html/);
+    assert.match(
+      publicContractSource,
+      new RegExp(`getActiveCanonicalLinkHref\\("${expected.routeId}"\\)`),
+    );
+    assert.match(appSource, new RegExp(`case "${expected.routeId}":`));
+  }
+  for (const consumerSource of [html, appSource, publicContractSource]) {
+    assert.equal(consumerSource.includes("../quote_check/code.html"), false);
+    assert.equal(
+      consumerSource.includes("http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html"),
+      false,
+    );
+  }
   assert.ok(tools.every((tool) => /<svg\b[^>]*class="decision-node__tool-icon"[^>]*aria-hidden="true"/.test(tool)));
-  assert.match(nodes[0], /<h3>材料是否安全？<\/h3>[\s\S]*?data-decision-tool="specification"/);
+  assert.match(nodes[0], /<h3>材料是否安全？<\/h3>[\s\S]*?材料型號、規格/);
+  assert.doesNotMatch(nodes[0], /decision-node__tool|data-decision-tool|homeDecisionSpecificationCheckToQuoteCheck/);
   assert.match(nodes[1], /<h3>報價合不合理？<\/h3>[\s\S]*?data-decision-tool="quote"/);
   assert.match(nodes[2], /<h3>圖說是否缺漏？<\/h3>[\s\S]*?data-decision-tool="drawing"/);
   assert.doesNotMatch(nodes[3], /decision-node__tool|data-decision-tool/);
@@ -890,7 +1097,26 @@ test("four decision branches end in aqua-glass actions with truthful destination
   assert.match(css, /\.decision-node__tool:hover\s*\{[^}]*transform:\s*translateY\(calc\(50%\s*-\s*2px\)\)/s);
   assert.match(css, /\.decision-node__tool:focus-visible\s*\{[^}]*outline:\s*2px solid #fff/s);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*0/s);
-  assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node__tool\s*\{[^}]*min-height:\s*38px;[^}]*font-size:\s*0\.68rem/s);
+  assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node__tool\s*\{[^}]*min-height:\s*44px;[^}]*font-size:\s*0\.68rem/s);
+
+  const { PUBLIC_ROUTES } = await import(
+    `${publicContractUrl.href}?home-decision-routes=${Date.now()}`
+  );
+  const { bindPublicRoutes } = await import(
+    `${appUrl.href}?home-decision-routes=${Date.now()}`
+  );
+  const controls = expectedTools.map(({ routeId }) => makeRouteControl(routeId));
+  const routes = Object.fromEntries(
+    expectedTools.map(({ routeId }) => [routeId, PUBLIC_ROUTES[routeId]]),
+  );
+  bindPublicRoutes({ querySelectorAll: () => controls }, routes);
+  for (const [index, control] of controls.entries()) {
+    assert.equal(PUBLIC_ROUTES[expectedTools[index].routeId], expectedTools[index].href);
+    assert.equal(control.getAttribute("href"), expectedTools[index].href);
+    assert.equal(control.getAttribute("aria-disabled"), null);
+    assert.equal(control.getAttribute("tabindex"), null);
+    assert.equal(control.dataset.routeState, "active");
+  }
 });
 
 test("primary quote-check action extends the decision glass language in orange", async () => {
@@ -898,12 +1124,16 @@ test("primary quote-check action extends the decision glass language in orange",
   const css = await readFile(cssUrl, "utf8");
   const decisionSection = readSection(html, "decision-prompts");
   const primaryAction = decisionSection.match(
-    /<a\b(?=[^>]*class="button button--primary")(?=[^>]*data-route="quoteCheck")(?=[^>]*href="\.\.\/quote_check\/code\.html")[^>]*>[\s\S]*?<\/a>/,
+    /<a\b(?=[^>]*class="button button--primary")(?=[^>]*data-route="quoteCheck")[^>]*>[\s\S]*?<\/a>/,
   )?.[0] ?? "";
   const glassCss = css.match(/\.decision-cta\s+\.button--primary\s*\{[^}]*\}/s)?.[0] ?? "";
 
   assert.match(primaryAction, /<span class="decision-cta__primary-label">直接試做報價健檢<\/span>/);
   assert.match(primaryAction, /<span class="decision-cta__primary-arrow" aria-hidden="true">→<\/span>/);
+  assert.match(primaryAction, /data-route-state="planned"/);
+  assert.match(primaryAction, /aria-disabled="true"/);
+  assert.match(primaryAction, /tabindex="-1"/);
+  assert.doesNotMatch(primaryAction, /\shref=/);
   assert.match(glassCss, /--cta-glass:\s*#ff5809/);
   assert.match(glassCss, /overflow:\s*hidden/);
   assert.match(glassCss, /radial-gradient\(ellipse at 50% 88%/);
@@ -944,11 +1174,11 @@ test("header starts fail closed and delegates the canonical shared account entry
   const html = await readFile(htmlUrl, "utf8");
   const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
   const accountEntry = header.match(
-    /<a\b(?=[^>]*class="header-action header-action--account")(?=[^>]*data-account-entry)(?=[^>]*data-route="accountAccess")(?=[^>]*data-canonical-route="\/account\/access")[^>]*>[\s\S]*?甲／乙方工作台[\s\S]*?<\/a>/,
+    /<a\b(?=[^>]*class="header-action header-action--account")(?=[^>]*data-account-entry)(?=[^>]*data-route="accountAccess")(?=[^>]*data-canonical-route="\/account\/access")[^>]*>[\s\S]*?登入／進入工作台[\s\S]*?<\/a>/,
   )?.[0] ?? "";
 
   assert.notEqual(accountEntry, "");
-  assert.equal((header.match(/甲／乙方工作台/g) ?? []).length, 1);
+  assert.equal((header.match(/登入／進入工作台/g) ?? []).length, 1);
   assert.match(accountEntry, /aria-disabled="true"/);
   assert.match(accountEntry, /tabindex="-1"/);
   assert.match(accountEntry, /data-route-state="planned"/);
@@ -965,9 +1195,9 @@ test("mobile header keeps only the primary audit and account actions visible", a
   assert.equal(actions.length, 4);
   assert.match(header, /文件健檢/);
   assert.doesNotMatch(header, /開始健檢/);
-  assert.match(header, /甲／乙方工作台/);
-  assert.match(header, /關於DRS/);
-  assert.match(header, /DRS服務合約/);
+  assert.match(header, /登入／進入工作台/);
+  assert.match(header, /關於 DRS/);
+  assert.match(header, /DRS 契約管理/);
   assert.doesNotMatch(header, /header-action--workspace|data-route="ownerWorkspace"|data-route="vendorWorkspace"/);
   assert.doesNotMatch(header, /完整流程|合作方式|里程碑治理|申請 Email 一次性登入|甲方登入／乙方受邀/);
   assert.match(css, /\.header-actions\s*\{[^}]*margin-left:\s*auto[^}]*justify-content:\s*flex-end/s);
@@ -975,6 +1205,108 @@ test("mobile header keeps only the primary audit and account actions visible", a
   assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header\s*\{[^}]*height:\s*72px[^}]*flex-wrap:\s*nowrap[\s\S]*?\.header-actions\s*\{[^}]*display:\s*flex[\s\S]*?\.header-action--context\s*\{[^}]*display:\s*none/s);
   assert.match(css, /@media\s*\(max-width:\s*440px\)\s*\{[\s\S]*?\.site-header\s+\.brand\s*>\s*\.drs-brand-lockup\s*\{[^}]*display:\s*none/s);
   assert.doesNotMatch(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.header-action\s*\{[^}]*width:\s*100%/s);
+});
+
+test("mobile actionable targets stay at least 44px through every effective breakpoint override", async () => {
+  const [html, css] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(cssUrl, "utf8"),
+  ]);
+  const decisionSection = readSection(html, "decision-prompts");
+
+  function closingBrace(source, openingBrace) {
+    let depth = 0;
+    for (let index = openingBrace; index < source.length; index += 1) {
+      if (source[index] === "{") depth += 1;
+      if (source[index] === "}") depth -= 1;
+      if (depth === 0) return index;
+    }
+    assert.fail(`unterminated CSS block at ${openingBrace}`);
+  }
+
+  function mediaApplies(prelude, viewport) {
+    const maxWidth = Number(prelude.match(/max-width:\s*(\d+)px/)?.[1] ?? Infinity);
+    const minWidth = Number(prelude.match(/min-width:\s*(\d+)px/)?.[1] ?? 0);
+    return viewport <= maxWidth && viewport >= minWidth;
+  }
+
+  function collectApplicableRules(source, viewport, rules = [], sequence = { value: 0 }) {
+    let cursor = 0;
+    while (cursor < source.length) {
+      const openingBrace = source.indexOf("{", cursor);
+      if (openingBrace < 0) break;
+      const end = closingBrace(source, openingBrace);
+      const rawPrelude = source.slice(cursor, openingBrace);
+      const prelude = rawPrelude.slice(rawPrelude.lastIndexOf(";") + 1).trim();
+      const block = source.slice(openingBrace + 1, end);
+
+      if (prelude.startsWith("@media")) {
+        if (mediaApplies(prelude, viewport)) {
+          collectApplicableRules(block, viewport, rules, sequence);
+        }
+      } else if (!prelude.startsWith("@")) {
+        const declarations = new Map();
+        for (const match of block.matchAll(/(?:^|;)\s*([a-z-]+)\s*:\s*([^;{}]+)(?=;|$)/g)) {
+          declarations.set(match[1], match[2].trim());
+        }
+        for (const selector of prelude.split(",").map((value) => value.trim())) {
+          if (!/^(?:\.[a-z0-9_-]+)+$/i.test(selector)) continue;
+          rules.push({
+            classes: [...selector.matchAll(/\.([a-z0-9_-]+)/gi)].map((match) => match[1]),
+            declarations,
+            order: sequence.value,
+          });
+          sequence.value += 1;
+        }
+      }
+      cursor = end + 1;
+    }
+    return rules;
+  }
+
+  function computedStyle(viewport, classes) {
+    const resolved = new Map();
+    const source = css.replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const rule of collectApplicableRules(source, viewport)) {
+      if (!rule.classes.every((className) => classes.includes(className))) continue;
+      const specificity = rule.classes.length;
+      for (const [property, value] of rule.declarations) {
+        const current = resolved.get(property);
+        if (!current || specificity > current.specificity || (
+          specificity === current.specificity && rule.order >= current.order
+        )) {
+          resolved.set(property, { order: rule.order, specificity, value });
+        }
+      }
+    }
+    return new Map([...resolved].map(([property, record]) => [property, record.value]));
+  }
+
+  const headerControls = [
+    ["header-action", "header-action--primary"],
+    ["header-action", "header-action--account"],
+    ["header-action", "header-action--context"],
+    ["header-action", "header-action--context"],
+  ];
+  const decisionControls = Array.from({ length: 3 }, () => ["decision-node__tool"]);
+
+  assert.equal((decisionSection.match(/data-decision-tool=/g) ?? []).length, 3);
+  for (const viewport of [360, 620, 680]) {
+    const visibleHeaderControls = headerControls.filter((classes) => (
+      computedStyle(viewport, classes).get("display") !== "none"
+    ));
+    assert.equal(visibleHeaderControls.length, viewport <= 620 ? 2 : 4, `${viewport}px header visibility`);
+    for (const classes of visibleHeaderControls) {
+      const minimum = Number.parseFloat(computedStyle(viewport, classes).get("min-height"));
+      assert.ok(minimum >= 44, `${viewport}px ${classes.join(".")} resolved to ${minimum}px`);
+    }
+    for (const classes of decisionControls) {
+      const style = computedStyle(viewport, classes);
+      assert.notEqual(style.get("display"), "none", `${viewport}px decision control visibility`);
+      const minimum = Number.parseFloat(style.get("min-height"));
+      assert.ok(minimum >= 44, `${viewport}px ${classes.join(".")} resolved to ${minimum}px`);
+    }
+  }
 });
 
 test("public home final runtime asset identity preserves the fitted mobile header stylesheet", async () => {
@@ -1668,14 +2000,14 @@ test("homepage consolidates the owner journey into one truthful conversion hiera
 
   assert.ok(positions.every((position) => position >= 0));
   assert.deepEqual(positions, [...positions].sort((a, b) => a - b));
-  assert.match(header, /class="header-action header-action--primary"[\s\S]*?data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?>文件健檢<\/a>/);
-  assert.match(header, /class="header-action header-action--account"[\s\S]*?data-account-entry[\s\S]*?>甲／乙方工作台<\/a>/);
+  assert.match(header, /<a\b(?=[^>]*class="header-action header-action--primary")(?=[^>]*data-route="quoteCheck")(?=[^>]*data-route-state="planned")(?=[^>]*aria-disabled="true")(?=[^>]*tabindex="-1")(?![^>]*\shref=)[^>]*>文件健檢<\/a>/);
+  assert.match(header, /class="header-action header-action--account"[\s\S]*?data-account-entry[\s\S]*?>登入／進入工作台<\/a>/);
   assert.doesNotMatch(header, /header-action--workspace|<span>工作台<\/span>/);
   assert.equal(convergenceActions.length, 2);
   assert.match(decisionSection, /decision-cta__glass--info[\s\S]*?先看 DRS 如何核對/);
   assert.doesNotMatch(decisionSection, /decision-cta__tertiary|decision-cta__glass--pink|decision-cta__glass--purple/);
   assert.match(scopeSection, /依現有書面資料協助核對，不代替現場查驗與法定專業判定。/);
-  assert.match(finalSection, /data-route="quoteCheck"[\s\S]*?href="\.\.\/quote_check\/code\.html"[\s\S]*?直接試做報價健檢/);
+  assert.match(finalSection, /<a\b(?=[^>]*data-route="quoteCheck")(?=[^>]*data-route-state="planned")(?=[^>]*aria-disabled="true")(?=[^>]*tabindex="-1")(?![^>]*\shref=)[^>]*>直接試做報價健檢<\/a>/);
   assert.match(finalSection, /data-account-entry[\s\S]*?data-route="accountAccess"[\s\S]*?登入／進入工作台/);
   assert.match(css, /--bg-black:\s*#05080a/i);
   assert.match(css, /--accent-orange:\s*#ff5809/i);

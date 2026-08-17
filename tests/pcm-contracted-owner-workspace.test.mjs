@@ -26,6 +26,218 @@ function sha256(value) {
   return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
+function currentHtmlElement(html, tagName, marker) {
+  const escapedMarker = marker.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+  const matches = html.match(
+    new RegExp(`<${tagName}\\b[^>]*${escapedMarker}(?=\\s|>)[^>]*>[\\s\\S]*?<\\/${tagName}>`, "gu"),
+  ) ?? [];
+  assert.equal(matches.length, 1, `current HTML must contain one ${marker} ${tagName}`);
+  const source = matches[0];
+  const opening = source.match(new RegExp(`^<${tagName}\\b([^>]*)>`, "u"));
+  assert.ok(opening, `${marker} opening tag`);
+  const attributes = new Map();
+  for (const attribute of opening[1].matchAll(/([:\w-]+)(?:\s*=\s*"([^"]*)")?/gu)) {
+    attributes.set(attribute[1], attribute[2] ?? "");
+  }
+  return {
+    source,
+    textContent: source.replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ").trim(),
+    setAttribute(name, value) {
+      attributes.set(name, String(value));
+    },
+    getAttribute(name) {
+      return attributes.get(name) ?? null;
+    },
+    hasAttribute(name) {
+      return attributes.has(name);
+    },
+    removeAttribute(name) {
+      attributes.delete(name);
+    },
+  };
+}
+
+function createHeaderDomHarness(html) {
+  const nodes = new Map([
+    ["[data-owner-brand-link]", currentHtmlElement(html, "a", "data-owner-brand-link")],
+    ["[data-owner-service-contract-link]", currentHtmlElement(html, "a", "data-owner-service-contract-link")],
+    ['[data-header-context-value="case"]', currentHtmlElement(html, "span", 'data-header-context-value="case"')],
+    ['[data-header-context-value="agreement"]', currentHtmlElement(html, "span", 'data-header-context-value="agreement"')],
+  ]);
+  return {
+    nodes,
+    root: {
+      body: null,
+      defaultView: null,
+      querySelector(selector) {
+        return nodes.get(selector) ?? null;
+      },
+      querySelectorAll() {
+        return [];
+      },
+    },
+  };
+}
+
+function createInteractiveTabHarness({
+  kind,
+  initialHash,
+  readyState = "complete",
+}) {
+  const keys = kind === "dashboard"
+    ? ["design", "construction", "contract"]
+    : ["overview", "facts", "changes", "records"];
+  const datasetKey = kind === "dashboard" ? "ownerTab" : "ownerContractView";
+  const panelDatasetKey = kind === "dashboard"
+    ? "ownerPanel"
+    : "ownerContractViewPanel";
+  const listeners = new Map();
+  const replacements = [];
+  const scrollCalls = [];
+  const frameCallbacks = [];
+  let nextFrameId = 1;
+  let frameExecutionCount = 0;
+
+  function interactiveNode(key) {
+    const nodeListeners = new Map();
+    return {
+      dataset: { [datasetKey]: key },
+      tabIndex: key === keys[0] ? 0 : -1,
+      focused: false,
+      attributes: new Map(),
+      addEventListener(type, listener) {
+        const current = nodeListeners.get(type) ?? [];
+        current.push(listener);
+        nodeListeners.set(type, current);
+      },
+      dispatch(type, event = {}) {
+        for (const listener of nodeListeners.get(type) ?? []) {
+          listener({
+            ...event,
+            preventDefault() {
+              event.defaultPrevented = true;
+            },
+          });
+        }
+      },
+      setAttribute(name, value) {
+        this.attributes.set(name, value);
+      },
+      getAttribute(name) {
+        return this.attributes.get(name) ?? null;
+      },
+      focus() {
+        this.focused = true;
+      },
+    };
+  }
+
+  const tabs = keys.map(interactiveNode);
+  const panels = keys.map((key) => ({
+    dataset: { [panelDatasetKey]: key },
+    hidden: key !== keys[0],
+  }));
+  const container = {
+    dataset: kind === "dashboard" ? { activeOwnerTab: "design" } : {},
+    querySelectorAll(selector) {
+      if (
+        selector === "[data-owner-tab]" ||
+        selector === "[data-owner-contract-view]"
+      ) return tabs;
+      if (
+        selector === "[data-owner-panel]" ||
+        selector === "[data-owner-contract-view-panel]"
+      ) return panels;
+      return [];
+    },
+  };
+  const root = {
+    readyState,
+    documentElement: { dataset: {} },
+    querySelector(selector) {
+      return selector === '[data-layout="owner-hero-dashboard"]'
+        ? container
+        : null;
+    },
+  };
+  const view = {
+    location: { hash: initialHash },
+    history: {
+      replaceState(_state, _title, value) {
+        replacements.push(value);
+        view.location.hash = String(value).slice(String(value).indexOf("#"));
+      },
+    },
+    addEventListener(type, listener, options = {}) {
+      const current = listeners.get(type) ?? [];
+      current.push({
+        listener,
+        once: Boolean(options?.once),
+        capture: typeof options === "boolean"
+          ? options
+          : Boolean(options?.capture),
+      });
+      listeners.set(type, current);
+    },
+    removeEventListener(type, listener, options = {}) {
+      const current = listeners.get(type) ?? [];
+      const capture = typeof options === "boolean"
+        ? options
+        : Boolean(options?.capture);
+      listeners.set(
+        type,
+        current.filter((entry) =>
+          entry.listener !== listener || entry.capture !== capture
+        ),
+      );
+    },
+    scrollTo(options) {
+      scrollCalls.push(options);
+    },
+    requestAnimationFrame(callback) {
+      const id = nextFrameId;
+      nextFrameId += 1;
+      frameCallbacks.push({ id, callback });
+      return id;
+    },
+    cancelAnimationFrame(id) {
+      const index = frameCallbacks.findIndex((entry) => entry.id === id);
+      if (index >= 0) frameCallbacks.splice(index, 1);
+    },
+    dispatch(type, event = {}) {
+      for (const entry of [...(listeners.get(type) ?? [])]) {
+        entry.listener(event);
+        if (entry.once) view.removeEventListener(type, entry.listener);
+      }
+    },
+    flushAnimationFrame() {
+      const currentFrame = frameCallbacks.splice(0);
+      for (const entry of currentFrame) {
+        frameExecutionCount += 1;
+        entry.callback();
+      }
+    },
+    flushAnimationFrames() {
+      while (frameCallbacks.length) this.flushAnimationFrame();
+    },
+  };
+
+  return {
+    container,
+    root,
+    view,
+    tabs,
+    panels,
+    replacements,
+    scrollCalls,
+    frameCallbacks,
+    get frameExecutionCount() {
+      return frameExecutionCount;
+    },
+    listeners,
+  };
+}
+
 function authorizedContext(overrides = {}) {
   return {
     sessionStatus: "active",
@@ -171,8 +383,9 @@ test("甲方儀表板在桌機左側並把誠實的 LINE 對話窗放在右側�
   assert.ok(conversationStart > workspaceStart, "LINE conversation follows the dashboard in reading order");
 
   assert.match(html, /data-layout="owner-line-conversation"[^>]*aria-label="案件 LINE 對話"/u);
-  assert.match(html, /尚未連結案件對話/u);
-  assert.match(html, /目前沒有可顯示的對話/u);
+  assert.match(html, /案件對話尚未連結/u);
+  assert.match(html, /完成正式案件與權限確認後，才會顯示本案對話紀錄/u);
+  assert.match(html, /data-owner-line-trusted-content/u);
   assert.match(html, /<textarea[^>]*disabled[^>]*aria-disabled="true"/u);
   assert.match(html, /<button[^>]*data-line-send[^>]*disabled[^>]*aria-disabled="true"/u);
   assert.doesNotMatch(html, /訊息已送出|已傳送訊息/u);
@@ -487,7 +700,7 @@ test("尚未生效的契約不得因缺少案件摘要而落入已授權狀態",
   );
   const model = buildOwnerWorkspaceViewModel(pendingAgreement);
   assert.equal(model.actorLabel, "尚待驗證");
-  assert.equal(model.agreementVersion, "尚待載入");
+  assert.equal(model.agreementVersion, "尚未確認服務版本");
 });
 
 test("服務結束只開放既有內容 read-only，不代表刪除案件紀錄", async () => {
@@ -1372,20 +1585,68 @@ test("canonical workspace uses the Decision & Record System name", async () => {
   const html = await readPageFile("code.html");
   assert.doesNotMatch(html, /AI PCM/i);
   assert.match(html, /<title>[^<]*LaiBE Decision &amp; Record System<\/title>/);
-  assert.match(html, /class="brand__product">Decision &amp; Record System<\/span>/);
-  assert.match(html, /aria-label="回到 LaiBE Decision &amp; Record System 首頁"/);
+  assert.match(html, /pcm_standalone\/shared\/drs-brand\.css/u);
+  assert.match(html, /class="drs-brand-lockup drs-brand-lockup--expanded"/u);
+  assert.match(html, /Decision[\s\S]*Record[\s\S]*System/u);
+  assert.match(html, /class="drs-brand-name">裝潢決策系統<\/small>/u);
+  assert.match(html, /aria-label="LaiBE DRS 首頁"/u);
 });
 
-test("mobile header keeps the current case identity visible", async () => {
-  const css = await readPageFile("styles.css");
-  assert.doesNotMatch(
-    css,
-    /context-chip\[data-slot="case-name"\]\s*\{[^}]*display:\s*none/i,
+test("workspace header keeps role, case, and service-agreement context distinct on desktop and mobile", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const header = html.slice(
+    html.indexOf('<header class="workspace-header"'),
+    html.indexOf("</header>"),
   );
-  assert.match(
-    css,
-    /@media\s*\(max-width:\s*760px\)[\s\S]*context-chip\[data-slot="case-name"\][\s\S]*grid-column:\s*1\s*\/\s*-1/i,
+
+  assert.match(header, /工作台角色[\s\S]*甲方/u);
+  assert.match(header, /案件[\s\S]*data-slot="case-name"[^>]*data-header-context-value="case"[^>]*>尚未連結正式案件/u);
+  assert.match(header, /服務契約[\s\S]*data-slot="agreement-label"[^>]*data-header-context-value="agreement"[^>]*>尚未確認/u);
+  assert.doesNotMatch(header, /data-slot="header-state"/u);
+  assert.doesNotMatch(css, /context-chip\[data-slot="case-name"\]\s*\{[^}]*display:\s*none/i);
+  assert.match(css, /\.workspace-header__context\s*\{[^}]*flex-wrap:\s*wrap/is);
+  assert.match(css, /@media\s*\(max-width:\s*760px\)[\s\S]*\.workspace-header__context[\s\S]*grid-template-columns:\s*1fr/is);
+  assert.match(css, /\.brand\s*\{[^}]*min-height:\s*44px/is);
+});
+
+test("owner header runtime binds manifest routes fail closed and updates only context values", async () => {
+  const {
+    bindOwnerWorkspaceCanonicalLinks,
+    renderOwnerHeaderContext,
+  } = await loadRuntime();
+  const { createOwnerWorkspaceBootstrap } = await loadBootstrap();
+  const html = await readPageFile("code.html");
+  const { root, nodes } = createHeaderDomHarness(html);
+
+  createOwnerWorkspaceBootstrap({
+    root,
+    authorizedCaseId: null,
+    loadOwnerWorkspace: null,
+  });
+  assert.equal(nodes.get("[data-owner-brand-link]").getAttribute("href"), "../public_home/code.html#top");
+  assert.equal(
+    nodes.get("[data-owner-service-contract-link]").getAttribute("href"),
+    "../pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract",
   );
+  assert.equal(nodes.get("[data-owner-brand-link]").hasAttribute("aria-disabled"), false);
+  assert.equal(nodes.get("[data-owner-brand-link]").hasAttribute("tabindex"), false);
+
+  renderOwnerHeaderContext(root, {
+    caseName: "新竹住宅案",
+    agreementLabel: "DRS 服務契約：有效",
+  });
+  assert.equal(nodes.get('[data-header-context-value="case"]').textContent, "新竹住宅案");
+  assert.equal(nodes.get('[data-header-context-value="agreement"]').textContent, "有效");
+
+  assert.equal(bindOwnerWorkspaceCanonicalLinks(root, () => "../wrong.html"), false);
+  assert.equal(nodes.get("[data-owner-brand-link]").hasAttribute("href"), false);
+  assert.equal(nodes.get("[data-owner-service-contract-link]").hasAttribute("href"), false);
+  assert.equal(nodes.get("[data-owner-brand-link]").getAttribute("aria-disabled"), "true");
+  assert.equal(bindOwnerWorkspaceCanonicalLinks(root, () => { throw new Error("route unavailable"); }), false);
+  assert.equal(nodes.get("[data-owner-service-contract-link]").hasAttribute("href"), false);
 });
 
 test("甲方契約工作區先交代角色、版本、狀態、責任與唯一主要行動", async () => {
@@ -1398,9 +1659,11 @@ test("甲方契約工作區先交代角色、版本、狀態、責任與唯一�
   assert.match(panel, /本案契約/u);
   assert.match(panel, /目前狀態/u);
   assert.match(panel, /下一位處理者/u);
-  assert.match(panel, /繼續填寫本案契約/u);
-  assert.equal((panel.match(/owner-contract-primary-action/g) || []).length, 1);
-  assert.match(panel, /disabled[^>]*aria-disabled="true"/u);
+  assert.match(panel, /了解並確認 DRS 服務契約/u);
+  assert.match(panel, /data-owner-service-contract-link[^>]*>\s*了解並確認 DRS 服務契約/u);
+  assert.doesNotMatch(panel, /data-owner-service-contract-link[^>]*\shref=/u);
+  assert.equal((panel.match(/owner-contract-recovery-action/g) || []).length, 1);
+  assert.match(panel, /data-owner-contract-trusted-action[^>]*disabled[^>]*aria-disabled="true"/u);
 });
 
 test("甲方契約工作區先顯示甲乙共用契約全文，再進入補充或變更草稿", async () => {
@@ -1414,7 +1677,7 @@ test("甲方契約工作區先顯示甲乙共用契約全文，再進入補充�
   assert.match(panel, /data-shared-contract-id="LAIBE-DESIGN-BUILD-V02"/u);
   assert.match(panel, /data-shared-contract-type="DESIGN_BUILD"/u);
   assert.match(panel, /建築物室內裝修設計及工程承攬契約/u);
-  assert.match(panel, /雙方看到同一份唯讀條文/u);
+  assert.match(panel, /目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方/u);
   assert.match(
     panel,
     /data-shared-contract-preview[^>]*href="\.\.\/\.\.\/\.\.\/site\/standard_contract_editor\/code\.html\?contractType=DESIGN_BUILD&amp;returnTo=owner"/u,
@@ -1581,16 +1844,13 @@ test("甲方契約編輯權只由 AUTHORIZED_READY render path 切換", async ()
   );
 });
 
-test("甲方契約 reviewer journey 在分頁內保留治理紀錄次要入口", async () => {
+test("甲方契約 reviewer journey 不提供會假裝前往正式紀錄的入口", async () => {
   const html = await readPageFile("code.html");
   const panel = ownerContractPanel(html);
 
-  assert.match(
-    panel,
-    /class="owner-hero-dashboard__next owner-contract-governance-link"[\s\S]*href="#governance"[\s\S]*查看契約治理紀錄/u,
-  );
-  assert.equal((panel.match(/owner-contract-primary-action/g) || []).length, 1);
-  assert.equal((panel.match(/繼續填寫本案契約/g) || []).length, 1);
+  assert.doesNotMatch(panel, /<a[^>]*>\s*查看契約治理紀錄/u);
+  assert.match(panel, /尚未建立可查看的契約治理紀錄/u);
+  assert.equal((panel.match(/owner-contract-recovery-action/g) || []).length, 1);
 });
 
 test("甲方契約 reviewer overflow guard 與草稿長度契約限制極端內容", async () => {
@@ -1626,10 +1886,10 @@ test("甲方契約管理以四個小白任務分頁分開服務資格、專案�
   }
   assert.match(panel, /萊比服務資格/u);
   assert.match(panel, /本案甲乙契約/u);
-  assert.match(panel, /繼續填寫本案契約/u);
+  assert.match(panel, /了解並確認 DRS 服務契約/u);
   assert.doesNotMatch(panel, /開始編輯契約資料/u);
   assert.match(panel, /contractType=DESIGN_BUILD&amp;returnTo=owner/u);
-  assert.match(panel, /雙方看到同一份唯讀條文；本頁草稿尚未保存，也尚未同步給另一方/u);
+  assert.match(panel, /目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方/u);
   assert.match(css, /\.owner-contract-view-tabs\s*\{/u);
 });
 
@@ -1726,4 +1986,386 @@ test("甲方工作台可由契約預覽返回連結直接開啟契約管理", as
   assert.equal(resolveOwnerDashboardTabFromHash("#construction-records"), "construction");
   assert.equal(resolveOwnerDashboardTabFromHash("#design-review"), "design");
   assert.equal(resolveOwnerDashboardTabFromHash("#unknown"), null);
+});
+
+test("未連結正式案件時說清楚原因、處理者、最近留痕與可恢復下一步", async () => {
+  const [html, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    loadRuntime(),
+  ]);
+  const model = runtime.buildOwnerWorkspaceViewModel();
+
+  assert.equal(model.state, "CONTRACT_CONTEXT_UNAVAILABLE");
+  assert.equal(model.stateLabel, "尚未連結正式案件");
+  assert.match(model.statusMessage, /甲方身分、DRS 服務契約與案件權限尚未完成確認/u);
+  assert.equal(model.currentActor, "由甲方先確認 DRS 服務與案件入口");
+  assert.equal(model.lastRecorded, "尚未建立正式案件紀錄");
+  assert.equal(model.nextAction, "了解並確認 DRS 服務契約");
+  assert.match(html, /完成後才會開放本案契約填寫與案件對話/u);
+  assert.match(html, /data-owner-service-contract-link[^>]*>\s*了解並確認 DRS 服務契約/u);
+  assert.doesNotMatch(model.statusMessage, /已保存/u);
+});
+
+test("主分頁是分類而非 01 到 03 流程，且三個假紀錄入口不再可點", async () => {
+  const html = await readPageFile("code.html");
+  const dashboardStart = html.indexOf('data-layout="owner-section-tabs"');
+  const dashboardEnd = html.indexOf("</div>", dashboardStart);
+  const mainTabs = html.slice(dashboardStart, dashboardEnd);
+
+  assert.doesNotMatch(mainTabs, />\s*0[123]\s*</u);
+  for (const label of ["查看設計案紀錄", "查看工程案紀錄", "查看契約治理紀錄"]) {
+    assert.doesNotMatch(html, new RegExp(`<a[^>]*>[^<]*${label}`, "u"));
+  }
+  assert.match(
+    html,
+    /href="\.\.\/\.\.\/\.\.\/site\/standard_contract_editor\/code\.html\?contractType=DESIGN_BUILD&amp;returnTo=owner"/u,
+  );
+});
+
+test("七種 workspace state 都有 truthful 待填狀態，只有 trusted case 顯示完整表單與進度", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const panel = ownerContractPanel(html);
+
+  assert.match(panel, /data-owner-contract-unavailable-preparation/u);
+  assert.match(panel, /data-slot="access-message"/u);
+  assert.match(panel, /正式案件可編輯後，才會開放 13 項資料/u);
+  assert.match(panel, /查看之後需要準備的資料/u);
+  assert.match(panel, /雙方與專案[\s\S]*甲方可先準備/u);
+  assert.match(panel, /工作範圍、價金與工期[\s\S]*依雙方文件核對/u);
+  assert.match(panel, /付款、驗收與保固[\s\S]*不知道時保留待確認，不要自行猜測/u);
+  assert.match(panel, /data-owner-contract-trusted-facts/u);
+  assert.equal((panel.match(/data-owner-contract-fact=/g) || []).length, 13);
+  assert.match(
+    css,
+    /\[data-owner-contract-trusted-facts\]\s*\{\s*display:\s*none/u,
+  );
+  assert.match(
+    css,
+    /body\[data-workspace-state="AUTHORIZED_READY"\][\s\S]{0,220}\[data-owner-contract-trusted-facts\][\s\S]{0,80}display:\s*block/u,
+  );
+  for (const state of [
+    "ACCESS_CHECKING",
+    "ACCESS_DENIED",
+    "CONTRACT_CONTEXT_UNAVAILABLE",
+    "AUTHORIZED_EMPTY",
+    "LOAD_FAILED_RETRYABLE",
+  ]) {
+    assert.match(
+      css,
+      new RegExp(`body\\[data-workspace-state="${state}"\\][\\s\\S]{0,120}\\[data-owner-contract-unavailable-preparation\\]`, "u"),
+    );
+  }
+  for (const state of ["AUTHORIZED_READY", "PCM_SERVICE_ENDED_READ_ONLY"]) {
+    assert.match(
+      css,
+      new RegExp(`body\\[data-workspace-state="${state}"\\][\\s\\S]{0,180}\\[data-owner-contract-unavailable-preparation\\][\\s\\S]{0,80}display:\\s*none`, "u"),
+    );
+    assert.match(
+      css,
+      new RegExp(`body\\[data-workspace-state="${state}"\\][\\s\\S]{0,220}\\[data-owner-contract-trusted-facts\\][\\s\\S]{0,80}display:\\s*block`, "u"),
+    );
+  }
+  assert.match(css, /\[data-owner-contract-facts-progress\]\s*\{\s*display:\s*none/u);
+  assert.match(
+    css,
+    /body\[data-workspace-state="AUTHORIZED_READY"\][\s\S]{0,220}\[data-owner-contract-facts-progress\][\s\S]{0,80}display:\s*inline/u,
+  );
+});
+
+test("mobile 在主分頁前保留精簡責任摘要，核心文案與觸控目標維持可讀", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const responsibility = html.indexOf('data-layout="owner-responsibility-panel"');
+  const tabs = html.indexOf('data-layout="owner-section-tabs"');
+
+  assert.ok(responsibility >= 0 && responsibility < tabs);
+  assert.match(html, /data-layout="owner-responsibility-mobile-summary"/u);
+  for (const label of [
+    "目前狀態",
+    "現在由誰處理",
+    "下一步",
+    "尚未開放原因",
+    "完成後",
+    "最近留痕",
+  ]) {
+    assert.match(html, new RegExp(label, "u"));
+  }
+  const hiddenResponsibilityRule = css.indexOf(
+    '[data-layout="owner-command-header"] [data-layout="owner-responsibility-panel"] {\n    display: none;',
+  );
+  const visibleResponsibilityRule = css.lastIndexOf(
+    '[data-layout="owner-command-header"] [data-layout="owner-responsibility-panel"] {\n    display: grid;',
+  );
+  assert.ok(hiddenResponsibilityRule >= 0);
+  assert.ok(
+    visibleResponsibilityRule > hiddenResponsibilityRule,
+    "mobile responsibility summary is restored by the final cascade",
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.owner-dashboard-tab[\s\S]{0,180}min-height:\s*(?:44|[5-9]\d)px/u,
+  );
+  assert.match(css, /overflow-x:\s*(?:clip|hidden)/u);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\[data-layout="owner-responsibility-mobile-summary"\][\s\S]{0,100}display:\s*block/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\[data-layout="owner-responsibility-panel"\]\s+\.handoff-panel__facts[\s\S]{0,80}display:\s*none/u,
+  );
+});
+
+test("desktop 與 mobile 的核心狀態、分類、說明及行動文字都至少 14px", async () => {
+  const css = await readPageFile("styles.css");
+  const start = css.indexOf("/* Core owner-workspace text is never auxiliary-sized. */");
+  const end = css.indexOf("/* End core owner-workspace typography. */", start);
+  const rule = start >= 0 && end > start ? css.slice(start, end) : "";
+
+  for (const selector of [
+    '[data-layout="owner-responsibility-panel"] dd',
+    ".workspace-intro__meta",
+    ".state-pill",
+    ".owner-dashboard-tab strong",
+    ".owner-dashboard-tab small",
+    ".owner-contract-command > div > p:last-child",
+    ".owner-contract-primary-action",
+    ".owner-contract-view-tabs button",
+    ".shared-contract-card__action",
+    ".owner-hero-dashboard__next strong",
+    ".owner-dashboard-static-note",
+    ".owner-contract-status dd",
+    ".owner-contract-facts-form input",
+    ".owner-contract-detail-body button",
+  ]) {
+    assert.match(rule, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "u"));
+  }
+  assert.match(rule, /font-size:\s*\.875rem/u);
+});
+
+test("契約主標題不會暗示本案契約早於 DRS 服務與案件確認", async () => {
+  const html = await readPageFile("code.html");
+  assert.match(html, /先確認目前可進行的步驟，再整理本案契約。/u);
+  assert.doesNotMatch(html, /先完成本案契約，再處理補充或變更。/u);
+});
+
+test("主分頁 click、鍵盤與 hashchange 同步 canonical hash 且不在一般切換強制捲動", async () => {
+  const { initializeOwnerDashboardTabs } = await loadRuntime();
+  const harness = createInteractiveTabHarness({
+    kind: "dashboard",
+    initialHash: "#owner-dashboard-panel-contract",
+    readyState: "loading",
+  });
+  const controller = initializeOwnerDashboardTabs(harness.root, harness.view);
+
+  assert.equal(harness.container.dataset.activeOwnerTab, "contract");
+  assert.equal(harness.tabs[2].getAttribute("aria-selected"), "true");
+  const directEntryScrollCount = harness.scrollCalls.length;
+  assert.equal(directEntryScrollCount, 1, "contract direct entry stabilizes once");
+  assert.deepEqual(harness.scrollCalls[0], {
+    top: 0,
+    left: 0,
+    behavior: "auto",
+  });
+  harness.view.dispatch("load");
+  assert.equal(harness.frameCallbacks.length, 1);
+  assert.equal(harness.scrollCalls.length, 1);
+  harness.view.flushAnimationFrame();
+  assert.equal(harness.frameCallbacks.length, 1);
+  assert.equal(harness.scrollCalls.length, 1);
+  harness.view.flushAnimationFrame();
+  assert.equal(harness.frameCallbacks.length, 0);
+  assert.equal(harness.scrollCalls.length, 2);
+  assert.deepEqual(harness.scrollCalls, [
+    { top: 0, left: 0, behavior: "auto" },
+    { top: 0, left: 0, behavior: "auto" },
+  ]);
+  assert.equal(harness.listeners.get("pointerdown")?.length, 0);
+  assert.equal(harness.listeners.get("hashchange")?.length, 1);
+
+  harness.tabs[0].dispatch("click");
+  assert.equal(harness.view.location.hash, "#design-review");
+  assert.equal(harness.container.dataset.activeOwnerTab, "design");
+  harness.tabs[0].dispatch("keydown", { key: "End" });
+  assert.equal(harness.view.location.hash, "#owner-dashboard-panel-contract");
+  assert.equal(harness.tabs[2].focused, true);
+  harness.tabs[2].dispatch("keydown", { key: "ArrowLeft" });
+  assert.equal(harness.view.location.hash, "#construction-records");
+  assert.equal(harness.tabs[1].tabIndex, 0);
+  assert.equal(harness.panels[1].hidden, false);
+  assert.equal(harness.scrollCalls.length, 2);
+
+  harness.view.location.hash = "#design-review";
+  harness.view.dispatch("hashchange");
+  assert.equal(harness.container.dataset.activeOwnerTab, "design");
+  assert.equal(harness.replacements.at(-1), "#construction-records");
+  assert.equal(controller.selectTab("unknown"), false);
+});
+
+test("contract direct-entry 的延遲 settle 會在任何互動或 route 變更後取消", async () => {
+  const { initializeOwnerDashboardTabs } = await loadRuntime();
+  for (const type of [
+    "pointerdown",
+    "keydown",
+    "wheel",
+    "touchstart",
+    "hashchange",
+  ]) {
+    const harness = createInteractiveTabHarness({
+      kind: "dashboard",
+      initialHash: "#owner-dashboard-panel-contract",
+      readyState: "loading",
+    });
+    initializeOwnerDashboardTabs(harness.root, harness.view);
+    assert.equal(harness.scrollCalls.length, 1, type);
+    if (type === "hashchange") harness.view.location.hash = "#design-review";
+    harness.view.dispatch(type);
+    harness.view.dispatch("load");
+    const executionCountAtCancellation = harness.frameExecutionCount;
+    harness.view.flushAnimationFrames();
+    assert.equal(harness.scrollCalls.length, 1, type);
+    assert.equal(harness.frameCallbacks.length, 0, type);
+    assert.equal(
+      harness.frameExecutionCount,
+      executionCountAtCancellation,
+      type,
+    );
+    assert.equal(harness.listeners.get("pointerdown")?.length, 0, type);
+  }
+
+  for (const type of [
+    "pointerdown",
+    "keydown",
+    "wheel",
+    "touchstart",
+    "hashchange",
+  ]) {
+    const afterFirstFrame = createInteractiveTabHarness({
+      kind: "dashboard",
+      initialHash: "#owner-dashboard-panel-contract",
+      readyState: "complete",
+    });
+    initializeOwnerDashboardTabs(afterFirstFrame.root, afterFirstFrame.view);
+    assert.equal(afterFirstFrame.frameCallbacks.length, 1, type);
+    afterFirstFrame.view.flushAnimationFrame();
+    assert.equal(afterFirstFrame.frameCallbacks.length, 1, type);
+    if (type === "hashchange") {
+      afterFirstFrame.view.location.hash = "#design-review";
+    }
+    afterFirstFrame.view.dispatch(type);
+    const executionCountAtCancellation = afterFirstFrame.frameExecutionCount;
+    assert.equal(afterFirstFrame.frameCallbacks.length, 0, type);
+    afterFirstFrame.view.flushAnimationFrames();
+    assert.equal(afterFirstFrame.frameExecutionCount, executionCountAtCancellation, type);
+    assert.equal(afterFirstFrame.scrollCalls.length, 1, type);
+    assert.equal(afterFirstFrame.listeners.get("pointerdown")?.length, 0, type);
+  }
+});
+
+test("非契約 hash 不做 direct-entry top reset，也不留下延遲 scroll callback", async () => {
+  const { initializeOwnerDashboardTabs } = await loadRuntime();
+  for (const hash of [
+    "#design-review",
+    "#construction-records",
+    "#governance",
+    "#unknown",
+  ]) {
+    const harness = createInteractiveTabHarness({ kind: "dashboard", initialHash: hash });
+    initializeOwnerDashboardTabs(harness.root, harness.view);
+    assert.equal(harness.scrollCalls.length, 0, hash);
+    assert.equal(harness.frameCallbacks.length, 0, hash);
+    harness.view.flushAnimationFrames();
+    harness.view.dispatch("load");
+    assert.equal(harness.scrollCalls.length, 0, hash);
+  }
+});
+
+test("records → construction → contract 跨層 journey 回到 overview 且兩個 hashchange listener 並存", async () => {
+  const {
+    initializeOwnerContractViewTabs,
+    initializeOwnerDashboardTabs,
+  } = await loadRuntime();
+  const main = createInteractiveTabHarness({
+    kind: "dashboard",
+    initialHash: "#owner-contract-view-panel-records",
+  });
+  const contract = createInteractiveTabHarness({
+    kind: "contract",
+    initialHash: "#owner-contract-view-panel-records",
+  });
+  const contractController = initializeOwnerContractViewTabs(contract.container, main.view);
+  initializeOwnerDashboardTabs(main.root, main.view, {
+    onContractMainSelected() {
+      contractController.selectView("overview", { syncHash: false });
+    },
+  });
+
+  assert.equal(
+    main.listeners.get("hashchange")?.length,
+    3,
+    "contract subview, direct-entry cancellation, and main tab listeners coexist",
+  );
+  assert.equal(contract.container.dataset.activeOwnerContractView, "records");
+  const initialScrollCount = main.scrollCalls.length;
+
+  main.tabs[1].dispatch("click");
+  assert.equal(main.view.location.hash, "#construction-records");
+  assert.equal(contract.container.dataset.activeOwnerContractView, "records");
+  main.view.flushAnimationFrames();
+  assert.equal(main.scrollCalls.length, initialScrollCount);
+  assert.equal(main.listeners.get("hashchange")?.length, 2);
+  main.tabs[2].dispatch("click");
+  assert.equal(main.view.location.hash, "#owner-dashboard-panel-contract");
+  assert.equal(main.container.dataset.activeOwnerTab, "contract");
+  assert.equal(contract.container.dataset.activeOwnerContractView, "overview");
+  assert.equal(contract.tabs[0].getAttribute("aria-selected"), "true");
+  assert.equal(contract.panels[0].hidden, false);
+  assert.equal(contract.tabs.some((tab) => tab.focused), false);
+
+  contractController.selectView("records");
+  main.tabs[1].dispatch("click");
+  main.tabs[1].dispatch("keydown", { key: "ArrowRight" });
+  assert.equal(main.view.location.hash, "#owner-dashboard-panel-contract");
+  assert.equal(contract.container.dataset.activeOwnerContractView, "overview");
+  assert.equal(contract.tabs.some((tab) => tab.focused), false);
+  assert.equal(main.scrollCalls.length, initialScrollCount);
+
+  main.view.location.hash = "#owner-contract-view-panel-changes";
+  main.view.dispatch("hashchange");
+  assert.equal(main.container.dataset.activeOwnerTab, "contract");
+  assert.equal(contract.container.dataset.activeOwnerContractView, "changes");
+});
+
+test("契約子分頁 click、Arrow、Home、End 與 hashchange 維持 ARIA 及 canonical hash", async () => {
+  const { initializeOwnerContractViewTabs } = await loadRuntime();
+  const harness = createInteractiveTabHarness({
+    kind: "contract",
+    initialHash: "#owner-contract-view-panel-facts",
+  });
+  const controller = initializeOwnerContractViewTabs(harness.container, harness.view);
+
+  assert.equal(harness.container.dataset.activeOwnerContractView, "facts");
+  assert.equal(harness.tabs[1].getAttribute("aria-selected"), "true");
+  harness.tabs[1].dispatch("click");
+  assert.equal(harness.view.location.hash, "#owner-contract-view-panel-facts");
+  harness.tabs[1].dispatch("keydown", { key: "End" });
+  assert.equal(harness.view.location.hash, "#owner-contract-view-panel-records");
+  assert.equal(harness.tabs[3].focused, true);
+  harness.tabs[3].dispatch("keydown", { key: "Home" });
+  assert.equal(harness.view.location.hash, "#owner-contract-view-panel-overview");
+  harness.tabs[0].dispatch("keydown", { key: "ArrowRight" });
+  assert.equal(harness.view.location.hash, "#owner-contract-view-panel-facts");
+  assert.equal(harness.panels[1].hidden, false);
+  assert.equal(harness.scrollCalls.length, 0);
+
+  harness.view.location.hash = "#owner-contract-view-panel-changes";
+  harness.view.dispatch("hashchange");
+  assert.equal(harness.container.dataset.activeOwnerContractView, "changes");
+  assert.equal(harness.tabs[2].tabIndex, 0);
+  assert.equal(controller.selectView("unknown"), false);
 });
