@@ -1003,7 +1003,7 @@ test("homepage turns five owner concerns into a central DRS decision path", asyn
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.decision-path__spine,[\s\S]*?\.decision-node,[\s\S]*?\.decision-convergence,[\s\S]*?\.decision-cta\s*\{[^}]*animation:\s*none/s);
 });
 
-test("decision titles reveal the approved detail checks and keep the latest panel open", async () => {
+test("decision titles reveal the approved detail checks and keep every activated panel open", async () => {
   const [html, css, appSource] = await Promise.all([
     readFile(htmlUrl, "utf8"),
     readFile(cssUrl, "utf8"),
@@ -1171,15 +1171,19 @@ test("decision titles reveal the approved detail checks and keep the latest pane
   assert.equal(mockNodes[0].classList.contains("is-detail-active"), true);
 
   mockNodes[1].trigger.listeners.click();
-  assert.equal(mockNodes[0].classList.contains("is-detail-active"), false);
-  assert.equal(mockNodes[0].trigger.getAttribute("aria-expanded"), "false");
-  assert.equal(mockNodes[0].panel.getAttribute("aria-hidden"), "true");
+  assert.equal(mockNodes[0].classList.contains("is-detail-active"), true);
+  assert.equal(mockNodes[0].trigger.getAttribute("aria-expanded"), "true");
+  assert.equal(mockNodes[0].panel.getAttribute("aria-hidden"), "false");
   assert.equal(mockNodes[1].classList.contains("is-detail-active"), true);
+  assert.equal(mockNodes[1].trigger.getAttribute("aria-expanded"), "true");
   assert.equal(mockNodes[1].panel.getAttribute("aria-hidden"), "false");
 
   mockNodes[2].trigger.listeners.focusin();
-  assert.equal(mockNodes[1].classList.contains("is-detail-active"), false);
+  assert.equal(mockNodes[0].classList.contains("is-detail-active"), true);
+  assert.equal(mockNodes[1].classList.contains("is-detail-active"), true);
   assert.equal(mockNodes[2].classList.contains("is-detail-active"), true);
+  assert.equal(mockNodes[2].trigger.getAttribute("aria-expanded"), "true");
+  assert.equal(mockNodes[2].panel.getAttribute("aria-hidden"), "false");
 });
 
 test("three decision branches consume their dedicated manifest-only quote-check mode routes", async () => {

@@ -328,17 +328,10 @@ export function bindDecisionDetailReveal(root) {
       records.push({ node, trigger, panel });
     }
 
-    const activateRecord = (current) => {
-      for (const record of records) {
-        const isActive = record === current;
-        if (isActive) {
-          record.node.classList.add("is-detail-active");
-        } else {
-          record.node.classList.remove("is-detail-active");
-        }
-        record.trigger.setAttribute("aria-expanded", isActive ? "true" : "false");
-        record.panel.setAttribute("aria-hidden", isActive ? "false" : "true");
-      }
+    const activateRecord = (record) => {
+      record.node.classList.add("is-detail-active");
+      record.trigger.setAttribute("aria-expanded", "true");
+      record.panel.setAttribute("aria-hidden", "false");
     };
 
     for (const record of records) {
