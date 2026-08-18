@@ -2,7 +2,6 @@ import * as localPdfJs from "./vendor/pdfjs/pdf.mjs";
 import "./pdf-plan-vector-extractor.js";
 import "./pdf-plan-objectization-adapter.js";
 import { recognizePdfObjects as recognizeWithGate } from "./pdf-recognition-gate.mjs";
-import { validateA11BundleBinding } from "./a11-floor-plan-bundle-consumer.mjs";
 
 export const MAX_DRAWING_PDF_BYTES = 32 * 1024 * 1024;
 
@@ -15,13 +14,44 @@ const trustedBlobSizeGetter = blobPrototype &&
 const trustedBlobArrayBuffer = blobPrototype &&
   safeGetOwnPropertyDescriptor(blobPrototype, "arrayBuffer")?.value;
 const EMPTY_ARGUMENTS = safeFreeze([]);
+export const DRAWING_PDF_SECURITY_STATUS = safeFreeze({
+  SAFE: "NO_ACTIVE_CONTENT_TRIGGER_DETECTED",
+  ACTIVE: "CONFIRMED_ACTIVE_CONTENT",
+  UNAVAILABLE: "SECURITY_INSPECTION_UNAVAILABLE",
+});
+
+const LOCAL_REVIEW_HOLDS = safeFreeze(["A11_FORMAL_BINDING_HOLD"]);
+const UNCERTAINTY_NEXT_ACTION = "請人工核對原始圖說後再決定是否採用。";
+const PRESENTATION_DATA_URL_LIMIT = 16 * 1024 * 1024;
+const PUBLIC_UNCERTAINTY_REASONS = safeFreeze({
+  wall_endpoint_requires_review: "牆線端點或銜接關係仍需人工核對。",
+  visible_symbol_requires_classification_review: "圖面符號的分類仍需人工核對。",
+  stair_void_requires_relationship_review: "樓梯與挑空的關係仍需人工核對。",
+  space_boundary_requires_topology_review: "空間邊界的連接關係仍需人工核對。",
+  missing_verified_stair_source_geometry: "樓梯線條來源仍不完整，需回看原始圖說。",
+});
+const PUBLIC_CLASSIFICATION_LABELS = safeFreeze({
+  locked_reference: "鎖定參考",
+  native_opening: "門窗與開口",
+  native_wall: "牆線",
+  unresolved: "一般待確認",
+  unresolved_important: "重要待確認",
+});
 
 function freezeResult(record) {
   if (record.file) safeFreeze(record.file);
   if (record.summary) safeFreeze(record.summary);
+  if (record.sourcePage) safeFreeze(record.sourcePage);
+  if (record.presentationReference) safeFreeze(record.presentationReference);
+  if (record.classificationCounts) {
+    record.classificationCounts.forEach(safeFreeze);
+    safeFreeze(record.classificationCounts);
+  }
   if (record.uncertainty) safeFreeze(record.uncertainty);
   return safeFreeze({
     ...record,
+    mode: "local_review_only",
+    holds: LOCAL_REVIEW_HOLDS,
     conversionAllowed: false,
     projectMutationAllowed: false,
     uploaded: false,
@@ -30,12 +60,21 @@ function freezeResult(record) {
   });
 }
 
-function closedResult(status, reason, file = null) {
+function closedResult(
+  status,
+  reason,
+  file = null,
+  securityStatus = DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE,
+) {
   return freezeResult({
     status,
     reason,
     file,
+    securityStatus,
     summary: null,
+    sourcePage: null,
+    presentationReference: null,
+    classificationCounts: safeFreeze([]),
     uncertainty: safeFreeze([]),
   });
 }
@@ -320,8 +359,10 @@ async function inflatePdfObjectStream(bytes) {
   }
 }
 
-async function pdfStructureHasActiveContent(bytes, depth = 0) {
-  if (depth > 4 || bytes.byteLength > PDF_EXPANDED_OBJECT_LIMIT) return true;
+async function inspectPdfStructureSecurity(bytes, depth = 0) {
+  if (depth > 4 || bytes.byteLength > PDF_EXPANDED_OBJECT_LIMIT) {
+    return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
+  }
   let cursor = 0;
   let count = 0;
   let previousToken = null;
@@ -331,8 +372,12 @@ async function pdfStructureHasActiveContent(bytes, depth = 0) {
     if (!token) break;
     cursor = token.end;
     count += 1;
-    if (count > PDF_STRUCTURAL_TOKEN_LIMIT) return true;
-    if (tokenCreatesActiveBehavior(token, previousToken)) return true;
+    if (count > PDF_STRUCTURAL_TOKEN_LIMIT) {
+      return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
+    }
+    if (tokenCreatesActiveBehavior(token, previousToken)) {
+      return DRAWING_PDF_SECURITY_STATUS.ACTIVE;
+    }
     tokens.push(token);
     previousToken = token;
     if (token.kind !== "keyword" || token.value !== "stream") continue;
@@ -342,22 +387,24 @@ async function pdfStructureHasActiveContent(bytes, depth = 0) {
     const lengthToken = directDictionaryValue(dictionary, "Length");
     const length = lengthToken?.kind === "number" ? lengthToken.value : null;
     if (start < 0 || !Number.isSafeInteger(length) || length < 0 || start + length > bytes.length) {
-      return true;
+      return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
     }
     const streamBytes = bytes.slice(start, start + length);
     if (dictionaryIsObjectStream(dictionary)) {
       const filter = objectStreamFilterIsSupported(dictionary);
-      if (filter === "unsupported") return true;
+      if (filter === "unsupported") return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
       const expanded = filter === "deflate"
         ? await inflatePdfObjectStream(streamBytes)
         : streamBytes;
-      if (!expanded || await pdfStructureHasActiveContent(expanded, depth + 1)) return true;
+      if (!expanded) return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
+      const nestedStatus = await inspectPdfStructureSecurity(expanded, depth + 1);
+      if (nestedStatus !== DRAWING_PDF_SECURITY_STATUS.SAFE) return nestedStatus;
     }
     cursor = start + length;
     tokens = [];
     previousToken = null;
   }
-  return false;
+  return DRAWING_PDF_SECURITY_STATUS.SAFE;
 }
 
 function recordHasEntries(value) {
@@ -402,7 +449,9 @@ export async function inspectDrawingPdfActiveContent({ bytes }) {
       "getOutline",
       "hasJSActions",
     ]) {
-      if (typeof pdfDocument[method] !== "function") return true;
+      if (typeof pdfDocument[method] !== "function") {
+        return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
+      }
     }
     const [attachments, documentActions, openAction, outline, hasJsActions] =
       await Promise.all([
@@ -418,11 +467,11 @@ export async function inspectDrawingPdfActiveContent({ bytes }) {
       recordHasEntries(openAction) ||
       hasJsActions === true ||
       outlineHasActiveContent(outline)
-    ) return true;
+    ) return DRAWING_PDF_SECURITY_STATUS.ACTIVE;
     for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
       const page = await pdfDocument.getPage(pageNumber);
       if (typeof page.getJSActions !== "function" || typeof page.getAnnotations !== "function") {
-        return true;
+        return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
       }
       const [pageActions, annotations] = await Promise.all([
         page.getJSActions(),
@@ -431,9 +480,9 @@ export async function inspectDrawingPdfActiveContent({ bytes }) {
       if (
         recordHasEntries(pageActions) ||
         (Array.isArray(annotations) && annotations.some(annotationHasActiveContent))
-      ) return true;
+      ) return DRAWING_PDF_SECURITY_STATUS.ACTIVE;
     }
-    return pdfStructureHasActiveContent(bytes);
+    return inspectPdfStructureSecurity(bytes);
   } finally {
     if (typeof pdfDocument.destroy === "function") await pdfDocument.destroy();
   }
@@ -528,32 +577,100 @@ async function defaultExtractScene({ bytes, sourceSha256 }) {
   }
 }
 
-function defaultValidateA11Binding(binding) {
-  if (!binding) return { passed: false, reason: "a11_bundle_unavailable" };
-  try {
-    validateA11BundleBinding(binding);
-    return { passed: true, reason: "a11_gate_passed" };
-  } catch {
-    return { passed: false, reason: "a11_gate_not_accepted" };
-  }
-}
-
 function defaultDependencies() {
   return {
     inspectActiveContent: inspectDrawingPdfActiveContent,
     presentSelectedPdfFile: defaultPresentSelectedPdfFile,
     extractScene: defaultExtractScene,
     recognizePdfObjects: recognizeWithGate,
-    validateA11Binding: defaultValidateA11Binding,
   };
 }
 
 function safeUncertainty(manifest) {
   const values = manifest?.recognition?.unresolvedIds;
   if (!Array.isArray(values)) return safeFreeze([]);
-  return safeFreeze(values
+  const objects = Array.isArray(manifest?.allObjects) ? manifest.allObjects : [];
+  const results = values
     .filter((value) => typeof value === "string" && value.length > 0)
-    .slice(0, 50));
+    .slice(0, 50)
+    .map((id) => {
+      const source = objects.find((candidate) =>
+        String(candidate?.sourceId || candidate?.source_object_id || "") === id);
+      const internalReason = String(
+        source?.sourcePayload?.unresolvedReason ||
+        source?.sourcePayload?.reason ||
+        manifest?.recognition?.reason ||
+        "",
+      );
+      const reason = PUBLIC_UNCERTAINTY_REASONS[internalReason] ||
+        "此項辨識依據仍不足，需回看原始圖說確認。";
+      return safeFreeze({
+        id: id.slice(0, 160),
+        category: String(source?.category || "unresolved_important").slice(0, 80),
+        reason,
+        nextAction: UNCERTAINTY_NEXT_ACTION,
+      });
+    });
+  return safeFreeze(results);
+}
+
+function safeClassificationCounts(manifest) {
+  const rows = Array.isArray(manifest?.summaryRows) ? manifest.summaryRows : [];
+  const normalizedRows = rows.slice(0, 50).flatMap((row) => {
+    const count = Number(row?.count);
+    const label = typeof row?.label === "string" ? row.label.trim().slice(0, 80) : "";
+    return label && Number.isSafeInteger(count) && count >= 0
+      ? [safeFreeze({ label, count })]
+      : [];
+  });
+  if (normalizedRows.length > 0) return safeFreeze(normalizedRows);
+  const counts = manifest?.counts;
+  if (!counts || typeof counts !== "object") return safeFreeze([]);
+  return safeFreeze(Reflect.ownKeys(counts).slice(0, 50).flatMap((key) => {
+    if (typeof key !== "string") return [];
+    const descriptor = Object.getOwnPropertyDescriptor(counts, key);
+    const count = Number(descriptor?.value);
+    return Number.isSafeInteger(count) && count >= 0
+      ? [safeFreeze({
+        label: PUBLIC_CLASSIFICATION_LABELS[key] || "其他待確認內容",
+        count,
+      })]
+      : [];
+  }));
+}
+
+function safePresentationReference(presentation, sourceSha256) {
+  const raster = presentation?.referenceRaster;
+  const dataUrl = typeof raster?.dataUrl === "string" ? raster.dataUrl : "";
+  const width = Number(raster?.naturalWidth);
+  const height = Number(raster?.naturalHeight);
+  const pageNumber = Number(raster?.pageNumber || presentation?.selectedPageNumber || 1);
+  const sourceMatches = raster?.sourceDocumentSha256 === sourceSha256;
+  const safeDataUrl = sourceMatches &&
+    dataUrl.length <= PRESENTATION_DATA_URL_LIMIT &&
+    /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(dataUrl)
+    ? dataUrl
+    : null;
+  return safeFreeze({
+    available: Boolean(
+      safeDataUrl && Number.isSafeInteger(pageNumber) && pageNumber > 0 &&
+      Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0
+    ),
+    dataUrl: safeDataUrl,
+    naturalWidth: Number.isFinite(width) && width > 0 ? Math.round(width) : null,
+    naturalHeight: Number.isFinite(height) && height > 0 ? Math.round(height) : null,
+    pageNumber: Number.isSafeInteger(pageNumber) && pageNumber > 0 ? pageNumber : 1,
+  });
+}
+
+function normalizedSecurityStatus(value) {
+  if (value === false || value === DRAWING_PDF_SECURITY_STATUS.SAFE) {
+    return DRAWING_PDF_SECURITY_STATUS.SAFE;
+  }
+  if (value === true || value === DRAWING_PDF_SECURITY_STATUS.ACTIVE) {
+    return DRAWING_PDF_SECURITY_STATUS.ACTIVE;
+  }
+  return DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
 }
 
 function classifyError(error) {
@@ -618,10 +735,25 @@ export async function recognizeDrawingFile(file, options = {}) {
   };
   const sourceSha256 = await sha256Hex(bytes);
   const fileFacts = safeFreeze({ byteLength: declaredSize, sha256: sourceSha256 });
+  let securityStatus = DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
   try {
-    const activeContent = await dependencies.inspectActiveContent({ bytes });
-    if (activeContent !== false) {
-      return closedResult("unsupported", "active_content", fileFacts);
+    try {
+      securityStatus = normalizedSecurityStatus(
+        await dependencies.inspectActiveContent({ bytes }),
+      );
+    } catch {
+      securityStatus = DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
+    }
+    if (securityStatus === DRAWING_PDF_SECURITY_STATUS.ACTIVE) {
+      return closedResult("unsupported", "active_content", fileFacts, securityStatus);
+    }
+    if (securityStatus === DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE) {
+      return closedResult(
+        "unsupported",
+        "security_inspection_unavailable",
+        fileFacts,
+        securityStatus,
+      );
     }
     const snapshot = createTrustedSnapshot(bytes);
     const presentation = await dependencies.presentSelectedPdfFile(snapshot, {
@@ -634,24 +766,30 @@ export async function recognizeDrawingFile(file, options = {}) {
       pageNumber: 1,
     });
     if (extraction?.activeContent === true) {
-      return closedResult("unsupported", "active_content", fileFacts);
+      return closedResult(
+        "unsupported",
+        "active_content",
+        fileFacts,
+        DRAWING_PDF_SECURITY_STATUS.ACTIVE,
+      );
     }
     const manifest = dependencies.recognizePdfObjects(extraction?.scene || {});
     const objectCount = Array.isArray(manifest?.allObjects)
       ? manifest.allObjects.length
       : 0;
     if (objectCount === 0) {
-      return closedResult("unsupported", "scanned_or_non_vector", fileFacts);
+      return closedResult("unsupported", "scanned_or_non_vector", fileFacts, securityStatus);
     }
     const uncertainty = safeUncertainty(manifest);
-    const a11 = dependencies.validateA11Binding(options.a11Binding || null);
-    const recognized = a11?.passed === true &&
-      manifest?.selection?.selectedRegionId &&
-      uncertainty.length === 0;
+    const classificationCounts = safeClassificationCounts(manifest);
     const pageCount = Number(extraction?.pageCount || presentation?.pageCount || 0);
+    const selectedPageNumber = Number(
+      presentation?.selectedPageNumber || extraction?.scene?.source?.pageNumber || 1,
+    );
     return freezeResult({
-      status: recognized ? "recognized" : "partial",
-      reason: recognized ? "recognized" : "review_required",
+      status: "partial",
+      reason: "A11_FORMAL_BINDING_HOLD",
+      securityStatus,
       file: safeFreeze({ ...fileFacts, pageCount }),
       summary: safeFreeze({
         pageCount,
@@ -659,9 +797,18 @@ export async function recognizeDrawingFile(file, options = {}) {
         unresolvedCount: uncertainty.length,
         counts: safeFreeze({ ...(manifest.counts || {}) }),
       }),
+      sourcePage: safeFreeze({
+        pageNumber: Number.isSafeInteger(selectedPageNumber) && selectedPageNumber > 0
+          ? selectedPageNumber
+          : 1,
+        pageCount,
+        label: `第 ${Number.isSafeInteger(selectedPageNumber) && selectedPageNumber > 0 ? selectedPageNumber : 1} 頁`,
+      }),
+      classificationCounts,
+      presentationReference: safePresentationReference(presentation, sourceSha256),
       uncertainty,
     });
   } catch (error) {
-    return closedResult("unsupported", classifyError(error), fileFacts);
+    return closedResult("unsupported", classifyError(error), fileFacts, securityStatus);
   }
 }

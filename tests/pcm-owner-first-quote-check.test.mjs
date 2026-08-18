@@ -2290,7 +2290,7 @@ test("quote drawing and account routes remain active while compatibility pages r
   }
 });
 
-test("quote-only recovery exposes one exact guarded drawing-check route", async () => {
+test("normal quote workflow exposes one visible exact guarded drawing-check CTA", async () => {
   const [html, appModule, manifestModule] = await Promise.all([
     readOrEmpty(htmlPath),
     import(`${pathToFileURL(appPath).href}?drawing-recovery-contract`),
@@ -2303,6 +2303,15 @@ test("quote-only recovery exposes one exact guarded drawing-check route", async 
 
   assert.ok(hrefs.length >= 2, "result and failure recovery both expose an anchor");
   assert.deepEqual(new Set(hrefs), new Set([exactHref]));
+  assert.match(
+    html,
+    /<a\b(?=[^>]*\bhref="\.\.\/drawing_check\/code\.html")(?=[^>]*\bdata-drawing-check-link)(?=[^>]*\bdata-drawing-check-primary)[^>]*>前往圖說檢討<\/a>/u,
+  );
+  assert.match(visible, /前往圖說檢討/u);
+  assert.doesNotMatch(
+    html,
+    /<div hidden data-legacy-page-contract>[\s\S]*?data-drawing-check-primary/u,
+  );
   assert.doesNotMatch(
     visible,
     /圖說檢討(?:入口)?尚未開放|圖說檢討正在整理中|目前沒有可點入口|圖說檢討入口開放後/,

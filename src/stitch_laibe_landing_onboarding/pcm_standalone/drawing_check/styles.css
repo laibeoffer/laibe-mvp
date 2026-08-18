@@ -461,13 +461,28 @@ button {
   line-height: 1.6;
 }
 
-.recognition-status[data-recognition-state="recognized"] {
-  border-inline-start-color: var(--owner-first-success);
-  background: rgba(91, 211, 161, 0.055);
+.recognition-reference {
+  margin: 18px 0 0;
 }
 
-.recognition-status[data-recognition-state="recognized"] > span {
-  color: var(--owner-first-success);
+.recognition-reference img {
+  display: block;
+  width: min(100%, 720px);
+  max-height: 420px;
+  object-fit: contain;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 12px;
+}
+
+.recognition-reference figcaption {
+  margin-top: 8px;
+  color: var(--owner-muted, #64748b);
+  font-size: 0.875rem;
+}
+
+.validation-list__wide {
+  grid-column: 1 / -1;
 }
 
 .recognition-status[data-recognition-state="partial"] {

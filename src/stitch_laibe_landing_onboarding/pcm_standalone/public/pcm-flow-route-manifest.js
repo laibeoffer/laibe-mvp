@@ -39,6 +39,8 @@ function freezeOwnList(...items) {
 const freezeRecord = (record) => safeFreeze({ ...record });
 const NO_ACTIONS = freezeOwnList();
 
+export const OWNER_WORKSPACE_NORMAL_ROUTE = "HOLD";
+
 export const PCM_FLOW_GATES = Object.freeze([
   freezeRecord({ id: "G1_UI_SOURCE", label: "介面與路徑來源", owner: "A0", state: "active" }),
   freezeRecord({ id: "G2_AUTH_RUNTIME", label: "身分與角色確認", owner: "A6", state: "closed" }),
@@ -155,11 +157,11 @@ export const PCM_FLOW_CANONICAL_LINKS = Object.freeze([
     trigger: "valid login submit with owner role selected",
     toPage: "ownerWorkspace",
     targetAnchor: null,
-    relativeHref: "../../client_awarding_dashboard/code.html",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
-    expectedVisibleState: "甲方案件工作台載入；身分與案件權限未確認時只顯示工作台結構與誠實空狀態。",
+    relativeHref: null,
+    canonicalHttpUrl: null,
+    expectedVisibleState: "正式身分入口尚未完成，甲方案件工作台正常入口仍在等待。",
     returnRoute: "accountAccess",
-    routeState: "active",
+    routeState: "hold",
   }),
   freezeRecord({
     id: "accountAccessInvitedPartnerLoginToVendorWorkspace",

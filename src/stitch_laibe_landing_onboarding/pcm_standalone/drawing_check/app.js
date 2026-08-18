@@ -334,9 +334,15 @@ export const DRAWING_CHECK_FAILURES = safeFreeze({
   }),
   ACTIVE_CONTENT_UNSUPPORTED: failureState({
     code: "ACTIVE_CONTENT_UNSUPPORTED",
-    reason: "這份 PDF 含有可執行內容，為保護本次檢視，本頁已停止處理。",
-    nextAction: "請乙方重新匯出不含可執行內容的靜態 PDF，再重新選擇。",
+    reason: "這份 PDF 已確認含有主動內容或外部動作，為保護本次檢視，本頁已停止處理。",
+    nextAction: "請乙方重新匯出不含主動內容或外部動作的靜態 PDF，再重新選擇。",
     responsibleRole: "乙方",
+  }),
+  SECURITY_INSPECTION_UNAVAILABLE: failureState({
+    code: "SECURITY_INSPECTION_UNAVAILABLE",
+    reason: "瀏覽器目前無法完成這份 PDF 的安全檢查，因此不能判斷是否適合繼續讀取。",
+    nextAction: "請重新選擇原始 PDF；若仍無法檢查，請乙方重新匯出靜態 PDF。",
+    responsibleRole: "甲方",
   }),
   FILE_READ_FAILED: failureState({
     code: "FILE_READ_FAILED",
@@ -424,6 +430,7 @@ HERO_ACTIONS.FILE_UNREADABLE = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.FILE_CORRUPTED = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.FILE_ENCRYPTED = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.ACTIVE_CONTENT_UNSUPPORTED = HERO_ACTIONS.FILE_FORMAT_INVALID;
+HERO_ACTIONS.SECURITY_INSPECTION_UNAVAILABLE = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.FILE_READ_FAILED = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.DUPLICATE_SUBMISSION = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.VERSION_CONFLICT = HERO_ACTIONS.FILE_FORMAT_INVALID;
@@ -470,6 +477,9 @@ export function projectDrawingCheckHeroAction(state) {
   }
   if (state === DRAWING_CHECK_FAILURES.ACTIVE_CONTENT_UNSUPPORTED) {
     return HERO_ACTIONS.ACTIVE_CONTENT_UNSUPPORTED;
+  }
+  if (state === DRAWING_CHECK_FAILURES.SECURITY_INSPECTION_UNAVAILABLE) {
+    return HERO_ACTIONS.SECURITY_INSPECTION_UNAVAILABLE;
   }
   if (state === DRAWING_CHECK_FAILURES.FILE_READ_FAILED) {
     return HERO_ACTIONS.FILE_READ_FAILED;
@@ -556,6 +566,9 @@ function failureForCode(code) {
     case "ACTIVE_CONTENT_UNSUPPORTED": {
       return DRAWING_CHECK_FAILURES.ACTIVE_CONTENT_UNSUPPORTED;
     }
+    case "SECURITY_INSPECTION_UNAVAILABLE": {
+      return DRAWING_CHECK_FAILURES.SECURITY_INSPECTION_UNAVAILABLE;
+    }
     case "FILE_READ_FAILED": return DRAWING_CHECK_FAILURES.FILE_READ_FAILED;
     case "DUPLICATE_SUBMISSION": return DRAWING_CHECK_FAILURES.DUPLICATE_SUBMISSION;
     case "VERSION_CONFLICT": return DRAWING_CHECK_FAILURES.VERSION_CONFLICT;
@@ -587,9 +600,12 @@ async function recognizeSelectedDrawingFile(file) {
   return adapter.recognizeDrawingFile(file);
 }
 
-function initializeDrawingCheckPage() {
+export function initializeDrawingCheckPage(options = {}) {
   const root = document.querySelector("[data-drawing-check-page]");
   if (!root) return;
+  const recognizeFile = typeof options.recognizeFile === "function"
+    ? options.recognizeFile
+    : recognizeSelectedDrawingFile;
 
   const panels = root.querySelectorAll("[data-flow-panel]");
   const railItems = root.querySelectorAll("[data-flow-step]");
@@ -619,6 +635,11 @@ function initializeDrawingCheckPage() {
   const recognitionPages = root.querySelector("[data-recognition-pages]");
   const recognitionObjects = root.querySelector("[data-recognition-objects]");
   const recognitionUncertainty = root.querySelector("[data-recognition-uncertainty]");
+  const recognitionCounts = root.querySelector("[data-recognition-counts]");
+  const recognitionItems = root.querySelector("[data-recognition-items]");
+  const recognitionReference = root.querySelector("[data-recognition-reference]");
+  const recognitionReferenceWrap = root.querySelector("[data-recognition-reference-wrap]");
+  const recognitionReferenceCaption = root.querySelector("[data-recognition-reference-caption]");
   const stepOrder = safeFreeze([
     "INTRODUCTION",
     "CONSENT",
@@ -688,6 +709,42 @@ function initializeDrawingCheckPage() {
     }
   }
 
+  function clearRecognitionReference() {
+    try {
+      if (recognitionReference) {
+        recognitionReference.removeAttribute("src");
+        recognitionReference.hidden = true;
+      }
+      if (recognitionReferenceWrap) recognitionReferenceWrap.hidden = true;
+      setText(recognitionReferenceCaption, "來源頁預覽");
+    } catch {
+      // A reference preview never receives authority over the review status.
+    }
+  }
+
+  function renderRecognitionReference(result) {
+    clearRecognitionReference();
+    const reference = result && result.presentationReference;
+    const sourcePage = result && result.sourcePage;
+    if (
+      !reference ||
+      reference.available !== true ||
+      typeof reference.dataUrl !== "string" ||
+      !reference.dataUrl.startsWith("data:image/png;base64,")
+    ) return;
+    try {
+      recognitionReference.src = reference.dataUrl;
+      recognitionReference.hidden = false;
+      if (recognitionReferenceWrap) recognitionReferenceWrap.hidden = false;
+      setText(
+        recognitionReferenceCaption,
+        `${sourcePage && sourcePage.label ? sourcePage.label : "來源頁"}預覽；僅供本次人工核對。`,
+      );
+    } catch {
+      clearRecognitionReference();
+    }
+  }
+
   function renderRecognitionStatus(status, result = null) {
     setRecognitionState(status);
     if (status === "processing") {
@@ -698,39 +755,66 @@ function initializeDrawingCheckPage() {
       setText(recognitionSize, "正在確認");
       setText(recognitionPages, "正在確認");
       setText(recognitionObjects, "正在整理");
+      setText(recognitionCounts, "辨識完成後顯示");
       setText(recognitionUncertainty, "辨識完成後顯示");
+      setText(recognitionItems, "辨識完成後顯示");
+      clearRecognitionReference();
       return;
     }
-    if (status === "recognized" || status === "partial") {
+    if (status === "partial") {
       const summary = result && result.summary;
       const file = result && result.file;
+      const sourcePage = result && result.sourcePage;
+      const classificationCounts = Array.isArray(result && result.classificationCounts)
+        ? result.classificationCounts
+        : [];
+      const uncertaintyItems = Array.isArray(result && result.uncertainty)
+        ? result.uncertainty
+        : [];
       const pageCount = Number(summary && summary.pageCount);
       const objectCount = Number(summary && summary.objectCount);
       const unresolvedCount = Number(summary && summary.unresolvedCount);
       const byteLength = Number(file && file.byteLength);
-      setText(recognitionKicker, status === "recognized" ? "已辨識" : "已整理，仍需確認");
+      setText(recognitionKicker, "已整理，仍需確認");
       setText(
         recognitionTitle,
-        status === "recognized" ? "圖面結構已整理" : "已找到圖面結構，仍有待確認內容",
+        "已找到圖面結構，仍有待確認內容",
       );
       setText(
         recognitionMessage,
         "這是本次瀏覽器內辨識摘要，不是正式圖面、尺寸確認或案件紀錄。",
       );
-      setText(recognitionContent, status === "recognized" ? "可辨識的向量 PDF" : "部分內容可辨識");
+      setText(recognitionContent, "部分內容可辨識；目前僅供本機人工檢視");
       setText(
         recognitionSize,
         Number.isFinite(byteLength) ? `${(byteLength / 1024 / 1024).toFixed(1)} MB（本次讀取）` : "已讀取",
       );
-      setText(recognitionPages, pageCount > 0 ? `${pageCount} 頁；本次整理第 1 頁` : "仍需確認");
+      setText(
+        recognitionPages,
+        sourcePage && sourcePage.label
+          ? `${pageCount} 頁；本次整理${sourcePage.label}`
+          : "來源頁仍需確認",
+      );
       setText(recognitionObjects, objectCount >= 0 ? `找到 ${objectCount} 個候選結構` : "仍需確認");
       setText(
-        recognitionUncertainty,
-        unresolvedCount > 0 ? `${unresolvedCount} 項仍需人工確認` : "未列出關鍵不確定項目，仍需人工核對",
+        recognitionCounts,
+        classificationCounts.length > 0
+          ? classificationCounts.map((row) => `${row.label} ${row.count} 項`).join("、")
+          : "尚未形成可顯示的分類摘要",
       );
-      const title = status === "recognized"
-        ? "圖面結構已整理，請人工核對"
-        : "圖面部分可辨識，請查看待確認事項";
+      setText(
+        recognitionUncertainty,
+        unresolvedCount > 0 ? `${unresolvedCount} 項仍需人工確認` : "目前沒有列出重要待確認項目，仍需人工核對",
+      );
+      setText(
+        recognitionItems,
+        uncertaintyItems.length > 0
+          ? uncertaintyItems.map((item, index) =>
+            `${index + 1}. ${item.reason} ${item.nextAction}`).join(" ")
+          : "目前沒有列出重要待確認項目；正式採用前仍須由甲方回看原始圖說。",
+      );
+      renderRecognitionReference(result);
+      const title = "圖面部分可辨識，請查看待確認事項";
       const next = "查看待確認清單；需要時可重新選擇原始 PDF。";
       for (let index = 0; index < statusTargets.length; index += 1) {
         statusTargets[index].textContent = title;
@@ -748,7 +832,10 @@ function initializeDrawingCheckPage() {
     setText(recognitionSize, "尚未選擇");
     setText(recognitionPages, "尚未選擇");
     setText(recognitionObjects, "尚未選擇");
+    setText(recognitionCounts, "尚未選擇");
     setText(recognitionUncertainty, "尚未選擇");
+    setText(recognitionItems, "尚未選擇");
+    clearRecognitionReference();
   }
 
   function failureCodeForRecognition(result) {
@@ -756,6 +843,9 @@ function initializeDrawingCheckPage() {
       case "oversize": return "FILE_TOO_LARGE";
       case "encrypted": return "FILE_ENCRYPTED";
       case "active_content": return "ACTIVE_CONTENT_UNSUPPORTED";
+      case "security_inspection_unavailable": {
+        return "SECURITY_INSPECTION_UNAVAILABLE";
+      }
       case "scanned_or_non_vector": return "FILE_UNREADABLE";
       case "corrupt": return "FILE_CORRUPTED";
       default: return "FILE_READ_FAILED";
@@ -765,13 +855,13 @@ function initializeDrawingCheckPage() {
   async function runRecognition(file, token) {
     let result;
     try {
-      result = await recognizeSelectedDrawingFile(file);
+      result = await recognizeFile(file);
     } catch {
       result = { status: "error", reason: "read_failed" };
     }
     if (token !== recognitionSequence) return;
-    if (result.status === "recognized" || result.status === "partial") {
-      renderRecognitionStatus(result.status, result);
+    if (result.status === "partial") {
+      renderRecognitionStatus("partial", result);
       return;
     }
     setRecognitionState(result.status === "unsupported" ? "unsupported" : "error");

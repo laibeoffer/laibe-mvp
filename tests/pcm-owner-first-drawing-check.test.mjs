@@ -1,12 +1,14 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 import { runInNewContext } from "node:vm";
+import { loadCanonicalUpper3fFixture } from "./helpers/canonical-pdf-scene.mjs";
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(testDir, "..");
@@ -29,6 +31,16 @@ const sharedTokenPath = resolve(drawingDir, "../shared/owner-first-tokens.css");
 const sharedShellPath = resolve(drawingDir, "../shared/owner-first-shell.css");
 const execFileAsync = promisify(execFile);
 
+test.before(async () => {
+  await loadCanonicalUpper3fFixture({
+    pdf: resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"),
+    pdfJs: resolve(repoRoot, "site/preview_floor_plan/vendor/pdfjs/pdf.mjs"),
+    extractor: resolve(repoRoot, "site/preview_floor_plan/pdf-plan-vector-extractor.js"),
+    adapter: resolve(repoRoot, "site/preview_floor_plan/pdf-plan-objectization-adapter.js"),
+    recognitionGate: resolve(repoRoot, "site/preview_floor_plan/pdf-recognition-gate.mjs"),
+  });
+});
+
 const requiredSteps = Object.freeze([
   "INTRODUCTION",
   "CONSENT",
@@ -48,6 +60,7 @@ const requiredFailures = Object.freeze([
   "FILE_CORRUPTED",
   "FILE_ENCRYPTED",
   "ACTIVE_CONTENT_UNSUPPORTED",
+  "SECURITY_INSPECTION_UNAVAILABLE",
   "FILE_READ_FAILED",
   "DUPLICATE_SUBMISSION",
   "VERSION_CONFLICT",
@@ -195,6 +208,28 @@ function createFileHandlerHarness() {
     "[data-failure-next]": { textContent: "" },
     "[data-failure-role]": { textContent: "" },
   };
+  const recognitionReference = {
+    alt: "",
+    hidden: true,
+    src: "",
+    removeAttribute(name) {
+      if (name === "src") this.src = "";
+    },
+  };
+  const recognitionTargets = {
+    "[data-recognition-output]": { dataset: { recognitionState: "idle" } },
+    "[data-recognition-kicker]": { textContent: "" },
+    "[data-recognition-title]": { textContent: "" },
+    "[data-recognition-message]": { textContent: "" },
+    "[data-recognition-content]": { textContent: "" },
+    "[data-recognition-size]": { textContent: "" },
+    "[data-recognition-pages]": { textContent: "" },
+    "[data-recognition-objects]": { textContent: "" },
+    "[data-recognition-uncertainty]": { textContent: "" },
+    "[data-recognition-counts]": { textContent: "" },
+    "[data-recognition-items]": { textContent: "" },
+    "[data-recognition-reference]": recognitionReference,
+  };
   const listeners = new Map();
   const heroStart = {
     attributes: new Map(),
@@ -230,12 +265,13 @@ function createFileHandlerHarness() {
     pickerClicks += 1;
   };
   const root = {
+    dataset: {},
     querySelector(selector) {
       if (selector === "#drawing-file") return fileInput;
       if (selector === "[data-hero-start]") return heroStart;
       if (selector === "[data-failure-recover]") return failureRecover;
       if (selector === "[data-failure-return]") return failureReturn;
-      return failureTargets[selector] ?? null;
+      return failureTargets[selector] ?? recognitionTargets[selector] ?? null;
     },
     querySelectorAll(selector) {
       if (selector === "[data-flow-panel]") return panels;
@@ -280,6 +316,15 @@ function createFileHandlerHarness() {
     failureReason() {
       return failureTargets["[data-failure-reason]"].textContent;
     },
+    recognitionState() {
+      return recognitionTargets["[data-recognition-output]"].dataset.recognitionState;
+    },
+    recognitionText(selector) {
+      return recognitionTargets[selector]?.textContent ?? "";
+    },
+    recognitionReference() {
+      return { ...recognitionReference };
+    },
     selectedName() {
       return fileNameTarget.textContent;
     },
@@ -301,6 +346,45 @@ function createFileHandlerHarness() {
       };
     },
   };
+}
+
+async function initializeManualFileHandlerHarness(tag, recognizeFile) {
+  const harness = createFileHandlerHarness();
+  const documentDescriptor = Object.getOwnPropertyDescriptor(globalThis, "document");
+  const fileListDescriptor = Object.getOwnPropertyDescriptor(globalThis, "FileList");
+  const inputDescriptor = Object.getOwnPropertyDescriptor(globalThis, "HTMLInputElement");
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: { querySelector() { return null; } },
+  });
+  Object.defineProperty(globalThis, "FileList", {
+    configurable: true,
+    value: HarnessFileList,
+  });
+  Object.defineProperty(globalThis, "HTMLInputElement", {
+    configurable: true,
+    value: HarnessHtmlInputElement,
+  });
+  try {
+    const module = await import(`${pathToFileURL(appPath).href}?manual-${tag}`);
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: harness.document,
+    });
+    module.initializeDrawingCheckPage({ recognizeFile });
+  } finally {
+    if (documentDescriptor) Object.defineProperty(globalThis, "document", documentDescriptor);
+    else delete globalThis.document;
+    if (fileListDescriptor) Object.defineProperty(globalThis, "FileList", fileListDescriptor);
+    else delete globalThis.FileList;
+    if (inputDescriptor) Object.defineProperty(globalThis, "HTMLInputElement", inputDescriptor);
+    else delete globalThis.HTMLInputElement;
+  }
+  return harness;
+}
+
+function nextTurn() {
+  return new Promise((resolveTurn) => setImmediate(resolveTurn));
 }
 
 async function initializeFileHandlerHarness(tag) {
@@ -422,18 +506,235 @@ test("selection stays local and cannot imply upload parsing persistence or a for
 });
 
 test("processing and recognition summary stay local honest and review-bound", async () => {
-  const [html, app] = await Promise.all([readOrEmpty(htmlPath), readOrEmpty(appPath)]);
+  const [html, app, css] = await Promise.all([
+    readOrEmpty(htmlPath),
+    readOrEmpty(appPath),
+    readOrEmpty(cssPath),
+  ]);
   const visible = stripNonVisibleHtml(html);
   assert.match(visible, /正在讀取 PDF 圖面結構/);
   assert.match(visible, /本次只在瀏覽器內整理，尚未保存案件/);
   assert.match(visible, /不等於正式圖面、比例、尺寸或案件紀錄/);
   assert.match(app, /"processing"/);
-  assert.match(app, /"recognized"/);
+  assert.doesNotMatch(app, /status === "recognized"|\? "recognized"/);
+  assert.doesNotMatch(css, /data-recognition-state=["']recognized["']/);
   assert.match(app, /"partial"/);
   assert.match(app, /"unsupported"/);
   assert.match(app, /"error"/);
   assert.match(app, /token !== recognitionSequence/);
   assert.match(app, /browser-recognition-adapter\.mjs/);
+  assert.match(html, /data-recognition-counts/);
+  assert.match(html, /data-recognition-items/);
+  assert.match(html, /data-recognition-reference/);
+});
+
+test("async app to real adapter renders bytes-derived safe partial details", async () => {
+  const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-safe-partial=1`);
+  const bytes = await readFile(resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
+  const file = new File([bytes], "實際圖說.pdf", { type: "application/pdf" });
+  const sourceSha256 = createHash("sha256").update(bytes).digest("hex").toUpperCase();
+  let result;
+  let settled;
+  const settledPromise = new Promise((resolveSettled) => { settled = resolveSettled; });
+  const harness = await initializeManualFileHandlerHarness(
+    "safe-partial",
+    async (selectedFile) => {
+      result = await adapter.recognizeDrawingFile(selectedFile, {
+        dependencies: {
+          async presentSelectedPdfFile() {
+            return {
+              pageCount: 1,
+              selectedPageNumber: 1,
+              referenceRaster: {
+                available: true,
+                dataUrl: "data:image/png;base64,iVBORw0KGgo=",
+                naturalWidth: 320,
+                naturalHeight: 240,
+                pageNumber: 1,
+                sourceDocumentSha256: sourceSha256,
+              },
+            };
+          },
+        },
+      });
+      settled();
+      return result;
+    },
+  );
+  harness.dispatchFile(file);
+  await settledPromise;
+  await nextTurn();
+  assert.equal(result.status, "partial");
+  assert.equal(harness.recognitionState(), "partial");
+  assert.match(harness.recognitionText("[data-recognition-pages]"), /第 1 頁/);
+  for (const row of result.classificationCounts) {
+    assert.match(
+      harness.recognitionText("[data-recognition-counts]"),
+      new RegExp(`${row.label}[^0-9]*${row.count}`),
+    );
+  }
+  const visibleUncertainty = harness.recognitionText("[data-recognition-items]");
+  assert.ok(result.uncertainty.length > 0, "fixture must expose a representative uncertainty");
+  for (const item of result.uncertainty) {
+    assert.match(visibleUncertainty, new RegExp(item.reason));
+    assert.match(visibleUncertainty, new RegExp(item.nextAction));
+  }
+  assert.equal(
+    visibleUncertainty.includes(result.uncertainty[0].id),
+    false,
+    "internal source/object ID must not appear in visible DOM text",
+  );
+  assert.equal(
+    harness.recognitionReference().src,
+    result.presentationReference.dataUrl,
+  );
+  assert.equal(harness.recognitionReference().hidden, false);
+});
+
+test("missing or mismatched presentation SHA never reaches the UI image", async () => {
+  const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-reference-sha=1`);
+  const bytes = await readFile(resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
+  for (const [label, sourceDocumentSha256] of [
+    ["missing", undefined],
+    ["mismatch", "B".repeat(64)],
+  ]) {
+    let result;
+    let settled;
+    const settledPromise = new Promise((resolveSettled) => { settled = resolveSettled; });
+    const harness = await initializeManualFileHandlerHarness(
+      `reference-${label}`,
+      async (selectedFile) => {
+        result = await adapter.recognizeDrawingFile(selectedFile, {
+          dependencies: {
+            async presentSelectedPdfFile() {
+              return {
+                pageCount: 1,
+                selectedPageNumber: 1,
+                referenceRaster: {
+                  available: true,
+                  dataUrl: "data:image/png;base64,iVBORw0KGgo=",
+                  naturalWidth: 320,
+                  naturalHeight: 240,
+                  pageNumber: 1,
+                  sourceDocumentSha256,
+                },
+              };
+            },
+          },
+        });
+        settled();
+        return result;
+      },
+    );
+    harness.dispatchFile(new File([bytes], `${label}.pdf`, { type: "application/pdf" }));
+    await settledPromise;
+    await nextTurn();
+    assert.equal(result.presentationReference.available, false, label);
+    assert.equal(result.presentationReference.dataUrl, null, label);
+    assert.equal(harness.recognitionReference().src, "", label);
+    assert.equal(harness.recognitionReference().hidden, true, label);
+  }
+});
+
+test("async app to real adapter shows active rejection without downstream parsing", async () => {
+  const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-active=1`);
+  const bytes = await readFile(resolve(
+    repoRoot,
+    "tests/fixtures/a0-canonical-repair/launch.pdf",
+  ));
+  const calls = { presentation: 0, extraction: 0, recognition: 0 };
+  let settled;
+  const settledPromise = new Promise((resolveSettled) => { settled = resolveSettled; });
+  const harness = await initializeManualFileHandlerHarness(
+    "active-rejection",
+    async (selectedFile) => {
+      const result = await adapter.recognizeDrawingFile(selectedFile, {
+        dependencies: {
+          async presentSelectedPdfFile() { calls.presentation += 1; },
+          async extractScene() { calls.extraction += 1; },
+          recognizePdfObjects() { calls.recognition += 1; },
+        },
+      });
+      settled();
+      return result;
+    },
+  );
+  harness.dispatchFile(new File([bytes], "含動作圖說.pdf", { type: "application/pdf" }));
+  await settledPromise;
+  await nextTurn();
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.recognitionState(), "unsupported");
+  assert.match(harness.failureReason(), /主動內容|外部動作/);
+  assert.deepEqual(calls, { presentation: 0, extraction: 0, recognition: 0 });
+});
+
+test("inspection unavailable has distinct product copy and never claims active content", async () => {
+  const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-inspection-unavailable=1`);
+  const bytes = await readFile(resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
+  let settled;
+  const settledPromise = new Promise((resolveSettled) => { settled = resolveSettled; });
+  const harness = await initializeManualFileHandlerHarness(
+    "inspection-unavailable",
+    async (selectedFile) => {
+      const result = await adapter.recognizeDrawingFile(selectedFile, {
+        dependencies: {
+          async inspectActiveContent() {
+            throw new Error("inspection unavailable");
+          },
+        },
+      });
+      settled();
+      return result;
+    },
+  );
+  harness.dispatchFile(new File([bytes], "待檢查圖說.pdf", { type: "application/pdf" }));
+  await settledPromise;
+  await nextTurn();
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.match(harness.failureReason(), /安全檢查.*無法完成|無法完成.*安全檢查/);
+  assert.doesNotMatch(harness.failureReason(), /已確認.*主動內容|含有主動內容|外部動作/);
+});
+
+test("async stale first selection cannot overwrite newer active rejection", async () => {
+  const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-stale=1`);
+  const safeBytes = await readFile(resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
+  const activeBytes = await readFile(resolve(
+    repoRoot,
+    "tests/fixtures/a0-canonical-repair/uri.pdf",
+  ));
+  let releaseFirst;
+  const firstGate = new Promise((resolveFirst) => { releaseFirst = resolveFirst; });
+  let callCount = 0;
+  let secondSettled;
+  const secondSettledPromise = new Promise((resolveSecond) => { secondSettled = resolveSecond; });
+  const harness = await initializeManualFileHandlerHarness(
+    "stale-selection",
+    async (selectedFile) => {
+      callCount += 1;
+      if (callCount === 1) await firstGate;
+      const result = await adapter.recognizeDrawingFile(selectedFile, {
+        dependencies: {
+          async presentSelectedPdfFile() {
+            return { pageCount: 1, selectedPageNumber: 1 };
+          },
+        },
+      });
+      if (callCount === 2) secondSettled();
+      return result;
+    },
+  );
+  harness.dispatchFile(new File([safeBytes], "舊圖說.pdf", { type: "application/pdf" }));
+  harness.dispatchFile(new File([activeBytes], "新圖說.pdf", { type: "application/pdf" }));
+  await secondSettledPromise;
+  await nextTurn();
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.recognitionState(), "unsupported");
+  releaseFirst();
+  await nextTurn();
+  await nextTurn();
+  assert.equal(harness.visibleState(), "FAILURE");
+  assert.equal(harness.recognitionState(), "unsupported");
+  assert.equal(harness.selectedName(), "新圖說.pdf");
 });
 
 test("DRS route shell recovery links and reload reset remain intact", async () => {
@@ -500,6 +801,14 @@ test("failure states are closed actionable responsible and recoverable", async (
     /瀏覽器.*檔案標示|檔案標示.*讀取/,
   );
   assert.match(failures.DRAWING_ONLY_QUOTE_MISSING.reason, /只有圖說|尚缺報價/);
+  assert.match(
+    failures.SECURITY_INSPECTION_UNAVAILABLE.reason,
+    /安全檢查.*無法完成|無法完成.*安全檢查/,
+  );
+  assert.doesNotMatch(
+    failures.SECURITY_INSPECTION_UNAVAILABLE.reason,
+    /已確認.*主動內容|含有主動內容|外部動作/,
+  );
 });
 
 test("state resolver is strict zero-case-data and survives hostile context", async () => {

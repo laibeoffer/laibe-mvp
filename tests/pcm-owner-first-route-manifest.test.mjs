@@ -520,7 +520,7 @@ test("Vendor Workspace publishes one active account-access recovery link while i
   await access(new URL(expected.relativeHref.split(/[?#]/, 1)[0], routeManifestUrl));
 });
 
-test("Account Access publishes exactly two active role-specific login workspace links", async () => {
+test("Account Access holds the Owner normal route while the Vendor route remains active", async () => {
   const {
     PCM_FLOW_ROUTE_MANIFEST,
     getActiveCanonicalLinkHref,
@@ -532,11 +532,11 @@ test("Account Access publishes exactly two active role-specific login workspace 
       trigger: "valid login submit with owner role selected",
       toPage: "ownerWorkspace",
       targetAnchor: null,
-      relativeHref: "../../client_awarding_dashboard/code.html",
-      canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
-      expectedVisibleState: "甲方案件工作台載入；身分與案件權限未確認時只顯示工作台結構與誠實空狀態。",
+      relativeHref: null,
+      canonicalHttpUrl: null,
+      expectedVisibleState: "正式身分入口尚未完成，甲方案件工作台正常入口仍在等待。",
       returnRoute: "accountAccess",
-      routeState: "active",
+      routeState: "hold",
     },
     {
       id: "accountAccessInvitedPartnerLoginToVendorWorkspace",
@@ -559,8 +559,13 @@ test("Account Access publishes exactly two active role-specific login workspace 
     );
     assert.equal(matches.length, 1, expected.id);
     assert.deepEqual(matches[0], expected);
-    assert.equal(getActiveCanonicalLinkHref(expected.id), expected.relativeHref);
-    await access(new URL(expected.relativeHref, routeManifestUrl));
+    assert.equal(
+      getActiveCanonicalLinkHref(expected.id),
+      expected.routeState === "active" ? expected.relativeHref : null,
+    );
+    if (expected.relativeHref) {
+      await access(new URL(expected.relativeHref, routeManifestUrl));
+    }
   }
 
   const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
@@ -1337,7 +1342,7 @@ test("public contract preserves its compatibility own-key schema while manifest 
   ]) {
     assert.equal(Object.hasOwn(PUBLIC_ROUTES, routeKey), false, routeKey);
   }
-  assert.equal(PUBLIC_ROUTES.accountAccessOwnerLoginToOwnerWorkspace, "../../client_awarding_dashboard/code.html");
+  assert.equal(PUBLIC_ROUTES.accountAccessOwnerLoginToOwnerWorkspace, null);
   assert.equal(PUBLIC_ROUTES.accountAccessInvitedPartnerLoginToVendorWorkspace, "../vendor_workspace/code.html");
   assert.equal(PUBLIC_ROUTES.ownerStart, "../owner_start/code.html");
   assert.equal(PUBLIC_ROUTES.documentCorrections, "../document_corrections/code.html");

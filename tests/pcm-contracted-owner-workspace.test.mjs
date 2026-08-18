@@ -7,6 +7,10 @@ const pageRoot = new URL(
   "../src/stitch_laibe_landing_onboarding/client_awarding_dashboard/",
   import.meta.url,
 );
+const routeManifestUrl = new URL(
+  "../src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
+  import.meta.url,
+);
 
 function readPageFile(path) {
   return readFile(new URL(path, pageRoot), "utf8");
@@ -369,6 +373,33 @@ test("甲方工作台 final runtime asset identity 保留既有 module runtime",
   assert.doesNotMatch(html, /tailwindcss|fonts\.googleapis|material-symbols/i);
 });
 
+test("正式身分入口未就緒時甲方工作台正常路徑維持 HOLD，deep link 不算通過", async () => {
+  const [manifestSource, manifest] = await Promise.all([
+    readFile(routeManifestUrl, "utf8"),
+    import(`${routeManifestUrl.href}?owner-workspace-normal-route=${Date.now()}`),
+  ]);
+  const ownerWorkspace = manifest.PCM_FLOW_NODES.find(({ id }) => id === "ownerWorkspace");
+  const normalRoute = manifest.PCM_FLOW_CANONICAL_LINKS.find(
+    ({ id }) => id === "accountAccessOwnerLoginToOwnerWorkspace",
+  );
+
+  assert.match(manifestSource, /export const OWNER_WORKSPACE_NORMAL_ROUTE = "HOLD";/u);
+  assert.deepEqual(ownerWorkspace, {
+    id: "ownerWorkspace",
+    publicPath: "/pcm/owner/workspace",
+    label: "甲方案件工作台",
+    role: "已授權甲方",
+    owner: "A0",
+    lifecycle: "active",
+    gate: "G1_UI_SOURCE",
+    href: "../../client_awarding_dashboard/code.html",
+  });
+  assert.equal(normalRoute.routeState, "hold");
+  assert.equal(normalRoute.relativeHref, null);
+  assert.equal(normalRoute.canonicalHttpUrl, null);
+  assert.doesNotMatch(manifestSource, /accountAccessOwnerLoginToOwnerWorkspace[\s\S]{0,420}client_awarding_dashboard\/code\.html/u);
+});
+
 test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
   const html = await readPageFile("code.html");
   const requiredSections = [
@@ -436,7 +467,8 @@ test("設計與工程中央區都完整保留給案件日曆", async () => {
     /data-owner-google-calendar-surface="design"/u,
   );
   assert.match(designCalendar, /title="甲方 Google 日曆｜設計管理"/u);
-  assert.match(designCalendar, /id="owner-design-google-calendar-title">甲方 Google 日曆尚未連結/u);
+  assert.match(designCalendar, /data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"/u);
+  assert.match(designCalendar, /id="owner-design-google-calendar-title">目前無法顯示甲方 Google 日曆/u);
   assert.match(designCalendar, /目前不顯示示意行程，也不使用其他角色的帳號/u);
   assert.match(designCalendar, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
   assert.doesNotMatch(designCalendar, /data-list="calendarSubmissions"|data-list="designReviews"/u);
@@ -452,7 +484,8 @@ test("設計與工程中央區都完整保留給案件日曆", async () => {
   assert.match(constructionPanel, /data-calendar-workspace="construction"/u);
   assert.match(constructionPanel, /data-owner-google-calendar/u);
   assert.match(constructionPanel, /data-owner-google-calendar-frame/u);
-  assert.match(constructionPanel, /甲方 Google 日曆尚未連結/u);
+  assert.match(constructionPanel, /data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"/u);
+  assert.match(constructionPanel, /目前無法顯示甲方 Google 日曆/u);
   assert.match(constructionPanel, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
   assert.match(constructionPanel, /data-list="constructionRecords"/u);
   assert.match(constructionPanel, /下一位處理者/u);

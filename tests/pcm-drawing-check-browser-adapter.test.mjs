@@ -13,6 +13,18 @@ const adapterPath = resolve(
   "site/preview_floor_plan/browser-recognition-adapter.mjs",
 );
 const pdfPath = resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf");
+const adversarialFixtureDir = resolve(
+  repoRoot,
+  "tests/fixtures/a0-canonical-repair",
+);
+const activePdfFixtures = Object.freeze([
+  ["Catalog OpenAction", "open-action.pdf"],
+  ["Launch action", "launch.pdf"],
+  ["URI action", "uri.pdf"],
+  ["SubmitForm action", "submit-form.pdf"],
+  ["page additional action", "page-action.pdf"],
+  ["attachment and GoToR action", "attachment-gotor.pdf"],
+]);
 const adapterUrl = pathToFileURL(adapterPath).href;
 const canonicalPaths = {
   pdf: pdfPath,
@@ -56,74 +68,11 @@ function recognizedScene() {
   };
 }
 
-function buildPdf(objectBodies) {
-  let source = "%PDF-1.7\n%\xE2\xE3\xCF\xD3\n";
-  const offsets = [0];
-  for (let index = 0; index < objectBodies.length; index += 1) {
-    offsets.push(Buffer.byteLength(source, "latin1"));
-    source += `${index + 1} 0 obj\n${objectBodies[index]}\nendobj\n`;
-  }
-  const xrefOffset = Buffer.byteLength(source, "latin1");
-  source += `xref\n0 ${objectBodies.length + 1}\n`;
-  source += "0000000000 65535 f \n";
-  for (const offset of offsets.slice(1)) {
-    source += `${String(offset).padStart(10, "0")} 00000 n \n`;
-  }
-  source += `trailer\n<< /Size ${objectBodies.length + 1} /Root 1 0 R >>\n`;
-  source += `startxref\n${xrefOffset}\n%%EOF\n`;
-  return Buffer.from(source, "latin1");
-}
-
-function pageObject(extra = "") {
-  return `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 100 100] /Contents 4 0 R ${extra} >>`;
-}
-
 function activePdfScenarios() {
-  const emptyContents = "<< /Length 0 >>\nstream\nendstream";
-  return [
-    {
-      name: "indirect Catalog OpenAction Launch",
-      bytes: buildPdf([
-        "<< /Type /Catalog /Pages 2 0 R /OpenAction 5 0 R >>",
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        pageObject(),
-        emptyContents,
-        "<< /Type /Action /S /Launch /F (calc.exe) >>",
-      ]),
-    },
-    {
-      name: "Catalog additional action URI",
-      bytes: buildPdf([
-        "<< /Type /Catalog /Pages 2 0 R /AA << /WC 5 0 R >> >>",
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        pageObject(),
-        emptyContents,
-        "<< /Type /Action /S /URI /URI (https://example.invalid) >>",
-      ]),
-    },
-    {
-      name: "page additional action SubmitForm",
-      bytes: buildPdf([
-        "<< /Type /Catalog /Pages 2 0 R >>",
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        pageObject("/AA << /O 5 0 R >>"),
-        emptyContents,
-        "<< /Type /Action /S /SubmitForm /F (https://example.invalid) >>",
-      ]),
-    },
-    {
-      name: "embedded attachment and page GoToR action",
-      bytes: buildPdf([
-        "<< /Type /Catalog /Pages 2 0 R /Names << /EmbeddedFiles << /Names [(payload.txt) 5 0 R] >> >> >>",
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        pageObject("/Annots [7 0 R]"),
-        emptyContents,
-        "<< /Type /Filespec /F (payload.txt) /EF << /F 6 0 R >> >>",
-        "<< /Type /EmbeddedFile /Length 4 >>\nstream\nDATA\nendstream",
-        "<< /Type /Annot /Subtype /Link /Rect [0 0 10 10] /A << /S /GoToR /F (remote.pdf) >> >>",
-      ]),
-    },
-  ];
+  return activePdfFixtures.map(([name, fileName]) => ({
+    name,
+    bytes: readFileSync(resolve(adversarialFixtureDir, fileName)),
+  }));
 }
 
 test("focused real File route reads bytes and returns recognition-only summary", async () => {
@@ -151,12 +100,16 @@ test("focused real File route reads bytes and returns recognition-only summary",
         recognizedCalls += 1;
         return {
           selection: { selectedRegionId: "page-1-full" },
-          allObjects: [{ category: "wall" }],
-          objects: [{ category: "wall" }],
-          counts: { wall: 1 },
+          allObjects: [{
+            sourceId: "wall-1",
+            category: "unresolved_important",
+            sourcePayload: { reason: "wall_endpoint_requires_review" },
+          }],
+          objects: [{ category: "unresolved_important" }],
+          counts: { unresolved_important: 1 },
           recognition: { status: "needs_review", unresolvedIds: ["wall-1"] },
           conversionGate: { status: "blocked" },
-          summaryRows: [{ key: "wall", count: 1 }],
+          summaryRows: [{ label: "重要待確認", count: 1 }],
         };
       },
       validateA11Binding: a11Unavailable,
@@ -171,6 +124,24 @@ test("focused real File route reads bytes and returns recognition-only summary",
   assert.equal(result.summary.pageCount, 1);
   assert.equal(result.summary.objectCount, 1);
   assert.equal(result.summary.unresolvedCount, 1);
+  assert.equal(result.mode, "local_review_only");
+  assert.deepEqual(result.holds, ["A11_FORMAL_BINDING_HOLD"]);
+  assert.equal(result.securityStatus, "NO_ACTIVE_CONTENT_TRIGGER_DETECTED");
+  assert.deepEqual(result.sourcePage, {
+    pageNumber: 1,
+    pageCount: 1,
+    label: "第 1 頁",
+  });
+  assert.deepEqual(result.classificationCounts, [{
+    label: "重要待確認",
+    count: 1,
+  }]);
+  assert.deepEqual(result.uncertainty, [{
+    id: "wall-1",
+    category: "unresolved_important",
+    reason: "牆線端點或銜接關係仍需人工核對。",
+    nextAction: "請人工核對原始圖說後再決定是否採用。",
+  }]);
   assert.equal(result.conversionAllowed, false);
   assert.equal(result.projectMutationAllowed, false);
   assert.equal(result.uploaded, false);
@@ -233,7 +204,115 @@ test("existing genuine PDF passes the local PDF.js vector and recognition chain"
   assert.equal(result.status, "partial");
   assert.equal(result.summary.pageCount, 1);
   assert.ok(result.summary.objectCount > 0);
+  assert.ok(result.classificationCounts.length > 0);
+  assert.equal(result.sourcePage.pageNumber, 1);
+  assert.equal(result.securityStatus, "NO_ACTIVE_CONTENT_TRIGGER_DETECTED");
   assert.equal(result.conversionAllowed, false);
+});
+
+test("normal caller and even caller-supplied A11 data remain local review only", async () => {
+  const { recognizeDrawingFile } = await import(`${adapterUrl}?a11-hold-red=1`);
+  const file = new File([readFileSync(pdfPath)], "drawing.pdf", {
+    type: "application/pdf",
+  });
+  const result = await recognizeDrawingFile(file, {
+    a11Binding: { callerSupplied: true },
+    dependencies: {
+      async inspectActiveContent() {
+        return "NO_ACTIVE_CONTENT_TRIGGER_DETECTED";
+      },
+      async presentSelectedPdfFile() {
+        return { pageCount: 1, selectedPageNumber: 1 };
+      },
+      async extractScene() {
+        return recognizedScene();
+      },
+      recognizePdfObjects() {
+        return {
+          selection: { selectedRegionId: "page-1-full" },
+          allObjects: [{ sourceId: "wall-1", category: "native_wall" }],
+          objects: [{ sourceId: "wall-1", category: "native_wall" }],
+          counts: { native_wall: 1 },
+          summaryRows: [{ label: "牆線", count: 1 }],
+          recognition: { unresolvedIds: [] },
+        };
+      },
+      validateA11Binding() {
+        return { passed: true, reason: "caller_claimed_pass" };
+      },
+    },
+  });
+  assert.equal(result.status, "partial");
+  assert.equal(result.reason, "A11_FORMAL_BINDING_HOLD");
+  assert.equal(result.mode, "local_review_only");
+  assert.deepEqual(result.holds, ["A11_FORMAL_BINDING_HOLD"]);
+});
+
+test("security inspection unavailable is distinct from confirmed active content", async () => {
+  const { recognizeDrawingFile } = await import(`${adapterUrl}?security-status-red=1`);
+  const file = new File([readFileSync(pdfPath)], "drawing.pdf", {
+    type: "application/pdf",
+  });
+  const calls = { presentation: 0, extraction: 0, recognition: 0 };
+  const result = await recognizeDrawingFile(file, {
+    dependencies: {
+      async inspectActiveContent() {
+        throw new Error("inspection unavailable");
+      },
+      async presentSelectedPdfFile() { calls.presentation += 1; },
+      async extractScene() { calls.extraction += 1; },
+      recognizePdfObjects() { calls.recognition += 1; },
+    },
+  });
+  assert.equal(result.status, "unsupported");
+  assert.equal(result.reason, "security_inspection_unavailable");
+  assert.equal(result.securityStatus, "SECURITY_INSPECTION_UNAVAILABLE");
+  assert.deepEqual(calls, { presentation: 0, extraction: 0, recognition: 0 });
+});
+
+test("presentation reference requires the exact selected PDF SHA", async () => {
+  const { recognizeDrawingFile } = await import(`${adapterUrl}?presentation-sha-red=1`);
+  const bytes = readFileSync(pdfPath);
+  for (const sourceDocumentSha256 of [undefined, "B".repeat(64)]) {
+    const result = await recognizeDrawingFile(
+      new File([bytes], "drawing.pdf", { type: "application/pdf" }),
+      {
+        dependencies: {
+          async inspectActiveContent() {
+            return "NO_ACTIVE_CONTENT_TRIGGER_DETECTED";
+          },
+          async presentSelectedPdfFile() {
+            return {
+              pageCount: 1,
+              selectedPageNumber: 1,
+              referenceRaster: {
+                available: true,
+                dataUrl: "data:image/png;base64,iVBORw0KGgo=",
+                naturalWidth: 320,
+                naturalHeight: 240,
+                pageNumber: 1,
+                sourceDocumentSha256,
+              },
+            };
+          },
+          async extractScene() {
+            return recognizedScene();
+          },
+          recognizePdfObjects() {
+            return {
+              allObjects: [{ sourceId: "wall-1", category: "native_wall" }],
+              counts: { native_wall: 1 },
+              summaryRows: [{ label: "牆線", count: 1 }],
+              recognition: { unresolvedIds: [] },
+            };
+          },
+        },
+      },
+    );
+    assert.equal(result.status, "partial");
+    assert.equal(result.presentationReference.available, false);
+    assert.equal(result.presentationReference.dataUrl, null);
+  }
 });
 
 test("unsupported scanned encrypted corrupt and active inputs stay closed", async () => {
@@ -300,7 +379,10 @@ test("unsupported scanned encrypted corrupt and active inputs stay closed", asyn
 });
 
 test("valid adversarial PDFs stop before presentation extraction or recognition", async () => {
-  const { recognizeDrawingFile } = await import(`${adapterUrl}?active-structure-red=1`);
+  const {
+    inspectDrawingPdfActiveContent,
+    recognizeDrawingFile,
+  } = await import(`${adapterUrl}?active-structure-red=1`);
   const pdfjs = await import(pathToFileURL(canonicalPaths.pdfJs).href);
   const scenarios = activePdfScenarios();
   for (const scenario of scenarios) {
@@ -310,6 +392,11 @@ test("valid adversarial PDFs stop before presentation extraction or recognition"
     }).promise;
     assert.equal(parsed.numPages, 1, `${scenario.name} must be a valid PDF`);
     await parsed.destroy();
+    assert.equal(
+      await inspectDrawingPdfActiveContent({ bytes: new Uint8Array(scenario.bytes) }),
+      "CONFIRMED_ACTIVE_CONTENT",
+      scenario.name,
+    );
   }
   for (const scenario of scenarios) {
     const calls = { presentation: 0, extraction: 0, recognition: 0 };
@@ -335,6 +422,7 @@ test("valid adversarial PDFs stop before presentation extraction or recognition"
     );
     assert.equal(result.status, "unsupported", scenario.name);
     assert.equal(result.reason, "active_content", scenario.name);
+    assert.equal(result.securityStatus, "CONFIRMED_ACTIVE_CONTENT", scenario.name);
     assert.deepEqual(calls, {
       presentation: 0,
       extraction: 0,
@@ -353,7 +441,6 @@ test("accepted contracts are reused without conversion or fixture-name branching
     "pdf-plan-objectization-adapter.js",
     "pdf-plan-exact-source-runtime.mjs",
     "pdf-recognition-gate.mjs",
-    "a11-floor-plan-bundle-consumer.mjs",
   ]) {
     assert.match(source, new RegExp(acceptedModule.replaceAll(".", "\\.")));
   }

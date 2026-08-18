@@ -1383,7 +1383,7 @@ test("header starts fail closed and delegates the canonical shared account entry
   assert.doesNotMatch(header, /ownerWorkspace|vendorWorkspace|client_awarding_dashboard|vendor_workspace/);
 });
 
-test("mobile header keeps only the primary audit and account actions visible", async () => {
+test("mobile header keeps the normal About DRS entry visible beside the primary actions", async () => {
   const html = await readFile(htmlUrl, "utf8");
   const css = await readFile(cssUrl, "utf8");
   const header = html.match(/<header\b[\s\S]*?<\/header>/)?.[0] ?? "";
@@ -1399,7 +1399,8 @@ test("mobile header keeps only the primary audit and account actions visible", a
   assert.doesNotMatch(header, /完整流程|合作方式|里程碑治理|申請 Email 一次性登入|甲方登入／乙方受邀/);
   assert.match(css, /\.header-actions\s*\{[^}]*margin-left:\s*auto[^}]*justify-content:\s*flex-end/s);
   assert.match(css, /\.header-action\s*\{[^}]*flex:\s*0\s+0\s+auto[^}]*width:\s*auto/s);
-  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header\s*\{[^}]*height:\s*72px[^}]*flex-wrap:\s*nowrap[\s\S]*?\.header-actions\s*\{[^}]*display:\s*flex[\s\S]*?\.header-action--context\s*\{[^}]*display:\s*none/s);
+  assert.match(header, /<a class="header-action header-action--context header-action--about" href="\.\.\/about_drs\/code\.html">關於 DRS<\/a>/u);
+  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.site-header\s*\{[^}]*height:\s*72px[^}]*flex-wrap:\s*nowrap[\s\S]*?\.header-actions\s*\{[^}]*display:\s*flex[\s\S]*?\.header-action--contract\s*\{[^}]*display:\s*none/s);
   assert.match(css, /@media\s*\(max-width:\s*440px\)\s*\{[\s\S]*?\.site-header\s+\.brand\s*>\s*\.drs-brand-lockup\s*\{[^}]*display:\s*none/s);
   assert.doesNotMatch(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.header-action\s*\{[^}]*width:\s*100%/s);
 });
@@ -1482,8 +1483,8 @@ test("mobile actionable targets stay at least 44px through every effective break
   const headerControls = [
     ["header-action", "header-action--primary"],
     ["header-action", "header-action--account"],
-    ["header-action", "header-action--context"],
-    ["header-action", "header-action--context"],
+    ["header-action", "header-action--context", "header-action--about"],
+    ["header-action", "header-action--context", "header-action--contract"],
   ];
   const decisionControls = Array.from({ length: 3 }, () => ["decision-node__tool"]);
 
@@ -1492,7 +1493,7 @@ test("mobile actionable targets stay at least 44px through every effective break
     const visibleHeaderControls = headerControls.filter((classes) => (
       computedStyle(viewport, classes).get("display") !== "none"
     ));
-    assert.equal(visibleHeaderControls.length, viewport <= 620 ? 2 : 4, `${viewport}px header visibility`);
+    assert.equal(visibleHeaderControls.length, viewport <= 620 ? 3 : 4, `${viewport}px header visibility`);
     for (const classes of visibleHeaderControls) {
       const minimum = Number.parseFloat(computedStyle(viewport, classes).get("min-height"));
       assert.ok(minimum >= 44, `${viewport}px ${classes.join(".")} resolved to ${minimum}px`);
@@ -2210,7 +2211,7 @@ test("homepage consolidates the owner journey into one truthful conversion hiera
   assert.match(css, /--accent-orange:\s*#ff5809/i);
   assert.match(css, /\.narrative-section--results,\s*\.narrative-section--decision\s*\{[^}]*background:[^;]*radial-gradient/s);
   assert.match(css, /\.application-check \.section-heading--split h2\s*\{[^}]*font-family:\s*"Noto Sans TC"/s);
-  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.header-action--context\s*\{[^}]*display:\s*none/s);
+  assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.header-action--contract\s*\{[^}]*display:\s*none/s);
   assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.qualification-list\s*\{[^}]*width:\s*100%[^}]*gap:\s*12px/s);
   assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*?\.qualification-object\s*\{[^}]*min-height:\s*184px[^}]*aspect-ratio:\s*auto/s);
 });

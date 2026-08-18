@@ -11,9 +11,13 @@ const routeManifest = await readFile(new URL("../public/pcm-flow-route-manifest.
 const { PUBLIC_ROUTES } = await import(new URL("../public/public-contract.js", root));
 
 function canonicalLinkHref(linkId) {
-  const match = routeManifest.match(new RegExp(`id: "${linkId}"[\\s\\S]*?relativeHref: "([^"]+)"`));
-  assert.ok(match, `missing canonical link: ${linkId}`);
-  return match[1];
+  const record = routeManifest.match(
+    new RegExp(`freezeRecord\\(\\{\\s*id: "${linkId}",([\\s\\S]*?)\\n  \\}\\),`),
+  );
+  assert.ok(record, `missing canonical link: ${linkId}`);
+  const href = record[1].match(/relativeHref:\s*(null|"([^"]+)")/u);
+  assert.ok(href, `missing canonical href: ${linkId}`);
+  return href[1] === "null" ? null : href[2];
 }
 
 function runWithBrowserWindow(callback) {
@@ -378,7 +382,9 @@ test("valid login stays on Account Access until role verification is formally av
     accountAccessInvitedPartnerLoginToVendorWorkspace: PUBLIC_ROUTES.accountAccessInvitedPartnerLoginToVendorWorkspace,
   };
 
+  assert.equal(routes.accountAccessOwnerLoginToOwnerWorkspace, null);
   assert.equal(routes.accountAccessOwnerLoginToOwnerWorkspace, canonicalLinkHref("accountAccessOwnerLoginToOwnerWorkspace"));
+  assert.equal(routes.accountAccessInvitedPartnerLoginToVendorWorkspace, "../vendor_workspace/code.html");
   assert.equal(routes.accountAccessInvitedPartnerLoginToVendorWorkspace, canonicalLinkHref("accountAccessInvitedPartnerLoginToVendorWorkspace"));
 
   for (const roleKey of [
