@@ -511,6 +511,32 @@ Deno.test("operator names require exact tokens while delimiter adjacency remains
   );
 });
 
+Deno.test("raw inline image content fails closed before opaque bytes can become text facts", async () => {
+  const { result: lookalikeResult } = await inspectStream(
+    "/BI BIx\nBT\n(LOOKALIKE SAFE|unit|1|2|2) Tj\nET\n",
+  );
+  assert.equal(
+    lookalikeResult.accepted,
+    true,
+    JSON.stringify(lookalikeResult),
+  );
+  assert.deepEqual(
+    lookalikeResult.facts.rows.map((row) => row.itemName),
+    ["LOOKALIKE SAFE"],
+  );
+
+  const opaquePixels = "BT (GHOST|u|1|1|1) Tj ET\n";
+  assert.equal(new TextEncoder().encode(opaquePixels).byteLength, 25);
+  const { result } = await inspectStream(
+    `BI /W 25 /H 1 /CS /G /BPC 8 ID\n${opaquePixels}EI\n`,
+  );
+
+  // This narrow intake cannot lex opaque ID bytes safely. CORRUPT_PDF is its
+  // existing lexical fail-closed result; the raw image is not compressed data.
+  assert.equal(result.accepted, false, JSON.stringify(result));
+  assert.equal(result.rejection?.code, "CORRUPT_PDF");
+});
+
 Deno.test("uppercase TJ, outside Tj, and non-literal Tj operands create no facts", async () => {
   const { result } = await inspectStream(
     "(OUTSIDE GHOST|unit|1|1|1) Tj\n" +

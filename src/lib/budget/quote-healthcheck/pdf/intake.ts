@@ -694,6 +694,7 @@ const extractedText = (
       if (activeTextObject) operands.push(token);
       continue;
     }
+    if (token.value === "BI") return { ok: false };
     if (token.value === "BT") {
       if (activeTextObject) return { ok: false };
       activeTextObject = true;
