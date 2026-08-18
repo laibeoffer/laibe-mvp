@@ -676,9 +676,9 @@ test("Public Home canonical header and decision entries use the approved DRS rou
   }
 });
 
-test("selected service-confirmation card consumes the manifest-only owner contract-management href", async () => {
+test("selected service-confirmation card sends contract management through Account Access with an owner intent", async () => {
   const routeId = "homeServiceConfirmationToOwnerContractManagement";
-  const formalHref = "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract";
+  const accountAccessHref = "../account_access/code.html?intent=owner-contract-management";
   const [html, appSource, publicContractSource] = await Promise.all([
     readFile(htmlUrl, "utf8"),
     readFile(appUrl, "utf8"),
@@ -699,15 +699,14 @@ test("selected service-confirmation card consumes the manifest-only owner contra
   assert.doesNotMatch(selectedCard, /簽署|完成簽署|先閱讀服務契約/);
   assert.doesNotMatch(selectedCard, /data-route="serviceContract"|\.\.\/service_contract\/code\.html|\shref=/);
   assert.equal(ownedLinks.length, 1);
-  assert.equal(ownedLinks[0].relativeHref, formalHref);
-  for (const consumerSource of [html, appSource, publicContractSource]) {
-    assert.equal(consumerSource.includes(formalHref), false);
-  }
+  assert.equal(ownedLinks[0].relativeHref, "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
+  assert.equal(html.includes(accountAccessHref), false);
+  assert.match(appSource, /owner-contract-management/);
   assert.match(publicContractSource, /getActiveCanonicalLinkHref\("homeServiceConfirmationToOwnerContractManagement"\)/);
 
   const { PUBLIC_ROUTES } = await import(`${publicContractUrl.href}?home-contract-management=${Date.now()}`);
   const { bindPublicRoutes } = await import(`${appUrl.href}?home-contract-management=${Date.now()}`);
-  assert.equal(PUBLIC_ROUTES[routeId], formalHref);
+  assert.equal(PUBLIC_ROUTES[routeId], ownedLinks[0].relativeHref);
   assert.equal(PUBLIC_ROUTES.serviceContract, "../service_contract/code.html");
 
   const selectedControl = makeRouteControl(routeId);
@@ -715,7 +714,7 @@ test("selected service-confirmation card consumes the manifest-only owner contra
     { querySelectorAll: () => [selectedControl] },
     { [routeId]: PUBLIC_ROUTES[routeId] },
   );
-  assert.equal(selectedControl.getAttribute("href"), formalHref);
+  assert.equal(selectedControl.getAttribute("href"), accountAccessHref);
   assert.equal(selectedControl.getAttribute("aria-disabled"), null);
   assert.equal(selectedControl.getAttribute("tabindex"), null);
   assert.equal(selectedControl.dataset.routeState, "active");
@@ -723,9 +722,9 @@ test("selected service-confirmation card consumes the manifest-only owner contra
   assert.equal(html.includes("../quote_check/code.html"), false);
 });
 
-test("Public Home header DRS service contract binds its dedicated manifest-only owner contract-management href", async () => {
+test("Public Home header DRS service contract sends owners through Account Access with an owner intent", async () => {
   const routeId = "homeHeaderServiceContractToOwnerContractManagement";
-  const formalHref = "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract";
+  const accountAccessHref = "../account_access/code.html?intent=owner-contract-management";
   const [html, appSource, publicContractSource] = await Promise.all([
     readFile(htmlUrl, "utf8"),
     readFile(appUrl, "utf8"),
@@ -745,9 +744,8 @@ test("Public Home header DRS service contract binds its dedicated manifest-only 
   assert.match(headerControl, /tabindex="-1"/);
   assert.doesNotMatch(headerControl, /data-route="serviceContract"|\shref=/);
 
-  for (const consumerSource of [html, appSource, publicContractSource]) {
-    assert.equal(consumerSource.includes(formalHref), false);
-  }
+  assert.equal(html.includes(accountAccessHref), false);
+  assert.match(appSource, /owner-contract-management/);
   assert.match(
     publicContractSource,
     /getActiveCanonicalLinkHref\("homeHeaderServiceContractToOwnerContractManagement"\)/,
@@ -763,7 +761,7 @@ test("Public Home header DRS service contract binds its dedicated manifest-only 
   const { bindPublicRoutes } = await import(
     `${appUrl.href}?home-header-contract-management=${Date.now()}`
   );
-  assert.equal(PUBLIC_ROUTES[routeId], formalHref);
+  assert.equal(PUBLIC_ROUTES[routeId], "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
   assert.equal(PUBLIC_ROUTES.serviceContract, "../service_contract/code.html");
 
   const selectedControl = makeRouteControl(routeId);
@@ -771,7 +769,7 @@ test("Public Home header DRS service contract binds its dedicated manifest-only 
     { querySelectorAll: () => [selectedControl] },
     { [routeId]: PUBLIC_ROUTES[routeId] },
   );
-  assert.equal(selectedControl.getAttribute("href"), formalHref);
+  assert.equal(selectedControl.getAttribute("href"), accountAccessHref);
   assert.equal(selectedControl.getAttribute("aria-disabled"), null);
   assert.equal(selectedControl.getAttribute("tabindex"), null);
   assert.equal(selectedControl.dataset.routeState, "active");

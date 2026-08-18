@@ -88,6 +88,14 @@ const trustedServiceContractHref = readOwnDataValue(
   PUBLIC_ROUTES,
   "serviceContract",
 );
+const ownerContractAccessHref = trustedAccountAccessHref === "../account_access/code.html"
+  ? "../account_access/code.html?intent=owner-contract-management"
+  : null;
+
+function isOwnerContractManagementRoute(routeName) {
+  return routeName === "homeServiceConfirmationToOwnerContractManagement" ||
+    routeName === "homeHeaderServiceContractToOwnerContractManagement";
+}
 
 function trustedRouteHref(routeName) {
   switch (routeName) {
@@ -125,9 +133,10 @@ function trustedRouteHref(routeName) {
 function getTrustedRouteHref(routes, routeName) {
   const trustedHref = trustedRouteHref(routeName);
   const candidateHref = readOwnDataValue(routes, routeName);
-  return typeof trustedHref === "string" && candidateHref === trustedHref
-    ? trustedHref
-    : null;
+  if (typeof trustedHref !== "string" || candidateHref !== trustedHref) return null;
+  return isOwnerContractManagementRoute(routeName)
+    ? ownerContractAccessHref
+    : trustedHref;
 }
 
 function closeRouteControl(element) {

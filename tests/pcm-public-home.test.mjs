@@ -627,7 +627,7 @@ test("every configured public route resolves inside the PCM package", async () =
   }
 });
 
-test("public homepage exposes DRS contract management as the fourth formal header entry", async () => {
+test("public homepage exposes DRS contract management as the fourth formal header entry through Account Access", async () => {
   const html = await readPcmFile("public_home/code.html");
   const headerNav = html.match(
     /<nav\b[^>]*>[\s\S]*?<\/nav>/i,
@@ -638,11 +638,7 @@ test("public homepage exposes DRS contract management as the fourth formal heade
       label: content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
     }),
   );
-  const { PCM_FLOW_ROUTE_MANIFEST, getActiveCanonicalLinkHref } = await import(
-    new URL("public/pcm-flow-route-manifest.js", packageUrl).href
-  );
-  const routeId = "homeHeaderServiceContractToOwnerContractManagement";
-  const route = PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.find(({ id }) => id === routeId);
+  const app = await readPcmFile("public_home/app.js");
 
   assert.equal(links.length, 4);
   assert.deepEqual(links.map(({ label }) => label), [
@@ -653,10 +649,7 @@ test("public homepage exposes DRS contract management as the fourth formal heade
   ]);
   assert.match(links[3].attributes, /data-route="homeHeaderServiceContractToOwnerContractManagement"/);
   assert.doesNotMatch(links[3].attributes, /\shref=/);
-  assert.equal(route?.trigger, "DRS 契約管理");
-  assert.equal(route?.relativeHref, "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
-  assert.equal(route?.targetAnchor, "#owner-dashboard-panel-contract");
-  assert.equal(getActiveCanonicalLinkHref(routeId), route.relativeHref);
+  assert.match(app, /\.\.\/account_access\/code\.html\?intent=owner-contract-management/);
   assert.doesNotMatch(headerNav, /href="[^\"]*service_contract/i);
   assert.doesNotMatch(headerNav, />\s*PCM 服務契約\s*</i);
 });

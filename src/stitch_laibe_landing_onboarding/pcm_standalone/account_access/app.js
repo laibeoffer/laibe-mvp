@@ -1,9 +1,19 @@
-import { PUBLIC_ROUTES } from "../public/public-contract.js";
-
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const OWNER_CONTRACT_MANAGEMENT_INTENT = "owner-contract-management";
 
-export const UNAVAILABLE_MESSAGE = "帳號功能正在整理中，正式開放後會提供完整操作入口。";
-export const ROUTE_UNAVAILABLE_MESSAGE = "目前無法開啟工作台，請稍後再試。";
+export const UNAVAILABLE_MESSAGE = "帳號功能尚未開放，正式開放後會先驗證角色，再進入相應工作台。";
+export const OWNER_CONTRACT_INTENT_MESSAGE = "登入後預計前往甲方工作台的契約管理。";
+
+export function accountAccessIntentMessage(location = globalThis.location) {
+  try {
+    const search = typeof location?.search === "string" ? location.search : "";
+    return new URLSearchParams(search).get("intent") === OWNER_CONTRACT_MANAGEMENT_INTENT
+      ? OWNER_CONTRACT_INTENT_MESSAGE
+      : "";
+  } catch {
+    return "";
+  }
+}
 
 function valueOf(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -108,12 +118,6 @@ function focusFirstError(root, form, errors) {
   else form.elements.namedItem("agree")?.focus();
 }
 
-function loginRouteForRole(role, routes) {
-  if (role === "owner") return routes?.accountAccessOwnerLoginToOwnerWorkspace ?? null;
-  if (role === "invited-partner") return routes?.accountAccessInvitedPartnerLoginToVendorWorkspace ?? null;
-  return null;
-}
-
 function handleSubmit(root, form, runtime) {
   const mode = form.dataset.accountForm;
   const values = formValues(form);
@@ -126,14 +130,9 @@ function handleSubmit(root, form, runtime) {
   }
 
   if (mode === "login") {
-    const href = loginRouteForRole(values.role, runtime.routes);
-    if (typeof href !== "string" || !href.trim() || typeof runtime.navigate !== "function") {
-      setStatus(form, ROUTE_UNAVAILABLE_MESSAGE, "error");
-      const password = form.elements.namedItem("password");
-      if (password) password.value = "";
-      return;
-    }
-    runtime.navigate(href);
+    setStatus(form, UNAVAILABLE_MESSAGE, "notice");
+    const password = form.elements.namedItem("password");
+    if (password) password.value = "";
     return;
   }
 
@@ -194,16 +193,21 @@ function selectRole(root, selected) {
   });
 }
 
-const defaultNavigate = (href) => window.location.assign(href);
 const defaultSchedule = (next, delay) => window.setTimeout(next, delay);
 
 export function initAccountAccess(root = document, {
-  navigate = defaultNavigate,
-  routes = PUBLIC_ROUTES,
   schedule = defaultSchedule,
+  location = globalThis.location,
 } = {}) {
   const page = root.querySelector("[data-account-access-page]");
   if (!page) return;
+
+  const intent = root.querySelector("[data-account-intent]");
+  const intentMessage = accountAccessIntentMessage(location);
+  if (intent) {
+    intent.textContent = intentMessage;
+    intent.hidden = !intentMessage;
+  }
 
   root.querySelectorAll("[data-mode-tab]").forEach((button) => {
     button.addEventListener("click", () => selectMode(root, button.dataset.modeTab));
@@ -217,10 +221,10 @@ export function initAccountAccess(root = document, {
   root.querySelectorAll("[data-account-form]").forEach((form) => {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      handleSubmit(root, form, { navigate, routes, schedule });
+      handleSubmit(root, form, { schedule });
     });
   });
-  selectMode(root, "register");
+  selectMode(root, intentMessage ? "login" : "register");
 }
 
 if (typeof document !== "undefined") initAccountAccess(document);

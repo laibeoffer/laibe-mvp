@@ -371,7 +371,7 @@ test("login submit rejects an empty password before role-based navigation", asyn
   assert.equal(harness.state.activeElement, harness.loginFields.password);
 });
 
-test("valid local login sends each explicit role only to its manifest-derived workspace route", async () => {
+test("valid login stays on Account Access until role verification is formally available", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?role-route=${Date.now()}`, import.meta.url));
   const routes = {
     accountAccessOwnerLoginToOwnerWorkspace: PUBLIC_ROUTES.accountAccessOwnerLoginToOwnerWorkspace,
@@ -381,9 +381,9 @@ test("valid local login sends each explicit role only to its manifest-derived wo
   assert.equal(routes.accountAccessOwnerLoginToOwnerWorkspace, canonicalLinkHref("accountAccessOwnerLoginToOwnerWorkspace"));
   assert.equal(routes.accountAccessInvitedPartnerLoginToVendorWorkspace, canonicalLinkHref("accountAccessInvitedPartnerLoginToVendorWorkspace"));
 
-  for (const [roleKey, expectedHref] of [
-    ["owner", routes.accountAccessOwnerLoginToOwnerWorkspace],
-    ["invited-partner", routes.accountAccessInvitedPartnerLoginToVendorWorkspace],
+  for (const roleKey of [
+    "owner",
+    "invited-partner",
   ]) {
     const harness = createRegistrationDomHarness();
     const navigations = [];
@@ -396,13 +396,14 @@ test("valid local login sends each explicit role only to its manifest-derived wo
     harness.loginTab.dispatch("click");
     runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
 
-    assert.deepEqual(navigations, [expectedHref]);
-    assert.equal(navigations[0].includes(harness.loginFields.email.value), false);
-    assert.equal(navigations[0].includes(harness.loginFields.password.value), false);
+    assert.deepEqual(navigations, []);
+    assert.equal(harness.loginStatus.textContent, module.UNAVAILABLE_MESSAGE);
+    assert.equal(harness.loginStatus.dataset.tone, "notice");
+    assert.equal(harness.loginFields.password.value, "");
   }
 });
 
-test("login fails closed in user-facing language when canonical route truth is unavailable", async () => {
+test("login keeps the same unavailable message even when old workspace routes are absent", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?route-unavailable=${Date.now()}`, import.meta.url));
   const harness = createRegistrationDomHarness();
   const navigations = [];
@@ -418,8 +419,8 @@ test("login fails closed in user-facing language when canonical route truth is u
   runWithBrowserWindow(() => harness.loginForm.dispatch("submit"));
 
   assert.deepEqual(navigations, []);
-  assert.equal(harness.loginStatus.textContent, "目前無法開啟工作台，請稍後再試。");
-  assert.equal(harness.loginStatus.dataset.tone, "error");
+  assert.equal(harness.loginStatus.textContent, module.UNAVAILABLE_MESSAGE);
+  assert.equal(harness.loginStatus.dataset.tone, "notice");
   assert.equal(harness.loginFields.password.value, "");
 });
 
@@ -430,11 +431,41 @@ test("registration stays a truthful unavailable account entry", async () => {
   }), {
     company: "請輸入公司名稱。", name: "請輸入姓名。", phone: "請輸入聯絡電話。", region: "請選擇所在縣市。", email: "請輸入有效的 Email。", password: "密碼至少需要 8 碼。", agree: "請先閱讀並同意使用說明。", role: "請選擇你目前的使用角色。",
   });
-  assert.equal(module.UNAVAILABLE_MESSAGE, "帳號功能正在整理中，正式開放後會提供完整操作入口。");
+  assert.equal(module.UNAVAILABLE_MESSAGE, "帳號功能尚未開放，正式開放後會先驗證角色，再進入相應工作台。");
 });
 
-test("login explains the safe workspace handoff without claiming confirmed case access", () => {
-  assert.match(html, /進入後會先看到對應工作台結構；案件資料會在身分與權限確認後顯示。/);
+test("login explains that role verification precedes the matching workspace", () => {
+  assert.match(html, /帳號功能正式開放後，會先驗證角色，再進入相應工作台。/);
+});
+
+test("Account Access presents the owner contract-management purpose only for its fixed intent", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?intent=${Date.now()}`, import.meta.url));
+
+  assert.equal(
+    module.accountAccessIntentMessage({ search: "?intent=owner-contract-management" }),
+    "登入後預計前往甲方工作台的契約管理。",
+  );
+  assert.equal(module.accountAccessIntentMessage({ search: "?intent=unexpected" }), "");
+  assert.match(html, /data-account-intent/);
+});
+
+test("owner contract-management intent opens the login mode while other entries keep registration", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?intent-mode=${Date.now()}`, import.meta.url));
+  const intended = createRegistrationDomHarness();
+  module.initAccountAccess(intended.rootDocument, {
+    location: { search: "?intent=owner-contract-management" },
+  });
+
+  assert.equal(intended.rootDocument.documentElement.dataset.accountMode, "login");
+  assert.equal(intended.loginForm.hidden, false);
+  assert.equal(intended.form.hidden, true);
+  assert.equal(intended.title.textContent, "登入 LaiBE DRS 帳號");
+
+  const defaultEntry = createRegistrationDomHarness();
+  module.initAccountAccess(defaultEntry.rootDocument, { location: { search: "" } });
+  assert.equal(defaultEntry.rootDocument.documentElement.dataset.accountMode, "register");
+  assert.equal(defaultEntry.form.hidden, false);
+  assert.equal(defaultEntry.loginForm.hidden, true);
 });
 
 test("canonical geometry and visual tokens survive the split", () => {
@@ -457,9 +488,8 @@ test("hidden company field cannot be made visible by the field grid rule", () =>
 
 test("no untruthful integration, prohibited product framing, or engineering language is introduced", () => {
   assert.doesNotMatch(app, /fetch\s*\(|XMLHttpRequest|WebSocket|localStorage|sessionStorage|indexedDB/i);
-  assert.doesNotMatch(app, /location\s*=|location\.href|window\.open|帳號已建立|登入成功/);
-  assert.match(app, /window\.location\.assign/);
-  assert.match(app, /from\s+"\.\.\/public\/public-contract\.js"/);
+  assert.doesNotMatch(app, /location\.assign|location\.href|window\.open|帳號已建立|登入成功/);
+  assert.doesNotMatch(app, /window\.location\.assign|public-contract\.js/);
   for (const forbiddenTarget of [
     "../../client_awarding_dashboard/code.html",
     "../vendor_workspace/code.html",
