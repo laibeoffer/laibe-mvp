@@ -31,7 +31,7 @@
       </div>
     </header>
 
-    <main class="owner-first-shell quote-shell" id="main-content" data-quote-check-page data-document-workspace>
+    <main class="owner-first-shell quote-shell" id="main-content" data-quote-check-page data-document-workspace data-quote-runtime-mode="LOCAL_PARSER_SUMMARY_ONLY">
       <section class="self-check-hero" aria-labelledby="workspace-title">
         <p class="workspace-heading__eyebrow">給已拿到報價、契約或圖說的業主</p>
         <h1 id="workspace-title">報價文件檢查</h1>
@@ -76,10 +76,10 @@
               <p class="document-feedback" id="document-feedback-quote" data-document-feedback="quote">尚未選擇檔案。</p>
               <p class="selected-file" data-selected-file="quote" hidden><span>檔名</span><strong data-document-filename="quote"></strong></p>
             </section>
-            <section class="document-action-step document-action-step--report" data-ai-report-step aria-labelledby="report-quote-title">
-              <header class="document-action-step__header"><p><span>02</span>本機解析摘要</p><h3 id="report-quote-title">報價文字層解析摘要</h3><small>讀到完整報價列後會在下方顯示；這不是案件正式報告。</small></header>
-              <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="quote" disabled>正式案件報告尚未開放</button>
-              <p class="ai-report-status" data-ai-report-status="quote" data-report-state="waiting-file">請先選擇 PDF。</p>
+            <section class="document-action-step document-action-step--report" data-parser-summary-step aria-labelledby="parser-summary-quote-title">
+              <header class="document-action-step__header"><p><span>02</span>本機解析摘要</p><h3 id="parser-summary-quote-title">報價文字層解析摘要</h3><small>讀到完整報價列後會在下方顯示；這不是案件正式報告。</small></header>
+              <p class="ai-report-status" data-parser-status="quote" data-parser-state="waiting-file">請先選擇 PDF。</p>
+              <p class="ai-report-boundary">目前只提供本機解析摘要，不會建立正式報告或案件紀錄。</p>
               <div class="local-parser-summary" data-parser-summary="quote" hidden>
                 <p class="local-parser-summary__eyebrow">本次瀏覽的解析摘要</p>
                 <dl>
@@ -90,7 +90,7 @@
                 </dl>
                 <p data-summary-limitations>這份本機解析摘要不會保存，也不是案件正式報告。</p>
               </div>
-              <p class="ai-report-boundary">這只整理本次 PDF 的文字層，不是 OCR 或完整報價審查。正式案件報告仍需綁定案件、文件版本與確認依據；目前不會在此頁建立。</p>
+              <p class="ai-report-boundary">這只整理本次 PDF 的文字層，不是 OCR、完整報價審查、正式報告或案件紀錄；請回到原始文件逐項核對。</p>
             </section>
           </div>
         </div>

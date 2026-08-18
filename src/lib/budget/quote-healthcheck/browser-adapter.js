@@ -935,6 +935,7 @@ export {
 // END GENERATED INTAKE BUNDLE
 
 var trustedBlobArrayBuffer = globalThis.Blob?.prototype?.arrayBuffer;
+var trustedGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 var trustedBlobSizeGetter = globalThis.Blob
   ? Object.getOwnPropertyDescriptor(globalThis.Blob.prototype, "size")?.get
   : void 0;
@@ -1033,7 +1034,30 @@ var safeFileSnapshot = async (file) => {
   }
 };
 
-var inspectParserOnlyQuotePdfBytes = (inputBytes) => {
+var notifyBeforePageTextParse = (dependencies) => {
+  let callback;
+  try {
+    if (
+      dependencies === null ||
+      dependencies === void 0 ||
+      (typeof dependencies !== "object" && typeof dependencies !== "function")
+    ) {
+      return;
+    }
+    const descriptor = trustedGetOwnPropertyDescriptor(
+      dependencies,
+      "onBeforePageTextParse"
+    );
+    callback = descriptor && typeof descriptor.value === "function"
+      ? descriptor.value
+      : void 0;
+  } catch {
+    return;
+  }
+  if (callback) callback();
+};
+
+var inspectParserOnlyQuotePdfBytes = (inputBytes, dependencies = void 0) => {
   const bytes = new Uint8Array(inputBytes);
   if (bytes.byteLength > DEFAULT_MAX_BYTES) {
     return reject("FILE_TOO_LARGE", "PDF exceeds the parser-only byte limit.");
@@ -1072,6 +1096,7 @@ var inspectParserOnlyQuotePdfBytes = (inputBytes) => {
   if (scannedNames.names.includes("Filter")) {
     return reject("UNSUPPORTED_COMPRESSED_CONTENT", "Compressed PDFs are outside parser-only intake.");
   }
+  notifyBeforePageTextParse(dependencies);
   const parsedPages = parseSupportedPageStreams(objects, bytes, DEFAULT_MAX_PAGES);
   if (!parsedPages.ok) return { accepted: false, rejection: parsedPages.rejection };
   const imageOnly = parsedPages.text.length === 0 &&
@@ -1113,7 +1138,7 @@ var translateLimitations = (limitations) => limitations.flatMap(({ code }) => {
   }
 });
 
-var inspectQuotePdfFile = async (file) => {
+var inspectQuotePdfFile = async (file, dependencies = void 0) => {
   const snapshot = await safeFileSnapshot(file);
   if (snapshot.kind === "too-large") return publicRejection("FILE_TOO_LARGE");
   if (snapshot.kind !== "bytes") {
@@ -1126,7 +1151,7 @@ var inspectQuotePdfFile = async (file) => {
   }
 
   try {
-    const intake = inspectParserOnlyQuotePdfBytes(snapshot.bytes);
+    const intake = inspectParserOnlyQuotePdfBytes(snapshot.bytes, dependencies);
     if (!intake.accepted) return publicRejection(intake.rejection.code);
     if (intake.inspection.readability === "IMAGE_ONLY") {
       return publicFailure(
@@ -1148,7 +1173,7 @@ var inspectQuotePdfFile = async (file) => {
       status: "PARSER_READY",
       title: "本機解析摘要已完成",
       message: "摘要只反映這次選擇的 PDF，不會上傳或保存。",
-      nextAction: "請回到原始報價文件逐項確認；正式報告需在案件中建立。",
+      nextAction: "請回到原始報價文件逐項確認；本頁不會建立正式報告或案件紀錄。",
       summary: {
         pageCount: intake.inspection.pageCount,
         itemCount: intake.rowCount,
@@ -1168,6 +1193,9 @@ var inspectQuotePdfFile = async (file) => {
   }
 };
 
+var QUOTE_BROWSER_RUNTIME_MODE = "LOCAL_PARSER_SUMMARY_ONLY";
+
 export {
-  inspectQuotePdfFile
+  inspectQuotePdfFile,
+  QUOTE_BROWSER_RUNTIME_MODE
 };

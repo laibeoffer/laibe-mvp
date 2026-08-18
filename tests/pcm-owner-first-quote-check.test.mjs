@@ -550,14 +550,21 @@ function createDocumentWorkspaceHarness() {
     input.setAttribute("aria-invalid", "false");
     return [kind, input];
   }));
-  const reportActions = Object.fromEntries(kinds.map((kind) => [kind, createNode({
+  const reportKinds = ["contract", "drawing"];
+  const reportActions = Object.fromEntries(reportKinds.map((kind) => [kind, createNode({
     dataset: { aiReportAction: kind },
     disabled: true,
   })]));
-  const reportStatuses = Object.fromEntries(kinds.map((kind) => [kind, createNode({
+  const reportStatuses = Object.fromEntries(reportKinds.map((kind) => [kind, createNode({
     dataset: { aiReportStatus: kind, reportState: "waiting-file" },
     textContent: "請先選擇 PDF。",
   })]));
+  const parserStatuses = {
+    quote: createNode({
+      dataset: { parserStatus: "quote", parserState: "waiting-file" },
+      textContent: "請先選擇 PDF。",
+    }),
+  };
   const parserSummary = createNode({
     dataset: { parserSummary: "quote" },
     hidden: true,
@@ -678,6 +685,7 @@ function createDocumentWorkspaceHarness() {
       ["document-file", fileInputs],
       ["ai-report-action", reportActions],
       ["ai-report-status", reportStatuses],
+      ["parser-status", parserStatuses],
     ];
     for (const [attribute, values] of selectors) {
       const match = selector.match(new RegExp(`^\\[data-${attribute}="(quote|contract|drawing)"\\]$`, "u"));
@@ -700,10 +708,12 @@ function createDocumentWorkspaceHarness() {
     items,
     live,
     panels,
+    pageRoot,
     pendingEmpty,
     pendingList,
     reportActions,
     parserSummary,
+    parserStatuses,
     reportStatuses,
     selectedRows,
     start,
@@ -935,13 +945,14 @@ test("approved two-function workspace is visible truthful and memory only", asyn
   assert.doesNotMatch(visible, /上傳成功|已上傳/u, "本機讀取流程不得對使用者宣稱已上傳");
   assert.match(html, /data-start-upload[^>]*>\s*選擇第一份 PDF\s*<\/button>/u);
   assert.equal((html.match(/data-document-upload-step\b/gu) ?? []).length, 3);
-  assert.equal((html.match(/data-ai-report-step\b/gu) ?? []).length, 3);
-  assert.equal((html.match(/data-ai-report-action=/gu) ?? []).length, 3);
-  assert.equal((html.match(/data-ai-report-status=/gu) ?? []).length, 3);
-  assert.match(
-    html,
-    /<button[^>]*data-ai-report-action="quote"[^>]*disabled[^>]*>正式案件報告尚未開放<\/button>/u,
-  );
+  assert.equal((html.match(/data-parser-summary-step\b/gu) ?? []).length, 1);
+  assert.equal((html.match(/data-ai-report-step\b/gu) ?? []).length, 2);
+  assert.equal((html.match(/data-ai-report-action=/gu) ?? []).length, 2);
+  assert.equal((html.match(/data-ai-report-status=/gu) ?? []).length, 2);
+  assert.match(html, /data-parser-status="quote"[^>]*data-parser-state="waiting-file"/u);
+  assert.doesNotMatch(html, /data-ai-report-action="quote"/u);
+  assert.match(html, /data-quote-runtime-mode="LOCAL_PARSER_SUMMARY_ONLY"/u);
+  assert.match(visible, /目前只提供本機解析摘要，不會建立正式報告或案件紀錄。/u);
   assert.match(html, /data-parser-summary="quote"[^>]*hidden/u);
   assert.doesNotMatch(html, /data-ai-report-output="quote"/u);
   assert.equal((html.match(/class="document-action-step(?:\s|")/gu) ?? []).length, 6);
@@ -960,7 +971,8 @@ test("approved two-function workspace is visible truthful and memory only", asyn
 
   assert.match(app, /application\/pdf/u);
   assert.match(app, /\.pdf\$/u);
-  assert.match(app, /inspectQuotePdfFile\(selection\.file\)/u);
+  assert.match(app, /inspectSelectedQuoteFile\(selection\.file\)/u);
+  assert.match(app, /QUOTE_BROWSER_RUNTIME_MODE/u);
   assert.doesNotMatch(app, /local-browser-session|local-browser-document/u);
   assert.match(app, /正在本機讀取 PDF；檔案不會上傳或保存。/u);
   assert.doesNotMatch(app, /上傳成功|已上傳/u, "動態可見文案不得宣稱已上傳");
@@ -1061,7 +1073,7 @@ test("production bootstrap applies mode to the first rendered tab and panel stat
   }
 });
 
-test("production workspace renders parser-only facts while keeping the formal report CTA disabled", async () => {
+test("production workspace renders parser-only facts without a formal report CTA", async () => {
   const app = await importDocumentWorkspaceApp("workspace-dom-listeners");
   const harness = createDocumentWorkspaceHarness();
   app.initializeQuoteCheckPage(harness.documentRoot, {
@@ -1070,6 +1082,7 @@ test("production workspace renders parser-only facts while keeping the formal re
   });
 
   assert.equal(harness.tabs.contract.getAttribute("aria-selected"), "true");
+  assert.equal(harness.pageRoot.dataset.quoteRuntimeMode, "LOCAL_PARSER_SUMMARY_ONLY");
   assert.equal(harness.tabs.contract.tabIndex, 0);
   assert.equal(harness.panels.contract.hidden, false);
   assert.equal(harness.panels.quote.hidden, true);
@@ -1102,11 +1115,9 @@ test("production workspace renders parser-only facts while keeping the formal re
   assert.equal(harness.activeElement(), harness.fileInputs.quote);
   assert.match(harness.live.textContent, /選擇報價內容 PDF/u);
 
-  assert.equal(harness.reportActions.quote.disabled, true);
   await harness.chooseFile("quote", await readableQuoteFile());
-  assert.equal(harness.reportActions.quote.disabled, true);
-  assert.equal(harness.reportStatuses.quote.dataset.reportState, "parser-ready");
-  assert.match(harness.reportStatuses.quote.textContent, /本機解析摘要已完成/u);
+  assert.equal(harness.parserStatuses.quote.dataset.parserState, "parser-ready");
+  assert.match(harness.parserStatuses.quote.textContent, /本機解析摘要已完成/u);
   assert.equal(harness.parserSummary.hidden, false);
   assert.equal(harness.summaryFields["[data-summary-page-count]"].textContent, "1");
   assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "2");
@@ -1124,7 +1135,6 @@ test("production workspace file events keep one truth across cancel invalid drop
   assert.equal(harness.filename.quote.textContent, "A.pdf");
   assert.equal(harness.selectedRows.quote.hidden, false);
   assert.equal(harness.feedback.quote.textContent, "已完成本機解析摘要；重新選擇可改看另一份 PDF。");
-  assert.equal(harness.reportActions.quote.disabled, true);
   assert.equal(harness.fileInputs.quote.getAttribute("aria-invalid"), "false");
   assert.equal(harness.fileInputs.quote.getAttribute("aria-describedby"), "document-feedback-quote");
 
@@ -1160,22 +1170,130 @@ test("production workspace fails closed for scanned bytes, recovers on reselect,
     "quote",
     await quoteFixtureFile("scanned-image-only.pdf", "掃描報價.pdf"),
   );
-  assert.equal(firstPage.reportStatuses.quote.dataset.reportState, "scanned");
-  assert.match(firstPage.reportStatuses.quote.textContent, /掃描檔[\s\S]*不會執行 OCR/u);
-  assert.equal(firstPage.reportActions.quote.disabled, true);
+  assert.equal(firstPage.parserStatuses.quote.dataset.parserState, "scanned");
+  assert.match(firstPage.parserStatuses.quote.textContent, /掃描檔[\s\S]*不會執行 OCR/u);
   assert.equal(firstPage.parserSummary.hidden, true);
 
   await firstPage.chooseFile("quote", await readableQuoteFile("可讀報價.pdf"));
-  assert.equal(firstPage.reportStatuses.quote.dataset.reportState, "parser-ready");
-  assert.equal(firstPage.reportActions.quote.disabled, true);
+  assert.equal(firstPage.parserStatuses.quote.dataset.parserState, "parser-ready");
   assert.equal(firstPage.parserSummary.hidden, false);
 
   const freshPage = createDocumentWorkspaceHarness();
   app.initializeQuoteCheckPage(freshPage.documentRoot, { hash: "", search: "?mode=quote" });
-  assert.equal(freshPage.reportStatuses.quote.dataset.reportState, "waiting-file");
-  assert.equal(freshPage.reportActions.quote.disabled, true);
+  assert.equal(freshPage.parserStatuses.quote.dataset.parserState, "waiting-file");
   assert.equal(freshPage.parserSummary.hidden, true);
   assert.equal(freshPage.fileSelectionSummary.textContent, "目前尚未選擇檔案。");
+});
+
+test("production workspace maps unsafe and fake-text bytes to safe parser-only recovery states", async () => {
+  const app = await importDocumentWorkspaceApp("workspace-byte-rejections");
+  const cases = [
+    ["encrypted.pdf", /這份 PDF 已加密/u],
+    ["adversarial-action.pdf", /這份 PDF 含有互動內容/u],
+    ["filter-array.pdf", /這份 PDF 使用尚未支援的壓縮格式/u],
+    ["corrupt.pdf", /無法安全讀取這份 PDF/u],
+    ["metadata-fake-tj.pdf", /尚未找到可整理的報價列/u],
+  ];
+
+  for (const [fixtureName, visibleMessage] of cases) {
+    const harness = createDocumentWorkspaceHarness();
+    app.initializeQuoteCheckPage(harness.documentRoot, { hash: "", search: "?mode=quote" });
+    await harness.chooseFile(
+      "quote",
+      await quoteFixtureFile(fixtureName, "相同顯示檔名.pdf"),
+    );
+    assert.equal(harness.parserStatuses.quote.dataset.parserState, "error", fixtureName);
+    assert.match(harness.parserStatuses.quote.textContent, visibleMessage, fixtureName);
+    assert.equal(harness.parserSummary.hidden, true, fixtureName);
+    assert.equal(harness.feedback.quote.dataset.feedbackState, "error", fixtureName);
+    assert.match(harness.live.textContent, /下一步/u, fixtureName);
+    assert.doesNotMatch(
+      `${harness.parserStatuses.quote.textContent} ${harness.live.textContent}`,
+      /stack|exception|raw JSON|CORRUPT_PDF|UNSUPPORTED_/iu,
+      fixtureName,
+    );
+    assert.equal(Object.hasOwn(harness.reportActions, "quote"), false, fixtureName);
+  }
+});
+
+test("same filename renders different parser summaries from different PDF bytes", async () => {
+  const app = await importDocumentWorkspaceApp("workspace-byte-derived-summary");
+  const harness = createDocumentWorkspaceHarness();
+  app.initializeQuoteCheckPage(harness.documentRoot, { hash: "", search: "?mode=quote" });
+
+  await harness.chooseFile(
+    "quote",
+    await quoteFixtureFile("readable-quote.pdf", "同名報價.pdf"),
+  );
+  assert.equal(harness.summaryFields["[data-summary-page-count]"].textContent, "1");
+  assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "2");
+
+  await harness.chooseFile(
+    "quote",
+    await quoteFixtureFile("toctou-quote.pdf", "同名報價.pdf"),
+  );
+  assert.equal(harness.filename.quote.textContent, "同名報價.pdf");
+  assert.equal(harness.summaryFields["[data-summary-page-count]"].textContent, "1");
+  assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "1");
+  assert.equal(harness.parserStatuses.quote.dataset.parserState, "parser-ready");
+});
+
+test("a deferred older parser result cannot replace the newer file truth", async () => {
+  const app = await importDocumentWorkspaceApp("workspace-stale-parser-result");
+  const harness = createDocumentWorkspaceHarness();
+  const pending = [];
+  const inspectDeferred = (file) => new Promise((resolveResult) => {
+    pending.push({ file, resolveResult });
+  });
+  app.initializeQuoteCheckPage(
+    harness.documentRoot,
+    { hash: "", search: "?mode=quote" },
+    { inspectQuotePdfFile: inspectDeferred },
+  );
+
+  const firstSelection = harness.chooseFile("quote", await readableQuoteFile("A.pdf"));
+  await Promise.resolve();
+  const secondSelection = harness.chooseFile("quote", await readableQuoteFile("B.pdf"));
+  await Promise.resolve();
+  assert.equal(pending.length, 2);
+
+  pending[1].resolveResult({
+    status: "PARSER_READY",
+    title: "本機解析摘要已完成",
+    message: "B bytes",
+    nextAction: "核對 B",
+    summary: {
+      pageCount: 1,
+      itemCount: 1,
+      readability: "可讀文字層",
+      comparison: "本次未提供比較基準",
+    },
+    limitations: [],
+    report: null,
+  });
+  await secondSelection;
+  assert.equal(harness.filename.quote.textContent, "B.pdf");
+  assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "1");
+
+  pending[0].resolveResult({
+    status: "PARSER_READY",
+    title: "本機解析摘要已完成",
+    message: "stale A bytes",
+    nextAction: "不應顯示",
+    summary: {
+      pageCount: 9,
+      itemCount: 99,
+      readability: "不應顯示",
+      comparison: "不應顯示",
+    },
+    limitations: [],
+    report: null,
+  });
+  await firstSelection;
+  assert.equal(harness.filename.quote.textContent, "B.pdf");
+  assert.equal(harness.summaryFields["[data-summary-page-count]"].textContent, "1");
+  assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "1");
+  assert.doesNotMatch(harness.live.textContent, /不應顯示|stale A/u);
 });
 
 test("missing or invalid mode query falls back quietly to quote", async () => {
@@ -1193,7 +1311,8 @@ test("quote check two-function path stays on the page and keeps DRS home availab
   ]);
 
   assert.equal((html.match(/data-document-upload-step\b/gu) ?? []).length, 3);
-  assert.equal((html.match(/data-ai-report-step\b/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-parser-summary-step\b/gu) ?? []).length, 1);
+  assert.equal((html.match(/data-ai-report-step\b/gu) ?? []).length, 2);
   assert.doesNotMatch(html, /data-self-check-summary|data-copy-pending/u);
   assert.match(html, /href="\.\.\/public_home\/code\.html#top"[^>]*>DRS 首頁<\/a>/u);
   assert.doesNotMatch(html, /href="\.\.\/basic_report\/code\.html"/u);

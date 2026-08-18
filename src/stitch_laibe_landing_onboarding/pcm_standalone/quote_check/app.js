@@ -1,4 +1,7 @@
-import { inspectQuotePdfFile } from "../../../lib/budget/quote-healthcheck/browser-adapter.js";
+import {
+  inspectQuotePdfFile,
+  QUOTE_BROWSER_RUNTIME_MODE,
+} from "../../../lib/budget/quote-healthcheck/browser-adapter.js";
 
 const safeArrayIsArray = Array.isArray;
 const safeApply = Reflect.apply;
@@ -788,7 +791,13 @@ function readDocumentInputSelection(input) {
   }
 }
 
-function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHash = "") {
+function initializeDocumentWorkspace(
+  root,
+  workspaceRoot,
+  initialMode,
+  initialHash = "",
+  dependencies = null,
+) {
   const tabs = root.querySelectorAll("[data-document-tab]");
   const panels = root.querySelectorAll("[data-document-panel]");
   const fileInputs = root.querySelectorAll("[data-document-file]");
@@ -804,6 +813,16 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   const copyPending = root.querySelector("[data-copy-pending]");
   const copyFeedback = root.querySelector("[data-copy-feedback]");
   const domFactory = root.ownerDocument || null;
+  const inspectorDescriptor = readOwnDataValue(dependencies, "inspectQuotePdfFile");
+  const inspectSelectedQuoteFile = inspectorDescriptor &&
+      typeof inspectorDescriptor.value === "function"
+    ? inspectorDescriptor.value
+    : inspectQuotePdfFile;
+  try {
+    root.dataset.quoteRuntimeMode = QUOTE_BROWSER_RUNTIME_MODE;
+  } catch {
+    // The runtime marker is informative; a hostile DOM host must not stop the workspace.
+  }
   let workspaceState = createDocumentWorkspaceState(initialMode);
   let pendingCopyText = "";
   const parserResults = {
@@ -876,18 +895,29 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     const parserResult = parserResults[kind];
     const filename = root.querySelector(`[data-document-filename="${kind}"]`);
     const filenameRow = root.querySelector(`[data-selected-file="${kind}"]`);
-    const reportAction = root.querySelector(`[data-ai-report-action="${kind}"]`);
-    const reportStatus = root.querySelector(`[data-ai-report-status="${kind}"]`);
+    const reportAction = kind === "quote"
+      ? null
+      : root.querySelector(`[data-ai-report-action="${kind}"]`);
+    const reportStatus = kind === "quote"
+      ? null
+      : root.querySelector(`[data-ai-report-status="${kind}"]`);
+    const parserStatus = kind === "quote"
+      ? root.querySelector('[data-parser-status="quote"]')
+      : null;
     if (filename) filename.textContent = selected ? documentSelection.name : "";
     if (filenameRow) filenameRow.hidden = !selected;
     if (!selected) {
       if (reportAction) {
         reportAction.disabled = true;
-        reportAction.textContent = kind === "quote" ? "正式案件報告尚未開放" : "檢查報告尚未開放";
+        reportAction.textContent = "檢查報告尚未開放";
       }
       if (reportStatus) {
         reportStatus.dataset.reportState = "waiting-file";
         reportStatus.textContent = "請先選擇 PDF。";
+      }
+      if (parserStatus) {
+        parserStatus.dataset.parserState = "waiting-file";
+        parserStatus.textContent = "請先選擇 PDF。";
       }
       return;
     }
@@ -903,28 +933,20 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
       return;
     }
     if (!parserResult || parserResult.status === "PROCESSING") {
-      if (reportAction) {
-        reportAction.disabled = true;
-        reportAction.textContent = "正式案件報告尚未開放";
-      }
-      if (reportStatus) {
-        reportStatus.dataset.reportState = "processing";
-        reportStatus.textContent = "正在本機讀取 PDF；檔案不會上傳或保存。";
+      if (parserStatus) {
+        parserStatus.dataset.parserState = "processing";
+        parserStatus.textContent = "正在本機讀取 PDF；檔案不會上傳或保存。";
       }
       return;
     }
     const ready = parserResult.status === "PARSER_READY" && Boolean(parserResult.summary);
-    if (reportAction) {
-      reportAction.disabled = true;
-      reportAction.textContent = "正式案件報告尚未開放";
-    }
-    if (reportStatus) {
-      reportStatus.dataset.reportState = ready
+    if (parserStatus) {
+      parserStatus.dataset.parserState = ready
         ? "parser-ready"
         : parserResult.status === "SCANNED_PDF"
           ? "scanned"
           : "error";
-      reportStatus.textContent = ready
+      parserStatus.textContent = ready
         ? "本機解析摘要已完成；這不是案件正式報告，請回到原始文件確認。"
         : `${parserResult.title}：${parserResult.message}`;
     }
@@ -1134,10 +1156,10 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
 
     const runId = analysisRuns.quote + 1;
     analysisRuns.quote = runId;
-    parserResults.quote = { status: "PROCESSING", summary: null, report: null };
+    parserResults.quote = { status: "PROCESSING", summary: null };
     render();
     announce("正在本機讀取報價 PDF；檔案不會上傳或保存。");
-    const parserResult = await inspectQuotePdfFile(selection.file);
+    const parserResult = await inspectSelectedQuoteFile(selection.file);
     if (analysisRuns.quote !== runId) return;
     parserResults.quote = parserResult;
     if (feedback) {
@@ -1149,7 +1171,7 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     render();
     announce(parserResult.status === "PARSER_READY"
       ? "本機解析摘要已完成；這不是案件正式報告，請回到原始文件確認。"
-      : `${parserResult.title}。${parserResult.nextAction}`);
+      : `${parserResult.title}。下一步：${parserResult.nextAction}`);
   }
 
   function focusFirstUnconfirmed() {
@@ -1305,7 +1327,11 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   }
 }
 
-export function initializeQuoteCheckPage(documentRoot = document, locationSource = globalThis.location) {
+export function initializeQuoteCheckPage(
+  documentRoot = document,
+  locationSource = globalThis.location,
+  dependencies = null,
+) {
   const root = documentRoot.querySelector("[data-quote-check-page]");
   if (!root) return;
 
@@ -1326,7 +1352,7 @@ export function initializeQuoteCheckPage(documentRoot = document, locationSource
       hash = "";
     }
     const initialMode = resolveDocumentWorkspaceHash(hash) || resolveDocumentWorkspaceMode(search);
-    initializeDocumentWorkspace(root, workspaceRoot, initialMode, hash);
+    initializeDocumentWorkspace(root, workspaceRoot, initialMode, hash, dependencies);
     return;
   }
 

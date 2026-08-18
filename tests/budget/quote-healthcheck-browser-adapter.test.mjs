@@ -47,9 +47,10 @@ test("Quote Check exposes a parser-only summary and never fabricates a formal re
     appSource,
     /from "\.\.\/\.\.\/\.\.\/lib\/budget\/quote-healthcheck\/browser-adapter\.js"/u,
   );
-  assert.match(appSource, /inspectQuotePdfFile\(/u);
+  assert.match(appSource, /inspectSelectedQuoteFile\(selection\.file\)/u);
 
   const adapter = await loadAdapter();
+  assert.equal(adapter.QUOTE_BROWSER_RUNTIME_MODE, "LOCAL_PARSER_SUMMARY_ONLY");
   const result = await adapter.inspectQuotePdfFile(
     fixtureFile("readable-quote.pdf"),
   );
@@ -63,6 +64,14 @@ test("Quote Check exposes a parser-only summary and never fabricates a formal re
   });
   assert.equal(result.report, null);
   assert.deepEqual(result.limitations, []);
+  assert.match(result.nextAction, /本頁不會建立正式報告或案件紀錄/u);
+  assert.doesNotMatch(
+    JSON.stringify(result),
+    /documentVersionId|caseId|sha256/u,
+  );
+  for (const domainField of ["packet", "policy", "findings", "schema"]) {
+    assert.equal(Object.hasOwn(result, domainField), false, domainField);
+  }
   assert.doesNotMatch(JSON.stringify(result), /拆除工程|油漆工程|1200|8000/u);
   assert.doesNotMatch(
     readFileSync(adapterPath, "utf8"),
@@ -102,6 +111,37 @@ test("encrypted corrupt active compressed and scanned PDFs fail closed with safe
     assert.match(`${result.title} ${result.message}`, visibleMessage, fixtureName);
     assert.doesNotMatch(JSON.stringify(result), /stack|exception|at file:|raw JSON/iu);
   }
+});
+
+test("active and encrypted PDFs stop before page and text parsing", async () => {
+  const adapter = await loadAdapter();
+  for (const fixtureName of ["adversarial-action.pdf", "encrypted.pdf"]) {
+    let pageTextParserCalls = 0;
+    const result = await adapter.inspectQuotePdfFile(
+      fixtureFile(fixtureName),
+      {
+        onBeforePageTextParse() {
+          pageTextParserCalls += 1;
+          throw new Error("page/text parser must not run");
+        },
+      },
+    );
+    assert.equal(pageTextParserCalls, 0, fixtureName);
+    assert.equal(result.report, null, fixtureName);
+  }
+
+  let readablePageTextParserCalls = 0;
+  const readable = await adapter.inspectQuotePdfFile(
+    fixtureFile("readable-quote.pdf"),
+    {
+      onBeforePageTextParse() {
+        readablePageTextParserCalls += 1;
+      },
+    },
+  );
+  assert.equal(readablePageTextParserCalls, 1);
+  assert.equal(readable.status, "PARSER_READY");
+  assert.equal(readable.summary.itemCount, 2);
 });
 
 test("adapter output is a safe summary generated from the accepted intake and never leaks raw failures", async () => {
