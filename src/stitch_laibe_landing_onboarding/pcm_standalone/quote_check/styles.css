@@ -1764,8 +1764,72 @@ select {
   color: #a8d9bf;
 }
 
+.ai-report-status[data-report-state="processing"] {
+  color: #d8e6ed;
+}
+
+.ai-report-status[data-report-state="error"] {
+  color: #ffbd9d;
+}
+
+.ai-report-status[data-report-state="scanned"] {
+  color: #ffd19f;
+}
+
 .ai-report-status[data-report-state="unavailable"] {
   color: #ffbd9d;
+}
+
+.local-report-summary {
+  grid-column: 1 / -1;
+  padding: 18px;
+  border: 1px solid rgba(168, 217, 191, 0.22);
+  border-radius: 14px;
+  background: rgba(168, 217, 191, 0.055);
+}
+
+.local-report-summary__eyebrow {
+  margin: 0 0 12px;
+  color: #a8d9bf;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.local-report-summary dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.local-report-summary dl div {
+  min-width: 0;
+  padding: 12px 14px;
+  background: #0a0d0f;
+}
+
+.local-report-summary dt {
+  color: #96a3ac;
+  font-size: 0.76rem;
+}
+
+.local-report-summary dd {
+  margin: 5px 0 0;
+  color: #f3f6f7;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.local-report-summary > p:last-child {
+  margin: 12px 0 0;
+  color: #aeb9c0;
+  font-size: 0.82rem;
+  line-height: 1.6;
 }
 
 .ai-report-boundary {
@@ -1773,6 +1837,12 @@ select {
   border-block-start: 1px solid rgba(255, 255, 255, 0.09);
   color: #9eabb4;
   font-size: 0.84rem;
+}
+
+@media (max-width: 560px) {
+  .local-report-summary dl {
+    grid-template-columns: 1fr;
+  }
 }
 
 .file-selection-summary--standalone {

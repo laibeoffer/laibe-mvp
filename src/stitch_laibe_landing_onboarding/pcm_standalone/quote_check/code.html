@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="LaiBE DRS 報價文件檢查工作台，協助業主選擇報價、契約或施工圖 PDF，並查看 AI 檢查報告的開放狀態。"
+      content="LaiBE DRS 報價文件檢查工作台，協助業主在瀏覽器本機整理具文字層的報價 PDF，並確認契約與施工圖檢查入口狀態。"
     />
     <title>LaiBE DRS｜報價文件檢查</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260818-ai-report-v1" />
+    <link rel="stylesheet" href="./styles.css?v=20260818-browser-adapter-v1" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
   </head>
   <body>
@@ -35,8 +35,8 @@
       <section class="self-check-hero" aria-labelledby="workspace-title">
         <p class="workspace-heading__eyebrow">給已拿到報價、契約或圖說的業主</p>
         <h1 id="workspace-title">報價文件檢查</h1>
-        <p class="self-check-hero__lead">選擇報價、契約或施工圖 PDF，再查看 AI 檢查報告的開放狀態。</p>
-        <p class="self-check-hero__boundary">目前只會在本次瀏覽顯示你選擇的 PDF 檔名，不會送出或保存。AI 檢查報告功能正在整理中，尚未讀取或分析檔案內容。</p>
+        <p class="self-check-hero__lead">選擇報價 PDF，在瀏覽器本機取得可回頭核對的初步摘要；契約與施工圖仍只顯示入口狀態。</p>
+        <p class="self-check-hero__boundary">目前只讀取未加密、未壓縮且含文字層的報價 PDF；檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。</p>
         <div class="self-check-hero__actions">
           <button class="owner-first-primary-action" type="button" data-start-upload>選擇第一份 PDF</button>
           <a class="owner-first-secondary-action" href="#document-workspace">選擇文件類型</a>
@@ -51,9 +51,9 @@
         <header class="workspace-heading workspace-heading--compact">
           <div>
             <p class="workspace-heading__eyebrow">文件檢查</p>
-            <h2 id="checklist-title">選擇檔案，查看報告狀態</h2>
+            <h2 id="checklist-title">選擇檔案，確認可讀狀態</h2>
           </div>
-          <p>報價、契約與施工圖分開處理；每個分頁只包含選擇檔案與 AI 檢查報告的開放狀態。</p>
+          <p>報價、契約與施工圖分開處理；目前只有報價 PDF 會在本機讀取文字層並產生初步摘要。</p>
         </header>
 
         <div class="document-tabs" role="tablist" aria-label="自查文件類型">
@@ -70,17 +70,27 @@
           </header>
           <div class="document-panel__body">
             <section class="document-action-step document-action-step--upload" data-document-upload-step aria-labelledby="upload-quote-title">
-              <header class="document-action-step__header"><p><span>01</span>選擇檔案</p><h3 id="upload-quote-title">選擇報價 PDF</h3><small>選擇檔案後，只會在本次瀏覽顯示檔名。</small></header>
+              <header class="document-action-step__header"><p><span>01</span>選擇檔案</p><h3 id="upload-quote-title">選擇報價 PDF</h3><small>檔案只在這個頁面本機讀取，不會上傳或保存。</small></header>
               <label class="document-dropzone" for="document-file-quote" data-document-dropzone="quote"><span class="document-dropzone__format" aria-hidden="true">PDF</span><span><strong>選擇報價 PDF</strong><small>可點選或拖放 PDF</small></span></label>
               <input id="document-file-quote" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="quote" aria-describedby="document-feedback-quote" aria-invalid="false" />
               <p class="document-feedback" id="document-feedback-quote" data-document-feedback="quote">尚未選擇檔案。</p>
               <p class="selected-file" data-selected-file="quote" hidden><span>檔名</span><strong data-document-filename="quote"></strong></p>
             </section>
             <section class="document-action-step document-action-step--report" data-ai-report-step aria-labelledby="report-quote-title">
-              <header class="document-action-step__header"><p><span>02</span>AI 檢查報告開放狀態</p><h3 id="report-quote-title">查看報價檢查報告開放狀態</h3><small>先選擇 PDF，再查看目前開放狀態。</small></header>
-              <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="quote" disabled>查看 AI 檢查報告開放狀態</button>
-              <p class="ai-report-status" data-ai-report-status="quote" data-report-state="waiting-file">請先選擇 PDF，才能查看 AI 檢查報告的開放狀態。</p>
-              <p class="ai-report-boundary">AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。</p>
+              <header class="document-action-step__header"><p><span>02</span>本機初步摘要</p><h3 id="report-quote-title">查看報價文字層摘要</h3><small>只有真正讀到完整報價列時，才會開放摘要。</small></header>
+              <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="quote" disabled>尚未有可查看的摘要</button>
+              <p class="ai-report-status" data-ai-report-status="quote" data-report-state="waiting-file">請先選擇 PDF。</p>
+              <div class="local-report-summary" data-ai-report-output="quote" hidden>
+                <p class="local-report-summary__eyebrow">本次瀏覽的初步摘要</p>
+                <dl>
+                  <div><dt>頁數</dt><dd data-report-page-count>—</dd></div>
+                  <div><dt>可辨識報價列</dt><dd data-report-item-count>—</dd></div>
+                  <div><dt>文件狀態</dt><dd data-report-readability>—</dd></div>
+                  <div><dt>比較狀態</dt><dd data-report-comparison>—</dd></div>
+                </dl>
+                <p data-report-limitations>本摘要未保存，也不是案件正式檢查結果。</p>
+              </div>
+              <p class="ai-report-boundary">這是由本次 PDF 文字層整理的初步摘要，不是 OCR、完整報價審查或案件正式結果；請回到原始文件逐項確認。</p>
             </section>
           </div>
         </div>
@@ -167,6 +177,6 @@
       <p class="state-live" data-state-live aria-live="polite"></p>
     </main>
 
-    <script type="module" src="./app.js?v=20260818-ai-report-v1"></script>
+    <script type="module" src="./app.js?v=20260818-browser-adapter-v1"></script>
   </body>
 </html>
