@@ -1,6 +1,5 @@
-// Generated from ./pdf/intake.ts with Deno's browser bundler.
-// Keep the parser below byte-for-byte derived from the accepted intake engine;
-// browser-only File handling and public result shaping live after the export.
+// Accepted source SHA-256: a4c54671c9193a3f3abd798a9df3cbec6930da5e36b0ceda48d8b0b906919c4a
+// BEGIN GENERATED INTAKE BUNDLE
 // src/lib/budget/quote-healthcheck/pdf/intake.ts
 var DEFAULT_MAX_BYTES = 10 * 1024 * 1024;
 var DEFAULT_MAX_PAGES = 100;
@@ -933,8 +932,12 @@ var inspectQuotePdfBytes = async (input) => {
 export {
   inspectQuotePdfBytes
 };
+// END GENERATED INTAKE BUNDLE
 
 var trustedBlobArrayBuffer = globalThis.Blob?.prototype?.arrayBuffer;
+var trustedBlobSizeGetter = globalThis.Blob
+  ? Object.getOwnPropertyDescriptor(globalThis.Blob.prototype, "size")?.get
+  : void 0;
 var trustedBlobTypeGetter = globalThis.Blob
   ? Object.getOwnPropertyDescriptor(globalThis.Blob.prototype, "type")?.get
   : void 0;
@@ -947,6 +950,7 @@ var publicFailure = (status, title, message, nextAction) => ({
   title,
   message,
   nextAction,
+  summary: null,
   report: null,
   limitations: []
 });
@@ -989,8 +993,6 @@ var publicRejection = (code) => {
         "請拆成較短的報價文件後再選擇。"
       );
     case "CORRUPT_PDF":
-    case "DOCUMENT_HASH_MISMATCH":
-    case "DOCUMENT_REFERENCE_INVALID":
     default:
       return publicFailure(
         code === "CORRUPT_PDF" ? code : "UNREADABLE_PDF",
@@ -1001,32 +1003,103 @@ var publicRejection = (code) => {
   }
 };
 
-var toHex = (bytes) => Array.from(bytes)
-  .map((value) => value.toString(16).padStart(2, "0"))
-  .join("");
-
 var safeFileSnapshot = async (file) => {
   if (
+    typeof trustedBlobSizeGetter !== "function" ||
     typeof trustedBlobArrayBuffer !== "function" ||
     typeof trustedBlobTypeGetter !== "function" ||
     typeof trustedFileNameGetter !== "function"
   ) {
-    return null;
+    return { kind: "invalid" };
   }
   try {
     const name = Reflect.apply(trustedFileNameGetter, file, []);
     const type = Reflect.apply(trustedBlobTypeGetter, file, []);
+    const size = Reflect.apply(trustedBlobSizeGetter, file, []);
     if (
       typeof name !== "string" || !name.toLowerCase().endsWith(".pdf") ||
-      (type !== "" && type !== "application/pdf")
+      (type !== "" && type !== "application/pdf") ||
+      !Number.isInteger(size) || size < 0
     ) {
-      return null;
+      return { kind: "invalid" };
     }
+    if (size > DEFAULT_MAX_BYTES) return { kind: "too-large" };
     const buffer = await Reflect.apply(trustedBlobArrayBuffer, file, []);
-    return new Uint8Array(buffer);
+    const bytes = new Uint8Array(buffer);
+    if (bytes.byteLength > DEFAULT_MAX_BYTES) return { kind: "too-large" };
+    return { kind: "bytes", bytes };
   } catch {
-    return null;
+    return { kind: "invalid" };
   }
+};
+
+var inspectParserOnlyQuotePdfBytes = (inputBytes) => {
+  const bytes = new Uint8Array(inputBytes);
+  if (bytes.byteLength > DEFAULT_MAX_BYTES) {
+    return reject("FILE_TOO_LARGE", "PDF exceeds the parser-only byte limit.");
+  }
+  let source;
+  try {
+    source = new TextDecoder("latin1", { fatal: true }).decode(bytes);
+  } catch {
+    return reject("CORRUPT_PDF", "PDF bytes cannot be decoded for structural inspection.");
+  }
+  if (!source.startsWith("%PDF-") || !source.includes("%%EOF")) {
+    return reject("CORRUPT_PDF", "PDF header or EOF marker is missing.");
+  }
+  const objects = structuredPdfObjects(source);
+  if (!objects) {
+    return reject("CORRUPT_PDF", "PDF indirect-object structure is incomplete.");
+  }
+  const hasStructuralActiveTrigger = objects.some(({ dictionaryEntries }) =>
+    ["OpenAction", "AA", "A"].some((trigger) => dictionaryEntries.has(trigger))
+  );
+  const scannedNames = scanPdfNames(maskActualStreamBodies(source, objects));
+  if (scannedNames.malformed) {
+    return reject("CORRUPT_PDF", "PDF contains a malformed name or literal token.");
+  }
+  if (
+    hasStructuralActiveTrigger ||
+    scannedNames.names.some((name) =>
+      ["JavaScript", "JS", "Launch", "RichMedia", "EmbeddedFile"].includes(name)
+    )
+  ) {
+    return reject("UNSUPPORTED_ACTIVE_CONTENT", "PDF active content is not accepted.");
+  }
+  if (scannedNames.names.includes("Encrypt")) {
+    return reject("ENCRYPTED_PDF", "Encrypted PDFs are outside parser-only intake.");
+  }
+  if (scannedNames.names.includes("Filter")) {
+    return reject("UNSUPPORTED_COMPRESSED_CONTENT", "Compressed PDFs are outside parser-only intake.");
+  }
+  const parsedPages = parseSupportedPageStreams(objects, bytes, DEFAULT_MAX_PAGES);
+  if (!parsedPages.ok) return { accepted: false, rejection: parsedPages.rejection };
+  const imageOnly = parsedPages.text.length === 0 &&
+    !parsedPages.invalidTextEncoding &&
+    scannedNames.names.includes("Image");
+  const readability = parsedPages.text.length > 0
+    ? "TEXT_LAYER"
+    : imageOnly
+    ? "IMAGE_ONLY"
+    : "NO_EXTRACTABLE_TEXT";
+  const rows = toQuoteRows(parsedPages.text, {
+    documentVersionId: "",
+    sha256: ""
+  });
+  const limitations = [];
+  if (imageOnly) limitations.push({ code: "OCR_NOT_PERFORMED" });
+  if (parsedPages.invalidTextEncoding) limitations.push({ code: "INVALID_TEXT_ENCODING" });
+  if (rows.length === 0) limitations.push({ code: "NO_STRUCTURED_QUOTE_ROWS" });
+  return {
+    accepted: true,
+    inspection: {
+      byteLength: bytes.byteLength,
+      pageCount: parsedPages.pageCount,
+      readability
+    },
+    rowCount: rows.length,
+    limitations
+  };
 };
 
 var translateLimitations = (limitations) => limitations.flatMap(({ code }) => {
@@ -1041,8 +1114,9 @@ var translateLimitations = (limitations) => limitations.flatMap(({ code }) => {
 });
 
 var inspectQuotePdfFile = async (file) => {
-  const bytes = await safeFileSnapshot(file);
-  if (!bytes) {
+  const snapshot = await safeFileSnapshot(file);
+  if (snapshot.kind === "too-large") return publicRejection("FILE_TOO_LARGE");
+  if (snapshot.kind !== "bytes") {
     return publicFailure(
       "INVALID_FILE",
       "請選擇有效的 PDF 檔案",
@@ -1052,18 +1126,8 @@ var inspectQuotePdfFile = async (file) => {
   }
 
   try {
-    const digest = await crypto.subtle.digest("SHA-256", bytes);
-    const hash = toHex(new Uint8Array(digest));
-    const intake = await inspectQuotePdfBytes({
-      bytes,
-      document: {
-        caseId: "local-browser-session",
-        documentVersionId: `local-browser-document-${hash.slice(0, 16)}`,
-        sha256: hash
-      }
-    });
+    const intake = inspectParserOnlyQuotePdfBytes(snapshot.bytes);
     if (!intake.accepted) return publicRejection(intake.rejection.code);
-
     if (intake.inspection.readability === "IMAGE_ONLY") {
       return publicFailure(
         "SCANNED_PDF",
@@ -1072,8 +1136,7 @@ var inspectQuotePdfFile = async (file) => {
         "請改選含有可選取文字層的 PDF。"
       );
     }
-
-    if (intake.inspection.readability !== "TEXT_LAYER" || intake.facts.rows.length === 0) {
+    if (intake.inspection.readability !== "TEXT_LAYER" || intake.rowCount === 0) {
       return publicFailure(
         "UNSUPPORTED_LAYOUT",
         "尚未找到可整理的報價列",
@@ -1081,18 +1144,18 @@ var inspectQuotePdfFile = async (file) => {
         "請確認內容包含項目、單位、數量、單價與金額，再重新選擇。"
       );
     }
-
     return {
-      status: "READY",
-      title: "本機初步摘要已完成",
+      status: "PARSER_READY",
+      title: "本機解析摘要已完成",
       message: "摘要只反映這次選擇的 PDF，不會上傳或保存。",
-      nextAction: "查看摘要後，仍請回到原始報價文件確認內容。",
-      report: {
+      nextAction: "請回到原始報價文件逐項確認；正式報告需在案件中建立。",
+      summary: {
         pageCount: intake.inspection.pageCount,
-        itemCount: intake.facts.rows.length,
+        itemCount: intake.rowCount,
         readability: "可讀文字層",
         comparison: "本次未提供比較基準"
       },
+      report: null,
       limitations: translateLimitations(intake.limitations)
     };
   } catch {

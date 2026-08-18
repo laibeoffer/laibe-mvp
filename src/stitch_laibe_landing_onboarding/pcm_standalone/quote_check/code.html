@@ -10,7 +10,7 @@
     <title>LaiBE DRS｜報價文件檢查</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260818-browser-adapter-v1" />
+    <link rel="stylesheet" href="./styles.css?v=20260818-parser-summary-v2" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs" />
   </head>
   <body>
@@ -35,7 +35,7 @@
       <section class="self-check-hero" aria-labelledby="workspace-title">
         <p class="workspace-heading__eyebrow">給已拿到報價、契約或圖說的業主</p>
         <h1 id="workspace-title">報價文件檢查</h1>
-        <p class="self-check-hero__lead">選擇報價 PDF，在瀏覽器本機取得可回頭核對的初步摘要；契約與施工圖仍只顯示入口狀態。</p>
+        <p class="self-check-hero__lead">選擇報價 PDF，在瀏覽器本機取得可回頭核對的解析摘要；契約與施工圖仍只顯示入口狀態。</p>
         <p class="self-check-hero__boundary">目前只讀取未加密、未壓縮且含文字層的報價 PDF；檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。</p>
         <div class="self-check-hero__actions">
           <button class="owner-first-primary-action" type="button" data-start-upload>選擇第一份 PDF</button>
@@ -53,7 +53,7 @@
             <p class="workspace-heading__eyebrow">文件檢查</p>
             <h2 id="checklist-title">選擇檔案，確認可讀狀態</h2>
           </div>
-          <p>報價、契約與施工圖分開處理；目前只有報價 PDF 會在本機讀取文字層並產生初步摘要。</p>
+          <p>報價、契約與施工圖分開處理；目前只有報價 PDF 會在本機讀取文字層並產生解析摘要。</p>
         </header>
 
         <div class="document-tabs" role="tablist" aria-label="自查文件類型">
@@ -77,20 +77,20 @@
               <p class="selected-file" data-selected-file="quote" hidden><span>檔名</span><strong data-document-filename="quote"></strong></p>
             </section>
             <section class="document-action-step document-action-step--report" data-ai-report-step aria-labelledby="report-quote-title">
-              <header class="document-action-step__header"><p><span>02</span>本機初步摘要</p><h3 id="report-quote-title">查看報價文字層摘要</h3><small>只有真正讀到完整報價列時，才會開放摘要。</small></header>
-              <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="quote" disabled>尚未有可查看的摘要</button>
+              <header class="document-action-step__header"><p><span>02</span>本機解析摘要</p><h3 id="report-quote-title">報價文字層解析摘要</h3><small>讀到完整報價列後會在下方顯示；這不是案件正式報告。</small></header>
+              <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="quote" disabled>正式案件報告尚未開放</button>
               <p class="ai-report-status" data-ai-report-status="quote" data-report-state="waiting-file">請先選擇 PDF。</p>
-              <div class="local-report-summary" data-ai-report-output="quote" hidden>
-                <p class="local-report-summary__eyebrow">本次瀏覽的初步摘要</p>
+              <div class="local-parser-summary" data-parser-summary="quote" hidden>
+                <p class="local-parser-summary__eyebrow">本次瀏覽的解析摘要</p>
                 <dl>
-                  <div><dt>頁數</dt><dd data-report-page-count>—</dd></div>
-                  <div><dt>可辨識報價列</dt><dd data-report-item-count>—</dd></div>
-                  <div><dt>文件狀態</dt><dd data-report-readability>—</dd></div>
-                  <div><dt>比較狀態</dt><dd data-report-comparison>—</dd></div>
+                  <div><dt>頁數</dt><dd data-summary-page-count>—</dd></div>
+                  <div><dt>可辨識報價列</dt><dd data-summary-item-count>—</dd></div>
+                  <div><dt>文件狀態</dt><dd data-summary-readability>—</dd></div>
+                  <div><dt>比較狀態</dt><dd data-summary-comparison>—</dd></div>
                 </dl>
-                <p data-report-limitations>本摘要未保存，也不是案件正式檢查結果。</p>
+                <p data-summary-limitations>這份本機解析摘要不會保存，也不是案件正式報告。</p>
               </div>
-              <p class="ai-report-boundary">這是由本次 PDF 文字層整理的初步摘要，不是 OCR、完整報價審查或案件正式結果；請回到原始文件逐項確認。</p>
+              <p class="ai-report-boundary">這只整理本次 PDF 的文字層，不是 OCR 或完整報價審查。正式案件報告仍需綁定案件、文件版本與確認依據；目前不會在此頁建立。</p>
             </section>
           </div>
         </div>
@@ -177,6 +177,6 @@
       <p class="state-live" data-state-live aria-live="polite"></p>
     </main>
 
-    <script type="module" src="./app.js?v=20260818-browser-adapter-v1"></script>
+    <script type="module" src="./app.js?v=20260818-parser-summary-v2"></script>
   </body>
 </html>

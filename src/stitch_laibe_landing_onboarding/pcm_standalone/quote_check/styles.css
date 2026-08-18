@@ -1760,7 +1760,7 @@ select {
   font-weight: 800;
 }
 
-.ai-report-status[data-report-state="ready"] {
+.ai-report-status[data-report-state="parser-ready"] {
   color: #a8d9bf;
 }
 
@@ -1780,7 +1780,7 @@ select {
   color: #ffbd9d;
 }
 
-.local-report-summary {
+.local-parser-summary {
   grid-column: 1 / -1;
   padding: 18px;
   border: 1px solid rgba(168, 217, 191, 0.22);
@@ -1788,7 +1788,7 @@ select {
   background: rgba(168, 217, 191, 0.055);
 }
 
-.local-report-summary__eyebrow {
+.local-parser-summary__eyebrow {
   margin: 0 0 12px;
   color: #a8d9bf;
   font-size: 0.76rem;
@@ -1796,7 +1796,7 @@ select {
   letter-spacing: 0.08em;
 }
 
-.local-report-summary dl {
+.local-parser-summary dl {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
@@ -1807,25 +1807,25 @@ select {
   background: rgba(255, 255, 255, 0.09);
 }
 
-.local-report-summary dl div {
+.local-parser-summary dl div {
   min-width: 0;
   padding: 12px 14px;
   background: #0a0d0f;
 }
 
-.local-report-summary dt {
+.local-parser-summary dt {
   color: #96a3ac;
   font-size: 0.76rem;
 }
 
-.local-report-summary dd {
+.local-parser-summary dd {
   margin: 5px 0 0;
   color: #f3f6f7;
   font-weight: 900;
   overflow-wrap: anywhere;
 }
 
-.local-report-summary > p:last-child {
+.local-parser-summary > p:last-child {
   margin: 12px 0 0;
   color: #aeb9c0;
   font-size: 0.82rem;
@@ -1840,7 +1840,7 @@ select {
 }
 
 @media (max-width: 560px) {
-  .local-report-summary dl {
+  .local-parser-summary dl {
     grid-template-columns: 1fr;
   }
 }

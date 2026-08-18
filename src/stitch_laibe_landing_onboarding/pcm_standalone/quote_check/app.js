@@ -793,7 +793,6 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   const panels = root.querySelectorAll("[data-document-panel]");
   const fileInputs = root.querySelectorAll("[data-document-file]");
   const dropzones = root.querySelectorAll("[data-document-dropzone]");
-  const reportActions = root.querySelectorAll("[data-ai-report-action]");
   const checkItems = root.querySelectorAll("[data-check-item]");
   const statusTargets = root.querySelectorAll("[data-current-status]");
   const nextTargets = root.querySelectorAll("[data-current-next]");
@@ -807,15 +806,10 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   const domFactory = root.ownerDocument || null;
   let workspaceState = createDocumentWorkspaceState(initialMode);
   let pendingCopyText = "";
-  const reportResults = {
+  const parserResults = {
     quote: null,
     contract: null,
     drawing: null,
-  };
-  const reportVisible = {
-    quote: false,
-    contract: false,
-    drawing: false,
   };
   const analysisRuns = {
     quote: 0,
@@ -879,7 +873,7 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   function renderDocumentSelection(kind) {
     const documentSelection = workspaceState.documents[kind];
     const selected = Boolean(documentSelection);
-    const reportResult = reportResults[kind];
+    const parserResult = parserResults[kind];
     const filename = root.querySelector(`[data-document-filename="${kind}"]`);
     const filenameRow = root.querySelector(`[data-selected-file="${kind}"]`);
     const reportAction = root.querySelector(`[data-ai-report-action="${kind}"]`);
@@ -889,7 +883,7 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     if (!selected) {
       if (reportAction) {
         reportAction.disabled = true;
-        reportAction.textContent = kind === "quote" ? "尚未有可查看的摘要" : "檢查報告尚未開放";
+        reportAction.textContent = kind === "quote" ? "正式案件報告尚未開放" : "檢查報告尚未開放";
       }
       if (reportStatus) {
         reportStatus.dataset.reportState = "waiting-file";
@@ -908,10 +902,10 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
       }
       return;
     }
-    if (!reportResult || reportResult.status === "PROCESSING") {
+    if (!parserResult || parserResult.status === "PROCESSING") {
       if (reportAction) {
         reportAction.disabled = true;
-        reportAction.textContent = "正在整理摘要…";
+        reportAction.textContent = "正式案件報告尚未開放";
       }
       if (reportStatus) {
         reportStatus.dataset.reportState = "processing";
@@ -919,38 +913,38 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
       }
       return;
     }
-    const ready = reportResult.status === "READY" && Boolean(reportResult.report);
+    const ready = parserResult.status === "PARSER_READY" && Boolean(parserResult.summary);
     if (reportAction) {
-      reportAction.disabled = !ready;
-      reportAction.textContent = ready ? "查看本機初步摘要" : "尚未有可查看的摘要";
+      reportAction.disabled = true;
+      reportAction.textContent = "正式案件報告尚未開放";
     }
     if (reportStatus) {
       reportStatus.dataset.reportState = ready
-        ? "ready"
-        : reportResult.status === "SCANNED_PDF"
+        ? "parser-ready"
+        : parserResult.status === "SCANNED_PDF"
           ? "scanned"
           : "error";
       reportStatus.textContent = ready
-        ? "本機初步摘要已完成；請查看後回到原始文件確認。"
-        : `${reportResult.title}：${reportResult.message}`;
+        ? "本機解析摘要已完成；這不是案件正式報告，請回到原始文件確認。"
+        : `${parserResult.title}：${parserResult.message}`;
     }
   }
 
-  function renderQuoteReportOutput() {
-    const output = root.querySelector('[data-ai-report-output="quote"]');
-    const result = reportResults.quote;
-    const ready = result?.status === "READY" && Boolean(result.report);
-    if (output) output.hidden = !(ready && reportVisible.quote);
+  function renderQuoteParserSummary() {
+    const output = root.querySelector('[data-parser-summary="quote"]');
+    const result = parserResults.quote;
+    const ready = result?.status === "PARSER_READY" && Boolean(result.summary);
+    if (output) output.hidden = !ready;
     if (!ready) return;
-    setTextFor("[data-report-page-count]", String(result.report.pageCount));
-    setTextFor("[data-report-item-count]", String(result.report.itemCount));
-    setTextFor("[data-report-readability]", result.report.readability);
-    setTextFor("[data-report-comparison]", result.report.comparison);
+    setTextFor("[data-summary-page-count]", String(result.summary.pageCount));
+    setTextFor("[data-summary-item-count]", String(result.summary.itemCount));
+    setTextFor("[data-summary-readability]", result.summary.readability);
+    setTextFor("[data-summary-comparison]", result.summary.comparison);
     setTextFor(
-      "[data-report-limitations]",
+      "[data-summary-limitations]",
       result.limitations.length > 0
         ? result.limitations.join(" ")
-        : "本摘要未保存，也不是案件正式檢查結果。",
+        : "這份本機解析摘要不會保存，也不是案件正式報告。",
     );
   }
 
@@ -1050,13 +1044,13 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   function render() {
     renderTabsAndPanels();
     for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentSelection(kind);
-    renderQuoteReportOutput();
+    renderQuoteParserSummary();
     const documentProjection = projectDocumentWorkspace(workspaceState);
     const fileSummary = documentProjection.uploadedCount === 0
       ? "目前尚未選擇檔案。"
       : documentProjection.uploadedCount === 3
-        ? "三類檔案已選擇；目前僅報價 PDF 可產生本機初步摘要。"
-        : `${documentProjection.uploadedCount}/3 類檔案已選擇；目前僅報價 PDF 可產生本機初步摘要。`;
+        ? "三類檔案已選擇；目前僅報價 PDF 可產生本機解析摘要。"
+        : `${documentProjection.uploadedCount}/3 類檔案已選擇；目前僅報價 PDF 可產生本機解析摘要。`;
     setTextFor("[data-file-selection-summary]", fileSummary);
     for (const kind of DOCUMENT_WORKSPACE_KINDS) {
       setTextFor(`[data-tab-status="${kind}"]`, workspaceState.documents[kind] ? "檔案已就緒" : "尚未選擇");
@@ -1066,8 +1060,8 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
       : `${documentProjection.uploadedCount}/3 類檔案已選擇`;
     const nextStep = documentProjection.uploadedCount === 0
       ? "選擇一類文件後，選擇 PDF。"
-      : reportResults.quote?.status === "READY"
-        ? "查看本機初步摘要，並回到原始文件確認。"
+      : parserResults.quote?.status === "PARSER_READY"
+        ? "查看本機解析摘要，並回到原始文件確認。"
         : "確認目前文件狀態，必要時重新選擇。";
     for (let index = 0; index < statusTargets.length; index += 1) {
       statusTargets[index].textContent = currentStatus;
@@ -1104,8 +1098,7 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     if (selection === EMPTY_FILE_SELECTION) return;
     if (!selection || selection.kind !== "PDF_METADATA") {
       analysisRuns[kind] += 1;
-      reportResults[kind] = null;
-      reportVisible[kind] = false;
+      parserResults[kind] = null;
       workspaceState = clearDocumentSelection(workspaceState, kind);
       if (input) {
         try {
@@ -1124,7 +1117,6 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
       return;
     }
     workspaceState = recordDocumentSelection(workspaceState, kind, selection);
-    reportVisible[kind] = false;
     if (feedback) {
       feedback.textContent = kind === "quote"
         ? "已選擇檔案，正在本機讀取內容。"
@@ -1134,7 +1126,7 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     if (input && typeof input.setAttribute === "function") input.setAttribute("aria-invalid", "false");
     if (kind !== "quote") {
       analysisRuns[kind] += 1;
-      reportResults[kind] = null;
+      parserResults[kind] = null;
       render();
       announce("已選擇檔案；這類文件的檢查功能仍在整理中。");
       return;
@@ -1142,22 +1134,22 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
 
     const runId = analysisRuns.quote + 1;
     analysisRuns.quote = runId;
-    reportResults.quote = { status: "PROCESSING", report: null };
+    parserResults.quote = { status: "PROCESSING", summary: null, report: null };
     render();
     announce("正在本機讀取報價 PDF；檔案不會上傳或保存。");
-    const reportResult = await inspectQuotePdfFile(selection.file);
+    const parserResult = await inspectQuotePdfFile(selection.file);
     if (analysisRuns.quote !== runId) return;
-    reportResults.quote = reportResult;
+    parserResults.quote = parserResult;
     if (feedback) {
-      feedback.textContent = reportResult.status === "READY"
-        ? "已完成本機初步摘要；重新選擇可改看另一份 PDF。"
-        : `${reportResult.title}；可重新選擇另一份 PDF。`;
-      feedback.dataset.feedbackState = reportResult.status === "READY" ? "selected" : "error";
+      feedback.textContent = parserResult.status === "PARSER_READY"
+        ? "已完成本機解析摘要；重新選擇可改看另一份 PDF。"
+        : `${parserResult.title}；可重新選擇另一份 PDF。`;
+      feedback.dataset.feedbackState = parserResult.status === "PARSER_READY" ? "selected" : "error";
     }
     render();
-    announce(reportResult.status === "READY"
-      ? "本機初步摘要已完成；請查看後回到原始文件確認。"
-      : `${reportResult.title}。${reportResult.nextAction}`);
+    announce(parserResult.status === "PARSER_READY"
+      ? "本機解析摘要已完成；這不是案件正式報告，請回到原始文件確認。"
+      : `${parserResult.title}。${parserResult.nextAction}`);
   }
 
   function focusFirstUnconfirmed() {
@@ -1253,22 +1245,6 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
       }
       const input = root.querySelector(`[data-document-file="${kind}"]`);
       await acceptSelection(kind, readTrustedPdfFileList(files), input);
-    });
-  }
-
-  for (let index = 0; index < reportActions.length; index += 1) {
-    const action = reportActions[index];
-    action.addEventListener("click", () => {
-      const kind = action.dataset ? action.dataset.aiReportAction : null;
-      if (
-        kind !== "quote" ||
-        !workspaceState.documents.quote ||
-        reportResults.quote?.status !== "READY" ||
-        !reportResults.quote.report
-      ) return;
-      reportVisible.quote = true;
-      renderQuoteReportOutput();
-      announce("已顯示本機初步摘要；內容未保存，也不是案件正式檢查結果。");
     });
   }
 
