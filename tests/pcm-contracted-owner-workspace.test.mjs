@@ -329,7 +329,7 @@ test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
   }
 });
 
-test("甲方 HERO 內提供三個治理分頁且只有設計案與主面板一體成形", async () => {
+test("甲方 HERO 內三個治理分頁在桌機都維持獨立完整卡片", async () => {
   const [html, css, runtime] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -358,6 +358,14 @@ test("甲方 HERO 內提供三個治理分頁且只有設計案與主面板一�
   assert.equal((html.match(/data-owner-panel=/g) || []).length, 3);
 
   assert.match(
+    css,
+    /\.owner-dashboard-tab\[aria-selected="true"\]\s*\{[\s\S]{0,520}border-color:\s*var\(--source-active\)[\s\S]{0,520}box-shadow:/i,
+  );
+  assert.doesNotMatch(
+    css,
+    /\[data-active-owner-tab="design"\]\s+\.owner-dashboard-tab\[data-owner-tab="design"\]\s*\{[\s\S]{0,320}margin-bottom:\s*-/i,
+  );
+  assert.doesNotMatch(
     css,
     /\[data-active-owner-tab="design"\][\s\S]{0,900}\.owner-hero-dashboard__panel[\s\S]{0,220}border-top-left-radius:\s*0/i,
   );
