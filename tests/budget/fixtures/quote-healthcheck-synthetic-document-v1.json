@@ -1,0 +1,133 @@
+{
+  "classification": "SYNTHETIC_DOMAIN_TEST_ONLY",
+  "formalCaseData": false,
+  "realDocumentEvidence": false,
+  "mayBeUsedForProductionAcceptance": false,
+  "sourceStatement": "Entirely invented normalized rows; not derived from any quote, Vault price, or external document.",
+  "dependencyNegativeCases": [
+    { "id": "missing", "mutation": "DELETE_PLAN_SNAPSHOT" },
+    { "id": "mismatch", "mutation": "MISMATCH_UPSTREAM_HASH" },
+    { "id": "inactive", "mutation": "RETIRE_KNOWLEDGE_RELEASE" },
+    { "id": "stale", "mutation": "STALE_PLAN_SNAPSHOT" },
+    { "id": "unknown_major", "mutation": "UNKNOWN_PLAN_MAJOR" },
+    { "id": "unknown_field", "mutation": "ADD_UNKNOWN_PLAN_FIELD" },
+    { "id": "invalid_version", "mutation": "ZERO_KNOWLEDGE_VERSION" },
+    { "id": "case_mismatch", "mutation": "MISMATCH_SPEC_CASE" }
+  ],
+  "packetInput": {
+    "packetId": "packet_test_quote_extract_001",
+    "caseId": "case_test_quote_001",
+    "producerVersion": "a1-domain-core-test-1",
+    "createdAt": "2026-07-31T12:00:00.000Z",
+    "recordedAt": "2026-07-31T12:00:01.000Z",
+    "mode": "PRE_CONTRACT_QUOTE_HEALTHCHECK",
+    "authority": {
+      "decisionCode": "A0-PCM-INTEGRATION-20260731-V1",
+      "status": "TEST_ONLY_CONFORMING_REFERENCE"
+    },
+    "document": {
+      "wireIdentity": "laibe.document-version-ref.v1",
+      "referenceId": "doc_ref_test_001",
+      "caseId": "case_test_quote_001",
+      "documentId": "document_test_quote_001",
+      "documentVersionId": "document_version_test_quote_001_v1",
+      "currentDocumentVersionId": "document_version_test_quote_001_v1",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "supersededByDocumentVersionId": null,
+      "status": "TEST_ONLY_CONFORMING_REFERENCE"
+    },
+    "dependencyBasis": {
+      "planSnapshot": {
+        "schemaName": "laibe.plan-puzzle-snapshot.v1",
+        "schemaVersion": 1,
+        "packetId": "plan_snapshot_test_packet_001",
+        "packetVersion": 1,
+        "packetSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "caseId": "case_test_quote_001",
+        "status": "active",
+        "current": true
+      },
+      "knowledgeRelease": {
+        "schemaVersion": "laibe.knowledge-release.v1",
+        "releaseId": "knowledge_release_test_001",
+        "releaseVersion": 1,
+        "contentSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "lifecycleState": "active",
+        "current": true
+      },
+      "specReference": {
+        "referenceType": "A0_PINNED_SPEC_REFERENCE",
+        "caseId": "case_test_quote_001",
+        "referenceId": "spec_test_reference_001",
+        "status": "pinned"
+      }
+    },
+    "upstreamPacketIds": [
+      {
+        "schemaName": "laibe.plan-puzzle-snapshot.v1",
+        "schemaVersion": 1,
+        "packetId": "plan_snapshot_test_packet_001",
+        "packetVersion": 1,
+        "packetSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "caseId": "case_test_quote_001",
+        "status": "active",
+        "current": true
+      }
+    ],
+    "supersedesPacketIds": [],
+    "rows": [
+      {
+        "lineId": "line_test_001",
+        "itemName": "\u56fa\u5b9a\u6536\u7d0d\u6ac3",
+        "unit": "\u7d44",
+        "quantity": "3",
+        "unitPrice": "100.25",
+        "multiplier": "1",
+        "declaredAmount": "300.75",
+        "notes": [],
+        "evidence": [
+          {
+            "kind": "worksheet_range",
+            "sourceDocumentVersionId": "document_version_test_quote_001_v1",
+            "sheet": "TEST_ONLY_SHEET",
+            "range": "A2:F2"
+          }
+        ]
+      },
+      {
+        "lineId": "line_test_002",
+        "itemName": "TEST_SCOPE_ITEM",
+        "unit": "\u5f0f",
+        "quantity": "1",
+        "unitPrice": "50",
+        "multiplier": "1",
+        "declaredAmount": "50",
+        "notes": [
+          "\u4e00\u5f0f \u4f9d\u73fe\u5834 \u66ab\u4f30 \u53e6\u8a08 \u672a\u542b \u7532\u4f9b \u9078\u914d"
+        ],
+        "evidence": [
+          {
+            "kind": "worksheet_range",
+            "sourceDocumentVersionId": "document_version_test_quote_001_v1",
+            "sheet": "TEST_ONLY_SHEET",
+            "range": "A3:F3"
+          }
+        ]
+      }
+    ],
+    "totals": {
+      "declaredSubtotal": "350.75",
+      "taxRate": "0.05",
+      "declaredTax": "17.54",
+      "declaredTotal": "368.29",
+      "evidence": [
+        {
+          "kind": "worksheet_range",
+          "sourceDocumentVersionId": "document_version_test_quote_001_v1",
+          "sheet": "TEST_ONLY_SHEET",
+          "range": "E4:F6"
+        }
+      ]
+    }
+  }
+}

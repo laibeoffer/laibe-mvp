@@ -1,0 +1,193 @@
+{
+  "fixtureVersion": "a1.quote-healthcheck.stage0-domain-cases.v1",
+  "classification": "SYNTHETIC_DOMAIN_TEST_ONLY",
+  "formalCaseData": false,
+  "realDocumentEvidence": false,
+  "mayBeUsedForProductionAcceptance": false,
+  "mayBeUsedAsExtractionEvidence": false,
+  "authorityDecisionCode": "A0-PCM-INTEGRATION-20260731-V1",
+  "cases": [
+    {
+      "id": "missing_document_version",
+      "category": "identity_gate",
+      "missing": "document_version",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "missing_source_hash",
+      "category": "identity_gate",
+      "missing": "source_hash",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "missing_case_spec_binding",
+      "category": "identity_gate",
+      "missing": "case_spec_binding",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "missing_evidence_pointer",
+      "category": "identity_gate",
+      "missing": "evidence_pointer",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "superseded_document_version",
+      "category": "identity_gate",
+      "missing": "current_version",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "missing_a5_approved_release",
+      "category": "identity_gate",
+      "missing": "a5_approved_release",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "missing_a0_authority",
+      "category": "identity_gate",
+      "missing": "a0_authority",
+      "expected": { "outcome": "FAIL_CLOSED", "humanReviewRequired": true }
+    },
+    {
+      "id": "arithmetic_quantity_unit_multiplier_tax_total",
+      "category": "arithmetic",
+      "input": {
+        "quantity": "3",
+        "unitPrice": "100.25",
+        "multiplier": "1",
+        "taxRate": "0.05"
+      },
+      "expected": {
+        "lineSubtotal": "300.75",
+        "tax": "15.04",
+        "total": "315.79",
+        "rounding": "HALF_UP_2_DECIMALS"
+      }
+    },
+    {
+      "id": "missing_item_name",
+      "category": "completeness",
+      "missing": "item_name",
+      "expectedFinding": "MISSING_REQUIRED_FIELD"
+    },
+    {
+      "id": "missing_unit",
+      "category": "completeness",
+      "missing": "unit",
+      "expectedFinding": "MISSING_REQUIRED_FIELD"
+    },
+    {
+      "id": "missing_quantity",
+      "category": "completeness",
+      "missing": "quantity",
+      "expectedFinding": "MISSING_REQUIRED_FIELD"
+    },
+    {
+      "id": "missing_unit_price",
+      "category": "completeness",
+      "missing": "unit_price",
+      "expectedFinding": "MISSING_REQUIRED_FIELD"
+    },
+    {
+      "id": "missing_amount",
+      "category": "completeness",
+      "missing": "amount",
+      "expectedFinding": "MISSING_REQUIRED_FIELD"
+    },
+    {
+      "id": "duplicate_line",
+      "category": "completeness",
+      "expectedFinding": "POSSIBLE_DUPLICATE"
+    },
+    {
+      "id": "ambiguous_lump_sum",
+      "category": "ambiguity",
+      "signal": "統包一式",
+      "expectedFinding": "AMBIGUOUS_SCOPE"
+    },
+    {
+      "id": "provisional_amount",
+      "category": "ambiguity",
+      "signal": "暫估",
+      "expectedFinding": "PROVISIONAL_AMOUNT"
+    },
+    {
+      "id": "separate_estimate",
+      "category": "ambiguity",
+      "signal": "另計",
+      "expectedFinding": "SEPARATE_ESTIMATE"
+    },
+    {
+      "id": "excluded_scope",
+      "category": "ambiguity",
+      "signal": "未含",
+      "expectedFinding": "EXCLUDED_SCOPE"
+    },
+    {
+      "id": "document_version_conflict",
+      "category": "ambiguity",
+      "expectedFinding": "VERSION_CONFLICT"
+    },
+    {
+      "id": "finding_evidence_pointer_required",
+      "category": "evidence",
+      "acceptedPointerKinds": [
+        "page_text_region",
+        "table_row",
+        "worksheet_cell",
+        "worksheet_range"
+      ],
+      "expected": { "allFindingsTraceable": true }
+    },
+    {
+      "id": "empty_number_unknown",
+      "category": "unknown",
+      "input": "",
+      "expected": {
+        "value": null,
+        "status": "UNKNOWN",
+        "review": "NEEDS_HUMAN_REVIEW"
+      }
+    },
+    {
+      "id": "nan_number_unknown",
+      "category": "unknown",
+      "input": "NaN",
+      "expected": {
+        "value": null,
+        "status": "UNKNOWN",
+        "review": "NEEDS_HUMAN_REVIEW"
+      }
+    },
+    {
+      "id": "infinity_number_unknown",
+      "category": "unknown",
+      "input": "Infinity",
+      "expected": {
+        "value": null,
+        "status": "UNKNOWN",
+        "review": "NEEDS_HUMAN_REVIEW"
+      }
+    },
+    {
+      "id": "invalid_number_unknown",
+      "category": "unknown",
+      "input": "無法判定",
+      "expected": {
+        "value": null,
+        "status": "UNKNOWN",
+        "review": "NEEDS_HUMAN_REVIEW"
+      }
+    },
+    {
+      "id": "missing_valid_a9_snapshot",
+      "category": "plan_boundary",
+      "input": { "a9VersionedSnapshot": false, "rawA11OrA12Present": true },
+      "expected": {
+        "crossDocumentComparison": "NOT_EVALUATED",
+        "rawUpstreamAccepted": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "classification": "SYNTHETIC_DOMAIN_TEST_ONLY",
+  "formalCaseData": false,
+  "realDocumentEvidence": false,
+  "mayBeUsedForProductionAcceptance": false,
+  "sourceStatement": "Contract-only mutations over the existing invented extraction fixture; not derived from any quote, Vault price, or external document.",
+  "crossCaseProbe": {
+    "reboundCaseId": "case_probe_cross_binding_002",
+    "expectedIssueCode": "EXTRACTION_BASIS_MISMATCH"
+  },
+  "negativeCases": [
+    { "id": "missing_basis", "mutation": "DELETE_EXTRACTION_BASIS" },
+    { "id": "mismatched_packet", "mutation": "MISMATCH_PACKET_ID" },
+    { "id": "inactive_release", "mutation": "RETIRE_KNOWLEDGE_RELEASE" },
+    { "id": "stale_plan", "mutation": "STALE_PLAN_SNAPSHOT" },
+    { "id": "unknown_major", "mutation": "UNKNOWN_EXTRACTION_MAJOR" },
+    { "id": "unknown_field", "mutation": "ADD_UNKNOWN_BASIS_FIELD" },
+    { "id": "non_machine_source", "mutation": "SET_NON_MACHINE_REVIEW_STAGE" }
+  ]
+}

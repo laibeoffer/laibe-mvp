@@ -1,0 +1,377 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://laibe.example/schemas/candidate/quote-health-report-v1.schema.json",
+  "title": "A1 Preliminary Quote Health Report V1 Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaName",
+    "schemaVersion",
+    "packetId",
+    "caseId",
+    "authorityDecisionCode",
+    "producerRole",
+    "producerVersion",
+    "sourceDocumentReferenceId",
+    "sourceDocumentId",
+    "sourceDocumentVersionId",
+    "sourceDocumentSha256",
+    "extractionPacketBasis",
+    "upstreamPacketIds",
+    "evidenceReferences",
+    "createdAt",
+    "recordedAt",
+    "processingStatus",
+    "uncertainty",
+    "warnings",
+    "supersedesPacketIds",
+    "humanReviewRequired",
+    "paymentAuthorization",
+    "contractorPaymentDue",
+    "pricedCandidateGenerated",
+    "reviewStage",
+    "reviewDisposition",
+    "mode",
+    "lifecycleStatus",
+    "overallStatus",
+    "findings",
+    "sections",
+    "priceReasonablenessDecision",
+    "factsHash"
+  ],
+  "properties": {
+    "schemaName": { "const": "laibe.quote-health-report.v1" },
+    "schemaVersion": { "const": 1 },
+    "packetId": { "$ref": "#/$defs/identity" },
+    "caseId": { "$ref": "#/$defs/identity" },
+    "authorityDecisionCode": { "const": "A0-PCM-INTEGRATION-20260731-V1" },
+    "producerRole": { "const": "A1" },
+    "producerVersion": { "$ref": "#/$defs/identity" },
+    "sourceDocumentReferenceId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentSha256": { "$ref": "#/$defs/sha256" },
+    "extractionPacketBasis": { "$ref": "#/$defs/extractionPacketBasis" },
+    "upstreamPacketIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/upstream" },
+      "maxItems": 1
+    },
+    "evidenceReferences": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "processingStatus": { "const": "candidate_ready" },
+    "uncertainty": { "type": "array", "items": { "$ref": "#/$defs/notice" } },
+    "warnings": { "type": "array", "items": { "$ref": "#/$defs/notice" } },
+    "supersedesPacketIds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/identity" }
+    },
+    "humanReviewRequired": { "const": true },
+    "paymentAuthorization": { "const": false },
+    "contractorPaymentDue": { "const": "NOT_DETERMINED" },
+    "pricedCandidateGenerated": { "const": false },
+    "reviewStage": { "const": "machine_candidate" },
+    "reviewDisposition": { "const": "HUMAN_PCM_REVIEW_PENDING" },
+    "mode": {
+      "enum": [
+        "PRE_CONTRACT_QUOTE_HEALTHCHECK",
+        "PCM_CASE_PRELIMINARY_QUOTE_REVIEW"
+      ]
+    },
+    "lifecycleStatus": { "enum": ["CURRENT", "STALE"] },
+    "overallStatus": { "enum": ["COMPLETE", "PARTIAL", "STALE"] },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "sections": { "$ref": "#/$defs/sections" },
+    "priceReasonablenessDecision": { "const": "NOT_DETERMINED" },
+    "factsHash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "identity": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaName", "packetId"],
+      "properties": {
+        "schemaName": { "$ref": "#/$defs/identity" },
+        "packetId": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "planSnapshotReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaName",
+        "schemaVersion",
+        "packetId",
+        "packetVersion",
+        "packetSha256",
+        "caseId",
+        "status",
+        "current"
+      ],
+      "properties": {
+        "schemaName": { "const": "laibe.plan-puzzle-snapshot.v1" },
+        "schemaVersion": { "const": 1 },
+        "packetId": { "$ref": "#/$defs/identity" },
+        "packetVersion": { "type": "integer", "minimum": 1 },
+        "packetSha256": { "$ref": "#/$defs/sha256" },
+        "caseId": { "$ref": "#/$defs/identity" },
+        "status": { "const": "active" },
+        "current": { "const": true }
+      }
+    },
+    "knowledgeReleaseReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "releaseId",
+        "releaseVersion",
+        "contentSha256",
+        "lifecycleState",
+        "current"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "laibe.knowledge-release.v1" },
+        "releaseId": { "$ref": "#/$defs/identity" },
+        "releaseVersion": { "type": "integer", "minimum": 1 },
+        "contentSha256": { "$ref": "#/$defs/sha256" },
+        "lifecycleState": { "const": "active" },
+        "current": { "const": true }
+      }
+    },
+    "specReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["referenceType", "caseId", "referenceId", "status"],
+      "properties": {
+        "referenceType": { "const": "A0_PINNED_SPEC_REFERENCE" },
+        "caseId": { "$ref": "#/$defs/identity" },
+        "referenceId": { "$ref": "#/$defs/identity" },
+        "status": { "const": "pinned" }
+      }
+    },
+    "dependencyBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planSnapshot", "knowledgeRelease", "specReference"],
+      "properties": {
+        "planSnapshot": { "$ref": "#/$defs/planSnapshotReference" },
+        "knowledgeRelease": {
+          "$ref": "#/$defs/knowledgeReleaseReference"
+        },
+        "specReference": { "$ref": "#/$defs/specReference" }
+      }
+    },
+    "extractionPacketBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaName",
+        "schemaVersion",
+        "packetId",
+        "factsHash",
+        "reviewStage",
+        "caseId",
+        "sourceDocumentReferenceId",
+        "sourceDocumentId",
+        "sourceDocumentVersionId",
+        "sourceDocumentCurrentVersionId",
+        "sourceDocumentSupersededByVersionId",
+        "sourceDocumentSha256",
+        "dependencyBasis"
+      ],
+      "properties": {
+        "schemaName": { "const": "laibe.quote-extraction-packet.v1" },
+        "schemaVersion": { "const": 1 },
+        "packetId": { "$ref": "#/$defs/identity" },
+        "factsHash": { "$ref": "#/$defs/sha256" },
+        "reviewStage": { "const": "machine_candidate" },
+        "caseId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentReferenceId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentCurrentVersionId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentSupersededByVersionId": {
+          "oneOf": [{ "$ref": "#/$defs/identity" }, { "type": "null" }]
+        },
+        "sourceDocumentSha256": { "$ref": "#/$defs/sha256" },
+        "dependencyBasis": { "$ref": "#/$defs/dependencyBasis" }
+      }
+    },
+    "worksheetCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "sheet", "cell"],
+      "properties": {
+        "kind": { "const": "worksheet_cell" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sheet": { "$ref": "#/$defs/identity" },
+        "cell": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "worksheetRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "sheet", "row"],
+      "properties": {
+        "kind": { "const": "worksheet_row" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sheet": { "$ref": "#/$defs/identity" },
+        "row": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "worksheetRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "sheet", "range"],
+      "properties": {
+        "kind": { "const": "worksheet_range" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sheet": { "$ref": "#/$defs/identity" },
+        "range": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "textRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "page", "region"],
+      "properties": {
+        "kind": { "const": "text_region" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "page": { "type": "integer", "minimum": 1 },
+        "region": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": { "type": "number", "minimum": 0 },
+            "y": { "type": "number", "minimum": 0 },
+            "width": { "type": "number", "minimum": 0 },
+            "height": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        { "$ref": "#/$defs/worksheetCell" },
+        { "$ref": "#/$defs/worksheetRow" },
+        { "$ref": "#/$defs/worksheetRange" },
+        { "$ref": "#/$defs/textRegion" }
+      ]
+    },
+    "notice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "evidence"],
+      "properties": {
+        "code": { "$ref": "#/$defs/identity" },
+        "message": { "$ref": "#/$defs/identity" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "findingId",
+        "code",
+        "category",
+        "severity",
+        "message",
+        "evidence"
+      ],
+      "properties": {
+        "findingId": { "$ref": "#/$defs/identity" },
+        "code": {
+          "enum": [
+            "MISSING_ITEM_NAME",
+            "MISSING_UNIT",
+            "UNKNOWN_QUANTITY",
+            "UNKNOWN_UNIT_PRICE",
+            "UNKNOWN_MULTIPLIER",
+            "UNKNOWN_AMOUNT",
+            "LINE_AMOUNT_MISMATCH",
+            "SUBTOTAL_MISMATCH",
+            "TAX_MISMATCH",
+            "TOTAL_MISMATCH",
+            "POSSIBLE_DUPLICATE",
+            "UNIT_CONFLICT",
+            "AMBIGUOUS_LUMP_SUM",
+            "SITE_DEPENDENT_SCOPE",
+            "PROVISIONAL_AMOUNT",
+            "SEPARATE_ESTIMATE",
+            "EXCLUDED_SCOPE",
+            "OWNER_SUPPLIED",
+            "OPTIONAL_ITEM",
+            "DOCUMENT_VERSION_SUPERSEDED"
+          ]
+        },
+        "category": {
+          "enum": [
+            "ARITHMETIC",
+            "COMPLETENESS",
+            "DUPLICATE",
+            "UNIT",
+            "SCOPE",
+            "VERSION"
+          ]
+        },
+        "severity": { "enum": ["INFO", "WARNING", "REVIEW_REQUIRED"] },
+        "message": { "$ref": "#/$defs/identity" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "reasonCodes"],
+      "properties": {
+        "status": { "enum": ["EVALUATED", "NOT_EVALUATED"] },
+        "reasonCodes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "MODE_NOT_REQUIRED",
+              "DEPENDENCY_MISSING",
+              "RAW_A11_A12_NOT_ACCEPTED",
+              "COMPARISON_ENGINE_NOT_IMPLEMENTED"
+            ]
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "internalDocumentChecks",
+        "scopeComparison",
+        "planComparison",
+        "priceEvidenceComparison"
+      ],
+      "properties": {
+        "internalDocumentChecks": { "$ref": "#/$defs/section" },
+        "scopeComparison": { "$ref": "#/$defs/section" },
+        "planComparison": { "$ref": "#/$defs/section" },
+        "priceEvidenceComparison": { "$ref": "#/$defs/section" }
+      }
+    }
+  }
+}

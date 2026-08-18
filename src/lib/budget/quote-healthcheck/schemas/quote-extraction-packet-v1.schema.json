@@ -1,0 +1,325 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://laibe.example/schemas/candidate/quote-extraction-packet-v1.schema.json",
+  "title": "A1 Quote Extraction Packet V1 Candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaName",
+    "schemaVersion",
+    "packetId",
+    "caseId",
+    "producerRole",
+    "producerVersion",
+    "sourceDocumentReferenceId",
+    "sourceDocumentId",
+    "sourceDocumentVersionId",
+    "sourceDocumentCurrentVersionId",
+    "sourceDocumentSupersededByVersionId",
+    "sourceDocumentSha256",
+    "dependencyBasis",
+    "upstreamPacketIds",
+    "evidenceReferences",
+    "createdAt",
+    "recordedAt",
+    "processingStatus",
+    "uncertainty",
+    "warnings",
+    "supersedesPacketIds",
+    "humanReviewRequired",
+    "paymentAuthorization",
+    "contractorPaymentDue",
+    "pricedCandidateGenerated",
+    "reviewStage",
+    "mode",
+    "authorityDecisionCode",
+    "rows",
+    "totals",
+    "factsHash"
+  ],
+  "properties": {
+    "schemaName": { "const": "laibe.quote-extraction-packet.v1" },
+    "schemaVersion": { "const": 1 },
+    "packetId": { "$ref": "#/$defs/identity" },
+    "caseId": { "$ref": "#/$defs/identity" },
+    "producerRole": { "const": "A1" },
+    "producerVersion": { "$ref": "#/$defs/identity" },
+    "sourceDocumentReferenceId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentCurrentVersionId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentSupersededByVersionId": {
+      "oneOf": [{ "$ref": "#/$defs/identity" }, { "type": "null" }]
+    },
+    "sourceDocumentSha256": { "$ref": "#/$defs/sha256" },
+    "dependencyBasis": { "$ref": "#/$defs/dependencyBasis" },
+    "upstreamPacketIds": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": { "$ref": "#/$defs/planSnapshotReference" }
+    },
+    "evidenceReferences": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/evidence" }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "processingStatus": { "const": "candidate_ready" },
+    "uncertainty": { "type": "array", "items": { "$ref": "#/$defs/notice" } },
+    "warnings": { "type": "array", "items": { "$ref": "#/$defs/notice" } },
+    "supersedesPacketIds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/identity" }
+    },
+    "humanReviewRequired": { "const": true },
+    "paymentAuthorization": { "const": false },
+    "contractorPaymentDue": { "const": "NOT_DETERMINED" },
+    "pricedCandidateGenerated": { "const": false },
+    "reviewStage": { "const": "machine_candidate" },
+    "mode": {
+      "enum": [
+        "PRE_CONTRACT_QUOTE_HEALTHCHECK",
+        "PCM_CASE_PRELIMINARY_QUOTE_REVIEW"
+      ]
+    },
+    "authorityDecisionCode": { "const": "A0-PCM-INTEGRATION-20260731-V1" },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/row" }
+    },
+    "totals": { "$ref": "#/$defs/totals" },
+    "factsHash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "identity": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "planSnapshotReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaName",
+        "schemaVersion",
+        "packetId",
+        "packetVersion",
+        "packetSha256",
+        "caseId",
+        "status",
+        "current"
+      ],
+      "properties": {
+        "schemaName": { "const": "laibe.plan-puzzle-snapshot.v1" },
+        "schemaVersion": { "const": 1 },
+        "packetId": { "$ref": "#/$defs/identity" },
+        "packetVersion": { "type": "integer", "minimum": 1 },
+        "packetSha256": { "$ref": "#/$defs/sha256" },
+        "caseId": { "$ref": "#/$defs/identity" },
+        "status": { "const": "active" },
+        "current": { "const": true }
+      }
+    },
+    "knowledgeReleaseReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "releaseId",
+        "releaseVersion",
+        "contentSha256",
+        "lifecycleState",
+        "current"
+      ],
+      "properties": {
+        "schemaVersion": { "const": "laibe.knowledge-release.v1" },
+        "releaseId": { "$ref": "#/$defs/identity" },
+        "releaseVersion": { "type": "integer", "minimum": 1 },
+        "contentSha256": { "$ref": "#/$defs/sha256" },
+        "lifecycleState": { "const": "active" },
+        "current": { "const": true }
+      }
+    },
+    "specReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["referenceType", "caseId", "referenceId", "status"],
+      "properties": {
+        "referenceType": { "const": "A0_PINNED_SPEC_REFERENCE" },
+        "caseId": { "$ref": "#/$defs/identity" },
+        "referenceId": { "$ref": "#/$defs/identity" },
+        "status": { "const": "pinned" }
+      }
+    },
+    "dependencyBasis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planSnapshot", "knowledgeRelease", "specReference"],
+      "properties": {
+        "planSnapshot": { "$ref": "#/$defs/planSnapshotReference" },
+        "knowledgeRelease": {
+          "$ref": "#/$defs/knowledgeReleaseReference"
+        },
+        "specReference": { "$ref": "#/$defs/specReference" }
+      }
+    },
+    "quoteNumber": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "value"],
+          "properties": {
+            "status": { "const": "KNOWN" },
+            "value": {
+              "type": "string",
+              "pattern": "^[+-]?[0-9]+(?:\\.[0-9]+)?$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "value", "reason"],
+          "properties": {
+            "status": { "const": "UNKNOWN" },
+            "value": { "type": "null" },
+            "reason": { "enum": ["EMPTY", "NON_FINITE", "INVALID"] }
+          }
+        }
+      ]
+    },
+    "worksheetCell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "sheet", "cell"],
+      "properties": {
+        "kind": { "const": "worksheet_cell" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sheet": { "$ref": "#/$defs/identity" },
+        "cell": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "worksheetRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "sheet", "row"],
+      "properties": {
+        "kind": { "const": "worksheet_row" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sheet": { "$ref": "#/$defs/identity" },
+        "row": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "worksheetRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "sheet", "range"],
+      "properties": {
+        "kind": { "const": "worksheet_range" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sheet": { "$ref": "#/$defs/identity" },
+        "range": { "$ref": "#/$defs/identity" }
+      }
+    },
+    "textRegion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "sourceDocumentVersionId", "page", "region"],
+      "properties": {
+        "kind": { "const": "text_region" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "page": { "type": "integer", "minimum": 1 },
+        "region": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": { "type": "number", "minimum": 0 },
+            "y": { "type": "number", "minimum": 0 },
+            "width": { "type": "number", "minimum": 0 },
+            "height": { "type": "number", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "oneOf": [
+        { "$ref": "#/$defs/worksheetCell" },
+        { "$ref": "#/$defs/worksheetRow" },
+        { "$ref": "#/$defs/worksheetRange" },
+        { "$ref": "#/$defs/textRegion" }
+      ]
+    },
+    "notice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "evidence"],
+      "properties": {
+        "code": { "$ref": "#/$defs/identity" },
+        "message": { "$ref": "#/$defs/identity" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineId",
+        "itemName",
+        "unit",
+        "quantity",
+        "unitPrice",
+        "multiplier",
+        "declaredAmount",
+        "notes",
+        "evidence"
+      ],
+      "properties": {
+        "lineId": { "$ref": "#/$defs/identity" },
+        "itemName": {
+          "oneOf": [{ "$ref": "#/$defs/identity" }, { "type": "null" }]
+        },
+        "unit": {
+          "oneOf": [{ "$ref": "#/$defs/identity" }, { "type": "null" }]
+        },
+        "quantity": { "$ref": "#/$defs/quoteNumber" },
+        "unitPrice": { "$ref": "#/$defs/quoteNumber" },
+        "multiplier": { "$ref": "#/$defs/quoteNumber" },
+        "declaredAmount": { "$ref": "#/$defs/quoteNumber" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "totals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "declaredSubtotal",
+        "taxRate",
+        "declaredTax",
+        "declaredTotal",
+        "evidence"
+      ],
+      "properties": {
+        "declaredSubtotal": { "$ref": "#/$defs/quoteNumber" },
+        "taxRate": { "$ref": "#/$defs/quoteNumber" },
+        "declaredTax": { "$ref": "#/$defs/quoteNumber" },
+        "declaredTotal": { "$ref": "#/$defs/quoteNumber" },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    }
+  }
+}

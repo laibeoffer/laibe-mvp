@@ -1,0 +1,15 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Page /Contents 2 0 R >>
+endobj
+2 0 obj
+<< /Length 22 >>
+stream
+BT (/Type /Page) Tj ET
+endstream
+endobj
+3 0 obj
+<< /Type (not-a-page) /Page /NotAType % /Type /Page
+>>
+endobj
+%%EOF
