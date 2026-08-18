@@ -303,6 +303,10 @@ const EMPTY_LIST_COPY = Object.freeze({
     title: "尚未取得乙方提交資料",
     body: "未有正式紀錄前，不顯示廠商名稱、金額、排序或回覆狀態。",
   }),
+  calendarSubmissions: Object.freeze({
+    title: "尚未取得已排程的設計事項",
+    body: "只有具備正式排程時間的設計事項，才會列入本週議程。",
+  }),
   messages: Object.freeze({
     title: "尚未取得案件訊息",
     body: "只有收到可信留痕憑證後，訊息才會顯示為「已記錄」。",
@@ -310,6 +314,14 @@ const EMPTY_LIST_COPY = Object.freeze({
   designReviews: Object.freeze({
     title: "尚未取得設計送審紀錄",
     body: "專業檢討可提出書面提醒，但不代替甲方接受設計或宣告現場品質。",
+  }),
+  designDecisionTrail: Object.freeze({
+    title: "尚未取得設計決策紀錄",
+    body: "正式案件連結後，會依序顯示提出者、文件版次、書面意見、結果與下一位處理者。",
+  }),
+  lineMessages: Object.freeze({
+    title: "尚未取得案件訊息",
+    body: "只有收到可信留痕憑證後，訊息才會顯示為已記錄。",
   }),
   constructionRecords: Object.freeze({
     title: "尚未取得施工或驗收事件",
@@ -644,6 +656,25 @@ export function normalizeOwnerWorkspaceContext(input = {}) {
       "submittedAtLabel",
       "nextActionLabel",
     ]),
+    scheduledDesignItems: normalizeRecords(source.scheduledDesignItems, [
+      "scope",
+      "title",
+      "statusLabel",
+      "versionLabel",
+      "scheduledAt",
+      "nextActionLabel",
+    ])
+      .filter(
+        (record) =>
+          record.scope === "design" &&
+          record.title !== "" &&
+          canonicalRecordedAt(record.scheduledAt),
+      )
+      .map((record) => ({
+        ...record,
+        scheduledAt: canonicalRecordedAt(record.scheduledAt),
+        scheduledAtLabel: taipeiTimeLabel(record.scheduledAt),
+      })),
     publicMessages: normalizePublicMessages(source.publicMessages),
     designReviews: normalizeRecords(source.designReviews, [
       "title",
@@ -652,6 +683,17 @@ export function normalizeOwnerWorkspaceContext(input = {}) {
       "reasonLabel",
       "nextActorLabel",
     ]),
+    designDecisionTrail: normalizeRecords(source.designDecisionTrail, [
+      "scope",
+      "title",
+      "actorLabel",
+      "recordedAtLabel",
+      "documentVersionLabel",
+      "resultLabel",
+      "nextActionLabel",
+    ]).filter(
+      (record) => record.scope === "design" && record.title !== "",
+    ),
     constructionRecords: normalizeRecords(source.constructionRecords, [
       "title",
       "statusLabel",
@@ -871,8 +913,10 @@ export function buildOwnerWorkspaceViewModel(input) {
     constructionActor: summary?.currentActorLabel || "尚待案件資料",
     documents: payloadVisible ? context.documents : [],
     submissions: payloadVisible ? context.submissions : [],
+    scheduledDesignItems: payloadVisible ? context.scheduledDesignItems : [],
     messages,
     designReviews: payloadVisible ? context.designReviews : [],
+    designDecisionTrail: payloadVisible ? context.designDecisionTrail : [],
     constructionRecords: payloadVisible ? context.constructionRecords : [],
     events: payloadVisible ? context.events : [],
     processSteps: payloadVisible ? context.processSteps : [],
@@ -1364,6 +1408,12 @@ function renderModel(root, model) {
   }
 
   renderProcessSteps(root, model.processSteps);
+  const designScheduleEmpty = root.querySelector(
+    '[data-calendar-empty="design-schedule"]',
+  );
+  if (designScheduleEmpty) {
+    designScheduleEmpty.hidden = model.scheduledDesignItems.length > 0;
+  }
   renderList(
     root,
     "documents",
@@ -1391,6 +1441,20 @@ function renderModel(root, model) {
         record.partyLabel,
         [record.versionLabel, record.statusLabel].filter(Boolean).join(" · "),
         [record.submittedAtLabel, record.nextActionLabel],
+      );
+    },
+  );
+  renderList(
+    root,
+    "calendarSubmissions",
+    model.scheduledDesignItems,
+    (documentRef, list, record) => {
+      appendRecord(
+        documentRef,
+        list,
+        record.title,
+        [record.versionLabel, record.statusLabel].filter(Boolean).join(" · "),
+        [record.scheduledAtLabel, record.nextActionLabel],
       );
     },
   );
@@ -1422,6 +1486,42 @@ function renderModel(root, model) {
           .filter(Boolean)
           .join(" · "),
         [record.nextActorLabel],
+      );
+    },
+  );
+  renderList(
+    root,
+    "designDecisionTrail",
+    model.designDecisionTrail,
+    (documentRef, list, record) => {
+      appendRecord(
+        documentRef,
+        list,
+        record.title,
+        [record.resultLabel, record.documentVersionLabel]
+          .filter(Boolean)
+          .join(" · "),
+        [record.actorLabel, record.recordedAtLabel, record.nextActionLabel],
+      );
+    },
+  );
+  renderList(
+    root,
+    "lineMessages",
+    model.messages,
+    (documentRef, list, record) => {
+      appendRecord(
+        documentRef,
+        list,
+        record.actorLabel,
+        record.body,
+        [
+          record.messageTypeLabel,
+          record.documentVersionLabel,
+          record.recordedAtLabel,
+          record.recordStatusLabel,
+          record.nextActionLabel,
+        ],
       );
     },
   );
@@ -1672,6 +1772,196 @@ export function initializeOwnerDashboardTabs(
   return Object.freeze({ selectTab });
 }
 
+export function initializeOwnerManagementInteractions(
+  root = typeof document === "undefined" ? null : document,
+) {
+  if (!root || typeof root.querySelector !== "function") {
+    return null;
+  }
+
+  const construction = root.querySelector(
+    '[data-owner-management-layout="construction"]',
+  );
+  const navigation = construction?.querySelector(
+    '[data-layout="owner-construction-navigation"]',
+  );
+  const viewButtons = Array.from(
+    navigation?.querySelectorAll?.("[data-owner-construction-view]") ?? [],
+  );
+  const viewPanels = Array.from(
+    construction?.querySelectorAll?.("[data-owner-construction-view-panel]") ?? [],
+  );
+  const viewKeys = viewButtons.map(
+    (button) => button.dataset.ownerConstructionView,
+  );
+
+  function selectConstructionView(key, { focus = false } = {}) {
+    if (!viewKeys.includes(key)) return false;
+    construction.dataset.activeOwnerConstructionView = key;
+    for (const button of viewButtons) {
+      const selected = button.dataset.ownerConstructionView === key;
+      button.setAttribute("aria-pressed", String(selected));
+      if (selected && focus) button.focus();
+    }
+    for (const panel of viewPanels) {
+      panel.hidden = panel.dataset.ownerConstructionViewPanel !== key;
+    }
+    return true;
+  }
+
+  for (const button of viewButtons) {
+    button.addEventListener("click", () => {
+      selectConstructionView(button.dataset.ownerConstructionView);
+    });
+    button.addEventListener("keydown", (event) => {
+      const currentIndex = viewButtons.indexOf(button);
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowDown" || event.key === "ArrowRight") {
+        nextIndex = (currentIndex + 1) % viewButtons.length;
+      } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
+        nextIndex = (currentIndex - 1 + viewButtons.length) % viewButtons.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = viewButtons.length - 1;
+      } else {
+        return;
+      }
+      event.preventDefault();
+      selectConstructionView(
+        viewButtons[nextIndex].dataset.ownerConstructionView,
+        { focus: true },
+      );
+    });
+  }
+
+  if (viewKeys.length && viewPanels.length === viewKeys.length) {
+    selectConstructionView(viewKeys[0]);
+  }
+
+  const revisionButton = root.querySelector(
+    '[data-action="open-owner-design-revision"]',
+  );
+  const revisionPanel = root.querySelector("[data-owner-design-revision-panel]");
+  const closeRevisionButton = root.querySelector(
+    '[data-action="close-owner-design-revision"]',
+  );
+
+  function setRevisionOpen(open, { focus = false } = {}) {
+    if (!revisionButton || !revisionPanel) return false;
+    const nextOpen = open === true;
+    revisionButton.setAttribute("aria-expanded", String(nextOpen));
+    revisionPanel.hidden = !nextOpen;
+    if (nextOpen && focus) {
+      revisionPanel.querySelector?.("textarea")?.focus?.();
+    }
+    return true;
+  }
+
+  revisionButton?.addEventListener("click", () => {
+    setRevisionOpen(revisionButton.getAttribute("aria-expanded") !== "true", {
+      focus: true,
+    });
+  });
+  closeRevisionButton?.addEventListener("click", () => {
+    setRevisionOpen(false);
+    revisionButton?.focus?.();
+  });
+
+  function setEnabled(enabled) {
+    const allowDraft = enabled === true;
+    if (revisionButton) {
+      revisionButton.disabled = !allowDraft;
+      revisionButton.setAttribute("aria-disabled", String(!allowDraft));
+    }
+    if (!allowDraft) setRevisionOpen(false);
+  }
+
+  setEnabled(false);
+  return Object.freeze({ selectConstructionView, setEnabled });
+}
+
+const OWNER_CALENDAR_VIEW_KEYS = Object.freeze(["week", "month", "agenda"]);
+
+export function initializeOwnerCalendarWorkspaces(
+  root = typeof document === "undefined" ? null : document,
+) {
+  if (!root || typeof root.querySelectorAll !== "function") {
+    return Object.freeze([]);
+  }
+
+  const workspaces = Array.from(
+    root.querySelectorAll("[data-calendar-workspace]"),
+  );
+  const controllers = [];
+
+  for (const workspace of workspaces) {
+    if (workspace.dataset.calendarReady === "true") {
+      continue;
+    }
+
+    const buttons = Array.from(
+      workspace.querySelectorAll("[data-calendar-view-option]"),
+    );
+    const availableViews = buttons
+      .map((button) => button.dataset.calendarViewOption)
+      .filter((key) => OWNER_CALENDAR_VIEW_KEYS.includes(key));
+
+    if (!availableViews.length) {
+      continue;
+    }
+
+    function selectView(key, { focus = false } = {}) {
+      if (!availableViews.includes(key)) {
+        return false;
+      }
+      workspace.dataset.calendarView = key;
+      for (const button of buttons) {
+        const selected = button.dataset.calendarViewOption === key;
+        button.setAttribute("aria-pressed", String(selected));
+        if (selected && focus) {
+          button.focus();
+        }
+      }
+      return true;
+    }
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        selectView(button.dataset.calendarViewOption);
+      });
+      button.addEventListener("keydown", (event) => {
+        const currentIndex = buttons.indexOf(button);
+        let nextIndex = currentIndex;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          nextIndex = (currentIndex + 1) % buttons.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = buttons.length - 1;
+        } else {
+          return;
+        }
+        event.preventDefault();
+        selectView(buttons[nextIndex].dataset.calendarViewOption, {
+          focus: true,
+        });
+      });
+    }
+
+    const initialView = availableViews.includes(workspace.dataset.calendarView)
+      ? workspace.dataset.calendarView
+      : availableViews[0];
+    workspace.dataset.calendarReady = "true";
+    selectView(initialView);
+    controllers.push(Object.freeze({ selectView }));
+  }
+
+  return Object.freeze(controllers);
+}
+
 export function createOwnerWorkspaceController({ root, adapter } = {}) {
   const documentRef = root ??
     (typeof document === "undefined" ? null : document);
@@ -1680,8 +1970,10 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   let currentModel = null;
 
   const contractWorkspace = initializeOwnerContractWorkspace(documentRef);
+  const managementWorkspace = initializeOwnerManagementInteractions(documentRef);
   const view = documentRef?.defaultView ??
     (typeof window === "undefined" ? null : window);
+  initializeOwnerCalendarWorkspaces(documentRef);
   initializeOwnerDashboardTabs(documentRef, view, {
     onContractMainSelected() {
       contractWorkspace?.selectView?.("overview", { syncHash: false });
@@ -1694,6 +1986,7 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
       renderModel(documentRef, model);
     }
     contractWorkspace?.setEnabled(model.state === "AUTHORIZED_READY");
+    managementWorkspace?.setEnabled(model.state === "AUTHORIZED_READY");
     return model;
   }
 

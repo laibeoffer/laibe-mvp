@@ -214,7 +214,7 @@
                 aria-selected="true"
                 aria-controls="owner-dashboard-panel-design"
               >
-                <strong>設計案管理</strong>
+                <strong>設計管理</strong>
                 <small>需求、圖面、版本與待確認</small>
               </button>
               <button
@@ -228,7 +228,7 @@
                 aria-controls="owner-dashboard-panel-construction"
                 tabindex="-1"
               >
-                <strong>工程案管理</strong>
+                <strong>工程管理</strong>
                 <small>任務、照片、變更與驗收</small>
               </button>
               <button
@@ -248,22 +248,24 @@
             </div>
 
             <section
-              class="owner-hero-dashboard__panel"
+              class="owner-hero-dashboard__panel owner-hero-dashboard__panel--calendar"
               id="owner-dashboard-panel-design"
               role="tabpanel"
               data-owner-panel="design"
+              data-owner-management-layout="design"
               aria-labelledby="owner-dashboard-tab-design"
             >
+              <span class="owner-route-anchor" id="design-review" aria-hidden="true"></span>
               <aside class="owner-hero-dashboard__summary">
-                <p class="eyebrow">設計案管理</p>
+                <p class="eyebrow">案件摘要｜設計管理</p>
                 <h3>先確認依據哪一版，再決定接受或要求修改。</h3>
                 <p>需求、圖面與設計回覆必須綁定版本、提出者與待確認事項。</p>
               </aside>
               <div class="owner-hero-dashboard__body">
                 <header>
                   <div>
-                    <p class="eyebrow">目前狀態與版本依據</p>
-                    <h3>設計決策工作區</h3>
+                    <p class="eyebrow">送審文件與版本</p>
+                    <h3>書面確認與修改</h3>
                   </div>
                   <span data-slot="state-label">尚待取得案件資料</span>
                 </header>
@@ -273,33 +275,140 @@
                   <div><dt>待確認事項</dt><dd data-slot="issue-summary">尚未連結正式案件</dd></div>
                 </dl>
               </div>
-              <footer class="owner-hero-dashboard__next">
-                <p>
-                  <span>下一步</span>
-                  <strong data-slot="next-summary">了解並確認 DRS 服務契約</strong>
-                  <small data-slot="next-owner-summary">責任人：甲方</small>
-                </p>
-                <span class="owner-dashboard-static-note">尚未建立可查看的設計案紀錄</span>
-              </footer>
+              <div
+                class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
+                data-calendar-workspace="design-review"
+                data-owner-google-calendar-surface="design"
+                data-calendar-state="unavailable"
+                aria-label="共同案件日曆｜設計管理"
+              >
+                <iframe
+                  title="甲方 Google 日曆｜設計管理"
+                  data-owner-google-calendar-design-frame
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  hidden
+                ></iframe>
+                <section
+                  class="owner-google-calendar-unavailable"
+                  data-owner-google-calendar-design-unavailable
+                  aria-labelledby="owner-design-google-calendar-title"
+                >
+                  <span class="owner-google-calendar-mark" aria-hidden="true">31</span>
+                  <p class="eyebrow">Google Calendar</p>
+                  <h3 id="owner-design-google-calendar-title">甲方 Google 日曆尚未連結</h3>
+                  <p>完成甲方帳號、正式案件與日曆權限確認後，這個完整區塊才會顯示甲方自己的 Google 日曆。</p>
+                  <strong>目前不顯示示意行程，也不使用其他角色的帳號。</strong>
+                </section>
+              </div>
+              <div class="owner-management-shell owner-management-shell--design">
+                <section class="owner-management-card" aria-labelledby="owner-design-review-actions-title">
+                  <header class="owner-management-card__heading">
+                    <div>
+                      <p class="eyebrow">送審文件與版本</p>
+                      <h3 id="owner-design-review-actions-title">書面確認與修改</h3>
+                    </div>
+                    <span data-slot="review-summary">尚未連結正式案件</span>
+                  </header>
+                  <p class="owner-management-card__copy">
+                    先核對文件名稱、版次與乙方回覆，再由甲方確認、提出問題或要求修改。任何正式結果都必須由案件服務回傳紀錄憑證。
+                  </p>
+                  <div class="owner-management-actions" data-layout="owner-design-review-actions">
+                    <button type="button" data-owner-record-action="accept-design" disabled aria-disabled="true">
+                      正式案件連結後可確認此版
+                    </button>
+                    <button
+                      type="button"
+                      data-action="open-owner-design-revision"
+                      data-owner-session-control
+                      aria-expanded="false"
+                      aria-controls="owner-design-revision-panel"
+                      disabled
+                      aria-disabled="true"
+                    >
+                      整理要求修改內容
+                    </button>
+                  </div>
+                  <section
+                    class="owner-management-revision"
+                    id="owner-design-revision-panel"
+                    data-owner-design-revision-panel
+                    aria-labelledby="owner-design-revision-title"
+                    hidden
+                  >
+                    <h4 id="owner-design-revision-title">要求修改草稿</h4>
+                    <label for="owner-design-revision-detail">請指出依據版次、問題位置與希望乙方回覆的內容</label>
+                    <textarea
+                      id="owner-design-revision-detail"
+                      rows="4"
+                      maxlength="1200"
+                      placeholder="例如：請依平面配置 v2，補充主臥衣櫃與走道尺寸，並標示修改版次。"
+                    ></textarea>
+                    <p role="status" aria-live="polite">目前只整理本次畫面草稿，不會自行送出或建立案件紀錄。</p>
+                    <div>
+                      <button type="button" data-action="close-owner-design-revision">取消整理</button>
+                      <button type="button" disabled aria-disabled="true">正式送出入口尚待案件服務開放</button>
+                    </div>
+                  </section>
+                </section>
+
+                <section class="owner-management-card" aria-labelledby="owner-design-trail-title">
+                  <header class="owner-management-card__heading">
+                    <div>
+                      <p class="eyebrow">文件、意見、決定</p>
+                      <h3 id="owner-design-trail-title">設計決策留痕</h3>
+                    </div>
+                    <span>只顯示正式案件紀錄</span>
+                  </header>
+                  <div class="owner-design-record-groups">
+                    <section class="owner-calendar__record-group">
+                      <p>已排入日曆事項</p>
+                      <ul class="record-list owner-calendar__records" data-list="calendarSubmissions">
+                        <li class="empty-state">
+                          <strong>尚未取得已排程的設計事項</strong>
+                          <span>只有具備正式排程時間的設計事項，才會列入案件日曆。</span>
+                        </li>
+                      </ul>
+                    </section>
+                    <section class="owner-calendar__record-group">
+                      <p>檢閱與版本決議</p>
+                      <ul class="record-list owner-calendar__records" data-list="designReviews">
+                        <li class="empty-state">
+                          <strong>尚未取得設計送審紀錄</strong>
+                          <span>專業檢討人員可提出書面提醒，但不代替甲方接受設計或宣告現場品質。</span>
+                        </li>
+                      </ul>
+                    </section>
+                  </div>
+                  <ul class="record-list" data-list="designDecisionTrail">
+                    <li class="empty-state">
+                      <strong>尚未取得設計決策紀錄</strong>
+                      <span>連結正式案件後，會依序顯示提出者、文件版次、書面意見、結果與下一位處理者。</span>
+                    </li>
+                  </ul>
+                </section>
+              </div>
             </section>
 
             <section
-              class="owner-hero-dashboard__panel"
+              class="owner-hero-dashboard__panel owner-hero-dashboard__panel--calendar"
               id="owner-dashboard-panel-construction"
               role="tabpanel"
               data-owner-panel="construction"
+              data-owner-management-layout="construction"
               aria-labelledby="owner-dashboard-tab-construction"
               hidden
             >
+              <span class="owner-route-anchor" id="construction-records" aria-hidden="true"></span>
               <aside class="owner-hero-dashboard__summary">
-                <p class="eyebrow">工程案管理</p>
+                <p class="eyebrow">案件摘要｜工程管理</p>
                 <h3>把現場進度連回任務、照片、變更與驗收責任。</h3>
                 <p>每個施工事件都要說清楚時間、依據文件、目前狀態與下一位處理者。</p>
               </aside>
               <div class="owner-hero-dashboard__body">
                 <header>
                   <div>
-                    <p class="eyebrow">今天與下一步</p>
+                    <p class="eyebrow">本日重要項目</p>
                     <h3>施工責任工作區</h3>
                   </div>
                   <span data-slot="case-status">尚未連結正式案件</span>
@@ -310,10 +419,146 @@
                   <div><dt>下一位處理者</dt><dd data-slot="construction-actor">尚待案件資料</dd></div>
                 </dl>
               </div>
-              <footer class="owner-hero-dashboard__next">
-                <p><span>紀錄原則</span><strong>只顯示正式案件已有的施工與驗收留痕。</strong></p>
-                <span class="owner-dashboard-static-note">尚未建立可查看的工程案紀錄</span>
-              </footer>
+              <nav
+                class="owner-construction-nav"
+                data-layout="owner-construction-navigation"
+                aria-label="工程管理資料分類"
+              >
+                <button
+                  type="button"
+                  data-action="select-owner-construction-view"
+                  data-owner-construction-view="today"
+                  aria-pressed="true"
+                  aria-controls="owner-construction-view-today"
+                >
+                  <strong>案件日曆</strong>
+                  <small>本日重要項目與責任</small>
+                </button>
+                <button
+                  type="button"
+                  data-action="select-owner-construction-view"
+                  data-owner-construction-view="changes"
+                  aria-pressed="false"
+                  aria-controls="owner-construction-view-changes"
+                >
+                  <strong>變更與驗收</strong>
+                  <small>待確認、追加減與缺失</small>
+                </button>
+                <button
+                  type="button"
+                  data-action="select-owner-construction-view"
+                  data-owner-construction-view="records"
+                  aria-pressed="false"
+                  aria-controls="owner-construction-view-records"
+                >
+                  <strong>歷史文件版本</strong>
+                  <small>送審、照片與更正紀錄</small>
+                </button>
+                <button
+                  type="button"
+                  data-action="select-owner-construction-view"
+                  data-owner-construction-view="trail"
+                  aria-pressed="false"
+                  aria-controls="owner-construction-view-trail"
+                >
+                  <strong>案件留痕</strong>
+                  <small>誰在何時依哪份文件處理</small>
+                </button>
+              </nav>
+              <div
+                class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
+                id="owner-construction-view-today"
+                data-owner-construction-view-panel="today"
+                data-calendar-workspace="construction"
+                data-owner-google-calendar
+                data-calendar-state="unavailable"
+              >
+                <iframe
+                  title="甲方 Google 日曆"
+                  data-owner-google-calendar-frame
+                  loading="lazy"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  hidden
+                ></iframe>
+                <section
+                  class="owner-google-calendar-unavailable"
+                  data-owner-google-calendar-unavailable
+                  aria-labelledby="owner-google-calendar-title"
+                >
+                  <span class="owner-google-calendar-mark" aria-hidden="true">31</span>
+                  <p class="eyebrow">Google Calendar</p>
+                  <h3 id="owner-google-calendar-title">甲方 Google 日曆尚未連結</h3>
+                  <p>完成甲方帳號、正式案件與日曆權限確認後，這個完整區塊才會顯示甲方自己的 Google 日曆。</p>
+                  <strong>目前不顯示示意行程，也不使用其他角色的帳號。</strong>
+                </section>
+              </div>
+              <section
+                class="owner-management-card owner-construction-view"
+                id="owner-construction-view-changes"
+                data-owner-construction-view-panel="changes"
+                aria-labelledby="owner-construction-view-changes-title"
+                hidden
+              >
+                <header class="owner-management-card__heading">
+                  <div><p class="eyebrow">甲方待處理</p><h3 id="owner-construction-view-changes-title">變更與驗收</h3></div>
+                  <span data-slot="construction-issues">尚待案件資料</span>
+                </header>
+                <p class="owner-management-card__copy">
+                  甲方可檢閱乙方提出的變更、追加減與驗收缺失；正式確認或退回必須綁定文件版次、書面理由與下一位處理者。
+                </p>
+                <ul class="record-list" data-list="constructionRecords">
+                  <li class="empty-state">
+                    <strong>尚未取得施工或驗收事件</strong>
+                    <span>施工任務、照片、追加減項與驗收缺失，必須來自正式案件紀錄。</span>
+                  </li>
+                </ul>
+                <div class="owner-management-actions">
+                  <button type="button" data-owner-record-action="confirm-construction-change" disabled aria-disabled="true">正式案件連結後可確認</button>
+                  <button type="button" data-owner-record-action="request-construction-revision" disabled aria-disabled="true">正式案件連結後可要求補正</button>
+                </div>
+                <p class="owner-management-boundary">甲方不在此上傳乙方施工日誌或照片，只檢閱、提問、確認並留下自己的案件紀錄。</p>
+              </section>
+
+              <section
+                class="owner-management-card owner-construction-view"
+                id="owner-construction-view-records"
+                data-owner-construction-view-panel="records"
+                aria-labelledby="owner-construction-view-records-title"
+                hidden
+              >
+                <header class="owner-management-card__heading">
+                  <div><p class="eyebrow">只讀檔案庫</p><h3 id="owner-construction-view-records-title">歷史文件版本</h3></div>
+                  <span>正式案件資料</span>
+                </header>
+                <details>
+                  <summary>施工日誌、照片與更正紀錄</summary>
+                  <p>正式案件連結後，依日期顯示乙方提交、原始版本、補充更正、甲方意見與處理結果；原版本不會被新版本覆蓋。</p>
+                </details>
+                <details>
+                  <summary>送審、變更與驗收文件</summary>
+                  <p>每一份文件都會標示版次、提交者、確認者、狀態與下一步，不以畫面上的單次操作冒充正式紀錄。</p>
+                </details>
+              </section>
+
+              <section
+                class="owner-management-card owner-construction-view"
+                id="owner-construction-view-trail"
+                data-owner-construction-view-panel="trail"
+                aria-labelledby="owner-construction-view-trail-title"
+                hidden
+              >
+                <header class="owner-management-card__heading">
+                  <div><p class="eyebrow">可追溯事件</p><h3 id="owner-construction-view-trail-title">案件留痕</h3></div>
+                  <span data-slot="last-recorded">尚未建立正式案件紀錄</span>
+                </header>
+                <p class="owner-management-card__copy">
+                  依時間查看誰對哪個案件、根據哪份文件做了什麼，目前狀態為何，以及下一步由誰處理。
+                </p>
+                <div class="owner-management-empty">
+                  <strong>尚未取得可顯示的工程事件</strong>
+                  <span>正式案件連結後，施工任務、照片、變更、追加減項、缺失與驗收結果會依序顯示。</span>
+                </div>
+              </section>
             </section>
 
             <section
@@ -587,45 +832,66 @@
           <aside
             class="owner-hero-dashboard__rail owner-line-conversation"
             data-layout="owner-line-conversation"
-            aria-label="案件 LINE 對話"
+            aria-label="甲方 LINE 對話"
           >
-            <section class="owner-line-conversation__unavailable" aria-labelledby="owner-line-unavailable-title">
-              <p class="eyebrow">案件對話</p>
-              <h2 id="owner-line-unavailable-title">案件對話尚未連結</h2>
-              <p>完成正式案件與權限確認後，才會顯示本案對話紀錄。</p>
-            </section>
-            <div data-owner-line-trusted-content>
+            <section
+              class="owner-chat-channel"
+              data-owner-chat-channel="drs"
+              aria-labelledby="owner-drs-line-title"
+            >
               <header class="owner-line-conversation__heading">
-                <div><p class="eyebrow">案件 LINE 對話</p><h2 data-slot="case-name">尚未連結正式案件</h2></div>
-                <span class="owner-hero-dashboard__rail-state" data-slot="header-state">決策準備中</span>
+                <div><p class="eyebrow">LINE｜DRS 一對一</p><h2 id="owner-drs-line-title">甲方 × DRS</h2></div>
+                <span class="owner-hero-dashboard__rail-state">一對一</span>
               </header>
-              <p class="owner-line-conversation__notice" role="status" aria-live="polite">案件對話尚未連結</p>
-              <section class="owner-line-conversation__stream" aria-labelledby="owner-line-empty-title">
-                <p class="eyebrow">對話紀錄</p>
-                <h3 id="owner-line-empty-title">目前沒有可顯示的對話</h3>
-                <p>完成甲方身分與案件權限確認後，才會顯示與這個案件有關的 LINE 對話紀錄。</p>
-              </section>
-              <dl>
-                <div>
-                  <dt>目前由誰處理</dt>
-                  <dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd>
-                </div>
-                <div>
-                  <dt>建議下一步</dt>
-                  <dd data-slot="next-action">了解並確認 DRS 服務契約</dd>
-                </div>
-                <div>
-                  <dt>最近留痕</dt>
-                  <dd data-slot="last-recorded">尚未建立正式案件紀錄</dd>
-                </div>
-              </dl>
-              <form class="owner-line-conversation__composer" aria-label="案件 LINE 訊息輸入">
-                <label for="owner-line-message">訊息</label>
-                <textarea id="owner-line-message" rows="3" disabled aria-disabled="true" placeholder="連結案件對話後才能輸入"></textarea>
-                <button type="button" data-line-send disabled aria-disabled="true">尚未開放傳送</button>
-                <p>目前不會送出或保存訊息；請先完成案件與權限確認。</p>
+              <div class="owner-chat-channel__unavailable">
+                <strong>甲方與 DRS 的一對一對話尚未連結</strong>
+                <p>完成甲方帳號與 DRS 服務確認後，這裡只顯示甲方與 DRS 的服務說明、補件提醒與書面回覆。</p>
+              </div>
+              <form class="owner-line-conversation__composer" aria-label="DRS 一對一 LINE 訊息輸入">
+                <label for="owner-drs-line-message">傳給 DRS</label>
+                <textarea id="owner-drs-line-message" rows="2" disabled aria-disabled="true" placeholder="連結 DRS 一對一對話後才能輸入"></textarea>
+                <button type="button" data-line-send="drs" disabled aria-disabled="true">尚未開放傳送</button>
+                <p>未完成正式連結前，不會送出或保存訊息。</p>
               </form>
-            </div>
+            </section>
+
+            <section
+              class="owner-chat-channel"
+              data-owner-chat-channel="case-group"
+              aria-labelledby="owner-case-line-title"
+            >
+              <header class="owner-line-conversation__heading">
+                <div><p class="eyebrow">LINE｜案件三方群組</p><h2 id="owner-case-line-title" data-slot="case-name">尚未連結正式案件</h2></div>
+                <span class="owner-hero-dashboard__rail-state" data-slot="header-state">甲方・乙方・DRS</span>
+              </header>
+              <section class="owner-line-conversation__unavailable" aria-labelledby="owner-case-line-unavailable-title">
+                <h3 id="owner-case-line-unavailable-title">甲方、乙方與 DRS 的案件群組尚未連結</h3>
+                <p>完成正式案件與三方權限確認後，才會顯示本案公開對話與已記錄訊息。</p>
+              </section>
+              <div data-owner-line-trusted-content>
+                <p class="owner-line-conversation__notice" role="status" aria-live="polite">只顯示具可信留痕憑證的案件訊息</p>
+                <section class="owner-line-conversation__stream" aria-labelledby="owner-line-empty-title">
+                  <p class="eyebrow">三方公開紀錄</p>
+                  <h3 id="owner-line-empty-title">目前沒有可顯示的對話</h3>
+                  <ul class="record-list owner-line-conversation__records" data-list="lineMessages">
+                    <li class="empty-state">
+                      <strong>尚未取得案件訊息</strong>
+                      <span>只有收到可信留痕憑證後，訊息才會顯示為已記錄。</span>
+                    </li>
+                  </ul>
+                </section>
+                <dl>
+                  <div><dt>目前由誰處理</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
+                  <div><dt>最近留痕</dt><dd data-slot="last-recorded">尚未建立正式案件紀錄</dd></div>
+                </dl>
+              </div>
+              <form class="owner-line-conversation__composer" aria-label="案件三方 LINE 訊息輸入">
+                <label for="owner-case-line-message">傳到案件三方群組</label>
+                <textarea id="owner-case-line-message" rows="2" disabled aria-disabled="true" placeholder="連結案件三方群組後才能輸入"></textarea>
+                <button type="button" data-line-send="case-group" disabled aria-disabled="true">尚未開放傳送</button>
+                <p>只有正式案件中的甲方、乙方與 DRS 可見；未連結前不會送出或保存。</p>
+              </form>
+            </section>
           </aside>
         </div>
       </section>
@@ -927,55 +1193,171 @@
           </section>
 
           <section
-            class="workspace-section"
-            id="design-review"
+            class="workspace-section owner-calendar-section"
+            id="design-review-archive"
             aria-labelledby="design-review-title"
+            hidden
+            aria-hidden="true"
           >
-            <div class="section-heading">
-              <p class="eyebrow">依文件作決定</p>
-              <h2 id="design-review-title">設計送審</h2>
-              <p>通過或要求修改，都必須綁定同一份文件版次、理由與記錄時間。</p>
+            <div class="section-heading section-heading--split">
+              <div>
+                <p class="eyebrow">依文件作決定</p>
+                <h2 id="design-review-title">設計送審</h2>
+                <p>用日期檢閱乙方提交、補件與版本決議；每一筆都要回到同一份文件與下一位處理者。</p>
+              </div>
+              <span class="owner-calendar-section__state">尚未連結正式案件時程</span>
             </div>
-            <ul class="record-list" data-list="designReviews">
-              <li class="empty-state">
-                <strong>尚未取得設計送審紀錄</strong>
-                <span>專業檢討人員
-                  可提出書面提醒，但不代替甲方接受設計或宣告現場品質。</span>
-              </li>
-            </ul>
+            <div
+              class="owner-calendar"
+              data-calendar-archive="design-review"
+              data-calendar-view="week"
+            >
+              <div class="owner-calendar__toolbar">
+                <div class="owner-calendar__title">
+                  <span>Google 日曆式檢閱進度</span>
+                  <strong data-calendar-period>案件時程尚未連結</strong>
+                </div>
+                <div class="owner-calendar__navigation" aria-label="設計檢閱日期導覽">
+                  <button type="button" data-action="calendar-nav" disabled aria-disabled="true">上一期</button>
+                  <button type="button" data-action="calendar-nav" disabled aria-disabled="true">今天</button>
+                  <button type="button" data-action="calendar-nav" disabled aria-disabled="true">下一期</button>
+                </div>
+                <div class="owner-calendar__view-switch" role="group" aria-label="設計檢閱日曆檢視">
+                  <button type="button" data-action="calendar-view" data-calendar-view-option="week" aria-pressed="true">週</button>
+                  <button type="button" data-action="calendar-view" data-calendar-view-option="month" aria-pressed="false">月</button>
+                  <button type="button" data-action="calendar-view" data-calendar-view-option="agenda" aria-pressed="false">議程</button>
+                </div>
+              </div>
+
+              <div class="owner-calendar__body">
+                <div class="owner-calendar__grid-shell">
+                  <div class="owner-calendar__week" role="grid" aria-label="設計檢閱週曆">
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週一</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週二</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週三</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週四</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週五</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day owner-calendar__day--weekend" role="gridcell"><header><span>週六</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day owner-calendar__day--weekend" role="gridcell"><header><span>週日</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                  </div>
+                  <div class="owner-calendar__empty-grid">
+                    <strong>尚未取得可排入日曆的設計送審時間</strong>
+                    <span>正式連結案件後，乙方提交、甲方檢閱、補件期限與版本決議會依日期排列。</span>
+                  </div>
+                </div>
+
+                <aside class="owner-calendar__agenda" aria-labelledby="design-agenda-archive-title">
+                  <div class="owner-calendar__agenda-heading">
+                    <p class="eyebrow">本週議程</p>
+                    <h3 id="design-agenda-archive-title">待檢閱與乙方提交</h3>
+                  </div>
+                  <div class="owner-calendar__legend" aria-label="設計檢閱日曆分類">
+                    <span data-calendar-tone="submission">乙方提交</span>
+                    <span data-calendar-tone="review">待檢閱</span>
+                    <span data-calendar-tone="revision">待補件</span>
+                    <span data-calendar-tone="decision">已決議</span>
+                  </div>
+                  <ul class="record-list owner-calendar__records" data-calendar-list-placeholder="designReviews">
+                    <li class="empty-state">
+                      <strong>尚未取得設計送審紀錄</strong>
+                      <span>專業檢討人員可提出書面提醒，但不代替甲方接受設計或宣告現場品質。</span>
+                    </li>
+                  </ul>
+                  <p class="owner-calendar__next-step"><span>下一步</span>等待正式案件時程與乙方文件版次。</p>
+                </aside>
+              </div>
+
+              <div class="owner-calendar__footer">
+                <p>萊比保留文件、意見、決議與處理者；日曆只負責把每一件事放回正確日期。</p>
+                <button type="button" data-action="calendar-sync" disabled aria-disabled="true">正式案件開放後可同步 Google 日曆</button>
+              </div>
+            </div>
           </section>
 
           <section
-            class="workspace-section"
-            id="construction-records"
+            class="workspace-section owner-calendar-section"
+            id="construction-records-archive"
             aria-labelledby="construction-title"
+            hidden
+            aria-hidden="true"
           >
-            <div class="section-heading">
-              <p class="eyebrow">今天與下一步</p>
-              <h2 id="construction-title">施工與驗收紀錄</h2>
-              <p>優先回答今天做什麼、缺什麼、誰要決定什麼。</p>
+            <div class="section-heading section-heading--split">
+              <div>
+                <p class="eyebrow">今天與下一步</p>
+                <h2 id="construction-title">施工與驗收紀錄</h2>
+                <p>把現場任務、照片、變更與驗收責任放回日期，讓每一天都說清楚依據、狀態與下一位處理者。</p>
+              </div>
+              <span class="owner-calendar-section__state">尚未連結正式案件時程</span>
             </div>
-            <div class="construction-grid">
-              <article>
-                <span>今日焦點</span>
-                <strong data-slot="today-focus">尚待案件資料</strong>
-              </article>
-              <article>
-                <span>待處理事項</span>
-                <strong data-slot="construction-issues">尚待案件資料</strong>
-              </article>
-              <article>
-                <span>下一位處理者</span>
-                <strong data-slot="construction-actor">尚待案件資料</strong>
-              </article>
+            <div
+              class="owner-calendar"
+              data-calendar-archive="construction"
+              data-calendar-view="week"
+            >
+              <div class="owner-calendar__toolbar">
+                <div class="owner-calendar__title">
+                  <span>Google 日曆式施工進度</span>
+                  <strong data-calendar-period>案件時程尚未連結</strong>
+                </div>
+                <div class="owner-calendar__navigation" aria-label="施工責任日期導覽">
+                  <button type="button" data-action="calendar-nav" disabled aria-disabled="true">上一期</button>
+                  <button type="button" data-action="calendar-nav" disabled aria-disabled="true">今天</button>
+                  <button type="button" data-action="calendar-nav" disabled aria-disabled="true">下一期</button>
+                </div>
+                <div class="owner-calendar__view-switch" role="group" aria-label="施工責任日曆檢視">
+                  <button type="button" data-action="calendar-view" data-calendar-view-option="week" aria-pressed="true">週</button>
+                  <button type="button" data-action="calendar-view" data-calendar-view-option="month" aria-pressed="false">月</button>
+                  <button type="button" data-action="calendar-view" data-calendar-view-option="agenda" aria-pressed="false">議程</button>
+                </div>
+              </div>
+
+              <div class="owner-calendar__body">
+                <div class="owner-calendar__grid-shell">
+                  <div class="owner-calendar__week" role="grid" aria-label="施工責任週曆">
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週一</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週二</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週三</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週四</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day" role="gridcell"><header><span>週五</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day owner-calendar__day--weekend" role="gridcell"><header><span>週六</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                    <article class="owner-calendar__day owner-calendar__day--weekend" role="gridcell"><header><span>週日</span><strong>—</strong></header><div class="owner-calendar__lane"></div></article>
+                  </div>
+                  <div class="owner-calendar__empty-grid">
+                    <strong>尚未取得可排入日曆的施工事件</strong>
+                    <span>正式連結案件後，任務、施工照片、追加減項、缺失與驗收責任會依日期排列。</span>
+                  </div>
+                </div>
+
+                <aside class="owner-calendar__agenda" aria-labelledby="construction-agenda-archive-title">
+                  <div class="owner-calendar__agenda-heading">
+                    <p class="eyebrow">本週議程</p>
+                    <h3 id="construction-agenda-archive-title">今日責任與待補件</h3>
+                  </div>
+                  <div class="construction-grid">
+                    <article><span>今日焦點</span><strong data-slot="today-focus">尚待案件資料</strong></article>
+                    <article><span>待處理事項</span><strong data-slot="construction-issues">尚待案件資料</strong></article>
+                    <article><span>下一位處理者</span><strong data-slot="construction-actor">尚待案件資料</strong></article>
+                  </div>
+                  <div class="owner-calendar__legend" aria-label="施工責任日曆分類">
+                    <span data-calendar-tone="submission">乙方提交</span>
+                    <span data-calendar-tone="review">待檢閱</span>
+                    <span data-calendar-tone="revision">待補件</span>
+                    <span data-calendar-tone="decision">已確認</span>
+                  </div>
+                  <ul class="record-list owner-calendar__records" data-calendar-list-placeholder="constructionRecords">
+                    <li class="empty-state">
+                      <strong>尚未取得施工或驗收事件</strong>
+                      <span>施工任務、照片、追加減項與驗收缺失，必須來自正式案件紀錄。</span>
+                    </li>
+                  </ul>
+                </aside>
+              </div>
+
+              <div class="owner-calendar__footer">
+                <p>每個施工事件都必須對應案件、文件、時間、目前狀態與下一位處理者。</p>
+                <button type="button" data-action="calendar-sync" disabled aria-disabled="true">正式案件開放後可同步 Google 日曆</button>
+              </div>
             </div>
-            <ul class="record-list" data-list="constructionRecords">
-              <li class="empty-state">
-                <strong>尚未取得施工或驗收事件</strong>
-                <span
-                >施工任務、照片、追加減項與驗收缺失，必須來自正式案件紀錄。</span>
-              </li>
-            </ul>
           </section>
 
           <section

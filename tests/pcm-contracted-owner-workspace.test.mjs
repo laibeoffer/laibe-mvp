@@ -79,6 +79,64 @@ function createHeaderDomHarness(html) {
   };
 }
 
+function createRenderNode(tagName = "div") {
+  const node = {
+    tagName,
+    className: "",
+    textContent: "",
+    hidden: false,
+    children: [],
+    append(...children) {
+      this.children.push(...children);
+    },
+    removeChild(child) {
+      const index = this.children.indexOf(child);
+      if (index >= 0) this.children.splice(index, 1);
+      return child;
+    },
+  };
+  Object.defineProperty(node, "firstChild", {
+    get() {
+      return this.children[0] ?? null;
+    },
+  });
+  return node;
+}
+
+function renderedText(node) {
+  return [
+    node.textContent,
+    ...node.children.map((child) => renderedText(child)),
+  ].filter(Boolean).join(" ");
+}
+
+function createOwnerWorkspaceRenderHarness() {
+  const lists = new Map([
+    ["calendarSubmissions", createRenderNode("ul")],
+    ["designDecisionTrail", createRenderNode("ul")],
+  ]);
+  const designScheduleEmpty = createRenderNode("div");
+  const root = {
+    body: { dataset: {} },
+    defaultView: null,
+    createElement(tagName) {
+      return createRenderNode(tagName);
+    },
+    querySelector(selector) {
+      const listMatch = selector.match(/^\[data-list="([^"]+)"\]$/u);
+      if (listMatch) return lists.get(listMatch[1]) ?? null;
+      if (selector === '[data-calendar-empty="design-schedule"]') {
+        return designScheduleEmpty;
+      }
+      return null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+  return { root, lists, designScheduleEmpty };
+}
+
 function createInteractiveTabHarness({
   kind,
   initialHash,
@@ -275,7 +333,9 @@ function authorizedContext(overrides = {}) {
     },
     documents: [],
     submissions: [],
+    scheduledDesignItems: [],
     publicMessages: [],
+    designDecisionTrail: [],
     events: [],
     permittedActions: [],
     ...overrides,
@@ -329,7 +389,237 @@ test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
   }
 });
 
-test("甲方 HERO 內三個治理分頁在桌機都維持獨立完整卡片", async () => {
+test("設計與工程中央區都完整保留給案件日曆", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const contractStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  assert.ok(designStart >= 0, "visible design dashboard panel exists");
+  assert.ok(constructionStart > designStart, "construction dashboard panel follows design panel");
+  assert.ok(contractStart > constructionStart, "contract dashboard panel follows construction panel");
+
+  const designPanel = html.slice(designStart, constructionStart);
+  const constructionPanel = html.slice(constructionStart, contractStart);
+
+  assert.match(designPanel, /data-calendar-workspace="design-review"/u);
+  assert.match(designPanel, /data-list="calendarSubmissions"/u);
+  assert.match(designPanel, /data-list="designReviews"/u);
+  assert.match(designPanel, /data-list="designDecisionTrail"/u);
+  assert.match(designPanel, /尚未取得已排程的設計事項/u);
+  assert.match(designPanel, /尚未取得設計送審紀錄/u);
+  assert.match(designPanel, /尚未取得設計決策紀錄/u);
+  const designCalendarStart = designPanel.indexOf(
+    'data-calendar-workspace="design-review"',
+  );
+  const designCalendarEnd = designPanel.indexOf(
+    'class="owner-management-shell owner-management-shell--design"',
+  );
+  const designCalendar = designPanel.slice(
+    designCalendarStart,
+    designCalendarEnd,
+  );
+  assert.ok(designCalendarStart >= 0 && designCalendarEnd > designCalendarStart);
+  assert.doesNotMatch(
+    designCalendar,
+    /owner-calendar__toolbar|owner-calendar__navigation|owner-calendar__view-switch|calendar-nav|calendar-view-option|owner-calendar__week|owner-calendar__agenda|data-calendar-empty/u,
+  );
+  assert.match(
+    designPanel,
+    /class="owner-calendar owner-calendar--hero owner-google-calendar-shell"/u,
+  );
+  assert.match(
+    designCalendar,
+    /data-owner-google-calendar-surface="design"/u,
+  );
+  assert.match(designCalendar, /title="甲方 Google 日曆｜設計管理"/u);
+  assert.match(designCalendar, /id="owner-design-google-calendar-title">甲方 Google 日曆尚未連結/u);
+  assert.match(designCalendar, /目前不顯示示意行程，也不使用其他角色的帳號/u);
+  assert.match(designCalendar, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
+  assert.doesNotMatch(designCalendar, /data-list="calendarSubmissions"|data-list="designReviews"/u);
+
+  const designOperationsStart = designPanel.indexOf(
+    'class="owner-management-shell owner-management-shell--design"',
+  );
+  assert.ok(designOperationsStart > designCalendarStart);
+  assert.ok(designPanel.indexOf('data-list="calendarSubmissions"') > designOperationsStart);
+  assert.ok(designPanel.indexOf('data-list="designReviews"') > designOperationsStart);
+  assert.ok(designPanel.indexOf('data-list="designDecisionTrail"') > designOperationsStart);
+
+  assert.match(constructionPanel, /data-calendar-workspace="construction"/u);
+  assert.match(constructionPanel, /data-owner-google-calendar/u);
+  assert.match(constructionPanel, /data-owner-google-calendar-frame/u);
+  assert.match(constructionPanel, /甲方 Google 日曆尚未連結/u);
+  assert.match(constructionPanel, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
+  assert.match(constructionPanel, /data-list="constructionRecords"/u);
+  assert.match(constructionPanel, /下一位處理者/u);
+  assert.match(constructionPanel, /尚未取得施工或驗收事件/u);
+  const constructionCalendarStart = constructionPanel.indexOf(
+    'id="owner-construction-view-today"',
+  );
+  const constructionCalendarEnd = constructionPanel.indexOf(
+    'id="owner-construction-view-changes"',
+  );
+  const constructionCalendar = constructionPanel.slice(
+    constructionCalendarStart,
+    constructionCalendarEnd,
+  );
+  assert.doesNotMatch(
+    constructionCalendar,
+    /owner-calendar__toolbar|calendar-nav|calendar-view-option|owner-calendar__agenda|本週議程|今日責任與待補件/u,
+  );
+
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-hero-dashboard__body\s*\{[\s\S]{0,180}grid-column:\s*1[\s\S]{0,120}grid-row:\s*3/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-design\s+\.owner-google-calendar-shell,\s*#owner-dashboard-panel-construction\s+\.owner-google-calendar-shell\s*\{[\s\S]{0,220}min-height:\s*720px/u,
+  );
+});
+
+test("設計摘要與案件事實在桌機左側、手機依序排列", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const designPanel = html.slice(designStart, constructionStart);
+  const summaryStart = designPanel.indexOf(
+    'class="owner-hero-dashboard__summary"',
+  );
+  const factsStart = designPanel.indexOf(
+    'class="owner-hero-dashboard__body"',
+  );
+  const calendarStart = designPanel.indexOf(
+    'data-calendar-workspace="design-review"',
+  );
+  const operationsStart = designPanel.indexOf(
+    'class="owner-management-shell owner-management-shell--design"',
+  );
+
+  assert.ok(
+    summaryStart >= 0 &&
+      factsStart > summaryStart &&
+      calendarStart > factsStart &&
+      operationsStart > calendarStart,
+    "design summary, facts, calendar and lower operations keep a clear reading order",
+  );
+  const designFacts = designPanel.slice(factsStart, calendarStart);
+  for (const copy of [
+    "送審文件與版本",
+    "書面確認與修改",
+    "文件版本",
+    "書面檢討",
+    "待確認事項",
+  ]) {
+    assert.match(designFacts, new RegExp(copy, "u"));
+  }
+
+  assert.match(
+    css,
+    /#owner-dashboard-panel-design\s*\{[^}]*grid-template-columns:\s*252px\s+minmax\(0,\s*1fr\)[^}]*grid-template-rows:\s*auto\s+auto\s+auto/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-design\s+\.owner-hero-dashboard__summary\s*\{[^}]*grid-column:\s*1[^}]*grid-row:\s*1/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-design\s+\.owner-hero-dashboard__body\s*\{[^}]*grid-column:\s*1[^}]*grid-row:\s*2/u,
+  );
+  const designCalendarRule = css.match(
+    /#owner-dashboard-panel-design\s+\.owner-calendar--hero\s*\{([^}]*)\}/u,
+  )?.[1];
+  assert.ok(designCalendarRule, "design calendar layout rule exists");
+  assert.match(designCalendarRule, /grid-column:\s*2/u);
+  assert.match(designCalendarRule, /grid-row:\s*1\s*\/\s*3/u);
+  assert.match(designCalendarRule, /min-height:\s*720px/u);
+  assert.match(
+    css,
+    /#owner-dashboard-panel-design\s+\.owner-management-shell--design\s*\{[^}]*grid-column:\s*1\s*\/\s*-1[^}]*grid-row:\s*3/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?#owner-dashboard-panel-design\s*\{[^}]*grid-template-columns:\s*1fr[^}]*grid-template-rows:\s*auto/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?#owner-dashboard-panel-design\s+\.owner-hero-dashboard__summary\s*\{[^}]*order:\s*1[\s\S]*?#owner-dashboard-panel-design\s+\.owner-hero-dashboard__body\s*\{[^}]*order:\s*2[\s\S]*?#owner-dashboard-panel-design\s+\.owner-calendar--hero\s*\{[^}]*order:\s*3[\s\S]*?#owner-dashboard-panel-design\s+\.owner-management-shell--design\s*\{[^}]*order:\s*4/u,
+  );
+});
+
+test("日曆檢視按鈕會同步目前視圖與可及性狀態", async () => {
+  const { initializeOwnerCalendarWorkspaces } = await loadRuntime();
+  assert.equal(typeof initializeOwnerCalendarWorkspaces, "function");
+
+  function viewButton(key) {
+    const listeners = new Map();
+    return {
+      dataset: { calendarViewOption: key },
+      focused: false,
+      attributes: new Map(),
+      addEventListener(type, listener) {
+        listeners.set(type, listener);
+      },
+      dispatch(type, event = {}) {
+        listeners.get(type)?.({
+          ...event,
+          preventDefault() {
+            event.defaultPrevented = true;
+          },
+        });
+      },
+      setAttribute(name, value) {
+        this.attributes.set(name, String(value));
+      },
+      getAttribute(name) {
+        return this.attributes.get(name) ?? null;
+      },
+      focus() {
+        this.focused = true;
+      },
+    };
+  }
+
+  const buttons = ["week", "month", "agenda"].map(viewButton);
+  const workspace = {
+    dataset: {
+      calendarWorkspace: "design-review",
+      calendarView: "week",
+    },
+    querySelectorAll(selector) {
+      return selector === "[data-calendar-view-option]" ? buttons : [];
+    },
+  };
+  const root = {
+    querySelectorAll(selector) {
+      return selector === "[data-calendar-workspace]" ? [workspace] : [];
+    },
+  };
+
+  const controllers = initializeOwnerCalendarWorkspaces(root);
+  assert.equal(controllers.length, 1);
+  assert.equal(workspace.dataset.calendarView, "week");
+  assert.equal(buttons[0].getAttribute("aria-pressed"), "true");
+  assert.equal(buttons[1].getAttribute("aria-pressed"), "false");
+
+  buttons[2].dispatch("click");
+  assert.equal(workspace.dataset.calendarView, "agenda");
+  assert.equal(buttons[0].getAttribute("aria-pressed"), "false");
+  assert.equal(buttons[2].getAttribute("aria-pressed"), "true");
+
+  buttons[2].dispatch("keydown", { key: "ArrowLeft" });
+  assert.equal(workspace.dataset.calendarView, "month");
+  assert.equal(buttons[1].focused, true);
+});
+
+test("甲方工作台以設計管理、工程管理、契約管理作為三個同級主區", async () => {
   const [html, css, runtime] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -342,32 +632,45 @@ test("甲方 HERO 內三個治理分頁在桌機都維持獨立完整卡片", as
   assert.ok(heroIndex >= 0 && dashboardIndex > heroIndex);
   assert.ok(stageIndex > dashboardIndex);
 
-  assert.match(
-    html,
-    /role="tablist"[\s\S]*data-owner-tab="design"[\s\S]*>\s*設計案管理\s*</,
-  );
-  assert.match(
-    html,
-    /data-owner-tab="construction"[\s\S]*>\s*工程案管理\s*</,
-  );
-  assert.match(
-    html,
-    /data-owner-tab="contract"[\s\S]*>\s*契約管理\s*</,
-  );
+  for (const [key, label] of [
+    ["design", "設計管理"],
+    ["construction", "工程管理"],
+    ["contract", "契約管理"],
+  ]) {
+    const tab = currentHtmlElement(html, "button", `data-owner-tab="${key}"`);
+    const panel = currentHtmlElement(html, "section", `data-owner-panel="${key}"`);
+    assert.match(tab.source, new RegExp(`<strong>${label}</strong>`, "u"));
+    assert.equal(tab.getAttribute("role"), "tab");
+    assert.equal(tab.getAttribute("aria-controls"), `owner-dashboard-panel-${key}`);
+    assert.equal(panel.getAttribute("id"), `owner-dashboard-panel-${key}`);
+    assert.equal(panel.getAttribute("role"), "tabpanel");
+    assert.equal(panel.getAttribute("aria-labelledby"), `owner-dashboard-tab-${key}`);
+  }
   assert.equal((html.match(/data-owner-tab=/g) || []).length, 3);
   assert.equal((html.match(/data-owner-panel=/g) || []).length, 3);
-
   assert.match(
     css,
     /\.owner-dashboard-tab\[aria-selected="true"\]\s*\{[\s\S]{0,520}border-color:\s*var\(--source-active\)[\s\S]{0,520}box-shadow:/i,
   );
   assert.doesNotMatch(
-    css,
-    /\[data-active-owner-tab="design"\]\s+\.owner-dashboard-tab\[data-owner-tab="design"\]\s*\{[\s\S]{0,320}margin-bottom:\s*-/i,
+    html,
+    /<strong>設計案管理<\/strong>|<strong>工程案管理<\/strong>|class="eyebrow">(?:設計案管理|工程案管理)<\/p>/u,
   );
   assert.doesNotMatch(
     css,
-    /\[data-active-owner-tab="design"\][\s\S]{0,900}\.owner-hero-dashboard__panel[\s\S]{0,220}border-top-left-radius:\s*0/i,
+    /\[data-active-owner-tab="design"\][\s\S]{0,420}\.owner-dashboard-tab\[data-owner-tab="design"\][\s\S]{0,260}(?:margin-bottom:\s*-|border-radius:\s*[^;]*0\s+0)/i,
+  );
+  assert.doesNotMatch(
+    css,
+    /\[data-active-owner-tab="design"\]\s+\.owner-hero-dashboard__panel:not\(\[hidden\]\)[\s\S]{0,120}border-top-left-radius:\s*0/i,
+  );
+  assert.match(
+    css,
+    /\[data-layout="owner-section-tabs"\]\s*\{[\s\S]{0,180}margin:\s*0\s+0\s+12px/u,
+  );
+  assert.match(
+    css,
+    /\.owner-dashboard-tab\s*\{[\s\S]{0,260}border-radius:\s*15px/u,
   );
   assert.match(
     css,
@@ -377,7 +680,45 @@ test("甲方 HERO 內三個治理分頁在桌機都維持獨立完整卡片", as
   assert.match(runtime, /ArrowRight|ArrowLeft/);
 });
 
-test("甲方儀表板在桌機左側並把誠實的 LINE 對話窗放在右側，手機則上下排列", async () => {
+test("設計與工程主區承接母版案件功能且只保留甲方需要的內容", async () => {
+  const [html, css, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+    readPageFile("app.js"),
+  ]);
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const contractStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const designPanel = html.slice(designStart, constructionStart);
+  const constructionPanel = html.slice(constructionStart, contractStart);
+  for (const copy of [
+    "案件摘要", "共同案件日曆", "送審文件與版本", "書面確認與修改", "設計決策留痕",
+  ]) assert.match(designPanel, new RegExp(copy, "u"));
+  assert.match(designPanel, /data-owner-management-layout="design"/u);
+  assert.match(designPanel, /data-list="calendarSubmissions"/u);
+  assert.match(designPanel, /data-list="designReviews"/u);
+  assert.match(designPanel, /data-list="designDecisionTrail"/u);
+  assert.match(designPanel, /data-action="open-owner-design-revision"/u);
+  assert.match(designPanel, /data-owner-design-revision-panel/u);
+  for (const copy of [
+    "案件摘要", "案件日曆", "本日重要項目", "變更與驗收", "歷史文件版本", "案件留痕",
+  ]) assert.match(constructionPanel, new RegExp(copy, "u"));
+  assert.match(constructionPanel, /data-owner-management-layout="construction"/u);
+  assert.match(constructionPanel, /data-layout="owner-construction-navigation"/u);
+  assert.equal((constructionPanel.match(/data-owner-construction-view=/gu) ?? []).length, 4);
+  assert.equal((constructionPanel.match(/data-owner-construction-view-panel=/gu) ?? []).length, 4);
+  assert.match(constructionPanel, /data-list="constructionRecords"/u);
+  assert.match(css, /\.owner-management-shell\s*\{/u);
+  assert.match(css, /\.owner-management-card\s*\{/u);
+  assert.match(css, /\.owner-construction-nav\s*\{/u);
+  assert.match(runtime, /export function initializeOwnerManagementInteractions/u);
+  assert.doesNotMatch(
+    `${designPanel}\n${constructionPanel}`,
+    /金流|撥款|託管|投資報酬|本機示意頁|已同步 LINE|已建立 Google 日曆同步/u,
+  );
+});
+
+test("甲方儀表板右側分成 DRS 一對一與案件三方群組兩個 LINE 對話框", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -386,16 +727,21 @@ test("甲方儀表板在桌機左側並把誠實的 LINE 對話窗放在右側�
   const dashboardStart = html.indexOf('data-layout="owner-hero-dashboard"');
   const workspaceStart = html.indexOf('data-layout="owner-hero-workspace"', dashboardStart);
   const conversationStart = html.indexOf('data-layout="owner-line-conversation"', dashboardStart);
+  const conversationEnd = html.indexOf("</aside>", conversationStart);
+  const conversation = html.slice(conversationStart, conversationEnd);
   assert.ok(dashboardStart >= 0, "owner hero dashboard exists");
   assert.ok(workspaceStart > dashboardStart, "owner workspace is inside the dashboard");
   assert.ok(conversationStart > workspaceStart, "LINE conversation follows the dashboard in reading order");
 
-  assert.match(html, /data-layout="owner-line-conversation"[^>]*aria-label="案件 LINE 對話"/u);
-  assert.match(html, /案件對話尚未連結/u);
-  assert.match(html, /完成正式案件與權限確認後，才會顯示本案對話紀錄/u);
-  assert.match(html, /data-owner-line-trusted-content/u);
-  assert.match(html, /<textarea[^>]*disabled[^>]*aria-disabled="true"/u);
-  assert.match(html, /<button[^>]*data-line-send[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(html, /data-layout="owner-line-conversation"[^>]*aria-label="甲方 LINE 對話"/u);
+  assert.equal((conversation.match(/data-owner-chat-channel=/gu) ?? []).length, 2);
+  assert.match(conversation, /data-owner-chat-channel="drs"[\s\S]*DRS 一對一/u);
+  assert.match(conversation, /data-owner-chat-channel="case-group"[\s\S]*案件三方群組/u);
+  assert.match(conversation, /甲方與 DRS 的一對一對話尚未連結/u);
+  assert.match(conversation, /甲方、乙方與 DRS 的案件群組尚未連結/u);
+  assert.match(conversation, /data-owner-line-trusted-content/u);
+  assert.equal((conversation.match(/<textarea[^>]*disabled[^>]*aria-disabled="true"/gu) ?? []).length, 2);
+  assert.equal((conversation.match(/<button[^>]*data-line-send[^>]*disabled[^>]*aria-disabled="true"/gu) ?? []).length, 2);
   assert.doesNotMatch(html, /訊息已送出|已傳送訊息/u);
 
   assert.match(
@@ -406,6 +752,7 @@ test("甲方儀表板在桌機左側並把誠實的 LINE 對話窗放在右側�
     css,
     /@media\s*\(max-width:\s*760px\)[\s\S]*?\[data-layout="owner-hero-workspace"\]\s*\{[\s\S]{0,100}order:\s*1[\s\S]*?\[data-layout="owner-line-conversation"\]\s*\{[\s\S]{0,100}order:\s*2/u,
   );
+  assert.match(css, /\.owner-chat-channel\s*\{/u);
 });
 
 test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約", async () => {
@@ -604,6 +951,11 @@ test("拒絕存取時不攜帶或呈現任何案件 payload", async () => {
     sessionStatus: "expired",
     documents: [{ title: "不得外洩的文件" }],
     submissions: [{ partyLabel: "不得外洩的乙方" }],
+    scheduledDesignItems: [{
+      scope: "design",
+      title: "不得外洩的設計排程",
+      scheduledAt: "2026-08-18T01:00:00.000Z",
+    }],
     publicMessages: [{
       actorLabel: "不得外洩的訊息",
       body: "不得外洩的內容",
@@ -614,6 +966,10 @@ test("拒絕存取時不攜帶或呈現任何案件 payload", async () => {
       },
     }],
     designReviews: [{ title: "不得外洩的送審" }],
+    designDecisionTrail: [{
+      scope: "design",
+      title: "不得外洩的設計決策",
+    }],
     constructionRecords: [{ title: "不得外洩的施工紀錄" }],
     events: [{ title: "不得外洩的事件" }],
     processSteps: [{ key: "documents", statusLabel: "不得外洩" }],
@@ -628,8 +984,10 @@ test("拒絕存取時不攜帶或呈現任何案件 payload", async () => {
   assert.equal(model.actorLabel, "尚待驗證");
   assert.deepEqual(model.documents, []);
   assert.deepEqual(model.submissions, []);
+  assert.deepEqual(model.scheduledDesignItems, []);
   assert.deepEqual(model.messages, []);
   assert.deepEqual(model.designReviews, []);
+  assert.deepEqual(model.designDecisionTrail, []);
   assert.deepEqual(model.constructionRecords, []);
   assert.deepEqual(model.events, []);
   assert.deepEqual(model.processSteps, []);
@@ -764,6 +1122,137 @@ test("授權資料正規化不接受任意 redirect 或 browser authority", asyn
   assert.equal("localStorageAuthorized" in result, false);
   assert.equal("queryAuthorized" in result, false);
   assert.equal("humanFinalDecision" in result, false);
+});
+
+test("設計決策留痕只呈現獨立欄位中明確標為 design 的事件", async () => {
+  const {
+    buildOwnerWorkspaceViewModel,
+    createOwnerWorkspaceController,
+  } = await loadRuntime();
+  const mixedContext = authorizedContext({
+    designDecisionTrail: [
+      {
+        scope: "design",
+        title: "設計版次確認",
+        resultLabel: "要求修改",
+        documentVersionLabel: "平面配置 v3",
+      },
+      { scope: "construction", title: "施工缺失確認" },
+      { scope: "contract", title: "契約條款確認" },
+      { title: "未標示範圍的事件" },
+      { scope: "unknown", title: "未知範圍事件" },
+    ],
+    events: [
+      { title: "通用設計事件不應自動進入設計決策" },
+      { title: "通用施工事件" },
+      { title: "通用契約事件" },
+    ],
+  });
+
+  const model = buildOwnerWorkspaceViewModel(mixedContext);
+  assert.deepEqual(
+    model.designDecisionTrail.map((record) => record.title),
+    ["設計版次確認"],
+  );
+
+  const harness = createOwnerWorkspaceRenderHarness();
+  const controller = createOwnerWorkspaceController({
+    root: harness.root,
+    adapter: { loadOwnerWorkspace: async () => mixedContext },
+  });
+  await controller.initialize();
+  const trailText = renderedText(harness.lists.get("designDecisionTrail"));
+  assert.match(trailText, /設計版次確認/u);
+  assert.doesNotMatch(
+    trailText,
+    /施工缺失|契約條款|未標示範圍|未知範圍|通用設計|通用施工|通用契約/u,
+  );
+});
+
+test("設計決策留痕缺少有效 design scope 時保留誠實空狀態", async () => {
+  const { createOwnerWorkspaceController } = await loadRuntime();
+  const harness = createOwnerWorkspaceRenderHarness();
+  const controller = createOwnerWorkspaceController({
+    root: harness.root,
+    adapter: {
+      loadOwnerWorkspace: async () => authorizedContext({
+        designDecisionTrail: [
+          { scope: "design" },
+          { title: "缺少範圍" },
+          { scope: "unknown", title: "未知範圍" },
+        ],
+      }),
+    },
+  });
+
+  await controller.initialize();
+  assert.match(
+    renderedText(harness.lists.get("designDecisionTrail")),
+    /尚未取得設計決策紀錄/u,
+  );
+});
+
+test("設計日曆沒有有效 scheduledAt 排程時顯示誠實空狀態", async () => {
+  const { createOwnerWorkspaceController } = await loadRuntime();
+  const harness = createOwnerWorkspaceRenderHarness();
+  const controller = createOwnerWorkspaceController({
+    root: harness.root,
+    adapter: {
+      loadOwnerWorkspace: async () => authorizedContext({
+        scheduledDesignItems: [
+          {
+            scope: "design",
+            scheduledAt: "2026-08-18T01:00:00.000Z",
+          },
+          {
+            scope: "design",
+            title: "只有提交時間的文件",
+            submittedAtLabel: "2026/08/18 09:00",
+          },
+          {
+            scope: "unknown",
+            title: "未知範圍排程",
+            scheduledAt: "2026-08-18T01:00:00.000Z",
+          },
+        ],
+      }),
+    },
+  });
+
+  await controller.initialize();
+  assert.equal(harness.designScheduleEmpty.hidden, false);
+  assert.match(
+    renderedText(harness.lists.get("calendarSubmissions")),
+    /尚未取得已排程的設計事項/u,
+  );
+});
+
+test("設計日曆有明確 design scheduledAt 排程時隱藏空狀態並呈現日期", async () => {
+  const { createOwnerWorkspaceController } = await loadRuntime();
+  const harness = createOwnerWorkspaceRenderHarness();
+  const controller = createOwnerWorkspaceController({
+    root: harness.root,
+    adapter: {
+      loadOwnerWorkspace: async () => authorizedContext({
+        scheduledDesignItems: [{
+          scope: "design",
+          title: "甲方檢閱平面配置",
+          versionLabel: "平面配置 v3",
+          statusLabel: "待檢閱",
+          scheduledAt: "2026-08-18T01:00:00.000Z",
+          submittedAtLabel: "不可冒充排程的提交時間",
+          nextActionLabel: "甲方書面回覆",
+        }],
+      }),
+    },
+  });
+
+  await controller.initialize();
+  const scheduleText = renderedText(harness.lists.get("calendarSubmissions"));
+  assert.equal(harness.designScheduleEmpty.hidden, true);
+  assert.match(scheduleText, /甲方檢閱平面配置/u);
+  assert.match(scheduleText, /2026\/08\/18 09:00/u);
+  assert.doesNotMatch(scheduleText, /不可冒充排程的提交時間/u);
 });
 
 test("runtime 不讀取瀏覽器 storage、query 或 raw HTML 注入", async () => {
