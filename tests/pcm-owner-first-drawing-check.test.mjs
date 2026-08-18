@@ -181,11 +181,13 @@ function browserFile(name, type) {
 function createFileHandlerHarness() {
   let focusedPanelCode = null;
   let pickerClicks = 0;
+  const focusCounts = new Map();
   const stateCodes = [...requiredSteps, "FAILURE"];
   const panels = stateCodes.map((code) => {
     const focusTarget = {
       focus() {
         focusedPanelCode = code;
+        focusCounts.set(code, (focusCounts.get(code) || 0) + 1);
       },
     };
     return {
@@ -228,6 +230,7 @@ function createFileHandlerHarness() {
     "[data-recognition-uncertainty]": { textContent: "" },
     "[data-recognition-counts]": { textContent: "" },
     "[data-recognition-items]": { textContent: "" },
+    "[data-correction-recognition-items]": { textContent: "" },
     "[data-recognition-reference]": recognitionReference,
   };
   const listeners = new Map();
@@ -333,6 +336,9 @@ function createFileHandlerHarness() {
     },
     focusedPanel() {
       return focusedPanelCode;
+    },
+    focusedPanelCount(code) {
+      return focusCounts.get(code) || 0;
     },
     pickerClicks() {
       return pickerClicks;
@@ -526,13 +532,14 @@ test("processing and recognition summary stay local honest and review-bound", as
   assert.match(html, /data-recognition-counts/);
   assert.match(html, /data-recognition-items/);
   assert.match(html, /data-recognition-reference/);
+  assert.match(html, /data-correction-recognition-items/);
 });
 
 test("async app to real adapter renders bytes-derived safe partial details", async () => {
   const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-safe-partial=1`);
   const bytes = await readFile(resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
   const file = new File([bytes], "實際圖說.pdf", { type: "application/pdf" });
-  const sourceSha256 = createHash("sha256").update(bytes).digest("hex").toUpperCase();
+  const sourceSha256 = createHash("sha256").update(bytes).digest("hex");
   let result;
   let settled;
   const settledPromise = new Promise((resolveSettled) => { settled = resolveSettled; });
@@ -575,14 +582,33 @@ test("async app to real adapter renders bytes-derived safe partial details", asy
   }
   const visibleUncertainty = harness.recognitionText("[data-recognition-items]");
   assert.ok(result.uncertainty.length > 0, "fixture must expose a representative uncertainty");
+  const representativeInternalId = "src_space_boundary_08f38e13fb7f1131e8dc418c";
   for (const item of result.uncertainty) {
+    assert.equal("id" in item, false);
+    assert.equal("category" in item, false);
     assert.match(visibleUncertainty, new RegExp(item.reason));
     assert.match(visibleUncertainty, new RegExp(item.nextAction));
   }
   assert.equal(
-    visibleUncertainty.includes(result.uncertainty[0].id),
+    visibleUncertainty.includes(representativeInternalId),
     false,
     "internal source/object ID must not appear in visible DOM text",
+  );
+  assert.doesNotMatch(visibleUncertainty, /unresolved_important|\{\s*"|"reason"/);
+  harness.dispatchHero();
+  assert.equal(harness.visibleState(), "CORRECTION_REQUIRED");
+  assert.equal(harness.focusedPanelCount("CORRECTION_REQUIRED"), 1);
+  const correctionUncertainty = harness.recognitionText(
+    "[data-correction-recognition-items]",
+  );
+  for (const item of result.uncertainty) {
+    assert.match(correctionUncertainty, new RegExp(item.reason));
+    assert.match(correctionUncertainty, new RegExp(item.nextAction));
+  }
+  assert.equal(correctionUncertainty.includes(representativeInternalId), false);
+  assert.doesNotMatch(
+    correctionUncertainty,
+    /unresolved_important|\{\s*"|"reason"|"category"|"id"/,
   );
   assert.equal(
     harness.recognitionReference().src,
@@ -591,12 +617,14 @@ test("async app to real adapter renders bytes-derived safe partial details", asy
   assert.equal(harness.recognitionReference().hidden, false);
 });
 
-test("missing or mismatched presentation SHA never reaches the UI image", async () => {
+test("unavailable missing or mismatched presentation never reaches the UI image", async () => {
   const adapter = await import(`${pathToFileURL(browserAdapterPath).href}?dom-reference-sha=1`);
   const bytes = await readFile(resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
-  for (const [label, sourceDocumentSha256] of [
-    ["missing", undefined],
-    ["mismatch", "B".repeat(64)],
+  const validSha256 = createHash("sha256").update(bytes).digest("hex");
+  for (const [label, upstreamAvailable, sourceDocumentSha256] of [
+    ["unavailable-residual", false, validSha256],
+    ["missing", true, undefined],
+    ["mismatch", true, "B".repeat(64)],
   ]) {
     let result;
     let settled;
@@ -611,7 +639,7 @@ test("missing or mismatched presentation SHA never reaches the UI image", async 
                 pageCount: 1,
                 selectedPageNumber: 1,
                 referenceRaster: {
-                  available: true,
+                  available: upstreamAvailable,
                   dataUrl: "data:image/png;base64,iVBORw0KGgo=",
                   naturalWidth: 320,
                   naturalHeight: 240,
@@ -631,6 +659,9 @@ test("missing or mismatched presentation SHA never reaches the UI image", async 
     await nextTurn();
     assert.equal(result.presentationReference.available, false, label);
     assert.equal(result.presentationReference.dataUrl, null, label);
+    assert.equal(result.presentationReference.pageNumber, null, label);
+    assert.equal(result.presentationReference.naturalWidth, null, label);
+    assert.equal(result.presentationReference.naturalHeight, null, label);
     assert.equal(harness.recognitionReference().src, "", label);
     assert.equal(harness.recognitionReference().hidden, true, label);
   }

@@ -375,7 +375,7 @@ test("login submit rejects an empty password before role-based navigation", asyn
   assert.equal(harness.state.activeElement, harness.loginFields.password);
 });
 
-test("valid login stays on Account Access until role verification is formally available", async () => {
+test("valid login stays on Account Access even when the Vendor destination remains reserved", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?role-route=${Date.now()}`, import.meta.url));
   const routes = {
     accountAccessOwnerLoginToOwnerWorkspace: PUBLIC_ROUTES.accountAccessOwnerLoginToOwnerWorkspace,

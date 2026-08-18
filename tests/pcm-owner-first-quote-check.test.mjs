@@ -271,6 +271,12 @@ class HarnessHtmlInputElement {
   }
 }
 
+class HarnessElement {
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+}
+
 function browserFile(name, type) {
   return new File(["local test bytes"], name, { type });
 }
@@ -434,8 +440,13 @@ function createFileHandlerHarness() {
 }
 
 async function importDocumentWorkspaceApp(tag) {
+  const elementDescriptor = Object.getOwnPropertyDescriptor(globalThis, "Element");
   const fileListDescriptor = Object.getOwnPropertyDescriptor(globalThis, "FileList");
   const inputDescriptor = Object.getOwnPropertyDescriptor(globalThis, "HTMLInputElement");
+  Object.defineProperty(globalThis, "Element", {
+    configurable: true,
+    value: HarnessElement,
+  });
   Object.defineProperty(globalThis, "FileList", {
     configurable: true,
     value: HarnessFileList,
@@ -447,6 +458,11 @@ async function importDocumentWorkspaceApp(tag) {
   try {
     return await import(`${pathToFileURL(appPath).href}?${tag}-${Date.now()}`);
   } finally {
+    if (elementDescriptor) {
+      Object.defineProperty(globalThis, "Element", elementDescriptor);
+    } else {
+      delete globalThis.Element;
+    }
     if (fileListDescriptor) {
       Object.defineProperty(globalThis, "FileList", fileListDescriptor);
     } else {
@@ -465,7 +481,7 @@ function createDocumentWorkspaceHarness() {
   const registeredNodes = new Set();
   const nodesById = new Map();
 
-  function createNode(initial = {}, target = {}) {
+  function createNode(initial = {}, target = new HarnessElement()) {
     const listeners = new Map();
     Object.assign(target, {
       attributes: new Map(),
@@ -484,10 +500,12 @@ function createDocumentWorkspaceHarness() {
       listeners.set(type, current);
     };
     target.dispatch = async (type, event = {}) => {
-      const normalizedEvent = {
-        preventDefault() {},
-        ...event,
-      };
+      const normalizedEvent = typeof Event !== "undefined" && event instanceof Event
+        ? event
+        : {
+          preventDefault() {},
+          ...event,
+        };
       for (const listener of listeners.get(type) ?? []) {
         await listener(normalizedEvent);
       }
@@ -637,6 +655,8 @@ function createDocumentWorkspaceHarness() {
   const copyFeedback = createNode();
   const summary = createNode({ id: "self-check-summary", tabIndex: -1 });
   const workspaceRoot = createNode({ id: "document-workspace" });
+  const drawingCheckLink = createNode();
+  drawingCheckLink.setAttribute("href", "../drawing_check/code.html");
 
   const documentRoot = {
     createElement() {
@@ -658,6 +678,7 @@ function createDocumentWorkspaceHarness() {
     if (selector === "[data-document-file]") return Object.values(fileInputs);
     if (selector === "[data-document-dropzone]") return Object.values(dropzones);
     if (selector === "[data-ai-report-action]") return Object.values(reportActions);
+    if (selector === "[data-drawing-check-link]") return [drawingCheckLink];
     if (selector === "[data-check-item]") return checkItems;
     if (selector === "[data-current-status]") return [currentStatus];
     if (selector === "[data-current-next]") return [currentNext];
@@ -701,6 +722,7 @@ function createDocumentWorkspaceHarness() {
     currentStatus,
     documentRoot,
     dropzones,
+    drawingCheckLink,
     feedback,
     fileInputs,
     fileSelectionSummary,
@@ -1123,6 +1145,21 @@ test("production workspace renders parser-only facts without a formal report CTA
   assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "2");
   assert.equal(harness.summaryFields["[data-summary-readability]"].textContent, "可讀文字層");
   assert.match(harness.live.textContent, /不是案件正式報告/u);
+});
+
+test("production document workspace guards a tampered drawing-check CTA and preserves its exact local href", async () => {
+  const app = await importDocumentWorkspaceApp("workspace-drawing-route-guard");
+  const harness = createDocumentWorkspaceHarness();
+  app.initializeQuoteCheckPage(harness.documentRoot, { hash: "", search: "?mode=quote" });
+
+  const exactEvent = new Event("click", { cancelable: true });
+  await harness.drawingCheckLink.dispatch("click", exactEvent);
+  assert.equal(exactEvent.defaultPrevented, false, "exact local drawing href remains usable");
+
+  harness.drawingCheckLink.setAttribute("href", "javascript:alert(1)");
+  const tamperedEvent = new Event("click", { cancelable: true });
+  await harness.drawingCheckLink.dispatch("click", tamperedEvent);
+  assert.equal(tamperedEvent.defaultPrevented, true, "tampered drawing href must fail closed");
 });
 
 test("production workspace file events keep one truth across cancel invalid drop and recovery", async () => {

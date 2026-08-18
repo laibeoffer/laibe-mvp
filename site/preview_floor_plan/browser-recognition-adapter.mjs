@@ -101,7 +101,7 @@ async function sha256Hex(bytes) {
     bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
   );
   return Array.from(new Uint8Array(digest), (value) =>
-    value.toString(16).padStart(2, "0")).join("").toUpperCase();
+    value.toString(16).padStart(2, "0")).join("");
 }
 
 function createTrustedSnapshot(bytes) {
@@ -605,8 +605,6 @@ function safeUncertainty(manifest) {
       const reason = PUBLIC_UNCERTAINTY_REASONS[internalReason] ||
         "此項辨識依據仍不足，需回看原始圖說確認。";
       return safeFreeze({
-        id: id.slice(0, 160),
-        category: String(source?.category || "unresolved_important").slice(0, 80),
         reason,
         nextAction: UNCERTAINTY_NEXT_ACTION,
       });
@@ -639,27 +637,41 @@ function safeClassificationCounts(manifest) {
   }));
 }
 
-function safePresentationReference(presentation, sourceSha256) {
+function safePresentationReference(
+  presentation,
+  sourceSha256,
+  requestedPageNumber,
+  extractionPageNumber,
+) {
   const raster = presentation?.referenceRaster;
   const dataUrl = typeof raster?.dataUrl === "string" ? raster.dataUrl : "";
   const width = Number(raster?.naturalWidth);
   const height = Number(raster?.naturalHeight);
-  const pageNumber = Number(raster?.pageNumber || presentation?.selectedPageNumber || 1);
+  const pageNumber = Number(raster?.pageNumber);
+  const presentationPageNumber = Number(presentation?.selectedPageNumber);
+  const requestedPage = Number(requestedPageNumber);
+  const extractionPage = Number(extractionPageNumber);
+  const upstreamAvailable = raster?.available === true;
   const sourceMatches = raster?.sourceDocumentSha256 === sourceSha256;
-  const safeDataUrl = sourceMatches &&
+  const pageMatches = Number.isSafeInteger(requestedPage) && requestedPage > 0 &&
+    pageNumber === requestedPage &&
+    presentationPageNumber === requestedPage &&
+    extractionPage === requestedPage;
+  const safeDataUrl = upstreamAvailable && sourceMatches && pageMatches &&
     dataUrl.length <= PRESENTATION_DATA_URL_LIMIT &&
     /^data:image\/png;base64,[A-Za-z0-9+/]+=*$/.test(dataUrl)
     ? dataUrl
     : null;
+  const isAvailable = Boolean(
+    safeDataUrl && Number.isFinite(width) && width > 0 &&
+    Number.isFinite(height) && height > 0
+  );
   return safeFreeze({
-    available: Boolean(
-      safeDataUrl && Number.isSafeInteger(pageNumber) && pageNumber > 0 &&
-      Number.isFinite(width) && width > 0 && Number.isFinite(height) && height > 0
-    ),
-    dataUrl: safeDataUrl,
-    naturalWidth: Number.isFinite(width) && width > 0 ? Math.round(width) : null,
-    naturalHeight: Number.isFinite(height) && height > 0 ? Math.round(height) : null,
-    pageNumber: Number.isSafeInteger(pageNumber) && pageNumber > 0 ? pageNumber : 1,
+    available: isAvailable,
+    dataUrl: isAvailable ? safeDataUrl : null,
+    naturalWidth: isAvailable ? Math.round(width) : null,
+    naturalHeight: isAvailable ? Math.round(height) : null,
+    pageNumber: isAvailable ? requestedPage : null,
   });
 }
 
@@ -735,6 +747,7 @@ export async function recognizeDrawingFile(file, options = {}) {
   };
   const sourceSha256 = await sha256Hex(bytes);
   const fileFacts = safeFreeze({ byteLength: declaredSize, sha256: sourceSha256 });
+  const requestedPageNumber = 1;
   let securityStatus = DRAWING_PDF_SECURITY_STATUS.UNAVAILABLE;
   try {
     try {
@@ -758,12 +771,12 @@ export async function recognizeDrawingFile(file, options = {}) {
     const snapshot = createTrustedSnapshot(bytes);
     const presentation = await dependencies.presentSelectedPdfFile(snapshot, {
       expectedSha256: sourceSha256,
-      pageNumber: 1,
+      pageNumber: requestedPageNumber,
     });
     const extraction = await dependencies.extractScene({
       bytes,
       sourceSha256,
-      pageNumber: 1,
+      pageNumber: requestedPageNumber,
     });
     if (extraction?.activeContent === true) {
       return closedResult(
@@ -783,9 +796,10 @@ export async function recognizeDrawingFile(file, options = {}) {
     const uncertainty = safeUncertainty(manifest);
     const classificationCounts = safeClassificationCounts(manifest);
     const pageCount = Number(extraction?.pageCount || presentation?.pageCount || 0);
-    const selectedPageNumber = Number(
-      presentation?.selectedPageNumber || extraction?.scene?.source?.pageNumber || 1,
-    );
+    const extractionPageNumber = Number(extraction?.scene?.source?.pageNumber);
+    const selectedPageNumber = Number.isSafeInteger(extractionPageNumber) && extractionPageNumber > 0
+      ? extractionPageNumber
+      : requestedPageNumber;
     return freezeResult({
       status: "partial",
       reason: "A11_FORMAL_BINDING_HOLD",
@@ -805,7 +819,12 @@ export async function recognizeDrawingFile(file, options = {}) {
         label: `第 ${Number.isSafeInteger(selectedPageNumber) && selectedPageNumber > 0 ? selectedPageNumber : 1} 頁`,
       }),
       classificationCounts,
-      presentationReference: safePresentationReference(presentation, sourceSha256),
+      presentationReference: safePresentationReference(
+        presentation,
+        sourceSha256,
+        requestedPageNumber,
+        extractionPageNumber,
+      ),
       uncertainty,
     });
   } catch (error) {

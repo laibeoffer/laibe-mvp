@@ -222,6 +222,36 @@ export function resolveQuoteDrawingRoute(candidate) {
     : null;
 }
 
+function readDrawingCheckHref(link) {
+  if (!link || !trustedGetAttribute) return null;
+  try {
+    return resolveQuoteDrawingRoute(
+      safeApply(trustedGetAttribute, link, SAFE_HREF_ARGUMENTS),
+    );
+  } catch {
+    return null;
+  }
+}
+
+function preventUnsafeDrawingNavigation(event) {
+  if (!event || !trustedPreventDefault) return;
+  try {
+    safeApply(trustedPreventDefault, event, SAFE_EMPTY_ARGUMENTS);
+  } catch {
+    // An unsafe or changed route remains closed.
+  }
+}
+
+function wireDrawingCheckRouteGuards(root) {
+  const drawingCheckLinks = root.querySelectorAll("[data-drawing-check-link]");
+  for (let index = 0; index < drawingCheckLinks.length; index += 1) {
+    const link = drawingCheckLinks[index];
+    link.addEventListener("click", (event) => {
+      if (!readDrawingCheckHref(link)) preventUnsafeDrawingNavigation(event);
+    });
+  }
+}
+
 function fileSelectionResult(kind, name = null, file = null) {
   const result = safeCreate(null);
   result.kind = kind;
@@ -1353,6 +1383,7 @@ export function initializeQuoteCheckPage(
     }
     const initialMode = resolveDocumentWorkspaceHash(hash) || resolveDocumentWorkspaceMode(search);
     initializeDocumentWorkspace(root, workspaceRoot, initialMode, hash, dependencies);
+    wireDrawingCheckRouteGuards(root);
     return;
   }
 
@@ -1375,7 +1406,6 @@ export function initializeQuoteCheckPage(
   const failureReturn = root.querySelector("[data-failure-return]");
   const failureDrawingRecover = root.querySelector("[data-failure-drawing-recover]");
   const primaryDrawingCheckLink = root.querySelector("[data-drawing-check-primary]");
-  const drawingCheckLinks = root.querySelectorAll("[data-drawing-check-link]");
   const heroStart = root.querySelector("[data-hero-start]");
   const openFileControls = root.querySelectorAll("[data-open-file]");
   const stepOrder = safeFreeze([
@@ -1495,26 +1525,6 @@ export function initializeQuoteCheckPage(
     if (failureRecover) failureRecover.hidden = usesDrawingRecovery;
     if (failureDrawingRecover) failureDrawingRecover.hidden = !usesDrawingRecovery;
     renderState(currentFailure, "FAILURE", true);
-  }
-
-  function readDrawingCheckHref(link) {
-    if (!link || !trustedGetAttribute) return null;
-    try {
-      return resolveQuoteDrawingRoute(
-        safeApply(trustedGetAttribute, link, SAFE_HREF_ARGUMENTS),
-      );
-    } catch {
-      return null;
-    }
-  }
-
-  function preventUnsafeDrawingNavigation(event) {
-    if (!event || !trustedPreventDefault) return;
-    try {
-      safeApply(trustedPreventDefault, event, SAFE_EMPTY_ARGUMENTS);
-    } catch {
-      // An unsafe or changed route remains closed.
-    }
   }
 
   function navigateToDrawingCheck() {
@@ -1669,12 +1679,7 @@ export function initializeQuoteCheckPage(
     });
   }
 
-  for (let index = 0; index < drawingCheckLinks.length; index += 1) {
-    const link = drawingCheckLinks[index];
-    link.addEventListener("click", (event) => {
-      if (!readDrawingCheckHref(link)) preventUnsafeDrawingNavigation(event);
-    });
-  }
+  wireDrawingCheckRouteGuards(root);
 
   if (heroStart) {
     heroStart.addEventListener("click", () => {

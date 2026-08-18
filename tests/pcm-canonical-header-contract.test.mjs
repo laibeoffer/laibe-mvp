@@ -218,10 +218,13 @@ test("page and role context stays explicit while header routes match the real ma
     PCM_FLOW_ROUTE_MANIFEST,
     "homeHeaderServiceContractToOwnerContractManagement",
   );
+  const ownerContractAccessHref = "../account_access/code.html?intent=owner-contract-management";
   assert.equal(homeContract.trigger, homeLinks[3].label);
   assert.equal(attribute(homeLinks[3].openingTag, "data-route"), homeContract.id);
-  assert.equal(attribute(homeLinks[3].openingTag, "href"), null);
-  assert.equal(homeContract.relativeHref, "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
+  assert.equal(attribute(homeLinks[3].openingTag, "href"), ownerContractAccessHref);
+  assert.equal(homeContract.toPage, "accountAccess");
+  assert.equal(homeContract.relativeHref, ownerContractAccessHref);
+  assert.doesNotMatch(homeContract.relativeHref, /client_awarding_dashboard|owner-dashboard-panel-contract/u);
   assert.equal(getActiveCanonicalLinkHref(homeContract.id), homeContract.relativeHref);
 
   assert.match(headerById.get("quoteCheck"), /aria-current="page"[^>]*>文件健檢<\/a>/u);

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { File } from "node:buffer";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -24,6 +25,9 @@ const activePdfFixtures = Object.freeze([
   ["SubmitForm action", "submit-form.pdf"],
   ["page additional action", "page-action.pdf"],
   ["attachment and GoToR action", "attachment-gotor.pdf"],
+  ["isolated Launch action", "launch-only.pdf"],
+  ["isolated GoToR action", "gotor-only.pdf"],
+  ["isolated attachment", "attachment-only.pdf"],
 ]);
 const adapterUrl = pathToFileURL(adapterPath).href;
 const canonicalPaths = {
@@ -121,6 +125,7 @@ test("focused real File route reads bytes and returns recognition-only summary",
   assert.equal(recognizedCalls, 1);
   assert.equal(result.status, "partial");
   assert.equal(result.file.byteLength, bytes.byteLength);
+  assert.match(result.file.sha256, /^[0-9a-f]{64}$/);
   assert.equal(result.summary.pageCount, 1);
   assert.equal(result.summary.objectCount, 1);
   assert.equal(result.summary.unresolvedCount, 1);
@@ -137,11 +142,11 @@ test("focused real File route reads bytes and returns recognition-only summary",
     count: 1,
   }]);
   assert.deepEqual(result.uncertainty, [{
-    id: "wall-1",
-    category: "unresolved_important",
     reason: "牆線端點或銜接關係仍需人工核對。",
     nextAction: "請人工核對原始圖說後再決定是否採用。",
   }]);
+  assert.equal("id" in result.uncertainty[0], false);
+  assert.equal("category" in result.uncertainty[0], false);
   assert.equal(result.conversionAllowed, false);
   assert.equal(result.projectMutationAllowed, false);
   assert.equal(result.uploaded, false);
@@ -273,7 +278,73 @@ test("security inspection unavailable is distinct from confirmed active content"
 test("presentation reference requires the exact selected PDF SHA", async () => {
   const { recognizeDrawingFile } = await import(`${adapterUrl}?presentation-sha-red=1`);
   const bytes = readFileSync(pdfPath);
-  for (const sourceDocumentSha256 of [undefined, "B".repeat(64)]) {
+  const sourceSha256 = createHash("sha256").update(bytes).digest("hex");
+  const cases = [
+    {
+      label: "canonical lowercase binding",
+      upstreamAvailable: true,
+      sourceDocumentSha256: sourceSha256,
+      rasterPageNumber: 1,
+      presentationPageNumber: 1,
+      extractionPageNumber: 1,
+      available: true,
+    },
+    {
+      label: "upstream unavailable with residual reference data",
+      upstreamAvailable: false,
+      sourceDocumentSha256: sourceSha256,
+      rasterPageNumber: 1,
+      presentationPageNumber: 1,
+      extractionPageNumber: 1,
+      available: false,
+    },
+    {
+      label: "missing SHA",
+      upstreamAvailable: true,
+      sourceDocumentSha256: undefined,
+      rasterPageNumber: 1,
+      presentationPageNumber: 1,
+      extractionPageNumber: 1,
+      available: false,
+    },
+    {
+      label: "uppercase noncanonical SHA",
+      upstreamAvailable: true,
+      sourceDocumentSha256: sourceSha256.toUpperCase(),
+      rasterPageNumber: 1,
+      presentationPageNumber: 1,
+      extractionPageNumber: 1,
+      available: false,
+    },
+    {
+      label: "raster page mismatch",
+      upstreamAvailable: true,
+      sourceDocumentSha256: sourceSha256,
+      rasterPageNumber: 2,
+      presentationPageNumber: 1,
+      extractionPageNumber: 1,
+      available: false,
+    },
+    {
+      label: "presentation page mismatch",
+      upstreamAvailable: true,
+      sourceDocumentSha256: sourceSha256,
+      rasterPageNumber: 1,
+      presentationPageNumber: 2,
+      extractionPageNumber: 1,
+      available: false,
+    },
+    {
+      label: "extraction page mismatch",
+      upstreamAvailable: true,
+      sourceDocumentSha256: sourceSha256,
+      rasterPageNumber: 1,
+      presentationPageNumber: 1,
+      extractionPageNumber: 2,
+      available: false,
+    },
+  ];
+  for (const entry of cases) {
     const result = await recognizeDrawingFile(
       new File([bytes], "drawing.pdf", { type: "application/pdf" }),
       {
@@ -284,19 +355,21 @@ test("presentation reference requires the exact selected PDF SHA", async () => {
           async presentSelectedPdfFile() {
             return {
               pageCount: 1,
-              selectedPageNumber: 1,
               referenceRaster: {
-                available: true,
+                available: entry.upstreamAvailable,
                 dataUrl: "data:image/png;base64,iVBORw0KGgo=",
                 naturalWidth: 320,
                 naturalHeight: 240,
-                pageNumber: 1,
-                sourceDocumentSha256,
+                pageNumber: entry.rasterPageNumber,
+                sourceDocumentSha256: entry.sourceDocumentSha256,
               },
+              selectedPageNumber: entry.presentationPageNumber,
             };
           },
           async extractScene() {
-            return recognizedScene();
+            const extraction = recognizedScene();
+            extraction.scene.source.pageNumber = entry.extractionPageNumber;
+            return extraction;
           },
           recognizePdfObjects() {
             return {
@@ -309,9 +382,29 @@ test("presentation reference requires the exact selected PDF SHA", async () => {
         },
       },
     );
-    assert.equal(result.status, "partial");
-    assert.equal(result.presentationReference.available, false);
-    assert.equal(result.presentationReference.dataUrl, null);
+    assert.equal(result.status, "partial", entry.label);
+    assert.equal(result.file.sha256, sourceSha256, entry.label);
+    assert.equal(result.presentationReference.available, entry.available, entry.label);
+    assert.equal(
+      result.presentationReference.dataUrl,
+      entry.available ? "data:image/png;base64,iVBORw0KGgo=" : null,
+      entry.label,
+    );
+    assert.equal(
+      result.presentationReference.pageNumber,
+      entry.available ? 1 : null,
+      entry.label,
+    );
+    assert.equal(
+      result.presentationReference.naturalWidth,
+      entry.available ? 320 : null,
+      entry.label,
+    );
+    assert.equal(
+      result.presentationReference.naturalHeight,
+      entry.available ? 240 : null,
+      entry.label,
+    );
   }
 });
 

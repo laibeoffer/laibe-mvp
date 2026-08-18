@@ -637,6 +637,7 @@ export function initializeDrawingCheckPage(options = {}) {
   const recognitionUncertainty = root.querySelector("[data-recognition-uncertainty]");
   const recognitionCounts = root.querySelector("[data-recognition-counts]");
   const recognitionItems = root.querySelector("[data-recognition-items]");
+  const correctionRecognitionItems = root.querySelector("[data-correction-recognition-items]");
   const recognitionReference = root.querySelector("[data-recognition-reference]");
   const recognitionReferenceWrap = root.querySelector("[data-recognition-reference-wrap]");
   const recognitionReferenceCaption = root.querySelector("[data-recognition-reference-caption]");
@@ -654,6 +655,7 @@ export function initializeDrawingCheckPage(options = {}) {
   let currentFailure = null;
   let currentHeroAction = NO_HERO_ACTION;
   let recognitionSequence = 0;
+  let latestRecognitionItemsText = "尚未完成本次辨識";
 
   function stepIndex(step) {
     for (let index = 0; index < stepOrder.length; index += 1) {
@@ -758,6 +760,7 @@ export function initializeDrawingCheckPage(options = {}) {
       setText(recognitionCounts, "辨識完成後顯示");
       setText(recognitionUncertainty, "辨識完成後顯示");
       setText(recognitionItems, "辨識完成後顯示");
+      setText(correctionRecognitionItems, "辨識完成後顯示");
       clearRecognitionReference();
       return;
     }
@@ -806,13 +809,12 @@ export function initializeDrawingCheckPage(options = {}) {
         recognitionUncertainty,
         unresolvedCount > 0 ? `${unresolvedCount} 項仍需人工確認` : "目前沒有列出重要待確認項目，仍需人工核對",
       );
-      setText(
-        recognitionItems,
-        uncertaintyItems.length > 0
-          ? uncertaintyItems.map((item, index) =>
-            `${index + 1}. ${item.reason} ${item.nextAction}`).join(" ")
-          : "目前沒有列出重要待確認項目；正式採用前仍須由甲方回看原始圖說。",
-      );
+      latestRecognitionItemsText = uncertaintyItems.length > 0
+        ? uncertaintyItems.map((item, index) =>
+          `${index + 1}. ${item.reason} ${item.nextAction}`).join(" ")
+        : "目前沒有列出重要待確認項目；正式採用前仍須由甲方回看原始圖說。";
+      setText(recognitionItems, latestRecognitionItemsText);
+      setText(correctionRecognitionItems, latestRecognitionItemsText);
       renderRecognitionReference(result);
       const title = "圖面部分可辨識，請查看待確認事項";
       const next = "查看待確認清單；需要時可重新選擇原始 PDF。";
@@ -835,6 +837,8 @@ export function initializeDrawingCheckPage(options = {}) {
     setText(recognitionCounts, "尚未選擇");
     setText(recognitionUncertainty, "尚未選擇");
     setText(recognitionItems, "尚未選擇");
+    latestRecognitionItemsText = "尚未完成本次辨識";
+    setText(correctionRecognitionItems, latestRecognitionItemsText);
     clearRecognitionReference();
   }
 
@@ -1050,10 +1054,13 @@ export function initializeDrawingCheckPage(options = {}) {
     switch (action.target) {
       case "CONSENT":
       case "SELECT_FILE":
-      case "CORRECTION_REQUIRED":
       case "RESELECT_FILE":
       case "RESULT_FORMAT":
       case "RESULT_UNAVAILABLE":
+        moveTo(action.target);
+        return;
+      case "CORRECTION_REQUIRED":
+        setText(correctionRecognitionItems, latestRecognitionItemsText);
         moveTo(action.target);
         return;
       case "OPEN_FILE":

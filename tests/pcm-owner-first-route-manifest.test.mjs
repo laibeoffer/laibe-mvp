@@ -222,7 +222,7 @@ test("canonical graph uses one quote check, one drawing check, and one shared ac
   );
 });
 
-test("Public Home service confirmation publishes one explicit owner contract-management link", async () => {
+test("Public Home service confirmation publishes one explicit Account Access owner-intent link", async () => {
   const {
     PCM_FLOW_ROUTE_MANIFEST,
     getActiveCanonicalLinkHref,
@@ -238,11 +238,11 @@ test("Public Home service confirmation publishes one explicit owner contract-man
     id: routeId,
     fromPage: "home",
     trigger: "前往契約管理",
-    toPage: "ownerWorkspace",
-    targetAnchor: "#owner-dashboard-panel-contract",
-    relativeHref: "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
-    expectedVisibleState: "甲方工作台「契約管理」主分頁已選取，預設子分頁「契約總覽」可見，案件仍保留未確認或空白的誠實狀態。",
+    toPage: "accountAccess",
+    targetAnchor: null,
+    relativeHref: "../account_access/code.html?intent=owner-contract-management",
+    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html?intent=owner-contract-management",
+    expectedVisibleState: "帳號入口先說明甲方契約管理目的；正式身分與案件權限確認後才會開放相應工作台。",
     returnRoute: "home",
     routeState: "active",
   });
@@ -259,7 +259,7 @@ test("Public Home service confirmation publishes one explicit owner contract-man
   assert.notEqual(serviceContract.href, matches[0].relativeHref);
 });
 
-test("Public Home header DRS service contract publishes its own owner contract-management link", async () => {
+test("Public Home header DRS service contract publishes its own Account Access owner-intent link", async () => {
   const {
     PCM_FLOW_ROUTE_MANIFEST,
     getActiveCanonicalLinkHref,
@@ -269,11 +269,11 @@ test("Public Home header DRS service contract publishes its own owner contract-m
     id: routeId,
     fromPage: "home",
     trigger: "DRS 契約管理",
-    toPage: "ownerWorkspace",
-    targetAnchor: "#owner-dashboard-panel-contract",
-    relativeHref: "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html#owner-dashboard-panel-contract",
-    expectedVisibleState: "甲方工作台「契約管理」主分頁已選取，預設子分頁「契約總覽」可見，案件仍保留未確認或空白的誠實狀態。",
+    toPage: "accountAccess",
+    targetAnchor: null,
+    relativeHref: "../account_access/code.html?intent=owner-contract-management",
+    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html?intent=owner-contract-management",
+    expectedVisibleState: "帳號入口先說明甲方契約管理目的；正式身分與案件權限確認後才會開放相應工作台。",
     returnRoute: "home",
     routeState: "active",
   };
@@ -520,7 +520,7 @@ test("Vendor Workspace publishes one active account-access recovery link while i
   await access(new URL(expected.relativeHref.split(/[?#]/, 1)[0], routeManifestUrl));
 });
 
-test("Account Access holds the Owner normal route while the Vendor route remains active", async () => {
+test("Account Access holds the Owner normal route while the Vendor destination remains reserved in the manifest", async () => {
   const {
     PCM_FLOW_ROUTE_MANIFEST,
     getActiveCanonicalLinkHref,

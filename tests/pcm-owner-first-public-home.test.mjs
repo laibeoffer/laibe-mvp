@@ -583,17 +583,19 @@ test("homepage presents five truthful entry stages in the confirmed order", asyn
   assert.equal((section.match(/data-entry-step=/g) ?? []).length, 5);
   assert.doesNotMatch(section, /查看圖說檢討|甲方登入／乙方受邀/);
 
-  for (const [step, route, label] of [
-    ["01", "quoteCheck", "報價資料健檢"],
-    ["02", "homeServiceConfirmationToOwnerContractManagement", "管理 DRS 契約"],
-  ]) {
-    const control = html.match(
-      new RegExp(`<a\\b(?=[^>]*data-entry-step="${step}")(?=[^>]*data-route="${route}")[^>]*>[\\s\\S]*?${label}[\\s\\S]*?<\\/a>`),
-    )?.[0] ?? "";
-    assert.match(control, /aria-disabled="true"/);
-    assert.match(control, /data-route-state="planned"/);
-    assert.doesNotMatch(control, /\shref=/);
-  }
+  const quoteCheckControl = html.match(
+    /<a\b(?=[^>]*data-entry-step="01")(?=[^>]*data-route="quoteCheck")[^>]*>[\s\S]*?報價資料健檢[\s\S]*?<\/a>/,
+  )?.[0] ?? "";
+  assert.match(quoteCheckControl, /aria-disabled="true"/);
+  assert.match(quoteCheckControl, /data-route-state="planned"/);
+  assert.doesNotMatch(quoteCheckControl, /\shref=/);
+
+  const contractManagementControl = html.match(
+    /<a\b(?=[^>]*data-entry-step="02")(?=[^>]*data-route="homeServiceConfirmationToOwnerContractManagement")[^>]*>[\s\S]*?管理 DRS 契約[\s\S]*?<\/a>/,
+  )?.[0] ?? "";
+  assert.match(contractManagementControl, /href="\.\.\/account_access\/code\.html\?intent=owner-contract-management"/);
+  assert.match(contractManagementControl, /data-route-state="active"/);
+  assert.doesNotMatch(contractManagementControl, /aria-disabled="true"|tabindex="-1"/);
 
   for (const [step, label, status] of [
     ["03", "邀請乙方加入", "完成契約後開放"],
@@ -697,11 +699,12 @@ test("selected service-confirmation card sends contract management through Accou
   assert.match(selectedCard, new RegExp(`data-route="${routeId}"`));
   assert.match(selectedCard, /契約管理[\s\S]*管理 DRS 契約[\s\S]*查看契約狀態、待補資料與雙方確認事項[\s\S]*前往契約管理[\s\S]*約[\s\S]*02/);
   assert.doesNotMatch(selectedCard, /簽署|完成簽署|先閱讀服務契約/);
-  assert.doesNotMatch(selectedCard, /data-route="serviceContract"|\.\.\/service_contract\/code\.html|\shref=/);
+  assert.doesNotMatch(selectedCard, /data-route="serviceContract"|\.\.\/service_contract\/code\.html/);
+  assert.ok(selectedCard.includes(`href="${accountAccessHref}"`));
   assert.equal(ownedLinks.length, 1);
-  assert.equal(ownedLinks[0].relativeHref, "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
-  assert.equal(html.includes(accountAccessHref), false);
-  assert.match(appSource, /owner-contract-management/);
+  assert.equal(ownedLinks[0].relativeHref, accountAccessHref);
+  assert.ok(html.includes(`href="${accountAccessHref}"`));
+  assert.doesNotMatch(appSource, /ownerContractAccessHref|isOwnerContractManagementRoute/);
   assert.match(publicContractSource, /getActiveCanonicalLinkHref\("homeServiceConfirmationToOwnerContractManagement"\)/);
 
   const { PUBLIC_ROUTES } = await import(`${publicContractUrl.href}?home-contract-management=${Date.now()}`);
@@ -739,13 +742,12 @@ test("Public Home header DRS service contract sends owners through Account Acces
   assert.equal(headerActions.length, 4);
   assert.match(headerControl, /DRS 契約管理/);
   assert.match(headerControl, new RegExp(`data-route="${routeId}"`));
-  assert.match(headerControl, /data-route-state="planned"/);
-  assert.match(headerControl, /aria-disabled="true"/);
-  assert.match(headerControl, /tabindex="-1"/);
-  assert.doesNotMatch(headerControl, /data-route="serviceContract"|\shref=/);
+  assert.match(headerControl, /data-route-state="active"/);
+  assert.ok(headerControl.includes(`href="${accountAccessHref}"`));
+  assert.doesNotMatch(headerControl, /aria-disabled="true"|tabindex="-1"|data-route="serviceContract"/);
 
-  assert.equal(html.includes(accountAccessHref), false);
-  assert.match(appSource, /owner-contract-management/);
+  assert.ok(html.includes(`href="${accountAccessHref}"`));
+  assert.doesNotMatch(appSource, /ownerContractAccessHref|isOwnerContractManagementRoute/);
   assert.match(
     publicContractSource,
     /getActiveCanonicalLinkHref\("homeHeaderServiceContractToOwnerContractManagement"\)/,
@@ -761,7 +763,7 @@ test("Public Home header DRS service contract sends owners through Account Acces
   const { bindPublicRoutes } = await import(
     `${appUrl.href}?home-header-contract-management=${Date.now()}`
   );
-  assert.equal(PUBLIC_ROUTES[routeId], "../../client_awarding_dashboard/code.html#owner-dashboard-panel-contract");
+  assert.equal(PUBLIC_ROUTES[routeId], accountAccessHref);
   assert.equal(PUBLIC_ROUTES.serviceContract, "../service_contract/code.html");
 
   const selectedControl = makeRouteControl(routeId);
