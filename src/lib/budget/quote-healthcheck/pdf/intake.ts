@@ -966,7 +966,7 @@ export const inspectQuotePdfBytes = async (
     );
   }
   const hasStructuralActiveTrigger = objects.some(({ dictionaryEntries }) =>
-    dictionaryEntries.has("OpenAction") || dictionaryEntries.has("AA")
+    ["OpenAction", "AA", "A"].some((trigger) => dictionaryEntries.has(trigger))
   );
   const scannedNames = scanPdfNames(maskActualStreamBodies(source, objects));
   if (scannedNames.malformed) {

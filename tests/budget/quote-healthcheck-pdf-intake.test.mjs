@@ -27,13 +27,20 @@ const documentReference = async (bytes) => ({
   caseId: "case_quote_pdf_001",
   sha256: await sha256(bytes),
 });
-const deterministicQuotePdf = ({ catalogEntry = "", stream }) => {
+const deterministicQuotePdf = ({
+  additionalObjects = "",
+  catalogEntry = "",
+  pageEntry = "",
+  stream,
+}) => {
   const encoder = new TextEncoder();
   const streamByteLength = encoder.encode(stream).byteLength;
   return encoder.encode(
     `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R${
       catalogEntry ? ` ${catalogEntry}` : ""
-    } >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 4 0 R >>\nendobj\n4 0 obj\n<< /Length ${streamByteLength} >>\nstream\n${stream}endstream\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF`,
+    } >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 4 0 R${
+      pageEntry ? ` ${pageEntry}` : ""
+    } >>\nendobj\n4 0 obj\n<< /Length ${streamByteLength} >>\nstream\n${stream}endstream\nendobj\n${additionalObjects}trailer\n<< /Root 1 0 R >>\n%%EOF`,
   );
 };
 const replaceAsciiInPlace = (bytes, from, to) => {
@@ -392,3 +399,40 @@ Deno.test("commented text operators never create quote facts while percent signs
     ["VALID 10%"],
   );
 });
+
+for (
+  const [name, annotationAction, actionObject] of [
+    [
+      "inline URI action",
+      "/A << /S /URI /URI (https://example.test) >>",
+      "",
+    ],
+    [
+      "indirect SubmitForm action",
+      "/A 9 0 R",
+      "9 0 obj\n<< /S /SubmitForm /F (https://example.test) >>\nendobj\n",
+    ],
+    [
+      "encoded A key",
+      "/#41 << /S /URI /URI (https://example.test) >>",
+      "",
+    ],
+  ]
+) {
+  Deno.test(`standard page annotation ${name} fails closed`, async () => {
+    const intake = await loadIntake();
+    const bytes = deterministicQuotePdf({
+      additionalObjects:
+        `5 0 obj\n<< /Type /Annot /Subtype /Link /Rect [0 0 10 10] ${annotationAction} >>\nendobj\n${actionObject}`,
+      pageEntry: "/Annots [5 0 R]",
+      stream: "BT\n(VALID ITEM|unit|1|2|2) Tj\nET\n",
+    });
+    const result = await intake.inspectQuotePdfBytes({
+      bytes,
+      document: await documentReference(bytes),
+    });
+
+    assert.equal(result.accepted, false, name);
+    assert.equal(result.rejection?.code, "UNSUPPORTED_ACTIVE_CONTENT");
+  });
+}
