@@ -17,7 +17,10 @@ const snapshotModule =
 const runtimeModule =
   "site/preview_floor_plan/pdf-plan-exact-source-runtime.mjs";
 const planPuzzleModule = "site/preview_floor_plan/plan-puzzle.js";
-const codeHtmlModule = "site/preview_floor_plan/code.html";
+const codeHtmlModule = "tests/fixtures/preview-floor-plan-code.fixture.txt";
+const directlyRoutableLegacyHtml = "site/preview_floor_plan/code.html";
+const directlyRoutableQaPdf =
+  "site/preview_floor_plan/_qa_pdf_reference_3rf.pdf";
 
 function filePath(relativePath) {
   return path.join(rootDir, relativePath);
@@ -62,7 +65,18 @@ function frozenObjectKeys(body) {
     .map((entry) => entry.split(":")[0].trim());
 }
 
-test("A11 bundle, gate, consumer, and snapshot module boundaries exist", () => {
+test("A11 support exists without directly routable legacy product fixtures", () => {
+  assert.equal(
+    fs.existsSync(filePath(directlyRoutableLegacyHtml)),
+    false,
+    `legacy HTML must not be directly routable: ${directlyRoutableLegacyHtml}`
+  );
+  assert.equal(
+    fs.existsSync(filePath(directlyRoutableQaPdf)),
+    false,
+    `QA PDF must not be directly routable: ${directlyRoutableQaPdf}`
+  );
+
   for (const modulePath of [
     bundleModule,
     gateModule,

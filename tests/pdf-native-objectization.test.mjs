@@ -17,14 +17,13 @@ import {
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const floorPlanRoot = path.join(repoRoot, "site", "preview_floor_plan");
 const paths = {
-  pdf: path.join(floorPlanRoot, "_qa_pdf_reference_3rf.pdf"),
+  pdf: path.join(repoRoot, "tests", "fixtures", "_qa_pdf_reference_3rf.pdf"),
   pdfJs: path.join(floorPlanRoot, "vendor", "pdfjs", "pdf.mjs"),
   extractor: path.join(floorPlanRoot, "pdf-plan-vector-extractor.js"),
   adapter: path.join(floorPlanRoot, "pdf-plan-objectization-adapter.js"),
   recognitionGate: path.join(floorPlanRoot, "pdf-recognition-gate.mjs"),
   exactSourceRuntime: path.join(floorPlanRoot, "pdf-plan-exact-source-runtime.mjs"),
-  planPuzzle: path.join(floorPlanRoot, "plan-puzzle.js"),
-  codeHtml: path.join(floorPlanRoot, "code.html")
+  planPuzzle: path.join(floorPlanRoot, "plan-puzzle.js")
 };
 const exact0312PdfPath = process.env.LAIBE_A9_PDF_0312 || String.raw`Z:\01-工作專區\2025工作資料夾\01-住宅\2025.01.10 青埔 鴻築馥麗B5-13F\01-DWG圖檔\PDF\0312.pdf`;
 const exact0312Sha256 = "D5644EC4F7578A08C0033502AC1CAEB3726844B83CF7623B3BE00ACA870072D3";
@@ -1474,11 +1473,15 @@ test("canonical upper 3F creates exactly 3 doors and 5 windows on valid native h
     assert.match(opening.assetUrl, /^\.\/svg-blocks3\/b057[03]\.svg$/);
   });
 
+  const servedAssets = new Map([
+    "svg-blocks3/b0570.svg",
+    "svg-blocks3/b0573.svg"
+  ].map((relative) => [relative, path.resolve(floorPlanRoot, relative)]));
   const server = createServer((request, response) => {
     try {
       const relative = decodeURIComponent(new URL(request.url, "http://127.0.0.1").pathname).replace(/^\/+/, "");
-      const target = path.resolve(floorPlanRoot, relative);
-      if (!target.startsWith(path.resolve(floorPlanRoot)) || !statSync(target).isFile()) {
+      const target = servedAssets.get(relative);
+      if (!target || !statSync(target).isFile()) {
         response.writeHead(404).end();
         return;
       }
@@ -1496,6 +1499,10 @@ test("canonical upper 3F creates exactly 3 doors and 5 windows on valid native h
       assert.equal(response.status, 200);
       assert.match(response.headers.get("content-type") || "", /image\/svg\+xml/);
     }
+    const deniedProductSource = await fetch(
+      new URL("plan-puzzle.js", `http://127.0.0.1:${port}/`)
+    );
+    assert.equal(deniedProductSource.status, 404);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

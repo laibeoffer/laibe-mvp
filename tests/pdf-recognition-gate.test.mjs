@@ -26,9 +26,9 @@ const planPuzzlePath = path.join(
 );
 const planPuzzleHtmlPath = path.join(
   repoRoot,
-  "site",
-  "preview_floor_plan",
-  "code.html"
+  "tests",
+  "fixtures",
+  "preview-floor-plan-code.fixture.txt"
 );
 const exactSourceRuntimePath = path.join(
   repoRoot,
@@ -50,8 +50,8 @@ const adapterPath = path.join(
 );
 const canonicalPdfPath = path.join(
   repoRoot,
-  "site",
-  "preview_floor_plan",
+  "tests",
+  "fixtures",
   "_qa_pdf_reference_3rf.pdf"
 );
 const pdfJsPath = path.join(
