@@ -17,6 +17,14 @@ const drawingDir = resolve(
 const htmlPath = resolve(drawingDir, "code.html");
 const cssPath = resolve(drawingDir, "styles.css");
 const appPath = resolve(drawingDir, "app.js");
+const browserAdapterPath = resolve(
+  repoRoot,
+  "site/preview_floor_plan/browser-recognition-adapter.mjs",
+);
+const legacyPlanPuzzlePagePath = resolve(
+  repoRoot,
+  "site/preview_floor_plan/code.html",
+);
 const sharedTokenPath = resolve(drawingDir, "../shared/owner-first-tokens.css");
 const sharedShellPath = resolve(drawingDir, "../shared/owner-first-shell.css");
 const execFileAsync = promisify(execFile);
@@ -38,6 +46,9 @@ const requiredFailures = Object.freeze([
   "PAGE_COUNT_INVALID",
   "FILE_UNREADABLE",
   "FILE_CORRUPTED",
+  "FILE_ENCRYPTED",
+  "ACTIVE_CONTENT_UNSUPPORTED",
+  "FILE_READ_FAILED",
   "DUPLICATE_SUBMISSION",
   "VERSION_CONFLICT",
   "DRAWING_ONLY_QUOTE_MISSING",
@@ -361,7 +372,7 @@ test("one page exposes the complete drawing-review state sequence", async () => 
   assert.match(html, /服務說明/);
   assert.match(html, /同意本機檢視/);
   assert.match(html, /選擇圖說 PDF/);
-  assert.match(html, /檔案標示與後續確認/);
+  assert.match(html, /圖說內容與後續確認/);
   assert.match(html, /待確認清單/);
   assert.match(html, /重新選擇/);
   assert.match(html, /結果格式示意/);
@@ -410,16 +421,33 @@ test("selection stays local and cannot imply upload parsing persistence or a for
   );
 });
 
-test("format size page count and readability remain explicitly unconfirmed", async () => {
-  const html = await readOrEmpty(htmlPath);
+test("processing and recognition summary stay local honest and review-bound", async () => {
+  const [html, app] = await Promise.all([readOrEmpty(htmlPath), readOrEmpty(appPath)]);
   const visible = stripNonVisibleHtml(html);
-  assert.match(visible, /瀏覽器標示為 PDF；檔名僅供辨識/);
-  assert.match(visible, /內容格式尚待驗證/);
-  assert.match(visible, /大小待正式規則確認/);
-  assert.match(visible, /頁數待正式解析/);
-  assert.match(visible, /圖面可讀性待正式解析/);
-  assert.doesNotMatch(visible, /格式已辨識|內容已解析|頁數已確認|可讀性通過/);
-  assert.doesNotMatch(visible, /(?:MB|GB|頁)\s*(?:上限|以內|以下|不得超過)/i);
+  assert.match(visible, /正在讀取 PDF 圖面結構/);
+  assert.match(visible, /本次只在瀏覽器內整理，尚未保存案件/);
+  assert.match(visible, /不等於正式圖面、比例、尺寸或案件紀錄/);
+  assert.match(app, /"processing"/);
+  assert.match(app, /"recognized"/);
+  assert.match(app, /"partial"/);
+  assert.match(app, /"unsupported"/);
+  assert.match(app, /"error"/);
+  assert.match(app, /token !== recognitionSequence/);
+  assert.match(app, /browser-recognition-adapter\.mjs/);
+});
+
+test("DRS route shell recovery links and reload reset remain intact", async () => {
+  const [html, app] = await Promise.all([readOrEmpty(htmlPath), readOrEmpty(appPath)]);
+  const visible = stripNonVisibleHtml(html);
+  assert.equal(existsSync(browserAdapterPath), true);
+  assert.equal(existsSync(legacyPlanPuzzlePagePath), false);
+  assert.match(html, /href="\.\.\/public_home\/code\.html#top"/);
+  assert.match(html, /href="\.\.\/quote_check\/code\.html"/);
+  assert.match(visible, /萊比 DRS/);
+  assert.match(visible, /返回萊比首頁/);
+  assert.doesNotMatch(visible, /AI PCM|返回 PCM 首頁/);
+  assert.match(app, /renderState\(resolveDrawingCheckState\(\{ step: "INTRODUCTION" \}\)\)/);
+  assert.doesNotMatch(app, /localStorage|sessionStorage/);
 });
 
 test("result boundary includes drawing-only recovery to the existing quote check", async () => {

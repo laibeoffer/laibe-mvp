@@ -162,10 +162,11 @@ const trustedFileNameGetter = readOwnGetter(trustedFilePrototype, "name");
 const trustedBlobTypeGetter = readOwnGetter(trustedBlobPrototype, "type");
 const trustedInputFilesGetter = readOwnGetter(trustedInputPrototype, "files");
 
-function fileSelectionResult(kind, name = null) {
+function fileSelectionResult(kind, name = null, file = null) {
   const result = safeCreate(null);
   result.kind = kind;
   result.name = name;
+  result.file = file;
   return safeFreeze(result);
 }
 
@@ -199,7 +200,7 @@ export const DRAWING_CHECK_STATES = safeFreeze({
     code: "INTRODUCTION",
     type: "OPEN",
     title: "先看圖說能替下一步回答什麼",
-    reason: "PCM 會整理圖說版次、頁面範圍、可讀性與仍需報價或乙方說明的地方。",
+    reason: "萊比會整理圖說版次、頁面範圍、可讀性與仍需報價或乙方說明的地方。",
     nextAction: "閱讀服務邊界後，進入同意步驟。",
     responsibleRole: "甲方",
     payloadPolicy: "NO_CASE_DATA",
@@ -208,7 +209,7 @@ export const DRAWING_CHECK_STATES = safeFreeze({
     code: "CONSENT",
     type: "OPEN",
     title: "確認本機檢視範圍",
-    reason: "本頁只暫時讀取你選擇的檔名與瀏覽器提供的檔案標示，不會送出或保存。",
+    reason: "本頁會在瀏覽器內暫時讀取 PDF 內容，不會送出或保存。",
     nextAction: "勾選同意後選擇圖說 PDF。",
     responsibleRole: "甲方",
     payloadPolicy: "NO_CASE_DATA",
@@ -217,7 +218,7 @@ export const DRAWING_CHECK_STATES = safeFreeze({
     code: "SELECT_FILE",
     type: "OPEN",
     title: "選擇圖說 PDF",
-    reason: "先查看瀏覽器提供的檔案標示；內容格式、大小、頁數與圖面可讀性仍需正式規則與解析。",
+    reason: "選擇後會先檢查 PDF 內容，再整理頁數、圖面結構與仍需確認之處。",
     nextAction: "從你的裝置選擇一份圖說 PDF。",
     responsibleRole: "甲方",
     payloadPolicy: "LOCAL_FILE_METADATA_ONLY",
@@ -225,9 +226,9 @@ export const DRAWING_CHECK_STATES = safeFreeze({
   VALIDATION_PENDING: freezeState({
     code: "VALIDATION_PENDING",
     type: "OPEN",
-    title: "PDF 標示已取得，圖面內容待驗證",
-    reason: "瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證。大小、頁數、尺寸、文字與圖面可讀性也尚未判定。",
-    nextAction: "查看待確認清單，決定是否重新選擇檔案。",
+    title: "正在瀏覽器內整理圖說",
+    reason: "正在讀取 PDF 內容並整理可辨識的圖面結構；本次不會保存或建立案件紀錄。",
+    nextAction: "等待辨識完成，再查看摘要與待確認事項。",
     responsibleRole: "甲方",
     payloadPolicy: "LOCAL_FILE_METADATA_ONLY",
   }),
@@ -303,8 +304,8 @@ export const DRAWING_CHECK_FAILURES = safeFreeze({
   }),
   FILE_TOO_LARGE: failureState({
     code: "FILE_TOO_LARGE",
-    reason: "正式檔案規則尚未確認，目前無法判定檔案大小是否符合條件。",
-    nextAction: "先保留原始檔，正式規則開放後再確認是否需要調整。",
+    reason: "這份檔案超出本頁可安全整理的大小，因此沒有讀取圖面內容。",
+    nextAction: "請向乙方取得較精簡的原始 PDF，再重新選擇。",
     responsibleRole: "甲方",
   }),
   PAGE_COUNT_INVALID: failureState({
@@ -315,8 +316,8 @@ export const DRAWING_CHECK_FAILURES = safeFreeze({
   }),
   FILE_UNREADABLE: failureState({
     code: "FILE_UNREADABLE",
-    reason: "目前沒有正式解析能力，無法確認尺寸、文字與細部索引是否清楚可讀。",
-    nextAction: "先用一般 PDF 閱讀工具確認內容；若模糊，請乙方提供清楚版本。",
+    reason: "這份 PDF 沒有足夠的向量圖面結構可供本頁整理，可能是掃描影像或不支援的內容。",
+    nextAction: "請乙方提供由繪圖軟體匯出的向量 PDF，再重新選擇。",
     responsibleRole: "甲方",
   }),
   FILE_CORRUPTED: failureState({
@@ -324,6 +325,23 @@ export const DRAWING_CHECK_FAILURES = safeFreeze({
     reason: "檔案若無法正常開啟，就不能進入後續書面檢討。",
     nextAction: "請乙方重新匯出可正常開啟的 PDF，再重新選擇。",
     responsibleRole: "乙方",
+  }),
+  FILE_ENCRYPTED: failureState({
+    code: "FILE_ENCRYPTED",
+    reason: "這份 PDF 需要密碼或受到內容保護，本頁不會嘗試解除限制。",
+    nextAction: "請乙方提供可正常開啟且允許檢視的 PDF，再重新選擇。",
+    responsibleRole: "乙方",
+  }),
+  ACTIVE_CONTENT_UNSUPPORTED: failureState({
+    code: "ACTIVE_CONTENT_UNSUPPORTED",
+    reason: "這份 PDF 含有可執行內容，為保護本次檢視，本頁已停止處理。",
+    nextAction: "請乙方重新匯出不含可執行內容的靜態 PDF，再重新選擇。",
+    responsibleRole: "乙方",
+  }),
+  FILE_READ_FAILED: failureState({
+    code: "FILE_READ_FAILED",
+    reason: "瀏覽器目前無法安全讀取這份檔案，因此沒有產生任何辨識摘要。",
+    nextAction: "重新選擇原始 PDF；若仍無法讀取，請乙方重新匯出。",
   }),
   DUPLICATE_SUBMISSION: failureState({
     code: "DUPLICATE_SUBMISSION",
@@ -404,6 +422,9 @@ HERO_ACTIONS.FILE_TOO_LARGE = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.PAGE_COUNT_INVALID = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.FILE_UNREADABLE = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.FILE_CORRUPTED = HERO_ACTIONS.FILE_FORMAT_INVALID;
+HERO_ACTIONS.FILE_ENCRYPTED = HERO_ACTIONS.FILE_FORMAT_INVALID;
+HERO_ACTIONS.ACTIVE_CONTENT_UNSUPPORTED = HERO_ACTIONS.FILE_FORMAT_INVALID;
+HERO_ACTIONS.FILE_READ_FAILED = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.DUPLICATE_SUBMISSION = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.VERSION_CONFLICT = HERO_ACTIONS.FILE_FORMAT_INVALID;
 HERO_ACTIONS.DRAWING_ONLY_QUOTE_MISSING = createHeroAction(
@@ -443,6 +464,15 @@ export function projectDrawingCheckHeroAction(state) {
   }
   if (state === DRAWING_CHECK_FAILURES.FILE_CORRUPTED) {
     return HERO_ACTIONS.FILE_CORRUPTED;
+  }
+  if (state === DRAWING_CHECK_FAILURES.FILE_ENCRYPTED) {
+    return HERO_ACTIONS.FILE_ENCRYPTED;
+  }
+  if (state === DRAWING_CHECK_FAILURES.ACTIVE_CONTENT_UNSUPPORTED) {
+    return HERO_ACTIONS.ACTIVE_CONTENT_UNSUPPORTED;
+  }
+  if (state === DRAWING_CHECK_FAILURES.FILE_READ_FAILED) {
+    return HERO_ACTIONS.FILE_READ_FAILED;
   }
   if (state === DRAWING_CHECK_FAILURES.DUPLICATE_SUBMISSION) {
     return HERO_ACTIONS.DUPLICATE_SUBMISSION;
@@ -522,6 +552,11 @@ function failureForCode(code) {
     case "PAGE_COUNT_INVALID": return DRAWING_CHECK_FAILURES.PAGE_COUNT_INVALID;
     case "FILE_UNREADABLE": return DRAWING_CHECK_FAILURES.FILE_UNREADABLE;
     case "FILE_CORRUPTED": return DRAWING_CHECK_FAILURES.FILE_CORRUPTED;
+    case "FILE_ENCRYPTED": return DRAWING_CHECK_FAILURES.FILE_ENCRYPTED;
+    case "ACTIVE_CONTENT_UNSUPPORTED": {
+      return DRAWING_CHECK_FAILURES.ACTIVE_CONTENT_UNSUPPORTED;
+    }
+    case "FILE_READ_FAILED": return DRAWING_CHECK_FAILURES.FILE_READ_FAILED;
     case "DUPLICATE_SUBMISSION": return DRAWING_CHECK_FAILURES.DUPLICATE_SUBMISSION;
     case "VERSION_CONFLICT": return DRAWING_CHECK_FAILURES.VERSION_CONFLICT;
     case "DRAWING_ONLY_QUOTE_MISSING": {
@@ -540,6 +575,16 @@ export function resolveDrawingCheckState(input) {
   } catch {
     return CONTEXT_UNAVAILABLE;
   }
+}
+
+const browserRecognitionAdapterUrl = new URL(
+  "../../../../site/preview_floor_plan/browser-recognition-adapter.mjs",
+  import.meta.url,
+).href;
+
+async function recognizeSelectedDrawingFile(file) {
+  const adapter = await import(browserRecognitionAdapterUrl);
+  return adapter.recognizeDrawingFile(file);
 }
 
 function initializeDrawingCheckPage() {
@@ -565,6 +610,15 @@ function initializeDrawingCheckPage() {
   const failureReturn = root.querySelector("[data-failure-return]");
   const heroStart = root.querySelector("[data-hero-start]");
   const openFileControls = root.querySelectorAll("[data-open-file]");
+  const recognitionOutput = root.querySelector("[data-recognition-output]");
+  const recognitionKicker = root.querySelector("[data-recognition-kicker]");
+  const recognitionTitle = root.querySelector("[data-recognition-title]");
+  const recognitionMessage = root.querySelector("[data-recognition-message]");
+  const recognitionContent = root.querySelector("[data-recognition-content]");
+  const recognitionSize = root.querySelector("[data-recognition-size]");
+  const recognitionPages = root.querySelector("[data-recognition-pages]");
+  const recognitionObjects = root.querySelector("[data-recognition-objects]");
+  const recognitionUncertainty = root.querySelector("[data-recognition-uncertainty]");
   const stepOrder = safeFreeze([
     "INTRODUCTION",
     "CONSENT",
@@ -578,6 +632,7 @@ function initializeDrawingCheckPage() {
   let currentStep = "INTRODUCTION";
   let currentFailure = null;
   let currentHeroAction = NO_HERO_ACTION;
+  let recognitionSequence = 0;
 
   function stepIndex(step) {
     for (let index = 0; index < stepOrder.length; index += 1) {
@@ -604,6 +659,7 @@ function initializeDrawingCheckPage() {
   }
 
   function clearFileSelection() {
+    recognitionSequence += 1;
     try {
       if (fileInput) fileInput.value = "";
     } catch {
@@ -616,6 +672,110 @@ function initializeDrawingCheckPage() {
         // Continue clearing every remaining product label.
       }
     }
+    renderRecognitionStatus("idle");
+  }
+
+  function setText(target, value) {
+    if (target) target.textContent = value;
+  }
+
+  function setRecognitionState(value) {
+    try {
+      if (recognitionOutput) recognitionOutput.dataset.recognitionState = value;
+      if (root.dataset) root.dataset.recognitionState = value;
+    } catch {
+      // Visible product state remains fail-closed if the document changes.
+    }
+  }
+
+  function renderRecognitionStatus(status, result = null) {
+    setRecognitionState(status);
+    if (status === "processing") {
+      setText(recognitionKicker, "正在整理");
+      setText(recognitionTitle, "正在讀取 PDF 圖面結構");
+      setText(recognitionMessage, "請稍候；完成前不會形成任何圖說、尺寸或案件結論。");
+      setText(recognitionContent, "正在檢查 PDF 內容");
+      setText(recognitionSize, "正在確認");
+      setText(recognitionPages, "正在確認");
+      setText(recognitionObjects, "正在整理");
+      setText(recognitionUncertainty, "辨識完成後顯示");
+      return;
+    }
+    if (status === "recognized" || status === "partial") {
+      const summary = result && result.summary;
+      const file = result && result.file;
+      const pageCount = Number(summary && summary.pageCount);
+      const objectCount = Number(summary && summary.objectCount);
+      const unresolvedCount = Number(summary && summary.unresolvedCount);
+      const byteLength = Number(file && file.byteLength);
+      setText(recognitionKicker, status === "recognized" ? "已辨識" : "已整理，仍需確認");
+      setText(
+        recognitionTitle,
+        status === "recognized" ? "圖面結構已整理" : "已找到圖面結構，仍有待確認內容",
+      );
+      setText(
+        recognitionMessage,
+        "這是本次瀏覽器內辨識摘要，不是正式圖面、尺寸確認或案件紀錄。",
+      );
+      setText(recognitionContent, status === "recognized" ? "可辨識的向量 PDF" : "部分內容可辨識");
+      setText(
+        recognitionSize,
+        Number.isFinite(byteLength) ? `${(byteLength / 1024 / 1024).toFixed(1)} MB（本次讀取）` : "已讀取",
+      );
+      setText(recognitionPages, pageCount > 0 ? `${pageCount} 頁；本次整理第 1 頁` : "仍需確認");
+      setText(recognitionObjects, objectCount >= 0 ? `找到 ${objectCount} 個候選結構` : "仍需確認");
+      setText(
+        recognitionUncertainty,
+        unresolvedCount > 0 ? `${unresolvedCount} 項仍需人工確認` : "未列出關鍵不確定項目，仍需人工核對",
+      );
+      const title = status === "recognized"
+        ? "圖面結構已整理，請人工核對"
+        : "圖面部分可辨識，請查看待確認事項";
+      const next = "查看待確認清單；需要時可重新選擇原始 PDF。";
+      for (let index = 0; index < statusTargets.length; index += 1) {
+        statusTargets[index].textContent = title;
+      }
+      for (let index = 0; index < nextTargets.length; index += 1) {
+        nextTargets[index].textContent = next;
+      }
+      if (liveTarget) liveTarget.textContent = `目前狀態：${title}。下一步：${next}`;
+      return;
+    }
+    setText(recognitionKicker, "尚未開始");
+    setText(recognitionTitle, "選擇 PDF 後顯示辨識狀態");
+    setText(recognitionMessage, "檔案只在瀏覽器內暫時讀取，不會送出或保存。");
+    setText(recognitionContent, "尚未選擇");
+    setText(recognitionSize, "尚未選擇");
+    setText(recognitionPages, "尚未選擇");
+    setText(recognitionObjects, "尚未選擇");
+    setText(recognitionUncertainty, "尚未選擇");
+  }
+
+  function failureCodeForRecognition(result) {
+    switch (result && result.reason) {
+      case "oversize": return "FILE_TOO_LARGE";
+      case "encrypted": return "FILE_ENCRYPTED";
+      case "active_content": return "ACTIVE_CONTENT_UNSUPPORTED";
+      case "scanned_or_non_vector": return "FILE_UNREADABLE";
+      case "corrupt": return "FILE_CORRUPTED";
+      default: return "FILE_READ_FAILED";
+    }
+  }
+
+  async function runRecognition(file, token) {
+    let result;
+    try {
+      result = await recognizeSelectedDrawingFile(file);
+    } catch {
+      result = { status: "error", reason: "read_failed" };
+    }
+    if (token !== recognitionSequence) return;
+    if (result.status === "recognized" || result.status === "partial") {
+      renderRecognitionStatus(result.status, result);
+      return;
+    }
+    setRecognitionState(result.status === "unsupported" ? "unsupported" : "error");
+    showFailure(failureCodeForRecognition(result));
   }
 
   function renderHeroAction(action) {
@@ -679,7 +839,7 @@ function initializeDrawingCheckPage() {
 
   function moveTo(step) {
     currentFailure = null;
-    if (step === "SELECT_FILE") clearFileSelection();
+    if (step === "SELECT_FILE" || step === "RESELECT_FILE") clearFileSelection();
     renderState(resolveDrawingCheckState({ step }), step, true);
   }
 
@@ -765,7 +925,7 @@ function initializeDrawingCheckPage() {
         return INVALID_FILE_SELECTION;
       }
 
-      return fileSelectionResult("PDF_METADATA", name);
+      return fileSelectionResult("PDF_METADATA", name, file);
     } catch {
       return INVALID_FILE_SELECTION;
     }
@@ -857,6 +1017,10 @@ function initializeDrawingCheckPage() {
           fileNameTargets[index].textContent = selection.name;
         }
         moveTo("VALIDATION_PENDING");
+        renderRecognitionStatus("processing");
+        recognitionSequence += 1;
+        const token = recognitionSequence;
+        void runRecognition(selection.file, token);
       } catch {
         showFileSelectionFailure();
       }

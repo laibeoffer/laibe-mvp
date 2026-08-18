@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="LaiBE AI PCM 圖說檢討，協助甲方先整理圖說版本、可讀性、待確認事項與下一步。"
+      content="萊比 DRS 圖說檢討，在瀏覽器內整理 PDF 圖面結構、待確認事項與下一步。"
     />
-    <title>LaiBE AI PCM｜圖說檢討</title>
+    <title>萊比 DRS｜圖說檢討</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
     <link rel="stylesheet" href="./styles.css" />
@@ -16,11 +16,11 @@
     <a class="skip-link" href="#main-content">跳到主要內容</a>
     <header class="drawing-header" id="top">
       <div class="drawing-header__inner">
-        <a class="drawing-brand" href="../public_home/code.html#top" aria-label="返回 PCM 首頁">
+        <a class="drawing-brand" href="../public_home/code.html#top" aria-label="返回萊比首頁">
           <img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" />
-          <span>AI PCM</span>
+          <span>萊比 DRS</span>
         </a>
-        <a class="drawing-header__back" href="../public_home/code.html#top">返回 PCM 首頁</a>
+        <a class="drawing-header__back" href="../public_home/code.html#top">返回萊比首頁</a>
       </div>
     </header>
 
@@ -34,13 +34,13 @@
           <p class="drawing-eyebrow">圖說檢討｜給準備施工圖 PDF 的甲方</p>
           <h1 id="drawing-title">先整理圖說版本與可讀性，再談施工範圍</h1>
           <p class="drawing-hero__lead">
-            先釐清圖說是什麼版本、哪些頁面要討論，以及哪些內容仍需報價或乙方說明；正式收件與解析開放前，本頁只在你的裝置暫時檢視檔名與瀏覽器提供的檔案標示。
+            選擇 PDF 後，萊比會在你的瀏覽器內讀取圖面結構，整理可辨識內容與仍需確認之處；本次不會送出或保存檔案，也不會建立正式案件紀錄。
           </p>
         </div>
         <aside class="drawing-hero__boundary" aria-label="服務邊界">
           <span>目前服務狀態</span>
-          <strong>圖說準備與結果格式預覽</strong>
-          <p>不送出文件、不建立案件，也不產生正式圖說檢討結果。</p>
+          <strong>瀏覽器內圖說辨識</strong>
+          <p>只整理本次選擇的 PDF，不送出文件、不建立案件，也不產生正式圖說或尺寸結論。</p>
           <div class="drawing-hero__continuation" aria-label="目前狀態與下一步">
             <p>
               <span>目前狀態</span>
@@ -97,7 +97,7 @@
             <p class="drawing-stage__eyebrow">先了解服務</p>
             <h2 id="intro-title" tabindex="-1" data-panel-focus>服務說明</h2>
             <p class="drawing-stage__summary">
-              PCM 圖說檢討會把「圖面現在能支持的討論」與「仍需報價、細部圖或乙方說明的決策問題」分開，讓甲方知道下一個問題要交給誰。
+              萊比圖說檢討會把「圖面現在能支持的討論」與「仍需報價、細部圖或乙方說明的決策問題」分開，讓甲方知道下一個問題要交給誰。
             </p>
             <div class="drawing-check-list" role="list">
               <p role="listitem"><span>01</span>圖說是否有明確檔名、版次與提供者。</p>
@@ -114,11 +114,11 @@
             <p class="drawing-stage__eyebrow">確認使用方式</p>
             <h2 id="consent-title" tabindex="-1" data-panel-focus>同意本機檢視</h2>
             <p class="drawing-stage__summary">
-              本頁只讀取你選擇的檔名與瀏覽器提供的檔案標示，尚未送出或保存；離開或重新整理後，選擇狀態不會保留。
+              本頁會在你的瀏覽器內暫時讀取 PDF 內容並整理圖面結構，檔案不會送出或保存；離開或重新整理後，辨識狀態不會保留。
             </p>
             <label class="consent-line" for="local-consent">
               <input id="local-consent" type="checkbox" />
-              <span><strong>我了解目前只做本機文件準備。</strong> 正式收件、案件建立、圖面解析與結果產生都尚未進行。</span>
+              <span><strong>我了解目前只做瀏覽器內圖說整理。</strong> 本次辨識不是正式收件、尺寸確認、案件建立或案件紀錄。</span>
             </label>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-next-step="SELECT_FILE" data-consent-continue disabled>同意並選擇圖說 PDF</button>
@@ -134,7 +134,7 @@
             </p>
             <label class="file-choice" for="drawing-file">
               <span class="file-choice__mark" aria-hidden="true">PDF</span>
-              <span><strong>從裝置選擇圖說 PDF</strong><small>接受瀏覽器標示為 PDF 的單一檔案；其餘條件會先顯示待確認。</small></span>
+              <span><strong>從裝置選擇圖說 PDF</strong><small>接受單一 PDF；選擇後會檢查內容格式並整理可辨識的圖面結構。</small></span>
               <span class="file-choice__action">選擇檔案</span>
             </label>
             <input id="drawing-file" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" />
@@ -144,16 +144,22 @@
           </section>
 
           <section data-flow-panel="VALIDATION_PENDING" aria-labelledby="validation-title" hidden>
-            <p class="drawing-stage__eyebrow">條件待確認</p>
-            <h2 id="validation-title" tabindex="-1" data-panel-focus>檔案標示與後續確認</h2>
+            <p class="drawing-stage__eyebrow">瀏覽器內辨識</p>
+            <h2 id="validation-title" tabindex="-1" data-panel-focus>圖說內容與後續確認</h2>
             <p class="selected-file">本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
-            <dl class="validation-list">
-              <div><dt>檔案標示</dt><dd class="status-pending">瀏覽器標示為 PDF；檔名僅供辨識，內容格式尚待驗證</dd></div>
-              <div><dt>檔案大小</dt><dd>大小待正式規則確認</dd></div>
-              <div><dt>圖說頁數</dt><dd>頁數待正式解析</dd></div>
-              <div><dt>尺寸與文字</dt><dd>圖面可讀性待正式解析</dd></div>
+            <div class="recognition-status" data-recognition-output data-recognition-state="processing" role="status" aria-live="polite">
+              <span data-recognition-kicker>正在整理</span>
+              <strong data-recognition-title>正在讀取 PDF 圖面結構</strong>
+              <p data-recognition-message>請稍候；完成前不會形成任何圖說、尺寸或案件結論。</p>
+            </div>
+            <dl class="validation-list" aria-label="本次辨識摘要">
+              <div><dt>內容狀態</dt><dd class="status-pending" data-recognition-content>正在檢查 PDF 內容</dd></div>
+              <div><dt>檔案大小</dt><dd data-recognition-size>正在確認</dd></div>
+              <div><dt>圖說頁數</dt><dd data-recognition-pages>正在確認</dd></div>
+              <div><dt>圖面結構</dt><dd data-recognition-objects>正在整理</dd></div>
+              <div><dt>仍需確認</dt><dd data-recognition-uncertainty>辨識完成後顯示</dd></div>
             </dl>
-            <p class="drawing-note">目前沒有讀取圖面內容，也沒有正式檢討結果；「待確認」不等於通過。</p>
+            <p class="drawing-note">本次只在瀏覽器內整理，尚未保存案件；辨識內容不等於正式圖面、比例、尺寸或案件紀錄。</p>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-next-step="CORRECTION_REQUIRED">查看待確認清單</button>
               <button class="owner-first-secondary-action" type="button" data-next-step="RESELECT_FILE">重新選擇</button>
@@ -179,7 +185,7 @@
           <section data-flow-panel="RESELECT_FILE" aria-labelledby="reselect-title" hidden>
             <p class="drawing-stage__eyebrow">重新選擇文件</p>
             <h2 id="reselect-title" tabindex="-1" data-panel-focus>重新選擇</h2>
-            <p class="drawing-stage__summary">前一份檔案沒有送出或保存。改選後，只會重新顯示瀏覽器提供的檔案標示。</p>
+            <p class="drawing-stage__summary">前一份檔案沒有送出或保存。改選後，前次辨識會立即失效，再從新檔案重新整理。</p>
             <p class="selected-file">前次本機選擇：<strong data-selected-file-name>尚未選擇</strong></p>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-open-file>選擇另一份 PDF</button>
@@ -226,7 +232,7 @@
             </div>
             <div class="owner-first-actions">
               <button class="owner-first-primary-action" type="button" data-next-step="SELECT_FILE">重新選擇圖說 PDF</button>
-              <a class="owner-first-secondary-action" href="../public_home/code.html#top">返回 PCM 首頁</a>
+              <a class="owner-first-secondary-action" href="../public_home/code.html#top">返回萊比首頁</a>
             </div>
           </section>
 

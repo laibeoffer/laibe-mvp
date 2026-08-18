@@ -435,6 +435,61 @@ button {
   color: var(--owner-first-text);
 }
 
+.recognition-status {
+  display: grid;
+  gap: 7px;
+  margin-block-end: 18px;
+  padding: 18px 20px;
+  border-inline-start: 3px solid var(--owner-first-warning);
+  background: rgba(255, 177, 69, 0.055);
+}
+
+.recognition-status > span {
+  color: var(--owner-first-warning);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.recognition-status > strong {
+  font-size: 1.04rem;
+}
+
+.recognition-status > p {
+  margin: 0;
+  color: var(--owner-first-muted);
+  line-height: 1.6;
+}
+
+.recognition-status[data-recognition-state="recognized"] {
+  border-inline-start-color: var(--owner-first-success);
+  background: rgba(91, 211, 161, 0.055);
+}
+
+.recognition-status[data-recognition-state="recognized"] > span {
+  color: var(--owner-first-success);
+}
+
+.recognition-status[data-recognition-state="partial"] {
+  border-inline-start-color: var(--owner-first-secondary-text);
+  background: rgba(101, 216, 255, 0.055);
+}
+
+.recognition-status[data-recognition-state="partial"] > span {
+  color: var(--owner-first-secondary-text);
+}
+
+.recognition-status[data-recognition-state="unsupported"],
+.recognition-status[data-recognition-state="error"] {
+  border-inline-start-color: var(--owner-first-danger);
+  background: rgba(255, 102, 102, 0.055);
+}
+
+.recognition-status[data-recognition-state="unsupported"] > span,
+.recognition-status[data-recognition-state="error"] > span {
+  color: var(--owner-first-danger);
+}
+
 .validation-list,
 .result-format {
   margin: 0;
