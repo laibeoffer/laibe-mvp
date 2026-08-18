@@ -297,6 +297,67 @@ export function bindQualificationDetailReveal(root) {
   }
 }
 
+export function bindDecisionDetailReveal(root) {
+  try {
+    const nodes = root.querySelectorAll("[data-decision-node]");
+    const records = [];
+
+    for (const node of nodes) {
+      const trigger = node?.querySelector?.("h3");
+      const panel = node?.querySelector?.("[data-decision-detail]");
+      if (
+        !trigger ||
+        !panel ||
+        typeof panel.id !== "string" ||
+        panel.id.length === 0 ||
+        typeof trigger.addEventListener !== "function" ||
+        typeof trigger.setAttribute !== "function" ||
+        typeof panel.setAttribute !== "function" ||
+        typeof node?.classList?.add !== "function" ||
+        typeof node?.classList?.remove !== "function"
+      ) {
+        continue;
+      }
+
+      node.classList.remove("is-detail-active");
+      trigger.setAttribute("role", "button");
+      trigger.setAttribute("tabindex", "0");
+      trigger.setAttribute("aria-controls", panel.id);
+      trigger.setAttribute("aria-expanded", "false");
+      panel.setAttribute("aria-hidden", "true");
+      records.push({ node, trigger, panel });
+    }
+
+    const activateRecord = (current) => {
+      for (const record of records) {
+        const isActive = record === current;
+        if (isActive) {
+          record.node.classList.add("is-detail-active");
+        } else {
+          record.node.classList.remove("is-detail-active");
+        }
+        record.trigger.setAttribute("aria-expanded", isActive ? "true" : "false");
+        record.panel.setAttribute("aria-hidden", isActive ? "false" : "true");
+      }
+    };
+
+    for (const record of records) {
+      const { trigger } = record;
+      const activate = () => activateRecord(record);
+      trigger.addEventListener("pointerenter", activate);
+      trigger.addEventListener("focusin", activate);
+      trigger.addEventListener("click", activate);
+      trigger.addEventListener("keydown", (event) => {
+        if (event?.key !== "Enter" && event?.key !== " ") return;
+        event.preventDefault?.();
+        activate();
+      });
+    }
+  } catch {
+    return;
+  }
+}
+
 export function initPublicHome(
   root = document,
   integrationConfig = globalThis.PCM_PUBLIC_INTEGRATION_CONFIG ?? {},
@@ -305,6 +366,7 @@ export function initPublicHome(
   bindSameHashTopRecovery(root);
   applyPublicIntegrationStatus(root, integrationConfig);
   bindQualificationDetailReveal(root);
+  bindDecisionDetailReveal(root);
   root.documentElement?.classList.add("is-ready");
 }
 

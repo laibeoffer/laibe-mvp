@@ -331,7 +331,7 @@ test("three owner-facing chapters inherit the HERO palette, type hierarchy, and 
 
   assert.match(css, /\.decision-node:nth-child\(1\)\s*\{[^}]*--decision-step:\s*var\(--chapter-step-01\)/s);
   assert.match(css, /\.decision-node:nth-child\(4\)\s+\.decision-node__index\s*\{[^}]*color:\s*var\(--accent-orange\)/s);
-  assert.match(css, /\.decision-node__tool-icon\s*\{[^}]*color:\s*#fff/s);
+  assert.match(css, /\.decision-node__tool-icon\s*\{[^}]*color:\s*var\(--tool-ink\)/s);
   assert.match(css, /\.qualification-object:nth-child\(1\)\s*\{[^}]*--object-accent:\s*var\(--chapter-step-01\)/s);
   assert.match(css, /\.qualification-object__face\s*\{[^}]*var\(--chapter-surface\)/s);
   assert.match(css, /\.risk-map__item:nth-child\(3\)\s*\{[^}]*--risk-step:\s*var\(--accent-orange\)/s);
@@ -1003,6 +1003,185 @@ test("homepage turns five owner concerns into a central DRS decision path", asyn
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.decision-path__spine,[\s\S]*?\.decision-node,[\s\S]*?\.decision-convergence,[\s\S]*?\.decision-cta\s*\{[^}]*animation:\s*none/s);
 });
 
+test("decision titles reveal the approved detail checks and keep the latest panel open", async () => {
+  const [html, css, appSource] = await Promise.all([
+    readFile(htmlUrl, "utf8"),
+    readFile(cssUrl, "utf8"),
+    readFile(appUrl, "utf8"),
+  ]);
+  const decisionSection = readSection(html, "decision-prompts");
+  const nodes = [...decisionSection.matchAll(
+    /<li\b[^>]*class="decision-node decision-node--(?:left|right)(?: decision-node--action)?"[\s\S]*?<\/li>/g,
+  )].map((match) => match[0]);
+  const expectedDetails = [
+    {
+      id: "q01",
+      title: "材料是否安全？",
+      items: [
+        "木作／系統櫃板材的甲醛釋出等級是否有明確標示與證明？",
+        "油漆、塗料、黏著劑是否有標示VOC、成分或相關安全資訊？",
+        "電線、開關、插座等電氣材料是否有合格認證、規格與品牌型號？",
+        "浴室、廚房等區域使用的防水材料，是否有完整品牌、型號與施工規範？",
+        "玻璃、耐燃材料或其他涉及安全的材料，是否使用符合該使用位置要求的規格？",
+      ],
+    },
+    {
+      id: "q02",
+      title: "報價合不合理？",
+      items: [
+        "每個工項的單價是否落在合理市場區間？",
+        "數量、坪數、才數、米數是否和圖面及現場規模對得起來？",
+        "「一式」報價是否有說清楚到底包含哪些工作與材料？",
+        "報價是否漏掉後續一定會施工、最後卻可能變成追加的項目？",
+        "同一項工程是否存在重複計價、拆項計價或計算錯誤？",
+      ],
+    },
+    {
+      id: "q03",
+      title: "圖說是否缺漏？",
+      items: [
+        "重要櫃體、牆面、天花等是否有完整尺寸與定位？",
+        "圖面上的材料是否有寫清楚材質、規格、型號或施工方式？",
+        "插座、開關、燈具、給排水等位置是否有足夠圖面可供施工？",
+        "特殊造型、收邊、櫃體或施工轉折處，是否缺少立面圖、剖面圖或細部圖？",
+        "平面圖、3D、報價單與施工圖之間，是否出現內容互相對不起來的地方？",
+      ],
+    },
+    {
+      id: "q04",
+      title: "追加是否正常？",
+      items: [
+        "追加項目是否其實已包含在原契約、原報價或原圖說內？",
+        "追加是因為甲方新增需求，還是因為乙方原本漏報、漏估或漏畫？",
+        "追加的單價是否有依據，是否落在合理市場價格範圍？",
+        "追加的數量與金額是否有清楚計算，而不是只寫「追加一式」？",
+        "追加施工前，是否已經把金額、工期影響與施工內容先讓甲方確認？",
+      ],
+    },
+    {
+      id: "q05",
+      title: "合約是否公平？",
+      items: [
+        "付款是否真的對應施工完成節點與應交成果，還是只按照日期收款？",
+        "追加、變更是否規定要先取得甲方確認，再施工、再計價？",
+        "工程延期時，甲乙雙方各自應負什麼責任，是否只有約束甲方、沒有約束乙方？",
+        "驗收發現缺失時，是否明確約定改善責任、改善期限與後續處理方式？",
+        "契約提前終止時，已付款、已完成工程、材料、圖說及設計成果要怎麼結算，是否對雙方都有明確規則？",
+      ],
+    },
+  ];
+
+  assert.equal(nodes.length, 5);
+  for (const [index, expected] of expectedDetails.entries()) {
+    assert.match(nodes[index], new RegExp(`<h3>${expected.title}<\\/h3>`));
+    const panel = nodes[index].match(
+      new RegExp(`<aside\\b(?=[^>]*class="decision-node__details")(?=[^>]*id="decision-detail-${expected.id}")(?=[^>]*data-decision-detail)(?=[^>]*aria-hidden="true")[^>]*>[\\s\\S]*?<\\/aside>`),
+    )?.[0] ?? "";
+    const items = [...panel.matchAll(/<p class="decision-node__details-item" role="listitem">([\s\S]*?)<\/p>/g)].map((match) => (
+      match[1].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+    ));
+
+    assert.doesNotMatch(panel, /decision-node__details-(?:kicker|title)|<strong\b/);
+    assert.match(panel, /class="decision-node__details-list" role="list"/);
+    assert.deepEqual(items, expected.items);
+  }
+
+  assert.match(css, /\.decision-node__details\s*\{[^}]*--decision-details-expanded-height:\s*760px;[^}]*position:\s*static;[^}]*width:\s*100%;[^}]*max-height:\s*0;[^}]*overflow:\s*hidden;[^}]*margin-top:\s*0;[^}]*padding:\s*0;[^}]*border:\s*0;[^}]*background:\s*transparent;[^}]*box-shadow:\s*none;[^}]*opacity:\s*0;[^}]*visibility:\s*hidden;[^}]*pointer-events:\s*none;/s);
+  assert.match(css, /\.decision-node\.is-detail-active\s+\.decision-node__details\s*\{[^}]*max-height:\s*var\(--decision-details-expanded-height\);[^}]*margin-top:\s*clamp\(18px,\s*2vw,\s*24px\);[^}]*opacity:\s*1;[^}]*visibility:\s*visible;[^}]*pointer-events:\s*auto;[^}]*transform:\s*translateY\(0\);/s);
+  assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node__details\s*\{[^}]*--decision-details-expanded-height:\s*1100px;/s);
+  assert.doesNotMatch(css, /\.decision-node\.is-detail-active\s*\{[^}]*animation:\s*none/s);
+  assert.doesNotMatch(css, /\.decision-node--(?:left|right)\s+\.decision-node__details\s*\{[^}]*\b(?:left|right|inset):/s);
+  assert.match(appSource, /export function bindDecisionDetailReveal/);
+  assert.match(appSource, /addEventListener\("pointerenter",\s*activate\)/);
+  assert.match(appSource, /addEventListener\("focusin",\s*activate\)/);
+  assert.match(appSource, /addEventListener\("click",\s*activate\)/);
+  assert.doesNotMatch(appSource, /addEventListener\("(?:pointerleave|mouseleave)",/);
+  assert.match(appSource, /bindDecisionDetailReveal\(root\)/);
+
+  const { bindDecisionDetailReveal } = await import(
+    `${appUrl.href}?decision-detail-reveal=${Date.now()}`
+  );
+  const makeClassList = () => {
+    const values = new Set();
+    return {
+      add: (value) => values.add(value),
+      remove: (value) => values.delete(value),
+      contains: (value) => values.has(value),
+    };
+  };
+  const mockNodes = expectedDetails.map((expected) => {
+    const panelAttributes = new Map([["aria-hidden", "true"]]);
+    const triggerAttributes = new Map();
+    const listeners = {};
+    const panel = {
+      id: `decision-detail-${expected.id}`,
+      setAttribute(name, value) {
+        panelAttributes.set(name, String(value));
+      },
+      getAttribute(name) {
+        return panelAttributes.get(name) ?? null;
+      },
+    };
+    const trigger = {
+      listeners,
+      addEventListener(name, listener) {
+        listeners[name] = listener;
+      },
+      setAttribute(name, value) {
+        triggerAttributes.set(name, String(value));
+      },
+      getAttribute(name) {
+        return triggerAttributes.get(name) ?? null;
+      },
+    };
+    return {
+      classList: makeClassList(),
+      panel,
+      trigger,
+      querySelector(selector) {
+        if (selector === "h3") return trigger;
+        if (selector === "[data-decision-detail]") return panel;
+        return null;
+      },
+    };
+  });
+
+  bindDecisionDetailReveal({
+    querySelectorAll(selector) {
+      return selector === "[data-decision-node]" ? mockNodes : [];
+    },
+  });
+  for (const node of mockNodes) {
+    assert.equal(node.trigger.getAttribute("role"), "button");
+    assert.equal(node.trigger.getAttribute("tabindex"), "0");
+    assert.equal(node.trigger.getAttribute("aria-controls"), node.panel.id);
+    assert.equal(node.trigger.getAttribute("aria-expanded"), "false");
+    assert.equal(node.panel.getAttribute("aria-hidden"), "true");
+    assert.equal(typeof node.trigger.listeners.pointerenter, "function");
+    assert.equal(typeof node.trigger.listeners.focusin, "function");
+    assert.equal(typeof node.trigger.listeners.click, "function");
+    assert.equal(node.trigger.listeners.pointerleave, undefined);
+    assert.equal(node.trigger.listeners.mouseleave, undefined);
+  }
+
+  mockNodes[0].trigger.listeners.pointerenter();
+  assert.equal(mockNodes[0].classList.contains("is-detail-active"), true);
+  assert.equal(mockNodes[0].trigger.getAttribute("aria-expanded"), "true");
+  assert.equal(mockNodes[0].panel.getAttribute("aria-hidden"), "false");
+  assert.equal(mockNodes[0].classList.contains("is-detail-active"), true);
+
+  mockNodes[1].trigger.listeners.click();
+  assert.equal(mockNodes[0].classList.contains("is-detail-active"), false);
+  assert.equal(mockNodes[0].trigger.getAttribute("aria-expanded"), "false");
+  assert.equal(mockNodes[0].panel.getAttribute("aria-hidden"), "true");
+  assert.equal(mockNodes[1].classList.contains("is-detail-active"), true);
+  assert.equal(mockNodes[1].panel.getAttribute("aria-hidden"), "false");
+
+  mockNodes[2].trigger.listeners.focusin();
+  assert.equal(mockNodes[1].classList.contains("is-detail-active"), false);
+  assert.equal(mockNodes[2].classList.contains("is-detail-active"), true);
+});
+
 test("three decision branches consume their dedicated manifest-only quote-check mode routes", async () => {
   const [html, css, appSource, publicContractSource] = await Promise.all([
     readFile(htmlUrl, "utf8"),
@@ -1081,32 +1260,37 @@ test("three decision branches consume their dedicated manifest-only quote-check 
   assert.match(css, /\.decision-node__heading\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*flex-end/s);
   assert.match(css, /\.decision-node__heading h3\s*\{[^}]*margin:\s*1em 0 0/s);
   const toolCss = css.match(/\.decision-node__tool\s*\{[^}]*\}/s)?.[0] ?? "";
-  assert.match(toolCss, /--tool-glass:[^;]*var\(--decision-step\)/s);
-  assert.match(toolCss, /--tool-frame-deep:[^;]*var\(--tool-glass\)/s);
-  assert.match(toolCss, /--tool-frame-hot:[^;]*var\(--tool-edge\)/s);
-  assert.match(toolCss, /--tool-well:[^;]*var\(--decision-step\)[^;]*var\(--chapter-surface\)/s);
+  assert.match(toolCss, /--tool-frame-deep:\s*#5a3605/s);
+  assert.match(toolCss, /--tool-frame-mid:\s*#d3a733/s);
+  assert.match(toolCss, /--tool-frame-hot:\s*#fff0a3/s);
+  assert.match(toolCss, /--tool-face-start:\s*#b9b6af/s);
+  assert.match(toolCss, /--tool-face-highlight:\s*#fffdf6/s);
+  assert.match(toolCss, /--tool-ink:\s*#17130b/s);
   assert.match(toolCss, /display:\s*inline-flex;[\s\S]*?min-height:\s*48px/);
-  assert.match(toolCss, /border-radius:\s*4px;[\s\S]*?overflow:\s*hidden/);
-  assert.match(toolCss, /background:\s*linear-gradient\(\s*118deg,[^}]*var\(--tool-frame-hot\)[^}]*var\(--tool-frame-deep\)/s);
-  assert.match(toolCss, /box-shadow:[\s\S]*?inset 0 1px 0 rgba\(255, 255, 255, 0\.58\)[\s\S]*?0 6px 14px -10px var\(--tool-glow\)/s);
-  assert.doesNotMatch(toolCss, /border-radius:\s*var\(--pill\)|radial-gradient\(ellipse at 50% 88%|clip-path/);
+  assert.match(toolCss, /border-radius:\s*2px 28px 2px 28px;[\s\S]*?overflow:\s*hidden/);
+  assert.match(toolCss, /background:\s*linear-gradient\(\s*112deg,[^}]*var\(--tool-frame-deep\)[^}]*var\(--tool-frame-hot\)[^}]*var\(--tool-frame-mid\)/s);
+  assert.match(toolCss, /box-shadow:[\s\S]*?inset 0 1px 0 rgba\(255, 255, 255, 0\.84\)[\s\S]*?0 0 14px -4px var\(--tool-glow\)/s);
+  assert.doesNotMatch(toolCss, /border-radius:\s*var\(--pill\)|clip-path/);
   assert.match(toolCss, /font-weight:\s*800;[\s\S]*?letter-spacing:\s*0\.065em/);
-  assert.match(css, /\.decision-node__tool::before\s*\{[^}]*inset:\s*2px;[^}]*border-radius:\s*inherit;[^}]*background:\s*linear-gradient\(105deg,\s*var\(--tool-well\)[^}]*inset -2px -2px 4px rgba\(0, 0, 0, 0\.68\)[^}]*content:\s*""/s);
-  assert.match(css, /\.decision-node__tool::after\s*\{[^}]*inset:\s*3px;[^}]*border-radius:\s*inherit;[^}]*background:\s*repeating-linear-gradient\(100deg,[^}]*filter:\s*none;[^}]*opacity:\s*0\.32/s);
-  assert.match(css, /\.decision-node__tool-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*0\.14em;[^}]*transform:\s*translateY\(-1px\);[^}]*text-shadow:[^}]*rgba\(0,\s*0,\s*0,\s*0\.54\)/s);
-  assert.match(css, /\.decision-node__tool-subject\s*\{[^}]*color:\s*#fff;[^}]*font-weight:\s*900/s);
-  assert.match(css, /\.decision-node__tool-action\s*\{[^}]*color:\s*rgba\(245,\s*251,\s*253,\s*0\.82\);[^}]*font-weight:\s*720/s);
-  assert.match(css, /\.decision-node__tool-icon\s*\{[^}]*z-index:\s*1;[^}]*stroke-width:\s*2\.35/s);
-  assert.match(css, /\.decision-node:nth-child\(5\)\s+\.decision-node__tool\s*\{[^}]*--tool-glass:/s);
-  assert.match(css, /\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*-1;[^}]*border-radius:\s*28px 4px 4px 18px/s);
-  assert.match(css, /\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*4px 28px 18px 4px/s);
+  assert.match(css, /\.decision-node__tool\[data-decision-tool="quote"\]\s*\{[^}]*--tool-face-start:\s*#b9b6af;[^}]*--tool-face-highlight:\s*#fffdf6;[^}]*--tool-ink:\s*#17130b/s);
+  assert.match(css, /\.decision-node__tool\[data-decision-tool="drawing"\]\s*\{[^}]*--tool-face-start:\s*#090806;[^}]*--tool-face-highlight:\s*#39342d;[^}]*--tool-ink:\s*#f1cb69/s);
+  assert.match(css, /\.decision-node__tool\[data-decision-tool="contract"\]\s*\{[^}]*--tool-frame-deep:\s*#74716a;[^}]*--tool-face-start:\s*#9f6906;[^}]*--tool-face-highlight:\s*#fff279;[^}]*--tool-ink:\s*#211505/s);
+  assert.match(css, /\.decision-node__tool::before\s*\{[^}]*inset:\s*2px;[^}]*border-radius:\s*inherit;[^}]*background:[^}]*radial-gradient\(circle at 24% 18%,\s*var\(--tool-sheen\),\s*transparent 34%\)[^}]*linear-gradient\(\s*104deg,[^}]*var\(--tool-face-start\)[^}]*var\(--tool-face-highlight\)[^}]*var\(--tool-face-end\)[^}]*content:\s*""/s);
+  assert.match(css, /\.decision-node__tool::after\s*\{[^}]*inset:\s*3px;[^}]*border-radius:\s*inherit;[^}]*background:[^}]*repeating-linear-gradient\(164deg,[^}]*mix-blend-mode:\s*soft-light;[^}]*opacity:\s*0\.62/s);
+  assert.match(css, /\.decision-node__tool-label\s*\{[^}]*display:\s*inline-flex;[^}]*align-items:\s*baseline;[^}]*gap:\s*0\.14em;[^}]*transform:\s*translateY\(-1px\);[^}]*text-shadow:\s*var\(--tool-text-shadow\)/s);
+  assert.match(css, /\.decision-node__tool-subject\s*\{[^}]*color:\s*var\(--tool-ink\);[^}]*font-weight:\s*900/s);
+  assert.match(css, /\.decision-node__tool-action\s*\{[^}]*color:\s*var\(--tool-ink-muted\);[^}]*font-weight:\s*720/s);
+  assert.match(css, /\.decision-node__tool-icon\s*\{[^}]*z-index:\s*1;[^}]*color:\s*var\(--tool-ink\);[^}]*stroke-width:\s*2\.35/s);
+  assert.match(css, /\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*-1/s);
+  assert.match(css, /\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*2px 28px 2px 28px/s);
   assert.match(css, /\.decision-node--action\s+\.decision-node__copy p\s*\{[^}]*margin-top:\s*clamp\(34px,\s*3vw,\s*42px\)/s);
-  assert.match(css, /\.decision-node__tool:hover\s*\{[^}]*transform:\s*translateY\(calc\(50%\s*-\s*2px\)\)/s);
+  assert.match(css, /\.decision-node__tool:hover\s*\{[^}]*transform:\s*translateY\(calc\(50%\s*-\s*2px\)\)[^}]*var\(--tool-glow\)/s);
+  assert.match(css, /\.decision-node__tool:hover::before\s*\{[^}]*filter:\s*brightness\(1\.08\)\s+saturate\(1\.04\)/s);
   assert.match(css, /\.decision-node__tool:focus-visible\s*\{[^}]*outline:\s*2px solid #fff/s);
   assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool\s*\{[^}]*order:\s*0/s);
-  assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*4px 22px 15px 4px/s);
+  assert.match(css, /@media\s*\(max-width:\s*680px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*2px 22px 2px 22px/s);
   assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node__tool\s*\{[^}]*min-height:\s*44px;[^}]*font-size:\s*0\.68rem/s);
-  assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*4px 18px 12px 4px/s);
+  assert.match(css, /@media\s*\(max-width:\s*360px\)[\s\S]*?\.decision-node--left\s+\.decision-node__tool,\s*\.decision-node--right\s+\.decision-node__tool\s*\{[^}]*border-radius:\s*2px 18px 2px 18px/s);
 
   const { PUBLIC_ROUTES } = await import(
     `${publicContractUrl.href}?home-decision-routes=${Date.now()}`
