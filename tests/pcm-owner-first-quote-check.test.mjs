@@ -530,6 +530,14 @@ function createDocumentWorkspaceHarness() {
     input.setAttribute("aria-invalid", "false");
     return [kind, input];
   }));
+  const reportActions = Object.fromEntries(kinds.map((kind) => [kind, createNode({
+    dataset: { aiReportAction: kind },
+    disabled: true,
+  })]));
+  const reportStatuses = Object.fromEntries(kinds.map((kind) => [kind, createNode({
+    dataset: { aiReportStatus: kind, reportState: "waiting-file" },
+    textContent: "請先選擇 PDF，才能查看 AI 檢查報告的開放狀態。",
+  })]));
   const itemSpecs = [
     ["quote", "quote-scope", "報價內容", "是否有項目只寫名稱，沒有規格或範圍？"],
     ["contract", "contract-change", "契約條款", "追加與變更由誰提出、誰確認？"],
@@ -609,6 +617,7 @@ function createDocumentWorkspaceHarness() {
     if (selector === "[data-document-panel]") return Object.values(panels);
     if (selector === "[data-document-file]") return Object.values(fileInputs);
     if (selector === "[data-document-dropzone]") return Object.values(dropzones);
+    if (selector === "[data-ai-report-action]") return Object.values(reportActions);
     if (selector === "[data-check-item]") return checkItems;
     if (selector === "[data-current-status]") return [currentStatus];
     if (selector === "[data-current-next]") return [currentNext];
@@ -621,7 +630,7 @@ function createDocumentWorkspaceHarness() {
   pageRoot.querySelector = (selector) => {
     if (selector === "[data-document-workspace-root]") return workspaceRoot;
     if (selector === "[data-state-live]") return live;
-    if (selector === "[data-start-self-check]") return start;
+    if (selector === "[data-start-upload]") return start;
     if (selector === "[data-pending-list]") return pendingList;
     if (selector === "[data-pending-empty]") return pendingEmpty;
     if (selector === "[data-copy-pending]") return copyPending;
@@ -632,6 +641,8 @@ function createDocumentWorkspaceHarness() {
       ["document-filename", filename],
       ["selected-file", selectedRows],
       ["document-file", fileInputs],
+      ["ai-report-action", reportActions],
+      ["ai-report-status", reportStatuses],
     ];
     for (const [attribute, values] of selectors) {
       const match = selector.match(new RegExp(`^\\[data-${attribute}="(quote|contract|drawing)"\\]$`, "u"));
@@ -656,6 +667,8 @@ function createDocumentWorkspaceHarness() {
     panels,
     pendingEmpty,
     pendingList,
+    reportActions,
+    reportStatuses,
     selectedRows,
     start,
     summaryTargets,
@@ -674,6 +687,9 @@ function createDocumentWorkspaceHarness() {
       await dropzones[kind].dispatch("drop", {
         dataTransfer: { files: new HarnessFileList(file ? [file] : []) },
       });
+    },
+    async requestAiReport(kind) {
+      await reportActions[kind].dispatch("click");
     },
     async selectStatus(kind, status, { note = "", owner = "owner" } = {}) {
       const item = items[kind];
@@ -825,8 +841,8 @@ test("quote check starts as one canonical three-file page", async () => {
 test("quote check final runtime asset identity binds the changed page assets", async () => {
   const html = await readFile(htmlPath, "utf8");
 
-  assert.match(html, /href="\.\/styles\.css\?v=20260817-self-check-v2"/);
-  assert.match(html, /src="\.\/app\.js\?v=20260817-self-check-v2"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260818-ai-report-v1"/);
+  assert.match(html, /src="\.\/app\.js\?v=20260818-ai-report-v1"/);
 });
 
 test("legacy owner journey is absent", async () => {
@@ -864,7 +880,7 @@ test("quote check header keeps the current page and DRS home visible", async () 
   );
 });
 
-test("approved self-check workspace contract is visible truthful and memory only", async () => {
+test("approved two-function workspace is visible truthful and memory only", async () => {
   const [html, app, styles] = await Promise.all([
     readFile(htmlPath, "utf8"),
     readFile(appPath, "utf8"),
@@ -872,46 +888,43 @@ test("approved self-check workspace contract is visible truthful and memory only
   ]);
   const visible = stripNonVisibleHtml(html);
 
-  assert.match(html, /<h1[^>]*>報價文件自查<\/h1>/u);
+  assert.match(html, /<h1[^>]*>報價文件檢查<\/h1>/u);
   assert.match(
     visible,
-    /目前版本提供固定自查清單，不會讀取或分析 PDF 內容。選擇檔案只會在本次瀏覽顯示檔名，不會送出或保存。/u,
+    /目前只會在本次瀏覽顯示你選擇的 PDF 檔名，不會送出或保存。AI 檢查報告功能正在整理中，尚未讀取或分析檔案內容。/u,
   );
-  assert.match(html, /data-start-self-check[^>]*>\s*開始第一項自查\s*<\/button>/u);
-  assert.equal((html.match(/data-check-item\b/gu) ?? []).length, 9);
-  for (const value of ["unconfirmed", "clear", "needs-info", "uncertain"]) {
-    assert.equal(
-      (html.match(new RegExp(`value="${value}"`, "gu")) ?? []).length,
-      9,
-      `${value} must be available for every question`,
-    );
-  }
-  assert.match(html, /data-self-check-summary/u);
-  assert.match(html, /data-summary-confirmed/u);
-  assert.match(html, /data-summary-needs-info/u);
-  assert.match(html, /data-summary-uncertain/u);
+  assert.doesNotMatch(visible, /上傳/u, "本機檔名選擇流程不得對使用者宣稱上傳");
+  assert.match(html, /data-start-upload[^>]*>\s*選擇第一份 PDF\s*<\/button>/u);
+  assert.equal((html.match(/data-document-upload-step\b/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-ai-report-step\b/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-ai-report-action=/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-ai-report-status=/gu) ?? []).length, 3);
+  assert.equal((html.match(/class="document-action-step(?:\s|")/gu) ?? []).length, 6);
+  assert.doesNotMatch(html, /data-check-item\b|type="radio"|data-check-note|data-check-owner/u);
+  assert.doesNotMatch(html, /data-self-check-summary|data-summary-confirmed|data-summary-needs-info|data-summary-uncertain/u);
   assert.match(html, /data-file-selection-summary/u);
-  assert.match(html, /data-pending-list/u);
-  assert.match(html, /data-copy-pending/u);
-  assert.match(visible, /目前沒有待確認事項。你仍可繼續檢查其他項目。/u);
+  assert.doesNotMatch(html, /data-pending-list|data-copy-pending/u);
+  assert.match(visible, /請先選擇 PDF，才能查看 AI 檢查報告的開放狀態。/u);
+  assert.match(visible, /AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。/u);
   assert.match(
     visible,
-    /本次自查內容只保留在目前頁面；重新整理或離開後會消失，尚未建立案件紀錄。/u,
+    /本次選擇只保留在目前頁面；重新整理或離開後會消失，尚未建立案件紀錄。/u,
   );
   assert.equal((html.match(/aria-live=/gu) ?? []).length, 1);
-  assert.doesNotMatch(visible, /檢查報告輸出|已建立檢查方向摘要|文件基礎已建立|查看基本報告範例/u);
+  assert.doesNotMatch(visible, /已完成 PDF 分析|風險評分|已產生報告|正式檢查報告/u);
 
   assert.match(app, /application\/pdf/u);
   assert.match(app, /\.pdf\$/u);
-  assert.match(app, /已選擇檔案，尚未分析內容。/u);
-  assert.match(app, /三類檔名已選擇，尚未分析或比對。/u);
+  assert.match(app, /AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。/u);
+  assert.doesNotMatch(app, /上傳/u, "動態可見文案不得對使用者宣稱上傳");
+  assert.match(app, /請先選擇 PDF，才能查看 AI 檢查報告的開放狀態。/u);
   assert.match(app, /ArrowLeft[\s\S]*ArrowRight[\s\S]*Home[\s\S]*End/u);
   assert.match(app, /location\.hash/u);
   assert.match(app, /requestAnimationFrame\(applyInitialHash\)/u);
   assert.match(app, /aria-invalid/u);
   assert.doesNotMatch(app, /localStorage|sessionStorage|FileReader/u);
 
-  assert.match(styles, /\.self-check-option[^}]*min-(?:block-)?size:\s*44px/u);
+  assert.match(styles, /\.ai-report-action[^}]*min-(?:block-)?size:\s*48px/u);
   assert.match(styles, /@media\s*\(max-width:\s*760px\)/u);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/u);
 });
@@ -1001,11 +1014,11 @@ test("production bootstrap applies mode to the first rendered tab and panel stat
   }
 });
 
-test("production workspace DOM listeners drive deep links tabs CTA self-check and clipboard", async () => {
+test("production workspace DOM listeners drive deep links tabs upload CTA and truthful AI report boundary", async () => {
   const app = await importDocumentWorkspaceApp("workspace-dom-listeners");
   const harness = createDocumentWorkspaceHarness();
   app.initializeQuoteCheckPage(harness.documentRoot, {
-    hash: "#check-contract-change",
+    hash: "#document-panel-contract",
     search: "?mode=quote",
   });
 
@@ -1013,7 +1026,7 @@ test("production workspace DOM listeners drive deep links tabs CTA self-check an
   assert.equal(harness.tabs.contract.tabIndex, 0);
   assert.equal(harness.panels.contract.hidden, false);
   assert.equal(harness.panels.quote.hidden, true);
-  assert.equal(harness.activeElement(), harness.items.contract);
+  assert.equal(harness.activeElement(), harness.panels.contract);
 
   let prevented = false;
   await harness.tabs.contract.dispatch("keydown", {
@@ -1039,56 +1052,22 @@ test("production workspace DOM listeners drive deep links tabs CTA self-check an
   assert.equal(harness.panels.quote.hidden, false);
 
   await harness.start.dispatch("click");
-  assert.equal(harness.activeElement(), harness.items.quote);
-  assert.match(harness.live.textContent, /第一個尚未確認項目/u);
+  assert.equal(harness.activeElement(), harness.fileInputs.quote);
+  assert.match(harness.live.textContent, /選擇報價內容 PDF/u);
 
-  await harness.selectStatus("quote", "needs-info", {
-    note: "缺少櫃體尺寸與材質",
-    owner: "provider",
-  });
-  assert.equal(harness.items.quote.details.hidden, false);
-  assert.equal(harness.summaryTargets["[data-summary-confirmed]"].textContent, "1/3");
-  assert.equal(harness.summaryTargets["[data-summary-needs-info]"].textContent, "1");
-  assert.equal(harness.summaryTargets["[data-summary-provider]"].textContent, "1");
-  assert.equal(harness.pendingEmpty.hidden, true);
-  assert.equal(harness.pendingList.hidden, false);
-  assert.equal(harness.pendingList.children.length, 1);
-  assert.equal(harness.copyPending.disabled, false);
+  assert.equal(harness.reportActions.quote.disabled, true);
+  await harness.chooseFile("quote", browserFile("報價.pdf", "application/pdf"));
+  assert.equal(harness.reportActions.quote.disabled, false);
+  assert.equal(harness.reportStatuses.quote.dataset.reportState, "ready");
+  assert.match(harness.reportStatuses.quote.textContent, /檔案已就緒/u);
 
-  const navigatorDescriptor = Object.getOwnPropertyDescriptor(globalThis, "navigator");
-  let copiedText = "";
-  try {
-    Object.defineProperty(globalThis, "navigator", {
-      configurable: true,
-      value: {
-        clipboard: {
-          async writeText(value) {
-            copiedText = value;
-          },
-        },
-      },
-    });
-    await harness.copyPending.dispatch("click");
-    assert.match(copiedText, /報價內容｜需要補件/u);
-    assert.match(copiedText, /缺少櫃體尺寸與材質/u);
-    assert.match(copiedText, /設計師／統包/u);
-    assert.equal(harness.copyFeedback.textContent, "已複製待確認事項。");
-
-    globalThis.navigator.clipboard.writeText = async () => {
-      throw new Error("clipboard denied");
-    };
-    await harness.copyPending.dispatch("click");
-    assert.equal(
-      harness.copyFeedback.textContent,
-      "目前無法自動複製，請手動選取待確認事項。",
-    );
-  } finally {
-    if (navigatorDescriptor) {
-      Object.defineProperty(globalThis, "navigator", navigatorDescriptor);
-    } else {
-      delete globalThis.navigator;
-    }
-  }
+  await harness.requestAiReport("quote");
+  assert.equal(harness.reportStatuses.quote.dataset.reportState, "unavailable");
+  assert.equal(
+    harness.reportStatuses.quote.textContent,
+    "AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。",
+  );
+  assert.match(harness.live.textContent, /AI 檢查報告功能正在整理中/u);
 });
 
 test("production workspace file events keep one truth across cancel invalid drop and recovery", async () => {
@@ -1100,14 +1079,15 @@ test("production workspace file events keep one truth across cancel invalid drop
   await harness.chooseFile("quote", quotePdf);
   assert.equal(harness.filename.quote.textContent, "A.pdf");
   assert.equal(harness.selectedRows.quote.hidden, false);
-  assert.equal(harness.feedback.quote.textContent, "已選擇檔案，尚未分析內容。");
+  assert.equal(harness.feedback.quote.textContent, "已選擇檔案，尚未產生檢查報告。");
+  assert.equal(harness.reportActions.quote.disabled, false);
   assert.equal(harness.fileInputs.quote.getAttribute("aria-invalid"), "false");
   assert.equal(harness.fileInputs.quote.getAttribute("aria-describedby"), "document-feedback-quote");
 
   await harness.cancelFilePicker("quote");
   assert.equal(harness.filename.quote.textContent, "A.pdf");
   assert.equal(harness.selectedRows.quote.hidden, false);
-  assert.equal(harness.feedback.quote.textContent, "已選擇檔案，尚未分析內容。");
+  assert.equal(harness.feedback.quote.textContent, "已選擇檔案，尚未產生檢查報告。");
 
   await harness.dropFile("quote", browserFile("不是PDF.txt", "text/plain"));
   assert.equal(harness.filename.quote.textContent, "");
@@ -1119,12 +1099,12 @@ test("production workspace file events keep one truth across cancel invalid drop
   await harness.chooseFile("quote", browserFile("A.pdf", ""));
   assert.equal(harness.filename.quote.textContent, "A.pdf");
   assert.equal(harness.selectedRows.quote.hidden, false);
-  assert.equal(harness.feedback.quote.textContent, "已選擇檔案，尚未分析內容。");
+  assert.equal(harness.feedback.quote.textContent, "已選擇檔案，尚未產生檢查報告。");
   assert.equal(harness.fileInputs.quote.getAttribute("aria-invalid"), "false");
 
   await harness.chooseFile("contract", browserFile("契約.pdf", "application/pdf"));
   await harness.chooseFile("drawing", browserFile("圖說.PDF", "text/plain"));
-  assert.equal(harness.fileSelectionSummary.textContent, "三類檔名已選擇，尚未分析或比對。");
+  assert.equal(harness.fileSelectionSummary.textContent, "三類檔案已選擇；AI 檢查報告尚未開放。");
 });
 
 test("missing or invalid mode query falls back quietly to quote", async () => {
@@ -1135,20 +1115,21 @@ test("missing or invalid mode query falls back quietly to quote", async () => {
   }
 });
 
-test("quote check completion path stays on the self-check result and keeps DRS home available", async () => {
+test("quote check two-function path stays on the page and keeps DRS home available", async () => {
   const [html, app] = await Promise.all([
     readFile(htmlPath, "utf8"),
     readFile(appPath, "utf8"),
   ]);
 
-  assert.match(html, /id="self-check-summary"[^>]*data-self-check-summary/u);
-  assert.match(html, /data-copy-pending[^>]*>複製待確認事項<\/button>/u);
+  assert.equal((html.match(/data-document-upload-step\b/gu) ?? []).length, 3);
+  assert.equal((html.match(/data-ai-report-step\b/gu) ?? []).length, 3);
+  assert.doesNotMatch(html, /data-self-check-summary|data-copy-pending/u);
   assert.match(html, /href="\.\.\/public_home\/code\.html#top"[^>]*>DRS 首頁<\/a>/u);
   assert.doesNotMatch(html, /href="\.\.\/basic_report\/code\.html"/u);
-  assert.match(app, /可複製整理結果，或返回 DRS 首頁。/u);
+  assert.match(app, /AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。/u);
 });
 
-test("self-check hero is the first surface and keeps the optional document workspace below it", async () => {
+test("file-check hero is the first surface and keeps the two-function document workspace below it", async () => {
   const html = await readFile(htmlPath, "utf8");
   const mainSource = html.match(
     /<main\b[^>]*data-quote-check-page[^>]*>([\s\S]*?)<\/main>/u,
@@ -1161,10 +1142,10 @@ test("self-check hero is the first surface and keeps the optional document works
   );
   assert.match(
     mainSource,
-    /^\s*<section class="self-check-hero" aria-labelledby="workspace-title">[\s\S]*?<h1 id="workspace-title">報價文件自查<\/h1>[\s\S]*?data-start-self-check/u,
+    /^\s*<section class="self-check-hero" aria-labelledby="workspace-title">[\s\S]*?<h1 id="workspace-title">報價文件檢查<\/h1>[\s\S]*?data-start-upload/u,
   );
   assert.equal((html.match(/<h1\b/gu) ?? []).length, 1);
-  assert.equal((html.match(/開始第一項自查/gu) ?? []).length, 1);
+  assert.equal((html.match(/選擇第一份 PDF/gu) ?? []).length, 1);
   assert.equal((html.match(/class="workspace-now"/gu) ?? []).length, 1);
   assert.equal((html.match(/role="tablist"/gu) ?? []).length, 1);
   assert.equal((html.match(/data-document-tab=/gu) ?? []).length, 3);
@@ -1190,7 +1171,7 @@ test("self-check hero is the first surface and keeps the optional document works
   assert.doesNotMatch(html, /id="quote-title"|quote-hero__copy|quote-assurances|document-ledger|data-hero-start|data-workspace-start/u);
 });
 
-test("one page keeps the legacy closed-state contract while exposing the approved self-check journey", async () => {
+test("one page keeps the legacy closed-state contract while exposing only upload and AI report actions", async () => {
   const [html, app] = await Promise.all([
     readOrEmpty(htmlPath),
     readOrEmpty(appPath),
@@ -1207,9 +1188,9 @@ test("one page keeps the legacy closed-state contract while exposing the approve
   assert.match(html, /待確認清單/);
   assert.match(html, /重新選擇/);
   assert.match(html, /結果格式示意/);
-  assert.match(html, /固定自查清單/);
-  assert.match(html, /data-check-item/u);
-  assert.match(html, /選擇 PDF（選填）/u);
+  assert.match(html, /選擇檔案/u);
+  assert.match(html, /查看 AI 檢查報告開放狀態/u);
+  assert.doesNotMatch(html, /固定自查清單|data-check-item|選擇 PDF（選填）/u);
 });
 
 test("first screen states role status next responsibility and trace boundary", async () => {
@@ -1441,8 +1422,8 @@ test("selection stays local and never claims durable upload or a formal result",
   const visible = stripNonVisibleHtml(html);
   assert.match(html, /type="file"/);
   assert.match(html, /accept="application\/pdf,\.pdf"/);
-  assert.match(visible, /選擇檔案只會在本次瀏覽顯示檔名，不會送出或保存/);
-  assert.match(visible, /本次自查內容只保留在目前頁面；重新整理或離開後會消失，尚未建立案件紀錄/);
+  assert.match(visible, /只會在本次瀏覽顯示你選擇的 PDF 檔名，不會送出或保存/);
+  assert.match(visible, /本次選擇只保留在目前頁面；重新整理或離開後會消失，尚未建立案件紀錄/);
   assert.doesNotMatch(visible, /上傳成功|已保存|已建立案件|健檢完成|正式健檢結果/);
   assert.doesNotMatch(
     `${html}\n${await readOrEmpty(appPath)}`,
@@ -1462,7 +1443,7 @@ test("file metadata policy accepts MIME or pdf extension without inventing conte
   assert.equal(app.isAcceptedPdfFileMetadata("報價.PDF", "text/plain"), true);
   assert.equal(app.isAcceptedPdfFileMetadata("報價.txt", "text/plain"), false);
   assert.equal(app.isAcceptedPdfFileMetadata("   ", "application/pdf"), false);
-  assert.match(visible, /不會讀取、上傳或分析內容/u);
+  assert.match(visible, /不會送出或保存[\s\S]*尚未讀取或分析檔案內容/u);
   assert.doesNotMatch(visible, /已分析|已比對|(?:MB|GB|頁)\s*(?:上限|以內|以下|不得超過)/i);
 });
 

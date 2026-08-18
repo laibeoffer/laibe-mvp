@@ -790,12 +790,13 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
   const panels = root.querySelectorAll("[data-document-panel]");
   const fileInputs = root.querySelectorAll("[data-document-file]");
   const dropzones = root.querySelectorAll("[data-document-dropzone]");
+  const reportActions = root.querySelectorAll("[data-ai-report-action]");
   const checkItems = root.querySelectorAll("[data-check-item]");
   const statusTargets = root.querySelectorAll("[data-current-status]");
   const nextTargets = root.querySelectorAll("[data-current-next]");
   const responsibilityTargets = root.querySelectorAll("[data-current-responsibility]");
   const liveTarget = root.querySelector("[data-state-live]");
-  const workspaceStart = root.querySelector("[data-start-self-check]");
+  const workspaceStart = root.querySelector("[data-start-upload]");
   const pendingList = root.querySelector("[data-pending-list]");
   const pendingEmpty = root.querySelector("[data-pending-empty]");
   const copyPending = root.querySelector("[data-copy-pending]");
@@ -862,8 +863,17 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     const selected = Boolean(documentSelection);
     const filename = root.querySelector(`[data-document-filename="${kind}"]`);
     const filenameRow = root.querySelector(`[data-selected-file="${kind}"]`);
+    const reportAction = root.querySelector(`[data-ai-report-action="${kind}"]`);
+    const reportStatus = root.querySelector(`[data-ai-report-status="${kind}"]`);
     if (filename) filename.textContent = selected ? documentSelection.name : "";
     if (filenameRow) filenameRow.hidden = !selected;
+    if (reportAction) reportAction.disabled = !selected;
+    if (reportStatus) {
+      reportStatus.dataset.reportState = selected ? "ready" : "waiting-file";
+      reportStatus.textContent = selected
+        ? "檔案已就緒，可查看 AI 檢查報告的開放狀態。"
+        : "請先選擇 PDF，才能查看 AI 檢查報告的開放狀態。";
+    }
   }
 
   function renderTabsAndPanels() {
@@ -964,12 +974,30 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentSelection(kind);
     const documentProjection = projectDocumentWorkspace(workspaceState);
     const fileSummary = documentProjection.uploadedCount === 0
-      ? "PDF 為選填，目前未選擇檔名。"
+      ? "目前尚未選擇檔案。"
       : documentProjection.uploadedCount === 3
-        ? "三類檔名已選擇，尚未分析或比對。"
-        : `${documentProjection.uploadedCount}/3 類檔名已選擇，尚未分析內容。`;
+        ? "三類檔案已選擇；AI 檢查報告尚未開放。"
+        : `${documentProjection.uploadedCount}/3 類檔案已選擇；AI 檢查報告尚未開放。`;
     setTextFor("[data-file-selection-summary]", fileSummary);
-    return renderSelfCheck();
+    for (const kind of DOCUMENT_WORKSPACE_KINDS) {
+      setTextFor(`[data-tab-status="${kind}"]`, workspaceState.documents[kind] ? "檔案已就緒" : "尚未選擇");
+    }
+    const currentStatus = documentProjection.uploadedCount === 0
+      ? "尚未選擇檔案"
+      : `${documentProjection.uploadedCount}/3 類檔案已選擇`;
+    const nextStep = documentProjection.uploadedCount === 0
+      ? "選擇一類文件後，選擇 PDF。"
+      : "查看 AI 檢查報告的開放狀態。";
+    for (let index = 0; index < statusTargets.length; index += 1) {
+      statusTargets[index].textContent = currentStatus;
+    }
+    for (let index = 0; index < nextTargets.length; index += 1) {
+      nextTargets[index].textContent = nextStep;
+    }
+    for (let index = 0; index < responsibilityTargets.length; index += 1) {
+      responsibilityTargets[index].textContent = "我（甲方）";
+    }
+    return { currentStatus, documentProjection, nextStep };
   }
 
   function announce(message) {
@@ -1013,15 +1041,15 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     }
     workspaceState = recordDocumentSelection(workspaceState, kind, selection);
     if (feedback) {
-      feedback.textContent = "已選擇檔案，尚未分析內容。";
+      feedback.textContent = "已選擇檔案，尚未產生檢查報告。";
       feedback.dataset.feedbackState = "selected";
     }
     if (input && typeof input.setAttribute === "function") input.setAttribute("aria-invalid", "false");
     const projection = projectDocumentWorkspace(workspaceState);
     render();
     announce(projection.uploadedCount === 3
-      ? "三類檔名已選擇，尚未分析或比對。"
-      : "已選擇檔案，尚未分析內容。");
+      ? "三類檔案已選擇；AI 檢查報告尚未開放。"
+      : "已選擇檔案，尚未產生檢查報告。");
   }
 
   function focusFirstUnconfirmed() {
@@ -1120,6 +1148,21 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
     });
   }
 
+  for (let index = 0; index < reportActions.length; index += 1) {
+    const action = reportActions[index];
+    action.addEventListener("click", () => {
+      const kind = action.dataset ? action.dataset.aiReportAction : null;
+      if (!isDocumentWorkspaceKind(kind) || !workspaceState.documents[kind]) return;
+      const reportStatus = root.querySelector(`[data-ai-report-status="${kind}"]`);
+      const unavailableMessage = "AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。";
+      if (reportStatus) {
+        reportStatus.dataset.reportState = "unavailable";
+        reportStatus.textContent = unavailableMessage;
+      }
+      announce(unavailableMessage);
+    });
+  }
+
   for (let index = 0; index < checkItems.length; index += 1) {
     const item = checkItems[index];
     item.addEventListener("change", () => {
@@ -1134,7 +1177,9 @@ function initializeDocumentWorkspace(root, workspaceRoot, initialMode, initialHa
 
   if (workspaceStart) {
     workspaceStart.addEventListener("click", () => {
-      focusFirstUnconfirmed();
+      const firstInput = fileInputs[0] || null;
+      if (firstInput && typeof firstInput.focus === "function") firstInput.focus();
+      announce("請選擇報價內容 PDF。");
     });
   }
 
