@@ -186,8 +186,12 @@ const extractedText = (
   streamByteOffset: number,
 ): ExtractedLiteralText[] => {
   const values: ExtractedLiteralText[] = [];
+  const lexicalSource = maskPdfComments(source);
+  if (lexicalSource === null) return values;
   const matcher = /\((?:\\.|[^\\)])*\)\s*Tj\b/g;
-  for (const textBlock of source.matchAll(/\bBT\b([\s\S]*?)\bET\b/g)) {
+  for (
+    const textBlock of lexicalSource.matchAll(/\bBT\b([\s\S]*?)\bET\b/g)
+  ) {
     const block = textBlock[1];
     const blockOffset = (textBlock.index ?? 0) + textBlock[0].indexOf(block);
     for (const match of block.matchAll(matcher)) {
@@ -515,6 +519,36 @@ const consumePdfLiteral = (source: string, start: number): number | null => {
     index++;
   }
   return depth === 0 ? index : null;
+};
+
+const maskPdfComments = (source: string): string | null => {
+  const characters = source.split("");
+  for (let index = 0; index < source.length;) {
+    if (source[index] === "(") {
+      const end = consumePdfLiteral(source, index);
+      if (end === null) return null;
+      index = end;
+      continue;
+    }
+    if (source[index] === "<" && source[index + 1] !== "<") {
+      const end = source.indexOf(">", index + 1);
+      if (end === -1) return null;
+      index = end + 1;
+      continue;
+    }
+    if (source[index] !== "%") {
+      index++;
+      continue;
+    }
+    while (
+      index < source.length && source[index] !== "\r" &&
+      source[index] !== "\n"
+    ) {
+      characters[index] = " ";
+      index++;
+    }
+  }
+  return characters.join("");
 };
 
 const consumePdfArray = (source: string, start: number): number | null => {
@@ -931,6 +965,9 @@ export const inspectQuotePdfBytes = async (
       "PDF indirect-object structure is incomplete.",
     );
   }
+  const hasStructuralActiveTrigger = objects.some(({ dictionaryEntries }) =>
+    dictionaryEntries.has("OpenAction") || dictionaryEntries.has("AA")
+  );
   const scannedNames = scanPdfNames(maskActualStreamBodies(source, objects));
   if (scannedNames.malformed) {
     return reject(
@@ -939,6 +976,7 @@ export const inspectQuotePdfBytes = async (
     );
   }
   if (
+    hasStructuralActiveTrigger ||
     scannedNames.names.some((name) =>
       ["JavaScript", "JS", "Launch", "RichMedia", "EmbeddedFile"].includes(name)
     )

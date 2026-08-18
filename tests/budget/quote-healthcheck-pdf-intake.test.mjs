@@ -27,6 +27,15 @@ const documentReference = async (bytes) => ({
   caseId: "case_quote_pdf_001",
   sha256: await sha256(bytes),
 });
+const deterministicQuotePdf = ({ catalogEntry = "", stream }) => {
+  const encoder = new TextEncoder();
+  const streamByteLength = encoder.encode(stream).byteLength;
+  return encoder.encode(
+    `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R${
+      catalogEntry ? ` ${catalogEntry}` : ""
+    } >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /Contents 4 0 R >>\nendobj\n4 0 obj\n<< /Length ${streamByteLength} >>\nstream\n${stream}endstream\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF`,
+  );
+};
 const replaceAsciiInPlace = (bytes, from, to) => {
   const before = new TextEncoder().encode(from);
   const after = new TextEncoder().encode(to);
@@ -342,4 +351,44 @@ Deno.test("an unterminated literal cannot supply a fake endstream terminator", a
 
   assert.equal(result.accepted, false, JSON.stringify(result));
   assert.equal(result.rejection?.code, "CORRUPT_PDF");
+});
+
+Deno.test("structural open and additional-action triggers fail closed across action subtypes and name escapes", async () => {
+  const intake = await loadIntake();
+  const stream = "BT\n(VALID ITEM|unit|1|2|2) Tj\nET\n";
+  const activeCatalogEntries = [
+    "/OpenAction << /S /URI /URI (https://example.test) >>",
+    "/Open#41ction << /S /URI /URI (https://example.test) >>",
+    "/AA << /O << /S /SubmitForm /F (https://example.test) >> >>",
+    "/#41A << /O << /S /ImportData /F (payload.fdf) >> >>",
+  ];
+
+  for (const catalogEntry of activeCatalogEntries) {
+    const bytes = deterministicQuotePdf({ catalogEntry, stream });
+    const result = await intake.inspectQuotePdfBytes({
+      bytes,
+      document: await documentReference(bytes),
+    });
+
+    assert.equal(result.accepted, false, catalogEntry);
+    assert.equal(result.rejection?.code, "UNSUPPORTED_ACTIVE_CONTENT");
+  }
+});
+
+Deno.test("commented text operators never create quote facts while percent signs inside literals remain data", async () => {
+  const intake = await loadIntake();
+  const bytes = deterministicQuotePdf({
+    stream:
+      "% BT\n% (COMMENT GHOST|unit|1|1|1) Tj\n% ET\nBT\n(VALID 10%|unit|1|2|2) Tj\nET\n",
+  });
+  const result = await intake.inspectQuotePdfBytes({
+    bytes,
+    document: await documentReference(bytes),
+  });
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["VALID 10%"],
+  );
 });
