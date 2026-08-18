@@ -43,6 +43,17 @@ const deterministicQuotePdf = ({
     } >>\nendobj\n4 0 obj\n<< /Length ${streamByteLength} >>\nstream\n${stream}endstream\nendobj\n${additionalObjects}trailer\n<< /Root 1 0 R >>\n%%EOF`,
   );
 };
+const inspectStream = async (stream) => {
+  const intake = await loadIntake();
+  const bytes = deterministicQuotePdf({ stream });
+  return {
+    bytes,
+    result: await intake.inspectQuotePdfBytes({
+      bytes,
+      document: await documentReference(bytes),
+    }),
+  };
+};
 const replaceAsciiInPlace = (bytes, from, to) => {
   const before = new TextEncoder().encode(from);
   const after = new TextEncoder().encode(to);
@@ -398,6 +409,149 @@ Deno.test("commented text operators never create quote facts while percent signs
     result.facts.rows.map((row) => row.itemName),
     ["VALID 10%"],
   );
+});
+
+Deno.test("a balanced nested literal cannot expose an inner fake Tj operand", async () => {
+  const { result } = await inspectStream(
+    "BT\n((GHOST|unit|1|1|1) Tj) Tj\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(result.facts.rows, []);
+});
+
+Deno.test("a legitimate quote row preserves nested literal parentheses", async () => {
+  const { result } = await inspectStream(
+    "BT\n(ITEM (nested)|unit|1|2|2) Tj\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["ITEM (nested)"],
+  );
+});
+
+Deno.test("operator-shaped bytes inside a literal cannot fabricate a quote row", async () => {
+  const { result } = await inspectStream(
+    "BT\n(BT (GHOST|unit|1|1|1) Tj ET) Tc\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(result.facts.rows, []);
+});
+
+Deno.test("ET text inside a literal does not close the active text object", async () => {
+  const { result } = await inspectStream(
+    "BT\n(VALID ET TOKEN|unit|1|2|2) Tj\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["VALID ET TOKEN"],
+  );
+});
+
+Deno.test("hex, name, array, and dictionary contents are atomic to text operators", async () => {
+  const { result } = await inspectStream(
+    "BT\n<4554> /ET [(ARRAY GHOST|unit|1|1|1) /Tj] << /Key (BT ET Tj) >> q\n" +
+      "(COMPOSITE SAFE|unit|1|2|2) Tj\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["COMPOSITE SAFE"],
+  );
+});
+
+Deno.test("LF, CR, and CRLF comments are skipped while literal percent signs remain data", async () => {
+  const { result } = await inspectStream(
+    "% LF BT (GHOST|unit|1|1|1) Tj ET\n" +
+      "% CR BT (GHOST|unit|1|1|1) Tj ET\r" +
+      "% CRLF BT (GHOST|unit|1|1|1) Tj ET\r\n" +
+      "BT\n(VALID 10%|unit|1|2|2) Tj\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["VALID 10%"],
+  );
+});
+
+Deno.test("literal escapes, octal bytes, and line continuations decode linearly", async () => {
+  const encodedItem = "Escaped \\(paren\\) \\\\ slash \\101\\102\\103 line\\" +
+    "\n" + "joined\\" + "\r" + "joined\\" + "\r\n" + "end";
+  const { result } = await inspectStream(
+    `BT\n(${encodedItem}|unit|1|2|2) Tj\nET\n`,
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["Escaped (paren) \\ slash ABC linejoinedjoinedend"],
+  );
+});
+
+Deno.test("operator names require exact tokens while delimiter adjacency remains valid", async () => {
+  const { result } = await inspectStream(
+    "/BT (NAME GHOST|unit|1|1|1) Tj\n" +
+      "BTx (PREFIX GHOST|unit|1|1|1) Tj\n" +
+      "BT-evil (HYPHEN GHOST|unit|1|1|1) Tj\n" +
+      "BT\n(TJ EXTRA GHOST|unit|1|1|1) Tj-extra\n" +
+      "(DELIMITER SAFE|unit|1|2|2)Tj\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(
+    result.facts.rows.map((row) => row.itemName),
+    ["DELIMITER SAFE"],
+  );
+});
+
+Deno.test("uppercase TJ, outside Tj, and non-literal Tj operands create no facts", async () => {
+  const { result } = await inspectStream(
+    "(OUTSIDE GHOST|unit|1|1|1) Tj\n" +
+      "BT\n/Name Tj\n(UPPERCASE GHOST|unit|1|1|1) TJ\nET\n",
+  );
+
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.deepEqual(result.facts.rows, []);
+});
+
+Deno.test("lexically incomplete or structurally invalid text objects fail closed", async () => {
+  for (
+    const [name, stream] of [
+      ["unterminated literal", "BT\n(ROW|unit|1|2|2 Tj\nET\n"],
+      ["unterminated hex", "BT\n<524f57\nET\n"],
+      ["nested BT", "BT\nBT\n(ROW|unit|1|2|2) Tj\nET\nET\n"],
+      ["orphan ET", "ET\n"],
+      ["unclosed BT", "BT\n(ROW|unit|1|2|2) Tj\n"],
+    ]
+  ) {
+    const { result } = await inspectStream(stream);
+    assert.equal(result.accepted, false, `${name}: ${JSON.stringify(result)}`);
+    assert.equal(result.rejection?.code, "CORRUPT_PDF", name);
+  }
+});
+
+Deno.test("multibyte stream prefixes preserve the exact outer-literal byte offset", async () => {
+  const literal = "(多位元項目|式|1|2|2)";
+  const { bytes, result } = await inspectStream(
+    `% 前綴\nBT\n${literal} Tj\nET\n`,
+  );
+  const marker = new TextEncoder().encode(literal);
+  const expectedOffset = bytes.findIndex((_value, candidate) =>
+    candidate + marker.length <= bytes.length &&
+    marker.every((value, offset) => bytes[candidate + offset] === value)
+  );
+
+  assert.notEqual(expectedOffset, -1);
+  assert.equal(result.accepted, true, JSON.stringify(result));
+  assert.equal(result.facts.rows.length, 1);
+  assert.equal(result.facts.rows[0].provenance.textOffset, expectedOffset);
 });
 
 for (

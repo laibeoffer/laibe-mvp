@@ -158,58 +158,15 @@ const freezeBaseline = (value: unknown): FrozenBaselineResult => {
   }
 };
 
-const decodePdfLiteral = (literal: string): string =>
-  literal.replace(
-    /\\([\\()nrtbf])/g,
-    (_match, character: string) =>
-      ({
-        "\\": "\\",
-        "(": "(",
-        ")": ")",
-        n: "\n",
-        r: "\r",
-        t: "\t",
-        b: "\b",
-        f: "\f",
-      })[character] ?? character,
-  );
-
 interface ExtractedLiteralText {
   text: string;
   offset: number;
   page: number;
 }
 
-const extractedText = (
-  source: string,
-  page: number,
-  streamByteOffset: number,
-): ExtractedLiteralText[] => {
-  const values: ExtractedLiteralText[] = [];
-  const lexicalSource = maskPdfComments(source);
-  if (lexicalSource === null) return values;
-  const matcher = /\((?:\\.|[^\\)])*\)\s*Tj\b/g;
-  for (
-    const textBlock of lexicalSource.matchAll(/\bBT\b([\s\S]*?)\bET\b/g)
-  ) {
-    const block = textBlock[1];
-    const blockOffset = (textBlock.index ?? 0) + textBlock[0].indexOf(block);
-    for (const match of block.matchAll(matcher)) {
-      const literal = match[0].replace(/\s*Tj\s*$/, "");
-      const localCharacterOffset = blockOffset + (match.index ?? 0);
-      values.push({
-        text: decodePdfLiteral(literal.slice(1, -1)),
-        // The decoded prefix re-encodes to the same UTF-8 bytes, so this is a
-        // byte offset in the exact frozen source that was hashed.
-        offset: streamByteOffset + new TextEncoder().encode(
-          source.slice(0, localCharacterOffset),
-        ).byteLength,
-        page,
-      });
-    }
-  }
-  return values;
-};
+type ExtractedTextResult =
+  | { ok: true; values: ExtractedLiteralText[] }
+  | { ok: false };
 
 const normalizeItem = (item: string): string =>
   item.trim().replace(/\s+/g, " ").toLocaleLowerCase("zh-TW");
@@ -521,36 +478,6 @@ const consumePdfLiteral = (source: string, start: number): number | null => {
   return depth === 0 ? index : null;
 };
 
-const maskPdfComments = (source: string): string | null => {
-  const characters = source.split("");
-  for (let index = 0; index < source.length;) {
-    if (source[index] === "(") {
-      const end = consumePdfLiteral(source, index);
-      if (end === null) return null;
-      index = end;
-      continue;
-    }
-    if (source[index] === "<" && source[index + 1] !== "<") {
-      const end = source.indexOf(">", index + 1);
-      if (end === -1) return null;
-      index = end + 1;
-      continue;
-    }
-    if (source[index] !== "%") {
-      index++;
-      continue;
-    }
-    while (
-      index < source.length && source[index] !== "\r" &&
-      source[index] !== "\n"
-    ) {
-      characters[index] = " ";
-      index++;
-    }
-  }
-  return characters.join("");
-};
-
 const consumePdfArray = (source: string, start: number): number | null => {
   let index = start + 1;
   while (true) {
@@ -622,6 +549,190 @@ const readPdfValue = (
     if (Number.isSafeInteger(value)) return { kind: "integer", value, end };
   }
   return { kind: "other", end };
+};
+
+type PdfContentToken =
+  | { kind: "literal"; start: number; end: number }
+  | { kind: "operand"; start: number; end: number }
+  | { kind: "regular"; start: number; end: number; value: string };
+
+interface PdfContentTokenRead {
+  token: PdfContentToken | null;
+  next: number;
+}
+
+const pdfHexDigit = /[0-9A-Fa-f]/;
+const pdfContentNumber = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/;
+
+const readPdfContentToken = (
+  source: string,
+  start: number,
+): PdfContentTokenRead | null => {
+  const index = skipPdfWhitespaceAndComments(source, start);
+  if (index >= source.length) return { token: null, next: index };
+  if (source[index] === "(") {
+    const end = consumePdfLiteral(source, index);
+    return end === null
+      ? null
+      : { token: { kind: "literal", start: index, end }, next: end };
+  }
+  if (source[index] === "/") {
+    const name = readPdfName(source, index);
+    return name === null ? null : {
+      token: { kind: "operand", start: index, end: name.end },
+      next: name.end,
+    };
+  }
+  if (source[index] === "[" || source[index] === "<") {
+    const value = readPdfValue(source, index);
+    if (value === null) return null;
+    if (source[index] === "<" && source[index + 1] !== "<") {
+      for (let cursor = index + 1; cursor < value.end - 1; cursor++) {
+        if (
+          !pdfWhitespace.test(source[cursor]) &&
+          !pdfHexDigit.test(source[cursor])
+        ) return null;
+      }
+    }
+    return {
+      token: { kind: "operand", start: index, end: value.end },
+      next: value.end,
+    };
+  }
+  if (pdfDelimiter.test(source[index])) return null;
+  let end = index;
+  while (
+    end < source.length && !pdfWhitespace.test(source[end]) &&
+    !pdfDelimiter.test(source[end])
+  ) end++;
+  if (end === index) return null;
+  return {
+    token: {
+      kind: "regular",
+      start: index,
+      end,
+      value: source.slice(index, end),
+    },
+    next: end,
+  };
+};
+
+const decodePdfLiteral = (
+  source: string,
+  start: number,
+  end: number,
+): string | null => {
+  if (source[start] !== "(" || source[end - 1] !== ")") return null;
+  let decoded = "";
+  for (let index = start + 1; index < end - 1;) {
+    const character = source[index];
+    if (character !== "\\") {
+      decoded += character;
+      index++;
+      continue;
+    }
+    index++;
+    if (index >= end - 1) return null;
+    const escaped = source[index];
+    if (escaped === "\n") {
+      index++;
+      continue;
+    }
+    if (escaped === "\r") {
+      index++;
+      if (source[index] === "\n") index++;
+      continue;
+    }
+    if (escaped >= "0" && escaped <= "7") {
+      let octal = escaped;
+      index++;
+      while (
+        octal.length < 3 && index < end - 1 &&
+        source[index] >= "0" && source[index] <= "7"
+      ) {
+        octal += source[index];
+        index++;
+      }
+      decoded += String.fromCharCode(Number.parseInt(octal, 8) & 0xff);
+      continue;
+    }
+    decoded += ({
+      n: "\n",
+      r: "\r",
+      t: "\t",
+      b: "\b",
+      f: "\f",
+      "(": "(",
+      ")": ")",
+      "\\": "\\",
+    } as Record<string, string>)[escaped] ?? escaped;
+    index++;
+  }
+  return decoded;
+};
+
+const isPdfContentOperandWord = (value: string): boolean =>
+  pdfContentNumber.test(value) ||
+  value === "true" || value === "false" || value === "null";
+
+const extractedText = (
+  source: string,
+  page: number,
+  streamByteOffset: number,
+): ExtractedTextResult => {
+  const values: ExtractedLiteralText[] = [];
+  const operands: PdfContentToken[] = [];
+  let activeTextObject = false;
+  let index = 0;
+  while (true) {
+    const read = readPdfContentToken(source, index);
+    if (read === null) return { ok: false };
+    index = read.next;
+    const token = read.token;
+    if (token === null) break;
+    if (token.kind !== "regular") {
+      if (activeTextObject) operands.push(token);
+      continue;
+    }
+    if (token.value === "BT") {
+      if (activeTextObject) return { ok: false };
+      activeTextObject = true;
+      operands.length = 0;
+      continue;
+    }
+    if (token.value === "ET") {
+      if (!activeTextObject) return { ok: false };
+      activeTextObject = false;
+      operands.length = 0;
+      continue;
+    }
+    if (token.value === "Tj") {
+      if (
+        activeTextObject && operands.length === 1 &&
+        operands[0].kind === "literal"
+      ) {
+        const literal = operands[0];
+        const decoded = decodePdfLiteral(source, literal.start, literal.end);
+        if (decoded === null) return { ok: false };
+        values.push({
+          text: decoded,
+          offset: streamByteOffset + new TextEncoder().encode(
+            source.slice(0, literal.start),
+          ).byteLength,
+          page,
+        });
+      }
+      operands.length = 0;
+      continue;
+    }
+    if (!activeTextObject) continue;
+    if (isPdfContentOperandWord(token.value)) {
+      operands.push(token);
+    } else {
+      operands.length = 0;
+    }
+  }
+  return activeTextObject ? { ok: false } : { ok: true, values };
 };
 
 const topLevelDictionaryEntries = (
@@ -876,7 +987,17 @@ const parseSupportedPageStreams = (
         invalidTextEncoding: true,
       };
     }
-    text.push(...extractedText(decoded, pageIndex + 1, absoluteStart));
+    const extracted = extractedText(decoded, pageIndex + 1, absoluteStart);
+    if (!extracted.ok) {
+      return {
+        ok: false,
+        rejection: {
+          code: "CORRUPT_PDF",
+          message: "PDF content-stream lexical structure is incomplete.",
+        },
+      };
+    }
+    text.push(...extracted.values);
   }
   return {
     ok: true,
