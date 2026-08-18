@@ -56,6 +56,76 @@ function recognizedScene() {
   };
 }
 
+function buildPdf(objectBodies) {
+  let source = "%PDF-1.7\n%\xE2\xE3\xCF\xD3\n";
+  const offsets = [0];
+  for (let index = 0; index < objectBodies.length; index += 1) {
+    offsets.push(Buffer.byteLength(source, "latin1"));
+    source += `${index + 1} 0 obj\n${objectBodies[index]}\nendobj\n`;
+  }
+  const xrefOffset = Buffer.byteLength(source, "latin1");
+  source += `xref\n0 ${objectBodies.length + 1}\n`;
+  source += "0000000000 65535 f \n";
+  for (const offset of offsets.slice(1)) {
+    source += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  }
+  source += `trailer\n<< /Size ${objectBodies.length + 1} /Root 1 0 R >>\n`;
+  source += `startxref\n${xrefOffset}\n%%EOF\n`;
+  return Buffer.from(source, "latin1");
+}
+
+function pageObject(extra = "") {
+  return `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 100 100] /Contents 4 0 R ${extra} >>`;
+}
+
+function activePdfScenarios() {
+  const emptyContents = "<< /Length 0 >>\nstream\nendstream";
+  return [
+    {
+      name: "indirect Catalog OpenAction Launch",
+      bytes: buildPdf([
+        "<< /Type /Catalog /Pages 2 0 R /OpenAction 5 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        pageObject(),
+        emptyContents,
+        "<< /Type /Action /S /Launch /F (calc.exe) >>",
+      ]),
+    },
+    {
+      name: "Catalog additional action URI",
+      bytes: buildPdf([
+        "<< /Type /Catalog /Pages 2 0 R /AA << /WC 5 0 R >> >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        pageObject(),
+        emptyContents,
+        "<< /Type /Action /S /URI /URI (https://example.invalid) >>",
+      ]),
+    },
+    {
+      name: "page additional action SubmitForm",
+      bytes: buildPdf([
+        "<< /Type /Catalog /Pages 2 0 R >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        pageObject("/AA << /O 5 0 R >>"),
+        emptyContents,
+        "<< /Type /Action /S /SubmitForm /F (https://example.invalid) >>",
+      ]),
+    },
+    {
+      name: "embedded attachment and page GoToR action",
+      bytes: buildPdf([
+        "<< /Type /Catalog /Pages 2 0 R /Names << /EmbeddedFiles << /Names [(payload.txt) 5 0 R] >> >> >>",
+        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+        pageObject("/Annots [7 0 R]"),
+        emptyContents,
+        "<< /Type /Filespec /F (payload.txt) /EF << /F 6 0 R >> >>",
+        "<< /Type /EmbeddedFile /Length 4 >>\nstream\nDATA\nendstream",
+        "<< /Type /Annot /Subtype /Link /Rect [0 0 10 10] /A << /S /GoToR /F (remote.pdf) >> >>",
+      ]),
+    },
+  ];
+}
+
 test("focused real File route reads bytes and returns recognition-only summary", async () => {
   const {
     recognizeDrawingFile,
@@ -172,6 +242,7 @@ test("unsupported scanned encrypted corrupt and active inputs stay closed", asyn
     type: "application/pdf",
   });
   const base = {
+    async inspectActiveContent() { return false; },
     async presentSelectedPdfFile() { return { pageCount: 1 }; },
     validateA11Binding: a11Unavailable,
   };
@@ -225,6 +296,52 @@ test("unsupported scanned encrypted corrupt and active inputs stay closed", asyn
     assert.equal(result.status, "unsupported", entry.reason);
     assert.equal(result.reason, entry.reason, entry.reason);
     assert.equal(result.conversionAllowed, false, entry.reason);
+  }
+});
+
+test("valid adversarial PDFs stop before presentation extraction or recognition", async () => {
+  const { recognizeDrawingFile } = await import(`${adapterUrl}?active-structure-red=1`);
+  const pdfjs = await import(pathToFileURL(canonicalPaths.pdfJs).href);
+  const scenarios = activePdfScenarios();
+  for (const scenario of scenarios) {
+    const parsed = await pdfjs.getDocument({
+      data: new Uint8Array(scenario.bytes),
+      disableWorker: true,
+    }).promise;
+    assert.equal(parsed.numPages, 1, `${scenario.name} must be a valid PDF`);
+    await parsed.destroy();
+  }
+  for (const scenario of scenarios) {
+    const calls = { presentation: 0, extraction: 0, recognition: 0 };
+    const result = await recognizeDrawingFile(
+      new File([scenario.bytes], "drawing.pdf", { type: "application/pdf" }),
+      {
+        dependencies: {
+          async presentSelectedPdfFile() {
+            calls.presentation += 1;
+            throw new Error("active PDF reached presentation");
+          },
+          async extractScene() {
+            calls.extraction += 1;
+            throw new Error("active PDF reached extraction");
+          },
+          recognizePdfObjects() {
+            calls.recognition += 1;
+            throw new Error("active PDF reached recognition");
+          },
+          validateA11Binding: a11Unavailable,
+        },
+      },
+    );
+    assert.equal(result.status, "unsupported", scenario.name);
+    assert.equal(result.reason, "active_content", scenario.name);
+    assert.deepEqual(calls, {
+      presentation: 0,
+      extraction: 0,
+      recognition: 0,
+    }, scenario.name);
+    assert.equal(result.conversionAllowed, false, scenario.name);
+    assert.equal(result.projectMutationAllowed, false, scenario.name);
   }
 });
 

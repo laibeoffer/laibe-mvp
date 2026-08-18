@@ -409,7 +409,7 @@ test("selection stays local and cannot imply upload parsing persistence or a for
   assert.match(html, /accept="application\/pdf,\.pdf"/);
   assert.match(visible, /只在本頁暫時檢視/);
   assert.match(visible, /尚未送出或保存/);
-  assert.match(visible, /尚未形成正式案件結果/);
+  assert.match(visible, /尚未產生可保存的圖面辨識摘要/);
   assert.match(visible, /結果格式示意，非真實案件/);
   assert.doesNotMatch(
     visible,
@@ -448,6 +448,16 @@ test("DRS route shell recovery links and reload reset remain intact", async () =
   assert.doesNotMatch(visible, /AI PCM|返回 PCM 首頁/);
   assert.match(app, /renderState\(resolveDrawingCheckState\(\{ step: "INTRODUCTION" \}\)\)/);
   assert.doesNotMatch(app, /localStorage|sessionStorage/);
+});
+
+test("closed result copy acknowledges local recognition without claiming a saved record", async () => {
+  const [html, app] = await Promise.all([readOrEmpty(htmlPath), readOrEmpty(appPath)]);
+  const visible = stripNonVisibleHtml(html);
+  assert.match(visible, /尚未產生可保存的圖面辨識摘要/);
+  assert.match(visible, /尚未形成正式案件紀錄/);
+  assert.match(app, /尚未產生可保存的圖面辨識摘要/);
+  assert.doesNotMatch(visible, /本頁沒有[^。]*圖面解析/);
+  assert.doesNotMatch(app, /本頁沒有[^。]*正式解析/);
 });
 
 test("result boundary includes drawing-only recovery to the existing quote check", async () => {

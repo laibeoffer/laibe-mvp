@@ -82,6 +82,363 @@ function createTrustedSnapshot(bytes) {
   return snapshot;
 }
 
+const ACTIVE_PDF_NAMES = safeFreeze(new Set([
+  "AA",
+  "AF",
+  "EF",
+  "EmbeddedFiles",
+  "JavaScript",
+  "OpenAction",
+]));
+const ACTIVE_PDF_ACTIONS = safeFreeze(new Set([
+  "GoToE",
+  "GoToR",
+  "ImportData",
+  "JavaScript",
+  "Launch",
+  "Movie",
+  "Rendition",
+  "RichMediaExecute",
+  "Sound",
+  "SubmitForm",
+  "URI",
+]));
+const PDF_STRUCTURAL_TOKEN_LIMIT = 1_000_000;
+const PDF_EXPANDED_OBJECT_LIMIT = 64 * 1024 * 1024;
+
+function isPdfWhite(byte) {
+  return byte === 0 || byte === 9 || byte === 10 || byte === 12 ||
+    byte === 13 || byte === 32;
+}
+
+function isPdfDelimiter(byte) {
+  return byte === 0x28 || byte === 0x29 || byte === 0x3c || byte === 0x3e ||
+    byte === 0x5b || byte === 0x5d || byte === 0x7b || byte === 0x7d ||
+    byte === 0x2f || byte === 0x25;
+}
+
+function hexDigit(byte) {
+  if (byte >= 0x30 && byte <= 0x39) return byte - 0x30;
+  if (byte >= 0x41 && byte <= 0x46) return byte - 0x41 + 10;
+  if (byte >= 0x61 && byte <= 0x66) return byte - 0x61 + 10;
+  return -1;
+}
+
+function decodePdfName(bytes, start, end) {
+  let value = "";
+  for (let index = start; index < end; index += 1) {
+    if (bytes[index] === 0x23 && index + 2 < end) {
+      const high = hexDigit(bytes[index + 1]);
+      const low = hexDigit(bytes[index + 2]);
+      if (high >= 0 && low >= 0) {
+        value += String.fromCharCode(high * 16 + low);
+        index += 2;
+        continue;
+      }
+    }
+    value += String.fromCharCode(bytes[index]);
+  }
+  return value;
+}
+
+function isPdfNumberText(value) {
+  if (!value) return false;
+  let digitCount = 0;
+  let dotCount = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code >= 0x30 && code <= 0x39) {
+      digitCount += 1;
+      continue;
+    }
+    if (code === 0x2e && dotCount === 0) {
+      dotCount += 1;
+      continue;
+    }
+    if ((code === 0x2b || code === 0x2d) && index === 0) continue;
+    return false;
+  }
+  return digitCount > 0;
+}
+
+function readPdfToken(bytes, initialCursor) {
+  let cursor = initialCursor;
+  while (cursor < bytes.length) {
+    if (isPdfWhite(bytes[cursor])) {
+      cursor += 1;
+      continue;
+    }
+    if (bytes[cursor] === 0x25) {
+      while (cursor < bytes.length && bytes[cursor] !== 10 && bytes[cursor] !== 13) {
+        cursor += 1;
+      }
+      continue;
+    }
+    break;
+  }
+  if (cursor >= bytes.length) return null;
+  const start = cursor;
+  const byte = bytes[cursor];
+  if (byte === 0x28) {
+    cursor += 1;
+    let depth = 1;
+    while (cursor < bytes.length && depth > 0) {
+      if (bytes[cursor] === 0x5c) {
+        cursor += 2;
+        continue;
+      }
+      if (bytes[cursor] === 0x28) depth += 1;
+      if (bytes[cursor] === 0x29) depth -= 1;
+      cursor += 1;
+    }
+    return { kind: "string", start, end: cursor };
+  }
+  if (byte === 0x3c) {
+    if (bytes[cursor + 1] === 0x3c) {
+      return { kind: "dictStart", start, end: cursor + 2 };
+    }
+    cursor += 1;
+    while (cursor < bytes.length && bytes[cursor] !== 0x3e) cursor += 1;
+    return { kind: "hexString", start, end: Math.min(cursor + 1, bytes.length) };
+  }
+  if (byte === 0x3e && bytes[cursor + 1] === 0x3e) {
+    return { kind: "dictEnd", start, end: cursor + 2 };
+  }
+  if (byte === 0x5b || byte === 0x5d) {
+    return {
+      kind: byte === 0x5b ? "arrayStart" : "arrayEnd",
+      start,
+      end: cursor + 1,
+    };
+  }
+  if (byte === 0x2f) {
+    cursor += 1;
+    const nameStart = cursor;
+    while (
+      cursor < bytes.length &&
+      !isPdfWhite(bytes[cursor]) &&
+      !isPdfDelimiter(bytes[cursor])
+    ) cursor += 1;
+    return {
+      kind: "name",
+      value: decodePdfName(bytes, nameStart, cursor),
+      start,
+      end: cursor,
+    };
+  }
+  while (
+    cursor < bytes.length &&
+    !isPdfWhite(bytes[cursor]) &&
+    !isPdfDelimiter(bytes[cursor])
+  ) cursor += 1;
+  if (cursor === start) return { kind: "delimiter", start, end: cursor + 1 };
+  let value = "";
+  for (let index = start; index < cursor; index += 1) {
+    value += String.fromCharCode(bytes[index]);
+  }
+  return {
+    kind: isPdfNumberText(value) ? "number" : "keyword",
+    value: isPdfNumberText(value) ? Number(value) : value,
+    start,
+    end: cursor,
+  };
+}
+
+function lastPdfDictionary(tokens) {
+  if (!tokens.length || tokens[tokens.length - 1].kind !== "dictEnd") return null;
+  let depth = 0;
+  for (let index = tokens.length - 1; index >= 0; index -= 1) {
+    if (tokens[index].kind === "dictEnd") depth += 1;
+    if (tokens[index].kind === "dictStart") {
+      depth -= 1;
+      if (depth === 0) return tokens.slice(index, tokens.length);
+    }
+  }
+  return null;
+}
+
+function directDictionaryValue(tokens, key) {
+  if (!tokens) return null;
+  for (let index = 0; index < tokens.length - 1; index += 1) {
+    if (tokens[index].kind === "name" && tokens[index].value === key) {
+      return tokens[index + 1];
+    }
+  }
+  return null;
+}
+
+function dictionaryIsObjectStream(tokens) {
+  const type = directDictionaryValue(tokens, "Type");
+  return type?.kind === "name" && type.value === "ObjStm";
+}
+
+function objectStreamFilterIsSupported(tokens) {
+  const filter = directDictionaryValue(tokens, "Filter");
+  if (!filter) return "none";
+  if (filter.kind === "name" && filter.value === "FlateDecode") return "deflate";
+  return "unsupported";
+}
+
+function tokenCreatesActiveBehavior(token, previousToken) {
+  if (token.kind !== "name") return false;
+  if (ACTIVE_PDF_NAMES.has(token.value)) return true;
+  if (
+    previousToken?.kind === "name" &&
+    previousToken.value === "S" &&
+    ACTIVE_PDF_ACTIONS.has(token.value)
+  ) return true;
+  if (
+    previousToken?.kind === "name" &&
+    previousToken.value === "Type" &&
+    (token.value === "EmbeddedFile" || token.value === "Filespec")
+  ) return true;
+  if (
+    previousToken?.kind === "name" &&
+    previousToken.value === "Subtype" &&
+    (token.value === "FileAttachment" || token.value === "RichMedia" ||
+      token.value === "Movie" || token.value === "Sound")
+  ) return true;
+  return false;
+}
+
+function streamDataStart(bytes, cursor) {
+  if (bytes[cursor] === 13 && bytes[cursor + 1] === 10) return cursor + 2;
+  if (bytes[cursor] === 10 || bytes[cursor] === 13) return cursor + 1;
+  return -1;
+}
+
+async function inflatePdfObjectStream(bytes) {
+  if (typeof globalThis.DecompressionStream !== "function") return null;
+  try {
+    const decompressed = await new Response(
+      new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate")),
+    ).arrayBuffer();
+    if (decompressed.byteLength > PDF_EXPANDED_OBJECT_LIMIT) return null;
+    return new Uint8Array(decompressed);
+  } catch {
+    return null;
+  }
+}
+
+async function pdfStructureHasActiveContent(bytes, depth = 0) {
+  if (depth > 4 || bytes.byteLength > PDF_EXPANDED_OBJECT_LIMIT) return true;
+  let cursor = 0;
+  let count = 0;
+  let previousToken = null;
+  let tokens = [];
+  while (cursor < bytes.length) {
+    const token = readPdfToken(bytes, cursor);
+    if (!token) break;
+    cursor = token.end;
+    count += 1;
+    if (count > PDF_STRUCTURAL_TOKEN_LIMIT) return true;
+    if (tokenCreatesActiveBehavior(token, previousToken)) return true;
+    tokens.push(token);
+    previousToken = token;
+    if (token.kind !== "keyword" || token.value !== "stream") continue;
+
+    const dictionary = lastPdfDictionary(tokens.slice(0, -1));
+    const start = streamDataStart(bytes, cursor);
+    const lengthToken = directDictionaryValue(dictionary, "Length");
+    const length = lengthToken?.kind === "number" ? lengthToken.value : null;
+    if (start < 0 || !Number.isSafeInteger(length) || length < 0 || start + length > bytes.length) {
+      return true;
+    }
+    const streamBytes = bytes.slice(start, start + length);
+    if (dictionaryIsObjectStream(dictionary)) {
+      const filter = objectStreamFilterIsSupported(dictionary);
+      if (filter === "unsupported") return true;
+      const expanded = filter === "deflate"
+        ? await inflatePdfObjectStream(streamBytes)
+        : streamBytes;
+      if (!expanded || await pdfStructureHasActiveContent(expanded, depth + 1)) return true;
+    }
+    cursor = start + length;
+    tokens = [];
+    previousToken = null;
+  }
+  return false;
+}
+
+function recordHasEntries(value) {
+  return Boolean(value && typeof value === "object" && Reflect.ownKeys(value).length > 0);
+}
+
+function annotationHasActiveContent(annotation) {
+  if (!annotation || typeof annotation !== "object") return false;
+  for (const key of [
+    "action",
+    "attachment",
+    "attachmentDest",
+    "file",
+    "resetForm",
+    "setOCGState",
+    "unsafeUrl",
+    "url",
+  ]) {
+    if (annotation[key]) return true;
+  }
+  return recordHasEntries(annotation.actions);
+}
+
+function outlineHasActiveContent(items) {
+  if (!Array.isArray(items)) return false;
+  return items.some((item) =>
+    annotationHasActiveContent(item) || outlineHasActiveContent(item?.items));
+}
+
+export async function inspectDrawingPdfActiveContent({ bytes }) {
+  const loadingTask = localPdfJs.getDocument({
+    data: bytes.slice(),
+    disableWorker: true,
+    isEvalSupported: false,
+  });
+  const pdfDocument = await loadingTask.promise;
+  try {
+    for (const method of [
+      "getAttachments",
+      "getJSActions",
+      "getOpenAction",
+      "getOutline",
+      "hasJSActions",
+    ]) {
+      if (typeof pdfDocument[method] !== "function") return true;
+    }
+    const [attachments, documentActions, openAction, outline, hasJsActions] =
+      await Promise.all([
+        pdfDocument.getAttachments(),
+        pdfDocument.getJSActions(),
+        pdfDocument.getOpenAction(),
+        pdfDocument.getOutline(),
+        pdfDocument.hasJSActions(),
+      ]);
+    if (
+      recordHasEntries(attachments) ||
+      recordHasEntries(documentActions) ||
+      recordHasEntries(openAction) ||
+      hasJsActions === true ||
+      outlineHasActiveContent(outline)
+    ) return true;
+    for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber += 1) {
+      const page = await pdfDocument.getPage(pageNumber);
+      if (typeof page.getJSActions !== "function" || typeof page.getAnnotations !== "function") {
+        return true;
+      }
+      const [pageActions, annotations] = await Promise.all([
+        page.getJSActions(),
+        page.getAnnotations({ intent: "display" }),
+      ]);
+      if (
+        recordHasEntries(pageActions) ||
+        (Array.isArray(annotations) && annotations.some(annotationHasActiveContent))
+      ) return true;
+    }
+    return pdfStructureHasActiveContent(bytes);
+  } finally {
+    if (typeof pdfDocument.destroy === "function") await pdfDocument.destroy();
+  }
+}
+
 async function defaultPresentSelectedPdfFile(snapshot, options) {
   if (typeof window === "undefined") {
     throw new Error("Browser document unavailable");
@@ -183,6 +540,7 @@ function defaultValidateA11Binding(binding) {
 
 function defaultDependencies() {
   return {
+    inspectActiveContent: inspectDrawingPdfActiveContent,
     presentSelectedPdfFile: defaultPresentSelectedPdfFile,
     extractScene: defaultExtractScene,
     recognizePdfObjects: recognizeWithGate,
@@ -261,6 +619,10 @@ export async function recognizeDrawingFile(file, options = {}) {
   const sourceSha256 = await sha256Hex(bytes);
   const fileFacts = safeFreeze({ byteLength: declaredSize, sha256: sourceSha256 });
   try {
+    const activeContent = await dependencies.inspectActiveContent({ bytes });
+    if (activeContent !== false) {
+      return closedResult("unsupported", "active_content", fileFacts);
+    }
     const snapshot = createTrustedSnapshot(bytes);
     const presentation = await dependencies.presentSelectedPdfFile(snapshot, {
       expectedSha256: sourceSha256,

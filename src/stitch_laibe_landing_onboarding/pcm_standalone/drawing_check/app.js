@@ -262,8 +262,8 @@ export const DRAWING_CHECK_STATES = safeFreeze({
   RESULT_UNAVAILABLE: freezeState({
     code: "RESULT_UNAVAILABLE",
     type: "CLOSED",
-    title: "尚未形成正式案件結果",
-    reason: "本頁沒有身分確認、文件送出與正式解析，因此不會產生圖說檢討結論。",
+    title: "尚未產生可保存的圖面辨識摘要",
+    reason: "本次只在瀏覽器內整理圖面，尚未完成身分確認、文件送出或案件建立，因此尚未形成正式案件紀錄。",
     nextAction: "可重新選擇圖說 PDF，或先準備配對報價。",
     responsibleRole: "甲方",
     payloadPolicy: "ZERO_CASE_DATA",
