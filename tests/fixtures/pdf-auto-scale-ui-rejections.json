@@ -1,0 +1,23 @@
+{
+  "schema": "laibe.tests.pdfAutoScaleUiRejections.v1",
+  "forbiddenSelectors": [
+    "[data-recognition-scale-source-horizontal]",
+    "[data-recognition-scale-source-vertical]",
+    "[data-recognition-scale-mm-horizontal]",
+    "[data-recognition-scale-mm-vertical]",
+    "[data-recognition-unresolved-choice]"
+  ],
+  "forbiddenUserCopy": [
+    "校正比例（必要）",
+    "確認圖面比例（必要）",
+    "水平尺寸",
+    "垂直尺寸",
+    "例如 6500",
+    "例如 5250",
+    "請逐項勾選辨識結果",
+    "請確認這張平面圖與紅色待確認項目"
+  ],
+  "requiredRejectedMessage": "這份圖面的尺寸標註不足，尚未建立物件。請改用含完整尺寸標註的 PDF。",
+  "minimumPassingConfidence": 0.98,
+  "maximumAxisConsistencyErrorPct": 1
+}

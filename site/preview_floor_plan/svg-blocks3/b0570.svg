@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 30" data-source-layer="20-1既有衛浴設備" data-source-unit="mm">
+  <desc>A$C76265628 extracted from 圖塊-平立面2021-1.dwg; units=mm; index-w=40; index-h=30; title=小便斗</desc>
+  <g data-locked="1" data-block="A$C76265628">
+    <path d="M 7.469 14.936 L 13.618 27.236" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 40 0 L 0 0" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 10 10 L 30 10" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 0 15 L 0.046 15.678 L 0.179 16.329 L 0.393 16.946 L 0.683 17.524 L 1.042 18.055 L 1.464 18.536 L 1.945 18.958 L 2.476 19.317 L 3.054 19.607 L 3.671 19.821 L 4.322 19.954 L 5 20" data-layer="0" data-dxftype="ARC" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 0 0 L 0 15" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 5 20 L 10 10" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 35 20 L 35.678 19.954 L 36.329 19.821 L 36.946 19.607 L 37.524 19.317 L 38.055 18.958 L 38.536 18.536 L 38.958 18.055 L 39.317 17.524 L 39.607 16.946 L 39.821 16.329 L 39.954 15.678 L 40 15" data-layer="0" data-dxftype="ARC" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 40 15 L 40 0" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 30 10 L 35 20" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 26.382 27.236 L 32.504 14.936" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 22.953 15 L 22.926 15.401 L 22.848 15.785 L 22.721 16.15 L 22.55 16.491 L 22.338 16.805 L 22.088 17.088 L 21.805 17.338 L 21.491 17.55 L 21.15 17.721 L 20.785 17.848 L 20.401 17.926 L 20 17.953 L 19.599 17.926 L 19.215 17.848 L 18.85 17.721 L 18.509 17.55 L 18.195 17.338 L 17.912 17.088 L 17.662 16.805 L 17.45 16.491 L 17.279 16.15 L 17.152 15.785 L 17.074 15.401 L 17.047 15 L 17.074 14.599 L 17.152 14.215 L 17.279 13.85 L 17.45 13.509 L 17.662 13.195 L 17.912 12.912 L 18.195 12.662 L 18.509 12.45 L 18.85 12.279 L 19.215 12.152 L 19.599 12.074 L 20 12.047 L 20.401 12.074 L 20.785 12.152 L 21.15 12.279 L 21.491 12.45 L 21.805 12.662 L 22.088 12.912 L 22.338 13.195 L 22.55 13.509 L 22.721 13.85 L 22.848 14.215 L 22.926 14.599 L 22.953 15" data-layer="0" data-dxftype="CIRCLE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 18.09 30 L 21.91 30" data-layer="0" data-dxftype="LINE" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 13.618 27.236 L 13.848 27.646 L 14.112 28.029 L 14.408 28.383 L 14.733 28.705 L 15.085 28.996 L 15.462 29.253 L 15.86 29.475 L 16.277 29.66 L 16.712 29.806 L 17.16 29.913 L 17.621 29.978 L 18.09 30" data-layer="0" data-dxftype="ARC" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M 21.91 30 L 22.379 29.978 L 22.84 29.913 L 23.288 29.806 L 23.723 29.66 L 24.14 29.475 L 24.538 29.253 L 24.915 28.996 L 25.267 28.705 L 25.592 28.383 L 25.888 28.029 L 26.152 27.646 L 26.382 27.236" data-layer="0" data-dxftype="ARC" stroke="#000000" fill="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"></path>
+  </g>
+</svg>

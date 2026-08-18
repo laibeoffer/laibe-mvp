@@ -1,0 +1,83 @@
+{
+  "schema": "laibe.tests.exact0312FrozenBrowserReceipt.v1",
+  "sourcePdfSha256": "D5644EC4F7578A08C0033502AC1CAEB3726844B83CF7623B3BE00ACA870072D3",
+  "pageNumber": 1,
+  "selectedRegionId": "page-1-neutral-cluster-b",
+  "dimensionScale": {
+    "status": "ready_for_scale_acceptance",
+    "decodedPairs": [
+      {
+        "rawLabel": "65",
+        "numericValue": 65,
+        "orientation": "horizontal",
+        "axisId": "src_dimension_axis_48951e3a91f0b45312188cc5",
+        "labelId": "src_dimension_label_3895e4606215834b007dc045",
+        "axisSpanPt": 36.84,
+        "sourceRegionId": "page-1-neutral-cluster-b",
+        "chainCompatible": true,
+        "witnessCount": 2
+      },
+      {
+        "rawLabel": "120",
+        "numericValue": 120,
+        "orientation": "vertical",
+        "axisId": "src_dimension_axis_14ddc7e2ffa6ea101503b80e",
+        "labelId": "src_dimension_label_e6e7abff90115b983a0a1e93",
+        "axisSpanPt": 68.04,
+        "sourceRegionId": "page-1-neutral-cluster-b",
+        "chainCompatible": true,
+        "witnessCount": 5
+      },
+      {
+        "rawLabel": "240",
+        "numericValue": 240,
+        "orientation": "vertical",
+        "axisId": "src_dimension_axis_b8842c05f83e3aa44fb580ae",
+        "labelId": "src_dimension_label_92e1c47863ac0f1c1e597e47",
+        "axisSpanPt": 136.08,
+        "sourceRegionId": "page-1-neutral-cluster-b",
+        "chainCompatible": true,
+        "witnessCount": 8
+      }
+    ],
+    "pairRegionCount": 1,
+    "availableOrientations": [
+      "horizontal",
+      "vertical"
+    ],
+    "crossAxisRelativeError": 0.000407083,
+    "crossAxisConsistencyPass": true,
+    "consensusPass": true,
+    "inferredUnit": "cm",
+    "decisionPass": true,
+    "failedRules": [],
+    "acceptedTransformStatus": "accepted_automatic_dimension_scale",
+    "unitsProven": true
+  },
+  "nativeObjectCategories": {
+    "walls": 200,
+    "structures": 1,
+    "openings": 12,
+    "zones": 0,
+    "furniture": 0,
+    "reviewText": 14,
+    "reviewLines": 4,
+    "reviewShapes": 23,
+    "stairs": 0
+  },
+  "topology": {
+    "pass": true,
+    "gapCount": 0,
+    "illegalOverlapCount": 0,
+    "protrusionCount": 0,
+    "disconnectedBoundaryCount": 0,
+    "failedJunctionCount": 0,
+    "closureCount": 16,
+    "allClosuresSourceJunctionProven": true,
+    "wallBodyCount": 115,
+    "columnBodyCount": 1,
+    "renderGeometryHash": "64a9c6771010f69cb0a4f9f4b0fecbdd3582bbca15d560bcf1458248f660d1e0",
+    "domGeometryHash": "64a9c6771010f69cb0a4f9f4b0fecbdd3582bbca15d560bcf1458248f660d1e0",
+    "hashesMatch": true
+  }
+}
