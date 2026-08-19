@@ -24,6 +24,10 @@ const fixtureDir = resolve(
   testDir,
   "fixtures/quote-healthcheck-pdf",
 );
+const quoteTargetPath =
+  "C:/CodexWork/訓練資料/2025.10.02-漢皇SUPER小伍哥/02-報價單/01-業主報價/小伍哥報價單0420-2.pdf";
+const contractTargetPath =
+  "C:/CodexWork/訓練資料/2025.10.02-漢皇SUPER小伍哥/02-報價單/01-業主報價/漢皇SUPER-4F住宅修改工程合約.pdf";
 
 const fixtureFile = (fixtureName, browserName = "報價.pdf") =>
   new File([readFileSync(resolve(fixtureDir, fixtureName))], browserName, {
@@ -38,6 +42,109 @@ const loadAdapter = async () => {
   );
   return import(`${pathToFileURL(adapterPath).href}?test=${crypto.randomUUID()}`);
 };
+
+function installPdfJsNodePolyfills() {
+  if (!Uint8Array.prototype.toHex) {
+    Object.defineProperty(Uint8Array.prototype, "toHex", {
+      value() {
+        return Array.from(this, (byte) => byte.toString(16).padStart(2, "0")).join("");
+      },
+    });
+  }
+  if (!Map.prototype.getOrInsertComputed) {
+    Object.defineProperty(Map.prototype, "getOrInsertComputed", {
+      value(key, createValue) {
+        if (!this.has(key)) this.set(key, createValue(key));
+        return this.get(key);
+      },
+    });
+  }
+  if (!globalThis.DOMMatrix) {
+    globalThis.DOMMatrix = class DOMMatrix {
+      constructor(values = [1, 0, 0, 1, 0, 0]) {
+        [this.a, this.b, this.c, this.d, this.e, this.f] = [
+          Number(values[0] ?? 1),
+          Number(values[1] ?? 0),
+          Number(values[2] ?? 0),
+          Number(values[3] ?? 1),
+          Number(values[4] ?? 0),
+          Number(values[5] ?? 0),
+        ];
+      }
+
+      multiplySelf(other) {
+        const next = {
+          a: this.a * other.a + this.c * other.b,
+          b: this.b * other.a + this.d * other.b,
+          c: this.a * other.c + this.c * other.d,
+          d: this.b * other.c + this.d * other.d,
+          e: this.a * other.e + this.c * other.f + this.e,
+          f: this.b * other.e + this.d * other.f + this.f,
+        };
+        Object.assign(this, next);
+        return this;
+      }
+
+      preMultiplySelf(other) {
+        const current = new globalThis.DOMMatrix([this.a, this.b, this.c, this.d, this.e, this.f]);
+        Object.assign(this, other);
+        return this.multiplySelf(current);
+      }
+
+      translateSelf(x = 0, y = 0) {
+        return this.multiplySelf(new globalThis.DOMMatrix([1, 0, 0, 1, x, y]));
+      }
+
+      scaleSelf(x = 1, y = x) {
+        return this.multiplySelf(new globalThis.DOMMatrix([x, 0, 0, y, 0, 0]));
+      }
+
+      invertSelf() {
+        const determinant = this.a * this.d - this.b * this.c;
+        const { a, b, c, d, e, f } = this;
+        Object.assign(this, {
+          a: d / determinant,
+          b: -b / determinant,
+          c: -c / determinant,
+          d: a / determinant,
+          e: (c * f - d * e) / determinant,
+          f: (b * e - a * f) / determinant,
+        });
+        return this;
+      }
+    };
+  }
+  globalThis.ImageData ||= class ImageData {};
+  globalThis.Path2D ||= class Path2D {};
+}
+
+async function createPdfJsTextExtractor() {
+  installPdfJsNodePolyfills();
+  const pdfJsPath = resolve(repoRoot, "site/preview_floor_plan/vendor/pdfjs/pdf.mjs");
+  const pdfjsLib = await import(pathToFileURL(pdfJsPath).href);
+  return async (bytes) => {
+    const document = await pdfjsLib.getDocument({
+      data: new Uint8Array(bytes),
+      disableWorker: true,
+      disableAutoFetch: true,
+      disableStream: true,
+    }).promise;
+    const textLines = [];
+    for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+      const page = await document.getPage(pageNumber);
+      const content = await page.getTextContent();
+      const line = content.items
+        .map((item) => typeof item?.str === "string" ? item.str.trim() : "")
+        .filter(Boolean)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (line) textLines.push(line);
+    }
+    await document.destroy();
+    return { pageCount: document.numPages, textLines };
+  };
+}
 
 test("Quote Check exposes a parser-only summary and never fabricates a formal report", async () => {
   const appSource = readFileSync(appPath, "utf8");
@@ -61,6 +168,7 @@ test("Quote Check exposes a parser-only summary and never fabricates a formal re
     lineCount: 2,
     readability: "可讀文字層",
     comparison: "本次未提供比較基準",
+    previewText: "拆除工程 | 式 | 2 | 1200 | 2400 / 油漆工程 | 坪 | 10 | 800 | 8000",
   });
   assert.equal(result.report, null);
   assert.deepEqual(result.limitations, []);
@@ -72,11 +180,63 @@ test("Quote Check exposes a parser-only summary and never fabricates a formal re
   for (const domainField of ["packet", "policy", "findings", "schema"]) {
     assert.equal(Object.hasOwn(result, domainField), false, domainField);
   }
-  assert.doesNotMatch(JSON.stringify(result), /拆除工程|油漆工程|1200|8000/u);
   assert.doesNotMatch(
     readFileSync(adapterPath, "utf8"),
     /local-browser-session|local-browser-document/u,
   );
+});
+
+test("compressed quote PDFs can still expose a local summary when an in-repo text extractor is available", async () => {
+  const adapter = await loadAdapter();
+  const result = await adapter.inspectQuotePdfFile(
+    fixtureFile("filter-array.pdf", "壓縮報價.pdf"),
+    {
+      async extractPdfTextWithPdfJs() {
+        return {
+          pageCount: 2,
+          textLines: [
+            "項次 單位 數量 單價 金額",
+            "客製櫃體與現場條件待依原始報價逐項確認",
+          ],
+        };
+      },
+    },
+  );
+
+  assert.equal(result.status, "PARSER_READY");
+  assert.equal(result.summary.pageCount, 2);
+  assert.equal(result.summary.itemCount, 0);
+  assert.equal(result.summary.lineCount, 2);
+  assert.match(result.summary.previewText, /項次/u);
+  assert.match(result.limitations.join(" "), /沒有找到可安全辨識的完整報價列/u);
+});
+
+test("human target PDFs produce local quote and contract summaries when repo pdfjs support is injected read-only", async () => {
+  assert.equal(existsSync(quoteTargetPath), true, "quote target PDF missing");
+  assert.equal(existsSync(contractTargetPath), true, "contract target PDF missing");
+  const adapter = await loadAdapter();
+  const extractPdfTextWithPdfJs = await createPdfJsTextExtractor();
+
+  const quoteBytes = readFileSync(quoteTargetPath);
+  const quoteResult = await adapter.inspectQuotePdfFile(
+    new File([quoteBytes], "小伍哥報價單0420-2.pdf", { type: "application/pdf" }),
+    { extractPdfTextWithPdfJs },
+  );
+  assert.equal(quoteResult.status, "PARSER_READY");
+  assert.equal(quoteResult.summary.pageCount, 4);
+  assert.ok(quoteResult.summary.lineCount > 0);
+  assert.match(quoteResult.summary.previewText, /項次|單位|金額/u);
+
+  const contractBytes = readFileSync(contractTargetPath);
+  const contractResult = await adapter.inspectContractPdfFile(
+    new File([contractBytes], "漢皇SUPER-4F住宅修改工程合約.pdf", { type: "application/pdf" }),
+    { extractPdfTextWithPdfJs },
+  );
+  assert.equal(contractResult.status, "PARSER_READY");
+  assert.equal(contractResult.summary.pageCount, 6);
+  assert.ok(contractResult.summary.lineCount > 0);
+  assert.deepEqual(contractResult.summary.clauseDraft.length, 7);
+  assert.equal(contractResult.report, null);
 });
 
 test("契約 PDF 會回傳條款初步整理（HOLD）摘要而非正式法務結論", async () => {

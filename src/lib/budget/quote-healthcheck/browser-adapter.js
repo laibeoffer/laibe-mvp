@@ -1057,6 +1057,171 @@ var notifyBeforePageTextParse = (dependencies) => {
   if (callback) callback();
 };
 
+var readOwnFunction = (value, key) => {
+  try {
+    if (
+      value === null ||
+      value === void 0 ||
+      (typeof value !== "object" && typeof value !== "function")
+    ) {
+      return void 0;
+    }
+    const descriptor = trustedGetOwnPropertyDescriptor(value, key);
+    return descriptor && typeof descriptor.value === "function"
+      ? descriptor.value
+      : void 0;
+  } catch {
+    return void 0;
+  }
+};
+
+var pdfJsModulePromise;
+
+var loadPdfJsModule = async (dependencies = void 0) => {
+  const providedLoader = readOwnFunction(dependencies, "loadPdfJsModule");
+  if (providedLoader) {
+    try {
+      const provided = await providedLoader();
+      return provided && typeof provided.getDocument === "function" ? provided : null;
+    } catch {
+      return null;
+    }
+  }
+  if (globalThis.pdfjsLib && typeof globalThis.pdfjsLib.getDocument === "function") {
+    return globalThis.pdfjsLib;
+  }
+  if (typeof window !== "object" || typeof document !== "object") return null;
+  if (!pdfJsModulePromise) {
+    pdfJsModulePromise = import("../../../../site/preview_floor_plan/vendor/pdfjs/pdf.mjs")
+      .then((module) => {
+        globalThis.pdfjsLib = module;
+        return module;
+      })
+      .catch(() => null);
+  }
+  return pdfJsModulePromise;
+};
+
+var groupPdfJsTextLines = (items) => {
+  const rows = [];
+  for (const item of items) {
+    const text = typeof item?.str === "string"
+      ? item.str.replace(/\s+/g, " ").trim()
+      : "";
+    if (!text) continue;
+    const transform = Array.isArray(item?.transform) ? item.transform : [];
+    const x = Number.isFinite(transform[4]) ? transform[4] : 0;
+    const y = Number.isFinite(transform[5]) ? transform[5] : rows.length;
+    const bucket = Math.round(y / 4) * 4;
+    let row = rows.find((entry) => Math.abs(entry.bucket - bucket) <= 2);
+    if (!row) {
+      row = { bucket, items: [] };
+      rows.push(row);
+    }
+    row.items.push({ x, text });
+  }
+  return rows
+    .sort((left, right) => right.bucket - left.bucket)
+    .flatMap((row) => {
+      const line = row.items
+        .sort((left, right) => left.x - right.x)
+        .map((entry) => entry.text)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return line ? [line] : [];
+    });
+};
+
+var summarizeReadableText = (lines) => {
+  const joined = lines
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter((line) => line.length > 0)
+    .slice(0, 3)
+    .join(" / ");
+  if (!joined) return "已讀取到文字層，但這次摘要沒有可顯示的前段文字。";
+  return joined.length <= 220 ? joined : `${joined.slice(0, 217)}...`;
+};
+
+var inspectPdfTextWithPdfJs = async (inputBytes, dependencies = void 0) => {
+  const providedExtractor = readOwnFunction(dependencies, "extractPdfTextWithPdfJs");
+  if (providedExtractor) {
+    try {
+      const provided = await providedExtractor(new Uint8Array(inputBytes));
+      if (!provided || !Number.isInteger(provided.pageCount) || !Array.isArray(provided.textLines)) {
+        return null;
+      }
+      const textLines = provided.textLines
+        .map((line) => typeof line === "string" ? line.trim() : "")
+        .filter((line) => line.length > 0);
+      return {
+        pageCount: provided.pageCount,
+        textLines,
+        readability: textLines.length > 0 ? "TEXT_LAYER" : "NO_EXTRACTABLE_TEXT",
+      };
+    } catch {
+      return null;
+    }
+  }
+  const pdfjs = await loadPdfJsModule(dependencies);
+  if (!pdfjs || typeof pdfjs.getDocument !== "function") return null;
+  try {
+    const document = await pdfjs.getDocument({
+      data: new Uint8Array(inputBytes),
+      disableWorker: true,
+      disableAutoFetch: true,
+      disableStream: true,
+    }).promise;
+    const textLines = [];
+    for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
+      const page = await document.getPage(pageNumber);
+      const content = await page.getTextContent();
+      textLines.push(...groupPdfJsTextLines(Array.isArray(content?.items) ? content.items : []));
+    }
+    await document.destroy();
+    return {
+      pageCount: document.numPages,
+      textLines,
+      readability: textLines.length > 0 ? "TEXT_LAYER" : "NO_EXTRACTABLE_TEXT",
+    };
+  } catch {
+    return null;
+  }
+};
+
+var buildQuoteSummaryResult = (intake) => ({
+  status: "PARSER_READY",
+  title: "本機解析摘要已完成",
+  message: "摘要只反映這次選擇的 PDF，不會上傳或保存。",
+  nextAction: "請回到原始報價文件逐項確認；本頁不會建立正式報告或案件紀錄。",
+  summary: {
+    pageCount: intake.inspection.pageCount,
+    itemCount: intake.rowCount,
+    lineCount: intake.textLines ? intake.textLines.length : 0,
+    readability: "可讀文字層",
+    comparison: "本次未提供比較基準",
+    previewText: summarizeReadableText(intake.textLines ?? []),
+  },
+  report: null,
+  limitations: translateLimitations(intake.limitations)
+});
+
+var buildContractSummaryResult = (intake) => ({
+  status: "PARSER_READY",
+  title: "契約條款初步整理完成（HOLD）",
+  message:
+    "本機僅提供條款初步整理，僅作參考；不會產生正式案件留痕。",
+  nextAction: "請回到原始契約逐條確認；正式留痕需在案件正式流程建立。",
+  summary: {
+    pageCount: intake.inspection.pageCount,
+    lineCount: intake.textLines ? intake.textLines.length : 0,
+    readability: "可讀文字層",
+    clauseDraft: extractClauseDraft(intake.textLines ?? []),
+  },
+  report: null,
+  limitations: [],
+});
+
 var inspectParserOnlyQuotePdfBytes = (inputBytes, dependencies = void 0) => {
   const bytes = new Uint8Array(inputBytes);
   if (bytes.byteLength > DEFAULT_MAX_BYTES) {
@@ -1208,7 +1373,25 @@ var inspectQuotePdfFile = async (file, dependencies = void 0) => {
 
   try {
     const intake = inspectParserOnlyQuotePdfBytes(snapshot.bytes, dependencies);
-    if (!intake.accepted) return publicRejection(intake.rejection.code);
+    if (!intake.accepted) {
+      if (["CORRUPT_PDF", "UNSUPPORTED_COMPRESSED_CONTENT"].includes(intake.rejection.code)) {
+        const fallback = await inspectPdfTextWithPdfJs(snapshot.bytes, dependencies);
+        if (fallback?.readability === "TEXT_LAYER") {
+          return buildQuoteSummaryResult({
+            accepted: true,
+            inspection: {
+              byteLength: snapshot.bytes.byteLength,
+              pageCount: fallback.pageCount,
+              readability: fallback.readability,
+            },
+            textLines: fallback.textLines,
+            rowCount: 0,
+            limitations: [{ code: "NO_STRUCTURED_QUOTE_ROWS" }],
+          });
+        }
+      }
+      return publicRejection(intake.rejection.code);
+    }
     if (intake.inspection.readability === "IMAGE_ONLY") {
       return publicFailure(
         "SCANNED_PDF",
@@ -1218,28 +1401,9 @@ var inspectQuotePdfFile = async (file, dependencies = void 0) => {
       );
     }
     if (intake.inspection.readability !== "TEXT_LAYER" || intake.rowCount === 0) {
-      return publicFailure(
-        "UNSUPPORTED_LAYOUT",
-        "尚未找到可整理的報價列",
-        "檔案有文字層，但沒有符合目前五欄報價格式的完整資料。",
-        "請確認內容包含項目、單位、數量、單價與金額，再重新選擇。"
-      );
+      return buildQuoteSummaryResult(intake);
     }
-    return {
-      status: "PARSER_READY",
-      title: "本機解析摘要已完成",
-      message: "摘要只反映這次選擇的 PDF，不會上傳或保存。",
-      nextAction: "請回到原始報價文件逐項確認；本頁不會建立正式報告或案件紀錄。",
-      summary: {
-        pageCount: intake.inspection.pageCount,
-        itemCount: intake.rowCount,
-        lineCount: intake.textLines ? intake.textLines.length : 0,
-        readability: "可讀文字層",
-        comparison: "本次未提供比較基準"
-      },
-      report: null,
-      limitations: translateLimitations(intake.limitations)
-    };
+    return buildQuoteSummaryResult(intake);
   } catch {
     return publicFailure(
       "UNREADABLE_PDF",
@@ -1263,7 +1427,25 @@ var inspectContractPdfFile = async (file, dependencies = void 0) => {
   }
   try {
     const intake = inspectParserOnlyQuotePdfBytes(snapshot.bytes, dependencies);
-    if (!intake.accepted) return publicRejection(intake.rejection.code);
+    if (!intake.accepted) {
+      if (["CORRUPT_PDF", "UNSUPPORTED_COMPRESSED_CONTENT"].includes(intake.rejection.code)) {
+        const fallback = await inspectPdfTextWithPdfJs(snapshot.bytes, dependencies);
+        if (fallback?.readability === "TEXT_LAYER") {
+          return buildContractSummaryResult({
+            accepted: true,
+            inspection: {
+              byteLength: snapshot.bytes.byteLength,
+              pageCount: fallback.pageCount,
+              readability: fallback.readability,
+            },
+            textLines: fallback.textLines,
+            rowCount: 0,
+            limitations: [],
+          });
+        }
+      }
+      return publicRejection(intake.rejection.code);
+    }
     if (intake.inspection.readability === "IMAGE_ONLY") {
       return publicFailure(
         "SCANNED_PDF",
@@ -1280,22 +1462,7 @@ var inspectContractPdfFile = async (file, dependencies = void 0) => {
         "請確認契約 PDF 可正常閱讀後再選擇。"
       );
     }
-    const clauseDraft = extractClauseDraft(intake.textLines ?? []);
-    return {
-      status: "PARSER_READY",
-      title: "契約條款初步整理完成（HOLD）",
-      message:
-        "本機僅提供條款初步整理，僅作參考；不會產生正式案件留痕。",
-      nextAction: "請回到原始契約逐條確認；正式留痕需在案件正式流程建立。",
-      summary: {
-        pageCount: intake.inspection.pageCount,
-        lineCount: intake.textLines ? intake.textLines.length : 0,
-        readability: "可讀文字層",
-        clauseDraft,
-      },
-      report: null,
-      limitations: [],
-    };
+    return buildContractSummaryResult(intake);
   } catch {
     return publicFailure(
       "UNREADABLE_PDF",

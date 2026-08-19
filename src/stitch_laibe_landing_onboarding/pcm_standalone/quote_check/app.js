@@ -1018,13 +1018,15 @@ function initializeDocumentWorkspace(
     if (!ready) return;
     setTextFor("[data-summary-page-count]", String(result.summary.pageCount));
     setTextFor("[data-summary-item-count]", String(result.summary.itemCount));
+    setTextFor("[data-summary-line-count]", String(result.summary.lineCount ?? 0));
     setTextFor("[data-summary-readability]", result.summary.readability);
     setTextFor("[data-summary-comparison]", result.summary.comparison);
     setTextFor(
-      "[data-summary-limitations]",
-      result.limitations.length > 0
-        ? result.limitations.join(" ")
-        : "這份本機解析摘要不會保存，也不是案件正式報告。",
+      "[data-summary-preview]",
+      result.summary.previewText ||
+        (result.limitations.length > 0
+          ? result.limitations.join(" ")
+          : "這份本機解析摘要不會保存，也不是案件正式報告。"),
     );
   }
 

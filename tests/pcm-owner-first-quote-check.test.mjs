@@ -601,13 +601,14 @@ function createDocumentWorkspaceHarness() {
   const summaryFields = {
     "[data-summary-page-count]": createNode({ textContent: "—" }),
     "[data-summary-item-count]": createNode({ textContent: "—" }),
+    "[data-summary-line-count]": createNode({ textContent: "—" }),
     "[data-summary-readability]": createNode({ textContent: "—" }),
     "[data-summary-comparison]": createNode({ textContent: "—" }),
-      "[data-summary-limitations]": createNode({
-        textContent: "這份本機解析摘要不是案件正式報告。",
-      }),
-      ...contractSummaryFields,
-    };
+    "[data-summary-preview]": createNode({
+      textContent: "尚未產生本機摘要。",
+    }),
+    ...contractSummaryFields,
+  };
   const itemSpecs = [
     ["quote", "quote-scope", "報價內容", "是否有項目只寫名稱，沒有規格或範圍？"],
     ["contract", "contract-change", "契約條款", "追加與變更由誰提出、誰確認？"],
@@ -716,6 +717,8 @@ function createDocumentWorkspaceHarness() {
     if (selector === "[data-contract-summary-line-count]") return contractSummaryFields["[data-contract-summary-line-count]"];
     if (selector === "[data-contract-summary-readability]") return contractSummaryFields["[data-contract-summary-readability]"];
     if (selector === "[data-contract-clause-draft]") return contractSummaryFields["[data-contract-clause-draft]"];
+    if (selector === "[data-summary-line-count]") return summaryFields["[data-summary-line-count]"];
+    if (selector === "[data-summary-preview]") return summaryFields["[data-summary-preview]"];
     const selectors = [
       ["document-feedback", feedback],
       ["document-filename", filename],
@@ -981,7 +984,7 @@ test("approved two-function workspace is visible truthful and memory only", asyn
   assert.match(html, /<h1[^>]*>報價文件檢查<\/h1>/u);
   assert.match(
     visible,
-    /未加密、未壓縮且含文字層；契約則以文字字串為基礎做初步條款整理/u,
+    /未加密且含文字層；若檔案可安全讀取，會先整理頁數、行數與本機摘要。契約則以文字字串為基礎做初步條款整理/u,
   );
   assert.doesNotMatch(visible, /上傳成功|已上傳/u, "本機讀取流程不得對使用者宣稱已上傳");
   assert.match(html, /data-start-upload[^>]*>\s*選擇第一份 PDF\s*<\/button>/u);
@@ -1162,7 +1165,9 @@ test("production workspace renders parser-only facts without a formal report CTA
   assert.equal(harness.parserSummary.hidden, false);
   assert.equal(harness.summaryFields["[data-summary-page-count]"].textContent, "1");
   assert.equal(harness.summaryFields["[data-summary-item-count]"].textContent, "2");
+  assert.equal(harness.summaryFields["[data-summary-line-count]"].textContent, "2");
   assert.equal(harness.summaryFields["[data-summary-readability]"].textContent, "可讀文字層");
+  assert.match(harness.summaryFields["[data-summary-preview]"].textContent, /拆除工程/u);
   assert.match(harness.live.textContent, /不是案件正式報告/u);
 });
 
@@ -1296,15 +1301,14 @@ test("production workspace fails closed for scanned bytes, recovers on reselect,
 
 test("production workspace maps unsafe and fake-text bytes to safe parser-only recovery states", async () => {
   const app = await importDocumentWorkspaceApp("workspace-byte-rejections");
-  const cases = [
+  const errorCases = [
     ["encrypted.pdf", /這份 PDF 已加密/u],
     ["adversarial-action.pdf", /這份 PDF 含有互動內容/u],
     ["filter-array.pdf", /這份 PDF 使用尚未支援的壓縮格式/u],
     ["corrupt.pdf", /無法安全讀取這份 PDF/u],
-    ["metadata-fake-tj.pdf", /尚未找到可整理的報價列/u],
   ];
 
-  for (const [fixtureName, visibleMessage] of cases) {
+  for (const [fixtureName, visibleMessage] of errorCases) {
     const harness = createDocumentWorkspaceHarness();
     app.initializeQuoteCheckPage(harness.documentRoot, { hash: "", search: "?mode=quote" });
     await harness.chooseFile(
@@ -1323,6 +1327,19 @@ test("production workspace maps unsafe and fake-text bytes to safe parser-only r
     );
     assert.equal(Object.hasOwn(harness.reportActions, "quote"), false, fixtureName);
   }
+
+  const readableButUnstructured = createDocumentWorkspaceHarness();
+  app.initializeQuoteCheckPage(readableButUnstructured.documentRoot, { hash: "", search: "?mode=quote" });
+  await readableButUnstructured.chooseFile(
+    "quote",
+    await quoteFixtureFile("metadata-fake-tj.pdf", "相同顯示檔名.pdf"),
+  );
+  assert.equal(readableButUnstructured.parserStatuses.quote.dataset.parserState, "parser-ready");
+  assert.equal(readableButUnstructured.parserSummary.hidden, false);
+  assert.match(readableButUnstructured.parserStatuses.quote.textContent, /本機解析摘要已完成/u);
+  assert.equal(readableButUnstructured.summaryFields["[data-summary-item-count]"].textContent, "0");
+  assert.match(readableButUnstructured.summaryFields["[data-summary-preview]"].textContent, /已讀取到文字層/u);
+  assert.equal(readableButUnstructured.feedback.quote.dataset.feedbackState, "selected");
 });
 
 test("same filename renders different parser summaries from different PDF bytes", async () => {

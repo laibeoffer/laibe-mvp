@@ -36,7 +36,7 @@
         <p class="workspace-heading__eyebrow">給已拿到報價、契約或圖說的業主</p>
         <h1 id="workspace-title">報價文件檢查</h1>
           <p class="self-check-hero__lead">報價 PDF 先顯示可回頭核對的解析摘要；契約 PDF 顯示本機條款初步整理；施工圖先維持入口狀態。</p>
-          <p class="self-check-hero__boundary">目前報價 PDF 需為未加密、未壓縮且含文字層；契約則以文字字串為基礎做初步條款整理。檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。</p>
+          <p class="self-check-hero__boundary">目前報價 PDF 需為未加密且含文字層；若檔案可安全讀取，會先整理頁數、行數與本機摘要。契約則以文字字串為基礎做初步條款整理。檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。</p>
         <div class="self-check-hero__actions">
           <button class="owner-first-primary-action" type="button" data-start-upload>選擇第一份 PDF</button>
           <a class="owner-first-secondary-action" href="#document-workspace">選擇文件類型</a>
@@ -86,10 +86,11 @@
                 <dl>
                   <div><dt>頁數</dt><dd data-summary-page-count>—</dd></div>
                   <div><dt>可辨識報價列</dt><dd data-summary-item-count>—</dd></div>
+                  <div><dt>可讀文字行數</dt><dd data-summary-line-count>—</dd></div>
                   <div><dt>文件狀態</dt><dd data-summary-readability>—</dd></div>
                   <div><dt>比較狀態</dt><dd data-summary-comparison>—</dd></div>
                 </dl>
-                <p data-summary-limitations>這份本機解析摘要不會保存，也不是案件正式報告。</p>
+                <p data-summary-preview>尚未產生本機摘要。</p>
               </div>
               <p class="ai-report-boundary">這只整理本次 PDF 的文字層，不是 OCR、完整報價審查、正式報告或案件紀錄；請回到原始文件逐項核對。</p>
             </section>
