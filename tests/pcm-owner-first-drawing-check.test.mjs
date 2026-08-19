@@ -224,11 +224,14 @@ function createFileHandlerHarness() {
     "[data-recognition-title]": { textContent: "" },
     "[data-recognition-message]": { textContent: "" },
     "[data-recognition-content]": { textContent: "" },
+    "[data-recognition-scope]": { textContent: "" },
+    "[data-recognition-binding]": { textContent: "" },
     "[data-recognition-size]": { textContent: "" },
     "[data-recognition-pages]": { textContent: "" },
     "[data-recognition-objects]": { textContent: "" },
     "[data-recognition-uncertainty]": { textContent: "" },
     "[data-recognition-counts]": { textContent: "" },
+    "[data-recognition-next]": { textContent: "" },
     "[data-recognition-items]": { textContent: "" },
     "[data-correction-recognition-items]": { textContent: "" },
     "[data-recognition-reference]": recognitionReference,
@@ -530,6 +533,9 @@ test("processing and recognition summary stay local honest and review-bound", as
   assert.match(app, /token !== recognitionSequence/);
   assert.match(app, /browser-recognition-adapter\.mjs/);
   assert.match(html, /data-recognition-counts/);
+  assert.match(html, /data-recognition-scope/);
+  assert.match(html, /data-recognition-binding/);
+  assert.match(html, /data-recognition-next/);
   assert.match(html, /data-recognition-items/);
   assert.match(html, /data-recognition-reference/);
   assert.match(html, /data-correction-recognition-items/);
@@ -574,9 +580,12 @@ test("async app to real adapter renders bytes-derived safe partial details", asy
   assert.equal(result.status, "partial");
   assert.equal(harness.recognitionState(), "partial");
   assert.match(harness.recognitionText("[data-recognition-pages]"), /第 1 頁/);
+  assert.match(harness.recognitionText("[data-recognition-scope]"), /本機圖面整理/);
+  assert.match(harness.recognitionText("[data-recognition-binding]"), /正式案件綁定尚未完成/);
   assert.match(harness.recognitionText("[data-recognition-size]"), /\d+(\.\d+)? MB/);
   assert.match(harness.recognitionText("[data-recognition-objects]"), /找到 \d+ 個候選結構/);
   assert.match(harness.recognitionText("[data-recognition-uncertainty]"), /\d+ 項仍需人工確認/);
+  assert.match(harness.recognitionText("[data-recognition-next]"), /案件、文件與版本核對/);
   for (const row of result.classificationCounts) {
     assert.match(
       harness.recognitionText("[data-recognition-counts]"),

@@ -631,11 +631,14 @@ export function initializeDrawingCheckPage(options = {}) {
   const recognitionTitle = root.querySelector("[data-recognition-title]");
   const recognitionMessage = root.querySelector("[data-recognition-message]");
   const recognitionContent = root.querySelector("[data-recognition-content]");
+  const recognitionScope = root.querySelector("[data-recognition-scope]");
+  const recognitionBinding = root.querySelector("[data-recognition-binding]");
   const recognitionSize = root.querySelector("[data-recognition-size]");
   const recognitionPages = root.querySelector("[data-recognition-pages]");
   const recognitionObjects = root.querySelector("[data-recognition-objects]");
   const recognitionUncertainty = root.querySelector("[data-recognition-uncertainty]");
   const recognitionCounts = root.querySelector("[data-recognition-counts]");
+  const recognitionNext = root.querySelector("[data-recognition-next]");
   const recognitionItems = root.querySelector("[data-recognition-items]");
   const correctionRecognitionItems = root.querySelector("[data-correction-recognition-items]");
   const recognitionReference = root.querySelector("[data-recognition-reference]");
@@ -754,11 +757,14 @@ export function initializeDrawingCheckPage(options = {}) {
       setText(recognitionTitle, "正在讀取 PDF 圖面結構");
       setText(recognitionMessage, "請稍候；完成前不會形成任何圖說、尺寸或案件結論。");
       setText(recognitionContent, "正在檢查 PDF 內容");
+      setText(recognitionScope, "辨識完成後顯示");
+      setText(recognitionBinding, "辨識完成後顯示");
       setText(recognitionSize, "正在確認");
       setText(recognitionPages, "正在確認");
       setText(recognitionObjects, "正在整理");
       setText(recognitionCounts, "辨識完成後顯示");
       setText(recognitionUncertainty, "辨識完成後顯示");
+      setText(recognitionNext, "辨識完成後顯示");
       setText(recognitionItems, "辨識完成後顯示");
       setText(correctionRecognitionItems, "辨識完成後顯示");
       clearRecognitionReference();
@@ -799,6 +805,19 @@ export function initializeDrawingCheckPage(options = {}) {
       const objectCount = Number(summary && summary.objectCount);
       const unresolvedCount = Number(summary && summary.unresolvedCount);
       const byteLength = Number(file && file.byteLength);
+      const reviewHolds = Array.isArray(result && result.holds)
+        ? result.holds
+        : [];
+      const formalBindingOnHold = reviewHolds.includes("A11_FORMAL_BINDING_HOLD");
+      const reviewScopeText = result && result.mode === "local_review_only"
+        ? "本機圖面整理；僅供這次人工檢視"
+        : "本次辨識摘要；仍待人工核對";
+      const bindingText = formalBindingOnHold
+        ? "正式案件綁定尚未完成"
+        : "正式案件綁定已提供";
+      const nextActionText = formalBindingOnHold
+        ? "若要形成正式圖說辨識，仍需完成案件、文件與版本核對；目前請先依本次摘要回看原始圖說。"
+        : "請依本次摘要回看原始圖說，再決定是否送入正式圖說辨識流程。";
       setText(recognitionKicker, "已整理，仍需確認");
       setText(
         recognitionTitle,
@@ -806,9 +825,13 @@ export function initializeDrawingCheckPage(options = {}) {
       );
       setText(
         recognitionMessage,
-        "這是本次瀏覽器內辨識摘要，不是正式圖面、尺寸確認或案件紀錄。",
+        formalBindingOnHold
+          ? "這是本次瀏覽器內辨識摘要；已整理出圖面結構，但正式案件綁定仍未完成。"
+          : "這是本次瀏覽器內辨識摘要，不是正式圖面、尺寸確認或案件紀錄。",
       );
       setText(recognitionContent, "部分內容可辨識；目前僅供本機人工檢視");
+      setText(recognitionScope, reviewScopeText);
+      setText(recognitionBinding, bindingText);
       setText(
         recognitionSize,
         Number.isFinite(byteLength) ? `${(byteLength / 1024 / 1024).toFixed(1)} MB（本次讀取）` : "已讀取",
@@ -829,9 +852,10 @@ export function initializeDrawingCheckPage(options = {}) {
       setText(
         recognitionUncertainty,
         stableUncertaintyItems.length > 0
-          ? `${stableUncertaintyItems.length} 項仍需人工確認`
+          ? `${Number.isFinite(unresolvedCount) && unresolvedCount >= 0 ? unresolvedCount : stableUncertaintyItems.length} 項仍需人工確認`
           : "目前沒有列出重要待確認項目，仍需人工核對",
       );
+      setText(recognitionNext, nextActionText);
       latestRecognitionItemsText = stableUncertaintyItems.length > 0
         ? stableUncertaintyItems.map((item, index) =>
           `${index + 1}. ${item.reason}；${item.nextAction || "請人工核對原始圖說後補充採用建議。"}`
@@ -855,11 +879,14 @@ export function initializeDrawingCheckPage(options = {}) {
     setText(recognitionTitle, "選擇 PDF 後顯示辨識狀態");
     setText(recognitionMessage, "檔案只在瀏覽器內暫時讀取，不會送出或保存。");
     setText(recognitionContent, "尚未選擇");
+    setText(recognitionScope, "尚未選擇");
+    setText(recognitionBinding, "尚未選擇");
     setText(recognitionSize, "尚未選擇");
     setText(recognitionPages, "尚未選擇");
     setText(recognitionObjects, "尚未選擇");
     setText(recognitionCounts, "尚未選擇");
     setText(recognitionUncertainty, "尚未選擇");
+    setText(recognitionNext, "尚未選擇");
     setText(recognitionItems, "尚未選擇");
     latestRecognitionItemsText = "尚未完成本次辨識";
     setText(correctionRecognitionItems, latestRecognitionItemsText);
