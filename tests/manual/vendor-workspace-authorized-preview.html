@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-preview-state="TEMPORARY_VISUAL_PREVIEW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>乙方工作台本機視覺驗收</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --preview-bg: #111827;
+        --preview-panel: #182230;
+        --preview-line: rgba(255, 255, 255, 0.16);
+        --preview-text: #f8fafc;
+        --preview-muted: #cbd5e1;
+        --preview-accent: #ff5809;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-block-size: 100vh;
+        background:
+          radial-gradient(circle at 12% 0%, rgba(255, 88, 9, 0.2), transparent 32rem),
+          var(--preview-bg);
+        color: var(--preview-text);
+        font-family:
+          "Noto Sans TC",
+          "Microsoft JhengHei",
+          system-ui,
+          sans-serif;
+      }
+
+      html,
+      body,
+      .visual-preview-shell {
+        inline-size: 100%;
+        block-size: 100%;
+      }
+
+      body {
+        overflow: hidden;
+      }
+
+      .visual-preview-shell {
+        display: block;
+        min-block-size: 100vh;
+      }
+
+      .visual-preview-frame-wrap {
+        inline-size: 100%;
+        block-size: 100%;
+        min-block-size: 100vh;
+        padding: 0;
+      }
+
+      .visual-preview-frame {
+        display: block;
+        inline-size: 100%;
+        block-size: 100vh;
+        min-block-size: 100vh;
+        border: 0;
+        border-radius: 0;
+        background: #f4f1ea;
+      }
+
+      @media (max-width: 640px) {
+        .visual-preview-frame {
+          block-size: 100vh;
+          min-block-size: 100vh;
+          border-radius: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="visual-preview-shell">
+      <main class="visual-preview-frame-wrap">
+        <iframe
+          class="visual-preview-frame"
+          data-vendor-workspace-preview-frame
+          data-harness-state="LOADING"
+          data-write-controls="DISABLED"
+          data-write-control-report="WRITE_CONTROLS=DISABLED"
+          data-preview-state="TEMPORARY_VISUAL_PREVIEW"
+          data-auth-state="REAL_AUTH_CONNECTED=FALSE"
+          data-case-state="REAL_CASE_DATA=FALSE"
+          title="乙方授權後工作台本機視覺驗收"
+          src="/src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html"
+        ></iframe>
+      </main>
+    </div>
+    <script type="module">
+      const frame = document.querySelector("[data-vendor-workspace-preview-frame]");
+      const harnessMessageSource = "LOCAL_VISUAL_PREVIEW_HARNESS";
+
+      function publishVisualState(state, writeControls) {
+        document.documentElement.dataset.harnessState = state;
+        frame.dataset.harnessState = state;
+        frame.dataset.writeControls = writeControls;
+        frame.dataset.writeControlReport = `WRITE_CONTROLS=${writeControls}`;
+      }
+
+      window.addEventListener("message", (event) => {
+        if (event.source !== frame.contentWindow) return;
+        const payload = event.data;
+        if (!payload || payload.source !== harnessMessageSource) return;
+        publishVisualState(payload.state, payload.writeControls);
+      });
+
+      function openAuthorizedVisualTemplate() {
+        const vendorDocument = frame.contentDocument;
+        if (!vendorDocument) {
+          publishVisualState("CONTEXT_UNAVAILABLE", "DISABLED");
+          return;
+        }
+        if (
+          !vendorDocument.location?.pathname.endsWith(
+            "/src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+          ) ||
+          vendorDocument.readyState !== "complete"
+        ) {
+          return;
+        }
+        if (vendorDocument.documentElement.dataset.visualHarnessOpened === "true") {
+          return;
+        }
+        vendorDocument.documentElement.dataset.visualHarnessOpened = "true";
+
+        const visualScript = vendorDocument.createElement("script");
+        visualScript.type = "module";
+        visualScript.textContent = `
+          import * as vendorRuntime from "/src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js";
+
+          const state = vendorRuntime.initializeVendorWorkspace(
+            document,
+            vendorRuntime.AUTHORIZED_VENDOR_WORKSPACE,
+          );
+          const controls = Array.from(document.querySelectorAll("[data-write-action]"));
+          const writeControlsDisabled = controls.length > 0 &&
+            controls.every((control) =>
+              control.disabled === true &&
+              control.getAttribute("aria-disabled") === "true"
+            );
+
+          window.parent.postMessage({
+            source: "LOCAL_VISUAL_PREVIEW_HARNESS",
+            state: state === vendorRuntime.AUTHORIZED_VENDOR_WORKSPACE
+              ? "AUTHORIZED_TEMPLATE_VISUAL_ONLY"
+              : "CONTEXT_UNAVAILABLE",
+            writeControls: writeControlsDisabled ? "DISABLED" : "OPEN",
+          }, window.location.origin);
+        `;
+        visualScript.addEventListener("error", () => {
+          publishVisualState("CONTEXT_UNAVAILABLE", "DISABLED");
+        });
+        vendorDocument.head.append(visualScript);
+      }
+
+      frame.addEventListener("load", () => {
+        void openAuthorizedVisualTemplate();
+      });
+      void openAuthorizedVisualTemplate();
+    </script>
+  </body>
+</html>

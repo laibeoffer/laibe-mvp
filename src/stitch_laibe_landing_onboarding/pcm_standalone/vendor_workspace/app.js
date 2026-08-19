@@ -6,11 +6,19 @@ const safeFreeze = Object.freeze;
 const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 const safeGetPrototypeOf = Object.getPrototypeOf;
 const safeApply = Reflect.apply;
+const safeEncodeURIComponent = globalThis.encodeURIComponent;
+const safeStringTrim = String.prototype.trim;
+const safeRegExpTest = RegExp.prototype.test;
+const unsafeCalendarIdPattern = /[\u0000-\u001f\u007f]/u;
 const iteratorKey = Symbol.iterator;
 
 export const VENDOR_WORKSPACE_ACCESS_RECOVERY_LINK_ID =
   "vendorWorkspaceAccessRecoveryToAccountAccess";
 const VENDOR_WORKSPACE_ACCESS_RECOVERY_HREF = "../account_access/code.html#top";
+export const VENDOR_GOOGLE_CALENDAR_GRANT_ENDPOINT =
+  "/functions/v1/vendor-google-calendar-grant";
+export const VENDOR_GOOGLE_CALENDAR_OAUTH_START_ENDPOINT =
+  "/functions/v1/vendor-google-calendar-oauth-start";
 
 function freezeRecord(entries) {
   const record = safeCreate(null);
@@ -194,6 +202,43 @@ export function resolveVendorWorkspaceTabKey(activeTab, key) {
   return VENDOR_WORKSPACE_TAB_KEYS[nextIndex];
 }
 
+const VENDOR_CASE_PRESENTATIONS = freezeRecord([
+  ["design", freezeRecord([
+    ["caseName", "青埔 A7 新建案"],
+    ["managementLabel", "設計管理"],
+  ])],
+  ["construction", freezeRecord([
+    ["caseName", "林宅老屋翻新"],
+    ["managementLabel", "工程管理"],
+  ])],
+]);
+
+function synchronizeVendorCasePresentation(root, activeTab) {
+  const presentation = ownValue(VENDOR_CASE_PRESENTATIONS, activeTab);
+  if (!presentation) return;
+  let activeCaseName;
+  let lineCaseContext;
+  let calendarCaseContext;
+  try {
+    activeCaseName = root.querySelector("[data-vendor-active-case-name]");
+    lineCaseContext = root.querySelector("[data-line-case-context]");
+    calendarCaseContext = root.querySelector("[data-calendar-case-context]");
+  } catch {
+    return;
+  }
+  const caseName = ownValue(presentation, "caseName");
+  const managementLabel = ownValue(presentation, "managementLabel");
+  try {
+    if (activeCaseName) activeCaseName.textContent = caseName;
+    if (lineCaseContext) lineCaseContext.textContent = `${caseName}・${managementLabel}`;
+    if (calendarCaseContext) {
+      calendarCaseContext.textContent = `目前案件：${caseName}・只會載入目前登入乙方在本案件授權使用的日曆。`;
+    }
+  } catch {
+    // The selected case panel remains the visible source of truth.
+  }
+}
+
 export const VENDOR_CONTRACT_IMPACT_KEYS = freezeList(
   "SCOPE",
   "PRICE",
@@ -213,6 +258,188 @@ function ownValue(record, key) {
   } catch {
     return undefined;
   }
+}
+
+function calendarEmbedResult(state, iframeSrc = null) {
+  return freezeRecord([
+    ["state", state],
+    ["iframeSrc", iframeSrc],
+  ]);
+}
+
+function safeIdentityText(value) {
+  if (typeof value !== "string") return false;
+  try {
+    return value.length > 0
+      && value.length <= 512
+      && safeApply(safeStringTrim, value, []) === value
+      && !safeApply(safeRegExpTest, unsafeCalendarIdPattern, [value]);
+  } catch {
+    return false;
+  }
+}
+
+export function resolveVendorCalendarEmbed(trustedGrant) {
+  const schemaVersion = ownValue(trustedGrant, "schemaVersion");
+  const authenticatedUserId = ownValue(trustedGrant, "authenticatedUserId");
+  const currentCaseId = ownValue(trustedGrant, "currentCaseId");
+  const membership = ownValue(trustedGrant, "membership");
+  const calendarBinding = ownValue(trustedGrant, "calendarBinding");
+
+  if (
+    schemaVersion !== "laibe.vendor-calendar-embed.v1"
+    || !safeIdentityText(authenticatedUserId)
+    || !safeIdentityText(currentCaseId)
+    || !membership
+    || !calendarBinding
+  ) {
+    return calendarEmbedResult("CONTEXT_UNAVAILABLE");
+  }
+
+  const membershipUserId = ownValue(membership, "userId");
+  const bindingUserId = ownValue(calendarBinding, "userId");
+  if (
+    membershipUserId !== authenticatedUserId
+    || bindingUserId !== authenticatedUserId
+  ) {
+    return calendarEmbedResult("IDENTITY_MISMATCH");
+  }
+
+  if (
+    ownValue(membership, "caseId") !== currentCaseId
+    || ownValue(calendarBinding, "caseId") !== currentCaseId
+    || ownValue(membership, "role") !== "pro"
+    || ownValue(membership, "status") !== "active"
+  ) {
+    return calendarEmbedResult("CASE_NOT_AUTHORIZED");
+  }
+
+  if (ownValue(calendarBinding, "connectionStatus") !== "connected") {
+    return calendarEmbedResult("CALENDAR_NOT_CONNECTED");
+  }
+
+  const calendarId = ownValue(calendarBinding, "calendarId");
+  if (
+    ownValue(calendarBinding, "bindingStatus") !== "active"
+    || ownValue(calendarBinding, "timeZone") !== "Asia/Taipei"
+    || !safeIdentityText(calendarId)
+  ) {
+    return calendarEmbedResult("INVALID_CALENDAR_BINDING");
+  }
+
+  try {
+    const encodedCalendarId = safeApply(safeEncodeURIComponent, undefined, [calendarId]);
+    return calendarEmbedResult(
+      "READY",
+      `https://calendar.google.com/calendar/embed?src=${encodedCalendarId}&ctz=Asia%2FTaipei&hl=zh_TW&mode=AGENDA&showTitle=0&showPrint=0&showTabs=0&showCalendars=0`,
+    );
+  } catch {
+    return calendarEmbedResult("INVALID_CALENDAR_BINDING");
+  }
+}
+
+export function initializeVendorCalendarEmbed(root, trustedGrant = null) {
+  let frame;
+  let emptyState;
+  let status;
+  try {
+    frame = root?.querySelector?.("[data-vendor-calendar-frame]");
+    emptyState = root?.querySelector?.("[data-vendor-calendar-empty]");
+    status = root?.querySelector?.("[data-vendor-calendar-status]");
+  } catch {
+    return calendarEmbedResult("CONTEXT_UNAVAILABLE");
+  }
+
+  const result = resolveVendorCalendarEmbed(trustedGrant);
+  try {
+    frame?.removeAttribute?.("src");
+    if (frame) frame.hidden = true;
+    if (emptyState) emptyState.hidden = false;
+    if (status) status.textContent = "尚未連結乙方 Google 日曆";
+    if (result.state !== "READY" || !frame) return result;
+
+    frame.setAttribute("src", result.iframeSrc);
+    frame.hidden = false;
+    if (emptyState) emptyState.hidden = true;
+    if (status) status.textContent = "已連結目前乙方的 Google 日曆";
+    return result;
+  } catch {
+    try {
+      frame?.removeAttribute?.("src");
+      if (frame) frame.hidden = true;
+      if (emptyState) emptyState.hidden = false;
+      if (status) status.textContent = "尚未連結乙方 Google 日曆";
+    } catch {
+      // The static closed calendar state remains the source of truth.
+    }
+    return calendarEmbedResult("CONTEXT_UNAVAILABLE");
+  }
+}
+
+function resolveFetchImplementation(fetchImplementation) {
+  return typeof fetchImplementation === "function" ? fetchImplementation : null;
+}
+
+export async function fetchVendorGoogleCalendarGrant(
+  fetchImplementation = globalThis.fetch,
+) {
+  const fetcher = resolveFetchImplementation(fetchImplementation);
+  if (!fetcher) return null;
+  try {
+    const response = await fetcher(VENDOR_GOOGLE_CALENDAR_GRANT_ENDPOINT, {
+      method: "GET",
+      credentials: "same-origin",
+      headers: { "accept": "application/json" },
+    });
+    if (!response?.ok) return null;
+    const grant = await response.json();
+    return resolveVendorCalendarEmbed(grant).state === "READY" ? grant : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function startVendorGoogleCalendarOAuth(
+  fetchImplementation = globalThis.fetch,
+) {
+  const fetcher = resolveFetchImplementation(fetchImplementation);
+  if (!fetcher) return null;
+  try {
+    const response = await fetcher(VENDOR_GOOGLE_CALENDAR_OAUTH_START_ENDPOINT, {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "accept": "application/json",
+        "content-type": "application/json",
+      },
+      body: "{}",
+    });
+    if (!response?.ok) return null;
+    const payload = await response.json();
+    const state = ownValue(payload, "state");
+    const authorizationUrl = ownValue(payload, "authorizationUrl");
+    if (
+      state !== "OAUTH_REDIRECT_REQUIRED" ||
+      typeof authorizationUrl !== "string" ||
+      !authorizationUrl.startsWith("https://accounts.google.com/")
+    ) {
+      return null;
+    }
+    return freezeRecord([
+      ["state", state],
+      ["authorizationUrl", authorizationUrl],
+    ]);
+  } catch {
+    return null;
+  }
+}
+
+export async function refreshVendorCalendarEmbedFromServer(
+  root,
+  fetchImplementation = globalThis.fetch,
+) {
+  const grant = await fetchVendorGoogleCalendarGrant(fetchImplementation);
+  return initializeVendorCalendarEmbed(root, grant);
 }
 
 function ownListLength(list) {
@@ -1282,6 +1509,7 @@ export function initializeVendorWorkspaceTabs(root, contractController = null) {
       try {
         tab.setAttribute("aria-selected", active ? "true" : "false");
         tab.tabIndex = active ? 0 : -1;
+        tab.classList?.toggle?.("on", active);
         if (active && shouldFocus) tab.focus();
       } catch {
         // The static fail-closed page remains usable if a node changes.
@@ -1294,6 +1522,7 @@ export function initializeVendorWorkspaceTabs(root, contractController = null) {
         // Unknown panels stay in their static hidden state.
       }
     }
+    synchronizeVendorCasePresentation(root, activeTab);
     if (liveTarget) {
       const label = activeTab === "design" ? "設計管理" : "工程管理";
       try {
@@ -1445,7 +1674,11 @@ export function initializeVendorWorkspaceTabs(root, contractController = null) {
   }
 }
 
-export function initializeVendorWorkspace(root, renderState = CONTEXT_UNAVAILABLE) {
+export function initializeVendorWorkspace(
+  root,
+  renderState = CONTEXT_UNAVAILABLE,
+  vendorCalendarGrant = null,
+) {
   if (!root) return CONTEXT_UNAVAILABLE;
   const trustedAuthorized = renderState === AUTHORIZED_VENDOR_WORKSPACE;
   resetVendorWorkspace(root);
@@ -1479,6 +1712,7 @@ export function initializeVendorWorkspace(root, renderState = CONTEXT_UNAVAILABL
     if (!closeWriteControls(mount)) throw new Error("workspace controls unavailable");
     const contractController = initializeVendorContractViewTabs(mount);
     initializeVendorWorkspaceTabs(mount, contractController);
+    initializeVendorCalendarEmbed(mount, vendorCalendarGrant);
     root.body?.setAttribute("data-vendor-state", AUTHORIZED_VENDOR_WORKSPACE.code);
     const gate = root.querySelector("#invited-cases");
     if (gate) gate.hidden = true;
