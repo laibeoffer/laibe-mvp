@@ -324,9 +324,7 @@ function vendorWorkspacePanel(html, kind) {
   if (start < 0) return "";
   const nextMarker = kind === "design"
     ? 'data-vendor-workspace-panel="construction"'
-    : kind === "construction"
-      ? 'data-vendor-workspace-panel="contract"'
-      : 'class="conversation-boundary"';
+    : 'class="conversation-boundary"';
   const end = html.indexOf(nextMarker, start);
   return end > start ? html.slice(start, end) : "";
 }
@@ -732,7 +730,7 @@ test("workspace copy preserves the contract attachment review and conversation b
   assert.doesNotMatch(html, /大型輸入|data-line-send|line-conversation__composer/u);
 });
 
-test("vendor workspace exposes three accessible governance tabs with vendor-only selectors", async () => {
+test("vendor workspace transposes the professional shell into two accessible management areas", async () => {
   const [html, css, runtimeSource] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
@@ -743,7 +741,6 @@ test("vendor workspace exposes three accessible governance tabs with vendor-only
   for (const [kind, label] of [
     ["design", "設計管理"],
     ["construction", "工程管理"],
-    ["contract", "契約管理"],
   ]) {
     assert.match(
       html,
@@ -756,11 +753,16 @@ test("vendor workspace exposes three accessible governance tabs with vendor-only
       kind,
     );
   }
-  assert.equal(count(html, /class="vendor-panel-facts"/gu), 3);
+  assert.equal(count(html, /class="vendor-panel-facts"/gu), 2);
   assert.equal(count(html, /\bdata-resource-code=/gu), 10);
+  assert.match(html, /class="vendor-workspace-shell"/u);
+  assert.match(html, /class="vendor-workspace-stage"/u);
+  assert.doesNotMatch(html, /data-vendor-workspace-tab="contract"|<iframe\b/iu);
   assert.doesNotMatch(`${html}\n${css}\n${runtimeSource}`, /\bowner-[a-z0-9_-]+/iu);
   assert.doesNotMatch(html, /data-document-(?:tab|panel|file|dropzone)|document-file-|PDF[^<]*拖/u);
   assert.match(css, /\.vendor-workspace-tabs\s*\{/u);
+  assert.match(css, /\.vendor-workspace-tabs button\s*\{[\s\S]{0,700}border-radius:\s*11px 11px 0 0/u);
+  assert.match(css, /\.vendor-workspace-tabs button\s*\{[\s\S]{0,700}linear-gradient/u);
   assert.match(css, /\.vendor-workspace-panel\s*\{/u);
   assert.match(css, /\.vendor-panel-facts\s*\{/u);
   assert.match(css, /\.vendor-status-rail\s*\{/u);
@@ -783,13 +785,14 @@ test("vendor redesign keeps the public document at a short authorization gate an
   assert.doesNotMatch(publicMarkup, /<button|<input|<textarea|<select/u);
 
   assert.notEqual(authorizedMarkup, "", "authorized workspace lives in an inert template");
-  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 3);
-  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-panel=/gu), 3);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-panel=/gu), 2);
   assert.deepEqual(
     [...authorizedMarkup.matchAll(/data-vendor-workspace-tab="[^"]+"[^>]*>[\s\S]*?<strong>([^<]+)<\/strong>/gu)]
       .map((match) => match[1]),
-    ["設計管理", "工程管理", "契約管理"],
+    ["設計管理", "工程管理"],
   );
+  assert.match(vendorWorkspacePanel(authorizedMarkup, "design"), /契約管理/u);
   assert.doesNotMatch(authorizedMarkup, /設計案管理|工程案管理|main-tabs/u);
   assert.match(authorizedMarkup, /id="case-conversation"/u);
   assert.doesNotMatch(authorizedMarkup, /line-conversation__composer|data-line-send/u);
@@ -1166,7 +1169,7 @@ test("vendor redesign authorized structure is data-first truthful and keeps all 
   assert.doesNotMatch(authorizedText, /\b(?:DB|API|n8n|debug)\b|raw JSON|mock-only|無 DB 寫入|API 未開/iu);
   assert.doesNotMatch(authorizedText, /金流託管|支付託管|代收代付|老屋投資|投資報酬|翻修獲利/u);
 
-  for (const kind of ["design", "construction", "contract"]) {
+  for (const kind of ["design", "construction"]) {
     const panel = vendorWorkspacePanel(authorizedMarkup, kind);
     for (const label of ["目前狀態", "下一步", "責任人", "最近紀錄"]) {
       assert.match(panel, new RegExp(label, "u"), `${kind}: ${label}`);
@@ -1185,21 +1188,22 @@ test("vendor redesign authorized structure is data-first truthful and keeps all 
   assert.match(css, /:focus-visible/u);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/u);
   assert.match(css, /@media\s*\(max-width:\s*768px\)/u);
-  assert.doesNotMatch(css, /backdrop-filter|filter:\s*blur|text-shadow/u);
+  assert.match(css, /backdrop-filter:\s*blur\(16px\)/u);
+  assert.doesNotMatch(css, /text-shadow/u);
 });
 
 test("vendor workspace tab keyboard contract supports arrows Home and End", async () => {
   const runtime = await import(moduleUrl(workspaceDir, "tabs"));
   assert.deepEqual(
     ownListValues(runtime.VENDOR_WORKSPACE_TAB_KEYS, "VENDOR_WORKSPACE_TAB_KEYS"),
-    ["design", "construction", "contract"],
+    ["design", "construction"],
   );
   assert.equal(runtime.resolveVendorWorkspaceTabKey("design", "ArrowRight"), "construction");
-  assert.equal(runtime.resolveVendorWorkspaceTabKey("design", "ArrowLeft"), "contract");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("design", "ArrowLeft"), "construction");
   assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "Home"), "design");
-  assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "End"), "contract");
-  assert.equal(runtime.resolveVendorWorkspaceTabKey("contract", "ArrowRight"), "design");
-  assert.equal(runtime.resolveVendorWorkspaceTabKey("contract", "Escape"), "contract");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "End"), "construction");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "ArrowRight"), "design");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "Escape"), "construction");
 });
 
 test("vendor document resolver accepts native-style accessors and rejects hostile values", async () => {
@@ -1310,16 +1314,16 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
     };
   }
 
-  const tabs = ["design", "construction", "contract"].map((kind) => element({
+  const tabs = ["design", "construction"].map((kind) => element({
     dataset: { vendorWorkspaceTab: kind },
   }));
-  const panels = ["design", "construction", "contract"].map((kind, index) => element({
+  const panels = ["design", "construction"].map((kind, index) => element({
     dataset: { vendorWorkspacePanel: kind },
     hidden: index !== 0,
   }));
   const links = ["#documents", "#execution", "#reviews", "#records"].map((href) => element({ href }));
   const targets = Object.fromEntries([
-    ["#documents", panels[2]],
+    ["#documents", panels[0]],
     ["#execution", panels[1]],
     ["#reviews", element()],
     ["#records", element()],
@@ -1349,14 +1353,14 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   const childActivations = [];
   runtime.initializeVendorWorkspaceTabs(root, {
     activate(viewKey) {
-      assert.equal(panels[2].hidden, false, "parent contract panel opens before child view");
+      assert.equal(panels[0].hidden, false, "parent design panel opens before the contract child view");
       childActivations.push(viewKey);
     },
   });
-  assert.equal(tabs[2].getAttribute("aria-selected"), "true");
-  assert.equal(tabs[2].tabIndex, 0);
-  assert.equal(panels[2].hidden, false);
-  assert.equal(focused, tabs[2]);
+  assert.equal(tabs[0].getAttribute("aria-selected"), "true");
+  assert.equal(tabs[0].tabIndex, 0);
+  assert.equal(panels[0].hidden, false);
+  assert.equal(focused, tabs[0]);
   assert.deepEqual(childActivations, ["overview"]);
   assert.equal(links[0].getAttribute("aria-current"), "location");
 
@@ -1368,11 +1372,11 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   assert.equal(focused, tabs[1]);
   assert.equal(panels[1].hidden, false);
   tabs[1].emit("keydown", { key: "End", preventDefault() {} });
-  assert.equal(focused, tabs[2]);
-  tabs[2].emit("keydown", { key: "Home", preventDefault() {} });
+  assert.equal(focused, tabs[1]);
+  tabs[1].emit("keydown", { key: "Home", preventDefault() {} });
   assert.equal(focused, tabs[0]);
   tabs[0].emit("keydown", { key: "ArrowLeft", preventDefault() {} });
-  assert.equal(focused, tabs[2]);
+  assert.equal(focused, tabs[1]);
 
   let prevented = false;
   links[1].emit("click", { preventDefault() { prevented = true; } });
@@ -1382,16 +1386,16 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
 
   view.location.hash = "#reviews";
   windowListeners.get("hashchange")?.();
-  assert.equal(focused, tabs[2]);
-  assert.equal(panels[2].hidden, false);
+  assert.equal(focused, tabs[0]);
+  assert.equal(panels[0].hidden, false);
   assert.deepEqual(childActivations, ["overview", "records"]);
   assert.equal(links[2].getAttribute("aria-current"), "location");
   assert.equal(links[0].getAttribute("aria-current"), null);
 
-  tabs[2].emit("keydown", { key: "ArrowLeft", preventDefault() {} });
+  tabs[0].emit("keydown", { key: "ArrowLeft", preventDefault() {} });
   assert.equal(focused, tabs[1]);
   assert.equal(links[2].getAttribute("aria-current"), null, "manual keyboard navigation clears the old route claim");
-  assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#records"), "contract");
+  assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#records"), "design");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#execution"), "construction");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#case-focus"), null);
 });
@@ -1416,8 +1420,8 @@ test("vendor cloned Element resolves ownerDocument view for initial and changed 
     };
   }
 
-  const workspaceTabs = ["design", "construction", "contract"].map((key) => element({ vendorWorkspaceTab: key }));
-  const workspacePanels = ["design", "construction", "contract"].map((key) => element({ vendorWorkspacePanel: key }));
+  const workspaceTabs = ["design", "construction"].map((key) => element({ vendorWorkspaceTab: key }));
+  const workspacePanels = ["design", "construction"].map((key) => element({ vendorWorkspacePanel: key }));
   const contractTabs = ["overview", "reply", "decision", "records"].map((key) => element({ vendorContractView: key }));
   const contractPanels = ["overview", "reply", "decision", "records"].map((key) => element({ vendorContractViewPanel: key }));
   const routeLinks = ["#documents", "#execution", "#reviews", "#records"].map((href) => element({}, href));
@@ -1451,7 +1455,7 @@ test("vendor cloned Element resolves ownerDocument view for initial and changed 
 
   const contractController = runtime.initializeVendorContractViewTabs(root);
   runtime.initializeVendorWorkspaceTabs(root, contractController);
-  assert.equal(workspacePanels[2].hidden, false);
+  assert.equal(workspacePanels[0].hidden, false);
   assert.equal(contractPanels[3].hidden, false);
   assert.equal(routeLinks[2].getAttribute("aria-current"), "location");
 
@@ -1462,25 +1466,18 @@ test("vendor cloned Element resolves ownerDocument view for initial and changed 
 
   view.location.hash = "#documents";
   for (const listener of viewListeners.get("hashchange") ?? []) listener();
-  assert.equal(workspacePanels[2].hidden, false);
+  assert.equal(workspacePanels[0].hidden, false);
   assert.equal(contractPanels[0].hidden, false);
   assert.equal(routeLinks[0].getAttribute("aria-current"), "location");
 });
 
-test("vendor resource ownership matches the three governance panels", async () => {
+test("vendor resource ownership is grouped under design and construction management", async () => {
   const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
   const panel = (kind) => vendorWorkspacePanel(html, kind);
   const resourceCodes = (source) => [...source.matchAll(/data-resource-code="([A-Z_]+)"/gu)]
     .map((match) => match[1]);
 
-  assert.deepEqual(resourceCodes(panel("design")), []);
-  assert.deepEqual(resourceCodes(panel("construction")), [
-    "SCHEDULES",
-    "EVIDENCE",
-    "CHANGES",
-    "ACCEPTANCE",
-  ]);
-  assert.deepEqual(resourceCodes(panel("contract")), [
+  assert.deepEqual(resourceCodes(panel("design")), [
     "CONTRACT_DRAFT_VERSIONS",
     "ATTACHMENTS",
     "PUBLIC_PCM_REVIEWS",
@@ -1488,10 +1485,16 @@ test("vendor resource ownership matches the three governance panels", async () =
     "ADDENDA",
     "CASE_RECORDS",
   ]);
-  assert.match(panel("contract"), /雙方確認/u);
-  assert.match(panel("contract"), /新版本/u);
-  assert.match(panel("contract"), /責任人/u);
-  assert.doesNotMatch(panel("contract"), /class="message-panel"/u);
+  assert.deepEqual(resourceCodes(panel("construction")), [
+    "SCHEDULES",
+    "EVIDENCE",
+    "CHANGES",
+    "ACCEPTANCE",
+  ]);
+  assert.match(panel("design"), /雙方確認/u);
+  assert.match(panel("design"), /新版本/u);
+  assert.match(panel("design"), /責任人/u);
+  assert.doesNotMatch(panel("design"), /class="message-panel"/u);
   for (const fragment of ["documents", "execution", "reviews", "records"]) {
     assert.match(html, new RegExp(`id="${fragment}"`, "u"), fragment);
     assert.match(html, new RegExp(`data-vendor-workspace-route[^>]*href="#${fragment}"|href="#${fragment}"[^>]*data-vendor-workspace-route`, "u"), fragment);
@@ -1759,12 +1762,12 @@ test("trusted vendor structural rendering leaves contract controls inert", async
   assert.equal(listenerCount, 0, "disabled controls receive no session mutation handlers");
 });
 
-test("vendor contract tab exposes a truthful disabled reply state and decision boundary", async () => {
+test("vendor design management exposes a truthful disabled contract reply state and decision boundary", async () => {
   const [html, css] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
   ]);
-  const contractPanel = vendorWorkspacePanel(html, "contract");
+  const contractPanel = vendorWorkspacePanel(html, "design");
 
   assert.match(contractPanel, /契約範本預覽/u);
   assert.match(contractPanel, /目前狀態/u);
@@ -1814,9 +1817,9 @@ test("vendor contract template preview uses the shared reader without claiming a
   assert.match(previewHtml, /id="contract-book"[^>]*aria-label="專案契約唯讀預覽"/u);
 });
 
-test("vendor contract editing scope is separated into task tabs and keeps owner facts protected", async () => {
+test("vendor design management contains contract task tabs and keeps owner facts protected", async () => {
   const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
-  const panel = vendorWorkspacePanel(html, "contract");
+  const panel = vendorWorkspacePanel(html, "design");
   const tabsStart = panel.indexOf('class="vendor-contract-view-tabs"');
   const previewStart = panel.indexOf('class="vendor-contract-preview"');
   const replyStart = panel.indexOf('data-vendor-contract-view-panel="reply"');
@@ -1845,8 +1848,9 @@ test("vendor authorized workspace is one flat data-first surface while the publi
   assert.match(publicMarkup, /class="vendor-gate"/u);
   assert.doesNotMatch(publicMarkup, /class="vendor-workspace"/u);
   assert.match(authorizedMarkup, /class="vendor-workspace"/u);
-  assert.equal(count(authorizedMarkup, /class="vendor-workspace-panel"/gu), 3);
-  assert.doesNotMatch(css, /backdrop-filter|radial-gradient|box-shadow/u);
+  assert.equal(count(authorizedMarkup, /class="vendor-workspace-panel"/gu), 2);
+  assert.doesNotMatch(authorizedMarkup, /<iframe\b/iu);
+  assert.match(css, /linear-gradient/u);
   assert.match(css, /\.vendor-workspace\s*\{[\s\S]{0,300}border:\s*1px solid var\(--workspace-line\)/u);
   assert.match(css, /\.vendor-workspace-panel\s*\{[\s\S]{0,160}background:\s*var\(--workspace-rail\)/u);
 });
@@ -1914,12 +1918,12 @@ test("local references language UTF-8 and accessibility source stay bounded", as
   }
 });
 
-test("vendor 契約管理以四個任務分頁說清共同預覽、待回覆、決定與紀錄", async () => {
+test("vendor 設計管理以四個契約任務分頁說清共同預覽、待回覆、決定與紀錄", async () => {
   const [html, css] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
   ]);
-  const contractPanel = vendorWorkspacePanel(html, "contract");
+  const contractPanel = vendorWorkspacePanel(html, "design");
 
   assert.equal((contractPanel.match(/data-vendor-contract-view="(?:overview|reply|decision|records)"/g) || []).length, 4);
   for (const label of ["契約總覽", "待我回覆", "變更與決定", "版本與紀錄"]) {
@@ -1962,7 +1966,7 @@ test("契約預覽返回乙方工作台時直接開啟待我回覆而不是契�
 
   assert.equal(
     runtime.resolveVendorWorkspaceTabForFragment("#vendor-contract-view-panel-reply"),
-    "contract",
+    "design",
   );
   assert.equal(
     runtime.resolveVendorContractViewFromFragment("#vendor-contract-view-panel-reply"),

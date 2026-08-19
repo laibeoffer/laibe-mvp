@@ -128,7 +128,6 @@ function freezeCompatibilityList(...items) {
 export const VENDOR_WORKSPACE_TAB_KEYS = freezeList(
   "design",
   "construction",
-  "contract",
 );
 
 export const VENDOR_CONTRACT_VIEW_KEYS = freezeList(
@@ -173,13 +172,13 @@ export function resolveVendorContractViewKey(activeView, key) {
 }
 
 function isVendorWorkspaceTabKey(value) {
-  return value === "design" || value === "construction" || value === "contract";
+  return value === "design" || value === "construction";
 }
 
 export function resolveVendorWorkspaceTabKey(activeTab, key) {
   const current = isVendorWorkspaceTabKey(activeTab) ? activeTab : "design";
   if (key === "Home") return "design";
-  if (key === "End") return "contract";
+  if (key === "End") return "construction";
   if (key !== "ArrowLeft" && key !== "ArrowRight") return current;
   let currentIndex = 0;
   for (let index = 0; index < VENDOR_WORKSPACE_TAB_KEYS.length; index += 1) {
@@ -1129,7 +1128,7 @@ export function resolveVendorWorkspaceTabForFragment(fragment) {
     fragment === "#records" ||
     resolveVendorContractViewFromFragment(fragment)
   ) {
-    return "contract";
+    return "design";
   }
   return null;
 }
@@ -1256,7 +1255,12 @@ export function initializeVendorWorkspaceTabs(root, contractController = null) {
   } catch {
     return;
   }
-  if (!tabs || !panels || tabs.length !== 3 || panels.length !== 3) return;
+  if (
+    !tabs
+    || !panels
+    || tabs.length !== VENDOR_WORKSPACE_TAB_KEYS.length
+    || panels.length !== VENDOR_WORKSPACE_TAB_KEYS.length
+  ) return;
 
   let activeTab = "design";
 
@@ -1291,11 +1295,7 @@ export function initializeVendorWorkspaceTabs(root, contractController = null) {
       }
     }
     if (liveTarget) {
-      const label = activeTab === "design"
-        ? "設計管理"
-        : activeTab === "construction"
-          ? "工程管理"
-          : "契約管理";
+      const label = activeTab === "design" ? "設計管理" : "工程管理";
       try {
         liveTarget.textContent = `已切換至${label}。`;
       } catch {

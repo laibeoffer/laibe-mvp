@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="LaiBE DRS 受邀乙方案件工作台，協助設計師與統包依有效文件處理下一步並留下案件紀錄。" />
+    <meta name="description" content="LaiBE DRS 受邀乙方案件工作台，協助設計師與統包依有效文件處理設計與工程事項並留下案件紀錄。" />
     <title>受邀乙方案件工作台｜LaiBE DRS 裝潢決策系統</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/drs-brand.css?v=20260810-drs-full-name" />
@@ -26,6 +26,7 @@
         </div>
       </div>
     </header>
+
     <main id="vendor-main">
       <section class="vendor-gate" id="invited-cases" aria-labelledby="vendor-gate-title">
         <p class="eyebrow">乙方案件工作台</p>
@@ -45,55 +46,150 @@
 
     <template id="vendor-authorized-workspace-template">
       <section class="vendor-workspace" data-vendor-workspace-root aria-labelledby="vendor-workspace-title">
+        <div class="vendor-workspace-shell">
         <header class="vendor-case-header">
-          <div class="vendor-case-heading"><p class="eyebrow">受邀乙方案件</p><h1 id="vendor-workspace-title" data-vendor-context="case-name">尚未提供案件名稱</h1><p><span data-vendor-context="case-identity">尚未提供案件辨識資訊</span><span aria-hidden="true">／</span><span data-vendor-context="client-name">尚未提供甲方資料</span></p></div>
-          <div class="vendor-case-switch" aria-label="案件入口與角色"><p><span>目前角色</span><strong data-vendor-context="role">尚未提供角色資料</strong></p><button type="button" data-write-action disabled aria-disabled="true">案件切換待正式開放</button></div>
+          <div class="vendor-case-heading">
+            <p class="eyebrow">受邀乙方案件</p>
+            <h1 id="vendor-workspace-title" data-vendor-context="case-name">尚未提供案件名稱</h1>
+            <p><span data-vendor-context="case-identity">尚未提供案件辨識資訊</span><span aria-hidden="true">／</span><span data-vendor-context="client-name">尚未提供甲方資料</span></p>
+          </div>
+          <div class="vendor-case-switch" aria-label="案件入口與角色">
+            <p><span>目前角色</span><strong data-vendor-context="role">尚未提供角色資料</strong></p>
+            <button type="button" data-write-action disabled aria-disabled="true">案件切換待正式開放</button>
+          </div>
         </header>
-        <nav class="vendor-route-nav" aria-label="案件快速定位"><a data-vendor-workspace-route href="#documents">有效文件</a><a data-vendor-workspace-route href="#execution">施工事項</a><a data-vendor-workspace-route href="#reviews">公開審查</a><a data-vendor-workspace-route href="#records">案件紀錄</a></nav>
+
+        <div class="vendor-shell-toolbar">
+          <nav class="vendor-route-nav" aria-label="案件快速定位">
+            <a data-vendor-workspace-route href="#documents">設計依據</a>
+            <a data-vendor-workspace-route href="#execution">工程現況</a>
+            <a data-vendor-workspace-route href="#reviews">公開審查</a>
+            <a data-vendor-workspace-route href="#records">案件紀錄</a>
+          </nav>
+          <p class="vendor-shell-note"><span aria-hidden="true"></span>重要操作會連回文件版本與案件紀錄</p>
+        </div>
+
         <dl class="vendor-status-rail vendor-status-rail--workspace" aria-label="案件狀態、下一步與留痕">
           <div><dt>目前狀態</dt><dd data-vendor-context="case-status">尚未提供案件狀態</dd></div>
           <div><dt>下一步</dt><dd data-vendor-context="next-action">尚未提供下一步</dd></div>
           <div><dt>責任人</dt><dd data-vendor-context="responsible">尚未提供責任人</dd></div>
           <div><dt>最近紀錄</dt><dd data-vendor-context="latest-record">尚無可顯示的案件紀錄</dd></div>
         </dl>
-        <div class="vendor-workspace-tabs" role="tablist" aria-label="乙方案件工作分類">
-          <button id="vendor-workspace-tab-design" type="button" role="tab" data-vendor-workspace-tab="design" aria-selected="true" aria-controls="vendor-workspace-panel-design" tabindex="0"><span>01</span><strong>設計管理</strong><small>需求、圖面與提案</small></button>
-          <button id="vendor-workspace-tab-construction" type="button" role="tab" data-vendor-workspace-tab="construction" aria-selected="false" aria-controls="vendor-workspace-panel-construction" tabindex="-1"><span>02</span><strong>工程管理</strong><small>任務、照片與驗收</small></button>
-          <button id="vendor-workspace-tab-contract" type="button" role="tab" data-vendor-workspace-tab="contract" aria-selected="false" aria-controls="vendor-workspace-panel-contract" tabindex="-1"><span>03</span><strong>契約管理</strong><small>條件、決定與版本</small></button>
+
+        <div class="vendor-workspace-tabs" role="tablist" aria-label="乙方案件管理區">
+          <button id="vendor-workspace-tab-design" type="button" role="tab" data-vendor-workspace-tab="design" aria-selected="true" aria-controls="vendor-workspace-panel-design" tabindex="0"><span class="vendor-tab-index">01</span><strong>設計管理</strong><small>需求、圖面、版本與待確認</small></button>
+          <button id="vendor-workspace-tab-construction" type="button" role="tab" data-vendor-workspace-tab="construction" aria-selected="false" aria-controls="vendor-workspace-panel-construction" tabindex="-1"><span class="vendor-tab-index">02</span><strong>工程管理</strong><small>任務、進度、照片、變更與驗收</small></button>
         </div>
 
-        <section class="vendor-workspace-panel" id="vendor-workspace-panel-design" role="tabpanel" aria-labelledby="vendor-workspace-tab-design" data-vendor-workspace-panel="design">
-          <header class="vendor-panel-heading"><div><p class="eyebrow">設計管理</p><h2>先核對有效版本，再請甲方做決定</h2></div><p>提案送出不等於甲方已確認。每次修改都要連回需求、圖面與原因。</p></header>
-          <dl class="vendor-panel-facts" aria-label="設計管理目前責任"><div><dt>目前狀態</dt><dd>尚未提供設計進度</dd></div><div><dt>下一步</dt><dd>尚未提供待處理事項</dd></div><div><dt>責任人</dt><dd>尚未提供下一責任人</dd></div><div><dt>最近紀錄</dt><dd>尚無設計異動紀錄</dd></div></dl>
-          <div class="vendor-section-heading"><div><p class="eyebrow">有效版本</p><h3>需求、圖面與提案依據</h3></div><span>資料待上游提供</span></div>
-          <ol class="vendor-ledger"><li><span>需求基準</span><strong>尚未提供有效版本</strong><small>版本、提出者、提出時間、等待對象與下一步</small><em>待資料</em></li><li><span>圖面版次</span><strong>尚未提供有效版本</strong><small>圖面用途、確認狀態、提出者與最近修改時間</small><em>待資料</em></li><li><span>提案版本</span><strong>尚未提供最新提案</strong><small>送出狀態不代表甲方已確認</small><em>待資料</em></li><li><span>修改理由</span><strong>尚無甲方要求修改紀錄</strong><small>提出原因、依據文件、等待誰與下一責任人</small><em>待資料</em></li></ol>
-          <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能整理提案</button>
-        </section>
+        <div class="vendor-workspace-stage">
+          <section class="vendor-workspace-panel" id="vendor-workspace-panel-design" role="tabpanel" aria-labelledby="vendor-workspace-tab-design" data-vendor-workspace-panel="design">
+            <header class="vendor-panel-heading">
+              <div><p class="eyebrow">設計管理</p><h2>先核對依據與版本，再請甲方做決定</h2></div>
+              <p>提案送出不等於甲方已確認。需求、圖面、版本、契約條件與修改原因都要能互相對回。</p>
+            </header>
+            <dl class="vendor-panel-facts" aria-label="設計管理目前責任">
+              <div><dt>目前狀態</dt><dd>尚未提供設計進度</dd></div>
+              <div><dt>下一步</dt><dd>尚未提供待處理事項</dd></div>
+              <div><dt>責任人</dt><dd>尚未提供下一責任人</dd></div>
+              <div><dt>最近紀錄</dt><dd>尚無設計異動紀錄</dd></div>
+            </dl>
 
-        <section class="vendor-workspace-panel" id="vendor-workspace-panel-construction" role="tabpanel" aria-labelledby="vendor-workspace-tab-construction" data-vendor-workspace-panel="construction" hidden>
-          <header class="vendor-panel-heading" id="execution"><div><p class="eyebrow">工程管理</p><h2>把現場事實連回任務與有效文件</h2></div><p>照片不是獨立相簿；每一筆都應連回時間、位置、任務、提交者與依據。</p></header>
-          <dl class="vendor-panel-facts" aria-label="工程管理目前責任"><div><dt>目前狀態</dt><dd>尚未提供工程進度</dd></div><div><dt>下一步</dt><dd>尚未提供近期施工任務</dd></div><div><dt>責任人</dt><dd>尚未提供下一責任人</dd></div><div><dt>最近紀錄</dt><dd>尚無施工異動紀錄</dd></div></dl>
-          <div class="vendor-section-heading"><div><p class="eyebrow">施工留痕</p><h3>任務、照片、變更與驗收</h3></div><span>資料待上游提供</span></div>
-          <ol class="vendor-ledger"><li data-resource-code="SCHEDULES"><span>施工任務</span><strong>尚無可顯示的任務</strong><small>責任人、期限、阻塞原因、依據文件與下一步</small><em>待資料</em></li><li data-resource-code="EVIDENCE"><span>施工照片</span><strong>尚無可顯示的照片</strong><small>時間、位置、任務、提交者與文件依據</small><em>待資料</em></li><li data-resource-code="CHANGES"><span>追加減項</span><strong>尚無可顯示的變更</strong><small>提出原因、影響、雙方狀態與下一責任人</small><em>待資料</em></li><li data-resource-code="ACCEPTANCE"><span>驗收</span><strong>尚無可顯示的缺失</strong><small>缺失位置、處理結果、確認者與回覆紀錄</small><em>待資料</em></li></ol>
-          <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能新增施工紀錄</button>
-        </section>
+            <div class="vendor-command-grid" aria-label="設計管理工作摘要">
+              <article><span>需求基準</span><strong>尚未提供有效版本</strong><p>需包含版本、提出者、提出時間、等待對象與下一步。</p><em>待資料</em></article>
+              <article><span>圖面版次</span><strong>尚未提供有效圖面</strong><p>需說明圖面用途、確認狀態、提出者與最近修改時間。</p><em>待資料</em></article>
+              <article><span>提案版本</span><strong>尚未提供最新提案</strong><p>送出狀態不代表甲方已確認，修改原因仍需留痕。</p><em>待資料</em></article>
+              <article><span>待確認事項</span><strong>尚無可顯示的待確認事項</strong><p>需指出依據文件、目前差異、等待誰與下一責任人。</p><em>待資料</em></article>
+            </div>
 
-        <section class="vendor-workspace-panel" id="vendor-workspace-panel-contract" role="tabpanel" aria-labelledby="vendor-workspace-tab-contract" data-vendor-workspace-panel="contract" hidden>
-          <header class="vendor-panel-heading"><div><p class="eyebrow">契約管理</p><h2>分清回覆、甲方決定與正式版本</h2></div><p>乙方回覆不等於甲方同意；只有雙方明確確認並建立新版本，才成為後續依據。</p></header>
-          <dl class="vendor-panel-facts" aria-label="契約管理目前責任"><div><dt>目前狀態</dt><dd>尚未提供案件契約狀態</dd></div><div><dt>下一步</dt><dd>尚未提供待回覆事項</dd></div><div><dt>責任人</dt><dd>尚未提供下一責任人</dd></div><div><dt>最近紀錄</dt><dd>尚無契約異動紀錄</dd></div></dl>
-          <div class="vendor-contract-view-tabs" role="tablist" aria-label="契約管理子分類"><button id="vendor-contract-view-tab-overview" type="button" role="tab" data-vendor-contract-view="overview" aria-selected="true" aria-controls="vendor-contract-view-panel-overview" tabindex="0">契約總覽</button><button id="vendor-contract-view-tab-reply" type="button" role="tab" data-vendor-contract-view="reply" aria-selected="false" aria-controls="vendor-contract-view-panel-reply" tabindex="-1">待我回覆</button><button id="vendor-contract-view-tab-decision" type="button" role="tab" data-vendor-contract-view="decision" aria-selected="false" aria-controls="vendor-contract-view-panel-decision" tabindex="-1">變更與決定</button><button id="vendor-contract-view-tab-records" type="button" role="tab" data-vendor-contract-view="records" aria-selected="false" aria-controls="vendor-contract-view-panel-records" tabindex="-1">版本與紀錄</button></div>
-          <section id="vendor-contract-view-panel-overview" role="tabpanel" data-vendor-contract-view-panel="overview" aria-labelledby="vendor-contract-view-tab-overview">
-            <article class="vendor-contract-preview" id="documents"><div><p class="eyebrow">契約範本預覽</p><h3>建築物室內裝修設計及工程承攬契約</h3></div><p>這是唯讀範本，不是本案已成立契約，也不代表任何條件已由雙方確認。</p><a href="../../../../site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&amp;returnTo=vendor">查看契約範本全文</a></article>
-            <ol class="vendor-ledger"><li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>尚未提供本案有效版本</strong><small>版本提出者、時間、確認狀態與下一步</small><em>待資料</em></li><li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版次、提送者與雙方確認關係</small><em>待資料</em></li></ol>
+            <section class="vendor-contract-hub" aria-labelledby="vendor-contract-hub-title">
+              <div class="vendor-section-heading" id="documents">
+                <div><p class="eyebrow">契約管理</p><h3 id="vendor-contract-hub-title">條件、附件、回覆與正式版本</h3></div>
+                <span>資料待上游提供</span>
+              </div>
+              <p class="vendor-section-intro">乙方回覆不等於甲方同意；只有雙方明確確認並建立新版本，才成為後續設計與工程依據。</p>
+              <div class="vendor-contract-view-tabs" role="tablist" aria-label="契約管理子分類">
+                <button id="vendor-contract-view-tab-overview" type="button" role="tab" data-vendor-contract-view="overview" aria-selected="true" aria-controls="vendor-contract-view-panel-overview" tabindex="0">契約總覽</button>
+                <button id="vendor-contract-view-tab-reply" type="button" role="tab" data-vendor-contract-view="reply" aria-selected="false" aria-controls="vendor-contract-view-panel-reply" tabindex="-1">待我回覆</button>
+                <button id="vendor-contract-view-tab-decision" type="button" role="tab" data-vendor-contract-view="decision" aria-selected="false" aria-controls="vendor-contract-view-panel-decision" tabindex="-1">變更與決定</button>
+                <button id="vendor-contract-view-tab-records" type="button" role="tab" data-vendor-contract-view="records" aria-selected="false" aria-controls="vendor-contract-view-panel-records" tabindex="-1">版本與紀錄</button>
+              </div>
+
+              <section id="vendor-contract-view-panel-overview" role="tabpanel" data-vendor-contract-view-panel="overview" aria-labelledby="vendor-contract-view-tab-overview">
+                <article class="vendor-contract-preview">
+                  <div><p class="eyebrow">契約範本預覽</p><h3>建築物室內裝修設計及工程承攬契約</h3></div>
+                  <p>這是唯讀範本，不是本案已成立契約，也不代表任何條件已由雙方確認。</p>
+                  <a href="../../../../site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&amp;returnTo=vendor">查看契約範本全文</a>
+                </article>
+                <ol class="vendor-ledger">
+                  <li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>尚未提供本案有效版本</strong><small>版本提出者、時間、確認狀態與下一步</small><em>待資料</em></li>
+                  <li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版次、提送者與雙方確認關係</small><em>待資料</em></li>
+                </ol>
+              </section>
+
+              <section id="vendor-contract-view-panel-reply" role="tabpanel" data-vendor-contract-view-panel="reply" aria-labelledby="vendor-contract-view-tab-reply" hidden>
+                <div class="vendor-section-heading"><div><p class="eyebrow">待我回覆</p><h3>補件或說明可能影響</h3></div><span>尚未送出／尚未保存</span></div>
+                <p class="vendor-boundary">本頁目前沒有正式保存能力。離開頁面後不保留內容，也不會建立案件紀錄。</p>
+                <label class="vendor-disabled-field" for="vendor-contract-description"><span>回覆內容</span><textarea id="vendor-contract-description" rows="4" data-write-action disabled aria-disabled="true" placeholder="正式開放後可整理原因、依據版本與希望甲方確認的事項"></textarea></label>
+                <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能送出回覆</button>
+              </section>
+
+              <section id="vendor-contract-view-panel-decision" role="tabpanel" data-vendor-contract-view-panel="decision" aria-labelledby="vendor-contract-view-tab-decision" hidden>
+                <div class="vendor-section-heading"><div><p class="eyebrow">變更與決定</p><h3>確認現在輪到誰處理</h3></div><span>資料待上游提供</span></div>
+                <dl class="vendor-decision-grid"><div><dt>乙方回覆</dt><dd>尚無回覆紀錄</dd></div><div><dt>甲方決定</dt><dd>尚無決定紀錄</dd></div><div><dt>雙方確認</dt><dd>尚無確認紀錄</dd></div><div><dt>新版本</dt><dd>尚未建立</dd></div></dl>
+                <p class="vendor-boundary">甲方決定不等於契約已變更。雙方確認與新版本必須各自留下時間、依據、狀態與責任人。</p>
+              </section>
+
+              <section id="vendor-contract-view-panel-records" role="tabpanel" data-vendor-contract-view-panel="records" aria-labelledby="vendor-contract-view-tab-records" hidden>
+                <div class="vendor-section-heading"><div><p class="eyebrow">版本與紀錄</p><h3>只顯示已留下的案件事實</h3></div><span>資料待上游提供</span></div>
+                <ol class="vendor-ledger">
+                  <li id="reviews" data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開審查</span><strong>萊比公開審查意見（PCM）</strong><small>意見必須對甲乙雙方公開並連回文件版本</small><em>待資料</em></li>
+                  <li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>尚無補件紀錄</strong><small>原因、提出者、期限、回覆版本與處理狀態</small><em>待資料</em></li>
+                  <li data-resource-code="ADDENDA"><span>附約</span><strong>尚無附約版本</strong><small>另建可追溯版本，不改寫原契約</small><em>待資料</em></li>
+                  <li id="records" data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>尚無契約決定紀錄</strong><small>誰、何時、依據哪份文件、做了什麼與下一責任人</small><em>待資料</em></li>
+                </ol>
+              </section>
+            </section>
+            <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能整理設計與契約事項</button>
           </section>
-          <section id="vendor-contract-view-panel-reply" role="tabpanel" data-vendor-contract-view-panel="reply" aria-labelledby="vendor-contract-view-tab-reply" hidden><div class="vendor-section-heading"><div><p class="eyebrow">待我回覆</p><h3>補件或說明可能影響</h3></div><span>尚未送出／尚未保存</span></div><p class="vendor-boundary">本頁目前沒有正式保存能力。離開頁面後不保留內容，也不會建立案件紀錄。</p><label class="vendor-disabled-field" for="vendor-contract-description"><span>回覆內容</span><textarea id="vendor-contract-description" rows="4" data-write-action disabled aria-disabled="true" placeholder="正式開放後可整理原因、依據版本與希望甲方確認的事項"></textarea></label><button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能送出回覆</button></section>
-          <section id="vendor-contract-view-panel-decision" role="tabpanel" data-vendor-contract-view-panel="decision" aria-labelledby="vendor-contract-view-tab-decision" hidden><div class="vendor-section-heading"><div><p class="eyebrow">變更與決定</p><h3>確認現在輪到誰處理</h3></div><span>資料待上游提供</span></div><dl class="vendor-decision-grid"><div><dt>乙方回覆</dt><dd>尚無回覆紀錄</dd></div><div><dt>甲方決定</dt><dd>尚無決定紀錄</dd></div><div><dt>雙方確認</dt><dd>尚無確認紀錄</dd></div><div><dt>新版本</dt><dd>尚未建立</dd></div></dl><p class="vendor-boundary">甲方決定不等於契約已變更。雙方確認與新版本必須各自留下時間、依據、狀態與責任人。</p></section>
-          <section id="vendor-contract-view-panel-records" role="tabpanel" data-vendor-contract-view-panel="records" aria-labelledby="vendor-contract-view-tab-records" hidden><div class="vendor-section-heading"><div><p class="eyebrow">版本與紀錄</p><h3>只顯示已留下的案件事實</h3></div><span>資料待上游提供</span></div><ol class="vendor-ledger"><li id="reviews" data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開審查</span><strong>萊比公開審查意見（PCM）</strong><small>意見必須對甲乙雙方公開並連回文件版本</small><em>待資料</em></li><li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>尚無補件紀錄</strong><small>原因、提出者、期限、回覆版本與處理狀態</small><em>待資料</em></li><li data-resource-code="ADDENDA"><span>附約</span><strong>尚無附約版本</strong><small>另建可追溯版本，不改寫原契約</small><em>待資料</em></li><li id="records" data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>尚無契約決定紀錄</strong><small>誰、何時、依據哪份文件、做了什麼與下一責任人</small><em>待資料</em></li></ol></section>
-        </section>
-        <details class="conversation-boundary" id="case-conversation"><summary>查看與案件決定有關的公開對話紀錄</summary><p>只整理與文件、任務、確認及變更有關的公開內容；私人對話不會顯示。尚無可顯示的公開對話紀錄。</p></details>
+
+          <section class="vendor-workspace-panel" id="vendor-workspace-panel-construction" role="tabpanel" aria-labelledby="vendor-workspace-tab-construction" data-vendor-workspace-panel="construction" hidden>
+            <header class="vendor-panel-heading" id="execution">
+              <div><p class="eyebrow">工程管理</p><h2>把現場事實連回任務與有效文件</h2></div>
+              <p>照片不是獨立相簿；任務、進度、照片、變更、追加減項與驗收，都要指出時間、位置、責任人與依據。</p>
+            </header>
+            <dl class="vendor-panel-facts" aria-label="工程管理目前責任">
+              <div><dt>目前狀態</dt><dd>尚未提供工程進度</dd></div>
+              <div><dt>下一步</dt><dd>尚未提供近期施工任務</dd></div>
+              <div><dt>責任人</dt><dd>尚未提供下一責任人</dd></div>
+              <div><dt>最近紀錄</dt><dd>尚無施工異動紀錄</dd></div>
+            </dl>
+
+            <div class="vendor-progress-board" aria-label="工程管理工作摘要">
+              <article><span>施工進度</span><strong>尚未提供排程</strong><p>完成比例、目前工項與阻塞原因需由有效任務提供。</p></article>
+              <article><span>近期任務</span><strong>尚無可顯示任務</strong><p>需包含責任人、期限、前置條件與依據文件。</p></article>
+              <article><span>待驗收事項</span><strong>尚無可顯示缺失</strong><p>缺失位置、改善結果與確認者需留下紀錄。</p></article>
+            </div>
+
+            <div class="vendor-section-heading"><div><p class="eyebrow">施工留痕</p><h3>任務、照片、變更與驗收</h3></div><span>資料待上游提供</span></div>
+            <ol class="vendor-ledger">
+              <li data-resource-code="SCHEDULES"><span>施工任務</span><strong>尚無可顯示的任務</strong><small>責任人、期限、阻塞原因、依據文件與下一步</small><em>待資料</em></li>
+              <li data-resource-code="EVIDENCE"><span>施工照片</span><strong>尚無可顯示的照片</strong><small>時間、位置、任務、提交者與文件依據</small><em>待資料</em></li>
+              <li data-resource-code="CHANGES"><span>追加減項</span><strong>尚無可顯示的變更</strong><small>提出原因、影響、雙方狀態與下一責任人</small><em>待資料</em></li>
+              <li data-resource-code="ACCEPTANCE"><span>驗收</span><strong>尚無可顯示的缺失</strong><small>缺失位置、處理結果、確認者與回覆紀錄</small><em>待資料</em></li>
+            </ol>
+            <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能新增施工紀錄</button>
+          </section>
+        </div>
+
+        <details class="conversation-boundary" id="case-conversation">
+          <summary>查看與案件決定有關的公開對話紀錄</summary>
+          <p>只整理與文件、任務、確認及變更有關的公開內容；私人對話不會顯示。尚無可顯示的公開對話紀錄。</p>
+        </details>
         <p class="vendor-live" data-vendor-workspace-live aria-live="polite"></p>
+        </div>
       </section>
     </template>
+
     <footer class="vendor-footer"><img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE offer" /><p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p></footer>
     <script type="module" src="./app.js"></script>
   </body>
