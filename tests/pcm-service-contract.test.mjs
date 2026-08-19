@@ -174,6 +174,23 @@ test("beginner contract uses DRS naming and marks decisive clauses with bold red
   assert.match(highlightRule[1], /text-decoration-thickness:\s*(?:[2-9]px|\.\d+em)\s*;/);
 });
 
+test("service contract direct page exposes a read-only standard contract template entry", async () => {
+  const html = await readFile(path.join(serviceContractDir, "code.html"), "utf8");
+  const link = [...html.matchAll(/<a\b[\s\S]*?<\/a>/giu)]
+    .map(([anchor]) => anchor)
+    .find((anchor) => /\bdata-service-project-contract-link\b/iu.test(anchor));
+
+  assert.ok(link, "service contract must expose a project-contract template entry");
+  assert.match(
+    link,
+    /href=["']\.\.\/\.\.\/\.\.\/\.\.\/site\/standard_contract_editor\/code\.html\?contractType=DESIGN_BUILD&amp;returnTo=service-contract["']/iu,
+  );
+  assert.match(link, />\s*查看甲乙契約範本\s*<\/a>/iu);
+  assert.match(html, /中性範本/);
+  assert.match(html, /不會建立正式契約、簽署或案件紀錄/);
+  assert.doesNotMatch(link, /已建立|已簽署|已保存/iu);
+});
+
 test("signing readiness evaluates the production initial envelope and fails closed for every mutation", async () => {
   const { CONTRACT_META } = await import(moduleUrl("contract-content.js"));
   const {

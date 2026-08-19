@@ -158,9 +158,20 @@ test("preview provides a prominent role-aware return to the exact editing task w
   assert.match(app, /function normalizePreviewReturnTarget/);
   assert.match(app, /owner[\s\S]{0,260}label:\s*["']回甲方工作台繼續填寫["'][\s\S]{0,260}client_awarding_dashboard\/code\.html#owner-contract-view-panel-facts/);
   assert.match(app, /vendor[\s\S]{0,260}label:\s*["']回乙方工作台繼續回覆["'][\s\S]{0,260}vendor_workspace\/code\.html#vendor-contract-view-panel-reply/);
+  assert.match(app, /service-contract[\s\S]{0,260}label:\s*["']回 DRS 服務契約["'][\s\S]{0,260}service_contract\/code\.html\?contract=engineering#full-contract/);
   assert.match(app, /refs\["reader-return-to-workspace"\]/);
   assert.match(app, /buildProjectContractPreviewHref\(selectedType,\s*state\.returnTarget\)/);
   assert.doesNotMatch(app, /returnTarget[\s\S]{0,120}(?:caseId|contractId|version)/);
+});
+
+test("preview accepts service contract as a neutral return target only", () => {
+  const { normalizePreviewReturnTarget, buildProjectContractPreviewHref } = require(appPath);
+
+  assert.equal(normalizePreviewReturnTarget("service-contract"), "service-contract");
+  assert.equal(
+    buildProjectContractPreviewHref("DESIGN_BUILD", "service-contract"),
+    "/site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&returnTo=service-contract",
+  );
 });
 
 test("mobile book keeps the orange cover but uses horizontal section tabs and a direct return action", () => {

@@ -19,6 +19,10 @@
       label: "回乙方工作台繼續回覆",
       href: "../../src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html#vendor-contract-view-panel-reply",
     }),
+    "service-contract": Object.freeze({
+      label: "回 DRS 服務契約",
+      href: "../../src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html?contract=engineering#full-contract",
+    }),
   });
   var TYPE_LABELS = {
     DESIGN: "設計契約",
@@ -184,7 +188,7 @@
   }
 
   function normalizePreviewReturnTarget(value) {
-    return value === "owner" || value === "vendor" ? value : null;
+    return Object.prototype.hasOwnProperty.call(RETURN_TARGETS, value) ? value : null;
   }
 
   function isOrdinaryRecord(candidate) {
