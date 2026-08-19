@@ -766,14 +766,35 @@ export function initializeDrawingCheckPage(options = {}) {
     }
     if (status === "partial") {
       const summary = result && result.summary;
+      const summaryCounts = summary && summary.counts;
       const file = result && result.file;
       const sourcePage = result && result.sourcePage;
       const classificationCounts = Array.isArray(result && result.classificationCounts)
         ? result.classificationCounts
         : [];
+      const fallbackCounts = Array.isArray(summaryCounts)
+        ? []
+        : Object.keys(summaryCounts ?? {}).map((key) => {
+          const count = Number(summaryCounts[key]);
+          if (!Number.isSafeInteger(count) || count < 0) return null;
+          return {
+            label: key,
+            count,
+          };
+        }).filter(Boolean);
+      const stableClassificationCounts = classificationCounts.length > 0
+        ? classificationCounts
+        : fallbackCounts;
       const uncertaintyItems = Array.isArray(result && result.uncertainty)
         ? result.uncertainty
         : [];
+      const stableUncertaintyItems = uncertaintyItems.filter((item) => {
+        return item &&
+          typeof item.reason === "string" &&
+          item.reason.trim().length > 0 &&
+          !item.reason.includes("id:") &&
+          !item.reason.includes("category:");
+      });
       const pageCount = Number(summary && summary.pageCount);
       const objectCount = Number(summary && summary.objectCount);
       const unresolvedCount = Number(summary && summary.unresolvedCount);
@@ -795,23 +816,26 @@ export function initializeDrawingCheckPage(options = {}) {
       setText(
         recognitionPages,
         sourcePage && sourcePage.label
-          ? `${pageCount} 頁；本次整理${sourcePage.label}`
+          ? `共 ${Number.isFinite(pageCount) ? pageCount : "?"} 頁；本次整理${sourcePage.label}`
           : "來源頁仍需確認",
       );
       setText(recognitionObjects, objectCount >= 0 ? `找到 ${objectCount} 個候選結構` : "仍需確認");
       setText(
         recognitionCounts,
-        classificationCounts.length > 0
-          ? classificationCounts.map((row) => `${row.label} ${row.count} 項`).join("、")
+        stableClassificationCounts.length > 0
+          ? stableClassificationCounts.map((row) => `${row.label} ${row.count} 項`).join("、")
           : "尚未形成可顯示的分類摘要",
       );
       setText(
         recognitionUncertainty,
-        unresolvedCount > 0 ? `${unresolvedCount} 項仍需人工確認` : "目前沒有列出重要待確認項目，仍需人工核對",
+        stableUncertaintyItems.length > 0
+          ? `${stableUncertaintyItems.length} 項仍需人工確認`
+          : "目前沒有列出重要待確認項目，仍需人工核對",
       );
-      latestRecognitionItemsText = uncertaintyItems.length > 0
-        ? uncertaintyItems.map((item, index) =>
-          `${index + 1}. ${item.reason} ${item.nextAction}`).join(" ")
+      latestRecognitionItemsText = stableUncertaintyItems.length > 0
+        ? stableUncertaintyItems.map((item, index) =>
+          `${index + 1}. ${item.reason}；${item.nextAction || "請人工核對原始圖說後補充採用建議。"}`
+        ).join(" ")
         : "目前沒有列出重要待確認項目；正式採用前仍須由甲方回看原始圖說。";
       setText(recognitionItems, latestRecognitionItemsText);
       setText(correctionRecognitionItems, latestRecognitionItemsText);

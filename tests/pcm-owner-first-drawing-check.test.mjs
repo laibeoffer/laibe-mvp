@@ -574,6 +574,9 @@ test("async app to real adapter renders bytes-derived safe partial details", asy
   assert.equal(result.status, "partial");
   assert.equal(harness.recognitionState(), "partial");
   assert.match(harness.recognitionText("[data-recognition-pages]"), /第 1 頁/);
+  assert.match(harness.recognitionText("[data-recognition-size]"), /\d+(\.\d+)? MB/);
+  assert.match(harness.recognitionText("[data-recognition-objects]"), /找到 \d+ 個候選結構/);
+  assert.match(harness.recognitionText("[data-recognition-uncertainty]"), /\d+ 項仍需人工確認/);
   for (const row of result.classificationCounts) {
     assert.match(
       harness.recognitionText("[data-recognition-counts]"),
