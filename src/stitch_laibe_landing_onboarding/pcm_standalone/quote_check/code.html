@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="LaiBE DRS 報價文件檢查工作台，協助業主在瀏覽器本機整理具文字層的報價 PDF，並確認契約與施工圖檢查入口狀態。"
-    />
+        <meta
+          name="description"
+          content="LaiBE DRS 報價文件檢查工作台，協助業主在瀏覽器本機整理報價 PDF 與做契約條款初步整理（HOLD），施工圖維持入口檢視。"
+        />
     <title>LaiBE DRS｜報價文件檢查</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
     <link rel="stylesheet" href="../shared/owner-first-shell.css" />
@@ -35,8 +35,8 @@
       <section class="self-check-hero" aria-labelledby="workspace-title">
         <p class="workspace-heading__eyebrow">給已拿到報價、契約或圖說的業主</p>
         <h1 id="workspace-title">報價文件檢查</h1>
-        <p class="self-check-hero__lead">選擇報價 PDF，在瀏覽器本機取得可回頭核對的解析摘要；契約與施工圖仍只顯示入口狀態。</p>
-        <p class="self-check-hero__boundary">目前只讀取未加密、未壓縮且含文字層的報價 PDF；檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。</p>
+          <p class="self-check-hero__lead">報價 PDF 先顯示可回頭核對的解析摘要；契約 PDF 顯示本機條款初步整理；施工圖先維持入口狀態。</p>
+          <p class="self-check-hero__boundary">目前報價 PDF 需為未加密、未壓縮且含文字層；契約則以文字字串為基礎做初步條款整理。檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。</p>
         <div class="self-check-hero__actions">
           <button class="owner-first-primary-action" type="button" data-start-upload>選擇第一份 PDF</button>
           <a class="owner-first-secondary-action" href="#document-workspace">選擇文件類型</a>
@@ -53,7 +53,7 @@
             <p class="workspace-heading__eyebrow">文件檢查</p>
             <h2 id="checklist-title">選擇檔案，確認可讀狀態</h2>
           </div>
-          <p>報價、契約與施工圖分開處理；目前只有報價 PDF 會在本機讀取文字層並產生解析摘要。</p>
+          <p>報價、契約與施工圖分開處理；報價 PDF 會產生文字層解析摘要，契約 PDF 會做條款初步整理（HOLD）。</p>
           <a class="owner-first-secondary-action document-workspace__drawing-cta" href="../drawing_check/code.html" data-drawing-check-link data-drawing-check-primary>前往圖說檢討</a>
         </header>
 
@@ -63,7 +63,7 @@
           <button id="document-tab-drawing" role="tab" type="button" data-document-tab="drawing" aria-selected="false" aria-controls="document-panel-drawing" tabindex="-1"><span>03</span><strong>施工圖說</strong><small data-tab-status="drawing">尚未選擇</small></button>
         </div>
 
-        <div class="document-panel" id="document-panel-quote" role="tabpanel" aria-labelledby="document-tab-quote" data-document-panel="quote" tabindex="-1">
+      <div class="document-panel" id="document-panel-quote" role="tabpanel" aria-labelledby="document-tab-quote" data-document-panel="quote" tabindex="-1">
           <header class="document-panel__intro">
             <p>報價內容</p>
             <h2>先確認報價能不能成為共同討論依據</h2>
@@ -93,31 +93,40 @@
               </div>
               <p class="ai-report-boundary">這只整理本次 PDF 的文字層，不是 OCR、完整報價審查、正式報告或案件紀錄；請回到原始文件逐項核對。</p>
             </section>
-          </div>
         </div>
+      </div>
 
-        <div class="document-panel" id="document-panel-contract" role="tabpanel" aria-labelledby="document-tab-contract" data-document-panel="contract" tabindex="-1" hidden>
-          <header class="document-panel__intro">
-            <p>契約條款</p>
+      <div class="document-panel" id="document-panel-contract" role="tabpanel" aria-labelledby="document-tab-contract" data-document-panel="contract" tabindex="-1" hidden>
+        <header class="document-panel__intro">
+          <p>契約條款</p>
             <h2>簽名前先找出最難回頭的責任邊界</h2>
             <p>付款、變更與文件優先順序都要有共同依據，不能只靠口頭記憶。</p>
           </header>
-          <div class="document-panel__body">
-            <section class="document-action-step document-action-step--upload" data-document-upload-step aria-labelledby="upload-contract-title">
-              <header class="document-action-step__header"><p><span>01</span>選擇檔案</p><h3 id="upload-contract-title">選擇契約 PDF</h3><small>選擇檔案後，只會在本次瀏覽顯示檔名。</small></header>
-              <label class="document-dropzone" for="document-file-contract" data-document-dropzone="contract"><span class="document-dropzone__format" aria-hidden="true">PDF</span><span><strong>選擇契約 PDF</strong><small>可點選或拖放 PDF</small></span></label>
-              <input id="document-file-contract" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="contract" aria-describedby="document-feedback-contract" aria-invalid="false" />
-              <p class="document-feedback" id="document-feedback-contract" data-document-feedback="contract">尚未選擇檔案。</p>
-              <p class="selected-file" data-selected-file="contract" hidden><span>檔名</span><strong data-document-filename="contract"></strong></p>
-            </section>
-            <section class="document-action-step document-action-step--report" data-ai-report-step aria-labelledby="report-contract-title">
-              <header class="document-action-step__header"><p><span>02</span>AI 檢查報告開放狀態</p><h3 id="report-contract-title">查看契約檢查報告開放狀態</h3><small>先選擇 PDF，再查看目前開放狀態。</small></header>
-              <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="contract" disabled>查看 AI 檢查報告開放狀態</button>
-              <p class="ai-report-status" data-ai-report-status="contract" data-report-state="waiting-file">請先選擇 PDF，才能查看 AI 檢查報告的開放狀態。</p>
-              <p class="ai-report-boundary">AI 檢查報告功能正在整理中，正式開放後會提供完整操作入口。</p>
-            </section>
-          </div>
+        <div class="document-panel__body">
+          <section class="document-action-step document-action-step--upload" data-document-upload-step aria-labelledby="upload-contract-title">
+            <header class="document-action-step__header"><p><span>01</span>選擇檔案</p><h3 id="upload-contract-title">選擇契約 PDF</h3><small>選擇檔案後，只會在本次瀏覽顯示檔名。</small></header>
+            <label class="document-dropzone" for="document-file-contract" data-document-dropzone="contract"><span class="document-dropzone__format" aria-hidden="true">PDF</span><span><strong>選擇契約 PDF</strong><small>可點選或拖放 PDF</small></span></label>
+            <input id="document-file-contract" class="visually-hidden-file" type="file" accept="application/pdf,.pdf" data-document-file="contract" aria-describedby="document-feedback-contract" aria-invalid="false" />
+            <p class="document-feedback" id="document-feedback-contract" data-document-feedback="contract">尚未選擇檔案。</p>
+            <p class="selected-file" data-selected-file="contract" hidden><span>檔名</span><strong data-document-filename="contract"></strong></p>
+          </section>
+          <section class="document-action-step document-action-step--report" data-ai-report-step aria-labelledby="report-contract-title">
+            <header class="document-action-step__header"><p><span>02</span>契約條款初步整理</p><h3 id="report-contract-title">條款初步整理</h3><small>先選擇 PDF，再查看本次本機初步整理結果。</small></header>
+            <button class="owner-first-primary-action ai-report-action" type="button" data-ai-report-action="contract" disabled>查看契約條款初步整理（HOLD）</button>
+            <p class="ai-report-status" data-ai-report-status="contract" data-report-state="waiting-file">請先選擇 PDF，才能查看入口狀態。</p>
+            <div class="local-parser-summary" data-parser-summary="contract" hidden>
+              <p class="local-parser-summary__eyebrow">契約條款初步整理（HOLD）</p>
+              <dl>
+                <div><dt>頁數</dt><dd data-contract-summary-page-count>—</dd></div>
+                <div><dt>可讀文字行數</dt><dd data-contract-summary-line-count>—</dd></div>
+                <div><dt>文件狀態</dt><dd data-contract-summary-readability>—</dd></div>
+              </dl>
+              <p data-contract-clause-draft>尚未完成條款整理。</p>
+            </div>
+            <p class="ai-report-boundary">契約本機條款整理僅作初步參考，未形成正式法律結論、正式報告或案件紀錄；後續仍需在正式流程完成正式紀錄。</p>
+          </section>
         </div>
+      </div>
 
         <div class="document-panel" id="document-panel-drawing" role="tabpanel" aria-labelledby="document-tab-drawing" data-document-panel="drawing" tabindex="-1" hidden>
           <header class="document-panel__intro">

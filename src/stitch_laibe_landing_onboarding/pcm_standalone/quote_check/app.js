@@ -1,5 +1,6 @@
 import {
   inspectQuotePdfFile,
+  inspectContractPdfFile,
   QUOTE_BROWSER_RUNTIME_MODE,
 } from "../../../lib/budget/quote-healthcheck/browser-adapter.js";
 
@@ -848,6 +849,14 @@ function initializeDocumentWorkspace(
       typeof inspectorDescriptor.value === "function"
     ? inspectorDescriptor.value
     : inspectQuotePdfFile;
+  const contractInspectorDescriptor = readOwnDataValue(
+    dependencies,
+    "inspectContractPdfFile",
+  );
+  const inspectSelectedContractFile = contractInspectorDescriptor &&
+      typeof contractInspectorDescriptor.value === "function"
+    ? contractInspectorDescriptor.value
+    : inspectContractPdfFile;
   try {
     root.dataset.quoteRuntimeMode = QUOTE_BROWSER_RUNTIME_MODE;
   } catch {
@@ -931,8 +940,10 @@ function initializeDocumentWorkspace(
     const reportStatus = kind === "quote"
       ? null
       : root.querySelector(`[data-ai-report-status="${kind}"]`);
-    const parserStatus = kind === "quote"
-      ? root.querySelector('[data-parser-status="quote"]')
+    const parserStatus = parserResult
+      ? root.querySelector(
+        kind === "quote" ? '[data-parser-status="quote"]' : `[data-ai-report-status="${kind}"]`,
+      )
       : null;
     if (filename) filename.textContent = selected ? documentSelection.name : "";
     if (filenameRow) filenameRow.hidden = !selected;
@@ -951,21 +962,30 @@ function initializeDocumentWorkspace(
       }
       return;
     }
-    if (kind !== "quote") {
+    if (kind === "drawing") {
       if (reportAction) {
         reportAction.disabled = true;
         reportAction.textContent = "檢查報告尚未開放";
       }
       if (reportStatus) {
         reportStatus.dataset.reportState = "unavailable";
-        reportStatus.textContent = "已選擇檔案；這類文件的檢查功能仍在整理中。";
+        reportStatus.textContent =
+          "已選擇檔案；這類文件目前為 HOLD 入口，僅保留本機檔名，不做正式法務或風險判讀。";
       }
       return;
     }
     if (!parserResult || parserResult.status === "PROCESSING") {
       if (parserStatus) {
-        parserStatus.dataset.parserState = "processing";
-        parserStatus.textContent = "正在本機讀取 PDF；檔案不會上傳或保存。";
+        parserStatus.dataset.parserState = kind === "quote" ? "processing" : "processing";
+        parserStatus.textContent = kind === "quote"
+          ? "正在本機讀取 PDF；檔案不會上傳或保存。"
+          : "正在做契約條款初步整理；結果僅本機顯示，未形成正式報告。";
+      }
+      if (reportStatus) {
+        reportStatus.dataset.reportState = kind === "quote" ? "processing" : "processing";
+        reportStatus.textContent = kind === "quote"
+          ? "正在本機讀取 PDF；檔案不會上傳或保存。"
+          : "契約條款初步整理中；未形成正式法律意見。";
       }
       return;
     }
@@ -977,8 +997,16 @@ function initializeDocumentWorkspace(
           ? "scanned"
           : "error";
       parserStatus.textContent = ready
-        ? "本機解析摘要已完成；這不是案件正式報告，請回到原始文件確認。"
+        ? kind === "quote"
+          ? "本機解析摘要已完成；這不是案件正式報告，請回到原始文件確認。"
+          : "契約條款初步整理已完成；僅作參考，仍保留 HOLD。"
         : `${parserResult.title}：${parserResult.message}`;
+    }
+    if (reportStatus) {
+      reportStatus.dataset.reportState = ready ? "parser-ready" : "error";
+      reportStatus.textContent = ready
+        ? "條款已完成初步整理（HOLD）。請回到原始契約逐條確認。"
+        : `${parserResult.title}；${parserResult.message}`;
     }
   }
 
@@ -998,6 +1026,29 @@ function initializeDocumentWorkspace(
         ? result.limitations.join(" ")
         : "這份本機解析摘要不會保存，也不是案件正式報告。",
     );
+  }
+
+  function renderContractParserSummary() {
+    const output = root.querySelector('[data-parser-summary="contract"]');
+    const result = parserResults.contract;
+    const ready = result?.status === "PARSER_READY" && Boolean(result.summary);
+    if (output) output.hidden = !ready;
+    if (!ready) return;
+    setTextFor("[data-contract-summary-page-count]", String(result.summary.pageCount));
+    setTextFor(
+      "[data-contract-summary-line-count]",
+      String(result.summary.lineCount ?? 0),
+    );
+    setTextFor("[data-contract-summary-readability]", result.summary.readability);
+    const clauseDraft = result.summary.clauseDraft ?? [];
+    const clauseTarget = root.querySelector('[data-contract-clause-draft]');
+    if (clauseTarget) {
+      clauseTarget.textContent = clauseDraft.length > 0
+        ? clauseDraft
+          .map((item) => `${item.label}：${item.status}`)
+          .join("；")
+        : "未偵測到明確條款項目詞彙。";
+    }
   }
 
   function renderTabsAndPanels() {
@@ -1097,12 +1148,13 @@ function initializeDocumentWorkspace(
     renderTabsAndPanels();
     for (const kind of DOCUMENT_WORKSPACE_KINDS) renderDocumentSelection(kind);
     renderQuoteParserSummary();
+    renderContractParserSummary();
     const documentProjection = projectDocumentWorkspace(workspaceState);
     const fileSummary = documentProjection.uploadedCount === 0
       ? "目前尚未選擇檔案。"
       : documentProjection.uploadedCount === 3
-        ? "三類檔案已選擇；目前僅報價 PDF 可產生本機解析摘要。"
-        : `${documentProjection.uploadedCount}/3 類檔案已選擇；目前僅報價 PDF 可產生本機解析摘要。`;
+        ? "三類檔案已選擇；報價會產生本機解析摘要，契約會提供條款初步整理（HOLD），施工圖仍保留檔名。"
+        : `${documentProjection.uploadedCount}/3 類檔案已選擇；報價會產生本機解析摘要，契約會提供條款初步整理（HOLD）。`;
     setTextFor("[data-file-selection-summary]", fileSummary);
     for (const kind of DOCUMENT_WORKSPACE_KINDS) {
       setTextFor(`[data-tab-status="${kind}"]`, workspaceState.documents[kind] ? "檔案已就緒" : "尚未選擇");
@@ -1172,11 +1224,34 @@ function initializeDocumentWorkspace(
     if (feedback) {
       feedback.textContent = kind === "quote"
         ? "已選擇檔案，正在本機讀取內容。"
-        : "已選擇檔案；這類文件目前只顯示檔名。";
+        : kind === "contract"
+          ? "已選擇檔案，正在做條款初步整理（HOLD）。"
+          : "已選擇檔案；這類文件目前為 HOLD 入口，僅保留本機檔名，不做正式法務或風險結論。";
       feedback.dataset.feedbackState = "selected";
     }
     if (input && typeof input.setAttribute === "function") input.setAttribute("aria-invalid", "false");
-    if (kind !== "quote") {
+    if (kind === "contract") {
+      const runId = analysisRuns.contract + 1;
+      analysisRuns.contract = runId;
+      parserResults.contract = { status: "PROCESSING", summary: null };
+      render();
+      announce("正在本機做契約條款初步整理；結果僅提供本機參考。");
+      const parserResult = await inspectSelectedContractFile(selection.file);
+      if (analysisRuns.contract !== runId) return;
+      parserResults.contract = parserResult;
+      if (feedback) {
+        feedback.textContent = parserResult.status === "PARSER_READY"
+          ? "條款初步整理完成；重新選擇可改看另一份 PDF。"
+          : `${parserResult.title}；可重新選擇另一份 PDF。`;
+        feedback.dataset.feedbackState = parserResult.status === "PARSER_READY" ? "selected" : "error";
+      }
+      render();
+      announce(parserResult.status === "PARSER_READY"
+        ? "條款初步整理完成（HOLD）；請回到原始契約逐條確認。"
+        : `${parserResult.title}。下一步：${parserResult.nextAction}`);
+      return;
+    }
+    if (kind === "drawing") {
       analysisRuns[kind] += 1;
       parserResults[kind] = null;
       render();

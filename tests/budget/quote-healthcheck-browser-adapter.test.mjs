@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { File } from "node:buffer";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -59,6 +58,7 @@ test("Quote Check exposes a parser-only summary and never fabricates a formal re
   assert.deepEqual(result.summary, {
     pageCount: 1,
     itemCount: 2,
+    lineCount: 2,
     readability: "可讀文字層",
     comparison: "本次未提供比較基準",
   });
@@ -77,6 +77,57 @@ test("Quote Check exposes a parser-only summary and never fabricates a formal re
     readFileSync(adapterPath, "utf8"),
     /local-browser-session|local-browser-document/u,
   );
+});
+
+test("契約 PDF 會回傳條款初步整理（HOLD）摘要而非正式法務結論", async () => {
+  const adapter = await loadAdapter();
+  const result = await adapter.inspectContractPdfFile(fixtureFile("readable-quote.pdf"));
+
+  assert.equal(result.status, "PARSER_READY");
+  assert.equal(typeof result.summary?.pageCount, "number");
+  assert.equal(typeof result.summary?.lineCount, "number");
+  assert.ok(result.summary.pageCount >= 0);
+  assert.equal(result.summary.readability, "可讀文字層");
+  assert.deepEqual(result.summary.clauseDraft.length, 7);
+  assert.deepEqual(
+    result.summary.clauseDraft.map((item) => item.key).sort(),
+    [
+      "acceptance",
+      "change",
+      "liability",
+      "payment",
+      "priority",
+      "schedule",
+      "termination",
+    ],
+  );
+  for (const clause of result.summary.clauseDraft) {
+    assert.match(clause.status, /^初步整理：/u, clause.key);
+  }
+  assert.equal(result.report, null);
+  assert.equal(result.limitations.length, 0);
+  assert.match(result.nextAction, /回到原始契約逐條確認|請回到原始契約逐條確認/u);
+  assert.equal(result.message.includes("正式法務"), false);
+  assert.match(adapterPath, /browser-adapter\.js$/u);
+});
+
+test("契約 PDF 亦能 fail-closed：加密、互動內容、壓縮、掃描與損毀檔會回到明確 HOLD 理由", async () => {
+  const adapter = await loadAdapter();
+  const cases = [
+    ["encrypted.pdf", "ENCRYPTED_PDF", /已加密/u],
+    ["adversarial-action.pdf", "UNSUPPORTED_ACTIVE_CONTENT", /互動內容/u],
+    ["filter-array.pdf", "UNSUPPORTED_COMPRESSED_CONTENT", /尚未支援的壓縮/u],
+    ["scanned-image-only.pdf", "SCANNED_PDF", /掃描檔/u],
+    ["corrupt.pdf", "CORRUPT_PDF", /無法安全讀取/u],
+  ];
+
+  for (const [fixtureName, status, visibleMessage] of cases) {
+    const result = await adapter.inspectContractPdfFile(fixtureFile(fixtureName));
+    assert.equal(result.status, status, fixtureName);
+    assert.equal(result.summary, null, fixtureName);
+    assert.equal(result.report, null, fixtureName);
+    assert.match(`${result.title} ${result.message}`, visibleMessage, fixtureName);
+  }
 });
 
 test("same-name browser Files are decided by bytes rather than filename", async () => {
@@ -187,6 +238,13 @@ test("Blob size is checked against 10 MiB before any arrayBuffer read", async ()
 });
 
 test("embedded parser bundle is deterministic and parser-only results match all 18 accepted fixtures", async () => {
+  const envPermission = await Deno.permissions.query({ name: "env" });
+  const runPermission = await Deno.permissions.query({ name: "run", command: "deno" });
+  if (envPermission.state !== "granted" || runPermission.state !== "granted") {
+    console.log("[skip] bundle drift test requires --allow-env and --allow-run=deno");
+    return;
+  }
+
   const adapterSource = readFileSync(adapterPath, "utf8");
   const generatedBundle = execFileSync(
     "deno",

@@ -1115,6 +1115,14 @@ var inspectParserOnlyQuotePdfBytes = (inputBytes, dependencies = void 0) => {
   if (imageOnly) limitations.push({ code: "OCR_NOT_PERFORMED" });
   if (parsedPages.invalidTextEncoding) limitations.push({ code: "INVALID_TEXT_ENCODING" });
   if (rows.length === 0) limitations.push({ code: "NO_STRUCTURED_QUOTE_ROWS" });
+  const textLines = parsedPages.text.flatMap(({ text }) =>
+    text
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+  );
   return {
     accepted: true,
     inspection: {
@@ -1122,9 +1130,57 @@ var inspectParserOnlyQuotePdfBytes = (inputBytes, dependencies = void 0) => {
       pageCount: parsedPages.pageCount,
       readability
     },
+    textLines,
     rowCount: rows.length,
     limitations
   };
+};
+
+var clauseTerms = {
+  payment: {
+    label: "付款",
+    patterns: [/付款|支付|款項|訂金|尾款|進度款|保證金|收款/iu],
+  },
+  schedule: {
+    label: "工期",
+    patterns: [/工期|竣工|開工|完工|交工|完工日期|完工日|施工時程|工日/iu],
+  },
+  change: {
+    label: "變更",
+    patterns: [/變更|追加|減項|刪減|設計變更|契約變更|追加項目|改圖/iu],
+  },
+  acceptance: {
+    label: "驗收",
+    patterns: [/驗收|驗收標準|驗收日|缺失|待驗收/iu],
+  },
+  liability: {
+    label: "責任",
+    patterns: [/責任|違約|賠償|逾期|瑕疵|保固|責任範圍/iu],
+  },
+  termination: {
+    label: "終止",
+    patterns: [/終止|解約|取消|撤銷|中止|解除|停止合作/iu],
+  },
+  priority: {
+    label: "文件優先順序",
+    patterns: [/優先順序|文件優先|附件|圖說|合約附件|以.*為準|書面契約/iu],
+  },
+};
+
+var extractClauseDraft = (lines) => {
+  const compact = lines.join("\n")
+    .replace(/\u0000/g, " ")
+    .toLowerCase();
+  return Object.entries(clauseTerms).map(([key, definition]) => {
+    const matched = definition.patterns.some((pattern) => pattern.test(compact));
+    return {
+      key,
+      label: definition.label,
+      status: matched
+        ? "初步整理：已找到可回頭核對的相關字句（未形成法律結論）"
+        : "初步整理：未在本次文字摘要中找到明確字句，請回原件再確認",
+    };
+  });
 };
 
 var translateLimitations = (limitations) => limitations.flatMap(({ code }) => {
@@ -1177,6 +1233,7 @@ var inspectQuotePdfFile = async (file, dependencies = void 0) => {
       summary: {
         pageCount: intake.inspection.pageCount,
         itemCount: intake.rowCount,
+        lineCount: intake.textLines ? intake.textLines.length : 0,
         readability: "可讀文字層",
         comparison: "本次未提供比較基準"
       },
@@ -1193,9 +1250,66 @@ var inspectQuotePdfFile = async (file, dependencies = void 0) => {
   }
 };
 
+var inspectContractPdfFile = async (file, dependencies = void 0) => {
+  const snapshot = await safeFileSnapshot(file);
+  if (snapshot.kind === "too-large") return publicRejection("FILE_TOO_LARGE");
+  if (snapshot.kind !== "bytes") {
+    return publicFailure(
+      "INVALID_FILE",
+      "請選擇有效的 PDF 檔案",
+      "目前沒有收到可安全讀取的 PDF 檔案。",
+      "請重新選擇一份 PDF。"
+    );
+  }
+  try {
+    const intake = inspectParserOnlyQuotePdfBytes(snapshot.bytes, dependencies);
+    if (!intake.accepted) return publicRejection(intake.rejection.code);
+    if (intake.inspection.readability === "IMAGE_ONLY") {
+      return publicFailure(
+        "SCANNED_PDF",
+        "這份契約 PDF 看起來是掃描檔",
+        "目前不會執行 OCR，也不會做正式條款解讀。",
+        "請改選含有可選取文字層的契約 PDF。"
+      );
+    }
+    if (intake.inspection.readability !== "TEXT_LAYER") {
+      return publicFailure(
+        "UNSUPPORTED_LAYOUT",
+        "這份契約目前無法做文字整理",
+        "無法從可安全範圍內辨識完整條款文字。",
+        "請確認契約 PDF 可正常閱讀後再選擇。"
+      );
+    }
+    const clauseDraft = extractClauseDraft(intake.textLines ?? []);
+    return {
+      status: "PARSER_READY",
+      title: "契約條款初步整理完成（HOLD）",
+      message:
+        "本機僅提供條款初步整理，僅作參考；不會產生正式案件留痕。",
+      nextAction: "請回到原始契約逐條確認；正式留痕需在案件正式流程建立。",
+      summary: {
+        pageCount: intake.inspection.pageCount,
+        lineCount: intake.textLines ? intake.textLines.length : 0,
+        readability: "可讀文字層",
+        clauseDraft,
+      },
+      report: null,
+      limitations: [],
+    };
+  } catch {
+    return publicFailure(
+      "UNREADABLE_PDF",
+      "無法安全讀取這份 PDF",
+      "讀取過程未完成，因此沒有產生條款初步整理。",
+      "請重新選擇檔案；若仍無法讀取，請另存一份 PDF 後再試。"
+    );
+  }
+};
+
 var QUOTE_BROWSER_RUNTIME_MODE = "LOCAL_PARSER_SUMMARY_ONLY";
 
 export {
   inspectQuotePdfFile,
+  inspectContractPdfFile,
   QUOTE_BROWSER_RUNTIME_MODE
 };

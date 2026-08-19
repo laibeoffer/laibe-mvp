@@ -582,20 +582,32 @@ function createDocumentWorkspaceHarness() {
       dataset: { parserStatus: "quote", parserState: "waiting-file" },
       textContent: "請先選擇 PDF。",
     }),
+    contract: reportStatuses.contract,
   };
   const parserSummary = createNode({
     dataset: { parserSummary: "quote" },
     hidden: true,
   });
+  const contractParserSummary = createNode({
+    dataset: { parserSummary: "contract" },
+    hidden: true,
+  });
+  const contractSummaryFields = {
+    "[data-contract-summary-page-count]": createNode({ textContent: "—" }),
+    "[data-contract-summary-line-count]": createNode({ textContent: "—" }),
+    "[data-contract-summary-readability]": createNode({ textContent: "—" }),
+    "[data-contract-clause-draft]": createNode({ textContent: "—" }),
+  };
   const summaryFields = {
     "[data-summary-page-count]": createNode({ textContent: "—" }),
     "[data-summary-item-count]": createNode({ textContent: "—" }),
     "[data-summary-readability]": createNode({ textContent: "—" }),
     "[data-summary-comparison]": createNode({ textContent: "—" }),
-    "[data-summary-limitations]": createNode({
-      textContent: "這份本機解析摘要不是案件正式報告。",
-    }),
-  };
+      "[data-summary-limitations]": createNode({
+        textContent: "這份本機解析摘要不是案件正式報告。",
+      }),
+      ...contractSummaryFields,
+    };
   const itemSpecs = [
     ["quote", "quote-scope", "報價內容", "是否有項目只寫名稱，沒有規格或範圍？"],
     ["contract", "contract-change", "契約條款", "追加與變更由誰提出、誰確認？"],
@@ -699,6 +711,11 @@ function createDocumentWorkspaceHarness() {
     if (selector === "[data-copy-feedback]") return copyFeedback;
     if (selector === "[data-self-check-summary]") return summary;
     if (selector === '[data-parser-summary="quote"]') return parserSummary;
+    if (selector === '[data-parser-summary="contract"]') return contractParserSummary;
+    if (selector === "[data-contract-summary-page-count]") return contractSummaryFields["[data-contract-summary-page-count]"];
+    if (selector === "[data-contract-summary-line-count]") return contractSummaryFields["[data-contract-summary-line-count]"];
+    if (selector === "[data-contract-summary-readability]") return contractSummaryFields["[data-contract-summary-readability]"];
+    if (selector === "[data-contract-clause-draft]") return contractSummaryFields["[data-contract-clause-draft]"];
     const selectors = [
       ["document-feedback", feedback],
       ["document-filename", filename],
@@ -735,6 +752,8 @@ function createDocumentWorkspaceHarness() {
     pendingList,
     reportActions,
     parserSummary,
+    contractParserSummary,
+    contractSummaryFields,
     parserStatuses,
     reportStatuses,
     selectedRows,
@@ -962,7 +981,7 @@ test("approved two-function workspace is visible truthful and memory only", asyn
   assert.match(html, /<h1[^>]*>報價文件檢查<\/h1>/u);
   assert.match(
     visible,
-    /目前只讀取未加密、未壓縮且含文字層的報價 PDF；檔案不會上傳或保存，也不會對掃描檔執行 OCR。重新整理或離開頁面後，本次結果就會消失。/u,
+    /未加密、未壓縮且含文字層；契約則以文字字串為基礎做初步條款整理/u,
   );
   assert.doesNotMatch(visible, /上傳成功|已上傳/u, "本機讀取流程不得對使用者宣稱已上傳");
   assert.match(html, /data-start-upload[^>]*>\s*選擇第一份 PDF\s*<\/button>/u);
@@ -1147,6 +1166,56 @@ test("production workspace renders parser-only facts without a formal report CTA
   assert.match(harness.live.textContent, /不是案件正式報告/u);
 });
 
+test("production workspace renders contract text parser summary in local HOLD mode", async () => {
+  const app = await importDocumentWorkspaceApp("workspace-contract-parser-summary");
+  const harness = createDocumentWorkspaceHarness();
+  app.initializeQuoteCheckPage(harness.documentRoot, {
+    hash: "#document-panel-contract",
+    search: "?mode=contract",
+  });
+
+  assert.equal(harness.tabs.contract.getAttribute("aria-selected"), "true");
+  assert.equal(harness.contractParserSummary.hidden, true);
+
+  await harness.chooseFile("contract", await quoteFixtureFile("readable-quote.pdf", "契約範本.pdf"));
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(harness.parserStatuses.contract.dataset.parserState, "parser-ready");
+  assert.equal(harness.reportStatuses.contract.dataset.reportState, "parser-ready");
+  assert.equal(harness.contractParserSummary.hidden, false);
+  assert.match(harness.contractSummaryFields["[data-contract-summary-page-count]"].textContent, /^\d+$/u);
+  assert.match(harness.contractSummaryFields["[data-contract-summary-line-count]"].textContent, /^\d+$/u);
+  assert.equal(harness.contractSummaryFields["[data-contract-summary-readability]"].textContent, "可讀文字層");
+  assert.match(harness.contractSummaryFields["[data-contract-clause-draft]"].textContent, /^付款：初步整理：/u);
+  assert.match(harness.live.textContent, /條款初步整理完成（HOLD）/u);
+  assert.match(harness.live.textContent, /非正式|僅作參考|HOLD/u);
+});
+
+test("production contract parser fails closed and clears old state on reselect", async () => {
+  const app = await importDocumentWorkspaceApp("workspace-contract-reselect");
+  const harness = createDocumentWorkspaceHarness();
+  app.initializeQuoteCheckPage(harness.documentRoot, {
+    hash: "#document-panel-contract",
+    search: "?mode=contract",
+  });
+
+  await harness.chooseFile("contract", await quoteFixtureFile("corrupt.pdf", "壞契約.pdf"));
+  await Promise.resolve();
+  assert.equal(harness.parserStatuses.contract.dataset.parserState, "error");
+  assert.equal(harness.reportStatuses.contract.dataset.reportState, "error");
+  assert.equal(harness.contractParserSummary.hidden, true);
+  assert.match(harness.live.textContent, /無法安全讀取這份 PDF/u);
+  assert.doesNotMatch(harness.live.textContent, /正式報告/u);
+
+  await harness.chooseFile("contract", await quoteFixtureFile("readable-quote.pdf", "可用契約.pdf"));
+  assert.equal(harness.parserStatuses.contract.dataset.parserState, "parser-ready");
+  assert.equal(harness.reportStatuses.contract.dataset.reportState, "parser-ready");
+  assert.equal(harness.contractParserSummary.hidden, false);
+  assert.match(harness.contractSummaryFields["[data-contract-summary-page-count]"].textContent, /^\d+$/u);
+  assert.equal(harness.contractSummaryFields["[data-contract-summary-readability]"].textContent, "可讀文字層");
+  assert.match(harness.contractSummaryFields["[data-contract-clause-draft]"].textContent, /^付款：初步整理：/u);
+});
+
 test("production document workspace guards a tampered drawing-check CTA and preserves its exact local href", async () => {
   const app = await importDocumentWorkspaceApp("workspace-drawing-route-guard");
   const harness = createDocumentWorkspaceHarness();
@@ -1195,7 +1264,10 @@ test("production workspace file events keep one truth across cancel invalid drop
 
   await harness.chooseFile("contract", browserFile("契約.pdf", "application/pdf"));
   await harness.chooseFile("drawing", browserFile("圖說.PDF", "text/plain"));
-  assert.equal(harness.fileSelectionSummary.textContent, "三類檔案已選擇；目前僅報價 PDF 可產生本機解析摘要。");
+  assert.match(
+    harness.fileSelectionSummary.textContent,
+    /報價會產生本機解析摘要，契約會提供條款初步整理（HOLD）/u,
+  );
 });
 
 test("production workspace fails closed for scanned bytes, recovers on reselect, and resets on a fresh page", async () => {
