@@ -654,7 +654,7 @@ test("Public Home canonical header and decision entries use the approved DRS rou
 
   const expectedModes = [
     ["homeDecisionQuoteCheckToQuoteCheck", "報價", "健檢", "../quote_check/code.html?mode=quote#document-workspace"],
-    ["homeDecisionDrawingCheckToQuoteCheck", "圖說", "檢查", "../quote_check/code.html?mode=drawing#document-workspace"],
+    ["homeDecisionDrawingCheckToQuoteCheck", "圖說", "檢查", "../drawing_check/code.html"],
     ["homeDecisionCustomContractToQuoteCheck", "契約", "健檢", "../quote_check/code.html?mode=contract#document-workspace"],
   ];
   const { PUBLIC_ROUTES } = await import(
@@ -1213,7 +1213,7 @@ test("three decision branches consume their dedicated manifest-only quote-check 
       routeId: "homeDecisionDrawingCheckToQuoteCheck",
       subject: "圖說",
       action: "檢查",
-      href: "../quote_check/code.html?mode=drawing#document-workspace",
+      href: "../drawing_check/code.html",
     },
     {
       decisionTool: "contract",

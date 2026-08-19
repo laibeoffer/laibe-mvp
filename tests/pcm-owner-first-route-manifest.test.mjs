@@ -315,7 +315,7 @@ test("Public Home decision controls publish exactly three real quote-check modes
     {
       id: "homeDecisionDrawingCheckToQuoteCheck",
       trigger: "圖說檢查",
-      relativeHref: "../quote_check/code.html?mode=drawing#document-workspace",
+      relativeHref: "../drawing_check/code.html",
     },
     {
       id: "homeDecisionCustomContractToQuoteCheck",
@@ -342,8 +342,13 @@ test("Public Home decision controls publish exactly three real quote-check modes
     assert.equal(ownedLinks.length, 1, expected.id);
     assert.equal(ownedLinks[0].fromPage, "home");
     assert.equal(ownedLinks[0].trigger, expected.trigger);
-    assert.equal(ownedLinks[0].toPage, "quoteCheck");
-    assert.equal(ownedLinks[0].targetAnchor, "#document-workspace");
+    if (ownedLinks[0].id === "homeDecisionDrawingCheckToQuoteCheck") {
+      assert.equal(ownedLinks[0].toPage, "drawingCheck");
+      assert.equal(ownedLinks[0].targetAnchor, null);
+    } else {
+      assert.equal(ownedLinks[0].toPage, "quoteCheck");
+      assert.equal(ownedLinks[0].targetAnchor, "#document-workspace");
+    }
     assert.equal(ownedLinks[0].relativeHref, expected.relativeHref);
     assert.equal(
       ownedLinks[0].canonicalHttpUrl,
@@ -1318,7 +1323,7 @@ test("public contract preserves its compatibility own-key schema while manifest 
   assert.equal(PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
   assert.equal(PUBLIC_ROUTES.accountAccess, "../account_access/code.html");
   assert.equal(PUBLIC_ROUTES.homeDecisionQuoteCheckToQuoteCheck, "../quote_check/code.html?mode=quote#document-workspace");
-  assert.equal(PUBLIC_ROUTES.homeDecisionDrawingCheckToQuoteCheck, "../quote_check/code.html?mode=drawing#document-workspace");
+  assert.equal(PUBLIC_ROUTES.homeDecisionDrawingCheckToQuoteCheck, "../drawing_check/code.html");
   assert.equal(PUBLIC_ROUTES.homeDecisionCustomContractToQuoteCheck, "../quote_check/code.html?mode=contract#document-workspace");
   for (const routeKey of [
     "aboutDrs",
