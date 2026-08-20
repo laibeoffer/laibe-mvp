@@ -241,7 +241,7 @@ test("Public Home service confirmation publishes one explicit Account Access own
     toPage: "accountAccess",
     targetAnchor: null,
     relativeHref: "../account_access/code.html?intent=owner-contract-management",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html?intent=owner-contract-management",
+    canonicalHttpUrl: "/account/access?intent=owner-contract-management",
     expectedVisibleState: "帳號入口先說明甲方契約管理目的；正式身分與案件權限確認後才會開放相應工作台。",
     returnRoute: "home",
     routeState: "active",
@@ -272,7 +272,7 @@ test("Public Home header DRS service contract publishes its own Account Access o
     toPage: "accountAccess",
     targetAnchor: null,
     relativeHref: "../account_access/code.html?intent=owner-contract-management",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html?intent=owner-contract-management",
+    canonicalHttpUrl: "/account/access?intent=owner-contract-management",
     expectedVisibleState: "帳號入口先說明甲方契約管理目的；正式身分與案件權限確認後才會開放相應工作台。",
     returnRoute: "home",
     routeState: "active",
@@ -311,16 +311,19 @@ test("Public Home decision controls publish exactly three real quote-check modes
       id: "homeDecisionQuoteCheckToQuoteCheck",
       trigger: "報價健檢",
       relativeHref: "../quote_check/code.html?mode=quote#document-workspace",
+      canonicalHttpUrl: "/pcm/quote-check?mode=quote#document-workspace",
     },
     {
       id: "homeDecisionDrawingCheckToQuoteCheck",
       trigger: "圖說檢查",
       relativeHref: "../drawing_check/code.html",
+      canonicalHttpUrl: "/pcm/drawing-check",
     },
     {
       id: "homeDecisionCustomContractToQuoteCheck",
       trigger: "契約健檢",
       relativeHref: "../quote_check/code.html?mode=contract#document-workspace",
+      canonicalHttpUrl: "/pcm/quote-check?mode=contract#document-workspace",
     },
   ];
 
@@ -350,13 +353,7 @@ test("Public Home decision controls publish exactly three real quote-check modes
       assert.equal(ownedLinks[0].targetAnchor, "#document-workspace");
     }
     assert.equal(ownedLinks[0].relativeHref, expected.relativeHref);
-    assert.equal(
-      ownedLinks[0].canonicalHttpUrl,
-      new URL(
-        expected.relativeHref,
-        "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js",
-      ).href,
-    );
+    assert.equal(ownedLinks[0].canonicalHttpUrl, expected.canonicalHttpUrl);
     assert.equal(ownedLinks[0].returnRoute, "home");
     assert.equal(ownedLinks[0].routeState, "active");
     assert.equal(getActiveCanonicalLinkHref(expected.id), expected.relativeHref);
@@ -471,7 +468,7 @@ test("Owner Workspace publishes one service-contract entry with a trusted contra
     toPage: "serviceContract",
     targetAnchor: "#full-contract",
     relativeHref: "../pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract",
+    canonicalHttpUrl: "/pcm/service-contract?returnTo=owner-contract#full-contract",
     expectedVisibleState: "從甲方工作台契約管理進入 DRS 服務契約完整內容；服務契約頁可返回甲方契約管理。",
     returnRoute: "ownerWorkspace",
     routeState: "active",
@@ -504,7 +501,7 @@ test("Vendor Workspace publishes one active account-access recovery link while i
     toPage: "accountAccess",
     targetAnchor: "#top",
     relativeHref: "../account_access/code.html#top",
-    canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html#top",
+    canonicalHttpUrl: "/account/access#top",
     expectedVisibleState: "使用者回到帳號入口選擇或確認角色，不帶入任何案件資料。",
     returnRoute: "vendorWorkspace",
     routeState: "active",
@@ -550,7 +547,7 @@ test("Account Access holds the Owner normal route while the Vendor destination r
       toPage: "vendorWorkspace",
       targetAnchor: null,
       relativeHref: "../vendor_workspace/code.html",
-      canonicalHttpUrl: "http://127.0.0.1:4173/src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+      canonicalHttpUrl: "/pcm/vendor/workspace",
       expectedVisibleState: "乙方案件工作台載入；身分與案件範圍未確認時維持零案件資料與安全空狀態。",
       returnRoute: "accountAccess",
       routeState: "active",
