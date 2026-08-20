@@ -1129,36 +1129,29 @@ const SINGLE_INTERNAL_TERM_PRESENTATION_LABELS = deepFreeze({
 });
 
 function replacePresentationLabels(text, labels) {
-  let presented = text;
-  const entries = Object.entries(labels).sort(([left], [right]) => right.length - left.length);
-  for (const [source, replacement] of entries) {
-    presented = presented.split(source).join(replacement);
-  }
-  return presented;
-}
-
-function replaceCompleteAsciiTermLabels(text, labels) {
-  let presented = text;
   const entries = Object.entries(labels).sort(([left], [right]) => right.length - left.length);
   const isTokenCharacter = (character) => (
     typeof character === "string" && /[A-Za-z0-9_-]/.test(character)
   );
+  let presented = "";
+  let cursor = 0;
 
-  for (const [source, replacement] of entries) {
-    let searchFrom = 0;
-    while (searchFrom < presented.length) {
-      const matchIndex = presented.indexOf(source, searchFrom);
-      if (matchIndex === -1) break;
-      const before = matchIndex > 0 ? presented[matchIndex - 1] : "";
-      const afterIndex = matchIndex + source.length;
-      const after = afterIndex < presented.length ? presented[afterIndex] : "";
-      if (!isTokenCharacter(before) && !isTokenCharacter(after)) {
-        presented = `${presented.slice(0, matchIndex)}${replacement}${presented.slice(afterIndex)}`;
-        searchFrom = matchIndex + replacement.length;
-      } else {
-        searchFrom = afterIndex;
-      }
+  while (cursor < text.length) {
+    const entry = entries.find(([source]) => text.startsWith(source, cursor));
+    if (!entry) {
+      presented += text[cursor];
+      cursor += 1;
+      continue;
     }
+
+    const [source, replacement] = entry;
+    const before = cursor > 0 ? text[cursor - 1] : "";
+    const afterIndex = cursor + source.length;
+    const after = afterIndex < text.length ? text[afterIndex] : "";
+    const requiresTokenBoundaries = /[A-Za-z]/.test(source);
+    const hasCompleteTokenBoundaries = !isTokenCharacter(before) && !isTokenCharacter(after);
+    presented += !requiresTokenBoundaries || hasCompleteTokenBoundaries ? replacement : source;
+    cursor = afterIndex;
   }
 
   return presented;
@@ -1174,8 +1167,11 @@ export function formatContractPresentationText(text) {
   ));
   presented = presented.replace(/\{\{[^{}\r\n]*\}\}/g, "待補齊必要資料");
   presented = presented.replace(/\{\{[^\r\n]*/g, "待補齊必要資料");
-  presented = replacePresentationLabels(presented, CONTRACT_PHRASE_PRESENTATION_LABELS);
-  presented = replaceCompleteAsciiTermLabels(presented, COMPLETE_ASCII_TERM_PRESENTATION_LABELS);
+  presented = replacePresentationLabels(presented, {
+    ...CONTRACT_PHRASE_PRESENTATION_LABELS,
+    ...COMPLETE_ASCII_TERM_PRESENTATION_LABELS,
+    ...MIXED_ENGLISH_TERM_PRESENTATION_LABELS,
+  });
   presented = presented.replace(/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/g, (token) => (
     Object.hasOwn(CONTRACT_TERM_PRESENTATION_LABELS, token)
       ? CONTRACT_TERM_PRESENTATION_LABELS[token]
@@ -1195,10 +1191,6 @@ export function formatContractPresentationText(text) {
   presented = presented.replace(
     /\b(?:APPROVE|BUSINESS|CONSUMER|DISPUTED|NONE|OVERRIDE|PAID|PASS|TRUE|UNRESOLVED)\b/g,
     (token) => SINGLE_INTERNAL_TERM_PRESENTATION_LABELS[token],
-  );
-  presented = presented.replace(
-    /\b(?:Contract|Decision|Record|Review|Objection|Override|timestamp|OCR|detail|version|reference|result|actor|time|action|termination|placeholder)\b/g,
-    (token) => MIXED_ENGLISH_TERM_PRESENTATION_LABELS[token],
   );
   presented = presented.replace(/\bPART\s+0*(\d+)\b/g, (_match, partNumber) => (
     `第 ${Number.parseInt(partNumber, 10)} 部分`

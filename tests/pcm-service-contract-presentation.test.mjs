@@ -162,6 +162,13 @@ test("contract presentation formatter resolves known and unknown source tokens s
     ["IDENTIFIER", "IDENTIFIER"],
     ["reviewing", "reviewing"],
     ["versioned", "versioned"],
+    ["Scheduler", "Scheduler"],
+    ["Case Eventual", "Case Eventual"],
+    ["Owner Overrideability", "Owner Overrideability"],
+    ["Review Records", "Review Records"],
+    ["document IDs", "document IDs"],
+    ["append-onlyness", "append-onlyness"],
+    ["DRS Reviewable", "DRS Reviewable"],
   ]) {
     assert.equal(
       formatContractPresentationText(ordinaryProse),
