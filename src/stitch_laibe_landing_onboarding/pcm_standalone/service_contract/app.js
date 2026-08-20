@@ -629,7 +629,29 @@ function renderClauseTable(tableData) {
   return table;
 }
 
-function renderContract(
+function createContractSourceTable(rows) {
+  const table = document.createElement("table");
+  table.className = "contract-source-table";
+  const head = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  for (let index = 0; index < rows[0].length; index += 1) {
+    headRow.append(createTextElement("th", rows[0][index]));
+  }
+  head.append(headRow);
+
+  const body = document.createElement("tbody");
+  for (let rowIndex = 1; rowIndex < rows.length; rowIndex += 1) {
+    const row = document.createElement("tr");
+    for (let cellIndex = 0; cellIndex < rows[rowIndex].length; cellIndex += 1) {
+      row.append(createTextElement("td", rows[rowIndex][cellIndex]));
+    }
+    body.append(row);
+  }
+  table.append(head, body);
+  return table;
+}
+
+export function renderContract(
   contractSource = CONTRACT_SOURCE,
   contractType = CONTRACT_TYPES.ENGINEERING,
   parts = CONTRACT_PARTS,
@@ -676,6 +698,9 @@ function renderContract(
   let headingIndex = 0;
   let currentPartIndex = 0;
   let currentParagraph = [];
+  let currentListItems = [];
+  let currentOrderedListItems = [];
+  let currentTableRows = [];
 
   function appendParagraph() {
     if (currentParagraph.length === 0) return;
@@ -685,12 +710,45 @@ function renderContract(
     currentParagraph = [];
   }
 
+  function appendList() {
+    if (currentListItems.length === 0) return;
+    const list = document.createElement("ul");
+    for (let index = 0; index < currentListItems.length; index += 1) {
+      list.append(createTextElement("li", currentListItems[index]));
+    }
+    pages[currentPartIndex].body.append(list);
+    currentListItems = [];
+  }
+
+  function appendOrderedList() {
+    if (currentOrderedListItems.length === 0) return;
+    const list = document.createElement("ol");
+    for (let index = 0; index < currentOrderedListItems.length; index += 1) {
+      list.append(createTextElement("li", currentOrderedListItems[index]));
+    }
+    pages[currentPartIndex].body.append(list);
+    currentOrderedListItems = [];
+  }
+
+  function appendTable() {
+    if (currentTableRows.length === 0) return;
+    pages[currentPartIndex].body.append(createContractSourceTable(currentTableRows));
+    currentTableRows = [];
+  }
+
+  function appendPendingBlocks() {
+    appendParagraph();
+    appendList();
+    appendOrderedList();
+    appendTable();
+  }
+
   for (let index = 0; index < lines.length; index += 1) {
     const line = lines[index];
     const headingMatch = /^(#{1,3})\s+(.+)$/.exec(line);
 
     if (headingMatch) {
-      appendParagraph();
+      appendPendingBlocks();
       headingIndex += 1;
       const level = headingMatch[1].length;
       const renderedLevel = level + 1;
@@ -704,17 +762,50 @@ function renderContract(
     }
 
     if (line === "---") {
-      appendParagraph();
+      appendPendingBlocks();
       pages[currentPartIndex].body.append(document.createElement("hr"));
       continue;
     }
-    if (line.trim() === "") {
-      appendParagraph();
+    if (/^```(?:text)?\s*$/.test(line.trim())) {
+      appendPendingBlocks();
       continue;
     }
-    currentParagraph.push(line);
+    if (line.trim() === "") {
+      appendPendingBlocks();
+      continue;
+    }
+    const listMatch = /^\s*-\s+(.+)$/.exec(line);
+    if (listMatch) {
+      appendParagraph();
+      appendOrderedList();
+      appendTable();
+      currentListItems.push(listMatch[1]);
+      continue;
+    }
+    const orderedListMatch = /^\s*\d+\.\s+(.+)$/.exec(line);
+    if (orderedListMatch) {
+      appendParagraph();
+      appendList();
+      appendTable();
+      currentOrderedListItems.push(orderedListMatch[1]);
+      continue;
+    }
+    const tableMatch = /^\s*\|(.+)\|\s*$/.exec(line);
+    if (tableMatch) {
+      appendParagraph();
+      appendList();
+      appendOrderedList();
+      const cells = tableMatch[1].split("|").map((cell) => cell.trim());
+      const delimiter = cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+      if (!delimiter) currentTableRows.push(cells);
+      continue;
+    }
+    appendList();
+    appendOrderedList();
+    appendTable();
+    currentParagraph.push(line.replace(/^\s*>\s?/, ""));
   }
-  appendParagraph();
+  appendPendingBlocks();
   return pages;
 }
 

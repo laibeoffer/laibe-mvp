@@ -1014,7 +1014,24 @@ const CONTRACT_TERM_PRESENTATION_LABELS = deepFreeze({
   LAWYER_FINAL_REVIEW_REQUIRED: "仍待法務最終審閱",
 });
 
+const LOWERCASE_TERM_PRESENTATION_LABELS = deepFreeze({
+  document_id: "文件識別碼",
+  document_type: "文件類型",
+  issued_at: "文件發出時間",
+  owner_confirmation: "業主確認狀態",
+  review_status: "審查狀態",
+  submitted_by: "提送人",
+  superseded_version: "被取代版本",
+});
+
+const HYPHEN_TERM_PRESENTATION_LABELS = deepFreeze({
+  "APPEND-ONLY": "僅能追加",
+});
+
 const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
+  "DRS REVIEW PASSED != DESIGN PAYMENT AUTOMATICALLY DUE": "DRS 審查通過不代表設計費自動到期應付",
+  "DESIGN_FEE != DRS_REVIEW_FEE": "設計費與 DRS 審查服務費為不同費用",
+  "APPEND-ONLY RECORD": "僅能追加的案件紀錄",
   "DESIGN PAYMENT AUTOMATICALLY DUE": "設計費自動到期應付",
   "EXTERNAL PROFESSIONAL REVIEW REQUIRED": "需要外部專業人員審查",
   "MISSING EXECUTION INFORMATION": "缺少執行所需資料",
@@ -1033,6 +1050,17 @@ const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
   "ONLY RECORD": "僅作為紀錄",
   "DRS REPORT": "DRS 書面報告",
   "DRS REVIEW": "DRS 書面審查",
+  "DRS Review Record": "DRS 書面審查紀錄",
+  "Review、Objection、Override": "審查、異議、另行決策",
+  "Owner Override": "業主另行決策",
+  "Review Record": "審查紀錄",
+  "Review ID": "審查紀錄編號",
+  "Case Event": "案件事件",
+  "source of truth": "正式資料基準",
+  "AI output": "AI 輸出結果",
+  "binding values": "綁定資料",
+  "Source 契約": "來源契約",
+  "Schedule": "交付時程",
 });
 
 const SINGLE_INTERNAL_TERM_PRESENTATION_LABELS = deepFreeze({
@@ -1065,12 +1093,25 @@ export function formatContractPresentationText(text) {
       ? PLACEHOLDER_PRESENTATION_LABELS[token]
       : "待補齊必要資料"
   ));
+  presented = presented.replace(/\{\{[^{}\r\n]*\}\}/g, "待補齊必要資料");
+  presented = presented.replace(/\{\{[^\r\n]*/g, "待補齊必要資料");
   presented = replacePresentationLabels(presented, CONTRACT_PHRASE_PRESENTATION_LABELS);
   presented = presented.replace(/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/g, (token) => (
     Object.hasOwn(CONTRACT_TERM_PRESENTATION_LABELS, token)
       ? CONTRACT_TERM_PRESENTATION_LABELS[token]
       : "待法務確認的契約用語"
   ));
+  presented = presented.replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (token) => (
+    Object.hasOwn(LOWERCASE_TERM_PRESENTATION_LABELS, token)
+      ? LOWERCASE_TERM_PRESENTATION_LABELS[token]
+      : "待法務確認的契約用語"
+  ));
+  presented = presented.replace(/\b[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\b/g, (token) => {
+    if (token === "SHA-256") return token;
+    return Object.hasOwn(HYPHEN_TERM_PRESENTATION_LABELS, token)
+      ? HYPHEN_TERM_PRESENTATION_LABELS[token]
+      : "待法務確認的契約用語";
+  });
   presented = presented.replace(
     /\b(?:APPROVE|BUSINESS|CONSUMER|DISPUTED|NONE|OVERRIDE|PAID|PASS|TRUE|UNRESOLVED)\b/g,
     (token) => SINGLE_INTERNAL_TERM_PRESENTATION_LABELS[token],
@@ -1078,7 +1119,13 @@ export function formatContractPresentationText(text) {
   presented = presented.replace(/\bPART\s+0*(\d+)\b/g, (_match, partNumber) => (
     `第 ${Number.parseInt(partNumber, 10)} 部分`
   ));
+  presented = presented.replace(/\bStage\s+([1-4])\b/g, (_match, stageNumber) => (
+    `第 ${stageNumber} 階段`
+  ));
   presented = presented.replace(/\bappend-only Case Event\b/gi, "只可追加的案件事件");
   presented = presented.replace(/\bsigned contract\b/gi, "已簽署契約");
+  presented = presented.replace(/\s*!=\s*/g, "不等同於");
+  presented = presented.replace(/\s+=\s+/g, "為");
+  presented = presented.replace(/`+/g, "");
   return presented;
 }

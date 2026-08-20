@@ -16,7 +16,7 @@ const serviceContractDir = path.join(
 );
 const frozenContractPath = path.join(serviceContractDir, "contract-content.js");
 const FROZEN_CONTRACT_FILE_SHA256 =
-  "d416ff49934264b8b3d4076f961d51f939bc587f5f9bb1dac4085b2e4b0dafe0";
+  "00dd7af007455fb43d09765d45cae6329f4a37f72c00845c7f53e9bc9ce262b5";
 const FROZEN_CONTRACT_SOURCE_SHA256 =
   "d398182f197a4d6e8f8adba08a8b720aab274f5e9a8756c49aef359b2bf78359";
 
