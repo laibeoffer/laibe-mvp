@@ -1,14 +1,15 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readdir, readFile, stat } from "node:fs/promises";
+import { readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url)));
 const distRoot = path.join(repositoryRoot, "dist", "drs");
 const buildScript = path.join(repositoryRoot, "scripts", "build-drs-production.mjs");
+const packagePath = path.join(repositoryRoot, "package.json");
 const manifestPath = path.join(
   repositoryRoot,
   "src",
@@ -18,12 +19,16 @@ const manifestPath = path.join(
   "pcm-flow-route-manifest.js",
 );
 
-function runBuild(extraEnvironment = {}) {
-  const result = spawnSync(process.execPath, [buildScript], {
+function executeBuild(extraEnvironment = {}) {
+  return spawnSync(process.execPath, [buildScript], {
     cwd: repositoryRoot,
     encoding: "utf8",
     env: { ...process.env, DRS_PUBLIC_ORIGIN: "", ...extraEnvironment },
   });
+}
+
+function runBuild(extraEnvironment = {}) {
+  const result = executeBuild(extraEnvironment);
   assert.equal(
     result.status,
     0,
@@ -59,12 +64,17 @@ function entryPath(publicPath) {
   return path.join(distRoot, publicPath.slice(1), "index.html");
 }
 
+test("root package keeps existing JavaScript interpretation unchanged", async () => {
+  const packageContract = JSON.parse(await readFile(packagePath, "utf8"));
+  assert.notEqual(packageContract.type, "module", "root package must not globally force .js to ESM");
+});
+
 test("production build emits deterministic clean DRS routes and an allowlisted asset tree", async () => {
   const sourceManifest = await readFile(manifestPath, "utf8");
   assert.doesNotMatch(sourceManifest, /(?:https?:)?\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?/iu);
 
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(
-    `${pathToFileURL(manifestPath).href}?production-build=${Date.now()}`
+    `data:text/javascript;base64,${Buffer.from(sourceManifest).toString("base64")}`
   );
   const deployNodes = PCM_FLOW_ROUTE_MANIFEST.nodes.filter(
     ({ publicPath, lifecycle }) => publicPath && ["active", "planned"].includes(lifecycle),
@@ -98,6 +108,47 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   assert.equal(assetRoots.size, 1, "all runtime assets share one content hash root");
   assert.match([...assetRoots][0], /^assets\/[a-f\d]{64}$/u);
 
+  const productionManifestFile = assetFiles.find((file) => (
+    file.endsWith("/src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js")
+  ));
+  assert.ok(productionManifestFile, "production route manifest asset");
+  const productionManifestSource = await readFile(
+    path.join(distRoot, productionManifestFile),
+    "utf8",
+  );
+  const {
+    PCM_FLOW_ROUTE_MANIFEST: productionManifest,
+    getActiveRouteHref: getProductionRouteHref,
+  } = await import(
+    `data:text/javascript;base64,${Buffer.from(productionManifestSource).toString("base64")}`
+  );
+  const productionNodeById = new Map(productionManifest.nodes.map((node) => [node.id, node]));
+  for (const node of PCM_FLOW_ROUTE_MANIFEST.nodes.filter(({ lifecycle }) => lifecycle === "active")) {
+    const suffix = node.href?.match(/[?#][\s\S]*$/u)?.[0] ?? "";
+    assert.equal(productionNodeById.get(node.id)?.href, `${node.publicPath}${suffix}`, node.id);
+  }
+  const productionLinkById = new Map(
+    productionManifest.canonicalLinks.map((link) => [link.id, link]),
+  );
+  for (const link of PCM_FLOW_ROUTE_MANIFEST.canonicalLinks.filter(({ relativeHref }) => relativeHref)) {
+    assert.equal(
+      productionLinkById.get(link.id)?.relativeHref,
+      link.canonicalHttpUrl,
+      `${link.id} production canonical route`,
+    );
+    if (link.toPage !== "accessUnavailable") {
+      assert.notEqual(productionLinkById.get(link.id)?.relativeHref, "/pcm/access-unavailable", link.id);
+    }
+  }
+
+  const [quoteEntry, quoteRuntime] = await Promise.all([
+    readFile(entryPath("/pcm/quote-check"), "utf8"),
+    readFile(path.join(distRoot, assetFiles.find((file) => file.endsWith("/pcm_standalone/quote_check/app.js"))), "utf8"),
+  ]);
+  assert.match(quoteEntry, /href="\/pcm\/drawing-check"[^>]*data-drawing-check-link/u);
+  assert.match(quoteRuntime, /DRAWING_CHECK_HREF = "\/pcm\/drawing-check"/u);
+  assert.equal(getProductionRouteHref("drawingCheck"), "/pcm/drawing-check");
+
   const forbiddenTopLevel = /^(?:docs|tests|config|app|tools|scripts|\.github|\.git|\.superpowers)(?:\/|$)/iu;
   const forbiddenArtifact = /(?:^|\/)(?:archive|manual|screenshots?)(?:\/|$)|\.(?:map|zip|rar|7z|env|pem|key|p12)$/iu;
   for (const file of assetFiles) {
@@ -121,6 +172,30 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   const drawing = await readFile(entryPath("/pcm/drawing-check"), "utf8");
   assert.match(drawing, /圖說辨識功能正在整理中/u);
   assert.match(drawing, /返回 DRS 首頁/u);
+});
+
+test("production build rejects every undeclared local stylesheet, module, and image dependency", async () => {
+  const probeRelative = ".superpowers/sdd/task-1-unknown-dependency-probe.html";
+  const probePath = path.join(repositoryRoot, probeRelative);
+  const probes = [
+    '<link rel="stylesheet" href="./missing-production-style.css" />',
+    '<script type="module" src="./missing-production-module.js"></script>',
+    '<img src="./missing-production-image.svg" alt="" />',
+  ];
+  try {
+    for (const probe of probes) {
+      await writeFile(probePath, `<!doctype html><html><head>${probe}</head><body></body></html>`, "utf8");
+      const result = executeBuild({ DRS_BUILD_DEPENDENCY_PROBE: probeRelative });
+      assert.notEqual(result.status, 0, probe);
+      assert.match(
+        result.stderr,
+        /Unknown local (?:href|src) dependency ".+" referenced by ".superpowers\/sdd\/task-1-unknown-dependency-probe\.html"/u,
+        result.stderr,
+      );
+    }
+  } finally {
+    await rm(probePath, { force: true });
+  }
 });
 
 test("production metadata provides strict headers, bounded redirects, a true 404, robots, and sitemap", async () => {
@@ -166,4 +241,17 @@ test("production metadata provides strict headers, bounded redirects, a true 404
   const absoluteSitemap = await readFile(path.join(distRoot, "sitemap.xml"), "utf8");
   assert.match(absoluteSitemap, /<loc>https:\/\/drs\.example\.test\/pcm<\/loc>/u);
   assert.doesNotMatch(absoluteSitemap, /drs\.example\.test\/\//u);
+});
+
+test("DRS_PUBLIC_ORIGIN rejects credentials, non-root paths, queries, and fragments", () => {
+  for (const invalidOrigin of [
+    "https://user:password@drs.example.test/",
+    "https://drs.example.test/not-an-origin",
+    "https://drs.example.test/?preview=1",
+    "https://drs.example.test/#preview",
+  ]) {
+    const result = executeBuild({ DRS_PUBLIC_ORIGIN: invalidOrigin });
+    assert.notEqual(result.status, 0, invalidOrigin);
+    assert.match(result.stderr, /DRS_PUBLIC_ORIGIN must be an HTTPS origin/u, invalidOrigin);
+  }
 });

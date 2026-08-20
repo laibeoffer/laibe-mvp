@@ -1,7 +1,6 @@
 {
   "name": "laibe-drs-static-build",
   "private": true,
-  "type": "module",
   "scripts": {
     "build:drs": "node scripts/build-drs-production.mjs",
     "test:drs-build": "node --test tests/pcm-production-build.test.mjs"

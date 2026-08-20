@@ -1,20 +1,24 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url)));
 const distParent = path.resolve(repositoryRoot, "dist");
 const distRoot = path.resolve(distParent, "drs");
 const manifestRelative = "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js";
 const manifestPath = path.join(repositoryRoot, manifestRelative);
-const manifestModule = await import(`${pathToFileURL(manifestPath).href}?build=production`);
+const manifestSource = await readFile(manifestPath, "utf8");
+const manifestModule = await import(
+  `data:text/javascript;base64,${Buffer.from(manifestSource).toString("base64")}`
+);
 const { PCM_FLOW_ROUTE_MANIFEST } = manifestModule;
 
 const SOURCE_ENTRY_BY_ID = Object.freeze({
   home: "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
   aboutDrs: "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html",
   quoteCheck: "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
+  drawingCheck: "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/code.html",
   accountAccess: "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html",
   serviceContract: "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html",
   contractPrerequisites: "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html",
@@ -67,7 +71,30 @@ const sourceToPublicPath = new Map(
     .filter(({ id }) => SOURCE_ENTRY_BY_ID[id])
     .map(({ id, publicPath }) => [SOURCE_ENTRY_BY_ID[id], publicPath]),
 );
+const publicRouteByLiteral = new Map();
+function registerPublicRouteLiteral(reference, publicRoute) {
+  if (!reference) return;
+  const existing = publicRouteByLiteral.get(reference);
+  if (existing && existing !== publicRoute) {
+    throw new Error(`Conflicting public routes for ${JSON.stringify(reference)}`);
+  }
+  publicRouteByLiteral.set(reference, publicRoute);
+}
+for (const node of activeNodes) {
+  registerPublicRouteLiteral(node.href, `${node.publicPath}${suffixOf(node.href)}`);
+}
+for (const link of PCM_FLOW_ROUTE_MANIFEST.canonicalLinks) {
+  registerPublicRouteLiteral(link.relativeHref, link.canonicalHttpUrl);
+}
 const allowlistedAssets = new Set(ASSET_ALLOWLIST);
+const explicitNavigationFallbacks = new Set([
+  "site/standard_contract_editor/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/basic_report/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/case_summary/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/owner_start/code.html",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/self_service_archive/code.html",
+]);
 const missingHeroAsset = "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/assets/d_rs_03_compact_d0e0e3.png";
 const heroAssetFallback = "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/assets/d_rs_03_compact_434343.svg";
 
@@ -83,20 +110,75 @@ function suffixOf(reference) {
 
 function cleanRouteForReference(fromRelative, reference) {
   if (!reference.includes("code.html")) return null;
+  const literalRoute = publicRouteByLiteral.get(reference);
+  if (literalRoute) return literalRoute;
   const resolved = resolveRepositoryReference(fromRelative, reference);
-  return `${sourceToPublicPath.get(resolved) ?? "/pcm/access-unavailable"}${suffixOf(reference)}`;
+  const publicPath = sourceToPublicPath.get(resolved);
+  if (publicPath) return `${publicPath}${suffixOf(reference)}`;
+  if (explicitNavigationFallbacks.has(resolved)) {
+    return `/pcm/access-unavailable${suffixOf(reference)}`;
+  }
+  return null;
+}
+
+function replaceManifestProperty(source, property, before, after) {
+  const needle = `${property}: ${JSON.stringify(before)}`;
+  if (!source.includes(needle)) {
+    throw new Error(`Manifest ${property} value is missing: ${JSON.stringify(before)}`);
+  }
+  return source.replaceAll(needle, `${property}: ${JSON.stringify(after)}`);
+}
+
+function transformManifestRoutes(source) {
+  let transformed = source;
+  for (const node of activeNodes) {
+    transformed = replaceManifestProperty(
+      transformed,
+      "href",
+      node.href,
+      `${node.publicPath}${suffixOf(node.href)}`,
+    );
+  }
+
+  const canonicalByRelativeHref = new Map();
+  for (const link of PCM_FLOW_ROUTE_MANIFEST.canonicalLinks) {
+    if (!link.relativeHref) continue;
+    const existing = canonicalByRelativeHref.get(link.relativeHref);
+    if (existing && existing !== link.canonicalHttpUrl) {
+      throw new Error(`Conflicting canonical routes for ${JSON.stringify(link.relativeHref)}`);
+    }
+    canonicalByRelativeHref.set(link.relativeHref, link.canonicalHttpUrl);
+  }
+  for (const [relativeHref, canonicalHttpUrl] of canonicalByRelativeHref) {
+    transformed = replaceManifestProperty(
+      transformed,
+      "relativeHref",
+      relativeHref,
+      canonicalHttpUrl,
+    );
+  }
+  return transformed;
 }
 
 function rewriteJavaScript(source, sourceRelative) {
   return source.replace(
     /((?:\.\.?\/)+[A-Za-z0-9_./-]*code\.html(?:[?#][^"'`\s]*)?)/gu,
-    (reference) => cleanRouteForReference(sourceRelative, reference) ?? reference,
+    (reference) => {
+      const cleanRoute = cleanRouteForReference(sourceRelative, reference);
+      if (cleanRoute) return cleanRoute;
+      throw new Error(
+        `Unknown local JavaScript navigation dependency ${JSON.stringify(reference)} referenced by ${JSON.stringify(sourceRelative)}`,
+      );
+    },
   );
 }
 
 function transformAsset(source, sourceRelative) {
   if (/\.m?js$/iu.test(sourceRelative)) {
-    return Buffer.from(rewriteJavaScript(source.toString("utf8"), sourceRelative));
+    const javascript = sourceRelative === manifestRelative
+      ? transformManifestRoutes(source.toString("utf8"))
+      : source.toString("utf8");
+    return Buffer.from(rewriteJavaScript(javascript, sourceRelative));
   }
   return source;
 }
@@ -137,8 +219,9 @@ function rewriteHtmlReference(sourceRelative, attribute, reference) {
   let resolved = resolveRepositoryReference(sourceRelative, reference);
   if (resolved === missingHeroAsset) resolved = heroAssetFallback;
   if (allowlistedAssets.has(resolved)) return assetUrl(resolved, suffixOf(reference));
-  if (attribute === "href") return "/pcm/access-unavailable";
-  return assetUrl("assets/logo/laibe_offer.svg");
+  throw new Error(
+    `Unknown local ${attribute} dependency ${JSON.stringify(reference)} referenced by ${JSON.stringify(sourceRelative)}`,
+  );
 }
 
 function transformEntryHtml(source, sourceRelative) {
@@ -171,8 +254,15 @@ function normalizePublicOrigin() {
   const configured = process.env.DRS_PUBLIC_ORIGIN?.trim();
   if (!configured) return "";
   const parsed = new URL(configured);
-  if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.search || parsed.hash) {
-    throw new Error("DRS_PUBLIC_ORIGIN must be an HTTPS origin without credentials, query, or fragment");
+  if (
+    parsed.protocol !== "https:" ||
+    parsed.username ||
+    parsed.password ||
+    parsed.pathname !== "/" ||
+    parsed.search ||
+    parsed.hash
+  ) {
+    throw new Error("DRS_PUBLIC_ORIGIN must be an HTTPS origin with only the root path and no credentials, query, or fragment");
   }
   return parsed.origin;
 }
@@ -190,6 +280,17 @@ const relativeDist = path.relative(distParent, distRoot);
 if (relativeDist !== "drs" || distRoot === distParent || relativeDist.startsWith("..")) {
   throw new Error(`Refusing to clear unexpected output path: ${distRoot}`);
 }
+
+const dependencyProbe = process.env.DRS_BUILD_DEPENDENCY_PROBE?.trim();
+if (dependencyProbe) {
+  const probePath = path.resolve(repositoryRoot, dependencyProbe);
+  const probeRelative = path.relative(repositoryRoot, probePath).replaceAll(path.sep, "/");
+  if (!probeRelative || probeRelative.startsWith("../") || path.isAbsolute(probeRelative)) {
+    throw new Error("DRS_BUILD_DEPENDENCY_PROBE must stay inside the repository worktree");
+  }
+  transformEntryHtml(await readFile(probePath, "utf8"), probeRelative);
+}
+
 await rm(distRoot, { recursive: true, force: true });
 await mkdir(distRoot, { recursive: true });
 
