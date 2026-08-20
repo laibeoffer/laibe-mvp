@@ -153,8 +153,8 @@ test("rendered engineering contract DOM contains only presentation-safe contract
   globalThis.document = document;
   globalThis.location = { search: "" };
   try {
-    await import(moduleUrl("app.js", `?presentation-test=${Date.now()}`));
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    const app = await import(moduleUrl("app.js", `?presentation-test=${Date.now()}`));
+    await app.serviceContractPageReady;
     const renderedText = collectText(contractRoot);
     assert.doesNotMatch(renderedText, /\{\{[^}]+\}\}/u);
     assert.doesNotMatch(renderedText, /\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/u);
@@ -189,10 +189,8 @@ test("protected design contract production path renders natural contract languag
     ),
   });
   try {
-    await import(moduleUrl("app.js", `?design-presentation-test=${Date.now()}`));
-    for (let attempt = 0; attempt < 10 && contractRoot.children.length === 0; attempt += 1) {
-      await new Promise((resolve) => setImmediate(resolve));
-    }
+    const app = await import(moduleUrl("app.js", `?design-presentation-test=${Date.now()}`));
+    await app.serviceContractPageReady;
     assert.ok(contractRoot.children.length > 0, "verified design source rendered");
     const renderedText = collectText(contractRoot);
     assert.doesNotMatch(renderedText, /\{\{/u);
@@ -251,7 +249,12 @@ test("production renderer fails malformed placeholder-like text closed without h
 
 test("signing readiness requires placeholder resolution proof for the exact contract version", async () => {
   const { CONTRACT_SOURCE_SHA256 } = await import(moduleUrl("contract-content.js"));
-  const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
+  const { evaluateSigningReadiness, serviceContractPageReady } = await import(moduleUrl("app.js"));
+  assert.ok(
+    serviceContractPageReady instanceof Promise,
+    "page initialization is always represented by an exported Promise",
+  );
+  await serviceContractPageReady;
   const otherwiseComplete = {
     contractVersionHash: CONTRACT_SOURCE_SHA256,
     ownerIdentityVerified: true,

@@ -1200,4 +1200,6 @@ async function initialisePage() {
   }
 }
 
-if (typeof document !== "undefined") initialisePage();
+export const serviceContractPageReady = typeof document !== "undefined"
+  ? initialisePage()
+  : Promise.resolve();
