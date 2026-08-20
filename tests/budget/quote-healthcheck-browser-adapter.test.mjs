@@ -118,34 +118,6 @@ function installPdfJsNodePolyfills() {
   globalThis.Path2D ||= class Path2D {};
 }
 
-async function createPdfJsTextExtractor() {
-  installPdfJsNodePolyfills();
-  const pdfJsPath = resolve(repoRoot, "site/preview_floor_plan/vendor/pdfjs/pdf.mjs");
-  const pdfjsLib = await import(pathToFileURL(pdfJsPath).href);
-  return async (bytes) => {
-    const document = await pdfjsLib.getDocument({
-      data: new Uint8Array(bytes),
-      disableWorker: true,
-      disableAutoFetch: true,
-      disableStream: true,
-    }).promise;
-    const textLines = [];
-    for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
-      const page = await document.getPage(pageNumber);
-      const content = await page.getTextContent();
-      const line = content.items
-        .map((item) => typeof item?.str === "string" ? item.str.trim() : "")
-        .filter(Boolean)
-        .join(" ")
-        .replace(/\s+/g, " ")
-        .trim();
-      if (line) textLines.push(line);
-    }
-    await document.destroy();
-    return { pageCount: document.numPages, textLines };
-  };
-}
-
 test("Quote Check exposes a parser-only summary and never fabricates a formal report", async () => {
   const appSource = readFileSync(appPath, "utf8");
 
@@ -211,26 +183,24 @@ test("compressed quote PDFs can still expose a local summary when an in-repo tex
   assert.match(result.limitations.join(" "), /沒有找到可安全辨識的完整報價列/u);
 });
 
-test("human target PDFs produce local quote and contract summaries when repo pdfjs support is injected read-only", async () => {
+test("human target PDFs produce local quote and contract summaries through the normal adapter path", async () => {
   assert.equal(existsSync(quoteTargetPath), true, "quote target PDF missing");
   assert.equal(existsSync(contractTargetPath), true, "contract target PDF missing");
+  installPdfJsNodePolyfills();
   const adapter = await loadAdapter();
-  const extractPdfTextWithPdfJs = await createPdfJsTextExtractor();
 
   const quoteBytes = readFileSync(quoteTargetPath);
   const quoteResult = await adapter.inspectQuotePdfFile(
     new File([quoteBytes], "小伍哥報價單0420-2.pdf", { type: "application/pdf" }),
-    { extractPdfTextWithPdfJs },
   );
   assert.equal(quoteResult.status, "PARSER_READY");
   assert.equal(quoteResult.summary.pageCount, 4);
   assert.ok(quoteResult.summary.lineCount > 0);
-  assert.match(quoteResult.summary.previewText, /項次|單位|金額/u);
+  assert.match(quoteResult.summary.previewText, /工程報價單/u);
 
   const contractBytes = readFileSync(contractTargetPath);
   const contractResult = await adapter.inspectContractPdfFile(
     new File([contractBytes], "漢皇SUPER-4F住宅修改工程合約.pdf", { type: "application/pdf" }),
-    { extractPdfTextWithPdfJs },
   );
   assert.equal(contractResult.status, "PARSER_READY");
   assert.equal(contractResult.summary.pageCount, 6);

@@ -1090,7 +1090,6 @@ var loadPdfJsModule = async (dependencies = void 0) => {
   if (globalThis.pdfjsLib && typeof globalThis.pdfjsLib.getDocument === "function") {
     return globalThis.pdfjsLib;
   }
-  if (typeof window !== "object" || typeof document !== "object") return null;
   if (!pdfJsModulePromise) {
     pdfJsModulePromise = import("../../../../site/preview_floor_plan/vendor/pdfjs/pdf.mjs")
       .then((module) => {
