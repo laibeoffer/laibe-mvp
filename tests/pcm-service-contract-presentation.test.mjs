@@ -149,6 +149,10 @@ test("contract presentation formatter resolves known and unknown source tokens s
     ["契約 ID；binding fields；portfolio", "契約識別碼；必要綁定欄位；作品集"],
     ["約定要交什麼 vs 實際交了什麼", "約定交付內容與實際交付內容"],
     ["目前有效版本 vs 前階段已確認內容", "目前有效版本與前階段已確認內容"],
+    ["append-only Case Event", "只可追加的案件事件"],
+    ["Append-Only Case Event", "只可追加的案件事件"],
+    ["signed contract", "已簽署契約"],
+    ["Signed Contract", "已簽署契約"],
   ]) {
     assert.equal(formatContractPresentationText(source), expected, source);
   }
@@ -169,6 +173,10 @@ test("contract presentation formatter resolves known and unknown source tokens s
     ["document IDs", "document IDs"],
     ["append-onlyness", "append-onlyness"],
     ["DRS Reviewable", "DRS Reviewable"],
+    ["prefix-append-only Case Event-suffix", "prefix-append-only Case Event-suffix"],
+    ["prefix-Append-Only Case Event-suffix", "prefix-Append-Only Case Event-suffix"],
+    ["prefix-signed contract-suffix", "prefix-signed contract-suffix"],
+    ["prefix-Signed Contract-suffix", "prefix-Signed Contract-suffix"],
   ]) {
     assert.equal(
       formatContractPresentationText(ordinaryProse),
@@ -190,6 +198,126 @@ test("contract presentation formatter resolves known and unknown source tokens s
     "DRS 審查通過不代表設計費自動到期應付",
   );
   assert.equal(formatContractPresentationText("PART 01"), "第 1 部分");
+});
+
+test("all presentation mappings share the complete ASCII token boundary", async () => {
+  const formatterPath = path.join(serviceContractDir, "contract-content.js");
+  const formatterSource = await readFile(formatterPath, "utf8");
+  const { formatContractPresentationText } = await import(moduleUrl("contract-content.js"));
+  const tableNames = [
+    "CONTRACT_PHRASE_PRESENTATION_LABELS",
+    "COMPLETE_ASCII_TERM_PRESENTATION_LABELS",
+    "MIXED_ENGLISH_TERM_PRESENTATION_LABELS",
+    "CONTRACT_TERM_PRESENTATION_LABELS",
+    "LOWERCASE_TERM_PRESENTATION_LABELS",
+    "HYPHEN_TERM_PRESENTATION_LABELS",
+    "SINGLE_INTERNAL_TERM_PRESENTATION_LABELS",
+  ];
+  const extractEntries = (tableName) => {
+    const tableMatch = formatterSource.match(
+      new RegExp(`const ${tableName} = deepFreeze\\(\\{([\\s\\S]*?)\\n\\}\\);`),
+    );
+    assert.ok(tableMatch, `presentation mapping table exists: ${tableName}`);
+    return [...tableMatch[1].matchAll(
+      /^\s*(?:((?:"(?:\\.|[^"\\])*")|([A-Za-z0-9_-]+))):\s*("(?:\\.|[^"\\])*")\s*,?$/gm,
+    )].map((match) => [
+      match[2] ?? JSON.parse(match[1]),
+      JSON.parse(match[3]),
+    ]);
+  };
+  const tableEntries = tableNames.flatMap(extractEntries);
+  assert.equal(tableEntries.length, 153, "all finite presentation mappings are inventoried");
+
+  const finiteEntries = [
+    ...tableEntries,
+    ["PART 01", "第 1 部分"],
+    ...[1, 2, 3, 4].map((stage) => [`Stage ${stage}`, `第 ${stage} 階段`]),
+    ["SHA-256", "SHA-256"],
+  ];
+  for (const [source, expected] of finiteEntries) {
+    assert.equal(
+      formatContractPresentationText(source),
+      expected,
+      `standalone finite presentation mapping: ${source}`,
+    );
+  }
+  for (const [source, expected] of [
+    ["aPpEnD-oNlY cAsE eVeNt", "只可追加的案件事件"],
+    ["sIgNeD cOnTrAcT", "已簽署契約"],
+    ["FUTURE_REQUIRED_FACT", "待法務確認的契約用語"],
+    ["future_required_fact", "待法務確認的契約用語"],
+    ["FUTURE-REQUIRED-FACT", "待法務確認的契約用語"],
+    ["FUTURE_OWNER_DECISION_EXTRA", "待法務確認的契約用語"],
+    ["future_document_id_extra", "待法務確認的契約用語"],
+    ["FUTURE-APPEND-ONLY-EXTRA", "待法務確認的契約用語"],
+    ["FUTURE-SHA-256-EXTRA", "待法務確認的契約用語"],
+    ["FUTURE_ID_EXTRA", "待法務確認的契約用語"],
+    ["FUTURE-APPROVE-EXTRA", "待法務確認的契約用語"],
+  ]) {
+    assert.equal(formatContractPresentationText(source), expected, `standalone generic intent: ${source}`);
+  }
+
+  const boundaryCharacters = ["x", "7", "_", "-"];
+  const failures = [];
+  let probeCount = 0;
+  const exactFiniteTokens = new Set([
+    ...tableEntries.map(([source]) => source),
+    "SHA-256",
+  ].filter((source) => /^[A-Za-z0-9_-]+$/.test(source)));
+  const classifyMaximalTokens = (input) => input.replace(/[A-Za-z0-9_-]+/g, (token) => {
+    if (exactFiniteTokens.has(token)) return token;
+    if (/^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/.test(token)) {
+      return "待法務確認的契約用語";
+    }
+    if (/^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/.test(token)) {
+      return "待法務確認的契約用語";
+    }
+    if (/^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$/.test(token)) {
+      return "待法務確認的契約用語";
+    }
+    return token;
+  });
+  const recordBoundaryProbe = (source, input, expected = input) => {
+    probeCount += 1;
+    const actual = formatContractPresentationText(input);
+    if (actual !== expected) failures.push({ source, input, expected, actual });
+  };
+  for (const [source] of finiteEntries) {
+    for (const boundary of boundaryCharacters) {
+      const prefixInput = `${boundary}${source}`;
+      const suffixInput = `${source}${boundary}`;
+      recordBoundaryProbe(source, prefixInput, classifyMaximalTokens(prefixInput));
+      recordBoundaryProbe(source, suffixInput, classifyMaximalTokens(suffixInput));
+    }
+  }
+  const genericEntries = [
+    "FUTURE_REQUIRED_FACT",
+    "future_required_fact",
+    "FUTURE-REQUIRED-FACT",
+  ];
+  for (const source of genericEntries) {
+    for (const boundary of boundaryCharacters) {
+      const prefixInput = `${boundary}${source}`;
+      const suffixInput = `${source}${boundary}`;
+      recordBoundaryProbe(
+        source,
+        prefixInput,
+        classifyMaximalTokens(prefixInput),
+      );
+      recordBoundaryProbe(
+        source,
+        suffixInput,
+        classifyMaximalTokens(suffixInput),
+      );
+    }
+  }
+  assert.equal(probeCount, 1296, "complete A+ boundary matrix probe count");
+  assert.deepEqual(failures, [], `complete boundary failures:\n${JSON.stringify(failures, null, 2)}`);
+  assert.equal(
+    formatContractPresentationText("FUTURE-REQUIRED-FACT-EXTRA"),
+    "待法務確認的契約用語",
+    "unknown uppercase-hyphen chains are classified as one maximal token",
+  );
 });
 
 test("both canonical contract templates cross the safe presentation boundary without raw internal terms", async () => {

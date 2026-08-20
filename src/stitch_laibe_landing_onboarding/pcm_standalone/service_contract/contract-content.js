@@ -1037,6 +1037,9 @@ const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
   "Owner Objection／Override": "業主異議／另行決策",
   "Stage Runtime Events": "階段後續案件事件",
   "append-only Case Event": "只可追加的案件事件",
+  "Append-Only Case Event": "只可追加的案件事件",
+  "signed contract": "已簽署契約",
+  "Signed Contract": "已簽署契約",
   "約定要交什麼 vs 實際交了什麼": "約定交付內容與實際交付內容",
   "目前有效版本 vs 前階段已確認內容": "目前有效版本與前階段已確認內容",
   "APPEND-ONLY RECORD": "僅能追加的案件紀錄",
@@ -1128,33 +1131,93 @@ const SINGLE_INTERNAL_TERM_PRESENTATION_LABELS = deepFreeze({
   UNRESOLVED: "待確認",
 });
 
-function replacePresentationLabels(text, labels) {
-  const entries = Object.entries(labels).sort(([left], [right]) => right.length - left.length);
-  const isTokenCharacter = (character) => (
-    typeof character === "string" && /[A-Za-z0-9_-]/.test(character)
+const CASE_FOLDED_PHRASE_PRESENTATION_LABELS = deepFreeze({
+  "append-only case event": "只可追加的案件事件",
+  "signed contract": "已簽署契約",
+});
+
+const isPresentationTokenCharacter = (character) => (
+  typeof character === "string" && /[A-Za-z0-9_-]/.test(character)
+);
+
+function replacePresentationLabels(text, labels, caseFoldedLabels = {}) {
+  const entries = [
+    ...Object.entries(labels).map(([source, replacement]) => ({
+      source,
+      replacement,
+      caseFolded: false,
+    })),
+    ...Object.entries(caseFoldedLabels).map(([source, replacement]) => ({
+      source,
+      replacement,
+      caseFolded: true,
+    })),
+  ].sort((left, right) => right.source.length - left.source.length);
+  const startsWithEntry = (entry, cursor) => (
+    entry.caseFolded
+      ? text.slice(cursor, cursor + entry.source.length).toLowerCase() === entry.source
+      : text.startsWith(entry.source, cursor)
   );
   let presented = "";
   let cursor = 0;
 
   while (cursor < text.length) {
-    const entry = entries.find(([source]) => text.startsWith(source, cursor));
+    const entry = entries.find((candidate) => startsWithEntry(candidate, cursor));
     if (!entry) {
       presented += text[cursor];
       cursor += 1;
       continue;
     }
 
-    const [source, replacement] = entry;
+    const { source, replacement } = entry;
     const before = cursor > 0 ? text[cursor - 1] : "";
     const afterIndex = cursor + source.length;
     const after = afterIndex < text.length ? text[afterIndex] : "";
     const requiresTokenBoundaries = /[A-Za-z]/.test(source);
-    const hasCompleteTokenBoundaries = !isTokenCharacter(before) && !isTokenCharacter(after);
-    presented += !requiresTokenBoundaries || hasCompleteTokenBoundaries ? replacement : source;
+    const hasCompleteTokenBoundaries = (
+      !isPresentationTokenCharacter(before) && !isPresentationTokenCharacter(after)
+    );
+    presented += !requiresTokenBoundaries || hasCompleteTokenBoundaries
+      ? replacement
+      : text.slice(cursor, afterIndex);
     cursor = afterIndex;
   }
 
   return presented;
+}
+
+function replaceGenericInternalTerms(text, finiteSources) {
+  const protectedTokenSources = new Set([...finiteSources, "SHA-256"]
+    .filter((source) => /^[A-Za-z0-9_-]+$/.test(source))
+  );
+
+  return text.replace(/[A-Za-z0-9_-]+/g, (token) => {
+    if (protectedTokenSources.has(token)) return token;
+    if (/^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+$/.test(token)) {
+      return "待法務確認的契約用語";
+    }
+    if (/^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$/.test(token)) {
+      return "待法務確認的契約用語";
+    }
+    if (/^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$/.test(token)) {
+      return token === "SHA-256" ? token : "待法務確認的契約用語";
+    }
+    return token;
+  });
+}
+
+function replaceBoundaryAwarePattern(text, pattern, createReplacement) {
+  return text.replace(pattern, (match, ...args) => {
+    const input = args.at(-1);
+    const offset = args.at(-2);
+    const before = offset > 0 ? input[offset - 1] : "";
+    const afterIndex = offset + match.length;
+    const after = afterIndex < input.length ? input[afterIndex] : "";
+    if (isPresentationTokenCharacter(before) || isPresentationTokenCharacter(after)) {
+      return match;
+    }
+    return createReplacement(...args.slice(0, -2));
+  });
 }
 
 export function formatContractPresentationText(text) {
@@ -1167,40 +1230,30 @@ export function formatContractPresentationText(text) {
   ));
   presented = presented.replace(/\{\{[^{}\r\n]*\}\}/g, "待補齊必要資料");
   presented = presented.replace(/\{\{[^\r\n]*/g, "待補齊必要資料");
-  presented = replacePresentationLabels(presented, {
+  const finitePresentationLabels = {
     ...CONTRACT_PHRASE_PRESENTATION_LABELS,
     ...COMPLETE_ASCII_TERM_PRESENTATION_LABELS,
     ...MIXED_ENGLISH_TERM_PRESENTATION_LABELS,
-  });
-  presented = presented.replace(/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/g, (token) => (
-    Object.hasOwn(CONTRACT_TERM_PRESENTATION_LABELS, token)
-      ? CONTRACT_TERM_PRESENTATION_LABELS[token]
-      : "待法務確認的契約用語"
-  ));
-  presented = presented.replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/g, (token) => (
-    Object.hasOwn(LOWERCASE_TERM_PRESENTATION_LABELS, token)
-      ? LOWERCASE_TERM_PRESENTATION_LABELS[token]
-      : "待法務確認的契約用語"
-  ));
-  presented = presented.replace(/\b[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\b/g, (token) => {
-    if (token === "SHA-256") return token;
-    return Object.hasOwn(HYPHEN_TERM_PRESENTATION_LABELS, token)
-      ? HYPHEN_TERM_PRESENTATION_LABELS[token]
-      : "待法務確認的契約用語";
-  });
-  presented = presented.replace(
-    /\b(?:APPROVE|BUSINESS|CONSUMER|DISPUTED|NONE|OVERRIDE|PAID|PASS|TRUE|UNRESOLVED)\b/g,
-    (token) => SINGLE_INTERNAL_TERM_PRESENTATION_LABELS[token],
+    ...CONTRACT_TERM_PRESENTATION_LABELS,
+    ...LOWERCASE_TERM_PRESENTATION_LABELS,
+    ...HYPHEN_TERM_PRESENTATION_LABELS,
+    ...SINGLE_INTERNAL_TERM_PRESENTATION_LABELS,
+  };
+  presented = replacePresentationLabels(
+    presented,
+    finitePresentationLabels,
+    CASE_FOLDED_PHRASE_PRESENTATION_LABELS,
   );
-  presented = presented.replace(/\bPART\s+0*(\d+)\b/g, (_match, partNumber) => (
+  presented = replaceGenericInternalTerms(presented, [
+    ...Object.keys(finitePresentationLabels),
+    ...Object.keys(CASE_FOLDED_PHRASE_PRESENTATION_LABELS),
+  ]);
+  presented = replaceBoundaryAwarePattern(presented, /PART\s+0*([1-9])/g, (partNumber) => (
     `第 ${Number.parseInt(partNumber, 10)} 部分`
   ));
-  presented = presented.replace(/\bStage\s+([1-4])\b/g, (_match, stageNumber) => (
+  presented = replaceBoundaryAwarePattern(presented, /Stage\s+([1-4])/g, (stageNumber) => (
     `第 ${stageNumber} 階段`
   ));
-  presented = presented.replace(/\bappend-only Case Event\b/gi, "只可追加的案件事件");
-  presented = presented.replace(/\bsigned contract\b/gi, "已簽署契約");
-  presented = presented.replace(/\s*!=\s*/g, "不等同於");
   presented = presented.replace(/\s+=\s+/g, "為");
   presented = presented.replace(/`+/g, "");
   return presented;
