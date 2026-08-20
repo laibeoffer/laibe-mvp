@@ -71,6 +71,35 @@ async function snapshot(root) {
   return { files, sha256: hash.digest("hex") };
 }
 
+async function listMaterializationArtifacts() {
+  const entries = await readdir(path.dirname(distRoot), { withFileTypes: true });
+  return entries
+    .filter((entry) => entry.name.startsWith(".drs-stage-") || entry.name.startsWith(".drs-backup-"))
+    .map((entry) => entry.name)
+    .sort();
+}
+
+async function removeMaterializationArtifacts() {
+  for (const name of await listMaterializationArtifacts()) {
+    await rm(path.join(path.dirname(distRoot), name), { recursive: true, force: true });
+  }
+}
+
+function bindFaultBuildToRepository(buildSource) {
+  const rootDeclaration =
+    'const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url)));';
+  assert.equal(buildSource.includes(rootDeclaration), true, "repository root declaration");
+  return buildSource.replace(rootDeclaration, `const repositoryRoot = ${JSON.stringify(repositoryRoot)};`);
+}
+
+function executeFaultBuild(faultBuildPath, extraEnvironment = {}) {
+  return spawnSync(process.execPath, [faultBuildPath], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+    env: { ...process.env, DRS_PUBLIC_ORIGIN: "", ...extraEnvironment },
+  });
+}
+
 function entryPath(publicPath) {
   return path.join(distRoot, publicPath.slice(1), "index.html");
 }
@@ -189,7 +218,10 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   }
 
   const assetFiles = second.files.filter((file) => file.startsWith("assets/"));
-  assert.ok(assetFiles.length > 0, "asset allowlist must not be empty");
+  assert.equal(assetFiles.length, 32, "exact production asset closure");
+  assert.equal(deployNodes.length, 18, "exact production route closure");
+  assert.equal(second.files.length, 55, "32 assets + 18 routes + 5 metadata files");
+  assert.deepEqual(await listMaterializationArtifacts(), [], "successful build swap artifacts");
   const assetRoots = new Set(assetFiles.map((file) => file.split("/").slice(0, 2).join("/")));
   assert.equal(assetRoots.size, 1, "all runtime assets share one content hash root");
   assert.match([...assetRoots][0], /^assets\/[a-f\d]{64}$/u);
@@ -354,6 +386,328 @@ test("production build closes the built adapter PDF.js runtime and parses the Hu
   ]);
   assert.deepEqual(builtPdfJs, sourcePdfJs, "built PDF.js module bytes");
   assert.deepEqual(builtPdfWorker, sourcePdfWorker, "built PDF.js worker bytes");
+});
+
+test("every real source-entry read and dependency failure preserves the exact live artifact", async (context) => {
+  const faultBuildPath = path.join(distRoot, ".real-route-family-atomicity-probe.mjs");
+  const sentinelPath = path.join(distRoot, ".real-route-family-atomicity-sentinel");
+  try {
+    runBuild();
+    const buildSource = await readFile(buildScript, "utf8");
+    const routeTransform =
+      '    html = transformEntryHtml(await readFile(path.join(repositoryRoot, sourceRelative), "utf8"), sourceRelative);';
+    assert.equal(buildSource.includes(routeTransform), true, "real source-entry transform");
+    const realRoutes = [
+      ["home", "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html"],
+      ["aboutDrs", "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html"],
+      ["quoteCheck", "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html"],
+      ["accountAccess", "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html"],
+      ["serviceContract", "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html"],
+      ["contractPrerequisites", "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html"],
+      ["contractSigning", "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/code.html"],
+      ["ownerWorkspace", "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html"],
+      ["vendorWorkspace", "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html"],
+      ["accessUnavailable", "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/code.html"],
+    ];
+    await writeFile(sentinelPath, "preserve every real route family\n", "utf8");
+    for (const [id, sourceRelative] of realRoutes) {
+      for (const failure of ["read", "dependency"]) {
+        await context.test(`${id} ${failure}`, async () => {
+          const replacement = failure === "read"
+            ? [
+              `    const routeSource = node.id === ${JSON.stringify(id)}`,
+              `      ? await readFile(path.join(repositoryRoot, ${JSON.stringify(`.missing-route-read-${id}`)}), "utf8")`,
+              "      : await readFile(path.join(repositoryRoot, sourceRelative), \"utf8\");",
+              "    html = transformEntryHtml(routeSource, sourceRelative);",
+            ].join("\n")
+            : [
+              '    const routeSource = await readFile(path.join(repositoryRoot, sourceRelative), "utf8");',
+              `    const faultedRouteSource = node.id === ${JSON.stringify(id)}`,
+              '      ? `<script src="./missing-real-route-runtime.js"></script>${routeSource}`',
+              "      : routeSource;",
+              "    html = transformEntryHtml(faultedRouteSource, sourceRelative);",
+            ].join("\n");
+          const faultBuildSource = bindFaultBuildToRepository(buildSource).replace(routeTransform, replacement);
+          await writeFile(faultBuildPath, faultBuildSource, "utf8");
+          const before = await snapshot(distRoot);
+          const result = executeFaultBuild(faultBuildPath);
+          assert.notEqual(result.status, 0, `${id} ${failure}\n${result.stdout}`);
+          if (failure === "read") {
+            assert.match(result.stderr, /ENOENT/u, result.stderr);
+          } else {
+            assert.equal(
+              result.stderr.includes(
+                `Unknown local src dependency "./missing-real-route-runtime.js" referenced by ${JSON.stringify(sourceRelative)}`,
+              ),
+              true,
+              result.stderr,
+            );
+          }
+          assert.deepEqual(await snapshot(distRoot), before, `${id} ${failure} live identity`);
+          assert.deepEqual(await listMaterializationArtifacts(), [], `${id} ${failure} swap cleanup`);
+        });
+      }
+    }
+    assert.equal(await readFile(sentinelPath, "utf8"), "preserve every real route family\n");
+  } finally {
+    await rm(faultBuildPath, { force: true });
+    await rm(sentinelPath, { force: true });
+    runBuild();
+  }
+});
+
+test("drawing and every planned route preflight failure preserve the exact live artifact", async (context) => {
+  const faultBuildPath = path.join(distRoot, ".generated-route-family-atomicity-probe.mjs");
+  const sentinelPath = path.join(distRoot, ".generated-route-family-atomicity-sentinel");
+  try {
+    runBuild();
+    const buildSource = await readFile(buildScript, "utf8");
+    const appendRoute = "  transformedEntries.push({ publicPath: node.publicPath, html });";
+    assert.equal(buildSource.includes(appendRoute), true, "generated route append");
+    await writeFile(sentinelPath, "preserve generated route families\n", "utf8");
+    for (const id of [
+      "drawingCheck",
+      "caseSetup",
+      "vendorInvitation",
+      "pcmAuthorizedList",
+      "pcmCaseWorkspace",
+      "internalGovernance",
+      "caseRecordCenter",
+      "caseCloseout",
+    ]) {
+      await context.test(id, async () => {
+        const faultBuildSource = bindFaultBuildToRepository(buildSource).replace(
+          appendRoute,
+          [
+            `  if (node.id === ${JSON.stringify(id)}) throw new Error(${JSON.stringify(`Injected generated route preflight failure for ${id}`)});`,
+            appendRoute,
+          ].join("\n"),
+        );
+        await writeFile(faultBuildPath, faultBuildSource, "utf8");
+        const before = await snapshot(distRoot);
+        const result = executeFaultBuild(faultBuildPath);
+        assert.notEqual(result.status, 0, `${id}\n${result.stdout}`);
+        assert.match(result.stderr, new RegExp(`Injected generated route preflight failure for ${id}`, "u"));
+        assert.deepEqual(await snapshot(distRoot), before, `${id} live identity`);
+        assert.deepEqual(await listMaterializationArtifacts(), [], `${id} swap cleanup`);
+      });
+    }
+    assert.equal(await readFile(sentinelPath, "utf8"), "preserve generated route families\n");
+  } finally {
+    await rm(faultBuildPath, { force: true });
+    await rm(sentinelPath, { force: true });
+    runBuild();
+  }
+});
+
+test("plan, manifest, and PDF.js declaration drift preserve the exact live artifact", async (context) => {
+  const faultBuildPath = path.join(distRoot, ".preflight-drift-atomicity-probe.mjs");
+  const sentinelPath = path.join(distRoot, ".preflight-drift-atomicity-sentinel");
+  try {
+    runBuild();
+    const buildSource = await readFile(buildScript, "utf8");
+    const routeLoop = "for (let index = 0; index < transformedEntries.length; index += 1) {";
+    const containedDestinationDeclaration = "function containedDestination(root, relative) {";
+    const assetRead = "  const source = await readFile(path.join(repositoryRoot, relative));";
+    for (const anchor of [routeLoop, containedDestinationDeclaration, assetRead]) {
+      assert.equal(buildSource.includes(anchor), true, `preflight drift anchor: ${anchor}`);
+    }
+    const driftCases = [
+      {
+        name: "destination collision",
+        source: buildSource.replace(
+          routeLoop,
+          [
+            "addMaterializationFile(`assets/${assetHash}/${ASSET_ALLOWLIST[0]}`, transformedAssets.get(ASSET_ALLOWLIST[0]));",
+            routeLoop,
+          ].join("\n"),
+        ),
+        error: /Duplicate production artifact destination/u,
+      },
+      {
+        name: "destination traversal",
+        source: buildSource.replace(
+          containedDestinationDeclaration,
+          `addMaterializationFile("../outside-drs.txt", "blocked");\n\n${containedDestinationDeclaration}`,
+        ),
+        error: /Unsafe production artifact destination/u,
+      },
+      {
+        name: "manifest drift",
+        source: buildSource.replace(
+          assetRead,
+          [
+            "  const sourceBytes = await readFile(path.join(repositoryRoot, relative));",
+            "  const source = relative === manifestRelative",
+            "    ? Buffer.from(sourceBytes.toString(\"utf8\").replace(\"href: \\\"../public_home/code.html#top\\\"\", \"href: \\\"../manifest-drift/code.html\\\"\"))",
+            "    : sourceBytes;",
+          ].join("\n"),
+        ),
+        error: /Manifest href value is missing/u,
+      },
+      {
+        name: "adapter to PDF.js declaration drift",
+        source: buildSource.replace(
+          assetRead,
+          [
+            "  const sourceBytes = await readFile(path.join(repositoryRoot, relative));",
+            '  const source = relative === "src/lib/budget/quote-healthcheck/browser-adapter.js"',
+            '    ? Buffer.from(sourceBytes.toString("utf8").replace("import(\\\"../../../../site/preview_floor_plan/vendor/pdfjs/pdf.mjs\\\")", "import(\\\"data:text/javascript,export default null\\\")"))',
+            "    : sourceBytes;",
+          ].join("\n"),
+        ),
+        error: /Declared runtime dependency .*pdf\.mjs.* is missing/u,
+      },
+      {
+        name: "PDF.js to worker declaration drift",
+        source: buildSource.replace(
+          assetRead,
+          [
+            "  const sourceBytes = await readFile(path.join(repositoryRoot, relative));",
+            '  const source = relative === "site/preview_floor_plan/vendor/pdfjs/pdf.mjs"',
+            '    ? Buffer.from(sourceBytes.toString("utf8").replace("./pdf.worker.mjs", "./pdf.worker-drift.mjs"))',
+            "    : sourceBytes;",
+          ].join("\n"),
+        ),
+        error: /Declared runtime dependency .*pdf\.worker\.mjs.* is missing/u,
+      },
+    ];
+    await writeFile(sentinelPath, "preserve preflight drift\n", "utf8");
+    for (const drift of driftCases) {
+      await context.test(drift.name, async () => {
+        await writeFile(faultBuildPath, bindFaultBuildToRepository(drift.source), "utf8");
+        const before = await snapshot(distRoot);
+        const result = executeFaultBuild(faultBuildPath);
+        assert.notEqual(result.status, 0, `${drift.name}\n${result.stdout}`);
+        assert.match(result.stderr, drift.error, result.stderr);
+        assert.deepEqual(await snapshot(distRoot), before, `${drift.name} live identity`);
+        assert.deepEqual(await listMaterializationArtifacts(), [], `${drift.name} swap cleanup`);
+      });
+    }
+    assert.equal(await readFile(sentinelPath, "utf8"), "preserve preflight drift\n");
+  } finally {
+    await rm(faultBuildPath, { force: true });
+    await rm(sentinelPath, { force: true });
+    runBuild();
+  }
+});
+
+test("granular staging and promotion failures preserve live output and leak no swap artifacts", async (context) => {
+  for (const fault of [
+    "stage-mkdir",
+    "stage-write-asset",
+    "stage-write-route-first",
+    "stage-write-route-middle",
+    "stage-write-route-last",
+    "stage-write-metadata-headers",
+    "stage-write-metadata-redirects",
+    "stage-write-metadata-404",
+    "stage-write-metadata-robots",
+    "stage-write-metadata-sitemap",
+    "stage-verify",
+    "promotion-current-to-backup",
+    "promotion-stage-to-live",
+    "promotion-after-stage",
+  ]) {
+    await context.test(fault, async () => {
+      const sentinelPath = path.join(distRoot, `.materialization-${fault}-sentinel`);
+      try {
+        runBuild();
+        await writeFile(sentinelPath, `preserve ${fault}\n`, "utf8");
+        const before = await snapshot(distRoot);
+        const result = executeBuild({ DRS_BUILD_FAULT_INJECTION: fault });
+        assert.notEqual(result.status, 0, `${fault}\n${result.stdout}`);
+        assert.match(
+          result.stderr,
+          new RegExp(`Injected DRS build failure at ${fault}`, "u"),
+          result.stderr,
+        );
+        assert.deepEqual(await snapshot(distRoot), before, `${fault} live artifact identity`);
+        assert.equal(await readFile(sentinelPath, "utf8"), `preserve ${fault}\n`);
+        assert.deepEqual(await listMaterializationArtifacts(), [], `${fault} swap cleanup`);
+      } finally {
+        await rm(sentinelPath, { force: true });
+        runBuild();
+      }
+    });
+  }
+});
+
+test("real stage verifier and unknown-fault failures preserve live output", async (context) => {
+  const rows = [
+    {
+      fault: "stage-verify-missing-planned-file",
+      diagnostic: /Staged production artifact file set does not match the validated plan: expected=55, actual=54,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
+    },
+    {
+      fault: "stage-verify-unexpected-file",
+      diagnostic: /Staged production artifact file set does not match the validated plan: expected=55, actual=56,/u,
+    },
+    {
+      fault: "stage-verify-mutated-bytes",
+      diagnostic: /Staged production artifact bytes differ: "_headers"/u,
+    },
+    {
+      fault: "unknown-m15-fault",
+      diagnostic: /Unknown DRS_BUILD_FAULT_INJECTION: "unknown-m15-fault"/u,
+    },
+  ];
+  for (const { fault, diagnostic } of rows) {
+    await context.test(fault, async () => {
+      const sentinelPath = path.join(distRoot, `.m15-${fault}-sentinel`);
+      try {
+        runBuild();
+        await writeFile(sentinelPath, `preserve ${fault}\n`, "utf8");
+        const before = await snapshot(distRoot);
+        const result = executeBuild({ DRS_BUILD_FAULT_INJECTION: fault });
+        assert.equal(result.status, 1, `${fault}\n${result.stdout}\n${result.stderr}`);
+        assert.match(result.stderr, diagnostic, result.stderr);
+        assert.deepEqual(await snapshot(distRoot), before, `${fault} live artifact identity`);
+        assert.equal(await readFile(sentinelPath, "utf8"), `preserve ${fault}\n`);
+        assert.deepEqual(await listMaterializationArtifacts(), [], `${fault} swap cleanup`);
+      } finally {
+        await rm(sentinelPath, { force: true });
+        runBuild();
+      }
+    });
+  }
+});
+
+test("partial backup cleanup after committed promotion keeps the complete verified live output", async () => {
+  const sentinelPath = path.join(distRoot, ".partial-backup-cleanup-sentinel");
+  try {
+    runBuild();
+    const expectedPromoted = await snapshot(distRoot);
+    await writeFile(sentinelPath, "old live must not be restored\n", "utf8");
+    const oldLive = await snapshot(distRoot);
+
+    const result = executeBuild({ DRS_BUILD_FAULT_INJECTION: "promotion-backup-cleanup-partial" });
+    assert.notEqual(result.status, 0, `cleanup debt must be explicit\n${result.stdout}`);
+    assert.match(
+      result.stderr,
+      /DRS_BUILD_CLEANUP_DEBT: live output committed and verified; backup cleanup incomplete:/u,
+      result.stderr,
+    );
+    assert.deepEqual(await snapshot(distRoot), expectedPromoted, "complete promoted live artifact identity");
+    const artifacts = await listMaterializationArtifacts();
+    const stageArtifacts = artifacts.filter((name) => name.startsWith(".drs-stage-"));
+    const backupArtifacts = artifacts.filter((name) => name.startsWith(".drs-backup-"));
+    assert.deepEqual(stageArtifacts, [], "no stage remains after committed promotion");
+    assert.equal(backupArtifacts.length, 1, "one bounded cleanup-debt backup");
+    const debtRoot = path.join(path.dirname(distRoot), backupArtifacts[0]);
+    assert.equal(
+      result.stderr.includes(debtRoot.replaceAll(path.sep, "/")),
+      true,
+      "cleanup debt identifies its exact bounded backup",
+    );
+    assert.equal(await readFile(path.join(debtRoot, path.basename(sentinelPath)), "utf8"), "old live must not be restored\n");
+    await assert.rejects(readFile(path.join(debtRoot, "_headers")), { code: "ENOENT" });
+    assert.notDeepEqual(await snapshot(debtRoot), oldLive, "partially deleted backup must never be restored");
+  } finally {
+    await rm(sentinelPath, { force: true });
+    await removeMaterializationArtifacts();
+    runBuild();
+  }
 });
 
 test("production build rejects an undeclared local dynamic module before replacing output", async () => {

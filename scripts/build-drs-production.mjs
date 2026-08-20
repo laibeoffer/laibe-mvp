@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -350,18 +350,8 @@ if (dependencyProbe) {
   }
 }
 
-await rm(distRoot, { recursive: true, force: true });
-await mkdir(distRoot, { recursive: true });
-
-for (const [relative, content] of transformedAssets) {
-  const destination = path.join(distRoot, "assets", assetHash, ...relative.split("/"));
-  await mkdir(path.dirname(destination), { recursive: true });
-  await writeFile(destination, content);
-}
-
+const transformedEntries = [];
 for (const node of deployNodes) {
-  const destination = path.join(distRoot, ...node.publicPath.slice(1).split("/"), "index.html");
-  await mkdir(path.dirname(destination), { recursive: true });
   let html;
   if (node.id === "drawingCheck") {
     html = unavailableEntry(node, "圖說辨識功能正在整理中，正式開放後會提供完整操作入口。");
@@ -371,8 +361,9 @@ for (const node of deployNodes) {
     const sourceRelative = SOURCE_ENTRY_BY_ID[node.id];
     html = transformEntryHtml(await readFile(path.join(repositoryRoot, sourceRelative), "utf8"), sourceRelative);
   }
-  await writeFile(destination, html, "utf8");
+  transformedEntries.push({ publicPath: node.publicPath, html });
 }
+const publicOrigin = normalizePublicOrigin();
 
 const headers = `/*
   Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://PROJECT_REF.supabase.co https://calendar.google.com; frame-src https://calendar.google.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
@@ -387,15 +378,238 @@ const redirects = deployNodes
 const notFound = `<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>找不到頁面｜LaiBE DRS</title><style>body{margin:0;background:#101a24;color:#f4f7fa;font-family:system-ui,sans-serif}main{max-width:40rem;margin:15vh auto;padding:2rem}p{color:#c7d2dc;line-height:1.7}a{color:#ff9b54}</style></head><body><main><p>404</p><h1>這個頁面不存在</h1><p>網址可能已更新，或這個入口尚未正式開放。你可以安全返回 DRS 首頁。</p><a href="/pcm">返回 DRS 首頁</a></main></body></html>
 `;
-const publicOrigin = normalizePublicOrigin();
 const robots = `User-agent: *\nAllow: /\n${publicOrigin ? `Sitemap: ${publicOrigin}/sitemap.xml\n` : ""}`;
 
-await Promise.all([
-  writeFile(path.join(distRoot, "_headers"), headers, "utf8"),
-  writeFile(path.join(distRoot, "_redirects"), redirects, "utf8"),
-  writeFile(path.join(distRoot, "404.html"), notFound, "utf8"),
-  writeFile(path.join(distRoot, "robots.txt"), robots, "utf8"),
-  writeFile(path.join(distRoot, "sitemap.xml"), sitemapXml(publicOrigin), "utf8"),
+const materializationPlan = [];
+const materializationDestinations = new Set();
+function addMaterializationFile(relative, content, writeFault = "") {
+  const normalized = path.posix.normalize(relative);
+  if (
+    !relative ||
+    normalized !== relative ||
+    normalized === "." ||
+    normalized.startsWith("../") ||
+    path.posix.isAbsolute(normalized)
+  ) {
+    throw new Error(`Unsafe production artifact destination: ${JSON.stringify(relative)}`);
+  }
+  const destinationKey = normalized.toLocaleLowerCase("en-US");
+  if (materializationDestinations.has(destinationKey)) {
+    throw new Error(`Duplicate production artifact destination: ${JSON.stringify(normalized)}`);
+  }
+  materializationDestinations.add(destinationKey);
+  materializationPlan.push({
+    relative: normalized,
+    content: Buffer.isBuffer(content) ? content : Buffer.from(content),
+    writeFault,
+  });
+}
+const assetEntries = [...transformedAssets];
+for (let index = 0; index < assetEntries.length; index += 1) {
+  const [relative, content] = assetEntries[index];
+  const writeFault = index === Math.floor(assetEntries.length / 2) ? "stage-write-asset" : "";
+  addMaterializationFile(`assets/${assetHash}/${relative}`, content, writeFault);
+}
+for (let index = 0; index < transformedEntries.length; index += 1) {
+  const { publicPath, html } = transformedEntries[index];
+  let writeFault = "";
+  if (index === 0) writeFault = "stage-write-route-first";
+  if (index === Math.floor(transformedEntries.length / 2)) writeFault = "stage-write-route-middle";
+  if (index === transformedEntries.length - 1) writeFault = "stage-write-route-last";
+  addMaterializationFile(`${publicPath.slice(1)}/index.html`, html, writeFault);
+}
+for (const [relative, content, writeFault] of [
+  ["_headers", headers, "stage-write-metadata-headers"],
+  ["_redirects", redirects, "stage-write-metadata-redirects"],
+  ["404.html", notFound, "stage-write-metadata-404"],
+  ["robots.txt", robots, "stage-write-metadata-robots"],
+  ["sitemap.xml", sitemapXml(publicOrigin), "stage-write-metadata-sitemap"],
+]) {
+  addMaterializationFile(relative, content, writeFault);
+}
+
+function containedDestination(root, relative) {
+  const destination = path.resolve(root, ...relative.split("/"));
+  const containment = path.relative(root, destination);
+  if (!containment || containment.startsWith("..") || path.isAbsolute(containment)) {
+    throw new Error(`Production artifact destination escaped its root: ${JSON.stringify(relative)}`);
+  }
+  return destination;
+}
+
+async function listMaterializedFiles(root, current = root) {
+  const entries = await readdir(current, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries.sort((left, right) => left.name.localeCompare(right.name))) {
+    const absolute = path.join(current, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...await listMaterializedFiles(root, absolute));
+    } else if (entry.isFile()) {
+      files.push(path.relative(root, absolute).replaceAll(path.sep, "/"));
+    } else {
+      throw new Error(`Unexpected staged artifact type: ${JSON.stringify(entry.name)}`);
+    }
+  }
+  return files;
+}
+
+async function verifyMaterializedStage(stageRoot) {
+  const expected = materializationPlan
+    .map(({ relative }) => relative)
+    .sort((left, right) => left.localeCompare(right));
+  const actual = (await listMaterializedFiles(stageRoot))
+    .sort((left, right) => left.localeCompare(right));
+  if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+    const firstMismatch = Array.from(
+      { length: Math.max(actual.length, expected.length) },
+      (_, index) => index,
+    ).find((index) => actual[index] !== expected[index]);
+    throw new Error(
+      "Staged production artifact file set does not match the validated plan: "
+      + `expected=${expected.length}, actual=${actual.length}, firstMismatch=${firstMismatch}, `
+      + `expectedPath=${JSON.stringify(expected[firstMismatch])}, `
+      + `actualPath=${JSON.stringify(actual[firstMismatch])}`,
+    );
+  }
+  for (const file of materializationPlan) {
+    const staged = await readFile(containedDestination(stageRoot, file.relative));
+    if (!staged.equals(file.content)) {
+      throw new Error(`Staged production artifact bytes differ: ${JSON.stringify(file.relative)}`);
+    }
+  }
+}
+
+const acceptedFaultInjections = new Set([
+  "",
+  "stage-mkdir",
+  "stage-write-asset",
+  "stage-write-route-first",
+  "stage-write-route-middle",
+  "stage-write-route-last",
+  "stage-write-metadata-headers",
+  "stage-write-metadata-redirects",
+  "stage-write-metadata-404",
+  "stage-write-metadata-robots",
+  "stage-write-metadata-sitemap",
+  "stage-verify",
+  "stage-verify-missing-planned-file",
+  "stage-verify-unexpected-file",
+  "stage-verify-mutated-bytes",
+  "promotion-current-to-backup",
+  "promotion-stage-to-live",
+  "promotion-after-stage",
+  "promotion-backup-cleanup-partial",
 ]);
+const faultInjection = process.env.DRS_BUILD_FAULT_INJECTION?.trim() ?? "";
+if (!acceptedFaultInjections.has(faultInjection)) {
+  throw new Error(`Unknown DRS_BUILD_FAULT_INJECTION: ${JSON.stringify(faultInjection)}`);
+}
+function injectBuildFault(point) {
+  if (faultInjection === point) {
+    throw new Error(`Injected DRS build failure at ${point}`);
+  }
+}
+
+await mkdir(distParent, { recursive: true });
+const swapIdentity = `${process.pid}-${randomUUID()}`;
+const stageRoot = path.join(distParent, `.drs-stage-${swapIdentity}`);
+const backupRoot = path.join(distParent, `.drs-backup-${swapIdentity}`);
+for (const [root, prefix] of [
+  [stageRoot, ".drs-stage-"],
+  [backupRoot, ".drs-backup-"],
+]) {
+  const sibling = path.relative(distParent, root);
+  if (path.dirname(sibling) !== "." || !path.basename(sibling).startsWith(prefix)) {
+    throw new Error(`Unsafe production swap path: ${root}`);
+  }
+}
+
+let stageCreated = false;
+let liveBackedUp = false;
+let stagePromoted = false;
+let promotionCommitted = false;
+try {
+  injectBuildFault("stage-mkdir");
+  await mkdir(stageRoot);
+  stageCreated = true;
+  for (const file of materializationPlan) {
+    if (file.writeFault) injectBuildFault(file.writeFault);
+    const destination = containedDestination(stageRoot, file.relative);
+    await mkdir(path.dirname(destination), { recursive: true });
+    await writeFile(destination, file.content);
+  }
+  injectBuildFault("stage-verify");
+  if (faultInjection === "stage-verify-missing-planned-file") {
+    await rm(containedDestination(stageRoot, "pcm/case/setup/index.html"));
+  }
+  if (faultInjection === "stage-verify-unexpected-file") {
+    await writeFile(containedDestination(stageRoot, "unexpected-stage-file.txt"), "unexpected staged file");
+  }
+  if (faultInjection === "stage-verify-mutated-bytes") {
+    await writeFile(containedDestination(stageRoot, "_headers"), "mutated staged bytes");
+  }
+  await verifyMaterializedStage(stageRoot);
+  injectBuildFault("promotion-current-to-backup");
+  try {
+    await rename(distRoot, backupRoot);
+    liveBackedUp = true;
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  injectBuildFault("promotion-stage-to-live");
+  await rename(stageRoot, distRoot);
+  stageCreated = false;
+  stagePromoted = true;
+  await verifyMaterializedStage(distRoot);
+  injectBuildFault("promotion-after-stage");
+  promotionCommitted = true;
+  if (liveBackedUp) {
+    if (faultInjection === "promotion-backup-cleanup-partial") {
+      await rm(path.join(backupRoot, "_headers"));
+      throw new Error("Injected DRS build failure during partial backup cleanup");
+    }
+    await rm(backupRoot, { recursive: true });
+    liveBackedUp = false;
+  }
+} catch (buildError) {
+  if (promotionCommitted) {
+    const cleanupDebtPath = backupRoot.replaceAll(path.sep, "/");
+    throw new Error(
+      `DRS_BUILD_CLEANUP_DEBT: live output committed and verified; backup cleanup incomplete: ${cleanupDebtPath}`,
+      { cause: buildError },
+    );
+  }
+  const rollbackErrors = [];
+  if (stagePromoted) {
+    try {
+      await rm(distRoot, { recursive: true });
+      stagePromoted = false;
+    } catch (error) {
+      rollbackErrors.push(error);
+    }
+  }
+  if (liveBackedUp) {
+    try {
+      await rename(backupRoot, distRoot);
+      liveBackedUp = false;
+    } catch (error) {
+      rollbackErrors.push(error);
+    }
+  }
+  if (stageCreated) {
+    try {
+      await rm(stageRoot, { recursive: true });
+      stageCreated = false;
+    } catch (error) {
+      rollbackErrors.push(error);
+    }
+  }
+  if (rollbackErrors.length > 0) {
+    throw new AggregateError([buildError, ...rollbackErrors], "DRS build failed and rollback was incomplete");
+  }
+  throw buildError;
+} finally {
+  if (stageCreated) await rm(stageRoot, { recursive: true, force: true });
+}
 
 console.log(`Built ${deployNodes.length} DRS routes with ${transformedAssets.size} allowlisted assets at ${assetPublicRoot}`);
