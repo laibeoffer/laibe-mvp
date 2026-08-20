@@ -174,27 +174,61 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   assert.match(drawing, /返回 DRS 首頁/u);
 });
 
-test("production build rejects every undeclared local stylesheet, module, and image dependency", async () => {
-  const probeRelative = ".superpowers/sdd/task-1-unknown-dependency-probe.html";
-  const probePath = path.join(repositoryRoot, probeRelative);
+test("production build rejects every undeclared single-quoted local dependency", async (context) => {
   const probes = [
-    '<link rel="stylesheet" href="./missing-production-style.css" />',
-    '<script type="module" src="./missing-production-module.js"></script>',
-    '<img src="./missing-production-image.svg" alt="" />',
+    { kind: "stylesheet", markup: "<link rel='stylesheet' href='./missing-production-style.css' />" },
+    { kind: "module", markup: "<script type='module' src='./missing-production-module.js'></script>" },
+    { kind: "image", markup: "<img src='./missing-production-image.svg' alt='' />" },
   ];
+  for (const probe of probes) {
+    await context.test(probe.kind, async () => {
+      const probeRelative = `.superpowers/sdd/task-1-unknown-${probe.kind}-probe.html`;
+      const probePath = path.join(repositoryRoot, probeRelative);
+      const sentinelPath = path.join(distRoot, `.dependency-probe-${probe.kind}-sentinel`);
+      try {
+        runBuild();
+        await writeFile(sentinelPath, "preserve prior production output\n", "utf8");
+        await writeFile(
+          probePath,
+          `<!doctype html><html><head>${probe.markup}</head><body></body></html>`,
+          "utf8",
+        );
+        const before = await snapshot(distRoot);
+        const result = executeBuild({ DRS_BUILD_DEPENDENCY_PROBE: probeRelative });
+        assert.notEqual(result.status, 0, probe.markup);
+        assert.match(
+          result.stderr,
+          new RegExp(
+            `Unknown local (?:href|src) dependency ".+" referenced by "\\.superpowers/sdd/task-1-unknown-${probe.kind}-probe\\.html"`,
+            "u",
+          ),
+          result.stderr,
+        );
+        assert.deepEqual(await snapshot(distRoot), before, `${probe.markup} must not modify prior output`);
+        assert.equal(await readFile(sentinelPath, "utf8"), "preserve prior production output\n");
+      } finally {
+        await rm(probePath, { force: true });
+        await rm(sentinelPath, { force: true });
+        runBuild();
+      }
+    });
+  }
+});
+
+test("single-quoted known assets are accepted without parsing data attributes or text as dependencies", async () => {
+  const probeRelative = ".superpowers/sdd/task-1-known-single-quote-probe.html";
+  const probePath = path.join(repositoryRoot, probeRelative);
   try {
-    for (const probe of probes) {
-      await writeFile(probePath, `<!doctype html><html><head>${probe}</head><body></body></html>`, "utf8");
-      const result = executeBuild({ DRS_BUILD_DEPENDENCY_PROBE: probeRelative });
-      assert.notEqual(result.status, 0, probe);
-      assert.match(
-        result.stderr,
-        /Unknown local (?:href|src) dependency ".+" referenced by ".superpowers\/sdd\/task-1-unknown-dependency-probe\.html"/u,
-        result.stderr,
-      );
-    }
+    await writeFile(
+      probePath,
+      "<!doctype html><html><body><img src='../../assets/logo/laibe_offer.svg' data-src='./not-a-runtime-image.svg' data-href='./not-a-runtime-style.css' alt='LaiBE' /><p>Example href='./not-a-runtime-style.css' remains text.</p></body></html>",
+      "utf8",
+    );
+    const result = executeBuild({ DRS_BUILD_DEPENDENCY_PROBE: probeRelative });
+    assert.equal(result.status, 0, result.stderr);
   } finally {
     await rm(probePath, { force: true });
+    runBuild();
   }
 });
 

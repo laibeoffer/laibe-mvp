@@ -226,9 +226,18 @@ function rewriteHtmlReference(sourceRelative, attribute, reference) {
 
 function transformEntryHtml(source, sourceRelative) {
   return source
-    .replace(/\b(href|src)="([^"]+)"/giu, (_match, attribute, reference) => (
-      `${attribute}="${rewriteHtmlReference(sourceRelative, attribute.toLowerCase(), reference)}"`
-    ))
+    .replace(
+      /<(?:[^>"']|"[^"]*"|'[^']*')*>/gu,
+      (tag) => tag.replace(
+        /(["'])[^]*?\1|(\s)(href|src)(\s*=\s*)(?:"([^"]+)"|'([^']+)')/giu,
+        (match, _otherQuote, prefix, attribute, assignment, doubleQuotedReference, singleQuotedReference) => {
+          if (!attribute) return match;
+          const quote = doubleQuotedReference === undefined ? "'" : '"';
+          const reference = doubleQuotedReference ?? singleQuotedReference;
+          return `${prefix}${attribute}${assignment}${quote}${rewriteHtmlReference(sourceRelative, attribute.toLowerCase(), reference)}${quote}`;
+        },
+      ),
+    )
     .replace(/<html\b([^>]*?)\blang="[^"]+"/iu, "<html$1lang=\"zh-Hant\"");
 }
 
