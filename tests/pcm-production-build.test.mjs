@@ -4,12 +4,23 @@ import { readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import test from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url)));
 const distRoot = path.join(repositoryRoot, "dist", "drs");
 const buildScript = path.join(repositoryRoot, "scripts", "build-drs-production.mjs");
 const packagePath = path.join(repositoryRoot, "package.json");
+const quoteTargetPath =
+  "C:/CodexWork/訓練資料/2025.10.02-漢皇SUPER小伍哥/02-報價單/01-業主報價/小伍哥報價單0420-2.pdf";
+const contractTargetPath =
+  "C:/CodexWork/訓練資料/2025.10.02-漢皇SUPER小伍哥/02-報價單/01-業主報價/漢皇SUPER-4F住宅修改工程合約.pdf";
+const pdfFixtureRoot = path.join(
+  repositoryRoot,
+  "tests",
+  "budget",
+  "fixtures",
+  "quote-healthcheck-pdf",
+);
 const manifestPath = path.join(
   repositoryRoot,
   "src",
@@ -62,6 +73,81 @@ async function snapshot(root) {
 
 function entryPath(publicPath) {
   return path.join(distRoot, publicPath.slice(1), "index.html");
+}
+
+function installPdfJsNodePolyfills() {
+  if (!Uint8Array.prototype.toHex) {
+    Object.defineProperty(Uint8Array.prototype, "toHex", {
+      value() {
+        return Array.from(this, (byte) => byte.toString(16).padStart(2, "0")).join("");
+      },
+    });
+  }
+  if (!Map.prototype.getOrInsertComputed) {
+    Object.defineProperty(Map.prototype, "getOrInsertComputed", {
+      value(key, createValue) {
+        if (!this.has(key)) this.set(key, createValue(key));
+        return this.get(key);
+      },
+    });
+  }
+  if (!globalThis.DOMMatrix) {
+    globalThis.DOMMatrix = class DOMMatrix {
+      constructor(values = [1, 0, 0, 1, 0, 0]) {
+        [this.a, this.b, this.c, this.d, this.e, this.f] = [
+          Number(values[0] ?? 1),
+          Number(values[1] ?? 0),
+          Number(values[2] ?? 0),
+          Number(values[3] ?? 1),
+          Number(values[4] ?? 0),
+          Number(values[5] ?? 0),
+        ];
+      }
+
+      multiplySelf(other) {
+        const next = {
+          a: this.a * other.a + this.c * other.b,
+          b: this.b * other.a + this.d * other.b,
+          c: this.a * other.c + this.c * other.d,
+          d: this.b * other.c + this.d * other.d,
+          e: this.a * other.e + this.c * other.f + this.e,
+          f: this.b * other.e + this.d * other.f + this.f,
+        };
+        Object.assign(this, next);
+        return this;
+      }
+
+      preMultiplySelf(other) {
+        const current = new globalThis.DOMMatrix([this.a, this.b, this.c, this.d, this.e, this.f]);
+        Object.assign(this, other);
+        return this.multiplySelf(current);
+      }
+
+      translateSelf(x = 0, y = 0) {
+        return this.multiplySelf(new globalThis.DOMMatrix([1, 0, 0, 1, x, y]));
+      }
+
+      scaleSelf(x = 1, y = x) {
+        return this.multiplySelf(new globalThis.DOMMatrix([x, 0, 0, y, 0, 0]));
+      }
+
+      invertSelf() {
+        const determinant = this.a * this.d - this.b * this.c;
+        const { a, b, c, d, e, f } = this;
+        Object.assign(this, {
+          a: d / determinant,
+          b: -b / determinant,
+          c: -c / determinant,
+          d: a / determinant,
+          e: (c * f - d * e) / determinant,
+          f: (b * e - a * f) / determinant,
+        });
+        return this;
+      }
+    };
+  }
+  globalThis.ImageData ||= class ImageData {};
+  globalThis.Path2D ||= class Path2D {};
 }
 
 test("root package keeps existing JavaScript interpretation unchanged", async () => {
@@ -158,20 +244,141 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
     assert.doesNotMatch(repositoryRelative, /(?:credential|secret|token|api[_-]?key)/iu, file);
   }
 
-  const javascript = (
-    await Promise.all(
-      assetFiles
-        .filter((file) => /\.(?:m?js)$/iu.test(file))
-        .map((file) => readFile(path.join(distRoot, file), "utf8")),
-    )
-  ).join("\n");
+  const javascriptAssets = await Promise.all(
+    assetFiles
+      .filter((file) => /\.(?:m?js)$/iu.test(file))
+      .map(async (file) => ({ file, source: await readFile(path.join(distRoot, file), "utf8") })),
+  );
+  const javascript = javascriptAssets.map(({ source }) => source).join("\n");
+  const applicationJavascript = javascriptAssets
+    .filter(({ file }) => !file.includes("/site/preview_floor_plan/vendor/pdfjs/"))
+    .map(({ source }) => source)
+    .join("\n");
   assert.doesNotMatch(javascript, /LaibePdfPlanExactSourceQa|LaibePlanPuzzleQa|__LAIBE_[A-Z0-9_]*_QA/iu);
   assert.doesNotMatch(javascript, /tests[\\/]manual|(?:https?:)?\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?/iu);
-  assert.doesNotMatch(javascript, /(?:\/src\/|code\.html)/iu);
+  assert.doesNotMatch(applicationJavascript, /(?:\/src\/|code\.html)/iu);
 
   const drawing = await readFile(entryPath("/pcm/drawing-check"), "utf8");
   assert.match(drawing, /圖說辨識功能正在整理中/u);
   assert.match(drawing, /返回 DRS 首頁/u);
+});
+
+test("production build closes the built adapter PDF.js runtime and parses the Human quote and contract", async () => {
+  installPdfJsNodePolyfills();
+  delete globalThis.pdfjsLib;
+  runBuild();
+  const assetFiles = (await listFiles(distRoot)).filter((file) => file.startsWith("assets/"));
+  const adapterFile = assetFiles.find((file) => (
+    file.endsWith("/src/lib/budget/quote-healthcheck/browser-adapter.js")
+  ));
+  const pdfJsFile = assetFiles.find((file) => (
+    file.endsWith("/site/preview_floor_plan/vendor/pdfjs/pdf.mjs")
+  ));
+  const pdfWorkerFile = assetFiles.find((file) => (
+    file.endsWith("/site/preview_floor_plan/vendor/pdfjs/pdf.worker.mjs")
+  ));
+  assert.ok(adapterFile, "built browser adapter");
+  const adapter = await import(
+    `${pathToFileURL(path.join(distRoot, adapterFile)).href}?test=${crypto.randomUUID()}`
+  );
+
+  let guardedParserCalls = 0;
+  const parserGuard = {
+    async extractPdfTextWithPdfJs() {
+      guardedParserCalls += 1;
+      return null;
+    },
+    async loadPdfJsModule() {
+      guardedParserCalls += 1;
+      return null;
+    },
+  };
+  for (const [fixtureName, expectedStatus] of [
+    ["adversarial-action.pdf", "UNSUPPORTED_ACTIVE_CONTENT"],
+    ["encrypted.pdf", "ENCRYPTED_PDF"],
+  ]) {
+    const result = await adapter.inspectQuotePdfFile(
+      new File([await readFile(path.join(pdfFixtureRoot, fixtureName))], fixtureName, {
+        type: "application/pdf",
+      }),
+      parserGuard,
+    );
+    assert.equal(result.status, expectedStatus, fixtureName);
+  }
+  assert.equal(guardedParserCalls, 0, "active/encrypted PDFs must stop before PDF.js");
+
+  const quoteResult = await adapter.inspectQuotePdfFile(
+    new File([await readFile(quoteTargetPath)], "小伍哥報價單0420-2.pdf", {
+      type: "application/pdf",
+    }),
+  );
+  const contractResult = await adapter.inspectContractPdfFile(
+    new File([await readFile(contractTargetPath)], "漢皇SUPER-4F住宅修改工程合約.pdf", {
+      type: "application/pdf",
+    }),
+  );
+  assert.deepEqual(
+    {
+      runtimeDependencies: {
+        pdfJs: Boolean(pdfJsFile),
+        pdfWorker: Boolean(pdfWorkerFile),
+      },
+      quote: {
+        status: quoteResult.status,
+        pageCount: quoteResult.summary?.pageCount ?? null,
+        report: quoteResult.report,
+      },
+      contract: {
+        status: contractResult.status,
+        pageCount: contractResult.summary?.pageCount ?? null,
+        categories: contractResult.summary?.clauseDraft?.length ?? null,
+        report: contractResult.report,
+      },
+    },
+    {
+      runtimeDependencies: { pdfJs: true, pdfWorker: true },
+      quote: { status: "PARSER_READY", pageCount: 4, report: null },
+      contract: {
+        status: "PARSER_READY",
+        pageCount: 6,
+        categories: 7,
+        report: null,
+      },
+    },
+  );
+  const [builtPdfJs, sourcePdfJs, builtPdfWorker, sourcePdfWorker] = await Promise.all([
+    readFile(path.join(distRoot, pdfJsFile)),
+    readFile(path.join(repositoryRoot, "site/preview_floor_plan/vendor/pdfjs/pdf.mjs")),
+    readFile(path.join(distRoot, pdfWorkerFile)),
+    readFile(path.join(repositoryRoot, "site/preview_floor_plan/vendor/pdfjs/pdf.worker.mjs")),
+  ]);
+  assert.deepEqual(builtPdfJs, sourcePdfJs, "built PDF.js module bytes");
+  assert.deepEqual(builtPdfWorker, sourcePdfWorker, "built PDF.js worker bytes");
+});
+
+test("production build rejects an undeclared local dynamic module before replacing output", async () => {
+  const probeRelative = "dist/drs/.dynamic-import-dependency-probe.mjs";
+  const probePath = path.join(repositoryRoot, probeRelative);
+  try {
+    runBuild();
+    await writeFile(
+      probePath,
+      'export const dependency = import("./missing-runtime-dependency.mjs");\n',
+      "utf8",
+    );
+    const before = await snapshot(distRoot);
+    const result = executeBuild({ DRS_BUILD_DEPENDENCY_PROBE: probeRelative });
+    assert.notEqual(result.status, 0, result.stdout);
+    assert.match(
+      result.stderr,
+      /Unknown local JavaScript module dependency "\.\/missing-runtime-dependency\.mjs" referenced by "dist\/drs\/\.dynamic-import-dependency-probe\.mjs"/u,
+      result.stderr,
+    );
+    assert.deepEqual(await snapshot(distRoot), before, "failed dependency closure must preserve output");
+  } finally {
+    await rm(probePath, { force: true });
+    runBuild();
+  }
 });
 
 test("production build rejects every undeclared single-quoted local dependency", async (context) => {
@@ -182,7 +389,7 @@ test("production build rejects every undeclared single-quoted local dependency",
   ];
   for (const probe of probes) {
     await context.test(probe.kind, async () => {
-      const probeRelative = `.superpowers/sdd/task-1-unknown-${probe.kind}-probe.html`;
+      const probeRelative = `dist/drs/.unknown-${probe.kind}-dependency-probe.html`;
       const probePath = path.join(repositoryRoot, probeRelative);
       const sentinelPath = path.join(distRoot, `.dependency-probe-${probe.kind}-sentinel`);
       try {
@@ -199,7 +406,7 @@ test("production build rejects every undeclared single-quoted local dependency",
         assert.match(
           result.stderr,
           new RegExp(
-            `Unknown local (?:href|src) dependency ".+" referenced by "\\.superpowers/sdd/task-1-unknown-${probe.kind}-probe\\.html"`,
+            `Unknown local (?:href|src) dependency ".+" referenced by "dist/drs/\\.unknown-${probe.kind}-dependency-probe\\.html"`,
             "u",
           ),
           result.stderr,
@@ -216,7 +423,7 @@ test("production build rejects every undeclared single-quoted local dependency",
 });
 
 test("single-quoted known assets are accepted without parsing data attributes or text as dependencies", async () => {
-  const probeRelative = ".superpowers/sdd/task-1-known-single-quote-probe.html";
+  const probeRelative = "dist/drs/.known-single-quote-dependency-probe.html";
   const probePath = path.join(repositoryRoot, probeRelative);
   try {
     await writeFile(

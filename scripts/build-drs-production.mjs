@@ -32,6 +32,8 @@ const SOURCE_ENTRY_BY_ID = Object.freeze({
 const ASSET_ALLOWLIST = Object.freeze([
   "assets/logo/laibe_offer.svg",
   "src/lib/budget/quote-healthcheck/browser-adapter.js",
+  "site/preview_floor_plan/vendor/pdfjs/pdf.mjs",
+  "site/preview_floor_plan/vendor/pdfjs/pdf.worker.mjs",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/app.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/owner-workspace-bootstrap.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
@@ -60,6 +62,17 @@ const ASSET_ALLOWLIST = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-shell.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/styles.css",
+]);
+
+const DECLARED_LOCAL_RUNTIME_DEPENDENCIES = Object.freeze([
+  Object.freeze({
+    source: "src/lib/budget/quote-healthcheck/browser-adapter.js",
+    reference: "../../../../site/preview_floor_plan/vendor/pdfjs/pdf.mjs",
+  }),
+  Object.freeze({
+    source: "site/preview_floor_plan/vendor/pdfjs/pdf.mjs",
+    reference: "./pdf.worker.mjs",
+  }),
 ]);
 
 const deployNodes = PCM_FLOW_ROUTE_MANIFEST.nodes.filter(
@@ -161,6 +174,21 @@ function transformManifestRoutes(source) {
 }
 
 function rewriteJavaScript(source, sourceRelative) {
+  const localModulePatterns = [
+    /\b(?:import|export)\s+(?:[^"'`]*?\s+from\s+)?(["'])(?<reference>\.{1,2}\/[^"'`\s]+)\1/gu,
+    /\bimport\s*\(\s*(["'])(?<reference>\.{1,2}\/[^"'`\s]+)\1\s*\)/gu,
+  ];
+  for (const pattern of localModulePatterns) {
+    for (const match of source.matchAll(pattern)) {
+      const { reference } = match.groups;
+      const resolved = resolveRepositoryReference(sourceRelative, reference);
+      if (!allowlistedAssets.has(resolved)) {
+        throw new Error(
+          `Unknown local JavaScript module dependency ${JSON.stringify(reference)} referenced by ${JSON.stringify(sourceRelative)}`,
+        );
+      }
+    }
+  }
   return source.replace(
     /((?:\.\.?\/)+[A-Za-z0-9_./-]*code\.html(?:[?#][^"'`\s]*)?)/gu,
     (reference) => {
@@ -187,6 +215,23 @@ const transformedAssets = new Map();
 for (const relative of ASSET_ALLOWLIST) {
   const source = await readFile(path.join(repositoryRoot, relative));
   transformedAssets.set(relative, transformAsset(source, relative));
+}
+for (const { source, reference } of DECLARED_LOCAL_RUNTIME_DEPENDENCIES) {
+  const sourceBytes = transformedAssets.get(source);
+  if (!sourceBytes) {
+    throw new Error(`Declared runtime dependency source is not allowlisted: ${JSON.stringify(source)}`);
+  }
+  if (!sourceBytes.toString("utf8").includes(reference)) {
+    throw new Error(
+      `Declared runtime dependency ${JSON.stringify(reference)} is missing from ${JSON.stringify(source)}`,
+    );
+  }
+  const resolved = resolveRepositoryReference(source, reference);
+  if (!transformedAssets.has(resolved)) {
+    throw new Error(
+      `Declared runtime dependency is not allowlisted: ${JSON.stringify(resolved)} referenced by ${JSON.stringify(source)}`,
+    );
+  }
 }
 
 const contentHash = createHash("sha256");
@@ -297,7 +342,12 @@ if (dependencyProbe) {
   if (!probeRelative || probeRelative.startsWith("../") || path.isAbsolute(probeRelative)) {
     throw new Error("DRS_BUILD_DEPENDENCY_PROBE must stay inside the repository worktree");
   }
-  transformEntryHtml(await readFile(probePath, "utf8"), probeRelative);
+  const probeSource = await readFile(probePath, "utf8");
+  if (/\.m?js$/iu.test(probeRelative)) {
+    rewriteJavaScript(probeSource, probeRelative);
+  } else {
+    transformEntryHtml(probeSource, probeRelative);
+  }
 }
 
 await rm(distRoot, { recursive: true, force: true });
