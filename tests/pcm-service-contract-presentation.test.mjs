@@ -60,6 +60,42 @@ function collectElements(node) {
   return [node, ...node.children.flatMap(collectElements)];
 }
 
+const MIXED_ENGLISH_INTERNAL_TERMS = Object.freeze([
+  "AI Prompt",
+  "DRS Review",
+  "Review",
+  "Objection",
+  "Override",
+  "Case Event",
+  "append-only",
+  "case ID",
+  "document ID",
+  "detail drawings",
+  "detail",
+  "document bytes",
+  "PDF document ID",
+  "version",
+  "reference",
+  "runtime event",
+  "Stage Runtime Events",
+  "source document",
+  "source version",
+  "successor version",
+  "Contract",
+  "Decision",
+  "Record",
+  "timestamp",
+  "OCR",
+  "ID",
+  "binding fields",
+  "portfolio",
+  " vs ",
+]);
+
+function findMixedEnglishInternalTerms(text) {
+  return MIXED_ENGLISH_INTERNAL_TERMS.filter((term) => text.includes(term));
+}
+
 function createContractDocument(contractRoot) {
   return {
     body: new TestElement("body"),
@@ -100,6 +136,27 @@ test("contract presentation formatter resolves known and unknown source tokens s
     "AI 初步分析 → 授權人工審查 → DRS 正式書面審查結果；終止 DRS 案件治理服務；萊比平台帳戶",
   );
   assert.equal(formatContractPresentationText("APPEND-ONLY RECORD"), "僅能追加的案件紀錄");
+  for (const [source, expected] of [
+    ["LaiBE Decision & Record System／裝潢決策系統", "LaiBE DRS 裝潢決策與案件紀錄系統"],
+    ["Decision & Record System／裝潢決策系統", "裝潢決策與案件紀錄系統"],
+    ["DRS Review、Review、Objection、Override", "DRS 書面審查、審查、異議、另行決策"],
+    ["Owner Objection／Override；Review Record；Review ID", "業主異議／另行決策；審查紀錄；審查紀錄編號"],
+    ["AI Prompt；Case Event；append-only", "AI 分析規則；案件事件；僅能追加"],
+    ["case ID；document ID；source document；source version；successor version", "案件識別碼；文件識別碼；來源文件；來源版本；後續版本"],
+    ["detail drawings；detail；document bytes；PDF document ID", "細部圖；施工細節；文件內容；PDF 文件識別碼"],
+    ["Stage Runtime Events；runtime event；version；reference；timestamp；OCR", "階段後續案件事件；後續案件事件；版本；關聯；時間；文字辨識"],
+    ["Contract、Decision、Record", "契約、決策、紀錄"],
+    ["契約 ID；binding fields；portfolio", "契約識別碼；必要綁定欄位；作品集"],
+    ["約定要交什麼 vs 實際交了什麼", "約定交付內容與實際交付內容"],
+    ["目前有效版本 vs 前階段已確認內容", "目前有效版本與前階段已確認內容"],
+  ]) {
+    assert.equal(formatContractPresentationText(source), expected, source);
+  }
+  assert.equal(
+    formatContractPresentationText("LaiBE DRS AI PDF SHA-256 LINE 3D"),
+    "LaiBE DRS AI PDF SHA-256 LINE 3D",
+    "approved brand and product acronyms remain intact",
+  );
   assert.equal(
     formatContractPresentationText("DESIGN_FEE != DRS_REVIEW_FEE"),
     "設計費與 DRS 審查服務費為不同費用",
@@ -141,6 +198,11 @@ test("both canonical contract templates cross the safe presentation boundary wit
     assert.doesNotMatch(presented, /待補齊必要資料/u, `${label} known placeholder coverage`);
     assert.doesNotMatch(presented, /待法務確認的契約用語/u, `${label} known term coverage`);
     assert.doesNotMatch(presented, /APPEND-ONLY|```|!=/u, `${label} presentation syntax`);
+    assert.deepEqual(
+      findMixedEnglishInternalTerms(presented),
+      [],
+      `${label} mixed-English internal presentation terms`,
+    );
   }
 });
 
@@ -211,6 +273,19 @@ test("protected design contract production path renders natural contract languag
       elements.some(({ tagName, textContent }) => tagName === "P" && textContent.trim() === "text"),
       false,
       "fence language never becomes an odd paragraph",
+    );
+
+    const page02 = contractRoot.children.find(
+      (element) => element.getAttribute("data-contract-page") === "1",
+    );
+    assert.ok(page02, "design page 02 panel rendered");
+    const page02Text = collectText(page02);
+    assert.match(page02Text, /設計審查流程/u);
+    assert.match(page02Text, /DRS 書面審查/u);
+    assert.deepEqual(
+      findMixedEnglishInternalTerms(page02Text),
+      [],
+      "design page 02 uses only product-facing contract language",
     );
   } finally {
     if (previousDocument === undefined) delete globalThis.document;

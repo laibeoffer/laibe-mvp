@@ -1029,8 +1029,16 @@ const HYPHEN_TERM_PRESENTATION_LABELS = deepFreeze({
 });
 
 const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
+  "actor、time、case ID、action、source document、source version、current state、next owner/action": "作成人、時間、案件識別碼、事件內容、來源文件、來源版本、目前狀態、下一位負責人／下一步行動",
+  "LaiBE Decision & Record System／裝潢決策系統": "LaiBE DRS 裝潢決策與案件紀錄系統",
+  "Decision & Record System／裝潢決策系統": "裝潢決策與案件紀錄系統",
   "DRS REVIEW PASSED != DESIGN PAYMENT AUTOMATICALLY DUE": "DRS 審查通過不代表設計費自動到期應付",
   "DESIGN_FEE != DRS_REVIEW_FEE": "設計費與 DRS 審查服務費為不同費用",
+  "Owner Objection／Override": "業主異議／另行決策",
+  "Stage Runtime Events": "階段後續案件事件",
+  "append-only Case Event": "只可追加的案件事件",
+  "約定要交什麼 vs 實際交了什麼": "約定交付內容與實際交付內容",
+  "目前有效版本 vs 前階段已確認內容": "目前有效版本與前階段已確認內容",
   "APPEND-ONLY RECORD": "僅能追加的案件紀錄",
   "DESIGN PAYMENT AUTOMATICALLY DUE": "設計費自動到期應付",
   "EXTERNAL PROFESSIONAL REVIEW REQUIRED": "需要外部專業人員審查",
@@ -1052,15 +1060,55 @@ const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
   "DRS REVIEW": "DRS 書面審查",
   "DRS Review Record": "DRS 書面審查紀錄",
   "Review、Objection、Override": "審查、異議、另行決策",
+  "PDF document ID": "PDF 文件識別碼",
+  "detail drawings": "細部圖",
+  "document bytes": "文件內容",
+  "successor version": "後續版本",
+  "source document": "來源文件",
+  "source version": "來源版本",
+  "runtime event": "後續案件事件",
+  "unresolved placeholder": "未解析的必要欄位",
+  "next owner/action": "下一位負責人／下一步行動",
+  "current state": "目前狀態",
+  "Owner Objection": "業主異議",
   "Owner Override": "業主另行決策",
   "Review Record": "審查紀錄",
   "Review ID": "審查紀錄編號",
   "Case Event": "案件事件",
+  "DRS Review": "DRS 書面審查",
+  "AI Prompt": "AI 分析規則",
+  "binding fields": "必要綁定欄位",
+  "portfolio": "作品集",
+  " ID": "識別碼",
+  "document ID": "文件識別碼",
+  "case ID": "案件識別碼",
+  "append-only": "僅能追加",
   "source of truth": "正式資料基準",
   "AI output": "AI 輸出結果",
   "binding values": "綁定資料",
   "Source 契約": "來源契約",
   "Schedule": "交付時程",
+});
+
+const MIXED_ENGLISH_TERM_PRESENTATION_LABELS = deepFreeze({
+  Contract: "契約",
+  Decision: "決策",
+  Record: "紀錄",
+  Review: "審查",
+  Objection: "異議",
+  Override: "另行決策",
+  timestamp: "時間",
+  OCR: "文字辨識",
+  detail: "施工細節",
+  version: "版本",
+  reference: "關聯",
+  result: "結果",
+  actor: "作成人",
+  time: "時間",
+  action: "事件內容",
+  termination: "終止事項",
+  placeholder: "必要欄位",
+  ID: "識別碼",
 });
 
 const SINGLE_INTERNAL_TERM_PRESENTATION_LABELS = deepFreeze({
@@ -1115,6 +1163,10 @@ export function formatContractPresentationText(text) {
   presented = presented.replace(
     /\b(?:APPROVE|BUSINESS|CONSUMER|DISPUTED|NONE|OVERRIDE|PAID|PASS|TRUE|UNRESOLVED)\b/g,
     (token) => SINGLE_INTERNAL_TERM_PRESENTATION_LABELS[token],
+  );
+  presented = presented.replace(
+    /\b(?:Contract|Decision|Record|Review|Objection|Override|timestamp|OCR|detail|version|reference|result|actor|time|action|termination|placeholder|ID)\b/g,
+    (token) => MIXED_ENGLISH_TERM_PRESENTATION_LABELS[token],
   );
   presented = presented.replace(/\bPART\s+0*(\d+)\b/g, (_match, partNumber) => (
     `第 ${Number.parseInt(partNumber, 10)} 部分`
