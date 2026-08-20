@@ -92,6 +92,7 @@ _archive/
 docs/archive_md/
 archive/
 backup/
+.superpowers/
 
 # OS / editor noise
 .DS_Store
