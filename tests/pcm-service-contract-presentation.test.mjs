@@ -152,6 +152,23 @@ test("contract presentation formatter resolves known and unknown source tokens s
   ]) {
     assert.equal(formatContractPresentationText(source), expected, source);
   }
+  for (const [ordinaryProse, expected] of [
+    ["portfolios", "portfolios"],
+    ["portfolio-based", "portfolio-based"],
+    ["portfolio2", "portfolio2"],
+    ["binding fields-based", "binding fields-based"],
+    ["valid ID card", "valid 識別碼 card"],
+    ["CASE IDENTITY", "CASE IDENTITY"],
+    ["IDENTIFIER", "IDENTIFIER"],
+    ["reviewing", "reviewing"],
+    ["versioned", "versioned"],
+  ]) {
+    assert.equal(
+      formatContractPresentationText(ordinaryProse),
+      expected,
+      `ordinary prose token boundary: ${ordinaryProse}`,
+    );
+  }
   assert.equal(
     formatContractPresentationText("LaiBE DRS AI PDF SHA-256 LINE 3D"),
     "LaiBE DRS AI PDF SHA-256 LINE 3D",

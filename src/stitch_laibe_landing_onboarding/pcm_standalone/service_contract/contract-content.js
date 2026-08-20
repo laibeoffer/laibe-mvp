@@ -1072,14 +1072,13 @@ const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
   "current state": "目前狀態",
   "Owner Objection": "業主異議",
   "Owner Override": "業主另行決策",
+  "契約之 ID": "契約之識別碼",
+  "契約 ID": "契約識別碼",
   "Review Record": "審查紀錄",
   "Review ID": "審查紀錄編號",
   "Case Event": "案件事件",
   "DRS Review": "DRS 書面審查",
   "AI Prompt": "AI 分析規則",
-  "binding fields": "必要綁定欄位",
-  "portfolio": "作品集",
-  " ID": "識別碼",
   "document ID": "文件識別碼",
   "case ID": "案件識別碼",
   "append-only": "僅能追加",
@@ -1088,6 +1087,12 @@ const CONTRACT_PHRASE_PRESENTATION_LABELS = deepFreeze({
   "binding values": "綁定資料",
   "Source 契約": "來源契約",
   "Schedule": "交付時程",
+});
+
+const COMPLETE_ASCII_TERM_PRESENTATION_LABELS = deepFreeze({
+  "binding fields": "必要綁定欄位",
+  portfolio: "作品集",
+  ID: "識別碼",
 });
 
 const MIXED_ENGLISH_TERM_PRESENTATION_LABELS = deepFreeze({
@@ -1108,7 +1113,6 @@ const MIXED_ENGLISH_TERM_PRESENTATION_LABELS = deepFreeze({
   action: "事件內容",
   termination: "終止事項",
   placeholder: "必要欄位",
-  ID: "識別碼",
 });
 
 const SINGLE_INTERNAL_TERM_PRESENTATION_LABELS = deepFreeze({
@@ -1133,6 +1137,33 @@ function replacePresentationLabels(text, labels) {
   return presented;
 }
 
+function replaceCompleteAsciiTermLabels(text, labels) {
+  let presented = text;
+  const entries = Object.entries(labels).sort(([left], [right]) => right.length - left.length);
+  const isTokenCharacter = (character) => (
+    typeof character === "string" && /[A-Za-z0-9_-]/.test(character)
+  );
+
+  for (const [source, replacement] of entries) {
+    let searchFrom = 0;
+    while (searchFrom < presented.length) {
+      const matchIndex = presented.indexOf(source, searchFrom);
+      if (matchIndex === -1) break;
+      const before = matchIndex > 0 ? presented[matchIndex - 1] : "";
+      const afterIndex = matchIndex + source.length;
+      const after = afterIndex < presented.length ? presented[afterIndex] : "";
+      if (!isTokenCharacter(before) && !isTokenCharacter(after)) {
+        presented = `${presented.slice(0, matchIndex)}${replacement}${presented.slice(afterIndex)}`;
+        searchFrom = matchIndex + replacement.length;
+      } else {
+        searchFrom = afterIndex;
+      }
+    }
+  }
+
+  return presented;
+}
+
 export function formatContractPresentationText(text) {
   if (typeof text !== "string") return "";
 
@@ -1144,6 +1175,7 @@ export function formatContractPresentationText(text) {
   presented = presented.replace(/\{\{[^{}\r\n]*\}\}/g, "待補齊必要資料");
   presented = presented.replace(/\{\{[^\r\n]*/g, "待補齊必要資料");
   presented = replacePresentationLabels(presented, CONTRACT_PHRASE_PRESENTATION_LABELS);
+  presented = replaceCompleteAsciiTermLabels(presented, COMPLETE_ASCII_TERM_PRESENTATION_LABELS);
   presented = presented.replace(/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/g, (token) => (
     Object.hasOwn(CONTRACT_TERM_PRESENTATION_LABELS, token)
       ? CONTRACT_TERM_PRESENTATION_LABELS[token]
@@ -1165,7 +1197,7 @@ export function formatContractPresentationText(text) {
     (token) => SINGLE_INTERNAL_TERM_PRESENTATION_LABELS[token],
   );
   presented = presented.replace(
-    /\b(?:Contract|Decision|Record|Review|Objection|Override|timestamp|OCR|detail|version|reference|result|actor|time|action|termination|placeholder|ID)\b/g,
+    /\b(?:Contract|Decision|Record|Review|Objection|Override|timestamp|OCR|detail|version|reference|result|actor|time|action|termination|placeholder)\b/g,
     (token) => MIXED_ENGLISH_TERM_PRESENTATION_LABELS[token],
   );
   presented = presented.replace(/\bPART\s+0*(\d+)\b/g, (_match, partNumber) => (
