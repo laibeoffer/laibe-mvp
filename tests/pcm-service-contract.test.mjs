@@ -200,6 +200,7 @@ test("signing readiness evaluates the production initial envelope and fails clos
 
   assert.deepEqual(INITIAL_SIGNING_ENVELOPE, {
     contractVersionHash: "",
+    placeholdersResolvedForVersionHash: "",
     ownerIdentityVerified: false,
     ownerPartyId: "",
     serviceProviderPartySnapshot: null,
@@ -213,6 +214,7 @@ test("signing readiness evaluates the production initial envelope and fails clos
   const readyEnvelope = {
     ...INITIAL_SIGNING_ENVELOPE,
     contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    placeholdersResolvedForVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
     ownerIdentityVerified: true,
     ownerPartyId: "owner-001",
     serviceProviderPartySnapshot: {
@@ -234,6 +236,8 @@ test("signing readiness evaluates the production initial envelope and fails clos
     ["uppercase SHA-256", (envelope) => { envelope.contractVersionHash = EXPECTED_CONTRACT_SOURCE_SHA256.toUpperCase(); }],
     ["nonhex SHA-256", (envelope) => { envelope.contractVersionHash = "g".repeat(64); }],
     ["different lowercase SHA-256", (envelope) => { envelope.contractVersionHash = "a".repeat(64); }],
+    ["missing placeholder proof", (envelope) => delete envelope.placeholdersResolvedForVersionHash],
+    ["different placeholder proof version", (envelope) => { envelope.placeholdersResolvedForVersionHash = "a".repeat(64); }],
     ["owner identity false", (envelope) => { envelope.ownerIdentityVerified = false; }],
     ["missing owner party id", (envelope) => delete envelope.ownerPartyId],
     ["empty owner party id", (envelope) => { envelope.ownerPartyId = ""; }],
@@ -297,6 +301,7 @@ test("signing readiness accepts only primitive strings without invoking caller c
   const { evaluateSigningReadiness } = await import(moduleUrl("app.js"));
   const readyEnvelope = {
     contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    placeholdersResolvedForVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
     ownerIdentityVerified: true,
     ownerPartyId: "owner-001",
     serviceProviderPartySnapshot: {
@@ -371,6 +376,7 @@ test("signing readiness accepts only plain own-data envelope records", async () 
   };
   const readyEnvelope = {
     contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    placeholdersResolvedForVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
     ownerIdentityVerified: true,
     ownerPartyId: "owner-001",
     serviceProviderPartySnapshot: readyProvider,
@@ -421,6 +427,7 @@ test("signing readiness accepts only plain own-data provider records", async () 
   };
   const readyEnvelope = {
     contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    placeholdersResolvedForVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
     ownerIdentityVerified: true,
     ownerPartyId: "owner-001",
     serviceProviderPartySnapshot: readyProvider,
@@ -455,6 +462,7 @@ test("signing readiness rejects accessors and non-enumerable required facts with
   };
   const readyEnvelope = {
     contractVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
+    placeholdersResolvedForVersionHash: EXPECTED_CONTRACT_SOURCE_SHA256,
     ownerIdentityVerified: true,
     ownerPartyId: "owner-001",
     serviceProviderPartySnapshot: readyProvider,

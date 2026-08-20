@@ -3,6 +3,7 @@ import {
   CONTRACT_META,
   CONTRACT_SOURCE,
   CONTRACT_SOURCE_SHA256,
+  formatContractPresentationText,
   KEY_CLAUSES,
   LIFECYCLE,
 } from "./contract-content.js?v=20260816-turnkey-fee-v5-rework";
@@ -104,6 +105,7 @@ const EMPTY_ARGUMENTS = ObjectFreeze([]);
 
 const ENVELOPE_FACT_NAMES = Object.freeze([
   "contractVersionHash",
+  "placeholdersResolvedForVersionHash",
   "ownerIdentityVerified",
   "ownerPartyId",
   "serviceProviderPartySnapshot",
@@ -327,6 +329,7 @@ async function loadDesignContractSource() {
 
 const READINESS_ITEMS = Object.freeze([
   ["正式契約版本", "正式契約版本尚未固定"],
+  ["契約必要資料", "契約必要資料尚未依本版本完整帶入"],
   ["甲方身分", "甲方身分尚未完成確認"],
   ["服務方資料", "自然人服務方資料尚未完成確認"],
   ["簽署紀錄", "正式簽署紀錄功能尚未就緒"],
@@ -335,6 +338,7 @@ const READINESS_ITEMS = Object.freeze([
 
 export const INITIAL_SIGNING_ENVELOPE = Object.freeze({
   contractVersionHash: "",
+  placeholdersResolvedForVersionHash: "",
   ownerIdentityVerified: false,
   ownerPartyId: "",
   serviceProviderPartySnapshot: null,
@@ -387,6 +391,7 @@ export function evaluateSigningReadiness(input = {}) {
   });
   const envelopeFacts = extractOwnDataFacts(input, ENVELOPE_FACT_NAMES);
   const contractVersionHash = envelopeFacts?.contractVersionHash;
+  const placeholdersResolvedForVersionHash = envelopeFacts?.placeholdersResolvedForVersionHash;
   const ownerIdentityVerified = envelopeFacts?.ownerIdentityVerified;
   const ownerPartyId = envelopeFacts?.ownerPartyId;
   const serviceProviderPartySnapshot = envelopeFacts?.serviceProviderPartySnapshot;
@@ -395,6 +400,9 @@ export function evaluateSigningReadiness(input = {}) {
 
   if (contractVersionHash !== CONTRACT_SOURCE_SHA256) {
     reasons.push("正式契約版本尚未固定");
+  }
+  if (placeholdersResolvedForVersionHash !== CONTRACT_SOURCE_SHA256) {
+    reasons.push("契約必要資料尚未依本版本完整帶入");
   }
   if (
     ownerIdentityVerified !== true ||
@@ -485,7 +493,7 @@ export function resolveContractContext(input = {}) {
 function createTextElement(tagName, text, className) {
   const element = document.createElement(tagName);
   if (className) element.className = className;
-  element.textContent = text;
+  element.textContent = formatContractPresentationText(text);
   return element;
 }
 
@@ -519,7 +527,7 @@ function createContractParagraph(text, highlightRules = BEGINNER_HIGHLIGHT_RULES
   }
 
   if (!highlight) {
-    paragraph.textContent = text;
+    paragraph.textContent = formatContractPresentationText(text);
     return paragraph;
   }
 

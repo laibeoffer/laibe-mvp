@@ -16,7 +16,7 @@ const serviceContractDir = path.join(
 );
 const frozenContractPath = path.join(serviceContractDir, "contract-content.js");
 const FROZEN_CONTRACT_FILE_SHA256 =
-  "2d8fa0dab74a7e4903f93ef49368effb722cc32937f617d66fea0646a25f8f11";
+  "d416ff49934264b8b3d4076f961d51f939bc587f5f9bb1dac4085b2e4b0dafe0";
 const FROZEN_CONTRACT_SOURCE_SHA256 =
   "d398182f197a4d6e8f8adba08a8b720aab274f5e9a8756c49aef359b2bf78359";
 
@@ -617,6 +617,7 @@ test("post-load intrinsic pollution cannot promote signing readiness or contract
 
     const readyEnvelope = {
       contractVersionHash: CONTRACT_SOURCE_SHA256,
+      placeholdersResolvedForVersionHash: CONTRACT_SOURCE_SHA256,
       ownerIdentityVerified: true,
       ownerPartyId: "owner-001",
       serviceProviderPartySnapshot: {
@@ -826,7 +827,9 @@ class TestDocument {
 }
 
 test("complete DOM renders every frozen heading and print works while signing stays disabled", async () => {
-  const { CONTRACT_SOURCE } = await import(moduleUrl("contract-content.js"));
+  const { CONTRACT_SOURCE, formatContractPresentationText } = await import(
+    moduleUrl("contract-content.js")
+  );
   const nodes = new Map([
     ["[data-contract]", new TestElement("article")],
     ["[data-readiness-list]", new TestElement("ol")],
@@ -851,7 +854,7 @@ test("complete DOM renders every frozen heading and print works while signing st
     await import(moduleUrl("app.js", `?dom=${Date.now()}`));
     const expectedHeadings = CONTRACT_SOURCE.split("\n")
       .filter((line) => /^(#{1,3})\s+/.test(line))
-      .map((line) => line.replace(/^(#{1,3})\s+/, ""));
+      .map((line) => formatContractPresentationText(line.replace(/^(#{1,3})\s+/, "")));
     const descendants = [];
     const collect = (element) => {
       for (const child of element.children) {
