@@ -1440,6 +1440,196 @@ p {
   }
 }
 
+/* Owner-authorized Google Calendar remains a bounded decision surface. */
+.owner-google-calendar {
+  display: grid;
+  min-width: 0;
+  padding: 22px 24px;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(220px, .72fr) minmax(0, 1.28fr);
+  gap: 18px 22px;
+  border-top: 1px solid var(--line);
+  background: rgb(8 12 15 / 72%);
+}
+
+.owner-google-calendar__summary {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+}
+
+.owner-google-calendar__summary h3,
+.owner-google-calendar__summary p,
+.owner-google-calendar__empty p,
+.owner-google-calendar__sharing p {
+  margin: 0;
+}
+
+.owner-google-calendar__summary h3 {
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.owner-google-calendar__summary > p:not(.eyebrow),
+.owner-google-calendar__empty p,
+.owner-google-calendar__sharing p {
+  color: var(--muted);
+  font-size: .76rem;
+  line-height: 1.6;
+}
+
+.owner-google-calendar__summary > strong {
+  color: var(--paper-soft);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.owner-google-calendar__summary button {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 138 43 / 55%);
+  border-radius: 999px;
+  background: rgb(255 138 43 / 12%);
+  color: var(--paper);
+  cursor: pointer;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 900;
+}
+
+.owner-google-calendar__summary button:focus-visible {
+  outline: 3px solid rgb(242 193 78 / 80%);
+  outline-offset: 3px;
+}
+
+.owner-google-calendar__summary button:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
+.owner-google-calendar__viewer {
+  min-width: 0;
+  min-height: 210px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgb(255 255 255 / 2.5%);
+}
+
+.owner-google-calendar__viewer iframe {
+  display: block;
+  width: 100%;
+  min-height: 340px;
+  border: 0;
+  background: #fff;
+}
+
+.owner-google-calendar__empty {
+  display: grid;
+  min-height: 210px;
+  padding: 24px;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.owner-google-calendar__viewer iframe:not([hidden]) + .owner-google-calendar__empty {
+  display: none;
+}
+
+.owner-google-calendar__sharing {
+  display: grid;
+  margin: 0;
+  padding: 14px 16px;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.owner-google-calendar__sharing legend {
+  padding-inline: 6px;
+  color: var(--paper-soft);
+  font-size: .72rem;
+  font-weight: 850;
+}
+
+.owner-google-calendar__sharing label {
+  display: flex;
+  min-height: 44px;
+  gap: 10px;
+  align-items: center;
+  color: var(--paper-soft);
+  font-size: .76rem;
+  font-weight: 750;
+}
+
+.owner-google-calendar__sharing p {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 760px) {
+  .owner-google-calendar {
+    padding: 18px;
+    grid-template-columns: 1fr;
+  }
+
+  .owner-google-calendar__sharing {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-google-calendar__sharing p {
+    grid-column: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .owner-google-calendar__summary button {
+    scroll-behavior: auto;
+  }
+}
+
+.owner-google-calendar-shell[data-owner-google-calendar]
+  .owner-google-calendar-unavailable {
+  align-content: center;
+}
+
+.owner-google-calendar-shell[data-owner-google-calendar]
+  [data-owner-calendar-connect] {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgb(255 138 43 / 55%);
+  border-radius: 999px;
+  background: rgb(255 138 43 / 12%);
+  color: var(--paper);
+  cursor: pointer;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 900;
+}
+
+.owner-google-calendar-shell[data-owner-google-calendar]
+  [data-owner-calendar-connect]:focus-visible {
+  outline: 3px solid rgb(242 193 78 / 80%);
+  outline-offset: 3px;
+}
+
+.owner-google-calendar-shell[data-owner-google-calendar]
+  [data-owner-calendar-connect]:disabled {
+  cursor: not-allowed;
+  opacity: .62;
+}
+
+.owner-google-calendar-shell[data-owner-google-calendar]
+  .owner-google-calendar__sharing {
+  grid-template-columns: 1fr;
+  text-align: left;
+}
+
 .timeline .record-item {
   position: relative;
   padding-left: 30px;

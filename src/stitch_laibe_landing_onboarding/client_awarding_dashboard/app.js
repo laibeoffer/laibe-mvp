@@ -599,6 +599,7 @@ export function normalizeOwnerWorkspaceContext(input = {}) {
       : null;
 
   return {
+    authorityMode: asText(source.authorityMode),
     sessionStatus: asText(source.sessionStatus),
     actor: {
       actorId: asText(actor.actorId),
@@ -747,7 +748,13 @@ export function resolveOwnerWorkspaceState(input) {
     context.serviceAgreement.version !== "" &&
     context.serviceAgreement.caseId !== "" &&
     context.serviceAgreement.caseId === context.caseBinding.caseId;
-  if (!agreementEvidenceComplete) {
+  const verifiedOwnerReadOnlyGrant =
+    context.authorityMode === "server_owner_grant_v1" &&
+    context.serviceAgreement.status === "unavailable" &&
+    context.serviceAgreement.agreementId === "" &&
+    context.serviceAgreement.version === "" &&
+    context.serviceAgreement.caseId === context.caseBinding.caseId;
+  if (!agreementEvidenceComplete && !verifiedOwnerReadOnlyGrant) {
     return {
       state: "ACCESS_DENIED",
       reasonCode: "AGREEMENT_EVIDENCE_INCOMPLETE",
@@ -766,6 +773,7 @@ export function resolveOwnerWorkspaceState(input) {
     OWNER_WORKSPACE_ACCESS.endedAgreementStatus;
   if (
     !agreementEnded &&
+    !verifiedOwnerReadOnlyGrant &&
     context.serviceAgreement.status !==
       OWNER_WORKSPACE_ACCESS.activeAgreementStatus
   ) {
@@ -861,8 +869,11 @@ export function buildOwnerWorkspaceViewModel(input) {
     stateLabel: copy.label,
     accessTitle: copy.title,
     statusMessage: copy.message,
-    readOnly: ended || !ready,
-    pcmInvolved: ready,
+    readOnly:
+      ended || !ready || context.serviceAgreement.status !== "active",
+    ownerContractEditable:
+      ready && context.serviceAgreement.status === "active",
+    pcmInvolved: ready && context.serviceAgreement.status === "active",
     retryVisible: resolution.state === "LOAD_FAILED_RETRYABLE",
     caseName: summary?.displayName ||
       (unavailable ? "尚未連結正式案件" : "尚待案件資料"),
@@ -1365,6 +1376,9 @@ function renderModel(root, model) {
   const body = root.body;
   if (body) {
     body.dataset.workspaceState = model.state;
+    body.dataset.ownerContractEditable = model.ownerContractEditable
+      ? "true"
+      : "false";
   }
 
   const slots = {
@@ -1986,7 +2000,10 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
       renderModel(documentRef, model);
     }
     contractWorkspace?.setEnabled(model.state === "AUTHORIZED_READY");
-    managementWorkspace?.setEnabled(model.state === "AUTHORIZED_READY");
+    if (!model.ownerContractEditable) contractWorkspace?.setEnabled(false);
+    managementWorkspace?.setEnabled(
+      model.state === "AUTHORIZED_READY" && model.ownerContractEditable,
+    );
     return model;
   }
 

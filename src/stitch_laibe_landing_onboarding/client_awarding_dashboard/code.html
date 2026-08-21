@@ -278,13 +278,13 @@
               <div
                 class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
                 data-calendar-workspace="design-review"
-                data-owner-google-calendar-surface="design"
+                data-owner-google-calendar
                 data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"
                 aria-label="共同案件日曆｜設計管理"
               >
                 <iframe
-                  title="甲方 Google 日曆｜設計管理"
-                  data-owner-google-calendar-design-frame
+                  title="本案 Google Calendar"
+                  data-owner-calendar-frame
                   loading="lazy"
                   referrerpolicy="strict-origin-when-cross-origin"
                   hidden
@@ -292,13 +292,20 @@
                 <section
                   class="owner-google-calendar-unavailable"
                   data-owner-google-calendar-design-unavailable
-                  aria-labelledby="owner-design-google-calendar-title"
+                  aria-labelledby="owner-google-calendar-title"
                 >
                   <span class="owner-google-calendar-mark" aria-hidden="true">31</span>
                   <p class="eyebrow">Google Calendar</p>
-                  <h3 id="owner-design-google-calendar-title">目前無法顯示甲方 Google 日曆</h3>
-                  <p>日曆連結尚未完成設定；待甲方帳號、正式案件與日曆權限確認後，才會顯示甲方自己的 Google 日曆。</p>
-                  <strong>目前不顯示示意行程，也不使用其他角色的帳號。</strong>
+                  <h3 id="owner-google-calendar-title">把本案時程放回同一份決策依據</h3>
+                  <p data-owner-calendar-note>連結後仍會依本案權限重新確認；目前不顯示任何日曆內容。</p>
+                  <strong data-owner-calendar-state role="status" aria-live="polite">尚未連結 Google Calendar</strong>
+                  <button type="button" data-owner-calendar-connect disabled aria-disabled="true">連結 Google Calendar</button>
+                  <fieldset class="owner-google-calendar__sharing">
+                    <legend>日曆分享</legend>
+                    <label><input type="checkbox" data-owner-calendar-share="vendor" disabled aria-disabled="true" /><span>分享給本案乙方</span></label>
+                    <label><input type="checkbox" data-owner-calendar-share="drs" disabled aria-disabled="true" /><span>分享給本案 DRS 協作者</span></label>
+                    <p>分享功能正在整理中，目前不會變更任何人的日曆權限。</p>
+                  </fieldset>
                 </section>
               </div>
               <div class="owner-management-shell owner-management-shell--design">
@@ -470,12 +477,11 @@
                 id="owner-construction-view-today"
                 data-owner-construction-view-panel="today"
                 data-calendar-workspace="construction"
-                data-owner-google-calendar
                 data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"
               >
                 <iframe
-                  title="甲方 Google 日曆"
-                  data-owner-google-calendar-frame
+                  title="本案施工時程摘要"
+                  data-owner-construction-calendar-frame
                   loading="lazy"
                   referrerpolicy="strict-origin-when-cross-origin"
                   hidden
@@ -483,13 +489,13 @@
                 <section
                   class="owner-google-calendar-unavailable"
                   data-owner-google-calendar-unavailable
-                  aria-labelledby="owner-google-calendar-title"
+                  aria-labelledby="owner-construction-calendar-title"
                 >
                   <span class="owner-google-calendar-mark" aria-hidden="true">31</span>
-                  <p class="eyebrow">Google Calendar</p>
-                  <h3 id="owner-google-calendar-title">目前無法顯示甲方 Google 日曆</h3>
-                  <p>日曆連結尚未完成設定；待甲方帳號、正式案件與日曆權限確認後，才會顯示甲方自己的 Google 日曆。</p>
-                  <strong>目前不顯示示意行程，也不使用其他角色的帳號。</strong>
+                  <p class="eyebrow">施工時程</p>
+                  <h3 id="owner-construction-calendar-title">尚未取得本案施工時程</h3>
+                  <p>施工任務、現場照片、變更與驗收會依正式案件紀錄整理在這裡。</p>
+                  <strong>請先在設計管理確認本案日曆連結與時程依據。</strong>
                 </section>
               </div>
               <section

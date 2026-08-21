@@ -3,6 +3,7 @@ import {
   createOwnerWorkspaceController,
   sha256Hex,
 } from "./app.js";
+import { getSupabaseAuthRuntime } from "../pcm_standalone/account_access/app.js";
 import { getActiveCanonicalLinkHref } from "../pcm_standalone/public/pcm-flow-route-manifest.js";
 
 const UUID_PATTERN =
@@ -111,6 +112,62 @@ const MESSAGE_RECEIPT_KEYS = Object.freeze([
   "schemaVersion",
 ]);
 const INVALID_RESULT = Object.freeze({ code: "INVALID_RUNTIME_RESULT" });
+const OWNER_RUNTIME_SCHEMA = "laibe.owner-workspace-runtime.v1";
+const OWNER_RUNTIME_KEYS = Object.freeze([
+  "authenticatedUserId",
+  "case",
+  "currentCaseId",
+  "documents",
+  "membership",
+  "schemaVersion",
+  "serviceContext",
+  "state",
+  "workspaceAccess",
+]);
+const OWNER_RUNTIME_CASE_KEYS = Object.freeze(["caseId", "status", "title"]);
+const OWNER_RUNTIME_MEMBER_KEYS = Object.freeze([
+  "caseId",
+  "role",
+  "status",
+  "userId",
+]);
+const OWNER_RUNTIME_ACCESS_KEYS = Object.freeze([
+  "mutationAllowed",
+  "payloadPolicy",
+  "role",
+  "writeActionsEnabled",
+]);
+const OWNER_RUNTIME_SERVICE_KEYS = Object.freeze([
+  "contractStatus",
+  "pcmStatus",
+]);
+const OWNER_RUNTIME_DOCUMENT_KEYS = Object.freeze([
+  "caseId",
+  "category",
+  "fileId",
+  "name",
+  "recordStatus",
+  "uploadedAt",
+  "versionLabel",
+  "versionNumber",
+]);
+const OWNER_CALENDAR_KEYS = Object.freeze([
+  "authenticatedUserId",
+  "calendarBinding",
+  "currentCaseId",
+  "membership",
+  "schemaVersion",
+]);
+const OWNER_CALENDAR_BINDING_KEYS = Object.freeze([
+  "accountRole",
+  "bindingStatus",
+  "calendarId",
+  "caseId",
+  "connectionStatus",
+  "timeZone",
+  "userId",
+]);
+const OWNER_ACCESS_ENTRY_URL = "http://127.0.0.1:4173/account/access/";
 
 function sortedStringKeys(keys) {
   const result = [];
@@ -651,14 +708,382 @@ export function createOwnerWorkspaceBootstrap(untrustedDependencies) {
   });
 }
 
+function ownerDocumentKind(category) {
+  if (category === "drawing") return "圖面";
+  if (category === "quote") return "報價";
+  if (category === "contract") return "契約";
+  throw INVALID_RESULT;
+}
+
+function ownerDocumentDate(timestamp) {
+  const value = utc(timestamp);
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T/u);
+  if (!match) throw INVALID_RESULT;
+  return `${match[1]}/${match[2]}/${match[3]}`;
+}
+
+function mapOwnerWorkspaceGrant(value) {
+  const result = snapshotExactRecord(value, OWNER_RUNTIME_KEYS);
+  if (
+    primitiveString(result.schemaVersion) !== OWNER_RUNTIME_SCHEMA ||
+    primitiveString(result.state) !== "AUTHORIZED_OWNER_WORKSPACE"
+  ) throw INVALID_RESULT;
+
+  const authenticatedUserId = uuid(result.authenticatedUserId);
+  const currentCaseId = uuid(result.currentCaseId);
+  const membership = snapshotExactRecord(
+    result.membership,
+    OWNER_RUNTIME_MEMBER_KEYS,
+  );
+  const workspaceAccess = snapshotExactRecord(
+    result.workspaceAccess,
+    OWNER_RUNTIME_ACCESS_KEYS,
+  );
+  const caseRecord = snapshotExactRecord(
+    result.case,
+    OWNER_RUNTIME_CASE_KEYS,
+  );
+  const serviceContext = snapshotExactRecord(
+    result.serviceContext,
+    OWNER_RUNTIME_SERVICE_KEYS,
+  );
+  if (
+    uuid(membership.userId) !== authenticatedUserId ||
+    uuid(membership.caseId) !== currentCaseId ||
+    primitiveString(membership.role) !== "owner" ||
+    primitiveString(membership.status) !== "active" ||
+    primitiveString(workspaceAccess.role) !== "owner" ||
+    workspaceAccess.mutationAllowed !== false ||
+    workspaceAccess.writeActionsEnabled !== false ||
+    primitiveString(workspaceAccess.payloadPolicy) !== "AUTHORIZED_SCOPE_ONLY" ||
+    uuid(caseRecord.caseId) !== currentCaseId ||
+    primitiveString(caseRecord.status) !== "active" ||
+    primitiveString(serviceContext.pcmStatus) !== "UNAVAILABLE" ||
+    primitiveString(serviceContext.contractStatus) !== "UNAVAILABLE"
+  ) throw INVALID_RESULT;
+
+  const title = primitiveString(caseRecord.title);
+  if (title.length === 0 || title.length > 240) throw INVALID_RESULT;
+  if (!Array.isArray(result.documents) || result.documents.length > 200) {
+    throw INVALID_RESULT;
+  }
+  const documents = result.documents.map((document) => {
+    const record = snapshotExactRecord(document, OWNER_RUNTIME_DOCUMENT_KEYS);
+    const caseId = uuid(record.caseId);
+    const category = primitiveString(record.category);
+    const name = primitiveString(record.name);
+    const versionLabel = primitiveString(record.versionLabel);
+    const recordStatus = primitiveString(record.recordStatus);
+    if (
+      uuid(record.fileId) === "" || caseId !== currentCaseId ||
+      name.length === 0 || name.length > 512 ||
+      versionLabel.length === 0 || versionLabel.length > 120 ||
+      !Number.isSafeInteger(record.versionNumber) || record.versionNumber < 1 ||
+      recordStatus !== "active"
+    ) throw INVALID_RESULT;
+    return Object.freeze({
+      title: name,
+      kindLabel: ownerDocumentKind(category),
+      versionLabel: `第 ${record.versionNumber} 版・${versionLabel}`,
+      submittedByLabel: "案件成員",
+      submittedAtLabel: ownerDocumentDate(record.uploadedAt),
+      statusLabel: "已記錄",
+      sourceLabel: "案件文件紀錄",
+    });
+  });
+
+  return Object.freeze({
+    state: "AUTHORIZED_READY",
+    authorityMode: "server_owner_grant_v1",
+    ownerContractEditable: false,
+    sessionStatus: "active",
+    actor: Object.freeze({
+      actorId: authenticatedUserId,
+      displayLabel: "業主",
+      role: "owner",
+    }),
+    membership: Object.freeze({ caseId: currentCaseId, status: "active" }),
+    serviceAgreement: Object.freeze({
+      agreementId: "",
+      caseId: currentCaseId,
+      status: "unavailable",
+      version: "",
+    }),
+    caseBinding: Object.freeze({ caseId: currentCaseId, status: "bound" }),
+    domain: Object.freeze({ name: "pcm", status: "active" }),
+    caseSummary: Object.freeze({
+      caseId: currentCaseId,
+      constructionIssueLabel: "尚待案件紀錄",
+      currentActorLabel: "由甲方確認文件與下一步",
+      displayName: title,
+      documentSummaryLabel: `${documents.length} 份已記錄文件`,
+      issueSummaryLabel: "依文件與案件紀錄確認",
+      lastRecordedAtLabel: documents[0]?.submittedAtLabel ?? "尚無文件紀錄",
+      nextActionLabel: "確認文件版本與案件日曆",
+      nextDueLabel: "依案件通知",
+      reviewSummaryLabel: "尚待書面檢討紀錄",
+      statusLabel: caseStatusLabel(caseRecord.status),
+      todayFocusLabel: "核對目前文件與待辦",
+      waitingRelationshipLabel: "甲方先確認目前資料，必要時請案件成員補充",
+    }),
+    constructionRecords: Object.freeze([]),
+    designReviews: Object.freeze([]),
+    documents: Object.freeze(documents),
+    events: Object.freeze([]),
+    permittedActions: Object.freeze([]),
+    processSteps: Object.freeze([]),
+    publicMessages: Object.freeze([]),
+    submissions: Object.freeze([]),
+  });
+}
+
+export function validateAndMapOwnerWorkspaceGrant(value) {
+  try {
+    return mapOwnerWorkspaceGrant(value);
+  } catch {
+    return null;
+  }
+}
+
+function calendarEmbedUrl(value, expectedUserId, expectedCaseId) {
+  try {
+    const result = snapshotExactRecord(value, OWNER_CALENDAR_KEYS);
+    const membership = snapshotExactRecord(
+      result.membership,
+      OWNER_RUNTIME_MEMBER_KEYS,
+    );
+    const binding = snapshotExactRecord(
+      result.calendarBinding,
+      OWNER_CALENDAR_BINDING_KEYS,
+    );
+    if (
+      primitiveString(result.schemaVersion) !== "laibe.owner-calendar-embed.v1" ||
+      uuid(result.authenticatedUserId) !== expectedUserId ||
+      uuid(result.currentCaseId) !== expectedCaseId ||
+      uuid(membership.userId) !== expectedUserId ||
+      uuid(membership.caseId) !== expectedCaseId ||
+      primitiveString(membership.role) !== "owner" ||
+      primitiveString(membership.status) !== "active" ||
+      uuid(binding.userId) !== expectedUserId ||
+      uuid(binding.caseId) !== expectedCaseId ||
+      primitiveString(binding.accountRole) !== "owner" ||
+      primitiveString(binding.connectionStatus) !== "connected" ||
+      primitiveString(binding.bindingStatus) !== "active" ||
+      primitiveString(binding.timeZone) !== "Asia/Taipei"
+    ) return null;
+    const calendarId = primitiveString(binding.calendarId);
+    if (calendarId.length === 0 || calendarId.length > 1024) return null;
+    return "https://calendar.google.com/calendar/embed?src=" +
+      encodeURIComponent(calendarId) +
+      "&ctz=Asia%2FTaipei&hl=zh_TW";
+  } catch {
+    return null;
+  }
+}
+
+function ownerCalendarNodes(root) {
+  return Object.freeze({
+    state: root?.querySelector?.("[data-owner-calendar-state]") ?? null,
+    note: root?.querySelector?.("[data-owner-calendar-note]") ?? null,
+    frame: root?.querySelector?.("[data-owner-calendar-frame]") ?? null,
+    connect: root?.querySelector?.("[data-owner-calendar-connect]") ?? null,
+  });
+}
+
+function renderCalendarClosed(
+  nodes,
+  message = "尚未連結 Google Calendar",
+  { connectEnabled = false } = {},
+) {
+  if (nodes.state) nodes.state.textContent = message;
+  if (nodes.note) {
+    nodes.note.textContent = "連結後仍會依本案權限重新確認；目前不顯示任何日曆內容。";
+  }
+  if (nodes.frame) {
+    if (typeof nodes.frame.removeAttribute === "function") {
+      nodes.frame.removeAttribute("src");
+    }
+    nodes.frame.hidden = true;
+  }
+  if (nodes.connect) {
+    nodes.connect.disabled = !connectEnabled;
+    nodes.connect.setAttribute?.(
+      "aria-disabled",
+      connectEnabled ? "false" : "true",
+    );
+    nodes.connect.textContent = "連結 Google Calendar";
+  }
+}
+
+function renderCalendarConnected(nodes, embedUrl) {
+  if (nodes.state) nodes.state.textContent = "本案 Google Calendar 已連結";
+  if (nodes.note) {
+    nodes.note.textContent = "目前只顯示經本案權限確認、屬於甲方的日曆。";
+  }
+  if (nodes.frame) {
+    nodes.frame.src = embedUrl;
+    nodes.frame.hidden = false;
+  }
+  if (nodes.connect) {
+    nodes.connect.disabled = false;
+    nodes.connect.setAttribute?.("aria-disabled", "false");
+    nodes.connect.textContent = "重新連結";
+  }
+}
+
+function oauthAuthorizationUrl(value) {
+  try {
+    const record = snapshotExactRecord(value, ["authorizationUrl", "state"]);
+    if (primitiveString(record.state) !== "OAUTH_REDIRECT_REQUIRED") return null;
+    const candidate = new URL(primitiveString(record.authorizationUrl));
+    if (
+      candidate.origin !== "https://accounts.google.com" ||
+      candidate.username !== "" ||
+      candidate.password !== "" ||
+      candidate.port !== "" ||
+      candidate.pathname !== "/o/oauth2/v2/auth"
+    ) return null;
+    return candidate.href;
+  } catch {
+    return null;
+  }
+}
+
+export function createOwnerSupabaseWorkspaceBootstrap({
+  root,
+  authRuntime,
+  authRuntimeProvider = getSupabaseAuthRuntime,
+} = {}) {
+  bindOwnerWorkspaceCanonicalLinks(root, getActiveCanonicalLinkHref);
+  const controller = createOwnerWorkspaceController({ root });
+  const calendarNodes = ownerCalendarNodes(root);
+  let runtime = authRuntime ?? null;
+  let currentGrant = null;
+  let activeGeneration = 0;
+
+  function isCurrent(generation) {
+    return generation === activeGeneration;
+  }
+
+  function redirectToOwnerAccess(generation) {
+    if (!isCurrent(generation)) return;
+    root?.defaultView?.location?.assign?.(OWNER_ACCESS_ENTRY_URL);
+  }
+
+  async function getRuntime() {
+    if (!runtime) runtime = await authRuntimeProvider();
+    if (
+      !runtime || typeof runtime.getSession !== "function" ||
+      typeof runtime.authenticatedFetch !== "function"
+    ) throw Object.freeze({ status: 503 });
+    return runtime;
+  }
+
+  async function getAuthorizedResponse(endpoint, generation) {
+    const activeRuntime = await getRuntime();
+    const session = await activeRuntime.getSession();
+    if (!session || typeof session.access_token !== "string" || !session.access_token) {
+      redirectToOwnerAccess(generation);
+      throw Object.freeze({ status: 401 });
+    }
+    const response = await activeRuntime.authenticatedFetch(endpoint, {
+      method: "GET",
+    });
+    if (!response?.ok) throw Object.freeze({ status: 403 });
+    try {
+      return await response.json();
+    } catch {
+      throw Object.freeze({ status: 403 });
+    }
+  }
+
+  async function loadOwnerWorkspace(generation) {
+    const mapped = validateAndMapOwnerWorkspaceGrant(
+      await getAuthorizedResponse("owner-workspace-grant", generation),
+    );
+    if (!mapped) throw Object.freeze({ status: 403 });
+    if (!isCurrent(generation)) throw Object.freeze({ status: 409 });
+    currentGrant = mapped;
+    return mapped;
+  }
+
+  async function loadCalendar(generation) {
+    const grant = currentGrant;
+    if (!grant) {
+      if (isCurrent(generation)) renderCalendarClosed(calendarNodes);
+      return false;
+    }
+    try {
+      const embedUrl = calendarEmbedUrl(
+        await getAuthorizedResponse("owner-google-calendar-grant", generation),
+        grant.actor.actorId,
+        grant.caseBinding.caseId,
+      );
+      if (!isCurrent(generation) || currentGrant !== grant) return false;
+      if (!embedUrl) {
+        renderCalendarClosed(calendarNodes, "尚未連結 Google Calendar", {
+          connectEnabled: true,
+        });
+        return false;
+      }
+      renderCalendarConnected(calendarNodes, embedUrl);
+      return true;
+    } catch {
+      if (!isCurrent(generation) || currentGrant !== grant) return false;
+      renderCalendarClosed(calendarNodes, "日曆狀態暫時無法確認", {
+        connectEnabled: true,
+      });
+      return false;
+    }
+  }
+
+  async function initialize() {
+    const generation = activeGeneration + 1;
+    activeGeneration = generation;
+    currentGrant = null;
+    renderCalendarClosed(calendarNodes);
+    controller.setAdapter(Object.freeze({
+      loadOwnerWorkspace() {
+        return loadOwnerWorkspace(generation);
+      },
+    }));
+    const model = await controller.initialize();
+    if (!isCurrent(generation)) return model;
+    if (model.state === "AUTHORIZED_READY") await loadCalendar(generation);
+    return model;
+  }
+
+  calendarNodes.connect?.addEventListener?.("click", async () => {
+    const generation = activeGeneration;
+    const grant = currentGrant;
+    if (!grant || calendarNodes.connect.disabled) return;
+    calendarNodes.connect.disabled = true;
+    calendarNodes.connect.setAttribute?.("aria-disabled", "true");
+    if (calendarNodes.state) calendarNodes.state.textContent = "正在準備連結";
+    try {
+      const authorizationUrl = oauthAuthorizationUrl(
+        await getAuthorizedResponse("owner-google-calendar-oauth-start", generation),
+      );
+      if (!authorizationUrl) throw Object.freeze({ status: 403 });
+      if (!isCurrent(generation) || currentGrant !== grant) return;
+      root?.defaultView?.location?.assign?.(authorizationUrl);
+    } catch {
+      if (!isCurrent(generation) || currentGrant !== grant) return;
+      renderCalendarClosed(
+        calendarNodes,
+        "這次未能開始連結，請稍後再試",
+        { connectEnabled: true },
+      );
+    }
+  });
+
+  return Object.freeze({ initialize });
+}
+
 export const canonicalOwnerWorkspacePage =
   typeof document === "undefined"
     ? null
-    : createOwnerWorkspaceBootstrap({
-      root: document,
-      authorizedCaseId: null,
-      loadOwnerWorkspace: null,
-    });
+    : createOwnerSupabaseWorkspaceBootstrap({ root: document });
 
 if (canonicalOwnerWorkspacePage) {
   void canonicalOwnerWorkspacePage.initialize();

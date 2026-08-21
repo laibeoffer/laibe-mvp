@@ -464,12 +464,12 @@ test("設計與工程中央區都完整保留給案件日曆", async () => {
   );
   assert.match(
     designCalendar,
-    /data-owner-google-calendar-surface="design"/u,
+    /data-owner-google-calendar(?=[\s=>])/u,
   );
-  assert.match(designCalendar, /title="甲方 Google 日曆｜設計管理"/u);
+  assert.match(designCalendar, /title="本案 Google Calendar"/u);
   assert.match(designCalendar, /data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"/u);
-  assert.match(designCalendar, /id="owner-design-google-calendar-title">目前無法顯示甲方 Google 日曆/u);
-  assert.match(designCalendar, /目前不顯示示意行程，也不使用其他角色的帳號/u);
+  assert.match(designCalendar, /id="owner-google-calendar-title">把本案時程放回同一份決策依據/u);
+  assert.match(designCalendar, /尚未連結 Google Calendar/u);
   assert.match(designCalendar, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
   assert.doesNotMatch(designCalendar, /data-list="calendarSubmissions"|data-list="designReviews"/u);
 
@@ -482,10 +482,10 @@ test("設計與工程中央區都完整保留給案件日曆", async () => {
   assert.ok(designPanel.indexOf('data-list="designDecisionTrail"') > designOperationsStart);
 
   assert.match(constructionPanel, /data-calendar-workspace="construction"/u);
-  assert.match(constructionPanel, /data-owner-google-calendar/u);
-  assert.match(constructionPanel, /data-owner-google-calendar-frame/u);
+  assert.doesNotMatch(constructionPanel, /data-owner-google-calendar(?=[\s=>])/u);
+  assert.match(constructionPanel, /data-owner-construction-calendar-frame/u);
   assert.match(constructionPanel, /data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"/u);
-  assert.match(constructionPanel, /目前無法顯示甲方 Google 日曆/u);
+  assert.match(constructionPanel, /尚未取得本案施工時程/u);
   assert.match(constructionPanel, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
   assert.match(constructionPanel, /data-list="constructionRecords"/u);
   assert.match(constructionPanel, /下一位處理者/u);
@@ -2898,4 +2898,409 @@ test("契約子分頁 click、Arrow、Home、End 與 hashchange 維持 ARIA 及 
   assert.equal(harness.container.dataset.activeOwnerContractView, "changes");
   assert.equal(harness.tabs[2].tabIndex, 0);
   assert.equal(controller.selectView("unknown"), false);
+});
+
+test("only the exact authorized owner grant can initialize the strict existing bootstrap", async () => {
+  const { validateAndMapOwnerWorkspaceGrant } = await loadBootstrap();
+  const grant = {
+    schemaVersion: "laibe.owner-workspace-runtime.v1",
+    state: "AUTHORIZED_OWNER_WORKSPACE",
+    authenticatedUserId: "11111111-1111-4111-8111-111111111111",
+    currentCaseId: "22222222-2222-4222-8222-222222222222",
+    membership: {
+      userId: "11111111-1111-4111-8111-111111111111",
+      caseId: "22222222-2222-4222-8222-222222222222",
+      role: "owner",
+      status: "active",
+    },
+    workspaceAccess: {
+      role: "owner",
+      mutationAllowed: false,
+      writeActionsEnabled: false,
+      payloadPolicy: "AUTHORIZED_SCOPE_ONLY",
+    },
+    case: {
+      caseId: "22222222-2222-4222-8222-222222222222",
+      title: "住宅修改工程",
+      status: "active",
+    },
+    serviceContext: { pcmStatus: "UNAVAILABLE", contractStatus: "UNAVAILABLE" },
+    documents: [],
+  };
+
+  assert.equal(validateAndMapOwnerWorkspaceGrant(grant).state, "AUTHORIZED_READY");
+  for (const mutate of [
+    (value) => { value.membership.role = "pro"; },
+    (value) => { value.case.caseId = "99999999-9999-4999-8999-999999999999"; },
+    (value) => { value.extra = true; },
+  ]) {
+    const malformed = structuredClone(grant);
+    mutate(malformed);
+    assert.equal(validateAndMapOwnerWorkspaceGrant(malformed), null);
+  }
+});
+
+test("Calendar stays in the main owner workspace with no initial iframe source, controlled sharing, and protected grant routes", async () => {
+  const [html, bootstrap] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("owner-workspace-bootstrap.js"),
+  ]);
+  const workspaceStart = html.indexOf('data-layout="owner-hero-workspace"');
+  const calendarStart = html.indexOf("data-owner-google-calendar", workspaceStart);
+  const lineStart = html.indexOf('data-layout="owner-line-conversation"', workspaceStart);
+  assert.ok(calendarStart > workspaceStart, "Calendar belongs to the main workspace");
+  assert.ok(lineStart > calendarStart, "LINE remains a right rail after Calendar");
+  assert.equal(
+    html.match(/data-owner-google-calendar(?=[\s=>])/gu)?.length,
+    1,
+    "only the Design management Calendar is controlled",
+  );
+  assert.equal(html.match(/id="owner-google-calendar-title"/gu)?.length, 1);
+  const controlledMarkup = html.slice(calendarStart, lineStart);
+  assert.match(controlledMarkup, /<iframe[^>]*data-owner-calendar-frame[^>]*(?!\bsrc=)[^>]*>/u);
+  assert.match(controlledMarkup, /data-owner-calendar-state[^>]*>\s*尚未連結 Google Calendar/u);
+  assert.match(controlledMarkup, /data-owner-calendar-connect[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(controlledMarkup, /data-owner-calendar-share="vendor"[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(controlledMarkup, /data-owner-calendar-share="drs"[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(bootstrap, /removeAttribute\(["']src["']\)/u);
+  assert.match(bootstrap, /owner-google-calendar-grant/u);
+  assert.match(bootstrap, /owner-google-calendar-oauth-start/u);
+  assert.match(bootstrap, /http:\/\/127\.0\.0\.1:4173\/account\/access\//u);
+  assert.doesNotMatch(bootstrap, /127\.0\.0\.1:4194|[?&](?:case|returnTo|next)=/u);
+});
+
+test("LINE right rail remains an unlinked truthful state with no fabricated conversation and disabled composer", async () => {
+  const html = await readPageFile("code.html");
+  const lineStart = html.indexOf('data-layout="owner-line-conversation"');
+  const lineMarkup = html.slice(lineStart, html.indexOf("</aside>", lineStart));
+
+  assert.ok(lineStart >= 0, "LINE rail exists");
+  assert.match(lineMarkup, /案件(?:三方)?群組尚未連結/u);
+  assert.match(lineMarkup, /尚未取得案件訊息|目前沒有可顯示的對話/u);
+  assert.doesNotMatch(lineMarkup, /訊息已送出|已傳送訊息|已讀/u);
+  assert.match(lineMarkup, /<textarea[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(lineMarkup, /data-line-send[^>]*disabled[^>]*aria-disabled="true"/u);
+});
+
+test("owner Supabase workspace bootstrap gates session, owner grant shape, strict snapshot, and Calendar failure cleanup", async () => {
+  const runtime = await loadBootstrap();
+  assert.equal(typeof runtime.createOwnerSupabaseWorkspaceBootstrap, "function");
+
+  const ownerGrant = {
+    schemaVersion: "laibe.owner-workspace-runtime.v1",
+    state: "AUTHORIZED_OWNER_WORKSPACE",
+    authenticatedUserId: OWNER_USER_ID,
+    currentCaseId: CANONICAL_OWNER_CASE_ID,
+    membership: {
+      userId: OWNER_USER_ID,
+      caseId: CANONICAL_OWNER_CASE_ID,
+      role: "owner",
+      status: "active",
+    },
+    workspaceAccess: {
+      role: "owner",
+      mutationAllowed: false,
+      writeActionsEnabled: false,
+      payloadPolicy: "AUTHORIZED_SCOPE_ONLY",
+    },
+    case: {
+      caseId: CANONICAL_OWNER_CASE_ID,
+      title: "Owner case",
+      status: "active",
+    },
+    serviceContext: { pcmStatus: "UNAVAILABLE", contractStatus: "UNAVAILABLE" },
+    documents: [],
+  };
+  const frame = {
+    src: "https://calendar.google.test/embed",
+    removeAttribute(name) {
+      if (name === "src") delete this.src;
+    },
+  };
+  const root = {
+    querySelector(selector) {
+      return selector === "[data-owner-calendar-frame]" ? frame : null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+  const calls = [];
+  const authRuntime = {
+    async getSession() {
+      return { access_token: "owner-session" };
+    },
+    async authenticatedFetch(endpoint, init = {}) {
+      calls.push({ endpoint, init });
+      if (endpoint === "owner-workspace-grant") {
+        return new Response(JSON.stringify(ownerGrant), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({ state: "GRANT_UNAVAILABLE" }), { status: 503 });
+    },
+  };
+  const bootstrap = runtime.createOwnerSupabaseWorkspaceBootstrap({
+    root,
+    authRuntime,
+    authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+  });
+
+  assert.equal(
+    (await runtime.createOwnerSupabaseWorkspaceBootstrap({
+      root: null,
+      authRuntime: { async getSession() { return null; }, async authenticatedFetch() { throw new Error("must not call"); } },
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    }).initialize()).state,
+    "ACCESS_DENIED",
+  );
+  assert.equal(
+    (await runtime.createOwnerSupabaseWorkspaceBootstrap({
+      root: null,
+      authRuntime: {
+        async getSession() { return { access_token: "wrong-role" }; },
+        async authenticatedFetch() {
+          return new Response(JSON.stringify({ ...ownerGrant, membership: { ...ownerGrant.membership, role: "pro" } }), { status: 200 });
+        },
+      },
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    }).initialize()).state,
+    "ACCESS_DENIED",
+  );
+  assert.equal(
+    (await runtime.createOwnerSupabaseWorkspaceBootstrap({
+      root: null,
+      authRuntime: {
+        async getSession() { return { access_token: "malformed" }; },
+        async authenticatedFetch() { return new Response(JSON.stringify({ state: "AUTHORIZED_OWNER_WORKSPACE" }), { status: 200 }); },
+      },
+      authorizedCaseId: CANONICAL_OWNER_CASE_ID,
+    }).initialize()).state,
+    "ACCESS_DENIED",
+  );
+
+  await bootstrap.initialize();
+  assert.equal(calls[0].endpoint, "owner-workspace-grant");
+  assert.equal(calls[0].init.method, "GET");
+  assert.equal(frame.src, undefined, "Calendar grant failure clears iframe src");
+});
+
+function ownerGrantPayload({
+  userId = OWNER_USER_ID,
+  caseId = CANONICAL_OWNER_CASE_ID,
+  title = "Owner case",
+} = {}) {
+  return {
+    schemaVersion: "laibe.owner-workspace-runtime.v1",
+    state: "AUTHORIZED_OWNER_WORKSPACE",
+    authenticatedUserId: userId,
+    currentCaseId: caseId,
+    membership: { userId, caseId, role: "owner", status: "active" },
+    workspaceAccess: {
+      role: "owner",
+      mutationAllowed: false,
+      writeActionsEnabled: false,
+      payloadPolicy: "AUTHORIZED_SCOPE_ONLY",
+    },
+    case: { caseId, title, status: "active" },
+    serviceContext: { pcmStatus: "UNAVAILABLE", contractStatus: "UNAVAILABLE" },
+    documents: [],
+  };
+}
+
+function ownerCalendarGrant({
+  userId = OWNER_USER_ID,
+  caseId = CANONICAL_OWNER_CASE_ID,
+  calendarId = "owner-calendar@example.test",
+} = {}) {
+  return {
+    schemaVersion: "laibe.owner-calendar-embed.v1",
+    authenticatedUserId: userId,
+    currentCaseId: caseId,
+    membership: { userId, caseId, role: "owner", status: "active" },
+    calendarBinding: {
+      userId,
+      caseId,
+      accountRole: "owner",
+      connectionStatus: "connected",
+      bindingStatus: "active",
+      calendarId,
+      timeZone: "Asia/Taipei",
+    },
+  };
+}
+
+function ownerCalendarHarness() {
+  const listeners = new Map();
+  const assigned = [];
+  const state = { textContent: "" };
+  const note = { textContent: "" };
+  const frame = {
+    hidden: true,
+    removeAttribute(name) {
+      if (name === "src") delete this.src;
+    },
+  };
+  const connect = {
+    disabled: true,
+    textContent: "",
+    attributes: new Map(),
+    addEventListener(type, listener) {
+      listeners.set(type, listener);
+    },
+    setAttribute(name, value) {
+      this.attributes.set(name, String(value));
+    },
+    async click() {
+      return listeners.get("click")?.();
+    },
+  };
+  const root = {
+    defaultView: { location: { assign(url) { assigned.push(url); } } },
+    querySelector(selector) {
+      return new Map([
+        ["[data-owner-calendar-state]", state],
+        ["[data-owner-calendar-note]", note],
+        ["[data-owner-calendar-frame]", frame],
+        ["[data-owner-calendar-connect]", connect],
+      ]).get(selector) ?? null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+  return { assigned, connect, frame, root, state };
+}
+
+function deferred() {
+  let resolve;
+  const promise = new Promise((nextResolve) => {
+    resolve = nextResolve;
+  });
+  return { promise, resolve };
+}
+
+test("owner Calendar accepts only matching grants and an exact Google OAuth authority", async () => {
+  const runtime = await loadBootstrap();
+  const harness = ownerCalendarHarness();
+  let calendarResponse = ownerCalendarGrant();
+  let oauthResponse = {
+    state: "OAUTH_REDIRECT_REQUIRED",
+    authorizationUrl: "https://user@accounts.google.com/o/oauth2/v2/auth?state=owner",
+  };
+  const authRuntime = {
+    async getSession() { return { access_token: "owner-session" }; },
+    async authenticatedFetch(endpoint) {
+      if (endpoint === "owner-workspace-grant") {
+        return new Response(JSON.stringify(ownerGrantPayload()), { status: 200 });
+      }
+      if (endpoint === "owner-google-calendar-grant") {
+        return new Response(JSON.stringify(calendarResponse), { status: 200 });
+      }
+      return new Response(JSON.stringify(oauthResponse), { status: 200 });
+    },
+  };
+  const bootstrap = runtime.createOwnerSupabaseWorkspaceBootstrap({
+    root: harness.root,
+    authRuntime,
+  });
+
+  await bootstrap.initialize();
+  assert.match(harness.frame.src, /calendar\.google\.com\/calendar\/embed/u);
+  await harness.connect.click();
+  assert.deepEqual(harness.assigned, [], "credentialed OAuth URLs are rejected");
+
+  calendarResponse = ownerCalendarGrant({
+    caseId: "9e000000-0000-4000-8000-000000000299",
+  });
+  await bootstrap.initialize();
+  assert.equal(harness.frame.src, undefined, "case mismatch clears Calendar bytes");
+  assert.equal(harness.connect.disabled, false, "only an authorized owner may retry connection");
+
+  calendarResponse = ownerCalendarGrant({
+    userId: "9e000000-0000-4000-8000-000000000099",
+  });
+  await bootstrap.initialize();
+  assert.equal(harness.frame.src, undefined, "user mismatch clears Calendar bytes");
+
+  calendarResponse = ownerCalendarGrant();
+  oauthResponse = {
+    state: "OAUTH_REDIRECT_REQUIRED",
+    authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=owner",
+  };
+  await bootstrap.initialize();
+  await harness.connect.click();
+  assert.deepEqual(harness.assigned, [oauthResponse.authorizationUrl]);
+
+  const signedOut = ownerCalendarHarness();
+  await runtime.createOwnerSupabaseWorkspaceBootstrap({
+    root: signedOut.root,
+    authRuntime: {
+      async getSession() { return null; },
+      async authenticatedFetch() { throw new Error("must not fetch"); },
+    },
+  }).initialize();
+  assert.deepEqual(signedOut.assigned, [
+    "http://127.0.0.1:4173/account/access/",
+  ]);
+});
+
+test("concurrent owner initialization and Calendar responses cannot overwrite the latest authorized scope", async () => {
+  const runtime = await loadBootstrap();
+  const harness = ownerCalendarHarness();
+  const oldOwner = deferred();
+  const oldCalendar = deferred();
+  const oldCalendarRequested = deferred();
+  const newUserId = "9e000000-0000-4000-8000-000000000003";
+  const newCaseId = "9e000000-0000-4000-8000-000000000203";
+  let ownerCalls = 0;
+  let calendarCalls = 0;
+  const authRuntime = {
+    async getSession() { return { access_token: "owner-session" }; },
+    async authenticatedFetch(endpoint) {
+      if (endpoint === "owner-workspace-grant") {
+        ownerCalls += 1;
+        if (ownerCalls === 1) return oldOwner.promise;
+        return new Response(JSON.stringify(ownerGrantPayload({
+          userId: newUserId,
+          caseId: newCaseId,
+          title: "New case",
+        })), { status: 200 });
+      }
+      if (endpoint === "owner-google-calendar-grant") {
+        calendarCalls += 1;
+        if (calendarCalls === 2) {
+          oldCalendarRequested.resolve();
+          return oldCalendar.promise;
+        }
+        return new Response(JSON.stringify(ownerCalendarGrant({
+          userId: newUserId,
+          caseId: newCaseId,
+          calendarId: "new-calendar@example.test",
+        })), { status: 200 });
+      }
+      throw new Error("unexpected endpoint");
+    },
+  };
+  const bootstrap = runtime.createOwnerSupabaseWorkspaceBootstrap({
+    root: harness.root,
+    authRuntime,
+  });
+
+  const first = bootstrap.initialize();
+  const second = bootstrap.initialize();
+  await second;
+  oldOwner.resolve(new Response(JSON.stringify(ownerGrantPayload()), { status: 200 }));
+  await first;
+  assert.match(harness.frame.src, /new-calendar/u);
+
+  const staleCalendarRun = bootstrap.initialize();
+  await oldCalendarRequested.promise;
+  const latest = bootstrap.initialize();
+  await latest;
+  oldCalendar.resolve(new Response(JSON.stringify(ownerCalendarGrant()), { status: 200 }));
+  await staleCalendarRun;
+  assert.match(harness.frame.src, /new-calendar/u);
+  assert.equal(harness.state.textContent, "本案 Google Calendar 已連結");
 });
