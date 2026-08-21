@@ -171,7 +171,7 @@
             </div>
             <div>
               <dt>完成後</dt>
-              <dd data-slot="next-due">完成後才會開放本案契約填寫與案件對話</dd>
+              <dd data-slot="next-due">完成後才會開放本案契約、文件分享與案件留痕</dd>
             </div>
             <div>
               <dt>最近留痕</dt>
@@ -187,7 +187,7 @@
             <div><dt>現在由誰處理</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
             <div><dt>下一步</dt><dd data-slot="next-action">了解並確認 DRS 服務契約</dd></div>
             <div><dt>尚未開放原因</dt><dd data-slot="waiting-relationship">甲方身分、DRS 服務契約與案件權限尚未完成確認</dd></div>
-            <div><dt>完成後</dt><dd data-slot="next-due">完成後才會開放本案契約填寫與案件對話</dd></div>
+            <div><dt>完成後</dt><dd data-slot="next-due">完成後才會開放本案契約、文件分享與案件留痕</dd></div>
             <div><dt>最近留痕</dt><dd data-slot="last-recorded">尚未建立正式案件紀錄</dd></div>
           </dl>
         </aside>
@@ -835,70 +835,6 @@
             </section>
           </div>
 
-          <aside
-            class="owner-hero-dashboard__rail owner-line-conversation"
-            data-layout="owner-line-conversation"
-            aria-label="甲方 LINE 對話"
-          >
-            <section
-              class="owner-chat-channel"
-              data-owner-chat-channel="drs"
-              aria-labelledby="owner-drs-line-title"
-            >
-              <header class="owner-line-conversation__heading">
-                <div><p class="eyebrow">LINE｜DRS 一對一</p><h2 id="owner-drs-line-title">甲方 × DRS</h2></div>
-                <span class="owner-hero-dashboard__rail-state">一對一</span>
-              </header>
-              <div class="owner-chat-channel__unavailable">
-                <strong>甲方與 DRS 的一對一對話尚未連結</strong>
-                <p>完成甲方帳號與 DRS 服務確認後，這裡只顯示甲方與 DRS 的服務說明、補件提醒與書面回覆。</p>
-              </div>
-              <form class="owner-line-conversation__composer" aria-label="DRS 一對一 LINE 訊息輸入">
-                <label for="owner-drs-line-message">傳給 DRS</label>
-                <textarea id="owner-drs-line-message" rows="2" disabled aria-disabled="true" placeholder="連結 DRS 一對一對話後才能輸入"></textarea>
-                <button type="button" data-line-send="drs" disabled aria-disabled="true">尚未開放傳送</button>
-                <p>未完成正式連結前，不會送出或保存訊息。</p>
-              </form>
-            </section>
-
-            <section
-              class="owner-chat-channel"
-              data-owner-chat-channel="case-group"
-              aria-labelledby="owner-case-line-title"
-            >
-              <header class="owner-line-conversation__heading">
-                <div><p class="eyebrow">LINE｜案件三方群組</p><h2 id="owner-case-line-title" data-slot="case-name">尚未連結正式案件</h2></div>
-                <span class="owner-hero-dashboard__rail-state" data-slot="header-state">甲方・乙方・DRS</span>
-              </header>
-              <section class="owner-line-conversation__unavailable" aria-labelledby="owner-case-line-unavailable-title">
-                <h3 id="owner-case-line-unavailable-title">甲方、乙方與 DRS 的案件群組尚未連結</h3>
-                <p>完成正式案件與三方權限確認後，才會顯示本案公開對話與已記錄訊息。</p>
-              </section>
-              <div data-owner-line-trusted-content>
-                <p class="owner-line-conversation__notice" role="status" aria-live="polite">只顯示具可信留痕憑證的案件訊息</p>
-                <section class="owner-line-conversation__stream" aria-labelledby="owner-line-empty-title">
-                  <p class="eyebrow">三方公開紀錄</p>
-                  <h3 id="owner-line-empty-title">目前沒有可顯示的對話</h3>
-                  <ul class="record-list owner-line-conversation__records" data-list="lineMessages">
-                    <li class="empty-state">
-                      <strong>尚未取得案件訊息</strong>
-                      <span>只有收到可信留痕憑證後，訊息才會顯示為已記錄。</span>
-                    </li>
-                  </ul>
-                </section>
-                <dl>
-                  <div><dt>目前由誰處理</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
-                  <div><dt>最近留痕</dt><dd data-slot="last-recorded">尚未建立正式案件紀錄</dd></div>
-                </dl>
-              </div>
-              <form class="owner-line-conversation__composer" aria-label="案件三方 LINE 訊息輸入">
-                <label for="owner-case-line-message">傳到案件三方群組</label>
-                <textarea id="owner-case-line-message" rows="2" disabled aria-disabled="true" placeholder="連結案件三方群組後才能輸入"></textarea>
-                <button type="button" data-line-send="case-group" disabled aria-disabled="true">尚未開放傳送</button>
-                <p>只有正式案件中的甲方、乙方與 DRS 可見；未連結前不會送出或保存。</p>
-              </form>
-            </section>
-          </aside>
         </div>
       </section>
 
@@ -961,7 +897,7 @@
         <a href="#overview">案件總覽</a>
         <a href="#documents">文件與報價</a>
         <a href="#submissions">乙方提交與場勘</a>
-        <a href="#messages">三方公開訊息</a>
+        <a href="#messages">三方書面紀錄</a>
         <a href="#governance">治理檢查</a>
         <a href="#design-review">設計送審</a>
         <a href="#construction-records">施工與驗收紀錄</a>
@@ -1062,11 +998,19 @@
               <div>
                 <p class="eyebrow">固定文件版次</p>
                 <h2 id="documents-title">文件與報價</h2>
-                <p>每份文件顯示種類、版次、提交者、時間與目前用途。</p>
+                <p>每份文件顯示種類、版次、提交者、時間與目前用途；分享只傳送受權限保護的案件入口。</p>
               </div>
-              <button class="button button--quiet" type="button" disabled>
-                文件入口正式開放後可使用
-              </button>
+              <aside
+                class="owner-document-share-guide"
+                data-owner-document-share-guide
+                aria-label="文件分享說明"
+              >
+                <span class="owner-document-share-guide__mark" aria-hidden="true">LINE</span>
+                <span>
+                  <strong>分享文件連結至 LINE</strong>
+                  <small>接收者仍須登入並具有本案權限；不會公開文件或變更權限。</small>
+                </span>
+              </aside>
             </div>
             <ul class="record-list" data-list="documents">
               <li class="empty-state">
@@ -1123,14 +1067,14 @@
             <div class="section-heading section-heading--split">
               <div>
                 <p class="eyebrow">三方可見留痕</p>
-                <h2 id="messages-title">三方公開訊息</h2>
+                <h2 id="messages-title">三方書面紀錄</h2>
                 <p>
                   甲方、乙方與專業檢討人員
-                  的正式訊息在案件內三方可見，並保存在案件紀錄中。
+                  的正式書面內容在案件內三方可見，並保存在案件紀錄中。
                 </p>
               </div>
               <button class="button button--quiet" type="button" disabled>
-                正式訊息入口正在整理中
+                正式書面紀錄入口正在整理中
               </button>
             </div>
             <ul class="message-list" data-list="messages">

@@ -22,7 +22,7 @@ function loadRuntime() {
 
 function ownerContractPanel(html) {
   const start = html.indexOf('id="owner-dashboard-panel-contract"');
-  const end = html.indexOf('data-layout="owner-line-conversation"', start);
+  const end = html.indexOf('data-layout="owner-stage-summary"', start);
   return start >= 0 && end > start ? html.slice(start, end) : "";
 }
 
@@ -89,6 +89,8 @@ function createRenderNode(tagName = "div") {
     className: "",
     textContent: "",
     hidden: false,
+    attributes: new Map(),
+    dataset: {},
     children: [],
     append(...children) {
       this.children.push(...children);
@@ -97,6 +99,12 @@ function createRenderNode(tagName = "div") {
       const index = this.children.indexOf(child);
       if (index >= 0) this.children.splice(index, 1);
       return child;
+    },
+    setAttribute(name, value) {
+      this.attributes.set(name, String(value));
+    },
+    getAttribute(name) {
+      return this.attributes.get(name) ?? null;
     },
   };
   Object.defineProperty(node, "firstChild", {
@@ -114,8 +122,13 @@ function renderedText(node) {
   ].filter(Boolean).join(" ");
 }
 
+function renderedNodes(node) {
+  return [node, ...node.children.flatMap((child) => renderedNodes(child))];
+}
+
 function createOwnerWorkspaceRenderHarness() {
   const lists = new Map([
+    ["documents", createRenderNode("ul")],
     ["calendarSubmissions", createRenderNode("ul")],
     ["designDecisionTrail", createRenderNode("ul")],
   ]);
@@ -406,7 +419,7 @@ test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
     ["overview", "案件總覽"],
     ["documents", "文件與報價"],
     ["submissions", "乙方提交與場勘"],
-    ["messages", "三方公開訊息"],
+    ["messages", "三方書面紀錄"],
     ["governance", "治理檢查"],
     ["design-review", "設計送審"],
     ["construction-records", "施工與驗收紀錄"],
@@ -751,7 +764,7 @@ test("設計與工程主區承接母版案件功能且只保留甲方需要的�
   );
 });
 
-test("甲方儀表板右側分成 DRS 一對一與案件三方群組兩個 LINE 對話框", async () => {
+test("甲方儀表板完全移除 LINE 對話框並把主視覺空間交給案件日曆", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -759,33 +772,23 @@ test("甲方儀表板右側分成 DRS 一對一與案件三方群組兩個 LINE 
 
   const dashboardStart = html.indexOf('data-layout="owner-hero-dashboard"');
   const workspaceStart = html.indexOf('data-layout="owner-hero-workspace"', dashboardStart);
-  const conversationStart = html.indexOf('data-layout="owner-line-conversation"', dashboardStart);
-  const conversationEnd = html.indexOf("</aside>", conversationStart);
-  const conversation = html.slice(conversationStart, conversationEnd);
   assert.ok(dashboardStart >= 0, "owner hero dashboard exists");
   assert.ok(workspaceStart > dashboardStart, "owner workspace is inside the dashboard");
-  assert.ok(conversationStart > workspaceStart, "LINE conversation follows the dashboard in reading order");
 
-  assert.match(html, /data-layout="owner-line-conversation"[^>]*aria-label="甲方 LINE 對話"/u);
-  assert.equal((conversation.match(/data-owner-chat-channel=/gu) ?? []).length, 2);
-  assert.match(conversation, /data-owner-chat-channel="drs"[\s\S]*DRS 一對一/u);
-  assert.match(conversation, /data-owner-chat-channel="case-group"[\s\S]*案件三方群組/u);
-  assert.match(conversation, /甲方與 DRS 的一對一對話尚未連結/u);
-  assert.match(conversation, /甲方、乙方與 DRS 的案件群組尚未連結/u);
-  assert.match(conversation, /data-owner-line-trusted-content/u);
-  assert.equal((conversation.match(/<textarea[^>]*disabled[^>]*aria-disabled="true"/gu) ?? []).length, 2);
-  assert.equal((conversation.match(/<button[^>]*data-line-send[^>]*disabled[^>]*aria-disabled="true"/gu) ?? []).length, 2);
-  assert.doesNotMatch(html, /訊息已送出|已傳送訊息/u);
+  assert.doesNotMatch(
+    html,
+    /owner-line-conversation|data-owner-chat-channel|data-owner-line-trusted-content|data-line-send|LINE｜DRS|LINE｜案件三方群組/u,
+  );
+  assert.doesNotMatch(css, /owner-line-conversation|owner-chat-channel/u);
 
   assert.match(
     css,
-    /\.owner-hero-dashboard\s*\{[\s\S]{0,360}grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(260px,\s*320px\)/u,
+    /\.owner-hero-dashboard\s*\{[\s\S]{0,360}grid-template-columns:\s*minmax\(0,\s*1fr\)/u,
   );
   assert.match(
     css,
-    /@media\s*\(max-width:\s*760px\)[\s\S]*?\[data-layout="owner-hero-workspace"\]\s*\{[\s\S]{0,100}order:\s*1[\s\S]*?\[data-layout="owner-line-conversation"\]\s*\{[\s\S]{0,100}order:\s*2/u,
+    /\.owner-hero-workspace\s*\{[^}]*width:\s*100%/u,
   );
-  assert.match(css, /\.owner-chat-channel\s*\{/u);
 });
 
 test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約", async () => {
@@ -832,7 +835,6 @@ test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約",
 
   for (const slot of [
     "case-name",
-    "header-state",
     "state-label",
     "agreement-label",
     "document-summary",
@@ -2531,7 +2533,7 @@ test("未連結正式案件時說清楚原因、處理者、最近留痕與可�
   assert.equal(model.currentActor, "由甲方先確認 DRS 服務與案件入口");
   assert.equal(model.lastRecorded, "尚未建立正式案件紀錄");
   assert.equal(model.nextAction, "了解並確認 DRS 服務契約");
-  assert.match(html, /完成後才會開放本案契約填寫與案件對話/u);
+  assert.match(html, /完成後才會開放本案契約、文件分享與案件留痕/u);
   assert.match(html, /data-owner-service-contract-link[^>]*>\s*了解並確認 DRS 服務契約/u);
   assert.doesNotMatch(model.statusMessage, /已保存/u);
 });
@@ -2947,16 +2949,19 @@ test("Calendar stays in the main owner workspace with no initial iframe source, 
   ]);
   const workspaceStart = html.indexOf('data-layout="owner-hero-workspace"');
   const calendarStart = html.indexOf("data-owner-google-calendar", workspaceStart);
-  const lineStart = html.indexOf('data-layout="owner-line-conversation"', workspaceStart);
+  const calendarEnd = html.indexOf(
+    'class="owner-management-shell owner-management-shell--design"',
+    calendarStart,
+  );
   assert.ok(calendarStart > workspaceStart, "Calendar belongs to the main workspace");
-  assert.ok(lineStart > calendarStart, "LINE remains a right rail after Calendar");
+  assert.ok(calendarEnd > calendarStart, "Calendar ends before Design operations");
   assert.equal(
     html.match(/data-owner-google-calendar(?=[\s=>])/gu)?.length,
     1,
     "only the Design management Calendar is controlled",
   );
   assert.equal(html.match(/id="owner-google-calendar-title"/gu)?.length, 1);
-  const controlledMarkup = html.slice(calendarStart, lineStart);
+  const controlledMarkup = html.slice(calendarStart, calendarEnd);
   assert.match(controlledMarkup, /<iframe[^>]*data-owner-calendar-frame[^>]*(?!\bsrc=)[^>]*>/u);
   assert.match(controlledMarkup, /data-owner-calendar-state[^>]*>\s*尚未連結 Google Calendar/u);
   assert.match(controlledMarkup, /data-owner-calendar-connect[^>]*disabled[^>]*aria-disabled="true"/u);
@@ -2969,17 +2974,66 @@ test("Calendar stays in the main owner workspace with no initial iframe source, 
   assert.doesNotMatch(bootstrap, /127\.0\.0\.1:4194|[?&](?:case|returnTo|next)=/u);
 });
 
-test("LINE right rail remains an unlinked truthful state with no fabricated conversation and disabled composer", async () => {
-  const html = await readPageFile("code.html");
-  const lineStart = html.indexOf('data-layout="owner-line-conversation"');
-  const lineMarkup = html.slice(lineStart, html.indexOf("</aside>", lineStart));
+test("每份案件文件都提供受權限保護的 LINE 分享連結", async () => {
+  const [html, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    loadRuntime(),
+  ]);
+  assert.equal(typeof runtime.createOwnerDocumentLineShareUrl, "function");
+  assert.match(html, /data-owner-document-share-guide/u);
+  assert.match(html, /接收者仍須登入並具有本案權限/u);
 
-  assert.ok(lineStart >= 0, "LINE rail exists");
-  assert.match(lineMarkup, /案件(?:三方)?群組尚未連結/u);
-  assert.match(lineMarkup, /尚未取得案件訊息|目前沒有可顯示的對話/u);
-  assert.doesNotMatch(lineMarkup, /訊息已送出|已傳送訊息|已讀/u);
-  assert.match(lineMarkup, /<textarea[^>]*disabled[^>]*aria-disabled="true"/u);
-  assert.match(lineMarkup, /data-line-send[^>]*disabled[^>]*aria-disabled="true"/u);
+  const shareUrl = runtime.createOwnerDocumentLineShareUrl({
+    title: "平面配置圖",
+    versionLabel: "第 3 版・甲方確認版",
+  });
+  const parsed = new URL(shareUrl);
+  assert.equal(parsed.origin, "https://social-plugins.line.me");
+  assert.equal(parsed.pathname, "/lineit/share");
+  assert.equal(
+    parsed.searchParams.get("url"),
+    "http://127.0.0.1:4173/pcm/owner/workspace/#documents",
+  );
+  assert.match(parsed.searchParams.get("text"), /平面配置圖/u);
+  assert.match(parsed.searchParams.get("text"), /第 3 版・甲方確認版/u);
+  assert.match(parsed.searchParams.get("text"), /登入並具有本案權限/u);
+  assert.equal(runtime.createOwnerDocumentLineShareUrl({ title: "" }), null);
+
+  const harness = createOwnerWorkspaceRenderHarness();
+  const controller = runtime.createOwnerWorkspaceController({
+    root: harness.root,
+    adapter: {
+      loadOwnerWorkspace: async () => authorizedContext({
+        documents: [
+          {
+            title: "平面配置圖",
+            kindLabel: "圖面",
+            versionLabel: "第 3 版・甲方確認版",
+            statusLabel: "已記錄",
+          },
+          {
+            title: "工程報價單",
+            kindLabel: "報價文件",
+            versionLabel: "第 2 版・待確認",
+            statusLabel: "已記錄",
+          },
+        ],
+      }),
+    },
+  });
+  await controller.initialize();
+  const documentNodes = renderedNodes(harness.lists.get("documents"));
+  const shareActions = documentNodes.filter(
+    (node) => node.getAttribute?.("data-owner-document-line-share") === "true",
+  );
+  assert.equal(shareActions.length, 2);
+  for (const action of shareActions) {
+    assert.equal(action.tagName, "a");
+    assert.equal(action.textContent, "分享至 LINE");
+    assert.equal(action.getAttribute("target"), "_blank");
+    assert.equal(action.getAttribute("rel"), "noopener noreferrer");
+    assert.match(action.getAttribute("href"), /^https:\/\/social-plugins\.line\.me\/lineit\/share\?/u);
+  }
 });
 
 test("owner Supabase workspace bootstrap gates session, owner grant shape, strict snapshot, and Calendar failure cleanup", async () => {

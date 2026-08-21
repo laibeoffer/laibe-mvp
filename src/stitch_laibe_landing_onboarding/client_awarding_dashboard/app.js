@@ -18,6 +18,10 @@ export const OWNER_WORKSPACE_ACCESS = Object.freeze({
   domainStatus: "active",
 });
 
+const OWNER_DOCUMENTS_CANONICAL_URL =
+  "http://127.0.0.1:4173/pcm/owner/workspace/#documents";
+const LINE_SHARE_BASE_URL = "https://social-plugins.line.me/lineit/share";
+
 export const PRECONTRACT_BOUNDARY = "REGISTERED != CONTRACTED";
 
 export const OWNER_CONTRACT_IMPACT_KEYS = Object.freeze([
@@ -319,10 +323,6 @@ const EMPTY_LIST_COPY = Object.freeze({
     title: "尚未取得設計決策紀錄",
     body: "正式案件連結後，會依序顯示提出者、文件版次、書面意見、結果與下一位處理者。",
   }),
-  lineMessages: Object.freeze({
-    title: "尚未取得案件訊息",
-    body: "只有收到可信留痕憑證後，訊息才會顯示為已記錄。",
-  }),
   constructionRecords: Object.freeze({
     title: "尚未取得施工或驗收事件",
     body: "施工任務、照片、追加減項與驗收缺失，必須來自正式案件紀錄。",
@@ -424,6 +424,20 @@ function asText(value, fallback = "") {
   }
   const normalized = value.trim().replace(/\s+/g, " ");
   return normalized ? normalized.slice(0, 500) : fallback;
+}
+
+export function createOwnerDocumentLineShareUrl(record) {
+  const title = asText(record?.title);
+  const versionLabel = asText(record?.versionLabel);
+  if (!title || !versionLabel) return null;
+
+  const shareUrl = new URL(LINE_SHARE_BASE_URL);
+  shareUrl.searchParams.set("url", OWNER_DOCUMENTS_CANONICAL_URL);
+  shareUrl.searchParams.set(
+    "text",
+    `萊比案件文件｜${title}｜${versionLabel}。接收者需登入並具有本案權限。`,
+  );
+  return shareUrl.href;
 }
 
 function asArray(value) {
@@ -904,7 +918,7 @@ export function buildOwnerWorkspaceViewModel(input) {
       (unavailable ? "了解並確認 DRS 服務契約" : "依案件狀態確認下一步"),
     nextDue: summary?.nextDueLabel ||
       (unavailable
-        ? "完成後才會開放本案契約填寫與案件對話"
+        ? "完成後才會開放本案契約、文件分享與案件留痕"
         : "依案件通知"),
     lastRecorded: summary?.lastRecordedAtLabel ||
       (unavailable ? "尚未建立正式案件紀錄" : "尚無案件留痕"),
@@ -966,6 +980,7 @@ function appendRecord(documentRef, list, title, body, metaLines = []) {
   }
   item.append(content, meta);
   list.append(item);
+  return item;
 }
 
 function clearNode(node) {
@@ -1433,7 +1448,7 @@ function renderModel(root, model) {
     "documents",
     model.documents,
     (documentRef, list, record) => {
-      appendRecord(
+      const item = appendRecord(
         documentRef,
         list,
         record.title,
@@ -1442,6 +1457,23 @@ function renderModel(root, model) {
           .join(" · "),
         [record.submittedByLabel, record.submittedAtLabel, record.sourceLabel],
       );
+      const shareUrl = createOwnerDocumentLineShareUrl(record);
+      if (!shareUrl) return;
+      const action = createTextElement(
+        documentRef,
+        "a",
+        "分享至 LINE",
+        "owner-document-line-share",
+      );
+      action.setAttribute("href", shareUrl);
+      action.setAttribute("target", "_blank");
+      action.setAttribute("rel", "noopener noreferrer");
+      action.setAttribute("data-owner-document-line-share", "true");
+      action.setAttribute(
+        "aria-label",
+        `分享${asText(record.title, "本文件")}的受權限保護連結至 LINE`,
+      );
+      item.append(action);
     },
   );
   renderList(
@@ -1516,26 +1548,6 @@ function renderModel(root, model) {
           .filter(Boolean)
           .join(" · "),
         [record.actorLabel, record.recordedAtLabel, record.nextActionLabel],
-      );
-    },
-  );
-  renderList(
-    root,
-    "lineMessages",
-    model.messages,
-    (documentRef, list, record) => {
-      appendRecord(
-        documentRef,
-        list,
-        record.actorLabel,
-        record.body,
-        [
-          record.messageTypeLabel,
-          record.documentVersionLabel,
-          record.recordedAtLabel,
-          record.recordStatusLabel,
-          record.nextActionLabel,
-        ],
       );
     },
   );
