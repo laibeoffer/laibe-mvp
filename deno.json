@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "strict": true
+  },
+  "fmt": {
+    "include": [
+      "src/lib/drs-linebot",
+      "tests/line_bot"
+    ]
+  },
+  "lint": {
+    "include": [
+      "src/lib/drs-linebot",
+      "tests/line_bot"
+    ]
+  }
+}

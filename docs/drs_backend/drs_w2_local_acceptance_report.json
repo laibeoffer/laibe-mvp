@@ -1,64 +1,118 @@
 {
-  "schema_version": "drs-w2-local-acceptance-v1",
-  "overall_decision": "ACTIVE_PROTECTED",
+  "schema_version": "drs-w2-local-acceptance-v2",
+  "overall_decision": "DRS_W2_LOCAL_INTEGRATED_CANDIDATE_READY_FOR_FINAL_REVIEW",
   "integration": {
     "worktree": "C:\\CodexWork\\08-Jacky\\worktrees\\laibe_MVP_project\\drs-w2-integration-20260821",
     "branch": "codex/drs-w2-integration-20260821",
     "baseline": "dfae8484228c2718486f147b8e22103c7ed2f0f7",
     "issue": 117,
     "commit": null,
-    "tree": null
+    "tree": null,
+    "commit_note": "Exact commit and tree are recorded by the Commander terminal report after commit creation."
   },
-  "gates": {
-    "source_convergence": {
-      "status": "GREEN_INVENTORY_ONLY_NOT_ADMISSION",
-      "passed": 4,
-      "total": 4,
-      "pending_lanes": ["A14_LINE_OPENAI_W2_REWORK", "WORKSPACE_W2_INDEPENDENT_REVIEW"],
-      "source_admission": "HOLD_NO_SOURCE_ADMISSION"
-    },
+  "source_admission": {
+    "status": "SOURCE_ADMITTED_LOCAL_CANDIDATE_FINAL_REVIEW_PENDING",
+    "method": "final_tree_diff_from_baseline_to_commander_frozen_lane_commits",
+    "source_convergence_tests": "7/7",
+    "admitted_file_equality": true,
+    "protected_path_guard": true,
+    "migration_order": [
+      "20260820000000_drs_linebot_group_ai_human_w1.sql",
+      "20260820090000_drs_core_case_audit_contract.sql"
+    ]
+  },
+  "lanes": {
     "core_w2": {
       "status": "FROZEN_LOCAL_CANDIDATE_WITH_LIVE_POSTGRES_HOLD",
       "commit": "5149037dda85b82c2fedca01d9bb08f9bc649438",
       "tree": "d00b4e415c55c3297242cbdc370c9cfed84a95e1",
       "independent_verdict": "APPROVE_CORE_W2_LOCAL_HARNESS_FOR_COMMANDER_FREEZE_WITH_LIVE_POSTGRES_HOLD",
+      "commander_freeze": "DRS_CORE_W2_FROZEN_LOCAL_CANDIDATE_WITH_LIVE_POSTGRES_HOLD",
       "w2_tests": "16/16",
       "w1_tests": "45/45",
+      "integration_tree_tests": "61/61",
       "live_postgres_proof": false
     },
     "a14_w2": {
-      "status": "REWORK_ACTIVE_AFTER_REQUEST_CHANGES",
-      "independent_verdict": "REQUEST_CHANGES_A14_W2",
-      "rejected_commit": "a2ca226017c74bb64d7de0048a667ae31b8bc279",
-      "rejected_tree": "abb1679e3cd279f94a2ef1db8b4c6c66c49d55d5",
-      "blocker": "provider-event lease ownership and expiry do not protect actual case receipt write",
-      "next_parent": "a2ca226017c74bb64d7de0048a667ae31b8bc279"
+      "status": "FROZEN_LOCAL_CANDIDATE",
+      "commit": "db955712199652c1fbac38273ba31e4b6fba64df",
+      "tree": "14992b5eb9946d229204f309f69fd3339acd4752",
+      "independent_verdict": "APPROVE_A14_W2_LOCAL_CANDIDATE_FOR_COMMANDER_FREEZE",
+      "commander_freeze": "A14_DRS_LINEBOT_W2_FROZEN_LOCAL_CANDIDATE",
+      "w2_tests": "20/20",
+      "w1_w2_tests": "78/78",
+      "deno_check": "PASS",
+      "deno_lint": "PASS",
+      "deno_fmt": "PASS"
     },
     "workspace_w2": {
-      "status": "CANDIDATE_PENDING_INDEPENDENT_REVIEW_AFTER_COMMANDER_BROWSER_GREEN",
-      "source_tests": "22/22",
-      "browser_role_state_viewport_checks": "30/30",
+      "status": "FROZEN_LOCAL_CANDIDATE",
+      "commit": "697bc83f6734abc6842546faa6feed9abef81f65",
+      "tree": "2768fe8e2403418fb92a27198a3bee6059e5b0de",
+      "independent_verdict": "APPROVE_WORKSPACE_W2_LOCAL_CANDIDATE_FOR_COMMANDER_FREEZE",
+      "commander_freeze": "DRS_WORKSPACE_UI_W2_FROZEN_LOCAL_CANDIDATE",
+      "source_tests": "23/23",
+      "browser_smoke": "1/1",
+      "a0_canonical_integration": false
+    }
+  },
+  "integration_gates": {
+    "runtime_contract": {
+      "status": "GREEN",
+      "tests": "13/13",
+      "verified_session_binding": true,
+      "human_only_final_authority": true,
+      "ai_advisory_only": true,
+      "transport_acceptance_not_recipient_read": true,
+      "strict_transport_evidence": true,
+      "strict_authority_intervals": true,
+      "sparse_arrays_fail_closed": true
+    },
+    "browser_product": {
+      "status": "GREEN",
+      "tests": "1/1",
+      "viewports": ["1440x900", "390x844"],
+      "roles": ["owner", "vendor", "specialist"],
+      "states": ["loading", "ready", "empty", "retryable-error", "permission-denied"],
       "console_errors": 0,
       "horizontal_overflow": 0,
-      "mobile_cta_live_overlap": false,
-      "commit": "4f9f3688224d12399fdcc842ed19a31ed9a90ff5",
-      "tree": "43b54bf3efe9cebaa907008d91e1fd804a2915a4"
+      "small_controls": 0,
+      "forbidden_visible_copy": 0
     },
-    "integration_contract": {
-      "status": "THIRD_REWORK_GREEN_PENDING_SOURCE_ADMISSION",
-      "tests": "13/13",
-      "bound_to_admitted_lane_sources": false
+    "static_guards": {
+      "node_check": "PASS",
+      "json_parse": "PASS",
+      "git_diff_check": "PASS",
+      "token_shape_secret_scan": "PASS",
+      "protected_path_scan": "PASS"
     },
-    "a0_immutable": true,
-    "production_authorized": false
+    "final_independent_review": {
+      "security_privacy": "PENDING",
+      "browser_product": "PENDING"
+    }
   },
-  "remaining_p0": [
-    "FINISH_A14_REWORK_AND_REVIEW_WORKSPACE",
-    "ADMIT_INDEPENDENTLY_APPROVED_AND_COMMANDER_FROZEN_W2_LANES",
-    "BIND_A14_TO_CORE_TRANSACTION_AND_EVENT_SEMANTICS",
-    "PROVE_VERIFIED_SPECIALIST_AND_VENDOR_PARTICIPANT_PROJECTION",
-    "RUN_FULL_CROSS_LANE_LOCAL_E2E",
-    "OBTAIN_TWO_INDEPENDENT_FINAL_REVIEWS"
-  ],
-  "forbidden_scope_unchanged": true
+  "remote_and_production": {
+    "canonical_admission": false,
+    "live_postgres_rls": false,
+    "remote_migration_applied": false,
+    "real_line_openai": false,
+    "secrets_used": false,
+    "deployment": false,
+    "push_pr_merge": false,
+    "production_ready": false
+  },
+  "forbidden_scope_unchanged": {
+    "a0_canonical_ui_routes": true,
+    "payment_escrow": true,
+    "old_house_investment_roi": true,
+    "tender_bid_low_price_marketplace": true,
+    "budget_engine_plancraft": true,
+    "formal_quote_excel_pdf": true
+  },
+  "open_gates": [
+    "FINAL_SECURITY_PRIVACY_REVIEW",
+    "FINAL_BROWSER_PRODUCT_REVIEW",
+    "LIVE_POSTGRES_RLS_PROOF",
+    "REMOTE_PRODUCTION_DEPLOYMENT_AUTHORITY"
+  ]
 }

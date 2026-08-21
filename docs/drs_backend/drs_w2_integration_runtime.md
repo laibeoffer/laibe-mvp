@@ -2,9 +2,17 @@
 
 ## Status
 
-`ACTIVE_PROTECTED / CONTRACT_SLICE_GREEN / SOURCE_ADMISSION_PENDING`
+`SOURCE_ADMITTED / CONTRACT_SLICE_GREEN / FINAL_REVIEW_PENDING`
 
-This is an isolated local integration contract. It does not connect to A0, real LINE, OpenAI, Auth, remote PostgreSQL, or production services.
+This is an isolated local integration contract. It admits the exact frozen A14, Core, and Workspace source files into one integration worktree, then verifies the cross-lane contract through dependency-injected local ports. It does not connect to A0, real LINE, OpenAI, live Auth, remote PostgreSQL, Supabase production, or deployment services.
+
+## Admitted Source Binding
+
+- A14 frozen commit: `db955712199652c1fbac38273ba31e4b6fba64df`
+- Core frozen commit: `5149037dda85b82c2fedca01d9bb08f9bc649438`
+- Workspace frozen commit: `697bc83f6734abc6842546faa6feed9abef81f65`
+- Source convergence: `tests/drs-w2-source-convergence.test.mjs` verifies exact frozen HEAD/tree for each lane and byte-for-byte equality for every admitted integration file.
+- Migration order: A14 `20260820000000_drs_linebot_group_ai_human_w1.sql` before Core `20260820090000_drs_core_case_audit_contract.sql`.
 
 ## Implemented Contract Slice
 
@@ -28,43 +36,54 @@ This is an isolated local integration contract. It does not connect to A0, real 
 - Submitted text is passed to the advisory port for the explicit review call but is not persisted in audit events; intermediate edits and hidden reasoning are not stored.
 - Advisory findings are reduced to the accepted `code`, `severity`, `evidenceRef`, and `recommendation` fields before persistence.
 - Finding codes, severities, evidence-reference syntax, and recommendations are policy-controlled. Free-form AI recommendation/proposed text is not persisted; only a proposed-text SHA-256 is retained.
+- Sparse advisory findings and sparse attachment arrays fail closed.
+- Transport acceptance evidence is snapshotted once into primitives before validation and persistence.
 - Transport acceptance requires strict UTC RFC3339 evidence, a non-empty transport message id, matching destination and payload hash, and valid attachment id/SHA-256 pairs.
+- Assignment and formal-group intervals use calendar-valid RFC3339 parsing and fail closed for `"0"` and impossible dates.
+- Workspace browser behavior preserves disabled/inert tabs in non-ready states, exactly one selected visible panel in ready states, role-scoped message visibility, and Traditional Chinese product copy without internal decision enum leakage.
 
 ## Fresh Evidence
 
-Command:
+Commands:
 
 ```powershell
 node --test tests/drs-w2-runtime-integration.test.mjs
+node --test tests/drs-w2-source-convergence.test.mjs
+$env:NODE_PATH='C:\Users\J\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules'; node --test tests/drs-w2-browser-smoke.test.mjs
 ```
 
-Result: `13/13 PASS` after observed RED. Covered flows:
+Results:
 
-1. Normal advisory review plus Human send and transport receipt.
-2. Transport timeout fail-closed behavior.
-3. Specialist authentication-subject mismatch denial.
-4. Review-service-unavailable manual exception requirements.
-5. Human cancellation without transport.
-6. Concurrent exact replay reservation.
-7. Cross-group source/destination/hash substitution denial.
-8. Advisory output schema reduction and privacy guard.
-9. Sparse advisory findings fail closed without persisting null policy entries.
-10. Malformed transport acceptance denial and stable replay.
-11. Invalid attachment identity/hash, including sparse arrays, denied before Human audit or transport.
-12. Accepted transport evidence is snapshotted once before validation and persistence.
-13. Malformed assignment and formal-group authority intervals fail closed under strict calendar-valid RFC3339 parsing.
+- Runtime integration: `13/13 PASS`.
+- Source convergence/admitted-file equality: `7/7 PASS`.
+- Browser smoke over admitted Workspace files: `1/1 PASS`.
 
-`node --check` passes for the runtime and focused tests. `tests/drs-w2-source-convergence.test.mjs` passes as a clean-source inventory check only; it is not source admission. `git diff --check` passes.
+Lane suites on the same integration tree:
 
-## Not Yet Claimed
+- A14 W1+W2 Deno tests: `78/78 PASS`.
+- A14 W2 focused tests: `20/20 PASS`.
+- Core contract/static/runtime-harness Node tests: `61/61 PASS`.
+- Workspace shell/data-binding Node tests: `23/23 PASS`.
 
-- The A14 W2 adapter, Core W2 PostgreSQL harness, and Workspace W2 data-binding candidates have not yet been admitted.
-- The local runtime has not yet been bound to A14/Core exported functions or SQL transactions.
-- No disposable PostgreSQL execution or real RLS proof is claimed here.
-- Owner/Vendor inbound message behavior and durable role projections await the admitted A14/UI candidates.
-- Attachment storage authorization, retention, expiry, and deletion are not implemented.
-- No production, deployment, remote API, credential, canonical route, or A0 acceptance is claimed.
+Static checks:
 
-## Next Safe Action
+- `deno check` over admitted A14 source/tests: PASS.
+- `deno lint src/lib/drs-linebot tests/line_bot`: PASS.
+- `deno fmt --check src/lib/drs-linebot tests/line_bot`: PASS.
+- `node --check` over integration runtime, source convergence, Core, Workspace JS, and tests: PASS.
+- `git diff --check` and `git diff --cached --check`: PASS.
+- Token-shape secret scan: no match.
+- Protected A0 path scan: no match.
 
-Review and freeze each exact W2 lane candidate, then replace the contract scaffold's injected boundaries with the admitted A14/Core/UI adapters while retaining this focused suite as the cross-lane acceptance test.
+## Not Claimed
+
+- No disposable PostgreSQL execution or real RLS proof is claimed.
+- No remote Supabase migration has been applied.
+- No real LINE/OpenAI call, credential, secret, production deployment, push, PR, or merge is claimed.
+- No canonical A0 route/header/navigation/page-registry/CTA/runtime admission is claimed.
+- No recipient read/confirmation is inferred from transport acceptance.
+- No payment escrow, old-house investment/ROI, tender/bid, Budget Engine, Plancraft, formal quote, Excel, or PDF scope is included.
+
+## Next Gate
+
+The exact integration tree must receive independent security/privacy review and independent browser/product review before Commander can freeze the final local integrated candidate.

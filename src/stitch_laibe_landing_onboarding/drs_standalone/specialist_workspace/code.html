@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="LaiBE DRS 專員工作台，呈現案件佇列、AI 初步檢核、人工作業控制與案件留痕。" />
+    <title>DRS 專員工作台｜LaiBE DRS</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-drs-workspace="specialist" data-view-model-boundary="isolated-data-client">
+    <a class="skip-link" href="#workspace-main">跳到 DRS 專員工作區</a>
+    <header class="topbar">
+      <div class="brand"><img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE" /><div><span>Decision &amp; Record System</span><strong>DRS 專員工作台</strong></div></div>
+      <dl class="identity-strip" aria-label="DRS 專員狀態">
+        <div><dt>角色</dt><dd>DRS 專員</dd></div>
+        <div><dt>案件佇列</dt><dd>4 件待處理</dd></div>
+        <div><dt>AI 初步檢核</dt><dd>2 件需人工判斷</dd></div>
+        <div><dt>下一步責任人</dt><dd data-drs-bind="responsible-role">DRS 專員</dd></div>
+      </dl>
+    </header>
+
+    <main id="workspace-main" class="workspace-shell">
+      <aside class="case-rail" aria-label="DRS 專員導覽">
+        <p class="rail-kicker">Specialist DRS</p>
+        <h1>AI 提醒風險，人來決定怎麼送出</h1>
+        <nav class="rail-tabs" aria-label="專員工作區切換" role="tablist">
+          <button type="button" class="is-active" id="specialist-tab-queue" data-drs-tab="queue" role="tab" aria-selected="true" aria-controls="specialist-panel-queue" tabindex="0">案件佇列</button>
+          <button type="button" id="specialist-tab-snapshot" data-drs-tab="snapshot" role="tab" aria-selected="false" aria-controls="specialist-panel-snapshot" tabindex="-1">送出前快照</button>
+          <button type="button" id="specialist-tab-control" data-drs-tab="control" role="tab" aria-selected="false" aria-controls="specialist-panel-control" tabindex="-1">人工控制</button>
+          <button type="button" id="specialist-tab-timeline" data-drs-tab="timeline" role="tab" aria-selected="false" aria-controls="specialist-panel-timeline" tabindex="-1">稽核時間軸</button>
+        </nav>
+        <section class="rail-note"><strong>權責邊界</strong><p>AI 不會自行送出，也不是核准者；所有對外回覆都要由 DRS 專員確認。</p></section>
+      </aside>
+
+      <section class="main-panel" aria-label="DRS 專員工作內容">
+        <section class="hero-state">
+          <p class="eyebrow">案件佇列</p>
+          <h2 data-drs-bind="current-status">先處理會阻塞屋主決策的文件問題</h2>
+          <p>專員工作台呈現案件狀態、送出前快照、AI 初步檢核、人工控制與可追溯時間軸；它不是自動核准工具。</p>
+          <div class="hero-actions">
+            <button type="button" class="primary-action" data-drs-action="open-control">檢視人工控制</button>
+            <button type="button" class="secondary-action" data-drs-action="open-editor">開啟複雜文件編輯入口</button>
+          </div>
+        </section>
+
+        <section class="workspace-status" data-drs-state-region aria-label="本頁案件資料狀態">
+          <div><p class="eyebrow" data-drs-bind="state-label">可檢視</p><h2 data-drs-bind="product-message">案件狀態已整理完成，請依下一步責任人處理。</h2></div>
+          <dl class="record-grid">
+            <div><dt>誰在等待誰</dt><dd data-drs-bind="waiting-for">屋主等待乙方補充尺寸說明</dd></div>
+            <div><dt>下一步</dt><dd data-drs-bind="next-action">乙方補充尺寸後，屋主再決定是否確認平面配置 v2。</dd></div>
+          </dl>
+          <button type="button" class="secondary-action" data-drs-action="retry-load">重新整理本頁案件狀態</button>
+        </section>
+
+        <section class="state-grid" aria-label="專員頁面狀態">
+          <article><span>載入中</span><strong>正在整理案件佇列</strong><p>正式開放後會依授權案件與責任人排序。</p><button type="button" data-drs-state-option="loading">檢視載入狀態</button></article>
+          <article><span>空狀態</span><strong>目前沒有待處理案件</strong><p>有新文件或回覆需求時才會進入佇列。</p><button type="button" data-drs-state-option="empty">檢視空狀態</button></article>
+          <article><span>錯誤狀態</span><strong>暫時無法取得案件快照</strong><p>請保留目前畫面，稍後重新整理案件狀態。</p><button type="button" data-drs-state-option="retryable-error">檢視暫時無法取得</button></article>
+          <article><span>未取得檢視權限</span><strong>需要確認案件授權</strong><p>正式開放後會依專員授權案件顯示內容。</p><button type="button" data-drs-state-option="permission-denied">檢視權限狀態</button></article>
+        </section>
+
+        <section class="queue-board" id="specialist-panel-queue" data-drs-panel="queue" role="tabpanel" aria-labelledby="specialist-tab-queue" data-drs-ready-content>
+          <div class="section-head"><div><p class="eyebrow">案件佇列</p><h2>依阻塞程度排序</h2></div><span>4 件待處理</span></div>
+          <ol class="ledger-list" data-drs-list="review-queue">
+            <li><span>青埔 A7</span><strong>平面配置 v2 尺寸說明不足</strong><small>阻塞屋主是否確認圖面</small><em>優先</em></li>
+            <li><span>新店小宅</span><strong>文件條件與圖面版本不一致</strong><small>需先整理差異，再要求補件</small><em>待判斷</em></li>
+            <li><span>大安舊案</span><strong>驗收缺失照片未對應位置</strong><small>需要求乙方補足照片脈絡</small><em>待處理</em></li>
+          </ol>
+        </section>
+
+        <section class="content-grid" data-drs-ready-content>
+          <article class="snapshot-board" id="specialist-panel-snapshot" data-drs-panel="snapshot" role="tabpanel" aria-labelledby="specialist-tab-snapshot" hidden>
+            <div class="section-head compact"><div><p class="eyebrow" data-drs-bind="snapshot-title">送出前快照</p><h2>提交內容摘要</h2></div><span>尚未送出</span></div>
+            <dl class="record-grid">
+              <div><dt>案件</dt><dd>青埔 A7 新成屋</dd></div>
+              <div><dt>引用文件</dt><dd data-drs-bind="snapshot-documents">平面配置 v2</dd></div>
+              <div><dt>目前狀態</dt><dd data-drs-bind="snapshot-state">等待乙方補尺寸說明</dd></div>
+              <div><dt>下一步</dt><dd data-drs-bind="snapshot-next">乙方回覆後屋主確認</dd></div>
+            </dl>
+          </article>
+          <article class="ai-board">
+            <div class="section-head compact"><div><p class="eyebrow">AI 初步檢核</p><h2>提醒狀態</h2></div><span data-drs-bind="ai-status">需人工確認</span></div>
+            <ol class="ledger-list" data-drs-list="ai-findings">
+              <li><span>尺寸疑點</span><strong>中島通道可能不足</strong><small>AI 初步提醒，仍需專員判斷並引用文件</small><em>需確認</em></li>
+              <li><span>文件缺口</span><strong>廚具尺寸表缺少版次</strong><small>建議列入補件要求</small><em>需確認</em></li>
+            </ol>
+            <p class="boundary">AI 不會自行送出，也不是核准者。送出、覆寫或例外送出都必須由 DRS 專員操作。</p>
+          </article>
+        </section>
+
+        <section class="control-board" id="specialist-panel-control" data-drs-panel="control" role="tabpanel" aria-labelledby="specialist-tab-control" data-drs-ready-content hidden>
+          <div class="section-head"><div><p class="eyebrow">人工送出前紀錄</p><h2 id="control-title">送出前控制</h2></div><span data-drs-bind="final-receipt">三種結果都會留下本頁紀錄</span></div>
+          <div class="control-grid">
+            <article><strong>編修後建立送出前紀錄</strong><p>先修改文字或引用文件，再建立本頁送出前決策紀錄。</p><button type="button" data-drs-action="edit-send">建立編修紀錄</button></article>
+            <article><strong>覆寫提醒並建立紀錄</strong><p>專員不同意 AI 提醒時，必須說明覆寫原因與文件依據。</p><button type="button" data-drs-action="override-send">建立覆寫紀錄</button></article>
+            <article><strong>人工例外紀錄</strong><p>特殊情況需留下例外原因、急迫程度與服務事件編號。</p><button type="button" data-drs-action="manual-send">建立例外紀錄</button></article>
+          </div>
+        </section>
+
+        <section class="tool-entry-grid" data-drs-ready-content>
+          <article><p class="eyebrow">複雜文件編輯</p><h2>多文件比較與人工整理</h2><p>此入口正在整理中；目前會在本頁顯示可用狀態，不會離開案件。</p><button type="button" data-drs-action="editor-entry">查看編輯入口狀態</button></article>
+          <article><p class="eyebrow">批次圖面檢視</p><h2>批次圖面檢視入口</h2><p>正式開放後可集中整理多張圖面、標註疑點與等待對象。</p><button type="button" data-drs-action="drawing-entry">查看圖面入口狀態</button></article>
+        </section>
+
+        <section class="timeline-board" id="specialist-panel-timeline" data-drs-panel="timeline" role="tabpanel" aria-labelledby="specialist-tab-timeline" data-drs-ready-content hidden>
+          <div class="section-head compact"><div><p class="eyebrow">稽核時間軸</p><h2>每次判斷都要回到案件事實</h2></div><span>唯讀檢視</span></div>
+          <ol class="timeline" data-drs-list="trace">
+            <li><time>07/11 09:32</time><strong>AI 初步提醒尺寸疑點</strong><p>狀態：等待 DRS 專員確認，不會自動送出。</p></li>
+            <li><time>07/11 09:48</time><strong>專員建立送出前快照</strong><p>引用平面配置 v2，下一步責任人為乙方設計團隊。</p></li>
+          </ol>
+        </section>
+      </section>
+    </main>
+
+    <p class="live-region" data-drs-live aria-live="polite">已載入 DRS 專員工作台。</p>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
