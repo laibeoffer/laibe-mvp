@@ -1,0 +1,64 @@
+{
+  "schema_version": "drs-w2-local-acceptance-v1",
+  "overall_decision": "ACTIVE_PROTECTED",
+  "integration": {
+    "worktree": "C:\\CodexWork\\08-Jacky\\worktrees\\laibe_MVP_project\\drs-w2-integration-20260821",
+    "branch": "codex/drs-w2-integration-20260821",
+    "baseline": "dfae8484228c2718486f147b8e22103c7ed2f0f7",
+    "issue": 117,
+    "commit": null,
+    "tree": null
+  },
+  "gates": {
+    "source_convergence": {
+      "status": "GREEN_INVENTORY_ONLY_NOT_ADMISSION",
+      "passed": 4,
+      "total": 4,
+      "pending_lanes": ["A14_LINE_OPENAI_W2_REWORK", "WORKSPACE_W2_INDEPENDENT_REVIEW"],
+      "source_admission": "HOLD_NO_SOURCE_ADMISSION"
+    },
+    "core_w2": {
+      "status": "FROZEN_LOCAL_CANDIDATE_WITH_LIVE_POSTGRES_HOLD",
+      "commit": "5149037dda85b82c2fedca01d9bb08f9bc649438",
+      "tree": "d00b4e415c55c3297242cbdc370c9cfed84a95e1",
+      "independent_verdict": "APPROVE_CORE_W2_LOCAL_HARNESS_FOR_COMMANDER_FREEZE_WITH_LIVE_POSTGRES_HOLD",
+      "w2_tests": "16/16",
+      "w1_tests": "45/45",
+      "live_postgres_proof": false
+    },
+    "a14_w2": {
+      "status": "REWORK_ACTIVE_AFTER_REQUEST_CHANGES",
+      "independent_verdict": "REQUEST_CHANGES_A14_W2",
+      "rejected_commit": "a2ca226017c74bb64d7de0048a667ae31b8bc279",
+      "rejected_tree": "abb1679e3cd279f94a2ef1db8b4c6c66c49d55d5",
+      "blocker": "provider-event lease ownership and expiry do not protect actual case receipt write",
+      "next_parent": "a2ca226017c74bb64d7de0048a667ae31b8bc279"
+    },
+    "workspace_w2": {
+      "status": "CANDIDATE_PENDING_INDEPENDENT_REVIEW_AFTER_COMMANDER_BROWSER_GREEN",
+      "source_tests": "22/22",
+      "browser_role_state_viewport_checks": "30/30",
+      "console_errors": 0,
+      "horizontal_overflow": 0,
+      "mobile_cta_live_overlap": false,
+      "commit": "4f9f3688224d12399fdcc842ed19a31ed9a90ff5",
+      "tree": "43b54bf3efe9cebaa907008d91e1fd804a2915a4"
+    },
+    "integration_contract": {
+      "status": "THIRD_REWORK_GREEN_PENDING_SOURCE_ADMISSION",
+      "tests": "13/13",
+      "bound_to_admitted_lane_sources": false
+    },
+    "a0_immutable": true,
+    "production_authorized": false
+  },
+  "remaining_p0": [
+    "FINISH_A14_REWORK_AND_REVIEW_WORKSPACE",
+    "ADMIT_INDEPENDENTLY_APPROVED_AND_COMMANDER_FROZEN_W2_LANES",
+    "BIND_A14_TO_CORE_TRANSACTION_AND_EVENT_SEMANTICS",
+    "PROVE_VERIFIED_SPECIALIST_AND_VENDOR_PARTICIPANT_PROJECTION",
+    "RUN_FULL_CROSS_LANE_LOCAL_E2E",
+    "OBTAIN_TWO_INDEPENDENT_FINAL_REVIEWS"
+  ],
+  "forbidden_scope_unchanged": true
+}
