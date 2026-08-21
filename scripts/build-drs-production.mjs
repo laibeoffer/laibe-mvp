@@ -34,6 +34,12 @@ const ASSET_ALLOWLIST = Object.freeze([
   "src/lib/budget/quote-healthcheck/browser-adapter.js",
   "site/preview_floor_plan/vendor/pdfjs/pdf.mjs",
   "site/preview_floor_plan/vendor/pdfjs/pdf.worker.mjs",
+  "site/preview_floor_plan/browser-recognition-adapter.mjs",
+  "site/preview_floor_plan/pdf-dimension-scale-decision.mjs",
+  "site/preview_floor_plan/pdf-plan-objectization-adapter.js",
+  "site/preview_floor_plan/pdf-plan-selected-source-presentation.mjs",
+  "site/preview_floor_plan/pdf-plan-vector-extractor.js",
+  "site/preview_floor_plan/pdf-recognition-gate.mjs",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/app.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/owner-workspace-bootstrap.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
@@ -55,11 +61,14 @@ const ASSET_ALLOWLIST = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/app.js",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/contract-content.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/drs-brand.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-shell.css",
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/styles.css",
 ]);
@@ -72,6 +81,22 @@ const DECLARED_LOCAL_RUNTIME_DEPENDENCIES = Object.freeze([
   Object.freeze({
     source: "site/preview_floor_plan/vendor/pdfjs/pdf.mjs",
     reference: "./pdf.worker.mjs",
+  }),
+  Object.freeze({
+    source: "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/app.js",
+    reference: "../../../../site/preview_floor_plan/browser-recognition-adapter.mjs",
+  }),
+  Object.freeze({
+    source: "site/preview_floor_plan/browser-recognition-adapter.mjs",
+    reference: "./vendor/pdfjs/pdf.worker.mjs",
+  }),
+  Object.freeze({
+    source: "site/preview_floor_plan/browser-recognition-adapter.mjs",
+    reference: "./pdf-plan-selected-source-presentation.mjs",
+  }),
+  Object.freeze({
+    source: "site/preview_floor_plan/pdf-recognition-gate.mjs",
+    reference: "./pdf-dimension-scale-decision.mjs",
   }),
 ]);
 
@@ -353,9 +378,7 @@ if (dependencyProbe) {
 const transformedEntries = [];
 for (const node of deployNodes) {
   let html;
-  if (node.id === "drawingCheck") {
-    html = unavailableEntry(node, "圖說辨識功能正在整理中，正式開放後會提供完整操作入口。");
-  } else if (node.lifecycle === "planned" || !SOURCE_ENTRY_BY_ID[node.id]) {
+  if (node.lifecycle === "planned" || !SOURCE_ENTRY_BY_ID[node.id]) {
     html = unavailableEntry(node, "此功能正在整理中，正式開放後會提供完整操作入口。");
   } else {
     const sourceRelative = SOURCE_ENTRY_BY_ID[node.id];

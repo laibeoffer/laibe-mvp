@@ -209,7 +209,7 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
     const html = await readFile(entryPath(node.publicPath), "utf8");
     assert.match(html, /<html\b[^>]*lang="zh-Hant"/iu, node.publicPath);
     assert.doesNotMatch(html, /(?:["']\/src\/|code\.html)/iu, node.publicPath);
-    if (node.lifecycle === "active" && node.id !== "drawingCheck") {
+    if (node.lifecycle === "active") {
       assert.match(html, /\/assets\/[a-f\d]{64}\//u, `${node.publicPath} asset URL`);
     }
   }
@@ -218,9 +218,9 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   }
 
   const assetFiles = second.files.filter((file) => file.startsWith("assets/"));
-  assert.equal(assetFiles.length, 32, "exact production asset closure");
+  assert.equal(assetFiles.length, 41, "exact production asset closure");
   assert.equal(deployNodes.length, 18, "exact production route closure");
-  assert.equal(second.files.length, 55, "32 assets + 18 routes + 5 metadata files");
+  assert.equal(second.files.length, 64, "41 assets + 18 routes + 5 metadata files");
   assert.deepEqual(await listMaterializationArtifacts(), [], "successful build swap artifacts");
   const assetRoots = new Set(assetFiles.map((file) => file.split("/").slice(0, 2).join("/")));
   assert.equal(assetRoots.size, 1, "all runtime assets share one content hash root");
@@ -273,7 +273,9 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
     const repositoryRelative = file.split("/").slice(2).join("/");
     assert.doesNotMatch(repositoryRelative, forbiddenTopLevel, file);
     assert.doesNotMatch(repositoryRelative, forbiddenArtifact, file);
-    assert.doesNotMatch(repositoryRelative, /(?:credential|secret|token|api[_-]?key)/iu, file);
+    if (repositoryRelative !== "src/stitch_laibe_landing_onboarding/pcm_standalone/shared/owner-first-tokens.css") {
+      assert.doesNotMatch(repositoryRelative, /(?:credential|secret|token|api[_-]?key)/iu, file);
+    }
   }
 
   const javascriptAssets = await Promise.all(
@@ -291,11 +293,33 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   assert.doesNotMatch(applicationJavascript, /(?:\/src\/|code\.html)/iu);
 
   const drawing = await readFile(entryPath("/pcm/drawing-check"), "utf8");
-  assert.match(drawing, /圖說辨識功能正在整理中/u);
-  assert.match(drawing, /返回 DRS 首頁/u);
+  assert.match(drawing, /data-drawing-check-page/u);
+  assert.match(drawing, /id="drawing-file"/u);
+  assert.match(drawing, /\/assets\/[a-f\d]{64}\/[^"']*\/drawing_check\/styles\.css/u);
+  assert.match(drawing, /\/assets\/[a-f\d]{64}\/[^"']*\/drawing_check\/app\.js/u);
+  assert.doesNotMatch(drawing, /圖說辨識功能正在整理中|正式開放後會提供完整操作入口/u);
+  for (const suffix of [
+    "/pcm_standalone/drawing_check/app.js",
+    "/pcm_standalone/drawing_check/styles.css",
+    "/site/preview_floor_plan/browser-recognition-adapter.mjs",
+    "/site/preview_floor_plan/pdf-plan-vector-extractor.js",
+    "/site/preview_floor_plan/pdf-plan-objectization-adapter.js",
+    "/site/preview_floor_plan/pdf-recognition-gate.mjs",
+    "/site/preview_floor_plan/pdf-dimension-scale-decision.mjs",
+    "/site/preview_floor_plan/pdf-plan-selected-source-presentation.mjs",
+    "/pcm_standalone/shared/owner-first-shell.css",
+    "/pcm_standalone/shared/owner-first-tokens.css",
+  ]) {
+    assert.equal(assetFiles.filter((file) => file.endsWith(suffix)).length, 1, suffix);
+  }
+  assert.equal(
+    assetFiles.some((file) => file.endsWith("/site/preview_floor_plan/pdf-plan-exact-source-runtime.mjs")),
+    false,
+    "full exact-source QA runtime must not ship",
+  );
 });
 
-test("production build closes the built adapter PDF.js runtime and parses the Human quote and contract", async () => {
+test("production build closes Quote and Drawing PDF.js runtimes and preserves local-review-only safety", async () => {
   installPdfJsNodePolyfills();
   delete globalThis.pdfjsLib;
   runBuild();
@@ -309,7 +333,11 @@ test("production build closes the built adapter PDF.js runtime and parses the Hu
   const pdfWorkerFile = assetFiles.find((file) => (
     file.endsWith("/site/preview_floor_plan/vendor/pdfjs/pdf.worker.mjs")
   ));
+  const drawingAdapterFile = assetFiles.find((file) => (
+    file.endsWith("/site/preview_floor_plan/browser-recognition-adapter.mjs")
+  ));
   assert.ok(adapterFile, "built browser adapter");
+  assert.ok(drawingAdapterFile, "built Drawing browser adapter");
   const adapter = await import(
     `${pathToFileURL(path.join(distRoot, adapterFile)).href}?test=${crypto.randomUUID()}`
   );
@@ -386,6 +414,31 @@ test("production build closes the built adapter PDF.js runtime and parses the Hu
   ]);
   assert.deepEqual(builtPdfJs, sourcePdfJs, "built PDF.js module bytes");
   assert.deepEqual(builtPdfWorker, sourcePdfWorker, "built PDF.js worker bytes");
+
+  const drawingAdapter = await import(
+    `${pathToFileURL(path.join(distRoot, drawingAdapterFile)).href}?test=${crypto.randomUUID()}`
+  );
+  const drawingBytes = await readFile(path.join(repositoryRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf"));
+  const drawingResult = await drawingAdapter.recognizeDrawingFile(
+    new File([drawingBytes], "安全圖說.pdf", { type: "application/pdf" }),
+    {
+      dependencies: {
+        async presentSelectedPdfFile(snapshot) {
+          assert.equal((await snapshot.arrayBuffer()).byteLength, drawingBytes.byteLength);
+          return { pageCount: 1, selectedPageNumber: 1 };
+        },
+      },
+    },
+  );
+  assert.equal(drawingResult.status, "partial");
+  assert.equal(drawingResult.reason, "A11_FORMAL_BINDING_HOLD");
+  assert.equal(drawingResult.mode, "local_review_only");
+  assert.deepEqual(drawingResult.holds, ["A11_FORMAL_BINDING_HOLD"]);
+  assert.equal(drawingResult.conversionAllowed, false);
+  assert.equal(drawingResult.projectMutationAllowed, false);
+  assert.equal(drawingResult.uploaded, false);
+  assert.equal(drawingResult.persisted, false);
+  assert.equal(drawingResult.formalCaseRecord, false);
 });
 
 test("every real source-entry read and dependency failure preserves the exact live artifact", async (context) => {
@@ -401,6 +454,7 @@ test("every real source-entry read and dependency failure preserves the exact li
       ["home", "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html"],
       ["aboutDrs", "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html"],
       ["quoteCheck", "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html"],
+      ["drawingCheck", "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/code.html"],
       ["accountAccess", "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html"],
       ["serviceContract", "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html"],
       ["contractPrerequisites", "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html"],
@@ -466,7 +520,6 @@ test("drawing and every planned route preflight failure preserve the exact live 
     assert.equal(buildSource.includes(appendRoute), true, "generated route append");
     await writeFile(sentinelPath, "preserve generated route families\n", "utf8");
     for (const id of [
-      "drawingCheck",
       "caseSetup",
       "vendorInvitation",
       "pcmAuthorizedList",
@@ -637,11 +690,11 @@ test("real stage verifier and unknown-fault failures preserve live output", asyn
   const rows = [
     {
       fault: "stage-verify-missing-planned-file",
-      diagnostic: /Staged production artifact file set does not match the validated plan: expected=55, actual=54,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=64, actual=63,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
     },
     {
       fault: "stage-verify-unexpected-file",
-      diagnostic: /Staged production artifact file set does not match the validated plan: expected=55, actual=56,/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=64, actual=65,/u,
     },
     {
       fault: "stage-verify-mutated-bytes",

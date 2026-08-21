@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { File } from "node:buffer";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadCanonicalUpper3fFixture } from "./helpers/canonical-pdf-scene.mjs";
@@ -13,7 +13,27 @@ const adapterPath = resolve(
   repoRoot,
   "site/preview_floor_plan/browser-recognition-adapter.mjs",
 );
+const selectedSourcePresenterPath = resolve(
+  repoRoot,
+  "site/preview_floor_plan/pdf-plan-selected-source-presentation.mjs",
+);
 const pdfPath = resolve(repoRoot, "tests/fixtures/_qa_pdf_reference_3rf.pdf");
+const realDrawingFixtures = Object.freeze([
+  Object.freeze({
+    path: "C:/CodexWork/訓練資料/2025.10.02-漢皇SUPER小伍哥/01-DWG圖檔/小伍哥0511.pdf",
+    sha256: "727de4d175e0c831cf2eacef5f967f322e8b94dd829c9f1b004bc17191923459",
+    pageCount: 28,
+    objectCount: 183,
+    unresolvedCount: 7,
+  }),
+  Object.freeze({
+    path: "C:/CodexWork/訓練資料/2025.10.02-漢皇SUPER小伍哥/01-DWG圖檔/PDF/漢皇SUPER平面系列圖面.pdf",
+    sha256: "1a470f432f4f956f4271c1a338186e12fa7ca3b99d70384e76e1f8c1fd90545c",
+    pageCount: 16,
+    objectCount: 167,
+    unresolvedCount: 13,
+  }),
+]);
 const adversarialFixtureDir = resolve(
   repoRoot,
   "tests/fixtures/a0-canonical-repair",
@@ -213,6 +233,132 @@ test("existing genuine PDF passes the local PDF.js vector and recognition chain"
   assert.equal(result.sourcePage.pageNumber, 1);
   assert.equal(result.securityStatus, "NO_ACTIVE_CONTENT_TRIGGER_DETECTED");
   assert.equal(result.conversionAllowed, false);
+});
+
+test("production-safe presenter binds the genuine File SHA page and PDF.js raster", async () => {
+  assert.equal(
+    existsSync(selectedSourcePresenterPath),
+    true,
+    "production-safe selected-source presenter must exist",
+  );
+  const source = readFileSync(selectedSourcePresenterPath, "utf8");
+  assert.doesNotMatch(
+    source,
+    /LaibePdfPlanExactSourceQa|localhost|Gate-B|gateB|pdf-plan-exact-source-runtime|native-import/i,
+  );
+
+  const bytes = readFileSync(pdfPath);
+  const sourceSha256 = createHash("sha256").update(bytes).digest("hex");
+  const renderCalls = [];
+  const pdfDocument = {
+    numPages: 1,
+    async getPage(pageNumber) {
+      assert.equal(pageNumber, 1);
+      return {
+        pageNumber,
+        getViewport({ scale, rotation = 0 }) {
+          return { width: 320 * scale, height: 240 * scale, rotation };
+        },
+        render(input) {
+          renderCalls.push(input);
+          return { promise: Promise.resolve() };
+        },
+      };
+    },
+    async destroy() {},
+  };
+  const pdfjsLib = {
+    getDocument({ data }) {
+      assert.equal(data.byteLength, bytes.byteLength);
+      structuredClone(data, { transfer: [data] });
+      return { promise: Promise.resolve(pdfDocument) };
+    },
+  };
+  const context = {
+    fillStyle: "",
+    fillRect() {},
+  };
+  const documentBefore = globalThis.document;
+  globalThis.document = {
+    createElement(tagName) {
+      assert.equal(tagName, "canvas");
+      return {
+        width: 0,
+        height: 0,
+        getContext(kind, options) {
+          assert.equal(kind, "2d");
+          assert.deepEqual(options, { alpha: false });
+          return context;
+        },
+        toDataURL(type) {
+          assert.equal(type, "image/png");
+          return "data:image/png;base64,iVBORw0KGgo=";
+        },
+      };
+    },
+  };
+  try {
+    const { presentSelectedPdfFile } = await import(
+      `${pathToFileURL(selectedSourcePresenterPath).href}?production-safe-presenter=1`
+    );
+    const result = await presentSelectedPdfFile(
+      new File([bytes], "真實圖說.pdf", { type: "application/pdf" }),
+      {
+        pdfjsLib,
+        expectedSha256: sourceSha256,
+        pageNumber: 1,
+        renderScale: 2,
+      },
+    );
+    assert.equal(result.schema, "laibe.planPuzzle.pdfSourcePresentation.v1");
+    assert.equal(result.route, "genuine-user-file-selection");
+    assert.equal(result.selectedSha256, sourceSha256);
+    assert.equal(result.selectedPageNumber, 1);
+    assert.equal(result.pageCount, 1);
+    assert.equal(result.file.byteLength, bytes.byteLength);
+    assert.equal(result.referenceRaster.sourceDocumentSha256, sourceSha256);
+    assert.equal(result.referenceRaster.pageNumber, 1);
+    assert.equal(result.referenceRaster.naturalWidth, 640);
+    assert.equal(result.referenceRaster.naturalHeight, 480);
+    assert.equal(renderCalls.length, 1);
+  } finally {
+    if (documentBefore === undefined) delete globalThis.document;
+    else globalThis.document = documentBefore;
+  }
+});
+
+test("real target drawings keep their exact local-review-only regressions", async () => {
+  const { recognizeDrawingFile } = await import(`${adapterUrl}?real-target-regressions=1`);
+  for (const fixture of realDrawingFixtures) {
+    assert.equal(existsSync(fixture.path), true, `FILE_NOT_FOUND: ${fixture.path}`);
+    const bytes = readFileSync(fixture.path);
+    assert.equal(createHash("sha256").update(bytes).digest("hex"), fixture.sha256, fixture.path);
+    const result = await recognizeDrawingFile(
+      new File([bytes], fixture.path.split("/").at(-1), { type: "application/pdf" }),
+      {
+        dependencies: {
+          async presentSelectedPdfFile(snapshot) {
+            const selected = await snapshot.arrayBuffer();
+            assert.equal(selected.byteLength, bytes.byteLength);
+            return { pageCount: fixture.pageCount, selectedPageNumber: 1 };
+          },
+        },
+      },
+    );
+    assert.equal(result.status, "partial", fixture.path);
+    assert.equal(result.reason, "A11_FORMAL_BINDING_HOLD", fixture.path);
+    assert.equal(result.mode, "local_review_only", fixture.path);
+    assert.deepEqual(result.holds, ["A11_FORMAL_BINDING_HOLD"], fixture.path);
+    assert.equal(result.file.sha256, fixture.sha256, fixture.path);
+    assert.equal(result.summary.pageCount, fixture.pageCount, fixture.path);
+    assert.equal(result.summary.objectCount, fixture.objectCount, fixture.path);
+    assert.equal(result.summary.unresolvedCount, fixture.unresolvedCount, fixture.path);
+    assert.equal(result.conversionAllowed, false, fixture.path);
+    assert.equal(result.projectMutationAllowed, false, fixture.path);
+    assert.equal(result.uploaded, false, fixture.path);
+    assert.equal(result.persisted, false, fixture.path);
+    assert.equal(result.formalCaseRecord, false, fixture.path);
+  }
 });
 
 test("normal caller and even caller-supplied A11 data remain local review only", async () => {
@@ -532,7 +678,7 @@ test("accepted contracts are reused without conversion or fixture-name branching
     "vendor/pdfjs/pdf.mjs",
     "pdf-plan-vector-extractor.js",
     "pdf-plan-objectization-adapter.js",
-    "pdf-plan-exact-source-runtime.mjs",
+    "pdf-plan-selected-source-presentation.mjs",
     "pdf-recognition-gate.mjs",
   ]) {
     assert.match(source, new RegExp(acceptedModule.replaceAll(".", "\\.")));
@@ -540,6 +686,6 @@ test("accepted contracts are reused without conversion or fixture-name branching
   assert.doesNotMatch(source, /_qa_pdf_reference_3rf|0312\.pdf|fixture/i);
   assert.doesNotMatch(
     source,
-    /convertAcceptedBundleToNativePlan|importSelectedPdfFile|importPdfObjectizationScene|laibePlanImport/i,
+    /pdf-plan-exact-source-runtime|convertAcceptedBundleToNativePlan|importSelectedPdfFile|importPdfObjectizationScene|laibePlanImport/i,
   );
 });

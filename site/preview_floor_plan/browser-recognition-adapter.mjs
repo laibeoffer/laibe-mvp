@@ -499,8 +499,11 @@ async function defaultPresentSelectedPdfFile(snapshot, options) {
       import.meta.url,
     ).href;
   }
-  const runtime = await import("./pdf-plan-exact-source-runtime.mjs");
-  return runtime.presentSelectedPdfFile(snapshot, options);
+  const presenter = await import("./pdf-plan-selected-source-presentation.mjs");
+  return presenter.presentSelectedPdfFile(snapshot, {
+    ...options,
+    pdfjsLib: localPdfJs,
+  });
 }
 
 async function documentHasActiveContent(pdfDocument) {
