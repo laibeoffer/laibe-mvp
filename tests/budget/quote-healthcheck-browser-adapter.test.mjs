@@ -367,14 +367,7 @@ test("Blob size is checked against 10 MiB before any arrayBuffer read", async ()
   );
 });
 
-test("embedded parser bundle is deterministic and parser-only results match all 18 accepted fixtures", async () => {
-  const envPermission = await Deno.permissions.query({ name: "env" });
-  const runPermission = await Deno.permissions.query({ name: "run", command: "deno" });
-  if (envPermission.state !== "granted" || runPermission.state !== "granted") {
-    console.log("[skip] bundle drift test requires --allow-env and --allow-run=deno");
-    return;
-  }
-
+test("embedded parser bundle is deterministic and parser-only results match all 18 checked fixtures", async () => {
   const adapterSource = readFileSync(adapterPath, "utf8");
   const generatedBundle = execFileSync(
     "deno",
@@ -428,12 +421,30 @@ test("embedded parser bundle is deterministic and parser-only results match all 
     const expectedStatus = accepted.accepted
       ? accepted.inspection.readability === "IMAGE_ONLY"
         ? "SCANNED_PDF"
-        : accepted.facts.rows.length > 0
-          ? "PARSER_READY"
-          : "UNSUPPORTED_LAYOUT"
+        : "PARSER_READY"
       : accepted.rejection.code;
     assert.equal(parserOnly.status, expectedStatus, fixtureName);
     assert.equal(parserOnly.report, null, fixtureName);
+    if (!accepted.accepted) {
+      assert.ok(
+        [
+          "CORRUPT_PDF",
+          "ENCRYPTED_PDF",
+          "UNSUPPORTED_ACTIVE_CONTENT",
+          "UNSUPPORTED_COMPRESSED_CONTENT",
+        ].includes(accepted.rejection.code),
+        fixtureName,
+      );
+      assert.equal(parserOnly.summary, null, fixtureName);
+    }
+    if (
+      accepted.accepted &&
+      accepted.inspection.readability !== "IMAGE_ONLY" &&
+      accepted.facts.rows.length === 0
+    ) {
+      assert.equal(parserOnly.status, "PARSER_READY", fixtureName);
+      assert.equal(parserOnly.summary.itemCount, 0, fixtureName);
+    }
     if (expectedStatus === "PARSER_READY") {
       assert.equal(parserOnly.summary.itemCount, accepted.facts.rows.length, fixtureName);
       assert.equal(parserOnly.summary.pageCount, accepted.inspection.pageCount, fixtureName);
