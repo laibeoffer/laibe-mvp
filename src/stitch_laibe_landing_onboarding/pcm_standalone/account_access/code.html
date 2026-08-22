@@ -6,10 +6,10 @@
     <meta name="description" content="建立或登入 LaiBE DRS 帳號。" />
     <title>LaiBE DRS｜帳號入口</title>
     <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
-    <link rel="stylesheet" href="./styles.css?v=20260815-final-runtime" />
+    <link rel="stylesheet" href="./styles.css?v=20260822-account-recovery" />
     <link rel="stylesheet" href="../shared/drs-brand.css" />
   </head>
-  <body data-laibe-page="register-owner" data-account-mode="register">
+  <body data-laibe-page="account-access" data-account-mode="login">
     <a class="skip-link" href="#main-content">跳到主要內容</a>
     <header class="site-header" id="top">
       <a class="brand" href="../public_home/code.html#top" aria-label="LaiBE DRS 首頁">
@@ -30,23 +30,23 @@
           <header class="fc-h" id="fcHead">
             <div>
               <p>帳號入口</p>
-              <h1 id="fcTitle">建立 LaiBE DRS 帳號</h1>
+              <h1 id="fcTitle">登入 LaiBE DRS 帳號</h1>
             </div>
-            <p id="fcSwitch">已有帳號？<button id="toLogin" type="button" data-mode-tab="login">登入</button></p>
+            <p id="fcSwitch" hidden>已有帳號？<button id="toLogin" type="button" data-mode-tab="login">登入</button></p>
           </header>
           <p class="alt-line" data-account-intent hidden aria-live="polite"></p>
 
           <div class="role-binding" aria-labelledby="role-title">
             <p id="role-title">選擇你的使用角色 <span aria-hidden="true">*</span></p>
             <div class="role-options">
-              <button type="button" data-role-option="owner" aria-pressed="false"><strong>甲方</strong><span>整理自己的裝修資料</span></button>
+              <button type="button" data-role-option="owner" aria-pressed="true"><strong>甲方</strong><span>整理自己的裝修資料</span></button>
               <button type="button" data-role-option="invited-partner" aria-pressed="false"><strong>受邀乙方</strong><span>依邀請加入後續協作</span></button>
             </div>
             <p class="field-error" data-field-error="register-role" data-role-error aria-live="polite"></p>
           </div>
 
-          <form class="fc-b" id="regForm" data-account-form="register" novalidate>
-            <input name="role" type="hidden" value="" />
+          <form class="fc-b" id="regForm" data-account-form="register" novalidate hidden>
+            <input name="role" type="hidden" value="owner" />
             <input name="accountType" type="hidden" value="personal" />
 
             <div class="field">
@@ -93,19 +93,57 @@
             </div>
             <label class="agree"><input id="agree" name="agree" type="checkbox" />我已閱讀並同意使用說明。</label>
             <p class="field-error" data-field-error="register-agree"></p>
-            <button class="btn primary" type="submit" data-submit-button><span data-submit-label>送出申請</span></button>
+            <button class="btn primary" type="submit" data-submit-button><span data-submit-label>建立帳號</span></button>
             <p class="form-status" data-form-status="register" aria-live="polite"></p>
-            <p class="alt-line">帳號功能正式開放後，會提供完整操作入口。</p>
+            <p class="alt-line">建立後請前往 Email 完成驗證；案件權限仍依受邀紀錄確認。</p>
           </form>
 
-          <form class="fc-b" id="loginForm" data-account-form="login" novalidate hidden>
-            <input name="role" type="hidden" value="" />
-            <div class="field"><label for="login-email">Email</label><input id="login-email" name="email" type="email" autocomplete="email" placeholder="you@example.com" /><p class="field-error" data-field-error="login-email"></p></div>
-            <div class="field"><label for="login-password">密碼</label><input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="請輸入密碼" /><p class="field-error" data-field-error="login-password"></p></div>
+          <form class="fc-b" id="loginForm" data-account-form="login" novalidate>
+            <input name="role" type="hidden" value="owner" />
+            <div class="field">
+              <label for="login-email">Email</label>
+              <input id="login-email" name="email" type="email" autocomplete="username" inputmode="email" placeholder="you@example.com" />
+              <p class="field-error" data-field-error="login-email"></p>
+            </div>
+            <div class="field">
+              <label for="login-password">密碼</label>
+              <input id="login-password" name="password" type="password" autocomplete="current-password" />
+              <p class="field-error" data-field-error="login-password"></p>
+            </div>
             <button class="btn primary" type="submit" data-submit-button><span data-submit-label>登入帳號</span></button>
             <p class="form-status" data-form-status="login" aria-live="polite"></p>
-            <p class="alt-line">帳號功能正式開放後，會先驗證角色，再進入相應工作台。</p>
+            <p class="alt-line">登入後會先確認帳號及案件資格，再開啟相應工作台；本頁選擇的角色不會自行取得案件權限。</p>
+            <p class="alt-line"><button type="button" data-mode-tab="forgot">忘記密碼</button></p>
             <p class="alt-line">尚未有帳號？<button type="button" data-mode-tab="register">建立帳號</button></p>
+          </form>
+
+          <form class="fc-b" id="forgotForm" data-account-form="forgot" novalidate hidden>
+            <div class="field">
+              <label for="forgot-email">Email</label>
+              <input id="forgot-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" />
+              <p class="field-error" data-field-error="forgot-email"></p>
+            </div>
+            <p class="form-help">輸入建立帳號時使用的 Email。我們會寄出一次性的密碼重設連結。</p>
+            <button class="btn primary" type="submit" data-submit-button><span data-submit-label>寄送重設信</span></button>
+            <p class="form-status" data-form-status="forgot" aria-live="polite"></p>
+            <p class="alt-line"><button type="button" data-mode-tab="login">返回登入</button></p>
+          </form>
+
+          <form class="fc-b" id="recoveryForm" data-account-form="recovery" novalidate hidden>
+            <div class="field">
+              <label for="recovery-password">新密碼</label>
+              <input id="recovery-password" name="password" type="password" autocomplete="new-password" placeholder="至少 8 碼" />
+              <p class="field-error" data-field-error="recovery-password"></p>
+            </div>
+            <div class="field">
+              <label for="recovery-confirm-password">再次輸入新密碼</label>
+              <input id="recovery-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" placeholder="再次輸入新密碼" />
+              <p class="field-error" data-field-error="recovery-confirmPassword"></p>
+            </div>
+            <p class="form-help">完成更新後，請使用新密碼重新登入。</p>
+            <button class="btn primary" type="submit" data-submit-button><span data-submit-label>更新密碼</span></button>
+            <p class="form-status" data-form-status="recovery" aria-live="polite"></p>
+            <p class="alt-line"><button type="button" data-mode-tab="login">返回登入</button></p>
           </form>
 
           <section id="okState" hidden aria-live="polite"></section>
@@ -114,7 +152,7 @@
         <section class="intro" aria-labelledby="account-title">
           <p class="eyebrow">LAIBE DRS</p>
           <h2 id="account-title">建立帳號，開始整理裝修決策。</h2>
-          <p class="lead">先建立可辨識的帳號入口；正式開放後，才能依你的角色整理需求、文件與後續決策紀錄。</p>
+          <p class="lead">建立帳號並完成 Email 驗證後，系統會依你的案件資格開啟可使用的工作台。</p>
 
           <div class="switch" aria-label="帳號模式">
             <button class="on" type="button" data-mode-tab="register" aria-pressed="true">建立帳號</button>
@@ -124,16 +162,16 @@
           <div class="steps" aria-label="建立帳號步驟">
             <article class="step"><span class="n">01</span><div><h3>填寫資料</h3><p>留下日後辨識與聯繫所需的基本資料。</p></div></article>
             <article class="step"><span class="n">02</span><div><h3>確認角色</h3><p>確認你是甲方，或是收到邀請加入的受邀乙方。</p></div></article>
-            <article class="step"><span class="n">03</span><div><h3>完成申請</h3><p>帳號入口開放後，依通知完成後續操作。</p></div></article>
+            <article class="step"><span class="n">03</span><div><h3>完成 Email 驗證</h3><p>前往信箱完成驗證，再回到此頁登入。</p></div></article>
           </div>
 
           <aside class="reassure">
-            <strong>帳號資料會先停留在本頁。</strong>
-            <p>目前不會建立帳號或傳送資料；正式開放後會提供完整操作入口。</p>
+            <strong>案件權限不由本頁的角色選擇決定。</strong>
+            <p>使用完成驗證的 Email 登入後，系統仍會依案件成員紀錄確認可開啟的工作台。</p>
           </aside>
         </section>
       </div>
     </main>
-    <script type="module" src="./app.js?v=20260815-final-runtime"></script>
+    <script type="module" src="./app.js?v=20260822-account-recovery"></script>
   </body>
 </html>

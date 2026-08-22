@@ -118,6 +118,25 @@ button { color: inherit; }
   padding: 54px 0 80px;
 }
 
+html[data-account-mode="login"] .reg-grid {
+  grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
+  grid-template-areas: "form .";
+}
+
+html[data-account-mode="login"] .intro { display: none; }
+html[data-account-mode="login"] .form-card { width: 100%; max-width: 540px; }
+
+html[data-account-mode="forgot"] .reg-grid,
+html[data-account-mode="recovery"] .reg-grid {
+  grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
+  grid-template-areas: "form .";
+}
+
+html[data-account-mode="forgot"] .intro,
+html[data-account-mode="recovery"] .intro { display: none; }
+html[data-account-mode="forgot"] .form-card,
+html[data-account-mode="recovery"] .form-card { width: 100%; max-width: 540px; }
+
 .intro { grid-area: intro; padding: 12px 4px; }
 .eyebrow { margin: 0 0 14px; color: var(--accent); font-size: 0.72rem; font-weight: 900; letter-spacing: 0.18em; }
 .intro h2 { max-width: 10ch; margin: 0; font-size: clamp(2.6rem, 5.5vw, 4.8rem); line-height: 1.05; letter-spacing: -0.06em; }
@@ -172,6 +191,8 @@ button { color: inherit; }
 .form-status { min-height: 1.3em; margin: -5px 0 0; color: var(--muted); font-size: 0.72rem; }
 .form-status[data-tone="error"] { color: var(--danger); }
 .form-status[data-tone="notice"] { color: #ffd0a7; }
+.form-status[data-tone="success"] { color: #94e5ce; }
+.form-help { margin: -2px 0 1px; color: var(--muted); font-size: 0.76rem; line-height: 1.6; }
 .alt-line { margin: -1px 0 0; color: var(--muted); font-size: 0.73rem; line-height: 1.5; text-align: center; }
 #okState { padding: 0 24px 24px; color: #ffd0a7; font-size: 0.78rem; line-height: 1.55; }
 
@@ -186,6 +207,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 @media (max-width: 540px) {
   .shell { width: min(100vw - 28px, 1080px); }
   .reg-grid { padding-top: 35px; }
+  html[data-account-mode="login"] .reg-grid { grid-template-columns: 1fr; grid-template-areas: "form"; }
+  html[data-account-mode="forgot"] .reg-grid,
+  html[data-account-mode="recovery"] .reg-grid { grid-template-columns: 1fr; grid-template-areas: "form"; }
   .intro h2 { font-size: clamp(2.4rem, 13vw, 3.5rem); }
   .fc-h, .role-binding, .fc-b { padding-inline: 18px; }
   .role-options { grid-template-columns: 1fr; }
