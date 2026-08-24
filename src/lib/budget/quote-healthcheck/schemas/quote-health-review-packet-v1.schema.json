@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://laibe.example/schemas/candidate/quote-health-review-packet-v1.schema.json",
+  "title": "Quote Health Review Packet V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaName", "schemaVersion", "packetId", "caseId",
+    "quoteHealthReportPacketId", "quoteHealthReportReference",
+    "sourceDocumentReferenceId", "sourceDocumentId", "sourceDocumentVersionId",
+    "sourceDocumentSha256", "reviewStatus", "nextOwner", "nextAction",
+    "decisionRecordReferences", "createdAt", "recordedAt", "factsHash"
+  ],
+  "properties": {
+    "schemaName": { "const": "laibe.quote-health-review-packet.v1" },
+    "schemaVersion": { "const": 1 },
+    "packetId": { "$ref": "#/$defs/identity" },
+    "caseId": { "$ref": "#/$defs/identity" },
+    "quoteHealthReportPacketId": { "$ref": "#/$defs/identity" },
+    "quoteHealthReportReference": { "$ref": "#/$defs/reportReference" },
+    "sourceDocumentReferenceId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+    "sourceDocumentSha256": { "$ref": "#/$defs/sha256" },
+    "reviewStatus": { "const": "HUMAN_PCM_REVIEW_PENDING" },
+    "nextOwner": { "const": "HUMAN_PCM" },
+    "nextAction": { "const": "REVIEW_QUOTE_HEALTH_REPORT" },
+    "decisionRecordReferences": {
+      "type": "array",
+      "minItems": 0,
+      "items": { "$ref": "#/$defs/decisionRecordReference" }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "recordedAt": { "type": "string", "format": "date-time" },
+    "factsHash": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "identity": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "decisionRecordReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decisionRecordId", "decisionRecordVersion", "decisionRecordSha256"],
+      "properties": {
+        "decisionRecordId": { "$ref": "#/$defs/identity" },
+        "decisionRecordVersion": { "type": "integer", "minimum": 1 },
+        "decisionRecordSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "reportReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaName", "schemaVersion", "packetId", "factsHash", "caseId",
+        "sourceDocumentReferenceId", "sourceDocumentId", "sourceDocumentVersionId",
+        "sourceDocumentSha256", "lifecycleStatus", "overallStatus", "reviewStage",
+        "reviewDisposition"
+      ],
+      "properties": {
+        "schemaName": { "const": "laibe.quote-health-report.v1" },
+        "schemaVersion": { "const": 1 },
+        "packetId": { "$ref": "#/$defs/identity" },
+        "factsHash": { "$ref": "#/$defs/sha256" },
+        "caseId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentReferenceId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentVersionId": { "$ref": "#/$defs/identity" },
+        "sourceDocumentSha256": { "$ref": "#/$defs/sha256" },
+        "lifecycleStatus": { "enum": ["CURRENT", "STALE"] },
+        "overallStatus": { "enum": ["COMPLETE", "PARTIAL", "STALE"] },
+        "reviewStage": { "const": "machine_candidate" },
+        "reviewDisposition": { "const": "HUMAN_PCM_REVIEW_PENDING" }
+      }
+    }
+  }
+}

@@ -2,6 +2,8 @@ export const QUOTE_EXTRACTION_PACKET_SCHEMA =
   "laibe.quote-extraction-packet.v1" as const;
 export const QUOTE_HEALTH_REPORT_SCHEMA =
   "laibe.quote-health-report.v1" as const;
+export const QUOTE_HEALTH_REVIEW_PACKET_SCHEMA =
+  "laibe.quote-health-review-packet.v1" as const;
 export const A0_AUTHORITY_DECISION_CODE =
   "A0-PCM-INTEGRATION-20260731-V1" as const;
 export const DOCUMENT_VERSION_REF_SCHEMA =
@@ -351,6 +353,56 @@ export interface QuoteHealthReportV1 {
   findings: QuoteHealthFinding[];
   sections: QuoteHealthSections;
   priceReasonablenessDecision: "NOT_DETERMINED";
+  factsHash: string;
+}
+
+export interface DecisionRecordReference {
+  decisionRecordId: string;
+  decisionRecordVersion: number;
+  decisionRecordSha256: string;
+}
+
+export interface QuoteHealthReportReference {
+  schemaName: typeof QUOTE_HEALTH_REPORT_SCHEMA;
+  schemaVersion: 1;
+  packetId: string;
+  factsHash: string;
+  caseId: string;
+  sourceDocumentReferenceId: string;
+  sourceDocumentId: string;
+  sourceDocumentVersionId: string;
+  sourceDocumentSha256: string;
+  lifecycleStatus: QuoteHealthReportV1["lifecycleStatus"];
+  overallStatus: QuoteHealthReportV1["overallStatus"];
+  reviewStage: "machine_candidate";
+  reviewDisposition: "HUMAN_PCM_REVIEW_PENDING";
+}
+
+export interface QuoteHealthReviewPacketBuildInput {
+  packetId: string;
+  createdAt: string;
+  recordedAt: string;
+  quoteHealthReport: QuoteHealthReportV1;
+  decisionRecordReferences: DecisionRecordReference[];
+}
+
+export interface QuoteHealthReviewPacketV1 {
+  schemaName: typeof QUOTE_HEALTH_REVIEW_PACKET_SCHEMA;
+  schemaVersion: 1;
+  packetId: string;
+  caseId: string;
+  quoteHealthReportPacketId: string;
+  quoteHealthReportReference: QuoteHealthReportReference;
+  sourceDocumentReferenceId: string;
+  sourceDocumentId: string;
+  sourceDocumentVersionId: string;
+  sourceDocumentSha256: string;
+  reviewStatus: "HUMAN_PCM_REVIEW_PENDING";
+  nextOwner: "HUMAN_PCM";
+  nextAction: "REVIEW_QUOTE_HEALTH_REPORT";
+  decisionRecordReferences: DecisionRecordReference[];
+  createdAt: string;
+  recordedAt: string;
   factsHash: string;
 }
 

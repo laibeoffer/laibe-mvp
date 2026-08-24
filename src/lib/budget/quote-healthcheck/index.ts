@@ -26,4 +26,8 @@ export {
   buildPreliminaryQuoteHealthReportV1,
   validateQuoteHealthReportV1,
 } from "./report.ts";
+export {
+  buildQuoteHealthReviewPacketV1,
+  validateQuoteHealthReviewPacketV1,
+} from "./review-packet.ts";
 export * from "./types.ts";
