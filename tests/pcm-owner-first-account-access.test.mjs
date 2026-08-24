@@ -38,7 +38,7 @@ function runWithBrowserWindow(callback) {
 function createRegistrationDomHarness() {
   const state = { activeElement: null };
 
-  function element({ dataset = {}, type = "", value = "", checked = false } = {}) {
+  function element({ dataset = {}, type = "", value = "", checked = false, readOnly = false } = {}) {
     const attributes = new Map();
     const listeners = new Map();
     return {
@@ -46,6 +46,7 @@ function createRegistrationDomHarness() {
       type,
       value,
       checked,
+      readOnly,
       hidden: false,
       disabled: false,
       textContent: "",
@@ -93,6 +94,7 @@ function createRegistrationDomHarness() {
   const forgotStatus = element({ dataset: {} });
   const forgotEmailError = element();
   const recoveryFields = {
+    email: element({ value: "", readOnly: true }),
     password: element({ type: "password", value: "new-account88" }),
     confirmPassword: element({ type: "password", value: "new-account88" }),
   };
@@ -110,6 +112,8 @@ function createRegistrationDomHarness() {
   const switcher = element();
   const submit = element();
   submit.querySelector = () => null;
+  const recoverySubmit = element();
+  recoverySubmit.querySelector = () => null;
 
   const form = element({ dataset: { accountForm: "register" } });
   form.elements = { namedItem(name) { return fields[name] ?? null; } };
@@ -145,7 +149,7 @@ function createRegistrationDomHarness() {
   recoveryForm.elements = { namedItem(name) { return recoveryFields[name] ?? null; } };
   recoveryForm.querySelector = (selector) => {
     if (selector === "[data-form-status]") return recoveryStatus;
-    if (selector === "[data-submit-button]") return submit;
+    if (selector === "[data-submit-button]") return recoverySubmit;
     return null;
   };
   recoveryForm.querySelectorAll = (selector) => selector === "[aria-invalid]"
@@ -170,6 +174,7 @@ function createRegistrationDomHarness() {
       if (selector === '[data-field-error="recovery-confirm-password"]') return recoveryConfirmPasswordError;
       if (selector === "[data-role-error]") return roleError;
       if (selector === "[data-role-option]") return owner;
+      if (selector === '[data-role-option="owner"]') return owner;
       if (selector === "#fcTitle") return title;
       if (selector === "#fcSwitch") return switcher;
       return null;
@@ -200,6 +205,7 @@ function createRegistrationDomHarness() {
     loginStatus,
     forgotStatus,
     recoveryStatus,
+    recoverySubmit,
     loginEmailError,
     loginPasswordError,
     forgotEmailError,
@@ -218,21 +224,21 @@ function createRegistrationDomHarness() {
   };
 }
 
-test("account access final runtime asset identity binds both changed assets", () => {
-  assert.match(html, /href="\.\/styles\.css\?v=20260822-account-recovery"/);
-  assert.match(html, /src="\.\/app\.js\?v=20260822-account-recovery"/);
+test("account access runtime identity pins the account-bound recovery app", () => {
+  assert.match(html, /href="\.\/styles\.css\?v=20260824-account-access"/);
+  assert.match(html, /src="\.\/app\.js\?v=20260824-account-access"/);
   assert.ok(css.length > 1000);
   assert.ok(app.length > 500);
 });
 
-test("registration keeps the existing LaiBE DRS header and real navigation", () => {
+test("registration keeps the existing LaiBE header and real navigation", () => {
   const startDocumentCheckHref = canonicalLinkHref("accountAccessHeaderStartDocumentCheckToQuoteCheck");
 
   assert.match(html, /<header class="site-header" id="top">/);
-  assert.match(html, /<a class="brand" href="\.\.\/public_home\/code\.html#top" aria-label="LaiBE DRS 首頁">/);
+  assert.match(html, /<a class="brand" href="\.\.\/public_home\/code\.html#top" aria-label="LaiBE 首頁">/);
   assert.match(html, /Decision &amp; Record System/);
   assert.match(html, /裝潢決策系統/);
-  assert.match(html, /class="header-action"[^>]*href="\.\.\/public_home\/code\.html#top"[^>]*>返回 DRS 首頁<\/a>/);
+  assert.match(html, /class="header-action"[^>]*href="\.\.\/public_home\/code\.html#top"[^>]*>返回 LaiBE 首頁<\/a>/);
   assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=quote#document-workspace");
   assert.ok(html.includes(`<a class="header-action header-action--primary" href="${startDocumentCheckHref}">開始文件健檢</a>`));
   assert.match(css, /\.site-header\s*\{/);
@@ -260,7 +266,7 @@ test("shared account access starts with login while registration keeps its expla
     html.indexOf('class="form-card"') < html.indexOf('class="intro"'),
     "the registration card must precede supporting explanation in DOM order",
   );
-  assert.match(html, /<h1 id="fcTitle">登入 LaiBE DRS 帳號<\/h1>/);
+  assert.match(html, /<h1 id="fcTitle">登入 LaiBE 帳號<\/h1>/);
   assert.match(html, /<h2 id="account-title">建立帳號，開始整理裝修決策。<\/h2>/);
   assert.equal((html.match(/<h1\b/g) ?? []).length, 1);
   assert.match(html, /<h3>填寫資料<\/h3>[\s\S]*<h3>確認角色<\/h3>[\s\S]*<h3>完成 Email 驗證<\/h3>/);
@@ -293,11 +299,12 @@ test("the canonical form card keeps its account mode switch and field sequence",
   assert.match(html, /class="alt-line"/);
 });
 
-test("registration binds the only permitted DRS roles outside the form with a visible error", () => {
+test("registration binds only the permitted owner and invited-partner roles outside the form", () => {
   assert.match(html, /data-role-option="owner"/);
   assert.match(html, /甲方/);
   assert.match(html, /data-role-option="invited-partner"/);
   assert.match(html, /受邀乙方/);
+  assert.doesNotMatch(html, /data-role-option="drs-specialist"/u);
   assert.match(html, /<input[^>]*name="role"[^>]*type="hidden"/);
   assert.equal((html.match(/<input[^>]*name="role"[^>]*type="hidden"/g) ?? []).length, 2);
   assert.match(html, /data-field-error="register-role"/);
@@ -401,6 +408,11 @@ test("Account Access exposes real registration, forgot-password, and same-page p
   assert.match(html, /name="email"[^>]*autocomplete="email"/u);
   assert.match(html, />寄送重設信</u);
   assert.match(html, /data-account-form="recovery"/u);
+  assert.match(html, /id="recovery-email"[^>]*name="email"[^>]*type="email"[^>]*readonly/u);
+  assert.ok(
+    html.indexOf('id="recovery-email"') < html.indexOf('id="recovery-password"'),
+    "the verified recovery account must appear before the new-password fields",
+  );
   assert.match(html, /name="password"[^>]*autocomplete="new-password"/u);
   assert.match(html, /name="confirmPassword"[^>]*autocomplete="new-password"/u);
   assert.match(html, />更新密碼</u);
@@ -420,7 +432,7 @@ test("registration, forgot-password, and recovery forms call the real auth runti
     async getSession() { return null; },
     async signUpWithPassword(values) { signUpCalls.push(values); return true; },
     async requestPasswordRecovery(email) { resetCalls.push(email); return true; },
-    async updatePassword(password) { updateCalls.push(password); return true; },
+    async updatePassword(password, email) { updateCalls.push({ password, email }); return true; },
     onPasswordRecovery(listener) {
       recoveryListener = listener;
       return () => {};
@@ -459,21 +471,78 @@ test("registration, forgot-password, and recovery forms call the real auth runti
   assert.equal(harness.forgotStatus.dataset.tone, "success");
 
   assert.equal(typeof recoveryListener, "function");
-  recoveryListener();
+  recoveryListener({ email: "member@example.com" });
   assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "recovery");
   assert.equal(harness.recoveryForm.hidden, false);
+  assert.equal(harness.recoveryFields.email.value, "member@example.com");
+  assert.equal(harness.recoveryFields.email.readOnly, true);
+  assert.equal(harness.recoveryFields.password.disabled, false);
+  assert.equal(harness.recoverySubmit.disabled, false);
+  assert.equal(harness.recoveryStatus.textContent, "已確認帳號，請設定新的登入密碼。");
+  harness.loginFields.email.value = "";
+  harness.loginFields.password.value = "stale-password";
   runWithBrowserWindow(() => harness.recoveryForm.dispatch("submit"));
   await new Promise((resolve) => setImmediate(resolve));
 
-  assert.deepEqual(updateCalls, ["new-account88"]);
+  assert.deepEqual(updateCalls, [{
+    password: "new-account88",
+    email: "member@example.com",
+  }]);
   assert.deepEqual(replacedUrls, ["/account/access/"]);
   assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "login");
+  assert.equal(harness.loginFields.email.value, "member@example.com");
+  assert.equal(harness.loginFields.password.value, "");
+  assert.equal(harness.state.activeElement, harness.loginFields.password);
   assert.equal(harness.loginStatus.textContent, "密碼已更新，請使用新密碼登入。");
   assert.equal(harness.loginStatus.dataset.tone, "success");
   assert.deepEqual(navigations, []);
 });
 
-test("a recovery fragment can select only the password form and can never authorize a workspace", async () => {
+test("recovery explains rate limits and requires a password different from the current one", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?recovery-errors=${Date.now()}`, import.meta.url));
+  const rateLimitHarness = createRegistrationDomHarness();
+  module.initAccountAccess(rateLimitHarness.rootDocument, {
+    authRuntimePromise: Promise.resolve({
+      async getSession() { return null; },
+      async requestPasswordRecovery() { throw new Error("PASSWORD_RECOVERY_RATE_LIMITED"); },
+      onPasswordRecovery() { return () => {}; },
+    }),
+    location: { pathname: "/account/access/", search: "", hash: "" },
+    schedule(next) { next(); },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  rateLimitHarness.forgotTab.dispatch("click");
+  runWithBrowserWindow(() => rateLimitHarness.forgotForm.dispatch("submit"));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(
+    rateLimitHarness.forgotStatus.textContent,
+    "重設信寄送次數已達上限，請稍候再試，並只使用最新一封信的連結。",
+  );
+  assert.equal(rateLimitHarness.forgotStatus.dataset.tone, "error");
+
+  const samePasswordHarness = createRegistrationDomHarness();
+  let recoveryListener = null;
+  module.initAccountAccess(samePasswordHarness.rootDocument, {
+    authRuntimePromise: Promise.resolve({
+      async getSession() { return null; },
+      onPasswordRecovery(listener) { recoveryListener = listener; return () => {}; },
+      async updatePassword() { throw new Error("PASSWORD_SAME_AS_CURRENT"); },
+    }),
+    location: { pathname: "/account/access/", search: "?flow=password-recovery", hash: "" },
+    schedule() {},
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+  recoveryListener({ email: "member@example.com" });
+  runWithBrowserWindow(() => samePasswordHarness.recoveryForm.dispatch("submit"));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(
+    samePasswordHarness.recoveryStatus.textContent,
+    "新密碼不可與目前密碼相同，請改用不同的密碼。",
+  );
+  assert.equal(samePasswordHarness.recoveryStatus.dataset.tone, "error");
+});
+
+test("a forged or expired recovery fragment never exposes an enabled password form or authorizes a workspace", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?recovery-fragment=${Date.now()}`, import.meta.url));
   const canonicalRecoveryLocation = {
     pathname: "/account/access/",
@@ -497,13 +566,174 @@ test("a recovery fragment can select only the password form and can never author
     }),
     location: canonicalRecoveryLocation,
     navigate: (href) => navigations.push(href),
+    schedule(next) { next(); },
   });
   await new Promise((resolve) => setImmediate(resolve));
 
-  assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "recovery");
-  assert.equal(harness.recoveryForm.hidden, false);
+  assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "forgot");
+  assert.equal(harness.recoveryForm.hidden, true);
+  assert.equal(harness.recoveryFields.password.disabled, true);
+  assert.equal(harness.recoverySubmit.disabled, true);
+  assert.equal(
+    harness.forgotStatus.textContent,
+    "重設連結已失效，請輸入帳號 Email 重新寄送。",
+  );
+  assert.equal(harness.forgotStatus.dataset.tone, "error");
   assert.equal(grantCalls, 0);
   assert.deepEqual(navigations, []);
+});
+
+test("a recovery redirect marker shows the verified account only after the real recovery event", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?recovery-marker=${Date.now()}`, import.meta.url));
+  const canonicalRecoveryLocation = {
+    pathname: "/account/access/",
+    search: "?flow=password-recovery",
+    hash: "",
+  };
+  assert.equal(module.isPasswordRecoveryReturn(canonicalRecoveryLocation), true);
+
+  const harness = createRegistrationDomHarness();
+  const navigations = [];
+  let grantCalls = 0;
+  let recoveryListener = null;
+  let recoveryTimeout = null;
+  module.initAccountAccess(harness.rootDocument, {
+    authRuntimePromise: Promise.resolve({
+      async getSession() { return { access_token: "recovery-session" }; },
+      async authenticatedFetch() { grantCalls += 1; return new Response("{}", { status: 200 }); },
+      onPasswordRecovery(listener) {
+        recoveryListener = listener;
+        return () => {};
+      },
+    }),
+    location: canonicalRecoveryLocation,
+    navigate: (href) => navigations.push(href),
+    schedule(next) { recoveryTimeout = next; },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(typeof recoveryTimeout, "function");
+  assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "recovery");
+  assert.equal(harness.recoveryForm.hidden, false);
+  assert.equal(harness.recoveryFields.email.value, "");
+  assert.equal(harness.recoveryFields.password.disabled, true);
+  assert.equal(harness.recoverySubmit.disabled, true);
+  assert.equal(harness.recoveryStatus.textContent, "正在確認重設連結與帳號…");
+
+  recoveryListener({ email: "member@example.com" });
+  recoveryTimeout();
+
+  assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "recovery");
+  assert.equal(harness.recoveryFields.email.value, "member@example.com");
+  assert.equal(harness.recoveryFields.password.disabled, false);
+  assert.equal(harness.recoverySubmit.disabled, false);
+  assert.equal(harness.recoveryStatus.textContent, "已確認帳號，請設定新的登入密碼。");
+  assert.equal(grantCalls, 0);
+  assert.deepEqual(navigations, []);
+});
+
+test("a verified recovery session keeps the password form open when the transient recovery event was missed", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?recovery-session-fallback=${Date.now()}`, import.meta.url));
+  const canonicalRecoveryLocation = {
+    pathname: "/account/access/",
+    search: "?flow=password-recovery",
+    hash: "",
+  };
+  const harness = createRegistrationDomHarness();
+  const navigations = [];
+  let grantCalls = 0;
+  let recoveryTimeout = null;
+
+  module.initAccountAccess(harness.rootDocument, {
+    authRuntimePromise: Promise.resolve({
+      onPasswordRecovery() { return () => {}; },
+      async resolvePasswordRecoverySession() {
+        return Object.freeze({ email: "member@example.com" });
+      },
+      async authenticatedFetch() { grantCalls += 1; return new Response("{}", { status: 200 }); },
+    }),
+    location: canonicalRecoveryLocation,
+    navigate: (href) => navigations.push(href),
+    schedule(next) { recoveryTimeout = next; },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  assert.equal(typeof recoveryTimeout, "function");
+  recoveryTimeout();
+  assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "recovery");
+  assert.equal(harness.recoveryForm.hidden, false);
+  assert.equal(harness.recoveryFields.email.value, "member@example.com");
+  assert.equal(harness.recoveryFields.password.disabled, false);
+  assert.equal(harness.recoverySubmit.disabled, false);
+  assert.equal(harness.recoveryStatus.textContent, "已確認帳號，請設定新的登入密碼。");
+  assert.equal(grantCalls, 0);
+  assert.deepEqual(navigations, []);
+});
+
+test("a recovery redirect keeps the signed-in session emitted while persisted storage is still empty", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?recovery-signed-in-race=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+  let authStateListener = null;
+  let recoveryTimeout = null;
+  const runtime = module.createSupabaseAuthRuntime({
+    createClientImplementation() {
+      return {
+        auth: {
+          async getSession() {
+            return { data: { session: null }, error: null };
+          },
+          onAuthStateChange(listener) {
+            authStateListener = listener;
+            return { data: { subscription: { unsubscribe() {} } } };
+          },
+        },
+      };
+    },
+    storage: {
+      getItem() { return null; },
+      setItem() {},
+      removeItem() {},
+    },
+    fetchImplementation: async () => new Response("{}", { status: 200 }),
+  });
+
+  module.initAccountAccess(harness.rootDocument, {
+    authRuntimePromise: Promise.resolve(runtime),
+    location: {
+      pathname: "/account/access/",
+      search: "?flow=password-recovery",
+      hash: "",
+    },
+    schedule(next) { recoveryTimeout = next; },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  const realisticAccessToken = [
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+    "eyJzdWIiOiIxMTExMTExMS0xMTExLTQxMTEtODExMS0xMTExMTExMTExMTEifQ".repeat(9),
+    "verified-signature",
+  ].join(".");
+  assert.ok(realisticAccessToken.length > 512);
+  authStateListener("SIGNED_IN", {
+    access_token: realisticAccessToken,
+    refresh_token: "verified-recovery-refresh",
+    expires_in: 3600,
+    expires_at: 1787548800,
+    token_type: "bearer",
+    user: {
+      id: "11111111-1111-4111-8111-111111111111",
+      aud: "authenticated",
+      role: "authenticated",
+      email: "member@example.com",
+    },
+  });
+  recoveryTimeout();
+
+  assert.equal(harness.rootDocument.documentElement.dataset.accountMode, "recovery");
+  assert.equal(harness.recoveryFields.email.value, "member@example.com");
+  assert.equal(harness.recoveryFields.password.disabled, false);
+  assert.equal(harness.recoverySubmit.disabled, false);
+  assert.equal(harness.recoveryStatus.textContent, "已確認帳號，請設定新的登入密碼。");
 });
 
 test("login submit rejects invalid fields before requesting a real password session", async () => {
@@ -603,7 +833,7 @@ test("Supabase runtime is tab-scoped, signs in with Email and password, and auth
   const client = {
     auth: {
       async getSession() {
-        return { data: { session: { access_token: "real-session-token" } }, error: null };
+        return { data: { session: null }, error: null };
       },
       async signInWithPassword(input) {
         passwordCalls.push(input);
@@ -624,6 +854,11 @@ test("Supabase runtime is tab-scoped, signs in with Email and password, and auth
   });
 
   await runtime.signInWithPassword(" member@example.com ", "account88");
+  assert.equal(
+    (await runtime.getSession())?.access_token,
+    "real-session-token",
+    "the verified password session must remain available while Supabase finishes persisting it",
+  );
   await runtime.authenticatedFetch("vendor-workspace-grant", { method: "GET" });
   const ownerEndpoints = [
     "owner-workspace-grant",
@@ -738,17 +973,25 @@ test("Supabase runtime sends a fixed recovery link and updates the password only
   const signOutCalls = [];
   let authStateListener = null;
   let unsubscribed = false;
+  let currentSession = null;
+  let resetError = null;
+  let updateError = null;
   const runtime = module.createSupabaseAuthRuntime({
     createClientImplementation() {
       return {
         auth: {
+          async getSession() {
+            return { data: { session: currentSession }, error: null };
+          },
           async resetPasswordForEmail(email, options) {
             resetCalls.push({ email, options });
-            return { data: {}, error: null };
+            return { data: {}, error: resetError };
           },
           async updateUser(input) {
             updateCalls.push(input);
-            return { data: { user: { id: "11111111-1111-4111-8111-111111111111" } }, error: null };
+            return updateError
+              ? { data: { user: null }, error: updateError }
+              : { data: { user: { id: "11111111-1111-4111-8111-111111111111" } }, error: null };
           },
           async signOut(options) {
             signOutCalls.push(options);
@@ -768,23 +1011,135 @@ test("Supabase runtime sends a fixed recovery link and updates the password only
     },
     fetchImplementation: async () => new Response("{}", { status: 200 }),
   });
-  let recoveryEvents = 0;
-  const stopListening = runtime.onPasswordRecovery(() => { recoveryEvents += 1; });
+  const recoveryAccounts = [];
+  const stopListening = runtime.onPasswordRecovery((account) => {
+    recoveryAccounts.push(account);
+  });
 
+  resetError = { code: "over_email_send_rate_limit" };
+  await assert.rejects(
+    runtime.requestPasswordRecovery(" member@example.com "),
+    /PASSWORD_RECOVERY_RATE_LIMITED/,
+  );
+  resetError = null;
   await runtime.requestPasswordRecovery(" member@example.com ");
   authStateListener("SIGNED_IN", { access_token: "normal-session" });
-  authStateListener("PASSWORD_RECOVERY", { access_token: "recovery-session" });
-  await runtime.updatePassword("new-account88");
+  currentSession = {
+    access_token: "recovery-session",
+    user: { email: "member@example.com" },
+  };
+  authStateListener("PASSWORD_RECOVERY", currentSession);
+  await assert.rejects(
+    runtime.updatePassword("new-account88", "another@example.com"),
+    /PASSWORD_UPDATE_UNAVAILABLE/,
+  );
+  assert.deepEqual(updateCalls, []);
+  updateError = { code: "same_password" };
+  await assert.rejects(
+    runtime.updatePassword("new-account88", "member@example.com"),
+    /PASSWORD_SAME_AS_CURRENT/,
+  );
+  updateError = null;
+  await runtime.updatePassword("new-account88", "member@example.com");
   stopListening();
 
-  assert.deepEqual(resetCalls, [{
-    email: "member@example.com",
-    options: { redirectTo: "http://127.0.0.1:4173/account/access/" },
-  }]);
-  assert.equal(recoveryEvents, 1);
-  assert.deepEqual(updateCalls, [{ password: "new-account88" }]);
+  assert.deepEqual(resetCalls, [
+    {
+      email: "member@example.com",
+      options: { redirectTo: "http://127.0.0.1:4173/account/access/?flow=password-recovery" },
+    },
+    {
+      email: "member@example.com",
+      options: { redirectTo: "http://127.0.0.1:4173/account/access/?flow=password-recovery" },
+    },
+  ]);
+  assert.deepEqual(recoveryAccounts, [{ email: "member@example.com" }]);
+  assert.deepEqual(updateCalls, [
+    { password: "new-account88" },
+    { password: "new-account88" },
+  ]);
   assert.deepEqual(signOutCalls, [{ scope: "local" }]);
   assert.equal(unsubscribed, true);
+});
+
+test("Supabase runtime preserves a recovery event that arrives before the page listener", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?early-recovery=${Date.now()}`, import.meta.url));
+  let authStateListener = null;
+  let subscriptionCalls = 0;
+  const moduleRuntime = module.createSupabaseAuthRuntime({
+    createClientImplementation() {
+      return {
+        auth: {
+          onAuthStateChange(listener) {
+            subscriptionCalls += 1;
+            authStateListener = listener;
+            return { data: { subscription: { unsubscribe() {} } } };
+          },
+        },
+      };
+    },
+    storage: {
+      getItem() { return null; },
+      setItem() {},
+      removeItem() {},
+    },
+    fetchImplementation: async () => new Response("{}", { status: 200 }),
+  });
+
+  assert.equal(
+    subscriptionCalls,
+    1,
+    "the runtime must subscribe immediately so Supabase initialization cannot outrun the page",
+  );
+  authStateListener("PASSWORD_RECOVERY", {
+    access_token: "early-recovery-session",
+    user: { email: "member@example.com" },
+  });
+
+  const recoveryAccounts = [];
+  moduleRuntime.onPasswordRecovery((account) => recoveryAccounts.push(account));
+
+  assert.deepEqual(recoveryAccounts, [{ email: "member@example.com" }]);
+});
+
+test("Supabase runtime binds an already verified session to password recovery after the redirect event was missed", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?verified-recovery-session=${Date.now()}`, import.meta.url));
+  const recoverySession = {
+    access_token: "verified-recovery-session",
+    user: { email: "member@example.com" },
+  };
+  const updateCalls = [];
+  const runtime = module.createSupabaseAuthRuntime({
+    createClientImplementation() {
+      return {
+        auth: {
+          async getSession() {
+            return { data: { session: recoverySession }, error: null };
+          },
+          async updateUser(input) {
+            updateCalls.push(input);
+            return { data: { user: { id: "11111111-1111-4111-8111-111111111111" } }, error: null };
+          },
+          async signOut() { return { error: null }; },
+          onAuthStateChange() {
+            return { data: { subscription: { unsubscribe() {} } } };
+          },
+        },
+      };
+    },
+    storage: {
+      getItem() { return null; },
+      setItem() {},
+      removeItem() {},
+    },
+    fetchImplementation: async () => new Response("{}", { status: 200 }),
+  });
+
+  const account = await runtime.resolvePasswordRecoverySession();
+  await runtime.updatePassword("new-account88", account.email);
+
+  assert.deepEqual(account, { email: "member@example.com" });
+  assert.deepEqual(updateCalls, [{ password: "new-account88" }]);
 });
 
 test("password account access is exposed only at the canonical 4173 route", async () => {
@@ -1063,7 +1418,7 @@ test("canonical Account Access opens the shared login mode while registration re
   assert.equal(intended.rootDocument.documentElement.dataset.accountMode, "login");
   assert.equal(intended.loginForm.hidden, false);
   assert.equal(intended.form.hidden, true);
-  assert.equal(intended.title.textContent, "登入 LaiBE DRS 帳號");
+  assert.equal(intended.title.textContent, "登入 LaiBE 帳號");
 
   const defaultEntry = createRegistrationDomHarness();
   module.initAccountAccess(defaultEntry.rootDocument, { location: { search: "" } });
@@ -1119,4 +1474,16 @@ test("no untruthful integration, prohibited product framing, or engineering lang
   assert.doesNotMatch(app, /UNAVAILABLE_MESSAGE/u);
   const forbidden = ["媒合", "標案", "招標", "付款", "金流託管", "老屋投資", "投資報酬", "raw JSON", "stack trace", "mock-only", "debug", "無 DB", "API 未開", "onboarding"];
   for (const term of forbidden) assert.equal(html.includes(term), false, `forbidden visible term: ${term}`);
+});
+
+test("Account Access exposes no DRS copy or DRS login role", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?account-roles=${Date.now()}`, import.meta.url));
+
+  assert.doesNotMatch(html, /\bDRS\b/u);
+  assert.doesNotMatch(app, /\bDRS\b|drs-specialist|data-drs-channel-note/u);
+  assert.deepEqual(module.validateLogin({
+    email: "reviewer@example.com",
+    password: "account88",
+    role: "drs-specialist",
+  }), { role: "請選擇你目前的使用角色。" });
 });

@@ -40,6 +40,7 @@ export const SUPABASE_PROJECT_URL = "https://zdwuyomhswjcbbpbhpcq.supabase.co";
 export const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jU9DCme4-MBAc-kQuU2BQQ_gfmjzgLa";
 export const SUPABASE_JS_MODULE_URL = "https://esm.sh/@supabase/supabase-js@2.112.3";
 export const CANONICAL_ACCOUNT_ACCESS_URL = "http://127.0.0.1:4173/account/access/";
+const PASSWORD_RECOVERY_REDIRECT_URL = `${CANONICAL_ACCOUNT_ACCESS_URL}?flow=password-recovery`;
 
 export const OWNER_CONTRACT_INTENT_MESSAGE = "登入後預計前往甲方工作台的契約管理。";
 
@@ -64,8 +65,12 @@ function valueOf(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function isPermittedRole(role) {
+function isPermittedRegistrationRole(role) {
   return role === "owner" || role === "invited-partner";
+}
+
+function isPermittedLoginRole(role) {
+  return isPermittedRegistrationRole(role);
 }
 
 function isIdentity(value) {
@@ -73,6 +78,14 @@ function isIdentity(value) {
     && value.length > 0
     && value.length <= 512
     && value.trim() === value;
+}
+
+function isAccessToken(value) {
+  return typeof value === "string"
+    && value.length > 0
+    && value.length <= 8192
+    && value.trim() === value
+    && !/[\r\n]/u.test(value);
 }
 
 function ownValue(record, key) {
@@ -180,7 +193,7 @@ export function validateRegister(values = {}) {
   if (!EMAIL_PATTERN.test(email)) errors.email = "請輸入有效的 Email。";
   if (password.length < 8) errors.password = "密碼至少需要 8 碼。";
   if (!values.agree) errors.agree = "請先閱讀並同意使用說明。";
-  if (!isPermittedRole(role)) errors.role = "請選擇你目前的使用角色。";
+  if (!isPermittedRegistrationRole(role)) errors.role = "請選擇你目前的使用角色。";
   return errors;
 }
 
@@ -188,7 +201,7 @@ export function validateLogin(values = {}) {
   const errors = {};
   if (!EMAIL_PATTERN.test(valueOf(values.email))) errors.email = "請輸入有效的 Email。";
   if (typeof values.password !== "string" || values.password.length === 0) errors.password = "請輸入密碼。";
-  if (!isPermittedRole(valueOf(values.role))) errors.role = "請選擇你目前的使用角色。";
+  if (!isPermittedLoginRole(valueOf(values.role))) errors.role = "請選擇你目前的使用角色。";
   return errors;
 }
 
@@ -209,6 +222,8 @@ export function validatePasswordUpdate(values = {}) {
 
 export function isPasswordRecoveryReturn(location = globalThis.location) {
   if (location?.pathname !== CANONICAL_ACCOUNT_ACCESS_PATH) return false;
+  const search = typeof location?.search === "string" ? location.search : "";
+  if (new URLSearchParams(search).get("flow") === "password-recovery") return true;
   const hash = typeof location?.hash === "string" ? location.hash.replace(/^#/u, "") : "";
   return new URLSearchParams(hash).get("type") === "recovery";
 }
@@ -233,11 +248,62 @@ export function createSupabaseAuthRuntime({
       flowType: "implicit",
     },
   });
+  let authenticatedSession = null;
+  let recoverySessionToken = null;
+  let recoveryAccountEmail = null;
+  let recoveryAccount = null;
+  let recoverySubscription = null;
+  let recoveryResolutionRequested = false;
+  const recoveryListeners = new Set();
+
+  function bindPasswordRecoverySession(session) {
+    const email = valueOf(session?.user?.email);
+    if (
+      !isAccessToken(session?.access_token) ||
+      !EMAIL_PATTERN.test(email)
+    ) return null;
+    recoverySessionToken = session.access_token;
+    recoveryAccountEmail = email;
+    authenticatedSession = session;
+    recoveryAccount = Object.freeze({ email });
+    recoveryResolutionRequested = false;
+    recoveryListeners.forEach((listener) => listener(recoveryAccount));
+    return recoveryAccount;
+  }
+
+  function handleAuthStateChange(event, session) {
+    const email = valueOf(session?.user?.email);
+    if (!isAccessToken(session?.access_token) || !EMAIL_PATTERN.test(email)) return;
+    authenticatedSession = session;
+    if (
+      event === "PASSWORD_RECOVERY" ||
+      (
+        recoveryResolutionRequested &&
+        recoveryListeners.size > 0 &&
+        (event === "INITIAL_SESSION" || event === "SIGNED_IN")
+      )
+    ) bindPasswordRecoverySession(session);
+  }
+
+  function ensureRecoverySubscription() {
+    if (recoverySubscription) return true;
+    if (typeof client.auth.onAuthStateChange !== "function") return false;
+    const result = client.auth.onAuthStateChange(handleAuthStateChange);
+    recoverySubscription = result?.data?.subscription ?? null;
+    return Boolean(recoverySubscription);
+  }
+
+  ensureRecoverySubscription();
 
   async function getSession() {
     const result = await client.auth.getSession();
     if (result?.error) throw new Error("AUTH_SESSION_UNAVAILABLE");
-    return result?.data?.session ?? null;
+    const session = result?.data?.session ?? null;
+    if (isAccessToken(session?.access_token)) {
+      authenticatedSession = session;
+      return session;
+    }
+    return authenticatedSession;
   }
 
   async function signInWithPassword(email, password) {
@@ -245,7 +311,10 @@ export function createSupabaseAuthRuntime({
       email: valueOf(email),
       password: typeof password === "string" ? password : "",
     });
-    if (result?.error || !result?.data?.session?.access_token) throw new Error("PASSWORD_SIGN_IN_UNAVAILABLE");
+    if (result?.error || !isAccessToken(result?.data?.session?.access_token)) {
+      throw new Error("PASSWORD_SIGN_IN_UNAVAILABLE");
+    }
+    authenticatedSession = result.data.session;
     return true;
   }
 
@@ -265,40 +334,72 @@ export function createSupabaseAuthRuntime({
       },
     });
     if (result?.error || !result?.data?.user) throw new Error("ACCOUNT_SIGN_UP_UNAVAILABLE");
-    if (result?.data?.session?.access_token) {
+    if (isAccessToken(result?.data?.session?.access_token)) {
       const signOutResult = await client.auth.signOut({ scope: "local" });
       if (signOutResult?.error) throw new Error("ACCOUNT_SIGN_UP_UNAVAILABLE");
+      authenticatedSession = null;
     }
     return true;
   }
 
   async function requestPasswordRecovery(email) {
     const result = await client.auth.resetPasswordForEmail(valueOf(email), {
-      redirectTo: CANONICAL_ACCOUNT_ACCESS_URL,
+      redirectTo: PASSWORD_RECOVERY_REDIRECT_URL,
     });
+    if (result?.error?.code === "over_email_send_rate_limit") {
+      throw new Error("PASSWORD_RECOVERY_RATE_LIMITED");
+    }
     if (result?.error) throw new Error("PASSWORD_RECOVERY_UNAVAILABLE");
     return true;
   }
 
   function onPasswordRecovery(listener) {
-    if (typeof listener !== "function" || typeof client.auth.onAuthStateChange !== "function") {
+    if (typeof listener !== "function" || !ensureRecoverySubscription()) {
       throw new Error("PASSWORD_RECOVERY_LISTENER_UNAVAILABLE");
     }
-    const result = client.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" && session?.access_token) listener();
-    });
-    const subscription = result?.data?.subscription;
-    return () => subscription?.unsubscribe?.();
+    recoveryListeners.add(listener);
+    if (recoveryAccount) listener(recoveryAccount);
+    return () => {
+      recoveryListeners.delete(listener);
+      if (recoveryListeners.size > 0 || !recoverySubscription) return;
+      recoveryResolutionRequested = false;
+      recoverySubscription.unsubscribe?.();
+      recoverySubscription = null;
+    };
   }
 
-  async function updatePassword(password) {
+  async function resolvePasswordRecoverySession() {
+    recoveryResolutionRequested = true;
+    const session = await getSession();
+    const account = bindPasswordRecoverySession(session);
+    if (!account) throw new Error("PASSWORD_RECOVERY_UNAVAILABLE");
+    return account;
+  }
+
+  async function updatePassword(password, expectedEmail) {
     if (typeof password !== "string" || password.length < 8) {
       throw new Error("PASSWORD_UPDATE_UNAVAILABLE");
     }
+    const normalizedEmail = valueOf(expectedEmail);
+    const session = await getSession();
+    if (
+      !isAccessToken(recoverySessionToken) ||
+      session?.access_token !== recoverySessionToken ||
+      !EMAIL_PATTERN.test(normalizedEmail) ||
+      normalizedEmail !== recoveryAccountEmail ||
+      valueOf(session?.user?.email) !== recoveryAccountEmail
+    ) throw new Error("PASSWORD_UPDATE_UNAVAILABLE");
     const result = await client.auth.updateUser({ password });
+    if (result?.error?.code === "same_password") {
+      throw new Error("PASSWORD_SAME_AS_CURRENT");
+    }
     if (result?.error || !result?.data?.user) throw new Error("PASSWORD_UPDATE_UNAVAILABLE");
     const signOutResult = await client.auth.signOut({ scope: "local" });
     if (signOutResult?.error) throw new Error("PASSWORD_UPDATE_UNAVAILABLE");
+    authenticatedSession = null;
+    recoverySessionToken = null;
+    recoveryAccountEmail = null;
+    recoveryAccount = null;
     return true;
   }
 
@@ -306,23 +407,26 @@ export function createSupabaseAuthRuntime({
     if (!ALLOWED_FUNCTION_ENDPOINTS.has(endpoint)) throw new Error("FUNCTION_ENDPOINT_NOT_ALLOWED");
     const session = await getSession();
     const accessToken = session?.access_token;
-    if (!isIdentity(accessToken)) throw new Error("AUTH_REQUIRED");
+    if (!isAccessToken(accessToken)) throw new Error("AUTH_REQUIRED");
     const headers = {
       ...(init.headers ?? {}),
       Authorization: `Bearer ${accessToken}`,
       apikey: publishableKey,
     };
-    return fetchImplementation(`${projectUrl}/functions/v1/${endpoint}`, {
+    const response = await fetchImplementation(`${projectUrl}/functions/v1/${endpoint}`, {
       ...init,
       credentials: "omit",
       headers,
     });
+    if (response?.status === 401) authenticatedSession = null;
+    return response;
   }
 
   return Object.freeze({
     authenticatedFetch,
     getSession,
     onPasswordRecovery,
+    resolvePasswordRecoverySession,
     requestPasswordRecovery,
     signInWithPassword,
     signUpWithPassword,
@@ -495,6 +599,29 @@ function setBusy(form, busy) {
   }
 }
 
+function setRecoveryFormState(root, {
+  email = "",
+  ready = false,
+  message = "",
+  tone = "",
+} = {}) {
+  const form = root.querySelector('[data-account-form="recovery"]');
+  if (!form) return;
+  const account = form.elements.namedItem("email");
+  const password = form.elements.namedItem("password");
+  const confirmPassword = form.elements.namedItem("confirmPassword");
+  const submit = form.querySelector("[data-submit-button]");
+  if (account) {
+    account.value = ready ? valueOf(email) : "";
+    account.readOnly = true;
+    account.setAttribute("aria-readonly", "true");
+  }
+  if (password) password.disabled = !ready;
+  if (confirmPassword) confirmPassword.disabled = !ready;
+  if (submit) submit.disabled = !ready;
+  setStatus(form, message, tone);
+}
+
 function focusFirstError(root, form, errors) {
   if (errors.role) {
     root.querySelector("[data-role-option]")?.focus();
@@ -572,8 +699,11 @@ async function handleSubmit(root, form, runtime) {
       const authRuntime = await runtime.authRuntimePromise;
       await authRuntime.requestPasswordRecovery(valueOf(values.email));
       setStatus(form, "如果這個 Email 已有帳號，我們已寄出重設密碼信。", "success");
-    } catch {
-      setStatus(form, "目前無法寄出重設密碼信，請稍後再試。", "error");
+    } catch (error) {
+      const message = error?.message === "PASSWORD_RECOVERY_RATE_LIMITED"
+        ? "重設信寄送次數已達上限，請稍候再試，並只使用最新一封信的連結。"
+        : "目前無法寄出重設密碼信，請稍後再試。";
+      setStatus(form, message, "error");
     } finally {
       setBusy(form, false);
     }
@@ -584,7 +714,8 @@ async function handleSubmit(root, form, runtime) {
   setStatus(form, "正在更新密碼…");
   try {
     const authRuntime = await runtime.authRuntimePromise;
-    await authRuntime.updatePassword(values.password);
+    const recoveredEmail = valueOf(values.email);
+    await authRuntime.updatePassword(values.password, recoveredEmail);
     runtime.replaceUrl(CANONICAL_ACCOUNT_ACCESS_PATH);
     const password = form.elements.namedItem("password");
     const confirmPassword = form.elements.namedItem("confirmPassword");
@@ -592,9 +723,21 @@ async function handleSubmit(root, form, runtime) {
     if (confirmPassword) confirmPassword.value = "";
     selectMode(root, "login");
     const loginForm = root.querySelector('[data-account-form="login"]');
-    if (loginForm) setStatus(loginForm, "密碼已更新，請使用新密碼登入。", "success");
-  } catch {
-    setStatus(form, "重設連結可能已失效，請重新寄送重設密碼信。", "error");
+    if (loginForm) {
+      const loginEmail = loginForm.elements.namedItem("email");
+      const loginPassword = loginForm.elements.namedItem("password");
+      if (loginEmail) loginEmail.value = recoveredEmail;
+      if (loginPassword) {
+        loginPassword.value = "";
+        loginPassword.focus();
+      }
+      setStatus(loginForm, "密碼已更新，請使用新密碼登入。", "success");
+    }
+  } catch (error) {
+    const message = error?.message === "PASSWORD_SAME_AS_CURRENT"
+      ? "新密碼不可與目前密碼相同，請改用不同的密碼。"
+      : "重設連結可能已失效，請重新寄送重設密碼信。";
+    setStatus(form, message, "error");
   } finally {
     setBusy(form, false);
   }
@@ -613,10 +756,10 @@ function selectMode(root, mode) {
   const title = root.querySelector("#fcTitle");
   const switcher = root.querySelector("#fcSwitch");
   const titles = {
-    forgot: "找回 LaiBE DRS 帳號",
-    login: "登入 LaiBE DRS 帳號",
+    forgot: "找回 LaiBE 帳號",
+    login: "登入 LaiBE 帳號",
     recovery: "設定新的登入密碼",
-    register: "建立 LaiBE DRS 帳號",
+    register: "建立 LaiBE 帳號",
   };
   if (title) title.textContent = titles[mode] ?? titles.login;
   if (switcher) switcher.hidden = mode !== "register";
@@ -701,18 +844,63 @@ export function initAccountAccess(root = document, {
   });
   const recoveryReturn = isPasswordRecoveryReturn(location);
   selectMode(root, recoveryReturn ? "recovery" : "login");
+  const roleIntent = new URLSearchParams(typeof location?.search === "string" ? location.search : "").get("intent");
+  if (recoveryReturn) {
+    setRecoveryFormState(root, {
+      message: "正在確認重設連結與帳號…",
+    });
+  }
 
   if (runtimePromise) {
+    let recoveryConfirmed = false;
     void Promise.resolve(runtimePromise)
-      .then((authRuntime) => {
+      .then(async (authRuntime) => {
+        let stopRecoveryListener = () => {};
+        const confirmRecoveryAccount = (account) => {
+          const email = valueOf(account?.email);
+          if (!EMAIL_PATTERN.test(email)) return;
+          recoveryConfirmed = true;
+          selectMode(root, "recovery");
+          setRecoveryFormState(root, {
+            email,
+            ready: true,
+            message: "已確認帳號，請設定新的登入密碼。",
+            tone: "success",
+          });
+        };
         try {
-          authRuntime.onPasswordRecovery(() => selectMode(root, "recovery"));
+          stopRecoveryListener = authRuntime.onPasswordRecovery(confirmRecoveryAccount);
         } catch {
           // The visible form remains fail-closed if the auth listener is unavailable.
         }
-        return recoveryReturn
-          ? Object.freeze({ state: "PASSWORD_RECOVERY" })
-          : resumeAuthorizedSession({ authRuntime, navigate, routes, location });
+        if (recoveryReturn) {
+          schedule(() => {
+            if (recoveryConfirmed) return;
+            stopRecoveryListener();
+            setRecoveryFormState(root, {
+              message: "重設連結已失效，請重新寄送重設密碼信。",
+              tone: "error",
+            });
+            selectMode(root, "forgot");
+            const forgotForm = root.querySelector('[data-account-form="forgot"]');
+            if (forgotForm) {
+              setStatus(
+                forgotForm,
+                "重設連結已失效，請輸入帳號 Email 重新寄送。",
+                "error",
+              );
+            }
+          }, 2500);
+          if (typeof authRuntime.resolvePasswordRecoverySession === "function") {
+            try {
+              confirmRecoveryAccount(await authRuntime.resolvePasswordRecoverySession());
+            } catch {
+              // The timeout presents the recovery action if no verified session is available.
+            }
+          }
+          return Object.freeze({ state: "PASSWORD_RECOVERY_PENDING" });
+        }
+        return resumeAuthorizedSession({ authRuntime, navigate, routes, location, roleIntent });
       })
       .then((result) => {
         if (result.state !== "ACCESS_DENIED") return;
@@ -722,7 +910,22 @@ export function initAccountAccess(root = document, {
           setStatus(loginForm, "已完成登入，但目前沒有可開啟的案件。請確認登入 Email 與案件資格。", "notice");
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!recoveryReturn) return;
+        setRecoveryFormState(root, {
+          message: "重設連結已失效，請重新寄送重設密碼信。",
+          tone: "error",
+        });
+        selectMode(root, "forgot");
+        const forgotForm = root.querySelector('[data-account-form="forgot"]');
+        if (forgotForm) {
+          setStatus(
+            forgotForm,
+            "重設連結已失效，請輸入帳號 Email 重新寄送。",
+            "error",
+          );
+        }
+      });
   }
 }
 
