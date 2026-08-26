@@ -80,6 +80,7 @@ export function createDrsWorkspaceGrantHandler(
 
     let candidate: unknown;
     try {
+      // The centralized guard is the sole source of every authority selector.
       candidate = await dependencies.resolveWorkspaceGrant({
         authenticatedUserId: guarded.authenticatedUserId,
         expectedCaseId: guarded.selectedCaseId,

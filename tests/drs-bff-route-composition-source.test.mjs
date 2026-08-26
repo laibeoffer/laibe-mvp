@@ -31,7 +31,7 @@ test("all five composed routes guard before server authority or provider work", 
     assert.doesNotMatch(text, /resolveAuthenticatedIdentity\(request\)/u);
     for (
       const backendMarker of [
-        "resolveWorkspaceGrant({",
+        "resolveWorkspaceGrant(",
         "port.resolveAuthorization(",
         "authorization.resolveAuthorization({",
         "port.loadGrant(",
@@ -48,23 +48,79 @@ test("all five composed routes guard before server authority or provider work", 
   }
 });
 
-test("custom BFF entrypoints are narrowly exempted from platform JWT verification", async () => {
+test("focused RED: P1 exact config map is absent", async () => {
   const config = await source("supabase/config.toml");
-  const configuredFunctions = [
-    ...config.matchAll(/^\[functions\.([^\]]+)\]$/gmu),
-  ]
-    .map((match) => match[1]);
-  assert.deepEqual(configuredFunctions, [
-    "drs-session-bootstrap",
-    "drs-workspace-grant",
-    "drs-google-calendar-grant",
-    "drs-google-calendar-oauth-start",
-    "drs-google-calendar-oauth-callback",
-    "drs-google-calendar-events-read",
-    "drs-google-calendar-revoke",
-  ]);
-  assert.equal((config.match(/^verify_jwt = false$/gmu) ?? []).length, 7);
-  assert.doesNotMatch(config, /^verify_jwt = true$/mu);
+  const map = Object.fromEntries(
+    [...config.matchAll(
+      /^\[functions\.([^\]]+)\]\nverify_jwt = (true|false)$/gmu,
+    )]
+      .map((match) => [match[1], match[2] === "true"]),
+  );
+  assert.deepEqual(map, {
+    "drs-session-bootstrap": false,
+    "drs-workspace-grant": false,
+    "drs-google-calendar-grant": false,
+    "drs-google-calendar-oauth-start": false,
+    "drs-google-calendar-oauth-callback": false,
+    "drs-google-calendar-events-read": false,
+    "drs-google-calendar-revoke": false,
+    "casework-case-create": true,
+    "owner-workspace-grant": true,
+    "vendor-workspace-grant": true,
+    "highest-reviewer-workspace-grant": true,
+  });
+  assert.equal(Object.keys(map).length, 11);
+  assert.doesNotMatch(
+    config,
+    /storage\.buckets|drs-document-upload|drs-document-snapshot/iu,
+  );
+});
+
+test("P1 JWT handlers close caller authority before service work", async () => {
+  for (
+    const [relativePath, backendMarker] of [
+      ["supabase/functions/casework-case-create/index.ts", "createCase("],
+      [
+        "supabase/functions/owner-workspace-grant/index.ts",
+        "resolveWorkspaceGrant(",
+      ],
+      [
+        "supabase/functions/vendor-workspace-grant/index.ts",
+        "resolveWorkspaceGrant(",
+      ],
+      [
+        "supabase/functions/highest-reviewer-workspace-grant/index.ts",
+        "resolveWorkspaceGrant(",
+      ],
+    ]
+  ) {
+    const route = await source(relativePath);
+    assert.match(route, /VERIFY_JWT_REQUIRED = true/u);
+    const identity = route.indexOf("resolveAuthenticatedIdentity(request)");
+    const backend = route.indexOf(backendMarker);
+    assert.notEqual(identity, -1, relativePath);
+    assert.notEqual(backend, -1, relativePath);
+    assert.ok(identity < backend, relativePath);
+    assert.doesNotMatch(
+      route,
+      /query.*case|body.*caseId|user_metadata|raw_user_meta_data/iu,
+    );
+  }
+});
+
+test("DRS workspace remains POST exact-empty and guarded before resolver", async () => {
+  const route = await source("supabase/functions/drs-workspace-grant/index.ts");
+  const composition = await source(
+    "supabase/functions/_shared/drs-auth/drs-bff-route-composition.ts",
+  );
+  assert.match(route, /createDrsBffRouteGuard\("workspaceGrant"\)/u);
+  const guard = route.indexOf("bffGuard.authorize(request)");
+  const resolver = route.indexOf("resolveWorkspaceGrant(");
+  assert.ok(guard >= 0 && resolver > guard);
+  assert.match(
+    composition,
+    /workspaceGrant:\s*closedPost\([\s\S]*?"\/functions\/v1\/drs-workspace-grant"[\s\S]*?exactEmptyBody/u,
+  );
 });
 
 test("accepted BFF contracts and excluded Calendar callback stay byte-identical", async () => {

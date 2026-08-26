@@ -1,0 +1,342 @@
+D5-DRS-DATA-AUTHORITY-20260826-V2
+
+V1_STATUS=SUPERSEDED_IN_FULL
+V2_STATUS=CORRECTED_COMPLETE_CONTRACT
+ROLE=INDEPENDENT_DRS_DATA_AND_STORAGE_CONTRACT_AUTHORITY
+GOVERNED_BY=A_PLUS_WITH_HUMAN_AA_PRODUCT_AUTHORITY
+NOT_PCM_A5_SUCCESSOR=TRUE
+NOT_A0_OR_A15_SUBAGENT=TRUE
+AUTHORITY=READ_ONLY_SCOPE_AND_CONTRACT_ONLY
+D5_VERDICT=ACCEPT_CONTRACT_CORRECTED
+A15_START_GATE=HOLD
+A0_INTAKE_GATE=CLOSED
+A_PLUS_REVIEW_GATE=PENDING_COMPLETE_V2
+IMPLEMENTATION_AUTHORITY=NONE
+WRITE_GIT_RUNTIME_REMOTE_EFFECTS=0
+
+1. EVIDENCE BINDING
+
+CANONICAL_WORKTREE=C:\CodexWork\08-Jacky\worktrees\laibe_MVP_project\a0-drs-single-owner-composition-w1-20260826
+CANONICAL_HEAD=c5b77f30f136a4fbe08409c27b76e367827770dd
+CANONICAL_TREE=6212097e47c233f2bc1855300492c4d72227a9e2
+CANONICAL_PARENT=f4267773353804a754409bc01be691399d46933d
+CANONICAL_STATUS=CLEAN
+CANONICAL_INDEX=EMPTY
+CANONICAL_HEAD_PATH_COUNT=73
+ASSERTED_73_PATH_MANIFEST_SHA256=8970163640dd52252b63ba8a3159a6d16300092903585671c5779ee49fbc98c6
+ASSERTED_MANIFEST_SERIALIZER=NOT_AVAILABLE
+ASSERTED_MANIFEST_FRESH_VERIFIED=FALSE
+CONFIG_TOML_PREIMAGE_SHA256=c1032b2f85f6b42d7e344b65d822ed0610f63eca0c3ada5102deefa525d9ee01
+A15_ORIGINAL_PACKET_SHA256=bad1a91f345e96603919e033e4da37902d6b939c017bc8d534bd4a49a6747942
+CURRENT_CASEWORK_CREATE_SOURCE_COUNT=0
+CURRENT_CASEWORK_SCHEMA_AUTHORITY=NOT_AVAILABLE
+CURRENT_OWNER_VENDOR_SHARED_AUTH_GRANT=NOT_AVAILABLE
+CURRENT_STORAGE_AUTHORITY=NOT_AVAILABLE
+CURRENT_DOCUMENT_VERSION_AUTHORITY=NOT_AVAILABLE
+CURRENT_DRS_SPECIALIST_GRANT=LOCAL_SOURCE_CONTRACT_ONLY_REAL_RUNTIME_UNPROVEN
+CURRENT_DRS_AUDIT_SEAM=public.drs_case_audit_events_ONLY_NOT_STORAGE_AUTHORITY
+REAL_POSTGRES_RLS_STORAGE_AUTH=UNVERIFIED
+HISTORICAL_PCM_A5_878560AA=EVIDENCE_ONLY_NOT_DRS_AUTHORITY
+
+2. PRESERVED PRODUCT AND MODEL DECISIONS
+
+LaiBE DRS storage only serves case decisions, versions, evidence, review, receipts and traceability. It is not a cloud drive, chat product, matching/lowest-bid platform, payment escrow or old-house investment product.
+
+MODEL_OPTIONS:
+- ONE_PRIVATE_BUCKET_PDF_ONLY=REJECTED because untrusted intake and formal evidence share one trust/lifecycle boundary and DRS photos/drawings are excluded.
+- FOUR_BUCKET_STAGING_ORIGINALS_DERIVATIVES_EXPORTS=REJECTED_FOR_MVP because it multiplies policy, copy, backup and drift surfaces.
+- TWO_PRIVATE_BUCKET_TRUST_BOUNDARY=ACCEPTED.
+
+EXACT_BUCKET_IDS:
+- drs-case-intake-private: untrusted staging/quarantine only; never formal evidence; expired unpromoted objects are cleanup eligible.
+- drs-case-records-private: validated canonical sources, exact-version derived artifacts and formal snapshot outputs.
+
+Both buckets are private. Buckets are named by DRS trust purpose, never by role or case. Roles/cases are rows and policies, not buckets.
+
+FIRST_PHASE_FILE_ALLOWLIST:
+- application/pdf with .pdf
+- image/jpeg with .jpg or .jpeg
+- image/png with .png
+Declared MIME, extension, magic bytes and successful decode must agree. Office, CAD, ZIP, SVG, HEIC, executable and unknown types are rejected.
+
+LIMITS:
+- one upload intent equals one file
+- maximum 25 MiB or 26,214,400 bytes per file
+- maximum 10 files and 100 MiB aggregate per UI batch
+- PDF maximum 500 pages
+- decoded JPEG/PNG maximum 40 megapixels
+All unknown, overflow and limit states fail closed.
+
+3. EXACT PUBLIC REQUEST AND RESPONSE CONTRACTS
+
+All public/browser contracts have closed method, path, query, headers and body. Unknown keys, x-* authority headers, duplicate keys, wrong types and caller-supplied identity/case/role/bucket/path/provider facts are rejected before Storage or authority work.
+
+3.1 CREATE UPLOAD INTENT
+POST /api/drs/documents/upload-intents
+Query: none
+Authority headers: none beyond the secure same-origin session/cookie contract
+Exact JSON body:
+{
+  "schemaVersion": "laibe.drs-document-upload-intent.request.v1",
+  "mode": "NEW_DOCUMENT" | "NEW_VERSION",
+  "documentRef": "<opaque ref; required only for NEW_VERSION>",
+  "documentKind": "drawing" | "quote" | "contract" | "photo" | "drs_review" | "other_case_evidence",
+  "originalFilename": "<metadata only>",
+  "declaredMime": "application/pdf" | "image/jpeg" | "image/png",
+  "declaredSizeBytes": "<integer 1..26214400>",
+  "declaredSha256": "<64 lowercase hex>"
+}
+The NEW_DOCUMENT form must omit documentRef. NEW_VERSION requires an own, non-empty opaque documentRef. The server resolves current case and permitted source role.
+
+Response 201:
+{
+  "schemaVersion": "laibe.drs-document-upload-intent.response.v1",
+  "state": "UPLOAD_INTENT_CREATED",
+  "intentRef": "<opaque>",
+  "intentExpiresAt": "<15-minute application deadline>",
+  "upload": {
+    "method": "SIGNED_UPLOAD",
+    "signedUploadUrl": "<server-issued capability>",
+    "nativeExpiresAt": "<Supabase native 2-hour deadline>",
+    "requiredHeaders": "<closed non-authority header map>"
+  },
+  "limits": {
+    "maxBytes": 26214400,
+    "allowedMime": ["application/pdf","image/jpeg","image/png"]
+  }
+}
+The server-generated bucket/key are not request fields. If the client library technically receives a path/token, they are output capability facts and must exactly equal the intent; the client may not substitute them.
+
+3.2 FINALIZE UPLOAD
+POST /api/drs/documents/upload-intents/finalize
+Query: none
+Exact JSON body:
+{
+  "schemaVersion": "laibe.drs-document-upload-finalize.request.v1",
+  "intentRef": "<opaque>",
+  "idempotencyKey": "<opaque own non-empty value>"
+}
+Response is one closed state:
+- 202 VALIDATION_PENDING with intentRef and no document/version/receipt authority.
+- 201 FORMAL_VERSION_CREATED with documentRef, versionRef and receiptRef after validation, canonical records-object verification and atomic DB finalize.
+- 409 IDEMPOTENCY_CONFLICT or VERSION_CONFLICT.
+- closed 4xx/5xx for expired, withdrawn, inactive, unauthorized, quarantine, mismatch or provider failure.
+No response exposes caseId, bucket, object key, service key or raw provider error.
+
+3.3 DOWNLOAD
+GET /api/drs/document-versions/{opaqueVersionRef}/download
+Query: none
+The BFF revalidates current authority on every request and streams only a formal validated source with:
+Content-Disposition: attachment
+X-Content-Type-Options: nosniff
+Cache-Control: private, no-store
+Raw intake is never downloadable or inline served. Direct signed download is not the default. If a later approved low-sensitivity direct capability is used, its TTL is at most 60 seconds, remains replayable until expiry and is never described as one-time or instantly revocable.
+
+3.4 SUBMISSION SNAPSHOT
+POST /api/drs/document-snapshots
+Exact JSON body:
+{
+  "schemaVersion": "laibe.drs-document-snapshot.request.v1",
+  "purpose": "REVIEW_SUBMISSION" | "DECISION_BASIS" | "FORMAL_RECEIPT",
+  "versionRefs": ["<one or more opaque exact-version refs>"],
+  "idempotencyKey": "<opaque own non-empty value>"
+}
+Response 201:
+{
+  "schemaVersion": "laibe.drs-document-snapshot.response.v1",
+  "state": "SNAPSHOT_RECORDED",
+  "snapshotRef": "<opaque>",
+  "receiptRef": "<opaque>",
+  "canonicalPayloadSha256": "<64 lowercase hex>"
+}
+A snapshot proves the submitted exact-version set, not approval, delivery/read or business acceptance.
+
+4. SERVER-OWNED OBJECT IDENTITY
+
+UI cannot select or assert caseId, bucket, object path, role, memberId or provider identifiers. Server-generated paths are:
+- intake: intents/{upload_intent_uuid}/{object_uuid}.{ext}
+- source: cases/{case_uuid}/documents/{document_uuid}/versions/{version_uuid}/source.{ext}
+- derived: cases/{case_uuid}/documents/{document_uuid}/versions/{version_uuid}/derived/{artifact_uuid}.{ext}
+- snapshot output: cases/{case_uuid}/submissions/{snapshot_uuid}/outputs/{artifact_uuid}.{ext}
+Original filename is metadata only. Upsert, in-place overwrite and path-derived authority are prohibited.
+
+5. EXECUTION PRINCIPAL CONTRACT
+
+The single canonical mutation model is CANONICAL_BFF_SERVICE_EXECUTION:
+
+1. Secure-session BFF validates the end-user session and cookie/session binding.
+2. BFF resolves the current server-owned workspace grant and derives this exact internal principal:
+{
+  "authenticatedUserId": "<verified session subject>",
+  "expectedCaseId": "<server-resolved current case>",
+  "authorizationSubject": "OWNER" | "VENDOR" | "DRS" | "HIGHEST_REVIEWER",
+  "grantId": "<server-owned opaque grant>",
+  "grantVersion": "<server-owned version>",
+  "grantExpiresAt": "<server-owned expiry>"
+}
+None of these fields may originate in public request JSON/query/custom headers.
+3. BFF uses server-only service credentials to call an exact-signature service-only RPC. A service-role call has no ambient end-user auth.uid and must never treat service_role auth.uid or NULL as the end user.
+4. If Data API exposure is required, the minimal exposed wrapper is SECURITY INVOKER, executable only by service_role, with the exact signature:
+server_document_operation_v1(
+  p_authenticated_user_id uuid,
+  p_expected_case_id uuid,
+  p_authorization_subject text,
+  p_grant_id uuid,
+  p_grant_version bigint,
+  p_operation text,
+  p_resource_ref text,
+  p_idempotency_key text,
+  p_expected_payload_sha256 text
+)
+The wrapper delegates to a non-exposed private SECURITY DEFINER with search_path='' and fully qualified names. Public, anon and authenticated have no EXECUTE. No client role has direct DML on metadata tables.
+5. The private function rechecks current identity, exact equality, active case, current grant and current role-specific authority. Owner/vendor require active casework.case_members. DRS requires current auth binding, ACTIVE specialist authority, non-terminated assignment, active case mapping and the document seam's current case membership/grant. Highest reviewer requires a distinct current case-scoped grant. Unknown/mismatch/revoked/expired closes.
+6. Every sensitive operation rechecks current authority. A prior grant projection is not a permanent capability.
+
+USER_JWT_RLS_EXECUTION is a separate optional future read seam only. User-JWT policies may use auth.uid as session identity but must still join current membership/assignment/grant. auth.uid alone is never specialist/case authority. User-JWT and service models may not use fallback, COALESCE or caller parameters to substitute for one another. Writes, URL minting, finalize, withdraw and snapshot remain BFF service operations.
+
+GRANTS:
+- REVOKE ALL exact wrapper/private signatures FROM PUBLIC, anon, authenticated and service_role first.
+- GRANT EXECUTE on the one exposed SECURITY INVOKER signature only TO service_role.
+- GRANT EXECUTE on each private function only to its single internal owner/caller role as technically required; never grant all functions.
+- service keys remain server-only and bypass RLS, so route and private-function revalidation are mandatory.
+
+6. DATA AND REFERENTIAL MODEL
+
+casework is the only case/document authority. No parallel public.drs case/document truth may be created.
+
+- documents: PK(id), NOT NULL case_id, UNIQUE(case_id,id), logical kind/visibility/source role/status, nullable current_version_id projection.
+- document_versions: PK(id), NOT NULL case_id/document_id, immutable version_no/actor/time/hash/size/detected MIME/validation/lifecycle, FK(case_id,document_id) to documents(case_id,id) ON DELETE RESTRICT, UNIQUE(case_id,document_id,id), UNIQUE(document_id,version_no).
+- documents current version: composite FK(case_id,id,current_version_id) to document_versions(case_id,document_id,id), so it cannot point across case/document. Only the sole finalize/supersede function updates it.
+- document_version_sources: exactly one canonical source for every FORMAL version; PK(case_id,document_id,version_id), composite FK to document_versions, NOT NULL bucket/key/hash/size/MIME/validation, UNIQUE(bucket_id,object_key). A deferred constraint trigger requires source count exactly one when version state is FORMAL.
+- document_artifacts: derived/output only; composite FK(case_id,document_id,version_id) to versions, SOURCE kind forbidden, UNIQUE(bucket_id,object_key).
+- document_upload_intents: one file each; server-owned case/document/path/expected facts/nonce/idempotency/expiry/state. A staging receipt is not a version.
+- evidence_references: exact case_id/document_id/version_id composite FK to versions plus page/region/item locator. Any review/event subject uses same-case FK/check.
+- submission_snapshots: UNIQUE(case_id,id), immutable canonical payload hash. snapshot_items have both FK(case_id,snapshot_id) to snapshot and FK(case_id,document_id,version_id) to version.
+- receipts/events/intents carry case_id and composite FKs to referenced version/snapshot. Generic subject_id without referential validation is not authority.
+- LINE, Calendar and formal review consumers only keep typed opaque exact-version refs resolved by server API. They receive no bucket/path/service-role/URL-minting permission.
+- public.drs_case_audit_events may reference the canonical case event/receipt ID for DRS workflow audit; it cannot become a second formal document/event truth.
+
+All metadata/evidence/snapshot/receipt tables ENABLE and FORCE RLS. Foreign keys and current-authority lookup fields are indexed. Cross-case/cross-document linkage must be impossible by constraints or the sole atomic function.
+
+7. LIFECYCLE AND ATOMICITY
+
+Formal source/version/evidence/snapshot/receipt/event are append-only. Records objects prohibit upsert and in-place replace.
+- Replace creates a new version.
+- Supersede preserves the old version; existing evidence stays pinned and becomes revalidation-required where applicable.
+- Withdraw appends a state/event, stops new access grants and new references, and preserves history.
+- Only expired unpromoted intake objects may be cleanup-deleted with a cleanup receipt.
+- Formal hard delete/legal purge is outside MVP and needs separate Human authority.
+
+Promotion saga:
+intake upload -> structural validation and malware scan -> copy to unique records path with no upsert -> verify served object hash/size -> sole short DB finalize transaction -> cleanup intake.
+Storage work occurs before the transaction. The transaction locks in fixed order document then intent/version; verifies idempotency and same-case/source-count invariants; inserts version/source/event/receipt and updates current projection. DB failure creates an orphan-cleanup work item and no formal receipt/version. Same document plus same verified SHA retry returns the same version/receipt. Same idempotency key with different payload conflicts. Concurrent finalize has one winner.
+
+8. ROLE MATRIX
+
+Every row also requires current case authority and server grant.
+- Owner: read/download owner-visible formal versions; upload owner-kind documents; version only own-source documents; request withdrawal of own submission; cannot alter vendor/DRS originals or closed snapshots.
+- Vendor: active invited same-case member; read/download vendor-visible; upload/version vendor-kind; cannot read DRS-internal or alter owner/DRS originals.
+- DRS: current DRS binding/assignment/case grant; read authorized party-visible and DRS-internal; create DRS review/report versions and evidence refs; request supplements; cannot overwrite party originals.
+- Highest reviewer: distinct case-scoped short-lived grant; read/download formal withdrawn/history with access event; create only review artifacts; no global wildcard/browse and no party-original mutation.
+
+All roles are forbidden from choosing bucket/path, minting Storage URLs, direct metadata DML, using email/LINE/filename/query/body caseId as authority, or acquiring storage permission through LINE/Calendar/review references.
+
+9. STORAGE PROVISIONING AND POLICIES
+
+SQL migration may create application tables, constraints, indexes, RLS, storage.objects policies, private functions and exact grants. It must not INSERT/UPDATE/DELETE storage.buckets or storage.objects.
+
+Versioned local declarations belong in supabase/config.toml, only after A0 grants one-writer authority to that shared file:
+- drs-case-intake-private: public=false, file_size_limit=25MiB, allowed MIME PDF/JPEG/PNG.
+- drs-case-records-private: public=false, same limit and allowlist.
+
+Remote bucket creation/update is a separately authorized Storage Admin/API provisioning action, not A15 local implementation. Admission must fresh-read actual bucket IDs/public/size/MIME through the Storage Admin/API and perform real negative uploads. Local config does not prove remote existence.
+
+storage.objects policies verify exact private bucket, server-generated key mapped to application metadata, exact version/case and current authority. Folder UUID or owner_id alone is insufficient. Service key bypasses RLS and is never product authority.
+
+10. SIGNED CAPABILITY TRUTH
+
+Supabase native signed upload URL requires no further auth and is valid for 2 hours. It is only issued for a unique intake path with upsert=false. Application intent TTL is 15 minutes; a later native upload remains quarantine-only and is cleaned after 24 hours. The token is not cryptographically one-time; unique key/no-upsert gives at most one successful creation, while finalize idempotency controls the state transition.
+
+Private signed download remains replayable until expiry and is not instantly revocable. Default download is current-authority BFF streaming. Any future direct link is at most 60 seconds and never used for raw intake or sensitive history. A true one-time download requires a separate server one-time ticket/proxy.
+
+11. HOSTILE FILE FORMALIZATION
+
+Every file requires declared facts, size/hash recomputation, magic/decode validation and malware CLEAN. PDF validation parses the object graph; keyword scanning alone is insufficient.
+
+PDF is REJECTED or QUARANTINED and never FORMAL when it is encrypted/password protected, contains JavaScript/OpenAction/Additional Actions/Launch/SubmitForm/ImportData/remote GoTo or automatic URI behavior, embedded files/FileSpec/portfolio/Collection, XFA/AcroForm, RichMedia/Movie/Sound/3D, external-resource or remote-reference behavior, malformed/xref recursion/ambiguous graph, unsupported active feature or unknown state.
+
+Hard worker limits per file:
+- CPU 10 seconds
+- wall 15 seconds
+- RSS 256 MiB
+- cumulative decoded/decompressed bytes 200 MiB
+- indirect objects 200,000
+- reference/nesting depth 64
+Timeout, OOM, limit, crash, scanner unknown or parse ambiguity remains QUARANTINED or VALIDATION_PENDING.
+
+Raw intake is accessible only to the isolated validation/cleanup worker, never inline or normal download. Formal source requires structural PASS, malware CLEAN and hash/size verification, and downloads as attachment with nosniff. Browser preview must be a post-validation server-generated safe derivative, never the untrusted source.
+
+12. AUDIT AND TRUTH BOUNDARIES
+
+- local/browser draft: no durable event/receipt/version and cannot be evidence.
+- staged upload: technical intent/upload receipt only, not a formal case record.
+- formal version: exists only after verified canonical source and sole atomic DB finalize.
+- snapshot: proves the exact-version set and canonical hash, not approval, delivery/read or acceptance.
+- receipt: proves the server accepted the exact operation, not a business decision.
+- LINE/Calendar/review references point to exact version only and grant no storage access.
+- DB backup contains Storage metadata, not Storage objects. Offsite object backup and restore require a separate verified mechanism.
+- Real Supabase Auth/PostgreSQL/RLS/Storage/scanner/backup are not verified; static/PGlite/local GREEN cannot upgrade this truth.
+
+13. REQUIRED NEGATIVE AND ADVERSARIAL TEST CONTRACT
+
+Contract/route:
+- unknown keys/method/path/query/body/header, caller user/case/role/bucket/path, malformed opaque refs, type/size/MIME/hash mismatch.
+Principal:
+- service-role ambient auth.uid/NULL, caller identity injection, user-JWT/service fallback, revoked/expired grant, inactive member, cross-account/cross-case, highest-reviewer wildcard.
+Storage/capability:
+- wrong bucket/key, upsert/replay, late upload, expired/replayed download, service-key bypass attempt, remote bucket missing/public/wrong limit/MIME.
+PDF/resource:
+- encrypted/password, JS/OpenAction/AA, Launch, embedded/portfolio, XFA/AcroForm, RichMedia/3D, external/remote reference, malformed recursion, decompression bomb, CPU/wall/RSS/object/depth limit, scanner timeout/unknown, raw intake inline/download.
+Referential/concurrency:
+- current_version points to another document/case, version/document mismatch, source count 0 or 2, derived artifact used as source, evidence cross-case, snapshot cross-case, object-key reuse, concurrent finalize, same idempotency/different payload, DB failure orphan.
+Real gate requires disposable real PostgreSQL migration/constraints/FORCE RLS with at least two users/two cases, real Auth sessions and real Storage bucket/policy/capability tests. Static source and mocks remain local evidence only.
+
+14. FUTURE ALLOWLIST CATEGORIES AND GATES
+
+A15 may build only after A+ accepts this V2 and A0 binds exact base/worktree/branch/one-writer/exact paths/current casework schema/current Shared Auth grant and RED contract.
+
+Potential future allowlist categories:
+1. SQL migration for application schema/constraints/indexes/RLS, storage.objects policies, private functions and exact grants; no bucket/object row mutation.
+2. supabase/config.toml exact two-bucket local declarations, only with A0 shared-file one-writer authority.
+3. shared closed contracts/validators and server BFF/RPC/storage/scanner ports.
+4. focused/static and real integration tests for all Section 13 cases.
+Remote provisioning, migration apply, secrets, production, deploy, UI, browser/4173 and current canonical 73-path Auth/Calendar/LINE source are excluded unless separately authorized.
+
+A0 intake requires: exact candidate commit/tree/parent and reproducible manifest; clean/index/outside allowlist=0; D5+A+ acceptance; prerequisite schema/grant identity; changed-path SHA list; migration order; exact principal/grant scan; config ownership; real bucket readback; hostile-file negatives; composite adversarial tests; real PG/RLS/Auth/Storage; signed replay/expiry; scanner failure/CLEAN; concurrent finalize/orphan cleanup; object backup/restore evidence. Missing evidence yields SOURCE_CANDIDATE or HOLD, never runtime/integration acceptance.
+
+15. HUMAN DECISIONS AND FINAL GATES
+
+HUMAN_DECISION_REQUIRED:
+1. retention period, per-case capacity/version quota, legal deletion and offsite object-backup/restore target.
+2. malware scanner provider, processing region, privacy and cost.
+These do not block a corrected local contract/port candidate, but production enable remains HOLD. Any highest-reviewer global cross-case authority is a separate Human decision; safe default is case-scoped.
+
+A15_START_GATE=HOLD
+A0_INTAKE_GATE=CLOSED
+A_PLUS_REVIEW_GATE=PENDING
+REAL_POSTGRES_RLS_STORAGE_AUTH=UNVERIFIED
+WEB_INTEGRATION_ACCEPTED=FALSE
+SOURCE_FILES_MODIFIED=0
+SCHEMA_MIGRATION_TEST_DOC_FILES_MODIFIED=0
+SUPABASE_REMOTE_SECRET_RUNTIME_BROWSER_EFFECTS=0
+GIT_WORKTREE_COMMIT_PUSH_PR_MERGE_DEPLOY_EFFECTS=0
+
+OFFICIAL_BASIS:
+- https://supabase.com/docs/guides/storage/security/access-control
+- https://supabase.com/docs/guides/storage/buckets/fundamentals
+- https://supabase.com/docs/reference/javascript/file-buckets-createsigneduploadurl
+- https://supabase.com/docs/guides/storage/serving/downloads
+- https://supabase.com/docs/guides/storage/security/ownership
+- https://supabase.com/docs/guides/platform/backups
+
+FINAL_STATUS=D5_ACCEPT_CONTRACT_CORRECTED_PENDING_A_PLUS_REVIEW_A15_HOLD_A0_CLOSED_EFFECTS_0

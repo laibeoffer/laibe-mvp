@@ -20,3 +20,15 @@ verify_jwt = false
 
 [functions.drs-google-calendar-revoke]
 verify_jwt = false
+
+[functions.casework-case-create]
+verify_jwt = true
+
+[functions.owner-workspace-grant]
+verify_jwt = true
+
+[functions.vendor-workspace-grant]
+verify_jwt = true
+
+[functions.highest-reviewer-workspace-grant]
+verify_jwt = true
