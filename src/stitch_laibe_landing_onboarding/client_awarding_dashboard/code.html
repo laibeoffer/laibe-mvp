@@ -162,7 +162,7 @@
           <span class="handoff-panel__actor-label">現在由誰處理</span>
           <h2 id="handoff-title" data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</h2>
           <p class="handoff-panel__action" data-slot="next-action">
-            下一步：了解並確認 DRS 服務契約
+            下一步：查看 DRS 服務契約全文
           </p>
           <dl class="handoff-panel__facts">
             <div>
@@ -185,7 +185,7 @@
           >
             <div><dt>目前狀態</dt><dd data-slot="state-label">尚未連結正式案件</dd></div>
             <div><dt>現在由誰處理</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
-            <div><dt>下一步</dt><dd data-slot="next-action">了解並確認 DRS 服務契約</dd></div>
+            <div><dt>下一步</dt><dd data-slot="next-action">查看 DRS 服務契約全文</dd></div>
             <div><dt>尚未開放原因</dt><dd data-slot="waiting-relationship">甲方身分、DRS 服務契約與案件權限尚未完成確認</dd></div>
             <div><dt>完成後</dt><dd data-slot="next-due">完成後才會開放本案契約、文件分享與案件留痕</dd></div>
             <div><dt>最近留痕</dt><dd data-slot="last-recorded">尚未建立正式案件紀錄</dd></div>
@@ -403,15 +403,22 @@
               role="tabpanel"
               data-owner-panel="construction"
               data-owner-management-layout="construction"
+              data-owner-construction-mode="construction"
               aria-labelledby="owner-dashboard-tab-construction"
               hidden
             >
               <span class="owner-route-anchor" id="construction-records" aria-hidden="true"></span>
+              <div class="owner-construction-rail">
               <aside class="owner-hero-dashboard__summary">
                 <p class="eyebrow">案件摘要｜工程管理</p>
                 <h3>把現場進度連回任務、照片、變更與驗收責任。</h3>
                 <p>每個施工事件都要說清楚時間、依據文件、目前狀態與下一位處理者。</p>
               </aside>
+              <div
+                class="owner-construction-collection-nav"
+                data-owner-collection-nav-host
+                aria-label="甲方案件內容收納區"
+              ></div>
               <div class="owner-hero-dashboard__body">
                 <header>
                   <div>
@@ -426,58 +433,79 @@
                   <div><dt>下一位處理者</dt><dd data-slot="construction-actor">尚待案件資料</dd></div>
                 </dl>
               </div>
+              </div>
+              <div class="owner-construction-stage">
               <nav
                 class="owner-construction-nav"
                 data-layout="owner-construction-navigation"
+                role="tablist"
                 aria-label="工程管理資料分類"
               >
                 <button
+                  id="owner-construction-tab-today"
                   type="button"
+                  role="tab"
                   data-action="select-owner-construction-view"
                   data-owner-construction-view="today"
-                  aria-pressed="true"
+                  aria-selected="true"
                   aria-controls="owner-construction-view-today"
+                  tabindex="0"
                 >
                   <strong>案件日曆</strong>
                   <small>本日重要項目與責任</small>
                 </button>
                 <button
+                  id="owner-construction-tab-changes"
                   type="button"
+                  role="tab"
                   data-action="select-owner-construction-view"
                   data-owner-construction-view="changes"
-                  aria-pressed="false"
+                  aria-selected="false"
                   aria-controls="owner-construction-view-changes"
+                  tabindex="-1"
                 >
                   <strong>變更與驗收</strong>
                   <small>待確認、追加減與缺失</small>
                 </button>
                 <button
+                  id="owner-construction-tab-records"
                   type="button"
+                  role="tab"
                   data-action="select-owner-construction-view"
                   data-owner-construction-view="records"
-                  aria-pressed="false"
+                  aria-selected="false"
                   aria-controls="owner-construction-view-records"
+                  tabindex="-1"
                 >
                   <strong>歷史文件版本</strong>
                   <small>送審、照片與更正紀錄</small>
                 </button>
                 <button
+                  id="owner-construction-tab-trail"
                   type="button"
+                  role="tab"
                   data-action="select-owner-construction-view"
                   data-owner-construction-view="trail"
-                  aria-pressed="false"
+                  aria-selected="false"
                   aria-controls="owner-construction-view-trail"
+                  tabindex="-1"
                 >
                   <strong>案件留痕</strong>
                   <small>誰在何時依哪份文件處理</small>
                 </button>
               </nav>
               <div
+                class="owner-construction-collection-content"
+                data-owner-collected-workbench-host
+                hidden
+              ></div>
+              <div
                 class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
                 id="owner-construction-view-today"
                 data-owner-construction-view-panel="today"
                 data-calendar-workspace="construction"
                 data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"
+                aria-labelledby="owner-construction-tab-today"
               >
                 <iframe
                   title="本案施工時程摘要"
@@ -502,7 +530,7 @@
                 class="owner-management-card owner-construction-view"
                 id="owner-construction-view-changes"
                 data-owner-construction-view-panel="changes"
-                aria-labelledby="owner-construction-view-changes-title"
+                aria-labelledby="owner-construction-tab-changes owner-construction-view-changes-title"
                 hidden
               >
                 <header class="owner-management-card__heading">
@@ -529,7 +557,7 @@
                 class="owner-management-card owner-construction-view"
                 id="owner-construction-view-records"
                 data-owner-construction-view-panel="records"
-                aria-labelledby="owner-construction-view-records-title"
+                aria-labelledby="owner-construction-tab-records owner-construction-view-records-title"
                 hidden
               >
                 <header class="owner-management-card__heading">
@@ -550,7 +578,7 @@
                 class="owner-management-card owner-construction-view"
                 id="owner-construction-view-trail"
                 data-owner-construction-view-panel="trail"
-                aria-labelledby="owner-construction-view-trail-title"
+                aria-labelledby="owner-construction-tab-trail owner-construction-view-trail-title"
                 hidden
               >
                 <header class="owner-management-card__heading">
@@ -565,6 +593,7 @@
                   <span>正式案件連結後，施工任務、照片、變更、追加減項、缺失與驗收結果會依序顯示。</span>
                 </div>
               </section>
+              </div>
             </section>
 
             <section
@@ -581,10 +610,6 @@
                   <h3>先確認目前可進行的步驟，再整理本案契約。</h3>
                   <p>從下方四個分頁開始：先看契約、補齊本案資料，再整理需要乙方回覆的變更。萊比只協助整理風險與紀錄，不替雙方作決定。</p>
                 </div>
-                <a
-                  class="owner-contract-recovery-action"
-                  data-owner-service-contract-link
-                >了解並確認 DRS 服務契約</a>
                 <button
                   class="owner-contract-primary-action"
                   type="button"
@@ -612,13 +637,17 @@
               >
                 <div class="contract-kind-grid" data-owner-contract-edit-overview>
                   <article class="contract-kind-card contract-kind-card--service">
-                    <p class="eyebrow">萊比服務資格</p>
-                    <h4>確認誰能進入案件與使用服務</h4>
-                    <p>這裡只說明案件服務的資格與目前狀態，不是甲乙雙方的工程契約。</p>
+                    <p class="eyebrow">DRS 服務契約</p>
+                    <h4>確認服務範圍、版本與案件使用資格</h4>
+                    <p>這份契約說明萊比提供的案件治理服務，不是甲方與乙方的工程契約；目前狀態與版本都仍待確認。</p>
                     <dl>
                       <div><dt>服務狀態</dt><dd data-slot="agreement-state">尚待確認</dd></div>
                       <div><dt>服務版本</dt><dd data-slot="agreement-version">尚未確認服務版本</dd></div>
                     </dl>
+                    <a
+                      class="owner-contract-recovery-action owner-service-contract-entry"
+                      data-owner-service-contract-link
+                    >查看 DRS 服務契約全文</a>
                   </article>
 
                   <article class="contract-kind-card contract-kind-card--project">
@@ -838,78 +867,97 @@
         </div>
       </section>
 
-      <section
-        class="journey-banner"
-        data-layout="owner-stage-summary"
-        aria-label="甲方案件流程"
+      <div
+        class="owner-operational-workbench"
+        data-layout="owner-tabbed-workbench"
+        data-active-owner-section="overview"
       >
-        <ol class="journey-banner__track">
-          <li class="journey-step is-current">
-            <span class="journey-number">1</span>
-            <div><strong>文件準備</strong><small>確認版本與補件</small></div>
-          </li>
-          <li class="journey-step">
-            <span class="journey-number">2</span>
-            <div><strong>案件總覽</strong><small>掌握責任與進度</small></div>
-          </li>
-          <li class="journey-step">
-            <span class="journey-number">3</span>
-            <div><strong>設計送審</strong><small>整理確認與變更</small></div>
-          </li>
-          <li class="journey-step">
-            <span class="journey-number">4</span>
-            <div><strong>施工與驗收</strong><small>留下執行紀錄</small></div>
-          </li>
-        </ol>
-      </section>
-
-      <section
-        class="access-notice"
-        data-role="access-notice"
-        aria-live="polite"
-        aria-labelledby="access-title"
-      >
-        <div class="access-notice__marker" aria-hidden="true">!</div>
-        <div>
-          <p class="eyebrow">目前狀態</p>
-          <h2 id="access-title" data-slot="access-title">
-            尚未連結正式案件內容
-          </h2>
-          <p data-slot="access-message">
-            你可以先整理已保存的摘要與文件；確認 DRS 服務契約後，正式案件內容才會在這裡提供。
-          </p>
-        </div>
-        <button
-          class="button button--ghost"
-          type="button"
-          data-action="retry"
-          hidden
+        <nav
+          class="section-nav owner-workbench-nav"
+          data-layout="owner-section-nav"
+          aria-label="甲方工作台分區"
         >
-          重新載入
-        </button>
-      </section>
+          <header class="owner-workbench-nav__heading">
+            <p class="eyebrow">案件分類</p>
+            <strong>一次只看一個工作區</strong>
+            <span>依目前要處理的文件、確認或案件紀錄切換。</span>
+          </header>
 
-      <nav
-        class="section-nav"
-        data-layout="owner-section-nav"
-        aria-label="甲方工作台分區"
-      >
-        <a href="#overview">案件總覽</a>
-        <a href="#documents">文件與報價</a>
-        <a href="#submissions">乙方提交與場勘</a>
-        <a href="#messages">三方書面紀錄</a>
-        <a href="#governance">治理檢查</a>
-        <a href="#design-review">設計送審</a>
-        <a href="#construction-records">施工與驗收紀錄</a>
-        <a href="#event-trail">案件留痕</a>
-      </nav>
+          <section class="owner-workbench-nav__stage" data-owner-section-stage="documents" aria-labelledby="owner-section-stage-documents">
+            <h2 id="owner-section-stage-documents"><span>01</span>文件準備</h2>
+            <a href="#documents" data-owner-section-tab="documents" aria-controls="documents">
+              <strong>文件與報價</strong><small>報價、圖面與版次依據</small>
+            </a>
+            <a href="#submissions" data-owner-section-tab="submissions" aria-controls="submissions">
+              <strong>乙方提交與場勘</strong><small>回覆、場勘與條件差異</small>
+            </a>
+          </section>
 
-      <div class="owner-shell-grid" data-layout="owner-operational-shell">
+          <section class="owner-workbench-nav__stage" data-owner-section-stage="overview" aria-labelledby="owner-section-stage-overview">
+            <h2 id="owner-section-stage-overview"><span>02</span>案件總覽</h2>
+            <a href="#overview" data-owner-section-tab="overview" aria-controls="overview" aria-current="page">
+              <strong>案件總覽</strong><small>狀態、責任與下一步</small>
+            </a>
+            <a href="#messages" data-owner-section-tab="messages" aria-controls="messages">
+              <strong>三方書面紀錄</strong><small>問題、回覆與確認</small>
+            </a>
+            <a href="#governance" data-owner-section-tab="governance" aria-controls="governance">
+              <strong>治理檢查</strong><small>異議、補件與決策邊界</small>
+            </a>
+            <a href="#event-trail" data-owner-section-tab="event-trail" aria-controls="event-trail">
+              <strong>案件留痕</strong><small>誰在何時依據什麼處理</small>
+            </a>
+          </section>
+
+          <section class="owner-workbench-nav__stage" data-owner-section-stage="design" aria-labelledby="owner-section-stage-design">
+            <h2 id="owner-section-stage-design"><span>03</span>設計送審</h2>
+            <a href="#design-review" data-owner-dashboard-shortcut="design">
+              <strong>設計送審</strong><small>前往上方設計管理與日曆</small>
+            </a>
+          </section>
+
+          <section class="owner-workbench-nav__stage" data-owner-section-stage="construction" aria-labelledby="owner-section-stage-construction">
+            <h2 id="owner-section-stage-construction"><span>04</span>施工與驗收</h2>
+            <a href="#construction-records" data-owner-dashboard-shortcut="construction">
+              <strong>施工與驗收紀錄</strong><small>前往上方工程管理與日曆</small>
+            </a>
+          </section>
+        </nav>
+
+        <div class="owner-workbench-stage">
+          <section
+            class="access-notice"
+            data-role="access-notice"
+            aria-live="polite"
+            aria-labelledby="access-title"
+          >
+            <div class="access-notice__marker" aria-hidden="true">!</div>
+            <div>
+              <p class="eyebrow">目前狀態</p>
+              <h2 id="access-title" data-slot="access-title">
+                尚未連結正式案件內容
+              </h2>
+              <p data-slot="access-message">
+                你可以先整理已保存的摘要與文件；確認 DRS 服務契約後，正式案件內容才會在這裡提供。
+              </p>
+            </div>
+            <button
+              class="button button--ghost"
+              type="button"
+              data-action="retry"
+              hidden
+            >
+              重新載入
+            </button>
+          </section>
+
+          <div class="owner-shell-grid" data-layout="owner-operational-shell">
       <div class="workspace-layout" data-layout="owner-workspace-split">
         <div class="workspace-main" data-layout="owner-workspace-main">
           <section
             class="workspace-section"
             id="overview"
+            data-owner-section-panel="overview"
             aria-labelledby="overview-title"
           >
             <div class="section-heading">
@@ -935,7 +983,7 @@
               </div>
               <div class="summary-card summary-card--accent">
                 <dt>下一步</dt>
-                <dd data-slot="next-summary">了解並確認 DRS 服務契約</dd>
+                <dd data-slot="next-summary">查看 DRS 服務契約全文</dd>
                 <p data-slot="next-owner-summary">責任人：甲方</p>
               </div>
             </dl>
@@ -944,6 +992,7 @@
           <section
             class="process-poster"
             data-layout="owner-stage-detail"
+            data-owner-section-panel="overview"
             aria-labelledby="process-title"
           >
             <div class="section-heading section-heading--inverse">
@@ -990,43 +1039,56 @@
           </section>
 
           <section
-            class="workspace-section"
+            class="workspace-section owner-document-workbench"
             id="documents"
+            data-owner-section-panel="documents"
             aria-labelledby="documents-title"
           >
-            <div class="section-heading section-heading--split">
-              <div>
+            <div class="section-heading section-heading--split owner-document-workbench__heading">
+              <div class="owner-document-workbench__intro">
                 <p class="eyebrow">固定文件版次</p>
                 <h2 id="documents-title">文件與報價</h2>
                 <p>每份文件顯示種類、版次、提交者、時間與目前用途；分享只傳送受權限保護的案件入口。</p>
               </div>
-              <aside
-                class="owner-document-share-guide"
-                data-owner-document-share-guide
-                aria-label="文件分享說明"
-              >
-                <span class="owner-document-share-guide__mark" aria-hidden="true">LINE</span>
-                <span>
-                  <strong>分享文件連結至 LINE</strong>
-                  <small>接收者仍須登入並具有本案權限；不會公開文件或變更權限。</small>
-                </span>
-              </aside>
+              <div class="owner-document-workbench__actions">
+                <a
+                  class="owner-document-workbench__primary-action"
+                  data-owner-document-primary-action
+                  href="../pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract"
+                >查看 DRS 服務契約全文</a>
+                <aside
+                  class="owner-document-share-guide"
+                  data-owner-document-share-guide
+                  aria-label="文件分享說明"
+                >
+                  <span class="owner-document-share-guide__mark" aria-hidden="true">LINE</span>
+                  <span>
+                    <strong>分享文件連結至 LINE</strong>
+                    <small>接收者仍須登入並具有本案權限；不會公開文件或變更權限。</small>
+                  </span>
+                </aside>
+              </div>
             </div>
-            <ul class="record-list" data-list="documents">
-              <li class="empty-state">
-                <strong>尚未取得可供顯示的文件</strong>
-                <span
-                >確認案件權限後，才會列出可讀取的報價單與施工圖版本。</span>
-              </li>
-            </ul>
-            <p class="boundary-note">
-              基本檢討與報價健檢只整理完整性、範圍與風險提示，不代替任何工程商業判定。
-            </p>
+            <div class="owner-document-workbench__evidence">
+              <ul class="record-list" data-list="documents">
+                <li class="empty-state">
+                  <strong>尚未取得可供顯示的文件</strong>
+                  <span
+                  >確認案件權限後，才會列出可讀取的報價單與施工圖版本。</span>
+                </li>
+              </ul>
+            </div>
+            <footer class="owner-document-workbench__footer">
+              <p class="boundary-note">
+                基本檢討與報價健檢只整理完整性、範圍與風險提示，不代替任何工程商業判定。
+              </p>
+            </footer>
           </section>
 
           <section
             class="workspace-section"
             id="submissions"
+            data-owner-section-panel="submissions"
             aria-labelledby="submissions-title"
           >
             <div class="section-heading">
@@ -1062,6 +1124,7 @@
           <section
             class="workspace-section"
             id="messages"
+            data-owner-section-panel="messages"
             aria-labelledby="messages-title"
           >
             <div class="section-heading section-heading--split">
@@ -1088,6 +1151,7 @@
           <section
             class="workspace-section"
             id="governance"
+            data-owner-section-panel="governance"
             aria-labelledby="governance-title"
           >
             <div class="section-heading">
@@ -1313,6 +1377,7 @@
           <section
             class="workspace-section"
             id="event-trail"
+            data-owner-section-panel="event-trail"
             aria-labelledby="event-trail-title"
           >
             <div class="section-heading">
@@ -1335,6 +1400,7 @@
         <aside
           class="owner-sidebar"
           data-layout="owner-context-rail"
+          data-owner-section-panel="overview"
           aria-label="案件狀態與快速入口"
         >
           <div class="workspace-aside">
@@ -1400,6 +1466,8 @@
           </div>
         </aside>
       </div>
+      </div>
+        </div>
       </div>
     </main>
 

@@ -22,7 +22,7 @@ function loadRuntime() {
 
 function ownerContractPanel(html) {
   const start = html.indexOf('id="owner-dashboard-panel-contract"');
-  const end = html.indexOf('data-layout="owner-stage-summary"', start);
+  const end = html.indexOf('data-layout="owner-tabbed-workbench"', start);
   return start >= 0 && end > start ? html.slice(start, end) : "";
 }
 
@@ -313,6 +313,102 @@ function createInteractiveTabHarness({
   };
 }
 
+function createOwnerSectionNavigationHarness(initialHash = "#overview") {
+  const keys = [
+    "overview",
+    "documents",
+    "submissions",
+    "messages",
+    "governance",
+    "event-trail",
+  ];
+  const listeners = new Map();
+  const replacements = [];
+
+  function interactiveNode(key) {
+    const nodeListeners = new Map();
+    return {
+      dataset: { ownerSectionTab: key },
+      tabIndex: 0,
+      focused: false,
+      attributes: new Map(),
+      addEventListener(type, listener) {
+        const current = nodeListeners.get(type) ?? [];
+        current.push(listener);
+        nodeListeners.set(type, current);
+      },
+      dispatch(type, event = {}) {
+        for (const listener of nodeListeners.get(type) ?? []) {
+          listener({
+            ...event,
+            preventDefault() {
+              event.defaultPrevented = true;
+            },
+          });
+        }
+      },
+      setAttribute(name, value) {
+        this.attributes.set(name, String(value));
+      },
+      getAttribute(name) {
+        return this.attributes.get(name) ?? null;
+      },
+      removeAttribute(name) {
+        this.attributes.delete(name);
+      },
+      focus() {
+        this.focused = true;
+      },
+    };
+  }
+
+  const tabs = keys.map(interactiveNode);
+  const panels = [
+    ...["overview", "overview", "overview"].map((key) => ({
+      dataset: { ownerSectionPanel: key },
+      hidden: false,
+    })),
+    ...keys.slice(1).map((key) => ({
+      dataset: { ownerSectionPanel: key },
+      hidden: false,
+    })),
+  ];
+  const workbench = {
+    dataset: {},
+    querySelectorAll(selector) {
+      if (selector === "[data-owner-section-tab]") return tabs;
+      if (selector === "[data-owner-section-panel]") return panels;
+      return [];
+    },
+  };
+  const root = {
+    querySelector(selector) {
+      return selector === '[data-layout="owner-tabbed-workbench"]'
+        ? workbench
+        : null;
+    },
+  };
+  const view = {
+    location: { hash: initialHash },
+    history: {
+      replaceState(_state, _title, value) {
+        replacements.push(value);
+        view.location.hash = String(value).slice(String(value).indexOf("#"));
+      },
+    },
+    addEventListener(type, listener) {
+      const current = listeners.get(type) ?? [];
+      current.push(listener);
+      listeners.set(type, current);
+    },
+    dispatch(type) {
+      for (const listener of listeners.get(type) ?? []) listener();
+    },
+  };
+
+  return { root, view, workbench, tabs, panels, replacements, listeners };
+}
+
 function authorizedContext(overrides = {}) {
   return {
     sessionStatus: "active",
@@ -431,6 +527,89 @@ test("完整映射案件治理資訊架構與可達頁內錨點", async () => {
     assert.match(html, new RegExp(label));
     assert.match(html, new RegExp(`href="#${id}"`));
   }
+});
+
+test("框選範圍改為桌機側欄與單一內容面板，手機保留可滑動分類", async () => {
+  const [html, css, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+    readPageFile("app.js"),
+  ]);
+
+  assert.match(html, /data-layout="owner-tabbed-workbench"/u);
+  assert.match(html, /class="section-nav owner-workbench-nav"/u);
+  assert.match(html, /data-owner-section-stage="documents"[\s\S]*01[\s\S]*文件準備/u);
+  assert.match(html, /data-owner-section-stage="overview"[\s\S]*02[\s\S]*案件總覽/u);
+  assert.match(html, /data-owner-section-stage="design"[\s\S]*03[\s\S]*設計送審/u);
+  assert.match(html, /data-owner-section-stage="construction"[\s\S]*04[\s\S]*施工與驗收/u);
+
+  for (const key of [
+    "overview",
+    "documents",
+    "submissions",
+    "messages",
+    "governance",
+    "event-trail",
+  ]) {
+    assert.match(html, new RegExp(`data-owner-section-tab="${key}"`, "u"));
+    assert.match(html, new RegExp(`data-owner-section-panel="${key}"`, "u"));
+  }
+  assert.match(html, /href="#design-review"\s+data-owner-dashboard-shortcut="design"/u);
+  assert.match(html, /href="#construction-records"\s+data-owner-dashboard-shortcut="construction"/u);
+  assert.doesNotMatch(html, /data-layout="owner-stage-summary"/u);
+
+  assert.match(
+    css,
+    /\[data-layout="owner-tabbed-workbench"\]\s*\{[^}]*grid-template-columns:\s*minmax\(210px,\s*240px\)\s+minmax\(0,\s*1fr\)/u,
+  );
+  assert.match(css, /\.owner-workbench-nav\s*\{[^}]*display:\s*grid[^}]*position:\s*sticky/u);
+  assert.match(
+    css,
+    /\.owner-workbench-nav a:focus-visible\s*\{[^}]*outline:\s*2px solid #ff7530/u,
+  );
+  assert.match(css, /\[data-owner-section-panel\]\[hidden\][^{]*\{[^}]*display:\s*none/u);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\[data-layout="owner-tabbed-workbench"\]\s*\{[^}]*grid-template-columns:\s*1fr[\s\S]*?\.owner-workbench-nav\s*\{[^}]*grid-auto-flow:\s*column[^}]*overflow-x:\s*auto/u,
+  );
+  assert.match(runtime, /export function initializeOwnerSectionNavigation/u);
+});
+
+test("分類切換同步 hash、目前標記、鍵盤焦點與唯一可見面板", async () => {
+  const { initializeOwnerSectionNavigation } = await loadRuntime();
+  assert.equal(typeof initializeOwnerSectionNavigation, "function");
+  const harness = createOwnerSectionNavigationHarness("#documents");
+
+  const controller = initializeOwnerSectionNavigation(harness.root, harness.view);
+  assert.equal(harness.workbench.dataset.activeOwnerSection, "documents");
+  assert.equal(harness.tabs[1].getAttribute("aria-current"), "page");
+  assert.equal(harness.tabs[1].tabIndex, 0);
+  assert.equal(harness.tabs[0].getAttribute("aria-current"), null);
+  assert.equal(
+    harness.panels.filter((panel) => !panel.hidden).every(
+      (panel) => panel.dataset.ownerSectionPanel === "documents",
+    ),
+    true,
+  );
+
+  harness.tabs[1].dispatch("keydown", { key: "ArrowDown" });
+  assert.equal(harness.workbench.dataset.activeOwnerSection, "submissions");
+  assert.equal(harness.tabs[2].focused, true);
+  assert.equal(harness.replacements.at(-1), "#submissions");
+
+  harness.tabs.at(-1).dispatch("keydown", { key: "Home" });
+  assert.equal(harness.workbench.dataset.activeOwnerSection, "overview");
+  assert.equal(
+    harness.panels.filter((panel) => !panel.hidden).length,
+    3,
+    "overview keeps its status, four-stage explanation and case context together",
+  );
+
+  harness.view.location.hash = "#messages";
+  harness.view.dispatch("hashchange");
+  assert.equal(harness.workbench.dataset.activeOwnerSection, "messages");
+  assert.equal(harness.tabs[3].getAttribute("aria-current"), "page");
+  assert.equal(controller.selectSection("unknown"), false);
 });
 
 test("設計與工程中央區都完整保留給案件日曆", async () => {
@@ -674,9 +853,9 @@ test("甲方工作台以設計管理、工程管理、契約管理作為三個�
 
   const heroIndex = html.indexOf('data-layout="owner-command-header"');
   const dashboardIndex = html.indexOf('data-layout="owner-hero-dashboard"');
-  const stageIndex = html.indexOf('data-layout="owner-stage-summary"');
+  const workbenchIndex = html.indexOf('data-layout="owner-tabbed-workbench"');
   assert.ok(heroIndex >= 0 && dashboardIndex > heroIndex);
-  assert.ok(stageIndex > dashboardIndex);
+  assert.ok(workbenchIndex > dashboardIndex);
 
   for (const [key, label] of [
     ["design", "設計管理"],
@@ -764,6 +943,128 @@ test("設計與工程主區承接母版案件功能且只保留甲方需要的�
   );
 });
 
+test("工程管理把下方案件內容收進左側標籤並將四個工程分類改為右側橫向分頁", async () => {
+  const [html, css, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+    readPageFile("app.js"),
+  ]);
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const contractStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const constructionPanel = html.slice(constructionStart, contractStart);
+
+  assert.match(constructionPanel, /data-owner-collection-nav-host/u);
+  assert.match(constructionPanel, /data-owner-collected-workbench-host/u);
+  assert.match(
+    constructionPanel,
+    /data-layout="owner-construction-navigation"[^>]*role="tablist"/u,
+  );
+  assert.equal((constructionPanel.match(/role="tab"/gu) ?? []).length, 4);
+  assert.equal((constructionPanel.match(/aria-selected=/gu) ?? []).length, 4);
+  assert.doesNotMatch(constructionPanel, /data-owner-construction-view=[^>]*aria-pressed=/u);
+
+  assert.match(runtime, /function collectOwnerWorkbenchIntoConstruction/u);
+  assert.match(runtime, /ownerConstructionMode\s*=\s*["']collection["']/u);
+  assert.match(runtime, /ownerConstructionMode\s*=\s*["']construction["']/u);
+  assert.match(runtime, /collectionNavHost\.append\(navigation\)/u);
+  assert.match(runtime, /collectionContentHost\.append\(stage\)/u);
+
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-construction-nav\s*\{[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/u,
+  );
+  assert.match(
+    css,
+    /data-owner-construction-mode="construction"[\s\S]{0,260}data-owner-collected-workbench-host/u,
+  );
+  assert.match(
+    css,
+    /data-owner-construction-mode="collection"[\s\S]{0,260}data-owner-construction-view-panel/u,
+  );
+});
+
+test("工程管理首屏以 Dusk Ember 語意壓縮日曆空態並降低橘框噪音", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const contractStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const constructionPanel = html.slice(constructionStart, contractStart);
+  const contractPanel = html.slice(contractStart);
+
+  assert.doesNotMatch(
+    constructionPanel,
+    /owner-construction-primary-action|查看 DRS 服務契約全文/u,
+  );
+  assert.match(
+    contractPanel,
+    /data-owner-service-contract-link[^>]*>[\s\S]{0,80}查看 DRS 服務契約全文/u,
+  );
+  assert.match(
+    html,
+    /owner-construction-rail/u,
+  );
+  assert.match(
+    html,
+    /owner-construction-stage[\s\S]{0,220}owner-construction-nav/u,
+  );
+
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s*\{[^}]*border:\s*1px solid rgb\(243 238 245 \/ 12%\)/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-google-calendar-unavailable\s*\{[^}]*min-height:\s*360px/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-construction-rail\s*\{[^}]*max-height:\s*560px[^}]*overflow:\s*auto/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction[\s\S]{0,260}\.owner-construction-collection-nav[\s\S]{0,260}\.owner-workbench-nav\s*\{[^}]*max-height:\s*none/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-dashboard-facts div,[\s\S]{0,220}min-height:\s*42px/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-construction-stage\s*\{[^}]*grid-template-rows:\s*auto minmax\(0,\s*1fr\)/u,
+  );
+  assert.doesNotMatch(css, /\.owner-construction-primary-action/u);
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-dashboard-facts div:nth-child\(2\) dd\s*\{[^}]*#e65a9f/u,
+  );
+  assert.match(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-dashboard-facts div:last-child\s*\{[^}]*#c26ae6/u,
+  );
+  assert.match(
+    css,
+    /body:has\(#owner-dashboard-panel-construction:not\(\[hidden\]\)\)\s+\.workspace-header__context/u,
+  );
+  assert.match(
+    css,
+    /body:has\(#owner-dashboard-panel-construction:not\(\[hidden\]\)\)[\s\S]{0,180}\.workspace-header__context\s+\.context-chip\s*\{[^}]*width:\s*auto/u,
+  );
+  assert.match(
+    css,
+    /\.workspace-header__context\s+\.context-chip--agreement\s*\{[^}]*grid-column:\s*2/u,
+  );
+  assert.match(
+    css,
+    /@media \(max-width:\s*760px\)[\s\S]*?#owner-dashboard-panel-construction\s+\.owner-construction-collection-nav\s*\{[^}]*order:\s*4/u,
+  );
+  assert.doesNotMatch(
+    css,
+    /#owner-dashboard-panel-construction\s+\.owner-google-calendar-unavailable\s*\{[^}]*linear-gradient\(rgb\(255 255 255 \/ 3%\) 1px/u,
+  );
+});
+
 test("甲方儀表板完全移除 LINE 對話框並把主視覺空間交給案件日曆", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
@@ -800,10 +1101,10 @@ test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約",
   const hierarchy = [
     ["workspace-intro", "owner-command-header"],
     ["handoff-panel", "owner-responsibility-panel"],
-    ["journey-banner", "owner-stage-summary"],
     ["workspace-tabs", "owner-section-tabs"],
     ["process-poster", "owner-stage-detail"],
-    ["section-nav", "owner-section-nav"],
+    ["owner-operational-workbench", "owner-tabbed-workbench"],
+    ["section-nav owner-workbench-nav", "owner-section-nav"],
     ["owner-shell-grid", "owner-operational-shell"],
     ["workspace-layout", "owner-workspace-split"],
     ["workspace-main", "owner-workspace-main"],
@@ -819,11 +1120,11 @@ test("甲方工作台採用緊湊案件指揮層級並保留既有資料契約",
   }
 
   const commandIndex = html.indexOf('data-layout="owner-command-header"');
-  const stageIndex = html.indexOf('data-layout="owner-stage-summary"');
+  const workbenchIndex = html.indexOf('data-layout="owner-tabbed-workbench"');
   const sectionNavIndex = html.indexOf('data-layout="owner-section-nav"');
   const shellIndex = html.indexOf('data-layout="owner-operational-shell"');
-  assert.ok(commandIndex < stageIndex);
-  assert.ok(stageIndex < sectionNavIndex);
+  assert.ok(commandIndex < workbenchIndex);
+  assert.ok(workbenchIndex < sectionNavIndex);
   assert.ok(sectionNavIndex < shellIndex);
 
   assert.match(
@@ -2191,8 +2492,8 @@ test("甲方契約工作區先交代角色、版本、狀態、責任與唯一�
   assert.match(panel, /本案契約/u);
   assert.match(panel, /目前狀態/u);
   assert.match(panel, /下一位處理者/u);
-  assert.match(panel, /了解並確認 DRS 服務契約/u);
-  assert.match(panel, /data-owner-service-contract-link[^>]*>\s*了解並確認 DRS 服務契約/u);
+  assert.match(panel, /查看 DRS 服務契約全文/u);
+  assert.match(panel, /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約全文/u);
   assert.doesNotMatch(panel, /data-owner-service-contract-link[^>]*\shref=/u);
   assert.equal((panel.match(/owner-contract-recovery-action/g) || []).length, 1);
   assert.match(panel, /data-owner-contract-trusted-action[^>]*disabled[^>]*aria-disabled="true"/u);
@@ -2416,13 +2717,35 @@ test("甲方契約管理以四個小白任務分頁分開服務資格、專案�
   for (const label of ["契約總覽", "待我填寫", "補充與變更", "版本與紀錄"]) {
     assert.match(panel, new RegExp(label));
   }
-  assert.match(panel, /萊比服務資格/u);
+  assert.match(panel, /DRS 服務契約/u);
   assert.match(panel, /本案甲乙契約/u);
-  assert.match(panel, /了解並確認 DRS 服務契約/u);
+  assert.match(panel, /查看 DRS 服務契約全文/u);
   assert.doesNotMatch(panel, /開始編輯契約資料/u);
   assert.match(panel, /contractType=DESIGN_BUILD&amp;returnTo=owner/u);
   assert.match(panel, /目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方/u);
   assert.match(css, /\.owner-contract-view-tabs\s*\{/u);
+});
+
+test("甲方契約總覽直接接上 DRS 服務契約全文並保留真實待確認狀態", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const panel = ownerContractPanel(html);
+  const cardStart = panel.indexOf("contract-kind-card--service");
+  const cardEnd = panel.indexOf("</article>", cardStart);
+  const serviceContractCard = panel.slice(cardStart, cardEnd);
+
+  assert.ok(cardStart >= 0 && cardEnd > cardStart, "DRS service contract card exists");
+  assert.match(serviceContractCard, /DRS 服務契約/u);
+  assert.match(serviceContractCard, /data-slot="agreement-state">尚待確認/u);
+  assert.match(serviceContractCard, /data-slot="agreement-version">尚未確認服務版本/u);
+  assert.match(
+    serviceContractCard,
+    /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約全文/u,
+  );
+  assert.equal((panel.match(/data-owner-service-contract-link/g) || []).length, 1);
+  assert.match(css, /\.owner-service-contract-entry\s*\{[^}]*display:\s*inline-flex/isu);
 });
 
 test("契約預覽返回甲方工作台時直接開啟待我填寫而不是契約總覽", async () => {
@@ -2514,10 +2837,104 @@ test("甲方契約資料 reducer 只維護本頁草稿並計算完成進度", as
 test("甲方工作台可由契約預覽返回連結直接開啟契約管理", async () => {
   const { resolveOwnerDashboardTabFromHash } = await loadRuntime();
   assert.equal(resolveOwnerDashboardTabFromHash("#owner-dashboard-panel-contract"), "contract");
-  assert.equal(resolveOwnerDashboardTabFromHash("#governance"), "contract");
+  assert.equal(resolveOwnerDashboardTabFromHash("#governance"), "construction");
   assert.equal(resolveOwnerDashboardTabFromHash("#construction-records"), "construction");
   assert.equal(resolveOwnerDashboardTabFromHash("#design-review"), "design");
   assert.equal(resolveOwnerDashboardTabFromHash("#unknown"), null);
+});
+
+test("legacy governance direct entry and history keep construction collection and governance visible", async () => {
+  const {
+    collectOwnerWorkbenchIntoConstruction,
+    initializeOwnerDashboardTabs,
+    initializeOwnerSectionNavigation,
+  } = await loadRuntime();
+  const dashboard = createInteractiveTabHarness({
+    kind: "dashboard",
+    initialHash: "#governance",
+  });
+  const section = createOwnerSectionNavigationHarness("#governance");
+  const navigation = {
+    querySelectorAll(selector) {
+      return selector === "[data-owner-section-tab]" ? section.tabs : [];
+    },
+  };
+  const stage = {};
+  const collectionNavHost = {
+    child: null,
+    append(node) {
+      this.child = node;
+    },
+  };
+  const collectedContentHost = {
+    child: null,
+    dataset: {},
+    hidden: true,
+    append(node) {
+      this.child = node;
+    },
+  };
+  const construction = {
+    dataset: {},
+    querySelector(selector) {
+      if (selector === "[data-owner-collection-nav-host]") return collectionNavHost;
+      if (selector === "[data-owner-collected-workbench-host]") {
+        return collectedContentHost;
+      }
+      return null;
+    },
+  };
+  section.workbench.querySelector = (selector) => {
+    if (selector === '[data-layout="owner-section-nav"]') return navigation;
+    if (selector === ".owner-workbench-stage") return stage;
+    return null;
+  };
+  const root = {
+    ...dashboard.root,
+    querySelector(selector) {
+      if (selector === '[data-layout="owner-hero-dashboard"]') {
+        return dashboard.container;
+      }
+      if (selector === '[data-layout="owner-tabbed-workbench"]') {
+        return section.workbench;
+      }
+      if (selector === '[data-owner-management-layout="construction"]') {
+        return construction;
+      }
+      if (selector === "[data-owner-collected-workbench-host]") {
+        return collectedContentHost;
+      }
+      return null;
+    },
+  };
+
+  initializeOwnerDashboardTabs(root, dashboard.view);
+  initializeOwnerSectionNavigation(root, dashboard.view);
+  collectOwnerWorkbenchIntoConstruction(root, dashboard.view);
+
+  function assertGovernanceState() {
+    assert.equal(dashboard.container.dataset.activeOwnerTab, "construction");
+    assert.equal(dashboard.panels[1].hidden, false, "construction panel is visible");
+    assert.equal(dashboard.panels[2].hidden, true, "contract panel is hidden");
+    assert.equal(construction.dataset.ownerConstructionMode, "collection");
+    assert.equal(collectedContentHost.hidden, false, "collection is visible");
+    assert.equal(section.workbench.dataset.activeOwnerSection, "governance");
+    assert.equal(
+      section.panels.find((panel) =>
+        panel.dataset.ownerSectionPanel === "governance"
+      )?.hidden,
+      false,
+      "governance section is visible",
+    );
+  }
+
+  assertGovernanceState();
+  dashboard.view.location.hash = "#owner-dashboard-panel-contract";
+  dashboard.view.dispatch("hashchange");
+  assert.equal(dashboard.container.dataset.activeOwnerTab, "contract");
+  dashboard.view.location.hash = "#governance";
+  dashboard.view.dispatch("hashchange");
+  assertGovernanceState();
 });
 
 test("未連結正式案件時說清楚原因、處理者、最近留痕與可恢復下一步", async () => {
@@ -2532,9 +2949,9 @@ test("未連結正式案件時說清楚原因、處理者、最近留痕與可�
   assert.match(model.statusMessage, /甲方身分、DRS 服務契約與案件權限尚未完成確認/u);
   assert.equal(model.currentActor, "由甲方先確認 DRS 服務與案件入口");
   assert.equal(model.lastRecorded, "尚未建立正式案件紀錄");
-  assert.equal(model.nextAction, "了解並確認 DRS 服務契約");
+  assert.equal(model.nextAction, "查看 DRS 服務契約全文");
   assert.match(html, /完成後才會開放本案契約、文件分享與案件留痕/u);
-  assert.match(html, /data-owner-service-contract-link[^>]*>\s*了解並確認 DRS 服務契約/u);
+  assert.match(html, /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約全文/u);
   assert.doesNotMatch(model.statusMessage, /已保存/u);
 });
 
@@ -3357,4 +3774,50 @@ test("concurrent owner initialization and Calendar responses cannot overwrite th
   await staleCalendarRun;
   assert.match(harness.frame.src, /new-calendar/u);
   assert.equal(harness.state.textContent, "本案 Google Calendar 已連結");
+});
+
+test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既有契約入口", async () => {
+  const [html, css] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+  ]);
+  const documentsId = html.indexOf('id="documents"');
+  const documentsStart = html.lastIndexOf("<section", documentsId);
+  const documentsEnd = html.indexOf('id="submissions"', documentsStart);
+  const documentsPanel = html.slice(documentsStart, documentsEnd);
+
+  assert.ok(documentsStart > 0 && documentsEnd > documentsStart);
+  assert.match(documentsPanel, /class="workspace-section owner-document-workbench"/u);
+  assert.match(documentsPanel, /owner-document-workbench__heading/u);
+  assert.match(documentsPanel, /owner-document-workbench__evidence/u);
+  assert.match(documentsPanel, /owner-document-workbench__footer/u);
+  assert.match(
+    documentsPanel,
+    /data-owner-document-primary-action[^>]*href="\.\.\/pcm_standalone\/service_contract\/code\.html\?returnTo=owner-contract#full-contract"[^>]*>[\s\S]*查看 DRS 服務契約全文/u,
+  );
+  assert.match(documentsPanel, /data-owner-document-share-guide/u);
+  assert.match(documentsPanel, /data-list="documents"/u);
+
+  assert.match(css, /\.owner-document-workbench\s*\{[\s\S]*grid-template-rows:/u);
+  assert.match(css, /\.owner-document-workbench__actions\s*\{[\s\S]*display:\s*grid/u);
+  assert.match(css, /\.owner-document-workbench__evidence\s*\{[\s\S]*min-height:/u);
+  assert.match(css, /data-active-owner-section="documents"[\s\S]*owner-workbench-nav/u);
+  assert.match(
+    css,
+    /@media \(max-width: 760px\)[\s\S]*\.owner-document-workbench__heading\s*\{[\s\S]*grid-template-columns:\s*1fr/u,
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 760px\)[\s\S]*#documents\.owner-document-workbench\s*\{[^}]*scroll-margin-top:\s*18\.5rem/u,
+  );
+  assert.match(css, /\.owner-document-workbench__primary-action\s*\{[\s\S]*min-height:\s*44px/u);
+  assert.doesNotMatch(css, /\.owner-construction-primary-action/u);
+  assert.match(
+    css,
+    /@media \(max-width: 760px\)[\s\S]*data-owner-construction-mode="collection"[\s\S]{0,220}data-active-owner-section="documents"[\s\S]{0,180}\.owner-construction-stage\s*\{[^}]*order:\s*1/u,
+  );
+  assert.match(
+    css,
+    /data-owner-construction-mode="collection"[\s\S]{0,220}data-active-owner-section="documents"[\s\S]{0,180}\.owner-construction-nav\s*\{[^}]*display:\s*none/u,
+  );
 });

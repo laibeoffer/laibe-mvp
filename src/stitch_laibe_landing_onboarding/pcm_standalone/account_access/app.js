@@ -29,8 +29,12 @@ const OWNER_CASE_KEYS = Object.freeze(["caseId", "status", "title"]);
 const OWNER_SERVICE_KEYS = Object.freeze(["contractStatus", "pcmStatus"]);
 const ALLOWED_FUNCTION_ENDPOINTS = new Set([
   "vendor-workspace-grant",
-  "vendor-google-calendar-grant",
-  "vendor-google-calendar-oauth-start",
+  "vendor-google-calendar-connect-start",
+  "vendor-google-calendar-support-grant",
+  "vendor-google-calendar-events-read",
+  "vendor-google-calendar-events-create",
+  "vendor-google-calendar-events-update",
+  "vendor-google-calendar-events-cancel",
   "owner-workspace-grant",
   "owner-google-calendar-grant",
   "owner-google-calendar-oauth-start",
@@ -230,7 +234,7 @@ export function isPasswordRecoveryReturn(location = globalThis.location) {
 
 export function createSupabaseAuthRuntime({
   createClientImplementation,
-  storage = globalThis.sessionStorage,
+  storage = globalThis.localStorage,
   fetchImplementation = globalThis.fetch,
   projectUrl = SUPABASE_PROJECT_URL,
   publishableKey = SUPABASE_PUBLISHABLE_KEY,
@@ -438,7 +442,7 @@ let authRuntimePromise = null;
 
 export function getSupabaseAuthRuntime({
   importImplementation = (moduleUrl) => import(moduleUrl),
-  storage = globalThis.sessionStorage,
+  storage = globalThis.localStorage,
   fetchImplementation = globalThis.fetch,
 } = {}) {
   if (!authRuntimePromise) {

@@ -819,7 +819,7 @@ test("password login uses selected vendor intent but opens the workspace only af
   assert.deepEqual(navigations, ["/pcm/vendor/workspace/"]);
 });
 
-test("Supabase runtime is tab-scoped, signs in with Email and password, and authenticates exact workspace endpoints", async () => {
+test("Supabase runtime persists the browser session, signs in with Email and password, and authenticates exact workspace endpoints", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?runtime=${Date.now()}`, import.meta.url));
   const clientCalls = [];
   const passwordCalls = [];
@@ -865,7 +865,19 @@ test("Supabase runtime is tab-scoped, signs in with Email and password, and auth
     "owner-google-calendar-grant",
     "owner-google-calendar-oauth-start",
   ];
-  for (const endpoint of ownerEndpoints) {
+  const vendorCalendarSupportEndpoints = [
+    "vendor-google-calendar-connect-start",
+    "vendor-google-calendar-support-grant",
+    "vendor-google-calendar-events-read",
+    "vendor-google-calendar-events-create",
+    "vendor-google-calendar-events-update",
+    "vendor-google-calendar-events-cancel",
+  ];
+  const authenticatedEndpoints = [
+    ...ownerEndpoints,
+    ...vendorCalendarSupportEndpoints,
+  ];
+  for (const endpoint of authenticatedEndpoints) {
     await runtime.authenticatedFetch(endpoint, { method: "GET" });
   }
 
@@ -883,11 +895,11 @@ test("Supabase runtime is tab-scoped, signs in with Email and password, and auth
   assert.equal(fetchCalls[0].url, "https://zdwuyomhswjcbbpbhpcq.supabase.co/functions/v1/vendor-workspace-grant");
   assert.equal(fetchCalls[0].init.headers.Authorization, "Bearer real-session-token");
   assert.match(fetchCalls[0].init.headers.apikey, /^sb_publishable_/u);
-  assert.equal(fetchCalls.length, 4);
-  for (let index = 0; index < ownerEndpoints.length; index += 1) {
+  assert.equal(fetchCalls.length, 10);
+  for (let index = 0; index < authenticatedEndpoints.length; index += 1) {
     assert.equal(
       fetchCalls[index + 1].url,
-      `https://zdwuyomhswjcbbpbhpcq.supabase.co/functions/v1/${ownerEndpoints[index]}`,
+      `https://zdwuyomhswjcbbpbhpcq.supabase.co/functions/v1/${authenticatedEndpoints[index]}`,
     );
     assert.equal(fetchCalls[index + 1].init.headers.Authorization, "Bearer real-session-token");
     assert.match(fetchCalls[index + 1].init.headers.apikey, /^sb_publishable_/u);
@@ -900,6 +912,66 @@ test("Supabase runtime is tab-scoped, signs in with Email and password, and auth
     runtime.authenticatedFetch("https://attacker.test/functions/v1/vendor-workspace-grant"),
     /FUNCTION_ENDPOINT_NOT_ALLOWED/u,
   );
+});
+
+test("canonical Auth runtime keeps a verified Supabase session available across same-origin tabs", async () => {
+  const localStorageDescriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  const sessionStorageDescriptor = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
+  const persistentStorage = {
+    getItem() { return null; },
+    setItem() {},
+    removeItem() {},
+  };
+  const tabStorage = {
+    getItem() { return null; },
+    setItem() {},
+    removeItem() {},
+  };
+  let clientOptions = null;
+
+  try {
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: persistentStorage,
+    });
+    Object.defineProperty(globalThis, "sessionStorage", {
+      configurable: true,
+      value: tabStorage,
+    });
+    const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?persistent-auth-storage=${Date.now()}`, import.meta.url));
+    await module.getSupabaseAuthRuntime({
+      importImplementation: async () => ({
+        createClient(_url, _key, options) {
+          clientOptions = options;
+          return {
+            auth: {
+              onAuthStateChange() {
+                return { data: { subscription: { unsubscribe() {} } } };
+              },
+            },
+          };
+        },
+      }),
+      fetchImplementation: async () => new Response("{}", { status: 200 }),
+    });
+
+    assert.equal(
+      clientOptions?.auth?.storage,
+      persistentStorage,
+      "the canonical runtime must not lose the verified session when the owner route opens in another tab",
+    );
+  } finally {
+    if (localStorageDescriptor) {
+      Object.defineProperty(globalThis, "localStorage", localStorageDescriptor);
+    } else {
+      delete globalThis.localStorage;
+    }
+    if (sessionStorageDescriptor) {
+      Object.defineProperty(globalThis, "sessionStorage", sessionStorageDescriptor);
+    } else {
+      delete globalThis.sessionStorage;
+    }
+  }
 });
 
 test("Supabase runtime creates an Email-verified account without granting a client-selected role", async () => {
@@ -1456,8 +1528,8 @@ test("hidden company field cannot be made visible by the field grid rule", () =>
 });
 
 test("no untruthful integration, prohibited product framing, or engineering language is introduced", () => {
-  assert.doesNotMatch(app, /XMLHttpRequest|WebSocket|localStorage|indexedDB|帳號已建立/u);
-  assert.match(app, /sessionStorage/u);
+  assert.doesNotMatch(app, /XMLHttpRequest|WebSocket|sessionStorage|indexedDB|帳號已建立/u);
+  assert.match(app, /localStorage/u);
   assert.match(app, /signInWithPassword/u);
   assert.match(app, /signUpWithPassword|resetPasswordForEmail|updatePassword/u);
   assert.doesNotMatch(app, /signInWithOtp|shouldCreateUser/u);

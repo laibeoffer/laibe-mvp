@@ -58,9 +58,9 @@
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/code.html",
-      "bytes": 4785,
-      "sha256": "fbee290989257aaeb501cce0a2520a20833cc29db542e711c3bdd24d75c492cf",
-      "gitBlobSha1": "ee16a189429d99124fcd307f2aa102b2a146eabe"
+      "bytes": 4828,
+      "sha256": "e67339d9f43488104357a8ec863ac04851dbf61a10fb8762a4d394df42e82b5a",
+      "gitBlobSha1": "d0b75a7bc10d43d0c5772f283dceefcc16c60220"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/styles.css",
@@ -70,9 +70,9 @@
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/app.js",
-      "bytes": 764,
-      "sha256": "2a2b8b96426438bfc35a9f545184938372b61dfbee812fc10242e4416155d55b",
-      "gitBlobSha1": "82c31bb6781801b3279d0b9b5f73c14513ab00fa"
+      "bytes": 2331,
+      "sha256": "352ec53a36dfe867e2accbf1f9aab1a111797df09ce1ca51456cb4a404517dc3",
+      "gitBlobSha1": "8504b2c54b99c7de55b556055e7618a322c15f0c"
     },
     {
       "path": "src/stitch_laibe_landing_onboarding/pcm_standalone/document_corrections/code.html",

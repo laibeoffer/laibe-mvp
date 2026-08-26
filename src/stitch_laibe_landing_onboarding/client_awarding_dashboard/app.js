@@ -79,6 +79,19 @@ export const OWNER_DASHBOARD_HASHES = Object.freeze({
   contract: "#owner-dashboard-panel-contract",
 });
 
+export const OWNER_SECTION_KEYS = Object.freeze([
+  "overview",
+  "documents",
+  "submissions",
+  "messages",
+  "governance",
+  "event-trail",
+]);
+
+export const OWNER_SECTION_HASHES = Object.freeze(
+  Object.fromEntries(OWNER_SECTION_KEYS.map((key) => [key, `#${key}`])),
+);
+
 export const OWNER_CONTRACT_VIEW_HASHES = Object.freeze({
   overview: "#owner-contract-view-panel-overview",
   facts: "#owner-contract-view-panel-facts",
@@ -915,7 +928,7 @@ export function buildOwnerWorkspaceViewModel(input) {
         ? "由甲方先確認 DRS 服務與案件入口"
         : "尚待案件資料"),
     nextAction: summary?.nextActionLabel ||
-      (unavailable ? "了解並確認 DRS 服務契約" : "依案件狀態確認下一步"),
+      (unavailable ? "查看 DRS 服務契約全文" : "依案件狀態確認下一步"),
     nextDue: summary?.nextDueLabel ||
       (unavailable
         ? "完成後才會開放本案契約、文件分享與案件留痕"
@@ -930,7 +943,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     reviewSummary: summary?.reviewSummaryLabel || "尚未連結正式案件",
     issueSummary: summary?.issueSummaryLabel || "尚未連結正式案件",
     nextSummary: summary?.nextActionLabel ||
-      (unavailable ? "了解並確認 DRS 服務契約" : "依案件狀態確認下一步"),
+      (unavailable ? "查看 DRS 服務契約全文" : "依案件狀態確認下一步"),
     nextOwnerSummary: `責任人：${summary?.currentActorLabel ||
       (unavailable ? "甲方" : "尚待案件確認")}`,
     todayFocus: summary?.todayFocusLabel || "尚待案件資料",
@@ -1581,14 +1594,105 @@ function renderModel(root, model) {
 export function resolveOwnerDashboardTabFromHash(hash) {
   if (
     hash === "#owner-dashboard-panel-contract" ||
-    hash === "#governance" ||
     resolveOwnerContractViewFromHash(hash)
   ) {
     return "contract";
   }
+  if (resolveOwnerSectionFromHash(hash)) return "construction";
   if (hash === "#construction-records") return "construction";
   if (hash === "#design-review") return "design";
   return null;
+}
+
+export function resolveOwnerSectionFromHash(hash) {
+  return OWNER_SECTION_KEYS.find((key) => OWNER_SECTION_HASHES[key] === hash) ?? null;
+}
+
+export function initializeOwnerSectionNavigation(
+  root = typeof document === "undefined" ? null : document,
+  view = typeof window === "undefined" ? null : window,
+) {
+  if (!root || typeof root.querySelector !== "function") return null;
+  const workbench = root.querySelector('[data-layout="owner-tabbed-workbench"]');
+  if (!workbench || workbench.dataset.ownerSectionNavigationReady === "true") {
+    return null;
+  }
+
+  const tabs = Array.from(workbench.querySelectorAll("[data-owner-section-tab]"));
+  const panels = Array.from(workbench.querySelectorAll("[data-owner-section-panel]"));
+  const collectedContentHost = root.querySelector(
+    "[data-owner-collected-workbench-host]",
+  );
+  const tabKeys = tabs.map((tab) => tab.dataset.ownerSectionTab);
+  if (
+    tabKeys.length !== OWNER_SECTION_KEYS.length ||
+    tabKeys.some((key) => !OWNER_SECTION_KEYS.includes(key)) ||
+    panels.length === 0
+  ) {
+    return null;
+  }
+
+  function selectSection(key, { focus = false, syncHash = true } = {}) {
+    if (!OWNER_SECTION_KEYS.includes(key)) return false;
+    workbench.dataset.activeOwnerSection = key;
+    if (collectedContentHost?.dataset) {
+      collectedContentHost.dataset.activeOwnerSection = key;
+    }
+
+    for (const tab of tabs) {
+      const selected = tab.dataset.ownerSectionTab === key;
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected) {
+        tab.setAttribute("aria-current", "page");
+        if (focus) tab.focus();
+      } else {
+        tab.removeAttribute("aria-current");
+      }
+    }
+    for (const panel of panels) {
+      panel.hidden = panel.dataset.ownerSectionPanel !== key;
+    }
+    if (syncHash) replaceOwnerWorkspaceHash(view, OWNER_SECTION_HASHES[key]);
+    return true;
+  }
+
+  for (const tab of tabs) {
+    tab.addEventListener("click", (event) => {
+      event.preventDefault();
+      selectSection(tab.dataset.ownerSectionTab);
+    });
+    tab.addEventListener("keydown", (event) => {
+      const currentIndex = tabs.indexOf(tab);
+      let nextIndex = currentIndex;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIndex = (currentIndex + 1) % tabs.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = tabs.length - 1;
+      } else {
+        return;
+      }
+      event.preventDefault();
+      selectSection(tabs[nextIndex].dataset.ownerSectionTab, { focus: true });
+    });
+  }
+
+  const selectFromHash = () => {
+    const key = resolveOwnerSectionFromHash(view?.location?.hash);
+    if (key) selectSection(key, { syncHash: false });
+  };
+  workbench.dataset.ownerSectionNavigationReady = "true";
+  selectSection(
+    resolveOwnerSectionFromHash(view?.location?.hash) ||
+      workbench.dataset.activeOwnerSection ||
+      OWNER_SECTION_KEYS[0],
+    { syncHash: false },
+  );
+  view?.addEventListener?.("hashchange", selectFromHash);
+  return Object.freeze({ selectSection });
 }
 
 export function stabilizeOwnerDashboardDirectEntry(root, view) {
@@ -1798,8 +1902,74 @@ export function initializeOwnerDashboardTabs(
   return Object.freeze({ selectTab });
 }
 
+export function collectOwnerWorkbenchIntoConstruction(
+  root = typeof document === "undefined" ? null : document,
+  view = typeof window === "undefined" ? null : window,
+) {
+  if (!root || typeof root.querySelector !== "function") return null;
+
+  const construction = root.querySelector(
+    '[data-owner-management-layout="construction"]',
+  );
+  const workbench = root.querySelector('[data-layout="owner-tabbed-workbench"]');
+  const navigation = workbench?.querySelector('[data-layout="owner-section-nav"]');
+  const stage = workbench?.querySelector(".owner-workbench-stage");
+  const collectionNavHost = construction?.querySelector(
+    "[data-owner-collection-nav-host]",
+  );
+  const collectionContentHost = construction?.querySelector(
+    "[data-owner-collected-workbench-host]",
+  );
+
+  if (
+    !construction ||
+    !workbench ||
+    !navigation ||
+    !stage ||
+    !collectionNavHost ||
+    !collectionContentHost
+  ) {
+    return null;
+  }
+
+  collectionNavHost.append(navigation);
+  collectionContentHost.append(stage);
+  workbench.dataset.ownerWorkbenchCollected = "true";
+  workbench.hidden = true;
+
+  function setMode(mode) {
+    let ownerConstructionMode = "construction";
+    if (mode === "collection") ownerConstructionMode = "collection";
+    construction.dataset.ownerConstructionMode = ownerConstructionMode;
+    collectionContentHost.hidden = ownerConstructionMode !== "collection";
+    return ownerConstructionMode;
+  }
+
+  for (const tab of navigation.querySelectorAll("[data-owner-section-tab]")) {
+    tab.addEventListener("click", () => setMode("collection"));
+  }
+
+  const syncModeFromHash = () => {
+    const hash = view?.location?.hash;
+    if (resolveOwnerSectionFromHash(hash)) {
+      setMode("collection");
+    } else if (hash === OWNER_DASHBOARD_HASHES.construction) {
+      setMode("construction");
+    }
+  };
+
+  setMode(
+    resolveOwnerSectionFromHash(view?.location?.hash)
+      ? "collection"
+      : "construction",
+  );
+  view?.addEventListener?.("hashchange", syncModeFromHash);
+  return Object.freeze({ setMode });
+}
+
 export function initializeOwnerManagementInteractions(
   root = typeof document === "undefined" ? null : document,
+  view = typeof window === "undefined" ? null : window,
 ) {
   if (!root || typeof root.querySelector !== "function") {
     return null;
@@ -1820,17 +1990,26 @@ export function initializeOwnerManagementInteractions(
   const viewKeys = viewButtons.map(
     (button) => button.dataset.ownerConstructionView,
   );
+  let collectionWorkspace = null;
 
-  function selectConstructionView(key, { focus = false } = {}) {
+  function selectConstructionView(
+    key,
+    { focus = false, activateMode = true, syncHash = activateMode } = {},
+  ) {
     if (!viewKeys.includes(key)) return false;
+    if (activateMode) collectionWorkspace?.setMode("construction");
     construction.dataset.activeOwnerConstructionView = key;
     for (const button of viewButtons) {
       const selected = button.dataset.ownerConstructionView === key;
-      button.setAttribute("aria-pressed", String(selected));
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
       if (selected && focus) button.focus();
     }
     for (const panel of viewPanels) {
       panel.hidden = panel.dataset.ownerConstructionViewPanel !== key;
+    }
+    if (syncHash) {
+      replaceOwnerWorkspaceHash(view, OWNER_DASHBOARD_HASHES.construction);
     }
     return true;
   }
@@ -1862,8 +2041,12 @@ export function initializeOwnerManagementInteractions(
   }
 
   if (viewKeys.length && viewPanels.length === viewKeys.length) {
-    selectConstructionView(viewKeys[0]);
+    selectConstructionView(viewKeys[0], {
+      activateMode: false,
+      syncHash: false,
+    });
   }
+  collectionWorkspace = collectOwnerWorkbenchIntoConstruction(root, view);
 
   const revisionButton = root.querySelector(
     '[data-action="open-owner-design-revision"]',
@@ -1996,9 +2179,13 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   let currentModel = null;
 
   const contractWorkspace = initializeOwnerContractWorkspace(documentRef);
-  const managementWorkspace = initializeOwnerManagementInteractions(documentRef);
   const view = documentRef?.defaultView ??
     (typeof window === "undefined" ? null : window);
+  initializeOwnerSectionNavigation(documentRef, view);
+  const managementWorkspace = initializeOwnerManagementInteractions(
+    documentRef,
+    view,
+  );
   initializeOwnerCalendarWorkspaces(documentRef);
   initializeOwnerDashboardTabs(documentRef, view, {
     onContractMainSelected() {

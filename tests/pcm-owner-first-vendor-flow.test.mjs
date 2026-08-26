@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
@@ -15,6 +16,7 @@ const pcmRoot = path.join(
   "stitch_laibe_landing_onboarding",
   "pcm_standalone",
 );
+const accountAccessDir = path.join(pcmRoot, "account_access");
 const invitationDir = path.join(pcmRoot, "vendor_invitation");
 const workspaceDir = path.join(pcmRoot, "vendor_workspace");
 const vendorWorkspacePreviewHarnessPath = path.join(
@@ -333,10 +335,8 @@ function cssLengthToPixels(value, { viewportWidth, containingWidth, style }) {
 function vendorWorkspacePanel(html, kind) {
   const start = html.indexOf(`data-vendor-workspace-panel="${kind}"`);
   if (start < 0) return "";
-  const nextMarker = kind === "design"
-    ? 'data-vendor-workspace-panel="construction"'
-    : 'class="vendor-workspace-sidecar"';
-  const end = html.indexOf(nextMarker, start);
+  if (kind === "construction") return html.slice(start);
+  const end = html.indexOf('data-vendor-workspace-panel="construction"', start);
   return end > start ? html.slice(start, end) : "";
 }
 
@@ -715,7 +715,7 @@ test("workspace exports exact ten resources and keeps terminal states in the ori
   assert.doesNotMatch(`${closed.title} ${cancelled.title}`, /封存工作台/u);
 });
 
-test("workspace copy preserves the contract attachment review and conversation boundaries", async () => {
+test("workspace copy preserves the contract attachment review and document-sharing boundaries", async () => {
   const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
   for (const label of [
     "契約版本",
@@ -736,7 +736,7 @@ test("workspace copy preserves the contract attachment review and conversation b
   assert.match(html, /尚未送出／尚未保存/u);
   assert.match(html, /另建可追溯版本，不改寫原契約/u);
   assert.match(html, /萊比公開審查意見（PCM）/u);
-  assert.match(html, /私人對話不會顯示/u);
+  assert.match(html, /data-vendor-document-share="CASE_RECORDS"/u);
   assert.doesNotMatch(html, /大型輸入|data-line-send/u);
 });
 
@@ -769,10 +769,9 @@ test("vendor workspace transposes the professional shell into two accessible man
   assert.match(html, /class="[^"]*\bcols\b[^"]*\bvendor-workspace-stage\b/u);
   assert.doesNotMatch(html, /data-vendor-workspace-tab="contract"/iu);
   const workspaceFrames = html.match(/<iframe\b[^>]*>/giu) ?? [];
-  assert.equal(workspaceFrames.length, 1);
-  assert.match(workspaceFrames[0], /data-vendor-calendar-frame/iu);
-  assert.doesNotMatch(workspaceFrames[0], /\bsrc=/iu);
-  assert.doesNotMatch(workspaceFrames[0], /line\.me|manager\.line\.biz/iu);
+  assert.equal(workspaceFrames.length, 0);
+  assert.match(html, /data-vendor-calendar-live-events/iu);
+  assert.match(html, /data-vendor-calendar-events/iu);
   assert.doesNotMatch(`${html}\n${css}\n${runtimeSource}`, /\bowner-[a-z0-9_-]+/iu);
   assert.doesNotMatch(html, /data-document-(?:tab|panel|file|dropzone)|document-file-|PDF[^<]*拖/u);
   assert.match(css, /\.vendor-workspace-tabs\s*\{/u);
@@ -784,7 +783,100 @@ test("vendor workspace transposes the professional shell into two accessible man
   assert.match(css, /\.vendor-status-rail\s*\{/u);
 });
 
-test("vendor workspace binds 青埔 to design management and 林宅 to construction management", async () => {
+test("vendor workspace preserves both management tabs while calendar and document sharing replace LINE", async () => {
+  const [html, css, runtimeSource] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+    readFile(pagePath(workspaceDir, "app.js"), "utf8"),
+  ]);
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
+  assert.match(authorizedMarkup, /data-vendor-workspace-tab="design"[\s\S]*設計管理/u);
+  assert.match(authorizedMarkup, /data-vendor-workspace-tab="construction"[\s\S]*工程管理/u);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-document-share=/gu), resourceCodes.length);
+  for (const code of resourceCodes) {
+    assert.match(authorizedMarkup, new RegExp(`data-vendor-document-share="${code}"`, "u"));
+  }
+  assert.match(authorizedMarkup, /class="[^"]*\bvendor-calendar-hero\b/u);
+  assert.match(authorizedMarkup, /class="[^"]*\bvendor-document-import\b/u);
+  assert.match(css, /\.vendor-workspace-stage\s*\{[\s\S]{0,180}grid-template-columns:\s*minmax\(0,\s*1fr\)/u);
+  assert.match(css, /\.vendor-document-share\s*\{/u);
+  assert.match(runtimeSource, /export function initializeVendorDocumentSharing/u);
+  assert.match(runtimeSource, /export function resolveVendorDocumentShareTarget/u);
+  assert.doesNotMatch(`${authorizedMarkup}\n${css}\n${runtimeSource}`, /LINE 三方群組|LINE 案件對話|line-conversation|vendor-workspace-sidecar|vendor-gate-chat/u);
+});
+
+test("vendor document sharing uses the system share sheet with a permission-safe copied-link fallback", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "vendor-document-sharing"));
+  const sourceHref = "http://127.0.0.1:4173/pcm/vendor/workspace/?role=owner&case=fake#records";
+
+  for (const code of resourceCodes) {
+    const target = runtime.resolveVendorDocumentShareTarget(code, sourceHref);
+    assert.ok(target, code);
+    assert.match(target.url, /^http:\/\/127\.0\.0\.1:4173\/pcm\/vendor\/workspace\/#/u);
+    assert.doesNotMatch(target.url, /role=|case=|owner|fake/u);
+    assert.match(target.text, /收件者仍須登入並具備案件權限/u);
+  }
+  assert.equal(runtime.resolveVendorDocumentShareTarget("UNKNOWN", sourceHref), null);
+  assert.equal(runtime.resolveVendorDocumentShareTarget("ATTACHMENTS", "file:///tmp/code.html"), null);
+
+  function shareButton(code) {
+    const listeners = new Map();
+    return {
+      disabled: false,
+      addEventListener(type, listener) { listeners.set(type, listener); },
+      getAttribute(name) { return name === "data-vendor-document-share" ? code : null; },
+      async emit(type) { await listeners.get(type)?.({ preventDefault() {} }); },
+    };
+  }
+
+  const nativeButton = shareButton("ATTACHMENTS");
+  const nativeStatus = { textContent: "" };
+  const nativePayloads = [];
+  const nativeRoot = {
+    querySelector(selector) {
+      return selector === "[data-vendor-workspace-live]" ? nativeStatus : null;
+    },
+    querySelectorAll(selector) {
+      return selector === "[data-vendor-document-share]" ? [nativeButton] : [];
+    },
+  };
+  assert.deepEqual(
+    { ...runtime.initializeVendorDocumentSharing(nativeRoot, {
+      locationHref: sourceHref,
+      share: async (payload) => nativePayloads.push(payload),
+      copy: async () => assert.fail("native share must precede copy fallback"),
+    }) },
+    { state: "READY", boundCount: 1 },
+  );
+  await nativeButton.emit("click");
+  assert.equal(nativePayloads.length, 1);
+  assert.match(nativePayloads[0].title, /契約附件/u);
+  assert.equal(nativeStatus.textContent, "已開啟系統分享選單。");
+  assert.equal(nativeButton.disabled, false);
+
+  const fallbackButton = shareButton("EVIDENCE");
+  const fallbackStatus = { textContent: "" };
+  const copiedUrls = [];
+  runtime.initializeVendorDocumentSharing({
+    querySelector(selector) {
+      return selector === "[data-vendor-workspace-live]" ? fallbackStatus : null;
+    },
+    querySelectorAll(selector) {
+      return selector === "[data-vendor-document-share]" ? [fallbackButton] : [];
+    },
+  }, {
+    locationHref: sourceHref,
+    share: async () => { throw new Error("share unavailable"); },
+    copy: async (url) => copiedUrls.push(url),
+  });
+  await fallbackButton.emit("click");
+  assert.deepEqual(copiedUrls, ["http://127.0.0.1:4173/pcm/vendor/workspace/#execution"]);
+  assert.match(fallbackStatus.textContent, /已複製受權連結/u);
+});
+
+test("vendor workspace keeps one current-case identity while design and construction stay separate management areas", async () => {
   const [html, css] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
@@ -800,39 +892,43 @@ test("vendor workspace binds 青埔 to design management and 林宅 to construct
   const constructionPanel = vendorWorkspacePanel(authorizedMarkup, "construction");
 
   assert.match(authorizedMarkup, /class="[^"]*\bside\b[^"]*"[^>]*aria-label="執行中案件"/u);
-  for (const referenceClass of ["app", "side", "canvas", "top", "stats", "cols", "card", "cgrid", "chatcard"]) {
+  for (const referenceClass of ["app", "side", "canvas", "top", "stats", "cols", "card"]) {
     assert.match(authorizedMarkup, new RegExp(`class="[^"]*\\b${referenceClass}\\b`, "u"), referenceClass);
   }
-  assert.match(designTab, /青埔 A7 新建案/u);
+  assert.match(designTab, /目前授權案件/u);
   assert.match(designTab, /設計管理/u);
   assert.match(designTab, /35%/u);
   assert.match(designTab, /class="r1"[\s\S]*?<b>設計管理<\/b>[\s\S]*?35%/u);
-  assert.match(designTab, /class="st"[\s\S]*?<strong>青埔 A7 新建案<\/strong>・甲方等你回覆平面 v2/u);
-  assert.match(constructionTab, /林宅老屋翻新/u);
+  assert.match(designTab, /class="st"[\s\S]*?<strong>目前授權案件<\/strong>・需求、圖面、版本與決策/u);
+  assert.match(constructionTab, /目前授權案件/u);
   assert.match(constructionTab, /工程管理/u);
   assert.match(constructionTab, /52%/u);
   assert.match(constructionTab, /class="r1"[\s\S]*?<b>工程管理<\/b>[\s\S]*?52%/u);
-  assert.match(constructionTab, /class="st"[\s\S]*?<strong>林宅老屋翻新<\/strong>・今日日誌待乙方補齊/u);
+  assert.match(constructionTab, /class="st"[\s\S]*?<strong>目前授權案件<\/strong>・任務、照片、變更與驗收/u);
 
-  assert.match(designPanel, /青埔 A7 新建案/u);
-  assert.match(designPanel, /設計階段/u);
+  assert.match(designPanel, /目前授權案件/u);
+  assert.match(designPanel, /設計管理/u);
   assert.match(designPanel, /回覆甲方「平面 v2」提問/u);
   assert.match(designPanel, /需求、圖面、版本與待確認/u);
-  assert.match(designPanel, /案件日曆・共同留痕/u);
-  assert.match(designPanel, /data-vendor-calendar-day="design-12"/u);
+  assert.match(designPanel, /設計管理次分類/u);
+  assert.match(designPanel, /data-vendor-calendar-node-summary/u);
+  assert.doesNotMatch(designPanel, /vendor-calendar-grid|data-vendor-calendar-day/u);
 
-  assert.match(constructionPanel, /林宅老屋翻新/u);
-  assert.match(constructionPanel, /施工階段/u);
+  assert.match(constructionPanel, /目前授權案件/u);
+  assert.match(constructionPanel, /工程管理/u);
   assert.match(constructionPanel, /寫今日施工日誌/u);
   assert.match(constructionPanel, /施工任務、進度、照片、變更與驗收/u);
-  assert.match(constructionPanel, /案件日曆・共同留痕/u);
-  assert.match(constructionPanel, /data-vendor-calendar-day="construction-11"/u);
+  assert.match(constructionPanel, /工程管理次分類/u);
+  assert.doesNotMatch(authorizedMarkup, /青埔 A7 新建案|林宅老屋翻新|桃園中壢|台北大安/u);
+  assert.match(constructionPanel, /data-vendor-calendar-node-summary/u);
+  assert.doesNotMatch(constructionPanel, /vendor-calendar-grid|data-vendor-calendar-day/u);
 
   assert.match(authorizedMarkup, /data-vendor-active-case-name/u);
-  assert.match(authorizedMarkup, /data-line-case-context/u);
+  assert.match(authorizedMarkup, /data-calendar-case-context/u);
+  assert.doesNotMatch(authorizedMarkup, /data-line-case-context/u);
   assert.match(css, /\.side\s*\{[\s\S]{0,360}color:\s*#eceef2/u);
   assert.match(css, /\.canvas\s*\{[\s\S]{0,300}background:\s*var\(--canvas\)/u);
-  assert.match(css, /\.cols\s*\{[\s\S]{0,220}grid-template-columns:\s*minmax\(0, 1fr\) 340px/u);
+  assert.match(css, /\.vendor-workspace-stage\s*\{[\s\S]{0,180}grid-template-columns:\s*minmax\(0,\s*1fr\)/u);
   assert.match(css, /@media\s*\(max-width:\s*900px\)[\s\S]*?\.app\s*\{[\s\S]{0,180}grid-template-columns:\s*1fr/u);
   assert.match(css, /\.side\s*\{[\s\S]{0,260}min-width:\s*0/u);
   assert.match(css, /@media\s*\(max-width:\s*900px\)[\s\S]*?\.vendor-workspace-tabs\s*\{[\s\S]{0,180}overflow-x:\s*auto/u);
@@ -840,7 +936,7 @@ test("vendor workspace binds 青埔 to design management and 林宅 to construct
   assert.match(css, /\.hero\s*\{\s*background:\s*linear-gradient\(115deg,#FF7A2F 0%,#FF5809 52%,#D93D00 100%\)\s*!important/u);
   assert.match(css, /\.vendor-panel-heading h2\s*\{\s*color:\s*#F4F1EA/u);
   assert.match(css, /\.vendor-panel-facts dd\s*\{\s*color:\s*#F4F1EA/u);
-  assert.match(css, /\.vendor-sidecar-heading h2\s*\{\s*color:\s*#1C242A/u);
+  assert.match(css, /\.vendor-calendar-connection\s*\{/u);
 });
 
 test("workspace route links remain visible after hover focus and selection on the editorial canvas", async () => {
@@ -852,21 +948,161 @@ test("workspace route links remain visible after hover focus and selection on th
   );
 });
 
-test("vendor redesign keeps the public document at a short authorization gate and the formal workspace inert", async () => {
-  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+test("vendor first fold adopts Dusk Ember and exposes one decision path without changing the Header", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+  const marker = "/* DUSK EMBER visual system — owner/vendor external workspace.";
+  const layerStart = css.indexOf(marker);
+
+  assert.notEqual(layerStart, -1, "the external vendor workspace must use the Dusk Ember visual family");
+  const layer = css.slice(layerStart);
+
+  for (const [token, value] of [
+    ["--vendor-carbon", "#09070B"],
+    ["--vendor-obsidian", "#161019"],
+    ["--vendor-night-plum", "#281820"],
+    ["--vendor-ember-deep", "#F75000"],
+    ["--vendor-ember", "#FF7530"],
+    ["--vendor-ember-gold", "#FFAA45"],
+    ["--vendor-responsibility", "#C26AE6"],
+    ["--vendor-pending", "#E65A9F"],
+    ["--vendor-record", "#C8C2CD"],
+    ["--vendor-document-white", "#F3EEF5"],
+  ]) {
+    assert.match(layer, new RegExp(`${token}:\\s*${value}`, "u"), `${token} must match Dusk Ember`);
+  }
+
+  for (const hook of [
+    "data-vendor-first-fold",
+    "data-vendor-case-status-strip",
+    "data-vendor-today-queue",
+    "data-vendor-responsibility-signal",
+    "data-vendor-evidence-basis",
+    "data-vendor-record-consequence",
+  ]) {
+    assert.match(authorizedMarkup, new RegExp(`\\b${hook}\\b`, "u"), `${hook} must be visible in the first-fold decision path`);
+  }
+
+  assert.match(authorizedMarkup, /今日待處理[\s\S]*下一確認節點[\s\S]*下一責任人/u);
+  assert.match(authorizedMarkup, /決策依據[\s\S]*案件紀錄/u);
+  assert.match(layer, /\.vendor-calendar-hero__decision-grid\s*\{[\s\S]{0,260}grid-template-columns:\s*minmax\(210px,[\s\S]{0,140}minmax\(0,\s*1\.7fr\)/u);
+  assert.match(layer, /\.vendor-calendar-connect\s*\{[\s\S]{0,300}linear-gradient\(100deg,\s*var\(--vendor-ember-deep\),\s*var\(--vendor-ember\),\s*var\(--vendor-ember-gold\)\)/u);
+  assert.match(layer, /@media\s*\(max-width:\s*560px\)[\s\S]*?\.vendor-calendar-hero__stage\s*\{[\s\S]{0,120}order:\s*1/u);
+  assert.doesNotMatch(layer, /OBSIDIAN BLOOM|#070708|#0E0C0D|#2D96FF|#79D94C/iu);
+  assert.doesNotMatch(layer, /\.vendor-header|\.vendor-brand|\.drs-brand/iu);
+  assert.match(layer, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*animation:\s*none/u);
+});
+
+test("vendor clickable controls and today-status tiles share the approved glass language", async () => {
+  const css = await readFile(pagePath(workspaceDir, "styles.css"), "utf8");
+  const marker = "/* Layer 7 — glass controls and temperature-ranked status tiles. */";
+  const layerStart = css.indexOf(marker);
+
+  assert.notEqual(layerStart, -1, "the approved glass-control layer must exist");
+  const layer = css.slice(layerStart);
+
+  assert.match(
+    layer,
+    /#vendor-main\s+:where\(\.vendor-gate,\s*\.vendor-workspace\)\s+:where\([\s\S]{0,240}button[\s\S]{0,240}\.vendor-primary-action[\s\S]{0,240}\.vendor-calendar-node-summary\s+a[\s\S]{0,240}\.vendor-contract-preview\s+a[\s\S]{0,260}\)\s*\{/u,
+  );
+  assert.match(layer, /--vendor-glass-rgb:\s*194,\s*106,\s*230\s*;/u);
+  assert.match(layer, /border-radius:\s*999px\s*!important\s*;/u);
+  assert.match(layer, /backdrop-filter:\s*blur\(14px\)\s+saturate\(140%\)\s*;/u);
+  assert.match(layer, /inset\s+0\s+1px\s+0\s+rgba\(243,\s*238,\s*245,\s*\.34\)/u);
+  assert.match(layer, /inset\s+0\s+-10px\s+20px\s+rgba\(var\(--vendor-glass-rgb\),\s*\.18\)/u);
+  assert.match(layer, /:where\(\s*button,\s*\.vendor-primary-action,[\s\S]{0,220}\):hover/u);
+  assert.match(layer, /:where\(\s*button,\s*\.vendor-primary-action,[\s\S]{0,220}\):active/u);
+  assert.match(layer, /:where\(\s*button:disabled,\s*button\[aria-disabled="true"\],[\s\S]{0,260}filter:\s*saturate\(\.55\)/u);
+
+  assert.match(layer, /#vendor-workspace-panel-design\s+\.vendor-today-grid\s*\{\s*--vendor-tile-rgb:\s*194,\s*106,\s*230\s*;/u);
+  assert.match(layer, /#vendor-workspace-panel-construction\s+\.vendor-today-grid\s*\{\s*--vendor-tile-rgb:\s*255,\s*117,\s*48\s*;/u);
+  assert.match(layer, /\.vendor-today-grid\s*>\s*:where\(\.hero,\s*\.stat\)\s*\{[\s\S]{0,420}border-radius:\s*22px\s*!important/u);
+  assert.match(layer, /inset\s+0\s+-3px\s+0\s+rgba\(var\(--vendor-tile-rgb\),\s*\.88\)/u);
+  assert.match(layer, /#vendor-main\s+\.vendor-workspace\s+\.vendor-today-grid\s*>\s*:nth-child\(1\)\s*\{\s*--vendor-tile-heat:\s*\.34\s*;/u);
+  assert.match(layer, /#vendor-main\s+\.vendor-workspace\s+\.vendor-today-grid\s*>\s*:nth-child\(4\)\s*\{\s*--vendor-tile-heat:\s*\.12\s*;/u);
+  assert.match(layer, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]{0,320}transition:\s*none\s*!important/u);
+});
+
+test("vendor public first fold leads with one Dusk Ember authorization decision instead of an empty card sea", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const publicMarkup = vendorPublicMarkup(html);
+  const marker = "/* DUSK EMBER visual system — owner/vendor external workspace.";
+  const layer = css.slice(css.indexOf(marker));
+
+  assert.match(publicMarkup, /\bdata-vendor-public-first-fold\b/u);
+  assert.match(
+    publicMarkup,
+    /目前卡點[\s\S]*下一步[\s\S]*下一責任人[\s\S]*會留下的紀錄/u,
+  );
+  assert.match(
+    publicMarkup,
+    /data-vendor-access-recovery[\s\S]*>登入並開啟我的案件<\/a>/u,
+  );
+  assert.equal(count(publicMarkup, /\bvendor-primary-action\b/gu), 1);
+  assert.equal(count(publicMarkup, /\bvendor-gate-placeholder\b/gu), 0);
+  assert.equal(count(publicMarkup, /class="[^"]*\bcard\b/gu), 1);
+  assert.match(publicMarkup, /\bdata-vendor-public-evidence\b/u);
+  assert.match(publicMarkup, /\bdata-vendor-public-record\b/u);
+
+  assert.match(
+    layer,
+    /\.vendor-gate-first-fold\s*\{[\s\S]{0,300}grid-template-columns:\s*minmax\(0,\s*1\.4fr\)\s+minmax\(240px,\s*\.6fr\)/u,
+  );
+  assert.match(
+    layer,
+    /\.vendor-gate \.vendor-primary-action\s*\{[\s\S]{0,320}linear-gradient\(100deg,\s*var\(--vendor-ember-deep\),\s*var\(--vendor-ember\),\s*var\(--vendor-ember-gold\)\)/u,
+  );
+  assert.match(
+    layer,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.vendor-gate-first-fold\s*\{[\s\S]{0,120}grid-template-columns:\s*1fr/u,
+  );
+  assert.doesNotMatch(layer, /rgba\(255,\s*90,\s*0|#FF5A00|#2D96FF|#F3C969/iu);
+});
+
+test("vendor public state keeps the original workspace interface without exposing protected case data", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
   const publicMarkup = vendorPublicMarkup(html);
   const authorizedMarkup = vendorAuthorizedTemplate(html);
 
   assert.match(publicMarkup, /id="invited-cases"/u);
-  assert.match(publicMarkup, /目前無法開啟案件工作台/u);
+  assert.match(publicMarkup, /class="[^"]*\bapp\b[^"]*\bvendor-gate-shell\b/u);
+  for (const referenceClass of ["side", "canvas", "top", "stats", "hero", "cols", "card"]) {
+    assert.match(publicMarkup, new RegExp(`class="[^"]*\\b${referenceClass}\\b`, "u"), referenceClass);
+  }
+  assert.match(publicMarkup, /執行中工作台/u);
+  assert.match(publicMarkup, /今日待辦/u);
+  assert.match(publicMarkup, /案件日曆/u);
+  assert.match(publicMarkup, /最新動態/u);
+  assert.match(publicMarkup, /登入後載入你參與的案件/u);
   assert.match(publicMarkup, /尚未確認案件授權/u);
-  assert.match(publicMarkup, /返回登入／帳號入口/u);
+  assert.match(publicMarkup, /登入並開啟我的案件/u);
   assert.doesNotMatch(publicMarkup, /回到邀請確認|href="\.\.\/vendor_invitation\/code\.html"/u);
   assert.match(publicMarkup, /責任人[\s\S]*目前使用者/u);
   assert.match(publicMarkup, /id="vendor-authorized-workspace-mount"/u);
+  assert.equal(count(publicMarkup, /\bdata-vendor-gate-management-tab=/gu), 2);
+  for (const [kind, label] of [["design", "設計管理"], ["construction", "工程管理"]]) {
+    assert.match(
+      publicMarkup,
+      new RegExp(`<button[^>]*data-vendor-gate-management-tab="${kind}"[^>]*disabled[^>]*aria-disabled="true"[\\s\\S]*?${label}[\\s\\S]*?<\\/button>`, "u"),
+    );
+  }
   assert.doesNotMatch(publicMarkup, /data-vendor-workspace-tab|role="tabpanel"/u);
-  assert.doesNotMatch(publicMarkup, /契約範本|共同契約|v0\.2|案件 LINE|line-conversation|composer/u);
-  assert.doesNotMatch(publicMarkup, /<button|<input|<textarea|<select/u);
+  assert.doesNotMatch(publicMarkup, /契約範本|共同契約|v0\.2|LINE|line-conversation|composer/u);
+  assert.doesNotMatch(publicMarkup, /青埔 A7|林宅老屋|漢皇SUPER|blueleft0120|<input|<textarea|<select/u);
+  assert.match(css, /\.vendor-gate-shell\s*\{[\s\S]{0,260}grid-template-columns:\s*236px minmax\(0,\s*1fr\)/u);
+  assert.match(css, /\.vendor-gate-placeholder\s*\{/u);
+  assert.match(css, /\.vendor-gate-columns\s*\{[\s\S]{0,120}grid-template-columns:\s*minmax\(0,\s*1fr\)/u);
+  assert.match(css, /\.vendor-gate-management-tabs\s*\{/u);
+  assert.match(css, /\.vendor-gate-management-tab:disabled\s*\{/u);
 
   assert.notEqual(authorizedMarkup, "", "authorized workspace lives in an inert template");
   assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
@@ -878,8 +1114,8 @@ test("vendor redesign keeps the public document at a short authorization gate an
   );
   assert.match(vendorWorkspacePanel(authorizedMarkup, "design"), /契約管理/u);
   assert.doesNotMatch(authorizedMarkup, /設計案管理|工程案管理|main-tabs/u);
-  assert.match(authorizedMarkup, /id="case-conversation"/u);
-  assert.match(authorizedMarkup, /line-conversation__composer/u);
+  assert.doesNotMatch(authorizedMarkup, /id="case-conversation"|line-conversation__composer/u);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-document-share=/gu), resourceCodes.length);
   assert.doesNotMatch(authorizedMarkup, /data-line-send/u);
 });
 
@@ -983,7 +1219,7 @@ test("390px cascade keeps the DRS lockup role state and 44px recovery target vis
   assert.doesNotMatch(`${sharedBrandCss}\n${css}`, /margin(?:-inline|-left|-right)?(?:-(?:start|end))?\s*:\s*-\d/iu);
 });
 
-test("production recovery binding enables only the manifest account route and closes null wrong or throwing getters", async () => {
+test("production recovery binding canonicalizes the vendor recovery route with invited-partner intent and closes null wrong or throwing getters", async () => {
   const runtime = await import(moduleUrl(workspaceDir, "manifest-recovery"));
   assert.equal(typeof runtime.bindVendorWorkspaceRecoveryRoute, "function");
 
@@ -1013,9 +1249,12 @@ test("production recovery binding enables only the manifest account route and cl
         ? "../account_access/code.html#top"
         : null,
     ),
-    "../account_access/code.html#top",
+    "/account/access/?intent=invited-partner",
   );
-  assert.equal(active.action.getAttribute("href"), "../account_access/code.html#top");
+  assert.equal(
+    active.action.getAttribute("href"),
+    "/account/access/?intent=invited-partner",
+  );
   assert.equal(active.action.getAttribute("aria-disabled"), "false");
 
   for (const [label, getter] of [
@@ -1027,6 +1266,103 @@ test("production recovery binding enables only the manifest account route and cl
     assert.equal(runtime.bindVendorWorkspaceRecoveryRoute(unavailable.root, getter), null, label);
     assert.equal(unavailable.action.getAttribute("href"), null, `${label}: href`);
     assert.equal(unavailable.action.getAttribute("aria-disabled"), "true", `${label}: disabled`);
+  }
+});
+
+test("vendor recovery intent selects only the vendor grant check while missing or invalid intent remains owner-first", async () => {
+  const accountRuntime = await import(moduleUrl(accountAccessDir, "vendor-recovery-intent-contract"));
+  const ownerGrant = {
+    schemaVersion: "laibe.owner-workspace-runtime.v1",
+    state: "AUTHORIZED_OWNER_WORKSPACE",
+    authenticatedUserId: "11111111-1111-4111-8111-111111111111",
+    currentCaseId: "22222222-2222-4222-8222-222222222222",
+    membership: {
+      userId: "11111111-1111-4111-8111-111111111111",
+      caseId: "22222222-2222-4222-8222-222222222222",
+      role: "owner",
+      status: "active",
+    },
+    workspaceAccess: {
+      role: "owner",
+      mutationAllowed: false,
+      writeActionsEnabled: false,
+      payloadPolicy: "AUTHORIZED_SCOPE_ONLY",
+    },
+    case: {
+      caseId: "22222222-2222-4222-8222-222222222222",
+      title: "住宅修改工程",
+      status: "active",
+    },
+    serviceContext: { pcmStatus: "UNAVAILABLE", contractStatus: "UNAVAILABLE" },
+    documents: [],
+  };
+
+  function accountRuntimeWithOwnerOnly(calls) {
+    return {
+      async getSession() {
+        return { access_token: "real-session-token" };
+      },
+      async authenticatedFetch(endpoint) {
+        calls.push(endpoint);
+        if (endpoint === "owner-workspace-grant") {
+          return new Response(JSON.stringify(ownerGrant), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          });
+        }
+        return new Response(JSON.stringify({ state: "CASE_NOT_AUTHORIZED" }), {
+          status: 403,
+          headers: { "content-type": "application/json" },
+        });
+      },
+    };
+  }
+
+  const vendorIntentCalls = [];
+  const vendorIntentNavigations = [];
+  const vendorIntentResult = await accountRuntime.resumeAuthorizedSession({
+    authRuntime: accountRuntimeWithOwnerOnly(vendorIntentCalls),
+    navigate: (href) => vendorIntentNavigations.push(href),
+    location: {
+      pathname: "/account/access/",
+      search: "?intent=invited-partner&role=pro&caseId=forged",
+    },
+    roleIntent: "invited-partner",
+  });
+
+  assert.deepEqual(vendorIntentCalls, ["vendor-workspace-grant"]);
+  assert.deepEqual(vendorIntentNavigations, []);
+  assert.deepEqual(vendorIntentResult, { state: "ACCESS_DENIED" });
+  for (const authorityField of [
+    "role",
+    "caseId",
+    "membership",
+    "authorization",
+    "workspaceAccess",
+  ]) {
+    assert.equal(
+      Object.hasOwn(vendorIntentResult, authorityField),
+      false,
+      `${authorityField} must come only from a trusted server grant`,
+    );
+  }
+
+  for (const roleIntent of [undefined, "unexpected"]) {
+    const ownerFirstCalls = [];
+    const ownerFirstNavigations = [];
+    const ownerFirstResult = await accountRuntime.resumeAuthorizedSession({
+      authRuntime: accountRuntimeWithOwnerOnly(ownerFirstCalls),
+      navigate: (href) => ownerFirstNavigations.push(href),
+      location: {
+        pathname: "/account/access/",
+        search: roleIntent === undefined ? "" : `?intent=${roleIntent}`,
+      },
+      roleIntent,
+    });
+
+    assert.deepEqual(ownerFirstCalls, ["owner-workspace-grant"]);
+    assert.deepEqual(ownerFirstNavigations, ["/pcm/owner/workspace/"]);
+    assert.deepEqual(ownerFirstResult, { state: "OWNER_GRANTED" });
   }
 });
 
@@ -1492,8 +1828,9 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   ]);
   const live = element();
   const activeCaseName = element();
-  const lineCaseContext = element();
+  activeCaseName.textContent = "目前授權案件";
   const calendarCaseContext = element();
+  calendarCaseContext.textContent = "只顯示目前登入乙方的授權案件。";
   const windowListeners = new Map();
   const view = {
     location: { hash: "#documents" },
@@ -1506,7 +1843,6 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
     querySelector(selector) {
       if (selector === "[data-vendor-workspace-live]") return live;
       if (selector === "[data-vendor-active-case-name]") return activeCaseName;
-      if (selector === "[data-line-case-context]") return lineCaseContext;
       if (selector === "[data-calendar-case-context]") return calendarCaseContext;
       return targets[selector] ?? null;
     },
@@ -1531,9 +1867,8 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   assert.equal(focused, tabs[0]);
   assert.deepEqual(childActivations, ["overview"]);
   assert.equal(links[0].getAttribute("aria-current"), "location");
-  assert.equal(activeCaseName.textContent, "青埔 A7 新建案");
-  assert.equal(lineCaseContext.textContent, "青埔 A7 新建案・設計管理");
-  assert.match(calendarCaseContext.textContent, /目前案件：青埔 A7 新建案/u);
+  assert.equal(activeCaseName.textContent, "目前授權案件");
+  assert.equal(calendarCaseContext.textContent, "只顯示目前登入乙方的授權案件。");
   assert.equal(tabs[0].classList.contains("on"), true);
 
   tabs[0].emit("click");
@@ -1543,9 +1878,8 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   tabs[0].emit("keydown", { key: "ArrowRight", preventDefault() {} });
   assert.equal(focused, tabs[1]);
   assert.equal(panels[1].hidden, false);
-  assert.equal(activeCaseName.textContent, "林宅老屋翻新");
-  assert.equal(lineCaseContext.textContent, "林宅老屋翻新・工程管理");
-  assert.match(calendarCaseContext.textContent, /目前案件：林宅老屋翻新/u);
+  assert.equal(activeCaseName.textContent, "目前授權案件");
+  assert.equal(calendarCaseContext.textContent, "只顯示目前登入乙方的授權案件。");
   assert.equal(tabs[1].classList.contains("on"), true);
   tabs[1].emit("keydown", { key: "End", preventDefault() {} });
   assert.equal(focused, tabs[1]);
@@ -1647,25 +1981,305 @@ test("vendor cloned Element resolves ownerDocument view for initial and changed 
   assert.equal(routeLinks[0].getAttribute("aria-current"), "location");
 });
 
-test("vendor sidecar exposes LINE directly while Google calendar stays on the main dashboard", async () => {
-  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+test("vendor Google Calendar Hero leads the main workspace without a conversation sidecar", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
   const authorizedMarkup = vendorAuthorizedTemplate(html);
-  const sidecarStart = authorizedMarkup.indexOf('class="vendor-workspace-sidecar"');
-  const sidecarEnd = authorizedMarkup.indexOf("</aside>", sidecarStart);
-  const sidecarMarkup = authorizedMarkup.slice(sidecarStart, sidecarEnd);
+  const calendarHeroStart = authorizedMarkup.indexOf("data-vendor-calendar-hero");
+  const documentImportStart = authorizedMarkup.indexOf("data-vendor-document-import");
+  const designPanelStart = authorizedMarkup.indexOf('data-vendor-workspace-panel="design"');
+  const constructionPanelStart = authorizedMarkup.indexOf('data-vendor-workspace-panel="construction"');
 
-  assert.ok(sidecarStart >= 0);
-  assert.ok(sidecarEnd > sidecarStart);
-  assert.match(sidecarMarkup, /data-line-conversation[\s\S]*LINE 案件對話/u);
-  assert.doesNotMatch(sidecarMarkup, /vendor-utility-tabs|data-vendor-utility-tab|role="tablist"/u);
-  assert.doesNotMatch(sidecarMarkup, /乙方 Google 日曆|data-vendor-calendar-frame|data-vendor-calendar-empty/u);
+  assert.ok(calendarHeroStart >= 0);
+  assert.ok(documentImportStart > calendarHeroStart);
+  assert.ok(designPanelStart > documentImportStart);
+  assert.ok(constructionPanelStart > designPanelStart);
+  assert.match(authorizedMarkup, /案件行程[\s\S]*data-vendor-calendar-live-events/u);
+  assert.doesNotMatch(authorizedMarkup, /vendor-workspace-sidecar|data-line-conversation|LINE 三方群組|LINE 案件對話/u);
+  assert.match(css, /\.vendor-calendar-hero\s*\{[\s\S]{0,260}min-block-size:\s*clamp\(480px,\s*62vh,\s*680px\)/u);
+  assert.match(css, /\.vendor-calendar-live-events\s*\{/u);
+  assert.match(css, /\.vendor-calendar-event\s*\{/u);
 
   for (const kind of ["design", "construction"]) {
     const panel = vendorWorkspacePanel(authorizedMarkup, kind);
-    assert.match(panel, /class="card vendor-calendar-card"/u);
-    assert.match(panel, /案件日曆・共同留痕/u);
-    assert.match(panel, /乙方 Google 日曆尚未連結/u);
+    assert.match(panel, /data-vendor-calendar-node-summary/u);
+    assert.match(panel, /下一節點摘要/u);
+    assert.match(panel, /href="#vendor-google-calendar-title"/u);
+    assert.doesNotMatch(panel, /vendor-calendar-card|vendor-calendar-grid|乙方 Google 日曆尚未連結/u);
   }
+});
+
+test("round 1 document storage and work categories", async () => {
+  const [html, css, runtimeSource] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+    readFile(pagePath(workspaceDir, "app.js"), "utf8"),
+  ]);
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+  const designPanel = vendorWorkspacePanel(authorizedMarkup, "design");
+  const constructionPanel = vendorWorkspacePanel(authorizedMarkup, "construction");
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-calendar-hero\b/gu), 1);
+  assert.equal(count(authorizedMarkup, /class="[^"]*vendor-calendar-grid[^"]*"/gu), 0);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-calendar-node-summary\b/gu), 2);
+  assert.equal(count(authorizedMarkup, /href="#vendor-google-calendar-title"/gu), 2);
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-document-storage(?:\s|>)/gu), 1);
+  assert.match(authorizedMarkup, /data-vendor-document-storage[^>]*data-expanded="false"/u);
+  assert.match(authorizedMarkup, /data-vendor-document-toggle[^>]*aria-expanded="false"[^>]*aria-controls="vendor-document-storage-panel"/u);
+  assert.match(authorizedMarkup, /data-vendor-document-add/u);
+  assert.match(authorizedMarkup, /data-vendor-document-recent-version/u);
+  assert.match(authorizedMarkup, /id="vendor-document-storage-panel"[^>]*hidden/u);
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
+  for (const [panel, labels] of [
+    [designPanel, ["今日待辦", "圖面與版本", "契約與回覆", "決策留痕"]],
+    [constructionPanel, ["今日任務", "變更與驗收", "施工文件與照片", "案件留痕"]],
+  ]) {
+    assert.equal(count(panel, /\bdata-vendor-work-subtab=/gu), 4);
+    assert.equal(count(panel, /\bdata-vendor-work-subpanel=/gu), 4);
+    for (const label of labels) assert.match(visibleText(panel), new RegExp(label, "u"));
+  }
+
+  assert.match(runtimeSource, /VENDOR_DESIGN_SUBTAB_KEYS\s*=\s*freezeList\([\s\S]*"today"[\s\S]*"drawings"[\s\S]*"contract"[\s\S]*"records"/u);
+  assert.match(runtimeSource, /VENDOR_CONSTRUCTION_SUBTAB_KEYS\s*=\s*freezeList\([\s\S]*"today"[\s\S]*"changes"[\s\S]*"files"[\s\S]*"records"/u);
+  assert.match(runtimeSource, /initializeVendorWorkSubtabs/u);
+  assert.match(runtimeSource, /initializeVendorDocumentStorage/u);
+  assert.match(css, /@media\s*\(max-width:\s*768px\)[\s\S]*?\.vendor-work-subtabs\s*\{[\s\S]{0,220}grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/u);
+  assert.match(css, /\.vendor-work-subtab[\s\S]{0,360}min-block-size:\s*var\(--workspace-control-min\)/u);
+});
+
+test("round 1 document storage and work categories retain queue and roving state", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "round-1-document-work-tabs"));
+  let focused = null;
+  let pickerClicks = 0;
+
+  function node(dataset = {}, ownerDocument = null) {
+    const attributes = new Map();
+    const listeners = new Map();
+    return {
+      dataset: { ...dataset },
+      ownerDocument,
+      children: [],
+      hidden: false,
+      tabIndex: 0,
+      textContent: "",
+      value: "",
+      className: "",
+      classList: { add() {}, remove() {}, toggle() {} },
+      addEventListener(type, listener) { listeners.set(type, listener); },
+      append(...children) { this.children.push(...children); },
+      appendChild(child) { this.children.push(child); },
+      click() { pickerClicks += 1; listeners.get("click")?.({ target: this }); },
+      emit(type, event = {}) { return listeners.get(type)?.(event); },
+      focus() { focused = this; },
+      getAttribute(name) { return attributes.get(name) ?? null; },
+      replaceChildren(...children) { this.children = children; },
+      setAttribute(name, value) { attributes.set(name, String(value)); },
+    };
+  }
+
+  assert.deepEqual(ownListValues(runtime.VENDOR_DESIGN_SUBTAB_KEYS), ["today", "drawings", "contract", "records"]);
+  assert.deepEqual(ownListValues(runtime.VENDOR_CONSTRUCTION_SUBTAB_KEYS), ["today", "changes", "files", "records"]);
+  assert.equal(runtime.resolveVendorWorkSubtabKey("design", "today", "ArrowRight"), "drawings");
+  assert.equal(runtime.resolveVendorWorkSubtabKey("design", "today", "End"), "records");
+  assert.equal(runtime.resolveVendorWorkSubtabKey("construction", "records", "Home"), "today");
+
+  const tabs = [];
+  const panels = [];
+  for (const [scope, keys] of [
+    ["design", ["today", "drawings", "contract", "records"]],
+    ["construction", ["today", "changes", "files", "records"]],
+  ]) {
+    for (const key of keys) {
+      tabs.push(node({ vendorWorkScope: scope, vendorWorkSubtab: key }));
+      panels.push(node({ vendorWorkScope: scope, vendorWorkSubpanel: key }));
+    }
+  }
+  const live = node();
+  const workRoot = {
+    querySelector(selector) { return selector === "[data-vendor-workspace-live]" ? live : null; },
+    querySelectorAll(selector) {
+      if (selector === "[data-vendor-work-subtab]") return tabs;
+      if (selector === "[data-vendor-work-subpanel]") return panels;
+      return [];
+    },
+  };
+  runtime.initializeVendorWorkSubtabs(workRoot);
+  assert.equal(panels[0].hidden, false);
+  assert.equal(panels[1].hidden, true);
+  tabs[0].emit("keydown", { key: "ArrowRight", preventDefault() {} });
+  assert.equal(focused, tabs[1]);
+  assert.equal(panels[1].hidden, false);
+  assert.equal(panels[0].hidden, true);
+  assert.match(live.textContent, /圖面與版本/u);
+
+  const ownerDocument = { createElement() {} };
+  ownerDocument.createElement = () => node({}, ownerDocument);
+  const storage = node({ expanded: "false" }, ownerDocument);
+  const storagePanel = node({}, ownerDocument);
+  storagePanel.hidden = true;
+  const toggle = node({}, ownerDocument);
+  const add = node({}, ownerDocument);
+  const picker = node({}, ownerDocument);
+  picker.id = "vendor-document-picker";
+  const dropzone = node({}, ownerDocument);
+  const queue = node({}, ownerDocument);
+  const empty = node({}, ownerDocument);
+  const countNode = node({}, ownerDocument);
+  const status = node({}, ownerDocument);
+  const storageNodes = new Map([
+    ["[data-vendor-document-storage]", storage],
+    ["#vendor-document-storage-panel", storagePanel],
+    ["[data-vendor-document-toggle]", toggle],
+    ["[data-vendor-document-add]", add],
+    ["[data-vendor-document-dropzone]", dropzone],
+    ["[data-vendor-document-picker]", picker],
+    ["[data-vendor-document-queue]", queue],
+    ["[data-vendor-document-empty]", empty],
+    ["[data-vendor-document-count]", countNode],
+    ["[data-vendor-document-import-status]", status],
+  ]);
+  const storageRoot = { querySelector(selector) { return storageNodes.get(selector) ?? null; } };
+  const storageController = runtime.initializeVendorDocumentStorage(storageRoot);
+  assert.equal(storageController.state, "READY");
+  assert.equal(storagePanel.hidden, true);
+  add.emit("click");
+  assert.equal(storagePanel.hidden, false);
+  assert.equal(pickerClicks, 1);
+  storageController.collapse();
+  const importController = runtime.initializeVendorDocumentImport(storageRoot, storageController);
+  importController.stageFiles([
+    { name: "平面配置-v3.pdf", size: 2048, type: "application/pdf", lastModified: 1 },
+  ], "裝置選擇");
+  assert.equal(storagePanel.hidden, false, "selecting a file expands the storage tool");
+  assert.equal(queue.children.length, 1);
+  storageController.collapse();
+  assert.equal(queue.children.length, 1, "collapsing the toolbar keeps the session-only queue");
+});
+
+test("PHASE A: Calendar Hero and document import lead the authorized workspace without touching the public gate", async () => {
+  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  const header = html.match(/<header class="vendor-header" id="top">[\s\S]*?<\/header>/u)?.[0] ?? "";
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+  const publicMarkup = vendorPublicMarkup(html);
+  const calendarHeroStart = authorizedMarkup.indexOf("data-vendor-calendar-hero");
+  const documentImportStart = authorizedMarkup.indexOf("data-vendor-document-import");
+  const managementWorkspaceStart = authorizedMarkup.indexOf("vendor-workspace-shell");
+
+  assert.equal(
+    createHash("sha256").update(header).digest("hex"),
+    "3a7288f5e97f1ed63b6dc3073dd2bd831a668c74baee5e697cf771cba9aeb90d",
+    "the frozen Header DOM, copy, attributes, and aria bytes must stay exact",
+  );
+  for (const label of [
+    "Decision &amp; Record System",
+    "裝潢決策系統",
+    "目前角色",
+    "受邀乙方｜設計師／統包",
+    "授權狀態",
+    "身分與案件範圍尚待確認",
+  ]) {
+    assert.match(header, new RegExp(label, "u"), label);
+  }
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-calendar-hero\b/gu), 1);
+  assert.ok(calendarHeroStart >= 0, "Calendar Hero must exist in the authorized template");
+  assert.ok(documentImportStart > calendarHeroStart, "document import must follow Calendar Hero");
+  assert.ok(managementWorkspaceStart > documentImportStart, "management tabs must follow the two new top-level areas");
+  assert.match(authorizedMarkup, /data-vendor-calendar-hero[\s\S]*data-vendor-calendar-state="loading"/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-hero[\s\S]*data-vendor-calendar-live-events/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-events/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-today/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-seven-days/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-next-step/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-responsibility/u);
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-document-import(?:\s|>)/gu), 1);
+  assert.match(authorizedMarkup, /data-vendor-document-dropzone/u);
+  assert.match(authorizedMarkup, /<input[^>]*type="file"[^>]*data-vendor-document-picker/iu);
+  assert.match(authorizedMarkup, /data-vendor-document-queue/u);
+  assert.doesNotMatch(authorizedMarkup, /data-vendor-line-import|LINE 文件匯入/u);
+  assert.match(authorizedMarkup, /data-vendor-document-upload[^>]*disabled[^>]*aria-disabled="true"/u);
+  assert.match(authorizedMarkup, /文件上傳正在整理中/u);
+
+  assert.doesNotMatch(publicMarkup, /data-vendor-calendar-hero|data-vendor-document-import|data-vendor-document-dropzone|LINE 文件匯入/u);
+  assert.doesNotMatch(authorizedMarkup, /LINE 三方群組|LINE 案件對話|line-conversation|vendor-workspace-sidecar/u);
+});
+
+test("PHASE A: document picker and drop stage supported files locally without claiming an upload", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "phase-a-document-import"));
+
+  function makeNode(ownerDocument = null) {
+    const listeners = new Map();
+    const classes = new Set();
+    const attributes = new Map();
+    return {
+      ownerDocument,
+      children: [],
+      hidden: false,
+      textContent: "",
+      value: "",
+      className: "",
+      classList: {
+        add(value) { classes.add(value); },
+        remove(value) { classes.delete(value); },
+      },
+      addEventListener(type, listener) { listeners.set(type, listener); },
+      append(...nodes) { this.children.push(...nodes); },
+      appendChild(node) { this.children.push(node); },
+      emit(type, event = {}) { return listeners.get(type)?.(event); },
+      replaceChildren(...nodes) { this.children = nodes; },
+      setAttribute(name, value) { attributes.set(name, String(value)); },
+    };
+  }
+
+  const ownerDocument = { createElement() {} };
+  ownerDocument.createElement = () => makeNode(ownerDocument);
+  const dropzone = makeNode(ownerDocument);
+  const picker = makeNode(ownerDocument);
+  picker.id = "vendor-document-picker";
+  const queue = makeNode(ownerDocument);
+  const empty = makeNode(ownerDocument);
+  const countNode = makeNode(ownerDocument);
+  const status = makeNode(ownerDocument);
+  const nodes = new Map([
+    ["[data-vendor-document-dropzone]", dropzone],
+    ["[data-vendor-document-picker]", picker],
+    ["[data-vendor-document-queue]", queue],
+    ["[data-vendor-document-empty]", empty],
+    ["[data-vendor-document-count]", countNode],
+    ["[data-vendor-document-import-status]", status],
+  ]);
+  const controller = runtime.initializeVendorDocumentImport({
+    querySelector(selector) { return nodes.get(selector) ?? null; },
+  });
+
+  assert.equal(controller.state, "READY");
+  assert.equal(controller.stageFiles([
+    { name: "平面配置-v3.pdf", size: 2048, type: "application/pdf", lastModified: 1 },
+    { name: "現場照片.jpg", size: 4096, type: "image/jpeg", lastModified: 2 },
+    { name: "未知格式.exe", size: 16, type: "application/octet-stream", lastModified: 3 },
+  ], "裝置選擇"), 2);
+  assert.equal(queue.children.length, 2);
+  assert.equal(empty.hidden, true);
+  assert.equal(countNode.textContent, "共 2 份・尚未送出");
+  assert.match(status.textContent, /尚未送出/u);
+  assert.equal(queue.children[0].children[0].children[0].textContent, "平面配置-v3.pdf");
+  assert.match(queue.children[1].children[0].children[1].children[2].textContent, /影像文件・待確認/u);
+  assert.equal(queue.children[0].children[0].children[1].children[3].textContent, "目前案件：目前授權案件");
+  assert.equal(queue.children[0].children[0].children[1].children[8].textContent, "上傳狀態：待上傳");
+
+  queue.children[0].children[1].emit("click");
+  assert.equal(queue.children.length, 1);
+  dropzone.emit("drop", {
+    preventDefault() {},
+    dataTransfer: { files: [{ name: "驗收照片.png", size: 8192, type: "image/png", lastModified: 4 }] },
+  });
+  assert.equal(queue.children.length, 2);
+  assert.equal(countNode.textContent, "共 2 份・尚未送出");
 });
 
 test("vendor calendar embed resolves only a trusted active pro grant and clears stale frames", async () => {
@@ -1719,6 +2333,13 @@ test("vendor calendar embed resolves only a trusted active pro grant and clears 
     }).state,
     "CALENDAR_NOT_CONNECTED",
   );
+  assert.equal(
+    runtime.resolveVendorCalendarEmbed({
+      ...grant,
+      calendarBinding: { ...grant.calendarBinding, connectionStatus: "expired" },
+    }).state,
+    "CALENDAR_CONNECTION_EXPIRED",
+  );
 
   let getterCalled = false;
   const hostileBinding = {
@@ -1766,66 +2387,413 @@ test("vendor calendar embed resolves only a trusted active pro grant and clears 
   assert.equal(status.textContent, "尚未連結乙方 Google 日曆");
 });
 
-test("vendor calendar grant loader uses only same-origin vendor endpoints", async () => {
-  const runtime = await import(moduleUrl(workspaceDir, "vendor-calendar-fetch"));
-  const calls = [];
-  const grant = {
-    schemaVersion: "laibe.vendor-calendar-embed.v1",
-    authenticatedUserId: "vendor-42",
-    currentCaseId: "case-7",
-    membership: {
-      userId: "vendor-42",
-      caseId: "case-7",
-      role: "pro",
-      status: "active",
-    },
-    calendarBinding: {
-      userId: "vendor-42",
-      caseId: "case-7",
-      connectionStatus: "connected",
-      bindingStatus: "active",
-      calendarId: "vendor+case@example.com",
-      timeZone: "Asia/Taipei",
+test("vendor calendar guidance stays in-page and renders only bounded server-read event fields", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "vendor-calendar-live-events"));
+  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+
+  for (const [selector, label] of [
+    ["data-vendor-calendar-description-link", "本日工作說明"],
+    ["data-vendor-calendar-notification-link", "活動通知"],
+    ["data-vendor-calendar-open-link", "案件日曆"],
+  ]) {
+    assert.match(
+      authorizedMarkup,
+      new RegExp(`${selector}[^>]*aria-disabled="true"[^>]*>${label}`, "u"),
+      selector,
+    );
+  }
+  assert.doesNotMatch(authorizedMarkup, /blueleft0120@gmail\.com/u);
+  assert.doesNotMatch(authorizedMarkup, /calendar\.google\.com|data-vendor-calendar-frame/iu);
+
+  function elementNode() {
+    return {
+      children: [],
+      textContent: "",
+      append(...children) { this.children.push(...children); },
+    };
+  }
+  const ownerDocument = { createElement: () => elementNode() };
+  const eventList = {
+    children: [],
+    ownerDocument,
+    replaceChildren(...children) { this.children = children; },
+  };
+  const liveEvents = { hidden: true };
+  const eventsEmpty = { hidden: true };
+  const empty = { hidden: false };
+  const today = { textContent: "" };
+  const sevenDays = { textContent: "" };
+  const root = {
+    querySelector(selector) {
+      if (selector === "[data-vendor-calendar-empty]") return empty;
+      if (selector === "[data-vendor-calendar-live-events]") return liveEvents;
+      if (selector === "[data-vendor-calendar-events]") return eventList;
+      if (selector === "[data-vendor-calendar-events-empty]") return eventsEmpty;
+      if (selector === "[data-vendor-calendar-today]") return today;
+      if (selector === "[data-vendor-calendar-seven-days]") return sevenDays;
+      return null;
     },
   };
-  const fetcher = async (url, init = {}) => {
-    calls.push({ url: String(url), init });
-    if (String(url).endsWith("grant")) {
-      return new Response(JSON.stringify(grant), {
+
+  const result = runtime.initializeVendorCalendarEvents(root, {
+    state: "ready",
+    timeZone: "Asia/Taipei",
+    events: [{
+      eventId: "provider-id-must-not-render",
+      etag: "provider-etag-must-not-render",
+      title: "泥作進場",
+      description: "本日工作說明：確認施工動線。",
+      start: "2026-08-25T09:00:00+08:00",
+      end: "2026-08-25T12:00:00+08:00",
+      status: "confirmed",
+    }],
+  });
+  assert.equal(result.state, "READY");
+  assert.equal(liveEvents.hidden, false);
+  assert.equal(empty.hidden, true);
+  assert.equal(eventList.children.length, 1);
+  assert.equal(eventList.children[0].children[1].textContent, "泥作進場");
+  assert.match(eventList.children[0].children[2].textContent, /本日工作說明/u);
+  assert.doesNotMatch(JSON.stringify(eventList.children), /provider-id|provider-etag/u);
+  assert.match(today.textContent, /1 筆/u);
+  assert.match(sevenDays.textContent, /1 筆/u);
+});
+
+test("vendor workspace and calendar loaders use the authenticated Supabase transport", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "vendor-calendar-fetch"));
+  const calls = [];
+  const membership = {
+    userId: "vendor-42",
+    caseId: "case-7",
+    role: "pro",
+    status: "active",
+  };
+  const workspaceGrant = {
+    schemaVersion: "laibe.vendor-workspace-auth.v1",
+    state: "AUTHORIZED_VENDOR_WORKSPACE",
+    authenticatedUserId: "vendor-42",
+    currentCaseId: "case-7",
+    membership,
+    workspaceAccess: {
+      role: "pro",
+      mutationAllowed: false,
+      writeActionsEnabled: false,
+    },
+  };
+  const supportGrant = {
+    state: "connected",
+    timeZone: "Asia/Taipei",
+    capabilities: ["read", "create", "update", "cancel"],
+  };
+  const authRuntime = {
+    async authenticatedFetch(endpoint, init = {}) {
+      calls.push({ endpoint, init });
+      if (endpoint === "vendor-workspace-grant") {
+        return new Response(JSON.stringify(workspaceGrant), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      if (endpoint === "vendor-google-calendar-support-grant") {
+        return new Response(JSON.stringify(supportGrant), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      }
+      return new Response(JSON.stringify({
+        state: "oauth_pending",
+        authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=opaque",
+      }), {
         status: 200,
         headers: { "content-type": "application/json" },
       });
-    }
-    return new Response(JSON.stringify({
-      state: "OAUTH_REDIRECT_REQUIRED",
-      authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=opaque",
-    }), {
-      status: 200,
-      headers: { "content-type": "application/json" },
-    });
+    },
   };
 
-  assert.deepEqual(await runtime.fetchVendorGoogleCalendarGrant(fetcher), grant);
-  assert.equal(calls[0].url, "/functions/v1/vendor-google-calendar-grant");
+  assert.deepEqual(await runtime.fetchVendorWorkspaceGrant(authRuntime), workspaceGrant);
+  assert.equal(calls[0].endpoint, "vendor-workspace-grant");
   assert.equal(calls[0].init.method, "GET");
   assert.equal(Object.hasOwn(calls[0].init, "body"), false);
 
-  const started = await runtime.startVendorGoogleCalendarOAuth(fetcher);
-  assert.equal(started.state, "OAUTH_REDIRECT_REQUIRED");
-  assert.equal(calls[1].url, "/functions/v1/vendor-google-calendar-oauth-start");
+  assert.deepEqual(await runtime.fetchVendorGoogleCalendarSupportGrant(authRuntime), supportGrant);
+  assert.equal(calls[1].endpoint, "vendor-google-calendar-support-grant");
   assert.equal(calls[1].init.method, "POST");
-  assert.equal(calls[1].init.headers["content-type"], "application/json");
   assert.equal(calls[1].init.body, "{}");
+
+  const started = await runtime.startVendorGoogleCalendarOAuth(authRuntime);
+  assert.equal(started.state, "oauth_pending");
+  assert.equal(calls[2].endpoint, "vendor-google-calendar-connect-start");
+  assert.equal(calls[2].init.method, "POST");
+  assert.equal(calls[2].init.headers["content-type"], "application/json");
+  assert.equal(calls[2].init.body, "{}");
 
   const serializedCalls = JSON.stringify(calls);
   assert.doesNotMatch(serializedCalls, /userId|caseId|calendarId|role|gmail/i);
   assert.equal(
-    await runtime.fetchVendorGoogleCalendarGrant(async () => new Response(
-      JSON.stringify({ state: "AUTH_REQUIRED" }),
-      { status: 401 },
-    )),
+    await runtime.fetchVendorWorkspaceGrant({
+      async authenticatedFetch() {
+        return new Response(JSON.stringify({ state: "AUTHORIZED_VENDOR_WORKSPACE" }), { status: 200 });
+      },
+    }),
     null,
   );
+});
+
+test("A15 vendor calendar transport maps all seven server-owned routes without client authority", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "a15-vendor-calendar-transport"));
+  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  const runtimeSource = await readFile(pagePath(workspaceDir, "app.js"), "utf8");
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+  const calls = [];
+  const responses = new Map([
+    ["vendor-google-calendar-support-grant", { status: 200, body: {
+      state: "connected",
+      timeZone: "Asia/Taipei",
+      capabilities: ["read", "create", "update", "cancel"],
+    } }],
+    ["vendor-google-calendar-events-read", { status: 200, body: {
+      state: "ready",
+      timeZone: "Asia/Taipei",
+      events: [{
+        eventId: "opaque-event-ref",
+        etag: "etag-1",
+        title: "泥作進場",
+        description: "本日工作說明",
+        start: "2026-08-25T09:00:00+08:00",
+        end: "2026-08-25T12:00:00+08:00",
+        status: "confirmed",
+      }],
+    } }],
+    ["vendor-google-calendar-connect-start", { status: 200, body: {
+      state: "oauth_pending",
+      authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=opaque",
+    } }],
+    ["vendor-google-calendar-events-create", { status: 201, body: {
+      state: "created",
+      event: { eventId: "opaque-event-ref", etag: "etag-1" },
+    } }],
+    ["vendor-google-calendar-events-update", { status: 200, body: {
+      state: "updated",
+      event: { eventId: "opaque-event-ref", etag: "etag-2" },
+    } }],
+    ["vendor-google-calendar-events-cancel", { status: 200, body: {
+      state: "cancelled",
+      event: { eventId: "opaque-event-ref", etag: "etag-3", status: "cancelled" },
+    } }],
+  ]);
+  const authRuntime = {
+    async authenticatedFetch(endpoint, init = {}) {
+      calls.push({ endpoint, init });
+      const response = responses.get(endpoint);
+      return response
+        ? new Response(JSON.stringify(response.body), {
+          status: response.status,
+          headers: { "content-type": "application/json" },
+        })
+        : new Response(JSON.stringify({ state: "invalid_request" }), { status: 400 });
+    },
+  };
+  const window = {
+    timeMin: "2026-08-25T00:00:00+08:00",
+    timeMax: "2026-09-01T23:59:59+08:00",
+  };
+  const eventInput = {
+    idempotencyKey: "calendar-create-1",
+    title: "泥作進場",
+    description: "本日工作說明",
+    start: "2026-08-25T09:00:00+08:00",
+    end: "2026-08-25T12:00:00+08:00",
+    basis: "工程排程 v2",
+    workNotes: "施工前確認動線",
+    tradeNotes: "泥作",
+    nextOwner: "乙方工務",
+  };
+
+  assert.equal(
+    runtime.VENDOR_GOOGLE_CALENDAR_CONNECT_CALLBACK_ENDPOINT,
+    "vendor-google-calendar-connect-callback",
+  );
+
+  const grant = await runtime.fetchVendorGoogleCalendarSupportGrant(authRuntime);
+  assert.equal(grant.state, "connected");
+  assert.deepEqual(grant.capabilities, ["read", "create", "update", "cancel"]);
+  const events = await runtime.fetchVendorGoogleCalendarEvents(authRuntime, window);
+  assert.equal(events.state, "ready");
+  assert.equal(events.events[0].eventId, "opaque-event-ref");
+  assert.equal((await runtime.startVendorGoogleCalendarOAuth(authRuntime)).state, "oauth_pending");
+  assert.equal((await runtime.createVendorGoogleCalendarEvent(authRuntime, eventInput)).state, "created");
+  assert.equal((await runtime.updateVendorGoogleCalendarEvent(authRuntime, {
+    ...eventInput,
+    idempotencyKey: "calendar-update-1",
+    eventId: "opaque-event-ref",
+    etag: "etag-1",
+  })).state, "updated");
+  assert.equal((await runtime.cancelVendorGoogleCalendarEvent(authRuntime, {
+    idempotencyKey: "calendar-cancel-1",
+    eventId: "opaque-event-ref",
+    etag: "etag-2",
+    reason: "工序調整",
+    basis: "工程變更紀錄 v1",
+    workNotes: "",
+    tradeNotes: "泥作",
+    nextOwner: "乙方工務",
+  })).state, "cancelled");
+
+  assert.deepEqual(calls.map(({ endpoint }) => endpoint), [
+    "vendor-google-calendar-support-grant",
+    "vendor-google-calendar-events-read",
+    "vendor-google-calendar-connect-start",
+    "vendor-google-calendar-events-create",
+    "vendor-google-calendar-events-update",
+    "vendor-google-calendar-events-cancel",
+  ]);
+  assert.equal(calls.every(({ init }) => init.method === "POST"), true);
+  assert.equal(calls.every(({ init }) => init.headers["content-type"] === "application/json"), true);
+  assert.deepEqual(JSON.parse(calls[0].init.body), {});
+  assert.deepEqual(JSON.parse(calls[1].init.body), window);
+  assert.doesNotMatch(JSON.stringify(calls), /authenticatedUserId|currentCaseId|caseId|calendarId|googleSubject|roleIntent|gmail/iu);
+  assert.match(authorizedMarkup, /data-vendor-calendar-live-events/u);
+  assert.match(authorizedMarkup, /data-vendor-calendar-events/u);
+  assert.doesNotMatch(authorizedMarkup, /data-vendor-calendar-(?:create|update|cancel)-action/u);
+  const serverBoot = runtimeSource.match(/export async function initializeVendorWorkspaceFromServer[\s\S]*?const documentRoot/u)?.[0] ?? "";
+  assert.match(serverBoot, /fetchVendorWorkspaceGrant[\s\S]*refreshVendorCalendarSupportFromServer/u);
+  assert.doesNotMatch(serverBoot, /calendarGrant|resolveVendorCalendarEmbed|localStorage|sessionStorage|location\.(?:search|hash)/u);
+});
+
+test("authorized vendor calendar connect keeps the workspace open and renders events only after the server grant is connected", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "vendor-calendar-connect"));
+  const workspaceMarkup = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  assert.match(
+    workspaceMarkup,
+    /點擊後會另開 Google 授權視窗；完成後，本頁會自動載入已核對的日曆。/u,
+  );
+  const listeners = new Map();
+  const navigations = [];
+  const calls = [];
+  const button = {
+    disabled: false,
+    addEventListener(type, listener) { listeners.set(type, listener); },
+    setAttribute() {},
+  };
+  const actionStatus = { textContent: "" };
+  const calendarStatus = { textContent: "" };
+  const empty = { hidden: false };
+  const hero = { dataset: {} };
+  function elementNode() {
+    return {
+      children: [],
+      textContent: "",
+      append(...children) { this.children.push(...children); },
+    };
+  }
+  const ownerDocument = { createElement: () => elementNode() };
+  const eventList = {
+    children: [],
+    ownerDocument,
+    replaceChildren(...children) { this.children = children; },
+  };
+  const liveEvents = { hidden: true };
+  const eventsEmpty = { hidden: true };
+  const root = {
+    querySelector(selector) {
+      if (selector === "[data-vendor-calendar-connect]") return button;
+      if (selector === "[data-vendor-calendar-action-status]") return actionStatus;
+      if (selector === "[data-vendor-calendar-status]") return calendarStatus;
+      if (selector === "[data-vendor-calendar-empty]") return empty;
+      if (selector === "[data-vendor-calendar-hero]") return hero;
+      if (selector === "[data-vendor-calendar-live-events]") return liveEvents;
+      if (selector === "[data-vendor-calendar-events]") return eventList;
+      if (selector === "[data-vendor-calendar-events-empty]") return eventsEmpty;
+      return null;
+    },
+  };
+  let grantReads = 0;
+  const authRuntime = {
+    async authenticatedFetch(endpoint, init) {
+      calls.push({ endpoint, init });
+      if (endpoint === "vendor-google-calendar-support-grant") {
+        grantReads += 1;
+        return grantReads === 1
+          ? new Response(JSON.stringify({ state: "calendar_not_connected" }), {
+            status: 403,
+            headers: { "content-type": "application/json" },
+          })
+          : new Response(JSON.stringify({
+            state: "connected",
+            timeZone: "Asia/Taipei",
+            capabilities: ["read", "create", "update", "cancel"],
+          }), {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          });
+      }
+      if (endpoint === "vendor-google-calendar-events-read") {
+        return new Response(JSON.stringify({
+          state: "ready",
+          timeZone: "Asia/Taipei",
+          events: [{
+            eventId: "opaque-event-ref",
+            etag: "etag-1",
+            title: "泥作進場",
+            description: "確認本日施工動線",
+            start: "2026-08-25T09:00:00+08:00",
+            end: "2026-08-25T12:00:00+08:00",
+            status: "confirmed",
+          }],
+        }), { status: 200, headers: { "content-type": "application/json" } });
+      }
+      return new Response(JSON.stringify({
+        state: "oauth_pending",
+        authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=opaque",
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    },
+  };
+  const authorizationWindow = {
+    closed: false,
+    location: {
+      assign(href) { navigations.push(href); },
+    },
+    close() { this.closed = true; },
+  };
+
+  const result = runtime.initializeVendorGoogleCalendarActions(root, {
+    authRuntime,
+    openAuthorizationWindow: () => authorizationWindow,
+    wait: async () => {},
+    maxPollAttempts: 2,
+  });
+  assert.equal(result.state, "READY");
+  assert.equal(typeof listeners.get("click"), "function");
+
+  await listeners.get("click")({ preventDefault() {} });
+
+  assert.equal(calls.length, 4);
+  assert.equal(calls[0].endpoint, "vendor-google-calendar-connect-start");
+  assert.equal(calls[0].init.method, "POST");
+  assert.equal(calls[1].endpoint, "vendor-google-calendar-support-grant");
+  assert.equal(calls[2].endpoint, "vendor-google-calendar-support-grant");
+  assert.equal(calls[3].endpoint, "vendor-google-calendar-events-read");
+  assert.deepEqual(navigations, ["https://accounts.google.com/o/oauth2/v2/auth?state=opaque"]);
+  assert.equal(authorizationWindow.closed, true);
+  assert.equal(empty.hidden, true);
+  assert.equal(liveEvents.hidden, false);
+  assert.equal(eventList.children.length, 1);
+  assert.equal(eventList.children[0].children[1].textContent, "泥作進場");
+  assert.equal(calendarStatus.textContent, "已連結目前乙方的 Google 日曆");
+  assert.equal(button.disabled, true);
+});
+
+test("formal vendor page bootstraps only from the real-session workspace grant", async () => {
+  const runtime = await readFile(pagePath(workspaceDir, "app.js"), "utf8");
+
+  assert.match(runtime, /getSupabaseAuthRuntime/u);
+  assert.match(runtime, /initializeVendorWorkspaceFromServer\(documentRoot/u);
+  assert.doesNotMatch(
+    runtime,
+    /initializeVendorWorkspace\(\s*documentRoot\s*,\s*AUTHORIZED_VENDOR_WORKSPACE/u,
+  );
+  assert.doesNotMatch(runtime, /preview=authorized|URLSearchParams|user_metadata|app_metadata/u);
 });
 
 test("vendor resource ownership is grouped under design and construction management", async () => {
@@ -1843,10 +2811,10 @@ test("vendor resource ownership is grouped under design and construction managem
     "CASE_RECORDS",
   ]);
   assert.deepEqual(resourceCodes(panel("construction")), [
-    "SCHEDULES",
-    "EVIDENCE",
     "CHANGES",
     "ACCEPTANCE",
+    "SCHEDULES",
+    "EVIDENCE",
   ]);
   assert.match(panel("design"), /雙方確認/u);
   assert.match(panel("design"), /新版本/u);
@@ -2174,15 +3142,17 @@ test("vendor contract template preview uses the shared reader without claiming a
   assert.match(previewHtml, /id="contract-book"[^>]*aria-label="專案契約唯讀預覽"/u);
 });
 
-test("vendor design management contains contract task tabs and keeps owner facts protected", async () => {
+test("vendor design management keeps contract work bounded inside the approved category", async () => {
   const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
   const panel = vendorWorkspacePanel(html, "design");
-  const tabsStart = panel.indexOf('class="vendor-contract-view-tabs"');
+  const tabsStart = panel.indexOf('data-vendor-work-subtab="contract"');
+  const contractPanelStart = panel.indexOf('data-vendor-work-subpanel="contract"');
   const previewStart = panel.indexOf('class="vendor-contract-preview"');
-  const replyStart = panel.indexOf('data-vendor-contract-view-panel="reply"');
+  const replyStart = panel.indexOf("補件或說明可能影響");
 
   assert.ok(previewStart >= 0, "shared preview exists");
-  assert.ok(tabsStart >= 0 && tabsStart < previewStart, "task tabs precede the preview");
+  assert.ok(tabsStart >= 0 && tabsStart < previewStart, "work categories precede the preview");
+  assert.ok(contractPanelStart > tabsStart && contractPanelStart < previewStart, "contract content stays in its category");
   assert.ok(replyStart > previewStart, "disabled reply state follows the template preview");
   assert.match(panel, /待我回覆/u);
   assert.match(panel, /補件或說明可能影響/u);
@@ -2190,6 +3160,7 @@ test("vendor design management contains contract task tabs and keeps owner facts
   assert.match(panel, /甲方決定/u);
   assert.match(panel, /data-write-action[^>]*disabled/u);
   assert.doesNotMatch(panel, /<details[^>]*data-vendor-contract-editor/u);
+  assert.doesNotMatch(panel, /data-vendor-contract-view=/u);
   assert.match(panel, /乙方回覆不等於甲方同意/u);
   assert.doesNotMatch(panel, /data-owner-contract-fact/u);
 });
@@ -2211,31 +3182,25 @@ test("vendor authorized workspace is one flat data-first surface while the publi
   assert.match(css, /\.canvas\s*\{[\s\S]{0,300}background:\s*var\(--canvas\)/u);
 });
 
-test("vendor workspace reserves the sidecar for the authorized LINE account", async () => {
-  const [html, css] = await Promise.all([
+test("vendor workspace offers one permission-safe share action for every document resource", async () => {
+  const [html, css, runtimeSource] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+    readFile(pagePath(workspaceDir, "app.js"), "utf8"),
   ]);
 
   const authorizedMarkup = vendorAuthorizedTemplate(html);
-  const workspaceStart = authorizedMarkup.indexOf('class="vendor-workspace"');
-  const conversationStart = authorizedMarkup.indexOf('data-line-conversation');
-  const sidecarStart = authorizedMarkup.indexOf('class="vendor-workspace-sidecar"');
-  const sidecarEnd = authorizedMarkup.indexOf("</aside>", sidecarStart);
-  const sidecarMarkup = authorizedMarkup.slice(sidecarStart, sidecarEnd);
-  assert.ok(workspaceStart >= 0);
-  assert.ok(conversationStart > workspaceStart);
-  assert.match(authorizedMarkup, /class="vendor-workspace-sidecar"/u);
-  assert.match(sidecarMarkup, /data-line-conversation[\s\S]*LINE 案件對話/u);
-  assert.match(sidecarMarkup, /尚未連結乙方 LINE 帳號/u);
-  assert.match(sidecarMarkup, /class="line-conversation__composer"[\s\S]*data-write-action[\s\S]*disabled/u);
-  assert.doesNotMatch(sidecarMarkup, /Google 日曆|data-vendor-calendar-frame|data-vendor-calendar-empty/u);
-  assert.doesNotMatch(authorizedMarkup, /@748pbmnz|blueleft0120@gmail\.com|line\.me\/R\/ti\/p/iu);
-  assert.doesNotMatch(vendorPublicMarkup(html), /calendar\.google\.com|@748pbmnz|blueleft0120/iu);
-  assert.doesNotMatch(html, /訊息已送出|已傳送訊息/u);
-  assert.match(css, /\.vendor-workspace-sidecar\s*\{/u);
-  assert.match(css, /\.line-conversation__composer\s*\{/u);
-  assert.doesNotMatch(css, /\.vendor-utility-tabs\s*\{/u);
+  const resourceMatches = [...authorizedMarkup.matchAll(/data-resource-code="([A-Z_]+)"/gu)]
+    .map((match) => match[1]);
+  const shareMatches = [...authorizedMarkup.matchAll(/data-vendor-document-share="([A-Z_]+)"/gu)]
+    .map((match) => match[1]);
+  assert.deepEqual(resourceMatches.sort(), [...resourceCodes].sort());
+  assert.deepEqual(shareMatches.sort(), [...resourceCodes].sort());
+  assert.match(css, /\.vendor-document-share\s*\{/u);
+  assert.match(runtimeSource, /resolveVendorDocumentShareTarget/u);
+  assert.match(runtimeSource, /initializeVendorDocumentSharing/u);
+  assert.doesNotMatch(`${html}\n${css}\n${runtimeSource}`, /LINE 三方群組|LINE 案件對話|line-conversation|vendor-workspace-sidecar|vendor-gate-chat/u);
+  assert.doesNotMatch(vendorPublicMarkup(html), /calendar\.google\.com|blueleft0120/iu);
 });
 
 test("all visible write controls stay disabled and browser-derived authority is absent", async () => {
@@ -2256,8 +3221,10 @@ test("all visible write controls stay disabled and browser-derived authority is 
       directory,
     );
     if (directory === workspaceDir) {
-      assert.match(runtime, /\/functions\/v1\/vendor-google-calendar-grant/u);
-      assert.match(runtime, /\/functions\/v1\/vendor-google-calendar-oauth-start/u);
+      assert.match(runtime, /vendor-workspace-grant/u);
+      assert.match(runtime, /vendor-google-calendar-grant/u);
+      assert.match(runtime, /vendor-google-calendar-oauth-start/u);
+      assert.match(runtime, /authenticatedFetch/u);
       assert.doesNotMatch(runtime, /fetch\(["']https?:\/\//iu);
     }
     assert.doesNotMatch(runtime, /\.innerHTML\s*=|insertAdjacentHTML|eval\s*\(/iu, directory);
@@ -2287,22 +3254,22 @@ test("local references language UTF-8 and accessibility source stay bounded", as
   }
 });
 
-test("vendor 設計管理以四個契約任務分頁說清共同預覽、待回覆、決定與紀錄", async () => {
+test("vendor 設計管理以四個工作次分類整理今日、圖面、契約與留痕", async () => {
   const [html, css] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
   ]);
   const contractPanel = vendorWorkspacePanel(html, "design");
 
-  assert.equal((contractPanel.match(/data-vendor-contract-view="(?:overview|reply|decision|records)"/g) || []).length, 4);
-  for (const label of ["契約總覽", "待我回覆", "變更與決定", "版本與紀錄"]) {
+  assert.equal((contractPanel.match(/data-vendor-work-scope="design" data-vendor-work-subtab="(?:today|drawings|contract|records)"/g) || []).length, 4);
+  for (const label of ["今日待辦", "圖面與版本", "契約與回覆", "決策留痕"]) {
     assert.match(contractPanel, new RegExp(label));
   }
   assert.match(contractPanel, /contractType=DESIGN_BUILD&amp;returnTo=vendor/u);
   assert.match(contractPanel, /唯讀範本，不是本案已成立契約/u);
   assert.match(contractPanel, /尚未送出／尚未保存/u);
   assert.doesNotMatch(contractPanel, /甲乙內容一致|本案共同契約|v0\.2/u);
-  assert.match(css, /\.vendor-contract-view-tabs\s*\{/u);
+  assert.match(css, /\.vendor-work-subtabs\s*\{/u);
 });
 
 test("vendor 契約內層任務分頁支援循環方向鍵與 Home End", async () => {

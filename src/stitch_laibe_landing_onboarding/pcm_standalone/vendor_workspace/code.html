@@ -29,23 +29,189 @@
 
     <main id="vendor-main">
       <section class="vendor-gate" id="invited-cases" aria-labelledby="vendor-gate-title">
-        <p class="eyebrow">乙方案件工作台</p>
-        <h1 id="vendor-gate-title">目前無法開啟案件工作台</h1>
-        <p class="vendor-gate__lead">尚未確認你的身分、案件成員或可查看範圍。確認完成前，不會顯示任何案件、文件、版本或待辦。</p>
-        <dl class="vendor-status-rail" aria-label="授權狀態與下一步">
-          <div><dt>目前狀態</dt><dd>尚未確認案件授權</dd></div>
-          <div><dt>下一步</dt><dd>前往登入／帳號入口確認角色</dd></div>
-          <div><dt>責任人</dt><dd>目前使用者</dd></div>
-          <div><dt>會留下的紀錄</dt><dd>授權完成後，重要回覆與決定才會連回案件。</dd></div>
-        </dl>
-        <a class="vendor-primary-action" data-primary-action data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true">返回登入／帳號入口</a>
-        <p class="vendor-gate__note">若你是從甲方通知進入，請使用原通知重新確認邀請。</p>
+        <div class="app vendor-gate-shell">
+          <aside class="side vendor-gate-sidebar" aria-label="執行中案件">
+            <div class="lg">La<em>i</em>BE</div>
+            <div class="sect">執行中案件</div>
+            <div class="vendor-gate-case" aria-live="polite">
+              <span class="dot them" aria-hidden="true"></span>
+              <div><strong>尚未載入案件</strong><small>登入後只顯示你參與或受邀的案件</small></div>
+            </div>
+            <div class="vendor-gate-management-tabs" aria-label="工作台管理區">
+              <button class="scase vendor-gate-management-tab" type="button" data-vendor-gate-management-tab="design" disabled aria-disabled="true">
+                <span class="r1"><span class="dot you" aria-hidden="true"></span><b>設計管理</b><span class="pct">登入後開啟</span></span>
+                <span class="st">圖面、報價、契約與決策紀錄</span>
+              </button>
+              <button class="scase vendor-gate-management-tab" type="button" data-vendor-gate-management-tab="construction" disabled aria-disabled="true">
+                <span class="r1"><span class="dot them" aria-hidden="true"></span><b>工程管理</b><span class="pct">登入後開啟</span></span>
+                <span class="st">任務、變更、照片與驗收紀錄</span>
+              </button>
+            </div>
+            <div class="foot vendor-sidebar-record">
+              <span>案件留痕原則</span>
+              <p>重要回覆、文件版本與決定，都會連回案件、日期與責任人。</p>
+            </div>
+          </aside>
+
+          <div class="canvas vendor-gate-canvas">
+            <header class="top vendor-gate-top">
+              <div>
+                <span class="wb">執行中工作台</span>
+                <h1 id="vendor-gate-title">乙方工作台 <span class="pill design">身分確認中</span></h1>
+                <p class="meta">設計師／統包・只會載入你實際參與或受邀的案件</p>
+              </div>
+            </header>
+
+            <div class="stats vendor-gate-stats vendor-gate-first-fold" data-vendor-public-first-fold aria-label="登入前工作台決策">
+              <article class="hero vendor-gate-hero">
+                <span class="hl">目前卡點</span>
+                <strong class="ht">尚未確認案件授權</strong>
+                <p>登入後載入你參與的案件；完成身分與案件權限確認前，不會預先顯示案件資料。</p>
+                <dl class="vendor-gate-decision-rail">
+                  <div><dt>下一步</dt><dd>登入並核對你參與或受邀的案件</dd></div>
+                  <div data-vendor-responsibility-signal><dt>下一責任人</dt><dd>目前使用者</dd></div>
+                  <div data-vendor-public-record><dt>會留下的紀錄</dt><dd>案件的重要回覆、文件版本與決定</dd></div>
+                </dl>
+                <div class="vendor-gate-actions">
+                  <a class="vendor-primary-action" data-primary-action data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true">登入並開啟我的案件</a>
+                  <p class="vendor-gate__note">若你是從甲方通知進入，請使用原通知重新確認邀請。</p>
+                </div>
+              </article>
+              <aside class="vendor-gate-brief" aria-label="登入後工作內容">
+                <p class="vendor-gate-brief__eyebrow">登入後顯示</p>
+                <h2>同一案件的決策、文件與施工紀錄</h2>
+                <ul>
+                  <li><span>今日待辦</span><strong>依截止時間與責任人排序</strong></li>
+                  <li data-vendor-public-evidence><span>決策依據</span><strong>圖面、報價、契約與案件留言</strong></li>
+                  <li><span>最新動態</span><strong>回覆、確認、變更與施工紀錄</strong></li>
+                </ul>
+              </aside>
+            </div>
+
+            <div class="cols vendor-gate-columns">
+              <section class="card vendor-gate-closed-surface" aria-labelledby="vendor-gate-closed-title">
+                <div class="hd"><div><h3 id="vendor-gate-closed-title">案件內容尚未開啟</h3><p class="sub">完成登入後，工作台才會顯示你獲授權的內容</p></div></div>
+                <div class="vendor-gate-closed-grid">
+                  <div><span>案件日曆</span><strong>節點、期限與下一責任人</strong></div>
+                  <div><span>設計管理</span><strong>圖面、報價、契約與決策紀錄</strong></div>
+                  <div><span>工程管理</span><strong>任務、變更、照片與驗收紀錄</strong></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
       </section>
       <div id="vendor-authorized-workspace-mount"></div>
     </main>
 
     <template id="vendor-authorized-workspace-template">
       <section class="vendor-workspace" data-vendor-workspace-root aria-label="受邀乙方案件工作台">
+        <section class="vendor-calendar-hero" data-vendor-calendar-hero data-vendor-first-fold data-vendor-calendar-state="loading" aria-labelledby="vendor-google-calendar-title">
+          <div class="vendor-calendar-hero__context" data-vendor-case-status-strip>
+            <div>
+              <p class="vendor-calendar-hero__eyebrow">受邀乙方｜案件執行工作台</p>
+              <h1 id="vendor-google-calendar-title">先看今日責任，再進入案件行程</h1>
+              <p data-calendar-case-context>正在核對目前登入乙方的案件與日曆授權。</p>
+            </div>
+            <div class="vendor-calendar-current-case" aria-label="目前授權案件">
+              <small><span class="vendor-calendar-current-case__signal" aria-hidden="true"></span>目前案件</small>
+              <strong data-vendor-active-case-name>目前授權案件</strong>
+              <span data-vendor-active-case-stage>案件階段依授權紀錄顯示</span>
+            </div>
+          </div>
+
+          <div class="vendor-calendar-hero__decision-grid">
+            <section class="vendor-calendar-today-queue" data-vendor-today-queue aria-labelledby="vendor-calendar-today-title">
+              <header>
+                <p>今日待處理</p>
+                <small>依截止與責任排序</small>
+              </header>
+              <strong id="vendor-calendar-today-title" data-vendor-calendar-today>正在核對行程</strong>
+              <dl>
+                <div><dt>下一確認節點</dt><dd data-vendor-calendar-next-step>依案件紀錄顯示</dd></div>
+                <div data-vendor-responsibility-signal><dt>下一責任人</dt><dd data-vendor-calendar-responsibility>依授權案件顯示</dd></div>
+              </dl>
+              <p class="vendor-calendar-record-note" data-vendor-record-consequence><span aria-hidden="true">✓</span>日曆說明可作為工作依據；正式確認與文件送出才會回到案件紀錄。</p>
+            </section>
+
+            <div class="vendor-calendar-hero__stage">
+              <div class="vendor-calendar-hero__statusbar">
+                <div><span class="vendor-calendar-hero__signal" aria-hidden="true"></span><strong data-vendor-calendar-status>正在核對 Google 日曆連線</strong></div>
+                <p>只顯示目前登入乙方在本案件獲授權的日曆。</p>
+              </div>
+              <nav class="vendor-calendar-commandbar" aria-label="Google 日曆快捷入口">
+                <div class="vendor-calendar-commandbar__actions">
+                  <a class="vendor-calendar-command" data-vendor-calendar-description-link aria-disabled="true" tabindex="-1">本日工作說明<small>顯示於行程卡</small></a>
+                  <a class="vendor-calendar-command" data-vendor-calendar-notification-link aria-disabled="true" tabindex="-1">活動通知<small>由連線帳號管理</small></a>
+                  <a class="vendor-calendar-command vendor-calendar-command--primary" data-vendor-calendar-open-link aria-disabled="true" tabindex="-1">案件日曆<small>已核對連線</small></a>
+                </div>
+                <p data-vendor-calendar-link-status aria-live="polite">日曆連線後，工作說明會顯示在下方行程卡。</p>
+              </nav>
+              <div class="vendor-calendar__empty" data-vendor-calendar-empty>
+                <strong data-vendor-calendar-empty-title>尚無可顯示的乙方案件行程</strong>
+                <p data-vendor-calendar-empty-copy>完成 Google 日曆連線，且本案件授權核對成功後，這裡才會顯示行程；不會載入甲方、平台方或其他乙方帳號。</p>
+                <button class="vendor-calendar-connect" type="button" data-vendor-calendar-connect disabled aria-disabled="true">連結乙方 Google 日曆</button>
+                <p class="vendor-calendar-action-status" data-vendor-calendar-action-status aria-live="polite">點擊後會另開 Google 授權視窗；完成後，本頁會自動載入已核對的日曆。</p>
+              </div>
+              <section class="vendor-calendar-live-events" data-vendor-calendar-live-events id="vendor-calendar-live-events" aria-labelledby="vendor-calendar-live-events-title" hidden>
+                <header>
+                  <div><small>台北時間｜唯讀同步</small><strong id="vendor-calendar-live-events-title">目前案件行程</strong></div>
+                  <span>僅顯示目前登入乙方獲授權的案件</span>
+                </header>
+                <p class="vendor-calendar-live-events__empty" data-vendor-calendar-events-empty hidden>未來 7 天暫無案件行程；有新排程時會在這裡顯示。</p>
+                <ol class="vendor-calendar-events" data-vendor-calendar-events aria-live="polite"></ol>
+              </section>
+            </div>
+
+            <aside class="vendor-calendar-evidence" data-vendor-evidence-basis aria-labelledby="vendor-calendar-evidence-title">
+              <header><p>決策依據</p><strong id="vendor-calendar-evidence-title">案件文件與行程</strong></header>
+              <p>本區先以目前授權案件的日曆為依據；圖面、報價與文件版本請到下方管理區核對。</p>
+              <dl>
+                <div><dt>未來 7 天</dt><dd data-vendor-calendar-seven-days>連線後顯示</dd></div>
+                <div><dt>案件紀錄</dt><dd>正式確認後連回原始依據</dd></div>
+              </dl>
+              <small>目前卡點會顯示在中央日曆狀態；未通過授權核對時不載入內容。</small>
+            </aside>
+          </div>
+        </section>
+
+        <section class="vendor-document-import vendor-document-storage" data-vendor-document-import data-vendor-document-storage data-expanded="false" aria-labelledby="vendor-document-import-title">
+          <header class="vendor-document-toolbar">
+            <div class="vendor-document-toolbar__identity">
+              <p class="vendor-calendar-hero__eyebrow">共用工具</p>
+              <h2 id="vendor-document-import-title">案件文件</h2>
+              <span>先分類與核對版本，正式送出後才會建立案件紀錄。</span>
+            </div>
+            <dl class="vendor-document-toolbar__status" aria-label="案件文件狀態">
+              <div><dt>待分類</dt><dd data-vendor-document-count>尚未加入文件</dd></div>
+              <div><dt>最近版本</dt><dd data-vendor-document-recent-version>案件資料核對後顯示</dd></div>
+            </dl>
+            <div class="vendor-document-toolbar__actions">
+              <button type="button" data-vendor-document-toggle aria-expanded="false" aria-controls="vendor-document-storage-panel">展開文件工具</button>
+              <button type="button" data-vendor-document-add>加入案件文件</button>
+            </div>
+          </header>
+          <div class="vendor-document-storage__panel" id="vendor-document-storage-panel" hidden>
+            <div class="vendor-document-import__channels">
+              <div class="vendor-document-dropzone" data-vendor-document-dropzone role="button" tabindex="0" aria-controls="vendor-document-picker" aria-describedby="vendor-document-import-boundary">
+                <span class="vendor-document-dropzone__icon" aria-hidden="true">＋</span>
+                <div><strong>把案件文件拖曳到這裡</strong><p>也可以從電腦或手機選擇；檔案只會先加入待分類清單。</p></div>
+                <label class="vendor-document-picker" for="vendor-document-picker">選擇案件文件</label>
+                <input id="vendor-document-picker" type="file" data-vendor-document-picker multiple />
+              </div>
+            </div>
+            <div class="vendor-document-import__queue">
+              <div class="vendor-document-import__queue-heading"><div><span>待分類清單</span><strong>確認文件類型與版本關係</strong></div><p id="vendor-document-import-boundary">檔案只會暫留在目前頁面；正式送出前不會建立案件紀錄。</p></div>
+              <p class="vendor-document-import__empty" data-vendor-document-empty>選擇或拖入文件後，會在這裡顯示檔名、大小、來源與待確認項目。</p>
+              <ol class="vendor-document-import__list" data-vendor-document-queue aria-live="polite"></ol>
+              <div class="vendor-document-import__footer">
+                <p data-vendor-document-import-status aria-live="polite">可先整理文件，送出功能正式開放後再建立案件留痕。</p>
+                <button type="button" data-vendor-document-upload data-write-action disabled aria-disabled="true">文件上傳正在整理中</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <div class="app vendor-workspace-shell">
           <aside class="side vendor-case-sidebar" aria-label="執行中案件">
             <div class="lg">La<em>i</em>BE</div>
@@ -53,11 +219,11 @@
             <div class="vendor-workspace-tabs" role="tablist" aria-label="乙方案件管理區">
               <button class="scase on" id="vendor-workspace-tab-design" type="button" role="tab" data-vendor-workspace-tab="design" aria-selected="true" aria-controls="vendor-workspace-panel-design" tabindex="0">
                 <span class="r1"><span class="dot you" aria-hidden="true"></span><b>設計管理</b><span class="pct">35%</span></span>
-                <span class="st"><strong>青埔 A7 新建案</strong>・甲方等你回覆平面 v2</span>
+                <span class="st"><strong>目前授權案件</strong>・需求、圖面、版本與決策</span>
               </button>
               <button class="scase" id="vendor-workspace-tab-construction" type="button" role="tab" data-vendor-workspace-tab="construction" aria-selected="false" aria-controls="vendor-workspace-panel-construction" tabindex="-1">
                 <span class="r1"><span class="dot you" aria-hidden="true"></span><b>工程管理</b><span class="pct">52%</span></span>
-                <span class="st"><strong>林宅老屋翻新</strong>・今日日誌待乙方補齊</span>
+                <span class="st"><strong>目前授權案件</strong>・任務、照片、變更與驗收</span>
               </button>
             </div>
             <div class="foot vendor-sidebar-record">
@@ -83,98 +249,76 @@
                   <header class="top vendor-case-header">
                     <div>
                       <span class="wb">執行中工作台・2026/07/11（六）</span>
-                      <h1 id="vendor-workspace-title">青埔 A7 新建案 <span class="pill design">設計階段</span></h1>
-                      <div class="meta">室內設計＋裝修統包・桃園中壢・下一里程碑：平面定案</div>
+                      <h1 id="vendor-workspace-title">目前授權案件 <span class="pill design">設計管理</span></h1>
+                      <div class="meta">需求、圖面、版本與決策依據・下一里程碑：平面定案</div>
                     </div>
                     <div class="rt">
                       <div class="prog vendor-progress" aria-label="設計進度 35%"><span>設計進度</span><div class="bar"><i style="width: 35%"></i></div><b>35%</b><span class="vs">進度正常</span></div>
                     </div>
                   </header>
 
-                  <div class="stats vendor-today-grid" aria-label="青埔案今日重點">
-                    <article class="hero vendor-key-action"><span class="hl">下一個關鍵動作</span><strong class="ht">回覆甲方「平面 v2」提問</strong><p>中島與冰箱間距是否可到 90cm・剩 1 天</p><div class="hb"><em>責任人：乙方設計團隊</em><button class="hbtn" type="button" data-write-action disabled aria-disabled="true">完成連線後立即回覆</button></div></article>
-                    <article class="stat warn vendor-stat"><span class="sl">今日待辦</span><strong class="sv">2 <small class="u">項</small></strong><p class="sd">平面回覆、立面圖送審</p></article>
-                    <article class="stat vendor-stat"><span class="sl">等甲方回覆</span><strong class="sv">1 <small class="u">項</small></strong><p class="sd">平面配置提案 v2</p></article>
-                    <article class="stat vendor-stat"><span class="sl">下一確認節點</span><strong class="sv">07/22</strong><p class="sd">平面定案目標</p></article>
-                  </div>
-
                   <header class="vendor-panel-heading">
                     <div><p class="eyebrow">設計管理</p><h2>需求、圖面、版本與待確認</h2></div>
                     <p>提案送出不等於甲方已確認；每一輪修改都要對回需求、圖面版次、甲方意見與下一責任人。</p>
                   </header>
-                  <dl class="vendor-panel-facts" aria-label="青埔設計管理目前責任">
+                  <dl class="vendor-panel-facts" aria-label="目前授權案件設計管理目前責任">
                     <div><dt>目前狀態</dt><dd>平面配置提案 v2・甲方審核中</dd></div>
                     <div><dt>下一步</dt><dd>回覆中島與冰箱 90cm 間距</dd></div>
                     <div><dt>責任人</dt><dd>乙方設計團隊・剩 1 天</dd></div>
                     <div><dt>最近紀錄</dt><dd>06/24 14:07・平面 v2 已送審</dd></div>
                   </dl>
 
-                  <section class="card vendor-calendar-card" aria-labelledby="design-calendar-title">
-                    <div class="hd vendor-card-heading"><div><h3 id="design-calendar-title">案件日曆・共同留痕・2026 年 7 月</h3><p class="sub">甲乙與 PCM 看同一份案件節點；選日期可查看依據與下一責任人。</p></div><span class="vendor-calendar-sync">乙方 Google 日曆尚未連結</span></div>
-                    <div class="calwrap"><div class="cgrid vendor-calendar-grid" role="grid" aria-label="青埔設計案 2026 年 7 月案件日曆">
-                      <span class="wd">日</span><span class="wd">一</span><span class="wd">二</span><span class="wd">三</span><span class="wd">四</span><span class="wd">五</span><span class="wd">六</span>
-                      <button type="button" class="day off2" aria-label="7月6日，無待辦"><span class="dn">6</span></button>
-                      <button type="button" class="day" aria-label="7月7日，無待辦"><span class="dn">7</span></button>
-                      <button type="button" class="day" aria-label="7月8日，無待辦"><span class="dn">8</span></button>
-                      <button type="button" class="day" aria-label="7月9日，無待辦"><span class="dn">9</span></button>
-                      <button type="button" class="day" aria-label="7月10日，無待辦"><span class="dn">10</span></button>
-                      <button type="button" class="day today" aria-label="7月11日，今天"><span class="dn">11</span><small class="tdb">今天</small></button>
-                      <button type="button" class="day missd" data-vendor-calendar-day="design-12" data-vendor-calendar-detail="回覆甲方平面 v2 提問截止｜責任人：乙方設計團隊｜依據：平面配置提案 v2" aria-label="7月12日，回覆甲方平面 v2 提問截止"><span class="dn">12</span><span class="mk"><i class="due">回覆截止</i></span></button>
-                      <button type="button" class="day" aria-label="7月13日，無待辦"><span class="dn">13</span></button>
-                      <button type="button" class="day" aria-label="7月14日，無待辦"><span class="dn">14</span></button>
-                      <button type="button" class="day" data-vendor-calendar-day="design-15" data-vendor-calendar-detail="材質初選線上會議 14:00｜參與者：甲方、乙方、PCM｜會議結論將連回案件紀錄" aria-label="7月15日，材質初選線上會議"><span class="dn">15</span><span class="mk"><i class="meet">材質會議</i></span></button>
-                      <button type="button" class="day missd" data-vendor-calendar-day="design-16" data-vendor-calendar-detail="立面圖與材質表送審截止｜責任人：乙方設計團隊｜依據：契約交付項" aria-label="7月16日，立面圖與材質表送審截止"><span class="dn">16</span><span class="mk"><i class="due">送審截止</i></span></button>
-                      <button type="button" class="day" aria-label="7月17日，無待辦"><span class="dn">17</span></button>
-                      <button type="button" class="day" aria-label="7月18日，無待辦"><span class="dn">18</span></button>
-                      <button type="button" class="day" aria-label="7月19日，無待辦"><span class="dn">19</span></button>
-                    </div></div>
-                    <p class="vendor-calendar-detail" data-vendor-calendar-detail-output>選擇有標記的日期，查看事件依據與下一責任人。</p>
-                    <p class="vendor-record-note">案件日誌送出後只能補充更正，原版本與時間會保留；Google 日曆只承接摘要與返回連結。</p>
-                  </section>
+                  <div class="vendor-work-subtabs" role="tablist" aria-label="設計管理次分類" data-vendor-work-subtabs="design">
+                    <button id="vendor-design-subtab-today" type="button" role="tab" data-vendor-work-scope="design" data-vendor-work-subtab="today" aria-selected="true" aria-controls="vendor-design-subpanel-today" tabindex="0"><span>今日待辦</span><small>2</small></button>
+                    <button id="vendor-design-subtab-drawings" type="button" role="tab" data-vendor-work-scope="design" data-vendor-work-subtab="drawings" aria-selected="false" aria-controls="vendor-design-subpanel-drawings" tabindex="-1"><span>圖面與版本</span><small>v2 審核中</small></button>
+                    <button id="vendor-design-subtab-contract" type="button" role="tab" data-vendor-work-scope="design" data-vendor-work-subtab="contract" aria-selected="false" aria-controls="vendor-design-subpanel-contract" tabindex="-1"><span>契約與回覆</span><small>待補件</small></button>
+                    <button id="vendor-design-subtab-records" type="button" role="tab" data-vendor-work-scope="design" data-vendor-work-subtab="records" aria-selected="false" aria-controls="vendor-design-subpanel-records" tabindex="-1"><span>決策留痕</span><small>最近 06/24</small></button>
+                  </div>
 
-                  <section class="card vendor-todo-card" aria-labelledby="design-todo-title">
-                    <div class="hd vendor-card-heading"><div><h3 id="design-todo-title">今日待辦</h3><p class="sub">先處理會阻塞甲方決定的設計事項。</p></div><span>2 項待乙方</span></div>
-                    <ol class="vendor-task-list">
-                      <li><span class="vendor-case-chip vendor-case-chip--design">青埔</span><div><strong>回覆甲方平面 v2 提問</strong><small>依據：平面配置提案 v2・07/12 截止</small></div><em>剩 1 天</em></li>
-                      <li><span class="vendor-case-chip vendor-case-chip--design">青埔</span><div><strong>立面圖＋材質表送審</strong><small>契約交付項・送出後等待 PCM 與甲方確認</small></div><em>剩 5 天</em></li>
-                    </ol>
-                  </section>
-
-                  <section class="card vendor-contract-hub" aria-labelledby="vendor-contract-hub-title">
-                    <div class="vendor-section-heading" id="documents"><div><p class="eyebrow">契約管理</p><h3 id="vendor-contract-hub-title">條件、附件、回覆與正式版本</h3></div><span>唯讀與待回覆狀態分開</span></div>
-                    <p class="vendor-section-intro">乙方回覆不等於甲方同意；只有雙方明確確認並建立新版本，才成為後續設計與工程依據。</p>
-                    <div class="vendor-contract-view-tabs" role="tablist" aria-label="契約管理子分類">
-                      <button id="vendor-contract-view-tab-overview" type="button" role="tab" data-vendor-contract-view="overview" aria-selected="true" aria-controls="vendor-contract-view-panel-overview" tabindex="0">契約總覽</button>
-                      <button id="vendor-contract-view-tab-reply" type="button" role="tab" data-vendor-contract-view="reply" aria-selected="false" aria-controls="vendor-contract-view-panel-reply" tabindex="-1">待我回覆</button>
-                      <button id="vendor-contract-view-tab-decision" type="button" role="tab" data-vendor-contract-view="decision" aria-selected="false" aria-controls="vendor-contract-view-panel-decision" tabindex="-1">變更與決定</button>
-                      <button id="vendor-contract-view-tab-records" type="button" role="tab" data-vendor-contract-view="records" aria-selected="false" aria-controls="vendor-contract-view-panel-records" tabindex="-1">版本與紀錄</button>
+                  <section id="vendor-design-subpanel-today" role="tabpanel" data-vendor-work-scope="design" data-vendor-work-subpanel="today" aria-labelledby="vendor-design-subtab-today">
+                    <div class="stats vendor-today-grid" aria-label="目前授權案件設計管理今日重點">
+                      <article class="hero vendor-key-action"><span class="hl">下一個關鍵動作</span><strong class="ht">回覆甲方「平面 v2」提問</strong><p>中島與冰箱間距是否可到 90cm・剩 1 天</p><div class="hb"><em>責任人：乙方設計團隊</em><button class="hbtn" type="button" data-write-action disabled aria-disabled="true">完成連線後立即回覆</button></div></article>
+                      <article class="stat warn vendor-stat"><span class="sl">今日待辦</span><strong class="sv">2 <small class="u">項</small></strong><p class="sd">平面回覆、立面圖送審</p></article>
+                      <article class="stat vendor-stat"><span class="sl">等甲方回覆</span><strong class="sv">1 <small class="u">項</small></strong><p class="sd">平面配置提案 v2</p></article>
+                      <article class="stat vendor-stat"><span class="sl">下一確認節點</span><strong class="sv">07/22</strong><p class="sd">平面定案目標</p></article>
                     </div>
-                    <section id="vendor-contract-view-panel-overview" role="tabpanel" data-vendor-contract-view-panel="overview" aria-labelledby="vendor-contract-view-tab-overview">
-                      <article class="vendor-contract-preview"><div><p class="eyebrow">契約範本預覽</p><h3>建築物室內裝修設計及工程承攬契約</h3></div><p>這是唯讀範本，不是本案已成立契約，也不代表任何條件已由雙方確認。</p><a href="../../../../site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&amp;returnTo=vendor">查看契約範本全文</a></article>
-                      <ol class="vendor-ledger">
-                        <li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>尚未提供本案有效版本</strong><small>版本提出者、時間、確認狀態與下一步</small><em>待資料</em></li>
-                        <li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版次、提送者與雙方確認關係</small><em>待資料</em></li>
-                      </ol>
+                    <section class="card vendor-calendar-node-summary" data-vendor-calendar-node-summary aria-labelledby="design-calendar-node-title">
+                      <div><p class="eyebrow">下一節點摘要</p><h3 id="design-calendar-node-title">07/12 回覆平面 v2 提問</h3><p>依據：平面配置提案 v2・責任人：乙方設計團隊・目前狀態：剩 1 天</p></div>
+                      <a href="#vendor-google-calendar-title">回到上方案件日曆</a>
                     </section>
-                    <section id="vendor-contract-view-panel-reply" role="tabpanel" data-vendor-contract-view-panel="reply" aria-labelledby="vendor-contract-view-tab-reply" hidden>
+                    <section class="card vendor-todo-card" aria-labelledby="design-todo-title">
+                      <div class="hd vendor-card-heading"><div><h3 id="design-todo-title">今日待辦</h3><p class="sub">先處理會阻塞甲方決定的設計事項。</p></div><span>2 項待乙方</span></div>
+                      <ol class="vendor-task-list"><li><span class="vendor-case-chip vendor-case-chip--design">本案</span><div><strong>回覆甲方平面 v2 提問</strong><small>依據：平面配置提案 v2・07/12 截止</small></div><em>剩 1 天</em></li><li><span class="vendor-case-chip vendor-case-chip--design">本案</span><div><strong>立面圖＋材質表送審</strong><small>契約交付項・送出後等待 PCM 與甲方確認</small></div><em>剩 5 天</em></li></ol>
+                    </section>
+                  </section>
+
+                  <section id="vendor-design-subpanel-drawings" role="tabpanel" data-vendor-work-scope="design" data-vendor-work-subpanel="drawings" aria-labelledby="vendor-design-subtab-drawings" hidden>
+                    <section class="card vendor-version-board" id="documents" aria-labelledby="vendor-design-version-title">
+                      <div class="vendor-section-heading"><div><p class="eyebrow">圖面與版本</p><h3 id="vendor-design-version-title">先確認目前有效圖面，再回覆甲方</h3></div><span>平面 v2・甲方審核中</span></div>
+                      <ol class="vendor-ledger"><li><span>目前版本</span><strong>平面配置提案 v2</strong><small>乙方 06/24 14:07 提出・PCM 檢核完成・等待甲方回覆</small><em>審核中</em></li><li><span>待送審</span><strong>立面圖與材質表</strong><small>依據：契約交付項・責任人：乙方設計團隊・07/16 前</small><em>待乙方</em></li></ol>
+                      <details class="vendor-history-group" data-vendor-history-group="document-versions"><summary><span>06/10・平面配置提案 v1</span><strong>已被 v2 取代</strong><small>責任人：乙方設計團隊・1 個過去版本</small></summary><p>過去版本只供追溯，不作為目前施工與回覆依據。</p></details>
+                    </section>
+                  </section>
+
+                  <section id="vendor-design-subpanel-contract" role="tabpanel" data-vendor-work-scope="design" data-vendor-work-subpanel="contract" aria-labelledby="vendor-design-subtab-contract" hidden>
+                    <section class="card vendor-contract-hub" aria-labelledby="vendor-contract-hub-title">
+                      <div class="vendor-section-heading"><div><p class="eyebrow">契約與回覆</p><h3 id="vendor-contract-hub-title">契約管理：條件、附件與待回覆事項</h3></div><span>尚未送出／尚未保存</span></div>
+                      <p class="vendor-section-intro">乙方回覆不等於甲方同意；只有雙方明確確認並建立新版本，才成為後續設計與工程依據。</p>
+                      <article class="vendor-contract-preview"><div><p class="eyebrow">契約範本預覽</p><h3>建築物室內裝修設計及工程承攬契約</h3></div><p>這是唯讀範本，不是本案已成立契約，也不代表任何條件已由雙方確認。</p><a href="../../../../site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&amp;returnTo=vendor">查看契約範本全文</a></article>
+                      <ol class="vendor-ledger"><li data-resource-code="CONTRACT_DRAFT_VERSIONS"><span>契約版本</span><strong>尚未提供本案有效版本</strong><small>版本提出者、時間、確認狀態與下一步</small><em>待資料</em><button class="vendor-document-share" type="button" data-vendor-document-share="CONTRACT_DRAFT_VERSIONS" aria-label="分享契約版本"><span aria-hidden="true">↗</span>分享</button></li><li data-resource-code="ATTACHMENTS"><span>契約附件</span><strong>尚無可顯示的附件</strong><small>附件版次、提送者與雙方確認關係</small><em>待資料</em><button class="vendor-document-share" type="button" data-vendor-document-share="ATTACHMENTS" aria-label="分享契約附件"><span aria-hidden="true">↗</span>分享</button></li></ol>
                       <div class="vendor-section-heading"><div><p class="eyebrow">待我回覆</p><h3>補件或說明可能影響</h3></div><span>尚未送出／尚未保存</span></div>
                       <p class="vendor-boundary">本頁目前沒有正式保存能力。離開頁面後不保留內容，也不會建立案件紀錄。</p>
                       <label class="vendor-disabled-field" for="vendor-contract-description"><span>回覆內容</span><textarea id="vendor-contract-description" rows="4" data-write-action disabled aria-disabled="true" placeholder="正式開放後可整理原因、依據版本與希望甲方確認的事項"></textarea></label>
                       <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能送出回覆</button>
-                    </section>
-                    <section id="vendor-contract-view-panel-decision" role="tabpanel" data-vendor-contract-view-panel="decision" aria-labelledby="vendor-contract-view-tab-decision" hidden>
-                      <div class="vendor-section-heading"><div><p class="eyebrow">變更與決定</p><h3>確認現在輪到誰處理</h3></div><span>依案件紀錄顯示</span></div>
                       <dl class="vendor-decision-grid"><div><dt>乙方回覆</dt><dd>尚無正式回覆紀錄</dd></div><div><dt>甲方決定</dt><dd>尚無決定紀錄</dd></div><div><dt>雙方確認</dt><dd>尚無確認紀錄</dd></div><div><dt>新版本</dt><dd>尚未建立</dd></div></dl>
                       <p class="vendor-boundary">甲方決定不等於契約已變更。雙方確認與新版本必須各自留下時間、依據、狀態與責任人。</p>
                     </section>
-                    <section id="vendor-contract-view-panel-records" role="tabpanel" data-vendor-contract-view-panel="records" aria-labelledby="vendor-contract-view-tab-records" hidden>
-                      <div class="vendor-section-heading"><div><p class="eyebrow">版本與紀錄</p><h3>只顯示已留下的案件事實</h3></div><span>依案件時間排序</span></div>
-                      <ol class="vendor-ledger">
-                        <li id="reviews" data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開審查</span><strong>萊比公開審查意見（PCM）</strong><small>意見必須對甲乙雙方公開並連回文件版本</small><em>待資料</em></li>
-                        <li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>立面圖、材質表尚待乙方送審</strong><small>提出者：PCM・07/16 前回覆・目前責任人：乙方</small><em>待乙方</em></li>
-                        <li data-resource-code="ADDENDA"><span>附約</span><strong>尚無附約版本</strong><small>另建可追溯版本，不改寫原契約</small><em>無</em></li>
-                        <li id="records" data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>06/24 平面配置提案 v2 已送審</strong><small>乙方提出・PCM 檢核完成・等待甲方回覆</small><em>可追溯</em></li>
-                      </ol>
+                  </section>
+
+                  <section id="vendor-design-subpanel-records" role="tabpanel" data-vendor-work-scope="design" data-vendor-work-subpanel="records" aria-labelledby="vendor-design-subtab-records" hidden>
+                    <section class="card vendor-record-board" id="reviews" aria-labelledby="vendor-design-record-title">
+                      <div class="vendor-section-heading"><div><p class="eyebrow">決策留痕</p><h3 id="vendor-design-record-title">只顯示已留下的案件事實</h3></div><span>依案件時間排序</span></div>
+                      <details class="vendor-history-group" id="records" data-vendor-history-group="past-decisions"><summary><span>06/24・平面配置提案 v2 已送審</span><strong>等待甲方回覆</strong><small>責任人：乙方設計團隊・4 類案件紀錄</small></summary><ol class="vendor-ledger"><li data-resource-code="PUBLIC_PCM_REVIEWS"><span>公開審查</span><strong>萊比公開審查意見（PCM）</strong><small>意見必須對甲乙雙方公開並連回文件版本</small><em>待資料</em><button class="vendor-document-share" type="button" data-vendor-document-share="PUBLIC_PCM_REVIEWS" aria-label="分享公開審查"><span aria-hidden="true">↗</span>分享</button></li><li data-resource-code="SUPPLEMENTS"><span>補件</span><strong>立面圖、材質表尚待乙方送審</strong><small>提出者：PCM・07/16 前回覆・目前責任人：乙方</small><em>待乙方</em><button class="vendor-document-share" type="button" data-vendor-document-share="SUPPLEMENTS" aria-label="分享補件"><span aria-hidden="true">↗</span>分享</button></li><li data-resource-code="ADDENDA"><span>附約</span><strong>尚無附約版本</strong><small>另建可追溯版本，不改寫原契約</small><em>無</em><button class="vendor-document-share" type="button" data-vendor-document-share="ADDENDA" aria-label="分享附約"><span aria-hidden="true">↗</span>分享</button></li><li data-resource-code="CASE_RECORDS"><span>案件紀錄</span><strong>06/24 平面配置提案 v2 已送審</strong><small>乙方提出・PCM 檢核完成・等待甲方回覆</small><em>可追溯</em><button class="vendor-document-share" type="button" data-vendor-document-share="CASE_RECORDS" aria-label="分享案件紀錄"><span aria-hidden="true">↗</span>分享</button></li></ol></details>
                     </section>
                   </section>
                 </section>
@@ -183,112 +327,74 @@
                   <header class="top vendor-case-header" id="execution">
                     <div>
                       <span class="wb">執行中工作台・2026/07/11（六）</span>
-                      <h1>林宅老屋翻新 <span class="pill build">施工階段</span></h1>
-                      <div class="meta">全室翻修・台北大安・下一里程碑：第 2 期泥作完成送驗</div>
+                      <h1>目前授權案件 <span class="pill build">工程管理</span></h1>
+                      <div class="meta">任務、照片、變更與驗收紀錄・下一里程碑：第 2 期泥作完成送驗</div>
                     </div>
                     <div class="rt"><div class="prog vendor-progress" aria-label="工程進度 52%"><span>工程進度</span><div class="bar"><i style="width: 52%"></i></div><b>52%</b><span class="vs">進度正常</span></div></div>
                   </header>
-
-                  <div class="stats vendor-today-grid" aria-label="林宅案今日重點">
-                    <article class="hero vendor-key-action"><span class="hl">下一個關鍵動作</span><strong class="ht">寫今日施工日誌</strong><p>收工前補齊今日工項、人數、照片與異常說明</p><div class="hb"><em>責任人：乙方工務</em><button class="hbtn" type="button" data-write-action disabled aria-disabled="true">正式開放後寫日誌</button></div></article>
-                    <article class="stat warn vendor-stat"><span class="sl">今日待辦</span><strong class="sv">1 <small class="u">項</small></strong><p class="sd">施工日誌待補</p></article>
-                    <article class="stat vendor-stat"><span class="sl">待補證據</span><strong class="sv">3 <small class="u">張</small></strong><p class="sd">泥作全景與試水紀錄</p></article>
-                    <article class="stat vendor-stat"><span class="sl">下一驗收節點</span><strong class="sv">07/20</strong><p class="sd">第 2 期泥作送驗</p></article>
-                  </div>
 
                   <header class="vendor-panel-heading">
                     <div><p class="eyebrow">工程管理</p><h2>施工任務、進度、照片、變更與驗收</h2></div>
                     <p>現場照片不能只是相簿；每張照片、每項變更與每個缺失都要連回工項、位置、日期、有效文件與責任人。</p>
                   </header>
-                  <dl class="vendor-panel-facts" aria-label="林宅工程管理目前責任">
+                  <dl class="vendor-panel-facts" aria-label="目前授權案件工程管理目前責任">
                     <div><dt>目前狀態</dt><dd>第 2 期泥作進行中・工程 52%</dd></div>
                     <div><dt>下一步</dt><dd>收工前完成 07/11 施工日誌</dd></div>
                     <div><dt>責任人</dt><dd>乙方工務・今日完成</dd></div>
                     <div><dt>最近紀錄</dt><dd>07/09 19:12・泥作材料 v2 甲方確認</dd></div>
                   </dl>
 
-                  <section class="card vendor-calendar-card" aria-labelledby="construction-calendar-title">
-                    <div class="hd vendor-card-heading"><div><h3 id="construction-calendar-title">案件日曆・共同留痕・2026 年 7 月</h3><p class="sub">用同一份日期軸對齊工序、日誌、照片、變更與送驗節點。</p></div><span class="vendor-calendar-sync">乙方 Google 日曆尚未連結</span></div>
-                    <div class="calwrap"><div class="cgrid vendor-calendar-grid" role="grid" aria-label="林宅工程案 2026 年 7 月案件日曆">
-                      <span class="wd">日</span><span class="wd">一</span><span class="wd">二</span><span class="wd">三</span><span class="wd">四</span><span class="wd">五</span><span class="wd">六</span>
-                      <button type="button" class="day haslog" data-vendor-calendar-day="construction-6" data-vendor-calendar-detail="泥作施工日誌已留下紀錄｜6 人｜含現場照片 4 張" aria-label="7月6日，泥作日誌已留下紀錄"><span class="dn">6</span><span class="mk"><i class="log">泥作・日誌</i></span></button>
-                      <button type="button" class="day haslog" aria-label="7月7日，泥作日誌已留下紀錄"><span class="dn">7</span><span class="mk"><i class="log">泥作・日誌</i></span></button>
-                      <button type="button" class="day haslog" aria-label="7月8日，泥作日誌已留下紀錄"><span class="dn">8</span><span class="mk"><i class="log">泥作・日誌</i></span></button>
-                      <button type="button" class="day haslog" data-vendor-calendar-day="construction-9" data-vendor-calendar-detail="泥作材料 v2 已由甲方確認｜07/09 19:12｜後續依此版本進料" aria-label="7月9日，泥作材料 v2 已確認"><span class="dn">9</span><span class="mk"><i class="sub">材料確認</i></span></button>
-                      <button type="button" class="day haslog" aria-label="7月10日，防水照片已上傳"><span class="dn">10</span><span class="mk"><i class="log">照片 4 張</i></span></button>
-                      <button type="button" class="day today missd" data-vendor-calendar-day="construction-11" data-vendor-calendar-detail="今日日誌尚未上傳｜責任人：乙方工務｜收工前補齊工項、人數、照片與異常" aria-label="7月11日，今天，施工日誌待補"><span class="dn">11</span><small class="tdb">今天</small><span class="mk"><i class="missb">日誌待補</i></span></button>
-                      <button type="button" class="day" aria-label="7月12日，泥作養護"><span class="dn">12</span><span class="mk"><i>泥作養護</i></span></button>
-                      <button type="button" class="day" aria-label="7月13日，泥作施工"><span class="dn">13</span><span class="mk"><i>泥作</i></span></button>
-                      <button type="button" class="day" aria-label="7月14日，泥作施工"><span class="dn">14</span><span class="mk"><i>泥作</i></span></button>
-                      <button type="button" class="day" aria-label="7月15日，泥作施工"><span class="dn">15</span><span class="mk"><i>泥作</i></span></button>
-                      <button type="button" class="day" aria-label="7月16日，送驗照片整理"><span class="dn">16</span><span class="mk"><i class="plan">照片整理</i></span></button>
-                      <button type="button" class="day" aria-label="7月17日，送驗前檢查"><span class="dn">17</span><span class="mk"><i class="plan">送驗前檢查</i></span></button>
-                      <button type="button" class="day" aria-label="7月18日，無待辦"><span class="dn">18</span></button>
-                      <button type="button" class="day" aria-label="7月19日，送驗準備"><span class="dn">19</span><span class="mk"><i class="plan">送驗準備</i></span></button>
-                    </div></div>
-                    <p class="vendor-calendar-detail" data-vendor-calendar-detail-output>選擇有標記的日期，查看工項、照片、文件依據與下一責任人。</p>
-                    <p class="vendor-record-note">照片要連回日期、位置與任務；日誌更正時保留原版本，避免現場事實被覆寫。</p>
-                  </section>
-
-                  <section class="card vendor-todo-card" aria-labelledby="construction-todo-title">
-                    <div class="hd vendor-card-heading"><div><h3 id="construction-todo-title">今日待辦</h3><p class="sub">先完成會影響送驗與責任釐清的現場紀錄。</p></div><span>1 項待乙方</span></div>
-                    <ol class="vendor-task-list"><li><span class="vendor-case-chip vendor-case-chip--construction">林宅</span><div><strong>今日施工日誌未寫</strong><small>工項、人數、照片、異常與依據文件需在收工前留痕</small></div><em>今日</em></li></ol>
-                  </section>
-
-                  <section class="card vendor-construction-board" aria-labelledby="construction-board-title">
-                    <div class="vendor-section-heading"><div><p class="eyebrow">施工留痕</p><h3 id="construction-board-title">任務、照片、變更與驗收</h3></div><span>第 2 期泥作進行中</span></div>
-                    <div class="vendor-progress-board" aria-label="工程管理工作摘要">
-                      <article><span>目前工序</span><strong>泥作與浴室防水</strong><p>第 2 期預計 07/20 送驗。</p></article>
-                      <article><span>待補照片</span><strong>3 張</strong><p>泥作完成面 2 張、浴室試水紀錄 1 張。</p></article>
-                      <article><span>待驗收事項</span><strong>送驗前檢查</strong><p>需對照材料 v2 與現場完成面。</p></article>
-                    </div>
-                    <ol class="vendor-ledger">
-                      <li data-resource-code="SCHEDULES"><span>施工任務</span><strong>第 2 期泥作完成・07/20 送驗</strong><small>責任人：乙方工務・依據：施工計畫 v1</small><em>進行中</em></li>
-                      <li data-resource-code="EVIDENCE"><span>施工照片</span><strong>07/09 浴室防水施作照片 4 張</strong><small>提交者：乙方・已連回浴室防水任務</small><em>已留痕</em></li>
-                      <li data-resource-code="CHANGES"><span>追加減項</span><strong>尚無待確認的追加減項</strong><small>如有變更，須記錄原因、影響、雙方狀態與下一責任人</small><em>無</em></li>
-                      <li data-resource-code="ACCEPTANCE"><span>驗收</span><strong>第 2 期送驗前資料整理中</strong><small>完成面全景 2 張、浴室試水紀錄 1 張待補</small><em>待乙方</em></li>
-                    </ol>
-                    <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能新增施工紀錄</button>
-                  </section>
-                </section>
-
-                <section class="card vendor-calendar-card vendor-calendar-connection" aria-labelledby="vendor-google-calendar-title">
-                  <div class="hd vendor-card-heading">
-                    <div>
-                      <h3 id="vendor-google-calendar-title">乙方 Google 日曆</h3>
-                      <p class="sub" data-calendar-case-context>目前案件：青埔 A7 新建案・只會載入目前登入乙方在本案件授權使用的日曆。</p>
-                    </div>
-                    <span data-vendor-calendar-status>尚未連結乙方 Google 日曆</span>
+                  <div class="vendor-work-subtabs" role="tablist" aria-label="工程管理次分類" data-vendor-work-subtabs="construction">
+                    <button id="vendor-construction-subtab-today" type="button" role="tab" data-vendor-work-scope="construction" data-vendor-work-subtab="today" aria-selected="true" aria-controls="vendor-construction-subpanel-today" tabindex="0"><span>今日任務</span><small>1</small></button>
+                    <button id="vendor-construction-subtab-changes" type="button" role="tab" data-vendor-work-scope="construction" data-vendor-work-subtab="changes" aria-selected="false" aria-controls="vendor-construction-subpanel-changes" tabindex="-1"><span>變更與驗收</span><small>待補 3 張</small></button>
+                    <button id="vendor-construction-subtab-files" type="button" role="tab" data-vendor-work-scope="construction" data-vendor-work-subtab="files" aria-selected="false" aria-controls="vendor-construction-subpanel-files" tabindex="-1"><span>施工文件與照片</span><small>4 張已留痕</small></button>
+                    <button id="vendor-construction-subtab-records" type="button" role="tab" data-vendor-work-scope="construction" data-vendor-work-subtab="records" aria-selected="false" aria-controls="vendor-construction-subpanel-records" tabindex="-1"><span>案件留痕</span><small>最近 07/09</small></button>
                   </div>
-                  <div class="vendor-calendar__empty" data-vendor-calendar-empty><strong>尚無可顯示的乙方案件行程</strong><p>乙方完成 Google 日曆連線，且本案件授權核對成功後，才會在這裡顯示行程；不會使用平台方、甲方或其他乙方帳號。</p></div>
-                  <iframe class="google-calendar-frame" data-vendor-calendar-frame title="目前乙方的案件 Google 日曆" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" hidden></iframe>
+
+                  <section id="vendor-construction-subpanel-today" role="tabpanel" data-vendor-work-scope="construction" data-vendor-work-subpanel="today" aria-labelledby="vendor-construction-subtab-today">
+                    <div class="stats vendor-today-grid" aria-label="目前授權案件工程管理今日重點">
+                      <article class="hero vendor-key-action"><span class="hl">下一個關鍵動作</span><strong class="ht">寫今日施工日誌</strong><p>收工前補齊今日工項、人數、照片與異常說明</p><div class="hb"><em>責任人：乙方工務</em><button class="hbtn" type="button" data-write-action disabled aria-disabled="true">正式開放後寫日誌</button></div></article>
+                      <article class="stat warn vendor-stat"><span class="sl">今日待辦</span><strong class="sv">1 <small class="u">項</small></strong><p class="sd">施工日誌待補</p></article>
+                      <article class="stat vendor-stat"><span class="sl">待補證據</span><strong class="sv">3 <small class="u">張</small></strong><p class="sd">泥作全景與試水紀錄</p></article>
+                      <article class="stat vendor-stat"><span class="sl">下一驗收節點</span><strong class="sv">07/20</strong><p class="sd">第 2 期泥作送驗</p></article>
+                    </div>
+                    <section class="card vendor-calendar-node-summary" data-vendor-calendar-node-summary aria-labelledby="construction-calendar-node-title">
+                      <div><p class="eyebrow">下一節點摘要</p><h3 id="construction-calendar-node-title">07/20 第 2 期泥作送驗</h3><p>依據：施工計畫 v1・責任人：乙方工務・目前狀態：送驗前資料整理中</p></div>
+                      <a href="#vendor-google-calendar-title">回到上方案件日曆</a>
+                    </section>
+                    <section class="card vendor-todo-card" aria-labelledby="construction-todo-title"><div class="hd vendor-card-heading"><div><h3 id="construction-todo-title">今日任務</h3><p class="sub">先完成會影響送驗與責任釐清的現場紀錄。</p></div><span>1 項待乙方</span></div><ol class="vendor-task-list"><li><span class="vendor-case-chip vendor-case-chip--construction">本案</span><div><strong>今日施工日誌未寫</strong><small>工項、人數、照片、異常與依據文件需在收工前留痕</small></div><em>今日</em></li></ol></section>
+                  </section>
+
+                  <section id="vendor-construction-subpanel-changes" role="tabpanel" data-vendor-work-scope="construction" data-vendor-work-subpanel="changes" aria-labelledby="vendor-construction-subtab-changes" hidden>
+                    <section class="card vendor-construction-board" aria-labelledby="construction-change-title">
+                      <div class="vendor-section-heading"><div><p class="eyebrow">變更與驗收</p><h3 id="construction-change-title">先補齊送驗依據，再確認結果</h3></div><span>第 2 期泥作進行中</span></div>
+                      <div class="vendor-progress-board" aria-label="工程管理工作摘要"><article><span>目前工序</span><strong>泥作與浴室防水</strong><p>第 2 期預計 07/20 送驗。</p></article><article><span>待補照片</span><strong>3 張</strong><p>泥作完成面 2 張、浴室試水紀錄 1 張。</p></article><article><span>待驗收事項</span><strong>送驗前檢查</strong><p>需對照材料 v2 與現場完成面。</p></article></div>
+                      <ol class="vendor-ledger"><li data-resource-code="CHANGES"><span>追加減項</span><strong>尚無待確認的追加減項</strong><small>如有變更，須記錄原因、影響、雙方狀態與下一責任人</small><em>無</em><button class="vendor-document-share" type="button" data-vendor-document-share="CHANGES" aria-label="分享追加減項"><span aria-hidden="true">↗</span>分享</button></li><li data-resource-code="ACCEPTANCE"><span>驗收</span><strong>第 2 期送驗前資料整理中</strong><small>完成面全景 2 張、浴室試水紀錄 1 張待補</small><em>待乙方</em><button class="vendor-document-share" type="button" data-vendor-document-share="ACCEPTANCE" aria-label="分享驗收資料"><span aria-hidden="true">↗</span>分享</button></li></ol>
+                      <details class="vendor-history-group" data-vendor-history-group="completed-acceptance"><summary><span>06/28・第 1 期拆除驗收</span><strong>已完成並留痕</strong><small>責任人：甲方確認・1 個已完成驗收</small></summary><p>已完成項目保留原日期、依據文件、確認人與結果，不改寫目前送驗狀態。</p></details>
+                      <button class="vendor-disabled-action" type="button" data-write-action disabled aria-disabled="true">正式開放後才能新增施工紀錄</button>
+                    </section>
+                  </section>
+
+                  <section id="vendor-construction-subpanel-files" role="tabpanel" data-vendor-work-scope="construction" data-vendor-work-subpanel="files" aria-labelledby="vendor-construction-subtab-files" hidden>
+                    <section class="card vendor-construction-board" aria-labelledby="construction-files-title">
+                      <div class="vendor-section-heading"><div><p class="eyebrow">施工文件與照片</p><h3 id="construction-files-title">每份證據都要連回任務、日期與位置</h3></div><span>4 張已留痕・3 張待補</span></div>
+                      <ol class="vendor-ledger"><li data-resource-code="SCHEDULES"><span>施工任務</span><strong>第 2 期泥作完成・07/20 送驗</strong><small>責任人：乙方工務・依據：施工計畫 v1</small><em>進行中</em><button class="vendor-document-share" type="button" data-vendor-document-share="SCHEDULES" aria-label="分享施工任務"><span aria-hidden="true">↗</span>分享</button></li><li data-resource-code="EVIDENCE"><span>施工照片</span><strong>07/09 浴室防水施作照片 4 張</strong><small>提交者：乙方・已連回浴室防水任務</small><em>已留痕</em><button class="vendor-document-share" type="button" data-vendor-document-share="EVIDENCE" aria-label="分享施工照片"><span aria-hidden="true">↗</span>分享</button></li></ol>
+                      <details class="vendor-history-group" data-vendor-history-group="photo-batches"><summary><span>07/09・浴室防水照片批次</span><strong>已連回施工任務</strong><small>責任人：乙方工務・4 張照片</small></summary><p>照片包含提交日期與任務關係；位置與試水紀錄仍須依案件文件核對。</p></details>
+                      <details class="vendor-history-group" data-vendor-history-group="construction-logs"><summary><span>07/06–07/10・歷史施工日誌</span><strong>已留下原版本</strong><small>責任人：乙方工務・5 日日誌</small></summary><p>日誌更正時保留原版本、時間與更正原因，避免現場事實被覆寫。</p></details>
+                    </section>
+                  </section>
+
+                  <section id="vendor-construction-subpanel-records" role="tabpanel" data-vendor-work-scope="construction" data-vendor-work-subpanel="records" aria-labelledby="vendor-construction-subtab-records" hidden>
+                    <section class="card vendor-record-board" aria-labelledby="construction-record-title">
+                      <div class="vendor-section-heading"><div><p class="eyebrow">案件留痕</p><h3 id="construction-record-title">誰在何時依哪份文件做了什麼</h3></div><span>最近紀錄 07/09 19:12</span></div>
+                      <ol class="vendor-task-list"><li><span class="vendor-case-chip vendor-case-chip--construction">07/09</span><div><strong>泥作材料 v2 由甲方確認</strong><small>依據：材料提送 v2・目前狀態：可依此版本進料・下一責任人：乙方工務</small></div><em>可追溯</em></li></ol>
+                      <details class="vendor-history-group" data-vendor-history-group="past-changes"><summary><span>06/30・過去變更紀錄</span><strong>無未決變更</strong><small>責任人：雙方確認・1 項過去變更</small></summary><p>過去變更保留原因、影響、雙方狀態與後續依據，不改寫目前工程版本。</p></details>
+                    </section>
+                  </section>
                 </section>
+
               </div>
 
-              <aside class="vendor-workspace-sidecar" id="case-conversation" aria-label="LINE 案件對話">
-                <div class="card chatcard">
-                <header class="hd vendor-sidecar-heading">
-                  <div><span class="vendor-sidecar-mark" aria-hidden="true">L</span><div><p>LINE 三方群組</p><h2 data-vendor-active-case-name>青埔 A7 新建案</h2></div></div>
-                  <span>只顯示此案件的授權內容</span>
-                </header>
-                <section class="line-conversation" data-line-conversation aria-label="LINE 案件對話">
-                  <div class="line-conversation__account">
-                    <span class="line-conversation__mark" aria-hidden="true">LINE</span>
-                    <div><small>目前乙方帳號</small><strong>尚未連結乙方 LINE 帳號</strong></div>
-                    <span class="line-conversation__status">等待乙方完成連線</span>
-                  </div>
-                  <div class="line-conversation__case"><span>目前案件</span><strong data-line-case-context>青埔 A7 新建案・設計管理</strong><small>甲方・乙方・PCM 的公開案件內容才會進入這裡</small></div>
-                  <div class="line-conversation__empty"><strong>尚無可顯示的案件對話</strong><p>完成連線後，與文件、任務、確認及變更有關的公開內容才會整理在這裡；私人對話不會顯示。</p></div>
-                  <div class="line-conversation__record-actions" aria-label="案件訊息可轉成的紀錄"><span>訊息可轉成</span><i>任務</i><i>變更</i><i>驗收缺失</i></div>
-                  <div class="line-conversation__composer" aria-label="LINE 案件訊息輸入">
-                    <label for="vendor-line-message">案件訊息</label>
-                    <textarea id="vendor-line-message" rows="3" data-write-action disabled aria-disabled="true" placeholder="完成 LINE 連線後可從這裡回覆案件訊息"></textarea>
-                    <button type="button" data-write-action disabled aria-disabled="true">完成連線後才能傳送</button>
-                  </div>
-                  <span class="vendor-external-link" aria-disabled="true">連結乙方帳號後才會開啟案件對話</span>
-                </section>
-                </div>
-              </aside>
             </div>
             <p class="vendor-live" data-vendor-workspace-live aria-live="polite"></p>
           </main>
