@@ -41,9 +41,9 @@ export interface DocumentRepositoryPort {
   queueOrphanCleanup(
     input: Readonly<{
       principal: DocumentModeAPrincipal;
+      intentRef: string;
       recordsBucket: string;
       recordsObjectKey: string;
-      expectedPayloadSha256: string;
     }>,
   ): Promise<void>;
 }

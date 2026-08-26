@@ -3,6 +3,7 @@ import {
   extensionFromFilename,
   type FinalizeRequest,
   INTAKE_BUCKET,
+  isOpaqueRef,
   readOwn,
   RECORDS_BUCKET,
   sha256Canonical,
@@ -58,6 +59,27 @@ function record(candidate: unknown): Record<string, unknown> | null {
       Object.getPrototypeOf(candidate) === Object.prototype
     ? candidate as Record<string, unknown>
     : null;
+}
+
+function logicalConflict(
+  candidate: Record<string, unknown> | null,
+): "IDEMPOTENCY_CONFLICT" | "VERSION_CONFLICT" | null {
+  const state = readOwn(candidate, "state");
+  return readOwn(candidate, "ok") === false &&
+      (state === "IDEMPOTENCY_CONFLICT" || state === "VERSION_CONFLICT")
+    ? state
+    : null;
+}
+
+function conflictResponse(
+  schemaVersion: string,
+  state: "IDEMPOTENCY_CONFLICT" | "VERSION_CONFLICT",
+): Readonly<Record<string, unknown>> {
+  return Object.freeze({ schemaVersion, state });
+}
+
+function exactRef(value: unknown, prefix: string): value is string {
+  return isOpaqueRef(value) && value.startsWith(`${prefix}_`);
 }
 
 export function createDocumentStorageService(
@@ -168,13 +190,28 @@ export function createDocumentStorageService(
       }),
     );
     if (!plan) return null;
-    if (readOwn(plan, "state") === "FORMAL_VERSION_CREATED") {
+    const planConflict = logicalConflict(plan);
+    if (planConflict) {
+      return conflictResponse(
+        "laibe.drs-document-upload-finalize.response.v1",
+        planConflict,
+      );
+    }
+    const planDocumentRef = readOwn(plan, "document_ref");
+    const planVersionRef = readOwn(plan, "version_ref");
+    const planReceiptRef = readOwn(plan, "receipt_ref");
+    if (
+      readOwn(plan, "ok") === true &&
+      readOwn(plan, "state") === "FORMAL_VERSION_CREATED" &&
+      exactRef(planDocumentRef, "doc") && exactRef(planVersionRef, "dvr") &&
+      exactRef(planReceiptRef, "rcp")
+    ) {
       return Object.freeze({
         schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
         state: "FORMAL_VERSION_CREATED",
-        documentRef: readOwn(plan, "document_ref"),
-        versionRef: readOwn(plan, "version_ref"),
-        receiptRef: readOwn(plan, "receipt_ref"),
+        documentRef: planDocumentRef,
+        versionRef: planVersionRef,
+        receiptRef: planReceiptRef,
       });
     }
     if (
@@ -209,7 +246,14 @@ export function createDocumentStorageService(
       objectKey: intakeKey,
       declaredMime: declaredMime as typeof intake.detectedMime,
     });
-    if (!scan || evaluateHostileFileReport(scan).state !== "CLEAN") {
+    const intakeFilename = intakeKey.split("/").at(-1) ?? "";
+    if (
+      !scan || evaluateHostileFileReport(scan).state !== "CLEAN" ||
+      scan.declaredMime !== declaredMime ||
+      scan.detectedMime !== intake.detectedMime ||
+      extensionFromFilename(intakeFilename, intake.detectedMime) !==
+        scan.extension
+    ) {
       return Object.freeze({
         schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
         state: "VALIDATION_PENDING",
@@ -234,9 +278,9 @@ export function createDocumentStorageService(
     ) {
       await dependencies.repository.queueOrphanCleanup({
         principal,
+        intentRef: request.intentRef,
         recordsBucket: RECORDS_BUCKET,
         recordsObjectKey: recordsKey,
-        expectedPayloadSha256: requestHash,
       });
       return null;
     }
@@ -248,6 +292,7 @@ export function createDocumentStorageService(
       verifiedSha256: records.sha256,
       verifiedSizeBytes: records.sizeBytes,
       detectedMime: records.detectedMime,
+      requestPayloadSha256: requestHash,
     });
     const finalized = record(
       await dependencies.repository.execute({
@@ -258,24 +303,36 @@ export function createDocumentStorageService(
         expectedPayloadSha256: await sha256Canonical(finalizeResource),
       }),
     );
+    const finalizeConflict = logicalConflict(finalized);
+    if (finalizeConflict) {
+      return conflictResponse(
+        "laibe.drs-document-upload-finalize.response.v1",
+        finalizeConflict,
+      );
+    }
+    const documentRef = readOwn(finalized, "document_ref");
+    const versionRef = readOwn(finalized, "version_ref");
+    const receiptRef = readOwn(finalized, "receipt_ref");
     if (
       readOwn(finalized, "ok") !== true ||
-      readOwn(finalized, "state") !== "FORMAL_VERSION_CREATED"
+      readOwn(finalized, "state") !== "FORMAL_VERSION_CREATED" ||
+      !exactRef(documentRef, "doc") || !exactRef(versionRef, "dvr") ||
+      !exactRef(receiptRef, "rcp")
     ) {
       await dependencies.repository.queueOrphanCleanup({
         principal,
+        intentRef: request.intentRef,
         recordsBucket: RECORDS_BUCKET,
         recordsObjectKey: recordsKey,
-        expectedPayloadSha256: requestHash,
       });
       return null;
     }
     return Object.freeze({
       schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
       state: "FORMAL_VERSION_CREATED",
-      documentRef: readOwn(finalized, "document_ref"),
-      versionRef: readOwn(finalized, "version_ref"),
-      receiptRef: readOwn(finalized, "receipt_ref"),
+      documentRef,
+      versionRef,
+      receiptRef,
     });
   }
 
@@ -330,6 +387,13 @@ export function createDocumentStorageService(
         expectedPayloadSha256,
       }),
     );
+    const conflict = logicalConflict(result);
+    if (conflict) {
+      return conflictResponse(
+        "laibe.drs-document-snapshot.response.v1",
+        conflict,
+      );
+    }
     if (
       readOwn(result, "ok") !== true ||
       readOwn(result, "state") !== "SNAPSHOT_RECORDED"
@@ -499,7 +563,12 @@ export function createDocumentEdgeHandler(
           );
         }
         return documentJsonResponse(
-          result.state === "VALIDATION_PENDING" ? 202 : 201,
+          result.state === "VALIDATION_PENDING"
+            ? 202
+            : result.state === "IDEMPOTENCY_CONFLICT" ||
+                result.state === "VERSION_CONFLICT"
+            ? 409
+            : 201,
           result,
           origin,
           dependencies.allowedOrigins,
@@ -512,7 +581,10 @@ export function createDocumentEdgeHandler(
         );
         return result
           ? documentJsonResponse(
-            201,
+            result.state === "IDEMPOTENCY_CONFLICT" ||
+              result.state === "VERSION_CONFLICT"
+              ? 409
+              : 201,
             result,
             origin,
             dependencies.allowedOrigins,

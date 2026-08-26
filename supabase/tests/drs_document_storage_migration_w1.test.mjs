@@ -156,6 +156,24 @@ Deno.test("case events are extended as a closed superset with typed same-case re
     sql,
     /foreign key \(case_id, document_id, document_version_id\)/iu,
   );
+  assert.match(sql, /upload_intent_id uuid/u);
+  assert.match(sql, /orphan_cleanup_work_item_id uuid/u);
+  assert.match(
+    sql,
+    /foreign key \(case_id, document_id, upload_intent_id\)[\s\S]*?document_upload_intents\(case_id, document_id, intent_id\)/iu,
+  );
+  assert.match(
+    sql,
+    /foreign key \(case_id, orphan_cleanup_work_item_id\)[\s\S]*?document_orphan_cleanup_work_items\(case_id, work_item_id\)/iu,
+  );
+  assert.match(
+    sql,
+    /DOCUMENT_UPLOAD_INTENT_CREATED[\s\S]*?upload_intent_id is not null/iu,
+  );
+  assert.match(
+    sql,
+    /DOCUMENT_ORPHAN_CLEANUP_QUEUED[\s\S]*?orphan_cleanup_work_item_id is not null/iu,
+  );
 });
 
 Deno.test("SQL never mutates Supabase Storage metadata rows and only allows server-owned keys", async () => {
@@ -165,8 +183,63 @@ Deno.test("SQL never mutates Supabase Storage metadata rows and only allows serv
     /(?:insert\s+into|update|delete\s+from)\s+storage\.(?:buckets|objects)/iu,
   );
   assert.doesNotMatch(sql, /create policy[\s\S]*?using\s*\(\s*true\s*\)/iu);
+  assert.equal(
+    [...sql.matchAll(
+      /create policy drs_document_(?:intake|records)_[a-z_]+/giu,
+    )]
+      .length,
+    4,
+  );
+  assert.match(
+    sql,
+    /native signed upload[\s\S]*?bypasses storage object rls[\s\S]*?mode a/iu,
+  );
+  assert.doesNotMatch(
+    sql,
+    /create policy[^;]+?on storage\.objects[^;]+?to\s+service_role/giu,
+  );
+  assert.match(
+    sql,
+    /document_storage_object_matches_v1[\s\S]*?drs-case-intake-private[\s\S]*?document_upload_intents[\s\S]*?drs-case-records-private[\s\S]*?document_version_sources/iu,
+  );
+  assert.equal(
+    [...sql.matchAll(
+      /create policy drs_document_(?:intake|records)_[a-z_]+[\s\S]*?as restrictive[\s\S]*?to anon, authenticated[\s\S]*?(?:using|with check)\s*\(\s*false\s*\)/giu,
+    )].length,
+    4,
+  );
+  assert.doesNotMatch(
+    sql,
+    /create policy[\s\S]*?to\s+public/iu,
+  );
+  assert.doesNotMatch(
+    sql,
+    /create policy[\s\S]*?(?:owner_id|storage\.foldername\s*\()/iu,
+  );
   assert.match(sql, /drs-case-intake-private/u);
   assert.match(sql, /drs-case-records-private/u);
+});
+
+Deno.test("finalize replay is bound to the first idempotency key and request digest", async () => {
+  const sql = await migration();
+  assert.match(sql, /finalize_idempotency_key text/u);
+  assert.match(sql, /finalize_request_payload_sha256 text/u);
+  assert.match(
+    sql,
+    /finalize_idempotency_key is null[\s\S]*?finalize_request_payload_sha256 is null/iu,
+  );
+  assert.match(
+    sql,
+    /v_intent\.finalize_idempotency_key\s*<>\s*p_idempotency_key[\s\S]*?VERSION_CONFLICT/iu,
+  );
+  assert.match(
+    sql,
+    /v_intent\.finalize_request_payload_sha256\s*<>\s*p_expected_payload_sha256[\s\S]*?IDEMPOTENCY_CONFLICT/iu,
+  );
+  assert.match(
+    sql,
+    /requestPayloadSha256[\s\S]*?finalize_request_payload_sha256/iu,
+  );
 });
 
 Deno.test("orphan cleanup is a typed work item, not a false execution receipt", async () => {
@@ -178,4 +251,8 @@ Deno.test("orphan cleanup is a typed work item, not a false execution receipt", 
   assert.match(sql, /cleanup_state[\s\S]*?'PENDING'/iu);
   assert.match(sql, /DOCUMENT_ORPHAN_CLEANUP_QUEUED/u);
   assert.doesNotMatch(sql, /DOCUMENT_ORPHAN_CLEANUP_COMPLETED/u);
+  assert.match(
+    sql,
+    /p_operation = 'QUEUE_ORPHAN_CLEANUP'[\s\S]*?p_expected_payload_sha256\s*<>\s*pg_catalog\.encode\([\s\S]*?extensions\.digest\(pg_catalog\.convert_to\(p_resource_ref, 'UTF8'\), 'sha256'\)/iu,
+  );
 });

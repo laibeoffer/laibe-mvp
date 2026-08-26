@@ -100,9 +100,12 @@ test("Storage uses fixed private buckets, upsert false and no SQL metadata-row m
 });
 
 test("scanner/provider gaps quarantine and orphan work remains queued rather than falsely completed", async () => {
-  const [validation, service, migration] = await Promise.all([
+  const [validation, service, documentAdapter, migration] = await Promise.all([
     text("supabase/functions/_shared/drs-document-storage/validation.ts"),
     text("supabase/functions/_shared/drs-document-storage/service.ts"),
+    text(
+      "supabase/functions/_shared/drs-document-storage/supabase-document-adapter.ts",
+    ),
     text("supabase/migrations/20260826190000_drs_document_storage_w1.sql"),
   ]);
   assert.match(
@@ -110,8 +113,31 @@ test("scanner/provider gaps quarantine and orphan work remains queued rather tha
     /UNKNOWN[\s\S]*?QUARANTINED|QUARANTINED[\s\S]*?UNKNOWN/u,
   );
   assert.match(service, /queueOrphanCleanup/u);
+  assert.match(documentAdapter, /crypto\.subtle\.digest/u);
+  assert.match(documentAdapter, /orphanPayloadSha256/u);
   assert.match(migration, /document_orphan_cleanup_work_items/u);
   assert.doesNotMatch(migration, /DOCUMENT_ORPHAN_CLEANUP_COMPLETED/u);
+});
+
+test("bounded streams, byte-derived hashes and closed conflict states are visible in source", async () => {
+  const [guard, adapter, service] = await Promise.all([
+    text("supabase/functions/_shared/drs-document-storage/request-guard.ts"),
+    text(
+      "supabase/functions/_shared/drs-document-storage/supabase-storage-adapter.ts",
+    ),
+    text("supabase/functions/_shared/drs-document-storage/service.ts"),
+  ]);
+  assert.match(guard, /body\.getReader\(\)/u);
+  assert.match(guard, /reader\.cancel\(/u);
+  assert.doesNotMatch(guard, /clone\(\)\.arrayBuffer\(\)/u);
+  assert.match(adapter, /candidate[\s\S]*?\.url/u);
+  assert.doesNotMatch(adapter, /\.signedURL/u);
+  assert.match(adapter, /method:\s*"GET"/u);
+  assert.match(adapter, /crypto\.subtle\.digest/u);
+  assert.doesNotMatch(adapter, /x-laibe-sha256/iu);
+  assert.match(service, /IDEMPOTENCY_CONFLICT/u);
+  assert.match(service, /VERSION_CONFLICT/u);
+  assert.match(service, /\b409\b/u);
 });
 
 test("no external engineering, escrow/payment or old-house investment content is introduced", async () => {

@@ -152,6 +152,19 @@ create table casework.document_upload_intents (
   ),
   expected_payload_sha256 text not null
     check (expected_payload_sha256 ~ '^[a-f0-9]{64}$'),
+  finalize_idempotency_key text
+    check (
+      finalize_idempotency_key is null
+      or (
+        length(finalize_idempotency_key) between 16 and 128
+        and finalize_idempotency_key !~ '[[:space:][:cntrl:]]'
+      )
+    ),
+  finalize_request_payload_sha256 text
+    check (
+      finalize_request_payload_sha256 is null
+      or finalize_request_payload_sha256 ~ '^[a-f0-9]{64}$'
+    ),
   created_by uuid not null references auth.users(id) on delete restrict,
   created_at timestamptz not null default clock_timestamp()
     check (isfinite(created_at)),
@@ -163,6 +176,13 @@ create table casework.document_upload_intents (
     references casework.documents(case_id, id) on delete restrict,
   check (expires_at > created_at),
   check (expires_at <= created_at + interval '15 minutes'),
+  check (
+    (finalize_idempotency_key is null and finalize_request_payload_sha256 is null)
+    or (
+      finalize_idempotency_key is not null
+      and finalize_request_payload_sha256 is not null
+    )
+  ),
   check (
     (intent_state = 'FORMALIZED' and finalized_at is not null)
     or (intent_state <> 'FORMALIZED' and finalized_at is null)
@@ -251,7 +271,9 @@ create table casework.document_operation_receipts (
 
 create table casework.document_orphan_cleanup_work_items (
   work_item_id uuid primary key default extensions.gen_random_uuid(),
-  case_id uuid not null references casework.cases(id) on delete restrict,
+  case_id uuid not null,
+  document_id uuid not null,
+  upload_intent_id uuid not null,
   records_bucket text not null check (records_bucket = 'drs-case-records-private'),
   records_object_key text not null,
   expected_payload_sha256 text not null
@@ -263,7 +285,10 @@ create table casework.document_orphan_cleanup_work_items (
     check (isfinite(queued_at)),
   last_error_code text,
   unique (records_bucket, records_object_key),
-  unique (case_id, work_item_id)
+  unique (case_id, work_item_id),
+  foreign key (case_id, document_id, upload_intent_id)
+    references casework.document_upload_intents(case_id, document_id, intent_id)
+    on delete restrict
 );
 
 create index documents_case_id_idx on casework.documents(case_id);
@@ -303,6 +328,10 @@ create index document_operation_receipts_snapshot_idx
 create index document_orphan_cleanup_pending_idx
   on casework.document_orphan_cleanup_work_items(case_id, queued_at)
   where cleanup_state = 'PENDING';
+create index document_orphan_cleanup_intent_idx
+  on casework.document_orphan_cleanup_work_items(
+    case_id, document_id, upload_intent_id
+  );
 
 alter table casework.documents enable row level security;
 alter table casework.documents force row level security;
@@ -335,6 +364,111 @@ revoke all on table casework.submission_snapshots from public, anon, authenticat
 revoke all on table casework.document_snapshot_items from public, anon, authenticated, service_role;
 revoke all on table casework.document_operation_receipts from public, anon, authenticated, service_role;
 revoke all on table casework.document_orphan_cleanup_work_items from public, anon, authenticated, service_role;
+
+create or replace function casework.document_storage_object_matches_v1(
+  p_bucket_id text,
+  p_object_key text,
+  p_operation text
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case p_operation
+    when 'INTAKE_WRITE' then p_bucket_id = 'drs-case-intake-private'
+      and exists (
+        select 1
+        from casework.document_upload_intents i
+        where i.intake_bucket = p_bucket_id
+          and i.intake_object_key = p_object_key
+          and i.intent_state = 'INTENT_CREATED'
+          and i.expires_at > statement_timestamp()
+      )
+    when 'INTAKE_READ' then p_bucket_id = 'drs-case-intake-private'
+      and exists (
+        select 1
+        from casework.document_upload_intents i
+        where i.intake_bucket = p_bucket_id
+          and i.intake_object_key = p_object_key
+          and i.intent_state in ('INTENT_CREATED', 'VALIDATION_PENDING')
+          and i.expires_at > statement_timestamp()
+      )
+    when 'RECORDS_WRITE' then p_bucket_id = 'drs-case-records-private'
+      and exists (
+        select 1
+        from casework.document_upload_intents i
+        where i.records_bucket = p_bucket_id
+          and i.records_object_key = p_object_key
+          and i.intent_state = 'VALIDATION_PENDING'
+      )
+    when 'RECORDS_READ' then p_bucket_id = 'drs-case-records-private'
+      and (
+        exists (
+          select 1
+          from casework.document_version_sources s
+          where s.bucket_id = p_bucket_id
+            and s.object_key = p_object_key
+            and s.validation_state = 'CLEAN'
+        )
+        or exists (
+          select 1
+          from casework.document_artifacts a
+          where a.bucket_id = p_bucket_id
+            and a.object_key = p_object_key
+            and a.validation_state = 'CLEAN'
+        )
+        or exists (
+          select 1
+          from casework.document_upload_intents i
+          where i.records_bucket = p_bucket_id
+            and i.records_object_key = p_object_key
+            and i.intent_state = 'VALIDATION_PENDING'
+        )
+      )
+    else false
+  end;
+$$;
+
+alter function casework.document_storage_object_matches_v1(text, text, text)
+  owner to postgres;
+revoke all on function casework.document_storage_object_matches_v1(
+  text, text, text
+) from public, anon, authenticated, service_role;
+grant execute on function casework.document_storage_object_matches_v1(
+  text, text, text
+) to service_role;
+
+-- Native signed upload verifies its capability and then bypasses Storage object RLS.
+-- Service-role BFF operations also bypass RLS. Product authority therefore remains
+-- the Mode A intent/grant chain and finalize recheck. These four policies make
+-- direct browser roles explicitly fail closed; the helper remains a service-only
+-- invariant check for exact server-owned bucket/key metadata.
+create policy drs_document_intake_insert
+  on storage.objects
+  as restrictive
+  for insert
+  to anon, authenticated
+  with check (false);
+create policy drs_document_intake_select
+  on storage.objects
+  as restrictive
+  for select
+  to anon, authenticated
+  using (false);
+create policy drs_document_records_insert
+  on storage.objects
+  as restrictive
+  for insert
+  to anon, authenticated
+  with check (false);
+create policy drs_document_records_select
+  on storage.objects
+  as restrictive
+  for select
+  to anon, authenticated
+  using (false);
 
 create or replace function casework.document_append_only_enforce_v1()
 returns trigger
@@ -439,6 +573,8 @@ alter table casework.case_events add column document_id uuid;
 alter table casework.case_events add column document_version_id uuid;
 alter table casework.case_events add column snapshot_id uuid;
 alter table casework.case_events add column receipt_id uuid;
+alter table casework.case_events add column upload_intent_id uuid;
+alter table casework.case_events add column orphan_cleanup_work_item_id uuid;
 alter table casework.case_events
   add constraint case_events_document_fk
   foreign key (case_id, document_id)
@@ -457,6 +593,16 @@ alter table casework.case_events
   foreign key (case_id, receipt_id)
   references casework.document_operation_receipts(case_id, id)
   on delete restrict;
+alter table casework.case_events
+  add constraint case_events_upload_intent_fk
+  foreign key (case_id, document_id, upload_intent_id)
+  references casework.document_upload_intents(case_id, document_id, intent_id)
+  on delete restrict;
+alter table casework.case_events
+  add constraint case_events_orphan_cleanup_work_item_fk
+  foreign key (case_id, orphan_cleanup_work_item_id)
+  references casework.document_orphan_cleanup_work_items(case_id, work_item_id)
+  on delete restrict;
 create index case_events_document_idx
   on casework.case_events(case_id, document_id)
   where document_id is not null;
@@ -469,6 +615,12 @@ create index case_events_snapshot_idx
 create index case_events_receipt_idx
   on casework.case_events(case_id, receipt_id)
   where receipt_id is not null;
+create index case_events_upload_intent_idx
+  on casework.case_events(case_id, document_id, upload_intent_id)
+  where upload_intent_id is not null;
+create index case_events_orphan_cleanup_work_item_idx
+  on casework.case_events(case_id, orphan_cleanup_work_item_id)
+  where orphan_cleanup_work_item_id is not null;
 
 create or replace function casework.case_event_document_refs_same_case_v1()
 returns trigger
@@ -482,24 +634,41 @@ begin
   ) and (
     new.document_id is not null or new.document_version_id is not null
     or new.snapshot_id is not null or new.receipt_id is not null
+    or new.upload_intent_id is not null
+    or new.orphan_cleanup_work_item_id is not null
   ) then raise exception 'CASE_EVENT_DOCUMENT_REFS_INVALID'; end if;
   if new.event_type = 'DOCUMENT_UPLOAD_INTENT_CREATED' and (
-    new.document_id is null or new.document_version_id is not null
-    or new.snapshot_id is not null or new.receipt_id is not null
+    new.document_id is null or new.upload_intent_id is null
+    or new.document_version_id is not null or new.snapshot_id is not null
+    or new.receipt_id is not null
+    or new.orphan_cleanup_work_item_id is not null
   ) then raise exception 'CASE_EVENT_DOCUMENT_REFS_INVALID'; end if;
   if new.event_type in (
     'DOCUMENT_VERSION_FORMALIZED', 'DOCUMENT_DOWNLOAD_ACCESSED',
     'DOCUMENT_WITHDRAWN'
   ) and (
     new.document_id is null or new.document_version_id is null
-    or (new.event_type = 'DOCUMENT_VERSION_FORMALIZED' and new.receipt_id is null)
+    or new.snapshot_id is not null or new.upload_intent_id is not null
+    or new.orphan_cleanup_work_item_id is not null
+    or (
+      new.event_type = 'DOCUMENT_VERSION_FORMALIZED'
+      and new.receipt_id is null
+    )
+    or (
+      new.event_type <> 'DOCUMENT_VERSION_FORMALIZED'
+      and new.receipt_id is not null
+    )
   ) then raise exception 'CASE_EVENT_DOCUMENT_REFS_INVALID'; end if;
   if new.event_type = 'DOCUMENT_SNAPSHOT_RECORDED' and (
     new.snapshot_id is null or new.receipt_id is null
+    or new.document_id is not null or new.document_version_id is not null
+    or new.upload_intent_id is not null
+    or new.orphan_cleanup_work_item_id is not null
   ) then raise exception 'CASE_EVENT_DOCUMENT_REFS_INVALID'; end if;
   if new.event_type = 'DOCUMENT_ORPHAN_CLEANUP_QUEUED' and (
-    new.document_id is not null or new.document_version_id is not null
-    or new.snapshot_id is not null or new.receipt_id is not null
+    new.document_id is null or new.orphan_cleanup_work_item_id is null
+    or new.document_version_id is not null or new.snapshot_id is not null
+    or new.receipt_id is not null or new.upload_intent_id is not null
   ) then raise exception 'CASE_EVENT_DOCUMENT_REFS_INVALID'; end if;
   return new;
 end;
@@ -548,6 +717,7 @@ declare
   v_receipt_ref text;
   v_snapshot_id uuid;
   v_snapshot_ref text;
+  v_cleanup_work_item_id uuid;
   v_previous_version_id uuid;
   v_version_no bigint;
   v_extension text;
@@ -649,11 +819,11 @@ begin
     );
     insert into casework.case_events(
       case_id, event_type, actor_user_id, idempotency_key,
-      payload_sha256, payload, document_id
+      payload_sha256, payload, document_id, upload_intent_id
     ) values (
       p_expected_case_id, 'DOCUMENT_UPLOAD_INTENT_CREATED',
       p_authenticated_user_id, v_resource ->> 'intentRef',
-      p_expected_payload_sha256, v_resource, v_document_id
+      p_expected_payload_sha256, v_resource, v_document_id, v_intent_id
     );
     return jsonb_build_object(
       'ok', true, 'state', 'UPLOAD_INTENT_CREATED',
@@ -668,12 +838,22 @@ begin
       and i.created_by = p_authenticated_user_id
     for update;
     if not found then return jsonb_build_object('ok', false, 'state', 'CASE_NOT_AUTHORIZED'); end if;
+    if v_intent.finalize_idempotency_key is not null
+      and v_intent.finalize_idempotency_key <> p_idempotency_key
+    then return jsonb_build_object('ok', false, 'state', 'VERSION_CONFLICT'); end if;
+    if v_intent.finalize_request_payload_sha256 is not null
+      and v_intent.finalize_request_payload_sha256 <> p_expected_payload_sha256
+    then return jsonb_build_object('ok', false, 'state', 'IDEMPOTENCY_CONFLICT'); end if;
     if v_intent.intent_state = 'FORMALIZED' then
       select v.* into v_version from casework.document_versions v
       where v.id = v_intent.planned_version_id;
       select r.* into v_receipt from casework.document_operation_receipts r
       where r.case_id = p_expected_case_id
-        and r.document_version_id = v_intent.planned_version_id;
+        and r.document_version_id = v_intent.planned_version_id
+        and r.operation = 'FINALIZE_UPLOAD'
+        and r.idempotency_key = v_intent.finalize_idempotency_key;
+      if v_version.id is null or v_receipt.id is null
+      then return jsonb_build_object('ok', false, 'state', 'CONTEXT_UNAVAILABLE'); end if;
       return jsonb_build_object(
         'ok', true, 'state', 'FORMAL_VERSION_CREATED',
         'document_ref', (select d.document_ref from casework.documents d where d.id = v_intent.document_id),
@@ -686,7 +866,18 @@ begin
       where intent_id = v_intent.intent_id;
       return jsonb_build_object('ok', false, 'state', 'UPLOAD_INTENT_EXPIRED');
     end if;
-    update casework.document_upload_intents set intent_state = 'VALIDATION_PENDING'
+    if v_intent.intent_state not in ('INTENT_CREATED', 'VALIDATION_PENDING')
+    then return jsonb_build_object('ok', false, 'state', 'VERSION_CONFLICT'); end if;
+    update casework.document_upload_intents set
+      intent_state = 'VALIDATION_PENDING',
+      finalize_idempotency_key = coalesce(
+        finalize_idempotency_key,
+        p_idempotency_key
+      ),
+      finalize_request_payload_sha256 = coalesce(
+        finalize_request_payload_sha256,
+        p_expected_payload_sha256
+      )
     where intent_id = v_intent.intent_id;
     return jsonb_build_object(
       'ok', true, 'state', 'VALIDATION_REQUIRED',
@@ -706,6 +897,7 @@ begin
     v_resource := p_resource_ref::jsonb;
     if v_resource ->> 'schemaVersion' <> 'laibe.drs-document-finalize.internal.v1'
       or v_resource ->> 'recordsBucket' <> 'drs-case-records-private'
+      or v_resource ->> 'requestPayloadSha256' !~ '^[a-f0-9]{64}$'
     then return jsonb_build_object('ok', false, 'state', 'INVALID_REQUEST'); end if;
     select i.* into v_intent
     from casework.document_upload_intents i
@@ -714,6 +906,10 @@ begin
       and i.created_by = p_authenticated_user_id
     for update;
     if not found or v_intent.expires_at <= v_now
+      or v_intent.intent_state <> 'VALIDATION_PENDING'
+      or v_intent.finalize_idempotency_key <> p_idempotency_key
+      or v_intent.finalize_request_payload_sha256 <>
+        v_resource ->> 'requestPayloadSha256'
       or v_intent.records_object_key <> v_resource ->> 'recordsObjectKey'
       or v_intent.declared_sha256 <> v_resource ->> 'verifiedSha256'
       or v_intent.declared_size_bytes <> (v_resource ->> 'verifiedSizeBytes')::bigint
@@ -821,7 +1017,8 @@ begin
       or jsonb_array_length(v_resource -> 'versionRefs') not between 1 and 10
     then return jsonb_build_object('ok', false, 'state', 'INVALID_REQUEST'); end if;
     select s.* into v_snapshot from casework.submission_snapshots s
-    where s.created_by = p_authenticated_user_id
+    where s.case_id = p_expected_case_id
+      and s.created_by = p_authenticated_user_id
       and s.idempotency_key = p_idempotency_key;
     if found then
       if v_snapshot.canonical_payload_sha256 <> p_expected_payload_sha256
@@ -891,26 +1088,59 @@ begin
   end if;
 
   if p_operation = 'QUEUE_ORPHAN_CLEANUP' then
+    if p_expected_payload_sha256 <> pg_catalog.encode(
+      extensions.digest(pg_catalog.convert_to(p_resource_ref, 'UTF8'), 'sha256'),
+      'hex'
+    ) then
+      return jsonb_build_object('ok', false, 'state', 'INVALID_REQUEST');
+    end if;
     v_resource := p_resource_ref::jsonb;
     if v_resource ->> 'schemaVersion' <> 'laibe.drs-document-orphan-cleanup.internal.v1'
+      or v_resource ->> 'intentRef' !~ '^int_[0-9a-z]{20,40}$'
       or v_resource ->> 'recordsBucket' <> 'drs-case-records-private'
       or v_resource ->> 'recordsObjectKey' !~ '^cases/[0-9a-f-]{36}/documents/[0-9a-f-]{36}/versions/[0-9a-f-]{36}/source\.(pdf|jpg|jpeg|png)$'
     then return jsonb_build_object('ok', false, 'state', 'INVALID_REQUEST'); end if;
+    select i.* into v_intent
+    from casework.document_upload_intents i
+    where i.case_id = p_expected_case_id
+      and i.intent_ref = v_resource ->> 'intentRef'
+      and i.created_by = p_authenticated_user_id
+      and i.records_bucket = 'drs-case-records-private'
+      and i.records_object_key = v_resource ->> 'recordsObjectKey'
+      and i.intent_state in ('VALIDATION_PENDING', 'FORMALIZED')
+    for update;
+    if not found
+    then return jsonb_build_object('ok', false, 'state', 'CASE_NOT_AUTHORIZED'); end if;
     insert into casework.document_orphan_cleanup_work_items(
-      case_id, records_bucket, records_object_key, expected_payload_sha256,
-      cleanup_state, queued_by
+      case_id, document_id, upload_intent_id, records_bucket,
+      records_object_key, expected_payload_sha256, cleanup_state, queued_by
     ) values (
-      p_expected_case_id, 'drs-case-records-private',
+      p_expected_case_id, v_intent.document_id, v_intent.intent_id,
+      'drs-case-records-private',
       v_resource ->> 'recordsObjectKey', p_expected_payload_sha256,
       'PENDING', p_authenticated_user_id
-    ) on conflict (records_bucket, records_object_key) do nothing;
+    ) on conflict (records_bucket, records_object_key) do nothing
+    returning work_item_id into v_cleanup_work_item_id;
+    if v_cleanup_work_item_id is null then
+      select w.work_item_id into v_cleanup_work_item_id
+      from casework.document_orphan_cleanup_work_items w
+      where w.case_id = p_expected_case_id
+        and w.document_id = v_intent.document_id
+        and w.upload_intent_id = v_intent.intent_id
+        and w.records_bucket = 'drs-case-records-private'
+        and w.records_object_key = v_intent.records_object_key
+        and w.expected_payload_sha256 = p_expected_payload_sha256;
+      if not found
+      then return jsonb_build_object('ok', false, 'state', 'IDEMPOTENCY_CONFLICT'); end if;
+    end if;
     insert into casework.case_events(
       case_id, event_type, actor_user_id, idempotency_key,
-      payload_sha256, payload
+      payload_sha256, payload, document_id, orphan_cleanup_work_item_id
     ) values (
       p_expected_case_id, 'DOCUMENT_ORPHAN_CLEANUP_QUEUED',
       p_authenticated_user_id, p_idempotency_key,
-      p_expected_payload_sha256, v_resource
+      p_expected_payload_sha256, v_resource, v_intent.document_id,
+      v_cleanup_work_item_id
     ) on conflict (actor_user_id, event_type, idempotency_key) do nothing;
     return jsonb_build_object('ok', true, 'state', 'ORPHAN_CLEANUP_QUEUED');
   end if;
