@@ -145,3 +145,45 @@ Deno.test("casework authority migration remains P1-only", async () => {
     /create table (?:if not exists )?public\.drs_cases/iu,
   );
 });
+
+Deno.test(
+  "focused RED rework: case-create replay revalidates held closed revoked and expired truth",
+  async () => {
+    const sql = await migrationSource();
+    const replayStart = sql.indexOf(
+      "create or replace function casework.case_create_locked_v1",
+    );
+    const replayEnd = sql.indexOf(
+      "create or replace function public.casework_case_create_v1",
+    );
+    const replay = sql.slice(replayStart, replayEnd);
+    for (
+      const required of [
+        /c\.case_status/u,
+        /m\.membership_status/u,
+        /m\.valid_from/u,
+        /m\.valid_until/u,
+        /m\.revoked_at/u,
+        /'state', 'CASE_ON_HOLD'/u,
+        /'state', 'CASE_CLOSED'/u,
+        /'state', 'MEMBERSHIP_REVOKED'/u,
+        /'state', 'MEMBERSHIP_EXPIRED'/u,
+      ]
+    ) assert.match(replay, required);
+    assert.doesNotMatch(
+      replay.slice(
+        replay.indexOf("if found then"),
+        replay.indexOf("end if;", replay.indexOf("if found then")) + 7,
+      ),
+      /'case_status', 'active'|'membership_status', 'active'/u,
+    );
+    const lock = replay.indexOf("perform pg_advisory_xact_lock(");
+    const currentReplay = replay.indexOf("c.creation_payload_sha256");
+    assert.ok(lock >= 0 && currentReplay > lock);
+    assert.match(
+      replay,
+      /p_authenticated_user_id::text \|\| E'\\\\x1f' \|\| p_idempotency_key/u,
+    );
+    assert.match(replay, /v_existing_payload_sha256 <> p_payload_sha256/u);
+  },
+);

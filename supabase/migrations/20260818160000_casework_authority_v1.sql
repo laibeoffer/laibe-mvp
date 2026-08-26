@@ -199,6 +199,12 @@ declare
   v_membership_id uuid;
   v_event_id uuid;
   v_existing_payload_sha256 text;
+  v_case_status text;
+  v_membership_role text;
+  v_membership_status text;
+  v_membership_valid_from timestamptz;
+  v_membership_valid_until timestamptz;
+  v_membership_revoked_at timestamptz;
 begin
   if p_authenticated_user_id is null
     or p_title is null
@@ -230,22 +236,34 @@ begin
       0
     )
   );
+  v_now := clock_timestamp();
 
   select
     c.id,
     c.creation_payload_sha256,
+    c.case_status,
     m.membership_id,
+    m.role,
+    m.membership_status,
+    m.valid_from,
+    m.valid_until,
+    m.revoked_at,
     e.event_id
   into
     v_case_id,
     v_existing_payload_sha256,
+    v_case_status,
     v_membership_id,
+    v_membership_role,
+    v_membership_status,
+    v_membership_valid_from,
+    v_membership_valid_until,
+    v_membership_revoked_at,
     v_event_id
   from casework.cases c
   join casework.case_members m
-    on m.case_id = c.id
+   on m.case_id = c.id
    and m.user_id = c.created_by
-   and m.role = 'owner'
   join casework.case_events e
     on e.case_id = c.id
    and e.membership_id = m.membership_id
@@ -258,15 +276,33 @@ begin
     if v_existing_payload_sha256 <> p_payload_sha256 then
       return jsonb_build_object('ok', false, 'state', 'IDEMPOTENCY_CONFLICT');
     end if;
+    if v_case_status = 'on_hold' then
+      return jsonb_build_object('ok', false, 'state', 'CASE_ON_HOLD');
+    end if;
+    if v_case_status = 'closed' then
+      return jsonb_build_object('ok', false, 'state', 'CASE_CLOSED');
+    end if;
+    if v_case_status <> 'active' or v_membership_role <> 'owner' then
+      return jsonb_build_object('ok', false, 'state', 'CASE_NOT_AUTHORIZED');
+    end if;
+    if v_membership_status = 'revoked' or v_membership_revoked_at is not null then
+      return jsonb_build_object('ok', false, 'state', 'MEMBERSHIP_REVOKED');
+    end if;
+    if v_membership_status <> 'active' or v_membership_valid_from > v_now then
+      return jsonb_build_object('ok', false, 'state', 'CASE_NOT_AUTHORIZED');
+    end if;
+    if v_membership_valid_until is not null and v_membership_valid_until <= v_now then
+      return jsonb_build_object('ok', false, 'state', 'MEMBERSHIP_EXPIRED');
+    end if;
     return jsonb_build_object(
       'ok', true,
       'created', false,
       'state', 'CASE_CREATE_REPLAYED',
       'case_id', v_case_id,
-      'case_status', 'active',
+      'case_status', v_case_status,
       'membership_id', v_membership_id,
-      'membership_role', 'owner',
-      'membership_status', 'active',
+      'membership_role', v_membership_role,
+      'membership_status', v_membership_status,
       'event_id', v_event_id
     );
   end if;
@@ -425,6 +461,7 @@ begin
       m.authority_version,
       m.case_id,
       m.role,
+      c.title as case_title,
       least(
         coalesce(m.valid_until, v_now + interval '15 minutes'),
         v_now + interval '15 minutes'
@@ -461,6 +498,7 @@ begin
     'state', 'AUTHORIZED_CASEWORK_WORKSPACE',
     'case_id', v_candidate.case_id,
     'case_status', 'active',
+    'case_title', v_candidate.case_title,
     'account_role', v_candidate.role,
     'grant_id', v_candidate.membership_id,
     'grant_version', v_candidate.authority_version,
@@ -540,6 +578,7 @@ begin
       g.grant_id,
       g.grant_version,
       g.case_id,
+      c.title as case_title,
       g.valid_until as grant_expires_at
     from casework.highest_reviewer_case_grants g
     join casework.cases c
@@ -572,6 +611,7 @@ begin
     'state', 'AUTHORIZED_CASEWORK_WORKSPACE',
     'case_id', v_candidate.case_id,
     'case_status', 'active',
+    'case_title', v_candidate.case_title,
     'account_role', 'highest_reviewer',
     'grant_id', v_candidate.grant_id,
     'grant_version', v_candidate.grant_version,

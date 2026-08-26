@@ -65,15 +65,22 @@ export function createVendorWorkspaceGrantHandler(
       return jsonResponse(denialStatus(state), { state }, cors);
     }
     return jsonResponse(200, {
-      schemaVersion: "laibe.casework-workspace-grant.v1",
-      state: "AUTHORIZED_CASEWORK_WORKSPACE",
-      case: { id: grant.caseId, status: "ACTIVE" },
-      workspaceAccess: {
-        accountRole: "pro",
-        mode: "read_only",
-        mutationAllowed: false,
+      schemaVersion: "laibe.vendor-workspace-auth.v1",
+      state: "AUTHORIZED_VENDOR_WORKSPACE",
+      authenticatedUserId: identity.userId,
+      currentCaseId: grant.caseId,
+      membership: {
+        userId: identity.userId,
+        caseId: grant.caseId,
+        role: "pro",
+        status: "active",
       },
-      next: { actor: "vendor", action: "REVIEW_CASE_REQUIREMENTS" },
+      workspaceAccess: {
+        role: "pro",
+        mutationAllowed: false,
+        writeActionsEnabled: false,
+        payloadPolicy: "AUTHORIZED_SCOPE_ONLY",
+      },
     }, cors);
   };
 }

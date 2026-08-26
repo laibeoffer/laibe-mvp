@@ -26,10 +26,22 @@ const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const IDEMPOTENCY_KEY = /^[^\s\p{C}]{16,128}$/u;
 const MAX_CASE_CREATE_BYTES = 1024;
+const APPROVED_USER_X_HEADERS = Object.freeze([
+  "x-client-info",
+  "x-forwarded-for",
+  "x-forwarded-host",
+  "x-forwarded-port",
+  "x-forwarded-proto",
+  "x-real-ip",
+  "x-request-id",
+  "x-supabase-api-version",
+]);
+const APPROVED_USER_X_HEADER_SET = new Set(APPROVED_USER_X_HEADERS);
 const ALLOWED_PREFLIGHT_HEADERS = new Set([
   "authorization",
   "content-type",
   "apikey",
+  ...APPROVED_USER_X_HEADERS,
 ]);
 
 export function isUuid(value: unknown): value is string {
@@ -59,7 +71,12 @@ export function corsHeaders(
     headers.set("access-control-allow-methods", "GET, POST, OPTIONS");
     headers.set(
       "access-control-allow-headers",
-      "authorization, content-type, apikey",
+      [
+        "authorization",
+        "content-type",
+        "apikey",
+        ...APPROVED_USER_X_HEADERS,
+      ].join(", "),
     );
   }
   return headers;
@@ -123,6 +140,15 @@ export function hasBearerAuthorization(request: Request): boolean {
   );
 }
 
+function hasOnlyApprovedUserXHeaders(request: Request): boolean {
+  for (const name of request.headers.keys()) {
+    if (name.startsWith("x-") && !APPROVED_USER_X_HEADER_SET.has(name)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function validateClosedGet(
   request: Request,
   pathname: string,
@@ -136,13 +162,7 @@ export function validateClosedGet(
   ) {
     return "invalid";
   }
-  for (const name of request.headers.keys()) {
-    if (
-      /^x-(?:case|user|role|group|provider|authorization-subject)/iu.test(name)
-    ) {
-      return "invalid";
-    }
-  }
+  if (!hasOnlyApprovedUserXHeaders(request)) return "invalid";
   return "ok";
 }
 
@@ -193,6 +213,99 @@ export type CaseCreateRequest = Readonly<{
   idempotencyKey: string;
 }>;
 
+function jsonStringEnd(source: string, start: number): number {
+  if (source[start] !== '"') return -1;
+  for (let index = start + 1; index < source.length; index += 1) {
+    const character = source[index];
+    if (character === '"') return index + 1;
+    if (character === "\\") {
+      index += 1;
+      if (index >= source.length) return -1;
+      if (source[index] === "u") {
+        if (!/^[0-9a-f]{4}$/iu.test(source.slice(index + 1, index + 5))) {
+          return -1;
+        }
+        index += 4;
+      } else if (!'"\\/bfnrt'.includes(source[index])) {
+        return -1;
+      }
+    } else if (character.charCodeAt(0) < 0x20) {
+      return -1;
+    }
+  }
+  return -1;
+}
+
+function skipJsonWhitespace(source: string, start: number): number {
+  let index = start;
+  while (index < source.length && /[\t\n\r ]/u.test(source[index])) index += 1;
+  return index;
+}
+
+function hasUniqueTopLevelJsonMembers(source: string): boolean {
+  let index = skipJsonWhitespace(source, 0);
+  if (source[index] !== "{") return false;
+  index = skipJsonWhitespace(source, index + 1);
+  if (source[index] === "}") {
+    return skipJsonWhitespace(source, index + 1) === source.length;
+  }
+
+  const seen = new Set<string>();
+  while (index < source.length) {
+    const keyEnd = jsonStringEnd(source, index);
+    if (keyEnd < 0) return false;
+    let key: unknown;
+    try {
+      key = JSON.parse(source.slice(index, keyEnd));
+    } catch {
+      return false;
+    }
+    if (typeof key !== "string" || seen.has(key)) return false;
+    seen.add(key);
+    index = skipJsonWhitespace(source, keyEnd);
+    if (source[index] !== ":") return false;
+    index = skipJsonWhitespace(source, index + 1);
+
+    let nestedDepth = 0;
+    let sawValue = false;
+    let foundDelimiter = false;
+    while (index < source.length) {
+      const character = source[index];
+      if (character === '"') {
+        const valueEnd = jsonStringEnd(source, index);
+        if (valueEnd < 0) return false;
+        sawValue = true;
+        index = valueEnd;
+        continue;
+      }
+      if (character === "{" || character === "[") {
+        nestedDepth += 1;
+        sawValue = true;
+      } else if (character === "]") {
+        if (nestedDepth === 0) return false;
+        nestedDepth -= 1;
+      } else if (character === "}") {
+        if (nestedDepth > 0) {
+          nestedDepth -= 1;
+        } else {
+          if (!sawValue) return false;
+          return skipJsonWhitespace(source, index + 1) === source.length;
+        }
+      } else if (character === "," && nestedDepth === 0) {
+        if (!sawValue) return false;
+        index = skipJsonWhitespace(source, index + 1);
+        foundDelimiter = true;
+        break;
+      } else if (!/[\t\n\r ]/u.test(character)) {
+        sawValue = true;
+      }
+      index += 1;
+    }
+    if (!foundDelimiter) return false;
+  }
+  return false;
+}
+
 export async function readCaseCreateRequest(
   request: Request,
 ): Promise<CaseCreateRequest | null> {
@@ -203,15 +316,15 @@ export async function readCaseCreateRequest(
     url.search.length !== 0 ||
     !/^application\/json(?:\s*;\s*charset=utf-8)?$/iu.test(
       request.headers.get("content-type") ?? "",
-    )
+    ) || !hasOnlyApprovedUserXHeaders(request)
   ) return null;
   const bytes = await boundedBody(request);
   if (!bytes || bytes.length === 0) return null;
   let candidate: unknown;
   try {
-    candidate = JSON.parse(
-      new TextDecoder("utf-8", { fatal: true }).decode(bytes),
-    );
+    const decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    if (!hasUniqueTopLevelJsonMembers(decoded)) return null;
+    candidate = JSON.parse(decoded);
   } catch {
     return null;
   }
@@ -279,6 +392,7 @@ export function validateCaseCreateResult(
 
 export type ValidWorkspaceGrant = Readonly<{
   caseId: string;
+  caseTitle: string;
   role: CaseworkRole;
 }>;
 
@@ -292,32 +406,45 @@ export function validateWorkspaceGrant(
   ) return null;
   const caseId = own(candidate, "case_id");
   const caseStatus = own(candidate, "case_status");
+  const caseTitle = own(candidate, "case_title");
   const role = own(candidate, "account_role");
   const grantId = own(candidate, "grant_id");
   const grantVersion = own(candidate, "grant_version");
   const grantExpiresAt = own(candidate, "grant_expires_at");
   if (
-    !isUuid(caseId) || caseStatus !== "active" || role !== expectedRole ||
+    !isUuid(caseId) || caseStatus !== "active" ||
+    typeof caseTitle !== "string" || caseTitle !== caseTitle.trim() ||
+    caseTitle.length < 1 || caseTitle.length > 200 ||
+    /\p{C}/u.test(caseTitle) ||
+    role !== expectedRole ||
     !isUuid(grantId) || !Number.isSafeInteger(grantVersion) ||
     (grantVersion as number) < 1 || typeof grantExpiresAt !== "string" ||
     !Number.isFinite(Date.parse(grantExpiresAt))
   ) return null;
-  return Object.freeze({ caseId, role: expectedRole });
+  return Object.freeze({ caseId, caseTitle, role: expectedRole });
 }
 
 export function denialState(candidate: unknown): string {
   const state = own(candidate, "state");
   return state === "AUTH_REQUIRED" || state === "CASE_SELECTION_REQUIRED" ||
-      state === "CASE_NOT_AUTHORIZED" || state === "IDEMPOTENCY_CONFLICT"
+      state === "CASE_NOT_AUTHORIZED" || state === "IDEMPOTENCY_CONFLICT" ||
+      state === "CASE_ON_HOLD" || state === "CASE_CLOSED" ||
+      state === "MEMBERSHIP_REVOKED" || state === "MEMBERSHIP_EXPIRED"
     ? state
     : "CONTEXT_UNAVAILABLE";
 }
 
 export function denialStatus(state: string): number {
   if (state === "AUTH_REQUIRED") return 401;
-  if (state === "CASE_SELECTION_REQUIRED" || state === "IDEMPOTENCY_CONFLICT") {
+  if (
+    state === "CASE_SELECTION_REQUIRED" || state === "IDEMPOTENCY_CONFLICT" ||
+    state === "CASE_ON_HOLD" || state === "CASE_CLOSED"
+  ) {
     return 409;
   }
-  if (state === "CASE_NOT_AUTHORIZED") return 403;
+  if (
+    state === "CASE_NOT_AUTHORIZED" || state === "MEMBERSHIP_REVOKED" ||
+    state === "MEMBERSHIP_EXPIRED"
+  ) return 403;
   return 503;
 }
