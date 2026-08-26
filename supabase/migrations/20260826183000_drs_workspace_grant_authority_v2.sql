@@ -106,6 +106,60 @@ revoke all on table integration.drs_workspace_grants
 revoke all on sequence integration.drs_workspace_grants_grant_version_seq
   from public, anon, authenticated, service_role;
 
+create or replace function integration.drs_workspace_grant_enforce_immutable_v1()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if tg_op = 'DELETE' then
+    raise exception 'DRS_WORKSPACE_GRANT_DELETE_DENIED';
+  end if;
+
+  if old.invalidated_at is not null then
+    raise exception 'DRS_WORKSPACE_GRANT_ALREADY_INVALIDATED';
+  end if;
+
+  if old.grant_id is distinct from new.grant_id
+    or old.grant_version is distinct from new.grant_version
+    or old.binding_id is distinct from new.binding_id
+    or old.authenticated_user_id is distinct from new.authenticated_user_id
+    or old.specialist_id is distinct from new.specialist_id
+    or old.assignment_id is distinct from new.assignment_id
+    or old.drs_case_id is distinct from new.drs_case_id
+    or old.casework_case_id is distinct from new.casework_case_id
+    or old.authorization_subject is distinct from new.authorization_subject
+    or old.issued_at is distinct from new.issued_at
+    or old.expires_at is distinct from new.expires_at
+  then
+    raise exception 'DRS_WORKSPACE_GRANT_IMMUTABLE_FACT_DENIED';
+  end if;
+
+  if old.invalidation_reason is not null
+    or new.invalidated_at is null
+    or new.invalidation_reason is null
+    or btrim(new.invalidation_reason) = ''
+  then
+    raise exception 'DRS_WORKSPACE_GRANT_INVALIDATION_TRANSITION_DENIED';
+  end if;
+
+  return new;
+end;
+$$;
+
+alter function integration.drs_workspace_grant_enforce_immutable_v1()
+  owner to postgres;
+
+revoke all on function integration.drs_workspace_grant_enforce_immutable_v1()
+  from public, anon, authenticated, service_role;
+
+create trigger drs_workspace_grants_enforce_immutable
+  before update or delete
+  on integration.drs_workspace_grants
+  for each row execute function
+    integration.drs_workspace_grant_enforce_immutable_v1();
+
 create or replace function integration.drs_workspace_grant_issue_locked_v2(
   p_authenticated_user_id uuid,
   p_expected_case_id uuid,
@@ -380,8 +434,14 @@ begin
     );
   end if;
 
+  if v_grant.invalidated_at is not null then
+    return jsonb_build_object(
+      'authorized', false,
+      'state', 'CASE_NOT_AUTHORIZED'
+    );
+  end if;
+
   if v_authority -> 'authorized' is distinct from 'true'::jsonb
-    or v_grant.invalidated_at is not null
     or v_grant.expires_at <= v_now
   then
     update integration.drs_workspace_grants
@@ -391,7 +451,8 @@ begin
         invalidation_reason,
         'CURRENT_AUTHORITY_DENIED'
       )
-    where grant_id = v_grant.grant_id;
+    where grant_id = v_grant.grant_id
+      and invalidated_at is null;
     return jsonb_build_object(
       'authorized', false,
       'state', 'CASE_NOT_AUTHORIZED'
@@ -460,7 +521,8 @@ begin
         invalidation_reason,
         'CURRENT_AUTHORITY_FACTS_CHANGED'
       )
-    where grant_id = v_grant.grant_id;
+    where grant_id = v_grant.grant_id
+      and invalidated_at is null;
     return jsonb_build_object(
       'authorized', false,
       'state', 'CASE_NOT_AUTHORIZED'

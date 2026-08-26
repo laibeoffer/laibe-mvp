@@ -10,6 +10,9 @@ const CASE_ID = "22222222-2222-4222-8222-222222222222";
 const SPECIALIST_ID = "33333333-3333-4333-8333-333333333333";
 const GRANT_ID = "44444444-4444-4444-8444-444444444444";
 const SUBJECT = `drs-specialist:${SPECIALIST_ID}`;
+const MALFORMED_UUID_SUBJECT =
+  "drs-specialist:00000000-0000-0000-8000-000000000000";
+const HTTP_DATE = "Wed, 26 Aug 2026 08:12:00 GMT";
 const NOW_MS = Date.parse("2026-08-26T08:00:00.000Z");
 
 function candidate(overrides = {}) {
@@ -80,6 +83,79 @@ Deno.test("versioned grant validation preserves bigint precision and closes malf
       null,
     );
   }
+});
+
+Deno.test("focused RED: exact subject and RFC3339 validators reject parser-compatible impostors", async () => {
+  const {
+    createSupabaseDrsVersionedWorkspaceGrantResolver,
+    validateDrsVersionedWorkspaceGrant,
+  } = await import(MODULE_URL.href);
+
+  assert.equal(
+    validateDrsVersionedWorkspaceGrant(
+      candidate({ authorization_subject: MALFORMED_UUID_SUBJECT }),
+      expectation({ authorizationSubject: MALFORMED_UUID_SUBJECT }),
+    ),
+    null,
+    "a UUID-shaped suffix that fails the accepted UUID predicate must close",
+  );
+  assert.equal(
+    validateDrsVersionedWorkspaceGrant(
+      candidate({ grant_expires_at: HTTP_DATE }),
+      expectation(),
+    ),
+    null,
+    "Date.parse-compatible HTTP dates are not the accepted RFC3339 wire syntax",
+  );
+  assert.equal(
+    validateDrsVersionedWorkspaceGrant(
+      candidate(),
+      expectation({ acceptedAuthorityExpiresAt: HTTP_DATE }),
+    ),
+    null,
+    "accepted authority expiry must use the same exact RFC3339 predicate",
+  );
+  assert.ok(
+    validateDrsVersionedWorkspaceGrant(
+      candidate({ grant_expires_at: "2026-08-26T16:10:00+08:00" }),
+      expectation({
+        acceptedAuthorityExpiresAt: "2026-08-26T16:12:00+08:00",
+      }),
+    ),
+    "an exact RFC3339 offset timestamp remains valid",
+  );
+
+  let fetchCalls = 0;
+  const resolver = createSupabaseDrsVersionedWorkspaceGrantResolver({
+    env: {
+      get(name) {
+        return name === "SUPABASE_URL"
+          ? "https://project.example"
+          : "service-role-test-only";
+      },
+    },
+    fetch: () => {
+      fetchCalls += 1;
+      return Promise.resolve(Response.json(candidate()));
+    },
+  });
+  assert.equal(
+    await resolver.issueVersionedWorkspaceGrant(
+      expectation({ authorizationSubject: MALFORMED_UUID_SUBJECT }),
+    ),
+    null,
+  );
+  assert.equal(
+    await resolver.issueVersionedWorkspaceGrant(
+      expectation({ acceptedAuthorityExpiresAt: HTTP_DATE }),
+    ),
+    null,
+  );
+  assert.equal(
+    fetchCalls,
+    0,
+    "invalid resolver inputs must close before RPC work",
+  );
 });
 
 Deno.test("service resolver uses only the private v2 RPC contract and validates its response", async () => {

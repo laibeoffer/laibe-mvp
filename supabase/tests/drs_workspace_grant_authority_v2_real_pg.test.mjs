@@ -67,6 +67,12 @@ function assertDenied(payload, label) {
   );
 }
 
+async function assertMutationDenied(sql, label, expected) {
+  const outcome = await runPsql(sql);
+  assert.equal(outcome.success, false, label);
+  assert.match(new TextDecoder().decode(outcome.stderr), expected, label);
+}
+
 const CLEANUP_SQL = `
   set session_replication_role = replica;
   delete from integration.drs_workspace_grants
@@ -172,11 +178,19 @@ function serviceIssueSql(caseId = CASE_A) {
   `;
 }
 
-function privateAssertSql(grant, prefix = "") {
+function privateAssertSql(
+  grant,
+  prefix = "",
+  {
+    userId = USER_A,
+    caseId = CASE_A,
+    subject = SUBJECT_A,
+  } = {},
+) {
   return `
     ${prefix}
     select integration.drs_workspace_grant_assert_current_locked_v1(
-      '${USER_A}', '${CASE_A}', '${SUBJECT_A}',
+      '${userId}', '${caseId}', '${subject}',
       '${grant.grant_id}', ${grant.grant_version}::bigint
     );
   `;
@@ -207,6 +221,28 @@ Deno.test({
           'assert_owner', pg_get_userbyid(assert_current.proowner),
           'assert_security_definer', assert_current.prosecdef,
           'assert_search_path', assert_current.proconfig,
+          'guard_owner', pg_get_userbyid(guard.proowner),
+          'guard_security_definer', guard.prosecdef,
+          'guard_search_path', guard.proconfig,
+          'guard_proacl', guard.proacl,
+          'service_can_execute_guard', has_function_privilege(
+            'service_role',
+            'integration.drs_workspace_grant_enforce_immutable_v1()',
+            'EXECUTE'
+          ),
+          'authenticated_can_execute_guard', has_function_privilege(
+            'authenticated',
+            'integration.drs_workspace_grant_enforce_immutable_v1()',
+            'EXECUTE'
+          ),
+          'guard_trigger_enabled', exists (
+            select 1
+            from pg_trigger trigger_row
+            where trigger_row.tgrelid = c.oid
+              and trigger_row.tgname = 'drs_workspace_grants_enforce_immutable'
+              and trigger_row.tgenabled = 'O'
+              and not trigger_row.tgisinternal
+          ),
           'wrapper_security_definer', wrapper.prosecdef,
           'proacl', issue.proacl,
           'service_can_issue', has_function_privilege(
@@ -226,6 +262,14 @@ Deno.test({
           ),
           'authenticated_can_select_table', has_table_privilege(
             'authenticated', 'integration.drs_workspace_grants', 'SELECT'
+          ),
+          'service_can_use_version_sequence', has_sequence_privilege(
+            'service_role',
+            'integration.drs_workspace_grants_grant_version_seq', 'USAGE'
+          ),
+          'authenticated_can_use_version_sequence', has_sequence_privilege(
+            'authenticated',
+            'integration.drs_workspace_grants_grant_version_seq', 'USAGE'
           )
         )
         from pg_class c
@@ -234,6 +278,7 @@ Deno.test({
           and a.attname = 'grant_version'
         cross join pg_proc issue
         cross join pg_proc assert_current
+        cross join pg_proc guard
         cross join pg_proc wrapper
         where n.nspname = 'integration'
           and c.relname = 'drs_workspace_grants'
@@ -241,6 +286,8 @@ Deno.test({
             'integration.drs_workspace_grant_issue_locked_v2(uuid,uuid,text)'::regprocedure
           and assert_current.oid =
             'integration.drs_workspace_grant_assert_current_locked_v1(uuid,uuid,text,uuid,bigint)'::regprocedure
+          and guard.oid =
+            'integration.drs_workspace_grant_enforce_immutable_v1()'::regprocedure
           and wrapper.oid =
             'public.drs_workspace_grant_v2(uuid,uuid,text)'::regprocedure;
       `),
@@ -256,12 +303,21 @@ Deno.test({
       assert.equal(catalog.assert_owner, "postgres");
       assert.equal(catalog.assert_security_definer, true);
       assert.deepEqual(catalog.assert_search_path, ['search_path=""']);
+      assert.equal(catalog.guard_owner, "postgres");
+      assert.equal(catalog.guard_security_definer, true);
+      assert.deepEqual(catalog.guard_search_path, ['search_path=""']);
+      assert.ok(catalog.guard_proacl);
+      assert.equal(catalog.service_can_execute_guard, false);
+      assert.equal(catalog.authenticated_can_execute_guard, false);
+      assert.equal(catalog.guard_trigger_enabled, true);
       assert.equal(catalog.wrapper_security_definer, false);
       assert.equal(catalog.service_can_issue, true);
       assert.equal(catalog.anon_can_issue, false);
       assert.equal(catalog.service_can_assert_private, false);
       assert.equal(catalog.service_can_select_table, false);
       assert.equal(catalog.authenticated_can_select_table, false);
+      assert.equal(catalog.service_can_use_version_sequence, false);
+      assert.equal(catalog.authenticated_can_use_version_sequence, false);
       assert.ok(catalog.proacl);
 
       const [first, second] = await Promise.all([
@@ -278,6 +334,73 @@ Deno.test({
       const current = jsonFrom(await psql(privateAssertSql(grantA)));
       assert.equal(current.authorized, true);
 
+      // Required matrix: normal invalidation is the only allowed table UPDATE.
+      const normalInvalidation = await psql(`
+        begin;
+        set local role postgres;
+        update integration.drs_workspace_grants
+          set invalidated_at = clock_timestamp(),
+              invalidation_reason = 'DISPOSABLE_NORMAL_INVALIDATION'
+          where grant_id = '${grantA.grant_id}';
+        select count(*)
+          from integration.drs_workspace_grants
+          where grant_id = '${grantA.grant_id}'
+            and invalidated_at is not null
+            and invalidation_reason = 'DISPOSABLE_NORMAL_INVALIDATION';
+        rollback;
+      `);
+      assert.equal(normalInvalidation, "1", "normal invalidation");
+
+      // Required matrix: even postgres/the table owner cannot reactivate,
+      // rewrite an invalidation, mutate immutable facts, or DELETE a grant.
+      await assertMutationDenied(
+        `begin;
+         set local role postgres;
+         update integration.drs_workspace_grants
+           set invalidated_at = clock_timestamp(),
+               invalidation_reason = 'DISPOSABLE_FIRST_INVALIDATION'
+           where grant_id = '${grantA.grant_id}';
+         update integration.drs_workspace_grants
+           set invalidated_at = null, invalidation_reason = null
+           where grant_id = '${grantA.grant_id}';
+         rollback;`,
+        "owner reactivation denial",
+        /DRS_WORKSPACE_GRANT_ALREADY_INVALIDATED/u,
+      );
+      await assertMutationDenied(
+        `begin;
+         set local role postgres;
+         update integration.drs_workspace_grants
+           set invalidated_at = clock_timestamp(),
+               invalidation_reason = 'DISPOSABLE_FIRST_INVALIDATION'
+           where grant_id = '${grantA.grant_id}';
+         update integration.drs_workspace_grants
+           set invalidation_reason = 'DISPOSABLE_REWRITE'
+           where grant_id = '${grantA.grant_id}';
+         rollback;`,
+        "invalidation rewrite denial",
+        /DRS_WORKSPACE_GRANT_ALREADY_INVALIDATED/u,
+      );
+      await assertMutationDenied(
+        `begin;
+         set local role postgres;
+         update integration.drs_workspace_grants
+           set expires_at = expires_at - interval '1 second'
+           where grant_id = '${grantA.grant_id}';
+         rollback;`,
+        "immutable fact mutation denial",
+        /DRS_WORKSPACE_GRANT_IMMUTABLE_FACT_DENIED/u,
+      );
+      await assertMutationDenied(
+        `begin;
+         set local role postgres;
+         delete from integration.drs_workspace_grants
+           where grant_id = '${grantA.grant_id}';
+         rollback;`,
+        "DELETE denial",
+        /DRS_WORKSPACE_GRANT_DELETE_DENIED/u,
+      );
+
       // Required matrix: cross-case denial.
       assertDenied(
         jsonFrom(await psql(serviceIssueSql(CASE_B))),
@@ -292,6 +415,49 @@ Deno.test({
       assertDenied(
         jsonFrom(await psql(privateAssertSql(stale))),
         "stale version denial",
+      );
+
+      // Required matrix: grant expiry without mutating immutable issue facts.
+      const expiredGrant = jsonFrom(
+        await psql(`
+          insert into integration.drs_workspace_grants (
+            binding_id,
+            authenticated_user_id,
+            specialist_id,
+            assignment_id,
+            drs_case_id,
+            casework_case_id,
+            authorization_subject,
+            issued_at,
+            expires_at
+          ) values (
+            '${BINDING_B}',
+            '${USER_B}',
+            '${SPECIALIST_B}',
+            '${ASSIGNMENT_B}',
+            '${DRS_CASE_B}',
+            '${CASE_B}',
+            'drs-specialist:${SPECIALIST_B}',
+            clock_timestamp() - interval '10 minutes',
+            clock_timestamp() - interval '1 second'
+          )
+          returning jsonb_build_object(
+            'grant_id', grant_id::text,
+            'grant_version', grant_version::text
+          );
+        `),
+      );
+      assertDenied(
+        jsonFrom(
+          await psql(
+            privateAssertSql(expiredGrant, "", {
+              userId: USER_B,
+              caseId: CASE_B,
+              subject: `drs-specialist:${SPECIALIST_B}`,
+            }),
+          ),
+        ),
+        "grant expiry",
       );
 
       const scenarios = [
@@ -338,13 +504,6 @@ Deno.test({
           "Auth user ban",
           `update auth.users set banned_until = clock_timestamp() + interval '1 hour'
              where id = '${USER_A}';`,
-        ],
-        [
-          "grant expiry",
-          `update integration.drs_workspace_grants
-             set issued_at = clock_timestamp() - interval '10 minutes',
-                 expires_at = clock_timestamp() - interval '1 second'
-             where grant_id = '${grantA.grant_id}';`,
         ],
       ];
       for (const [label, mutation] of scenarios) {
