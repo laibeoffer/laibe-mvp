@@ -65,15 +65,28 @@ export function createOwnerWorkspaceGrantHandler(
       return jsonResponse(denialStatus(state), { state }, cors);
     }
     return jsonResponse(200, {
-      schemaVersion: "laibe.casework-workspace-grant.v1",
-      state: "AUTHORIZED_CASEWORK_WORKSPACE",
-      case: { id: grant.caseId, status: "ACTIVE" },
-      workspaceAccess: {
-        accountRole: "owner",
-        mode: "read_only",
-        mutationAllowed: false,
+      schemaVersion: "laibe.owner-workspace-runtime.v1",
+      state: "AUTHORIZED_OWNER_WORKSPACE",
+      authenticatedUserId: identity.userId,
+      currentCaseId: grant.caseId,
+      membership: {
+        userId: identity.userId,
+        caseId: grant.caseId,
+        role: "owner",
+        status: "active",
       },
-      next: { actor: "owner", action: "REVIEW_CASE_DECISIONS" },
+      workspaceAccess: {
+        role: "owner",
+        mutationAllowed: false,
+        writeActionsEnabled: false,
+        payloadPolicy: "AUTHORIZED_SCOPE_ONLY",
+      },
+      case: { caseId: grant.caseId, status: "active", title: grant.caseTitle },
+      serviceContext: {
+        pcmStatus: "UNAVAILABLE",
+        contractStatus: "UNAVAILABLE",
+      },
+      documents: [],
     }, cors);
   };
 }
