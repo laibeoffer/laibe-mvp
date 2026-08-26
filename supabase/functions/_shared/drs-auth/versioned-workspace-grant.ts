@@ -9,6 +9,9 @@ import {
 const MAX_GRANT_TTL_MS = 15 * 60 * 1000;
 const MAX_POSTGRES_BIGINT = 9_223_372_036_854_775_807n;
 const DECIMAL_BIGINT_PATTERN = /^[1-9]\d{0,18}$/u;
+const DRS_SPECIALIST_SUBJECT_PREFIX = "drs-specialist:";
+const RFC3339_PATTERN =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2})$/u;
 const EXACT_WIRE_KEYS = Object.freeze(
   [
     "authorized",
@@ -75,8 +78,18 @@ function isCanonicalPostgresBigint(value: unknown): value is string {
   }
 }
 
+function isDrsSpecialistSubject(
+  authorizationSubject: unknown,
+): authorizationSubject is string {
+  return typeof authorizationSubject === "string" &&
+    authorizationSubject.startsWith(DRS_SPECIALIST_SUBJECT_PREFIX) &&
+    isUuid(
+      authorizationSubject.slice(DRS_SPECIALIST_SUBJECT_PREFIX.length),
+    );
+}
+
 function timestamp(value: unknown): number | null {
-  if (typeof value !== "string") return null;
+  if (typeof value !== "string" || !RFC3339_PATTERN.test(value)) return null;
   const parsed = Date.parse(value);
   return Number.isFinite(parsed) ? parsed : null;
 }
@@ -116,9 +129,8 @@ export function validateDrsVersionedWorkspaceGrant(
       authenticatedUserId !== expectation.authenticatedUserId ||
       !isUuid(selectedCaseId) ||
       selectedCaseId !== expectation.expectedCaseId ||
-      typeof authorizationSubject !== "string" ||
       authorizationSubject !== expectation.authorizationSubject ||
-      !/^drs-specialist:[0-9a-f-]{36}$/iu.test(authorizationSubject) ||
+      !isDrsSpecialistSubject(authorizationSubject) ||
       !isUuid(grantId) ||
       !isCanonicalPostgresBigint(grantVersion) ||
       typeof grantExpiresAt !== "string" ||
@@ -163,9 +175,7 @@ export function createSupabaseDrsVersionedWorkspaceGrantResolver(
         !runtimeAvailable ||
         !isUuid(input.authenticatedUserId) ||
         !isUuid(input.expectedCaseId) ||
-        !/^drs-specialist:[0-9a-f-]{36}$/iu.test(
-          input.authorizationSubject,
-        ) ||
+        !isDrsSpecialistSubject(input.authorizationSubject) ||
         timestamp(input.acceptedAuthorityExpiresAt) === null
       ) return null;
 

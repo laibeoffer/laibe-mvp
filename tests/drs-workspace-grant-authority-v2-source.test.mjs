@@ -47,6 +47,74 @@ test("migration binds persistent monotonic capability state without JS precision
   );
 });
 
+test("focused RED: database enforces owner-proof one-way invalidation", async () => {
+  const migration = await text(
+    "supabase/migrations/20260826183000_drs_workspace_grant_authority_v2.sql",
+  );
+  assert.match(
+    migration,
+    /create or replace function integration\.drs_workspace_grant_enforce_immutable_v1\(\)\s+returns trigger\s+language plpgsql\s+security definer\s+set search_path = ''/u,
+  );
+  assert.match(
+    migration,
+    /create trigger drs_workspace_grants_enforce_immutable\s+before update or delete\s+on integration\.drs_workspace_grants/u,
+  );
+  assert.match(
+    migration,
+    /revoke all on function integration\.drs_workspace_grant_enforce_immutable_v1\(\)\s+from public, anon, authenticated, service_role/u,
+  );
+  assert.match(
+    migration,
+    /if tg_op = 'DELETE' then\s+raise exception 'DRS_WORKSPACE_GRANT_DELETE_DENIED'/u,
+  );
+  assert.match(
+    migration,
+    /if old\.invalidated_at is not null then\s+raise exception 'DRS_WORKSPACE_GRANT_ALREADY_INVALIDATED'/u,
+  );
+  for (
+    const fact of [
+      "grant_id",
+      "grant_version",
+      "binding_id",
+      "authenticated_user_id",
+      "specialist_id",
+      "assignment_id",
+      "drs_case_id",
+      "casework_case_id",
+      "authorization_subject",
+      "issued_at",
+      "expires_at",
+    ]
+  ) {
+    assert.match(
+      migration,
+      new RegExp(`old\\.${fact} is distinct from new\\.${fact}`, "u"),
+      `${fact} must be immutable even for the table owner`,
+    );
+  }
+  assert.match(
+    migration,
+    /new\.invalidated_at is null[\s\S]*?new\.invalidation_reason is null[\s\S]*?btrim\(new\.invalidation_reason\) = ''/u,
+  );
+
+  const assertCurrent = migration.match(
+    /create or replace function integration\.drs_workspace_grant_assert_current_locked_v1\([\s\S]*?\n\$\$;/u,
+  )?.[0];
+  assert.ok(assertCurrent);
+  assert.match(
+    assertCurrent,
+    /if v_grant\.invalidated_at is not null\s+then\s+return jsonb_build_object/u,
+    "already-invalidated rows must fail closed without an UPDATE",
+  );
+  assert.equal(
+    assertCurrent.match(
+      /where grant_id = v_grant\.grant_id\s+and invalidated_at is null/gu,
+    )?.length,
+    2,
+    "both assert-current invalidations must target only current rows",
+  );
+});
+
 test("issue and private assert recheck canonical current authority and every stored fact", async () => {
   const migration = await text(
     "supabase/migrations/20260826183000_drs_workspace_grant_authority_v2.sql",
@@ -106,6 +174,7 @@ test("function ownership and execute privileges preserve the private P2 boundary
     const name of [
       "integration.drs_workspace_grant_issue_locked_v2",
       "integration.drs_workspace_grant_assert_current_locked_v1",
+      "integration.drs_workspace_grant_enforce_immutable_v1",
       "integration.drs_workspace_grant_invalidate_from_authority_change_v1",
     ]
   ) {
@@ -143,6 +212,22 @@ test("function ownership and execute privileges preserve the private P2 boundary
     migration,
     /grant execute on function integration\.drs_workspace_grant_assert_current_locked_v1\([\s\S]*?to service_role/u,
   );
+});
+
+test("focused RED: shared resolver uses accepted UUID and exact RFC3339 predicates", async () => {
+  const module = await text(
+    "supabase/functions/_shared/drs-auth/versioned-workspace-grant.ts",
+  );
+  assert.match(
+    module,
+    /authorizationSubject\.startsWith\(DRS_SPECIALIST_SUBJECT_PREFIX\)[\s\S]*?isUuid\(\s*authorizationSubject\.slice\(DRS_SPECIALIST_SUBJECT_PREFIX\.length\)\s*,?\s*\)/u,
+  );
+  assert.match(module, /RFC3339_PATTERN\.test\(value\)/u);
+  assert.match(
+    module,
+    /if \(typeof value !== "string" \|\| !RFC3339_PATTERN\.test\(value\)\)\s+return null;\s+const parsed = Date\.parse\(value\)/u,
+  );
+  assert.doesNotMatch(module, /\^drs-specialist:\[0-9a-f-\]\{36\}\$/u);
 });
 
 test("authority changes irreversibly invalidate current derived capabilities", async () => {
@@ -226,6 +311,13 @@ test("real PostgreSQL harness binds the two-user two-case adversarial matrix", a
       "grant expiry",
       "stale version denial",
       "concurrent issue convergence",
+      "normal invalidation",
+      "owner reactivation denial",
+      "invalidation rewrite denial",
+      "immutable fact mutation denial",
+      "DELETE denial",
+      "guard_owner",
+      "guard_search_path",
       "proacl",
       "rollback",
     ]
