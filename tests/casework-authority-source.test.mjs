@@ -72,9 +72,8 @@ test("P1 source paths close JWT identity before service RPC", async () => {
   }
 });
 
-test("P1 source excludes all document and Storage authority", async () => {
+test("P1 production source excludes all document and Storage authority", async () => {
   const paths = [
-    "supabase/config.toml",
     "supabase/migrations/20260818160000_casework_authority_v1.sql",
     "supabase/functions/_shared/casework-authority/contracts.ts",
     "supabase/functions/_shared/casework-authority/resolver.ts",

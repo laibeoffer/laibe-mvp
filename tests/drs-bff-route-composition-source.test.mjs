@@ -48,14 +48,23 @@ test("all five composed routes guard before server authority or provider work", 
   }
 });
 
-test("focused RED: P1 exact config map is absent", async () => {
+test("focused RED: P2 shared config map and private buckets are absent", async () => {
   const config = await source("supabase/config.toml");
-  const map = Object.fromEntries(
-    [...config.matchAll(
-      /^\[functions\.([^\]]+)\]\nverify_jwt = (true|false)$/gmu,
-    )]
-      .map((match) => [match[1], match[2] === "true"]),
-  );
+  const tables = [...`${config}\n[`.matchAll(
+    /^\[([^\]]+)\]\n([\s\S]*?)(?=^\[)/gmu,
+  )].map((match) => [match[1], match[2].trimEnd()]);
+  const tableNames = tables.map(([name]) => name);
+  assert.equal(new Set(tableNames).size, tableNames.length);
+
+  const functionEntries = tables
+    .filter(([name]) => name.startsWith("functions."))
+    .map(([name, body]) => {
+      assert.match(body, /^verify_jwt = (?:true|false)$/u, name);
+      return [name.slice("functions.".length), body.endsWith("true")];
+    });
+  const map = Object.fromEntries(functionEntries);
+  assert.equal(functionEntries.length, 15);
+  assert.equal(Object.keys(map).length, 15);
   assert.deepEqual(map, {
     "drs-session-bootstrap": false,
     "drs-workspace-grant": false,
@@ -68,11 +77,34 @@ test("focused RED: P1 exact config map is absent", async () => {
     "owner-workspace-grant": true,
     "vendor-workspace-grant": true,
     "highest-reviewer-workspace-grant": true,
+    "drs-document-upload-intent": false,
+    "drs-document-upload-finalize": false,
+    "drs-document-version-download": false,
+    "drs-document-snapshot": false,
   });
-  assert.equal(Object.keys(map).length, 11);
+
+  const bucketEntries = tables.filter(([name]) =>
+    name.startsWith("storage.buckets.")
+  );
+  assert.deepEqual(
+    bucketEntries.map(([name]) => name),
+    [
+      "storage.buckets.drs-case-intake-private",
+      "storage.buckets.drs-case-records-private",
+    ],
+  );
+  const expectedBucketBody = [
+    "public = false",
+    'file_size_limit = "25MiB"',
+    'allowed_mime_types = ["application/pdf", "image/jpeg", "image/png"]',
+  ].join("\n");
+  for (const [name, body] of bucketEntries) {
+    assert.equal(body, expectedBucketBody, name);
+  }
+  assert.doesNotMatch(config, /objects_path/iu);
   assert.doesNotMatch(
     config,
-    /storage\.buckets|drs-document-upload|drs-document-snapshot/iu,
+    /https?:\/\/|service_role|secret|provision|apply|remote/iu,
   );
 });
 

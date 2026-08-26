@@ -32,3 +32,25 @@ verify_jwt = true
 
 [functions.highest-reviewer-workspace-grant]
 verify_jwt = true
+
+[storage.buckets.drs-case-intake-private]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["application/pdf", "image/jpeg", "image/png"]
+
+[storage.buckets.drs-case-records-private]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["application/pdf", "image/jpeg", "image/png"]
+
+[functions.drs-document-upload-intent]
+verify_jwt = false
+
+[functions.drs-document-upload-finalize]
+verify_jwt = false
+
+[functions.drs-document-version-download]
+verify_jwt = false
+
+[functions.drs-document-snapshot]
+verify_jwt = false
