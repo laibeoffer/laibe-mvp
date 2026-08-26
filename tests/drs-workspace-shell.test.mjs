@@ -392,6 +392,21 @@ test("DRS specialist non-ready layout gives status copy readable width", async (
   assert.match(styles, /body:not\(\[data-drs-state="ready"\]\)\s+\.workspace-status\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)/u, "non-ready status region uses one readable column");
 });
 
+test("DRS specialist mobile permission state stays inside the workspace shell", async () => {
+  const styles = await readPageSource("specialist_workspace", "styles.css");
+
+  assert.match(
+    styles,
+    /@media \(max-width: 680px\)[\s\S]*?\.workspace-status\s*\{[^}]*width:\s*auto;[^}]*margin:\s*4px\s+0;/u,
+    "the mobile status region must use the shell track instead of adding a fixed width to its horizontal margins",
+  );
+  assert.doesNotMatch(
+    styles,
+    /\.workspace-status\s*\{[^}]*width:\s*calc\(100%\s*-\s*8px\)/u,
+    "the mobile status region must not overflow its already inset workspace shell",
+  );
+});
+
 test("DRS specialist static default status waits for authorization before case data", async () => {
   const html = await readPageSource("specialist_workspace", "code.html");
   const statusRegion = html.match(/<section\b[^>]*class="workspace-status"[\s\S]*?<\/section>/u)?.[0] ?? "";
