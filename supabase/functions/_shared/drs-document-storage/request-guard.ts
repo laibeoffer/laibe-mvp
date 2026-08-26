@@ -93,15 +93,47 @@ async function readExactJson(request: Request): Promise<unknown> {
     contentLength !== null &&
     (!/^(?:0|[1-9]\d*)$/u.test(contentLength) ||
       Number(contentLength) > MAX_BODY_BYTES)
-  ) invalidRequest();
-  let bytes: ArrayBuffer;
-  try {
-    bytes = await request.clone().arrayBuffer();
-  } catch {
+  ) {
+    try {
+      await request.body.cancel();
+    } catch {
+      // The request is rejected regardless of provider cancellation support.
+    }
     invalidRequest();
   }
-  if (bytes.byteLength === 0 || bytes.byteLength > MAX_BODY_BYTES) {
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (
+        !(value instanceof Uint8Array) ||
+        total + value.byteLength > MAX_BODY_BYTES
+      ) {
+        await reader.cancel();
+        invalidRequest();
+      }
+      chunks.push(value);
+      total += value.byteLength;
+    }
+  } catch {
+    try {
+      await reader.cancel();
+    } catch {
+      // The request is rejected regardless of provider cancellation support.
+    }
     invalidRequest();
+  } finally {
+    reader.releaseLock();
+  }
+  if (total === 0) invalidRequest();
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
   }
   try {
     const raw = new TextDecoder("utf-8", { fatal: true }).decode(bytes);

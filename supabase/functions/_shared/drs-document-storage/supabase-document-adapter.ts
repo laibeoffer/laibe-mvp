@@ -9,6 +9,17 @@ import type {
 const DECIMAL_BIGINT = /^[1-9]\d{0,18}$/u;
 const MAX_RESOURCE_REF_BYTES = 16 * 1024;
 
+async function sha256Text(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value),
+  );
+  return Array.from(
+    new Uint8Array(digest),
+    (byte) => byte.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
 function validPrincipal(principal: DocumentModeAPrincipal): boolean {
   return isUuid(principal.authenticatedUserId) &&
     isUuid(principal.expectedCaseId) &&
@@ -102,22 +113,24 @@ export function createSupabaseDocumentRepository(
     async queueOrphanCleanup(
       input: Readonly<{
         principal: DocumentModeAPrincipal;
+        intentRef: string;
         recordsBucket: string;
         recordsObjectKey: string;
-        expectedPayloadSha256: string;
       }>,
     ) {
       const resourceRef = JSON.stringify({
         schemaVersion: "laibe.drs-document-orphan-cleanup.internal.v1",
+        intentRef: input.intentRef,
         recordsBucket: input.recordsBucket,
         recordsObjectKey: input.recordsObjectKey,
       });
+      const orphanPayloadSha256 = await sha256Text(resourceRef);
       await execute({
         principal: input.principal,
         operation: "QUEUE_ORPHAN_CLEANUP",
         resourceRef,
-        idempotencyKey: `orphan-${input.expectedPayloadSha256.slice(0, 40)}`,
-        expectedPayloadSha256: input.expectedPayloadSha256,
+        idempotencyKey: `orphan-${orphanPayloadSha256.slice(0, 40)}`,
+        expectedPayloadSha256: orphanPayloadSha256,
       });
     },
   });

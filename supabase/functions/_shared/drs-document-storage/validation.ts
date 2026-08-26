@@ -22,28 +22,13 @@ export type FileValidationDecision = Readonly<{
   reason: string | null;
 }>;
 
-const BLOCKED_PDF_FEATURES = new Set([
-  "JavaScript",
-  "OpenAction",
-  "AdditionalActions",
-  "Launch",
-  "SubmitForm",
-  "ImportData",
-  "RemoteGoTo",
-  "URI",
-  "EmbeddedFiles",
-  "FileSpec",
-  "Collection",
-  "XFA",
-  "AcroForm",
-  "RichMedia",
-  "Movie",
-  "Sound",
-  "3D",
-  "ExternalResource",
-  "RemoteReference",
-  "Encrypted",
-]);
+const MIME_EXTENSIONS = Object.freeze(
+  {
+    "application/pdf": Object.freeze(["pdf"]),
+    "image/jpeg": Object.freeze(["jpg", "jpeg"]),
+    "image/png": Object.freeze(["png"]),
+  } satisfies Readonly<Record<DocumentMime, readonly string[]>>,
+);
 
 export function evaluateHostileFileReport(
   input: HostileFileReport,
@@ -52,6 +37,8 @@ export function evaluateHostileFileReport(
     if (
       input.declaredMime !== input.detectedMime ||
       !DOCUMENT_LIMITS.allowedMime.includes(input.detectedMime) ||
+      typeof input.extension !== "string" ||
+      !MIME_EXTENSIONS[input.detectedMime]?.includes(input.extension) ||
       !Number.isFinite(input.decodedBytes) || input.decodedBytes < 1 ||
       input.decodedBytes > 200 * 1024 * 1024 ||
       !Number.isFinite(input.cpuMs) || input.cpuMs < 0 ||
@@ -73,8 +60,15 @@ export function evaluateHostileFileReport(
         reason: "STRUCTURAL_VALIDATION_INCOMPLETE",
       });
     }
+    if (!Array.isArray(input.activeFeatures)) {
+      return Object.freeze({
+        state: "QUARANTINED",
+        reason: "VALIDATION_UNKNOWN",
+      });
+    }
     if (
-      input.activeFeatures.some((feature) => BLOCKED_PDF_FEATURES.has(feature))
+      input.activeFeatures.length !== 0 ||
+      input.activeFeatures.some((feature) => typeof feature !== "string")
     ) {
       return Object.freeze({ state: "REJECTED", reason: "ACTIVE_FEATURE" });
     }
@@ -93,7 +87,7 @@ export function evaluateHostileFileReport(
     if (input.malwareState === "INFECTED") {
       return Object.freeze({ state: "REJECTED", reason: "MALWARE_DETECTED" });
     }
-    if (input.malwareState === "UNKNOWN" || input.malwareState === "TIMEOUT") {
+    if (input.malwareState !== "CLEAN") {
       return Object.freeze({ state: "QUARANTINED", reason: "MALWARE_UNKNOWN" });
     }
     return Object.freeze({ state: "CLEAN", reason: null });

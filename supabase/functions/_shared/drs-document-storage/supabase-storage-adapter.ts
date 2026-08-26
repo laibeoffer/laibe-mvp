@@ -3,7 +3,6 @@ import {
   DOCUMENT_LIMITS,
   type DocumentMime,
   INTAKE_BUCKET,
-  isSha256,
   isUuid,
   RECORDS_BUCKET,
 } from "./contracts.ts";
@@ -54,10 +53,81 @@ function mime(value: string | null): DocumentMime | null {
     : null;
 }
 
-function exactInteger(value: string | null): number | null {
-  if (value === null || !/^(?:0|[1-9]\d*)$/u.test(value)) return null;
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) ? parsed : null;
+function hex(bytes: ArrayBuffer): string {
+  return [...new Uint8Array(bytes)].map((value) =>
+    value.toString(16).padStart(2, "0")
+  ).join("");
+}
+
+function mimeFromBytes(bytes: Uint8Array): DocumentMime | null {
+  if (
+    bytes.length >= 5 && bytes[0] === 0x25 && bytes[1] === 0x50 &&
+    bytes[2] === 0x44 && bytes[3] === 0x46 && bytes[4] === 0x2d
+  ) return "application/pdf";
+  if (
+    bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 &&
+    bytes[2] === 0xff
+  ) return "image/jpeg";
+  if (
+    bytes.length >= 8 &&
+    [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((value, index) =>
+      bytes[index] === value
+    )
+  ) return "image/png";
+  return null;
+}
+
+function objectExtensionMatches(
+  path: string,
+  detectedMime: DocumentMime,
+): boolean {
+  const extension = path.slice(path.lastIndexOf(".") + 1);
+  return detectedMime === "application/pdf"
+    ? extension === "pdf"
+    : detectedMime === "image/jpeg"
+    ? extension === "jpg" || extension === "jpeg"
+    : extension === "png";
+}
+
+async function readBoundedObject(
+  response: Response,
+): Promise<Uint8Array | null> {
+  if (!response.body) return null;
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (
+        !(value instanceof Uint8Array) ||
+        total + value.byteLength > DOCUMENT_LIMITS.maxFileBytes
+      ) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+      total += value.byteLength;
+    }
+  } catch {
+    try {
+      await reader.cancel();
+    } catch {
+      // Fail closed even when the provider cannot acknowledge cancellation.
+    }
+    return null;
+  } finally {
+    reader.releaseLock();
+  }
+  if (total < 1) return null;
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
 }
 
 export function createSupabaseDocumentStoragePort(
@@ -118,8 +188,9 @@ export function createSupabaseDocumentStoragePort(
         if (!response.ok) return null;
         const candidate = await response.json();
         const signed = candidate && typeof candidate === "object" &&
-            !Array.isArray(candidate)
-          ? (candidate as Record<string, unknown>).signedURL
+            !Array.isArray(candidate) &&
+            Object.prototype.hasOwnProperty.call(candidate, "url")
+          ? (candidate as Record<string, unknown>).url
           : null;
         if (
           typeof signed !== "string" || signed.length < 1 ||
@@ -127,8 +198,18 @@ export function createSupabaseDocumentStoragePort(
         ) {
           return null;
         }
-        const signedUrl = new URL(signed, `${supabaseUrl}/storage/v1/`);
-        if (signedUrl.origin !== new URL(supabaseUrl!).origin) return null;
+        if (!signed.startsWith("/object/upload/sign/")) return null;
+        const signedUrl = new URL(`/storage/v1${signed}`, supabaseUrl);
+        const expectedPath =
+          `/storage/v1/object/upload/sign/${input.bucket}/${path}`;
+        if (
+          signedUrl.origin !== new URL(supabaseUrl!).origin ||
+          signedUrl.pathname !== expectedPath || signedUrl.username ||
+          signedUrl.password || signedUrl.hash ||
+          [...signedUrl.searchParams.keys()].some((key) => key !== "token") ||
+          signedUrl.searchParams.getAll("token").length !== 1 ||
+          !signedUrl.searchParams.get("token")
+        ) return null;
         const issuedAt = now();
         if (!Number.isFinite(issuedAt.getTime())) return null;
         return Object.freeze({
@@ -157,22 +238,27 @@ export function createSupabaseDocumentStoragePort(
       try {
         const response = await fetchImplementation!(
           `${supabaseUrl}/storage/v1/object/authenticated/${input.bucket}/${path}`,
-          { method: "HEAD", headers: headers() },
+          { method: "GET", headers: headers() },
         );
         if (!response.ok) return null;
-        const sizeBytes = exactInteger(response.headers.get("content-length"));
-        const detectedMime = mime(response.headers.get("content-type"));
-        const sha256 = response.headers.get("x-laibe-sha256");
+        const bytes = await readBoundedObject(response);
+        if (!bytes) return null;
+        const detectedMime = mimeFromBytes(bytes);
+        const reportedMime = mime(response.headers.get("content-type"));
         if (
-          sizeBytes === null || sizeBytes < 1 ||
-          sizeBytes > DOCUMENT_LIMITS.maxFileBytes || !detectedMime ||
-          !isSha256(sha256)
+          !detectedMime || reportedMime !== detectedMime ||
+          !objectExtensionMatches(input.objectKey, detectedMime)
         ) return null;
+        const digestInput = bytes.buffer.slice(
+          bytes.byteOffset,
+          bytes.byteOffset + bytes.byteLength,
+        ) as ArrayBuffer;
+        const sha256 = hex(await crypto.subtle.digest("SHA-256", digestInput));
         return Object.freeze({
           bucket: input.bucket,
           objectKey: input.objectKey,
           sha256,
-          sizeBytes,
+          sizeBytes: bytes.byteLength,
           detectedMime,
         });
       } catch {
