@@ -407,6 +407,26 @@ test("DRS specialist mobile permission state stays inside the workspace shell", 
   );
 });
 
+test("DRS specialist mobile header keeps title and authority status on separate rows", async () => {
+  const styles = await readPageSource("specialist_workspace", "styles.css");
+  const mobileStyles = styles.slice(styles.lastIndexOf("@media (max-width: 680px)"));
+  const mobileTopbarRules = [...mobileStyles.matchAll(/\.topbar\s*\{([^}]*)\}/gu)].map((match) => match[1]);
+
+  assert.ok(mobileTopbarRules.length > 0, "the mobile layout defines a topbar geometry contract");
+  for (const rule of mobileTopbarRules) {
+    assert.match(
+      rule,
+      /grid-template-columns:\s*minmax\(0,\s*1fr\)/u,
+      "the mobile title and authority status occupy separate full-width grid rows",
+    );
+    assert.doesNotMatch(
+      rule,
+      /grid-template-columns:\s*108px\s+minmax\(0,\s*1fr\)/u,
+      "the mobile header must not place the title and authority status in intersecting columns",
+    );
+  }
+});
+
 test("DRS specialist static default status waits for authorization before case data", async () => {
   const html = await readPageSource("specialist_workspace", "code.html");
   const statusRegion = html.match(/<section\b[^>]*class="workspace-status"[\s\S]*?<\/section>/u)?.[0] ?? "";
