@@ -268,7 +268,11 @@ Deno.test("post-promotion verification uses destination bytes and queues a typed
       },
       queueOrphanCleanup() {
         cleanupCalls += 1;
-        return Promise.resolve();
+        return Promise.resolve({
+          ok: true,
+          state: "ORPHAN_CLEANUP_QUEUED",
+          work_item_id: "55555555-5555-4555-8555-555555555555",
+        });
       },
     },
     storage,

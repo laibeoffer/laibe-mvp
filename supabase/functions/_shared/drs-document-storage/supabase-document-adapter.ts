@@ -125,7 +125,7 @@ export function createSupabaseDocumentRepository(
         recordsObjectKey: input.recordsObjectKey,
       });
       const orphanPayloadSha256 = await sha256Text(resourceRef);
-      await execute({
+      return await execute({
         principal: input.principal,
         operation: "QUEUE_ORPHAN_CLEANUP",
         resourceRef,

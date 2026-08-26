@@ -62,7 +62,7 @@ Deno.test("upload intent parser accepts only the exact D5 request shape", async 
   const valid = {
     schemaVersion: "laibe.drs-document-upload-intent.request.v1",
     mode: "NEW_DOCUMENT",
-    documentKind: "drawing",
+    documentKind: "drs_review",
     originalFilename: "一樓平面圖.pdf",
     declaredMime: "application/pdf",
     declaredSizeBytes: 1024,
@@ -84,6 +84,7 @@ Deno.test("upload intent parser accepts only the exact D5 request shape", async 
       { ...valid, declaredSizeBytes: 26_214_401 },
       { ...valid, declaredMime: "image/svg+xml" },
       { ...valid, originalFilename: "drawing.png" },
+      { ...valid, documentKind: "drawing" },
     ]
   ) {
     await assert.rejects(
@@ -103,7 +104,7 @@ Deno.test("new-version, finalize and snapshot contracts reject ambiguity and cal
     schemaVersion: "laibe.drs-document-upload-intent.request.v1",
     mode: "NEW_VERSION",
     documentRef: VERSION_REF.replace("dvr_", "doc_"),
-    documentKind: "quote",
+    documentKind: "drs_review",
     originalFilename: "報價.pdf",
     declaredMime: "application/pdf",
     declaredSizeBytes: 4096,
@@ -519,4 +520,246 @@ Deno.test("malformed formal replay cannot be projected as a successful version",
     }),
     null,
   );
+});
+
+Deno.test("snapshot success projection rejects malformed or open repository shapes", async () => {
+  const { createDocumentEdgeHandler, createDocumentStorageService } =
+    await import(SERVICE_URL.href);
+  const validResult = {
+    ok: true,
+    state: "SNAPSHOT_RECORDED",
+    snapshot_ref: "snp_01j6a8k9m4q2w3e4r5t6y7u8i9",
+    receipt_ref: "rcp_01j6a8k9m4q2w3e4r5t6y7u8i9",
+    canonical_payload_sha256: SHA,
+  };
+  const request = {
+    schemaVersion: "laibe.drs-document-snapshot.request.v1",
+    purpose: "DECISION_BASIS",
+    versionRefs: [VERSION_REF],
+    idempotencyKey: "snapshot-01j6a8k9m4q2w3e4",
+  };
+  const storage = {
+    runtimeAvailable: true,
+    createSignedUpload: () => Promise.resolve(null),
+    inspect: () => Promise.resolve(null),
+    promote: () => Promise.resolve(false),
+    download: () => Promise.resolve(null),
+  };
+  for (
+    const malformed of [
+      { ...validResult, snapshot_ref: "snapshot-raw" },
+      { ...validResult, receipt_ref: "rcp_short" },
+      { ...validResult, canonical_payload_sha256: "A".repeat(64) },
+      { ...validResult, canonical_payload_sha256: 7 },
+      { ...validResult, provider_payload: { internal: true } },
+    ]
+  ) {
+    const service = createDocumentStorageService({
+      repository: {
+        runtimeAvailable: true,
+        execute: () => Promise.resolve(malformed),
+        queueOrphanCleanup: () => Promise.resolve(undefined),
+      },
+      storage,
+      scanner: { runtimeAvailable: false, scan: () => Promise.resolve(null) },
+    });
+    assert.equal(await service.createSnapshot(PRINCIPAL, request), null);
+  }
+
+  const malformedService = createDocumentStorageService({
+    repository: {
+      runtimeAvailable: true,
+      execute: () => Promise.resolve({ ...validResult, snapshot_ref: null }),
+      queueOrphanCleanup: () => Promise.resolve(undefined),
+    },
+    storage,
+    scanner: { runtimeAvailable: false, scan: () => Promise.resolve(null) },
+  });
+  const handler = createDocumentEdgeHandler(
+    "snapshot",
+    "/functions/v1/drs-document-snapshot",
+    {
+      allowedOrigins: ["https://app.example"],
+      authority: {
+        runtimeAvailable: true,
+        authorize: () => Promise.resolve(PRINCIPAL),
+      },
+      service: malformedService,
+    },
+  );
+  const malformedResponse = await handler(jsonRequest(
+    "/functions/v1/drs-document-snapshot",
+    request,
+    { headers: { authorization: "Bearer session" } },
+  ));
+  assert.equal(malformedResponse.status, 503);
+  assert.deepEqual(await malformedResponse.json(), {
+    state: "CONTEXT_UNAVAILABLE",
+  });
+
+  const validService = createDocumentStorageService({
+    repository: {
+      runtimeAvailable: true,
+      execute: () => Promise.resolve(validResult),
+      queueOrphanCleanup: () => Promise.resolve(undefined),
+    },
+    storage,
+    scanner: { runtimeAvailable: false, scan: () => Promise.resolve(null) },
+  });
+  assert.deepEqual(await validService.createSnapshot(PRINCIPAL, request), {
+    schemaVersion: "laibe.drs-document-snapshot.response.v1",
+    state: "SNAPSHOT_RECORDED",
+    snapshotRef: validResult.snapshot_ref,
+    receiptRef: validResult.receipt_ref,
+    canonicalPayloadSha256: SHA,
+  });
+});
+
+Deno.test("post-promotion conflict is returned only after durable orphan queue proof", async () => {
+  const { createDocumentStorageService } = await import(SERVICE_URL.href);
+  const plan = {
+    ok: true,
+    state: "VALIDATION_REQUIRED",
+    intake_bucket: "drs-case-intake-private",
+    records_bucket: "drs-case-records-private",
+    intake_object_key:
+      "intents/11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222.pdf",
+    records_object_key:
+      "cases/22222222-2222-4222-8222-222222222222/documents/33333333-3333-4333-8333-333333333333/versions/44444444-4444-4444-8444-444444444444/source.pdf",
+    declared_mime: "application/pdf",
+  };
+  const facts = {
+    bucket: "drs-case-records-private",
+    objectKey: plan.records_object_key,
+    sha256: SHA,
+    sizeBytes: 12,
+    detectedMime: "application/pdf",
+  };
+  const storage = {
+    runtimeAvailable: true,
+    createSignedUpload: () => Promise.resolve(null),
+    inspect: () => Promise.resolve(facts),
+    promote: () => Promise.resolve(true),
+    download: () => Promise.resolve(null),
+  };
+  const scanner = {
+    runtimeAvailable: true,
+    scan: () =>
+      Promise.resolve({
+        declaredMime: "application/pdf",
+        detectedMime: "application/pdf",
+        extension: "pdf",
+        decodedBytes: 12,
+        pageCount: 1,
+        megapixels: null,
+        cpuMs: 1,
+        wallMs: 1,
+        rssBytes: 1,
+        indirectObjects: 1,
+        maxReferenceDepth: 1,
+        structuralState: "PASS",
+        activeFeatures: [],
+        malwareState: "CLEAN",
+      }),
+  };
+  const request = {
+    schemaVersion: "laibe.drs-document-upload-finalize.request.v1",
+    intentRef: "int_01j6a8k9m4q2w3e4r5t6y7u8i9",
+    idempotencyKey: "finalize-01j6a8k9m4q2w3e4",
+  };
+
+  async function run(cleanupResult) {
+    let executeCalls = 0;
+    let cleanupCalls = 0;
+    const service = createDocumentStorageService({
+      repository: {
+        runtimeAvailable: true,
+        execute: () =>
+          Promise.resolve(
+            ++executeCalls === 1
+              ? plan
+              : { ok: false, state: "IDEMPOTENCY_CONFLICT" },
+          ),
+        queueOrphanCleanup: () => {
+          cleanupCalls += 1;
+          return Promise.resolve(cleanupResult);
+        },
+      },
+      storage,
+      scanner,
+    });
+    try {
+      return {
+        result: await service.finalizeUpload(PRINCIPAL, request),
+        cleanupCalls,
+        failure: null,
+      };
+    } catch (failure) {
+      return { result: null, cleanupCalls, failure };
+    }
+  }
+
+  const withoutDurability = await run(undefined);
+  assert.equal(withoutDurability.cleanupCalls, 1);
+  assert.equal(
+    withoutDurability.failure?.message,
+    "ORPHAN_DURABILITY_UNAVAILABLE",
+  );
+
+  const durable = await run({
+    ok: true,
+    state: "ORPHAN_CLEANUP_QUEUED",
+    work_item_id: "55555555-5555-4555-8555-555555555555",
+  });
+  assert.equal(durable.cleanupCalls, 1);
+  assert.equal(durable.failure, null);
+  assert.deepEqual(durable.result, {
+    schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
+    state: "IDEMPOTENCY_CONFLICT",
+  });
+});
+
+Deno.test("DRS upload intent rejects non-review kinds before authority or provider work", async () => {
+  const { createDocumentEdgeHandler } = await import(SERVICE_URL.href);
+  let authorityCalls = 0;
+  let serviceCalls = 0;
+  const handler = createDocumentEdgeHandler(
+    "uploadIntent",
+    "/functions/v1/drs-document-upload-intent",
+    {
+      allowedOrigins: ["https://app.example"],
+      authority: {
+        runtimeAvailable: true,
+        authorize: () => {
+          authorityCalls += 1;
+          return Promise.resolve(PRINCIPAL);
+        },
+      },
+      service: {
+        createUploadIntent: () => {
+          serviceCalls += 1;
+          return Promise.resolve(null);
+        },
+        finalizeUpload: () => Promise.resolve(null),
+        downloadVersion: () => Promise.resolve(null),
+        createSnapshot: () => Promise.resolve(null),
+      },
+    },
+  );
+  const response = await handler(jsonRequest(
+    "/functions/v1/drs-document-upload-intent",
+    {
+      schemaVersion: "laibe.drs-document-upload-intent.request.v1",
+      mode: "NEW_DOCUMENT",
+      documentKind: "drawing",
+      originalFilename: "drawing.pdf",
+      declaredMime: "application/pdf",
+      declaredSizeBytes: 1024,
+      declaredSha256: SHA,
+    },
+    { headers: { authorization: "Bearer session" } },
+  ));
+  assert.equal(response.status, 400);
+  assert.equal(authorityCalls, 0);
+  assert.equal(serviceCalls, 0);
 });

@@ -125,7 +125,7 @@ create table casework.document_upload_intents (
   planned_version_ref text not null unique
     check (planned_version_ref ~ '^dvr_[0-9a-z]{20,40}$'),
   mode text not null check (mode in ('NEW_DOCUMENT', 'NEW_VERSION')),
-  document_kind text not null,
+  document_kind text not null check (document_kind = 'drs_review'),
   original_filename text not null
     check (original_filename = btrim(original_filename))
     check (length(original_filename) between 1 and 240)
@@ -1142,7 +1142,10 @@ begin
       p_expected_payload_sha256, v_resource, v_intent.document_id,
       v_cleanup_work_item_id
     ) on conflict (actor_user_id, event_type, idempotency_key) do nothing;
-    return jsonb_build_object('ok', true, 'state', 'ORPHAN_CLEANUP_QUEUED');
+    return jsonb_build_object(
+      'ok', true, 'state', 'ORPHAN_CLEANUP_QUEUED',
+      'work_item_id', v_cleanup_work_item_id
+    );
   end if;
 
   return jsonb_build_object('ok', false, 'state', 'INVALID_REQUEST');
