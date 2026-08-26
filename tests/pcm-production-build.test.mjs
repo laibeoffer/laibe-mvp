@@ -218,9 +218,9 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   }
 
   const assetFiles = second.files.filter((file) => file.startsWith("assets/"));
-  assert.equal(assetFiles.length, 41, "exact production asset closure");
+  assert.equal(assetFiles.length, 47, "exact production asset closure");
   assert.equal(deployNodes.length, 18, "exact production route closure");
-  assert.equal(second.files.length, 64, "41 assets + 18 routes + 5 metadata files");
+  assert.equal(second.files.length, 70, "47 assets + 18 routes + 5 metadata files");
   assert.deepEqual(await listMaterializationArtifacts(), [], "successful build swap artifacts");
   const assetRoots = new Set(assetFiles.map((file) => file.split("/").slice(0, 2).join("/")));
   assert.equal(assetRoots.size, 1, "all runtime assets share one content hash root");
@@ -690,11 +690,11 @@ test("real stage verifier and unknown-fault failures preserve live output", asyn
   const rows = [
     {
       fault: "stage-verify-missing-planned-file",
-        diagnostic: /Staged production artifact file set does not match the validated plan: expected=64, actual=63,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=70, actual=69,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
     },
     {
       fault: "stage-verify-unexpected-file",
-        diagnostic: /Staged production artifact file set does not match the validated plan: expected=64, actual=65,/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=70, actual=71,/u,
     },
     {
       fault: "stage-verify-mutated-bytes",

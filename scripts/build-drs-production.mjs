@@ -25,6 +25,8 @@ const SOURCE_ENTRY_BY_ID = Object.freeze({
   contractSigning: "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/code.html",
   ownerWorkspace: "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
   vendorWorkspace: "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+  pcmAuthorizedList: "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/code.html",
+  pcmCaseWorkspace: "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/code.html",
   accessUnavailable: "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/code.html",
 });
 
@@ -43,6 +45,12 @@ const ASSET_ALLOWLIST = Object.freeze([
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/app.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/owner-workspace-bootstrap.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/shared/drs-workspace-renderer.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/app.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/calendar-transport.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/drs-session-adapter.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/drs-workspace-transport.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/styles.css",

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="LaiBE DRS 案件審查作業台，在正式身分與案件授權確認後協助專員核對文件、回覆與時程。" />
+  <title>治理收件匣｜LaiBE DRS</title>
+  <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body data-drs-workspace="specialist" data-drs-state="loading" data-workbench-view="triage" data-governance-view="inbox" data-view-model-boundary="isolated-data-client">
+  <a class="skip-link" href="#workspace-main">跳到案件決策審核桌</a>
+
+  <header class="topbar case-command-bar" aria-label="DRS 治理與案件審查工作台">
+    <div class="brand"><img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE" /><div><span>決策・文件・留痕</span><strong>DRS 治理作業台</strong></div></div>
+    <dl class="identity-strip" aria-label="本頁角色與案件狀態">
+      <div><dt>身分與權限</dt><dd>正在確認正式 DRS 授權</dd></div>
+      <div data-drs-ready-content hidden><dt>選定案件</dt><dd data-drs-bind="case-name">尚未取得正式案件</dd></div>
+      <div data-drs-ready-content hidden><dt>案件狀態</dt><dd data-drs-bind="current-status">尚未取得正式狀態</dd></div>
+      <div data-drs-ready-content hidden><dt>下一步責任人</dt><dd data-drs-bind="responsible-role">尚未確認</dd></div>
+    </dl>
+    <div class="command-actions" data-drs-ready-content hidden><button type="button" class="quiet-button is-active" data-governance-nav="inbox" aria-pressed="true">治理收件匣</button><button type="button" class="quiet-button" data-governance-nav="reviews" aria-pressed="false">我的審查</button><button type="button" class="signal-button" data-drs-action="enter-review">進入文件審查</button></div>
+  </header>
+
+  <main id="workspace-main" class="workspace-shell">
+    <section class="workspace-status" data-drs-state-region aria-label="本頁案件資料狀態">
+      <div class="status-state-copy"><p class="eyebrow" data-drs-bind="state-label">確認中</p><h1 data-drs-bind="product-message">正在確認案件授權與可檢視內容，完成後才會顯示案件資料。</h1></div>
+      <dl class="status-grid" data-drs-ready-content hidden><div class="status-next-owner"><dt>下一步責任人</dt><dd data-drs-bind="responsible-role">尚未確認</dd></div><div class="status-next-action"><dt>明確下一步</dt><dd data-drs-bind="next-action">完成身分與案件授權後，再顯示下一步。</dd></div><div class="status-basis"><dt>目前審核依據</dt><dd>尚未取得正式文件</dd></div></dl>
+      <button type="button" class="ghost-action status-retry" data-drs-action="retry-load" hidden disabled aria-disabled="true">重新整理本頁案件狀態</button>
+    </section>
+
+    <section class="state-grid" data-drs-state-fixtures hidden aria-label="本頁狀態檢視">
+      <article><span>載入中</span><strong>正在整理案件狀態</strong><p>請稍候，本頁會先確認授權與案件狀態。</p><button type="button" data-drs-state-option="loading">檢視載入狀態</button></article>
+      <article><span>空狀態</span><strong>目前沒有待審核案件</strong><p>有授權文件、正式對話或補件需求後，才會顯示審核內容。</p><button type="button" data-drs-state-option="empty">檢視空狀態</button></article>
+      <article><span>暫時無法取得</span><strong>案件狀態暫時無法整理</strong><p>請保留目前畫面，稍後重新整理案件狀態。</p><button type="button" data-drs-state-option="retryable-error">檢視暫時無法取得</button></article>
+      <article><span>未取得檢視權限</span><strong>需要確認案件授權</strong><p>未確認前不顯示日曆、LINE 或案件內容。</p><button type="button" data-drs-state-option="permission-denied">檢視權限狀態</button></article>
+      <article><span>連線中斷</span><strong>目前無法更新案件資料</strong><p>本頁不會顯示先前案件內容；恢復連線後可重新整理。</p><button type="button" data-drs-state-option="disconnected">檢視連線中斷狀態</button></article>
+    </section>
+
+    <section class="triage-mode" data-workbench-mode="triage" data-drs-ready-content data-drs-authorized-content hidden aria-labelledby="governance-title">
+      <nav class="governance-nav-strip" aria-label="DRS 治理工作區">
+        <button type="button" class="is-active" data-governance-nav="inbox" aria-pressed="true"><span>01</span>治理收件匣</button>
+        <button type="button" data-governance-nav="reviews" aria-pressed="false"><span>02</span>我的審查</button>
+        <button type="button" data-governance-nav="history" aria-pressed="false" data-chief-only="case-history"><span>03</span>歷史案件</button>
+        <button type="button" data-governance-nav="reviewers" aria-pressed="false" data-chief-only="reviewer-access"><span>04</span>人員與權限</button>
+        <button type="button" data-governance-nav="contracts" aria-pressed="false" data-chief-only="service-contracts"><span>05</span>服務契約</button>
+      </nav>
+
+      <section class="governance-home" data-governance-home data-governance-panel="inbox" aria-labelledby="governance-title">
+        <header class="inbox-hero">
+          <div><p class="eyebrow">DRS 治理入口</p><h1 id="governance-title">治理收件匣</h1><p>正式治理權限與案件資料確認後，才會顯示可處理的契約、補件與例外。</p></div>
+          <div class="role-proof"><span>目前有效權限</span><strong>尚未取得正式資料</strong><small>此功能正在整理中；目前不提供治理操作。</small></div>
+        </header>
+
+        <dl class="inbox-summary" aria-label="今日治理摘要">
+          <div><dt>待處理總數</dt><dd>尚未取得正式總數</dd><small>登入與授權確認後更新</small></div>
+          <div data-signal="blocker"><dt>最高優先卡點</dt><dd>尚未取得正式契約內容</dd><small>現在不能接案或要求補件</small></div>
+          <div><dt>下一責任人</dt><dd>DRS 服務</dd><small>先完成身分與治理收件授權</small></div>
+          <div><dt>今日處理順序</dt><dd>新契約 → 補件回覆 → 逾期</dd><small>高風險例外置頂</small></div>
+        </dl>
+
+        <div class="intake-workbench">
+          <aside class="intake-queue" aria-label="治理待處理分類">
+            <header><div><p class="eyebrow">待處理分類</p><h2>治理佇列</h2></div><span>等待正式資料</span></header>
+            <button type="button" class="intake-filter is-active" aria-pressed="true"><span>新契約</span><strong>—</strong><small>尚未取得正式筆數</small></button>
+            <button type="button" class="intake-filter" aria-pressed="false"><span>待補件回覆</span><strong>—</strong><small>尚未取得正式筆數</small></button>
+            <button type="button" class="intake-filter" aria-pressed="false"><span>逾期</span><strong>—</strong><small>尚未取得正式時程</small></button>
+            <button type="button" class="intake-filter" aria-pressed="false"><span>抽查／全面審查</span><strong>—</strong><small>尚未取得正式指派</small></button>
+            <button type="button" class="intake-filter" aria-pressed="false"><span>高風險例外</span><strong>—</strong><small>沒有可顯示的正式例外</small></button>
+          </aside>
+
+          <section class="intake-detail" aria-labelledby="intake-detail-title" data-intake-state="unavailable">
+            <header class="intake-detail__head"><div><p class="eyebrow">契約決策</p><h2 id="intake-detail-title">尚未取得正式契約內容</h2></div><span class="state-chip">等待授權</span></header>
+            <div class="contract-empty"><div class="contract-document" aria-hidden="true"><span>DRS</span><strong>服務契約</strong><i></i><i></i><i></i></div><div><h3>先取得 LINE 分流與案件授權</h3><p>正式契約、附件、甲方資料、送件時間與歷次補件會在授權後出現在此；本頁不顯示推測資料。</p><dl><div><dt>契約版本</dt><dd>尚未取得</dd></div><div><dt>送件時間</dt><dd>尚未取得</dd></div><div><dt>甲方</dt><dd>尚未取得</dd></div><div><dt>附件</dt><dd>尚未取得</dd></div></dl></div></div>
+            <section class="intake-snapshot" aria-label="治理功能狀態"><strong>正式治理功能尚未開放</strong><p>完成正式權限與紀錄服務後，才會顯示可執行範圍與留痕。</p></section>
+            <div class="intake-actions" aria-label="治理功能狀態"><p>此功能正在整理中；正式權限確認前不提供接案、補件或案件處置。</p></div>
+            <p class="intake-boundary">只有接案成功後，甲方才會收到邀請乙方加入 DRS 治理的入口。現在尚未建立案件、指派、回執或邀請。</p>
+            <p class="decision-result" data-intake-decision-result aria-live="polite">尚未建立契約決策。</p>
+          </section>
+        </div>
+
+        <section class="authority-audit-strip" aria-label="正式權限與留痕狀態">
+          <div><span>正式權限與稽核</span><strong>尚未取得正式資料</strong><small>正式權限與稽核紀錄尚未取得；待治理功能完成授權並成功建立紀錄後，才會顯示可執行範圍與留痕。</small></div>
+          <div><span>不可冒充</span><strong>目前不提供治理操作</strong><small>正式紀錄服務完成後，才會依實際結果呈現操作者、案件、時間、狀態與依據。</small></div>
+          <div><span>刪除審核員</span><strong>停權／撤回未來權限</strong><small>既有留痕不會被刪除，也不會改寫歷史操作者。</small></div>
+        </section>
+      </section>
+
+      <section class="my-review-workspace" data-governance-panel="reviews" hidden aria-labelledby="my-review-title">
+        <section class="decision-band" data-drs-ready-content hidden aria-label="目前案件審核狀態">
+          <div class="decision-summary"><div class="case-context"><p class="eyebrow">我的審查</p><h1 id="my-review-title">尚未取得正式案件</h1><p class="decision-question">完成授權後才會顯示待決策事項</p><p class="case-stage"><span>案件類型</span><strong>尚未取得</strong></p></div><button type="button" class="primary-cta" data-drs-action="enter-review">進入 PDF 文件審查</button></div>
+          <dl class="blocked-grid"><div data-signal="blocker"><dt>目前卡點</dt><dd>尚未取得正式案件與文件資料</dd></div><div data-signal="review"><dt>案件進度</dt><dd>等待正式授權</dd></div><div><dt>誰在等待誰</dt><dd data-drs-bind="waiting-for">尚未確認</dd></div><div data-signal="action"><dt>下一責任人</dt><dd>完成授權後才會顯示</dd></div></dl>
+          <p class="authority-summary"><strong>AI 初步檢核</strong>｜AI 只提醒可能風險與缺漏，不能核准、否決、送出或覆核；所有決策與留痕都由人類 DRS 完成。</p>
+        </section>
+
+        <div class="triage-shell">
+          <aside id="case-queue" class="review-case-rail" data-drs-ready-content hidden aria-label="我的進行中案件">
+            <div class="queue-heading"><div><p class="eyebrow">我的審查</p><h2>進行中案件</h2></div><span>1 件已授權案件</span></div>
+            <label class="queue-search"><span>搜尋已授權案件</span><input type="search" placeholder="輸入案件名稱" /></label>
+            <nav class="case-type-nav" aria-label="待審案件類型"><a class="is-active" href="#case-queue" aria-current="page">全部待審</a><a href="#case-queue-design">設計</a><a href="#case-queue-engineering">統包／工程</a><a href="#completed-review">已完成</a></nav>
+            <section id="case-queue-design" class="case-queue-group case-queue-group--empty" aria-labelledby="case-queue-design-title"><h3 id="case-queue-design-title">設計案件</h3><p>取得正式案件授權後才會顯示。</p></section>
+            <section id="case-queue-engineering" class="case-queue-group case-queue-group--empty" aria-labelledby="case-queue-engineering-title"><h3 id="case-queue-engineering-title">統包／工程案件</h3><p>取得案件授權後才會顯示。</p></section>
+            <section id="completed-review" class="case-queue-group case-queue-group--empty" aria-labelledby="completed-review-title"><h3 id="completed-review-title">已完成</h3><p>目前沒有可顯示的已完成審查。</p></section>
+          </aside>
+
+          <section class="case-calendar-workspace" data-case-governance-calendar data-drs-calendar-state="loading" data-drs-ready-content hidden aria-label="案件治理日曆">
+            <header class="calendar-head"><div><p class="eyebrow">案件治理主工作索引</p><h2>Google Calendar</h2><p>Google Calendar 是案件治理索引；DRS 保存正式狀態、責任人、證據、決策與留痕。</p></div><div class="calendar-view-switch" role="group" aria-label="日曆檢視"><button type="button" class="is-active" data-calendar-view="month" aria-pressed="true">月</button><button type="button" data-calendar-view="week" aria-pressed="false">週</button><button type="button" data-calendar-view="agenda" aria-pressed="false">議程</button></div></header>
+            <div class="calendar-canvas" data-calendar-canvas data-calendar-state="permission">
+              <div class="calendar-permission-state" data-drs-calendar-status role="status" aria-live="polite"><span class="calendar-lock" aria-hidden="true">⌁</span><div class="calendar-access-copy"><span data-drs-calendar-state-label>確認中</span><strong data-drs-calendar-state-title>尚未取得正式日曆資料</strong><p data-drs-calendar-state-message>需先確認登入身分與案件權限，才會顯示實際事件。</p><small>授權撤回、過期或載入失敗時會清除先前事件，不保留舊資料。</small></div><div class="calendar-access-actions" aria-label="Google 日曆連結操作"><button type="button" data-drs-calendar-action="connect" hidden disabled aria-disabled="true">連結 Google 日曆</button><button type="button" data-drs-calendar-action="reconnect" hidden disabled aria-disabled="true">重新連結</button><button type="button" data-drs-calendar-action="revoke" hidden disabled aria-disabled="true">移除連結</button></div></div>
+              <div class="calendar-month-grid" aria-hidden="true"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="calendar-readonly-note" data-drs-calendar-readonly hidden><strong>目前為唯讀檢視</strong><p>事件只作為案件決策的時程依據。</p></div><div class="calendar-empty" data-drs-calendar-empty hidden><strong>授權期間內沒有可顯示事件</strong></div><section class="calendar-event-list" data-drs-calendar-events hidden><p data-drs-calendar-window>期間由案件授權結果決定</p><ol class="calendar-agenda" data-drs-calendar-event-list aria-label="有事件日期"></ol></section>
+            </div>
+            <section class="calendar-event-detail" aria-label="選定事件詳情"><div><span>發生什麼事</span><strong>尚未選取正式事件</strong></div><div><span>來源與依據</span><strong>尚未取得</strong></div><div><span>誰在等待誰</span><strong>乙方補件後由 DRS 複核</strong></div><div><span>正式案件紀錄</span><strong>尚未建立</strong></div></section>
+            <footer class="calendar-next-action"><div><span>本案下一步</span><strong>乙方補充正式尺寸與版本，DRS 再建立可回查的證據引用。</strong></div><button type="button" data-drs-action="enter-review">進入文件審查</button></footer>
+          </section>
+        </div>
+      </section>
+
+      <section class="governance-placeholder" data-governance-panel="history" hidden data-chief-only="case-history"><p class="eyebrow">所有過往案件</p><h2>歷史案件資料庫</h2><p>正式資料接入後，可依案件、甲乙方、審查員、契約、年份、版本與狀態查找；目前不顯示推測案件。</p></section>
+      <section class="governance-placeholder" data-governance-panel="reviewers" hidden data-chief-only="reviewer-access"><p class="eyebrow">人員與權限</p><h2>指派、改派、停權與撤權</h2><p>一般審查員日後以 5–10 件工作量節制；任何權限變更都保留操作者、時間、案件、變更前後狀態與依據。</p></section>
+      <section class="governance-placeholder" data-governance-panel="contracts" hidden data-chief-only="service-contracts"><p class="eyebrow">治理權限尚未開放</p><h2>DRS 服務契約管理</h2><p>正式契約與治理權限完成後才提供查找與操作入口。</p></section>
+    </section>
+
+    <section class="review-mode" data-workbench-mode="review" data-drs-ready-content data-drs-authorized-content hidden aria-labelledby="review-workbench-title">
+      <header class="compact-case-bar"><button type="button" class="back-to-cases" data-drs-action="show-triage" aria-label="返回案件分流">← 案件</button><div><p class="eyebrow"><span class="compact-case-name">尚未取得正式案件</span>｜文件審查</p><h1 id="review-workbench-title">尚未取得正式文件</h1></div><span class="state-chip" data-state="review">等待授權</span><button type="button" class="signal-button" data-drs-action="open-review-editor">建立審查事項</button></header>
+      <section class="case-milestones" data-case-milestones aria-label="影響目前決策的時間節點"><div><span>目前節點</span><strong>圖面回覆</strong><small>丈量確認後</small></div><div><span>回覆期限</span><strong>開工前確認前</strong><small>正式日期待取得</small></div><div><span>影響</span><strong>甲方無法確認平面配置</strong><small>乙方補尺寸後由 DRS 複核</small></div></section>
+      <section class="review-contract-strip" aria-label="文件審查送出與輸出契約"><div class="review-contract-item review-contract-item--blocker"><span>送出條件</span><strong>沒有正式版本或引用不能送出</strong></div><div class="review-contract-item"><span>覆核分離</span><strong>高風險事項的覆核者不可等於原作者</strong></div><div class="review-contract-item"><span>正式輸出</span><strong>審查報告 PDF＋帶標註的原始 PDF，綁定同一來源版本與事項版次</strong></div><small>傳送失敗會保留草稿與送出前快照；傳送、送達、已讀與正式案件紀錄分開保存。</small></section>
+
+      <div class="review-focus-shell">
+        <aside class="review-tool-rail" data-review-tool-rail aria-label="審查工具導覽">
+          <div class="task-tabs"><nav class="rail-tabs" aria-label="審核桌主要任務" role="tablist" inert>
+            <button type="button" class="is-active" id="specialist-tab-documents" data-drs-tab="documents" data-task-label="文件審查" data-task-summary="0 / 4 項依據已引用" data-task-status="REVIEW" role="tab" aria-selected="true" aria-disabled="true" aria-controls="specialist-panel-documents" tabindex="-1" disabled><span aria-hidden="true">01</span><strong>文件審查</strong><small>0 / 4</small></button>
+            <button type="button" id="specialist-tab-sources" data-drs-tab="sources" data-task-label="訊息來源" data-task-summary="3 個脈絡待核對" data-task-status="REVIEW" role="tab" aria-selected="false" aria-disabled="true" aria-controls="specialist-panel-sources" tabindex="-1" disabled><span aria-hidden="true">02</span><strong>訊息來源</strong><small>3 個</small></button>
+            <button type="button" id="specialist-tab-opinion" data-drs-tab="opinion" data-task-label="審查意見" data-task-summary="等待文件依據" data-task-status="ACTION" role="tab" aria-selected="false" aria-disabled="true" aria-controls="specialist-panel-opinion" tabindex="-1" disabled><span aria-hidden="true">03</span><strong>審查意見</strong><small>草稿</small></button>
+            <button type="button" id="specialist-tab-record" data-drs-tab="record" data-task-label="送出與留痕" data-task-summary="3 項未完成" data-task-status="REVIEW" role="tab" aria-selected="false" aria-disabled="true" aria-controls="specialist-panel-record" tabindex="-1" disabled><span aria-hidden="true">04</span><strong>送出與留痕</strong><small>未建立</small></button>
+          </nav></div>
+        </aside>
+
+        <section class="document-workspace" aria-label="文件檢視區">
+          <header class="document-toolbar"><div class="document-title"><span>圖面｜v2</span><strong>平面配置</strong><small>尚未取得正式圖面</small></div><div class="document-commands" aria-label="文件檢視操作"><button type="button" data-document-command="previous" disabled aria-disabled="true" aria-label="上一頁">←</button><span>— / —</span><button type="button" data-document-command="next" disabled aria-disabled="true" aria-label="下一頁">→</button><button type="button" data-document-command="zoom-out" disabled aria-disabled="true" aria-label="縮小">−</button><span>100%</span><button type="button" data-document-command="zoom-in" disabled aria-disabled="true" aria-label="放大">＋</button><button type="button" data-document-command="fit-width" disabled aria-disabled="true">符合寬度</button></div>
+            <details class="document-drawer" data-document-drawer><summary>文件清單</summary><div class="document-drawer__body" aria-label="待審查文件清單">
+              <button type="button" class="document-source is-selected" data-drs-action="select-document" data-review-document="drawing" data-document-id="plan-v2" data-document-type="圖面" data-document-version="版本待確認" data-document-proposer="提出者待確認" data-document-updated="待取得正式紀錄" disabled aria-disabled="true" aria-pressed="true"><span>圖面</span><strong>尚未取得正式圖面</strong><small>尚未提供可讀圖面</small></button>
+              <button type="button" class="document-source" data-drs-action="select-document" data-review-document="quotation" data-document-id="quotation-kitchen" data-document-type="報價" data-document-version="版本待提供" data-document-proposer="乙方設計團隊（待確認）" data-document-updated="待取得正式紀錄" disabled aria-disabled="true" aria-pressed="false"><span>報價</span><strong>廚具項目與修訂條件</strong><small>尚未提供正式報價版本</small></button>
+              <button type="button" class="document-source" data-drs-action="select-document" data-review-document="formal-message" data-document-id="formal-line" data-document-type="正式訊息" data-document-version="紀錄版本待確認" data-document-proposer="甲方／乙方（待授權後確認）" data-document-updated="待取得正式紀錄" disabled aria-disabled="true" aria-pressed="false"><span>正式訊息</span><strong>三方 LINE 正式紀錄</strong><small>尚未連結實際 LINE</small></button>
+              <button type="button" class="document-source" data-drs-action="select-document" data-review-document="calendar" data-document-id="calendar-milestone" data-document-type="日曆時程" data-document-version="分享狀態待確認" data-document-proposer="乙方設計團隊（待確認）" data-document-updated="待取得實際日曆" disabled aria-disabled="true" aria-pressed="false"><span>日曆時程</span><strong>影響目前決策的節點</strong><small>尚未連結實際 Google 日曆</small></button>
+            </div></details>
+          </header>
+          <div class="document-canvas" data-document-canvas data-evidence-state="unavailable" role="status" aria-live="polite"><div class="paper-sheet"><span class="paper-kicker">文件狀態 / DOCUMENT STATUS</span><div class="paper-mark" aria-hidden="true">⌁</div><h2>尚未讀取正式文件內容</h2><p>取得正式文件與案件授權後，這裡才會顯示可核對內容與版本。現在不呈現推測的圖面、報價差異或訊息內容。</p><dl><div><dt>目前需要</dt><dd>正式文件版本</dd></div><div><dt>建立引用</dt><dd>選取頁碼、圖號、區域、報價項目或訊息時間</dd></div></dl></div></div>
+          <footer class="canvas-footer"><span>文件檢視為審查主畫面</span><button type="button" data-document-command="compare" disabled aria-disabled="true">版本比較尚不可用</button></footer>
+        </section>
+
+        <details class="review-inspector" data-review-inspector open>
+          <summary><span>審查事項</span><strong data-draft-status>尚未儲存</strong></summary>
+          <div class="review-inspector__body">
+            <section class="main-tab-panel is-selected" id="specialist-panel-documents" data-drs-panel="documents" role="tabpanel" aria-labelledby="specialist-tab-documents" data-drs-ready-content hidden inert>
+              <div class="section-head"><div><p class="eyebrow">文件審查</p><h2>文件與引用依據</h2></div><span class="truth-badge">尚未取得正式資料</span></div>
+              <section class="selected-document" data-selected-document aria-label="目前選取文件"><div class="subsection-heading"><strong data-selected-document-name>尚未取得正式圖面</strong><span data-selected-document-state>尚未提供可讀內容</span></div><dl class="document-meta"><div><dt>文件類型</dt><dd data-selected-document-meta="type">圖面</dd></div><div><dt>版本</dt><dd data-selected-document-meta="version">版本待確認</dd></div><div><dt>提出者</dt><dd data-selected-document-meta="proposer">提出者待確認</dd></div><div><dt>最近更新</dt><dd data-selected-document-meta="updated">待取得正式紀錄</dd></div><div><dt>案件關聯</dt><dd>尚未取得正式案件</dd></div><div><dt>引用位置</dt><dd>頁碼、圖號、區域、報價項目或正式訊息時間</dd></div></dl></section>
+              <section class="review-basis-workspace" data-review-basis-workspace aria-label="加入審查依據"><div class="subsection-heading"><strong>審查依據</strong><span>每一項都要能回到來源</span></div><label><span>對應文件</span><select data-review-document-select aria-label="對應文件"><option value="plan-v2">尚未取得正式圖面</option><option value="quotation-kitchen">報價文件待提供</option><option value="formal-line">正式訊息待取得</option><option value="calendar-milestone">日曆時程待取得</option></select></label><label><span>引用位置</span><input type="text" data-citation-location aria-label="引用位置" placeholder="取得正式文件後再填寫引用位置" /></label><button type="button" data-drs-action="add-review-basis" disabled aria-disabled="true">加入審查依據</button><p class="basis-empty" data-review-basis-empty>尚未加入依據。未引用正式文件前，不能提交送出前審查。</p><ol class="selected-basis-list" data-review-basis-list aria-live="polite"></ol></section>
+              <details class="supporting-tools"><summary>其他文件工具</summary><div><strong>複雜文件編輯</strong><p>此入口正在整理中。</p><button type="button" data-drs-action="editor-entry" disabled aria-disabled="true">查看編輯入口狀態</button><strong>批次圖面檢視</strong><p>正式開放後再提供批次標註與人工確認。</p><button type="button" data-drs-action="drawing-entry" disabled aria-disabled="true">查看圖面入口狀態</button></div></details>
+              <section class="document-unavailable" data-document-unavailable aria-label="文件異常狀態"><div><strong>文件暫時無法讀取</strong><p>保留目前審查內容，稍後重新取得文件。</p></div><div><strong>尚未提供</strong><p>請下一步責任人提供可辨識的文件與版本。</p></div><div><strong>權限不足</strong><p>請案件管理者確認授權；確認前不顯示內容。</p></div></section>
+            </section>
+
+            <section class="main-tab-panel" id="specialist-panel-sources" data-drs-panel="sources" role="tabpanel" aria-labelledby="specialist-tab-sources" data-drs-ready-content hidden inert>
+              <div class="section-head"><div><p class="eyebrow">訊息來源</p><h2>三方輸入分開核對</h2></div><span>訊息不自動成為紀錄</span></div>
+              <nav class="source-tabs" role="tablist" aria-label="訊息方向"><button type="button" class="is-active" id="source-tab-party-a" data-source-tab="party-a" role="tab" aria-selected="true" aria-controls="source-panel-party-a" tabindex="0">甲方輸入</button><button type="button" id="source-tab-party-b" data-source-tab="party-b" role="tab" aria-selected="false" aria-controls="source-panel-party-b" tabindex="-1">乙方輸入</button><button type="button" id="source-tab-drs-output" data-source-tab="drs-output" role="tab" aria-selected="false" aria-controls="source-panel-drs-output" tabindex="-1">DRS 輸出</button><button type="button" id="source-tab-formal-record" data-source-tab="formal-record" role="tab" aria-selected="false" aria-controls="source-panel-formal-record" tabindex="-1">三方正式紀錄</button><button type="button" id="source-tab-schedule" data-source-tab="schedule" role="tab" aria-selected="false" aria-controls="source-panel-schedule" tabindex="-1">時程</button></nav>
+              <section class="source-panel" id="source-panel-party-a" data-source-panel="party-a" role="tabpanel" aria-labelledby="source-tab-party-a" data-source-role="甲方輸入" data-source-sender="屋主"><div class="source-identity"><span>甲方輸入</span><strong>屋主</strong><small>甲方一對一 LINE｜尚未引用</small></div><section class="context-module" data-specialist-context="line-owner" data-drs-ready-content hidden tabindex="0" aria-labelledby="owner-line-title"><h3 id="owner-line-title">甲方一對一 LINE 對話</h3><p>尚未連結或取得此案件的正式 LINE 內容。</p><dl><div><dt>可確認狀態</dt><dd>尚未納入案件依據</dd></div><div><dt>下一步</dt><dd>取得授權與正式內容後，再由專員核對是否建立引用</dd></div></dl><p class="context-state">未連結、無正式紀錄或未授權時，只顯示取得狀態，不顯示訊息內容或操作。</p></section></section>
+              <section class="source-panel" id="source-panel-party-b" data-source-panel="party-b" role="tabpanel" aria-labelledby="source-tab-party-b" data-source-role="乙方輸入" data-source-sender="乙方設計團隊" hidden inert><div class="source-identity"><span>乙方輸入</span><strong>尚未取得正式來源</strong><small>等待授權</small></div><p>取得正式文件與案件授權後才會顯示；目前不推測差異。</p></section>
+              <section class="source-panel" id="source-panel-drs-output" data-source-panel="drs-output" role="tabpanel" aria-labelledby="source-tab-drs-output" data-source-role="DRS 輸出" data-source-sender="指派 DRS 專員" hidden inert><div class="source-identity"><span>DRS 輸出</span><strong>指派 DRS 專員</strong><small>尚未送出</small></div><p>目前沒有已送出的 DRS 審查意見。</p></section>
+              <section class="source-panel" id="source-panel-formal-record" data-source-panel="formal-record" role="tabpanel" aria-labelledby="source-tab-formal-record" data-source-role="三方正式紀錄" data-source-sender="三方確認後建立" hidden inert><div class="source-identity"><span>三方正式紀錄</span><strong>三方確認後建立</strong><small>原始訊息不等於正式案件紀錄</small></div><section class="context-module" data-specialist-context="line-shared" data-drs-ready-content hidden tabindex="0" aria-labelledby="shared-line-title"><h3 id="shared-line-title">甲方 / 乙方 / DRS 三方群組 LINE 對話</h3><p>尚未連結或取得此案件的三方正式訊息。</p><dl><div><dt>案件留痕</dt><dd>尚未建立可回查的共用案件紀錄</dd></div><div><dt>下一步</dt><dd>取得授權與正式內容後，再核對文件版本、回覆人與時間</dd></div></dl><p class="context-state">未連結、無正式紀錄或未授權時，只顯示取得狀態，不顯示訊息內容或操作。</p></section></section>
+              <section class="source-panel" id="source-panel-schedule" data-source-panel="schedule" role="tabpanel" aria-labelledby="source-tab-schedule" data-source-role="時程" data-source-sender="乙方分享" hidden inert><div class="source-identity"><span>時程</span><strong>乙方分享的 Google 日曆</strong><small>尚未取得事件日期</small></div><section class="context-module" data-specialist-context="calendar" data-drs-ready-content hidden tabindex="0" aria-labelledby="calendar-title"><h3 id="calendar-title">乙方分享的 Google 日曆</h3><p>尚未連結此案件的實際 Google 日曆，因此不顯示推測日期或事件。</p><p class="context-state">取得授權與正式事件後，才會列出影響本次決策的日期；未授權時不顯示內容或操作。</p></section></section>
+            </section>
+
+            <section class="main-tab-panel" id="specialist-panel-opinion" data-drs-panel="opinion" role="tabpanel" aria-labelledby="specialist-tab-opinion" data-drs-ready-content hidden inert>
+              <div class="section-head"><div><p class="eyebrow">審查意見</p><h2>建立可追蹤的審查事項</h2></div><span data-review-mode-label>草稿</span></div>
+              <div class="review-issue-state" aria-label="目前審查事項狀態"><dl><div><dt>目前狀態</dt><dd data-review-issue-status>草稿</dd></div><div><dt>草稿版本</dt><dd data-review-issue-revision>尚未儲存版本</dd></div><div><dt>原審查人</dt><dd data-review-issue-author>指派 DRS 專員</dd></div><div><dt>覆核人</dt><dd data-review-issue-peer>尚未指派</dd></div><div><dt>覆核結果</dt><dd data-review-issue-peer-result>尚未提出覆核</dd></div></dl><p>這些是本頁暫存狀態；尚未通知任何人，也不代表正式案件紀錄。</p></div>
+              <div class="issue-lifecycle workflow-stepper" aria-label="審查事項生命週期"><span class="is-current" data-review-lifecycle-state="草稿">草稿</span><span data-review-lifecycle-state="待送出">待送出</span><span data-review-lifecycle-state="等待回覆">等待回覆</span><span data-review-lifecycle-state="已回覆待複核">已回覆待複核</span><span data-review-lifecycle-state="待甲方決定">待甲方決定</span><span data-review-lifecycle-state="已完成留痕">已完成留痕</span></div>
+              <details class="review-issue-events"><summary>查看本頁狀態轉換</summary><ol data-review-issue-events><li><strong>尚無狀態轉換</strong><small>儲存草稿或交由另一位 DRS 覆核後，才會產生本頁事件。</small></li></ol></details>
+              <details class="issue-exceptions"><summary>例外狀態</summary><ul><li>已撤回</li><li>已被新版本取代</li><li>需另一位 DRS 覆核</li><li>證據失效</li></ul></details>
+              <section class="review-editor" data-review-editor aria-label="審查意見編輯器">
+                <div class="quick-review-actions" aria-label="快速審查操作"><button type="button" data-drs-action="request-dimensions" disabled aria-disabled="true">要求乙方補尺寸</button><button type="button" data-drs-action="mark-mismatch" disabled aria-disabled="true">標記圖面與報價不一致</button><button type="button" data-drs-action="request-owner-material" disabled aria-disabled="true">要求甲方確認替代材料</button><button type="button" data-drs-action="create-consensus" disabled aria-disabled="true">建立三方共識紀錄</button></div>
+                <details class="review-stage" open><summary><span>01</span><strong>問題與依據</strong><small>先說清楚可驗證的發現</small></summary><div class="editor-grid"><label><span>問題分類</span><select data-review-field="issue-type" required><option value="">請選擇</option><option>尺寸缺漏</option><option>文件不一致</option><option>材料待確認</option><option>三方共識</option></select></label><label><span>對應文件及引用位置</span><input data-review-field="basis-summary" value="加入審查依據後自動整理" readonly aria-readonly="true" /></label><label class="editor-span"><span>可驗證的發現</span><textarea data-review-field="risk" required rows="3" placeholder="只描述文件能支持的事實"></textarea></label><label class="editor-span"><span>對決策的影響</span><textarea data-review-field="impact" required rows="2" placeholder="說明若未處理，會影響哪一個決定"></textarea></label></div></details>
+                <details class="review-stage" open><summary><span>02</span><strong>要求與責任</strong><small>說明要誰補什麼、何時回覆</small></summary><div class="editor-grid"><label class="editor-span"><span>要求補正或確認的內容</span><textarea data-review-field="request" required rows="3" placeholder="說明可執行的補正內容"></textarea></label><label><span>收件角色</span><select data-review-field="audience" required><option value="">請選擇</option><option>甲方</option><option>乙方設計團隊</option><option>甲乙雙方</option></select></label><label><span>下一步負責人</span><select data-review-field="next-owner" required><option value="">請選擇</option><option>甲方</option><option>乙方設計團隊</option><option>DRS 專員</option></select></label><label class="editor-span"><span>預期回覆時間或案件節點</span><input type="text" data-review-field="response-due" required placeholder="例如：開工前確認前" /></label></div></details>
+                <details class="review-stage"><summary><span>03</span><strong>回覆與完成</strong><small>收到回覆後才決定完成、退回或升級</small></summary><div class="editor-grid"><label class="editor-span"><span>收到回覆後的最終處置</span><textarea data-review-field="resolution" rows="2" placeholder="尚未收到回覆時可留空"></textarea></label></div></details>
+                <div class="sticky-action-bar"><div class="draft-meta"><strong data-draft-status>尚未儲存</strong><small>草稿只保留在目前頁面，重新整理後不保留</small></div><button type="button" data-drs-action="save-review-draft" disabled aria-disabled="true">儲存草稿</button><button type="button" data-drs-action="request-peer-review" disabled aria-disabled="true">交由另一位 DRS 覆核</button><button type="button" class="primary-review-submit" data-drs-action="submit-presend-review" data-primary-action disabled aria-disabled="true">檢查送出前快照</button></div>
+                <details class="low-frequency-controls"><summary>更多操作</summary><section id="specialist-panel-control" aria-label="專員人工控制"><p class="control-result" data-drs-control-result aria-live="polite" hidden>本頁尚未準備人工控制結果。</p><div class="review-mode-actions"><button type="button" data-drs-action="edit-send" disabled aria-disabled="true" aria-pressed="false">編輯後送出</button><button type="button" data-drs-action="override-send" disabled aria-disabled="true" aria-pressed="false">覆核後送出</button></div><div class="control-grid"><article data-drs-cancel-control><strong>取消本次送出</strong><label><span>取消原因</span><textarea data-drs-cancel-field="reason" required rows="2" aria-label="取消原因"></textarea></label><label><span>取消後下一步責任人</span><select data-drs-cancel-field="next-actor" required aria-label="取消後下一步責任人"><option value="">請選擇</option><option value="甲方">甲方</option><option value="乙方設計團隊">乙方設計團隊</option><option value="DRS 專員">DRS 專員</option></select></label><button type="button" data-drs-action="cancel-send" disabled aria-disabled="true">取消本次送出</button></article><article data-drs-manual-exception><strong>建立人工例外紀錄</strong><label><span>人工例外原因</span><textarea data-drs-manual-field="exception-reason" required rows="2" aria-label="人工例外原因"></textarea></label><label><span>急迫程度</span><select data-drs-manual-field="urgency" required aria-label="急迫程度"><option value="">請選擇</option><option value="低">低</option><option value="中">中</option><option value="高">高</option></select></label><label><span>服務事件編號</span><input type="text" data-drs-manual-field="service-incident-id" required aria-label="服務事件編號" /></label><label><span>下一步責任人</span><select data-drs-manual-field="next-actor" required aria-label="下一步責任人"><option value="">請選擇</option><option value="甲方">甲方</option><option value="乙方設計團隊">乙方設計團隊</option><option value="DRS 專員">DRS 專員</option></select></label><button type="button" data-drs-action="manual-send" disabled aria-disabled="true">建立人工例外紀錄</button></article></div><span data-drs-bind="final-receipt">尚未建立送出前收據；所有對外回覆仍需 DRS 專員確認。</span></section></details>
+                <p class="editor-boundary">建立快照不等於已送出；傳送成功、對方已讀與正式案件紀錄會分開呈現。</p><p class="decision-result" data-drs-decision-result aria-live="polite" hidden>本頁尚未準備操作結果。</p>
+              </section>
+            </section>
+
+            <section class="main-tab-panel" id="specialist-panel-record" data-drs-panel="record" role="tabpanel" aria-labelledby="specialist-tab-record" data-drs-ready-content hidden inert>
+              <div class="section-head"><div><p class="eyebrow">送出與留痕</p><h2 data-drs-bind="snapshot-title">送出前快照尚未建立</h2></div><span>四個狀態分開保存</span></div>
+              <section id="specialist-panel-snapshot" aria-label="送出前快照"><div class="snapshot-empty" data-presend-snapshot-empty><strong>尚未提交送出前審查</strong><p>加入正式文件依據、完成補件要求並確認收件角色後，才能建立快照。</p></div><div class="snapshot-stale" data-presend-snapshot-stale hidden><strong>先前快照已過期，不可送出</strong><p data-presend-stale-reason>審查內容或引用依據已變更</p><small>請返回審查意見，重新儲存並建立送出前快照。</small></div><dl class="snapshot-grid" data-presend-snapshot-content hidden><div><dt>審核者</dt><dd data-presend-bind="reviewer">尚未確認</dd></div><div><dt>案件</dt><dd data-presend-bind="case">尚未取得正式案件</dd></div><div><dt>審查事項版本</dt><dd data-presend-bind="issue-version">尚未建立</dd></div><div><dt>問題分類</dt><dd data-presend-bind="issue-type">尚未選擇</dd></div><div><dt>可驗證的發現</dt><dd data-presend-bind="finding">尚未填寫</dd></div><div><dt>對決策的影響</dt><dd data-presend-bind="impact">尚未填寫</dd></div><div><dt>要求補正或確認</dt><dd data-presend-bind="request">尚未填寫</dd></div><div><dt>收件角色</dt><dd data-presend-bind="audience">尚未選擇</dd></div><div><dt>引用文件、版本與位置</dt><dd data-presend-bind="documents">尚未加入</dd></div><div><dt>對話來源</dt><dd data-presend-bind="conversation">尚未取得正式來源</dd></div><div><dt>處理結果</dt><dd data-presend-bind="outcome">尚未選擇</dd></div><div><dt>下一步責任人</dt><dd data-presend-bind="next-owner">尚未選擇</dd></div><div><dt>回覆時間／節點</dt><dd data-presend-bind="response-due">尚未填寫</dd></div><div><dt>目前狀態</dt><dd data-presend-bind="state">尚未送出、尚未建立正式案件紀錄</dd></div></dl></section>
+              <ol class="receipt-states"><li><span>01</span><strong>送出前快照</strong><small>尚未建立</small></li><li><span>02</span><strong>傳送結果</strong><small>尚未傳送</small></li><li><span>03</span><strong>收件狀態</strong><small>尚無已讀資料</small></li><li><span>04</span><strong>正式案件紀錄</strong><small>尚未建立</small></li></ol>
+              <section class="audit-footprint"><h3>正式留痕狀態</h3><p>此操作目前只保留在本頁；尚未送出，尚未建立正式案件紀錄。</p></section>
+              <p class="record-boundary">只有實際傳送成功才會記錄傳送結果；送出前快照、收件狀態與正式案件紀錄不會互相冒充。</p>
+            </section>
+          </div>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <p class="live-region" data-drs-live aria-live="polite">正在載入 DRS 專員案件決策審核桌。</p>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

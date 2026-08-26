@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="LaiBE DRS 乙方案件工作台，協助受邀乙方處理共用案件、文件回覆與下一步留痕。" />
+    <title>乙方案件工作台｜LaiBE DRS</title>
+    <link rel="icon" type="image/svg+xml" href="../../../../assets/logo/laibe_offer.svg" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-drs-workspace="vendor" data-view-model-boundary="isolated-data-client">
+    <a class="skip-link" href="#workspace-main">跳到乙方工作區</a>
+    <header class="topbar">
+      <div class="brand"><img src="../../../../assets/logo/laibe_offer.svg" alt="LaiBE" /><div><span>Decision &amp; Record System</span><strong>乙方案件工作台</strong></div></div>
+      <dl class="identity-strip" aria-label="受邀案件狀態">
+        <div><dt>角色</dt><dd>設計師／統包</dd></div>
+        <div><dt>可見範圍</dt><dd>此案件共用內容</dd></div>
+        <div><dt>受邀案件</dt><dd data-drs-bind="case-name">青埔 A7 新成屋</dd></div>
+        <div><dt>下一步責任人</dt><dd data-drs-bind="responsible-role">乙方設計團隊</dd></div>
+      </dl>
+    </header>
+
+    <main id="workspace-main" class="workspace-shell">
+      <aside class="case-rail" aria-label="乙方案件導覽">
+        <p class="rail-kicker">Vendor DRS</p>
+        <h1>只處理被授權的共用案件</h1>
+        <nav class="rail-tabs" aria-label="乙方工作區切換" role="tablist">
+          <button type="button" class="is-active" id="vendor-tab-assigned" data-drs-tab="assigned" role="tab" aria-selected="true" aria-controls="vendor-panel-assigned" tabindex="0">受邀案件</button>
+          <button type="button" id="vendor-tab-line" data-drs-tab="line" role="tab" aria-selected="false" aria-controls="vendor-panel-line" tabindex="-1">共用 LINE 群組</button>
+          <button type="button" id="vendor-tab-documents" data-drs-tab="documents" role="tab" aria-selected="false" aria-controls="vendor-panel-documents" tabindex="-1">文件回覆</button>
+          <button type="button" id="vendor-tab-records" data-drs-tab="records" role="tab" aria-selected="false" aria-controls="vendor-panel-records" tabindex="-1">案件紀錄</button>
+        </nav>
+        <section class="rail-note">
+          <strong>乙方可見範圍</strong>
+          <p>乙方只看此案件共用內容；屋主私有整理不會顯示。</p>
+        </section>
+      </aside>
+
+      <section class="main-panel" aria-label="乙方工作內容">
+        <section class="assigned-panel" id="vendor-panel-assigned" data-drs-panel="assigned" role="tabpanel" aria-labelledby="vendor-tab-assigned">
+          <section class="hero-state">
+            <p class="eyebrow">受邀案件</p>
+            <h2 data-drs-bind="current-status">請先回覆平面配置 v2 的尺寸問題</h2>
+            <p>本工作台不是替代 LINE 聊天，而是把共用群組中的文件問題、回覆、版本與下一步整理成可追溯的案件事實。</p>
+            <div class="hero-actions">
+              <button type="button" class="primary-action" data-drs-action="open-reply">撰寫文件回覆草稿</button>
+              <button type="button" class="secondary-action" data-drs-action="open-line">查看共用 LINE 脈絡</button>
+            </div>
+          </section>
+
+          <section class="workspace-status" data-drs-state-region aria-label="本頁案件資料狀態">
+            <div><p class="eyebrow" data-drs-bind="state-label">可檢視</p><h2 data-drs-bind="product-message">案件狀態已整理完成，請依下一步責任人處理。</h2></div>
+            <dl class="record-grid">
+              <div><dt>誰在等待誰</dt><dd data-drs-bind="waiting-for">屋主等待乙方補充尺寸說明</dd></div>
+              <div><dt>下一步</dt><dd data-drs-bind="next-action">乙方補充尺寸後，屋主再決定是否確認平面配置 v2。</dd></div>
+            </dl>
+            <button type="button" class="secondary-action" data-drs-action="retry-load">重新整理本頁案件狀態</button>
+          </section>
+
+          <section class="state-grid" aria-label="乙方頁面狀態">
+            <article><span>載入中</span><strong>正在核對受邀案件</strong><p>正式開放後會先確認邀請、角色與案件範圍。</p><button type="button" data-drs-state-option="loading">檢視載入狀態</button></article>
+            <article><span>空狀態</span><strong>目前沒有待回覆項目</strong><p>有文件提問或補件要求時才會列出。</p><button type="button" data-drs-state-option="empty">檢視空狀態</button></article>
+            <article><span>錯誤狀態</span><strong>暫時無法開啟案件</strong><p>請回到原邀請通知重新確認身分。</p><button type="button" data-drs-state-option="retryable-error">檢視暫時無法取得</button></article>
+            <article><span>未取得檢視權限</span><strong>需要確認案件授權</strong><p>正式開放後會依案件邀請顯示共用內容。</p><button type="button" data-drs-state-option="permission-denied">檢視權限狀態</button></article>
+          </section>
+
+          <article class="assignment-board" data-drs-ready-content>
+            <div class="section-head compact"><div><p class="eyebrow">受邀案件工作</p><h2>本週應處理</h2></div><span>依責任人排序</span></div>
+            <ol class="ledger-list" data-drs-list="review-queue">
+              <li><span>設計團隊</span><strong>回覆平面配置問題</strong><small>下一步責任人：乙方設計團隊</small><em>待乙方</em></li>
+              <li><span>工務</span><strong>暫無施工任務</strong><small>正式施工任務開放後才會列入</small><em>無</em></li>
+            </ol>
+          </article>
+        </section>
+
+        <section class="line-card" id="vendor-panel-line" data-drs-panel="line" role="tabpanel" aria-labelledby="vendor-tab-line" data-drs-ready-content hidden>
+          <div class="section-head">
+            <div><p class="eyebrow">此案件共用內容</p><h2 id="line-title">共用 LINE 群組</h2></div>
+            <span>只顯示此案件共用內容</span>
+          </div>
+          <div class="line-phone">
+            <div class="line-status"><strong>青埔 A7 新成屋</strong><span>等待乙方回覆</span></div>
+            <ol class="message-list" data-drs-list="shared-messages">
+              <li><b>屋主</b><span>請確認中島與冰箱距離是否可達 90cm。</span><em>待乙方</em></li>
+              <li><b>DRS 專員</b><span>請回覆依據文件版本，避免後續討論各說各話。</span><em>已留痕</em></li>
+            </ol>
+            <label><span>乙方回覆草稿</span><textarea data-drs-draft="line" rows="4" placeholder="回覆時請引用平面配置 v2 與廚具尺寸表"></textarea></label>
+            <button type="button" data-drs-action="line-response">整理為共用回覆</button>
+          </div>
+        </section>
+
+        <section class="content-grid" id="vendor-panel-documents" data-drs-panel="documents" role="tabpanel" aria-labelledby="vendor-tab-documents" data-drs-ready-content hidden>
+          <article class="document-board">
+            <div class="section-head compact"><div><p class="eyebrow">文件回覆</p><h2>待處理文件</h2></div><span>2 項</span></div>
+            <ol class="ledger-list">
+              <li><span>平面配置 v2</span><strong>需補尺寸說明</strong><small>引用屋主問題與 DRS 標註</small><em>今日</em></li>
+              <li><span>廚具尺寸表</span><strong>尚待提供</strong><small>提供後才能讓屋主確認平面配置</small><em>待補</em></li>
+              <li><span>材料初選表</span><strong>已提交</strong><small>等待屋主在共用群組確認</small><em>待屋主</em></li>
+            </ol>
+            <button type="button" class="secondary-action" data-drs-action="document-response">標記回覆草稿已整理</button>
+          </article>
+        </section>
+
+        <section class="record-board" id="vendor-panel-records" data-drs-panel="records" role="tabpanel" aria-labelledby="vendor-tab-records" data-drs-ready-content hidden>
+          <div class="section-head compact"><div><p class="eyebrow">案件紀錄</p><h2>乙方回覆會如何留下紀錄</h2></div><span>送出前先確認</span></div>
+          <dl class="record-grid">
+            <div><dt>誰</dt><dd>乙方設計團隊</dd></div>
+            <div><dt>何時</dt><dd>正式送出時間</dd></div>
+            <div><dt>依據</dt><dd>平面配置 v2、廚具尺寸表</dd></div>
+            <div><dt>下一步</dt><dd>屋主確認是否接受</dd></div>
+          </dl>
+          <button type="button" class="primary-action" data-drs-action="mark-next">確認下一步說明</button>
+        </section>
+      </section>
+    </main>
+
+    <p class="live-region" data-drs-live aria-live="polite">已載入乙方案件工作台。</p>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
