@@ -4,6 +4,8 @@ import {
   type FinalizeRequest,
   INTAKE_BUCKET,
   isOpaqueRef,
+  isSha256,
+  isUuid,
   readOwn,
   RECORDS_BUCKET,
   sha256Canonical,
@@ -82,6 +84,16 @@ function exactRef(value: unknown, prefix: string): value is string {
   return isOpaqueRef(value) && value.startsWith(`${prefix}_`);
 }
 
+function hasExactRecordKeys(
+  candidate: Record<string, unknown> | null,
+  expected: readonly string[],
+): candidate is Record<string, unknown> {
+  if (!candidate) return false;
+  const keys = Object.keys(candidate);
+  return keys.length === expected.length &&
+    expected.every((key) => keys.includes(key));
+}
+
 export function createDocumentStorageService(
   dependencies: Readonly<{
     repository: DocumentRepositoryPort;
@@ -93,6 +105,31 @@ export function createDocumentStorageService(
 ) {
   const now = dependencies.now ?? (() => new Date());
   const randomUuid = dependencies.randomUuid ?? uuid;
+
+  async function queuePromotedOrphan(
+    principal: DocumentModeAPrincipal,
+    intentRef: string,
+    recordsObjectKey: string,
+  ): Promise<void> {
+    let durable = false;
+    try {
+      const queued = record(
+        await dependencies.repository.queueOrphanCleanup({
+          principal,
+          intentRef,
+          recordsBucket: RECORDS_BUCKET,
+          recordsObjectKey,
+        }),
+      );
+      durable = hasExactRecordKeys(
+        queued,
+        ["ok", "state", "work_item_id"],
+      ) && readOwn(queued, "ok") === true &&
+        readOwn(queued, "state") === "ORPHAN_CLEANUP_QUEUED" &&
+        isUuid(readOwn(queued, "work_item_id"));
+    } catch { /* closed below */ }
+    if (!durable) throw new Error("ORPHAN_DURABILITY_UNAVAILABLE");
+  }
 
   async function createUploadIntent(
     principal: DocumentModeAPrincipal,
@@ -276,12 +313,7 @@ export function createDocumentStorageService(
       records.sizeBytes !== intake.sizeBytes ||
       records.detectedMime !== intake.detectedMime
     ) {
-      await dependencies.repository.queueOrphanCleanup({
-        principal,
-        intentRef: request.intentRef,
-        recordsBucket: RECORDS_BUCKET,
-        recordsObjectKey: recordsKey,
-      });
+      await queuePromotedOrphan(principal, request.intentRef, recordsKey);
       return null;
     }
     const finalizeResource = Object.freeze({
@@ -305,6 +337,7 @@ export function createDocumentStorageService(
     );
     const finalizeConflict = logicalConflict(finalized);
     if (finalizeConflict) {
+      await queuePromotedOrphan(principal, request.intentRef, recordsKey);
       return conflictResponse(
         "laibe.drs-document-upload-finalize.response.v1",
         finalizeConflict,
@@ -319,12 +352,7 @@ export function createDocumentStorageService(
       !exactRef(documentRef, "doc") || !exactRef(versionRef, "dvr") ||
       !exactRef(receiptRef, "rcp")
     ) {
-      await dependencies.repository.queueOrphanCleanup({
-        principal,
-        intentRef: request.intentRef,
-        recordsBucket: RECORDS_BUCKET,
-        recordsObjectKey: recordsKey,
-      });
+      await queuePromotedOrphan(principal, request.intentRef, recordsKey);
       return null;
     }
     return Object.freeze({
@@ -395,8 +423,18 @@ export function createDocumentStorageService(
       );
     }
     if (
+      !hasExactRecordKeys(result, [
+        "ok",
+        "state",
+        "snapshot_ref",
+        "receipt_ref",
+        "canonical_payload_sha256",
+      ]) ||
       readOwn(result, "ok") !== true ||
-      readOwn(result, "state") !== "SNAPSHOT_RECORDED"
+      readOwn(result, "state") !== "SNAPSHOT_RECORDED" ||
+      !exactRef(readOwn(result, "snapshot_ref"), "snp") ||
+      !exactRef(readOwn(result, "receipt_ref"), "rcp") ||
+      !isSha256(readOwn(result, "canonical_payload_sha256"))
     ) return null;
     return Object.freeze({
       schemaVersion: "laibe.drs-document-snapshot.response.v1",

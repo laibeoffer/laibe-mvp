@@ -100,23 +100,45 @@ test("Storage uses fixed private buckets, upsert false and no SQL metadata-row m
 });
 
 test("scanner/provider gaps quarantine and orphan work remains queued rather than falsely completed", async () => {
-  const [validation, service, documentAdapter, migration] = await Promise.all([
-    text("supabase/functions/_shared/drs-document-storage/validation.ts"),
-    text("supabase/functions/_shared/drs-document-storage/service.ts"),
-    text(
-      "supabase/functions/_shared/drs-document-storage/supabase-document-adapter.ts",
-    ),
-    text("supabase/migrations/20260826190000_drs_document_storage_w1.sql"),
-  ]);
+  const [validation, service, ports, documentAdapter, migration] = await Promise
+    .all([
+      text("supabase/functions/_shared/drs-document-storage/validation.ts"),
+      text("supabase/functions/_shared/drs-document-storage/service.ts"),
+      text("supabase/functions/_shared/drs-document-storage/ports.ts"),
+      text(
+        "supabase/functions/_shared/drs-document-storage/supabase-document-adapter.ts",
+      ),
+      text("supabase/migrations/20260826190000_drs_document_storage_w1.sql"),
+    ]);
   assert.match(
     validation,
     /UNKNOWN[\s\S]*?QUARANTINED|QUARANTINED[\s\S]*?UNKNOWN/u,
   );
   assert.match(service, /queueOrphanCleanup/u);
+  assert.match(service, /ORPHAN_CLEANUP_QUEUED/u);
+  assert.match(service, /work_item_id/u);
+  assert.doesNotMatch(ports, /queueOrphanCleanup[\s\S]*?Promise<void>/u);
   assert.match(documentAdapter, /crypto\.subtle\.digest/u);
   assert.match(documentAdapter, /orphanPayloadSha256/u);
+  assert.match(documentAdapter, /return await execute/u);
   assert.match(migration, /document_orphan_cleanup_work_items/u);
   assert.doesNotMatch(migration, /DOCUMENT_ORPHAN_CLEANUP_COMPLETED/u);
+});
+
+test("snapshot projection and DRS document kind stay closed", async () => {
+  const [contracts, service, migration] = await Promise.all([
+    text("supabase/functions/_shared/drs-document-storage/contracts.ts"),
+    text("supabase/functions/_shared/drs-document-storage/service.ts"),
+    text("supabase/migrations/20260826190000_drs_document_storage_w1.sql"),
+  ]);
+  assert.match(contracts, /type DocumentKind\s*=\s*"drs_review"/u);
+  assert.doesNotMatch(
+    contracts,
+    /type DocumentKind[\s\S]*?"(?:drawing|quote|contract|photo|other_case_evidence)"/u,
+  );
+  assert.match(service, /canonical_payload_sha256[\s\S]*?isSha256/u);
+  assert.match(service, /snapshot_ref[\s\S]*?exactRef/u);
+  assert.match(migration, /document_kind\s*=\s*'drs_review'/u);
 });
 
 test("bounded streams, byte-derived hashes and closed conflict states are visible in source", async () => {

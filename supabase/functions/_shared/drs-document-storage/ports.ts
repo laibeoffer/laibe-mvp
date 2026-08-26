@@ -45,7 +45,7 @@ export interface DocumentRepositoryPort {
       recordsBucket: string;
       recordsObjectKey: string;
     }>,
-  ): Promise<void>;
+  ): Promise<unknown>;
 }
 
 export type StorageObjectFacts = Readonly<{

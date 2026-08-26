@@ -24,13 +24,7 @@ export const INTAKE_BUCKET = "drs-case-intake-private" as const;
 export const RECORDS_BUCKET = "drs-case-records-private" as const;
 
 export type DocumentMime = typeof DOCUMENT_LIMITS.allowedMime[number];
-export type DocumentKind =
-  | "drawing"
-  | "quote"
-  | "contract"
-  | "photo"
-  | "drs_review"
-  | "other_case_evidence";
+export type DocumentKind = "drs_review";
 export type SnapshotPurpose =
   | "REVIEW_SUBMISSION"
   | "DECISION_BASIS"
@@ -165,14 +159,7 @@ export function parseUploadIntentRequest(
     schemaVersion !== UPLOAD_INTENT_REQUEST_SCHEMA ||
     (mode !== "NEW_DOCUMENT" && mode !== "NEW_VERSION") ||
     (mode === "NEW_VERSION" && !isOpaqueRef(documentRef)) ||
-    ![
-      "drawing",
-      "quote",
-      "contract",
-      "photo",
-      "drs_review",
-      "other_case_evidence",
-    ].includes(String(documentKind)) ||
+    documentKind !== "drs_review" ||
     typeof originalFilename !== "string" ||
     !DOCUMENT_LIMITS.allowedMime.includes(declaredMime as DocumentMime) ||
     extensionFromFilename(

@@ -255,4 +255,20 @@ Deno.test("orphan cleanup is a typed work item, not a false execution receipt", 
     sql,
     /p_operation = 'QUEUE_ORPHAN_CLEANUP'[\s\S]*?p_expected_payload_sha256\s*<>\s*pg_catalog\.encode\([\s\S]*?extensions\.digest\(pg_catalog\.convert_to\(p_resource_ref, 'UTF8'\), 'sha256'\)/iu,
   );
+  assert.match(
+    sql,
+    /'ORPHAN_CLEANUP_QUEUED'[\s\S]*?'work_item_id'\s*,\s*v_cleanup_work_item_id/iu,
+  );
+});
+
+Deno.test("DRS upload-intent document kind is closed to drs_review in SQL", async () => {
+  const sql = await migration();
+  assert.match(
+    sql,
+    /create table casework\.document_upload_intents[\s\S]*?document_kind text not null[\s\S]*?check\s*\(document_kind\s*=\s*'drs_review'\)/iu,
+  );
+  assert.match(
+    sql,
+    /p_operation = 'CREATE_UPLOAD_INTENT'[\s\S]*?documentKind'\s*<>\s*'drs_review'/iu,
+  );
 });
