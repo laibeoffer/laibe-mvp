@@ -82,13 +82,22 @@ function jsonResponse(payload, status = 200) {
 function createProductionFetchHarness(now) {
   const calls = [];
   let issued = null;
+  let finalizeRpcCount = 0;
   const grantExpiresAt = new Date(now.getTime() + 30_000).toISOString();
   const fetch = (input, init = {}) => {
     const url = new URL(
       typeof input === "string" || input instanceof URL ? input : input.url,
     );
     const body = typeof init.body === "string" ? JSON.parse(init.body) : null;
-    calls.push(Object.freeze({ pathname: url.pathname, body }));
+    const bodyBytes = init.body instanceof Uint8Array
+      ? init.body.slice()
+      : null;
+    calls.push(Object.freeze({
+      method: init.method ?? "GET",
+      pathname: url.pathname,
+      body,
+      bodyBytes,
+    }));
     if (
       url.origin === SUPABASE_ORIGIN && url.pathname.startsWith("/rest/v1/rpc/")
     ) {
@@ -142,6 +151,8 @@ function createProductionFetchHarness(now) {
           });
         }
         if (body.p_operation === "FINALIZE_UPLOAD") {
+          finalizeRpcCount += 1;
+          if (finalizeRpcCount === 1) return jsonResponse(plan());
           return jsonResponse({
             ok: true,
             state: "FORMAL_VERSION_CREATED",
@@ -182,6 +193,17 @@ function createProductionFetchHarness(now) {
     if (
       url.origin === SUPABASE_ORIGIN &&
       url.pathname.startsWith(
+        `/storage/v1/object/authenticated/${INTAKE_BUCKET}/`,
+      )
+    ) {
+      return new Response(PDF_BYTES, {
+        status: 200,
+        headers: { "content-type": "application/pdf" },
+      });
+    }
+    if (
+      url.origin === SUPABASE_ORIGIN &&
+      url.pathname.startsWith(
         `/storage/v1/object/authenticated/${RECORDS_BUCKET}/`,
       )
     ) {
@@ -189,6 +211,12 @@ function createProductionFetchHarness(now) {
         status: 200,
         headers: { "content-type": "application/pdf" },
       });
+    }
+    if (
+      url.origin === SUPABASE_ORIGIN &&
+      url.pathname.startsWith(`/storage/v1/object/${RECORDS_BUCKET}/`)
+    ) {
+      return new Response(null, { status: 200 });
     }
     if (url.href === `${SCANNER_ORIGIN}/v1/scan`) {
       return jsonResponse(cleanReport());
@@ -896,6 +924,90 @@ Deno.test("all four real handler factories validate before authority and compose
       true,
       `${route.name} provider seam`,
     );
+    if (route.name === "upload-finalize") {
+      const scannerCall = harness.calls.find((call) =>
+        call.pathname === "/v1/scan"
+      );
+      const recordsWrite = harness.calls.find((call) =>
+        call.method === "POST" &&
+        call.pathname.startsWith(`/storage/v1/object/${RECORDS_BUCKET}/`)
+      );
+      assert.equal(
+        paths.filter((path) => path === "/v1/scan").length,
+        1,
+        "upload-finalize scans the exact intake bytes",
+      );
+      assert.equal(
+        paths.filter((path) =>
+          path.startsWith(`/storage/v1/object/${RECORDS_BUCKET}/`)
+        ).length,
+        1,
+        "upload-finalize writes the sealed bytes to records storage",
+      );
+      assert.deepEqual(
+        scannerCall?.bodyBytes,
+        PDF_BYTES,
+        "scanner receives the exact intake bytes",
+      );
+      assert.deepEqual(
+        recordsWrite?.bodyBytes,
+        scannerCall?.bodyBytes,
+        "records receives the exact bytes that were scanned",
+      );
+      assert.equal(
+        paths.filter((path) =>
+          path.startsWith(
+            `/storage/v1/object/authenticated/${INTAKE_BUCKET}/`,
+          )
+        ).length,
+        4,
+        "A B C and E each read the exact intake object",
+      );
+      assert.equal(
+        paths.filter((path) =>
+          path.startsWith(
+            `/storage/v1/object/authenticated/${RECORDS_BUCKET}/`,
+          )
+        ).length,
+        1,
+        "D reinspects the sealed records object",
+      );
+      assert.equal(
+        paths.includes("/storage/v1/object/copy"),
+        false,
+        "sealed promotion never copies or refetches the mutable intake key",
+      );
+      const finalizeCalls = harness.calls.filter((call) =>
+        call.body?.p_operation === "FINALIZE_UPLOAD"
+      );
+      assert.equal(
+        finalizeCalls.length,
+        2,
+        "repository plans first and formalizes only after sealed verification",
+      );
+      for (const call of finalizeCalls) {
+        assert.equal(
+          call.body.p_authenticated_user_id,
+          PRINCIPAL.authenticatedUserId,
+        );
+        assert.equal(call.body.p_expected_case_id, PRINCIPAL.expectedCaseId);
+        assert.equal(call.body.p_grant_id, PRINCIPAL.grantId);
+        assert.equal(call.body.p_grant_version, PRINCIPAL.grantVersion);
+      }
+      for (
+        const currentAuthorityPath of [
+          "/rest/v1/rpc/drs_server_session_verify_v1",
+          "/rest/v1/rpc/drs_workspace_grant_v1",
+          "/rest/v1/rpc/drs_workspace_grant_v2",
+        ]
+      ) {
+        assert.equal(
+          paths.filter((path) => path === currentAuthorityPath).length,
+          1,
+          `upload-finalize freshly rechecks ${currentAuthorityPath}`,
+        );
+      }
+    }
   }
 });
 
