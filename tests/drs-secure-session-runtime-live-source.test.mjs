@@ -163,6 +163,43 @@ $invokeClosedProcessBodyGraphs = @($ast.FindAll({
     statements = $statements
   }
 })
+$assertOwnedRuntimeStateBodyGraphs = @($ast.FindAll({
+  param($item)
+  $item -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+    $item.Name -ieq 'Assert-OwnedRuntimeState'
+}, $true) | ForEach-Object {
+  $function = $_
+  $bodyStart = $function.Body.Extent.StartOffset
+  $statements = @($function.Body.FindAll({
+    param($item) $item -is [System.Management.Automation.Language.StatementAst]
+  }, $true) | Sort-Object { $_.Extent.StartOffset }, { $_.Extent.EndOffset }, { $_.GetType().Name } | ForEach-Object {
+    $statement = $_
+    $parentStatement = $statement.Parent
+    while (
+      $null -ne $parentStatement -and
+      $parentStatement -ne $function -and
+      $parentStatement -isnot [System.Management.Automation.Language.StatementAst]
+    ) {
+      $parentStatement = $parentStatement.Parent
+    }
+    if ($parentStatement -eq $function) { $parentStatement = $null }
+    [ordered]@{
+      type = $statement.GetType().Name
+      relativeStart = $statement.Extent.StartOffset - $bodyStart
+      relativeEnd = $statement.Extent.EndOffset - $bodyStart
+      parentType = if ($null -eq $parentStatement) { $null } else { $parentStatement.GetType().Name }
+      parentRelativeStart = if ($null -eq $parentStatement) { $null } else { $parentStatement.Extent.StartOffset - $bodyStart }
+      parentRelativeEnd = if ($null -eq $parentStatement) { $null } else { $parentStatement.Extent.EndOffset - $bodyStart }
+      text = $statement.Extent.Text
+    }
+  })
+  [ordered]@{
+    name = $function.Name
+    bodyType = $function.Body.GetType().Name
+    bodyText = $function.Body.Extent.Text
+    statements = $statements
+  }
+})
 $commands = @($ast.FindAll({
   param($item) $item -is [System.Management.Automation.Language.CommandAst]
 }, $true) | ForEach-Object {
@@ -333,6 +370,7 @@ $result = [ordered]@{
   functions = $functions
   variableReferences = $variableReferences
   invokeClosedProcessBodyGraphs = $invokeClosedProcessBodyGraphs
+  assertOwnedRuntimeStateBodyGraphs = $assertOwnedRuntimeStateBodyGraphs
   commands = $commands
   pipelines = $pipelines
   assignments = $assignments
@@ -1694,6 +1732,7 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
 function assertExactSupabaseStartExclusions(ps) {
   const ast = parseNativePowerShellAst(ps);
   const reachability = powerShellReachability(ast);
+  assertExactOwnedRuntimeStateGraph(ast);
   const startCalls = reachability.commands
     .filter((command) => command.name?.toLowerCase() === "invoke-closedprocess")
     .map((command) => ({ command, parameters: commandParameters(command) }))
@@ -1813,6 +1852,29 @@ function assertExactSupabaseStartExclusions(ps) {
   );
 }
 
+function assertExactOwnedRuntimeStateGraph(ast) {
+  assert.deepEqual(
+    ast.assertOwnedRuntimeStateBodyGraphs.map((graph) => ({
+      name: graph.name,
+      bodyType: graph.bodyType,
+      statementCount: graph.statements.length,
+      sha256: createHash("sha256")
+        .update(JSON.stringify(graph))
+        .digest("hex"),
+    })),
+    [
+      {
+        name: "Assert-OwnedRuntimeState",
+        bodyType: "ScriptBlockAst",
+        statementCount: 98,
+        sha256:
+          "e2f89685a18754e59ded300caa7a40a89ebcf02d7195834ff959e4f360abc17e",
+      },
+    ],
+    "Assert-OwnedRuntimeState full native-AST statement graph and body are exactly whitelisted",
+  );
+}
+
 function assertExactSupabaseArchiveBlock(ps) {
   const archiveStartMarker =
     "$archivePath = Assert-ExactDescendant -Root $runtimeRoot -Candidate (Join-Path $runtimeRoot '.git-archive-head.tar')";
@@ -1876,6 +1938,7 @@ function assertExactSupabaseArchiveBlock(ps) {
   );
 
   const nativeAst = assertNativePowerShellSecurityContract(ps);
+  assertExactOwnedRuntimeStateGraph(nativeAst);
   assertExactSupabaseCliEnvironment(ps, nativeAst);
 }
 
@@ -4127,5 +4190,34 @@ test("S17-F2 Supabase start preserves exact exclusions containers and db-only vo
     missedVolumeMutations,
     [],
     "exact owned-volume set rejects rebinds aliases index writes and member mutation",
+  );
+
+  const pipelineInputObjectAliasWrite = ps.replace(
+    exactVolumeExpectation,
+    `${exactVolumeExpectation}\nForEach-Object -InputObject $expectedVolumes -Process { $_.SetValue("supabase_config_$ProjectId", 0) }`,
+  );
+  assert.notEqual(
+    pipelineInputObjectAliasWrite,
+    ps,
+    "PIPELINE_INPUTOBJECT_ALIAS_WRITE: mutation applied",
+  );
+  const missedPipelineInputObjectGates = [];
+  for (
+    const [label, gate] of [
+      ["canonicalResourceSelector", assertExactSupabaseStartExclusions],
+      ["priorNativeGate", assertExactSupabaseArchiveBlock],
+    ]
+  ) {
+    try {
+      gate(pipelineInputObjectAliasWrite);
+      missedPipelineInputObjectGates.push(label);
+    } catch (error) {
+      if (!(error instanceof assert.AssertionError)) throw error;
+    }
+  }
+  assert.deepEqual(
+    missedPipelineInputObjectGates,
+    [],
+    "PIPELINE_INPUTOBJECT_ALIAS_WRITE is rejected by both canonical resource gates",
   );
 });
