@@ -126,6 +126,43 @@ $variableReferences = @($ast.FindAll({
     path = $_.VariablePath.UserPath
   }
 })
+$invokeClosedProcessBodyGraphs = @($ast.FindAll({
+  param($item)
+  $item -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+    $item.Name -ieq 'Invoke-ClosedProcess'
+}, $true) | ForEach-Object {
+  $function = $_
+  $bodyStart = $function.Body.Extent.StartOffset
+  $statements = @($function.Body.FindAll({
+    param($item) $item -is [System.Management.Automation.Language.StatementAst]
+  }, $true) | Sort-Object { $_.Extent.StartOffset }, { $_.Extent.EndOffset }, { $_.GetType().Name } | ForEach-Object {
+    $statement = $_
+    $parentStatement = $statement.Parent
+    while (
+      $null -ne $parentStatement -and
+      $parentStatement -ne $function -and
+      $parentStatement -isnot [System.Management.Automation.Language.StatementAst]
+    ) {
+      $parentStatement = $parentStatement.Parent
+    }
+    if ($parentStatement -eq $function) { $parentStatement = $null }
+    [ordered]@{
+      type = $statement.GetType().Name
+      relativeStart = $statement.Extent.StartOffset - $bodyStart
+      relativeEnd = $statement.Extent.EndOffset - $bodyStart
+      parentType = if ($null -eq $parentStatement) { $null } else { $parentStatement.GetType().Name }
+      parentRelativeStart = if ($null -eq $parentStatement) { $null } else { $parentStatement.Extent.StartOffset - $bodyStart }
+      parentRelativeEnd = if ($null -eq $parentStatement) { $null } else { $parentStatement.Extent.EndOffset - $bodyStart }
+      text = $statement.Extent.Text
+    }
+  })
+  [ordered]@{
+    name = $function.Name
+    bodyType = $function.Body.GetType().Name
+    bodyText = $function.Body.Extent.Text
+    statements = $statements
+  }
+})
 $commands = @($ast.FindAll({
   param($item) $item -is [System.Management.Automation.Language.CommandAst]
 }, $true) | ForEach-Object {
@@ -295,6 +332,7 @@ $result = [ordered]@{
   parseErrors = @($parseErrors | ForEach-Object { $_.Message })
   functions = $functions
   variableReferences = $variableReferences
+  invokeClosedProcessBodyGraphs = $invokeClosedProcessBodyGraphs
   commands = $commands
   pipelines = $pipelines
   assignments = $assignments
@@ -1302,6 +1340,26 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
     wrapperDefinitions.length,
     1,
     "Invoke-ClosedProcess has one canonical definition",
+  );
+  assert.deepEqual(
+    ast.invokeClosedProcessBodyGraphs.map((graph) => ({
+      name: graph.name,
+      bodyType: graph.bodyType,
+      statementCount: graph.statements.length,
+      sha256: createHash("sha256")
+        .update(JSON.stringify(graph))
+        .digest("hex"),
+    })),
+    [
+      {
+        name: "Invoke-ClosedProcess",
+        bodyType: "ScriptBlockAst",
+        statementCount: 222,
+        sha256:
+          "6f51c7e71f2a12a71fb5b1f1d90b000c79216b389eb78da9e62a60587ddec0cc",
+      },
+    ],
+    "Invoke-ClosedProcess full native-AST statement graph and body are exactly whitelisted",
   );
   const wrapperDefinition = wrapperDefinitions[0];
   const nestedWrapperFunctions = ast.functions.filter((definition) =>
@@ -3839,6 +3897,13 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     "NESTED_FUNCTION_PIPELINE_ALIAS_WRITE",
   );
 
+  const executionContextAliasWrite = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  $ExecutionContext.SessionState.PSVariable.GetValue('Environment')['EXTRA']='1'\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "EXECUTIONCONTEXT_ALIAS_WRITE",
+  );
+
   const cleanupSystemRootRenamed = mutateOnce(
     ps,
     "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
@@ -3884,6 +3949,7 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
         "NESTED_FUNCTION_PIPELINE_ALIAS_WRITE",
         nestedFunctionPipelineAliasWrite,
       ],
+      ["EXECUTIONCONTEXT_ALIAS_WRITE", executionContextAliasWrite],
       ["CLEANUP_PARAM_SHADOW", cleanupParameterShadow],
     ]
   ) {
@@ -3904,6 +3970,7 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
         "NESTED_FUNCTION_PIPELINE_ALIAS_WRITE",
         nestedFunctionPipelineAliasWrite,
       ],
+      ["EXECUTIONCONTEXT_ALIAS_WRITE", executionContextAliasWrite],
     ]
   ) {
     try {
