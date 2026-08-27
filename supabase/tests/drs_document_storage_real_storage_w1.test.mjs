@@ -145,6 +145,19 @@ async function rewriteVerifiedSignedUploadExpiry(
   return { url, claims: decodeJwtPayload(rewrittenToken) };
 }
 
+function buildPsqlCommandOptions(password) {
+  return {
+    clearEnv: true,
+    env: {
+      PGCONNECT_TIMEOUT: "5",
+      ...(password ? { PGPASSWORD: password } : {}),
+    },
+    stdin: "null",
+    stdout: "piped",
+    stderr: "piped",
+  };
+}
+
 async function runPsql(psqlPath, rawDatabaseUrl, sql) {
   const databaseUrl = new URL(rawDatabaseUrl);
   assert.ok(["postgres:", "postgresql:"].includes(databaseUrl.protocol));
@@ -156,6 +169,7 @@ async function runPsql(psqlPath, rawDatabaseUrl, sql) {
   const password = decodeURIComponent(databaseUrl.password);
   databaseUrl.password = "";
   const command = new Deno.Command(psqlPath, {
+    ...buildPsqlCommandOptions(password),
     args: [
       "--no-psqlrc",
       "--quiet",
@@ -168,10 +182,6 @@ async function runPsql(psqlPath, rawDatabaseUrl, sql) {
       "--command",
       sql,
     ],
-    env: password ? { PGPASSWORD: password } : {},
-    stdin: "null",
-    stdout: "piped",
-    stderr: "piped",
   });
   const result = await command.output();
   assert.equal(result.code, 0, "disposable PostgreSQL fixture command failed");
@@ -254,6 +264,24 @@ async function assertAuthorizationSpecificDenial(response) {
   );
 }
 
+async function assertStorageObjectAbsent(response) {
+  assert.equal(response.ok, false, "deleted Storage object must be absent");
+  assert.equal(
+    response.status,
+    400,
+    "deleted Storage object must return the provider not-found HTTP status",
+  );
+  const body = await response.json();
+  assert.deepEqual(
+    Object.keys(body).sort(),
+    ["error", "message", "statusCode"],
+    "Storage absence response must use the exact provider shape",
+  );
+  assert.equal(String(body.statusCode), "404");
+  assert.equal(body.error, "not_found");
+  assert.equal(body.message, "Object not found");
+}
+
 async function runVerifiedCleanup({
   base,
   adminHeaders,
@@ -286,8 +314,7 @@ async function runVerifiedCleanup({
           `${base}/storage/v1/object/authenticated/${bucket}/${key}`,
           { headers: adminHeaders },
         );
-        assert.equal(readback.ok, false, `Storage cleanup readback: ${bucket}`);
-        if (readback.body) await readback.body.cancel();
+        await assertStorageObjectAbsent(readback);
       }
     });
   }
@@ -381,6 +408,51 @@ Deno.test("focused RED review: cleanup success and primary failure aggregation a
   const aggregateName = ["Aggregate", "Error"].join("");
   assert.ok(source.includes(`function ${cleanupName}`));
   assert.ok(source.includes(aggregateName));
+});
+
+Deno.test("focused RED readmission: psql child environment is not minimal", () => {
+  const options = buildPsqlCommandOptions("local-disposable-password");
+  assert.equal(options.clearEnv, true);
+  assert.deepEqual(Object.keys(options.env).sort(), [
+    "PGCONNECT_TIMEOUT",
+    "PGPASSWORD",
+  ]);
+  for (
+    const name of [
+      "DRS_DOCUMENT_REAL_SERVICE_ROLE_KEY",
+      "DRS_DOCUMENT_REAL_ANON_KEY",
+      "DRS_DOCUMENT_REAL_JWT_SECRET",
+    ]
+  ) {
+    assert.equal(Object.hasOwn(options.env, name), false);
+  }
+});
+
+Deno.test("focused RED readmission: cleanup rejects arbitrary provider failure", async () => {
+  await assert.doesNotReject(() =>
+    assertStorageObjectAbsent(
+      new Response(
+        JSON.stringify({
+          statusCode: "404",
+          error: "not_found",
+          message: "Object not found",
+        }),
+        { status: 400, headers: { "content-type": "application/json" } },
+      ),
+    )
+  );
+  await assert.rejects(() =>
+    assertStorageObjectAbsent(
+      new Response(
+        JSON.stringify({
+          statusCode: "500",
+          error: "internal_error",
+          message: "Internal server error",
+        }),
+        { status: 500, headers: { "content-type": "application/json" } },
+      ),
+    )
+  );
 });
 
 Deno.test("server-owned intake path cannot be replaced by a caller path", async () => {
