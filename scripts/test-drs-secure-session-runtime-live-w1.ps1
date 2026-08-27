@@ -533,7 +533,7 @@ function Assert-OwnedRuntimeState {
   $resources = Get-TaskOwnedResources -WorkingDirectory $runtimeRoot
   $expectedContainers = @("supabase_auth_$ProjectId", "supabase_db_$ProjectId", "supabase_kong_$ProjectId", "supabase_rest_$ProjectId") | Sort-Object
   $expectedNetworks = @("supabase_network_$ProjectId")
-  $expectedVolumes = @("supabase_config_$ProjectId", "supabase_db_$ProjectId") | Sort-Object
+  $expectedVolumes = @("supabase_db_$ProjectId") | Sort-Object
   if (
     -not $RequireExact -or
     ($resources.Containers -join "`n") -cne ($expectedContainers -join "`n") -or

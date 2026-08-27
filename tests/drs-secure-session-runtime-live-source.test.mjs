@@ -1738,6 +1738,23 @@ function assertExactSupabaseStartExclusions(ps) {
     ),
     "runtime acceptance remains the exact four admitted containers",
   );
+
+  const expectedVolumeAssignments = ast.assignments.filter((assignment) =>
+    assignment.owner === "Assert-OwnedRuntimeState" &&
+    assignment.leftVariable === "expectedVolumes"
+  );
+  assert.equal(
+    expectedVolumeAssignments.length,
+    1,
+    "one exact expected-volume assignment",
+  );
+  assert.equal(
+    normalizePowerShellAstText(expectedVolumeAssignments[0].rightText),
+    normalizePowerShellAstText(
+      '@("supabase_db_$ProjectId") | Sort-Object',
+    ),
+    "runtime acceptance admits exactly the hash-bound CLI db volume",
+  );
 }
 
 function assertExactSupabaseArchiveBlock(ps) {
@@ -3990,7 +4007,7 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
   );
 });
 
-test("S17-F2 Supabase start excludes mailpit and preserves the exact four-container runtime", () => {
+test("S17-F2 Supabase start preserves exact exclusions containers and db-only volume", () => {
   const ps = source(urls.powershell);
   assertExactSupabaseStartExclusions(ps);
   const admittedExclusions =
@@ -4005,4 +4022,27 @@ test("S17-F2 Supabase start excludes mailpit and preserves the exact four-contai
     assert.AssertionError,
     "inbucket cannot replace the hash-bound CLI mailpit exclusion",
   );
+
+  const exactVolumeExpectation =
+    '$expectedVolumes = @("supabase_db_$ProjectId") | Sort-Object';
+  for (
+    const [label, replacement] of [
+      [
+        "EXTRA_CONFIG_VOLUME",
+        '$expectedVolumes = @("supabase_config_$ProjectId", "supabase_db_$ProjectId") | Sort-Object',
+      ],
+      [
+        "MISSING_DB_VOLUME",
+        "$expectedVolumes = @() | Sort-Object",
+      ],
+    ]
+  ) {
+    const volumeMutation = ps.replace(exactVolumeExpectation, replacement);
+    assert.notEqual(volumeMutation, ps, `${label}: mutation applied`);
+    assert.throws(
+      () => assertExactSupabaseStartExclusions(volumeMutation),
+      assert.AssertionError,
+      `${label}: exact owned-volume set rejected`,
+    );
+  }
 });
