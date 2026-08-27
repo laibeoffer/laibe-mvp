@@ -198,16 +198,21 @@ $memberInvocations = @($ast.FindAll({
 $foreachStatements = @($ast.FindAll({
   param($item) $item -is [System.Management.Automation.Language.ForEachStatementAst]
 }, $true) | ForEach-Object {
+  $conditionFacts = Get-AstLeafFacts -Node $_.Condition
   [ordered]@{
     owner = Get-OwnerFunctionName -Node $_
     start = $_.Extent.StartOffset
     end = $_.Extent.EndOffset
     variable = $_.Variable.VariablePath.UserPath
     condition = $_.Condition.Extent.Text
+    conditionVariables = $conditionFacts.variables
     conditionStart = $_.Condition.Extent.StartOffset
     conditionEnd = $_.Condition.Extent.EndOffset
     bodyStart = $_.Body.Extent.StartOffset
     bodyEnd = $_.Body.Extent.EndOffset
+    bodyText = $_.Body.Extent.Text
+    bodyStatementCount = @($_.Body.Statements).Count
+    bodyStatementTypes = @($_.Body.Statements | ForEach-Object { $_.GetType().Name }) -join ','
   }
 })
 $startInfoEnvironmentStatements = @($ast.FindAll({
@@ -1246,6 +1251,48 @@ function assertExactSupabaseCliEnvironment(ps) {
   );
 
   const wrapperOwner = "invoke-closedprocess";
+  const wrapperProtectedInputs = new Set(["environment", "entry"]);
+  const protectedInputPaths = (variables) => [
+    ...new Set(
+      variables
+        .map((variable) => variableLeaf(variable.path))
+        .filter((path) => wrapperProtectedInputs.has(path)),
+    ),
+  ];
+  const wrapperProtectedAssignments = ast.assignments
+    .filter((assignment) => assignment.owner?.toLowerCase() === wrapperOwner)
+    .map((assignment) => ({
+      assignment,
+      leftProtected: protectedInputPaths(assignment.leftVariables),
+      rightProtected: protectedInputPaths(assignment.rightVariables),
+    }))
+    .filter(({ leftProtected, rightProtected }) =>
+      leftProtected.length !== 0 || rightProtected.length !== 0
+    );
+  assert.deepEqual(
+    wrapperProtectedAssignments.map((
+      { assignment, leftProtected, rightProtected },
+    ) => ({
+      leftType: assignment.leftType,
+      left: normalizePowerShellAstText(assignment.left),
+      rightType: assignment.rightType,
+      rightText: normalizePowerShellAstText(assignment.rightText),
+      leftProtected,
+      rightProtected,
+    })),
+    [
+      {
+        leftType: "IndexExpressionAst",
+        left: "$startInfo.Environment[$entry.Key]",
+        rightType: "CommandExpressionAst",
+        rightText: "[string]$entry.Value",
+        leftProtected: ["entry"],
+        rightProtected: ["entry"],
+      },
+    ],
+    "wrapper Environment and entry assignments have one exact protected dataflow",
+  );
+
   const wrapperEnvironmentStatements = [...new Map(
     ast.startInfoEnvironmentStatements
       .filter((statement) => statement.owner?.toLowerCase() === wrapperOwner)
@@ -1308,18 +1355,72 @@ function assertExactSupabaseCliEnvironment(ps) {
     "startInfo.Environment has exactly one Clear member invocation",
   );
 
-  const environmentEnumeratorInvocations = ast.memberInvocations
+  const wrapperProtectedMemberInvocations = ast.memberInvocations
     .filter((invocation) =>
       invocation.owner?.toLowerCase() === wrapperOwner &&
+      protectedInputPaths(invocation.variables).length !== 0
+    );
+  assert.deepEqual(
+    wrapperProtectedMemberInvocations.map((invocation) => ({
+      expressionType: invocation.expressionType,
+      expressionText: invocation.expressionText,
+      member: invocation.memberValue?.toLowerCase() ?? null,
+      static: invocation.static,
+      arguments: invocation.arguments,
+      protectedInputs: protectedInputPaths(invocation.variables),
+    })),
+    [
+      {
+        expressionType: "VariableExpressionAst",
+        expressionText: "$Environment",
+        member: "getenumerator",
+        static: false,
+        arguments: [null],
+        protectedInputs: ["environment"],
+      },
+    ],
+    "protected wrapper inputs cannot flow through any other member invocation",
+  );
+  const environmentEnumeratorInvocations = wrapperProtectedMemberInvocations
+    .filter((invocation) =>
       invocation.memberValue?.toLowerCase() === "getenumerator" &&
-      invocation.expressionVariables.some((variable) =>
-        variableLeaf(variable.path) === "environment"
+      protectedInputPaths(invocation.expressionVariables).includes(
+        "environment",
       )
     );
   assert.equal(
     environmentEnumeratorInvocations.length,
     1,
     "Environment.GetEnumerator is invoked exactly once",
+  );
+  const wrapperProtectedLoops = ast.foreachStatements.filter((statement) =>
+    statement.owner?.toLowerCase() === wrapperOwner &&
+    (wrapperProtectedInputs.has(variableLeaf(statement.variable)) ||
+      protectedInputPaths(statement.conditionVariables).length !== 0)
+  );
+  assert.deepEqual(
+    wrapperProtectedLoops.map((statement) => ({
+      variable: statement.variable,
+      condition: normalizePowerShellAstText(statement.condition),
+      protectedConditionInputs: protectedInputPaths(
+        statement.conditionVariables,
+      ),
+      bodyStatementCount: statement.bodyStatementCount,
+      bodyStatementTypes: statement.bodyStatementTypes,
+      bodyText: normalizePowerShellAstText(statement.bodyText),
+    })),
+    [
+      {
+        variable: "entry",
+        condition: "$Environment.GetEnumerator()",
+        protectedConditionInputs: ["environment"],
+        bodyStatementCount: 1,
+        bodyStatementTypes: "AssignmentStatementAst",
+        bodyText:
+          "{ $startInfo.Environment[$entry.Key] = [string]$entry.Value }",
+      },
+    ],
+    "the protected Environment-to-entry copy loop has one exact body statement",
   );
   const environmentCopyLoops = ast.foreachStatements.filter((statement) =>
     statement.owner?.toLowerCase() === wrapperOwner &&
@@ -3574,6 +3675,20 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     "CLEAR_AFTER_COPY",
   );
 
+  const callerEnvironmentExtraWrite = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  $Environment['EXTRA'] = '1'\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "CALLER_ENV_EXTRA_WRITE",
+  );
+
+  const copyEntryRebind = mutateOnce(
+    ps,
+    "  foreach ($entry in $Environment.GetEnumerator()) {\n    $startInfo.Environment[$entry.Key] = [string]$entry.Value",
+    "  foreach ($entry in $Environment.GetEnumerator()) {\n    $entry = [pscustomobject]@{ Key = 'EXTRA'; Value = '1' }\n    $startInfo.Environment[$entry.Key] = [string]$entry.Value",
+    "COPY_ENTRY_REBIND",
+  );
+
   const cleanupSystemRootRenamed = mutateOnce(
     ps,
     "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
@@ -3610,6 +3725,8 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     const [label, mutated] of [
       ["WRAPPER_EXTRA_ENV", wrapperExtraEnvironment],
       ["CLEAR_AFTER_COPY", clearAfterCopy],
+      ["CALLER_ENV_EXTRA_WRITE", callerEnvironmentExtraWrite],
+      ["COPY_ENTRY_REBIND", copyEntryRebind],
       ["CLEANUP_PARAM_SHADOW", cleanupParameterShadow],
     ]
   ) {
