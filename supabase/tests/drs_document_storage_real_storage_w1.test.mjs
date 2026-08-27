@@ -36,6 +36,25 @@ async function optionalEnv(name) {
   }
 }
 
+function decodeJwtPayload(token) {
+  const parts = token.split(".");
+  assert.equal(parts.length, 3, "signed capability must be a JWT");
+  const padded = parts[1]
+    .replaceAll("-", "+")
+    .replaceAll("_", "/")
+    .padEnd(Math.ceil(parts[1].length / 4) * 4, "=");
+  const bytes = Uint8Array.from(
+    atob(padded),
+    (character) => character.charCodeAt(0),
+  );
+  const payload = JSON.parse(new TextDecoder().decode(bytes));
+  assert.equal(typeof payload, "object");
+  assert.notEqual(payload, null);
+  assert.equal(Number.isSafeInteger(payload.iat), true);
+  assert.equal(Number.isSafeInteger(payload.exp), true);
+  return payload;
+}
+
 const REAL_STORAGE_CONFIRMED =
   (await optionalEnv("DRS_DOCUMENT_REAL_STORAGE_CONFIRMED")) === "1";
 
@@ -347,6 +366,9 @@ Deno.test({
       apikey: serviceKey,
       "content-type": "application/json",
     };
+    const discardBody = async (response) => {
+      if (response.body) await response.body.cancel();
+    };
     const issueSignedUrl = async (key) => {
       const response = await fetch(
         `${base}/storage/v1/object/upload/sign/drs-case-intake-private/${key}`,
@@ -373,11 +395,13 @@ Deno.test({
         1,
         `${label} token`,
       );
-      assert.ok(url.searchParams.get("token"), `${label} token`);
+      const token = url.searchParams.get("token");
+      assert.ok(token, `${label} token`);
       assert.equal([...url.searchParams.keys()].join(","), "token");
       return {
         url,
         objectKey: decodeURIComponent(url.pathname.slice(prefix.length)),
+        claims: decodeJwtPayload(token),
       };
     };
     const suffix = crypto.randomUUID();
@@ -436,19 +460,21 @@ Deno.test({
           },
         );
         assert.equal(direct.ok, false, "cross-case denial failed");
+        await discardBody(direct);
       }
 
       const signedUrl = await issueSignedUrl(objectKey);
 
       const upload = await fetch(signedUrl, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
         body: bytes,
       });
       assert.equal(upload.ok, true, "signed upload failed");
+      await discardBody(upload);
       uploadedKeys.push(objectKey);
       const replay = await fetch(signedUrl, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
         body: bytes,
       });
@@ -457,45 +483,55 @@ Deno.test({
         false,
         "signed capability replay must not overwrite",
       );
+      await discardBody(replay);
       const wrongKey = new URL(signedUrl);
       wrongKey.pathname = wrongKey.pathname.replace(/\.pdf$/u, "-wrong.pdf");
       const wrong = await fetch(wrongKey, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
         body: bytes,
       });
       assert.equal(wrong.ok, false, "wrong key token substitution must fail");
+      await discardBody(wrong);
 
       const wrongMimeKey =
         `intents/${crypto.randomUUID()}/${crypto.randomUUID()}.pdf`;
       const wrongMimeUrl = await issueSignedUrl(wrongMimeKey);
       const wrongMime = await fetch(wrongMimeUrl, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/svg+xml", "x-upsert": "false" },
         body: new TextEncoder().encode("<svg/>"),
       });
       assert.equal(wrongMime.ok, false, "bucket MIME allowlist must reject");
+      await discardBody(wrongMime);
 
       const oversizedKey =
         `intents/${crypto.randomUUID()}/${crypto.randomUUID()}.pdf`;
       const oversizedUrl = await issueSignedUrl(oversizedKey);
       const oversized = await fetch(oversizedUrl, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
         body: new Uint8Array(26_214_401),
       });
       assert.equal(oversized.ok, false, "bucket size limit must reject");
+      await discardBody(oversized);
 
       const expiredFixture = inspectFixtureUrl(
         expiredUploadUrl,
         "expired capability",
       );
       const expired = await fetch(expiredFixture.url, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
         body: bytes,
       });
+      assert.equal(expiredFixture.claims.exp - expiredFixture.claims.iat, 7200);
+      assert.ok(
+        expiredFixture.claims.exp * 1000 < Date.now(),
+        "expired capability fixture must carry a past expiry",
+      );
       assert.equal(expired.ok, false, "expired capability must fail");
+      await discardBody(expired);
 
       const lateIssuedMs = Date.parse(lateIssuedAt);
       const lateAgeMs = Date.now() - lateIssuedMs;
@@ -506,8 +542,14 @@ Deno.test({
         "late token must remain native-valid",
       );
       const lateFixture = inspectFixtureUrl(lateUploadUrl, "late capability");
+      assert.equal(lateFixture.claims.iat * 1000, lateIssuedMs);
+      assert.equal(lateFixture.claims.exp - lateFixture.claims.iat, 7200);
+      assert.ok(
+        lateFixture.claims.exp * 1000 > Date.now(),
+        "late capability must remain within native token expiry",
+      );
       const late = await fetch(lateFixture.url, {
-        method: "POST",
+        method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
         body: bytes,
       });
@@ -516,6 +558,7 @@ Deno.test({
         true,
         "native token remains replayable after application TTL",
       );
+      await discardBody(late);
       uploadedKeys.push(lateFixture.objectKey);
 
       const served = await fetch(
@@ -536,17 +579,22 @@ Deno.test({
     } finally {
       // API cleanup only; never mutate storage.objects or auth tables directly.
       if (uploadedKeys.length > 0) {
-        await fetch(`${base}/storage/v1/object/drs-case-intake-private`, {
-          method: "DELETE",
-          headers: adminHeaders,
-          body: JSON.stringify({ prefixes: uploadedKeys }),
-        });
+        const cleanup = await fetch(
+          `${base}/storage/v1/object/drs-case-intake-private`,
+          {
+            method: "DELETE",
+            headers: adminHeaders,
+            body: JSON.stringify({ prefixes: uploadedKeys }),
+          },
+        );
+        await discardBody(cleanup);
       }
       for (const id of users) {
-        await fetch(`${base}/auth/v1/admin/users/${id}`, {
+        const cleanup = await fetch(`${base}/auth/v1/admin/users/${id}`, {
           method: "DELETE",
           headers: adminHeaders,
         });
+        await discardBody(cleanup);
       }
     }
   },
