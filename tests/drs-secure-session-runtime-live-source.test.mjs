@@ -1741,17 +1741,46 @@ function assertExactSupabaseStartExclusions(ps) {
 
   const normalizedVariableLeaf = (variable) =>
     variable.toLowerCase().split(":").at(-1);
-  const expectedVolumeAssignments = ast.assignments
+  const normalizedVariables = (variables) =>
+    variables.map((variable) => normalizedVariableLeaf(variable.path));
+  const ownedRuntimeAssignments = ast.assignments.filter((assignment) =>
+    assignment.owner?.toLowerCase() === "assert-ownedruntimestate"
+  );
+  const expectedVolumeVariables = new Set(["expectedvolumes"]);
+  let expectedVolumeAliasAdded;
+  do {
+    expectedVolumeAliasAdded = false;
+    for (const assignment of ownedRuntimeAssignments) {
+      const rightVariables = normalizedVariables(assignment.rightVariables);
+      if (
+        !rightVariables.some((variable) =>
+          expectedVolumeVariables.has(variable)
+        )
+      ) continue;
+      for (const variable of normalizedVariables(assignment.leftVariables)) {
+        if (expectedVolumeVariables.has(variable)) continue;
+        expectedVolumeVariables.add(variable);
+        expectedVolumeAliasAdded = true;
+      }
+    }
+  } while (expectedVolumeAliasAdded);
+  const expectedVolumeAssignments = ownedRuntimeAssignments
     .filter((assignment) =>
-      assignment.owner?.toLowerCase() === "assert-ownedruntimestate" &&
-      assignment.leftVariable !== null &&
-      normalizedVariableLeaf(assignment.leftVariable) === "expectedvolumes"
+      [...assignment.leftVariables, ...assignment.rightVariables].some(
+        (variable) =>
+          expectedVolumeVariables.has(normalizedVariableLeaf(variable.path)),
+      )
     )
     .map((assignment) => ({
       owner: assignment.owner.toLowerCase(),
       leftType: assignment.leftType,
-      leftVariable: normalizedVariableLeaf(assignment.leftVariable),
+      leftVariable: assignment.leftVariable === null
+        ? null
+        : normalizedVariableLeaf(assignment.leftVariable),
+      leftVariables: normalizedVariables(assignment.leftVariables),
+      rightType: assignment.rightType,
       rightText: normalizePowerShellAstText(assignment.rightText),
+      rightVariables: normalizedVariables(assignment.rightVariables),
     }));
   assert.deepEqual(
     expectedVolumeAssignments,
@@ -1760,12 +1789,27 @@ function assertExactSupabaseStartExclusions(ps) {
         owner: "assert-ownedruntimestate",
         leftType: "VariableExpressionAst",
         leftVariable: "expectedvolumes",
+        leftVariables: ["expectedvolumes"],
+        rightType: "PipelineAst",
         rightText: normalizePowerShellAstText(
           '@("supabase_db_$ProjectId") | Sort-Object',
         ),
+        rightVariables: ["projectid"],
       },
     ],
-    "runtime acceptance admits one exact hash-bound CLI db-volume assignment",
+    "runtime acceptance admits one exact db-volume assignment and no alias dataflow",
+  );
+  const isReachableOwner = (owner) =>
+    owner === null || reachability.functionNames.has(owner.toLowerCase());
+  assert.deepEqual(
+    ast.memberInvocations.filter((invocation) =>
+      isReachableOwner(invocation.owner) &&
+      invocation.variables.some((variable) =>
+        expectedVolumeVariables.has(normalizedVariableLeaf(variable.path))
+      )
+    ),
+    [],
+    "expectedVolumes and its aliases have zero reachable member invocations",
   );
 }
 
@@ -4056,6 +4100,18 @@ test("S17-F2 Supabase start preserves exact exclusions containers and db-only vo
         "LOCAL_QUALIFIED_REBIND",
         `${exactVolumeExpectation}\n$local:expectedVolumes = @("supabase_config_$ProjectId", "supabase_db_$ProjectId") | Sort-Object`,
       ],
+      [
+        "EXPECTED_VOLUMES_INDEX_WRITE",
+        `${exactVolumeExpectation}\n$expectedVolumes[0] = "supabase_config_$ProjectId"`,
+      ],
+      [
+        "EXPECTED_VOLUMES_ALIAS_INDEX_WRITE",
+        `${exactVolumeExpectation}\n$volumeAlias = $expectedVolumes\n$volumeAlias[0] = "supabase_config_$ProjectId"`,
+      ],
+      [
+        "EXPECTED_VOLUMES_SETVALUE_WRITE",
+        `${exactVolumeExpectation}\n$expectedVolumes.SetValue("supabase_config_$ProjectId", 0)`,
+      ],
     ]
   ) {
     const volumeMutation = ps.replace(exactVolumeExpectation, replacement);
@@ -4070,6 +4126,6 @@ test("S17-F2 Supabase start preserves exact exclusions containers and db-only vo
   assert.deepEqual(
     missedVolumeMutations,
     [],
-    "exact owned-volume set rejects case-equivalent and scope-qualified rebinds",
+    "exact owned-volume set rejects rebinds aliases index writes and member mutation",
   );
 });
