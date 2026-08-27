@@ -200,10 +200,39 @@ $foreachStatements = @($ast.FindAll({
 }, $true) | ForEach-Object {
   [ordered]@{
     owner = Get-OwnerFunctionName -Node $_
+    start = $_.Extent.StartOffset
+    end = $_.Extent.EndOffset
     variable = $_.Variable.VariablePath.UserPath
     condition = $_.Condition.Extent.Text
+    conditionStart = $_.Condition.Extent.StartOffset
+    conditionEnd = $_.Condition.Extent.EndOffset
     bodyStart = $_.Body.Extent.StartOffset
     bodyEnd = $_.Body.Extent.EndOffset
+  }
+})
+$startInfoEnvironmentStatements = @($ast.FindAll({
+  param($item)
+  if ($item -isnot [System.Management.Automation.Language.MemberExpressionAst]) { return $false }
+  if ($item.Member -isnot [System.Management.Automation.Language.StringConstantExpressionAst]) { return $false }
+  if ($item.Member.Value -ine 'Environment') { return $false }
+  return @($item.Expression.FindAll({
+    param($child)
+    $child -is [System.Management.Automation.Language.VariableExpressionAst] -and
+      $child.VariablePath.UserPath -ieq 'startInfo'
+  }, $true)).Count -gt 0
+}, $true) | ForEach-Object {
+  $statement = $_
+  while ($null -ne $statement -and $statement -isnot [System.Management.Automation.Language.StatementAst]) {
+    $statement = $statement.Parent
+  }
+  if ($null -ne $statement) {
+    [ordered]@{
+      owner = Get-OwnerFunctionName -Node $statement
+      start = $statement.Extent.StartOffset
+      end = $statement.Extent.EndOffset
+      type = $statement.GetType().Name
+      text = $statement.Extent.Text
+    }
   }
 })
 $hashtables = @($ast.FindAll({
@@ -231,6 +260,7 @@ $result = [ordered]@{
   assignments = $assignments
   memberInvocations = $memberInvocations
   foreachStatements = $foreachStatements
+  startInfoEnvironmentStatements = $startInfoEnvironmentStatements
   hashtables = $hashtables
   returns = $returns
 }
@@ -1165,17 +1195,200 @@ function assertExactSupabaseCliEnvironment(ps) {
     "stop cleanup receives only telemetry suppression plus exact SystemRoot",
   );
 
+  const cleanupDefinitions = ast.functions
+    .filter((definition) =>
+      definition.name.toLowerCase() === "invoke-exactprojectstopcleanup"
+    )
+    .map((definition) => ({
+      name: definition.name,
+      parameters: Array.isArray(definition.parameters)
+        ? definition.parameters
+        : definition.parameters === null ||
+            (typeof definition.parameters === "object" &&
+              Object.keys(definition.parameters).length === 0)
+        ? []
+        : [definition.parameters],
+    }));
+  assert.deepEqual(
+    cleanupDefinitions,
+    [{ name: "Invoke-ExactProjectStopCleanup", parameters: [] }],
+    "exact stop cleanup has one canonical definition and no parameters",
+  );
+  const variableLeaf = (path) => path.toLowerCase().split(":").at(-1);
+  const cleanupSystemRootBindings = [
+    ...ast.assignments
+      .filter((assignment) =>
+        assignment.owner?.toLowerCase() ===
+          "invoke-exactprojectstopcleanup" &&
+        assignment.leftVariables.some((variable) =>
+          variableLeaf(variable.path) === "systemrootpath"
+        )
+      )
+      .map((assignment) => ({
+        kind: "assignment",
+        text: normalizePowerShellAstText(assignment.left),
+      })),
+    ...ast.foreachStatements
+      .filter((statement) =>
+        statement.owner?.toLowerCase() ===
+          "invoke-exactprojectstopcleanup" &&
+        variableLeaf(statement.variable) === "systemrootpath"
+      )
+      .map((statement) => ({
+        kind: "loop",
+        text: statement.variable,
+      })),
+  ];
+  assert.deepEqual(
+    cleanupSystemRootBindings,
+    [],
+    "exact stop cleanup cannot shadow SystemRootPath through assignment or loop binding",
+  );
+
+  const wrapperOwner = "invoke-closedprocess";
+  const wrapperEnvironmentStatements = [...new Map(
+    ast.startInfoEnvironmentStatements
+      .filter((statement) => statement.owner?.toLowerCase() === wrapperOwner)
+      .map((statement) => [`${statement.start}:${statement.end}`, statement]),
+  ).values()];
+  assert.deepEqual(
+    wrapperEnvironmentStatements.map((statement) => ({
+      type: statement.type,
+      text: normalizePowerShellAstText(statement.text),
+    })),
+    [
+      {
+        type: "CommandExpressionAst",
+        text: "$startInfo.Environment.Clear()",
+      },
+      {
+        type: "AssignmentStatementAst",
+        text: "$startInfo.Environment[$entry.Key] = [string]$entry.Value",
+      },
+    ],
+    "every statement that accesses startInfo.Environment is exactly whitelisted",
+  );
+
+  const wrapperEnvironmentMemberMutations = ast.memberInvocations
+    .filter((invocation) =>
+      invocation.owner?.toLowerCase() === wrapperOwner &&
+      invocation.expressionVariables.some((variable) =>
+        variableLeaf(variable.path) === "startinfo"
+      ) &&
+      invocation.expressionMemberValues.some((member) =>
+        member?.toLowerCase() === "environment"
+      )
+    )
+    .map((invocation) => ({
+      start: invocation.start,
+      end: invocation.end,
+      expressionType: invocation.expressionType,
+      expressionText: invocation.expressionText,
+      member: invocation.memberValue?.toLowerCase() ?? null,
+      static: invocation.static,
+      arguments: invocation.arguments,
+    }));
+  assert.deepEqual(
+    wrapperEnvironmentMemberMutations.map((invocation) => ({
+      expressionType: invocation.expressionType,
+      expressionText: invocation.expressionText,
+      member: invocation.member,
+      static: invocation.static,
+      arguments: invocation.arguments,
+    })),
+    [
+      {
+        expressionType: "MemberExpressionAst",
+        expressionText: "$startInfo.Environment",
+        member: "clear",
+        static: false,
+        arguments: [null],
+      },
+    ],
+    "startInfo.Environment has exactly one Clear member invocation",
+  );
+
+  const environmentEnumeratorInvocations = ast.memberInvocations
+    .filter((invocation) =>
+      invocation.owner?.toLowerCase() === wrapperOwner &&
+      invocation.memberValue?.toLowerCase() === "getenumerator" &&
+      invocation.expressionVariables.some((variable) =>
+        variableLeaf(variable.path) === "environment"
+      )
+    );
+  assert.equal(
+    environmentEnumeratorInvocations.length,
+    1,
+    "Environment.GetEnumerator is invoked exactly once",
+  );
+  const environmentCopyLoops = ast.foreachStatements.filter((statement) =>
+    statement.owner?.toLowerCase() === wrapperOwner &&
+    normalizePowerShellAstText(statement.condition) ===
+      "$Environment.GetEnumerator()"
+  );
+  assert.deepEqual(
+    environmentCopyLoops.map((statement) => ({
+      variable: statement.variable,
+      condition: normalizePowerShellAstText(statement.condition),
+    })),
+    [
+      {
+        variable: "entry",
+        condition: "$Environment.GetEnumerator()",
+      },
+    ],
+    "one exact Environment.GetEnumerator copy loop is admitted",
+  );
+  const copyAssignments = ast.assignments.filter((assignment) =>
+    assignment.owner?.toLowerCase() === wrapperOwner &&
+    normalizePowerShellAstText(assignment.left) ===
+      "$startInfo.Environment[$entry.Key]"
+  );
+  assert.deepEqual(
+    copyAssignments.map((assignment) => ({
+      leftType: assignment.leftType,
+      left: normalizePowerShellAstText(assignment.left),
+      rightType: assignment.rightType,
+      rightText: normalizePowerShellAstText(assignment.rightText),
+    })),
+    [
+      {
+        leftType: "IndexExpressionAst",
+        left: "$startInfo.Environment[$entry.Key]",
+        rightType: "CommandExpressionAst",
+        rightText: "[string]$entry.Value",
+      },
+    ],
+    "the copy loop has one exact startInfo.Environment assignment",
+  );
+  const clearInvocation = wrapperEnvironmentMemberMutations[0];
+  const copyLoop = environmentCopyLoops[0];
+  const enumeratorInvocation = environmentEnumeratorInvocations[0];
+  const copyAssignment = copyAssignments[0];
+  assert.equal(
+    clearInvocation.end <= copyLoop.start,
+    true,
+    "Environment.Clear precedes the environment copy loop",
+  );
+  assert.equal(
+    enumeratorInvocation.start >= copyLoop.conditionStart &&
+      enumeratorInvocation.end <= copyLoop.conditionEnd,
+    true,
+    "the exact GetEnumerator invocation is the copy-loop condition",
+  );
+  assert.equal(
+    copyAssignment.start >= copyLoop.bodyStart &&
+      copyAssignment.end <= copyLoop.bodyEnd,
+    true,
+    "the exact environment assignment is contained by the copy loop",
+  );
+
   const closedProcessStart = ps.indexOf("function Invoke-ClosedProcess");
   const closedProcessEnd = ps.indexOf(
     "function ConvertTo-base64url43",
     closedProcessStart,
   );
   const closedProcess = ps.slice(closedProcessStart, closedProcessEnd);
-  assert.equal(
-    occurrences(closedProcess, /\$startInfo\.Environment\.Clear\(\)/gu),
-    1,
-    "the child environment is cleared exactly once before admitted entries",
-  );
   assert.doesNotMatch(
     closedProcess,
     /\$env:|GetEnvironmentVariables?|\b(?:PATH|HOME|USERPROFILE|PROFILE)\b/iu,
@@ -3347,6 +3560,20 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     "shared start/status environment rejects missing SystemRoot",
   );
 
+  const wrapperExtraEnvironment = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  $startInfo.Environment['EXTRA'] = '1'\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "WRAPPER_EXTRA_ENV",
+  );
+
+  const clearAfterCopy = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {\n    $startInfo.Environment[$entry.Key] = [string]$entry.Value\n  }",
+    "  foreach ($entry in $Environment.GetEnumerator()) {\n    $startInfo.Environment[$entry.Key] = [string]$entry.Value\n  }\n  $startInfo.Environment.Clear()",
+    "CLEAR_AFTER_COPY",
+  );
+
   const cleanupSystemRootRenamed = mutateOnce(
     ps,
     "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
@@ -3357,6 +3584,46 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     () => assertExactSupabaseCliEnvironment(cleanupSystemRootRenamed),
     assert.AssertionError,
     "exact stop cleanup rejects renamed SystemRoot",
+  );
+
+  const cleanupSystemRootRemoved = mutateOnce(
+    ps,
+    "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
+    "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1' } -AllowFailure",
+    "cleanup SystemRoot removal",
+  );
+  assert.throws(
+    () => assertExactSupabaseCliEnvironment(cleanupSystemRootRemoved),
+    assert.AssertionError,
+    "exact stop cleanup rejects missing SystemRoot",
+  );
+
+  const cleanupParameterShadow = mutateOnce(
+    ps,
+    "function Invoke-ExactProjectStopCleanup {\n  $stopResult =",
+    "function Invoke-ExactProjectStopCleanup {\n  param([string]$SystemRootPath = 'C:\\WINDOWS')\n\n  $stopResult =",
+    "cleanup SystemRootPath parameter shadow",
+  );
+
+  const missedEnvironmentClosureMutations = [];
+  for (
+    const [label, mutated] of [
+      ["WRAPPER_EXTRA_ENV", wrapperExtraEnvironment],
+      ["CLEAR_AFTER_COPY", clearAfterCopy],
+      ["CLEANUP_PARAM_SHADOW", cleanupParameterShadow],
+    ]
+  ) {
+    try {
+      assertExactSupabaseCliEnvironment(mutated);
+      missedEnvironmentClosureMutations.push(label);
+    } catch (error) {
+      if (!(error instanceof assert.AssertionError)) throw error;
+    }
+  }
+  assert.deepEqual(
+    missedEnvironmentClosureMutations,
+    [],
+    "native AST closure rejects every wrapper environment mutation and cleanup shadow",
   );
 });
 
