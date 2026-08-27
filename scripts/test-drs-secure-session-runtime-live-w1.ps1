@@ -23,6 +23,7 @@ $DockerExecutable = 'C:\Users\J\AppData\Local\Programs\DockerDesktop\resources\b
 $DockerExecutableSha256 = '0f97bc1111f59d859766ba938691ee07ed4e58d5fdaeb6f4dfb10a5ef5394753'
 $GitExecutablePath = 'C:\Program Files\Git\cmd\git.exe'
 $GitExecutableSha256 = 'da240fe9bc24895b3e04150a4990b8a6ff329ecabcd8f19684c2cc310da5ef3f'
+$SystemRootPath = 'C:\WINDOWS'
 $TarExecutablePath = 'C:\WINDOWS\system32\tar.exe'
 $TarExecutableSha256 = '9b77d4c912f2edae8c241d0ece1094d2ac068b084269ceaf85d7c7b085d2ae86'
 $DenoExecutablePath = 'C:\Users\J\AppData\Local\Microsoft\WinGet\Links\deno.exe'
@@ -619,7 +620,7 @@ function Assert-CapturedOutputSanitized {
 }
 
 function Invoke-ExactProjectStopCleanup {
-  $stopResult = Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @('stop', '--project-id', $ProjectId, '--no-backup') -WorkingDirectory $runtimeRoot -Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1' } -AllowFailure -FailureCode 'A17_S1AR_EXACT_STOP_FAILED'
+  $stopResult = Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @('stop', '--project-id', $ProjectId, '--no-backup') -WorkingDirectory $runtimeRoot -Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure -FailureCode 'A17_S1AR_EXACT_STOP_FAILED'
   if ($stopResult.ExitCode -ne 0) { throw 'A17_S1AR_EXACT_STOP_FAILED' }
 }
 
@@ -636,6 +637,14 @@ if (
   (Get-LowerSha256 $GitExecutablePath) -cne $GitExecutableSha256
 ) { throw 'A17_S1AR_GIT_IDENTITY_REJECTED' }
 $gitExecutable = $GitExecutablePath
+if (
+  -not (Test-Path -LiteralPath $SystemRootPath -PathType Container) -or
+  [System.IO.Path]::GetFullPath($SystemRootPath).TrimEnd(
+    [System.IO.Path]::DirectorySeparatorChar,
+    [System.IO.Path]::AltDirectorySeparatorChar
+  ) -cne $SystemRootPath -or
+  [System.IO.Path]::GetFullPath((Join-Path $SystemRootPath 'system32\tar.exe')) -cne $TarExecutablePath
+) { throw 'A17_S1AR_SYSTEM_ROOT_REJECTED' }
 if (
   -not (Test-Path -LiteralPath $TarExecutablePath -PathType Leaf) -or
   (Get-LowerSha256 $TarExecutablePath) -cne $TarExecutableSha256
@@ -687,9 +696,9 @@ try {
   [System.IO.File]::WriteAllBytes($cliLatestPath, [System.Text.Encoding]::UTF8.GetBytes($CliLatestBytes))
   if ((Get-LowerSha256 $cliLatestPath) -cne $CliLatestSha256 -or [System.IO.File]::ReadAllText($cliLatestPath) -cne $CliLatestBytes) { throw 'A17_S1AR_CLI_LATEST_IDENTITY_REJECTED' }
 
-  $supabaseProcessEnvironment = @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1' }
+  $supabaseProcessEnvironment = @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath }
   $startAttempted = $true
-  [void](Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @("start", "--workdir", $runtimeRoot, '--exclude', 'studio,imgproxy,inbucket,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_START_REJECTED')
+  [void](Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @("start", "--workdir", $runtimeRoot, '--exclude', 'studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_START_REJECTED')
   Assert-OwnedRuntimeState -RequireExact
 
   $statusResult = Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @('status', '--workdir', $runtimeRoot, '--output', 'env') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_STATUS_REJECTED'

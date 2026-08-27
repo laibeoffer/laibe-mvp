@@ -124,6 +124,8 @@ $commands = @($ast.FindAll({
     $facts = Get-AstLeafFacts -Node $element
     [ordered]@{
       type = $element.GetType().Name
+      start = $element.Extent.StartOffset
+      end = $element.Extent.EndOffset
       text = $element.Extent.Text
       parameter = if ($element -is [System.Management.Automation.Language.CommandParameterAst]) { $element.ParameterName } else { $null }
       parameterArgument = if ($element -is [System.Management.Automation.Language.CommandParameterAst] -and $null -ne $element.Argument) { $element.Argument.Extent.Text } else { $null }
@@ -1003,6 +1005,245 @@ function assertNativePowerShellSecurityContract(ps) {
       ["FailureCode", "'A17_S1AR_ARCHIVE_EXTRACT_FAILED'"],
     ],
     "one exact tar extractor",
+  );
+}
+
+function assertExactSupabaseCliEnvironment(ps) {
+  const ast = parseNativePowerShellAst(ps);
+  const reachability = powerShellReachability(ast);
+  const closedCalls = reachability.commands.filter((command) =>
+    command.name?.toLowerCase() === "invoke-closedprocess"
+  );
+  const closedDetails = closedCalls.map((command) => ({
+    command,
+    parameters: commandParameters(command),
+  }));
+  const supabaseCliDetails = closedDetails.filter(({ parameters }) => {
+    const filePath = parameters.get("FilePath");
+    return filePath?.variables.length === 1 &&
+      filePath.variables[0].path.toLowerCase() === "supabaseexecutable";
+  }).map(({ command, parameters }) => {
+    const filePath = parameters.get("FilePath");
+    const argumentsValue = parameters.get("Arguments");
+    const environment = parameters.get("Environment");
+    assert.notEqual(
+      argumentsValue,
+      null,
+      "Supabase CLI arguments are required",
+    );
+    assert.notEqual(environment, null, "Supabase CLI environment is required");
+    return {
+      command,
+      parameters,
+      filePath,
+      argumentsValue,
+      environment,
+      action: argumentsValue.literals[0]?.value ?? null,
+    };
+  });
+  assert.deepEqual(
+    supabaseCliDetails.map((detail) => ({
+      owner: detail.command.owner,
+      action: detail.action,
+      filePathType: detail.filePath.type,
+      filePathVariables: detail.filePath.variables.map((variable) =>
+        variable.path.toLowerCase()
+      ),
+      environmentType: detail.environment.type,
+      environmentVariables: detail.environment.variables.map((variable) =>
+        variable.path.toLowerCase()
+      ),
+    })),
+    [
+      {
+        owner: "Invoke-ExactProjectStopCleanup",
+        action: "stop",
+        filePathType: "VariableExpressionAst",
+        filePathVariables: ["supabaseexecutable"],
+        environmentType: "HashtableAst",
+        environmentVariables: ["systemrootpath"],
+      },
+      {
+        owner: null,
+        action: "start",
+        filePathType: "VariableExpressionAst",
+        filePathVariables: ["supabaseexecutable"],
+        environmentType: "VariableExpressionAst",
+        environmentVariables: ["supabaseprocessenvironment"],
+      },
+      {
+        owner: null,
+        action: "status",
+        filePathType: "VariableExpressionAst",
+        filePathVariables: ["supabaseexecutable"],
+        environmentType: "VariableExpressionAst",
+        environmentVariables: ["supabaseprocessenvironment"],
+      },
+    ],
+    "every reachable Supabase CLI child uses the one admitted environment route",
+  );
+
+  const exactEnvironmentEntries = [
+    { key: "DO_NOT_TRACK", value: "'1'" },
+    { key: "SUPABASE_TELEMETRY_DISABLED", value: "'1'" },
+    { key: "SystemRoot", value: "$SystemRootPath" },
+  ];
+  const systemRootWrites = ast.assignments.filter((assignment) =>
+    assignment.leftVariables.some((variable) =>
+      variable.path.toLowerCase() === "systemrootpath"
+    )
+  );
+  assert.deepEqual(
+    systemRootWrites.map((assignment) => ({
+      owner: assignment.owner,
+      leftType: assignment.leftType,
+      leftVariable: assignment.leftVariable,
+      rightText: assignment.rightText,
+    })),
+    [
+      {
+        owner: null,
+        leftType: "VariableExpressionAst",
+        leftVariable: "SystemRootPath",
+        rightText: "'C:\\WINDOWS'",
+      },
+    ],
+    "SystemRoot is one exact nonsecret immutable binding",
+  );
+
+  const sharedEnvironmentWrites = ast.assignments.filter((assignment) =>
+    assignment.leftVariables.some((variable) =>
+      variable.path.toLowerCase() === "supabaseprocessenvironment"
+    )
+  );
+  assert.equal(
+    sharedEnvironmentWrites.length,
+    1,
+    "one shared Supabase CLI environment assignment",
+  );
+  assert.equal(
+    sharedEnvironmentWrites[0].leftVariable,
+    "supabaseProcessEnvironment",
+    "shared Supabase CLI environment is a direct scalar assignment",
+  );
+  const sharedTables = ast.hashtables.filter((table) =>
+    table.start === sharedEnvironmentWrites[0].rightStart &&
+    table.end === sharedEnvironmentWrites[0].rightEnd
+  );
+  assert.equal(sharedTables.length, 1, "shared environment is one hashtable");
+  assert.deepEqual(
+    sharedTables[0].entries,
+    exactEnvironmentEntries,
+    "start and status receive only telemetry suppression plus exact SystemRoot",
+  );
+  assert.deepEqual(
+    ast.memberInvocations.filter((invocation) =>
+      invocation.variables.some((variable) =>
+        variable.path.toLowerCase() === "supabaseprocessenvironment"
+      )
+    ),
+    [],
+    "shared Supabase CLI environment is never mutated through a member call",
+  );
+
+  const stopDetail = supabaseCliDetails.find((detail) =>
+    detail.action === "stop"
+  );
+  assert.notEqual(stopDetail, undefined, "exact stop cleanup is reachable");
+  const stopTables = ast.hashtables.filter((table) =>
+    table.start === stopDetail.environment.start &&
+    table.end === stopDetail.environment.end
+  );
+  assert.equal(
+    stopTables.length,
+    1,
+    "stop environment is one inline hashtable",
+  );
+  assert.deepEqual(
+    stopTables[0].entries,
+    exactEnvironmentEntries,
+    "stop cleanup receives only telemetry suppression plus exact SystemRoot",
+  );
+
+  const closedProcessStart = ps.indexOf("function Invoke-ClosedProcess");
+  const closedProcessEnd = ps.indexOf(
+    "function ConvertTo-base64url43",
+    closedProcessStart,
+  );
+  const closedProcess = ps.slice(closedProcessStart, closedProcessEnd);
+  assert.equal(
+    occurrences(closedProcess, /\$startInfo\.Environment\.Clear\(\)/gu),
+    1,
+    "the child environment is cleared exactly once before admitted entries",
+  );
+  assert.doesNotMatch(
+    closedProcess,
+    /\$env:|GetEnvironmentVariables?|\b(?:PATH|HOME|USERPROFILE|PROFILE)\b/iu,
+    "the closed child wrapper does not inherit profile or discovery state",
+  );
+  assertOrdered(
+    ps,
+    [
+      "$SystemRootPath = 'C:\\WINDOWS'",
+      "Test-Path -LiteralPath $SystemRootPath -PathType Container",
+      "[System.IO.Path]::GetFullPath($SystemRootPath).TrimEnd(",
+      ") -cne $SystemRootPath -or",
+      "[System.IO.Path]::GetFullPath((Join-Path $SystemRootPath 'system32\\tar.exe')) -cne $TarExecutablePath",
+      "throw 'A17_S1AR_SYSTEM_ROOT_REJECTED'",
+      "$tarExecutable = $TarExecutablePath",
+      'Assert-SourceIdentity -Stage "pre-start"',
+      "$supabaseProcessEnvironment = @{",
+    ],
+    "exact SystemRoot is canonically bound to the admitted Windows tool path before runtime start",
+  );
+}
+
+function assertExactSupabaseStartExclusions(ps) {
+  const ast = parseNativePowerShellAst(ps);
+  const reachability = powerShellReachability(ast);
+  const startCalls = reachability.commands
+    .filter((command) => command.name?.toLowerCase() === "invoke-closedprocess")
+    .map((command) => ({ command, parameters: commandParameters(command) }))
+    .filter(({ parameters }) => {
+      const filePath = parameters.get("FilePath");
+      const argumentsValue = parameters.get("Arguments");
+      return filePath?.variables.length === 1 &&
+        filePath.variables[0].path.toLowerCase() === "supabaseexecutable" &&
+        argumentsValue?.literals[0]?.value === "start";
+    });
+  assert.equal(startCalls.length, 1, "one reachable Supabase start child");
+  const startArguments = startCalls[0].parameters.get("Arguments");
+  assert.deepEqual(
+    startArguments.literals.map((literal) => literal.value),
+    [
+      "start",
+      "--workdir",
+      "--exclude",
+      "studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta",
+    ],
+    "Supabase start excludes mailpit and every other non-admitted service",
+  );
+  assert.deepEqual(
+    startArguments.variables.map((variable) => variable.path.toLowerCase()),
+    ["runtimeroot"],
+    "Supabase start uses only the exact runtime-root argument variable",
+  );
+
+  const expectedContainerAssignments = ast.assignments.filter((assignment) =>
+    assignment.owner === "Assert-OwnedRuntimeState" &&
+    assignment.leftVariable === "expectedContainers"
+  );
+  assert.equal(
+    expectedContainerAssignments.length,
+    1,
+    "one exact expected-container assignment",
+  );
+  assert.equal(
+    normalizePowerShellAstText(expectedContainerAssignments[0].rightText),
+    normalizePowerShellAstText(
+      '@("supabase_auth_$ProjectId", "supabase_db_$ProjectId", "supabase_kong_$ProjectId", "supabase_rest_$ProjectId") | Sort-Object',
+    ),
+    "runtime acceptance remains the exact four admitted containers",
   );
 }
 
@@ -2620,7 +2861,7 @@ test("S12-F1 every closed-process argument array is a legal named-parameter valu
     'Invoke-GitIdentity -Arguments @("rev-list", "--parents", "-n", "1", "HEAD")',
     'Invoke-GitIdentity -Arguments @("diff", "--cached", "--name-only")',
     'Invoke-GitIdentity -Arguments @("ls-files", "--others", "--exclude-standard")',
-    "Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @(\"start\", \"--workdir\", $runtimeRoot, '--exclude', 'studio,imgproxy,inbucket,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta')",
+    "Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @(\"start\", \"--workdir\", $runtimeRoot, '--exclude', 'studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta')",
   ];
   assert.equal(correctedSites.length, 7);
   for (const site of correctedSites) {
@@ -3082,5 +3323,56 @@ test("S16-F1 native AST contract closes reachable invocation grammar and exact d
     missedSemanticMutations,
     [],
     "native AST semantics must reject every Start/ArgumentList.Add bypass",
+  );
+});
+
+test("S17-F1 every Supabase CLI child receives only telemetry suppression and exact SystemRoot", () => {
+  const ps = source(urls.powershell);
+  assertExactSupabaseCliEnvironment(ps);
+
+  const mutateOnce = (input, needle, replacement, label) => {
+    const mutated = input.replace(needle, replacement);
+    assert.notEqual(mutated, input, `${label}: mutation applied`);
+    return mutated;
+  };
+  const sharedSystemRootRemoved = mutateOnce(
+    ps,
+    "$supabaseProcessEnvironment = @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath }",
+    "$supabaseProcessEnvironment = @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1' }",
+    "shared SystemRoot removal",
+  );
+  assert.throws(
+    () => assertExactSupabaseCliEnvironment(sharedSystemRootRemoved),
+    assert.AssertionError,
+    "shared start/status environment rejects missing SystemRoot",
+  );
+
+  const cleanupSystemRootRenamed = mutateOnce(
+    ps,
+    "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
+    "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SYSTEM_ROOT = $SystemRootPath } -AllowFailure",
+    "cleanup SystemRoot rename",
+  );
+  assert.throws(
+    () => assertExactSupabaseCliEnvironment(cleanupSystemRootRenamed),
+    assert.AssertionError,
+    "exact stop cleanup rejects renamed SystemRoot",
+  );
+});
+
+test("S17-F2 Supabase start excludes mailpit and preserves the exact four-container runtime", () => {
+  const ps = source(urls.powershell);
+  assertExactSupabaseStartExclusions(ps);
+  const admittedExclusions =
+    "studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta";
+  const mutated = ps.replace(
+    admittedExclusions,
+    admittedExclusions.replace("mailpit", "inbucket"),
+  );
+  assert.notEqual(mutated, ps, "inbucket exclusion mutation applied");
+  assert.throws(
+    () => assertExactSupabaseStartExclusions(mutated),
+    assert.AssertionError,
+    "inbucket cannot replace the hash-bound CLI mailpit exclusion",
   );
 });
