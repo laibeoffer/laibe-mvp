@@ -36,23 +36,291 @@ async function optionalEnv(name) {
   }
 }
 
-function decodeJwtPayload(token) {
-  const parts = token.split(".");
-  assert.equal(parts.length, 3, "signed capability must be a JWT");
-  const padded = parts[1]
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;
+
+function decodeBase64Url(segment) {
+  const padded = segment
     .replaceAll("-", "+")
     .replaceAll("_", "/")
-    .padEnd(Math.ceil(parts[1].length / 4) * 4, "=");
-  const bytes = Uint8Array.from(
+    .padEnd(Math.ceil(segment.length / 4) * 4, "=");
+  return Uint8Array.from(
     atob(padded),
     (character) => character.charCodeAt(0),
   );
-  const payload = JSON.parse(new TextDecoder().decode(bytes));
+}
+
+function encodeBase64Url(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(
+    /=+$/u,
+    "",
+  );
+}
+
+function decodeJwtPart(segment) {
+  return JSON.parse(new TextDecoder().decode(decodeBase64Url(segment)));
+}
+
+function decodeJwtPayload(token) {
+  const parts = token.split(".");
+  assert.equal(parts.length, 3, "signed capability must be a JWT");
+  const payload = decodeJwtPart(parts[1]);
   assert.equal(typeof payload, "object");
   assert.notEqual(payload, null);
   assert.equal(Number.isSafeInteger(payload.iat), true);
   assert.equal(Number.isSafeInteger(payload.exp), true);
   return payload;
+}
+
+async function importJwtHmacKey(secret) {
+  assert.equal(typeof secret, "string");
+  assert.ok(secret.length >= 32, "trusted local JWT secret is required");
+  return await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign", "verify"],
+  );
+}
+
+async function rewriteVerifiedSignedUploadExpiry(
+  rawUrl,
+  secret,
+  issuedAt,
+  expiresAt,
+) {
+  assert.equal(Number.isSafeInteger(issuedAt), true);
+  assert.equal(Number.isSafeInteger(expiresAt), true);
+  assert.ok(expiresAt > issuedAt);
+  const url = new URL(rawUrl);
+  const token = url.searchParams.get("token");
+  assert.ok(token, "signed capability token is required");
+  const parts = token.split(".");
+  assert.equal(parts.length, 3, "signed capability must be a JWT");
+  const header = decodeJwtPart(parts[0]);
+  assert.deepEqual(Object.keys(header).sort(), ["alg"]);
+  assert.equal(header.alg, "HS256");
+  const key = await importJwtHmacKey(secret);
+  const originalValid = await crypto.subtle.verify(
+    "HMAC",
+    key,
+    decodeBase64Url(parts[2]),
+    new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
+  );
+  assert.equal(
+    originalValid,
+    true,
+    "provider capability must verify with the trusted local signer",
+  );
+  const originalClaims = decodeJwtPayload(token);
+  const nextClaims = { ...originalClaims, iat: issuedAt, exp: expiresAt };
+  const payload = encodeBase64Url(
+    new TextEncoder().encode(JSON.stringify(nextClaims)),
+  );
+  const signingInput = `${parts[0]}.${payload}`;
+  const signature = new Uint8Array(
+    await crypto.subtle.sign(
+      "HMAC",
+      key,
+      new TextEncoder().encode(signingInput),
+    ),
+  );
+  url.searchParams.set(
+    "token",
+    `${signingInput}.${encodeBase64Url(signature)}`,
+  );
+  const rewrittenToken = url.searchParams.get("token");
+  assert.ok(rewrittenToken);
+  const rewrittenParts = rewrittenToken.split(".");
+  const rewrittenValid = await crypto.subtle.verify(
+    "HMAC",
+    key,
+    decodeBase64Url(rewrittenParts[2]),
+    new TextEncoder().encode(`${rewrittenParts[0]}.${rewrittenParts[1]}`),
+  );
+  assert.equal(rewrittenValid, true, "rewritten fixture signature must verify");
+  return { url, claims: decodeJwtPayload(rewrittenToken) };
+}
+
+async function runPsql(psqlPath, rawDatabaseUrl, sql) {
+  const databaseUrl = new URL(rawDatabaseUrl);
+  assert.ok(["postgres:", "postgresql:"].includes(databaseUrl.protocol));
+  assert.ok(
+    ["127.0.0.1", "localhost", "::1"].includes(databaseUrl.hostname),
+    "database fixture must be loopback-only",
+  );
+  assert.ok(databaseUrl.pathname.length > 1, "database name is required");
+  const password = decodeURIComponent(databaseUrl.password);
+  databaseUrl.password = "";
+  const command = new Deno.Command(psqlPath, {
+    args: [
+      "--no-psqlrc",
+      "--quiet",
+      "--set",
+      "ON_ERROR_STOP=1",
+      "--tuples-only",
+      "--no-align",
+      "--dbname",
+      databaseUrl.toString(),
+      "--command",
+      sql,
+    ],
+    env: password ? { PGPASSWORD: password } : {},
+    stdin: "null",
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const result = await command.output();
+  assert.equal(result.code, 0, "disposable PostgreSQL fixture command failed");
+  return new TextDecoder().decode(result.stdout).trim();
+}
+
+async function createCaseBoundRecordsFixture({
+  psqlPath,
+  databaseUrl,
+  ownerUserId,
+  otherUserId,
+}) {
+  assert.match(ownerUserId, UUID_PATTERN);
+  assert.match(otherUserId, UUID_PATTERN);
+  const ownerCaseId = crypto.randomUUID();
+  const otherCaseId = crypto.randomUUID();
+  const sql = `
+begin;
+insert into casework.cases(
+  id, case_status, title, created_by, creation_idempotency_key,
+  creation_payload_sha256
+) values
+  ('${ownerCaseId}', 'active', 'A15 owner case', '${ownerUserId}',
+   'a15storage${ownerCaseId.replaceAll("-", "")}', repeat('a', 64)),
+  ('${otherCaseId}', 'active', 'A15 other case', '${otherUserId}',
+   'a15storage${otherCaseId.replaceAll("-", "")}', repeat('b', 64));
+insert into casework.case_members(case_id, user_id, role, added_by)
+values
+  ('${ownerCaseId}', '${ownerUserId}', 'owner', '${ownerUserId}'),
+  ('${otherCaseId}', '${otherUserId}', 'owner', '${otherUserId}');
+select
+  (select count(*) from casework.cases where id in ('${ownerCaseId}', '${otherCaseId}'))
+  || '|' ||
+  (select count(*) from casework.case_members where case_id in ('${ownerCaseId}', '${otherCaseId}'));
+commit;`;
+  assert.equal(await runPsql(psqlPath, databaseUrl, sql), "2|2");
+  return { ownerCaseId, otherCaseId };
+}
+
+async function removeCaseBoundRecordsFixture(
+  { psqlPath, databaseUrl, fixture },
+) {
+  const { ownerCaseId, otherCaseId } = fixture;
+  assert.match(ownerCaseId, UUID_PATTERN);
+  assert.match(otherCaseId, UUID_PATTERN);
+  const sql = `
+begin;
+delete from casework.case_members
+where case_id in ('${ownerCaseId}', '${otherCaseId}');
+delete from casework.cases
+where id in ('${ownerCaseId}', '${otherCaseId}');
+select
+  (select count(*) from casework.cases where id in ('${ownerCaseId}', '${otherCaseId}'))
+  || '|' ||
+  (select count(*) from casework.case_members where case_id in ('${ownerCaseId}', '${otherCaseId}'));
+commit;`;
+  assert.equal(await runPsql(psqlPath, databaseUrl, sql), "0|0");
+}
+
+async function assertAuthorizationSpecificDenial(response) {
+  assert.equal(response.ok, false, "direct browser Storage access must fail");
+  assert.ok(
+    [400, 401, 403, 404].includes(response.status),
+    "Storage denial status is required",
+  );
+  const text = await response.text();
+  let body = {};
+  try {
+    body = JSON.parse(text);
+  } catch {
+    body = {};
+  }
+  const marker = [body.statusCode, body.error, body.code, body.message]
+    .filter((value) => typeof value === "string" || typeof value === "number")
+    .join(" ");
+  assert.match(
+    marker,
+    /403|unauthori[sz]ed|permission|row.level|object not found/iu,
+    "Storage must return its closed authorization/object-concealment outcome",
+  );
+}
+
+async function runVerifiedCleanup({
+  base,
+  adminHeaders,
+  uploadedByBucket,
+  users,
+  caseFixture,
+  psqlPath,
+  databaseUrl,
+}) {
+  const errors = [];
+  const attempt = async (label, operation) => {
+    try {
+      await operation();
+    } catch (error) {
+      errors.push(new Error(`${label} failed`, { cause: error }));
+    }
+  };
+  for (const [bucket, keys] of Object.entries(uploadedByBucket)) {
+    if (keys.length === 0) continue;
+    await attempt(`Storage cleanup ${bucket}`, async () => {
+      const cleanup = await fetch(`${base}/storage/v1/object/${bucket}`, {
+        method: "DELETE",
+        headers: adminHeaders,
+        body: JSON.stringify({ prefixes: keys }),
+      });
+      assert.equal(cleanup.ok, true, `Storage cleanup rejected for ${bucket}`);
+      if (cleanup.body) await cleanup.body.cancel();
+      for (const key of keys) {
+        const readback = await fetch(
+          `${base}/storage/v1/object/authenticated/${bucket}/${key}`,
+          { headers: adminHeaders },
+        );
+        assert.equal(readback.ok, false, `Storage cleanup readback: ${bucket}`);
+        if (readback.body) await readback.body.cancel();
+      }
+    });
+  }
+  if (caseFixture) {
+    await attempt("case/member fixture cleanup", async () => {
+      await removeCaseBoundRecordsFixture({
+        psqlPath,
+        databaseUrl,
+        fixture: caseFixture,
+      });
+    });
+  }
+  for (const id of users) {
+    await attempt("Auth user cleanup", async () => {
+      const cleanup = await fetch(`${base}/auth/v1/admin/users/${id}`, {
+        method: "DELETE",
+        headers: adminHeaders,
+      });
+      assert.equal(cleanup.ok, true, "Auth user cleanup rejected");
+      if (cleanup.body) await cleanup.body.cancel();
+      const readback = await fetch(`${base}/auth/v1/admin/users/${id}`, {
+        headers: adminHeaders,
+      });
+      assert.equal(
+        readback.ok,
+        false,
+        "Auth user cleanup readback must be absent",
+      );
+      assert.equal(readback.status, 404, "deleted Auth user must return 404");
+      if (readback.body) await readback.body.cancel();
+    });
+  }
+  return errors;
 }
 
 const REAL_STORAGE_CONFIRMED =
@@ -72,8 +340,11 @@ Deno.test("real Storage/Auth harness registers permission-safely and contains ex
   );
   assert.match(source, /Deno\.permissions\.query/u);
   assert.doesNotMatch(source, /separately\s+clock-controlled\s+provider/iu);
-  assert.match(source, /DRS_DOCUMENT_REAL_EXPIRED_UPLOAD_URL/u);
-  assert.match(source, /DRS_DOCUMENT_REAL_LATE_UPLOAD_URL/u);
+  assert.match(source, /DRS_DOCUMENT_REAL_JWT_SECRET/u);
+  assert.match(source, /DRS_DOCUMENT_REAL_PSQL/u);
+  assert.match(source, /createCaseBoundRecordsFixture/u);
+  assert.match(source, /rewriteVerifiedSignedUploadExpiry/u);
+  assert.match(source, /runVerifiedCleanup/u);
   assert.match(source, /allowed_mime_types/u);
   assert.match(source, /crypto\.subtle\.digest/u);
   assert.match(source, /26_214_401/u);
@@ -86,6 +357,30 @@ Deno.test("focused RED 4: signed capability and scanner fail-closed seams are ab
   const validation = await import(VALIDATION_URL.href);
   assert.equal(typeof storage.createSupabaseDocumentStoragePort, "function");
   assert.equal(typeof validation.evaluateHostileFileReport, "function");
+});
+
+Deno.test("focused RED review: an existing case-bound records object denial is absent", async () => {
+  const source = await Deno.readTextFile(SELF_URL);
+  const fixtureName = ["create", "CaseBound", "RecordsFixture"].join("");
+  const denialName = ["assert", "Authorization", "SpecificDenial"].join("");
+  assert.ok(source.includes(`function ${fixtureName}`));
+  assert.ok(source.includes(`function ${denialName}`));
+});
+
+Deno.test("focused RED review: expired capability signature provenance is absent", async () => {
+  const source = await Deno.readTextFile(SELF_URL);
+  const signerName = ["rewrite", "Verified", "SignedUploadExpiry"].join("");
+  const secretName = ["DRS_DOCUMENT", "REAL_JWT", "SECRET"].join("_");
+  assert.ok(source.includes(`function ${signerName}`));
+  assert.ok(source.includes(secretName));
+});
+
+Deno.test("focused RED review: cleanup success and primary failure aggregation are absent", async () => {
+  const source = await Deno.readTextFile(SELF_URL);
+  const cleanupName = ["run", "Verified", "Cleanup"].join("");
+  const aggregateName = ["Aggregate", "Error"].join("");
+  assert.ok(source.includes(`function ${cleanupName}`));
+  assert.ok(source.includes(aggregateName));
 });
 
 Deno.test("server-owned intake path cannot be replaced by a caller path", async () => {
@@ -341,18 +636,11 @@ Deno.test({
     const rawUrl = await optionalEnv("DRS_DOCUMENT_REAL_STORAGE_URL");
     const serviceKey = await optionalEnv("DRS_DOCUMENT_REAL_SERVICE_ROLE_KEY");
     const anonKey = await optionalEnv("DRS_DOCUMENT_REAL_ANON_KEY");
-    const expiredUploadUrl = await optionalEnv(
-      "DRS_DOCUMENT_REAL_EXPIRED_UPLOAD_URL",
-    );
-    const lateUploadUrl = await optionalEnv(
-      "DRS_DOCUMENT_REAL_LATE_UPLOAD_URL",
-    );
-    const lateIssuedAt = await optionalEnv(
-      "DRS_DOCUMENT_REAL_LATE_ISSUED_AT",
-    );
+    const jwtSecret = await optionalEnv("DRS_DOCUMENT_REAL_JWT_SECRET");
+    const psqlPath = await optionalEnv("DRS_DOCUMENT_REAL_PSQL");
+    const databaseUrl = await optionalEnv("DRS_DOCUMENT_REAL_PG_URL");
     assert.ok(
-      rawUrl && serviceKey && anonKey && expiredUploadUrl && lateUploadUrl &&
-        lateIssuedAt,
+      rawUrl && serviceKey && anonKey && jwtSecret && psqlPath && databaseUrl,
     );
     const origin = new URL(rawUrl);
     assert.ok(["http:", "https:"].includes(origin.protocol));
@@ -385,31 +673,18 @@ Deno.test({
       assert.equal(url.origin, origin.origin);
       return url;
     };
-    const inspectFixtureUrl = (raw, label) => {
-      const url = new URL(raw);
-      const prefix = "/storage/v1/object/upload/sign/drs-case-intake-private/";
-      assert.equal(url.origin, origin.origin, `${label} origin`);
-      assert.ok(url.pathname.startsWith(prefix), `${label} bucket/path`);
-      assert.equal(
-        url.searchParams.getAll("token").length,
-        1,
-        `${label} token`,
-      );
-      const token = url.searchParams.get("token");
-      assert.ok(token, `${label} token`);
-      assert.equal([...url.searchParams.keys()].join(","), "token");
-      return {
-        url,
-        objectKey: decodeURIComponent(url.pathname.slice(prefix.length)),
-        claims: decodeJwtPayload(token),
-      };
-    };
     const suffix = crypto.randomUUID();
     const objectKey =
       `intents/${crypto.randomUUID()}/${crypto.randomUUID()}.pdf`;
     const bytes = new TextEncoder().encode("%PDF-1.7\nA15 real Storage");
     const users = [];
-    const uploadedKeys = [];
+    const sessions = [];
+    const uploadedByBucket = {
+      "drs-case-intake-private": [],
+      "drs-case-records-private": [],
+    };
+    let caseFixture = null;
+    let primaryFailure = null;
     try {
       // bucket readback: both buckets must be private, 25 MiB and exact MIME.
       for (
@@ -430,8 +705,8 @@ Deno.test({
         ]);
       }
 
-      // Two disposable Auth sessions prove direct cross-case denial before any
-      // signed capability is used.
+      // Two disposable Auth sessions plus two real case memberships bind the
+      // denial to one existing records object, not a randomized 404.
       for (const role of ["a", "b"]) {
         const email = `a15-storage-${role}-${suffix}@example.invalid`;
         const password = `A15-${suffix}-${role}-safe`;
@@ -450,18 +725,52 @@ Deno.test({
         });
         assert.equal(login.ok, true, "disposable Auth session failed");
         const session = await login.json();
-        const direct = await fetch(
-          `${base}/storage/v1/object/drs-case-records-private/cases/${crypto.randomUUID()}/documents/${crypto.randomUUID()}/versions/${crypto.randomUUID()}/source.pdf`,
-          {
-            headers: {
-              authorization: `Bearer ${session.access_token}`,
-              apikey: anonKey,
-            },
-          },
-        );
-        assert.equal(direct.ok, false, "cross-case denial failed");
-        await discardBody(direct);
+        sessions.push({ id: created.id, accessToken: session.access_token });
       }
+
+      caseFixture = await createCaseBoundRecordsFixture({
+        psqlPath,
+        databaseUrl,
+        ownerUserId: sessions[0].id,
+        otherUserId: sessions[1].id,
+      });
+      const recordsKey =
+        `cases/${caseFixture.ownerCaseId}/documents/${crypto.randomUUID()}/versions/${crypto.randomUUID()}/source.pdf`;
+      const recordsUpload = await fetch(
+        `${base}/storage/v1/object/drs-case-records-private/${recordsKey}`,
+        {
+          method: "POST",
+          headers: {
+            ...adminHeaders,
+            "content-type": "application/pdf",
+            "x-upsert": "false",
+          },
+          body: bytes,
+        },
+      );
+      assert.equal(recordsUpload.ok, true, "records fixture upload failed");
+      await discardBody(recordsUpload);
+      uploadedByBucket["drs-case-records-private"].push(recordsKey);
+      const serviceRead = await fetch(
+        `${base}/storage/v1/object/authenticated/drs-case-records-private/${recordsKey}`,
+        { headers: adminHeaders },
+      );
+      assert.equal(serviceRead.ok, true, "service records readback failed");
+      assert.deepEqual(
+        new Uint8Array(await serviceRead.arrayBuffer()),
+        bytes,
+        "service records readback bytes",
+      );
+      const crossCaseRead = await fetch(
+        `${base}/storage/v1/object/authenticated/drs-case-records-private/${recordsKey}`,
+        {
+          headers: {
+            authorization: `Bearer ${sessions[1].accessToken}`,
+            apikey: anonKey,
+          },
+        },
+      );
+      await assertAuthorizationSpecificDenial(crossCaseRead);
 
       const signedUrl = await issueSignedUrl(objectKey);
 
@@ -472,7 +781,7 @@ Deno.test({
       });
       assert.equal(upload.ok, true, "signed upload failed");
       await discardBody(upload);
-      uploadedKeys.push(objectKey);
+      uploadedByBucket["drs-case-intake-private"].push(objectKey);
       const replay = await fetch(signedUrl, {
         method: "PUT",
         headers: { "content-type": "application/pdf", "x-upsert": "false" },
@@ -516,9 +825,15 @@ Deno.test({
       assert.equal(oversized.ok, false, "bucket size limit must reject");
       await discardBody(oversized);
 
-      const expiredFixture = inspectFixtureUrl(
-        expiredUploadUrl,
-        "expired capability",
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const expiredKey =
+        `intents/${crypto.randomUUID()}/${crypto.randomUUID()}.pdf`;
+      const expiredSource = await issueSignedUrl(expiredKey);
+      const expiredFixture = await rewriteVerifiedSignedUploadExpiry(
+        expiredSource,
+        jwtSecret,
+        nowSeconds - 7_260,
+        nowSeconds - 60,
       );
       const expired = await fetch(expiredFixture.url, {
         method: "PUT",
@@ -531,17 +846,31 @@ Deno.test({
         "expired capability fixture must carry a past expiry",
       );
       assert.equal(expired.ok, false, "expired capability must fail");
-      await discardBody(expired);
+      assert.ok([400, 401, 403].includes(expired.status));
+      const expiredBody = await expired.text();
+      assert.match(
+        expiredBody,
+        /expir|jwt|token/iu,
+        "validly signed capability must fail specifically on expiry",
+      );
 
-      const lateIssuedMs = Date.parse(lateIssuedAt);
+      const lateKey =
+        `intents/${crypto.randomUUID()}/${crypto.randomUUID()}.pdf`;
+      const lateSource = await issueSignedUrl(lateKey);
+      const lateIssuedSeconds = nowSeconds - 960;
+      const lateFixture = await rewriteVerifiedSignedUploadExpiry(
+        lateSource,
+        jwtSecret,
+        lateIssuedSeconds,
+        lateIssuedSeconds + 7200,
+      );
+      const lateIssuedMs = lateIssuedSeconds * 1000;
       const lateAgeMs = Date.now() - lateIssuedMs;
-      assert.ok(Number.isFinite(lateIssuedMs));
       assert.ok(lateAgeMs > 15 * 60_000, "late upload must exceed app TTL");
       assert.ok(
         lateAgeMs < 2 * 60 * 60_000,
         "late token must remain native-valid",
       );
-      const lateFixture = inspectFixtureUrl(lateUploadUrl, "late capability");
       assert.equal(lateFixture.claims.iat * 1000, lateIssuedMs);
       assert.equal(lateFixture.claims.exp - lateFixture.claims.iat, 7200);
       assert.ok(
@@ -559,7 +888,7 @@ Deno.test({
         "native token remains replayable after application TTL",
       );
       await discardBody(late);
-      uploadedKeys.push(lateFixture.objectKey);
+      uploadedByBucket["drs-case-intake-private"].push(lateKey);
 
       const served = await fetch(
         `${base}/storage/v1/object/authenticated/drs-case-intake-private/${objectKey}`,
@@ -576,26 +905,27 @@ Deno.test({
         await crypto.subtle.digest("SHA-256", bytes),
       );
       assert.deepEqual(actualHash, expectedHash, "actual byte hash mismatch");
-    } finally {
-      // API cleanup only; never mutate storage.objects or auth tables directly.
-      if (uploadedKeys.length > 0) {
-        const cleanup = await fetch(
-          `${base}/storage/v1/object/drs-case-intake-private`,
-          {
-            method: "DELETE",
-            headers: adminHeaders,
-            body: JSON.stringify({ prefixes: uploadedKeys }),
-          },
-        );
-        await discardBody(cleanup);
-      }
-      for (const id of users) {
-        const cleanup = await fetch(`${base}/auth/v1/admin/users/${id}`, {
-          method: "DELETE",
-          headers: adminHeaders,
-        });
-        await discardBody(cleanup);
-      }
+    } catch (error) {
+      primaryFailure = error;
+    }
+    const cleanupErrors = await runVerifiedCleanup({
+      base,
+      adminHeaders,
+      uploadedByBucket,
+      users,
+      caseFixture,
+      psqlPath,
+      databaseUrl,
+    });
+    if (primaryFailure && cleanupErrors.length > 0) {
+      throw new AggregateError(
+        [primaryFailure, ...cleanupErrors],
+        "real Storage operation and cleanup both failed",
+      );
+    }
+    if (primaryFailure) throw primaryFailure;
+    if (cleanupErrors.length > 0) {
+      throw new AggregateError(cleanupErrors, "real Storage cleanup failed");
     }
   },
 });
