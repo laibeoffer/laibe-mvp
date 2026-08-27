@@ -145,6 +145,28 @@ $commands = @($ast.FindAll({
     elements = $elements
   }
 })
+$pipelines = @($ast.FindAll({
+  param($item) $item -is [System.Management.Automation.Language.PipelineAst]
+}, $true) | ForEach-Object {
+  $pipeline = $_
+  $facts = Get-AstLeafFacts -Node $pipeline
+  [ordered]@{
+    owner = Get-OwnerFunctionName -Node $pipeline
+    start = $pipeline.Extent.StartOffset
+    end = $pipeline.Extent.EndOffset
+    text = $pipeline.Extent.Text
+    variables = $facts.variables
+    members = $facts.members
+    elements = @($pipeline.PipelineElements | ForEach-Object {
+      [ordered]@{
+        type = $_.GetType().Name
+        start = $_.Extent.StartOffset
+        end = $_.Extent.EndOffset
+        text = $_.Extent.Text
+      }
+    })
+  }
+})
 $assignments = @($ast.FindAll({
   param($item) $item -is [System.Management.Automation.Language.AssignmentStatementAst]
 }, $true) | ForEach-Object {
@@ -262,6 +284,7 @@ $result = [ordered]@{
   parseErrors = @($parseErrors | ForEach-Object { $_.Message })
   functions = $functions
   commands = $commands
+  pipelines = $pipelines
   assignments = $assignments
   memberInvocations = $memberInvocations
   foreachStatements = $foreachStatements
@@ -1041,10 +1064,11 @@ function assertNativePowerShellSecurityContract(ps) {
     ],
     "one exact tar extractor",
   );
+  return ast;
 }
 
-function assertExactSupabaseCliEnvironment(ps) {
-  const ast = parseNativePowerShellAst(ps);
+function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
+  const ast = nativeAst ?? parseNativePowerShellAst(ps);
   const reachability = powerShellReachability(ast);
   const closedCalls = reachability.commands.filter((command) =>
     command.name?.toLowerCase() === "invoke-closedprocess"
@@ -1291,6 +1315,35 @@ function assertExactSupabaseCliEnvironment(ps) {
       },
     ],
     "wrapper Environment and entry assignments have one exact protected dataflow",
+  );
+
+  const wrapperProtectedPipelines = ast.pipelines.filter((pipeline) =>
+    pipeline.owner?.toLowerCase() === wrapperOwner &&
+    protectedInputPaths(pipeline.variables).length !== 0
+  );
+  assert.deepEqual(
+    wrapperProtectedPipelines.map((pipeline) => ({
+      text: normalizePowerShellAstText(pipeline.text),
+      protectedInputs: protectedInputPaths(pipeline.variables),
+    })),
+    [
+      {
+        text: "$Environment.GetEnumerator()",
+        protectedInputs: ["environment"],
+      },
+    ],
+    "protected wrapper inputs have only the canonical GetEnumerator pipeline",
+  );
+  const wrapperProtectedPipelineCommands = ast.commands.filter((command) =>
+    command.owner?.toLowerCase() === wrapperOwner &&
+    wrapperProtectedPipelines.some((pipeline) =>
+      command.start >= pipeline.start && command.end <= pipeline.end
+    )
+  );
+  assert.deepEqual(
+    wrapperProtectedPipelineCommands,
+    [],
+    "the canonical protected-input pipeline contains no command or alias stage",
   );
 
   const wrapperEnvironmentStatements = [...new Map(
@@ -1623,7 +1676,8 @@ function assertExactSupabaseArchiveBlock(ps) {
     "archive block rejects additive scope, locale, and extractor mutations",
   );
 
-  assertNativePowerShellSecurityContract(ps);
+  const nativeAst = assertNativePowerShellSecurityContract(ps);
+  assertExactSupabaseCliEnvironment(ps, nativeAst);
 }
 
 test("focused RED: the exact three live harness seams exist", () => {
@@ -3689,6 +3743,13 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     "COPY_ENTRY_REBIND",
   );
 
+  const environmentPipelineAliasWrite = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  $Environment | ForEach-Object { $_['EXTRA'] = '1' }\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "ENV_PIPELINE_ALIAS_WRITE",
+  );
+
   const cleanupSystemRootRenamed = mutateOnce(
     ps,
     "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
@@ -3727,6 +3788,7 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
       ["CLEAR_AFTER_COPY", clearAfterCopy],
       ["CALLER_ENV_EXTRA_WRITE", callerEnvironmentExtraWrite],
       ["COPY_ENTRY_REBIND", copyEntryRebind],
+      ["ENV_PIPELINE_ALIAS_WRITE", environmentPipelineAliasWrite],
       ["CLEANUP_PARAM_SHADOW", cleanupParameterShadow],
     ]
   ) {
@@ -3737,10 +3799,20 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
       if (!(error instanceof assert.AssertionError)) throw error;
     }
   }
+  const missedPriorEnvironmentClosureMutations = [];
+  try {
+    assertExactSupabaseArchiveBlock(environmentPipelineAliasWrite);
+    missedPriorEnvironmentClosureMutations.push("ENV_PIPELINE_ALIAS_WRITE");
+  } catch (error) {
+    if (!(error instanceof assert.AssertionError)) throw error;
+  }
   assert.deepEqual(
-    missedEnvironmentClosureMutations,
-    [],
-    "native AST closure rejects every wrapper environment mutation and cleanup shadow",
+    {
+      exactEnvironmentGate: missedEnvironmentClosureMutations,
+      priorGate: missedPriorEnvironmentClosureMutations,
+    },
+    { exactEnvironmentGate: [], priorGate: [] },
+    "exact environment and prior native AST gates reject every wrapper environment mutation and cleanup shadow",
   );
 });
 
