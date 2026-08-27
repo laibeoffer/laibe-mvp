@@ -14,6 +14,11 @@ import {
 } from "./contracts.ts";
 import { createDocumentAuthorityResolver } from "./authority.ts";
 import type {
+  DrsDocumentSealedScannerRuntime,
+  SealedByteIdentity,
+  SealedDocumentScan,
+} from "./drs-document-scanner-runtime.ts";
+import type {
   DocumentAuthorityPort,
   DocumentModeAPrincipal,
   DocumentRepositoryPort,
@@ -92,6 +97,164 @@ function hasExactRecordKeys(
   const keys = Object.keys(candidate);
   return keys.length === expected.length &&
     expected.every((key) => keys.includes(key));
+}
+
+function encodeObjectKey(value: string): string {
+  return value.split("/").map(encodeURIComponent).join("/");
+}
+
+function exactSignedUploadCapability(
+  candidate: unknown,
+  objectKey: string,
+  mime: UploadIntentRequest["declaredMime"],
+  issuedAt: Date,
+):
+  | Readonly<{
+    signedUploadUrl: string;
+    nativeExpiresAt: string;
+    requiredHeaders: Readonly<Record<string, string>>;
+  }>
+  | null {
+  const signed = record(candidate);
+  const requiredHeaders = record(readOwn(signed, "requiredHeaders"));
+  if (
+    !hasExactRecordKeys(signed, [
+      "signedUploadUrl",
+      "nativeExpiresAt",
+      "requiredHeaders",
+    ]) ||
+    !hasExactRecordKeys(requiredHeaders, ["content-type"]) ||
+    readOwn(requiredHeaders, "content-type") !== mime
+  ) return null;
+  const signedUploadUrl = readOwn(signed, "signedUploadUrl");
+  const nativeExpiresAt = readOwn(signed, "nativeExpiresAt");
+  if (
+    typeof signedUploadUrl !== "string" || signedUploadUrl.length < 1 ||
+    signedUploadUrl.length > 4096 || typeof nativeExpiresAt !== "string"
+  ) return null;
+  const expiresAt = Date.parse(nativeExpiresAt);
+  if (
+    !Number.isFinite(expiresAt) || expiresAt <= issuedAt.getTime() ||
+    expiresAt > issuedAt.getTime() + 2 * 60 * 60 * 1000 + 60_000
+  ) return null;
+  try {
+    const url = new URL(signedUploadUrl);
+    const loopback = url.protocol === "http:" &&
+      (url.hostname === "127.0.0.1" || url.hostname === "[::1]");
+    const expectedPath = `/storage/v1/object/upload/sign/${INTAKE_BUCKET}/${
+      encodeObjectKey(objectKey)
+    }`;
+    if (
+      (url.protocol !== "https:" && !loopback) ||
+      url.pathname !== expectedPath ||
+      url.username || url.password || url.hash ||
+      [...url.searchParams.keys()].some((key) => key !== "token") ||
+      url.searchParams.getAll("token").length !== 1 ||
+      !url.searchParams.get("token")
+    ) return null;
+  } catch {
+    return null;
+  }
+  return Object.freeze({
+    signedUploadUrl,
+    nativeExpiresAt,
+    requiredHeaders: Object.freeze({ "content-type": mime }),
+  });
+}
+
+function sealedScanner(
+  candidate: DocumentScannerPort,
+): DrsDocumentSealedScannerRuntime | null {
+  const value = candidate as Partial<DrsDocumentSealedScannerRuntime>;
+  return typeof value.scanSealed === "function" &&
+      typeof value.promoteSealed === "function"
+    ? value as DrsDocumentSealedScannerRuntime
+    : null;
+}
+
+function exactSealedScan(
+  candidate: SealedDocumentScan | null,
+  declaredMime: UploadIntentRequest["declaredMime"],
+): candidate is SealedDocumentScan {
+  if (
+    !candidate ||
+    !hasExactRecordKeys(record(candidate), ["seal", "report", "facts"])
+  ) {
+    return false;
+  }
+  const facts = record(candidate.facts);
+  if (
+    !hasExactRecordKeys(facts, [
+      "sha256",
+      "sizeBytes",
+      "detectedMime",
+      "validatedMime",
+    ]) || !isSha256(candidate.facts.sha256) ||
+    !Number.isSafeInteger(candidate.facts.sizeBytes) ||
+    candidate.facts.sizeBytes < 1 || candidate.facts.sizeBytes > 26_214_400 ||
+    candidate.facts.detectedMime !== declaredMime ||
+    candidate.facts.validatedMime !== declaredMime ||
+    candidate.report.declaredMime !== declaredMime ||
+    candidate.report.detectedMime !== declaredMime
+  ) return false;
+  return (typeof candidate.seal === "object" && candidate.seal !== null) ||
+    typeof candidate.seal === "function";
+}
+
+function storageFactsEqual(
+  candidate: unknown,
+  expected: SealedByteIdentity,
+  bucket: string,
+  objectKey: string,
+): boolean {
+  const facts = record(candidate);
+  return hasExactRecordKeys(facts, [
+    "bucket",
+    "objectKey",
+    "sha256",
+    "sizeBytes",
+    "detectedMime",
+  ]) && readOwn(facts, "bucket") === bucket &&
+    readOwn(facts, "objectKey") === objectKey &&
+    readOwn(facts, "sha256") === expected.sha256 &&
+    readOwn(facts, "sizeBytes") === expected.sizeBytes &&
+    readOwn(facts, "detectedMime") === expected.detectedMime &&
+    expected.validatedMime === expected.detectedMime;
+}
+
+function validationPending(
+  intentRef: string,
+): Readonly<Record<string, unknown>> {
+  return Object.freeze({
+    schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
+    state: "VALIDATION_PENDING",
+    intentRef,
+  });
+}
+
+function canonicalAuthorityRequest(
+  route: DocumentRoute,
+  functionPath: string,
+  request: Request,
+): Request | null {
+  try {
+    const headers = new Headers();
+    for (
+      const name of ["authorization", "cookie", "origin", "sec-fetch-site"]
+    ) {
+      const value = request.headers.get(name);
+      if (value !== null) headers.set(name, value);
+    }
+    const method = route === "download" ? "GET" : "POST";
+    if (method === "POST") headers.set("content-type", "application/json");
+    return new Request(new URL(functionPath, request.url), {
+      method,
+      headers,
+      body: method === "POST" ? "{}" : undefined,
+    });
+  } catch {
+    return null;
+  }
 }
 
 export function createDocumentStorageService(
@@ -183,11 +346,17 @@ export function createDocumentStorageService(
       readOwn(stored, "state") !== "UPLOAD_INTENT_CREATED" ||
       readOwn(stored, "intent_ref") !== intentRef
     ) return null;
-    const signed = await dependencies.storage.createSignedUpload({
+    const signedCandidate = await dependencies.storage.createSignedUpload({
       bucket: INTAKE_BUCKET,
       objectKey,
       mime: request.declaredMime,
     });
+    const signed = exactSignedUploadCapability(
+      signedCandidate,
+      objectKey,
+      request.declaredMime,
+      issuedAt,
+    );
     if (!signed) return null;
     return Object.freeze({
       schemaVersion: "laibe.drs-document-upload-intent.response.v1",
@@ -278,6 +447,82 @@ export function createDocumentStorageService(
       objectKey: intakeKey,
     });
     if (!intake) return null;
+    const sealed = sealedScanner(dependencies.scanner);
+    if (sealed) {
+      const scan = await sealed.scanSealed({
+        intentRef: request.intentRef,
+        sourceBucket: INTAKE_BUCKET,
+        sourceObjectKey: intakeKey,
+        targetBucket: RECORDS_BUCKET,
+        targetObjectKey: recordsKey,
+        declaredMime: declaredMime as typeof intake.detectedMime,
+      });
+      const intakeFilename = intakeKey.split("/").at(-1) ?? "";
+      if (
+        !exactSealedScan(scan, declaredMime as typeof intake.detectedMime) ||
+        evaluateHostileFileReport(scan.report).state !== "CLEAN" ||
+        extensionFromFilename(intakeFilename, scan.facts.detectedMime) !==
+          scan.report.extension ||
+        !storageFactsEqual(
+          intake,
+          scan.facts,
+          INTAKE_BUCKET,
+          intakeKey,
+        )
+      ) return validationPending(request.intentRef);
+      const prePromotion = await dependencies.storage.inspect({
+        bucket: INTAKE_BUCKET,
+        objectKey: intakeKey,
+      });
+      if (
+        !storageFactsEqual(
+          prePromotion,
+          scan.facts,
+          INTAKE_BUCKET,
+          intakeKey,
+        )
+      ) return validationPending(request.intentRef);
+      const promotion = await sealed.promoteSealed({
+        seal: scan.seal,
+        intentRef: request.intentRef,
+        sourceBucket: INTAKE_BUCKET,
+        sourceObjectKey: intakeKey,
+        targetBucket: RECORDS_BUCKET,
+        targetObjectKey: recordsKey,
+      });
+      if (promotion === "NO_WRITE") return null;
+      if (promotion === "WRITE_UNCERTAIN") {
+        await queuePromotedOrphan(principal, request.intentRef, recordsKey);
+        return null;
+      }
+      const records = await dependencies.storage.inspect({
+        bucket: RECORDS_BUCKET,
+        objectKey: recordsKey,
+      });
+      const postPromotionIntake = await dependencies.storage.inspect({
+        bucket: INTAKE_BUCKET,
+        objectKey: intakeKey,
+      });
+      if (
+        !storageFactsEqual(records, scan.facts, RECORDS_BUCKET, recordsKey) ||
+        !storageFactsEqual(
+          postPromotionIntake,
+          scan.facts,
+          INTAKE_BUCKET,
+          intakeKey,
+        )
+      ) {
+        await queuePromotedOrphan(principal, request.intentRef, recordsKey);
+        return null;
+      }
+      return await finalizePromoted(
+        principal,
+        request,
+        requestHash,
+        recordsKey,
+        scan.facts,
+      );
+    }
     const scan = await dependencies.scanner.scan({
       bucket: INTAKE_BUCKET,
       objectKey: intakeKey,
@@ -316,6 +561,26 @@ export function createDocumentStorageService(
       await queuePromotedOrphan(principal, request.intentRef, recordsKey);
       return null;
     }
+    return await finalizePromoted(
+      principal,
+      request,
+      requestHash,
+      recordsKey,
+      records,
+    );
+  }
+
+  async function finalizePromoted(
+    principal: DocumentModeAPrincipal,
+    request: FinalizeRequest,
+    requestHash: string,
+    recordsKey: string,
+    records: Readonly<{
+      sha256: string;
+      sizeBytes: number;
+      detectedMime: UploadIntentRequest["declaredMime"];
+    }>,
+  ): Promise<Readonly<Record<string, unknown>> | null> {
     const finalizeResource = Object.freeze({
       schemaVersion: "laibe.drs-document-finalize.internal.v1",
       intentRef: request.intentRef,
@@ -558,7 +823,20 @@ export function createDocumentEdgeHandler(
         dependencies.allowedOrigins,
       );
     }
-    const principal = await dependencies.authority.authorize(request);
+    const authorityRequest = canonicalAuthorityRequest(
+      route,
+      functionPath,
+      request,
+    );
+    if (!authorityRequest) {
+      return documentJsonResponse(
+        503,
+        { state: "CONTEXT_UNAVAILABLE" },
+        origin,
+        dependencies.allowedOrigins,
+      );
+    }
+    const principal = await dependencies.authority.authorize(authorityRequest);
     if (!principal) {
       return documentJsonResponse(
         403,
