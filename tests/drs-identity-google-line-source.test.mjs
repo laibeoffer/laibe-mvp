@@ -160,6 +160,20 @@ test("final migration order cuts predecessor UUID shortcut over to bound selecte
   );
 });
 
+test("focused RED: core audit subject refs use PostgreSQL-native exact-key closure", async () => {
+  const { predecessorMigration } = await sources();
+
+  assert.doesNotMatch(predecessorMigration, /jsonb_object_length\s*\(/iu);
+  assert.match(
+    predecessorMigration,
+    /subject_ref\s*\?&\s*array\['document_id',\s*'version'\][\s\S]*?subject_ref\s*-\s*array\['document_id',\s*'version'\]\s*=\s*'\{\}'::jsonb/iu,
+  );
+  assert.match(
+    predecessorMigration,
+    /subject_ref\s*\?&\s*array\['drawing_id',\s*'version'\][\s\S]*?subject_ref\s*-\s*array\['drawing_id',\s*'version'\]\s*=\s*'\{\}'::jsonb/iu,
+  );
+});
+
 test("cutover source makes binding mapping assignment and termination the only specialist RLS arm", async () => {
   const { migration } = await sources();
   assert.match(
@@ -204,9 +218,11 @@ test("migration is additive explicit and avoids composite multi-target INTO", as
   assert.deepEqual(
     missingFiniteConstraints,
     [],
-    `POSTGRES_FINITE_TIMESTAMP_AUTHORITY_WINDOW_MISSING: ${missingFiniteConstraints.join(
-      ",",
-    )}`,
+    `POSTGRES_FINITE_TIMESTAMP_AUTHORITY_WINDOW_MISSING: ${
+      missingFiniteConstraints.join(
+        ",",
+      )
+    }`,
   );
   assert.match(migration, /^begin;/u);
   assert.match(migration, /commit;\s*$/u);

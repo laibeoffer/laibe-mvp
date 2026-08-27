@@ -171,7 +171,8 @@ create table if not exists public.drs_review_work_items (
     (
       work_item_type = 'DOCUMENT_REVIEW'
       and jsonb_typeof(subject_ref) = 'object'
-      and jsonb_object_length(subject_ref) = 2
+      and subject_ref ?& array['document_id', 'version']
+      and subject_ref - array['document_id', 'version'] = '{}'::jsonb
       and jsonb_typeof(subject_ref->'document_id') = 'string'
       and subject_ref->>'document_id' ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
       and jsonb_typeof(subject_ref->'version') = 'string'
@@ -180,7 +181,8 @@ create table if not exists public.drs_review_work_items (
     or (
       work_item_type = 'DRAWING_REVIEW'
       and jsonb_typeof(subject_ref) = 'object'
-      and jsonb_object_length(subject_ref) = 2
+      and subject_ref ?& array['drawing_id', 'version']
+      and subject_ref - array['drawing_id', 'version'] = '{}'::jsonb
       and jsonb_typeof(subject_ref->'drawing_id') = 'string'
       and subject_ref->>'drawing_id' ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
       and jsonb_typeof(subject_ref->'version') = 'string'

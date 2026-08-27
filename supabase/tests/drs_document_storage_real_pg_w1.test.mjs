@@ -21,6 +21,10 @@ const IDS = Object.freeze({
   bindingB: "aaaaaaaa-9999-4999-8999-999999999999",
   mappingA: "bbbbbbbb-9999-4999-8999-999999999999",
   mappingB: "cccccccc-9999-4999-8999-999999999999",
+  membershipA: "abababab-abab-4bab-8bab-abababababab",
+  membershipB: "bcbcbcbc-bcbc-4cbc-8cbc-bcbcbcbcbcbc",
+  highestEvent: "cdcdcdcd-cdcd-4dcd-8dcd-cdcdcdcdcdcd",
+  highestGrant: "dededede-dede-4ede-8ede-dededededede",
   intent: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
   object: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
   zeroDocument: "ffffffff-ffff-4fff-8fff-ffffffffffff",
@@ -129,6 +133,8 @@ const CLEANUP_SQL = `
     where case_id in ('${IDS.caseA}', '${IDS.caseB}');
   delete from casework.document_operation_receipts
     where case_id in ('${IDS.caseA}', '${IDS.caseB}');
+  delete from casework.highest_reviewer_case_grants
+    where grant_id = '${IDS.highestGrant}';
   delete from casework.case_events
     where case_id in ('${IDS.caseA}', '${IDS.caseB}');
   delete from casework.document_artifacts
@@ -157,6 +163,8 @@ const CLEANUP_SQL = `
     where specialist_id in ('${IDS.specialistA}', '${IDS.specialistB}');
   delete from public.drs_cases
     where case_id in ('${IDS.drsCaseA}', '${IDS.drsCaseB}');
+  delete from casework.case_members
+    where membership_id in ('${IDS.membershipA}', '${IDS.membershipB}');
   delete from casework.cases where id in ('${IDS.caseA}', '${IDS.caseB}');
   delete from auth.users where id in ('${IDS.userA}', '${IDS.userB}');
   set local session_replication_role = origin;
@@ -175,6 +183,34 @@ const SETUP_SQL = `
      'a15-document-real-case-a', repeat('a', 64)),
     ('${IDS.caseB}', 'active', 'A15 disposable case B', '${IDS.userB}',
      'a15-document-real-case-b', repeat('b', 64));
+  insert into casework.case_members(
+    membership_id, case_id, user_id, role, membership_status,
+    valid_from, valid_until, authority_version, added_by
+  ) values
+    ('${IDS.membershipA}', '${IDS.caseA}', '${IDS.userA}', 'owner', 'active',
+     clock_timestamp() - interval '1 hour', clock_timestamp() + interval '1 day',
+     1, '${IDS.userA}'),
+    ('${IDS.membershipB}', '${IDS.caseB}', '${IDS.userB}', 'pro', 'active',
+     clock_timestamp() - interval '1 hour', clock_timestamp() + interval '1 day',
+     1, '${IDS.userB}');
+  insert into casework.case_events(
+    event_id, case_id, event_type, actor_user_id, subject_user_id,
+    membership_id, idempotency_key, payload_sha256, payload, occurred_at
+  ) values (
+    '${IDS.highestEvent}', '${IDS.caseA}', 'HIGHEST_REVIEWER_GRANTED',
+    '${IDS.userA}', '${IDS.userA}', '${IDS.membershipA}',
+    'a15-highest-grant-event', repeat('c', 64),
+    jsonb_build_object('authority_basis', 'disposable real gate'),
+    clock_timestamp()
+  );
+  insert into casework.highest_reviewer_case_grants(
+    grant_id, grant_version, case_id, user_id, status, valid_from, valid_until,
+    authority_basis, created_event_id, granted_by
+  ) values (
+    '${IDS.highestGrant}', 1, '${IDS.caseA}', '${IDS.userA}', 'active',
+    clock_timestamp() - interval '1 second', clock_timestamp() + interval '10 minutes',
+    'disposable real gate', '${IDS.highestEvent}', '${IDS.userA}'
+  );
   insert into public.drs_cases(case_id, case_number, owner_id, case_state)
   values
     ('${IDS.drsCaseA}', 'A15-DOC-A', '${IDS.userA}', 'ACTIVE_REVIEW'),
@@ -384,6 +420,85 @@ Deno.test({
       }
       await psql(psqlPath, databaseUrl, SETUP_SQL);
 
+      const upstreamWorkspaceGrants = jsonFrom(
+        await psql(
+          psqlPath,
+          databaseUrl,
+          `begin;
+           set local role service_role;
+           select jsonb_build_object(
+             'owner', public.owner_workspace_grant_v1('${IDS.userA}'),
+             'vendor', public.vendor_workspace_grant_v1('${IDS.userB}'),
+             'highest', public.highest_reviewer_workspace_grant_v1('${IDS.userA}'),
+             'owner_cross', public.owner_workspace_grant_v1('${IDS.userB}'),
+             'vendor_cross', public.vendor_workspace_grant_v1('${IDS.userA}')
+           );
+           commit;`,
+        ),
+      );
+      assert.equal(upstreamWorkspaceGrants.owner.authorized, true);
+      assert.equal(upstreamWorkspaceGrants.owner.case_id, IDS.caseA);
+      assert.equal(upstreamWorkspaceGrants.vendor.authorized, true);
+      assert.equal(upstreamWorkspaceGrants.vendor.case_id, IDS.caseB);
+      assert.equal(upstreamWorkspaceGrants.highest.authorized, true);
+      assert.equal(upstreamWorkspaceGrants.highest.case_id, IDS.caseA);
+      assert.equal(upstreamWorkspaceGrants.owner_cross.authorized, false);
+      assert.equal(upstreamWorkspaceGrants.vendor_cross.authorized, false);
+
+      const revokedOwner = jsonFrom(
+        await psql(
+          psqlPath,
+          databaseUrl,
+          `begin;
+           update casework.case_members
+             set membership_status = 'revoked',
+                 revoked_at = clock_timestamp(),
+                 valid_until = clock_timestamp(),
+                 authority_version = authority_version + 1
+             where membership_id = '${IDS.membershipA}';
+           set local role service_role;
+           select public.owner_workspace_grant_v1('${IDS.userA}');
+           rollback;`,
+        ),
+      );
+      assert.equal(revokedOwner.authorized, false);
+      assert.equal(revokedOwner.state, "CASE_NOT_AUTHORIZED");
+
+      const expiredVendor = jsonFrom(
+        await psql(
+          psqlPath,
+          databaseUrl,
+          `begin;
+           update casework.case_members
+             set valid_until = clock_timestamp() - interval '1 second'
+             where membership_id = '${IDS.membershipB}';
+           set local role service_role;
+           select public.vendor_workspace_grant_v1('${IDS.userB}');
+           rollback;`,
+        ),
+      );
+      assert.equal(expiredVendor.authorized, false);
+      assert.equal(expiredVendor.state, "CASE_NOT_AUTHORIZED");
+
+      const revokedHighest = jsonFrom(
+        await psql(
+          psqlPath,
+          databaseUrl,
+          `begin;
+           update casework.highest_reviewer_case_grants
+             set status = 'revoked',
+                 revoked_at = clock_timestamp(),
+                 valid_until = clock_timestamp(),
+                 grant_version = grant_version + 1
+             where grant_id = '${IDS.highestGrant}';
+           set local role service_role;
+           select public.highest_reviewer_workspace_grant_v1('${IDS.userA}');
+           rollback;`,
+        ),
+      );
+      assert.equal(revokedHighest.authorized, false);
+      assert.equal(revokedHighest.state, "CASE_NOT_AUTHORIZED");
+
       const catalogFacts = jsonFrom(
         await psql(
           psqlPath,
@@ -525,6 +640,23 @@ Deno.test({
       assert.equal(crossCase.ok, false);
       assert.equal(crossCase.state, "CASE_NOT_AUTHORIZED");
 
+      const activeGrant = jsonFrom(
+        await psql(
+          psqlPath,
+          databaseUrl,
+          `begin; set local role service_role;
+           select public.drs_workspace_grant_v2(
+             '${IDS.userA}', '${IDS.caseA}', '${SUBJECT_A}'
+           ); commit;`,
+        ),
+      );
+      assert.equal(activeGrant.authorized, true);
+      assert.notEqual(activeGrant.grant_id, issued.grant_id);
+      assert.ok(
+        BigInt(activeGrant.grant_version) > BigInt(issued.grant_version),
+        "cross-case denial must rotate the invalidated grant",
+      );
+
       const finalizeRequest = JSON.stringify({
         schemaVersion: "laibe.drs-document-upload-finalize.request.v1",
         intentRef: INTENT_REF,
@@ -532,7 +664,7 @@ Deno.test({
       });
       const finalizeDigest = await sha256(finalizeRequest);
       const firstPhase = operationSql(
-        issued,
+        activeGrant,
         "FINALIZE_UPLOAD",
         INTENT_REF,
         FINALIZE_KEY,
@@ -552,7 +684,7 @@ Deno.test({
           psqlPath,
           databaseUrl,
           operationSql(
-            issued,
+            activeGrant,
             "FINALIZE_UPLOAD",
             INTENT_REF,
             "different-finalize-key-a15",
@@ -566,7 +698,7 @@ Deno.test({
           psqlPath,
           databaseUrl,
           operationSql(
-            issued,
+            activeGrant,
             "FINALIZE_UPLOAD",
             INTENT_REF,
             FINALIZE_KEY,
@@ -588,7 +720,7 @@ Deno.test({
           psqlPath,
           databaseUrl,
           operationSql(
-            issued,
+            activeGrant,
             "QUEUE_ORPHAN_CLEANUP",
             orphanResource,
             "queue-orphan-a15-20260826",
@@ -610,7 +742,7 @@ Deno.test({
         detectedMime: "application/pdf",
       });
       const formalSql = operationSql(
-        issued,
+        activeGrant,
         "FINALIZE_UPLOAD",
         formalResource,
         FINALIZE_KEY,
@@ -706,7 +838,7 @@ Deno.test({
           psqlPath,
           databaseUrl,
           operationSql(
-            issued,
+            activeGrant,
             "DOWNLOAD_VERSION",
             "dvr_01j6a8k9m4q2w3e4r5t6y7u8i9",
             "stale-grant-a15-20260826",
