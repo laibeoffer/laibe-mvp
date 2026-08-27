@@ -115,6 +115,17 @@ $functions = @($ast.FindAll({
     bodyEnd = $function.Body.Extent.EndOffset
   }
 })
+$variableReferences = @($ast.FindAll({
+  param($item) $item -is [System.Management.Automation.Language.VariableExpressionAst]
+}, $true) | ForEach-Object {
+  [ordered]@{
+    owner = Get-OwnerFunctionName -Node $_
+    start = $_.Extent.StartOffset
+    end = $_.Extent.EndOffset
+    text = $_.Extent.Text
+    path = $_.VariablePath.UserPath
+  }
+})
 $commands = @($ast.FindAll({
   param($item) $item -is [System.Management.Automation.Language.CommandAst]
 }, $true) | ForEach-Object {
@@ -283,6 +294,7 @@ $returns = @($ast.FindAll({
 $result = [ordered]@{
   parseErrors = @($parseErrors | ForEach-Object { $_.Message })
   functions = $functions
+  variableReferences = $variableReferences
   commands = $commands
   pipelines = $pipelines
   assignments = $assignments
@@ -1283,6 +1295,62 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
         .filter((path) => wrapperProtectedInputs.has(path)),
     ),
   ];
+  const wrapperDefinitions = ast.functions.filter((definition) =>
+    definition.name.toLowerCase() === wrapperOwner
+  );
+  assert.equal(
+    wrapperDefinitions.length,
+    1,
+    "Invoke-ClosedProcess has one canonical definition",
+  );
+  const wrapperDefinition = wrapperDefinitions[0];
+  const nestedWrapperFunctions = ast.functions.filter((definition) =>
+    definition.start > wrapperDefinition.bodyStart &&
+    definition.end < wrapperDefinition.bodyEnd
+  );
+  assert.deepEqual(
+    nestedWrapperFunctions.map((definition) => definition.name.toLowerCase()),
+    [],
+    "Invoke-ClosedProcess cannot define nested functions that capture wrapper inputs",
+  );
+  const customFunctionNames = new Set(
+    ast.functions.map((definition) => definition.name.toLowerCase()),
+  );
+  const wrapperCustomFunctionCalls = ast.commands
+    .filter((command) =>
+      command.owner?.toLowerCase() === wrapperOwner &&
+      command.name !== null &&
+      customFunctionNames.has(command.name.toLowerCase())
+    )
+    .map((command) => ({
+      name: command.name.toLowerCase(),
+      text: normalizePowerShellAstText(command.text),
+    }));
+  assert.deepEqual(
+    wrapperCustomFunctionCalls,
+    Array.from({ length: 3 }, () => ({
+      name: "get-remainingprocessdeadlinemilliseconds",
+      text:
+        "Get-RemainingProcessDeadlineMilliseconds -ProcessDeadline $processDeadline -ProcessTimeoutMilliseconds $ProcessTimeoutMilliseconds",
+    })),
+    "Invoke-ClosedProcess custom-function calls are exactly whitelisted",
+  );
+  const forbiddenAutomaticEnvironmentAliases = ast.variableReferences
+    .filter((variable) =>
+      variable.owner?.toLowerCase() === wrapperOwner &&
+      ["psboundparameters", "myinvocation"].includes(
+        variableLeaf(variable.path),
+      )
+    )
+    .map((variable) => ({
+      path: variableLeaf(variable.path),
+      text: normalizePowerShellAstText(variable.text),
+    }));
+  assert.deepEqual(
+    forbiddenAutomaticEnvironmentAliases,
+    [],
+    "Invoke-ClosedProcess cannot alias Environment through PowerShell automatic bound-parameter variables",
+  );
   const wrapperProtectedAssignments = ast.assignments
     .filter((assignment) => assignment.owner?.toLowerCase() === wrapperOwner)
     .map((assignment) => ({
@@ -3750,6 +3818,27 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     "ENV_PIPELINE_ALIAS_WRITE",
   );
 
+  const psBoundParametersAliasWrite = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  $environmentAlias = $PSBoundParameters['Environment']\n  $environmentAlias['EXTRA'] = '1'\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "PSBOUNDPARAMETERS_ALIAS_WRITE",
+  );
+
+  const myInvocationAliasWrite = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  $environmentAlias = $MyInvocation.BoundParameters['Environment']\n  $environmentAlias['EXTRA'] = '1'\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "MYINVOCATION_ALIAS_WRITE",
+  );
+
+  const nestedFunctionPipelineAliasWrite = mutateOnce(
+    ps,
+    "  $startInfo.Environment.Clear()\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "  $startInfo.Environment.Clear()\n  function Add-EnvironmentAlias {\n    $Environment | ForEach-Object { $_['EXTRA'] = '1' }\n  }\n  Add-EnvironmentAlias\n  foreach ($entry in $Environment.GetEnumerator()) {",
+    "NESTED_FUNCTION_PIPELINE_ALIAS_WRITE",
+  );
+
   const cleanupSystemRootRenamed = mutateOnce(
     ps,
     "-Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure",
@@ -3789,6 +3878,12 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
       ["CALLER_ENV_EXTRA_WRITE", callerEnvironmentExtraWrite],
       ["COPY_ENTRY_REBIND", copyEntryRebind],
       ["ENV_PIPELINE_ALIAS_WRITE", environmentPipelineAliasWrite],
+      ["PSBOUNDPARAMETERS_ALIAS_WRITE", psBoundParametersAliasWrite],
+      ["MYINVOCATION_ALIAS_WRITE", myInvocationAliasWrite],
+      [
+        "NESTED_FUNCTION_PIPELINE_ALIAS_WRITE",
+        nestedFunctionPipelineAliasWrite,
+      ],
       ["CLEANUP_PARAM_SHADOW", cleanupParameterShadow],
     ]
   ) {
@@ -3800,11 +3895,23 @@ test("S17-F1 every Supabase CLI child receives only telemetry suppression and ex
     }
   }
   const missedPriorEnvironmentClosureMutations = [];
-  try {
-    assertExactSupabaseArchiveBlock(environmentPipelineAliasWrite);
-    missedPriorEnvironmentClosureMutations.push("ENV_PIPELINE_ALIAS_WRITE");
-  } catch (error) {
-    if (!(error instanceof assert.AssertionError)) throw error;
+  for (
+    const [label, mutated] of [
+      ["ENV_PIPELINE_ALIAS_WRITE", environmentPipelineAliasWrite],
+      ["PSBOUNDPARAMETERS_ALIAS_WRITE", psBoundParametersAliasWrite],
+      ["MYINVOCATION_ALIAS_WRITE", myInvocationAliasWrite],
+      [
+        "NESTED_FUNCTION_PIPELINE_ALIAS_WRITE",
+        nestedFunctionPipelineAliasWrite,
+      ],
+    ]
+  ) {
+    try {
+      assertExactSupabaseArchiveBlock(mutated);
+      missedPriorEnvironmentClosureMutations.push(label);
+    } catch (error) {
+      if (!(error instanceof assert.AssertionError)) throw error;
+    }
   }
   assert.deepEqual(
     {
