@@ -1,17 +1,14 @@
 import assert from "node:assert/strict";
 
-const SCANNER_RUNTIME_URL = new URL(
-  "../functions/_shared/drs-document-storage/drs-document-scanner-runtime.ts",
-  import.meta.url,
-);
-const EDGE_RUNTIME_URL = new URL(
-  "../functions/_shared/drs-document-storage/drs-document-edge-runtime.ts",
-  import.meta.url,
-);
-const SERVICE_URL = new URL(
-  "../functions/_shared/drs-document-storage/service.ts",
-  import.meta.url,
-);
+import { createDrsSecureSessionRuntime } from "../functions/_shared/drs-auth/drs-secure-session-runtime.ts";
+import { createDrsDocumentEdgeRuntime } from "../functions/_shared/drs-document-storage/drs-document-edge-runtime.ts";
+import { createDrsDocumentScannerRuntime } from "../functions/_shared/drs-document-storage/drs-document-scanner-runtime.ts";
+import { createDocumentStorageService } from "../functions/_shared/drs-document-storage/service.ts";
+import { createDrsDocumentSnapshotHandler } from "../functions/drs-document-snapshot/index.ts";
+import { createDrsDocumentUploadFinalizeHandler } from "../functions/drs-document-upload-finalize/index.ts";
+import { createDrsDocumentUploadIntentHandler } from "../functions/drs-document-upload-intent/index.ts";
+import { createDrsDocumentVersionDownloadHandler } from "../functions/drs-document-version-download/index.ts";
+import { createDrsSessionBootstrapEndpoint } from "../functions/drs-session-bootstrap/index.ts";
 
 const INTAKE_BUCKET = "drs-case-intake-private";
 const RECORDS_BUCKET = "drs-case-records-private";
@@ -32,6 +29,211 @@ const PRINCIPAL = Object.freeze({
   grantVersion: "7",
   grantExpiresAt: "2026-08-28T12:15:00.000Z",
 });
+const APP_ORIGIN = "https://app.example.com";
+const SUPABASE_ORIGIN = "http://127.0.0.1:54321";
+const SCANNER_ORIGIN = "http://127.0.0.1:54329";
+const SESSION_COOKIE_NAME = "__Host-laibe-drs-session";
+const SPECIALIST_ID = "55555555-5555-4555-8555-555555555555";
+const AUTHORIZATION_SUBJECT = `drs-specialist:${SPECIALIST_ID}`;
+const DOCUMENT_REF = "doc_01j6a8k9m4q2w3e4r5t6y7u8i9";
+const VERSION_REF = "dvr_01j6a8k9m4q2w3e4r5t6y7u8i9";
+const RECEIPT_REF = "rcp_01j6a8k9m4q2w3e4r5t6y7u8i9";
+const SNAPSHOT_REF = "snp_01j6a8k9m4q2w3e4r5t6y7u8i9";
+
+function base64Url(bytes) {
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replace(
+    /=+$/u,
+    "",
+  );
+}
+
+const COOKIE_KEY = base64Url(new Uint8Array(32).fill(0x31));
+const PROOF_KEY = base64Url(new Uint8Array(32).fill(0x32));
+
+function productionEnvironment(overrides = {}) {
+  const values = Object.freeze({
+    SUPABASE_URL: SUPABASE_ORIGIN,
+    SUPABASE_SERVICE_ROLE_KEY: "opaque-test-service-role",
+    LAIBE_DRS_APP_ORIGIN: APP_ORIGIN,
+    LAIBE_DRS_SESSION_SUCCESS_URL: `${APP_ORIGIN}/specialist`,
+    LAIBE_DRS_SESSION_COOKIE_NAME: SESSION_COOKIE_NAME,
+    LAIBE_DRS_SESSION_COOKIE_KEY_V1: COOKIE_KEY,
+    LAIBE_DRS_BFF_PROOF_KEY_V1: PROOF_KEY,
+    LAIBE_DRS_DOCUMENT_SCANNER_URL: `${SCANNER_ORIGIN}/v1/scan`,
+    LAIBE_DRS_DOCUMENT_SCANNER_TOKEN: "opaque-test-scanner-token",
+    ...overrides,
+  });
+  return Object.freeze({ get: (name) => values[name] });
+}
+
+function jsonResponse(payload, status = 200) {
+  const body = JSON.stringify(payload);
+  return new Response(body, {
+    status,
+    headers: {
+      "content-length": String(new TextEncoder().encode(body).byteLength),
+      "content-type": "application/json",
+    },
+  });
+}
+
+function createProductionFetchHarness(now) {
+  const calls = [];
+  let issued = null;
+  const grantExpiresAt = new Date(now.getTime() + 30_000).toISOString();
+  const fetch = (input, init = {}) => {
+    const url = new URL(
+      typeof input === "string" || input instanceof URL ? input : input.url,
+    );
+    const body = typeof init.body === "string" ? JSON.parse(init.body) : null;
+    calls.push(Object.freeze({ pathname: url.pathname, body }));
+    if (
+      url.origin === SUPABASE_ORIGIN && url.pathname.startsWith("/rest/v1/rpc/")
+    ) {
+      if (url.pathname.endsWith("/drs_server_session_issue_v1")) {
+        issued = Object.freeze({
+          digest: body.p_access_token_digest,
+          expiresAt: body.p_expires_at,
+        });
+        return jsonResponse({
+          server_session_id: body.p_server_session_id,
+          expires_at: body.p_expires_at,
+        });
+      }
+      if (url.pathname.endsWith("/drs_server_session_verify_v1")) {
+        assert.equal(body.p_access_token_digest, issued?.digest);
+        return jsonResponse({
+          authenticated_user_id: PRINCIPAL.authenticatedUserId,
+          specialist_id: SPECIALIST_ID,
+          authorization_subject: AUTHORIZATION_SUBJECT,
+          expires_at: issued?.expiresAt,
+        });
+      }
+      if (url.pathname.endsWith("/drs_workspace_grant_v1")) {
+        return jsonResponse({
+          authorized: true,
+          state: "AUTHORIZED_DRS_WORKSPACE",
+          case_id: PRINCIPAL.expectedCaseId,
+          case_status: "active",
+          access_mode: "read_only",
+        });
+      }
+      if (url.pathname.endsWith("/drs_workspace_grant_v2")) {
+        return jsonResponse({
+          authorized: true,
+          state: "AUTHORIZED_DRS_VERSIONED_WORKSPACE",
+          authenticated_user_id: PRINCIPAL.authenticatedUserId,
+          case_id: PRINCIPAL.expectedCaseId,
+          authorization_subject: AUTHORIZATION_SUBJECT,
+          grant_id: PRINCIPAL.grantId,
+          grant_version: PRINCIPAL.grantVersion,
+          grant_expires_at: grantExpiresAt,
+        });
+      }
+      if (url.pathname.endsWith("/server_document_operation_v1")) {
+        if (body.p_operation === "CREATE_UPLOAD_INTENT") {
+          const resource = JSON.parse(body.p_resource_ref);
+          return jsonResponse({
+            ok: true,
+            state: "UPLOAD_INTENT_CREATED",
+            intent_ref: resource.intentRef,
+          });
+        }
+        if (body.p_operation === "FINALIZE_UPLOAD") {
+          return jsonResponse({
+            ok: true,
+            state: "FORMAL_VERSION_CREATED",
+            document_ref: DOCUMENT_REF,
+            version_ref: VERSION_REF,
+            receipt_ref: RECEIPT_REF,
+          });
+        }
+        if (body.p_operation === "CREATE_SNAPSHOT") {
+          return jsonResponse({
+            ok: true,
+            state: "SNAPSHOT_RECORDED",
+            snapshot_ref: SNAPSHOT_REF,
+            receipt_ref: RECEIPT_REF,
+            canonical_payload_sha256: SHA,
+          });
+        }
+        if (body.p_operation === "DOWNLOAD_VERSION") {
+          return jsonResponse({
+            ok: true,
+            state: "DOWNLOAD_READY",
+            bucket_id: RECORDS_BUCKET,
+            object_key: RECORDS_KEY,
+          });
+        }
+      }
+    }
+    if (
+      url.origin === SUPABASE_ORIGIN &&
+      url.pathname.startsWith("/storage/v1/object/upload/sign/")
+    ) {
+      return jsonResponse({
+        url: `${
+          url.pathname.slice("/storage/v1".length)
+        }?token=opaque-test-token`,
+      });
+    }
+    if (
+      url.origin === SUPABASE_ORIGIN &&
+      url.pathname.startsWith(
+        `/storage/v1/object/authenticated/${RECORDS_BUCKET}/`,
+      )
+    ) {
+      return new Response(PDF_BYTES, {
+        status: 200,
+        headers: { "content-type": "application/pdf" },
+      });
+    }
+    if (url.href === `${SCANNER_ORIGIN}/v1/scan`) {
+      return jsonResponse(cleanReport());
+    }
+    throw new Error(`unexpected provider call ${url.pathname}`);
+  };
+  return Object.freeze({ calls, fetch });
+}
+
+async function createBrowserAuthorization(options) {
+  const runtime = createDrsSecureSessionRuntime(options);
+  assert.equal(runtime.runtimeAvailable, true);
+  const produced = await runtime.verifiedSessionProducer.createVerifiedSession({
+    authenticatedUserId: PRINCIPAL.authenticatedUserId,
+    specialistId: SPECIALIST_ID,
+    authorizationSubject: AUTHORIZATION_SUBJECT,
+    callbackOrigin: APP_ORIGIN,
+    successRedirectUrl: `${APP_ORIGIN}/specialist`,
+    sessionCookieName: SESSION_COOKIE_NAME,
+  });
+  const cookie = produced.response.headers.get("set-cookie")?.split(";", 1)[0];
+  assert.match(cookie, new RegExp(`^${SESSION_COOKIE_NAME}=v1\\.`));
+  const bootstrap = createDrsSessionBootstrapEndpoint(
+    runtime.bootstrapDependencies,
+  );
+  const response = await bootstrap(
+    new Request(`${APP_ORIGIN}/functions/v1/drs-session-bootstrap`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie,
+        origin: APP_ORIGIN,
+        "sec-fetch-site": "same-origin",
+      },
+      body: "{}",
+    }),
+  );
+  assert.equal(response.status, 204);
+  const authorization = response.headers.get("authorization");
+  assert.match(
+    authorization,
+    /^Bearer [A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/u,
+  );
+  return Object.freeze({ authorization, cookie });
+}
 
 async function sha256(bytes) {
   const digest = await crypto.subtle.digest(
@@ -106,27 +308,12 @@ function finalizeRequest() {
   };
 }
 
-async function importRequired(url, label) {
-  const imported = await import(`${url.href}?test=${crypto.randomUUID()}`)
-    .catch(
-      () => null,
-    );
-  assert.ok(imported, `${label} production module is absent`);
-  return imported;
-}
-
-Deno.test("focused RED: exact scanner and Edge runtime modules exist", async () => {
-  const scanner = await importRequired(SCANNER_RUNTIME_URL, "scanner runtime");
-  const edge = await importRequired(EDGE_RUNTIME_URL, "Edge runtime");
-  assert.equal(typeof scanner.createDrsDocumentScannerRuntime, "function");
-  assert.equal(typeof edge.createDrsDocumentEdgeRuntime, "function");
+Deno.test("focused RED: exact scanner and Edge runtime modules exist", () => {
+  assert.equal(typeof createDrsDocumentScannerRuntime, "function");
+  assert.equal(typeof createDrsDocumentEdgeRuntime, "function");
 });
 
 Deno.test("scanner derives identity from the exact bytes it scans and promotes that sealed byte sequence once", async () => {
-  const { createDrsDocumentScannerRuntime } = await importRequired(
-    SCANNER_RUNTIME_URL,
-    "scanner runtime",
-  );
   const scannerBodies = [];
   const recordBodies = [];
   const runtime = createDrsDocumentScannerRuntime({
@@ -204,10 +391,6 @@ Deno.test("scanner derives identity from the exact bytes it scans and promotes t
 });
 
 Deno.test("scanner seal rejects foreign targets, malformed reports, MIME mismatch and oversized streams", async () => {
-  const { createDrsDocumentScannerRuntime } = await importRequired(
-    SCANNER_RUNTIME_URL,
-    "scanner runtime",
-  );
   let mode = "clean";
   let cancelled = false;
   let pulls = 0;
@@ -275,10 +458,6 @@ Deno.test("scanner seal rejects foreign targets, malformed reports, MIME mismatc
 });
 
 Deno.test("scanner deadline covers streamed object bytes and cancels a stalled body", async () => {
-  const { createDrsDocumentScannerRuntime } = await importRequired(
-    SCANNER_RUNTIME_URL,
-    "scanner runtime",
-  );
   let cancelled = false;
   const runtime = createDrsDocumentScannerRuntime({
     env: env(),
@@ -324,7 +503,6 @@ Deno.test("scanner deadline covers streamed object bytes and cancels a stalled b
 });
 
 Deno.test("service requires A B C D E equality and never calls mutable-key promote on the sealed path", async () => {
-  const { createDocumentStorageService } = await import(SERVICE_URL.href);
   let executeCalls = 0;
   let legacyPromoteCalls = 0;
   let promoteSealedCalls = 0;
@@ -386,7 +564,6 @@ Deno.test("service requires A B C D E equality and never calls mutable-key promo
 });
 
 Deno.test("object swap before sealed promotion remains pending and performs no records write", async () => {
-  const { createDocumentStorageService } = await import(SERVICE_URL.href);
   let promoteCalls = 0;
   let executeCalls = 0;
   const service = createDocumentStorageService({
@@ -438,7 +615,6 @@ Deno.test("object swap before sealed promotion remains pending and performs no r
 });
 
 Deno.test("post-write mismatch requires durable orphan proof and never creates a formal version", async () => {
-  const { createDocumentStorageService } = await import(SERVICE_URL.href);
   let executeCalls = 0;
   let cleanupCalls = 0;
   const sequence = [
@@ -495,7 +671,6 @@ Deno.test("post-write mismatch requires durable orphan proof and never creates a
 });
 
 Deno.test("upload capability is projected only after the exact intent and signed response validate", async () => {
-  const { createDocumentStorageService } = await import(SERVICE_URL.href);
   const request = {
     schemaVersion: "laibe.drs-document-upload-intent.request.v1",
     mode: "NEW_DOCUMENT",
@@ -565,9 +740,167 @@ Deno.test("upload capability is projected only after the exact intent and signed
   }
 });
 
-Deno.test("default Edge composer is import-safe and fails closed without the exact runtime environment", async () => {
-  const edge = await importRequired(EDGE_RUNTIME_URL, "Edge runtime");
-  const composed = edge.createDrsDocumentEdgeRuntime(
+Deno.test("all four real handler factories validate before authority and compose the exact server runtime", async () => {
+  const now = new Date();
+  const harness = createProductionFetchHarness(now);
+  const options = Object.freeze({
+    env: productionEnvironment(),
+    fetch: harness.fetch,
+    crypto: globalThis.crypto,
+    now: () => new Date(now),
+  });
+  const browser = await createBrowserAuthorization(options);
+  const uploadBody = Object.freeze({
+    schemaVersion: "laibe.drs-document-upload-intent.request.v1",
+    mode: "NEW_DOCUMENT",
+    documentKind: "drs_review",
+    originalFilename: "review.pdf",
+    declaredMime: "application/pdf",
+    declaredSizeBytes: PDF_BYTES.byteLength,
+    declaredSha256: SHA,
+  });
+  const routes = [
+    Object.freeze({
+      name: "upload-intent",
+      factory: createDrsDocumentUploadIntentHandler,
+      path: "/functions/v1/drs-document-upload-intent",
+      method: "POST",
+      body: uploadBody,
+      status: 201,
+      state: "UPLOAD_INTENT_CREATED",
+      operation: "CREATE_UPLOAD_INTENT",
+      providerPath: "/storage/v1/object/upload/sign/",
+    }),
+    Object.freeze({
+      name: "upload-finalize",
+      factory: createDrsDocumentUploadFinalizeHandler,
+      path: "/functions/v1/drs-document-upload-finalize",
+      method: "POST",
+      body: finalizeRequest(),
+      status: 201,
+      state: "FORMAL_VERSION_CREATED",
+      operation: "FINALIZE_UPLOAD",
+      providerPath: "/rest/v1/rpc/server_document_operation_v1",
+    }),
+    Object.freeze({
+      name: "snapshot",
+      factory: createDrsDocumentSnapshotHandler,
+      path: "/functions/v1/drs-document-snapshot",
+      method: "POST",
+      body: Object.freeze({
+        schemaVersion: "laibe.drs-document-snapshot.request.v1",
+        purpose: "DECISION_BASIS",
+        versionRefs: Object.freeze([VERSION_REF]),
+        idempotencyKey: "snapshot-01j6a8k9m4q2w3e4",
+      }),
+      status: 201,
+      state: "SNAPSHOT_RECORDED",
+      operation: "CREATE_SNAPSHOT",
+      providerPath: "/rest/v1/rpc/server_document_operation_v1",
+    }),
+    Object.freeze({
+      name: "download",
+      factory: createDrsDocumentVersionDownloadHandler,
+      path: `/functions/v1/drs-document-version-download/${VERSION_REF}`,
+      method: "GET",
+      body: null,
+      status: 200,
+      state: null,
+      operation: "DOWNLOAD_VERSION",
+      providerPath: `/storage/v1/object/authenticated/${RECORDS_BUCKET}/`,
+    }),
+  ];
+
+  function request(route, overrides = {}) {
+    const method = overrides.method ?? route.method;
+    const body = overrides.body === undefined ? route.body : overrides.body;
+    const headers = new Headers({
+      authorization: browser.authorization,
+      cookie: browser.cookie,
+      origin: APP_ORIGIN,
+      "sec-fetch-site": "same-origin",
+      ...(method === "POST" && body !== null
+        ? { "content-type": "application/json" }
+        : {}),
+      ...overrides.headers,
+    });
+    return new Request(`${APP_ORIGIN}${overrides.path ?? route.path}`, {
+      method,
+      headers,
+      ...(method === "POST" && body !== null
+        ? { body: JSON.stringify(body) }
+        : {}),
+    });
+  }
+
+  for (const route of routes) {
+    const handler = route.factory(undefined, options);
+    const wrongMethod = route.method === "GET" ? "POST" : "GET";
+    const authorityBody = route.body === null
+      ? null
+      : { ...route.body, userId: PRINCIPAL.authenticatedUserId };
+    const invalid = [
+      request(route, { method: wrongMethod, body: null }),
+      request(route, { path: `${route.path}/wrong` }),
+      request(route, { path: `${route.path}?grantId=${PRINCIPAL.grantId}` }),
+      request(route, { headers: { "x-browser-role": "drs-specialist" } }),
+      route.body === null
+        ? request(route, { headers: { "content-type": "application/json" } })
+        : request(route, { body: authorityBody }),
+    ];
+    for (const hostile of invalid) {
+      harness.calls.length = 0;
+      const response = await handler(hostile);
+      assert.equal(response.status, 400, `${route.name} hostile request`);
+      assert.equal(harness.calls.length, 0, `${route.name} fetched too early`);
+    }
+
+    harness.calls.length = 0;
+    const response = await handler(request(route));
+    assert.equal(response.status, route.status, route.name);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const text = new TextDecoder().decode(bytes);
+    if (route.state) {
+      assert.equal(JSON.parse(text).state, route.state, route.name);
+    } else {
+      assert.deepEqual(bytes, PDF_BYTES, route.name);
+      assert.equal(response.headers.get("content-disposition"), "attachment");
+      assert.equal(response.headers.get("cache-control"), "private, no-store");
+    }
+    assert.equal(
+      text.includes("signedUploadUrl"),
+      route.name === "upload-intent",
+      route.name,
+    );
+    assert.equal(text.includes("opaque-test-service-role"), false, route.name);
+    assert.equal(text.includes("opaque-test-scanner-token"), false, route.name);
+    assert.equal(text.includes(browser.cookie), false, route.name);
+    const paths = harness.calls.map((call) => call.pathname);
+    for (
+      const required of [
+        "/rest/v1/rpc/drs_server_session_verify_v1",
+        "/rest/v1/rpc/drs_workspace_grant_v1",
+        "/rest/v1/rpc/drs_workspace_grant_v2",
+        "/rest/v1/rpc/server_document_operation_v1",
+      ]
+    ) {
+      assert.equal(paths.includes(required), true, `${route.name} ${required}`);
+    }
+    assert.equal(
+      harness.calls.some((call) => call.body?.p_operation === route.operation),
+      true,
+      `${route.name} repository operation`,
+    );
+    assert.equal(
+      paths.some((path) => path.startsWith(route.providerPath)),
+      true,
+      `${route.name} provider seam`,
+    );
+  }
+});
+
+Deno.test("default Edge composer is import-safe and fails closed without the exact runtime environment", () => {
+  const composed = createDrsDocumentEdgeRuntime(
     "uploadIntent",
     "/functions/v1/drs-document-upload-intent",
     { env: Object.freeze({ get: () => undefined }) },
