@@ -1739,21 +1739,33 @@ function assertExactSupabaseStartExclusions(ps) {
     "runtime acceptance remains the exact four admitted containers",
   );
 
-  const expectedVolumeAssignments = ast.assignments.filter((assignment) =>
-    assignment.owner === "Assert-OwnedRuntimeState" &&
-    assignment.leftVariable === "expectedVolumes"
-  );
-  assert.equal(
-    expectedVolumeAssignments.length,
-    1,
-    "one exact expected-volume assignment",
-  );
-  assert.equal(
-    normalizePowerShellAstText(expectedVolumeAssignments[0].rightText),
-    normalizePowerShellAstText(
-      '@("supabase_db_$ProjectId") | Sort-Object',
-    ),
-    "runtime acceptance admits exactly the hash-bound CLI db volume",
+  const normalizedVariableLeaf = (variable) =>
+    variable.toLowerCase().split(":").at(-1);
+  const expectedVolumeAssignments = ast.assignments
+    .filter((assignment) =>
+      assignment.owner?.toLowerCase() === "assert-ownedruntimestate" &&
+      assignment.leftVariable !== null &&
+      normalizedVariableLeaf(assignment.leftVariable) === "expectedvolumes"
+    )
+    .map((assignment) => ({
+      owner: assignment.owner.toLowerCase(),
+      leftType: assignment.leftType,
+      leftVariable: normalizedVariableLeaf(assignment.leftVariable),
+      rightText: normalizePowerShellAstText(assignment.rightText),
+    }));
+  assert.deepEqual(
+    expectedVolumeAssignments,
+    [
+      {
+        owner: "assert-ownedruntimestate",
+        leftType: "VariableExpressionAst",
+        leftVariable: "expectedvolumes",
+        rightText: normalizePowerShellAstText(
+          '@("supabase_db_$ProjectId") | Sort-Object',
+        ),
+      },
+    ],
+    "runtime acceptance admits one exact hash-bound CLI db-volume assignment",
   );
 }
 
@@ -4025,6 +4037,7 @@ test("S17-F2 Supabase start preserves exact exclusions containers and db-only vo
 
   const exactVolumeExpectation =
     '$expectedVolumes = @("supabase_db_$ProjectId") | Sort-Object';
+  const missedVolumeMutations = [];
   for (
     const [label, replacement] of [
       [
@@ -4035,14 +4048,28 @@ test("S17-F2 Supabase start preserves exact exclusions containers and db-only vo
         "MISSING_DB_VOLUME",
         "$expectedVolumes = @() | Sort-Object",
       ],
+      [
+        "CASE_EQUIVALENT_REBIND",
+        `${exactVolumeExpectation}\n$EXPECTEDVOLUMES = @("supabase_config_$ProjectId", "supabase_db_$ProjectId") | Sort-Object`,
+      ],
+      [
+        "LOCAL_QUALIFIED_REBIND",
+        `${exactVolumeExpectation}\n$local:expectedVolumes = @("supabase_config_$ProjectId", "supabase_db_$ProjectId") | Sort-Object`,
+      ],
     ]
   ) {
     const volumeMutation = ps.replace(exactVolumeExpectation, replacement);
     assert.notEqual(volumeMutation, ps, `${label}: mutation applied`);
-    assert.throws(
-      () => assertExactSupabaseStartExclusions(volumeMutation),
-      assert.AssertionError,
-      `${label}: exact owned-volume set rejected`,
-    );
+    try {
+      assertExactSupabaseStartExclusions(volumeMutation);
+      missedVolumeMutations.push(label);
+    } catch (error) {
+      if (!(error instanceof assert.AssertionError)) throw error;
+    }
   }
+  assert.deepEqual(
+    missedVolumeMutations,
+    [],
+    "exact owned-volume set rejects case-equivalent and scope-qualified rebinds",
+  );
 });
