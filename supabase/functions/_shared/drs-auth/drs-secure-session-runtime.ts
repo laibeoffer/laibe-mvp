@@ -34,6 +34,7 @@ const SESSION_TTL_SECONDS = 900;
 const PROOF_TTL_SECONDS = 60;
 const MAX_RPC_REQUEST_BYTES = 2048;
 const MAX_RPC_RESPONSE_BYTES = 8192;
+const RPC_OPERATION_TIMEOUT_MS = 5000;
 const MAX_COOKIE_BYTES = 4096;
 const MAX_PROOF_BYTES = 4096;
 const COOKIE_DOMAIN = "laibe.drs-server-session-cookie.v1";
@@ -368,12 +369,12 @@ function hasDuplicateTopLevelJsonMemberName(raw: string): boolean {
   return false;
 }
 
-async function cancelReader(
+function cancelReader(
   reader: ReadableStreamDefaultReader<Uint8Array> | null,
-): Promise<void> {
+): void {
   if (!reader) return;
   try {
-    await reader.cancel();
+    void Promise.resolve(reader.cancel()).catch(() => {});
   } catch {
     // Cancellation is best-effort after the request has already failed closed.
   }
@@ -385,6 +386,23 @@ function createBoundedRpcFetch(
   rawFetch: FetchLike,
 ): FetchLike {
   return async (input, init) => {
+    const controller = new AbortController();
+    const operationClock = Date.now;
+    const operationDeadline = operationClock() + RPC_OPERATION_TIMEOUT_MS;
+    const failIfDeadlineExpired = () => {
+      if (operationClock() >= operationDeadline) throw sanitizedFailure();
+    };
+    let rejectDeadline: (reason?: unknown) => void = () => {};
+    const deadlineFailure = new Promise<never>((_resolve, reject) => {
+      rejectDeadline = reject;
+    });
+    const failAtDeadline = () => rejectDeadline(sanitizedFailure());
+    controller.signal.addEventListener("abort", failAtDeadline, { once: true });
+    void deadlineFailure.catch(() => {});
+    const deadlineTimer = setTimeout(
+      () => controller.abort(),
+      Math.max(0, operationDeadline - operationClock()),
+    );
     let reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
     try {
       if (
@@ -413,16 +431,22 @@ function createBoundedRpcFetch(
         JSON.stringify(requestPayload) !== init.body
       ) throw sanitizedFailure();
 
-      const response = await rawFetch(`${supabaseOrigin}${path}`, {
-        method: "POST",
-        headers: {
-          "authorization": `Bearer ${serviceRoleKey}`,
-          "apikey": serviceRoleKey,
-          "content-type": "application/json",
-        },
-        body: init.body,
-        redirect: "error",
-      });
+      failIfDeadlineExpired();
+      const response = await Promise.race([
+        rawFetch(`${supabaseOrigin}${path}`, {
+          method: "POST",
+          headers: {
+            "authorization": `Bearer ${serviceRoleKey}`,
+            "apikey": serviceRoleKey,
+            "content-type": "application/json",
+          },
+          body: init.body,
+          redirect: "error",
+          signal: controller.signal,
+        }),
+        deadlineFailure,
+      ]);
+      failIfDeadlineExpired();
       if (!response.body) throw sanitizedFailure();
       reader = response.body.getReader();
       const status = response.status;
@@ -445,7 +469,9 @@ function createBoundedRpcFetch(
       const chunks: Uint8Array[] = [];
       let total = 0;
       while (true) {
-        const result = await reader.read();
+        failIfDeadlineExpired();
+        const result = await Promise.race([reader.read(), deadlineFailure]);
+        failIfDeadlineExpired();
         if (result.done) break;
         if (!(result.value instanceof Uint8Array)) throw sanitizedFailure();
         total += result.value.byteLength;
@@ -471,13 +497,18 @@ function createBoundedRpcFetch(
         payload === null || typeof payload !== "object" ||
         Array.isArray(payload)
       ) throw sanitizedFailure();
+      failIfDeadlineExpired();
       return new Response(bytes, {
         status,
         headers: { "content-type": "application/json" },
       });
     } catch {
-      await cancelReader(reader);
+      controller.abort();
+      cancelReader(reader);
       throw sanitizedFailure();
+    } finally {
+      clearTimeout(deadlineTimer);
+      controller.signal.removeEventListener("abort", failAtDeadline);
     }
   };
 }

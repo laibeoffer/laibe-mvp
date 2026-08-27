@@ -141,6 +141,129 @@ function validRuntime(module, overrides = {}) {
   });
 }
 
+function deferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
+}
+
+function installManualTimers() {
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
+  const originalAbortController = globalThis.AbortController;
+  const originalDateNow = Date.now;
+  const active = new Map();
+  const scheduled = [];
+  const cleared = [];
+  const abortListeners = new WeakMap();
+  let nextHandle = 1;
+  let clockNow = 0;
+
+  globalThis.AbortController = class extends originalAbortController {
+    constructor() {
+      super();
+      const signal = this.signal;
+      const added = [];
+      const removed = [];
+      const addEventListener = signal.addEventListener.bind(signal);
+      const removeEventListener = signal.removeEventListener.bind(signal);
+      abortListeners.set(signal, { added, removed });
+      Object.defineProperties(signal, {
+        addEventListener: {
+          configurable: true,
+          value(type, listener, options) {
+            if (type === "abort") added.push(listener);
+            return addEventListener(type, listener, options);
+          },
+        },
+        removeEventListener: {
+          configurable: true,
+          value(type, listener, options) {
+            if (type === "abort") removed.push(listener);
+            return removeEventListener(type, listener, options);
+          },
+        },
+      });
+    }
+  };
+  Date.now = () => clockNow;
+
+  globalThis.setTimeout = (callback, delay = 0, ...args) => {
+    const handle = nextHandle++;
+    scheduled.push({ handle, delay: Number(delay) });
+    active.set(handle, () => callback(...args));
+    return handle;
+  };
+  globalThis.clearTimeout = (handle) => {
+    cleared.push(handle);
+    active.delete(handle);
+  };
+
+  return {
+    scheduled,
+    cleared,
+    activeCount: () => active.size,
+    advance(milliseconds) {
+      assert.equal(Number.isFinite(milliseconds) && milliseconds >= 0, true);
+      clockNow += milliseconds;
+    },
+    abortListenerRecord(signal) {
+      return abortListeners.get(signal);
+    },
+    fire(handle = scheduled[0]?.handle) {
+      assert.notEqual(handle, undefined, "a finite operation timer must exist");
+      const callback = active.get(handle);
+      assert.equal(
+        typeof callback,
+        "function",
+        "operation timer must be active",
+      );
+      active.delete(handle);
+      callback();
+    },
+    restore() {
+      globalThis.setTimeout = originalSetTimeout;
+      globalThis.clearTimeout = originalClearTimeout;
+      globalThis.AbortController = originalAbortController;
+      Date.now = originalDateNow;
+    },
+  };
+}
+
+function assertOneFiniteDeadline(timers) {
+  assert.equal(timers.scheduled.length, 1, "one shared operation deadline");
+  assert.equal(Number.isFinite(timers.scheduled[0].delay), true);
+  assert.equal(timers.scheduled[0].delay > 0, true);
+}
+
+async function assertSanitizedFailure(operation) {
+  await assert.rejects(operation, (error) => {
+    assert.equal(error instanceof Error, true);
+    assert.equal(error.message, "DRS_SECURE_SESSION_UNAVAILABLE");
+    return true;
+  });
+}
+
+function assertAbortListenerCleaned(timers, signal) {
+  const record = timers.abortListenerRecord(signal);
+  assert.notEqual(
+    record,
+    undefined,
+    "the captured fetch signal is instrumented",
+  );
+  assert.equal(record.added.length, 1, "one abort listener added");
+  assert.equal(record.removed.length, 1, "one abort listener removed");
+  assert.equal(
+    record.removed[0],
+    record.added[0],
+    "the same listener is removed",
+  );
+}
+
 Deno.test("focused RED: secure-session runtime factory composes exact immutable server ports", async () => {
   const module = await api();
   const harness = createRpcHarness();
@@ -524,6 +647,327 @@ Deno.test("bounded RPC response reader rejects redirects, sizes, malformed strea
     accessToken: RAW_TOKEN,
   });
   assert.equal(noDeclaredLength.canceled(), 0);
+});
+
+Deno.test("bounded RPC aborts a fetch promise that never settles and fails sanitized", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  const fetchStarted = deferred();
+  let fetchSignal;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        fetchStarted.resolve();
+        return new Promise(() => {});
+      },
+    });
+    const operation = runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+    void operation.catch(() => {});
+    await fetchStarted.promise;
+
+    assertOneFiniteDeadline(timers);
+    assert.equal(fetchSignal instanceof AbortSignal, true);
+    timers.fire();
+    await assertSanitizedFailure(operation);
+    assert.equal(fetchSignal.aborted, true);
+    assert.equal(timers.activeCount(), 0);
+    assert.deepEqual(timers.cleared, [timers.scheduled[0].handle]);
+  } finally {
+    timers.restore();
+  }
+});
+
+Deno.test("bounded RPC cancels a stalled body reader and aborts its fetch signal", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  const readStarted = deferred();
+  let fetchSignal;
+  let cancelCount = 0;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        return Promise.resolve({
+          status: 200,
+          redirected: false,
+          headers: new Headers(),
+          body: {
+            getReader: () => ({
+              read() {
+                readStarted.resolve();
+                return new Promise(() => {});
+              },
+              cancel() {
+                cancelCount += 1;
+                return Promise.resolve();
+              },
+            }),
+          },
+        });
+      },
+    });
+    const operation = runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+    void operation.catch(() => {});
+    await readStarted.promise;
+
+    assertOneFiniteDeadline(timers);
+    timers.fire();
+    await assertSanitizedFailure(operation);
+    assert.equal(fetchSignal.aborted, true);
+    assert.equal(cancelCount, 1);
+    assert.equal(timers.activeCount(), 0);
+  } finally {
+    timers.restore();
+  }
+});
+
+Deno.test("bounded RPC fetch and every reader read consume one shared deadline", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  const fetchStarted = deferred();
+  const fetchResult = deferred();
+  const firstReadStarted = deferred();
+  const firstReadResult = deferred();
+  const secondReadStarted = deferred();
+  let fetchSignal;
+  let readCount = 0;
+  let cancelCount = 0;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        fetchStarted.resolve();
+        return fetchResult.promise;
+      },
+    });
+    const operation = runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+    void operation.catch(() => {});
+    await fetchStarted.promise;
+    assertOneFiniteDeadline(timers);
+
+    fetchResult.resolve({
+      status: 200,
+      redirected: false,
+      headers: new Headers(),
+      body: {
+        getReader: () => ({
+          read() {
+            readCount += 1;
+            if (readCount === 1) {
+              firstReadStarted.resolve();
+              return firstReadResult.promise;
+            }
+            secondReadStarted.resolve();
+            return new Promise(() => {});
+          },
+          cancel() {
+            cancelCount += 1;
+            return Promise.resolve();
+          },
+        }),
+      },
+    });
+    await firstReadStarted.promise;
+    assert.equal(
+      timers.scheduled.length,
+      1,
+      "fetch did not receive its own reset window",
+    );
+
+    firstReadResult.resolve({
+      done: false,
+      value: new TextEncoder().encode('{"revoked":true}'),
+    });
+    await secondReadStarted.promise;
+    assert.equal(
+      timers.scheduled.length,
+      1,
+      "reader reads did not receive reset windows",
+    );
+
+    timers.fire();
+    await assertSanitizedFailure(operation);
+    assert.equal(fetchSignal.aborted, true);
+    assert.equal(cancelCount, 1);
+    assert.equal(timers.activeCount(), 0);
+  } finally {
+    timers.restore();
+  }
+});
+
+Deno.test("bounded RPC success clears its one timer without aborting the fetch signal", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  let fetchSignal;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        return Promise.resolve(jsonResponse({ revoked: true }));
+      },
+    });
+    await runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+
+    assertOneFiniteDeadline(timers);
+    assert.equal(fetchSignal instanceof AbortSignal, true);
+    assert.equal(fetchSignal.aborted, false);
+    assert.equal(timers.activeCount(), 0);
+    assert.deepEqual(timers.cleared, [timers.scheduled[0].handle]);
+    assertAbortListenerCleaned(timers, fetchSignal);
+  } finally {
+    timers.restore();
+  }
+});
+
+Deno.test("bounded RPC rejects a late fetch resolution when its timer callback is delayed", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  const fetchStarted = deferred();
+  const fetchResult = deferred();
+  let fetchSignal;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        fetchStarted.resolve();
+        return fetchResult.promise;
+      },
+    });
+    const operation = runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+    void operation.catch(() => {});
+    await fetchStarted.promise;
+    assertOneFiniteDeadline(timers);
+
+    timers.advance(timers.scheduled[0].delay + 1);
+    fetchResult.resolve(jsonResponse({ revoked: true }));
+    await assertSanitizedFailure(operation);
+    assert.equal(fetchSignal.aborted, true);
+    assert.equal(timers.activeCount(), 0);
+    assert.deepEqual(timers.cleared, [timers.scheduled[0].handle]);
+    assertAbortListenerCleaned(timers, fetchSignal);
+  } finally {
+    timers.restore();
+  }
+});
+
+Deno.test("bounded RPC rejects a late reader result and cancels it when its timer callback is delayed", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  const readStarted = deferred();
+  const readResult = deferred();
+  let fetchSignal;
+  let readCount = 0;
+  let cancelCount = 0;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        return Promise.resolve({
+          status: 200,
+          redirected: false,
+          headers: new Headers(),
+          body: {
+            getReader: () => ({
+              read() {
+                readCount += 1;
+                if (readCount === 1) {
+                  readStarted.resolve();
+                  return readResult.promise;
+                }
+                return Promise.resolve({ done: true, value: undefined });
+              },
+              cancel() {
+                cancelCount += 1;
+                return Promise.resolve();
+              },
+            }),
+          },
+        });
+      },
+    });
+    const operation = runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+    void operation.catch(() => {});
+    await readStarted.promise;
+    assertOneFiniteDeadline(timers);
+
+    timers.advance(timers.scheduled[0].delay + 1);
+    readResult.resolve({
+      done: false,
+      value: new TextEncoder().encode('{"revoked":true}'),
+    });
+    await assertSanitizedFailure(operation);
+    assert.equal(fetchSignal.aborted, true);
+    assert.equal(cancelCount, 1);
+    assert.equal(timers.activeCount(), 0);
+    assert.deepEqual(timers.cleared, [timers.scheduled[0].handle]);
+    assertAbortListenerCleaned(timers, fetchSignal);
+  } finally {
+    timers.restore();
+  }
+});
+
+Deno.test("bounded RPC reader errors abort, cancel and remove cleanup resources with sanitized failure", async () => {
+  const module = await api();
+  const timers = installManualTimers();
+  let fetchSignal;
+  let cancelCount = 0;
+  try {
+    const runtime = validRuntime(module, {
+      fetch: (_input, init) => {
+        fetchSignal = init?.signal;
+        return Promise.resolve({
+          status: 200,
+          redirected: false,
+          headers: new Headers(),
+          body: {
+            getReader: () => ({
+              read() {
+                return Promise.reject(
+                  new Error("provider secret must not escape"),
+                );
+              },
+              cancel() {
+                cancelCount += 1;
+                return Promise.resolve();
+              },
+            }),
+          },
+        });
+      },
+    });
+    const operation = runtime.sessionRevoker.revokeServerSession({
+      serverSessionId: "44444444-4444-4444-8444-444444444444",
+      accessToken: RAW_TOKEN,
+    });
+
+    await assertSanitizedFailure(operation);
+    assert.equal(fetchSignal.aborted, true);
+    assert.equal(cancelCount, 1);
+    assert.equal(timers.activeCount(), 0);
+    assert.deepEqual(timers.cleared, [timers.scheduled[0].handle]);
+    assertAbortListenerCleaned(timers, fetchSignal);
+  } finally {
+    timers.restore();
+  }
 });
 
 Deno.test("server revoker validates its closed input, hashes the raw token, and accepts only own-key true", async () => {
