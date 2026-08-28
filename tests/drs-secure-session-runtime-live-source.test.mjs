@@ -9,8 +9,10 @@ import {
   request as httpRequest,
 } from "node:http";
 import { connect as connectPipe } from "node:net";
+import process from "node:process";
 import { PassThrough } from "node:stream";
 import test from "node:test";
+import { setImmediate } from "node:timers";
 
 import {
   classifyDockerRequestTarget,
@@ -4803,6 +4805,103 @@ test("S18-F6 upgrade-create is rejected before backend while non-create upgrade 
     assert.equal(backendUpgrades, 1);
   } finally {
     await proxy.close();
+    await closeServer(backend);
+  }
+});
+
+test("S18-F7 child output overflow settles every lifecycle promise and cleans the pipe", async () => {
+  const suffixBytes = Buffer.alloc(16, 0xcd);
+  const capability = createTaskPipeCapability({
+    randomBytesImpl: () => suffixBytes,
+  });
+  const backendPipe = uniquePipePath("overflow-backend");
+  const backend = createHttpServer((_request, response) => response.end("ok"));
+  backend.listen(backendPipe);
+  await once(backend, "listening");
+
+  const unhandledRejections = [];
+  const uncaughtExceptions = [];
+  const onUnhandledRejection = (reason) => unhandledRejections.push(reason);
+  const onUncaughtException = (error) => uncaughtExceptions.push(error);
+  process.on("unhandledRejection", onUnhandledRejection);
+  process.on("uncaughtException", onUncaughtException);
+  try {
+    for (const overflowStreamName of ["stdout", "stderr"]) {
+      let killRequests = 0;
+      let stdoutEnded = false;
+      let stderrEnded = false;
+      let caughtError = null;
+      const spawnImpl = () => {
+        const child = new EventEmitter();
+        child.stdout = new PassThrough();
+        child.stderr = new PassThrough();
+        child.stdout.once("end", () => {
+          stdoutEnded = true;
+        });
+        child.stderr.once("end", () => {
+          stderrEnded = true;
+        });
+        child.kill = () => {
+          killRequests += 1;
+          queueMicrotask(() => child.emit("close", null, "SIGTERM"));
+          setTimeout(() => {
+            child.stdout.end();
+            child.stderr.end();
+          }, 10);
+          return true;
+        };
+        queueMicrotask(() => {
+          child[overflowStreamName].write(Buffer.alloc(8_388_609, 0x78));
+        });
+        return child;
+      };
+
+      try {
+        await runDockerCliWithLoopbackProxy({
+          backendPipe,
+          childExecutable: String.raw`C:\bound\supabase.exe`,
+          childArguments: ["status"],
+          environment: { SystemRoot: String.raw`C:\WINDOWS` },
+          allowedContainerNames: loopbackProxyContainerNames,
+          randomBytesImpl: () => suffixBytes,
+          spawnImpl,
+        });
+      } catch (error) {
+        caughtError = error;
+      }
+      await new Promise((resolve) => setImmediate(resolve));
+
+      assert.equal(
+        caughtError?.message,
+        "A17_DOCKER_LOOPBACK_PROXY_OUTPUT_REJECTED",
+        `${overflowStreamName} overflow has stable precedence`,
+      );
+      assert.equal(
+        killRequests,
+        1,
+        `${overflowStreamName} requests termination`,
+      );
+      assert.equal(
+        stdoutEnded,
+        true,
+        "stdout collector settles before rejection",
+      );
+      assert.equal(
+        stderrEnded,
+        true,
+        "stderr collector settles before rejection",
+      );
+      assert.deepEqual(unhandledRejections, []);
+      assert.deepEqual(uncaughtExceptions, []);
+
+      const cleanupProof = createHttpServer();
+      cleanupProof.listen(capability.pipePath);
+      await once(cleanupProof, "listening");
+      await closeServer(cleanupProof);
+    }
+  } finally {
+    process.off("unhandledRejection", onUnhandledRejection);
+    process.off("uncaughtException", onUncaughtException);
     await closeServer(backend);
   }
 });

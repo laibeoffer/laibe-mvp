@@ -454,20 +454,28 @@ function collectChildOutput(stream, onOverflow) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let total = 0;
+    let settled = false;
     stream.on("data", (chunk) => {
+      if (settled) return;
       total += chunk.byteLength;
       if (total > MAX_CHILD_OUTPUT_BYTES) {
+        settled = true;
         onOverflow();
         reject(new Error("A17_DOCKER_LOOPBACK_PROXY_OUTPUT_REJECTED"));
         return;
       }
       chunks.push(chunk);
     });
-    stream.once("end", () => resolve(Buffer.concat(chunks, total)));
-    stream.once(
-      "error",
-      () => reject(new Error("A17_DOCKER_LOOPBACK_PROXY_OUTPUT_REJECTED")),
-    );
+    stream.once("end", () => {
+      if (settled) return;
+      settled = true;
+      resolve(Buffer.concat(chunks, total));
+    });
+    stream.once("error", () => {
+      if (settled) return;
+      settled = true;
+      reject(new Error("A17_DOCKER_LOOPBACK_PROXY_OUTPUT_REJECTED"));
+    });
   });
 }
 
@@ -527,7 +535,7 @@ export async function runDockerCliWithLoopbackProxy({
     };
     const stdoutPromise = collectChildOutput(child.stdout, stopChild);
     const stderrPromise = collectChildOutput(child.stderr, stopChild);
-    const childResult = await new Promise((resolve, reject) => {
+    const childResultPromise = new Promise((resolve, reject) => {
       child.once(
         "error",
         () => reject(new Error("A17_DOCKER_LOOPBACK_PROXY_CHILD_REJECTED")),
@@ -540,10 +548,21 @@ export async function runDockerCliWithLoopbackProxy({
         resolve(exitCode);
       });
     });
-    const [stdoutBytes, stderrBytes] = await Promise.all([
+    const [childResult, stdoutResult, stderrResult] = await Promise.allSettled([
+      childResultPromise,
       stdoutPromise,
       stderrPromise,
     ]);
+    if (
+      stdoutResult.status === "rejected" || stderrResult.status === "rejected"
+    ) {
+      fail("A17_DOCKER_LOOPBACK_PROXY_OUTPUT_REJECTED");
+    }
+    if (childResult.status === "rejected") {
+      fail("A17_DOCKER_LOOPBACK_PROXY_CHILD_REJECTED");
+    }
+    const stdoutBytes = stdoutResult.value;
+    const stderrBytes = stderrResult.value;
     const stdout = stdoutBytes.toString("utf8");
     const stderr = stderrBytes.toString("utf8");
     const suffix = capability.dockerHost.slice(-32);
@@ -556,7 +575,7 @@ export async function runDockerCliWithLoopbackProxy({
         fail("A17_DOCKER_LOOPBACK_PROXY_OUTPUT_REJECTED");
       }
     }
-    return { exitCode: childResult, stdout, stderr };
+    return { exitCode: childResult.value, stdout, stderr };
   } finally {
     await proxy.close();
   }
