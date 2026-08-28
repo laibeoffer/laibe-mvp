@@ -31,6 +31,12 @@ If instructions conflict, stop only the conflicting action, preserve the current
 - Ordinary authorized local edits, tests, and non-destructive technical choices do not require renewed Human approval.
 - Escalate only production secrets, production writes or deployment, destructive or irreversible actions, external paid accounts or coordination, product/legal/commercial decisions, real customer data authority, publication authority, or material scope expansion.
 
+### Hermes And Global Codex Safety
+
+- Hermes is optional. Never autonomously install, update, log in to, reset, or start Hermes or a persistent Hermes service.
+- Use Hermes only when the Owner explicitly requests it, or when the exact task requires it and the Hermes MCP is already available.
+- If Hermes is unavailable or unconfigured, report the missing configuration. Never autonomously change global Codex configuration or start multiple Hermes background services.
+
 ## 3. LaiBE DRS Product Identity
 
 LaiBE DRS is a renovation decision and case-record system. It is not a matching marketplace, low-price bidding platform, chat tool, cloud drive, payment or escrow service, investment product, or generic AI quotation tool.
@@ -412,10 +418,14 @@ Keep publication truth separate:
 ```text
 LOCAL_SOURCE_PASS != REMOTE_BRANCH_PUBLISHED
 REMOTE_BRANCH_PUBLISHED != PR_READY
-PR_READY != MERGED
+REMOTE_BRANCH_PUBLISHED != PR_CREATED
+PR_READY != PR_CREATED
+PR_CREATED != MERGED
 MERGED != DEPLOYED
 DEPLOYED != LAUNCHED
 ```
+
+`PR_READY` means only that an admitted candidate may be proposed for a PR; it does not mean a PR exists. Without an exact PR number and URL, report `PR_CREATED=FALSE`.
 
 After a non-force branch push, verify the exact remote ref SHA. Never describe branch publication as a PR, merge, deployment, admission, or launch.
 
