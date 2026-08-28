@@ -959,25 +959,28 @@ test("canonical runtime fails closed before browser storage, remote import, or f
 
 test("account access disables submission and shows truthful pending copy when canonical auth runtime is unavailable", async () => {
   const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?canonical-auth-pending=${Date.now()}`, import.meta.url));
-  const harness = createRegistrationDomHarness();
+  for (const search of ["", "?flow=password-recovery"]) {
+    const harness = createRegistrationDomHarness();
 
-  module.initAccountAccess(harness.rootDocument, {
-    authRuntimePromise: Promise.reject(new Error("AUTH_RUNTIME_UNAVAILABLE")),
-    location: { pathname: "/account/access/", search: "" },
-  });
-  await new Promise((resolve) => setImmediate(resolve));
+    module.initAccountAccess(harness.rootDocument, {
+      authRuntimePromise: Promise.reject(new Error("AUTH_RUNTIME_UNAVAILABLE")),
+      location: { pathname: "/account/access/", search, hash: "" },
+    });
+    await new Promise((resolve) => setImmediate(resolve));
 
-  for (const form of [
-    harness.form,
-    harness.loginForm,
-    harness.forgotForm,
-    harness.recoveryForm,
-  ]) {
-    assert.equal(form.querySelector("[data-submit-button]")?.disabled, true);
-    assert.match(
-      form.querySelector("[data-form-status]")?.textContent ?? "",
-      /帳號與案件權限確認正在整理中/u,
-    );
+    for (const form of [
+      harness.form,
+      harness.loginForm,
+      harness.forgotForm,
+      harness.recoveryForm,
+    ]) {
+      assert.equal(form.querySelector("[data-submit-button]")?.disabled, true, search);
+      assert.match(
+        form.querySelector("[data-form-status]")?.textContent ?? "",
+        /帳號與案件權限確認正在整理中/u,
+        search,
+      );
+    }
   }
 });
 

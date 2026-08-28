@@ -932,23 +932,7 @@ export function initAccountAccess(root = document, {
         }
       })
       .catch(() => {
-        if (!recoveryReturn) {
-          showAuthRuntimeUnavailable(root);
-          return;
-        }
-        setRecoveryFormState(root, {
-          message: "重設連結已失效，請重新寄送重設密碼信。",
-          tone: "error",
-        });
-        selectMode(root, "forgot");
-        const forgotForm = root.querySelector('[data-account-form="forgot"]');
-        if (forgotForm) {
-          setStatus(
-            forgotForm,
-            "重設連結已失效，請輸入帳號 Email 重新寄送。",
-            "error",
-          );
-        }
+        showAuthRuntimeUnavailable(root);
       });
   }
 }
