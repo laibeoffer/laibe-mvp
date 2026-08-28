@@ -65,25 +65,67 @@ async function readPageSource(directory, file) {
   return readFile(path.join(drsRoot, directory, file), "utf8");
 }
 
-function specialistWorkspaceProjection() {
+function specialistWorkspaceGrantResponse() {
   return {
-    ok: true,
-    kind: "specialist-workspace-projection",
-    schemaVersion: "laibe.drs-specialist-workspace-projection.v1",
-    authority: { state: "authorized", mode: "read_only", label: "已確認案件檢視權限" },
-    case: {
-      id: "11111111-1111-4111-8111-111111111111",
-      status: "REVIEW_IN_PROGRESS",
-      label: "已授權案件",
-      statusLabel: "審查進行中",
-    },
-    documents: { state: "pending", label: "尚未取得正式文件", items: [] },
-    next: {
-      actor: "drs_specialist",
-      actorLabel: "DRS 專員",
-      action: "REVIEW_AUTHORIZED_CASE_RECORDS",
-      actionLabel: "先核對文件來源與版本；正式文件資料尚未取得前，審查與送出維持停用。",
-    },
+    schemaVersion: "laibe.drs-workspace-auth.v1",
+    state: "AUTHORIZED_DRS_WORKSPACE",
+    case: { id: "11111111-1111-4111-8111-111111111111", status: "REVIEW_IN_PROGRESS" },
+    workspaceAccess: { accountRole: "drs", mode: "read_only", mutationAllowed: false, writeActionsEnabled: false },
+    next: { actor: "drs_specialist", action: "REVIEW_AUTHORIZED_CASE_RECORDS" },
+  };
+}
+
+function createSpecialistServerFetch(calls = []) {
+  return async (url, options = {}) => {
+    calls.push({ url, options });
+    if (url === "/functions/v1/drs-session-bootstrap") {
+      return {
+        status: 204,
+        headers: {
+          get(name) {
+            if (name === "authorization") return "Bearer header.payload.signature";
+            if (name === "x-laibe-session-expires-at") return "2099-01-01T00:00:00Z";
+            return null;
+          },
+        },
+      };
+    }
+    if (url === "/functions/v1/drs-workspace-grant") {
+      return { ok: true, async json() { return specialistWorkspaceGrantResponse(); } };
+    }
+    if (url === "/functions/v1/drs-google-calendar-grant") {
+      return {
+        ok: true,
+        async json() {
+          return {
+            state: "READY",
+            grant: {
+              schemaVersion: "laibe.drs-calendar-read.v1",
+              caseId: "11111111-1111-4111-8111-111111111111",
+              accessMode: "read_only",
+              connectionStatus: "connected",
+              timeZone: "Asia/Taipei",
+            },
+          };
+        },
+      };
+    }
+    if (url === "/functions/v1/drs-google-calendar-events-read") {
+      const window = JSON.parse(options.body);
+      return {
+        ok: true,
+        async json() {
+          return {
+            state: "READY",
+            caseId: "11111111-1111-4111-8111-111111111111",
+            timeZone: "Asia/Taipei",
+            window,
+            events: [],
+          };
+        },
+      };
+    }
+    throw new Error(`Unexpected specialist route: ${url}`);
   };
 }
 
@@ -284,16 +326,20 @@ async function flushAsyncWork() {
 }
 
 async function importWorkspaceForState(page, root, marker, state) {
-  const module = await import(`../src/stitch_laibe_landing_onboarding/drs_standalone/${page.directory}/app.js?${marker}=${Date.now()}-${page.key}`);
-  await flushAsyncWork();
-  if (state) {
-    if (page.key === "specialist" && state === "ready") {
-      assert.equal(module.bindSpecialistWorkspaceProjection(specialistWorkspaceProjection()), true, "specialist test ready state uses an admitted server projection");
-    }
-    await module.loadWorkspaceState(root, state);
+  const previousFetch = globalThis.fetch;
+  if (page.key === "specialist" && state === "ready") globalThis.fetch = createSpecialistServerFetch();
+  try {
+    const module = await import(`../src/stitch_laibe_landing_onboarding/drs_standalone/${page.directory}/app.js?${marker}=${Date.now()}-${page.key}`);
     await flushAsyncWork();
+    if (state) {
+      await module.loadWorkspaceState(root, state);
+      await flushAsyncWork();
+    }
+    return module;
+  } finally {
+    if (previousFetch === undefined) delete globalThis.fetch;
+    else globalThis.fetch = previousFetch;
   }
-  return module;
 }
 
 test("DRS W1 workspace candidate publishes three local static shells", async () => {
@@ -571,10 +617,7 @@ test("DRS specialist ready renderer opens only one panel from fail-closed markup
     assert.ok(fakeDocument.panels.every((panel) => panel.hidden), "fake static panels start hidden");
 
     globalThis.document = fakeDocument;
-    const module = await importWorkspaceForState(specialist, fakeDocument, "fail-closed-ready");
-    assert.equal(typeof module.bindSpecialistWorkspaceProjection, "function");
-    assert.equal(module.bindSpecialistWorkspaceProjection(specialistWorkspaceProjection()), true);
-    await module.loadWorkspaceState(fakeDocument, "ready");
+    await importWorkspaceForState(specialist, fakeDocument, "fail-closed-ready", "ready");
 
     assert.equal(fakeDocument.body.dataset.drsState, "ready");
     assert.ok(fakeDocument.tabs.every((tab) => !tab.disabled), "ready render enables case tabs");
@@ -734,8 +777,7 @@ test("DRS specialist runtime model excludes draft or unsent message data before 
       readyContentPanels: specialist.tabs,
     });
     globalThis.document = fakeDocument;
-    const module = await import(`../src/stitch_laibe_landing_onboarding/drs_standalone/${specialist.directory}/app.js?privacy-model=${Date.now()}`);
-    assert.equal(module.bindSpecialistWorkspaceProjection(specialistWorkspaceProjection()), true);
+    const module = await importWorkspaceForState(specialist, fakeDocument, "privacy-model", "ready");
     const model = await module.loadWorkspaceState(fakeDocument, "ready");
     const serialized = JSON.stringify(model);
 
@@ -747,7 +789,7 @@ test("DRS specialist runtime model excludes draft or unsent message data before 
   }
 });
 
-test("DRS specialist local review transition updates only formal review and trace state", async () => {
+test("DRS specialist module import exposes no local authority mutation client", async () => {
   const previousDocument = globalThis.document;
 
   try {
@@ -757,22 +799,14 @@ test("DRS specialist local review transition updates only formal review and trac
       readyContentPanels: specialist.tabs,
     });
     globalThis.document = fakeDocument;
-    const module = await import(`../src/stitch_laibe_landing_onboarding/drs_standalone/${specialist.directory}/app.js?local-client-transition=${Date.now()}`);
-    assert.equal(typeof module.createSpecialistWorkspaceClient, "function", "specialist app exposes a narrow local client factory for tests");
+    const module = await importWorkspaceForState(specialist, fakeDocument, "local-client-transition");
+    assert.equal(module.createSpecialistWorkspaceClient, undefined, "module callers cannot create or seed an authority-bearing workspace client");
+    assert.equal(module.bindSpecialistWorkspaceProjection, undefined, "module callers cannot bind a projection");
+    assert.equal(module.createSpecialistCalendarRuntime, undefined, "module callers cannot inject an authority transport");
+    assert.equal(module.bootstrapSpecialistCalendarRuntime, undefined, "module callers cannot restart the authority bootstrap");
 
-    const client = module.createSpecialistWorkspaceClient();
-    assert.equal(client.bindServerProjection(specialistWorkspaceProjection()), true);
-    const before = await client.loadWorkspace({ state: "ready" });
-    await client.transitionReviewItem({ itemId: "drawing-ceiling-v2", action: "mark-reviewed" });
-    const after = await client.loadWorkspace({ state: "ready" });
-    const serialized = JSON.stringify(after);
-
-    assert.deepEqual(before.messages, [], "local specialist model starts without message payloads");
-    assert.deepEqual(after.messages, [], "local specialist transition does not add message payloads");
-    assert.deepEqual(after.reviewQueue, [], "local transition cannot manufacture an authorized case queue");
-    assert.ok(after.traceEntries.length > before.traceEntries.length, "local transition appends trace state");
-    assert.match(after.traceEntries.at(-1)?.summary ?? "", /批次圖面檢視狀態已更新/u);
-    assert.doesNotMatch(serialized, /草稿|尚未公開|\bunsent\b|\bdraft\b|\btyping\b|hidden reasoning/u, "local transition state excludes draft or unsent payloads");
+    const model = await module.loadWorkspaceState(fakeDocument, "ready");
+    assert.equal(model.state, "permission-denied", "module import alone cannot manufacture an authorized case");
   } finally {
     if (previousDocument === undefined) delete globalThis.document;
     else globalThis.document = previousDocument;
@@ -1151,6 +1185,7 @@ test("DRS specialist desk keeps AI advisory and Human audit authority product-sa
   assert.match(decisionBandText, /AI 只提醒可能風險與缺漏/u, "first-view decision band explains AI advisory boundary");
   assert.match(decisionBandText, /不能核准、否決、送出或覆核/u, "first-view decision band says AI cannot approve, veto, send, or review");
   assert.match(decisionBandText, /所有決策與留痕都由人類 DRS 完成/u, "first-view decision band explains Human-only control authority");
+  assert.equal((decisionBandText.match(/AI 只/gu) ?? []).length, 1, "the first-view AI authority restriction is stated once without duplicate copy");
   assert.match(visibleText, /取消本次送出|編輯後送出|覆核後送出|建立人工例外紀錄/u, "the review desk names Human-only decisions");
   assert.doesNotMatch(visibleText, /AI\s*(?:核准|否決|送出)|自動核准|自動否決|自動送出/u);
   for (const copy of ["正式權限與稽核紀錄尚未取得", "此操作目前只保留在本頁", "目前審核依據", "對話來源", "處理結果", "下一步責任人"]) {
@@ -1183,26 +1218,47 @@ test("DRS specialist document workspace identifies every review source and its h
   assert.doesNotMatch(visibleHtmlText(html), /已完成真實文件比對|已讀取正式 PDF/u);
 });
 
-test("focused RED: specialist case content requires an admitted projection and never accepts browser authority", async () => {
+test("focused RED: specialist ready state requires strict server transport and exposes no authority binder", async () => {
   const previousDocument = globalThis.document;
+  const previousFetch = globalThis.fetch;
+  const previousLocalStorage = globalThis.localStorage;
+  const previousSessionStorage = globalThis.sessionStorage;
   try {
     const specialist = pages.find((page) => page.key === "specialist");
-    const fakeDocument = new FakeDocument(specialist, {
+    const deniedDocument = new FakeDocument(specialist, {
       search: "?caseId=attacker&specialistId=attacker&grant=attacker",
       readyContentCount: 3,
       readyContentPanels: specialist.tabs,
       failClosed: true,
     });
-    globalThis.document = fakeDocument;
-    const module = await importWorkspaceForState(specialist, fakeDocument, "projection-gate");
+    deniedDocument.body.dataset.caseId = "attacker";
+    deniedDocument.body.dataset.specialistId = "attacker";
+    deniedDocument.body.dataset.grant = "attacker";
+    globalThis.document = deniedDocument;
+    globalThis.localStorage = { getItem: () => JSON.stringify({ caseId: "attacker", grant: "attacker" }) };
+    globalThis.sessionStorage = { getItem: () => JSON.stringify({ caseId: "attacker", grant: "attacker" }) };
+    globalThis.fetch = async () => { throw new Error("server unavailable"); };
+    const deniedModule = await importWorkspaceForState(specialist, deniedDocument, "projection-gate-denied");
 
-    const denied = await module.loadWorkspaceState(fakeDocument, "ready");
+    const denied = await deniedModule.loadWorkspaceState(deniedDocument, "ready");
     assert.equal(denied.state, "permission-denied");
-    assert.ok(fakeDocument.readyContent.every((element) => element.hidden));
-    assert.equal(typeof module.bindSpecialistWorkspaceProjection, "function");
-    assert.equal(module.bindSpecialistWorkspaceProjection(specialistWorkspaceProjection()), true);
+    assert.ok(deniedDocument.readyContent.every((element) => element.hidden));
+    for (const exportedAuthoritySeam of ["bindSpecialistWorkspaceProjection", "createSpecialistWorkspaceClient", "createSpecialistCalendarRuntime", "bootstrapSpecialistCalendarRuntime"]) {
+      assert.equal(deniedModule[exportedAuthoritySeam], undefined, `${exportedAuthoritySeam} is private to the production bootstrap`);
+    }
 
-    const admitted = await module.loadWorkspaceState(fakeDocument, "ready");
+    const serverCalls = [];
+    const admittedDocument = new FakeDocument(specialist, {
+      search: "?caseId=attacker&specialistId=attacker&grant=attacker",
+      readyContentCount: 3,
+      readyContentPanels: specialist.tabs,
+      failClosed: true,
+    });
+    globalThis.document = admittedDocument;
+    globalThis.fetch = createSpecialistServerFetch(serverCalls);
+    const admittedModule = await import(`../src/stitch_laibe_landing_onboarding/drs_standalone/${specialist.directory}/app.js?projection-gate-admitted=${Date.now()}`);
+    await flushAsyncWork();
+    const admitted = await admittedModule.loadWorkspaceState(admittedDocument, "ready");
     assert.equal(admitted.state, "ready");
     assert.deepEqual(admitted.case, {
       caseId: "11111111-1111-4111-8111-111111111111",
@@ -1213,13 +1269,25 @@ test("focused RED: specialist case content requires an admitted projection and n
       nextAction: "先核對文件來源與版本；正式文件資料尚未取得前，審查與送出維持停用。",
     });
     assert.deepEqual(admitted.documents, { state: "pending", label: "尚未取得正式文件", items: [] });
-    assert.doesNotMatch(fakeDocument.bound.get("case-name")[0].textContent, /11111111|attacker/u);
+    assert.doesNotMatch(admittedDocument.bound.get("case-name")[0].textContent, /11111111|attacker/u);
+    assert.deepEqual(serverCalls.filter(({ url }) => url === "/functions/v1/drs-workspace-grant").map(({ options }) => ({
+      method: options.method,
+      credentials: options.credentials,
+      body: options.body,
+    })), [{ method: "POST", credentials: "same-origin", body: "{}" }], "ready follows exactly one strict workspace-grant transport call");
+    assert.equal(serverCalls.some(({ url }) => /\/api\/drs\/(?:documents|document-versions|document-snapshots)/u.test(url)), false, "authority bootstrap makes no document route call");
 
     const script = await readPageSource("specialist_workspace", "app.js");
     assert.doesNotMatch(script, /URLSearchParams|location\.search|localStorage|sessionStorage|dataset\.(?:caseId|specialistId|assignmentId|grant|documentRef|bucket|path)/u);
   } finally {
     if (previousDocument === undefined) delete globalThis.document;
     else globalThis.document = previousDocument;
+    if (previousFetch === undefined) delete globalThis.fetch;
+    else globalThis.fetch = previousFetch;
+    if (previousLocalStorage === undefined) delete globalThis.localStorage;
+    else globalThis.localStorage = previousLocalStorage;
+    if (previousSessionStorage === undefined) delete globalThis.sessionStorage;
+    else globalThis.sessionStorage = previousSessionStorage;
   }
 });
 
@@ -1238,7 +1306,7 @@ test("focused RED: document review stays pending without route calls and names e
     assert.match(visibleText, new RegExp(copy, "u"), `document decision state ${copy}`);
   }
   assert.match(visibleText, /草稿不是正式案件紀錄/u);
-  assert.match(visibleText, /AI 只整理與提醒，不能替人核准、否決或送出/u);
+  assert.match(visibleText, /AI 只提醒可能風險與缺漏，不能核准、否決、送出或覆核/u);
   assert.doesNotMatch(visibleText, forbiddenUserCopy);
 });
 

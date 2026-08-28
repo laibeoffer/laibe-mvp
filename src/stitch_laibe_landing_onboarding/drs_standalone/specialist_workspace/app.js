@@ -361,8 +361,8 @@ function sourceCaseFromServerProjection(projection) {
   };
 }
 
-function createSpecialistWorkspaceClient(sourceCase = SPECIALIST_SOURCE_CASE) {
-  let activeSourceCase = clone(sourceCase);
+function createSpecialistWorkspaceClient() {
+  let activeSourceCase = clone(SPECIALIST_SOURCE_CASE);
   let reviewQueue = clone(activeSourceCase.reviewQueue);
   let traceEntries = clone(activeSourceCase.traceEntries);
 
@@ -389,25 +389,25 @@ function createSpecialistWorkspaceClient(sourceCase = SPECIALIST_SOURCE_CASE) {
     };
   }
 
-  return {
+  function acceptTransportProjection(projection) {
+    const nextSourceCase = sourceCaseFromServerProjection(projection);
+    if (!nextSourceCase) {
+      activeSourceCase = clone(SPECIALIST_SOURCE_CASE);
+      reviewQueue = [];
+      traceEntries = [];
+      return false;
+    }
+    activeSourceCase = nextSourceCase;
+    reviewQueue = [];
+    traceEntries = [];
+    return true;
+  }
+
+  const client = Object.freeze({
     async loadWorkspace({ state = "ready" } = {}) {
       if (state === "loading" || state === "empty" || state === "retryable-error" || state === "permission-denied" || state === "disconnected") return stateModel(state);
       if (!activeSourceCase.case.caseId) return stateModel("permission-denied", PRODUCT_STATES["permission-denied"]);
       return readyModel();
-    },
-
-    bindServerProjection(projection) {
-      const nextSourceCase = sourceCaseFromServerProjection(projection);
-      if (!nextSourceCase) {
-        activeSourceCase = clone(SPECIALIST_SOURCE_CASE);
-        reviewQueue = [];
-        traceEntries = [];
-        return false;
-      }
-      activeSourceCase = nextSourceCase;
-      reviewQueue = [];
-      traceEntries = [];
-      return true;
     },
 
     async transitionReviewItem({ itemId, action }) {
@@ -432,7 +432,9 @@ function createSpecialistWorkspaceClient(sourceCase = SPECIALIST_SOURCE_CASE) {
         },
       };
     },
-  };
+  });
+
+  return Object.freeze({ client, acceptTransportProjection });
 }
 
 function createSpecialistCalendarIntegration({ workspaceTransport, calendarTransport, navigate }) {
@@ -813,7 +815,7 @@ function createSpecialistCalendarRuntime({
     }
     const result = await integration.initialize(requestedWindow);
     const integrationState = integration.getState();
-    const projectionAccepted = bindSpecialistWorkspaceProjection(integration.getWorkspaceProjection());
+    const projectionAccepted = specialistWorkspaceController.acceptTransportProjection(integration.getWorkspaceProjection());
     if (projectionAccepted) await loadWorkspaceState(root, "ready");
     if (result.ok) {
       renderCalendarState(root, "connected", integrationState);
@@ -882,11 +884,8 @@ function bootstrapSpecialistCalendarRuntime(root = document) {
   return runtime;
 }
 
-const drsClient = createSpecialistWorkspaceClient();
-
-function bindSpecialistWorkspaceProjection(projection) {
-  return drsClient.bindServerProjection(projection);
-}
+const specialistWorkspaceController = createSpecialistWorkspaceClient();
+const drsClient = specialistWorkspaceController.client;
 
 function setWorkspaceState(root, message) {
   const live = root.querySelector("[data-drs-live]");
@@ -1542,4 +1541,4 @@ function bindWorkspaceActions(root = document) {
 bindWorkspaceActions();
 bootstrapSpecialistCalendarRuntime();
 
-export { AI_REVIEW_STATES, DRS_WORKSPACE_VIEW_MODEL, bindSpecialistWorkspaceProjection, bindWorkspaceActions, bootstrapSpecialistCalendarRuntime, buildPreSendSnapshot, cancelValues, createInitialReviewIssue, createSpecialistCalendarIntegration, createSpecialistCalendarRuntime, createSpecialistWorkspaceClient, invalidateSnapshotModel, loadWorkspaceState, manualExceptionValues, markReviewDraftDirty, renderCalendarState, requestPeerReview, reviewIssueAllowsPreSend, saveReviewDraft, setGovernanceView, setWorkbenchMode, setWorkspaceState, transitionReviewIssueModel, updateCancelAction, updateManualExceptionAction };
+export { AI_REVIEW_STATES, DRS_WORKSPACE_VIEW_MODEL, bindWorkspaceActions, buildPreSendSnapshot, cancelValues, createInitialReviewIssue, createSpecialistCalendarIntegration, invalidateSnapshotModel, loadWorkspaceState, manualExceptionValues, markReviewDraftDirty, renderCalendarState, requestPeerReview, reviewIssueAllowsPreSend, saveReviewDraft, setGovernanceView, setWorkbenchMode, setWorkspaceState, transitionReviewIssueModel, updateCancelAction, updateManualExceptionAction };
