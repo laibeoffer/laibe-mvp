@@ -1,8 +1,23 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
+import { EventEmitter, once } from "node:events";
 import { existsSync, readFileSync } from "node:fs";
+import {
+  createServer as createHttpServer,
+  request as httpRequest,
+} from "node:http";
+import { connect as connectPipe } from "node:net";
+import { PassThrough } from "node:stream";
 import test from "node:test";
+
+import {
+  classifyDockerRequestTarget,
+  createDockerLoopbackProxyServer,
+  createTaskPipeCapability,
+  rewriteContainerCreateRequest,
+  runDockerCliWithLoopbackProxy,
+} from "../scripts/a17-docker-loopback-api-proxy.mjs";
 
 const root = new URL("../", import.meta.url);
 const baseline = "d0571b467b0f75439a7773b300febbcfe8069cd1";
@@ -10,7 +25,8 @@ const confirmationName = "A17_S1AR_RUNTIME_CONFIRMED";
 const confirmationValue =
   "A17_S1AR_DISPOSABLE_LOCAL_RUNTIME_CONFIRMED_20260827_V1";
 
-const exactSix = Object.freeze([
+const exactSeven = Object.freeze([
+  "scripts/a17-docker-loopback-api-proxy.mjs",
   "scripts/test-drs-secure-session-runtime-live-w1.ps1",
   "supabase/functions/_shared/drs-auth/drs-secure-session-runtime.ts",
   "supabase/tests/drs_secure_session_runtime_composition_w1.test.mjs",
@@ -29,6 +45,10 @@ const protectedExactThree = Object.freeze({
 });
 
 const urls = Object.freeze({
+  proxy: new URL(
+    "scripts/a17-docker-loopback-api-proxy.mjs",
+    root,
+  ),
   powershell: new URL(
     "scripts/test-drs-secure-session-runtime-live-w1.ps1",
     root,
@@ -1167,8 +1187,12 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
   }));
   const supabaseCliDetails = closedDetails.filter(({ parameters }) => {
     const filePath = parameters.get("FilePath");
+    const argumentsValue = parameters.get("Arguments");
     return filePath?.variables.length === 1 &&
-      filePath.variables[0].path.toLowerCase() === "supabaseexecutable";
+      filePath.variables[0].path.toLowerCase() === "nodeexecutable" &&
+      argumentsValue?.literals[0]?.value === "--supabase-executable" &&
+      argumentsValue?.literals[1]?.value === "--project-id" &&
+      argumentsValue?.literals[2]?.value === "--";
   }).map(({ command, parameters }) => {
     const filePath = parameters.get("FilePath");
     const argumentsValue = parameters.get("Arguments");
@@ -1185,7 +1209,10 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
       filePath,
       argumentsValue,
       environment,
-      action: argumentsValue.literals[0]?.value ?? null,
+      action: argumentsValue.literals[3]?.value ?? null,
+      argumentVariables: argumentsValue.variables.map((variable) =>
+        variable.path.toLowerCase()
+      ),
     };
   });
   assert.deepEqual(
@@ -1206,7 +1233,7 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
         owner: "Invoke-ExactProjectStopCleanup",
         action: "stop",
         filePathType: "VariableExpressionAst",
-        filePathVariables: ["supabaseexecutable"],
+        filePathVariables: ["nodeexecutable"],
         environmentType: "HashtableAst",
         environmentVariables: ["systemrootpath"],
       },
@@ -1214,7 +1241,7 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
         owner: null,
         action: "start",
         filePathType: "VariableExpressionAst",
-        filePathVariables: ["supabaseexecutable"],
+        filePathVariables: ["nodeexecutable"],
         environmentType: "VariableExpressionAst",
         environmentVariables: ["supabaseprocessenvironment"],
       },
@@ -1222,12 +1249,48 @@ function assertExactSupabaseCliEnvironment(ps, nativeAst = null) {
         owner: null,
         action: "status",
         filePathType: "VariableExpressionAst",
-        filePathVariables: ["supabaseexecutable"],
+        filePathVariables: ["nodeexecutable"],
         environmentType: "VariableExpressionAst",
         environmentVariables: ["supabaseprocessenvironment"],
       },
     ],
     "every reachable Supabase CLI child uses the one admitted environment route",
+  );
+  assert.deepEqual(
+    supabaseCliDetails.map((detail) => ({
+      action: detail.action,
+      variables: detail.argumentVariables,
+    })),
+    [
+      {
+        action: "stop",
+        variables: [
+          "dockerloopbackproxypath",
+          "supabaseexecutable",
+          "projectid",
+          "projectid",
+        ],
+      },
+      {
+        action: "start",
+        variables: [
+          "dockerloopbackproxypath",
+          "supabaseexecutable",
+          "projectid",
+          "runtimeroot",
+        ],
+      },
+      {
+        action: "status",
+        variables: [
+          "dockerloopbackproxypath",
+          "supabaseexecutable",
+          "projectid",
+          "runtimeroot",
+        ],
+      },
+    ],
+    "every Supabase child is routed through the exact proxy prelude",
   );
 
   const exactEnvironmentEntries = [
@@ -1740,14 +1803,20 @@ function assertExactSupabaseStartExclusions(ps) {
       const filePath = parameters.get("FilePath");
       const argumentsValue = parameters.get("Arguments");
       return filePath?.variables.length === 1 &&
-        filePath.variables[0].path.toLowerCase() === "supabaseexecutable" &&
-        argumentsValue?.literals[0]?.value === "start";
+        filePath.variables[0].path.toLowerCase() === "nodeexecutable" &&
+        argumentsValue?.literals[0]?.value === "--supabase-executable" &&
+        argumentsValue?.literals[1]?.value === "--project-id" &&
+        argumentsValue?.literals[2]?.value === "--" &&
+        argumentsValue?.literals[3]?.value === "start";
     });
   assert.equal(startCalls.length, 1, "one reachable Supabase start child");
   const startArguments = startCalls[0].parameters.get("Arguments");
   assert.deepEqual(
     startArguments.literals.map((literal) => literal.value),
     [
+      "--supabase-executable",
+      "--project-id",
+      "--",
       "start",
       "--workdir",
       "--exclude",
@@ -1757,7 +1826,12 @@ function assertExactSupabaseStartExclusions(ps) {
   );
   assert.deepEqual(
     startArguments.variables.map((variable) => variable.path.toLowerCase()),
-    ["runtimeroot"],
+    [
+      "dockerloopbackproxypath",
+      "supabaseexecutable",
+      "projectid",
+      "runtimeroot",
+    ],
     "Supabase start uses only the exact runtime-root argument variable",
   );
 
@@ -1948,7 +2022,7 @@ test("focused RED: the exact three live harness seams exist", () => {
   assert.equal(existsSync(urls.deno), true, urls.deno.pathname);
 });
 
-test("candidate changes are exact-six and accepted exact-three bytes remain immutable", () => {
+test("candidate changes are exact-seven and accepted exact-three bytes remain immutable", () => {
   const trackedChanged = execFileSync(
     "git",
     ["diff", "--name-only", baseline, "--"],
@@ -1960,7 +2034,7 @@ test("candidate changes are exact-six and accepted exact-three bytes remain immu
     { cwd: root, encoding: "utf8" },
   ).trim().split(/\r?\n/u).filter(Boolean).sort();
   const changed = [...new Set([...trackedChanged, ...untrackedChanged])].sort();
-  assert.deepEqual(changed, [...exactSix].sort());
+  assert.deepEqual(changed, [...exactSeven].sort());
 
   for (const [path, expected] of Object.entries(protectedExactThree)) {
     assert.equal(sha256(new URL(path, root)), expected, path);
@@ -2210,7 +2284,7 @@ test("R1 runtime identity is activation-supplied, revalidated, and followed by o
     ps,
     [
       'Assert-SourceIdentity -Stage "pre-start"',
-      '@("start", "--workdir", $runtimeRoot',
+      '\'--\', "start", "--workdir", $runtimeRoot',
       "Assert-OwnedRuntimeState -RequireExact",
       "drs_secure_session_runtime_live_pg_w1.sql",
     ],
@@ -2226,7 +2300,7 @@ test("R2 cleanup is primary-first, exhaustive, transactional, and emits one term
     ps,
     [
       "$startAttempted = $true",
-      '@("start", "--workdir", $runtimeRoot',
+      '\'--\', "start", "--workdir", $runtimeRoot',
       "$primaryResult =",
       "finally {",
       "Assert-HarnessCleanupReadback",
@@ -2994,7 +3068,10 @@ test("S5-F1 every closed child process is deadline-bounded and disposed before s
     ps.indexOf("function Invoke-ExactProjectStopCleanup"),
     ps.indexOf("if ([Environment]::GetEnvironmentVariable"),
   );
-  assert.match(stopCleanup, /Invoke-ClosedProcess[\s\S]*supabase[\s\S]*stop/iu);
+  assert.match(
+    stopCleanup,
+    /Invoke-ClosedProcess[\s\S]*nodeExecutable[\s\S]*dockerLoopbackProxyPath[\s\S]*supabase-executable[\s\S]*stop/iu,
+  );
   assert.doesNotMatch(stopCleanup, /Start-Process|&\s*\$SupabaseExecutable/u);
   assert.match(
     ps,
@@ -3491,7 +3568,7 @@ test("S12-F1 every closed-process argument array is a legal named-parameter valu
     'Invoke-GitIdentity -Arguments @("rev-list", "--parents", "-n", "1", "HEAD")',
     'Invoke-GitIdentity -Arguments @("diff", "--cached", "--name-only")',
     'Invoke-GitIdentity -Arguments @("ls-files", "--others", "--exclude-standard")',
-    "Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @(\"start\", \"--workdir\", $runtimeRoot, '--exclude', 'studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta')",
+    "Invoke-ClosedProcess -FilePath $nodeExecutable -Arguments @($dockerLoopbackProxyPath, '--supabase-executable', $SupabaseExecutable, '--project-id', $ProjectId, '--', \"start\", \"--workdir\", $runtimeRoot, '--exclude', 'studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta')",
   ];
   assert.equal(correctedSites.length, 7);
   for (const site of correctedSites) {
@@ -4219,5 +4296,426 @@ test("S17-F2 Supabase start preserves exact exclusions containers and db-only vo
     missedPipelineInputObjectGates,
     [],
     "PIPELINE_INPUTOBJECT_ALIAS_WRITE is rejected by both canonical resource gates",
+  );
+});
+
+const loopbackProxyProjectId = "a17-s1ar-20260827";
+const loopbackProxyContainerNames = Object.freeze([
+  `supabase_auth_${loopbackProxyProjectId}`,
+  `supabase_db_${loopbackProxyProjectId}`,
+  `supabase_kong_${loopbackProxyProjectId}`,
+  `supabase_rest_${loopbackProxyProjectId}`,
+]);
+const canonicalCreateTarget =
+  `/v1.51/containers/create?name=supabase_db_${loopbackProxyProjectId}`;
+
+function dockerCreateBody(hostIp = "") {
+  return Buffer.from(
+    JSON.stringify({
+      Image: "immutable-local-image",
+      HostConfig: {
+        PortBindings: {
+          "5432/tcp": [{ HostIp: hostIp, HostPort: "54322" }],
+        },
+      },
+    }),
+    "utf8",
+  );
+}
+
+function exactJsonRawHeaders(body) {
+  return [
+    "Content-Type",
+    "application/json",
+    "Content-Length",
+    String(body.byteLength),
+  ];
+}
+
+function uniquePipePath(label) {
+  return `\\\\.\\pipe\\a17-s1ar-${label}-${randomBytes(16).toString("hex")}`;
+}
+
+async function closeServer(server) {
+  if (!server.listening) return;
+  server.close();
+  await once(server, "close");
+}
+
+function requestOverPipe({ pipePath, method, target, body, rawHeaders }) {
+  return new Promise((resolve, reject) => {
+    const headers = {};
+    for (let index = 0; index < rawHeaders.length; index += 2) {
+      const name = rawHeaders[index];
+      const value = rawHeaders[index + 1];
+      if (Object.hasOwn(headers, name)) {
+        headers[name] = Array.isArray(headers[name])
+          ? [...headers[name], value]
+          : [headers[name], value];
+      } else {
+        headers[name] = value;
+      }
+    }
+    const request = httpRequest(
+      { socketPath: pipePath, method, path: target, headers },
+      (response) => {
+        const chunks = [];
+        response.on("data", (chunk) => chunks.push(chunk));
+        response.on("end", () =>
+          resolve({
+            statusCode: response.statusCode,
+            body: Buffer.concat(chunks).toString("utf8"),
+          }));
+      },
+    );
+    request.once("error", reject);
+    request.end(body);
+  });
+}
+
+function fakeChildProcess({ stdout = "", stderr = "", exitCode = 0 }) {
+  const child = new EventEmitter();
+  child.stdout = new PassThrough();
+  child.stderr = new PassThrough();
+  child.kill = () => true;
+  queueMicrotask(() => {
+    child.stdout.end(stdout);
+    child.stderr.end(stderr);
+    child.emit("close", exitCode, null);
+  });
+  return child;
+}
+
+test("S18-F1 Docker create routing is canonical and every alias fails before backend", () => {
+  assert.deepEqual(
+    classifyDockerRequestTarget({
+      method: "POST",
+      target: canonicalCreateTarget,
+      allowedContainerNames: loopbackProxyContainerNames,
+    }),
+    {
+      kind: "container-create",
+      containerName: `supabase_db_${loopbackProxyProjectId}`,
+    },
+  );
+
+  assert.deepEqual(
+    classifyDockerRequestTarget({
+      method: "GET",
+      target: "/v1.51/containers/json?all=1",
+      allowedContainerNames: loopbackProxyContainerNames,
+    }),
+    { kind: "passthrough" },
+  );
+
+  for (
+    const target of [
+      `/containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `http://docker/v1.51/containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51/CONTAINERS/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51/containers/%63reate?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51/containers%2fcreate?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51/ignored/../containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51//containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51\\containers\\create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v01.51/containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.051/containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51/containers/create?name=supabase_db_${loopbackProxyProjectId}&name=supabase_db_${loopbackProxyProjectId}`,
+      `/v1.51/containers/create?name=supabase_db_${loopbackProxyProjectId}&extra=1`,
+      `/v1.51/containers/create?name=supabase%5fdb_${loopbackProxyProjectId}`,
+      `/v1.51/containers/create?name=supabase_unknown_${loopbackProxyProjectId}`,
+    ]
+  ) {
+    assert.throws(
+      () =>
+        classifyDockerRequestTarget({
+          method: "POST",
+          target,
+          allowedContainerNames: loopbackProxyContainerNames,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_REQUEST_TARGET_REJECTED" },
+      target,
+    );
+  }
+});
+
+test("S18-F2 Docker create JSON and framing are rewritten closed to IPv4 loopback", () => {
+  for (const hostIp of ["", "127.0.0.1"]) {
+    const body = dockerCreateBody(hostIp);
+    const rewritten = rewriteContainerCreateRequest({
+      rawHeaders: exactJsonRawHeaders(body),
+      body,
+    });
+    assert.equal(rewritten.headers["content-type"], "application/json");
+    assert.equal(
+      rewritten.headers["content-length"],
+      String(rewritten.body.byteLength),
+    );
+    assert.equal(rewritten.headers["transfer-encoding"], undefined);
+    assert.equal(
+      JSON.parse(rewritten.body.toString("utf8")).HostConfig.PortBindings[
+        "5432/tcp"
+      ][0].HostIp,
+      "127.0.0.1",
+    );
+  }
+
+  for (const hostIp of ["0.0.0.0", "::", "::1", "localhost", "127.0.0.01"]) {
+    const body = dockerCreateBody(hostIp);
+    assert.throws(
+      () =>
+        rewriteContainerCreateRequest({
+          rawHeaders: exactJsonRawHeaders(body),
+          body,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED" },
+      hostIp,
+    );
+  }
+
+  const validBody = dockerCreateBody();
+  for (
+    const rawHeaders of [
+      ["Content-Length", String(validBody.byteLength)],
+      [
+        "Content-Type",
+        "application/json; charset=utf-8",
+        "Content-Length",
+        String(validBody.byteLength),
+      ],
+      [
+        ...exactJsonRawHeaders(validBody),
+        "Content-Length",
+        String(validBody.byteLength),
+      ],
+      [...exactJsonRawHeaders(validBody), "Transfer-Encoding", "chunked"],
+      [...exactJsonRawHeaders(validBody), "Content-Encoding", "gzip"],
+      [...exactJsonRawHeaders(validBody), "Expect", "100-continue"],
+    ]
+  ) {
+    assert.throws(
+      () => rewriteContainerCreateRequest({ rawHeaders, body: validBody }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_FRAMING_REJECTED" },
+    );
+  }
+
+  const oversized = Buffer.alloc(1_048_577, 0x20);
+  assert.throws(
+    () =>
+      rewriteContainerCreateRequest({
+        rawHeaders: exactJsonRawHeaders(oversized),
+        body: oversized,
+      }),
+    { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_FRAMING_REJECTED" },
+  );
+
+  const extraBinding = JSON.parse(validBody.toString("utf8"));
+  extraBinding.HostConfig.PortBindings["5432/tcp"][0].Unknown = "value";
+  const extraBindingBody = Buffer.from(JSON.stringify(extraBinding));
+  assert.throws(
+    () =>
+      rewriteContainerCreateRequest({
+        rawHeaders: exactJsonRawHeaders(extraBindingBody),
+        body: extraBindingBody,
+      }),
+    { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED" },
+  );
+});
+
+test("S18-F3 named-pipe proxy rewrites canonical create and blocks aliases without backend", async () => {
+  const backendPipe = uniquePipePath("backend");
+  const frontendPipe = uniquePipePath("frontend");
+  let backendRequests = 0;
+  let backendBody = null;
+  const backend = createHttpServer((request, response) => {
+    backendRequests += 1;
+    const chunks = [];
+    request.on("data", (chunk) => chunks.push(chunk));
+    request.on("end", () => {
+      backendBody = Buffer.concat(chunks);
+      response.writeHead(201, { "content-type": "application/json" });
+      response.end('{"Id":"local-only"}');
+    });
+  });
+  backend.listen(backendPipe);
+  await once(backend, "listening");
+
+  const proxy = await createDockerLoopbackProxyServer({
+    pipePath: frontendPipe,
+    backendPipe,
+    allowedContainerNames: loopbackProxyContainerNames,
+  });
+  try {
+    const body = dockerCreateBody();
+    const accepted = await requestOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: canonicalCreateTarget,
+      body,
+      rawHeaders: exactJsonRawHeaders(body),
+    });
+    assert.equal(accepted.statusCode, 201);
+    assert.equal(backendRequests, 1);
+    assert.equal(
+      JSON.parse(backendBody.toString("utf8")).HostConfig.PortBindings[
+        "5432/tcp"
+      ][0].HostIp,
+      "127.0.0.1",
+    );
+
+    const rejected = await requestOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: `/containers/create?name=supabase_db_${loopbackProxyProjectId}`,
+      body,
+      rawHeaders: exactJsonRawHeaders(body),
+    });
+    assert.equal(rejected.statusCode, 400);
+    assert.equal(backendRequests, 1, "alias never opens a backend request");
+  } finally {
+    await proxy.close();
+    await closeServer(backend);
+  }
+
+  await assert.rejects(
+    new Promise((resolve, reject) => {
+      const socket = connectPipe(frontendPipe, () => {
+        socket.destroy();
+        resolve();
+      });
+      socket.once("error", reject);
+    }),
+  );
+});
+
+test("S18-F4 wrapper binds an unguessable nonprojected pipe before child spawn and cleans it", async () => {
+  const suffixBytes = Buffer.alloc(16, 0xab);
+  const capability = createTaskPipeCapability({
+    randomBytesImpl: () => suffixBytes,
+  });
+  assert.deepEqual(capability, {
+    pipePath: `\\\\.\\pipe\\a17-s1ar-loopback-${"ab".repeat(16)}`,
+    dockerHost: `npipe:////./pipe/a17-s1ar-loopback-${"ab".repeat(16)}`,
+  });
+
+  const backendPipe = uniquePipePath("wrapper-backend");
+  const backend = createHttpServer((_request, response) => response.end("ok"));
+  backend.listen(backendPipe);
+  await once(backend, "listening");
+  let spawnCount = 0;
+  let observedEnvironment = null;
+  let listenBeforeSpawn = false;
+  const result = await runDockerCliWithLoopbackProxy({
+    backendPipe,
+    childExecutable: String.raw`C:\bound\supabase.exe`,
+    childArguments: ["status"],
+    environment: { SystemRoot: String.raw`C:\WINDOWS` },
+    allowedContainerNames: loopbackProxyContainerNames,
+    randomBytesImpl: () => suffixBytes,
+    spawnImpl: (_executable, _arguments, options) => {
+      spawnCount += 1;
+      observedEnvironment = options.env;
+      const child = fakeChildProcess({ stdout: "bounded-output" });
+      const socket = connectPipe(capability.pipePath, () => {
+        listenBeforeSpawn = true;
+        socket.destroy();
+      });
+      socket.once("error", () => {});
+      return child;
+    },
+  });
+  await closeServer(backend);
+  assert.equal(spawnCount, 1);
+  assert.equal(listenBeforeSpawn, true);
+  assert.deepEqual(observedEnvironment, {
+    SystemRoot: String.raw`C:\WINDOWS`,
+    DOCKER_HOST: capability.dockerHost,
+  });
+  assert.deepEqual(result, {
+    exitCode: 0,
+    stdout: "bounded-output",
+    stderr: "",
+  });
+  assert.doesNotMatch(JSON.stringify(result), /a17-s1ar-loopback/u);
+
+  const collisionServer = createHttpServer();
+  collisionServer.listen(capability.pipePath);
+  await once(collisionServer, "listening");
+  let collisionSpawnCount = 0;
+  await assert.rejects(
+    runDockerCliWithLoopbackProxy({
+      backendPipe,
+      childExecutable: String.raw`C:\bound\supabase.exe`,
+      childArguments: ["status"],
+      environment: { SystemRoot: String.raw`C:\WINDOWS` },
+      allowedContainerNames: loopbackProxyContainerNames,
+      randomBytesImpl: () => suffixBytes,
+      spawnImpl: () => {
+        collisionSpawnCount += 1;
+        return fakeChildProcess({});
+      },
+    }),
+    { message: "A17_DOCKER_LOOPBACK_PROXY_LISTEN_REJECTED" },
+  );
+  assert.equal(collisionSpawnCount, 0);
+  await closeServer(collisionServer);
+
+  await assert.rejects(
+    runDockerCliWithLoopbackProxy({
+      backendPipe,
+      childExecutable: String.raw`C:\bound\supabase.exe`,
+      childArguments: ["status"],
+      environment: { SystemRoot: String.raw`C:\WINDOWS` },
+      allowedContainerNames: loopbackProxyContainerNames,
+      randomBytesImpl: () => Buffer.alloc(15),
+      spawnImpl: () => fakeChildProcess({}),
+    }),
+    { message: "A17_DOCKER_LOOPBACK_PROXY_CAPABILITY_REJECTED" },
+  );
+});
+
+test("S18-F5 proxy and harness bind exact local tools with no TCP or remote dependency", () => {
+  const proxy = source(urls.proxy);
+  const ps = source(urls.powershell);
+  assert.doesNotMatch(
+    proxy,
+    /from\s+["'](?:https?:|npm:|jsr:)|\bfetch\s*\(|\bconsole\.|createConnection\s*\(\s*\{[^}]*\bhost\b/iu,
+  );
+  assert.match(
+    proxy,
+    /const BACKEND_PIPE = String\.raw`\\\\\.\\pipe\\dockerDesktopLinuxEngine`/u,
+  );
+  assert.match(proxy, /server\.listen\(pipePath\)/u);
+  assert.doesNotMatch(proxy, /server\.listen\(\s*\d|listen\(\s*\{[^}]*port/iu);
+  assert.match(
+    ps,
+    /\$NodeExecutablePath = 'C:\\Program Files\\nodejs\\node\.exe'/u,
+  );
+  assert.match(
+    ps,
+    /\$NodeExecutableSha256 = 'd14ba95cdce1ef7dc9ad3ac74949ca5db38b27378ee30f30a23cf26f9e875a11'/u,
+  );
+  assert.match(
+    ps,
+    /\$DockerLoopbackProxyRelativePath = 'scripts\\a17-docker-loopback-api-proxy\.mjs'/u,
+  );
+  assert.equal(
+    occurrences(
+      ps,
+      /Invoke-ClosedProcess -FilePath \$nodeExecutable -Arguments @\(\$dockerLoopbackProxyPath, '--supabase-executable'/gu,
+    ),
+    3,
+    "start status and stop are the exact three proxy-routed Supabase calls",
+  );
+  assertOrdered(
+    ps,
+    [
+      "Get-LowerSha256 $NodeExecutablePath",
+      "$nodeExecutable = $NodeExecutablePath",
+      "$dockerLoopbackProxyPath = Assert-ExactDescendant",
+      "Test-Path -LiteralPath $dockerLoopbackProxyPath -PathType Leaf",
+      'Assert-SourceIdentity -Stage "pre-start"',
+    ],
+    "Node and proxy identities are closed before runtime construction",
   );
 });

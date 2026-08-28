@@ -28,6 +28,9 @@ $TarExecutablePath = 'C:\WINDOWS\system32\tar.exe'
 $TarExecutableSha256 = '9b77d4c912f2edae8c241d0ece1094d2ac068b084269ceaf85d7c7b085d2ae86'
 $DenoExecutablePath = 'C:\Users\J\AppData\Local\Microsoft\WinGet\Links\deno.exe'
 $DenoExecutableSha256 = '3c53c061724194360f71b45e1dd227128750fe5c167ce314fa9c64110e690598'
+$NodeExecutablePath = 'C:\Program Files\nodejs\node.exe'
+$NodeExecutableSha256 = 'd14ba95cdce1ef7dc9ad3ac74949ca5db38b27378ee30f30a23cf26f9e875a11'
+$DockerLoopbackProxyRelativePath = 'scripts\a17-docker-loopback-api-proxy.mjs'
 $ListenerRangeContract = '54320..54329 and 58017'
 $ArchiveContract = 'git archive HEAD -- supabase'
 $ImageCacheContract = 'docker image inspect'
@@ -620,7 +623,7 @@ function Assert-CapturedOutputSanitized {
 }
 
 function Invoke-ExactProjectStopCleanup {
-  $stopResult = Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @('stop', '--project-id', $ProjectId, '--no-backup') -WorkingDirectory $runtimeRoot -Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure -FailureCode 'A17_S1AR_EXACT_STOP_FAILED'
+  $stopResult = Invoke-ClosedProcess -FilePath $nodeExecutable -Arguments @($dockerLoopbackProxyPath, '--supabase-executable', $SupabaseExecutable, '--project-id', $ProjectId, '--', 'stop', '--project-id', $ProjectId, '--no-backup') -WorkingDirectory $runtimeRoot -Environment @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath } -AllowFailure -FailureCode 'A17_S1AR_EXACT_STOP_FAILED'
   if ($stopResult.ExitCode -ne 0) { throw 'A17_S1AR_EXACT_STOP_FAILED' }
 }
 
@@ -655,6 +658,13 @@ if (
   (Get-LowerSha256 $DenoExecutablePath) -cne $DenoExecutableSha256
 ) { throw 'A17_S1AR_DENO_IDENTITY_REJECTED' }
 $denoExecutable = $DenoExecutablePath
+if (
+  -not (Test-Path -LiteralPath $NodeExecutablePath -PathType Leaf) -or
+  (Get-LowerSha256 $NodeExecutablePath) -cne $NodeExecutableSha256
+) { throw 'A17_S1AR_NODE_IDENTITY_REJECTED' }
+$nodeExecutable = $NodeExecutablePath
+$dockerLoopbackProxyPath = Assert-ExactDescendant -Root $worktreeRoot -Candidate (Join-Path $worktreeRoot $DockerLoopbackProxyRelativePath)
+if (-not (Test-Path -LiteralPath $dockerLoopbackProxyPath -PathType Leaf)) { throw 'A17_S1AR_DOCKER_PROXY_IDENTITY_REJECTED' }
 $candidateManifest = ConvertFrom-ExpectedManifest -Json $ExpectedCandidateManifest -FailureCode 'A17_S1AR_CANDIDATE_MANIFEST_INPUT_REJECTED'
 $protectedManifest = ConvertFrom-ExpectedManifest -Json $ExpectedProtectedManifest -FailureCode 'A17_S1AR_PROTECTED_MANIFEST_INPUT_REJECTED'
 $startAttempted = $false
@@ -698,10 +708,10 @@ try {
 
   $supabaseProcessEnvironment = @{ DO_NOT_TRACK = '1'; SUPABASE_TELEMETRY_DISABLED = '1'; SystemRoot = $SystemRootPath }
   $startAttempted = $true
-  [void](Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @("start", "--workdir", $runtimeRoot, '--exclude', 'studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_START_REJECTED')
+  [void](Invoke-ClosedProcess -FilePath $nodeExecutable -Arguments @($dockerLoopbackProxyPath, '--supabase-executable', $SupabaseExecutable, '--project-id', $ProjectId, '--', "start", "--workdir", $runtimeRoot, '--exclude', 'studio,imgproxy,mailpit,storage-api,realtime,edge-runtime,logflare,vector,supavisor,postgres-meta') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_START_REJECTED')
   Assert-OwnedRuntimeState -RequireExact
 
-  $statusResult = Invoke-ClosedProcess -FilePath $SupabaseExecutable -Arguments @('status', '--workdir', $runtimeRoot, '--output', 'env') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_STATUS_REJECTED'
+  $statusResult = Invoke-ClosedProcess -FilePath $nodeExecutable -Arguments @($dockerLoopbackProxyPath, '--supabase-executable', $SupabaseExecutable, '--project-id', $ProjectId, '--', 'status', '--workdir', $runtimeRoot, '--output', 'env') -WorkingDirectory $runtimeRoot -Environment $supabaseProcessEnvironment -FailureCode 'A17_S1AR_SUPABASE_STATUS_REJECTED'
   $statusEnvironment = Read-StatusEnvironment -Text $statusResult.Stdout
   $sqlPath = Assert-ExactDescendant -Root $runtimeRoot -Candidate (Join-Path $runtimeRoot 'supabase\tests\drs_secure_session_runtime_live_pg_w1.sql')
   $sqlSource = [System.IO.File]::ReadAllText($sqlPath)
