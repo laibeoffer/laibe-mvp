@@ -3815,7 +3815,7 @@ test("文件 consumer 首屏說清案件、狀態、責任人、下一步與留�
   assert.equal(emptyModel.documentNext, "逐項回覆文件問題");
   assert.equal(emptyModel.documentTrace, "目前沒有可確認的正式文件紀錄");
 
-  const readyModel = runtime.buildOwnerWorkspaceViewModel(authorizedContext({
+  const injectedModel = runtime.buildOwnerWorkspaceViewModel(authorizedContext({
     documents: [{
       title: "平面配置圖",
       kindLabel: "圖面",
@@ -3827,10 +3827,20 @@ test("文件 consumer 首屏說清案件、狀態、責任人、下一步與留�
       traceabilityLabel: "已留下正式案件紀錄",
     }],
   }));
-  assert.equal(readyModel.documentStatus, "文件可檢視");
-  assert.equal(readyModel.documentTrace, "已留下正式案件紀錄");
-  assert.equal(readyModel.documents[0].nextActorLabel, "下一步責任人：甲方確認");
-  assert.equal(readyModel.documents[0].traceabilityLabel, "已留下正式案件紀錄");
+  assert.equal(injectedModel.documentStatus, "文件可檢視");
+  assert.equal(injectedModel.documentTrace, "尚待正式案件紀錄確認");
+  assert.equal(
+    injectedModel.documents[0].nextActorLabel,
+    "下一步責任人：甲方確認",
+  );
+  assert.equal(
+    injectedModel.documents[0].traceabilityLabel,
+    "尚待正式案件紀錄確認",
+  );
+  assert.doesNotMatch(
+    JSON.stringify(injectedModel),
+    /已留下正式案件紀錄/u,
+  );
 });
 
 test("文件 consumer 對每種 fail-closed 狀態使用可理解的產品語", async () => {
@@ -3861,9 +3871,10 @@ test("文件 consumer 對每種 fail-closed 狀態使用可理解的產品語", 
 });
 
 test("未開放的文件操作保持停用、沒有 browser authority 或虛構成功", async () => {
-  const [html, runtimeSource] = await Promise.all([
+  const [html, runtimeSource, runtime] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("app.js"),
+    loadRuntime(),
   ]);
   const documentsId = html.indexOf('id="documents"');
   const documentsStart = html.lastIndexOf("<section", documentsId);
@@ -3878,6 +3889,10 @@ test("未開放的文件操作保持停用、沒有 browser authority 或虛構�
     assert.match(control, /\bdisabled\b/u);
     assert.match(control, /aria-disabled="true"/u);
   }
+  assert.match(
+    documentsPanel,
+    /data-slot="document-workbench-pending-copy"/u,
+  );
   assert.match(documentsPanel, /尚待案件授權與文件服務開放/u);
   assert.doesNotMatch(
     documentsPanel,
@@ -3887,10 +3902,30 @@ test("未開放的文件操作保持停用、沒有 browser authority 或虛構�
     `${documentsPanel}\n${runtimeSource}`,
     /(?:searchParams|localStorage|dataset)\.(?:userId|caseId|role|memberId|grant|bucket|path|documentRef)\b/u,
   );
+
+  const pendingModel = runtime.buildOwnerWorkspaceViewModel();
+  assert.match(
+    pendingModel.documentPendingCopy,
+    /尚待案件授權與文件服務開放/u,
+  );
+  const authorizedModel = runtime.buildOwnerWorkspaceViewModel(
+    authorizedContext(),
+  );
+  assert.equal(
+    authorizedModel.documentPendingCopy,
+    "文件服務與案件紀錄讀取仍在整理中；目前不會建立新版本或完成紀錄。",
+  );
+  assert.doesNotMatch(
+    authorizedModel.documentPendingCopy,
+    /尚待案件授權/u,
+  );
 });
 
 test("可信 server projection 才能把文件列標為正式案件紀錄", async () => {
-  const { validateAndMapOwnerWorkspaceGrant } = await loadBootstrap();
+  const [{ validateAndMapOwnerWorkspaceGrant }, runtime] = await Promise.all([
+    loadBootstrap(),
+    loadRuntime(),
+  ]);
   const payload = ownerGrantPayload({ title: "住宅修改工程" });
   payload.documents.push({
     caseId: CANONICAL_OWNER_CASE_ID,
@@ -3902,9 +3937,19 @@ test("可信 server projection 才能把文件列標為正式案件紀錄", asyn
     versionLabel: "甲方確認版",
     versionNumber: 3,
   });
+  payload.documents.push({
+    caseId: CANONICAL_OWNER_CASE_ID,
+    category: "quote",
+    fileId: "9e000000-0000-4000-8000-000000000702",
+    name: "工程報價單",
+    recordStatus: "active",
+    uploadedAt: "2026-08-29T08:15:00.000Z",
+    versionLabel: "待甲方確認",
+    versionNumber: 2,
+  });
 
   const mapped = validateAndMapOwnerWorkspaceGrant(payload);
-  assert.equal(mapped.documents.length, 1);
+  assert.equal(mapped.documents.length, 2);
   assert.deepEqual(mapped.documents[0], {
     title: "平面配置圖",
     kindLabel: "圖面",
@@ -3916,10 +3961,21 @@ test("可信 server projection 才能把文件列標為正式案件紀錄", asyn
     nextActorLabel: "下一步責任人：甲方確認",
     traceabilityLabel: "已留下正式案件紀錄",
   });
+  assert.equal(mapped.caseSummary.lastRecordedAtLabel, "2026/08/29");
+  const strictModel = runtime.buildOwnerWorkspaceViewModel(mapped);
+  assert.equal(strictModel.documentTrace, "已留下正式案件紀錄");
+  assert.equal(
+    strictModel.documents[0].traceabilityLabel,
+    "已留下正式案件紀錄",
+  );
 
   const notRecorded = structuredClone(payload);
   notRecorded.documents[0].recordStatus = "pending";
   assert.equal(validateAndMapOwnerWorkspaceGrant(notRecorded), null);
+
+  const invalidTimestamp = structuredClone(payload);
+  invalidTimestamp.documents[0].uploadedAt = "2026-02-31T02:30:00.000Z";
+  assert.equal(validateAndMapOwnerWorkspaceGrant(invalidTimestamp), null);
 });
 
 test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既有契約入口", async () => {

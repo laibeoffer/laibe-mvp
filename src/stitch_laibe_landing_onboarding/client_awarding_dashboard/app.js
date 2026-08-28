@@ -777,12 +777,7 @@ export function resolveOwnerWorkspaceState(input) {
     context.serviceAgreement.version !== "" &&
     context.serviceAgreement.caseId !== "" &&
     context.serviceAgreement.caseId === context.caseBinding.caseId;
-  const verifiedOwnerReadOnlyGrant =
-    context.authorityMode === "server_owner_grant_v1" &&
-    context.serviceAgreement.status === "unavailable" &&
-    context.serviceAgreement.agreementId === "" &&
-    context.serviceAgreement.version === "" &&
-    context.serviceAgreement.caseId === context.caseBinding.caseId;
+  const verifiedOwnerReadOnlyGrant = hasStrictMappedOwnerGrant(context);
   if (!agreementEvidenceComplete && !verifiedOwnerReadOnlyGrant) {
     return {
       state: "ACCESS_DENIED",
@@ -830,6 +825,15 @@ export function resolveOwnerWorkspaceState(input) {
     state: "AUTHORIZED_READY",
     reasonCode: "OWNER_CASE_CONTEXT_CONFIRMED",
   };
+}
+
+function hasStrictMappedOwnerGrant(context) {
+  return context.authorityMode === "server_owner_grant_v1" &&
+    context.serviceAgreement.status === "unavailable" &&
+    context.serviceAgreement.agreementId === "" &&
+    context.serviceAgreement.version === "" &&
+    context.serviceAgreement.caseId !== "" &&
+    context.serviceAgreement.caseId === context.caseBinding.caseId;
 }
 
 export function publicMessageRecordLabel(message, expectedCaseId) {
@@ -881,6 +885,7 @@ function documentConsumerSummary(state, summary, documents) {
     : "正在確認案件授權";
   const identityVisible = state === "AUTHORIZED_READY" ||
     state === "PCM_SERVICE_ENDED_READ_ONLY";
+  const authorizationConfirmed = identityVisible || state === "AUTHORIZED_EMPTY";
 
   return Object.freeze({
     documentCase: identityVisible && summary?.displayName
@@ -911,7 +916,23 @@ function documentConsumerSummary(state, summary, documents) {
       : visibleDocuments.length > 0
       ? "尚待正式案件紀錄確認"
       : "目前沒有可確認的正式文件紀錄",
+    documentPendingCopy: authorizationConfirmed
+      ? "文件服務與案件紀錄讀取仍在整理中；目前不會建立新版本或完成紀錄。"
+      : "尚待案件授權與文件服務開放；目前不會建立新版本或完成紀錄。",
   });
+}
+
+function documentConsumerRecords(context, payloadVisible) {
+  if (!payloadVisible) return [];
+  const formalTraceAllowed = hasStrictMappedOwnerGrant(context);
+  return context.documents.map((record) => ({
+    ...record,
+    traceabilityLabel:
+      formalTraceAllowed &&
+        record.traceabilityLabel === "已留下正式案件紀錄"
+        ? "已留下正式案件紀錄"
+        : "尚待正式案件紀錄確認",
+  }));
 }
 
 export function buildOwnerWorkspaceViewModel(input) {
@@ -926,6 +947,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     resolution.state === "AUTHORIZED_EMPTY";
   const payloadVisible = ready || ended;
   const summary = payloadVisible ? context.caseSummary : null;
+  const documents = documentConsumerRecords(context, payloadVisible);
   const messages = payloadVisible
     ? context.publicMessages
       .filter(
@@ -945,7 +967,7 @@ export function buildOwnerWorkspaceViewModel(input) {
   const documentSummary = documentConsumerSummary(
     resolution.state,
     summary,
-    payloadVisible ? context.documents : [],
+    documents,
   );
 
   return {
@@ -1008,7 +1030,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     constructionIssues: summary?.constructionIssueLabel || "尚待案件資料",
     constructionActor: summary?.currentActorLabel || "尚待案件資料",
     ...documentSummary,
-    documents: payloadVisible ? context.documents : [],
+    documents,
     submissions: payloadVisible ? context.submissions : [],
     scheduledDesignItems: payloadVisible ? context.scheduledDesignItems : [],
     messages,
@@ -1487,6 +1509,7 @@ function renderModel(root, model) {
     "document-workbench-actor": model.documentActor,
     "document-workbench-next": model.documentNext,
     "document-workbench-trace": model.documentTrace,
+    "document-workbench-pending-copy": model.documentPendingCopy,
     "review-summary": model.reviewSummary,
     "issue-summary": model.issueSummary,
     "next-summary": model.nextSummary,
