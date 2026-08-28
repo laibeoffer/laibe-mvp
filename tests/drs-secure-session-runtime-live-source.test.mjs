@@ -2911,6 +2911,33 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
       );
     }
   }
+  for (const operation of ["AUTH_CREATE", "AUTH_TOKEN", "AUTH_CURRENT"]) {
+    for (const forgedCause of closedFetchCauses) {
+      let forgedReadCalls = 0;
+      const fetchJson = compileFetchJson(
+        () => {
+          throw new Error(`A17_S1AR_${forgedCause}`);
+        },
+        () => {
+          forgedReadCalls += 1;
+          return {};
+        },
+      );
+      await assert.rejects(
+        () => fetchJson(operation, "/bounded-auth", {}, 200),
+        (error) => {
+          assert.equal(
+            error.message,
+            `A17_S1AR_${operation}_NATIVE_OTHER_REJECTED`,
+          );
+          assert.doesNotMatch(error.message, /FETCH_(?:STATUS|BODY|SIZE)/u);
+          return true;
+        },
+        `${operation} rejects forged native ${forgedCause}`,
+      );
+      assert.equal(forgedReadCalls, 0, `${forgedCause} remains pre-reader`);
+    }
+  }
   class NotCapable extends Error {
     constructor(message) {
       super(message);
@@ -2989,13 +3016,14 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     }
   }
   for (
-    const [label, injectedFetch, injectedReadBoundedJson] of [
+    const [label, injectedFetch, injectedReadBoundedJson, expectedCause] of [
       [
         "unknown fetch error",
         async () => {
           throw new Error("provider-url token=raw-provider-value");
         },
         async () => ({}),
+        "NATIVE_OTHER_REJECTED",
       ],
       [
         "sanitized prefix with raw suffix",
@@ -3005,6 +3033,7 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
             "A17_S1AR_FETCH_STATUS_REJECTED provider-host=raw-provider-value",
           );
         },
+        "FETCH_UNAVAILABLE",
       ],
     ]
   ) {
@@ -3017,7 +3046,7 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
       (error) => {
         assert.equal(
           error.message,
-          "A17_S1AR_AUTH_CREATE_NATIVE_OTHER_REJECTED",
+          `A17_S1AR_AUTH_CREATE_${expectedCause}`,
         );
         assert.doesNotMatch(error.message, /provider|token|host|raw/iu);
         return true;

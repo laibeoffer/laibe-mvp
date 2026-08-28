@@ -262,23 +262,30 @@ async function fetchJson(operation, path, init, expectedStatus) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10_000);
   try {
-    const response = await fetch(`${supabaseOrigin}${path}`, {
-      ...init,
-      redirect: "error",
-      signal: controller.signal,
-    });
-    return await readBoundedJson(response, expectedStatus);
-  } catch (error) {
-    const closedCause = error instanceof Error
-      ? closedFetchCauses.find(
-        (cause) => error.message === `A17_S1AR_${cause}`,
-      )
-      : undefined;
-    throw sanitizedFailure(
-      `${operation}_${
-        closedCause ?? classifyNativeFetchFailure(error, controller.signal)
-      }`,
-    );
+    let response;
+    try {
+      response = await fetch(`${supabaseOrigin}${path}`, {
+        ...init,
+        redirect: "error",
+        signal: controller.signal,
+      });
+    } catch (error) {
+      throw sanitizedFailure(
+        `${operation}_${classifyNativeFetchFailure(error, controller.signal)}`,
+      );
+    }
+    try {
+      return await readBoundedJson(response, expectedStatus);
+    } catch (error) {
+      const closedCause = error instanceof Error
+        ? closedFetchCauses.find(
+          (cause) => error.message === `A17_S1AR_${cause}`,
+        )
+        : undefined;
+      throw sanitizedFailure(
+        `${operation}_${closedCause ?? "FETCH_UNAVAILABLE"}`,
+      );
+    }
   } finally {
     clearTimeout(timer);
   }
