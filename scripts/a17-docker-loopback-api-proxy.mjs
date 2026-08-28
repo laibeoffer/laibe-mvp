@@ -173,17 +173,18 @@ export function rewriteContainerCreateRequest({ rawHeaders, body }) {
   if (
     !isPlainObject(value) ||
     !Object.hasOwn(value, "HostConfig") ||
-    !isPlainObject(value.HostConfig) ||
-    !Object.hasOwn(value.HostConfig, "PortBindings") ||
-    !isPlainObject(value.HostConfig.PortBindings)
+    !isPlainObject(value.HostConfig)
   ) {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
   }
+  const hasPortBindings = Object.hasOwn(value.HostConfig, "PortBindings");
+  if (hasPortBindings && !isPlainObject(value.HostConfig.PortBindings)) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+  const portBindings = hasPortBindings ? value.HostConfig.PortBindings : {};
 
   for (
-    const [containerPort, bindings] of Object.entries(
-      value.HostConfig.PortBindings,
-    )
+    const [containerPort, bindings] of Object.entries(portBindings)
   ) {
     const portMatch = /^([1-9]\d{0,4})\/(tcp|udp|sctp)$/u.exec(containerPort);
     if (

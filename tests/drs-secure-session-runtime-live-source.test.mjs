@@ -4508,6 +4508,36 @@ test("S18-F2 Docker create JSON and framing are rewritten closed to IPv4 loopbac
   }
 
   const validBody = dockerCreateBody();
+  const noPublishedPorts = JSON.parse(validBody.toString("utf8"));
+  delete noPublishedPorts.HostConfig.PortBindings;
+  const noPublishedPortsBody = Buffer.from(JSON.stringify(noPublishedPorts));
+  const noPublishedPortsResult = rewriteContainerCreateRequest({
+    rawHeaders: exactJsonRawHeaders(noPublishedPortsBody),
+    body: noPublishedPortsBody,
+  });
+  assert.equal(
+    Object.hasOwn(
+      JSON.parse(noPublishedPortsResult.body.toString("utf8")).HostConfig,
+      "PortBindings",
+    ),
+    false,
+    "a container with no published ports remains non-published",
+  );
+
+  for (const malformedBindings of [null, [], ""]) {
+    const malformed = JSON.parse(validBody.toString("utf8"));
+    malformed.HostConfig.PortBindings = malformedBindings;
+    const malformedBody = Buffer.from(JSON.stringify(malformed));
+    assert.throws(
+      () =>
+        rewriteContainerCreateRequest({
+          rawHeaders: exactJsonRawHeaders(malformedBody),
+          body: malformedBody,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED" },
+    );
+  }
+
   for (
     const rawHeaders of [
       ["Content-Length", String(validBody.byteLength)],
