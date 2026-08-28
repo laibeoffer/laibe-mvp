@@ -1,7 +1,7 @@
 import { initialWorkspaceState, renderWorkspaceModel } from "../shared/drs-workspace-renderer.js";
 import { createSpecialistCalendarTransport } from "./calendar-transport.js";
 import { createDrsSessionBootstrapResolver, createDrsSessionHeadersResolver } from "./drs-session-adapter.js";
-import { createDrsWorkspaceTransport } from "./drs-workspace-transport.js";
+import { createDrsWorkspaceTransport, mapWorkspaceGrantToSpecialistProjection } from "./drs-workspace-transport.js";
 
 const CALENDAR_ENDPOINTS = Object.freeze({
   grant: "/functions/v1/drs-google-calendar-grant",
@@ -34,12 +34,7 @@ const AI_REVIEW_STATES = Object.freeze({
   UNAVAILABLE: "REVIEW_SERVICE_UNAVAILABLE",
 });
 
-const REVIEW_DOCUMENTS = Object.freeze([
-  Object.freeze({ id: "plan-v2", label: "尚未取得正式圖面", type: "圖面", version: "版本待確認", versionConfirmed: false, evidenceState: "unavailable", proposer: "提出者待確認", updated: "待取得正式紀錄", state: "尚未提供可讀內容" }),
-  Object.freeze({ id: "quotation-kitchen", label: "廚具項目與修訂條件", type: "報價", version: "版本待提供", versionConfirmed: false, evidenceState: "unavailable", proposer: "乙方設計團隊（待確認）", updated: "待取得正式紀錄", state: "尚未提供正式報價" }),
-  Object.freeze({ id: "formal-line", label: "三方 LINE 正式紀錄", type: "正式訊息", version: "紀錄版本待確認", versionConfirmed: false, evidenceState: "unavailable", proposer: "甲方／乙方（待授權後確認）", updated: "待取得正式紀錄", state: "尚未連結實際 LINE" }),
-  Object.freeze({ id: "calendar-milestone", label: "影響目前決策的節點", type: "日曆時程", version: "分享狀態待確認", versionConfirmed: false, evidenceState: "unavailable", proposer: "乙方設計團隊（待確認）", updated: "待取得實際日曆", state: "尚未連結實際 Google 日曆" }),
-]);
+const REVIEW_DOCUMENTS = Object.freeze([]);
 
 const SPECIALIST_SOURCE_CASE = Object.freeze({
   case: Object.freeze({
@@ -52,6 +47,7 @@ const SPECIALIST_SOURCE_CASE = Object.freeze({
   }),
   reviewQueue: Object.freeze([]),
   traceEntries: Object.freeze([]),
+  documents: Object.freeze({ state: "pending", label: "尚未取得正式文件", items: Object.freeze([]) }),
   submittedSnapshot: null,
   aiAdvisory: Object.freeze({
     state: AI_REVIEW_STATES.UNAVAILABLE,
@@ -77,6 +73,7 @@ let workbenchModeChosen = false;
 let activeGovernanceView = "inbox";
 let governanceViewChosen = false;
 let reviewDraftState = { dirty: false, revision: 0, savedAt: "" };
+let documentProjectionReady = false;
 
 function createInitialReviewIssue() {
   return {
@@ -316,6 +313,7 @@ function stateModel(state, productMessage = PRODUCT_STATES[state]) {
     messages: [],
     reviewQueue: [],
     traceEntries: [],
+    documents: { state: "hidden", label: "尚未取得正式文件", items: [] },
     submittedSnapshot: null,
     aiAdvisory: { state: AI_REVIEW_STATES.UNAVAILABLE, status: "提醒服務目前無法使用", findings: [] },
     finalTransportReceipt: null,
@@ -323,27 +321,69 @@ function stateModel(state, productMessage = PRODUCT_STATES[state]) {
   };
 }
 
+function sourceCaseFromServerProjection(projection) {
+  if (
+    projection?.ok !== true
+    || projection.kind !== "specialist-workspace-projection"
+    || projection.schemaVersion !== "laibe.drs-specialist-workspace-projection.v1"
+    || projection.authority?.state !== "authorized"
+    || projection.authority?.mode !== "read_only"
+    || typeof projection.case?.id !== "string"
+    || typeof projection.case?.label !== "string"
+    || typeof projection.case?.statusLabel !== "string"
+    || projection.documents?.state !== "pending"
+    || !Array.isArray(projection.documents?.items)
+    || projection.documents.items.length !== 0
+    || projection.next?.actor !== "drs_specialist"
+    || typeof projection.next?.actorLabel !== "string"
+    || typeof projection.next?.actionLabel !== "string"
+  ) {
+    return null;
+  }
+  return {
+    case: {
+      caseId: projection.case.id,
+      caseName: projection.case.label,
+      currentStatus: projection.case.statusLabel,
+      currentResponsibleRole: projection.next.actorLabel,
+      waitingFor: projection.documents.label,
+      nextAction: projection.next.actionLabel,
+    },
+    reviewQueue: [],
+    traceEntries: [],
+    documents: clone(projection.documents),
+    submittedSnapshot: null,
+    aiAdvisory: {
+      state: AI_REVIEW_STATES.UNAVAILABLE,
+      status: "等待正式文件後再整理提醒",
+      findings: [],
+    },
+  };
+}
+
 function createSpecialistWorkspaceClient(sourceCase = SPECIALIST_SOURCE_CASE) {
-  let reviewQueue = clone(sourceCase.reviewQueue);
-  let traceEntries = clone(sourceCase.traceEntries);
+  let activeSourceCase = clone(sourceCase);
+  let reviewQueue = clone(activeSourceCase.reviewQueue);
+  let traceEntries = clone(activeSourceCase.traceEntries);
 
   function readyModel() {
     return {
       state: "ready",
       role: DRS_WORKSPACE_VIEW_MODEL.role,
       authorityClass: DRS_WORKSPACE_VIEW_MODEL.authorityClass,
-      case: clone(sourceCase.case),
+      case: clone(activeSourceCase.case),
       status: {
-        currentResponsibleRole: sourceCase.case.currentResponsibleRole,
-        waitingFor: sourceCase.case.waitingFor,
-        nextAction: sourceCase.case.nextAction,
+        currentResponsibleRole: activeSourceCase.case.currentResponsibleRole,
+        waitingFor: activeSourceCase.case.waitingFor,
+        nextAction: activeSourceCase.case.nextAction,
       },
       authorizedGroups: [],
       messages: [],
       reviewQueue: clone(reviewQueue),
       traceEntries: clone(traceEntries),
-      submittedSnapshot: clone(sourceCase.submittedSnapshot),
-      aiAdvisory: clone(sourceCase.aiAdvisory),
+      documents: clone(activeSourceCase.documents),
+      submittedSnapshot: clone(activeSourceCase.submittedSnapshot),
+      aiAdvisory: clone(activeSourceCase.aiAdvisory),
       finalTransportReceipt: null,
       productMessage: PRODUCT_STATES.ready,
     };
@@ -352,10 +392,26 @@ function createSpecialistWorkspaceClient(sourceCase = SPECIALIST_SOURCE_CASE) {
   return {
     async loadWorkspace({ state = "ready" } = {}) {
       if (state === "loading" || state === "empty" || state === "retryable-error" || state === "permission-denied" || state === "disconnected") return stateModel(state);
+      if (!activeSourceCase.case.caseId) return stateModel("permission-denied", PRODUCT_STATES["permission-denied"]);
       return readyModel();
     },
 
+    bindServerProjection(projection) {
+      const nextSourceCase = sourceCaseFromServerProjection(projection);
+      if (!nextSourceCase) {
+        activeSourceCase = clone(SPECIALIST_SOURCE_CASE);
+        reviewQueue = [];
+        traceEntries = [];
+        return false;
+      }
+      activeSourceCase = nextSourceCase;
+      reviewQueue = [];
+      traceEntries = [];
+      return true;
+    },
+
     async transitionReviewItem({ itemId, action }) {
+      if (!activeSourceCase.case.caseId) return { ok: false, code: "WORKSPACE_UNAVAILABLE" };
       const nextStatus = action === "mark-reviewed" ? "已標記可供人工判斷" : "等待 DRS 專員判斷";
       reviewQueue = reviewQueue.map((item) => (item.id === itemId ? { ...item, status: nextStatus } : item));
       traceEntries = [
@@ -394,6 +450,7 @@ function createSpecialistCalendarIntegration({ workspaceTransport, calendarTrans
   let currentState = {
     workspaceCaseId: null,
     workspaceStatus: null,
+    workspaceProjection: null,
     calendarState: "unavailable",
     timeZone: null,
     window: null,
@@ -404,6 +461,7 @@ function createSpecialistCalendarIntegration({ workspaceTransport, calendarTrans
     currentState = {
       workspaceCaseId: null,
       workspaceStatus: null,
+      workspaceProjection: null,
       calendarState: "unavailable",
       timeZone: null,
       window: null,
@@ -468,8 +526,15 @@ function createSpecialistCalendarIntegration({ workspaceTransport, calendarTrans
       return { ok: false, code: failureCode(workspaceGrant) };
     }
 
+    const workspaceProjection = mapWorkspaceGrantToSpecialistProjection(workspaceGrant);
+    if (!workspaceProjection.ok) {
+      clearAll();
+      return { ok: false, code: "INVALID_RESPONSE" };
+    }
+
     currentState.workspaceCaseId = workspaceGrant.case.id;
     currentState.workspaceStatus = workspaceGrant.case.status;
+    currentState.workspaceProjection = workspaceProjection;
 
     let calendarGrant;
     try {
@@ -499,6 +564,7 @@ function createSpecialistCalendarIntegration({ workspaceTransport, calendarTrans
     currentState = {
       workspaceCaseId: workspaceGrant.case.id,
       workspaceStatus: workspaceGrant.case.status,
+      workspaceProjection,
       calendarState: "connected",
       timeZone: calendarEvents.timeZone,
       window: Object.freeze({ ...calendarEvents.window }),
@@ -568,9 +634,13 @@ function createSpecialistCalendarIntegration({ workspaceTransport, calendarTrans
       clearCalendar("disconnected");
       return { ok: true, state: "REVOKED" };
     },
+    getWorkspaceProjection() {
+      return currentState.workspaceProjection ? clone(currentState.workspaceProjection) : null;
+    },
     getState() {
+      const { workspaceProjection: _workspaceProjection, ...publicState } = currentState;
       return {
-        ...currentState,
+        ...publicState,
         window: currentState.window ? { ...currentState.window } : null,
         events: currentState.events.map((event) => ({ ...event })),
       };
@@ -743,21 +813,23 @@ function createSpecialistCalendarRuntime({
     }
     const result = await integration.initialize(requestedWindow);
     const integrationState = integration.getState();
+    const projectionAccepted = bindSpecialistWorkspaceProjection(integration.getWorkspaceProjection());
+    if (projectionAccepted) await loadWorkspaceState(root, "ready");
     if (result.ok) {
       renderCalendarState(root, "connected", integrationState);
-      renderWorkspaceGate(root, "empty", "案件授權已確認；目前只顯示已授權的唯讀日曆時程，其餘案件內容仍待正式資料。");
+      setWorkspaceState(root, "案件檢視權限已確認；日曆僅供檢視，正式文件資料尚未取得。");
       return result;
     }
-    if (!integrationState.workspaceCaseId) {
+    if (!projectionAccepted) {
       renderCalendarState(root, "permission");
       renderWorkspaceGate(root, "permission-denied", PRODUCT_STATES["permission-denied"]);
       return result;
     }
     const stateName = result.code === "HTTP_ERROR" || result.code === "NETWORK_ERROR" || result.code === "REQUEST_ABORTED" ? "error" : "disconnected";
     renderCalendarState(root, stateName);
-    renderWorkspaceGate(root, stateName === "error" ? "retryable-error" : "empty", stateName === "error"
-      ? "案件權限已確認，但日曆狀態暫時無法取得；本頁不顯示先前內容。"
-      : "案件權限已確認；完成日曆連結後，才會顯示可檢視的實際時程。");
+    setWorkspaceState(root, stateName === "error"
+      ? "案件檢視權限已確認，但日曆狀態暫時無法取得；文件審查仍維持停用。"
+      : "案件檢視權限已確認；日曆尚未連結，正式文件資料也尚未取得。");
     return result;
   }
 
@@ -812,6 +884,10 @@ function bootstrapSpecialistCalendarRuntime(root = document) {
 
 const drsClient = createSpecialistWorkspaceClient();
 
+function bindSpecialistWorkspaceProjection(projection) {
+  return drsClient.bindServerProjection(projection);
+}
+
 function setWorkspaceState(root, message) {
   const live = root.querySelector("[data-drs-live]");
   if (live) live.textContent = message;
@@ -861,11 +937,15 @@ function setTaskSummary(root, task, summary) {
 }
 
 function reviewDocumentById(documentId) {
-  return REVIEW_DOCUMENTS.find((documentItem) => documentItem.id === documentId) ?? REVIEW_DOCUMENTS[0];
+  return REVIEW_DOCUMENTS.find((documentItem) => documentItem.id === documentId) ?? null;
 }
 
 function selectDocument(root, action) {
   const documentItem = reviewDocumentById(action.dataset.documentId);
+  if (!documentItem) {
+    setWorkspaceState(root, "尚未取得可審查的正式文件；請先等待文件資料與版本確認。");
+    return;
+  }
   for (const button of root.querySelectorAll("[data-review-document]")) {
     const selected = button.dataset.documentId === documentItem.id;
     button.classList.toggle("is-selected", selected);
@@ -912,6 +992,11 @@ function addReviewBasis(root) {
     return;
   }
   const documentItem = reviewDocumentById(documentId);
+  if (!documentItem) {
+    setDecisionResult(root, "尚未取得可引用的正式文件；請先等待文件資料與版本確認。");
+    updateReviewActionState(root);
+    return;
+  }
   reviewBasisSequence += 1;
   reviewBasis = [...reviewBasis, {
     id: `basis-${reviewBasisSequence}`,
@@ -1070,12 +1155,23 @@ function updateReviewActionState(root = document) {
   const ready = !root.body?.dataset.drsState || root.body.dataset.drsState === "ready";
   const location = root.querySelector("[data-citation-location]")?.value?.trim() ?? "";
   const documentCanvas = root.querySelector("[data-document-canvas]");
-  const formalEvidenceReady = documentCanvas ? documentCanvas.dataset.evidenceState === "ready" : true;
+  const formalEvidenceReady = documentProjectionReady && (documentCanvas ? documentCanvas.dataset.evidenceState === "ready" : true);
   const everyBasisReady = reviewBasis.length > 0 && reviewBasis.every((basis) => basis.versionConfirmed === true && basis.evidenceState === "ready");
   const issueAllowsPreSend = reviewIssueAllowsPreSend(reviewIssue);
+  const evidenceDependentActions = new Set([
+    "request-dimensions",
+    "mark-mismatch",
+    "request-owner-material",
+    "create-consensus",
+    "save-review-draft",
+    "request-peer-review",
+    "submit-presend-review",
+    "edit-send",
+    "override-send",
+  ]);
   for (const action of root.querySelectorAll("[data-drs-action]")) {
     if (action.dataset.drsAction === "add-review-basis") {
-      const enabled = ready && Boolean(location);
+      const enabled = ready && formalEvidenceReady && Boolean(location) && Boolean(reviewDocumentById(root.querySelector("[data-review-document-select]")?.value));
       action.disabled = !enabled;
       action.setAttribute("aria-disabled", enabled ? "false" : "true");
     }
@@ -1085,15 +1181,39 @@ function updateReviewActionState(root = document) {
       action.setAttribute("aria-disabled", enabled ? "false" : "true");
     }
     if (action.dataset.drsAction === "save-review-draft") {
-      const enabled = ready && reviewDraftState.dirty && reviewDraftHasContent(root);
+      const enabled = ready && formalEvidenceReady && reviewDraftState.dirty && reviewDraftHasContent(root);
       action.disabled = !enabled;
       action.setAttribute("aria-disabled", enabled ? "false" : "true");
     }
     if (action.dataset.drsAction === "request-peer-review") {
-      const enabled = ready && reviewDraftState.revision > 0 && !reviewDraftState.dirty;
+      const enabled = ready && formalEvidenceReady && reviewDraftState.revision > 0 && !reviewDraftState.dirty;
       action.disabled = !enabled;
       action.setAttribute("aria-disabled", enabled ? "false" : "true");
     }
+    if (!formalEvidenceReady && evidenceDependentActions.has(action.dataset.drsAction)) {
+      action.disabled = true;
+      action.setAttribute("aria-disabled", "true");
+    }
+  }
+}
+
+function renderDocumentProjection(root, documentProjection) {
+  const pending = documentProjection?.state === "pending" && Array.isArray(documentProjection.items) && documentProjection.items.length === 0;
+  documentProjectionReady = documentProjection?.state === "ready" && Array.isArray(documentProjection.items) && documentProjection.items.length > 0;
+  setBoundText(root, "[data-document-projection-label]", pending ? documentProjection.label : "尚未取得正式文件");
+  setBoundText(root, "[data-document-risk-state]", pending ? "等待正式文件與版本資料" : "權限或資料狀態尚未確認");
+  setBoundText(root, "[data-document-next-actor]", "DRS 專員");
+  const canvas = root.querySelector("[data-document-canvas]");
+  if (canvas?.dataset) canvas.dataset.evidenceState = "unavailable";
+  const selector = root.querySelector("[data-review-document-select]");
+  if (selector) {
+    selector.value = "";
+    selector.disabled = true;
+    selector.setAttribute?.("aria-disabled", "true");
+  }
+  for (const control of root.querySelectorAll("[data-document-command], [data-document-route-action]")) {
+    control.disabled = true;
+    control.setAttribute?.("aria-disabled", "true");
   }
 }
 
@@ -1270,6 +1390,7 @@ async function loadWorkspaceState(root = document, state = initialWorkspaceState
     resetTransientReviewState(root);
   }
   renderWorkspaceModel(root, model);
+  renderDocumentProjection(root, model.documents);
   syncReadyInertState(root, model.state);
   syncRetryAction(root, model.state);
   bindRenderedReviewActions(root);
@@ -1421,4 +1542,4 @@ function bindWorkspaceActions(root = document) {
 bindWorkspaceActions();
 bootstrapSpecialistCalendarRuntime();
 
-export { AI_REVIEW_STATES, DRS_WORKSPACE_VIEW_MODEL, bindWorkspaceActions, bootstrapSpecialistCalendarRuntime, buildPreSendSnapshot, cancelValues, createInitialReviewIssue, createSpecialistCalendarIntegration, createSpecialistCalendarRuntime, createSpecialistWorkspaceClient, invalidateSnapshotModel, loadWorkspaceState, manualExceptionValues, markReviewDraftDirty, renderCalendarState, requestPeerReview, reviewIssueAllowsPreSend, saveReviewDraft, setGovernanceView, setWorkbenchMode, setWorkspaceState, transitionReviewIssueModel, updateCancelAction, updateManualExceptionAction };
+export { AI_REVIEW_STATES, DRS_WORKSPACE_VIEW_MODEL, bindSpecialistWorkspaceProjection, bindWorkspaceActions, bootstrapSpecialistCalendarRuntime, buildPreSendSnapshot, cancelValues, createInitialReviewIssue, createSpecialistCalendarIntegration, createSpecialistCalendarRuntime, createSpecialistWorkspaceClient, invalidateSnapshotModel, loadWorkspaceState, manualExceptionValues, markReviewDraftDirty, renderCalendarState, requestPeerReview, reviewIssueAllowsPreSend, saveReviewDraft, setGovernanceView, setWorkbenchMode, setWorkspaceState, transitionReviewIssueModel, updateCancelAction, updateManualExceptionAction };
