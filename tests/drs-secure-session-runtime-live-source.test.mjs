@@ -4448,6 +4448,37 @@ function projectHelperCreateBody() {
   return Buffer.from(JSON.stringify(projectHelperCreateValue()), "utf8");
 }
 
+function projectStorageMigrationHelperCreateValue() {
+  const value = projectHelperCreateValue();
+  const anonKey =
+    "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiJ9.opaque_anon_signature";
+  const serviceKey =
+    "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.opaque_service_signature";
+  value.Env = [
+    "DB_INSTALL_ROLES=false",
+    "DB_MIGRATIONS_FREEZE_AT=",
+    `ANON_KEY=${anonKey}`,
+    `SERVICE_KEY=${serviceKey}`,
+    "PGRST_JWT_SECRET=opaque-local-jwt-secret-at-least-32-characters",
+    `DATABASE_URL=postgresql://supabase_storage_admin:opaquePw8@supabase_db_${loopbackProxyProjectId}:5432/postgres`,
+    "FILE_SIZE_LIMIT=52428800",
+    "STORAGE_BACKEND=file",
+    "STORAGE_FILE_BACKEND_PATH=/mnt",
+    "TENANT_ID=stub",
+    "REGION=stub",
+    "GLOBAL_S3_BUCKET=stub",
+  ];
+  value.Cmd = ["node", "dist/scripts/migrate-call.js"];
+  value.Image = "public.ecr.aws/supabase/storage-api:v1.62.5";
+  return value;
+}
+
+function replaceEnvironmentValue(value, name, replacement) {
+  const index = value.Env.findIndex((entry) => entry.startsWith(`${name}=`));
+  assert.notEqual(index, -1);
+  value.Env[index] = `${name}=${replacement}`;
+}
+
 function exactJsonRawHeaders(body) {
   return [
     "Content-Type",
@@ -5229,5 +5260,99 @@ test("S18-F9 exact nameless Realtime health helper is closed and has no host cap
   } finally {
     await proxy.close();
     await closeServer(backend);
+  }
+});
+
+test("S18-F10 exact nameless Storage migration helper is local-only and has no host capability", () => {
+  const value = projectStorageMigrationHelperCreateValue();
+  const body = Buffer.from(JSON.stringify(value), "utf8");
+  const rewritten = rewriteProjectHelperCreateRequest({
+    rawHeaders: exactJsonRawHeaders(body),
+    body,
+  });
+  assert.deepEqual(JSON.parse(rewritten.body.toString("utf8")), value);
+  assert.equal(rewritten.headers["content-type"], "application/json");
+  assert.equal(
+    rewritten.headers["content-length"],
+    String(rewritten.body.byteLength),
+  );
+
+  const hostileMutations = [
+    (candidate) =>
+      candidate.Image = "public.ecr.aws/supabase/storage-api:latest",
+    (candidate) => candidate.Cmd.push("--remote"),
+    (candidate) => candidate.Env.push("UNKNOWN=value"),
+    (candidate) => candidate.Env.push(candidate.Env[0]),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "DB_INSTALL_ROLES", "true"),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "DB_MIGRATIONS_FREEZE_AT",
+        "2026-08-28",
+      ),
+    (candidate) => replaceEnvironmentValue(candidate, "ANON_KEY", "not-a-jwt"),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "SERVICE_KEY", "not-a-jwt"),
+    (candidate) => {
+      const anon = candidate.Env.find((entry) => entry.startsWith("ANON_KEY="))
+        .slice("ANON_KEY=".length);
+      replaceEnvironmentValue(candidate, "SERVICE_KEY", anon);
+    },
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "PGRST_JWT_SECRET", "short"),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "DATABASE_URL",
+        "postgresql://supabase_storage_admin:opaquePw8@db.example.com:5432/postgres",
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "DATABASE_URL",
+        `postgresql://postgres:opaquePw8@supabase_db_${loopbackProxyProjectId}:5432/postgres`,
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "DATABASE_URL",
+        `postgresql://supabase_storage_admin:opaquePw8@supabase_db_${loopbackProxyProjectId}:5433/postgres`,
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "DATABASE_URL",
+        `postgresql://supabase_storage_admin:opaquePw8@supabase_db_${loopbackProxyProjectId}:5432/postgres?sslmode=require`,
+      ),
+    (candidate) => replaceEnvironmentValue(candidate, "FILE_SIZE_LIMIT", "0"),
+    (candidate) => replaceEnvironmentValue(candidate, "STORAGE_BACKEND", "s3"),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "STORAGE_FILE_BACKEND_PATH", "/tmp"),
+    (candidate) => replaceEnvironmentValue(candidate, "TENANT_ID", "other"),
+    (candidate) => replaceEnvironmentValue(candidate, "REGION", "remote"),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "GLOBAL_S3_BUCKET", "remote"),
+    (candidate) => candidate.Labels["com.supabase.cli.project"] = "other",
+    (candidate) => candidate.HostConfig.NetworkMode = "bridge",
+    (candidate) => candidate.HostConfig.PortBindings = {},
+    (candidate) => candidate.HostConfig.Binds = [],
+    (candidate) => candidate.HostConfig.DeviceRequests = [],
+    (candidate) => candidate.HostConfig.CapAdd = ["SYS_ADMIN"],
+    (candidate) => candidate.HostConfig.Privileged = true,
+    (candidate) => candidate.HostConfig.PublishAllPorts = true,
+  ];
+  for (const mutate of hostileMutations) {
+    const candidate = projectStorageMigrationHelperCreateValue();
+    mutate(candidate);
+    const hostileBody = Buffer.from(JSON.stringify(candidate), "utf8");
+    assert.throws(
+      () =>
+        rewriteProjectHelperCreateRequest({
+          rawHeaders: exactJsonRawHeaders(hostileBody),
+          body: hostileBody,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED" },
+    );
   }
 });

@@ -271,6 +271,26 @@ const PROJECT_HELPER_ENVIRONMENT_NAMES = Object.freeze([
   "SEED_SELF_HOST",
 ]);
 
+const PROJECT_STORAGE_HELPER_ENVIRONMENT_NAMES = Object.freeze([
+  "ANON_KEY",
+  "DATABASE_URL",
+  "DB_INSTALL_ROLES",
+  "DB_MIGRATIONS_FREEZE_AT",
+  "FILE_SIZE_LIMIT",
+  "GLOBAL_S3_BUCKET",
+  "PGRST_JWT_SECRET",
+  "REGION",
+  "SERVICE_KEY",
+  "STORAGE_BACKEND",
+  "STORAGE_FILE_BACKEND_PATH",
+  "TENANT_ID",
+]);
+
+const PROJECT_STORAGE_HELPER_OVERRIDES = Object.freeze({
+  Cmd: Object.freeze(["node", "dist/scripts/migrate-call.js"]),
+  Image: "public.ecr.aws/supabase/storage-api:v1.62.5",
+});
+
 const PROJECT_HELPER_FIXED_VALUE = Object.freeze({
   Hostname: "",
   Domainname: "",
@@ -363,6 +383,43 @@ const PROJECT_HELPER_HOST_CONFIG = Object.freeze({
   ReadonlyPaths: null,
 });
 
+function assertProjectStorageHelperEnvironment(environment) {
+  const exactValues = Object.freeze({
+    DB_INSTALL_ROLES: "false",
+    DB_MIGRATIONS_FREEZE_AT: "",
+    FILE_SIZE_LIMIT: "52428800",
+    STORAGE_BACKEND: "file",
+    STORAGE_FILE_BACKEND_PATH: "/mnt",
+    TENANT_ID: "stub",
+    REGION: "stub",
+    GLOBAL_S3_BUCKET: "stub",
+  });
+  for (const [name, expected] of Object.entries(exactValues)) {
+    if (environment.get(name) !== expected) {
+      fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+    }
+  }
+  const jwtPattern =
+    /^[A-Za-z0-9_-]{1,2048}\.[A-Za-z0-9_-]{1,2048}\.[A-Za-z0-9_-]{1,2048}$/u;
+  const anonKey = environment.get("ANON_KEY") ?? "";
+  const serviceKey = environment.get("SERVICE_KEY") ?? "";
+  if (
+    !jwtPattern.test(anonKey) ||
+    !jwtPattern.test(serviceKey) ||
+    anonKey === serviceKey ||
+    !/^[A-Za-z0-9_-]{32,256}$/u.test(
+      environment.get("PGRST_JWT_SECRET") ?? "",
+    ) ||
+    !new RegExp(
+      `^postgresql://supabase_storage_admin:[A-Za-z0-9_-]{1,128}` +
+        `@supabase_db_${PROJECT_ID}:5432/postgres$`,
+      "u",
+    ).test(environment.get("DATABASE_URL") ?? "")
+  ) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+}
+
 function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
   if (isPlainObject(value)) {
@@ -385,15 +442,28 @@ export function rewriteProjectHelperCreateRequest({ rawHeaders, body }) {
     "Env",
     "HostConfig",
   ].sort();
+  const realtimeHelper = canonicalJson(value.Cmd) ===
+      canonicalJson(PROJECT_HELPER_FIXED_VALUE.Cmd) &&
+    value.Image === PROJECT_HELPER_FIXED_VALUE.Image;
+  const storageHelper = canonicalJson(value.Cmd) ===
+      canonicalJson(PROJECT_STORAGE_HELPER_OVERRIDES.Cmd) &&
+    value.Image === PROJECT_STORAGE_HELPER_OVERRIDES.Image;
+  if (realtimeHelper === storageHelper) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+  const expectedEnvironmentNames = storageHelper
+    ? PROJECT_STORAGE_HELPER_ENVIRONMENT_NAMES
+    : PROJECT_HELPER_ENVIRONMENT_NAMES;
   if (
     JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(exactKeys) ||
     !Array.isArray(value.Env) ||
-    value.Env.length !== PROJECT_HELPER_ENVIRONMENT_NAMES.length ||
+    value.Env.length !== expectedEnvironmentNames.length ||
     !isPlainObject(value.HostConfig)
   ) {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
   }
   const environmentNames = [];
+  const environment = new Map();
   for (const entry of value.Env) {
     if (
       typeof entry !== "string" ||
@@ -407,20 +477,26 @@ export function rewriteProjectHelperCreateRequest({ rawHeaders, body }) {
       fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
     }
     environmentNames.push(match[1]);
+    environment.set(match[1], entry.slice(match[0].length));
   }
   if (
     JSON.stringify(environmentNames.sort()) !==
-      JSON.stringify(PROJECT_HELPER_ENVIRONMENT_NAMES) ||
+      JSON.stringify(expectedEnvironmentNames) ||
     canonicalJson(value.HostConfig) !==
       canonicalJson(PROJECT_HELPER_HOST_CONFIG)
   ) {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
   }
   for (const [key, expected] of Object.entries(PROJECT_HELPER_FIXED_VALUE)) {
-    if (canonicalJson(value[key]) !== canonicalJson(expected)) {
+    const variantExpected = storageHelper &&
+        Object.hasOwn(PROJECT_STORAGE_HELPER_OVERRIDES, key)
+      ? PROJECT_STORAGE_HELPER_OVERRIDES[key]
+      : expected;
+    if (canonicalJson(value[key]) !== canonicalJson(variantExpected)) {
       fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
     }
   }
+  if (storageHelper) assertProjectStorageHelperEnvironment(environment);
   return serializeCreateRequest({ framing, value });
 }
 
