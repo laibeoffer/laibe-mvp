@@ -225,7 +225,7 @@ const closedFetchCauses = Object.freeze([
   "FETCH_UNAVAILABLE",
 ]);
 const nativeRedirectFailureMessage =
-  "Encountered redirect while redirect mode is set to 'error'";
+  "Fetch failed: Encountered redirect while redirect mode is set to 'error'";
 
 function isExactDenoError(error, constructor, name) {
   return typeof constructor === "function" && error instanceof constructor &&

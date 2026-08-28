@@ -2956,7 +2956,7 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
       "NATIVE_REDIRECT_REJECTED",
       () =>
         new TypeError(
-          "Encountered redirect while redirect mode is set to 'error'",
+          "Fetch failed: Encountered redirect while redirect mode is set to 'error'",
         ),
     ],
     ["NATIVE_ABORTED", () => new Error("raw abort suffix")],
@@ -2979,6 +2979,30 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
         error.cause = new Error("raw provider cause");
         return error;
       },
+    ],
+    [
+      "NATIVE_OTHER_REJECTED",
+      () => new TypeError(
+        "Encountered redirect while redirect mode is set to 'error'",
+      ),
+    ],
+    [
+      "NATIVE_OTHER_REJECTED",
+      () => new TypeError(
+        "Fetch failed: Encountered redirect while redirect mode is set to 'error' raw-suffix",
+      ),
+    ],
+    [
+      "NATIVE_OTHER_REJECTED",
+      () => new TypeError(
+        "raw-prefix Fetch failed: Encountered redirect while redirect mode is set to 'error'",
+      ),
+    ],
+    [
+      "NATIVE_OTHER_REJECTED",
+      () => new TypeError(
+        "Fetch failed: Encountered redirect while redirect mode is set to error",
+      ),
     ],
   ];
   for (const operation of ["AUTH_CREATE", "AUTH_TOKEN", "AUTH_CURRENT"]) {
@@ -3085,7 +3109,7 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
   }
   assert.match(
     fetchJsonSource,
-    /Encountered redirect while redirect mode is set to 'error'/u,
+    /"Fetch failed: Encountered redirect while redirect mode is set to 'error'"/u,
   );
   assert.match(fetchJsonSource, /Deno\.errors\.NotCapable/u);
   assert.match(fetchJsonSource, /Deno\.errors\.ConnectionRefused/u);
