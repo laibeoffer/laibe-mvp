@@ -440,11 +440,18 @@ export function createSupabaseAuthRuntime({
 
 let authRuntimePromise = null;
 
-export function getSupabaseAuthRuntime({
-  importImplementation = (moduleUrl) => import(moduleUrl),
-  storage = globalThis.localStorage,
-  fetchImplementation = globalThis.fetch,
-} = {}) {
+export function getSupabaseAuthRuntime(options) {
+  const importImplementation = ownValue(options, "importImplementation");
+  const storage = ownValue(options, "storage");
+  const fetchImplementation = ownValue(options, "fetchImplementation");
+  if (
+    typeof importImplementation !== "function" ||
+    !storage ||
+    typeof storage !== "object" ||
+    typeof fetchImplementation !== "function"
+  ) {
+    return Promise.reject(new Error("AUTH_RUNTIME_UNAVAILABLE"));
+  }
   if (!authRuntimePromise) {
     authRuntimePromise = Promise.resolve(importImplementation(SUPABASE_JS_MODULE_URL)).then((module) => (
       createSupabaseAuthRuntime({
@@ -601,6 +608,16 @@ function setBusy(form, busy) {
     };
     label.textContent = busy ? busyLabels[mode] : readyLabels[mode];
   }
+}
+
+function showAuthRuntimeUnavailable(root) {
+  const message = "帳號與案件權限確認正在整理中，正式開放後可由此建立或登入帳號。";
+  root.querySelectorAll("[data-account-form]").forEach((form) => {
+    form.setAttribute("aria-busy", "false");
+    const submit = form.querySelector("[data-submit-button]");
+    if (submit) submit.disabled = true;
+    setStatus(form, message, "notice");
+  });
 }
 
 function setRecoveryFormState(root, {
@@ -915,7 +932,10 @@ export function initAccountAccess(root = document, {
         }
       })
       .catch(() => {
-        if (!recoveryReturn) return;
+        if (!recoveryReturn) {
+          showAuthRuntimeUnavailable(root);
+          return;
+        }
         setRecoveryFormState(root, {
           message: "重設連結已失效，請重新寄送重設密碼信。",
           tone: "error",

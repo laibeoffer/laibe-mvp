@@ -914,63 +914,70 @@ test("Supabase runtime persists the browser session, signs in with Email and pas
   );
 });
 
-test("canonical Auth runtime keeps a verified Supabase session available across same-origin tabs", async () => {
+test("canonical runtime fails closed before browser storage, remote import, or fetch without an admitted same-origin BFF", async () => {
   const localStorageDescriptor = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
-  const sessionStorageDescriptor = Object.getOwnPropertyDescriptor(globalThis, "sessionStorage");
-  const persistentStorage = {
-    getItem() { return null; },
-    setItem() {},
-    removeItem() {},
-  };
-  const tabStorage = {
-    getItem() { return null; },
-    setItem() {},
-    removeItem() {},
-  };
-  let clientOptions = null;
+  const fetchDescriptor = Object.getOwnPropertyDescriptor(globalThis, "fetch");
+  let storageReads = 0;
+  let fetchReads = 0;
 
   try {
     Object.defineProperty(globalThis, "localStorage", {
       configurable: true,
-      value: persistentStorage,
+      get() {
+        storageReads += 1;
+        throw new Error("browser storage must not be read");
+      },
     });
-    Object.defineProperty(globalThis, "sessionStorage", {
+    Object.defineProperty(globalThis, "fetch", {
       configurable: true,
-      value: tabStorage,
+      get() {
+        fetchReads += 1;
+        throw new Error("remote fetch must not be read");
+      },
     });
-    const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?persistent-auth-storage=${Date.now()}`, import.meta.url));
-    await module.getSupabaseAuthRuntime({
-      importImplementation: async () => ({
-        createClient(_url, _key, options) {
-          clientOptions = options;
-          return {
-            auth: {
-              onAuthStateChange() {
-                return { data: { subscription: { unsubscribe() {} } } };
-              },
-            },
-          };
-        },
-      }),
-      fetchImplementation: async () => new Response("{}", { status: 200 }),
-    });
+    const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?canonical-auth-unavailable=${Date.now()}`, import.meta.url));
 
-    assert.equal(
-      clientOptions?.auth?.storage,
-      persistentStorage,
-      "the canonical runtime must not lose the verified session when the owner route opens in another tab",
+    await assert.rejects(
+      module.getSupabaseAuthRuntime(),
+      /AUTH_RUNTIME_UNAVAILABLE/u,
     );
+    assert.equal(storageReads, 0);
+    assert.equal(fetchReads, 0);
   } finally {
     if (localStorageDescriptor) {
       Object.defineProperty(globalThis, "localStorage", localStorageDescriptor);
     } else {
       delete globalThis.localStorage;
     }
-    if (sessionStorageDescriptor) {
-      Object.defineProperty(globalThis, "sessionStorage", sessionStorageDescriptor);
+    if (fetchDescriptor) {
+      Object.defineProperty(globalThis, "fetch", fetchDescriptor);
     } else {
-      delete globalThis.sessionStorage;
+      delete globalThis.fetch;
     }
+  }
+});
+
+test("account access disables submission and shows truthful pending copy when canonical auth runtime is unavailable", async () => {
+  const module = await import(new URL(`../src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js?canonical-auth-pending=${Date.now()}`, import.meta.url));
+  const harness = createRegistrationDomHarness();
+
+  module.initAccountAccess(harness.rootDocument, {
+    authRuntimePromise: Promise.reject(new Error("AUTH_RUNTIME_UNAVAILABLE")),
+    location: { pathname: "/account/access/", search: "" },
+  });
+  await new Promise((resolve) => setImmediate(resolve));
+
+  for (const form of [
+    harness.form,
+    harness.loginForm,
+    harness.forgotForm,
+    harness.recoveryForm,
+  ]) {
+    assert.equal(form.querySelector("[data-submit-button]")?.disabled, true);
+    assert.match(
+      form.querySelector("[data-form-status]")?.textContent ?? "",
+      /帳號與案件權限確認正在整理中/u,
+    );
   }
 });
 
