@@ -382,13 +382,18 @@ export async function createDockerLoopbackProxyServer({
 
   server.on("connection", (socket) => trackSocket(frontendSockets, socket));
   server.on("upgrade", (request, socket, head) => {
+    let classification;
     try {
-      classifyDockerRequestTarget({
+      classification = classifyDockerRequestTarget({
         method: request.method,
         target: request.url,
         allowedContainerNames,
       });
     } catch {
+      socket.destroy();
+      return;
+    }
+    if (classification.kind === "container-create") {
       socket.destroy();
       return;
     }

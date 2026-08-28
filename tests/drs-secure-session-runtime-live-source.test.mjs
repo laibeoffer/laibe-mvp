@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import { execFileSync } from "node:child_process";
 import { createHash, randomBytes } from "node:crypto";
 import { EventEmitter, once } from "node:events";
@@ -4373,6 +4374,37 @@ function requestOverPipe({ pipePath, method, target, body, rawHeaders }) {
   });
 }
 
+function upgradeOverPipe({ pipePath, method, target, body }) {
+  return new Promise((resolve, reject) => {
+    const socket = connectPipe(pipePath);
+    const chunks = [];
+    const timer = setTimeout(() => {
+      socket.destroy();
+      resolve(Buffer.concat(chunks).toString("utf8"));
+    }, 100);
+    socket.once("connect", () => {
+      socket.write(
+        `${method} ${target} HTTP/1.1\r\n` +
+          "Host: docker\r\n" +
+          "Connection: Upgrade\r\n" +
+          "Upgrade: tcp\r\n" +
+          "Content-Type: application/json\r\n" +
+          `Content-Length: ${body.byteLength}\r\n\r\n`,
+      );
+      socket.write(body);
+    });
+    socket.on("data", (chunk) => chunks.push(chunk));
+    socket.once("close", () => {
+      clearTimeout(timer);
+      resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+    socket.once("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+  });
+}
+
 function fakeChildProcess({ stdout = "", stderr = "", exitCode = 0 }) {
   const child = new EventEmitter();
   child.stdout = new PassThrough();
@@ -4718,4 +4750,59 @@ test("S18-F5 proxy and harness bind exact local tools with no TCP or remote depe
     ],
     "Node and proxy identities are closed before runtime construction",
   );
+});
+
+test("S18-F6 upgrade-create is rejected before backend while non-create upgrade remains transparent", async () => {
+  const backendPipe = uniquePipePath("upgrade-backend");
+  const frontendPipe = uniquePipePath("frontend");
+  let backendConnections = 0;
+  let backendUpgrades = 0;
+  const backend = createHttpServer();
+  backend.on("connection", () => {
+    backendConnections += 1;
+  });
+  backend.on("upgrade", (_request, socket) => {
+    backendUpgrades += 1;
+    socket.write(
+      "HTTP/1.1 101 Switching Protocols\r\n" +
+        "Connection: Upgrade\r\n" +
+        "Upgrade: tcp\r\n\r\n" +
+        "UPGRADED",
+    );
+    socket.end();
+  });
+  backend.listen(backendPipe);
+  await once(backend, "listening");
+  const proxy = await createDockerLoopbackProxyServer({
+    pipePath: frontendPipe,
+    backendPipe,
+    allowedContainerNames: loopbackProxyContainerNames,
+  });
+  try {
+    const hostileBody = dockerCreateBody("0.0.0.0");
+    await upgradeOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: canonicalCreateTarget,
+      body: hostileBody,
+    });
+    assert.equal(
+      backendConnections,
+      0,
+      "container-create upgrade is destroyed before backend connection",
+    );
+
+    const upgraded = await upgradeOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: "/v1.51/exec/opaque/start",
+      body: Buffer.alloc(0),
+    });
+    assert.match(upgraded, /101 Switching Protocols[\s\S]*UPGRADED/u);
+    assert.equal(backendConnections, 1);
+    assert.equal(backendUpgrades, 1);
+  } finally {
+    await proxy.close();
+    await closeServer(backend);
+  }
 });
