@@ -596,6 +596,27 @@ function Read-ExactCausalVerdict {
   return $values[0]
 }
 
+function Read-ExactSanitizedDenoAggregateMarker {
+  param([Parameter(Mandatory)][string]$Text)
+
+  $matches = [regex]::Matches(
+    $Text,
+    '(?m)^\s*(?:error:\s*)?(?:Uncaught(?:\s+\(in promise\))?\s+)?(?:AggregateError|Error):\s*(A17_S1AR_[A-Z0-9_:=-]+)\s*$'
+  )
+  $candidates = @(
+    $matches |
+      ForEach-Object { $_.Groups[1].Value } |
+      Where-Object {
+        $_ -cne 'A17_S1AR_CLEANUP_CONFIRMED' -and
+        $_ -notmatch '\AA17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_(?:ROT|LOCK)\z'
+      }
+  )
+  if ($candidates.Count -ne 1) { return $null }
+  $values = @($candidates | Sort-Object -Unique)
+  if ($values.Count -ne 1) { return $null }
+  return $values[0]
+}
+
 function Assert-CapturedOutputSanitized {
   param(
     [Parameter(Mandatory)][string]$Text,
@@ -670,6 +691,7 @@ $protectedManifest = ConvertFrom-ExpectedManifest -Json $ExpectedProtectedManife
 $startAttempted = $false
 $denoAttempted = $false
 $denoResult = $null
+$aggregateMarker = $null
 $primaryError = $null
 $cleanupErrors = [System.Collections.Generic.List[string]]::new()
 $stopSucceeded = $false
@@ -738,13 +760,28 @@ try {
   Assert-CapturedOutputSanitized -Text ($denoResult.Stdout + "`n" + $denoResult.Stderr) -SUPABASE_SERVICE_ROLE_KEY $statusEnvironment['SERVICE_ROLE_KEY'] -LAIBE_DRS_SESSION_COOKIE_KEY_V1 $cookieKey -LAIBE_DRS_BFF_PROOF_KEY_V1 $proofKey
   if ($denoResult.ExitCode -ne 0) {
     $causalVerdict = Read-ExactCausalVerdict -Text $sanitizedText
-    if ($null -ne $causalVerdict) { $primaryResult = $causalVerdict } else { throw 'A17_S1AR_DENO_LIVE_REJECTED' }
+    if ($null -ne $causalVerdict) {
+      $primaryResult = $causalVerdict
+    } else {
+      $aggregateMarker = Read-ExactSanitizedDenoAggregateMarker -Text $sanitizedText
+      if ($null -eq $aggregateMarker) { throw 'A17_S1AR_DENO_LIVE_REJECTED' }
+      throw $aggregateMarker
+    }
   } else {
     $primaryResult = 'A17_S1AR_DISPOSABLE_LOCAL_RUNTIME_PASS'
   }
 }
 catch {
-  $primaryError = if ($_.Exception.Message -match '^A17_S1AR_[A-Z0-9_:,-]+$') { $_.Exception.Message } else { 'A17_S1AR_PRIMARY_REJECTED' }
+  $primaryError = if (
+    $null -ne $aggregateMarker -and
+    $_.Exception.Message -ceq $aggregateMarker
+  ) {
+    $aggregateMarker
+  } elseif ($_.Exception.Message -match '^A17_S1AR_[A-Z0-9_:,-]+$') {
+    $_.Exception.Message
+  } else {
+    'A17_S1AR_PRIMARY_REJECTED'
+  }
   $primaryResult = 'A17_S1AR_DISPOSABLE_LOCAL_RUNTIME_FAIL'
 }
 finally {

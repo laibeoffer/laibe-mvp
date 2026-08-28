@@ -13,6 +13,7 @@ import process from "node:process";
 import { PassThrough } from "node:stream";
 import test from "node:test";
 import { setImmediate } from "node:timers";
+import { fileURLToPath } from "node:url";
 
 import {
   classifyDockerRequestTarget,
@@ -2575,6 +2576,107 @@ test("S2-R1 protected identity is exact-twelve and listener queries fail closed"
 test("S2-R2 causal terminal and cleanup preserve an exact ROT or LOCK reason", () => {
   const ps = source(urls.powershell);
   const deno = source(urls.deno);
+  const extractPowerShellFunction = (name) => {
+    const start = ps.indexOf(`function ${name} {`);
+    if (start === -1) return "";
+    const end = ps.indexOf("\nfunction ", start + 1);
+    return ps.slice(start, end === -1 ? ps.length : end);
+  };
+  const denoFailureStart = ps.indexOf("if ($denoResult.ExitCode -ne 0) {");
+  const denoFailureEnd = ps.indexOf(
+    "\n  } else {\n    $primaryResult = 'A17_S1AR_DISPOSABLE_LOCAL_RUNTIME_PASS'",
+    denoFailureStart,
+  );
+  assert.notEqual(denoFailureStart, -1);
+  assert.equal(denoFailureEnd > denoFailureStart, true);
+  const denoFailureBranch = ps.slice(denoFailureStart, denoFailureEnd) +
+    "\n  }";
+  const causalFunction = extractPowerShellFunction("Read-ExactCausalVerdict");
+  assert.notEqual(causalFunction, "");
+  const aggregateFunction = extractPowerShellFunction(
+    "Read-ExactSanitizedDenoAggregateMarker",
+  );
+  const runDenoFailureBranch = (text) => {
+    const encoded = Buffer.from(text, "utf8").toString("base64");
+    const script = String.raw`
+$ErrorActionPreference = 'Stop'
+${causalFunction}
+${aggregateFunction}
+$sanitizedText = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${encoded}'))
+$denoResult = [pscustomobject]@{ ExitCode = 1 }
+$primaryResult = $null
+try {
+${denoFailureBranch}
+  if ($null -ne $primaryResult) { [Console]::Out.Write([string]$primaryResult) }
+}
+catch {
+  [Console]::Out.Write([string]$_.Exception.Message)
+}
+`;
+    return execFileSync(
+      windowsPowerShellParser,
+      [
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        script,
+      ],
+      {
+        cwd: fileURLToPath(root),
+        encoding: "utf8",
+        windowsHide: true,
+      },
+    ).trim();
+  };
+  const sanitizedAggregateMarker =
+    "A17_S1AR_PROVIDER_FAILURE:PHASE=FETCH";
+  assert.deepEqual(
+    {
+      oneAggregate: runDenoFailureBranch(
+        `error: Uncaught (in promise) AggregateError: ${sanitizedAggregateMarker}`,
+      ),
+      oneError: runDenoFailureBranch(
+        `Error: ${sanitizedAggregateMarker}`,
+      ),
+      causalPrecedence: runDenoFailureBranch(
+        `A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_ROT\n` +
+          `AggregateError: ${sanitizedAggregateMarker}`,
+      ),
+      missing: runDenoFailureBranch("AggregateError: provider failure"),
+      duplicate: runDenoFailureBranch(
+        `AggregateError: ${sanitizedAggregateMarker}\n` +
+          `Error: ${sanitizedAggregateMarker}`,
+      ),
+      conflicting: runDenoFailureBranch(
+        `AggregateError: ${sanitizedAggregateMarker}\n` +
+          "Error: A17_S1AR_OTHER_FAILURE",
+      ),
+      cleanup: runDenoFailureBranch(
+        "AggregateError: A17_S1AR_CLEANUP_CONFIRMED",
+      ),
+      causalAsError: runDenoFailureBranch(
+        "Error: A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_LOCK",
+      ),
+      providerSuffix: runDenoFailureBranch(
+        `AggregateError: ${sanitizedAggregateMarker} provider-data`,
+      ),
+    },
+    {
+      oneAggregate: sanitizedAggregateMarker,
+      oneError: sanitizedAggregateMarker,
+      causalPrecedence: "A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_ROT",
+      missing: "A17_S1AR_DENO_LIVE_REJECTED",
+      duplicate: "A17_S1AR_DENO_LIVE_REJECTED",
+      conflicting: "A17_S1AR_DENO_LIVE_REJECTED",
+      cleanup: "A17_S1AR_DENO_LIVE_REJECTED",
+      causalAsError: "A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_LOCK",
+      providerSuffix: "A17_S1AR_DENO_LIVE_REJECTED",
+    },
+    "only one sanitized AggregateError or Error marker survives generic Deno failure",
+  );
   for (
     const marker of [
       "A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_ROT",
@@ -2609,6 +2711,34 @@ test("S2-R2 causal terminal and cleanup preserve an exact ROT or LOCK reason", (
   ], "cleanup confirmation before primary rethrow");
   assert.match(ps, /A17_S1AR_PRIMARY_FAILED_CLEANUP_CONFIRMED/u);
   assert.match(ps, /A17_S1AR_CLEANUP_FAILED/u);
+  const denoFailureSelector = ps.slice(
+    ps.indexOf("$sanitizedText = $denoResult.Stdout"),
+    ps.indexOf("$primaryResult = 'A17_S1AR_DISPOSABLE_LOCAL_RUNTIME_PASS'"),
+  );
+  assertOrdered(
+    denoFailureSelector,
+    [
+      "Assert-CapturedOutputSanitized",
+      "Read-ExactCausalVerdict",
+      "Read-ExactSanitizedDenoAggregateMarker",
+      "A17_S1AR_DENO_LIVE_REJECTED",
+    ],
+    "secret scan and causal verdict precede sanitized AggregateError fallback",
+  );
+  const primaryCatchStart = ps.indexOf("\ncatch {", denoFailureEnd);
+  const primaryCatchEnd = ps.indexOf("\nfinally {", primaryCatchStart);
+  assert.equal(primaryCatchStart > denoFailureEnd, true);
+  assert.equal(primaryCatchEnd > primaryCatchStart, true);
+  const primaryCatch = ps.slice(primaryCatchStart, primaryCatchEnd);
+  assertOrdered(
+    primaryCatch,
+    [
+      "$null -ne $aggregateMarker",
+      "$_.Exception.Message -ceq $aggregateMarker",
+      "^A17_S1AR_[A-Z0-9_:,-]+$",
+    ],
+    "only the parser-bound marker bypasses the original primary allow-pattern",
+  );
 });
 
 test("S2-R3 issue verify revoke lock lanes and exact column metadata are executable", () => {
