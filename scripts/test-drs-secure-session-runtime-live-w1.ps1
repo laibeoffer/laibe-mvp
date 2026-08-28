@@ -596,12 +596,12 @@ function Read-ExactCausalVerdict {
   return $values[0]
 }
 
-function Read-ExactSanitizedDenoAggregateMarker {
+function Read-ExactSanitizedDenoPrimaryMarker {
   param([Parameter(Mandatory)][string]$Text)
 
   $matches = [regex]::Matches(
     $Text,
-    '(?m)^\s*(?:error:\s*)?(?:Uncaught(?:\s+\(in promise\))?\s+)?(?:AggregateError|Error):\s*(A17_S1AR_[A-Z0-9_:=-]+)\s*$'
+    '(?m)^A17_S1AR_SANITIZED_PRIMARY=(A17_S1AR_[A-Z0-9_:=-]+)\r?$'
   )
   $candidates = @(
     $matches |
@@ -691,7 +691,7 @@ $protectedManifest = ConvertFrom-ExpectedManifest -Json $ExpectedProtectedManife
 $startAttempted = $false
 $denoAttempted = $false
 $denoResult = $null
-$aggregateMarker = $null
+$sanitizedPrimaryMarker = $null
 $primaryError = $null
 $cleanupErrors = [System.Collections.Generic.List[string]]::new()
 $stopSucceeded = $false
@@ -763,9 +763,9 @@ try {
     if ($null -ne $causalVerdict) {
       $primaryResult = $causalVerdict
     } else {
-      $aggregateMarker = Read-ExactSanitizedDenoAggregateMarker -Text $sanitizedText
-      if ($null -eq $aggregateMarker) { throw 'A17_S1AR_DENO_LIVE_REJECTED' }
-      throw $aggregateMarker
+      $sanitizedPrimaryMarker = Read-ExactSanitizedDenoPrimaryMarker -Text $sanitizedText
+      if ($null -eq $sanitizedPrimaryMarker) { throw 'A17_S1AR_DENO_LIVE_REJECTED' }
+      throw $sanitizedPrimaryMarker
     }
   } else {
     $primaryResult = 'A17_S1AR_DISPOSABLE_LOCAL_RUNTIME_PASS'
@@ -773,10 +773,10 @@ try {
 }
 catch {
   $primaryError = if (
-    $null -ne $aggregateMarker -and
-    $_.Exception.Message -ceq $aggregateMarker
+    $null -ne $sanitizedPrimaryMarker -and
+    $_.Exception.Message -ceq $sanitizedPrimaryMarker
   ) {
-    $aggregateMarker
+    $sanitizedPrimaryMarker
   } elseif ($_.Exception.Message -match '^A17_S1AR_[A-Z0-9_:,-]+$') {
     $_.Exception.Message
   } else {

@@ -1426,6 +1426,9 @@ if (runtimeConfirmed) {
               /^A17_S1AR_[A-Z0-9_=:-]+$/u.test(primaryError.message)
             ? primaryError.message
             : "A17_S1AR_PRIMARY_REJECTED");
+        if (!primaryError?.causalMarker) {
+          console.log(`A17_S1AR_SANITIZED_PRIMARY=${primaryTrace}`);
+        }
         const aggregate = [
           primaryError ? primaryTrace : "A17_S1AR_PRIMARY_COMPLETE",
           ...cleanupErrors,

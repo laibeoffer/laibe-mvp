@@ -2593,19 +2593,31 @@ test("S2-R2 causal terminal and cleanup preserve an exact ROT or LOCK reason", (
     "\n  }";
   const causalFunction = extractPowerShellFunction("Read-ExactCausalVerdict");
   assert.notEqual(causalFunction, "");
-  const aggregateFunction = extractPowerShellFunction(
+  const legacyAggregateFunction = extractPowerShellFunction(
     "Read-ExactSanitizedDenoAggregateMarker",
   );
+  const sanitizedPrimaryFunction = extractPowerShellFunction(
+    "Read-ExactSanitizedDenoPrimaryMarker",
+  );
+  const sanitizerFunction = extractPowerShellFunction(
+    "Assert-CapturedOutputSanitized",
+  );
+  assert.notEqual(sanitizerFunction, "");
   const runDenoFailureBranch = (text) => {
     const encoded = Buffer.from(text, "utf8").toString("base64");
     const script = String.raw`
 $ErrorActionPreference = 'Stop'
 ${causalFunction}
-${aggregateFunction}
+${legacyAggregateFunction}
+${sanitizedPrimaryFunction}
+${sanitizerFunction}
 $sanitizedText = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${encoded}'))
 $denoResult = [pscustomobject]@{ ExitCode = 1 }
 $primaryResult = $null
+$aggregateMarker = $null
+$sanitizedPrimaryMarker = $null
 try {
+  Assert-CapturedOutputSanitized -Text $sanitizedText -SUPABASE_SERVICE_ROLE_KEY 'opaque-service-role-secret' -LAIBE_DRS_SESSION_COOKIE_KEY_V1 'opaque-cookie-key' -LAIBE_DRS_BFF_PROOF_KEY_V1 'opaque-proof-key'
 ${denoFailureBranch}
   if ($null -ne $primaryResult) { [Console]::Out.Write([string]$primaryResult) }
 }
@@ -2631,51 +2643,56 @@ catch {
       },
     ).trim();
   };
-  const sanitizedAggregateMarker =
+  const sanitizedPrimaryMarker =
     "A17_S1AR_PROVIDER_FAILURE:PHASE=FETCH";
+  const dedicatedPrefix = "A17_S1AR_SANITIZED_PRIMARY=";
   assert.deepEqual(
     {
-      oneAggregate: runDenoFailureBranch(
-        `error: Uncaught (in promise) AggregateError: ${sanitizedAggregateMarker}`,
-      ),
-      oneError: runDenoFailureBranch(
-        `Error: ${sanitizedAggregateMarker}`,
+      oneDedicated: runDenoFailureBranch(
+        `${dedicatedPrefix}${sanitizedPrimaryMarker}`,
       ),
       causalPrecedence: runDenoFailureBranch(
         `A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_ROT\n` +
-          `AggregateError: ${sanitizedAggregateMarker}`,
+          `${dedicatedPrefix}${sanitizedPrimaryMarker}`,
       ),
       missing: runDenoFailureBranch("AggregateError: provider failure"),
       duplicate: runDenoFailureBranch(
-        `AggregateError: ${sanitizedAggregateMarker}\n` +
-          `Error: ${sanitizedAggregateMarker}`,
+        `${dedicatedPrefix}${sanitizedPrimaryMarker}\n` +
+          `${dedicatedPrefix}${sanitizedPrimaryMarker}`,
       ),
       conflicting: runDenoFailureBranch(
-        `AggregateError: ${sanitizedAggregateMarker}\n` +
-          "Error: A17_S1AR_OTHER_FAILURE",
+        `${dedicatedPrefix}${sanitizedPrimaryMarker}\n` +
+          `${dedicatedPrefix}A17_S1AR_OTHER_FAILURE`,
       ),
       cleanup: runDenoFailureBranch(
-        "AggregateError: A17_S1AR_CLEANUP_CONFIRMED",
+        `${dedicatedPrefix}A17_S1AR_CLEANUP_CONFIRMED`,
       ),
-      causalAsError: runDenoFailureBranch(
-        "Error: A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_LOCK",
+      causalAsDedicated: runDenoFailureBranch(
+        `${dedicatedPrefix}A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_LOCK`,
       ),
       providerSuffix: runDenoFailureBranch(
-        `AggregateError: ${sanitizedAggregateMarker} provider-data`,
+        `${dedicatedPrefix}${sanitizedPrimaryMarker} provider-data`,
+      ),
+      secretCanary: runDenoFailureBranch(
+        `${dedicatedPrefix}A17_S1AR_HOSTILE_ACCESS_TOKEN_CANARY_202608`,
+      ),
+      unknownPrimary: runDenoFailureBranch(
+        `${dedicatedPrefix}A17_S1AR_PRIMARY_REJECTED`,
       ),
     },
     {
-      oneAggregate: sanitizedAggregateMarker,
-      oneError: sanitizedAggregateMarker,
+      oneDedicated: sanitizedPrimaryMarker,
       causalPrecedence: "A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_ROT",
       missing: "A17_S1AR_DENO_LIVE_REJECTED",
       duplicate: "A17_S1AR_DENO_LIVE_REJECTED",
       conflicting: "A17_S1AR_DENO_LIVE_REJECTED",
       cleanup: "A17_S1AR_DENO_LIVE_REJECTED",
-      causalAsError: "A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_LOCK",
+      causalAsDedicated: "A17_S1AR_RUNTIME_VERDICT=NEEDS_REWORK_LOCK",
       providerSuffix: "A17_S1AR_DENO_LIVE_REJECTED",
+      secretCanary: "A17_S1AR_CAPTURED_OUTPUT_SECRET_OR_CANARY",
+      unknownPrimary: "A17_S1AR_PRIMARY_REJECTED",
     },
-    "only one sanitized AggregateError or Error marker survives generic Deno failure",
+    "only one dedicated sanitized primary marker survives generic Deno failure",
   );
   for (
     const marker of [
@@ -2709,6 +2726,26 @@ catch {
     'console.log("A17_S1AR_CLEANUP_CONFIRMED")',
     "if (primaryError",
   ], "cleanup confirmation before primary rethrow");
+  const denoAggregateTerminal = deno.slice(
+    deno.indexOf("const primaryTrace = primaryError?.causalMarker"),
+    deno.indexOf("throw new AggregateError", deno.indexOf("const primaryTrace")),
+  );
+  assert.equal(
+    occurrences(denoAggregateTerminal, /A17_S1AR_SANITIZED_PRIMARY=/gu),
+    1,
+    "Deno emits one dedicated sanitized primary line",
+  );
+  assertOrdered(
+    denoAggregateTerminal,
+    [
+      "const primaryTrace = primaryError?.causalMarker",
+      '"A17_S1AR_PRIMARY_REJECTED"',
+      "if (!primaryError?.causalMarker)",
+      "A17_S1AR_SANITIZED_PRIMARY=${primaryTrace}",
+      "const aggregate =",
+    ],
+    "Deno closes primaryTrace before noncausal dedicated output",
+  );
   assert.match(ps, /A17_S1AR_PRIMARY_FAILED_CLEANUP_CONFIRMED/u);
   assert.match(ps, /A17_S1AR_CLEANUP_FAILED/u);
   const denoFailureSelector = ps.slice(
@@ -2720,10 +2757,10 @@ catch {
     [
       "Assert-CapturedOutputSanitized",
       "Read-ExactCausalVerdict",
-      "Read-ExactSanitizedDenoAggregateMarker",
+      "Read-ExactSanitizedDenoPrimaryMarker",
       "A17_S1AR_DENO_LIVE_REJECTED",
     ],
-    "secret scan and causal verdict precede sanitized AggregateError fallback",
+    "secret scan and causal verdict precede dedicated sanitized primary fallback",
   );
   const primaryCatchStart = ps.indexOf("\ncatch {", denoFailureEnd);
   const primaryCatchEnd = ps.indexOf("\nfinally {", primaryCatchStart);
@@ -2733,8 +2770,8 @@ catch {
   assertOrdered(
     primaryCatch,
     [
-      "$null -ne $aggregateMarker",
-      "$_.Exception.Message -ceq $aggregateMarker",
+      "$null -ne $sanitizedPrimaryMarker",
+      "$_.Exception.Message -ceq $sanitizedPrimaryMarker",
       "^A17_S1AR_[A-Z0-9_:,-]+$",
     ],
     "only the parser-bound marker bypasses the original primary allow-pattern",
