@@ -4694,6 +4694,9 @@ test("S18-F2 Docker create JSON and framing are rewritten closed to IPv4 loopbac
 
   const nullPortBindings = JSON.parse(validBody.toString("utf8"));
   nullPortBindings.HostConfig.PortBindings = null;
+  nullPortBindings.HostConfig.PublishAllPorts = false;
+  nullPortBindings.HostConfig.NetworkMode =
+    `supabase_network_${loopbackProxyProjectId}`;
   const nullPortBindingsBody = Buffer.from(JSON.stringify(nullPortBindings));
   const nullPortBindingsResult = rewriteContainerCreateRequest({
     rawHeaders: exactJsonRawHeaders(nullPortBindingsBody),
@@ -4704,6 +4707,63 @@ test("S18-F2 Docker create JSON and framing are rewritten closed to IPv4 loopbac
       .PortBindings,
     null,
     "an explicit null PortBindings remains non-published",
+  );
+
+  const missedUnsafeNullPortBindings = [];
+  for (
+    const [label, mutate] of [
+      [
+        "PUBLISH_ALL_PORTS_TRUE",
+        (candidate) => candidate.HostConfig.PublishAllPorts = true,
+      ],
+      [
+        "NETWORK_MODE_HOST",
+        (candidate) => candidate.HostConfig.NetworkMode = "host",
+      ],
+      [
+        "NETWORK_MODE_BRIDGE",
+        (candidate) => candidate.HostConfig.NetworkMode = "bridge",
+      ],
+      [
+        "NETWORK_MODE_WRONG_PROJECT",
+        (candidate) =>
+          candidate.HostConfig.NetworkMode = "supabase_network_other",
+      ],
+      [
+        "NETWORK_MODE_MISSING",
+        (candidate) => delete candidate.HostConfig.NetworkMode,
+      ],
+      [
+        "NETWORK_MODE_EMPTY",
+        (candidate) => candidate.HostConfig.NetworkMode = "",
+      ],
+      [
+        "NETWORK_MODE_NULL",
+        (candidate) => candidate.HostConfig.NetworkMode = null,
+      ],
+    ]
+  ) {
+    const unsafe = structuredClone(nullPortBindings);
+    mutate(unsafe);
+    const unsafeBody = Buffer.from(JSON.stringify(unsafe));
+    try {
+      rewriteContainerCreateRequest({
+        rawHeaders: exactJsonRawHeaders(unsafeBody),
+        body: unsafeBody,
+      });
+      missedUnsafeNullPortBindings.push(label);
+    } catch (error) {
+      assert.equal(
+        error.message,
+        "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED",
+        label,
+      );
+    }
+  }
+  assert.deepEqual(
+    missedUnsafeNullPortBindings,
+    [],
+    "null PortBindings requires non-published exact project networking",
   );
 
   for (const malformedBindings of [[], ""]) {

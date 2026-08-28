@@ -209,6 +209,16 @@ export function rewriteContainerCreateRequest({ rawHeaders, body }) {
   const hasPortBindings = Object.hasOwn(value.HostConfig, "PortBindings");
   if (
     hasPortBindings &&
+    value.HostConfig.PortBindings === null &&
+    (
+      value.HostConfig.PublishAllPorts !== false ||
+      value.HostConfig.NetworkMode !== `supabase_network_${PROJECT_ID}`
+    )
+  ) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+  if (
+    hasPortBindings &&
     value.HostConfig.PortBindings !== null &&
     !isPlainObject(value.HostConfig.PortBindings)
   ) {
