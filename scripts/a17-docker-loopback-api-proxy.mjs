@@ -207,10 +207,16 @@ export function rewriteContainerCreateRequest({ rawHeaders, body }) {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
   }
   const hasPortBindings = Object.hasOwn(value.HostConfig, "PortBindings");
-  if (hasPortBindings && !isPlainObject(value.HostConfig.PortBindings)) {
+  if (
+    hasPortBindings &&
+    value.HostConfig.PortBindings !== null &&
+    !isPlainObject(value.HostConfig.PortBindings)
+  ) {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
   }
-  const portBindings = hasPortBindings ? value.HostConfig.PortBindings : {};
+  const portBindings = hasPortBindings && value.HostConfig.PortBindings !== null
+    ? value.HostConfig.PortBindings
+    : {};
 
   for (
     const [containerPort, bindings] of Object.entries(portBindings)

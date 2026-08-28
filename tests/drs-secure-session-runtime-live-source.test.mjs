@@ -4692,7 +4692,21 @@ test("S18-F2 Docker create JSON and framing are rewritten closed to IPv4 loopbac
     "a container with no published ports remains non-published",
   );
 
-  for (const malformedBindings of [null, [], ""]) {
+  const nullPortBindings = JSON.parse(validBody.toString("utf8"));
+  nullPortBindings.HostConfig.PortBindings = null;
+  const nullPortBindingsBody = Buffer.from(JSON.stringify(nullPortBindings));
+  const nullPortBindingsResult = rewriteContainerCreateRequest({
+    rawHeaders: exactJsonRawHeaders(nullPortBindingsBody),
+    body: nullPortBindingsBody,
+  });
+  assert.equal(
+    JSON.parse(nullPortBindingsResult.body.toString("utf8")).HostConfig
+      .PortBindings,
+    null,
+    "an explicit null PortBindings remains non-published",
+  );
+
+  for (const malformedBindings of [[], ""]) {
     const malformed = JSON.parse(validBody.toString("utf8"));
     malformed.HostConfig.PortBindings = malformedBindings;
     const malformedBody = Buffer.from(JSON.stringify(malformed));
