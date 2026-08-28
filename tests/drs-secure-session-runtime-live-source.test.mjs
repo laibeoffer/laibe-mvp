@@ -2968,7 +2968,13 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
       ": client error (Connect): transport error: ",
     ),
     calibratedConnectionMessage.replace("No connection", "No\nconnection"),
-    `${calibratedConnectionPrefix}${"x".repeat(1_024)} ${calibratedConnectionSuffix}`,
+    calibratedConnectionMessage.replace("No connection", "No\u0080connection"),
+    calibratedConnectionMessage.replace("No connection", "No\u0085connection"),
+    calibratedConnectionMessage.replace("No connection", "No\u009bconnection"),
+    calibratedConnectionMessage.replace("No connection", "No\u009fconnection"),
+    `${calibratedConnectionPrefix}${
+      "x".repeat(1_024)
+    } ${calibratedConnectionSuffix}`,
   ];
   const nativeFetchCases = [
     [

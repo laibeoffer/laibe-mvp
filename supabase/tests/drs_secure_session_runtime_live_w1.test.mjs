@@ -241,7 +241,10 @@ function isClosedUtf8Text(text, maxBytes) {
   ) return false;
   for (let index = 0; index < text.length; index += 1) {
     const codeUnit = text.charCodeAt(index);
-    if (codeUnit <= 0x1f || codeUnit === 0x7f) return false;
+    if (
+      codeUnit <= 0x1f || codeUnit === 0x7f ||
+      (codeUnit >= 0x80 && codeUnit <= 0x9f)
+    ) return false;
   }
   const bytes = new TextEncoder().encode(text);
   if (bytes.byteLength > maxBytes) return false;
