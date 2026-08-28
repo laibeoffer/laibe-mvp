@@ -98,7 +98,11 @@ export function classifyDockerRequestTarget({
 
   const canonicalPath = /^\/v([1-9]\d*)\.(0|[1-9]\d*)\/containers\/create$/u;
   const pathMatch = canonicalPath.exec(pathname);
-  if (method === "POST" && pathMatch !== null && queryIndex === -1) {
+  if (
+    method === "POST" &&
+    pathname === "/v1.51/containers/create" &&
+    queryIndex === -1
+  ) {
     return { kind: "project-helper-create" };
   }
   const queryMatch = /^name=([A-Za-z0-9_-]+)$/u.exec(rawQuery);

@@ -5092,6 +5092,11 @@ test("S18-F9 exact nameless Realtime health helper is closed and has no host cap
       ["POST", "/containers/create"],
       ["POST", "/v1.51/CONTAINERS/create"],
       ["POST", "/v1.51/containers/%63reate"],
+      ["POST", "/v1.0/containers/create"],
+      ["POST", "/v1.50/containers/create"],
+      ["POST", "/v1.52/containers/create"],
+      ["POST", "/v2.0/containers/create"],
+      ["POST", "/v999.999/containers/create"],
       ["POST", "/v1.51/containers/create?"],
       ["POST", "/v1.51/containers/create?name="],
       ["POST", "/v1.51/containers/create?extra=1"],
@@ -5160,11 +5165,15 @@ test("S18-F9 exact nameless Realtime health helper is closed and has no host cap
   const backendPipe = uniquePipePath("helper-backend");
   const frontendPipe = uniquePipePath("frontend");
   let backendRequests = 0;
+  let backendConnections = 0;
   const backend = createHttpServer((request, response) => {
     backendRequests += 1;
     request.resume();
     response.writeHead(201, { "content-type": "application/json" });
     response.end('{"Id":"local-helper"}');
+  });
+  backend.on("connection", () => {
+    backendConnections += 1;
   });
   backend.listen(backendPipe);
   await once(backend, "listening");
@@ -5196,6 +5205,27 @@ test("S18-F9 exact nameless Realtime health helper is closed and has no host cap
     });
     assert.equal(rejected.statusCode, 400);
     assert.equal(backendRequests, 1);
+
+    const connectionsBeforeAliases = backendConnections;
+    const rejectedVersion = await requestOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: "/v1.52/containers/create",
+      body,
+      rawHeaders: exactJsonRawHeaders(body),
+    });
+    assert.equal(rejectedVersion.statusCode, 400);
+    assert.equal(backendRequests, 1);
+    assert.equal(backendConnections, connectionsBeforeAliases);
+
+    await upgradeOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: "/v2.0/containers/create",
+      body,
+    });
+    assert.equal(backendRequests, 1);
+    assert.equal(backendConnections, connectionsBeforeAliases);
   } finally {
     await proxy.close();
     await closeServer(backend);
