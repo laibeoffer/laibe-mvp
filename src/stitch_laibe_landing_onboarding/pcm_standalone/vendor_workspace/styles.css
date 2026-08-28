@@ -3407,7 +3407,7 @@ html,body{background:#0B0B0B !important}
   transform: none;
 }
 
-.vendor-gate .vendor-gate-management-tab:disabled {
+#vendor-main .vendor-gate .vendor-gate-management-tab:disabled {
   color: var(--vendor-warm-ivory);
   filter: none;
   opacity: 1;

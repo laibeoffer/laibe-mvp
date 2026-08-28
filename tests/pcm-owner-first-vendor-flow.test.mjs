@@ -154,9 +154,10 @@ function parseCssDeclarations(block) {
 }
 
 function cssSpecificity(selector) {
-  const ids = selector.match(/#[a-z0-9_-]+/giu)?.length ?? 0;
-  const classes = selector.match(/\.[a-z0-9_-]+|\[[^\]]+\]|:(?!:)[a-z0-9_-]+/giu)?.length ?? 0;
-  const elements = selector
+  const specificitySource = selector.replace(/:where\([^)]*\)/giu, "");
+  const ids = specificitySource.match(/#[a-z0-9_-]+/giu)?.length ?? 0;
+  const classes = specificitySource.match(/\.[a-z0-9_-]+|\[[^\]]+\]|:(?!:)[a-z0-9_-]+/giu)?.length ?? 0;
+  const elements = specificitySource
     .split(/\s+/u)
     .filter((part) => /^[a-z][a-z0-9-]*/iu.test(part))
     .length;
@@ -1913,8 +1914,17 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   assert.equal(focused, tabs[2]);
   assert.equal(links[2].getAttribute("aria-current"), null, "manual keyboard navigation clears the old route claim");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#records"), "design");
+  assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#contracts"), "contract");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#execution"), "construction");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#case-focus"), null);
+
+  view.location.hash = "#contracts";
+  windowListeners.get("hashchange")?.();
+  assert.equal(focused, tabs[1]);
+  assert.equal(tabs[1].getAttribute("aria-selected"), "true");
+  assert.equal(panels[0].hidden, true);
+  assert.equal(panels[1].hidden, false);
+  assert.equal(panels[2].hidden, true);
 });
 
 test("vendor cloned Element resolves ownerDocument view for initial and changed fragments", async () => {
@@ -2451,7 +2461,21 @@ test("vendor sidebar exposes truthful contract backup management with readable a
 
   assert.match(
     css,
-    /\.vendor-gate \.vendor-gate-management-tab:disabled\s*\{[\s\S]{0,280}color:\s*var\(--vendor-warm-ivory\)[\s\S]{0,280}filter:\s*none[\s\S]{0,280}opacity:\s*1/u,
+    /#vendor-main \.vendor-gate \.vendor-gate-management-tab:disabled\s*\{[\s\S]{0,280}color:\s*var\(--vendor-warm-ivory\)[\s\S]{0,280}filter:\s*none[\s\S]{0,280}opacity:\s*1/u,
+  );
+  const glassDisabledSelector = "#vendor-main :where(.vendor-gate, .vendor-workspace) :where(button:disabled, button[aria-disabled=\"true\"], .vendor-primary-action[aria-disabled=\"true\"])";
+  const managementContrastSelector = css.match(
+    /([^,{]+\.vendor-gate-management-tab:disabled)\s*\{[^}]*filter:\s*none;[^}]*opacity:\s*1;/u,
+  )?.[1].trim();
+  assert.ok(managementContrastSelector, "management contrast override selector");
+  assert.deepEqual(cssSpecificity(glassDisabledSelector), [1, 0, 0]);
+  assert.equal(
+    compareCssPriority(
+      { important: false, specificity: cssSpecificity(managementContrastSelector), order: 1 },
+      { important: false, specificity: cssSpecificity(glassDisabledSelector), order: 0 },
+    ),
+    1,
+    "management contrast override must outrank the glass disabled rule",
   );
   assert.match(
     css,
