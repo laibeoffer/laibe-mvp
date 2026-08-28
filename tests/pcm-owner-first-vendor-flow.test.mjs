@@ -2203,7 +2203,7 @@ test("PHASE A: Calendar Hero and document import lead the authorized workspace w
   assert.match(authorizedMarkup, /data-vendor-document-queue/u);
   assert.doesNotMatch(authorizedMarkup, /data-vendor-line-import|LINE 文件匯入/u);
   assert.match(authorizedMarkup, /data-vendor-document-upload[^>]*disabled[^>]*aria-disabled="true"/u);
-  assert.match(authorizedMarkup, /文件上傳正在整理中/u);
+  assert.match(authorizedMarkup, /等待文件服務開放/u);
 
   assert.doesNotMatch(publicMarkup, /data-vendor-calendar-hero|data-vendor-document-import|data-vendor-document-dropzone|LINE 文件匯入/u);
   assert.doesNotMatch(authorizedMarkup, /LINE 三方群組|LINE 案件對話|line-conversation|vendor-workspace-sidecar/u);
@@ -2265,12 +2265,13 @@ test("PHASE A: document picker and drop stage supported files locally without cl
   ], "裝置選擇"), 2);
   assert.equal(queue.children.length, 2);
   assert.equal(empty.hidden, true);
-  assert.equal(countNode.textContent, "共 2 份・尚未送出");
+  assert.equal(countNode.textContent, "本機選取 2 份・尚未送出");
   assert.match(status.textContent, /尚未送出/u);
   assert.equal(queue.children[0].children[0].children[0].textContent, "平面配置-v3.pdf");
   assert.match(queue.children[1].children[0].children[1].children[2].textContent, /影像文件・待確認/u);
   assert.equal(queue.children[0].children[0].children[1].children[3].textContent, "目前案件：目前授權案件");
-  assert.equal(queue.children[0].children[0].children[1].children[8].textContent, "上傳狀態：待上傳");
+  assert.equal(queue.children[0].children[0].children[1].children[7].textContent, "送出狀態：尚未送出");
+  assert.equal(queue.children[0].children[0].children[1].children[8].textContent, "留痕狀態：尚未建立案件紀錄");
 
   queue.children[0].children[1].emit("click");
   assert.equal(queue.children.length, 1);
@@ -2279,7 +2280,148 @@ test("PHASE A: document picker and drop stage supported files locally without cl
     dataTransfer: { files: [{ name: "驗收照片.png", size: 8192, type: "image/png", lastModified: 4 }] },
   });
   assert.equal(queue.children.length, 2);
-  assert.equal(countNode.textContent, "共 2 份・尚未送出");
+  assert.equal(countNode.textContent, "本機選取 2 份・尚未送出");
+});
+
+test("vendor document consumer maps work categories to responsibility next action and record truth", async () => {
+  const [html, runtimeSource] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "app.js"), "utf8"),
+  ]);
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+  const documentStart = authorizedMarkup.indexOf("data-vendor-document-import");
+  const documentEnd = authorizedMarkup.indexOf('<div class="app vendor-workspace-shell"', documentStart);
+  const documentArea = authorizedMarkup.slice(documentStart, documentEnd);
+
+  assert.ok(documentStart >= 0);
+  assert.ok(documentEnd > documentStart);
+  assert.equal(count(documentArea, /\bdata-vendor-document-category=/gu), 5);
+  for (const category of [
+    "圖面",
+    "報價與估價附件",
+    "契約與變更",
+    "施工文件與照片",
+    "驗收與缺失",
+  ]) {
+    assert.match(documentArea, new RegExp(category, "u"), category);
+  }
+  for (const selector of [
+    "data-vendor-document-current-case",
+    "data-vendor-document-current-state",
+    "data-vendor-document-responsibility",
+    "data-vendor-document-next-action",
+    "data-vendor-document-record-state",
+  ]) {
+    assert.match(documentArea, new RegExp(selector, "u"), selector);
+  }
+  for (const state of [
+    "本機尚未送出",
+    "等待服務開放",
+    "等待補件",
+    "等待業主確認",
+    "等待 PCM 整理",
+    "已有正式紀錄",
+    "暫時不可用",
+    "無權限",
+  ]) {
+    assert.match(documentArea, new RegExp(state, "u"), state);
+  }
+  assert.match(documentArea, /data-vendor-document-primary-action[^>]*>整理待交付文件</u);
+  assert.match(documentArea, /data-vendor-document-upload[^>]*disabled[^>]*aria-disabled="true"[^>]*>等待文件服務開放</u);
+  assert.match(documentArea, /只有案件服務提供的正式事件，才會顯示「已留下案件紀錄」/u);
+  assert.doesNotMatch(documentArea, /上傳完成|下載成功|已建立正式版本|業主已確認|receipt|snapshot/iu);
+  assert.doesNotMatch(
+    documentArea,
+    /(?:name|id|data-[a-z0-9-]+)=["'][^"']*\b(?:userId|caseId|role|grant|bucket|path|versionRef)\b[^"']*["']/iu,
+  );
+  assert.doesNotMatch(
+    `${html}\n${runtimeSource}`,
+    /\/api\/drs\/(?:documents\/upload-intents|document-versions\/|document-snapshots)/u,
+  );
+});
+
+test("vendor local file staging remains selected locally without upload or record success", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "document-local-truth"));
+
+  function makeNode(ownerDocument = null) {
+    const listeners = new Map();
+    const attributes = new Map();
+    return {
+      ownerDocument,
+      children: [],
+      hidden: false,
+      textContent: "",
+      value: "",
+      className: "",
+      classList: { add() {}, remove() {} },
+      addEventListener(type, listener) { listeners.set(type, listener); },
+      append(...nodes) { this.children.push(...nodes); },
+      appendChild(node) { this.children.push(node); },
+      emit(type, event = {}) { return listeners.get(type)?.(event); },
+      replaceChildren(...nodes) { this.children = nodes; },
+      setAttribute(name, value) { attributes.set(name, String(value)); },
+    };
+  }
+
+  const ownerDocument = { createElement() {} };
+  ownerDocument.createElement = () => makeNode(ownerDocument);
+  const dropzone = makeNode(ownerDocument);
+  const picker = makeNode(ownerDocument);
+  picker.id = "vendor-document-picker";
+  const queue = makeNode(ownerDocument);
+  const empty = makeNode(ownerDocument);
+  const countNode = makeNode(ownerDocument);
+  const status = makeNode(ownerDocument);
+  const currentCase = makeNode(ownerDocument);
+  currentCase.textContent = "目前授權案件";
+  const nodes = new Map([
+    ["[data-vendor-document-dropzone]", dropzone],
+    ["[data-vendor-document-picker]", picker],
+    ["[data-vendor-document-queue]", queue],
+    ["[data-vendor-document-empty]", empty],
+    ["[data-vendor-document-count]", countNode],
+    ["[data-vendor-document-import-status]", status],
+    ["[data-vendor-active-case-name]", currentCase],
+  ]);
+  const controller = runtime.initializeVendorDocumentImport({
+    querySelector(selector) { return nodes.get(selector) ?? null; },
+  });
+
+  assert.equal(controller.stageFiles([
+    { name: "平面配置-v3.pdf", size: 2048, type: "application/pdf", lastModified: 1 },
+  ], "裝置選擇"), 1);
+  const meta = queue.children[0].children[0].children[1].children.map((node) => node.textContent);
+  assert.match(countNode.textContent, /本機選取 1 份・尚未送出/u);
+  assert.match(status.textContent, /只在本機整理/u);
+  assert.ok(meta.includes("文件種類：待確認"));
+  assert.ok(meta.includes("版本關係：新文件／新版本待確認"));
+  assert.ok(meta.includes("下一步：確認文件種類與版本關係"));
+  assert.ok(meta.includes("送出狀態：尚未送出"));
+  assert.ok(meta.includes("留痕狀態：尚未建立案件紀錄"));
+  assert.doesNotMatch(`${countNode.textContent}\n${status.textContent}\n${meta.join("\n")}`, /待上傳|上傳完成|已留痕/u);
+});
+
+test("vendor document consumer keeps a Dusk Ember ledger and one readable mobile primary action", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-document-primary-action\b/gu), 1);
+  assert.match(css, /\.vendor-document-command-rail\s*\{[\s\S]{0,500}grid-template-columns:/u);
+  assert.match(css, /\.vendor-document-register\s*\{/u);
+  assert.match(css, /\.vendor-document-register__row\s*\{[\s\S]{0,500}grid-template-columns:/u);
+  assert.match(css, /\.vendor-document-register__row[\s\S]{0,800}var\(--vendor-document-white\)/u);
+  assert.match(css, /\.vendor-document-state-guide\s*\{/u);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*768px\)[\s\S]*?\.vendor-document-register__row\s*\{[\s\S]{0,220}grid-template-columns:\s*1fr/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*420px\)[\s\S]*?\[data-vendor-document-primary-action\][\s\S]{0,160}inline-size:\s*100%/u,
+  );
 });
 
 test("vendor calendar embed resolves only a trusted active pro grant and clears stale frames", async () => {

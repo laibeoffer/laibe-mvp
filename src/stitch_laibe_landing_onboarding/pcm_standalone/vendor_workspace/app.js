@@ -1215,7 +1215,7 @@ export function initializeVendorDocumentStorage(root) {
       storage.dataset.expanded = expanded ? "true" : "false";
       panel.hidden = !expanded;
       toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
-      toggle.textContent = expanded ? "收起文件工具" : "展開文件工具";
+      toggle.textContent = expanded ? "收起本機整理區" : "查看本機整理區";
     } catch {
       return false;
     }
@@ -1310,11 +1310,11 @@ export function initializeVendorDocumentImport(root, storageController = null) {
         `來源：${entry.source}`,
         entry.kind,
         `目前案件：${currentCaseName}`,
-        "預定分類：待確認",
-        "文件關係：新文件／新版本待確認",
-        "備註：待補",
-        "下一責任人：待確認",
-        "上傳狀態：待上傳",
+        "文件種類：待確認",
+        "版本關係：新文件／新版本待確認",
+        "下一步：確認文件種類與版本關係",
+        "送出狀態：尚未送出",
+        "留痕狀態：尚未建立案件紀錄",
       ]) {
         const detail = ownerDocument.createElement("span");
         detail.textContent = value;
@@ -1342,8 +1342,8 @@ export function initializeVendorDocumentImport(root, storageController = null) {
     if (empty) empty.hidden = entries.length > 0;
     if (count) {
       count.textContent = entries.length > 0
-        ? `共 ${entries.length} 份・尚未送出`
-        : "尚未加入文件";
+        ? `本機選取 ${entries.length} 份・尚未送出`
+        : "尚未選取檔案";
     }
     return true;
   }
@@ -1385,9 +1385,9 @@ export function initializeVendorDocumentImport(root, storageController = null) {
     }
     if (status) {
       if (added > 0) {
-        status.textContent = `已加入 ${added} 份文件；請確認分類與版本關係。這些文件尚未送出。`;
+        status.textContent = `已在本機選取 ${added} 份檔案；請確認文件種類與版本關係。這些檔案只在本機整理，尚未送出。`;
       } else if (skipped > 0) {
-        status.textContent = "沒有加入新文件；這個檔案目前無法加入，或已經存在待確認清單。";
+        status.textContent = "沒有加入新檔案；目前只接受 PDF、JPG 或 PNG，重複檔案也不會再次加入。";
       }
     }
     return added;

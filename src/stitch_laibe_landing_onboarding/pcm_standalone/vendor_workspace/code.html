@@ -175,38 +175,107 @@
           </div>
         </section>
 
-        <section class="vendor-document-import vendor-document-storage" data-vendor-document-import data-vendor-document-storage data-expanded="false" aria-labelledby="vendor-document-import-title">
+        <section class="vendor-document-import vendor-document-storage vendor-document-consumer" data-vendor-document-import data-vendor-document-storage data-expanded="false" aria-labelledby="vendor-document-import-title">
           <header class="vendor-document-toolbar">
             <div class="vendor-document-toolbar__identity">
-              <p class="vendor-calendar-hero__eyebrow">共用工具</p>
-              <h2 id="vendor-document-import-title">案件文件</h2>
-              <span>先分類與核對版本，正式送出後才會建立案件紀錄。</span>
+              <p class="vendor-calendar-hero__eyebrow">文件交付與版本追蹤</p>
+              <h2 id="vendor-document-import-title">案件文件工作區</h2>
+              <span>先看版本、責任與下一步；本機整理不代表已上傳或已留下紀錄。</span>
             </div>
             <dl class="vendor-document-toolbar__status" aria-label="案件文件狀態">
-              <div><dt>待分類</dt><dd data-vendor-document-count>尚未加入文件</dd></div>
-              <div><dt>最近版本</dt><dd data-vendor-document-recent-version>案件資料核對後顯示</dd></div>
+              <div><dt>本機整理</dt><dd data-vendor-document-count>尚未選取檔案</dd></div>
+              <div><dt>正式版本</dt><dd data-vendor-document-recent-version>服務開放並核對後顯示</dd></div>
             </dl>
             <div class="vendor-document-toolbar__actions">
-              <button type="button" data-vendor-document-toggle aria-expanded="false" aria-controls="vendor-document-storage-panel">展開文件工具</button>
-              <button type="button" data-vendor-document-add>加入案件文件</button>
+              <button type="button" data-vendor-document-toggle aria-expanded="false" aria-controls="vendor-document-storage-panel">查看本機整理區</button>
+              <button type="button" data-vendor-document-add data-vendor-document-primary-action>整理待交付文件</button>
             </div>
           </header>
+
+          <dl class="vendor-document-command-rail" aria-label="目前案件文件責任與下一步">
+            <div><dt>目前案件</dt><dd data-vendor-document-current-case>目前授權案件</dd></div>
+            <div><dt>文件狀態</dt><dd data-vendor-document-current-state>等待服務開放</dd></div>
+            <div><dt>目前責任</dt><dd data-vendor-document-responsibility>乙方先整理待交付檔案</dd></div>
+            <div><dt>下一步</dt><dd data-vendor-document-next-action>確認文件種類與版本關係</dd></div>
+            <div><dt>案件留痕</dt><dd data-vendor-document-record-state>尚未建立文件紀錄</dd></div>
+          </dl>
+
+          <div class="vendor-document-register" role="table" aria-label="案件文件種類與目前狀態">
+            <div class="vendor-document-register__header" role="row">
+              <span role="columnheader">文件名稱／種類</span>
+              <span role="columnheader">版本／提供者／時間</span>
+              <span role="columnheader">審閱狀態</span>
+              <span role="columnheader">等待對象／下一步</span>
+              <span role="columnheader">留痕狀態</span>
+            </div>
+            <div class="vendor-document-register__row" role="row" data-vendor-document-category="drawings">
+              <div role="cell" data-label="文件名稱／種類"><strong>圖面</strong><small>平面、立面、材質與必要標註</small></div>
+              <div role="cell" data-label="版本／提供者／時間"><strong>目前版本：尚未取得</strong><small>提供者：待服務確認・更新時間：尚未取得</small></div>
+              <div role="cell" data-label="審閱狀態"><span class="vendor-document-state">等待服務開放</span><small>尚無可顯示的正式狀態</small></div>
+              <div role="cell" data-label="等待對象／下一步"><strong>等待案件文件服務</strong><small>下一步：先核對檔名與預定版次</small></div>
+              <div role="cell" data-label="留痕狀態"><strong>尚未建立</strong><small>正式事件回傳後顯示</small></div>
+            </div>
+            <div class="vendor-document-register__row" role="row" data-vendor-document-category="quotes">
+              <div role="cell" data-label="文件名稱／種類"><strong>報價與估價附件</strong><small>報價原檔、估價附件與比較依據</small></div>
+              <div role="cell" data-label="版本／提供者／時間"><strong>目前版本：尚未取得</strong><small>提供者：待服務確認・更新時間：尚未取得</small></div>
+              <div role="cell" data-label="審閱狀態"><span class="vendor-document-state">等待服務開放</span><small>尚無可顯示的補件狀態</small></div>
+              <div role="cell" data-label="等待對象／下一步"><strong>等待案件文件服務</strong><small>下一步：先整理原始報價與附件</small></div>
+              <div role="cell" data-label="留痕狀態"><strong>尚未建立</strong><small>正式事件回傳後顯示</small></div>
+            </div>
+            <div class="vendor-document-register__row" role="row" data-vendor-document-category="contract-changes">
+              <div role="cell" data-label="文件名稱／種類"><strong>契約與變更</strong><small>契約、附約、變更說明與影響依據</small></div>
+              <div role="cell" data-label="版本／提供者／時間"><strong>目前版本：尚未取得</strong><small>提供者：待服務確認・更新時間：尚未取得</small></div>
+              <div role="cell" data-label="審閱狀態"><span class="vendor-document-state">等待服務開放</span><small>尚無可顯示的確認狀態</small></div>
+              <div role="cell" data-label="等待對象／下一步"><strong>等待案件文件服務</strong><small>下一步：先區分原契約與變更附件</small></div>
+              <div role="cell" data-label="留痕狀態"><strong>尚未建立</strong><small>正式事件回傳後顯示</small></div>
+            </div>
+            <div class="vendor-document-register__row" role="row" data-vendor-document-category="construction-files">
+              <div role="cell" data-label="文件名稱／種類"><strong>施工文件與照片</strong><small>施工計畫、任務附件與現場照片</small></div>
+              <div role="cell" data-label="版本／提供者／時間"><strong>目前版本：尚未取得</strong><small>提供者：待服務確認・更新時間：尚未取得</small></div>
+              <div role="cell" data-label="審閱狀態"><span class="vendor-document-state">等待服務開放</span><small>尚無可顯示的整理狀態</small></div>
+              <div role="cell" data-label="等待對象／下一步"><strong>等待案件文件服務</strong><small>下一步：先確認任務、日期與位置</small></div>
+              <div role="cell" data-label="留痕狀態"><strong>尚未建立</strong><small>正式事件回傳後顯示</small></div>
+            </div>
+            <div class="vendor-document-register__row" role="row" data-vendor-document-category="acceptance">
+              <div role="cell" data-label="文件名稱／種類"><strong>驗收與缺失</strong><small>送驗依據、缺失照片與改善附件</small></div>
+              <div role="cell" data-label="版本／提供者／時間"><strong>目前版本：尚未取得</strong><small>提供者：待服務確認・更新時間：尚未取得</small></div>
+              <div role="cell" data-label="審閱狀態"><span class="vendor-document-state">等待服務開放</span><small>尚無可顯示的驗收狀態</small></div>
+              <div role="cell" data-label="等待對象／下一步"><strong>等待案件文件服務</strong><small>下一步：先核對驗收項目與缺失位置</small></div>
+              <div role="cell" data-label="留痕狀態"><strong>尚未建立</strong><small>正式事件回傳後顯示</small></div>
+            </div>
+          </div>
+
+          <div class="vendor-document-state-guide" data-vendor-document-state-guide aria-label="文件狀態說明">
+            <p>狀態怎麼看</p>
+            <ul>
+              <li><strong>本機尚未送出</strong><small>只在目前頁面整理</small></li>
+              <li><strong>等待服務開放</strong><small>不能送出或下載</small></li>
+              <li><strong>等待補件</strong><small>由正式案件狀態指出責任人</small></li>
+              <li><strong>等待業主確認</strong><small>不等於業主已同意</small></li>
+              <li><strong>等待 PCM 整理</strong><small>不等於已完成審閱</small></li>
+              <li><strong>已有正式紀錄</strong><small>只依案件服務回傳顯示</small></li>
+              <li><strong>暫時不可用</strong><small>稍後重新核對案件狀態</small></li>
+              <li><strong>無權限</strong><small>不顯示案件文件內容</small></li>
+            </ul>
+            <span>只有案件服務提供的正式事件，才會顯示「已留下案件紀錄」。</span>
+          </div>
+
           <div class="vendor-document-storage__panel" id="vendor-document-storage-panel" hidden>
             <div class="vendor-document-import__channels">
               <div class="vendor-document-dropzone" data-vendor-document-dropzone role="button" tabindex="0" aria-controls="vendor-document-picker" aria-describedby="vendor-document-import-boundary">
                 <span class="vendor-document-dropzone__icon" aria-hidden="true">＋</span>
-                <div><strong>把案件文件拖曳到這裡</strong><p>也可以從電腦或手機選擇；檔案只會先加入待分類清單。</p></div>
-                <label class="vendor-document-picker" for="vendor-document-picker">選擇案件文件</label>
-                <input id="vendor-document-picker" type="file" data-vendor-document-picker multiple />
+                <div><strong>把待交付檔案拖曳到這裡</strong><p>也可以從電腦或手機選擇；檔案只會留在本機待整理清單。</p></div>
+                <label class="vendor-document-picker" for="vendor-document-picker">從裝置選取檔案</label>
+                <input id="vendor-document-picker" type="file" data-vendor-document-picker accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" multiple />
               </div>
             </div>
             <div class="vendor-document-import__queue">
-              <div class="vendor-document-import__queue-heading"><div><span>待分類清單</span><strong>確認文件類型與版本關係</strong></div><p id="vendor-document-import-boundary">檔案只會暫留在目前頁面；正式送出前不會建立案件紀錄。</p></div>
-              <p class="vendor-document-import__empty" data-vendor-document-empty>選擇或拖入文件後，會在這裡顯示檔名、大小、來源與待確認項目。</p>
+              <div class="vendor-document-import__queue-heading"><div><span>本機待整理</span><strong>確認文件種類與版本關係</strong></div><p id="vendor-document-import-boundary">離開頁面後不保留；不會自動上傳，也不會建立案件紀錄。</p></div>
+              <p class="vendor-document-import__empty" data-vendor-document-empty>選取或拖入檔案後，這裡會顯示檔名、格式、來源與送出前待確認事項。</p>
               <ol class="vendor-document-import__list" data-vendor-document-queue aria-live="polite"></ol>
               <div class="vendor-document-import__footer">
-                <p data-vendor-document-import-status aria-live="polite">可先整理文件，送出功能正式開放後再建立案件留痕。</p>
-                <button type="button" data-vendor-document-upload data-write-action disabled aria-disabled="true">文件上傳正在整理中</button>
+                <p data-vendor-document-import-status aria-live="polite">可先在本機整理檔案；服務開放前不能送出，也不會建立案件紀錄。</p>
+                <button type="button" data-vendor-document-upload data-write-action disabled aria-disabled="true">等待文件服務開放</button>
               </div>
             </div>
           </div>
