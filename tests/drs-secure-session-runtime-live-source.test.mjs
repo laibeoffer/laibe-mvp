@@ -2860,13 +2860,29 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
   );
   assert.notEqual(sanitizedFailureSource, "");
   assert.notEqual(fetchJsonSource, "");
-  const compileFetchJson = (injectedFetch, injectedReadBoundedJson) =>
+  const compileFetchJson = (
+    injectedFetch,
+    injectedReadBoundedJson,
+    injectedDeno = { errors: {} },
+    injectedSetTimeout = setTimeout,
+    injectedClearTimeout = clearTimeout,
+  ) =>
     Function(
       "fetch",
       "readBoundedJson",
       "supabaseOrigin",
+      "Deno",
+      "setTimeout",
+      "clearTimeout",
       `"use strict";\n${sanitizedFailureSource}\n${fetchJsonSource}\nreturn fetchJson;`,
-    )(injectedFetch, injectedReadBoundedJson, "http://127.0.0.1:54321");
+    )(
+      injectedFetch,
+      injectedReadBoundedJson,
+      "http://127.0.0.1:54321",
+      injectedDeno,
+      injectedSetTimeout,
+      injectedClearTimeout,
+    );
   const closedFetchCauses = [
     "FETCH_STATUS_REJECTED",
     "FETCH_CONTENT_LENGTH_REJECTED",
@@ -2892,6 +2908,83 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
           return true;
         },
         `${operation} preserves ${cause}`,
+      );
+    }
+  }
+  class NotCapable extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "NotCapable";
+    }
+  }
+  class ConnectionRefused extends Error {
+    constructor(message) {
+      super(message);
+      this.name = "ConnectionRefused";
+    }
+  }
+  const injectedDeno = { errors: { NotCapable, ConnectionRefused } };
+  const nativeFetchCases = [
+    [
+      "NATIVE_REDIRECT_REJECTED",
+      () =>
+        new TypeError(
+          "Encountered redirect while redirect mode is set to 'error'",
+        ),
+    ],
+    ["NATIVE_ABORTED", () => new Error("raw abort suffix")],
+    [
+      "NATIVE_PERMISSION_REJECTED",
+      () => new NotCapable("raw permission path"),
+    ],
+    [
+      "NATIVE_CONNECTION_REJECTED",
+      () => {
+        const error = new TypeError("raw fetch URL");
+        error.cause = new ConnectionRefused("raw loopback address");
+        return error;
+      },
+    ],
+    [
+      "NATIVE_OTHER_REJECTED",
+      () => {
+        const error = new TypeError("error sending request for raw URL");
+        error.cause = new Error("raw provider cause");
+        return error;
+      },
+    ],
+  ];
+  for (const operation of ["AUTH_CREATE", "AUTH_TOKEN", "AUTH_CURRENT"]) {
+    for (const [closedCause, createError] of nativeFetchCases) {
+      const abortBeforeFetch = closedCause === "NATIVE_ABORTED";
+      const fetchJson = compileFetchJson(
+        () => {
+          throw createError();
+        },
+        () => ({}),
+        injectedDeno,
+        abortBeforeFetch
+          ? (callback) => {
+            callback();
+            return 1;
+          }
+          : setTimeout,
+        abortBeforeFetch ? () => {} : clearTimeout,
+      );
+      await assert.rejects(
+        () => fetchJson(operation, "/bounded-auth", {}, 200),
+        (error) => {
+          assert.equal(
+            error.message,
+            `A17_S1AR_${operation}_${closedCause}`,
+          );
+          assert.doesNotMatch(
+            error.message,
+            /provider|host|path|url|cause|loopback|address|raw/iu,
+          );
+          return true;
+        },
+        `${operation} closes ${closedCause}`,
       );
     }
   }
@@ -2922,7 +3015,10 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     await assert.rejects(
       () => fetchJson("AUTH_CREATE", "/bounded-auth", {}, 200),
       (error) => {
-        assert.equal(error.message, "A17_S1AR_AUTH_CREATE_FETCH_UNAVAILABLE");
+        assert.equal(
+          error.message,
+          "A17_S1AR_AUTH_CREATE_NATIVE_OTHER_REJECTED",
+        );
         assert.doesNotMatch(error.message, /provider|token|host|raw/iu);
         return true;
       },
@@ -2947,6 +3043,27 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     /AUTH_CREATE[\s\S]*AUTH_TOKEN[\s\S]*AUTH_CURRENT/u,
   );
   assert.match(fetchJsonSource, /FETCH_OPERATION_REJECTED/u);
+  for (
+    const cause of [
+      "NATIVE_REDIRECT_REJECTED",
+      "NATIVE_ABORTED",
+      "NATIVE_PERMISSION_REJECTED",
+      "NATIVE_CONNECTION_REJECTED",
+      "NATIVE_OTHER_REJECTED",
+    ]
+  ) {
+    assert.equal(fetchJsonSource.includes(`"${cause}"`), true, cause);
+  }
+  assert.match(
+    fetchJsonSource,
+    /Encountered redirect while redirect mode is set to 'error'/u,
+  );
+  assert.match(fetchJsonSource, /Deno\.errors\.NotCapable/u);
+  assert.match(fetchJsonSource, /Deno\.errors\.ConnectionRefused/u);
+  assert.doesNotMatch(
+    fetchJsonSource,
+    /String\(error\)|error\.(?:stack|toString)\s*\(/u,
+  );
   for (const cause of closedFetchCauses) {
     assert.equal(fetchJsonSource.includes(`"${cause}"`), true, cause);
   }

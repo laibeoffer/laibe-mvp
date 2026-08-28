@@ -224,6 +224,36 @@ const closedFetchCauses = Object.freeze([
   "FETCH_BODY_REJECTED",
   "FETCH_UNAVAILABLE",
 ]);
+const nativeRedirectFailureMessage =
+  "Encountered redirect while redirect mode is set to 'error'";
+
+function isExactDenoError(error, constructor, name) {
+  return typeof constructor === "function" && error instanceof constructor &&
+    error.name === name;
+}
+
+function classifyNativeFetchFailure(error, signal) {
+  if (
+    signal.aborted ||
+    (error instanceof DOMException && error.name === "AbortError")
+  ) return "NATIVE_ABORTED";
+  if (
+    error instanceof TypeError &&
+    error.message === nativeRedirectFailureMessage
+  ) return "NATIVE_REDIRECT_REJECTED";
+  if (isExactDenoError(error, Deno.errors.NotCapable, "NotCapable")) {
+    return "NATIVE_PERMISSION_REJECTED";
+  }
+  if (
+    error instanceof TypeError &&
+    isExactDenoError(
+      error.cause,
+      Deno.errors.ConnectionRefused,
+      "ConnectionRefused",
+    )
+  ) return "NATIVE_CONNECTION_REJECTED";
+  return "NATIVE_OTHER_REJECTED";
+}
 
 async function fetchJson(operation, path, init, expectedStatus) {
   if (!authFetchOperations.includes(operation)) {
@@ -245,7 +275,9 @@ async function fetchJson(operation, path, init, expectedStatus) {
       )
       : undefined;
     throw sanitizedFailure(
-      `${operation}_${closedCause ?? "FETCH_UNAVAILABLE"}`,
+      `${operation}_${
+        closedCause ?? classifyNativeFetchFailure(error, controller.signal)
+      }`,
     );
   } finally {
     clearTimeout(timer);
