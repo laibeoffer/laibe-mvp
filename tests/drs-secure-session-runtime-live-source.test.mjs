@@ -2847,9 +2847,128 @@ test("S2-R3 issue verify revoke lock lanes and exact column metadata are executa
   }
 });
 
-test("S2-R4 hostile fetch and tamper run through accepted runtime ports with output canary scans", () => {
+test("S2-R4 hostile fetch and tamper run through accepted runtime ports with output canary scans", async () => {
   const ps = source(urls.powershell);
   const deno = source(urls.deno);
+  const sanitizedFailureSource = deno.slice(
+    deno.indexOf("function sanitizedFailure"),
+    deno.indexOf("function causalFailure"),
+  );
+  const fetchJsonSource = deno.slice(
+    deno.indexOf("const authFetchOperations"),
+    deno.indexOf("async function runPsql"),
+  );
+  assert.notEqual(sanitizedFailureSource, "");
+  assert.notEqual(fetchJsonSource, "");
+  const compileFetchJson = (injectedFetch, injectedReadBoundedJson) =>
+    Function(
+      "fetch",
+      "readBoundedJson",
+      "supabaseOrigin",
+      `"use strict";\n${sanitizedFailureSource}\n${fetchJsonSource}\nreturn fetchJson;`,
+    )(injectedFetch, injectedReadBoundedJson, "http://127.0.0.1:54321");
+  const closedFetchCauses = [
+    "FETCH_STATUS_REJECTED",
+    "FETCH_CONTENT_LENGTH_REJECTED",
+    "FETCH_CHUNK_REJECTED",
+    "FETCH_SIZE_REJECTED",
+    "FETCH_CONTENT_LENGTH_MISMATCH",
+    "FETCH_DUPLICATE_MEMBER_REJECTED",
+    "FETCH_BODY_REJECTED",
+    "FETCH_UNAVAILABLE",
+  ];
+  for (const operation of ["AUTH_CREATE", "AUTH_TOKEN", "AUTH_CURRENT"]) {
+    for (const cause of closedFetchCauses) {
+      const fetchJson = compileFetchJson(
+        async () => ({}),
+        async () => {
+          throw new Error(`A17_S1AR_${cause}`);
+        },
+      );
+      await assert.rejects(
+        () => fetchJson(operation, "/bounded-auth", {}, 200),
+        (error) => {
+          assert.equal(error.message, `A17_S1AR_${operation}_${cause}`);
+          return true;
+        },
+        `${operation} preserves ${cause}`,
+      );
+    }
+  }
+  for (
+    const [label, injectedFetch, injectedReadBoundedJson] of [
+      [
+        "unknown fetch error",
+        async () => {
+          throw new Error("provider-url token=raw-provider-value");
+        },
+        async () => ({}),
+      ],
+      [
+        "sanitized prefix with raw suffix",
+        async () => ({}),
+        async () => {
+          throw new Error(
+            "A17_S1AR_FETCH_STATUS_REJECTED provider-host=raw-provider-value",
+          );
+        },
+      ],
+    ]
+  ) {
+    const fetchJson = compileFetchJson(
+      injectedFetch,
+      injectedReadBoundedJson,
+    );
+    await assert.rejects(
+      () => fetchJson("AUTH_CREATE", "/bounded-auth", {}, 200),
+      (error) => {
+        assert.equal(error.message, "A17_S1AR_AUTH_CREATE_FETCH_UNAVAILABLE");
+        assert.doesNotMatch(error.message, /provider|token|host|raw/iu);
+        return true;
+      },
+      label,
+    );
+  }
+  let invalidOperationFetchCalls = 0;
+  const invalidOperationFetchJson = compileFetchJson(
+    async () => {
+      invalidOperationFetchCalls += 1;
+      return {};
+    },
+    async () => ({}),
+  );
+  await assert.rejects(
+    () => invalidOperationFetchJson("AUTH_DELETE", "/bounded-auth", {}, 200),
+    /A17_S1AR_FETCH_OPERATION_REJECTED/u,
+  );
+  assert.equal(invalidOperationFetchCalls, 0);
+  assert.match(
+    fetchJsonSource,
+    /AUTH_CREATE[\s\S]*AUTH_TOKEN[\s\S]*AUTH_CURRENT/u,
+  );
+  assert.match(fetchJsonSource, /FETCH_OPERATION_REJECTED/u);
+  for (const cause of closedFetchCauses) {
+    assert.equal(fetchJsonSource.includes(`"${cause}"`), true, cause);
+  }
+  const authUser = deno.slice(
+    deno.indexOf("async function createRealAuthUser"),
+    deno.indexOf("function seedSql"),
+  );
+  for (
+    const [operation, path] of [
+      ["AUTH_CREATE", "/auth/v1/admin/users"],
+      ["AUTH_TOKEN", "/auth/v1/token?grant_type=password"],
+      ["AUTH_CURRENT", "/auth/v1/user"],
+    ]
+  ) {
+    assert.match(
+      authUser,
+      new RegExp(
+        `fetchJson\\(\\s*"${operation}",\\s*"${path.replaceAll("?", "\\?")}"`,
+        "u",
+      ),
+    );
+  }
   const fixture = deno.slice(
     deno.indexOf("async function startHostileLoopbackFixture"),
     deno.indexOf("async function assertIssueLockBarrier"),

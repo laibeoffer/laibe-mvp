@@ -209,7 +209,26 @@ function assertNoDuplicateTopLevelMembers(text) {
   }
 }
 
-async function fetchJson(path, init, expectedStatus) {
+const authFetchOperations = Object.freeze([
+  "AUTH_CREATE",
+  "AUTH_TOKEN",
+  "AUTH_CURRENT",
+]);
+const closedFetchCauses = Object.freeze([
+  "FETCH_STATUS_REJECTED",
+  "FETCH_CONTENT_LENGTH_REJECTED",
+  "FETCH_CHUNK_REJECTED",
+  "FETCH_SIZE_REJECTED",
+  "FETCH_CONTENT_LENGTH_MISMATCH",
+  "FETCH_DUPLICATE_MEMBER_REJECTED",
+  "FETCH_BODY_REJECTED",
+  "FETCH_UNAVAILABLE",
+]);
+
+async function fetchJson(operation, path, init, expectedStatus) {
+  if (!authFetchOperations.includes(operation)) {
+    throw sanitizedFailure("FETCH_OPERATION_REJECTED");
+  }
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10_000);
   try {
@@ -219,8 +238,15 @@ async function fetchJson(path, init, expectedStatus) {
       signal: controller.signal,
     });
     return await readBoundedJson(response, expectedStatus);
-  } catch {
-    throw sanitizedFailure("FETCH_UNAVAILABLE");
+  } catch (error) {
+    const closedCause = error instanceof Error
+      ? closedFetchCauses.find(
+        (cause) => error.message === `A17_S1AR_${cause}`,
+      )
+      : undefined;
+    throw sanitizedFailure(
+      `${operation}_${closedCause ?? "FETCH_UNAVAILABLE"}`,
+    );
   } finally {
     clearTimeout(timer);
   }
@@ -268,6 +294,7 @@ async function createRealAuthUser(serviceRoleKey, registerUserId) {
     "content-type": "application/json",
   };
   const created = await fetchJson(
+    "AUTH_CREATE",
     "/auth/v1/admin/users",
     {
       method: "POST",
@@ -285,6 +312,7 @@ async function createRealAuthUser(serviceRoleKey, registerUserId) {
   registerUserId(userId);
 
   const signedIn = await fetchJson(
+    "AUTH_TOKEN",
     "/auth/v1/token?grant_type=password",
     {
       method: "POST",
@@ -301,6 +329,7 @@ async function createRealAuthUser(serviceRoleKey, registerUserId) {
     throw sanitizedFailure("AUTH_TOKEN_REJECTED");
   }
   const current = await fetchJson(
+    "AUTH_CURRENT",
     "/auth/v1/user",
     {
       method: "GET",
