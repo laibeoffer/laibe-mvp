@@ -226,13 +226,47 @@ const closedFetchCauses = Object.freeze([
 ]);
 const nativeRedirectFailureMessage =
   "Fetch failed: Encountered redirect while redirect mode is set to 'error'";
+const windowsConnectionSegment =
+  ": client error (Connect): tcp connect error: ";
+const windowsConnectionSuffix = "(os error 10061)";
 
 function isExactDenoError(error, constructor, name) {
   return typeof constructor === "function" && error instanceof constructor &&
     error.name === name;
 }
 
-function classifyNativeFetchFailure(error, signal) {
+function isClosedUtf8Text(text, maxBytes) {
+  if (
+    typeof text !== "string" || text.length < 1 || text.length > maxBytes
+  ) return false;
+  for (let index = 0; index < text.length; index += 1) {
+    const codeUnit = text.charCodeAt(index);
+    if (codeUnit <= 0x1f || codeUnit === 0x7f) return false;
+  }
+  const bytes = new TextEncoder().encode(text);
+  if (bytes.byteLength > maxBytes) return false;
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(bytes) === text;
+  } catch {
+    return false;
+  }
+}
+
+function isWindowsConnectionRefused(error, requestUrl) {
+  if (
+    !(error instanceof TypeError) ||
+    !isClosedUtf8Text(requestUrl, 256) ||
+    !isClosedUtf8Text(error.message, 512)
+  ) return false;
+  const prefix =
+    `Fetch failed: error sending request for url (${requestUrl})${windowsConnectionSegment}`;
+  return error.message.length >
+      prefix.length + windowsConnectionSuffix.length &&
+    error.message.startsWith(prefix) &&
+    error.message.endsWith(windowsConnectionSuffix);
+}
+
+function classifyNativeFetchFailure(error, signal, requestUrl) {
   if (
     signal.aborted ||
     (error instanceof DOMException && error.name === "AbortError")
@@ -252,6 +286,9 @@ function classifyNativeFetchFailure(error, signal) {
       "ConnectionRefused",
     )
   ) return "NATIVE_CONNECTION_REJECTED";
+  if (isWindowsConnectionRefused(error, requestUrl)) {
+    return "NATIVE_CONNECTION_REJECTED";
+  }
   return "NATIVE_OTHER_REJECTED";
 }
 
@@ -259,19 +296,22 @@ async function fetchJson(operation, path, init, expectedStatus) {
   if (!authFetchOperations.includes(operation)) {
     throw sanitizedFailure("FETCH_OPERATION_REJECTED");
   }
+  const requestUrl = `${supabaseOrigin}${path}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 10_000);
   try {
     let response;
     try {
-      response = await fetch(`${supabaseOrigin}${path}`, {
+      response = await fetch(requestUrl, {
         ...init,
         redirect: "error",
         signal: controller.signal,
       });
     } catch (error) {
       throw sanitizedFailure(
-        `${operation}_${classifyNativeFetchFailure(error, controller.signal)}`,
+        `${operation}_${
+          classifyNativeFetchFailure(error, controller.signal, requestUrl)
+        }`,
       );
     }
     try {

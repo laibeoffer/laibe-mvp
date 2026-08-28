@@ -2951,6 +2951,25 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     }
   }
   const injectedDeno = { errors: { NotCapable, ConnectionRefused } };
+  const calibratedRequestUrl = "http://127.0.0.1:54321/bounded-auth";
+  const calibratedConnectionPrefix =
+    `Fetch failed: error sending request for url (${calibratedRequestUrl}): client error (Connect): tcp connect error: `;
+  const calibratedConnectionSuffix = "(os error 10061)";
+  const calibratedConnectionMessage =
+    `${calibratedConnectionPrefix}No connection could be made because the target machine actively refused it. ${calibratedConnectionSuffix}`;
+  const windowsConnectionNearMisses = [
+    calibratedConnectionMessage.replace("127.0.0.1", "localhost"),
+    calibratedConnectionMessage.replace("/bounded-auth", "/bounded-auth/other"),
+    `raw-prefix ${calibratedConnectionMessage}`,
+    `${calibratedConnectionMessage} raw-suffix`,
+    calibratedConnectionMessage.replace("(os error 10061)", "(os error 10060)"),
+    calibratedConnectionMessage.replace(
+      ": client error (Connect): tcp connect error: ",
+      ": client error (Connect): transport error: ",
+    ),
+    calibratedConnectionMessage.replace("No connection", "No\nconnection"),
+    `${calibratedConnectionPrefix}${"x".repeat(1_024)} ${calibratedConnectionSuffix}`,
+  ];
   const nativeFetchCases = [
     [
       "NATIVE_REDIRECT_REJECTED",
@@ -2963,6 +2982,10 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     [
       "NATIVE_PERMISSION_REJECTED",
       () => new NotCapable("raw permission path"),
+    ],
+    [
+      "NATIVE_CONNECTION_REJECTED",
+      () => new TypeError(calibratedConnectionMessage),
     ],
     [
       "NATIVE_CONNECTION_REJECTED",
@@ -3004,6 +3027,10 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
         "Fetch failed: Encountered redirect while redirect mode is set to error",
       ),
     ],
+    ...windowsConnectionNearMisses.map((message) => [
+      "NATIVE_OTHER_REJECTED",
+      () => new TypeError(message),
+    ]),
   ];
   for (const operation of ["AUTH_CREATE", "AUTH_TOKEN", "AUTH_CURRENT"]) {
     for (const [closedCause, createError] of nativeFetchCases) {
@@ -3113,6 +3140,19 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
   );
   assert.match(fetchJsonSource, /Deno\.errors\.NotCapable/u);
   assert.match(fetchJsonSource, /Deno\.errors\.ConnectionRefused/u);
+  assert.match(
+    fetchJsonSource,
+    /const requestUrl = `\$\{supabaseOrigin\}\$\{path\}`/u,
+  );
+  assert.match(
+    fetchJsonSource,
+    /classifyNativeFetchFailure\(error, controller\.signal, requestUrl\)/u,
+  );
+  assert.match(
+    fetchJsonSource,
+    /: client error \(Connect\): tcp connect error: /u,
+  );
+  assert.match(fetchJsonSource, /\(os error 10061\)/u);
   assert.doesNotMatch(
     fetchJsonSource,
     /String\(error\)|error\.(?:stack|toString)\s*\(/u,
