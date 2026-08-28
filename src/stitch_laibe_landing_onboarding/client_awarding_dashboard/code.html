@@ -1046,9 +1046,9 @@
           >
             <div class="section-heading section-heading--split owner-document-workbench__heading">
               <div class="owner-document-workbench__intro">
-                <p class="eyebrow">固定文件版次</p>
-                <h2 id="documents-title">文件與報價</h2>
-                <p>每份文件顯示種類、版次、提交者、時間與目前用途；分享只傳送受權限保護的案件入口。</p>
+                <p class="eyebrow">案件文件與版本</p>
+                <h2 id="documents-title">先看目前版本，再確認下一步</h2>
+                <p>每份文件都會交代版本、提供者、更新時間、目前狀態與下一步責任人；只有正式案件紀錄明確提供的留痕才會標示為已記錄。</p>
               </div>
               <div class="owner-document-workbench__actions">
                 <a
@@ -1069,6 +1069,66 @@
                 </aside>
               </div>
             </div>
+            <section
+              class="owner-document-status-band"
+              aria-labelledby="owner-document-status-title"
+            >
+              <div class="owner-document-status-band__lead">
+                <p class="eyebrow">文件狀態</p>
+                <h3 id="owner-document-status-title" data-slot="document-workbench-status"
+                >正在確認案件授權</h3>
+                <p>先確認目前案件與責任分工，再依正式文件版本進行討論。</p>
+              </div>
+              <dl class="owner-document-status-band__facts">
+                <div>
+                  <dt>目前案件</dt>
+                  <dd data-slot="document-workbench-case">尚待案件確認</dd>
+                </div>
+                <div>
+                  <dt>最近更新</dt>
+                  <dd data-slot="document-workbench-updated">尚無可顯示的更新</dd>
+                </div>
+                <div>
+                  <dt>目前責任人</dt>
+                  <dd data-slot="document-workbench-actor">甲方</dd>
+                </div>
+                <div>
+                  <dt>下一步</dt>
+                  <dd data-slot="document-workbench-next">先確認服務契約與案件入口</dd>
+                </div>
+                <div>
+                  <dt>案件紀錄</dt>
+                  <dd data-slot="document-workbench-trace">目前沒有可確認的正式文件紀錄</dd>
+                </div>
+              </dl>
+              <div class="owner-document-pending-actions" aria-label="文件操作開放狀態">
+                <p>
+                  <strong>文件操作尚未開放</strong>
+                  <span data-slot="document-workbench-pending-copy"
+                  >尚待案件授權與文件服務開放；目前不會建立新版本或完成紀錄。</span>
+                </p>
+                <div>
+                  <button
+                    type="button"
+                    data-owner-document-pending-action="upload"
+                    disabled
+                    aria-disabled="true"
+                  >上傳新文件</button>
+                  <button
+                    type="button"
+                    data-owner-document-pending-action="download"
+                    disabled
+                    aria-disabled="true"
+                  >下載目前版本</button>
+                  <button
+                    type="button"
+                    data-owner-document-pending-action="version-set"
+                    disabled
+                    aria-disabled="true"
+                  >固定版本組合</button>
+                </div>
+              </div>
+            </section>
             <div class="owner-document-workbench__evidence">
               <ul class="record-list" data-list="documents">
                 <li class="empty-state">

@@ -6389,7 +6389,7 @@ body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
   max-height: none;
   padding: 0;
   overflow: hidden;
-  grid-template-rows: auto minmax(190px, 1fr) auto;
+  grid-template-rows: auto auto minmax(190px, 1fr) auto;
   border: 1px solid rgb(243 238 245 / 13%);
   border-radius: 8px;
   background:
@@ -6459,6 +6459,128 @@ body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
   min-width: 0;
   gap: 8px;
   align-content: start;
+}
+
+.owner-document-status-band {
+  display: grid;
+  min-width: 0;
+  padding: 16px 24px;
+  grid-template-columns: minmax(180px, .72fr) minmax(0, 1.45fr);
+  gap: 14px 24px;
+  align-items: start;
+  border-bottom: 1px solid rgb(243 238 245 / 11%);
+  background:
+    linear-gradient(100deg, rgb(255 117 48 / 6%), transparent 42%),
+    rgb(9 7 11 / 70%);
+}
+
+.owner-document-status-band__lead {
+  min-width: 0;
+}
+
+.owner-document-status-band__lead .eyebrow {
+  margin: 0 0 4px;
+  color: #ff7530;
+  font-size: .72rem;
+}
+
+.owner-document-status-band__lead h3 {
+  margin: 0;
+  color: #f3eef5;
+  font-size: 1.05rem;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+.owner-document-status-band__lead > p:last-child {
+  max-width: 340px;
+  margin: 7px 0 0;
+  color: rgb(243 238 245 / 62%);
+  font-size: .875rem;
+  line-height: 1.55;
+}
+
+.owner-document-status-band__facts {
+  display: grid;
+  min-width: 0;
+  margin: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 18px;
+}
+
+.owner-document-status-band__facts > div {
+  min-width: 0;
+  padding: 7px 0 9px;
+  border-bottom: 1px solid rgb(243 238 245 / 9%);
+}
+
+.owner-document-status-band__facts > div:last-child {
+  grid-column: 1 / -1;
+}
+
+.owner-document-status-band__facts dt {
+  margin: 0 0 3px;
+  color: rgb(243 238 245 / 52%);
+  font-size: .875rem;
+  line-height: 1.35;
+}
+
+.owner-document-status-band__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #f3eef5;
+  font-size: .875rem;
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.owner-document-pending-actions {
+  display: grid;
+  min-width: 0;
+  padding-top: 12px;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(180px, .72fr) minmax(0, 1.45fr);
+  gap: 12px 24px;
+  align-items: center;
+}
+
+.owner-document-pending-actions > p {
+  display: grid;
+  margin: 0;
+  gap: 3px;
+}
+
+.owner-document-pending-actions strong {
+  color: #f3eef5;
+  font-size: .875rem;
+}
+
+.owner-document-pending-actions span {
+  color: rgb(243 238 245 / 57%);
+  font-size: .875rem;
+  line-height: 1.45;
+}
+
+.owner-document-pending-actions > div {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.owner-document-pending-actions button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 9px 10px;
+  border: 1px solid rgb(243 238 245 / 12%);
+  border-radius: 8px;
+  background: rgb(243 238 245 / 4%);
+  color: rgb(243 238 245 / 46%);
+  font: inherit;
+  font-size: .875rem;
+  font-weight: 650;
+  line-height: 1.35;
+  cursor: not-allowed;
 }
 
 .owner-document-workbench__primary-action {
@@ -6691,7 +6813,7 @@ body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
   #documents.owner-document-workbench {
     min-height: 0;
     scroll-margin-top: 18.5rem;
-    grid-template-rows: auto minmax(220px, auto) auto;
+    grid-template-rows: auto auto minmax(220px, auto) auto;
   }
 
   .owner-document-workbench__heading {
@@ -6701,6 +6823,34 @@ body[data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE"]
   }
 
   .owner-document-workbench__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-document-status-band {
+    padding: 16px 18px;
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .owner-document-status-band__lead > p:last-child {
+    max-width: none;
+  }
+
+  .owner-document-status-band__facts {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-document-status-band__facts > div:last-child {
+    grid-column: auto;
+  }
+
+  .owner-document-pending-actions {
+    padding-top: 4px;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .owner-document-pending-actions > div {
     grid-template-columns: 1fr;
   }
 

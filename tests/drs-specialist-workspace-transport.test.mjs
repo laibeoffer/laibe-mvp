@@ -116,3 +116,37 @@ test("workspace transport maps abort, invalid JSON, HTTP, network, and invalid c
   assert.throws(() => createDrsWorkspaceTransport({ fetchImplementation: async () => jsonResponse(grant()), resolveSessionHeaders: null }), TypeError);
   assert.throws(() => createDrsWorkspaceTransport({ fetchImplementation: async () => jsonResponse(grant()), resolveSessionHeaders: async () => ({ authorization: "Bearer a.b.c" }), endpoint: "https://attacker.invalid" }), TypeError);
 });
+
+test("focused RED: accepted workspace grant is the only specialist case projection and document routes stay closed", async () => {
+  const calls = [];
+  const transport = await createTransport(async (url, init) => {
+    calls.push({ url, ...init });
+    return jsonResponse(grant());
+  });
+  const workspaceGrant = await transport.loadWorkspaceGrant();
+  const { mapWorkspaceGrantToSpecialistProjection } = await import(`${moduleUrl.href}?projection=${Date.now()}-${Math.random()}`);
+
+  assert.equal(typeof mapWorkspaceGrantToSpecialistProjection, "function");
+  assert.deepEqual(mapWorkspaceGrantToSpecialistProjection(workspaceGrant), {
+    ok: true,
+    kind: "specialist-workspace-projection",
+    schemaVersion: "laibe.drs-specialist-workspace-projection.v1",
+    authority: { state: "authorized", mode: "read_only", label: "已確認案件檢視權限" },
+    case: {
+      id: caseId,
+      status: "REVIEW_IN_PROGRESS",
+      label: "已授權案件",
+      statusLabel: "審查進行中",
+    },
+    documents: { state: "pending", label: "尚未取得正式文件", items: [] },
+    next: {
+      actor: "drs_specialist",
+      actorLabel: "DRS 專員",
+      action: "REVIEW_AUTHORIZED_CASE_RECORDS",
+      actionLabel: "先核對文件來源與版本；正式文件資料尚未取得前，審查與送出維持停用。",
+    },
+  });
+  assert.deepEqual(mapWorkspaceGrantToSpecialistProjection({ ok: true, case: { id: caseId } }), { ok: false, code: "INVALID_RESPONSE" });
+  assert.deepEqual(calls.map((call) => call.url), [workspaceEndpoint]);
+  assert.doesNotMatch(JSON.stringify(calls), /\/api\/drs\/(?:documents|document-versions|document-snapshots)/u);
+});
