@@ -4473,6 +4473,21 @@ function projectStorageMigrationHelperCreateValue() {
   return value;
 }
 
+function projectAuthMigrationHelperCreateValue() {
+  const value = projectHelperCreateValue();
+  value.Env = [
+    "API_EXTERNAL_URL=http://127.0.0.1:54321/auth/v1",
+    `GOTRUE_DB_DATABASE_URL=postgresql://supabase_auth_admin:opaquePw8@supabase_db_${loopbackProxyProjectId}:5432/postgres`,
+    "GOTRUE_DB_DRIVER=postgres",
+    "GOTRUE_JWT_SECRET=opaque-local-jwt-secret-at-least-32-characters",
+    "GOTRUE_LOG_LEVEL=error",
+    "GOTRUE_SITE_URL=http://127.0.0.1:3000",
+  ];
+  value.Cmd = ["gotrue", "migrate"];
+  value.Image = "public.ecr.aws/supabase/gotrue:v2.192.0";
+  return value;
+}
+
 function replaceEnvironmentValue(value, name, replacement) {
   const index = value.Env.findIndex((entry) => entry.startsWith(`${name}=`));
   assert.notEqual(index, -1);
@@ -5344,6 +5359,91 @@ test("S18-F10 exact nameless Storage migration helper is local-only and has no h
   ];
   for (const mutate of hostileMutations) {
     const candidate = projectStorageMigrationHelperCreateValue();
+    mutate(candidate);
+    const hostileBody = Buffer.from(JSON.stringify(candidate), "utf8");
+    assert.throws(
+      () =>
+        rewriteProjectHelperCreateRequest({
+          rawHeaders: exactJsonRawHeaders(hostileBody),
+          body: hostileBody,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED" },
+    );
+  }
+});
+
+test("S18-F11 exact nameless Auth migration helper is local-only and has no host capability", () => {
+  const value = projectAuthMigrationHelperCreateValue();
+  const body = Buffer.from(JSON.stringify(value), "utf8");
+  const rewritten = rewriteProjectHelperCreateRequest({
+    rawHeaders: exactJsonRawHeaders(body),
+    body,
+  });
+  assert.deepEqual(JSON.parse(rewritten.body.toString("utf8")), value);
+  assert.equal(rewritten.headers["content-type"], "application/json");
+  assert.equal(
+    rewritten.headers["content-length"],
+    String(rewritten.body.byteLength),
+  );
+
+  const hostileMutations = [
+    (candidate) => candidate.Image = "public.ecr.aws/supabase/gotrue:latest",
+    (candidate) => candidate.Cmd.push("--remote"),
+    (candidate) => candidate.Env.push("UNKNOWN=value"),
+    (candidate) => candidate.Env.push(candidate.Env[0]),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "API_EXTERNAL_URL",
+        "http://127.0.0.1:54322/auth/v1",
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "GOTRUE_DB_DRIVER", "mysql"),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "GOTRUE_LOG_LEVEL", "debug"),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "GOTRUE_SITE_URL",
+        "https://example.com",
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(candidate, "GOTRUE_JWT_SECRET", "short"),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "GOTRUE_DB_DATABASE_URL",
+        `postgresql://postgres:opaquePw8@supabase_db_${loopbackProxyProjectId}:5432/postgres`,
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "GOTRUE_DB_DATABASE_URL",
+        "postgresql://supabase_auth_admin:opaquePw8@db.example.com:5432/postgres",
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "GOTRUE_DB_DATABASE_URL",
+        `postgresql://supabase_auth_admin:opaquePw8@supabase_db_${loopbackProxyProjectId}:5433/postgres`,
+      ),
+    (candidate) =>
+      replaceEnvironmentValue(
+        candidate,
+        "GOTRUE_DB_DATABASE_URL",
+        `postgresql://supabase_auth_admin:opaquePw8@supabase_db_${loopbackProxyProjectId}:5432/postgres?sslmode=require`,
+      ),
+    (candidate) => candidate.Labels["com.supabase.cli.project"] = "other",
+    (candidate) => candidate.HostConfig.NetworkMode = "bridge",
+    (candidate) => candidate.HostConfig.PortBindings = {},
+    (candidate) => candidate.HostConfig.Binds = [],
+    (candidate) => candidate.HostConfig.DeviceRequests = [],
+    (candidate) => candidate.HostConfig.CapAdd = ["SYS_ADMIN"],
+    (candidate) => candidate.HostConfig.Privileged = true,
+    (candidate) => candidate.HostConfig.PublishAllPorts = true,
+  ];
+  for (const mutate of hostileMutations) {
+    const candidate = projectAuthMigrationHelperCreateValue();
     mutate(candidate);
     const hostileBody = Buffer.from(JSON.stringify(candidate), "utf8");
     assert.throws(
