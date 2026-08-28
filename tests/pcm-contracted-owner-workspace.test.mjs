@@ -3776,6 +3776,152 @@ test("concurrent owner initialization and Calendar responses cannot overwrite th
   assert.equal(harness.state.textContent, "本案 Google Calendar 已連結");
 });
 
+test("文件 consumer 首屏說清案件、狀態、責任人、下一步與留痕依據", async () => {
+  const [html, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    loadRuntime(),
+  ]);
+  const documentsId = html.indexOf('id="documents"');
+  const documentsStart = html.lastIndexOf("<section", documentsId);
+  const documentsEnd = html.indexOf('id="submissions"', documentsStart);
+  const documentsPanel = html.slice(documentsStart, documentsEnd);
+
+  for (const slot of [
+    "document-workbench-case",
+    "document-workbench-status",
+    "document-workbench-updated",
+    "document-workbench-actor",
+    "document-workbench-next",
+    "document-workbench-trace",
+  ]) {
+    assert.match(documentsPanel, new RegExp(`data-slot="${slot}"`, "u"));
+  }
+  for (const label of [
+    "目前案件",
+    "文件狀態",
+    "最近更新",
+    "目前責任人",
+    "下一步",
+    "案件紀錄",
+  ]) {
+    assert.match(documentsPanel, new RegExp(label, "u"));
+  }
+
+  const emptyModel = runtime.buildOwnerWorkspaceViewModel(authorizedContext());
+  assert.equal(emptyModel.documentCase, "驗收用案件（非正式資料）");
+  assert.equal(emptyModel.documentStatus, "尚無文件");
+  assert.equal(emptyModel.documentUpdated, "依案件紀錄顯示");
+  assert.equal(emptyModel.documentActor, "PCM");
+  assert.equal(emptyModel.documentNext, "逐項回覆文件問題");
+  assert.equal(emptyModel.documentTrace, "目前沒有可確認的正式文件紀錄");
+
+  const readyModel = runtime.buildOwnerWorkspaceViewModel(authorizedContext({
+    documents: [{
+      title: "平面配置圖",
+      kindLabel: "圖面",
+      versionLabel: "第 3 版・甲方確認版",
+      submittedByLabel: "提供者：案件成員",
+      submittedAtLabel: "更新時間：2026/08/28",
+      statusLabel: "文件可檢視",
+      nextActorLabel: "下一步責任人：甲方確認",
+      traceabilityLabel: "已留下正式案件紀錄",
+    }],
+  }));
+  assert.equal(readyModel.documentStatus, "文件可檢視");
+  assert.equal(readyModel.documentTrace, "已留下正式案件紀錄");
+  assert.equal(readyModel.documents[0].nextActorLabel, "下一步責任人：甲方確認");
+  assert.equal(readyModel.documents[0].traceabilityLabel, "已留下正式案件紀錄");
+});
+
+test("文件 consumer 對每種 fail-closed 狀態使用可理解的產品語", async () => {
+  const runtime = await loadRuntime();
+  assert.equal(
+    runtime.buildOwnerWorkspaceViewModel().documentStatus,
+    "正在確認案件授權",
+  );
+  assert.equal(
+    runtime.buildOwnerWorkspaceViewModel(authorizedContext({ caseSummary: null }))
+      .documentStatus,
+    "文件整理中",
+  );
+  assert.equal(
+    runtime.buildOwnerWorkspaceViewModel(authorizedContext({ sessionStatus: "expired" }))
+      .documentStatus,
+    "無權限",
+  );
+
+  const unavailable = runtime.createOwnerWorkspaceController({
+    adapter: {
+      loadOwnerWorkspace() {
+        throw Object.assign(new Error("unavailable"), { status: 503 });
+      },
+    },
+  });
+  assert.equal((await unavailable.initialize()).documentStatus, "暫時無法取得");
+});
+
+test("未開放的文件操作保持停用、沒有 browser authority 或虛構成功", async () => {
+  const [html, runtimeSource] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("app.js"),
+  ]);
+  const documentsId = html.indexOf('id="documents"');
+  const documentsStart = html.lastIndexOf("<section", documentsId);
+  const documentsEnd = html.indexOf('id="submissions"', documentsStart);
+  const documentsPanel = html.slice(documentsStart, documentsEnd);
+  const pendingControls = documentsPanel.match(
+    /<button\b[^>]*data-owner-document-pending-action="[^"]+"[^>]*>/gu,
+  ) ?? [];
+
+  assert.equal(pendingControls.length, 3);
+  for (const control of pendingControls) {
+    assert.match(control, /\bdisabled\b/u);
+    assert.match(control, /aria-disabled="true"/u);
+  }
+  assert.match(documentsPanel, /尚待案件授權與文件服務開放/u);
+  assert.doesNotMatch(
+    documentsPanel,
+    /\/api\/|\bAPI\b|\bDB\b|debug|mock|source|上傳完成|下載完成|版本組合已固定/u,
+  );
+  assert.doesNotMatch(
+    `${documentsPanel}\n${runtimeSource}`,
+    /(?:searchParams|localStorage|dataset)\.(?:userId|caseId|role|memberId|grant|bucket|path|documentRef)\b/u,
+  );
+});
+
+test("可信 server projection 才能把文件列標為正式案件紀錄", async () => {
+  const { validateAndMapOwnerWorkspaceGrant } = await loadBootstrap();
+  const payload = ownerGrantPayload({ title: "住宅修改工程" });
+  payload.documents.push({
+    caseId: CANONICAL_OWNER_CASE_ID,
+    category: "drawing",
+    fileId: "9e000000-0000-4000-8000-000000000701",
+    name: "平面配置圖",
+    recordStatus: "active",
+    uploadedAt: "2026-08-28T02:30:00.000Z",
+    versionLabel: "甲方確認版",
+    versionNumber: 3,
+  });
+
+  const mapped = validateAndMapOwnerWorkspaceGrant(payload);
+  assert.equal(mapped.documents.length, 1);
+  assert.deepEqual(mapped.documents[0], {
+    title: "平面配置圖",
+    kindLabel: "圖面",
+    versionLabel: "第 3 版・甲方確認版",
+    submittedByLabel: "提供者：案件成員",
+    submittedAtLabel: "更新時間：2026/08/28",
+    statusLabel: "文件可檢視",
+    sourceLabel: "依據：案件文件紀錄",
+    nextActorLabel: "下一步責任人：甲方確認",
+    traceabilityLabel: "已留下正式案件紀錄",
+  });
+
+  const notRecorded = structuredClone(payload);
+  notRecorded.documents[0].recordStatus = "pending";
+  assert.equal(validateAndMapOwnerWorkspaceGrant(notRecorded), null);
+});
+
 test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既有契約入口", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
@@ -3789,6 +3935,8 @@ test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既�
   assert.ok(documentsStart > 0 && documentsEnd > documentsStart);
   assert.match(documentsPanel, /class="workspace-section owner-document-workbench"/u);
   assert.match(documentsPanel, /owner-document-workbench__heading/u);
+  assert.match(documentsPanel, /owner-document-status-band/u);
+  assert.match(documentsPanel, /owner-document-pending-actions/u);
   assert.match(documentsPanel, /owner-document-workbench__evidence/u);
   assert.match(documentsPanel, /owner-document-workbench__footer/u);
   assert.match(
@@ -3800,6 +3948,11 @@ test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既�
 
   assert.match(css, /\.owner-document-workbench\s*\{[\s\S]*grid-template-rows:/u);
   assert.match(css, /\.owner-document-workbench__actions\s*\{[\s\S]*display:\s*grid/u);
+  assert.match(css, /\.owner-document-status-band\s*\{[\s\S]*display:\s*grid/u);
+  assert.match(css, /\.owner-document-pending-actions\s*\{[\s\S]*display:\s*grid/u);
+  assert.match(css, /\.owner-document-pending-actions button\s*\{[\s\S]*min-height:\s*44px/u);
+  assert.match(css, /\.owner-document-status-band__facts dd\s*\{[\s\S]*font-size:\s*\.875rem/u);
+  assert.match(css, /\.owner-document-pending-actions button\s*\{[\s\S]*font-size:\s*\.875rem/u);
   assert.match(css, /\.owner-document-workbench__evidence\s*\{[\s\S]*min-height:/u);
   assert.match(css, /data-active-owner-section="documents"[\s\S]*owner-workbench-nav/u);
   assert.match(

@@ -785,10 +785,12 @@ function mapOwnerWorkspaceGrant(value) {
       title: name,
       kindLabel: ownerDocumentKind(category),
       versionLabel: `第 ${record.versionNumber} 版・${versionLabel}`,
-      submittedByLabel: "案件成員",
-      submittedAtLabel: ownerDocumentDate(record.uploadedAt),
-      statusLabel: "已記錄",
-      sourceLabel: "案件文件紀錄",
+      submittedByLabel: "提供者：案件成員",
+      submittedAtLabel: `更新時間：${ownerDocumentDate(record.uploadedAt)}`,
+      statusLabel: "文件可檢視",
+      sourceLabel: "依據：案件文件紀錄",
+      nextActorLabel: "下一步責任人：甲方確認",
+      traceabilityLabel: "已留下正式案件紀錄",
     });
   });
 
@@ -814,12 +816,17 @@ function mapOwnerWorkspaceGrant(value) {
     caseSummary: Object.freeze({
       caseId: currentCaseId,
       constructionIssueLabel: "尚待案件紀錄",
-      currentActorLabel: "由甲方確認文件與下一步",
+      currentActorLabel: "甲方",
       displayName: title,
-      documentSummaryLabel: `${documents.length} 份已記錄文件`,
+      documentSummaryLabel: documents.length > 0
+        ? `${documents.length} 份可檢視文件`
+        : "尚無文件",
       issueSummaryLabel: "依文件與案件紀錄確認",
-      lastRecordedAtLabel: documents[0]?.submittedAtLabel ?? "尚無文件紀錄",
-      nextActionLabel: "確認文件版本與案件日曆",
+      lastRecordedAtLabel: documents[0]?.submittedAtLabel.replace("更新時間：", "") ??
+        "尚無文件紀錄",
+      nextActionLabel: documents.length > 0
+        ? "確認目前文件版本與待補資料"
+        : "等待案件成員提供正式文件",
       nextDueLabel: "依案件通知",
       reviewSummaryLabel: "尚待書面檢討紀錄",
       statusLabel: caseStatusLabel(caseRecord.status),

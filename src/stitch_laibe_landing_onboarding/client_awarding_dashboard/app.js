@@ -676,6 +676,8 @@ export function normalizeOwnerWorkspaceContext(input = {}) {
       "submittedAtLabel",
       "statusLabel",
       "sourceLabel",
+      "nextActorLabel",
+      "traceabilityLabel",
     ]),
     submissions: normalizeRecords(source.submissions, [
       "partyLabel",
@@ -861,6 +863,57 @@ export function publicMessageRecordLabel(message, expectedCaseId) {
   return "尚未記錄";
 }
 
+function documentConsumerSummary(state, summary, documents) {
+  const visibleDocuments = Array.isArray(documents) ? documents : [];
+  const recorded = visibleDocuments.some(
+    (record) => record.traceabilityLabel === "已留下正式案件紀錄",
+  );
+  const status = state === "ACCESS_DENIED"
+    ? "無權限"
+    : state === "LOAD_FAILED_RETRYABLE"
+    ? "暫時無法取得"
+    : state === "AUTHORIZED_EMPTY"
+    ? "文件整理中"
+    : state === "AUTHORIZED_READY" || state === "PCM_SERVICE_ENDED_READ_ONLY"
+    ? visibleDocuments.length > 0
+      ? "文件可檢視"
+      : "尚無文件"
+    : "正在確認案件授權";
+  const identityVisible = state === "AUTHORIZED_READY" ||
+    state === "PCM_SERVICE_ENDED_READ_ONLY";
+
+  return Object.freeze({
+    documentCase: identityVisible && summary?.displayName
+      ? summary.displayName
+      : state === "ACCESS_DENIED"
+      ? "案件內容不公開"
+      : "尚待案件確認",
+    documentStatus: status,
+    documentUpdated: identityVisible && summary?.lastRecordedAtLabel
+      ? summary.lastRecordedAtLabel
+      : state === "LOAD_FAILED_RETRYABLE"
+      ? "請稍後重新載入"
+      : "尚無可顯示的更新",
+    documentActor: identityVisible && summary?.currentActorLabel
+      ? summary.currentActorLabel
+      : state === "ACCESS_DENIED"
+      ? "請由甲方入口重新登入"
+      : "甲方",
+    documentNext: identityVisible && summary?.nextActionLabel
+      ? summary.nextActionLabel
+      : state === "LOAD_FAILED_RETRYABLE"
+      ? "稍後重新載入案件資料"
+      : state === "ACCESS_DENIED"
+      ? "重新確認甲方身分與案件權限"
+      : "先確認服務契約與案件入口",
+    documentTrace: recorded
+      ? "已留下正式案件紀錄"
+      : visibleDocuments.length > 0
+      ? "尚待正式案件紀錄確認"
+      : "目前沒有可確認的正式文件紀錄",
+  });
+}
+
 export function buildOwnerWorkspaceViewModel(input) {
   const context = normalizeOwnerWorkspaceContext(input);
   const resolution = resolveOwnerWorkspaceState(input);
@@ -889,6 +942,11 @@ export function buildOwnerWorkspaceViewModel(input) {
         ),
       }))
     : [];
+  const documentSummary = documentConsumerSummary(
+    resolution.state,
+    summary,
+    payloadVisible ? context.documents : [],
+  );
 
   return {
     state: resolution.state,
@@ -949,6 +1007,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     todayFocus: summary?.todayFocusLabel || "尚待案件資料",
     constructionIssues: summary?.constructionIssueLabel || "尚待案件資料",
     constructionActor: summary?.currentActorLabel || "尚待案件資料",
+    ...documentSummary,
     documents: payloadVisible ? context.documents : [],
     submissions: payloadVisible ? context.submissions : [],
     scheduledDesignItems: payloadVisible ? context.scheduledDesignItems : [],
@@ -1422,6 +1481,12 @@ function renderModel(root, model) {
     "access-title": model.accessTitle,
     "access-message": model.statusMessage,
     "document-summary": model.documentSummary,
+    "document-workbench-case": model.documentCase,
+    "document-workbench-status": model.documentStatus,
+    "document-workbench-updated": model.documentUpdated,
+    "document-workbench-actor": model.documentActor,
+    "document-workbench-next": model.documentNext,
+    "document-workbench-trace": model.documentTrace,
     "review-summary": model.reviewSummary,
     "issue-summary": model.issueSummary,
     "next-summary": model.nextSummary,
@@ -1468,7 +1533,13 @@ function renderModel(root, model) {
         [record.kindLabel, record.versionLabel, record.statusLabel]
           .filter(Boolean)
           .join(" · "),
-        [record.submittedByLabel, record.submittedAtLabel, record.sourceLabel],
+        [
+          record.submittedByLabel,
+          record.submittedAtLabel,
+          record.sourceLabel,
+          record.nextActorLabel,
+          record.traceabilityLabel,
+        ],
       );
       const shareUrl = createOwnerDocumentLineShareUrl(record);
       if (!shareUrl) return;
@@ -2212,8 +2283,10 @@ export function createOwnerWorkspaceController({ root, adapter } = {}) {
   }
 
   function renderNamedState(state, reasonCode) {
+    const documentSummary = documentConsumerSummary(state, null, []);
     const model = {
       ...buildOwnerWorkspaceViewModel(),
+      ...documentSummary,
       state,
       reasonCode,
       stateLabel: STATE_COPY[state].label,
