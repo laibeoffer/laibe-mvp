@@ -98,6 +98,9 @@ export function classifyDockerRequestTarget({
 
   const canonicalPath = /^\/v([1-9]\d*)\.(0|[1-9]\d*)\/containers\/create$/u;
   const pathMatch = canonicalPath.exec(pathname);
+  if (method === "POST" && pathMatch !== null && queryIndex === -1) {
+    return { kind: "project-helper-create" };
+  }
   const queryMatch = /^name=([A-Za-z0-9_-]+)$/u.exec(rawQuery);
   if (
     method !== "POST" ||
@@ -158,7 +161,7 @@ function validateCreateFraming(rawHeaders) {
   return { headers, contentLength };
 }
 
-export function rewriteContainerCreateRequest({ rawHeaders, body }) {
+function parseCreateRequest({ rawHeaders, body }) {
   const framing = validateCreateFraming(rawHeaders);
   if (!Buffer.isBuffer(body) || body.byteLength !== framing.contentLength) {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_FRAMING_REJECTED");
@@ -170,6 +173,28 @@ export function rewriteContainerCreateRequest({ rawHeaders, body }) {
   } catch {
     fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
   }
+  return { framing, value };
+}
+
+function serializeCreateRequest({ framing, value }) {
+  const rewrittenBody = Buffer.from(JSON.stringify(value), "utf8");
+  const rewrittenHeaders = Object.create(null);
+  for (const [name, values] of framing.headers.entries()) {
+    if (
+      name === "content-length" ||
+      name === "content-encoding" ||
+      name === "transfer-encoding" ||
+      name === "trailer" ||
+      name === "expect"
+    ) continue;
+    rewrittenHeaders[name] = values.length === 1 ? values[0] : [...values];
+  }
+  rewrittenHeaders["content-length"] = String(rewrittenBody.byteLength);
+  return { body: rewrittenBody, headers: rewrittenHeaders };
+}
+
+export function rewriteContainerCreateRequest({ rawHeaders, body }) {
+  const { framing, value } = parseCreateRequest({ rawHeaders, body });
   if (
     !isPlainObject(value) ||
     !Object.hasOwn(value, "HostConfig") ||
@@ -217,20 +242,182 @@ export function rewriteContainerCreateRequest({ rawHeaders, body }) {
     }
   }
 
-  const rewrittenBody = Buffer.from(JSON.stringify(value), "utf8");
-  const rewrittenHeaders = Object.create(null);
-  for (const [name, values] of framing.headers.entries()) {
-    if (
-      name === "content-length" ||
-      name === "content-encoding" ||
-      name === "transfer-encoding" ||
-      name === "trailer" ||
-      name === "expect"
-    ) continue;
-    rewrittenHeaders[name] = values.length === 1 ? values[0] : [...values];
+  return serializeCreateRequest({ framing, value });
+}
+
+const PROJECT_HELPER_ENVIRONMENT_NAMES = Object.freeze([
+  "API_JWT_JWKS",
+  "API_JWT_SECRET",
+  "APP_NAME",
+  "DB_AFTER_CONNECT_QUERY",
+  "DB_ENC_KEY",
+  "DB_HOST",
+  "DB_NAME",
+  "DB_PASSWORD",
+  "DB_PORT",
+  "DB_USER",
+  "DNS_NODES",
+  "ERL_AFLAGS",
+  "MAX_HEADER_LENGTH",
+  "METRICS_JWT_SECRET",
+  "PORT",
+  "RLIMIT_NOFILE",
+  "RUN_JANITOR",
+  "SECRET_KEY_BASE",
+  "SEED_SELF_HOST",
+]);
+
+const PROJECT_HELPER_FIXED_VALUE = Object.freeze({
+  Hostname: "",
+  Domainname: "",
+  User: "",
+  AttachStdin: false,
+  AttachStdout: false,
+  AttachStderr: false,
+  Tty: false,
+  OpenStdin: false,
+  StdinOnce: false,
+  Cmd: Object.freeze([
+    "/app/bin/realtime",
+    "eval",
+    '{:ok, _} = Application.ensure_all_started(:realtime)\n{:ok, _} = Realtime.Tenants.health_check("realtime-dev")',
+  ]),
+  Image: "public.ecr.aws/supabase/realtime:v2.112.6",
+  Volumes: null,
+  WorkingDir: "",
+  Entrypoint: null,
+  OnBuild: null,
+  Labels: Object.freeze({
+    "com.docker.compose.project": PROJECT_ID,
+    "com.supabase.cli.project": PROJECT_ID,
+  }),
+  NetworkingConfig: Object.freeze({ EndpointsConfig: null }),
+});
+
+const PROJECT_HELPER_HOST_CONFIG = Object.freeze({
+  Binds: null,
+  ContainerIDFile: "",
+  LogConfig: Object.freeze({ Type: "", Config: null }),
+  NetworkMode: `supabase_network_${PROJECT_ID}`,
+  PortBindings: null,
+  RestartPolicy: Object.freeze({ Name: "", MaximumRetryCount: 0 }),
+  AutoRemove: false,
+  VolumeDriver: "",
+  VolumesFrom: null,
+  ConsoleSize: Object.freeze([0, 0]),
+  CapAdd: null,
+  CapDrop: null,
+  CgroupnsMode: "",
+  Dns: null,
+  DnsOptions: null,
+  DnsSearch: null,
+  ExtraHosts: null,
+  GroupAdd: null,
+  IpcMode: "",
+  Cgroup: "",
+  Links: null,
+  OomScoreAdj: 0,
+  PidMode: "",
+  Privileged: false,
+  PublishAllPorts: false,
+  ReadonlyRootfs: false,
+  SecurityOpt: null,
+  UTSMode: "",
+  UsernsMode: "",
+  ShmSize: 0,
+  Isolation: "",
+  CpuShares: 0,
+  Memory: 0,
+  NanoCpus: 0,
+  CgroupParent: "",
+  BlkioWeight: 0,
+  BlkioWeightDevice: null,
+  BlkioDeviceReadBps: null,
+  BlkioDeviceWriteBps: null,
+  BlkioDeviceReadIOps: null,
+  BlkioDeviceWriteIOps: null,
+  CpuPeriod: 0,
+  CpuQuota: 0,
+  CpuRealtimePeriod: 0,
+  CpuRealtimeRuntime: 0,
+  CpusetCpus: "",
+  CpusetMems: "",
+  Devices: null,
+  DeviceCgroupRules: null,
+  DeviceRequests: null,
+  MemoryReservation: 0,
+  MemorySwap: 0,
+  MemorySwappiness: null,
+  OomKillDisable: null,
+  PidsLimit: null,
+  Ulimits: null,
+  CpuCount: 0,
+  CpuPercent: 0,
+  IOMaximumIOps: 0,
+  IOMaximumBandwidth: 0,
+  MaskedPaths: null,
+  ReadonlyPaths: null,
+});
+
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (isPlainObject(value)) {
+    return `{${
+      Object.keys(value).sort().map((key) =>
+        `${JSON.stringify(key)}:${canonicalJson(value[key])}`
+      ).join(",")
+    }}`;
   }
-  rewrittenHeaders["content-length"] = String(rewrittenBody.byteLength);
-  return { body: rewrittenBody, headers: rewrittenHeaders };
+  return JSON.stringify(value);
+}
+
+export function rewriteProjectHelperCreateRequest({ rawHeaders, body }) {
+  const { framing, value } = parseCreateRequest({ rawHeaders, body });
+  if (!isPlainObject(value)) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+  const exactKeys = [
+    ...Object.keys(PROJECT_HELPER_FIXED_VALUE),
+    "Env",
+    "HostConfig",
+  ].sort();
+  if (
+    JSON.stringify(Object.keys(value).sort()) !== JSON.stringify(exactKeys) ||
+    !Array.isArray(value.Env) ||
+    value.Env.length !== PROJECT_HELPER_ENVIRONMENT_NAMES.length ||
+    !isPlainObject(value.HostConfig)
+  ) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+  const environmentNames = [];
+  for (const entry of value.Env) {
+    if (
+      typeof entry !== "string" ||
+      entry.length > 16_384 ||
+      /[\0\r\n]/u.test(entry)
+    ) {
+      fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+    }
+    const match = /^([A-Z][A-Z0-9_]*)=/u.exec(entry);
+    if (match === null) {
+      fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+    }
+    environmentNames.push(match[1]);
+  }
+  if (
+    JSON.stringify(environmentNames.sort()) !==
+      JSON.stringify(PROJECT_HELPER_ENVIRONMENT_NAMES) ||
+    canonicalJson(value.HostConfig) !==
+      canonicalJson(PROJECT_HELPER_HOST_CONFIG)
+  ) {
+    fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+  }
+  for (const [key, expected] of Object.entries(PROJECT_HELPER_FIXED_VALUE)) {
+    if (canonicalJson(value[key]) !== canonicalJson(expected)) {
+      fail("A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED");
+    }
+  }
+  return serializeCreateRequest({ framing, value });
 }
 
 export function createTaskPipeCapability(
@@ -340,14 +527,22 @@ export async function createDockerLoopbackProxyServer({
 
     const upstreamHeaders = { ...request.headers };
     let body = null;
-    if (classification.kind === "container-create") {
+    if (
+      classification.kind === "container-create" ||
+      classification.kind === "project-helper-create"
+    ) {
       try {
         const framing = validateCreateFraming(request.rawHeaders);
         body = await readBoundedCreateBody(request, framing.contentLength);
-        const rewritten = rewriteContainerCreateRequest({
-          rawHeaders: request.rawHeaders,
-          body,
-        });
+        const rewritten = classification.kind === "container-create"
+          ? rewriteContainerCreateRequest({
+            rawHeaders: request.rawHeaders,
+            body,
+          })
+          : rewriteProjectHelperCreateRequest({
+            rawHeaders: request.rawHeaders,
+            body,
+          });
         body = rewritten.body;
         for (const key of Object.keys(upstreamHeaders)) {
           delete upstreamHeaders[key];
@@ -394,7 +589,10 @@ export async function createDockerLoopbackProxyServer({
       socket.destroy();
       return;
     }
-    if (classification.kind === "container-create") {
+    if (
+      classification.kind === "container-create" ||
+      classification.kind === "project-helper-create"
+    ) {
       socket.destroy();
       return;
     }

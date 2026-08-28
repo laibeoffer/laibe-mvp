@@ -19,6 +19,7 @@ import {
   createDockerLoopbackProxyServer,
   createTaskPipeCapability,
   rewriteContainerCreateRequest,
+  rewriteProjectHelperCreateRequest,
   runDockerCliWithLoopbackProxy,
 } from "../scripts/a17-docker-loopback-api-proxy.mjs";
 
@@ -4311,6 +4312,7 @@ const loopbackProxyContainerNames = Object.freeze([
 ]);
 const canonicalCreateTarget =
   `/v1.51/containers/create?name=supabase_db_${loopbackProxyProjectId}`;
+const canonicalProjectHelperCreateTarget = "/v1.51/containers/create";
 
 function dockerCreateBody(hostIp = "") {
   return Buffer.from(
@@ -4324,6 +4326,126 @@ function dockerCreateBody(hostIp = "") {
     }),
     "utf8",
   );
+}
+
+const projectHelperEnvironmentNames = Object.freeze([
+  "API_JWT_JWKS",
+  "API_JWT_SECRET",
+  "APP_NAME",
+  "DB_AFTER_CONNECT_QUERY",
+  "DB_ENC_KEY",
+  "DB_HOST",
+  "DB_NAME",
+  "DB_PASSWORD",
+  "DB_PORT",
+  "DB_USER",
+  "DNS_NODES",
+  "ERL_AFLAGS",
+  "MAX_HEADER_LENGTH",
+  "METRICS_JWT_SECRET",
+  "PORT",
+  "RLIMIT_NOFILE",
+  "RUN_JANITOR",
+  "SECRET_KEY_BASE",
+  "SEED_SELF_HOST",
+]);
+
+function projectHelperCreateValue() {
+  return {
+    Hostname: "",
+    Domainname: "",
+    User: "",
+    AttachStdin: false,
+    AttachStdout: false,
+    AttachStderr: false,
+    Tty: false,
+    OpenStdin: false,
+    StdinOnce: false,
+    Env: projectHelperEnvironmentNames.map((name) => `${name}=opaque`),
+    Cmd: [
+      "/app/bin/realtime",
+      "eval",
+      '{:ok, _} = Application.ensure_all_started(:realtime)\n{:ok, _} = Realtime.Tenants.health_check("realtime-dev")',
+    ],
+    Image: "public.ecr.aws/supabase/realtime:v2.112.6",
+    Volumes: null,
+    WorkingDir: "",
+    Entrypoint: null,
+    OnBuild: null,
+    Labels: {
+      "com.docker.compose.project": loopbackProxyProjectId,
+      "com.supabase.cli.project": loopbackProxyProjectId,
+    },
+    HostConfig: {
+      Binds: null,
+      ContainerIDFile: "",
+      LogConfig: { Type: "", Config: null },
+      NetworkMode: `supabase_network_${loopbackProxyProjectId}`,
+      PortBindings: null,
+      RestartPolicy: { Name: "", MaximumRetryCount: 0 },
+      AutoRemove: false,
+      VolumeDriver: "",
+      VolumesFrom: null,
+      ConsoleSize: [0, 0],
+      CapAdd: null,
+      CapDrop: null,
+      CgroupnsMode: "",
+      Dns: null,
+      DnsOptions: null,
+      DnsSearch: null,
+      ExtraHosts: null,
+      GroupAdd: null,
+      IpcMode: "",
+      Cgroup: "",
+      Links: null,
+      OomScoreAdj: 0,
+      PidMode: "",
+      Privileged: false,
+      PublishAllPorts: false,
+      ReadonlyRootfs: false,
+      SecurityOpt: null,
+      UTSMode: "",
+      UsernsMode: "",
+      ShmSize: 0,
+      Isolation: "",
+      CpuShares: 0,
+      Memory: 0,
+      NanoCpus: 0,
+      CgroupParent: "",
+      BlkioWeight: 0,
+      BlkioWeightDevice: null,
+      BlkioDeviceReadBps: null,
+      BlkioDeviceWriteBps: null,
+      BlkioDeviceReadIOps: null,
+      BlkioDeviceWriteIOps: null,
+      CpuPeriod: 0,
+      CpuQuota: 0,
+      CpuRealtimePeriod: 0,
+      CpuRealtimeRuntime: 0,
+      CpusetCpus: "",
+      CpusetMems: "",
+      Devices: null,
+      DeviceCgroupRules: null,
+      DeviceRequests: null,
+      MemoryReservation: 0,
+      MemorySwap: 0,
+      MemorySwappiness: null,
+      OomKillDisable: null,
+      PidsLimit: null,
+      Ulimits: null,
+      CpuCount: 0,
+      CpuPercent: 0,
+      IOMaximumIOps: 0,
+      IOMaximumBandwidth: 0,
+      MaskedPaths: null,
+      ReadonlyPaths: null,
+    },
+    NetworkingConfig: { EndpointsConfig: null },
+  };
+}
+
+function projectHelperCreateBody() {
+  return Buffer.from(JSON.stringify(projectHelperCreateValue()), "utf8");
 }
 
 function exactJsonRawHeaders(body) {
@@ -4953,4 +5075,129 @@ test("S18-F8 executable main passes a closed plain environment to the child life
     /runDockerCliWithLoopbackProxy\(\{[\s\S]*?environment:\s*process\.env/u,
     "the special native environment object is never passed to the plain-object port",
   );
+});
+
+test("S18-F9 exact nameless Realtime health helper is closed and has no host capability", async () => {
+  assert.deepEqual(
+    classifyDockerRequestTarget({
+      method: "POST",
+      target: canonicalProjectHelperCreateTarget,
+      allowedContainerNames: loopbackProxyContainerNames,
+    }),
+    { kind: "project-helper-create" },
+  );
+  for (
+    const [method, target] of [
+      ["GET", canonicalProjectHelperCreateTarget],
+      ["POST", "/containers/create"],
+      ["POST", "/v1.51/CONTAINERS/create"],
+      ["POST", "/v1.51/containers/%63reate"],
+      ["POST", "/v1.51/containers/create?"],
+      ["POST", "/v1.51/containers/create?name="],
+      ["POST", "/v1.51/containers/create?extra=1"],
+    ]
+  ) {
+    assert.throws(
+      () =>
+        classifyDockerRequestTarget({
+          method,
+          target,
+          allowedContainerNames: loopbackProxyContainerNames,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_REQUEST_TARGET_REJECTED" },
+    );
+  }
+
+  const body = projectHelperCreateBody();
+  const rewritten = rewriteProjectHelperCreateRequest({
+    rawHeaders: exactJsonRawHeaders(body),
+    body,
+  });
+  assert.deepEqual(
+    JSON.parse(rewritten.body.toString("utf8")),
+    projectHelperCreateValue(),
+  );
+  assert.equal(rewritten.headers["content-type"], "application/json");
+  assert.equal(
+    rewritten.headers["content-length"],
+    String(rewritten.body.byteLength),
+  );
+
+  const hostileMutations = [
+    (value) => value.Image = "public.ecr.aws/supabase/realtime:latest",
+    (value) => value.Cmd[2] += '\nSystem.cmd("id", [])',
+    (value) => value.Env.push("UNKNOWN=value"),
+    (value) => value.Env.push(value.Env[0]),
+    (value) => value.Labels["com.supabase.cli.project"] = "other",
+    (value) => value.Labels.Unknown = loopbackProxyProjectId,
+    (value) => value.NetworkingConfig.EndpointsConfig = {},
+    (value) => value.HostConfig.NetworkMode = "bridge",
+    (value) => value.HostConfig.PortBindings = {},
+    (value) => value.HostConfig.Binds = [],
+    (value) => value.HostConfig.Devices = [],
+    (value) => value.HostConfig.DeviceRequests = [],
+    (value) => value.HostConfig.CapAdd = ["SYS_ADMIN"],
+    (value) => value.HostConfig.Privileged = true,
+    (value) => value.HostConfig.PublishAllPorts = true,
+    (value) => value.HostConfig.ReadonlyPaths = [],
+    (value) => value.HostConfig.Unknown = false,
+    (value) => value.Unknown = null,
+  ];
+  for (const mutate of hostileMutations) {
+    const value = projectHelperCreateValue();
+    mutate(value);
+    const hostileBody = Buffer.from(JSON.stringify(value), "utf8");
+    assert.throws(
+      () =>
+        rewriteProjectHelperCreateRequest({
+          rawHeaders: exactJsonRawHeaders(hostileBody),
+          body: hostileBody,
+        }),
+      { message: "A17_DOCKER_LOOPBACK_PROXY_CREATE_BODY_REJECTED" },
+    );
+  }
+
+  const backendPipe = uniquePipePath("helper-backend");
+  const frontendPipe = uniquePipePath("frontend");
+  let backendRequests = 0;
+  const backend = createHttpServer((request, response) => {
+    backendRequests += 1;
+    request.resume();
+    response.writeHead(201, { "content-type": "application/json" });
+    response.end('{"Id":"local-helper"}');
+  });
+  backend.listen(backendPipe);
+  await once(backend, "listening");
+  const proxy = await createDockerLoopbackProxyServer({
+    pipePath: frontendPipe,
+    backendPipe,
+    allowedContainerNames: loopbackProxyContainerNames,
+  });
+  try {
+    const accepted = await requestOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: canonicalProjectHelperCreateTarget,
+      body,
+      rawHeaders: exactJsonRawHeaders(body),
+    });
+    assert.equal(accepted.statusCode, 201);
+    assert.equal(backendRequests, 1);
+
+    const hostileValue = projectHelperCreateValue();
+    hostileValue.HostConfig.Privileged = true;
+    const hostileBody = Buffer.from(JSON.stringify(hostileValue), "utf8");
+    const rejected = await requestOverPipe({
+      pipePath: frontendPipe,
+      method: "POST",
+      target: canonicalProjectHelperCreateTarget,
+      body: hostileBody,
+      rawHeaders: exactJsonRawHeaders(hostileBody),
+    });
+    assert.equal(rejected.statusCode, 400);
+    assert.equal(backendRequests, 1);
+  } finally {
+    await proxy.close();
+    await closeServer(backend);
+  }
 });
