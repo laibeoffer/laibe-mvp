@@ -263,7 +263,7 @@ function isWindowsConnectionRefused(error, requestUrl) {
     !isClosedUtf8Text(error.message, 512)
   ) return false;
   const prefix =
-    `Fetch failed: error sending request for url (${requestUrl})${windowsConnectionSegment}`;
+    `error sending request for url (${requestUrl})${windowsConnectionSegment}`;
   return error.message.length >
       prefix.length + windowsConnectionSuffix.length &&
     error.message.startsWith(prefix) &&

@@ -2953,7 +2953,7 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
   const injectedDeno = { errors: { NotCapable, ConnectionRefused } };
   const calibratedRequestUrl = "http://127.0.0.1:54321/bounded-auth";
   const calibratedConnectionPrefix =
-    `Fetch failed: error sending request for url (${calibratedRequestUrl}): client error (Connect): tcp connect error: `;
+    `error sending request for url (${calibratedRequestUrl}): client error (Connect): tcp connect error: `;
   const calibratedConnectionSuffix = "(os error 10061)";
   const calibratedConnectionMessage =
     `${calibratedConnectionPrefix}No connection could be made because the target machine actively refused it. ${calibratedConnectionSuffix}`;
@@ -2964,6 +2964,7 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     null,
   ];
   const windowsConnectionNearMisses = [
+    `Fetch failed: ${calibratedConnectionMessage}`,
     calibratedConnectionMessage.replace("127.0.0.1", "localhost"),
     calibratedConnectionMessage.replace("/bounded-auth", "/bounded-auth/other"),
     `raw-prefix ${calibratedConnectionMessage}`,
