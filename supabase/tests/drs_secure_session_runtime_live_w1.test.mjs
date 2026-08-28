@@ -258,6 +258,7 @@ function isClosedUtf8Text(text, maxBytes) {
 function isWindowsConnectionRefused(error, requestUrl) {
   if (
     !(error instanceof TypeError) ||
+    error.cause !== undefined ||
     !isClosedUtf8Text(requestUrl, 256) ||
     !isClosedUtf8Text(error.message, 512)
   ) return false;

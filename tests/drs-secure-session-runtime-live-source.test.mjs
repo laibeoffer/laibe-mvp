@@ -2957,6 +2957,12 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
   const calibratedConnectionSuffix = "(os error 10061)";
   const calibratedConnectionMessage =
     `${calibratedConnectionPrefix}No connection could be made because the target machine actively refused it. ${calibratedConnectionSuffix}`;
+  const windowsConnectionForeignCauses = [
+    new Error("foreign provider cause"),
+    "foreign provider cause",
+    { source: "foreign provider" },
+    null,
+  ];
   const windowsConnectionNearMisses = [
     calibratedConnectionMessage.replace("127.0.0.1", "localhost"),
     calibratedConnectionMessage.replace("/bounded-auth", "/bounded-auth/other"),
@@ -3036,6 +3042,10 @@ test("S2-R4 hostile fetch and tamper run through accepted runtime ports with out
     ...windowsConnectionNearMisses.map((message) => [
       "NATIVE_OTHER_REJECTED",
       () => new TypeError(message),
+    ]),
+    ...windowsConnectionForeignCauses.map((cause) => [
+      "NATIVE_OTHER_REJECTED",
+      () => new TypeError(calibratedConnectionMessage, { cause }),
     ]),
   ];
   for (const operation of ["AUTH_CREATE", "AUTH_TOKEN", "AUTH_CURRENT"]) {
