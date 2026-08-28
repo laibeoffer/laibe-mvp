@@ -620,12 +620,13 @@ function assertMainEnvironment(environment) {
 
 async function main() {
   const childArguments = parseMainArguments(process.argv.slice(2));
-  assertMainEnvironment(process.env);
+  const mainEnvironment = { ...process.env };
+  assertMainEnvironment(mainEnvironment);
   const result = await runDockerCliWithLoopbackProxy({
     backendPipe: BACKEND_PIPE,
     childExecutable: SUPABASE_EXECUTABLE,
     childArguments,
-    environment: process.env,
+    environment: mainEnvironment,
     allowedContainerNames: exactAllowedContainerNames(PROJECT_ID),
   });
   process.stdout.write(result.stdout);

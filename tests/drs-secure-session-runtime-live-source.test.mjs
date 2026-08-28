@@ -4905,3 +4905,22 @@ test("S18-F7 child output overflow settles every lifecycle promise and cleans th
     await closeServer(backend);
   }
 });
+
+test("S18-F8 executable main passes a closed plain environment to the child lifecycle", () => {
+  const proxy = source(urls.proxy);
+  assert.match(
+    proxy,
+    /const mainEnvironment\s*=\s*\{\s*\.\.\.process\.env\s*\};\s*assertMainEnvironment\(mainEnvironment\)/u,
+    "native process.env is copied only before closed validation",
+  );
+  assert.match(
+    proxy,
+    /runDockerCliWithLoopbackProxy\(\{[\s\S]*?environment:\s*mainEnvironment,[\s\S]*?\}\)/u,
+    "the validated plain environment reaches the child lifecycle",
+  );
+  assert.doesNotMatch(
+    proxy,
+    /runDockerCliWithLoopbackProxy\(\{[\s\S]*?environment:\s*process\.env/u,
+    "the special native environment object is never passed to the plain-object port",
+  );
+});
