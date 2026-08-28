@@ -160,6 +160,7 @@ function freezeCompatibilityList(...items) {
 
 export const VENDOR_WORKSPACE_TAB_KEYS = freezeList(
   "design",
+  "contract",
   "construction",
 );
 
@@ -219,7 +220,7 @@ export function resolveVendorContractViewKey(activeView, key) {
 }
 
 function isVendorWorkspaceTabKey(value) {
-  return value === "design" || value === "construction";
+  return value === "design" || value === "contract" || value === "construction";
 }
 
 export function resolveVendorWorkspaceTabKey(activeTab, key) {
@@ -2506,6 +2507,7 @@ function initializeVendorContractSession(root) {
 
 export function resolveVendorWorkspaceTabForFragment(fragment) {
   if (fragment === "#execution") return "construction";
+  if (fragment === "#contracts") return "contract";
   if (
     fragment === "#documents" ||
     fragment === "#reviews" ||
@@ -2805,7 +2807,11 @@ export function initializeVendorWorkspaceTabs(
       }
     }
     if (liveTarget) {
-      const label = activeTab === "design" ? "設計管理" : "工程管理";
+      const label = activeTab === "design"
+        ? "設計管理"
+        : activeTab === "contract"
+          ? "契約管理"
+          : "工程管理";
       try {
         liveTarget.textContent = `已切換至${label}。`;
       } catch {

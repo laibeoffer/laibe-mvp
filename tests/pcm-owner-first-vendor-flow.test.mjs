@@ -740,7 +740,7 @@ test("workspace copy preserves the contract attachment review and document-shari
   assert.doesNotMatch(html, /大型輸入|data-line-send/u);
 });
 
-test("vendor workspace transposes the professional shell into two accessible management areas", async () => {
+test("vendor workspace transposes the professional shell into three accessible management areas", async () => {
   const [html, css, runtimeSource] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
@@ -750,6 +750,7 @@ test("vendor workspace transposes the professional shell into two accessible man
   assert.match(html, /class="vendor-workspace-tabs"[^>]*role="tablist"/u);
   for (const [kind, label] of [
     ["design", "設計管理"],
+    ["contract", "契約管理"],
     ["construction", "工程管理"],
   ]) {
     assert.match(
@@ -763,11 +764,11 @@ test("vendor workspace transposes the professional shell into two accessible man
       kind,
     );
   }
-  assert.equal(count(html, /class="vendor-panel-facts"/gu), 2);
+  assert.equal(count(html, /class="vendor-panel-facts"/gu), 3);
   assert.equal(count(html, /\bdata-resource-code=/gu), 10);
   assert.match(html, /class="[^"]*\bapp\b[^"]*\bvendor-workspace-shell\b/u);
   assert.match(html, /class="[^"]*\bcols\b[^"]*\bvendor-workspace-stage\b/u);
-  assert.doesNotMatch(html, /data-vendor-workspace-tab="contract"/iu);
+  assert.match(html, /data-vendor-workspace-tab="contract"/iu);
   const workspaceFrames = html.match(/<iframe\b[^>]*>/giu) ?? [];
   assert.equal(workspaceFrames.length, 0);
   assert.match(html, /data-vendor-calendar-live-events/iu);
@@ -783,7 +784,7 @@ test("vendor workspace transposes the professional shell into two accessible man
   assert.match(css, /\.vendor-status-rail\s*\{/u);
 });
 
-test("vendor workspace preserves both management tabs while calendar and document sharing replace LINE", async () => {
+test("vendor workspace preserves three management tabs while calendar and document sharing replace LINE", async () => {
   const [html, css, runtimeSource] = await Promise.all([
     readFile(pagePath(workspaceDir, "code.html"), "utf8"),
     readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
@@ -791,8 +792,9 @@ test("vendor workspace preserves both management tabs while calendar and documen
   ]);
   const authorizedMarkup = vendorAuthorizedTemplate(html);
 
-  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 3);
   assert.match(authorizedMarkup, /data-vendor-workspace-tab="design"[\s\S]*設計管理/u);
+  assert.match(authorizedMarkup, /data-vendor-workspace-tab="contract"[\s\S]*契約管理/u);
   assert.match(authorizedMarkup, /data-vendor-workspace-tab="construction"[\s\S]*工程管理/u);
   assert.equal(count(authorizedMarkup, /\bdata-vendor-document-share=/gu), resourceCodes.length);
   for (const code of resourceCodes) {
@@ -1088,8 +1090,8 @@ test("vendor public state keeps the original workspace interface without exposin
   assert.doesNotMatch(publicMarkup, /回到邀請確認|href="\.\.\/vendor_invitation\/code\.html"/u);
   assert.match(publicMarkup, /責任人[\s\S]*目前使用者/u);
   assert.match(publicMarkup, /id="vendor-authorized-workspace-mount"/u);
-  assert.equal(count(publicMarkup, /\bdata-vendor-gate-management-tab=/gu), 2);
-  for (const [kind, label] of [["design", "設計管理"], ["construction", "工程管理"]]) {
+  assert.equal(count(publicMarkup, /\bdata-vendor-gate-management-tab=/gu), 3);
+  for (const [kind, label] of [["design", "設計管理"], ["contract", "契約管理"], ["construction", "工程管理"]]) {
     assert.match(
       publicMarkup,
       new RegExp(`<button[^>]*data-vendor-gate-management-tab="${kind}"[^>]*disabled[^>]*aria-disabled="true"[\\s\\S]*?${label}[\\s\\S]*?<\\/button>`, "u"),
@@ -1105,14 +1107,16 @@ test("vendor public state keeps the original workspace interface without exposin
   assert.match(css, /\.vendor-gate-management-tab:disabled\s*\{/u);
 
   assert.notEqual(authorizedMarkup, "", "authorized workspace lives in an inert template");
-  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
-  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-panel=/gu), 2);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 3);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-panel=/gu), 3);
   assert.deepEqual(
     [...authorizedMarkup.matchAll(/data-vendor-workspace-tab="[^"]+"[^>]*>[\s\S]*?class="r1"[\s\S]*?<b>([^<]+)<\/b>/gu)]
       .map((match) => match[1]),
-    ["設計管理", "工程管理"],
+    ["設計管理", "契約管理", "工程管理"],
   );
-  assert.match(vendorWorkspacePanel(authorizedMarkup, "design"), /契約管理/u);
+  assert.match(vendorWorkspacePanel(authorizedMarkup, "contract"), /甲方契約副本/u);
+  assert.match(vendorWorkspacePanel(authorizedMarkup, "contract"), /乙方契約副本/u);
+  assert.match(vendorWorkspacePanel(authorizedMarkup, "contract"), /尚未建立契約備份紀錄/u);
   assert.doesNotMatch(authorizedMarkup, /設計案管理|工程案管理|main-tabs/u);
   assert.doesNotMatch(authorizedMarkup, /id="case-conversation"|line-conversation__composer/u);
   assert.equal(count(authorizedMarkup, /\bdata-vendor-document-share=/gu), resourceCodes.length);
@@ -1685,13 +1689,15 @@ test("vendor workspace tab keyboard contract supports arrows Home and End", asyn
   const runtime = await import(moduleUrl(workspaceDir, "tabs"));
   assert.deepEqual(
     ownListValues(runtime.VENDOR_WORKSPACE_TAB_KEYS, "VENDOR_WORKSPACE_TAB_KEYS"),
-    ["design", "construction"],
+    ["design", "contract", "construction"],
   );
-  assert.equal(runtime.resolveVendorWorkspaceTabKey("design", "ArrowRight"), "construction");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("design", "ArrowRight"), "contract");
   assert.equal(runtime.resolveVendorWorkspaceTabKey("design", "ArrowLeft"), "construction");
   assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "Home"), "design");
   assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "End"), "construction");
   assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "ArrowRight"), "design");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("contract", "ArrowRight"), "construction");
+  assert.equal(runtime.resolveVendorWorkspaceTabKey("contract", "ArrowLeft"), "design");
   assert.equal(runtime.resolveVendorWorkspaceTabKey("construction", "Escape"), "construction");
 });
 
@@ -1812,17 +1818,18 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
     };
   }
 
-  const tabs = ["design", "construction"].map((kind) => element({
+  const tabs = ["design", "contract", "construction"].map((kind) => element({
     dataset: { vendorWorkspaceTab: kind },
   }));
-  const panels = ["design", "construction"].map((kind, index) => element({
+  const panels = ["design", "contract", "construction"].map((kind, index) => element({
     dataset: { vendorWorkspacePanel: kind },
     hidden: index !== 0,
   }));
   const links = ["#documents", "#execution", "#reviews", "#records"].map((href) => element({ href }));
   const targets = Object.fromEntries([
     ["#documents", panels[0]],
-    ["#execution", panels[1]],
+    ["#contracts", panels[1]],
+    ["#execution", panels[2]],
     ["#reviews", element()],
     ["#records", element()],
   ]);
@@ -1882,17 +1889,17 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   assert.equal(calendarCaseContext.textContent, "只顯示目前登入乙方的授權案件。");
   assert.equal(tabs[1].classList.contains("on"), true);
   tabs[1].emit("keydown", { key: "End", preventDefault() {} });
-  assert.equal(focused, tabs[1]);
-  tabs[1].emit("keydown", { key: "Home", preventDefault() {} });
+  assert.equal(focused, tabs[2]);
+  tabs[2].emit("keydown", { key: "Home", preventDefault() {} });
   assert.equal(focused, tabs[0]);
   tabs[0].emit("keydown", { key: "ArrowLeft", preventDefault() {} });
-  assert.equal(focused, tabs[1]);
+  assert.equal(focused, tabs[2]);
 
   let prevented = false;
   links[1].emit("click", { preventDefault() { prevented = true; } });
   assert.equal(prevented, false);
-  assert.equal(focused, tabs[1]);
-  assert.equal(panels[1].hidden, false);
+  assert.equal(focused, tabs[2]);
+  assert.equal(panels[2].hidden, false);
 
   view.location.hash = "#reviews";
   windowListeners.get("hashchange")?.();
@@ -1903,7 +1910,7 @@ test("vendor tab initializer drives DOM state and maps current and legacy fragme
   assert.equal(links[0].getAttribute("aria-current"), null);
 
   tabs[0].emit("keydown", { key: "ArrowLeft", preventDefault() {} });
-  assert.equal(focused, tabs[1]);
+  assert.equal(focused, tabs[2]);
   assert.equal(links[2].getAttribute("aria-current"), null, "manual keyboard navigation clears the old route claim");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#records"), "design");
   assert.equal(runtime.resolveVendorWorkspaceTabForFragment("#execution"), "construction");
@@ -1930,8 +1937,8 @@ test("vendor cloned Element resolves ownerDocument view for initial and changed 
     };
   }
 
-  const workspaceTabs = ["design", "construction"].map((key) => element({ vendorWorkspaceTab: key }));
-  const workspacePanels = ["design", "construction"].map((key) => element({ vendorWorkspacePanel: key }));
+  const workspaceTabs = ["design", "contract", "construction"].map((key) => element({ vendorWorkspaceTab: key }));
+  const workspacePanels = ["design", "contract", "construction"].map((key) => element({ vendorWorkspacePanel: key }));
   const contractTabs = ["overview", "reply", "decision", "records"].map((key) => element({ vendorContractView: key }));
   const contractPanels = ["overview", "reply", "decision", "records"].map((key) => element({ vendorContractViewPanel: key }));
   const routeLinks = ["#documents", "#execution", "#reviews", "#records"].map((href) => element({}, href));
@@ -1971,7 +1978,7 @@ test("vendor cloned Element resolves ownerDocument view for initial and changed 
 
   view.location.hash = "#execution";
   for (const listener of viewListeners.get("hashchange") ?? []) listener();
-  assert.equal(workspacePanels[1].hidden, false);
+  assert.equal(workspacePanels[2].hidden, false);
   assert.equal(routeLinks[1].getAttribute("aria-current"), "location");
 
   view.location.hash = "#documents";
@@ -2033,7 +2040,7 @@ test("round 1 document storage and work categories", async () => {
   assert.match(authorizedMarkup, /data-vendor-document-recent-version/u);
   assert.match(authorizedMarkup, /id="vendor-document-storage-panel"[^>]*hidden/u);
 
-  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 2);
+  assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 3);
   for (const [panel, labels] of [
     [designPanel, ["今日待辦", "圖面與版本", "契約與回覆", "決策留痕"]],
     [constructionPanel, ["今日任務", "變更與驗收", "施工文件與照片", "案件留痕"]],
@@ -2421,6 +2428,38 @@ test("vendor document consumer keeps a Dusk Ember ledger and one readable mobile
   assert.match(
     css,
     /@media\s*\(max-width:\s*420px\)[\s\S]*?\[data-vendor-document-primary-action\][\s\S]{0,160}inline-size:\s*100%/u,
+  );
+});
+
+test("vendor sidebar exposes truthful contract backup management with readable and active Dusk Ember states", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const publicMarkup = vendorPublicMarkup(html);
+  const authorizedMarkup = vendorAuthorizedTemplate(html);
+  const contractPanel = vendorWorkspacePanel(authorizedMarkup, "contract");
+
+  assert.match(publicMarkup, /data-vendor-gate-management-tab="contract"[\s\S]*?<b>契約管理<\/b>[\s\S]*?甲乙方契約副本與版本留痕/u);
+  assert.match(authorizedMarkup, /data-vendor-workspace-tab="contract"[\s\S]*?<b>契約管理<\/b>[\s\S]*?甲乙方契約副本與版本留痕/u);
+  assert.match(contractPanel, /id="contracts"/u);
+  assert.match(contractPanel, /甲方契約副本/u);
+  assert.match(contractPanel, /乙方契約副本/u);
+  assert.match(contractPanel, /等待文件服務開放/u);
+  assert.match(contractPanel, /尚未建立契約備份紀錄/u);
+  assert.doesNotMatch(contractPanel, /已備份|備份完成|已留下案件紀錄|正式版本\s*v?\d/iu);
+
+  assert.match(
+    css,
+    /\.vendor-gate \.vendor-gate-management-tab:disabled\s*\{[\s\S]{0,280}color:\s*var\(--vendor-warm-ivory\)[\s\S]{0,280}filter:\s*none[\s\S]{0,280}opacity:\s*1/u,
+  );
+  assert.match(
+    css,
+    /\.vendor-workspace \.vendor-workspace-tabs \.scase\[aria-selected="true"\]\s*\{[\s\S]{0,420}0\s+0\s+24px\s+rgba\(255,\s*117,\s*48,\s*\.22\)/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*768px\)[\s\S]*?\.vendor-workspace-tabs\s*\{[\s\S]{0,180}grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/u,
   );
 });
 
@@ -3318,7 +3357,7 @@ test("vendor authorized workspace is one flat data-first surface while the publi
   assert.match(publicMarkup, /class="vendor-gate"/u);
   assert.doesNotMatch(publicMarkup, /class="vendor-workspace"/u);
   assert.match(authorizedMarkup, /class="vendor-workspace"/u);
-  assert.equal(count(authorizedMarkup, /class="vendor-workspace-panel"/gu), 2);
+  assert.equal(count(authorizedMarkup, /class="vendor-workspace-panel"/gu), 3);
   assert.match(css, /linear-gradient/u);
   assert.match(css, /\.vendor-workspace\s*\{[\s\S]{0,300}border:\s*1px solid var\(--workspace-line\)/u);
   assert.match(css, /\.canvas\s*\{[\s\S]{0,300}background:\s*var\(--canvas\)/u);

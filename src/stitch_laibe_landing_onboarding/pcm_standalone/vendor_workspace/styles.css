@@ -756,6 +756,7 @@ body[data-vendor-state="AUTHORIZED_VENDOR_WORKSPACE"] .vendor-gate { display: no
 .scase[aria-selected="true"] .st { color: var(--sec); }
 .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
 .dot.you { background: var(--coral); }
+.dot.contract { background: var(--vendor-responsibility); }
 .dot.them { background: var(--indigo); }
 
 .side .foot { margin-top: auto; display: flex; flex-direction: column; gap: 5px; padding: 14px 12px 0; color: #8a8e99; font-size: var(--f-s); }
@@ -811,6 +812,7 @@ body[data-vendor-state="AUTHORIZED_VENDOR_WORKSPACE"] .vendor-gate { display: no
 .top .rt { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 .pill { padding: 3px 10px; border-radius: 999px; font-size: var(--f-s); font-weight: 900; }
 .pill.design { color: var(--indigo); background: var(--indigo-bg); }
+.pill.contract { color: var(--vendor-signal-complete); background: rgba(194, 106, 230, .14); }
 .pill.build { color: var(--amber); background: var(--amber-bg); }
 
 .prog { display: flex; align-items: center; gap: 9px; padding: 7px 14px; border: 1px solid var(--line2); border-radius: 999px; background: #fff; }
@@ -1697,6 +1699,8 @@ html,body{background:#0B0B0B !important}
 
 .vendor-gate .dot.you,
 .vendor-workspace .dot.you { background: var(--vendor-ember); }
+.vendor-gate .dot.contract,
+.vendor-workspace .dot.contract { background: var(--vendor-responsibility); }
 .vendor-gate .dot.them,
 .vendor-workspace .dot.them { background: rgba(248, 244, 233, .56); }
 
@@ -2742,11 +2746,6 @@ html,body{background:#0B0B0B !important}
   background: rgba(22, 16, 25, .72);
 }
 
-.vendor-gate .vendor-gate-management-tab:first-child:disabled {
-  border-color: rgba(255, 117, 48, .3);
-  box-shadow: inset 2px 0 0 var(--vendor-ember);
-}
-
 .vendor-gate .vendor-gate-canvas {
   min-inline-size: 0;
   padding: 26px 24px 32px;
@@ -2925,7 +2924,7 @@ html,body{background:#0B0B0B !important}
   .vendor-gate .vendor-gate-case small { margin-block-start: 2px; font-size: 10px; }
 
   .vendor-gate .vendor-gate-management-tabs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     margin-block-start: 8px;
   }
 
@@ -3258,7 +3257,7 @@ html,body{background:#0B0B0B !important}
 @media (max-width: 768px) {
   .vendor-workspace-tabs {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
     overflow: visible;
   }
@@ -3305,6 +3304,8 @@ html,body{background:#0B0B0B !important}
 }
 
 @media (max-width: 420px) {
+  .vendor-gate .vendor-gate-management-tabs,
+  .vendor-workspace-tabs { grid-template-columns: 1fr; }
   .vendor-document-toolbar { grid-template-columns: 1fr; }
   .vendor-document-toolbar__status,
   .vendor-document-toolbar__actions { grid-column: 1; }
@@ -3404,6 +3405,52 @@ html,body{background:#0B0B0B !important}
   filter: saturate(.55);
   opacity: .62;
   transform: none;
+}
+
+.vendor-gate .vendor-gate-management-tab:disabled {
+  color: var(--vendor-warm-ivory);
+  filter: none;
+  opacity: 1;
+}
+
+.vendor-gate .vendor-gate-management-tab:disabled .st {
+  color: rgba(243, 238, 245, .72);
+}
+
+.vendor-gate .vendor-gate-management-tab:disabled .pct {
+  color: var(--vendor-signal-complete) !important;
+}
+
+.vendor-workspace .vendor-workspace-tabs .scase[aria-selected="true"] {
+  border-color: rgba(255, 117, 48, .72) !important;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 117, 48, .22), transparent 48%),
+    linear-gradient(180deg, rgba(78, 42, 79, .9), rgba(32, 21, 34, .96)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(243, 238, 245, .3),
+    inset 0 -2px 0 var(--vendor-ember),
+    0 10px 26px rgba(0, 0, 0, .34),
+    0 0 24px rgba(255, 117, 48, .22) !important;
+}
+
+.vendor-contract-backup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 14px 16px 16px;
+  border-block-start: 1px solid rgba(243, 238, 245, .08);
+}
+
+.vendor-contract-backup-actions p {
+  max-inline-size: 720px;
+  color: var(--vendor-ivory-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 420px) {
+  .vendor-contract-backup-actions { align-items: stretch; flex-direction: column; }
 }
 
 #vendor-workspace-panel-design .vendor-today-grid { --vendor-tile-rgb: 194, 106, 230; }
