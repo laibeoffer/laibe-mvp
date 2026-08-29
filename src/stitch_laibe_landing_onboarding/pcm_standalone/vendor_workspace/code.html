@@ -93,6 +93,35 @@
             </div>
 
             <div class="cols vendor-gate-columns">
+              <section class="vendor-case-binding-panel" data-vendor-case-binding-panel data-vendor-binding-state="CONTEXT_UNAVAILABLE" aria-labelledby="vendor-case-binding-title">
+                <header class="vendor-case-binding-header">
+                  <div>
+                    <p class="vendor-case-binding-eyebrow">甲乙方案件綁定</p>
+                    <h2 id="vendor-case-binding-title" data-vendor-binding-title>案件綁定狀態待確認</h2>
+                    <p data-vendor-binding-summary>完成身分與邀請紀錄核對前，不會顯示案件內容或代替你回覆邀請。</p>
+                  </div>
+                  <p class="vendor-case-binding-case"><span>目前案件</span><strong data-vendor-binding-case>尚未取得可顯示案件</strong></p>
+                </header>
+                <dl class="vendor-case-binding-rail">
+                  <div><dt>目前狀態</dt><dd data-vendor-binding-status>等待核對</dd></div>
+                  <div><dt>下一責任人</dt><dd data-vendor-binding-responsible>目前使用者</dd></div>
+                  <div><dt>下一步</dt><dd data-vendor-binding-next-step>登入並從甲方正式通知重新確認邀請</dd></div>
+                  <div><dt>案件留痕</dt><dd data-vendor-binding-record>尚未取得可顯示的正式案件事件</dd></div>
+                </dl>
+                <div class="vendor-case-binding-actions" data-vendor-binding-actions="invite" hidden>
+                  <button type="button" data-vendor-binding-action="accept-invitation" data-write-action disabled aria-disabled="true">確認承接邀請</button>
+                  <button type="button" data-vendor-binding-action="decline-invitation" data-write-action disabled aria-disabled="true">婉拒本次邀請</button>
+                </div>
+                <div class="vendor-case-binding-actions" data-vendor-binding-actions="termination" hidden>
+                  <button type="button" data-vendor-binding-action="confirm-mutual-termination" data-write-action disabled aria-disabled="true">確認雙方終止</button>
+                  <button type="button" data-vendor-binding-action="report-no-consensus" data-write-action disabled aria-disabled="true">尚未達成終止共識</button>
+                </div>
+                <p class="vendor-case-binding-action-status" data-vendor-binding-action-status aria-live="polite">正式回覆入口開放後，才會依你的選擇更新案件紀錄。</p>
+                <footer class="vendor-case-binding-basis">
+                  <span>狀態依據<strong data-vendor-binding-basis>等待正式邀請紀錄</strong></span>
+                  <span>最近更新<strong data-vendor-binding-updated>尚未取得正式事件</strong></span>
+                </footer>
+              </section>
               <section class="card vendor-gate-closed-surface" aria-labelledby="vendor-gate-closed-title">
                 <div class="hd"><div><h3 id="vendor-gate-closed-title">案件內容尚未開啟</h3><p class="sub">完成登入後，工作台才會顯示你獲授權的內容</p></div></div>
                 <div class="vendor-gate-closed-grid">

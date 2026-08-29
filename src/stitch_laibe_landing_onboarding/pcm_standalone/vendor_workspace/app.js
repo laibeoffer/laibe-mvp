@@ -1854,6 +1854,212 @@ function closedAction(code, label) {
   ]);
 }
 
+function vendorCaseBindingState({
+  code,
+  statusLabel,
+  title,
+  summary,
+  responsible,
+  nextStep,
+  recordTruth,
+  actionMode = "none",
+}) {
+  return freezeRecord([
+    ["code", code],
+    ["statusLabel", statusLabel],
+    ["title", title],
+    ["summary", summary],
+    ["responsible", responsible],
+    ["nextStep", nextStep],
+    ["recordTruth", recordTruth],
+    ["actionMode", actionMode],
+    ["workspaceAuthority", false],
+    ["fullCaseContentAllowed", false],
+    ["mutationAllowed", false],
+  ]);
+}
+
+export const VENDOR_CASE_BINDING_ACTIONS = freezeList(
+  closedAction("ACCEPT_INVITATION", "確認承接邀請"),
+  closedAction("DECLINE_INVITATION", "婉拒本次邀請"),
+  closedAction("CONFIRM_MUTUAL_TERMINATION", "確認雙方終止"),
+  closedAction("REPORT_NO_TERMINATION_CONSENSUS", "尚未達成終止共識"),
+);
+
+export const VENDOR_CASE_BINDING_CONTEXT_UNAVAILABLE = vendorCaseBindingState({
+  code: "CONTEXT_UNAVAILABLE",
+  statusLabel: "等待核對",
+  title: "案件綁定狀態待確認",
+  summary: "完成身分與邀請紀錄核對前，不會顯示案件內容或代替你回覆邀請。",
+  responsible: "目前使用者",
+  nextStep: "登入並從甲方正式通知重新確認邀請",
+  recordTruth: "尚未取得可顯示的正式案件事件",
+});
+
+const VALID_INVITE = vendorCaseBindingState({
+  code: "VALID_INVITE",
+  statusLabel: "有效邀請待回覆",
+  title: "請確認是否承接這個案件",
+  summary: "邀請內容已核對；你可以確認或婉拒本次承接邀請，完整案件內容仍保持關閉。",
+  responsible: "受邀乙方",
+  nextStep: "確認或婉拒本次案件邀請",
+  recordTruth: "正式邀請事件已列入案件紀錄",
+  actionMode: "invite",
+});
+
+const BINDING_DECLINED = vendorCaseBindingState({
+  code: "DECLINED",
+  statusLabel: "邀請已婉拒",
+  title: "已婉拒本次邀請",
+  summary: "本次邀請不會建立案件成員關係，也不會取得案件內容。",
+  responsible: "甲方",
+  nextStep: "由甲方決定是否另行邀請乙方",
+  recordTruth: "婉拒結果已列入案件紀錄",
+});
+
+const ACCEPTED_AWAITING_OWNER = vendorCaseBindingState({
+  code: "ACCEPTED_AWAITING_OWNER",
+  statusLabel: "乙方已回覆",
+  title: "等待業主最後確認",
+  summary: "你已回覆願意承接；業主完成最後確認前，尚未開放完整案件內容。",
+  responsible: "業主",
+  nextStep: "等待業主確認唯一主要乙方",
+  recordTruth: "乙方回覆已列入案件紀錄",
+});
+
+const FORMALLY_BOUND = vendorCaseBindingState({
+  code: "FORMALLY_BOUND",
+  statusLabel: "正式綁定",
+  title: "正式綁定已確認",
+  summary: "你已是本案件唯一主要乙方；進入完整內容仍須通過工作台授權核對。",
+  responsible: "受邀乙方",
+  nextStep: "核對工作台授權後處理第一項案件責任",
+  recordTruth: "甲乙方正式綁定事件已列入案件紀錄",
+});
+
+const ACCESS_STOPPED = vendorCaseBindingState({
+  code: "ACCESS_STOPPED",
+  statusLabel: "存取已停止",
+  title: "案件存取已停止",
+  summary: "業主已停止你查看與處理後續案件內容；這不代表雙方已確認終止合作。",
+  responsible: "甲乙雙方",
+  nextStep: "確認雙方是否同意終止，或註明尚未取得共識",
+  recordTruth: "存取停止事件已列入案件紀錄；終止共識仍待確認",
+  actionMode: "termination",
+});
+
+const TERMINATION_CONFIRMED = vendorCaseBindingState({
+  code: "TERMINATION_CONFIRMED",
+  statusLabel: "雙方已確認終止",
+  title: "雙方終止已確認",
+  summary: "甲乙雙方都已確認終止合作；後續不再開放案件操作，並保留既有案件紀錄。",
+  responsible: "案件雙方",
+  nextStep: "依既有紀錄完成必要的後續交接",
+  recordTruth: "雙方終止確認事件已列入案件紀錄",
+});
+
+const TERMINATION_DISPUTED = vendorCaseBindingState({
+  code: "TERMINATION_DISPUTED",
+  statusLabel: "終止共識待釐清",
+  title: "尚未取得終止共識",
+  summary: "目前只有存取停止或單方說明；不得顯示為雙方終止完成。",
+  responsible: "甲乙雙方",
+  nextStep: "回到原始依據釐清雙方立場與下一步",
+  recordTruth: "無共識狀態已列入案件紀錄",
+});
+
+export const VENDOR_CASE_BINDING_STATES = freezeRecord([
+  ["VALID_INVITE", VALID_INVITE],
+  ["DECLINED", BINDING_DECLINED],
+  ["ACCEPTED_AWAITING_OWNER", ACCEPTED_AWAITING_OWNER],
+  ["FORMALLY_BOUND", FORMALLY_BOUND],
+  ["ACCESS_STOPPED", ACCESS_STOPPED],
+  ["TERMINATION_CONFIRMED", TERMINATION_CONFIRMED],
+  ["TERMINATION_DISPUTED", TERMINATION_DISPUTED],
+]);
+
+export const VENDOR_CASE_BINDING_STATE_LIST = freezeList(
+  VALID_INVITE,
+  BINDING_DECLINED,
+  ACCEPTED_AWAITING_OWNER,
+  FORMALLY_BOUND,
+  ACCESS_STOPPED,
+  TERMINATION_CONFIRMED,
+  TERMINATION_DISPUTED,
+);
+
+function vendorCaseBindingProjectionResult(
+  state,
+  caseLabel = "尚未取得可顯示案件",
+  basisLabel = "等待正式邀請紀錄",
+  updatedAtLabel = "尚未取得正式事件",
+  recordedEvent = false,
+) {
+  return freezeRecord([
+    ["state", state],
+    ["caseLabel", caseLabel],
+    ["basisLabel", basisLabel],
+    ["updatedAtLabel", updatedAtLabel],
+    ["recordedEvent", recordedEvent],
+    ["workspaceAuthority", false],
+    ["mutationAllowed", false],
+  ]);
+}
+
+function unavailableVendorCaseBindingProjection() {
+  return vendorCaseBindingProjectionResult(VENDOR_CASE_BINDING_CONTEXT_UNAVAILABLE);
+}
+
+export function resolveVendorCaseBindingProjection(projection) {
+  const schemaVersion = ownValue(projection, "schemaVersion");
+  const authoritySource = ownValue(projection, "authoritySource");
+  const role = ownValue(projection, "role");
+  const code = ownValue(projection, "state");
+  const caseLabel = ownValue(projection, "caseLabel");
+  const basisLabel = ownValue(projection, "basisLabel");
+  const updatedAtLabel = ownValue(projection, "updatedAtLabel");
+  const recordedEvent = ownValue(projection, "recordedEvent");
+  const activePrimaryVendorCount = ownValue(projection, "activePrimaryVendorCount");
+  const viewerIsPrimaryVendor = ownValue(projection, "viewerIsPrimaryVendor");
+  const accessStatus = ownValue(projection, "accessStatus");
+  const state = ownValue(VENDOR_CASE_BINDING_STATES, code);
+
+  if (
+    schemaVersion !== "laibe.vendor-case-binding-read.v1"
+    || authoritySource !== "SAME_ORIGIN_SERVER_PROJECTION"
+    || role !== "pro"
+    || !state
+    || !safeIdentityText(caseLabel)
+    || !safeIdentityText(basisLabel)
+    || !safeIdentityText(updatedAtLabel)
+    || recordedEvent !== true
+  ) {
+    return unavailableVendorCaseBindingProjection();
+  }
+
+  const isPreBinding = code === "VALID_INVITE"
+    || code === "DECLINED"
+    || code === "ACCEPTED_AWAITING_OWNER";
+  const isFormallyBound = code === "FORMALLY_BOUND";
+  const isStopped = code === "ACCESS_STOPPED"
+    || code === "TERMINATION_CONFIRMED"
+    || code === "TERMINATION_DISPUTED";
+  const primaryVendorExact = isFormallyBound
+    ? activePrimaryVendorCount === 1 && viewerIsPrimaryVendor === true && accessStatus === "active"
+    : activePrimaryVendorCount === 0
+      && viewerIsPrimaryVendor === false
+      && ((isPreBinding && accessStatus === "not-yet-granted") || (isStopped && accessStatus === "stopped"));
+
+  if (!primaryVendorExact) return unavailableVendorCaseBindingProjection();
+  return vendorCaseBindingProjectionResult(
+    state,
+    caseLabel,
+    basisLabel,
+    updatedAtLabel,
+    true,
+  );
+}
+
 export const VENDOR_WORKSPACE_ACTIONS = freezeList(
   closedAction("EDIT_ATTACHMENT", "編輯附件"),
   closedAction("SUBMIT_FOR_PCM_REVIEW", "提送 PCM 審查"),
@@ -2195,6 +2401,84 @@ function closeWriteControls(scope) {
   return true;
 }
 
+function vendorCaseBindingNode(root, selector) {
+  try {
+    return root?.querySelector?.(selector) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function setVendorCaseBindingText(root, selector, value) {
+  const node = vendorCaseBindingNode(root, selector);
+  if (!node) return;
+  try {
+    node.textContent = value;
+  } catch {
+    // Static product copy remains available when a node cannot be updated.
+  }
+}
+
+function setVendorCaseBindingGroupVisibility(root, mode, visible) {
+  const group = vendorCaseBindingNode(root, `[data-vendor-binding-actions="${mode}"]`);
+  if (!group) return;
+  try {
+    group.hidden = !visible;
+  } catch {
+    // The static groups are hidden, so a failed update stays fail-closed.
+  }
+}
+
+export function renderVendorCaseBinding(root, projection = null) {
+  const view = resolveVendorCaseBindingProjection(projection);
+  const state = ownValue(view, "state") ?? VENDOR_CASE_BINDING_CONTEXT_UNAVAILABLE;
+  const panel = vendorCaseBindingNode(root, "[data-vendor-case-binding-panel]");
+  try {
+    panel?.setAttribute?.("data-vendor-binding-state", ownValue(state, "code"));
+  } catch {
+    // The panel starts in the unavailable state.
+  }
+
+  setVendorCaseBindingText(root, "[data-vendor-binding-case]", ownValue(view, "caseLabel"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-title]", ownValue(state, "title"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-summary]", ownValue(state, "summary"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-status]", ownValue(state, "statusLabel"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-responsible]", ownValue(state, "responsible"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-next-step]", ownValue(state, "nextStep"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-record]", ownValue(state, "recordTruth"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-basis]", ownValue(view, "basisLabel"));
+  setVendorCaseBindingText(root, "[data-vendor-binding-updated]", ownValue(view, "updatedAtLabel"));
+  setVendorCaseBindingText(
+    root,
+    "[data-vendor-binding-action-status]",
+    "正式回覆入口開放後，才會依你的選擇更新案件紀錄。",
+  );
+
+  let actions = null;
+  try {
+    actions = root?.querySelectorAll?.("[data-vendor-binding-action]") ?? null;
+  } catch {
+    actions = null;
+  }
+  let actionCount = null;
+  try {
+    const length = actions?.length;
+    if (typeof length === "number" && length >= 0 && length <= 16 && length % 1 === 0) {
+      actionCount = length;
+    }
+  } catch {
+    actionCount = null;
+  }
+  if (actionCount !== null) {
+    for (let index = 0; index < actionCount; index += 1) closeControl(actions[index]);
+  }
+
+  const actionMode = ownValue(state, "actionMode");
+  setVendorCaseBindingGroupVisibility(root, "invite", actionMode === "invite");
+  setVendorCaseBindingGroupVisibility(root, "termination", actionMode === "termination");
+  return view;
+}
+
 function resolveVendorView(root) {
   try {
     if (root.defaultView) return root.defaultView;
@@ -2259,6 +2543,7 @@ function resetVendorWorkspace(root) {
     // Continue clearing any previously published authorized surface.
   }
 
+  renderVendorCaseBinding(root);
   closeWriteControls(root);
 
   let mount = null;

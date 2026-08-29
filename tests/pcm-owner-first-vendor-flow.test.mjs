@@ -1124,6 +1124,213 @@ test("vendor public state keeps the original workspace interface without exposin
   assert.doesNotMatch(authorizedMarkup, /data-line-send/u);
 });
 
+test("vendor case binding first fold names the decision state while keeping every mutation closed", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const publicMarkup = vendorPublicMarkup(html);
+
+  assert.match(publicMarkup, /data-vendor-case-binding-panel/u);
+  assert.match(
+    publicMarkup,
+    /甲乙方案件綁定[\s\S]*案件綁定狀態待確認[\s\S]*目前狀態[\s\S]*下一責任人[\s\S]*下一步[\s\S]*案件留痕/u,
+  );
+  for (const action of [
+    "accept-invitation",
+    "decline-invitation",
+    "confirm-mutual-termination",
+    "report-no-consensus",
+  ]) {
+    assert.match(
+      publicMarkup,
+      new RegExp(`<button[^>]*data-vendor-binding-action="${action}"[^>]*data-write-action[^>]*disabled[^>]*aria-disabled="true"`, "u"),
+      action,
+    );
+  }
+  assert.match(publicMarkup, /正式回覆入口開放後，才會依你的選擇更新案件紀錄/u);
+  assert.doesNotMatch(publicMarkup, /邀請已接受|綁定成功|終止完成|receipt|versionRef|caseId|userId|LINE.*(?:身分|成員|授權)/iu);
+
+  assert.match(css, /\.vendor-case-binding-panel\s*\{/u);
+  assert.match(css, /\.vendor-case-binding-actions\s*\{/u);
+  assert.match(
+    css,
+    /#vendor-main \.vendor-gate \.vendor-case-binding-actions button:disabled\s*\{[^}]*filter:\s*none;[^}]*opacity:\s*1;/u,
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?\.vendor-case-binding-actions\s*\{[\s\S]{0,180}grid-template-columns:\s*1fr/u,
+  );
+});
+
+test("vendor case binding consumes only an exact server projection and never grants workspace authority", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "vendor-case-binding-read-model"));
+  const expectedCodes = [
+    "VALID_INVITE",
+    "DECLINED",
+    "ACCEPTED_AWAITING_OWNER",
+    "FORMALLY_BOUND",
+    "ACCESS_STOPPED",
+    "TERMINATION_CONFIRMED",
+    "TERMINATION_DISPUTED",
+  ];
+
+  assert.deepEqual(
+    [...runtime.VENDOR_CASE_BINDING_STATE_LIST].map((state) => state.code),
+    expectedCodes,
+  );
+  assert.deepEqual(Object.keys(runtime.VENDOR_CASE_BINDING_STATES), expectedCodes);
+  assert.deepEqual(
+    [...runtime.VENDOR_CASE_BINDING_ACTIONS].map((action) => [action.code, action.enabled, action.mutationAuthority]),
+    [
+      ["ACCEPT_INVITATION", false, false],
+      ["DECLINE_INVITATION", false, false],
+      ["CONFIRM_MUTUAL_TERMINATION", false, false],
+      ["REPORT_NO_TERMINATION_CONSENSUS", false, false],
+    ],
+  );
+
+  function projection(state, overrides = {}) {
+    const preBinding = state === "VALID_INVITE"
+      || state === "DECLINED"
+      || state === "ACCEPTED_AWAITING_OWNER";
+    return {
+      schemaVersion: "laibe.vendor-case-binding-read.v1",
+      authoritySource: "SAME_ORIGIN_SERVER_PROJECTION",
+      role: "pro",
+      state,
+      caseLabel: "目前受邀案件",
+      basisLabel: "甲方正式邀請紀錄",
+      updatedAtLabel: "最近一次正式事件",
+      recordedEvent: true,
+      activePrimaryVendorCount: state === "FORMALLY_BOUND" ? 1 : 0,
+      viewerIsPrimaryVendor: state === "FORMALLY_BOUND",
+      accessStatus: state === "FORMALLY_BOUND" ? "active" : preBinding ? "not-yet-granted" : "stopped",
+      ...overrides,
+    };
+  }
+
+  for (const code of expectedCodes) {
+    const result = runtime.resolveVendorCaseBindingProjection(projection(code));
+    assert.equal(result.state, runtime.VENDOR_CASE_BINDING_STATES[code], code);
+    assert.equal(result.caseLabel, "目前受邀案件", code);
+    assert.equal(result.recordedEvent, true, code);
+    assert.equal(result.workspaceAuthority, false, `${code}: the read model cannot open protected content`);
+    assert.equal(result.mutationAllowed, false, `${code}: no mutation route is accepted on this base`);
+    for (const forbidden of ["caseId", "userId", "grant", "receipt", "versionRef"]) {
+      assert.equal(Object.hasOwn(result, forbidden), false, `${code}: ${forbidden}`);
+    }
+  }
+
+  for (const [label, value] of [
+    ["query-shaped", { state: "FORMALLY_BOUND", search: "?caseId=forged&role=pro" }],
+    ["local storage-shaped", { schemaVersion: "laibe.vendor-case-binding-read.v1", localStorage: { state: "FORMALLY_BOUND" } }],
+    ["wrong source", projection("FORMALLY_BOUND", { authoritySource: "LINE_PROFILE" })],
+    ["formal without one primary vendor", projection("FORMALLY_BOUND", { activePrimaryVendorCount: 0 })],
+    ["formal viewer is not primary vendor", projection("FORMALLY_BOUND", { viewerIsPrimaryVendor: false })],
+    ["invite while another primary vendor is active", projection("VALID_INVITE", { activePrimaryVendorCount: 1 })],
+    ["unrecorded state", projection("VALID_INVITE", { recordedEvent: false })],
+  ]) {
+    const result = runtime.resolveVendorCaseBindingProjection(value);
+    assert.equal(result.state, runtime.VENDOR_CASE_BINDING_CONTEXT_UNAVAILABLE, label);
+    assert.equal(result.workspaceAuthority, false, label);
+    assert.equal(result.mutationAllowed, false, label);
+  }
+});
+
+test("vendor case binding renderer separates invite waiting stop and mutual-termination truth", async () => {
+  const runtime = await import(moduleUrl(workspaceDir, "vendor-case-binding-renderer"));
+
+  function node() {
+    const attributes = new Map();
+    return {
+      attributes,
+      disabled: false,
+      hidden: false,
+      textContent: "",
+      setAttribute(name, value) { attributes.set(name, String(value)); },
+    };
+  }
+
+  function fixture() {
+    const selectors = new Map([
+      ["[data-vendor-case-binding-panel]", node()],
+      ["[data-vendor-binding-case]", node()],
+      ["[data-vendor-binding-title]", node()],
+      ["[data-vendor-binding-summary]", node()],
+      ["[data-vendor-binding-status]", node()],
+      ["[data-vendor-binding-responsible]", node()],
+      ["[data-vendor-binding-next-step]", node()],
+      ["[data-vendor-binding-record]", node()],
+      ["[data-vendor-binding-basis]", node()],
+      ["[data-vendor-binding-updated]", node()],
+      ["[data-vendor-binding-action-status]", node()],
+      ["[data-vendor-binding-actions=\"invite\"]", node()],
+      ["[data-vendor-binding-actions=\"termination\"]", node()],
+    ]);
+    const actions = Array.from({ length: 4 }, () => node());
+    const root = {
+      querySelector(selector) { return selectors.get(selector) ?? null; },
+      querySelectorAll(selector) { return selector === "[data-vendor-binding-action]" ? actions : []; },
+    };
+    return { actions, root, selectors };
+  }
+
+  function projection(state) {
+    return {
+      schemaVersion: "laibe.vendor-case-binding-read.v1",
+      authoritySource: "SAME_ORIGIN_SERVER_PROJECTION",
+      role: "pro",
+      state,
+      caseLabel: "目前受邀案件",
+      basisLabel: "甲方正式邀請紀錄",
+      updatedAtLabel: "最近一次正式事件",
+      recordedEvent: true,
+      activePrimaryVendorCount: state === "FORMALLY_BOUND" ? 1 : 0,
+      viewerIsPrimaryVendor: state === "FORMALLY_BOUND",
+      accessStatus: state === "FORMALLY_BOUND"
+        ? "active"
+        : ["VALID_INVITE", "DECLINED", "ACCEPTED_AWAITING_OWNER"].includes(state)
+          ? "not-yet-granted"
+          : "stopped",
+    };
+  }
+
+  const scenarios = [
+    ["VALID_INVITE", /請確認是否承接/, /受邀乙方/, /確認或婉拒/],
+    ["DECLINED", /已婉拒本次邀請/, /甲方/, /不會取得案件內容/],
+    ["ACCEPTED_AWAITING_OWNER", /等待業主最後確認/, /業主/, /尚未開放完整案件內容/],
+    ["FORMALLY_BOUND", /正式綁定已確認/, /受邀乙方/, /仍須通過工作台授權核對/],
+    ["ACCESS_STOPPED", /案件存取已停止/, /甲乙雙方/, /不代表雙方已確認終止合作/],
+    ["TERMINATION_CONFIRMED", /雙方終止已確認/, /案件雙方/, /保留既有案件紀錄/],
+    ["TERMINATION_DISPUTED", /尚未取得終止共識/, /甲乙雙方/, /不得顯示為雙方終止完成/],
+  ];
+
+  for (const [code, title, responsible, summary] of scenarios) {
+    const view = fixture();
+    const result = runtime.renderVendorCaseBinding(view.root, projection(code));
+    assert.equal(result.state, runtime.VENDOR_CASE_BINDING_STATES[code], code);
+    assert.match(view.selectors.get("[data-vendor-binding-title]").textContent, title, code);
+    assert.match(view.selectors.get("[data-vendor-binding-responsible]").textContent, responsible, code);
+    assert.match(view.selectors.get("[data-vendor-binding-summary]").textContent, summary, code);
+    assert.equal(view.selectors.get("[data-vendor-case-binding-panel]").attributes.get("data-vendor-binding-state"), code);
+    for (const action of view.actions) {
+      assert.equal(action.disabled, true, `${code}: disabled`);
+      assert.equal(action.attributes.get("aria-disabled"), "true", `${code}: aria-disabled`);
+    }
+  }
+
+  const stopped = fixture();
+  runtime.renderVendorCaseBinding(stopped.root, projection("ACCESS_STOPPED"));
+  assert.equal(stopped.selectors.get("[data-vendor-binding-actions=\"invite\"]").hidden, true);
+  assert.equal(stopped.selectors.get("[data-vendor-binding-actions=\"termination\"]").hidden, false);
+
+  const awaiting = fixture();
+  runtime.renderVendorCaseBinding(awaiting.root, projection("ACCEPTED_AWAITING_OWNER"));
+  assert.equal(awaiting.selectors.get("[data-vendor-binding-actions=\"invite\"]").hidden, true);
+  assert.equal(awaiting.selectors.get("[data-vendor-binding-actions=\"termination\"]").hidden, true);
+});
+
 test("vendor header uses the cross-page official expanded DRS lockup and truthful context copy", async () => {
   const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
 
