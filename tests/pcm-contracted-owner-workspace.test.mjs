@@ -4159,6 +4159,17 @@ test("合作乙方狀態會給出一致的等待關係、責任人與下一步",
         primaryVendor: formallyBound
           ? { displayName: "森安設計", membershipStatus: "active" }
           : null,
+        successorCase: state === "successor_case_created"
+          ? {
+            currentCaseId: "case-fixture-owner-workspace",
+            predecessorCaseId: "case-fixture-owner-workspace",
+            successorCaseId: "case-fixture-owner-successor",
+            relation: "successor",
+            stage: "construction",
+            displayName: "接續工程案",
+            transferStatus: "selection_required",
+          }
+          : null,
       },
     }));
     assert.equal(model.vendorBindingStatus, label, state);
@@ -4181,6 +4192,16 @@ test("拒絕、停止存取、終止歧異與接續案件都不製造正式成�
         actorLabel: "受邀乙方",
         recordedAt: "2026-08-29T03:20:00.000Z",
         recordStatus: "recorded",
+        basisDocument: {
+          title: "乙方合作邀請",
+          versionLabel: "v1",
+        },
+        statusAfter: "vendor_declined",
+        nextActorRole: "owner",
+        invitedParty: {
+          displayName: "受邀乙方",
+          identitySource: "server_case_invitation",
+        },
       },
     },
   }));
@@ -4206,7 +4227,11 @@ test("拒絕、停止存取、終止歧異與接續案件都不製造正式成�
       state: "successor_case_created",
       activePrimaryVendorCount: 0,
       successorCase: {
+        currentCaseId: "case-fixture-owner-workspace",
+        predecessorCaseId: "case-fixture-owner-workspace",
+        successorCaseId: "case-fixture-owner-successor",
         relation: "successor",
+        stage: "construction",
         displayName: "接續工程案",
         transferStatus: "selection_required",
       },
@@ -4281,4 +4306,140 @@ test("無有效服務契約不開放邀請，停止存取保留原紀錄且跨�
     designPanel,
     /設計案與工程案由不同乙方承作時，會建立兩個彼此關聯但權限與留痕獨立的案件/u,
   );
+});
+
+test("接續案件必須具有不同且一致的 current、predecessor、successor 身分與階段關係", async () => {
+  const runtime = await loadRuntime();
+  const validSuccessor = {
+    currentCaseId: "case-fixture-owner-workspace",
+    predecessorCaseId: "case-fixture-owner-workspace",
+    successorCaseId: "case-fixture-owner-successor",
+    relation: "successor",
+    stage: "construction",
+    displayName: "接續工程案",
+    transferStatus: "selection_required",
+  };
+  const buildContext = (successorCase) => strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "construction",
+      state: "successor_case_created",
+      activePrimaryVendorCount: 0,
+      successorCase,
+    },
+  });
+
+  const accepted = buildContext(validSuccessor);
+  assert.equal(runtime.resolveOwnerWorkspaceState(accepted).state, "AUTHORIZED_READY");
+  assert.equal(
+    runtime.buildOwnerWorkspaceViewModel(accepted).vendorSuccessorCase,
+    "接續工程案",
+  );
+
+  const mutations = [
+    ["same successor case", { successorCaseId: "case-fixture-owner-workspace" }],
+    ["wrong current case", { currentCaseId: "case-other" }],
+    ["wrong predecessor", { predecessorCaseId: "case-other" }],
+    ["wrong relation", { relation: "current" }],
+    ["missing stage", { stage: "" }],
+    ["unknown stage", { stage: "procurement" }],
+  ];
+  for (const [label, mutation] of mutations) {
+    const context = buildContext({ ...validSuccessor, ...mutation });
+    const resolution = runtime.resolveOwnerWorkspaceState(context);
+    const model = runtime.buildOwnerWorkspaceViewModel(context);
+    assert.equal(resolution.state, "ACCESS_DENIED", label);
+    assert.equal(
+      resolution.reasonCode,
+      "VENDOR_SUCCESSOR_CASE_BINDING_INVALID",
+      label,
+    );
+    assert.equal(model.vendorSuccessorCase, "尚未建立接續案件", label);
+  }
+});
+
+test("最近合作紀錄完整呈現依據、事件後狀態、下一責任人與安全受邀方身分", async () => {
+  const [html, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    loadRuntime(),
+  ]);
+  const validEvent = {
+    caseId: "case-fixture-owner-workspace",
+    type: "vendor_declined",
+    actorLabel: "受邀乙方",
+    recordedAt: "2026-08-29T03:20:00.000Z",
+    recordStatus: "recorded",
+    basisDocument: {
+      title: "乙方合作邀請",
+      versionLabel: "v1",
+    },
+    statusAfter: "vendor_declined",
+    nextActorRole: "owner",
+    invitedParty: {
+      displayName: "森安設計",
+      identitySource: "server_case_invitation",
+    },
+  };
+  const buildContext = (latestEvent) => strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "design",
+      state: "vendor_declined",
+      activePrimaryVendorCount: 0,
+      latestEvent,
+    },
+  });
+
+  const complete = runtime.buildOwnerWorkspaceViewModel(buildContext(validEvent));
+  assert.match(complete.vendorLastRecord, /乙方婉拒邀請/u);
+  assert.equal(complete.vendorRecordBasis, "乙方合作邀請｜v1");
+  assert.equal(complete.vendorRecordStatusAfter, "乙方已婉拒");
+  assert.equal(complete.vendorRecordNextActor, "甲方");
+  assert.equal(complete.vendorInvitedParty, "森安設計");
+  for (const slot of [
+    "vendor-binding-record-basis",
+    "vendor-binding-record-status-after",
+    "vendor-binding-record-next-actor",
+    "vendor-binding-invited-party",
+  ]) {
+    assert.match(html, new RegExp(`data-slot="${slot}"`, "u"), slot);
+  }
+
+  const mutations = [
+    ["missing document version", {
+      basisDocument: { title: "乙方合作邀請", versionLabel: "" },
+    }],
+    ["wrong post-event status", { statusAfter: "formally_bound" }],
+    ["wrong next actor", { nextActorRole: "invited_vendor" }],
+    ["untrusted invited identity", {
+      invitedParty: {
+        displayName: "森安設計",
+        identitySource: "line_profile",
+      },
+    }],
+    ["unsafe invited display name", {
+      invitedParty: {
+        displayName: "<script>森安設計</script>",
+        identitySource: "server_case_invitation",
+      },
+    }],
+  ];
+  for (const [label, mutation] of mutations) {
+    const model = runtime.buildOwnerWorkspaceViewModel(buildContext({
+      ...validEvent,
+      ...mutation,
+    }));
+    assert.equal(
+      model.vendorLastRecord,
+      "尚無可確認的正式合作紀錄",
+      label,
+    );
+    assert.equal(model.vendorRecordBasis, "尚無可確認的紀錄依據", label);
+    assert.equal(model.vendorInvitedParty, "尚無可確認的受邀乙方", label);
+    assert.doesNotMatch(
+      JSON.stringify(model),
+      /乙方合作邀請｜v1|<script>|LINE profile/u,
+      label,
+    );
+  }
 });

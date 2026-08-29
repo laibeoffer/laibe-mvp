@@ -206,6 +206,44 @@ const OWNER_VENDOR_EVENT_LABELS = Object.freeze({
   document_snapshot_carried: "甲方選擇帶入案件依據",
 });
 
+const OWNER_VENDOR_EVENT_POST_STATES = Object.freeze({
+  invitation_created: "invitation_pending",
+  invitation_withdrawn: "invitation_withdrawn",
+  invitation_expired: "invitation_expired",
+  vendor_declined: "vendor_declined",
+  vendor_accepted: "vendor_accepted_pending_owner",
+  owner_confirmed_vendor: "formally_bound",
+  membership_created: "formally_bound",
+  termination_requested: "termination_pending",
+  vendor_access_stopped: "access_stopped",
+  termination_confirmed: "termination_confirmed",
+  termination_disputed: "termination_disputed",
+  case_archived: "case_archived",
+  successor_case_created: "successor_case_created",
+  document_snapshot_carried: "successor_case_created",
+});
+
+const OWNER_VENDOR_NEXT_ACTOR_ROLES = Object.freeze({
+  not_invited: "owner",
+  invitation_pending: "invited_vendor",
+  vendor_declined: "owner",
+  vendor_accepted_pending_owner: "owner",
+  formally_bound: "case_assignment",
+  invitation_expired: "owner",
+  invitation_withdrawn: "owner",
+  access_stopped: "owner",
+  termination_pending: "original_vendor",
+  termination_confirmed: "owner",
+  termination_disputed: "owner",
+  case_archived: "owner",
+  successor_case_created: "owner",
+});
+
+const OWNER_VENDOR_PARTY_IDENTITY_SOURCES = Object.freeze([
+  "server_case_invitation",
+  "server_case_membership",
+]);
+
 export const OWNER_CONTRACT_VIEW_HASHES = Object.freeze({
   overview: "#owner-contract-view-panel-overview",
   facts: "#owner-contract-view-panel-facts",
@@ -553,6 +591,14 @@ function asText(value, fallback = "") {
   return normalized ? normalized.slice(0, 500) : fallback;
 }
 
+function safeDisplayLabel(value) {
+  const text = asText(value);
+  return text !== "" && text.length <= 80 &&
+      !/[<>\u0000-\u001f\u007f]/u.test(text)
+    ? text
+    : "";
+}
+
 export function createOwnerDocumentLineShareUrl(record) {
   const title = asText(record?.title);
   const versionLabel = asText(record?.versionLabel);
@@ -693,6 +739,14 @@ function normalizeOwnerVendorBinding(value) {
   const latestEvent = source.latestEvent && typeof source.latestEvent === "object"
     ? source.latestEvent
     : {};
+  const basisDocument = latestEvent.basisDocument &&
+      typeof latestEvent.basisDocument === "object"
+    ? latestEvent.basisDocument
+    : {};
+  const invitedParty = latestEvent.invitedParty &&
+      typeof latestEvent.invitedParty === "object"
+    ? latestEvent.invitedParty
+    : {};
   const successorCase = source.successorCase &&
       typeof source.successorCase === "object"
     ? source.successorCase
@@ -718,13 +772,49 @@ function normalizeOwnerVendorBinding(value) {
       actorLabel: asText(latestEvent.actorLabel),
       recordedAt: asText(latestEvent.recordedAt),
       recordStatus: asText(latestEvent.recordStatus),
+      basisDocument: {
+        title: asText(basisDocument.title),
+        versionLabel: asText(basisDocument.versionLabel),
+      },
+      statusAfter: asText(latestEvent.statusAfter),
+      nextActorRole: asText(latestEvent.nextActorRole),
+      invitedParty: {
+        displayName: asText(invitedParty.displayName),
+        identitySource: asText(invitedParty.identitySource),
+      },
     },
     successorCase: {
+      currentCaseId: asText(successorCase.currentCaseId),
+      predecessorCaseId: asText(successorCase.predecessorCaseId),
+      successorCaseId: asText(successorCase.successorCaseId),
       relation: asText(successorCase.relation),
+      stage: asText(successorCase.stage),
       displayName: asText(successorCase.displayName),
       transferStatus: asText(successorCase.transferStatus),
     },
   };
+}
+
+function hasSuccessorCaseClaim(binding) {
+  return binding.state === "successor_case_created" ||
+    Object.values(binding.successorCase).some((value) => value !== "");
+}
+
+function hasValidSuccessorCaseLink(context) {
+  const binding = context.vendorBinding;
+  const successor = binding.successorCase;
+  const currentCaseId = context.caseBinding.caseId;
+  return binding.state === "successor_case_created" &&
+    binding.caseId === currentCaseId &&
+    successor.currentCaseId === currentCaseId &&
+    successor.predecessorCaseId === currentCaseId &&
+    successor.successorCaseId !== "" &&
+    successor.successorCaseId !== currentCaseId &&
+    successor.relation === "successor" &&
+    ["design", "construction"].includes(binding.caseStage) &&
+    ["design", "construction"].includes(successor.stage) &&
+    safeDisplayLabel(successor.displayName) !== "" &&
+    successor.transferStatus === "selection_required";
 }
 
 function normalizePublicMessages(value) {
@@ -951,6 +1041,16 @@ export function resolveOwnerWorkspaceState(input) {
     return { state: "ACCESS_DENIED", reasonCode: "CASE_BINDING_MISMATCH" };
   }
 
+  if (
+    hasSuccessorCaseClaim(context.vendorBinding) &&
+    !hasValidSuccessorCaseLink(context)
+  ) {
+    return {
+      state: "ACCESS_DENIED",
+      reasonCode: "VENDOR_SUCCESSOR_CASE_BINDING_INVALID",
+    };
+  }
+
   const agreementEnded = context.serviceAgreement.status ===
     OWNER_WORKSPACE_ACCESS.endedAgreementStatus;
   if (
@@ -1104,6 +1204,10 @@ function ownerVendorBindingSummary(context, resolution) {
     vendorWaitingRelationship: "尚待案件授權與合作關係確認",
     vendorNextActor: "甲方",
     vendorLastRecord: "尚無可確認的正式合作紀錄",
+    vendorRecordBasis: "尚無可確認的紀錄依據",
+    vendorRecordStatusAfter: "尚待案件狀態確認",
+    vendorRecordNextActor: "尚待指定下一步責任人",
+    vendorInvitedParty: "尚無可確認的受邀乙方",
     vendorActionLabel: "查看合作條件與下一步",
     vendorActionEnabled: false,
     vendorPendingCopy: "此操作正在整理中，正式開放後會提供完整案件流程。",
@@ -1145,16 +1249,31 @@ function ownerVendorBindingSummary(context, resolution) {
   const latestEvent = binding.latestEvent;
   const recordedAt = canonicalRecordedAt(latestEvent.recordedAt);
   const eventLabel = OWNER_VENDOR_EVENT_LABELS[latestEvent.type] ?? "";
-  const lastRecord = latestEvent.caseId === context.caseBinding.caseId &&
+  const basisTitle = safeDisplayLabel(latestEvent.basisDocument.title);
+  const basisVersion = safeDisplayLabel(
+    latestEvent.basisDocument.versionLabel,
+  );
+  const invitedPartyName = safeDisplayLabel(
+    latestEvent.invitedParty.displayName,
+  );
+  const traceabilityValid = latestEvent.caseId === context.caseBinding.caseId &&
       latestEvent.recordStatus === "recorded" &&
-      latestEvent.actorLabel !== "" &&
+      safeDisplayLabel(latestEvent.actorLabel) !== "" &&
       recordedAt &&
-      eventLabel
+      eventLabel &&
+      basisTitle &&
+      basisVersion &&
+      latestEvent.statusAfter === binding.state &&
+      OWNER_VENDOR_EVENT_POST_STATES[latestEvent.type] === binding.state &&
+      latestEvent.nextActorRole === OWNER_VENDOR_NEXT_ACTOR_ROLES[binding.state] &&
+      invitedPartyName &&
+      OWNER_VENDOR_PARTY_IDENTITY_SOURCES.includes(
+        latestEvent.invitedParty.identitySource,
+      );
+  const lastRecord = traceabilityValid
     ? `${taipeiTimeLabel(recordedAt)}・${latestEvent.actorLabel}・${eventLabel}`
     : "尚無可確認的正式合作紀錄";
-  const successorVisible = binding.successorCase.relation === "successor" &&
-    binding.successorCase.transferStatus === "selection_required" &&
-    binding.successorCase.displayName !== "";
+  const successorVisible = hasValidSuccessorCaseLink(context);
 
   return Object.freeze({
     vendorBindingState: binding.state,
@@ -1167,6 +1286,18 @@ function ownerVendorBindingSummary(context, resolution) {
     vendorWaitingRelationship: copy.waiting,
     vendorNextActor: copy.nextActor,
     vendorLastRecord: lastRecord,
+    vendorRecordBasis: traceabilityValid
+      ? `${basisTitle}｜${basisVersion}`
+      : fallback.vendorRecordBasis,
+    vendorRecordStatusAfter: traceabilityValid
+      ? copy.label
+      : fallback.vendorRecordStatusAfter,
+    vendorRecordNextActor: traceabilityValid
+      ? copy.nextActor
+      : fallback.vendorRecordNextActor,
+    vendorInvitedParty: traceabilityValid
+      ? invitedPartyName
+      : fallback.vendorInvitedParty,
     vendorActionLabel: copy.action,
     vendorActionEnabled: false,
     vendorPendingCopy: "此操作正在整理中，正式開放後會提供完整案件流程。",
@@ -1775,6 +1906,10 @@ function renderModel(root, model) {
     "vendor-binding-waiting": model.vendorWaitingRelationship,
     "vendor-binding-next-actor": model.vendorNextActor,
     "vendor-binding-last-record": model.vendorLastRecord,
+    "vendor-binding-record-basis": model.vendorRecordBasis,
+    "vendor-binding-record-status-after": model.vendorRecordStatusAfter,
+    "vendor-binding-record-next-actor": model.vendorRecordNextActor,
+    "vendor-binding-invited-party": model.vendorInvitedParty,
     "vendor-binding-action-label": model.vendorActionLabel,
     "vendor-binding-pending-copy": model.vendorPendingCopy,
     "vendor-binding-successor": model.vendorSuccessorCase,
