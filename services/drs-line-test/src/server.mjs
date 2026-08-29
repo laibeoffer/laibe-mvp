@@ -25,6 +25,13 @@ function send(response, status, { allow, json } = {}) {
   response.end();
 }
 
+function sendAndClose(request, response, status) {
+  response.shouldKeepAlive = false;
+  response.setHeader('connection', 'close');
+  response.once('finish', () => request.destroy());
+  send(response, status);
+}
+
 function contentTypeIsJson(request) {
   const contentType = request.headers['content-type'];
   return typeof contentType === 'string'
@@ -38,7 +45,13 @@ export function createDrsLineServer({
   createServerImpl = createServer,
 } = {}) {
   return createServerImpl(async (request, response) => {
-    const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+    let pathname;
+    try {
+      pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+    } catch {
+      send(response, 400);
+      return;
+    }
 
     if (pathname === '/health') {
       if (request.method !== 'GET') {
@@ -71,7 +84,11 @@ export function createDrsLineServer({
       const status = error?.httpStatus === 408 || error?.httpStatus === 413
         ? error.httpStatus
         : 400;
-      send(response, status);
+      if (error?.closeConnection === true) {
+        sendAndClose(request, response, status);
+      } else {
+        send(response, status);
+      }
       return;
     }
 
@@ -82,8 +99,8 @@ export function createDrsLineServer({
         requestId: requestIdFactory(),
       });
       send(response, result?.status ?? 500);
-    } catch {
-      send(response, 500);
+    } catch (error) {
+      send(response, error?.httpStatus === 503 ? 503 : 500);
     }
   });
 }

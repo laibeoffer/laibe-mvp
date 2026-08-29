@@ -6,6 +6,7 @@ export class BodyReadError extends Error {
     super(message);
     this.name = 'BodyReadError';
     this.httpStatus = httpStatus;
+    this.closeConnection = httpStatus === 408 || httpStatus === 413;
   }
 }
 

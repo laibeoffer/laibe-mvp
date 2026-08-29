@@ -35,6 +35,18 @@ node --test
 
 raw body 上限為 1 MiB，讀取 timeout 為 5 秒；LINE Reply API timeout 也是 5 秒。單行 JSON log 僅保留時間、request/event type、source type、outcome、HTTP status 與 duration，不保存訊息文字、個人／群組／聊天室 ID、replyToken、signature、Authorization 或憑證。
 
+SANITIZED_LOG_FIELDS:
+```text
+at
+requestId
+eventId
+eventType
+sourceType
+outcome
+httpStatus
+durationMs
+```
+
 ## Zeabur 測試部署
 
 - Branch：`codex/drs-line-real-test-20260829`

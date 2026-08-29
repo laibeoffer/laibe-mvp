@@ -1,6 +1,15 @@
 const DEFAULT_TTL_MS = 24 * 60 * 60 * 1_000;
 const DEFAULT_MAX_ENTRIES = 10_000;
 
+export class DedupeCapacityError extends Error {
+  constructor() {
+    super('Dedupe capacity exhausted');
+    this.name = 'DedupeCapacityError';
+    this.code = 'DEDUPE_CAPACITY_EXHAUSTED';
+    this.httpStatus = 503;
+  }
+}
+
 export function createDedupeStore({
   ttlMs = DEFAULT_TTL_MS,
   maxEntries = DEFAULT_MAX_ENTRIES,
@@ -14,25 +23,13 @@ export function createDedupeStore({
     }
   };
 
-  const evictOldestCompleted = () => {
-    for (const [eventId, entry] of entries) {
-      if (entry.state === 'completed') {
-        entries.delete(eventId);
-        return true;
-      }
-    }
-    return false;
-  };
-
   return Object.freeze({
     begin(eventId) {
       if (typeof eventId !== 'string' || eventId.length === 0) return false;
       const currentTime = now();
       prune(currentTime);
       if (entries.has(eventId)) return false;
-      while (entries.size >= maxEntries) {
-        if (!evictOldestCompleted()) return false;
-      }
+      if (entries.size >= maxEntries) throw new DedupeCapacityError();
       entries.set(eventId, { state: 'processing', expiresAt: currentTime + ttlMs });
       return true;
     },
