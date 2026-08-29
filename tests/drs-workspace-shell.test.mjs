@@ -1497,7 +1497,13 @@ test("DRS W1/W2 write set stays inside the explicit standalone workspace allowli
   const top = await readdir(drsRoot);
   assert.deepEqual(
     top.sort(),
-    ["owner_workspace", "shared", "specialist_workspace", "vendor_workspace"],
+    [
+      "owner_workspace",
+      "reviewer_access",
+      "shared",
+      "specialist_workspace",
+      "vendor_workspace",
+    ],
   );
 });
 

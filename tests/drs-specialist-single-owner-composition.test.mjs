@@ -104,5 +104,5 @@ test("single-owner composition RED: both DRS routes have self-contained manifest
   assert.match(builder, /pcmAuthorizedList[\s\S]{0,500}drs_standalone[\\/]specialist_workspace/);
   assert.match(builder, /pcmCaseWorkspace[\s\S]{0,500}drs_standalone[\\/]specialist_workspace/);
   assert.match(productionTest, /entryPath\(node\.publicPath\)/);
-  assert.match(productionTest, /deployNodes\.length,\s*18/);
+  assert.match(productionTest, /deployNodes\.length,\s*19/);
 });

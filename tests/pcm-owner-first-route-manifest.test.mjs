@@ -157,6 +157,7 @@ const requiredCanonicalNodes = Object.freeze([
   "ownerWorkspace",
   "vendorInvitation",
   "vendorWorkspace",
+  "reviewerAccess",
   "pcmAuthorizedList",
   "pcmCaseWorkspace",
   "internalGovernance",

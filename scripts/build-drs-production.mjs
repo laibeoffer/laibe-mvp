@@ -7,6 +7,7 @@ const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url
 const distParent = path.resolve(repositoryRoot, "dist");
 const distRoot = path.resolve(distParent, "drs");
 const manifestRelative = "src/stitch_laibe_landing_onboarding/pcm_standalone/public/pcm-flow-route-manifest.js";
+const reviewerTransportRelative = "src/stitch_laibe_landing_onboarding/drs_standalone/reviewer_access/reviewer-access-transport.js";
 const manifestPath = path.join(repositoryRoot, manifestRelative);
 const manifestSource = await readFile(manifestPath, "utf8");
 const manifestModule = await import(
@@ -25,6 +26,7 @@ const SOURCE_ENTRY_BY_ID = Object.freeze({
   contractSigning: "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_signing/code.html",
   ownerWorkspace: "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/code.html",
   vendorWorkspace: "src/stitch_laibe_landing_onboarding/pcm_standalone/vendor_workspace/code.html",
+  reviewerAccess: "src/stitch_laibe_landing_onboarding/drs_standalone/reviewer_access/code.html",
   pcmAuthorizedList: "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/code.html",
   pcmCaseWorkspace: "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/code.html",
   accessUnavailable: "src/stitch_laibe_landing_onboarding/pcm_standalone/access_unavailable/code.html",
@@ -46,6 +48,9 @@ const ASSET_ALLOWLIST = Object.freeze([
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/owner-workspace-bootstrap.js",
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/styles.css",
   "src/stitch_laibe_landing_onboarding/drs_standalone/shared/drs-workspace-renderer.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/reviewer_access/app.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/reviewer_access/reviewer-access-transport.js",
+  "src/stitch_laibe_landing_onboarding/drs_standalone/reviewer_access/styles.css",
   "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/app.js",
   "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/calendar-transport.js",
   "src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/drs-session-adapter.js",
@@ -234,11 +239,58 @@ function rewriteJavaScript(source, sourceRelative) {
   );
 }
 
+function rewriteReviewerAccessTransport(source) {
+  const sourceDestination =
+    'const GOVERNANCE_DESTINATION =\n  "http://127.0.0.1:8766/drs_standalone/specialist_workspace/code.html?ui=obsidian-bloom-20260829";';
+  const productionDestination =
+    'const GOVERNANCE_DESTINATION =\n  "/pcm/console/?ui=obsidian-bloom-20260829";';
+  const sourceFallback = 'const DEFAULT_ORIGIN = "http://127.0.0.1:8766";';
+  const productionFallback = 'const DEFAULT_ORIGIN = "https://invalid.invalid";';
+  if (!source.includes(sourceDestination) || !source.includes(sourceFallback)) {
+    throw new Error("Reviewer access source-only runtime constants changed without a production route decision");
+  }
+  return source
+    .replace(sourceDestination, productionDestination)
+    .replace(sourceFallback, productionFallback);
+}
+
+const PRODUCTION_LOOPBACK_NAVIGATION_REWRITES = Object.freeze({
+  "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/app.js": Object.freeze([
+    Object.freeze([
+      "http://127.0.0.1:4173/pcm/owner/workspace/#documents",
+      "/pcm/owner/workspace/#documents",
+    ]),
+  ]),
+  "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/owner-workspace-bootstrap.js": Object.freeze([
+    Object.freeze(["http://127.0.0.1:4173/account/access/", "/account/access/"]),
+  ]),
+  "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/app.js": Object.freeze([
+    Object.freeze(["http://127.0.0.1:4173/account/access/", "/account/access/"]),
+  ]),
+});
+
+function rewriteProductionLoopbackNavigation(source, sourceRelative) {
+  let transformed = source;
+  for (const [sourceUrl, canonicalPath] of PRODUCTION_LOOPBACK_NAVIGATION_REWRITES[sourceRelative] ?? []) {
+    if (!transformed.includes(sourceUrl)) {
+      throw new Error(
+        `Production navigation source changed without a canonical route decision: ${JSON.stringify(sourceRelative)}`,
+      );
+    }
+    transformed = transformed.replaceAll(sourceUrl, canonicalPath);
+  }
+  return transformed;
+}
+
 function transformAsset(source, sourceRelative) {
   if (/\.m?js$/iu.test(sourceRelative)) {
-    const javascript = sourceRelative === manifestRelative
-      ? transformManifestRoutes(source.toString("utf8"))
-      : source.toString("utf8");
+    const sourceText = source.toString("utf8");
+    const routeAdjusted = sourceRelative === manifestRelative
+      ? transformManifestRoutes(sourceText)
+      : sourceRelative === reviewerTransportRelative
+      ? rewriteReviewerAccessTransport(sourceText)
+      : sourceText;
+    const javascript = rewriteProductionLoopbackNavigation(routeAdjusted, sourceRelative);
     return Buffer.from(rewriteJavaScript(javascript, sourceRelative));
   }
   return source;
