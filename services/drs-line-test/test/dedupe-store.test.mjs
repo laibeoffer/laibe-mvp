@@ -37,12 +37,14 @@ test('dedupe store expires entries after TTL and remains bounded', async () => {
   assert.equal(store.begin('event-2'), true);
   store.complete('event-2');
   now = 2;
-  assert.equal(store.begin('event-3'), true);
-  store.complete('event-3');
-  assert.equal(store.begin('event-1'), true, 'oldest entry is evicted at capacity');
+  assert.throws(
+    () => store.begin('event-3'),
+    (error) => error?.code === 'DEDUPE_CAPACITY_EXHAUSTED' && error?.httpStatus === 503,
+  );
+  assert.equal(store.begin('event-1'), false, 'unexpired completed event remains deduplicated');
 
   now = 200;
-  assert.equal(store.begin('event-2'), true, 'expired entries may be retried');
+  assert.equal(store.begin('event-3'), true, 'capacity becomes available after entries expire');
 });
 
 test('dedupe capacity never evicts an in-flight processing marker', async () => {
@@ -51,7 +53,10 @@ test('dedupe capacity never evicts an in-flight processing marker', async () => 
 
   assert.equal(store.begin('processing-1'), true);
   assert.equal(store.begin('processing-2'), true);
-  assert.equal(store.begin('new-event'), false, 'new claim is refused while capacity is fully in flight');
+  assert.throws(
+    () => store.begin('new-event'),
+    (error) => error?.code === 'DEDUPE_CAPACITY_EXHAUSTED' && error?.httpStatus === 503,
+  );
   assert.equal(store.begin('processing-1'), false, 'the first processing marker remains protected');
 
   store.release('processing-2');

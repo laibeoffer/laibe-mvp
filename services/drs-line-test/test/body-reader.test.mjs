@@ -23,7 +23,7 @@ test('raw body reader rejects a body larger than the configured limit with 413',
 
   await assert.rejects(
     readRawBody(Readable.from([Buffer.alloc(6)]), { maxBytes: 5 }),
-    (error) => error?.httpStatus === 413,
+    (error) => error?.httpStatus === 413 && error?.closeConnection === true,
   );
 });
 
@@ -40,6 +40,6 @@ test('raw body reader rejects a stalled body with 408', async () => {
       },
       clearTimeoutFn() {},
     }),
-    (error) => error?.httpStatus === 408,
+    (error) => error?.httpStatus === 408 && error?.closeConnection === true,
   );
 });
