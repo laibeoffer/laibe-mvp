@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta
+      name="description"
+      content="萊比 DRS 審查員帳號入口：建立身分、登入既有帳號，並查看資格與案件授權狀態。"
+    >
+    <title>DRS 審查員帳號入口｜萊比</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#access-main">跳到主要內容</a>
+
+    <header class="site-header" aria-label="萊比 DRS">
+      <a class="brand" href="#access-main" aria-label="回到審查員帳號入口">
+        <span class="brand-mark" aria-hidden="true">L</span>
+        <span class="brand-copy">
+          <strong>LAIBE</strong>
+          <small>DECISION RECORD SYSTEM</small>
+        </span>
+      </a>
+      <p class="header-context">審查員身分與案件授權</p>
+    </header>
+
+    <main id="access-main">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">DRS REVIEWER ACCESS</p>
+        <h1 id="page-title">審查員帳號入口</h1>
+        <p class="hero-lead">
+          先確認身分，再進入授權案件。登入或連結 LINE 都不會自動新增案件權限。
+        </p>
+        <div class="hero-truth" aria-label="入口原則">
+          <span>預設角色</span>
+          <strong>一般審查員</strong>
+          <span>案件範圍</span>
+          <strong>由萊比核對</strong>
+        </div>
+      </section>
+
+      <section class="access-chooser" aria-labelledby="chooser-title">
+        <div class="section-heading">
+          <p class="eyebrow">CHOOSE YOUR PATH</p>
+          <h2 id="chooser-title">選擇你現在要處理的事</h2>
+          <p>兩個流程都在本頁完成切換，不會離開目前頁面。</p>
+        </div>
+
+        <div class="access-cards" role="list">
+          <a
+            class="access-card is-selected"
+            href="#register"
+            data-access-trigger="register"
+            aria-expanded="true"
+            aria-controls="register"
+            role="listitem"
+          >
+            <span class="card-number" aria-hidden="true">01</span>
+            <span class="card-kicker">第一次使用 DRS</span>
+            <strong>建立審查員帳號</strong>
+            <span>提出審查員身分資料，等待資格與案件範圍核對。</span>
+            <span class="card-action">開始建立 <span aria-hidden="true"
+              >→</span></span>
+          </a>
+
+          <a
+            class="access-card"
+            href="#login"
+            data-access-trigger="login"
+            aria-expanded="false"
+            aria-controls="login"
+            role="listitem"
+          >
+            <span class="card-number" aria-hidden="true">02</span>
+            <span class="card-kicker">已有審查員帳號</span>
+            <strong>登入審查員帳號</strong>
+            <span>確認 DRS 身分與目前可處理的案件，再進入工作台。</span>
+            <span class="card-action">前往登入 <span aria-hidden="true"
+              >→</span></span>
+          </a>
+        </div>
+      </section>
+
+      <section class="inline-workspace" aria-label="審查員帳號流程">
+        <p class="workspace-hint" data-workspace-hint hidden>
+          請選擇建立審查員身分，或登入既有帳號。
+        </p>
+
+        <section
+          id="register"
+          class="access-panel"
+          data-access-panel="register"
+          aria-labelledby="register-title"
+        >
+          <div class="panel-heading">
+            <p class="eyebrow">CREATE REVIEWER IDENTITY</p>
+            <h2 id="register-title" tabindex="-1">建立可追溯的審查員身分</h2>
+            <p>帳號建立完成後，仍需核對資格與案件範圍，才會顯示可處理案件。</p>
+          </div>
+
+          <div class="status-strip">
+            <div>
+              <span>目前狀態</span>
+              <strong>尚未提出身分資料</strong>
+            </div>
+            <div>
+              <span>下一責任人</span>
+              <strong>你先完成基本資料</strong>
+            </div>
+          </div>
+
+          <ol class="process-steps" aria-label="建立審查員身分流程">
+            <li class="is-current">
+              <span>1</span>
+              <div>
+                <strong>建立 Gmail 審查員身分</strong><p>
+                  使用可聯繫的 Gmail 提出身分資料。
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>2</span>
+              <div>
+                <strong>核對資格與案件範圍</strong><p>
+                  萊比確認審查資格以及可處理的案件。
+                </p>
+              </div>
+            </li>
+            <li>
+              <span>3</span>
+              <div>
+                <strong>接受授權後進入治理收件匣</strong><p>
+                  只顯示已授權案件與對應的下一步。
+                </p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="panel-grid">
+            <form class="access-form" data-reviewer-form="register" novalidate>
+              <div class="form-heading">
+                <span>身分資料</span>
+                <strong>建立登入資料</strong>
+              </div>
+              <label for="register-email">Gmail</label>
+              <input
+                id="register-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                inputmode="email"
+                placeholder="name@gmail.com"
+                required
+              >
+              <p class="field-help">
+                Gmail 只用於帳號聯繫，不會單獨決定案件權限。
+              </p>
+
+              <label for="register-password">建立登入密碼</label>
+              <input
+                id="register-password"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                minlength="8"
+                required
+              >
+
+              <label class="check-row" for="register-scope-confirmation">
+                <input
+                  id="register-scope-confirmation"
+                  name="scope-confirmation"
+                  type="checkbox"
+                  required
+                >
+                <span
+                >我了解審查資格與案件權限需要另外確認，建立帳號不代表已取得案件資料。</span>
+              </label>
+
+              <button class="primary-button" type="submit">
+                使用 Gmail 繼續
+              </button>
+              <p
+                class="form-status"
+                role="status"
+                aria-live="polite"
+                data-form-status="register"
+              >
+                填寫後會先進入資格核對，不會直接開放案件。
+              </p>
+              <button
+                class="text-button"
+                type="button"
+                data-switch-access="login"
+              >
+                已有帳號？同頁登入
+              </button>
+            </form>
+
+            <aside
+              class="record-panel"
+              aria-labelledby="register-records-title"
+            >
+              <p class="eyebrow">TRACEABLE RECORDS</p>
+              <h3 id="register-records-title">會留下的紀錄</h3>
+              <dl>
+                <div>
+                  <dt>身分提出</dt>
+                  <dd>提出時間與聯繫帳號</dd>
+                </div>
+                <div>
+                  <dt>資格核對</dt>
+                  <dd>核對結果與處理人</dd>
+                </div>
+                <div>
+                  <dt>案件授權</dt>
+                  <dd>授權案件、範圍與生效狀態</dd>
+                </div>
+              </dl>
+              <div class="next-step">
+                <span>下一步</span>
+                <strong>送出資料後，等待資格管理人員核對</strong>
+              </div>
+              <p class="policy-note">
+                註冊不等於取得一般審查員、最高審查官或任意案件權限。
+              </p>
+            </aside>
+          </div>
+        </section>
+
+        <section
+          id="login"
+          class="access-panel"
+          data-access-panel="login"
+          aria-labelledby="login-title"
+          hidden
+        >
+          <div class="panel-heading">
+            <p class="eyebrow">RESUME REVIEW WORK</p>
+            <h2 id="login-title" tabindex="-1">登入 DRS 審查工作台</h2>
+            <p>登入後仍需由萊比確認審查員身分及可處理案件，才會進入治理頁。</p>
+          </div>
+
+          <div class="status-strip">
+            <div>
+              <span>目前狀態</span>
+              <strong data-login-state>尚未確認登入身分</strong>
+            </div>
+            <div>
+              <span>正在等待</span>
+              <strong data-login-waiting>等待你登入既有帳號</strong>
+            </div>
+          </div>
+
+          <div class="login-state-guide" aria-label="登入後可能狀態">
+            <span>載入中</span>
+            <span>登入失敗</span>
+            <span>尚未取得審查資格</span>
+            <span>已登入但沒有案件</span>
+            <span>已登入且有授權案件</span>
+          </div>
+
+          <div class="panel-grid panel-grid-login">
+            <form class="access-form" data-reviewer-form="login" novalidate>
+              <div class="form-heading">
+                <span>既有 DRS 身分</span>
+                <strong>確認目前登入狀態</strong>
+              </div>
+              <label for="login-email">Gmail</label>
+              <input
+                id="login-email"
+                name="email"
+                type="email"
+                autocomplete="username"
+                inputmode="email"
+                placeholder="name@gmail.com"
+                required
+              >
+
+              <label for="login-password">登入密碼</label>
+              <input
+                id="login-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+              >
+
+              <button class="primary-button" type="submit">
+                確認身分並繼續
+              </button>
+              <p
+                class="form-status"
+                role="status"
+                aria-live="polite"
+                data-form-status="login"
+              >
+                完成確認後，萊比會再核對審查資格與授權案件。
+              </p>
+              <button
+                class="text-button"
+                type="button"
+                data-switch-access="register"
+              >
+                尚未建立審查員身分？同頁建立
+              </button>
+            </form>
+
+            <section class="line-panel" aria-labelledby="line-title">
+              <div class="line-heading">
+                <span class="line-mark" aria-hidden="true">LINE</span>
+                <div>
+                  <p class="eyebrow">CASE ROUTING</p>
+                  <h3 id="line-title">LINE 帳號連結</h3>
+                </div>
+              </div>
+              <div class="line-state" data-line-state="temporarily_unavailable">
+                <span data-line-label>連結入口準備中</span>
+                <strong data-line-title>LINE 案件分流正在整理中</strong>
+                <p data-line-message>
+                  此功能正在整理中，正式開放後會提供完整操作入口。
+                </p>
+                <small data-line-waiting>正在等待萊比完成連結入口</small>
+              </div>
+              <button
+                class="secondary-button"
+                type="button"
+                data-line-link-action
+                disabled
+                aria-disabled="true"
+              >
+                連結我的 LINE
+              </button>
+              <p class="line-policy">
+                LINE 只用於案件收件與身分分流，不會取代 DRS
+                身分確認，也不會新增角色或案件權限。
+              </p>
+              <p class="reviewer-policy">
+                新案件預設由一般審查員處理。最高審查官介入時，必須說明原因並留下案件紀錄。
+              </p>
+            </section>
+          </div>
+
+          <div class="login-footer-grid">
+            <div>
+              <span>下一步</span>
+              <strong>確認登入身分，再由萊比核對可處理案件</strong>
+            </div>
+            <div>
+              <span>會留下的紀錄</span>
+              <strong>登入確認、資格結果、案件授權與進入時間</strong>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>讓每一次裝修決策都有依據，讓每一段案件過程都有紀錄。</p>
+      <small>LAIBE DRS · 審查員身分與案件授權入口</small>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
