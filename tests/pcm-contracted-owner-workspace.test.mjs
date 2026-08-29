@@ -455,6 +455,19 @@ function authorizedContext(overrides = {}) {
   };
 }
 
+function strictMappedOwnerContext(overrides = {}) {
+  return authorizedContext({
+    authorityMode: "server_owner_grant_v1",
+    serviceAgreement: {
+      agreementId: "",
+      version: "",
+      status: "unavailable",
+      caseId: "case-fixture-owner-workspace",
+    },
+    ...overrides,
+  });
+}
+
 test("未簽 DRS 服務契約前只顯示誠實的註冊後準備預覽", async () => {
   const html = await readPageFile("code.html");
 
@@ -4028,5 +4041,244 @@ test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既�
   assert.match(
     css,
     /data-owner-construction-mode="collection"[\s\S]{0,220}data-active-owner-section="documents"[\s\S]{0,180}\.owner-construction-nav\s*\{[^}]*display:\s*none/u,
+  );
+});
+
+test("合作乙方首屏說清案件、階段、主要乙方、等待關係、下一步與最近留痕", async () => {
+  const html = await readPageFile("code.html");
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const designPanel = html.slice(designStart, constructionStart);
+
+  assert.ok(designStart > 0 && constructionStart > designStart);
+  assert.match(designPanel, /data-owner-vendor-governance/u);
+  for (const slot of [
+    "vendor-binding-case",
+    "vendor-binding-stage",
+    "vendor-binding-primary-vendor",
+    "vendor-binding-status",
+    "vendor-binding-waiting",
+    "vendor-binding-next-actor",
+    "vendor-binding-last-record",
+  ]) {
+    assert.match(designPanel, new RegExp(`data-slot="${slot}"`, "u"));
+  }
+  for (const label of [
+    "目前案件",
+    "案件階段",
+    "目前主要乙方",
+    "綁定狀態",
+    "誰正在等待誰",
+    "下一步由誰處理",
+    "最近合作紀錄",
+  ]) {
+    assert.match(designPanel, new RegExp(label, "u"));
+  }
+});
+
+test("合作乙方只接受嚴格案件投影且一案最多一位主要乙方", async () => {
+  const runtime = await loadRuntime();
+  const injected = runtime.buildOwnerWorkspaceViewModel(authorizedContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "design",
+      state: "formally_bound",
+      activePrimaryVendorCount: 1,
+      primaryVendor: {
+        displayName: "任意注入乙方",
+        membershipStatus: "active",
+      },
+    },
+  }));
+  assert.notEqual(injected.vendorBindingStatus, "已正式綁定");
+  assert.doesNotMatch(JSON.stringify(injected), /任意注入乙方/u);
+
+  const bound = runtime.buildOwnerWorkspaceViewModel(strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "design",
+      state: "formally_bound",
+      activePrimaryVendorCount: 1,
+      primaryVendor: {
+        displayName: "森安設計",
+        membershipStatus: "active",
+      },
+    },
+  }));
+  assert.equal(bound.vendorCaseStage, "設計案");
+  assert.equal(bound.vendorPrimaryVendor, "森安設計");
+  assert.equal(bound.vendorBindingStatus, "已正式綁定");
+
+  const collision = runtime.buildOwnerWorkspaceViewModel(strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "design",
+      state: "formally_bound",
+      activePrimaryVendorCount: 2,
+      primaryVendor: {
+        displayName: "不應顯示",
+        membershipStatus: "active",
+      },
+    },
+  }));
+  assert.equal(collision.vendorBindingStatus, "暫時無法確認合作乙方");
+  assert.notEqual(collision.vendorPrimaryVendor, "不應顯示");
+});
+
+test("合作乙方狀態會給出一致的等待關係、責任人與下一步", async () => {
+  const runtime = await loadRuntime();
+  const cases = [
+    ["not_invited", "尚未邀請", "甲方", "邀請乙方加入案件"],
+    ["invitation_pending", "邀請待接受", "受邀乙方", "查看邀請狀態"],
+    ["vendor_declined", "乙方已婉拒", "甲方", "改邀其他乙方"],
+    [
+      "vendor_accepted_pending_owner",
+      "乙方已接受，待甲方確認",
+      "甲方",
+      "確認此乙方並開放案件",
+    ],
+    ["formally_bound", "已正式綁定", "依案件分工", "查看合作與權限"],
+    ["invitation_expired", "邀請已過期", "甲方", "重新邀請乙方"],
+    ["invitation_withdrawn", "邀請已撤回", "甲方", "重新邀請乙方"],
+    ["access_stopped", "乙方存取已停止", "甲方", "查看終止狀態"],
+    ["termination_pending", "合作終止待確認", "原乙方", "查看終止狀態"],
+    ["termination_confirmed", "雙方已確認終止", "甲方", "建立接續案件"],
+    ["termination_disputed", "終止狀態尚有歧異", "甲方", "建立接續案件"],
+    ["case_archived", "原案件已封存", "甲方", "前往接續案件"],
+    ["successor_case_created", "接續案件已建立", "甲方", "前往接續案件"],
+  ];
+
+  for (const [state, label, actor, action] of cases) {
+    const formallyBound = state === "formally_bound";
+    const model = runtime.buildOwnerWorkspaceViewModel(strictMappedOwnerContext({
+      vendorBinding: {
+        caseId: "case-fixture-owner-workspace",
+        caseStage: "design",
+        state,
+        activePrimaryVendorCount: formallyBound ? 1 : 0,
+        primaryVendor: formallyBound
+          ? { displayName: "森安設計", membershipStatus: "active" }
+          : null,
+      },
+    }));
+    assert.equal(model.vendorBindingStatus, label, state);
+    assert.equal(model.vendorNextActor, actor, state);
+    assert.equal(model.vendorActionLabel, action, state);
+  }
+});
+
+test("拒絕、停止存取、終止歧異與接續案件都不製造正式成功", async () => {
+  const runtime = await loadRuntime();
+  const declined = runtime.buildOwnerWorkspaceViewModel(strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "design",
+      state: "vendor_declined",
+      activePrimaryVendorCount: 0,
+      latestEvent: {
+        caseId: "case-fixture-owner-workspace",
+        type: "vendor_declined",
+        actorLabel: "受邀乙方",
+        recordedAt: "2026-08-29T03:20:00.000Z",
+        recordStatus: "recorded",
+      },
+    },
+  }));
+  assert.equal(declined.vendorPrimaryVendor, "尚未綁定");
+  assert.match(declined.vendorLastRecord, /乙方婉拒邀請/u);
+  assert.equal(declined.vendorActionLabel, "改邀其他乙方");
+
+  const disputed = runtime.buildOwnerWorkspaceViewModel(strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "construction",
+      state: "termination_disputed",
+      activePrimaryVendorCount: 0,
+    },
+  }));
+  assert.match(disputed.vendorBindingStatus, /尚有歧異/u);
+  assert.doesNotMatch(JSON.stringify(disputed), /雙方已解約|已完成終止|已正式結案/u);
+
+  const successor = runtime.buildOwnerWorkspaceViewModel(strictMappedOwnerContext({
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "construction",
+      state: "successor_case_created",
+      activePrimaryVendorCount: 0,
+      successorCase: {
+        relation: "successor",
+        displayName: "接續工程案",
+        transferStatus: "selection_required",
+      },
+    },
+  }));
+  assert.equal(successor.vendorSuccessorCase, "接續工程案");
+  assert.match(successor.vendorCarryoverRule, /逐份選擇|不會自動開放/u);
+});
+
+test("合作乙方未開放操作保持停用且 LINE 不作聊天或案件 authority", async () => {
+  const [html, appSource] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("app.js"),
+  ]);
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const designPanel = html.slice(designStart, constructionStart);
+  const controls = designPanel.match(
+    /<button\b[^>]*data-owner-vendor-pending-action="[^"]+"[^>]*>/gu,
+  ) ?? [];
+
+  assert.ok(controls.length >= 1);
+  for (const control of controls) {
+    assert.match(control, /\bdisabled\b/u);
+    assert.match(control, /aria-disabled="true"/u);
+  }
+  assert.match(designPanel, /LINE 只(?:負責)?傳送邀請/u);
+  assert.match(designPanel, /不會讀取(?:任何)?對話/u);
+  assert.match(designPanel, /一個案件只能有一位主要乙方/u);
+  assert.match(designPanel, /封存原案件並建立接續案件/u);
+  assert.doesNotMatch(
+    designPanel,
+    /\/api\/|\bAPI\b|\bDB\b|debug|mock|source|localStorage|query string/u,
+  );
+  assert.doesNotMatch(
+    `${designPanel}\n${appSource}`,
+    /(?:searchParams|localStorage|dataset)\.(?:userId|caseId|role|memberId|grant|bucket|path|documentRef)\b/u,
+  );
+  assert.doesNotMatch(
+    designPanel,
+    /LINE (?:對話|個人檔案).*(?:身分|權限|成員)/u,
+  );
+});
+
+test("無有效服務契約不開放邀請，停止存取保留原紀錄且跨階段另建關聯案件", async () => {
+  const [html, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    loadRuntime(),
+  ]);
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const designPanel = html.slice(designStart, constructionStart);
+  const noAgreement = runtime.buildOwnerWorkspaceViewModel(authorizedContext({
+    serviceAgreement: {
+      agreementId: "",
+      version: "",
+      status: "pending",
+      caseId: "case-fixture-owner-workspace",
+    },
+    vendorBinding: {
+      caseId: "case-fixture-owner-workspace",
+      caseStage: "design",
+      state: "not_invited",
+      activePrimaryVendorCount: 0,
+    },
+  }));
+
+  assert.equal(noAgreement.vendorActionEnabled, false);
+  assert.notEqual(noAgreement.vendorBindingStatus, "尚未邀請");
+  assert.match(designPanel, /停止存取不會刪除原乙方的歷史文件、留言、確認與操作紀錄/u);
+  assert.match(
+    designPanel,
+    /設計案與工程案由不同乙方承作時，會建立兩個彼此關聯但權限與留痕獨立的案件/u,
   );
 });

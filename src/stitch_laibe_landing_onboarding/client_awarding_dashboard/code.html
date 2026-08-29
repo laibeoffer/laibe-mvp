@@ -261,19 +261,46 @@
                 <h3>先確認依據哪一版，再決定接受或要求修改。</h3>
                 <p>需求、圖面與設計回覆必須綁定版本、提出者與待確認事項。</p>
               </aside>
-              <div class="owner-hero-dashboard__body">
+              <div class="owner-hero-dashboard__body" data-owner-vendor-governance>
                 <header>
                   <div>
-                    <p class="eyebrow">送審文件與版本</p>
-                    <h3>書面確認與修改</h3>
+                    <p class="eyebrow">合作乙方｜案件治理</p>
+                    <h3>目前合作關係與下一步</h3>
                   </div>
-                  <span data-slot="state-label">尚待取得案件資料</span>
+                  <span data-slot="vendor-binding-status">正在確認案件關係</span>
                 </header>
-                <dl class="owner-dashboard-facts">
-                  <div><dt>文件版本</dt><dd data-slot="document-summary">尚未連結正式案件</dd></div>
-                  <div><dt>書面檢討</dt><dd data-slot="review-summary">尚未連結正式案件</dd></div>
-                  <div><dt>待確認事項</dt><dd data-slot="issue-summary">尚未連結正式案件</dd></div>
+                <dl class="owner-dashboard-facts owner-vendor-binding-facts">
+                  <div><dt>目前案件</dt><dd data-slot="vendor-binding-case">尚待案件確認</dd></div>
+                  <div><dt>案件階段</dt><dd data-slot="vendor-binding-stage">尚待確認</dd></div>
+                  <div><dt>目前主要乙方</dt><dd data-slot="vendor-binding-primary-vendor">尚待案件確認</dd></div>
+                  <div><dt>綁定狀態</dt><dd data-slot="vendor-binding-status">正在確認案件關係</dd></div>
+                  <div><dt>誰正在等待誰</dt><dd data-slot="vendor-binding-waiting">尚待案件授權與合作關係確認</dd></div>
+                  <div><dt>下一步由誰處理</dt><dd data-slot="vendor-binding-next-actor">甲方</dd></div>
+                  <div><dt>最近合作紀錄</dt><dd data-slot="vendor-binding-last-record">尚無可確認的正式合作紀錄</dd></div>
                 </dl>
+                <div class="owner-vendor-binding-actions">
+                  <a href="#owner-vendor-binding-detail">查看合作條件與下一步</a>
+                  <button type="button" data-owner-vendor-pending-action="state-transition" disabled aria-disabled="true">
+                    <span data-slot="vendor-binding-action-label">邀請乙方加入案件</span>
+                  </button>
+                  <button
+                    class="owner-vendor-binding-danger"
+                    type="button"
+                    data-owner-vendor-pending-action="termination"
+                    data-owner-vendor-termination-action
+                    disabled
+                    aria-disabled="true"
+                    hidden
+                  >
+                    終止合作並準備更換乙方
+                  </button>
+                </div>
+                <p class="owner-vendor-binding-pending" data-slot="vendor-binding-pending-copy">
+                  此操作正在整理中，正式開放後會提供完整案件流程。
+                </p>
+                <p class="owner-vendor-binding-design-context">
+                  設計送審文件與版本、書面確認與修改，仍會依文件版本、書面檢討與待確認事項呈現。
+                </p>
               </div>
               <div
                 class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
@@ -309,6 +336,36 @@
                 </section>
               </div>
               <div class="owner-management-shell owner-management-shell--design">
+                <section
+                  class="owner-vendor-binding-detail"
+                  id="owner-vendor-binding-detail"
+                  aria-labelledby="owner-vendor-binding-detail-title"
+                >
+                  <header>
+                    <div>
+                      <p class="eyebrow">案件角色與權限</p>
+                      <h3 id="owner-vendor-binding-detail-title">先確認合作關係，再開放案件內容</h3>
+                    </div>
+                    <span data-slot="vendor-binding-status">正在確認案件關係</span>
+                  </header>
+                  <div class="owner-vendor-binding-detail__grid">
+                    <section aria-labelledby="owner-vendor-binding-boundary-title">
+                      <h4 id="owner-vendor-binding-boundary-title">一案一位主要乙方</h4>
+                      <p>一個案件只能有一位主要乙方。乙方接受邀請後，仍要由甲方最後確認，才會建立正式案件關係。</p>
+                      <p>LINE 只負責傳送邀請通知，不會讀取任何對話，也不作為帳號、案件身分或權限依據。</p>
+                    </section>
+                    <section aria-labelledby="owner-vendor-binding-successor-title">
+                      <h4 id="owner-vendor-binding-successor-title">更換乙方保留原案留痕</h4>
+                      <p>更換乙方會封存原案件並建立接續案件，不會在原案件覆蓋主要乙方，也不會讓新乙方自動讀取全部內容。</p>
+                      <p>停止存取不會刪除原乙方的歷史文件、留言、確認與操作紀錄。</p>
+                      <p>設計案與工程案由不同乙方承作時，會建立兩個彼此關聯但權限與留痕獨立的案件。</p>
+                      <dl>
+                        <div><dt>接續案件</dt><dd data-slot="vendor-binding-successor">尚未建立接續案件</dd></div>
+                        <div><dt>資料帶入</dt><dd data-slot="vendor-binding-carryover">接續案件不會自動開放原案件內容。</dd></div>
+                      </dl>
+                    </section>
+                  </div>
+                </section>
                 <section class="owner-management-card" aria-labelledby="owner-design-review-actions-title">
                   <header class="owner-management-card__heading">
                     <div>

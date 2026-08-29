@@ -92,6 +92,120 @@ export const OWNER_SECTION_HASHES = Object.freeze(
   Object.fromEntries(OWNER_SECTION_KEYS.map((key) => [key, `#${key}`])),
 );
 
+export const OWNER_VENDOR_BINDING_STATES = Object.freeze([
+  "not_invited",
+  "invitation_pending",
+  "vendor_declined",
+  "vendor_accepted_pending_owner",
+  "formally_bound",
+  "invitation_expired",
+  "invitation_withdrawn",
+  "access_stopped",
+  "termination_pending",
+  "termination_confirmed",
+  "termination_disputed",
+  "case_archived",
+  "successor_case_created",
+]);
+
+const OWNER_VENDOR_BINDING_COPY = Object.freeze({
+  not_invited: Object.freeze({
+    label: "尚未邀請",
+    waiting: "甲方正在確認邀請條件",
+    nextActor: "甲方",
+    action: "邀請乙方加入案件",
+  }),
+  invitation_pending: Object.freeze({
+    label: "邀請待接受",
+    waiting: "甲方等待受邀乙方回覆",
+    nextActor: "受邀乙方",
+    action: "查看邀請狀態",
+  }),
+  vendor_declined: Object.freeze({
+    label: "乙方已婉拒",
+    waiting: "乙方已回覆，等待甲方決定下一位受邀者",
+    nextActor: "甲方",
+    action: "改邀其他乙方",
+  }),
+  vendor_accepted_pending_owner: Object.freeze({
+    label: "乙方已接受，待甲方確認",
+    waiting: "乙方等待甲方最後確認",
+    nextActor: "甲方",
+    action: "確認此乙方並開放案件",
+  }),
+  formally_bound: Object.freeze({
+    label: "已正式綁定",
+    waiting: "甲乙方依目前案件分工處理",
+    nextActor: "依案件分工",
+    action: "查看合作與權限",
+  }),
+  invitation_expired: Object.freeze({
+    label: "邀請已過期",
+    waiting: "原邀請已失效，等待甲方重新確認受邀者",
+    nextActor: "甲方",
+    action: "重新邀請乙方",
+  }),
+  invitation_withdrawn: Object.freeze({
+    label: "邀請已撤回",
+    waiting: "邀請已停止，等待甲方決定下一步",
+    nextActor: "甲方",
+    action: "重新邀請乙方",
+  }),
+  access_stopped: Object.freeze({
+    label: "乙方存取已停止",
+    waiting: "原乙方已停止後續存取，終止狀態仍待確認",
+    nextActor: "甲方",
+    action: "查看終止狀態",
+  }),
+  termination_pending: Object.freeze({
+    label: "合作終止待確認",
+    waiting: "甲方等待原乙方確認終止狀態",
+    nextActor: "原乙方",
+    action: "查看終止狀態",
+  }),
+  termination_confirmed: Object.freeze({
+    label: "雙方已確認終止",
+    waiting: "原案件保留唯讀紀錄，等待甲方安排接續案件",
+    nextActor: "甲方",
+    action: "建立接續案件",
+  }),
+  termination_disputed: Object.freeze({
+    label: "終止狀態尚有歧異",
+    waiting: "原乙方後續存取已停止，雙方終止狀態仍有歧異",
+    nextActor: "甲方",
+    action: "建立接續案件",
+  }),
+  case_archived: Object.freeze({
+    label: "原案件已封存",
+    waiting: "原案件保留完整留痕，後續工作移至接續案件",
+    nextActor: "甲方",
+    action: "前往接續案件",
+  }),
+  successor_case_created: Object.freeze({
+    label: "接續案件已建立",
+    waiting: "新案件需重新邀請並完成甲乙方確認",
+    nextActor: "甲方",
+    action: "前往接續案件",
+  }),
+});
+
+const OWNER_VENDOR_EVENT_LABELS = Object.freeze({
+  invitation_created: "甲方建立乙方邀請",
+  invitation_withdrawn: "甲方撤回邀請",
+  invitation_expired: "邀請已過期",
+  vendor_declined: "乙方婉拒邀請",
+  vendor_accepted: "乙方接受邀請",
+  owner_confirmed_vendor: "甲方確認乙方",
+  membership_created: "正式案件關係已建立",
+  termination_requested: "甲方提出終止合作",
+  vendor_access_stopped: "原乙方存取已停止",
+  termination_confirmed: "乙方確認終止狀態",
+  termination_disputed: "乙方表示終止狀態尚有歧異",
+  case_archived: "原案件已封存",
+  successor_case_created: "接續案件已建立",
+  document_snapshot_carried: "甲方選擇帶入案件依據",
+});
+
 export const OWNER_CONTRACT_VIEW_HASHES = Object.freeze({
   overview: "#owner-contract-view-panel-overview",
   facts: "#owner-contract-view-panel-facts",
@@ -570,6 +684,49 @@ function normalizeRecords(value, fields) {
     .map((record) => normalizeRecord(record, fields));
 }
 
+function normalizeOwnerVendorBinding(value) {
+  const source = value && typeof value === "object" ? value : {};
+  const primaryVendor = source.primaryVendor &&
+      typeof source.primaryVendor === "object"
+    ? source.primaryVendor
+    : {};
+  const latestEvent = source.latestEvent && typeof source.latestEvent === "object"
+    ? source.latestEvent
+    : {};
+  const successorCase = source.successorCase &&
+      typeof source.successorCase === "object"
+    ? source.successorCase
+    : {};
+  const activePrimaryVendorCount = Number.isInteger(
+      source.activePrimaryVendorCount,
+    ) && source.activePrimaryVendorCount >= 0
+    ? source.activePrimaryVendorCount
+    : null;
+
+  return {
+    caseId: asText(source.caseId),
+    caseStage: asText(source.caseStage),
+    state: asText(source.state),
+    activePrimaryVendorCount,
+    primaryVendor: {
+      displayName: asText(primaryVendor.displayName),
+      membershipStatus: asText(primaryVendor.membershipStatus),
+    },
+    latestEvent: {
+      caseId: asText(latestEvent.caseId),
+      type: asText(latestEvent.type),
+      actorLabel: asText(latestEvent.actorLabel),
+      recordedAt: asText(latestEvent.recordedAt),
+      recordStatus: asText(latestEvent.recordStatus),
+    },
+    successorCase: {
+      relation: asText(successorCase.relation),
+      displayName: asText(successorCase.displayName),
+      transferStatus: asText(successorCase.transferStatus),
+    },
+  };
+}
+
 function normalizePublicMessages(value) {
   return asArray(value).map((record) => {
     const source = record && typeof record === "object" ? record : {};
@@ -668,6 +825,7 @@ export function normalizeOwnerWorkspaceContext(input = {}) {
         constructionIssueLabel: asText(caseSummary.constructionIssueLabel),
       }
       : null,
+    vendorBinding: normalizeOwnerVendorBinding(source.vendorBinding),
     documents: normalizeRecords(source.documents, [
       "title",
       "kindLabel",
@@ -935,6 +1093,93 @@ function documentConsumerRecords(context, payloadVisible) {
   }));
 }
 
+function ownerVendorBindingSummary(context, resolution) {
+  const summary = context.caseSummary;
+  const fallback = Object.freeze({
+    vendorBindingState: "pending_projection",
+    vendorCase: summary?.displayName || "尚待案件確認",
+    vendorCaseStage: "尚待確認",
+    vendorPrimaryVendor: "尚待案件確認",
+    vendorBindingStatus: "正在確認案件關係",
+    vendorWaitingRelationship: "尚待案件授權與合作關係確認",
+    vendorNextActor: "甲方",
+    vendorLastRecord: "尚無可確認的正式合作紀錄",
+    vendorActionLabel: "查看合作條件與下一步",
+    vendorActionEnabled: false,
+    vendorPendingCopy: "此操作正在整理中，正式開放後會提供完整案件流程。",
+    vendorTerminationVisible: false,
+    vendorSuccessorCase: "尚未建立接續案件",
+    vendorCarryoverRule: "接續案件不會自動開放原案件內容。",
+  });
+  const binding = context.vendorBinding;
+  const trustedProjection = hasStrictMappedOwnerGrant(context) &&
+    resolution.state === "AUTHORIZED_READY" &&
+    binding.caseId !== "" &&
+    binding.caseId === context.caseBinding.caseId &&
+    OWNER_VENDOR_BINDING_STATES.includes(binding.state);
+  if (!trustedProjection) return fallback;
+
+  const formallyBound = binding.state === "formally_bound";
+  const countValid = formallyBound
+    ? binding.activePrimaryVendorCount === 1 &&
+      binding.primaryVendor.membershipStatus === "active" &&
+      binding.primaryVendor.displayName !== ""
+    : binding.activePrimaryVendorCount === 0;
+  if (!countValid) {
+    return Object.freeze({
+      ...fallback,
+      vendorBindingState: "invalid_primary_vendor_projection",
+      vendorBindingStatus: "暫時無法確認合作乙方",
+      vendorWaitingRelationship: "案件合作關係需要由案件負責人重新確認",
+      vendorNextActor: "案件負責人",
+      vendorActionLabel: "確認案件合作狀態",
+    });
+  }
+
+  const copy = OWNER_VENDOR_BINDING_COPY[binding.state];
+  const stageLabel = binding.caseStage === "design"
+    ? "設計案"
+    : binding.caseStage === "construction"
+    ? "工程案"
+    : "尚待確認";
+  const latestEvent = binding.latestEvent;
+  const recordedAt = canonicalRecordedAt(latestEvent.recordedAt);
+  const eventLabel = OWNER_VENDOR_EVENT_LABELS[latestEvent.type] ?? "";
+  const lastRecord = latestEvent.caseId === context.caseBinding.caseId &&
+      latestEvent.recordStatus === "recorded" &&
+      latestEvent.actorLabel !== "" &&
+      recordedAt &&
+      eventLabel
+    ? `${taipeiTimeLabel(recordedAt)}・${latestEvent.actorLabel}・${eventLabel}`
+    : "尚無可確認的正式合作紀錄";
+  const successorVisible = binding.successorCase.relation === "successor" &&
+    binding.successorCase.transferStatus === "selection_required" &&
+    binding.successorCase.displayName !== "";
+
+  return Object.freeze({
+    vendorBindingState: binding.state,
+    vendorCase: summary?.displayName || "尚待案件確認",
+    vendorCaseStage: stageLabel,
+    vendorPrimaryVendor: formallyBound
+      ? binding.primaryVendor.displayName
+      : "尚未綁定",
+    vendorBindingStatus: copy.label,
+    vendorWaitingRelationship: copy.waiting,
+    vendorNextActor: copy.nextActor,
+    vendorLastRecord: lastRecord,
+    vendorActionLabel: copy.action,
+    vendorActionEnabled: false,
+    vendorPendingCopy: "此操作正在整理中，正式開放後會提供完整案件流程。",
+    vendorTerminationVisible: formallyBound,
+    vendorSuccessorCase: successorVisible
+      ? binding.successorCase.displayName
+      : "尚未建立接續案件",
+    vendorCarryoverRule: successorVisible
+      ? "文件不會自動開放；甲方須逐份選擇帶入，並留下來源案件與版本紀錄。"
+      : "接續案件不會自動開放原案件內容。",
+  });
+}
+
 export function buildOwnerWorkspaceViewModel(input) {
   const context = normalizeOwnerWorkspaceContext(input);
   const resolution = resolveOwnerWorkspaceState(input);
@@ -969,6 +1214,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     summary,
     documents,
   );
+  const vendorBindingSummary = ownerVendorBindingSummary(context, resolution);
 
   return {
     state: resolution.state,
@@ -1030,6 +1276,7 @@ export function buildOwnerWorkspaceViewModel(input) {
     constructionIssues: summary?.constructionIssueLabel || "尚待案件資料",
     constructionActor: summary?.currentActorLabel || "尚待案件資料",
     ...documentSummary,
+    ...vendorBindingSummary,
     documents,
     submissions: payloadVisible ? context.submissions : [],
     scheduledDesignItems: payloadVisible ? context.scheduledDesignItems : [],
@@ -1521,6 +1768,17 @@ function renderModel(root, model) {
     "agreement-version": model.agreementVersion,
     "case-status": model.caseStatus,
     "actor-label": model.actorLabel,
+    "vendor-binding-case": model.vendorCase,
+    "vendor-binding-stage": model.vendorCaseStage,
+    "vendor-binding-primary-vendor": model.vendorPrimaryVendor,
+    "vendor-binding-status": model.vendorBindingStatus,
+    "vendor-binding-waiting": model.vendorWaitingRelationship,
+    "vendor-binding-next-actor": model.vendorNextActor,
+    "vendor-binding-last-record": model.vendorLastRecord,
+    "vendor-binding-action-label": model.vendorActionLabel,
+    "vendor-binding-pending-copy": model.vendorPendingCopy,
+    "vendor-binding-successor": model.vendorSuccessorCase,
+    "vendor-binding-carryover": model.vendorCarryoverRule,
   };
 
   renderOwnerHeaderContext(root, model);
@@ -1535,6 +1793,12 @@ function renderModel(root, model) {
   const retry = root.querySelector('[data-action="retry"]');
   if (retry) {
     retry.hidden = !model.retryVisible;
+  }
+
+  for (const node of root.querySelectorAll(
+    "[data-owner-vendor-termination-action]",
+  )) {
+    node.hidden = !model.vendorTerminationVisible;
   }
 
   renderProcessSteps(root, model.processSteps);
