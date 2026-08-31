@@ -38,6 +38,15 @@ export type LineBindingActionEvent = Readonly<{
   isRedelivery: boolean;
 }>;
 
+export type LineUnlinkActionEvent = Readonly<{
+  kind: "unlink_action";
+  webhookEventId: string;
+  replyToken: string;
+  lineUserId: string;
+  timestamp: number;
+  isRedelivery: boolean;
+}>;
+
 export type AccountLinkEvent = Readonly<{
   kind: "account_link";
   webhookEventId: string;
@@ -49,10 +58,12 @@ export type AccountLinkEvent = Readonly<{
   isRedelivery: boolean;
 }>;
 
-export type LineWebhookEvent = LineBindingActionEvent | AccountLinkEvent;
+export type LineWebhookEvent =
+  | LineBindingActionEvent
+  | LineUnlinkActionEvent
+  | AccountLinkEvent;
 
 export type LineWebhookEnvelope = Readonly<{
   destination: string;
   events: readonly LineWebhookEvent[];
 }>;
-

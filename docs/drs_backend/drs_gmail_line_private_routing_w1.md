@@ -17,12 +17,12 @@
 2. 登入頁或收件匣讀取 LINE 綁定狀態。
 3. 尚未綁定時，審查員啟動綁定；瀏覽器不能提交審查員 ID、案件 ID、角色或 LINE ID。
 4. 審查員在 laibe 官方帳號私人聊天室傳送「綁定 LINE 案件通知」，或點選等效 postback。
-5. LINE webhook 驗證原始請求簽章，取得一次性 link token，並以私人訊息回覆「繼續綁定」。
+5. LINE webhook 驗證原始請求簽章，取得一次性 link token，並以帶有穩定 retry key 的私人 push 訊息提供「繼續綁定」。
 6. 繼續頁在有效 Gmail-backed DRS session 下交換一次性 nonce，導向 LINE 官方 accountLink。
 7. LINE 傳回簽名的 `accountLink` 事件後，伺服器只保存 LINE ID 的 keyed digest 與 AES-GCM 密文。
-8. 案件指派建立 outbox。派送器送出前再次確認案件、指派、審查員、綁定及綁定版本仍有效。
-9. 推播結果寫入 append-only delivery receipt；LINE 是否送達不會改變 DRS 案件權限。
-10. 解除綁定後，尚未送出的通知會被抑制，原案件指派與既有留痕保留。
+8. 案件指派或新綁定會由資料庫觸發器自動建立 derived outbox。派送器送出前再次確認案件、指派、審查員、綁定及綁定版本仍有效。
+9. 推播結果同時寫入 append-only delivery receipt 與 `PRIVATE_LINE_NOTIFICATION` 案件留痕；LINE 是否送達不會改變 DRS 案件權限。
+10. 解除綁定後，尚未送出的通知會被抑制，原案件指派與既有留痕保留。若已無有效案件 session，可在本人 LINE 私聊傳送完全相同的「解除 LINE 案件通知」；這只能撤銷同一個 LINE 身分的通知目的地，不能登入、切換角色或取得案件。
 
 ## 瀏覽器操作契約
 
@@ -34,14 +34,16 @@
 - `POST /functions/v1/drs-line-account-link-unlink`，body 必須是 `{}`。
 - `POST /functions/v1/drs-line-account-link-continue?linkToken=...`，body 必須是 `{}`。
 
-五個操作都使用既有 A17 sealed session cookie 與短效 BFF proof，並在每次操作重新解析目前案件授權。回應只會出現核准的 12-state DTO，不會投影審查員、案件、assignment、角色、LINE ID 或 provider credential。
+五個操作都使用既有 A17 sealed session cookie 與短效 BFF proof，並在每次操作重新解析目前案件授權。回應只會出現核准的 12-state DTO，不會投影審查員、案件、assignment、角色、LINE ID 或 provider credential。沒有有效案件 session 時，不開放 start／status／cancel／continue；解除通知改走上述 signed private-LINE 自助撤銷路徑。
+
+這些 BFF 必須由 DRS 網站的同源反向代理提供；瀏覽器看見的 origin、`Origin` header、`Sec-Fetch-Site` 與 `LAIBE_DRS_APP_ORIGIN` 必須一致。不得把 Supabase Functions 的跨網域網址直接交給前端呼叫。
 
 外部 LINE webhook：
 
 - `POST /functions/v1/drs-line-webhook`
 - 僅接受 `application/json`，上限 1 MiB。
 - 必須先以 `LINE_CHANNEL_SECRET` 對原始 bytes 驗證 canonical `X-Line-Signature`，通過後才解析 JSON。
-- `webhookEventId` 只以 keyed digest 留存；重送不會重複執行已完成副作用。
+- `webhookEventId` 只以 keyed digest 留存；每筆事件另有固定 provider retry key，重送或處理程序重啟不會重複顯示已由 LINE 接受的 push 訊息。
 
 服務排程入口：
 
@@ -89,7 +91,7 @@ LAIBE_DRS_BFF_PROOF_KEY_V1
 5. 部署 `drs-line-webhook`，再將 LINE Developers Console webhook 指向其公開 HTTPS URL。
 6. 執行 LINE Verify；成功後才開啟 Use webhook。
 7. 部署 `drs-line-private-notification-dispatch`，只由受控的 service-role 排程呼叫。
-8. 將 DRS UI 的既有 12-state LINE 區塊接到 BFF；`/drs/line-account-link` 繼續頁必須先移除網址上的 link token，再以有效 session 呼叫 continue。
+8. 在 DRS 網站建立同源反向代理，再將 UI 的既有 12-state LINE 區塊接到 BFF；`/drs/line-account-link` 繼續頁必須先移除網址上的 link token，再以有效 session 呼叫 continue。
 9. 依 Human-only Pilot 清單做一個非正式案件的綁定、通知、開啟、解除與解除後不再推播驗證。
 
 ## HOLD 與回復條件
@@ -140,7 +142,7 @@ source_revision
 
 ## 本候選目前證據邊界
 
-- 已建立：source contracts、BFF、官方 signed webhook、durable binding/dedupe/outbox/receipt、service-only dispatcher、unit/source tests 與 local migration verification。
+- 已建立：source contracts、BFF、官方 signed webhook、durable binding/dedupe、assignment producer、outbox/receipt、案件留痕、claim lease recovery、send fence、service-only dispatcher、unit/source tests 與 local migration verification。
 - 尚未建立於本 producer：A3 UI 串接與 `/drs/line-account-link` 繼續頁。
 - 尚未證明：已部署 Supabase runtime、正式 Gmail Auth、正式 durable LINE binding、真實案件派送、手機通知、解除後抑制與 production ownership。
 - 未執行：push、PR、merge、Supabase deploy、LINE Console 變更、Zeabur 變更、secret 輸入、真人訊息或 production launch。

@@ -14,6 +14,14 @@ const JSON_HEADERS = Object.freeze({
   "x-content-type-options": "nosniff",
 });
 
+function hasUnsafeLinkTokenByte(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 32 || code === 127) return true;
+  }
+  return false;
+}
+
 function json(state: unknown, status = 200): Response {
   return new Response(JSON.stringify(state), { status, headers: JSON_HEADERS });
 }
@@ -42,7 +50,7 @@ async function exactRequest(
       throw new DrsIdentityError("INVALID_REQUEST", 400);
     }
     const value = entries[0][1];
-    if (value.length < 1 || value.length > 512 || /[\u0000-\u0020\u007f]/u.test(value)) {
+    if (value.length < 1 || value.length > 512 || hasUnsafeLinkTokenByte(value)) {
       throw new DrsIdentityError("INVALID_REQUEST", 400);
     }
   }

@@ -42,10 +42,12 @@ const RPCS = [
   "drs_line_prepare_nonce_v1",
   "drs_line_complete_account_link_v1",
   "drs_line_unlink_account_v1",
+  "drs_line_unlink_by_line_identity_v1",
   "drs_line_claim_webhook_v1",
   "drs_line_complete_webhook_v1",
   "drs_line_admit_case_notification_v1",
   "drs_line_claim_notification_v1",
+  "drs_line_assert_notification_claim_v1",
   "drs_line_complete_notification_v1",
 ];
 
@@ -197,6 +199,9 @@ test("account-link completion consumes one nonce and maps both collision directi
   assert.match(rpc, /conflict_drs_already_bound/iu);
   assert.match(rpc, /insert into integration\.drs_line_account_bindings/iu);
   assert.doesNotMatch(rpc, /on conflict[\s\S]*do update/iu);
+  assert.match(rpc, /integration\.drs_identity_authority_resolve_locked_v1/iu);
+  assert.match(rpc, /specialist_inactive/iu);
+  assert.match(rpc, /v_intent\.assignment_id/iu);
 });
 
 test("webhook claim and completion preserve durable replay outcome", () => {
@@ -206,15 +211,65 @@ test("webhook claim and completion preserve durable replay outcome", () => {
   assert.match(claim, /for update/iu);
   assert.match(claim, /already_completed/iu);
   assert.match(claim, /claim_token/iu);
+  assert.match(claim, /provider_retry_key/iu);
+  assert.match(claim, /attempt_count\s*>=\s*12[\s\S]*processing_state\s*=\s*'completed'/iu);
   assert.match(complete, /completed_at/iu);
   assert.match(complete, /safe_outcome/iu);
   assert.doesNotMatch(`${claim}\n${complete}`, /delete from integration\.drs_line_webhook_events/iu);
 });
 
+test("private LINE owner can revoke only the binding matching the signed LINE identity", () => {
+  const unlink = functionSource("drs_line_unlink_by_line_identity_v1");
+  assert.match(unlink, /provider_channel_id/iu);
+  assert.match(unlink, /line_user_digest/iu);
+  assert.match(unlink, /binding_state\s*=\s*'active'/iu);
+  assert.match(unlink, /binding_state\s*=\s*'revoked'/iu);
+  assert.doesNotMatch(unlink, /role|assignment_id|selected_case_id/iu);
+});
+
+test("assignment and newly linked binding automatically produce derived private notification outbox work", () => {
+  assert.match(sql, /create or replace function drs_private\.drs_line_enqueue_assignment_v1/iu);
+  assert.match(sql, /create trigger drs_line_assignment_notification_producer[\s\S]*after insert[\s\S]*on public\.drs_case_specialist_assignments/iu);
+  assert.match(sql, /create trigger drs_line_binding_notification_producer[\s\S]*after insert[\s\S]*on integration\.drs_line_account_bindings/iu);
+  const admission = functionSource("drs_line_admit_case_notification_v1");
+  assert.match(admission, /drs_private\.drs_line_enqueue_assignment_v1/iu);
+  assert.doesNotMatch(admission, /case_label'|case_status'|next_action'|case_url'|idempotency_key'/iu);
+  assert.match(tableSource("drs_line_notification_outbox"), /case_path\s+text/iu);
+});
+
+test("claimed delivery has stale-lease recovery and state-change fencing", () => {
+  const claim = functionSource("drs_line_claim_notification_v1");
+  const assertClaim = functionSource("drs_line_assert_notification_claim_v1");
+  assert.match(claim, /delivery_state\s*=\s*'claimed'[\s\S]*claimed_at\s*<=\s*v_now\s*-\s*interval\s*'2 minutes'/iu);
+  assert.match(claim, /dispatcher_claim_expired/iu);
+  assert.match(assertClaim, /claim_token/iu);
+  assert.match(assertClaim, /drs_case_specialist_assignment_terminations/iu);
+  assert.match(sql, /DRS_LINE_DELIVERY_IN_FLIGHT/iu);
+  assert.match(sql, /before insert[\s\S]*on public\.drs_case_specialist_assignment_terminations/iu);
+  assert.match(sql, /before update of authority_state[\s\S]*on public\.drs_specialists/iu);
+  assert.match(sql, /before update of case_state[\s\S]*on public\.drs_cases/iu);
+});
+
+test("notification outcomes append both an immutable receipt and a case audit event", () => {
+  const complete = functionSource("drs_line_complete_notification_v1");
+  const auditHelper = sql.match(
+    /create or replace function drs_private\.drs_line_append_case_receipt_v1\([\s\S]*?\$\$;/iu,
+  )?.[0] ?? "";
+  assert.match(complete, /integration\.drs_line_delivery_receipts/iu);
+  assert.match(complete, /drs_line_append_case_receipt_v1/iu);
+  assert.match(auditHelper, /drs_private\.insert_drs_audit_event/iu);
+  assert.match(auditHelper, /'PRIVATE_LINE_NOTIFICATION'/iu);
+  assert.match(auditHelper, /PRIVATE_LINE_NOTIFICATION/iu);
+});
+
 test("notification admission and claim recheck assignment, case, specialist, binding, and binding version", () => {
   const admit = functionSource("drs_line_admit_case_notification_v1");
   const claim = functionSource("drs_line_claim_notification_v1");
-  for (const source of [admit, claim]) {
+  const producer = sql.match(
+    /create or replace function drs_private\.drs_line_enqueue_assignment_v1\([\s\S]*?\$\$;/iu,
+  )?.[0] ?? "";
+  assert.match(admit, /drs_line_enqueue_assignment_v1/iu);
+  for (const source of [producer, claim]) {
     assert.match(source, /public\.drs_case_specialist_assignments/iu);
     assert.match(source, /public\.drs_case_specialist_assignment_terminations/iu);
     assert.match(source, /public\.drs_specialists/iu);

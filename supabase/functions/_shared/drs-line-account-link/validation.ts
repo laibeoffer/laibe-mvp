@@ -2,6 +2,7 @@ import {
   LINE_LINK_STATES,
   type AccountLinkEvent,
   type LineBindingActionEvent,
+  type LineUnlinkActionEvent,
   type LineLinkNextAction,
   type LineLinkState,
   type LineLinkStatusDto,
@@ -14,6 +15,7 @@ const RFC3339_PATTERN =
 const LINE_USER_ID_PATTERN = /^U[0-9a-f]{32}$/u;
 const PROVIDER_EVENT_ID_PATTERN = /^[A-Za-z0-9_-]{16,128}$/u;
 const EXACT_BINDING_TEXT = "綁定 LINE 案件通知";
+const EXACT_UNLINK_TEXT = "解除 LINE 案件通知";
 const EXACT_BINDING_POSTBACK = "action=drs_line_account_link";
 const FALLBACK_STATUS = Object.freeze({
   state: "temporarily_unavailable" as const,
@@ -86,7 +88,15 @@ function isProviderEventId(value: unknown): value is string {
 }
 
 function isReplyToken(value: unknown): value is string {
-  return isBoundedString(value, 1, 256) && !/[\u0000-\u001f\u007f]/u.test(value);
+  return isBoundedString(value, 1, 256) && !hasAsciiControl(value);
+}
+
+function hasAsciiControl(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 31 || code === 127) return true;
+  }
+  return false;
 }
 
 function isTimestamp(value: unknown): value is number {
@@ -259,7 +269,7 @@ export function readAccountLinkEvent(input: unknown): AccountLinkEvent | null {
     if (
       (result !== "ok" && result !== "failed") ||
       !isBoundedString(nonce, 1, 255) ||
-      /[\u0000-\u001f\u007f]/u.test(nonce)
+      hasAsciiControl(nonce)
     ) return null;
     const common = readCommonEvent(input);
     if (!common) return null;
@@ -274,7 +284,9 @@ export function readAccountLinkEvent(input: unknown): AccountLinkEvent | null {
   }
 }
 
-function readBindingMessage(input: unknown): LineBindingActionEvent | null {
+function readBindingMessage(
+  input: unknown,
+): LineBindingActionEvent | LineUnlinkActionEvent | null {
   if (
     !hasExactOwnKeys(input, [
       "type",
@@ -293,15 +305,16 @@ function readBindingMessage(input: unknown): LineBindingActionEvent | null {
       ["id", "type", "text"],
       ["id", "type", "quoteToken", "text"],
     ]) || own(message, "type") !== "text" ||
-    own(message, "text") !== EXACT_BINDING_TEXT ||
+    ![EXACT_BINDING_TEXT, EXACT_UNLINK_TEXT].includes(String(own(message, "text"))) ||
     !isBoundedString(own(message, "id"), 1, 128) ||
     (Object.prototype.hasOwnProperty.call(message, "quoteToken") &&
       !isBoundedString(own(message, "quoteToken"), 1, 256))
   ) return null;
   const common = readCommonEvent(input);
-  return common
-    ? Object.freeze({ kind: "binding_action" as const, ...common })
-    : null;
+  if (!common) return null;
+  return own(message, "text") === EXACT_UNLINK_TEXT
+    ? Object.freeze({ kind: "unlink_action" as const, ...common })
+    : Object.freeze({ kind: "binding_action" as const, ...common });
 }
 
 function readBindingPostback(input: unknown): LineBindingActionEvent | null {
@@ -362,4 +375,3 @@ export function readLineWebhookEnvelope(
     return null;
   }
 }
-

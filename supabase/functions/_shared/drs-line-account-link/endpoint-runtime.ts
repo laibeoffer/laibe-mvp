@@ -24,6 +24,14 @@ const PATHS = Object.freeze({
   continue: "/functions/v1/drs-line-account-link-continue",
 });
 
+function hasUnsafeLinkTokenByte(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 32 || code === 127) return true;
+  }
+  return false;
+}
+
 function runtimeEnv(name: string): string {
   try {
     const candidate = (globalThis as unknown as {
@@ -45,7 +53,7 @@ function requestContract(name: LineAccountLinkEndpointName): DrsBffRequestContra
         scalarType: "string" as const,
         validate: (value: string | number | boolean) =>
           typeof value === "string" && value.length >= 1 && value.length <= 512 &&
-          !/[\u0000-\u0020\u007f]/u.test(value),
+          !hasUnsafeLinkTokenByte(value),
       })])
       : Object.freeze([]),
     jsonBodyFields: name === "status" ? null : Object.freeze([]),

@@ -29,6 +29,16 @@ begin
 end;
 $$;
 
+alter table public.drs_case_audit_events
+  drop constraint drs_case_audit_events_type_check;
+alter table public.drs_case_audit_events
+  add constraint drs_case_audit_events_type_check check (
+    event_type in (
+      'LINE_SENT_EVENT', 'AI_REVIEW', 'HUMAN_DECISION', 'FINAL_MESSAGE',
+      'RECEIPT', 'WORK_ITEM_TRANSITION', 'PRIVATE_LINE_NOTIFICATION'
+    )
+  );
+
 create table integration.drs_line_account_link_intents (
   intent_id uuid primary key default extensions.gen_random_uuid(),
   authenticated_user_id uuid not null references auth.users(id)
@@ -109,7 +119,8 @@ create table integration.drs_line_account_bindings (
     line_user_digest ~ '^[A-Za-z0-9_-]{43}$'
   ),
   constraint drs_line_bindings_envelope_check check (
-    line_user_ciphertext ~ '^[A-Za-z0-9_-]{24,1024}$'
+    line_user_ciphertext ~ '^[A-Za-z0-9_-]+$'
+    and length(line_user_ciphertext) between 24 and 1024
     and line_user_iv ~ '^[A-Za-z0-9_-]{16}$'
     and encryption_key_version ~ '^[A-Za-z0-9._-]{1,64}$'
   ),
@@ -168,6 +179,7 @@ create table integration.drs_line_webhook_events (
   processing_state text not null default 'processing',
   safe_outcome text not null default 'pending',
   claim_token uuid not null default extensions.gen_random_uuid(),
+  provider_retry_key uuid not null default extensions.gen_random_uuid(),
   attempt_count integer not null default 1,
   first_seen_at timestamptz not null default clock_timestamp(),
   claimed_at timestamptz not null default clock_timestamp(),
@@ -176,7 +188,7 @@ create table integration.drs_line_webhook_events (
     webhook_event_digest ~ '^[A-Za-z0-9_-]{43}$'
   ),
   constraint drs_line_webhook_kind_check check (
-    event_kind in ('binding_action', 'account_link', 'verify')
+    event_kind in ('binding_action', 'unlink_action', 'account_link', 'verify')
   ),
   constraint drs_line_webhook_state_check check (
     processing_state in ('processing', 'completed')
@@ -185,7 +197,8 @@ create table integration.drs_line_webhook_events (
     safe_outcome in (
       'pending', 'verified', 'link_token_replied', 'linked', 'expired',
       'conflict_line_already_bound', 'conflict_drs_already_bound',
-      'ignored', 'failed', 'temporarily_unavailable'
+      'not_linked', 'revoked', 'ignored', 'failed',
+      'temporarily_unavailable'
     )
   ),
   constraint drs_line_webhook_attempt_check check (
@@ -222,7 +235,7 @@ create table integration.drs_line_notification_outbox (
   case_label text not null,
   case_status text not null,
   next_action text not null,
-  case_url text not null,
+  case_path text not null,
   delivery_state text not null default 'pending',
   attempt_count integer not null default 0,
   next_attempt_at timestamptz not null default clock_timestamp(),
@@ -244,8 +257,8 @@ create table integration.drs_line_notification_outbox (
     and case_label !~ '[\x00-\x1f\x7f]'
     and case_status !~ '[\x00-\x1f\x7f]'
     and next_action !~ '[\x00-\x1f\x7f]'
-    and case_url ~ '^https://'
-    and length(case_url) <= 512
+    and case_path ~ '^/pcm/console/case\?caseId=[0-9a-f-]{36}$'
+    and length(case_path) <= 512
   ),
   constraint drs_line_outbox_state_check check (
     delivery_state in (
@@ -320,7 +333,7 @@ create unique index drs_line_bindings_one_active_line_identity_idx
 
 create index drs_line_outbox_due_idx
   on integration.drs_line_notification_outbox(next_attempt_at, created_at)
-  where delivery_state in ('pending', 'retry');
+  where delivery_state in ('pending', 'retry', 'claimed');
 
 create index drs_line_audit_specialist_time_idx
   on integration.drs_line_binding_audit(specialist_id, occurred_at);
@@ -625,6 +638,7 @@ begin
   if not found then
     return jsonb_build_object('state', 'not_linked', 'next_action', 'relink');
   end if;
+
   if v_intent.intent_state in ('pending', 'link_token_issued', 'nonce_ready')
     and v_intent.expires_at <= v_now
   then
@@ -653,6 +667,81 @@ begin
   end if;
   return jsonb_build_object(
     'state', 'temporarily_unavailable', 'next_action', 'retry'
+  );
+exception
+  when others then
+    return jsonb_build_object(
+      'state', 'temporarily_unavailable', 'next_action', 'retry'
+    );
+end;
+$$;
+
+create or replace function drs_private.drs_line_unlink_by_line_identity_v1(
+  p_input jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_now timestamptz := clock_timestamp();
+  v_binding integration.drs_line_account_bindings%rowtype;
+begin
+  if not drs_private.drs_line_exact_json_keys_v1(
+    p_input, array['provider_channel_id', 'line_user_digest']
+  )
+    or coalesce(p_input ->> 'provider_channel_id', '') !~ '^[0-9]{1,32}$'
+    or coalesce(p_input ->> 'line_user_digest', '') !~
+      '^[A-Za-z0-9_-]{43}$'
+  then
+    return jsonb_build_object(
+      'state', 'temporarily_unavailable', 'next_action', 'retry'
+    );
+  end if;
+
+  select * into v_binding
+  from integration.drs_line_account_bindings
+  where provider_channel_id = p_input ->> 'provider_channel_id'
+    and line_user_digest = p_input ->> 'line_user_digest'
+    and binding_state = 'active'
+  for update;
+  if not found then
+    return jsonb_build_object('state', 'not_linked', 'next_action', 'relink');
+  end if;
+
+  perform 1
+  from integration.drs_line_notification_outbox
+  where binding_id = v_binding.binding_id
+    and binding_version = v_binding.binding_version
+    and delivery_state = 'claimed'
+  for update;
+  if found then
+    return jsonb_build_object(
+      'state', 'temporarily_unavailable', 'next_action', 'retry'
+    );
+  end if;
+
+  update integration.drs_line_account_bindings
+  set binding_state = 'revoked', revoked_at = v_now
+  where binding_id = v_binding.binding_id;
+  update integration.drs_line_notification_outbox
+  set delivery_state = 'suppressed', claim_token = null,
+    claimed_at = null, completed_at = v_now
+  where binding_id = v_binding.binding_id
+    and binding_version = v_binding.binding_version
+    and delivery_state in ('pending', 'retry');
+  insert into integration.drs_line_binding_audit (
+    specialist_id, binding_id, event_type, safe_outcome, safe_payload,
+    occurred_at
+  ) values (
+    v_binding.specialist_id, v_binding.binding_id, 'revoked', 'revoked',
+    jsonb_build_object(
+      'state', 'revoked', 'binding_version', v_binding.binding_version::text
+    ), v_now
+  );
+  return jsonb_build_object(
+    'state', 'revoked', 'revoked_at', v_now, 'next_action', 'relink'
   );
 exception
   when others then
@@ -803,6 +892,7 @@ declare
   v_existing_line integration.drs_line_account_bindings%rowtype;
   v_existing_specialist integration.drs_line_account_bindings%rowtype;
   v_binding integration.drs_line_account_bindings%rowtype;
+  v_authority jsonb;
 begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input,
@@ -815,7 +905,9 @@ begin
     or coalesce(p_input ->> 'nonce_digest', '') !~ '^[A-Za-z0-9_-]{43}$'
     or coalesce(p_input ->> 'line_user_digest', '') !~ '^[A-Za-z0-9_-]{43}$'
     or coalesce(p_input ->> 'line_user_ciphertext', '') !~
-      '^[A-Za-z0-9_-]{24,1024}$'
+      '^[A-Za-z0-9_-]+$'
+    or length(coalesce(p_input ->> 'line_user_ciphertext', ''))
+      not between 24 and 1024
     or coalesce(p_input ->> 'line_user_iv', '') !~ '^[A-Za-z0-9_-]{16}$'
     or coalesce(p_input ->> 'encryption_key_version', '') !~
       '^[A-Za-z0-9._-]{1,64}$'
@@ -837,6 +929,34 @@ begin
 
   if not found then
     return jsonb_build_object('state', 'expired', 'next_action', 'relink');
+  end if;
+
+  v_authority := integration.drs_identity_authority_resolve_locked_v1(
+    v_intent.authenticated_user_id,
+    v_intent.selected_case_id,
+    v_intent.authorization_subject
+  );
+  if v_authority -> 'authorized' is distinct from 'true'::jsonb
+    or v_authority ->> 'specialist_id' is distinct from
+      v_intent.specialist_id::text
+    or v_authority ->> 'assignment_id' is distinct from
+      v_intent.assignment_id::text
+  then
+    update integration.drs_line_account_link_intents
+    set intent_state = 'specialist_inactive', consumed_at = v_now,
+      failed_at = v_now, nonce_digest = null, nonce_expires_at = null
+    where intent_id = v_intent.intent_id;
+    insert into integration.drs_line_binding_audit (
+      specialist_id, intent_id, event_type, safe_outcome, safe_payload,
+      occurred_at
+    ) values (
+      v_intent.specialist_id, v_intent.intent_id, 'denied',
+      'specialist_inactive',
+      jsonb_build_object('state', 'specialist_inactive'), v_now
+    );
+    return jsonb_build_object(
+      'state', 'specialist_inactive', 'next_action', 'retry'
+    );
   end if;
 
   select * into v_existing_line
@@ -985,6 +1105,18 @@ begin
     return jsonb_build_object('state', 'not_linked', 'next_action', 'relink');
   end if;
 
+  perform 1
+  from integration.drs_line_notification_outbox
+  where binding_id = v_binding.binding_id
+    and binding_version = v_binding.binding_version
+    and delivery_state = 'claimed'
+  for update;
+  if found then
+    return jsonb_build_object(
+      'state', 'temporarily_unavailable', 'next_action', 'retry'
+    );
+  end if;
+
   insert into integration.drs_line_binding_audit (
     specialist_id, binding_id, event_type, safe_outcome, safe_payload,
     occurred_at
@@ -1036,6 +1168,7 @@ declare
   v_now timestamptz := clock_timestamp();
   v_event integration.drs_line_webhook_events%rowtype;
   v_claim_token uuid := extensions.gen_random_uuid();
+  v_provider_retry_key uuid := extensions.gen_random_uuid();
 begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input, array['webhook_event_digest', 'event_kind']
@@ -1043,7 +1176,7 @@ begin
     or coalesce(p_input ->> 'webhook_event_digest', '') !~
       '^[A-Za-z0-9_-]{43}$'
     or coalesce(p_input ->> 'event_kind', '') not in (
-      'binding_action', 'account_link', 'verify'
+      'binding_action', 'unlink_action', 'account_link', 'verify'
     )
   then
     return jsonb_build_object('admission', 'rejected');
@@ -1061,11 +1194,20 @@ begin
         'safe_outcome', v_event.safe_outcome
       );
     end if;
-    if v_event.claimed_at > v_now - interval '2 minutes'
-      or v_event.attempt_count >= 12
-    then
+    if v_event.attempt_count >= 12 then
+      update integration.drs_line_webhook_events
+      set processing_state = 'completed',
+        safe_outcome = 'temporarily_unavailable', completed_at = v_now
+      where webhook_event_digest = v_event.webhook_event_digest;
+      return jsonb_build_object(
+        'admission', 'already_completed',
+        'safe_outcome', 'temporarily_unavailable'
+      );
+    end if;
+    if v_event.claimed_at > v_now - interval '2 minutes' then
       return jsonb_build_object('admission', 'in_progress');
     end if;
+    v_provider_retry_key := v_event.provider_retry_key;
     update integration.drs_line_webhook_events
     set claim_token = v_claim_token, claimed_at = v_now,
       attempt_count = attempt_count + 1
@@ -1073,15 +1215,17 @@ begin
   else
     insert into integration.drs_line_webhook_events (
       webhook_event_digest, event_kind, processing_state, safe_outcome,
-      claim_token, attempt_count, first_seen_at, claimed_at
+      claim_token, provider_retry_key, attempt_count, first_seen_at, claimed_at
     ) values (
       p_input ->> 'webhook_event_digest', p_input ->> 'event_kind',
-      'processing', 'pending', v_claim_token, 1, v_now, v_now
+      'processing', 'pending', v_claim_token, v_provider_retry_key,
+      1, v_now, v_now
     );
   end if;
 
   return jsonb_build_object(
-    'admission', 'claimed', 'claim_token', v_claim_token::text
+    'admission', 'claimed', 'claim_token', v_claim_token::text,
+    'provider_retry_key', v_provider_retry_key::text
   );
 exception
   when unique_violation then
@@ -1109,7 +1253,8 @@ begin
     or coalesce(p_input ->> 'safe_outcome', '') not in (
       'verified', 'link_token_replied', 'linked', 'expired',
       'conflict_line_already_bound', 'conflict_drs_already_bound',
-      'ignored', 'failed', 'temporarily_unavailable'
+      'not_linked', 'revoked', 'ignored', 'failed',
+      'temporarily_unavailable'
     )
   then
     return jsonb_build_object('completed', false);
@@ -1144,39 +1289,36 @@ exception
 end;
 $$;
 
-create or replace function drs_private.drs_line_admit_case_notification_v1(
-  p_input jsonb
+create or replace function drs_private.drs_line_enqueue_assignment_v1(
+  p_assignment_id uuid,
+  p_provider_channel_id text,
+  p_template_version text
 )
-returns jsonb
+returns integer
 language plpgsql
 security definer
 set search_path = ''
 as $$
 declare
   v_now timestamptz := clock_timestamp();
-  v_binding integration.drs_line_account_bindings%rowtype;
-  v_outbox integration.drs_line_notification_outbox%rowtype;
+  v_assignment public.drs_case_specialist_assignments%rowtype;
+  v_case public.drs_cases%rowtype;
+  v_count integer := 0;
 begin
-  if not drs_private.drs_line_exact_json_keys_v1(
-    p_input,
-    array[
-      'case_id', 'assignment_id', 'specialist_id', 'provider_channel_id',
-      'idempotency_key', 'template_version', 'case_label', 'case_status',
-      'next_action', 'case_url'
-    ]
-  ) then
-    return jsonb_build_object('admitted', false, 'state', 'permission_denied');
+  if p_assignment_id is null
+    or coalesce(p_provider_channel_id, '') !~ '^[0-9]{1,32}$'
+    or coalesce(p_template_version, '') !~ '^[A-Za-z0-9._-]{1,64}$'
+  then
+    return 0;
   end if;
 
-  perform 1
+  select assignment_record.* into v_assignment
   from public.drs_case_specialist_assignments assignment_record
   join public.drs_specialists specialist_record
     on specialist_record.specialist_id = assignment_record.specialist_id
   join public.drs_cases case_record
     on case_record.case_id = assignment_record.case_id
-  where assignment_record.assignment_id = (p_input ->> 'assignment_id')::uuid
-    and assignment_record.case_id = (p_input ->> 'case_id')::uuid
-    and assignment_record.specialist_id = (p_input ->> 'specialist_id')::uuid
+  where assignment_record.assignment_id = p_assignment_id
     and assignment_record.valid_from <= v_now
     and (assignment_record.valid_until is null or assignment_record.valid_until > v_now)
     and specialist_record.authority_state = 'ACTIVE'
@@ -1188,59 +1330,267 @@ begin
         and termination.terminated_at <= v_now
     )
   for update of assignment_record, specialist_record, case_record;
-
   if not found then
-    return jsonb_build_object(
-      'admitted', false, 'state', 'suppressed_authority'
-    );
+    return 0;
   end if;
-
-  select * into v_binding
-  from integration.drs_line_account_bindings
-  where provider_channel_id = p_input ->> 'provider_channel_id'
-    and specialist_id = (p_input ->> 'specialist_id')::uuid
-    and binding_state = 'active'
-  for update;
-
-  if not found then
-    return jsonb_build_object(
-      'admitted', false, 'state', 'notification_pending_setup'
-    );
-  end if;
+  select * into strict v_case
+  from public.drs_cases where case_id = v_assignment.case_id;
 
   insert into integration.drs_line_notification_outbox (
     case_id, assignment_id, specialist_id, binding_id, binding_version,
     provider_channel_id, template_version, idempotency_key, case_label,
-    case_status, next_action, case_url, delivery_state, attempt_count,
+    case_status, next_action, case_path, delivery_state, attempt_count,
     next_attempt_at, created_at
-  ) values (
-    (p_input ->> 'case_id')::uuid,
-    (p_input ->> 'assignment_id')::uuid,
-    (p_input ->> 'specialist_id')::uuid,
-    v_binding.binding_id, v_binding.binding_version,
-    p_input ->> 'provider_channel_id', p_input ->> 'template_version',
-    p_input ->> 'idempotency_key', p_input ->> 'case_label',
-    p_input ->> 'case_status', p_input ->> 'next_action',
-    p_input ->> 'case_url', 'pending', 0, v_now, v_now
   )
-  on conflict (idempotency_key) do nothing
-  returning * into v_outbox;
+  select
+    v_assignment.case_id, v_assignment.assignment_id,
+    v_assignment.specialist_id, binding.binding_id,
+    binding.binding_version, binding.provider_channel_id,
+    p_template_version,
+    'assignment:' || v_assignment.assignment_id::text ||
+      ':binding:' || binding.binding_version::text ||
+      ':template:' || p_template_version,
+    left('案件 ' || v_case.case_number, 80),
+    case v_case.case_state
+      when 'ACTIVE_REVIEW' then '審查進行中'
+      else '施工追蹤中'
+    end,
+    '請開啟 DRS 收件匣檢視案件',
+    '/pcm/console/case?caseId=' || v_assignment.case_id::text,
+    'pending', 0, v_now, v_now
+  from integration.drs_line_account_bindings binding
+  where binding.specialist_id = v_assignment.specialist_id
+    and binding.provider_channel_id = p_provider_channel_id
+    and binding.binding_state = 'active'
+  on conflict (idempotency_key) do nothing;
 
-  if v_outbox.outbox_id is null then
-    select * into v_outbox
-    from integration.drs_line_notification_outbox
-    where idempotency_key = p_input ->> 'idempotency_key';
+  select count(*)::integer into v_count
+  from integration.drs_line_notification_outbox outbox
+  where outbox.assignment_id = v_assignment.assignment_id
+    and outbox.provider_channel_id = p_provider_channel_id
+    and outbox.template_version = p_template_version;
+  return v_count;
+end;
+$$;
+
+create or replace function drs_private.drs_line_assignment_producer_v1()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_binding record;
+begin
+  for v_binding in
+    select distinct provider_channel_id
+    from integration.drs_line_account_bindings
+    where specialist_id = new.specialist_id and binding_state = 'active'
+  loop
+    perform drs_private.drs_line_enqueue_assignment_v1(
+      new.assignment_id, v_binding.provider_channel_id, 'assignment-v1'
+    );
+  end loop;
+  return new;
+end;
+$$;
+
+create or replace function drs_private.drs_line_binding_producer_v1()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_assignment record;
+begin
+  if new.binding_state <> 'active' then
+    return new;
   end if;
+  for v_assignment in
+    select assignment_id
+    from public.drs_case_specialist_assignments
+    where specialist_id = new.specialist_id
+  loop
+    perform drs_private.drs_line_enqueue_assignment_v1(
+      v_assignment.assignment_id, new.provider_channel_id, 'assignment-v1'
+    );
+  end loop;
+  return new;
+end;
+$$;
+
+create trigger drs_line_assignment_notification_producer
+  after insert on public.drs_case_specialist_assignments
+  for each row execute function drs_private.drs_line_assignment_producer_v1();
+
+create trigger drs_line_binding_notification_producer
+  after insert on integration.drs_line_account_bindings
+  for each row execute function drs_private.drs_line_binding_producer_v1();
+
+create or replace function drs_private.drs_line_delivery_fence_v1()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_key uuid;
+begin
+  if tg_table_schema = 'public'
+    and tg_table_name = 'drs_case_specialist_assignment_terminations'
+  then
+    v_key := (to_jsonb(new) ->> 'assignment_id')::uuid;
+    perform 1 from integration.drs_line_notification_outbox
+    where assignment_id = v_key and delivery_state = 'claimed';
+  elsif tg_table_schema = 'public'
+    and tg_table_name = 'drs_case_specialist_assignments'
+  then
+    v_key := (to_jsonb(old) ->> 'assignment_id')::uuid;
+    perform 1 from integration.drs_line_notification_outbox
+    where assignment_id = v_key and delivery_state = 'claimed';
+  elsif tg_table_schema = 'public' and tg_table_name = 'drs_specialists'
+  then
+    v_key := (to_jsonb(old) ->> 'specialist_id')::uuid;
+    perform 1 from integration.drs_line_notification_outbox
+    where specialist_id = v_key and delivery_state = 'claimed';
+  elsif tg_table_schema = 'public' and tg_table_name = 'drs_cases'
+  then
+    v_key := (to_jsonb(old) ->> 'case_id')::uuid;
+    perform 1 from integration.drs_line_notification_outbox
+    where case_id = v_key and delivery_state = 'claimed';
+  elsif tg_table_schema = 'integration'
+    and tg_table_name = 'drs_auth_specialist_bindings'
+  then
+    v_key := (to_jsonb(old) ->> 'specialist_id')::uuid;
+    perform 1 from integration.drs_line_notification_outbox
+    where specialist_id = v_key and delivery_state = 'claimed';
+  elsif tg_table_schema = 'integration'
+    and tg_table_name = 'drs_line_account_bindings'
+  then
+    v_key := (to_jsonb(old) ->> 'binding_id')::uuid;
+    perform 1 from integration.drs_line_notification_outbox
+    where binding_id = v_key and delivery_state = 'claimed';
+  else
+    if tg_op = 'DELETE' then return old; end if;
+    return new;
+  end if;
+  if found then
+    raise exception 'DRS_LINE_DELIVERY_IN_FLIGHT';
+  end if;
+  if tg_op = 'DELETE' then return old; end if;
+  return new;
+end;
+$$;
+
+create trigger drs_line_assignment_termination_delivery_fence
+  before insert on public.drs_case_specialist_assignment_terminations
+  for each row execute function drs_private.drs_line_delivery_fence_v1();
+create trigger drs_line_assignment_update_delivery_fence
+  before update of valid_until on public.drs_case_specialist_assignments
+  for each row when (old.valid_until is distinct from new.valid_until)
+  execute function drs_private.drs_line_delivery_fence_v1();
+create trigger drs_line_specialist_delivery_fence
+  before update of authority_state on public.drs_specialists
+  for each row when (old.authority_state is distinct from new.authority_state)
+  execute function drs_private.drs_line_delivery_fence_v1();
+create trigger drs_line_case_delivery_fence
+  before update of case_state on public.drs_cases
+  for each row when (old.case_state is distinct from new.case_state)
+  execute function drs_private.drs_line_delivery_fence_v1();
+create trigger drs_line_auth_binding_delivery_fence
+  before update of binding_status, revoked_at, valid_until or delete
+  on integration.drs_auth_specialist_bindings
+  for each row execute function drs_private.drs_line_delivery_fence_v1();
+create trigger drs_line_binding_revoke_delivery_fence
+  before update of binding_state on integration.drs_line_account_bindings
+  for each row when (old.binding_state is distinct from new.binding_state)
+  execute function drs_private.drs_line_delivery_fence_v1();
+
+create or replace function drs_private.drs_line_admit_case_notification_v1(
+  p_input jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_count integer;
+begin
+  if not drs_private.drs_line_exact_json_keys_v1(
+    p_input, array['assignment_id', 'provider_channel_id', 'template_version']
+  )
+    or coalesce(p_input ->> 'provider_channel_id', '') !~ '^[0-9]{1,32}$'
+    or coalesce(p_input ->> 'template_version', '') !~
+      '^[A-Za-z0-9._-]{1,64}$'
+  then
+    return jsonb_build_object('admitted', false, 'state', 'permission_denied');
+  end if;
+
+  v_count := drs_private.drs_line_enqueue_assignment_v1(
+    (p_input ->> 'assignment_id')::uuid,
+    p_input ->> 'provider_channel_id',
+    p_input ->> 'template_version'
+  );
   return jsonb_build_object(
-    'admitted', true, 'state', v_outbox.delivery_state,
-    'outbox_id', v_outbox.outbox_id::text,
-    'binding_version', v_outbox.binding_version::text
+    'admitted', v_count > 0,
+    'state', case when v_count > 0 then 'pending'
+      else 'notification_pending_setup' end,
+    'outbox_count', v_count
   );
 exception
   when others then
     return jsonb_build_object(
       'admitted', false, 'state', 'temporarily_unavailable'
     );
+end;
+$$;
+
+create or replace function drs_private.drs_line_append_case_receipt_v1(
+  p_outbox_id uuid,
+  p_outcome text,
+  p_reason_code text,
+  p_occurred_at timestamptz
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_outbox integration.drs_line_notification_outbox%rowtype;
+  v_previous_event_id uuid;
+  v_event_id uuid := extensions.gen_random_uuid();
+begin
+  select * into strict v_outbox
+  from integration.drs_line_notification_outbox
+  where outbox_id = p_outbox_id;
+  perform 1 from public.drs_cases
+  where case_id = v_outbox.case_id for update;
+  select event.event_id into v_previous_event_id
+  from public.drs_case_audit_events event
+  where event.case_id = v_outbox.case_id
+    and not exists (
+      select 1 from public.drs_case_audit_events successor
+      where successor.previous_event_id = event.event_id
+    )
+  order by event.occurred_at desc, event.event_id desc
+  limit 1
+  for update;
+  return drs_private.insert_drs_audit_event(
+    v_event_id, v_outbox.case_id, v_previous_event_id,
+    'PRIVATE_LINE_NOTIFICATION',
+    p_occurred_at, 'SYSTEM', 'drs-line-private-notification', 'SYSTEM',
+    null, null,
+    jsonb_build_object(
+      'receipt_kind', 'PRIVATE_LINE_NOTIFICATION',
+      'outbox_id', v_outbox.outbox_id::text,
+      'outcome', p_outcome,
+      'reason_code', p_reason_code,
+      'binding_version', v_outbox.binding_version::text
+    ), false, false
+  );
 end;
 $$;
 
@@ -1265,15 +1615,43 @@ begin
 
   select * into v_outbox
   from integration.drs_line_notification_outbox
-  where delivery_state in ('pending', 'retry')
-    and next_attempt_at <= v_now
-    and attempt_count < 5
+  where (
+      delivery_state in ('pending', 'retry')
+      and next_attempt_at <= v_now
+      and attempt_count < 5
+    ) or (
+      delivery_state = 'claimed'
+      and claimed_at <= v_now - interval '2 minutes'
+    )
   order by next_attempt_at, created_at, outbox_id
   limit 1
   for update skip locked;
 
   if not found then
     return jsonb_build_object('admitted', false, 'state', 'empty');
+  end if;
+
+  if v_outbox.delivery_state = 'claimed' and v_outbox.attempt_count >= 5 then
+    update integration.drs_line_notification_outbox
+    set delivery_state = 'permanent_failure', claim_token = null,
+      claimed_at = null, completed_at = v_now
+    where outbox_id = v_outbox.outbox_id;
+    insert into integration.drs_line_delivery_receipts (
+      outbox_id, case_id, specialist_id, attempt_number, outcome,
+      http_status_class, provider_request_id, reason_code, duration_ms,
+      attempted_at
+    ) values (
+      v_outbox.outbox_id, v_outbox.case_id, v_outbox.specialist_id,
+      v_outbox.attempt_count, 'permanent_failure', 'none', null,
+      'dispatcher_claim_expired', 0, v_now
+    );
+    perform drs_private.drs_line_append_case_receipt_v1(
+      v_outbox.outbox_id, 'permanent_failure',
+      'dispatcher_claim_expired', v_now
+    );
+    return jsonb_build_object(
+      'admitted', false, 'state', 'permanent_failure'
+    );
   end if;
 
   perform 1
@@ -1321,6 +1699,9 @@ begin
       greatest(v_outbox.attempt_count + 1, 1), 'suppressed', 'none', null,
       'suppressed_authority', 0, v_now
     );
+    perform drs_private.drs_line_append_case_receipt_v1(
+      v_outbox.outbox_id, 'suppressed', 'suppressed_authority', v_now
+    );
     return jsonb_build_object(
       'admitted', false,
       'state', 'suppressed_authority',
@@ -1344,7 +1725,7 @@ begin
     'case_label', v_outbox.case_label,
     'case_status', v_outbox.case_status,
     'next_action', v_outbox.next_action,
-    'case_url', v_outbox.case_url
+    'case_path', v_outbox.case_path
   );
 exception
   when unique_violation then
@@ -1355,6 +1736,67 @@ exception
     return jsonb_build_object(
       'admitted', false, 'state', 'temporarily_unavailable'
     );
+end;
+$$;
+
+create or replace function drs_private.drs_line_assert_notification_claim_v1(
+  p_input jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_now timestamptz := clock_timestamp();
+  v_outbox integration.drs_line_notification_outbox%rowtype;
+  v_current boolean := false;
+begin
+  if not drs_private.drs_line_exact_json_keys_v1(
+    p_input, array['outbox_id', 'claim_token']
+  ) then
+    return jsonb_build_object('current', false);
+  end if;
+  select * into v_outbox
+  from integration.drs_line_notification_outbox
+  where outbox_id = (p_input ->> 'outbox_id')::uuid
+    and delivery_state = 'claimed'
+    and claim_token = (p_input ->> 'claim_token')::uuid
+  for update;
+  if not found then
+    return jsonb_build_object('current', false);
+  end if;
+  perform 1
+  from public.drs_case_specialist_assignments assignment_record
+  join public.drs_specialists specialist_record
+    on specialist_record.specialist_id = assignment_record.specialist_id
+  join public.drs_cases case_record
+    on case_record.case_id = assignment_record.case_id
+  join integration.drs_line_account_bindings binding
+    on binding.binding_id = v_outbox.binding_id
+  where assignment_record.assignment_id = v_outbox.assignment_id
+    and assignment_record.case_id = v_outbox.case_id
+    and assignment_record.specialist_id = v_outbox.specialist_id
+    and assignment_record.valid_from <= v_now
+    and (assignment_record.valid_until is null or assignment_record.valid_until > v_now)
+    and specialist_record.authority_state = 'ACTIVE'
+    and case_record.case_state in ('ACTIVE_REVIEW', 'ACTIVE_CONSTRUCTION')
+    and binding.specialist_id = v_outbox.specialist_id
+    and binding.provider_channel_id = v_outbox.provider_channel_id
+    and binding.binding_version = v_outbox.binding_version
+    and binding.binding_state = 'active'
+    and not exists (
+      select 1
+      from public.drs_case_specialist_assignment_terminations termination
+      where termination.assignment_id = assignment_record.assignment_id
+        and termination.terminated_at <= v_now
+    )
+  for update of assignment_record, specialist_record, case_record, binding;
+  v_current := found;
+  return jsonb_build_object('current', v_current);
+exception
+  when others then
+    return jsonb_build_object('current', false);
 end;
 $$;
 
@@ -1417,7 +1859,7 @@ begin
     v_next_state := 'accepted';
     update integration.drs_line_notification_outbox
     set delivery_state = v_next_state, claim_token = null,
-      completed_at = v_now
+      claimed_at = null, completed_at = v_now
     where outbox_id = v_outbox.outbox_id;
   elsif p_input ->> 'outcome' = 'retryable_failure'
     and v_outbox.attempt_count < 5
@@ -1435,10 +1877,13 @@ begin
     v_next_state := 'permanent_failure';
     update integration.drs_line_notification_outbox
     set delivery_state = v_next_state, claim_token = null,
-      completed_at = v_now
+      claimed_at = null, completed_at = v_now
     where outbox_id = v_outbox.outbox_id;
   end if;
 
+  perform drs_private.drs_line_append_case_receipt_v1(
+    v_outbox.outbox_id, v_next_state, p_input ->> 'reason_code', v_now
+  );
   return jsonb_build_object('completed', true, 'state', v_next_state);
 exception
   when unique_violation then
@@ -1460,6 +1905,8 @@ alter function drs_private.drs_line_complete_account_link_v1(jsonb)
   owner to postgres;
 alter function drs_private.drs_line_unlink_account_v1(jsonb)
   owner to postgres;
+alter function drs_private.drs_line_unlink_by_line_identity_v1(jsonb)
+  owner to postgres;
 alter function drs_private.drs_line_claim_webhook_v1(jsonb)
   owner to postgres;
 alter function drs_private.drs_line_complete_webhook_v1(jsonb)
@@ -1468,7 +1915,16 @@ alter function drs_private.drs_line_admit_case_notification_v1(jsonb)
   owner to postgres;
 alter function drs_private.drs_line_claim_notification_v1(jsonb)
   owner to postgres;
+alter function drs_private.drs_line_assert_notification_claim_v1(jsonb)
+  owner to postgres;
 alter function drs_private.drs_line_complete_notification_v1(jsonb)
+  owner to postgres;
+alter function drs_private.drs_line_enqueue_assignment_v1(uuid,text,text)
+  owner to postgres;
+alter function drs_private.drs_line_assignment_producer_v1() owner to postgres;
+alter function drs_private.drs_line_binding_producer_v1() owner to postgres;
+alter function drs_private.drs_line_delivery_fence_v1() owner to postgres;
+alter function drs_private.drs_line_append_case_receipt_v1(uuid,text,text,timestamptz)
   owner to postgres;
 
 revoke all on function drs_private.drs_line_start_link_intent_v1(jsonb)
@@ -1483,6 +1939,8 @@ revoke all on function drs_private.drs_line_complete_account_link_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function drs_private.drs_line_unlink_account_v1(jsonb)
   from public, anon, authenticated;
+revoke all on function drs_private.drs_line_unlink_by_line_identity_v1(jsonb)
+  from public, anon, authenticated;
 revoke all on function drs_private.drs_line_claim_webhook_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function drs_private.drs_line_complete_webhook_v1(jsonb)
@@ -1491,8 +1949,20 @@ revoke all on function drs_private.drs_line_admit_case_notification_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function drs_private.drs_line_claim_notification_v1(jsonb)
   from public, anon, authenticated;
+revoke all on function drs_private.drs_line_assert_notification_claim_v1(jsonb)
+  from public, anon, authenticated;
 revoke all on function drs_private.drs_line_complete_notification_v1(jsonb)
   from public, anon, authenticated;
+revoke all on function drs_private.drs_line_enqueue_assignment_v1(uuid,text,text)
+  from public, anon, authenticated, service_role;
+revoke all on function drs_private.drs_line_assignment_producer_v1()
+  from public, anon, authenticated, service_role;
+revoke all on function drs_private.drs_line_binding_producer_v1()
+  from public, anon, authenticated, service_role;
+revoke all on function drs_private.drs_line_delivery_fence_v1()
+  from public, anon, authenticated, service_role;
+revoke all on function drs_private.drs_line_append_case_receipt_v1(uuid,text,text,timestamptz)
+  from public, anon, authenticated, service_role;
 
 grant execute on function drs_private.drs_line_start_link_intent_v1(jsonb)
   to service_role;
@@ -1506,6 +1976,8 @@ grant execute on function drs_private.drs_line_complete_account_link_v1(jsonb)
   to service_role;
 grant execute on function drs_private.drs_line_unlink_account_v1(jsonb)
   to service_role;
+grant execute on function drs_private.drs_line_unlink_by_line_identity_v1(jsonb)
+  to service_role;
 grant execute on function drs_private.drs_line_claim_webhook_v1(jsonb)
   to service_role;
 grant execute on function drs_private.drs_line_complete_webhook_v1(jsonb)
@@ -1513,6 +1985,8 @@ grant execute on function drs_private.drs_line_complete_webhook_v1(jsonb)
 grant execute on function drs_private.drs_line_admit_case_notification_v1(jsonb)
   to service_role;
 grant execute on function drs_private.drs_line_claim_notification_v1(jsonb)
+  to service_role;
+grant execute on function drs_private.drs_line_assert_notification_claim_v1(jsonb)
   to service_role;
 grant execute on function drs_private.drs_line_complete_notification_v1(jsonb)
   to service_role;
@@ -1538,6 +2012,9 @@ as $$ select drs_private.drs_line_complete_account_link_v1(p_input) $$;
 create or replace function public.drs_line_unlink_account_v1(p_input jsonb)
 returns jsonb language sql security definer set search_path = ''
 as $$ select drs_private.drs_line_unlink_account_v1(p_input) $$;
+create or replace function public.drs_line_unlink_by_line_identity_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_unlink_by_line_identity_v1(p_input) $$;
 create or replace function public.drs_line_claim_webhook_v1(p_input jsonb)
 returns jsonb language sql security definer set search_path = ''
 as $$ select drs_private.drs_line_claim_webhook_v1(p_input) $$;
@@ -1550,6 +2027,9 @@ as $$ select drs_private.drs_line_admit_case_notification_v1(p_input) $$;
 create or replace function public.drs_line_claim_notification_v1(p_input jsonb)
 returns jsonb language sql security definer set search_path = ''
 as $$ select drs_private.drs_line_claim_notification_v1(p_input) $$;
+create or replace function public.drs_line_assert_notification_claim_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_assert_notification_claim_v1(p_input) $$;
 create or replace function public.drs_line_complete_notification_v1(p_input jsonb)
 returns jsonb language sql security definer set search_path = ''
 as $$ select drs_private.drs_line_complete_notification_v1(p_input) $$;
@@ -1560,10 +2040,12 @@ alter function public.drs_line_cancel_link_intent_v1(jsonb) owner to postgres;
 alter function public.drs_line_prepare_nonce_v1(jsonb) owner to postgres;
 alter function public.drs_line_complete_account_link_v1(jsonb) owner to postgres;
 alter function public.drs_line_unlink_account_v1(jsonb) owner to postgres;
+alter function public.drs_line_unlink_by_line_identity_v1(jsonb) owner to postgres;
 alter function public.drs_line_claim_webhook_v1(jsonb) owner to postgres;
 alter function public.drs_line_complete_webhook_v1(jsonb) owner to postgres;
 alter function public.drs_line_admit_case_notification_v1(jsonb) owner to postgres;
 alter function public.drs_line_claim_notification_v1(jsonb) owner to postgres;
+alter function public.drs_line_assert_notification_claim_v1(jsonb) owner to postgres;
 alter function public.drs_line_complete_notification_v1(jsonb) owner to postgres;
 
 revoke all on function public.drs_line_start_link_intent_v1(jsonb)
@@ -1578,6 +2060,8 @@ revoke all on function public.drs_line_complete_account_link_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function public.drs_line_unlink_account_v1(jsonb)
   from public, anon, authenticated;
+revoke all on function public.drs_line_unlink_by_line_identity_v1(jsonb)
+  from public, anon, authenticated;
 revoke all on function public.drs_line_claim_webhook_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function public.drs_line_complete_webhook_v1(jsonb)
@@ -1585,6 +2069,8 @@ revoke all on function public.drs_line_complete_webhook_v1(jsonb)
 revoke all on function public.drs_line_admit_case_notification_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function public.drs_line_claim_notification_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_assert_notification_claim_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function public.drs_line_complete_notification_v1(jsonb)
   from public, anon, authenticated;
@@ -1601,6 +2087,8 @@ grant execute on function public.drs_line_complete_account_link_v1(jsonb)
   to service_role;
 grant execute on function public.drs_line_unlink_account_v1(jsonb)
   to service_role;
+grant execute on function public.drs_line_unlink_by_line_identity_v1(jsonb)
+  to service_role;
 grant execute on function public.drs_line_claim_webhook_v1(jsonb)
   to service_role;
 grant execute on function public.drs_line_complete_webhook_v1(jsonb)
@@ -1608,6 +2096,8 @@ grant execute on function public.drs_line_complete_webhook_v1(jsonb)
 grant execute on function public.drs_line_admit_case_notification_v1(jsonb)
   to service_role;
 grant execute on function public.drs_line_claim_notification_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_assert_notification_claim_v1(jsonb)
   to service_role;
 grant execute on function public.drs_line_complete_notification_v1(jsonb)
   to service_role;

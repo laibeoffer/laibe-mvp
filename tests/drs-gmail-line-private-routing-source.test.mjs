@@ -96,6 +96,18 @@ function textBindingEvent(overrides = {}) {
   };
 }
 
+function textUnlinkEvent(overrides = {}) {
+  return textBindingEvent({
+    webhookEventId: "01HXXXXXXXXXXXXXXXXXXXXXXX",
+    message: {
+      id: "555002",
+      type: "text",
+      text: "解除 LINE 案件通知",
+    },
+    ...overrides,
+  });
+}
+
 test("closed browser contract exposes exactly the twelve approved states", async () => {
   const { LINE_LINK_STATES } = await import(contractsUrl.href);
 
@@ -366,9 +378,10 @@ test("LINE client pins official endpoints and emits only approved request bodies
 
   assert.equal(await client.issueLinkToken(LINE_USER_ID), "one-time-link-value");
   assert.deepEqual(
-    await client.replyAccountLink(
-      REPLY_TOKEN,
+    await client.pushAccountLink(
+      LINE_USER_ID,
       "https://laibe.example/drs/line/continue?protocol=opaque",
+      "00000000-0000-4000-8000-000000000098",
     ),
     { requestId: "req-2" },
   );
@@ -385,13 +398,13 @@ test("LINE client pins official endpoints and emits only approved request bodies
 
   assert.deepEqual(calls.map(({ input }) => input), [
     `https://api.line.me/v2/bot/user/${LINE_USER_ID}/linkToken`,
-    "https://api.line.me/v2/bot/message/reply",
+    "https://api.line.me/v2/bot/message/push",
     "https://api.line.me/v2/bot/message/push",
   ]);
   assert.equal(calls.every(({ init }) => init.method === "POST"), true);
   assert.equal(calls[0].init.body, undefined);
   assert.deepEqual(JSON.parse(calls[1].init.body), {
-    replyToken: REPLY_TOKEN,
+    to: LINE_USER_ID,
     messages: [{
       type: "template",
       altText: "確認綁定 LINE 案件通知",
@@ -406,6 +419,10 @@ test("LINE client pins official endpoints and emits only approved request bodies
       },
     }],
   });
+  assert.equal(
+    calls[1].init.headers["x-line-retry-key"],
+    "00000000-0000-4000-8000-000000000098",
+  );
   assert.deepEqual(JSON.parse(calls[2].init.body), {
     to: LINE_USER_ID,
     messages: [{
@@ -457,6 +474,35 @@ test("LINE client fails closed with sanitized errors and bounded provider respon
       return true;
     },
   );
+});
+
+test("LINE account-link prompt uses one stable push retry key across webhook recovery", async () => {
+  const { createLineClient } = await import(lineClientUrl.href);
+  const calls = [];
+  const retryKey = "00000000-0000-4000-8000-000000000099";
+  const client = createLineClient({
+    accessToken: "not-a-provider-credential",
+    fetch: async (url, init) => {
+      calls.push({ url, init });
+      return new Response("{}", {
+        status: 409,
+        headers: { "x-line-accepted-request-id": "accepted-on-first-attempt" },
+      });
+    },
+  });
+  assert.deepEqual(
+    await client.pushAccountLink(
+      LINE_USER_ID,
+      "https://laibe.example/drs/line-account-link?linkToken=opaque",
+      retryKey,
+    ),
+    { requestId: "accepted-on-first-attempt" },
+  );
+  assert.equal(calls[0].url, "https://api.line.me/v2/bot/message/push");
+  assert.equal(calls[0].init.headers["x-line-retry-key"], retryKey);
+  const body = JSON.parse(calls[0].init.body);
+  assert.equal(body.to, LINE_USER_ID);
+  assert.equal(body.messages[0].template.actions[0].uri.includes("linkToken=opaque"), true);
 });
 
 test("LINE client rejects inherited notification authority before any provider call", async () => {
@@ -821,7 +867,11 @@ test("signed binding action durably claims before issuing the official link toke
     repository: {
       async claimEvent(input) {
         calls.push({ operation: "claim", input });
-        return { admission: "claimed", claimToken: "00000000-0000-4000-8000-000000000099" };
+        return {
+          admission: "claimed",
+          claimToken: "00000000-0000-4000-8000-000000000099",
+          providerRetryKey: "00000000-0000-4000-8000-000000000097",
+        };
       },
       async completeEvent(input) {
         calls.push({ operation: "complete", input });
@@ -834,8 +884,8 @@ test("signed binding action durably claims before issuing the official link toke
         calls.push({ operation: "issue", lineUserId });
         return "provider-link-token";
       },
-      async replyAccountLink(replyToken, linkingUrl) {
-        calls.push({ operation: "reply", replyToken, linkingUrl });
+      async pushAccountLink(lineUserId, linkingUrl, retryKey) {
+        calls.push({ operation: "push-link", lineUserId, linkingUrl, retryKey });
         return { requestId: "safe-request-id" };
       },
       async pushCaseNotification() { throw new Error("not used"); },
@@ -848,7 +898,7 @@ test("signed binding action durably claims before issuing the official link toke
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {});
   assert.deepEqual(calls.map(({ operation }) => operation), [
-    "claim", "issue", "reply", "complete",
+    "claim", "issue", "push-link", "complete",
   ]);
   assert.match(calls[0].input.webhookEventDigest, /^[A-Za-z0-9_-]{43}$/u);
   assert.equal(JSON.stringify(calls[0]).includes(WEBHOOK_EVENT_ID), false);
@@ -856,6 +906,8 @@ test("signed binding action durably claims before issuing the official link toke
   assert.equal(link.origin, "https://laibe.example");
   assert.equal(link.pathname, "/drs/line-account-link");
   assert.equal(link.searchParams.get("linkToken"), "provider-link-token");
+  assert.equal(calls[2].lineUserId, LINE_USER_ID);
+  assert.equal(calls[2].retryKey, "00000000-0000-4000-8000-000000000097");
   assert.equal(calls[3].input.safeOutcome, "link_token_replied");
 });
 
@@ -915,7 +967,11 @@ test("signed accountLink stores only digests and an encrypted private LINE ident
     publicOrigin: "https://laibe.example",
     repository: {
       async claimEvent() {
-        return { admission: "claimed", claimToken: "00000000-0000-4000-8000-000000000099" };
+        return {
+          admission: "claimed",
+          claimToken: "00000000-0000-4000-8000-000000000099",
+          providerRetryKey: "00000000-0000-4000-8000-000000000097",
+        };
       },
       async completeEvent(input) {
         completed.push({ operation: "event", input });
@@ -952,6 +1008,64 @@ test("signed accountLink stores only digests and an encrypted private LINE ident
   assert.equal(serialized.includes(rawNonce), false);
   assert.equal(serialized.includes(LINE_USER_ID), false);
   assert.equal(completed.at(-1).input.safeOutcome, "linked");
+});
+
+test("signed private LINE unlink revokes only its own binding and confirms idempotently", async () => {
+  const { createLineWebhookHandler } = await import(lineWebhookUrl.href);
+  const secret = "unit-test-channel-secret";
+  const calls = [];
+  const handler = createLineWebhookHandler({
+    channelSecret: secret,
+    identityHmacKey: "unit-test-identity-hmac-key",
+    identityEncryptionKey: await testEncryptionKey(),
+    identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
+    repository: {
+      async claimEvent(input) {
+        calls.push({ operation: "claim", input });
+        return {
+          admission: "claimed",
+          claimToken: "00000000-0000-4000-8000-000000000099",
+          providerRetryKey: "00000000-0000-4000-8000-000000000097",
+        };
+      },
+      async unlinkByLineIdentity(input) {
+        calls.push({ operation: "unlink", input });
+        return {
+          state: "revoked",
+          revoked_at: "2026-08-31T12:00:00.000Z",
+          next_action: "relink",
+        };
+      },
+      async completeEvent(input) {
+        calls.push({ operation: "complete", input });
+        return { completed: true, safeOutcome: input.safeOutcome };
+      },
+      async completeAccountLink() { throw new Error("not used"); },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("not used"); },
+      async pushUnlinkConfirmation(lineUserId, retryKey) {
+        calls.push({ operation: "confirm", lineUserId, retryKey });
+        return { requestId: "safe-request-id" };
+      },
+      async pushCaseNotification() { throw new Error("not used"); },
+    },
+  });
+  const response = await handler(await webhookRequest({
+    destination: LINE_USER_ID,
+    events: [textUnlinkEvent()],
+  }, secret));
+  assert.equal(response.status, 200);
+  assert.deepEqual(calls.map(({ operation }) => operation), [
+    "claim", "unlink", "confirm", "complete",
+  ]);
+  assert.equal(calls[0].input.eventKind, "unlink_action");
+  assert.match(calls[1].input.lineUserDigest, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(JSON.stringify(calls[1]).includes(LINE_USER_ID), false);
+  assert.equal(calls[2].lineUserId, LINE_USER_ID);
+  assert.equal(calls[2].retryKey, "00000000-0000-4000-8000-000000000097");
+  assert.equal(calls[3].input.safeOutcome, "revoked");
 });
 
 test("completed redelivery is idempotent and retryable storage failure is non-2xx", async () => {
@@ -1021,7 +1135,7 @@ async function encryptedLineClaim(overrides = {}) {
       caseLabel: "案件 DRS-042",
       caseStatus: "等待一般審查員確認",
       nextAction: "請開啟 DRS 收件匣檢視",
-      caseUrl: "https://laibe.example/drs/cases/current",
+      casePath: "/pcm/console/case?caseId=00000000-0000-4000-8000-000000000003",
       ...overrides,
     },
   };
@@ -1036,6 +1150,10 @@ test("private dispatcher decrypts only a claimed current binding and appends acc
   const dispatcher = createPrivateNotificationDispatcher({
     repository: {
       async claimNext() { calls.push({ operation: "claim" }); return claim; },
+      async assertCurrent(input) {
+        calls.push({ operation: "assert", input });
+        return { current: true };
+      },
       async complete(input) {
         calls.push({ operation: "complete", input });
         return { completed: true, state: "accepted" };
@@ -1051,6 +1169,7 @@ test("private dispatcher decrypts only a claimed current binding and appends acc
     },
     identityEncryptionKey: key,
     identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
     clock: (() => {
       const values = [1000, 1354];
       return () => values.shift() ?? 1354;
@@ -1058,20 +1177,24 @@ test("private dispatcher decrypts only a claimed current binding and appends acc
   });
   assert.deepEqual(await dispatcher(), { state: "accepted" });
   assert.deepEqual(calls.map(({ operation }) => operation), [
-    "claim", "push", "complete",
+    "claim", "assert", "push", "complete",
   ]);
-  assert.equal(calls[1].lineUserId, LINE_USER_ID);
-  assert.equal(calls[1].retryKey, claim.outboxId);
-  assert.deepEqual(calls[1].message, {
+  assert.deepEqual(calls[1].input, {
+    outboxId: claim.outboxId,
+    claimToken: claim.claimToken,
+  });
+  assert.equal(calls[2].lineUserId, LINE_USER_ID);
+  assert.equal(calls[2].retryKey, claim.outboxId);
+  assert.deepEqual(calls[2].message, {
     caseLabel: claim.caseLabel,
     caseStatus: claim.caseStatus,
     nextAction: claim.nextAction,
-    caseUrl: claim.caseUrl,
+    caseUrl: `https://laibe.example${claim.casePath}`,
   });
-  assert.equal(calls[2].input.outcome, "accepted");
-  assert.equal(calls[2].input.httpStatusClass, "2xx");
-  assert.equal(calls[2].input.durationMs, 354);
-  assert.equal(JSON.stringify(calls[2]).includes(LINE_USER_ID), false);
+  assert.equal(calls[3].input.outcome, "accepted");
+  assert.equal(calls[3].input.httpStatusClass, "2xx");
+  assert.equal(calls[3].input.durationMs, 354);
+  assert.equal(JSON.stringify(calls[3]).includes(LINE_USER_ID), false);
 });
 
 test("dispatcher never sends after key-version mismatch and bounds provider retries", async () => {
@@ -1097,6 +1220,7 @@ test("dispatcher never sends after key-version mismatch and bounds provider retr
     },
     identityEncryptionKey: key,
     identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
   });
   assert.deepEqual(await mismatch(), { state: "permanent_failure" });
   assert.equal(pushes, 0);
@@ -1105,6 +1229,7 @@ test("dispatcher never sends after key-version mismatch and bounds provider retr
   const retrying = createPrivateNotificationDispatcher({
     repository: {
       async claimNext() { return claim; },
+      async assertCurrent() { return { current: true }; },
       async complete(input) {
         completions.push(input);
         return { completed: true, state: "retry" };
@@ -1119,10 +1244,37 @@ test("dispatcher never sends after key-version mismatch and bounds provider retr
     },
     identityEncryptionKey: key,
     identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
   });
   assert.deepEqual(await retrying(), { state: "retry" });
   assert.equal(completions.at(-1).outcome, "retryable_failure");
   assert.equal(completions.at(-1).retryAfterSeconds, 60);
+});
+
+test("dispatcher leaves a non-current claim for durable recovery and never sends", async () => {
+  const { createPrivateNotificationDispatcher } = await import(
+    lineNotificationUrl.href
+  );
+  const { key, claim } = await encryptedLineClaim();
+  let pushes = 0;
+  let completions = 0;
+  const dispatcher = createPrivateNotificationDispatcher({
+    repository: {
+      async claimNext() { return claim; },
+      async assertCurrent() { return { current: false }; },
+      async complete() { completions += 1; return { completed: false }; },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("not used"); },
+      async pushCaseNotification() { pushes += 1; return { requestId: null }; },
+    },
+    identityEncryptionKey: key,
+    identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
+  });
+  await assert.rejects(() => dispatcher(), /notification_claim_not_current/u);
+  assert.equal(pushes, 0);
+  assert.equal(completions, 0);
 });
 
 test("service-only dispatch endpoint has an exact empty request contract", async () => {

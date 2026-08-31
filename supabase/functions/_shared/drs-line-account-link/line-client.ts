@@ -35,9 +35,14 @@ export class LineProviderError extends Error {
 
 export type LineClient = Readonly<{
   issueLinkToken(lineUserId: string): Promise<string>;
-  replyAccountLink(
-    replyToken: string,
+  pushAccountLink(
+    lineUserId: string,
     linkingUrl: string,
+    retryKey: string,
+  ): Promise<Readonly<{ requestId: string | null }>>;
+  pushUnlinkConfirmation(
+    lineUserId: string,
+    retryKey: string,
   ): Promise<Readonly<{ requestId: string | null }>>;
   pushCaseNotification(
     lineUserId: string,
@@ -53,7 +58,15 @@ export type LineClientDependencies = Readonly<{
 
 function isSafeText(value: unknown, minimum: number, maximum: number): value is string {
   return typeof value === "string" && value.length >= minimum &&
-    value.length <= maximum && !/[\u0000-\u001f\u007f]/u.test(value);
+    value.length <= maximum && !hasAsciiControl(value);
+}
+
+function hasAsciiControl(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 31 || code === 127) return true;
+  }
+  return false;
 }
 
 function isSafeHttpsUrl(value: unknown, maximum = 1024): value is string {
@@ -71,6 +84,11 @@ function isSafeHttpsUrl(value: unknown, maximum = 1024): value is string {
 
 function safeRequestId(response: Response): string | null {
   const value = response.headers.get("x-line-request-id");
+  return value && /^[A-Za-z0-9._:-]{1,128}$/u.test(value) ? value : null;
+}
+
+function safeAcceptedRequestId(response: Response): string | null {
+  const value = response.headers.get("x-line-accepted-request-id");
   return value && /^[A-Za-z0-9._:-]{1,128}$/u.test(value) ? value : null;
 }
 
@@ -152,6 +170,7 @@ export function createLineClient(
     path: string,
     body?: unknown,
     additionalHeaders?: Readonly<Record<string, string>>,
+    acceptRetryConflict = false,
   ): Promise<Readonly<{ payload: unknown; requestId: string | null }>> {
     let response: Response;
     try {
@@ -169,6 +188,12 @@ export function createLineClient(
     } catch {
       throw new LineProviderError("provider_unavailable");
     }
+    if (response.status === 409 && acceptRetryConflict) {
+      const acceptedRequestId = safeAcceptedRequestId(response);
+      await response.body?.cancel().catch(() => undefined);
+      if (acceptedRequestId === null) throw failureForStatus(response.status);
+      return Object.freeze({ payload: {}, requestId: acceptedRequestId });
+    }
     if (!response.ok) throw failureForStatus(response.status);
     const payload = await boundedJson(response);
     return Object.freeze({ payload, requestId: safeRequestId(response) });
@@ -185,15 +210,17 @@ export function createLineClient(
       return linkToken;
     },
 
-    async replyAccountLink(
-      replyToken: string,
+    async pushAccountLink(
+      lineUserId: string,
       linkingUrl: string,
+      retryKey: string,
     ): Promise<Readonly<{ requestId: string | null }>> {
-      if (!isSafeText(replyToken, 1, 256) || !isSafeHttpsUrl(linkingUrl)) {
-        throw new LineProviderError("provider_invalid_request");
-      }
-      const result = await request("/v2/bot/message/reply", {
-        replyToken,
+      if (
+        !LINE_USER_ID_PATTERN.test(lineUserId) ||
+        !isSafeHttpsUrl(linkingUrl) || !UUID_PATTERN.test(retryKey)
+      ) throw new LineProviderError("provider_invalid_request");
+      const result = await request("/v2/bot/message/push", {
+        to: lineUserId,
         messages: [{
           type: "template",
           altText: "確認綁定 LINE 案件通知",
@@ -207,7 +234,27 @@ export function createLineClient(
             }],
           },
         }],
-      });
+      }, { "x-line-retry-key": retryKey }, true);
+      if (!exactEmptyObject(result.payload)) {
+        throw new LineProviderError("provider_invalid_response");
+      }
+      return Object.freeze({ requestId: result.requestId });
+    },
+
+    async pushUnlinkConfirmation(
+      lineUserId: string,
+      retryKey: string,
+    ): Promise<Readonly<{ requestId: string | null }>> {
+      if (!LINE_USER_ID_PATTERN.test(lineUserId) || !UUID_PATTERN.test(retryKey)) {
+        throw new LineProviderError("provider_invalid_request");
+      }
+      const result = await request("/v2/bot/message/push", {
+        to: lineUserId,
+        messages: [{
+          type: "text",
+          text: "LINE 案件通知已解除。Gmail 登入與 DRS 身分不受影響。",
+        }],
+      }, { "x-line-retry-key": retryKey }, true);
       if (!exactEmptyObject(result.payload)) {
         throw new LineProviderError("provider_invalid_response");
       }

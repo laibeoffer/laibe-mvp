@@ -27,7 +27,15 @@ function projectAuthority(
 
 function validLinkToken(value: string): boolean {
   return typeof value === "string" && value.length >= 1 && value.length <= 512 &&
-    !/[\u0000-\u0020\u007f]/u.test(value);
+    !hasUnsafeAscii(value, true);
+}
+
+function hasUnsafeAscii(value: string, rejectSpace: boolean): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= (rejectSpace ? 32 : 31) || code === 127) return true;
+  }
+  return false;
 }
 
 export function createLineAccountLinkService(options: ServiceOptions) {

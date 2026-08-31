@@ -17,16 +17,22 @@ type SafeWebhookOutcome =
   | "conflict_drs_already_bound"
   | "ignored"
   | "failed"
+  | "not_linked"
+  | "revoked"
   | "temporarily_unavailable";
 
 type WebhookClaim =
-  | Readonly<{ admission: "claimed"; claimToken: string }>
+  | Readonly<{
+    admission: "claimed";
+    claimToken: string;
+    providerRetryKey: string;
+  }>
   | Readonly<{ admission: "already_completed"; safeOutcome: SafeWebhookOutcome }>
   | Readonly<{ admission: "in_progress" | "rejected" | "temporarily_unavailable" }>;
 
 type ClaimInput = Readonly<{
   webhookEventDigest: string;
-  eventKind: "binding_action" | "account_link";
+  eventKind: "binding_action" | "unlink_action" | "account_link";
 }>;
 
 type CompletionInput = Readonly<{
@@ -43,10 +49,15 @@ type CompleteAccountLinkInput = Readonly<{
   encryptionKeyVersion: string;
 }>;
 
+type UnlinkByLineIdentityInput = Readonly<{
+  lineUserDigest: string;
+}>;
+
 export interface LineWebhookRepository {
   claimEvent(input: ClaimInput): Promise<WebhookClaim>;
   completeEvent(input: CompletionInput): Promise<unknown>;
   completeAccountLink(input: CompleteAccountLinkInput): Promise<unknown>;
+  unlinkByLineIdentity(input: UnlinkByLineIdentityInput): Promise<unknown>;
 }
 
 export type LineWebhookDependencies = Readonly<{
@@ -160,11 +171,28 @@ async function processEvent(
     const linkToken = await dependencies.lineClient.issueLinkToken(event.lineUserId);
     const linkingUrl = new URL("/drs/line-account-link", dependencies.publicOrigin);
     linkingUrl.searchParams.set("linkToken", linkToken);
-    await dependencies.lineClient.replyAccountLink(
-      event.replyToken,
+    await dependencies.lineClient.pushAccountLink(
+      event.lineUserId,
       linkingUrl.toString(),
+      claim.providerRetryKey,
     );
     outcome = "link_token_replied";
+  } else if (event.kind === "unlink_action") {
+    const lineUserDigest = await hmacIdentityDigest(
+      dependencies.identityHmacKey,
+      `laibe.drs-line-account-link.line-user.v1:${event.lineUserId}`,
+    );
+    const status = sanitizeLineLinkStatus(
+      await dependencies.repository.unlinkByLineIdentity({ lineUserDigest }),
+    );
+    if (status.state !== "revoked" && status.state !== "not_linked") {
+      throw new Error("account_unlink_not_completed");
+    }
+    await dependencies.lineClient.pushUnlinkConfirmation(
+      event.lineUserId,
+      claim.providerRetryKey,
+    );
+    outcome = status.state;
   } else if (event.result === "failed") {
     outcome = "failed";
   } else {
@@ -256,8 +284,15 @@ function createSupabaseWebhookRepository(
         event_kind: input.eventKind,
       });
       const admission = result.admission;
-      if (admission === "claimed" && typeof result.claim_token === "string") {
-        return Object.freeze({ admission, claimToken: result.claim_token });
+      if (
+        admission === "claimed" && typeof result.claim_token === "string" &&
+        typeof result.provider_retry_key === "string"
+      ) {
+        return Object.freeze({
+          admission,
+          claimToken: result.claim_token,
+          providerRetryKey: result.provider_retry_key,
+        });
       }
       if (
         admission === "already_completed" &&
@@ -288,6 +323,12 @@ function createSupabaseWebhookRepository(
         line_user_ciphertext: input.lineUserCiphertext,
         line_user_iv: input.lineUserIv,
         encryption_key_version: input.encryptionKeyVersion,
+      });
+    },
+    async unlinkByLineIdentity(input: UnlinkByLineIdentityInput) {
+      return await invoke("drs_line_unlink_by_line_identity_v1", {
+        provider_channel_id: providerChannelId,
+        line_user_digest: input.lineUserDigest,
       });
     },
   });

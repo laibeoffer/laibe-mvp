@@ -78,7 +78,7 @@ The LINE channel has one canonical webhook. During source construction and revie
 3. The response contains only a sanitized pending state, expiry, next action, and the public laibe Official Account launch URL.
 4. The reviewer opens the laibe private chat and selects the exact binding action.
 5. The signed LINE event supplies the provider-owned LINE user identity to the canonical webhook.
-6. The webhook requests a one-time `linkToken` for that LINE user and replies with the official linking URL.
+6. The webhook requests a one-time `linkToken` and sends the official linking URL by private push with a durable provider retry key. A crash and LINE redelivery reuse that key, so an already accepted visible prompt is not duplicated.
 7. The user opens the link. The continuation page requires the existing Gmail-backed DRS session; when absent, it resumes only the existing Gmail authentication flow.
 8. The continuation service resolves the active specialist again, generates a cryptographically random single-use nonce, stores only the nonce digest with the pending intent, and redirects to LINE's official account-link endpoint.
 9. LINE sends a signed `accountLink` webhook event containing the result, LINE user identity, and nonce.
@@ -137,7 +137,7 @@ Content-Type: application/json
 {}
 ```
 
-Unlink is an independent operation. It must remain available to an authenticated owner of the binding even when the specialist is no longer eligible to start a new binding. Unlink revokes the active relation and stops new LINE notifications without deleting historical audits or receipts.
+Unlink is an independent operation. An active Gmail-backed DRS session may use this BFF. When no current-case session exists, the owner may send the exact private message `解除 LINE 案件通知` from the already-bound LINE identity. The signed webhook can revoke only the matching provider-channel/LINE-identity binding; it cannot authenticate, grant a case, or change a role. Both paths stop new notifications without deleting historical audits or receipts.
 
 ## 8. Browser state contract
 
@@ -189,7 +189,7 @@ Append-only identity-level events: start, link-token-issued, linked, conflict, e
 
 ### `integration.drs_line_webhook_events`
 
-Stores a durable digest of `webhookEventId`, event kind, first-seen time, completion state, and safe outcome. A unique key makes signed LINE redelivery idempotent.
+Stores a durable digest of `webhookEventId`, event kind, first-seen time, stable provider retry key, completion state, and safe outcome. The unique event key plus stable provider retry key make signed LINE redelivery and crash recovery idempotent at the visible push boundary.
 
 ### `integration.drs_line_notification_outbox`
 
@@ -204,10 +204,10 @@ Identity encryption and deterministic lookup use separate server-only secrets wi
 ## 10. Private case-notification flow
 
 1. DRS accepts a case assignment using existing server authority.
-2. The same database transaction, or an authority-bound database operation invoked immediately after it, creates one outbox record keyed by assignment and notification-template version.
+2. Database triggers on assignment creation and active-binding creation invoke one server-derived producer. It creates one outbox record keyed by assignment, binding version, and notification-template version; the caller cannot provide message text, case URL, role, or specialist identity.
 3. The dispatcher re-resolves the active case, assignment, specialist, and current binding version immediately before sending.
 4. The dispatcher decrypts the LINE destination only inside the server process, constructs the minimum notification, and calls the LINE push endpoint.
-5. It appends a delivery receipt and a DRS case audit event describing whether the reviewer was notified.
+5. It appends a delivery receipt and a `PRIVATE_LINE_NOTIFICATION` DRS case audit event describing whether the reviewer was notified.
 6. Retryable failure schedules a bounded retry using the same idempotency key. Permanent failure stops retries and leaves a clear DRS inbox state.
 
 The private LINE message contains only:
