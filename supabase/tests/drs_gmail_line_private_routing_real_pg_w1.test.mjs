@@ -17,9 +17,9 @@ const approvedDockerExecutable = String
 const approvedDockerExecutableBytes = 43_247_024;
 const approvedDockerExecutableSha256 =
   "0f97bc1111f59d859766ba938691ee07ed4e58d5fdaeb6f4dfb10a5ef5394753";
-const approvedLineMigrationBytes = 81_400;
+const approvedLineMigrationBytes = 84_866;
 const approvedLineMigrationSha256 =
-  "a4c7c5885b98c03236b938c89940a1dfd1ebb34824963a22f3b4c878b6038cc5";
+  "b600b481762031755e58b35085759504f20557df5bb6d0fbf016b79a3ca81d9c";
 const approvedSystemRoot = String.raw`C:\WINDOWS`;
 const localDockerHost = "npipe:////./pipe/docker_engine";
 const fixedImage = "public.ecr.aws/supabase/postgres:17.6.1.165";
@@ -212,6 +212,29 @@ async function callJson(containerName, functionName, input) {
     containerName,
     `select drs_private.${functionName}(${jsonSql(input)});`,
   );
+}
+
+function assertNoNotificationPayloadOrDestination(value) {
+  for (
+    const key of [
+      "outbox_id",
+      "claim_token",
+      "binding_version",
+      "line_user_ciphertext",
+      "line_user_iv",
+      "encryption_key_version",
+      "case_label",
+      "case_status",
+      "next_action",
+      "case_path",
+    ]
+  ) {
+    assert.equal(
+      Object.hasOwn(value, key),
+      false,
+      `stale authority response must not expose ${key}`,
+    );
+  }
 }
 
 const authIdentityPrerequisiteSql = `
@@ -740,6 +763,200 @@ Deno.test({
         /DRS_LINE_APPEND_ONLY/u,
       );
 
+      await runPsql(
+        containerName,
+        `insert into integration.drs_line_notification_outbox(
+          case_id, assignment_id, specialist_id, auth_binding_id,
+          binding_id, binding_version, provider_channel_id, template_version,
+          idempotency_key, case_label, case_status, next_action, case_path,
+          delivery_state, attempt_count, next_attempt_at, created_at
+        )
+        select case_id, assignment_id, specialist_id, auth_binding_id,
+          binding_id, binding_version, provider_channel_id, 'auth-rotation-v1',
+          'auth-rotation-before-claim-v1', case_label, case_status,
+          next_action, case_path, 'pending', 0, clock_timestamp(),
+          clock_timestamp()
+        from integration.drs_line_notification_outbox
+        where template_version = 'assignment-v1';`,
+      );
+      await runPsql(
+        containerName,
+        `create function public.drs_line_test_reject_auth_suppression_audit()
+          returns trigger language plpgsql as $$
+          begin
+            if new.event_type = 'PRIVATE_LINE_NOTIFICATION' then
+              raise exception 'TEST_AUTH_SUPPRESSION_AUDIT_BLOCK';
+            end if;
+            return new;
+          end;
+          $$;
+          create trigger drs_line_test_reject_auth_suppression_audit
+            before insert on public.drs_case_audit_events
+            for each row execute function
+              public.drs_line_test_reject_auth_suppression_audit();`,
+      );
+      await assertPsqlFailure(
+        containerName,
+        `update integration.drs_auth_specialist_bindings
+         set updated_at = clock_timestamp() + interval '1 second'
+         where binding_id = '${ids.authBinding}';`,
+        /TEST_AUTH_SUPPRESSION_AUDIT_BLOCK/u,
+      );
+      const atomicSuppressionRollback = await queryJson(
+        containerName,
+        `select jsonb_build_object(
+          'state', outbox.delivery_state,
+          'receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            where receipt.outbox_id = outbox.outbox_id
+          ),
+          'audits', (
+            select count(*) from public.drs_case_audit_events audit
+            where audit.event_type = 'PRIVATE_LINE_NOTIFICATION'
+              and audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+          )
+        )
+        from integration.drs_line_notification_outbox outbox
+        where template_version = 'auth-rotation-v1';`,
+      );
+      assert.deepEqual(atomicSuppressionRollback, {
+        state: "pending",
+        receipts: 0,
+        audits: 0,
+      });
+      await runPsql(
+        containerName,
+        `drop trigger drs_line_test_reject_auth_suppression_audit
+           on public.drs_case_audit_events;
+         drop function public.drs_line_test_reject_auth_suppression_audit();
+         update integration.drs_auth_specialist_bindings
+         set updated_at = clock_timestamp() + interval '1 second'
+         where binding_id = '${ids.authBinding}';`,
+      );
+      const rotatedBeforeFirstClaim = await queryJson(
+        containerName,
+        `select jsonb_build_object(
+          'state', outbox.delivery_state,
+          'claim_token', outbox.claim_token::text,
+          'receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            where receipt.outbox_id = outbox.outbox_id
+          ),
+          'audits', (
+            select count(*) from public.drs_case_audit_events audit
+            where audit.event_type = 'PRIVATE_LINE_NOTIFICATION'
+              and audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+          )
+        )
+        from integration.drs_line_notification_outbox outbox
+        where template_version = 'auth-rotation-v1';`,
+      );
+      assert.deepEqual(rotatedBeforeFirstClaim, {
+        state: "suppressed",
+        claim_token: null,
+        receipts: 1,
+        audits: 1,
+      });
+      await runPsql(
+        containerName,
+        `update integration.drs_auth_specialist_bindings
+         set updated_at = updated_at + interval '1 second'
+         where binding_id = '${ids.authBinding}';`,
+      );
+      const rotationRepeatFacts = await queryJson(
+        containerName,
+        `select jsonb_build_object(
+          'receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            join integration.drs_line_notification_outbox outbox
+              on outbox.outbox_id = receipt.outbox_id
+            where outbox.template_version = 'auth-rotation-v1'
+          ),
+          'audits', (
+            select count(*) from public.drs_case_audit_events audit
+            join integration.drs_line_notification_outbox outbox
+              on audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+            where outbox.template_version = 'auth-rotation-v1'
+          )
+        );`,
+      );
+      assert.deepEqual(rotationRepeatFacts, { receipts: 1, audits: 1 });
+
+      await runPsql(
+        containerName,
+        `update integration.drs_auth_specialist_bindings
+         set valid_until = clock_timestamp() + interval '1 second',
+           updated_at = clock_timestamp()
+         where binding_id = '${ids.authBinding}';
+
+         insert into integration.drs_line_notification_outbox(
+           case_id, assignment_id, specialist_id, auth_binding_id,
+           binding_id, binding_version, provider_channel_id, template_version,
+           idempotency_key, case_label, case_status, next_action, case_path,
+           delivery_state, attempt_count, next_attempt_at, created_at
+         )
+         select case_id, assignment_id, specialist_id, auth_binding_id,
+           binding_id, binding_version, provider_channel_id, 'auth-expiry-v1',
+           'auth-expiry-before-claim-v1', case_label, case_status,
+           next_action, case_path, 'pending', 0, clock_timestamp(),
+           clock_timestamp()
+         from integration.drs_line_notification_outbox
+         where template_version = 'assignment-v1';`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+      const expiredBeforeFirstClaim = await callJson(
+        containerName,
+        "drs_line_claim_notification_v1",
+        {},
+      );
+      assert.deepEqual(expiredBeforeFirstClaim, {
+        admitted: false,
+        state: "suppressed_authority",
+        assignment_status: "not_current",
+      });
+      assertNoNotificationPayloadOrDestination(expiredBeforeFirstClaim);
+      const expiryFacts = await queryJson(
+        containerName,
+        `select jsonb_build_object(
+          'state', outbox.delivery_state,
+          'claim_token', outbox.claim_token::text,
+          'receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            where receipt.outbox_id = outbox.outbox_id
+          ),
+          'audits', (
+            select count(*) from public.drs_case_audit_events audit
+            where audit.event_type = 'PRIVATE_LINE_NOTIFICATION'
+              and audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+          )
+        )
+        from integration.drs_line_notification_outbox outbox
+        where template_version = 'auth-expiry-v1';`,
+      );
+      assert.deepEqual(expiryFacts, {
+        state: "suppressed",
+        claim_token: null,
+        receipts: 1,
+        audits: 1,
+      });
+      const repeatedAfterExpirySuppression = await callJson(
+        containerName,
+        "drs_line_claim_notification_v1",
+        {},
+      );
+      assert.deepEqual(repeatedAfterExpirySuppression, {
+        admitted: false,
+        state: "empty",
+      });
+      assertNoNotificationPayloadOrDestination(repeatedAfterExpirySuppression);
+      await runPsql(
+        containerName,
+        `update integration.drs_auth_specialist_bindings
+         set valid_until = clock_timestamp() + interval '1 day',
+           updated_at = clock_timestamp()
+         where binding_id = '${ids.authBinding}';`,
+      );
+
       const secondAdmission = await callJson(
         containerName,
         "drs_line_admit_case_notification_v1",
@@ -767,8 +984,149 @@ Deno.test({
       assert.deepEqual(unlinkFacts, {
         binding_state: "revoked",
         suppressed_pending: 1,
-        receipt_count: 1,
+        receipt_count: 3,
       });
+
+      await runPsql(
+        containerName,
+        `insert into integration.drs_line_notification_outbox(
+          case_id, assignment_id, specialist_id, auth_binding_id,
+          binding_id, binding_version, provider_channel_id, template_version, idempotency_key,
+          case_label, case_status, next_action, case_path,
+          delivery_state, attempt_count, next_attempt_at, created_at
+        )
+        select case_id, assignment_id, specialist_id, auth_binding_id,
+          binding_id, binding_version, provider_channel_id, 'auth-revoke-v1',
+          'auth-revoke-before-claim-v1', case_label, case_status,
+          next_action, case_path, 'pending', 0, clock_timestamp(),
+          clock_timestamp()
+        from integration.drs_line_notification_outbox
+        where template_version = 'assignment-v1';
+
+        insert into integration.drs_line_notification_outbox(
+          case_id, assignment_id, specialist_id, auth_binding_id,
+          binding_id, binding_version, provider_channel_id, template_version, idempotency_key,
+          case_label, case_status, next_action, case_path,
+          delivery_state, attempt_count, next_attempt_at, created_at
+        )
+        select case_id, assignment_id, specialist_id, auth_binding_id,
+          binding_id, binding_version, provider_channel_id, 'auth-retry-v1',
+          'auth-revoke-before-retry-v1', case_label, case_status,
+          next_action, case_path, 'retry', 1,
+          clock_timestamp() + interval '5 minutes', clock_timestamp()
+        from integration.drs_line_notification_outbox
+        where template_version = 'assignment-v1';
+
+        insert into integration.drs_line_delivery_receipts(
+          outbox_id, case_id, specialist_id, attempt_number, outcome,
+          http_status_class, provider_request_id, reason_code, duration_ms,
+          attempted_at
+        )
+        select outbox_id, case_id, specialist_id, 1, 'retryable_failure',
+          '5xx', null, 'provider_retry_scheduled', 0, clock_timestamp()
+        from integration.drs_line_notification_outbox
+        where template_version = 'auth-retry-v1';
+
+        select drs_private.drs_line_append_case_receipt_v1(
+          outbox_id, 'retry', 'provider_retry_scheduled', clock_timestamp()
+        )
+        from integration.drs_line_notification_outbox
+        where template_version = 'auth-retry-v1';
+
+        update integration.drs_auth_specialist_bindings
+        set binding_status = 'revoked', revoked_at = clock_timestamp(),
+          updated_at = clock_timestamp()
+        where binding_id = '${ids.authBinding}';`,
+      );
+      const revokedBeforeClaimOrRetry = await queryJson(
+        containerName,
+        `select jsonb_build_object(
+          'pending_state', (
+            select delivery_state from integration.drs_line_notification_outbox
+            where template_version = 'auth-revoke-v1'
+          ),
+          'pending_claim_token', (
+            select claim_token::text from integration.drs_line_notification_outbox
+            where template_version = 'auth-revoke-v1'
+          ),
+          'pending_receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            join integration.drs_line_notification_outbox outbox
+              on outbox.outbox_id = receipt.outbox_id
+            where outbox.template_version = 'auth-revoke-v1'
+          ),
+          'pending_audits', (
+            select count(*) from public.drs_case_audit_events audit
+            join integration.drs_line_notification_outbox outbox
+              on audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+            where outbox.template_version = 'auth-revoke-v1'
+          ),
+          'retry_state', (
+            select delivery_state from integration.drs_line_notification_outbox
+            where template_version = 'auth-retry-v1'
+          ),
+          'retry_claim_token', (
+            select claim_token::text from integration.drs_line_notification_outbox
+            where template_version = 'auth-retry-v1'
+          ),
+          'retry_receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            join integration.drs_line_notification_outbox outbox
+              on outbox.outbox_id = receipt.outbox_id
+            where outbox.template_version = 'auth-retry-v1'
+          ),
+          'retry_audits', (
+            select count(*) from public.drs_case_audit_events audit
+            join integration.drs_line_notification_outbox outbox
+              on audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+            where outbox.template_version = 'auth-retry-v1'
+          )
+        );`,
+      );
+      assert.deepEqual(revokedBeforeClaimOrRetry, {
+        pending_state: "suppressed",
+        pending_claim_token: null,
+        pending_receipts: 1,
+        pending_audits: 1,
+        retry_state: "suppressed",
+        retry_claim_token: null,
+        retry_receipts: 2,
+        retry_audits: 2,
+      });
+      const repeatedAfterRevokeSuppression = await callJson(
+        containerName,
+        "drs_line_claim_notification_v1",
+        {},
+      );
+      assert.deepEqual(repeatedAfterRevokeSuppression, {
+        admitted: false,
+        state: "empty",
+      });
+      assertNoNotificationPayloadOrDestination(repeatedAfterRevokeSuppression);
+      await runPsql(
+        containerName,
+        `update integration.drs_auth_specialist_bindings
+         set updated_at = updated_at + interval '1 second'
+         where binding_id = '${ids.authBinding}';`,
+      );
+      const repeatedSuppressionFacts = await queryJson(
+        containerName,
+        `select jsonb_build_object(
+          'receipts', (
+            select count(*) from integration.drs_line_delivery_receipts receipt
+            join integration.drs_line_notification_outbox outbox
+              on outbox.outbox_id = receipt.outbox_id
+            where outbox.template_version in ('auth-revoke-v1', 'auth-retry-v1')
+          ),
+          'audits', (
+            select count(*) from public.drs_case_audit_events audit
+            join integration.drs_line_notification_outbox outbox
+              on audit.payload ->> 'outbox_id' = outbox.outbox_id::text
+            where outbox.template_version in ('auth-revoke-v1', 'auth-retry-v1')
+          )
+        );`,
+      );
+      assert.deepEqual(repeatedSuppressionFacts, { receipts: 3, audits: 3 });
     } finally {
       if (created) {
         await runDockerRequired(["rm", "--force", containerName]);

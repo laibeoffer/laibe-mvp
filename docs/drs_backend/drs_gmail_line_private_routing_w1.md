@@ -11,7 +11,9 @@
 
 本功能不使用 LINE Login、LIFF、LINE 群組、密碼登入、群組案件分流、金流託管或任何老屋投資功能。
 
-## 使用者流程
+## 預期部署流程與目前證據界線
+
+以下描述的是 source contract 預期的部署後流程。除「本候選目前證據邊界」明列的 local source／disposable PostgreSQL assertions 外，不代表 remote runtime、Gmail/Auth、LINE provider、手機送達或 production 已完成。
 
 1. 審查員先完成 Gmail 登入並取得有效 DRS session。
 2. 登入頁或收件匣讀取 LINE 綁定狀態。
@@ -20,13 +22,13 @@
 5. LINE webhook 驗證原始請求簽章，取得一次性 link token，並以帶有穩定 retry key 的私人 push 訊息提供「繼續綁定」。
 6. 繼續頁在有效 Gmail-backed DRS session 下交換一次性 nonce，導向 LINE 官方 accountLink。
 7. LINE 傳回簽名的 `accountLink` 事件後，伺服器只保存 LINE ID 的 keyed digest 與 AES-GCM 密文。
-8. 案件指派或新綁定會由資料庫觸發器自動建立 derived outbox。派送器送出前再次確認案件、指派、審查員、綁定及綁定版本仍有效。
-9. 推播結果同時寫入 append-only delivery receipt 與 `PRIVATE_LINE_NOTIFICATION` 案件留痕；LINE 是否送達不會改變 DRS 案件權限。
-10. 解除綁定後，尚未送出的通知會被抑制，原案件指派與既有留痕保留。若已無有效案件 session，可在本人 LINE 私聊傳送完全相同的「解除 LINE 案件通知」；這只能撤銷同一個 LINE 身分的通知目的地，不能登入、切換角色或取得案件。
+8. 案件指派或新綁定的 source contract 會建立 derived outbox。disposable PostgreSQL harness 目前只證明：Gmail-backed authority 在 provider call 前、outbox claim／retry 前失效時，pending／retry 項目會被抑制。
+9. Source contract 要求派送或抑制結果寫入 append-only delivery receipt 與 `PRIVATE_LINE_NOTIFICATION` 案件留痕；真實 provider 結果與手機送達仍須部署後驗證，且不會改變 DRS 案件權限。
+10. 解除綁定或 authority 失效後，尚未 claim 或等待 retry 的通知應被抑制，原案件指派與既有留痕保留。此保證不延伸到已 claim 或已開始的 provider request，也不表示可以中途取消 LINE 端已接收的請求。本人 LINE 私聊撤銷路徑仍須經真實 webhook／provider 部署驗證；它不得登入、切換角色或取得案件。
 
 ## 瀏覽器操作契約
 
-已提供以下 Edge Function：
+原始碼目前定義以下 Edge Function 路由；這不表示它們已部署、已由同源 BFF 提供，或已可由正式瀏覽器使用：
 
 - `POST /functions/v1/drs-line-account-link-start`，body 必須是 `{}`。
 - `GET /functions/v1/drs-line-account-link-status`，不得有 query 或 body。
@@ -43,7 +45,7 @@ The five browser-adjacent BFF functions intentionally use `verify_jwt = false` a
 - `POST /functions/v1/drs-line-webhook`
 - 僅接受 `application/json`，上限 1 MiB。
 - 必須先以 `LINE_CHANNEL_SECRET` 對原始 bytes 驗證 canonical `X-Line-Signature`，通過後才解析 JSON。
-- `webhookEventId` 只以 keyed digest 留存；每筆事件另有固定 provider retry key，重送或處理程序重啟不會重複顯示已由 LINE 接受的 push 訊息。
+- Source contract 以 `webhookEventId` keyed digest 與固定 provider retry key 支援冪等判定；真實 LINE webhook 重送、程序重啟與 provider 已接受 push 的去重結果，仍須在部署後以真實 provider evidence 驗證。
 
 服務排程入口：
 
@@ -142,8 +144,9 @@ source_revision
 
 ## 本候選目前證據邊界
 
-- 已建立：source contracts、BFF、官方 signed webhook、durable binding/dedupe、assignment producer、outbox/receipt、案件留痕、claim lease recovery、send fence、service-only dispatcher 與 unit/source tests。
-- 已完成一輪 task-scoped disposable PostgreSQL 驗證：使用 pinned local image、隔離網路且不掛載 port／volume，完成 local migration execution、完整狀態機斷言與 `finally` 容器清理。This bounded local evidence does not prove a remote database, real LINE provider, deployment, or launch.
+- 原始碼目前包含：source contracts、BFF handlers、signed-webhook contract、durable binding／dedupe、assignment producer、outbox／receipt、案件留痕、claim lease recovery、send-fence source、service-only dispatcher 與 unit／source tests。這是 source inventory，不是 deployed-runtime 證明。
+- 已完成一輪 task-scoped disposable PostgreSQL 驗證：使用 pinned local image、隔離網路且不掛載 port／volume，完成 local migration execution，並驗證 harness 明列的 pre-claim／pre-retry stale Gmail-backed authority suppression。該證據只涵蓋 provider call 尚未開始前的 pending／retry 抑制；不證明 claimed／in-flight request 可被中途取消。
+- This bounded local pre-claim evidence does not prove a remote database, real LINE provider, deployment, or launch, and it does not prove cancellation of a claimed or in-flight provider request.
 - 尚未建立於本 producer：A3 UI 串接與 `/drs/line-account-link` 繼續頁。
-- 尚未證明：已部署 Supabase runtime、正式 Gmail Auth、正式 durable LINE binding、真實案件派送、手機通知、解除後抑制與 production ownership。
+- 尚未證明：remote database、deployed Supabase runtime、正式 Gmail Auth、正式 durable LINE binding、真實 LINE webhook/provider 行為、案件派送、手機通知、in-flight cancellation、解除後的 provider-side 結果或 production ownership。
 - 未執行：push、PR、merge、Supabase deploy、LINE Console 變更、Zeabur 變更、secret 輸入、真人訊息或 production launch。

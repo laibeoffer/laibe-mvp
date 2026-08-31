@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a source-reviewed Pilot backend in which Gmail-authenticated DRS specialists securely bind one personal LINE account and receive private notifications for server-authorized case assignments.
+**Goal:** Build and locally verify a Pilot backend source candidate in which Gmail-authenticated DRS specialists bind one personal LINE notification destination for server-authorized case assignments. Source and local-database evidence do not establish deployment, provider operation, phone delivery, or Pilot launch.
 
-**Architecture:** Extend the clean A17 secure-session base with a private Postgres state machine and thin Supabase Edge Functions. The canonical LINE webhook validates the exact raw body, consumes official `accountLink` events idempotently, and the notification dispatcher sends from a durable outbox only after rechecking assignment and binding authority.
+**Architecture:** Extend the clean A17 secure-session base with a private Postgres state machine and thin Supabase Edge Function source. The intended deployed flow validates the exact webhook raw body, processes official `accountLink` events idempotently, and begins a provider request only after a final pre-claim authority check. Current evidence is limited to source and bounded local PostgreSQL assertions; it does not prove a deployed webhook, real LINE provider behavior, phone delivery, or cancellation after a provider request has started.
 
 **Tech Stack:** TypeScript on Supabase Edge Functions/Deno, PostgreSQL 17 migrations and RPCs, Node.js built-in test runner, Web Crypto, LINE Messaging API.
 
@@ -20,7 +20,7 @@
 - Do not read, print, persist, fixture, or commit LINE secrets, access tokens, encryption keys, raw nonces, raw link tokens, or real LINE user IDs.
 - Browser contracts reject all extra keys and never accept specialist, assignment, case, role, provider, callback, or return-route authority.
 - Tables are server-owned in `integration`; private functions live in `drs_private`, set `search_path = ''`, revoke `PUBLIC`, and grant only exact callers.
-- Every provider event and notification command is durable and idempotent before external effects.
+- The source contract requires provider-event and notification-command state to be durable and idempotent before an external effect begins. Current local evidence does not prove provider-side idempotency or cancellation of an already-started external request.
 - Source, local database, deployed runtime, LINE provider, phone delivery, and production launch evidence remain separate.
 
 ---
@@ -378,7 +378,7 @@ export function createPrivateNotificationDispatcher(
 
 - [ ] **Step 1: Write failing notification tests**
 
-Cover assignment-authorized outbox admission, exact safe message fields, binding decryption only at send time, current binding-version assertion, no send after unlink/assignment termination/authority loss, bounded retry, permanent failure, idempotent receipt, one case audit event, and no role switch through message contents.
+Cover assignment-authorized outbox admission, exact safe message fields, binding decryption only at send time, current binding-version assertion, pre-claim and pre-retry suppression after unlink, assignment termination, or Gmail-backed authority loss, bounded retry, permanent failure, idempotent receipt, one case audit event, and no role switch through message contents. Claimed or in-flight provider-request cancellation remains outside this harness.
 
 - [ ] **Step 2: Verify causal RED**
 
@@ -388,7 +388,7 @@ node --test supabase/tests/drs_gmail_line_private_routing_w1.test.mjs tests/drs-
 
 - [ ] **Step 3: Implement dispatcher and service-only endpoint**
 
-Use a service-only function authentication mode; never accept a browser case ID or target LINE identity. Claim one outbox row under lock, re-resolve current authority and binding version, send once, then append the receipt and case audit outcome.
+Use a service-only function authentication mode; never accept a browser case ID or target LINE identity. Claim one outbox row under lock, re-resolve current authority and binding facts, and begin the provider request only if the final pre-claim check remains current. Append the safe receipt and case audit outcome according to the persisted result. Do not describe an already-started provider request as cancellable by a later authority change.
 
 - [ ] **Step 4: Verify GREEN**
 
@@ -403,7 +403,7 @@ git add -- supabase/config.toml supabase/functions/_shared/drs-line-account-link
 git commit -m "feat(drs): dispatch private LINE case notifications"
 ```
 
-### Task 7: Operator contract, full verification, and immutable source receipt
+### Task 7: Operator contract, bounded local verification, and immutable source receipt
 
 **Files:**
 - Create: `docs/drs_backend/drs_gmail_line_private_routing_w1.md`
@@ -451,7 +451,7 @@ Use the available CLI's documented local function check/serve command. If Deno i
 
 Use `supabase --help`, `supabase db --help`, and `supabase migration --help` to select current commands. Run the migration list, local database reset, real-PostgreSQL tests, and advisors. If Docker or local Supabase is unavailable, report the exact blocked gates.
 
-The focused real-PostgreSQL gate uses one task-scoped disposable PostgreSQL container with the pinned local image, no network, ports, or volumes. It applies the prerequisite migrations and LINE migration, executes the complete state-machine assertions, and removes the container in `finally`. This proves only bounded local migration execution against that disposable PostgreSQL identity; it does not prove a remote database, real LINE provider, deployment, or launch.
+The focused real-PostgreSQL gate uses one task-scoped disposable PostgreSQL container with the pinned local image, no network, ports, or volumes. It applies the prerequisite migrations and LINE migration and exercises the harness-defined bounded cases, including suppression of pending or retry outbox work when Gmail-backed authority becomes stale before claim or retry. It removes the container in `finally`. This proves only those local assertions against that disposable PostgreSQL identity. It does not prove cancellation of a claimed or in-flight provider request, a remote database, deployed runtime, real Gmail/Auth, real LINE webhook or provider delivery, phone receipt, deployment, or launch.
 
 - [ ] **Step 5: Run secret and forbidden-scope scans**
 
@@ -476,7 +476,7 @@ Expected: clean worktree, final HEAD/tree recorded, no push/PR/merge/deploy/prov
 
 ## Plan self-review result
 
-- Spec coverage: Tasks 1–7 cover contracts, official account linking, durable binding, all four browser operations, continuation, webhook replay safety, private assignment notifications, receipts, audit, failure behavior, security, tests, and Pilot handoff.
+- Source-plan coverage: Tasks 1–7 define source contracts and intended operational steps for account linking, private assignment notifications, receipts, audit, bounded failure handling, tests, and a future Pilot handoff. Current verification remains limited to the checks explicitly recorded for source and disposable local PostgreSQL; it is not end-to-end runtime, provider, delivery, or launch evidence.
 - Scope: personal LINE only; no LINE Login, LIFF, password login, LINE groups, frontend role selection, A3 UI edits, or transport-service edits.
 - Type consistency: `LineLinkState`, `LineLinkStatusDto`, authority facts, repository ports, notification claim/completion, and handler factory names are defined once and reused consistently.
 - Placeholder scan: no implementation placeholder remains; the migration filename is intentionally created by the required Supabase CLI command and then used verbatim.
