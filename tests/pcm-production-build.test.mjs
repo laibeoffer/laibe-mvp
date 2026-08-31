@@ -101,7 +101,9 @@ function executeFaultBuild(faultBuildPath, extraEnvironment = {}) {
 }
 
 function entryPath(publicPath) {
-  return path.join(distRoot, publicPath.slice(1), "index.html");
+  return publicPath === "/"
+    ? path.join(distRoot, "index.html")
+    : path.join(distRoot, publicPath.slice(1), "index.html");
 }
 
 function installPdfJsNodePolyfills() {
@@ -219,8 +221,8 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
 
   const assetFiles = second.files.filter((file) => file.startsWith("assets/"));
   assert.equal(assetFiles.length, 50, "exact production asset closure");
-  assert.equal(deployNodes.length, 19, "exact production route closure");
-  assert.equal(second.files.length, 74, "50 assets + 19 routes + 5 metadata files");
+  assert.equal(deployNodes.length, 20, "exact production route closure");
+  assert.equal(second.files.length, 75, "50 assets + 20 routes + 5 metadata files");
   assert.deepEqual(await listMaterializationArtifacts(), [], "successful build swap artifacts");
   const assetRoots = new Set(assetFiles.map((file) => file.split("/").slice(0, 2).join("/")));
   assert.equal(assetRoots.size, 1, "all runtime assets share one content hash root");
@@ -464,6 +466,7 @@ test("every real source-entry read and dependency failure preserves the exact li
       '    html = transformEntryHtml(await readFile(path.join(repositoryRoot, sourceRelative), "utf8"), sourceRelative);';
     assert.equal(buildSource.includes(routeTransform), true, "real source-entry transform");
     const realRoutes = [
+      ["preLanding", "src/stitch_laibe_landing_onboarding/pcm_standalone/pre_landing/code.html"],
       ["home", "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html"],
       ["aboutDrs", "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html"],
       ["quoteCheck", "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html"],
@@ -703,11 +706,11 @@ test("real stage verifier and unknown-fault failures preserve live output", asyn
   const rows = [
     {
       fault: "stage-verify-missing-planned-file",
-        diagnostic: /Staged production artifact file set does not match the validated plan: expected=74, actual=73,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=75, actual=74,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
     },
     {
       fault: "stage-verify-unexpected-file",
-        diagnostic: /Staged production artifact file set does not match the validated plan: expected=74, actual=75,/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=75, actual=76,/u,
     },
     {
       fault: "stage-verify-mutated-bytes",

@@ -16,6 +16,7 @@ const manifestModule = await import(
 const { PCM_FLOW_ROUTE_MANIFEST } = manifestModule;
 
 const SOURCE_ENTRY_BY_ID = Object.freeze({
+  preLanding: "src/stitch_laibe_landing_onboarding/pcm_standalone/pre_landing/code.html",
   home: "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
   aboutDrs: "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html",
   quoteCheck: "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
@@ -456,6 +457,7 @@ const headers = `/*
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 `;
 const redirects = deployNodes
+  .filter(({ publicPath }) => publicPath !== "/")
   .map(({ publicPath }) => `${publicPath}/ ${publicPath} 301`)
   .join("\n") + "\n";
 const notFound = `<!doctype html>
@@ -499,7 +501,8 @@ for (let index = 0; index < transformedEntries.length; index += 1) {
   if (index === 0) writeFault = "stage-write-route-first";
   if (index === Math.floor(transformedEntries.length / 2)) writeFault = "stage-write-route-middle";
   if (index === transformedEntries.length - 1) writeFault = "stage-write-route-last";
-  addMaterializationFile(`${publicPath.slice(1)}/index.html`, html, writeFault);
+  const routeArtifact = publicPath === "/" ? "index.html" : `${publicPath.slice(1)}/index.html`;
+  addMaterializationFile(routeArtifact, html, writeFault);
 }
 for (const [relative, content, writeFault] of [
   ["_headers", headers, "stage-write-metadata-headers"],

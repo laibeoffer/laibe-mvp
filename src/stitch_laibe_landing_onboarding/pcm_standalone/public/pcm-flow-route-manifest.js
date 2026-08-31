@@ -49,6 +49,7 @@ export const PCM_FLOW_GATES = Object.freeze([
 ]);
 
 export const PCM_FLOW_NODES = Object.freeze([
+  freezeRecord({ id: "preLanding", publicPath: "/", label: "LaiBE DRS 前導頁", role: "所有訪客", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../pre_landing/code.html" }),
   freezeRecord({ id: "home", publicPath: "/pcm", label: "PCM 公開首頁", role: "一般屋主", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../public_home/code.html#top" }),
   freezeRecord({ id: "aboutDrs", publicPath: "/pcm/about-drs", label: "關於 DRS", role: "一般屋主", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../about_drs/code.html" }),
   freezeRecord({ id: "quoteCheck", publicPath: "/pcm/quote-check", label: "報價健檢", role: "甲方", owner: "A0", lifecycle: "active", gate: "G1_UI_SOURCE", href: "../quote_check/code.html" }),

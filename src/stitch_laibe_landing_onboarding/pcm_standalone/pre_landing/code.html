@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="../../../../assets/logo/laibe_offer.svg" type="image/svg+xml">
+  <title>LaiBE DRS</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #030507;
+      --text-primary: #f4f7fa;
+      --axis: rgba(221, 232, 239, 0.58);
+      --accent: #f0a12b;
+      --axis-x: 68.5vw;
+      --axis-y: 32vh;
+      --first-row-y: 40vh;
+      --row-gap: 8.3vh;
+      --question-size: clamp(15px, 1.28vw, 19px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-width: 320px;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--background);
+    }
+
+    body {
+      position: relative;
+      color: var(--text-primary);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      content: "";
+      background:
+        linear-gradient(rgba(156, 178, 193, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(156, 178, 193, 0.025) 1px, transparent 1px),
+        radial-gradient(circle at 69% 43%, rgba(163, 191, 209, 0.055), transparent 37%);
+      background-size: 52px 52px, 52px 52px, 100% 100%;
+      mask-image: linear-gradient(to bottom, transparent 2%, black 18%, black 86%, transparent 100%);
+    }
+
+    .intro {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      isolation: isolate;
+    }
+
+    .brand-lockup {
+      position: relative;
+      display: inline-flex;
+      min-height: 44px;
+      margin-top: 24px;
+      align-items: center;
+      gap: 14px;
+      opacity: 0;
+      filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.38));
+      transform: translateY(8px) scale(0.667);
+      transform-origin: left top;
+      user-select: none;
+      will-change: opacity, transform;
+    }
+
+    .brand-lockup > img {
+      display: block;
+      width: clamp(100px, 8vw, 112px);
+      height: auto;
+      flex: 0 0 auto;
+    }
+
+    .drs-brand-lockup {
+      position: relative;
+      display: inline-grid;
+      min-width: 168px;
+      padding: 3px 0 4px 17px;
+      align-content: center;
+      align-items: start;
+      gap: 2px;
+      line-height: 1;
+      text-align: left;
+      justify-items: stretch;
+    }
+
+    .drs-brand-lockup::before {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 0;
+      width: 1px;
+      content: "";
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(255, 232, 174, 0.18) 12%,
+        rgba(232, 182, 79, 0.46) 42%,
+        rgba(220, 228, 237, 0.24) 78%,
+        transparent 100%
+      );
+      box-shadow: 0 0 8px rgba(232, 182, 79, 0.12);
+    }
+
+    .drs-brand-wordmark {
+      display: block;
+      inline-size: 100%;
+      margin: 0;
+      padding: 0;
+      color: #d8c79d;
+      background: linear-gradient(105deg, #b88a37 0%, #d8c79d 34%, #f4dfaa 52%, #d8c79d 70%, #b88a37 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-family: "Bahnschrift SemiCondensed", "DIN Alternate", sans-serif;
+      font-size: 0.84rem;
+      font-stretch: condensed;
+      font-weight: 760;
+      letter-spacing: 0.035em;
+      line-height: 1.04;
+      white-space: nowrap;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 5px rgba(255, 228, 161, 0.1);
+    }
+
+    .drs-brand-term,
+    .drs-brand-rest,
+    .drs-brand-initial,
+    .drs-brand-amp {
+      display: inline;
+    }
+
+    .drs-brand-initial {
+      color: #fff4c2;
+      background: linear-gradient(115deg, #e8b64f 0%, #fff4c2 52%, #c68d2c 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-size: 1.12em;
+      font-weight: 900;
+      letter-spacing: 0.01em;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .drs-brand-amp {
+      color: #e8b64f;
+      font-size: 0.88em;
+      font-weight: 680;
+      opacity: 0.76;
+    }
+
+    .drs-brand-name {
+      display: block;
+      inline-size: 100%;
+      margin: 2px 0 0;
+      padding: 0;
+      color: #f4f8fc;
+      background: linear-gradient(100deg, #8592a1 0%, #f4f8fc 46%, #b9c4d0 72%, #f8fbff 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      font-family: "Microsoft JhengHei UI", "Noto Sans TC", sans-serif;
+      font-size: 0.9rem;
+      font-style: normal;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+      text-align: justify;
+      text-align-last: justify;
+      white-space: nowrap;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 4px rgba(225, 236, 247, 0.2));
+    }
+
+    .plain-control {
+      position: absolute;
+      z-index: 10;
+      display: inline-grid;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      border-radius: 0;
+      color: rgba(236, 242, 246, 0.68);
+      background: transparent;
+      font: 500 13px/1 "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 160ms ease, text-shadow 160ms ease;
+    }
+
+    .plain-control:hover,
+    .plain-control:focus-visible {
+      color: #fff;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.42);
+      outline: none;
+    }
+
+    .plain-control:focus-visible::after {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      left: 6px;
+      height: 1px;
+      content: "";
+      background: currentColor;
+    }
+
+    #skip {
+      top: clamp(16px, 2.6vh, 28px);
+      right: clamp(18px, 2.8vw, 42px);
+    }
+
+    .cross-axis {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      opacity: 1;
+      pointer-events: none;
+      transition: opacity 380ms ease;
+    }
+
+    .axis-line {
+      position: absolute;
+      display: block;
+      opacity: 0;
+      background: var(--axis);
+      box-shadow: 0 0 5px rgba(218, 235, 246, 0.42), 0 0 18px rgba(174, 207, 226, 0.17);
+      will-change: opacity, transform;
+    }
+
+    .axis-horizontal {
+      top: var(--axis-y);
+      left: 47vw;
+      width: 47vw;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        rgba(209, 224, 233, 0.24) 0%,
+        rgba(223, 237, 245, 0.56) 38%,
+        rgba(250, 253, 255, 0.96) 45.7%,
+        rgba(221, 235, 244, 0.48) 64%,
+        rgba(202, 219, 229, 0.2) 100%
+      );
+      box-shadow:
+        0 0 5px rgba(227, 240, 248, 0.44),
+        0 0 24px rgba(178, 210, 229, 0.12);
+      transform: scaleX(0);
+      transform-origin: 45.7% 50%;
+    }
+
+    .axis-horizontal::before,
+    .axis-horizontal::after {
+      position: absolute;
+      right: 0;
+      left: 0;
+      content: "";
+      pointer-events: none;
+    }
+
+    .axis-horizontal::before {
+      top: -3px;
+      height: 7px;
+      background: inherit;
+      filter: blur(3px);
+      opacity: 0.48;
+    }
+
+    .axis-horizontal::after {
+      top: -12px;
+      height: 25px;
+      background:
+        radial-gradient(ellipse 54px 18px at 45.7% 50%, rgba(239, 250, 255, 0.44), transparent 72%),
+        linear-gradient(90deg, transparent 0%, rgba(188, 221, 239, 0.12) 18%, rgba(228, 244, 253, 0.2) 45.7%, rgba(184, 216, 234, 0.1) 76%, transparent 100%);
+      filter: blur(7px);
+      opacity: 0.78;
+    }
+
+    .axis-end {
+      position: absolute;
+      top: 50%;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      opacity: 0;
+      background: rgba(247, 251, 255, 0.94);
+      box-shadow:
+        0 0 6px rgba(255, 255, 255, 0.9),
+        0 0 16px rgba(214, 237, 250, 0.56);
+      transform: translateY(-50%);
+      will-change: opacity;
+    }
+
+    .axis-end-left {
+      left: 0;
+    }
+
+    .axis-end-right {
+      right: 0;
+    }
+
+    .axis-vertical {
+      top: 0;
+      left: var(--axis-x);
+      width: 1px;
+      height: 89vh;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.98) 0%,
+        rgba(232, 244, 251, 0.72) 14%,
+        rgba(217, 231, 240, 0.54) 58%,
+        rgba(195, 214, 226, 0.22) 100%
+      );
+      box-shadow:
+        0 0 5px rgba(235, 247, 255, 0.52),
+        0 0 20px rgba(186, 218, 236, 0.17);
+      transform: scaleY(0);
+      transform-origin: 50% 0;
+    }
+
+    .axis-vertical::before {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 7px;
+      content: "";
+      background: linear-gradient(
+        180deg,
+        rgba(250, 253, 255, 0.72) 0%,
+        rgba(218, 238, 249, 0.26) 16%,
+        rgba(210, 232, 244, 0.18) 58%,
+        rgba(183, 214, 231, 0.08) 100%
+      );
+      filter: blur(3px);
+      opacity: 0.58;
+      transform: translateX(-50%);
+    }
+
+    .axis-vertical::after {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 29px;
+      content: "";
+      background:
+        radial-gradient(ellipse 18px 72px at 50% 0%, rgba(233, 248, 255, 0.34), transparent 76%),
+        radial-gradient(ellipse 18px 70px at 50% var(--axis-y), rgba(221, 241, 252, 0.22), transparent 78%);
+      filter: blur(6px);
+      opacity: 0.66;
+      transform: translateX(-50%);
+    }
+
+    .axis-top-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 3px;
+      height: min(9vh, 82px);
+      background: linear-gradient(180deg, #fff 0%, rgba(240, 249, 255, 0.76) 36%, transparent 100%);
+      box-shadow:
+        0 0 7px rgba(255, 255, 255, 0.8),
+        0 0 24px rgba(210, 237, 251, 0.36);
+      transform: translateX(-50%);
+    }
+
+    .axis-ticks {
+      position: absolute;
+      inset: 0 auto 0 50%;
+      width: 3px;
+      background: repeating-linear-gradient(180deg, transparent 0, transparent 38px, rgba(240, 248, 253, 0.46) 39px, transparent 41px);
+      opacity: 0.34;
+      transform: translateX(-50%);
+      mask-image: linear-gradient(to bottom, transparent 8%, black 24%, black 92%, transparent 100%);
+    }
+
+    .axis-core {
+      position: absolute;
+      top: var(--axis-y);
+      left: var(--axis-x);
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      opacity: 0;
+      background: #f8fbfd;
+      box-shadow:
+        0 0 7px rgba(255, 255, 255, 0.95),
+        0 0 24px rgba(216, 238, 250, 0.68),
+        0 0 60px rgba(184, 220, 240, 0.26),
+        0 0 110px rgba(160, 204, 230, 0.12);
+      transform: translate(-50%, -50%);
+      will-change: opacity, transform;
+    }
+
+    .axis-core::before {
+      position: absolute;
+      inset: -4px;
+      border: 1px solid rgba(224, 241, 251, 0.38);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 12px rgba(214, 238, 251, 0.25);
+    }
+
+    .axis-label {
+      position: absolute;
+      z-index: 1;
+      opacity: 0;
+      color: rgba(244, 248, 251, 0.88);
+      font-size: clamp(12px, 1.05vw, 16px);
+      font-weight: 500;
+      line-height: 1;
+      text-shadow: 0 0 12px rgba(225, 241, 250, 0.28);
+      white-space: nowrap;
+      will-change: opacity, transform;
+    }
+
+    .axis-label-party-a {
+      top: var(--axis-y);
+      left: calc(47vw - 16px);
+      transform: translate(-100%, -50%);
+    }
+
+    .axis-label-party-b {
+      top: var(--axis-y);
+      left: calc(94vw + 16px);
+      transform: translateY(-50%);
+    }
+
+    .axis-label-drs {
+      top: 10.5vh;
+      left: var(--axis-x);
+      padding: 6px 18px;
+      font-size: clamp(13px, 1.18vw, 18px);
+      letter-spacing: 0;
+      background: var(--background);
+      box-shadow:
+        0 0 0 7px var(--background),
+        0 0 16px 10px rgba(3, 5, 7, 0.98);
+      transform: translate(-50%, -50%);
+    }
+
+    .questions {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      transition: opacity 380ms ease;
+    }
+
+    .questions.is-dimmed {
+      opacity: 1;
+    }
+
+    .questions.is-dimmed .question-front,
+    .questions.is-dimmed .question-back {
+      filter: opacity(0.22);
+    }
+
+    .intro.is-closing .cross-axis {
+      opacity: 1;
+    }
+
+    .question-row {
+      position: absolute;
+      top: calc(var(--first-row-y) + (var(--row) * var(--row-gap)));
+      left: 0;
+      width: 100%;
+      height: 44px;
+      color: var(--text-primary);
+      font-size: var(--question-size);
+      font-weight: 400;
+      line-height: 44px;
+      text-shadow: 0 0 12px rgba(221, 236, 246, 0.16);
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    .question-front,
+    .question-back {
+      position: absolute;
+      top: 0;
+      min-height: 44px;
+      overflow: visible;
+      transition: filter 380ms ease;
+    }
+
+    .question-front {
+      right: calc(100vw - var(--axis-x) + 22px);
+      width: min(27vw, 380px);
+      text-align: right;
+    }
+
+    .question-back {
+      left: calc(var(--axis-x) + 22px);
+      width: min(27.5vw, 420px);
+      opacity: 0;
+      text-align: left;
+      transform: translateX(48px);
+      will-change: transform, opacity;
+    }
+
+    .question-node {
+      position: absolute;
+      top: 50%;
+      left: var(--axis-x);
+      width: 12px;
+      height: 12px;
+      border: 1px solid rgba(211, 229, 240, 0.58);
+      border-radius: 50%;
+      opacity: 0;
+      background: rgba(13, 20, 25, 0.78);
+      box-shadow: inset 0 0 5px rgba(224, 241, 251, 0.18);
+      transform: translate(-50%, -50%);
+      will-change: opacity, transform;
+    }
+
+    .question-node::before,
+    .question-node::after {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 50%;
+      content: "";
+      transform: translate(-50%, -50%);
+    }
+
+    .question-node::before {
+      width: 4px;
+      height: 4px;
+      opacity: 0;
+      background: #fbfdff;
+      box-shadow: 0 0 5px rgba(255, 255, 255, 0.98);
+    }
+
+    .question-node::after {
+      width: 32px;
+      height: 32px;
+      opacity: 0;
+      background: radial-gradient(circle, rgba(226, 244, 254, 0.32) 0%, rgba(192, 224, 242, 0.12) 32%, transparent 70%);
+      filter: blur(3px);
+    }
+
+    .question-node.is-lit {
+      border-color: rgba(255, 255, 255, 0.92);
+      background: rgba(25, 34, 40, 0.64);
+      box-shadow:
+        inset 0 0 5px rgba(245, 251, 255, 0.34),
+        0 0 8px rgba(225, 242, 252, 0.52),
+        0 0 0 3px rgba(181, 211, 228, 0.08);
+    }
+
+    .question-node.is-lit::before {
+      opacity: 1;
+    }
+
+    .question-node.is-lit::after {
+      animation: node-pulse 480ms cubic-bezier(0.22, 0.72, 0.26, 1) both;
+    }
+
+    @keyframes node-pulse {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.45);
+      }
+      42% {
+        opacity: 0.82;
+        transform: translate(-50%, -50%) scale(1.12);
+      }
+      100% {
+        opacity: 0.64;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .question-back::before {
+      position: absolute;
+      top: 50%;
+      left: -17px;
+      width: 9px;
+      height: 1px;
+      content: "";
+      background: linear-gradient(90deg, rgba(238, 247, 252, 0.7), transparent);
+      box-shadow: 0 0 5px rgba(217, 239, 251, 0.28);
+    }
+
+    .closing {
+      position: absolute;
+      top: 44%;
+      left: clamp(48px, 6vw, 96px);
+      z-index: 3;
+      width: min(47vw, 650px);
+      pointer-events: none;
+    }
+
+    .closing-line {
+      margin: 0;
+      opacity: 0;
+      color: var(--text-primary);
+      font-size: clamp(42px, 4.1vw, 62px);
+      font-weight: 440;
+      line-height: 1.14;
+      letter-spacing: 0;
+      text-shadow: 0 0 18px rgba(226, 237, 244, 0.1);
+      transform: translateY(10px);
+      will-change: opacity, transform;
+    }
+
+    .closing-line > span {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .closing-line + .closing-line {
+      margin-top: 18px;
+    }
+
+    .closing-line.accent {
+      color: var(--accent);
+      font-weight: 620;
+      text-shadow: 0 0 18px rgba(240, 161, 43, 0.13);
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --axis-x: 50vw;
+        --axis-y: 24vh;
+        --first-row-y: 31vh;
+        --row-gap: 8.4vh;
+        --question-size: clamp(11px, 3.15vw, 13px);
+      }
+
+      body::before {
+        background-size: 34px 34px, 34px 34px, 100% 100%;
+      }
+
+      .brand-lockup {
+        margin-top: 14px;
+        gap: 10px;
+        transform-origin: center top;
+      }
+
+      .brand-lockup > img {
+        width: 88px;
+      }
+
+      .drs-brand-lockup {
+        min-width: 132px;
+        padding-left: 11px;
+      }
+
+      .drs-brand-wordmark {
+        font-size: 0.66rem;
+        letter-spacing: 0.018em;
+      }
+
+      .drs-brand-name {
+        font-size: 0.78rem;
+        letter-spacing: 0.035em;
+      }
+
+      .axis-horizontal {
+        left: 7vw;
+        width: 86vw;
+      }
+
+      .axis-label-party-a {
+        top: calc(var(--axis-y) - 14px);
+        left: 7vw;
+        transform: none;
+      }
+
+      .axis-label-party-b {
+        top: calc(var(--axis-y) - 14px);
+        left: 93vw;
+        transform: translateX(-100%);
+      }
+
+      .axis-label-drs {
+        top: 8.5vh;
+      }
+
+      .axis-vertical {
+        height: 78vh;
+      }
+
+      .question-row,
+      .question-front,
+      .question-back {
+        height: 36px;
+        min-height: 36px;
+        line-height: 36px;
+      }
+
+      .question-front {
+        right: calc(100vw - var(--axis-x) + 12px);
+        width: 45vw;
+      }
+
+      .question-back {
+        left: calc(var(--axis-x) + 12px);
+        width: 45vw;
+        transform: translateX(30px);
+      }
+
+      .question-node {
+        width: 10px;
+        height: 10px;
+      }
+
+      .closing {
+        top: 54vh;
+        left: 22px;
+        width: calc(100vw - 44px);
+        text-align: center;
+      }
+
+      .closing-line {
+        font-size: clamp(28px, 8.7vw, 34px);
+        line-height: 1.12;
+      }
+
+      .closing-line + .closing-line {
+        margin-top: 12px;
+      }
+
+      .questions.is-dimmed {
+        opacity: 1;
+      }
+
+      .questions.is-dimmed .question-front,
+      .questions.is-dimmed .question-back {
+        filter: opacity(0.08);
+      }
+    }
+
+    @media (max-height: 680px) {
+      :root {
+        --first-row-y: 37vh;
+        --row-gap: 8.2vh;
+      }
+
+      .closing {
+        top: 43%;
+      }
+    }
+
+    @media (max-height: 680px) and (min-width: 761px) {
+      .brand-lockup {
+        top: calc(43% - 86px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        transition-duration: 1ms !important;
+      }
+    }
+
+    html.skip-final *,
+    html.skip-final *::before,
+    html.skip-final *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    html.skip-final .question-node.is-lit::after {
+      opacity: 0.64;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  </style>
+</head>
+<body data-phase="horizontal-axis">
+  <main class="intro" aria-label="LaiBE DRS 前導頁">
+    <button class="plain-control" id="skip" type="button">Skip</button>
+    <div class="cross-axis" aria-hidden="true">
+      <span class="axis-line axis-horizontal">
+        <span class="axis-end axis-end-left"></span>
+        <span class="axis-end axis-end-right"></span>
+      </span>
+      <span class="axis-line axis-vertical">
+        <span class="axis-top-glow"></span>
+        <span class="axis-ticks"></span>
+      </span>
+      <span class="axis-core"></span>
+      <span class="axis-label axis-label-party-a">甲方</span>
+      <span class="axis-label axis-label-party-b">乙方</span>
+      <span class="axis-label axis-label-drs">DRS</span>
+    </div>
+
+    <section class="questions" aria-label="裝修決策問題">
+      <div class="question-row" style="--row: 0"><span class="question-front"></span><span class="question-node" aria-hidden="true"></span><span class="question-back"></span></div>
+      <div class="question-row" style="--row: 1"><span class="question-front"></span><span class="question-node" aria-hidden="true"></span><span class="question-back"></span></div>
+      <div class="question-row" style="--row: 2"><span class="question-front"></span><span class="question-node" aria-hidden="true"></span><span class="question-back"></span></div>
+      <div class="question-row" style="--row: 3"><span class="question-front"></span><span class="question-node" aria-hidden="true"></span><span class="question-back"></span></div>
+      <div class="question-row" style="--row: 4"><span class="question-front"></span><span class="question-node" aria-hidden="true"></span><span class="question-back"></span></div>
+      <div class="question-row" style="--row: 5"><span class="question-front"></span><span class="question-node" aria-hidden="true"></span><span class="question-back"></span></div>
+    </section>
+
+    <section class="closing" aria-label="核心觀點">
+      <p class="closing-line"><span>人情與信任</span><span>不應該與專業綁定</span></p>
+      <p class="closing-line accent"><span>第三方顧問</span><span>才是你的決策底氣</span></p>
+      <div class="brand-lockup" role="img" aria-label="LaiBE Decision &amp; Record System 裝潢決策系統">
+        <img src="../../../../assets/logo/laibe_offer.svg" alt="" aria-hidden="true">
+        <span class="drs-brand-lockup">
+          <span class="drs-brand-wordmark" aria-hidden="true"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
+          <small class="drs-brand-name" aria-hidden="true">裝潢決策系統</small>
+        </span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const questions = [
+        ['報價單上百條項目，', '價格合理嗎？'],
+        ['圖說幾十張，', '重點說清楚了嗎？'],
+        ['契約好像很清楚，', '但罰則與責任能落地嗎？'],
+        ['追加說是必要，', '就代表你該買單嗎？'],
+        ['進度說已完成，', '隱蔽項目你看得懂嗎？'],
+        ['驗收走馬看花，', '你知道重點在哪裡嗎？'],
+      ];
+
+      const horizontalStart = 0;
+      const horizontalEnd = 420;
+      const verticalStart = 420;
+      const verticalEnd = 900;
+      const frontStarts = [900, 1170, 1440, 1710, 1980, 2250];
+      const frontDuration = 240;
+      const backStarts = [2500, 3050, 3600, 4150, 4700, 5250];
+      const backDuration = 320;
+      const holdStart = 5600;
+      const closingStart = 6100;
+      const firstClosingEnd = 6800;
+      const secondClosingEnd = 7600;
+      const logoEnd = 8200;
+      const HOME_DESTINATION = '/pcm';
+
+      const intro = document.querySelector('.intro');
+      const brand = document.querySelector('.brand-lockup');
+      const horizontalAxis = document.querySelector('.axis-horizontal');
+      const verticalAxis = document.querySelector('.axis-vertical');
+      const axisCore = document.querySelector('.axis-core');
+      const axisEnds = [...document.querySelectorAll('.axis-end')];
+      const partyLabels = [...document.querySelectorAll('.axis-label-party-a, .axis-label-party-b')];
+      const drsLabel = document.querySelector('.axis-label-drs');
+      const questionGroup = document.querySelector('.questions');
+      const rows = [...document.querySelectorAll('.question-row')];
+      const closingLines = [...document.querySelectorAll('.closing-line')];
+      const skip = document.querySelector('#skip');
+
+      let animationFrame = 0;
+      let startedAt = 0;
+      let isComplete = false;
+      let hasNavigated = false;
+
+      const clamp01 = (value) => Math.min(1, Math.max(0, value));
+      const easeOutCubic = (value) => 1 - Math.pow(1 - clamp01(value), 3);
+      const easeInOut = (value) => {
+        const progress = clamp01(value);
+        return progress * progress * (3 - (2 * progress));
+      };
+
+      function setPhase(elapsed) {
+        let phase = 'horizontal-axis';
+        if (elapsed >= logoEnd) phase = 'complete';
+        else if (elapsed >= secondClosingEnd) phase = 'logo';
+        else if (elapsed >= closingStart) phase = 'closing';
+        else if (elapsed >= holdStart) phase = 'hold';
+        else if (elapsed >= backStarts[0]) phase = 'node-and-right-copy';
+        else if (elapsed >= frontStarts[0]) phase = 'left-copy';
+        else if (elapsed >= verticalStart) phase = 'vertical-axis';
+        document.body.dataset.phase = phase;
+      }
+
+      function renderAxes(elapsed) {
+        const horizontalProgress = easeInOut((elapsed - horizontalStart) / (horizontalEnd - horizontalStart));
+        horizontalAxis.style.opacity = horizontalProgress.toFixed(3);
+        horizontalAxis.style.transform = `scaleX(${horizontalProgress.toFixed(4)})`;
+
+        const horizontalDetailProgress = easeOutCubic((elapsed - 230) / 190);
+        axisCore.style.opacity = horizontalDetailProgress.toFixed(3);
+        axisCore.style.transform = `translate(-50%, -50%) scale(${(0.72 + (0.28 * horizontalDetailProgress)).toFixed(3)})`;
+        axisEnds.forEach((end) => {
+          end.style.opacity = horizontalDetailProgress.toFixed(3);
+        });
+        partyLabels.forEach((label) => {
+          label.style.opacity = horizontalDetailProgress.toFixed(3);
+        });
+
+        const verticalProgress = easeInOut((elapsed - verticalStart) / (verticalEnd - verticalStart));
+        verticalAxis.style.opacity = verticalProgress > 0 ? '1' : '0';
+        verticalAxis.style.transform = `scaleY(${verticalProgress.toFixed(4)})`;
+        const drsProgress = easeOutCubic((elapsed - 520) / 260);
+        drsLabel.style.opacity = drsProgress.toFixed(3);
+      }
+
+      function renderQuestion(index, elapsed) {
+        const row = rows[index];
+        const front = row.querySelector('.question-front');
+        const node = row.querySelector('.question-node');
+        const back = row.querySelector('.question-back');
+
+        const frontProgress = clamp01((elapsed - frontStarts[index]) / frontDuration);
+        const frontLength = Math.ceil(questions[index][0].length * frontProgress);
+        front.textContent = questions[index][0].slice(0, frontLength);
+
+        const backProgress = easeOutCubic((elapsed - backStarts[index]) / backDuration);
+        const nodeProgress = easeOutCubic((elapsed - backStarts[index]) / 220);
+        node.classList.toggle('is-lit', elapsed >= backStarts[index]);
+        node.style.opacity = nodeProgress.toFixed(3);
+        node.style.transform = `translate(-50%, -50%) scale(${(0.72 + (0.28 * nodeProgress)).toFixed(3)})`;
+        back.textContent = questions[index][1];
+        back.style.opacity = backProgress.toFixed(3);
+        back.style.transform = `translateX(${(48 * (1 - backProgress)).toFixed(2)}px)`;
+      }
+
+      function renderClosing(elapsed) {
+        const firstProgress = easeInOut((elapsed - closingStart) / (firstClosingEnd - closingStart));
+        const secondProgress = easeInOut((elapsed - firstClosingEnd) / (secondClosingEnd - firstClosingEnd));
+        const progresses = [firstProgress, secondProgress];
+
+        closingLines.forEach((line, index) => {
+          const progress = progresses[index];
+          line.style.opacity = progress.toFixed(3);
+          line.style.transform = `translateY(${(10 * (1 - progress)).toFixed(2)}px)`;
+        });
+      }
+
+      function renderBrand(elapsed) {
+        const progress = easeInOut((elapsed - secondClosingEnd) / (logoEnd - secondClosingEnd));
+        brand.style.opacity = progress.toFixed(3);
+        brand.style.transform = `translateY(${(8 * (1 - progress)).toFixed(2)}px) scale(0.667)`;
+      }
+
+      function render(elapsed) {
+        renderAxes(elapsed);
+        rows.forEach((_, index) => renderQuestion(index, elapsed));
+        renderClosing(elapsed);
+        renderBrand(elapsed);
+        setPhase(elapsed);
+
+        const isClosing = elapsed >= closingStart;
+        questionGroup.classList.toggle('is-dimmed', isClosing);
+        intro.classList.toggle('is-closing', isClosing);
+      }
+
+      function tick(now) {
+        if (isComplete) return;
+        const elapsed = now - startedAt;
+        render(elapsed);
+
+        if (elapsed >= logoEnd) {
+          navigateOnce();
+          return;
+        }
+
+        animationFrame = requestAnimationFrame(tick);
+      }
+
+      function navigateOnce() {
+        if (hasNavigated) return;
+        hasNavigated = true;
+        cancelAnimationFrame(animationFrame);
+        isComplete = true;
+        window.location.replace(HOME_DESTINATION);
+      }
+
+      skip.addEventListener('click', navigateOnce);
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        navigateOnce();
+      } else {
+        startedAt = performance.now();
+        animationFrame = requestAnimationFrame(tick);
+      }
+    })();
+  </script>
+</body>
+</html>

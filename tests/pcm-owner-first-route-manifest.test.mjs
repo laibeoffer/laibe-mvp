@@ -145,6 +145,7 @@ function scanJsonObjectKeys(source) {
 }
 
 const requiredCanonicalNodes = Object.freeze([
+  "preLanding",
   "home",
   "aboutDrs",
   "quoteCheck",
