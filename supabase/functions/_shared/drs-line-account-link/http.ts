@@ -14,6 +14,8 @@ const JSON_HEADERS = Object.freeze({
   "x-content-type-options": "nosniff",
 });
 
+const LINE_LINK_STATUS_PATH = "/functions/v1/drs-line-account-link-status";
+
 function hasUnsafeLinkTokenByte(value: string): boolean {
   for (let index = 0; index < value.length; index += 1) {
     const code = value.charCodeAt(index);
@@ -37,7 +39,16 @@ async function exactRequest(
   if (request.method !== method || url.pathname !== pathname) {
     throw new DrsIdentityError("INVALID_REQUEST", 400);
   }
-  if (request.headers.get("origin") !== allowedOrigin) {
+  const origin = request.headers.get("origin");
+  const isSameOriginStatusGet = method === "GET" &&
+    pathname === LINE_LINK_STATUS_PATH &&
+    request.headers.get("sec-fetch-site") === "same-origin";
+  if (
+    (origin === null && !isSameOriginStatusGet) ||
+    (origin !== null && origin !== allowedOrigin) ||
+    (method === "GET" && pathname === LINE_LINK_STATUS_PATH &&
+      !isSameOriginStatusGet)
+  ) {
     throw new DrsIdentityError("INVALID_REQUEST", 403);
   }
   if (queryName === undefined) {
@@ -84,6 +95,22 @@ async function exactRequest(
   return queryName === undefined ? null : url.searchParams.get(queryName);
 }
 
+function bindStatusGetOriginForGuard(
+  request: Request,
+  allowedOrigin: string,
+  method: "GET" | "POST",
+  pathname: string,
+): Request {
+  if (
+    method !== "GET" || pathname !== LINE_LINK_STATUS_PATH ||
+    request.headers.has("origin") ||
+    request.headers.get("sec-fetch-site") !== "same-origin"
+  ) return request;
+  const headers = new Headers(request.headers);
+  headers.set("origin", allowedOrigin);
+  return new Request(request, { headers });
+}
+
 function failureResponse(error: unknown): Response {
   if (error instanceof DrsIdentityError) {
     const status = error.status === 401
@@ -117,7 +144,14 @@ function createStatusHandler(
         method,
         pathname,
       );
-      const authority = await dependencies.guard.authorize(request);
+      const authority = await dependencies.guard.authorize(
+        bindStatusGetOriginForGuard(
+          request,
+          dependencies.allowedOrigin,
+          method,
+          pathname,
+        ),
+      );
       return json(await dependencies.service[operation](authority));
     } catch (error) {
       return failureResponse(error);
@@ -139,7 +173,7 @@ export function createLineLinkStatusHandler(dependencies: Dependencies) {
     dependencies,
     "status",
     "GET",
-    "/functions/v1/drs-line-account-link-status",
+    LINE_LINK_STATUS_PATH,
   );
 }
 

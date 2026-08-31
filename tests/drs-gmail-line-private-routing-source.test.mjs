@@ -814,7 +814,10 @@ test("status cancel and unlink handlers preserve operation-specific methods", as
     new Request(
       "https://edge.example/functions/v1/drs-line-account-link-status",
       {
-        headers: { origin: "https://laibe.example" },
+        headers: {
+          origin: "https://laibe.example",
+          "sec-fetch-site": "same-origin",
+        },
       },
     ),
   );
@@ -850,6 +853,181 @@ test("status cancel and unlink handlers preserve operation-specific methods", as
   assert.deepEqual(operations, ["status", "cancel", "unlink"]);
 });
 
+test("focused RED: status GET accepts same-origin browser metadata without Origin and keeps every auth and POST boundary closed", async () => {
+  const {
+    createLineLinkCancelHandler,
+    createLineLinkContinueHandler,
+    createLineLinkStartHandler,
+    createLineLinkStatusHandler,
+    createLineLinkUnlinkHandler,
+  } = await import(lineHttpUrl.href);
+  const { DrsIdentityError } = await import(
+    new URL(
+      "../supabase/functions/_shared/drs-auth/contracts.ts",
+      import.meta.url,
+    ).href
+  );
+  const allowedOrigin = "https://laibe.example";
+  const authorization = "Bearer browser.proof.value";
+  const cookie = "__Host-laibe-drs-session=opaque-session-cookie";
+  let guardCalls = 0;
+  let statusCalls = 0;
+  const handler = createLineLinkStatusHandler({
+    allowedOrigin,
+    guard: {
+      authorize(request) {
+        guardCalls += 1;
+        assert.equal(request.headers.get("origin"), allowedOrigin);
+        assert.equal(request.headers.get("sec-fetch-site"), "same-origin");
+        if (
+          request.headers.get("authorization") !== authorization ||
+          request.headers.get("cookie") !== cookie
+        ) {
+          throw new DrsIdentityError("AUTH_REQUIRED", 401);
+        }
+        return AUTHORITY;
+      },
+    },
+    service: {
+      status() {
+        statusCalls += 1;
+        return Object.freeze({ state: "not_linked", nextAction: "relink" });
+      },
+    },
+  });
+
+  const accepted = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-status",
+      {
+        headers: {
+          authorization,
+          cookie,
+          referer: `${allowedOrigin}/pcm/reviewer/access/`,
+          "sec-fetch-site": "same-origin",
+        },
+      },
+    ),
+  );
+  assert.equal(accepted.status, 200);
+  assert.deepEqual(await accepted.json(), {
+    state: "not_linked",
+    nextAction: "relink",
+  });
+  assert.equal(guardCalls, 1);
+  assert.equal(statusCalls, 1);
+
+  for (
+    const headers of [
+      {
+        authorization,
+        cookie,
+        origin: "https://attacker.example",
+        "sec-fetch-site": "same-origin",
+      },
+      {
+        authorization,
+        cookie,
+        origin: allowedOrigin,
+        "sec-fetch-site": "cross-site",
+      },
+      {
+        authorization,
+        cookie,
+        "sec-fetch-site": "cross-site",
+      },
+    ]
+  ) {
+    const rejected = await handler(
+      new Request(
+        "https://edge.example/functions/v1/drs-line-account-link-status",
+        { headers },
+      ),
+    );
+    assert.equal(rejected.status, 403);
+  }
+  assert.equal(guardCalls, 1);
+  assert.equal(statusCalls, 1);
+
+  for (
+    const rejectedAuthorization of [undefined, "Bearer invalid-proof"]
+  ) {
+    const headers = {
+      cookie,
+      "sec-fetch-site": "same-origin",
+    };
+    if (rejectedAuthorization !== undefined) {
+      headers.authorization = rejectedAuthorization;
+    }
+    const rejected = await handler(
+      new Request(
+        "https://edge.example/functions/v1/drs-line-account-link-status",
+        { headers },
+      ),
+    );
+    assert.equal(rejected.status, 401);
+  }
+  assert.equal(guardCalls, 3);
+  assert.equal(statusCalls, 1);
+
+  const postDependencies = {
+    allowedOrigin,
+    guard: {
+      authorize() {
+        throw new Error("POST without Origin must fail before authorization");
+      },
+    },
+    service: {
+      start() {
+        throw new Error("must not run");
+      },
+      cancel() {
+        throw new Error("must not run");
+      },
+      unlink() {
+        throw new Error("must not run");
+      },
+      continueLink() {
+        throw new Error("must not run");
+      },
+    },
+  };
+  for (
+    const [postHandler, pathname] of [
+      [
+        createLineLinkStartHandler(postDependencies),
+        "/functions/v1/drs-line-account-link-start",
+      ],
+      [
+        createLineLinkCancelHandler(postDependencies),
+        "/functions/v1/drs-line-account-link-cancel",
+      ],
+      [
+        createLineLinkUnlinkHandler(postDependencies),
+        "/functions/v1/drs-line-account-link-unlink",
+      ],
+      [
+        createLineLinkContinueHandler(postDependencies),
+        "/functions/v1/drs-line-account-link-continue?linkToken=opaque",
+      ],
+    ]
+  ) {
+    const rejected = await postHandler(
+      new Request(`https://edge.example${pathname}`, {
+        method: "POST",
+        headers: {
+          authorization,
+          cookie,
+          "content-type": "application/json",
+          "sec-fetch-site": "same-origin",
+        },
+        body: "{}",
+      }),
+    );
+    assert.equal(rejected.status, 403);
+  }
+});
+
 test("handler converts missing Gmail-backed DRS authority to permission_denied", async () => {
   const { createLineLinkStatusHandler } = await import(lineHttpUrl.href);
   const { DrsIdentityError } = await import(
@@ -874,7 +1052,12 @@ test("handler converts missing Gmail-backed DRS authority to permission_denied",
   const response = await handler(
     new Request(
       "https://edge.example/functions/v1/drs-line-account-link-status",
-      { headers: { origin: "https://laibe.example" } },
+      {
+        headers: {
+          origin: "https://laibe.example",
+          "sec-fetch-site": "same-origin",
+        },
+      },
     ),
   );
   assert.equal(response.status, 401);
