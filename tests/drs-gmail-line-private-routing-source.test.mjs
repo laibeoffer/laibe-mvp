@@ -39,6 +39,10 @@ const lineHttpUrl = new URL(
   "../supabase/functions/_shared/drs-line-account-link/http.ts",
   import.meta.url,
 );
+const lineWebhookUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/webhook.ts",
+  import.meta.url,
+);
 
 const AUTHORITY = Object.freeze({
   authenticatedUserId: "00000000-0000-4000-8000-000000000001",
@@ -766,4 +770,224 @@ test("default function entries expose custom-session handlers without deployment
     linePortsUrl.href
   );
   assert.equal(typeof createSupabaseDrsLineAccountLinkRepository, "function");
+});
+
+async function webhookRequest(body, secret, signatureOverride) {
+  const raw = JSON.stringify(body);
+  const signature = signatureOverride ?? createHmac("sha256", secret)
+    .update(raw).digest("base64");
+  return new Request("https://edge.example/functions/v1/drs-line-webhook", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-line-signature": signature,
+    },
+    body: raw,
+  });
+}
+
+async function testEncryptionKey() {
+  return await webcrypto.subtle.importKey(
+    "raw",
+    new Uint8Array(32).fill(17),
+    "AES-GCM",
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
+test("signed binding action durably claims before issuing the official link token", async () => {
+  const { createLineWebhookHandler } = await import(lineWebhookUrl.href);
+  const secret = "unit-test-channel-secret";
+  const calls = [];
+  const handler = createLineWebhookHandler({
+    channelSecret: secret,
+    identityHmacKey: "unit-test-identity-hmac-key",
+    identityEncryptionKey: await testEncryptionKey(),
+    identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
+    repository: {
+      async claimEvent(input) {
+        calls.push({ operation: "claim", input });
+        return { admission: "claimed", claimToken: "00000000-0000-4000-8000-000000000099" };
+      },
+      async completeEvent(input) {
+        calls.push({ operation: "complete", input });
+        return { completed: true, safeOutcome: input.safeOutcome };
+      },
+      async completeAccountLink() { throw new Error("not used"); },
+    },
+    lineClient: {
+      async issueLinkToken(lineUserId) {
+        calls.push({ operation: "issue", lineUserId });
+        return "provider-link-token";
+      },
+      async replyAccountLink(replyToken, linkingUrl) {
+        calls.push({ operation: "reply", replyToken, linkingUrl });
+        return { requestId: "safe-request-id" };
+      },
+      async pushCaseNotification() { throw new Error("not used"); },
+    },
+  });
+  const response = await handler(await webhookRequest({
+    destination: LINE_USER_ID,
+    events: [textBindingEvent()],
+  }, secret));
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {});
+  assert.deepEqual(calls.map(({ operation }) => operation), [
+    "claim", "issue", "reply", "complete",
+  ]);
+  assert.match(calls[0].input.webhookEventDigest, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(JSON.stringify(calls[0]).includes(WEBHOOK_EVENT_ID), false);
+  const link = new URL(calls[2].linkingUrl);
+  assert.equal(link.origin, "https://laibe.example");
+  assert.equal(link.pathname, "/drs/line-account-link");
+  assert.equal(link.searchParams.get("linkToken"), "provider-link-token");
+  assert.equal(calls[3].input.safeOutcome, "link_token_replied");
+});
+
+test("webhook verifies exact raw bytes before parsing or durable work", async () => {
+  const { createLineWebhookHandler } = await import(lineWebhookUrl.href);
+  let repositoryCalls = 0;
+  const handler = createLineWebhookHandler({
+    channelSecret: "unit-test-channel-secret",
+    identityHmacKey: "unit-test-identity-hmac-key",
+    identityEncryptionKey: await testEncryptionKey(),
+    identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
+    repository: {
+      async claimEvent() { repositoryCalls += 1; throw new Error("must not run"); },
+      async completeEvent() { throw new Error("must not run"); },
+      async completeAccountLink() { throw new Error("must not run"); },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("must not run"); },
+      async replyAccountLink() { throw new Error("must not run"); },
+      async pushCaseNotification() { throw new Error("must not run"); },
+    },
+  });
+  const response = await handler(await webhookRequest(
+    { destination: LINE_USER_ID, events: [textBindingEvent()] },
+    "unit-test-channel-secret",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+  ));
+  assert.equal(response.status, 401);
+  assert.equal(repositoryCalls, 0);
+
+  const oversized = await handler(new Request(
+    "https://edge.example/functions/v1/drs-line-webhook",
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+      },
+      body: "x".repeat(1_048_577),
+    },
+  ));
+  assert.equal(oversized.status, 413);
+  assert.equal(repositoryCalls, 0);
+});
+
+test("signed accountLink stores only digests and an encrypted private LINE identity", async () => {
+  const { createLineWebhookHandler } = await import(lineWebhookUrl.href);
+  const secret = "unit-test-channel-secret";
+  const completed = [];
+  const rawNonce = "single-use-protocol-value";
+  const handler = createLineWebhookHandler({
+    channelSecret: secret,
+    identityHmacKey: "unit-test-identity-hmac-key",
+    identityEncryptionKey: await testEncryptionKey(),
+    identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
+    repository: {
+      async claimEvent() {
+        return { admission: "claimed", claimToken: "00000000-0000-4000-8000-000000000099" };
+      },
+      async completeEvent(input) {
+        completed.push({ operation: "event", input });
+        return { completed: true, safeOutcome: input.safeOutcome };
+      },
+      async completeAccountLink(input) {
+        completed.push({ operation: "link", input });
+        return {
+          state: "linked",
+          linked_at: "2026-08-31T12:00:00.000Z",
+          next_action: "unlink",
+        };
+      },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("not used"); },
+      async replyAccountLink() { throw new Error("not used"); },
+      async pushCaseNotification() { throw new Error("not used"); },
+    },
+  });
+  const event = accountLinkEvent({ link: { result: "ok", nonce: rawNonce } });
+  const response = await handler(await webhookRequest({
+    destination: LINE_USER_ID,
+    events: [event],
+  }, secret));
+  assert.equal(response.status, 200);
+  const linkInput = completed.find(({ operation }) => operation === "link").input;
+  assert.match(linkInput.nonceDigest, /^[A-Za-z0-9_-]{43}$/u);
+  assert.match(linkInput.lineUserDigest, /^[A-Za-z0-9_-]{43}$/u);
+  assert.match(linkInput.lineUserCiphertext, /^[A-Za-z0-9_-]{24,1024}$/u);
+  assert.match(linkInput.lineUserIv, /^[A-Za-z0-9_-]{16}$/u);
+  assert.equal(linkInput.encryptionKeyVersion, "test-v1");
+  const serialized = JSON.stringify(linkInput);
+  assert.equal(serialized.includes(rawNonce), false);
+  assert.equal(serialized.includes(LINE_USER_ID), false);
+  assert.equal(completed.at(-1).input.safeOutcome, "linked");
+});
+
+test("completed redelivery is idempotent and retryable storage failure is non-2xx", async () => {
+  const { createLineWebhookHandler } = await import(lineWebhookUrl.href);
+  const secret = "unit-test-channel-secret";
+  let providerCalls = 0;
+  const base = {
+    channelSecret: secret,
+    identityHmacKey: "unit-test-identity-hmac-key",
+    identityEncryptionKey: await testEncryptionKey(),
+    identityEncryptionKeyVersion: "test-v1",
+    publicOrigin: "https://laibe.example",
+    lineClient: {
+      async issueLinkToken() { providerCalls += 1; return "unused"; },
+      async replyAccountLink() { providerCalls += 1; return { requestId: null }; },
+      async pushCaseNotification() { throw new Error("not used"); },
+    },
+  };
+  const body = { destination: LINE_USER_ID, events: [textBindingEvent()] };
+  const duplicate = createLineWebhookHandler({
+    ...base,
+    repository: {
+      async claimEvent() { return { admission: "already_completed", safeOutcome: "link_token_replied" }; },
+      async completeEvent() { throw new Error("must not run"); },
+      async completeAccountLink() { throw new Error("must not run"); },
+    },
+  });
+  assert.equal((await duplicate(await webhookRequest(body, secret))).status, 200);
+  assert.equal(providerCalls, 0);
+
+  const unavailable = createLineWebhookHandler({
+    ...base,
+    repository: {
+      async claimEvent() { throw new Error("database unavailable"); },
+      async completeEvent() { throw new Error("must not run"); },
+      async completeAccountLink() { throw new Error("must not run"); },
+    },
+  });
+  assert.equal((await unavailable(await webhookRequest(body, secret))).status, 503);
+  assert.equal(providerCalls, 0);
+});
+
+test("canonical LINE webhook entry disables gateway JWT and remains import-safe", async () => {
+  const module = await import(new URL(
+    "../supabase/functions/drs-line-webhook/index.ts",
+    import.meta.url,
+  ).href);
+  assert.equal(module.VERIFY_JWT_REQUIRED, false);
+  assert.equal(typeof module.createLineWebhookHandler, "function");
+  assert.equal(typeof module.handler, "function");
 });

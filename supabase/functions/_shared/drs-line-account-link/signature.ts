@@ -1,5 +1,11 @@
 const TEXT_ENCODER = new TextEncoder();
 
+function ownedArrayBuffer(value: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(value.byteLength);
+  copy.set(value);
+  return copy.buffer;
+}
+
 function decodeCanonicalSignature(value: string): Uint8Array | null {
   if (
     value.length !== 44 ||
@@ -51,11 +57,14 @@ export async function verifyLineSignature(
       ["sign"],
     );
     const expected = new Uint8Array(
-      await globalThis.crypto.subtle.sign("HMAC", key, rawBody),
+      await globalThis.crypto.subtle.sign(
+        "HMAC",
+        key,
+        ownedArrayBuffer(rawBody),
+      ),
     );
     return constantTimeEqual(expected, supplied);
   } catch {
     return false;
   }
 }
-

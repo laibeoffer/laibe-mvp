@@ -86,6 +86,20 @@ export async function hmacIdentityDigest(
   return base64UrlEncode(new Uint8Array(digest));
 }
 
+export async function importLineUserIdEncryptionKey(
+  encodedKey: string,
+): Promise<CryptoKey> {
+  const bytes = base64UrlDecode(encodedKey);
+  if (bytes.byteLength !== 32) throw new Error("invalid_encryption_key");
+  return await runtimeCrypto().subtle.importKey(
+    "raw",
+    ownedArrayBuffer(bytes),
+    "AES-GCM",
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
 export async function encryptLineUserId(
   key: CryptoKey,
   value: string,

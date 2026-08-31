@@ -69,3 +69,6 @@ verify_jwt = false
 
 [functions.drs-line-account-link-continue]
 verify_jwt = false
+
+[functions.drs-line-webhook]
+verify_jwt = false
