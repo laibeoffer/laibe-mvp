@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHmac, webcrypto } from "node:crypto";
 import test from "node:test";
 
 const contractsUrl = new URL(
@@ -7,6 +8,18 @@ const contractsUrl = new URL(
 );
 const validationUrl = new URL(
   "../supabase/functions/_shared/drs-line-account-link/validation.ts",
+  import.meta.url,
+);
+const cryptoUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/crypto.ts",
+  import.meta.url,
+);
+const signatureUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/signature.ts",
+  import.meta.url,
+);
+const lineClientUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/line-client.ts",
   import.meta.url,
 );
 
@@ -214,4 +227,214 @@ test("webhook envelope rejects unknown actions, oversized batches, and prototype
     events: [textBindingEvent()],
   });
   assert.equal(readLineWebhookEnvelope(inherited), null);
+});
+
+test("LINE signature verification uses exact raw bytes and strict canonical Base64", async () => {
+  const { verifyLineSignature } = await import(signatureUrl.href);
+  const key = "unit-test-hmac-key-with-no-provider-value";
+  const raw = new TextEncoder().encode('{"events":[]}');
+  const signature = createHmac("sha256", key).update(raw).digest("base64");
+
+  assert.equal(await verifyLineSignature(raw, signature, key), true);
+  assert.equal(
+    await verifyLineSignature(
+      new TextEncoder().encode('{ "events":[] }'),
+      signature,
+      key,
+    ),
+    false,
+  );
+  assert.equal(await verifyLineSignature(raw, `${signature}\n`, key), false);
+  assert.equal(await verifyLineSignature(raw, signature.replace(/=+$/u, ""), key), false);
+  assert.equal(await verifyLineSignature(raw, `${signature.slice(0, -1)}!`, key), false);
+  assert.equal(await verifyLineSignature(raw, null, key), false);
+});
+
+test("protocol values, identity digests, and AES-GCM envelopes are cryptographically bounded", async () => {
+  const {
+    base64UrlDecode,
+    base64UrlEncode,
+    decryptLineUserId,
+    encryptLineUserId,
+    hmacIdentityDigest,
+    randomProtocolValue,
+  } = await import(cryptoUrl.href);
+
+  const first = randomProtocolValue();
+  const second = randomProtocolValue();
+  assert.equal(first.byteLength, 32);
+  assert.equal(second.byteLength, 32);
+  assert.notDeepEqual(first, second);
+  assert.throws(() => randomProtocolValue(15), /invalid_protocol_size/u);
+  assert.deepEqual(base64UrlDecode(base64UrlEncode(first)), first);
+
+  const digestA = await hmacIdentityDigest("unit-test-identity-key", LINE_USER_ID);
+  const digestB = await hmacIdentityDigest("unit-test-identity-key", LINE_USER_ID);
+  const digestOther = await hmacIdentityDigest(
+    "unit-test-identity-key",
+    "Uffffffffffffffffffffffffffffffff",
+  );
+  assert.equal(digestA, digestB);
+  assert.notEqual(digestA, digestOther);
+  assert.match(digestA, /^[A-Za-z0-9_-]{43}$/u);
+
+  const encryptionKey = await webcrypto.subtle.generateKey(
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+  const envelope = await encryptLineUserId(encryptionKey, LINE_USER_ID);
+  assert.deepEqual(Object.keys(envelope).sort(), ["ciphertext", "iv"]);
+  assert.equal(Object.isFrozen(envelope), true);
+  assert.equal(await decryptLineUserId(encryptionKey, envelope), LINE_USER_ID);
+  const tampered = {
+    ...envelope,
+    ciphertext: `${envelope.ciphertext.slice(0, -1)}${
+      envelope.ciphertext.endsWith("A") ? "B" : "A"
+    }`,
+  };
+  await assert.rejects(() => decryptLineUserId(encryptionKey, tampered));
+  await assert.rejects(() =>
+    decryptLineUserId(encryptionKey, { ...envelope, iv: `${envelope.iv}=` })
+  );
+});
+
+test("LINE client pins official endpoints and emits only approved request bodies", async () => {
+  const { createLineClient } = await import(lineClientUrl.href);
+  const calls = [];
+  const responses = [
+    new Response(JSON.stringify({ linkToken: "one-time-link-value" }), {
+      status: 200,
+      headers: { "content-type": "application/json", "x-line-request-id": "req-1" },
+    }),
+    new Response("{}", {
+      status: 200,
+      headers: { "content-type": "application/json", "x-line-request-id": "req-2" },
+    }),
+    new Response("{}", {
+      status: 200,
+      headers: { "content-type": "application/json", "x-line-request-id": "req-3" },
+    }),
+  ];
+  const client = createLineClient({
+    accessToken: "not-a-provider-credential",
+    fetch: async (input, init) => {
+      calls.push({ input: String(input), init });
+      return responses.shift();
+    },
+  });
+
+  assert.equal(await client.issueLinkToken(LINE_USER_ID), "one-time-link-value");
+  assert.deepEqual(
+    await client.replyAccountLink(
+      REPLY_TOKEN,
+      "https://laibe.example/drs/line/continue?protocol=opaque",
+    ),
+    { requestId: "req-2" },
+  );
+  assert.deepEqual(await client.pushCaseNotification(LINE_USER_ID, {
+    caseLabel: "案件 DRS-042",
+    caseStatus: "等待一般審查員確認",
+    nextAction: "請開啟 DRS 收件匣檢視",
+    caseUrl: "https://laibe.example/drs/cases/current",
+  }), { requestId: "req-3" });
+
+  assert.deepEqual(calls.map(({ input }) => input), [
+    `https://api.line.me/v2/bot/user/${LINE_USER_ID}/linkToken`,
+    "https://api.line.me/v2/bot/message/reply",
+    "https://api.line.me/v2/bot/message/push",
+  ]);
+  assert.equal(calls.every(({ init }) => init.method === "POST"), true);
+  assert.equal(calls[0].init.body, undefined);
+  assert.deepEqual(JSON.parse(calls[1].init.body), {
+    replyToken: REPLY_TOKEN,
+    messages: [{
+      type: "template",
+      altText: "確認綁定 LINE 案件通知",
+      template: {
+        type: "buttons",
+        text: "請完成 LINE 案件通知綁定",
+        actions: [{
+          type: "uri",
+          label: "繼續綁定",
+          uri: "https://laibe.example/drs/line/continue?protocol=opaque",
+        }],
+      },
+    }],
+  });
+  assert.deepEqual(JSON.parse(calls[2].init.body), {
+    to: LINE_USER_ID,
+    messages: [{
+      type: "text",
+      text: [
+        "萊比案件通知",
+        "案件 DRS-042",
+        "目前狀態：等待一般審查員確認",
+        "下一步：請開啟 DRS 收件匣檢視",
+        "https://laibe.example/drs/cases/current",
+      ].join("\n"),
+    }],
+  });
+});
+
+test("LINE client fails closed with sanitized errors and bounded provider responses", async () => {
+  const { createLineClient, LineProviderError } = await import(lineClientUrl.href);
+  const failed = createLineClient({
+    accessToken: "not-a-provider-credential",
+    fetch: async () => new Response("provider body must never escape", { status: 503 }),
+  });
+  await assert.rejects(
+    () => failed.issueLinkToken(LINE_USER_ID),
+    (error) => {
+      assert.equal(error instanceof LineProviderError, true);
+      assert.equal(error.code, "provider_unavailable");
+      assert.equal(error.statusClass, "5xx");
+      assert.doesNotMatch(error.message, /provider body must never escape/u);
+      return true;
+    },
+  );
+
+  const oversized = createLineClient({
+    accessToken: "not-a-provider-credential",
+    fetch: async () => new Response(`{"linkToken":"${"x".repeat(40_000)}"}`, {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    }),
+  });
+  await assert.rejects(
+    () => oversized.issueLinkToken(LINE_USER_ID),
+    (error) => {
+      assert.equal(error instanceof LineProviderError, true);
+      assert.equal(error.code, "provider_invalid_response");
+      return true;
+    },
+  );
+});
+
+test("LINE client rejects inherited notification authority before any provider call", async () => {
+  const { createLineClient, LineProviderError } = await import(lineClientUrl.href);
+  let providerCalled = false;
+  const client = createLineClient({
+    accessToken: "not-a-provider-credential",
+    fetch: async () => {
+      providerCalled = true;
+      return new Response("{}", { status: 200 });
+    },
+  });
+  const inherited = Object.assign(
+    Object.create({ role: "highest_reviewer" }),
+    {
+      caseLabel: "案件 DRS-042",
+      caseStatus: "等待一般審查員確認",
+      nextAction: "請開啟 DRS 收件匣檢視",
+      caseUrl: "https://laibe.example/drs/cases/current",
+    },
+  );
+
+  await assert.rejects(
+    () => client.pushCaseNotification(LINE_USER_ID, inherited),
+    (error) => error instanceof LineProviderError &&
+      error.code === "provider_invalid_request",
+  );
+  assert.equal(providerCalled, false);
 });
