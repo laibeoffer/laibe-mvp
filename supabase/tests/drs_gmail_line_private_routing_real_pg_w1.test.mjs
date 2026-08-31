@@ -17,9 +17,9 @@ const approvedDockerExecutable = String
 const approvedDockerExecutableBytes = 43_247_024;
 const approvedDockerExecutableSha256 =
   "0f97bc1111f59d859766ba938691ee07ed4e58d5fdaeb6f4dfb10a5ef5394753";
-const approvedLineMigrationBytes = 84_866;
+const approvedLineMigrationBytes = 91_486;
 const approvedLineMigrationSha256 =
-  "b600b481762031755e58b35085759504f20557df5bb6d0fbf016b79a3ca81d9c";
+  "ffb7e58d31f68f37aafab35e796754ab0c59e56a06c7d563ec228489d245358f";
 const approvedSystemRoot = String.raw`C:\WINDOWS`;
 const localDockerHost = "npipe:////./pipe/docker_engine";
 const fixedImage = "public.ecr.aws/supabase/postgres:17.6.1.165";
@@ -395,6 +395,260 @@ const schemaFactsSql = `
     )
   );
 `;
+
+async function withFocusedDisposableDatabase(scenario, runAssertions) {
+  assert.ok(taskId);
+  assert.match(scenario, /^[a-z0-9-]{3,32}$/u);
+  await assertDockerExecutableIdentity();
+  await assertFileIdentity(
+    lineMigrationUrl,
+    approvedLineMigrationBytes,
+    approvedLineMigrationSha256,
+  );
+  await assertLocalImageIdentity();
+
+  const [coreMigration, identityMigration, lineMigration] = await Promise.all([
+    Deno.readTextFile(coreMigrationUrl),
+    Deno.readTextFile(identityMigrationUrl),
+    Deno.readTextFile(lineMigrationUrl),
+  ]);
+  const nonce = crypto.randomUUID().replaceAll("-", "").slice(0, 12);
+  const containerName = `laibe-a0-line-pg-${taskId}-${scenario}-${nonce}`;
+  let created = false;
+
+  try {
+    const collision = await runDocker([
+      "container",
+      "inspect",
+      containerName,
+    ]);
+    assert.equal(collision.success, false, "container name must be unused");
+
+    await runDockerRequired([
+      "run",
+      "--pull",
+      "never",
+      "--detach",
+      "--name",
+      containerName,
+      "--network",
+      "none",
+      "--label",
+      "laibe.test.kind=drs-gmail-line-private-routing-real-pg",
+      "--label",
+      `laibe.test.task=${taskId}`,
+      "--label",
+      `laibe.test.nonce=${nonce}`,
+      "--env",
+      `POSTGRES_PASSWORD=${nonce}`,
+      approvedImageId,
+    ]);
+    created = true;
+    await waitForHealthy(containerName);
+
+    const inspectOutput = await runDockerRequired(["inspect", containerName]);
+    const [inspectRecord] = JSON.parse(decoder.decode(inspectOutput.stdout));
+    assertContainerIdentity(inspectRecord, containerName, nonce);
+
+    await runPsql(containerName, coreMigration);
+    await runPsql(
+      containerName,
+      authIdentityPrerequisiteSql,
+      false,
+      "supabase_admin",
+    );
+    await runPsql(containerName, identityPrerequisiteSql);
+    await runPsql(containerName, identityMigration);
+    await runPsql(containerName, lineMigration);
+    await runPsql(containerName, fixtureSql);
+    await runPsql(
+      containerName,
+      `insert into integration.drs_line_account_bindings(
+         specialist_id, provider_channel_id, line_user_digest,
+         line_user_ciphertext, line_user_iv, encryption_key_version
+       ) values (
+         '${ids.specialist}', '${providerChannelId}', '${lineUserDigest}',
+         '${"c".repeat(24)}', '${"i".repeat(16)}', 'line-key-v1'
+       );`,
+    );
+    await runAssertions(containerName);
+  } finally {
+    if (created) {
+      await runDockerRequired(["rm", "--force", containerName]);
+      const remaining = await runDocker([
+        "container",
+        "inspect",
+        containerName,
+      ]);
+      assert.equal(
+        remaining.success,
+        false,
+        "task-owned container must be removed",
+      );
+    }
+  }
+}
+
+function startPsql(containerName, sql) {
+  const command = new Deno.Command(approvedDockerExecutable, {
+    args: [
+      "--host",
+      localDockerHost,
+      "exec",
+      "-i",
+      containerName,
+      "psql",
+      "--no-psqlrc",
+      "--quiet",
+      "--set=ON_ERROR_STOP=1",
+      "--tuples-only",
+      "--no-align",
+      "--username",
+      "postgres",
+      "--dbname",
+      "postgres",
+    ],
+    clearEnv: true,
+    env: { SystemRoot: approvedSystemRoot },
+    stdin: "piped",
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const child = command.spawn();
+  const write = async () => {
+    const writer = child.stdin.getWriter();
+    await writer.write(encoder.encode(sql));
+    await writer.close();
+  };
+  return { child, write };
+}
+
+Deno.test({
+  name:
+    "focused RED: deleting an authorization binding is rejected without lifecycle side effects",
+  ignore: taskId === null,
+  sanitizeResources: false,
+  sanitizeOps: false,
+  async fn() {
+    await withFocusedDisposableDatabase(
+      "delete-reject",
+      async (containerName) => {
+        const admitted = await callJson(
+          containerName,
+          "drs_line_admit_case_notification_v1",
+          {
+            assignment_id: ids.assignment,
+            provider_channel_id: providerChannelId,
+            template_version: "delete-reject-v1",
+          },
+        );
+        assert.equal(admitted.admitted, true);
+        const before = await queryJson(
+          containerName,
+          `select jsonb_build_object(
+          'binding', (select count(*) from integration.drs_auth_specialist_bindings where binding_id = '${ids.authBinding}'),
+          'state', (select delivery_state from integration.drs_line_notification_outbox where template_version = 'delete-reject-v1'),
+          'receipts', (select count(*) from integration.drs_line_delivery_receipts receipt join integration.drs_line_notification_outbox outbox using(outbox_id) where outbox.template_version = 'delete-reject-v1'),
+          'audits', (select count(*) from public.drs_case_audit_events audit join integration.drs_line_notification_outbox outbox on audit.payload ->> 'outbox_id' = outbox.outbox_id::text where outbox.template_version = 'delete-reject-v1')
+        );`,
+        );
+        assert.deepEqual(before, {
+          binding: 1,
+          state: "pending",
+          receipts: 0,
+          audits: 0,
+        });
+        await assertPsqlFailure(
+          containerName,
+          `delete from integration.drs_auth_specialist_bindings where binding_id = '${ids.authBinding}';`,
+          /DRS_AUTH_BINDING_DELETE_FORBIDDEN/u,
+        );
+        const after = await queryJson(
+          containerName,
+          `select jsonb_build_object(
+          'binding', (select count(*) from integration.drs_auth_specialist_bindings where binding_id = '${ids.authBinding}'),
+          'state', (select delivery_state from integration.drs_line_notification_outbox where template_version = 'delete-reject-v1'),
+          'receipts', (select count(*) from integration.drs_line_delivery_receipts receipt join integration.drs_line_notification_outbox outbox using(outbox_id) where outbox.template_version = 'delete-reject-v1'),
+          'audits', (select count(*) from public.drs_case_audit_events audit join integration.drs_line_notification_outbox outbox on audit.payload ->> 'outbox_id' = outbox.outbox_id::text where outbox.template_version = 'delete-reject-v1')
+        );`,
+        );
+        assert.deepEqual(after, before);
+      },
+    );
+  },
+});
+
+Deno.test({
+  name:
+    "focused RED: lock wait crossing authorization expiry fails at post-lock decision time",
+  ignore: taskId === null,
+  sanitizeResources: false,
+  sanitizeOps: false,
+  async fn() {
+    await withFocusedDisposableDatabase(
+      "expiry-lock",
+      async (containerName) => {
+        await runPsql(
+          containerName,
+          `update integration.drs_auth_specialist_bindings
+         set valid_until = clock_timestamp() + interval '1.5 seconds',
+           updated_at = clock_timestamp()
+         where binding_id = '${ids.authBinding}';`,
+        );
+        const admitted = await callJson(
+          containerName,
+          "drs_line_admit_case_notification_v1",
+          {
+            assignment_id: ids.assignment,
+            provider_channel_id: providerChannelId,
+            template_version: "expiry-lock-v1",
+          },
+        );
+        assert.equal(admitted.admitted, true);
+
+        const locker = startPsql(
+          containerName,
+          `begin;
+         select 1 from integration.drs_auth_specialist_bindings
+         where binding_id = '${ids.authBinding}' for update;
+         select pg_sleep(2.5);
+         commit;`,
+        );
+        await locker.write();
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        const claim = await callJson(
+          containerName,
+          "drs_line_claim_notification_v1",
+          {},
+        );
+        const lockerOutput = await locker.child.output();
+        assert.equal(lockerOutput.success, true, outputText(lockerOutput));
+        assert.deepEqual(claim, {
+          admitted: false,
+          state: "suppressed_authority",
+          assignment_status: "not_current",
+        });
+        assertNoNotificationPayloadOrDestination(claim);
+        const facts = await queryJson(
+          containerName,
+          `select jsonb_build_object(
+          'state', outbox.delivery_state,
+          'claim_token', outbox.claim_token::text,
+          'receipts', (select count(*) from integration.drs_line_delivery_receipts receipt where receipt.outbox_id = outbox.outbox_id),
+          'audits', (select count(*) from public.drs_case_audit_events audit where audit.event_type = 'PRIVATE_LINE_NOTIFICATION' and audit.payload ->> 'outbox_id' = outbox.outbox_id::text)
+        ) from integration.drs_line_notification_outbox outbox
+        where outbox.template_version = 'expiry-lock-v1';`,
+        );
+        assert.deepEqual(facts, {
+          state: "suppressed",
+          claim_token: null,
+          receipts: 1,
+          audits: 1,
+        });
+      },
+    );
+  },
+});
 
 Deno.test({
   name: "real gate: private LINE routing migration state machine",

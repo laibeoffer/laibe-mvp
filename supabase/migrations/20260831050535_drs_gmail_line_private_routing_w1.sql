@@ -1376,6 +1376,8 @@ declare
   v_assignment public.drs_case_specialist_assignments%rowtype;
   v_case public.drs_cases%rowtype;
   v_auth_binding integration.drs_auth_specialist_bindings%rowtype;
+  v_binding integration.drs_line_account_bindings%rowtype;
+  v_authority_current boolean := false;
   v_count integer := 0;
 begin
   if p_assignment_id is null
@@ -1424,19 +1426,71 @@ begin
     return 0;
   end if;
 
+  select * into v_binding
+  from integration.drs_line_account_bindings binding
+  where binding.specialist_id = v_assignment.specialist_id
+    and binding.provider_channel_id = p_provider_channel_id
+    and binding.binding_state = 'active'
+  for update;
+  if not found then
+    return 0;
+  end if;
+
+  -- Lock acquisition can wait. Refresh the decision clock after all required
+  -- authority and delivery-binding rows are locked, then repeat the complete
+  -- current-authority predicate before persisting any payload.
+  v_now := clock_timestamp();
+  select exists (
+    select 1
+    from public.drs_case_specialist_assignments assignment_record
+    join public.drs_specialists specialist_record
+      on specialist_record.specialist_id = assignment_record.specialist_id
+    join public.drs_cases case_record
+      on case_record.case_id = assignment_record.case_id
+    join integration.drs_auth_specialist_bindings auth_binding_record
+      on auth_binding_record.binding_id = v_auth_binding.binding_id
+    where assignment_record.assignment_id = v_assignment.assignment_id
+      and assignment_record.case_id = v_assignment.case_id
+      and assignment_record.specialist_id = v_assignment.specialist_id
+      and assignment_record.valid_from <= v_now
+      and (
+        assignment_record.valid_until is null
+        or assignment_record.valid_until > v_now
+      )
+      and specialist_record.authority_state = 'ACTIVE'
+      and case_record.case_state in ('ACTIVE_REVIEW', 'ACTIVE_CONSTRUCTION')
+      and auth_binding_record.specialist_id = v_assignment.specialist_id
+      and auth_binding_record.selected_assignment_id = v_assignment.assignment_id
+      and auth_binding_record.authorization_subject =
+        'drs-specialist:' || v_assignment.specialist_id::text
+      and auth_binding_record.binding_status = 'active'
+      and auth_binding_record.revoked_at is null
+      and auth_binding_record.valid_from <= v_now
+      and auth_binding_record.valid_until > v_now
+      and not exists (
+        select 1
+        from public.drs_case_specialist_assignment_terminations termination
+        where termination.assignment_id = assignment_record.assignment_id
+          and termination.terminated_at <= v_now
+      )
+  ) into v_authority_current;
+  if not v_authority_current then
+    return 0;
+  end if;
+
   insert into integration.drs_line_notification_outbox (
     case_id, assignment_id, specialist_id, auth_binding_id, binding_id,
     binding_version, provider_channel_id, template_version, idempotency_key,
     case_label, case_status, next_action, case_path, delivery_state,
     attempt_count, next_attempt_at, created_at
   )
-  select
+  values (
     v_assignment.case_id, v_assignment.assignment_id,
-    v_assignment.specialist_id, v_auth_binding.binding_id, binding.binding_id,
-    binding.binding_version, binding.provider_channel_id,
+    v_assignment.specialist_id, v_auth_binding.binding_id, v_binding.binding_id,
+    v_binding.binding_version, v_binding.provider_channel_id,
     p_template_version,
     'a:' || replace(v_assignment.assignment_id::text, '-', '') ||
-      ':l:' || binding.binding_version::text ||
+      ':l:' || v_binding.binding_version::text ||
       ':u:' || replace(v_auth_binding.binding_id::text, '-', '') ||
       ':t:' || p_template_version,
     left('案件 ' || v_case.case_number, 80),
@@ -1447,10 +1501,7 @@ begin
     '請開啟 DRS 收件匣檢視案件',
     '/pcm/console/case?caseId=' || v_assignment.case_id::text,
     'pending', 0, v_now, v_now
-  from integration.drs_line_account_bindings binding
-  where binding.specialist_id = v_assignment.specialist_id
-    and binding.provider_channel_id = p_provider_channel_id
-    and binding.binding_state = 'active'
+  )
   on conflict (idempotency_key) do nothing;
 
   select count(*)::integer into v_count
@@ -1530,6 +1581,13 @@ declare
   v_now timestamptz := clock_timestamp();
   v_suppressed integration.drs_line_notification_outbox%rowtype;
 begin
+  if tg_table_schema = 'integration'
+    and tg_table_name = 'drs_auth_specialist_bindings'
+    and tg_op = 'DELETE'
+  then
+    raise exception 'DRS_AUTH_BINDING_DELETE_FORBIDDEN';
+  end if;
+
   if tg_table_schema = 'public'
     and tg_table_name = 'drs_case_specialist_assignment_terminations'
   then
@@ -1728,6 +1786,7 @@ declare
   v_outbox integration.drs_line_notification_outbox%rowtype;
   v_binding integration.drs_line_account_bindings%rowtype;
   v_authority_current boolean := false;
+  v_binding_current boolean := false;
 begin
   if not drs_private.drs_line_exact_json_keys_v1(p_input, array[]::text[]) then
     return jsonb_build_object('admitted', false, 'state', 'permission_denied');
@@ -1815,8 +1874,49 @@ begin
     and binding_version = v_outbox.binding_version
     and binding_state = 'active'
   for update;
+  v_binding_current := found;
 
-  if not v_authority_current or not found then
+  -- The required row locks may have waited past an authority deadline.
+  -- Refresh the clock and recheck every current fact before exposing payload.
+  v_now := clock_timestamp();
+  if v_authority_current and v_binding_current then
+    select exists (
+      select 1
+      from public.drs_case_specialist_assignments assignment_record
+      join public.drs_specialists specialist_record
+        on specialist_record.specialist_id = assignment_record.specialist_id
+      join public.drs_cases case_record
+        on case_record.case_id = assignment_record.case_id
+      join integration.drs_auth_specialist_bindings auth_binding_record
+        on auth_binding_record.binding_id = v_outbox.auth_binding_id
+      where assignment_record.assignment_id = v_outbox.assignment_id
+        and assignment_record.case_id = v_outbox.case_id
+        and assignment_record.specialist_id = v_outbox.specialist_id
+        and assignment_record.valid_from <= v_now
+        and (
+          assignment_record.valid_until is null
+          or assignment_record.valid_until > v_now
+        )
+        and specialist_record.authority_state = 'ACTIVE'
+        and case_record.case_state in ('ACTIVE_REVIEW', 'ACTIVE_CONSTRUCTION')
+        and auth_binding_record.specialist_id = v_outbox.specialist_id
+        and auth_binding_record.selected_assignment_id = v_outbox.assignment_id
+        and auth_binding_record.authorization_subject =
+          'drs-specialist:' || v_outbox.specialist_id::text
+        and auth_binding_record.binding_status = 'active'
+        and auth_binding_record.revoked_at is null
+        and auth_binding_record.valid_from <= v_now
+        and auth_binding_record.valid_until > v_now
+        and not exists (
+          select 1
+          from public.drs_case_specialist_assignment_terminations termination
+          where termination.assignment_id = assignment_record.assignment_id
+            and termination.terminated_at <= v_now
+        )
+    ) into v_authority_current;
+  end if;
+
+  if not v_authority_current or not v_binding_current then
     update integration.drs_line_notification_outbox
     set delivery_state = 'suppressed', claim_token = null,
       claimed_at = null, completed_at = v_now
@@ -1935,6 +2035,49 @@ begin
   for update of assignment_record, specialist_record, case_record, binding,
     auth_binding_record;
   v_current := found;
+  if v_current then
+    v_now := clock_timestamp();
+    select exists (
+      select 1
+      from public.drs_case_specialist_assignments assignment_record
+      join public.drs_specialists specialist_record
+        on specialist_record.specialist_id = assignment_record.specialist_id
+      join public.drs_cases case_record
+        on case_record.case_id = assignment_record.case_id
+      join integration.drs_line_account_bindings binding
+        on binding.binding_id = v_outbox.binding_id
+      join integration.drs_auth_specialist_bindings auth_binding_record
+        on auth_binding_record.binding_id = v_outbox.auth_binding_id
+      where assignment_record.assignment_id = v_outbox.assignment_id
+        and assignment_record.case_id = v_outbox.case_id
+        and assignment_record.specialist_id = v_outbox.specialist_id
+        and assignment_record.valid_from <= v_now
+        and (
+          assignment_record.valid_until is null
+          or assignment_record.valid_until > v_now
+        )
+        and specialist_record.authority_state = 'ACTIVE'
+        and case_record.case_state in ('ACTIVE_REVIEW', 'ACTIVE_CONSTRUCTION')
+        and binding.specialist_id = v_outbox.specialist_id
+        and binding.provider_channel_id = v_outbox.provider_channel_id
+        and binding.binding_version = v_outbox.binding_version
+        and binding.binding_state = 'active'
+        and auth_binding_record.specialist_id = v_outbox.specialist_id
+        and auth_binding_record.selected_assignment_id = v_outbox.assignment_id
+        and auth_binding_record.authorization_subject =
+          'drs-specialist:' || v_outbox.specialist_id::text
+        and auth_binding_record.binding_status = 'active'
+        and auth_binding_record.revoked_at is null
+        and auth_binding_record.valid_from <= v_now
+        and auth_binding_record.valid_until > v_now
+        and not exists (
+          select 1
+          from public.drs_case_specialist_assignment_terminations termination
+          where termination.assignment_id = assignment_record.assignment_id
+            and termination.terminated_at <= v_now
+        )
+    ) into v_current;
+  end if;
   return jsonb_build_object('current', v_current);
 exception
   when others then
