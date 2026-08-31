@@ -1,6 +1,8 @@
 const LINE_API_ORIGIN = "https://api.line.me";
 const MAX_PROVIDER_RESPONSE_BYTES = 32 * 1024;
 const LINE_USER_ID_PATTERN = /^U[0-9a-f]{32}$/u;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
 export type LineCaseNotification = Readonly<{
   caseLabel: string;
@@ -40,6 +42,7 @@ export type LineClient = Readonly<{
   pushCaseNotification(
     lineUserId: string,
     message: LineCaseNotification,
+    retryKey?: string,
   ): Promise<Readonly<{ requestId: string | null }>>;
 }>;
 
@@ -148,14 +151,19 @@ export function createLineClient(
   async function request(
     path: string,
     body?: unknown,
+    additionalHeaders?: Readonly<Record<string, string>>,
   ): Promise<Readonly<{ payload: unknown; requestId: string | null }>> {
     let response: Response;
     try {
       response = await fetcher(`${LINE_API_ORIGIN}${path}`, {
         method: "POST",
         headers: body === undefined
-          ? headers
-          : { ...headers, "content-type": "application/json; charset=utf-8" },
+          ? { ...headers, ...additionalHeaders }
+          : {
+            ...headers,
+            ...additionalHeaders,
+            "content-type": "application/json; charset=utf-8",
+          },
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch {
@@ -209,6 +217,7 @@ export function createLineClient(
     async pushCaseNotification(
       lineUserId: string,
       message: LineCaseNotification,
+      retryKey?: string,
     ): Promise<Readonly<{ requestId: string | null }>> {
       if (
         !LINE_USER_ID_PATTERN.test(lineUserId) ||
@@ -216,7 +225,8 @@ export function createLineClient(
         !isSafeText(message.caseLabel, 1, 80) ||
         !isSafeText(message.caseStatus, 1, 120) ||
         !isSafeText(message.nextAction, 1, 160) ||
-        !isSafeHttpsUrl(message.caseUrl, 512)
+        !isSafeHttpsUrl(message.caseUrl, 512) ||
+        (retryKey !== undefined && !UUID_PATTERN.test(retryKey))
       ) throw new LineProviderError("provider_invalid_request");
       const result = await request("/v2/bot/message/push", {
         to: lineUserId,
@@ -230,7 +240,7 @@ export function createLineClient(
             message.caseUrl,
           ].join("\n"),
         }],
-      });
+      }, retryKey === undefined ? undefined : { "x-line-retry-key": retryKey });
       if (!exactEmptyObject(result.payload)) {
         throw new LineProviderError("provider_invalid_response");
       }

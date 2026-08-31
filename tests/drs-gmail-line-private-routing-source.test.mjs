@@ -43,6 +43,10 @@ const lineWebhookUrl = new URL(
   "../supabase/functions/_shared/drs-line-account-link/webhook.ts",
   import.meta.url,
 );
+const lineNotificationUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/notification.ts",
+  import.meta.url,
+);
 
 const AUTHORITY = Object.freeze({
   authenticatedUserId: "00000000-0000-4000-8000-000000000001",
@@ -368,12 +372,16 @@ test("LINE client pins official endpoints and emits only approved request bodies
     ),
     { requestId: "req-2" },
   );
-  assert.deepEqual(await client.pushCaseNotification(LINE_USER_ID, {
-    caseLabel: "案件 DRS-042",
-    caseStatus: "等待一般審查員確認",
-    nextAction: "請開啟 DRS 收件匣檢視",
-    caseUrl: "https://laibe.example/drs/cases/current",
-  }), { requestId: "req-3" });
+  assert.deepEqual(await client.pushCaseNotification(
+    LINE_USER_ID,
+    {
+      caseLabel: "案件 DRS-042",
+      caseStatus: "等待一般審查員確認",
+      nextAction: "請開啟 DRS 收件匣檢視",
+      caseUrl: "https://laibe.example/drs/cases/current",
+    },
+    "00000000-0000-4000-8000-000000000099",
+  ), { requestId: "req-3" });
 
   assert.deepEqual(calls.map(({ input }) => input), [
     `https://api.line.me/v2/bot/user/${LINE_USER_ID}/linkToken`,
@@ -411,6 +419,10 @@ test("LINE client pins official endpoints and emits only approved request bodies
       ].join("\n"),
     }],
   });
+  assert.equal(
+    calls[2].init.headers["x-line-retry-key"],
+    "00000000-0000-4000-8000-000000000099",
+  );
 });
 
 test("LINE client fails closed with sanitized errors and bounded provider responses", async () => {
@@ -989,5 +1001,171 @@ test("canonical LINE webhook entry disables gateway JWT and remains import-safe"
   ).href);
   assert.equal(module.VERIFY_JWT_REQUIRED, false);
   assert.equal(typeof module.createLineWebhookHandler, "function");
+  assert.equal(typeof module.handler, "function");
+});
+
+async function encryptedLineClaim(overrides = {}) {
+  const { encryptLineUserId } = await import(cryptoUrl.href);
+  const key = await testEncryptionKey();
+  const envelope = await encryptLineUserId(key, LINE_USER_ID);
+  return {
+    key,
+    claim: {
+      admitted: true,
+      outboxId: "00000000-0000-4000-8000-000000000099",
+      claimToken: "00000000-0000-4000-8000-000000000098",
+      bindingVersion: "17",
+      lineUserCiphertext: envelope.ciphertext,
+      lineUserIv: envelope.iv,
+      encryptionKeyVersion: "test-v1",
+      caseLabel: "案件 DRS-042",
+      caseStatus: "等待一般審查員確認",
+      nextAction: "請開啟 DRS 收件匣檢視",
+      caseUrl: "https://laibe.example/drs/cases/current",
+      ...overrides,
+    },
+  };
+}
+
+test("private dispatcher decrypts only a claimed current binding and appends acceptance", async () => {
+  const { createPrivateNotificationDispatcher } = await import(
+    lineNotificationUrl.href
+  );
+  const { key, claim } = await encryptedLineClaim();
+  const calls = [];
+  const dispatcher = createPrivateNotificationDispatcher({
+    repository: {
+      async claimNext() { calls.push({ operation: "claim" }); return claim; },
+      async complete(input) {
+        calls.push({ operation: "complete", input });
+        return { completed: true, state: "accepted" };
+      },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("not used"); },
+      async replyAccountLink() { throw new Error("not used"); },
+      async pushCaseNotification(lineUserId, message, retryKey) {
+        calls.push({ operation: "push", lineUserId, message, retryKey });
+        return { requestId: "safe-request-id" };
+      },
+    },
+    identityEncryptionKey: key,
+    identityEncryptionKeyVersion: "test-v1",
+    clock: (() => {
+      const values = [1000, 1354];
+      return () => values.shift() ?? 1354;
+    })(),
+  });
+  assert.deepEqual(await dispatcher(), { state: "accepted" });
+  assert.deepEqual(calls.map(({ operation }) => operation), [
+    "claim", "push", "complete",
+  ]);
+  assert.equal(calls[1].lineUserId, LINE_USER_ID);
+  assert.equal(calls[1].retryKey, claim.outboxId);
+  assert.deepEqual(calls[1].message, {
+    caseLabel: claim.caseLabel,
+    caseStatus: claim.caseStatus,
+    nextAction: claim.nextAction,
+    caseUrl: claim.caseUrl,
+  });
+  assert.equal(calls[2].input.outcome, "accepted");
+  assert.equal(calls[2].input.httpStatusClass, "2xx");
+  assert.equal(calls[2].input.durationMs, 354);
+  assert.equal(JSON.stringify(calls[2]).includes(LINE_USER_ID), false);
+});
+
+test("dispatcher never sends after key-version mismatch and bounds provider retries", async () => {
+  const {
+    createPrivateNotificationDispatcher,
+  } = await import(lineNotificationUrl.href);
+  const { LineProviderError } = await import(lineClientUrl.href);
+  const { key, claim } = await encryptedLineClaim();
+  const completions = [];
+  let pushes = 0;
+  const mismatch = createPrivateNotificationDispatcher({
+    repository: {
+      async claimNext() { return { ...claim, encryptionKeyVersion: "retired-v0" }; },
+      async complete(input) {
+        completions.push(input);
+        return { completed: true, state: "permanent_failure" };
+      },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("not used"); },
+      async replyAccountLink() { throw new Error("not used"); },
+      async pushCaseNotification() { pushes += 1; throw new Error("must not send"); },
+    },
+    identityEncryptionKey: key,
+    identityEncryptionKeyVersion: "test-v1",
+  });
+  assert.deepEqual(await mismatch(), { state: "permanent_failure" });
+  assert.equal(pushes, 0);
+  assert.equal(completions[0].reasonCode, "encryption_key_unavailable");
+
+  const retrying = createPrivateNotificationDispatcher({
+    repository: {
+      async claimNext() { return claim; },
+      async complete(input) {
+        completions.push(input);
+        return { completed: true, state: "retry" };
+      },
+    },
+    lineClient: {
+      async issueLinkToken() { throw new Error("not used"); },
+      async replyAccountLink() { throw new Error("not used"); },
+      async pushCaseNotification() {
+        throw new LineProviderError("provider_rate_limited", "4xx");
+      },
+    },
+    identityEncryptionKey: key,
+    identityEncryptionKeyVersion: "test-v1",
+  });
+  assert.deepEqual(await retrying(), { state: "retry" });
+  assert.equal(completions.at(-1).outcome, "retryable_failure");
+  assert.equal(completions.at(-1).retryAfterSeconds, 60);
+});
+
+test("service-only dispatch endpoint has an exact empty request contract", async () => {
+  const { createPrivateNotificationDispatchHandler } = await import(
+    lineNotificationUrl.href
+  );
+  let dispatches = 0;
+  const handler = createPrivateNotificationDispatchHandler({
+    authorizeService: () => true,
+    dispatcher: async () => {
+      dispatches += 1;
+      return { state: "empty" };
+    },
+  });
+  const accepted = await handler(new Request(
+    "https://edge.example/functions/v1/drs-line-private-notification-dispatch",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+    },
+  ));
+  assert.equal(accepted.status, 200);
+  assert.deepEqual(await accepted.json(), { state: "empty" });
+  assert.equal(dispatches, 1);
+  const rejected = await handler(new Request(
+    "https://edge.example/functions/v1/drs-line-private-notification-dispatch?caseId=x",
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "{}",
+    },
+  ));
+  assert.equal(rejected.status, 400);
+  assert.equal(dispatches, 1);
+});
+
+test("private notification entry requires gateway JWT and remains import-safe", async () => {
+  const module = await import(new URL(
+    "../supabase/functions/drs-line-private-notification-dispatch/index.ts",
+    import.meta.url,
+  ).href);
+  assert.equal(module.VERIFY_JWT_REQUIRED, true);
+  assert.equal(typeof module.createPrivateNotificationDispatchHandler, "function");
   assert.equal(typeof module.handler, "function");
 });

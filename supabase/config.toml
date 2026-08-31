@@ -72,3 +72,6 @@ verify_jwt = false
 
 [functions.drs-line-webhook]
 verify_jwt = false
+
+[functions.drs-line-private-notification-dispatch]
+verify_jwt = true
