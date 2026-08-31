@@ -228,7 +228,7 @@ test("page and role context stays explicit while header routes match the real ma
   assert.equal(getActiveCanonicalLinkHref(homeContract.id), homeContract.relativeHref);
 
   assert.match(headerById.get("quoteCheck"), /aria-current="page"[^>]*>文件健檢<\/a>/u);
-  assert.match(headerById.get("accountAccess"), /href="\.\.\/quote_check\/code\.html\?mode=quote#document-workspace">開始文件健檢<\/a>/u);
+  assert.match(headerById.get("accountAccess"), /href="\.\.\/quote_check\/code\.html\?mode=contract#document-workspace">開始文件健檢<\/a>/u);
   assert.match(headerById.get("aboutDrs"), /aria-current="page">關於 DRS<\/span>/u);
   assert.match(headerById.get("serviceContract"), /data-service-header-return[^>]*>返回 DRS 首頁<\/a>/u);
   assert.match(headerById.get("ownerWorkspace"), /工作台角色[\s\S]*?>甲方<[\s\S]*?>案件<[\s\S]*?>服務契約</u);

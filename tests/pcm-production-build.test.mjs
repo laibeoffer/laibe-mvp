@@ -213,7 +213,8 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
     `data:text/javascript;base64,${Buffer.from(sourceManifest).toString("base64")}`
   );
   const deployNodes = PCM_FLOW_ROUTE_MANIFEST.nodes.filter(
-    ({ publicPath, lifecycle }) => publicPath && ["active", "planned"].includes(lifecycle),
+    ({ publicPath, lifecycle }) =>
+      publicPath && ["active", "planned", "compatibility_redirect"].includes(lifecycle),
   );
   const retiredPaths = PCM_FLOW_ROUTE_MANIFEST.nodes
     .filter(({ lifecycle }) => lifecycle === "retired")
@@ -239,9 +240,9 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   }
 
   const assetFiles = second.files.filter((file) => file.startsWith("assets/"));
-  assert.equal(assetFiles.length, 50, "exact production asset closure");
+  assert.equal(assetFiles.length, 48, "exact production asset closure");
   assert.equal(deployNodes.length, 20, "exact production route closure");
-  assert.equal(second.files.length, 75, "50 assets + 20 routes + 5 metadata files");
+  assert.equal(second.files.length, 73, "48 assets + 20 routes + 5 metadata files");
   assert.deepEqual(await listMaterializationArtifacts(), [], "successful build swap artifacts");
   const assetRoots = new Set(assetFiles.map((file) => file.split("/").slice(0, 2).join("/")));
   assert.equal(assetRoots.size, 1, "all runtime assets share one content hash root");
@@ -284,9 +285,14 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
     readFile(entryPath("/pcm/quote-check"), "utf8"),
     readFile(path.join(distRoot, assetFiles.find((file) => file.endsWith("/pcm_standalone/quote_check/app.js"))), "utf8"),
   ]);
-  assert.match(quoteEntry, /href="\/pcm\/drawing-check"[^>]*data-drawing-check-link/u);
-  assert.match(quoteRuntime, /DRAWING_CHECK_HREF = "\/pcm\/drawing-check"/u);
-  assert.equal(getProductionRouteHref("drawingCheck"), "/pcm/drawing-check");
+  assert.match(quoteEntry, /href="\?mode=drawing#document-workspace"[^>]*data-drawing-check-link/u);
+  assert.match(quoteRuntime, /DRAWING_CHECK_HREF = "\?mode=drawing#document-workspace"/u);
+  assert.equal(getProductionRouteHref("drawingCheck"), null);
+  assert.equal(productionNodeById.get("drawingCheck")?.lifecycle, "compatibility_redirect");
+  assert.equal(
+    productionNodeById.get("drawingCheck")?.redirectTo,
+    "/pcm/quote-check/?mode=contract#document-workspace",
+  );
 
   const reviewerEntry = await readFile(entryPath("/pcm/reviewer/access"), "utf8");
   const reviewerTransportFile = assetFiles.find((file) => (
@@ -327,14 +333,10 @@ test("production build emits deterministic clean DRS routes and an allowlisted a
   assert.doesNotMatch(applicationJavascript, /(?:\/src\/|code\.html)/iu);
 
   const drawing = await readFile(entryPath("/pcm/drawing-check"), "utf8");
-  assert.match(drawing, /data-drawing-check-page/u);
-  assert.match(drawing, /id="drawing-file"/u);
-  assert.match(drawing, /\/assets\/[a-f\d]{64}\/[^"']*\/drawing_check\/styles\.css/u);
-  assert.match(drawing, /\/assets\/[a-f\d]{64}\/[^"']*\/drawing_check\/app\.js/u);
-  assert.doesNotMatch(drawing, /圖說辨識功能正在整理中|正式開放後會提供完整操作入口/u);
+  assert.match(drawing, /http-equiv="refresh"/u);
+  assert.match(drawing, /\/pcm\/quote-check\/\?mode=contract#document-workspace/u);
+  assert.doesNotMatch(drawing, /data-drawing-check-page|id="drawing-file"|\/assets\//u);
   for (const suffix of [
-    "/pcm_standalone/drawing_check/app.js",
-    "/pcm_standalone/drawing_check/styles.css",
     "/site/preview_floor_plan/browser-recognition-adapter.mjs",
     "/site/preview_floor_plan/pdf-plan-vector-extractor.js",
     "/site/preview_floor_plan/pdf-plan-objectization-adapter.js",
@@ -489,7 +491,6 @@ test("every real source-entry read and dependency failure preserves the exact li
       ["home", "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html"],
       ["aboutDrs", "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html"],
       ["quoteCheck", "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html"],
-      ["drawingCheck", "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/code.html"],
       ["accountAccess", "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html"],
       ["serviceContract", "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html"],
       ["contractPrerequisites", "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html"],
@@ -545,7 +546,7 @@ test("every real source-entry read and dependency failure preserves the exact li
   }
 });
 
-test("drawing and every planned route preflight failure preserve the exact live artifact", async (context) => {
+test("compatibility and every planned route preflight failure preserve the exact live artifact", async (context) => {
   const faultBuildPath = path.join(distRoot, ".generated-route-family-atomicity-probe.mjs");
   const sentinelPath = path.join(distRoot, ".generated-route-family-atomicity-sentinel");
   try {
@@ -555,6 +556,7 @@ test("drawing and every planned route preflight failure preserve the exact live 
     assert.equal(buildSource.includes(appendRoute), true, "generated route append");
     await writeFile(sentinelPath, "preserve generated route families\n", "utf8");
     for (const id of [
+      "drawingCheck",
       "caseSetup",
       "vendorInvitation",
       "pcmAuthorizedList",
@@ -725,11 +727,11 @@ test("real stage verifier and unknown-fault failures preserve live output", asyn
   const rows = [
     {
       fault: "stage-verify-missing-planned-file",
-        diagnostic: /Staged production artifact file set does not match the validated plan: expected=75, actual=74,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=73, actual=72,[^\r\n]*expectedPath="pcm\/case\/setup\/index\.html"/u,
     },
     {
       fault: "stage-verify-unexpected-file",
-        diagnostic: /Staged production artifact file set does not match the validated plan: expected=75, actual=76,/u,
+        diagnostic: /Staged production artifact file set does not match the validated plan: expected=73, actual=74,/u,
     },
     {
       fault: "stage-verify-mutated-bytes",
@@ -907,8 +909,12 @@ test("production metadata provides strict headers, bounded redirects, a true 404
   assert.doesNotMatch(redirects, /\/src\/|\s\/\*\s|200\s*$/mu);
   for (const line of redirects.trim().split(/\r?\n/u)) {
     const [from, to, status] = line.trim().split(/\s+/u);
-    assert.equal(from.endsWith("/"), true, line);
-    assert.equal(to, from.slice(0, -1), line);
+    if (from.startsWith("/pcm/drawing-check")) {
+      assert.equal(to, "/pcm/quote-check/?mode=contract#document-workspace", line);
+    } else {
+      assert.equal(from.endsWith("/"), true, line);
+      assert.equal(to, from.slice(0, -1), line);
+    }
     assert.equal(status, "301", line);
   }
 
@@ -919,6 +925,7 @@ test("production metadata provides strict headers, bounded redirects, a true 404
   assert.match(robots, /^User-agent: \*\r?\nAllow: \/$/mu);
   assert.doesNotMatch(sitemap, /<loc>https?:\/\//u);
   assert.match(sitemap, /<loc>\/pcm<\/loc>/u);
+  assert.doesNotMatch(sitemap, /\/pcm\/drawing-check/u);
 
   runBuild({ DRS_PUBLIC_ORIGIN: "https://drs.example.test/" });
   const absoluteSitemap = await readFile(path.join(distRoot, "sitemap.xml"), "utf8");

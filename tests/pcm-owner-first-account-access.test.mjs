@@ -239,7 +239,7 @@ test("registration keeps the existing LaiBE header and real navigation", () => {
   assert.match(html, /Decision &amp; Record System/);
   assert.match(html, /裝潢決策系統/);
   assert.match(html, /class="header-action"[^>]*href="\.\.\/public_home\/code\.html#top"[^>]*>返回 LaiBE 首頁<\/a>/);
-  assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=contract#document-workspace");
   assert.ok(html.includes(`<a class="header-action header-action--primary" href="${startDocumentCheckHref}">開始文件健檢</a>`));
   assert.match(css, /\.site-header\s*\{/);
   assert.match(css, /@media\s*\(max-width:\s*620px\)[\s\S]*\.site-header\s*\{/);

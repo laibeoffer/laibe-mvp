@@ -653,8 +653,8 @@ test("Public Home canonical header and decision entries use the approved DRS rou
   );
 
   const expectedModes = [
-    ["homeDecisionQuoteCheckToQuoteCheck", "報價", "健檢", "../quote_check/code.html?mode=quote#document-workspace"],
-    ["homeDecisionDrawingCheckToQuoteCheck", "圖說", "檢查", "../drawing_check/code.html"],
+    ["homeDecisionQuoteCheckToQuoteCheck", "報價", "健檢", "../quote_check/code.html?mode=contract#document-workspace"],
+    ["homeDecisionDrawingCheckToQuoteCheck", "圖說", "檢查", "../quote_check/code.html?mode=contract#document-workspace"],
     ["homeDecisionCustomContractToQuoteCheck", "契約", "健檢", "../quote_check/code.html?mode=contract#document-workspace"],
   ];
   const { PUBLIC_ROUTES } = await import(
@@ -1188,7 +1188,7 @@ test("decision titles reveal the approved detail checks and keep every activated
   assert.equal(mockNodes[2].panel.getAttribute("aria-hidden"), "false");
 });
 
-test("three decision branches consume their dedicated manifest-only quote-check mode routes", async () => {
+test("three decision branches consume the unified manifest-only document workspace route", async () => {
   const [html, css, appSource, publicContractSource] = await Promise.all([
     readFile(htmlUrl, "utf8"),
     readFile(cssUrl, "utf8"),
@@ -1206,14 +1206,14 @@ test("three decision branches consume their dedicated manifest-only quote-check 
       routeId: "homeDecisionQuoteCheckToQuoteCheck",
       subject: "報價",
       action: "健檢",
-      href: "../quote_check/code.html?mode=quote#document-workspace",
+      href: "../quote_check/code.html?mode=contract#document-workspace",
     },
     {
       decisionTool: "drawing",
       routeId: "homeDecisionDrawingCheckToQuoteCheck",
       subject: "圖說",
       action: "檢查",
-      href: "../drawing_check/code.html",
+      href: "../quote_check/code.html?mode=contract#document-workspace",
     },
     {
       decisionTool: "contract",
@@ -1831,9 +1831,9 @@ test("route binding requires an exact trusted route name and href pair", async (
   const activeDrawing = makeRouteControl("drawingCheck");
   bindPublicRoutes(
     { querySelectorAll: () => [activeDrawing] },
-    { drawingCheck: "../drawing_check/code.html" },
+    { drawingCheck: "../quote_check/code.html?mode=contract#document-workspace" },
   );
-  assert.equal(activeDrawing.getAttribute("href"), "../drawing_check/code.html");
+  assert.equal(activeDrawing.getAttribute("href"), "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(activeDrawing.getAttribute("aria-disabled"), null);
   assert.equal(activeDrawing.getAttribute("tabindex"), null);
   assert.equal(activeDrawing.dataset.routeState, "active");

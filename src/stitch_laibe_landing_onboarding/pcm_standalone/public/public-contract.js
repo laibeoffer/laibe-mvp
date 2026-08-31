@@ -85,7 +85,7 @@ const publicRoutes = {
 // its own source package is admitted and activated.
 Object.defineProperties(publicRoutes, {
   quoteCheck: { value: getActiveRouteHref("quoteCheck"), enumerable: false },
-  drawingCheck: { value: getActiveRouteHref("drawingCheck"), enumerable: false },
+  drawingCheck: { value: getActiveCanonicalLinkHref("homeDecisionDrawingCheckToQuoteCheck"), enumerable: false },
   accountAccess: { value: getActiveRouteHref("accountAccess"), enumerable: false },
   caseSetup: { value: getActiveRouteHref("caseSetup"), enumerable: false },
   serviceContract: { value: getActiveRouteHref("serviceContract"), enumerable: false },

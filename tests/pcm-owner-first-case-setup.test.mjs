@@ -60,8 +60,11 @@ test("document pairing and formal PCM decision stay truthful and zero-write", as
     "是否申請正式 PCM 服務",
     "尚未建立案件",
   ]) assert.match(html, new RegExp(marker, "u"));
-  assert.match(html, /href="\.\.\/quote_check\/code\.html"/u);
-  assert.match(html, /href="\.\.\/drawing_check\/code\.html"/u);
+  assert.equal(
+    (html.match(/href="\.\.\/quote_check\/code\.html\?mode=contract#document-workspace"/gu) ?? []).length,
+    4,
+  );
+  assert.doesNotMatch(html, /drawing_check\/code\.html/u);
   assert.doesNotMatch(html, /(?:已上傳|已儲存|案件已建立|正式審查完成)/u);
   const disabledControls = html.match(/<(?:button|input)[^>]*disabled/gu) ?? [];
   assert.ok(disabledControls.length >= 3);

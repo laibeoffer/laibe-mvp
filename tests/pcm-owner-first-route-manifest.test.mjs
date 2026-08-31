@@ -303,7 +303,7 @@ test("Public Home header DRS service contract publishes its own Account Access o
   assert.notEqual(serviceContract.href, expected.relativeHref);
 });
 
-test("Public Home decision controls publish exactly three real quote-check modes", async () => {
+test("Public Home decision controls publish one unified document workspace", async () => {
   const {
     PCM_FLOW_ROUTE_MANIFEST,
     getActiveCanonicalLinkHref,
@@ -312,20 +312,20 @@ test("Public Home decision controls publish exactly three real quote-check modes
     {
       id: "homeDecisionQuoteCheckToQuoteCheck",
       trigger: "報價健檢",
-      relativeHref: "../quote_check/code.html?mode=quote#document-workspace",
-      canonicalHttpUrl: "/pcm/quote-check?mode=quote#document-workspace",
+      relativeHref: "../quote_check/code.html?mode=contract#document-workspace",
+      canonicalHttpUrl: "/pcm/quote-check/?mode=contract#document-workspace",
     },
     {
       id: "homeDecisionDrawingCheckToQuoteCheck",
       trigger: "圖說檢查",
-      relativeHref: "../drawing_check/code.html",
-      canonicalHttpUrl: "/pcm/drawing-check",
+      relativeHref: "../quote_check/code.html?mode=contract#document-workspace",
+      canonicalHttpUrl: "/pcm/quote-check/?mode=contract#document-workspace",
     },
     {
       id: "homeDecisionCustomContractToQuoteCheck",
       trigger: "契約健檢",
       relativeHref: "../quote_check/code.html?mode=contract#document-workspace",
-      canonicalHttpUrl: "/pcm/quote-check?mode=contract#document-workspace",
+      canonicalHttpUrl: "/pcm/quote-check/?mode=contract#document-workspace",
     },
   ];
 
@@ -347,13 +347,8 @@ test("Public Home decision controls publish exactly three real quote-check modes
     assert.equal(ownedLinks.length, 1, expected.id);
     assert.equal(ownedLinks[0].fromPage, "home");
     assert.equal(ownedLinks[0].trigger, expected.trigger);
-    if (ownedLinks[0].id === "homeDecisionDrawingCheckToQuoteCheck") {
-      assert.equal(ownedLinks[0].toPage, "drawingCheck");
-      assert.equal(ownedLinks[0].targetAnchor, null);
-    } else {
-      assert.equal(ownedLinks[0].toPage, "quoteCheck");
-      assert.equal(ownedLinks[0].targetAnchor, "#document-workspace");
-    }
+    assert.equal(ownedLinks[0].toPage, "quoteCheck");
+    assert.equal(ownedLinks[0].targetAnchor, "#document-workspace");
     assert.equal(ownedLinks[0].relativeHref, expected.relativeHref);
     assert.equal(ownedLinks[0].canonicalHttpUrl, expected.canonicalHttpUrl);
     assert.equal(ownedLinks[0].returnRoute, "home");
@@ -421,7 +416,7 @@ test("canonical header brand and CTA links cover public returns without inventin
 
   const accountCheck = byLinkId.get("accountAccessHeaderStartDocumentCheckToQuoteCheck");
   assert.equal(accountCheck?.trigger, "開始文件健檢");
-  assert.equal(accountCheck?.relativeHref, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.equal(accountCheck?.relativeHref, "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(accountCheck?.targetAnchor, "#document-workspace");
 
   const conditionalOwnerReturn = byLinkId.get("serviceContractTrustedOwnerReturnToOwnerContractManagement");
@@ -585,7 +580,7 @@ test("Account Access holds the Owner normal route while the Vendor destination r
   });
 });
 
-test("admitted UI routes are active while the remaining runtime routes stay planned and 404-safe", async () => {
+test("admitted UI routes, compatibility redirects, and planned routes stay distinct", async () => {
   const { PCM_FLOW_ROUTE_MANIFEST } = await import(routeManifestUrl.href);
   const byId = new Map(PCM_FLOW_ROUTE_MANIFEST.nodes.map((node) => [node.id, node]));
 
@@ -595,8 +590,9 @@ test("admitted UI routes are active while the remaining runtime routes stay plan
   await access(new URL(quoteCheck.href, routeManifestUrl));
 
   const drawingCheck = byId.get("drawingCheck");
-  assert.equal(drawingCheck.lifecycle, "active");
-  assert.equal(drawingCheck.href, "../drawing_check/code.html");
+  assert.equal(drawingCheck.lifecycle, "compatibility_redirect");
+  assert.equal(drawingCheck.href, "../quote_check/code.html?mode=contract#document-workspace");
+  assert.equal(drawingCheck.redirectTo, "/pcm/quote-check/?mode=contract#document-workspace");
   await access(new URL(drawingCheck.href, routeManifestUrl));
 
   const accountAccess = byId.get("accountAccess");
@@ -626,16 +622,17 @@ test("admitted UI routes are active while the remaining runtime routes stay plan
   }
 
   for (const [from, to] of [
-    ["home", "drawingCheck"],
     ["home", "accountAccess"],
-    ["quoteCheck", "drawingCheck"],
-    ["drawingCheck", "quoteCheck"],
   ]) {
     const edge = PCM_FLOW_ROUTE_MANIFEST.edges.find(
       (candidate) => candidate.from === from && candidate.to === to,
     );
     assert.equal(edge?.clickable, true, `${from} -> ${to}`);
   }
+  assert.equal(
+    PCM_FLOW_ROUTE_MANIFEST.edges.some(({ from, to }) => from === "drawingCheck" || to === "drawingCheck"),
+    false,
+  );
 });
 
 test("canonical route graph retains forward, back, pending, and recovery coverage", async () => {
@@ -1011,11 +1008,11 @@ test("trusted route lookup ignores post-load Array.find pollution before consume
   assert.equal(child.status, 0, child.stderr);
   const evidence = JSON.parse(child.stdout);
   assert.equal(evidence.findCalls, 0);
-  assert.equal(evidence.drawingHref, "../drawing_check/code.html");
+  assert.equal(evidence.drawingHref, "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(evidence.compatibilityHref, "../owner_start/code.html");
   assert.deepEqual(evidence.result, {
     routeKey: "drawingCheck",
-    href: "../drawing_check/code.html",
+    href: "../quote_check/code.html?mode=contract#document-workspace",
     gate: "G1_UI_SOURCE",
     reason: "PUBLIC_ROUTE",
     payloadPolicy: "NO_CASE_DATA",
@@ -1319,10 +1316,10 @@ test("public contract preserves its compatibility own-key schema while manifest 
   ]);
 
   assert.equal(PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
-  assert.equal(PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
+  assert.equal(PUBLIC_ROUTES.drawingCheck, "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(PUBLIC_ROUTES.accountAccess, "../account_access/code.html");
-  assert.equal(PUBLIC_ROUTES.homeDecisionQuoteCheckToQuoteCheck, "../quote_check/code.html?mode=quote#document-workspace");
-  assert.equal(PUBLIC_ROUTES.homeDecisionDrawingCheckToQuoteCheck, "../drawing_check/code.html");
+  assert.equal(PUBLIC_ROUTES.homeDecisionQuoteCheckToQuoteCheck, "../quote_check/code.html?mode=contract#document-workspace");
+  assert.equal(PUBLIC_ROUTES.homeDecisionDrawingCheckToQuoteCheck, "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(PUBLIC_ROUTES.homeDecisionCustomContractToQuoteCheck, "../quote_check/code.html?mode=contract#document-workspace");
   for (const routeKey of [
     "aboutDrs",
@@ -1360,7 +1357,7 @@ test("public contract preserves its compatibility own-key schema while manifest 
 
   const drawingResult = resolvePcmFlowContinuation({ intent: "START_DRAWING_CHECK" });
   assert.equal(drawingResult.routeKey, "drawingCheck");
-  assert.equal(drawingResult.href, "../drawing_check/code.html");
+  assert.equal(drawingResult.href, "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(drawingResult.reason, "PUBLIC_ROUTE");
   assert.equal(drawingResult.canMutate, false);
 

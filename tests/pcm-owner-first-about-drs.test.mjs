@@ -49,9 +49,9 @@ test("about DRS page is a complete local public route with a beginner-first DRS 
   assert.doesNotMatch(html, /<a\b[^>]*>\s*關於 DRS\s*<\/a>/u);
   assert.equal(headerHomeHref, "../public_home/code.html#top");
   assert.ok(html.includes(`<a class="about-header__home" href="${headerHomeHref}">DRS 首頁</a>`));
-  assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=quote#document-workspace");
+  assert.equal(startDocumentCheckHref, "../quote_check/code.html?mode=contract#document-workspace");
   assert.ok(html.includes(`<a class="about-header__cta" href="${startDocumentCheckHref}">查看文件健檢開放狀態</a>`));
-  assert.match(html, /<a class="about-cta__primary about-hero__cta" href="\.\.\/quote_check\/code\.html">/u);
+  assert.match(html, /<a class="about-cta__primary about-hero__cta" href="\.\.\/quote_check\/code\.html\?mode=contract#document-workspace">/u);
   assert.match(html, /返回 DRS 首頁/u);
   assert.match(home, /<a class="header-action header-action--context header-action--about" href="\.\.\/about_drs\/code\.html">關於 DRS<\/a>/u);
   assert.match(css, /\.about-brand\s*\{[^}]*min-block-size:\s*44px/su);

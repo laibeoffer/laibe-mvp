@@ -669,7 +669,7 @@ function createDocumentWorkspaceHarness() {
   const summary = createNode({ id: "self-check-summary", tabIndex: -1 });
   const workspaceRoot = createNode({ id: "document-workspace" });
   const drawingCheckLink = createNode();
-  drawingCheckLink.setAttribute("href", "../drawing_check/code.html");
+  drawingCheckLink.setAttribute("href", "?mode=drawing#document-workspace");
 
   const documentRoot = {
     createElement() {
@@ -830,8 +830,8 @@ function runProductionDrawingRouteListenerProbe(appSource) {
   }
 
   const dispatchTrustedClick = RouteHtmlElement.prototype.click;
-  const primary = new RouteHtmlElement("../drawing_check/code.html");
-  const failure = new RouteHtmlElement("../drawing_check/code.html");
+  const primary = new RouteHtmlElement("?mode=drawing#document-workspace");
+  const failure = new RouteHtmlElement("?mode=drawing#document-workspace");
   primary.hidden = false;
   failure.hidden = true;
   const root = {
@@ -1096,10 +1096,10 @@ test("production bootstrap applies mode to the first rendered tab and panel stat
     ["?mode=quote", "quote"],
     ["?mode=drawing", "drawing"],
     ["?mode=contract", "contract"],
-    ["", "quote"],
-    ["?mode=", "quote"],
-    ["?mode=specification", "quote"],
-    ["?mode=QUOTE", "quote"],
+    ["", "contract"],
+    ["?mode=", "contract"],
+    ["?mode=specification", "contract"],
+    ["?mode=QUOTE", "contract"],
   ];
 
   for (const [search, expectedKind] of cases) {
@@ -1422,11 +1422,11 @@ test("a deferred older parser result cannot replace the newer file truth", async
   assert.doesNotMatch(harness.live.textContent, /不應顯示|stale A/u);
 });
 
-test("missing or invalid mode query falls back quietly to quote", async () => {
+test("missing or invalid mode query falls back quietly to the unified contract workspace", async () => {
   const app = await import(`${pathToFileURL(appPath).href}?document-mode-fallback=${Date.now()}`);
   assert.equal(typeof app.resolveDocumentWorkspaceMode, "function");
   for (const search of ["", "?mode=", "?mode=specification", "?mode=QUOTE", "?other=drawing"]) {
-    assert.equal(app.resolveDocumentWorkspaceMode(search), "quote", search);
+    assert.equal(app.resolveDocumentWorkspaceMode(search), "contract", search);
   }
 });
 
@@ -2399,8 +2399,9 @@ test("quote drawing and account routes remain active while compatibility pages r
     gate: "G1_UI_SOURCE",
     href: "../quote_check/code.html",
   });
-  assert.equal(byId.drawingCheck.lifecycle, "active");
-  assert.equal(byId.drawingCheck.href, "../drawing_check/code.html");
+  assert.equal(byId.drawingCheck.lifecycle, "compatibility_redirect");
+  assert.equal(byId.drawingCheck.href, "../quote_check/code.html?mode=contract#document-workspace");
+  assert.equal(byId.drawingCheck.redirectTo, "/pcm/quote-check/?mode=contract#document-workspace");
   assert.equal(byId.accountAccess.lifecycle, "active");
   assert.equal(byId.accountAccess.href, "../account_access/code.html");
   const quoteEdge = manifestModule.PCM_FLOW_EDGES.find(
@@ -2408,7 +2409,7 @@ test("quote drawing and account routes remain active while compatibility pages r
   );
   assert.equal(quoteEdge.clickable, true);
   assert.equal(contractModule.PUBLIC_ROUTES.quoteCheck, "../quote_check/code.html");
-  assert.equal(contractModule.PUBLIC_ROUTES.drawingCheck, "../drawing_check/code.html");
+  assert.equal(contractModule.PUBLIC_ROUTES.drawingCheck, "../quote_check/code.html?mode=contract#document-workspace");
   assert.equal(contractModule.PUBLIC_ROUTES.accountAccess, "../account_access/code.html");
   const canonicalIds = new Set(nodes.map((node) => node.id));
   for (const alias of ["ownerStart", "documentCorrections", "basicReport", "selfServiceArchive"]) {
@@ -2416,14 +2417,14 @@ test("quote drawing and account routes remain active while compatibility pages r
   }
 });
 
-test("normal quote workflow exposes one visible exact guarded drawing-check CTA", async () => {
+test("normal quote workflow keeps drawing checks inside the unified document workspace", async () => {
   const [html, appModule, manifestModule] = await Promise.all([
     readOrEmpty(htmlPath),
     import(`${pathToFileURL(appPath).href}?drawing-recovery-contract`),
     import(`${pathToFileURL(routeManifestPath).href}?drawing-recovery-route`),
   ]);
   const visible = stripNonVisibleHtml(html);
-  const exactHref = "../drawing_check/code.html";
+  const exactHref = "?mode=drawing#document-workspace";
   const hrefs = [...html.matchAll(/<a\b[^>]*\bhref="([^"]*)"[^>]*\bdata-drawing-check-link\b[^>]*>/gi)]
     .map((match) => match[1]);
 
@@ -2431,9 +2432,9 @@ test("normal quote workflow exposes one visible exact guarded drawing-check CTA"
   assert.deepEqual(new Set(hrefs), new Set([exactHref]));
   assert.match(
     html,
-    /<a\b(?=[^>]*\bhref="\.\.\/drawing_check\/code\.html")(?=[^>]*\bdata-drawing-check-link)(?=[^>]*\bdata-drawing-check-primary)[^>]*>前往圖說檢討<\/a>/u,
+    /<a\b(?=[^>]*\bhref="\?mode=drawing#document-workspace")(?=[^>]*\bdata-drawing-check-link)(?=[^>]*\bdata-drawing-check-primary)[^>]*>查看圖說健檢<\/a>/u,
   );
-  assert.match(visible, /前往圖說檢討/u);
+  assert.match(visible, /查看圖說健檢/u);
   assert.doesNotMatch(
     html,
     /<div hidden data-legacy-page-contract>[\s\S]*?data-drawing-check-primary/u,
@@ -2473,10 +2474,12 @@ test("normal quote workflow exposes one visible exact guarded drawing-check CTA"
     assert.equal(appModule.resolveQuoteDrawingRoute(unsafe), null);
   }
 
-  const edge = manifestModule.PCM_FLOW_EDGES.find(
-    (candidate) => candidate.from === "quoteCheck" && candidate.to === "drawingCheck",
+  assert.equal(
+    manifestModule.PCM_FLOW_EDGES.some(
+      (candidate) => candidate.from === "quoteCheck" && candidate.to === "drawingCheck",
+    ),
+    false,
   );
-  assert.equal(edge.clickable, true);
 });
 
 test("production drawing listener closes hostile hrefs after post-load intrinsic pollution", async () => {
@@ -2519,7 +2522,7 @@ test("production drawing listener closes hostile hrefs after post-load intrinsic
       configurable: true,
       value() {
         pollutedCalls += 1;
-        return "../drawing_check/code.html";
+        return "?mode=drawing#document-workspace";
       },
     });
     Object.defineProperty(probe.classes.Event.prototype, "preventDefault", {
@@ -2609,7 +2612,7 @@ test("all local page references and fragments resolve", async () => {
     }
     const [pathAndQuery, fragment] = reference.split("#");
     const path = pathAndQuery.split("?")[0];
-    const target = resolve(quoteDir, path);
+    const target = path ? resolve(quoteDir, path) : htmlPath;
     assert.equal(existsSync(target), true, reference);
     if (fragment) {
       const targetHtml = await readFile(target, "utf8");

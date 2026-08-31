@@ -215,7 +215,7 @@ const trustedPreventDefault =
     ? trustedPreventDefaultDescriptor.value
     : null;
 
-const DRAWING_CHECK_HREF = "../drawing_check/code.html";
+const DRAWING_CHECK_HREF = "?mode=drawing#document-workspace";
 
 export function resolveQuoteDrawingRoute(candidate) {
   return typeof candidate === "string" && candidate === DRAWING_CHECK_HREF
@@ -591,11 +591,11 @@ function isDocumentWorkspaceKind(kind) {
 
 export function resolveDocumentWorkspaceMode(search = "") {
   try {
-    if (typeof search !== "string") return "quote";
+    if (typeof search !== "string") return "contract";
     const mode = new URLSearchParams(search).get("mode");
-    return isDocumentWorkspaceKind(mode) ? mode : "quote";
+    return isDocumentWorkspaceKind(mode) ? mode : "contract";
   } catch {
-    return "quote";
+    return "contract";
   }
 }
 

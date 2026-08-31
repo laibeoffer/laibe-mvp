@@ -20,7 +20,6 @@ const SOURCE_ENTRY_BY_ID = Object.freeze({
   home: "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/code.html",
   aboutDrs: "src/stitch_laibe_landing_onboarding/pcm_standalone/about_drs/code.html",
   quoteCheck: "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/code.html",
-  drawingCheck: "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/code.html",
   accountAccess: "src/stitch_laibe_landing_onboarding/pcm_standalone/account_access/code.html",
   serviceContract: "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/code.html",
   contractPrerequisites: "src/stitch_laibe_landing_onboarding/pcm_standalone/contract_prerequisites/code.html",
@@ -75,8 +74,6 @@ const ASSET_ALLOWLIST = Object.freeze([
   "src/stitch_laibe_landing_onboarding/pcm_standalone/public_home/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/quote_check/styles.css",
-  "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/app.js",
-  "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/styles.css",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/app.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/contract-content.js",
   "src/stitch_laibe_landing_onboarding/pcm_standalone/service_contract/styles.css",
@@ -97,10 +94,6 @@ const DECLARED_LOCAL_RUNTIME_DEPENDENCIES = Object.freeze([
     reference: "./pdf.worker.mjs",
   }),
   Object.freeze({
-    source: "src/stitch_laibe_landing_onboarding/pcm_standalone/drawing_check/app.js",
-    reference: "../../../../site/preview_floor_plan/browser-recognition-adapter.mjs",
-  }),
-  Object.freeze({
     source: "site/preview_floor_plan/browser-recognition-adapter.mjs",
     reference: "./vendor/pdfjs/pdf.worker.mjs",
   }),
@@ -115,7 +108,8 @@ const DECLARED_LOCAL_RUNTIME_DEPENDENCIES = Object.freeze([
 ]);
 
 const deployNodes = PCM_FLOW_ROUTE_MANIFEST.nodes.filter(
-  ({ publicPath, lifecycle }) => publicPath && ["active", "planned"].includes(lifecycle),
+  ({ publicPath, lifecycle }) =>
+    publicPath && ["active", "planned", "compatibility_redirect"].includes(lifecycle),
 );
 const activeNodes = deployNodes.filter(({ lifecycle }) => lifecycle === "active");
 const sourceToPublicPath = new Map(
@@ -331,6 +325,7 @@ function assetUrl(relative, suffix = "") {
 function rewriteHtmlReference(sourceRelative, attribute, reference) {
   if (
     reference.startsWith("#") ||
+    reference.startsWith("?") ||
     reference.startsWith("data:") ||
     reference.startsWith("blob:") ||
     reference.startsWith("mailto:") ||
@@ -384,6 +379,29 @@ function unavailableEntry(node, message) {
 `;
 }
 
+function compatibilityRedirectEntry(node) {
+  const target = node.redirectTo;
+  if (
+    typeof target !== "string" ||
+    !target.startsWith("/pcm/quote-check/?mode=contract#document-workspace")
+  ) {
+    throw new Error(`Invalid compatibility redirect target for ${JSON.stringify(node.id)}`);
+  }
+  const safeTarget = escapeHtml(target).replaceAll('"', "&quot;");
+  return `<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="refresh" content="0; url=${safeTarget}" />
+  <link rel="canonical" href="${safeTarget}" />
+  <title>前往文件健檢｜LaiBE DRS</title>
+</head>
+<body><main><p>圖說、報價與契約健檢已整合到同一個文件工作台。</p><a href="${safeTarget}">前往文件健檢</a></main></body>
+</html>
+`;
+}
+
 function normalizePublicOrigin() {
   const configured = process.env.DRS_PUBLIC_ORIGIN?.trim();
   if (!configured) return "";
@@ -402,7 +420,9 @@ function normalizePublicOrigin() {
 }
 
 function sitemapXml(publicOrigin) {
-  const locations = deployNodes.map(({ publicPath }) => `${publicOrigin}${publicPath}`);
+  const locations = deployNodes
+    .filter(({ lifecycle }) => lifecycle !== "compatibility_redirect")
+    .map(({ publicPath }) => `${publicOrigin}${publicPath}`);
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${locations.map((location) => `  <url><loc>${escapeHtml(location)}</loc></url>`).join("\n")}
@@ -433,7 +453,9 @@ if (dependencyProbe) {
 const transformedEntries = [];
 for (const node of deployNodes) {
   let html;
-  if (node.lifecycle === "planned" || !SOURCE_ENTRY_BY_ID[node.id]) {
+  if (node.lifecycle === "compatibility_redirect") {
+    html = compatibilityRedirectEntry(node);
+  } else if (node.lifecycle === "planned" || !SOURCE_ENTRY_BY_ID[node.id]) {
     html = unavailableEntry(node, "此功能正在整理中，正式開放後會提供完整操作入口。");
   } else {
     const sourceRelative = SOURCE_ENTRY_BY_ID[node.id];
@@ -451,8 +473,16 @@ const headers = `/*
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 `;
 const redirects = deployNodes
-  .filter(({ publicPath }) => publicPath !== "/")
+  .filter(({ publicPath, lifecycle }) => publicPath !== "/" && lifecycle !== "compatibility_redirect")
   .map(({ publicPath }) => `${publicPath}/ ${publicPath} 301`)
+  .concat(
+    deployNodes
+      .filter(({ lifecycle }) => lifecycle === "compatibility_redirect")
+      .flatMap(({ publicPath, redirectTo }) => [
+        `${publicPath} ${redirectTo} 301`,
+        `${publicPath}/ ${redirectTo} 301`,
+      ]),
+  )
   .join("\n") + "\n";
 const notFound = `<!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>找不到頁面｜LaiBE DRS</title><style>body{margin:0;background:#101a24;color:#f4f7fa;font-family:system-ui,sans-serif}main{max-width:40rem;margin:15vh auto;padding:2rem}p{color:#c7d2dc;line-height:1.7}a{color:#ff9b54}</style></head><body><main><p>404</p><h1>這個頁面不存在</h1><p>網址可能已更新，或這個入口尚未正式開放。你可以安全返回 DRS 首頁。</p><a href="/pcm">返回 DRS 首頁</a></main></body></html>

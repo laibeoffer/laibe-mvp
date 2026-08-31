@@ -105,7 +105,7 @@ export const CASE_SETUP_FAILURES = closedTable([
     nextAction: "前往圖說檢討頁整理圖說資料。",
     responsibleRole: "甲方",
     returnRoute: "#preparation",
-    recoveryRoute: "../drawing_check/code.html",
+    recoveryRoute: "../quote_check/code.html?mode=contract#document-workspace",
   })],
   ["DRAWING_ONLY_QUOTE_MISSING", closedState({
     code: "DRAWING_ONLY_QUOTE_MISSING",
@@ -114,7 +114,7 @@ export const CASE_SETUP_FAILURES = closedTable([
     nextAction: "前往報價健檢頁整理報價資料。",
     responsibleRole: "甲方",
     returnRoute: "#preparation",
-    recoveryRoute: "../quote_check/code.html",
+    recoveryRoute: "../quote_check/code.html?mode=contract#document-workspace",
   })],
   ["BOTH_DOCUMENTS_MISSING", closedState({
     code: "BOTH_DOCUMENTS_MISSING",
@@ -123,7 +123,7 @@ export const CASE_SETUP_FAILURES = closedTable([
     nextAction: "先從報價健檢或圖說檢討任一頁開始整理。",
     responsibleRole: "甲方",
     returnRoute: "../public_home/code.html#case-flow",
-    recoveryRoute: "../quote_check/code.html",
+    recoveryRoute: "../quote_check/code.html?mode=contract#document-workspace",
   })],
   ["FILE_METADATA_UNCONFIRMED", closedState({
     code: "FILE_METADATA_UNCONFIRMED",
