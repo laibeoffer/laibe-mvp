@@ -275,19 +275,24 @@ export function createLineClient(
         !isSafeHttpsUrl(message.caseUrl, 512) ||
         (retryKey !== undefined && !UUID_PATTERN.test(retryKey))
       ) throw new LineProviderError("provider_invalid_request");
-      const result = await request("/v2/bot/message/push", {
-        to: lineUserId,
-        messages: [{
-          type: "text",
-          text: [
-            "萊比案件通知",
-            message.caseLabel,
-            `目前狀態：${message.caseStatus}`,
-            `下一步：${message.nextAction}`,
-            message.caseUrl,
-          ].join("\n"),
-        }],
-      }, retryKey === undefined ? undefined : { "x-line-retry-key": retryKey });
+      const result = await request(
+        "/v2/bot/message/push",
+        {
+          to: lineUserId,
+          messages: [{
+            type: "text",
+            text: [
+              "萊比案件通知",
+              message.caseLabel,
+              `目前狀態：${message.caseStatus}`,
+              `下一步：${message.nextAction}`,
+              message.caseUrl,
+            ].join("\n"),
+          }],
+        },
+        retryKey === undefined ? undefined : { "x-line-retry-key": retryKey },
+        retryKey !== undefined,
+      );
       if (!exactEmptyObject(result.payload)) {
         throw new LineProviderError("provider_invalid_response");
       }

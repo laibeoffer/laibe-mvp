@@ -505,6 +505,39 @@ test("LINE account-link prompt uses one stable push retry key across webhook rec
   assert.equal(body.messages[0].template.actions[0].uri.includes("linkToken=opaque"), true);
 });
 
+test("LINE case notification preserves accepted truth across stable retry recovery", async () => {
+  const { createLineClient } = await import(lineClientUrl.href);
+  const calls = [];
+  const retryKey = "00000000-0000-4000-8000-000000000097";
+  const client = createLineClient({
+    accessToken: "not-a-provider-credential",
+    fetch: async (url, init) => {
+      calls.push({ url, init });
+      return new Response("{}", {
+        status: 409,
+        headers: { "x-line-accepted-request-id": "accepted-case-on-first-attempt" },
+      });
+    },
+  });
+
+  assert.deepEqual(
+    await client.pushCaseNotification(
+      LINE_USER_ID,
+      {
+        caseLabel: "案件 DRS-042",
+        caseStatus: "等待一般審查員確認",
+        nextAction: "請開啟 DRS 收件匣檢視",
+        caseUrl: "https://laibe.example/drs/cases/current",
+      },
+      retryKey,
+    ),
+    { requestId: "accepted-case-on-first-attempt" },
+  );
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, "https://api.line.me/v2/bot/message/push");
+  assert.equal(calls[0].init.headers["x-line-retry-key"], retryKey);
+});
+
 test("LINE client rejects inherited notification authority before any provider call", async () => {
   const { createLineClient, LineProviderError } = await import(lineClientUrl.href);
   let providerCalled = false;
