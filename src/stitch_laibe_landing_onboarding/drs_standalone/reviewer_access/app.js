@@ -3,7 +3,7 @@ import { createReviewerAccessTransport } from "./reviewer-access-transport.js";
 const ACCESS_TYPES = Object.freeze(["register", "login"]);
 
 export function resolveAccessAnchor(hash) {
-  return hash === "#login" ? "login" : "register";
+  return ACCESS_TYPES.find((type) => hash === `#${type}`) ?? null;
 }
 
 function setText(node, value) {
@@ -14,10 +14,6 @@ function setStatus(node, message, tone = "neutral") {
   if (!node) return;
   node.textContent = message;
   node.dataset.tone = tone;
-}
-
-function validGmail(value) {
-  return /^[^\s@]+@gmail\.com$/iu.test(String(value).trim());
 }
 
 function createAccessController(doc, view, transport) {
@@ -31,6 +27,7 @@ function createAccessController(doc, view, transport) {
       node,
     ) => [node.dataset.accessPanel, node]),
   );
+  const workspace = doc.querySelector("[data-access-workspace]");
   const formStatus = new Map(
     [...doc.querySelectorAll("[data-form-status]")].map((
       node,
@@ -43,7 +40,17 @@ function createAccessController(doc, view, transport) {
     message: doc.querySelector("[data-line-message]"),
     waiting: doc.querySelector("[data-line-waiting]"),
     action: doc.querySelector("[data-line-link-action]"),
+    cancel: doc.querySelector("[data-line-cancel-action]"),
   });
+  const enterWorkspace = doc.querySelector("[data-enter-workspace]");
+
+  function renderWorkspaceAction() {
+    const canEnter = transport.canEnterWorkspace();
+    if (!enterWorkspace) return;
+    enterWorkspace.hidden = !canEnter;
+    enterWorkspace.disabled = !canEnter;
+    enterWorkspace.setAttribute("aria-disabled", String(!canEnter));
+  }
 
   function renderLineState(state) {
     if (lineNodes.container) {
@@ -59,31 +66,36 @@ function createAccessController(doc, view, transport) {
       lineNodes.action.disabled = !canRequest;
       lineNodes.action.setAttribute("aria-disabled", String(!canRequest));
     }
+    const canCancel = transport.canCancelLineAccountLink();
+    if (lineNodes.cancel) {
+      lineNodes.cancel.hidden = !canCancel;
+      lineNodes.cancel.disabled = !canCancel;
+      lineNodes.cancel.setAttribute("aria-disabled", String(!canCancel));
+    }
   }
 
   function activate(type, options = {}) {
-    const selected = ACCESS_TYPES.includes(type) ? type : "register";
+    const selected = ACCESS_TYPES.includes(type) ? type : null;
+    if (workspace) workspace.hidden = selected === null;
     for (const candidate of ACCESS_TYPES) {
       const isSelected = candidate === selected;
       const trigger = triggers.get(candidate);
       const panel = panels.get(candidate);
       trigger?.classList.toggle("is-selected", isSelected);
       trigger?.setAttribute("aria-expanded", String(isSelected));
+      trigger?.setAttribute("aria-current", isSelected ? "location" : "false");
       if (panel) panel.hidden = !isSelected;
     }
-    if (options.focus) {
+    if (options.focus && selected) {
       const heading = panels.get(selected)?.querySelector("h2");
       heading?.focus({ preventScroll: true });
-      panels.get(selected)?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
     }
     return selected;
   }
 
   function selectWithHash(type, focus = true) {
-    const selected = ACCESS_TYPES.includes(type) ? type : "register";
+    const selected = ACCESS_TYPES.includes(type) ? type : null;
+    if (!selected) return activate(null);
     const nextHash = `#${selected}`;
     if (view.location.hash === nextHash) activate(selected, { focus });
     else view.location.hash = nextHash;
@@ -112,38 +124,11 @@ function createAccessController(doc, view, transport) {
     "submit",
     async (event) => {
       event.preventDefault();
-      const form = event.currentTarget;
-      const email = form.elements.namedItem("email");
-      const password = form.elements.namedItem("password");
-      const scopeConfirmation = form.elements.namedItem("scope-confirmation");
-      if (!validGmail(email?.value)) {
-        setStatus(
-          formStatus.get("register"),
-          "請輸入有效的 Gmail，再繼續建立審查員身分。",
-          "error",
-        );
-        email?.focus();
-        return;
-      }
-      if (String(password?.value ?? "").length < 8) {
-        setStatus(
-          formStatus.get("register"),
-          "請設定至少 8 個字元的登入密碼。",
-          "error",
-        );
-        password?.focus();
-        return;
-      }
-      if (!scopeConfirmation?.checked) {
-        setStatus(
-          formStatus.get("register"),
-          "請先確認你了解資格與案件權限需要另外核對。",
-          "error",
-        );
-        scopeConfirmation?.focus();
-        return;
-      }
-      setStatus(formStatus.get("register"), "正在確認帳號入口…", "loading");
+      setStatus(
+        formStatus.get("register"),
+        "正在確認 Gmail 身分入口…",
+        "loading",
+      );
       const result = await transport.register();
       setStatus(formStatus.get("register"), result.message, "neutral");
     },
@@ -153,27 +138,6 @@ function createAccessController(doc, view, transport) {
     "submit",
     async (event) => {
       event.preventDefault();
-      const form = event.currentTarget;
-      const email = form.elements.namedItem("email");
-      const password = form.elements.namedItem("password");
-      if (!validGmail(email?.value)) {
-        setStatus(
-          formStatus.get("login"),
-          "請輸入有效的 Gmail，再確認登入狀態。",
-          "error",
-        );
-        email?.focus();
-        return;
-      }
-      if (String(password?.value ?? "").length === 0) {
-        setStatus(
-          formStatus.get("login"),
-          "請輸入登入密碼，再確認身分。",
-          "error",
-        );
-        password?.focus();
-        return;
-      }
 
       setStatus(formStatus.get("login"), "正在確認身分與案件授權…", "loading");
       setText(doc.querySelector("[data-login-state]"), "正在確認登入身分");
@@ -182,7 +146,23 @@ function createAccessController(doc, view, transport) {
         "正在等待萊比核對案件範圍",
       );
       const result = await transport.resumeAccess();
-      if (result.state === "authorized") return;
+      renderLineState(transport.getLineAccountLinkState());
+      renderWorkspaceAction();
+      if (result.state === "authorized") {
+        setText(
+          doc.querySelector("[data-login-state]"),
+          "身分與案件範圍已確認",
+        );
+        setText(
+          doc.querySelector("[data-login-waiting]"),
+          "可連結 LINE 或進入案件工作區",
+        );
+        setStatus(
+          formStatus.get("login"),
+          "身分確認完成。你可以連結 LINE，或進入案件工作區。",
+        );
+        return;
+      }
       setText(
         doc.querySelector("[data-login-state]"),
         "目前無法確認審查資格或授權案件",
@@ -193,18 +173,39 @@ function createAccessController(doc, view, transport) {
       );
       setStatus(
         formStatus.get("login"),
-        "目前無法進入治理頁。請確認既有帳號狀態，或稍後再試。",
+        "請先完成 Gmail 身分確認；登入入口準備完成後可在此繼續。",
         "error",
       );
-      renderLineState(transport.getLineAccountLinkState());
     },
   );
 
+  enterWorkspace?.addEventListener("click", () => {
+    renderLineState(transport.refreshLineAccess());
+    renderWorkspaceAction();
+    if (transport.enterWorkspace()) return;
+    setStatus(
+      formStatus.get("login"),
+      "請先完成 Gmail 身分確認；登入入口準備完成後可在此繼續。",
+      "error",
+    );
+  });
+
   lineNodes.action?.addEventListener("click", async () => {
+    renderLineState(transport.refreshLineAccess());
+    renderWorkspaceAction();
     if (!transport.canRequestLineAccountLink()) return;
     lineNodes.action.disabled = true;
     lineNodes.action.setAttribute("aria-disabled", "true");
     renderLineState(await transport.requestLineAccountLink());
+  });
+
+  lineNodes.cancel?.addEventListener("click", async () => {
+    renderLineState(transport.refreshLineAccess());
+    renderWorkspaceAction();
+    if (!transport.canCancelLineAccountLink()) return;
+    lineNodes.cancel.disabled = true;
+    lineNodes.cancel.setAttribute("aria-disabled", "true");
+    renderLineState(await transport.cancelLineAccountLink());
   });
 
   view.addEventListener(
@@ -212,9 +213,10 @@ function createAccessController(doc, view, transport) {
     () => activate(resolveAccessAnchor(view.location.hash), { focus: true }),
   );
   activate(resolveAccessAnchor(view.location.hash));
-  renderLineState(transport.getLineAccountLinkState());
+  renderLineState(transport.refreshLineAccess());
+  renderWorkspaceAction();
 
-  return Object.freeze({ activate, renderLineState });
+  return Object.freeze({ activate, renderLineState, renderWorkspaceAction });
 }
 
 if (typeof document !== "undefined" && typeof window !== "undefined") {

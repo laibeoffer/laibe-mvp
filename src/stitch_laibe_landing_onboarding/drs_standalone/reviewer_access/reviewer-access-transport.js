@@ -3,6 +3,22 @@ const GOVERNANCE_DESTINATION =
 const DEFAULT_ORIGIN = "http://127.0.0.1:8766";
 const SESSION_ENDPOINT = "/functions/v1/drs-session-bootstrap";
 const REVIEWER_GRANT_ENDPOINT = "/functions/v1/drs-workspace-grant";
+const LINE_ACCOUNT_LINK_ENDPOINTS = Object.freeze({
+  start: "/functions/v1/drs-line-account-link-start",
+  status: "/functions/v1/drs-line-account-link-status",
+  cancel: "/functions/v1/drs-line-account-link-cancel",
+  unlink: "/functions/v1/drs-line-account-link-unlink",
+});
+const LINE_NEXT_ACTIONS = Object.freeze({
+  not_linked: "relink",
+  expired: "relink",
+  cancelled: "relink",
+  conflict_line_already_bound: "relink",
+  conflict_drs_already_bound: "relink",
+  linked: "unlink",
+  revoked: "relink",
+  temporarily_unavailable: "retry",
+});
 
 const LINE_ACCOUNT_LINK_COPY = Object.freeze({
   not_linked: Object.freeze({
@@ -70,9 +86,10 @@ const LINE_ACCOUNT_LINK_COPY = Object.freeze({
   }),
   temporarily_unavailable: Object.freeze({
     title: "LINE 案件分流正在整理中",
-    label: "入口準備中",
-    message: "此功能正在整理中，正式開放後會提供完整操作入口。",
-    waitingOn: "正在等待萊比完成連結入口",
+    label: "請先完成 Gmail 登入",
+    message:
+      "請先完成 Gmail 登入；此功能正在整理中，正式開放後會提供完整操作入口。",
+    waitingOn: "正在等待你完成 Gmail 登入或連結入口準備完成",
     action: "稍後再試",
   }),
   unlinking: Object.freeze({
@@ -134,8 +151,8 @@ function isExactJsonResponse(response, expectedUrl) {
     !(response instanceof Response) || response.status !== 200 ||
     response.url !== expectedUrl
   ) return false;
-  return response.headers.get("content-type")?.trim().toLowerCase() ===
-    "application/json";
+  return response.headers.get("content-type")?.split(";", 1)[0]?.trim()
+    .toLowerCase() === "application/json";
 }
 
 async function readExactJson(response, expectedUrl) {
@@ -146,6 +163,36 @@ async function readExactJson(response, expectedUrl) {
   } catch {
     return null;
   }
+}
+
+async function readLineStatusJson(response, expectedUrl) {
+  if (
+    !(response instanceof Response) || response.url !== expectedUrl ||
+    response.headers.get("content-type")?.split(";", 1)[0]?.trim()
+        .toLowerCase() !== "application/json"
+  ) return null;
+  let body;
+  try {
+    body = await response.json();
+  } catch {
+    return null;
+  }
+  if (!isPlainRecord(body)) return null;
+  if (response.status === 200) return body;
+  if (response.status === 401 || response.status === 403) {
+    return hasExactKeys(body, ["state"]) &&
+        body.state === "permission_denied"
+      ? body
+      : null;
+  }
+  if (response.status === 503) {
+    return hasExactKeys(body, ["nextAction", "state"]) &&
+        body.state === "temporarily_unavailable" &&
+        body.nextAction === "retry"
+      ? body
+      : null;
+  }
+  return null;
 }
 
 function validSessionResponse(response, expectedUrl, now) {
@@ -163,7 +210,7 @@ function validSessionResponse(response, expectedUrl, now) {
   if (!RFC3339.test(expiresAtValue)) return null;
   const expiresAt = Date.parse(expiresAtValue);
   if (!Number.isFinite(expiresAt) || expiresAt <= now) return null;
-  return Object.freeze({ authorization });
+  return Object.freeze({ authorization, expiresAt });
 }
 
 function validGrant(body) {
@@ -192,7 +239,8 @@ function validGrant(body) {
 function sessionPost() {
   return fetch(SESSION_ENDPOINT, {
     method: "POST",
-    credentials: "same-origin",
+    credentials: "include",
+    cache: "no-store",
     headers: Object.freeze({ "content-type": "application/json" }),
     body: "{}",
   });
@@ -201,13 +249,89 @@ function sessionPost() {
 function grantPost({ authorization }) {
   return fetch(REVIEWER_GRANT_ENDPOINT, {
     method: "POST",
-    credentials: "same-origin",
+    credentials: "include",
+    cache: "no-store",
     headers: Object.freeze({
       authorization,
       "content-type": "application/json",
     }),
     body: "{}",
   });
+}
+
+function lineRequestFromBrowser({ method, url, headers }) {
+  return fetch(url, {
+    method,
+    credentials: "include",
+    cache: "no-store",
+    headers,
+    body: method === "POST" ? "{}" : undefined,
+  });
+}
+
+function validLineDate(value) {
+  if (
+    typeof value !== "string" || !RFC3339.test(value) ||
+    !Number.isFinite(Date.parse(value))
+  ) return false;
+  return true;
+}
+
+function validLineLaunchUrl(value) {
+  if (typeof value !== "string" || value.length < 1 || value.length > 512) {
+    return false;
+  }
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.username === "" &&
+      url.password === "" && url.port === "" &&
+      (url.hostname === "line.me" || url.hostname.endsWith(".line.me"));
+  } catch {
+    return false;
+  }
+}
+
+function validLineStatus(body) {
+  if (!isPlainRecord(body) || typeof body.state !== "string") return null;
+  const { state } = body;
+  if (!owns(LINE_ACCOUNT_LINK_COPY, state)) return null;
+  if (state === "awaiting_line_confirmation") {
+    if (
+      !hasExactKeys(body, [
+        "botLaunchUrl",
+        "expiresAt",
+        "nextAction",
+        "state",
+      ]) || !validLineDate(body.expiresAt) ||
+      body.nextAction !== "continue_in_line" ||
+      !validLineLaunchUrl(body.botLaunchUrl)
+    ) return null;
+    return Object.freeze({ state, botLaunchUrl: body.botLaunchUrl });
+  }
+  if (state === "linked") {
+    if (
+      !hasExactKeys(body, ["linkedAt", "nextAction", "state"]) ||
+      !validLineDate(body.linkedAt) || body.nextAction !== "unlink"
+    ) return null;
+    return Object.freeze({ state });
+  }
+  if (state === "revoked") {
+    if (
+      !hasExactKeys(body, ["nextAction", "revokedAt", "state"]) ||
+      !validLineDate(body.revokedAt) || body.nextAction !== "relink"
+    ) return null;
+    return Object.freeze({ state });
+  }
+  const nextAction = LINE_NEXT_ACTIONS[state];
+  if (nextAction !== undefined) {
+    if (
+      !hasExactKeys(body, ["state"]) &&
+      (!hasExactKeys(body, ["nextAction", "state"]) ||
+        body.nextAction !== nextAction)
+    ) return null;
+    return Object.freeze({ state });
+  }
+  return hasExactKeys(body, ["state"]) ? Object.freeze({ state }) : null;
 }
 
 function defaultNavigate(href) {
@@ -255,18 +379,131 @@ export function createReviewerAccessTransport(options = {}) {
   const navigate = typeof options.navigate === "function"
     ? options.navigate
     : defaultNavigate;
-  const lineState = sanitizeLineAccountLinkState({
+  const openLine = typeof options.openLine === "function"
+    ? options.openLine
+    : defaultNavigate;
+  const lineAccountLinkRequest =
+    typeof options.lineAccountLinkRequest === "function"
+      ? options.lineAccountLinkRequest
+      : ({ request }) => lineRequestFromBrowser(request);
+  const expectedLineUrls = Object.freeze(
+    Object.fromEntries(
+      Object.entries(LINE_ACCOUNT_LINK_ENDPOINTS).map(([operation, path]) => [
+        operation,
+        new URL(path, browserOrigin).href,
+      ]),
+    ),
+  );
+  let lineState = sanitizeLineAccountLinkState({
     state: "temporarily_unavailable",
   });
+  let workspaceAuthority = null;
+  let lineAuthority = null;
+  let lineOperation = null;
 
   function unavailable(message) {
     return Promise.resolve(Object.freeze({ state: "unavailable", message }));
   }
 
+  function resetWorkspaceAccess() {
+    workspaceAuthority = null;
+    lineAuthority = null;
+    lineState = sanitizeLineAccountLinkState({
+      state: "temporarily_unavailable",
+    });
+    return lineState;
+  }
+
+  function currentWorkspaceAuthority() {
+    if (workspaceAuthority === null) return null;
+    if (workspaceAuthority.expiresAt <= now()) {
+      resetWorkspaceAccess();
+      return null;
+    }
+    return workspaceAuthority;
+  }
+
+  function currentLineAuthority() {
+    const authority = currentWorkspaceAuthority();
+    if (authority === null || lineAuthority === null) return null;
+    return lineAuthority;
+  }
+
+  async function invokeLineOperation(operation) {
+    const authority = currentLineAuthority();
+    if (authority === null) return lineState;
+    const endpoint = expectedLineUrls[operation];
+    const method = operation === "status" ? "GET" : "POST";
+    const request = method === "POST"
+      ? Object.freeze({
+        method,
+        url: endpoint,
+        body: "{}",
+        headers: Object.freeze({
+          authorization: authority.authorization,
+          "content-type": "application/json",
+        }),
+      })
+      : Object.freeze({
+        method,
+        url: endpoint,
+        headers: Object.freeze({ authorization: authority.authorization }),
+      });
+    try {
+      const response = await lineAccountLinkRequest(
+        Object.freeze({ operation, request }),
+      );
+      const body = await readLineStatusJson(response, endpoint);
+      const next = validLineStatus(body);
+      if (next === null) throw new Error("line_status_unavailable");
+      lineState = sanitizeLineAccountLinkState({ state: next.state });
+      if (next.state === "permission_denied") {
+        workspaceAuthority = null;
+        lineAuthority = null;
+      }
+      if (operation === "start" && next.botLaunchUrl !== undefined) {
+        openLine(next.botLaunchUrl);
+      }
+      return lineState;
+    } catch {
+      lineAuthority = null;
+      lineState = sanitizeLineAccountLinkState({
+        state: "temporarily_unavailable",
+      });
+      return lineState;
+    }
+  }
+
+  function runLineOperation(operation) {
+    if (lineOperation !== null) return lineOperation;
+    lineOperation = invokeLineOperation(operation).finally(() => {
+      lineOperation = null;
+    });
+    return lineOperation;
+  }
+
+  function lineOperationForCurrentState() {
+    switch (lineState.state) {
+      case "linked":
+        return "unlink";
+      case "awaiting_line_confirmation":
+      case "unlinking":
+      case "temporarily_unavailable":
+        return "status";
+      case "not_linked":
+      case "expired":
+      case "cancelled":
+      case "revoked":
+        return "start";
+      default:
+        return null;
+    }
+  }
+
   return Object.freeze({
     register() {
       return unavailable(
-        "審查員帳號入口正在整理中，正式開放後會提供完整操作方式。",
+        "請先完成 Gmail 身分確認；註冊入口準備完成後可在此繼續。",
       );
     },
     login() {
@@ -275,6 +512,7 @@ export function createReviewerAccessTransport(options = {}) {
       );
     },
     async resumeAccess() {
+      resetWorkspaceAccess();
       try {
         const session = validSessionResponse(
           await secureSessionBootstrap(),
@@ -287,20 +525,54 @@ export function createReviewerAccessTransport(options = {}) {
           expectedGrantUrl,
         );
         if (!validGrant(grant)) return Object.freeze({ state: "denied" });
-        navigate(GOVERNANCE_DESTINATION);
-        return Object.freeze({ state: "authorized" });
+        workspaceAuthority = session;
+        lineAuthority = session;
+        await runLineOperation("status");
+        return Object.freeze({
+          state: currentWorkspaceAuthority() === null ? "denied" : "authorized",
+        });
       } catch {
+        resetWorkspaceAccess();
         return Object.freeze({ state: "denied" });
       }
     },
     getLineAccountLinkState() {
+      currentWorkspaceAuthority();
+      return lineState;
+    },
+    refreshLineAccess() {
+      currentWorkspaceAuthority();
       return lineState;
     },
     canRequestLineAccountLink() {
-      return false;
+      return currentLineAuthority() !== null && lineOperation === null &&
+        lineOperationForCurrentState() !== null;
     },
     requestLineAccountLink() {
-      return Promise.resolve(lineState);
+      const operation = currentLineAuthority() !== null
+        ? lineOperationForCurrentState()
+        : null;
+      return operation === null
+        ? Promise.resolve(lineState)
+        : runLineOperation(operation);
+    },
+    canCancelLineAccountLink() {
+      return currentLineAuthority() !== null && lineOperation === null &&
+        lineState.state === "awaiting_line_confirmation";
+    },
+    cancelLineAccountLink() {
+      return currentLineAuthority() !== null && lineOperation === null &&
+          lineState.state === "awaiting_line_confirmation"
+        ? runLineOperation("cancel")
+        : Promise.resolve(lineState);
+    },
+    canEnterWorkspace() {
+      return currentWorkspaceAuthority() !== null;
+    },
+    enterWorkspace() {
+      if (currentWorkspaceAuthority() === null) return false;
+      navigate(GOVERNANCE_DESTINATION);
+      return true;
     },
   });
 }
