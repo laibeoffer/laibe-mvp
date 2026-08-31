@@ -38,18 +38,18 @@
               <div><strong>尚未載入案件</strong><small>登入後只顯示你參與或受邀的案件</small></div>
             </div>
             <div class="vendor-gate-management-tabs" aria-label="工作台管理區">
-              <button class="scase vendor-gate-management-tab" type="button" data-vendor-gate-management-tab="design" disabled aria-disabled="true">
+              <a class="scase vendor-gate-management-tab" data-vendor-gate-management-tab="design" data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true" tabindex="-1">
                 <span class="r1"><span class="dot you" aria-hidden="true"></span><b>設計管理</b><span class="pct">登入後開啟</span></span>
                 <span class="st">圖面、報價與決策紀錄</span>
-              </button>
-              <button class="scase vendor-gate-management-tab" type="button" data-vendor-gate-management-tab="contract" disabled aria-disabled="true">
+              </a>
+              <a class="scase vendor-gate-management-tab" data-vendor-gate-management-tab="contract" data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true" tabindex="-1">
                 <span class="r1"><span class="dot contract" aria-hidden="true"></span><b>契約管理</b><span class="pct">登入後開啟</span></span>
                 <span class="st">甲乙方契約副本與版本留痕</span>
-              </button>
-              <button class="scase vendor-gate-management-tab" type="button" data-vendor-gate-management-tab="construction" disabled aria-disabled="true">
+              </a>
+              <a class="scase vendor-gate-management-tab" data-vendor-gate-management-tab="construction" data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true" tabindex="-1">
                 <span class="r1"><span class="dot them" aria-hidden="true"></span><b>工程管理</b><span class="pct">登入後開啟</span></span>
                 <span class="st">任務、變更、照片與驗收紀錄</span>
-              </button>
+              </a>
             </div>
             <div class="foot vendor-sidebar-record">
               <span>案件留痕原則</span>
@@ -77,7 +77,7 @@
                   <div data-vendor-public-record><dt>會留下的紀錄</dt><dd>案件的重要回覆、文件版本與決定</dd></div>
                 </dl>
                 <div class="vendor-gate-actions">
-                  <a class="vendor-primary-action" data-primary-action data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true">登入並開啟我的案件</a>
+                  <a class="vendor-primary-action" data-primary-action data-vendor-access-recovery data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess" aria-disabled="true" tabindex="-1">登入並開啟我的案件</a>
                   <p class="vendor-gate__note">若你是從甲方通知進入，請使用原通知重新確認邀請。</p>
                 </div>
               </article>
@@ -206,6 +206,125 @@
               </dl>
               <small>目前卡點會顯示在中央日曆狀態；未通過授權核對時不載入內容。</small>
             </aside>
+          </div>
+        </section>
+
+        <section class="vendor-shared-calendar-workspace" data-vendor-shared-calendar-workspace aria-labelledby="vendor-shared-calendar-title">
+          <header class="vendor-shared-calendar-workspace__header">
+            <div>
+              <p class="vendor-calendar-hero__eyebrow">甲乙方共享日曆</p>
+              <h2 id="vendor-shared-calendar-title">排程、日誌與現場回覆</h2>
+              <p>Google Calendar 只作為乙方排程來源；意見、照片、缺失與專業審閱不會直接寫入 Google。</p>
+            </div>
+            <dl class="vendor-shared-calendar-workspace__status" aria-label="共享日曆目前狀態">
+              <div><dt>目前狀態</dt><dd>正式操作入口尚未開放</dd></div>
+              <div><dt>目前責任</dt><dd>乙方先備妥時間與依據</dd></div>
+              <div><dt>下一步</dt><dd>開放後再發布正式內容</dd></div>
+              <div><dt>案件留痕</dt><dd>尚未建立正式案件紀錄</dd></div>
+            </dl>
+          </header>
+
+          <div class="vendor-calendar-work-register" role="table" aria-label="乙方排程與日誌操作狀態">
+            <div class="vendor-calendar-work-register__header" role="row">
+              <span role="columnheader">工作種類</span>
+              <span role="columnheader">狀態與責任</span>
+              <span role="columnheader">下一步與留痕</span>
+              <span role="columnheader">正式操作</span>
+            </div>
+
+            <div class="vendor-calendar-work-row" role="row" data-vendor-calendar-work-kind="DESIGN_SCHEDULE">
+              <div role="cell" data-label="工作種類"><strong>設計進度</strong><small>提案、送審與確認節點</small></div>
+              <div role="cell" data-label="狀態與責任"><span>等待正式入口</span><small>目前責任：乙方確認日期與依據文件</small></div>
+              <div role="cell" data-label="下一步與留痕"><strong>開放後提交排程</strong><small>正式事件回傳前不會顯示為已記錄</small></div>
+              <div class="vendor-calendar-work-actions" role="cell" data-label="正式操作">
+                <button type="button" data-vendor-calendar-action="publish" data-write-action disabled aria-disabled="true">發布進度</button>
+                <button type="button" data-vendor-calendar-action="update" data-write-action disabled aria-disabled="true">更新進度</button>
+                <button type="button" data-vendor-calendar-action="cancel" data-write-action disabled aria-disabled="true">取消排程</button>
+              </div>
+            </div>
+
+            <div class="vendor-calendar-work-row" role="row" data-vendor-calendar-work-kind="CONSTRUCTION_SCHEDULE">
+              <div role="cell" data-label="工作種類"><strong>施工進度</strong><small>進場、工序與交接節點</small></div>
+              <div role="cell" data-label="狀態與責任"><span>等待正式入口</span><small>目前責任：乙方核對工序與現場責任人</small></div>
+              <div role="cell" data-label="下一步與留痕"><strong>開放後提交排程</strong><small>異動會另留新紀錄，不覆蓋原排程</small></div>
+              <div class="vendor-calendar-work-actions" role="cell" data-label="正式操作">
+                <button type="button" data-vendor-calendar-action="publish" data-write-action disabled aria-disabled="true">發布進度</button>
+                <button type="button" data-vendor-calendar-action="update" data-write-action disabled aria-disabled="true">更新進度</button>
+                <button type="button" data-vendor-calendar-action="cancel" data-write-action disabled aria-disabled="true">取消排程</button>
+              </div>
+            </div>
+
+            <div class="vendor-calendar-work-row" role="row" data-vendor-calendar-work-kind="DAILY_LOG">
+              <div role="cell" data-label="工作種類"><strong>每日施工紀錄</strong><small>現場進度、異常與照片依據</small></div>
+              <div role="cell" data-label="狀態與責任"><span>等待正式入口</span><small>目前責任：乙方先備妥當日事實</small></div>
+              <div role="cell" data-label="下一步與留痕"><strong>開放後提交日誌</strong><small>送出後追加案件紀錄，不改寫舊版本</small></div>
+              <div class="vendor-calendar-work-actions" role="cell" data-label="正式操作">
+                <button type="button" data-vendor-calendar-action="publish" data-write-action disabled aria-disabled="true">發布日誌</button>
+                <button type="button" data-vendor-calendar-action="update" data-write-action disabled aria-disabled="true">更新日誌</button>
+                <button type="button" data-vendor-calendar-action="cancel" data-write-action disabled aria-disabled="true">取消日誌</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="vendor-field-evidence-layout">
+            <section class="vendor-daily-log-fields" data-vendor-daily-log-fields aria-labelledby="vendor-daily-log-fields-title">
+              <header>
+                <div><small>每日施工紀錄</small><h3 id="vendor-daily-log-fields-title">一筆紀錄要能說清楚現場事實</h3></div>
+                <span>正式紀錄回傳後顯示</span>
+              </header>
+              <dl>
+                <div data-vendor-daily-log-field="work-item"><dt>工項</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="date"><dt>日期</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="location"><dt>位置</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="responsible"><dt>人員／責任人</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="progress"><dt>進度</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="exception"><dt>異常</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="photos"><dt>照片</dt><dd>尚未取得正式紀錄</dd></div>
+                <div data-vendor-daily-log-field="basis-document"><dt>依據文件</dt><dd>尚未取得正式紀錄</dd></div>
+              </dl>
+            </section>
+
+            <section class="vendor-defect-response" data-vendor-defect-response aria-labelledby="vendor-defect-response-title">
+              <header>
+                <div><small>缺失改善回覆</small><h3 id="vendor-defect-response-title">回覆證據，保留最後確認權</h3></div>
+                <span>等待甲方或 PCM 確認</span>
+              </header>
+              <dl>
+                <div data-vendor-defect-field="improvement-note"><dt>改善說明</dt><dd>正式資料回傳後顯示</dd></div>
+                <div data-vendor-defect-field="before-photo"><dt>改善前照片</dt><dd>正式資料回傳後顯示</dd></div>
+                <div data-vendor-defect-field="after-photo"><dt>改善後照片</dt><dd>正式資料回傳後顯示</dd></div>
+                <div data-vendor-defect-field="status"><dt>目前狀態</dt><dd>等待甲方或 PCM 確認</dd></div>
+                <div data-vendor-defect-field="next-actor"><dt>下一位處理者</dt><dd>依正式案件紀錄顯示</dd></div>
+              </dl>
+              <footer>
+                <p>乙方可說明改善內容並提供前後照片；乙方不能自行標示最終改善完成。</p>
+                <button type="button" data-vendor-defect-response-submit data-write-action disabled aria-disabled="true">正式入口開放後提交改善證據</button>
+              </footer>
+            </section>
+          </div>
+        </section>
+
+        <section class="vendor-case-history" data-vendor-case-history aria-labelledby="vendor-case-history-title">
+          <header class="vendor-case-history__header">
+            <div>
+              <p class="vendor-calendar-hero__eyebrow">案件共同事實</p>
+              <h2 id="vendor-case-history-title">唯讀案件歷史資料庫</h2>
+              <p>分類與甲方一致，依時間查看同一案件的文件、回覆、決策與施工事件。</p>
+            </div>
+            <div class="vendor-case-history__truth">
+              <strong>只有正式事件回傳後，才會顯示為已留下案件紀錄。</strong>
+              <span>正式變更會追加新的案件紀錄，不會覆蓋舊版本。</span>
+            </div>
+          </header>
+          <div class="vendor-case-history__register" role="list" aria-label="案件歷史分類">
+            <div role="listitem" data-vendor-history-category="documents"><strong>案件文件</strong><span>圖面、報價與可讀取版本</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="submissions"><strong>乙方提送</strong><span>提交內容、補件與回覆狀態</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="calendarSubmissions"><strong>已排程事項</strong><span>設計與施工進度節點</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="messages"><strong>案件訊息</strong><span>書面問題、回覆與責任交接</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="designReviews"><strong>設計送審</strong><span>檢討意見與補充要求</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="designDecisionTrail"><strong>設計決策</strong><span>提出者、版次、結果與下一位處理者</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="constructionRecords"><strong>施工與驗收</strong><span>日誌、照片、追加減項與缺失</span><small>正式事件回傳後顯示</small></div>
+            <div role="listitem" data-vendor-history-category="events"><strong>案件事件</strong><span>依時間保留的完整留痕</span><small>正式事件回傳後顯示</small></div>
           </div>
         </section>
 

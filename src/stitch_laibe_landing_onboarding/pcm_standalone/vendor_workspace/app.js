@@ -2496,13 +2496,18 @@ export function bindVendorWorkspaceRecoveryRoute(
   root,
   routeGetter = getActiveCanonicalLinkHref,
 ) {
-  let action = null;
+  let actions = [];
   try {
-    action = root?.querySelector?.("[data-vendor-access-recovery]") ?? null;
+    const matches = root?.querySelectorAll?.("[data-vendor-access-recovery]");
+    if (matches && typeof matches.length === "number") actions = matches;
+    else {
+      const action = root?.querySelector?.("[data-vendor-access-recovery]") ?? null;
+      if (action) actions = [action];
+    }
   } catch {
-    action = null;
+    actions = [];
   }
-  if (!action) return null;
+  if (actions.length === 0) return null;
 
   let href = null;
   try {
@@ -2514,24 +2519,31 @@ export function bindVendorWorkspaceRecoveryRoute(
   }
 
   if (href === VENDOR_WORKSPACE_ACCESS_RECOVERY_MANIFEST_HREF) {
-    try {
-      action.setAttribute("href", VENDOR_WORKSPACE_ACCESS_RECOVERY_CANONICAL_HREF);
-      action.setAttribute("aria-disabled", "false");
-      return VENDOR_WORKSPACE_ACCESS_RECOVERY_CANONICAL_HREF;
-    } catch {
-      // Fall through and remove any partial or stale navigation target.
+    let activated = true;
+    for (let index = 0; index < actions.length; index += 1) {
+      try {
+        actions[index].setAttribute("href", VENDOR_WORKSPACE_ACCESS_RECOVERY_CANONICAL_HREF);
+        actions[index].setAttribute("aria-disabled", "false");
+        actions[index].removeAttribute("tabindex");
+      } catch {
+        activated = false;
+      }
     }
+    if (activated) return VENDOR_WORKSPACE_ACCESS_RECOVERY_CANONICAL_HREF;
   }
 
-  try {
-    action.removeAttribute("href");
-  } catch {
-    // Static markup has no fallback href, so navigation remains closed.
-  }
-  try {
-    action.setAttribute("aria-disabled", "true");
-  } catch {
-    // Missing route state must never create a guessed destination.
+  for (let index = 0; index < actions.length; index += 1) {
+    try {
+      actions[index].removeAttribute("href");
+    } catch {
+      // Static markup has no fallback href, so navigation remains closed.
+    }
+    try {
+      actions[index].setAttribute("aria-disabled", "true");
+      actions[index].setAttribute("tabindex", "-1");
+    } catch {
+      // Missing route state must never create a guessed destination.
+    }
   }
   return null;
 }

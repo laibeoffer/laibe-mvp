@@ -341,6 +341,13 @@ function vendorWorkspacePanel(html, kind) {
   return end > start ? html.slice(start, end) : "";
 }
 
+function markupBetween(source, startMarker, endMarker) {
+  const start = source.indexOf(startMarker);
+  if (start < 0) return "";
+  const end = source.indexOf(endMarker, start + startMarker.length);
+  return end > start ? source.slice(start, end) : "";
+}
+
 function restoreDescriptor(target, key, descriptor) {
   if (descriptor) {
     Object.defineProperty(target, key, descriptor);
@@ -1091,13 +1098,15 @@ test("vendor public state keeps the original workspace interface without exposin
   assert.doesNotMatch(publicMarkup, /回到邀請確認|href="\.\.\/vendor_invitation\/code\.html"/u);
   assert.match(publicMarkup, /責任人[\s\S]*目前使用者/u);
   assert.match(publicMarkup, /id="vendor-authorized-workspace-mount"/u);
+  assert.match(publicMarkup, /class="vendor-gate-management-tabs"[^>]*aria-label="工作台管理區"/u);
   assert.equal(count(publicMarkup, /\bdata-vendor-gate-management-tab=/gu), 3);
   for (const [kind, label] of [["design", "設計管理"], ["contract", "契約管理"], ["construction", "工程管理"]]) {
     assert.match(
       publicMarkup,
-      new RegExp(`<button[^>]*data-vendor-gate-management-tab="${kind}"[^>]*disabled[^>]*aria-disabled="true"[\\s\\S]*?${label}[\\s\\S]*?<\\/button>`, "u"),
+      new RegExp(`<a[^>]*data-vendor-gate-management-tab="${kind}"[^>]*data-vendor-access-recovery[^>]*data-canonical-link="vendorWorkspaceAccessRecoveryToAccountAccess"[^>]*aria-disabled="true"[^>]*tabindex="-1"[\\s\\S]*?${label}[\\s\\S]*?<\\/a>`, "u"),
     );
   }
+  assert.doesNotMatch(publicMarkup, /<button[^>]*data-vendor-gate-management-tab=/u);
   assert.doesNotMatch(publicMarkup, /data-vendor-workspace-tab|role="tabpanel"/u);
   assert.doesNotMatch(publicMarkup, /契約範本|共同契約|v0\.2|LINE|line-conversation|composer/u);
   assert.doesNotMatch(publicMarkup, /青埔 A7|林宅老屋|漢皇SUPER|blueleft0120|<input|<textarea|<select/u);
@@ -1105,7 +1114,9 @@ test("vendor public state keeps the original workspace interface without exposin
   assert.match(css, /\.vendor-gate-placeholder\s*\{/u);
   assert.match(css, /\.vendor-gate-columns\s*\{[\s\S]{0,120}grid-template-columns:\s*minmax\(0,\s*1fr\)/u);
   assert.match(css, /\.vendor-gate-management-tabs\s*\{/u);
-  assert.match(css, /\.vendor-gate-management-tab:disabled\s*\{/u);
+  assert.match(css, /\.vendor-gate-management-tab\[aria-disabled="true"\]\s*\{[^}]*cursor:\s*not-allowed/u);
+  assert.match(css, /\.vendor-gate-management-tab\[aria-disabled="false"\]\s*\{[^}]*cursor:\s*pointer/u);
+  assert.doesNotMatch(css, /\.vendor-gate-management-tab:disabled/u);
 
   assert.notEqual(authorizedMarkup, "", "authorized workspace lives in an inert template");
   assert.equal(count(authorizedMarkup, /\bdata-vendor-workspace-tab=/gu), 3);
@@ -1431,23 +1442,25 @@ test("390px cascade keeps the DRS lockup role state and 44px recovery target vis
   assert.doesNotMatch(`${sharedBrandCss}\n${css}`, /margin(?:-inline|-left|-right)?(?:-(?:start|end))?\s*:\s*-\d/iu);
 });
 
-test("production recovery binding canonicalizes the vendor recovery route with invited-partner intent and closes null wrong or throwing getters", async () => {
+test("production recovery binding activates every vendor entry with invited-partner intent and closes all entries for null wrong or throwing getters", async () => {
   const runtime = await import(moduleUrl(workspaceDir, "manifest-recovery"));
   assert.equal(typeof runtime.bindVendorWorkspaceRecoveryRoute, "function");
 
-  function recoveryFixture(initialHref = null) {
-    const attributes = new Map();
-    if (initialHref) attributes.set("href", initialHref);
-    const action = {
-      getAttribute(name) { return attributes.get(name) ?? null; },
-      removeAttribute(name) { attributes.delete(name); },
-      setAttribute(name, value) { attributes.set(name, String(value)); },
-    };
+  function recoveryFixture(initialHref = null, count = 4) {
+    const actions = Array.from({ length: count }, () => {
+      const attributes = new Map([["aria-disabled", "true"], ["tabindex", "-1"]]);
+      if (initialHref) attributes.set("href", initialHref);
+      return {
+        getAttribute(name) { return attributes.get(name) ?? null; },
+        removeAttribute(name) { attributes.delete(name); },
+        setAttribute(name, value) { attributes.set(name, String(value)); },
+      };
+    });
     return {
-      action,
+      actions,
       root: {
-        querySelector(selector) {
-          return selector === "[data-vendor-access-recovery]" ? action : null;
+        querySelectorAll(selector) {
+          return selector === "[data-vendor-access-recovery]" ? actions : [];
         },
       },
     };
@@ -1463,11 +1476,12 @@ test("production recovery binding canonicalizes the vendor recovery route with i
     ),
     "/account/access/?intent=invited-partner",
   );
-  assert.equal(
-    active.action.getAttribute("href"),
-    "/account/access/?intent=invited-partner",
-  );
-  assert.equal(active.action.getAttribute("aria-disabled"), "false");
+  assert.equal(active.actions.length, 4);
+  for (const action of active.actions) {
+    assert.equal(action.getAttribute("href"), "/account/access/?intent=invited-partner");
+    assert.equal(action.getAttribute("aria-disabled"), "false");
+    assert.equal(action.getAttribute("tabindex"), null);
+  }
 
   for (const [label, getter] of [
     ["null", () => null],
@@ -1476,8 +1490,11 @@ test("production recovery binding canonicalizes the vendor recovery route with i
   ]) {
     const unavailable = recoveryFixture("../vendor_invitation/code.html");
     assert.equal(runtime.bindVendorWorkspaceRecoveryRoute(unavailable.root, getter), null, label);
-    assert.equal(unavailable.action.getAttribute("href"), null, `${label}: href`);
-    assert.equal(unavailable.action.getAttribute("aria-disabled"), "true", `${label}: disabled`);
+    for (const action of unavailable.actions) {
+      assert.equal(action.getAttribute("href"), null, `${label}: href`);
+      assert.equal(action.getAttribute("aria-disabled"), "true", `${label}: disabled`);
+      assert.equal(action.getAttribute("tabindex"), "-1", `${label}: tabindex`);
+    }
   }
 });
 
@@ -2668,22 +2685,9 @@ test("vendor sidebar exposes truthful contract backup management with readable a
 
   assert.match(
     css,
-    /#vendor-main \.vendor-gate \.vendor-gate-management-tab:disabled\s*\{[\s\S]{0,280}color:\s*var\(--vendor-warm-ivory\)[\s\S]{0,280}filter:\s*none[\s\S]{0,280}opacity:\s*1/u,
+    /#vendor-main \.vendor-gate \.vendor-gate-management-tab\s*\{[\s\S]{0,280}color:\s*var\(--vendor-warm-ivory\)[\s\S]{0,280}filter:\s*none[\s\S]{0,280}opacity:\s*1/u,
   );
-  const glassDisabledSelector = "#vendor-main :where(.vendor-gate, .vendor-workspace) :where(button:disabled, button[aria-disabled=\"true\"], .vendor-primary-action[aria-disabled=\"true\"])";
-  const managementContrastSelector = css.match(
-    /([^,{]+\.vendor-gate-management-tab:disabled)\s*\{[^}]*filter:\s*none;[^}]*opacity:\s*1;/u,
-  )?.[1].trim();
-  assert.ok(managementContrastSelector, "management contrast override selector");
-  assert.deepEqual(cssSpecificity(glassDisabledSelector), [1, 0, 0]);
-  assert.equal(
-    compareCssPriority(
-      { important: false, specificity: cssSpecificity(managementContrastSelector), order: 1 },
-      { important: false, specificity: cssSpecificity(glassDisabledSelector), order: 0 },
-    ),
-    1,
-    "management contrast override must outrank the glass disabled rule",
-  );
+  assert.match(css, /#vendor-main \.vendor-gate \.vendor-gate-management-tab\[aria-disabled="false"\]\s*\{[^}]*cursor:\s*pointer/u);
   assert.match(
     css,
     /\.vendor-workspace \.vendor-workspace-tabs \.scase\[aria-selected="true"\]\s*\{[\s\S]{0,420}0\s+0\s+24px\s+rgba\(255,\s*117,\s*48,\s*\.22\)/u,
@@ -3800,4 +3804,101 @@ test("local visual preview harness opens only the exported authorized template w
     routeManifest,
     /vendor-workspace-authorized-preview|TEMPORARY_VISUAL_PREVIEW/u,
   );
+});
+
+test("vendor shared calendar keeps schedule and daily-log mutations pending until the accepted contract exists", async () => {
+  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  const template = vendorAuthorizedTemplate(html);
+  const sharedCalendar = markupBetween(
+    template,
+    "data-vendor-shared-calendar-workspace",
+    "data-vendor-case-history",
+  );
+
+  assert.notEqual(sharedCalendar, "", "shared calendar workbench must exist inside the authorized template");
+  for (const kind of ["DESIGN_SCHEDULE", "CONSTRUCTION_SCHEDULE", "DAILY_LOG"]) {
+    assert.match(sharedCalendar, new RegExp(`data-vendor-calendar-work-kind="${kind}"`, "u"));
+  }
+  for (const action of ["publish", "update", "cancel"]) {
+    const controls = sharedCalendar.match(
+      new RegExp(`<button[^>]*data-vendor-calendar-action="${action}"[^>]*>`, "gu"),
+    ) ?? [];
+    assert.equal(controls.length, 3, `${action} must be represented for all three work types`);
+    for (const control of controls) {
+      assert.match(control, /\bdisabled\b/u);
+      assert.match(control, /aria-disabled="true"/u);
+      assert.match(control, /data-write-action/u);
+    }
+  }
+  assert.match(sharedCalendar, /目前狀態/u);
+  assert.match(sharedCalendar, /目前責任/u);
+  assert.match(sharedCalendar, /下一步/u);
+  assert.match(sharedCalendar, /尚未建立正式案件紀錄/u);
+  assert.match(sharedCalendar, /Google Calendar[^。]*只作為乙方排程來源/u);
+  assert.match(sharedCalendar, /意見、照片、缺失與專業審閱[^。]*不會直接寫入 Google/u);
+  assert.doesNotMatch(
+    sharedCalendar,
+    /\/api\/|\bfetch\s*\(|\b(?:caseId|userId|grant|bucket|path|versionRef)\b|上傳成功|發布成功|更新成功|取消成功/iu,
+  );
+});
+
+test("vendor daily log and defect response expose complete evidence fields without claiming final completion", async () => {
+  const html = await readFile(pagePath(workspaceDir, "code.html"), "utf8");
+  const template = vendorAuthorizedTemplate(html);
+  const dailyLog = markupBetween(
+    template,
+    "data-vendor-daily-log-fields",
+    "data-vendor-defect-response",
+  );
+  const defectResponse = markupBetween(
+    template,
+    "data-vendor-defect-response",
+    "data-vendor-case-history",
+  );
+
+  assert.notEqual(dailyLog, "", "daily log evidence fields must be visible");
+  for (const field of [
+    "work-item", "date", "location", "responsible", "progress", "exception", "photos", "basis-document",
+  ]) {
+    assert.match(dailyLog, new RegExp(`data-vendor-daily-log-field="${field}"`, "u"));
+  }
+  for (const copy of ["工項", "日期", "位置", "人員／責任人", "進度", "異常", "照片", "依據文件"]) {
+    assert.match(dailyLog, new RegExp(copy, "u"));
+  }
+  assert.match(dailyLog, /正式紀錄回傳後顯示/u);
+
+  assert.notEqual(defectResponse, "", "defect response evidence surface must be visible");
+  for (const field of ["improvement-note", "before-photo", "after-photo", "status", "next-actor"]) {
+    assert.match(defectResponse, new RegExp(`data-vendor-defect-field="${field}"`, "u"));
+  }
+  assert.match(defectResponse, /乙方不能自行標示最終改善完成/u);
+  assert.match(defectResponse, /等待甲方或 PCM 確認/u);
+  assert.doesNotMatch(defectResponse, /已改善完成|已驗收完成|已留下案件紀錄/u);
+});
+
+test("vendor readonly case history mirrors owner record categories and preserves append-only truth on mobile", async () => {
+  const [html, css] = await Promise.all([
+    readFile(pagePath(workspaceDir, "code.html"), "utf8"),
+    readFile(pagePath(workspaceDir, "styles.css"), "utf8"),
+  ]);
+  const template = vendorAuthorizedTemplate(html);
+  const history = markupBetween(
+    template,
+    "data-vendor-case-history",
+    "class=\"vendor-document-import",
+  );
+
+  assert.notEqual(history, "", "readonly case history must precede the document workspace");
+  for (const category of [
+    "documents", "submissions", "calendarSubmissions", "messages", "designReviews",
+    "designDecisionTrail", "constructionRecords", "events",
+  ]) {
+    assert.match(history, new RegExp(`data-vendor-history-category="${category}"`, "u"));
+  }
+  assert.match(history, /唯讀案件歷史資料庫/u);
+  assert.match(history, /正式變更會追加新的案件紀錄，不會覆蓋舊版本/u);
+  assert.match(history, /只有正式事件回傳後，才會顯示為已留下案件紀錄/u);
+  assert.doesNotMatch(history, /分享連結[^。]*權限|本機選檔[^。]*正式紀錄/u);
+  assert.match(css, /\.vendor-shared-calendar-workspace\s*,\s*\.vendor-case-history\s*\{/u);
+  assert.match(css, /@media\s*\(max-width:\s*760px\)[\s\S]*\.vendor-calendar-work-row/u);
 });
