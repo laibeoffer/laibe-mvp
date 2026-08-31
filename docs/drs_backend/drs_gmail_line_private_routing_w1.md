@@ -34,7 +34,7 @@
 - `POST /functions/v1/drs-line-account-link-unlink`，body 必須是 `{}`。
 - `POST /functions/v1/drs-line-account-link-continue?linkToken=...`，body 必須是 `{}`。
 
-五個操作都使用既有 A17 sealed session cookie 與短效 BFF proof，並在每次操作重新解析目前案件授權。回應只會出現核准的 12-state DTO，不會投影審查員、案件、assignment、角色、LINE ID 或 provider credential。沒有有效案件 session 時，不開放 start／status／cancel／continue；解除通知改走上述 signed private-LINE 自助撤銷路徑。
+The five browser-adjacent BFF functions intentionally use `verify_jwt = false` as a non-user-JWT boundary；每個 handler 仍必須先驗證既有 A17 sealed session cookie 與 exact short-lived opaque BFF proof，才可重新解析目前案件授權或執行 provider work。回應只會出現核准的 12-state DTO，不會投影審查員、案件、assignment、角色、LINE ID 或 provider credential。沒有有效案件 session 時，不開放 start／status／cancel／continue；解除通知改走上述 signed private-LINE 自助撤銷路徑。
 
 這些 BFF 必須由 DRS 網站的同源反向代理提供；瀏覽器看見的 origin、`Origin` header、`Sec-Fetch-Site` 與 `LAIBE_DRS_APP_ORIGIN` 必須一致。不得把 Supabase Functions 的跨網域網址直接交給前端呼叫。
 
@@ -48,7 +48,7 @@
 服務排程入口：
 
 - `POST /functions/v1/drs-line-private-notification-dispatch`，body 必須是 `{}`。
-- Supabase gateway JWT 驗證必須開啟，且 handler 只接受 gateway 已驗證的 `service_role` claim。
+- 此 service-only dispatcher 維持 `verify_jwt = true`，且 handler 只接受 gateway 已驗證的 `service_role` claim。
 - 不接受瀏覽器提供的案件或 LINE 目的地。
 
 ## names-only 設定契約
@@ -87,7 +87,7 @@ LAIBE_DRS_BFF_PROOF_KEY_V1
 1. 先確認既有 Gmail Auth、A17 secure session、DRS specialist authority 與案件指派已部署且可用。
 2. 套用 `20260831050535_drs_gmail_line_private_routing_w1.sql`。
 3. 設定 names-only 變數的實際值。
-4. 部署 start、status、cancel、unlink 與 continue 五個 authenticated BFF。
+4. 部署 start、status、cancel、unlink 與 continue 五個 browser-adjacent BFF functions；其 non-user-JWT boundary 不取代 sealed session 與 BFF proof 驗證。
 5. 部署 `drs-line-webhook`，再將 LINE Developers Console webhook 指向其公開 HTTPS URL。
 6. 執行 LINE Verify；成功後才開啟 Use webhook。
 7. 部署 `drs-line-private-notification-dispatch`，只由受控的 service-role 排程呼叫。
@@ -142,7 +142,8 @@ source_revision
 
 ## 本候選目前證據邊界
 
-- 已建立：source contracts、BFF、官方 signed webhook、durable binding/dedupe、assignment producer、outbox/receipt、案件留痕、claim lease recovery、send fence、service-only dispatcher、unit/source tests 與 local migration verification。
+- 已建立：source contracts、BFF、官方 signed webhook、durable binding/dedupe、assignment producer、outbox/receipt、案件留痕、claim lease recovery、send fence、service-only dispatcher 與 unit/source tests。
+- 已完成一輪 task-scoped disposable PostgreSQL 驗證：使用 pinned local image、隔離網路且不掛載 port／volume，完成 local migration execution、完整狀態機斷言與 `finally` 容器清理。This bounded local evidence does not prove a remote database, real LINE provider, deployment, or launch.
 - 尚未建立於本 producer：A3 UI 串接與 `/drs/line-account-link` 繼續頁。
 - 尚未證明：已部署 Supabase runtime、正式 Gmail Auth、正式 durable LINE binding、真實案件派送、手機通知、解除後抑制與 production ownership。
 - 未執行：push、PR、merge、Supabase deploy、LINE Console 變更、Zeabur 變更、secret 輸入、真人訊息或 production launch。

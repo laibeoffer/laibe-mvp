@@ -22,6 +22,51 @@ const guardedRoutes = Object.freeze([
   "supabase/functions/drs-google-calendar-revoke/index.ts",
 ]);
 
+const expectedFunctionConfig = Object.freeze({
+  "drs-session-bootstrap": false,
+  "drs-workspace-grant": false,
+  "drs-google-calendar-grant": false,
+  "drs-google-calendar-oauth-start": false,
+  "drs-google-calendar-oauth-callback": false,
+  "drs-google-calendar-events-read": false,
+  "drs-google-calendar-revoke": false,
+  "casework-case-create": true,
+  "owner-workspace-grant": true,
+  "vendor-workspace-grant": true,
+  "highest-reviewer-workspace-grant": true,
+  "drs-document-upload-intent": false,
+  "drs-document-upload-finalize": false,
+  "drs-document-version-download": false,
+  "drs-document-snapshot": false,
+  "drs-line-account-link-start": false,
+  "drs-line-account-link-status": false,
+  "drs-line-account-link-cancel": false,
+  "drs-line-account-link-unlink": false,
+  "drs-line-account-link-continue": false,
+  "drs-line-webhook": false,
+  "drs-line-private-notification-dispatch": true,
+});
+
+function assertExactFunctionConfig(config) {
+  const tables = [...`${config}\n[`.matchAll(
+    /^\[([^\]]+)\]\n([\s\S]*?)(?=^\[)/gmu,
+  )].map((match) => [match[1], match[2].trimEnd()]);
+  const tableNames = tables.map(([name]) => name);
+  assert.equal(new Set(tableNames).size, tableNames.length);
+
+  const functionEntries = tables
+    .filter(([name]) => name.startsWith("functions."))
+    .map(([name, body]) => {
+      assert.match(body, /^verify_jwt = (?:true|false)$/u, name);
+      return [name.slice("functions.".length), body.endsWith("true")];
+    });
+  const map = Object.fromEntries(functionEntries);
+  assert.equal(functionEntries.length, 22);
+  assert.equal(Object.keys(map).length, 22);
+  assert.deepEqual(map, expectedFunctionConfig);
+  return tables;
+}
+
 test("all five composed routes guard before server authority or provider work", async () => {
   for (const relativePath of guardedRoutes) {
     const text = await source(relativePath);
@@ -48,40 +93,9 @@ test("all five composed routes guard before server authority or provider work", 
   }
 });
 
-test("focused RED: P2 shared config map and private buckets are absent", async () => {
+test("final shared config has the exact 22 function entries and private buckets", async () => {
   const config = await source("supabase/config.toml");
-  const tables = [...`${config}\n[`.matchAll(
-    /^\[([^\]]+)\]\n([\s\S]*?)(?=^\[)/gmu,
-  )].map((match) => [match[1], match[2].trimEnd()]);
-  const tableNames = tables.map(([name]) => name);
-  assert.equal(new Set(tableNames).size, tableNames.length);
-
-  const functionEntries = tables
-    .filter(([name]) => name.startsWith("functions."))
-    .map(([name, body]) => {
-      assert.match(body, /^verify_jwt = (?:true|false)$/u, name);
-      return [name.slice("functions.".length), body.endsWith("true")];
-    });
-  const map = Object.fromEntries(functionEntries);
-  assert.equal(functionEntries.length, 15);
-  assert.equal(Object.keys(map).length, 15);
-  assert.deepEqual(map, {
-    "drs-session-bootstrap": false,
-    "drs-workspace-grant": false,
-    "drs-google-calendar-grant": false,
-    "drs-google-calendar-oauth-start": false,
-    "drs-google-calendar-oauth-callback": false,
-    "drs-google-calendar-events-read": false,
-    "drs-google-calendar-revoke": false,
-    "casework-case-create": true,
-    "owner-workspace-grant": true,
-    "vendor-workspace-grant": true,
-    "highest-reviewer-workspace-grant": true,
-    "drs-document-upload-intent": false,
-    "drs-document-upload-finalize": false,
-    "drs-document-version-download": false,
-    "drs-document-snapshot": false,
-  });
+  const tables = assertExactFunctionConfig(config);
 
   const bucketEntries = tables.filter(([name]) =>
     name.startsWith("storage.buckets.")
@@ -105,6 +119,68 @@ test("focused RED: P2 shared config map and private buckets are absent", async (
   assert.doesNotMatch(
     config,
     /https?:\/\/|service_role|secret|provision|apply|remote/iu,
+  );
+});
+
+test("function config rejects missing, duplicate, name-drifted, and JWT-drifted entries", async () => {
+  const config = await source("supabase/config.toml");
+  const missing = config.replace(
+    /\n\[functions\.drs-line-account-link-status\]\nverify_jwt = false\n/u,
+    "\n",
+  );
+  const duplicate =
+    `${config}\n[functions.drs-line-account-link-start]\nverify_jwt = false\n`;
+  const nameDrift = config.replace(
+    "[functions.drs-line-account-link-cancel]",
+    "[functions.drs-line-account-link-cancelled]",
+  );
+  const jwtDrift = config.replace(
+    "[functions.drs-line-account-link-unlink]\nverify_jwt = false",
+    "[functions.drs-line-account-link-unlink]\nverify_jwt = true",
+  );
+  for (
+    const [name, mutation] of [
+      ["missing", missing],
+      ["duplicate", duplicate],
+      ["name drift", nameDrift],
+      ["verify_jwt drift", jwtDrift],
+    ]
+  ) {
+    assert.throws(() => assertExactFunctionConfig(mutation), undefined, name);
+  }
+});
+
+test("LINE boundary docs describe intentional non-user-JWT BFF proof and bounded local verification", async () => {
+  const plan = await source(
+    "docs/superpowers/plans/2026-08-31-drs-gmail-line-private-routing-w1.md",
+  );
+  const backend = await source(
+    "docs/drs_backend/drs_gmail_line_private_routing_w1.md",
+  );
+  assert.match(
+    plan,
+    /five browser-adjacent BFF functions[\s\S]*?verify_jwt = false[\s\S]*?sealed session cookie[\s\S]*?opaque BFF proof/iu,
+  );
+  assert.doesNotMatch(
+    plan,
+    /Configure authenticated functions with JWT verification/iu,
+  );
+  assert.doesNotMatch(
+    plan,
+    /Set `verify_jwt = false` only for `drs-line-webhook`/iu,
+  );
+  assert.match(
+    backend,
+    /five browser-adjacent BFF functions[\s\S]*?verify_jwt = false[\s\S]*?non-user-JWT boundary[\s\S]*?sealed session cookie[\s\S]*?opaque BFF proof/iu,
+  );
+  assert.doesNotMatch(backend, /gateway JWT 驗證必須開啟/iu);
+  assert.match(
+    backend,
+    /task-scoped disposable PostgreSQL[\s\S]*?local migration execution/iu,
+  );
+  assert.match(
+    backend,
+    /not prove[\s\S]*?remote database[\s\S]*?real LINE provider[\s\S]*?deployment[\s\S]*?launch/iu,
   );
 });
 

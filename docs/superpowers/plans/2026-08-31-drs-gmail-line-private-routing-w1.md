@@ -236,7 +236,7 @@ git add -- supabase/migrations/*_drs_gmail_line_private_routing_w1.sql supabase/
 git commit -m "feat(drs): add durable private LINE routing state"
 ```
 
-### Task 4: Account-link service and four authenticated BFF endpoints
+### Task 4: Account-link service and five browser-adjacent BFF functions
 
 **Files:**
 - Create: `supabase/functions/_shared/drs-line-account-link/ports.ts`
@@ -283,7 +283,7 @@ Expected: FAIL on missing service/handler/functions.
 
 - [ ] **Step 3: Implement thin handlers and service**
 
-Reuse A17 secure-session dependencies. Keep repository and provider ports injected for tests. Configure authenticated functions with JWT verification; continuation must exchange protocol input into server-held state before any redirect and must not log it.
+Reuse A17 secure-session dependencies. Keep repository and provider ports injected for tests. The five browser-adjacent BFF functions intentionally use `verify_jwt = false` as a non-user-JWT boundary; each handler must verify the A17 sealed session cookie and exact short-lived opaque BFF proof before server-derived authority or provider work. Continuation must exchange protocol input into server-held state before any redirect and must not log it.
 
 - [ ] **Step 4: Verify GREEN and A17 regressions**
 
@@ -332,7 +332,7 @@ node --test tests/drs-gmail-line-private-routing-source.test.mjs
 
 - [ ] **Step 3: Implement the canonical webhook**
 
-Set `verify_jwt = false` only for `drs-line-webhook`; validate `X-Line-Signature` against the exact bytes before inspecting events. Return HTTP 200 only after every admitted event has a durable safe outcome; retryable storage failure returns a retryable non-2xx without duplicating committed effects.
+Set `verify_jwt = false` for `drs-line-webhook` because LINE cannot present a Supabase user JWT; validate `X-Line-Signature` against the exact bytes before inspecting events. Return HTTP 200 only after every admitted event has a durable safe outcome; retryable storage failure returns a retryable non-2xx without duplicating committed effects.
 
 - [ ] **Step 4: Verify GREEN**
 
@@ -428,7 +428,7 @@ DRS_PUBLIC_ORIGIN
 DRS_LINE_OFFICIAL_ACCOUNT_URL
 ```
 
-State that the Human enters secrets directly into Supabase encrypted secrets after source approval. Include deploy order: migration, authenticated BFFs, continuation, webhook, dispatcher, health/source checks, LINE Verify, Human-only Pilot. Include a hold if any provider, DB, or phone fact is unproven.
+State that the Human enters secrets directly into Supabase encrypted secrets after source approval. Include deploy order: migration, five browser-adjacent BFF functions, continuation, webhook, dispatcher, health/source checks, LINE Verify, Human-only Pilot. Include a hold if any provider, DB, or phone fact is unproven.
 
 - [ ] **Step 2: Run static and focused verification**
 
@@ -450,6 +450,8 @@ Use the available CLI's documented local function check/serve command. If Deno i
 - [ ] **Step 4: Run migration/advisor verification when local Supabase is available**
 
 Use `supabase --help`, `supabase db --help`, and `supabase migration --help` to select current commands. Run the migration list, local database reset, real-PostgreSQL tests, and advisors. If Docker or local Supabase is unavailable, report the exact blocked gates.
+
+The focused real-PostgreSQL gate uses one task-scoped disposable PostgreSQL container with the pinned local image, no network, ports, or volumes. It applies the prerequisite migrations and LINE migration, executes the complete state-machine assertions, and removes the container in `finally`. This proves only bounded local migration execution against that disposable PostgreSQL identity; it does not prove a remote database, real LINE provider, deployment, or launch.
 
 - [ ] **Step 5: Run secret and forbidden-scope scans**
 
