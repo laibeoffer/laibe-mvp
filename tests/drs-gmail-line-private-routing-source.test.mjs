@@ -27,6 +27,29 @@ const migrationUrl = new URL(
   "../supabase/migrations/20260831050535_drs_gmail_line_private_routing_w1.sql",
   import.meta.url,
 );
+const linePortsUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/ports.ts",
+  import.meta.url,
+);
+const lineServiceUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/service.ts",
+  import.meta.url,
+);
+const lineHttpUrl = new URL(
+  "../supabase/functions/_shared/drs-line-account-link/http.ts",
+  import.meta.url,
+);
+
+const AUTHORITY = Object.freeze({
+  authenticatedUserId: "00000000-0000-4000-8000-000000000001",
+  specialistId: "00000000-0000-4000-8000-000000000002",
+  authorizationSubject:
+    "drs-specialist:00000000-0000-4000-8000-000000000002",
+  selectedCaseId: "00000000-0000-4000-8000-000000000003",
+  caseStatus: "active",
+  accessMode: "read_only",
+  proofExpiresAt: "2026-08-31T12:01:00.000Z",
+});
 
 const LINE_USER_ID = "U0123456789abcdef0123456789abcdef";
 const WEBHOOK_EVENT_ID = "01HZZZZZZZZZZZZZZZZZZZZZZZ";
@@ -446,4 +469,301 @@ test("LINE client rejects inherited notification authority before any provider c
       error.code === "provider_invalid_request",
   );
   assert.equal(providerCalled, false);
+});
+
+test("account-link service sends only server-derived authority to its repository", async () => {
+  const { createLineAccountLinkService } = await import(lineServiceUrl.href);
+  const calls = [];
+  const repository = {
+    async startIntent(authority) {
+      calls.push({ operation: "start", authority });
+      return {
+        state: "awaiting_line_confirmation",
+        expires_at: "2026-08-31T12:10:00.000Z",
+        next_action: "continue_in_line",
+        bot_launch_url: "https://line.me/R/ti/p/@953vqegd",
+      };
+    },
+    async readStatus(authority) {
+      calls.push({ operation: "status", authority });
+      return { state: "not_linked" };
+    },
+    async cancelIntent(authority) {
+      calls.push({ operation: "cancel", authority });
+      return { state: "cancelled", next_action: "relink" };
+    },
+    async prepareNonce() {
+      throw new Error("not used");
+    },
+    async unlink(authority) {
+      calls.push({ operation: "unlink", authority });
+      return {
+        state: "revoked",
+        revoked_at: "2026-08-31T12:00:00.000Z",
+        next_action: "relink",
+      };
+    },
+  };
+  const service = createLineAccountLinkService({
+    repository,
+    identityHmacKey: "unit-test-identity-key",
+  });
+
+  assert.deepEqual(await service.start(AUTHORITY), {
+    state: "awaiting_line_confirmation",
+    expiresAt: "2026-08-31T12:10:00.000Z",
+    nextAction: "continue_in_line",
+    botLaunchUrl: "https://line.me/R/ti/p/@953vqegd",
+  });
+  assert.deepEqual(await service.status(AUTHORITY), {
+    state: "not_linked",
+    nextAction: "relink",
+  });
+  assert.deepEqual(await service.cancel(AUTHORITY), {
+    state: "cancelled",
+    nextAction: "relink",
+  });
+  assert.deepEqual(await service.unlink(AUTHORITY), {
+    state: "revoked",
+    revokedAt: "2026-08-31T12:00:00.000Z",
+    nextAction: "relink",
+  });
+  assert.deepEqual(calls.map(({ operation }) => operation), [
+    "start",
+    "status",
+    "cancel",
+    "unlink",
+  ]);
+  for (const { authority } of calls) {
+    assert.deepEqual(Object.keys(authority).sort(), [
+      "authenticatedUserId",
+      "authorizationSubject",
+      "selectedCaseId",
+      "specialistId",
+    ]);
+    assert.equal("assignmentId" in authority, false);
+    assert.equal("role" in authority, false);
+  }
+});
+
+test("start handler accepts only same-origin exact-empty requests and returns safe DTO", async () => {
+  const { createLineLinkStartHandler } = await import(lineHttpUrl.href);
+  let startCalls = 0;
+  const handler = createLineLinkStartHandler({
+    allowedOrigin: "https://laibe.example",
+    guard: {
+      async authorize() {
+        return AUTHORITY;
+      },
+    },
+    service: {
+      async start() {
+        startCalls += 1;
+        return Object.freeze({
+          state: "awaiting_line_confirmation",
+          expiresAt: "2026-08-31T12:10:00.000Z",
+          nextAction: "continue_in_line",
+          botLaunchUrl: "https://line.me/R/ti/p/@953vqegd",
+        });
+      },
+    },
+  });
+
+  const accepted = await handler(new Request(
+    "https://edge.example/functions/v1/drs-line-account-link-start",
+    {
+      method: "POST",
+      headers: {
+        origin: "https://laibe.example",
+        "content-type": "application/json",
+      },
+      body: "{}",
+    },
+  ));
+  assert.equal(accepted.status, 200);
+  assert.deepEqual(await accepted.json(), {
+    state: "awaiting_line_confirmation",
+    expiresAt: "2026-08-31T12:10:00.000Z",
+    nextAction: "continue_in_line",
+    botLaunchUrl: "https://line.me/R/ti/p/@953vqegd",
+  });
+  assert.equal(accepted.headers.get("cache-control"), "no-store");
+  assert.equal(startCalls, 1);
+
+  for (const request of [
+    new Request("https://edge.example/functions/v1/drs-line-account-link-start", {
+      method: "POST",
+      headers: { origin: "https://laibe.example", "content-type": "application/json" },
+      body: '{"specialistId":"00000000-0000-4000-8000-000000000002"}',
+    }),
+    new Request("https://edge.example/functions/v1/drs-line-account-link-start?caseId=x", {
+      method: "POST",
+      headers: { origin: "https://laibe.example", "content-type": "application/json" },
+      body: "{}",
+    }),
+    new Request("https://edge.example/functions/v1/drs-line-account-link-start", {
+      method: "POST",
+      headers: { origin: "https://attacker.example", "content-type": "application/json" },
+      body: "{}",
+    }),
+  ]) {
+    const rejected = await handler(request);
+    assert.equal([400, 403].includes(rejected.status), true);
+  }
+  assert.equal(startCalls, 1);
+});
+
+test("status cancel and unlink handlers preserve operation-specific methods", async () => {
+  const {
+    createLineLinkCancelHandler,
+    createLineLinkStatusHandler,
+    createLineLinkUnlinkHandler,
+  } = await import(lineHttpUrl.href);
+  const operations = [];
+  const dependencies = {
+    allowedOrigin: "https://laibe.example",
+    guard: { async authorize() { return AUTHORITY; } },
+    service: {
+      async status() {
+        operations.push("status");
+        return Object.freeze({ state: "not_linked", nextAction: "relink" });
+      },
+      async cancel() {
+        operations.push("cancel");
+        return Object.freeze({ state: "cancelled", nextAction: "relink" });
+      },
+      async unlink() {
+        operations.push("unlink");
+        return Object.freeze({
+          state: "revoked",
+          revokedAt: "2026-08-31T12:00:00.000Z",
+          nextAction: "relink",
+        });
+      },
+    },
+  };
+  const statusResponse = await createLineLinkStatusHandler(dependencies)(
+    new Request("https://edge.example/functions/v1/drs-line-account-link-status", {
+      headers: { origin: "https://laibe.example" },
+    }),
+  );
+  assert.equal(statusResponse.status, 200);
+  const cancelResponse = await createLineLinkCancelHandler(dependencies)(
+    new Request("https://edge.example/functions/v1/drs-line-account-link-cancel", {
+      method: "POST",
+      headers: { origin: "https://laibe.example", "content-type": "application/json" },
+      body: "{}",
+    }),
+  );
+  assert.equal(cancelResponse.status, 200);
+  const unlinkResponse = await createLineLinkUnlinkHandler(dependencies)(
+    new Request("https://edge.example/functions/v1/drs-line-account-link-unlink", {
+      method: "POST",
+      headers: { origin: "https://laibe.example", "content-type": "application/json" },
+      body: "{}",
+    }),
+  );
+  assert.equal(unlinkResponse.status, 200);
+  assert.deepEqual(operations, ["status", "cancel", "unlink"]);
+});
+
+test("handler converts missing Gmail-backed DRS authority to permission_denied", async () => {
+  const { createLineLinkStatusHandler } = await import(lineHttpUrl.href);
+  const { DrsIdentityError } = await import(
+    new URL(
+      "../supabase/functions/_shared/drs-auth/contracts.ts",
+      import.meta.url,
+    ).href
+  );
+  const handler = createLineLinkStatusHandler({
+    allowedOrigin: "https://laibe.example",
+    guard: {
+      async authorize() {
+        throw new DrsIdentityError("AUTH_REQUIRED", 401);
+      },
+    },
+    service: { async status() { throw new Error("must not run"); } },
+  });
+  const response = await handler(new Request(
+    "https://edge.example/functions/v1/drs-line-account-link-status",
+    { headers: { origin: "https://laibe.example" } },
+  ));
+  assert.equal(response.status, 401);
+  assert.deepEqual(await response.json(), { state: "permission_denied" });
+});
+
+test("continue creates a one-time nonce digest and only redirects to LINE accountLink", async () => {
+  const { createLineAccountLinkService } = await import(lineServiceUrl.href);
+  const { createLineLinkContinueHandler } = await import(lineHttpUrl.href);
+  const prepared = [];
+  const service = createLineAccountLinkService({
+    repository: {
+      async startIntent() { throw new Error("not used"); },
+      async readStatus() { throw new Error("not used"); },
+      async cancelIntent() { throw new Error("not used"); },
+      async unlink() { throw new Error("not used"); },
+      async prepareNonce(input) {
+        prepared.push(input);
+        return { accepted: true, state: "awaiting_line_confirmation" };
+      },
+    },
+    identityHmacKey: "unit-test-identity-key",
+    now: () => new Date("2026-08-31T12:00:00.000Z"),
+    randomBytes: () => new Uint8Array(32).fill(7),
+  });
+  const handler = createLineLinkContinueHandler({
+    allowedOrigin: "https://laibe.example",
+    guard: { async authorize() { return AUTHORITY; } },
+    service,
+  });
+  const response = await handler(new Request(
+    "https://edge.example/functions/v1/drs-line-account-link-continue?linkToken=one-time-provider-value",
+    {
+      method: "POST",
+      headers: { origin: "https://laibe.example", "content-type": "application/json" },
+      body: "{}",
+      redirect: "manual",
+    },
+  ));
+  assert.equal(response.status, 303);
+  const location = new URL(response.headers.get("location"));
+  assert.equal(location.origin, "https://access.line.me");
+  assert.equal(location.pathname, "/dialog/bot/accountLink");
+  assert.equal(location.searchParams.get("linkToken"), "one-time-provider-value");
+  const nonce = location.searchParams.get("nonce");
+  assert.match(nonce, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(prepared.length, 1);
+  assert.equal(prepared[0].nonceDigest === nonce, false);
+  assert.equal("nonce" in prepared[0], false);
+  assert.equal("linkToken" in prepared[0], false);
+  assert.deepEqual(Object.keys(prepared[0].authority).sort(), [
+    "authenticatedUserId",
+    "authorizationSubject",
+    "selectedCaseId",
+    "specialistId",
+  ]);
+});
+
+test("default function entries expose custom-session handlers without deployment side effects", async () => {
+  for (const [path, exportName] of [
+    ["drs-line-account-link-start", "createLineLinkStartHandler"],
+    ["drs-line-account-link-status", "createLineLinkStatusHandler"],
+    ["drs-line-account-link-cancel", "createLineLinkCancelHandler"],
+    ["drs-line-account-link-unlink", "createLineLinkUnlinkHandler"],
+    ["drs-line-account-link-continue", "createLineLinkContinueHandler"],
+  ]) {
+    const module = await import(new URL(
+      `../supabase/functions/${path}/index.ts`,
+      import.meta.url,
+    ).href);
+    assert.equal(module.VERIFY_JWT_REQUIRED, false);
+    assert.equal(typeof module[exportName], "function");
+    assert.equal(typeof module.handler, "function");
+  }
+  const { createSupabaseDrsLineAccountLinkRepository } = await import(
+    linePortsUrl.href
+  );
+  assert.equal(typeof createSupabaseDrsLineAccountLinkRepository, "function");
 });

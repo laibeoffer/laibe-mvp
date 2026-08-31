@@ -127,6 +127,23 @@ test("all private routing RPCs are closed postgres-owned service-only functions"
   }
 });
 
+test("Edge runtime RPCs have service-only public PostgREST facades", () => {
+  for (const name of RPCS) {
+    assert.match(sql, new RegExp(
+      `create or replace function public\\.${name}\\(\\s*p_input jsonb\\s*\\)[\\s\\S]*?drs_private\\.${name}\\(p_input\\)`,
+      "iu",
+    ));
+    assert.match(sql, new RegExp(
+      `revoke all on function public\\.${name}\\(jsonb\\)[\\s\\S]*?from public, anon, authenticated`,
+      "iu",
+    ));
+    assert.match(sql, new RegExp(
+      `grant execute on function public\\.${name}\\(jsonb\\)\\s+to service_role`,
+      "iu",
+    ));
+  }
+});
+
 test("browser-adjacent mutations re-resolve canonical Gmail-backed DRS authority", () => {
   for (const name of [
     "drs_line_start_link_intent_v1",

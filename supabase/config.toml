@@ -54,3 +54,18 @@ verify_jwt = false
 
 [functions.drs-document-snapshot]
 verify_jwt = false
+
+[functions.drs-line-account-link-start]
+verify_jwt = false
+
+[functions.drs-line-account-link-status]
+verify_jwt = false
+
+[functions.drs-line-account-link-cancel]
+verify_jwt = false
+
+[functions.drs-line-account-link-unlink]
+verify_jwt = false
+
+[functions.drs-line-account-link-continue]
+verify_jwt = false

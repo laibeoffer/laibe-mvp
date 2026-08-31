@@ -2,6 +2,12 @@ const TEXT_ENCODER = new TextEncoder();
 const TEXT_DECODER = new TextDecoder("utf-8", { fatal: true });
 const LINE_ID_AAD = TEXT_ENCODER.encode("laibe.drs-line-user-id.v1");
 
+function ownedArrayBuffer(value: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(value.byteLength);
+  copy.set(value);
+  return copy.buffer;
+}
+
 function runtimeCrypto(): Crypto {
   const value = globalThis.crypto;
   if (!value?.subtle || typeof value.getRandomValues !== "function") {
@@ -88,7 +94,12 @@ export async function encryptLineUserId(
   const crypto = runtimeCrypto();
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ciphertext = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv, additionalData: LINE_ID_AAD, tagLength: 128 },
+    {
+      name: "AES-GCM",
+      iv: ownedArrayBuffer(iv),
+      additionalData: ownedArrayBuffer(LINE_ID_AAD),
+      tagLength: 128,
+    },
     key,
     TEXT_ENCODER.encode(value),
   );
@@ -114,12 +125,16 @@ export async function decryptLineUserId(
     throw new Error("invalid_encryption_envelope");
   }
   const plaintext = await runtimeCrypto().subtle.decrypt(
-    { name: "AES-GCM", iv, additionalData: LINE_ID_AAD, tagLength: 128 },
+    {
+      name: "AES-GCM",
+      iv: ownedArrayBuffer(iv),
+      additionalData: ownedArrayBuffer(LINE_ID_AAD),
+      tagLength: 128,
+    },
     key,
-    ciphertext,
+    ownedArrayBuffer(ciphertext),
   );
   const value = TEXT_DECODER.decode(plaintext);
   if (!/^U[0-9a-f]{32}$/u.test(value)) throw new Error("invalid_line_user_id");
   return value;
 }
-

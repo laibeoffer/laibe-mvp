@@ -1517,4 +1517,99 @@ grant execute on function drs_private.drs_line_claim_notification_v1(jsonb)
 grant execute on function drs_private.drs_line_complete_notification_v1(jsonb)
   to service_role;
 
+-- PostgREST only exposes functions in its configured API schemas. These
+-- facades expose no table and no browser authority: service_role is the sole
+-- caller and every operation remains implemented by the closed private RPC.
+create or replace function public.drs_line_start_link_intent_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_start_link_intent_v1(p_input) $$;
+create or replace function public.drs_line_read_link_status_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_read_link_status_v1(p_input) $$;
+create or replace function public.drs_line_cancel_link_intent_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_cancel_link_intent_v1(p_input) $$;
+create or replace function public.drs_line_prepare_nonce_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_prepare_nonce_v1(p_input) $$;
+create or replace function public.drs_line_complete_account_link_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_complete_account_link_v1(p_input) $$;
+create or replace function public.drs_line_unlink_account_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_unlink_account_v1(p_input) $$;
+create or replace function public.drs_line_claim_webhook_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_claim_webhook_v1(p_input) $$;
+create or replace function public.drs_line_complete_webhook_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_complete_webhook_v1(p_input) $$;
+create or replace function public.drs_line_admit_case_notification_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_admit_case_notification_v1(p_input) $$;
+create or replace function public.drs_line_claim_notification_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_claim_notification_v1(p_input) $$;
+create or replace function public.drs_line_complete_notification_v1(p_input jsonb)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_complete_notification_v1(p_input) $$;
+
+alter function public.drs_line_start_link_intent_v1(jsonb) owner to postgres;
+alter function public.drs_line_read_link_status_v1(jsonb) owner to postgres;
+alter function public.drs_line_cancel_link_intent_v1(jsonb) owner to postgres;
+alter function public.drs_line_prepare_nonce_v1(jsonb) owner to postgres;
+alter function public.drs_line_complete_account_link_v1(jsonb) owner to postgres;
+alter function public.drs_line_unlink_account_v1(jsonb) owner to postgres;
+alter function public.drs_line_claim_webhook_v1(jsonb) owner to postgres;
+alter function public.drs_line_complete_webhook_v1(jsonb) owner to postgres;
+alter function public.drs_line_admit_case_notification_v1(jsonb) owner to postgres;
+alter function public.drs_line_claim_notification_v1(jsonb) owner to postgres;
+alter function public.drs_line_complete_notification_v1(jsonb) owner to postgres;
+
+revoke all on function public.drs_line_start_link_intent_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_read_link_status_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_cancel_link_intent_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_prepare_nonce_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_complete_account_link_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_unlink_account_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_claim_webhook_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_complete_webhook_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_admit_case_notification_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_claim_notification_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_complete_notification_v1(jsonb)
+  from public, anon, authenticated;
+
+grant execute on function public.drs_line_start_link_intent_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_read_link_status_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_cancel_link_intent_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_prepare_nonce_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_complete_account_link_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_unlink_account_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_claim_webhook_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_complete_webhook_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_admit_case_notification_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_claim_notification_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_complete_notification_v1(jsonb)
+  to service_role;
+
 commit;
