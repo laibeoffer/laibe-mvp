@@ -151,22 +151,6 @@ const OWNER_RUNTIME_DOCUMENT_KEYS = Object.freeze([
   "versionLabel",
   "versionNumber",
 ]);
-const OWNER_CALENDAR_KEYS = Object.freeze([
-  "authenticatedUserId",
-  "calendarBinding",
-  "currentCaseId",
-  "membership",
-  "schemaVersion",
-]);
-const OWNER_CALENDAR_BINDING_KEYS = Object.freeze([
-  "accountRole",
-  "bindingStatus",
-  "calendarId",
-  "caseId",
-  "connectionStatus",
-  "timeZone",
-  "userId",
-]);
 const OWNER_ACCESS_ENTRY_URL = "http://127.0.0.1:4173/account/access/";
 
 function sortedStringKeys(keys) {
@@ -866,110 +850,6 @@ export function validateAndMapOwnerWorkspaceGrant(value) {
   }
 }
 
-function calendarEmbedUrl(value, expectedUserId, expectedCaseId) {
-  try {
-    const result = snapshotExactRecord(value, OWNER_CALENDAR_KEYS);
-    const membership = snapshotExactRecord(
-      result.membership,
-      OWNER_RUNTIME_MEMBER_KEYS,
-    );
-    const binding = snapshotExactRecord(
-      result.calendarBinding,
-      OWNER_CALENDAR_BINDING_KEYS,
-    );
-    if (
-      primitiveString(result.schemaVersion) !== "laibe.owner-calendar-embed.v1" ||
-      uuid(result.authenticatedUserId) !== expectedUserId ||
-      uuid(result.currentCaseId) !== expectedCaseId ||
-      uuid(membership.userId) !== expectedUserId ||
-      uuid(membership.caseId) !== expectedCaseId ||
-      primitiveString(membership.role) !== "owner" ||
-      primitiveString(membership.status) !== "active" ||
-      uuid(binding.userId) !== expectedUserId ||
-      uuid(binding.caseId) !== expectedCaseId ||
-      primitiveString(binding.accountRole) !== "owner" ||
-      primitiveString(binding.connectionStatus) !== "connected" ||
-      primitiveString(binding.bindingStatus) !== "active" ||
-      primitiveString(binding.timeZone) !== "Asia/Taipei"
-    ) return null;
-    const calendarId = primitiveString(binding.calendarId);
-    if (calendarId.length === 0 || calendarId.length > 1024) return null;
-    return "https://calendar.google.com/calendar/embed?src=" +
-      encodeURIComponent(calendarId) +
-      "&ctz=Asia%2FTaipei&hl=zh_TW";
-  } catch {
-    return null;
-  }
-}
-
-function ownerCalendarNodes(root) {
-  return Object.freeze({
-    state: root?.querySelector?.("[data-owner-calendar-state]") ?? null,
-    note: root?.querySelector?.("[data-owner-calendar-note]") ?? null,
-    frame: root?.querySelector?.("[data-owner-calendar-frame]") ?? null,
-    connect: root?.querySelector?.("[data-owner-calendar-connect]") ?? null,
-  });
-}
-
-function renderCalendarClosed(
-  nodes,
-  message = "尚未連結 Google Calendar",
-  { connectEnabled = false } = {},
-) {
-  if (nodes.state) nodes.state.textContent = message;
-  if (nodes.note) {
-    nodes.note.textContent = "連結後仍會依本案權限重新確認；目前不顯示任何日曆內容。";
-  }
-  if (nodes.frame) {
-    if (typeof nodes.frame.removeAttribute === "function") {
-      nodes.frame.removeAttribute("src");
-    }
-    nodes.frame.hidden = true;
-  }
-  if (nodes.connect) {
-    nodes.connect.disabled = !connectEnabled;
-    nodes.connect.setAttribute?.(
-      "aria-disabled",
-      connectEnabled ? "false" : "true",
-    );
-    nodes.connect.textContent = "連結 Google Calendar";
-  }
-}
-
-function renderCalendarConnected(nodes, embedUrl) {
-  if (nodes.state) nodes.state.textContent = "本案 Google Calendar 已連結";
-  if (nodes.note) {
-    nodes.note.textContent = "目前只顯示經本案權限確認、屬於甲方的日曆。";
-  }
-  if (nodes.frame) {
-    nodes.frame.src = embedUrl;
-    nodes.frame.hidden = false;
-  }
-  if (nodes.connect) {
-    nodes.connect.disabled = false;
-    nodes.connect.setAttribute?.("aria-disabled", "false");
-    nodes.connect.textContent = "重新連結";
-  }
-}
-
-function oauthAuthorizationUrl(value) {
-  try {
-    const record = snapshotExactRecord(value, ["authorizationUrl", "state"]);
-    if (primitiveString(record.state) !== "OAUTH_REDIRECT_REQUIRED") return null;
-    const candidate = new URL(primitiveString(record.authorizationUrl));
-    if (
-      candidate.origin !== "https://accounts.google.com" ||
-      candidate.username !== "" ||
-      candidate.password !== "" ||
-      candidate.port !== "" ||
-      candidate.pathname !== "/o/oauth2/v2/auth"
-    ) return null;
-    return candidate.href;
-  } catch {
-    return null;
-  }
-}
-
 export function createOwnerSupabaseWorkspaceBootstrap({
   root,
   authRuntime,
@@ -977,9 +857,7 @@ export function createOwnerSupabaseWorkspaceBootstrap({
 } = {}) {
   bindOwnerWorkspaceCanonicalLinks(root, getActiveCanonicalLinkHref);
   const controller = createOwnerWorkspaceController({ root });
-  const calendarNodes = ownerCalendarNodes(root);
   let runtime = authRuntime ?? null;
-  let currentGrant = null;
   let activeGeneration = 0;
 
   function isCurrent(generation) {
@@ -1024,79 +902,20 @@ export function createOwnerSupabaseWorkspaceBootstrap({
     );
     if (!mapped) throw Object.freeze({ status: 403 });
     if (!isCurrent(generation)) throw Object.freeze({ status: 409 });
-    currentGrant = mapped;
     return mapped;
-  }
-
-  async function loadCalendar(generation) {
-    const grant = currentGrant;
-    if (!grant) {
-      if (isCurrent(generation)) renderCalendarClosed(calendarNodes);
-      return false;
-    }
-    try {
-      const embedUrl = calendarEmbedUrl(
-        await getAuthorizedResponse("owner-google-calendar-grant", generation),
-        grant.actor.actorId,
-        grant.caseBinding.caseId,
-      );
-      if (!isCurrent(generation) || currentGrant !== grant) return false;
-      if (!embedUrl) {
-        renderCalendarClosed(calendarNodes, "尚未連結 Google Calendar", {
-          connectEnabled: true,
-        });
-        return false;
-      }
-      renderCalendarConnected(calendarNodes, embedUrl);
-      return true;
-    } catch {
-      if (!isCurrent(generation) || currentGrant !== grant) return false;
-      renderCalendarClosed(calendarNodes, "日曆狀態暫時無法確認", {
-        connectEnabled: true,
-      });
-      return false;
-    }
   }
 
   async function initialize() {
     const generation = activeGeneration + 1;
     activeGeneration = generation;
-    currentGrant = null;
-    renderCalendarClosed(calendarNodes);
     controller.setAdapter(Object.freeze({
       loadOwnerWorkspace() {
         return loadOwnerWorkspace(generation);
       },
     }));
     const model = await controller.initialize();
-    if (!isCurrent(generation)) return model;
-    if (model.state === "AUTHORIZED_READY") await loadCalendar(generation);
     return model;
   }
-
-  calendarNodes.connect?.addEventListener?.("click", async () => {
-    const generation = activeGeneration;
-    const grant = currentGrant;
-    if (!grant || calendarNodes.connect.disabled) return;
-    calendarNodes.connect.disabled = true;
-    calendarNodes.connect.setAttribute?.("aria-disabled", "true");
-    if (calendarNodes.state) calendarNodes.state.textContent = "正在準備連結";
-    try {
-      const authorizationUrl = oauthAuthorizationUrl(
-        await getAuthorizedResponse("owner-google-calendar-oauth-start", generation),
-      );
-      if (!authorizationUrl) throw Object.freeze({ status: 403 });
-      if (!isCurrent(generation) || currentGrant !== grant) return;
-      root?.defaultView?.location?.assign?.(authorizationUrl);
-    } catch {
-      if (!isCurrent(generation) || currentGrant !== grant) return;
-      renderCalendarClosed(
-        calendarNodes,
-        "這次未能開始連結，請稍後再試",
-        { connectEnabled: true },
-      );
-    }
-  });
 
   return Object.freeze({ initialize });
 }

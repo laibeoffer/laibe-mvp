@@ -18,10 +18,6 @@ export const OWNER_WORKSPACE_ACCESS = Object.freeze({
   domainStatus: "active",
 });
 
-const OWNER_DOCUMENTS_CANONICAL_URL =
-  "http://127.0.0.1:4173/pcm/owner/workspace/#documents";
-const LINE_SHARE_BASE_URL = "https://social-plugins.line.me/lineit/share";
-
 export const PRECONTRACT_BOUNDARY = "REGISTERED != CONTRACTED";
 
 export const OWNER_CONTRACT_IMPACT_KEYS = Object.freeze([
@@ -429,7 +425,7 @@ const STATE_COPY = Object.freeze({
   ACCESS_CHECKING: Object.freeze({
     label: "正在確認案件權限",
     title: "正在取得你的案件資料",
-    message: "完成身分、DRS 服務契約與案件權限確認後，才會顯示案件內容。",
+    message: "完成身分與案件權限確認後，才會顯示案件內容。",
   }),
   ACCESS_DENIED: Object.freeze({
     label: "無法開啟案件",
@@ -439,7 +435,7 @@ const STATE_COPY = Object.freeze({
   CONTRACT_CONTEXT_UNAVAILABLE: Object.freeze({
     label: "尚未連結正式案件",
     title: "尚未連結正式案件",
-    message: "甲方身分、DRS 服務契約與案件權限尚未完成確認。",
+    message: "甲方身分、案件權限與甲乙契約資料尚未完成確認。",
   }),
   AUTHORIZED_EMPTY: Object.freeze({
     label: "案件權限已確認",
@@ -597,20 +593,6 @@ function safeDisplayLabel(value) {
       !/[<>\u0000-\u001f\u007f]/u.test(text)
     ? text
     : "";
-}
-
-export function createOwnerDocumentLineShareUrl(record) {
-  const title = asText(record?.title);
-  const versionLabel = asText(record?.versionLabel);
-  if (!title || !versionLabel) return null;
-
-  const shareUrl = new URL(LINE_SHARE_BASE_URL);
-  shareUrl.searchParams.set("url", OWNER_DOCUMENTS_CANONICAL_URL);
-  shareUrl.searchParams.set(
-    "text",
-    `萊比案件文件｜${title}｜${versionLabel}。接收者需登入並具有本案權限。`,
-  );
-  return shareUrl.href;
 }
 
 function asArray(value) {
@@ -1382,25 +1364,25 @@ export function buildOwnerWorkspaceViewModel(input) {
       (unavailable ? "尚未連結正式案件" : "尚待案件資料"),
     currentActor: summary?.currentActorLabel ||
       (unavailable
-        ? "由甲方先確認 DRS 服務與案件入口"
+        ? "由甲方確認案件入口與甲乙契約資料"
         : "尚待案件資料"),
     nextAction: summary?.nextActionLabel ||
-      (unavailable ? "查看 DRS 服務契約全文" : "依案件狀態確認下一步"),
+      (unavailable ? "確認本案權限與甲乙契約資料" : "依案件狀態確認下一步"),
     nextDue: summary?.nextDueLabel ||
       (unavailable
-        ? "完成後才會開放本案契約、文件分享與案件留痕"
+        ? "完成後才會開放本案契約、文件檢視與案件留痕"
         : "依案件通知"),
     lastRecorded: summary?.lastRecordedAtLabel ||
       (unavailable ? "尚未建立正式案件紀錄" : "尚無案件留痕"),
     waitingRelationship: summary?.waitingRelationshipLabel ||
       (unavailable
-        ? "甲方身分、DRS 服務契約與案件權限尚未完成確認"
+        ? "甲方身分、案件權限與甲乙契約資料尚未完成確認"
         : "尚待案件確認"),
     documentSummary: summary?.documentSummaryLabel || "尚未連結正式案件",
     reviewSummary: summary?.reviewSummaryLabel || "尚未連結正式案件",
     issueSummary: summary?.issueSummaryLabel || "尚未連結正式案件",
     nextSummary: summary?.nextActionLabel ||
-      (unavailable ? "查看 DRS 服務契約全文" : "依案件狀態確認下一步"),
+      (unavailable ? "確認本案權限與甲乙契約資料" : "依案件狀態確認下一步"),
     nextOwnerSummary: `責任人：${summary?.currentActorLabel ||
       (unavailable ? "甲方" : "尚待案件確認")}`,
     todayFocus: summary?.todayFocusLabel || "尚待案件資料",
@@ -1948,7 +1930,7 @@ function renderModel(root, model) {
     "documents",
     model.documents,
     (documentRef, list, record) => {
-      const item = appendRecord(
+      appendRecord(
         documentRef,
         list,
         record.title,
@@ -1963,23 +1945,6 @@ function renderModel(root, model) {
           record.traceabilityLabel,
         ],
       );
-      const shareUrl = createOwnerDocumentLineShareUrl(record);
-      if (!shareUrl) return;
-      const action = createTextElement(
-        documentRef,
-        "a",
-        "分享至 LINE",
-        "owner-document-line-share",
-      );
-      action.setAttribute("href", shareUrl);
-      action.setAttribute("target", "_blank");
-      action.setAttribute("rel", "noopener noreferrer");
-      action.setAttribute("data-owner-document-line-share", "true");
-      action.setAttribute(
-        "aria-label",
-        `分享${asText(record.title, "本文件")}的受權限保護連結至 LINE`,
-      );
-      item.append(action);
     },
   );
   renderList(

@@ -13,8 +13,8 @@
       type="image/svg+xml"
       href="../../../assets/logo/laibe_offer.svg"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260815-final-runtime" />
-    <link rel="stylesheet" href="../pcm_standalone/shared/drs-brand.css?v=20260810-drs" />
+    <link rel="stylesheet" href="./styles.css?v=20260830-owner-shared-history" />
+    <link rel="stylesheet" href="../pcm_standalone/shared/drs-brand.css?v=20260810-drs-full-name" />
     <script type="module" src="./owner-workspace-bootstrap.js"></script>
   </head>
   <body data-workspace-state="CONTRACT_CONTEXT_UNAVAILABLE">
@@ -29,7 +29,7 @@
         >
           <img
             src="../../../assets/logo/laibe_offer.svg"
-            alt="LaiBE offer"
+            alt="LaiBE"
           />
           <span class="drs-brand-lockup drs-brand-lockup--expanded">
             <span class="drs-brand-wordmark" aria-label="Decision &amp; Record System"><span class="drs-brand-term"><span class="drs-brand-initial">D</span><span class="drs-brand-rest">ecision</span></span> <span class="drs-brand-amp">&amp;</span> <span class="drs-brand-term"><span class="drs-brand-initial">R</span><span class="drs-brand-rest">ecord</span></span> <span class="drs-brand-term"><span class="drs-brand-initial">S</span><span class="drs-brand-rest">ystem</span></span></span>
@@ -38,18 +38,18 @@
         </a>
 
         <div class="workspace-header__context" aria-label="工作台角色、案件與服務契約狀態">
-          <span class="context-chip context-chip--role">
+          <p class="workspace-header__context-item context-chip context-chip--role">
             <span class="context-chip__label">工作台角色</span>
-            <span class="context-chip__value">甲方</span>
-          </span>
-          <span class="context-chip context-chip--case">
+            <strong><span class="context-chip__value">甲方</span></strong>
+          </p>
+          <p class="workspace-header__context-item context-chip context-chip--case">
             <span class="context-chip__label">案件</span>
-            <span class="context-chip__value" data-slot="case-name" data-header-context-value="case">尚未連結正式案件</span>
-          </span>
-          <span class="context-chip context-chip--agreement">
+            <strong><span class="context-chip__value" data-slot="case-name" data-header-context-value="case">尚未連結正式案件</span></strong>
+          </p>
+          <p class="workspace-header__context-item context-chip context-chip--agreement">
             <span class="context-chip__label">服務契約</span>
-            <span class="context-chip__value" data-slot="agreement-label" data-header-context-value="agreement">尚未確認</span>
-          </span>
+            <strong><span class="context-chip__value" data-slot="agreement-label" data-header-context-value="agreement">尚未確認</span></strong>
+          </p>
         </div>
       </div>
     </header>
@@ -160,18 +160,18 @@
             <span class="signal-dot" aria-hidden="true"></span>
           </div>
           <span class="handoff-panel__actor-label">現在由誰處理</span>
-          <h2 id="handoff-title" data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</h2>
+          <h2 id="handoff-title" data-slot="current-actor">由甲方確認案件入口與甲乙契約資料</h2>
           <p class="handoff-panel__action" data-slot="next-action">
-            下一步：查看 DRS 服務契約全文
+            下一步：確認本案權限與甲乙契約資料
           </p>
           <dl class="handoff-panel__facts">
             <div>
               <dt>尚未開放原因</dt>
-              <dd data-slot="waiting-relationship">甲方身分、DRS 服務契約與案件權限尚未完成確認</dd>
+              <dd data-slot="waiting-relationship">甲方身分、案件權限與甲乙契約資料尚未完成確認</dd>
             </div>
             <div>
               <dt>完成後</dt>
-              <dd data-slot="next-due">完成後才會開放本案契約、文件分享與案件留痕</dd>
+              <dd data-slot="next-due">完成後才會開放本案契約、文件檢視與案件留痕</dd>
             </div>
             <div>
               <dt>最近留痕</dt>
@@ -184,10 +184,10 @@
             aria-label="手機版責任摘要"
           >
             <div><dt>目前狀態</dt><dd data-slot="state-label">尚未連結正式案件</dd></div>
-            <div><dt>現在由誰處理</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
-            <div><dt>下一步</dt><dd data-slot="next-action">查看 DRS 服務契約全文</dd></div>
-            <div><dt>尚未開放原因</dt><dd data-slot="waiting-relationship">甲方身分、DRS 服務契約與案件權限尚未完成確認</dd></div>
-            <div><dt>完成後</dt><dd data-slot="next-due">完成後才會開放本案契約、文件分享與案件留痕</dd></div>
+            <div><dt>現在由誰處理</dt><dd data-slot="current-actor">由甲方確認案件入口與甲乙契約資料</dd></div>
+            <div><dt>下一步</dt><dd data-slot="next-action">確認本案權限與甲乙契約資料</dd></div>
+            <div><dt>尚未開放原因</dt><dd data-slot="waiting-relationship">甲方身分、案件權限與甲乙契約資料尚未完成確認</dd></div>
+            <div><dt>完成後</dt><dd data-slot="next-due">完成後才會開放本案契約、文件檢視與案件留痕</dd></div>
             <div><dt>最近留痕</dt><dd data-slot="last-recorded">尚未建立正式案件紀錄</dd></div>
           </dl>
         </aside>
@@ -302,39 +302,30 @@
                   設計送審文件與版本、書面確認與修改，仍會依文件版本、書面檢討與待確認事項呈現。
                 </p>
               </div>
-              <div
-                class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
-                data-calendar-workspace="design-review"
-                data-owner-google-calendar
-                data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"
-                aria-label="共同案件日曆｜設計管理"
+              <section
+                class="owner-design-stage-library"
+                data-owner-design-stage-library
+                aria-labelledby="owner-design-stage-library-title"
               >
-                <iframe
-                  title="本案 Google Calendar"
-                  data-owner-calendar-frame
-                  loading="lazy"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  hidden
-                ></iframe>
-                <section
-                  class="owner-google-calendar-unavailable"
-                  data-owner-google-calendar-design-unavailable
-                  aria-labelledby="owner-google-calendar-title"
-                >
-                  <span class="owner-google-calendar-mark" aria-hidden="true">31</span>
-                  <p class="eyebrow">Google Calendar</p>
-                  <h3 id="owner-google-calendar-title">把本案時程放回同一份決策依據</h3>
-                  <p data-owner-calendar-note>連結後仍會依本案權限重新確認；目前不顯示任何日曆內容。</p>
-                  <strong data-owner-calendar-state role="status" aria-live="polite">尚未連結 Google Calendar</strong>
-                  <button type="button" data-owner-calendar-connect disabled aria-disabled="true">連結 Google Calendar</button>
-                  <fieldset class="owner-google-calendar__sharing">
-                    <legend>日曆分享</legend>
-                    <label><input type="checkbox" data-owner-calendar-share="vendor" disabled aria-disabled="true" /><span>分享給本案乙方</span></label>
-                    <label><input type="checkbox" data-owner-calendar-share="drs" disabled aria-disabled="true" /><span>分享給本案 DRS 協作者</span></label>
-                    <p>分享功能正在整理中，目前不會變更任何人的日曆權限。</p>
-                  </fieldset>
-                </section>
-              </div>
+                <header class="owner-design-stage-library__header">
+                  <div>
+                    <p class="eyebrow">設計合約階段文件庫</p>
+                    <h3 id="owner-design-stage-library-title">依設計合約階段檢視每次提交的文件與版本</h3>
+                    <p>只有本案設計合約明確約定的提交階段，才會在這裡形成對應的文件版本與甲方檢閱狀態。</p>
+                  </div>
+                  <span role="status" aria-live="polite">尚待設計合約階段資料</span>
+                </header>
+                <dl class="owner-design-stage-library__facts" aria-label="設計階段文件欄位">
+                  <div><dt>設計合約階段</dt><dd>依本案設計合約顯示</dd></div>
+                  <div><dt>階段性文件版本</dt><dd>尚未取得可顯示版本</dd></div>
+                  <div><dt>甲方檢閱狀態</dt><dd>尚待階段文件資料</dd></div>
+                </dl>
+                <div class="owner-design-stage-library__empty" role="status">
+                  <strong>尚未取得可顯示的階段文件</strong>
+                  <p>取得本案設計合約的提交階段後，才會列出文件名稱、版次、提供者、時間與檢閱狀態；不會預設階段或以範例文件代替案件資料。</p>
+                </div>
+                <a class="owner-design-stage-library__history-link" href="#documents">前往案件歷史資料庫</a>
+              </section>
               <div class="owner-management-shell owner-management-shell--design">
                 <section
                   class="owner-vendor-binding-detail"
@@ -540,8 +531,8 @@
                   aria-controls="owner-construction-view-records"
                   tabindex="-1"
                 >
-                  <strong>歷史文件版本</strong>
-                  <small>送審、照片與更正紀錄</small>
+                  <strong>歷史資料入口</strong>
+                  <small>帶入施工情境的唯讀查找</small>
                 </button>
                 <button
                   id="owner-construction-tab-trail"
@@ -563,30 +554,24 @@
                 hidden
               ></div>
               <div
-                class="owner-calendar owner-calendar--hero owner-google-calendar-shell"
+                class="owner-calendar owner-calendar--hero owner-google-calendar-shell owner-shared-case-calendar owner-shared-case-calendar--context"
                 id="owner-construction-view-today"
                 data-owner-construction-view-panel="today"
                 data-calendar-workspace="construction"
-                data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"
+                data-calendar-state="CASE_CALENDAR_PENDING"
                 aria-labelledby="owner-construction-tab-today"
               >
-                <iframe
-                  title="本案施工時程摘要"
-                  data-owner-construction-calendar-frame
-                  loading="lazy"
-                  referrerpolicy="strict-origin-when-cross-origin"
-                  hidden
-                ></iframe>
                 <section
-                  class="owner-google-calendar-unavailable"
-                  data-owner-google-calendar-unavailable
+                  class="owner-shared-case-calendar__context"
                   aria-labelledby="owner-construction-calendar-title"
                 >
-                  <span class="owner-google-calendar-mark" aria-hidden="true">31</span>
-                  <p class="eyebrow">施工時程</p>
-                  <h3 id="owner-construction-calendar-title">尚未取得本案施工時程</h3>
-                  <p>施工任務、現場照片、變更與驗收會依正式案件紀錄整理在這裡。</p>
-                  <strong>請先在設計管理確認本案日曆連結與時程依據。</strong>
+                  <p class="eyebrow">乙方共享案件日曆｜施工情境</p>
+                  <h3 id="owner-construction-calendar-title">從同一份時程查看施工進度與每日紀錄</h3>
+                  <p>甲方在此檢視乙方發布的施工節點；意見、照片與缺失會回到同一筆節點與案件歷史，不另建一套紀錄。</p>
+                  <div class="owner-shared-case-calendar__context-actions">
+                    <a href="#design-review">查看完整案件日曆</a>
+                    <a href="#documents">查看施工相關歷史</a>
+                  </div>
                 </section>
               </div>
               <section
@@ -613,7 +598,7 @@
                   <button type="button" data-owner-record-action="confirm-construction-change" disabled aria-disabled="true">正式案件連結後可確認</button>
                   <button type="button" data-owner-record-action="request-construction-revision" disabled aria-disabled="true">正式案件連結後可要求補正</button>
                 </div>
-                <p class="owner-management-boundary">甲方不在此上傳乙方施工日誌或照片，只檢閱、提問、確認並留下自己的案件紀錄。</p>
+                <p class="owner-management-boundary">乙方負責施工日誌與改善證據；甲方可在指定節點追加自己的意見、照片或缺失，但不能修改乙方排程。</p>
               </section>
 
               <section
@@ -624,17 +609,11 @@
                 hidden
               >
                 <header class="owner-management-card__heading">
-                  <div><p class="eyebrow">只讀檔案庫</p><h3 id="owner-construction-view-records-title">歷史文件版本</h3></div>
-                  <span>正式案件資料</span>
+                  <div><p class="eyebrow">施工情境入口</p><h3 id="owner-construction-view-records-title">案件歷史資料庫</h3></div>
+                  <span>同一份唯讀資料</span>
                 </header>
-                <details>
-                  <summary>施工日誌、照片與更正紀錄</summary>
-                  <p>正式案件連結後，依日期顯示乙方提交、原始版本、補充更正、甲方意見與處理結果；原版本不會被新版本覆蓋。</p>
-                </details>
-                <details>
-                  <summary>送審、變更與驗收文件</summary>
-                  <p>每一份文件都會標示版次、提交者、確認者、狀態與下一步，不以畫面上的單次操作冒充正式紀錄。</p>
-                </details>
+                <p class="owner-management-card__copy">從中央歷史資料庫帶入「施工日誌、照片、日曆快照、缺失、改善、複查」篩選；原版本與改善前證據不會被新版覆蓋。</p>
+                <a class="owner-context-history-link" href="#documents">依施工類型查找歷史</a>
               </section>
 
               <section
@@ -651,10 +630,8 @@
                 <p class="owner-management-card__copy">
                   依時間查看誰對哪個案件、根據哪份文件做了什麼，目前狀態為何，以及下一步由誰處理。
                 </p>
-                <div class="owner-management-empty">
-                  <strong>尚未取得可顯示的工程事件</strong>
-                  <span>正式案件連結後，施工任務、照片、變更、追加減項、缺失與驗收結果會依序顯示。</span>
-                </div>
+                <p class="owner-management-card__copy">中央案件時間軸會依序顯示施工任務、照片、變更、追加減項、缺失與確認結果，並保留事件後狀態與下一位處理者。</p>
+                <a class="owner-context-history-link" href="#documents">開啟案件時間軸</a>
               </section>
               </div>
             </section>
@@ -700,9 +677,9 @@
               >
                 <div class="contract-kind-grid" data-owner-contract-edit-overview>
                   <article class="contract-kind-card contract-kind-card--service">
-                    <p class="eyebrow">DRS 服務契約</p>
-                    <h4>確認服務範圍、版本與案件使用資格</h4>
-                    <p>這份契約說明萊比提供的案件治理服務，不是甲方與乙方的工程契約；目前狀態與版本都仍待確認。</p>
+                    <p class="eyebrow">DRS 服務契約備查</p>
+                    <h4>查看服務範圍、版本與案件使用資格</h4>
+                    <p>這份契約只供備查萊比提供的案件治理服務；本區只顯示狀態、版本與全文入口，不需在此填寫或再次確認。</p>
                     <dl>
                       <div><dt>服務狀態</dt><dd data-slot="agreement-state">尚待確認</dd></div>
                       <div><dt>服務版本</dt><dd data-slot="agreement-version">尚未確認服務版本</dd></div>
@@ -710,14 +687,18 @@
                     <a
                       class="owner-contract-recovery-action owner-service-contract-entry"
                       data-owner-service-contract-link
-                    >查看 DRS 服務契約全文</a>
+                    >查看 DRS 服務契約</a>
                   </article>
 
-                  <article class="contract-kind-card contract-kind-card--project">
+                  <article
+                    class="contract-kind-card contract-kind-card--project"
+                    data-owner-project-contract-reference
+                    data-project-contract-kind="DESIGN_BUILD"
+                  >
                     <p class="eyebrow">本案甲乙契約</p>
-                    <h4>約定工作範圍、價金、工期與驗收</h4>
-                    <p>這才是甲方與設計師／統包共同檢查、補充與確認的專案契約。</p>
-                    <span>目前：尚待補齊本案資料</span>
+                    <h4>設計＋工程（統包）參考範本</h4>
+                    <p>本案目前以統包契約關係呈現；分開簽訂時會分列設計合約與工程合約。</p>
+                    <span>尚未取得本案正式契約識別、案件版本與雙方確認狀態</span>
                   </article>
                 </div>
                 <article
@@ -725,18 +706,19 @@
                   data-shared-contract
                   data-shared-contract-id="LAIBE-DESIGN-BUILD-V02"
                   data-shared-contract-type="DESIGN_BUILD"
+                  data-project-contract-kind="DESIGN_BUILD"
                 >
                   <div class="shared-contract-card__cover" aria-hidden="true">
-                    <span>本案契約預覽</span>
-                    <strong>甲乙共同契約</strong>
+                    <span>統包參考預覽</span>
+                    <strong>設計＋工程（統包）</strong>
                     <small>v0.2</small>
                   </div>
                   <div class="shared-contract-card__content">
-                    <p class="eyebrow">本案甲乙契約｜共同預覽</p>
+                    <p class="eyebrow">甲乙契約｜統包參考預覽</p>
                     <h4>建築物室內裝修設計及工程承攬契約</h4>
-                    <p>目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方。</p>
+                    <p>設計＋工程（統包）參考範本；尚未取得本案正式契約識別、案件版本與雙方確認狀態。</p>
                     <dl aria-label="共同契約摘要">
-                      <div><dt>契約類型</dt><dd>設計＋工程</dd></div>
+                      <div><dt>契約類型</dt><dd>設計＋工程（統包）</dd></div>
                       <div><dt>預覽版本</dt><dd>v0.2</dd></div>
                       <div><dt>案件版本</dt><dd>尚未連結案件確認版本</dd></div>
                     </dl>
@@ -744,15 +726,15 @@
                       class="shared-contract-card__action"
                       data-shared-contract-preview
                       href="../../../site/standard_contract_editor/code.html?contractType=DESIGN_BUILD&amp;returnTo=owner"
-                    >查看契約全文 <span aria-hidden="true">→</span></a>
+                    >查看統包參考範本 <span aria-hidden="true">→</span></a>
                   </div>
                 </article>
 
                 <dl class="owner-contract-status" aria-label="目前專案契約責任摘要">
                   <div><dt>目前角色</dt><dd>甲方（業主）</dd></div>
-                  <div><dt>本案契約</dt><dd>設計＋工程・草稿資料待補</dd></div>
+                  <div><dt>本案契約</dt><dd>設計＋工程（統包）・正式契約資料待連結</dd></div>
                   <div><dt>目前狀態</dt><dd>尚待確認</dd></div>
-                  <div><dt>下一位處理者</dt><dd data-slot="current-actor">由甲方先確認 DRS 服務與案件入口</dd></div>
+                  <div><dt>下一位處理者</dt><dd data-slot="current-actor">由甲方確認案件入口與甲乙契約資料</dd></div>
                 </dl>
               </section>
 
@@ -770,7 +752,7 @@
                 </header>
                 <div class="owner-contract-unavailable-preparation" data-owner-contract-unavailable-preparation role="status">
                   <strong>目前尚不能填寫</strong>
-                  <p data-slot="access-message">甲方身分、DRS 服務契約與案件權限尚未完成確認。</p>
+                  <p data-slot="access-message">甲方身分、案件權限與甲乙契約資料尚未完成確認。</p>
                   <p>正式案件可編輯後，才會開放 13 項資料。</p>
                   <details>
                     <summary>查看之後需要準備的資料</summary>
@@ -1001,7 +983,7 @@
                 尚未連結正式案件內容
               </h2>
               <p data-slot="access-message">
-                你可以先整理已保存的摘要與文件；確認 DRS 服務契約後，正式案件內容才會在這裡提供。
+                你可以先整理已保存的摘要與文件；完成身分與案件權限確認後，正式案件內容才會在這裡提供。
               </p>
             </div>
             <button
@@ -1046,7 +1028,7 @@
               </div>
               <div class="summary-card summary-card--accent">
                 <dt>下一步</dt>
-                <dd data-slot="next-summary">查看 DRS 服務契約全文</dd>
+                <dd data-slot="next-summary">確認本案權限與甲乙契約資料</dd>
                 <p data-slot="next-owner-summary">責任人：甲方</p>
               </div>
             </dl>
@@ -1109,27 +1091,9 @@
           >
             <div class="section-heading section-heading--split owner-document-workbench__heading">
               <div class="owner-document-workbench__intro">
-                <p class="eyebrow">案件文件與版本</p>
-                <h2 id="documents-title">先看目前版本，再確認下一步</h2>
-                <p>每份文件都會交代版本、提供者、更新時間、目前狀態與下一步責任人；只有正式案件紀錄明確提供的留痕才會標示為已記錄。</p>
-              </div>
-              <div class="owner-document-workbench__actions">
-                <a
-                  class="owner-document-workbench__primary-action"
-                  data-owner-document-primary-action
-                  href="../pcm_standalone/service_contract/code.html?returnTo=owner-contract#full-contract"
-                >查看 DRS 服務契約全文</a>
-                <aside
-                  class="owner-document-share-guide"
-                  data-owner-document-share-guide
-                  aria-label="文件分享說明"
-                >
-                  <span class="owner-document-share-guide__mark" aria-hidden="true">LINE</span>
-                  <span>
-                    <strong>分享文件連結至 LINE</strong>
-                    <small>接收者仍須登入並具有本案權限；不會公開文件或變更權限。</small>
-                  </span>
-                </aside>
+                <p class="eyebrow">甲乙方共用｜唯讀案件歷史</p>
+                <h2 id="documents-title">案件歷史資料庫</h2>
+                <p>文件、日曆節點、意見、照片與缺失都回到同一份案件事實；正式保存後只能檢視，修正會以新版本或補充事件保留。</p>
               </div>
             </div>
             <section
@@ -1192,15 +1156,68 @@
                 </div>
               </div>
             </section>
-            <div class="owner-document-workbench__evidence">
-              <ul class="record-list" data-list="documents">
-                <li class="empty-state">
-                  <strong>尚未取得可供顯示的文件</strong>
-                  <span
-                  >確認案件權限後，才會列出可讀取的報價單與施工圖版本。</span>
-                </li>
-              </ul>
-            </div>
+            <section
+              class="owner-history-library"
+              data-owner-history-immutable="true"
+              aria-labelledby="owner-history-library-title"
+            >
+              <header class="owner-history-library__heading">
+                <div>
+                  <p class="eyebrow">同一份資料、兩種查找方式</p>
+                  <h3 id="owner-history-library-title">先找文件，再回到事件脈絡</h3>
+                </div>
+                <span>DRS 保存區唯讀</span>
+              </header>
+              <div class="owner-history-categories" aria-label="案件歷史類別">
+                <span>需求</span>
+                <span>圖說</span>
+                <span>報價</span>
+                <span>契約／附約</span>
+                <span>設計送審</span>
+                <span>施工日誌</span>
+                <span>照片</span>
+                <span>日曆快照</span>
+                <span>各方意見</span>
+                <span>決定</span>
+                <span>變更／追加減</span>
+                <span>缺失</span>
+                <span>改善</span>
+                <span>複查</span>
+                <span>結案</span>
+              </div>
+              <p class="owner-history-fields">
+                每筆固定顯示：版本、提供者、日期、關聯節點／工項、依據、狀態、下一位處理者、正式留痕。
+              </p>
+
+              <div class="owner-history-views">
+                <details class="owner-history-view" open>
+                  <summary>
+                    <span><strong>依類型查找</strong><small>文件、照片與狀態分類</small></span>
+                    <span aria-hidden="true">切換檢視</span>
+                  </summary>
+                  <div class="owner-document-workbench__evidence">
+                    <ul class="record-list" data-list="documents">
+                      <li class="empty-state">
+                        <strong>尚未取得可供顯示的案件歷史</strong>
+                        <span>確認案件權限後，才會列出本案正式保存的文件、照片與事件版本。</span>
+                      </li>
+                    </ul>
+                  </div>
+                </details>
+                <details class="owner-history-view">
+                  <summary>
+                    <span><strong>案件時間軸</strong><small>依事件時間查看誰在等待誰</small></span>
+                    <span aria-hidden="true">切換檢視</span>
+                  </summary>
+                  <ul class="record-list owner-history-timeline" data-list="caseHistory">
+                    <li class="empty-state">
+                      <strong>尚未取得可顯示的案件事件</strong>
+                      <span>正式事件會依時間顯示行動人、依據、事件後狀態與下一位處理者。</span>
+                    </li>
+                  </ul>
+                </details>
+              </div>
+            </section>
             <footer class="owner-document-workbench__footer">
               <p class="boundary-note">
                 基本檢討與報價健檢只整理完整性、範圍與風險提示，不代替任何工程商業判定。

@@ -483,10 +483,10 @@ test("未簽 DRS 服務契約前只顯示誠實的註冊後準備預覽", async 
   assert.doesNotMatch(html, /href="\.\.\/pcm_standalone\/owner_start\/code\.html"/);
 });
 
-test("甲方工作台 final runtime asset identity 保留既有 module runtime", async () => {
+test("甲方工作台 final runtime asset identity 保留目前 header 與 module runtime", async () => {
   const html = await readPageFile("code.html");
 
-  assert.match(html, /href="\.\/styles\.css\?v=20260815-final-runtime"/);
+  assert.match(html, /href="\.\/styles\.css\?v=20260830-owner-shared-history"/);
   assert.match(
     html,
     /type="module"\s+src="\.\/owner-workspace-bootstrap\.js"/,
@@ -625,7 +625,7 @@ test("分類切換同步 hash、目前標記、鍵盤焦點與唯一可見面板
   assert.equal(controller.selectSection("unknown"), false);
 });
 
-test("設計與工程中央區都完整保留給案件日曆", async () => {
+test("設計階段文件庫與工程時程依管理分區呈現", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -641,57 +641,36 @@ test("設計與工程中央區都完整保留給案件日曆", async () => {
   const designPanel = html.slice(designStart, constructionStart);
   const constructionPanel = html.slice(constructionStart, contractStart);
 
-  assert.match(designPanel, /data-calendar-workspace="design-review"/u);
+  assert.match(designPanel, /data-owner-design-stage-library/u);
+  assert.match(designPanel, /設計合約階段文件庫/u);
+  assert.match(designPanel, /依設計合約階段檢視每次提交的文件與版本/u);
   assert.match(designPanel, /data-list="calendarSubmissions"/u);
   assert.match(designPanel, /data-list="designReviews"/u);
   assert.match(designPanel, /data-list="designDecisionTrail"/u);
   assert.match(designPanel, /尚未取得已排程的設計事項/u);
   assert.match(designPanel, /尚未取得設計送審紀錄/u);
   assert.match(designPanel, /尚未取得設計決策紀錄/u);
-  const designCalendarStart = designPanel.indexOf(
-    'data-calendar-workspace="design-review"',
+  const designLibraryStart = designPanel.indexOf(
+    "data-owner-design-stage-library",
   );
-  const designCalendarEnd = designPanel.indexOf(
-    'class="owner-management-shell owner-management-shell--design"',
-  );
-  const designCalendar = designPanel.slice(
-    designCalendarStart,
-    designCalendarEnd,
-  );
-  assert.ok(designCalendarStart >= 0 && designCalendarEnd > designCalendarStart);
-  assert.doesNotMatch(
-    designCalendar,
-    /owner-calendar__toolbar|owner-calendar__navigation|owner-calendar__view-switch|calendar-nav|calendar-view-option|owner-calendar__week|owner-calendar__agenda|data-calendar-empty/u,
-  );
-  assert.match(
-    designPanel,
-    /class="owner-calendar owner-calendar--hero owner-google-calendar-shell"/u,
-  );
-  assert.match(
-    designCalendar,
-    /data-owner-google-calendar(?=[\s=>])/u,
-  );
-  assert.match(designCalendar, /title="本案 Google Calendar"/u);
-  assert.match(designCalendar, /data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"/u);
-  assert.match(designCalendar, /id="owner-google-calendar-title">把本案時程放回同一份決策依據/u);
-  assert.match(designCalendar, /尚未連結 Google Calendar/u);
-  assert.match(designCalendar, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
-  assert.doesNotMatch(designCalendar, /data-list="calendarSubmissions"|data-list="designReviews"/u);
-
   const designOperationsStart = designPanel.indexOf(
     'class="owner-management-shell owner-management-shell--design"',
   );
-  assert.ok(designOperationsStart > designCalendarStart);
+  assert.ok(designLibraryStart >= 0 && designOperationsStart > designLibraryStart);
+  assert.doesNotMatch(
+    designPanel,
+    /data-owner-shared-case-calendar|施工進度|每日施工紀錄|施工日誌|現場照片|標記缺失|缺失處理/u,
+  );
   assert.ok(designPanel.indexOf('data-list="calendarSubmissions"') > designOperationsStart);
   assert.ok(designPanel.indexOf('data-list="designReviews"') > designOperationsStart);
   assert.ok(designPanel.indexOf('data-list="designDecisionTrail"') > designOperationsStart);
 
   assert.match(constructionPanel, /data-calendar-workspace="construction"/u);
   assert.doesNotMatch(constructionPanel, /data-owner-google-calendar(?=[\s=>])/u);
-  assert.match(constructionPanel, /data-owner-construction-calendar-frame/u);
-  assert.match(constructionPanel, /data-calendar-state="CALENDAR_UNAVAILABLE_STATE_UI"/u);
-  assert.match(constructionPanel, /尚未取得本案施工時程/u);
-  assert.match(constructionPanel, /<iframe[^>]*hidden(?![^>]*\bsrc=)[^>]*>/u);
+  assert.match(constructionPanel, /data-calendar-state="CASE_CALENDAR_PENDING"/u);
+  assert.match(constructionPanel, /乙方共享案件日曆｜施工情境/u);
+  assert.match(constructionPanel, /查看完整案件日曆/u);
+  assert.doesNotMatch(constructionPanel, /data-owner-construction-calendar-frame|<iframe/u);
   assert.match(constructionPanel, /data-list="constructionRecords"/u);
   assert.match(constructionPanel, /下一位處理者/u);
   assert.match(constructionPanel, /尚未取得施工或驗收事件/u);
@@ -716,11 +695,11 @@ test("設計與工程中央區都完整保留給案件日曆", async () => {
   );
   assert.match(
     css,
-    /#owner-dashboard-panel-design\s+\.owner-google-calendar-shell,\s*#owner-dashboard-panel-construction\s+\.owner-google-calendar-shell\s*\{[\s\S]{0,220}min-height:\s*720px/u,
+    /\.owner-design-stage-library\s*\{/u,
   );
 });
 
-test("設計摘要與案件事實在桌機左側、手機依序排列", async () => {
+test("設計摘要與案件事實在桌機左側，階段文件庫作為主內容", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -734,8 +713,8 @@ test("設計摘要與案件事實在桌機左側、手機依序排列", async ()
   const factsStart = designPanel.indexOf(
     'class="owner-hero-dashboard__body"',
   );
-  const calendarStart = designPanel.indexOf(
-    'data-calendar-workspace="design-review"',
+  const libraryStart = designPanel.indexOf(
+    "data-owner-design-stage-library",
   );
   const operationsStart = designPanel.indexOf(
     'class="owner-management-shell owner-management-shell--design"',
@@ -744,11 +723,11 @@ test("設計摘要與案件事實在桌機左側、手機依序排列", async ()
   assert.ok(
     summaryStart >= 0 &&
       factsStart > summaryStart &&
-      calendarStart > factsStart &&
-      operationsStart > calendarStart,
-    "design summary, facts, calendar and lower operations keep a clear reading order",
+      libraryStart > factsStart &&
+      operationsStart > libraryStart,
+    "design summary, facts, stage library and lower operations keep a clear reading order",
   );
-  const designFacts = designPanel.slice(factsStart, calendarStart);
+  const designFacts = designPanel.slice(factsStart, libraryStart);
   for (const copy of [
     "送審文件與版本",
     "書面確認與修改",
@@ -771,13 +750,12 @@ test("設計摘要與案件事實在桌機左側、手機依序排列", async ()
     css,
     /#owner-dashboard-panel-design\s+\.owner-hero-dashboard__body\s*\{[^}]*grid-column:\s*1[^}]*grid-row:\s*2/u,
   );
-  const designCalendarRule = css.match(
-    /#owner-dashboard-panel-design\s+\.owner-calendar--hero\s*\{([^}]*)\}/u,
+  const designLibraryRule = css.match(
+    /#owner-dashboard-panel-design\s+\.owner-design-stage-library\s*\{([^}]*)\}/u,
   )?.[1];
-  assert.ok(designCalendarRule, "design calendar layout rule exists");
-  assert.match(designCalendarRule, /grid-column:\s*2/u);
-  assert.match(designCalendarRule, /grid-row:\s*1\s*\/\s*3/u);
-  assert.match(designCalendarRule, /min-height:\s*720px/u);
+  assert.ok(designLibraryRule, "design stage library layout rule exists");
+  assert.match(designLibraryRule, /grid-column:\s*2/u);
+  assert.match(designLibraryRule, /grid-row:\s*1\s*\/\s*3/u);
   assert.match(
     css,
     /#owner-dashboard-panel-design\s+\.owner-management-shell--design\s*\{[^}]*grid-column:\s*1\s*\/\s*-1[^}]*grid-row:\s*3/u,
@@ -788,7 +766,7 @@ test("設計摘要與案件事實在桌機左側、手機依序排列", async ()
   );
   assert.match(
     css,
-    /@media\s*\(max-width:\s*760px\)[\s\S]*?#owner-dashboard-panel-design\s+\.owner-hero-dashboard__summary\s*\{[^}]*order:\s*1[\s\S]*?#owner-dashboard-panel-design\s+\.owner-hero-dashboard__body\s*\{[^}]*order:\s*2[\s\S]*?#owner-dashboard-panel-design\s+\.owner-calendar--hero\s*\{[^}]*order:\s*3[\s\S]*?#owner-dashboard-panel-design\s+\.owner-management-shell--design\s*\{[^}]*order:\s*4/u,
+    /@media\s*\(max-width:\s*760px\)[\s\S]*?#owner-dashboard-panel-design\s+\.owner-design-stage-library\s*\{[^}]*order:\s*3/u,
   );
 });
 
@@ -930,8 +908,9 @@ test("設計與工程主區承接母版案件功能且只保留甲方需要的�
   const designPanel = html.slice(designStart, constructionStart);
   const constructionPanel = html.slice(constructionStart, contractStart);
   for (const copy of [
-    "案件摘要", "共同案件日曆", "送審文件與版本", "書面確認與修改", "設計決策留痕",
+    "案件摘要", "設計合約階段文件庫", "送審文件與版本", "書面確認與修改", "設計決策留痕",
   ]) assert.match(designPanel, new RegExp(copy, "u"));
+  assert.doesNotMatch(designPanel, /施工進度|每日施工紀錄|施工日誌|現場照片|標記缺失/u);
   assert.match(designPanel, /data-owner-management-layout="design"/u);
   assert.match(designPanel, /data-list="calendarSubmissions"/u);
   assert.match(designPanel, /data-list="designReviews"/u);
@@ -939,7 +918,7 @@ test("設計與工程主區承接母版案件功能且只保留甲方需要的�
   assert.match(designPanel, /data-action="open-owner-design-revision"/u);
   assert.match(designPanel, /data-owner-design-revision-panel/u);
   for (const copy of [
-    "案件摘要", "案件日曆", "本日重要項目", "變更與驗收", "歷史文件版本", "案件留痕",
+    "案件摘要", "案件日曆", "本日重要項目", "變更與驗收", "歷史資料入口", "案件留痕",
   ]) assert.match(constructionPanel, new RegExp(copy, "u"));
   assert.match(constructionPanel, /data-owner-management-layout="construction"/u);
   assert.match(constructionPanel, /data-layout="owner-construction-navigation"/u);
@@ -1012,7 +991,7 @@ test("工程管理首屏以 Dusk Ember 語意壓縮日曆空態並降低橘框�
   );
   assert.match(
     contractPanel,
-    /data-owner-service-contract-link[^>]*>[\s\S]{0,80}查看 DRS 服務契約全文/u,
+    /data-owner-service-contract-link[^>]*>[\s\S]{0,80}查看 DRS 服務契約/u,
   );
   assert.match(
     html,
@@ -2438,7 +2417,7 @@ test("canonical workspace uses the Decision & Record System name", async () => {
   assert.match(html, /aria-label="LaiBE DRS 首頁"/u);
 });
 
-test("workspace header keeps role, case, and service-agreement context distinct on desktop and mobile", async () => {
+test("owner header mirrors the vendor header composition while retaining owner context", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -2447,15 +2426,32 @@ test("workspace header keeps role, case, and service-agreement context distinct 
     html.indexOf('<header class="workspace-header"'),
     html.indexOf("</header>"),
   );
+  const headerContractStart = css.indexOf(
+    "/* Owner header mirrors the vendor workspace header composition. */",
+  );
+  const headerCss = headerContractStart >= 0 ? css.slice(headerContractStart) : "";
 
+  assert.match(html, /styles\.css\?v=20260830-owner-shared-history/u);
+  assert.match(html, /pcm_standalone\/shared\/drs-brand\.css\?v=20260810-drs-full-name/u);
+  assert.match(header, /<img\s+src="\.\.\/\.\.\/\.\.\/assets\/logo\/laibe_offer\.svg"\s+alt="LaiBE"/u);
+  assert.match(header, /class="drs-brand-lockup drs-brand-lockup--expanded"/u);
   assert.match(header, /工作台角色[\s\S]*甲方/u);
   assert.match(header, /案件[\s\S]*data-slot="case-name"[^>]*data-header-context-value="case"[^>]*>尚未連結正式案件/u);
   assert.match(header, /服務契約[\s\S]*data-slot="agreement-label"[^>]*data-header-context-value="agreement"[^>]*>尚未確認/u);
+  assert.equal((header.match(/workspace-header__context-item/g) || []).length, 3);
+  assert.doesNotMatch(header, /受邀乙方|授權狀態/u);
   assert.doesNotMatch(header, /data-slot="header-state"/u);
-  assert.doesNotMatch(css, /context-chip\[data-slot="case-name"\]\s*\{[^}]*display:\s*none/i);
-  assert.match(css, /\.workspace-header__context\s*\{[^}]*flex-wrap:\s*wrap/is);
-  assert.match(css, /@media\s*\(max-width:\s*760px\)[\s\S]*\.workspace-header__context[\s\S]*grid-template-columns:\s*1fr/is);
-  assert.match(css, /\.brand\s*\{[^}]*min-height:\s*44px/is);
+  assert.ok(headerContractStart >= 0, "owner header has one final vendor-composition contract");
+  assert.match(headerCss, /\.workspace-header\s*\{[^}]*min-height:\s*70px[^}]*z-index:\s*30[^}]*background:\s*rgba\(5,\s*6,\s*7,\s*\.92\)[^}]*backdrop-filter:\s*blur\(16px\)/is);
+  assert.match(headerCss, /\.workspace-header__inner\s*\{[^}]*width:\s*min\(1480px,\s*calc\(100%\s*-\s*32px\)\)[^}]*min-height:\s*70px[^}]*gap:\s*20px/is);
+  assert.match(headerCss, /\.brand\s*\{[^}]*min-height:\s*44px[^}]*gap:\s*14px/is);
+  assert.match(headerCss, /\.brand img\s*\{[^}]*width:\s*112px/is);
+  assert.match(headerCss, /\.workspace-header__context\s*\{[^}]*align-items:\s*stretch[^}]*gap:\s*18px[^}]*flex-wrap:\s*nowrap/is);
+  assert.match(headerCss, /\.workspace-header__context-item\s*\{[^}]*display:\s*grid[^}]*min-height:\s*44px[^}]*border-radius:\s*0/is);
+  assert.match(headerCss, /\.workspace-header__context-item\s*\+\s*\.workspace-header__context-item\s*\{[^}]*padding-left:\s*18px[^}]*border-left:\s*1px solid rgba\(255,\s*255,\s*255,\s*\.16\)/is);
+  assert.match(headerCss, /@media\s*\(max-width:\s*768px\)[\s\S]*\.workspace-header__inner\s*\{[^}]*padding:\s*12px 0[^}]*flex-direction:\s*column[^}]*gap:\s*10px/is);
+  assert.match(headerCss, /@media\s*\(max-width:\s*768px\)[\s\S]*\.brand img\s*\{[^}]*width:\s*clamp\(82px,\s*28vw,\s*108px\)/is);
+  assert.match(headerCss, /@media\s*\(max-width:\s*768px\)[\s\S]*\.workspace-header__context\s*\{[^}]*grid-template-columns:\s*1fr\s*!important/is);
 });
 
 test("owner header runtime binds manifest routes fail closed and updates only context values", async () => {
@@ -2505,8 +2501,8 @@ test("甲方契約工作區先交代角色、版本、狀態、責任與唯一�
   assert.match(panel, /本案契約/u);
   assert.match(panel, /目前狀態/u);
   assert.match(panel, /下一位處理者/u);
-  assert.match(panel, /查看 DRS 服務契約全文/u);
-  assert.match(panel, /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約全文/u);
+  assert.match(panel, /DRS 服務契約備查/u);
+  assert.match(panel, /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約/u);
   assert.doesNotMatch(panel, /data-owner-service-contract-link[^>]*\shref=/u);
   assert.equal((panel.match(/owner-contract-recovery-action/g) || []).length, 1);
   assert.match(panel, /data-owner-contract-trusted-action[^>]*disabled[^>]*aria-disabled="true"/u);
@@ -2522,13 +2518,15 @@ test("甲方契約工作區先顯示甲乙共用契約全文，再進入補充�
   assert.ok(draftEditorStart > sharedContractStart, "shared contract precedes the draft editor");
   assert.match(panel, /data-shared-contract-id="LAIBE-DESIGN-BUILD-V02"/u);
   assert.match(panel, /data-shared-contract-type="DESIGN_BUILD"/u);
+  assert.match(panel, /data-project-contract-kind="DESIGN_BUILD"/u);
   assert.match(panel, /建築物室內裝修設計及工程承攬契約/u);
-  assert.match(panel, /目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方/u);
+  assert.match(panel, /設計＋工程（統包）參考範本/u);
+  assert.match(panel, /尚未取得本案正式契約識別、案件版本與雙方確認狀態/u);
   assert.match(
     panel,
     /data-shared-contract-preview[^>]*href="\.\.\/\.\.\/\.\.\/site\/standard_contract_editor\/code\.html\?contractType=DESIGN_BUILD&amp;returnTo=owner"/u,
   );
-  assert.match(panel, /查看契約全文/u);
+  assert.match(panel, /查看統包參考範本/u);
 });
 
 test("甲方契約編輯依總覽、待填、變更與紀錄分頁呈現且草稿編輯器預設展開", async () => {
@@ -2732,33 +2730,52 @@ test("甲方契約管理以四個小白任務分頁分開服務資格、專案�
   }
   assert.match(panel, /DRS 服務契約/u);
   assert.match(panel, /本案甲乙契約/u);
-  assert.match(panel, /查看 DRS 服務契約全文/u);
+  assert.match(panel, /查看 DRS 服務契約/u);
   assert.doesNotMatch(panel, /開始編輯契約資料/u);
   assert.match(panel, /contractType=DESIGN_BUILD&amp;returnTo=owner/u);
-  assert.match(panel, /目前顯示中性契約範本；尚未連結案件，也尚未分享給乙方/u);
+  assert.match(panel, /設計＋工程（統包）參考範本/u);
+  assert.match(panel, /分開簽訂時會分列設計合約與工程合約/u);
   assert.match(css, /\.owner-contract-view-tabs\s*\{/u);
 });
 
-test("甲方契約總覽直接接上 DRS 服務契約全文並保留真實待確認狀態", async () => {
-  const [html, css] = await Promise.all([
+test("甲方契約總覽將 DRS 服務契約保持備查並誠實呈現統包參考範本", async () => {
+  const [html, css, runtime] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
+    loadRuntime(),
   ]);
   const panel = ownerContractPanel(html);
   const cardStart = panel.indexOf("contract-kind-card--service");
   const cardEnd = panel.indexOf("</article>", cardStart);
   const serviceContractCard = panel.slice(cardStart, cardEnd);
+  const projectCardStart = panel.indexOf("data-owner-project-contract-reference");
+  const projectCardEnd = panel.indexOf("</article>", projectCardStart);
+  const projectCard = panel.slice(projectCardStart, projectCardEnd);
 
   assert.ok(cardStart >= 0 && cardEnd > cardStart, "DRS service contract card exists");
-  assert.match(serviceContractCard, /DRS 服務契約/u);
+  assert.match(serviceContractCard, /DRS 服務契約備查/u);
+  assert.match(serviceContractCard, /不需在此填寫或再次確認/u);
+  assert.doesNotMatch(serviceContractCard, /確認服務範圍/u);
   assert.match(serviceContractCard, /data-slot="agreement-state">尚待確認/u);
   assert.match(serviceContractCard, /data-slot="agreement-version">尚未確認服務版本/u);
   assert.match(
     serviceContractCard,
-    /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約全文/u,
+    /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約/u,
   );
   assert.equal((panel.match(/data-owner-service-contract-link/g) || []).length, 1);
   assert.match(css, /\.owner-service-contract-entry\s*\{[^}]*display:\s*inline-flex/isu);
+
+  assert.ok(projectCardStart >= 0 && projectCardEnd > projectCardStart);
+  assert.match(projectCard, /data-project-contract-kind="DESIGN_BUILD"/u);
+  assert.match(projectCard, /設計＋工程（統包）參考範本/u);
+  assert.match(projectCard, /分開簽訂時會分列設計合約與工程合約/u);
+  assert.match(projectCard, /尚未取得本案正式契約識別、案件版本與雙方確認狀態/u);
+  assert.doesNotMatch(projectCard, /已連結|已分享給乙方/u);
+
+  const model = runtime.buildOwnerWorkspaceViewModel();
+  assert.equal(model.currentActor, "由甲方確認案件入口與甲乙契約資料");
+  assert.equal(model.nextAction, "確認本案權限與甲乙契約資料");
+  assert.doesNotMatch(`${model.currentActor}\n${model.nextAction}`, /DRS 服務契約/u);
 });
 
 test("契約預覽返回甲方工作台時直接開啟待我填寫而不是契約總覽", async () => {
@@ -2959,12 +2976,13 @@ test("未連結正式案件時說清楚原因、處理者、最近留痕與可�
 
   assert.equal(model.state, "CONTRACT_CONTEXT_UNAVAILABLE");
   assert.equal(model.stateLabel, "尚未連結正式案件");
-  assert.match(model.statusMessage, /甲方身分、DRS 服務契約與案件權限尚未完成確認/u);
-  assert.equal(model.currentActor, "由甲方先確認 DRS 服務與案件入口");
+  assert.match(model.statusMessage, /甲方身分、案件權限與甲乙契約資料尚未完成確認/u);
+  assert.equal(model.currentActor, "由甲方確認案件入口與甲乙契約資料");
   assert.equal(model.lastRecorded, "尚未建立正式案件紀錄");
-  assert.equal(model.nextAction, "查看 DRS 服務契約全文");
-  assert.match(html, /完成後才會開放本案契約、文件分享與案件留痕/u);
-  assert.match(html, /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約全文/u);
+  assert.equal(model.nextAction, "確認本案權限與甲乙契約資料");
+  assert.match(html, /完成後才會開放本案契約、文件檢視與案件留痕/u);
+  assert.doesNotMatch(html, /文件分享/u);
+  assert.match(html, /data-owner-service-contract-link[^>]*>\s*查看 DRS 服務契約/u);
   assert.doesNotMatch(model.statusMessage, /已保存/u);
 });
 
@@ -3372,62 +3390,137 @@ test("only the exact authorized owner grant can initialize the strict existing b
   }
 });
 
-test("Calendar stays in the main owner workspace with no initial iframe source, controlled sharing, and protected grant routes", async () => {
+test("甲方工作台不再連結或分享 Google Calendar，時程來源只由乙方發布", async () => {
   const [html, bootstrap] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("owner-workspace-bootstrap.js"),
   ]);
-  const workspaceStart = html.indexOf('data-layout="owner-hero-workspace"');
-  const calendarStart = html.indexOf("data-owner-google-calendar", workspaceStart);
-  const calendarEnd = html.indexOf(
-    'class="owner-management-shell owner-management-shell--design"',
-    calendarStart,
-  );
-  assert.ok(calendarStart > workspaceStart, "Calendar belongs to the main workspace");
-  assert.ok(calendarEnd > calendarStart, "Calendar ends before Design operations");
-  assert.equal(
-    html.match(/data-owner-google-calendar(?=[\s=>])/gu)?.length,
-    1,
-    "only the Design management Calendar is controlled",
-  );
-  assert.equal(html.match(/id="owner-google-calendar-title"/gu)?.length, 1);
-  const controlledMarkup = html.slice(calendarStart, calendarEnd);
-  assert.match(controlledMarkup, /<iframe[^>]*data-owner-calendar-frame[^>]*(?!\bsrc=)[^>]*>/u);
-  assert.match(controlledMarkup, /data-owner-calendar-state[^>]*>\s*尚未連結 Google Calendar/u);
-  assert.match(controlledMarkup, /data-owner-calendar-connect[^>]*disabled[^>]*aria-disabled="true"/u);
-  assert.match(controlledMarkup, /data-owner-calendar-share="vendor"[^>]*disabled[^>]*aria-disabled="true"/u);
-  assert.match(controlledMarkup, /data-owner-calendar-share="drs"[^>]*disabled[^>]*aria-disabled="true"/u);
-  assert.match(bootstrap, /removeAttribute\(["']src["']\)/u);
-  assert.match(bootstrap, /owner-google-calendar-grant/u);
-  assert.match(bootstrap, /owner-google-calendar-oauth-start/u);
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const contractStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const controlledMarkup = html.slice(constructionStart, contractStart);
+  assert.match(controlledMarkup, /乙方共享案件日曆｜施工情境/u);
+  assert.match(controlledMarkup, /從同一份時程查看施工進度與每日紀錄/u);
+  assert.doesNotMatch(controlledMarkup, /<iframe|data-owner-calendar-connect|data-owner-calendar-share/u);
+  assert.doesNotMatch(bootstrap, /owner-google-calendar-grant/u);
+  assert.doesNotMatch(bootstrap, /owner-google-calendar-oauth-start/u);
+  assert.doesNotMatch(bootstrap, /calendar\.google\.com/u);
   assert.match(bootstrap, /http:\/\/127\.0\.0\.1:4173\/account\/access\//u);
   assert.doesNotMatch(bootstrap, /127\.0\.0\.1:4194|[?&](?:case|returnTo|next)=/u);
 });
 
-test("每份案件文件都提供受權限保護的 LINE 分享連結", async () => {
-  const [html, runtime] = await Promise.all([
+test("設計管理只顯示依設計合約階段整理的文件版本庫", async () => {
+  const html = await readPageFile("code.html");
+  const designStart = html.indexOf('id="owner-dashboard-panel-design"');
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const designPanel = html.slice(designStart, constructionStart);
+
+  assert.match(designPanel, /data-owner-design-stage-library/u);
+  assert.match(designPanel, /設計合約階段文件庫/u);
+  assert.match(designPanel, /依設計合約階段檢視每次提交的文件與版本/u);
+  for (const field of [
+    "設計合約階段",
+    "階段性文件版本",
+    "甲方檢閱狀態",
+  ]) {
+    assert.match(designPanel, new RegExp(field, "u"));
+  }
+  assert.match(designPanel, /尚待設計合約階段資料/u);
+  assert.match(designPanel, /不會預設階段或以範例文件代替案件資料/u);
+  assert.doesNotMatch(
+    designPanel,
+    /data-owner-shared-case-calendar|施工進度|每日施工紀錄|施工日誌|現場照片|標記缺失|缺失處理|data-owner-calendar-contribution|owner-defect-flow/u,
+  );
+  assert.doesNotMatch(designPanel, /概念設計|基本設計|細部設計/u);
+});
+
+test("甲方從工程管理檢視乙方施工時程，案件歷史維持唯讀", async () => {
+  const [html, bootstrap, app] = await Promise.all([
     readPageFile("code.html"),
+    readPageFile("owner-workspace-bootstrap.js"),
+    readPageFile("app.js"),
+  ]);
+  const constructionStart = html.indexOf('id="owner-dashboard-panel-construction"');
+  const contractStart = html.indexOf('id="owner-dashboard-panel-contract"');
+  const ownerCalendar = html.slice(constructionStart, contractStart);
+  const documentsId = html.indexOf('id="documents"');
+  const documentsStart = html.lastIndexOf("<section", documentsId);
+  const documentsEnd = html.indexOf('id="submissions"', documentsStart);
+  const history = html.slice(documentsStart, documentsEnd);
+
+  assert.match(ownerCalendar, /乙方共享案件日曆｜施工情境/u);
+  assert.match(ownerCalendar, /施工進度與每日紀錄/u);
+  assert.match(ownerCalendar, /data-calendar-state="CASE_CALENDAR_PENDING"/u);
+  assert.match(ownerCalendar, /查看完整案件日曆/u);
+  assert.doesNotMatch(
+    ownerCalendar,
+    /data-owner-calendar-connect|data-owner-calendar-share|甲方建立排程|甲方修改排程|甲方取消排程|新增意見或照片|標記缺失/u,
+  );
+  assert.doesNotMatch(
+    bootstrap,
+    /owner-google-calendar-grant|owner-google-calendar-oauth-start/u,
+  );
+
+  assert.match(history, /案件歷史資料庫/u);
+  assert.match(history, /data-owner-history-immutable="true"/u);
+  assert.match(history, /依類型查找/u);
+  assert.match(history, /案件時間軸/u);
+  assert.equal(history.match(/切換檢視/gu)?.length, 2);
+  for (const category of [
+    "需求",
+    "圖說",
+    "報價",
+    "契約／附約",
+    "設計送審",
+    "施工日誌",
+    "照片",
+    "日曆快照",
+    "各方意見",
+    "決定",
+    "變更／追加減",
+    "缺失",
+    "改善",
+    "複查",
+    "結案",
+  ]) {
+    assert.match(history, new RegExp(category, "u"));
+  }
+  for (const field of [
+    "版本",
+    "提供者",
+    "日期",
+    "關聯節點／工項",
+    "依據",
+    "狀態",
+    "下一位處理者",
+    "正式留痕",
+  ]) {
+    assert.match(history, new RegExp(field, "u"));
+  }
+  assert.match(history, /正式保存後只能檢視/u);
+  assert.match(history, /修正會以新版本或補充事件保留/u);
+  assert.doesNotMatch(
+    `${ownerCalendar}\n${history}`,
+    /\bAPI\b|\bDB\b|debug|mock|source clean/u,
+  );
+  assert.doesNotMatch(
+    `${app}\n${bootstrap}`,
+    /\/functions\/v1\/case-(?:collaboration-feed|contribution-create|defect-transition|history-read)/u,
+  );
+});
+
+test("甲方案件文件維持唯讀，不提供文件分享功能", async () => {
+  const [html, css, app, runtime] = await Promise.all([
+    readPageFile("code.html"),
+    readPageFile("styles.css"),
+    readPageFile("app.js"),
     loadRuntime(),
   ]);
-  assert.equal(typeof runtime.createOwnerDocumentLineShareUrl, "function");
-  assert.match(html, /data-owner-document-share-guide/u);
-  assert.match(html, /接收者仍須登入並具有本案權限/u);
-
-  const shareUrl = runtime.createOwnerDocumentLineShareUrl({
-    title: "平面配置圖",
-    versionLabel: "第 3 版・甲方確認版",
-  });
-  const parsed = new URL(shareUrl);
-  assert.equal(parsed.origin, "https://social-plugins.line.me");
-  assert.equal(parsed.pathname, "/lineit/share");
-  assert.equal(
-    parsed.searchParams.get("url"),
-    "http://127.0.0.1:4173/pcm/owner/workspace/#documents",
+  assert.equal(typeof runtime.createOwnerDocumentLineShareUrl, "undefined");
+  assert.doesNotMatch(
+    `${html}\n${app}`,
+    /文件分享|LINE_SHARE_BASE_URL|OWNER_DOCUMENTS_CANONICAL_URL|createOwnerDocumentLineShareUrl|data-owner-document-share-guide|data-owner-document-line-share|分享至 LINE/u,
   );
-  assert.match(parsed.searchParams.get("text"), /平面配置圖/u);
-  assert.match(parsed.searchParams.get("text"), /第 3 版・甲方確認版/u);
-  assert.match(parsed.searchParams.get("text"), /登入並具有本案權限/u);
-  assert.equal(runtime.createOwnerDocumentLineShareUrl({ title: "" }), null);
+  assert.doesNotMatch(css, /\.owner-document-(?:share-guide|line-share)/u);
 
   const harness = createOwnerWorkspaceRenderHarness();
   const controller = runtime.createOwnerWorkspaceController({
@@ -3456,17 +3549,10 @@ test("每份案件文件都提供受權限保護的 LINE 分享連結", async ()
   const shareActions = documentNodes.filter(
     (node) => node.getAttribute?.("data-owner-document-line-share") === "true",
   );
-  assert.equal(shareActions.length, 2);
-  for (const action of shareActions) {
-    assert.equal(action.tagName, "a");
-    assert.equal(action.textContent, "分享至 LINE");
-    assert.equal(action.getAttribute("target"), "_blank");
-    assert.equal(action.getAttribute("rel"), "noopener noreferrer");
-    assert.match(action.getAttribute("href"), /^https:\/\/social-plugins\.line\.me\/lineit\/share\?/u);
-  }
+  assert.equal(shareActions.length, 0);
 });
 
-test("owner Supabase workspace bootstrap gates session, owner grant shape, strict snapshot, and Calendar failure cleanup", async () => {
+test("owner Supabase workspace bootstrap gates session and strict owner grant without Calendar side effects", async () => {
   const runtime = await loadBootstrap();
   assert.equal(typeof runtime.createOwnerSupabaseWorkspaceBootstrap, "function");
 
@@ -3495,16 +3581,8 @@ test("owner Supabase workspace bootstrap gates session, owner grant shape, stric
     serviceContext: { pcmStatus: "UNAVAILABLE", contractStatus: "UNAVAILABLE" },
     documents: [],
   };
-  const frame = {
-    src: "https://calendar.google.test/embed",
-    removeAttribute(name) {
-      if (name === "src") delete this.src;
-    },
-  };
   const root = {
-    querySelector(selector) {
-      return selector === "[data-owner-calendar-frame]" ? frame : null;
-    },
+    querySelector() { return null; },
     querySelectorAll() {
       return [];
     },
@@ -3567,7 +3645,7 @@ test("owner Supabase workspace bootstrap gates session, owner grant shape, stric
   await bootstrap.initialize();
   assert.equal(calls[0].endpoint, "owner-workspace-grant");
   assert.equal(calls[0].init.method, "GET");
-  assert.equal(frame.src, undefined, "Calendar grant failure clears iframe src");
+  assert.equal(calls.length, 1, "owner bootstrap does not call a Calendar or OAuth route");
 });
 
 function ownerGrantPayload({
@@ -3593,70 +3671,6 @@ function ownerGrantPayload({
   };
 }
 
-function ownerCalendarGrant({
-  userId = OWNER_USER_ID,
-  caseId = CANONICAL_OWNER_CASE_ID,
-  calendarId = "owner-calendar@example.test",
-} = {}) {
-  return {
-    schemaVersion: "laibe.owner-calendar-embed.v1",
-    authenticatedUserId: userId,
-    currentCaseId: caseId,
-    membership: { userId, caseId, role: "owner", status: "active" },
-    calendarBinding: {
-      userId,
-      caseId,
-      accountRole: "owner",
-      connectionStatus: "connected",
-      bindingStatus: "active",
-      calendarId,
-      timeZone: "Asia/Taipei",
-    },
-  };
-}
-
-function ownerCalendarHarness() {
-  const listeners = new Map();
-  const assigned = [];
-  const state = { textContent: "" };
-  const note = { textContent: "" };
-  const frame = {
-    hidden: true,
-    removeAttribute(name) {
-      if (name === "src") delete this.src;
-    },
-  };
-  const connect = {
-    disabled: true,
-    textContent: "",
-    attributes: new Map(),
-    addEventListener(type, listener) {
-      listeners.set(type, listener);
-    },
-    setAttribute(name, value) {
-      this.attributes.set(name, String(value));
-    },
-    async click() {
-      return listeners.get("click")?.();
-    },
-  };
-  const root = {
-    defaultView: { location: { assign(url) { assigned.push(url); } } },
-    querySelector(selector) {
-      return new Map([
-        ["[data-owner-calendar-state]", state],
-        ["[data-owner-calendar-note]", note],
-        ["[data-owner-calendar-frame]", frame],
-        ["[data-owner-calendar-connect]", connect],
-      ]).get(selector) ?? null;
-    },
-    querySelectorAll() {
-      return [];
-    },
-  };
-  return { assigned, connect, frame, root, state };
-}
-
 function deferred() {
   let resolve;
   const promise = new Promise((nextResolve) => {
@@ -3665,84 +3679,53 @@ function deferred() {
   return { promise, resolve };
 }
 
-test("owner Calendar accepts only matching grants and an exact Google OAuth authority", async () => {
+test("owner bootstrap never starts owner Calendar or OAuth and signed-out access still fails closed", async () => {
   const runtime = await loadBootstrap();
-  const harness = ownerCalendarHarness();
-  let calendarResponse = ownerCalendarGrant();
-  let oauthResponse = {
-    state: "OAUTH_REDIRECT_REQUIRED",
-    authorizationUrl: "https://user@accounts.google.com/o/oauth2/v2/auth?state=owner",
+  const assigned = [];
+  const endpoints = [];
+  const root = {
+    defaultView: { location: { assign(url) { assigned.push(url); } } },
+    querySelector() { return null; },
+    querySelectorAll() { return []; },
   };
   const authRuntime = {
     async getSession() { return { access_token: "owner-session" }; },
     async authenticatedFetch(endpoint) {
-      if (endpoint === "owner-workspace-grant") {
-        return new Response(JSON.stringify(ownerGrantPayload()), { status: 200 });
-      }
-      if (endpoint === "owner-google-calendar-grant") {
-        return new Response(JSON.stringify(calendarResponse), { status: 200 });
-      }
-      return new Response(JSON.stringify(oauthResponse), { status: 200 });
+      endpoints.push(endpoint);
+      assert.equal(endpoint, "owner-workspace-grant");
+      return new Response(JSON.stringify(ownerGrantPayload()), { status: 200 });
     },
   };
-  const bootstrap = runtime.createOwnerSupabaseWorkspaceBootstrap({
-    root: harness.root,
-    authRuntime,
-  });
-
-  await bootstrap.initialize();
-  assert.match(harness.frame.src, /calendar\.google\.com\/calendar\/embed/u);
-  await harness.connect.click();
-  assert.deepEqual(harness.assigned, [], "credentialed OAuth URLs are rejected");
-
-  calendarResponse = ownerCalendarGrant({
-    caseId: "9e000000-0000-4000-8000-000000000299",
-  });
-  await bootstrap.initialize();
-  assert.equal(harness.frame.src, undefined, "case mismatch clears Calendar bytes");
-  assert.equal(harness.connect.disabled, false, "only an authorized owner may retry connection");
-
-  calendarResponse = ownerCalendarGrant({
-    userId: "9e000000-0000-4000-8000-000000000099",
-  });
-  await bootstrap.initialize();
-  assert.equal(harness.frame.src, undefined, "user mismatch clears Calendar bytes");
-
-  calendarResponse = ownerCalendarGrant();
-  oauthResponse = {
-    state: "OAUTH_REDIRECT_REQUIRED",
-    authorizationUrl: "https://accounts.google.com/o/oauth2/v2/auth?state=owner",
-  };
-  await bootstrap.initialize();
-  await harness.connect.click();
-  assert.deepEqual(harness.assigned, [oauthResponse.authorizationUrl]);
-
-  const signedOut = ownerCalendarHarness();
   await runtime.createOwnerSupabaseWorkspaceBootstrap({
-    root: signedOut.root,
+    root,
+    authRuntime,
+  }).initialize();
+  assert.deepEqual(endpoints, ["owner-workspace-grant"]);
+  assert.deepEqual(assigned, []);
+
+  await runtime.createOwnerSupabaseWorkspaceBootstrap({
+    root,
     authRuntime: {
       async getSession() { return null; },
       async authenticatedFetch() { throw new Error("must not fetch"); },
     },
   }).initialize();
-  assert.deepEqual(signedOut.assigned, [
+  assert.deepEqual(assigned, [
     "http://127.0.0.1:4173/account/access/",
   ]);
 });
 
-test("concurrent owner initialization and Calendar responses cannot overwrite the latest authorized scope", async () => {
+test("concurrent owner initialization keeps the latest owner case and never adds a Calendar request", async () => {
   const runtime = await loadBootstrap();
-  const harness = ownerCalendarHarness();
   const oldOwner = deferred();
-  const oldCalendar = deferred();
-  const oldCalendarRequested = deferred();
   const newUserId = "9e000000-0000-4000-8000-000000000003";
   const newCaseId = "9e000000-0000-4000-8000-000000000203";
   let ownerCalls = 0;
-  let calendarCalls = 0;
+  const endpoints = [];
   const authRuntime = {
     async getSession() { return { access_token: "owner-session" }; },
     async authenticatedFetch(endpoint) {
+      endpoints.push(endpoint);
       if (endpoint === "owner-workspace-grant") {
         ownerCalls += 1;
         if (ownerCalls === 1) return oldOwner.promise;
@@ -3752,41 +3735,23 @@ test("concurrent owner initialization and Calendar responses cannot overwrite th
           title: "New case",
         })), { status: 200 });
       }
-      if (endpoint === "owner-google-calendar-grant") {
-        calendarCalls += 1;
-        if (calendarCalls === 2) {
-          oldCalendarRequested.resolve();
-          return oldCalendar.promise;
-        }
-        return new Response(JSON.stringify(ownerCalendarGrant({
-          userId: newUserId,
-          caseId: newCaseId,
-          calendarId: "new-calendar@example.test",
-        })), { status: 200 });
-      }
       throw new Error("unexpected endpoint");
     },
   };
+  const root = { querySelector() { return null; }, querySelectorAll() { return []; } };
   const bootstrap = runtime.createOwnerSupabaseWorkspaceBootstrap({
-    root: harness.root,
+    root,
     authRuntime,
   });
 
   const first = bootstrap.initialize();
   const second = bootstrap.initialize();
-  await second;
+  const latestModel = await second;
   oldOwner.resolve(new Response(JSON.stringify(ownerGrantPayload()), { status: 200 }));
-  await first;
-  assert.match(harness.frame.src, /new-calendar/u);
-
-  const staleCalendarRun = bootstrap.initialize();
-  await oldCalendarRequested.promise;
-  const latest = bootstrap.initialize();
-  await latest;
-  oldCalendar.resolve(new Response(JSON.stringify(ownerCalendarGrant()), { status: 200 }));
-  await staleCalendarRun;
-  assert.match(harness.frame.src, /new-calendar/u);
-  assert.equal(harness.state.textContent, "本案 Google Calendar 已連結");
+  const staleCompletion = await first;
+  assert.equal(latestModel.caseName, "New case");
+  assert.equal(staleCompletion.caseName, "New case");
+  assert.deepEqual(endpoints, ["owner-workspace-grant", "owner-workspace-grant"]);
 });
 
 test("文件 consumer 首屏說清案件、狀態、責任人、下一步與留痕依據", async () => {
@@ -3991,7 +3956,7 @@ test("可信 server projection 才能把文件列標為正式案件紀錄", asyn
   assert.equal(validateAndMapOwnerWorkspaceGrant(invalidTimestamp), null);
 });
 
-test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既有契約入口", async () => {
+test("甲方文件區呈現狀態與依據，不混入契約或分享入口", async () => {
   const [html, css] = await Promise.all([
     readPageFile("code.html"),
     readPageFile("styles.css"),
@@ -4008,15 +3973,19 @@ test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既�
   assert.match(documentsPanel, /owner-document-pending-actions/u);
   assert.match(documentsPanel, /owner-document-workbench__evidence/u);
   assert.match(documentsPanel, /owner-document-workbench__footer/u);
-  assert.match(
+  assert.doesNotMatch(
     documentsPanel,
-    /data-owner-document-primary-action[^>]*href="\.\.\/pcm_standalone\/service_contract\/code\.html\?returnTo=owner-contract#full-contract"[^>]*>[\s\S]*查看 DRS 服務契約全文/u,
+    /data-owner-document-primary-action|查看 DRS 服務契約全文/u,
   );
-  assert.match(documentsPanel, /data-owner-document-share-guide/u);
+  assert.doesNotMatch(documentsPanel, /data-owner-document-share-guide/u);
   assert.match(documentsPanel, /data-list="documents"/u);
 
   assert.match(css, /\.owner-document-workbench\s*\{[\s\S]*grid-template-rows:/u);
-  assert.match(css, /\.owner-document-workbench__actions\s*\{[\s\S]*display:\s*grid/u);
+  assert.match(
+    css,
+    /\.owner-document-workbench__heading\s*\{[^}]*grid-template-columns:\s*1fr/isu,
+  );
+  assert.doesNotMatch(css, /\.owner-document-workbench__actions\s*\{/u);
   assert.match(css, /\.owner-document-status-band\s*\{[\s\S]*display:\s*grid/u);
   assert.match(css, /\.owner-document-pending-actions\s*\{[\s\S]*display:\s*grid/u);
   assert.match(css, /\.owner-document-pending-actions button\s*\{[\s\S]*min-height:\s*44px/u);
@@ -4032,7 +4001,7 @@ test("甲方文件區以橘焰 first-fold 工作台呈現狀態、依據與既�
     css,
     /@media \(max-width: 760px\)[\s\S]*#documents\.owner-document-workbench\s*\{[^}]*scroll-margin-top:\s*18\.5rem/u,
   );
-  assert.match(css, /\.owner-document-workbench__primary-action\s*\{[\s\S]*min-height:\s*44px/u);
+  assert.doesNotMatch(css, /\.owner-document-workbench__primary-action\s*\{/u);
   assert.doesNotMatch(css, /\.owner-construction-primary-action/u);
   assert.match(
     css,
