@@ -452,7 +452,6 @@ begin
     and v_authority ->> 'authenticated_user_id' =
       p_input ->> 'authenticated_user_id'
     and v_authority ->> 'specialist_id' = p_input ->> 'specialist_id'
-    and v_authority ->> 'assignment_id' = p_input ->> 'assignment_id'
     and v_authority ->> 'selected_case_id' = p_input ->> 'selected_case_id'
     and v_authority ->> 'authorization_subject' =
       p_input ->> 'authorization_subject';
@@ -477,15 +476,15 @@ set search_path = ''
 as $$
 declare
   v_now timestamptz := clock_timestamp();
+  v_authority jsonb;
   v_existing integration.drs_line_account_link_intents%rowtype;
   v_binding integration.drs_line_account_bindings%rowtype;
 begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input,
     array[
-      'authenticated_user_id', 'specialist_id', 'assignment_id',
-      'selected_case_id', 'authorization_subject', 'provider_channel_id',
-      'bot_launch_url'
+      'authenticated_user_id', 'specialist_id', 'selected_case_id',
+      'authorization_subject', 'provider_channel_id', 'bot_launch_url'
     ]
   )
     or coalesce(p_input ->> 'provider_channel_id', '') !~ '^[0-9]{1,32}$'
@@ -493,6 +492,15 @@ begin
       '^https://([a-z0-9-]+\.)*line\.me/'
     or not drs_private.drs_line_authority_matches_v1(p_input)
   then
+    return jsonb_build_object('state', 'permission_denied');
+  end if;
+
+  v_authority := integration.drs_identity_authority_resolve_locked_v1(
+    (p_input ->> 'authenticated_user_id')::uuid,
+    (p_input ->> 'selected_case_id')::uuid,
+    p_input ->> 'authorization_subject'
+  );
+  if v_authority -> 'authorized' is distinct from 'true'::jsonb then
     return jsonb_build_object('state', 'permission_denied');
   end if;
 
@@ -533,7 +541,7 @@ begin
     ) values (
       (p_input ->> 'authenticated_user_id')::uuid,
       (p_input ->> 'specialist_id')::uuid,
-      (p_input ->> 'assignment_id')::uuid,
+      (v_authority ->> 'assignment_id')::uuid,
       (p_input ->> 'selected_case_id')::uuid,
       p_input ->> 'authorization_subject',
       p_input ->> 'provider_channel_id',
@@ -585,8 +593,8 @@ begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input,
     array[
-      'authenticated_user_id', 'specialist_id', 'assignment_id',
-      'selected_case_id', 'authorization_subject', 'provider_channel_id'
+      'authenticated_user_id', 'specialist_id', 'selected_case_id',
+      'authorization_subject', 'provider_channel_id'
     ]
   ) or not drs_private.drs_line_authority_matches_v1(p_input)
   then
@@ -669,8 +677,8 @@ begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input,
     array[
-      'authenticated_user_id', 'specialist_id', 'assignment_id',
-      'selected_case_id', 'authorization_subject', 'provider_channel_id'
+      'authenticated_user_id', 'specialist_id', 'selected_case_id',
+      'authorization_subject', 'provider_channel_id'
     ]
   ) or not drs_private.drs_line_authority_matches_v1(p_input)
   then
@@ -723,9 +731,9 @@ begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input,
     array[
-      'authenticated_user_id', 'specialist_id', 'assignment_id',
-      'selected_case_id', 'authorization_subject', 'provider_channel_id',
-      'nonce_digest', 'nonce_expires_at'
+      'authenticated_user_id', 'specialist_id', 'selected_case_id',
+      'authorization_subject', 'provider_channel_id', 'nonce_digest',
+      'nonce_expires_at'
     ]
   ) or not drs_private.drs_line_authority_matches_v1(p_input)
   then
@@ -940,8 +948,8 @@ begin
   if not drs_private.drs_line_exact_json_keys_v1(
     p_input,
     array[
-      'authenticated_user_id', 'specialist_id', 'assignment_id',
-      'selected_case_id', 'authorization_subject', 'provider_channel_id'
+      'authenticated_user_id', 'specialist_id', 'selected_case_id',
+      'authorization_subject', 'provider_channel_id'
     ]
   ) then
     return jsonb_build_object('state', 'permission_denied');

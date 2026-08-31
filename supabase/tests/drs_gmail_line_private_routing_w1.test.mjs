@@ -139,7 +139,6 @@ test("browser-adjacent mutations re-resolve canonical Gmail-backed DRS authority
     assert.match(rpc, /drs_private\.drs_line_authority_matches_v1/iu);
     assert.match(rpc, /authenticated_user_id/iu);
     assert.match(rpc, /specialist_id/iu);
-    assert.match(rpc, /assignment_id/iu);
     assert.match(rpc, /selected_case_id/iu);
     assert.match(rpc, /authorization_subject/iu);
   }
@@ -151,6 +150,25 @@ test("browser-adjacent mutations re-resolve canonical Gmail-backed DRS authority
     authorityHelper,
     /integration\.drs_identity_authority_resolve_locked_v1/iu,
   );
+});
+
+test("browser-adjacent RPCs derive assignment from the locked authority resolver", () => {
+  for (const name of [
+    "drs_line_start_link_intent_v1",
+    "drs_line_read_link_status_v1",
+    "drs_line_cancel_link_intent_v1",
+    "drs_line_prepare_nonce_v1",
+    "drs_line_unlink_account_v1",
+  ]) {
+    assert.doesNotMatch(
+      functionSource(name),
+      /p_input\s*->>\s*'assignment_id'/iu,
+      `${name} must not receive assignment authority from its caller`,
+    );
+  }
+  const start = functionSource("drs_line_start_link_intent_v1");
+  assert.match(start, /integration\.drs_identity_authority_resolve_locked_v1/iu);
+  assert.match(start, /v_authority\s*->>\s*'assignment_id'/iu);
 });
 
 test("account-link completion consumes one nonce and maps both collision directions without overwrite", () => {
