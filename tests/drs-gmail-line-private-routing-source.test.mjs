@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHmac, webcrypto } from "node:crypto";
+import { existsSync } from "node:fs";
 import test from "node:test";
 
 const contractsUrl = new URL(
@@ -20,6 +21,10 @@ const signatureUrl = new URL(
 );
 const lineClientUrl = new URL(
   "../supabase/functions/_shared/drs-line-account-link/line-client.ts",
+  import.meta.url,
+);
+const migrationUrl = new URL(
+  "../supabase/migrations/20260831050535_drs_gmail_line_private_routing_w1.sql",
   import.meta.url,
 );
 
@@ -78,6 +83,10 @@ test("closed browser contract exposes exactly the twelve approved states", async
     "revoked",
   ]);
   assert.equal(Object.isFrozen(LINE_LINK_STATES), true);
+});
+
+test("private LINE routing migration uses the CLI-issued immutable path", () => {
+  assert.equal(existsSync(migrationUrl), true);
 });
 
 test("pending status projects only browser-safe fields and is immutable", async () => {
