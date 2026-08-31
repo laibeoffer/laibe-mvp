@@ -186,6 +186,25 @@ test("root package keeps existing JavaScript interpretation unchanged", async ()
   assert.notEqual(packageContract.type, "module", "root package must not globally force .js to ESM");
 });
 
+test("production build retires the removed owner document LINE navigation transform", async () => {
+  const ownerAppPath = path.join(
+    repositoryRoot,
+    "src",
+    "stitch_laibe_landing_onboarding",
+    "client_awarding_dashboard",
+    "app.js",
+  );
+  const [ownerApp, buildSource] = await Promise.all([
+    readFile(ownerAppPath, "utf8"),
+    readFile(buildScript, "utf8"),
+  ]);
+  const removedLoopbackNavigation = "http://127.0.0.1:4173/pcm/owner/workspace/#documents";
+
+  assert.doesNotMatch(ownerApp, /OWNER_DOCUMENTS_CANONICAL_URL|createOwnerDocumentLineShareUrl/u);
+  assert.equal(ownerApp.includes(removedLoopbackNavigation), false);
+  assert.equal(buildSource.includes(removedLoopbackNavigation), false);
+});
+
 test("production build emits deterministic clean DRS routes and an allowlisted asset tree", async () => {
   const sourceManifest = await readFile(manifestPath, "utf8");
   assert.doesNotMatch(sourceManifest, /(?:https?:)?\/\/(?:127\.0\.0\.1|localhost)(?::\d+)?/iu);

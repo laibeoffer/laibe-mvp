@@ -256,12 +256,6 @@ function rewriteReviewerAccessTransport(source) {
 }
 
 const PRODUCTION_LOOPBACK_NAVIGATION_REWRITES = Object.freeze({
-  "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/app.js": Object.freeze([
-    Object.freeze([
-      "http://127.0.0.1:4173/pcm/owner/workspace/#documents",
-      "/pcm/owner/workspace/#documents",
-    ]),
-  ]),
   "src/stitch_laibe_landing_onboarding/client_awarding_dashboard/owner-workspace-bootstrap.js": Object.freeze([
     Object.freeze(["http://127.0.0.1:4173/account/access/", "/account/access/"]),
   ]),
