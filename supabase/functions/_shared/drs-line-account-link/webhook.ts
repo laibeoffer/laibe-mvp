@@ -15,6 +15,7 @@ type SafeWebhookOutcome =
   | "expired"
   | "conflict_line_already_bound"
   | "conflict_drs_already_bound"
+  | "specialist_inactive"
   | "ignored"
   | "failed"
   | "not_linked"
@@ -49,6 +50,11 @@ type CompleteAccountLinkInput = Readonly<{
   encryptionKeyVersion: string;
 }>;
 
+type CompleteAccountLinkEventInput = CompleteAccountLinkInput & Readonly<{
+  webhookEventDigest: string;
+  claimToken: string;
+}>;
+
 type UnlinkByLineIdentityInput = Readonly<{
   lineUserDigest: string;
 }>;
@@ -56,7 +62,7 @@ type UnlinkByLineIdentityInput = Readonly<{
 export interface LineWebhookRepository {
   claimEvent(input: ClaimInput): Promise<WebhookClaim>;
   completeEvent(input: CompletionInput): Promise<unknown>;
-  completeAccountLink(input: CompleteAccountLinkInput): Promise<unknown>;
+  completeAccountLinkEvent(input: CompleteAccountLinkEventInput): Promise<unknown>;
   unlinkByLineIdentity(input: UnlinkByLineIdentityInput): Promise<unknown>;
 }
 
@@ -146,6 +152,7 @@ function stableOutcome(state: string): SafeWebhookOutcome | null {
       "expired",
       "conflict_line_already_bound",
       "conflict_drs_already_bound",
+      "specialist_inactive",
     ].includes(state)
     ? state as SafeWebhookOutcome
     : null;
@@ -208,18 +215,24 @@ async function processEvent(
       dependencies.identityEncryptionKey,
       event.lineUserId,
     );
-    const status = sanitizeLineLinkStatus(
-      await dependencies.repository.completeAccountLink({
-        nonceDigest,
-        lineUserDigest,
-        lineUserCiphertext: encrypted.ciphertext,
-        lineUserIv: encrypted.iv,
-        encryptionKeyVersion: dependencies.identityEncryptionKeyVersion,
-      }),
-    );
-    const accepted = stableOutcome(status.state);
-    if (accepted === null) throw new Error("account_link_not_completed");
-    outcome = accepted;
+    const result = await dependencies.repository.completeAccountLinkEvent({
+      webhookEventDigest: eventDigest,
+      claimToken: claim.claimToken,
+      nonceDigest,
+      lineUserDigest,
+      lineUserCiphertext: encrypted.ciphertext,
+      lineUserIv: encrypted.iv,
+      encryptionKeyVersion: dependencies.identityEncryptionKeyVersion,
+    });
+    const candidate = result !== null && typeof result === "object"
+      ? Object.getOwnPropertyDescriptor(result, "safeOutcome")?.value ??
+        Object.getOwnPropertyDescriptor(result, "safe_outcome")?.value
+      : null;
+    const accepted = stableOutcome(String(candidate));
+    if (!completed(result, accepted ?? "temporarily_unavailable") || accepted === null) {
+      throw new Error("account_link_not_completed");
+    }
+    return;
   }
   const result = await dependencies.repository.completeEvent({
     webhookEventDigest: eventDigest,
@@ -315,8 +328,10 @@ function createSupabaseWebhookRepository(
         safe_outcome: input.safeOutcome,
       });
     },
-    async completeAccountLink(input: CompleteAccountLinkInput) {
-      return await invoke("drs_line_complete_account_link_v1", {
+    async completeAccountLinkEvent(input: CompleteAccountLinkEventInput) {
+      return await invoke("drs_line_complete_account_link_event_v1", {
+        webhook_event_digest: input.webhookEventDigest,
+        claim_token: input.claimToken,
         provider_channel_id: providerChannelId,
         nonce_digest: input.nonceDigest,
         line_user_digest: input.lineUserDigest,

@@ -987,7 +987,7 @@ test("webhook verifies exact raw bytes before parsing or durable work", async ()
   assert.equal(repositoryCalls, 0);
 });
 
-test("signed accountLink stores only digests and an encrypted private LINE identity", async () => {
+test("signed accountLink atomically stores private identity and terminal webhook truth", async () => {
   const { createLineWebhookHandler } = await import(lineWebhookUrl.href);
   const secret = "unit-test-channel-secret";
   const completed = [];
@@ -1006,16 +1006,11 @@ test("signed accountLink stores only digests and an encrypted private LINE ident
           providerRetryKey: "00000000-0000-4000-8000-000000000097",
         };
       },
-      async completeEvent(input) {
-        completed.push({ operation: "event", input });
-        return { completed: true, safeOutcome: input.safeOutcome };
-      },
-      async completeAccountLink(input) {
-        completed.push({ operation: "link", input });
+      async completeAccountLinkEvent(input) {
+        completed.push({ operation: "link-event", input });
         return {
-          state: "linked",
-          linked_at: "2026-08-31T12:00:00.000Z",
-          next_action: "unlink",
+          completed: true,
+          safeOutcome: "linked",
         };
       },
     },
@@ -1031,7 +1026,8 @@ test("signed accountLink stores only digests and an encrypted private LINE ident
     events: [event],
   }, secret));
   assert.equal(response.status, 200);
-  const linkInput = completed.find(({ operation }) => operation === "link").input;
+  assert.deepEqual(completed.map(({ operation }) => operation), ["link-event"]);
+  const linkInput = completed[0].input;
   assert.match(linkInput.nonceDigest, /^[A-Za-z0-9_-]{43}$/u);
   assert.match(linkInput.lineUserDigest, /^[A-Za-z0-9_-]{43}$/u);
   assert.match(linkInput.lineUserCiphertext, /^[A-Za-z0-9_-]{24,1024}$/u);
@@ -1040,7 +1036,11 @@ test("signed accountLink stores only digests and an encrypted private LINE ident
   const serialized = JSON.stringify(linkInput);
   assert.equal(serialized.includes(rawNonce), false);
   assert.equal(serialized.includes(LINE_USER_ID), false);
-  assert.equal(completed.at(-1).input.safeOutcome, "linked");
+  assert.match(linkInput.webhookEventDigest, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(
+    linkInput.claimToken,
+    "00000000-0000-4000-8000-000000000099",
+  );
 });
 
 test("signed private LINE unlink revokes only its own binding and confirms idempotently", async () => {

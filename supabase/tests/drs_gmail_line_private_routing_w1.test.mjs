@@ -45,6 +45,7 @@ const RPCS = [
   "drs_line_unlink_by_line_identity_v1",
   "drs_line_claim_webhook_v1",
   "drs_line_complete_webhook_v1",
+  "drs_line_complete_account_link_event_v1",
   "drs_line_admit_case_notification_v1",
   "drs_line_claim_notification_v1",
   "drs_line_assert_notification_claim_v1",
@@ -207,6 +208,9 @@ test("account-link completion consumes one nonce and maps both collision directi
 test("webhook claim and completion preserve durable replay outcome", () => {
   const claim = functionSource("drs_line_claim_webhook_v1");
   const complete = functionSource("drs_line_complete_webhook_v1");
+  const completeLinkEvent = functionSource(
+    "drs_line_complete_account_link_event_v1",
+  );
   assert.match(claim, /webhook_event_digest/iu);
   assert.match(claim, /for update/iu);
   assert.match(claim, /already_completed/iu);
@@ -215,6 +219,17 @@ test("webhook claim and completion preserve durable replay outcome", () => {
   assert.match(claim, /attempt_count\s*>=\s*12[\s\S]*processing_state\s*=\s*'completed'/iu);
   assert.match(complete, /completed_at/iu);
   assert.match(complete, /safe_outcome/iu);
+  assert.match(
+    completeLinkEvent,
+    /drs_private\.drs_line_complete_account_link_v1/iu,
+  );
+  assert.match(
+    completeLinkEvent,
+    /drs_private\.drs_line_complete_webhook_v1/iu,
+  );
+  assert.match(completeLinkEvent, /webhook_event_digest/iu);
+  assert.match(completeLinkEvent, /claim_token/iu);
+  assert.match(completeLinkEvent, /raise exception 'DRS_LINE_ATOMIC_LINK'/iu);
   assert.doesNotMatch(`${claim}\n${complete}`, /delete from integration\.drs_line_webhook_events/iu);
 });
 

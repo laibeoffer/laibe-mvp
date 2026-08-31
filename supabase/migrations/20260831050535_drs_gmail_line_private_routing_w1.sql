@@ -197,7 +197,7 @@ create table integration.drs_line_webhook_events (
     safe_outcome in (
       'pending', 'verified', 'link_token_replied', 'linked', 'expired',
       'conflict_line_already_bound', 'conflict_drs_already_bound',
-      'not_linked', 'revoked', 'ignored', 'failed',
+      'specialist_inactive', 'not_linked', 'revoked', 'ignored', 'failed',
       'temporarily_unavailable'
     )
   ),
@@ -1253,7 +1253,7 @@ begin
     or coalesce(p_input ->> 'safe_outcome', '') not in (
       'verified', 'link_token_replied', 'linked', 'expired',
       'conflict_line_already_bound', 'conflict_drs_already_bound',
-      'not_linked', 'revoked', 'ignored', 'failed',
+      'specialist_inactive', 'not_linked', 'revoked', 'ignored', 'failed',
       'temporarily_unavailable'
     )
   then
@@ -1283,6 +1283,72 @@ begin
   return jsonb_build_object(
     'completed', true, 'safe_outcome', p_input ->> 'safe_outcome'
   );
+exception
+  when others then
+    return jsonb_build_object('completed', false);
+end;
+$$;
+
+create or replace function drs_private.drs_line_complete_account_link_event_v1(
+  p_input jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_link jsonb;
+  v_completion jsonb;
+  v_outcome text;
+begin
+  if not drs_private.drs_line_exact_json_keys_v1(
+    p_input,
+    array[
+      'webhook_event_digest', 'claim_token', 'provider_channel_id',
+      'nonce_digest', 'line_user_digest', 'line_user_ciphertext',
+      'line_user_iv', 'encryption_key_version'
+    ]
+  )
+    or coalesce(p_input ->> 'webhook_event_digest', '') !~
+      '^[A-Za-z0-9_-]{43}$'
+    or coalesce(p_input ->> 'claim_token', '') !~
+      '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+  then
+    return jsonb_build_object('completed', false);
+  end if;
+
+  v_link := drs_private.drs_line_complete_account_link_v1(
+    jsonb_build_object(
+      'provider_channel_id', p_input ->> 'provider_channel_id',
+      'nonce_digest', p_input ->> 'nonce_digest',
+      'line_user_digest', p_input ->> 'line_user_digest',
+      'line_user_ciphertext', p_input ->> 'line_user_ciphertext',
+      'line_user_iv', p_input ->> 'line_user_iv',
+      'encryption_key_version', p_input ->> 'encryption_key_version'
+    )
+  );
+  v_outcome := v_link ->> 'state';
+  if coalesce(v_outcome, '') not in (
+    'linked', 'expired', 'conflict_line_already_bound',
+    'conflict_drs_already_bound', 'specialist_inactive'
+  ) then
+    raise exception 'DRS_LINE_ATOMIC_LINK';
+  end if;
+
+  v_completion := drs_private.drs_line_complete_webhook_v1(
+    jsonb_build_object(
+      'webhook_event_digest', p_input ->> 'webhook_event_digest',
+      'claim_token', p_input ->> 'claim_token',
+      'safe_outcome', v_outcome
+    )
+  );
+  if v_completion -> 'completed' is distinct from 'true'::jsonb
+    or v_completion ->> 'safe_outcome' is distinct from v_outcome
+  then
+    raise exception 'DRS_LINE_ATOMIC_LINK';
+  end if;
+  return v_completion;
 exception
   when others then
     return jsonb_build_object('completed', false);
@@ -1911,6 +1977,8 @@ alter function drs_private.drs_line_claim_webhook_v1(jsonb)
   owner to postgres;
 alter function drs_private.drs_line_complete_webhook_v1(jsonb)
   owner to postgres;
+alter function drs_private.drs_line_complete_account_link_event_v1(jsonb)
+  owner to postgres;
 alter function drs_private.drs_line_admit_case_notification_v1(jsonb)
   owner to postgres;
 alter function drs_private.drs_line_claim_notification_v1(jsonb)
@@ -1944,6 +2012,8 @@ revoke all on function drs_private.drs_line_unlink_by_line_identity_v1(jsonb)
 revoke all on function drs_private.drs_line_claim_webhook_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function drs_private.drs_line_complete_webhook_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function drs_private.drs_line_complete_account_link_event_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function drs_private.drs_line_admit_case_notification_v1(jsonb)
   from public, anon, authenticated;
@@ -1981,6 +2051,8 @@ grant execute on function drs_private.drs_line_unlink_by_line_identity_v1(jsonb)
 grant execute on function drs_private.drs_line_claim_webhook_v1(jsonb)
   to service_role;
 grant execute on function drs_private.drs_line_complete_webhook_v1(jsonb)
+  to service_role;
+grant execute on function drs_private.drs_line_complete_account_link_event_v1(jsonb)
   to service_role;
 grant execute on function drs_private.drs_line_admit_case_notification_v1(jsonb)
   to service_role;
@@ -2021,6 +2093,11 @@ as $$ select drs_private.drs_line_claim_webhook_v1(p_input) $$;
 create or replace function public.drs_line_complete_webhook_v1(p_input jsonb)
 returns jsonb language sql security definer set search_path = ''
 as $$ select drs_private.drs_line_complete_webhook_v1(p_input) $$;
+create or replace function public.drs_line_complete_account_link_event_v1(
+  p_input jsonb
+)
+returns jsonb language sql security definer set search_path = ''
+as $$ select drs_private.drs_line_complete_account_link_event_v1(p_input) $$;
 create or replace function public.drs_line_admit_case_notification_v1(p_input jsonb)
 returns jsonb language sql security definer set search_path = ''
 as $$ select drs_private.drs_line_admit_case_notification_v1(p_input) $$;
@@ -2043,6 +2120,8 @@ alter function public.drs_line_unlink_account_v1(jsonb) owner to postgres;
 alter function public.drs_line_unlink_by_line_identity_v1(jsonb) owner to postgres;
 alter function public.drs_line_claim_webhook_v1(jsonb) owner to postgres;
 alter function public.drs_line_complete_webhook_v1(jsonb) owner to postgres;
+alter function public.drs_line_complete_account_link_event_v1(jsonb)
+  owner to postgres;
 alter function public.drs_line_admit_case_notification_v1(jsonb) owner to postgres;
 alter function public.drs_line_claim_notification_v1(jsonb) owner to postgres;
 alter function public.drs_line_assert_notification_claim_v1(jsonb) owner to postgres;
@@ -2065,6 +2144,8 @@ revoke all on function public.drs_line_unlink_by_line_identity_v1(jsonb)
 revoke all on function public.drs_line_claim_webhook_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function public.drs_line_complete_webhook_v1(jsonb)
+  from public, anon, authenticated;
+revoke all on function public.drs_line_complete_account_link_event_v1(jsonb)
   from public, anon, authenticated;
 revoke all on function public.drs_line_admit_case_notification_v1(jsonb)
   from public, anon, authenticated;
@@ -2092,6 +2173,8 @@ grant execute on function public.drs_line_unlink_by_line_identity_v1(jsonb)
 grant execute on function public.drs_line_claim_webhook_v1(jsonb)
   to service_role;
 grant execute on function public.drs_line_complete_webhook_v1(jsonb)
+  to service_role;
+grant execute on function public.drs_line_complete_account_link_event_v1(jsonb)
   to service_role;
 grant execute on function public.drs_line_admit_case_notification_v1(jsonb)
   to service_role;
