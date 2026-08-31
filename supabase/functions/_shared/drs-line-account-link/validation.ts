@@ -1,11 +1,11 @@
 import {
-  LINE_LINK_STATES,
   type AccountLinkEvent,
+  LINE_LINK_STATES,
   type LineBindingActionEvent,
-  type LineUnlinkActionEvent,
   type LineLinkNextAction,
   type LineLinkState,
   type LineLinkStatusDto,
+  type LineUnlinkActionEvent,
   type LineWebhookEnvelope,
   type LineWebhookEvent,
 } from "./contracts.ts";
@@ -42,9 +42,7 @@ function hasExactOwnKeys(
   try {
     const keys = Object.keys(input);
     return keys.length === expected.length &&
-      expected.every((key) =>
-        Object.prototype.hasOwnProperty.call(input, key)
-      );
+      expected.every((key) => Object.prototype.hasOwnProperty.call(input, key));
   } catch {
     return false;
   }
@@ -228,13 +226,15 @@ function readDeliveryContext(input: unknown): boolean | null {
 
 function readCommonEvent(
   input: Record<string, unknown>,
-): Readonly<{
-  webhookEventId: string;
-  replyToken: string;
-  lineUserId: string;
-  timestamp: number;
-  isRedelivery: boolean;
-}> | null {
+):
+  | Readonly<{
+    webhookEventId: string;
+    replyToken: string;
+    lineUserId: string;
+    timestamp: number;
+    isRedelivery: boolean;
+  }>
+  | null {
   if (own(input, "mode") !== "active") return null;
   const webhookEventId = own(input, "webhookEventId");
   const replyToken = own(input, "replyToken");
@@ -305,7 +305,9 @@ function readBindingMessage(
       ["id", "type", "text"],
       ["id", "type", "quoteToken", "text"],
     ]) || own(message, "type") !== "text" ||
-    ![EXACT_BINDING_TEXT, EXACT_UNLINK_TEXT].includes(String(own(message, "text"))) ||
+    ![EXACT_BINDING_TEXT, EXACT_UNLINK_TEXT].includes(
+      String(own(message, "text")),
+    ) ||
     !isBoundedString(own(message, "id"), 1, 128) ||
     (Object.prototype.hasOwnProperty.call(message, "quoteToken") &&
       !isBoundedString(own(message, "quoteToken"), 1, 256))

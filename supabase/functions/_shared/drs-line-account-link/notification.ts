@@ -11,27 +11,29 @@ import {
   LineProviderError,
 } from "./line-client.ts";
 
-type NotificationClaim = Readonly<{
-  admitted: true;
-  outboxId: string;
-  claimToken: string;
-  bindingVersion: string;
-  lineUserCiphertext: string;
-  lineUserIv: string;
-  encryptionKeyVersion: string;
-  caseLabel: string;
-  caseStatus: string;
-  nextAction: string;
-  casePath: string;
-}> | Readonly<{
-  admitted: false;
-  state:
-    | "empty"
-    | "suppressed_authority"
-    | "permanent_failure"
-    | "temporarily_unavailable"
-    | "permission_denied";
-}>;
+type NotificationClaim =
+  | Readonly<{
+    admitted: true;
+    outboxId: string;
+    claimToken: string;
+    bindingVersion: string;
+    lineUserCiphertext: string;
+    lineUserIv: string;
+    encryptionKeyVersion: string;
+    caseLabel: string;
+    caseStatus: string;
+    nextAction: string;
+    casePath: string;
+  }>
+  | Readonly<{
+    admitted: false;
+    state:
+      | "empty"
+      | "suppressed_authority"
+      | "permanent_failure"
+      | "temporarily_unavailable"
+      | "permission_denied";
+  }>;
 
 type NotificationCompletion = Readonly<{
   outboxId: string;
@@ -46,7 +48,9 @@ type NotificationCompletion = Readonly<{
 
 export interface NotificationRepository {
   claimNext(): Promise<unknown>;
-  assertCurrent(input: Readonly<{ outboxId: string; claimToken: string }>): Promise<unknown>;
+  assertCurrent(
+    input: Readonly<{ outboxId: string; claimToken: string }>,
+  ): Promise<unknown>;
   complete(input: NotificationCompletion): Promise<unknown>;
 }
 
@@ -85,19 +89,27 @@ const CLAIM_KEYS = Object.freeze([
   "casePath",
 ]);
 
-function exactOwnKeys(input: unknown, keys: readonly string[]): input is Record<string, unknown> {
-  if (input === null || typeof input !== "object" || Array.isArray(input)) return false;
+function exactOwnKeys(
+  input: unknown,
+  keys: readonly string[],
+): input is Record<string, unknown> {
+  if (input === null || typeof input !== "object" || Array.isArray(input)) {
+    return false;
+  }
   const actual = Object.keys(input);
-  return actual.length === keys.length && keys.every((key) =>
-    Object.prototype.hasOwnProperty.call(input, key)
-  );
+  return actual.length === keys.length &&
+    keys.every((key) => Object.prototype.hasOwnProperty.call(input, key));
 }
 
 function own(input: Record<string, unknown>, key: string): unknown {
   return Object.getOwnPropertyDescriptor(input, key)?.value;
 }
 
-function safeText(value: unknown, minimum: number, maximum: number): value is string {
+function safeText(
+  value: unknown,
+  minimum: number,
+  maximum: number,
+): value is string {
   return typeof value === "string" && value.length >= minimum &&
     value.length <= maximum && !hasAsciiControl(value);
 }
@@ -123,15 +135,20 @@ function safeCasePath(value: unknown): value is string {
 }
 
 function readClaim(input: unknown): NotificationClaim {
-  if (exactOwnKeys(input, ["admitted", "state"]) && own(input, "admitted") === false) {
+  if (
+    exactOwnKeys(input, ["admitted", "state"]) &&
+    own(input, "admitted") === false
+  ) {
     const state = own(input, "state");
-    if ([
-      "empty",
-      "suppressed_authority",
-      "permanent_failure",
-      "temporarily_unavailable",
-      "permission_denied",
-    ].includes(String(state))) {
+    if (
+      [
+        "empty",
+        "suppressed_authority",
+        "permanent_failure",
+        "temporarily_unavailable",
+        "permission_denied",
+      ].includes(String(state))
+    ) {
       return Object.freeze({ admitted: false, state } as NotificationClaim);
     }
   }
@@ -152,9 +169,12 @@ function readClaim(input: unknown): NotificationClaim {
     typeof outboxId !== "string" || !UUID_PATTERN.test(outboxId) ||
     typeof claimToken !== "string" || !UUID_PATTERN.test(claimToken) ||
     typeof bindingVersion !== "string" || !/^\d{1,20}$/u.test(bindingVersion) ||
-    typeof lineUserCiphertext !== "string" || !/^[A-Za-z0-9_-]{24,1024}$/u.test(lineUserCiphertext) ||
-    typeof lineUserIv !== "string" || !/^[A-Za-z0-9_-]{16}$/u.test(lineUserIv) ||
-    typeof encryptionKeyVersion !== "string" || !/^[A-Za-z0-9._-]{1,64}$/u.test(encryptionKeyVersion) ||
+    typeof lineUserCiphertext !== "string" ||
+    !/^[A-Za-z0-9_-]{24,1024}$/u.test(lineUserCiphertext) ||
+    typeof lineUserIv !== "string" ||
+    !/^[A-Za-z0-9_-]{16}$/u.test(lineUserIv) ||
+    typeof encryptionKeyVersion !== "string" ||
+    !/^[A-Za-z0-9._-]{1,64}$/u.test(encryptionKeyVersion) ||
     !safeText(caseLabel, 1, 80) || !safeText(caseStatus, 1, 120) ||
     !safeText(nextAction, 1, 160) || !safeCasePath(casePath)
   ) throw new Error("invalid_notification_claim");
@@ -174,7 +194,9 @@ function readClaim(input: unknown): NotificationClaim {
 }
 
 function completionAccepted(input: unknown, state: string): boolean {
-  if (input === null || typeof input !== "object" || Array.isArray(input)) return false;
+  if (input === null || typeof input !== "object" || Array.isArray(input)) {
+    return false;
+  }
   return Object.getOwnPropertyDescriptor(input, "completed")?.value === true &&
     (Object.getOwnPropertyDescriptor(input, "state")?.value === state);
 }
@@ -209,7 +231,9 @@ export function createPrivateNotificationDispatcher(
     const start = clock();
     let completion: NotificationCompletion;
     let expectedState: DispatchResult["state"];
-    if (claim.encryptionKeyVersion !== dependencies.identityEncryptionKeyVersion) {
+    if (
+      claim.encryptionKeyVersion !== dependencies.identityEncryptionKeyVersion
+    ) {
       completion = Object.freeze({
         outboxId: claim.outboxId,
         claimToken: claim.claimToken,
@@ -224,10 +248,13 @@ export function createPrivateNotificationDispatcher(
     } else {
       let lineUserId: string;
       try {
-        lineUserId = await decryptLineUserId(dependencies.identityEncryptionKey, {
-          ciphertext: claim.lineUserCiphertext,
-          iv: claim.lineUserIv,
-        });
+        lineUserId = await decryptLineUserId(
+          dependencies.identityEncryptionKey,
+          {
+            ciphertext: claim.lineUserCiphertext,
+            iv: claim.lineUserIv,
+          },
+        );
       } catch {
         completion = Object.freeze({
           outboxId: claim.outboxId,
@@ -241,7 +268,9 @@ export function createPrivateNotificationDispatcher(
         });
         expectedState = "permanent_failure";
         const result = await dependencies.repository.complete(completion);
-        if (!completionAccepted(result, expectedState)) throw new Error("notification_completion_failed");
+        if (!completionAccepted(result, expectedState)) {
+          throw new Error("notification_completion_failed");
+        }
         return Object.freeze({ state: expectedState });
       }
       const message: LineCaseNotification = Object.freeze({
@@ -277,7 +306,9 @@ export function createPrivateNotificationDispatcher(
         expectedState = "accepted";
       } catch (error) {
         const retryable = error instanceof LineProviderError &&
-          ["provider_rate_limited", "provider_unavailable"].includes(error.code);
+          ["provider_rate_limited", "provider_unavailable"].includes(
+            error.code,
+          );
         completion = Object.freeze({
           outboxId: claim.outboxId,
           claimToken: claim.claimToken,
@@ -286,7 +317,9 @@ export function createPrivateNotificationDispatcher(
             ? error.statusClass
             : "none",
           providerRequestId: "",
-          reasonCode: error instanceof LineProviderError ? error.code : "provider_unavailable",
+          reasonCode: error instanceof LineProviderError
+            ? error.code
+            : "provider_unavailable",
           durationMs: boundedDuration(start, clock()),
           retryAfterSeconds: retryable ? 60 : 0,
         });
@@ -320,21 +353,29 @@ function createSupabaseNotificationRepository(
     throw new Error("notification_runtime_unavailable");
   }
   async function invoke(name: string, pInput: Record<string, unknown>) {
-    const response = await fetchImplementation(`${supabaseUrl}/rest/v1/rpc/${name}`, {
-      method: "POST",
-      headers: {
-        apikey: serviceRoleKey,
-        authorization: `Bearer ${serviceRoleKey}`,
-        "content-type": "application/json",
+    const response = await fetchImplementation(
+      `${supabaseUrl}/rest/v1/rpc/${name}`,
+      {
+        method: "POST",
+        headers: {
+          apikey: serviceRoleKey,
+          authorization: `Bearer ${serviceRoleKey}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ p_input: pInput }),
       },
-      body: JSON.stringify({ p_input: pInput }),
-    });
+    );
     const raw = await response.text();
-    if (!response.ok || new TextEncoder().encode(raw).byteLength > MAX_RPC_RESPONSE_BYTES) {
+    if (
+      !response.ok ||
+      new TextEncoder().encode(raw).byteLength > MAX_RPC_RESPONSE_BYTES
+    ) {
       throw new Error("notification_runtime_unavailable");
     }
     const parsed = JSON.parse(raw);
-    if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    if (
+      parsed === null || typeof parsed !== "object" || Array.isArray(parsed)
+    ) {
       throw new Error("notification_runtime_unavailable");
     }
     return parsed as Record<string, unknown>;
@@ -384,11 +425,16 @@ function createSupabaseNotificationRepository(
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   const parts = token.split(".");
-  if (parts.length !== 3 || parts.some((part) => !/^[A-Za-z0-9_-]+$/u.test(part))) return null;
+  if (
+    parts.length !== 3 || parts.some((part) => !/^[A-Za-z0-9_-]+$/u.test(part))
+  ) return null;
   try {
     const bytes = base64UrlDecode(parts[1]);
-    const parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
-    return parsed !== null && typeof parsed === "object" && !Array.isArray(parsed)
+    const parsed = JSON.parse(
+      new TextDecoder("utf-8", { fatal: true }).decode(bytes),
+    );
+    return parsed !== null && typeof parsed === "object" &&
+        !Array.isArray(parsed)
       ? parsed as Record<string, unknown>
       : null;
   } catch {
@@ -398,10 +444,12 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 
 function gatewayVerifiedServiceRole(request: Request): boolean {
   const authorization = request.headers.get("authorization") ?? "";
-  const match = /^Bearer ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/u.exec(authorization);
+  const match = /^Bearer ([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)$/u
+    .exec(authorization);
   if (!match) return false;
   const claims = decodeJwtPayload(match[1]);
-  return claims !== null && Object.getOwnPropertyDescriptor(claims, "role")?.value === "service_role";
+  return claims !== null &&
+    Object.getOwnPropertyDescriptor(claims, "role")?.value === "service_role";
 }
 
 async function runtimeHandlerDependencies(): Promise<HandlerDependencies> {
@@ -420,7 +468,10 @@ async function runtimeHandlerDependencies(): Promise<HandlerDependencies> {
     identityEncryptionKeyVersion: version,
     publicOrigin,
   });
-  return Object.freeze({ authorizeService: gatewayVerifiedServiceRole, dispatcher });
+  return Object.freeze({
+    authorizeService: gatewayVerifiedServiceRole,
+    dispatcher,
+  });
 }
 
 async function exactDispatchRequest(request: Request): Promise<boolean> {
@@ -429,7 +480,8 @@ async function exactDispatchRequest(request: Request): Promise<boolean> {
     request.method !== "POST" ||
     url.pathname !== "/functions/v1/drs-line-private-notification-dispatch" ||
     url.search !== "" ||
-    request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() !==
+    request.headers.get("content-type")?.split(";", 1)[0].trim()
+        .toLowerCase() !==
       "application/json"
   ) return false;
   const raw = await request.text();
@@ -447,13 +499,17 @@ export function createPrivateNotificationDispatchHandler(
 ): (request: Request) => Promise<Response> {
   return async (request: Request): Promise<Response> => {
     if (!await exactDispatchRequest(request.clone())) {
-      return Response.json({ state: "temporarily_unavailable" }, { status: 400 });
+      return Response.json({ state: "temporarily_unavailable" }, {
+        status: 400,
+      });
     }
     let dependencies: HandlerDependencies;
     try {
       dependencies = injected ?? await runtimeHandlerDependencies();
     } catch {
-      return Response.json({ state: "temporarily_unavailable" }, { status: 503 });
+      return Response.json({ state: "temporarily_unavailable" }, {
+        status: 503,
+      });
     }
     if (!dependencies.authorizeService(request)) {
       return Response.json({ state: "permission_denied" }, { status: 401 });
@@ -464,7 +520,9 @@ export function createPrivateNotificationDispatchHandler(
         headers: { "cache-control": "no-store" },
       });
     } catch {
-      return Response.json({ state: "temporarily_unavailable" }, { status: 503 });
+      return Response.json({ state: "temporarily_unavailable" }, {
+        status: 503,
+      });
     }
   };
 }

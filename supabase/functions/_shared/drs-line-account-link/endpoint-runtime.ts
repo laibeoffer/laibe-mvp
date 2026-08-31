@@ -43,7 +43,9 @@ function runtimeEnv(name: string): string {
   }
 }
 
-function requestContract(name: LineAccountLinkEndpointName): DrsBffRequestContract {
+function requestContract(
+  name: LineAccountLinkEndpointName,
+): DrsBffRequestContract {
   return Object.freeze({
     method: name === "status" ? "GET" : "POST",
     pathname: PATHS[name],
@@ -52,7 +54,8 @@ function requestContract(name: LineAccountLinkEndpointName): DrsBffRequestContra
         name: "linkToken",
         scalarType: "string" as const,
         validate: (value: string | number | boolean) =>
-          typeof value === "string" && value.length >= 1 && value.length <= 512 &&
+          typeof value === "string" && value.length >= 1 &&
+          value.length <= 512 &&
           !hasUnsafeLinkTokenByte(value),
       })])
       : Object.freeze([]),

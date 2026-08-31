@@ -6,7 +6,10 @@ import {
 } from "./crypto.ts";
 import { createLineClient, type LineClient } from "./line-client.ts";
 import { verifyLineSignature } from "./signature.ts";
-import { readLineWebhookEnvelope, sanitizeLineLinkStatus } from "./validation.ts";
+import {
+  readLineWebhookEnvelope,
+  sanitizeLineLinkStatus,
+} from "./validation.ts";
 
 type SafeWebhookOutcome =
   | "verified"
@@ -28,8 +31,12 @@ type WebhookClaim =
     claimToken: string;
     providerRetryKey: string;
   }>
-  | Readonly<{ admission: "already_completed"; safeOutcome: SafeWebhookOutcome }>
-  | Readonly<{ admission: "in_progress" | "rejected" | "temporarily_unavailable" }>;
+  | Readonly<
+    { admission: "already_completed"; safeOutcome: SafeWebhookOutcome }
+  >
+  | Readonly<
+    { admission: "in_progress" | "rejected" | "temporarily_unavailable" }
+  >;
 
 type ClaimInput = Readonly<{
   webhookEventDigest: string;
@@ -50,10 +57,12 @@ type CompleteAccountLinkInput = Readonly<{
   encryptionKeyVersion: string;
 }>;
 
-type CompleteAccountLinkEventInput = CompleteAccountLinkInput & Readonly<{
-  webhookEventDigest: string;
-  claimToken: string;
-}>;
+type CompleteAccountLinkEventInput =
+  & CompleteAccountLinkInput
+  & Readonly<{
+    webhookEventDigest: string;
+    claimToken: string;
+  }>;
 
 type UnlinkByLineIdentityInput = Readonly<{
   lineUserDigest: string;
@@ -62,7 +71,9 @@ type UnlinkByLineIdentityInput = Readonly<{
 export interface LineWebhookRepository {
   claimEvent(input: ClaimInput): Promise<WebhookClaim>;
   completeEvent(input: CompletionInput): Promise<unknown>;
-  completeAccountLinkEvent(input: CompleteAccountLinkEventInput): Promise<unknown>;
+  completeAccountLinkEvent(
+    input: CompleteAccountLinkEventInput,
+  ): Promise<unknown>;
   unlinkByLineIdentity(input: UnlinkByLineIdentityInput): Promise<unknown>;
 }
 
@@ -99,7 +110,10 @@ function runtimeEnvironment(): RuntimeEnvironment | undefined {
 
 async function boundedBody(request: Request): Promise<Uint8Array> {
   const declared = request.headers.get("content-length");
-  if (declared !== null && (!/^\d+$/u.test(declared) || Number(declared) > MAX_BODY_BYTES)) {
+  if (
+    declared !== null &&
+    (!/^\d+$/u.test(declared) || Number(declared) > MAX_BODY_BYTES)
+  ) {
     throw new RangeError("body_too_large");
   }
   if (request.body === null) return new Uint8Array();
@@ -139,10 +153,13 @@ function exactWebhookRequest(request: Request): boolean {
 }
 
 function completed(input: unknown, expected: SafeWebhookOutcome): boolean {
-  if (input === null || typeof input !== "object" || Array.isArray(input)) return false;
+  if (input === null || typeof input !== "object" || Array.isArray(input)) {
+    return false;
+  }
   const descriptor = Object.getOwnPropertyDescriptor(input, "completed")?.value;
-  const outcome = Object.getOwnPropertyDescriptor(input, "safeOutcome")?.value ??
-    Object.getOwnPropertyDescriptor(input, "safe_outcome")?.value;
+  const outcome =
+    Object.getOwnPropertyDescriptor(input, "safeOutcome")?.value ??
+      Object.getOwnPropertyDescriptor(input, "safe_outcome")?.value;
   return descriptor === true && outcome === expected;
 }
 
@@ -160,7 +177,9 @@ function stableOutcome(state: string): SafeWebhookOutcome | null {
 
 async function processEvent(
   dependencies: LineWebhookDependencies,
-  event: NonNullable<ReturnType<typeof readLineWebhookEnvelope>>["events"][number],
+  event: NonNullable<
+    ReturnType<typeof readLineWebhookEnvelope>
+  >["events"][number],
 ): Promise<void> {
   const eventDigest = await hmacIdentityDigest(
     dependencies.identityHmacKey,
@@ -175,8 +194,13 @@ async function processEvent(
 
   let outcome: SafeWebhookOutcome;
   if (event.kind === "binding_action") {
-    const linkToken = await dependencies.lineClient.issueLinkToken(event.lineUserId);
-    const linkingUrl = new URL("/drs/line-account-link", dependencies.publicOrigin);
+    const linkToken = await dependencies.lineClient.issueLinkToken(
+      event.lineUserId,
+    );
+    const linkingUrl = new URL(
+      "/drs/line-account-link",
+      dependencies.publicOrigin,
+    );
     linkingUrl.searchParams.set("linkToken", linkToken);
     await dependencies.lineClient.pushAccountLink(
       event.lineUserId,
@@ -229,7 +253,10 @@ async function processEvent(
         Object.getOwnPropertyDescriptor(result, "safe_outcome")?.value
       : null;
     const accepted = stableOutcome(String(candidate));
-    if (!completed(result, accepted ?? "temporarily_unavailable") || accepted === null) {
+    if (
+      !completed(result, accepted ?? "temporarily_unavailable") ||
+      accepted === null
+    ) {
       throw new Error("account_link_not_completed");
     }
     return;
@@ -243,7 +270,8 @@ async function processEvent(
 }
 
 function validDependencies(input: LineWebhookDependencies): boolean {
-  return input.channelSecret.length >= 16 && input.identityHmacKey.length >= 16 &&
+  return input.channelSecret.length >= 16 &&
+    input.identityHmacKey.length >= 16 &&
     /^[A-Za-z0-9._-]{1,64}$/u.test(input.identityEncryptionKeyVersion) &&
     /^https:\/\/[^/]+$/u.test(input.publicOrigin) &&
     typeof input.repository?.claimEvent === "function" &&
@@ -277,12 +305,17 @@ function createSupabaseWebhookRepository(
       },
     );
     const raw = await response.text();
-    if (!response.ok || new TextEncoder().encode(raw).byteLength > MAX_RPC_RESPONSE_BYTES) {
+    if (
+      !response.ok ||
+      new TextEncoder().encode(raw).byteLength > MAX_RPC_RESPONSE_BYTES
+    ) {
       throw new Error("runtime_unavailable");
     }
     try {
       const parsed = JSON.parse(raw);
-      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+      if (
+        parsed === null || typeof parsed !== "object" || Array.isArray(parsed)
+      ) {
         throw new Error("invalid_response");
       }
       return parsed as Record<string, unknown>;
@@ -316,7 +349,11 @@ function createSupabaseWebhookRepository(
           safeOutcome: result.safe_outcome as SafeWebhookOutcome,
         });
       }
-      if (["in_progress", "rejected", "temporarily_unavailable"].includes(String(admission))) {
+      if (
+        ["in_progress", "rejected", "temporarily_unavailable"].includes(
+          String(admission),
+        )
+      ) {
         return Object.freeze({ admission } as WebhookClaim);
       }
       throw new Error("runtime_unavailable");
@@ -390,21 +427,27 @@ export function createLineWebhookHandler(
     } catch {
       return json(503);
     }
-    if (!await verifyLineSignature(
-      rawBody,
-      request.headers.get("x-line-signature"),
-      dependencies.channelSecret,
-    )) return json(401);
+    if (
+      !await verifyLineSignature(
+        rawBody,
+        request.headers.get("x-line-signature"),
+        dependencies.channelSecret,
+      )
+    ) return json(401);
     let payload: unknown;
     try {
-      payload = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(rawBody));
+      payload = JSON.parse(
+        new TextDecoder("utf-8", { fatal: true }).decode(rawBody),
+      );
     } catch {
       return json(400);
     }
     const envelope = readLineWebhookEnvelope(payload);
     if (!envelope) return json(400);
     try {
-      for (const event of envelope.events) await processEvent(dependencies, event);
+      for (const event of envelope.events) {
+        await processEvent(dependencies, event);
+      }
       return json(200);
     } catch {
       return json(503);

@@ -1,17 +1,19 @@
-export const LINE_LINK_STATES = Object.freeze([
-  "not_linked",
-  "awaiting_line_confirmation",
-  "linked",
-  "expired",
-  "cancelled",
-  "conflict_line_already_bound",
-  "conflict_drs_already_bound",
-  "permission_denied",
-  "specialist_inactive",
-  "temporarily_unavailable",
-  "unlinking",
-  "revoked",
-] as const);
+export const LINE_LINK_STATES = Object.freeze(
+  [
+    "not_linked",
+    "awaiting_line_confirmation",
+    "linked",
+    "expired",
+    "cancelled",
+    "conflict_line_already_bound",
+    "conflict_drs_already_bound",
+    "permission_denied",
+    "specialist_inactive",
+    "temporarily_unavailable",
+    "unlinking",
+    "revoked",
+  ] as const,
+);
 
 export type LineLinkState = (typeof LINE_LINK_STATES)[number];
 export type LineLinkNextAction =

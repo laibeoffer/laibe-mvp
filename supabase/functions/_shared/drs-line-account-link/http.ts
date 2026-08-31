@@ -50,7 +50,9 @@ async function exactRequest(
       throw new DrsIdentityError("INVALID_REQUEST", 400);
     }
     const value = entries[0][1];
-    if (value.length < 1 || value.length > 512 || hasUnsafeLinkTokenByte(value)) {
+    if (
+      value.length < 1 || value.length > 512 || hasUnsafeLinkTokenByte(value)
+    ) {
       throw new DrsIdentityError("INVALID_REQUEST", 400);
     }
   }
@@ -84,9 +86,17 @@ async function exactRequest(
 
 function failureResponse(error: unknown): Response {
   if (error instanceof DrsIdentityError) {
-    const status = error.status === 401 ? 401 : error.status === 400 ? 400 : 403;
+    const status = error.status === 401
+      ? 401
+      : error.status === 400
+      ? 400
+      : 403;
     return json(
-      { state: status === 401 || status === 403 ? "permission_denied" : "temporarily_unavailable" },
+      {
+        state: status === 401 || status === 403
+          ? "permission_denied"
+          : "temporarily_unavailable",
+      },
       status,
     );
   }
@@ -101,7 +111,12 @@ function createStatusHandler(
 ) {
   return async (request: Request): Promise<Response> => {
     try {
-      await exactRequest(request.clone(), dependencies.allowedOrigin, method, pathname);
+      await exactRequest(
+        request.clone(),
+        dependencies.allowedOrigin,
+        method,
+        pathname,
+      );
       const authority = await dependencies.guard.authorize(request);
       return json(await dependencies.service[operation](authority));
     } catch (error) {
@@ -156,9 +171,14 @@ export function createLineLinkContinueHandler(dependencies: Dependencies) {
         "/functions/v1/drs-line-account-link-continue",
         "linkToken",
       );
-      if (linkToken === null) throw new DrsIdentityError("INVALID_REQUEST", 400);
+      if (linkToken === null) {
+        throw new DrsIdentityError("INVALID_REQUEST", 400);
+      }
       const authority = await dependencies.guard.authorize(request);
-      const location = await dependencies.service.continueLink(authority, linkToken);
+      const location = await dependencies.service.continueLink(
+        authority,
+        linkToken,
+      );
       return new Response(null, {
         status: 303,
         headers: {

@@ -107,7 +107,9 @@ export function createSupabaseDrsLineAccountLinkRepository(
     }
     try {
       const parsed = JSON.parse(raw);
-      if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+      if (
+        parsed === null || typeof parsed !== "object" || Array.isArray(parsed)
+      ) {
         throw new Error("invalid_rpc_response");
       }
       return parsed;

@@ -1,5 +1,9 @@
 import type { DrsBffAuthorizedContext } from "../drs-auth/drs-session-bootstrap-bff.ts";
-import { base64UrlEncode, hmacIdentityDigest, randomProtocolValue } from "./crypto.ts";
+import {
+  base64UrlEncode,
+  hmacIdentityDigest,
+  randomProtocolValue,
+} from "./crypto.ts";
 import type { LineLinkStatusDto } from "./contracts.ts";
 import type {
   LineAccountLinkAuthority,
@@ -26,7 +30,8 @@ function projectAuthority(
 }
 
 function validLinkToken(value: string): boolean {
-  return typeof value === "string" && value.length >= 1 && value.length <= 512 &&
+  return typeof value === "string" && value.length >= 1 &&
+    value.length <= 512 &&
     !hasUnsafeAscii(value, true);
 }
 
@@ -45,14 +50,20 @@ export function createLineAccountLinkService(options: ServiceOptions) {
     operation: "startIntent" | "readStatus" | "cancelIntent" | "unlink",
     context: DrsBffAuthorizedContext,
   ): Promise<LineLinkStatusDto> {
-    const result = await options.repository[operation](projectAuthority(context));
+    const result = await options.repository[operation](
+      projectAuthority(context),
+    );
     return sanitizeLineLinkStatus(result);
   }
   return Object.freeze({
-    start: (context: DrsBffAuthorizedContext) => statusOperation("startIntent", context),
-    status: (context: DrsBffAuthorizedContext) => statusOperation("readStatus", context),
-    cancel: (context: DrsBffAuthorizedContext) => statusOperation("cancelIntent", context),
-    unlink: (context: DrsBffAuthorizedContext) => statusOperation("unlink", context),
+    start: (context: DrsBffAuthorizedContext) =>
+      statusOperation("startIntent", context),
+    status: (context: DrsBffAuthorizedContext) =>
+      statusOperation("readStatus", context),
+    cancel: (context: DrsBffAuthorizedContext) =>
+      statusOperation("cancelIntent", context),
+    unlink: (context: DrsBffAuthorizedContext) =>
+      statusOperation("unlink", context),
     async continueLink(
       context: DrsBffAuthorizedContext,
       linkToken: string,
@@ -74,7 +85,8 @@ export function createLineAccountLinkService(options: ServiceOptions) {
       const prepared = await options.repository.prepareNonce({
         authority: projectAuthority(context),
         nonceDigest,
-        nonceExpiresAt: new Date(current.getTime() + 9 * 60 * 1000).toISOString(),
+        nonceExpiresAt: new Date(current.getTime() + 9 * 60 * 1000)
+          .toISOString(),
       });
       if (
         prepared === null || typeof prepared !== "object" ||

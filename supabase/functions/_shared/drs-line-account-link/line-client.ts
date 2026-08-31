@@ -56,7 +56,11 @@ export type LineClientDependencies = Readonly<{
   fetch?: typeof fetch;
 }>;
 
-function isSafeText(value: unknown, minimum: number, maximum: number): value is string {
+function isSafeText(
+  value: unknown,
+  minimum: number,
+  maximum: number,
+): value is string {
   return typeof value === "string" && value.length >= minimum &&
     value.length <= maximum && !hasAsciiControl(value);
 }
@@ -70,7 +74,9 @@ function hasAsciiControl(value: string): boolean {
 }
 
 function isSafeHttpsUrl(value: unknown, maximum = 1024): value is string {
-  if (typeof value !== "string" || value.length === 0 || value.length > maximum) {
+  if (
+    typeof value !== "string" || value.length === 0 || value.length > maximum
+  ) {
     return false;
   }
   try {
@@ -107,7 +113,8 @@ async function boundedJson(response: Response): Promise<unknown> {
   const declaredLength = response.headers.get("content-length");
   if (
     declaredLength !== null &&
-    (!/^\d+$/u.test(declaredLength) || Number(declaredLength) > MAX_PROVIDER_RESPONSE_BYTES)
+    (!/^\d+$/u.test(declaredLength) ||
+      Number(declaredLength) > MAX_PROVIDER_RESPONSE_BYTES)
   ) throw new LineProviderError("provider_invalid_response");
   const bytes = new Uint8Array(await response.arrayBuffer());
   if (bytes.byteLength > MAX_PROVIDER_RESPONSE_BYTES) {
@@ -134,10 +141,13 @@ function exactLinkToken(input: unknown): string | null {
 
 function exactEmptyObject(input: unknown): boolean {
   return input !== null && typeof input === "object" && !Array.isArray(input) &&
-    Object.getPrototypeOf(input) === Object.prototype && Object.keys(input).length === 0;
+    Object.getPrototypeOf(input) === Object.prototype &&
+    Object.keys(input).length === 0;
 }
 
-function hasExactNotificationKeys(input: unknown): input is LineCaseNotification {
+function hasExactNotificationKeys(
+  input: unknown,
+): input is LineCaseNotification {
   if (
     input === null || typeof input !== "object" || Array.isArray(input) ||
     Object.getPrototypeOf(input) !== Object.prototype
@@ -176,13 +186,11 @@ export function createLineClient(
     try {
       response = await fetcher(`${LINE_API_ORIGIN}${path}`, {
         method: "POST",
-        headers: body === undefined
-          ? { ...headers, ...additionalHeaders }
-          : {
-            ...headers,
-            ...additionalHeaders,
-            "content-type": "application/json; charset=utf-8",
-          },
+        headers: body === undefined ? { ...headers, ...additionalHeaders } : {
+          ...headers,
+          ...additionalHeaders,
+          "content-type": "application/json; charset=utf-8",
+        },
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch {
@@ -219,22 +227,27 @@ export function createLineClient(
         !LINE_USER_ID_PATTERN.test(lineUserId) ||
         !isSafeHttpsUrl(linkingUrl) || !UUID_PATTERN.test(retryKey)
       ) throw new LineProviderError("provider_invalid_request");
-      const result = await request("/v2/bot/message/push", {
-        to: lineUserId,
-        messages: [{
-          type: "template",
-          altText: "確認綁定 LINE 案件通知",
-          template: {
-            type: "buttons",
-            text: "請完成 LINE 案件通知綁定",
-            actions: [{
-              type: "uri",
-              label: "繼續綁定",
-              uri: linkingUrl,
-            }],
-          },
-        }],
-      }, { "x-line-retry-key": retryKey }, true);
+      const result = await request(
+        "/v2/bot/message/push",
+        {
+          to: lineUserId,
+          messages: [{
+            type: "template",
+            altText: "確認綁定 LINE 案件通知",
+            template: {
+              type: "buttons",
+              text: "請完成 LINE 案件通知綁定",
+              actions: [{
+                type: "uri",
+                label: "繼續綁定",
+                uri: linkingUrl,
+              }],
+            },
+          }],
+        },
+        { "x-line-retry-key": retryKey },
+        true,
+      );
       if (!exactEmptyObject(result.payload)) {
         throw new LineProviderError("provider_invalid_response");
       }
@@ -245,16 +258,23 @@ export function createLineClient(
       lineUserId: string,
       retryKey: string,
     ): Promise<Readonly<{ requestId: string | null }>> {
-      if (!LINE_USER_ID_PATTERN.test(lineUserId) || !UUID_PATTERN.test(retryKey)) {
+      if (
+        !LINE_USER_ID_PATTERN.test(lineUserId) || !UUID_PATTERN.test(retryKey)
+      ) {
         throw new LineProviderError("provider_invalid_request");
       }
-      const result = await request("/v2/bot/message/push", {
-        to: lineUserId,
-        messages: [{
-          type: "text",
-          text: "LINE 案件通知已解除。Gmail 登入與 DRS 身分不受影響。",
-        }],
-      }, { "x-line-retry-key": retryKey }, true);
+      const result = await request(
+        "/v2/bot/message/push",
+        {
+          to: lineUserId,
+          messages: [{
+            type: "text",
+            text: "LINE 案件通知已解除。Gmail 登入與 DRS 身分不受影響。",
+          }],
+        },
+        { "x-line-retry-key": retryKey },
+        true,
+      );
       if (!exactEmptyObject(result.payload)) {
         throw new LineProviderError("provider_invalid_response");
       }

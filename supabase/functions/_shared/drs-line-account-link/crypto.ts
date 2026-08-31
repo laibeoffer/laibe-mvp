@@ -48,7 +48,9 @@ export function base64UrlDecode(value: string): Uint8Array {
     const standard = value.replaceAll("-", "+").replaceAll("_", "/");
     const padded = standard.padEnd(Math.ceil(standard.length / 4) * 4, "=");
     const decoded = binaryToBytes(atob(padded));
-    if (base64UrlEncode(decoded) !== value) throw new Error("invalid_base64url");
+    if (base64UrlEncode(decoded) !== value) {
+      throw new Error("invalid_base64url");
+    }
     return decoded;
   } catch {
     throw new Error("invalid_base64url");

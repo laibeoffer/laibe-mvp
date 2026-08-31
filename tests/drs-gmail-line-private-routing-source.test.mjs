@@ -51,8 +51,7 @@ const lineNotificationUrl = new URL(
 const AUTHORITY = Object.freeze({
   authenticatedUserId: "00000000-0000-4000-8000-000000000001",
   specialistId: "00000000-0000-4000-8000-000000000002",
-  authorizationSubject:
-    "drs-specialist:00000000-0000-4000-8000-000000000002",
+  authorizationSubject: "drs-specialist:00000000-0000-4000-8000-000000000002",
   selectedCaseId: "00000000-0000-4000-8000-000000000003",
   caseStatus: "active",
   accessMode: "read_only",
@@ -229,9 +228,12 @@ test("webhook envelope admits only exact private-user binding actions and accoun
   const { readLineWebhookEnvelope } = await import(validationUrl.href);
   const envelope = readLineWebhookEnvelope({
     destination: LINE_USER_ID,
-    events: [textBindingEvent(), accountLinkEvent({
-      webhookEventId: "01HYYYYYYYYYYYYYYYYYYYYYYY",
-    })],
+    events: [
+      textBindingEvent(),
+      accountLinkEvent({
+        webhookEventId: "01HYYYYYYYYYYYYYYYYYYYYYYY",
+      }),
+    ],
   });
 
   assert.deepEqual(envelope, {
@@ -264,16 +266,22 @@ test("webhook envelope admits only exact private-user binding actions and accoun
 test("webhook envelope rejects unknown actions, oversized batches, and prototype authority", async () => {
   const { readLineWebhookEnvelope } = await import(validationUrl.href);
 
-  assert.equal(readLineWebhookEnvelope({
-    destination: LINE_USER_ID,
-    events: [textBindingEvent({
-      message: { id: "555001", type: "text", text: "DRS真人測試" },
-    })],
-  }), null);
-  assert.equal(readLineWebhookEnvelope({
-    destination: LINE_USER_ID,
-    events: Array.from({ length: 21 }, () => textBindingEvent()),
-  }), null);
+  assert.equal(
+    readLineWebhookEnvelope({
+      destination: LINE_USER_ID,
+      events: [textBindingEvent({
+        message: { id: "555001", type: "text", text: "DRS真人測試" },
+      })],
+    }),
+    null,
+  );
+  assert.equal(
+    readLineWebhookEnvelope({
+      destination: LINE_USER_ID,
+      events: Array.from({ length: 21 }, () => textBindingEvent()),
+    }),
+    null,
+  );
   const inherited = Object.create({
     destination: LINE_USER_ID,
     events: [textBindingEvent()],
@@ -297,8 +305,14 @@ test("LINE signature verification uses exact raw bytes and strict canonical Base
     false,
   );
   assert.equal(await verifyLineSignature(raw, `${signature}\n`, key), false);
-  assert.equal(await verifyLineSignature(raw, signature.replace(/=+$/u, ""), key), false);
-  assert.equal(await verifyLineSignature(raw, `${signature.slice(0, -1)}!`, key), false);
+  assert.equal(
+    await verifyLineSignature(raw, signature.replace(/=+$/u, ""), key),
+    false,
+  );
+  assert.equal(
+    await verifyLineSignature(raw, `${signature.slice(0, -1)}!`, key),
+    false,
+  );
   assert.equal(await verifyLineSignature(raw, null, key), false);
 });
 
@@ -320,8 +334,14 @@ test("protocol values, identity digests, and AES-GCM envelopes are cryptographic
   assert.throws(() => randomProtocolValue(15), /invalid_protocol_size/u);
   assert.deepEqual(base64UrlDecode(base64UrlEncode(first)), first);
 
-  const digestA = await hmacIdentityDigest("unit-test-identity-key", LINE_USER_ID);
-  const digestB = await hmacIdentityDigest("unit-test-identity-key", LINE_USER_ID);
+  const digestA = await hmacIdentityDigest(
+    "unit-test-identity-key",
+    LINE_USER_ID,
+  );
+  const digestB = await hmacIdentityDigest(
+    "unit-test-identity-key",
+    LINE_USER_ID,
+  );
   const digestOther = await hmacIdentityDigest(
     "unit-test-identity-key",
     "Uffffffffffffffffffffffffffffffff",
@@ -357,15 +377,24 @@ test("LINE client pins official endpoints and emits only approved request bodies
   const responses = [
     new Response(JSON.stringify({ linkToken: "one-time-link-value" }), {
       status: 200,
-      headers: { "content-type": "application/json", "x-line-request-id": "req-1" },
+      headers: {
+        "content-type": "application/json",
+        "x-line-request-id": "req-1",
+      },
     }),
     new Response("{}", {
       status: 200,
-      headers: { "content-type": "application/json", "x-line-request-id": "req-2" },
+      headers: {
+        "content-type": "application/json",
+        "x-line-request-id": "req-2",
+      },
     }),
     new Response("{}", {
       status: 200,
-      headers: { "content-type": "application/json", "x-line-request-id": "req-3" },
+      headers: {
+        "content-type": "application/json",
+        "x-line-request-id": "req-3",
+      },
     }),
   ];
   const client = createLineClient({
@@ -376,7 +405,10 @@ test("LINE client pins official endpoints and emits only approved request bodies
     },
   });
 
-  assert.equal(await client.issueLinkToken(LINE_USER_ID), "one-time-link-value");
+  assert.equal(
+    await client.issueLinkToken(LINE_USER_ID),
+    "one-time-link-value",
+  );
   assert.deepEqual(
     await client.pushAccountLink(
       LINE_USER_ID,
@@ -385,16 +417,19 @@ test("LINE client pins official endpoints and emits only approved request bodies
     ),
     { requestId: "req-2" },
   );
-  assert.deepEqual(await client.pushCaseNotification(
-    LINE_USER_ID,
-    {
-      caseLabel: "案件 DRS-042",
-      caseStatus: "等待一般審查員確認",
-      nextAction: "請開啟 DRS 收件匣檢視",
-      caseUrl: "https://laibe.example/drs/cases/current",
-    },
-    "00000000-0000-4000-8000-000000000099",
-  ), { requestId: "req-3" });
+  assert.deepEqual(
+    await client.pushCaseNotification(
+      LINE_USER_ID,
+      {
+        caseLabel: "案件 DRS-042",
+        caseStatus: "等待一般審查員確認",
+        nextAction: "請開啟 DRS 收件匣檢視",
+        caseUrl: "https://laibe.example/drs/cases/current",
+      },
+      "00000000-0000-4000-8000-000000000099",
+    ),
+    { requestId: "req-3" },
+  );
 
   assert.deepEqual(calls.map(({ input }) => input), [
     `https://api.line.me/v2/bot/user/${LINE_USER_ID}/linkToken`,
@@ -443,10 +478,13 @@ test("LINE client pins official endpoints and emits only approved request bodies
 });
 
 test("LINE client fails closed with sanitized errors and bounded provider responses", async () => {
-  const { createLineClient, LineProviderError } = await import(lineClientUrl.href);
+  const { createLineClient, LineProviderError } = await import(
+    lineClientUrl.href
+  );
   const failed = createLineClient({
     accessToken: "not-a-provider-credential",
-    fetch: async () => new Response("provider body must never escape", { status: 503 }),
+    fetch: async () =>
+      new Response("provider body must never escape", { status: 503 }),
   });
   await assert.rejects(
     () => failed.issueLinkToken(LINE_USER_ID),
@@ -461,10 +499,11 @@ test("LINE client fails closed with sanitized errors and bounded provider respon
 
   const oversized = createLineClient({
     accessToken: "not-a-provider-credential",
-    fetch: async () => new Response(`{"linkToken":"${"x".repeat(40_000)}"}`, {
-      status: 200,
-      headers: { "content-type": "application/json" },
-    }),
+    fetch: async () =>
+      new Response(`{"linkToken":"${"x".repeat(40_000)}"}`, {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }),
   });
   await assert.rejects(
     () => oversized.issueLinkToken(LINE_USER_ID),
@@ -502,7 +541,10 @@ test("LINE account-link prompt uses one stable push retry key across webhook rec
   assert.equal(calls[0].init.headers["x-line-retry-key"], retryKey);
   const body = JSON.parse(calls[0].init.body);
   assert.equal(body.to, LINE_USER_ID);
-  assert.equal(body.messages[0].template.actions[0].uri.includes("linkToken=opaque"), true);
+  assert.equal(
+    body.messages[0].template.actions[0].uri.includes("linkToken=opaque"),
+    true,
+  );
 });
 
 test("LINE case notification preserves accepted truth across stable retry recovery", async () => {
@@ -515,7 +557,9 @@ test("LINE case notification preserves accepted truth across stable retry recove
       calls.push({ url, init });
       return new Response("{}", {
         status: 409,
-        headers: { "x-line-accepted-request-id": "accepted-case-on-first-attempt" },
+        headers: {
+          "x-line-accepted-request-id": "accepted-case-on-first-attempt",
+        },
       });
     },
   });
@@ -539,7 +583,9 @@ test("LINE case notification preserves accepted truth across stable retry recove
 });
 
 test("LINE client rejects inherited notification authority before any provider call", async () => {
-  const { createLineClient, LineProviderError } = await import(lineClientUrl.href);
+  const { createLineClient, LineProviderError } = await import(
+    lineClientUrl.href
+  );
   let providerCalled = false;
   const client = createLineClient({
     accessToken: "not-a-provider-credential",
@@ -560,7 +606,8 @@ test("LINE client rejects inherited notification authority before any provider c
 
   await assert.rejects(
     () => client.pushCaseNotification(LINE_USER_ID, inherited),
-    (error) => error instanceof LineProviderError &&
+    (error) =>
+      error instanceof LineProviderError &&
       error.code === "provider_invalid_request",
   );
   assert.equal(providerCalled, false);
@@ -664,17 +711,19 @@ test("start handler accepts only same-origin exact-empty requests and returns sa
     },
   });
 
-  const accepted = await handler(new Request(
-    "https://edge.example/functions/v1/drs-line-account-link-start",
-    {
-      method: "POST",
-      headers: {
-        origin: "https://laibe.example",
-        "content-type": "application/json",
+  const accepted = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-start",
+      {
+        method: "POST",
+        headers: {
+          origin: "https://laibe.example",
+          "content-type": "application/json",
+        },
+        body: "{}",
       },
-      body: "{}",
-    },
-  ));
+    ),
+  );
   assert.equal(accepted.status, 200);
   assert.deepEqual(await accepted.json(), {
     state: "awaiting_line_confirmation",
@@ -685,23 +734,43 @@ test("start handler accepts only same-origin exact-empty requests and returns sa
   assert.equal(accepted.headers.get("cache-control"), "no-store");
   assert.equal(startCalls, 1);
 
-  for (const request of [
-    new Request("https://edge.example/functions/v1/drs-line-account-link-start", {
-      method: "POST",
-      headers: { origin: "https://laibe.example", "content-type": "application/json" },
-      body: '{"specialistId":"00000000-0000-4000-8000-000000000002"}',
-    }),
-    new Request("https://edge.example/functions/v1/drs-line-account-link-start?caseId=x", {
-      method: "POST",
-      headers: { origin: "https://laibe.example", "content-type": "application/json" },
-      body: "{}",
-    }),
-    new Request("https://edge.example/functions/v1/drs-line-account-link-start", {
-      method: "POST",
-      headers: { origin: "https://attacker.example", "content-type": "application/json" },
-      body: "{}",
-    }),
-  ]) {
+  for (
+    const request of [
+      new Request(
+        "https://edge.example/functions/v1/drs-line-account-link-start",
+        {
+          method: "POST",
+          headers: {
+            origin: "https://laibe.example",
+            "content-type": "application/json",
+          },
+          body: '{"specialistId":"00000000-0000-4000-8000-000000000002"}',
+        },
+      ),
+      new Request(
+        "https://edge.example/functions/v1/drs-line-account-link-start?caseId=x",
+        {
+          method: "POST",
+          headers: {
+            origin: "https://laibe.example",
+            "content-type": "application/json",
+          },
+          body: "{}",
+        },
+      ),
+      new Request(
+        "https://edge.example/functions/v1/drs-line-account-link-start",
+        {
+          method: "POST",
+          headers: {
+            origin: "https://attacker.example",
+            "content-type": "application/json",
+          },
+          body: "{}",
+        },
+      ),
+    ]
+  ) {
     const rejected = await handler(request);
     assert.equal([400, 403].includes(rejected.status), true);
   }
@@ -717,7 +786,11 @@ test("status cancel and unlink handlers preserve operation-specific methods", as
   const operations = [];
   const dependencies = {
     allowedOrigin: "https://laibe.example",
-    guard: { async authorize() { return AUTHORITY; } },
+    guard: {
+      async authorize() {
+        return AUTHORITY;
+      },
+    },
     service: {
       async status() {
         operations.push("status");
@@ -738,25 +811,40 @@ test("status cancel and unlink handlers preserve operation-specific methods", as
     },
   };
   const statusResponse = await createLineLinkStatusHandler(dependencies)(
-    new Request("https://edge.example/functions/v1/drs-line-account-link-status", {
-      headers: { origin: "https://laibe.example" },
-    }),
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-status",
+      {
+        headers: { origin: "https://laibe.example" },
+      },
+    ),
   );
   assert.equal(statusResponse.status, 200);
   const cancelResponse = await createLineLinkCancelHandler(dependencies)(
-    new Request("https://edge.example/functions/v1/drs-line-account-link-cancel", {
-      method: "POST",
-      headers: { origin: "https://laibe.example", "content-type": "application/json" },
-      body: "{}",
-    }),
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-cancel",
+      {
+        method: "POST",
+        headers: {
+          origin: "https://laibe.example",
+          "content-type": "application/json",
+        },
+        body: "{}",
+      },
+    ),
   );
   assert.equal(cancelResponse.status, 200);
   const unlinkResponse = await createLineLinkUnlinkHandler(dependencies)(
-    new Request("https://edge.example/functions/v1/drs-line-account-link-unlink", {
-      method: "POST",
-      headers: { origin: "https://laibe.example", "content-type": "application/json" },
-      body: "{}",
-    }),
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-unlink",
+      {
+        method: "POST",
+        headers: {
+          origin: "https://laibe.example",
+          "content-type": "application/json",
+        },
+        body: "{}",
+      },
+    ),
   );
   assert.equal(unlinkResponse.status, 200);
   assert.deepEqual(operations, ["status", "cancel", "unlink"]);
@@ -777,12 +865,18 @@ test("handler converts missing Gmail-backed DRS authority to permission_denied",
         throw new DrsIdentityError("AUTH_REQUIRED", 401);
       },
     },
-    service: { async status() { throw new Error("must not run"); } },
+    service: {
+      async status() {
+        throw new Error("must not run");
+      },
+    },
   });
-  const response = await handler(new Request(
-    "https://edge.example/functions/v1/drs-line-account-link-status",
-    { headers: { origin: "https://laibe.example" } },
-  ));
+  const response = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-status",
+      { headers: { origin: "https://laibe.example" } },
+    ),
+  );
   assert.equal(response.status, 401);
   assert.deepEqual(await response.json(), { state: "permission_denied" });
 });
@@ -793,10 +887,18 @@ test("continue creates a one-time nonce digest and only redirects to LINE accoun
   const prepared = [];
   const service = createLineAccountLinkService({
     repository: {
-      async startIntent() { throw new Error("not used"); },
-      async readStatus() { throw new Error("not used"); },
-      async cancelIntent() { throw new Error("not used"); },
-      async unlink() { throw new Error("not used"); },
+      async startIntent() {
+        throw new Error("not used");
+      },
+      async readStatus() {
+        throw new Error("not used");
+      },
+      async cancelIntent() {
+        throw new Error("not used");
+      },
+      async unlink() {
+        throw new Error("not used");
+      },
       async prepareNonce(input) {
         prepared.push(input);
         return { accepted: true, state: "awaiting_line_confirmation" };
@@ -808,23 +910,35 @@ test("continue creates a one-time nonce digest and only redirects to LINE accoun
   });
   const handler = createLineLinkContinueHandler({
     allowedOrigin: "https://laibe.example",
-    guard: { async authorize() { return AUTHORITY; } },
+    guard: {
+      async authorize() {
+        return AUTHORITY;
+      },
+    },
     service,
   });
-  const response = await handler(new Request(
-    "https://edge.example/functions/v1/drs-line-account-link-continue?linkToken=one-time-provider-value",
-    {
-      method: "POST",
-      headers: { origin: "https://laibe.example", "content-type": "application/json" },
-      body: "{}",
-      redirect: "manual",
-    },
-  ));
+  const response = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-account-link-continue?linkToken=one-time-provider-value",
+      {
+        method: "POST",
+        headers: {
+          origin: "https://laibe.example",
+          "content-type": "application/json",
+        },
+        body: "{}",
+        redirect: "manual",
+      },
+    ),
+  );
   assert.equal(response.status, 303);
   const location = new URL(response.headers.get("location"));
   assert.equal(location.origin, "https://access.line.me");
   assert.equal(location.pathname, "/dialog/bot/accountLink");
-  assert.equal(location.searchParams.get("linkToken"), "one-time-provider-value");
+  assert.equal(
+    location.searchParams.get("linkToken"),
+    "one-time-provider-value",
+  );
   const nonce = location.searchParams.get("nonce");
   assert.match(nonce, /^[A-Za-z0-9_-]{43}$/u);
   assert.equal(response.headers.get("referrer-policy"), "no-referrer");
@@ -842,17 +956,21 @@ test("continue creates a one-time nonce digest and only redirects to LINE accoun
 });
 
 test("default function entries expose custom-session handlers without deployment side effects", async () => {
-  for (const [path, exportName] of [
-    ["drs-line-account-link-start", "createLineLinkStartHandler"],
-    ["drs-line-account-link-status", "createLineLinkStatusHandler"],
-    ["drs-line-account-link-cancel", "createLineLinkCancelHandler"],
-    ["drs-line-account-link-unlink", "createLineLinkUnlinkHandler"],
-    ["drs-line-account-link-continue", "createLineLinkContinueHandler"],
-  ]) {
-    const module = await import(new URL(
-      `../supabase/functions/${path}/index.ts`,
-      import.meta.url,
-    ).href);
+  for (
+    const [path, exportName] of [
+      ["drs-line-account-link-start", "createLineLinkStartHandler"],
+      ["drs-line-account-link-status", "createLineLinkStatusHandler"],
+      ["drs-line-account-link-cancel", "createLineLinkCancelHandler"],
+      ["drs-line-account-link-unlink", "createLineLinkUnlinkHandler"],
+      ["drs-line-account-link-continue", "createLineLinkContinueHandler"],
+    ]
+  ) {
+    const module = await import(
+      new URL(
+        `../supabase/functions/${path}/index.ts`,
+        import.meta.url,
+      ).href
+    );
     assert.equal(module.VERIFY_JWT_REQUIRED, false);
     assert.equal(typeof module[exportName], "function");
     assert.equal(typeof module.handler, "function");
@@ -910,7 +1028,9 @@ test("signed binding action durably claims before issuing the official link toke
         calls.push({ operation: "complete", input });
         return { completed: true, safeOutcome: input.safeOutcome };
       },
-      async completeAccountLink() { throw new Error("not used"); },
+      async completeAccountLink() {
+        throw new Error("not used");
+      },
     },
     lineClient: {
       async issueLinkToken(lineUserId) {
@@ -918,20 +1038,32 @@ test("signed binding action durably claims before issuing the official link toke
         return "provider-link-token";
       },
       async pushAccountLink(lineUserId, linkingUrl, retryKey) {
-        calls.push({ operation: "push-link", lineUserId, linkingUrl, retryKey });
+        calls.push({
+          operation: "push-link",
+          lineUserId,
+          linkingUrl,
+          retryKey,
+        });
         return { requestId: "safe-request-id" };
       },
-      async pushCaseNotification() { throw new Error("not used"); },
+      async pushCaseNotification() {
+        throw new Error("not used");
+      },
     },
   });
-  const response = await handler(await webhookRequest({
-    destination: LINE_USER_ID,
-    events: [textBindingEvent()],
-  }, secret));
+  const response = await handler(
+    await webhookRequest({
+      destination: LINE_USER_ID,
+      events: [textBindingEvent()],
+    }, secret),
+  );
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {});
   assert.deepEqual(calls.map(({ operation }) => operation), [
-    "claim", "issue", "push-link", "complete",
+    "claim",
+    "issue",
+    "push-link",
+    "complete",
   ]);
   assert.match(calls[0].input.webhookEventDigest, /^[A-Za-z0-9_-]{43}$/u);
   assert.equal(JSON.stringify(calls[0]).includes(WEBHOOK_EVENT_ID), false);
@@ -954,35 +1086,52 @@ test("webhook verifies exact raw bytes before parsing or durable work", async ()
     identityEncryptionKeyVersion: "test-v1",
     publicOrigin: "https://laibe.example",
     repository: {
-      async claimEvent() { repositoryCalls += 1; throw new Error("must not run"); },
-      async completeEvent() { throw new Error("must not run"); },
-      async completeAccountLink() { throw new Error("must not run"); },
+      async claimEvent() {
+        repositoryCalls += 1;
+        throw new Error("must not run");
+      },
+      async completeEvent() {
+        throw new Error("must not run");
+      },
+      async completeAccountLink() {
+        throw new Error("must not run");
+      },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("must not run"); },
-      async replyAccountLink() { throw new Error("must not run"); },
-      async pushCaseNotification() { throw new Error("must not run"); },
+      async issueLinkToken() {
+        throw new Error("must not run");
+      },
+      async replyAccountLink() {
+        throw new Error("must not run");
+      },
+      async pushCaseNotification() {
+        throw new Error("must not run");
+      },
     },
   });
-  const response = await handler(await webhookRequest(
-    { destination: LINE_USER_ID, events: [textBindingEvent()] },
-    "unit-test-channel-secret",
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
-  ));
+  const response = await handler(
+    await webhookRequest(
+      { destination: LINE_USER_ID, events: [textBindingEvent()] },
+      "unit-test-channel-secret",
+      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    ),
+  );
   assert.equal(response.status, 401);
   assert.equal(repositoryCalls, 0);
 
-  const oversized = await handler(new Request(
-    "https://edge.example/functions/v1/drs-line-webhook",
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-line-signature": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+  const oversized = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-webhook",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-line-signature": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+        },
+        body: "x".repeat(1_048_577),
       },
-      body: "x".repeat(1_048_577),
-    },
-  ));
+    ),
+  );
   assert.equal(oversized.status, 413);
   assert.equal(repositoryCalls, 0);
 });
@@ -1015,16 +1164,24 @@ test("signed accountLink atomically stores private identity and terminal webhook
       },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("not used"); },
-      async replyAccountLink() { throw new Error("not used"); },
-      async pushCaseNotification() { throw new Error("not used"); },
+      async issueLinkToken() {
+        throw new Error("not used");
+      },
+      async replyAccountLink() {
+        throw new Error("not used");
+      },
+      async pushCaseNotification() {
+        throw new Error("not used");
+      },
     },
   });
   const event = accountLinkEvent({ link: { result: "ok", nonce: rawNonce } });
-  const response = await handler(await webhookRequest({
-    destination: LINE_USER_ID,
-    events: [event],
-  }, secret));
+  const response = await handler(
+    await webhookRequest({
+      destination: LINE_USER_ID,
+      events: [event],
+    }, secret),
+  );
   assert.equal(response.status, 200);
   assert.deepEqual(completed.map(({ operation }) => operation), ["link-event"]);
   const linkInput = completed[0].input;
@@ -1074,24 +1231,35 @@ test("signed private LINE unlink revokes only its own binding and confirms idemp
         calls.push({ operation: "complete", input });
         return { completed: true, safeOutcome: input.safeOutcome };
       },
-      async completeAccountLink() { throw new Error("not used"); },
+      async completeAccountLink() {
+        throw new Error("not used");
+      },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("not used"); },
+      async issueLinkToken() {
+        throw new Error("not used");
+      },
       async pushUnlinkConfirmation(lineUserId, retryKey) {
         calls.push({ operation: "confirm", lineUserId, retryKey });
         return { requestId: "safe-request-id" };
       },
-      async pushCaseNotification() { throw new Error("not used"); },
+      async pushCaseNotification() {
+        throw new Error("not used");
+      },
     },
   });
-  const response = await handler(await webhookRequest({
-    destination: LINE_USER_ID,
-    events: [textUnlinkEvent()],
-  }, secret));
+  const response = await handler(
+    await webhookRequest({
+      destination: LINE_USER_ID,
+      events: [textUnlinkEvent()],
+    }, secret),
+  );
   assert.equal(response.status, 200);
   assert.deepEqual(calls.map(({ operation }) => operation), [
-    "claim", "unlink", "confirm", "complete",
+    "claim",
+    "unlink",
+    "confirm",
+    "complete",
   ]);
   assert.equal(calls[0].input.eventKind, "unlink_action");
   assert.match(calls[1].input.lineUserDigest, /^[A-Za-z0-9_-]{43}$/u);
@@ -1112,40 +1280,71 @@ test("completed redelivery is idempotent and retryable storage failure is non-2x
     identityEncryptionKeyVersion: "test-v1",
     publicOrigin: "https://laibe.example",
     lineClient: {
-      async issueLinkToken() { providerCalls += 1; return "unused"; },
-      async replyAccountLink() { providerCalls += 1; return { requestId: null }; },
-      async pushCaseNotification() { throw new Error("not used"); },
+      async issueLinkToken() {
+        providerCalls += 1;
+        return "unused";
+      },
+      async replyAccountLink() {
+        providerCalls += 1;
+        return { requestId: null };
+      },
+      async pushCaseNotification() {
+        throw new Error("not used");
+      },
     },
   };
   const body = { destination: LINE_USER_ID, events: [textBindingEvent()] };
   const duplicate = createLineWebhookHandler({
     ...base,
     repository: {
-      async claimEvent() { return { admission: "already_completed", safeOutcome: "link_token_replied" }; },
-      async completeEvent() { throw new Error("must not run"); },
-      async completeAccountLink() { throw new Error("must not run"); },
+      async claimEvent() {
+        return {
+          admission: "already_completed",
+          safeOutcome: "link_token_replied",
+        };
+      },
+      async completeEvent() {
+        throw new Error("must not run");
+      },
+      async completeAccountLink() {
+        throw new Error("must not run");
+      },
     },
   });
-  assert.equal((await duplicate(await webhookRequest(body, secret))).status, 200);
+  assert.equal(
+    (await duplicate(await webhookRequest(body, secret))).status,
+    200,
+  );
   assert.equal(providerCalls, 0);
 
   const unavailable = createLineWebhookHandler({
     ...base,
     repository: {
-      async claimEvent() { throw new Error("database unavailable"); },
-      async completeEvent() { throw new Error("must not run"); },
-      async completeAccountLink() { throw new Error("must not run"); },
+      async claimEvent() {
+        throw new Error("database unavailable");
+      },
+      async completeEvent() {
+        throw new Error("must not run");
+      },
+      async completeAccountLink() {
+        throw new Error("must not run");
+      },
     },
   });
-  assert.equal((await unavailable(await webhookRequest(body, secret))).status, 503);
+  assert.equal(
+    (await unavailable(await webhookRequest(body, secret))).status,
+    503,
+  );
   assert.equal(providerCalls, 0);
 });
 
 test("canonical LINE webhook entry disables gateway JWT and remains import-safe", async () => {
-  const module = await import(new URL(
-    "../supabase/functions/drs-line-webhook/index.ts",
-    import.meta.url,
-  ).href);
+  const module = await import(
+    new URL(
+      "../supabase/functions/drs-line-webhook/index.ts",
+      import.meta.url,
+    ).href
+  );
   assert.equal(module.VERIFY_JWT_REQUIRED, false);
   assert.equal(typeof module.createLineWebhookHandler, "function");
   assert.equal(typeof module.handler, "function");
@@ -1182,7 +1381,10 @@ test("private dispatcher decrypts only a claimed current binding and appends acc
   const calls = [];
   const dispatcher = createPrivateNotificationDispatcher({
     repository: {
-      async claimNext() { calls.push({ operation: "claim" }); return claim; },
+      async claimNext() {
+        calls.push({ operation: "claim" });
+        return claim;
+      },
       async assertCurrent(input) {
         calls.push({ operation: "assert", input });
         return { current: true };
@@ -1193,8 +1395,12 @@ test("private dispatcher decrypts only a claimed current binding and appends acc
       },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("not used"); },
-      async replyAccountLink() { throw new Error("not used"); },
+      async issueLinkToken() {
+        throw new Error("not used");
+      },
+      async replyAccountLink() {
+        throw new Error("not used");
+      },
       async pushCaseNotification(lineUserId, message, retryKey) {
         calls.push({ operation: "push", lineUserId, message, retryKey });
         return { requestId: "safe-request-id" };
@@ -1210,7 +1416,10 @@ test("private dispatcher decrypts only a claimed current binding and appends acc
   });
   assert.deepEqual(await dispatcher(), { state: "accepted" });
   assert.deepEqual(calls.map(({ operation }) => operation), [
-    "claim", "assert", "push", "complete",
+    "claim",
+    "assert",
+    "push",
+    "complete",
   ]);
   assert.deepEqual(calls[1].input, {
     outboxId: claim.outboxId,
@@ -1240,16 +1449,25 @@ test("dispatcher never sends after key-version mismatch and bounds provider retr
   let pushes = 0;
   const mismatch = createPrivateNotificationDispatcher({
     repository: {
-      async claimNext() { return { ...claim, encryptionKeyVersion: "retired-v0" }; },
+      async claimNext() {
+        return { ...claim, encryptionKeyVersion: "retired-v0" };
+      },
       async complete(input) {
         completions.push(input);
         return { completed: true, state: "permanent_failure" };
       },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("not used"); },
-      async replyAccountLink() { throw new Error("not used"); },
-      async pushCaseNotification() { pushes += 1; throw new Error("must not send"); },
+      async issueLinkToken() {
+        throw new Error("not used");
+      },
+      async replyAccountLink() {
+        throw new Error("not used");
+      },
+      async pushCaseNotification() {
+        pushes += 1;
+        throw new Error("must not send");
+      },
     },
     identityEncryptionKey: key,
     identityEncryptionKeyVersion: "test-v1",
@@ -1261,16 +1479,24 @@ test("dispatcher never sends after key-version mismatch and bounds provider retr
 
   const retrying = createPrivateNotificationDispatcher({
     repository: {
-      async claimNext() { return claim; },
-      async assertCurrent() { return { current: true }; },
+      async claimNext() {
+        return claim;
+      },
+      async assertCurrent() {
+        return { current: true };
+      },
       async complete(input) {
         completions.push(input);
         return { completed: true, state: "retry" };
       },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("not used"); },
-      async replyAccountLink() { throw new Error("not used"); },
+      async issueLinkToken() {
+        throw new Error("not used");
+      },
+      async replyAccountLink() {
+        throw new Error("not used");
+      },
       async pushCaseNotification() {
         throw new LineProviderError("provider_rate_limited", "4xx");
       },
@@ -1293,13 +1519,25 @@ test("dispatcher leaves a non-current claim for durable recovery and never sends
   let completions = 0;
   const dispatcher = createPrivateNotificationDispatcher({
     repository: {
-      async claimNext() { return claim; },
-      async assertCurrent() { return { current: false }; },
-      async complete() { completions += 1; return { completed: false }; },
+      async claimNext() {
+        return claim;
+      },
+      async assertCurrent() {
+        return { current: false };
+      },
+      async complete() {
+        completions += 1;
+        return { completed: false };
+      },
     },
     lineClient: {
-      async issueLinkToken() { throw new Error("not used"); },
-      async pushCaseNotification() { pushes += 1; return { requestId: null }; },
+      async issueLinkToken() {
+        throw new Error("not used");
+      },
+      async pushCaseNotification() {
+        pushes += 1;
+        return { requestId: null };
+      },
     },
     identityEncryptionKey: key,
     identityEncryptionKeyVersion: "test-v1",
@@ -1322,35 +1560,44 @@ test("service-only dispatch endpoint has an exact empty request contract", async
       return { state: "empty" };
     },
   });
-  const accepted = await handler(new Request(
-    "https://edge.example/functions/v1/drs-line-private-notification-dispatch",
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: "{}",
-    },
-  ));
+  const accepted = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-private-notification-dispatch",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      },
+    ),
+  );
   assert.equal(accepted.status, 200);
   assert.deepEqual(await accepted.json(), { state: "empty" });
   assert.equal(dispatches, 1);
-  const rejected = await handler(new Request(
-    "https://edge.example/functions/v1/drs-line-private-notification-dispatch?caseId=x",
-    {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: "{}",
-    },
-  ));
+  const rejected = await handler(
+    new Request(
+      "https://edge.example/functions/v1/drs-line-private-notification-dispatch?caseId=x",
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      },
+    ),
+  );
   assert.equal(rejected.status, 400);
   assert.equal(dispatches, 1);
 });
 
 test("private notification entry requires gateway JWT and remains import-safe", async () => {
-  const module = await import(new URL(
-    "../supabase/functions/drs-line-private-notification-dispatch/index.ts",
-    import.meta.url,
-  ).href);
+  const module = await import(
+    new URL(
+      "../supabase/functions/drs-line-private-notification-dispatch/index.ts",
+      import.meta.url,
+    ).href
+  );
   assert.equal(module.VERIFY_JWT_REQUIRED, true);
-  assert.equal(typeof module.createPrivateNotificationDispatchHandler, "function");
+  assert.equal(
+    typeof module.createPrivateNotificationDispatchHandler,
+    "function",
+  );
   assert.equal(typeof module.handler, "function");
 });
