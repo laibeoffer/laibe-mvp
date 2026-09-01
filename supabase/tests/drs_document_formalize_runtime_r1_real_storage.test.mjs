@@ -90,6 +90,36 @@ function rewriteStandaloneRestRequestUrl(restOrigin, input) {
   return url;
 }
 
+async function closeDeniedResponseBody(response) {
+  await response.body?.cancel();
+}
+
+Deno.test("denied response body closes exactly once without being read", async () => {
+  let cancelCount = 0;
+  let pullCount = 0;
+  const deniedResponse = new Response(
+    new ReadableStream(
+      {
+        pull() {
+          pullCount += 1;
+        },
+        cancel() {
+          cancelCount += 1;
+        },
+      },
+      { highWaterMark: 0 },
+    ),
+    { status: 403 },
+  );
+
+  assert.equal(deniedResponse.ok, false);
+  assert.ok([400, 401, 403, 404].includes(deniedResponse.status));
+  await closeDeniedResponseBody(deniedResponse);
+
+  assert.equal(cancelCount, 1);
+  assert.equal(pullCount, 0);
+});
+
 Deno.test("standalone PostgREST transport removes only its gateway prefix", () => {
   assert.equal(
     rewriteStandaloneRestRequestUrl(
@@ -990,6 +1020,7 @@ Deno.test({
       );
       assert.equal(browserRead.ok, false);
       assert.ok([400, 401, 403, 404].includes(browserRead.status));
+      await closeDeniedResponseBody(browserRead);
     } catch (error) {
       primaryFailure = error;
     }
