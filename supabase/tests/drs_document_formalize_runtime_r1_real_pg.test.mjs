@@ -349,7 +349,7 @@ insert into casework.document_upload_intents(
   'drs-case-intake-private','${document.intakeKey}',
   'drs-case-records-private','${document.recordsKey}','INTENT_CREATED',
   '${PDF_SHA256}','${document.actor.user}',clock_timestamp(),
-  clock_timestamp()+interval '30 minutes'
+  clock_timestamp()+interval '10 minutes'
 );
 `;
 }
