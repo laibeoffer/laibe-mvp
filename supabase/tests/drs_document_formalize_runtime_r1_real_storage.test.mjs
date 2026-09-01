@@ -174,6 +174,178 @@ async function captureStageDiagnostic(diagnostics, stage, operation) {
   }
 }
 
+function formatAuthorizeHttpDiagnostic(input) {
+  const methodValue = typeof input.method === "string"
+    ? input.method.toUpperCase()
+    : "";
+  const method = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+      .includes(methodValue)
+    ? methodValue
+    : "OTHER";
+  let rpc = "OTHER";
+  try {
+    const pathname = new URL(input.url).pathname;
+    if (
+      pathname ===
+        "/rest/v1/rpc/server_document_finalize_domain_command_v1"
+    ) rpc = "DOCUMENT_FINALIZE";
+  } catch {
+    rpc = "OTHER";
+  }
+  const status = Number.isInteger(input.status) &&
+      input.status >= 100 && input.status <= 599
+    ? input.status
+    : 0;
+  const ok = input.ok === true;
+  const mediaType = typeof input.contentType === "string"
+    ? input.contentType.split(";", 1)[0].trim().toLowerCase()
+    : "";
+  const contentType = mediaType === "application/json" ||
+      mediaType.endsWith("+json")
+    ? "JSON"
+    : mediaType === "text/plain"
+    ? "TEXT"
+    : mediaType.length > 0
+    ? "OTHER"
+    : "MISSING";
+  const jsonParsed = input.jsonParsed === true;
+  const jsonValue = input.jsonValue;
+  const shape = !jsonParsed
+    ? "UNPARSED"
+    : jsonValue === null
+    ? "NULL"
+    : Array.isArray(jsonValue)
+    ? "ARRAY"
+    : typeof jsonValue === "object"
+    ? "OBJECT"
+    : "PRIMITIVE";
+  const ownDataValue = (key) => {
+    if (shape !== "OBJECT") return undefined;
+    const descriptor = Object.getOwnPropertyDescriptor(jsonValue, key);
+    return descriptor && Object.hasOwn(descriptor, "value")
+      ? descriptor.value
+      : undefined;
+  };
+  const sensitiveKey = /token|url|detail|message|hint|header|authorization|apikey|body/iu;
+  const keys = shape === "OBJECT"
+    ? Object.getOwnPropertyNames(jsonValue)
+      .filter((key) => {
+        if (
+          !/^[A-Za-z][A-Za-z0-9_]{0,31}$/u.test(key) ||
+          sensitiveKey.test(key)
+        ) return false;
+        const descriptor = Object.getOwnPropertyDescriptor(jsonValue, key);
+        return descriptor !== undefined && Object.hasOwn(descriptor, "value");
+      })
+      .sort()
+      .slice(0, 8)
+    : [];
+  const rawCode = ownDataValue("code");
+  let code = "-";
+  if (typeof rawCode === "string" && /^PGRST[0-9]{3}$/u.test(rawCode)) {
+    code = rawCode;
+  } else if (
+    typeof rawCode === "string" && /^[0-9A-Z]{5}$/u.test(rawCode) &&
+    ["22", "23", "28", "40", "42", "53", "54", "55", "57", "58", "P0", "XX"]
+      .includes(rawCode.slice(0, 2))
+  ) {
+    code = `${rawCode.slice(0, 2)}***`;
+  }
+  const fetchThrew = input.fetchThrew === true;
+  return `AUTHORIZE_HTTP|method=${method}|rpc=${rpc}|status=${status}|ok=${ok}|contentType=${contentType}|shape=${shape}|keys=${
+    keys.join(",") || "-"
+  }|code=${code}|fetchThrew=${fetchThrew}`;
+}
+
+Deno.test("AUTHORIZE HTTP diagnostics expose only bounded response metadata", () => {
+  const jsonValue = Object.create({ message: "inherited-message-value" });
+  Object.defineProperties(jsonValue, {
+    code: { enumerable: true, value: "PGRST202" },
+    state: { enumerable: true, value: "INVALID_REQUEST" },
+    token: { enumerable: true, value: "sensitive-token-value" },
+    url: { enumerable: true, value: "https://secret.example.test/path" },
+    details: { enumerable: true, value: "sensitive-details-value" },
+    message: { enumerable: true, value: "sensitive-message-value" },
+    hint: { enumerable: true, value: "sensitive-hint-value" },
+    getter: {
+      enumerable: true,
+      get() {
+        throw new Error("HTTP diagnostic getter must not execute");
+      },
+    },
+  });
+  const diagnostic = formatAuthorizeHttpDiagnostic({
+    method: "POST",
+    url:
+      "http://rest:3000/rest/v1/rpc/server_document_finalize_domain_command_v1?token=secret",
+    status: 404,
+    ok: false,
+    contentType: "application/json; charset=utf-8",
+    jsonParsed: true,
+    jsonValue,
+    fetchThrew: false,
+  });
+  assert.equal(
+    diagnostic,
+    "AUTHORIZE_HTTP|method=POST|rpc=DOCUMENT_FINALIZE|status=404|ok=false|contentType=JSON|shape=OBJECT|keys=code,state|code=PGRST202|fetchThrew=false",
+  );
+  assert.ok(diagnostic.length <= 320);
+  assert.doesNotMatch(
+    diagnostic,
+    /secret|token|url|detail|message|hint|getter|inherited|http:\/\/|https:\/\//iu,
+  );
+});
+
+function createAuthorizeHttpDiagnosticFetch(
+  diagnostics,
+  fetchImplementation = fetch,
+) {
+  return async (input, init) => {
+    const isRequest = typeof Request !== "undefined" && input instanceof Request;
+    const method = isRequest ? input.method : init?.method ?? "GET";
+    const url = isRequest
+      ? input.url
+      : input instanceof URL
+      ? input.href
+      : String(input);
+    try {
+      const response = await fetchImplementation(input, init);
+      const contentType = response.headers.get("content-type") ?? "";
+      let jsonParsed = false;
+      let jsonValue;
+      try {
+        jsonValue = await response.clone().json();
+        jsonParsed = true;
+      } catch {
+        jsonValue = undefined;
+      }
+      diagnostics.push(formatAuthorizeHttpDiagnostic({
+        method,
+        url,
+        status: response.status,
+        ok: response.ok,
+        contentType,
+        jsonParsed,
+        jsonValue,
+        fetchThrew: false,
+      }));
+      return response;
+    } catch (error) {
+      diagnostics.push(formatAuthorizeHttpDiagnostic({
+        method,
+        url,
+        status: 0,
+        ok: false,
+        contentType: "",
+        jsonParsed: false,
+        jsonValue: undefined,
+        fetchThrew: true,
+      }));
+      throw error;
+    }
+  };
+}
+
 function cleanReport(overrides = {}) {
   return {
     declaredMime: "application/pdf",
@@ -646,6 +818,7 @@ Deno.test({
       );
       const { createDocumentStorageService } = await import(serviceUrl.href);
       const stageDiagnostics = [];
+      const authorizeHttpDiagnostics = [];
       const baseRepository = createSupabaseDocumentRepository({
         env: {
           get(name) {
@@ -654,6 +827,7 @@ Deno.test({
             return undefined;
           },
         },
+        fetch: createAuthorizeHttpDiagnosticFetch(authorizeHttpDiagnostics),
       });
       const repository = {
         ...baseRepository,
@@ -733,7 +907,12 @@ Deno.test({
       assert.equal(
         result?.state,
         "FORMAL_VERSION_CREATED",
-        ["bounded stage diagnostics", ...stageDiagnostics].join("\n"),
+        [
+          "bounded stage diagnostics",
+          ...stageDiagnostics,
+          "bounded AUTHORIZE HTTP diagnostics",
+          ...authorizeHttpDiagnostics,
+        ].join("\n"),
       );
       assert.match(result?.documentRef ?? "", /^doc_[0-9a-z]{20,40}$/u);
       assert.match(result?.versionRef ?? "", /^dvr_[0-9a-z]{20,40}$/u);
