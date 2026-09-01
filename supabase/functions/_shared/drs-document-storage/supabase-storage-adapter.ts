@@ -294,7 +294,9 @@ export function createSupabaseDocumentStoragePort(
             }),
           },
         );
-        return response.ok;
+        const promoted = response.ok;
+        await response.body?.cancel();
+        return promoted;
       } catch {
         return false;
       }

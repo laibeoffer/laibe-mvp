@@ -120,6 +120,100 @@ Deno.test("denied response body closes exactly once without being read", async (
   assert.equal(pullCount, 0);
 });
 
+const PROMOTE_INPUT = Object.freeze({
+  sourceBucket: "drs-case-intake-private",
+  sourceObjectKey:
+    "intents/11111111-1111-4111-8111-111111111111/22222222-2222-4222-8222-222222222222.pdf",
+  targetBucket: "drs-case-records-private",
+  targetObjectKey:
+    "cases/33333333-3333-4333-8333-333333333333/documents/44444444-4444-4444-8444-444444444444/versions/55555555-5555-4555-8555-555555555555/source.pdf",
+});
+
+Deno.test("Supabase Storage promote response lifecycle closes ok and non-ok bodies without reading", async () => {
+  const { createSupabaseDocumentStoragePort } = await import(storageUrl.href);
+  const observations = [];
+
+  for (const scenario of [{ status: 200, result: true }, { status: 403, result: false }]) {
+    let cancelCount = 0;
+    let pullCount = 0;
+    const storage = createSupabaseDocumentStoragePort({
+      env: {
+        get(name) {
+          if (name === "SUPABASE_URL") return "https://project.supabase.co";
+          if (name === "SUPABASE_SERVICE_ROLE_KEY") return "test-service-role";
+          return undefined;
+        },
+      },
+      fetch: async () =>
+        new Response(
+          new ReadableStream(
+            {
+              pull() {
+                pullCount += 1;
+              },
+              cancel() {
+                cancelCount += 1;
+              },
+            },
+            { highWaterMark: 0 },
+          ),
+          { status: scenario.status },
+        ),
+    });
+
+    observations.push({
+      result: await storage.promote(PROMOTE_INPUT),
+      cancelCount,
+      pullCount,
+    });
+  }
+
+  assert.deepEqual(observations, [
+    { result: true, cancelCount: 1, pullCount: 0 },
+    { result: false, cancelCount: 1, pullCount: 0 },
+  ]);
+});
+
+Deno.test("Supabase Storage promote response lifecycle fails closed when body cancellation rejects", async () => {
+  const { createSupabaseDocumentStoragePort } = await import(storageUrl.href);
+  let cancelCount = 0;
+  let pullCount = 0;
+  const storage = createSupabaseDocumentStoragePort({
+    env: {
+      get(name) {
+        if (name === "SUPABASE_URL") return "https://project.supabase.co";
+        if (name === "SUPABASE_SERVICE_ROLE_KEY") return "test-service-role";
+        return undefined;
+      },
+    },
+    fetch: async () =>
+      new Response(
+        new ReadableStream(
+          {
+            pull() {
+              pullCount += 1;
+            },
+            cancel() {
+              cancelCount += 1;
+              throw new Error("PROVIDER_CANCEL_FAILED");
+            },
+          },
+          { highWaterMark: 0 },
+        ),
+        { status: 200 },
+      ),
+  });
+
+  assert.deepEqual(
+    {
+      result: await storage.promote(PROMOTE_INPUT),
+      cancelCount,
+      pullCount,
+    },
+    { result: false, cancelCount: 1, pullCount: 0 },
+  );
+});
+
 Deno.test("standalone PostgREST transport removes only its gateway prefix", () => {
   assert.equal(
     rewriteStandaloneRestRequestUrl(
