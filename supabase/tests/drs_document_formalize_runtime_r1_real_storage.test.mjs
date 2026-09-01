@@ -56,6 +56,46 @@ const PDF_BYTES = new TextEncoder().encode("%PDF-1.7\nTask4 deterministic fixtur
 const PDF_SHA256 =
   "2bd18072c1be5d76677a2f47c7abc8ca6ffe1b34c4a5f953a00744c2bca74aa2";
 
+function rewriteStandaloneStorageRequestUrl(storageOrigin, input) {
+  const url = new URL(input);
+  if (
+    url.origin === storageOrigin &&
+    (url.pathname === "/storage/v1" ||
+      url.pathname.startsWith("/storage/v1/"))
+  ) {
+    url.pathname = url.pathname.slice("/storage/v1".length) || "/";
+  }
+  return url;
+}
+
+function createStandaloneStorageFetch(
+  storageOrigin,
+  fetchImplementation = fetch,
+) {
+  return (input, init) =>
+    fetchImplementation(
+      rewriteStandaloneStorageRequestUrl(storageOrigin, input),
+      init,
+    );
+}
+
+Deno.test("standalone Storage test transport removes only its gateway prefix", () => {
+  assert.equal(
+    rewriteStandaloneStorageRequestUrl(
+      "http://storage:5000",
+      "http://storage:5000/storage/v1/bucket/drs-case-intake-private",
+    ).href,
+    "http://storage:5000/bucket/drs-case-intake-private",
+  );
+  assert.equal(
+    rewriteStandaloneStorageRequestUrl(
+      "http://storage:5000",
+      "https://project.supabase.co/storage/v1/object/authenticated/private/file.pdf",
+    ).href,
+    "https://project.supabase.co/storage/v1/object/authenticated/private/file.pdf",
+  );
+});
+
 function cleanReport(overrides = {}) {
   return {
     declaredMime: "application/pdf",
@@ -452,6 +492,7 @@ Deno.test({
     ) assert.ok(value);
     assert.equal(storageOrigin, "http://storage:5000");
     assert.equal(restOrigin, "http://rest:3000");
+    const standaloneStorageFetch = createStandaloneStorageFetch(storageOrigin);
     const expectedCaseVersion = Number(expectedVersionRaw);
     assert.equal(Number.isSafeInteger(expectedCaseVersion), true);
     assert.ok(expectedCaseVersion > 0);
@@ -480,7 +521,7 @@ Deno.test({
           "drs-case-records-private",
         ]
       ) {
-        const response = await fetch(
+        const response = await standaloneStorageFetch(
           `${storageOrigin}/storage/v1/bucket/${bucket}`,
           { headers: adminHeaders },
         );
@@ -501,7 +542,7 @@ Deno.test({
         ]);
       }
 
-      const upload = await fetch(
+      const upload = await standaloneStorageFetch(
         `${storageOrigin}/storage/v1/object/drs-case-intake-private/${intakeKey}`,
         {
           method: "POST",
@@ -543,6 +584,7 @@ Deno.test({
             return undefined;
           },
         },
+        fetch: standaloneStorageFetch,
       });
       const scanner = {
         runtimeAvailable: true,
@@ -594,7 +636,7 @@ Deno.test({
         PDF_BYTES,
       );
 
-      const browserRead = await fetch(
+      const browserRead = await standaloneStorageFetch(
         `${storageOrigin}/storage/v1/object/authenticated/drs-case-records-private/${recordsKey}`,
         {
           headers: {
@@ -612,7 +654,7 @@ Deno.test({
     const cleanupErrors = [];
     for (const [bucket, objectKey] of uploaded) {
       try {
-        const cleanup = await fetch(
+        const cleanup = await standaloneStorageFetch(
           `${storageOrigin}/storage/v1/object/${bucket}`,
           {
             method: "DELETE",
