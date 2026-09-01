@@ -301,7 +301,7 @@ function documentFixture({
     intentRef: `int_task4runtime${suffix}`,
     key: `task4-finalize-key-${suffix}`,
     intakeKey:
-      `intents/f${suffix.slice(0, 7)}-0000-4000-8000-${suffix}/source.pdf`,
+      `intents/f${suffix.slice(0, 7)}-0000-4000-8000-${suffix}/e${suffix.slice(0, 7)}-0000-4000-8000-${suffix}.pdf`,
     recordsKey:
       `cases/${caseId}/documents/d${suffix.slice(0, 7)}-0000-4000-8000-${suffix}/versions/e${suffix.slice(0, 7)}-0000-4000-8000-${suffix}/source.pdf`,
   });
