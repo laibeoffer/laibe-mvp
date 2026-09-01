@@ -484,8 +484,13 @@ Deno.test({
           `${storageOrigin}/storage/v1/bucket/${bucket}`,
           { headers: adminHeaders },
         );
-        assert.equal(response.ok, true, `bucket unavailable: ${bucket}`);
-        const body = await response.json();
+        const text = await response.text();
+        assert.equal(
+          response.ok,
+          true,
+          `bucket unavailable: ${bucket} status=${response.status} body=${text}`,
+        );
+        const body = JSON.parse(text);
         assert.equal(body.id, bucket);
         assert.equal(body.public, false);
         assert.equal(Number(body.file_size_limit), 26_214_400);
@@ -618,7 +623,12 @@ Deno.test({
             body: JSON.stringify({ prefixes: [objectKey] }),
           },
         );
-        assert.equal(cleanup.ok, true, `cleanup failed: ${bucket}`);
+        const cleanupText = await cleanup.text();
+        assert.equal(
+          cleanup.ok,
+          true,
+          `cleanup failed: ${bucket} status=${cleanup.status} body=${cleanupText}`,
+        );
       } catch (error) {
         cleanupErrors.push(error);
       }

@@ -149,10 +149,15 @@ function docker(args, options = {}) {
     windowsHide: true,
   });
   if (!options.allowFailure) {
+    const displayArgs = args.map((value) =>
+      /^(?:DRS_TASK4_(?:SERVICE_ROLE|ANON)_KEY|AUTH_JWT_SECRET)=/u.test(value)
+        ? `${value.split("=", 1)[0]}=<redacted>`
+        : value
+    );
     assert.equal(
       result.status,
       0,
-      `docker ${args.join(" ")} failed\n${result.stderr}\n${result.stdout}`,
+      `docker ${displayArgs.join(" ")} failed\n${result.stderr}\n${result.stdout}`,
     );
   }
   return result;
