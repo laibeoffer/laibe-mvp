@@ -785,7 +785,7 @@ ${mutation}
 set local role authenticated;
 select set_config('request.jwt.claim.sub','${actor.user}',true);
 select set_config('request.jwt.claims',${sqlLiteral(claims)},true);
-select pg_catalog.coalesce(
+select coalesce(
   pg_catalog.jsonb_agg(pg_catalog.jsonb_build_object(
     'documentRef',document_ref,'sha256',sha256
   ) order by document_ref),
