@@ -507,7 +507,7 @@ $roles$;
 alter role authenticator with login password 'postgres';
 alter role supabase_storage_admin with login password 'postgres';
 grant anon, authenticated, service_role to authenticator;
-`);
+`, "supabase_admin");
 }
 
 function startDataServices(anonKey, serviceKey) {
