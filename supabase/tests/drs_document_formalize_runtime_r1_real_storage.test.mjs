@@ -96,6 +96,84 @@ Deno.test("standalone Storage test transport removes only its gateway prefix", (
   );
 });
 
+function formatStageDiagnostic(stage, value, threw = false) {
+  const allowedStages = [
+    "AUTHORIZE",
+    "INTAKE_INSPECT",
+    "SCAN",
+    "STABILITY_INSPECT",
+    "PROMOTE",
+    "DESTINATION_INSPECT",
+    "COMMIT",
+    "RESPONSE_CONTRACT",
+  ];
+  const boundedStage = allowedStages.includes(stage) ? stage : "UNKNOWN";
+  const present = value !== null && typeof value !== "undefined";
+  const record = present && typeof value === "object" && !Array.isArray(value);
+  const keys = record
+    ? Object.getOwnPropertyNames(value)
+      .filter((key) => /^[A-Za-z][A-Za-z0-9_]{0,31}$/u.test(key))
+      .sort()
+      .slice(0, 8)
+    : [];
+  const ownDataValue = (key) => {
+    if (!record) return undefined;
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    return descriptor && Object.hasOwn(descriptor, "value")
+      ? descriptor.value
+      : undefined;
+  };
+  const rawState = ownDataValue("state");
+  const state = typeof rawState === "string" &&
+      /^[A-Z][A-Z0-9_]{0,47}$/u.test(rawState)
+    ? rawState
+    : "-";
+  const rawEffects = ownDataValue("newEffects");
+  const newEffects = rawEffects === 0 || rawEffects === 1
+    ? String(rawEffects)
+    : "-";
+  return `${boundedStage}|present=${present}|record=${record}|threw=${threw}|keys=${
+    keys.join(",") || "-"
+  }|state=${state}|newEffects=${newEffects}`;
+}
+
+Deno.test("stage diagnostics are bounded and secret-redacted", () => {
+  const result = Object.create({ authorization: "inherited-secret" });
+  Object.defineProperties(result, {
+    state: { enumerable: true, value: "APPLIED" },
+    newEffects: { enumerable: true, value: 1 },
+    token: { enumerable: true, value: "eyJ-secret-token" },
+    url: { enumerable: true, value: "https://secret.example.test/path" },
+    getter: {
+      enumerable: true,
+      get() {
+        throw new Error("diagnostic getter must not execute");
+      },
+    },
+  });
+  const diagnostic = formatStageDiagnostic("COMMIT", result);
+  assert.equal(
+    diagnostic,
+    "COMMIT|present=true|record=true|threw=false|keys=getter,newEffects,state,token,url|state=APPLIED|newEffects=1",
+  );
+  assert.ok(diagnostic.length <= 256);
+  assert.doesNotMatch(
+    diagnostic,
+    /inherited-secret|eyJ-secret-token|https:\/\/secret|diagnostic getter/u,
+  );
+});
+
+async function captureStageDiagnostic(diagnostics, stage, operation) {
+  try {
+    const value = await operation();
+    diagnostics.push(formatStageDiagnostic(stage, value));
+    return value;
+  } catch (error) {
+    diagnostics.push(formatStageDiagnostic(stage, null, true));
+    throw error;
+  }
+}
+
 function cleanReport(overrides = {}) {
   return {
     declaredMime: "application/pdf",
@@ -567,7 +645,8 @@ Deno.test({
         storageUrl.href
       );
       const { createDocumentStorageService } = await import(serviceUrl.href);
-      const repository = createSupabaseDocumentRepository({
+      const stageDiagnostics = [];
+      const baseRepository = createSupabaseDocumentRepository({
         env: {
           get(name) {
             if (name === "SUPABASE_URL") return restOrigin;
@@ -576,7 +655,16 @@ Deno.test({
           },
         },
       });
-      const storage = createSupabaseDocumentStoragePort({
+      const repository = {
+        ...baseRepository,
+        finalizeDomainCommand: (input) =>
+          captureStageDiagnostic(
+            stageDiagnostics,
+            input.action,
+            () => baseRepository.finalizeDomainCommand(input),
+          ),
+      };
+      const baseStorage = createSupabaseDocumentStoragePort({
         env: {
           get(name) {
             if (name === "SUPABASE_URL") return storageOrigin;
@@ -586,9 +674,38 @@ Deno.test({
         },
         fetch: standaloneStorageFetch,
       });
+      let inspectCount = 0;
+      const inspectStages = [
+        "INTAKE_INSPECT",
+        "STABILITY_INSPECT",
+        "DESTINATION_INSPECT",
+      ];
+      const storage = {
+        ...baseStorage,
+        inspect(input) {
+          const stage = inspectStages[inspectCount] ?? "DESTINATION_INSPECT";
+          inspectCount += 1;
+          return captureStageDiagnostic(
+            stageDiagnostics,
+            stage,
+            () => baseStorage.inspect(input),
+          );
+        },
+        promote: (input) =>
+          captureStageDiagnostic(
+            stageDiagnostics,
+            "PROMOTE",
+            () => baseStorage.promote(input),
+          ),
+      };
       const scanner = {
         runtimeAvailable: true,
-        scan: () => Promise.resolve(cleanReport()),
+        scan: () =>
+          captureStageDiagnostic(
+            stageDiagnostics,
+            "SCAN",
+            () => Promise.resolve(cleanReport()),
+          ),
       };
       const service = createDocumentStorageService({
         repository,
@@ -610,12 +727,19 @@ Deno.test({
         commandId,
         expectedCaseVersion,
       });
-      assert.equal(result?.state, "FORMAL_VERSION_CREATED");
+      stageDiagnostics.push(
+        formatStageDiagnostic("RESPONSE_CONTRACT", result),
+      );
+      assert.equal(
+        result?.state,
+        "FORMAL_VERSION_CREATED",
+        ["bounded stage diagnostics", ...stageDiagnostics].join("\n"),
+      );
       assert.match(result?.documentRef ?? "", /^doc_[0-9a-z]{20,40}$/u);
       assert.match(result?.versionRef ?? "", /^dvr_[0-9a-z]{20,40}$/u);
       assert.match(result?.receiptRef ?? "", /^rcp_[0-9a-z]{20,40}$/u);
 
-      const destination = await storage.inspect({
+      const destination = await baseStorage.inspect({
         bucket: "drs-case-records-private",
         objectKey: recordsKey,
       });
@@ -626,7 +750,7 @@ Deno.test({
         sizeBytes: PDF_BYTES.byteLength,
         detectedMime: "application/pdf",
       });
-      const downloaded = await storage.download({
+      const downloaded = await baseStorage.download({
         bucket: "drs-case-records-private",
         objectKey: recordsKey,
       });
