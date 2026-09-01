@@ -1,0 +1,86 @@
+project_id = "laibe-mvp-project"
+
+[functions.drs-session-bootstrap]
+verify_jwt = false
+
+[functions.drs-workspace-grant]
+verify_jwt = false
+
+[functions.drs-google-calendar-grant]
+verify_jwt = false
+
+[functions.drs-google-calendar-oauth-start]
+verify_jwt = false
+
+[functions.drs-google-calendar-oauth-callback]
+verify_jwt = false
+
+[functions.drs-google-calendar-events-read]
+verify_jwt = false
+
+[functions.drs-google-calendar-revoke]
+verify_jwt = false
+
+[functions.casework-case-create]
+verify_jwt = true
+
+[functions.owner-workspace-grant]
+verify_jwt = true
+
+[functions.vendor-workspace-grant]
+verify_jwt = true
+
+[functions.highest-reviewer-workspace-grant]
+verify_jwt = true
+
+[storage.buckets.drs-case-intake-private]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["application/pdf", "image/jpeg", "image/png"]
+
+[storage.buckets.drs-case-records-private]
+public = false
+file_size_limit = "25MiB"
+allowed_mime_types = ["application/pdf", "image/jpeg", "image/png"]
+
+[functions.drs-document-upload-intent]
+verify_jwt = false
+
+[functions.drs-document-upload-finalize]
+verify_jwt = false
+
+[functions.drs-document-version-download]
+verify_jwt = false
+
+[functions.drs-document-snapshot]
+verify_jwt = false
+
+[functions.drs-line-account-link-start]
+verify_jwt = false
+
+[functions.drs-line-account-link-status]
+verify_jwt = false
+
+[functions.drs-line-account-link-cancel]
+verify_jwt = false
+
+[functions.drs-line-account-link-unlink]
+verify_jwt = false
+
+[functions.drs-line-account-link-continue]
+verify_jwt = false
+
+[functions.drs-line-webhook]
+verify_jwt = false
+
+[functions.drs-line-private-notification-dispatch]
+verify_jwt = true
+
+[functions.drs-google-auth-start]
+verify_jwt = false
+
+[functions.drs-google-auth-callback]
+verify_jwt = false
+
+[functions.drs-session-grant]
+verify_jwt = true
