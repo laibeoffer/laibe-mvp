@@ -78,11 +78,29 @@ const FORBIDDEN_AUTHORITY_FIELDS = Object.freeze(
   new Set([
     "userId",
     "caseId",
+    "session",
+    "sessionId",
+    "authSession",
+    "authSessionId",
+    "membership",
+    "membershipId",
     "role",
+    "sourceRole",
+    "authorityVersion",
+    "nextActor",
+    "visibility",
     "memberId",
     "grantId",
     "grantVersion",
     "bucket",
+    "object",
+    "objectKey",
+    "document",
+    "version",
+    "receipt",
+    "canonicalPayloadSha256",
+    "evidence",
+    "evidenceRefs",
     "path",
     "providerIdentity",
   ]),
@@ -712,7 +730,7 @@ function validFinalizeCreated(
     "receiptRef",
   ]) &&
     candidate.schemaVersion ===
-      "laibe.drs-document-upload-finalize.response.v1" &&
+      "laibe.drs-document-upload-finalize.response.v2" &&
     candidate.state === "FORMAL_VERSION_CREATED" &&
     OPAQUE_DOCUMENT_REF.test(String(candidate.documentRef)) &&
     OPAQUE_VERSION_REF.test(String(candidate.versionRef)) &&
@@ -724,7 +742,7 @@ function validFinalizePending(
 ): candidate is Record<string, unknown> {
   return hasExactOwnKeys(candidate, ["schemaVersion", "state", "intentRef"]) &&
     candidate.schemaVersion ===
-      "laibe.drs-document-upload-finalize.response.v1" &&
+      "laibe.drs-document-upload-finalize.response.v2" &&
     candidate.state === "VALIDATION_PENDING" &&
     OPAQUE_INTENT_REF.test(String(candidate.intentRef));
 }
@@ -736,7 +754,8 @@ function validConflict(
   return hasExactOwnKeys(candidate, ["schemaVersion", "state"]) &&
     candidate.schemaVersion === schemaVersion &&
     (candidate.state === "IDEMPOTENCY_CONFLICT" ||
-      candidate.state === "VERSION_CONFLICT");
+      candidate.state === "VERSION_CONFLICT" ||
+      candidate.state === "CASE_VERSION_CONFLICT");
 }
 
 function validSnapshotCreated(
@@ -796,7 +815,7 @@ async function projectEdgeJsonResponse(
       edgeResponse.status === 409 &&
       validConflict(
         candidate,
-        "laibe.drs-document-upload-finalize.response.v1",
+        "laibe.drs-document-upload-finalize.response.v2",
       )
     ) return jsonResponse(409, candidate);
   }

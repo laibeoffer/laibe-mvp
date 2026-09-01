@@ -1,6 +1,9 @@
 import {
+  canonicalFinalizeDomainResourceV1,
+  canonicalFinalizeRequestV2,
   type DownloadRequest,
   extensionFromFilename,
+  type FinalizeDomainResource,
   type FinalizeRequest,
   INTAKE_BUCKET,
   isOpaqueRef,
@@ -9,6 +12,7 @@ import {
   readOwn,
   RECORDS_BUCKET,
   sha256Canonical,
+  sha256CanonicalText,
   type SnapshotRequest,
   type UploadIntentRequest,
 } from "./contracts.ts";
@@ -17,7 +21,9 @@ import type {
   DocumentAuthorityPort,
   DocumentModeAPrincipal,
   DocumentRepositoryPort,
+  DocumentRuntimePrincipal,
   DocumentScannerPort,
+  DocumentSessionContext,
   DocumentStoragePort,
 } from "./ports.ts";
 import {
@@ -65,17 +71,18 @@ function record(candidate: unknown): Record<string, unknown> | null {
 
 function logicalConflict(
   candidate: Record<string, unknown> | null,
-): "IDEMPOTENCY_CONFLICT" | "VERSION_CONFLICT" | null {
+): "IDEMPOTENCY_CONFLICT" | "VERSION_CONFLICT" | "CASE_VERSION_CONFLICT" | null {
   const state = readOwn(candidate, "state");
   return readOwn(candidate, "ok") === false &&
-      (state === "IDEMPOTENCY_CONFLICT" || state === "VERSION_CONFLICT")
+      (state === "IDEMPOTENCY_CONFLICT" || state === "VERSION_CONFLICT" ||
+        state === "CASE_VERSION_CONFLICT")
     ? state
     : null;
 }
 
 function conflictResponse(
   schemaVersion: string,
-  state: "IDEMPOTENCY_CONFLICT" | "VERSION_CONFLICT",
+  state: "IDEMPOTENCY_CONFLICT" | "VERSION_CONFLICT" | "CASE_VERSION_CONFLICT",
 ): Readonly<Record<string, unknown>> {
   return Object.freeze({ schemaVersion, state });
 }
@@ -94,6 +101,29 @@ function hasExactRecordKeys(
     expected.every((key) => keys.includes(key));
 }
 
+function sessionContext(
+  principal: DocumentRuntimePrincipal,
+): principal is DocumentSessionContext {
+  const candidate = principal as Partial<DocumentSessionContext>;
+  return isUuid(candidate.userId) && isUuid(candidate.sessionId) &&
+    isUuid(candidate.caseId) && isUuid(candidate.membershipId) &&
+    ["owner", "vendor", "drs"].includes(String(candidate.role)) &&
+    Number.isSafeInteger(candidate.authorityVersion) &&
+    Number(candidate.authorityVersion) > 0 &&
+    ["owner", "vendor", "drs"].includes(String(candidate.nextActor));
+}
+
+function modeAPrincipal(
+  principal: DocumentRuntimePrincipal,
+): principal is DocumentModeAPrincipal {
+  const candidate = principal as Partial<DocumentModeAPrincipal>;
+  return isUuid(candidate.authenticatedUserId) &&
+    isUuid(candidate.expectedCaseId) &&
+    typeof candidate.authorizationSubject === "string" &&
+    isUuid(candidate.grantId) && typeof candidate.grantVersion === "string" &&
+    typeof candidate.grantExpiresAt === "string";
+}
+
 export function createDocumentStorageService(
   dependencies: Readonly<{
     repository: DocumentRepositoryPort;
@@ -107,7 +137,7 @@ export function createDocumentStorageService(
   const randomUuid = dependencies.randomUuid ?? uuid;
 
   async function queuePromotedOrphan(
-    principal: DocumentModeAPrincipal,
+    principal: DocumentRuntimePrincipal,
     intentRef: string,
     recordsObjectKey: string,
   ): Promise<void> {
@@ -132,11 +162,11 @@ export function createDocumentStorageService(
   }
 
   async function createUploadIntent(
-    principal: DocumentModeAPrincipal,
+    principal: DocumentRuntimePrincipal,
     request: UploadIntentRequest,
   ): Promise<Readonly<Record<string, unknown>> | null> {
     if (
-      !dependencies.repository.runtimeAvailable ||
+      !dependencies.repository.runtimeAvailable || !modeAPrincipal(principal) ||
       !dependencies.storage.runtimeAvailable
     ) {
       return null;
@@ -207,30 +237,31 @@ export function createDocumentStorageService(
   }
 
   async function finalizeUpload(
-    principal: DocumentModeAPrincipal,
+    principal: DocumentRuntimePrincipal,
     request: FinalizeRequest,
   ): Promise<Readonly<Record<string, unknown>> | null> {
     if (
       !dependencies.repository.runtimeAvailable ||
-      !dependencies.storage.runtimeAvailable
+      !dependencies.storage.runtimeAvailable || !sessionContext(principal)
     ) {
       return null;
     }
-    const requestHash = await sha256Canonical(request);
+    const requestHash = await sha256CanonicalText(
+      canonicalFinalizeRequestV2(request),
+    );
     const plan = record(
-      await dependencies.repository.execute({
+      await dependencies.repository.finalizeDomainCommand({
         principal,
-        operation: "FINALIZE_UPLOAD",
-        resourceRef: request.intentRef,
-        idempotencyKey: request.idempotencyKey,
-        expectedPayloadSha256: requestHash,
+        action: "AUTHORIZE",
+        request,
+        finalizeRequestPayloadSha256: requestHash,
       }),
     );
     if (!plan) return null;
     const planConflict = logicalConflict(plan);
     if (planConflict) {
       return conflictResponse(
-        "laibe.drs-document-upload-finalize.response.v1",
+        "laibe.drs-document-upload-finalize.response.v2",
         planConflict,
       );
     }
@@ -238,13 +269,13 @@ export function createDocumentStorageService(
     const planVersionRef = readOwn(plan, "version_ref");
     const planReceiptRef = readOwn(plan, "receipt_ref");
     if (
-      readOwn(plan, "ok") === true &&
-      readOwn(plan, "state") === "FORMAL_VERSION_CREATED" &&
+      readOwn(plan, "ok") === true && readOwn(plan, "state") === "REPLAYED" &&
+      readOwn(plan, "newEffects") === 0 &&
       exactRef(planDocumentRef, "doc") && exactRef(planVersionRef, "dvr") &&
       exactRef(planReceiptRef, "rcp")
     ) {
       return Object.freeze({
-        schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
+        schemaVersion: "laibe.drs-document-upload-finalize.response.v2",
         state: "FORMAL_VERSION_CREATED",
         documentRef: planDocumentRef,
         versionRef: planVersionRef,
@@ -259,7 +290,7 @@ export function createDocumentStorageService(
     ) return null;
     if (!dependencies.scanner.runtimeAvailable) {
       return Object.freeze({
-        schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
+        schemaVersion: "laibe.drs-document-upload-finalize.response.v2",
         state: "VALIDATION_PENDING",
         intentRef: request.intentRef,
       });
@@ -267,22 +298,35 @@ export function createDocumentStorageService(
     const intakeKey = readOwn(plan, "intake_object_key");
     const recordsKey = readOwn(plan, "records_object_key");
     const declaredMime = readOwn(plan, "declared_mime");
+    const declaredSizeBytes = readOwn(plan, "declared_size_bytes");
+    const declaredSha256 = readOwn(plan, "declared_sha256");
     if (
       typeof intakeKey !== "string" || typeof recordsKey !== "string" ||
       !["application/pdf", "image/jpeg", "image/png"].includes(
         String(declaredMime),
-      )
+      ) || !Number.isSafeInteger(declaredSizeBytes) ||
+      !isSha256(declaredSha256)
     ) return null;
     const intake = await dependencies.storage.inspect({
       bucket: INTAKE_BUCKET,
       objectKey: intakeKey,
     });
-    if (!intake) return null;
-    const scan = await dependencies.scanner.scan({
-      bucket: INTAKE_BUCKET,
-      objectKey: intakeKey,
-      declaredMime: declaredMime as typeof intake.detectedMime,
-    });
+    if (
+      !intake || intake.bucket !== INTAKE_BUCKET ||
+      intake.objectKey !== intakeKey || intake.sha256 !== declaredSha256 ||
+      intake.sizeBytes !== declaredSizeBytes ||
+      intake.detectedMime !== declaredMime
+    ) return null;
+    let scan;
+    try {
+      scan = await dependencies.scanner.scan({
+        bucket: INTAKE_BUCKET,
+        objectKey: intakeKey,
+        declaredMime: declaredMime as typeof intake.detectedMime,
+      });
+    } catch {
+      scan = null;
+    }
     const intakeFilename = intakeKey.split("/").at(-1) ?? "";
     if (
       !scan || evaluateHostileFileReport(scan).state !== "CLEAN" ||
@@ -292,11 +336,22 @@ export function createDocumentStorageService(
         scan.extension
     ) {
       return Object.freeze({
-        schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
+        schemaVersion: "laibe.drs-document-upload-finalize.response.v2",
         state: "VALIDATION_PENDING",
         intentRef: request.intentRef,
       });
     }
+    const stableIntake = await dependencies.storage.inspect({
+      bucket: INTAKE_BUCKET,
+      objectKey: intakeKey,
+    });
+    if (
+      !stableIntake || stableIntake.bucket !== intake.bucket ||
+      stableIntake.objectKey !== intake.objectKey ||
+      stableIntake.sha256 !== intake.sha256 ||
+      stableIntake.sizeBytes !== intake.sizeBytes ||
+      stableIntake.detectedMime !== intake.detectedMime
+    ) return null;
     const promoted = await dependencies.storage.promote({
       sourceBucket: INTAKE_BUCKET,
       sourceObjectKey: intakeKey,
@@ -309,15 +364,17 @@ export function createDocumentStorageService(
       objectKey: recordsKey,
     });
     if (
-      !records || records.sha256 !== intake.sha256 ||
+      !records || records.bucket !== RECORDS_BUCKET ||
+      records.objectKey !== recordsKey || records.sha256 !== intake.sha256 ||
       records.sizeBytes !== intake.sizeBytes ||
       records.detectedMime !== intake.detectedMime
     ) {
       await queuePromotedOrphan(principal, request.intentRef, recordsKey);
       return null;
     }
-    const finalizeResource = Object.freeze({
-      schemaVersion: "laibe.drs-document-finalize.internal.v1",
+    const finalizeResource: FinalizeDomainResource = Object.freeze({
+      schemaVersion:
+        "laibe.drs-document-finalize-domain-command.internal.v1",
       intentRef: request.intentRef,
       recordsBucket: RECORDS_BUCKET,
       recordsObjectKey: recordsKey,
@@ -326,20 +383,24 @@ export function createDocumentStorageService(
       detectedMime: records.detectedMime,
       requestPayloadSha256: requestHash,
     });
+    const canonicalPayloadSha256 = await sha256CanonicalText(
+      canonicalFinalizeDomainResourceV1(finalizeResource),
+    );
     const finalized = record(
-      await dependencies.repository.execute({
+      await dependencies.repository.finalizeDomainCommand({
         principal,
-        operation: "FINALIZE_UPLOAD",
-        resourceRef: JSON.stringify(finalizeResource),
-        idempotencyKey: request.idempotencyKey,
-        expectedPayloadSha256: await sha256Canonical(finalizeResource),
+        action: "COMMIT",
+        request,
+        finalizeRequestPayloadSha256: requestHash,
+        canonicalPayloadSha256,
+        resource: finalizeResource,
       }),
     );
     const finalizeConflict = logicalConflict(finalized);
     if (finalizeConflict) {
       await queuePromotedOrphan(principal, request.intentRef, recordsKey);
       return conflictResponse(
-        "laibe.drs-document-upload-finalize.response.v1",
+        "laibe.drs-document-upload-finalize.response.v2",
         finalizeConflict,
       );
     }
@@ -348,7 +409,11 @@ export function createDocumentStorageService(
     const receiptRef = readOwn(finalized, "receipt_ref");
     if (
       readOwn(finalized, "ok") !== true ||
-      readOwn(finalized, "state") !== "FORMAL_VERSION_CREATED" ||
+      !["APPLIED", "REPLAYED"].includes(String(readOwn(finalized, "state"))) ||
+      (readOwn(finalized, "state") === "APPLIED" &&
+        readOwn(finalized, "newEffects") !== 1) ||
+      (readOwn(finalized, "state") === "REPLAYED" &&
+        readOwn(finalized, "newEffects") !== 0) ||
       !exactRef(documentRef, "doc") || !exactRef(versionRef, "dvr") ||
       !exactRef(receiptRef, "rcp")
     ) {
@@ -356,7 +421,7 @@ export function createDocumentStorageService(
       return null;
     }
     return Object.freeze({
-      schemaVersion: "laibe.drs-document-upload-finalize.response.v1",
+      schemaVersion: "laibe.drs-document-upload-finalize.response.v2",
       state: "FORMAL_VERSION_CREATED",
       documentRef,
       versionRef,
@@ -365,9 +430,10 @@ export function createDocumentStorageService(
   }
 
   async function downloadVersion(
-    principal: DocumentModeAPrincipal,
+    principal: DocumentRuntimePrincipal,
     request: DownloadRequest,
   ): Promise<Response | null> {
+    if (!modeAPrincipal(principal)) return null;
     const payloadSha256 = await sha256Canonical(request);
     const result = record(
       await dependencies.repository.execute({
@@ -401,9 +467,10 @@ export function createDocumentStorageService(
   }
 
   async function createSnapshot(
-    principal: DocumentModeAPrincipal,
+    principal: DocumentRuntimePrincipal,
     request: SnapshotRequest,
   ): Promise<Readonly<Record<string, unknown>> | null> {
+    if (!modeAPrincipal(principal)) return null;
     const resourceRef = JSON.stringify(request);
     const expectedPayloadSha256 = await sha256Canonical(request);
     const result = record(
@@ -604,7 +671,8 @@ export function createDocumentEdgeHandler(
           result.state === "VALIDATION_PENDING"
             ? 202
             : result.state === "IDEMPOTENCY_CONFLICT" ||
-                result.state === "VERSION_CONFLICT"
+                result.state === "VERSION_CONFLICT" ||
+                result.state === "CASE_VERSION_CONFLICT"
             ? 409
             : 201,
           result,

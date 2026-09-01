@@ -1,7 +1,7 @@
 export const UPLOAD_INTENT_REQUEST_SCHEMA =
   "laibe.drs-document-upload-intent.request.v1" as const;
 export const FINALIZE_REQUEST_SCHEMA =
-  "laibe.drs-document-upload-finalize.request.v1" as const;
+  "laibe.drs-document-upload-finalize.request.v2" as const;
 export const SNAPSHOT_REQUEST_SCHEMA =
   "laibe.drs-document-snapshot.request.v1" as const;
 
@@ -24,7 +24,13 @@ export const INTAKE_BUCKET = "drs-case-intake-private" as const;
 export const RECORDS_BUCKET = "drs-case-records-private" as const;
 
 export type DocumentMime = typeof DOCUMENT_LIMITS.allowedMime[number];
-export type DocumentKind = "drs_review";
+export type DocumentKind =
+  | "drawing"
+  | "quote"
+  | "contract"
+  | "photo"
+  | "other_case_evidence"
+  | "drs_review";
 export type SnapshotPurpose =
   | "REVIEW_SUBMISSION"
   | "DECISION_BASIS"
@@ -45,6 +51,19 @@ export type FinalizeRequest = Readonly<{
   schemaVersion: typeof FINALIZE_REQUEST_SCHEMA;
   intentRef: string;
   idempotencyKey: string;
+  commandId: string;
+  expectedCaseVersion: number;
+}>;
+
+export type FinalizeDomainResource = Readonly<{
+  schemaVersion: "laibe.drs-document-finalize-domain-command.internal.v1";
+  intentRef: string;
+  recordsBucket: typeof RECORDS_BUCKET;
+  recordsObjectKey: string;
+  verifiedSha256: string;
+  verifiedSizeBytes: number;
+  detectedMime: DocumentMime;
+  requestPayloadSha256: string;
 }>;
 
 export type SnapshotRequest = Readonly<{
@@ -62,7 +81,7 @@ export type DocumentRequest =
   | DownloadRequest;
 
 const UUID =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u;
 const OPAQUE_REF = /^(?:doc|dvr|int|snp|rcp)_[0-9a-z]{20,40}$/u;
 const SHA256 = /^[a-f0-9]{64}$/u;
 const IDEMPOTENCY = /^[^\s\p{C}]{16,128}$/u;
@@ -159,7 +178,14 @@ export function parseUploadIntentRequest(
     schemaVersion !== UPLOAD_INTENT_REQUEST_SCHEMA ||
     (mode !== "NEW_DOCUMENT" && mode !== "NEW_VERSION") ||
     (mode === "NEW_VERSION" && !isOpaqueRef(documentRef)) ||
-    documentKind !== "drs_review" ||
+    ![
+      "drawing",
+      "quote",
+      "contract",
+      "photo",
+      "other_case_evidence",
+      "drs_review",
+    ].includes(String(documentKind)) ||
     typeof originalFilename !== "string" ||
     !DOCUMENT_LIMITS.allowedMime.includes(declaredMime as DocumentMime) ||
     extensionFromFilename(
@@ -184,17 +210,68 @@ export function parseUploadIntentRequest(
 }
 
 export function parseFinalizeRequest(input: unknown): FinalizeRequest | null {
-  if (!hasExactKeys(input, ["schemaVersion", "intentRef", "idempotencyKey"])) {
+  if (
+    !hasExactKeys(input, [
+      "schemaVersion",
+      "intentRef",
+      "idempotencyKey",
+      "commandId",
+      "expectedCaseVersion",
+    ])
+  ) {
     return null;
   }
   const schemaVersion = readOwn(input, "schemaVersion");
   const intentRef = readOwn(input, "intentRef");
   const idempotencyKey = readOwn(input, "idempotencyKey");
+  const commandId = readOwn(input, "commandId");
+  const expectedCaseVersion = readOwn(input, "expectedCaseVersion");
   if (
     schemaVersion !== FINALIZE_REQUEST_SCHEMA || !isOpaqueRef(intentRef) ||
-    !isIdempotencyKey(idempotencyKey)
+    !isIdempotencyKey(idempotencyKey) || !isUuid(commandId) ||
+    !Number.isSafeInteger(expectedCaseVersion) ||
+    (expectedCaseVersion as number) < 1
   ) return null;
-  return Object.freeze({ schemaVersion, intentRef, idempotencyKey });
+  return Object.freeze({
+    schemaVersion,
+    intentRef,
+    idempotencyKey,
+    commandId,
+    expectedCaseVersion: expectedCaseVersion as number,
+  });
+}
+
+export function canonicalFinalizeRequestV2(request: FinalizeRequest): string {
+  return `schemaVersion=${request.schemaVersion}\n` +
+    `intentRef=${request.intentRef}\n` +
+    `idempotencyKey=${request.idempotencyKey}\n` +
+    `commandId=${request.commandId}\n` +
+    `expectedCaseVersion=${request.expectedCaseVersion}`;
+}
+
+export function canonicalFinalizeDomainResourceV1(
+  resource: FinalizeDomainResource,
+): string {
+  return `schemaVersion=${resource.schemaVersion}\n` +
+    `intentRef=${resource.intentRef}\n` +
+    `recordsBucket=${resource.recordsBucket}\n` +
+    `recordsObjectKey=${resource.recordsObjectKey}\n` +
+    `verifiedSha256=${resource.verifiedSha256}\n` +
+    `verifiedSizeBytes=${resource.verifiedSizeBytes}\n` +
+    `detectedMime=${resource.detectedMime}\n` +
+    `requestPayloadSha256=${resource.requestPayloadSha256}`;
+}
+
+export async function sha256CanonicalText(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value),
+  );
+  let result = "";
+  for (const byte of new Uint8Array(digest)) {
+    result += byte.toString(16).padStart(2, "0");
+  }
+  return result;
 }
 
 export function parseSnapshotRequest(input: unknown): SnapshotRequest | null {

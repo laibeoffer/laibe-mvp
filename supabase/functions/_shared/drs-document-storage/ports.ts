@@ -1,9 +1,11 @@
 import type {
   DocumentMime,
+  FinalizeDomainResource,
   FinalizeRequest,
   SnapshotRequest,
   UploadIntentRequest,
 } from "./contracts.ts";
+import type { SessionContext } from "../drs-auth/drs-session-bootstrap-bff.ts";
 import type { HostileFileReport } from "./validation.ts";
 
 export type DocumentModeAPrincipal = Readonly<{
@@ -15,6 +17,11 @@ export type DocumentModeAPrincipal = Readonly<{
   grantExpiresAt: string;
 }>;
 
+export type DocumentSessionContext = SessionContext;
+export type DocumentRuntimePrincipal =
+  | DocumentModeAPrincipal
+  | DocumentSessionContext;
+
 export type DocumentOperation =
   | "CREATE_UPLOAD_INTENT"
   | "FINALIZE_UPLOAD"
@@ -24,7 +31,7 @@ export type DocumentOperation =
 
 export interface DocumentAuthorityPort {
   readonly runtimeAvailable: boolean;
-  authorize(request: Request): Promise<DocumentModeAPrincipal | null>;
+  authorize(request: Request): Promise<DocumentRuntimePrincipal | null>;
 }
 
 export interface DocumentRepositoryPort {
@@ -38,9 +45,19 @@ export interface DocumentRepositoryPort {
       expectedPayloadSha256: string;
     }>,
   ): Promise<unknown>;
+  finalizeDomainCommand(
+    input: Readonly<{
+      principal: DocumentSessionContext;
+      action: "AUTHORIZE" | "COMMIT";
+      request: FinalizeRequest;
+      finalizeRequestPayloadSha256: string;
+      canonicalPayloadSha256?: string;
+      resource?: FinalizeDomainResource;
+    }>,
+  ): Promise<unknown>;
   queueOrphanCleanup(
     input: Readonly<{
-      principal: DocumentModeAPrincipal;
+      principal: DocumentRuntimePrincipal;
       intentRef: string;
       recordsBucket: string;
       recordsObjectKey: string;
