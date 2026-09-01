@@ -2,8 +2,11 @@ import {
   BFF_PROOF_AUDIENCE,
   createServerOwnedVerifiedSessionProducer,
   type DrsSessionBootstrapDependencies,
+  type DrsThreeRoleSessionBootstrapDependencies,
   type OpaqueBffProofClaims,
   type SealedSessionCookieEnvelope,
+  type SessionContext,
+  type TechnicalSealedSessionCookieEnvelope,
 } from "./drs-session-bootstrap-bff.ts";
 import {
   createSupabaseDrsWorkspaceGrantDependencies,
@@ -17,6 +20,9 @@ import type {
   VerifiedSessionProducer,
 } from "./contracts.ts";
 import { isUuid } from "./contracts.ts";
+import type {
+  DrsThreeRoleTechnicalSessionProducer,
+} from "./drs-three-role-auth-runtime.ts";
 
 const ENVIRONMENT_NAMES = Object.freeze(
   [
@@ -37,8 +43,12 @@ const MAX_RPC_RESPONSE_BYTES = 8192;
 const MAX_COOKIE_BYTES = 4096;
 const MAX_PROOF_BYTES = 4096;
 const COOKIE_DOMAIN = "laibe.drs-server-session-cookie.v1";
+const THREE_ROLE_COOKIE_DOMAIN = "drs-three-role-technical-session-v1";
 const PROOF_AUDIENCE = "laibe:drs-session-bff";
 const COOKIE_AAD = new TextEncoder().encode(COOKIE_DOMAIN);
+const THREE_ROLE_COOKIE_AAD = new TextEncoder().encode(
+  THREE_ROLE_COOKIE_DOMAIN,
+);
 const PROOF_HEADER_JSON = '{"alg":"HS256","typ":"JWT"}';
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
@@ -52,6 +62,8 @@ const RPC_PATHS = Object.freeze(
     "/rest/v1/rpc/drs_server_session_issue_v1",
     "/rest/v1/rpc/drs_server_session_verify_v1",
     "/rest/v1/rpc/drs_server_session_revoke_v1",
+    "/rest/v1/rpc/drs_three_role_server_session_issue_v1",
+    "/rest/v1/rpc/drs_three_role_server_session_verify_v1",
   ] as const,
 );
 
@@ -75,6 +87,14 @@ export type DrsSecureSessionRuntime = Readonly<{
   sessionRevoker: DrsServerSessionRevoker | null;
 }>;
 
+export type DrsThreeRoleSecureSessionRuntime = Readonly<{
+  runtimeAvailable: boolean;
+  bootstrapDependencies:
+    | DrsThreeRoleSessionBootstrapDependencies
+    | undefined;
+  technicalSessionProducer: DrsThreeRoleTechnicalSessionProducer | null;
+}>;
+
 export type DrsSecureSessionRuntimeOptions = Readonly<{
   env?: RuntimeEnvironment;
   fetch?: FetchLike;
@@ -88,6 +108,13 @@ const UNAVAILABLE_RUNTIME: DrsSecureSessionRuntime = Object.freeze({
   verifiedSessionProducer: null,
   sessionRevoker: null,
 });
+
+const UNAVAILABLE_THREE_ROLE_RUNTIME: DrsThreeRoleSecureSessionRuntime = Object
+  .freeze({
+    runtimeAvailable: false,
+    bootstrapDependencies: undefined,
+    technicalSessionProducer: null,
+  });
 
 function unavailable(): DrsSecureSessionRuntime {
   return UNAVAILABLE_RUNTIME;
@@ -315,6 +342,34 @@ function exactRpcBody(path: RpcPath, input: unknown): boolean {
         ownValue(body, "p_specialist_id"),
       ) && validRfc3339(ownValue(body, "p_issued_at")) &&
       validRfc3339(ownValue(body, "p_expires_at"));
+  }
+  if (path === "/rest/v1/rpc/drs_three_role_server_session_issue_v1") {
+    return hasExactOwnKeys(body, [
+      "p_server_session_id",
+      "p_access_token_digest",
+      "p_user_id",
+      "p_auth_session_id",
+      "p_issued_at",
+      "p_expires_at",
+    ]) && isUuid(ownValue(body, "p_server_session_id")) &&
+      BASE64URL_32_BYTE_PATTERN.test(
+        String(ownValue(body, "p_access_token_digest") ?? ""),
+      ) && isUuid(ownValue(body, "p_user_id")) &&
+      isUuid(ownValue(body, "p_auth_session_id")) &&
+      validRfc3339(ownValue(body, "p_issued_at")) &&
+      validRfc3339(ownValue(body, "p_expires_at"));
+  }
+  if (path === "/rest/v1/rpc/drs_three_role_server_session_verify_v1") {
+    return hasExactOwnKeys(body, [
+      "p_server_session_id",
+      "p_access_token_digest",
+      "p_expected_user_id",
+      "p_expected_auth_session_id",
+    ]) && isUuid(ownValue(body, "p_server_session_id")) &&
+      BASE64URL_32_BYTE_PATTERN.test(
+        String(ownValue(body, "p_access_token_digest") ?? ""),
+      ) && isUuid(ownValue(body, "p_expected_user_id")) &&
+      isUuid(ownValue(body, "p_expected_auth_session_id"));
   }
   return hasExactOwnKeys(body, [
     "p_server_session_id",
@@ -615,6 +670,122 @@ function createCookieEnvelopeCodec(
           throw sanitizedFailure();
         }
         return Object.freeze({ ...(parsed as SealedSessionCookieEnvelope) });
+      } catch {
+        throw sanitizedFailure();
+      }
+    },
+  });
+}
+
+function createThreeRoleTechnicalCookieCodec(
+  cryptoImplementation: Crypto,
+  rawKey: Uint8Array<ArrayBuffer>,
+) {
+  let keyPromise: Promise<CryptoKey> | null = null;
+  const key = () =>
+    keyPromise ??= cryptoImplementation.subtle.importKey(
+      "raw",
+      rawKey,
+      { name: "AES-GCM" },
+      false,
+      ["encrypt", "decrypt"],
+    );
+
+  function validateEnvelope(
+    input: unknown,
+  ): input is TechnicalSealedSessionCookieEnvelope {
+    return hasExactOwnKeys(input, [
+      "schemaVersion",
+      "userId",
+      "authSessionId",
+      "serverSessionId",
+      "accessToken",
+      "expiresAtEpochSeconds",
+    ]) &&
+      ownValue(input, "schemaVersion") === THREE_ROLE_COOKIE_DOMAIN &&
+      isUuid(ownValue(input, "userId")) &&
+      isUuid(ownValue(input, "authSessionId")) &&
+      isUuid(ownValue(input, "serverSessionId")) &&
+      typeof ownValue(input, "accessToken") === "string" &&
+      BASE64URL_32_BYTE_PATTERN.test(
+        ownValue(input, "accessToken") as string,
+      ) &&
+      Number.isSafeInteger(ownValue(input, "expiresAtEpochSeconds")) &&
+      (ownValue(input, "expiresAtEpochSeconds") as number) > 0;
+  }
+
+  return Object.freeze({
+    async sealTechnicalSessionCookie(
+      payload: TechnicalSealedSessionCookieEnvelope,
+    ): Promise<string> {
+      try {
+        if (!validateEnvelope(payload)) throw sanitizedFailure();
+        const plaintext = JSON.stringify({
+          schemaVersion: payload.schemaVersion,
+          userId: payload.userId,
+          authSessionId: payload.authSessionId,
+          serverSessionId: payload.serverSessionId,
+          accessToken: payload.accessToken,
+          expiresAtEpochSeconds: payload.expiresAtEpochSeconds,
+        });
+        const iv = new Uint8Array(12);
+        cryptoImplementation.getRandomValues(iv);
+        const ciphertext = new Uint8Array(
+          await cryptoImplementation.subtle.encrypt(
+            {
+              name: "AES-GCM",
+              iv,
+              additionalData: THREE_ROLE_COOKIE_AAD,
+              tagLength: 128,
+            },
+            await key(),
+            new TextEncoder().encode(plaintext),
+          ),
+        );
+        const sealed = `v1.${base64Url(iv)}.${base64Url(ciphertext)}`;
+        if (sealed.length > MAX_COOKIE_BYTES) throw sanitizedFailure();
+        return sealed;
+      } catch {
+        throw sanitizedFailure();
+      }
+    },
+
+    async openTechnicalSessionCookie(value: string): Promise<unknown> {
+      try {
+        if (
+          typeof value !== "string" || value.length < 1 ||
+          value.length > MAX_COOKIE_BYTES
+        ) throw sanitizedFailure();
+        const parts = value.split(".");
+        if (parts.length !== 3 || parts[0] !== "v1") throw sanitizedFailure();
+        const iv = fromBase64Url(parts[1]);
+        const ciphertext = fromBase64Url(parts[2]);
+        if (iv.byteLength !== 12 || ciphertext.byteLength < 17) {
+          throw sanitizedFailure();
+        }
+        const plaintextBytes = await cryptoImplementation.subtle.decrypt(
+          {
+            name: "AES-GCM",
+            iv,
+            additionalData: THREE_ROLE_COOKIE_AAD,
+            tagLength: 128,
+          },
+          await key(),
+          ciphertext,
+        );
+        const plaintext = new TextDecoder("utf-8", { fatal: true }).decode(
+          plaintextBytes,
+        );
+        if (new TextEncoder().encode(plaintext).byteLength > MAX_COOKIE_BYTES) {
+          throw sanitizedFailure();
+        }
+        const parsed: unknown = JSON.parse(plaintext);
+        if (!validateEnvelope(parsed) || JSON.stringify(parsed) !== plaintext) {
+          throw sanitizedFailure();
+        }
+        return Object.freeze({
+          ...(parsed as TechnicalSealedSessionCookieEnvelope),
+        });
       } catch {
         throw sanitizedFailure();
       }
@@ -929,6 +1100,275 @@ function createSessionPorts(
     accessSessionVerifier,
     sessionRevoker,
   });
+}
+
+function threeRole(value: unknown): value is "owner" | "vendor" | "drs" {
+  return value === "owner" || value === "vendor" || value === "drs";
+}
+
+function createThreeRoleSessionPorts(
+  boundedFetch: FetchLike,
+  supabaseOrigin: string,
+  cryptoImplementation: Crypto,
+  now: () => Date,
+  technicalCookieCodec: ReturnType<typeof createThreeRoleTechnicalCookieCodec>,
+  configuration: Readonly<{
+    successUrl: string;
+    sessionCookieName: string;
+  }>,
+) {
+  const technicalSessionProducer: DrsThreeRoleTechnicalSessionProducer = Object
+    .freeze({
+      async createTechnicalSession(
+        input: Parameters<
+          DrsThreeRoleTechnicalSessionProducer["createTechnicalSession"]
+        >[0],
+      ) {
+        try {
+          if (
+            !hasExactOwnKeys(input, [
+              "userId",
+              "authSessionId",
+              "accessToken",
+              "expiresAtEpochSeconds",
+              "callbackOrigin",
+              "successRedirectUrl",
+              "sessionCookieName",
+            ]) ||
+            !isUuid(ownValue(input, "userId")) ||
+            !isUuid(ownValue(input, "authSessionId")) ||
+            typeof ownValue(input, "accessToken") !== "string" ||
+            (ownValue(input, "accessToken") as string).split(".").length !==
+              3 ||
+            !Number.isSafeInteger(ownValue(input, "expiresAtEpochSeconds")) ||
+            ownValue(input, "callbackOrigin") !== supabaseOrigin ||
+            ownValue(input, "successRedirectUrl") !==
+              configuration.successUrl ||
+            ownValue(input, "sessionCookieName") !==
+              configuration.sessionCookieName
+          ) throw sanitizedFailure();
+          const issuedAt = safeNow(now);
+          const nowEpochSeconds = Math.floor(issuedAt.getTime() / 1000);
+          const expiresAtEpochSeconds = Math.min(
+            input.expiresAtEpochSeconds,
+            nowEpochSeconds + SESSION_TTL_SECONDS,
+          );
+          if (expiresAtEpochSeconds <= nowEpochSeconds) {
+            throw sanitizedFailure();
+          }
+          const serverSessionId = cryptoImplementation.randomUUID();
+          if (!isUuid(serverSessionId)) throw sanitizedFailure();
+          const tokenBytes = new Uint8Array(32);
+          cryptoImplementation.getRandomValues(tokenBytes);
+          const technicalAccessToken = base64Url(tokenBytes);
+          const expiresAt = new Date(
+            expiresAtEpochSeconds * 1000,
+          ).toISOString();
+          const projection = await callRpc(
+            boundedFetch,
+            supabaseOrigin,
+            "/rest/v1/rpc/drs_three_role_server_session_issue_v1",
+            {
+              p_server_session_id: serverSessionId,
+              p_access_token_digest: await accessTokenDigest(
+                cryptoImplementation,
+                technicalAccessToken,
+              ),
+              p_user_id: input.userId,
+              p_auth_session_id: input.authSessionId,
+              p_issued_at: issuedAt.toISOString(),
+              p_expires_at: expiresAt,
+            },
+          );
+          if (
+            !hasExactOwnKeys(projection, [
+              "server_session_id",
+              "expires_at",
+            ]) ||
+            ownValue(projection, "server_session_id") !== serverSessionId ||
+            ownValue(projection, "expires_at") !== expiresAt
+          ) throw sanitizedFailure();
+          const sealed = await technicalCookieCodec.sealTechnicalSessionCookie({
+            schemaVersion: THREE_ROLE_COOKIE_DOMAIN,
+            userId: input.userId,
+            authSessionId: input.authSessionId,
+            serverSessionId,
+            accessToken: technicalAccessToken,
+            expiresAtEpochSeconds,
+          });
+          return Object.freeze({
+            response: new Response(null, {
+              status: 303,
+              headers: {
+                "location": configuration.successUrl,
+                "set-cookie":
+                  `${configuration.sessionCookieName}=${sealed}; Path=/; HttpOnly; Secure; SameSite=Lax`,
+                "x-laibe-session-state": "SESSION_ESTABLISHED",
+                "cache-control": "no-store",
+                "pragma": "no-cache",
+                "x-content-type-options": "nosniff",
+              },
+            }),
+          });
+        } catch {
+          throw sanitizedFailure();
+        }
+      },
+    });
+
+  const sessionVerifier = Object.freeze({
+    async verifyThreeRoleSession(
+      input: Readonly<{
+        serverSessionId: string;
+        accessToken: string;
+        expectedUserId: string;
+        expectedAuthSessionId: string;
+      }>,
+    ): Promise<SessionContext> {
+      try {
+        if (
+          !hasExactOwnKeys(input, [
+            "serverSessionId",
+            "accessToken",
+            "expectedUserId",
+            "expectedAuthSessionId",
+          ]) ||
+          !isUuid(ownValue(input, "serverSessionId")) ||
+          typeof ownValue(input, "accessToken") !== "string" ||
+          !BASE64URL_32_BYTE_PATTERN.test(input.accessToken) ||
+          !isUuid(ownValue(input, "expectedUserId")) ||
+          !isUuid(ownValue(input, "expectedAuthSessionId"))
+        ) throw sanitizedFailure();
+        const projection = await callRpc(
+          boundedFetch,
+          supabaseOrigin,
+          "/rest/v1/rpc/drs_three_role_server_session_verify_v1",
+          {
+            p_server_session_id: input.serverSessionId,
+            p_access_token_digest: await accessTokenDigest(
+              cryptoImplementation,
+              input.accessToken,
+            ),
+            p_expected_user_id: input.expectedUserId,
+            p_expected_auth_session_id: input.expectedAuthSessionId,
+          },
+        );
+        if (
+          !hasExactOwnKeys(projection, [
+            "user_id",
+            "session_id",
+            "case_id",
+            "membership_id",
+            "role",
+            "authority_version",
+            "next_actor",
+            "expires_at",
+          ]) ||
+          ownValue(projection, "user_id") !== input.expectedUserId ||
+          ownValue(projection, "session_id") !== input.expectedAuthSessionId ||
+          !isUuid(ownValue(projection, "case_id")) ||
+          !isUuid(ownValue(projection, "membership_id")) ||
+          !threeRole(ownValue(projection, "role")) ||
+          !Number.isSafeInteger(ownValue(projection, "authority_version")) ||
+          (ownValue(projection, "authority_version") as number) <= 0 ||
+          !threeRole(ownValue(projection, "next_actor")) ||
+          !validRfc3339(ownValue(projection, "expires_at")) ||
+          Date.parse(ownValue(projection, "expires_at") as string) <=
+            safeNow(now).getTime()
+        ) throw sanitizedFailure();
+        return Object.freeze({
+          userId: input.expectedUserId,
+          sessionId: input.expectedAuthSessionId,
+          caseId: ownValue(projection, "case_id") as string,
+          membershipId: ownValue(projection, "membership_id") as string,
+          role: ownValue(projection, "role") as "owner" | "vendor" | "drs",
+          authorityVersion: ownValue(
+            projection,
+            "authority_version",
+          ) as number,
+          nextActor: ownValue(projection, "next_actor") as
+            | "owner"
+            | "vendor"
+            | "drs",
+        });
+      } catch {
+        throw sanitizedFailure();
+      }
+    },
+  });
+
+  return Object.freeze({ technicalSessionProducer, sessionVerifier });
+}
+
+export function createDrsThreeRoleSecureSessionRuntime(
+  options: DrsSecureSessionRuntimeOptions = {},
+): DrsThreeRoleSecureSessionRuntime {
+  try {
+    const environment = options.env ?? defaultEnvironment();
+    if (!environment || typeof environment.get !== "function") {
+      return UNAVAILABLE_THREE_ROLE_RUNTIME;
+    }
+    const supabaseOrigin = environment.get("SUPABASE_URL");
+    const serviceRoleKey = environment.get("SUPABASE_SERVICE_ROLE_KEY");
+    const appOrigin = environment.get("LAIBE_DRS_APP_ORIGIN");
+    const successUrl = environment.get("LAIBE_DRS_SESSION_SUCCESS_URL");
+    const sessionCookieName = environment.get("LAIBE_DRS_SESSION_COOKIE_NAME");
+    const rawCookieKey = environment.get("LAIBE_DRS_SESSION_COOKIE_KEY_V1");
+    if (
+      typeof supabaseOrigin !== "string" ||
+      typeof serviceRoleKey !== "string" ||
+      typeof appOrigin !== "string" ||
+      typeof successUrl !== "string" ||
+      typeof sessionCookieName !== "string" ||
+      typeof rawCookieKey !== "string" ||
+      !validSupabaseOrigin(supabaseOrigin) ||
+      !validServiceRoleKey(serviceRoleKey) ||
+      !validHttpsOrigin(appOrigin) ||
+      !validSuccessUrl(successUrl, appOrigin) ||
+      !validHostCookieName(sessionCookieName)
+    ) return UNAVAILABLE_THREE_ROLE_RUNTIME;
+    const cookieKey = readKey(rawCookieKey);
+    const fetchImplementation = options.fetch ?? globalThis.fetch;
+    const cryptoImplementation = options.crypto ?? globalThis.crypto;
+    const now = options.now ?? (() => new Date());
+    if (
+      !cookieKey ||
+      typeof fetchImplementation !== "function" ||
+      !validCrypto(cryptoImplementation) ||
+      typeof now !== "function"
+    ) return UNAVAILABLE_THREE_ROLE_RUNTIME;
+    safeNow(now);
+    const boundedFetch = createBoundedRpcFetch(
+      supabaseOrigin,
+      serviceRoleKey,
+      fetchImplementation,
+    );
+    const technicalCookieCodec = createThreeRoleTechnicalCookieCodec(
+      cryptoImplementation,
+      cookieKey,
+    );
+    const ports = createThreeRoleSessionPorts(
+      boundedFetch,
+      supabaseOrigin,
+      cryptoImplementation,
+      now,
+      technicalCookieCodec,
+      Object.freeze({ successUrl, sessionCookieName }),
+    );
+    return Object.freeze({
+      runtimeAvailable: true,
+      bootstrapDependencies: Object.freeze({
+        allowedOrigin: appOrigin,
+        sessionCookieName,
+        now,
+        technicalCookieCodec,
+        sessionVerifier: ports.sessionVerifier,
+      }),
+      technicalSessionProducer: ports.technicalSessionProducer,
+    });
+  } catch {
+    return UNAVAILABLE_THREE_ROLE_RUNTIME;
+  }
 }
 
 export function createDrsSecureSessionRuntime(

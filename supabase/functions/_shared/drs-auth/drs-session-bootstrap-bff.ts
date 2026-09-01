@@ -130,6 +130,62 @@ export interface DrsSessionBootstrapDependencies {
   authorization: DrsSpecialistAuthorizationStrategy;
 }
 
+export const DRS_THREE_ROLE_SESSION_CONTEXT_KEYS = Object.freeze(
+  [
+    "userId",
+    "sessionId",
+    "caseId",
+    "membershipId",
+    "role",
+    "authorityVersion",
+    "nextActor",
+  ] as const,
+);
+
+export type DrsThreeRole = "owner" | "vendor" | "drs";
+
+export type SessionContext = Readonly<{
+  userId: string;
+  sessionId: string;
+  caseId: string;
+  membershipId: string;
+  role: DrsThreeRole;
+  authorityVersion: number;
+  nextActor: DrsThreeRole;
+}>;
+
+export type TechnicalSealedSessionCookieEnvelope = Readonly<{
+  schemaVersion: "drs-three-role-technical-session-v1";
+  userId: string;
+  authSessionId: string;
+  serverSessionId: string;
+  accessToken: string;
+  expiresAtEpochSeconds: number;
+}>;
+
+export interface TechnicalSessionCookieCodec {
+  openTechnicalSessionCookie(value: string): Promise<unknown>;
+}
+
+export interface DrsThreeRoleSessionVerifier {
+  verifyThreeRoleSession(
+    input: Readonly<{
+      serverSessionId: string;
+      accessToken: string;
+      expectedUserId: string;
+      expectedAuthSessionId: string;
+    }>,
+  ): Promise<unknown>;
+}
+
+export interface DrsThreeRoleSessionBootstrapDependencies {
+  allowedOrigin: string;
+  sessionCookieName: string;
+  now(): Date;
+  technicalCookieCodec: TechnicalSessionCookieCodec;
+  sessionVerifier: DrsThreeRoleSessionVerifier;
+}
+
 export type DrsBffRequestScalar = string | number | boolean;
 
 export type DrsBffRequestFieldContract = Readonly<{
@@ -827,6 +883,164 @@ export function createDrsSessionBootstrapHandler(
           proof,
           new Date(expiresAtEpochSeconds * 1000).toISOString(),
         ),
+      });
+    } catch (error) {
+      return closedResponse(
+        sanitizedStatus(error),
+        allowedOrigin && request.headers.get("origin") === allowedOrigin
+          ? allowedOrigin
+          : undefined,
+      );
+    }
+  };
+}
+
+function validTechnicalSessionCookieEnvelope(
+  input: unknown,
+  nowEpochSeconds: number,
+): input is TechnicalSealedSessionCookieEnvelope {
+  if (
+    !hasExactOwnKeys(input, [
+      "schemaVersion",
+      "userId",
+      "authSessionId",
+      "serverSessionId",
+      "accessToken",
+      "expiresAtEpochSeconds",
+    ]) ||
+    input.schemaVersion !== "drs-three-role-technical-session-v1" ||
+    !isUuid(input.userId) ||
+    !isUuid(input.authSessionId) ||
+    typeof input.serverSessionId !== "string" ||
+    input.serverSessionId.length < 8 ||
+    input.serverSessionId.length > MAX_SECRET_LENGTH ||
+    typeof input.accessToken !== "string" ||
+    input.accessToken.length < 8 ||
+    input.accessToken.length > MAX_SECRET_LENGTH ||
+    typeof input.expiresAtEpochSeconds !== "number" ||
+    !Number.isSafeInteger(input.expiresAtEpochSeconds) ||
+    input.expiresAtEpochSeconds <= nowEpochSeconds
+  ) return false;
+  return true;
+}
+
+function isThreeRole(value: unknown): value is DrsThreeRole {
+  return value === "owner" || value === "vendor" || value === "drs";
+}
+
+function validSessionContext(input: unknown): input is SessionContext {
+  return hasExactOwnKeys(
+    input,
+    DRS_THREE_ROLE_SESSION_CONTEXT_KEYS as unknown as readonly string[],
+  ) &&
+    isUuid(input.userId) &&
+    isUuid(input.sessionId) &&
+    isUuid(input.caseId) &&
+    isUuid(input.membershipId) &&
+    isThreeRole(input.role) &&
+    typeof input.authorityVersion === "number" &&
+    Number.isSafeInteger(input.authorityVersion) &&
+    input.authorityVersion > 0 &&
+    isThreeRole(input.nextActor);
+}
+
+function threeRoleRuntimeAvailable(
+  dependencies: DrsThreeRoleSessionBootstrapDependencies | undefined,
+): dependencies is DrsThreeRoleSessionBootstrapDependencies {
+  return !!dependencies &&
+    typeof dependencies.allowedOrigin === "string" &&
+    validHostCookieName(dependencies.sessionCookieName) &&
+    typeof dependencies.now === "function" &&
+    typeof dependencies.technicalCookieCodec?.openTechnicalSessionCookie ===
+      "function" &&
+    typeof dependencies.sessionVerifier?.verifyThreeRoleSession === "function";
+}
+
+function threeRoleSuccessHeaders(origin: string): HeadersInit {
+  return {
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store",
+    "pragma": "no-cache",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "referrer-policy": "no-referrer",
+    "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+    "vary": "Origin, Cookie",
+    "access-control-allow-origin": origin,
+    "access-control-allow-credentials": "true",
+  };
+}
+
+function exactSessionContextJson(context: SessionContext): string {
+  const payload = Object.create(null) as Record<string, unknown>;
+  payload.userId = context.userId;
+  payload.sessionId = context.sessionId;
+  payload.caseId = context.caseId;
+  payload.membershipId = context.membershipId;
+  payload.role = context.role;
+  payload.authorityVersion = context.authorityVersion;
+  payload.nextActor = context.nextActor;
+  return JSON.stringify(payload);
+}
+
+export function createDrsThreeRoleSessionBootstrapHandler(
+  dependencies?: DrsThreeRoleSessionBootstrapDependencies,
+): (request: Request) => Promise<Response> {
+  return async (request) => {
+    let allowedOrigin: string | undefined;
+    try {
+      const url = new URL(request.url);
+      if (
+        request.method !== "POST" ||
+        url.pathname !== BOOTSTRAP_PATH ||
+        url.search.length !== 0 ||
+        url.hash.length !== 0 ||
+        !(await readExactEmptyJsonBody(request))
+      ) throw new DrsIdentityError("INVALID_REQUEST", 400);
+      assertNoAuthorityHeaders(request, false);
+      assertNoCustomGuardHeaders(request);
+      if (!threeRoleRuntimeAvailable(dependencies)) {
+        throw new DrsIdentityError("CONTEXT_UNAVAILABLE", 503);
+      }
+      assertConfiguredOrigin(dependencies.allowedOrigin);
+      allowedOrigin = dependencies.allowedOrigin;
+      assertSameOrigin(request, dependencies.allowedOrigin);
+      const cookie = readConfiguredCookie(
+        request,
+        dependencies.sessionCookieName,
+      );
+      const nowEpochSeconds = epochSeconds(currentDate(dependencies.now));
+      let envelope: unknown;
+      try {
+        envelope = await dependencies.technicalCookieCodec
+          .openTechnicalSessionCookie(cookie.value);
+      } catch {
+        throw new DrsIdentityError("AUTH_REQUIRED", 401);
+      }
+      if (!validTechnicalSessionCookieEnvelope(envelope, nowEpochSeconds)) {
+        throw new DrsIdentityError("AUTH_REQUIRED", 401);
+      }
+      let verified: unknown;
+      try {
+        verified = await dependencies.sessionVerifier.verifyThreeRoleSession({
+          serverSessionId: envelope.serverSessionId,
+          accessToken: envelope.accessToken,
+          expectedUserId: envelope.userId,
+          expectedAuthSessionId: envelope.authSessionId,
+        });
+      } catch (error) {
+        throw preserveVerificationError(error);
+      }
+      if (!validSessionContext(verified)) {
+        throw new DrsIdentityError("CASE_NOT_AUTHORIZED", 403);
+      }
+      if (
+        verified.userId !== envelope.userId ||
+        verified.sessionId !== envelope.authSessionId
+      ) throw new DrsIdentityError("AUTH_REQUIRED", 401);
+      return new Response(exactSessionContextJson(verified), {
+        status: 200,
+        headers: threeRoleSuccessHeaders(dependencies.allowedOrigin),
       });
     } catch (error) {
       return closedResponse(

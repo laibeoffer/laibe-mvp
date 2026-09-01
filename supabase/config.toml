@@ -3,6 +3,12 @@ project_id = "laibe-mvp-project"
 [functions.drs-session-bootstrap]
 verify_jwt = false
 
+[functions.drs-google-auth-start]
+verify_jwt = false
+
+[functions.drs-google-auth-callback]
+verify_jwt = false
+
 [functions.drs-workspace-grant]
 verify_jwt = false
 

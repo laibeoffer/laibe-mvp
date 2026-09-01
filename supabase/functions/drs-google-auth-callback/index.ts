@@ -5,6 +5,12 @@ import {
   type IdentityOAuthAdapter,
   strictPreflight,
 } from "../_shared/drs-auth/contracts.ts";
+import {
+  createDrsThreeRoleGoogleAuthRuntime,
+} from "../_shared/drs-auth/drs-three-role-auth-runtime.ts";
+import {
+  createDrsThreeRoleSecureSessionRuntime,
+} from "../_shared/drs-auth/drs-secure-session-runtime.ts";
 
 export interface DrsGoogleAuthCallbackDependencies {
   allowedOrigin: string;
@@ -28,6 +34,18 @@ export function createDrsGoogleAuthCallbackHandler(
   };
 }
 
-export const handler = createDrsGoogleAuthCallbackHandler();
+const secureRuntime = createDrsThreeRoleSecureSessionRuntime();
+const authRuntime = createDrsThreeRoleGoogleAuthRuntime({
+  sessionProducer: secureRuntime.technicalSessionProducer,
+});
+
+export const handler = createDrsGoogleAuthCallbackHandler(
+  secureRuntime.bootstrapDependencies && authRuntime.adapter
+    ? Object.freeze({
+      allowedOrigin: secureRuntime.bootstrapDependencies.allowedOrigin,
+      adapter: authRuntime.adapter,
+    })
+    : undefined,
+);
 
 if (import.meta.main) Deno.serve(handler);
