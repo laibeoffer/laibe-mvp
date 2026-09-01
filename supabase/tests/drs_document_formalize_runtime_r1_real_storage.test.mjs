@@ -79,6 +79,41 @@ function createStandaloneStorageFetch(
     );
 }
 
+function rewriteStandaloneRestRequestUrl(restOrigin, input) {
+  const url = new URL(input);
+  if (
+    url.origin === restOrigin &&
+    (url.pathname === "/rest/v1" || url.pathname.startsWith("/rest/v1/"))
+  ) {
+    url.pathname = url.pathname.slice("/rest/v1".length) || "/";
+  }
+  return url;
+}
+
+Deno.test("standalone PostgREST transport removes only its gateway prefix", () => {
+  assert.equal(
+    rewriteStandaloneRestRequestUrl(
+      "http://rest:3000",
+      "http://rest:3000/rest/v1/rpc/server_document_finalize_domain_command_v1?mode=authorize",
+    ).href,
+    "http://rest:3000/rpc/server_document_finalize_domain_command_v1?mode=authorize",
+  );
+  assert.equal(
+    rewriteStandaloneRestRequestUrl(
+      "http://rest:3000",
+      "https://project.supabase.co/rest/v1/rpc/server_document_finalize_domain_command_v1?mode=authorize",
+    ).href,
+    "https://project.supabase.co/rest/v1/rpc/server_document_finalize_domain_command_v1?mode=authorize",
+  );
+  assert.equal(
+    rewriteStandaloneRestRequestUrl(
+      "http://rest:3000",
+      "http://rest:3000/status?probe=ready#state",
+    ).href,
+    "http://rest:3000/status?probe=ready#state",
+  );
+});
+
 Deno.test("standalone Storage test transport removes only its gateway prefix", () => {
   assert.equal(
     rewriteStandaloneStorageRequestUrl(
@@ -819,6 +854,8 @@ Deno.test({
       const { createDocumentStorageService } = await import(serviceUrl.href);
       const stageDiagnostics = [];
       const authorizeHttpDiagnostics = [];
+      const standaloneRestFetch = (input, init) =>
+        fetch(rewriteStandaloneRestRequestUrl(restOrigin, input), init);
       const baseRepository = createSupabaseDocumentRepository({
         env: {
           get(name) {
@@ -827,7 +864,10 @@ Deno.test({
             return undefined;
           },
         },
-        fetch: createAuthorizeHttpDiagnosticFetch(authorizeHttpDiagnostics),
+        fetch: createAuthorizeHttpDiagnosticFetch(
+          authorizeHttpDiagnostics,
+          standaloneRestFetch,
+        ),
       });
       const repository = {
         ...baseRepository,
