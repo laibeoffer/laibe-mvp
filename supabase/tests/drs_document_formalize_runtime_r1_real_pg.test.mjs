@@ -678,6 +678,17 @@ reset role;
 
 function applyTask4SchemaAndFixtures() {
   applySql(loadMigration("20260826190000_drs_document_storage_w1.sql"));
+  applySql(`insert into storage.buckets(
+    id, name, public, file_size_limit, allowed_mime_types
+  ) values
+    (
+      'drs-case-intake-private', 'drs-case-intake-private', false, 26214400,
+      array['application/pdf', 'image/jpeg', 'image/png']::text[]
+    ),
+    (
+      'drs-case-records-private', 'drs-case-records-private', false, 26214400,
+      array['application/pdf', 'image/jpeg', 'image/png']::text[]
+    );`);
   applySql(baseFixtureSql());
   applySql(loadMigration("20260901192440_drs_case_event_ledger_r1.sql"));
   applySql(
@@ -851,6 +862,10 @@ test("Task4 harness is bound to the exact isolated disposable topology", () => {
   assert.match(source, /"--cap-drop"[\s\S]*?"ALL"/u);
   assert.match(source, /no-new-privileges/u);
   assert.match(source, /type=bind[\s\S]*?dst=\/workspace[\s\S]*?readonly/u);
+  assert.match(
+    source,
+    /insert into storage\.buckets\([\s\S]*?'drs-case-intake-private'[\s\S]*?'drs-case-records-private'/u,
+  );
 });
 
 test(
