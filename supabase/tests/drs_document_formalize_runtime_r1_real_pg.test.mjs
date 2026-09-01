@@ -813,6 +813,7 @@ test("Task4 migration remains resolvable with an empty security-definer search p
   const source = readFileSync(new URL(migration, migrationsUrl), "utf8");
 
   assert.doesNotMatch(source, /\|\|\s*chr\(10\)/u);
+  assert.doesNotMatch(source, /pg_catalog\.coalesce\(/u);
   assert.match(source, /\|\|\s*pg_catalog\.chr\(10\)/u);
   assert.match(
     source,

@@ -135,7 +135,7 @@ as $function$
     select
       (select auth.uid()) as user_id,
       case
-        when pg_catalog.coalesce((select auth.jwt()->>'session_id'), '') ~
+        when coalesce((select auth.jwt()->>'session_id'), '') ~
           '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
         then ((select auth.jwt()->>'session_id'))::uuid
         else null::uuid
@@ -852,7 +852,7 @@ begin
     );
   end if;
 
-  select pg_catalog.coalesce(pg_catalog.max(version_record.version_no), 0) + 1
+  select coalesce(pg_catalog.max(version_record.version_no), 0) + 1
   into v_version_no
   from casework.document_versions version_record
   where version_record.document_id = v_document.id;
