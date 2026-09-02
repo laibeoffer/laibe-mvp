@@ -547,6 +547,170 @@ test("duplicate worker delivery for one run key has one durable effect", async (
   assert.equal(completeEffects, 1);
 });
 
+test("validated output durable bytes and hash ignore inherited Object.prototype.toJSON", async () => {
+  const runWorker = requiredFunction(workerModule, "runAnalysisWorkerOnce");
+  const validate = requiredFunction(contracts, "validateAnalysisOutput");
+  const expectedOutput = validate(runContext(), analysisOutput());
+  assert.ok(expectedOutput);
+  const expectedBytes = JSON.stringify(expectedOutput);
+  const expectedSha256 = createHash("sha256")
+    .update(expectedBytes, "utf8")
+    .digest("hex");
+  const candidate = analysisOutput();
+  const candidateFindings = [...candidate.findings];
+  const originalToJson = Object.getOwnPropertyDescriptor(
+    Object.prototype,
+    "toJSON",
+  );
+  let inheritedInstalled = false;
+  let inheritedToJsonCalls = 0;
+  Object.defineProperty(candidateFindings, "map", {
+    configurable: true,
+    get() {
+      if (!inheritedInstalled) {
+        inheritedInstalled = true;
+        Object.defineProperty(Object.prototype, "toJSON", {
+          configurable: true,
+          enumerable: false,
+          writable: true,
+          value() {
+            inheritedToJsonCalls += 1;
+            return { poisoned: "INHERITED_TO_JSON" };
+          },
+        });
+      }
+      return Array.prototype.map;
+    },
+  });
+  let completeEffects = 0;
+  let failEffects = 0;
+  let completedSha256 = null;
+  let completedBytes = null;
+  try {
+    const result = await runWorker({
+      workerId: "99999999-9090-4090-8090-909090909090",
+      queue: {
+        async claim() {
+          return {
+            jobId: "88888888-8080-4080-8080-808080808080",
+            workerId: "99999999-9090-4090-8090-909090909090",
+            input: runContext(),
+          };
+        },
+        async complete(_jobId, _workerId, outputSha256, output) {
+          completeEffects += 1;
+          completedSha256 = outputSha256;
+          completedBytes = JSON.stringify(output);
+          return { state: "APPLIED", newEffects: 1 };
+        },
+        async fail() {
+          failEffects += 1;
+          return { state: "FAILED", newEffects: 0 };
+        },
+      },
+      provider: {
+        async analyze() {
+          return { ...candidate, findings: candidateFindings };
+        },
+      },
+    });
+    assert.deepEqual(result, { state: "APPLIED", newEffects: 1 });
+  } finally {
+    if (originalToJson) {
+      Object.defineProperty(Object.prototype, "toJSON", originalToJson);
+    } else {
+      delete Object.prototype.toJSON;
+    }
+  }
+
+  assert.equal(inheritedInstalled, true);
+  assert.equal(inheritedToJsonCalls, 0);
+  assert.equal(completedSha256, expectedSha256);
+  assert.equal(completedBytes, expectedBytes);
+  assert.equal(completeEffects, 1);
+  assert.equal(failEffects, 0);
+});
+
+test("invalid and tampered outputs cannot reach durable completion under inherited toJSON", async () => {
+  const runWorker = requiredFunction(workerModule, "runAnalysisWorkerOnce");
+  const rejected = [
+    analysisOutput({ schemaVersion: "invalid.analysis-output" }),
+    { ...analysisOutput(), toolCalls: [{ name: "write_case_event" }] },
+  ];
+  for (const candidate of rejected) {
+    const originalToJson = Object.getOwnPropertyDescriptor(
+      Object.prototype,
+      "toJSON",
+    );
+    let inheritedToJsonCalls = 0;
+    let providerCalls = 0;
+    let completeEffects = 0;
+    let failEffects = 0;
+    let failCode = null;
+    let commandEffects = 0;
+    let decisionEffects = 0;
+    let eventEffects = 0;
+    try {
+      Object.defineProperty(Object.prototype, "toJSON", {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value() {
+          inheritedToJsonCalls += 1;
+          return { poisoned: "REJECTED_OUTPUT_TO_JSON" };
+        },
+      });
+      const result = await runWorker({
+        workerId: "99999999-9090-4090-8090-909090909090",
+        queue: {
+          async claim() {
+            return {
+              jobId: "88888888-8080-4080-8080-808080808080",
+              workerId: "99999999-9090-4090-8090-909090909090",
+              input: runContext(),
+            };
+          },
+          async complete() {
+            completeEffects += 1;
+            return { state: "APPLIED", newEffects: 1 };
+          },
+          async fail(_jobId, _workerId, errorCode) {
+            failEffects += 1;
+            failCode = errorCode;
+            return { state: "FAILED", newEffects: 0 };
+          },
+        },
+        provider: {
+          async analyze() {
+            providerCalls += 1;
+            return candidate;
+          },
+        },
+        formalEffects: {
+          command: () => commandEffects += 1,
+          decision: () => decisionEffects += 1,
+          event: () => eventEffects += 1,
+        },
+      });
+      assert.deepEqual(result, { state: "FAILED", newEffects: 0 });
+    } finally {
+      if (originalToJson) {
+        Object.defineProperty(Object.prototype, "toJSON", originalToJson);
+      } else {
+        delete Object.prototype.toJSON;
+      }
+    }
+    assert.equal(providerCalls, 1);
+    assert.equal(completeEffects, 0);
+    assert.equal(failEffects, 1);
+    assert.equal(failCode, "INVALID_ANALYSIS_OUTPUT");
+    assert.equal(inheritedToJsonCalls, 0);
+    assert.equal(commandEffects, 0);
+    assert.equal(decisionEffects, 0);
+    assert.equal(eventEffects, 0);
+  }
+});
+
 test("UI read model explicitly separates AI draft, DRS review, party statement, and owner decision", () => {
   const build = requiredFunction(contracts, "buildFindingReadModel");
   const pending = build(finding(), null);
