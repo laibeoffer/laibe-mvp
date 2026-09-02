@@ -15,7 +15,9 @@ const safeObjectCreate = Object.create;
 const safeObjectFreeze = Object.freeze;
 const safeObjectKeys = Object.keys;
 const safeObjectSetPrototypeOf = Object.setPrototypeOf;
+const safeReflectApply = Reflect.apply;
 const safeString = String;
+const safeStringCharCodeAt = String.prototype.charCodeAt;
 const JSON_HEX = "0123456789abcdef";
 
 export type AnalysisClaimedJob = Readonly<{
@@ -73,7 +75,7 @@ function jsonUnicodeEscape(code: number): string {
 function jsonQuotedString(value: string): string {
   let result = '"';
   for (let index = 0; index < value.length; index += 1) {
-    const code = value.charCodeAt(index);
+    const code = safeReflectApply(safeStringCharCodeAt, value, [index]);
     if (code === 0x22) result += '\\"';
     else if (code === 0x5c) result += "\\\\";
     else if (code === 0x08) result += "\\b";
@@ -83,7 +85,9 @@ function jsonQuotedString(value: string): string {
     else if (code === 0x0d) result += "\\r";
     else if (code < 0x20) result += jsonUnicodeEscape(code);
     else if (code >= 0xd800 && code <= 0xdbff) {
-      const next = index + 1 < value.length ? value.charCodeAt(index + 1) : -1;
+      const next = index + 1 < value.length
+        ? safeReflectApply(safeStringCharCodeAt, value, [index + 1])
+        : -1;
       if (next >= 0xdc00 && next <= 0xdfff) {
         result += value[index] + value[index + 1];
         index += 1;
