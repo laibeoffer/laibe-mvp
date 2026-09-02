@@ -3,6 +3,7 @@ import {
   type AnalysisRunContext,
   sha256Text,
   validateAnalysisOutput,
+  validateAnalysisRunContext,
 } from "../_shared/drs-analysis/contracts.ts";
 
 export const VERIFY_JWT_REQUIRED = false;
@@ -88,10 +89,14 @@ export async function runAnalysisWorkerOnce(
     return Object.freeze({ state: "FAILED", newEffects: 0 });
   }
   try {
+    const input = validateAnalysisRunContext(job.input);
+    if (!input) throw new Error("INVALID_ANALYSIS_INPUT");
     // The provider receives document text only as untrusted data. No command,
     // decision, event, or tool capability is supplied to this adapter.
-    const candidate = await dependencies.provider.analyze(job);
-    const validated = validateAnalysisOutput(job.input, candidate);
+    const candidate = await dependencies.provider.analyze(
+      Object.freeze({ ...job, input }),
+    );
+    const validated = validateAnalysisOutput(input, candidate);
     if (!validated) throw new Error("INVALID_ANALYSIS_OUTPUT");
     const outputSha256 = await sha256Text(JSON.stringify(validated));
     const completed = completionResult(

@@ -368,6 +368,43 @@ export function canonicalRunKeySha256(
   return sha256Text(canonicalRunIdentity(request));
 }
 
+export function validateAnalysisRunContext(
+  value: unknown,
+): AnalysisRunContext | null {
+  if (
+    !hasExactKeys(value, ["runId", "runKeySha256", "caseId", "documents"])
+  ) return null;
+  const runId = readOwn(value, "runId");
+  const runKeySha256 = readOwn(value, "runKeySha256");
+  const caseId = readOwn(value, "caseId");
+  const documentsValue = readOwn(value, "documents");
+  if (
+    !validUuid(runId) || !validSha(runKeySha256) || !validUuid(caseId) ||
+    !Array.isArray(documentsValue) || documentsValue.length < 1 ||
+    documentsValue.length > 24
+  ) return null;
+  const documents: AnalysisDocumentVersion[] = [];
+  for (let index = 0; index < documentsValue.length; index += 1) {
+    const document = parseDocumentVersion(
+      documentsValue[index],
+      caseId,
+      index + 1,
+    );
+    if (!document) return null;
+    documents.push(document);
+  }
+  if (
+    new Set(documents.map((document) => document.documentVersionId)).size !==
+      documents.length
+  ) return null;
+  return Object.freeze({
+    runId,
+    runKeySha256,
+    caseId,
+    documents: Object.freeze(documents),
+  });
+}
+
 function sourceVersion(value: unknown): SourceDocumentVersion | null {
   if (
     !hasExactKeys(value, [

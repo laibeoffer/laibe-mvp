@@ -203,6 +203,66 @@ test("cross-case analysis input is rejected before any effect", () => {
   assert.equal(parse(crossCase, CASE_A), null);
 });
 
+test("cross-case claimed input is rejected before adapter execution with effects=0", async () => {
+  const runWorker = requiredFunction(workerModule, "runAnalysisWorkerOnce");
+  let providerCalls = 0;
+  let completeEffects = 0;
+  let failEffects = 0;
+  let failCode = null;
+  let commandEffects = 0;
+  let decisionEffects = 0;
+  let eventEffects = 0;
+  let claimed = false;
+  const queue = {
+    async claim() {
+      if (claimed) return null;
+      claimed = true;
+      return {
+        jobId: "88888888-8080-4080-8080-808080808080",
+        workerId: "99999999-9090-4090-8090-909090909090",
+        input: runContext({
+          documents: runtimeDocuments.map((document, index) =>
+            index === 0 ? { ...document, caseId: CASE_B } : document
+          ),
+        }),
+      };
+    },
+    async complete() {
+      completeEffects += 1;
+      return { state: "APPLIED", newEffects: 1 };
+    },
+    async fail(_jobId, _workerId, errorCode) {
+      failEffects += 1;
+      failCode = errorCode;
+      return { state: "FAILED", newEffects: 0 };
+    },
+  };
+  const result = await runWorker({
+    workerId: "99999999-9090-4090-8090-909090909090",
+    queue,
+    provider: {
+      async analyze() {
+        providerCalls += 1;
+        return analysisOutput();
+      },
+    },
+    formalEffects: {
+      command: () => commandEffects += 1,
+      decision: () => decisionEffects += 1,
+      event: () => eventEffects += 1,
+    },
+  });
+
+  assert.deepEqual(result, { state: "FAILED", newEffects: 0 });
+  assert.equal(providerCalls, 0);
+  assert.equal(completeEffects, 0);
+  assert.equal(failEffects, 1);
+  assert.equal(failCode, "INVALID_ANALYSIS_INPUT");
+  assert.equal(commandEffects, 0);
+  assert.equal(decisionEffects, 0);
+  assert.equal(eventEffects, 0);
+});
+
 test("invalid output schema, human review false, or formal impact is rejected", () => {
   const validate = requiredFunction(contracts, "validateAnalysisOutput");
   assert.equal(
