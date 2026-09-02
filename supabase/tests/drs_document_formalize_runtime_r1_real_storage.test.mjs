@@ -174,44 +174,50 @@ Deno.test("Supabase Storage promote response lifecycle closes ok and non-ok bodi
   ]);
 });
 
-Deno.test("Supabase Storage promote response lifecycle fails closed when body cancellation rejects", async () => {
+Deno.test("Supabase Storage promote response lifecycle preserves the copy outcome when body cancellation rejects", async () => {
   const { createSupabaseDocumentStoragePort } = await import(storageUrl.href);
-  let cancelCount = 0;
-  let pullCount = 0;
-  const storage = createSupabaseDocumentStoragePort({
-    env: {
-      get(name) {
-        if (name === "SUPABASE_URL") return "https://project.supabase.co";
-        if (name === "SUPABASE_SERVICE_ROLE_KEY") return "test-service-role";
-        return undefined;
-      },
-    },
-    fetch: async () =>
-      new Response(
-        new ReadableStream(
-          {
-            pull() {
-              pullCount += 1;
-            },
-            cancel() {
-              cancelCount += 1;
-              throw new Error("PROVIDER_CANCEL_FAILED");
-            },
-          },
-          { highWaterMark: 0 },
-        ),
-        { status: 200 },
-      ),
-  });
+  const observations = [];
 
-  assert.deepEqual(
-    {
+  for (const scenario of [{ status: 200, result: true }, { status: 403, result: false }]) {
+    let cancelCount = 0;
+    let pullCount = 0;
+    const storage = createSupabaseDocumentStoragePort({
+      env: {
+        get(name) {
+          if (name === "SUPABASE_URL") return "https://project.supabase.co";
+          if (name === "SUPABASE_SERVICE_ROLE_KEY") return "test-service-role";
+          return undefined;
+        },
+      },
+      fetch: async () =>
+        new Response(
+          new ReadableStream(
+            {
+              pull() {
+                pullCount += 1;
+              },
+              cancel() {
+                cancelCount += 1;
+                throw new Error("PROVIDER_CANCEL_FAILED");
+              },
+            },
+            { highWaterMark: 0 },
+          ),
+          { status: scenario.status },
+        ),
+    });
+
+    observations.push({
       result: await storage.promote(PROMOTE_INPUT),
       cancelCount,
       pullCount,
-    },
+    });
+  }
+
+  assert.deepEqual(observations, [
+    { result: true, cancelCount: 1, pullCount: 0 },
     { result: false, cancelCount: 1, pullCount: 0 },
-  );
+  ]);
 });
 
 Deno.test("standalone PostgREST transport removes only its gateway prefix", () => {

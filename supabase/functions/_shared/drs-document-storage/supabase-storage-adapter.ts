@@ -295,7 +295,11 @@ export function createSupabaseDocumentStoragePort(
           },
         );
         const promoted = response.ok;
-        await response.body?.cancel();
+        try {
+          await response.body?.cancel();
+        } catch {
+          // Preserve the provider outcome; the service verifies the destination.
+        }
         return promoted;
       } catch {
         return false;
