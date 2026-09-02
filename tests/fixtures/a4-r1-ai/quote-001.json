@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "laibe.drs.a4-ai-fixture.v1",
+  "synthetic": true,
+  "caseId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "documents": [
+    {
+      "documentId": "10101010-1010-4010-8010-101010101010",
+      "documentVersionId": "11111111-1010-4010-8010-101010101010",
+      "documentVersionRef": "dvr_11111111101040108010101010101010",
+      "documentKind": "quote",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "documentId": "20202020-2020-4020-8020-202020202020",
+      "documentVersionId": "22222222-2020-4020-8020-202020202020",
+      "documentVersionRef": "dvr_22222222202040208020202020202020",
+      "documentKind": "quote",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    }
+  ],
+  "rows": [
+    {
+      "label": "拆除工程",
+      "amount": 120000,
+      "documentVersionId": "11111111-1010-4010-8010-101010101010",
+      "page": 2,
+      "row": 7
+    },
+    {
+      "label": "拆除工程",
+      "amount": 135000,
+      "documentVersionId": "22222222-2020-4020-8020-202020202020",
+      "sheet": "追加報價",
+      "row": 8,
+      "cellRange": "B8:F8"
+    },
+    {
+      "label": "防水工程",
+      "amount": null,
+      "status": "unknown",
+      "requiredEvidence": "數量、單價與計價單位",
+      "documentVersionId": "11111111-1010-4010-8010-101010101010",
+      "page": 3,
+      "row": 12
+    }
+  ]
+}

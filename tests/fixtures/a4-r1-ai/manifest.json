@@ -1,0 +1,51 @@
+{
+  "schema_version": "laibe.drs.sanitized-fixture-manifest.v1",
+  "provenance": "synthetic_from_scratch",
+  "source_root": "SYNTHETIC_ONLY_SOURCE",
+  "destination_root": "SYNTHETIC_ONLY_DESTINATION",
+  "source_read_only": true,
+  "intended_use": "LOCAL_ONLY",
+  "max_total_bytes": 100000,
+  "items": [
+    {
+      "id": "document-001",
+      "source_locator_hash": "f78247bd3d3ea4417f6b8a04d4a69256ac1458cee597f30dfe5b4ba83acc8006",
+      "output_name": "document-001.json",
+      "size": 1601,
+      "redaction_status": "VERIFIED",
+      "metadata_removed": true,
+      "active_content_status": "SAFE_OR_REMOVED",
+      "content_sha256": "a5f4ad15c1a7874b8e08f7ab89f7f391730e38385eb262a31bddd86836480feb"
+    },
+    {
+      "id": "drawing-001",
+      "source_locator_hash": "ef9059f282ef68925a1cde7c6e0707d0810eaf3071b74acb917a029f67094ace",
+      "output_name": "drawing-001.json",
+      "size": 1153,
+      "redaction_status": "VERIFIED",
+      "metadata_removed": true,
+      "active_content_status": "SAFE_OR_REMOVED",
+      "content_sha256": "12935b080e801d91b871fd81725d89e7f032f7dee86b3ef093213ba0942fe437"
+    },
+    {
+      "id": "fixture-001",
+      "source_locator_hash": "03cc137c5f8c3a8f18a3d82c1182edc5d7dd0e07b76a75e822a7de7b50261a12",
+      "output_name": "fixture-001.json",
+      "size": 365,
+      "redaction_status": "VERIFIED",
+      "metadata_removed": true,
+      "active_content_status": "SAFE_OR_REMOVED",
+      "content_sha256": "56af333ce9a5031fb66f84541d1194c37e82fbbce4bed51324bd335b84bb0561"
+    },
+    {
+      "id": "quote-001",
+      "source_locator_hash": "0f3c94b3c3991eafcadb9ac61d1e9663cca89361dec4a2068b01e2909990d352",
+      "output_name": "quote-001.json",
+      "size": 1435,
+      "redaction_status": "VERIFIED",
+      "metadata_removed": true,
+      "active_content_status": "SAFE_OR_REMOVED",
+      "content_sha256": "62efa968d5175ba653fc9b27d0cd768213f4ca9a887f0e745b5a219846a03f61"
+    }
+  ]
+}

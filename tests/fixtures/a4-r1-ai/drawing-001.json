@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "laibe.drs.a4-ai-fixture.v1",
+  "synthetic": true,
+  "caseId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "documents": [
+    {
+      "documentId": "30303030-3030-4030-8030-303030303030",
+      "documentVersionId": "33333333-3030-4030-8030-303030303030",
+      "documentVersionRef": "dvr_33333333303040308030303030303030",
+      "documentKind": "drawing",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    }
+  ],
+  "observations": [
+    {
+      "code": "DRAWING_SCALE_MISSING",
+      "setName": "配置圖",
+      "sheet": "A-01",
+      "page": 1,
+      "scaleStatus": "missing",
+      "scaleValue": null,
+      "coordinateRegion": { "x": 0.72, "y": 0.86, "width": 0.22, "height": 0.1 },
+      "documentVersionId": "33333333-3030-4030-8030-303030303030"
+    },
+    {
+      "code": "DRAWING_SCAN_UNREADABLE",
+      "setName": "配置圖",
+      "sheet": "A-02",
+      "page": 2,
+      "scaleStatus": "unreadable",
+      "scaleValue": null,
+      "coordinateRegion": { "x": 0.1, "y": 0.1, "width": 0.8, "height": 0.72 },
+      "documentVersionId": "33333333-3030-4030-8030-303030303030"
+    }
+  ]
+}
