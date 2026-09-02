@@ -1,4 +1,3 @@
-import type { SessionContext } from "../_shared/drs-auth/drs-session-bootstrap-bff.ts";
 import {
   type AnalysisEnqueueRequest,
   canonicalRunKeySha256,
@@ -9,8 +8,18 @@ export const VERIFY_JWT_REQUIRED = false;
 const ENDPOINT_PATH = "/drs-analysis-enqueue";
 const MAX_BODY_BYTES = 65_536;
 
+export type AnalysisEnqueueSessionContext = Readonly<{
+  userId: string;
+  sessionId: string;
+  caseId: string;
+  membershipId: string;
+  role: "owner" | "vendor" | "drs";
+  authorityVersion: number;
+  nextActor: "owner" | "vendor" | "drs";
+}>;
+
 export type AnalysisEnqueueRepositoryInput = Readonly<{
-  principal: SessionContext;
+  principal: AnalysisEnqueueSessionContext;
   request: AnalysisEnqueueRequest;
   runKeySha256: string;
   enqueuePayloadSha256: string;
@@ -21,7 +30,9 @@ export interface AnalysisEnqueueRepository {
 }
 
 export type AnalysisEnqueueHandlerDependencies = Readonly<{
-  resolveSessionContext(request: Request): Promise<SessionContext | null>;
+  resolveSessionContext(
+    request: Request,
+  ): Promise<AnalysisEnqueueSessionContext | null>;
   repository: AnalysisEnqueueRepository;
   logger?: Readonly<{
     info(code: string, fields: Readonly<Record<string, unknown>>): void;

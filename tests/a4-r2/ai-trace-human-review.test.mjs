@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { validateAnalysisOutput } from "../../supabase/functions/_shared/drs-analysis/contracts.ts";
@@ -10,6 +11,13 @@ const RUN_ID = "66666666-6060-4060-8060-606060606060";
 const RUN_KEY = "f".repeat(64);
 const JOB_ID = "88888888-8080-4080-8080-808080808080";
 const WORKER_ID = "99999999-9090-4090-8090-909090909090";
+const ENQUEUE_SOURCE = readFileSync(
+  new URL(
+    "../../supabase/functions/drs-analysis-enqueue/index.ts",
+    import.meta.url,
+  ),
+  "utf8",
+);
 const DOCUMENT = Object.freeze({
   ordinal: 1,
   caseId: CASE_ID,
@@ -73,6 +81,42 @@ function analysisOutput() {
     }],
   };
 }
+
+test("analysis enqueue closure excludes protected auth implementation and preserves session authority fields", () => {
+  const importSpecifiers = [...ENQUEUE_SOURCE.matchAll(
+    /\bfrom\s+["']([^"']+)["']/gu,
+  )].map((match) => match[1]);
+  assert.deepEqual(importSpecifiers, [
+    "../_shared/drs-analysis/contracts.ts",
+  ]);
+
+  const contextDeclaration = ENQUEUE_SOURCE.match(
+    /export type AnalysisEnqueueSessionContext = Readonly<\{([\s\S]*?)\}>;/u,
+  );
+  assert.ok(contextDeclaration);
+  const contextBody = contextDeclaration[1];
+  for (
+    const [field, type] of Object.entries({
+      userId: "string",
+      sessionId: "string",
+      caseId: "string",
+      membershipId: "string",
+      authorityVersion: "number",
+    })
+  ) {
+    assert.match(contextBody, new RegExp(`\\b${field}: ${type};`, "u"));
+  }
+  assert.match(contextBody, /\brole: "owner" \| "vendor" \| "drs"/u);
+  assert.match(contextBody, /\bnextActor: "owner" \| "vendor" \| "drs"/u);
+  assert.match(
+    ENQUEUE_SOURCE,
+    /principal: AnalysisEnqueueSessionContext;/u,
+  );
+  assert.match(
+    ENQUEUE_SOURCE,
+    /resolveSessionContext\(\s*request: Request,?\s*\): Promise<AnalysisEnqueueSessionContext \| null>;/u,
+  );
+});
 
 test("worker captures String.prototype.charCodeAt before validation-time mutation", async () => {
   const input = runContext();
