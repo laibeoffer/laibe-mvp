@@ -480,6 +480,50 @@ exception
 end;
 $function$;
 
+create function drs_analysis_private.source_citation_triple_sets_equal_v1(
+  p_sources jsonb,
+  p_citations jsonb
+)
+returns boolean
+language sql
+immutable
+security invoker
+set search_path = ''
+as $function$
+  select case
+    when jsonb_typeof(p_sources) = 'array'
+      and jsonb_typeof(p_citations) = 'array'
+    then
+      not exists (
+        (select
+          source_value ->> 'documentId',
+          source_value ->> 'documentVersionId',
+          source_value ->> 'documentSha256'
+        from jsonb_array_elements(p_sources) source_value)
+        except
+        (select
+          citation_value ->> 'documentId',
+          citation_value ->> 'documentVersionId',
+          citation_value ->> 'documentSha256'
+        from jsonb_array_elements(p_citations) citation_value)
+      )
+      and not exists (
+        (select
+          citation_value ->> 'documentId',
+          citation_value ->> 'documentVersionId',
+          citation_value ->> 'documentSha256'
+        from jsonb_array_elements(p_citations) citation_value)
+        except
+        (select
+          source_value ->> 'documentId',
+          source_value ->> 'documentVersionId',
+          source_value ->> 'documentSha256'
+        from jsonb_array_elements(p_sources) source_value)
+      )
+    else false
+  end;
+$function$;
+
 create function public.server_drs_analysis_enqueue_v1(
   p_actor_user_id uuid,
   p_actor_auth_session_id uuid,
@@ -880,6 +924,11 @@ begin
         return jsonb_build_object('state', 'INVALID_ANALYSIS_OUTPUT', 'newEffects', 0);
       end if;
     end loop;
+    if not drs_analysis_private.source_citation_triple_sets_equal_v1(
+      v_finding -> 'sourceDocumentVersions', v_finding -> 'citations'
+    ) then
+      return jsonb_build_object('state', 'INVALID_ANALYSIS_OUTPUT', 'newEffects', 0);
+    end if;
     for v_unknown in
       select value from jsonb_array_elements(v_finding -> 'unknowns')
     loop
@@ -919,6 +968,11 @@ begin
           return jsonb_build_object('state', 'INVALID_ANALYSIS_OUTPUT', 'newEffects', 0);
         end if;
       end loop;
+      if not drs_analysis_private.source_citation_triple_sets_equal_v1(
+        v_unknown -> 'sourceDocumentVersions', v_unknown -> 'citations'
+      ) then
+        return jsonb_build_object('state', 'INVALID_ANALYSIS_OUTPUT', 'newEffects', 0);
+      end if;
     end loop;
   end loop;
 
@@ -1494,6 +1548,9 @@ revoke all on function drs_analysis_private.source_version_valid_v1(uuid, jsonb)
   from public, anon, authenticated, service_role;
 revoke all on function drs_analysis_private.citation_valid_v1(uuid, uuid, jsonb)
   from public, anon, authenticated, service_role;
+revoke all on function drs_analysis_private.source_citation_triple_sets_equal_v1(
+  jsonb, jsonb
+) from public, anon, authenticated, service_role;
 revoke all on function drs_analysis_private.stale_findings_for_document_version_v1(uuid)
   from public, anon, authenticated, service_role;
 revoke all on function drs_analysis_private.document_receipt_stale_trigger_v1()

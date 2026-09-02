@@ -568,6 +568,20 @@ function parseCitation(
   return null;
 }
 
+function sourceCitationTripleSetsEqual(
+  sources: readonly SourceDocumentVersion[],
+  citations: readonly AnalysisCitation[],
+): boolean {
+  const tripleKey = (
+    value: SourceDocumentVersion | AnalysisCitation,
+  ): string =>
+    `${value.documentId}\u0000${value.documentVersionId}\u0000${value.documentSha256}`;
+  const sourceKeys = new Set(sources.map(tripleKey));
+  const citationKeys = new Set(citations.map(tripleKey));
+  return sourceKeys.size === citationKeys.size &&
+    [...sourceKeys].every((key) => citationKeys.has(key));
+}
+
 function parseUnknown(
   value: unknown,
   context: AnalysisRunContext,
@@ -598,7 +612,11 @@ function parseUnknown(
   );
   if (
     sources.some((source) => source === null) ||
-    citations.some((c) => c === null)
+    citations.some((c) => c === null) ||
+    !sourceCitationTripleSetsEqual(
+      sources as SourceDocumentVersion[],
+      citations as AnalysisCitation[],
+    )
   ) {
     return null;
   }
@@ -692,6 +710,10 @@ function parseFinding(
     sources.some((source) => source === null) ||
     !(sources as SourceDocumentVersion[]).every((source) =>
       sourceExists(source, context)
+    ) ||
+    !sourceCitationTripleSetsEqual(
+      sources as SourceDocumentVersion[],
+      citations as AnalysisCitation[],
     ) ||
     (["high", "critical"].includes(String(readOwn(value, "severity"))) &&
       citations.length < 1) ||

@@ -61,7 +61,7 @@ const quoteDocuments = quoteFixture.documents.map((document, index) => ({
   caseId: quoteFixture.caseId,
   ...document,
 }));
-const runtimeDocuments = Object.freeze([quoteDocuments[0]]);
+const runtimeDocuments = Object.freeze([...quoteDocuments]);
 
 function enqueueRequest(overrides = {}) {
   return {
@@ -93,6 +93,23 @@ function quoteCitation(overrides = {}) {
     row: 7,
     ...overrides,
   };
+}
+
+function sourceVersionFor(document) {
+  return {
+    documentId: document.documentId,
+    documentVersionId: document.documentVersionId,
+    documentSha256: document.sha256,
+  };
+}
+
+function quoteCitationFor(document, overrides = {}) {
+  return quoteCitation({
+    documentId: document.documentId,
+    documentVersionId: document.documentVersionId,
+    documentSha256: document.sha256,
+    ...overrides,
+  });
 }
 
 function finding(overrides = {}) {
@@ -213,6 +230,27 @@ test("high-risk finding without an exact citation is rejected", () => {
   );
 });
 
+test("finding source and citation triple sets are exact after dedupe and order normalization", () => {
+  const validate = requiredFunction(contracts, "validateAnalysisOutput");
+  const sourceA = sourceVersionFor(quoteDocuments[0]);
+  const sourceB = sourceVersionFor(quoteDocuments[1]);
+  const citationA = quoteCitationFor(quoteDocuments[0]);
+  const citationB = quoteCitationFor(quoteDocuments[1]);
+  const output = (sourceDocumentVersions, citations) =>
+    analysisOutput({
+      findings: [finding({ sourceDocumentVersions, citations })],
+    });
+
+  assert.equal(validate(runContext(), output([sourceA], [citationB])), null);
+  assert.equal(validate(runContext(), output([sourceA, sourceB], [citationA])), null);
+  assert.equal(validate(runContext(), output([sourceA], [citationA, citationB])), null);
+  assert.ok(validate(
+    runContext(),
+    output([sourceA, sourceA, sourceB], [citationB, citationA, citationB]),
+  ));
+  assert.ok(validate(runContext(), output([sourceA, sourceB], [citationB, citationA])));
+});
+
 test("UNKNOWN requires evidence, exact source versions, citations, and a next actor", () => {
   const validate = requiredFunction(contracts, "validateAnalysisOutput");
   const unknown = finding({
@@ -246,6 +284,37 @@ test("UNKNOWN requires evidence, exact source versions, citations, and a next ac
     ),
     null,
   );
+});
+
+test("nested unknown source and citation triple sets are exact after dedupe and order normalization", () => {
+  const validate = requiredFunction(contracts, "validateAnalysisOutput");
+  const sourceA = sourceVersionFor(quoteDocuments[0]);
+  const sourceB = sourceVersionFor(quoteDocuments[1]);
+  const citationA = quoteCitationFor(quoteDocuments[0]);
+  const citationB = quoteCitationFor(quoteDocuments[1]);
+  const output = (sourceDocumentVersions, citations) =>
+    analysisOutput({
+      findings: [finding({
+        classification: "unknown",
+        severity: "medium",
+        unknowns: [{
+          code: "QUOTE_REQUIRED_FIELD_UNKNOWN",
+          requiredEvidence: "補充數量與單價明細",
+          sourceDocumentVersions,
+          citations,
+          nextActor: "vendor",
+        }],
+      })],
+    });
+
+  assert.equal(validate(runContext(), output([sourceA], [citationB])), null);
+  assert.equal(validate(runContext(), output([sourceA, sourceB], [citationA])), null);
+  assert.equal(validate(runContext(), output([sourceA], [citationA, citationB])), null);
+  assert.ok(validate(
+    runContext(),
+    output([sourceA, sourceA, sourceB], [citationB, citationA, citationB]),
+  ));
+  assert.ok(validate(runContext(), output([sourceA, sourceB], [citationB, citationA])));
 });
 
 test("structural, fire, code, MEP, waterproof, and sign-off findings require external review", () => {
@@ -468,11 +537,34 @@ test("exactly one frozen migration contains queue, immutable finding, review, RL
   assert.doesNotMatch(source, /https?:\/\/|openai|anthropic|gemini/iu);
 });
 
+const sourceCapsulePaths = Object.freeze([
+  "supabase/functions/_shared/drs-analysis/contracts.ts",
+  "supabase/migrations/20260902004813_drs_analysis_finding_r1.sql",
+  "supabase/tests/drs_analysis_finding_r1.test.mjs",
+  "tests/a4-r1/healthcheck-steps-1-3.test.mjs",
+].sort());
+
+function gitBlobSha1(relativePath) {
+  const bytes = readFileSync(new URL(relativePath, worktreeUrl));
+  return createHash("sha1")
+    .update(Buffer.from(`blob ${bytes.length}\0`, "utf8"))
+    .update(bytes)
+    .digest("hex");
+}
+
+const sourceCapsuleSha1 = createHash("sha1")
+  .update(
+    sourceCapsulePaths.map((relativePath) =>
+      `${relativePath}\t${gitBlobSha1(relativePath)}`
+    ).join("\n"),
+    "utf8",
+  )
+  .digest("hex");
 const dockerPath = process.env.DRS_AI_R1_DOCKER ?? "docker";
 const candidate = process.env.DRS_AI_R1_CANDIDATE ?? "";
 const disposableConfirmed =
   process.env.DRS_AI_R1_DISPOSABLE_CONFIRMED === "YES";
-const runtimeEnabled = disposableConfirmed && /^[a-f0-9]{40}$/u.test(candidate);
+const runtimeEnabled = disposableConfirmed && candidate === sourceCapsuleSha1;
 const IMAGE =
   "public.ecr.aws/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518";
 const RESOURCES = Object.freeze({
@@ -623,6 +715,8 @@ const IDS = Object.freeze({
   ownerBTechnical: "84444444-4444-4444-8444-444444444444",
   quoteDocument: quoteDocuments[0].documentId,
   quoteVersion: quoteDocuments[0].documentVersionId,
+  quoteDocumentB: quoteDocuments[1].documentId,
+  quoteVersionB: quoteDocuments[1].documentVersionId,
   quoteVersion2: "12121212-1010-4010-8010-101010101010",
 });
 
@@ -685,6 +779,9 @@ insert into casework.documents(
 ) values (
   '${IDS.quoteDocument}','${CASE_A}','doc_10101010101040108010101010101010',
   'quote','PARTY_VISIBLE','OWNER','ACTIVE','${IDS.owner}'
+), (
+  '${IDS.quoteDocumentB}','${CASE_A}','doc_20202020202040208020202020202020',
+  'quote','PARTY_VISIBLE','OWNER','ACTIVE','${IDS.owner}'
 );
 insert into casework.document_versions(
   id,case_id,document_id,version_ref,version_no,created_by,sha256,
@@ -695,6 +792,11 @@ insert into casework.document_versions(
   '${quoteDocuments[0].documentVersionRef}',1,'${IDS.owner}',
   '${quoteDocuments[0].sha256}',1024,'application/pdf','FORMAL','ACTIVE',
   'ai-r1-quote-v1-create','${"9".repeat(64)}'
+), (
+  '${IDS.quoteVersionB}','${CASE_A}','${IDS.quoteDocumentB}',
+  '${quoteDocuments[1].documentVersionRef}',1,'${IDS.owner}',
+  '${quoteDocuments[1].sha256}',2048,'application/pdf','FORMAL','ACTIVE',
+  'ai-r1-quote-b-v1-create','${"8".repeat(64)}'
 );
 insert into casework.document_version_sources(
   case_id,document_id,version_id,bucket_id,object_key,sha256,
@@ -704,6 +806,11 @@ insert into casework.document_version_sources(
   'drs-case-records-private',
   'cases/${CASE_A}/documents/${IDS.quoteDocument}/versions/${IDS.quoteVersion}/source.pdf',
   '${quoteDocuments[0].sha256}',1024,'application/pdf','CLEAN'
+), (
+  '${CASE_A}','${IDS.quoteDocumentB}','${IDS.quoteVersionB}',
+  'drs-case-records-private',
+  'cases/${CASE_A}/documents/${IDS.quoteDocumentB}/versions/${IDS.quoteVersionB}/source.pdf',
+  '${quoteDocuments[1].sha256}',2048,'application/pdf','CLEAN'
 );
 insert into casework.document_operation_receipts(
   id,receipt_ref,case_id,operation,receipt_state,actor_user_id,
@@ -713,9 +820,17 @@ insert into casework.document_operation_receipts(
   '${CASE_A}','FINALIZE_UPLOAD','FORMAL_VERSION_CREATED','${IDS.owner}',
   'ai-r1-quote-v1-receipt','${"9".repeat(64)}','${IDS.quoteDocument}',
   '${IDS.quoteVersion}'
+), (
+  'acacacac-acac-4cac-8cac-acacacacacac','rcp_acacacacacac4cac8cacacacacacacac',
+  '${CASE_A}','FINALIZE_UPLOAD','FORMAL_VERSION_CREATED','${IDS.owner}',
+  'ai-r1-quote-b-v1-receipt','${"8".repeat(64)}','${IDS.quoteDocumentB}',
+  '${IDS.quoteVersionB}'
 );
-update casework.documents set current_version_id='${IDS.quoteVersion}'
-where id='${IDS.quoteDocument}';
+update casework.documents set current_version_id = case id
+  when '${IDS.quoteDocument}'::uuid then '${IDS.quoteVersion}'::uuid
+  when '${IDS.quoteDocumentB}'::uuid then '${IDS.quoteVersionB}'::uuid
+end
+where id in ('${IDS.quoteDocument}'::uuid, '${IDS.quoteDocumentB}'::uuid);
 commit;`;
 }
 
@@ -770,8 +885,8 @@ function enqueueSql({
 }
 
 test("disposable runtime harness architecture audit binds every predecessor and AI dependency", () => {
-  assert.equal(runtimeDocuments.length, 1);
-  assert.deepEqual(runtimeDocuments[0], quoteDocuments[0]);
+  assert.equal(runtimeDocuments.length, 2);
+  assert.deepEqual(runtimeDocuments, quoteDocuments);
   assert.equal(runtimeDocuments[0].caseId, CASE_A);
   assert.equal(runtimeDocuments[0].documentId, IDS.quoteDocument);
   assert.equal(runtimeDocuments[0].documentVersionId, IDS.quoteVersion);
@@ -833,13 +948,16 @@ test("disposable runtime harness architecture audit binds every predecessor and 
     "casework.document_versions",
     "casework.document_version_sources",
     "casework.document_operation_receipts",
-    `update casework.documents set current_version_id='${IDS.quoteVersion}'`,
+    `when '${IDS.quoteDocument}'::uuid then '${IDS.quoteVersion}'::uuid`,
+    `when '${IDS.quoteDocumentB}'::uuid then '${IDS.quoteVersionB}'::uuid`,
     runtimeDocuments[0].documentVersionRef,
     runtimeDocuments[0].sha256,
+    runtimeDocuments[1].documentVersionRef,
+    runtimeDocuments[1].sha256,
   ]) assert.ok(documentSql.includes(required), required);
   const enqueue = enqueueSql();
   assert.ok(enqueue.includes(sqlLiteral(JSON.stringify(runtimeDocuments))));
-  assert.equal(enqueue.includes(quoteDocuments[1].documentVersionId), false);
+  assert.equal(enqueue.includes(quoteDocuments[1].documentVersionId), true);
 
   const syntheticClaim = {
     runId: "60606060-6060-4060-8060-606060606060",
@@ -874,6 +992,7 @@ test("one exact no-port disposable PostgreSQL run enforces authority, idempotenc
     : "set DRS_AI_R1_DISPOSABLE_CONFIRMED=YES and exact candidate SHA",
 }, async () => {
   assert.equal(existsSync(worktreeUrl), true);
+  assert.equal(candidate, sourceCapsuleSha1, "runtime candidate must equal current source capsule SHA-1");
   const source = readFileSync(new URL("tests/drs_analysis_finding_r1.test.mjs", rootUrl), "utf8");
   assert.equal(source.includes(["docker", ".sock"].join("")), false);
   assert.equal(source.includes(["--", "publish"].join("")), false);
@@ -993,6 +1112,87 @@ test("one exact no-port disposable PostgreSQL run enforces authority, idempotenc
       );`,
     ));
     assert.equal(crossOutput.newEffects, 0);
+
+    const sourceA = sourceVersionFor(runtimeDocuments[0]);
+    const sourceB = sourceVersionFor(runtimeDocuments[1]);
+    const citationA = quoteCitationFor(runtimeDocuments[0]);
+    const citationB = quoteCitationFor(runtimeDocuments[1]);
+    const completionInRollback = (outputSha256, output) =>
+      jsonResult(psql(`begin;
+        select public.server_drs_analysis_complete_v1(
+          '99999999-9090-4090-8090-909090909090',
+          ${sqlLiteral(claim.jobId)}::uuid,'${outputSha256}',
+          ${sqlLiteral(JSON.stringify(output))}::jsonb
+        );
+        rollback;`));
+    const persistenceEffects = () => jsonResult(psql(`select jsonb_build_object(
+      'runs',(select count(*) from casework.drs_analysis_runs),
+      'findings',(select count(*) from casework.drs_analysis_findings),
+      'citations',(select count(*) from casework.drs_analysis_finding_citations),
+      'lifecycle',(select count(*) from casework.drs_analysis_finding_lifecycle_events)
+    );`));
+    const setEffectsBefore = persistenceEffects();
+
+    const mismatchedFindingOutput = analysisOutputForClaim(claim, {
+      outputSha256: "0".repeat(64),
+      findings: [findingForClaim(claim, {
+        sourceDocumentVersions: [sourceA],
+        citations: [citationB],
+      })],
+    });
+    const mismatchedFinding = completionInRollback(
+      "0".repeat(64),
+      mismatchedFindingOutput,
+    );
+
+    const nestedMismatchOutput = analysisOutputForClaim(claim, {
+      outputSha256: "1".repeat(64),
+      findings: [findingForClaim(claim, {
+        classification: "unknown",
+        severity: "medium",
+        unknowns: [{
+          code: "QUOTE_REQUIRED_FIELD_UNKNOWN",
+          requiredEvidence: "補充數量與單價明細",
+          sourceDocumentVersions: [sourceA],
+          citations: [citationB],
+          nextActor: "vendor",
+        }],
+      })],
+    });
+    const nestedMismatch = completionInRollback(
+      "1".repeat(64),
+      nestedMismatchOutput,
+    );
+
+    const normalizedExactOutput = analysisOutputForClaim(claim, {
+      outputSha256: "2".repeat(64),
+      findings: [findingForClaim(claim, {
+        classification: "unknown",
+        severity: "medium",
+        sourceDocumentVersions: [sourceA, sourceA, sourceB],
+        citations: [citationB, citationA, citationB],
+        unknowns: [{
+          code: "QUOTE_REQUIRED_FIELD_UNKNOWN",
+          requiredEvidence: "補充數量與單價明細",
+          sourceDocumentVersions: [sourceB, sourceA, sourceB],
+          citations: [citationA, citationB, citationA],
+          nextActor: "vendor",
+        }],
+      })],
+    });
+    const normalizedExact = completionInRollback(
+      "2".repeat(64),
+      normalizedExactOutput,
+    );
+    const setEffectsAfter = persistenceEffects();
+
+    assert.equal(mismatchedFinding.state, "INVALID_ANALYSIS_OUTPUT");
+    assert.equal(mismatchedFinding.newEffects, 0);
+    assert.equal(nestedMismatch.state, "INVALID_ANALYSIS_OUTPUT");
+    assert.equal(nestedMismatch.newEffects, 0);
+    assert.equal(normalizedExact.state, "APPLIED");
+    assert.equal(normalizedExact.newEffects, 1);
+    assert.deepEqual(setEffectsAfter, setEffectsBefore);
 
     const validFindings = [
       findingForClaim(claim),
