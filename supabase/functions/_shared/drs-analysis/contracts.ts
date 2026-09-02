@@ -4,6 +4,14 @@ export const ANALYSIS_OUTPUT_SCHEMA = "laibe.drs.analysis-output.v1" as const;
 export const ANALYSIS_FINDING_DRAFT_SCHEMA =
   "laibe.drs.analysis-finding-draft.v1" as const;
 
+const safeArrayIsArray = Array.isArray;
+const safeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+const safeGetPrototypeOf = Object.getPrototypeOf;
+const safeNumberIsInteger = Number.isInteger;
+const safeObjectFreeze = Object.freeze;
+const safeObjectPrototype = Object.prototype;
+const safeReflectOwnKeys = Reflect.ownKeys;
+
 export type AnalysisDomain = "quote" | "drawing" | "contract";
 export type FindingClassification =
   | "confirmed"
@@ -368,41 +376,144 @@ export function canonicalRunKeySha256(
   return sha256Text(canonicalRunIdentity(request));
 }
 
+function intrinsicOwnDataDescriptor(
+  value: object,
+  key: PropertyKey,
+): PropertyDescriptor | null {
+  const descriptor = safeGetOwnPropertyDescriptor(value, key);
+  return descriptor && safeGetOwnPropertyDescriptor(descriptor, "value")
+    ? descriptor
+    : null;
+}
+
+function intrinsicExactOwnDataValues(
+  value: unknown,
+  keys: readonly string[],
+): unknown[] | null {
+  if (
+    value === null || typeof value !== "object" || safeArrayIsArray(value) ||
+    safeGetPrototypeOf(value) !== safeObjectPrototype
+  ) return null;
+  const ownKeys = safeReflectOwnKeys(value);
+  if (ownKeys.length !== keys.length) return null;
+  const values: unknown[] = [];
+  values.length = keys.length;
+  for (let index = 0; index < keys.length; index += 1) {
+    const descriptor = intrinsicOwnDataDescriptor(value, keys[index]);
+    if (!descriptor) return null;
+    values[index] = descriptor.value;
+  }
+  return values;
+}
+
+function intrinsicDenseOwnDataElements(
+  value: unknown,
+  maximum: number,
+): unknown[] | null {
+  if (!safeArrayIsArray(value)) return null;
+  const lengthDescriptor = intrinsicOwnDataDescriptor(value, "length");
+  const length = lengthDescriptor?.value;
+  if (
+    !safeNumberIsInteger(length) || length < 1 || length > maximum ||
+    safeReflectOwnKeys(value).length !== length + 1
+  ) return null;
+  const elements: unknown[] = [];
+  elements.length = length;
+  for (let index = 0; index < length; index += 1) {
+    const descriptor = intrinsicOwnDataDescriptor(value, `${index}`);
+    if (!descriptor) return null;
+    elements[index] = descriptor.value;
+  }
+  return elements;
+}
+
+function intrinsicAnalysisRunDocument(
+  value: unknown,
+  expectedCaseId: string,
+  expectedOrdinal: number,
+): AnalysisDocumentVersion | null {
+  const values = intrinsicExactOwnDataValues(value, [
+    "ordinal",
+    "caseId",
+    "documentId",
+    "documentVersionId",
+    "documentVersionRef",
+    "documentKind",
+    "sha256",
+  ]);
+  if (!values) return null;
+  const ordinal = values[0];
+  const caseId = values[1];
+  const documentId = values[2];
+  const documentVersionId = values[3];
+  const documentVersionRef = values[4];
+  const documentKind = values[5];
+  const sha256 = values[6];
+  if (
+    ordinal !== expectedOrdinal || caseId !== expectedCaseId ||
+    !validUuid(documentId) || !validUuid(documentVersionId) ||
+    typeof documentVersionRef !== "string" ||
+    !OPAQUE_VERSION_REF.test(documentVersionRef) ||
+    (documentKind !== "quote" && documentKind !== "drawing" &&
+      documentKind !== "contract") ||
+    !validSha(sha256)
+  ) return null;
+  return safeObjectFreeze({
+    ordinal,
+    caseId,
+    documentId,
+    documentVersionId,
+    documentVersionRef,
+    documentKind: documentKind as AnalysisDomain,
+    sha256,
+  });
+}
+
 export function validateAnalysisRunContext(
   value: unknown,
 ): AnalysisRunContext | null {
-  if (
-    !hasExactKeys(value, ["runId", "runKeySha256", "caseId", "documents"])
-  ) return null;
-  const runId = readOwn(value, "runId");
-  const runKeySha256 = readOwn(value, "runKeySha256");
-  const caseId = readOwn(value, "caseId");
-  const documentsValue = readOwn(value, "documents");
-  if (
-    !validUuid(runId) || !validSha(runKeySha256) || !validUuid(caseId) ||
-    !Array.isArray(documentsValue) || documentsValue.length < 1 ||
-    documentsValue.length > 24
-  ) return null;
-  const documents: AnalysisDocumentVersion[] = [];
-  for (let index = 0; index < documentsValue.length; index += 1) {
-    const document = parseDocumentVersion(
-      documentsValue[index],
+  try {
+    const values = intrinsicExactOwnDataValues(value, [
+      "runId",
+      "runKeySha256",
+      "caseId",
+      "documents",
+    ]);
+    if (!values) return null;
+    const runId = values[0];
+    const runKeySha256 = values[1];
+    const caseId = values[2];
+    const documentsValue = values[3];
+    if (!validUuid(runId) || !validSha(runKeySha256) || !validUuid(caseId)) {
+      return null;
+    }
+    const documentValues = intrinsicDenseOwnDataElements(documentsValue, 24);
+    if (!documentValues) return null;
+    const documents: AnalysisDocumentVersion[] = [];
+    documents.length = documentValues.length;
+    for (let index = 0; index < documentValues.length; index += 1) {
+      const document = intrinsicAnalysisRunDocument(
+        documentValues[index],
+        caseId,
+        index + 1,
+      );
+      if (!document) return null;
+      for (let prior = 0; prior < index; prior += 1) {
+        if (
+          documents[prior].documentVersionId === document.documentVersionId
+        ) return null;
+      }
+      documents[index] = document;
+    }
+    return safeObjectFreeze({
+      runId,
+      runKeySha256,
       caseId,
-      index + 1,
-    );
-    if (!document) return null;
-    documents.push(document);
+      documents: safeObjectFreeze(documents),
+    });
+  } catch {
+    return null;
   }
-  if (
-    new Set(documents.map((document) => document.documentVersionId)).size !==
-      documents.length
-  ) return null;
-  return Object.freeze({
-    runId,
-    runKeySha256,
-    caseId,
-    documents: Object.freeze(documents),
-  });
 }
 
 function sourceVersion(value: unknown): SourceDocumentVersion | null {
