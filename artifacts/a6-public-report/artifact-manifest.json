@@ -1,0 +1,109 @@
+{
+  "manifestSchemaName": "laibe.quote-health-public-report.artifact-manifest.v1",
+  "manifestVersion": "v1",
+  "createdAt": "2026-09-03T14:57:37.8193105+08:00",
+  "artifact": {
+    "schemaName": "laibe.quote-health-public-report.v1",
+    "schemaVersion": "v1",
+    "goldenSetVersion": "laibe.quote-health-public-report.golden.v1",
+    "producerIdentity": "src/lib/budget/quote-healthcheck/public-report.ts#buildQuoteHealthPublicReportV1",
+    "validatorIdentity": "src/lib/budget/quote-healthcheck/public-report.ts#validateQuoteHealthPublicReportV1"
+  },
+  "baseIdentity": {
+    "worktree": "C:\\CodexWork\\08-Jacky\\worktrees\\laibe_MVP_project\\a4-r6-ai-findings-healthchecks-20260902",
+    "branch": "drs-runtime/a4-r6-ai-findings-healthchecks-20260902",
+    "head": "9abf3e78e6bcd80fd744e43b09f16c4a34cd47c5",
+    "tree": "553cc561ee39f29e907861765d173c660e02e533",
+    "status": "clean"
+  },
+  "candidateIdentity": {
+    "kind": "sha256_file_set",
+    "bundleSha256": "6bcb12e819530abb7ac60135766baeec2580782050ef0452ebd74b84bdeebd07",
+    "gitCommit": null,
+    "gitTree": null,
+    "bindingNote": "The bundle hash covers the five source, schema, export, test, and Golden Set files listed below. The manifest self-hash and optional local commit identity are bound in the terminal report."
+  },
+  "changedPaths": [
+    "src/lib/budget/quote-healthcheck/public-report.ts",
+    "src/lib/budget/quote-healthcheck/schemas/quote-health-public-report-v1.schema.json",
+    "src/lib/budget/quote-healthcheck/index.ts",
+    "tests/budget/quote-health-public-report.test.mjs",
+    "tests/fixtures/quote-health-public-report/golden-cases.v1.json",
+    "artifacts/a6-public-report/artifact-manifest.json"
+  ],
+  "files": [
+    {
+      "path": "src/lib/budget/quote-healthcheck/public-report.ts",
+      "bytes": 45776,
+      "sha256": "830d569d38bdfb673484c58c2786ab0f53f1a88c451c4c07428218eafc2e6f69"
+    },
+    {
+      "path": "src/lib/budget/quote-healthcheck/schemas/quote-health-public-report-v1.schema.json",
+      "bytes": 5178,
+      "sha256": "f907604103f602b07d9350892cf16a31ac3e87b3217a0d48c57e7c7abafec189"
+    },
+    {
+      "path": "src/lib/budget/quote-healthcheck/index.ts",
+      "bytes": 1430,
+      "sha256": "7d4bac575f65ba437a4cffccbb49550c415ea36152fec2d2857817af734ca1c7"
+    },
+    {
+      "path": "tests/budget/quote-health-public-report.test.mjs",
+      "bytes": 13359,
+      "sha256": "606d44140833869842e38d75ec3f05b8eb3f2e88202060c21202c0775b6b623f"
+    },
+    {
+      "path": "tests/fixtures/quote-health-public-report/golden-cases.v1.json",
+      "bytes": 4669,
+      "sha256": "fca835b8722d707e5cbe419d359e1ca7b3d9242d91fa77926812045da0e106a2"
+    }
+  ],
+  "manifestSelfBinding": {
+    "path": "artifacts/a6-public-report/artifact-manifest.json",
+    "sha256RecordedInTerminalReport": true
+  },
+  "verification": {
+    "focusedRed": {
+      "status": "expected_failure",
+      "result": "2 passed, 11 failed because the public builder, validator, and schema did not yet exist"
+    },
+    "focusedGreen": {
+      "status": "pass",
+      "result": "13 passed, 0 failed on the final dual-approved display wording"
+    },
+    "typecheck": {
+      "status": "pass",
+      "command": "deno check --no-config --no-lock src/lib/budget/quote-healthcheck/public-report.ts"
+    },
+    "format": {
+      "status": "pass",
+      "result": "5 scoped files checked"
+    },
+    "scopedRegression": {
+      "status": "pass",
+      "result": "94 passed, 0 failed",
+      "excluded": "Unmodified browser-adapter tests that require task-external real PDF read permission or environment/process permission",
+      "candidateRelation": "The full scoped suite passed before a dual-approved display-only text correction; the affected public suite, typecheck, format, and manifest binding are rerun on final bytes."
+    },
+    "broaderReadOnlyScan": {
+      "status": "permission_blocked_outside_scope",
+      "result": "103 passed, 2 permission-blocked",
+      "sourceImpact": "none"
+    }
+  },
+  "legacyContract": {
+    "schemaName": "laibe.quote-health-report.v1",
+    "schemaPath": "src/lib/budget/quote-healthcheck/schemas/quote-health-report-v1.schema.json",
+    "sha256": "596ce2b3d0f4c42d19ba68e43d4778f2470c2ebbf138651dde15ff0bb893b2a4",
+    "changed": false
+  },
+  "scope": {
+    "realCaseData": false,
+    "ocrIntegration": false,
+    "sitesSourceMutation": false,
+    "pushPrMergeDeploy": false
+  },
+  "reviewStatus": "pending_A6-Q1",
+  "a6RecognitionAccepted": false,
+  "bplusSiteArtifactCompatibilityAccepted": false
+}

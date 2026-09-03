@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:laibe:schema:quote-health-public-report:v1",
+  "title": "LaiBE Quote Health Public Report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaName",
+    "schemaVersion",
+    "artifactId",
+    "generatedAt",
+    "analysisStatus",
+    "document",
+    "summary",
+    "findings",
+    "limitations",
+    "humanReviewRequired",
+    "professionalReviewRequired",
+    "disclaimerCode",
+    "provenance"
+  ],
+  "properties": {
+    "schemaName": { "const": "laibe.quote-health-public-report.v1" },
+    "schemaVersion": { "const": "v1" },
+    "artifactId": { "$ref": "#/$defs/identity" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "analysisStatus": {
+      "enum": ["complete", "limited", "unsupported", "failed"]
+    },
+    "document": { "$ref": "#/$defs/document" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "findings": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "limitations": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/displayText" }
+    },
+    "humanReviewRequired": { "const": true },
+    "professionalReviewRequired": { "const": true },
+    "disclaimerCode": {
+      "const": "FREE_HEALTHCHECK_NOT_PROFESSIONAL_APPROVAL"
+    },
+    "provenance": { "$ref": "#/$defs/provenance" }
+  },
+  "$defs": {
+    "identity": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "displayText": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1200,
+      "pattern": "^[^<>`\\u0000-\\u001f\\u007f]+$"
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["displayName", "mimeType", "pageCount"],
+      "properties": {
+        "displayName": {
+          "allOf": [
+            { "$ref": "#/$defs/displayText" },
+            { "maxLength": 256 },
+            { "pattern": "^[^/\\\\]+$" }
+          ]
+        },
+        "mimeType": { "const": "application/pdf" },
+        "pageCount": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "headline",
+        "findingCount",
+        "highCount",
+        "mediumCount",
+        "lowCount",
+        "unconfirmedCount"
+      ],
+      "properties": {
+        "headline": { "$ref": "#/$defs/displayText" },
+        "findingCount": { "type": "integer", "minimum": 0 },
+        "highCount": { "type": "integer", "minimum": 0 },
+        "mediumCount": { "type": "integer", "minimum": 0 },
+        "lowCount": { "type": "integer", "minimum": 0 },
+        "unconfirmedCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "findingId",
+        "category",
+        "severity",
+        "title",
+        "description",
+        "evidenceStatus",
+        "pageReferences",
+        "suggestedNextStep"
+      ],
+      "properties": {
+        "findingId": { "$ref": "#/$defs/identity" },
+        "category": {
+          "enum": [
+            "arithmetic",
+            "completeness",
+            "duplicate",
+            "unit",
+            "scope",
+            "version"
+          ]
+        },
+        "severity": { "enum": ["high", "medium", "low", "info"] },
+        "title": { "$ref": "#/$defs/displayText" },
+        "description": { "$ref": "#/$defs/displayText" },
+        "evidenceStatus": {
+          "enum": [
+            "observed",
+            "inferred",
+            "unconfirmed",
+            "insufficient_evidence"
+          ]
+        },
+        "pageReferences": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "suggestedNextStep": { "$ref": "#/$defs/displayText" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceKind",
+        "sourceSchemaName",
+        "sourceSchemaVersion",
+        "sourceReportId",
+        "sourceFactsHash",
+        "publicFactsHash"
+      ],
+      "properties": {
+        "sourceKind": {
+          "enum": ["internal_report", "terminal_extraction_outcome"]
+        },
+        "sourceSchemaName": {
+          "enum": [
+            "laibe.quote-health-report.v1",
+            "laibe.quote-pdf-terminal-extraction-outcome.v1"
+          ]
+        },
+        "sourceSchemaVersion": { "const": "v1" },
+        "sourceReportId": {
+          "oneOf": [
+            { "$ref": "#/$defs/identity" },
+            { "type": "null" }
+          ]
+        },
+        "sourceFactsHash": {
+          "oneOf": [
+            { "$ref": "#/$defs/sha256" },
+            { "type": "null" }
+          ]
+        },
+        "publicFactsHash": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "goldenSetVersion": "laibe.quote-health-public-report.golden.v1",
+  "classification": "SYNTHETIC_PUBLIC_CONTRACT_TEST_ONLY",
+  "formalCaseData": false,
+  "realDocumentEvidence": false,
+  "mayBeUsedForProductionAcceptance": false,
+  "cases": [
+    {
+      "goldenId": "G1",
+      "description": "validated current complete internal report with no findings",
+      "artifactId": "public_report_g1_complete_clear",
+      "generatedAt": "2026-09-03T01:00:00.000Z",
+      "documentDisplayName": "報價單完整無待確認項目.pdf",
+      "sourceScenario": "internal_report_no_findings",
+      "expected": {
+        "analysisStatus": "complete",
+        "findingCount": 0,
+        "highCount": 0,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "unconfirmedCount": 0
+      }
+    },
+    {
+      "goldenId": "G2",
+      "description": "validated current complete internal report with findings",
+      "artifactId": "public_report_g2_complete_findings",
+      "generatedAt": "2026-09-03T01:01:00.000Z",
+      "documentDisplayName": "報價單待確認內容.pdf",
+      "sourceScenario": "internal_report_with_findings",
+      "expected": {
+        "analysisStatus": "complete",
+        "findingCount": 7,
+        "highCount": 7,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "unconfirmedCount": 0,
+        "pageReferences": [1, 3]
+      }
+    },
+    {
+      "goldenId": "G3",
+      "description": "terminal parse failure remains limited and cannot expose stale findings",
+      "artifactId": "public_report_g3_parse_limited",
+      "generatedAt": "2026-09-03T01:02:00.000Z",
+      "documentDisplayName": "報價單解析受限.pdf",
+      "sourceScenario": "terminal_parse_failure",
+      "terminalOutcome": {
+        "accepted": false,
+        "rejection": {
+          "code": "CORRUPT_PDF",
+          "message": "Synthetic parse failure only."
+        }
+      },
+      "expected": {
+        "analysisStatus": "limited",
+        "findingCount": 0,
+        "highCount": 0,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "unconfirmedCount": 0
+      }
+    },
+    {
+      "goldenId": "G4",
+      "description": "image-only PDF before OCR is unsupported",
+      "artifactId": "public_report_g4_scanned_unsupported",
+      "generatedAt": "2026-09-03T01:03:00.000Z",
+      "documentDisplayName": "掃描報價單.pdf",
+      "sourceScenario": "terminal_scanned_before_ocr",
+      "terminalOutcome": {
+        "accepted": true,
+        "inspection": {
+          "byteLength": 2048,
+          "pageCount": 1,
+          "readability": "IMAGE_ONLY"
+        },
+        "facts": {
+          "rows": []
+        },
+        "limitations": [
+          {
+            "code": "OCR_NOT_PERFORMED",
+            "message": "Synthetic image-only fixture; OCR not performed."
+          },
+          {
+            "code": "NO_STRUCTURED_QUOTE_ROWS",
+            "message": "Synthetic fixture has no extracted rows."
+          }
+        ],
+        "comparison": {
+          "status": "NOT_EVALUATED",
+          "findings": []
+        }
+      },
+      "expected": {
+        "analysisStatus": "unsupported",
+        "findingCount": 0,
+        "highCount": 0,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "unconfirmedCount": 0,
+        "pageCount": 1
+      }
+    },
+    {
+      "goldenId": "G5",
+      "description": "terminal source validation failure replaces prior success without leakage",
+      "artifactId": "public_report_g5_failed_no_leak",
+      "generatedAt": "2026-09-03T01:04:00.000Z",
+      "documentDisplayName": "報價單驗證失敗.pdf",
+      "sourceScenario": "terminal_document_hash_failure",
+      "terminalOutcome": {
+        "accepted": false,
+        "rejection": {
+          "code": "DOCUMENT_HASH_MISMATCH",
+          "message": "C:\\private\\CASE-123\\raw.pdf stack=secret-token"
+        }
+      },
+      "expected": {
+        "analysisStatus": "failed",
+        "findingCount": 0,
+        "highCount": 0,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "unconfirmedCount": 0
+      }
+    },
+    {
+      "goldenId": "G6",
+      "description": "unknown quantity remains unconfirmed and is never guessed",
+      "artifactId": "public_report_g6_unknown_unconfirmed",
+      "generatedAt": "2026-09-03T01:05:00.000Z",
+      "documentDisplayName": "報價單數量待確認.pdf",
+      "sourceScenario": "internal_report_unknown_quantity",
+      "expected": {
+        "analysisStatus": "complete",
+        "findingCount": 1,
+        "highCount": 1,
+        "mediumCount": 0,
+        "lowCount": 0,
+        "unconfirmedCount": 1,
+        "evidenceStatus": "unconfirmed",
+        "title": "數量待確認"
+      }
+    }
+  ]
+}

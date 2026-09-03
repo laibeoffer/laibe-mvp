@@ -27,6 +27,25 @@ export {
   validateQuoteHealthReportV1,
 } from "./report.ts";
 export {
+  buildQuoteHealthPublicReportV1,
+  QUOTE_HEALTH_PUBLIC_REPORT_DISCLAIMER,
+  QUOTE_HEALTH_PUBLIC_REPORT_MAX_BYTES,
+  QUOTE_HEALTH_PUBLIC_REPORT_SCHEMA,
+  QUOTE_HEALTH_PUBLIC_REPORT_VERSION,
+  validateQuoteHealthPublicReportV1,
+} from "./public-report.ts";
+export type {
+  QuoteHealthPublicAnalysisStatus,
+  QuoteHealthPublicCategory,
+  QuoteHealthPublicDocument,
+  QuoteHealthPublicEvidenceStatus,
+  QuoteHealthPublicFinding,
+  QuoteHealthPublicProvenance,
+  QuoteHealthPublicReportV1,
+  QuoteHealthPublicSeverity,
+  QuoteHealthPublicSummary,
+} from "./public-report.ts";
+export {
   buildQuoteHealthReviewPacketV1,
   validateQuoteHealthReviewPacketV1,
 } from "./review-packet.ts";
