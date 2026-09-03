@@ -122,7 +122,7 @@
     "sitesSourceMutation": false,
     "pushPrMergeDeploy": false
   },
-  "reviewStatus": "pending_A6-Q1",
-  "a6RecognitionAccepted": false,
-  "bplusSiteArtifactCompatibilityAccepted": false
+  "reviewStatus": "accepted_A6-Q1",
+  "a6RecognitionAccepted": true,
+  "bplusSiteArtifactCompatibilityAccepted": true
 }
