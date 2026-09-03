@@ -18,9 +18,9 @@
   },
   "candidateIdentity": {
     "kind": "sha256_file_set",
-    "bundleSha256": "c0691fd38dc231bc50cac21e43388e93dbc80847ce0d63c4785c61b5e6337300",
-    "gitCommit": "e303c9e4ba4a6db8ea8590199ad5bb10922c0d80",
-    "gitTree": "92525f180921ff6d519d9110af48b64eea663120",
+    "bundleSha256": "c44bd1629e1b4bc300d2ef225f137d5b7169a263fcfd076d0f1332203ec2b84b",
+    "gitCommit": "b892d4489b1ebf718655d1dff9eee1732f591f44",
+    "gitTree": "e67c0f2594f10703fcefa18382e09e8a4d8c5c41",
     "bindingNote": "The bundle hash covers the five source, schema, export, test, and Golden Set files listed below. The manifest self-hash and optional local commit identity are bound in the terminal report."
   },
   "changedPaths": [
@@ -39,8 +39,8 @@
     },
     {
       "path": "src/lib/budget/quote-healthcheck/schemas/quote-health-public-report-v1.schema.json",
-      "bytes": 7381,
-      "sha256": "00729c3fd8d246e236de2900fec86efa971c43e35d4ab9996541a67c95dcf533"
+      "bytes": 7394,
+      "sha256": "a267b02d0462659e00a2d56a640e0ac13d3299522fbd22c15c368dfbd52ea2a2"
     },
     {
       "path": "src/lib/budget/quote-healthcheck/index.ts",
@@ -49,8 +49,8 @@
     },
     {
       "path": "tests/budget/quote-health-public-report.test.mjs",
-      "bytes": 30438,
-      "sha256": "6e281f558b57fc6312e4a966b38fc73bc4c6fa62adccb9104a232b0015ed3048"
+      "bytes": 31222,
+      "sha256": "52cb1e8f62cdb1be21c520d3f60142d48b2ad2ef26d1a0a31d74ffe2ab217108"
     },
     {
       "path": "tests/fixtures/quote-health-public-report/golden-cases.v1.json",
@@ -122,7 +122,7 @@
     "sitesSourceMutation": false,
     "pushPrMergeDeploy": false
   },
-  "reviewStatus": "accepted_A6-Q1",
-  "a6RecognitionAccepted": true,
+  "reviewStatus": "pending_A6-Q1",
+  "a6RecognitionAccepted": false,
   "bplusSiteArtifactCompatibilityAccepted": false
 }
