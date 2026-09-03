@@ -246,6 +246,71 @@ const withSelfConsistentHash = async (report) => {
   return forged;
 };
 
+const serializedByteLength = (report) =>
+  new TextEncoder().encode(JSON.stringify(report)).byteLength;
+
+const buildSizedReport = async (targetBytes, multibyte = false) => {
+  const result = await buildFromGolden("G2");
+  assert.equal(result.ok, true, JSON.stringify(result));
+  const template = result.value.findings[0];
+  const report = structuredClone(result.value);
+  report.findings = Array.from({ length: 256 }, (_, index) => ({
+    ...structuredClone(template),
+    findingId: `sized_finding_${index}`,
+    title: `${multibyte && index === 0 ? "繁中🙂" : "T"}${index}`,
+    description: `D${index}`,
+    pageReferences: [],
+    suggestedNextStep: `N${index}`,
+  }));
+  report.limitations = Array.from(
+    { length: 128 },
+    (_, index) => `L${index}`,
+  );
+  report.summary = {
+    headline: "本次免費健檢發現 256 項待確認內容。",
+    findingCount: 256,
+    highCount: 256,
+    mediumCount: 0,
+    lowCount: 0,
+    unconfirmedCount: 0,
+  };
+  report.provenance.publicFactsHash = "0".repeat(64);
+
+  let remaining = targetBytes - serializedByteLength(report);
+  assert.ok(
+    remaining >= 0,
+    `target ${targetBytes} is below minimum report size`,
+  );
+  for (const finding of report.findings) {
+    for (const key of ["title", "description", "suggestedNextStep"]) {
+      const room = 1200 - finding[key].length;
+      const added = Math.min(room, remaining);
+      finding[key] += "x".repeat(added);
+      remaining -= added;
+      if (remaining === 0) break;
+    }
+    if (remaining === 0) break;
+  }
+  for (
+    let index = 0;
+    remaining > 0 && index < report.limitations.length;
+    index += 1
+  ) {
+    const room = 1200 - report.limitations[index].length;
+    const added = Math.min(room, remaining);
+    report.limitations[index] += "x".repeat(added);
+    remaining -= added;
+  }
+  assert.equal(
+    remaining,
+    0,
+    `insufficient display-text capacity for ${targetBytes}`,
+  );
+  const sized = await withSelfConsistentHash(report);
+  assert.equal(serializedByteLength(sized), targetBytes);
+  return sized;
+};
+
 Deno.test("public report implementation and closed schema are exported", () => {
   assert.equal(typeof buildPublicReport, "function");
   assert.equal(typeof validatePublicReport, "function");
@@ -276,6 +341,36 @@ Deno.test("public report implementation and closed schema are exported", () => {
   assert.equal(schema.$defs.summary.additionalProperties, false);
   assert.equal(schema.$defs.finding.additionalProperties, false);
   assert.equal(schema.$defs.provenance.additionalProperties, false);
+  assert.equal(schema.$defs.provenance.oneOf.length, 2);
+  const constantOrNonNull = (field) =>
+    Object.hasOwn(field, "const") ? field.const : "non-null";
+  assert.deepEqual(
+    schema.$defs.provenance.oneOf.map((branch) => ({
+      sourceKind: branch.properties.sourceKind.const,
+      sourceSchemaName: constantOrNonNull(branch.properties.sourceSchemaName),
+      sourceSchemaVersion: constantOrNonNull(
+        branch.properties.sourceSchemaVersion,
+      ),
+      sourceReportId: constantOrNonNull(branch.properties.sourceReportId),
+      sourceFactsHash: constantOrNonNull(branch.properties.sourceFactsHash),
+    })),
+    [
+      {
+        sourceKind: "internal_report",
+        sourceSchemaName: "laibe.quote-health-report.v1",
+        sourceSchemaVersion: 1,
+        sourceReportId: "non-null",
+        sourceFactsHash: "non-null",
+      },
+      {
+        sourceKind: "terminal_extraction_outcome",
+        sourceSchemaName: null,
+        sourceSchemaVersion: null,
+        sourceReportId: null,
+        sourceFactsHash: null,
+      },
+    ],
+  );
   assert.equal(schema.allOf.length, 3);
   assert.equal(
     schema.allOf[0].if.properties.provenance.properties.sourceKind.const,
@@ -319,6 +414,12 @@ Deno.test("G1 valid current complete report has no findings", async () => {
   assert.deepEqual(result.value.findings, []);
   assert.equal(result.value.summary.findingCount, 0);
   assert.equal(result.value.provenance.sourceKind, "internal_report");
+  assert.equal(
+    result.value.provenance.sourceSchemaName,
+    "laibe.quote-health-report.v1",
+  );
+  assert.equal(result.value.provenance.sourceSchemaVersion, 1);
+  assert.match(result.value.provenance.sourceReportId, /^[A-Za-z0-9][\w.:-]*$/);
   assert.match(result.value.provenance.sourceFactsHash, /^[a-f\d]{64}$/);
 });
 
@@ -361,6 +462,14 @@ Deno.test("G3 parse failure is limited with no stale findings", async () => {
     unconfirmedCount: 0,
   });
   assert.ok(result.value.limitations.length > 0);
+  assert.deepEqual(result.value.provenance, {
+    sourceKind: "terminal_extraction_outcome",
+    sourceSchemaName: null,
+    sourceSchemaVersion: null,
+    sourceReportId: null,
+    sourceFactsHash: null,
+    publicFactsHash: result.value.provenance.publicFactsHash,
+  });
 });
 
 Deno.test("G4 scanned PDF before OCR is unsupported with zero counts", async () => {
@@ -423,6 +532,196 @@ Deno.test("publicFactsHash is deterministic and excludes generatedAt only", asyn
   const changed = structuredClone(second.value);
   changed.summary.headline += "變更";
   assert.equal((await validatePublicReport(changed)).valid, false);
+});
+
+Deno.test("provenance is a closed source-kind discriminator", async () => {
+  const internal = await buildFromGolden("G1");
+  const terminal = await buildFromGolden("G3");
+  assert.equal(internal.ok, true, JSON.stringify(internal));
+  assert.equal(terminal.ok, true, JSON.stringify(terminal));
+  const invalid = [
+    { ...structuredClone(internal.value.provenance), sourceSchemaName: null },
+    {
+      ...structuredClone(internal.value.provenance),
+      sourceSchemaVersion: null,
+    },
+    { ...structuredClone(internal.value.provenance), sourceReportId: null },
+    {
+      ...structuredClone(terminal.value.provenance),
+      sourceSchemaName: "laibe.quote-health-report.v1",
+    },
+    { ...structuredClone(terminal.value.provenance), sourceSchemaVersion: 1 },
+    { ...structuredClone(terminal.value.provenance), sourceReportId: "forged" },
+    {
+      ...structuredClone(terminal.value.provenance),
+      sourceFactsHash: "a".repeat(64),
+    },
+  ];
+  for (const provenance of invalid) {
+    const base = provenance.sourceKind === "internal_report"
+      ? internal.value
+      : terminal.value;
+    const forged = await withSelfConsistentHash({
+      ...structuredClone(base),
+      provenance,
+    });
+    const validation = await validatePublicReport(forged);
+    assert.equal(validation.valid, false, JSON.stringify(validation));
+    assert.ok(
+      validation.issues.some((issue) => issue.code === "PROVENANCE_INVALID"),
+      JSON.stringify(validation),
+    );
+  }
+});
+
+Deno.test("generatedAt requires a real RFC3339 Gregorian timestamp", async () => {
+  for (
+    const generatedAt of [
+      "2024-02-29T23:59:59Z",
+      "2026-09-03T12:34:56.123+08:00",
+      "2026-09-03T12:34:56+14:00",
+      "2026-09-03T12:34:56-14:00",
+    ]
+  ) {
+    const result = await buildFromGolden("G1", generatedAt);
+    assert.equal(result.ok, true, `${generatedAt}: ${JSON.stringify(result)}`);
+  }
+  for (
+    const generatedAt of [
+      "2026-02-29T00:00:00Z",
+      "2024-02-30T00:00:00Z",
+      "2026-00-01T00:00:00Z",
+      "2026-13-01T00:00:00Z",
+      "2026-01-00T00:00:00Z",
+      "2026-01-01T24:00:00Z",
+      "2026-01-01T00:60:00Z",
+      "2026-01-01T00:00:60Z",
+      "2026-01-01T00:00:00+14:01",
+      "2026-01-01T00:00:00+15:00",
+      "2026-01-01T00:00:00-00:00",
+      "2026-01-01T00:00:00",
+      "2026-01-01t00:00:00z",
+      " 2026-01-01T00:00:00Z",
+      "2026-01-01T00:00:00Z ",
+      "September 3, 2026",
+    ]
+  ) {
+    const result = await buildFromGolden("G1", generatedAt);
+    assert.equal(result.ok, false, `${generatedAt}: ${JSON.stringify(result)}`);
+    assert.ok(
+      result.issues.some((issue) => issue.code === "GENERATED_AT_INVALID"),
+    );
+  }
+  const valid = await buildFromGolden("G1");
+  assert.equal(valid.ok, true, JSON.stringify(valid));
+  valid.value.generatedAt = "2026-02-30T00:00:00Z";
+  const validation = await validatePublicReport(valid.value);
+  assert.equal(validation.valid, false, JSON.stringify(validation));
+  assert.ok(
+    validation.issues.some((issue) => issue.code === "GENERATED_AT_INVALID"),
+  );
+});
+
+Deno.test("payload accepts exact one-MiB UTF-8 bytes and rejects one byte more", async () => {
+  for (const target of [1_048_575, 1_048_576]) {
+    const report = await buildSizedReport(target, target === 1_048_576);
+    assert.ok(
+      new TextEncoder().encode(JSON.stringify(report)).byteLength >
+        JSON.stringify(report).length,
+    );
+    const validation = await validatePublicReport(report);
+    assert.equal(
+      validation.valid,
+      true,
+      `${target}: ${JSON.stringify(validation)}`,
+    );
+  }
+  const oversized = await buildSizedReport(1_048_577, true);
+  const validation = await validatePublicReport(oversized);
+  assert.equal(validation.valid, false, JSON.stringify(validation));
+  assert.ok(
+    validation.issues.some((issue) => issue.code === "PAYLOAD_TOO_LARGE"),
+  );
+});
+
+Deno.test("every public display field rejects markup and Unicode category-C text", async () => {
+  const result = await buildFromGolden("G2");
+  assert.equal(result.ok, true, JSON.stringify(result));
+  const fields = [
+    [
+      "document.displayName",
+      (report, value) => report.document.displayName = value,
+      "DISPLAY_NAME_INVALID",
+    ],
+    [
+      "summary.headline",
+      (report, value) => report.summary.headline = value,
+      "DISPLAY_TEXT_INVALID",
+    ],
+    [
+      "limitations[0]",
+      (report, value) => report.limitations = [value],
+      "LIMITATIONS_INVALID",
+    ],
+    [
+      "findings[0].title",
+      (report, value) => report.findings[0].title = value,
+      "DISPLAY_TEXT_INVALID",
+    ],
+    [
+      "findings[0].description",
+      (report, value) => report.findings[0].description = value,
+      "DISPLAY_TEXT_INVALID",
+    ],
+    [
+      "findings[0].suggestedNextStep",
+      (report, value) => report.findings[0].suggestedNextStep = value,
+      "DISPLAY_TEXT_INVALID",
+    ],
+  ];
+  const unsafeValues = [
+    "<script>",
+    "`template`",
+    "控制\u0000字元",
+    "雙向\u202e覆寫",
+    "零寬\u200b字元",
+    "未配對代理\ud800",
+  ];
+  for (const [path, mutate, issueCode] of fields) {
+    for (const unsafe of unsafeValues) {
+      const report = structuredClone(result.value);
+      mutate(report, unsafe);
+      const forged = await withSelfConsistentHash(report);
+      const validation = await validatePublicReport(forged);
+      assert.equal(
+        validation.valid,
+        false,
+        `${path}: ${JSON.stringify(validation)}`,
+      );
+      assert.ok(
+        validation.issues.some((issue) => issue.code === issueCode),
+        `${path}: ${JSON.stringify(validation)}`,
+      );
+    }
+  }
+  for (
+    const displayName of [
+      "C:private.pdf",
+      "https:private.pdf",
+      "../private.pdf",
+    ]
+  ) {
+    const build = await buildPublicReport({
+      artifactId: "unsafe_path_like_name",
+      generatedAt: "2026-09-03T04:00:00Z",
+      document: { displayName, mimeType: "application/pdf" },
+      source: {
+        kind: "terminal_extraction_outcome",
+        value: structuredClone(goldenCase("G3").terminalOutcome),
+      },
+    });
+    assert.equal(build.ok, false, `${displayName}: ${JSON.stringify(build)}`);
+  }
 });
 
 Deno.test("validator rejects a self-consistent terminal source forged as complete", async () => {

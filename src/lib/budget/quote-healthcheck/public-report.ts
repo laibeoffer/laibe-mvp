@@ -17,8 +17,6 @@ export const QUOTE_HEALTH_PUBLIC_REPORT_DISCLAIMER =
 export const QUOTE_HEALTH_PUBLIC_REPORT_MAX_BYTES = 1_048_576;
 
 const INTERNAL_REPORT_SCHEMA = "laibe.quote-health-report.v1" as const;
-const TERMINAL_OUTCOME_SCHEMA =
-  "laibe.quote-pdf-terminal-extraction-outcome.v1" as const;
 
 export type QuoteHealthPublicAnalysisStatus =
   | "complete"
@@ -67,10 +65,8 @@ export interface QuoteHealthPublicFinding {
 
 export interface QuoteHealthPublicProvenance {
   sourceKind: "internal_report" | "terminal_extraction_outcome";
-  sourceSchemaName:
-    | typeof INTERNAL_REPORT_SCHEMA
-    | typeof TERMINAL_OUTCOME_SCHEMA;
-  sourceSchemaVersion: "v1";
+  sourceSchemaName: typeof INTERNAL_REPORT_SCHEMA | null;
+  sourceSchemaVersion: 1 | null;
   sourceReportId: string | null;
   sourceFactsHash: string | null;
   publicFactsHash: string;
@@ -336,8 +332,9 @@ const PROVENANCE_KEYS = [
 const identityPattern = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/;
 const sha256Pattern = /^[a-f\d]{64}$/;
 const dateTimePattern =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/;
-const unsafeDisplayPattern = /[<>`\u0000-\u001f\u007f]/;
+  /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|([+-])(\d{2}):(\d{2}))$/;
+const unsafeDisplayPattern = /[<>`\p{C}]/u;
+const pathLikeDisplayNamePattern = /^[A-Za-z][A-Za-z\d+.-]*:/;
 
 const addIssue = (
   issues: ValidationIssue[],
@@ -387,7 +384,50 @@ const isDisplayText = (value: unknown, maxLength = 1200): value is string =>
   value === value.trim() && !unsafeDisplayPattern.test(value);
 
 const isDisplayName = (value: unknown): value is string =>
-  isDisplayText(value, 256) && !/[\\/]/.test(value);
+  isDisplayText(value, 256) && !/[\\/]/.test(value) &&
+  !pathLikeDisplayNamePattern.test(value);
+
+const isLeapYear = (year: number): boolean =>
+  year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+
+const isRfc3339DateTime = (value: unknown): value is string => {
+  if (typeof value !== "string") return false;
+  const match = dateTimePattern.exec(value);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6]);
+  if (
+    year < 1 || month < 1 || month > 12 || hour > 23 || minute > 59 ||
+    second > 59
+  ) {
+    return false;
+  }
+  const daysInMonth = [
+    31,
+    isLeapYear(year) ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ];
+  if (day < 1 || day > daysInMonth[month - 1]) return false;
+  if (match[8] === "Z") return true;
+  const offsetHour = Number(match[10]);
+  const offsetMinute = Number(match[11]);
+  if (offsetHour > 14 || offsetMinute > 59) return false;
+  if (offsetHour === 14 && offsetMinute !== 0) return false;
+  return !(match[9] === "-" && offsetHour === 0 && offsetMinute === 0);
+};
 
 const isPositiveInteger = (value: unknown): value is number =>
   Number.isInteger(value) && Number(value) > 0;
@@ -951,8 +991,7 @@ const parseBuildInput = (
     );
   }
   if (
-    typeof value.generatedAt !== "string" ||
-    !dateTimePattern.test(value.generatedAt)
+    !isRfc3339DateTime(value.generatedAt)
   ) {
     addIssue(
       issues,
@@ -1059,7 +1098,7 @@ export const buildQuoteHealthPublicReportV1 = async (
     provenanceWithoutPublicHash = {
       sourceKind: "internal_report",
       sourceSchemaName: INTERNAL_REPORT_SCHEMA,
-      sourceSchemaVersion: "v1",
+      sourceSchemaVersion: 1,
       sourceReportId: report.packetId,
       sourceFactsHash: report.factsHash,
     };
@@ -1073,8 +1112,8 @@ export const buildQuoteHealthPublicReportV1 = async (
     limitations = terminal.limitations;
     provenanceWithoutPublicHash = {
       sourceKind: "terminal_extraction_outcome",
-      sourceSchemaName: TERMINAL_OUTCOME_SCHEMA,
-      sourceSchemaVersion: "v1",
+      sourceSchemaName: null,
+      sourceSchemaVersion: null,
       sourceReportId: null,
       sourceFactsHash: null,
     };
@@ -1168,8 +1207,7 @@ export const validateQuoteHealthPublicReportV1 = async (
     );
   }
   if (
-    typeof value.generatedAt !== "string" ||
-    !dateTimePattern.test(value.generatedAt)
+    !isRfc3339DateTime(value.generatedAt)
   ) {
     addIssue(
       issues,
@@ -1448,17 +1486,10 @@ export const validateQuoteHealthPublicReportV1 = async (
     );
   } else {
     requireClosedKeys(value.provenance, PROVENANCE_KEYS, "provenance", issues);
-    if (value.provenance.sourceSchemaVersion !== "v1") {
-      addIssue(
-        issues,
-        "provenance.sourceSchemaVersion",
-        "CONSTANT_MISMATCH",
-        "Source schema version is invalid.",
-      );
-    }
     if (value.provenance.sourceKind === "internal_report") {
       if (
         value.provenance.sourceSchemaName !== INTERNAL_REPORT_SCHEMA ||
+        value.provenance.sourceSchemaVersion !== 1 ||
         !identityPattern.test(String(value.provenance.sourceReportId ?? "")) ||
         typeof value.provenance.sourceFactsHash !== "string" ||
         !sha256Pattern.test(value.provenance.sourceFactsHash)
@@ -1472,7 +1503,8 @@ export const validateQuoteHealthPublicReportV1 = async (
       }
     } else if (value.provenance.sourceKind === "terminal_extraction_outcome") {
       if (
-        value.provenance.sourceSchemaName !== TERMINAL_OUTCOME_SCHEMA ||
+        value.provenance.sourceSchemaName !== null ||
+        value.provenance.sourceSchemaVersion !== null ||
         value.provenance.sourceReportId !== null ||
         value.provenance.sourceFactsHash !== null
       ) {
@@ -1543,14 +1575,14 @@ export const validateQuoteHealthPublicReportV1 = async (
       );
     }
     if (
-      new TextEncoder().encode(JSON.stringify(report)).length >=
+      new TextEncoder().encode(JSON.stringify(report)).length >
         QUOTE_HEALTH_PUBLIC_REPORT_MAX_BYTES
     ) {
       addIssue(
         issues,
         "",
         "PAYLOAD_TOO_LARGE",
-        "Public report must be smaller than one MiB.",
+        "Public report must not exceed one MiB.",
       );
     }
   }

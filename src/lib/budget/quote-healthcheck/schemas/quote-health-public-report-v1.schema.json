@@ -23,7 +23,11 @@
     "schemaName": { "const": "laibe.quote-health-public-report.v1" },
     "schemaVersion": { "const": "v1" },
     "artifactId": { "$ref": "#/$defs/identity" },
-    "generatedAt": { "type": "string", "format": "date-time" },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+    },
     "analysisStatus": {
       "enum": ["complete", "limited", "unsupported", "failed"]
     },
@@ -117,7 +121,7 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 1200,
-      "pattern": "^[^<>`\\u0000-\\u001f\\u007f]+$"
+      "pattern": "^(?!\\s)(?!.*\\s$)[^<>`\\p{C}]+$"
     },
     "document": {
       "type": "object",
@@ -128,7 +132,7 @@
           "allOf": [
             { "$ref": "#/$defs/displayText" },
             { "maxLength": 256 },
-            { "pattern": "^[^/\\\\]+$" }
+            { "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:)[^/\\\\]+$" }
           ]
         },
         "mimeType": { "const": "application/pdf" },
@@ -221,12 +225,17 @@
           "enum": ["internal_report", "terminal_extraction_outcome"]
         },
         "sourceSchemaName": {
-          "enum": [
-            "laibe.quote-health-report.v1",
-            "laibe.quote-pdf-terminal-extraction-outcome.v1"
+          "oneOf": [
+            { "const": "laibe.quote-health-report.v1" },
+            { "type": "null" }
           ]
         },
-        "sourceSchemaVersion": { "const": "v1" },
+        "sourceSchemaVersion": {
+          "oneOf": [
+            { "const": 1 },
+            { "type": "null" }
+          ]
+        },
         "sourceReportId": {
           "oneOf": [
             { "$ref": "#/$defs/identity" },
@@ -240,7 +249,27 @@
           ]
         },
         "publicFactsHash": { "$ref": "#/$defs/sha256" }
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "sourceKind": { "const": "internal_report" },
+            "sourceSchemaName": { "const": "laibe.quote-health-report.v1" },
+            "sourceSchemaVersion": { "const": 1 },
+            "sourceReportId": { "$ref": "#/$defs/identity" },
+            "sourceFactsHash": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        {
+          "properties": {
+            "sourceKind": { "const": "terminal_extraction_outcome" },
+            "sourceSchemaName": { "const": null },
+            "sourceSchemaVersion": { "const": null },
+            "sourceReportId": { "const": null },
+            "sourceFactsHash": { "const": null }
+          }
+        }
+      ]
     }
   }
 }
