@@ -1418,15 +1418,24 @@ export const validateQuoteHealthPublicReportV1 = async (
   }
 
   if (
-    (value.analysisStatus === "unsupported" ||
-      value.analysisStatus === "failed") &&
-    (publicFindings.length !== 0 || publicLimitations.length === 0)
+    value.analysisStatus !== "complete" && publicLimitations.length === 0
   ) {
     addIssue(
       issues,
-      "analysisStatus",
+      "limitations",
+      "LIMITATION_REQUIRED",
+      "Every non-complete artifact requires a public limitation.",
+    );
+  }
+  if (
+    (value.analysisStatus === "unsupported" ||
+      value.analysisStatus === "failed") && publicFindings.length !== 0
+  ) {
+    addIssue(
+      issues,
+      "findings",
       "TERMINAL_STATUS_CONTENT_INVALID",
-      "Unsupported and failed artifacts require zero findings and a limitation.",
+      "Unsupported and failed artifacts cannot carry findings.",
     );
   }
 
@@ -1474,12 +1483,39 @@ export const validateQuoteHealthPublicReportV1 = async (
           "Terminal outcome lineage is invalid.",
         );
       }
+      if (value.analysisStatus === "complete") {
+        addIssue(
+          issues,
+          "analysisStatus",
+          "SOURCE_STATUS_MISMATCH",
+          "Only a validated internal report can support complete status.",
+        );
+      }
+      if (publicFindings.length !== 0 || publicLimitations.length === 0) {
+        addIssue(
+          issues,
+          "findings",
+          "TERMINAL_SOURCE_CONTENT_INVALID",
+          "A terminal extraction outcome cannot create findings and requires a limitation.",
+        );
+      }
     } else {
       addIssue(
         issues,
         "provenance.sourceKind",
         "SOURCE_KIND_INVALID",
         "Public sourceKind is invalid.",
+      );
+    }
+    if (
+      value.analysisStatus === "complete" &&
+      value.provenance.sourceKind !== "internal_report"
+    ) {
+      addIssue(
+        issues,
+        "provenance.sourceKind",
+        "SOURCE_STATUS_MISMATCH",
+        "Complete status requires internal-report provenance.",
       );
     }
     if (

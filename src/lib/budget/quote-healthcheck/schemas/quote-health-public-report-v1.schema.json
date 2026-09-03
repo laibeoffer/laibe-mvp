@@ -47,6 +47,63 @@
     },
     "provenance": { "$ref": "#/$defs/provenance" }
   },
+  "allOf": [
+    {
+      "if": {
+        "required": ["provenance"],
+        "properties": {
+          "provenance": {
+            "required": ["sourceKind"],
+            "properties": {
+              "sourceKind": { "const": "terminal_extraction_outcome" }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "analysisStatus": {
+            "enum": ["limited", "unsupported", "failed"]
+          },
+          "findings": { "maxItems": 0 },
+          "limitations": { "minItems": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["analysisStatus"],
+        "properties": {
+          "analysisStatus": { "const": "complete" }
+        }
+      },
+      "then": {
+        "properties": {
+          "provenance": {
+            "required": ["sourceKind"],
+            "properties": {
+              "sourceKind": { "const": "internal_report" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": ["analysisStatus"],
+        "properties": {
+          "analysisStatus": {
+            "enum": ["limited", "unsupported", "failed"]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "limitations": { "minItems": 1 }
+        }
+      }
+    }
+  ],
   "$defs": {
     "identity": {
       "type": "string",

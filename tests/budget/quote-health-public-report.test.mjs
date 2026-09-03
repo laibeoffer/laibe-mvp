@@ -125,6 +125,127 @@ const buildFromGolden = async (id, generatedAtOverride) => {
   });
 };
 
+const appendHashField = (preimage, name, value) =>
+  `${preimage}${name}:${JSON.stringify(value)}\n`;
+
+const publicFactsPreimage = (report) => {
+  let value = "laibe.quote-health-public-report.v1|public-facts|v1\n";
+  value = appendHashField(value, "schemaName", report.schemaName);
+  value = appendHashField(value, "schemaVersion", report.schemaVersion);
+  value = appendHashField(value, "artifactId", report.artifactId);
+  value = appendHashField(value, "analysisStatus", report.analysisStatus);
+  value = appendHashField(
+    value,
+    "document.displayName",
+    report.document.displayName,
+  );
+  value = appendHashField(value, "document.mimeType", report.document.mimeType);
+  value = appendHashField(
+    value,
+    "document.pageCount",
+    report.document.pageCount,
+  );
+  value = appendHashField(value, "summary.headline", report.summary.headline);
+  value = appendHashField(
+    value,
+    "summary.findingCount",
+    report.summary.findingCount,
+  );
+  value = appendHashField(value, "summary.highCount", report.summary.highCount);
+  value = appendHashField(
+    value,
+    "summary.mediumCount",
+    report.summary.mediumCount,
+  );
+  value = appendHashField(value, "summary.lowCount", report.summary.lowCount);
+  value = appendHashField(
+    value,
+    "summary.unconfirmedCount",
+    report.summary.unconfirmedCount,
+  );
+  for (let index = 0; index < report.findings.length; index += 1) {
+    const finding = report.findings[index];
+    const prefix = `findings.${index}`;
+    for (
+      const key of [
+        "findingId",
+        "category",
+        "severity",
+        "title",
+        "description",
+        "evidenceStatus",
+      ]
+    ) value = appendHashField(value, `${prefix}.${key}`, finding[key]);
+    for (
+      let pageIndex = 0;
+      pageIndex < finding.pageReferences.length;
+      pageIndex += 1
+    ) {
+      value = appendHashField(
+        value,
+        `${prefix}.pageReferences.${pageIndex}`,
+        finding.pageReferences[pageIndex],
+      );
+    }
+    value = appendHashField(
+      value,
+      `${prefix}.pageReferences.length`,
+      finding.pageReferences.length,
+    );
+    value = appendHashField(
+      value,
+      `${prefix}.suggestedNextStep`,
+      finding.suggestedNextStep,
+    );
+  }
+  value = appendHashField(value, "findings.length", report.findings.length);
+  for (let index = 0; index < report.limitations.length; index += 1) {
+    value = appendHashField(
+      value,
+      `limitations.${index}`,
+      report.limitations[index],
+    );
+  }
+  value = appendHashField(
+    value,
+    "limitations.length",
+    report.limitations.length,
+  );
+  value = appendHashField(
+    value,
+    "humanReviewRequired",
+    report.humanReviewRequired,
+  );
+  value = appendHashField(
+    value,
+    "professionalReviewRequired",
+    report.professionalReviewRequired,
+  );
+  value = appendHashField(value, "disclaimerCode", report.disclaimerCode);
+  for (
+    const key of [
+      "sourceKind",
+      "sourceSchemaName",
+      "sourceSchemaVersion",
+      "sourceReportId",
+      "sourceFactsHash",
+    ]
+  ) value = appendHashField(value, `provenance.${key}`, report.provenance[key]);
+  return value;
+};
+
+const withSelfConsistentHash = async (report) => {
+  const forged = structuredClone(report);
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(publicFactsPreimage(forged)),
+  );
+  forged.provenance.publicFactsHash = Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+  return forged;
+};
+
 Deno.test("public report implementation and closed schema are exported", () => {
   assert.equal(typeof buildPublicReport, "function");
   assert.equal(typeof validatePublicReport, "function");
@@ -155,6 +276,23 @@ Deno.test("public report implementation and closed schema are exported", () => {
   assert.equal(schema.$defs.summary.additionalProperties, false);
   assert.equal(schema.$defs.finding.additionalProperties, false);
   assert.equal(schema.$defs.provenance.additionalProperties, false);
+  assert.equal(schema.allOf.length, 3);
+  assert.equal(
+    schema.allOf[0].if.properties.provenance.properties.sourceKind.const,
+    "terminal_extraction_outcome",
+  );
+  assert.deepEqual(schema.allOf[0].then.properties.analysisStatus.enum, [
+    "limited",
+    "unsupported",
+    "failed",
+  ]);
+  assert.equal(schema.allOf[0].then.properties.findings.maxItems, 0);
+  assert.equal(schema.allOf[0].then.properties.limitations.minItems, 1);
+  assert.equal(
+    schema.allOf[1].then.properties.provenance.properties.sourceKind.const,
+    "internal_report",
+  );
+  assert.equal(schema.allOf[2].then.properties.limitations.minItems, 1);
 });
 
 Deno.test("Golden Set G1-G6 remains synthetic, complete, and versioned", () => {
@@ -285,6 +423,56 @@ Deno.test("publicFactsHash is deterministic and excludes generatedAt only", asyn
   const changed = structuredClone(second.value);
   changed.summary.headline += "變更";
   assert.equal((await validatePublicReport(changed)).valid, false);
+});
+
+Deno.test("validator rejects a self-consistent terminal source forged as complete", async () => {
+  const terminal = await buildFromGolden("G3");
+  assert.equal(terminal.ok, true, JSON.stringify(terminal));
+  terminal.value.analysisStatus = "complete";
+  terminal.value.summary.headline = "本次免費健檢未發現需立即確認的報價項目。";
+  const forged = await withSelfConsistentHash(terminal.value);
+  const validation = await validatePublicReport(forged);
+  assert.equal(validation.valid, false, JSON.stringify(validation));
+  assert.ok(
+    validation.issues.some((issue) => issue.code === "SOURCE_STATUS_MISMATCH"),
+  );
+});
+
+Deno.test("validator rejects a self-consistent terminal source carrying findings", async () => {
+  const terminal = await buildFromGolden("G3");
+  const internal = await buildFromGolden("G2");
+  assert.equal(terminal.ok, true, JSON.stringify(terminal));
+  assert.equal(internal.ok, true, JSON.stringify(internal));
+  terminal.value.findings = [structuredClone(internal.value.findings[0])];
+  terminal.value.summary.findingCount = 1;
+  terminal.value.summary.highCount = 1;
+  const forged = await withSelfConsistentHash(terminal.value);
+  const validation = await validatePublicReport(forged);
+  assert.equal(validation.valid, false, JSON.stringify(validation));
+  assert.ok(
+    validation.issues.some((issue) =>
+      issue.code === "TERMINAL_SOURCE_CONTENT_INVALID"
+    ),
+  );
+});
+
+Deno.test("validator rejects self-consistent non-complete artifacts without limitations", async () => {
+  for (const goldenId of ["G3", "G4", "G5"]) {
+    const result = await buildFromGolden(goldenId);
+    assert.equal(result.ok, true, JSON.stringify(result));
+    result.value.limitations = [];
+    const forged = await withSelfConsistentHash(result.value);
+    const validation = await validatePublicReport(forged);
+    assert.equal(
+      validation.valid,
+      false,
+      `${goldenId}: ${JSON.stringify(validation)}`,
+    );
+    assert.ok(
+      validation.issues.some((issue) => issue.code === "LIMITATION_REQUIRED"),
+      goldenId,
+    );
+  }
 });
 
 Deno.test("validator rejects unknown fields, unsafe display names, and invalid references", async () => {

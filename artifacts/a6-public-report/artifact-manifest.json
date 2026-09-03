@@ -18,7 +18,7 @@
   },
   "candidateIdentity": {
     "kind": "sha256_file_set",
-    "bundleSha256": "6bcb12e819530abb7ac60135766baeec2580782050ef0452ebd74b84bdeebd07",
+    "bundleSha256": "b5a62fe3e9c44c259e6ab0db2b3c057634013536f824b4ce91972982779300eb",
     "gitCommit": null,
     "gitTree": null,
     "bindingNote": "The bundle hash covers the five source, schema, export, test, and Golden Set files listed below. The manifest self-hash and optional local commit identity are bound in the terminal report."
@@ -34,13 +34,13 @@
   "files": [
     {
       "path": "src/lib/budget/quote-healthcheck/public-report.ts",
-      "bytes": 45776,
-      "sha256": "830d569d38bdfb673484c58c2786ab0f53f1a88c451c4c07428218eafc2e6f69"
+      "bytes": 46785,
+      "sha256": "7192d44db22490b18972552a6c6ec190babcfb4b437e5c33c59352946bb71ae6"
     },
     {
       "path": "src/lib/budget/quote-healthcheck/schemas/quote-health-public-report-v1.schema.json",
-      "bytes": 5178,
-      "sha256": "f907604103f602b07d9350892cf16a31ac3e87b3217a0d48c57e7c7abafec189"
+      "bytes": 6443,
+      "sha256": "45a1c6d6094956f9e4042c31878ab980d058f55118785bde58232a19ac7ce489"
     },
     {
       "path": "src/lib/budget/quote-healthcheck/index.ts",
@@ -49,8 +49,8 @@
     },
     {
       "path": "tests/budget/quote-health-public-report.test.mjs",
-      "bytes": 13359,
-      "sha256": "606d44140833869842e38d75ec3f05b8eb3f2e88202060c21202c0775b6b623f"
+      "bytes": 19624,
+      "sha256": "1dd5f46b788603709950512618a7fea2f5e8dae530e33de7731a6fa6a6f3dadc"
     },
     {
       "path": "tests/fixtures/quote-health-public-report/golden-cases.v1.json",
@@ -69,7 +69,11 @@
     },
     "focusedGreen": {
       "status": "pass",
-      "result": "13 passed, 0 failed on the final dual-approved display wording"
+      "result": "16 passed, 0 failed on the corrected validator and schema bytes"
+    },
+    "reworkFocusedRed": {
+      "status": "expected_failure",
+      "result": "12 passed, 4 failed because schema conditionals and validator source-status-content gates were absent"
     },
     "typecheck": {
       "status": "pass",
@@ -81,9 +85,8 @@
     },
     "scopedRegression": {
       "status": "pass",
-      "result": "94 passed, 0 failed",
-      "excluded": "Unmodified browser-adapter tests that require task-external real PDF read permission or environment/process permission",
-      "candidateRelation": "The full scoped suite passed before a dual-approved display-only text correction; the affected public suite, typecheck, format, and manifest binding are rerun on final bytes."
+      "result": "97 passed, 0 failed on final source, schema, and test bytes",
+      "excluded": "Unmodified browser-adapter tests that require task-external real PDF read permission or environment/process permission"
     },
     "broaderReadOnlyScan": {
       "status": "permission_blocked_outside_scope",
