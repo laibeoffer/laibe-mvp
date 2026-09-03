@@ -19,8 +19,8 @@
   "candidateIdentity": {
     "kind": "sha256_file_set",
     "bundleSha256": "c0691fd38dc231bc50cac21e43388e93dbc80847ce0d63c4785c61b5e6337300",
-    "gitCommit": null,
-    "gitTree": null,
+    "gitCommit": "e303c9e4ba4a6db8ea8590199ad5bb10922c0d80",
+    "gitTree": "92525f180921ff6d519d9110af48b64eea663120",
     "bindingNote": "The bundle hash covers the five source, schema, export, test, and Golden Set files listed below. The manifest self-hash and optional local commit identity are bound in the terminal report."
   },
   "changedPaths": [
@@ -122,7 +122,7 @@
     "sitesSourceMutation": false,
     "pushPrMergeDeploy": false
   },
-  "reviewStatus": "pending_A6-Q1",
-  "a6RecognitionAccepted": false,
+  "reviewStatus": "accepted_A6-Q1",
+  "a6RecognitionAccepted": true,
   "bplusSiteArtifactCompatibilityAccepted": false
 }
