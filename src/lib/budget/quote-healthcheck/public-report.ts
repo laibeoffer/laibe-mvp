@@ -1490,7 +1490,8 @@ export const validateQuoteHealthPublicReportV1 = async (
       if (
         value.provenance.sourceSchemaName !== INTERNAL_REPORT_SCHEMA ||
         value.provenance.sourceSchemaVersion !== 1 ||
-        !identityPattern.test(String(value.provenance.sourceReportId ?? "")) ||
+        typeof value.provenance.sourceReportId !== "string" ||
+        !identityPattern.test(value.provenance.sourceReportId) ||
         typeof value.provenance.sourceFactsHash !== "string" ||
         !sha256Pattern.test(value.provenance.sourceFactsHash)
       ) {

@@ -1,7 +1,7 @@
 {
   "manifestSchemaName": "laibe.quote-health-public-report.artifact-manifest.v1",
   "manifestVersion": "v1",
-  "createdAt": "2026-09-03T16:25:11.3286605+08:00",
+  "createdAt": "2026-09-03T16:38:19.2412813+08:00",
   "artifact": {
     "schemaName": "laibe.quote-health-public-report.v1",
     "schemaVersion": "v1",
@@ -12,13 +12,13 @@
   "baseIdentity": {
     "worktree": "C:\\CodexWork\\08-Jacky\\worktrees\\laibe_MVP_project\\a4-r6-ai-findings-healthchecks-20260902",
     "branch": "drs-runtime/a4-r6-ai-findings-healthchecks-20260902",
-    "head": "93b6aa95b39aff066e4d92de7aeab4c02fdc0f6a",
-    "tree": "a3ea602690f5808b252dbab9f81abab7e08ec84b",
+    "head": "e6bb021739acb5647f7afe9cfbb4ec39bade3c35",
+    "tree": "1ca4ce15244dcc2d1ccf5d0195ca9a885c77c926",
     "status": "clean"
   },
   "candidateIdentity": {
     "kind": "sha256_file_set",
-    "bundleSha256": "a4160dab43b9be4911060c3dee3c970f98c0af5d1b2628e8ed96a5f888cd4192",
+    "bundleSha256": "c0691fd38dc231bc50cac21e43388e93dbc80847ce0d63c4785c61b5e6337300",
     "gitCommit": null,
     "gitTree": null,
     "bindingNote": "The bundle hash covers the five source, schema, export, test, and Golden Set files listed below. The manifest self-hash and optional local commit identity are bound in the terminal report."
@@ -34,8 +34,8 @@
   "files": [
     {
       "path": "src/lib/budget/quote-healthcheck/public-report.ts",
-      "bytes": 47661,
-      "sha256": "c5d81936b7b37b50789d16b702cf92b7a17e94fefeecab1ef9691a2d4ac6e6f9"
+      "bytes": 47710,
+      "sha256": "e4041f0aaf22c50f4e4bbccc9db10179b24147a25199b6ee26886f7bd476483d"
     },
     {
       "path": "src/lib/budget/quote-healthcheck/schemas/quote-health-public-report-v1.schema.json",
@@ -49,8 +49,8 @@
     },
     {
       "path": "tests/budget/quote-health-public-report.test.mjs",
-      "bytes": 29455,
-      "sha256": "35cbfc8329d51756fb43a6d258985799e211b302fe71ecc58a38e17d38711eeb"
+      "bytes": 30438,
+      "sha256": "6e281f558b57fc6312e4a966b38fc73bc4c6fa62adccb9104a232b0015ed3048"
     },
     {
       "path": "tests/fixtures/quote-health-public-report/golden-cases.v1.json",
@@ -83,17 +83,25 @@
       "status": "pass",
       "result": "20 passed, 0 failed on the corrected public builder, validator, schema, and test bytes"
     },
+    "identityTypeReworkFocusedRed": {
+      "status": "expected_failure",
+      "result": "0 passed, 1 failed because numeric sourceReportId 7 was accepted after a self-consistent publicFactsHash recomputation"
+    },
+    "identityTypeReworkFocusedGreen": {
+      "status": "pass",
+      "result": "1 passed, 0 failed across numeric, boxed-string, and array sourceReportId values after rehash"
+    },
     "typecheck": {
       "status": "pass",
       "command": "deno check --no-config --no-lock src/lib/budget/quote-healthcheck/public-report.ts"
     },
     "format": {
       "status": "pass",
-      "result": "5 scoped files checked"
+      "result": "3 scoped files checked"
     },
     "scopedRegression": {
       "status": "pass",
-      "result": "101 passed, 0 failed on final source, schema, and test bytes",
+      "result": "102 passed, 0 failed on final source, schema, and test bytes",
       "excluded": "Unmodified browser-adapter tests that require task-external real PDF read permission or environment/process permission"
     },
     "broaderReadOnlyScan": {

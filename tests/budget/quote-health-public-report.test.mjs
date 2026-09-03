@@ -574,6 +574,35 @@ Deno.test("provenance is a closed source-kind discriminator", async () => {
   }
 });
 
+Deno.test("internal provenance rejects non-string source report identities after rehash", async () => {
+  const internal = await buildFromGolden("G1");
+  assert.equal(internal.ok, true, JSON.stringify(internal));
+  const validIdentity = internal.value.provenance.sourceReportId;
+  const invalidIdentities = [7, Object(validIdentity), [validIdentity]];
+
+  for (const sourceReportId of invalidIdentities) {
+    const forged = await withSelfConsistentHash({
+      ...structuredClone(internal.value),
+      provenance: {
+        ...structuredClone(internal.value.provenance),
+        sourceReportId,
+      },
+    });
+    const validation = await validatePublicReport(forged);
+    assert.equal(
+      validation.valid,
+      false,
+      `${Object.prototype.toString.call(sourceReportId)}: ${
+        JSON.stringify(validation)
+      }`,
+    );
+    assert.ok(
+      validation.issues.some((issue) => issue.code === "PROVENANCE_INVALID"),
+      JSON.stringify(validation),
+    );
+  }
+});
+
 Deno.test("generatedAt requires a real RFC3339 Gregorian timestamp", async () => {
   for (
     const generatedAt of [
