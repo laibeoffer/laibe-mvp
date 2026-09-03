@@ -651,6 +651,25 @@ Deno.test("generatedAt requires a real RFC3339 Gregorian timestamp", async () =>
   );
 });
 
+Deno.test("generatedAt schema and source agree on known and unknown offsets", async () => {
+  const schema = JSON.parse(readFileSync(SCHEMA_PATH, "utf8"));
+  assert.equal(schema.properties.generatedAt.format, "date-time");
+  const schemaPattern = new RegExp(schema.properties.generatedAt.pattern);
+  const vectors = [
+    ["2026-09-03T12:34:56Z", true],
+    ["2026-09-03T12:34:56+00:00", true],
+    ["2026-09-03T12:34:56+08:00", true],
+    ["2026-09-03T12:34:56-08:00", true],
+    ["2026-09-03T12:34:56-00:00", false],
+  ];
+
+  for (const [generatedAt, expected] of vectors) {
+    assert.equal(schemaPattern.test(generatedAt), expected, generatedAt);
+    const sourceResult = await buildFromGolden("G1", generatedAt);
+    assert.equal(sourceResult.ok, expected, generatedAt);
+  }
+});
+
 Deno.test("payload accepts exact one-MiB UTF-8 bytes and rejects one byte more", async () => {
   for (const target of [1_048_575, 1_048_576]) {
     const report = await buildSizedReport(target, target === 1_048_576);
