@@ -101,7 +101,7 @@
     },
     "scopedRegression": {
       "status": "pass",
-      "result": "102 passed, 0 failed on final source, schema, and test bytes",
+      "result": "103 passed, 0 failed on final source, schema, and test bytes",
       "excluded": "Unmodified browser-adapter tests that require task-external real PDF read permission or environment/process permission"
     },
     "broaderReadOnlyScan": {
