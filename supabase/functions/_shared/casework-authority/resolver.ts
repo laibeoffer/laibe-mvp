@@ -2,8 +2,9 @@ import {
   type CaseCreateInput,
   type CaseworkAuthorityDependencies,
   type CaseworkRole,
-  isUuid,
 } from "./contracts.ts";
+import { verifyAuthSession } from "../auth-session/verified-auth-session.ts";
+import { appendApprovedSiteOrigins } from "./site-origins.ts";
 
 type RuntimeEnvironment = { get(name: string): string | undefined };
 type FetchLike = (
@@ -34,7 +35,7 @@ function environmentValue(
 }
 
 function allowedOrigins(environment: RuntimeEnvironment | undefined) {
-  return Object.freeze(
+  const configuredOrigins = Object.freeze(
     (environmentValue(environment, "LAIBE_ALLOWED_ORIGINS") ?? "")
       .split(",").map((value) => value.trim()).filter((value) => {
         try {
@@ -45,12 +46,14 @@ function allowedOrigins(environment: RuntimeEnvironment | undefined) {
         }
       }),
   );
-}
-
-function bearerToken(request: Request): string | null {
-  return request.headers.get("authorization")?.match(/^Bearer\s+([^\s]+)$/u)
-    ?.[1] ??
-    null;
+  try {
+    return appendApprovedSiteOrigins(
+      environment?.get("SUPABASE_URL"),
+      configuredOrigins,
+    );
+  } catch {
+    return configuredOrigins;
+  }
 }
 
 export function createSupabaseCaseworkAuthorityDependencies(
@@ -95,28 +98,16 @@ export function createSupabaseCaseworkAuthorityDependencies(
     allowedOrigins: Object.freeze([...configuredOrigins]),
     runtimeAvailable,
     async resolveAuthenticatedIdentity(request: Request) {
-      const token = bearerToken(request);
-      if (!runtimeAvailable || !token) return null;
-      try {
-        const response = await fetchImplementation(
-          `${supabaseUrl}/auth/v1/user`,
-          {
-            headers: {
-              authorization: `Bearer ${token}`,
-              apikey: serviceRoleKey!,
-            },
-          },
-        );
-        if (!response.ok) return null;
-        const candidate = await response.json();
-        const userId = candidate && typeof candidate === "object" &&
-            !Array.isArray(candidate)
-          ? (candidate as Record<string, unknown>).id
-          : null;
-        return isUuid(userId) ? Object.freeze({ userId }) : null;
-      } catch {
-        return null;
+      if (!runtimeAvailable) throw new Error("Auth service unavailable");
+      const result = await verifyAuthSession(request, {
+        supabaseUrl: supabaseUrl!,
+        serviceRoleKey: serviceRoleKey!,
+        fetch: fetchImplementation,
+      });
+      if (result.state === "unavailable") {
+        throw new Error("Auth service unavailable");
       }
+      return result.state === "verified" ? result.session : null;
     },
     async createCase(input: CaseCreateInput) {
       return await rpc("casework_case_create_v1", {

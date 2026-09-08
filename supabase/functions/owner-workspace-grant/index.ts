@@ -48,7 +48,12 @@ export function createOwnerWorkspaceGrantHandler(
     if (!dependencies.runtimeAvailable) {
       return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
     }
-    const identity = await dependencies.resolveAuthenticatedIdentity(request);
+    let identity;
+    try {
+      identity = await dependencies.resolveAuthenticatedIdentity(request);
+    } catch {
+      return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
+    }
     if (!identity) return jsonResponse(401, { state: "AUTH_REQUIRED" }, cors);
     let candidate: unknown;
     try {

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { Buffer } from "node:buffer";
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
@@ -98,4 +98,70 @@ test("P1 migration is ordered before every accepted dependent migration", () => 
       "20260824180000_drs_calendar_identity_composition_w1.sql",
     ]
   ) assert.ok(p1 < dependent, dependent);
+});
+
+test("S1 shared session boundary keeps identity failures outside business calls", async () => {
+  const resolver = await text(
+    "supabase/functions/_shared/casework-authority/resolver.ts",
+  );
+  assert.match(resolver, /verifyAuthSession\(request/u);
+  assert.match(resolver, /result\.state === "unavailable"/u);
+  assert.match(
+    resolver,
+    /result\.state === "verified" \? result\.session : null/u,
+  );
+  for (
+    const route of [
+      "owner-workspace-grant",
+      "vendor-workspace-grant",
+      "highest-reviewer-workspace-grant",
+      "casework-case-create",
+    ]
+  ) {
+    const source = await text(`supabase/functions/${route}/index.ts`);
+    assert.match(
+      source,
+      /try \{\s+identity = await dependencies\.resolveAuthenticatedIdentity\(request\);\s+\} catch \{\s+return jsonResponse\(503, \{ state: "CONTEXT_UNAVAILABLE" \}, cors\);/u,
+    );
+    assert.match(
+      source,
+      /if \(!identity\) return jsonResponse\(401, \{ state: "AUTH_REQUIRED" \}, cors\);/u,
+    );
+  }
+});
+
+test("S1 migration adds only a service-only bounded read of the exact Auth session", async () => {
+  const files = (await readdir(new URL("supabase/migrations/", root)))
+    .filter((file) => /^\d{14}_auth_session_validation_v1\.sql$/u.test(file));
+  assert.equal(files.length, 1);
+  const sql = await text(`supabase/migrations/${files[0]}`);
+  assert.match(sql, /^begin;/u);
+  assert.match(sql, /commit;\s*$/u);
+  assert.equal((sql.match(/create function /gu) ?? []).length, 1);
+  assert.match(sql, /security definer\s+set search_path = ''/u);
+  assert.match(
+    sql,
+    /current_setting\('role', true\) is distinct from 'service_role'/u,
+  );
+  assert.match(
+    sql,
+    /session\.id = p_auth_session_id\s+and session\.user_id = p_authenticated_user_id/u,
+  );
+  assert.match(
+    sql,
+    /session\.not_after is null or session\.not_after > statement_timestamp\(\)/u,
+  );
+  assert.match(
+    sql,
+    /revoke all on function public\.auth_session_validation_v1\(uuid, uuid\)\s+from public, anon, authenticated;/u,
+  );
+  assert.match(
+    sql,
+    /grant execute on function public\.auth_session_validation_v1\(uuid, uuid\)\s+to service_role;/u,
+  );
+  assert.doesNotMatch(
+    sql,
+    /\b(?:insert|update|delete|truncate|drop|create table|alter table|create policy)\b/iu,
+  );
+  assert.doesNotMatch(sql, /case_members|user_metadata|raw_user_meta_data/iu);
 });
