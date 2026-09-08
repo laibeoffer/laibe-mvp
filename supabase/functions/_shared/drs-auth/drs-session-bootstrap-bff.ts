@@ -68,13 +68,25 @@ export interface ServerSessionIssuer {
   ): Promise<IssuedServerSession>;
 }
 
-export type SealedSessionCookieEnvelope = Readonly<
+export type LegacySessionCookieEnvelope = Readonly<
   & SessionIdentityFacts
   & IssuedServerSession
   & {
     schemaVersion: "laibe.drs-server-session-cookie.v1";
   }
 >;
+
+export type AuthBoundCookieEnvelope = Readonly<
+  Omit<LegacySessionCookieEnvelope, "schemaVersion"> & {
+    schemaVersion: "laibe.drs-server-session-cookie.v2";
+    authSessionId: string;
+    supabaseAccessToken: string;
+    authExpiresAtEpochSeconds: number;
+  }
+>;
+export type SealedSessionCookieEnvelope =
+  | LegacySessionCookieEnvelope
+  | AuthBoundCookieEnvelope;
 
 export interface SealedCookieEnvelopeCodec {
   sealCookieEnvelope(payload: SealedSessionCookieEnvelope): Promise<string>;
@@ -105,6 +117,7 @@ export interface AccessSessionVerifier {
     input: Readonly<{
       serverSessionId: string;
       accessToken: string;
+      authBoundEnvelope?: AuthBoundCookieEnvelope;
     }>,
   ): Promise<unknown>;
 }
@@ -377,6 +390,9 @@ function validEnvelope(
   input: unknown,
   nowEpochSeconds: number,
 ): input is SealedSessionCookieEnvelope {
+  const authBound = !!input && typeof input === "object" &&
+    "schemaVersion" in input &&
+    input.schemaVersion === "laibe.drs-server-session-cookie.v2";
   if (
     !hasExactOwnKeys(input, [
       "schemaVersion",
@@ -386,10 +402,22 @@ function validEnvelope(
       "serverSessionId",
       "accessToken",
       "expiresAtEpochSeconds",
+      ...(authBound
+        ? ["authSessionId", "supabaseAccessToken", "authExpiresAtEpochSeconds"]
+        : []),
     ])
   ) return false;
   const expiresAtEpochSeconds = input.expiresAtEpochSeconds;
-  return input.schemaVersion === "laibe.drs-server-session-cookie.v1" &&
+  return (input.schemaVersion === "laibe.drs-server-session-cookie.v1" ||
+    (authBound && isUuid(input.authSessionId) &&
+      typeof input.supabaseAccessToken === "string" &&
+      input.supabaseAccessToken.length <= 3000 &&
+      /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/u.test(
+        input.supabaseAccessToken,
+      ) &&
+      Number.isSafeInteger(input.authExpiresAtEpochSeconds) &&
+      (input.authExpiresAtEpochSeconds as number) >=
+        (expiresAtEpochSeconds as number))) &&
     isUuid(input.authenticatedUserId) && isUuid(input.specialistId) &&
     input.authorizationSubject === `drs-specialist:${input.specialistId}` &&
     validSecret(input.serverSessionId) && validSecret(input.accessToken) &&
@@ -401,17 +429,32 @@ function validEnvelope(
 function validVerifiedAccessSession(
   input: unknown,
   nowEpochSeconds: number,
-): input is VerifiedAccessSession {
+): input is
+  & VerifiedAccessSession
+  & Partial<{
+    authSessionId: string;
+    selectedCaseId: string;
+    caseStatus: "active";
+    accessMode: "read_only";
+  }> {
+  const authBound = !!input && typeof input === "object" &&
+    "authSessionId" in input;
   if (
     !hasExactOwnKeys(input, [
       "authenticatedUserId",
       "specialistId",
       "authorizationSubject",
       "expiresAtEpochSeconds",
+      ...(authBound
+        ? ["authSessionId", "selectedCaseId", "caseStatus", "accessMode"]
+        : []),
     ])
   ) return false;
   const expiresAtEpochSeconds = input.expiresAtEpochSeconds;
-  return isUuid(input.authenticatedUserId) && isUuid(input.specialistId) &&
+  return (!authBound ||
+    (isUuid(input.authSessionId) && isUuid(input.selectedCaseId) &&
+      input.caseStatus === "active" && input.accessMode === "read_only")) &&
+    isUuid(input.authenticatedUserId) && isUuid(input.specialistId) &&
     input.authorizationSubject === `drs-specialist:${input.specialistId}` &&
     typeof expiresAtEpochSeconds === "number" &&
     Number.isSafeInteger(expiresAtEpochSeconds) &&
@@ -721,6 +764,9 @@ async function resolveBoundSession(
     verified = await dependencies.accessSessionVerifier.verifyAccessSession({
       serverSessionId: envelope.serverSessionId,
       accessToken: envelope.accessToken,
+      ...(envelope.schemaVersion === "laibe.drs-server-session-cookie.v2"
+        ? { authBoundEnvelope: envelope }
+        : {}),
     });
   } catch (error) {
     throw preserveVerificationError(error);
@@ -730,14 +776,22 @@ async function resolveBoundSession(
     verified.authenticatedUserId !== envelope.authenticatedUserId ||
     verified.specialistId !== envelope.specialistId ||
     verified.authorizationSubject !== envelope.authorizationSubject ||
-    verified.expiresAtEpochSeconds !== envelope.expiresAtEpochSeconds
+    verified.expiresAtEpochSeconds !== envelope.expiresAtEpochSeconds ||
+    (envelope.schemaVersion === "laibe.drs-server-session-cookie.v2" &&
+      verified.authSessionId !== envelope.authSessionId)
   ) throw new DrsIdentityError("AUTH_REQUIRED", 401);
 
   let grant: unknown;
   try {
-    grant = await dependencies.authorization.resolveSession({
-      authenticatedUserId: verified.authenticatedUserId,
-    });
+    grant = envelope.schemaVersion === "laibe.drs-server-session-cookie.v2"
+      ? {
+        selectedCaseId: verified.selectedCaseId,
+        caseStatus: verified.caseStatus,
+        accessMode: verified.accessMode,
+      }
+      : await dependencies.authorization.resolveSession({
+        authenticatedUserId: verified.authenticatedUserId,
+      });
   } catch (error) {
     if (
       error instanceof DrsIdentityError &&

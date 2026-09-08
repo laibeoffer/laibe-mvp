@@ -1,7 +1,7 @@
 import {
   corsHeaders,
   jsonResponse,
-  readDenialState,
+  readRuntimeEnvironment,
   validateDrsWorkspaceGrantProjection,
 } from "../_shared/drs-auth/contracts.ts";
 import {
@@ -9,12 +9,40 @@ import {
   type DrsBffGuard,
   readDrsBffGuardFailure,
 } from "../_shared/drs-auth/drs-bff-route-composition.ts";
-import {
-  createSupabaseDrsWorkspaceGrantDependencies,
-  type DrsWorkspaceGrantDependencies,
-} from "../_shared/drs-auth/drs-specialist-authority.ts";
-
+import { createDrsSecureSessionRuntime } from "../_shared/drs-auth/drs-secure-session-runtime.ts";
 export const VERIFY_JWT_REQUIRED = false;
+
+type WorkspaceSessionDependencies = Readonly<{
+  allowedOrigins: readonly string[];
+  runtimeAvailable: boolean;
+}>;
+
+function defaultDependencies(): WorkspaceSessionDependencies {
+  const origin = readRuntimeEnvironment(undefined, "LAIBE_DRS_APP_ORIGIN");
+  try {
+    const parsed = new URL(origin ?? "");
+    if (parsed.protocol === "https:" && parsed.origin === origin) {
+      return Object.freeze({
+        allowedOrigins: Object.freeze([origin]),
+        runtimeAvailable: true,
+      });
+    }
+  } catch {
+    // Missing or malformed DRS origin keeps this endpoint closed.
+  }
+  return Object.freeze({
+    allowedOrigins: Object.freeze([]),
+    runtimeAvailable: false,
+  });
+}
+
+function defaultBffGuard(): DrsBffGuard {
+  const secureRuntime = createDrsSecureSessionRuntime();
+  return createDrsBffRouteGuard(
+    "workspaceGrant",
+    secureRuntime.bootstrapDependencies,
+  );
+}
 
 function hasDisallowedOrigin(
   origin: string | null,
@@ -50,9 +78,8 @@ function isAllowedPreflight(
 }
 
 export function createDrsWorkspaceGrantHandler(
-  dependencies: DrsWorkspaceGrantDependencies =
-    createSupabaseDrsWorkspaceGrantDependencies(),
-  bffGuard: DrsBffGuard = createDrsBffRouteGuard("workspaceGrant"),
+  dependencies: WorkspaceSessionDependencies = defaultDependencies(),
+  bffGuard: DrsBffGuard = defaultBffGuard(),
 ) {
   return async function drsWorkspaceGrant(request: Request): Promise<Response> {
     const origin = request.headers.get("origin");
@@ -78,28 +105,16 @@ export function createDrsWorkspaceGrantHandler(
       return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
     }
 
-    let candidate: unknown;
-    try {
-      // The centralized guard is the sole source of every authority selector.
-      candidate = await dependencies.resolveWorkspaceGrant({
-        authenticatedUserId: guarded.authenticatedUserId,
-        expectedCaseId: guarded.selectedCaseId,
-        expectedAuthorizationSubject: guarded.authorizationSubject,
-      });
-    } catch {
-      return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
-    }
-    if (candidate === null || candidate === undefined) {
-      return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
-    }
-
-    const denialState = readDenialState(candidate);
-    if (denialState === "CONTEXT_UNAVAILABLE") {
-      return jsonResponse(503, { state: denialState }, cors);
-    }
-    const grant = validateDrsWorkspaceGrantProjection(candidate);
-    if (!grant || grant.selectedCaseId !== guarded.selectedCaseId) {
-      return jsonResponse(403, { state: denialState }, cors);
+    // The guard freshly verifies the bound session and its current case authority.
+    const grant = validateDrsWorkspaceGrantProjection({
+      authorized: true,
+      state: "AUTHORIZED_DRS_WORKSPACE",
+      case_id: guarded.selectedCaseId,
+      case_status: guarded.caseStatus,
+      access_mode: guarded.accessMode,
+    });
+    if (!grant) {
+      return jsonResponse(403, { state: "CASE_NOT_AUTHORIZED" }, cors);
     }
 
     return jsonResponse(200, {
@@ -120,6 +135,6 @@ export function createDrsWorkspaceGrantHandler(
   };
 }
 
-if (typeof Deno !== "undefined" && import.meta.main) {
-  Deno.serve(createDrsWorkspaceGrantHandler());
-}
+export const handler = createDrsWorkspaceGrantHandler();
+
+if (typeof Deno !== "undefined" && import.meta.main) Deno.serve(handler);

@@ -20,6 +20,11 @@ import type {
   VerifiedSessionProducer,
 } from "./contracts.ts";
 import { isUuid } from "./contracts.ts";
+import {
+  type AuthBoundSession,
+  createAuthBoundSession,
+} from "./auth-bound-session.ts";
+import type { PasswordVerifiedSessionProducer } from "./drs-password-auth-session.ts";
 import type {
   DrsThreeRoleTechnicalSessionProducer,
 } from "./drs-three-role-auth-runtime.ts";
@@ -85,6 +90,8 @@ export type DrsSecureSessionRuntime = Readonly<{
   bootstrapDependencies: DrsSessionBootstrapDependencies | undefined;
   verifiedSessionProducer: VerifiedSessionProducer | null;
   sessionRevoker: DrsServerSessionRevoker | null;
+  passwordSessionProducer?: PasswordVerifiedSessionProducer | null;
+  authBoundSession?: AuthBoundSession;
 }>;
 
 export type DrsThreeRoleSecureSessionRuntime = Readonly<{
@@ -212,6 +219,7 @@ function validHttpsOrigin(value: string): boolean {
 
 function validSuccessUrl(value: string, appOrigin: string): boolean {
   if (!value || hasUnsafeUrlByte(value)) return false;
+  if (value === `${appOrigin}/pcm/reviewer/access/#login`) return true;
   try {
     const parsed = new URL(value);
     return parsed.protocol === "https:" && parsed.origin === appOrigin &&
@@ -1458,15 +1466,26 @@ export function createDrsSecureSessionRuntime(
         cookieEnvelope,
       }),
     );
+    const authBoundSession = createAuthBoundSession({
+      supabaseUrl: supabaseOrigin,
+      serviceRoleKey: environment.SUPABASE_SERVICE_ROLE_KEY,
+      allowedOrigin: environment.LAIBE_DRS_APP_ORIGIN,
+      successRedirectUrl: environment.LAIBE_DRS_SESSION_SUCCESS_URL,
+      sessionCookieName: environment.LAIBE_DRS_SESSION_COOKIE_NAME,
+      cookieKey,
+      now,
+      fetch: fetchImplementation,
+      crypto: cryptoImplementation,
+    });
     const bootstrapDependencies: DrsSessionBootstrapDependencies = Object
       .freeze({
         allowedOrigin: environment.LAIBE_DRS_APP_ORIGIN,
         sessionCookieName: environment.LAIBE_DRS_SESSION_COOKIE_NAME,
         proofTtlSeconds: 60,
         now,
-        cookieEnvelope,
+        cookieEnvelope: authBoundSession.codec,
         proofCodec,
-        accessSessionVerifier: sessionPorts.accessSessionVerifier,
+        accessSessionVerifier: authBoundSession.accessSessionVerifier,
         authorization,
       });
     return Object.freeze({
@@ -1474,6 +1493,8 @@ export function createDrsSecureSessionRuntime(
       bootstrapDependencies,
       verifiedSessionProducer,
       sessionRevoker: sessionPorts.sessionRevoker,
+      passwordSessionProducer: authBoundSession.passwordSessionProducer,
+      authBoundSession,
     });
   } catch {
     return unavailable();

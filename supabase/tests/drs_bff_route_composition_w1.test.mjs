@@ -143,7 +143,7 @@ function post(pathname, body = {}) {
   });
 }
 
-Deno.test("workspace grant uses only guard-selected case and subject before its accepted RPC seam", async () => {
+Deno.test("workspace grant projects only the freshly guarded case without a legacy RPC", async () => {
   const route = await import(
     new URL("functions/drs-workspace-grant/index.ts", ROOT).href
   );
@@ -154,15 +154,10 @@ Deno.test("workspace grant uses only guard-selected case and subject before its 
     async resolveAuthenticatedIdentity() {
       assert.fail("raw Supabase JWT identity must not run");
     },
-    async resolveWorkspaceGrant(input) {
-      calls.push({ backend: input });
-      return {
-        authorized: true,
-        state: "AUTHORIZED_DRS_WORKSPACE",
-        case_id: CASE_ID,
-        case_status: "active",
-        access_mode: "read_only",
-      };
+    async resolveWorkspaceGrant() {
+      assert.fail(
+        "fresh session authority must not re-enter the legacy Google RPC",
+      );
     },
   }, fakeGuard(calls))(
     post("/functions/v1/drs-workspace-grant"),
@@ -171,13 +166,6 @@ Deno.test("workspace grant uses only guard-selected case and subject before its 
   assert.equal(response.status, 200);
   assert.deepEqual(calls, [
     "guard:/functions/v1/drs-workspace-grant",
-    {
-      backend: {
-        authenticatedUserId: AUTH_USER_ID,
-        expectedCaseId: CASE_ID,
-        expectedAuthorizationSubject: SUBJECT,
-      },
-    },
   ]);
   assert.deepEqual(await response.json(), {
     schemaVersion: "laibe.drs-workspace-auth.v1",
@@ -437,23 +425,10 @@ Deno.test("focused correction: A0 accepts the direct workspace route replay as A
   const route = await import(
     new URL("functions/drs-workspace-grant/index.ts", ROOT).href
   );
-  const a0ModuleHref = [
-    "file:",
-    "",
-    "",
-    "C:",
-    "CodexWork",
-    "08-Jacky",
-    "worktrees",
-    "laibe_MVP_project",
-    "a0-drs-specialist-calendar-integration-w1-20260824",
-    "src",
-    "stitch_laibe_landing_onboarding",
-    "drs_standalone",
-    "specialist_workspace",
-    "drs-workspace-transport.js",
-  ].join("/");
-  const a0ModuleSpecifier = `${a0ModuleHref}?composition=${Date.now()}`;
+  const a0ModuleSpecifier = new URL(
+    "../src/stitch_laibe_landing_onboarding/drs_standalone/specialist_workspace/drs-workspace-transport.js",
+    ROOT,
+  ).href;
   const a0Module = await import(a0ModuleSpecifier);
   const handler = route.createDrsWorkspaceGrantHandler({
     runtimeAvailable: true,

@@ -23,6 +23,9 @@ const guardedRoutes = Object.freeze([
 ]);
 
 const expectedFunctionConfig = Object.freeze({
+  "drs-reviewer-registration-applications": true,
+  "drs-password-auth-session": true,
+  "drs-session-logout": false,
   "drs-session-bootstrap": false,
   "drs-case-command": false,
   "drs-google-auth-start": false,
@@ -64,8 +67,8 @@ function assertExactFunctionConfig(config) {
       return [name.slice("functions.".length), body.endsWith("true")];
     });
   const map = Object.fromEntries(functionEntries);
-  assert.equal(functionEntries.length, 25);
-  assert.equal(Object.keys(map).length, 25);
+  assert.equal(functionEntries.length, 28);
+  assert.equal(Object.keys(map).length, 28);
   assert.deepEqual(map, expectedFunctionConfig);
   return tables;
 }
@@ -96,7 +99,7 @@ test("all five composed routes guard before server authority or provider work", 
   }
 });
 
-test("final shared config has the exact 25 function entries and private buckets", async () => {
+test("final shared config has the exact 28 function entries and private buckets", async () => {
   const config = await source("supabase/config.toml");
   const tables = assertExactFunctionConfig(config);
 
@@ -219,15 +222,19 @@ test("P1 JWT handlers close caller authority before service work", async () => {
   }
 });
 
-test("DRS workspace remains POST exact-empty and guarded before resolver", async () => {
+test("DRS workspace remains POST exact-empty and projects only fresh guard authority", async () => {
   const route = await source("supabase/functions/drs-workspace-grant/index.ts");
   const composition = await source(
     "supabase/functions/_shared/drs-auth/drs-bff-route-composition.ts",
   );
-  assert.match(route, /createDrsBffRouteGuard\("workspaceGrant"\)/u);
+  assert.match(route, /createDrsBffRouteGuard\(\s*"workspaceGrant",\s*secureRuntime\.bootstrapDependencies,?\s*\)/u);
   const guard = route.indexOf("bffGuard.authorize(request)");
-  const resolver = route.indexOf("resolveWorkspaceGrant(");
-  assert.ok(guard >= 0 && resolver > guard);
+  const projection = route.indexOf("validateDrsWorkspaceGrantProjection({");
+  assert.ok(guard >= 0 && projection > guard);
+  assert.doesNotMatch(route, /resolveWorkspaceGrant\(/u);
+  assert.match(route, /case_id: guarded\.selectedCaseId/u);
+  assert.match(route, /case_status: guarded\.caseStatus/u);
+  assert.match(route, /access_mode: guarded\.accessMode/u);
   assert.match(
     composition,
     /workspaceGrant:\s*closedPost\([\s\S]*?"\/functions\/v1\/drs-workspace-grant"[\s\S]*?exactEmptyBody/u,
@@ -237,7 +244,7 @@ test("DRS workspace remains POST exact-empty and guarded before resolver", async
 test("accepted BFF contracts and excluded Calendar callback stay byte-identical", async () => {
   assert.equal(
     await sha256("supabase/functions/_shared/drs-auth/contracts.ts"),
-    "72fbc081359f8e3db870a32e5614a2229039d8af6e9e03c07f16ac309e133a51",
+    "694c1ce13d7d99996353ff7e9aa1143a5565a908b27f9347f5080301d112f26e",
   );
   assert.equal(
     await sha256(

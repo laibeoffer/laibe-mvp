@@ -84,3 +84,12 @@ verify_jwt = false
 
 [functions.drs-line-private-notification-dispatch]
 verify_jwt = true
+
+[functions.drs-password-auth-session]
+verify_jwt = true
+
+[functions.drs-session-logout]
+verify_jwt = false
+
+[functions.drs-reviewer-registration-applications]
+verify_jwt = true

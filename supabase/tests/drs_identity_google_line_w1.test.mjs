@@ -347,7 +347,7 @@ function bffContext(overrides = {}) {
     specialistId: SPECIALIST_ID,
     authorizationSubject: SUBJECT,
     selectedCaseId: CASE_ID,
-    caseStatus: "ACTIVE",
+    caseStatus: "active",
     accessMode: "read_only",
     proofExpiresAt: "2099-01-01T00:00:00.000Z",
     ...overrides,
@@ -508,7 +508,7 @@ Deno.test("workspace grant keeps CORS and centralized BFF rejection before autho
   );
   assert.equal(noOrigin.status, 200);
   assert.equal(noOrigin.headers.get("vary"), "Origin");
-  assert.deepEqual(order, ["bff-guard", "workspace-rpc"]);
+  assert.deepEqual(order, ["bff-guard"]);
   assert.equal(legacyIdentityCalls, 0);
 });
 
@@ -531,27 +531,17 @@ Deno.test("workspace grant separates 401 403 and 503 with sanitized errors", asy
   assert.deepEqual(await unavailable.json(), { state: "CONTEXT_UNAVAILABLE" });
 
   const denied = await endpoint.createDrsWorkspaceGrantHandler(
-    endpointDependencies({
-      async resolveWorkspaceGrant() {
-        return {
-          authorized: false,
-          state: "CASE_SELECTION_REQUIRED",
-          raw: "secret",
-        };
-      },
-    }),
-    acceptedBffGuard(),
+    endpointDependencies(),
+    acceptedBffGuard({ accessMode: "write", raw: "secret" }),
   )(exactPost());
   assert.equal(denied.status, 403);
-  assert.deepEqual(await denied.json(), { state: "CASE_SELECTION_REQUIRED" });
+  assert.deepEqual(await denied.json(), { state: "CASE_NOT_AUTHORIZED" });
 
   const rpcUnavailable = await endpoint.createDrsWorkspaceGrantHandler(
-    endpointDependencies({
-      async resolveWorkspaceGrant() {
-        return { authorized: false, state: "CONTEXT_UNAVAILABLE" };
-      },
-    }),
-    acceptedBffGuard(),
+    endpointDependencies(),
+    rejectingBffGuard(
+      new composition.DrsBffRouteGuardError("CONTEXT_UNAVAILABLE", 503),
+    ),
   )(exactPost());
   assert.equal(rpcUnavailable.status, 503);
   assert.deepEqual(await rpcUnavailable.json(), {

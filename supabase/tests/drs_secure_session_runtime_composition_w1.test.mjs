@@ -157,6 +157,8 @@ Deno.test("focused RED: secure-session runtime factory composes exact immutable 
     "bootstrapDependencies",
     "verifiedSessionProducer",
     "sessionRevoker",
+    "passwordSessionProducer",
+    "authBoundSession",
   ]);
   assert.equal(runtime.runtimeAvailable, true);
   assert.ok(Object.isFrozen(runtime));
@@ -264,17 +266,20 @@ Deno.test("AES cookie and HMAC proof codecs round-trip, randomize, reject tamper
   const cookieCodec = runtime.bootstrapDependencies.cookieEnvelope;
   const proofCodec = runtime.bootstrapDependencies.proofCodec;
   const envelope = Object.freeze({
-    schemaVersion: "laibe.drs-server-session-cookie.v1",
+    schemaVersion: "laibe.drs-server-session-cookie.v2",
     authenticatedUserId: USER_ID,
     specialistId: SPECIALIST_ID,
     authorizationSubject: SUBJECT,
     serverSessionId: "44444444-4444-4444-8444-444444444444",
     accessToken: RAW_TOKEN,
     expiresAtEpochSeconds: Math.floor(NOW.getTime() / 1000) + 900,
+    authSessionId: "55555555-5555-4555-8555-555555555555",
+    supabaseAccessToken: "synthetic.payload.signature",
+    authExpiresAtEpochSeconds: Math.floor(NOW.getTime() / 1000) + 900,
   });
   const sealedA = await cookieCodec.sealCookieEnvelope(envelope);
   const sealedB = await cookieCodec.sealCookieEnvelope(envelope);
-  assert.match(sealedA, /^v1\.[A-Za-z0-9_-]{16}\.[A-Za-z0-9_-]+$/u);
+  assert.match(sealedA, /^v2\.[A-Za-z0-9_-]{16}\.[A-Za-z0-9_-]+$/u);
   assert.notEqual(sealedA, sealedB);
   assert.deepEqual(await cookieCodec.openCookieEnvelope(sealedA), envelope);
   assert.equal(sealedA.includes(USER_ID), false);
@@ -338,7 +343,55 @@ Deno.test("AES cookie and HMAC proof codecs round-trip, randomize, reject tamper
 Deno.test("issuer to cookie to bootstrap to proof to guard re-verifies session and current authority", async () => {
   const module = await api();
   const harness = createRpcHarness();
-  const runtime = validRuntime(module, { fetch: harness.fetch });
+  const authSessionId = "55555555-5555-4555-8555-555555555555";
+  const expiration = Math.floor(NOW.getTime() / 1000) + 900;
+  const encode = (value) =>
+    base64Url(new TextEncoder().encode(JSON.stringify(value)));
+  const token = `${encode({ alg: "HS256" })}.${
+    encode({
+      sub: USER_ID,
+      session_id: authSessionId,
+      iss: SUPABASE_ORIGIN + "/auth/v1",
+      aud: "authenticated",
+      exp: expiration,
+    })
+  }.c3ludGhldGlj`;
+  const boundCalls = [];
+  let active = true;
+  let expiresAt;
+  const runtime = validRuntime(module, {
+    fetch: async (input, init) => {
+      const path = new URL(String(input)).pathname;
+      if (path === "/auth/v1/user") return Response.json({ id: USER_ID });
+      if (path.endsWith("/auth_session_validation_v1")) {
+        return Response.json({
+          schemaVersion: "laibe.auth-session-validation.v1",
+          active,
+        });
+      }
+      if (path.includes("/drs_auth_bound_")) {
+        const body = await new Response(String(init.body)).json();
+        boundCalls.push({ path, body });
+        assert.equal(body.p_auth_session_id, authSessionId);
+        assert.equal(String(init.body).includes(token), false);
+        if (path.endsWith("_issue_v1")) {
+          expiresAt = body.p_expires_at;
+          return Response.json(exactIssueProjection(body));
+        }
+        return Response.json({
+          authenticated_user_id: USER_ID,
+          auth_session_id: authSessionId,
+          specialist_id: SPECIALIST_ID,
+          authorization_subject: SUBJECT,
+          expires_at: expiresAt,
+          selected_case_id: CASE_ID,
+          case_status: "active",
+          access_mode: "read_only",
+        });
+      }
+      return harness.fetch(input, init);
+    },
+  });
   const producerResult = await runtime.verifiedSessionProducer
     .createVerifiedSession({
       authenticatedUserId: USER_ID,
@@ -349,17 +402,41 @@ Deno.test("issuer to cookie to bootstrap to proof to guard re-verifies session a
       sessionCookieName: COOKIE_NAME,
     });
   assert.equal(producerResult.response.status, 303);
-  const exactCookie = producerResult.response.headers.get("set-cookie")
+  const oldCookie = producerResult.response.headers.get("set-cookie")
     .split(";", 1)[0];
-  assert.match(exactCookie, new RegExp(`^${COOKIE_NAME}=v1\\.`));
-  assert.equal(exactCookie.includes(USER_ID), false);
-  assert.equal(exactCookie.includes(SPECIALIST_ID), false);
-  assert.equal(exactCookie.includes(SUBJECT), false);
+  assert.match(oldCookie, new RegExp(`^${COOKIE_NAME}=v1\\.`));
+  const bound = await runtime.passwordSessionProducer.createVerifiedSession({
+    authenticatedUserId: USER_ID,
+    authSessionId,
+    supabaseAccessToken: token,
+    authExpiresAtEpochSeconds: expiration,
+    specialistId: SPECIALIST_ID,
+    authorizationSubject: SUBJECT,
+    callbackOrigin: APP_ORIGIN,
+    successRedirectUrl: SUCCESS_URL,
+    sessionCookieName: COOKIE_NAME,
+  });
+  const exactCookie = bound.response.headers.get("set-cookie").split(";", 1)[0];
+  assert.equal(exactCookie.includes(token), false);
 
   const endpoint = await import(`${ENDPOINT_URL.href}?v=${Date.now()}`);
   const bootstrap = endpoint.createDrsSessionBootstrapEndpoint(
     runtime.bootstrapDependencies,
   );
+  const oldResponse = await bootstrap(
+    new Request(`${APP_ORIGIN}/functions/v1/drs-session-bootstrap`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie: oldCookie,
+        origin: APP_ORIGIN,
+        "sec-fetch-site": "same-origin",
+      },
+      body: "{}",
+    }),
+  );
+  assert.equal(oldResponse.status, 401);
+  assert.equal(oldResponse.headers.has("authorization"), false);
   const bootstrapResponse = await bootstrap(
     new Request(
       `${APP_ORIGIN}/functions/v1/drs-session-bootstrap`,
@@ -414,10 +491,10 @@ Deno.test("issuer to cookie to bootstrap to proof to guard re-verifies session a
 
   const paths = harness.calls.map((call) => call.url.pathname);
   assert.equal(paths.filter((path) => path.endsWith("_issue_v1")).length, 1);
-  assert.equal(paths.filter((path) => path.endsWith("_verify_v1")).length, 2);
+  assert.equal(paths.filter((path) => path.endsWith("_verify_v1")).length, 0);
   assert.equal(
     paths.filter((path) => path.endsWith("workspace_grant_v1")).length,
-    2,
+    0,
   );
   assert.equal(paths.some((path) => path === "/auth/v1/user"), false);
   for (const call of harness.calls) {
@@ -436,6 +513,30 @@ Deno.test("issuer to cookie to bootstrap to proof to guard re-verifies session a
     "p_expires_at",
   ]);
   assert.match(issue.body.p_access_token_digest, /^[A-Za-z0-9_-]{43}$/u);
+  assert.equal(
+    boundCalls.filter((call) => call.path.endsWith("_issue_v1")).length,
+    1,
+  );
+  assert.equal(
+    boundCalls.filter((call) => call.path.endsWith("_verify_v1")).length,
+    2,
+  );
+  active = false;
+  await assert.rejects(
+    () =>
+      guard.authorize(
+        new Request(`${APP_ORIGIN}/functions/v1/drs-secure-probe`, {
+          method: "POST",
+          headers: {
+            authorization: proof,
+            cookie: exactCookie,
+            origin: APP_ORIGIN,
+            "sec-fetch-site": "same-origin",
+          },
+        }),
+      ),
+    (error) => error.status === 401,
+  );
 });
 
 function hostileResponse({

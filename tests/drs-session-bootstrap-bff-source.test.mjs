@@ -3,6 +3,18 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
+
+test("S2 bootstrap uses exact v2 identity and server-returned case after each fresh verification", () => {
+  const shared = source(sharedUrl);
+  const entry = source(endpointUrl);
+  assert.match(shared, /verified\.authSessionId !== envelope\.authSessionId/u);
+  assert.match(shared, /authBoundEnvelope: envelope/u);
+  assert.match(shared, /selectedCaseId: verified\.selectedCaseId/u);
+  assert.doesNotMatch(
+    entry,
+    /defaultThreeRoleDependencies|defaultLegacyDependencies/u,
+  );
+});
 const sharedUrl = new URL(
   "supabase/functions/_shared/drs-auth/drs-session-bootstrap-bff.ts",
   root,

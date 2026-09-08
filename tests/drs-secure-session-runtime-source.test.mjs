@@ -3,6 +3,26 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
+
+test("S2 default runtime binds password producer and every bootstrap consumer to Auth-bound verification", () => {
+  const runtime = source(runtimeUrl);
+  assert.match(runtime, /const authBoundSession = createAuthBoundSession/u);
+  assert.match(runtime, /cookieEnvelope: authBoundSession\.codec/u);
+  assert.match(
+    runtime,
+    /accessSessionVerifier: authBoundSession\.accessSessionVerifier/u,
+  );
+  assert.match(
+    runtime,
+    /passwordSessionProducer: authBoundSession\.passwordSessionProducer/u,
+  );
+  const bound = source(
+    new URL("supabase/functions/_shared/drs-auth/auth-bound-session.ts", root),
+  );
+  assert.match(bound, /verifyAuthSession/u);
+  assert.match(bound, /laibe\.drs-server-session-cookie\.v2/u);
+  assert.doesNotMatch(bound, /refresh_token|console\.|localStorage/u);
+});
 const runtimeUrl = new URL(
   "supabase/functions/_shared/drs-auth/drs-secure-session-runtime.ts",
   root,

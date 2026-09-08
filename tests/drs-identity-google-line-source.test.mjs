@@ -57,13 +57,21 @@ test("source contract exposes one authenticated POST read-only workspace seam", 
   assert.match(source.endpoint, /VERIFY_JWT_REQUIRED\s*=\s*false/u);
   assert.match(
     source.endpoint,
-    /createDrsBffRouteGuard\("workspaceGrant"\)/u,
+    /createDrsBffRouteGuard\(\s*"workspaceGrant",\s*secureRuntime\.bootstrapDependencies,?\s*\)/u,
   );
+  assert.match(source.endpoint, /const secureRuntime = createDrsSecureSessionRuntime\(\)/u);
+  assert.match(source.endpoint, /bffGuard: DrsBffGuard = defaultBffGuard\(\)/u);
+  assert.match(source.endpoint, /export const handler = createDrsWorkspaceGrantHandler\(\)/u);
+  assert.match(source.endpoint, /Deno\.serve\(handler\)/u);
   const guard = source.endpoint.indexOf("bffGuard.authorize(request)");
-  const workspaceRpc = source.endpoint.indexOf(
-    "dependencies.resolveWorkspaceGrant({",
+  const projection = source.endpoint.indexOf(
+    "validateDrsWorkspaceGrantProjection({",
   );
-  assert.ok(guard >= 0 && workspaceRpc > guard);
+  assert.ok(guard >= 0 && projection > guard);
+  assert.doesNotMatch(source.endpoint, /resolveWorkspaceGrant\(/u);
+  assert.match(source.endpoint, /case_id: guarded\.selectedCaseId/u);
+  assert.match(source.endpoint, /case_status: guarded\.caseStatus/u);
+  assert.match(source.endpoint, /access_mode: guarded\.accessMode/u);
   assert.match(source.endpoint, /readDrsBffGuardFailure\(error\)/u);
   assert.doesNotMatch(
     source.endpoint,
