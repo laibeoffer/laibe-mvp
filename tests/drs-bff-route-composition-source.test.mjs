@@ -24,6 +24,8 @@ const guardedRoutes = Object.freeze([
 
 const expectedFunctionConfig = Object.freeze({
   "drs-reviewer-registration-applications": true,
+  "drs-reviewer-registration-queue": true,
+  "drs-reviewer-registration-decision": true,
   "drs-password-auth-session": true,
   "drs-session-logout": false,
   "drs-session-bootstrap": false,
@@ -67,8 +69,8 @@ function assertExactFunctionConfig(config) {
       return [name.slice("functions.".length), body.endsWith("true")];
     });
   const map = Object.fromEntries(functionEntries);
-  assert.equal(functionEntries.length, 28);
-  assert.equal(Object.keys(map).length, 28);
+  assert.equal(functionEntries.length, 30);
+  assert.equal(Object.keys(map).length, 30);
   assert.deepEqual(map, expectedFunctionConfig);
   return tables;
 }
@@ -99,7 +101,7 @@ test("all five composed routes guard before server authority or provider work", 
   }
 });
 
-test("final shared config has the exact 28 function entries and private buckets", async () => {
+test("final shared config has the exact 30 function entries and private buckets", async () => {
   const config = await source("supabase/config.toml");
   const tables = assertExactFunctionConfig(config);
 
