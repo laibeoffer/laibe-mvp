@@ -1,3 +1,4 @@
+import { withEdgeRequestBoundary } from "../_shared/http/edge-request-boundary.ts";
 import {
   corsHeaders,
   jsonResponse,
@@ -135,6 +136,9 @@ export function createDrsWorkspaceGrantHandler(
   };
 }
 
-export const handler = createDrsWorkspaceGrantHandler();
+export const handler = withEdgeRequestBoundary(
+  "drs-workspace-grant",
+  createDrsWorkspaceGrantHandler(),
+);
 
 if (typeof Deno !== "undefined" && import.meta.main) Deno.serve(handler);

@@ -1,3 +1,4 @@
+import { withEdgeRequestBoundary } from "../_shared/http/edge-request-boundary.ts";
 import {
   createDrsSessionBootstrapHandler,
   createDrsThreeRoleSessionBootstrapHandler,
@@ -24,8 +25,9 @@ export function createDrsThreeRoleSessionBootstrapEndpoint(
   return createDrsThreeRoleSessionBootstrapHandler(dependencies);
 }
 
-export const handler = createDrsSessionBootstrapEndpoint(
-  secureSessionRuntime.bootstrapDependencies,
+export const handler = withEdgeRequestBoundary(
+  "drs-session-bootstrap",
+  createDrsSessionBootstrapEndpoint(secureSessionRuntime.bootstrapDependencies),
 );
 
 if (import.meta.main) Deno.serve(handler);

@@ -35,6 +35,7 @@ async function password(
   denial?: string,
   tokenTransform = (value: string) => value,
   serviceStatus = 200,
+  successUrl = `${ORIGIN}/pcm/reviewer/access/#login`,
 ) {
   const exp = Math.floor(Date.now() / 1000) + 300;
   const token = tokenTransform(jwt(exp));
@@ -45,7 +46,7 @@ async function password(
     supabaseAnonKey: "synthetic-publishable-key",
     serviceRoleKey: "synthetic-service-key",
     sessionCookieName: COOKIE,
-    sessionSuccessRedirectUrl: `${ORIGIN}/pcm/reviewer/access/#login`,
+    sessionSuccessRedirectUrl: successUrl,
     now: () => new Date(),
     fetch: (input: string | URL | Request) =>
       Promise.resolve(Response.json(
@@ -82,7 +83,7 @@ async function password(
           response: new Response(null, {
             status: 303,
             headers: {
-              location: `${ORIGIN}/pcm/reviewer/access/#login`,
+              location: successUrl,
               "x-laibe-session-state": "SESSION_ESTABLISHED",
               "set-cookie":
                 `${COOKIE}=synthetic; Path=/; HttpOnly; Secure; SameSite=Lax`,
@@ -108,6 +109,49 @@ async function password(
   );
   return { response, issued, token, exp };
 }
+
+Deno.test("P1 canonical success URL admits the current no-slash configuration", async () => {
+  const { response, issued } = await password(
+    true,
+    undefined,
+    (value) => value,
+    200,
+    `${ORIGIN}/pcm/reviewer/access`,
+  );
+  assert(
+    response.status === 204,
+    `Canonical configuration expected 204, got ${response.status}`,
+  );
+  assert(
+    issued.length === 1,
+    "Canonical configuration must reach the verified producer",
+  );
+});
+
+Deno.test("P1 success URL rejects every non-approved path query or fragment", async () => {
+  for (
+    const path of [
+      "/pcm/reviewer/access/",
+      "/pcm/reviewer/access#login",
+      "/pcm/reviewer/access?x=1",
+      "/pcm/reviewer/access/#other",
+      "/pcm/reviewer/access/other",
+      "/pcm/reviewer/%61ccess",
+    ]
+  ) {
+    const { response, issued } = await password(
+      true,
+      undefined,
+      (value) => value,
+      200,
+      ORIGIN + path,
+    );
+    assert(
+      response.status === 503 && issued.length === 0,
+      "Unapproved success URL must fail before issue",
+    );
+  }
+});
 
 Deno.test("S2 password: revoked Auth session cannot mint a DRS cookie", async () => {
   const { response, issued } = await password(false);

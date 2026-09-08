@@ -15,7 +15,7 @@ import {
 } from "./contracts.ts";
 
 const ENDPOINT_PATH = "/functions/v1/drs-password-auth-session";
-const REVIEWER_ACCESS_PATH = "/pcm/reviewer/access/";
+const REVIEWER_ACCESS_PATH = "/pcm/reviewer/access";
 const MAX_TOKEN_LENGTH = 16 * 1024;
 const JWT_PATTERN = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/u;
 const HOST_COOKIE_PATTERN = /^__Host-[A-Za-z0-9_-]{1,64}$/u;
@@ -87,9 +87,10 @@ function assertDependencies(
   const supabaseOrigin = exactOrigin(dependencies.supabaseUrl);
   const successUrl = new URL(dependencies.sessionSuccessRedirectUrl);
   if (
-    successUrl.origin !== allowedOrigin.origin ||
-    successUrl.pathname !== REVIEWER_ACCESS_PATH || successUrl.search ||
-    successUrl.hash !== "#login" ||
+    ![
+      allowedOrigin.origin + REVIEWER_ACCESS_PATH,
+      allowedOrigin.origin + REVIEWER_ACCESS_PATH + "/#login",
+    ].includes(dependencies.sessionSuccessRedirectUrl) ||
     !HOST_COOKIE_PATTERN.test(dependencies.sessionCookieName) ||
     typeof dependencies.serviceRoleKey !== "string" ||
     dependencies.serviceRoleKey.length < 8 ||

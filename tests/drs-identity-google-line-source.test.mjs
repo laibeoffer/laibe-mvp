@@ -61,7 +61,7 @@ test("source contract exposes one authenticated POST read-only workspace seam", 
   );
   assert.match(source.endpoint, /const secureRuntime = createDrsSecureSessionRuntime\(\)/u);
   assert.match(source.endpoint, /bffGuard: DrsBffGuard = defaultBffGuard\(\)/u);
-  assert.match(source.endpoint, /export const handler = createDrsWorkspaceGrantHandler\(\)/u);
+  assert.match(source.endpoint, /export const handler = withEdgeRequestBoundary\(\s*"drs-workspace-grant",\s*createDrsWorkspaceGrantHandler\(\)/u);
   assert.match(source.endpoint, /Deno\.serve\(handler\)/u);
   const guard = source.endpoint.indexOf("bffGuard.authorize(request)");
   const projection = source.endpoint.indexOf(

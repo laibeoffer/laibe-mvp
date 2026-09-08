@@ -1,3 +1,4 @@
+import { withEdgeRequestBoundary } from "../_shared/http/edge-request-boundary.ts";
 import {
   createDrsPasswordAuthSessionHandler,
   createDrsPasswordAuthSessionRuntimeDependencies,
@@ -15,6 +16,9 @@ const dependencies = createDrsPasswordAuthSessionRuntimeDependencies({
   sessionProducer: secureRuntime.passwordSessionProducer,
 });
 
-export const handler = createDrsPasswordAuthSessionHandler(dependencies);
+export const handler = withEdgeRequestBoundary(
+  "drs-password-auth-session",
+  createDrsPasswordAuthSessionHandler(dependencies),
+);
 
 if (import.meta.main) Deno.serve(handler);
