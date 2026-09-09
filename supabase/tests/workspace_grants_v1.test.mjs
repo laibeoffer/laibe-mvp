@@ -188,6 +188,101 @@ Deno.test("owner gateway route preserves verified workspace and closed request g
   );
 });
 
+Deno.test("vendor runtime normalizes transport while retaining verified pro authority", async () => {
+  const module = await import("../functions/vendor-workspace-grant/index.ts");
+  const createRuntime = module.createVendorWorkspaceGrantRuntimeHandler ??
+    module.createVendorWorkspaceGrantHandler;
+  let identities = 0;
+  let grants = 0;
+  const handler = createRuntime(dependencies({
+    allowedOrigins: ["https://approved.test"],
+    resolveAuthenticatedIdentity(incoming) {
+      identities++;
+      assert.deepEqual(Object.fromEntries(incoming.headers), {
+        apikey: "synthetic-routing-key",
+        authorization: "Bearer verified-user-jwt",
+        "content-type": "application/json",
+      });
+      return Promise.resolve({ userId: USER_ID });
+    },
+    resolveWorkspaceGrant(userId, role) {
+      grants++;
+      assert.equal(userId, USER_ID);
+      assert.equal(role, "pro");
+      return dependencies().resolveWorkspaceGrant(userId, role);
+    },
+  }));
+  for (
+    const path of [
+      "/vendor-workspace-grant",
+      "/functions/v1/vendor-workspace-grant",
+    ]
+  ) {
+    const response = await handler(request(path, {
+      headers: {
+        apikey: "synthetic-routing-key",
+        "x-platform-routing-id": "metadata-canary",
+        cookie: "cookie-canary",
+      },
+    }));
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.state, "AUTHORIZED_VENDOR_WORKSPACE");
+    assert.equal(body.authenticatedUserId, USER_ID);
+    assert.equal(body.currentCaseId, CASE_ID);
+    assert.equal(body.membership.role, "pro");
+    assert.equal(body.workspaceAccess.mutationAllowed, false);
+    assert.doesNotMatch(
+      JSON.stringify([body, [...response.headers]]),
+      /canary/,
+    );
+  }
+  for (
+    const [path, init, status] of [
+      ["/vendor-workspace-grant?caseId=guess", {}, 400],
+      ["/vendor-workspace-grant", { method: "POST", body: "{}" }, 405],
+      ["/vendor-workspace-grant", { headers: { "content-length": "1" } }, 400],
+      ["/vendor-workspace-grant", { headers: { authorization: "" } }, 401],
+      ["/vendor-workspace-grant", {
+        headers: { origin: "https://unapproved.test" },
+      }, 403],
+      ...[
+        "x-user-id",
+        "x-role",
+        "x-case-id",
+        "x-selected-case",
+        "x-laibe-role",
+        "x-calendar-id",
+        "x-arbitrary-authority",
+        "x-authenticated-user-id",
+        "x-account-role",
+      ].map(
+        (name) => ["/vendor-workspace-grant", {
+          headers: { [name]: "caller-authority" },
+        }, 400],
+      ),
+    ]
+  ) assert.equal((await handler(request(path, init))).status, status);
+  assert.equal(identities, 2);
+  assert.equal(grants, 2);
+  const denied = createRuntime(
+    dependencies({
+      resolveAuthenticatedIdentity: () => Promise.resolve(null),
+      resolveWorkspaceGrant: () => {
+        throw new Error("Must not grant without verified identity");
+      },
+    }),
+  );
+  assert.equal(
+    (await denied(
+      request("/vendor-workspace-grant", {
+        headers: { "x-platform-routing-id": "metadata" },
+      }),
+    )).status,
+    401,
+  );
+});
+
 Deno.test("owner runtime discards gateway metadata before verified authority", async () => {
   const { createOwnerWorkspaceGrantRuntimeHandler } = await import(
     "../functions/owner-workspace-grant/index.ts"

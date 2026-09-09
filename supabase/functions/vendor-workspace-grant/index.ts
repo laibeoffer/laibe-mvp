@@ -11,6 +11,7 @@ import {
   validateWorkspaceGrant,
 } from "../_shared/casework-authority/contracts.ts";
 import { createSupabaseCaseworkAuthorityDependencies } from "../_shared/casework-authority/resolver.ts";
+import { withEdgeRequestBoundary } from "../_shared/http/edge-request-boundary.ts";
 
 export const VERIFY_JWT_REQUIRED = true;
 
@@ -90,6 +91,48 @@ export function createVendorWorkspaceGrantHandler(
   };
 }
 
+export function createVendorWorkspaceGrantRuntimeHandler(
+  dependencies?: CaseworkAuthorityDependencies,
+) {
+  const handler = createVendorWorkspaceGrantHandler(dependencies);
+  const applicationHeaders = [
+    "authorization",
+    "apikey",
+    "origin",
+    "content-type",
+    "content-length",
+    "access-control-request-method",
+    "access-control-request-headers",
+  ];
+  const reservedAuthorityHeaders = new Set([
+    "x-user-id",
+    "x-authenticated-user-id",
+    "x-account-role",
+    "x-role",
+    "x-case-id",
+    "x-selected-case",
+    "x-calendar-id",
+    "x-arbitrary-authority",
+  ]);
+  return withEdgeRequestBoundary(
+    "vendor-workspace-grant",
+    (request) => {
+      for (const name of request.headers.keys()) {
+        if (
+          name.startsWith("x-laibe-") || reservedAuthorityHeaders.has(name)
+        ) return handler(request);
+      }
+      // The business handler receives application inputs, never gateway metadata.
+      const headers = new Headers();
+      for (const name of applicationHeaders) {
+        const value = request.headers.get(name);
+        if (value !== null) headers.set(name, value);
+      }
+      return handler(new Request(request, { headers }));
+    },
+  );
+}
+
 if (typeof Deno !== "undefined" && import.meta.main) {
-  Deno.serve(createVendorWorkspaceGrantHandler());
+  Deno.serve(createVendorWorkspaceGrantRuntimeHandler());
 }
