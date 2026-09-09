@@ -6,13 +6,66 @@ import {
   disallowedOrigin,
   hasBearerAuthorization,
   jsonResponse,
+  observeWorkspaceStage,
   preflightResponse,
   validateClosedGet,
   validateWorkspaceGrant,
+  type WorkspaceObservationOutcome,
+  type WorkspaceObservationStage,
+  workspaceObservationStart,
+  type WorkspaceStageObserver,
 } from "../_shared/casework-authority/contracts.ts";
 import { createSupabaseCaseworkAuthorityDependencies } from "../_shared/casework-authority/resolver.ts";
 
 export const VERIFY_JWT_REQUIRED = true;
+
+const STAGES = ["gate", "auth", "session", "workspace", "shape"] as const;
+const OUTCOMES: readonly WorkspaceObservationOutcome[] = [
+  "PASS",
+  "DENIED",
+  "UNAVAILABLE",
+  "HTTP_ERROR",
+  "TRANSPORT_ERROR",
+  "INVALID_JSON",
+  "INVALID_SHAPE",
+];
+
+function requestObservation() {
+  const entries = new Map<WorkspaceObservationStage, string>();
+  const observer: WorkspaceStageObserver = (
+    stage,
+    outcome,
+    status,
+    duration,
+  ) => {
+    if (
+      !STAGES.includes(stage) || !OUTCOMES.includes(outcome) ||
+      entries.has(stage)
+    ) return;
+    const safeStatus =
+      Number.isInteger(status) && status >= 100 && status <= 599 ? status : 0;
+    const safeDuration = Number.isFinite(duration)
+      ? Math.min(60_000, Math.max(0, Math.floor(duration)))
+      : 0;
+    entries.set(stage, `${outcome},${safeStatus},${safeDuration}`);
+  };
+  return {
+    observer,
+    finish(response: Response): Response {
+      try {
+        response.headers.set(
+          "x-laibe-workspace-stages",
+          "v1;" + STAGES.map(
+            (stage) => `${stage}=${entries.get(stage) ?? "NOT_REACHED,0,0"}`,
+          ).join(";"),
+        );
+      } catch {
+        // A missing diagnostic header must not change the business response.
+      }
+      return response;
+    },
+  };
+}
 
 export function createOwnerWorkspaceGrantHandler(
   dependencies: CaseworkAuthorityDependencies =
@@ -21,6 +74,21 @@ export function createOwnerWorkspaceGrantHandler(
   return async function ownerWorkspaceGrant(
     request: Request,
   ): Promise<Response> {
+    const { observer, finish } = requestObservation();
+    const gateStarted = workspaceObservationStart(observer);
+    const gateResponse = (
+      response: Response,
+      outcome: WorkspaceObservationOutcome,
+    ) => {
+      observeWorkspaceStage(
+        observer,
+        "gate",
+        outcome,
+        response.status,
+        gateStarted,
+      );
+      return finish(response);
+    };
     const origin = request.headers.get("origin");
     const cors = corsHeaders(origin, dependencies.allowedOrigins);
     const preflight = preflightResponse(
@@ -28,48 +96,102 @@ export function createOwnerWorkspaceGrantHandler(
       "GET",
       dependencies.allowedOrigins,
     );
-    if (preflight) return preflight;
+    if (preflight) {
+      return gateResponse(
+        preflight,
+        preflight.status === 204 ? "PASS" : "DENIED",
+      );
+    }
     if (disallowedOrigin(request, dependencies.allowedOrigins)) {
-      return jsonResponse(403, { state: "CONTEXT_UNAVAILABLE" }, cors);
+      return gateResponse(
+        jsonResponse(403, { state: "CONTEXT_UNAVAILABLE" }, cors),
+        "DENIED",
+      );
     }
     const contract = validateClosedGet(
       request,
       "/functions/v1/owner-workspace-grant",
     );
     if (contract === "method") {
-      return jsonResponse(405, { state: "INVALID_REQUEST" }, cors);
+      return gateResponse(
+        jsonResponse(405, { state: "INVALID_REQUEST" }, cors),
+        "DENIED",
+      );
     }
     if (contract !== "ok") {
-      return jsonResponse(400, { state: "INVALID_REQUEST" }, cors);
+      return gateResponse(
+        jsonResponse(400, { state: "INVALID_REQUEST" }, cors),
+        "DENIED",
+      );
     }
     if (!hasBearerAuthorization(request)) {
-      return jsonResponse(401, { state: "AUTH_REQUIRED" }, cors);
+      return gateResponse(
+        jsonResponse(401, { state: "AUTH_REQUIRED" }, cors),
+        "DENIED",
+      );
     }
     if (!dependencies.runtimeAvailable) {
-      return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
+      return gateResponse(
+        jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors),
+        "UNAVAILABLE",
+      );
     }
+    observeWorkspaceStage(observer, "gate", "PASS", 0, gateStarted);
+    const authStarted = workspaceObservationStart(observer);
     let identity;
     try {
-      identity = await dependencies.resolveAuthenticatedIdentity(request);
+      identity = await dependencies.resolveAuthenticatedIdentity(
+        request,
+        observer,
+      );
     } catch {
-      return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
+      observeWorkspaceStage(observer, "auth", "UNAVAILABLE", 0, authStarted);
+      return finish(jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors));
     }
-    if (!identity) return jsonResponse(401, { state: "AUTH_REQUIRED" }, cors);
+    observeWorkspaceStage(
+      observer,
+      "auth",
+      identity ? "PASS" : "DENIED",
+      0,
+      authStarted,
+    );
+    if (!identity) {
+      return finish(jsonResponse(401, { state: "AUTH_REQUIRED" }, cors));
+    }
+    const workspaceStarted = workspaceObservationStart(observer);
     let candidate: unknown;
     try {
       candidate = await dependencies.resolveWorkspaceGrant(
         identity.userId,
         "owner",
+        observer,
       );
     } catch {
-      return jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors);
+      observeWorkspaceStage(
+        observer,
+        "workspace",
+        "UNAVAILABLE",
+        0,
+        workspaceStarted,
+      );
+      return finish(jsonResponse(503, { state: "CONTEXT_UNAVAILABLE" }, cors));
     }
+    observeWorkspaceStage(observer, "workspace", "PASS", 0, workspaceStarted);
+    const shapeStarted = workspaceObservationStart(observer);
     const grant = validateWorkspaceGrant(candidate, "owner");
     if (!grant) {
       const state = denialState(candidate);
-      return jsonResponse(denialStatus(state), { state }, cors);
+      observeWorkspaceStage(
+        observer,
+        "shape",
+        state === "CONTEXT_UNAVAILABLE" ? "INVALID_SHAPE" : "DENIED",
+        denialStatus(state),
+        shapeStarted,
+      );
+      return finish(jsonResponse(denialStatus(state), { state }, cors));
     }
-    return jsonResponse(200, {
+    observeWorkspaceStage(observer, "shape", "PASS", 200, shapeStarted);
+    return finish(jsonResponse(200, {
       schemaVersion: "laibe.owner-workspace-runtime.v1",
       state: "AUTHORIZED_OWNER_WORKSPACE",
       authenticatedUserId: identity.userId,
@@ -92,7 +214,7 @@ export function createOwnerWorkspaceGrantHandler(
         contractStatus: "UNAVAILABLE",
       },
       documents: [],
-    }, cors);
+    }, cors));
   };
 }
 

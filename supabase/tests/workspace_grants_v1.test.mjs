@@ -1,5 +1,30 @@
 import assert from "node:assert/strict";
 
+const STAGES_HEADER = "x-laibe-workspace-stages";
+const STAGE_NAMES = ["gate", "auth", "session", "workspace", "shape"];
+
+function workspaceStages(response) {
+  const header = response.headers.get(STAGES_HEADER);
+  assert.equal(typeof header, "string", "owner response carries stage summary");
+  assert.ok(header.length <= 512 && /^[\x20-\x7e]+$/.test(header));
+  const parts = header.split(";");
+  assert.equal(parts.shift(), "v1");
+  assert.equal(parts.length, 5);
+  return Object.fromEntries(parts.map((part, index) => {
+    const match =
+      /^(gate|auth|session|workspace|shape)=(NOT_REACHED|PASS|DENIED|UNAVAILABLE|HTTP_ERROR|TRANSPORT_ERROR|INVALID_JSON|INVALID_SHAPE),(0|[1-5][0-9]{2}),(0|[1-9][0-9]*)$/
+        .exec(part);
+    assert.ok(match, "closed stage grammar");
+    assert.equal(match[1], STAGE_NAMES[index]);
+    const duration = Number(match[4]);
+    assert.ok(duration <= 60000);
+    if (match[2] === "NOT_REACHED") {
+      assert.equal(`${match[3]},${match[4]}`, "0,0");
+    }
+    return [match[1], [match[2], Number(match[3]), duration]];
+  }));
+}
+
 const CASE_ID = "11111111-1111-4111-8111-111111111111";
 const USER_ID = "22222222-2222-4222-8222-222222222222";
 const CASE_TITLE = "廚房更新決策";
@@ -62,9 +87,210 @@ function dependencies(overrides = {}) {
   };
 }
 
+Deno.test("owner observability: grant denials keep the existing business response", async () => {
+  const { createOwnerWorkspaceGrantHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  for (
+    const [state, status] of [["AUTH_REQUIRED", 401], [
+      "CASE_NOT_AUTHORIZED",
+      403,
+    ], ["CASE_SELECTION_REQUIRED", 409]]
+  ) {
+    const response = await createOwnerWorkspaceGrantHandler(dependencies({
+      resolveWorkspaceGrant: () => Promise.resolve({ state }),
+    }))(request("/functions/v1/owner-workspace-grant"));
+    assert.equal(response.status, status);
+    assert.equal(await response.text(), JSON.stringify({ state }));
+    const stages = workspaceStages(response);
+    assert.deepEqual(stages.workspace.slice(0, 2), ["PASS", 0]);
+    assert.deepEqual(stages.shape.slice(0, 2), ["DENIED", status]);
+  }
+});
+
 async function readJson(response) {
   return await response.json();
 }
+
+Deno.test("owner observability: closed gate responses preserve body status and CORS", async () => {
+  const { createOwnerWorkspaceGrantHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  const cases = [
+    {
+      init: { method: "POST" },
+      status: 405,
+      state: "INVALID_REQUEST",
+      outcome: "DENIED",
+    },
+    {
+      init: { headers: { authorization: "" } },
+      status: 401,
+      state: "AUTH_REQUIRED",
+      outcome: "DENIED",
+    },
+    {
+      init: { headers: { "x-laibe-workspace-stages": "attacker" } },
+      status: 400,
+      state: "INVALID_REQUEST",
+      outcome: "DENIED",
+    },
+    {
+      init: { headers: { origin: "https://unapproved.test" } },
+      status: 403,
+      state: "CONTEXT_UNAVAILABLE",
+      outcome: "DENIED",
+    },
+    {
+      init: {},
+      runtimeAvailable: false,
+      status: 503,
+      state: "CONTEXT_UNAVAILABLE",
+      outcome: "UNAVAILABLE",
+    },
+  ];
+  for (const scenario of cases) {
+    let calls = 0;
+    const handler = createOwnerWorkspaceGrantHandler(dependencies({
+      runtimeAvailable: scenario.runtimeAvailable ?? true,
+      resolveAuthenticatedIdentity() {
+        calls++;
+        throw new Error("must not call Auth");
+      },
+    }));
+    const response = await handler(
+      request("/functions/v1/owner-workspace-grant", scenario.init),
+    );
+    assert.equal(response.status, scenario.status);
+    assert.equal(
+      await response.text(),
+      JSON.stringify({ state: scenario.state }),
+    );
+    const stages = workspaceStages(response);
+    assert.deepEqual(stages.gate.slice(0, 2), [
+      scenario.outcome,
+      scenario.status,
+    ]);
+    for (const name of STAGE_NAMES.slice(1)) {
+      assert.deepEqual(stages[name], ["NOT_REACHED", 0, 0]);
+    }
+    const headers = new Headers(response.headers);
+    headers.delete(STAGES_HEADER);
+    assert.deepEqual(Object.fromEntries(headers), {
+      "cache-control": "no-store",
+      "content-type": "application/json; charset=utf-8",
+      vary: "Origin",
+    });
+    assert.equal(calls, 0);
+  }
+  const response = await createOwnerWorkspaceGrantHandler(
+    dependencies({ allowedOrigins: ["https://approved.test"] }),
+  )(
+    request("/functions/v1/owner-workspace-grant", {
+      method: "OPTIONS",
+      headers: {
+        origin: "https://approved.test",
+        "access-control-request-method": "GET",
+      },
+    }),
+  );
+  assert.equal(response.status, 204);
+  assert.equal(await response.text(), "");
+  assert.equal(
+    response.headers.get("access-control-allow-origin"),
+    "https://approved.test",
+  );
+  assert.equal(response.headers.has("access-control-expose-headers"), false);
+  assert.deepEqual(workspaceStages(response).gate.slice(0, 2), ["PASS", 204]);
+});
+
+Deno.test("owner observability: two interleaved owners and vendor keep independent stages", async () => {
+  const { createOwnerWorkspaceGrantHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  const { createVendorWorkspaceGrantHandler } = await import(
+    "../functions/vendor-workspace-grant/index.ts"
+  );
+  let releaseFirst;
+  let firstEntered;
+  const entered = new Promise((resolve) => {
+    firstEntered = resolve;
+  });
+  const waitFirst = new Promise((resolve) => {
+    releaseFirst = resolve;
+  });
+  let identityCalls = 0;
+  let grantCalls = 0;
+  const base = dependencies({
+    async resolveAuthenticatedIdentity(_request, observer) {
+      identityCalls++;
+      if (identityCalls === 1) {
+        firstEntered();
+        await waitFirst;
+        observer?.("auth", "HTTP_ERROR", 503, 7);
+        throw new Error("synthetic private details must stay private");
+      }
+      observer?.("auth", "PASS", 200, 2);
+      observer?.("session", "PASS", 200, 3);
+      return { userId: USER_ID };
+    },
+    async resolveWorkspaceGrant(userId, role, observer) {
+      grantCalls++;
+      if (role === "pro") assert.equal(observer, undefined);
+      observer?.("workspace", "PASS", 200, 4);
+      return await dependencies().resolveWorkspaceGrant(userId, role);
+    },
+  });
+  const owner = createOwnerWorkspaceGrantHandler(base);
+  const first = owner(request("/functions/v1/owner-workspace-grant"));
+  await entered;
+  const [second, vendor] = await Promise.all([
+    owner(request("/functions/v1/owner-workspace-grant")),
+    createVendorWorkspaceGrantHandler(base)(
+      request("/functions/v1/vendor-workspace-grant"),
+    ),
+  ]);
+  releaseFirst();
+  const failed = await first;
+  assert.equal(failed.status, 503);
+  assert.equal(await failed.text(), '{"state":"CONTEXT_UNAVAILABLE"}');
+  const failedStages = workspaceStages(failed);
+  assert.deepEqual(failedStages.auth, ["HTTP_ERROR", 503, 7]);
+  for (const name of ["session", "workspace", "shape"]) {
+    assert.deepEqual(failedStages[name], ["NOT_REACHED", 0, 0]);
+  }
+  assert.equal(second.status, 200);
+  const successful = workspaceStages(second);
+  for (const name of STAGE_NAMES) assert.equal(successful[name][0], "PASS");
+  assert.equal(vendor.status, 200);
+  assert.equal(vendor.headers.has(STAGES_HEADER), false);
+  assert.equal(identityCalls, 3);
+  assert.equal(grantCalls, 2);
+  assert.doesNotMatch(
+    second.headers.get(STAGES_HEADER),
+    /private|11111111|22222222|Bearer|synthetic/,
+  );
+});
+
+Deno.test("owner observability: invalid diagnostics cannot enter the wire and durations clamp", async () => {
+  const { createOwnerWorkspaceGrantHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  const response = await createOwnerWorkspaceGrantHandler(dependencies({
+    resolveAuthenticatedIdentity(_request, observer) {
+      observer?.("auth", "untrusted-secret", 200, 1);
+      observer?.("untrusted-stage", "PASS", 200, 1);
+      observer?.("auth", "PASS", 999, -10);
+      observer?.("session", "PASS", 200, 70000);
+      return Promise.resolve({ userId: USER_ID });
+    },
+  }))(request("/functions/v1/owner-workspace-grant"));
+  assert.equal(response.status, 200);
+  const stages = workspaceStages(response);
+  assert.deepEqual(stages.auth, ["PASS", 0, 0]);
+  assert.deepEqual(stages.session, ["PASS", 200, 60000]);
+  assert.doesNotMatch(response.headers.get(STAGES_HEADER), /untrusted/);
+});
 
 Deno.test(
   "focused RED: case create and workspace grants are absent",

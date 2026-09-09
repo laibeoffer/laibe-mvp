@@ -2,6 +2,10 @@ import {
   type CaseCreateInput,
   type CaseworkAuthorityDependencies,
   type CaseworkRole,
+  observeWorkspaceStage,
+  type WorkspaceObservationOutcome,
+  workspaceObservationStart,
+  type WorkspaceStageObserver,
 } from "./contracts.ts";
 import { verifyAuthSession } from "../auth-session/verified-auth-session.ts";
 import { appendApprovedSiteOrigins } from "./site-origins.ts";
@@ -73,8 +77,15 @@ export function createSupabaseCaseworkAuthorityDependencies(
     supabaseUrl && serviceRoleKey && typeof fetchImplementation === "function",
   );
 
-  async function rpc(name: string, body: Readonly<Record<string, unknown>>) {
+  async function rpc(
+    name: string,
+    body: Readonly<Record<string, unknown>>,
+    observer?: WorkspaceStageObserver,
+  ) {
     if (!runtimeAvailable) return null;
+    const startedAt = workspaceObservationStart(observer);
+    let outcome: WorkspaceObservationOutcome = "TRANSPORT_ERROR";
+    let status = 0;
     try {
       const response = await fetchImplementation(
         `${supabaseUrl}/rest/v1/rpc/${name}`,
@@ -88,21 +99,38 @@ export function createSupabaseCaseworkAuthorityDependencies(
           body: JSON.stringify(body),
         },
       );
-      return response.ok ? await response.json() : null;
-    } catch {
+      status = response.status;
+      if (!response.ok) {
+        outcome = "HTTP_ERROR";
+        return null;
+      }
+      outcome = "INVALID_JSON";
+      const result = await response.json();
+      outcome = "PASS";
+      return result;
+    } catch (error) {
+      if (outcome === "INVALID_JSON" && !(error instanceof SyntaxError)) {
+        outcome = "TRANSPORT_ERROR";
+      }
       return null;
+    } finally {
+      observeWorkspaceStage(observer, "workspace", outcome, status, startedAt);
     }
   }
 
   return Object.freeze({
     allowedOrigins: Object.freeze([...configuredOrigins]),
     runtimeAvailable,
-    async resolveAuthenticatedIdentity(request: Request) {
+    async resolveAuthenticatedIdentity(
+      request: Request,
+      observer?: WorkspaceStageObserver,
+    ) {
       if (!runtimeAvailable) throw new Error("Auth service unavailable");
       const result = await verifyAuthSession(request, {
         supabaseUrl: supabaseUrl!,
         serviceRoleKey: serviceRoleKey!,
         fetch: fetchImplementation,
+        observer,
       });
       if (result.state === "unavailable") {
         throw new Error("Auth service unavailable");
@@ -117,13 +145,21 @@ export function createSupabaseCaseworkAuthorityDependencies(
         p_payload_sha256: input.payloadSha256,
       });
     },
-    async resolveWorkspaceGrant(userId: string, role: CaseworkRole) {
+    async resolveWorkspaceGrant(
+      userId: string,
+      role: CaseworkRole,
+      observer?: WorkspaceStageObserver,
+    ) {
       const rpcName = role === "owner"
         ? "owner_workspace_grant_v1"
         : role === "pro"
         ? "vendor_workspace_grant_v1"
         : "highest_reviewer_workspace_grant_v1";
-      return await rpc(rpcName, { p_authenticated_user_id: userId });
+      return await rpc(
+        rpcName,
+        { p_authenticated_user_id: userId },
+        role === "owner" ? observer : undefined,
+      );
     },
   });
 }

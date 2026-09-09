@@ -9,14 +9,71 @@ export type CaseCreateInput = Readonly<{
 
 export type CaseworkIdentity = Readonly<{ userId: string }>;
 
+export type WorkspaceObservationStage =
+  | "gate"
+  | "auth"
+  | "session"
+  | "workspace"
+  | "shape";
+export type WorkspaceObservationOutcome =
+  | "NOT_REACHED"
+  | "PASS"
+  | "DENIED"
+  | "UNAVAILABLE"
+  | "HTTP_ERROR"
+  | "TRANSPORT_ERROR"
+  | "INVALID_JSON"
+  | "INVALID_SHAPE";
+export type WorkspaceStageObserver = (
+  stage: WorkspaceObservationStage,
+  outcome: WorkspaceObservationOutcome,
+  status: number,
+  durationMs: number,
+) => void;
+
+export function workspaceObservationStart(
+  observer?: WorkspaceStageObserver,
+): number {
+  if (!observer) return 0;
+  try {
+    return performance.now();
+  } catch {
+    return 0;
+  }
+}
+
+export function observeWorkspaceStage(
+  observer: WorkspaceStageObserver | undefined,
+  stage: WorkspaceObservationStage,
+  outcome: WorkspaceObservationOutcome,
+  status: number,
+  startedAt: number,
+): void {
+  if (!observer) return;
+  try {
+    const elapsed = performance.now() - startedAt;
+    const duration = Number.isFinite(elapsed)
+      ? Math.min(60_000, Math.max(0, Math.floor(elapsed)))
+      : 0;
+    observer(stage, outcome, status, duration);
+  } catch {
+    // Observation must never change authorization or the response.
+  }
+}
+
 export type CaseworkAuthorityDependencies = Readonly<{
   allowedOrigins: readonly string[];
   runtimeAvailable: boolean;
   resolveAuthenticatedIdentity(
     request: Request,
+    observer?: WorkspaceStageObserver,
   ): Promise<CaseworkIdentity | null>;
   createCase(input: CaseCreateInput): Promise<unknown>;
-  resolveWorkspaceGrant(userId: string, role: CaseworkRole): Promise<unknown>;
+  resolveWorkspaceGrant(
+    userId: string,
+    role: CaseworkRole,
+    observer?: WorkspaceStageObserver,
+  ): Promise<unknown>;
 }>;
 
 export const CASEWORK_CASE_CREATE_SCHEMA =
