@@ -16,6 +16,7 @@ import {
   type WorkspaceStageObserver,
 } from "../_shared/casework-authority/contracts.ts";
 import { createSupabaseCaseworkAuthorityDependencies } from "../_shared/casework-authority/resolver.ts";
+import { withEdgeRequestBoundary } from "../_shared/http/edge-request-boundary.ts";
 
 export const VERIFY_JWT_REQUIRED = true;
 
@@ -218,6 +219,15 @@ export function createOwnerWorkspaceGrantHandler(
   };
 }
 
+export function createOwnerWorkspaceGrantRuntimeHandler(
+  dependencies?: CaseworkAuthorityDependencies,
+) {
+  return withEdgeRequestBoundary(
+    "owner-workspace-grant",
+    createOwnerWorkspaceGrantHandler(dependencies),
+  );
+}
+
 if (typeof Deno !== "undefined" && import.meta.main) {
-  Deno.serve(createOwnerWorkspaceGrantHandler());
+  Deno.serve(createOwnerWorkspaceGrantRuntimeHandler());
 }

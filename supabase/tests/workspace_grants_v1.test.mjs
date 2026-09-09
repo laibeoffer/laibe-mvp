@@ -87,6 +87,50 @@ function dependencies(overrides = {}) {
   };
 }
 
+Deno.test("owner gateway route preserves verified workspace and closed request guards", async () => {
+  const module = await import("../functions/owner-workspace-grant/index.ts");
+  const createRuntime = module.createOwnerWorkspaceGrantRuntimeHandler ??
+    module.createOwnerWorkspaceGrantHandler;
+  let identityCalls = 0;
+  const handler = createRuntime(dependencies({
+    resolveAuthenticatedIdentity: () => {
+      identityCalls++;
+      return Promise.resolve({ userId: USER_ID });
+    },
+  }));
+  const canonical = await handler(
+    request("/functions/v1/owner-workspace-grant"),
+  );
+  const gateway = await handler(request("/owner-workspace-grant"));
+  assert.equal(canonical.status, 200);
+  assert.equal(
+    gateway.status,
+    200,
+    "The deployed gateway short path must reach the same verified handler",
+  );
+  assert.equal(await canonical.text(), await gateway.text());
+  assert.equal(identityCalls, 2);
+  for (
+    const [path, init] of [
+      ["/owner-workspace-grant?", {}],
+      ["/owner-workspace-grant?caseId=guess", {}],
+      ["/owner-workspace-grant/", {}],
+      ["/vendor-workspace-grant", {}],
+      ["/owner-workspace-grant", { headers: { "content-length": "1" } }],
+      ["/owner-workspace-grant", {
+        headers: { "x-user-id": "caller-authority" },
+      }],
+    ]
+  ) {
+    assert.equal((await handler(request(path, init))).status, 400);
+  }
+  assert.equal(
+    identityCalls,
+    2,
+    "Invalid gateway requests cannot reach identity or grant checks",
+  );
+});
+
 Deno.test("owner observability: grant denials keep the existing business response", async () => {
   const { createOwnerWorkspaceGrantHandler } = await import(
     "../functions/owner-workspace-grant/index.ts"
