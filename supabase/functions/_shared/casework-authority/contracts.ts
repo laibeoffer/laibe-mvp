@@ -85,6 +85,7 @@ const IDEMPOTENCY_KEY = /^[^\s\p{C}]{16,128}$/u;
 const MAX_CASE_CREATE_BYTES = 1024;
 const APPROVED_USER_X_HEADERS = Object.freeze([
   "x-client-info",
+  "x-deno-subhost",
   "x-forwarded-for",
   "x-forwarded-host",
   "x-forwarded-port",

@@ -85,6 +85,7 @@ const CASE_CREATE_BODY = JSON.stringify({
 });
 const APPROVED_X_HEADERS = Object.freeze([
   "x-client-info",
+  "x-deno-subhost",
   "x-forwarded-for",
   "x-forwarded-host",
   "x-forwarded-port",
