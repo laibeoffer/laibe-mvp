@@ -231,9 +231,42 @@ export function createOwnerWorkspaceGrantHandler(
 export function createOwnerWorkspaceGrantRuntimeHandler(
   dependencies?: CaseworkAuthorityDependencies,
 ) {
+  const handler = createOwnerWorkspaceGrantHandler(dependencies);
+  const applicationHeaders = [
+    "authorization",
+    "apikey",
+    "origin",
+    "content-type",
+    "content-length",
+    "access-control-request-method",
+    "access-control-request-headers",
+  ];
+  const reservedAuthorityHeaders = new Set([
+    "x-user-id",
+    "x-authenticated-user-id",
+    "x-account-role",
+    "x-role",
+    "x-case-id",
+    "x-selected-case",
+    "x-calendar-id",
+    "x-arbitrary-authority",
+  ]);
   return withEdgeRequestBoundary(
     "owner-workspace-grant",
-    createOwnerWorkspaceGrantHandler(dependencies),
+    (request) => {
+      for (const name of request.headers.keys()) {
+        if (
+          name.startsWith("x-laibe-") || reservedAuthorityHeaders.has(name)
+        ) return handler(request);
+      }
+      // The business handler receives application inputs, never gateway metadata.
+      const headers = new Headers();
+      for (const name of applicationHeaders) {
+        const value = request.headers.get(name);
+        if (value !== null) headers.set(name, value);
+      }
+      return handler(new Request(request, { headers }));
+    },
   );
 }
 

@@ -188,6 +188,127 @@ Deno.test("owner gateway route preserves verified workspace and closed request g
   );
 });
 
+Deno.test("owner runtime discards gateway metadata before verified authority", async () => {
+  const { createOwnerWorkspaceGrantRuntimeHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  const incomingHeaders = {
+    authorization: "Bearer verified-user-jwt",
+    apikey: "synthetic-routing-key",
+    "content-type": "application/json",
+    "content-length": "0",
+    "x-platform-routing-id": "private-platform-canary",
+    "x-future-proxy-feature": "private-feature-canary",
+    "x-deno-subhost": "private-subhost-canary",
+    cookie: "private-cookie-canary",
+  };
+  let identityCalls = 0;
+  let grantCalls = 0;
+  const handler = createOwnerWorkspaceGrantRuntimeHandler(dependencies({
+    resolveAuthenticatedIdentity(incoming) {
+      identityCalls++;
+      assert.deepEqual(Object.fromEntries(incoming.headers), {
+        apikey: incomingHeaders.apikey,
+        authorization: incomingHeaders.authorization,
+        "content-length": "0",
+        "content-type": "application/json",
+      });
+      return Promise.resolve({ userId: USER_ID });
+    },
+    resolveWorkspaceGrant(userId, role) {
+      grantCalls++;
+      assert.equal(userId, USER_ID);
+      assert.equal(role, "owner");
+      return dependencies().resolveWorkspaceGrant(userId, role);
+    },
+  }));
+  const response = await handler(request("/owner-workspace-grant", {
+    headers: incomingHeaders,
+  }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("x-laibe-workspace-gate-reason"), "OK");
+  const body = await response.json();
+  assert.equal(body.authenticatedUserId, USER_ID);
+  assert.equal(body.currentCaseId, CASE_ID);
+  assert.equal(body.membership.role, "owner");
+  assert.equal(body.workspaceAccess.mutationAllowed, false);
+  assert.doesNotMatch(JSON.stringify([body, [...response.headers]]), /canary/);
+  assert.equal(identityCalls, 1);
+  assert.equal(grantCalls, 1);
+});
+
+Deno.test("owner runtime retains reserved authority and closed request denials", async () => {
+  const { createOwnerWorkspaceGrantRuntimeHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  let identityCalls = 0;
+  let grantCalls = 0;
+  const handler = createOwnerWorkspaceGrantRuntimeHandler(dependencies({
+    allowedOrigins: ["https://approved.test"],
+    resolveAuthenticatedIdentity() {
+      identityCalls++;
+      return Promise.resolve(null);
+    },
+    resolveWorkspaceGrant() {
+      grantCalls++;
+      return Promise.resolve(null);
+    },
+  }));
+  for (
+    const name of [
+      "x-user-id",
+      "x-role",
+      "x-case-id",
+      "x-laibe-role",
+      "x-selected-case",
+      "x-calendar-id",
+      "x-arbitrary-authority",
+      "x-authenticated-user-id",
+      "x-account-role",
+    ]
+  ) {
+    assert.equal(
+      (await handler(request("/owner-workspace-grant", {
+        headers: { [name]: "caller-authority" },
+      }))).status,
+      400,
+    );
+  }
+  for (
+    const [path, init, expected] of [
+      ["/owner-workspace-grant?caseId=guess", {}, 400],
+      ["/owner-workspace-grant", { method: "POST", body: "{}" }, 405],
+      ["/owner-workspace-grant", { headers: { "content-length": "1" } }, 400],
+      ["/owner-workspace-grant", {
+        headers: { origin: "https://unapproved.test" },
+      }, 403],
+      ["/owner-workspace-grant", { headers: { authorization: "" } }, 401],
+    ]
+  ) assert.equal((await handler(request(path, init))).status, expected);
+  assert.equal(identityCalls, 0);
+  const preflight = await handler(request("/owner-workspace-grant", {
+    method: "OPTIONS",
+    headers: {
+      origin: "https://approved.test",
+      "access-control-request-method": "GET",
+      "access-control-request-headers": "authorization,apikey",
+    },
+  }));
+  assert.equal(preflight.status, 204);
+  assert.equal(
+    preflight.headers.get("access-control-allow-origin"),
+    "https://approved.test",
+  );
+  assert.equal(
+    (await handler(request("/owner-workspace-grant", {
+      headers: { "x-future-platform-tag": "synthetic" },
+    }))).status,
+    401,
+  );
+  assert.equal(identityCalls, 1);
+  assert.equal(grantCalls, 0);
+});
+
 Deno.test("owner observability: grant denials keep the existing business response", async () => {
   const { createOwnerWorkspaceGrantHandler } = await import(
     "../functions/owner-workspace-grant/index.ts"
