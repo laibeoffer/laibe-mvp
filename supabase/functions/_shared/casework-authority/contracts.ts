@@ -212,21 +212,38 @@ function hasOnlyApprovedUserXHeaders(request: Request): boolean {
   return true;
 }
 
+export type ClosedGetReason =
+  | "OK"
+  | "METHOD"
+  | "PATH"
+  | "QUERY"
+  | "BODY"
+  | "CONTENT_LENGTH"
+  | "UNAPPROVED_X_HEADER";
+
+export function classifyClosedGet(
+  request: Request,
+  pathname: string,
+): ClosedGetReason {
+  if (request.method !== "GET") return "METHOD";
+  const url = new URL(request.url);
+  if (url.pathname !== pathname) return "PATH";
+  if (url.search.length !== 0) return "QUERY";
+  if (request.body !== null) return "BODY";
+  const contentLength = request.headers.get("content-length");
+  if (contentLength !== null && contentLength !== "0") {
+    return "CONTENT_LENGTH";
+  }
+  if (!hasOnlyApprovedUserXHeaders(request)) return "UNAPPROVED_X_HEADER";
+  return "OK";
+}
+
 export function validateClosedGet(
   request: Request,
   pathname: string,
 ): "ok" | "method" | "invalid" {
-  if (request.method !== "GET") return "method";
-  const url = new URL(request.url);
-  if (url.pathname !== pathname || url.search.length !== 0) return "invalid";
-  const contentLength = request.headers.get("content-length");
-  if (
-    request.body !== null || (contentLength !== null && contentLength !== "0")
-  ) {
-    return "invalid";
-  }
-  if (!hasOnlyApprovedUserXHeaders(request)) return "invalid";
-  return "ok";
+  const reason = classifyClosedGet(request, pathname);
+  return reason === "OK" ? "ok" : reason === "METHOD" ? "method" : "invalid";
 }
 
 async function boundedBody(request: Request): Promise<Uint8Array | null> {

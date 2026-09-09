@@ -1,5 +1,7 @@
 import {
   type CaseworkAuthorityDependencies,
+  classifyClosedGet,
+  type ClosedGetReason,
   corsHeaders,
   denialState,
   denialStatus,
@@ -8,7 +10,6 @@ import {
   jsonResponse,
   observeWorkspaceStage,
   preflightResponse,
-  validateClosedGet,
   validateWorkspaceGrant,
   type WorkspaceObservationOutcome,
   type WorkspaceObservationStage,
@@ -33,6 +34,7 @@ const OUTCOMES: readonly WorkspaceObservationOutcome[] = [
 
 function requestObservation() {
   const entries = new Map<WorkspaceObservationStage, string>();
+  let gateReason: ClosedGetReason | undefined;
   const observer: WorkspaceStageObserver = (
     stage,
     outcome,
@@ -52,8 +54,14 @@ function requestObservation() {
   };
   return {
     observer,
+    setGateReason(reason: ClosedGetReason): void {
+      gateReason = reason;
+    },
     finish(response: Response): Response {
       try {
+        if (gateReason !== undefined) {
+          response.headers.set("x-laibe-workspace-gate-reason", gateReason);
+        }
         response.headers.set(
           "x-laibe-workspace-stages",
           "v1;" + STAGES.map(
@@ -75,7 +83,7 @@ export function createOwnerWorkspaceGrantHandler(
   return async function ownerWorkspaceGrant(
     request: Request,
   ): Promise<Response> {
-    const { observer, finish } = requestObservation();
+    const { observer, finish, setGateReason } = requestObservation();
     const gateStarted = workspaceObservationStart(observer);
     const gateResponse = (
       response: Response,
@@ -109,17 +117,18 @@ export function createOwnerWorkspaceGrantHandler(
         "DENIED",
       );
     }
-    const contract = validateClosedGet(
+    const contract = classifyClosedGet(
       request,
       "/functions/v1/owner-workspace-grant",
     );
-    if (contract === "method") {
+    setGateReason(contract);
+    if (contract === "METHOD") {
       return gateResponse(
         jsonResponse(405, { state: "INVALID_REQUEST" }, cors),
         "DENIED",
       );
     }
-    if (contract !== "ok") {
+    if (contract !== "OK") {
       return gateResponse(
         jsonResponse(400, { state: "INVALID_REQUEST" }, cors),
         "DENIED",

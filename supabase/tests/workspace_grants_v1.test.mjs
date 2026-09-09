@@ -3,6 +3,56 @@ import assert from "node:assert/strict";
 const STAGES_HEADER = "x-laibe-workspace-stages";
 const STAGE_NAMES = ["gate", "auth", "session", "workspace", "shape"];
 
+Deno.test("owner gate reason identifies the closed rejection without request data", async () => {
+  const { createOwnerWorkspaceGrantHandler } = await import(
+    "../functions/owner-workspace-grant/index.ts"
+  );
+  let identityCalls = 0;
+  const handler = createOwnerWorkspaceGrantHandler(dependencies({
+    resolveAuthenticatedIdentity: () => {
+      identityCalls++;
+      return Promise.resolve({ userId: USER_ID });
+    },
+  }));
+  const path = "/functions/v1/owner-workspace-grant";
+  const bodyRequest = request(path);
+  Object.defineProperty(bodyRequest, "body", { value: {} });
+  for (
+    const [input, reason, status] of [
+      [request(path), "OK", 200],
+      [request(path, { method: "POST" }), "METHOD", 405],
+      [request("/secret-path-canary"), "PATH", 400],
+      [request(path + "?secret-query-canary=private"), "QUERY", 400],
+      [bodyRequest, "BODY", 400],
+      [
+        request(path, { headers: { "content-length": "17" } }),
+        "CONTENT_LENGTH",
+        400,
+      ],
+      [
+        request(path, {
+          headers: { "x-secret-name-canary": "secret-value-canary" },
+        }),
+        "UNAPPROVED_X_HEADER",
+        400,
+      ],
+    ]
+  ) {
+    const response = await handler(input);
+    assert.equal(response.status, status);
+    assert.equal(response.headers.get("x-laibe-workspace-gate-reason"), reason);
+    assert.doesNotMatch(
+      JSON.stringify([...response.headers]),
+      /canary|private/,
+    );
+    if (status !== 200) {
+      assert.deepEqual(await response.json(), { state: "INVALID_REQUEST" });
+      assert.equal(workspaceStages(response).auth[0], "NOT_REACHED");
+    }
+  }
+  assert.equal(identityCalls, 1);
+});
+
 function workspaceStages(response) {
   const header = response.headers.get(STAGES_HEADER);
   assert.equal(typeof header, "string", "owner response carries stage summary");
@@ -226,6 +276,7 @@ Deno.test("owner observability: closed gate responses preserve body status and C
     }
     const headers = new Headers(response.headers);
     headers.delete(STAGES_HEADER);
+    headers.delete("x-laibe-workspace-gate-reason");
     assert.deepEqual(Object.fromEntries(headers), {
       "cache-control": "no-store",
       "content-type": "application/json; charset=utf-8",

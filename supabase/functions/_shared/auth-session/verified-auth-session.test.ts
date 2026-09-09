@@ -459,6 +459,8 @@ Deno.test("owner observability: success retains exact payload headers upstream o
     );
     const headers = new Headers(response.headers);
     headers.delete(OBSERVATION_HEADER);
+    assert.equal(headers.get("x-laibe-workspace-gate-reason"), "OK");
+    headers.delete("x-laibe-workspace-gate-reason");
     assert.deepEqual(Object.fromEntries(headers), {
       "cache-control": "no-store",
       "content-type": "application/json; charset=utf-8",
