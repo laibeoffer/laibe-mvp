@@ -1,5 +1,114 @@
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+
+export const HIGHEST_REVIEWER_GOVERNANCE_SCHEMA =
+  "laibe.drs-highest-reviewer-governance.v1";
+export type HighestReviewerErrorState =
+  | "INVALID_REQUEST"
+  | "AUTH_REQUIRED"
+  | "GOVERNANCE_OWNER_NOT_AUTHORIZED"
+  | "REVIEWER_QUALIFICATION_CONFLICT"
+  | "HIGHEST_REVIEWER_GRANT_CONFLICT"
+  | "LEGACY_GRANT_RECONCILIATION_REQUIRED"
+  | "IDEMPOTENCY_CONFLICT"
+  | "TEMPORARILY_UNAVAILABLE";
+export type HighestReviewerCursor = Readonly<
+  { sortKey: string; candidateKey: string }
+>;
+export type HighestReviewerCandidatesRequest = Readonly<
+  { cursor: HighestReviewerCursor | null }
+>;
+export type HighestReviewerDecisionRequest = Readonly<{
+  subject: Readonly<
+    {
+      authBindingId: string | null;
+      bindingVersion: number | null;
+      grantId: string | null;
+      expectedGrantVersion: number | null;
+    }
+  >;
+  decision: "grant" | "revoke";
+  reason: string;
+  idempotencyKey: string;
+}>;
+export type HighestReviewerSubject = Readonly<
+  {
+    authBindingId: string;
+    bindingVersion: number;
+    grantId: string | null;
+    grantVersion: number | null;
+  }
+>;
+export type HighestReviewerCandidate =
+  | Readonly<{
+    candidateKey: string;
+    displayName: string | null;
+    accountEmail: string | null;
+    subject: HighestReviewerSubject;
+    qualification: Readonly<
+      {
+        state: "active" | "inactive" | "expired" | "revoked";
+        validUntil: string | null;
+      }
+    >;
+    governanceGrant: Readonly<
+      {
+        state: "never_granted" | "active" | "expired" | "revoked";
+        validUntil: string | null;
+      }
+    >;
+    effectiveHighestReviewer: boolean;
+    availableAction: "grant" | "revoke" | null;
+  }>
+  | Readonly<{
+    candidateKey: string;
+    displayName: null;
+    accountEmail: null;
+    subject: Readonly<
+      {
+        authBindingId: null;
+        bindingVersion: null;
+        grantId: string;
+        grantVersion: number;
+      }
+    >;
+    qualification: Readonly<{ state: "unresolved"; validUntil: null }>;
+    governanceGrant: Readonly<
+      { state: "legacy_identity_unresolved"; validUntil: null }
+    >;
+    effectiveHighestReviewer: false;
+    availableAction: "reconciliation_required";
+  }>;
+export type HighestReviewerCandidatesResponse = Readonly<{
+  schemaVersion: typeof HIGHEST_REVIEWER_GOVERNANCE_SCHEMA;
+  state: "HIGHEST_REVIEWER_CANDIDATES_READY" | "NO_ELIGIBLE_REVIEWERS";
+  candidates: readonly HighestReviewerCandidate[];
+  nextCursor: HighestReviewerCursor | null;
+}>;
+export type HighestReviewerDecisionResponse = Readonly<{
+  schemaVersion: typeof HIGHEST_REVIEWER_GOVERNANCE_SCHEMA;
+  state: "HIGHEST_REVIEWER_GRANTED" | "HIGHEST_REVIEWER_REVOKED";
+  subject: Readonly<
+    {
+      authBindingId: string;
+      bindingVersion: number;
+      grantId: string;
+      grantVersion: number;
+    }
+  >;
+  decision: Readonly<
+    { decisionId: string; outcome: "grant" | "revoke"; decidedAt: string }
+  >;
+  governanceGrant: Readonly<
+    { state: "active" | "revoked"; validUntil: string }
+  >;
+  caseAccessChanged: false;
+  replayed: boolean;
+}>;
+export type HighestReviewerErrorResponse = Readonly<{
+  schemaVersion: typeof HIGHEST_REVIEWER_GOVERNANCE_SCHEMA;
+  state: HighestReviewerErrorState;
+}>;
 const RFC3339_PATTERN =
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?(?:Z|[+-]\d{2}:\d{2})$/u;
 
