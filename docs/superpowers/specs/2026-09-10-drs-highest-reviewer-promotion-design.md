@@ -1,6 +1,6 @@
 # DRS 最高審查官升任與治理權限設計
 
-**狀態：** 口頭方向已確認；書面規格待 Human review，尚未進入實作
+**狀態：** Human 已於 2026-09-10 確認書面規格；尚未進入實作
 
 **日期：** 2026-09-10
 
@@ -260,7 +260,7 @@ owner authorization RPC 必須同時鎖定並驗證 `auth.sessions`、`auth.user
 - 回傳固定 schema version、有限狀態碼及 sanitized DTO。
 - 不在 log、response 或 audit payload 輸出 bearer token、密碼、secret 或完整 provider payload。
 
-登入後，治理頁同時呼叫既有 registration-authority endpoint 與新的 candidates endpoint。前者獨立回答 `canReviewRegistrations`，後者只有 owner 才會成功並等價回答 `canManageHighestReviewers`。任一能力成立就顯示其對應區塊；兩者皆不成立才顯示沒有治理權限。前端不得用其中一種能力替代另一種。
+既有 registration-authority endpoint 只回答全站是否已配置註冊審核窗口，維持未登入也可讀取的 public availability 語意，不能被重新解讀成目前使用者的 capability。登入後，治理頁以受保護的 queue request 判定 `canReviewRegistrations`，並以新的 candidates request 判定 `canManageHighestReviewers`。任一能力成立就顯示其對應區塊；兩者皆不成立才顯示沒有治理權限。前端不得用 public configuration 或其中一種 capability 替代另一種。
 
 ### 6.2 Sites route
 
