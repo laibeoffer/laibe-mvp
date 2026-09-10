@@ -46,6 +46,28 @@ const GROUP_ID = "C0123456789abcdef0123456789abcdef";
 const USER_ID = "U0123456789abcdef0123456789abcdef";
 const EVENT_ID = "01HZZZZZZZZZZZZZZZZZZZZZZZ";
 const REVIEW_EVENT_ID = "00000000-0000-4000-8000-000000000001";
+const publicLineEntrypoints = [
+  {
+    slug: "drs-line-case-group-binding-start",
+    createName: "createCaseGroupBindingStartHandler",
+    verifyJwt: true,
+  },
+  {
+    slug: "drs-line-review-notification-enqueue",
+    createName: "createReviewNotificationEnqueueHandler",
+    verifyJwt: false,
+  },
+  {
+    slug: "drs-line-review-notification-dispatch",
+    createName: "createReviewNotificationDispatchHandler",
+    verifyJwt: true,
+  },
+  {
+    slug: "drs-line-webhook",
+    createName: "createCanonicalLineWebhookHandler",
+    verifyJwt: false,
+  },
+];
 
 test("all bounded LINE case-group runtime artifacts exist", () => {
   for (const path of expectedFiles) {
@@ -500,12 +522,160 @@ test("canonical LINE webhook routes unchanged signed bytes by provider source ty
   assert.equal(seen.length, 0);
 });
 
-test("canonical drs-line-webhook entrypoint owns both validated provider routes", () => {
-  const source = readFileSync(expectedFiles.at(-1), "utf8");
-  assert.match(source, /createCanonicalLineWebhookHandler/u);
-  assert.match(source, /createLineWebhookHandler/u);
-  assert.match(source, /createCaseGroupWebhookHandler/u);
-  assert.match(source, /VERIFY_JWT_REQUIRED\s*=\s*false/u);
+test("all public LINE entrypoints compose their exact gateway boundary and preserve JWT flags", () => {
+  for (const entrypoint of publicLineEntrypoints) {
+    const source = readFileSync(
+      new URL(`supabase/functions/${entrypoint.slug}/index.ts`, root),
+      "utf8",
+    );
+    assert.match(source, /withEdgeRequestBoundary/u, entrypoint.slug);
+    assert.match(
+      source,
+      new RegExp(
+        `handler\\s*=\\s*withEdgeRequestBoundary\\(\\s*"${entrypoint.slug}"\\s*,\\s*${entrypoint.createName}\\(`,
+        "u",
+      ),
+      entrypoint.slug,
+    );
+    assert.match(
+      source,
+      new RegExp(
+        `VERIFY_JWT_REQUIRED\\s*=\\s*${entrypoint.verifyJwt}`,
+        "u",
+      ),
+      entrypoint.slug,
+    );
+  }
+});
+
+test("canonical boundary accepts gateway and public paths without changing signed bytes", async () => {
+  const { withEdgeRequestBoundary } = await import(
+    new URL(
+      "supabase/functions/_shared/http/edge-request-boundary.ts",
+      root,
+    ).href
+  );
+  const { createCanonicalLineWebhookHandler } = await import(
+    new URL("canonical-webhook.ts", shared).href
+  );
+  const seen = [];
+  const handler = withEdgeRequestBoundary(
+    "drs-line-webhook",
+    createCanonicalLineWebhookHandler({
+      accountLinkHandler: async (request) => {
+        seen.push({
+          path: new URL(request.url).pathname,
+          signature: request.headers.get("x-line-signature"),
+          body: new Uint8Array(await request.arrayBuffer()),
+        });
+        return new Response(null, { status: 200 });
+      },
+      caseGroupHandler: () => {
+        throw new Error("empty events must not reach the case-group handler");
+      },
+    }),
+  );
+  const rawBody = new TextEncoder().encode(
+    ` {"destination":"${USER_ID}","events":[]}\r\n`,
+  );
+
+  for (
+    const path of [
+      "/drs-line-webhook",
+      "/functions/v1/drs-line-webhook",
+    ]
+  ) {
+    const response = await handler(
+      new Request(`https://api.example.invalid${path}`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-line-signature": "signed-exact-raw-bytes",
+        },
+        body: Uint8Array.from(rawBody),
+      }),
+    );
+    assert.equal(response.status, 200);
+  }
+
+  assert.equal(seen.length, 2);
+  for (const request of seen) {
+    assert.equal(request.path, "/functions/v1/drs-line-webhook");
+    assert.equal(request.signature, "signed-exact-raw-bytes");
+    assert.deepEqual(request.body, rawBody);
+  }
+});
+
+test("all public LINE boundaries reject lookalike paths before downstream effects", async () => {
+  const { withEdgeRequestBoundary } = await import(
+    new URL(
+      "supabase/functions/_shared/http/edge-request-boundary.ts",
+      root,
+    ).href
+  );
+  let effects = 0;
+  const downstream = () => {
+    effects += 1;
+    return new Response(null, { status: 200 });
+  };
+  for (const entrypoint of publicLineEntrypoints) {
+    const handler = withEdgeRequestBoundary(entrypoint.slug, downstream);
+    const rejected = [
+      `/${entrypoint.slug}?unexpected=1`,
+      `/${entrypoint.slug}/`,
+      `/${entrypoint.slug}/child`,
+      "/another-function",
+    ];
+    for (const path of rejected) {
+      const response = await handler(
+        new Request(`https://api.example.invalid${path}`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-line-signature": "signed-but-wrong-path",
+          },
+          body: `{"destination":"${USER_ID}","events":[]}`,
+        }),
+      );
+      assert.equal(response.status, 400, `${entrypoint.slug}:${path}`);
+      assert.equal(
+        response.headers.get("cache-control"),
+        "no-store",
+        `${entrypoint.slug}:${path}`,
+      );
+    }
+  }
+  assert.equal(effects, 0);
+});
+
+test("all public LINE exported handlers treat gateway and canonical paths identically", async () => {
+  for (const entrypoint of publicLineEntrypoints) {
+    const { handler } = await import(
+      new URL(`supabase/functions/${entrypoint.slug}/index.ts`, root).href
+    );
+    const outcomes = [];
+    for (
+      const path of [
+        `/${entrypoint.slug}`,
+        `/functions/v1/${entrypoint.slug}`,
+      ]
+    ) {
+      const response = await handler(
+        new Request(`https://api.example.invalid${path}`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: `{"destination":"${USER_ID}","events":[]}`,
+        }),
+      );
+      outcomes.push({ status: response.status, body: await response.text() });
+    }
+    assert.deepEqual(outcomes[0], outcomes[1], entrypoint.slug);
+    assert.notEqual(
+      outcomes[0].body,
+      '{"state":"INVALID_REQUEST"}',
+      entrypoint.slug,
+    );
+  }
 });
 
 test("webhook rejects an invalid signature before parsing or persistence", async () => {
