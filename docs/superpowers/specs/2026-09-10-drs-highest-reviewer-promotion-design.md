@@ -159,10 +159,10 @@
 以依序執行的 forward-only migrations 擴充 `drs_forward_private.reviewer_registration_operation_grants`，不修改既有 migration：
 
 1. **Expand migration**：只新增 nullable 的 `specialist_id uuid`、`auth_binding_id uuid` 與 `auth_binding_version bigint`，以及 `legacy_identity_unresolved boolean not null default false`；此階段尚不驗證 two-shape constraint，也不建立依賴完整 identity 的 runtime RPC。
-2. **Row-explicit reconciliation migration（僅在 legacy rows 非空時）**：deployment preflight 必須檢查全部 active、revoked 與已逾期 rows，逐一列出每個 `grant_id`。可以證明歷史 reviewer binding 的列補齊三欄並維持 `legacy_identity_unresolved=false`；無法證明的列必須明確撤銷、版本加一、append audit，並設為 `legacy_identity_unresolved=true`。不得自動猜測 Email、使用 generic update、靜默補綁或丟棄歷史列。
+2. **Reconciliation gate migration**：此檔永遠在 expand 與 enforce 之間建立。deployment preflight 必須檢查全部 active、revoked 與已逾期 rows；若表為空，此 migration 只留下 zero-legacy assertion 並安全 no-op。若存在 legacy rows，部署前必須把此檔改成逐一列出每個 `grant_id` 的 row-explicit reconciliation：可以證明歷史 reviewer binding 的列補齊三欄並維持 `legacy_identity_unresolved=false`；無法證明的列必須明確撤銷、版本加一、append audit，並設為 `legacy_identity_unresolved=true`。不得自動猜測 Email、使用 generic update、靜默補綁或丟棄歷史列。
 3. **Enforce migration**：只有在所有 rows 已經是 resolved 或 audited unresolved 形狀後，才驗證 two-shape constraint、替換 runtime actor check，並建立 owner trust root、decision ledger 與兩個原子 RPC。
 
-三個 migration 的順序不可顛倒。若 deployment preflight 顯示表為空，可以省略 reconciliation，但仍須先 expand 再 enforce。若存在 legacy row，expand、row-explicit reconciliation 與 enforce 必須先形成同一份受審候選，再由受核准 migration authority 依序套用；不得先部署 expand 後把 remote 留在無 constraint 的半完成狀態。
+三個 migration 必須依序建立為 expand → reconciliation gate → enforce，順序不可顛倒。若 deployment preflight 顯示表為空，中間 migration 以 zero-legacy assertion no-op；若存在 legacy row，expand、row-explicit reconciliation 與 enforce 必須先形成同一份受審候選，再由受核准 migration authority 依序套用。不得先部署 expand 後把 remote 留在無 constraint 的半完成狀態。
 
 - 三個 identity 欄位在 physical schema 保持 nullable，但 validated check constraint 只允許兩種形狀：`legacy_identity_unresolved=false` 且三欄全部非 null；或 `legacy_identity_unresolved=true`、status 為 revoked、revoked_at 非 null 且三欄全部為 null。
 - 新增／更新 grant 的一般 RPC 永遠不能把 `legacy_identity_unresolved` 設為 true，也不能 grant/regrant 尚未解析的 row；所有 runtime authority query 都拒絕此旗標。未解析狀態本身不能形成 authority，但受核准的資料庫 reconciliation 可以在日後取得可證明 binding 時，更新同一 row 為完整 identity、設回 false、版本加一並 append audit。如此保留既有 unique identity 與歷史，不永久封鎖該 actor。
@@ -438,7 +438,7 @@ Sites 新增同名 BFF route，只負責：
 
 實作階段另開一份 execution plan，依 `ONE_FILE = ONE_WRITER` 分成：
 
-1. **Core data/auth slice**：expand migration、必要時的 row-explicit reconciliation、enforce migration、real-PG tests、actor check 與原子 RPC。
+1. **Core data/auth slice**：expand migration、reconciliation gate（必要時填入 row-explicit reconciliation）、enforce migration、real-PG tests、actor check 與原子 RPC。
 2. **Core Edge slice**：owner verifier、candidates/decision handlers 與 unit tests。
 3. **Sites governance slice**：BFF routes、`/pcm/governance/` UI、產品狀態與 scoped tests。
 4. **Integration/acceptance slice**：遠端 migration/function deploy、受核准的初始 owner grant provision、真實帳號旅程及 canonical desktop/mobile 驗收。
