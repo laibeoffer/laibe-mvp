@@ -102,3 +102,9 @@ verify_jwt = false
 
 [functions.drs-reviewer-registration-applications]
 verify_jwt = true
+
+[functions.drs-highest-reviewer-candidates]
+verify_jwt = true
+
+[functions.drs-highest-reviewer-role-decision]
+verify_jwt = true

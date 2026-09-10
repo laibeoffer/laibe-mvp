@@ -23,6 +23,9 @@ const guardedRoutes = Object.freeze([
 ]);
 
 const expectedFunctionConfig = Object.freeze({
+  "drs-highest-reviewer-candidates": true,
+  "drs-highest-reviewer-role-decision": true,
+  "drs-reviewer-registration-authority": false,
   "drs-reviewer-registration-applications": true,
   "drs-reviewer-registration-queue": true,
   "drs-reviewer-registration-decision": true,
@@ -69,8 +72,8 @@ function assertExactFunctionConfig(config) {
       return [name.slice("functions.".length), body.endsWith("true")];
     });
   const map = Object.fromEntries(functionEntries);
-  assert.equal(functionEntries.length, 30);
-  assert.equal(Object.keys(map).length, 30);
+  assert.equal(functionEntries.length, 33);
+  assert.equal(Object.keys(map).length, 33);
   assert.deepEqual(map, expectedFunctionConfig);
   return tables;
 }
@@ -101,7 +104,7 @@ test("all five composed routes guard before server authority or provider work", 
   }
 });
 
-test("final shared config has the exact 30 function entries and private buckets", async () => {
+test("final shared config has the exact 33 function entries and private buckets", async () => {
   const config = await source("supabase/config.toml");
   const tables = assertExactFunctionConfig(config);
 
@@ -192,6 +195,18 @@ test("LINE boundary docs describe intentional non-user-JWT BFF proof and bounded
   );
 });
 
+test("highest-reviewer entrypoints delegate each exact operation to the shared handler", async () => {
+  for (const operation of ["candidates", "role-decision"]) {
+    const route = await source(`supabase/functions/drs-highest-reviewer-${operation}/index.ts`);
+    assert.match(route, /import\s*\{\s*createHighestReviewerGovernanceHandler\s*\}\s*from\s*"\.\.\/_shared\/highest-reviewer-governance\/handler\.ts";/u);
+    assert.match(route, /export const VERIFY_JWT_REQUIRED = true;/u);
+    assert.match(route, new RegExp(`export const handler = createHighestReviewerGovernanceHandler\\("${operation}"\\);`, "u"));
+    assert.equal([...route.matchAll(/createHighestReviewerGovernanceHandler\(/gu)].length, 1);
+    assert.match(route, /if \(import\.meta\.main\) Deno\.serve\(handler\);/u);
+    assert.doesNotMatch(route, /fetch\(|\.rpc\(|user_metadata|raw_user_meta_data|ownerId|actorUserId/u);
+  }
+});
+
 test("P1 JWT handlers close caller authority before service work", async () => {
   for (
     const [relativePath, backendMarker] of [
@@ -212,7 +227,7 @@ test("P1 JWT handlers close caller authority before service work", async () => {
   ) {
     const route = await source(relativePath);
     assert.match(route, /VERIFY_JWT_REQUIRED = true/u);
-    const identity = route.indexOf("resolveAuthenticatedIdentity(request)");
+    const identity = route.search(/await\s+dependencies\.resolveAuthenticatedIdentity\(\s*request\s*(?:,\s*observer\s*)?,?\s*\)/u);
     const backend = route.indexOf(backendMarker);
     assert.notEqual(identity, -1, relativePath);
     assert.notEqual(backend, -1, relativePath);
@@ -246,7 +261,7 @@ test("DRS workspace remains POST exact-empty and projects only fresh guard autho
 test("accepted BFF contracts and excluded Calendar callback stay byte-identical", async () => {
   assert.equal(
     await sha256("supabase/functions/_shared/drs-auth/contracts.ts"),
-    "694c1ce13d7d99996353ff7e9aa1143a5565a908b27f9347f5080301d112f26e",
+    "fe4ef40a064a9d922eb8682ef86324ebd6170b8c5a3959a387d8b69f6b030a12",
   );
   assert.equal(
     await sha256(
