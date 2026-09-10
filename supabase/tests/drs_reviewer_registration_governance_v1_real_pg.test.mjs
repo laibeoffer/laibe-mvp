@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile, realpath } from "node:fs/promises";
 import { spawn, spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { basename, isAbsolute, resolve } from "node:path";
 import test from "node:test";
 
 const psql = process.env.DRS_AUTH_S5_PSQL,
@@ -14,28 +14,24 @@ const quote = (x) =>
   x === null ? "null" : "'" + String(x).replaceAll("'", "''") + "'";
 test(
   "S5 real PostgreSQL operation authority, identity atomicity, audit, lock expiry and concurrency",
-  { skip: !psql || !port || !enabled ? "REAL_PG_PENDING" : false },
-  async () => {
-    assert.equal(
-      await realpath(psql),
-      await realpath(
-        fileURLToPath(
-          new URL(
-            "../../.codex-auth-r2/postgresql/bin/psql.exe",
-            import.meta.url,
-          ),
-        ),
-      ),
-    );
-    assert.match(port, /^\d{4,5}$/u);
+  { timeout: 180000 },
+  async (t) => {
+    assert.equal(enabled, true, "Explicit disposable permission is required");
+    assert.ok(psql && isAbsolute(psql), "Explicit absolute psql path is required");
+    assert.match(basename(psql), /^psql(?:\.exe)?$/iu);
+    assert.equal((await realpath(psql)).toLowerCase(), resolve(psql).toLowerCase());
+    assert.equal(port, "55449", "Only the task-owned governance listener is allowed");
     const args = [
       "--host=127.0.0.1",
       "--port=" + port,
+      "--username=postgres",
       "--dbname=" + database,
+      "--no-password",
       "--no-psqlrc",
       "--set=ON_ERROR_STOP=1",
       "--quiet",
       "--tuples-only",
+      "--no-align",
     ];
     const execute = (sql) =>
       spawnSync(psql, args, {
@@ -51,6 +47,14 @@ test(
       return r.stdout.trim();
     };
     const json = (sql) => JSON.parse(query(sql));
+    const marker = "drs-registration-governance-task4-disposable";
+    const markerGuard = `do $guard$ begin if current_database()<>${quote(database)} or
+      (select shobj_description(oid,'pg_database') from pg_database where datname=current_database()) is distinct from ${quote(marker)}
+      then raise exception 'DISPOSABLE_MARKER_REQUIRED'; end if; end $guard$;`;
+    const roles = ["anon", "authenticated", "service_role"];
+    const existingRoles = json("select coalesce(jsonb_agg(rolname),'[]'::jsonb) from pg_roles where rolname in ('anon','authenticated','service_role')");
+    const createdRoles = roles.filter((role) => !existingRoles.includes(role));
+    let owned = false;
     const migration = await readFile(
       new URL(
         "../migrations/20260908091859_drs_reviewer_registration_governance_v1.sql",
@@ -65,10 +69,24 @@ test(
       ),
       "utf8",
     );
+    const highestMigrations = await Promise.all([
+      "20260910055954_drs_highest_reviewer_identity_expand_v1.sql",
+      "20260910055957_drs_highest_reviewer_legacy_reconciliation_v1.sql",
+      "20260910055959_drs_highest_reviewer_promotion_enforce_v1.sql",
+    ].map((name) => readFile(new URL("../migrations/" + name, import.meta.url), "utf8")));
+    try {
+    assert.equal(query("select current_database()"), database);
+    const previousMarker = query("select coalesce(shobj_description(oid,'pg_database'),'') from pg_database where datname=current_database()");
+    assert.ok(previousMarker === "" || previousMarker === marker);
+    assert.equal(query("select count(*) from pg_namespace where nspname in ('auth','drs_forward_private','casework','extensions')"), "0", "Empty task fixture schemas required");
+    assert.equal(query("select (select count(*) from pg_class where relnamespace='public'::regnamespace)+(select count(*) from pg_proc where pronamespace='public'::regnamespace)"), "0", "Empty public schema required");
+    query(`comment on database ${database} is ${quote(marker)}`);
+    owned = true;
     query(
       "do $guard$ begin if current_database()<>" + quote(database) +
         " or exists(select 1 from pg_namespace where nspname='auth') then raise exception 'Empty disposable target required';end if;end;$guard$;" +
-        "create role anon nologin;create role authenticated nologin;create role service_role nologin;" +
+        createdRoles.map((role) => `create role ${role} nologin;`).join("") +
+        "grant usage on schema public to public;create schema extensions;create extension pgcrypto with schema extensions;" +
         "create schema auth;create schema drs_forward_private;create schema casework;" +
         "create table auth.users(id uuid primary key,email varchar(255),email_confirmed_at timestamptz,deleted_at timestamptz,banned_until timestamptz);" +
         "create table auth.sessions(id uuid primary key,user_id uuid not null references auth.users(id),not_after timestamptz);" +
@@ -76,7 +94,7 @@ test(
         "create table drs_forward_private.auth_specialist_bindings(auth_binding_id uuid primary key,authenticated_user_id uuid not null references auth.users(id) on delete restrict,specialist_id uuid not null references drs_forward_private.specialists(specialist_id) on delete restrict,binding_status text not null default 'active' check(binding_status in ('active','revoked')),binding_version bigint not null default 1 check(binding_version>=1),valid_from timestamptz not null default clock_timestamp(),valid_until timestamptz not null,revoked_at timestamptz,created_at timestamptz not null default clock_timestamp(),updated_at timestamptz not null default clock_timestamp(),unique(authenticated_user_id,specialist_id,auth_binding_id),check(valid_until>valid_from and (revoked_at is null or revoked_at>=valid_from) and ((binding_status='active' and revoked_at is null) or binding_status='revoked')));" +
         "create table casework.case_members(id integer);create table drs_forward_private.case_mappings(id integer);create table drs_forward_private.reviewer_case_authorities(id integer);create table drs_forward_private.server_sessions(id integer);" +
         "insert into casework.case_members values(1);insert into drs_forward_private.case_mappings values(1);insert into drs_forward_private.reviewer_case_authorities values(1);insert into drs_forward_private.server_sessions values(1);" +
-        selfMigration + migration,
+        selfMigration + migration + highestMigrations.join("\n"),
     );
     let sequence = 1, checks = 0;
     const check = (actual, expected, label) => {
@@ -88,14 +106,19 @@ test(
     function actor(grant = true) {
       const user = id(sequence++),
         session = id(sequence++),
-        grantId = id(sequence++);
+        grantId = id(sequence++),
+        specialist = id(sequence++),
+        binding = id(sequence++);
       query(
         "insert into auth.users(id,email,email_confirmed_at) values(" +
           quote(user) +
           ",'operator@example.invalid',clock_timestamp());insert into auth.sessions(id,user_id) values(" +
           quote(session) + "," + quote(user) + ");" +
           (grant
-            ? "insert into drs_forward_private.reviewer_registration_operation_grants(grant_id,actor_user_id,operation,scope,status,valid_from,valid_until,granted_by,authority_basis) values(" +
+            ? `insert into drs_forward_private.specialists(specialist_id) values(${quote(specialist)});
+              insert into drs_forward_private.auth_specialist_bindings(auth_binding_id,authenticated_user_id,specialist_id,valid_from,valid_until)
+              values(${quote(binding)},${quote(user)},${quote(specialist)},clock_timestamp()-interval '1 day',clock_timestamp()+interval '1 day');` +
+              "insert into drs_forward_private.reviewer_registration_operation_grants(grant_id,actor_user_id,operation,scope,status,valid_from,valid_until,granted_by,authority_basis,specialist_id,auth_binding_id,auth_binding_version) values(" +
               [
                 grantId,
                 user,
@@ -104,10 +127,10 @@ test(
                 "active",
               ].map(quote).join(",") +
               ",clock_timestamp()-interval '1 day',clock_timestamp()+interval '1 day'," +
-              quote(user) + ",'synthetic controlled fixture');"
+              quote(user) + ",'synthetic controlled fixture'," + quote(specialist) + "," + quote(binding) + ",1);"
             : ""),
       );
-      return { user, session, grantId };
+      return { user, session, grantId, specialist, binding };
     }
     function application(user = null) {
       if (!user) {
@@ -159,6 +182,11 @@ test(
       json(
         "select jsonb_build_object('specialists',(select count(*) from drs_forward_private.specialists),'bindings',(select count(*) from drs_forward_private.auth_specialist_bindings),'decisions',(select count(*) from drs_forward_private.reviewer_registration_decisions));",
       );
+    const snapshotSql = "select jsonb_build_object(" + [
+      "reviewer_registration_operation_grants", "operation_grant_events", "reviewer_registration_decisions",
+      "governance_owner_grants", "governance_owner_grant_events", "highest_reviewer_role_decisions",
+      "specialists", "auth_specialist_bindings", "reviewer_self_applications",
+    ].map((table) => `${quote(table)},(select coalesce(jsonb_agg(to_jsonb(r) order by to_jsonb(r)::text),'[]'::jsonb) from drs_forward_private.${table} r)`).join(",") + ")";
     const appState = (b) =>
       json(
         "select jsonb_build_object('status',status,'version',version) from drs_forward_private.reviewer_self_applications where application_id=" +
@@ -168,6 +196,25 @@ test(
       "select (select count(*) from casework.case_members),(select count(*) from drs_forward_private.case_mappings),(select count(*) from drs_forward_private.reviewer_case_authorities),(select count(*) from drs_forward_private.server_sessions);",
     );
     const noGrant = actor(false), admin = actor(), applicant = application();
+    await t.test("reviewer-first invalidations reject both queue and decisions before any write", () => {
+      const changes = [
+        ["Auth deletion", `update auth.users set deleted_at=clock_timestamp() where id=${quote(admin.user)}`, "AUTH_REQUIRED"],
+        ["Auth suspension", `update auth.users set banned_until=clock_timestamp()+interval '1 day' where id=${quote(admin.user)}`, "AUTH_REQUIRED"],
+        ["Email confirmation lost", `update auth.users set email_confirmed_at=null where id=${quote(admin.user)}`, "AUTH_REQUIRED"],
+        ["specialist inactive", `update drs_forward_private.specialists set specialist_status='suspended' where specialist_id=${quote(admin.specialist)}`, "REGISTRATION_OPERATION_NOT_AUTHORIZED"],
+        ["binding revoked", `update drs_forward_private.auth_specialist_bindings set binding_status='revoked',revoked_at=clock_timestamp() where auth_binding_id=${quote(admin.binding)}`, "REGISTRATION_OPERATION_NOT_AUTHORIZED"],
+        ["binding expired", `update drs_forward_private.auth_specialist_bindings set valid_until=clock_timestamp()-interval '1 second' where auth_binding_id=${quote(admin.binding)}`, "REGISTRATION_OPERATION_NOT_AUTHORIZED"],
+        ["binding version replaced", `update drs_forward_private.auth_specialist_bindings set binding_version=binding_version+1 where auth_binding_id=${quote(admin.binding)}`, "REGISTRATION_OPERATION_NOT_AUTHORIZED"],
+        ["unresolved legacy", `update drs_forward_private.reviewer_registration_operation_grants set status='revoked',revoked_at=clock_timestamp(),specialist_id=null,auth_binding_id=null,auth_binding_version=null,legacy_identity_unresolved=true,version=version+1 where grant_id=${quote(admin.grantId)}`, "REGISTRATION_OPERATION_NOT_AUTHORIZED"],
+      ];
+      const queueSql = "set role service_role;select public.drs_reviewer_registration_queue_v1(" + [admin.user, admin.session, future(), null, null].map(quote).join(",") + ");reset role;";
+      for (const [label, change, expected] of changes) for (const command of [queueSql, decisionSql(admin, applicant)]) {
+        const rows = query(`begin;${change};${snapshotSql};${command}${snapshotSql};rollback;`).split(/\r?\n/u).filter(Boolean).map((row) => JSON.parse(row));
+        check(rows.length, 3, label + " snapshots captured before rollback");
+        check(rows[1].state, expected, label + " denies queue and decision");
+        check(rows[2], rows[0], label + " rejection causes no transient writes");
+      }
+    });
     check(
       queue(noGrant).state,
       "REGISTRATION_OPERATION_NOT_AUTHORIZED",
@@ -180,7 +227,7 @@ test(
     );
     check(
       counts(),
-      { specialists: 0, bindings: 0, decisions: 0 },
+      { specialists: 1, bindings: 1, decisions: 0 },
       "No grant causes zero writes",
     );
     check(
@@ -225,7 +272,7 @@ test(
     );
     check(
       counts(),
-      { specialists: 1, bindings: 1, decisions: 1 },
+      { specialists: 2, bindings: 2, decisions: 1 },
       "Replay creates no extra identity",
     );
     const rejected = application();
@@ -635,5 +682,14 @@ test(
         realSupabaseAuth: false,
       }),
     );
+    } finally {
+      if (owned) {
+        query(markerGuard + "drop schema if exists drs_forward_private cascade;drop schema if exists auth cascade;drop schema if exists casework cascade;drop schema public cascade;create schema public;grant usage on schema public to public;drop extension if exists pgcrypto;drop schema if exists extensions;" + createdRoles.map((role) => `drop role if exists ${role};`).join(""));
+        assert.equal(query("select count(*) from pg_namespace where nspname in ('auth','drs_forward_private','casework','extensions')"), "0");
+        assert.equal(query("select (select count(*) from pg_class where relnamespace='public'::regnamespace)+(select count(*) from pg_proc where pronamespace='public'::regnamespace)"), "0");
+        assert.equal(query("select count(*) from pg_roles where rolname=any(array[" + createdRoles.map(quote).join(",") + "]::text[])"), "0");
+        t.diagnostic("GOVERNANCE_FIXTURE_CLEANUP_CONFIRMED");
+      }
+    }
   },
 );

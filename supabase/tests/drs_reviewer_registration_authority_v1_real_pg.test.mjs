@@ -1,28 +1,46 @@
 import assert from "node:assert/strict";
 import { readFile, realpath } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
-import { fileURLToPath } from "node:url";
+import { basename, isAbsolute, resolve } from "node:path";
 import test from "node:test";
 
 const database = "laibe_registration_authority_disposable";
 const port = process.env.DRS_REGISTRATION_AUTHORITY_PG_PORT;
 const enabled = process.env.DRS_REGISTRATION_AUTHORITY_ALLOW_DISPOSABLE === "1";
-const psql = fileURLToPath(new URL("../../.codex-auth-r2/postgresql/bin/psql.exe", import.meta.url));
+const psql = process.env.DRS_REGISTRATION_AUTHORITY_PSQL;
 const migrationUrl = new URL("../migrations/20260909021753_drs_reviewer_registration_authority_v1.sql", import.meta.url);
 const actor = "11111111-1111-4111-8111-111111111111";
 
-test("registration authority uses live grants without disclosing or writing authority", { skip: !port || !enabled ? "REAL_PG_PENDING" : false }, async (t) => {
-  assert.equal(port, "55439", "Only the dedicated disposable listener is allowed");
-  await realpath(psql);
-  const execute = (sql) => spawnSync(psql, ["--host=127.0.0.1", "--port=" + port, "--username=postgres", "--dbname=" + database, "--no-psqlrc", "--set=ON_ERROR_STOP=1", "--quiet", "--tuples-only", "--no-align"], { input: sql, encoding: "utf8", windowsHide: true, timeout: 10000 });
+test("registration authority uses live grants without disclosing or writing authority", { timeout: 60000 }, async (t) => {
+  assert.equal(enabled, true, "Explicit disposable permission is required");
+  assert.equal(port, "55450", "Only the task-owned authority listener is allowed");
+  assert.ok(psql && isAbsolute(psql), "Explicit absolute psql path is required");
+  assert.match(basename(psql), /^psql(?:\.exe)?$/iu);
+  assert.equal((await realpath(psql)).toLowerCase(), resolve(psql).toLowerCase());
+  const execute = (sql) => spawnSync(psql, ["--host=127.0.0.1", "--port=" + port, "--username=postgres", "--dbname=" + database, "--no-password", "--no-psqlrc", "--set=ON_ERROR_STOP=1", "--quiet", "--tuples-only", "--no-align"], { input: sql, encoding: "utf8", windowsHide: true, timeout: 10000 });
   const query = (sql) => {
     const result = execute(sql);
     assert.ifError(result.error);
     assert.equal(result.status, 0, result.stderr);
     return result.stdout.trim();
   };
-  query(`do $guard$ begin if current_database()<>'${database}' or exists(select 1 from pg_namespace where nspname='auth') then raise exception 'Empty disposable target required';end if;end;$guard$;
-    create role anon nologin; create role authenticated nologin; create role service_role nologin;
+  const marker = "drs-registration-authority-task4-disposable";
+  const markerGuard = `do $guard$ begin if current_database()<>'${database}' or
+    (select shobj_description(oid,'pg_database') from pg_database where datname=current_database()) is distinct from '${marker}'
+    then raise exception 'DISPOSABLE_MARKER_REQUIRED'; end if; end $guard$;`;
+  const existingRoles = JSON.parse(query("select coalesce(jsonb_agg(rolname),'[]'::jsonb) from pg_roles where rolname in ('anon','authenticated','service_role')"));
+  const createdRoles = ["anon", "authenticated", "service_role"].filter((role) => !existingRoles.includes(role));
+  let owned = false;
+  try {
+  assert.equal(query("select current_database()"), database);
+  const previousMarker = query("select coalesce(shobj_description(oid,'pg_database'),'') from pg_database where datname=current_database()");
+  assert.ok(previousMarker === "" || previousMarker === marker);
+  assert.equal(query("select count(*) from pg_namespace where nspname in ('auth','drs_forward_private')"), "0", "Empty task fixture schemas required");
+  assert.equal(query("select (select count(*) from pg_class where relnamespace='public'::regnamespace)+(select count(*) from pg_proc where pronamespace='public'::regnamespace)"), "0", "Empty public schema required");
+  query(`comment on database ${database} is '${marker}'`);
+  owned = true;
+  query(markerGuard + createdRoles.map((role) => `create role ${role} nologin;`).join("") + `
+    grant usage on schema public to public;
     create schema auth; create schema drs_forward_private;
     create table auth.users(id uuid primary key,email text,email_confirmed_at timestamptz,deleted_at timestamptz,banned_until timestamptz);
     create table drs_forward_private.reviewer_registration_operation_grants(actor_user_id uuid,operation text,scope text,status text,revoked_at timestamptz,valid_from timestamptz,valid_until timestamptz);
@@ -30,7 +48,16 @@ test("registration authority uses live grants without disclosing or writing auth
     alter table drs_forward_private.reviewer_registration_operation_grants force row level security;
     revoke all on drs_forward_private.reviewer_registration_operation_grants from public,anon,authenticated,service_role;`);
   query(await readFile(migrationUrl, "utf8"));
-  const status = () => JSON.parse(query("begin read only;set local role service_role;select public.drs_reviewer_registration_authority_v1();rollback;"));
+  const status = () => {
+    const result = JSON.parse(query("begin read only;set local role service_role;select public.drs_reviewer_registration_authority_v1();rollback;"));
+    assert.deepEqual(Object.keys(result), ["configured"], "Public authority has one aggregate key only");
+    assert.equal(typeof result.configured, "boolean");
+    for (const key of ["user", "userId", "actorUserId", "grant", "grantId", "role", "canReviewRegistrations", "canManageHighestReviewers"]) {
+      assert.equal(Object.hasOwn(result, key), false, "Public output must not expose " + key);
+    }
+    assert.equal(JSON.stringify(result).includes(actor), false);
+    return result;
+  };
   await t.test("no operator is not configured", () => assert.deepEqual(status(), { configured: false }));
   query(`insert into auth.users values('${actor}','synthetic@example.test',now(),null,null);
     insert into drs_forward_private.reviewer_registration_operation_grants values('${actor}','reviewer_registration_decide','reviewer_registration','active',null,now()-interval '1 day',now()+interval '1 day');`);
@@ -81,4 +108,13 @@ test("registration authority uses live grants without disclosing or writing auth
     assert.deepEqual(status(), { configured: false });
     assert.equal(query("select count(*) from auth.users"), "1");
   });
+  } finally {
+    if (owned) {
+      query(markerGuard + "drop schema if exists drs_forward_private cascade;drop schema if exists auth cascade;drop schema public cascade;create schema public;grant usage on schema public to public;" + createdRoles.map((role) => `drop role if exists ${role};`).join(""));
+      assert.equal(query("select count(*) from pg_namespace where nspname in ('auth','drs_forward_private')"), "0");
+      assert.equal(query("select (select count(*) from pg_class where relnamespace='public'::regnamespace)+(select count(*) from pg_proc where pronamespace='public'::regnamespace)"), "0");
+      assert.equal(query(`select count(*) from pg_roles where rolname=any(array[${createdRoles.map((role) => `'${role}'`).join(",")}]::text[])`), "0");
+      t.diagnostic("AUTHORITY_FIXTURE_CLEANUP_CONFIRMED");
+    }
+  }
 });
