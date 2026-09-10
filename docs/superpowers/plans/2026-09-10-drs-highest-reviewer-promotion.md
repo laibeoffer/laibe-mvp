@@ -702,7 +702,7 @@ git commit -m "chore(drs): register highest reviewer functions"
 ```powershell
 git status --short --branch
 git rev-parse HEAD
-git rev-parse HEAD^{tree}
+git rev-parse 'HEAD^{tree}'
 git diff --check 61b7dd49a9819721c347486dc994c53f1c45faca..HEAD
 git diff --name-status 61b7dd49a9819721c347486dc994c53f1c45faca..HEAD
 ```
@@ -996,7 +996,7 @@ Confirm:
 ```powershell
 git status --short --branch
 git rev-parse HEAD
-git rev-parse HEAD^{tree}
+git rev-parse 'HEAD^{tree}'
 git diff --check 876af6cac21709b8ec201f594734599fcad607c0..HEAD
 git diff --name-status 876af6cac21709b8ec201f594734599fcad607c0..HEAD
 ```
