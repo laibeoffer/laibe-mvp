@@ -156,12 +156,14 @@
 
 ### 5.1 擴充既有 operation grant
 
-以新的 forward-only migration 擴充 `drs_forward_private.reviewer_registration_operation_grants`，不修改既有 migration：
+以依序執行的 forward-only migrations 擴充 `drs_forward_private.reviewer_registration_operation_grants`，不修改既有 migration：
 
-- 第一階段先新增 nullable 的 `specialist_id uuid`、`auth_binding_id uuid` 與 `auth_binding_version bigint`，並新增 `legacy_identity_unresolved boolean not null default false`，避免在未知遠端資料上直接套用 `NOT NULL`。
-- deployment preflight 必須檢查全部 legacy rows，不只檢查目前 active 的 rows。
-- 若表為空，migration 可立即完成 conditional identity constraint validation；所有新列都必須是完整綁定列。
-- 若存在任何 active、revoked 或已逾期 legacy row，部署立即停止；由另一次受核准 reconciliation 處理每一列。可以證明歷史 reviewer binding 的列補齊三欄並維持 `legacy_identity_unresolved=false`；無法證明的列必須明確撤銷、版本加一、append audit，並設為 `legacy_identity_unresolved=true`。不得自動猜測 Email、靜默補綁或丟棄歷史列。
+1. **Expand migration**：只新增 nullable 的 `specialist_id uuid`、`auth_binding_id uuid` 與 `auth_binding_version bigint`，以及 `legacy_identity_unresolved boolean not null default false`；此階段尚不驗證 two-shape constraint，也不建立依賴完整 identity 的 runtime RPC。
+2. **Row-explicit reconciliation migration（僅在 legacy rows 非空時）**：deployment preflight 必須檢查全部 active、revoked 與已逾期 rows，逐一列出每個 `grant_id`。可以證明歷史 reviewer binding 的列補齊三欄並維持 `legacy_identity_unresolved=false`；無法證明的列必須明確撤銷、版本加一、append audit，並設為 `legacy_identity_unresolved=true`。不得自動猜測 Email、使用 generic update、靜默補綁或丟棄歷史列。
+3. **Enforce migration**：只有在所有 rows 已經是 resolved 或 audited unresolved 形狀後，才驗證 two-shape constraint、替換 runtime actor check，並建立 owner trust root、decision ledger 與兩個原子 RPC。
+
+三個 migration 的順序不可顛倒。若 deployment preflight 顯示表為空，可以省略 reconciliation，但仍須先 expand 再 enforce。若存在 legacy row，expand、row-explicit reconciliation 與 enforce 必須先形成同一份受審候選，再由受核准 migration authority 依序套用；不得先部署 expand 後把 remote 留在無 constraint 的半完成狀態。
+
 - 三個 identity 欄位在 physical schema 保持 nullable，但 validated check constraint 只允許兩種形狀：`legacy_identity_unresolved=false` 且三欄全部非 null；或 `legacy_identity_unresolved=true`、status 為 revoked、revoked_at 非 null 且三欄全部為 null。
 - 新增／更新 grant 的一般 RPC 永遠不能把 `legacy_identity_unresolved` 設為 true，也不能 grant/regrant 尚未解析的 row；所有 runtime authority query 都拒絕此旗標。未解析狀態本身不能形成 authority，但受核准的資料庫 reconciliation 可以在日後取得可證明 binding 時，更新同一 row 為完整 identity、設回 false、版本加一並 append audit。如此保留既有 unique identity 與歷史，不永久封鎖該 actor。
 - 對所有 `legacy_identity_unresolved=false` 的列，`specialist_id` 與 `auth_binding_id` 必須引用同一位 `actor_user_id` 的可驗證綁定；是否「目前有效」仍由每次 command/runtime check 判斷，不能只靠 FK。
@@ -204,7 +206,7 @@ owner authorization RPC 必須同時鎖定並驗證 `auth.sessions`、`auth.user
 
 `payload_digest` 由資料庫針對 canonical JSON 計算，至少涵蓋 subject binding ID、binding version、grant ID、expected grant version、outcome 與 reason。`(owner_user_id, idempotency_key)` 唯一。重送相同 payload 回傳同一 receipt；同一 idempotency key 搭配不同 digest 必須拒絕。資料表禁止 update、delete 與 truncate。
 
-首次 request 尚無 ledger row 可鎖，因此 RPC 必須先依固定順序取得 transaction-scoped advisory locks：先鎖 `(owner_user_id, idempotency_key)`，再鎖 `(subject_user_id, operation, scope)`。取得第一把鎖後才查詢或建立 idempotency record；唯一 constraint 仍保留作第二層防線。所有相同 command path 都使用同一鎖順序，避免 grant/revoke 競態與 deadlock。
+首次 request 尚無 ledger row 可鎖，因此 RPC 必須先依固定順序取得 transaction-scoped advisory locks：先鎖 `(owner_user_id, idempotency_key)`，再鎖 `(subject_user_id, operation, scope)`。瀏覽器不提交 `subject_user_id`；RPC 先由 server-issued binding ID（grant）或既有 grant ID（revoke）查出 subject user，取得第二把 advisory lock 後再重新讀取、row-lock 並核對 identity 與版本。新 binding 的 grant 與舊 grant 的 revoke 只要屬於同一位使用者，就必須落在同一個 subject lock domain。取得第一把鎖後才查詢或建立 idempotency record；唯一 constraint 仍保留作第二層防線。所有相同 command path 都使用同一鎖順序，避免 grant/revoke 競態與 deadlock。
 
 既有 `operation_grant_events` 持續記錄 grant 的 before/after state；command ledger 則回答「誰、何時、指定或撤銷誰、理由、影響哪個版本」。兩者共同構成可稽核留痕。
 
@@ -283,6 +285,34 @@ Sites 新增同名 BFF route，只負責：
 }
 ```
 
+候選回應必須以 `governanceGrant.state` 作 discriminated union。一般 resolved row 的 `authBindingId`／`bindingVersion` 為非 null；歷史未解析 row 的 exact shape 為：
+
+```json
+{
+  "candidateKey": "server-issued-grant-uuid",
+  "displayName": null,
+  "accountEmail": null,
+  "subject": {
+    "authBindingId": null,
+    "bindingVersion": null,
+    "grantId": "server-issued-grant-uuid",
+    "grantVersion": 4
+  },
+  "qualification": {
+    "state": "unresolved",
+    "validUntil": null
+  },
+  "governanceGrant": {
+    "state": "legacy_identity_unresolved",
+    "validUntil": null
+  },
+  "effectiveHighestReviewer": false,
+  "availableAction": "reconciliation_required"
+}
+```
+
+若歷史 Auth row 或已驗證 Email 已不存在，`displayName` 與 `accountEmail` 必須回傳 `null`；UI 顯示「歷史審查員（身分待核對）」與「Email 已無法確認」，不得補造姓名、Email 或從 audit/log 推測 identity。
+
 決策：
 
 ```json
@@ -339,7 +369,7 @@ Sites 新增同名 BFF route，只負責：
 - 不使用 `user_metadata`、HTML、JavaScript、URL、localStorage 或 cookie 自述角色。
 - 系統擁有者與最高審查官都不因全域治理角色取得任何案件 wildcard。
 - 最高審查官數量不以單席 constraint 限制。
-- grant、revoke、資格失效、重試與衝突都必須留下可追溯結果。
+- `grant`、`revoke` 與受控 reconciliation 的每次 state change 都必須有 immutable audit。相同 idempotency request 回傳同一 receipt；衝突與資格失效回傳 deterministic result，但不承諾在會 rollback 的失敗 transaction 內另寫 attempt ledger。資格狀態本身的變更仍由其既有資格／binding audit 追溯。
 - secret 值、密碼、OTP、service-role key 與完整 bearer token 不進入頁面、log、audit 或測試 fixture。
 - 登出仍使用既有 server-side session logout；最高審查官與一般審查員均可清除本機 session，但登出不修改 grant。
 
@@ -378,6 +408,8 @@ Sites 新增同名 BFF route，只負責：
 - grant/revoke idempotency、payload digest conflict、stale binding version、stale grant version 與 concurrent decision 均有決定性結果。
 - revoke 不依賴 live binding version；binding 已撤銷或換版時仍能按既有 grant identity/version 完成撤銷。
 - 首次相同 idempotency key 並行送出時只產生一筆 decision；固定 advisory-lock order 不發生 deadlock。
+- 新 binding grant 與舊 grant revoke 同時操作同一 subject 時，必須使用同一個 `subject_user_id` lock domain，較晚的 stale command 不可覆蓋先完成的決策。
+- eligible owner 可以以 owner authority 升任自己；ineligible owner self-grant 必須 fail closed。成功 self-grant 仍必填理由、append audit 且 `caseAccessChanged=false`，不可誤套「最高審查官不能核准自己的普通審查員申請」規則。
 - decision 與 grant event append-only。
 - 建立 highest-reviewer grant 前後，該 user 的案件可見範圍完全不變。
 
@@ -406,7 +438,7 @@ Sites 新增同名 BFF route，只負責：
 
 實作階段另開一份 execution plan，依 `ONE_FILE = ONE_WRITER` 分成：
 
-1. **Core data/auth slice**：forward migration、real-PG tests、actor check 與原子 RPC。
+1. **Core data/auth slice**：expand migration、必要時的 row-explicit reconciliation、enforce migration、real-PG tests、actor check 與原子 RPC。
 2. **Core Edge slice**：owner verifier、candidates/decision handlers 與 unit tests。
 3. **Sites governance slice**：BFF routes、`/pcm/governance/` UI、產品狀態與 scoped tests。
 4. **Integration/acceptance slice**：遠端 migration/function deploy、受核准的初始 owner grant provision、真實帳號旅程及 canonical desktop/mobile 驗收。
