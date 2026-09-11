@@ -692,6 +692,7 @@ test("start handler accepts only same-origin exact-empty requests and returns sa
   const { createLineLinkStartHandler } = await import(lineHttpUrl.href);
   let startCalls = 0;
   const handler = createLineLinkStartHandler({
+    runtimeReady: true,
     allowedOrigin: "https://laibe.example",
     guard: {
       async authorize() {
@@ -785,6 +786,7 @@ test("status cancel and unlink handlers preserve operation-specific methods", as
   } = await import(lineHttpUrl.href);
   const operations = [];
   const dependencies = {
+    runtimeReady: true,
     allowedOrigin: "https://laibe.example",
     guard: {
       async authorize() {
@@ -873,6 +875,7 @@ test("focused RED: status GET accepts same-origin browser metadata without Origi
   let guardCalls = 0;
   let statusCalls = 0;
   const handler = createLineLinkStatusHandler({
+    runtimeReady: true,
     allowedOrigin,
     guard: {
       authorize(request) {
@@ -971,6 +974,7 @@ test("focused RED: status GET accepts same-origin browser metadata without Origi
   assert.equal(statusCalls, 1);
 
   const postDependencies = {
+    runtimeReady: true,
     allowedOrigin,
     guard: {
       authorize() {
@@ -1037,6 +1041,7 @@ test("handler converts missing Gmail-backed DRS authority to permission_denied",
     ).href
   );
   const handler = createLineLinkStatusHandler({
+    runtimeReady: true,
     allowedOrigin: "https://laibe.example",
     guard: {
       async authorize() {
@@ -1092,6 +1097,7 @@ test("continue creates a one-time nonce digest and only redirects to LINE accoun
     randomBytes: () => new Uint8Array(32).fill(7),
   });
   const handler = createLineLinkContinueHandler({
+    runtimeReady: true,
     allowedOrigin: "https://laibe.example",
     guard: {
       async authorize() {

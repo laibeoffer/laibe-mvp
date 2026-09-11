@@ -3,6 +3,7 @@ import type { DrsBffGuard } from "../drs-auth/drs-session-bootstrap-bff.ts";
 import type { LineAccountLinkService } from "./service.ts";
 
 type Dependencies = Readonly<{
+  runtimeReady: boolean;
   allowedOrigin: string;
   guard: DrsBffGuard;
   service: LineAccountLinkService;
@@ -137,6 +138,7 @@ function createStatusHandler(
   pathname: string,
 ) {
   return async (request: Request): Promise<Response> => {
+    if (dependencies.runtimeReady !== true) return failureResponse(undefined);
     try {
       await exactRequest(
         request.clone(),
@@ -197,6 +199,7 @@ export function createLineLinkUnlinkHandler(dependencies: Dependencies) {
 
 export function createLineLinkContinueHandler(dependencies: Dependencies) {
   return async (request: Request): Promise<Response> => {
+    if (dependencies.runtimeReady !== true) return failureResponse(undefined);
     try {
       const linkToken = await exactRequest(
         request.clone(),
