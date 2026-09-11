@@ -137,7 +137,7 @@ Deno.test("S5 queue keysets retain PostgreSQL microseconds and UUID comparison",
     "Typed UUID cursor comparison",
   );
 });
-Deno.test("S5 actual JWT entries use accepted gateway adapter with no injected handler", async () => {
+Deno.test("S5 actual JWT entries declare their gateway mode and still require custom Auth", async () => {
   const descriptor = Object.getOwnPropertyDescriptor(Deno, "env")!,
     oldFetch = globalThis.fetch;
   const env: Record<string, string> = {
@@ -160,8 +160,8 @@ Deno.test("S5 actual JWT entries use accepted gateway adapter with no injected h
         "../../drs-reviewer-registration-" + route + "/index.ts?s5-entry"
       );
       assert(
-        module.VERIFY_JWT_REQUIRED === true,
-        "Gateway JWT verification must remain enabled",
+        module.VERIFY_JWT_REQUIRED === (route === "decision"),
+        "Queue uses custom Auth while decision retains gateway verification",
       );
       const body = route === "queue" ? { cursor: null } : input;
       const r = await module.handler(
