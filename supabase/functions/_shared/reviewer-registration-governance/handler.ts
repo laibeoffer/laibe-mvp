@@ -1,9 +1,16 @@
-import { verifyAuthSession } from "../auth-session/verified-auth-session.ts";
 import {
+  DrsIdentityError,
   isUuid,
   readRuntimeEnvironment,
   type RuntimeEnvironment,
 } from "../drs-auth/contracts.ts";
+import {
+  createDrsBffGuard,
+  type DrsBffAuthorizedContext,
+  type DrsBffGuard,
+  type DrsBffRequestContract,
+} from "../drs-auth/drs-session-bootstrap-bff.ts";
+import { createDrsSecureSessionRuntime } from "../drs-auth/drs-secure-session-runtime.ts";
 
 const SCHEMA = "laibe.drs-reviewer-registration-governance.v1";
 type Route = "queue" | "decision";
@@ -12,6 +19,7 @@ type Options = Readonly<
     env?: RuntimeEnvironment;
     fetch?: typeof globalThis.fetch;
     now?: () => number;
+    guard?: DrsBffGuard;
   }
 >;
 const ERRORS: Readonly<Record<string, number>> = Object.freeze({
@@ -25,25 +33,6 @@ const ERRORS: Readonly<Record<string, number>> = Object.freeze({
   EXISTING_IDENTITY_REQUIRES_REVIEW: 409,
   CONTEXT_UNAVAILABLE: 503,
 });
-function authFailureStage(
-  stage: string,
-  outcome: string,
-  status: number,
-):
-  | "INPUT"
-  | "AUTH_PROVIDER"
-  | "IDENTITY"
-  | "AUTH_SERVICE"
-  | "SESSION_STATE"
-  | "SESSION_SERVICE" {
-  if (stage === "session") {
-    return outcome === "DENIED" ? "SESSION_STATE" : "SESSION_SERVICE";
-  }
-  if (outcome !== "DENIED") return "AUTH_SERVICE";
-  if (status >= 200 && status <= 299) return "IDENTITY";
-  if (status === 401 || status === 403) return "AUTH_PROVIDER";
-  return "INPUT";
-}
 function exact(
   v: unknown,
   keys: readonly string[],
@@ -157,6 +146,81 @@ function input(route: Route, v: unknown): v is Record<string, unknown> {
       ? timestamp(v.bindingValidUntil)
       : v.bindingValidUntil === null);
 }
+function requestContract(route: Route): DrsBffRequestContract {
+  const queueFields = Object.freeze([Object.freeze({
+    name: "cursor",
+    scalarType: "structured" as const,
+    validate: cursor,
+  })]);
+  const decisionFields = Object.freeze([
+    Object.freeze({
+      name: "applicationId",
+      scalarType: "string" as const,
+      validate: (value: string | number | boolean) => isUuid(value),
+    }),
+    Object.freeze({
+      name: "expectedVersion",
+      scalarType: "number" as const,
+      validate: (value: string | number | boolean) =>
+        Number.isInteger(value) && (value as number) >= 1 &&
+        (value as number) < 2147483647,
+    }),
+    Object.freeze({
+      name: "decision",
+      scalarType: "string" as const,
+      validate: (value: string | number | boolean) =>
+        value === "approve" || value === "reject",
+    }),
+    Object.freeze({
+      name: "reason",
+      scalarType: "string" as const,
+      validate: (value: string | number | boolean) =>
+        typeof value === "string" && text(value, 1, 500) &&
+        value === value.trim(),
+    }),
+    Object.freeze({
+      name: "idempotencyKey",
+      scalarType: "string" as const,
+      validate: (value: string | number | boolean) => isUuid(value),
+    }),
+    Object.freeze({
+      name: "bindingValidUntil",
+      scalarType: "structured" as const,
+      validate: (value: unknown) => value === null || timestamp(value),
+    }),
+  ]);
+  return Object.freeze({
+    method: "POST",
+    pathname: "/functions/v1/drs-reviewer-registration-" + route,
+    queryFields: Object.freeze([]),
+    jsonBodyFields: route === "queue" ? queueFields : decisionFields,
+  });
+}
+function verifiedAuthBinding(
+  context: DrsBffAuthorizedContext,
+  now: number,
+):
+  | Readonly<{
+    userId: string;
+    authSessionId: string;
+    expiresAtEpochSeconds: number;
+  }>
+  | null {
+  const binding = context.verifiedAuthSession;
+  if (
+    !Number.isFinite(now) ||
+    !exact(binding, ["userId", "authSessionId", "expiresAtEpochSeconds"]) ||
+    !isUuid(binding.userId) || binding.userId !== context.authenticatedUserId ||
+    !isUuid(binding.authSessionId) ||
+    !Number.isSafeInteger(binding.expiresAtEpochSeconds) ||
+    (binding.expiresAtEpochSeconds as number) * 1000 <= now
+  ) return null;
+  return Object.freeze({
+    userId: binding.userId as string,
+    authSessionId: binding.authSessionId as string,
+    expiresAtEpochSeconds: binding.expiresAtEpochSeconds as number,
+  });
+}
 function projection(
   route: Route,
   v: unknown,
@@ -255,6 +319,14 @@ export function createRegistrationGovernanceHandler(
   );
   const fetcher = options.fetch ?? globalThis.fetch,
     now = options.now ?? Date.now;
+  const guard = options.guard ?? createDrsBffGuard(
+    createDrsSecureSessionRuntime({
+      env: options.env,
+      fetch: fetcher,
+      now: () => new Date(now()),
+    }).bootstrapDependencies,
+    requestContract(route),
+  );
   return async (request: Request): Promise<Response> => {
     const headers: Record<string, string> = {
       "cache-control": "no-store",
@@ -296,6 +368,12 @@ export function createRegistrationGovernanceHandler(
         request.headers.get("content-type") ?? "",
       )
     ) return reply(400, { state: "INVALID_REQUEST" });
+    let guardedRequest: Request;
+    try {
+      guardedRequest = request.clone();
+    } catch {
+      return reply(400, { state: "INVALID_REQUEST" });
+    }
     let body: unknown;
     try {
       body = await boundedJson(request.body, 4096);
@@ -306,28 +384,35 @@ export function createRegistrationGovernanceHandler(
     if (!https(project) || !service || service.length < 32) {
       return reply(503, { state: "CONTEXT_UNAVAILABLE" });
     }
-    let authStage: ReturnType<typeof authFailureStage> = "AUTH_SERVICE";
-    const verified = await verifyAuthSession(request, {
-      supabaseUrl: project,
-      serviceRoleKey: service,
-      fetch: fetcher,
-      now,
-      observer: (stage, outcome, status) => {
-        authStage = authFailureStage(stage, outcome, status);
-      },
-    });
-    if (verified.state !== "verified") {
-      if (route === "queue") headers["x-laibe-auth-stage"] = authStage;
-      return reply(verified.state === "denied" ? 401 : 503, {
-        state: verified.state === "denied"
+    let context: DrsBffAuthorizedContext;
+    try {
+      context = await guard.authorize(guardedRequest);
+    } catch (error) {
+      const status = error instanceof DrsIdentityError &&
+          [400, 401, 403, 503].includes(error.status)
+        ? error.status
+        : 503;
+      if (route === "queue" && (status === 401 || status === 503)) {
+        headers["x-laibe-auth-stage"] = status === 401
+          ? "SESSION_STATE"
+          : "SESSION_SERVICE";
+      }
+      return reply(status, {
+        state: status === 400
+          ? "INVALID_REQUEST"
+          : status === 401
           ? "AUTH_REQUIRED"
+          : status === 403
+          ? "REGISTRATION_OPERATION_NOT_AUTHORIZED"
           : "CONTEXT_UNAVAILABLE",
       });
     }
+    const verified = verifiedAuthBinding(context, now());
+    if (!verified) return reply(401, { state: "AUTH_REQUIRED" });
     const base = {
-      p_actor_user_id: verified.session.userId,
-      p_auth_session_id: verified.session.authSessionId,
-      p_jwt_expires_at: new Date(verified.session.expiresAtEpochSeconds * 1000)
+      p_actor_user_id: verified.userId,
+      p_auth_session_id: verified.authSessionId,
+      p_jwt_expires_at: new Date(verified.expiresAtEpochSeconds * 1000)
         .toISOString(),
     };
     const c = body.cursor as Record<string, string> | null;
@@ -347,6 +432,19 @@ export function createRegistrationGovernanceHandler(
         p_binding_valid_until: body.bindingValidUntil,
       };
     try {
+      const requestTime = now();
+      const proofExpiresAt = timestamp(context.proofExpiresAt)
+        ? Date.parse(context.proofExpiresAt)
+        : Number.NaN;
+      if (
+        !Number.isFinite(requestTime) || !Number.isFinite(proofExpiresAt) ||
+        proofExpiresAt <= requestTime
+      ) {
+        if (route === "queue") {
+          headers["x-laibe-auth-stage"] = "SESSION_STATE";
+        }
+        return reply(401, { state: "AUTH_REQUIRED" });
+      }
       const response = await fetcher(
         new URL(
           "/rest/v1/rpc/drs_reviewer_registration_" + route + "_v1",
@@ -389,7 +487,7 @@ export function createRegistrationGovernanceHandler(
       if (!Number.isFinite(current)) {
         return reply(503, { state: "CONTEXT_UNAVAILABLE" });
       }
-      if (current >= verified.session.expiresAtEpochSeconds * 1000) {
+      if (current >= verified.expiresAtEpochSeconds * 1000) {
         return reply(401, { state: "AUTH_REQUIRED" });
       }
       return reply(200, raw);

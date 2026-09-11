@@ -7,7 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.drs-reviewer-registration-decision]
-verify_jwt = true
+verify_jwt = false
 
 [functions.drs-session-bootstrap]
 verify_jwt = false

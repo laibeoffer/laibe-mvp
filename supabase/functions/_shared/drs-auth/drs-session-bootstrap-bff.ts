@@ -201,11 +201,17 @@ export interface DrsThreeRoleSessionBootstrapDependencies {
 
 export type DrsBffRequestScalar = string | number | boolean;
 
-export type DrsBffRequestFieldContract = Readonly<{
-  name: string;
-  scalarType: "string" | "number" | "boolean";
-  validate(value: DrsBffRequestScalar): boolean;
-}>;
+export type DrsBffRequestFieldContract =
+  | Readonly<{
+    name: string;
+    scalarType: "string" | "number" | "boolean";
+    validate(value: DrsBffRequestScalar): boolean;
+  }>
+  | Readonly<{
+    name: string;
+    scalarType: "structured";
+    validate(value: unknown): boolean;
+  }>;
 
 export type DrsBffRequestContract = Readonly<{
   method: string;
@@ -220,6 +226,11 @@ export type DrsBffAuthorizedContext = Readonly<
     caseStatus: "active";
     accessMode: "read_only";
     proofExpiresAt: string;
+    verifiedAuthSession?: Readonly<{
+      userId: string;
+      authSessionId: string;
+      expiresAtEpochSeconds: number;
+    }>;
   }
 >;
 
@@ -235,6 +246,11 @@ type BoundSession = Readonly<
     selectedCaseId: string;
     caseStatus: "active";
     accessMode: "read_only";
+    verifiedAuthSession?: Readonly<{
+      userId: string;
+      authSessionId: string;
+      expiresAtEpochSeconds: number;
+    }>;
   }
 >;
 
@@ -279,7 +295,7 @@ function compileRequestFields(
       typeof candidate.name !== "string" ||
       !REQUEST_FIELD_NAME_PATTERN.test(candidate.name) ||
       names.has(candidate.name) ||
-      !["string", "number", "boolean"].includes(
+      !["string", "number", "boolean", "structured"].includes(
         candidate.scalarType as string,
       ) ||
       (queryFields && candidate.scalarType !== "string") ||
@@ -288,11 +304,9 @@ function compileRequestFields(
     names.add(candidate.name);
     return Object.freeze({
       name: candidate.name,
-      scalarType: candidate.scalarType as "string" | "number" | "boolean",
-      validate: candidate.validate as (
-        value: DrsBffRequestScalar,
-      ) => boolean,
-    });
+      scalarType: candidate.scalarType,
+      validate: candidate.validate,
+    }) as DrsBffRequestFieldContract;
   });
   return Object.freeze(fields);
 }
@@ -812,6 +826,15 @@ async function resolveBoundSession(
     selectedCaseId: grant.selectedCaseId,
     caseStatus: grant.caseStatus,
     accessMode: grant.accessMode,
+    ...(envelope.schemaVersion === "laibe.drs-server-session-cookie.v2"
+      ? {
+        verifiedAuthSession: Object.freeze({
+          userId: verified.authenticatedUserId,
+          authSessionId: envelope.authSessionId,
+          expiresAtEpochSeconds: envelope.authExpiresAtEpochSeconds,
+        }),
+      }
+      : {}),
   });
 }
 
@@ -1116,11 +1139,15 @@ function assertFieldValue(
   value: unknown,
 ): void {
   if (
-    typeof value !== field.scalarType ||
-    (typeof value === "number" && !Number.isFinite(value))
+    field.scalarType !== "structured" &&
+    (typeof value !== field.scalarType ||
+      (typeof value === "number" && !Number.isFinite(value)))
   ) return invalidClosedRequest();
   try {
-    if (field.validate(value as DrsBffRequestScalar) !== true) {
+    const valid = field.scalarType === "structured"
+      ? field.validate(value)
+      : field.validate(value as DrsBffRequestScalar);
+    if (valid !== true) {
       return invalidClosedRequest();
     }
   } catch {
@@ -1327,6 +1354,9 @@ export function createDrsBffGuard(
         proofExpiresAt: new Date(
           candidateClaims.expiresAtEpochSeconds * 1000,
         ).toISOString(),
+        ...(session.verifiedAuthSession
+          ? { verifiedAuthSession: session.verifiedAuthSession }
+          : {}),
       });
     },
   });

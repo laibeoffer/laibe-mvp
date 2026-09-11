@@ -335,7 +335,18 @@ function fixture(lifetimeSeconds = 300, issueDelaySeconds = 0) {
     successRedirectUrl: env.LAIBE_DRS_SESSION_SUCCESS_URL,
     sessionCookieName: COOKIE,
   };
-  return { state, runtime, input, producer, token, now, fetcher };
+  return {
+    state,
+    runtime,
+    input,
+    producer,
+    token,
+    now,
+    fetcher,
+    advance(seconds: number) {
+      nowMs += seconds * 1000;
+    },
+  };
 }
 
 async function issueThroughPasswordHandler(f: ReturnType<typeof fixture>) {
@@ -487,7 +498,7 @@ Deno.test("S2 cookie v2: encrypted JWT, exact identity, TTL, tampering and old-u
   assert(f.state.issues === 1, "Invalid identity must never reach issue RPC");
 });
 
-Deno.test("S2 bootstrap and real BFF guard reject revoked-before-exp and changed-case late proof", async () => {
+Deno.test("S2 bootstrap and real BFF guard expose verified Auth binding without token", async () => {
   const f = fixture();
   const issued = await f.producer.createVerifiedSession(f.input);
   const cookie = issued.response.headers.get("set-cookie")!.split(";")[0];
@@ -516,22 +527,50 @@ Deno.test("S2 bootstrap and real BFF guard reject revoked-before-exp and changed
   );
   const guard = createDrsBffGuard(dependencies, {
     method: "POST",
-    pathname: "/functions/v1/drs-protected-test",
+    pathname: "/functions/v1/drs-reviewer-registration-queue",
     queryFields: [],
-    jsonBodyFields: [],
+    jsonBodyFields: [{
+      name: "cursor",
+      scalarType: "structured",
+      validate: (value: unknown) => value === null,
+    }],
   });
-  const guarded = () =>
-    new Request(`${PROJECT}/functions/v1/drs-protected-test`, {
+  const guarded = (
+    authorization = proof,
+    requestCookie = cookie,
+  ) =>
+    new Request(`${PROJECT}/functions/v1/drs-reviewer-registration-queue`, {
       method: "POST",
       headers: {
         origin: ORIGIN,
-        cookie,
-        authorization: proof,
+        cookie: requestCookie,
+        authorization,
         "sec-fetch-site": "same-origin",
         "content-type": "application/json",
       },
-      body: "{}",
+      body: '{"cursor":null}',
     });
+  const context = await guard.authorize(guarded());
+  assert(
+    JSON.stringify(context.verifiedAuthSession) === JSON.stringify({
+      userId: USER,
+      authSessionId: SESSION,
+      expiresAtEpochSeconds: Math.floor(f.now().getTime() / 1000) + 300,
+    }),
+    "Guard must expose only verified Auth binding facts",
+  );
+  assert(
+    !Object.hasOwn(context.verifiedAuthSession ?? {}, "supabaseAccessToken"),
+    "Guard context must never expose the Supabase token",
+  );
+  await rejectsStatus(
+    () => guard.authorize(guarded(proof.slice(0, -2) + "AA")),
+    401,
+  );
+  await rejectsStatus(
+    () => guard.authorize(guarded(proof, cookie + "tampered")),
+    401,
+  );
   f.state.active = false;
   const denied = await bootstrap(request());
   assert(
@@ -547,5 +586,57 @@ Deno.test("S2 bootstrap and real BFF guard reject revoked-before-exp and changed
   assert(
     (await bootstrap(request())).status === 503,
     "Service fault must not become Auth denial",
+  );
+});
+
+Deno.test("S2 expired opaque proof stops before auth-bound session reuse", async () => {
+  const f = fixture();
+  const issued = await f.producer.createVerifiedSession(f.input);
+  const cookie = issued.response.headers.get("set-cookie")!.split(";")[0];
+  const dependencies = f.runtime.bootstrapDependencies!;
+  const bootstrap = createDrsSessionBootstrapHandler(dependencies);
+  const response = await bootstrap(
+    new Request(`${PROJECT}/functions/v1/drs-session-bootstrap`, {
+      method: "POST",
+      headers: {
+        origin: ORIGIN,
+        cookie,
+        "sec-fetch-site": "same-origin",
+        "content-type": "application/json",
+      },
+      body: "{}",
+    }),
+  );
+  const proof = response.headers.get("authorization")!;
+  const guard = createDrsBffGuard(dependencies, {
+    method: "POST",
+    pathname: "/functions/v1/drs-reviewer-registration-queue",
+    queryFields: [],
+    jsonBodyFields: [{
+      name: "cursor",
+      scalarType: "structured",
+      validate: (value: unknown) => value === null,
+    }],
+  });
+  f.advance(61);
+  await rejectsStatus(
+    () =>
+      guard.authorize(
+        new Request(
+          `${PROJECT}/functions/v1/drs-reviewer-registration-queue`,
+          {
+            method: "POST",
+            headers: {
+              origin: ORIGIN,
+              cookie,
+              authorization: proof,
+              "sec-fetch-site": "same-origin",
+              "content-type": "application/json",
+            },
+            body: '{"cursor":null}',
+          },
+        ),
+      ),
+    401,
   );
 });

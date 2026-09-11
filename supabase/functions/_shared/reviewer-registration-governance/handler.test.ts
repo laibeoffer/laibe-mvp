@@ -1,5 +1,6 @@
 import { createRegistrationGovernanceHandler } from "./handler.ts";
 import { base64url } from "../drs-auth/auth-bound-session.ts";
+import { DrsIdentityError } from "../drs-auth/contracts.ts";
 const U = "11111111-1111-4111-8111-111111111111",
   S = "22222222-2222-4222-8222-222222222222",
   A = "33333333-3333-4333-8333-333333333333",
@@ -46,6 +47,38 @@ function fixture(route: "queue" | "decision", reply: unknown) {
   const handler = createRegistrationGovernanceHandler(route, {
     env: { get: (n: string) => (env as Record<string, string>)[n] },
     now: () => NOW,
+    guard: {
+      authorize: (request: Request) => {
+        if (state.fault || state.sessionFault) {
+          return Promise.reject(
+            new DrsIdentityError("CONTEXT_UNAVAILABLE", 503),
+          );
+        }
+        if (
+          request.headers.get("authorization") !== "Bearer " + jwt ||
+          request.headers.get("cookie") !==
+            "__Host-laibe-drs-session=opaque-cookie" ||
+          state.authStatus !== 200 || state.authUserId !== U || !state.live
+        ) {
+          return Promise.reject(new DrsIdentityError("AUTH_REQUIRED", 401));
+        }
+        return Promise.resolve({
+          authenticatedUserId: U,
+          specialistId: "55555555-5555-4555-8555-555555555555",
+          authorizationSubject:
+            "drs-specialist:55555555-5555-4555-8555-555555555555",
+          selectedCaseId: "66666666-6666-4666-8666-666666666666",
+          caseStatus: "active" as const,
+          accessMode: "read_only" as const,
+          proofExpiresAt: "2026-09-08T09:01:00.000Z",
+          verifiedAuthSession: {
+            userId: U,
+            authSessionId: S,
+            expiresAtEpochSeconds: NOW / 1000 + 300,
+          },
+        });
+      },
+    },
     fetch: async (url: string | URL | Request, init?: RequestInit) => {
       await Promise.resolve();
       const path = new URL(String(url)).pathname;
@@ -80,6 +113,8 @@ function fixture(route: "queue" | "decision", reply: unknown) {
         headers: {
           origin,
           authorization: "Bearer " + jwt,
+          cookie: "__Host-laibe-drs-session=opaque-cookie",
+          "sec-fetch-site": "same-origin",
           "content-type": "application/json",
         },
         body: typeof body === "string" ? body : JSON.stringify(body),
@@ -106,7 +141,7 @@ Deno.test("S5 RED verified caller without operation authority cannot list applic
   );
 });
 
-Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async () => {
+Deno.test("S5 queue proof/session failures expose only fixed diagnostic stages", async () => {
   const inputFailure = fixture("queue", {});
   const malformed = inputFailure.request();
   const malformedHeaders = new Headers(malformed.headers);
@@ -116,8 +151,8 @@ Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async ()
   );
   assert(inputResponse.status === 401, "Malformed claims remain denied");
   assert(
-    inputResponse.headers.get("x-laibe-auth-stage") === "INPUT",
-    "Input rejection has a fixed stage",
+    inputResponse.headers.get("x-laibe-auth-stage") === "SESSION_STATE",
+    "Proof rejection has a fixed stage",
   );
 
   const providerFailure = fixture("queue", {});
@@ -130,8 +165,8 @@ Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async ()
     "Auth provider rejection remains denied",
   );
   assert(
-    providerResponse.headers.get("x-laibe-auth-stage") === "AUTH_PROVIDER",
-    "Auth provider rejection has a fixed stage",
+    providerResponse.headers.get("x-laibe-auth-stage") === "SESSION_STATE",
+    "Auth session rejection has a fixed stage",
   );
 
   const identityFailure = fixture("queue", {});
@@ -142,7 +177,7 @@ Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async ()
   );
   assert(identityResponse.status === 401, "Identity mismatch remains denied");
   assert(
-    identityResponse.headers.get("x-laibe-auth-stage") === "IDENTITY",
+    identityResponse.headers.get("x-laibe-auth-stage") === "SESSION_STATE",
     "Identity rejection has a fixed stage",
   );
 
@@ -164,7 +199,7 @@ Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async ()
   );
   assert(serviceResponse.status === 503, "Auth outage remains unavailable");
   assert(
-    serviceResponse.headers.get("x-laibe-auth-stage") === "AUTH_SERVICE",
+    serviceResponse.headers.get("x-laibe-auth-stage") === "SESSION_SERVICE",
     "Service failure has a fixed stage",
   );
 
@@ -201,7 +236,7 @@ Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async ()
     ]
   ) {
     assert(
-      /^(INPUT|AUTH_PROVIDER|IDENTITY|SESSION_STATE|AUTH_SERVICE|SESSION_SERVICE)$/u
+      /^(SESSION_STATE|SESSION_SERVICE)$/u
         .test(
           response.headers.get("x-laibe-auth-stage") ?? "",
         ),
@@ -260,13 +295,17 @@ Deno.test("S5 queue keysets retain PostgreSQL microseconds and UUID comparison",
     "Typed UUID cursor comparison",
   );
 });
-Deno.test("S5 actual JWT entries declare their gateway mode and still require custom Auth", async () => {
+Deno.test("S5 actual entries disable gateway JWT and require the custom proof guard", async () => {
   const descriptor = Object.getOwnPropertyDescriptor(Deno, "env")!,
     oldFetch = globalThis.fetch;
   const env: Record<string, string> = {
     SUPABASE_URL: PROJECT,
     SUPABASE_SERVICE_ROLE_KEY: "synthetic-service-key-at-least-32-characters",
     LAIBE_DRS_APP_ORIGIN: ORIGIN,
+    LAIBE_DRS_SESSION_SUCCESS_URL: `${ORIGIN}/pcm/reviewer/access/#login`,
+    LAIBE_DRS_SESSION_COOKIE_NAME: "__Host-laibe-drs-session",
+    LAIBE_DRS_SESSION_COOKIE_KEY_V1: base64url(new Uint8Array(32).fill(11)),
+    LAIBE_DRS_BFF_PROOF_KEY_V1: base64url(new Uint8Array(32).fill(22)),
   };
   let calls = 0;
   try {
@@ -275,8 +314,10 @@ Deno.test("S5 actual JWT entries declare their gateway mode and still require cu
     );
     assert(
       /\[functions\.drs-reviewer-registration-queue\]\r?\nverify_jwt = false/u
-        .test(config),
-      "Queue deployment config matches the custom Auth entry",
+        .test(config) &&
+        /\[functions\.drs-reviewer-registration-decision\]\r?\nverify_jwt = false/u
+          .test(config),
+      "Both governance entries accept only the custom proof guard",
     );
     Object.defineProperty(Deno, "env", {
       configurable: true,
@@ -291,18 +332,25 @@ Deno.test("S5 actual JWT entries declare their gateway mode and still require cu
         "../../drs-reviewer-registration-" + route + "/index.ts?s5-entry"
       );
       assert(
-        module.VERIFY_JWT_REQUIRED === (route === "decision"),
-        "Queue uses custom Auth while decision retains gateway verification",
+        module.VERIFY_JWT_REQUIRED === false,
+        "Opaque proof reaches the same custom guard for both operations",
       );
       const body = route === "queue" ? { cursor: null } : input;
       const r = await module.handler(
-        new Request(PROJECT + "/drs-reviewer-registration-" + route, {
-          method: "POST",
-          headers: { origin: ORIGIN, "content-type": "application/json" },
-          body: JSON.stringify(body),
-        }),
+        new Request(
+          PROJECT + "/functions/v1/drs-reviewer-registration-" + route,
+          {
+            method: "POST",
+            headers: {
+              origin: ORIGIN,
+              "sec-fetch-site": "same-origin",
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(body),
+          },
+        ),
       );
-      assert(r.status === 401, "Short path reaches true Auth-required entry");
+      assert(r.status === 401, "Missing proof reaches the custom guard");
     }
     assert(calls === 0, "No token means no provider request");
   } finally {
@@ -541,4 +589,243 @@ Deno.test("S5 RED decision uses verified JWT expiry and projects zero case autho
     f.state.rpc[0].p_jwt_expires_at === "2026-09-08T09:05:00.000Z",
     "JWT deadline must be S1 verified",
   );
+});
+
+Deno.test("S5 auth-bound proof bridge supplies queue and decision actor facts without browser JWT", async () => {
+  const queue = {
+    schemaVersion: SCHEMA,
+    state: "REGISTRATION_QUEUE_READY",
+    applications: [],
+    nextCursor: null,
+  };
+  const decision = {
+    schemaVersion: SCHEMA,
+    state: "REGISTRATION_DECIDED",
+    application: { applicationId: A, status: "approved", version: 2 },
+    decision: {
+      decisionId: K,
+      outcome: "approve",
+      decidedAt: "2026-09-08T09:00:00Z",
+    },
+    qualification: { effect: "granted", validUntil: input.bindingValidUntil },
+    caseAccessGranted: false,
+    replayed: false,
+  };
+  for (
+    const [route, reply] of [
+      ["queue", queue],
+      ["decision", decision],
+    ] as const
+  ) {
+    const rpc: Array<{ body: Record<string, unknown>; headers: Headers }> = [];
+    const proof =
+      "Bearer e30.eyJhdWQiOiJsYWliZTpkcnMtc2Vzc2lvbi1iZmYifQ.cHJvb2Y";
+    const cookie = "__Host-laibe-drs-session=opaque-cookie";
+    let guardCalls = 0;
+    const handler = createRegistrationGovernanceHandler(route, {
+      env: {
+        get: (name: string) =>
+          ({
+            SUPABASE_URL: PROJECT,
+            SUPABASE_SERVICE_ROLE_KEY:
+              "synthetic-service-key-at-least-32-characters",
+            LAIBE_DRS_APP_ORIGIN: ORIGIN,
+          } as Record<string, string>)[name],
+      },
+      now: () => NOW,
+      guard: {
+        authorize: (request: Request) => {
+          guardCalls++;
+          assert(
+            request.headers.get("authorization") === proof &&
+              request.headers.get("cookie") === cookie,
+            "Guard must receive only the opaque proof and selected cookie",
+          );
+          return Promise.resolve({
+            authenticatedUserId: U,
+            specialistId: "55555555-5555-4555-8555-555555555555",
+            authorizationSubject:
+              "drs-specialist:55555555-5555-4555-8555-555555555555",
+            selectedCaseId: "66666666-6666-4666-8666-666666666666",
+            caseStatus: "active" as const,
+            accessMode: "read_only" as const,
+            proofExpiresAt: "2026-09-08T09:01:00.000Z",
+            verifiedAuthSession: {
+              userId: U,
+              authSessionId: S,
+              expiresAtEpochSeconds: NOW / 1000 + 300,
+            },
+          });
+        },
+      },
+      fetch: (_url, init) => {
+        const requestInit = init as
+          | Readonly<{
+            body?: BodyInit | null;
+            headers?: HeadersInit;
+          }>
+          | undefined;
+        rpc.push({
+          body: JSON.parse(String(requestInit?.body)),
+          headers: new Headers(requestInit?.headers),
+        });
+        return Promise.resolve(Response.json(reply));
+      },
+    });
+    const body = route === "queue" ? { cursor: null } : input;
+    const response = await handler(
+      new Request(
+        `${PROJECT}/functions/v1/drs-reviewer-registration-${route}`,
+        {
+          method: "POST",
+          headers: {
+            origin: ORIGIN,
+            authorization: proof,
+            cookie,
+            "sec-fetch-site": "same-origin",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(body),
+        },
+      ),
+    );
+    assert(response.status === 200, `${route} bridge must succeed`);
+    assert(guardCalls === 1 && rpc.length === 1, "One guard and one RPC only");
+    assert(
+      rpc[0].body.p_actor_user_id === U &&
+        rpc[0].body.p_auth_session_id === S &&
+        rpc[0].body.p_jwt_expires_at === "2026-09-08T09:05:00.000Z",
+      "RPC identity and expiry must come from the server-authenticated binding",
+    );
+    assert(
+      rpc[0].headers.get("authorization") ===
+          "Bearer synthetic-service-key-at-least-32-characters" &&
+        !JSON.stringify(rpc[0].body).includes(proof) &&
+        !JSON.stringify(rpc[0].body).includes(cookie),
+      "Service role stays transport-only and no browser credential enters RPC args",
+    );
+  }
+});
+
+for (
+  const [label, status] of [
+    ["expired proof", 401],
+    ["revoked Auth session", 401],
+    ["tampered proof", 401],
+    ["tampered cookie", 401],
+    ["withdrawn authority", 403],
+    ["session verifier outage", 503],
+  ] as const
+) {
+  Deno.test(`S5 ${label} causes zero governance business writes`, async () => {
+    let rpcCalls = 0;
+    const handler = createRegistrationGovernanceHandler("decision", {
+      env: {
+        get: (name: string) =>
+          ({
+            SUPABASE_URL: PROJECT,
+            SUPABASE_SERVICE_ROLE_KEY:
+              "synthetic-service-key-at-least-32-characters",
+            LAIBE_DRS_APP_ORIGIN: ORIGIN,
+          } as Record<string, string>)[name],
+      },
+      now: () => NOW,
+      guard: {
+        authorize: () =>
+          Promise.reject(
+            new DrsIdentityError(
+              status === 401
+                ? "AUTH_REQUIRED"
+                : status === 403
+                ? "CASE_NOT_AUTHORIZED"
+                : "CONTEXT_UNAVAILABLE",
+              status,
+            ),
+          ),
+      },
+      fetch: () => {
+        rpcCalls++;
+        return Promise.resolve(Response.json({}));
+      },
+    });
+    const response = await handler(
+      new Request(
+        `${PROJECT}/functions/v1/drs-reviewer-registration-decision`,
+        {
+          method: "POST",
+          headers: {
+            origin: ORIGIN,
+            authorization: "Bearer e30.e30.cHJvb2Y",
+            cookie: "__Host-laibe-drs-session=opaque-cookie",
+            "sec-fetch-site": "same-origin",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(input),
+        },
+      ),
+    );
+    assert(response.status === status, `${label} status must remain closed`);
+    assert(rpcCalls === 0, `${label} must stop before governance RPC`);
+  });
+}
+
+Deno.test("S5 proof crossing expiry after guard stops queue and decision RPC", async () => {
+  for (const route of ["queue", "decision"] as const) {
+    let clock = NOW;
+    let rpcCalls = 0;
+    const handler = createRegistrationGovernanceHandler(route, {
+      env: {
+        get: (name: string) =>
+          ({
+            SUPABASE_URL: PROJECT,
+            SUPABASE_SERVICE_ROLE_KEY:
+              "synthetic-service-key-at-least-32-characters",
+            LAIBE_DRS_APP_ORIGIN: ORIGIN,
+          } as Record<string, string>)[name],
+      },
+      now: () => clock,
+      guard: {
+        authorize: () => {
+          clock = NOW + 60_000;
+          return Promise.resolve({
+            authenticatedUserId: U,
+            specialistId: "55555555-5555-4555-8555-555555555555",
+            authorizationSubject:
+              "drs-specialist:55555555-5555-4555-8555-555555555555",
+            selectedCaseId: "66666666-6666-4666-8666-666666666666",
+            caseStatus: "active" as const,
+            accessMode: "read_only" as const,
+            proofExpiresAt: "2026-09-08T09:01:00.000Z",
+            verifiedAuthSession: {
+              userId: U,
+              authSessionId: S,
+              expiresAtEpochSeconds: NOW / 1000 + 300,
+            },
+          });
+        },
+      },
+      fetch: () => {
+        rpcCalls++;
+        return Promise.resolve(Response.json({}));
+      },
+    });
+    const response = await handler(
+      new Request(
+        `${PROJECT}/functions/v1/drs-reviewer-registration-${route}`,
+        {
+          method: "POST",
+          headers: {
+            origin: ORIGIN,
+            authorization: "Bearer e30.e30.cHJvb2Y",
+            cookie: "__Host-laibe-drs-session=opaque-cookie",
+            "sec-fetch-site": "same-origin",
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(route === "queue" ? { cursor: null } : input),
+        },
+      ),
+    );
+    assert(response.status === 401, `${route} crossed proof expiry`);
+    assert(rpcCalls === 0, `${route} must stop before governance RPC`);
+  }
 });
