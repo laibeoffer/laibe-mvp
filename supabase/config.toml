@@ -4,7 +4,7 @@ project_id = "laibe-mvp-project"
 verify_jwt = false
 
 [functions.drs-reviewer-registration-queue]
-verify_jwt = true
+verify_jwt = false
 
 [functions.drs-reviewer-registration-decision]
 verify_jwt = true

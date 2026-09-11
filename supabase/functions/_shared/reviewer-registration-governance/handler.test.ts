@@ -28,6 +28,9 @@ function fixture(route: "queue" | "decision", reply: unknown) {
   const state = {
     live: true,
     fault: false,
+    sessionFault: false,
+    authStatus: 200,
+    authUserId: U,
     rpc: [] as Record<string, unknown>[],
   };
   const enc = (x: unknown) =>
@@ -45,10 +48,17 @@ function fixture(route: "queue" | "decision", reply: unknown) {
     now: () => NOW,
     fetch: async (url: string | URL | Request, init?: RequestInit) => {
       await Promise.resolve();
-      if (state.fault) return Response.json({}, { status: 503 });
       const path = new URL(String(url)).pathname;
-      if (path === "/auth/v1/user") return Response.json({ id: U });
+      if (path === "/auth/v1/user") {
+        if (state.fault) return Response.json({}, { status: 503 });
+        return state.authStatus >= 200 && state.authStatus <= 299
+          ? Response.json({ id: state.authUserId }, {
+            status: state.authStatus,
+          })
+          : Response.json({}, { status: state.authStatus });
+      }
       if (path.endsWith("/auth_session_validation_v1")) {
+        if (state.sessionFault) return Response.json({}, { status: 503 });
         return Response.json({
           schemaVersion: "laibe.auth-session-validation.v1",
           active: state.live,
@@ -94,6 +104,119 @@ Deno.test("S5 RED verified caller without operation authority cannot list applic
       f.state.rpc[0].p_auth_session_id === S,
     "Actor must come only from S1",
   );
+});
+
+Deno.test("S5 queue auth failures expose only fixed diagnostic stages", async () => {
+  const inputFailure = fixture("queue", {});
+  const malformed = inputFailure.request();
+  const malformedHeaders = new Headers(malformed.headers);
+  malformedHeaders.set("authorization", "Bearer e30.e30.c2ln");
+  const inputResponse = await inputFailure.handler(
+    new Request(malformed, { headers: malformedHeaders }),
+  );
+  assert(inputResponse.status === 401, "Malformed claims remain denied");
+  assert(
+    inputResponse.headers.get("x-laibe-auth-stage") === "INPUT",
+    "Input rejection has a fixed stage",
+  );
+
+  const providerFailure = fixture("queue", {});
+  providerFailure.state.authStatus = 401;
+  const providerResponse = await providerFailure.handler(
+    providerFailure.request(),
+  );
+  assert(
+    providerResponse.status === 401,
+    "Auth provider rejection remains denied",
+  );
+  assert(
+    providerResponse.headers.get("x-laibe-auth-stage") === "AUTH_PROVIDER",
+    "Auth provider rejection has a fixed stage",
+  );
+
+  const identityFailure = fixture("queue", {});
+  identityFailure.state.authStatus = 201;
+  identityFailure.state.authUserId = A;
+  const identityResponse = await identityFailure.handler(
+    identityFailure.request(),
+  );
+  assert(identityResponse.status === 401, "Identity mismatch remains denied");
+  assert(
+    identityResponse.headers.get("x-laibe-auth-stage") === "IDENTITY",
+    "Identity rejection has a fixed stage",
+  );
+
+  const sessionFailure = fixture("queue", {});
+  sessionFailure.state.live = false;
+  const sessionResponse = await sessionFailure.handler(
+    sessionFailure.request(),
+  );
+  assert(sessionResponse.status === 401, "Inactive session remains denied");
+  assert(
+    sessionResponse.headers.get("x-laibe-auth-stage") === "SESSION_STATE",
+    "Session rejection has a fixed stage",
+  );
+
+  const serviceFailure = fixture("queue", {});
+  serviceFailure.state.fault = true;
+  const serviceResponse = await serviceFailure.handler(
+    serviceFailure.request(),
+  );
+  assert(serviceResponse.status === 503, "Auth outage remains unavailable");
+  assert(
+    serviceResponse.headers.get("x-laibe-auth-stage") === "AUTH_SERVICE",
+    "Service failure has a fixed stage",
+  );
+
+  const sessionServiceFailure = fixture("queue", {});
+  sessionServiceFailure.state.sessionFault = true;
+  const sessionServiceResponse = await sessionServiceFailure.handler(
+    sessionServiceFailure.request(),
+  );
+  assert(
+    sessionServiceResponse.status === 503,
+    "Session outage remains unavailable",
+  );
+  assert(
+    sessionServiceResponse.headers.get("x-laibe-auth-stage") ===
+      "SESSION_SERVICE",
+    "Session service failure has a fixed stage",
+  );
+
+  const decision = fixture("decision", {});
+  decision.state.authStatus = 401;
+  const decisionResponse = await decision.handler(decision.request());
+  assert(
+    decisionResponse.headers.get("x-laibe-auth-stage") === null,
+    "Diagnostic stage is limited to the queue route",
+  );
+  for (
+    const response of [
+      inputResponse,
+      providerResponse,
+      identityResponse,
+      sessionResponse,
+      serviceResponse,
+      sessionServiceResponse,
+    ]
+  ) {
+    assert(
+      /^(INPUT|AUTH_PROVIDER|IDENTITY|SESSION_STATE|AUTH_SERVICE|SESSION_SERVICE)$/u
+        .test(
+          response.headers.get("x-laibe-auth-stage") ?? "",
+        ),
+      "Stage values remain bounded",
+    );
+    assert(
+      JSON.stringify(await response.json()) ===
+        JSON.stringify({
+          state: response.status === 401
+            ? "AUTH_REQUIRED"
+            : "CONTEXT_UNAVAILABLE",
+        }),
+      "Diagnostic header cannot change the closed response body",
+    );
+  }
 });
 
 Deno.test("S5 queue keysets retain PostgreSQL microseconds and UUID comparison", async () => {
@@ -147,6 +270,14 @@ Deno.test("S5 actual JWT entries declare their gateway mode and still require cu
   };
   let calls = 0;
   try {
+    const config = await Deno.readTextFile(
+      new URL("../../../config.toml", import.meta.url),
+    );
+    assert(
+      /\[functions\.drs-reviewer-registration-queue\]\r?\nverify_jwt = false/u
+        .test(config),
+      "Queue deployment config matches the custom Auth entry",
+    );
     Object.defineProperty(Deno, "env", {
       configurable: true,
       value: { get: (n: string) => env[n] },

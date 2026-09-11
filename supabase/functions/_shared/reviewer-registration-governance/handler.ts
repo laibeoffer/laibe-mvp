@@ -25,6 +25,25 @@ const ERRORS: Readonly<Record<string, number>> = Object.freeze({
   EXISTING_IDENTITY_REQUIRES_REVIEW: 409,
   CONTEXT_UNAVAILABLE: 503,
 });
+function authFailureStage(
+  stage: string,
+  outcome: string,
+  status: number,
+):
+  | "INPUT"
+  | "AUTH_PROVIDER"
+  | "IDENTITY"
+  | "AUTH_SERVICE"
+  | "SESSION_STATE"
+  | "SESSION_SERVICE" {
+  if (stage === "session") {
+    return outcome === "DENIED" ? "SESSION_STATE" : "SESSION_SERVICE";
+  }
+  if (outcome !== "DENIED") return "AUTH_SERVICE";
+  if (status >= 200 && status <= 299) return "IDENTITY";
+  if (status === 401 || status === 403) return "AUTH_PROVIDER";
+  return "INPUT";
+}
 function exact(
   v: unknown,
   keys: readonly string[],
@@ -287,13 +306,18 @@ export function createRegistrationGovernanceHandler(
     if (!https(project) || !service || service.length < 32) {
       return reply(503, { state: "CONTEXT_UNAVAILABLE" });
     }
+    let authStage: ReturnType<typeof authFailureStage> = "AUTH_SERVICE";
     const verified = await verifyAuthSession(request, {
       supabaseUrl: project,
       serviceRoleKey: service,
       fetch: fetcher,
       now,
+      observer: (stage, outcome, status) => {
+        authStage = authFailureStage(stage, outcome, status);
+      },
     });
     if (verified.state !== "verified") {
+      if (route === "queue") headers["x-laibe-auth-stage"] = authStage;
       return reply(verified.state === "denied" ? 401 : 503, {
         state: verified.state === "denied"
           ? "AUTH_REQUIRED"
