@@ -116,8 +116,8 @@ begin
     );
   end if;
 
-  select binding, credential
-  into v_binding, v_credential
+  select binding.*
+  into v_binding
   from integration.vendor_google_calendar_bindings binding
   join casework.case_members vendor_membership
     on vendor_membership.case_id = binding.case_id
@@ -133,6 +133,30 @@ begin
     and binding.sharing_revision > 0
     and binding.credential_domain is not null
     and binding.credential_domain is not distinct from credential.client_domain
+    and credential.credential_status = 'active'
+    and credential.credential_generation > 0
+    and credential.encrypted_credential like 'v2.%'
+    and credential.granted_scopes && array[
+      'https://www.googleapis.com/auth/calendar.events.owned',
+      'https://www.googleapis.com/auth/calendar.events.readonly',
+      'https://www.googleapis.com/auth/calendar.readonly'
+    ]::text[]
+  limit 1;
+
+  if not found then
+    return pg_catalog.jsonb_build_object(
+      'ok', false,
+      'state', 'temporarily_unavailable'
+    );
+  end if;
+
+  select credential.*
+  into v_credential
+  from integration.vendor_google_calendar_credentials credential
+  where credential.id = v_binding.credential_id
+    and credential.user_id = v_binding.user_id
+    and credential.google_subject = v_binding.google_subject
+    and credential.client_domain is not distinct from v_binding.credential_domain
     and credential.credential_status = 'active'
     and credential.credential_generation > 0
     and credential.encrypted_credential like 'v2.%'

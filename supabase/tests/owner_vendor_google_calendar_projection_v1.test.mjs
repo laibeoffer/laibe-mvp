@@ -138,6 +138,12 @@ test("SQL projection authority is service-only and takes no browser selectors", 
     sql,
     /grant\s+execute\s+on\s+function\s+public\.owner_vendor_google_calendar_projection_v1\s*\(\s*uuid\s*,\s*uuid\s*\)\s+to\s+service_role/i,
   );
+  assert.doesNotMatch(
+    sql,
+    /select\s+binding\s*,\s*credential\s+into\s+v_binding\s*,\s*v_credential/i,
+  );
+  assert.match(sql, /select\s+binding\.\*\s+into\s+v_binding/i);
+  assert.match(sql, /select\s+credential\.\*\s+into\s+v_credential/i);
 });
 
 test("SQL projection resolves one same-case active Vendor share and filters stale rows", async () => {
