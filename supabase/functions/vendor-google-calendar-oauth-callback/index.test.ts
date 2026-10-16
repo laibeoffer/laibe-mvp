@@ -120,3 +120,34 @@ Deno.test("registered callback delegates a current flow without legacy ACL acces
     `expected safe failed claim, got ${response.status}`,
   );
 });
+
+Deno.test("Google issuer is verified before the current callback claims state", async () => {
+  const createHandler =
+    createVendorGoogleCalendarOauthCallbackHandler as unknown as (
+      dependencies: unknown,
+    ) => (request: Request) => Response | Promise<Response>;
+  let claims = 0;
+  const handler = createHandler({
+    callbackUri: VENDOR_CALENDAR_CALLBACK_URI,
+    configured: true,
+    domain: Promise.resolve("calendar-v2"),
+    dispatch: (action: string) => {
+      if (action === "callback_claim") claims++;
+      return Promise.reject(new Error("Synthetic flow has no stored state"));
+    },
+  });
+  const callback = (issuer: string) =>
+    new Request(
+      `${VENDOR_CALENDAR_CALLBACK_URI}?state=${
+        "a".repeat(64)
+      }&code=synthetic-code&iss=${encodeURIComponent(issuer)}`,
+    );
+
+  const googleResponse = await handler(callback("https://accounts.google.com"));
+  assert(googleResponse.status === 400, "synthetic state should fail safely");
+  assert(claims === 1, "verified Google issuer should reach the v2 claim");
+
+  const forgedResponse = await handler(callback("https://example.invalid"));
+  assert(forgedResponse.status === 400, "forged issuer should fail safely");
+  assert(claims === 1, "forged issuer must not reach the v2 claim");
+});

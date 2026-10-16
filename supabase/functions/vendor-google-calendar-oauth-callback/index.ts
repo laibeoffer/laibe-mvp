@@ -21,11 +21,17 @@ export function createVendorGoogleCalendarOauthCallbackHandler(
   >[0],
 ) {
   return (request: Request): Response | Promise<Response> => {
-    const state = new URL(request.url).searchParams.get("state");
+    const url = new URL(request.url);
+    const state = url.searchParams.get("state");
     if (
       request.method !== "GET" || !state ||
       !/^[A-Za-z0-9_-]{64}$/u.test(state)
     ) return retiredResponse();
+    const issuer = url.searchParams.getAll("iss");
+    if (issuer.length === 1 && issuer[0] === "https://accounts.google.com") {
+      url.searchParams.delete("iss");
+      request = new Request(url, request);
+    }
     return createVendorCalendarConnectCallbackHandler(
       dependencies ?? createVendorCalendarRuntimeDependencies(),
     )(request);
