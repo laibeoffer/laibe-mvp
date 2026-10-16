@@ -236,3 +236,42 @@ Deno.test("callback reports unavailable configuration before claiming state", as
     console.warn = originalWarn;
   }
 });
+
+Deno.test("callback classifies unexpected query keys without logging their values", async () => {
+  const warnings: unknown[][] = [];
+  const originalWarn = console.warn;
+  console.warn = (...values: unknown[]) => warnings.push(values);
+  try {
+    const createHandler =
+      createVendorGoogleCalendarOauthCallbackHandler as unknown as (
+        dependencies: unknown,
+      ) => (request: Request) => Response | Promise<Response>;
+    const handler = createHandler({
+      callbackUri: VENDOR_CALENDAR_CALLBACK_URI,
+      configured: true,
+      domain: Promise.resolve("calendar-v2"),
+      dispatch: () => {
+        throw new Error("must not claim");
+      },
+    });
+    const response = await handler(
+      new Request(
+        `${VENDOR_CALENDAR_CALLBACK_URI}?state=${
+          "a".repeat(64)
+        }&code=synthetic-code&iss=https%3A%2F%2Faccounts.google.com&unexpected=private-value`,
+      ),
+    );
+    assert(response.status === 400, "unexpected query should fail safely");
+    assert(
+      JSON.stringify(warnings) ===
+        JSON.stringify([[
+          "calendar_callback_rejected",
+          "before_dispatch",
+          "query_invalid",
+        ]]),
+      "diagnostic should identify the query shape without logging its contents",
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
+});

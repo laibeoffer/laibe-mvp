@@ -22,6 +22,39 @@ const CALLBACK_FAILURES = new Set([
   "scope_not_supported",
   "sign_in_required",
 ]);
+const CALLBACK_QUERY_KEYS = new Set([
+  "state",
+  "code",
+  "scope",
+  "authuser",
+  "prompt",
+  "error",
+  "error_description",
+  "error_uri",
+]);
+
+function preDispatchCategory(
+  request: Request,
+  runtime: Parameters<typeof createVendorCalendarConnectCallbackHandler>[0],
+): string {
+  const url = new URL(request.url);
+  if (request.method !== "GET") return "method_invalid";
+  if (url.origin + url.pathname !== runtime.callbackUri) return "uri_mismatch";
+  if (!runtime.configured) return "setup_unavailable";
+  if (
+    [...url.searchParams.keys()].some((key) =>
+      !CALLBACK_QUERY_KEYS.has(key) || url.searchParams.getAll(key).length !== 1
+    )
+  ) return "query_invalid";
+  if (url.searchParams.has("error")) return "provider_error";
+  const state = url.searchParams.get("state");
+  const code = url.searchParams.get("code");
+  if (!state || !/^[A-Za-z0-9_-]{64}$/u.test(state)) return "state_invalid";
+  if (!code || code.length > 8192 || /\p{C}/u.test(code)) {
+    return "code_invalid";
+  }
+  return "unclassified";
+}
 
 function retiredResponse(): Response {
   return new Response(RETIRED_MESSAGE, {
@@ -83,7 +116,7 @@ export function createVendorGoogleCalendarOauthCallbackHandler(
           console.warn(
             "calendar_callback_rejected",
             phase,
-            runtime.configured ? "unclassified" : "setup_unavailable",
+            preDispatchCategory(request, runtime),
           );
         }
         return response;
