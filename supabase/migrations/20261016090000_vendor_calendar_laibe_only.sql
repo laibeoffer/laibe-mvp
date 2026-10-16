@@ -831,7 +831,7 @@ exception
       'state', 'temporarily_unavailable'
     );
 end;
-$function$
+$function$;
 
 
 alter function public.pcm_vendor_google_calendar_projection_v1(uuid)

@@ -147,3 +147,11 @@ test("PCM projection derives its case from live authority and grants no browser 
   assert.match(sql, /drs_workspace_grant_v2\s*\(\s*p_authenticated_user_id\s*,\s*v_current_case_id\s*,\s*v_authority->>'authorization_subject'\s*\)/i);
   assert.match(sql, /revoke\s+all\s+on\s+function\s+public\.pcm_vendor_google_calendar_projection_v1\s*\(\s*uuid\s*\)\s+from\s+public\s*,\s*anon\s*,\s*authenticated/i);
 });
+
+test("PCM projection function terminates before its ownership and grants", async () => {
+  const sql = await readFile(migrationUrl, "utf8");
+  assert.ok(
+    /\$function\$;\s*alter function public\.pcm_vendor_google_calendar_projection_v1/i.test(sql),
+    "PCM function closing delimiter must terminate before its ownership statement",
+  );
+});
