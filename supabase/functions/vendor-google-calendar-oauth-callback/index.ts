@@ -39,7 +39,17 @@ function preDispatchCategory(
 ): string {
   const url = new URL(request.url);
   if (request.method !== "GET") return "method_invalid";
-  if (url.origin + url.pathname !== runtime.callbackUri) return "uri_mismatch";
+  if (url.origin + url.pathname !== runtime.callbackUri) {
+    let expected: URL;
+    try {
+      expected = new URL(runtime.callbackUri);
+    } catch {
+      return "uri_config_invalid";
+    }
+    if (url.origin === expected.origin) return "uri_path_mismatch";
+    if (url.pathname === expected.pathname) return "uri_origin_mismatch";
+    return "uri_both_mismatch";
+  }
   if (!runtime.configured) return "setup_unavailable";
   if (
     [...url.searchParams.keys()].some((key) =>

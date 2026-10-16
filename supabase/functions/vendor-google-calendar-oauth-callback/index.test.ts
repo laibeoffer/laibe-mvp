@@ -275,3 +275,94 @@ Deno.test("callback classifies unexpected query keys without logging their value
     console.warn = originalWarn;
   }
 });
+
+Deno.test("callback distinguishes fixed origin and path mismatch categories", async () => {
+  const warnings: unknown[][] = [];
+  const originalWarn = console.warn;
+  console.warn = (...values: unknown[]) => warnings.push(values);
+  try {
+    const createHandler =
+      createVendorGoogleCalendarOauthCallbackHandler as unknown as (
+        dependencies: unknown,
+      ) => (request: Request) => Response | Promise<Response>;
+    const handler = createHandler({
+      callbackUri: VENDOR_CALENDAR_CALLBACK_URI,
+      configured: true,
+      domain: Promise.resolve("calendar-v2"),
+      dispatch: () => {
+        throw new Error("must not claim");
+      },
+    });
+    const originChanged = new URL(VENDOR_CALENDAR_CALLBACK_URI);
+    originChanged.hostname = "internal.example";
+    originChanged.search = `?state=${
+      "a".repeat(64)
+    }&code=synthetic-code&iss=https%3A%2F%2Faccounts.google.com`;
+    const pathChanged = new URL(originChanged);
+    pathChanged.hostname = new URL(VENDOR_CALENDAR_CALLBACK_URI).hostname;
+    pathChanged.pathname = "/internal/callback";
+    assert(
+      (await handler(new Request(originChanged))).status === 400,
+      "changed origin should fail",
+    );
+    assert(
+      (await handler(new Request(pathChanged))).status === 400,
+      "changed path should fail",
+    );
+    assert(
+      JSON.stringify(warnings) === JSON.stringify([
+        [
+          "calendar_callback_rejected",
+          "before_dispatch",
+          "uri_origin_mismatch",
+        ],
+        ["calendar_callback_rejected", "before_dispatch", "uri_path_mismatch"],
+      ]),
+      "diagnostics should distinguish only fixed mismatch categories",
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
+});
+
+Deno.test("callback diagnostic preserves a safe response with invalid callback configuration", async () => {
+  const warnings: unknown[][] = [];
+  const originalWarn = console.warn;
+  console.warn = (...values: unknown[]) => warnings.push(values);
+  try {
+    const createHandler =
+      createVendorGoogleCalendarOauthCallbackHandler as unknown as (
+        dependencies: unknown,
+      ) => (request: Request) => Response | Promise<Response>;
+    const handler = createHandler({
+      callbackUri: "invalid-callback-uri",
+      configured: true,
+      domain: Promise.resolve("calendar-v2"),
+      dispatch: () => {
+        throw new Error("must not claim");
+      },
+    });
+    const response = await handler(
+      new Request(
+        `${VENDOR_CALENDAR_CALLBACK_URI}?state=${
+          "a".repeat(64)
+        }&code=synthetic-code&iss=https%3A%2F%2Faccounts.google.com`,
+      ),
+    );
+    assert(
+      response.status === 400,
+      "invalid callback configuration must retain safe response",
+    );
+    assert(
+      JSON.stringify(warnings) ===
+        JSON.stringify([[
+          "calendar_callback_rejected",
+          "before_dispatch",
+          "uri_config_invalid",
+        ]]),
+      "diagnostic should log only a fixed category for invalid configuration",
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
+});
