@@ -94,6 +94,13 @@ export function createVendorGoogleCalendarOauthCallbackHandler(
       request = new Request(url, request);
     }
     const runtime = dependencies ?? createVendorCalendarRuntimeDependencies();
+    try {
+      const canonical = new URL(runtime.callbackUri);
+      canonical.search = url.search;
+      request = new Request(canonical, request);
+    } catch {
+      // Let the shared handler reject an invalid callback configuration.
+    }
     let phase = "before_dispatch";
     let reported = false;
     const observed = {
