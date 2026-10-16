@@ -1,16 +1,14 @@
-import {
-  createOAuthCallbackHandler,
-  createSupabaseGoogleCalendarOAuthDependencies,
-} from "../_shared/google-calendar/google-oauth-adapter.ts";
+const RETIRED_MESSAGE = "這個日曆連結入口已停止使用，請返回萊比重新連結日曆。";
 
-export const DEFAULT_CLOSED_STATE = "CONTEXT_UNAVAILABLE";
-export const AUTH_CLOSED_STATE = "AUTH_REQUIRED";
-
-export function createVendorGoogleCalendarOauthCallbackHandler(
-  dependencies: Parameters<typeof createOAuthCallbackHandler>[1] =
-    createSupabaseGoogleCalendarOAuthDependencies("pro"),
-) {
-  return createOAuthCallbackHandler("pro", dependencies);
+export function createVendorGoogleCalendarOauthCallbackHandler() {
+  return (_request: Request): Response =>
+    new Response(RETIRED_MESSAGE, {
+      status: 410,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+      },
+    });
 }
 
 if (typeof Deno !== "undefined" && import.meta.main) {

@@ -19,7 +19,7 @@ type CalendarSelection = Readonly<
   {
     selectionRef: string;
     calendarId: string;
-    shareMode: "busy_only" | "title_time";
+    shareMode: "full_detail";
   }
 >;
 export type CalendarReadEvent = Readonly<
@@ -30,6 +30,8 @@ export type CalendarReadEvent = Readonly<
     start: string;
     end: string;
     title?: string;
+    description?: string;
+    location?: string;
   }
 >;
 export type CalendarCredential = Readonly<
@@ -124,15 +126,33 @@ function projectReadEvent(
     start,
     end,
   };
-  if (selection.shareMode === "title_time") {
-    if (
-      value.summary !== undefined &&
-      (typeof value.summary !== "string" || value.summary.length > 200 ||
-        /\p{C}/u.test(value.summary))
-    ) throw new ProviderBoundaryError("incomplete");
-    return { ...event, title: value.summary ?? "" };
+  if (selection.shareMode !== "full_detail") {
+    throw new ProviderBoundaryError("incomplete");
   }
-  return event;
+  const details = [
+    [value.summary, 1024],
+    [value.description, 16_384],
+    [value.location, 2048],
+  ] as const;
+  for (const [detail, maximum] of details) {
+    if (
+      detail !== undefined &&
+      (typeof detail !== "string" || detail.length > maximum ||
+        Array.from(detail).some((char) => {
+          const code = char.codePointAt(0) ?? 0;
+          return code <= 8 || (code >= 11 && code <= 31) ||
+            (code >= 127 && code <= 159) ||
+            (code >= 0x202a && code <= 0x202e) ||
+            (code >= 0x2066 && code <= 0x2069);
+        }))
+    ) throw new ProviderBoundaryError("incomplete");
+  }
+  return {
+    ...event,
+    title: typeof value.summary === "string" ? value.summary : "",
+    description: typeof value.description === "string" ? value.description : "",
+    location: typeof value.location === "string" ? value.location : "",
+  };
 }
 
 export async function sealCalendarV2(
@@ -497,13 +517,13 @@ export function createGoogleCalendarProvider(config: ProviderConfig) {
       if (
         !from || !to || Date.parse(to) <= Date.parse(from) ||
         Date.parse(to) - Date.parse(from) > 31 * 86400000 ||
-        input.selections.length < 1 || input.selections.length > 8 ||
+        input.selections.length !== 1 ||
         new Set(input.selections.map((s) => s.selectionRef)).size !==
           input.selections.length ||
         input.selections.some((s) =>
           !boundedString(s.calendarId, 1024) ||
           !boundedString(s.selectionRef, 128) ||
-          !["busy_only", "title_time"].includes(s.shareMode)
+          s.shareMode !== "full_detail"
         )
       ) throw new ProviderBoundaryError("incomplete");
       const results: CalendarReadEvent[][] = new Array(input.selections.length);
@@ -529,9 +549,8 @@ export function createGoogleCalendarProvider(config: ProviderConfig) {
                 singleEvents: "true",
                 orderBy: "startTime",
                 maxResults: "250",
-                fields: `nextPageToken,items(id,status,transparency,start,end${
-                  selection.shareMode === "title_time" ? ",summary" : ""
-                })`,
+                fields:
+                  "nextPageToken,items(id,status,transparency,start,end,summary,description,location)",
               })
             ) url.searchParams.set(key, value);
             if (pageToken) url.searchParams.set("pageToken", pageToken);
@@ -569,141 +588,6 @@ export function createGoogleCalendarProvider(config: ProviderConfig) {
         Array.from({ length: Math.min(2, input.selections.length) }, worker),
       );
       return { events: results.flat() };
-    });
-  }
-  function shareCalendarWithRecipients(input: {
-    accessToken: string;
-    calendarId: string;
-    recipients: readonly string[];
-    accessLevel: "busy_only" | "calendar_details";
-    beforeWrite(): Promise<void>;
-  }) {
-    return operation(262144, 12000, async (limit) => {
-      if (!["busy_only", "calendar_details"].includes(input.accessLevel)) {
-        throw new ProviderBoundaryError("scope_not_supported");
-      }
-      if (
-        !boundedString(input.calendarId, 1024) ||
-        !Array.isArray(input.recipients) || input.recipients.length !== 2 ||
-        new Set(input.recipients).size !== 2 || input.recipients.some((x) =>
-          !boundedString(x, 254) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(x)
-        ) ||
-        typeof input.beforeWrite !== "function"
-      ) {
-        throw new ProviderBoundaryError("incomplete");
-      }
-      const base = `https://www.googleapis.com/calendar/v3/calendars/${
-        encodeURIComponent(input.calendarId)
-      }/acl`;
-      const headers = {
-        authorization: `Bearer ${input.accessToken}`,
-        "content-type": "application/json",
-      };
-      const wanted = input.accessLevel === "busy_only"
-        ? "freeBusyReader"
-        : "reader";
-      const roles = [
-        "none",
-        "freeBusyReader",
-        "reader",
-        "writerWithoutPrivateAccess",
-        "writer",
-        "owner",
-      ];
-      const rules: Record<string, unknown>[] = [], pages = new Set<string>();
-      let pageToken = "";
-      for (let page = 0; page < 3; page++) {
-        const url = new URL(base);
-        url.searchParams.set("maxResults", "100");
-        url.searchParams.set(
-          "fields",
-          "nextPageToken,items(id,etag,role,scope)",
-        );
-        if (pageToken) {
-          url.searchParams.set("pageToken", pageToken);
-        }
-        const listed = await readJson(url, { headers }, limit);
-        if (
-          !Array.isArray(listed.items) || listed.items.some((x) =>
-            !isRecord(x)
-          )
-        ) throw new ProviderBoundaryError("incomplete");
-        rules.push(...listed.items as Record<string, unknown>[]);
-        if (rules.length > 250) throw new ProviderBoundaryError("incomplete");
-        if (!listed.nextPageToken) break;
-        if (
-          page === 2 || !boundedString(listed.nextPageToken, 2048) ||
-          pages.has(listed.nextPageToken)
-        ) throw new ProviderBoundaryError("incomplete");
-        pageToken = listed.nextPageToken;
-        pages.add(pageToken);
-      }
-      const receipts: {
-        recipient: string;
-        ruleId: string;
-        etag: string;
-        role: string;
-        preservedHigherAccess: boolean;
-      }[] = [];
-      for (const recipient of input.recipients) {
-        const matching = rules.filter((x) =>
-          isRecord(x.scope) && x.scope.type === "user" &&
-          x.scope.value === recipient
-        );
-        if (matching.length > 1) throw new ProviderBoundaryError("incomplete");
-        let rule = matching[0];
-        if (
-          rule &&
-          (!boundedString(rule.id, 2048) || !boundedString(rule.etag, 512) ||
-            !roles.includes(String(rule.role)))
-        ) {
-          throw new ProviderBoundaryError("revision_conflict");
-        }
-        // Connecting this case must not remove access already granted in Google Calendar.
-        const effectiveRole =
-          rule && roles.indexOf(String(rule.role)) >= roles.indexOf(wanted)
-            ? String(rule.role)
-            : wanted;
-        if (!rule || rule.role !== effectiveRole) {
-          await input.beforeWrite();
-          const url = new URL(
-            rule ? `${base}/${encodeURIComponent(rule.id as string)}` : base,
-          );
-          url.searchParams.set("sendNotifications", "false");
-          rule = await readJson(url, {
-            method: rule ? "PUT" : "POST",
-            headers: rule
-              ? { ...headers, "if-match": rule.etag as string }
-              : headers,
-            body: JSON.stringify({
-              role: wanted,
-              scope: { type: "user", value: recipient },
-            }),
-          }, limit);
-        }
-        if (!boundedString(rule.id, 2048)) {
-          throw new ProviderBoundaryError("incomplete");
-        }
-        const verified = await readJson(
-          `${base}/${encodeURIComponent(rule.id)}`,
-          { headers },
-          limit,
-        );
-        if (
-          verified.id !== rule.id || !boundedString(verified.etag, 512) ||
-          verified.role !== effectiveRole ||
-          !isRecord(verified.scope) || verified.scope.type !== "user" ||
-          verified.scope.value !== recipient
-        ) throw new ProviderBoundaryError("revision_conflict");
-        receipts.push({
-          recipient,
-          ruleId: rule.id,
-          etag: verified.etag,
-          role: effectiveRole,
-          preservedHigherAccess: effectiveRole !== wanted,
-        });
-      }
-      return { receipts };
     });
   }
   function upsertAcceptanceEvent(input: {
@@ -845,7 +729,6 @@ export function createGoogleCalendarProvider(config: ProviderConfig) {
     resolveSubject,
     listOwnedCalendars,
     readSelectedEvents,
-    shareCalendarWithRecipients,
     upsertAcceptanceEvent,
   };
 }

@@ -369,13 +369,12 @@ function bindingResult(value: Record<string, unknown>) {
   if (value.state === "connected") {
     if (
       !ref(value.binding_ref) || !number(value.sharing_revision, 1) ||
-      !Array.isArray(value.selections) || value.selections.length < 1 ||
-      value.selections.length > 8
+      !Array.isArray(value.selections) || value.selections.length !== 1
     ) fail("setup_unavailable", 503);
     result.selections = value.selections.map((s) => {
       if (
         !isRecord(s) || !ref(s.selection_ref) || !string(s.label, 200) ||
-        !["busy_only", "title_time"].includes(String(s.share_mode))
+        s.share_mode !== "full_detail"
       ) fail("setup_unavailable", 503);
       return {
         selectionRef: s.selection_ref,
@@ -680,14 +679,7 @@ export function createVendorCalendarSharingHandler(d: RuntimeDependencies) {
     ],
     ["schemaVersion", "action"],
     async (request, body) => {
-      if (body.action === "share") {
-        return await performCalendarMutation(
-          request,
-          body,
-          "share",
-          d,
-        );
-      }
+      if (body.action === "share") fail("read_only_sharing", 403);
       const input = sharingInput(body);
       if (input.action === "unlink") {
         const { value } = await call(request, d, "unlink", {
@@ -749,6 +741,7 @@ export function createVendorCalendarSharingHandler(d: RuntimeDependencies) {
         ) fail("reconsent_required");
         let selected: Record<string, unknown>[] = [];
         if (input.action === "save") {
+          if (input.choices.length !== 1) fail("flow_invalid");
           selected = input.choices.map((choice) => {
             const cached = (loaded.value.choices as unknown[]).find((c) =>
               isRecord(c) && c.choice_ref === choice.choiceRef
@@ -869,8 +862,7 @@ export function createVendorCalendarEventsReadHandler(d: RuntimeDependencies) {
           !number(value.credential_generation, 1) ||
           !string(value.google_subject, 255) ||
           typeof value.encrypted_credential !== "string" ||
-          !Array.isArray(value.selections) || value.selections.length < 1 ||
-          value.selections.length > 8
+          !Array.isArray(value.selections) || value.selections.length !== 1
         ) {
           fail("reconnect_required");
         }
@@ -931,7 +923,7 @@ export function createVendorCalendarEventsReadHandler(d: RuntimeDependencies) {
         if (
           !isRecord(s) || !ref(s.selection_ref) ||
           !string(s.calendar_id, 1024) ||
-          (s.share_mode !== "busy_only" && s.share_mode !== "title_time")
+          s.share_mode !== "full_detail"
         ) fail("reconnect_required");
         return {
           selectionRef: s.selection_ref,
@@ -967,9 +959,9 @@ export function createVendorCalendarEventsReadHandler(d: RuntimeDependencies) {
           start: event.start,
           end: event.end,
         };
-        if (selection.shareMode === "title_time") {
-          result.title = event.title ?? "";
-        }
+        result.title = event.title ?? "";
+        result.description = event.description ?? "";
+        result.location = event.location ?? "";
         return result;
       }));
       await call(request, d, "read_check", {
@@ -999,297 +991,12 @@ function readOnlyMutation(d: RuntimeDependencies) {
         new CalendarFailure("read_only_sharing", 403),
       );
 }
-async function performCalendarMutation(
-  request: Request,
-  body: Record<string, unknown>,
-  kind: "share" | "create" | "update",
-  d: RuntimeDependencies,
-) {
-  const input = parseVendorCalendarMutationRequest(body, kind);
-  if (!input) fail("invalid_request", 400);
-  const expected = {
-    binding_ref: input.bindingRef,
-    expected_sharing_revision: input.expectedSharingRevision,
-  };
-  const loaded = await call(request, d, "read_prepare", expected),
-    domain = await d.domain;
-  let value = loaded.value;
-  function validateCredential() {
-    if (
-      value.state !== "connected" || value.binding_ref !== input!.bindingRef ||
-      value.sharing_revision !== input!.expectedSharingRevision ||
-      value.user_id !== loaded.context.userId ||
-      value.case_id !== loaded.context.caseId ||
-      value.client_domain !== domain ||
-      !number(value.credential_generation, 1) ||
-      !string(value.google_subject, 255) ||
-      typeof value.encrypted_credential !== "string" ||
-      !Array.isArray(value.selections)
-    ) fail("reconnect_required");
-  }
-  validateCredential();
-  let tokens = credential(
-    await d.unseal(
-      value.encrypted_credential as string,
-      credentialBinding(
-        loaded.context.userId,
-        value.google_subject as string,
-        domain,
-        value.credential_generation as number,
-      ),
-    ),
-  );
-  async function providerFailure(state: string): Promise<never> {
-    if (state === "reconnect_required") {
-      await call(request, d, "mark_reconnect", {
-        ...expected,
-        credential_generation: value.credential_generation,
-      }, loaded.context);
-    }
-    return fail(
-      state === "not_found" ? "revision_conflict" : state,
-      state === "revision_conflict" ? 409 : 503,
-    );
-  }
-  if (Date.parse(tokens.expiresAt) <= d.now() + 30000) {
-    if (!tokens.refreshToken) fail("reconsent_required");
-    await call(request, d, "read_check", {
-      ...expected,
-      credential_generation: value.credential_generation,
-    }, loaded.context);
-    const refreshed = await d.provider.refreshAccessToken(
-      tokens.refreshToken,
-      tokens.scopes,
-    );
-    if (!refreshed.ok) return await providerFailure(refreshed.state);
-    tokens = credential(refreshed.credential);
-    const sealed = await d.seal(
-      tokens,
-      credentialBinding(
-        loaded.context.userId,
-        value.google_subject as string,
-        domain,
-        (value.credential_generation as number) + 1,
-      ),
-    );
-    value = (await call(request, d, "refresh_commit", {
-      ...expected,
-      credential_generation: value.credential_generation,
-      encrypted_credential: sealed,
-      token_expires_at: tokens.expiresAt,
-      granted_scopes: tokens.scopes,
-    }, loaded.context)).value;
-    validateCredential();
-  }
-  const selection = (value.selections as unknown[]).find((x) =>
-    isRecord(x) && x.selection_ref === input.selectionRef
-  );
-  if (!isRecord(selection) || !string(selection.calendar_id, 1024)) {
-    fail("revision_conflict");
-  }
-  const checkInput = {
-    ...expected,
-    selection_ref: input.selectionRef,
-    credential_generation: value.credential_generation,
-  };
-  const requestPayload = kind === "share"
-    ? { access_level: input.accessLevel }
-    : {
-      event_kind: input.eventKind,
-      start: input.start,
-      end: input.end,
-      ...(kind === "update"
-        ? {
-          event_ref: input.eventRef,
-          expected_event_revision: input.expectedEventRevision,
-        }
-        : {}),
-    };
-  const prepared = await call(request, d, "mutation_prepare", {
-    ...checkInput,
-    kind,
-    request_ref: input.requestRef,
-    request_payload: requestPayload,
-  }, loaded.context);
-  const op = prepared.value.operation;
-  if (
-    !isRecord(op) || !ref(op.operation_ref) ||
-    op.request_ref !== input.requestRef ||
-    op.user_id !== loaded.context.userId ||
-    op.case_id !== loaded.context.caseId ||
-    op.kind !== kind || op.selection_ref !== input.selectionRef ||
-    op.sharing_revision !== input.expectedSharingRevision ||
-    !isRecord(op.desired) ||
-    typeof op.content_digest !== "string" ||
-    !/^[a-f0-9]{64}$/u.test(op.content_digest) ||
-    prepared.value.calendar_id !== selection.calendar_id
-  ) fail("setup_unavailable", 503);
-  const operationRef = op.operation_ref;
-  function publicResult(operation: Record<string, unknown>) {
-    const result = operation.result;
-    if (operation.operation_status !== "committed" || !isRecord(result)) {
-      fail("operation_pending");
-    }
-    if (kind === "share") {
-      const wanted = input!.accessLevel === "busy_only"
-        ? "freeBusyReader"
-        : "reader";
-      const allowed = wanted === "freeBusyReader"
-        ? [
-          "freeBusyReader",
-          "reader",
-          "writerWithoutPrivateAccess",
-          "writer",
-          "owner",
-        ]
-        : ["reader", "writerWithoutPrivateAccess", "writer", "owner"];
-      if (
-        result.state !== "shared" || result.recipientCount !== 2 ||
-        result.requestedAccessLevel !== input!.accessLevel ||
-        !Array.isArray(result.recipients) || result.recipients.length !== 2 ||
-        !isRecord(operation.desired) ||
-        !Array.isArray(operation.desired.recipients)
-      ) fail("setup_unavailable", 503);
-      const expectedRecipients = operation.desired.recipients;
-      const recipients = result.recipients.map((x) => {
-        if (
-          !isRecord(x) || typeof x.email !== "string" ||
-          !expectedRecipients.includes(x.email) ||
-          typeof x.accessRole !== "string" || !allowed.includes(x.accessRole) ||
-          x.preservedHigherAccess !== (x.accessRole !== wanted)
-        ) fail("setup_unavailable", 503);
-        return {
-          email: x.email,
-          accessRole: x.accessRole,
-          preservedHigherAccess: x.preservedHigherAccess,
-        };
-      });
-      if (new Set(recipients.map((x) => x.email)).size !== 2) {
-        fail("setup_unavailable", 503);
-      }
-      return {
-        schemaVersion: SCHEMA,
-        state: "shared",
-        operationRef,
-        selectionRef: input!.selectionRef,
-        recipientCount: 2,
-        requestedAccessLevel: result.requestedAccessLevel,
-        recipients,
-      };
-    }
-    if (
-      result.state !== "saved" || !ref(result.eventRef) ||
-      !number(result.eventRevision, 1) || !string(result.title, 200) ||
-      typeof result.start !== "string" || typeof result.end !== "string"
-    ) fail("setup_unavailable", 503);
-    return {
-      schemaVersion: SCHEMA,
-      state: "saved",
-      operationRef,
-      eventRef: result.eventRef,
-      eventRevision: result.eventRevision,
-      selectionRef: input!.selectionRef,
-      title: result.title,
-      start: result.start,
-      end: result.end,
-      timeZone: "Asia/Taipei",
-    };
-  }
-  if (op.operation_status === "committed") return publicResult(op);
-  if (op.operation_status !== "pending") fail("operation_pending");
-  const operationInput = { ...checkInput, operation_ref: op.operation_ref };
-  const beforeWrite = async () => {
-    const current =
-      (await call(request, d, "mutation_check", operationInput, loaded.context))
-        .value.operation;
-    if (
-      !isRecord(current) || current.operation_ref !== op.operation_ref ||
-      current.operation_status !== "pending" ||
-      current.content_digest !== op.content_digest
-    ) fail("revision_conflict");
-  };
-  let receipt: Record<string, unknown>;
-  if (kind === "share") {
-    if (
-      op.desired.access_level !== input.accessLevel ||
-      !Array.isArray(op.desired.recipients) ||
-      op.desired.recipients.length !== 2 || op.desired.recipients.some((x) =>
-        typeof x !== "string"
-      )
-    ) fail("setup_unavailable", 503);
-    const result = await d.provider.shareCalendarWithRecipients({
-      accessToken: tokens.accessToken,
-      calendarId: selection.calendar_id,
-      recipients: op.desired.recipients as string[],
-      accessLevel: input.accessLevel!,
-      beforeWrite,
-    });
-    if (!result.ok) return await providerFailure(result.state);
-    receipt = { receipts: result.receipts };
-  } else {
-    if (
-      !ref(op.event_ref) || !string(op.desired.title, 200) ||
-      !string(op.desired.description, 1000) ||
-      op.desired.start !== input.start || op.desired.end !== input.end ||
-      op.desired.event_kind !== input.eventKind ||
-      (kind === "update" &&
-        (op.event_ref !== input.eventRef ||
-          op.expected_event_revision !== input.expectedEventRevision ||
-          !string(op.expected_etag, 512)))
-    ) fail("setup_unavailable", 503);
-    const result = await d.provider.upsertAcceptanceEvent({
-      accessToken: tokens.accessToken,
-      calendarId: selection.calendar_id,
-      providerEventId: op.event_ref.replaceAll("-", ""),
-      eventRef: op.event_ref,
-      operationRef: op.operation_ref,
-      contentDigest: op.content_digest,
-      title: op.desired.title,
-      description: op.desired.description,
-      start: input.start!,
-      end: input.end!,
-      mode: kind,
-      expectedEtag: kind === "update" ? op.expected_etag as string : undefined,
-      beforeWrite,
-    });
-    if (!result.ok) return await providerFailure(result.state);
-    receipt = result.event;
-  }
-  const committed = await call(request, d, "mutation_commit", {
-    ...operationInput,
-    result: receipt,
-  }, loaded.context);
-  if (
-    !isRecord(committed.value.operation) ||
-    committed.value.operation.operation_ref !== op.operation_ref
-  ) fail("operation_pending");
-  return publicResult(committed.value.operation);
-}
-function mutationHandler(d: RuntimeDependencies, kind: "create" | "update") {
-  const keys = [
-    "schemaVersion",
-    "bindingRef",
-    "expectedSharingRevision",
-    "selectionRef",
-    "requestRef",
-    "eventKind",
-    "start",
-    "end",
-    ...(kind === "update" ? ["eventRef", "expectedEventRevision"] : []),
-  ];
-  return handler(
-    d,
-    keys,
-    keys,
-    (request, body) => performCalendarMutation(request, body, kind, d),
-  );
-}
 export const createVendorCalendarEventsCreateHandler = (
   d: RuntimeDependencies,
-) => mutationHandler(d, "create");
+) => readOnlyMutation(d);
 export const createVendorCalendarEventsUpdateHandler = (
   d: RuntimeDependencies,
-) => mutationHandler(d, "update");
+) => readOnlyMutation(d);
 export const createVendorCalendarEventsCancelHandler = readOnlyMutation;
 
 export function createVendorCalendarRuntimeDependencies(

@@ -7,8 +7,7 @@ export const VENDOR_CALENDAR_MAX_WINDOW_DAYS = 31;
 export const VENDOR_CALENDAR_GOOGLE_SCOPES = Object.freeze([
   "openid",
   "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
-  "https://www.googleapis.com/auth/calendar.events.owned",
-  "https://www.googleapis.com/auth/calendar.acls",
+  "https://www.googleapis.com/auth/calendar.events.owned.readonly",
 ]);
 
 export type ClosedJsonResult =
@@ -17,7 +16,7 @@ export type ClosedJsonResult =
 
 export const VENDOR_CALENDAR_SHARING_SCHEMA =
   "laibe.vendor-calendar-sharing.v2";
-export type CalendarShareMode = "busy_only" | "title_time";
+export type CalendarShareMode = "full_detail";
 type SharingFlowInput = Readonly<{
   schemaVersion: typeof VENDOR_CALENDAR_SHARING_SCHEMA;
   flowRef: string;
@@ -131,7 +130,7 @@ export function parseVendorCalendarSharingRequest(
     !exactKeys(value, [...keys, "expectedSharingRevision", "choices"]) ||
     !revision(value.expectedSharingRevision, 0) ||
     !Array.isArray(value.choices) ||
-    value.choices.length < 1 || value.choices.length > 8
+    value.choices.length !== 1
   ) return null;
   const choices: Readonly<
     { choiceRef: string; shareMode: CalendarShareMode }
@@ -143,7 +142,7 @@ export function parseVendorCalendarSharingRequest(
       typeof choice.choiceRef !== "string" ||
       !OPAQUE_REF.test(choice.choiceRef) ||
       seen.has(choice.choiceRef) ||
-      (choice.shareMode !== "busy_only" && choice.shareMode !== "title_time")
+      choice.shareMode !== "full_detail"
     ) return null;
     seen.add(choice.choiceRef);
     choices.push(

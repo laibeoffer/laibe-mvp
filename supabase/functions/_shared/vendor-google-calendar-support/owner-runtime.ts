@@ -15,9 +15,7 @@ const ERROR_SCHEMA = "laibe.owner-vendor-calendar-error.v1";
 const UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 const GOOGLE_READ_SCOPES = new Set([
-  "https://www.googleapis.com/auth/calendar.events.owned",
-  "https://www.googleapis.com/auth/calendar.events.readonly",
-  "https://www.googleapis.com/auth/calendar.readonly",
+  "https://www.googleapis.com/auth/calendar.events.owned.readonly",
 ]);
 const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder();
@@ -58,6 +56,8 @@ type ProviderEvent = Readonly<{
   start: string;
   end: string;
   title?: string;
+  description?: string;
+  location?: string;
   [key: string]: unknown;
 }>;
 
@@ -709,17 +709,14 @@ function normalizeProjection(value: unknown): PrivateOwnerCalendarProjection {
     !boundedText(value.encrypted_credential, 65_536) ||
     !boundedText(value.token_expires_at, 40) ||
     !Array.isArray(value.granted_scopes) ||
-    !Array.isArray(value.selections) || value.selections.length === 0 ||
-    value.selections.length > 8
+    !Array.isArray(value.selections) || value.selections.length !== 1
   ) fail("setup_unavailable", 503);
   const selections = value.selections.map((selection) => {
     if (
       !isRecord(selection) ||
       !UUID.test(String(selection.selection_ref ?? "")) ||
       !boundedText(selection.calendar_id, 1024) ||
-      !["availability_only", "title_time"].includes(
-        String(selection.share_mode),
-      )
+      selection.share_mode !== "full_detail"
     ) fail("setup_unavailable", 503);
     return {
       selectionRef: selection.selection_ref as string,

@@ -37,12 +37,12 @@ function privateProjection(overrides: Record<string, unknown> = {}) {
     encryptedCredential: "v2.private.private",
     tokenExpiresAt: "2026-09-25T12:00:00Z",
     grantedScopes: [
-      "https://www.googleapis.com/auth/calendar.events.owned",
+      "https://www.googleapis.com/auth/calendar.events.owned.readonly",
     ],
     selections: [{
       selectionRef: SELECTION_REF,
       calendarId: "vendor-private-calendar@example.com",
-      shareMode: "title_time",
+      shareMode: "full_detail",
     }],
     ...overrides,
   };
@@ -80,7 +80,7 @@ Deno.test("Owner status returns only safe same-case sharing state", async () => 
   });
 });
 
-Deno.test("Owner event read projects titles by share mode and strips Provider fields", async () => {
+Deno.test("Owner event read projects full details and strips Provider fields", async () => {
   const { createOwnerCalendarEventsReadHandler } = await runtimeModule();
   let projectionReads = 0;
   const handler = createOwnerCalendarEventsReadHandler({
@@ -134,6 +134,8 @@ Deno.test("Owner event read projects titles by share mode and strips Provider fi
       start: "2026-09-25T10:00:00+08:00",
       end: "2026-09-25T11:00:00+08:00",
       title: "材料確認",
+      description: "private-description",
+      location: "",
     }],
   });
 });
@@ -337,7 +339,9 @@ Deno.test("real runtime dependency decrypts Vendor credential and bounds Google 
       accessToken: "access-token-placeholder",
       refreshToken: "refresh-token-placeholder",
       expiresAt: "2026-09-25T12:00:00Z",
-      scopes: ["https://www.googleapis.com/auth/calendar.events.owned"],
+      scopes: [
+        "https://www.googleapis.com/auth/calendar.events.owned.readonly",
+      ],
     },
     key,
     binding,

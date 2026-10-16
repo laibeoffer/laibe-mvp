@@ -4,7 +4,7 @@ export const OWNER_VENDOR_CALENDAR_STATUS_SCHEMA =
   "laibe.owner-vendor-calendar-status.v1" as const;
 export const OWNER_VENDOR_CALENDAR_TIME_ZONE = "Asia/Taipei" as const;
 
-export type OwnerCalendarShareMode = "availability_only" | "title_time";
+export type OwnerCalendarShareMode = "full_detail";
 export type OwnerCalendarProjectionState =
   | "ready"
   | "not_shared"
@@ -22,7 +22,9 @@ export type OwnerCalendarEvent = Readonly<{
   allDay: boolean;
   start: string;
   end: string;
-  title?: string;
+  title: string;
+  description: string;
+  location: string;
 }>;
 
 export type OwnerCalendarProjectionContext = Readonly<{
@@ -70,6 +72,21 @@ function isBoundedText(value: unknown, maxLength: number): value is string {
 
 function isTimestamp(value: unknown): value is string {
   return isBoundedText(value, 40) && Number.isFinite(Date.parse(value));
+}
+
+function safeDetail(value: unknown, maximum: number): string {
+  if (value === undefined) return "";
+  if (
+    typeof value !== "string" || value.length > maximum ||
+    Array.from(value).some((char) => {
+      const code = char.codePointAt(0) ?? 0;
+      return code <= 8 || (code >= 11 && code <= 31) ||
+        (code >= 127 && code <= 159) ||
+        (code >= 0x202a && code <= 0x202e) ||
+        (code >= 0x2066 && code <= 0x2069);
+    })
+  ) fail("temporarily_unavailable", 503);
+  return value;
 }
 
 export function parseOwnerCalendarProjectionRequest(
@@ -140,7 +157,7 @@ export function projectOwnerCalendarEvent(
   shareMode: OwnerCalendarShareMode,
 ): OwnerCalendarEvent {
   if (
-    !["availability_only", "title_time"].includes(shareMode) ||
+    shareMode !== "full_detail" ||
     !isBoundedText(value.eventRef, 128) ||
     !isBoundedText(value.selectionRef, 128) ||
     typeof value.allDay !== "boolean" ||
@@ -156,18 +173,19 @@ export function projectOwnerCalendarEvent(
     allDay: boolean;
     start: string;
     end: string;
-    title?: string;
+    title: string;
+    description: string;
+    location: string;
   } = {
     eventRef: value.eventRef,
     selectionRef: value.selectionRef,
     allDay: value.allDay,
     start: value.start,
     end: value.end,
+    title: safeDetail(value.title, 1024),
+    description: safeDetail(value.description, 16_384),
+    location: safeDetail(value.location, 2048),
   };
-
-  if (shareMode === "title_time" && isBoundedText(value.title, 300)) {
-    event.title = value.title;
-  }
   return event;
 }
 
