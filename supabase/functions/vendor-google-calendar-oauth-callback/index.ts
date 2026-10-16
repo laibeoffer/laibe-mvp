@@ -4,6 +4,24 @@ import {
 } from "../_shared/vendor-google-calendar-support/runtime.ts";
 
 const RETIRED_MESSAGE = "這個日曆連結入口已停止使用，請返回萊比重新連結日曆。";
+const CALLBACK_ACTIONS = new Set([
+  "callback_claim",
+  "callback_check",
+  "callback_subject",
+  "callback_complete",
+]);
+const CALLBACK_FAILURES = new Set([
+  "flow_invalid",
+  "flow_expired",
+  "session_changed",
+  "context_changed",
+  "case_not_authorized",
+  "revision_conflict",
+  "setup_unavailable",
+  "reconsent_required",
+  "scope_not_supported",
+  "sign_in_required",
+]);
 
 function retiredResponse(): Response {
   return new Response(RETIRED_MESSAGE, {
@@ -32,9 +50,41 @@ export function createVendorGoogleCalendarOauthCallbackHandler(
       url.searchParams.delete("iss");
       request = new Request(url, request);
     }
-    return createVendorCalendarConnectCallbackHandler(
-      dependencies ?? createVendorCalendarRuntimeDependencies(),
-    )(request);
+    const runtime = dependencies ?? createVendorCalendarRuntimeDependencies();
+    let phase = "before_dispatch";
+    let reported = false;
+    const observed = {
+      ...runtime,
+      dispatch: async (...args: Parameters<typeof runtime.dispatch>) => {
+        const [action] = args;
+        phase = CALLBACK_ACTIONS.has(action) ? action : "other";
+        try {
+          const result = await runtime.dispatch(...args);
+          if (result.ok !== true) {
+            const state = result.state;
+            const category = typeof state === "string" &&
+                CALLBACK_FAILURES.has(state)
+              ? state
+              : "unknown";
+            console.warn("calendar_callback_rejected", phase, category);
+            reported = true;
+          }
+          return result;
+        } catch (error) {
+          console.warn("calendar_callback_rejected", phase, "transport_error");
+          reported = true;
+          throw error;
+        }
+      },
+    };
+    return createVendorCalendarConnectCallbackHandler(observed)(request).then(
+      (response) => {
+        if (response.status >= 400 && !reported) {
+          console.warn("calendar_callback_rejected", phase, "unclassified");
+        }
+        return response;
+      },
+    );
   };
 }
 

@@ -151,3 +151,46 @@ Deno.test("Google issuer is verified before the current callback claims state", 
   assert(forgedResponse.status === 400, "forged issuer should fail safely");
   assert(claims === 1, "forged issuer must not reach the v2 claim");
 });
+
+Deno.test("callback failure records only a bounded phase and error category", async () => {
+  const warnings: unknown[][] = [];
+  const originalWarn = console.warn;
+  console.warn = (...values: unknown[]) => {
+    warnings.push(values);
+  };
+  try {
+    const createHandler =
+      createVendorGoogleCalendarOauthCallbackHandler as unknown as (
+        dependencies: unknown,
+      ) => (request: Request) => Response | Promise<Response>;
+    const handler = createHandler({
+      callbackUri: VENDOR_CALENDAR_CALLBACK_URI,
+      configured: true,
+      domain: Promise.resolve("calendar-v2"),
+      dispatch: () =>
+        Promise.resolve({
+          ok: false,
+          state: "code=private-code&state=private-state",
+        }),
+    });
+    const response = await handler(
+      new Request(
+        `${VENDOR_CALENDAR_CALLBACK_URI}?state=${
+          "a".repeat(64)
+        }&code=synthetic-code&iss=https%3A%2F%2Faccounts.google.com`,
+      ),
+    );
+    assert(response.status === 400, "failed claim should remain safe");
+    assert(
+      JSON.stringify(warnings) ===
+        JSON.stringify([[
+          "calendar_callback_rejected",
+          "callback_claim",
+          "unknown",
+        ]]),
+      "diagnostic must contain only a fixed phase and category",
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
+});
