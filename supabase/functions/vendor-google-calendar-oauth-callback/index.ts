@@ -80,7 +80,11 @@ export function createVendorGoogleCalendarOauthCallbackHandler(
     return createVendorCalendarConnectCallbackHandler(observed)(request).then(
       (response) => {
         if (response.status >= 400 && !reported) {
-          console.warn("calendar_callback_rejected", phase, "unclassified");
+          console.warn(
+            "calendar_callback_rejected",
+            phase,
+            runtime.configured ? "unclassified" : "setup_unavailable",
+          );
         }
         return response;
       },
