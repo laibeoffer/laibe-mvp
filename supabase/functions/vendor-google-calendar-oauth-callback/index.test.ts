@@ -1,4 +1,5 @@
 import { createVendorGoogleCalendarOauthCallbackHandler } from "./index.ts";
+import { VENDOR_CALENDAR_CALLBACK_URI } from "../_shared/vendor-google-calendar-support/contracts.ts";
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -81,4 +82,41 @@ Deno.test("retired Calendar callback returns the same safe 410 without side effe
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+Deno.test("Calendar v2 uses the registered legacy callback URI", () => {
+  assert(
+    VENDOR_CALENDAR_CALLBACK_URI ===
+      "https://zdwuyomhswjcbbpbhpcq.supabase.co/functions/v1/vendor-google-calendar-oauth-callback",
+    "Calendar v2 must return through the registered callback",
+  );
+});
+
+Deno.test("registered callback delegates a current flow without legacy ACL access", async () => {
+  let claims = 0;
+  const createHandler =
+    createVendorGoogleCalendarOauthCallbackHandler as unknown as (
+      dependencies: unknown,
+    ) => (request: Request) => Response | Promise<Response>;
+  const handler = createHandler({
+    callbackUri: VENDOR_CALENDAR_CALLBACK_URI,
+    configured: true,
+    domain: Promise.resolve("calendar-v2"),
+    dispatch: (action: string) => {
+      if (action === "callback_claim") claims++;
+      return Promise.reject(new Error("Synthetic flow has no stored state"));
+    },
+  });
+  const response = await handler(
+    new Request(
+      `${VENDOR_CALENDAR_CALLBACK_URI}?state=${
+        "a".repeat(64)
+      }&code=synthetic-code`,
+    ),
+  );
+  assert(claims === 1, `expected one v2 claim, got ${claims}`);
+  assert(
+    response.status === 400,
+    `expected safe failed claim, got ${response.status}`,
+  );
 });

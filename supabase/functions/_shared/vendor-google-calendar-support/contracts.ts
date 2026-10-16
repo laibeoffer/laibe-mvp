@@ -1,5 +1,5 @@
 export const VENDOR_CALENDAR_CALLBACK_URI =
-  "https://zdwuyomhswjcbbpbhpcq.supabase.co/functions/v1/vendor-google-calendar-connect-callback";
+  "https://zdwuyomhswjcbbpbhpcq.supabase.co/functions/v1/vendor-google-calendar-oauth-callback";
 export const VENDOR_CALENDAR_TIME_ZONE = "Asia/Taipei";
 export const VENDOR_CALENDAR_SITE_ORIGIN =
   "https://laibe-drs-owner-vendor-20260908.blueleft120.chatgpt.site";
